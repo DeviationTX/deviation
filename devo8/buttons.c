@@ -1,0 +1,55 @@
+#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/f1/gpio.h>
+#include "../tx.h"
+
+static const u16 columns[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
+static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};
+#define COL_PORT GPIOB
+#define COL_PORT_MASK (GPIO6 | GPIO7 | GPIO8 | GPIO9)
+#define ROW_PORT GPIOE
+
+
+void Initialize_ButtonMatrix()
+{
+  /* Enable AFIO */
+  rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_AFIOEN);
+
+  /* Remap GPIO_Remap_SWJ_JTAGDisable */
+  AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON;
+
+  /* Enable GPIOB & GPIOE */
+  rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+  rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
+  
+  /* PortB 6-9 are open-drain output */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                GPIO_CNF_OUTPUT_PUSHPULL, GPIO6 | GPIO7 | GPIO8 | GPIO9);
+
+  /* PB.6 = 1, PB.7 = 0, PB.8 = 1, PB.9 = 1 */
+  gpio_set(GPIOB, GPIO6 | GPIO8 | GPIO9);
+  gpio_clear(GPIOB, GPIO7);
+
+  /* PortE 2-6 are pull-up inputs */
+  gpio_set_mode(GPIOE, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_PULL_UPDOWN, GPIO2 | GPIO3 | GPIO4 | GPIO5 | GPIO6);
+  gpio_set(GPIOE, GPIO2 | GPIO3 | GPIO4 | GPIO5 | GPIO6);
+}
+u32 ScanButtons()
+{
+    u8 idx = 0;
+    u32 result = 0;
+    const u16 *c, *r;
+    gpio_set(COL_PORT, COL_PORT_MASK);
+    for(c = columns; *c != 0xffff; c++) {
+        gpio_clear(COL_PORT, *c);
+        u16 but = gpio_port_read(ROW_PORT);
+        gpio_set(COL_PORT, *c);
+        for(r = rows; *r != 0xffff; r++) {
+            if(but & *r) {
+                result |= (1 << idx);
+            }
+            idx++;
+        }
+    }
+    return result;
+}

@@ -1,0 +1,9 @@
+Installation instructions:
+1) install the gnu arm toolchain including gcc, newlib, and libopencm3:
+    This is a convenient script to download and build all components:
+    https://github.com/esden/summon-arm-toolchain
+
+2) build:
+    make
+
+3) install resulting dfu using Walkera flashing software
