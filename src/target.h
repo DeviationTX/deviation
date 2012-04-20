@@ -1,5 +1,5 @@
-#ifndef _TX_H_
-#define _TX_H_
+#ifndef _TARGET_H_
+#define _TARGET_H_
 #include <stdint.h>
 
 typedef int8_t s8;
@@ -11,8 +11,6 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 
 /* General functions */
-void Delay(u32 count);
-void Hang();
 void SignOn();
 
 /* Display Functions */

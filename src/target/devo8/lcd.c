@@ -17,6 +17,7 @@
 #include <libopencm3/stm32/fsmc.h>
 #include <libopencm3/stm32/timer.h>
 #include "target.h"
+#include "misc.h"
 
 #define LCD_REG_ADDR  ((uint32_t)FSMC_BANK1_BASE)    /* Register Address */
 #define LCD_DATA_ADDR  ((uint32_t)FSMC_BANK1_BASE + 0x20000)  /* Data Address */

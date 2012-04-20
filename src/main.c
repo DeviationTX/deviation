@@ -14,22 +14,7 @@
 */
 
 #include "target.h"
-
-void Delay(u32 count)
-{
-    while(count) {
-        int i = 72000;
-        while(i)
-            i--;
-        count--;
-    }
-}
-
-void Hang()
-{
-    while(1)
-        ;
-}
+#include "misc.h"
 
 int main()
 {
