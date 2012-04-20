@@ -12,8 +12,6 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "../tx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +20,11 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Box.H>
 #include <FL/fl_draw.H>
+
+extern "C" {
+#define SKIP_PRINTF_DEFS
+#include "target.h"
+}
 
 u8 keymap[32] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
 static struct {
@@ -34,23 +37,6 @@ static struct {
     int  aileron;
     u8  powerdown;
 } gui;
-
-void Initialize_Backlight() {}
-void Initialize_ButtonMatrix() {}
-void Initialize_Clock(void) {}
-void Initialize_PowerSwitch(void) {}
-void Initialize_Channels() {}
-void Initialize_SPIFlash() {}
-void Initialize_UART() {}
-void SignOn() {}
-
-void lcd_drawstart(void) {
-    Fl::check();
-    Fl::flush();
-}
-void lcd_drawstop(void) {
-    Fl::check();
-}
 
 static Fl_Window *window;
 
@@ -130,6 +116,25 @@ public:
         return Fl_Window::handle(event);
     }
 };
+extern "C" {
+void Initialize_Backlight() {}
+void Initialize_ButtonMatrix() {}
+void Initialize_Clock(void) {}
+void Initialize_PowerSwitch(void) {}
+void Initialize_Channels() {}
+void Initialize_SPIFlash() {}
+void Initialize_UART() {}
+void Initialize_SPICYRF() {}
+void SignOn() {}
+
+void lcd_drawstart(void) {
+    Fl::check();
+    Fl::flush();
+}
+void lcd_drawstop(void) {
+    Fl::check();
+}
+
 void Initialize_LCD()
 {
   window = new mywin(320,240);
@@ -200,5 +205,8 @@ u16 ReadAileron()
 u32 ReadFlashID()
 {
     return 0;
+}
+
+
 }
 

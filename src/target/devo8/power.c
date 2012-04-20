@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/rcc.h>
-#include "../tx.h"
+#include "target.h"
 
 void Initialize_Clock(void)
 {

@@ -15,7 +15,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/adc.h>
-#include "../tx.h"
+#include "target.h"
 
 void Initialize_Channels()
 {

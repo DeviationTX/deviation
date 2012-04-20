@@ -27,6 +27,7 @@
 */
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/usart.h>
+#include "target.h"
 
 #include <stdarg.h>
 

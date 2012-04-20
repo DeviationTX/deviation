@@ -13,7 +13,7 @@
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tx.h"
+#include "target.h"
 
 void Delay(u32 count)
 {
@@ -188,6 +188,6 @@ int main()
     }
 
 #endif
-
+    return 0;
 }
 

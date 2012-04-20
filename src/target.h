@@ -55,7 +55,9 @@ void StartReceive();
 
 /* UART & Debug */
 void Initialize_UART();
+
+#ifndef SKIP_PRINTF_DEFS
 int printf(const char *format, ...);
 int sprintf(char *out, const char *format, ...);
-
+#endif
 #endif

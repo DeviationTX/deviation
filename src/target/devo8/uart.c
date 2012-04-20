@@ -15,7 +15,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/gpio.h>
-#include "../tx.h"
+#include "target.h"
 
 void Initialize_UART()
 {
@@ -63,7 +63,7 @@ void SignOn()
     printf("\n\rOpen Whatever\n\r");
     /* Check CPU type */
     printf("BootLoader    : '%s'\n\r",pBLString);
-    printf("SPI Flash     : '%X'\n\r",ReadFlashID());
+    printf("SPI Flash     : '%X'\n\r",(unsigned int)ReadFlashID());
     GetMfgData(mfgdata);
     printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n\r",
             mfgdata[0],

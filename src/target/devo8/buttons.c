@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
-//#include "../tx.h"
+#include "target.h"
 
 static const u16 columns[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};

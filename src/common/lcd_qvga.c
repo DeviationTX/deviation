@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "../tx.h"
+#include "target.h"
 
 void lcd_draw_pixel(unsigned int color);
 void lcd_drawstart(void);
