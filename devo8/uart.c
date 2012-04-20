@@ -17,9 +17,6 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include "../tx.h"
 
-#include <stdio.h>
-#include <errno.h>
-
 void Initialize_UART()
 {
     /* Enable clocks for GPIO port A (for GPIO_USART1_TX) and USART1. */
@@ -61,12 +58,21 @@ int _write(int file, char *ptr, int len)
 void SignOn()
 {
     u8 * pBLString = (u8*)0x08001000;
-
+    u8 mfgdata[6];
+    
     printf("\n\rOpen Whatever\n\r");
     /* Check CPU type */
-    printf("BootLoader : '%s'\n\r",pBLString);
-    printf("SPI Flash : '%X'\n\r",ReadFlashID());
-
+    printf("BootLoader    : '%s'\n\r",pBLString);
+    printf("SPI Flash     : '%X'\n\r",ReadFlashID());
+    GetMfgData(mfgdata);
+    printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n\r",
+            mfgdata[0],
+            mfgdata[1],
+            mfgdata[2],
+            mfgdata[3],
+            mfgdata[4],
+            mfgdata[5]);
+    
 }
 
 
