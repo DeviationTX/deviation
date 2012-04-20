@@ -1,11 +1,19 @@
 #ifndef _TX_H_
 #define _TX_H_
+#include <stdint.h>
 
-#include <libopencm3/cm3/common.h>
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 /* General functions */
 void Delay(u32 count);
 void Hang();
+void SignOn();
 
 /* Display Functions */
 void Initialize_Backlight();

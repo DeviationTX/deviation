@@ -13,8 +13,6 @@
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <libopencm3/stm32/f1/flash.h>
-
 #include "tx.h"
 
 void Delay(u32 count)
@@ -39,8 +37,6 @@ int main()
     Initialize_PowerSwitch();
     Initialize_ButtonMatrix();
     Delay(0x2710);
-
-    flash_unlock();
 
     Initialize_Clock();
 
