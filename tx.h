@@ -33,8 +33,21 @@ u16 ReadAileron();
 /* SPI Flash */
 void Initialize_SPIFlash();
 u32 ReadFlashID();
+void EraseSector(u32 sectorAddress);
+void WritePage(u32 writeAddress, u32 length, u8 * buffer);
 
-/* USART */
+/* SPI CYRF6936 */
+void Initialize_SPICYRF();
+void GetMfgData(u8 data[]);
+
+void ConfigRxTx(u32 TxRx);
+void ConfigRFChannel(u8 ch);
+void ConfigCRCSeed(u8 crc);
+void StartReceive();
+
+/* UART & Debug */
 void Initialize_UART();
+int printf(const char *format, ...);
+int sprintf(char *out, const char *format, ...);
 
 #endif

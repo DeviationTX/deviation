@@ -6,6 +6,9 @@
 #define CS_HI() gpio_set(GPIOB, GPIO2)
 #define CS_LO() gpio_clear(GPIOB, GPIO2)
 
+/*
+ *
+ */
 void Initialize_SPIFlash()
 {
     /* Enable SPI1 */
@@ -38,21 +41,154 @@ void Initialize_SPIFlash()
 
     spi_enable(SPI1);
 }
-
+/*
+ *
+ */
 u32 ReadFlashID()
 {
     u32 result;
     CS_LO();
 
-    spi_xfer(SPI1, 0x9F);
+    spi_xfer(SPI1, 0x90);
+    spi_xfer(SPI1, 0x00);
+    spi_xfer(SPI1, 0x00);
+    spi_xfer(SPI1, 0x00); /* Mfr, Dev */
     result  = (u8)spi_xfer(SPI1, 0);
     result <<= 8;
     result |= (u8)spi_xfer(SPI1, 0);
     result <<= 8;
     result |= (u8)spi_xfer(SPI1, 0);
-    
+    result <<= 8;
+    result |= (u8)spi_xfer(SPI1, 0);
+   
     CS_HI();
     return result;
 }
+/*
+ *
+ */
+void WriteFlashWriteEnable()
+{
+    CS_LO();
+    spi_xfer(SPI1, 0x06);
+    CS_HI();
+}
+/*
+ *
+ */
+void WriteFlashWriteDisable()
+{
+    CS_LO();
+    spi_xfer(SPI1, 0x04);
+    CS_HI();
+}
+/*
+ *
+ */
+void DisableHWRYBY()
+{
+    CS_LO();
+    spi_xfer(SPI1, 0x80);
+    CS_HI();
+}
+/*
+ *
+ */
+void WaitForWriteComplete()
+{
+    u8 sr;
+    CS_LO();
+    spi_xfer(SPI1, 0x05);
+    do
+    {
+        sr = spi_xfer(SPI1, 0x00);
+    }while(sr & 0x01); 
+    CS_HI();
+}
+/*
+ *
+ */
+void EraseSector(u32 sectorAddress)
+{
+    WriteFlashWriteEnable();
 
+    CS_LO();
+    spi_xfer(SPI1, 0x20);
+    spi_xfer(SPI1, (u8)(sectorAddress >> 16));
+    spi_xfer(SPI1, (u8)(sectorAddress >>  8));
+    spi_xfer(SPI1, (u8)(sectorAddress));
+    CS_HI();
 
+    WaitForWriteComplete();
+}
+/*
+ *
+ */
+void BulkErase()
+{
+    printf("BulkErase...\n\r");
+
+    WriteFlashWriteEnable();
+
+    CS_LO();
+    spi_xfer(SPI1, 0xC7);
+    CS_HI();
+
+    WaitForWriteComplete();
+}
+/*
+ * Length should be multiple of 2
+ */
+void WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
+{
+    u32 i;
+
+    printf("WriteBytes...\n\r");
+    
+    DisableHWRYBY();
+
+    WriteFlashWriteEnable();
+
+    CS_LO();
+    spi_xfer(SPI1, 0xAD);
+    spi_xfer(SPI1, (u8)(writeAddress >> 16));
+    spi_xfer(SPI1, (u8)(writeAddress >>  8));
+    spi_xfer(SPI1, (u8)(writeAddress));
+    spi_xfer(SPI1, buffer[0]);
+    spi_xfer(SPI1, buffer[1]);
+    CS_HI();
+
+    WaitForWriteComplete();
+
+    for(i=2;i<length;i+=2)
+    {
+        CS_LO();
+        spi_xfer(SPI1, 0xAD);
+        spi_xfer(SPI1, buffer[i]);
+        spi_xfer(SPI1, buffer[i+1]);
+        CS_HI();
+
+        WaitForWriteComplete();
+    }
+
+    WriteFlashWriteDisable();
+}
+/*
+ *
+ */
+void ReadBytes(u32 readAddress, u32 length, u8 * buffer)
+{
+    u32 i;
+    CS_LO();
+    spi_xfer(SPI1, 0x03);
+    spi_xfer(SPI1, (u8)(readAddress >> 16));
+    spi_xfer(SPI1, (u8)(readAddress >>  8));
+    spi_xfer(SPI1, (u8)(readAddress));
+
+    for(i=0;i<length;i++)
+    {
+        spi_xfer(SPI1, buffer[i]);
+    }
+
+    CS_HI();
+}
