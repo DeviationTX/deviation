@@ -1,9 +1,14 @@
-Installation instructions:
-1) install the gnu arm toolchain including gcc, newlib, and libopencm3:
-    This is a convenient script to download and build all components:
-    https://github.com/esden/summon-arm-toolchain
+There are multiple targets available for building the Whippet application:
 
-2) build:
-    make
+devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
+        It requires the gnu arm toolchain including gcc, newlib, and libopencm3
+        Here is a convenient script to download and build all components:
+           https://github.com/esden/summon-arm-toolchain
 
-3) install resulting dfu using Walkera flashing software
+emu_devo8: This will build on the native platform (no cross-compiler needed)
+           The main purpose of this target is to facilitate GUI development.
+
+the default target is 'devo8'
+
+To build:
+make TARGET=<target>
