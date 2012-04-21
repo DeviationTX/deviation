@@ -25,8 +25,7 @@ int main()
 
     Initialize_Clock();
 
-    Initialize_LCD();
-    Initialize_Backlight();
+    LCD_Init();
     Initialize_Channels();
 
     Initialize_SPIFlash();
@@ -35,14 +34,8 @@ int main()
     SignOn();
 	
 #ifdef BL_DUMP
-    lcd_clear(0x0000);
-    lcd_writeCharacter('D', 40,  10);    
-    lcd_writeCharacter('U', 50,  10);    
-    lcd_writeCharacter('M', 60,  10);    
-    lcd_writeCharacter('P', 70,  10);    
-    lcd_writeCharacter('I', 80,  10);    
-    lcd_writeCharacter('N', 90,  10);    
-    lcd_writeCharacter('G', 100, 10);    
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(40, 10, "Dumping");
 
     printf("Erase...\n\r");
 
@@ -61,11 +54,8 @@ int main()
     WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
     printf("Done\n\r");
 
-    lcd_clear(0x0000);
-    lcd_writeCharacter('D', 40,  10);    
-    lcd_writeCharacter('O', 50,  10);    
-    lcd_writeCharacter('N', 60,  10);    
-    lcd_writeCharacter('E', 70,  10);    
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(40, 10, "Done");
 
     while(1) 
     {
@@ -75,28 +65,22 @@ int main()
 #endif 
 
 #ifdef HELLO_WORLD
-    lcd_clear(0x0000);
-    lcd_writeCharacter('H', 40, 10);    
-    lcd_writeCharacter('E', 50, 10);    
-    lcd_writeCharacter('L', 60, 10);    
-    lcd_writeCharacter('L', 70, 10);    
-    lcd_writeCharacter('O', 80, 10);    
-    lcd_writeCharacter('W', 40, 30);    
-    lcd_writeCharacter('O', 50, 30);    
-    lcd_writeCharacter('R', 60, 30);    
-    lcd_writeCharacter('L', 70, 30);    
-    lcd_writeCharacter('D', 80, 30);    
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(40, 10, "Hello\n");
+    LCD_PrintString("World");
 
     while(1) {
         int i;
         if(CheckPowerSwitch())
             PowerDown();
         u32 buttons = ScanButtons();
+        LCD_SetXY(0, 60);
         for(i = 0; i < 32; i++)
-            lcd_writeCharacter((buttons & (1 << i)) ? '0' : '1', i << 3, 60);
+            LCD_PrintChar((buttons & (1 << i)) ? '0' : '1');
         u16 throttle = ReadThrottle();
+        LCD_PrintChar('\n');
         for(i = 11; i >= 0; i--)
-            lcd_writeCharacter((throttle & (1 << i)) ? '0' : '1', i << 3, 80);
+            LCD_PrintChar((throttle & (1 << i)) ? '0' : '1');
     }
 #endif    
 #ifdef SCANNER
@@ -129,7 +113,7 @@ int main()
         if(channel == NUM_CHANNELS)
         {
             channel = 0x04;
-            lcd_clear(0x0000);
+            LCD_Clear(0x0000);
 
             for(i=4;i<NUM_CHANNELS;i++)
             {

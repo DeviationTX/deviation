@@ -14,10 +14,15 @@ typedef uint64_t u64;
 void SignOn();
 
 /* Display Functions */
-void Initialize_Backlight();
-void Initialize_LCD();
-void lcd_writeCharacter(unsigned char character, unsigned int x, unsigned int y);
-void lcd_clear(unsigned int color);
+void LCD_Init();
+
+void LCD_PrintCharXY(unsigned int x, unsigned int y, const char c);
+void LCD_PrintChar(const char c);
+void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
+void LCD_PrintString(const char *str);
+void LCD_SetXY(unsigned int x, unsigned int y);
+void LCD_Clear(unsigned int color);
+void LCD_SetFont(unsigned int idx);
 
 /* Buttons and switches */
 void Initialize_ButtonMatrix();

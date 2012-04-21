@@ -13,145 +13,106 @@
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "target.h"
+#include "fonts_qvga.c"
 
 void lcd_draw_pixel(unsigned int color);
 void lcd_drawstart(void);
 void lcd_drawstop(void);
 void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
 
-unsigned char _0[8] = {0x1C,0x22,0x26,0x2A,0x32,0x22,0x1C,0x00};
-unsigned char _1[8] = {0x08,0x18,0x08,0x08,0x08,0x08,0x1C,0x00};
-unsigned char _2[8] = {0x1C,0x22,0x02,0x04,0x08,0x10,0x3E,0x00};
-unsigned char _3[8] = {0x3E,0x04,0x08,0x04,0x02,0x22,0x1C,0x00};
-unsigned char _4[8] = {0x04,0x0C,0x14,0x24,0x3E,0x04,0x04,0x00};
-unsigned char _5[8] = {0x3E,0x20,0x3C,0x02,0x02,0x22,0x1C,0x00};
-unsigned char _6[8] = {0x0C,0x10,0x20,0x3C,0x22,0x22,0x1C,0x00};
-unsigned char _7[8] = {0x3E,0x22,0x02,0x04,0x08,0x08,0x08,0x00};
-unsigned char _8[8] = {0x1C,0x22,0x22,0x1C,0x22,0x22,0x1C,0x00};
-unsigned char _9[8] = {0x1C,0x22,0x22,0x1E,0x02,0x04,0x18,0x00};
-unsigned char _A[8] = {0x1C,0x22,0x22,0x22,0x3E,0x22,0x22,0x00};
-unsigned char _B[8] = {0x3C,0x22,0x22,0x3C,0x22,0x22,0x3C,0x00};
-unsigned char _C[8] = {0x1C,0x22,0x20,0x20,0x20,0x22,0x1C,0x00};
-unsigned char _D[8] = {0x38,0x24,0x22,0x22,0x22,0x24,0x38,0x00};
-unsigned char _E[8] = {0x3E,0x20,0x20,0x3C,0x20,0x20,0x3E,0x00};
-unsigned char _F[8] = {0x3E,0x20,0x20,0x3C,0x20,0x20,0x20,0x00};
-unsigned char _G[8] = {0x1C,0x22,0x20,0x2E,0x22,0x22,0x1E,0x00};
-unsigned char _H[8] = {0x22,0x22,0x22,0x3E,0x22,0x22,0x22,0x00};
-unsigned char _I[8] = {0x1C,0x08,0x08,0x08,0x08,0x08,0x1C,0x00};
-unsigned char _J[8] = {0x0E,0x04,0x04,0x04,0x04,0x24,0x18,0x00};
-unsigned char _K[8] = {0x22,0x24,0x28,0x30,0x28,0x24,0x22,0x00};
-unsigned char _L[8] = {0x20,0x20,0x20,0x20,0x20,0x20,0x3E,0x00};
-unsigned char _M[8] = {0x22,0x36,0x2A,0x2A,0x22,0x22,0x22,0x00};
-unsigned char _N[8] = {0x22,0x22,0x32,0x2A,0x26,0x22,0x22,0x00};
-unsigned char _O[8] = {0x1C,0x22,0x22,0x22,0x22,0x22,0x1C,0x00};
-unsigned char _P[8] = {0x3C,0x22,0x22,0x3C,0x20,0x20,0x20,0x00};
-unsigned char _Q[8] = {0x1C,0x22,0x22,0x22,0x2A,0x24,0x1A,0x00};
-unsigned char _R[8] = {0x3C,0x22,0x22,0x3C,0x28,0x24,0x22,0x00};
-unsigned char _S[8] = {0x1E,0x20,0x20,0x1C,0x02,0x02,0x3C,0x00};
-unsigned char _T[8] = {0x3E,0x08,0x08,0x08,0x08,0x08,0x08,0x00};
-unsigned char _U[8] = {0x22,0x22,0x22,0x22,0x22,0x22,0x1C,0x00};
-unsigned char _V[8] = {0x22,0x22,0x22,0x22,0x22,0x14,0x08,0x00};
-unsigned char _W[8] = {0x22,0x22,0x22,0x2A,0x2A,0x2A,0x14,0x00};
-unsigned char _X[8] = {0x22,0x22,0x14,0x08,0x14,0x22,0x22,0x00};
-unsigned char _Y[8] = {0x22,0x22,0x22,0x14,0x08,0x08,0x08,0x00};
-unsigned char _Z[8] = {0x3E,0x02,0x04,0x08,0x10,0x20,0x3E,0x00};
-unsigned char _none[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-void lcd_writeCharacter(unsigned char character, unsigned int x, unsigned int y){
-	uint8_t i,j;
-	unsigned char *ptr;
+static struct {
+    const struct FONT_DEF *font;
+    unsigned int x_start;
+    unsigned int x;
+    unsigned int y;
+} cur_str = { &Fonts[4], 0, 0, 0};
 
-	switch(character){
-		case 'A': ptr = _A;
-			break;
-		case 'B': ptr = _B;
-			break;
-		case 'C': ptr = _C;
-			break;
-		case 'D': ptr = _D;
-			break;
-		case 'E': ptr = _E;
-			break;
-		case 'F': ptr = _F;
-			break;
-		case 'G': ptr = _G;
-			break;
-		case 'H': ptr = _H;
-			break;
-		case 'I': ptr = _I;
-			break;
-		case 'J': ptr = _J;
-			break;
-		case 'K': ptr = _K;
-			break;
-		case 'L': ptr = _L;
-			break;
-		case 'M': ptr = _M;
-			break;
-		case 'N': ptr = _N;
-			break;
-		case 'O': ptr = _O;
-			break;
-		case 'P': ptr = _P;
-			break;
-		case 'Q': ptr = _Q;
-			break;
-		case 'R': ptr = _R;
-			break;
-		case 'S': ptr = _S;
-			break;
-		case 'T': ptr = _T;
-			break;
-		case 'U': ptr = _U;
-			break;
-		case 'V': ptr = _V;
-			break;
-		case 'W': ptr = _W;
-			break;
-		case 'X': ptr = _X;
-			break;
-		case 'Y': ptr = _Y;
-			break;
-		case 'Z': ptr = _Z;
-			break;
-		case '0': ptr = _0;
-			break;
-		case '1': ptr = _1;
-			break;
-		case '2': ptr = _2;
-			break;
-		case '3': ptr = _3;
-			break;
-		case '4': ptr = _4;
-			break;
-		case '5': ptr = _5;
-			break;
-		case '6': ptr = _6;
-			break;
-		case '7': ptr = _7;
-			break;
-		case '8': ptr = _8;
-			break;
-		case '9': ptr = _9;
-			break;
-		default: ptr = _none;
-			break;
-	}
+void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
+{
+  u8 column[cur_str.font->width];
+  u8 row, col;
+  // Check if the requested character is available
+  if ((c >= cur_str.font->first_char) && (c <= cur_str.font->last_char))
+  {
+    // Retrieve appropriate columns from font data
+    for (col = 0; col < cur_str.font->width; col++)
+    {
+      // Get's first column of appropriate character
+      column[col] = cur_str.font->font_table[((c - 32) * cur_str.font->width) + col];
+    }
+  }
+  else
+  {    
+    // Requested characer is not available in this font ... send a space instead
+    for (col = 0; col < cur_str.font->width; col++)
+    {
+      column[col] = 0xFF;    // Send solid space
+    }
+  }
 
-	lcd_set_draw_area(x, y, (x+6), (y+7));
-	lcd_drawstart();
-	for(i=0; i<8; i++){
-		for(j=7;j>0; j--){
-			if(((ptr[i]>>(j-1))&0x01) == 1){
-				lcd_draw_pixel(0xFFFF);
-			}else{
-				lcd_draw_pixel(0x0000);
-			}
-		}
-	}
-	lcd_drawstop();
+  lcd_set_draw_area(x, y, x+cur_str.font->width-1, y+cur_str.font->height);
+  lcd_drawstart();
+  // Render each column
+  for (row = 8-cur_str.font->height; row < 8; row++)
+  {
+    for (col = 0; col < cur_str.font->width; col++)
+    {
+      u8 color;
+      color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
+      if(color & 0x80) {
+          lcd_draw_pixel(0xffff);
+      } else {
+          lcd_draw_pixel(0);
+      }
+    }
+  }
+  lcd_drawstop();
 }
 
-void lcd_clear(unsigned int color){
+void LCD_SetFont(unsigned int idx)
+{
+    int count = sizeof(Fonts) / sizeof(struct FONT_DEF);
+    if(idx >= count)
+        return;
+    cur_str.font = &Fonts[idx];
+}
+
+void LCD_SetXY(unsigned int x, unsigned int y)
+{
+    cur_str.x_start = x;
+    cur_str.x = x;
+    cur_str.y = y;
+}
+
+void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str)
+{
+    LCD_SetXY(x, y);
+    while(*str != 0) {
+        LCD_PrintChar(*str);
+        str++;
+    }
+}
+
+void LCD_PrintString(const char *str)
+{
+    while(*str != 0) {
+        LCD_PrintChar(*str);
+        str++;
+    }
+}
+
+void LCD_PrintChar(const char c)
+{
+    if(c == '\n') {
+        cur_str.x = cur_str.x_start;
+        cur_str.y += cur_str.font->height + 2;
+    } else {
+        LCD_PrintCharXY(cur_str.x, cur_str.y, c);
+        cur_str.x += cur_str.font->width + 1;
+    }
+}
+
+void LCD_Clear(unsigned int color){
         uint16_t zeile, spalte;
         lcd_set_draw_area(0, 0, (320-1), (240-1));
         lcd_drawstart();

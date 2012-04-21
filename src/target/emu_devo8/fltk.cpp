@@ -117,7 +117,6 @@ public:
     }
 };
 extern "C" {
-void Initialize_Backlight() {}
 void Initialize_ButtonMatrix() {}
 void Initialize_Clock(void) {}
 void Initialize_PowerSwitch(void) {}
@@ -135,7 +134,7 @@ void lcd_drawstop(void) {
     Fl::check();
 }
 
-void Initialize_LCD()
+void LCD_Init()
 {
   window = new mywin(320,240);
   window->end();
