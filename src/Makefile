@@ -9,7 +9,7 @@ AS       = $(CROSS)as
 CP       = $(CROSS)objcopy
 DUMP     = $(CROSS)objdump
 
-SRC_C    := $(SRC_C) $(wildcard *.c)
+SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/$(SCREENSIZE)/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 
@@ -32,13 +32,18 @@ $(ODIR)/%.o: target/$(TARGET)/%.c
 	mkdir $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(ODIR)/%.o: target/$(TARGET)/%.cpp
+	mkdir $(ODIR) 2>/dev/null || true
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
 $(ODIR)/%.o: common/%.c
 	mkdir $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)/%.o: target/$(TARGET)/%.cpp
+$(ODIR)/%.o: screen/$(SCREENSIZE)/%.c
 	mkdir $(ODIR) 2>/dev/null || true
-	$(CXX) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 
 # phony targets
 .PHONY: clean

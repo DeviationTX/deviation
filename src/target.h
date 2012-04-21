@@ -16,12 +16,18 @@ void SignOn();
 /* Display Functions */
 void LCD_Init();
 
+    /* Primitives */
+void LCD_DrawPixel(unsigned int color);
+void LCD_DrawStart(void);
+void LCD_DrawStop(void);
+void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
+void LCD_Clear(unsigned int color);
+    /* Strings */
 void LCD_PrintCharXY(unsigned int x, unsigned int y, const char c);
 void LCD_PrintChar(const char c);
 void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
-void LCD_Clear(unsigned int color);
 void LCD_SetFont(unsigned int idx);
 
 /* Buttons and switches */

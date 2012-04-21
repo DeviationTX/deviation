@@ -13,12 +13,7 @@
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "target.h"
-#include "fonts_qvga.c"
-
-void lcd_draw_pixel(unsigned int color);
-void lcd_drawstart(void);
-void lcd_drawstop(void);
-void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
+#include "fonts.h"
 
 static struct {
     const struct FONT_DEF *font;
@@ -50,8 +45,8 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
     }
   }
 
-  lcd_set_draw_area(x, y, x+cur_str.font->width-1, y+cur_str.font->height);
-  lcd_drawstart();
+  LCD_SetDrawArea(x, y, x+cur_str.font->width-1, y+cur_str.font->height);
+  LCD_DrawStart();
   // Render each column
   for (row = 8-cur_str.font->height; row < 8; row++)
   {
@@ -60,20 +55,22 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
       u8 color;
       color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
       if(color & 0x80) {
-          lcd_draw_pixel(0xffff);
+          LCD_DrawPixel(0xffff);
       } else {
-          lcd_draw_pixel(0);
+          LCD_DrawPixel(0);
       }
     }
   }
-  lcd_drawstop();
+  LCD_DrawStop();
 }
 
 void LCD_SetFont(unsigned int idx)
 {
-    int count = sizeof(Fonts) / sizeof(struct FONT_DEF);
-    if(idx >= count)
-        return;
+    int i;
+    for(i = 0; i <= idx; i++) {
+        if(Fonts[i].width == 0)
+            return;
+    }
     cur_str.font = &Fonts[idx];
 }
 
@@ -114,14 +111,14 @@ void LCD_PrintChar(const char c)
 
 void LCD_Clear(unsigned int color){
         uint16_t zeile, spalte;
-        lcd_set_draw_area(0, 0, (320-1), (240-1));
-        lcd_drawstart();
+        LCD_SetDrawArea(0, 0, (320-1), (240-1));
+        LCD_DrawStart();
         for(zeile = 0; zeile < 240; zeile++){
                 for(spalte = 0; spalte < 320; spalte++){
-                        lcd_draw_pixel(color);
+                        LCD_DrawPixel(color);
                 }
         }
-        lcd_drawstop();
+        LCD_DrawStop();
 
         return;
 }

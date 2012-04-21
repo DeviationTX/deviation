@@ -25,27 +25,25 @@
 #define LCD_REG  *(volatile uint16_t *)(LCD_REG_ADDR)
 #define LCD_DATA *(volatile uint16_t *)(LCD_DATA_ADDR)
 
-void Delay(uint32_t);
-
 void lcd_cmd(uint8_t addr, uint8_t data)
 {
     LCD_REG = addr;
     LCD_DATA = data;
 }
-void lcd_draw_pixel(unsigned int color)
+void LCD_DrawPixel(unsigned int color)
 {
     LCD_DATA = color;
 }
-void lcd_drawstart(void)
+void LCD_DrawStart(void)
 {
     LCD_REG = 0x22;
 }
-void lcd_drawstop(void)
+void LCD_DrawStop(void)
 {
   return;
 }
 
-void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
+void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {
   lcd_cmd(0x03, (x0>>0)); //set x0
   lcd_cmd(0x02, (x0>>8)); //set x0
@@ -59,7 +57,7 @@ void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsign
   return;
 }
 
-void LCD_InitBacklight()
+void lcd_init_backlight()
 {
 
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
@@ -164,6 +162,6 @@ void LCD_Init()
   Delay(40);
   lcd_cmd(0x28, 0x3C);
 
-  LCD_InitBacklight();
+  lcd_init_backlight();
 }
 

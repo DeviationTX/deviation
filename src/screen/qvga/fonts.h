@@ -20,6 +20,8 @@ Dt 08.06.2006
 
 /* Extern definitions */
 
+#include "target.h"
+
 struct FONT_DEF 
 {
 	u8 width;     	/* Character width for storage         */

@@ -126,11 +126,11 @@ void Initialize_UART() {}
 void Initialize_SPICYRF() {}
 void SignOn() {}
 
-void lcd_drawstart(void) {
+void LCD_DrawStart(void) {
     Fl::check();
     Fl::flush();
 }
-void lcd_drawstop(void) {
+void LCD_DrawStop(void) {
     Fl::check();
 }
 
@@ -144,7 +144,7 @@ void LCD_Init()
   Fl::wait();
 }
 
-void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
+void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {
     gui.xstart = x0;
     gui.ystart = y0;
@@ -154,7 +154,7 @@ void lcd_set_draw_area(unsigned int x0, unsigned int y0, unsigned int x1, unsign
     gui.y = y0;
 }
 
-void lcd_draw_pixel(unsigned int color)
+void LCD_DrawPixel(unsigned int color)
 {
     u8 r, g, b;
     r = (color >> 8) & 0xf8;

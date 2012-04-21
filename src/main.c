@@ -117,41 +117,41 @@ int main()
 
             for(i=4;i<NUM_CHANNELS;i++)
             {
-                lcd_area(30 + (3*i), 30, 31 + (3*i), 190);
-                lcd_drawstart();        
+                LCD_SetDrawArea(30 + (3*i), 30, 31 + (3*i), 190);
+                LCD_DrawStart();        
                 for(k=0;k<16; k++)
                 {
                     for(j=0; j<2; j++)
                     {
                         if(k < (15 - channelnoise[i]))
                         {
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
-                            lcd_draw(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
+                            LCD_DrawPixel(0xF000);
                         }
                         else
                         {
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
-                            lcd_draw(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
+                            LCD_DrawPixel(0xFFFF);
                         }
                     }
                 }
-                lcd_drawstop();
+                LCD_DrawStop();
             }
         }
     }

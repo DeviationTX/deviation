@@ -1,7 +1,8 @@
 CROSS    = arm-none-eabi-
 
-SRC_C    = $(wildcard target/$(TARGET)/*.c) common/lcd_qvga.c
+SRC_C    = $(wildcard target/$(TARGET)/*.c)
 
+SCREENSIZE = qvga
 LINKFILE = target/$(TARGET)/$(TARGET).ld
 
 CFLAGS   = -DSTM32F1 -mcpu=cortex-m3 -mthumb
