@@ -68,6 +68,7 @@ int main()
     LCD_Clear(0x0000);
     LCD_PrintStringXY(40, 10, "Hello\n");
     LCD_PrintString("World");
+    LCD_DrawCircle(200, 200, 40, 0xF800);
 
     while(1) {
         int i;

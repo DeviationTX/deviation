@@ -30,10 +30,31 @@ void lcd_cmd(uint8_t addr, uint8_t data)
     LCD_REG = addr;
     LCD_DATA = data;
 }
+
+void lcd_set_pos(unsigned int x0, unsigned int y0)
+{
+    lcd_cmd(0x03, (x0>>0)); //set x0
+    lcd_cmd(0x02, (x0>>8)); //set x0
+    lcd_cmd(0x07, (y0>>0)); //set y0
+    lcd_cmd(0x06, (y0>>8)); //set y0
+    LCD_REG = 0x22;
+}
+
 void LCD_DrawPixel(unsigned int color)
 {
     LCD_DATA = color;
 }
+
+void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
+{
+    lcd_cmd(0x03, (x>>0)); //set x0
+    lcd_cmd(0x02, (x>>8)); //set x0
+    lcd_cmd(0x07, (y>>0)); //set y0
+    lcd_cmd(0x06, (y>>8)); //set y0
+    LCD_REG = 0x22;
+    LCD_DATA = color;
+}
+
 void LCD_DrawStart(void)
 {
     LCD_REG = 0x22;

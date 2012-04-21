@@ -18,6 +18,7 @@ void LCD_Init();
 
     /* Primitives */
 void LCD_DrawPixel(unsigned int color);
+void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color);
 void LCD_DrawStart(void);
 void LCD_DrawStop(void);
 void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
@@ -29,6 +30,19 @@ void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_SetFont(unsigned int idx);
+    /* Graphics */
+void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color);
+void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color);
+void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color);
+void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color);
+void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color);
+void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);
+void LCD_FillRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);
+void LCD_DrawTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
+void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
+void LCD_DrawImageFromSPI(u16 x, u16 y, const u16 *bitmap, u16 w, u16 h);
+
+
 
 /* Buttons and switches */
 void Initialize_ButtonMatrix();

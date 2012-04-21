@@ -168,6 +168,18 @@ void LCD_DrawPixel(unsigned int color)
         gui.y++;
     }
 }
+void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
+{
+    u8 r, g, b;
+    r = (color >> 8) & 0xf8;
+    g = (color >> 3) & 0xfc;
+    b = (color << 3) & 0xf8;
+    Fl_Color c = fl_rgb_color(r, g, b);
+    fl_color(c);
+    Fl::check();
+    Fl::flush();
+    fl_point(x, y);
+}
 
 u32 ScanButtons()
 {
