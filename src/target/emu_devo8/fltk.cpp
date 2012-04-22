@@ -121,7 +121,7 @@ void Initialize_ButtonMatrix() {}
 void Initialize_Clock(void) {}
 void Initialize_PowerSwitch(void) {}
 void Initialize_Channels() {}
-void Initialize_SPIFlash() {}
+void SPIFlash_Init() {}
 void Initialize_UART() {}
 void Initialize_SPICYRF() {}
 void SignOn() {}

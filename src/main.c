@@ -28,7 +28,7 @@ int main()
     LCD_Init();
     Initialize_Channels();
 
-    Initialize_SPIFlash();
+    SPIFlash_Init();
     Initialize_SPICYRF();
     Initialize_UART();
     SignOn();
@@ -39,19 +39,19 @@ int main()
 
     printf("Erase...\n\r");
 
-    EraseSector(0x2000);
-    EraseSector(0x3000);
-    EraseSector(0x4000);
-    EraseSector(0x5000);
+    SPIFlash_EraseSector(0x2000);
+    SPIFlash_EraseSector(0x3000);
+    SPIFlash_EraseSector(0x4000);
+    SPIFlash_EraseSector(0x5000);
 
     printf("Pgm 2\n\r");
-    WriteBytes(0x2000, 0x1000, (u8*)0x08000000);
+    SPIFlash_WriteBytes(0x2000, 0x1000, (u8*)0x08000000);
     printf("Pgm 3\n\r");
-    WriteBytes(0x3000, 0x1000, (u8*)0x08001000);
+    SPIFlash_WriteBytes(0x3000, 0x1000, (u8*)0x08001000);
     printf("Pgm 4\n\r");
-    WriteBytes(0x4000, 0x1000, (u8*)0x08002000);
+    SPIFlash_WriteBytes(0x4000, 0x1000, (u8*)0x08002000);
     printf("Pgm 5\n\r");
-    WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
+    SPIFlash_WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
     printf("Done\n\r");
 
     LCD_Clear(0x0000);

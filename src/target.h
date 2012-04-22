@@ -62,10 +62,12 @@ u16 ReadElevator();
 u16 ReadAileron();
 
 /* SPI Flash */
-void Initialize_SPIFlash();
-u32 ReadFlashID();
-void EraseSector(u32 sectorAddress);
-void WritePage(u32 writeAddress, u32 length, u8 * buffer);
+void SPIFlash_Init();
+u32  SPIFlash_ReadID();
+void SPIFlash_EraseSector(u32 sectorAddress);
+void SPIFlash_BulkErase();
+void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer);
+void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 
 /* SPI CYRF6936 */
 void Initialize_SPICYRF();

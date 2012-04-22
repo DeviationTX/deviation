@@ -1,0 +1,13 @@
+The following guidelines should be followed as much as possible when writing code for this project:
+1)  Code should be in 'C' whenever possible
+2)  Exported function names should be named as <module>_<function> (i.e. SPIFlash_Init() )
+3)  Indentation should be 4 spaces
+4)  Code should compile without warnings even with -Wall
+
+Hardware specific functions are defined in target/<target>.  The goal will be to standardize the
+interface as much as possibe so that the same core code can be used for multiple transmitters.
+Whether this is actually a feasible goal remains to be seen.
+
+Screen interface functions are defined in screen/<screen>.  Each screen represents support for
+a specific screen resolution (i.e. qvga = 320x240)
+

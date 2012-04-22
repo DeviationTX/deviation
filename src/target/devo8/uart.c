@@ -63,7 +63,7 @@ void SignOn()
     printf("\n\rOpen Whatever\n\r");
     /* Check CPU type */
     printf("BootLoader    : '%s'\n\r",pBLString);
-    printf("SPI Flash     : '%X'\n\r",(unsigned int)ReadFlashID());
+    printf("SPI Flash     : '%X'\n\r",(unsigned int)SPIFlash_ReadID());
     GetMfgData(mfgdata);
     printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n\r",
             mfgdata[0],

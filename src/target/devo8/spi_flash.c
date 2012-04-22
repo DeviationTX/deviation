@@ -23,7 +23,7 @@
 /*
  *
  */
-void Initialize_SPIFlash()
+void SPIFlash_Init()
 {
     /* Enable SPI1 */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SPI1EN);
@@ -58,7 +58,7 @@ void Initialize_SPIFlash()
 /*
  *
  */
-u32 ReadFlashID()
+u32 SPIFlash_ReadID()
 {
     u32 result;
     CS_LO();
@@ -122,7 +122,7 @@ void WaitForWriteComplete()
 /*
  *
  */
-void EraseSector(u32 sectorAddress)
+void SPIFlash_EraseSector(u32 sectorAddress)
 {
     WriteFlashWriteEnable();
 
@@ -138,7 +138,7 @@ void EraseSector(u32 sectorAddress)
 /*
  *
  */
-void BulkErase()
+void SPIFlash_BulkErase()
 {
     printf("BulkErase...\n\r");
 
@@ -153,7 +153,7 @@ void BulkErase()
 /*
  * Length should be multiple of 2
  */
-void WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
+void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
 {
     u32 i;
 
@@ -190,7 +190,7 @@ void WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
 /*
  *
  */
-void ReadBytes(u32 readAddress, u32 length, u8 * buffer)
+void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 {
     u32 i;
     CS_LO();
