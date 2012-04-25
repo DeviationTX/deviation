@@ -18,7 +18,6 @@
 
 int main()
 {
-    int i = 0;
     Initialize_Clock();
 
     Initialize_PowerSwitch();
@@ -29,12 +28,12 @@ int main()
     Initialize_Channels();
 
     SPIFlash_Init();
-    Initialize_SPICYRF();
-    Initialize_UART();
+    CYRF_Initialize();
+    UART_Initialize();
     SPITouch_Init();
     SignOn();
     LCD_Clear(0x0000);
-	
+
 #ifdef BL_DUMP
     LCD_PrintStringXY(40, 10, "Dumping");
 
@@ -76,7 +75,7 @@ int main()
         LCD_PrintStringXY(10, 10, str);
         sprintf(str, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
         LCD_PrintString(str);
-        GetMfgData(mfgdata);
+        CYRF_GetMfgData(mfgdata);
         sprintf(str, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
             mfgdata[0],
             mfgdata[1],
@@ -122,21 +121,21 @@ int main()
     u8 channelnoise[NUM_CHANNELS];
     u8 channel = 0x04;
 
-    ConfigRxTx(1);
-    ConfigCRCSeed(0);
-    ConfigSOPCode(0);
+    CYRF_ConfigRxTx(1);
+    CYRF_ConfigCRCSeed(0);
+    CYRF_ConfigSOPCode(0);
 
     while(1)
     {
         if(CheckPowerSwitch())
             PowerDown();
 
-        ConfigRFChannel(channel);
-        StartReceive();
+        CYRF_ConfigRFChannel(channel);
+        CYRF_StartReceive();
         Delay(10);
 
-        ReadDataPacket(dpbuffer);
-        channelnoise[channel] = ReadRSSI(1);
+        CYRF_ReadDataPacket(dpbuffer);
+        channelnoise[channel] = CYRF_ReadRSSI(1);
 
         printf("%02X : %d\n\r",channel,channelnoise[channel]);
     

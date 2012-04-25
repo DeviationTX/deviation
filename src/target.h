@@ -80,16 +80,23 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 
 /* SPI CYRF6936 */
-void Initialize_SPICYRF();
-void GetMfgData(u8 data[]);
+void CYRF_Initialize();
+void CYRF_GetMfgData(u8 data[]);
 
-void ConfigRxTx(u32 TxRx);
-void ConfigRFChannel(u8 ch);
-void ConfigCRCSeed(u8 crc);
-void StartReceive();
+void CYRF_ConfigRxTx(u32 TxRx);
+void CYRF_ConfigRFChannel(u8 ch);
+void CYRF_ConfigCRCSeed(u8 crc);
+void CYRF_StartReceive();
+void CYRF_ConfigSOPCode(u32 idx);
+
+
+u8 CYRF_ReadRSSI(u32 dodummyread);
+void CYRF_StartReceive();
+
+void CYRF_ReadDataPacket(u8 dpbuffer[]); 
 
 /* UART & Debug */
-void Initialize_UART();
+void UART_Initialize();
 
 #ifndef SKIP_PRINTF_DEFS
 int printf(const char *format, ...);

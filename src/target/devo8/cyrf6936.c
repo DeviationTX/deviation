@@ -59,7 +59,7 @@ static void ReadRegister(u8 address, u8 data[], u8 length)
 }
 
 
-void Initialize_SPICYRF()
+void CYRF_Initialize()
 {
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
@@ -123,7 +123,7 @@ void Initialize_SPICYRF()
 /*
  *
  */
-void GetMfgData(u8 data[])
+void CYRF_GetMfgData(u8 data[])
 {
     /* Fuses power on */
     WriteRegister(0x25, 0xFF);
@@ -136,7 +136,7 @@ void GetMfgData(u8 data[])
 /*
  * 0 - Tx else Rx
  */
-void ConfigRxTx(u32 TxRx)
+void CYRF_ConfigRxTx(u32 TxRx)
 {
     if(TxRx)
     {
@@ -152,14 +152,14 @@ void ConfigRxTx(u32 TxRx)
 /*
  *
  */
-void ConfigRFChannel(u8 ch)
+void CYRF_ConfigRFChannel(u8 ch)
 {
     WriteRegister(0x00,ch);
 }
 /*
  *
  */
-void ConfigCRCSeed(u8 crc)
+void CYRF_ConfigCRCSeed(u8 crc)
 {
     WriteRegister(0x15,crc);
     WriteRegister(0x16,crc);
@@ -190,24 +190,24 @@ static const u8 sopcodes[] = {
     0x7F,0x1A,0x14,0x72
 };
 
-void ConfigSOPCode(u32 idx)
+void CYRF_ConfigSOPCode(u32 idx)
 {
     WriteRegisterMulti(0x22, &sopcodes[idx * 8], 8);
 }
 /*
  *
  */
-void StartReceive()
+void CYRF_StartReceive()
 {
     WriteRegister(0x05,0x87);
 }
 
-void ReadDataPacket(u8 dpbuffer[])
+void CYRF_ReadDataPacket(u8 dpbuffer[])
 {
     ReadRegister(0x21, dpbuffer, 0x10);
 }
 
-u8 ReadRSSI(u32 dodummyread)
+u8 CYRF_ReadRSSI(u32 dodummyread)
 {
     u8 result[1];
     if(dodummyread)

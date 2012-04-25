@@ -17,7 +17,10 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include "target.h"
 
-void Initialize_UART()
+#include <stdio.h>
+#include <string.h>
+
+void UART_Initialize()
 {
     /* Enable clocks for GPIO port A (for GPIO_USART1_TX) and USART1. */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
@@ -58,13 +61,20 @@ int _write(int file, char *ptr, int len)
 void SignOn()
 {
     u8 * pBLString = (u8*)0x08001000;
+    u8 Power =  *((u8*)0x08001007);
     u8 mfgdata[6];
+    u8 tmp[8];
     
     printf("\n\rOpen Whatever\n\r");
     /* Check CPU type */
-    printf("BootLoader    : '%s'\n\r",pBLString);
+
+    //memcpy(tmp, pBLString, 7);
+    tmp[7] = 0;
+    
+    printf("BootLoader    : '%s'\n\r",tmp);
+    printf("Power         : '%s'\n\r",Power == 0 ? "100mW" : "10mW" );
     printf("SPI Flash     : '%X'\n\r",(unsigned int)SPIFlash_ReadID());
-    GetMfgData(mfgdata);
+    CYRF_GetMfgData(mfgdata);
     printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n\r",
             mfgdata[0],
             mfgdata[1],
