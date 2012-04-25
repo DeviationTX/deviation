@@ -69,9 +69,10 @@ void SPITouch_Init()
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
 
-    /* PenIRQ */
+    /* PenIRQ is pull-up input*/
     gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO5);
+                  GPIO_CNF_INPUT_PULL_UPDOWN, GPIO5);
+    gpio_set(GPIOB, GPIO5);
 
     CS_LO();
     spi_xfer(SPI1, RESET);

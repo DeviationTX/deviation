@@ -25,7 +25,7 @@ const struct FONT_DEF Fonts[] = {
     {8, 8, 32, 128, Font8x8thn},
     {8, 8, 32, 128, Font8x8ord},
     {8, 12, 32, 57, FontCourrier8x12},
-    0,
+    {0},
     };
 
 /* System 3x6 (char #32 to #96) */
