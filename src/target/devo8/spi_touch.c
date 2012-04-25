@@ -26,14 +26,14 @@
 #define ADR_X   (5 << 4)
 
 #define MODE   (0 << 3)
-#define SER    (0 << 2)
+#define SER    (1 << 2)
 #define PD     (0 << 0)
 
 #define READ_X  START | ADR_X   | MODE | SER | PD
 #define READ_Y  START | ADR_Y   | MODE | SER | PD
 #define READ_Z1 START | ADR_Z1  | MODE | SER | PD
 #define READ_Z2 START | ADR_Z2  | MODE | SER | PD
-#define RESET   START | ADR_RST | MODE | SER | PD
+#define RESET   START | ADR_RST | MODE | SER | PD | 0x01
 
 /*
 PB0 : Chip Select
@@ -49,7 +49,7 @@ PA7 : SPI1_MOSI
 
 u8 read_channel(u8 address)
 {
-    spi_xfer(SPI1, READ_X);
+    spi_xfer(SPI1, address);
     while(pen_is_down())
         ;
     return spi_xfer(SPI1, 0x00);
@@ -57,24 +57,32 @@ u8 read_channel(u8 address)
 
 void SPITouch_Init()
 {
+#if 0
     /* Enable SPI1 */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SPI1EN);
     /* Enable GPIOA */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     /* Enable GPIOB */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
+#endif
     /* CS */
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
 
+    /* PenIRQ */
+    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_FLOAT, GPIO5);
+
+    CS_LO();
+    spi_xfer(SPI1, RESET);
+    CS_HI();
+#if 0
     /* SCK, MOSI */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO5 | GPIO7);
     /* MISO */
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
                   GPIO_CNF_INPUT_FLOAT, GPIO6);
-    CS_HI();
     /* Includes enable */
     spi_init_master(SPI1, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_4,
@@ -86,6 +94,7 @@ void SPITouch_Init()
     spi_set_nss_high(SPI1);
 
     spi_enable(SPI1);
+#endif
 }
 
 struct touch SPITouch_GetCoords()
@@ -98,5 +107,10 @@ struct touch SPITouch_GetCoords()
     res.z2 = read_channel(READ_Z2);
     CS_HI();
     return res;
+}
+
+int SPITouch_IRQ()
+{
+    return pen_is_down();
 }
 

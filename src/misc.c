@@ -3,7 +3,7 @@
 void Delay(u32 count)
 {
     while(count) {
-        int i = 72000;
+        int i = 0; //72000;
         while(i)
             i--;
         count--;

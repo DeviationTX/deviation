@@ -51,6 +51,7 @@ struct touch {
 };
 void SPITouch_Init();
 struct touch SPITouch_GetCoords();
+int SPITouch_IRQ();
 
 
 /* Buttons and switches */

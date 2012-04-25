@@ -18,12 +18,12 @@
 
 int main()
 {
+    int i = 0;
+    Initialize_Clock();
 
     Initialize_PowerSwitch();
     Initialize_ButtonMatrix();
     Delay(0x2710);
-
-    Initialize_Clock();
 
     LCD_Init();
     Initialize_Channels();
@@ -31,10 +31,11 @@ int main()
     SPIFlash_Init();
     Initialize_SPICYRF();
     Initialize_UART();
+    SPITouch_Init();
     SignOn();
+    LCD_Clear(0x0000);
 	
 #ifdef BL_DUMP
-    LCD_Clear(0x0000);
     LCD_PrintStringXY(40, 10, "Dumping");
 
     printf("Erase...\n\r");
@@ -64,12 +65,51 @@ int main()
     }
 #endif 
 
-#ifdef HELLO_WORLD
-    LCD_Clear(0x0000);
-    LCD_PrintStringXY(40, 10, "Hello\n");
-    LCD_PrintString("World");
-    LCD_DrawCircle(200, 200, 40, 0xF800);
+#ifdef TOUCH_TEST
+    while(1)
+    {
+        if(CheckPowerSwitch())
+            PowerDown();
+        LCD_PrintCharXY(10, 10, '0' + (SPITouch_IRQ() ? 1 : 0));
+        if(SPITouch_IRQ()) {
+            struct touch t = SPITouch_GetCoords();
+            char a[20];
+            sprintf(a, "%d\n", i++);
+            LCD_PrintStringXY(40, 10, a);
+            sprintf(a, "x: %d\n", t.x);
+            LCD_PrintString(a);
+            sprintf(a, "y: %d\n", t.y);
+            LCD_PrintString(a);
+            sprintf(a, "z1: %d\n", t.z1);
+            LCD_PrintString(a);
+            sprintf(a, "z2: %d\n", t.z2);
+            LCD_PrintString(a);
+        }
+    }
+#endif
 
+#ifdef HELLO_WORLD
+    //LCD_PrintStringXY(40, 10, "Hello\n");
+    //LCD_PrintString("World");
+    LCD_DrawCircle(200, 200, 40, 0xF800);
+    {
+        u8 * pBLString = (u8*)0x08001000;
+        char str[80];
+        u8 mfgdata[6];
+        sprintf(str, "BootLoader   : %s\n",pBLString);
+        LCD_PrintStringXY(10, 10, str);
+        sprintf(str, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
+        LCD_PrintString(str);
+        GetMfgData(mfgdata);
+        sprintf(str, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
+            mfgdata[0],
+            mfgdata[1],
+            mfgdata[2],
+            mfgdata[3],
+            mfgdata[4],
+            mfgdata[5]);
+        LCD_PrintString(str);
+    }
     while(1) {
         int i;
         if(CheckPowerSwitch())
@@ -82,6 +122,8 @@ int main()
         LCD_PrintChar('\n');
         for(i = 11; i >= 0; i--)
             LCD_PrintChar((throttle & (1 << i)) ? '0' : '1');
+        LCD_PrintChar('\n');
+        LCD_PrintChar('0' + (SPITouch_IRQ() ? 1 : 0));
     }
 #endif    
 #ifdef SCANNER

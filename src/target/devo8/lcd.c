@@ -47,10 +47,12 @@ void LCD_DrawPixel(unsigned int color)
 
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
-    lcd_cmd(0x03, (x>>0)); //set x0
+    LCD_SetDrawArea(x,y,x,y);
+/*    lcd_cmd(0x03, (x>>0)); //set x0
     lcd_cmd(0x02, (x>>8)); //set x0
     lcd_cmd(0x07, (y>>0)); //set y0
     lcd_cmd(0x06, (y>>8)); //set y0
+*/
     LCD_REG = 0x22;
     LCD_DATA = color;
 }
