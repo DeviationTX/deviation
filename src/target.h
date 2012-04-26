@@ -59,10 +59,10 @@ void Initialize_ButtonMatrix();
 u32 ScanButtons();
 
 /* Power functions */
-void Initialize_Clock(void);
-void Initialize_PowerSwitch(void);
-int CheckPowerSwitch();
-void PowerDown();
+void PWR_Init(void);
+u16  PWR_ReadVoltage(void);
+int  PWR_CheckPowerSwitch();
+void PWR_Shutdown();
 
 /* Sticks */
 void Initialize_Channels();

@@ -18,9 +18,7 @@
 
 int main()
 {
-    Initialize_Clock();
-
-    Initialize_PowerSwitch();
+    PWR_Init();
     Initialize_ButtonMatrix();
     Delay(0x2710);
 
@@ -59,8 +57,8 @@ int main()
 
     while(1) 
     {
-        if(CheckPowerSwitch())
-            PowerDown();
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
     }
 #endif 
 
@@ -87,8 +85,8 @@ int main()
     }
     while(1) {
         int i;
-        if(CheckPowerSwitch())
-            PowerDown();
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
         u32 buttons = ScanButtons();
         if(buttons != last_buttons) {
             last_buttons = buttons;
@@ -96,12 +94,15 @@ int main()
             for(i = 0; i < 32; i++)
                 LCD_PrintChar((buttons & (1 << i)) ? '0' : '1');
         }
+        u16 voltage = PWR_ReadVoltage();
+        sprintf(str, "Voltage: %2d.%03d\n", voltage >> 12, voltage & 0x0fff);
+        LCD_PrintStringXY(10, 60, str);
         u16 throttle = ReadThrottle();
         u16 rudder = ReadRudder();
         u16 aileron = ReadAileron();
         u16 elevator = ReadElevator();
         sprintf(str, "Throttle: %04X Elevator: %04X\n", throttle, elevator);
-        LCD_PrintStringXY(10, 60, str);
+        LCD_PrintString(str);
         sprintf(str, "Rudder  : %04X Aileron : %04X\n", rudder, aileron);
         LCD_PrintString(str);
         if(SPITouch_IRQ()) {
@@ -127,8 +128,8 @@ int main()
 
     while(1)
     {
-        if(CheckPowerSwitch())
-            PowerDown();
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
 
         CYRF_ConfigRFChannel(channel);
         CYRF_StartReceive();

@@ -15,29 +15,32 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include "target.h"
+#include "devo8.h"
 
-void Initialize_Clock(void)
+void PWR_Init(void)
 {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
+
+    /* Enable GPIOA so we can manage the power switch */
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+
+    /* Pin 2 controls power-down */
+    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
+
+    /* Enable GPIOA.2 to keep from shutting down */
+    gpio_set(GPIOA, GPIO2);
+
+    /* When Pin 3 goes high, the user turned off the Tx */
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_FLOAT, GPIO3);
+
+    /* Enable Voltage measurement */
+    /* ADC is configured by the 'channel' code */
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 }
 
-void Initialize_PowerSwitch(void)
-{
-  /* Enable GPIOA so we can manage the power switch */
-  rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-
-  /* Pin 2 controls power-down */
-  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
-
-  /* Enable GPIOA.2 to keep from shutting down */
-  gpio_set(GPIOA, GPIO2);
-
-  /* When Pin 3 goes high, the user turned off the Tx */
-  gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_FLOAT, GPIO3);
-}
-void PowerDown()
+void PWR_Shutdown()
 {
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(HSI);
@@ -46,7 +49,7 @@ void PowerDown()
     while(1) ;
 }
 
-int CheckPowerSwitch()
+int PWR_CheckPowerSwitch()
 {
     static u16 debounce = 0;
     if(gpio_get(GPIOA, GPIO3)) {
@@ -58,4 +61,17 @@ int CheckPowerSwitch()
         return 1;
     }
     return 0;
+}
+
+/* Return fixed-point(4.12) volatge */
+u16 PWR_ReadVoltage(void)
+{
+    u16 v_fp;
+    u32 v = ADC1_Read(14);
+    /* Compute voltage from y = 0.0021x + 0.3026 */
+    /* Multily the above by 4096 to putthe voltage in the upper nibble */
+    v = v * 1564 / 181 + 1239;
+    v_fp = v & 0xf000;
+    v_fp |= ((v & 0x0fff) * 1000) >> 12;
+    return v_fp;
 }
