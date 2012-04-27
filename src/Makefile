@@ -20,7 +20,7 @@ OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:
 CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE)
 
 $(TARGET).elf: $(LINKFILE) $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LFLAGS)
+	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 
 clean:
 	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(ODIR)/*.o

@@ -68,7 +68,7 @@ void SignOn()
     printf("\n\rOpen Whatever\n\r");
     /* Check CPU type */
 
-    //memcpy(tmp, pBLString, 7);
+    memcpy(tmp, pBLString, 7);
     tmp[7] = 0;
     
     printf("BootLoader    : '%s'\n\r",tmp);
