@@ -36,6 +36,8 @@ static struct {
     int  elevator;
     int  aileron;
     u8  powerdown;
+    u8  mouse;
+    u16 mousex, mousey;
 } gui;
 
 static Fl_Window *window;
@@ -112,18 +114,52 @@ public:
                 gui.buttons &= ~(1 << key);
             }
             return 1;
+        case FL_PUSH:
+        case FL_DRAG:
+            gui.mouse = 1;
+            gui.mousex = Fl::event_x();
+            gui.mousey = Fl::event_y();
+            return 1;
+        case FL_RELEASE:
+            gui.mouse = 0;
+            return 1;
         }
         return Fl_Window::handle(event);
     }
 };
 extern "C" {
 void Initialize_ButtonMatrix() {}
-void Initialize_Clock(void) {}
-void Initialize_PowerSwitch(void) {}
+void PWR_Init(void) {}
+u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
 void Initialize_Channels() {}
 void SPIFlash_Init() {}
-void Initialize_UART() {}
-void Initialize_SPICYRF() {}
+u32  SPIFlash_ReadID() { return 0x12345678; }
+void SPITouch_Init() {}
+struct touch SPITouch_GetCoords() {
+    struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
+    return t;
+}
+
+int SPITouch_IRQ() { return gui.mouse;}
+
+u8 *BOOTLOADER_Read(int idx) {
+    static u8 str[3][80] = {
+        "",
+        "Devo8 Emu"
+        };
+    u8 ret = 0;
+    switch(idx) {
+        case BL_ID: ret = 1; break;
+    }
+    return str[ret];
+}
+    
+void UART_Initialize() {}
+void CYRF_Initialize() {}
+void CYRF_GetMfgData(u8 data[]) { 
+    u8 d[] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    memcpy(data, d, 6);
+}
 void SignOn() {}
 
 void LCD_DrawStart(void) {
@@ -186,12 +222,12 @@ u32 ScanButtons()
     return ~gui.buttons;
 }
 
-int CheckPowerSwitch()
+int PWR_CheckPowerSwitch()
 {
     return gui.powerdown;
 }
 
-void PowerDown() {exit(0);}
+void PWR_Shutdown() {exit(0);}
 
 u16 ReadThrottle()
 {

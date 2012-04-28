@@ -67,7 +67,8 @@ int main()
     char str[80];
     LCD_DrawCircle(200, 200, 40, 0xF800);
     {
-        u8 * pBLString = (u8*)0x08001000;
+        u8 * pBLString = BOOTLOADER_Read(BL_ID);
+(u8*)0x08001000;
         u8 mfgdata[6];
         sprintf(str, "BootLoader   : %s\n",pBLString);
         LCD_PrintStringXY(10, 10, str);
