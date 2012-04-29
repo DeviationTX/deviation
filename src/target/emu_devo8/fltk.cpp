@@ -26,6 +26,8 @@ extern "C" {
 #include "target.h"
 }
 
+#define ALT_DRAW
+
 u8 keymap[32] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
 static struct {
     u16 xstart, xend, ystart, yend;
@@ -38,6 +40,7 @@ static struct {
     u8  powerdown;
     u8  mouse;
     u16 mousex, mousey;
+    u8  image[320*240*3];
 } gui;
 
 static Fl_Window *window;
@@ -126,6 +129,12 @@ public:
         }
         return Fl_Window::handle(event);
     }
+#ifdef ALT_DRAW
+    void draw() {
+        fl_draw_image(gui.image, 0, 0, 320,240, 3, 0);
+    }
+#endif
+    
 };
 extern "C" {
 void Initialize_ButtonMatrix() {}
@@ -167,11 +176,15 @@ void LCD_DrawStart(void) {
     Fl::flush();
 }
 void LCD_DrawStop(void) {
+#ifdef ALT_DRAW
+    Fl::redraw();
+#endif
     Fl::check();
 }
 
 void LCD_Init()
 {
+  Fl::visual(FL_RGB);
   window = new mywin(320,240);
   window->end();
   window->show();
@@ -196,9 +209,16 @@ void LCD_DrawPixel(unsigned int color)
     r = (color >> 8) & 0xf8;
     g = (color >> 3) & 0xfc;
     b = (color << 3) & 0xf8;
+#ifdef ALT_DRAW
+    gui.image[3*(320*gui.y+gui.x)] = r;
+    gui.image[3*(320*gui.y+gui.x)+1] = g;
+    gui.image[3*(320*gui.y+gui.x)+2] = b;
+    gui.x++;
+#else
     Fl_Color c = fl_rgb_color(r, g, b);
     fl_color(c);
     fl_point(gui.x++, gui.y);
+#endif
     if(gui.x > gui.xend) {
         gui.x = gui.xstart;
         gui.y++;
@@ -210,11 +230,17 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
     r = (color >> 8) & 0xf8;
     g = (color >> 3) & 0xfc;
     b = (color << 3) & 0xf8;
+#ifdef ALT_DRAW
+    gui.image[3*(320*y+x)] = r;
+    gui.image[3*(320*y+x)+1] = g;
+    gui.image[3*(320*y+x)+2] = b;
+#else
     Fl_Color c = fl_rgb_color(r, g, b);
     fl_color(c);
     Fl::check();
     Fl::flush();
     fl_point(x, y);
+#endif
 }
 
 u32 ScanButtons()
