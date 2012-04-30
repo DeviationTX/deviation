@@ -14,8 +14,8 @@
 */
 
 #include "target.h"
-#include "gui/gui.h"
 #include "misc.h"
+#include "gui/gui.h"
 
 int main()
 {
@@ -67,7 +67,11 @@ int main()
     u32 last_buttons = 0;
     char str[80];
 #ifdef HAS_FS
+    void PushMeButton(void) {
+    	LCD_PrintStringXY(100, 100, "You pushed it.");
+    }
     LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
+    int testButton = GUI_CreateButton(150,150,90,24,"Push Me",PushMeButton);
 #else
     LCD_DrawCircle(200, 200, 40, 0xF800);
 #endif
@@ -113,6 +117,7 @@ int main()
         LCD_PrintString(str);
         if(SPITouch_IRQ()) {
             struct touch t = SPITouch_GetCoords();
+
             sprintf(str, "x : %4d y : %4d\n", t.x, t.y);
             LCD_PrintString(str);
             sprintf(str, "z1: %4d z2: %4d\n", t.z1, t.z2);
