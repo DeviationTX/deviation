@@ -68,7 +68,7 @@ int main()
     char str[80];
 #ifdef HAS_FS
     void PushMeButton(void) {
-    	LCD_PrintStringXY(100, 100, "You pushed it.");
+    	LCD_PrintStringXY(100, 130, "You pushed it.");
     }
     LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
     /* SRC image is 90x24, when called below with 90x24 it gives out of bounds return on image draw
@@ -124,6 +124,7 @@ int main()
             LCD_PrintString(str);
             sprintf(str, "z1: %4d z2: %4d\n", t.z1, t.z2);
             LCD_PrintString(str);
+            GUI_CheckTouch(t);
         }
     }
 #endif    

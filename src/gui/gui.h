@@ -29,7 +29,7 @@ struct guiBox {
 };
 
 struct guiButton {
-	char text[40];
+	const char *text;
 	struct guiBox box;
 
 };
@@ -37,6 +37,7 @@ struct guiObject {
 	enum GUIType Type;
 	void (*CallBack)(void);
 	int GUIID;
+	int TypeID;
 };
 
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void));

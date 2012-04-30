@@ -16,10 +16,11 @@
 #include "gui.h"
 
 struct guiObject GUI_Array[256];
-
+struct guiButton GUI_Button_Array[256];
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
+	struct guiButton button;
 	struct guiObject objButton;
 
 	buttonBox.x = x;
@@ -33,12 +34,26 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	objButton.Type = Button;
 	objButton.CallBack = *CallBack;
 	objButton.GUIID = 0;
+	objButton.TypeID = 0;
+
+	button.box = buttonBox;
+	button.text = text;
+
 	GUI_Array[0] = objButton;
+	GUI_Button_Array[0] = button;
 	LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
-	printf("DEBUG: Drawing the button image should be complete\nFile: %s\n",buttonImage.file);
 	return 0;
 }
 void GUI_CheckTouch(struct touch coords) {
-
+	int i;
+	for (i=0;i<256;i++) {
+		struct guiObject currentObject = GUI_Array[i];
+		if (currentObject.CallBack != 0) {
+			struct guiButton button = GUI_Button_Array[currentObject.TypeID];
+			if (coords.x >= button.box.x && coords.x <= (button.box.width + button.box.x) & coords.y >= button.box.y && coords.y <= (button.box.height + button.box.y) ) {
+				currentObject.CallBack();
+			}
+		}
+	}
 }
 
