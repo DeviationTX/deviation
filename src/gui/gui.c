@@ -40,15 +40,16 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	int objLoc = GUI_GetFreeObj();
 	int objButtonLoc = GUI_GetFreeButtonObj();
 	if (objLoc == -1)
-		return;
+		return -1;
 	if (objButtonLoc == -1)
-		return;
+		return -1;
 	objButton.GUIID = objLoc;
 	objButton.TypeID = objButtonLoc;
 
 	GUI_Array[objLoc] = objButton;
 	GUI_Button_Array[objButtonLoc] = button;
 	LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
+	LCD_PrintStringXY(buttonBox.x, (buttonBox.y + ((buttonBox.height/2)-4)), text);
 	return objLoc;
 }
 int GUI_GetFreeObj(void) {

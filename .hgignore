@@ -6,6 +6,7 @@ gz$
 src/gz*
 src/elf*
 src/objs
+src/push
 .cproject
 .project
 
