@@ -20,7 +20,8 @@ static struct {
     unsigned int x_start;
     unsigned int x;
     unsigned int y;
-} cur_str = { &Fonts[4], 0, 0, 0};
+    u16          color;
+} cur_str = { &Fonts[4], 0, 0, 0, 0xffff};
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 {
@@ -45,6 +46,21 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
     }
   }
 
+#ifdef TRASNPARENT_FONT
+  LCD_DrawStart();
+  for (row = 8-cur_str.font->height; row < 8; row++)
+  {
+    for (col = 0; col < cur_str.font->width; col++)
+    {
+      u8 color;
+      color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
+      if(color & 0x80) {
+          LCD_DrawPixelXY(x + col, y + row, cur_str.color);
+      }
+    }
+  }
+  LCD_DrawStop();
+#else
   LCD_SetDrawArea(x, y, x+cur_str.font->width-1, y+cur_str.font->height);
   LCD_DrawStart();
   // Render each column
@@ -55,13 +71,14 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
       u8 color;
       color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
       if(color & 0x80) {
-          LCD_DrawPixel(0xffff);
+          LCD_DrawPixel(cur_str.color);
       } else {
           LCD_DrawPixel(0);
       }
     }
   }
   LCD_DrawStop();
+#endif
 }
 
 void LCD_SetFont(unsigned int idx)
