@@ -329,11 +329,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     u8 buf[320 * 2];
     fh = fopen(file, "r");
     u32 img_w, img_h, offset;
-    if(fread(buf, 0x1e, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    if(fread(buf, 0x22, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
         return;
     if(*((u16 *)(buf + 0x1a)) != 1      /* 1 plane */
        || *((u16 *)(buf + 0x1c)) != 16  /* 16bpp */
-       || *((u32 *)(buf + 0x1e)) != 0)  /* compression */
+       //|| *((u32 *)(buf + 0x1e)) != 0   /* compression */
+      )
     {
         return;
     }
