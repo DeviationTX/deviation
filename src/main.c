@@ -71,7 +71,9 @@ int main()
     	LCD_PrintStringXY(100, 100, "You pushed it.");
     }
     LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
-    int testButton = GUI_CreateButton(150,150,90,24,"Push Me",PushMeButton);
+    /* SRC image is 90x24, when called below with 90x24 it gives out of bounds return on image draw
+     * however if I give it 1 pixel less on height and width it draws but wraps... */
+    int testButton = GUI_CreateButton(150,150,89,23,"Push Me",PushMeButton);
 #else
     LCD_DrawCircle(200, 200, 40, 0xF800);
 #endif

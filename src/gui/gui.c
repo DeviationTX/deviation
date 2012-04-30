@@ -35,6 +35,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	objButton.GUIID = 0;
 	GUI_Array[0] = objButton;
 	LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
+	printf("DEBUG: Drawing the button image should be complete\nFile: %s\n",buttonImage.file);
 	return 0;
 }
 void GUI_CheckTouch(struct touch coords) {
