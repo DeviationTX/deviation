@@ -33,17 +33,44 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 
 	objButton.Type = Button;
 	objButton.CallBack = *CallBack;
-	objButton.GUIID = 0;
-	objButton.TypeID = 0;
 
 	button.box = buttonBox;
 	button.text = text;
 
-	GUI_Array[0] = objButton;
-	GUI_Button_Array[0] = button;
+	int objLoc = GUI_GetFreeObj();
+	int objButtonLoc = GUI_GetFreeButtonObj();
+	if (objLoc == -1)
+		return;
+	if (objButtonLoc == -1)
+		return;
+	objButton.GUIID = objLoc;
+	objButton.TypeID = objButtonLoc;
+
+	GUI_Array[objLoc] = objButton;
+	GUI_Button_Array[objButtonLoc] = button;
 	LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
-	return 0;
+	return objLoc;
 }
+int GUI_GetFreeObj(void) {
+	int i;
+	for (i=0;i<256;i++) {
+		if (GUI_Array[i].CallBack == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int GUI_GetFreeButtonObj(void) {
+	int i;
+	for (i=0;i<256;i++) {
+		if (GUI_Button_Array[i].box.width == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void GUI_CheckTouch(struct touch coords) {
 	int i;
 	for (i=0;i<256;i++) {
