@@ -3,6 +3,8 @@ dfu$
 elf$
 list$
 gz$
+src/gz*
+src/elf*
 src/objs
 .cproject
 .project
