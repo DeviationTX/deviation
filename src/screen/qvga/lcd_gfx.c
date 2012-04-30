@@ -16,6 +16,7 @@ All text above must be included in any redistribution
 
 #include "target.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 /* helper functions */
 
@@ -320,18 +321,49 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
   }
 }
 
-/*  Read From SPI not yet supported
-void LCD_DrawImageFromSPI(u16 x, u16 y, const u16 *bitmap, u16 w, u16 h)
+#ifdef HAS_FS
+void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off)
 {
     u16 i, j;
-    LCD_SetDrawArea(x, y, x + w, y + h);
+    FILE *fh;
+    u8 buf[320 * 2];
+    fh = fopen(file, "r");
+    u32 img_w, img_h, offset;
+    if(fread(buf, 0x1e, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+        return;
+    if(*((u16 *)(buf + 0x1a)) != 1      /* 1 plane */
+       || *((u16 *)(buf + 0x1c)) != 16  /* 16bpp */
+       || *((u32 *)(buf + 0x1e)) != 0)  /* compression */
+    {
+        return;
+    }
+    offset = *((u32 *)(buf + 0x0a));
+    img_w = *((u32 *)(buf + 0x12));
+    img_h = *((u32 *)(buf + 0x16));
+    if(w + x_off >= img_w || h + y_off >= img_h)
+        return;
+    if(w == 0)
+        w = img_w;
+    if(h == 0)
+        h = img_h;
+
+    offset += (img_w * y_off + x_off) * 2;
     LCD_DrawStart();
-    for (j=0; j<h; j++) {
-        for (i=0; i<w; i++ ) {
-            u16 color = SPI_ReadByte(bitmap++);
-            LCD_DrawPixel(color);
+    /* Bitmap start is at lower-left corner */
+    for (j = 0; j < h; j++) {
+        u16 *ptr = (u16 *)buf;
+        LCD_SetDrawArea(x, y + h - j - 1, x + w, y + h -j);
+        fread(buf, img_w * 2, 1, fh);
+        for (i = 0; i < w; i++ ) {
+            LCD_DrawPixel(*(ptr++));
         }
     }
     LCD_DrawStop();
+    fclose(fh);
 }
-*/
+
+void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
+{
+    LCD_DrawWindowedImageFromFile(x, y, file, 0, 0, 0, 0);
+}
+#endif

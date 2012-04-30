@@ -65,7 +65,11 @@ int main()
 #ifdef STATUS_SCREEN
     u32 last_buttons = 0;
     char str[80];
+#ifdef HAS_FS
+    LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
+#else
     LCD_DrawCircle(200, 200, 40, 0xF800);
+#endif
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
 (u8*)0x08001000;

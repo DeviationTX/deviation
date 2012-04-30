@@ -26,23 +26,23 @@ clean:
 	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(ODIR)/*.o
 
 $(ODIR)/%.o: %.c
-	mkdir $(ODIR) 2>/dev/null || true
+	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(ODIR)/%.o: target/$(TARGET)/%.c
-	mkdir $(ODIR) 2>/dev/null || true
+	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(ODIR)/%.o: target/$(TARGET)/%.cpp
-	mkdir $(ODIR) 2>/dev/null || true
+	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
 $(ODIR)/%.o: common/%.c
-	mkdir $(ODIR) 2>/dev/null || true
+	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(ODIR)/%.o: screen/$(SCREENSIZE)/%.c
-	mkdir $(ODIR) 2>/dev/null || true
+	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 
