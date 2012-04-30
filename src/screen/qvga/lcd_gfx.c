@@ -328,13 +328,22 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     FILE *fh;
     u8 buf[320 * 2];
     fh = fopen(file, "r");
-    u32 img_w, img_h, offset;
-    if(fread(buf, 0x22, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    u32 img_w, img_h, offset, compression;
+
+    if(fread(buf, 0x42, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
         return;
+    compression = *((u32 *)(buf + 0x1e));
     if(*((u16 *)(buf + 0x1a)) != 1      /* 1 plane */
        || *((u16 *)(buf + 0x1c)) != 16  /* 16bpp */
-       //|| *((u32 *)(buf + 0x1e)) != 0   /* compression */
+       || (compression != 0 && compression != 3)  /* BI_RGB or BI_BITFIELDS */
       )
+    {
+        return;
+    }
+    if(compression == 3 &&
+       (*((u16 *)(buf + 0x36))    != 0xf800 
+        || *((u16 *)(buf + 0x3a)) != 0x07e0
+        || *((u16 *)(buf + 0x3e)) != 0x001f))
     {
         return;
     }
@@ -353,7 +362,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         u16 *ptr = (u16 *)buf;
-        LCD_SetDrawArea(x, y + h - j - 1, x + w, y + h -j);
+        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h -j);
         fread(buf, img_w * 2, 1, fh);
         for (i = 0; i < w; i++ ) {
             LCD_DrawPixel(*(ptr++));
