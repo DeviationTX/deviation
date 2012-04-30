@@ -14,6 +14,7 @@
 */
 
 #include "target.h"
+#include "gui/gui.h"
 #include "misc.h"
 
 int main()
