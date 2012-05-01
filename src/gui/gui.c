@@ -17,6 +17,8 @@
 
 struct guiObject GUI_Array[256];
 struct guiButton GUI_Button_Array[256];
+struct guiLabel GUI_Label_Array[256];
+struct guiFrame GUI_Frame_Array[256];
 
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int objID)) {
 	struct guiBox buttonBox;
@@ -39,7 +41,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	button.text = text;
 
 	int objLoc = GUI_GetFreeObj();
-	int objButtonLoc = GUI_GetFreeButtonObj();
+	int objButtonLoc = GUI_GetFreeGUIObj(Button);
 	if (objLoc == -1)
 		return -1;
 	if (objButtonLoc == -1)
@@ -108,11 +110,39 @@ int GUI_GetFreeObj(void) {
 	return -1;
 }
 
-int GUI_GetFreeButtonObj(void) {
+int GUI_GetFreeGUIObj(struct GUIType guiType) {
 	int i;
 	for (i=0;i<256;i++) {
-		if (GUI_Button_Array[i].box.width == 0) {
-			return i;
+		switch (guiType) {
+			case Button:
+				{
+					if (GUI_Button_Array[i].box.width == 0) {
+						return i;
+					}
+				}
+				break;
+			case Label:
+				{
+					if (GUI_Label_Array[i].box.width == 0) {
+						return i;
+					}
+				}
+				break;
+			case Frame:
+				{
+					if (GUI_Frame_Array[i].box.width == 0) {
+						return i;
+					}
+				}
+				break;
+			case CheckBox:
+				{
+				}
+				break;
+			case Dropdown:
+				{
+				}
+				break;
 		}
 	}
 	return -1;
