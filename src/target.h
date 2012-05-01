@@ -34,6 +34,8 @@ void LCD_SetFont(unsigned int idx);
 void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color);
 void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color);
 void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color);
+void LCD_DrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color);
 void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color);
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color);
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);
@@ -42,6 +44,8 @@ void LCD_DrawTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off);
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
+void LCD_CalibrateTouch(void);
+
 /* Touchscreen */
 struct touch {
     u16 x;
@@ -52,6 +56,7 @@ struct touch {
 void SPITouch_Init();
 struct touch SPITouch_GetCoords();
 int SPITouch_IRQ();
+void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff);
 
 
 /* Buttons and switches */
