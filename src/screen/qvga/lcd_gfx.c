@@ -355,7 +355,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     offset = *((u32 *)(buf + 0x0a));
     img_w = *((u32 *)(buf + 0x12));
     img_h = *((u32 *)(buf + 0x16));
-    if(w + x_off >= img_w || h + y_off >= img_h)
+    if(w + x_off > img_w || h + y_off > img_h)
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         return;
