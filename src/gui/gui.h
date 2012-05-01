@@ -35,13 +35,15 @@ struct guiButton {
 };
 struct guiObject {
 	enum GUIType Type;
-	void (*CallBack)(void);
+	void (*CallBack)(int ObjID);
 	int GUIID;
 	int TypeID;
 };
 
-int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void));
+int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int ObjID));
 void GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
+void GUI_DrawObjects(void);
+void GUI_RemoveObj(int objID);
 
 #endif /* GUI_H_ */

@@ -67,13 +67,31 @@ int main()
     u32 last_buttons = 0;
     char str[80];
 #ifdef HAS_FS
-    void PushMeButton(void) {
-    	LCD_PrintStringXY(100, 130, "You pushed it.");
+    void PushMeButton1(int objID) {
+    	GUI_RemoveObj(objID);
+    	GUI_DrawScreen();
+    	LCD_PrintStringXY(100, 130, "Button 1 Pushed");
     }
-    LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
+    void PushMeButton2(int objID) {
+    	GUI_RemoveObj(objID);
+    	GUI_DrawScreen();
+    	LCD_PrintStringXY(100, 130, "Button 2 Pushed");
+    }
+    void PushMeButton3(int objID) {
+    	GUI_RemoveObj(objID);
+    	GUI_DrawScreen();
+    	LCD_PrintStringXY(100, 130, "Button 3 Pushed");
+    }
+
+    //LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
     /* SRC image is 90x24, when called below with 90x24 it gives out of bounds return on image draw
      * however if I give it 1 pixel less on height and width it draws but wraps... */
-    int testButton = GUI_CreateButton(100,150,89,23,"Push Me",PushMeButton);
+    int testButton1 = GUI_CreateButton(10,200,89,23," Button 1 ",PushMeButton1);
+    int testButton2 = GUI_CreateButton(110,200,89,23," Button 2 ",PushMeButton2);
+    int testButton3 = GUI_CreateButton(210,200,89,23," Button 3 ",PushMeButton3);
+
+	GUI_DrawScreen();
+
 #else
     LCD_DrawCircle(200, 200, 40, 0xF800);
 #endif
@@ -104,7 +122,6 @@ int main()
         /* GUI Handling
          * We beed to handle screen redraws here
          * */
-
         if(buttons != last_buttons) {
             last_buttons = buttons;
             LCD_PrintStringXY(10, 50, "Buttons:\n");

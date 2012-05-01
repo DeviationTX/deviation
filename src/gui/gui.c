@@ -18,7 +18,7 @@
 struct guiObject GUI_Array[256];
 struct guiButton GUI_Button_Array[256];
 
-int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void)) {
+int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int objID)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
 	struct guiButton button;
@@ -31,7 +31,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	buttonImage.file = "gui.bmp";
 	buttonImage.x_off = 0;
 	buttonImage.y_off = 0;
-
+	buttonBox.image = buttonImage;
 	objButton.Type = Button;
 	objButton.CallBack = *CallBack;
 
@@ -49,9 +49,34 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 
 	GUI_Array[objLoc] = objButton;
 	GUI_Button_Array[objButtonLoc] = button;
-	LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
-	LCD_PrintStringXY(buttonBox.x, (buttonBox.y + ((buttonBox.height/2)-4)), text);
 	return objLoc;
+}
+void GUI_DrawObjects(void) {
+	struct guiBox buttonBox;
+	struct guiImage buttonImage;
+
+	int i;
+	for (i=0;i<256;i++) {
+		if (GUI_Array[i].CallBack != 0) {
+			buttonBox = GUI_Button_Array[GUI_Array[i].TypeID].box;
+			buttonImage = GUI_Button_Array[GUI_Array[i].TypeID].box.image;
+			LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
+			LCD_PrintStringXY(buttonBox.x, (buttonBox.y + ((buttonBox.height/2)-4)), GUI_Button_Array[GUI_Array[i].TypeID].text);
+		}
+	}
+}
+void GUI_RemoveObj(int objID) {
+	if (GUI_Array[objID].Type == Button) {
+		struct guiObject blankObj;
+		struct guiButton blankButton;
+		blankObj.CallBack = 0;
+		blankObj.GUIID = 0;
+		blankObj.Type = 0;
+		blankObj.TypeID = 0;
+		blankButton.text = "";
+		GUI_Button_Array[GUI_Array[objID].TypeID] = blankButton;
+		GUI_Array[objID] = blankObj;
+	}
 }
 int GUI_GetFreeObj(void) {
 	int i;
@@ -81,6 +106,7 @@ void GUI_DrawScreen(void) {
 	/*
 	 * Then we need to draw any supporting GUI
 	 */
+	GUI_DrawObjects();
 }
 
 void GUI_CheckTouch(struct touch coords) {
@@ -95,7 +121,7 @@ void GUI_CheckTouch(struct touch coords) {
 				coords.x <= ((button.box.width + button.box.x) + calibrateX) &&
 				coords.y >= (button.box.y + calibrateY) &&
 				coords.y <= ((button.box.height + button.box.y) + calibrateY)) {
-					currentObject.CallBack();
+					currentObject.CallBack(i);
 			}
 		}
 	}
