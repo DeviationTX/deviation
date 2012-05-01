@@ -46,7 +46,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
     }
   }
 
-#ifdef TRASNPARENT_FONT
+#ifdef TRANSPARENT_FONT
   LCD_DrawStart();
   for (row = 8-cur_str.font->height; row < 8; row++)
   {
