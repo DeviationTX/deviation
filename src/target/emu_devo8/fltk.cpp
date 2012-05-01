@@ -145,7 +145,8 @@ void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPITouch_Init() {}
 struct touch SPITouch_GetCoords() {
-    struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
+    //struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
+    struct touch t = {gui.mousex, gui.mousey, 0, 0};
     return t;
 }
 

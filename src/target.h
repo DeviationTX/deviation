@@ -44,10 +44,10 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
 /* Touchscreen */
 struct touch {
-    u8 x;
-    u8 y;
-    u8 z1;
-    u8 z2;
+    u16 x;
+    u16 y;
+    u16 z1;
+    u16 z2;
 };
 void SPITouch_Init();
 struct touch SPITouch_GetCoords();
