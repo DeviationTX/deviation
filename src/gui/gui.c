@@ -17,6 +17,7 @@
 
 struct guiObject GUI_Array[256];
 struct guiButton GUI_Button_Array[256];
+
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
@@ -70,6 +71,16 @@ int GUI_GetFreeButtonObj(void) {
 		}
 	}
 	return -1;
+}
+
+void GUI_DrawScreen(void) {
+	/*
+	 * First we need to draw the main background
+	 *  */
+	LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
+	/*
+	 * Then we need to draw any supporting GUI
+	 */
 }
 
 void GUI_CheckTouch(struct touch coords) {

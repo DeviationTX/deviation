@@ -42,6 +42,6 @@ struct guiObject {
 
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(void));
 void GUI_CheckTouch(struct touch coords);
-
+void GUI_DrawScreen(void);
 
 #endif /* GUI_H_ */

@@ -100,15 +100,20 @@ int main()
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
         u32 buttons = ScanButtons();
+
+        /* GUI Handling
+         * We beed to handle screen redraws here
+         * */
+
         if(buttons != last_buttons) {
             last_buttons = buttons;
-            LCD_PrintStringXY(10, 40, "Buttons:\n");
+            LCD_PrintStringXY(10, 50, "Buttons:\n");
             for(i = 0; i < 32; i++)
                 LCD_PrintChar((buttons & (1 << i)) ? '0' : '1');
         }
         u16 voltage = PWR_ReadVoltage();
         sprintf(str, "Voltage: %2d.%03d\n", voltage >> 12, voltage & 0x0fff);
-        LCD_PrintStringXY(10, 60, str);
+        LCD_PrintStringXY(10, 70, str);
         u16 throttle = ReadThrottle();
         u16 rudder = ReadRudder();
         u16 aileron = ReadAileron();
