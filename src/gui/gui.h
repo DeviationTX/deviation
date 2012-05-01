@@ -49,6 +49,7 @@ struct guiObject {
 	int TypeID;
 };
 
+int GUI_CreateLabel(u16 x, u16 y, const char *text);
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int ObjID));
 void GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);

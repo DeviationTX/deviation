@@ -65,7 +65,7 @@ int main()
 
 #ifdef STATUS_SCREEN
     u32 last_buttons = 0;
-    char str[80];
+    char str[80],strBootLoader[80],strSPIFlash[80],strMfg[80];
 #ifdef HAS_FS
     /* GUI Callbacks */
     void PushMeButton1(int objID) {
@@ -88,8 +88,6 @@ int main()
     int testButton2 = GUI_CreateButton(110,200,89,23," Button 2 ",PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23," Button 3 ",PushMeButton3);
 
-    /* draw it all */
-	GUI_DrawScreen();
 
 #else
     LCD_DrawCircle(200, 200, 40, 0xF800);
@@ -98,19 +96,34 @@ int main()
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
         (u8*)0x08001000;
         u8 mfgdata[6];
-        sprintf(str, "BootLoader   : %s\n",pBLString);
-        LCD_PrintStringXY(10, 10, str);
-        sprintf(str, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
-        LCD_PrintString(str);
+        sprintf(strBootLoader, "BootLoader   : %s\n",pBLString);
+#ifdef HAS_FS
+        int lblBootLoader = GUI_CreateLabel(10,10,strBootLoader);
+#else
+        LCD_PrintStringXY(10, 10, strBootLoader);
+#endif
+        sprintf(strSPIFlash, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
+#ifdef HAS_FS
+        int lblSPIFlash = GUI_CreateLabel(10,20,strSPIFlash);
+#else
+        LCD_PrintString(strSPIFlash);
+#endif
         CYRF_GetMfgData(mfgdata);
-        sprintf(str, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
+        sprintf(strMfg, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
             mfgdata[0],
             mfgdata[1],
             mfgdata[2],
             mfgdata[3],
             mfgdata[4],
             mfgdata[5]);
-        LCD_PrintString(str);
+#ifdef HAS_FS
+        int lblMfg = GUI_CreateLabel(10,30,strMfg);
+        /* draw it all */
+    	GUI_DrawScreen();
+    	int lblButtons = GUI_CreateLabel(10,50,"Buttons:\n");
+#else
+        LCD_PrintString(strMfg);
+#endif
     }
     while(1) {
         int i;

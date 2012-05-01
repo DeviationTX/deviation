@@ -20,6 +20,33 @@ struct guiButton GUI_Button_Array[256];
 struct guiLabel GUI_Label_Array[256];
 struct guiFrame GUI_Frame_Array[256];
 
+int GUI_CreateLabel(u16 x, u16 y, const char *text) {
+	struct guiBox labelBox;
+	struct guiObject objLabel;
+	struct guiLabel label;
+
+	labelBox.x = x;
+	labelBox.y = y;
+	labelBox.width = 10;
+	labelBox.height = 10;
+	objLabel.Type = Label;
+	objLabel.CallBack = 0x1; /* no call back yet for labels */
+	label.box = labelBox;
+	label.text = text;
+
+	int objLoc = GUI_GetFreeObj();
+	int objLabelLoc = GUI_GetFreeGUIObj(Label);
+	if (objLoc == -1)
+		return -1;
+	if (objLabelLoc == -1)
+		return -1;
+	objLabel.GUIID = objLoc;
+	objLabel.TypeID = objLabelLoc;
+
+	GUI_Array[objLoc] = objLabel;
+	GUI_Label_Array[objLabelLoc] = label;
+	return objLoc;
+}
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int objID)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
@@ -68,6 +95,15 @@ void GUI_DrawObjects(void) {
 					LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
 					LCD_PrintStringXY(buttonBox.x, (buttonBox.y + ((buttonBox.height/2)-4)), GUI_Button_Array[GUI_Array[i].TypeID].text);
 				}
+				break;
+				case Label:
+				{
+					struct guiBox labelBox;
+					labelBox = GUI_Label_Array[GUI_Array[i].TypeID].box;
+					LCD_PrintStringXY(labelBox.x, labelBox.y, GUI_Label_Array[GUI_Array[i].TypeID].text);
+				}
+				break;
+				case Frame:
 				break;
 				case CheckBox:
 				break;
