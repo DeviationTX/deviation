@@ -67,6 +67,7 @@ int main()
     u32 last_buttons = 0;
     char str[80];
 #ifdef HAS_FS
+    /* GUI Callbacks */
     void PushMeButton1(int objID) {
     	GUI_RemoveObj(objID);
     	GUI_DrawScreen();
@@ -82,14 +83,12 @@ int main()
     	GUI_DrawScreen();
     	LCD_PrintStringXY(100, 130, "Button 3 Pushed");
     }
-
-    //LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
-    /* SRC image is 90x24, when called below with 90x24 it gives out of bounds return on image draw
-     * however if I give it 1 pixel less on height and width it draws but wraps... */
+    /* Create the buttons */
     int testButton1 = GUI_CreateButton(10,200,89,23," Button 1 ",PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23," Button 2 ",PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23," Button 3 ",PushMeButton3);
 
+    /* draw it all */
 	GUI_DrawScreen();
 
 #else

@@ -45,5 +45,7 @@ void GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(int objID);
+int GUI_GetFreeObj(void);
+int GUI_GetFreeButtonObj(void);
 
 #endif /* GUI_H_ */
