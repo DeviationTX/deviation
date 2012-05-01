@@ -74,11 +74,16 @@ int GUI_GetFreeButtonObj(void) {
 
 void GUI_CheckTouch(struct touch coords) {
 	int i;
+	int calibrateX = -20;	/* Placeholder for X calibration offset */
+	int calibrateY = 2;	    /* Placeholder for Y calibration offset */
 	for (i=0;i<256;i++) {
 		struct guiObject currentObject = GUI_Array[i];
 		if (currentObject.CallBack != 0) {
 			struct guiButton button = GUI_Button_Array[currentObject.TypeID];
-			if (coords.x >= button.box.x && coords.x <= (button.box.width + button.box.x) & coords.y >= button.box.y && coords.y <= (button.box.height + button.box.y) ) {
+			if (coords.x >= (button.box.x + calibrateX) &&
+				coords.x <= ((button.box.width + button.box.x) + calibrateX) &&
+				coords.y >= (button.box.y + calibrateY) &&
+				coords.y <= ((button.box.height + button.box.y) + calibrateY)) {
 				currentObject.CallBack();
 			}
 		}

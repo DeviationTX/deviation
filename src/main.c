@@ -73,13 +73,13 @@ int main()
     LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
     /* SRC image is 90x24, when called below with 90x24 it gives out of bounds return on image draw
      * however if I give it 1 pixel less on height and width it draws but wraps... */
-    int testButton = GUI_CreateButton(150,150,89,23,"Push Me",PushMeButton);
+    int testButton = GUI_CreateButton(100,150,89,23,"Push Me",PushMeButton);
 #else
     LCD_DrawCircle(200, 200, 40, 0xF800);
 #endif
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
-(u8*)0x08001000;
+        (u8*)0x08001000;
         u8 mfgdata[6];
         sprintf(str, "BootLoader   : %s\n",pBLString);
         LCD_PrintStringXY(10, 10, str);
