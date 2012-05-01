@@ -331,38 +331,47 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     u32 img_w, img_h, offset, compression;
 
     if(fread(buf, 0x42, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    {
+    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
         return;
+    }
     compression = *((u32 *)(buf + 0x1e));
     if(*((u16 *)(buf + 0x1a)) != 1      /* 1 plane */
        || *((u16 *)(buf + 0x1c)) != 16  /* 16bpp */
        || (compression != 0 && compression != 3)  /* BI_RGB or BI_BITFIELDS */
       )
     {
-        return;
+    	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct\n");
+    	return;
     }
     if(compression == 3 &&
        (*((u16 *)(buf + 0x36))    != 0xf800 
         || *((u16 *)(buf + 0x3a)) != 0x07e0
         || *((u16 *)(buf + 0x3e)) != 0x001f))
     {
+    	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct second check\n");
         return;
     }
     offset = *((u32 *)(buf + 0x0a));
     img_w = *((u32 *)(buf + 0x12));
     img_h = *((u32 *)(buf + 0x16));
     if(w + x_off >= img_w || h + y_off >= img_h)
+    {
+    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         return;
+    }
     if(w == 0)
         w = img_w;
     if(h == 0)
         h = img_h;
 
     offset += (img_w * y_off + x_off) * 2;
+    fseek(fh, offset, SEEK_SET);
     LCD_DrawStart();
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         u16 *ptr = (u16 *)buf;
-        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h -j);
+        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
         fread(buf, img_w * 2, 1, fh);
         for (i = 0; i < w; i++ ) {
             LCD_DrawPixel(*(ptr++));
