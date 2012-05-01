@@ -386,7 +386,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
                 u16 color = *(ptr++);
                 if((color & 0x8000)) {
                     //convert 1555 -> 565
-                    color = ((color & 0x7fe) << 1) | (color & 0x1f);
+                    color = ((color & 0x7fe0) << 1) | (color & 0x1f);
                     LCD_DrawPixelXY(x + i, y + h - j - 1, color);
                 }
             }
