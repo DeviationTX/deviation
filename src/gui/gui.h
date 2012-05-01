@@ -55,6 +55,6 @@ void GUI_DrawScreen(void);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(int objID);
 int GUI_GetFreeObj(void);
-int GUI_GetFreeGUIObj(struct GUIType);
+int GUI_GetFreeGUIObj(enum GUIType guiType);
 
 #endif /* GUI_H_ */

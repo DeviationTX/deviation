@@ -110,7 +110,7 @@ int GUI_GetFreeObj(void) {
 	return -1;
 }
 
-int GUI_GetFreeGUIObj(struct GUIType guiType) {
+int GUI_GetFreeGUIObj(enum GUIType guiType) {
 	int i;
 	for (i=0;i<256;i++) {
 		switch (guiType) {
