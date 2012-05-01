@@ -326,11 +326,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
 {
     u16 i, j;
     FILE *fh;
+    u8 transparent = 0;
     u8 buf[320 * 2];
     fh = fopen(file, "r");
     u32 img_w, img_h, offset, compression;
 
-    if(fread(buf, 0x42, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
         return;
@@ -344,13 +345,21 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct\n");
     	return;
     }
-    if(compression == 3 &&
-       (*((u16 *)(buf + 0x36))    != 0xf800 
-        || *((u16 *)(buf + 0x3a)) != 0x07e0
-        || *((u16 *)(buf + 0x3e)) != 0x001f))
+    if(compression == 3)
     {
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct second check\n");
-        return;
+        if(*((u16 *)(buf + 0x36)) == 0x7c00 
+           && *((u16 *)(buf + 0x3a)) == 0x03e0
+           && *((u16 *)(buf + 0x3e)) == 0x001f
+           && *((u16 *)(buf + 0x42)) == 0x8000)
+        {
+            transparent = 1;
+        } else if(*((u16 *)(buf + 0x36)) != 0xf800 
+           || *((u16 *)(buf + 0x3a)) != 0x07e0
+           || *((u16 *)(buf + 0x3e)) != 0x001f)
+        {
+            printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct second check\n");
+            return;
+        }
     }
     offset = *((u32 *)(buf + 0x0a));
     img_w = *((u32 *)(buf + 0x12));
@@ -371,10 +380,21 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         u16 *ptr = (u16 *)buf;
-        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
         fread(buf, img_w * 2, 1, fh);
-        for (i = 0; i < w; i++ ) {
-            LCD_DrawPixel(*(ptr++));
+        if(transparent) {
+            for (i = 0; i < w; i++ ) {
+                u16 color = *(ptr++);
+                if((color & 0x8000)) {
+                    //convert 1555 -> 565
+                    color = ((color & 0x7fe) << 1) | (color & 0x1f);
+                    LCD_DrawPixelXY(x + i, y + h - j - 1, color);
+                }
+            }
+        } else {
+            LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
+            for (i = 0; i < w; i++ ) {
+                LCD_DrawPixel(*(ptr++));
+            }
         }
     }
     LCD_DrawStop();
