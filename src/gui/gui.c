@@ -85,8 +85,8 @@ void GUI_DrawScreen(void) {
 
 void GUI_CheckTouch(struct touch coords) {
 	int i;
-	int calibrateX = -20;	/* Placeholder for X calibration offset */
-	int calibrateY = 2;	    /* Placeholder for Y calibration offset */
+	int calibrateX = 0;	/* Placeholder for X calibration offset */
+	int calibrateY = 0;	    /* Placeholder for Y calibration offset */
 	for (i=0;i<256;i++) {
 		struct guiObject currentObject = GUI_Array[i];
 		if (currentObject.CallBack != 0) {
@@ -95,7 +95,7 @@ void GUI_CheckTouch(struct touch coords) {
 				coords.x <= ((button.box.width + button.box.x) + calibrateX) &&
 				coords.y >= (button.box.y + calibrateY) &&
 				coords.y <= ((button.box.height + button.box.y) + calibrateY)) {
-				currentObject.CallBack();
+					currentObject.CallBack();
 			}
 		}
 	}
