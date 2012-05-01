@@ -355,7 +355,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     offset = *((u32 *)(buf + 0x0a));
     img_w = *((u32 *)(buf + 0x12));
     img_h = *((u32 *)(buf + 0x16));
-    if(w + x_off >= img_w || h + y_off >= img_h)
+    if(w + x_off > img_w || h + y_off > img_h)
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         return;
@@ -366,11 +366,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
         h = img_h;
 
     offset += (img_w * y_off + x_off) * 2;
+    fseek(fh, offset, SEEK_SET);
     LCD_DrawStart();
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         u16 *ptr = (u16 *)buf;
-        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h -j);
+        LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
         fread(buf, img_w * 2, 1, fh);
         for (i = 0; i < w; i++ ) {
             LCD_DrawPixel(*(ptr++));
