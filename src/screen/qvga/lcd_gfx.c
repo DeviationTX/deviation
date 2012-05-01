@@ -22,7 +22,7 @@ All text above must be included in any redistribution
 
 #define swap(x, y) {int __tmp = x; x = y; y = __tmp;}
 
-void drawFastVLine(int16_t x, int16_t y, 
+void LCD_DrawFastVLine(int16_t x, int16_t y, 
 				 int16_t h, uint16_t color) {
     LCD_SetDrawArea(x, y, x, y + h);
     LCD_DrawStart();
@@ -31,7 +31,7 @@ void drawFastVLine(int16_t x, int16_t y,
     LCD_DrawStop();
 }
 
-void drawFastHLine(u16 x, u16 y, u16 w, u16 color) {
+void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
     LCD_SetDrawArea(x, y, x + w, y);
     LCD_DrawStart();
     while(w--)
@@ -60,12 +60,12 @@ void fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
     f     += ddF_x;
 
     if (cornername & 0x1) {
-      drawFastVLine(x0+x, y0-y, 2*y+1+delta, color);
-      drawFastVLine(x0+y, y0-x, 2*x+1+delta, color);
+      LCD_DrawFastVLine(x0+x, y0-y, 2*y+1+delta, color);
+      LCD_DrawFastVLine(x0+y, y0-x, 2*x+1+delta, color);
     }
     if (cornername & 0x2) {
-      drawFastVLine(x0-x, y0-y, 2*y+1+delta, color);
-      drawFastVLine(x0-y, y0-x, 2*x+1+delta, color);
+      LCD_DrawFastVLine(x0-x, y0-y, 2*y+1+delta, color);
+      LCD_DrawFastVLine(x0-y, y0-x, 2*x+1+delta, color);
     }
   }
 }
@@ -146,7 +146,7 @@ void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color)
 
 void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color)
 {
-    drawFastVLine(x0, y0-r, 2*r+1, color);
+    LCD_DrawFastVLine(x0, y0-r, 2*r+1, color);
     fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
@@ -195,10 +195,10 @@ void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color)
 // draw a rectangle
 void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
-  drawFastHLine(x, y, w, color);
-  drawFastHLine(x, y+h-1, w, color);
-  drawFastVLine(x, y, h, color);
-  drawFastVLine(x+w-1, y, h, color);
+  LCD_DrawFastHLine(x, y, w, color);
+  LCD_DrawFastHLine(x, y+h-1, w, color);
+  LCD_DrawFastVLine(x, y, h, color);
+  LCD_DrawFastVLine(x+w-1, y, h, color);
 }
 
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
@@ -215,10 +215,10 @@ void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color)
 {
   // smarter version
-  drawFastHLine(x+r  , y    , w-2*r, color); // Top
-  drawFastHLine(x+r  , y+h-1, w-2*r, color); // Bottom
-  drawFastVLine(  x    , y+r  , h-2*r, color); // Left
-  drawFastVLine(  x+w-1, y+r  , h-2*r, color); // Right
+  LCD_DrawFastHLine(x+r  , y    , w-2*r, color); // Top
+  LCD_DrawFastHLine(x+r  , y+h-1, w-2*r, color); // Bottom
+  LCD_DrawFastVLine(  x    , y+r  , h-2*r, color); // Left
+  LCD_DrawFastVLine(  x+w-1, y+r  , h-2*r, color); // Right
   // draw four corners
   drawCircleHelper(x+r    , y+r    , r, 1, color);
   drawCircleHelper(x+w-r-1, y+r    , r, 2, color);
@@ -267,7 +267,7 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
     else if(x1 > b) b = x1;
     if(x2 < a)      a = x2;
     else if(x2 > b) b = x2;
-    drawFastHLine(a, y0, b-a+1, color);
+    LCD_DrawFastHLine(a, y0, b-a+1, color);
     return;
   }
 
@@ -300,7 +300,7 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
     b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
     */
     if(a > b) swap(a,b);
-    drawFastHLine(a, y, b-a+1, color);
+    LCD_DrawFastHLine(a, y, b-a+1, color);
   }
 
   // For lower part of triangle, find scanline crossings for segments
@@ -317,7 +317,7 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
     b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
     */
     if(a > b) swap(a,b);
-    drawFastHLine(a, y, b-a+1, color);
+    LCD_DrawFastHLine(a, y, b-a+1, color);
   }
 }
 

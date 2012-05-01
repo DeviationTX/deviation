@@ -95,6 +95,8 @@ int main()
         u32 buttons = ScanButtons();
         if(buttons != last_buttons) {
             last_buttons = buttons;
+            if((buttons & 0x1) == 0)
+                LCD_CalibrateTouch();
             LCD_PrintStringXY(10, 40, "Buttons:\n");
             for(i = 0; i < 32; i++)
                 LCD_PrintChar((buttons & (1 << i)) ? '0' : '1');

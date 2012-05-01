@@ -42,6 +42,12 @@ static struct {
     u16 mousex, mousey;
     u8  image[320*240*3];
 } gui;
+struct {
+    u32 xscale;
+    u32 yscale;
+    s32 xoffset;
+    s32 yoffset;
+} calibration = {0x10000, 0x10000, 0, 0};
 
 static Fl_Window *window;
 
@@ -120,8 +126,8 @@ public:
         case FL_PUSH:
         case FL_DRAG:
             gui.mouse = 1;
-            gui.mousex = Fl::event_x();
-            gui.mousey = Fl::event_y();
+            gui.mousex = calibration.xscale * Fl::event_x() / 0x10000 + calibration.xoffset;
+            gui.mousey = calibration.yscale * Fl::event_y() / 0x10000 + calibration.yoffset;
             return 1;
         case FL_RELEASE:
             gui.mouse = 0;
@@ -150,7 +156,11 @@ struct touch SPITouch_GetCoords() {
     return t;
 }
 
-int SPITouch_IRQ() { return gui.mouse;}
+int SPITouch_IRQ()
+{
+    Fl::check();
+    return gui.mouse;
+}
 
 u8 *BOOTLOADER_Read(int idx) {
     static u8 str[3][80] = {
@@ -281,6 +291,13 @@ u32 ReadFlashID()
     return 0;
 }
 
+void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff)
+{
+    calibration.xscale = xscale;
+    calibration.yscale = yscale;
+    calibration.xoffset = xoff;
+    calibration.yoffset = yoff;
+}
 
 }
 

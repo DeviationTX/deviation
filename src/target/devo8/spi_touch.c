@@ -47,6 +47,13 @@ PA7 : SPI1_MOSI
 #define CS_LO() gpio_clear(GPIOB, GPIO0)
 #define pen_is_down() (! gpio_get(GPIOB, GPIO5))
 
+struct {
+    u32 xscale;
+    u32 yscale;
+    s32 xoffset;
+    s32 yoffset;
+} calibration = {0x10000, 0x10000, 0, 0};
+
 u8 read_channel(u8 address)
 {
     spi_xfer(SPI1, address);
@@ -107,6 +114,8 @@ struct touch SPITouch_GetCoords()
     res.z1 = read_channel(READ_Z1);
     res.z2 = read_channel(READ_Z2);
     CS_HI();
+    res.x = res.x * calibration.xscale / 0x10000 + calibration.xoffset;
+    res.x = res.y * calibration.yscale / 0x10000 + calibration.yoffset;
     return res;
 }
 
@@ -115,3 +124,10 @@ int SPITouch_IRQ()
     return pen_is_down();
 }
 
+void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff)
+{
+    calibration.xscale = xscale;
+    calibration.yscale = yscale;
+    calibration.xoffset = xoff;
+    calibration.yoffset = yoff;
+}
