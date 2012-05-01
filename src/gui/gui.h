@@ -11,8 +11,10 @@
 
 enum GUIType {
 	Button,
+	Label,
+	Frame,
 	CheckBox,
-	Dropdown,
+	Dropdown
 };
 struct guiImage {
 	const char *file;
@@ -27,7 +29,14 @@ struct guiBox {
 	u16 height;
 	struct guiImage image;
 };
-
+struct guiLabel {
+	const char *text;
+	struct guiBox box;
+};
+struct guiFrame {
+	const char *text;
+	struct guiBox box;
+};
 struct guiButton {
 	const char *text;
 	struct guiBox box;
