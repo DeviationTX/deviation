@@ -30,7 +30,7 @@ struct guiBox {
 	struct guiImage image;
 };
 struct guiLabel {
-	char text[512];
+	char text[128];
 	struct guiBox box;
 };
 struct guiFrame {
@@ -38,7 +38,7 @@ struct guiFrame {
 	struct guiBox box;
 };
 struct guiButton {
-	char text[80];
+	char text[40];
 	struct guiBox box;
 
 };

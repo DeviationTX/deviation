@@ -15,10 +15,10 @@
 #include "target.h"
 #include "gui.h"
 
-struct guiObject GUI_Array[256];
-struct guiButton GUI_Button_Array[256];
-struct guiLabel GUI_Label_Array[256];
-struct guiFrame GUI_Frame_Array[256];
+struct guiObject GUI_Array[128];
+struct guiButton GUI_Button_Array[64];
+struct guiLabel GUI_Label_Array[64];
+struct guiFrame GUI_Frame_Array[16];
 
 void GUI_SetText(int GUIID,const char *text) {
 	int TypeID = GUI_Array[GUIID].TypeID;
