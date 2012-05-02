@@ -126,7 +126,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 void GUI_DrawObjects(void) {
 
 	int i;
-	for (i=0;i<256;i++) {
+	for (i=0;i<128;i++) {
 		if (GUI_Array[i].CallBack != 0) {
 			switch (GUI_Array[i].Type) {
 				case Button:
@@ -260,7 +260,7 @@ void GUI_CheckTouch(struct touch coords) {
 	int i;
 	int calibrateX = 0;	/* Placeholder for X calibration offset */
 	int calibrateY = 0;	    /* Placeholder for Y calibration offset */
-	for (i=0;i<256;i++) {
+	for (i=0;i<128;i++) {
 		struct guiObject currentObject = GUI_Array[i];
 		if (currentObject.CallBack != 0) {
 			switch (currentObject.Type) {
