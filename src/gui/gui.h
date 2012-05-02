@@ -30,7 +30,7 @@ struct guiBox {
 	struct guiImage image;
 };
 struct guiLabel {
-	const char *text;
+	char text[512];
 	struct guiBox box;
 };
 struct guiFrame {
@@ -38,7 +38,7 @@ struct guiFrame {
 	struct guiBox box;
 };
 struct guiButton {
-	const char *text;
+	char text[80];
 	struct guiBox box;
 
 };
@@ -49,6 +49,8 @@ struct guiObject {
 	int TypeID;
 };
 
+char* GUI_GetText(int GUIID);
+void GUI_SetText(int GUIID,const char *text);
 int GUI_CreateLabel(u16 x, u16 y, const char *text);
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int ObjID));
 void GUI_CheckTouch(struct touch coords);
