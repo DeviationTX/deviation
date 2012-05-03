@@ -63,7 +63,7 @@ char* GUI_GetText(int GUIID) {
 	}
 }
 
-int GUI_CreateLabel(u16 x, u16 y, const char *text) {
+int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
 	struct guiBox labelBox;
 	struct guiObject objLabel;
 	struct guiLabel label;
@@ -76,7 +76,7 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text) {
 	objLabel.CallBack = 0x1; /* no call back yet for labels */
 	label.box = labelBox;
 	label.text = text;
-
+	label.fontColor = fontColor;
 	int objLoc = GUI_GetFreeObj();
 	int objLabelLoc = GUI_GetFreeGUIObj(Label);
 	if (objLoc == -1)
@@ -122,7 +122,7 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
 	return objLoc;
 
 }
-int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int objID)) {
+int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, u16 fontColor, void (*CallBack)(int objID)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
 	struct guiButton button;
@@ -141,7 +141,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 
 	button.box = buttonBox;
 	button.text = text;
-
+	button.fontColor = fontColor;
 	int objLoc = GUI_GetFreeObj();
 	int objButtonLoc = GUI_GetFreeGUIObj(Button);
 	if (objLoc == -1)
@@ -170,6 +170,7 @@ void GUI_DrawObjects(void) {
 #ifdef HAS_FS
 					LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
 #endif
+					LCD_SetFontColor(GUI_Button_Array[GUI_Array[i].TypeID].fontColor);
 					LCD_PrintStringXY(buttonBox.x, (buttonBox.y + ((buttonBox.height/2)-4)), GUI_Button_Array[GUI_Array[i].TypeID].text);
 				}
 				break;
@@ -177,6 +178,7 @@ void GUI_DrawObjects(void) {
 				{
 					struct guiBox labelBox;
 					labelBox = GUI_Label_Array[GUI_Array[i].TypeID].box;
+					LCD_SetFontColor(GUI_Label_Array[GUI_Array[i].TypeID].fontColor);
 					LCD_PrintStringXY(labelBox.x, labelBox.y, GUI_Label_Array[GUI_Array[i].TypeID].text);
 				}
 				break;

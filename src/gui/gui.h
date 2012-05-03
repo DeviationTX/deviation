@@ -31,6 +31,7 @@ struct guiBox {
 };
 struct guiLabel {
 	const char *text;
+	u16 fontColor;
 	struct guiBox box;
 };
 struct guiFrame {
@@ -38,6 +39,7 @@ struct guiFrame {
 };
 struct guiButton {
 	const char *text;
+	u16 fontColor;
 	struct guiBox box;
 
 };
@@ -50,9 +52,9 @@ struct guiObject {
 
 char* GUI_GetText(int GUIID);
 void GUI_SetText(int GUIID,const char *text);
-int GUI_CreateLabel(u16 x, u16 y, const char *text);
+int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
-int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int ObjID));
+int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, u16 fontColor, void (*CallBack)(int ObjID));
 void GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_DrawObjects(void);

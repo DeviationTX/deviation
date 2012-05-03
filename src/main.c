@@ -135,19 +135,19 @@ int main()
 
     frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
     frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
-    lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash);
-    lblBootLoader = GUI_CreateLabel(10,40,strBootLoader);
-    lblMfg = GUI_CreateLabel(10,30,strMfg);
-    lblButtons = GUI_CreateLabel(10,60,buttonstr);
-	lblVoltage = GUI_CreateLabel(262,8,voltagestr);
-	lblTE = GUI_CreateLabel(10,90,te);
-	lblRA = GUI_CreateLabel(10,100,ra);
-	lblT1 = GUI_CreateLabel(10,110,t1);
-	lblT2 = GUI_CreateLabel(10,120,t2);
-	lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage);
-    int testButton1 = GUI_CreateButton(10,200,89,23,button1,PushMeButton1);
-    int testButton2 = GUI_CreateButton(110,200,89,23,button2,PushMeButton2);
-    int testButton3 = GUI_CreateButton(210,200,89,23,button3,PushMeButton3);
+    lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
+    lblBootLoader = GUI_CreateLabel(10,40,strBootLoader,0x0000);
+    lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
+    lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
+	lblVoltage = GUI_CreateLabel(262,8,voltagestr,0x0f00);
+	lblTE = GUI_CreateLabel(10,90,te,0xffff);
+	lblRA = GUI_CreateLabel(10,100,ra,0xffff);
+	lblT1 = GUI_CreateLabel(10,110,t1,0xffff);
+	lblT2 = GUI_CreateLabel(10,120,t2,0xffff);
+	lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage,0xffff);
+    int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
+    int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
+    int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
 
     	int ReDraw=1;
     while(1) {
