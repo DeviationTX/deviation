@@ -31,6 +31,7 @@ void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_SetFont(unsigned int idx);
+void LCD_SetFontColor(u16 color);
     /* Graphics */
 void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color);
 void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color);

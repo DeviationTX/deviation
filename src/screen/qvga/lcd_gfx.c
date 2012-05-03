@@ -22,6 +22,20 @@ All text above must be included in any redistribution
 
 #define swap(x, y) {int __tmp = x; x = y; y = __tmp;}
 
+void LCD_Clear(unsigned int color){
+        uint16_t zeile, spalte;
+        LCD_SetDrawArea(0, 0, (320-1), (240-1));
+        LCD_DrawStart();
+        for(zeile = 0; zeile < 240; zeile++){
+                for(spalte = 0; spalte < 320; spalte++){
+                        LCD_DrawPixel(color);
+                }
+        }
+        LCD_DrawStop();
+
+        return;
+}
+
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
 				 int16_t h, uint16_t color) {
     LCD_SetDrawArea(x, y, x, y + h);
@@ -327,7 +341,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     u16 i, j;
     FILE *fh;
     u8 transparent = 0;
-    u8 buf[320 * 2];
+    u8 buf[0x46];
     fh = fopen(file, "r");
     u32 img_w, img_h, offset, compression;
 
@@ -379,11 +393,10 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     LCD_DrawStart();
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
-        u16 *ptr = (u16 *)buf;
-        fread(buf, img_w * 2, 1, fh);
         if(transparent) {
             for (i = 0; i < w; i++ ) {
-                u16 color = *(ptr++);
+                u16 color;
+                fread(&color, 2, 1, fh);
                 if((color & 0x8000)) {
                     //convert 1555 -> 565
                     color = ((color & 0x7fe0) << 1) | (color & 0x1f);
@@ -393,8 +406,13 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
         } else {
             LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
             for (i = 0; i < w; i++ ) {
-                LCD_DrawPixel(*(ptr++));
+                u16 color;
+                fread(&color, 2, 1, fh);
+                LCD_DrawPixel(color);
             }
+        }
+        if(w < img_w) {
+            fseek(fh, 2 * (img_w - w), SEEK_CUR);
         }
     }
     LCD_DrawStop();

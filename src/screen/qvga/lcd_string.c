@@ -126,17 +126,6 @@ void LCD_PrintChar(const char c)
     }
 }
 
-void LCD_Clear(unsigned int color){
-        uint16_t zeile, spalte;
-        LCD_SetDrawArea(0, 0, (320-1), (240-1));
-        LCD_DrawStart();
-        for(zeile = 0; zeile < 240; zeile++){
-                for(spalte = 0; spalte < 320; spalte++){
-                        LCD_DrawPixel(color);
-                }
-        }
-        LCD_DrawStop();
-
-        return;
+void LCD_SetFontColor(u16 color) {
+    cur_str.color = color;
 }
-
