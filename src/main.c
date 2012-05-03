@@ -64,50 +64,62 @@ int main()
 #endif 
 
 #ifdef STATUS_SCREEN
+    /* Some needed variables */
     u32 last_buttons = 0;
-    char str[80],strBootLoader[80],strSPIFlash[80],strMfg[80];
+
+    char strBootLoader[80],strSPIFlash[80],strMfg[80];
+    char buttonstr[80];
+    char buttonstring[33];
+    char voltagestr[8];
+    char te[40];
+    char ra[40];
+    char t1[40];
+    char t2[40];
+    char buttonmessage[30];
+    const char *button1 = " Button 1 ";
+    const char *button2 = " Button 2 ";
+    const char *button3 = " Button 3 ";
     const char *statusBar = "bar.bmp";
     const char *batteryImg = "bat.bmp";
     int frmStatusBar;
     int frmBattery;
     int lblButtonMessage;
-
-
-    frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
-    frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
-    /* GUI Callbacks */
-    void PushMeButton1(int objID) {
-    	GUI_RemoveObj(objID);
-    	GUI_SetText(lblButtonMessage, "Button 1 Pushed");
-    }
-    void PushMeButton2(int objID) {
-    	GUI_RemoveObj(objID);
-    	GUI_SetText(lblButtonMessage, "Button 2 Pushed");
-    }
-    void PushMeButton3(int objID) {
-    	GUI_RemoveObj(objID);
-    	GUI_SetText(lblButtonMessage, "Button 3 Pushed");
-    }
-    /* Create the buttons */
-    int testButton1 = GUI_CreateButton(10,200,89,23," Button 1 ",PushMeButton1);
-    int testButton2 = GUI_CreateButton(110,200,89,23," Button 2 ",PushMeButton2);
-    int testButton3 = GUI_CreateButton(210,200,89,23," Button 3 ",PushMeButton3);
-
-    char buttonstring[32];
     int lblButtons;
     int lblVoltage;
     int lblTE;
     int lblRA;
     int lblT1;
     int lblT2;
+    int lblSPIFlash;
+    int lblBootLoader;
+    int lblMfg;
+
+    sprintf(buttonstr,"buttons");
+    sprintf(buttonmessage," ");
+    sprintf(t1," ");
+    sprintf(t2," ");
+
+    /* GUI Callbacks */
+    void PushMeButton1(int objID) {
+    	GUI_RemoveObj(objID);
+    	sprintf(buttonmessage,"%s","Button 1 Pushed");
+    }
+    void PushMeButton2(int objID) {
+    	GUI_RemoveObj(objID);
+    	sprintf(buttonmessage,"%s","Button 2 Pushed");
+    }
+    void PushMeButton3(int objID) {
+    	GUI_RemoveObj(objID);
+    	sprintf(buttonmessage,"%s","Button 3 Pushed");
+    }
+
+
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
         (u8*)0x08001000;
         u8 mfgdata[6];
         sprintf(strBootLoader, "BootLoader   : %s\n",pBLString);
-        int lblBootLoader = GUI_CreateLabel(10,40,strBootLoader);
         sprintf(strSPIFlash, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
-        int lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash);
         CYRF_GetMfgData(mfgdata);
         sprintf(strMfg, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
             mfgdata[0],
@@ -116,19 +128,28 @@ int main()
             mfgdata[3],
             mfgdata[4],
             mfgdata[5]);
-        int lblMfg = GUI_CreateLabel(10,30,strMfg);
-        /* draw it all */
-    	GUI_DrawScreen();
-    	lblButtons = GUI_CreateLabel(10,60,"Buttons:\n");
-    	lblVoltage = GUI_CreateLabel(262,8,"0.0");
-    	lblTE = GUI_CreateLabel(10,90,"TE");
-    	lblRA = GUI_CreateLabel(10,100,"RA");
-    	lblT1 = GUI_CreateLabel(10,110," ");
-    	lblT2 = GUI_CreateLabel(10,120," ");
-    	lblButtonMessage = GUI_CreateLabel(100,130," ");
-
     }
-    	int ReDraw=0;
+
+
+    /* Create some GUI elements */
+
+    frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
+    frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
+    lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash);
+    lblBootLoader = GUI_CreateLabel(10,40,strBootLoader);
+    lblMfg = GUI_CreateLabel(10,30,strMfg);
+    lblButtons = GUI_CreateLabel(10,60,buttonstr);
+	lblVoltage = GUI_CreateLabel(262,8,voltagestr);
+	lblTE = GUI_CreateLabel(10,90,te);
+	lblRA = GUI_CreateLabel(10,100,ra);
+	lblT1 = GUI_CreateLabel(10,110,t1);
+	lblT2 = GUI_CreateLabel(10,120,t2);
+	lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage);
+    int testButton1 = GUI_CreateButton(10,200,89,23,button1,PushMeButton1);
+    int testButton2 = GUI_CreateButton(110,200,89,23,button2,PushMeButton2);
+    int testButton3 = GUI_CreateButton(210,200,89,23,button3,PushMeButton3);
+
+    	int ReDraw=1;
     while(1) {
         int i;
         if(PWR_CheckPowerSwitch())
@@ -146,53 +167,47 @@ int main()
             	buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
         }
 
-        		char s[80];
-        		sprintf(s,"Buttons:\n%s",buttonstring);
-        		if (strcmp(s,GUI_GetText(lblButtons)) != 0) {
-        			GUI_SetText(lblButtons,s);
-        			ReDraw = 1;
-        		}
+        char s[80];
+        sprintf(s,"Buttons:\n%s",buttonstring);
+        if (strcmp(s,buttonstr) != 0) {
+        	sprintf(buttonstr,"%s",s);
+        	ReDraw = 1;
+        }
         u16 voltage = PWR_ReadVoltage();
-        sprintf(str, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
-    		sprintf(s,"%s",str);
-    		if (strcmp(s,GUI_GetText(lblVoltage)) != 0) {
-    			GUI_SetText(lblVoltage,s);
-    			ReDraw = 1;
-    		}
+        sprintf(s, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
+    	if (strcmp(s,voltagestr) != 0) {
+    		sprintf(voltagestr,"%s",s);
+    		ReDraw = 1;
+    	}
         u16 throttle = ReadThrottle();
         u16 rudder = ReadRudder();
         u16 aileron = ReadAileron();
         u16 elevator = ReadElevator();
-        sprintf(str, "Throttle: %04X Elevator: %04X\n", throttle, elevator);
-		sprintf(s,"%s",str);
-		if (strcmp(s,GUI_GetText(lblTE)) != 0) {
-			GUI_SetText(lblTE,s);
+        sprintf(s, "Throttle: %04X Elevator: %04X\n", throttle, elevator);
+		if (strcmp(s,te) != 0) {
+			sprintf(te,"%s",s);
 			ReDraw = 1;
 		}
-        sprintf(str, "Rudder  : %04X Aileron : %04X\n", rudder, aileron);
-		sprintf(s,"%s",str);
-		if (strcmp(s,GUI_GetText(lblRA)) != 0) {
-			GUI_SetText(lblRA,s);
+        sprintf(s, "Rudder  : %04X Aileron : %04X\n", rudder, aileron);
+		if (strcmp(s,ra) != 0) {
+			sprintf(ra,"%s",s);
 			ReDraw = 1;
 		}
         if(SPITouch_IRQ()) {
             struct touch t = SPITouch_GetCoords();
 
-            sprintf(str, "x : %4d y : %4d\n", t.x, t.y);
-    		sprintf(s,"%s",str);
-    		if (strcmp(s,GUI_GetText(lblT1)) != 0) {
-    			GUI_SetText(lblT1,s);
+            sprintf(s, "x : %4d y : %4d\n", t.x, t.y);
+    		if (strcmp(s,t1) != 0) {
+    			sprintf(t1,"%s",s);
     			ReDraw = 1;
     		}
-            sprintf(str, "z1: %4d z2: %4d\n", t.z1, t.z2);
-    		sprintf(s,"%s",str);
-    		if (strcmp(s,GUI_GetText(lblT2)) != 0) {
-    			GUI_SetText(lblT2,s);
+            sprintf(s, "z1: %4d z2: %4d\n", t.z1, t.z2);
+    		if (strcmp(s,t2) != 0) {
+    			sprintf(t2,"%s",s);
     			ReDraw = 1;
     		}
             GUI_CheckTouch(t);
         }
-
         if (ReDraw == 1) {
         	/* Redraw everything */
         	GUI_DrawScreen();

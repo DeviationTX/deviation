@@ -30,14 +30,14 @@ struct guiBox {
 	struct guiImage image;
 };
 struct guiLabel {
-	char text[128];
+	const char *text;
 	struct guiBox box;
 };
 struct guiFrame {
 	struct guiBox box;
 };
 struct guiButton {
-	char text[40];
+	const char *text;
 	struct guiBox box;
 
 };

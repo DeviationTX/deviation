@@ -75,7 +75,7 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text) {
 	objLabel.Type = Label;
 	objLabel.CallBack = 0x1; /* no call back yet for labels */
 	label.box = labelBox;
-	sprintf(label.text,"%s",text);
+	label.text = text;
 
 	int objLoc = GUI_GetFreeObj();
 	int objLabelLoc = GUI_GetFreeGUIObj(Label);
@@ -140,7 +140,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void
 	objButton.CallBack = *CallBack;
 
 	button.box = buttonBox;
-	sprintf(button.text,"%s",text);
+	button.text = text;
 
 	int objLoc = GUI_GetFreeObj();
 	int objButtonLoc = GUI_GetFreeGUIObj(Button);
@@ -211,14 +211,14 @@ void GUI_RemoveObj(int objID) {
 		case Button:
 		{
 			struct guiButton blankButton;
-			sprintf(blankButton.text," ");
+			blankButton.text = " ";
 			GUI_Button_Array[GUI_Array[objID].TypeID] = blankButton;
 		}
 		break;
 		case Label:
 		{
 			struct guiLabel blankLabel;
-			sprintf(blankLabel.text," ");
+			blankLabel.text = " ";
 			GUI_Label_Array[GUI_Array[objID].TypeID] = blankLabel;
 		}
 		break;
