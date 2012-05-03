@@ -66,8 +66,15 @@ int main()
 #ifdef STATUS_SCREEN
     u32 last_buttons = 0;
     char str[80],strBootLoader[80],strSPIFlash[80],strMfg[80];
+    const char *statusBar = "bar.bmp";
+    const char *batteryImg = "bat.bmp";
+    int frmStatusBar;
+    int frmBattery;
     int lblButtonMessage;
 
+
+    frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
+    frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
     /* GUI Callbacks */
     void PushMeButton1(int objID) {
     	GUI_RemoveObj(objID);
@@ -98,9 +105,9 @@ int main()
         (u8*)0x08001000;
         u8 mfgdata[6];
         sprintf(strBootLoader, "BootLoader   : %s\n",pBLString);
-        int lblBootLoader = GUI_CreateLabel(10,10,strBootLoader);
+        int lblBootLoader = GUI_CreateLabel(10,40,strBootLoader);
         sprintf(strSPIFlash, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
-        int lblSPIFlash = GUI_CreateLabel(10,20,strSPIFlash);
+        int lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash);
         CYRF_GetMfgData(mfgdata);
         sprintf(strMfg, "CYRF Mfg Data: %02X%02X%02X%02X%02X%02X\n",
             mfgdata[0],
@@ -112,12 +119,12 @@ int main()
         int lblMfg = GUI_CreateLabel(10,30,strMfg);
         /* draw it all */
     	GUI_DrawScreen();
-    	lblButtons = GUI_CreateLabel(10,50,"Buttons:\n");
-    	lblVoltage = GUI_CreateLabel(10,70,"Voltage:");
-    	lblTE = GUI_CreateLabel(10,80,"TE");
-    	lblRA = GUI_CreateLabel(10,90,"RA");
-    	lblT1 = GUI_CreateLabel(10,100," ");
-    	lblT2 = GUI_CreateLabel(10,110," ");
+    	lblButtons = GUI_CreateLabel(10,60,"Buttons:\n");
+    	lblVoltage = GUI_CreateLabel(262,8,"0.0");
+    	lblTE = GUI_CreateLabel(10,90,"TE");
+    	lblRA = GUI_CreateLabel(10,100,"RA");
+    	lblT1 = GUI_CreateLabel(10,110," ");
+    	lblT2 = GUI_CreateLabel(10,120," ");
     	lblButtonMessage = GUI_CreateLabel(100,130," ");
 
     }
@@ -146,7 +153,7 @@ int main()
         			ReDraw = 1;
         		}
         u16 voltage = PWR_ReadVoltage();
-        sprintf(str, "Voltage: %2d.%03d\n", voltage >> 12, voltage & 0x0fff);
+        sprintf(str, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
     		sprintf(s,"%s",str);
     		if (strcmp(s,GUI_GetText(lblVoltage)) != 0) {
     			GUI_SetText(lblVoltage,s);

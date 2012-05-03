@@ -90,6 +90,38 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text) {
 	GUI_Label_Array[objLabelLoc] = label;
 	return objLoc;
 }
+int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
+	struct guiBox frameBox;
+	struct guiImage frameImage;
+	struct guiFrame frame;
+	struct guiObject objFrame;
+
+	frameBox.x = x;
+	frameBox.y = y;
+	frameBox.width = width;
+	frameBox.height = height;
+	frameImage.file = image;
+	frameImage.x_off = 0;
+	frameImage.y_off = 0;
+	frameBox.image = frameImage;
+	objFrame.Type = Frame;
+	objFrame.CallBack = 0x1;
+
+	frame.box = frameBox;
+	int objLoc = GUI_GetFreeObj();
+	int objFrameLoc = GUI_GetFreeGUIObj(Frame);
+	if (objLoc == -1)
+		return -1;
+	if (objFrameLoc == -1)
+		return -1;
+	objFrame.GUIID = objLoc;
+	objFrame.TypeID = objFrameLoc;
+
+	GUI_Array[objLoc] = objFrame;
+	GUI_Frame_Array[objFrameLoc] = frame;
+	return objLoc;
+
+}
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, void (*CallBack)(int objID)) {
 	struct guiBox buttonBox;
 	struct guiImage buttonImage;
@@ -149,6 +181,16 @@ void GUI_DrawObjects(void) {
 				}
 				break;
 				case Frame:
+				{
+					struct guiBox frameBox;
+					struct guiImage frameImage;
+					frameBox = GUI_Frame_Array[GUI_Array[i].TypeID].box;
+					frameImage = GUI_Frame_Array[GUI_Array[i].TypeID].box.image;
+#ifdef HAS_FS
+					LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y, frameImage.file, frameBox.width, frameBox.height, frameImage.x_off, frameImage.y_off);
+#endif
+
+				}
 				break;
 				case CheckBox:
 				break;
@@ -183,7 +225,6 @@ void GUI_RemoveObj(int objID) {
 		case Frame:
 		{
 			struct guiFrame blankFrame;
-			blankFrame.text = "";
 			GUI_Frame_Array[GUI_Array[objID].TypeID] = blankFrame;
 		}
 		break;
