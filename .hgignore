@@ -2,4 +2,5 @@ bin$
 dfu$
 elf$
 list$
+map$
 src/objs
