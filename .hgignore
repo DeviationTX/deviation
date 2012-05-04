@@ -3,4 +3,4 @@ dfu$
 elf$
 list$
 map$
-src/objs
+/objs/
