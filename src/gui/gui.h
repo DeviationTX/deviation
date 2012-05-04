@@ -10,77 +10,73 @@
 #define GUI_H_
 
 enum DialogType {
-	dtOk,
-	dtOkCancel
+    dtOk, dtOkCancel
 };
 enum GUIType {
-	UnknownGUI,		/* Placeholder to keep 0 out of the enum */
-	Button,
-	Label,
-	Frame,
-	CheckBox,
-	Dropdown,
-	Dialog
+    UnknownGUI, /* Placeholder to keep 0 out of the enum */
+    Button, Label, Frame, CheckBox, Dropdown, Dialog
 };
 struct guiImage {
-	const char *file;
-	u16 x_off;
-	u16 y_off;
+    const char *file;
+    u16 x_off;
+    u16 y_off;
 };
 
 struct guiBox {
-	u16 x;
-	u16 y;
-	u16 width;
-	u16 height;
-	struct guiImage image;
+    u16 x;
+    u16 y;
+    u16 width;
+    u16 height;
+    struct guiImage image;
 };
 struct guiLabel {
-	const char *text;
-	u16 fontColor;
-	struct guiBox box;
+    const char *text;
+    u16 fontColor;
+    struct guiBox box;
 };
 struct guiFrame {
-	struct guiBox box;
+    struct guiBox box;
 };
 struct guiButton {
-	const char *text;
-	u16 fontColor;
-	struct guiBox box;
+    const char *text;
+    u16 fontColor;
+    struct guiBox box;
 };
 struct guiDialogReturn {
-	u8 buttonPushed;
-	char strInput[80];
-	int intInput;
+    u8 buttonPushed;
+    char strInput[80];
+    int intInput;
 };
 
 struct guiDialog {
-	const char *text;
-	const char *title;
-	struct guiBox box;
-	enum DialogType Type;
-	u16 fontColor;
-	u16 titleColor;
-	int buttonid[4];
-	void (*CallBack)(int ObjID,struct guiDialogReturn gDR);
+    const char *text;
+    const char *title;
+    struct guiBox box;
+    enum DialogType Type;
+    u16 fontColor;
+    u16 titleColor;
+    int buttonid[4];
+    void (*CallBack)(int ObjID, struct guiDialogReturn gDR);
 
 };
 struct guiObject {
-	enum GUIType Type;
-	void (*CallBack)(int ObjID);
-	int GUIID;
-	int TypeID;
-	u8 Disabled; /* bool: Means this UI element is not 'active' */
-	u8 Model;	 /* bool: Means this UI element is active and all non-model elements are not */
-	int parent;
+    enum GUIType Type;
+    void (*CallBack)(int ObjID);
+    int GUIID;
+    int TypeID;
+    u8 Disabled; /* bool: Means this UI element is not 'active' */
+    u8 Model; /* bool: Means this UI element is active and all non-model elements are not */
+    int parent;
 };
 u8 GUI_CheckModel(void);
-char* GUI_GetText(int GUIID);
-void GUI_SetText(int GUIID,const char *text);
-int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height,const char *title, const char *text, u16 titleColor, u16 fontColor,void (*CallBack)(int ObjID, struct guiDialogReturn),enum DialogType dgType);
+int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
+        const char *text, u16 titleColor, u16 fontColor,
+        void (*CallBack)(int ObjID, struct guiDialogReturn),
+        enum DialogType dgType);
 int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
-int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, u16 fontColor, void (*CallBack)(int ObjID));
+int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
+        u16 fontColor, void (*CallBack)(int ObjID));
 void GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_DrawObjects(void);
