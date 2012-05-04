@@ -19,6 +19,7 @@ struct guiObject GUI_Array[128];
 struct guiButton GUI_Button_Array[64];
 struct guiLabel GUI_Label_Array[64];
 struct guiFrame GUI_Frame_Array[16];
+struct guiDialog GUI_Dialog_Array[8];
 
 void GUI_SetText(int GUIID,const char *text) {
 	int TypeID = GUI_Array[GUIID].TypeID;
@@ -62,7 +63,69 @@ char* GUI_GetText(int GUIID) {
 		break;
 	}
 }
+int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height,const char *title, const char *text, u16 titleColor, u16 fontColor,void (*CallBack)(int ObjID, struct guiDialogReturn),enum DialogType dgType) {
+	struct guiBox dgBox;
+	struct guiImage dgImage;
+	struct guiDialog dialog;
+	struct guiObject objDG;
 
+	dgBox.x = x;
+	dgBox.y = y;
+	dgBox.width = width;
+	dgBox.height = height;
+	dgImage.file = "dialog.bmp";
+	dgImage.x_off = 0;
+	dgImage.y_off = 0;
+	dgBox.image = dgImage;
+	objDG.CallBack = 0x1;
+	objDG.Type = Dialog;
+	objDG.Disabled = 0;
+	objDG.Model = 1;
+
+	dialog.box = dgBox;
+	dialog.text = text;
+	dialog.title = title;
+	dialog.fontColor = fontColor;
+	dialog.titleColor = titleColor;
+	dialog.Type = dgType;
+	dialog.CallBack = *CallBack;
+
+	int objLoc = GUI_GetFreeObj();
+	int objDGLoc = GUI_GetFreeGUIObj(Dialog);
+	if (objLoc == -1)
+		return -1;
+	if (objDGLoc == -1)
+		return -1;
+	objDG.GUIID = objLoc;
+	objDG.TypeID = objDGLoc;
+	GUI_Array[objLoc] = objDG;
+	GUI_Dialog_Array[objDGLoc] = dialog;
+
+	dialog.buttonid[0] = -1;
+	dialog.buttonid[1] = -1;
+	dialog.buttonid[2] = -1;
+	dialog.buttonid[3] = -1;
+
+	switch (dgType) {
+		case dtOk:
+		{
+			dialog.buttonid[0] = GUI_CreateButton( ((x+width)/2)-10,((y+height)-27),89,23,"    Ok",0x0000,dgCallback);
+			GUI_Array[dialog.buttonid[0]].Model = 1;
+			GUI_Array[dialog.buttonid[0]].parent = objLoc;
+		}
+		break;
+		case dtOkCancel:
+		{
+
+		}
+		break;
+	}
+	GUI_Array[objLoc] = objDG;
+	GUI_Dialog_Array[objDGLoc] = dialog;
+
+	return objLoc;
+
+}
 int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
 	struct guiBox labelBox;
 	struct guiObject objLabel;
@@ -74,6 +137,9 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
 	labelBox.height = 10;
 	objLabel.Type = Label;
 	objLabel.CallBack = 0x1; /* no call back yet for labels */
+	objLabel.Model = 0;
+	objLabel.Disabled = 0;
+
 	label.box = labelBox;
 	label.text = text;
 	label.fontColor = fontColor;
@@ -106,6 +172,8 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
 	frameBox.image = frameImage;
 	objFrame.Type = Frame;
 	objFrame.CallBack = 0x1;
+	objFrame.Disabled = 0;
+	objFrame.Model = 0;
 
 	frame.box = frameBox;
 	int objLoc = GUI_GetFreeObj();
@@ -193,7 +261,21 @@ void GUI_DrawObjects(void) {
 #ifdef HAS_FS
 					LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y, frameImage.file, frameBox.width, frameBox.height, frameImage.x_off, frameImage.y_off);
 #endif
-
+				}
+				break;
+				case Dialog:
+				{
+					struct guiBox dgBox;
+					struct guiImage dgImage;
+					dgBox = GUI_Dialog_Array[GUI_Array[i].TypeID].box;
+					dgImage = GUI_Dialog_Array[GUI_Array[i].TypeID].box.image;
+#ifdef HAS_FS
+					LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file, dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
+#endif
+					LCD_SetFontColor(GUI_Dialog_Array[GUI_Array[i].TypeID].titleColor);
+					LCD_PrintStringXY(dgBox.x+5, (dgBox.y + 10), GUI_Dialog_Array[GUI_Array[i].TypeID].title);
+					LCD_SetFontColor(GUI_Dialog_Array[GUI_Array[i].TypeID].fontColor);
+					LCD_PrintStringXY(dgBox.x, (dgBox.y + ((dgBox.height/2)-4)), GUI_Dialog_Array[GUI_Array[i].TypeID].text);
 				}
 				break;
 				case CheckBox:
@@ -230,6 +312,22 @@ void GUI_RemoveObj(int objID) {
 		{
 			struct guiFrame blankFrame;
 			GUI_Frame_Array[GUI_Array[objID].TypeID] = blankFrame;
+		}
+		break;
+		case Dialog:
+		{
+			struct guiDialog blankDialog;
+			blankDialog.buttonid[0] = -1;
+			blankDialog.buttonid[1] = -1;
+			blankDialog.buttonid[2] = -1;
+			blankDialog.buttonid[3] = -1;
+
+			int i;
+			for (i=0;i<4;i++) {
+				GUI_RemoveObj(GUI_Dialog_Array[GUI_Array[objID].TypeID].buttonid[i]);
+			}
+
+			GUI_Dialog_Array[GUI_Array[objID].TypeID] = blankDialog;
 		}
 		break;
 		case CheckBox:
@@ -275,6 +373,13 @@ int GUI_GetFreeGUIObj(enum GUIType guiType) {
 					}
 				}
 				break;
+			case Dialog:
+				{
+					if (GUI_Dialog_Array[i].box.width == 0) {
+						return i;
+					}
+				}
+				break;
 			case CheckBox:
 				{
 				}
@@ -310,6 +415,18 @@ u8 GUI_CheckModel(void) {
 	}
 	return 0;
 }
+void dgCallback(int ObjID) {
+	struct guiDialogReturn gDR;
+	struct guiDialog gd;
+	gd = GUI_Dialog_Array[GUI_Array[GUI_Array[ObjID].parent].TypeID];
+	if (gd.buttonid[0] == ObjID) {gDR.buttonPushed = 0;}
+	if (gd.buttonid[1] == ObjID) {gDR.buttonPushed = 1;}
+	if (gd.buttonid[2] == ObjID) {gDR.buttonPushed = 2;}
+	if (gd.buttonid[3] == ObjID) {gDR.buttonPushed = 3;}
+	gDR.intInput = 0;
+	sprintf(gDR.strInput," ");
+	gd.CallBack(GUI_Array[ObjID].parent,gDR);
+}
 void GUI_CheckTouch(struct touch coords) {
 	int i;
 	int calibrateX = 0;	/* Placeholder for X calibration offset */
@@ -318,21 +435,6 @@ void GUI_CheckTouch(struct touch coords) {
 	modelActive = GUI_CheckModel();
 	for (i=0;i<128;i++) {
 		struct guiObject currentObject = GUI_Array[i];
-		if (currentObject.Type == Button) {
-			printf("Callback: %d\nDisabled: %d\nModelActive: %d\nIsModel: %d\nPass: %d\n",
-					(currentObject.CallBack != 0),
-					(currentObject.Disabled == 0),
-					(modelActive == 0),
-					(currentObject.Model > 0),
-					(
-							(currentObject.CallBack != 0) &&
-							(currentObject.Disabled == 0) &&
-							(
-									(modelActive == 0) ||
-									(currentObject.Model > 0)
-							)
-					));
-		}
 		if ((currentObject.CallBack != 0) && (currentObject.Disabled == 0) && ((modelActive == 0) || (currentObject.Model > 0))) {
 			switch (currentObject.Type) {
 				case Button:
@@ -346,6 +448,8 @@ void GUI_CheckTouch(struct touch coords) {
 					}
 				}
 				break;
+				case Dialog:
+				break;	/* Dialogs are handled by buttons */
 				case Label:
 				break;
 				case Frame:

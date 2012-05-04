@@ -112,7 +112,9 @@ int main()
     	GUI_RemoveObj(objID);
     	sprintf(buttonmessage,"%s","Button 3 Pushed");
     }
-
+    void openDialogPush(int objID, struct guiDialogReturn gDR) {
+    	GUI_RemoveObj(objID);
+    }
 
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
@@ -148,8 +150,9 @@ int main()
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
+    int openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","     Welcome to\n     Deviation",0xffff,0x0000,openDialogPush,dtOk);
 
-    	int ReDraw=1;
+    int ReDraw=1;
     while(1) {
         int i;
         if(PWR_CheckPowerSwitch())
