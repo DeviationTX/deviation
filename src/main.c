@@ -150,6 +150,12 @@ int main() {
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
     int openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","     Welcome to\n     Deviation",0xffff,0x0000,openDialogPush,dtOk);
 
+    /* little bit of code to stop variable warnings */
+    if (frmStatusBar && frmBattery && lblButtonMessage && lblButtons && lblVoltage &&
+        lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
+        testButton1 && testButton2 && testButton3 && openDialog)
+    {/*Just here to avoid warnings*/}
+
     int ReDraw=1;
     while(1) {
         int i;
