@@ -11,4 +11,4 @@ src/push
 push
 .cproject
 .project
-
+/objs/
