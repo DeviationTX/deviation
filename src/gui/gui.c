@@ -138,6 +138,8 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text, u16 
 	buttonBox.image = buttonImage;
 	objButton.Type = Button;
 	objButton.CallBack = *CallBack;
+	objButton.Disabled = 0;
+	objButton.Model = 0;
 
 	button.box = buttonBox;
 	button.text = text;
@@ -298,14 +300,40 @@ void GUI_DrawScreen(void) {
 	 */
 	GUI_DrawObjects();
 }
-
+u8 GUI_CheckModel(void) {
+	int i;
+	for (i=0;i<128;i++) {
+		struct guiObject currentObject = GUI_Array[i];
+		if ((currentObject.Model > 0) && (currentObject.Disabled == 0)) {
+			return 1;
+		}
+	}
+	return 0;
+}
 void GUI_CheckTouch(struct touch coords) {
 	int i;
 	int calibrateX = 0;	/* Placeholder for X calibration offset */
 	int calibrateY = 0;	    /* Placeholder for Y calibration offset */
+	u8 modelActive;
+	modelActive = GUI_CheckModel();
 	for (i=0;i<128;i++) {
 		struct guiObject currentObject = GUI_Array[i];
-		if (currentObject.CallBack != 0) {
+		if (currentObject.Type == Button) {
+			printf("Callback: %d\nDisabled: %d\nModelActive: %d\nIsModel: %d\nPass: %d\n",
+					(currentObject.CallBack != 0),
+					(currentObject.Disabled == 0),
+					(modelActive == 0),
+					(currentObject.Model > 0),
+					(
+							(currentObject.CallBack != 0) &&
+							(currentObject.Disabled == 0) &&
+							(
+									(modelActive == 0) ||
+									(currentObject.Model > 0)
+							)
+					));
+		}
+		if ((currentObject.CallBack != 0) && (currentObject.Disabled == 0) && ((modelActive == 0) || (currentObject.Model > 0))) {
 			switch (currentObject.Type) {
 				case Button:
 				{

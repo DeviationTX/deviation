@@ -41,15 +41,16 @@ struct guiButton {
 	const char *text;
 	u16 fontColor;
 	struct guiBox box;
-
 };
 struct guiObject {
 	enum GUIType Type;
 	void (*CallBack)(int ObjID);
 	int GUIID;
 	int TypeID;
+	u8 Disabled; /* bool: Means this UI element is not 'active' */
+	u8 Model;	/* bool: Means this UI element is active and all non-model elements are not */
 };
-
+u8 GUI_CheckModel(void);
 char* GUI_GetText(int GUIID);
 void GUI_SetText(int GUIID,const char *text);
 int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
