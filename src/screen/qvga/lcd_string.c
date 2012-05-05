@@ -15,70 +15,124 @@
 #include "target.h"
 #include "fonts.h"
 
+#include "fonts.h"
+
+#include "font_arial_14.h"
+#include "font_arial_bold_14.h"
+#include "font_corsiva_12.h"
+#include "font_system_5x7.h"
+#include "font_system_8x8thin.h"
+#include "font_system_8x8thick.h"
+#include "font_system_8x8ord.h"
+#include "font_system_5x8.h"
+#include "font_system_7x8.h"
+
+/* The font bitfield is designed to be backwards compatible with standard
+ * GLCD 8bit bit-fields, but to also support upto 32x32 proportional fonts
+ *
+ * For fixed fonts, the 'width' field of struct FONT_DEF will be the character
+ * width.  For proportional fonts, the 'width' filed will be ORed with 0x80
+ *
+ * If the font is proportional, the 'font_table' will begin with a list of u8
+ * values which represent the width of each character.  The font data follows
+ * immediately afterwards.
+ * If the font is fixed-width, the font data starts at the beginning of the
+ * 'font_table'
+ *
+ * The font data is represented as a bit-field.  A chunk of 1, 2, 3, or 4
+ * bytes represents a single column of pixels.  This will be repeated for
+ * the width of the font.
+ * The column chunk can be thought of as a little-endian number of 8, 16, 24,
+ * or 32 bits, with the low-order bit representing the top row, and the
+ * 'height'-th bit representing the bottom row.
+ *
+ * Example: Here is a '!' as a 1x10 bit-field:
+ *        *    1
+ *        *    1
+ *        *    1
+ *        *    1
+ *        *    1
+ *        *    1
+ *        *    1
+ *             0   = 0x7F
+ *        *    1
+ *        *    1   = 0x03
+ *
+ *  So this would appear as '0x7F, 0x03' in the font table
+ *
+ */
+
+const struct FONT_DEF Fonts[] = {
+    {5, 7, 0x20, 0x80, FontSystem5x7},
+    {5, 8, 32, 128, FontSystem5x8},
+    {7, 8, 32, 128, FontSystem7x8},
+    {8, 8, 32, 128, Font8x8ord},
+    {8, 8, 32, 128, Font8x8thk},
+    {8, 8, 0x20, 0x80, Font8x8thn},
+    {0x80 | 10, 15, 0x20, 0x80, FontArial_14},
+    {0x80 | 10, 15, 0x20, 0x80, FontArial_bold_14},
+    {0x80 | 10, 12, 0x20, 0x80, FontCorsiva_12},
+    {0},
+    };
 static struct {
     const struct FONT_DEF *font;
     unsigned int x_start;
     unsigned int x;
     unsigned int y;
     u16          color;
-} cur_str = { &Fonts[4], 0, 0, 0, 0xffff};
+} cur_str = { &Fonts[5], 0, 0, 0, 0xffff};
 
+u8 get_width(u8 c)
+{
+    // Do not call this function unless you are sure that 'c' is in the font
+    if (IS_PROPORTIONAL(cur_str.font)) {
+        return *(cur_str.font->font_table + c - cur_str.font->first_char);
+    } else {
+        return WIDTH(cur_str.font);
+    }
+}
 void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 {
-  u8 column[cur_str.font->width];
-  u8 row, col;
-  // Check if the requested character is available
-  if ((c >= cur_str.font->first_char) && (c <= cur_str.font->last_char))
-  {
-    // Retrieve appropriate columns from font data
-    for (col = 0; col < cur_str.font->width; col++)
+    u8 row, col, width;
+    u8 row_bytes = HEIGHT(cur_str.font) > 16 ? 4 : HEIGHT(cur_str.font) > 8 ? 2 : 1;
+    const u8 *offset = cur_str.font->font_table;
+    // Check if the requested character is available
+    if ((c >= cur_str.font->first_char) && (c <= cur_str.font->last_char))
     {
-      // Get's first column of appropriate character
-      column[col] = cur_str.font->font_table[((c - 32) * cur_str.font->width) + col];
+        // Check if font is proportional
+        if (IS_PROPORTIONAL(cur_str.font)) {
+            const u8 *proportional_width = offset;
+            // Add up width of all characters up to 'c'
+            for(row = cur_str.font->first_char; row < c; row++) {
+                offset += (*proportional_width++) * row_bytes;
+            }
+            width = *proportional_width;
+            // Move offset past width table
+            offset += cur_str.font->last_char - cur_str.font->first_char;
+        } else {
+            offset += (c - cur_str.font->first_char) * WIDTH(cur_str.font) * row_bytes;
+            width = WIDTH(cur_str.font);
+        }
+        LCD_DrawStart();
+        for (col = 0; col < width; col++)
+        {
+            const u8 *data = offset++;
+            u8 bit = 0;
+            // Data is right aligned,adrawn top to bottom
+            for (row = 0; row < HEIGHT(cur_str.font); ++row)
+            {
+                if (bit == 8) {
+                    data = offset++;
+                    bit = 0;
+                }
+                if (*data & (1 << bit)) {
+                    LCD_DrawPixelXY(x + col, y + row, cur_str.color);
+                }
+                bit++;
+            }
+        }
+        LCD_DrawStop();
     }
-  }
-  else
-  {    
-    // Requested characer is not available in this font ... send a space instead
-    for (col = 0; col < cur_str.font->width; col++)
-    {
-      column[col] = 0xFF;    // Send solid space
-    }
-  }
-
-#ifdef TRANSPARENT_FONT
-  LCD_DrawStart();
-  for (row = 8-cur_str.font->height; row < 8; row++)
-  {
-    for (col = 0; col < cur_str.font->width; col++)
-    {
-      u8 color;
-      color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
-      if(color & 0x80) {
-          LCD_DrawPixelXY(x + col, y + row, cur_str.color);
-      }
-    }
-  }
-  LCD_DrawStop();
-#else
-  LCD_SetDrawArea(x, y, x+cur_str.font->width-1, y+cur_str.font->height);
-  LCD_DrawStart();
-  // Render each column
-  for (row = 8-cur_str.font->height; row < 8; row++)
-  {
-    for (col = 0; col < cur_str.font->width; col++)
-    {
-      u8 color;
-      color = (column[col] << (8 - (row + 1)));     // Shift current row bit left
-      if(color & 0x80) {
-          LCD_DrawPixel(cur_str.color);
-      } else {
-          LCD_DrawPixel(0);
-      }
-    }
-  }
-  LCD_DrawStop();
-#endif
 }
 
 void LCD_SetFont(unsigned int idx)
@@ -119,10 +173,10 @@ void LCD_PrintChar(const char c)
 {
     if(c == '\n') {
         cur_str.x = cur_str.x_start;
-        cur_str.y += cur_str.font->height + 2;
+        cur_str.y += HEIGHT(cur_str.font) + 2;
     } else {
         LCD_PrintCharXY(cur_str.x, cur_str.y, c);
-        cur_str.x += cur_str.font->width + 1;
+        cur_str.x += get_width(c) + 1;
     }
 }
 

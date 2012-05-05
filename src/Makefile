@@ -17,7 +17,7 @@ SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 ODIR     = objs/$(TARGET)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
-CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE)
+CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE) -std=gnu99
 
 $(TARGET).elf: $(LINKFILE) $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)

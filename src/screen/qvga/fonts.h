@@ -30,6 +30,9 @@ struct FONT_DEF
         u8 last_char;          /* The last character available        */
 	const u8 *font_table;       /* Font table start address in memory  */
 };
+#define WIDTH(x)           (0x7F & x->width)
+#define HEIGHT(x)          (x->height)
+#define IS_PROPORTIONAL(x) (0x80 & x->width)
 extern const struct FONT_DEF Fonts[];
 
 extern const u8 FontSystem3x6[];
