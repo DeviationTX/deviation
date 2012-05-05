@@ -1,6 +1,7 @@
 #ifndef _TARGET_H_
 #define _TARGET_H_
 #include <stdint.h>
+#include <string.h>
 
 typedef int8_t s8;
 typedef int16_t s16;
