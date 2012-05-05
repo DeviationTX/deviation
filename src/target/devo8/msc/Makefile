@@ -9,21 +9,23 @@ AS       = $(CROSS)as
 CP       = $(CROSS)objcopy
 DUMP     = $(CROSS)objdump
 
-SRC_C    := $(SRC_C) $(wildcard *.c)
-SRC_S    := $(SRC_S) $(wildcard *.s)
-SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
+SCREEN_DIR  = ../../../screen/qvga
+ROOT_DIR    = ../../../
+DEVO_DIR    = ../
+SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard $(DEVO_DIR)/*.c) $(wildcard $(SCREEN_DIR)/*.c) $(ROOT_DIR)/misc.c
 
 ODIR     = objs
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
-CFLAGS   = -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -std=gnu99
-LFLAGS   = -nostartfiles --gc-sections -nostartfiles -Wl,-Tdevo8.ld -lopencm3_stm32f1 -lc -lnosys
+CFLAGS   = -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -std=gnu99 -fdata-sections -ffunction-sections
+LFLAGS   = -nostartfiles -Wl,-gc-sections -nostartfiles -Wl,-T../devo8.ld -Wl,-Map=$(TARGET).map,--cref -lopencm3_stm32f1 -lc -lnosys
 
-CFLAGS   := $(CFLAGS) -g -Wall -I. -Ilib/inc
+CFLAGS   := $(CFLAGS) -g -Wall -I. -I$(ROOT_DIR)
 
 all = $(TARGET).dfu
 $(TARGET).dfu: $(TARGET).bin
 	../../../../utils/dfu.py -b 0x08004000:$< $@
+	../../../../utils/get_mem_usage.pl $(TARGET).map
 
 $(TARGET).bin: $(TARGET).elf
 	$(CP) -O binary $< $@
@@ -38,10 +40,17 @@ $(ODIR)/%.o: %.c
 	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)/%.o: lib/src/%.c
+$(ODIR)/%.o: $(SCREEN_DIR)/%.c
 	mkdir -p $(ODIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(ODIR)/%.o: $(ROOT_DIR)/%.c
+	mkdir -p $(ODIR) 2>/dev/null || true
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(ODIR)/%.o: $(DEVO_DIR)/%.c
+	mkdir -p $(ODIR) 2>/dev/null || true
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 # phony targets
 .PHONY: clean

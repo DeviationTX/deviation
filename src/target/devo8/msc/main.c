@@ -155,26 +155,14 @@ int main(void)
 	int i;
 
 	PWR_Init();
-#if 0
-	rcc_clock_setup_in_hsi_out_48mhz();
-	rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-
-	/* Pin 2 controls power-down */
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-		GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
-
-	/* Enable GPIOA.2 to keep from shutting down */
-	gpio_set(GPIOA, GPIO2);
-
-	/* When Pin 3 goes high, the user turned off the Tx */
-	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT, GPIO3);
-#endif
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
 		GPIO_CNF_OUTPUT_OPENDRAIN, GPIO10);
 	gpio_set(GPIOB, GPIO10);
 	Delay(0x2710);
 	LCD_Init();
+        SPIFlash_Init();
+        UART_Initialize();
+
 	LCD_Clear(0x0000);
         LCD_PrintStringXY(40, 10, "Hello\n");
 
