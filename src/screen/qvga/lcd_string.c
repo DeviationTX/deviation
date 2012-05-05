@@ -74,6 +74,9 @@ const struct FONT_DEF Fonts[] = {
     {0x80 | 10, 12, 0x20, 0x80, FontCorsiva_12},
     {0},
     };
+
+#define LINE_SPACING 2
+#define CHAR_SPACING 1
 static struct {
     const struct FONT_DEF *font;
     unsigned int x_start;
@@ -84,13 +87,15 @@ static struct {
 
 u8 get_width(u8 c)
 {
-    // Do not call this function unless you are sure that 'c' is in the font
+    if ((c < cur_str.font->first_char) || (c > cur_str.font->last_char))
+        return 0;
     if (IS_PROPORTIONAL(cur_str.font)) {
         return *(cur_str.font->font_table + c - cur_str.font->first_char);
     } else {
         return WIDTH(cur_str.font);
     }
 }
+
 void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 {
     u8 row, col, width;
@@ -173,10 +178,23 @@ void LCD_PrintChar(const char c)
 {
     if(c == '\n') {
         cur_str.x = cur_str.x_start;
-        cur_str.y += HEIGHT(cur_str.font) + 2;
+        cur_str.y += HEIGHT(cur_str.font) + LINE_SPACING;
     } else {
         LCD_PrintCharXY(cur_str.x, cur_str.y, c);
-        cur_str.x += get_width(c) + 1;
+        cur_str.x += get_width(c) + CHAR_SPACING;
+    }
+}
+
+void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
+    *height = HEIGHT(cur_str.font);
+    *width = 0;
+    while(*str) {
+        if(*str == '\n') {
+            *height += HEIGHT(cur_str.font) + LINE_SPACING;
+        } else {
+            *width += get_width(*str) + CHAR_SPACING;
+        }
+        str++;
     }
 }
 

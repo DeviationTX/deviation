@@ -29,6 +29,7 @@ void LCD_PrintChar(const char c);
 void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
+void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height);
 void LCD_SetFont(unsigned int idx);
 void LCD_SetFontColor(u16 color);
     /* Graphics */
