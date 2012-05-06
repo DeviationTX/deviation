@@ -14,11 +14,13 @@
 */
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/f1/scb.h>
 #include "target.h"
 #include "devo8.h"
 
 void PWR_Init(void)
 {
+    SCB_VTOR = 0x4000;
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
     /* Enable GPIOA so we can manage the power switch */
