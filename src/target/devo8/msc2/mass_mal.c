@@ -68,7 +68,6 @@ uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uin
   {
     case 0:
       //DBG("Writing: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
-      SPIFlash_EraseSector(Memory_Offset + (SECTOR_OFFSET * 0x1000));
       SPIFlash_WriteBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8 *)Writebuff);
       //NAND_Write(Memory_Offset, Writebuff, Transfer_Length);
       break;
@@ -100,6 +99,18 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
   return MAL_OK;
 }
 
+/*******************************************************************************
+* Function Name  : MAL_Clear
+* Description    : Clear sectors
+* Input          : None
+* Output         : None
+* Return         : Buffer pointer
+*******************************************************************************/
+uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
+{
+  SPIFlash_EraseSector(Memory_Offset + (SECTOR_OFFSET * 0x1000));
+  return MAL_OK;
+}
 /*******************************************************************************
 * Function Name  : MAL_GetStatus
 * Description    : Get status

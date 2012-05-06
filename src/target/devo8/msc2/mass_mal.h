@@ -31,6 +31,7 @@ uint16_t MAL_Init (uint8_t lun);
 uint16_t MAL_GetStatus (uint8_t lun);
 uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint16_t Transfer_Length);
 uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uint16_t Transfer_Length);
+uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset);
 #endif /* __MASS_MAL_H */
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
