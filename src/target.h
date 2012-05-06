@@ -86,6 +86,7 @@ void SPIFlash_EraseSector(u32 sectorAddress);
 void SPIFlash_BulkErase();
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+void SPI_FlashBlockWriteEnable(u8 enable);
 
 /* SPI CYRF6936 */
 void CYRF_Initialize();
