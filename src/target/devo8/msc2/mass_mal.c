@@ -26,9 +26,10 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint32_t Mass_Memory_Size[2] = {512 * 1024 - 0x26000, 0};
-uint32_t Mass_Block_Size[2] = {512, 0};
-uint32_t Mass_Block_Count[2] = {1024 - 26, 0};
+#define SECTOR_OFFSET 36
+uint32_t Mass_Memory_Size[2] = {0x1000 * (1024 - SECTOR_OFFSET), 0};
+uint32_t Mass_Block_Size[2] = {4096, 0};
+uint32_t Mass_Block_Count[2] = {1024 - SECTOR_OFFSET, 0};
 volatile uint32_t Status = 0;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,22 +64,12 @@ uint16_t MAL_Init(uint8_t lun)
 *******************************************************************************/
 uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uint16_t Transfer_Length)
 {
-  u32 verify[512/ 4];
-  u8 *wb = (u8 *)Writebuff;
-  int i;
   switch (lun)
   {
     case 0:
-      DBG("Writing: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
-      SPIFlash_EraseSector(Memory_Offset * 8 + 0x26000);
-      SPIFlash_WriteBytes(Memory_Offset * 8 + 0x26000, Transfer_Length, wb);
-      SPIFlash_ReadBytes(Memory_Offset * 8 + 0x26000, Transfer_Length, (u8 *)verify);
-      for(i = 0; i < Transfer_Length / 4; i++)
-          if(Writebuff[i] != verify[i]) {
-              printf("Failed: %d %08x != %08x\n\r", i, (unsigned int)wb[i], (unsigned int)verify[i]);
-              return MAL_FAIL;
-          }
-      DBG("Verifed\n\r");
+      //DBG("Writing: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
+      SPIFlash_EraseSector(Memory_Offset + (SECTOR_OFFSET * 0x1000));
+      SPIFlash_WriteBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8 *)Writebuff);
       //NAND_Write(Memory_Offset, Writebuff, Transfer_Length);
       break;
     default:
@@ -101,7 +92,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
     case 0:
       //NAND_Read(Memory_Offset, Readbuff, Transfer_Length);
       //DBG("Reading: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
-      SPIFlash_ReadBytes(Memory_Offset * 8 + 0x26000, Transfer_Length, (u8*)Readbuff);
+      SPIFlash_ReadBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8*)Readbuff);
       break;
     default:
       return MAL_FAIL;

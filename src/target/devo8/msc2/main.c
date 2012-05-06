@@ -57,23 +57,12 @@ int main(void)
         rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
         USB_Init();  
         //nvic_enable_irq(NVIC_USB_HP_CAN_TX_IRQ);
-        //nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 	//gpio_set(GPIOB, GPIO10);
-	if(1){
-		int i;
-		u8 data[512];
-		u8 data1[512];
-		for(i = 0; i < 512; i++) {
-			data[i] = (u8)~i;
-		}
-                //MAL_Write(0, 0, (uint32_t *)data, 512);
-	
-	}
 	SPI_FlashBlockWriteEnable(1);
 	while (1) {
 		if(PWR_CheckPowerSwitch())
 			PWR_Shutdown();
-	        USB_Istr();
         }
 }
 

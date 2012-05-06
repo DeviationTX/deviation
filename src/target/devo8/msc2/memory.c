@@ -33,7 +33,7 @@ __IO uint32_t Block_Read_count = 0;
 __IO uint32_t Block_offset;
 __IO uint32_t Counter = 0;
 uint32_t  Idx;
-uint32_t Data_Buffer[BULK_MAX_PACKET_SIZE *2]; /* 512 bytes*/
+uint32_t Data_Buffer[BULK_MAX_PACKET_SIZE * 16]; /* 4096 bytes*/
 uint8_t TransferState = TXFR_IDLE;
 /* Extern variables ----------------------------------------------------------*/
 extern uint8_t Bulk_Data_Buff[BULK_MAX_PACKET_SIZE];  /* data buffer*/
