@@ -42,8 +42,8 @@ static struct {
     u8  image[320*240*3];
 } gui;
 struct {
-    u32 xscale;
-    u32 yscale;
+    s32 xscale;
+    s32 yscale;
     s32 xoffset;
     s32 yoffset;
 } calibration = {0x10000, 0x10000, 0, 0};
@@ -142,15 +142,6 @@ public:
     
 };
 extern "C" {
-void USB_Initialize() {}
-void Initialize_ButtonMatrix() {}
-void PWR_Init(void) {}
-u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
-void Initialize_Channels() {}
-void SPIFlash_Init() {}
-u32  SPIFlash_ReadID() { return 0x12345678; }
-void SPI_FlashBlockWriteEnable(u8 enable) {};
-void SPITouch_Init() {}
 struct touch SPITouch_GetCoords() {
     //struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
     struct touch t = {gui.mousex, gui.mousey, 0, 0};
@@ -162,26 +153,6 @@ int SPITouch_IRQ()
     Fl::check();
     return gui.mouse;
 }
-
-u8 *BOOTLOADER_Read(int idx) {
-    static u8 str[3][80] = {
-        "",
-        "Devo8 Emu"
-        };
-    u8 ret = 0;
-    switch(idx) {
-        case BL_ID: ret = 1; break;
-    }
-    return str[ret];
-}
-    
-void UART_Initialize() {}
-void CYRF_Initialize() {}
-void CYRF_GetMfgData(u8 data[]) { 
-    u8 d[] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-    memcpy(data, d, 6);
-}
-void SignOn() {}
 
 void LCD_DrawStart(void) {
     Fl::check();
@@ -292,7 +263,7 @@ u32 ReadFlashID()
     return 0;
 }
 
-void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff)
+void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
 {
     calibration.xscale = xscale;
     calibration.yscale = yscale;
