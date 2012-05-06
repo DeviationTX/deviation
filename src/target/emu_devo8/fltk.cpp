@@ -22,7 +22,6 @@
 #include <FL/fl_draw.H>
 
 extern "C" {
-#define SKIP_PRINTF_DEFS
 #include "target.h"
 }
 

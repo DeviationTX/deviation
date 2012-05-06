@@ -199,9 +199,7 @@ void GUI_DrawObjects(void) {
                 struct guiImage buttonImage;
                 buttonBox = GUI_Button_Array[GUI_Array[i].TypeID].box;
                 buttonImage = GUI_Button_Array[GUI_Array[i].TypeID].box.image;
-#ifdef HAS_FS
                 LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
-#endif
                 LCD_SetFontColor(
                         GUI_Button_Array[GUI_Array[i].TypeID].fontColor);
                 LCD_PrintStringXY(buttonBox.x,
@@ -223,9 +221,7 @@ void GUI_DrawObjects(void) {
                 struct guiImage frameImage;
                 frameBox = GUI_Frame_Array[GUI_Array[i].TypeID].box;
                 frameImage = GUI_Frame_Array[GUI_Array[i].TypeID].box.image;
-#ifdef HAS_FS
                 LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y, frameImage.file, frameBox.width, frameBox.height, frameImage.x_off, frameImage.y_off);
-#endif
             }
                 break;
             case Dialog: {
@@ -233,9 +229,7 @@ void GUI_DrawObjects(void) {
                 struct guiImage dgImage;
                 dgBox = GUI_Dialog_Array[GUI_Array[i].TypeID].box;
                 dgImage = GUI_Dialog_Array[GUI_Array[i].TypeID].box.image;
-#ifdef HAS_FS
                 LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file, dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
-#endif
                 LCD_SetFontColor(
                         GUI_Dialog_Array[GUI_Array[i].TypeID].titleColor);
                 LCD_PrintStringXY(dgBox.x + 5, (dgBox.y + 10),
@@ -360,9 +354,7 @@ void GUI_DrawScreen(void) {
     /*
      * First we need to draw the main background
      *  */
-#ifdef HAS_FS
     LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
-#endif
     /*
      * Then we need to draw any supporting GUI
      */

@@ -1,6 +1,7 @@
 #ifndef _TARGET_H_
 #define _TARGET_H_
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef int8_t s8;
@@ -112,8 +113,4 @@ enum {
     BL_ID = 0,
 };
 u8 *BOOTLOADER_Read(int idx);
-#ifndef SKIP_PRINTF_DEFS
-int printf(const char *format, ...);
-int sprintf(char *out, const char *format, ...);
-#endif
 #endif

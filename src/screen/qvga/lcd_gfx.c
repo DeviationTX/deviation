@@ -335,7 +335,6 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
   }
 }
 
-#ifdef HAS_FS
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off)
 {
     u16 i, j;
@@ -423,4 +422,3 @@ void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
 {
     LCD_DrawWindowedImageFromFile(x, y, file, 0, 0, 0, 0);
 }
-#endif
