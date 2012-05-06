@@ -108,6 +108,8 @@ void CYRF_ReadDataPacket(u8 dpbuffer[]);
 /* UART & Debug */
 void UART_Initialize();
 
+/* USB*/
+void USB_Initialize();
 /* Abstract bootloader access */
 enum {
     BL_ID = 0,

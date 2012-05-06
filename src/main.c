@@ -29,6 +29,8 @@ int main() {
     CYRF_Initialize();
     UART_Initialize();
     SPITouch_Init();
+    USB_Initialize();
+    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
     LCD_Clear(0x0000);
 

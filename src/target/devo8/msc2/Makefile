@@ -12,12 +12,12 @@ DUMP     = $(CROSS)objdump
 SCREEN_DIR  = ../../../screen/qvga
 ROOT_DIR    = ../../../
 DEVO_DIR    = ../
-SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard $(DEVO_DIR)/*.c) $(wildcard $(SCREEN_DIR)/*.c) $(ROOT_DIR)/misc.c $(wildcard lib/*.c)
+SRC_C    := $(wildcard *.c) $(wildcard $(DEVO_DIR)/*.c) $(wildcard $(SCREEN_DIR)/*.c) $(ROOT_DIR)/misc.c $(wildcard lib/*.c)
 
 ODIR     = objs
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
-CFLAGS   =  -D"assert_param(x)" -DSTM32F1 -DSTM32F10X_HD -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -std=gnu99 -fdata-sections -ffunction-sections
+CFLAGS   = -DUSB_TEST -D"assert_param(x)=" -DSTM32F1 -DSTM32F10X_HD -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -std=gnu99 -fdata-sections -ffunction-sections
 LFLAGS   = -nostartfiles -Wl,-gc-sections -nostartfiles -Wl,-T../devo8.ld -Wl,-Map=$(TARGET).map,--cref -lopencm3_stm32f1 -lc -lnosys
 
 CFLAGS   := $(CFLAGS) -g -Wall -I. -I$(ROOT_DIR) -Ilib

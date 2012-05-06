@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <stdlib.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
@@ -25,20 +24,27 @@
 
 #define LE_WORD(x)		((x)&0xFF),((x)>>8)
 
-void Set_USBClock();
 void USB_Init();
-uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uint16_t Transfer_Length);
+void USB_Istr(void);
 
+/*
 void usb_hp_can_tx_isr()
 {
         USB_Istr();
 }
+*/
 
 void usb_lp_can_rx0_isr()
 {
         USB_Istr();
 }
-
+void USB_Initialize() {
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
+    USB_Init();  
+    //nvic_enable_irq(NVIC_USB_HP_CAN_TX_IRQ);
+    nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+}
+#ifdef USB_TEST
 int main(void)
 {
 	PWR_Init();
@@ -54,10 +60,7 @@ int main(void)
         LCD_PrintStringXY(40, 10, "Hello\n");
         printf("Hello\n\r");
 
-        rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
-        USB_Init();  
-        //nvic_enable_irq(NVIC_USB_HP_CAN_TX_IRQ);
-        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+        USB_Initialize();
 	//gpio_set(GPIOB, GPIO10);
 	SPI_FlashBlockWriteEnable(1);
 	while (1) {
@@ -65,4 +68,4 @@ int main(void)
 			PWR_Shutdown();
         }
 }
-
+#endif

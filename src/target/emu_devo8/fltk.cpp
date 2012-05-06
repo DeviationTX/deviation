@@ -142,12 +142,14 @@ public:
     
 };
 extern "C" {
+void USB_Initialize() {}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
 void Initialize_Channels() {}
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
+void SPI_FlashBlockWriteEnable(u8 enable) {};
 void SPITouch_Init() {}
 struct touch SPITouch_GetCoords() {
     //struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
