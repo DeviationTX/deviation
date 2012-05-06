@@ -340,8 +340,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     u16 i, j;
     FILE *fh;
     u8 transparent = 0;
-    u8 buf[0x46];
+    u8 buf[320 * 2];
     fh = fopen(file, "r");
+    if(! fh) {
+        LCD_FillRect(x, y, w, h, 0);
+        return;
+    }
     u32 img_w, img_h, offset, compression;
 
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
@@ -392,23 +396,24 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     LCD_DrawStart();
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
+        fread(buf, 2 * w, 1, fh);
+        u16 *color = (u16 *)buf;
         if(transparent) {
             for (i = 0; i < w; i++ ) {
-                u16 color;
-                fread(&color, 2, 1, fh);
-                if((color & 0x8000)) {
+                if((*color & 0x8000)) {
                     //convert 1555 -> 565
-                    color = ((color & 0x7fe0) << 1) | (color & 0x1f);
-                    LCD_DrawPixelXY(x + i, y + h - j - 1, color);
+                    *color = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
+                    LCD_DrawPixelXY(x + i, y + h - j - 1, *color);
                 }
+                color++;
             }
         } else {
-            LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j);
+            LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j - 1);
+            LCD_DrawStart();
             for (i = 0; i < w; i++ ) {
-                u16 color;
-                fread(&color, 2, 1, fh);
-                LCD_DrawPixel(color);
+                LCD_DrawPixel(*color++);
             }
+            LCD_DrawStop();
         }
         if(w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
