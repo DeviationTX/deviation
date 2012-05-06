@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 #include <stdio.h>
-#define DBG printf
+#define DBG if(0) printf
 /* Bulk-only Command Block Wrapper */
 
 typedef struct _Bulk_Only_CBW
