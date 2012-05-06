@@ -64,6 +64,8 @@
 #define SCSI_CMD_WRITE_6			0x0A	/* not implemented yet */
 #define SCSI_CMD_WRITE_10			0x2A
 #define SCSI_CMD_VERIFY_10			0x2F	/* required for windows format */
+#define SCSI_CMD_READ_FORMAT_CAPACITY	        0xFE
+#define SCSI_CMD_MODE_SENSE_6 		        0xFF
 
 // sense codes
 #define WRITE_ERROR				0x030C00
@@ -150,7 +152,7 @@ U8 * SCSIHandleCmd(U8 *pbCDB, U8 iCDBLen, int *piRspLen, BOOL *pfDevIn)
 	// check CDB length
 	bGroupCode = (pCDB->bOperationCode >> 5) & 0x7;
 	if (iCDBLen < aiCDBLen[bGroupCode]) {
-		DBG("Invalid CBD len (expected %d)!\n", (int)aiCDBLen[bGroupCode]);
+		DBG("Invalid CBD len (expected %d)!\n\r", (int)aiCDBLen[bGroupCode]);
 		return NULL;
 	}
 
@@ -158,40 +160,53 @@ U8 * SCSIHandleCmd(U8 *pbCDB, U8 iCDBLen, int *piRspLen, BOOL *pfDevIn)
 
 	// test unit ready (6)
 	case SCSI_CMD_TEST_UNIT_READY:
-		DBG("TEST UNIT READY\n");
+		DBG("TEST UNIT READY\n\r");
 		*piRspLen = 0;
 		break;
 	
 	// request sense (6)
 	case SCSI_CMD_REQUEST_SENSE:
-		DBG("REQUEST SENSE (%06X)\n", (unsigned int)dwSense);
+		DBG("REQUEST SENSE (%06X)\n\r", (unsigned int)dwSense);
 		// check params
 		*piRspLen = MIN(18, pCDB->bLength);
 		break;
 	
+	// mode sense (6)
+	case SCSI_CMD_MODE_SENSE_6:
+		DBG("MODE SENSE(6)\n\r");
+		// check params
+		*piRspLen = MIN(4, pCDB->bLength);
+		break;
+
 	case SCSI_CMD_FORMAT_UNIT:
-		DBG("FORMAT UNIT %02X\n", (unsigned int)pbCDB[1]);
+		DBG("FORMAT UNIT %02X\n\r", (unsigned int)pbCDB[1]);
 		*piRspLen = 0;
 		break;
 	
 	// inquiry (6)
 	case SCSI_CMD_INQUIRY:
-		DBG("INQUIRY\n");
+		DBG("INQUIRY: EVPD: %d, Page: %02x, Len: %04x Control: %02x\n\r",
+                   pCDB->abLBA[0], pCDB->abLBA[1], pCDB->abLBA[2] << 8 | pCDB->bLength, pCDB->bControl );
 		// see SPC3r23, 4.3.4.6
 		*piRspLen = MIN(36, pCDB->bLength);
 		break;
 		
 	// read capacity (10)
 	case SCSI_CMD_READ_CAPACITY_10:
-		DBG("READ CAPACITY\n");
+		DBG("READ CAPACITY\n\r");
 		*piRspLen = 8;
 		break;
 		
+	// read format capacity
+	case SCSI_CMD_READ_FORMAT_CAPACITY:
+		DBG("READ FORMAT CAPACITY\n\r");
+		*piRspLen = 12;
+		break;
 	// read (10)
 	case SCSI_CMD_READ_10:
 		dwLBA = (pbCDB[2] << 24) | (pbCDB[3] << 16) | (pbCDB[4] << 8) | (pbCDB[5]);
 		dwLen = (pbCDB[7] << 8) | pbCDB[8];
-		DBG("READ10, LBA=%d, len=%d\n", (int)dwLBA, (int)dwLen);
+		DBG("READ10, LBA=%d, len=%d\n\r", (int)dwLBA, (int)dwLen);
 		*piRspLen = dwLen * BLOCKSIZE;
 		break;
 
@@ -199,16 +214,16 @@ U8 * SCSIHandleCmd(U8 *pbCDB, U8 iCDBLen, int *piRspLen, BOOL *pfDevIn)
 	case SCSI_CMD_WRITE_10:
 		dwLBA = (pbCDB[2] << 24) | (pbCDB[3] << 16) | (pbCDB[4] << 8) | (pbCDB[5]);
 		dwLen = (pbCDB[7] << 8) | pbCDB[8];
-		DBG("WRITE10, LBA=%d, len=%d\n", (int)dwLBA, (int)dwLen);
+		DBG("WRITE10, LBA=%d, len=%d\n\r", (int)dwLBA, (int)dwLen);
 		*piRspLen = dwLen * BLOCKSIZE;
 		*pfDevIn = FALSE;
 		break;
 
 	case SCSI_CMD_VERIFY_10:
-		DBG("VERIFY10\n");
+		DBG("VERIFY10\n\r");
 		if ((pbCDB[1] & (1 << 1)) != 0) {
 			// we don't support BYTCHK
-			DBG("BYTCHK not supported\n");
+			DBG("BYTCHK not supported\n\r");
 			return NULL;
 		}
 		*piRspLen = 0;
@@ -219,7 +234,7 @@ U8 * SCSIHandleCmd(U8 *pbCDB, U8 iCDBLen, int *piRspLen, BOOL *pfDevIn)
 		for (i = 0; i < iCDBLen; i++) {
 			DBG(" %02X", (unsigned int)pbCDB[i]);
 		}
-		DBG("\n");
+		DBG("\n\r");
 		// unsupported command
 		dwSense = INVALID_CMD_OPCODE;
 		*piRspLen = 0;
@@ -273,6 +288,13 @@ U8 * SCSIHandleData(U8 *pbCDB, U8 iCDBLen, U8 *pbData, U32 dwOffset)
 		dwSense = 0;
 		break;
 	
+	// mode sense
+	case SCSI_CMD_MODE_SENSE_6:
+		pbData[0] = 0x03;
+		pbData[1] = 0x00;
+		pbData[2] = 0x00;
+		pbData[3] = 0x00;
+		break;
 	case SCSI_CMD_FORMAT_UNIT:
 		// nothing to do, ignore this command
 		break;
@@ -298,6 +320,25 @@ U8 * SCSIHandleData(U8 *pbCDB, U8 iCDBLen, U8 *pbData, U32 dwOffset)
 		pbData[6] = (BLOCKSIZE >> 8) & 0xFF;
 		pbData[7] = (BLOCKSIZE >> 0) & 0xFF;
 		break;
+	case SCSI_CMD_READ_FORMAT_CAPACITY:
+		// get size of drive (bytes)
+		BlockDevGetSize(&dwDevSize);
+		// calculate highest LBA
+		dwMaxBlock = (dwDevSize - 1) / 512;
+		
+		pbData[0] = 0x00;
+		pbData[1] = 0x00;
+		pbData[2] = 0x00;
+		pbData[3] = 0x08;
+		pbData[4] = (dwMaxBlock >> 24) & 0xFF;
+		pbData[5] = (dwMaxBlock >> 16) & 0xFF;
+		pbData[6] = (dwMaxBlock >> 8) & 0xFF;
+		pbData[7] = (dwMaxBlock >> 0) & 0xFF;
+		pbData[8] = 0x02;
+		pbData[9] = (BLOCKSIZE >> 16) & 0xFF;
+		pbData[10] = (BLOCKSIZE >> 8) & 0xFF;
+		pbData[11] = (BLOCKSIZE >> 0) & 0xFF;
+		break;
 		
 	// read10
 	case SCSI_CMD_READ_10:
@@ -308,10 +349,10 @@ U8 * SCSIHandleData(U8 *pbCDB, U8 iCDBLen, U8 *pbData, U32 dwOffset)
 		if (dwBufPos == 0) {
 			// read new block
 			dwBlockNr = dwLBA + (dwOffset / BLOCKSIZE);
-			DBG("R");
+			//DBG("R");
 			if (BlockDevRead(dwBlockNr, abBlockBuf) < 0) {
 				dwSense = READ_ERROR;
-				DBG("BlockDevRead failed\n");
+				DBG("BlockDevRead failed\n\r");
 				return NULL;
 			}
 		}
@@ -330,7 +371,7 @@ U8 * SCSIHandleData(U8 *pbCDB, U8 iCDBLen, U8 *pbData, U32 dwOffset)
 			DBG("W");
 			if (BlockDevWrite(dwBlockNr, abBlockBuf) < 0) {
 				dwSense = WRITE_ERROR;
-				DBG("BlockDevWrite failed\n");
+				DBG("BlockDevWrite failed\n\r");
 				return NULL;
 			}
 		}

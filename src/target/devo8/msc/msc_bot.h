@@ -29,7 +29,7 @@
 #define U16 u16
 #define U8 u8
 #define BOOL u8
-#define DBG printf
+#define DBG if(0) printf
 #define MAX(x, y) (x > y ? x : y)
 #define MIN(x, y) (x < y ? x : y)
 #define MSC_BULK_OUT_EP		0x02

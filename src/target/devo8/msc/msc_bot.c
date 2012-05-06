@@ -93,7 +93,7 @@ static U8			*pbData;
  */
 void MSCBotReset(void)
 {
-	DBG("BOT reset in state %d\n", eState);
+	DBG("BOT reset in state %d\n\r", eState);
 	// reset BOT state
 	eState = eCBW;
 	// reset SCSI
@@ -118,7 +118,7 @@ static void SendCSW(U8 bStatus)
 	CSW.dwCSWDataResidue 	= MAX(iResidue, 0);
 	CSW.bmCSWStatus 		= bStatus;
 
-	DBG("CSW: status=%x, residue=%d\n", (unsigned int)bStatus, (int)CSW.dwCSWDataResidue);
+	DBG("CSW: len=%d status=%x, residue=%d\n\r", (unsigned int)dwTransferSize, (unsigned int)bStatus, (int)CSW.dwCSWDataResidue);
 
 	// next state
 	eState = eCSW;
@@ -137,21 +137,21 @@ static BOOL CheckCBW(TCBW *pCBW, int iLen)
 {
 	// CBW valid?
 	if (iLen != 31) {
-		DBG("Invalid length (%d)\n", iLen);
+		DBG("Invalid length (%d)\n\r", iLen);
 		return FALSE;
 	}
 	if (pCBW->dwCBWSignature != CBW_SIGNATURE) {
-		DBG("Invalid signature %x\n", (unsigned int)pCBW->dwCBWSignature);
+		DBG("Invalid signature %x\n\r", (unsigned int)pCBW->dwCBWSignature);
 		return FALSE;
 	}
 
 	// CBW meaningful?
 	if (pCBW->bCBWLun != 0) {
-		DBG("Invalid LUN %d\n", (int)pCBW->bCBWLun);
+		DBG("Invalid LUN %d\n\r", (int)pCBW->bCBWLun);
 		return FALSE;
 	}
 	if ((pCBW->bCBWCBLength < 1) || (pCBW->bCBWCBLength > 16)) {
-		DBG("Invalid CB len %d\n", pCBW->bCBWCBLength);
+		DBG("Invalid CB len %d\n\r", pCBW->bCBWCBLength);
 		return FALSE;
 	}
 	return TRUE;
@@ -209,7 +209,7 @@ static void HandleDataIn(void)
 	if (dwOffset == dwTransferSize) {
 		if (dwOffset != CBW.dwCBWDataTransferLength) {
 			// stall pipe
-			DBG("stalling DIN");
+			DBG("stalling DIN\n\r");
 			BOTStall();
 		}
 		// done
@@ -245,7 +245,7 @@ static void HandleDataOut(void)
 	if (dwOffset == dwTransferSize) {
 		if (dwOffset != CBW.dwCBWDataTransferLength) {
 			// stall pipe
-			DBG("stalling DOUT");
+			DBG("stalling DOUT\n\r");
 			BOTStall();
 		}
 		SendCSW(STATUS_PASSED);
@@ -264,7 +264,7 @@ void MSCBotBulkOut(U8 bEP)
 {
 	int 	iLen, iChunk;
 	BOOL	fHostIn, fDevIn;
-	
+	DBG("bulk out: %02x %02x\n\r", bEP, eState);
 	switch (eState) {
 
 	case eCBW:
@@ -279,7 +279,7 @@ void MSCBotBulkOut(U8 bEP)
 			break;
 		}
 		
-		DBG("CBW: len=%d, flags=%x, cmd=%x, cmdlen=%d\n",
+		DBG("CBW: len=%d, flags=%x, cmd=%x, cmdlen=%d\n\r",
 			(int)CBW.dwCBWDataTransferLength, (unsigned int)CBW.bmCBWFlags, (int)CBW.CBWCB[0], (int)CBW.bCBWCBLength);
 		
 		dwOffset = 0;
@@ -299,7 +299,7 @@ void MSCBotBulkOut(U8 bEP)
 		if ((iLen > 0) &&
 			((fHostIn && !fDevIn) ||
 			(!fHostIn && fDevIn))) {
-			DBG("Host and device disagree on direction\n");
+			DBG("Host and device disagree on direction\n\r");
 			BOTStall();
 			SendCSW(STATUS_PHASE_ERR);
 			break;
@@ -307,7 +307,7 @@ void MSCBotBulkOut(U8 bEP)
 
 		// rule: if D > H, send CSW with status 2
 		if (iLen > CBW.dwCBWDataTransferLength) {
-			DBG("Negative residue\n");
+			DBG("Negative residue\n\r");
 			BOTStall();
 			SendCSW(STATUS_PHASE_ERR);
 			break;
@@ -332,7 +332,7 @@ void MSCBotBulkOut(U8 bEP)
 	case eDataIn:
 	case eCSW:
 		iChunk = usbd_ep_read_packet(bEP, NULL, 0);
-		DBG("Phase error in state %d, %d bytes\n", eState, iChunk);
+		DBG("Phase error in state %d, %d bytes\n\r", eState, iChunk);
 		eState = eCBW;
 		break;
 	
@@ -342,7 +342,7 @@ void MSCBotBulkOut(U8 bEP)
 		break;
 		
 	default:
-		DBG("Invalid state %d\n", eState);
+		DBG("Invalid state %d\n\r", eState);
 		while(1) ;
 		break;
 	}
@@ -358,6 +358,7 @@ void MSCBotBulkOut(U8 bEP)
  */
 void MSCBotBulkIn(U8 bEP)
 {
+	DBG("bulk in: %02x %02x\n\r", bEP, eState);
 	switch (eState) {
 	
 	case eCBW:
@@ -372,6 +373,7 @@ void MSCBotBulkIn(U8 bEP)
 	case eCSW:
 		// wait for an IN token, then send the CSW
 		usbd_ep_write_packet(MSC_BULK_IN_EP, (U8 *)&CSW, 13);
+		DBG("Sending CSW to host\n\r");
 		eState = eCBW;
 		break;
 		
@@ -381,7 +383,7 @@ void MSCBotBulkIn(U8 bEP)
 		break;
 		
 	default:
-		DBG("Invalid state %d\n", eState);
+		DBG("Invalid state %d\n\r", eState);
 		ASSERT(FALSE);
 		break;
 	}

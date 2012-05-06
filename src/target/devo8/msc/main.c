@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/nvic.h>
 #include <libopencm3/usb/usbd.h>
 #include "msc_bot.h"
 #include "target.h"
@@ -106,11 +107,11 @@ static int msc_control_request(struct usb_setup_data *req, u8 **buf,
 	(void)buf;
 
 	if (req->wIndex != 0) {
-		DBG("Invalid idx %X\n", req->wIndex);
+		DBG("Invalid idx %X\n\r", req->wIndex);
 		return 0;
 	}
 	if (req->wValue != 0) {
-		DBG("Invalid val %X\n", req->wValue);
+		DBG("Invalid val %X\n\r", req->wValue);
 		return 0;
 	}
 
@@ -131,7 +132,7 @@ static int msc_control_request(struct usb_setup_data *req, u8 **buf,
 		break;
 		
 	default:
-		DBG("Unhandled class\n");
+		DBG("Unhandled class\n\r");
 		return 0;
 	}
 	return 1;
@@ -150,6 +151,16 @@ static void msc_set_config(u16 wValue)
 				msc_control_request);
 }
 
+void usb_hp_can_tx_isr()
+{
+        usbd_poll();
+}
+
+void usb_lp_can_rx0_isr()
+{
+        usbd_poll();
+}
+
 int main(void)
 {
 	int i;
@@ -165,9 +176,12 @@ int main(void)
 
 	LCD_Clear(0x0000);
         LCD_PrintStringXY(40, 10, "Hello\n");
+        printf("Hello\n\r");
 
 	usbd_init(&stm32f103_usb_driver, &dev, &config, usb_strings);
 	usbd_register_set_config_callback(msc_set_config);
+        nvic_enable_irq(NVIC_USB_HP_CAN_TX_IRQ);
+        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
 
 	for (i = 0; i < 0x800000; i++)
 		__asm__("nop");
@@ -176,7 +190,7 @@ int main(void)
 	while (1) {
 		if(PWR_CheckPowerSwitch())
 			PWR_Shutdown();
-		usbd_poll();
+		//usbd_poll();
         }
 }
 

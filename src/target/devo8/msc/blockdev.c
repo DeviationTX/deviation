@@ -29,6 +29,10 @@ int BlockDevWrite(U32 dwAddress, U8* pbBuf) {
 }
 
 int BlockDevRead(U32 dwAddress, U8* pbBuf) {
+    int i;
+    for(i = 0; i < 512; i++) {
+        pbBuf[i] = (u8)i;
+    }
     return 0;
 }
 
