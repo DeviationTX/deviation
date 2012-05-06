@@ -48,11 +48,11 @@ PA7 : SPI1_MOSI
 #define pen_is_down() (! gpio_get(GPIOB, GPIO5))
 
 struct {
-    u32 xscale;
-    u32 yscale;
+    s32 xscale;
+    s32 yscale;
     s32 xoffset;
     s32 yoffset;
-} calibration = {0x10000, 0x10000, 0, 0};
+} calibration;
 
 u8 read_channel(u8 address)
 {
@@ -84,6 +84,7 @@ void SPITouch_Init()
     CS_LO();
     spi_xfer(SPI1, RESET);
     CS_HI();
+    SPITouch_Calibrate(197312, 147271, -404, -20); /* Read from my Tx */
 #if 0
     /* SCK, MOSI */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
@@ -109,13 +110,19 @@ struct touch SPITouch_GetCoords()
 {
     struct touch res;
     CS_LO();
-    res.x = read_channel(READ_X);
-    res.y = read_channel(READ_Y);
+    /* X and Y are swapped on Devo8 */
+    /* and X is reversed */
+    res.x = 255 - read_channel(READ_Y);
+    res.y = read_channel(READ_X);
     res.z1 = read_channel(READ_Z1);
     res.z2 = read_channel(READ_Z2);
     CS_HI();
     res.x = res.x * calibration.xscale / 0x10000 + calibration.xoffset;
-    res.x = res.y * calibration.yscale / 0x10000 + calibration.yoffset;
+    if(res.x & 0x8000)
+        res.x = 0;
+    res.y = res.y * calibration.yscale / 0x10000 + calibration.yoffset;
+    if(res.y & 0x8000)
+        res.y = 0;
     return res;
 }
 
@@ -124,7 +131,7 @@ int SPITouch_IRQ()
     return pen_is_down();
 }
 
-void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff)
+void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
 {
     calibration.xscale = xscale;
     calibration.yscale = yscale;
