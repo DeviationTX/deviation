@@ -26,7 +26,6 @@
 
 void USB_Init();
 void USB_Istr(void);
-
 /*
 void usb_hp_can_tx_isr()
 {
@@ -38,12 +37,44 @@ void usb_lp_can_rx0_isr()
 {
         USB_Istr();
 }
-void USB_Initialize() {
+
+void USB_Enable(u8 use_interrupt)
+{
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+        GPIO_CNF_OUTPUT_OPENDRAIN, GPIO10);
+        gpio_set(GPIOB, GPIO10);
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
     USB_Init();  
-    //nvic_enable_irq(NVIC_USB_HP_CAN_TX_IRQ);
-    nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+    if(use_interrupt) {
+        nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+    }
 }
+
+void USB_Disable()
+{
+    gpio_set(GPIOB, GPIO10);
+    nvic_disable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
+}
+ 
+void USB_HandleISR()
+{
+    USB_Istr();
+}
+
+void USB_Connect()
+{
+    //Wait for button release
+    while((ScanButtons() & 0x02) == 0)
+        ;
+    USB_Enable(1);
+    while((ScanButtons() & 0x02) != 0)
+        ;
+    //Wait for button release
+    while((ScanButtons() & 0x02) == 0)
+        ;
+    USB_Disable(1);
+}
+
 #ifdef USB_TEST
 int main(void)
 {
@@ -60,7 +91,7 @@ int main(void)
         LCD_PrintStringXY(40, 10, "Hello\n");
         printf("Hello\n\r");
 
-        USB_Initialize();
+        USB_Enable();
 	//gpio_set(GPIOB, GPIO10);
 	SPI_FlashBlockWriteEnable(1);
 	while (1) {

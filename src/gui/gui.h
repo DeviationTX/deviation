@@ -77,7 +77,7 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
         u16 fontColor, void (*CallBack)(int ObjID));
-void GUI_CheckTouch(struct touch coords);
+u8 GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(int objID);

@@ -29,7 +29,7 @@ int main() {
     CYRF_Initialize();
     UART_Initialize();
     SPITouch_Init();
-    USB_Initialize();
+    FS_Mount();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
     LCD_Clear(0x0000);
@@ -99,8 +99,8 @@ int main() {
     sprintf(buttonmessage," ");
     sprintf(t1," ");
     sprintf(t2," ");
-
     /* GUI Callbacks */
+
     void PushMeButton1(int objID) {
         GUI_RemoveObj(objID);
         sprintf(buttonmessage,"%s","Button 1 Pushed");
@@ -119,7 +119,6 @@ int main() {
 
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
-        (u8*)0x08001000;
         u8 mfgdata[6];
         sprintf(strBootLoader, "BootLoader   : %s\n",pBLString);
         sprintf(strSPIFlash, "SPI Flash    : %X\n",(unsigned int)SPIFlash_ReadID());
@@ -134,7 +133,6 @@ int main() {
     }
 
     /* Create some GUI elements */
-
     frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
     frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
     lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
@@ -157,7 +155,6 @@ int main() {
         lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
         testButton1 && testButton2 && testButton3 && openDialog)
     {/*Just here to avoid warnings*/}
-
     int ReDraw=1;
     while(1) {
         int i;
@@ -170,10 +167,14 @@ int main() {
          * */
         if(buttons != last_buttons) {
             last_buttons = buttons;
-            if((buttons & 0x1) == 0)
-            LCD_CalibrateTouch();
+            if((buttons & 0x01) == 0)
+                LCD_CalibrateTouch();
+            if((buttons & 0x02) == 0)
+                USB_Connect();
             for(i = 0; i < 32; i++)
             buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
+            buttonstring[32] = 0;
+            printf("Buttons: %s\n\r",buttonstring);
         }
 
         char s[80];
@@ -186,7 +187,7 @@ int main() {
         sprintf(s, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
         if (strcmp(s,voltagestr) != 0) {
             sprintf(voltagestr,"%s",s);
-            ReDraw = 1;
+            //ReDraw = 1;
         }
         u16 throttle = ReadThrottle();
         u16 rudder = ReadRudder();
@@ -195,27 +196,27 @@ int main() {
         sprintf(s, "Throttle: %04X Elevator: %04X\n", throttle, elevator);
         if (strcmp(s,te) != 0) {
             sprintf(te,"%s",s);
-            ReDraw = 1;
+            //ReDraw = 1;
         }
         sprintf(s, "Rudder  : %04X Aileron : %04X\n", rudder, aileron);
         if (strcmp(s,ra) != 0) {
             sprintf(ra,"%s",s);
-            ReDraw = 1;
+            //ReDraw = 1;
         }
         if(SPITouch_IRQ()) {
             struct touch t = SPITouch_GetCoords();
-
+            printf("x : %4d y : %4d\n\r", t.x, t.y);
             sprintf(s, "x : %4d y : %4d\n", t.x, t.y);
             if (strcmp(s,t1) != 0) {
                 sprintf(t1,"%s",s);
-                ReDraw = 1;
+                //ReDraw = 1;
             }
             sprintf(s, "z1: %4d z2: %4d\n", t.z1, t.z2);
             if (strcmp(s,t2) != 0) {
                 sprintf(t2,"%s",s);
-                ReDraw = 1;
+                //ReDraw = 1;
             }
-            GUI_CheckTouch(t);
+            ReDraw |= GUI_CheckTouch(t);
         }
         if (ReDraw == 1) {
             /* Redraw everything */

@@ -60,7 +60,7 @@ struct touch {
 void SPITouch_Init();
 struct touch SPITouch_GetCoords();
 int SPITouch_IRQ();
-void SPITouch_Calibrate(u32 xscale, u32 yscale, s32 xoff, s32 yoff);
+void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff);
 
 
 /* Buttons and switches */
@@ -109,7 +109,15 @@ void CYRF_ReadDataPacket(u8 dpbuffer[]);
 void UART_Initialize();
 
 /* USB*/
-void USB_Initialize();
+void USB_Enable(u8 use_iinterrupt);
+void USB_Disable();
+void USB_HandleISR();
+void USB_Connect();
+
+/* Filesystem */
+void FS_Mount();
+void FS_Unmount();
+
 /* Abstract bootloader access */
 enum {
     BL_ID = 0,
