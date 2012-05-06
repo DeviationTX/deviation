@@ -78,6 +78,18 @@ u32 SPIFlash_ReadID()
     CS_HI();
     return result;
 }
+
+void SPI_FlashBlockWriteEnable(u8 enable)
+{
+    CS_LO();
+    spi_xfer(SPI1, 0x50);
+    CS_HI();
+    CS_LO();
+    spi_xfer(SPI1, 0x01);
+    spi_xfer(SPI1, enable ? 0 : 0x38);
+    CS_HI();
+}
+
 /*
  *
  */
@@ -201,7 +213,7 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 
     for(i=0;i<length;i++)
     {
-        spi_xfer(SPI1, buffer[i]);
+        buffer[i] = spi_xfer(SPI1, 0);
     }
 
     CS_HI();
