@@ -24,7 +24,7 @@ $(TARGET).elf: $(LINKFILE) $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 
 clean:
-	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(ODIR)/*.o
+	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
 
 $(OBJS): | $(ODIR)
 
