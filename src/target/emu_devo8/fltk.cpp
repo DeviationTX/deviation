@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/timeb.h>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -271,5 +272,12 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
     calibration.yoffset = yoff;
 }
 
+u32 CLOCK_getms()
+{
+    struct timeb tp;
+  
+    ftime(&tp);
+    return (tp.time * 1000) + tp.millitm;
+}
 }
 

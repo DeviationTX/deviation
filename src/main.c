@@ -19,6 +19,7 @@
 
 int main() {
     PWR_Init();
+    CLOCK_Init();
     Initialize_ButtonMatrix();
     Delay(0x2710);
 

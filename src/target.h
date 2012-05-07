@@ -73,6 +73,9 @@ u16  PWR_ReadVoltage(void);
 int  PWR_CheckPowerSwitch();
 void PWR_Shutdown();
 
+/* Clock functions */
+void CLOCK_Init(void);
+u32 CLOCK_getms(void);
 /* Sticks */
 void Initialize_Channels();
 u16 ReadThrottle();
