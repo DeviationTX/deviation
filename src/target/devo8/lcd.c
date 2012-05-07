@@ -90,14 +90,19 @@ void lcd_init_backlight()
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM3EN);
     timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT,
                     TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    timer_set_prescaler(TIM3, 0);
-    timer_set_repetition_counter(TIM3, 0);
     timer_set_period(TIM3, 0x2CF);
-
-
+    timer_set_prescaler(TIM3, 0);
+    timer_generate_event(TIM3, TIM_EGR_UG);
+    //timer_set_repetition_counter(TIM3, 0);
     timer_set_oc_mode(TIM3, TIM_OC4, TIM_OCM_PWM1);
-    timer_set_oc_value(TIM3, TIM_OC4, 0x168);
+    timer_enable_oc_preload(TIM3, TIM_OC4);
+
+    timer_set_oc_polarity_low(TIM3, TIM_OC4);
     timer_enable_oc_output(TIM3, TIM_OC4);
+
+    timer_set_oc_value(TIM3, TIM_OC4, 0x168);
+    timer_enable_preload(TIM3);
+    timer_enable_counter(TIM3);
 }
 
 void LCD_Init()

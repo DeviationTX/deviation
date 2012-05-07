@@ -29,6 +29,7 @@ int main() {
     CYRF_Initialize();
     UART_Initialize();
     SPITouch_Init();
+    SOUND_Init();
     FS_Mount();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
@@ -301,4 +302,3 @@ int main() {
 #endif
     return 0;
 }
-

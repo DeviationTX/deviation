@@ -105,6 +105,12 @@ void CYRF_StartReceive();
 
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
 
+/* Sound */
+void SOUND_Init();
+void SOUND_SetPeriod(u16 period);
+void SOUND_Enable();
+void SOUND_Disable();
+
 /* UART & Debug */
 void UART_Initialize();
 
