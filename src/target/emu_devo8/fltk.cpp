@@ -192,6 +192,11 @@ void start_event_loop() {
     Fl::run();
 }
 
+void close_window(Fl_Widget *widget, void *param)
+{
+    exit(0);
+}
+
 void LCD_Init()
 {
   int i;
@@ -222,6 +227,7 @@ void LCD_Init()
   //Fl_Output out(320, 0, 30, 10);
   main_window->end();
   main_window->show();
+  main_window->callback(close_window);
   //Fl::add_handler(&handler);
   Fl::add_check(update_channels);
   Fl::wait();
