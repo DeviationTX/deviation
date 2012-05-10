@@ -17,6 +17,12 @@
 #include "misc.h"
 #include "gui/gui.h"
 
+void initialize_status();
+void event_loop(void *);
+void channel_scanner();
+void dump_bootloader();
+extern void start_event_loop();
+
 int main() {
     PWR_Init();
     CLOCK_Init();
@@ -37,65 +43,38 @@ int main() {
     LCD_Clear(0x0000);
 
 #ifdef BL_DUMP
-    LCD_PrintStringXY(40, 10, "Dumping");
-
-    printf("Erase...\n\r");
-
-    SPIFlash_EraseSector(0x2000);
-    SPIFlash_EraseSector(0x3000);
-    SPIFlash_EraseSector(0x4000);
-    SPIFlash_EraseSector(0x5000);
-
-    printf("Pgm 2\n\r");
-    SPIFlash_WriteBytes(0x2000, 0x1000, (u8*)0x08000000);
-    printf("Pgm 3\n\r");
-    SPIFlash_WriteBytes(0x3000, 0x1000, (u8*)0x08001000);
-    printf("Pgm 4\n\r");
-    SPIFlash_WriteBytes(0x4000, 0x1000, (u8*)0x08002000);
-    printf("Pgm 5\n\r");
-    SPIFlash_WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
-    printf("Done\n\r");
-
-    LCD_Clear(0x0000);
-    LCD_PrintStringXY(40, 10, "Done");
-
-    while(1)
-    {
-        if(PWR_CheckPowerSwitch())
-        PWR_Shutdown();
-    }
-#endif 
-
+    dump_bootloader();
+#endif
+#if SCANNER
+    channel_scanner();
+#endif
 #ifdef STATUS_SCREEN
-    /* Some needed variables */
-    u32 last_buttons = 0;
+    initialize_status();
+#ifdef HAS_EVENT_LOOP
+    start_event_loop();
+#else
+    while(1)
+        event_loop(NULL);
+#endif
+    return 0;
+#endif
+}
 
-    char strBootLoader[80],strSPIFlash[80],strMfg[80];
-    char buttonstr[80];
-    char buttonstring[33];
-    char voltagestr[8];
-    char te[40];
-    char ra[40];
-    char t1[40];
-    char t2[40];
-    char buttonmessage[30];
-    const char *button1 = " Button 1 ";
-    const char *button2 = " Button 2 ";
-    const char *button3 = " Button 3 ";
-    const char *statusBar = "bar.bmp";
-    const char *batteryImg = "bat.bmp";
-    int frmStatusBar;
-    int frmBattery;
-    int lblButtonMessage;
-    int lblButtons;
-    int lblVoltage;
-    int lblTE;
-    int lblRA;
-    int lblT1;
-    int lblT2;
-    int lblSPIFlash;
-    int lblBootLoader;
-    int lblMfg;
+static char buttonstr[80];
+static char voltagestr[8];
+static char te[40];
+static char ra[40];
+static char t1[40];
+static char t2[40];
+void initialize_status()
+{
+    static char strBootLoader[80],strSPIFlash[80],strMfg[80];
+    static char buttonmessage[30];
+    static const char *button1 = "Button 1";
+    static const char *button2 = "Button 2";
+    static const char *button3 = "Button 3";
+    static const char *statusBar = "bar.bmp";
+    static const char *batteryImg = "bat.bmp";
 
     sprintf(buttonstr,"buttons");
     sprintf(buttonmessage," ");
@@ -135,18 +114,18 @@ int main() {
     }
 
     /* Create some GUI elements */
-    frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
-    frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
-    lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
-    lblBootLoader = GUI_CreateLabel(10,40,strBootLoader,0x0000);
-    lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
-    lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
-    lblVoltage = GUI_CreateLabel(262,8,voltagestr,0x0f00);
-    lblTE = GUI_CreateLabel(10,90,te,0xffff);
-    lblRA = GUI_CreateLabel(10,100,ra,0xffff);
-    lblT1 = GUI_CreateLabel(10,110,t1,0xffff);
-    lblT2 = GUI_CreateLabel(10,120,t2,0xffff);
-    lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage,0xffff);
+    int frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
+    int frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
+    int lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
+    int lblBootLoader = GUI_CreateLabel(10,40,strBootLoader,0x0000);
+    int lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
+    int lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
+    int lblVoltage = GUI_CreateLabel(262,8,voltagestr,0x0f00);
+    int lblTE = GUI_CreateLabel(10,90,te,0xffff);
+    int lblRA = GUI_CreateLabel(10,100,ra,0xffff);
+    int lblT1 = GUI_CreateLabel(10,110,t1,0xffff);
+    int lblT2 = GUI_CreateLabel(10,120,t2,0xffff);
+    int lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage,0xffff);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
@@ -157,17 +136,27 @@ int main() {
         lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
         testButton1 && testButton2 && testButton3 && openDialog)
     {/*Just here to avoid warnings*/}
-    int ReDraw=1;
-    while(1) {
-        int i;
-        if(PWR_CheckPowerSwitch())
+}
+
+void event_loop(void *param)
+{
+    /* Some needed variables */
+    static u32 last_buttons = 0;
+    char s[80];
+    (void)(param);
+
+    int ReDraw=0;
+    int i;
+    if(PWR_CheckPowerSwitch())
         PWR_Shutdown();
+    {
         u32 buttons = ScanButtons();
 
         /* GUI Handling
          * We beed to handle screen redraws here
          * */
         if(buttons != last_buttons) {
+            char buttonstring[33];
             last_buttons = buttons;
             if((buttons & 0x01) == 0)
                 LCD_CalibrateTouch();
@@ -177,20 +166,19 @@ int main() {
             buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
             buttonstring[32] = 0;
             printf("Buttons: %s\n\r",buttonstring);
-        }
-
-        char s[80];
-        sprintf(s,"Buttons:\n%s",buttonstring);
-        if (strcmp(s,buttonstr) != 0) {
-            sprintf(buttonstr,"%s",s);
+            sprintf(buttonstr,"Buttons:\n%s",buttonstring);
             ReDraw = 1;
         }
+    }
+    {
         u16 voltage = PWR_ReadVoltage();
         sprintf(s, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
         if (strcmp(s,voltagestr) != 0) {
             sprintf(voltagestr,"%s",s);
             //ReDraw = 1;
         }
+    }
+    {
         u16 throttle = ReadThrottle();
         u16 rudder = ReadRudder();
         u16 aileron = ReadAileron();
@@ -205,29 +193,32 @@ int main() {
             sprintf(ra,"%s",s);
             //ReDraw = 1;
         }
-        if(SPITouch_IRQ()) {
-            struct touch t = SPITouch_GetCoords();
-            printf("x : %4d y : %4d\n\r", t.x, t.y);
-            sprintf(s, "x : %4d y : %4d\n", t.x, t.y);
-            if (strcmp(s,t1) != 0) {
-                sprintf(t1,"%s",s);
-                //ReDraw = 1;
-            }
-            sprintf(s, "z1: %4d z2: %4d\n", t.z1, t.z2);
-            if (strcmp(s,t2) != 0) {
-                sprintf(t2,"%s",s);
-                //ReDraw = 1;
-            }
-            ReDraw |= GUI_CheckTouch(t);
-        }
-        if (ReDraw == 1) {
-            /* Redraw everything */
-            GUI_DrawScreen();
-            ReDraw = 0;
-        }
     }
-#endif    
-#ifdef SCANNER
+    if(SPITouch_IRQ()) {
+        struct touch t = SPITouch_GetCoords();
+        printf("x : %4d y : %4d\n\r", t.x, t.y);
+        sprintf(s, "x : %4d y : %4d\n", t.x, t.y);
+        if (strcmp(s,t1) != 0) {
+            sprintf(t1,"%s",s);
+            //ReDraw = 1;
+        }
+        sprintf(s, "z1: %4d z2: %4d\n", t.z1, t.z2);
+        if (strcmp(s,t2) != 0) {
+            sprintf(t2,"%s",s);
+            //ReDraw = 1;
+        }
+        ReDraw |= GUI_CheckTouch(t);
+    }
+    if (ReDraw == 1) {
+        /* Redraw everything */
+        GUI_DrawScreen();
+        ReDraw = 0;
+    }
+}
+
+#if SCANNER
+void channel_scanner()
+{
 #define NUM_CHANNELS    0x50
 
     u32 i,j,k;
@@ -299,7 +290,38 @@ int main() {
             }
         }
     }
-
-#endif
-    return 0;
 }
+#endif
+
+#ifdef BL_DUMP
+void dump_bootloader()
+{
+    LCD_PrintStringXY(40, 10, "Dumping");
+
+    printf("Erase...\n\r");
+
+    SPIFlash_EraseSector(0x2000);
+    SPIFlash_EraseSector(0x3000);
+    SPIFlash_EraseSector(0x4000);
+    SPIFlash_EraseSector(0x5000);
+
+    printf("Pgm 2\n\r");
+    SPIFlash_WriteBytes(0x2000, 0x1000, (u8*)0x08000000);
+    printf("Pgm 3\n\r");
+    SPIFlash_WriteBytes(0x3000, 0x1000, (u8*)0x08001000);
+    printf("Pgm 4\n\r");
+    SPIFlash_WriteBytes(0x4000, 0x1000, (u8*)0x08002000);
+    printf("Pgm 5\n\r");
+    SPIFlash_WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
+    printf("Done\n\r");
+
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(40, 10, "Done");
+
+    while(1)
+    {
+        if(PWR_CheckPowerSwitch())
+        PWR_Shutdown();
+    }
+}
+#endif

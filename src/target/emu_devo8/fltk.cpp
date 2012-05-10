@@ -16,10 +16,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/timeb.h>
+#include <time.h>
 
 #include <FL/Fl.H>
+#include <FL/x.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
 
 extern "C" {
@@ -40,21 +44,32 @@ static struct {
     u8  powerdown;
     u8  mouse;
     u16 mousex, mousey;
+    Fl_Output *raw[20];
+    Fl_Output *final[20];
+    u32 last_redraw;
+#ifdef ALT_DRAW
     u8  image[320*240*3];
+#else
+    Fl_Offscreen image;
+#endif
 } gui;
-struct {
+
+static struct {
     s32 xscale;
     s32 yscale;
     s32 xoffset;
     s32 yoffset;
 } calibration = {0x10000, 0x10000, 0, 0};
 
-static Fl_Window *window;
+static Fl_Window *main_window;
+static Fl_Box    *image;
+void update_channels(void *);
 
-class mywin : public Fl_Window
+#define WINDOW Fl_Window
+class mywin : public WINDOW
 {
 public:
-    mywin(int W, int H) : Fl_Window(W,H) {
+    mywin(int W, int H) : WINDOW(W,H) {
     }
     int get_button(int key)
     {
@@ -75,6 +90,7 @@ public:
             return 1;
         case FL_KEYDOWN:
         //case FL_SHORTCUT:
+            redraw();
             key = get_button(Fl::event_key());
             if(key >= 0) {
                 gui.buttons |= (1 << key);
@@ -133,16 +149,93 @@ public:
             gui.mouse = 0;
             return 1;
         }
-        return Fl_Window::handle(event);
+        return WINDOW::handle(event);
     }
-#ifdef ALT_DRAW
-    void draw() {
-        fl_draw_image(gui.image, 0, 0, 320,240, 3, 0);
-    }
-#endif
-    
 };
+class image_box : public Fl_Box
+{
+public:
+    image_box(int X, int Y, int W, int H) : Fl_Box(X, Y, W, H) {
+    }
+    void draw() {
+#ifdef ALT_DRAW
+      fl_draw_image(gui.image, 0, 0, 320,240, 3, 0);
+#else
+      fl_copy_offscreen(x(), y(), w(), h(), gui.image, 0, 0);
+#endif
+    }
+};
+void update_channels(void *params)
+{
+    (void)params;
+    char str[80];
+    int changed = 0;
+    if(gui.raw[0]) {
+        sprintf(str, "%6.2f%%", gui.throttle * 10.0);
+        if(strcmp(str, gui.raw[0]->value()))
+            changed |= gui.raw[0]->value(str);
+        sprintf(str, "%6.2f%%", gui.rudder * 10.0);
+        if(strcmp(str, gui.raw[1]->value()))
+            changed |= gui.raw[1]->value(str);
+        sprintf(str, "%6.2f%%", gui.elevator * 10.0);
+        if(strcmp(str, gui.raw[2]->value()))
+            changed |= gui.raw[2]->value(str);
+        sprintf(str, "%6.2f%%", gui.aileron * 10.0);
+        if(strcmp(str, gui.raw[3]->value()))
+            changed = gui.raw[3]->value(str);
+    }
+}
 extern "C" {
+extern void event_loop(void *);
+void start_event_loop() {
+    Fl::add_idle(event_loop);
+    Fl::run();
+}
+
+void LCD_Init()
+{
+  int i;
+  Fl::visual(FL_RGB);
+  main_window = new mywin(640,240);
+  image = new image_box(0, 0, 320, 240);
+  //fl_font(fl_font(), 5);
+  memset(&gui, 0, sizeof(gui));
+  for(i = 0; i < 10; i++) {
+      //This will leak memory for the labels, but it won't be much
+      char *str;
+      asprintf(&str, "Ch %d", i);
+      gui.raw[i] = new Fl_Output(370, 20 * i + 20, 50, 15, str);
+      gui.raw[i]->textsize(10);
+      gui.final[i] = new Fl_Output(430, 20 * i + 20, 50, 15);
+      gui.final[i]->textsize(10);
+      asprintf(&str, "Ch %d", i + 10);
+      gui.raw[i+10] = new Fl_Output(530, 20 * i + 20, 50, 15, str);
+      gui.raw[i+10]->textsize(10);
+      gui.final[i+10] = new Fl_Output(590, 20 * i + 20, 50, 15);
+      gui.final[i+10]->textsize(10);
+  }
+  new Fl_Box(370, 0, 50, 20,"Raw");
+  new Fl_Box(430, 0, 50, 20,"Final");
+  new Fl_Box(530, 0, 50, 20,"Raw");
+  new Fl_Box(590, 0, 50, 20,"Final");
+  //Fl_Box box(320, 0, 320, 240);
+  //Fl_Output out(320, 0, 30, 10);
+  main_window->end();
+  main_window->show();
+  //Fl::add_handler(&handler);
+  Fl::add_check(update_channels);
+  Fl::wait();
+  gui.last_redraw = CLOCK_getms();
+#ifndef ALT_DRAW
+  main_window->make_current();
+  gui.image = fl_create_offscreen(320, 240);
+  fl_begin_offscreen(gui.image);
+  fl_color(FL_BLACK);
+  fl_rectf(0, 0, 320, 240);
+  fl_end_offscreen();
+#endif
+}
+
 struct touch SPITouch_GetCoords() {
     //struct touch t = {gui.mousex * 256 / 320, gui.mousey, 0, 0};
     struct touch t = {gui.mousex, gui.mousey, 0, 0};
@@ -151,31 +244,26 @@ struct touch SPITouch_GetCoords() {
 
 int SPITouch_IRQ()
 {
+#ifndef HAS_EVENT_LOOP
     Fl::check();
+#endif
     return gui.mouse;
 }
 
 void LCD_DrawStart(void) {
+#ifndef HAS_EVENT_LOOP
     Fl::check();
     Fl::flush();
+#endif
 }
 void LCD_DrawStop(void) {
-#ifdef ALT_DRAW
-    Fl::redraw();
-#endif
+    image->redraw();
+    //Fl::redraw();
+#ifndef HAS_EVENT_LOOP
     Fl::check();
+#endif
 }
 
-void LCD_Init()
-{
-  Fl::visual(FL_RGB);
-  window = new mywin(320,240);
-  window->end();
-  window->show();
-  memset(&gui, 0, sizeof(gui));
-  //Fl::add_handler(&handler);
-  Fl::wait();
-}
 
 void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {
@@ -199,9 +287,11 @@ void LCD_DrawPixel(unsigned int color)
     gui.image[3*(320*gui.y+gui.x)+2] = b;
     gui.x++;
 #else
+    fl_begin_offscreen(gui.image);
     Fl_Color c = fl_rgb_color(r, g, b);
     fl_color(c);
     fl_point(gui.x++, gui.y);
+    fl_end_offscreen();
 #endif
     if(gui.x > gui.xend) {
         gui.x = gui.xstart;
@@ -219,11 +309,11 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
     gui.image[3*(320*y+x)+1] = g;
     gui.image[3*(320*y+x)+2] = b;
 #else
+    fl_begin_offscreen(gui.image);
     Fl_Color c = fl_rgb_color(r, g, b);
     fl_color(c);
-    Fl::check();
-    Fl::flush();
     fl_point(x, y);
+    fl_end_offscreen();
 #endif
 }
 

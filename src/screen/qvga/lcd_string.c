@@ -83,7 +83,7 @@ static struct {
     unsigned int x;
     unsigned int y;
     u16          color;
-} cur_str = { &Fonts[5], 0, 0, 0, 0xffff};
+} cur_str = { &Fonts[6], 0, 0, 0, 0xffff};
 
 u8 get_width(u8 c)
 {
