@@ -39,6 +39,8 @@ struct guiFrame {
 };
 struct guiButton {
     const char *text;
+    u16 text_x_off;
+    u16 text_y_off;
     u16 fontColor;
     struct guiBox box;
 };

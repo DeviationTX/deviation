@@ -172,6 +172,10 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
 
     button.box = buttonBox;
     button.text = text;
+    LCD_GetStringDimensions((u8 *)text, &button.text_x_off, &button.text_y_off);
+    printf("%s: (%d, %d), Box: (%d, %d -> %d, %d)\n", text, button.text_x_off, button.text_y_off, x, y, width, height);
+    button.text_x_off = (width - button.text_x_off) / 2 + x;
+    button.text_y_off = (height - button.text_y_off) / 2 + y;
     button.fontColor = fontColor;
     int objLoc = GUI_GetFreeObj();
     int objButtonLoc = GUI_GetFreeGUIObj(Button);
@@ -202,8 +206,8 @@ void GUI_DrawObjects(void) {
                 LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
                 LCD_SetFontColor(
                         GUI_Button_Array[GUI_Array[i].TypeID].fontColor);
-                LCD_PrintStringXY(buttonBox.x,
-                        (buttonBox.y + ((buttonBox.height / 2) - 4)),
+                LCD_PrintStringXY(GUI_Button_Array[GUI_Array[i].TypeID].text_x_off,
+                        GUI_Button_Array[GUI_Array[i].TypeID].text_y_off,
                         GUI_Button_Array[GUI_Array[i].TypeID].text);
             }
                 break;
