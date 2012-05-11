@@ -71,7 +71,7 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     switch (dgType) {
     case dtOk: {
         dialog.buttonid[0] = GUI_CreateButton(((x + width) / 2) - 10,
-                ((y + height) - 27), 89, 23, "    Ok", 0x0000, dgCallback);
+                ((y + height) - 27), 89, 23, "Ok", 0x0000, dgCallback);
         GUI_Array[dialog.buttonid[0]].Model = 1;
         GUI_Array[dialog.buttonid[0]].parent = objLoc;
     }
@@ -243,6 +243,8 @@ void GUI_DrawObject(int ObjID)
             struct guiImage dgImage;
             dgBox = GUI_Array[ObjID].box;
             dgImage = GUI_Array[ObjID].box.image;
+            printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", dgBox.x,
+                    dgBox.y, dgBox.width, dgBox.height);
             LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file,
                     dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
             LCD_SetFontColor(
@@ -253,6 +255,12 @@ void GUI_DrawObject(int ObjID)
                     GUI_Dialog_Array[GUI_Array[ObjID].TypeID].fontColor);
             LCD_PrintStringXY(dgBox.x, (dgBox.y + ((dgBox.height / 2) - 4)),
                     GUI_Dialog_Array[GUI_Array[ObjID].TypeID].text);
+            int i;
+            for (i=0;i<4;i++) {
+                if (GUI_Dialog_Array[GUI_Array[ObjID].TypeID].buttonid[i] != -1) {
+                    GUI_DrawObject(GUI_Dialog_Array[GUI_Array[ObjID].TypeID].buttonid[i]);
+                }
+            }
         }
             break;
         case CheckBox:
@@ -452,8 +460,26 @@ void GUI_DrawWindow(int ObjID)
                                     <= (currentBox.x + currentBox.width))
                             && (obj.box.y >= currentBox.y)
                             && ((obj.box.y + obj.box.height)
+                                    <= (currentBox.y + currentBox.height)))
+                    || ((obj.box.x <= currentBox.x) /* Offset to the left */
+                            && ((obj.box.x + obj.box.width)
+                                    <= (currentBox.x + currentBox.width))
+                            && (obj.box.y >= currentBox.y)
+                            && ((obj.box.y + obj.box.height)
+                                    <= (currentBox.y + currentBox.height)))
+                    || ((obj.box.x < (currentBox.x + currentBox.width)) /* Offset to the right */
+                    && ((obj.box.x + obj.box.width) > currentBox.x)
+                            && (obj.box.y >= currentBox.y)
+                            && ((obj.box.y + obj.box.height)
                                     <= (currentBox.y + currentBox.height))))
             {
+                switch (currentObj.Type) {
+                    case UnknownGUI:
+                    case Dialog: {
+                        GUI_DrawObject(i);
+                    }
+                    break;
+                }
                 printf(
                         "Partial Hit...TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n              TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n",
                         obj.Type, ObjID, obj.box.x, obj.box.y, obj.box.width,
@@ -466,9 +492,12 @@ void GUI_DrawWindow(int ObjID)
                         obj.box.height, currentObj.Type, i, currentBox.x,
                         currentBox.y, currentBox.width, currentBox.height);
             }
+        } else {
+            if (ObjID == i) {
+                GUI_DrawObject(ObjID);
+            }
         }
     }
-    GUI_DrawObject(ObjID);
 }
 u8 GUI_CheckTouch(struct touch coords)
 {

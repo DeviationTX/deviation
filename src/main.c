@@ -117,20 +117,20 @@ void initialize_status()
     /* Create some GUI elements */
     int frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
     int frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
-    int lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
-    int lblBootLoader = GUI_CreateLabel(10,40,strBootLoader,0x0000);
+    int lblSPIFlash = GUI_CreateLabel(10,60,strSPIFlash,0x0000);
+    int lblBootLoader = GUI_CreateLabel(10,45,strBootLoader,0x0000);
     int lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
-    lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
-    int lblVoltage = GUI_CreateLabel(262,8,voltagestr,0x0f00);
-    int lblTE = GUI_CreateLabel(10,90,te,0xffff);
-    int lblRA = GUI_CreateLabel(10,100,ra,0xffff);
-    int lblT1 = GUI_CreateLabel(10,110,t1,0xffff);
-    int lblT2 = GUI_CreateLabel(10,120,t2,0xffff);
-    int lblButtonMessage = GUI_CreateLabel(100,130,buttonmessage,0xffff);
+    lblButtons = GUI_CreateLabel(10,75,buttonstr,0x0000);
+    int lblVoltage = GUI_CreateLabel(267,8,voltagestr,0x0f00);
+    int lblTE = GUI_CreateLabel(10,110,te,0xffff);
+    int lblRA = GUI_CreateLabel(10,140,ra,0xffff);
+    int lblT1 = GUI_CreateLabel(10,125,t1,0xffff);
+    int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
+    int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
-    int openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","     Welcome to\n     Deviation",0xffff,0x0000,openDialogPush,dtOk);
+    int openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
 
     /* little bit of code to stop variable warnings */
     if (frmStatusBar && frmBattery && lblButtonMessage && lblButtons && lblVoltage &&
