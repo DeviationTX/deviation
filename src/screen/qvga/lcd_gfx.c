@@ -391,7 +391,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     if(h == 0)
         h = img_h;
 
-    offset += (img_w * y_off + x_off) * 2;
+    offset += (img_w * (img_h - (y_off + h)) + x_off) * 2;
     fseek(fh, offset, SEEK_SET);
     LCD_DrawStart();
     /* Bitmap start is at lower-left corner */

@@ -188,7 +188,6 @@ void LCD_PrintChar(const char c)
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
     *height = HEIGHT(cur_str.font);
     *width = 0;
-    printf("String: %s\nW: %d   H: %d\n",str,width,height);
     while(*str) {
         if(*str == '\n') {
             *height += HEIGHT(cur_str.font) + LINE_SPACING;
@@ -197,6 +196,7 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
         }
         str++;
     }
+    printf("String: %s\nW: %d   H: %d\n",str,(int)*width,(int)*height);
 }
 
 void LCD_SetFontColor(u16 color) {
