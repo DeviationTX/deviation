@@ -32,17 +32,17 @@ struct guiBox {
 struct guiLabel {
     const char *text;
     u16 fontColor;
-    struct guiBox box;
+    u8 inuse;
 };
 struct guiFrame {
-    struct guiBox box;
+    u8 inuse;
 };
 struct guiButton {
     const char *text;
     u16 text_x_off;
     u16 text_y_off;
     u16 fontColor;
-    struct guiBox box;
+    u8 inuse;
 };
 struct guiDialogReturn {
     u8 buttonPushed;
@@ -53,17 +53,17 @@ struct guiDialogReturn {
 struct guiDialog {
     const char *text;
     const char *title;
-    struct guiBox box;
     enum DialogType Type;
     u16 fontColor;
     u16 titleColor;
     int buttonid[4];
     void (*CallBack)(int ObjID, struct guiDialogReturn gDR);
-
+    u8 inuse;
 };
 struct guiObject {
     enum GUIType Type;
     void (*CallBack)(int ObjID);
+    struct guiBox box;
     int GUIID;
     int TypeID;
     u8 Disabled; /* bool: Means this UI element is not 'active' */
@@ -86,4 +86,5 @@ void GUI_RemoveObj(int objID);
 int GUI_GetFreeObj(void);
 int GUI_GetFreeGUIObj(enum GUIType guiType);
 void dgCallback(int ObjID);
+void GUI_DrawWindow(int ObjID);
 #endif /* GUI_H_ */

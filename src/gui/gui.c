@@ -24,7 +24,8 @@ struct guiDialog GUI_Dialog_Array[8];
 int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *text, u16 titleColor, u16 fontColor,
         void (*CallBack)(int ObjID, struct guiDialogReturn),
-        enum DialogType dgType) {
+        enum DialogType dgType)
+{
     struct guiBox dgBox;
     struct guiImage dgImage;
     struct guiDialog dialog;
@@ -42,14 +43,14 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     objDG.Type = Dialog;
     objDG.Disabled = 0;
     objDG.Model = 1;
-
-    dialog.box = dgBox;
+    objDG.box = dgBox;
     dialog.text = text;
     dialog.title = title;
     dialog.fontColor = fontColor;
     dialog.titleColor = titleColor;
     dialog.Type = dgType;
     dialog.CallBack = *CallBack;
+    dialog.inuse = 1;
 
     int objLoc = GUI_GetFreeObj();
     int objDGLoc = GUI_GetFreeGUIObj(Dialog);
@@ -86,7 +87,8 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     return objLoc;
 
 }
-int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
+int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
+{
     struct guiBox labelBox;
     struct guiObject objLabel;
     struct guiLabel label;
@@ -100,9 +102,10 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
     objLabel.Model = 0;
     objLabel.Disabled = 0;
 
-    label.box = labelBox;
+    objLabel.box = labelBox;
     label.text = text;
     label.fontColor = fontColor;
+    label.inuse = 1;
     int objLoc = GUI_GetFreeObj();
     int objLabelLoc = GUI_GetFreeGUIObj(Label);
     if (objLoc == -1)
@@ -116,7 +119,8 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor) {
     GUI_Label_Array[objLabelLoc] = label;
     return objLoc;
 }
-int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
+int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image)
+{
     struct guiBox frameBox;
     struct guiImage frameImage;
     struct guiFrame frame;
@@ -134,8 +138,8 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
     objFrame.CallBack = (void *) 0x1;
     objFrame.Disabled = 0;
     objFrame.Model = 0;
-
-    frame.box = frameBox;
+    frame.inuse = 1;
+    objFrame.box = frameBox;
     int objLoc = GUI_GetFreeObj();
     int objFrameLoc = GUI_GetFreeGUIObj(Frame);
     if (objLoc == -1)
@@ -151,7 +155,8 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image) {
 
 }
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
-        u16 fontColor, void (*CallBack)(int objID)) {
+        u16 fontColor, void (*CallBack)(int objID))
+{
     struct guiBox buttonBox;
     struct guiImage buttonImage;
     struct guiButton button;
@@ -169,11 +174,13 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     objButton.CallBack = *CallBack;
     objButton.Disabled = 0;
     objButton.Model = 0;
-
-    button.box = buttonBox;
+    button.inuse = 1;
+    objButton.box = buttonBox;
     button.text = text;
-    LCD_GetStringDimensions((u8 *)text, &button.text_x_off, &button.text_y_off);
-    printf("%s: (%d, %d), Box: (%d, %d -> %d, %d)\n", text, button.text_x_off, button.text_y_off, x, y, width, height);
+    LCD_GetStringDimensions((u8 *) text, &button.text_x_off,
+            &button.text_y_off);
+    printf("%s: (%d, %d), Box: (%d, %d -> %d, %d)\n", text, button.text_x_off,
+            button.text_y_off, x, y, width, height);
     button.text_x_off = (width - button.text_x_off) / 2 + x;
     button.text_y_off = (height - button.text_y_off) / 2 + y;
     button.fontColor = fontColor;
@@ -190,7 +197,8 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     GUI_Button_Array[objButtonLoc] = button;
     return objLoc;
 }
-void GUI_DrawObjects(void) {
+void GUI_DrawObjects(void)
+{
 
     int i;
     for (i = 0; i < 128; i++) {
@@ -201,19 +209,22 @@ void GUI_DrawObjects(void) {
             case Button: {
                 struct guiBox buttonBox;
                 struct guiImage buttonImage;
-                buttonBox = GUI_Button_Array[GUI_Array[i].TypeID].box;
-                buttonImage = GUI_Button_Array[GUI_Array[i].TypeID].box.image;
-                LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y, buttonImage.file, buttonBox.width, buttonBox.height, buttonImage.x_off, buttonImage.y_off);
+                buttonBox = GUI_Array[i].box;
+                buttonImage = GUI_Array[i].box.image;
+                LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y,
+                        buttonImage.file, buttonBox.width, buttonBox.height,
+                        buttonImage.x_off, buttonImage.y_off);
                 LCD_SetFontColor(
                         GUI_Button_Array[GUI_Array[i].TypeID].fontColor);
-                LCD_PrintStringXY(GUI_Button_Array[GUI_Array[i].TypeID].text_x_off,
+                LCD_PrintStringXY(
+                        GUI_Button_Array[GUI_Array[i].TypeID].text_x_off,
                         GUI_Button_Array[GUI_Array[i].TypeID].text_y_off,
                         GUI_Button_Array[GUI_Array[i].TypeID].text);
             }
                 break;
             case Label: {
                 struct guiBox labelBox;
-                labelBox = GUI_Label_Array[GUI_Array[i].TypeID].box;
+                labelBox = GUI_Array[i].box;
                 LCD_SetFontColor(
                         GUI_Label_Array[GUI_Array[i].TypeID].fontColor);
                 LCD_PrintStringXY(labelBox.x, labelBox.y,
@@ -223,17 +234,21 @@ void GUI_DrawObjects(void) {
             case Frame: {
                 struct guiBox frameBox;
                 struct guiImage frameImage;
-                frameBox = GUI_Frame_Array[GUI_Array[i].TypeID].box;
-                frameImage = GUI_Frame_Array[GUI_Array[i].TypeID].box.image;
-                LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y, frameImage.file, frameBox.width, frameBox.height, frameImage.x_off, frameImage.y_off);
+                frameBox = GUI_Array[i].box;
+                frameImage = GUI_Array[i].box.image;
+                LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y,
+                        frameImage.file, frameBox.width, frameBox.height,
+                        frameImage.x_off, frameImage.y_off);
             }
                 break;
             case Dialog: {
                 struct guiBox dgBox;
                 struct guiImage dgImage;
-                dgBox = GUI_Dialog_Array[GUI_Array[i].TypeID].box;
-                dgImage = GUI_Dialog_Array[GUI_Array[i].TypeID].box.image;
-                LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file, dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
+                dgBox = GUI_Array[i].box;
+                dgImage = GUI_Array[i].box.image;
+                LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file,
+                        dgBox.width, dgBox.height, dgImage.x_off,
+                        dgImage.y_off);
                 LCD_SetFontColor(
                         GUI_Dialog_Array[GUI_Array[i].TypeID].titleColor);
                 LCD_PrintStringXY(dgBox.x + 5, (dgBox.y + 10),
@@ -252,7 +267,8 @@ void GUI_DrawObjects(void) {
         }
     }
 }
-void GUI_RemoveObj(int objID) {
+void GUI_RemoveObj(int objID)
+{
     struct guiObject blankObj;
     blankObj.CallBack = 0;
     blankObj.GUIID = 0;
@@ -265,17 +281,20 @@ void GUI_RemoveObj(int objID) {
     case Button: {
         struct guiButton blankButton;
         blankButton.text = " ";
+        blankButton.inuse = 0;
         GUI_Button_Array[GUI_Array[objID].TypeID] = blankButton;
     }
         break;
     case Label: {
         struct guiLabel blankLabel;
         blankLabel.text = " ";
+        blankLabel.inuse = 0;
         GUI_Label_Array[GUI_Array[objID].TypeID] = blankLabel;
     }
         break;
     case Frame: {
         struct guiFrame blankFrame;
+        blankFrame.inuse = 0;
         GUI_Frame_Array[GUI_Array[objID].TypeID] = blankFrame;
     }
         break;
@@ -285,7 +304,7 @@ void GUI_RemoveObj(int objID) {
         blankDialog.buttonid[1] = -1;
         blankDialog.buttonid[2] = -1;
         blankDialog.buttonid[3] = -1;
-
+        blankDialog.inuse = 0;
         int i;
         for (i = 0; i < 4; i++) {
             GUI_RemoveObj(
@@ -303,7 +322,8 @@ void GUI_RemoveObj(int objID) {
     GUI_Array[objID] = blankObj;
 }
 
-int GUI_GetFreeObj(void) {
+int GUI_GetFreeObj(void)
+{
     int i;
     for (i = 0; i < 256; i++) {
         if (GUI_Array[i].CallBack == 0) {
@@ -313,32 +333,33 @@ int GUI_GetFreeObj(void) {
     return -1;
 }
 
-int GUI_GetFreeGUIObj(enum GUIType guiType) {
+int GUI_GetFreeGUIObj(enum GUIType guiType)
+{
     int i;
     for (i = 0; i < 256; i++) {
         switch (guiType) {
         case UnknownGUI:
             break;
         case Button: {
-            if (GUI_Button_Array[i].box.width == 0) {
+            if (GUI_Button_Array[i].inuse == 0) {
                 return i;
             }
         }
             break;
         case Label: {
-            if (GUI_Label_Array[i].box.width == 0) {
+            if (GUI_Label_Array[i].inuse == 0) {
                 return i;
             }
         }
             break;
         case Frame: {
-            if (GUI_Frame_Array[i].box.width == 0) {
+            if (GUI_Frame_Array[i].inuse == 0) {
                 return i;
             }
         }
             break;
         case Dialog: {
-            if (GUI_Dialog_Array[i].box.width == 0) {
+            if (GUI_Dialog_Array[i].inuse == 0) {
                 return i;
             }
         }
@@ -354,7 +375,8 @@ int GUI_GetFreeGUIObj(enum GUIType guiType) {
     return -1;
 }
 
-void GUI_DrawScreen(void) {
+void GUI_DrawScreen(void)
+{
     /*
      * First we need to draw the main background
      *  */
@@ -364,7 +386,8 @@ void GUI_DrawScreen(void) {
      */
     GUI_DrawObjects();
 }
-u8 GUI_CheckModel(void) {
+u8 GUI_CheckModel(void)
+{
     int i;
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
@@ -374,7 +397,8 @@ u8 GUI_CheckModel(void) {
     }
     return 0;
 }
-void dgCallback(int ObjID) {
+void dgCallback(int ObjID)
+{
     struct guiDialogReturn gDR;
     struct guiDialog gd;
     gd = GUI_Dialog_Array[GUI_Array[GUI_Array[ObjID].parent].TypeID];
@@ -394,7 +418,56 @@ void dgCallback(int ObjID) {
     sprintf(gDR.strInput, " ");
     gd.CallBack(GUI_Array[ObjID].parent, gDR);
 }
-u8 GUI_CheckTouch(struct touch coords) {
+void GUI_DrawWindow(int ObjID)
+{
+    int i;
+    // First we need to get the info on what we are working with
+    struct guiObject obj = GUI_Array[ObjID];
+    // Now we can redraw the main background...
+    if (obj.Type == Label) {
+        LCD_GetStringDimensions(GUI_Label_Array[obj.TypeID].text,&obj.box.width,&obj.box.height);
+    }
+    LCD_DrawWindowedImageFromFile(obj.box.x, obj.box.y, "devo8.bmp", obj.box.width, obj.box.height, obj.box.x, obj.box.y);
+
+    for (i = 0; i < 128; i++) {
+        if ((GUI_Array[i].CallBack != 0) && (ObjID != i)) {
+            // First is this object in any way inside of the object in question...
+            struct guiObject currentObj = GUI_Array[i];
+            struct guiBox currentBox = currentObj.box;
+
+            if (
+                 (
+                     (currentBox.x >= obj.box.x) /* other object fully inside */
+                     && ((currentBox.x + currentBox.width) <= (obj.box.x + obj.box.width))
+                     && (currentBox.y >= obj.box.y)
+                     && ((currentBox.y + currentBox.height) <= (obj.box.y + obj.box.height))
+                 )
+                 ||
+                 (
+                     (obj.box.x >= currentBox.x) /* Inside of other object */
+                     && ((obj.box.x + obj.box.width) <= (currentBox.x + currentBox.width))
+                     && (obj.box.y >= currentBox.y)
+                     && ((obj.box.y + obj.box.height) <= (currentBox.y + currentBox.height))
+                  )
+                )
+            {
+                printf(
+                        "Partial Hit...TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n              TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n",
+                        obj.Type, ObjID, obj.box.x, obj.box.y, obj.box.width,
+                        obj.box.height, currentObj.Type, i, currentBox.x,
+                        currentBox.y, currentBox.width, currentBox.height);
+            } else {
+                printf(
+                        "No Hit...TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n         TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n",
+                        obj.Type, ObjID, obj.box.x, obj.box.y, obj.box.width,
+                        obj.box.height, currentObj.Type, i, currentBox.x,
+                        currentBox.y, currentBox.width, currentBox.height);
+            }
+        }
+    }
+}
+u8 GUI_CheckTouch(struct touch coords)
+{
     int i;
     u8 redraw = 0;
     u8 modelActive;
@@ -402,16 +475,20 @@ u8 GUI_CheckTouch(struct touch coords) {
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
         if ((currentObject.CallBack != 0) && (currentObject.Disabled == 0)
-                && ((modelActive == 0) || (currentObject.Model > 0))) {
+                && ((modelActive == 0) || (currentObject.Model > 0)))
+        {
             switch (currentObject.Type) {
             case UnknownGUI:
                 break;
             case Button: {
-                struct guiButton button = GUI_Button_Array[currentObject.TypeID];
-                if (coords.x >= button.box.x
-                        && coords.x <= (button.box.width + button.box.x)
-                        && coords.y >= button.box.y
-                        && coords.y <= (button.box.height + button.box.y))
+                if (coords.x >= currentObject.box.x
+                        && coords.x
+                                <= (currentObject.box.width
+                                        + currentObject.box.x)
+                        && coords.y >= currentObject.box.y
+                        && coords.y
+                                <= (currentObject.box.height
+                                        + currentObject.box.y))
                 {
                     currentObject.CallBack(i);
                     redraw = 1;

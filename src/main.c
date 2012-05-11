@@ -66,6 +66,7 @@ static char te[40];
 static char ra[40];
 static char t1[40];
 static char t2[40];
+int lblButtons;
 void initialize_status()
 {
     static char strBootLoader[80],strSPIFlash[80],strMfg[80];
@@ -119,7 +120,7 @@ void initialize_status()
     int lblSPIFlash = GUI_CreateLabel(10,50,strSPIFlash,0x0000);
     int lblBootLoader = GUI_CreateLabel(10,40,strBootLoader,0x0000);
     int lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
-    int lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
+    lblButtons = GUI_CreateLabel(10,60,buttonstr,0x0000);
     int lblVoltage = GUI_CreateLabel(262,8,voltagestr,0x0f00);
     int lblTE = GUI_CreateLabel(10,90,te,0xffff);
     int lblRA = GUI_CreateLabel(10,100,ra,0xffff);
@@ -136,6 +137,8 @@ void initialize_status()
         lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
         testButton1 && testButton2 && testButton3 && openDialog)
     {/*Just here to avoid warnings*/}
+    // do a master redraw
+    GUI_DrawScreen();
 }
 
 void event_loop(void *param)
@@ -167,7 +170,8 @@ void event_loop(void *param)
             buttonstring[32] = 0;
             printf("Buttons: %s\n\r",buttonstring);
             sprintf(buttonstr,"Buttons:\n%s",buttonstring);
-            ReDraw = 1;
+            GUI_DrawWindow(lblButtons);
+            //ReDraw = 1;
         }
     }
     {
