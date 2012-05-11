@@ -81,6 +81,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
         u16 fontColor, void (*CallBack)(int ObjID));
 u8 GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
+void GUI_DrawObject(int ObjID);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(int objID);
 int GUI_GetFreeObj(void);

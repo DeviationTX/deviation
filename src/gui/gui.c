@@ -197,74 +197,78 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     GUI_Button_Array[objButtonLoc] = button;
     return objLoc;
 }
+void GUI_DrawObject(int ObjID)
+{
+    if (GUI_Array[ObjID].CallBack != 0) {
+        switch (GUI_Array[ObjID].Type) {
+        case UnknownGUI:
+            break;
+        case Button: {
+            struct guiBox buttonBox;
+            struct guiImage buttonImage;
+            buttonBox = GUI_Array[ObjID].box;
+            buttonImage = GUI_Array[ObjID].box.image;
+            LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y,
+                    buttonImage.file, buttonBox.width, buttonBox.height,
+                    buttonImage.x_off, buttonImage.y_off);
+            LCD_SetFontColor(
+                    GUI_Button_Array[GUI_Array[ObjID].TypeID].fontColor);
+            LCD_PrintStringXY(
+                    GUI_Button_Array[GUI_Array[ObjID].TypeID].text_x_off,
+                    GUI_Button_Array[GUI_Array[ObjID].TypeID].text_y_off,
+                    GUI_Button_Array[GUI_Array[ObjID].TypeID].text);
+        }
+            break;
+        case Label: {
+            struct guiBox labelBox;
+            labelBox = GUI_Array[ObjID].box;
+            LCD_SetFontColor(
+                    GUI_Label_Array[GUI_Array[ObjID].TypeID].fontColor);
+            LCD_PrintStringXY(labelBox.x, labelBox.y,
+                    GUI_Label_Array[GUI_Array[ObjID].TypeID].text);
+        }
+            break;
+        case Frame: {
+            struct guiBox frameBox;
+            struct guiImage frameImage;
+            frameBox = GUI_Array[ObjID].box;
+            frameImage = GUI_Array[ObjID].box.image;
+            LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y,
+                    frameImage.file, frameBox.width, frameBox.height,
+                    frameImage.x_off, frameImage.y_off);
+        }
+            break;
+        case Dialog: {
+            struct guiBox dgBox;
+            struct guiImage dgImage;
+            dgBox = GUI_Array[ObjID].box;
+            dgImage = GUI_Array[ObjID].box.image;
+            LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file,
+                    dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
+            LCD_SetFontColor(
+                    GUI_Dialog_Array[GUI_Array[ObjID].TypeID].titleColor);
+            LCD_PrintStringXY(dgBox.x + 5, (dgBox.y + 10),
+                    GUI_Dialog_Array[GUI_Array[ObjID].TypeID].title);
+            LCD_SetFontColor(
+                    GUI_Dialog_Array[GUI_Array[ObjID].TypeID].fontColor);
+            LCD_PrintStringXY(dgBox.x, (dgBox.y + ((dgBox.height / 2) - 4)),
+                    GUI_Dialog_Array[GUI_Array[ObjID].TypeID].text);
+        }
+            break;
+        case CheckBox:
+            break;
+        case Dropdown:
+            break;
+        }
+    }
+
+}
 void GUI_DrawObjects(void)
 {
 
     int i;
     for (i = 0; i < 128; i++) {
-        if (GUI_Array[i].CallBack != 0) {
-            switch (GUI_Array[i].Type) {
-            case UnknownGUI:
-                break;
-            case Button: {
-                struct guiBox buttonBox;
-                struct guiImage buttonImage;
-                buttonBox = GUI_Array[i].box;
-                buttonImage = GUI_Array[i].box.image;
-                LCD_DrawWindowedImageFromFile(buttonBox.x, buttonBox.y,
-                        buttonImage.file, buttonBox.width, buttonBox.height,
-                        buttonImage.x_off, buttonImage.y_off);
-                LCD_SetFontColor(
-                        GUI_Button_Array[GUI_Array[i].TypeID].fontColor);
-                LCD_PrintStringXY(
-                        GUI_Button_Array[GUI_Array[i].TypeID].text_x_off,
-                        GUI_Button_Array[GUI_Array[i].TypeID].text_y_off,
-                        GUI_Button_Array[GUI_Array[i].TypeID].text);
-            }
-                break;
-            case Label: {
-                struct guiBox labelBox;
-                labelBox = GUI_Array[i].box;
-                LCD_SetFontColor(
-                        GUI_Label_Array[GUI_Array[i].TypeID].fontColor);
-                LCD_PrintStringXY(labelBox.x, labelBox.y,
-                        GUI_Label_Array[GUI_Array[i].TypeID].text);
-            }
-                break;
-            case Frame: {
-                struct guiBox frameBox;
-                struct guiImage frameImage;
-                frameBox = GUI_Array[i].box;
-                frameImage = GUI_Array[i].box.image;
-                LCD_DrawWindowedImageFromFile(frameBox.x, frameBox.y,
-                        frameImage.file, frameBox.width, frameBox.height,
-                        frameImage.x_off, frameImage.y_off);
-            }
-                break;
-            case Dialog: {
-                struct guiBox dgBox;
-                struct guiImage dgImage;
-                dgBox = GUI_Array[i].box;
-                dgImage = GUI_Array[i].box.image;
-                LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file,
-                        dgBox.width, dgBox.height, dgImage.x_off,
-                        dgImage.y_off);
-                LCD_SetFontColor(
-                        GUI_Dialog_Array[GUI_Array[i].TypeID].titleColor);
-                LCD_PrintStringXY(dgBox.x + 5, (dgBox.y + 10),
-                        GUI_Dialog_Array[GUI_Array[i].TypeID].title);
-                LCD_SetFontColor(
-                        GUI_Dialog_Array[GUI_Array[i].TypeID].fontColor);
-                LCD_PrintStringXY(dgBox.x, (dgBox.y + ((dgBox.height / 2) - 4)),
-                        GUI_Dialog_Array[GUI_Array[i].TypeID].text);
-            }
-                break;
-            case CheckBox:
-                break;
-            case Dropdown:
-                break;
-            }
-        }
+        GUI_DrawObject(i);
     }
 }
 void GUI_RemoveObj(int objID)
@@ -425,9 +429,11 @@ void GUI_DrawWindow(int ObjID)
     struct guiObject obj = GUI_Array[ObjID];
     // Now we can redraw the main background...
     if (obj.Type == Label) {
-        LCD_GetStringDimensions(GUI_Label_Array[obj.TypeID].text,&obj.box.width,&obj.box.height);
+        LCD_GetStringDimensions(GUI_Label_Array[obj.TypeID].text,
+                &obj.box.width, &obj.box.height);
     }
-    LCD_DrawWindowedImageFromFile(obj.box.x, obj.box.y, "devo8.bmp", obj.box.width, obj.box.height, obj.box.x, obj.box.y);
+    LCD_DrawWindowedImageFromFile(obj.box.x, obj.box.y, "devo8.bmp",
+            obj.box.width, obj.box.height, obj.box.x, obj.box.y);
 
     for (i = 0; i < 128; i++) {
         if ((GUI_Array[i].CallBack != 0) && (ObjID != i)) {
@@ -435,21 +441,18 @@ void GUI_DrawWindow(int ObjID)
             struct guiObject currentObj = GUI_Array[i];
             struct guiBox currentBox = currentObj.box;
 
-            if (
-                 (
-                     (currentBox.x >= obj.box.x) /* other object fully inside */
-                     && ((currentBox.x + currentBox.width) <= (obj.box.x + obj.box.width))
-                     && (currentBox.y >= obj.box.y)
-                     && ((currentBox.y + currentBox.height) <= (obj.box.y + obj.box.height))
-                 )
-                 ||
-                 (
-                     (obj.box.x >= currentBox.x) /* Inside of other object */
-                     && ((obj.box.x + obj.box.width) <= (currentBox.x + currentBox.width))
-                     && (obj.box.y >= currentBox.y)
-                     && ((obj.box.y + obj.box.height) <= (currentBox.y + currentBox.height))
-                  )
-                )
+            if (((currentBox.x >= obj.box.x) /* other object fully inside */
+                    && ((currentBox.x + currentBox.width)
+                            <= (obj.box.x + obj.box.width))
+                    && (currentBox.y >= obj.box.y)
+                    && ((currentBox.y + currentBox.height)
+                            <= (obj.box.y + obj.box.height)))
+                    || ((obj.box.x >= currentBox.x) /* Inside of other object */
+                            && ((obj.box.x + obj.box.width)
+                                    <= (currentBox.x + currentBox.width))
+                            && (obj.box.y >= currentBox.y)
+                            && ((obj.box.y + obj.box.height)
+                                    <= (currentBox.y + currentBox.height))))
             {
                 printf(
                         "Partial Hit...TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n              TYPE: %d ID: %d X: %d Y: %d: Width: %d Height: %d\n",
@@ -465,6 +468,7 @@ void GUI_DrawWindow(int ObjID)
             }
         }
     }
+    GUI_DrawObject(ObjID);
 }
 u8 GUI_CheckTouch(struct touch coords)
 {
