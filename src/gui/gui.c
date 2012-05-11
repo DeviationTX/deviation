@@ -475,6 +475,11 @@ void GUI_DrawWindow(int ObjID)
             {
                 switch (currentObj.Type) {
                     case UnknownGUI:
+                    case Button:
+                    case Frame:
+                    case Label:
+                    case CheckBox:
+                    case Dropdown:
                     case Dialog: {
                         GUI_DrawObject(i);
                     }
