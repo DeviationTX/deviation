@@ -13,8 +13,14 @@ enum DialogType {
     dtOk, dtOkCancel
 };
 enum GUIType {
-    UnknownGUI, /* Placeholder to keep 0 out of the enum */
-    Button, Label, Frame, CheckBox, Dropdown, Dialog
+    UnknownGUI,
+    Button,
+    Label,
+    Frame,
+    CheckBox,
+    Dropdown,
+    Dialog,
+    XYGraph,
 };
 struct guiImage {
     const char *file;
@@ -44,6 +50,16 @@ struct guiButton {
     u16 fontColor;
     u8 inuse;
 };
+
+struct guiXYGraph {
+    s16 min_x;
+    s16 min_y;
+    s16 max_x;
+    s16 max_y;
+    s16 (*CallBack)(s16 xval);
+    u8 inuse;
+};
+
 struct guiDialogReturn {
     u8 buttonPushed;
     char strInput[80];
@@ -79,6 +95,8 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
 int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
         u16 fontColor, void (*CallBack)(int ObjID));
+int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x,
+        s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval));
 u8 GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_DrawObject(int ObjID);

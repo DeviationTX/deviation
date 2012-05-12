@@ -20,6 +20,7 @@ struct guiButton GUI_Button_Array[64];
 struct guiLabel GUI_Label_Array[64];
 struct guiFrame GUI_Frame_Array[16];
 struct guiDialog GUI_Dialog_Array[8];
+struct guiXYGraph GUI_XYGraph_Array[1];
 
 int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *text, u16 titleColor, u16 fontColor,
@@ -197,6 +198,45 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     GUI_Button_Array[objButtonLoc] = button;
     return objLoc;
 }
+
+int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x, s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval))
+{
+    struct guiBox     box;
+    struct guiXYGraph graph;
+    struct guiObject  obj;
+
+    box.x = x;
+    box.y = y;
+    box.width = width;
+    box.height = height;
+    graph.min_x = min_x;
+    graph.min_y = min_y;
+    graph.max_x = max_x;
+    graph.max_y = max_y;
+    graph.inuse = 1;
+    graph.CallBack = Callback;
+
+    obj.Type = XYGraph;
+    obj.CallBack = (void *)0x1;
+    obj.box = box;
+    obj.Disabled = 0;
+    obj.Model = 0;
+    obj.Disabled = 0;
+
+    int objLoc = GUI_GetFreeObj();
+    int objXYGraphLoc = GUI_GetFreeGUIObj(XYGraph);
+    if (objLoc == -1)
+        return -1;
+    if (objXYGraphLoc == -1)
+        return -1;
+    obj.GUIID = objLoc;
+    obj.TypeID = objXYGraphLoc;
+
+    GUI_Array[objLoc] = obj;
+    GUI_XYGraph_Array[objXYGraphLoc] = graph;
+    return objLoc;
+}
+
 void GUI_DrawObject(int ObjID)
 {
     if (GUI_Array[ObjID].CallBack != 0) {
@@ -267,6 +307,9 @@ void GUI_DrawObject(int ObjID)
             break;
         case Dropdown:
             break;
+        case XYGraph:
+            GUI_DrawGraph(ObjID);
+            break;
         }
     }
 
@@ -330,6 +373,9 @@ void GUI_RemoveObj(int objID)
         break;
     case Dropdown:
         break;
+    case XYGraph:
+        GUI_XYGraph_Array[GUI_Array[objID].TypeID].inuse = 0;
+        break;
     }
     GUI_Array[objID] = blankObj;
 }
@@ -380,6 +426,12 @@ int GUI_GetFreeGUIObj(enum GUIType guiType)
         }
             break;
         case Dropdown: {
+        }
+            break;
+        case XYGraph: {
+            if (GUI_XYGraph_Array[i].inuse == 0) {
+                return i;
+            }
         }
             break;
         }
@@ -437,7 +489,7 @@ void GUI_DrawWindow(int ObjID)
     struct guiObject obj = GUI_Array[ObjID];
     // Now we can redraw the main background...
     if (obj.Type == Label) {
-        LCD_GetStringDimensions(GUI_Label_Array[obj.TypeID].text,
+        LCD_GetStringDimensions((const u8 *)GUI_Label_Array[obj.TypeID].text,
                 &obj.box.width, &obj.box.height);
     }
     LCD_DrawWindowedImageFromFile(obj.box.x, obj.box.y, "devo8.bmp",
@@ -480,6 +532,7 @@ void GUI_DrawWindow(int ObjID)
                     case Label:
                     case CheckBox:
                     case Dropdown:
+                    case XYGraph:
                     case Dialog: {
                         GUI_DrawObject(i);
                     }
@@ -543,9 +596,35 @@ u8 GUI_CheckTouch(struct touch coords)
                 break;
             case Dropdown:
                 break;
+            case XYGraph:
+                break;
             }
         }
     }
     return redraw;
 }
+void GUI_DrawGraph(int id)
+{
+    struct guiBox *box = &GUI_Array[id].box;
+    struct guiXYGraph *graph = &GUI_XYGraph_Array[GUI_Array[id].TypeID];
+    s32 xval, yval;
+    u32 x, y;
 
+    LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
+    if (graph->min_x < 0 && graph->max_x > 0) {
+        int x = box->x + box->width * (0 - graph->min_x) / (graph->max_x - graph->min_x);
+        LCD_DrawFastVLine(x, box->y, box->height, 0xFFFF);
+    }
+    if (graph->min_y < 0 && graph->max_y > 0) {
+        y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
+        LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
+    }
+    
+    for (x = 0; x < box->width; x++) {
+        xval = graph->min_x + x * (graph->max_x - graph->min_x) / box->width;
+        yval = graph->CallBack(xval);
+        y = (xval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
+printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
+        LCD_DrawPixelXY(x + box->x, box->y + box->height - y , 0xFFE0); //Yellow
+    }
+}

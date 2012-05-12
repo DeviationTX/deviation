@@ -98,7 +98,9 @@ void initialize_status()
     void openDialogPush(int objID, struct guiDialogReturn gDR) {
         GUI_RemoveObj(objID);
     }
-
+    s16 xy_cb(s16 val) {
+        return val;
+    }
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
         u8 mfgdata[6];
@@ -127,6 +129,7 @@ void initialize_status()
     int lblT1 = GUI_CreateLabel(10,125,t1,0xffff);
     int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
     int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
+    int tstXYGraph = GUI_CreateXYGraph(10, 90, 300, 140, -10, -10, 40, 40, xy_cb);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
