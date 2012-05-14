@@ -98,8 +98,14 @@ void initialize_status()
     void openDialogPush(int objID, struct guiDialogReturn gDR) {
         GUI_RemoveObj(objID);
     }
-    s16 xy_cb(s16 val) {
+    s16 xy_cb(s16 val, void *data) {
+        (void)data;
         return val;
+    }
+    s16 bar_cb(void *data) {
+        (void)data;
+        static int val = 100;
+        return val++;
     }
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
@@ -129,7 +135,9 @@ void initialize_status()
     int lblT1 = GUI_CreateLabel(10,125,t1,0xffff);
     int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
     int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
-    int tstXYGraph = GUI_CreateXYGraph(10, 90, 300, 140, -10, -10, 40, 40, xy_cb);
+    int tstXYGraph = GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
+    int tstBarGraph1 = GUI_CreateBarGraph(10, 90, 100, 10, 0, 200, BAR_HORIZONTAL, bar_cb, NULL);
+    int tstBarGraph2 = GUI_CreateBarGraph(10, 110, 10, 100, 0, 200, BAR_VERTICAL, bar_cb, NULL);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);

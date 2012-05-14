@@ -20,7 +20,11 @@ struct guiButton GUI_Button_Array[64];
 struct guiLabel GUI_Label_Array[64];
 struct guiFrame GUI_Frame_Array[16];
 struct guiDialog GUI_Dialog_Array[8];
-struct guiXYGraph GUI_XYGraph_Array[1];
+struct guiXYGraph GUI_XYGraph_Array[2];
+struct guiBarGraph GUI_BarGraph_Array[32];
+
+static void GUI_DrawBarGraph(int id);
+static void GUI_DrawXYGraph(int id);
 
 int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *text, u16 titleColor, u16 fontColor,
@@ -199,7 +203,9 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     return objLoc;
 }
 
-int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x, s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval))
+int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
+                      s16 min_x, s16 min_y, s16 max_x, s16 max_y,
+                      s16 (*Callback)(s16 xval, void *data), void *cb_data)
 {
     struct guiBox     box;
     struct guiXYGraph graph;
@@ -215,6 +221,7 @@ int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x, s16 min_y,
     graph.max_y = max_y;
     graph.inuse = 1;
     graph.CallBack = Callback;
+    graph.cb_data = cb_data;
 
     obj.Type = XYGraph;
     obj.CallBack = (void *)0x1;
@@ -237,6 +244,45 @@ int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x, s16 min_y,
     return objLoc;
 }
 
+int GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
+                      s16 min, s16 max, u8 direction,
+                      s16 (*Callback)(void *data), void *cb_data)
+{
+    struct guiBox      box;
+    struct guiBarGraph graph;
+    struct guiObject   obj;
+
+    box.x = x;
+    box.y = y;
+    box.width = width;
+    box.height = height;
+    graph.min = min;
+    graph.max = max;
+    graph.direction = direction;
+    graph.inuse = 1;
+    graph.CallBack = Callback;
+    graph.cb_data = cb_data;
+
+    obj.Type = BarGraph;
+    obj.CallBack = (void *)0x1;
+    obj.box = box;
+    obj.Disabled = 0;
+    obj.Model = 0;
+    obj.Disabled = 0;
+
+    int objLoc = GUI_GetFreeObj();
+    int objBarGraphLoc = GUI_GetFreeGUIObj(BarGraph);
+    if (objLoc == -1)
+        return -1;
+    if (objBarGraphLoc == -1)
+        return -1;
+    obj.GUIID = objLoc;
+    obj.TypeID = objBarGraphLoc;
+
+    GUI_Array[objLoc] = obj;
+    GUI_BarGraph_Array[objBarGraphLoc] = graph;
+    return objLoc;
+}
 void GUI_DrawObject(int ObjID)
 {
     if (GUI_Array[ObjID].CallBack != 0) {
@@ -308,7 +354,10 @@ void GUI_DrawObject(int ObjID)
         case Dropdown:
             break;
         case XYGraph:
-            GUI_DrawGraph(ObjID);
+            GUI_DrawXYGraph(ObjID);
+            break;
+        case BarGraph:
+            GUI_DrawBarGraph(ObjID);
             break;
         }
     }
@@ -376,6 +425,9 @@ void GUI_RemoveObj(int objID)
     case XYGraph:
         GUI_XYGraph_Array[GUI_Array[objID].TypeID].inuse = 0;
         break;
+    case BarGraph:
+        GUI_BarGraph_Array[GUI_Array[objID].TypeID].inuse = 0;
+        break;
     }
     GUI_Array[objID] = blankObj;
 }
@@ -428,11 +480,15 @@ int GUI_GetFreeGUIObj(enum GUIType guiType)
         case Dropdown: {
         }
             break;
-        case XYGraph: {
+        case XYGraph:
             if (GUI_XYGraph_Array[i].inuse == 0) {
                 return i;
             }
-        }
+            break;
+        case BarGraph:
+            if (GUI_BarGraph_Array[i].inuse == 0) {
+                return i;
+            }
             break;
         }
     }
@@ -533,6 +589,7 @@ void GUI_DrawWindow(int ObjID)
                     case CheckBox:
                     case Dropdown:
                     case XYGraph:
+                    case BarGraph:
                     case Dialog: {
                         GUI_DrawObject(i);
                     }
@@ -598,16 +655,18 @@ u8 GUI_CheckTouch(struct touch coords)
                 break;
             case XYGraph:
                 break;
+            case BarGraph:
+                break;
             }
         }
     }
     return redraw;
 }
-void GUI_DrawGraph(int id)
+
+void GUI_DrawXYGraph(int id)
 {
     struct guiBox *box = &GUI_Array[id].box;
     struct guiXYGraph *graph = &GUI_XYGraph_Array[GUI_Array[id].TypeID];
-    s32 xval, yval;
     u32 x, y;
 
     LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
@@ -619,12 +678,30 @@ void GUI_DrawGraph(int id)
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
         LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
     }
-    
     for (x = 0; x < box->width; x++) {
+        s32 xval, yval;
         xval = graph->min_x + x * (graph->max_x - graph->min_x) / box->width;
-        yval = graph->CallBack(xval);
+        yval = graph->CallBack(xval, graph->cb_data);
         y = (xval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
-printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
+        printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
         LCD_DrawPixelXY(x + box->x, box->y + box->height - y , 0xFFE0); //Yellow
+    }
+}
+
+void GUI_DrawBarGraph(int id)
+{
+    struct guiBox *box = &GUI_Array[id].box;
+    struct guiBarGraph *graph = &GUI_BarGraph_Array[GUI_Array[id].TypeID];
+
+    LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
+    s32 val = graph->CallBack(graph->cb_data);
+
+    printf("H: (%d, %d) -> (%d, %d)\n", box->x, box->y, val, box->height);
+    if (graph->direction == BAR_HORIZONTAL) {
+        val = box->width * val / (graph->max - graph->min);
+        LCD_FillRect(box->x, box->y, val, box->height, 0xFFE0);
+    } else {
+        val = box->height * val / (graph->max - graph->min);
+        LCD_FillRect(box->x, box->y + box->height - val, box->width, val, 0xFFE0);
     }
 }
