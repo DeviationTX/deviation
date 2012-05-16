@@ -22,6 +22,7 @@ void event_loop(void *);
 void channel_scanner();
 void dump_bootloader();
 extern void start_event_loop();
+extern void TEST_init_mixer();
 
 int main() {
     PWR_Init();
@@ -30,7 +31,7 @@ int main() {
     Delay(0x2710);
 
     LCD_Init();
-    Initialize_Channels();
+    CHAN_Init();
 
     SPIFlash_Init();
     CYRF_Initialize();
@@ -66,6 +67,8 @@ static char te[40];
 static char ra[40];
 static char t1[40];
 static char t2[40];
+static int show_mixer = 0;
+static int bar[NUM_CHANNELS];
 int lblButtons;
 void initialize_status()
 {
@@ -136,8 +139,6 @@ void initialize_status()
     int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
     int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
     int tstXYGraph = GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
-    int tstBarGraph1 = GUI_CreateBarGraph(10, 90, 100, 10, 0, 200, BAR_HORIZONTAL, bar_cb, NULL);
-    int tstBarGraph2 = GUI_CreateBarGraph(10, 110, 10, 100, 0, 200, BAR_VERTICAL, bar_cb, NULL);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
@@ -148,8 +149,15 @@ void initialize_status()
         lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
         testButton1 && testButton2 && testButton3 && openDialog)
     {/*Just here to avoid warnings*/}
+    TEST_init_mixer();
     // do a master redraw
     GUI_DrawScreen();
+}
+
+s16 showchan_cb(void *data)
+{
+    long ch = (long)data;
+    return Channels[ch];
 }
 
 void event_loop(void *param)
@@ -176,6 +184,8 @@ void event_loop(void *param)
                 LCD_CalibrateTouch();
             if((buttons & 0x02) == 0)
                 USB_Connect();
+            if((buttons & 0x04) == 0)
+                show_mixer = 0x80 | (show_mixer & 0x01 ? 0 : 1);
             for(i = 0; i < 32; i++)
             buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
             buttonstring[32] = 0;
@@ -194,10 +204,10 @@ void event_loop(void *param)
         }
     }
     {
-        u16 throttle = ReadThrottle();
-        u16 rudder = ReadRudder();
-        u16 aileron = ReadAileron();
-        u16 elevator = ReadElevator();
+        u16 throttle = CHAN_ReadInput(INP_THROTTLE);
+        u16 rudder   = CHAN_ReadInput(INP_RUDDER);
+        u16 aileron  = CHAN_ReadInput(INP_AILERON);
+        u16 elevator = CHAN_ReadInput(INP_ELEVATOR);
         sprintf(s, "Throttle: %04X Elevator: %04X\n", throttle, elevator);
         if (strcmp(s,te) != 0) {
             sprintf(te,"%s",s);
@@ -224,6 +234,23 @@ void event_loop(void *param)
         }
         ReDraw |= GUI_CheckTouch(t);
     }
+    if (show_mixer & 0x80) {
+        show_mixer &= 0x7F;
+        if(show_mixer) {
+            TEST_init_mixer();
+            for(i = 0; i < NUM_CHANNELS; i++) {
+                bar[i] = GUI_CreateBarGraph(10 + 20 * i, 10, 10, 220, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, showchan_cb, (void *)((long)i));
+            }
+        } else {
+            GUI_RemoveObj(bar[i]);
+        }
+        ReDraw = 1;
+    }
+    MIX_CalcChannels();
+    if (show_mixer) {
+        ReDraw = 1;
+    }
+
     if (ReDraw == 1) {
         /* Redraw everything */
         GUI_DrawScreen();

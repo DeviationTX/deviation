@@ -698,10 +698,10 @@ void GUI_DrawBarGraph(int id)
 
     printf("H: (%d, %d) -> (%d, %d)\n", box->x, box->y, val, box->height);
     if (graph->direction == BAR_HORIZONTAL) {
-        val = box->width * val / (graph->max - graph->min);
+        val = box->width * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(box->x, box->y, val, box->height, 0xFFE0);
     } else {
-        val = box->height * val / (graph->max - graph->min);
+        val = box->height * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(box->x, box->y + box->height - val, box->width, val, 0xFFE0);
     }
 }

@@ -24,7 +24,7 @@ void USB_Connect() {}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
-void Initialize_Channels() {}
+void CHAN_Init() {}
 
 void SOUND_Init() {}
 void CLOCK_Init() {}

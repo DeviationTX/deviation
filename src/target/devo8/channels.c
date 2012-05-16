@@ -16,9 +16,9 @@
 #include "target.h"
 #include "devo8.h"
 
-void Initialize_Channels()
+void CHAN_Init()
 {
-
+    int i;
     ADC_Init();
 
     /* configure channels for analog */
@@ -27,24 +27,38 @@ void Initialize_Channels()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
 
+    // This is just to fill in dummy values
+    for(i = 0; i < INP_HAS_CALIBRATION; i++) {
+        Transmitter.calibration[i].max = CHAN_MAX_VALUE;
+        Transmitter.calibration[i].min = CHAN_MIN_VALUE;
+        Transmitter.calibration[i].zero = 0;
+    }
 }
 
-u16 ReadThrottle()
+s16 CHAN_ReadInput(int channel)
 {
-    return ADC1_Read(13);
-}
-
-u16 ReadRudder()
-{
-    return ADC1_Read(11);
-}
-
-u16 ReadElevator()
-{
-    return ADC1_Read(10);
-}
-
-u16 ReadAileron()
-{
-    return ADC1_Read(12);
+    u16 value;
+    switch(channel) {
+    case INP_THROTTLE: value = ADC1_Read(13); break;
+    case INP_RUDDER:   value = ADC1_Read(11); break;
+    case INP_ELEVATOR: value = ADC1_Read(10); break;
+    case INP_AILERON:  value = ADC1_Read(12); break;
+    }
+    if(channel <= INP_HAS_CALIBRATION) {
+        u16 max = Transmitter.calibration[channel - 1].max;
+        u16 min = Transmitter.calibration[channel - 1].min;
+        u16 zero = Transmitter.calibration[channel - 1].zero;
+        if(! zero) {
+            //If this input doesn't have a zero, calculate from max/min
+            zero = ((u32)max + min) / 2;
+        }
+        if(value >= zero) {
+            value = ((s32)value - zero) * CHAN_MAX_VALUE / max;
+        } else {
+            value = ((s32)value - zero) * CHAN_MIN_VALUE / min;
+        }
+    } else {
+        value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+    }
+    return value;
 }

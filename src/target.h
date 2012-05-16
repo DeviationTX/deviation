@@ -11,6 +11,25 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
+//Load target-specific include
+#include TARGET_H
+
+struct Calibration {
+    u16 max;
+    u16 min;
+    u16 zero;
+};
+
+struct Curve {
+    u8 num_points;
+    s8 points[MAX_POINTS];
+};
+
+struct Transmitter {
+    struct Calibration calibration[NUM_INPUTS];
+};
+extern struct Transmitter Transmitter;
+extern s16 Channels[NUM_CHANNELS];
 
 /* General functions */
 void SignOn();
@@ -62,7 +81,6 @@ struct touch SPITouch_GetCoords();
 int SPITouch_IRQ();
 void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff);
 
-
 /* Buttons and switches */
 void Initialize_ButtonMatrix();
 u32 ScanButtons();
@@ -77,11 +95,8 @@ void PWR_Shutdown();
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
 /* Sticks */
-void Initialize_Channels();
-u16 ReadThrottle();
-u16 ReadRudder();
-u16 ReadElevator();
-u16 ReadAileron();
+void CHAN_Init();
+s16  CHAN_ReadInput(int channel);
 
 /* SPI Flash */
 void SPIFlash_Init();
@@ -101,11 +116,7 @@ void CYRF_ConfigRFChannel(u8 ch);
 void CYRF_ConfigCRCSeed(u8 crc);
 void CYRF_StartReceive();
 void CYRF_ConfigSOPCode(u32 idx);
-
-
 u8 CYRF_ReadRSSI(u32 dodummyread);
-void CYRF_StartReceive();
-
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
 
 /* Sound */
@@ -126,6 +137,12 @@ void USB_Connect();
 /* Filesystem */
 void FS_Mount();
 void FS_Unmount();
+
+/* Curve functions */
+s16 CURVE_Interpolate(struct Curve *curve, s16 value);
+
+/* Mixer functions */
+void MIX_CalcChannels();
 
 /* Abstract bootloader access */
 enum {

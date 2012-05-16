@@ -28,31 +28,11 @@
 
 extern "C" {
 #include "target.h"
+#include "fltk.h"
 }
 
-#define ALT_DRAW
 
 u8 keymap[32] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
-static struct {
-    u16 xstart, xend, ystart, yend;
-    u16 x, y;
-    u32 buttons;
-    int  throttle;
-    int  rudder;
-    int  elevator;
-    int  aileron;
-    u8  powerdown;
-    u8  mouse;
-    u16 mousex, mousey;
-    Fl_Output *raw[20];
-    Fl_Output *final[20];
-    u32 last_redraw;
-#ifdef ALT_DRAW
-    u8  image[320*240*3];
-#else
-    Fl_Offscreen image;
-#endif
-} gui;
 
 static struct {
     s32 xscale;
@@ -170,19 +150,20 @@ void update_channels(void *params)
     (void)params;
     char str[80];
     int changed = 0;
-    if(gui.raw[0]) {
-        sprintf(str, "%6.2f%%", gui.throttle * 10.0);
-        if(strcmp(str, gui.raw[0]->value()))
-            changed |= gui.raw[0]->value(str);
-        sprintf(str, "%6.2f%%", gui.rudder * 10.0);
-        if(strcmp(str, gui.raw[1]->value()))
-            changed |= gui.raw[1]->value(str);
-        sprintf(str, "%6.2f%%", gui.elevator * 10.0);
-        if(strcmp(str, gui.raw[2]->value()))
-            changed |= gui.raw[2]->value(str);
-        sprintf(str, "%6.2f%%", gui.aileron * 10.0);
-        if(strcmp(str, gui.raw[3]->value()))
-            changed = gui.raw[3]->value(str);
+    if(! gui.raw[0])
+        return;
+
+    for(int i = 0; i < 20; i++) {
+        if(i < NUM_INPUTS) {
+            sprintf(str, "%6.2f%%", 100.0 * (float)CHAN_ReadInput(i + 1) / CHAN_MAX_VALUE);
+            if(strcmp(str, gui.raw[i]->value()))
+                changed |= gui.raw[i]->value(str);
+        }
+        if(i < NUM_CHANNELS) {
+            sprintf(str, "%6.2f%%", 100.0 * (float)Channels[i] / CHAN_MAX_VALUE);
+            if(strcmp(str, gui.final[i]->value()))
+                changed |= gui.final[i]->value(str);
+        }
     }
 }
 extern "C" {
@@ -334,26 +315,6 @@ int PWR_CheckPowerSwitch()
 }
 
 void PWR_Shutdown() {exit(0);}
-
-u16 ReadThrottle()
-{
-    return ~(((( 1 << 12) - 1) / 10) * gui.throttle);
-}
-
-u16 ReadRudder()
-{
-    return ~(((( 1 << 12) - 1) / 10) * gui.rudder);
-}
-
-u16 ReadElevator()
-{
-    return ~(((( 1 << 12) - 1) / 10) * gui.elevator);
-}
-
-u16 ReadAileron()
-{
-    return ~(((( 1 << 12) - 1) / 10) * gui.aileron);
-}
 
 u32 ReadFlashID()
 {
