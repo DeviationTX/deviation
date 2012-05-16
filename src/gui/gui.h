@@ -100,7 +100,7 @@ struct guiObject {
     int GUIID;
     int TypeID;
     u8 Disabled; /* bool: Means this UI element is not 'active' */
-    u8 Model; /* bool: Means this UI element is active and all non-model elements are not */
+    u8 Modal; /* bool: Means this UI element is active and all non-model elements are not */
     int parent;
 };
 u8 GUI_CheckModel(void);

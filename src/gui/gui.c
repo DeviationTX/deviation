@@ -47,7 +47,7 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     objDG.CallBack = (void *) 0x1;
     objDG.Type = Dialog;
     objDG.Disabled = 0;
-    objDG.Model = 1;
+    objDG.Modal = 1;
     objDG.box = dgBox;
     dialog.text = text;
     dialog.title = title;
@@ -77,7 +77,7 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     case dtOk: {
         dialog.buttonid[0] = GUI_CreateButton(((x + width) / 2) - 10,
                 ((y + height) - 27), 89, 23, "Ok", 0x0000, dgCallback);
-        GUI_Array[dialog.buttonid[0]].Model = 1;
+        GUI_Array[dialog.buttonid[0]].Modal = 1;
         GUI_Array[dialog.buttonid[0]].parent = objLoc;
     }
         break;
@@ -104,7 +104,7 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
     labelBox.height = 10;
     objLabel.Type = Label;
     objLabel.CallBack = (void *) 0x1; /* no call back yet for labels */
-    objLabel.Model = 0;
+    objLabel.Modal = 0;
     objLabel.Disabled = 0;
 
     objLabel.box = labelBox;
@@ -142,7 +142,7 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image)
     objFrame.Type = Frame;
     objFrame.CallBack = (void *) 0x1;
     objFrame.Disabled = 0;
-    objFrame.Model = 0;
+    objFrame.Modal = 0;
     frame.inuse = 1;
     objFrame.box = frameBox;
     int objLoc = GUI_GetFreeObj();
@@ -178,7 +178,7 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     objButton.Type = Button;
     objButton.CallBack = *CallBack;
     objButton.Disabled = 0;
-    objButton.Model = 0;
+    objButton.Modal = 0;
     button.inuse = 1;
     objButton.box = buttonBox;
     button.text = text;
@@ -227,7 +227,7 @@ int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     obj.CallBack = (void *)0x1;
     obj.box = box;
     obj.Disabled = 0;
-    obj.Model = 0;
+    obj.Modal = 0;
     obj.Disabled = 0;
 
     int objLoc = GUI_GetFreeObj();
@@ -267,7 +267,7 @@ int GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     obj.CallBack = (void *)0x1;
     obj.box = box;
     obj.Disabled = 0;
-    obj.Model = 0;
+    obj.Modal = 0;
     obj.Disabled = 0;
 
     int objLoc = GUI_GetFreeObj();
@@ -506,12 +506,12 @@ void GUI_DrawScreen(void)
      */
     GUI_DrawObjects();
 }
-u8 GUI_CheckModel(void)
+u8 GUI_CheckModal(void)
 {
     int i;
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
-        if ((currentObject.Model > 0) && (currentObject.Disabled == 0)) {
+        if ((currentObject.Modal > 0) && (currentObject.Disabled == 0)) {
             return 1;
         }
     }
@@ -619,11 +619,11 @@ u8 GUI_CheckTouch(struct touch coords)
     int i;
     u8 redraw = 0;
     u8 modelActive;
-    modelActive = GUI_CheckModel();
+    modelActive = GUI_CheckModal();
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
         if ((currentObject.CallBack != 0) && (currentObject.Disabled == 0)
-                && ((modelActive == 0) || (currentObject.Model > 0)))
+                && ((modelActive == 0) || (currentObject.Modal > 0)))
         {
             switch (currentObject.Type) {
             case UnknownGUI:
