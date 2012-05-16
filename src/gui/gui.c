@@ -22,6 +22,7 @@ struct guiFrame GUI_Frame_Array[16];
 struct guiDialog GUI_Dialog_Array[8];
 struct guiXYGraph GUI_XYGraph_Array[2];
 struct guiBarGraph GUI_BarGraph_Array[32];
+static u8 FullRedraw;
 
 static void GUI_DrawBarGraph(int id);
 static void GUI_DrawXYGraph(int id);
@@ -46,8 +47,10 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     dgBox.image = dgImage;
     objDG.CallBack = (void *) 0x1;
     objDG.Type = Dialog;
-    objDG.Disabled = 0;
-    objDG.Modal = 1;
+    OBJ_SET_DISABLED(objDG, 0);
+    OBJ_SET_MODAL(objDG, 1);
+    OBJ_SET_DIRTY(objDG, 1);
+    OBJ_SET_TRANSPARENT(objDG, LCD_ImageIsTransparent(dgImage.file));
     objDG.box = dgBox;
     dialog.text = text;
     dialog.title = title;
@@ -74,16 +77,13 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     dialog.buttonid[3] = -1;
 
     switch (dgType) {
-    case dtOk: {
+    case dtOk:
         dialog.buttonid[0] = GUI_CreateButton(((x + width) / 2) - 10,
                 ((y + height) - 27), 89, 23, "Ok", 0x0000, dgCallback);
-        GUI_Array[dialog.buttonid[0]].Modal = 1;
+        OBJ_SET_MODAL(GUI_Array[dialog.buttonid[0]], 1);
         GUI_Array[dialog.buttonid[0]].parent = objLoc;
-    }
         break;
-    case dtOkCancel: {
-
-    }
+    case dtOkCancel:
         break;
     }
     GUI_Array[objLoc] = objDG;
@@ -100,12 +100,13 @@ int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
 
     labelBox.x = x;
     labelBox.y = y;
-    labelBox.width = 10;
-    labelBox.height = 10;
+    LCD_GetStringDimensions((const u8 *)text, &labelBox.width, &labelBox.height);
     objLabel.Type = Label;
     objLabel.CallBack = (void *) 0x1; /* no call back yet for labels */
-    objLabel.Modal = 0;
-    objLabel.Disabled = 0;
+    OBJ_SET_MODAL(objLabel, 0);
+    OBJ_SET_DISABLED(objLabel, 0);
+    OBJ_SET_DIRTY(objLabel, 1);
+    OBJ_SET_TRANSPARENT(objLabel, 1);
 
     objLabel.box = labelBox;
     label.text = text;
@@ -141,8 +142,10 @@ int GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image)
     frameBox.image = frameImage;
     objFrame.Type = Frame;
     objFrame.CallBack = (void *) 0x1;
-    objFrame.Disabled = 0;
-    objFrame.Modal = 0;
+    OBJ_SET_DISABLED(objFrame, 0);
+    OBJ_SET_MODAL(objFrame, 0);
+    OBJ_SET_DIRTY(objFrame, 1);
+    OBJ_SET_TRANSPARENT(objFrame, LCD_ImageIsTransparent(image));
     frame.inuse = 1;
     objFrame.box = frameBox;
     int objLoc = GUI_GetFreeObj();
@@ -177,8 +180,10 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     buttonBox.image = buttonImage;
     objButton.Type = Button;
     objButton.CallBack = *CallBack;
-    objButton.Disabled = 0;
-    objButton.Modal = 0;
+    OBJ_SET_DISABLED(objButton, 0);
+    OBJ_SET_MODAL(objButton, 0);
+    OBJ_SET_DIRTY(objButton, 1);
+    OBJ_SET_TRANSPARENT(objButton, LCD_ImageIsTransparent(buttonImage.file));
     button.inuse = 1;
     objButton.box = buttonBox;
     button.text = text;
@@ -226,9 +231,10 @@ int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     obj.Type = XYGraph;
     obj.CallBack = (void *)0x1;
     obj.box = box;
-    obj.Disabled = 0;
-    obj.Modal = 0;
-    obj.Disabled = 0;
+    OBJ_SET_DISABLED(obj, 0);
+    OBJ_SET_MODAL(obj, 0);
+    OBJ_SET_DIRTY(obj, 1);
+    OBJ_SET_TRANSPARENT(obj, 0);
 
     int objLoc = GUI_GetFreeObj();
     int objXYGraphLoc = GUI_GetFreeGUIObj(XYGraph);
@@ -266,9 +272,10 @@ int GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     obj.Type = BarGraph;
     obj.CallBack = (void *)0x1;
     obj.box = box;
-    obj.Disabled = 0;
-    obj.Modal = 0;
-    obj.Disabled = 0;
+    OBJ_SET_DISABLED(obj, 0);
+    OBJ_SET_MODAL(obj, 0);
+    OBJ_SET_DIRTY(obj, 1);
+    OBJ_SET_TRANSPARENT(obj, 0);
 
     int objLoc = GUI_GetFreeObj();
     int objBarGraphLoc = GUI_GetFreeGUIObj(BarGraph);
@@ -361,6 +368,7 @@ void GUI_DrawObject(int ObjID)
             break;
         }
     }
+    OBJ_SET_DIRTY(GUI_Array[ObjID], 0);
 
 }
 void GUI_DrawObjects(void)
@@ -430,6 +438,7 @@ void GUI_RemoveObj(int objID)
         break;
     }
     GUI_Array[objID] = blankObj;
+    FullRedraw = 1;
 }
 
 int GUI_GetFreeObj(void)
@@ -505,13 +514,14 @@ void GUI_DrawScreen(void)
      * Then we need to draw any supporting GUI
      */
     GUI_DrawObjects();
+    FullRedraw = 0;
 }
 u8 GUI_CheckModal(void)
 {
     int i;
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
-        if ((currentObject.Modal > 0) && (currentObject.Disabled == 0)) {
+        if (OBJ_IS_MODAL(currentObject) && ! OBJ_IS_DISABLED(currentObject)) {
             return 1;
         }
     }
@@ -537,6 +547,48 @@ void dgCallback(int ObjID)
     gDR.intInput = 0;
     sprintf(gDR.strInput, " ");
     gd.CallBack(GUI_Array[ObjID].parent, gDR);
+}
+
+void GUI_Redraw(u8 ObjID)
+{
+    OBJ_SET_DIRTY(GUI_Array[ObjID], 1);
+}
+
+void GUI_RefreshScreen(void)
+{
+    int i;
+    if (FullRedraw) {
+        GUI_DrawScreen();
+        return;
+    }
+    if(GUI_Dialog_Array[0].inuse) {
+        u8 redraw = 0;
+        int dialog = -1;
+        for (i = 0; i < 128; i++) {
+            struct guiObject *obj = &GUI_Array[i];
+            if(OBJ_IS_MODAL(*obj) && OBJ_IS_DIRTY(*obj)) {
+                redraw = 1;
+            }
+            if(obj->Type == Dialog) {
+                dialog = i;
+            }
+        }
+        if(redraw && dialog >= 0) {
+            GUI_DrawObject(dialog);
+        }
+    } else {
+        for (i = 0; i < 128; i++) {
+            struct guiObject *obj = &GUI_Array[i];
+            if(! OBJ_IS_DIRTY(*obj)) {
+                continue;
+            }
+            if(OBJ_IS_TRANSPARENT(*obj)) {
+                LCD_DrawWindowedImageFromFile(obj->box.x, obj->box.y, "devo8.bmp",
+                    obj->box.width, obj->box.height, obj->box.x, obj->box.y);
+            }
+            GUI_DrawObject(i);
+        }
+    }
 }
 void GUI_DrawWindow(int ObjID)
 {
@@ -618,12 +670,12 @@ u8 GUI_CheckTouch(struct touch coords)
 {
     int i;
     u8 redraw = 0;
-    u8 modelActive;
-    modelActive = GUI_CheckModal();
+    u8 modalActive;
+    modalActive = GUI_CheckModal();
     for (i = 0; i < 128; i++) {
         struct guiObject currentObject = GUI_Array[i];
-        if ((currentObject.CallBack != 0) && (currentObject.Disabled == 0)
-                && ((modelActive == 0) || (currentObject.Modal > 0)))
+        if ((currentObject.CallBack != 0) && ! OBJ_IS_DISABLED(currentObject)
+                && ((modalActive == 0) || OBJ_IS_MODAL(currentObject)))
         {
             switch (currentObject.Type) {
             case UnknownGUI:

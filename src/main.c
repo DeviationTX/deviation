@@ -191,8 +191,9 @@ void event_loop(void *param)
             buttonstring[32] = 0;
             printf("Buttons: %s\n\r",buttonstring);
             sprintf(buttonstr,"Buttons:\n%s",buttonstring);
-            GUI_DrawWindow(lblButtons);
-            //ReDraw = 1;
+            GUI_Redraw(lblButtons);
+            //GUI_DrawWindow(lblButtons);
+            ReDraw = 1;
         }
     }
     {
@@ -248,12 +249,15 @@ void event_loop(void *param)
     }
     MIX_CalcChannels();
     if (show_mixer) {
+        for(i = 0; i < NUM_CHANNELS; i++) {
+            GUI_Redraw(bar[i]);
+        }
         ReDraw = 1;
     }
 
     if (ReDraw == 1) {
         /* Redraw everything */
-        GUI_DrawScreen();
+        GUI_RefreshScreen();
         ReDraw = 0;
     }
 }

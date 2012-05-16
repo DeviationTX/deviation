@@ -335,6 +335,34 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
   }
 }
 
+u8 LCD_ImageIsTransparent(const char *file)
+{
+    FILE *fh;
+    u8 buf[0x46];
+    fh = fopen(file, "r");
+    if(! fh) {
+        return 0;
+    }
+    u32 compression;
+
+    if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    {
+    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
+        return 0;
+    }
+    compression = *((u32 *)(buf + 0x1e));
+    if(compression == 3)
+    {
+        if(*((u16 *)(buf + 0x36)) == 0x7c00 
+           && *((u16 *)(buf + 0x3a)) == 0x03e0
+           && *((u16 *)(buf + 0x3e)) == 0x001f
+           && *((u16 *)(buf + 0x42)) == 0x8000)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off)
 {
     u16 i, j;
