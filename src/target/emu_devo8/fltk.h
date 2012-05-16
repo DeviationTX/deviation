@@ -10,6 +10,7 @@
 struct Gui {
     u16 xstart, xend, ystart, yend;
     u16 x, y;
+    s8 dir;
     u32 buttons;
     int  throttle;
     int  rudder;

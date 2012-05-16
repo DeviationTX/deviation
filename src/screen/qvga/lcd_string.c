@@ -118,7 +118,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
             offset += (c - cur_str.font->first_char) * WIDTH(cur_str.font) * row_bytes;
             width = WIDTH(cur_str.font);
         }
-        LCD_DrawStart();
+        LCD_DrawStart(x, y, width, HEIGHT(cur_str.font), DRAW_NWSE);
         for (col = 0; col < width; col++)
         {
             const u8 *data = offset++;
@@ -196,7 +196,7 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
         }
         str++;
     }
-    printf("String: %s\nW: %d   H: %d\n",str,(int)*width,(int)*height);
+    //printf("String: %s\nW: %d   H: %d\n",str,(int)*width,(int)*height);
 }
 
 void LCD_SetFontColor(u16 color) {

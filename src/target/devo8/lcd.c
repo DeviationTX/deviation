@@ -25,6 +25,7 @@
 #define LCD_REG  *(volatile uint16_t *)(LCD_REG_ADDR)
 #define LCD_DATA *(volatile uint16_t *)(LCD_DATA_ADDR)
 
+static u8 invert;
 void lcd_cmd(uint8_t addr, uint8_t data)
 {
     LCD_REG = addr;
@@ -33,6 +34,8 @@ void lcd_cmd(uint8_t addr, uint8_t data)
 
 void lcd_set_pos(unsigned int x0, unsigned int y0)
 {
+    if (invert)
+        y0 - 319 - y0;
     lcd_cmd(0x03, (x0>>0)); //set x0
     lcd_cmd(0x02, (x0>>8)); //set x0
     lcd_cmd(0x07, (y0>>0)); //set y0
@@ -47,27 +50,19 @@ void LCD_DrawPixel(unsigned int color)
 
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
-    LCD_SetDrawArea(x,y,x,y);
-/*    lcd_cmd(0x03, (x>>0)); //set x0
-    lcd_cmd(0x02, (x>>8)); //set x0
-    lcd_cmd(0x07, (y>>0)); //set y0
-    lcd_cmd(0x06, (y>>8)); //set y0
-*/
-    LCD_REG = 0x22;
+    lcd_set_pos(x, y);
     LCD_DATA = color;
 }
 
-void LCD_DrawStart(void)
+void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
 {
-    LCD_REG = 0x22;
-}
-void LCD_DrawStop(void)
-{
-  return;
-}
-
-void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
-{
+  invert = 0;
+  if (dir == DRAW_SWNE) {
+    unsigned int y = 319 - y0;
+    y0 = 319 - y1;
+    y1 = y;
+    invert = 1;
+  }
   lcd_cmd(0x03, (x0>>0)); //set x0
   lcd_cmd(0x02, (x0>>8)); //set x0
   lcd_cmd(0x05, (x1>>0)); //set x1
@@ -76,7 +71,13 @@ void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned
   lcd_cmd(0x06, (y0>>8)); //set y0
   lcd_cmd(0x09, (y1>>0)); //set y1
   lcd_cmd(0x08, (y1>>8)); //set y1
+  LCD_REG = 0x22;
 
+  return;
+}
+
+void LCD_DrawStop(void)
+{
   return;
 }
 

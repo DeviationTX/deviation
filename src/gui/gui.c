@@ -189,8 +189,8 @@ int GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
     button.text = text;
     LCD_GetStringDimensions((u8 *) text, &button.text_x_off,
             &button.text_y_off);
-    printf("%s: (%d, %d), Box: (%d, %d -> %d, %d)\n", text, button.text_x_off,
-            button.text_y_off, x, y, width, height);
+    //printf("%s: (%d, %d), Box: (%d, %d -> %d, %d)\n", text, button.text_x_off,
+    //        button.text_y_off, x, y, width, height);
     button.text_x_off = (width - button.text_x_off) / 2 + x;
     button.text_y_off = (height - button.text_y_off) / 2 + y;
     button.fontColor = fontColor;
@@ -504,12 +504,19 @@ int GUI_GetFreeGUIObj(enum GUIType guiType)
     return -1;
 }
 
+void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
+{
+    if(w == 0 || h == 0)
+        return;
+    LCD_DrawWindowedImageFromFile(x, y, "devo8.bmp", w, h, x, y);
+}
+
 void GUI_DrawScreen(void)
 {
     /*
      * First we need to draw the main background
      *  */
-    LCD_DrawWindowedImageFromFile(0, 0, "devo8.bmp", 0, 0, 0, 0);
+    GUI_DrawBackground(0, 0, 320, 240);
     /*
      * Then we need to draw any supporting GUI
      */
@@ -583,8 +590,12 @@ void GUI_RefreshScreen(void)
                 continue;
             }
             if(OBJ_IS_TRANSPARENT(*obj)) {
-                LCD_DrawWindowedImageFromFile(obj->box.x, obj->box.y, "devo8.bmp",
-                    obj->box.width, obj->box.height, obj->box.x, obj->box.y);
+                // Labels are special because they can change size
+                if (obj->Type == Label) {
+                    u8 idx = obj->TypeID;
+                    LCD_GetStringDimensions((const u8 *)GUI_Label_Array[idx].text, &obj->box.width, &obj->box.height);
+                }
+                GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
             }
             GUI_DrawObject(i);
         }
@@ -600,8 +611,7 @@ void GUI_DrawWindow(int ObjID)
         LCD_GetStringDimensions((const u8 *)GUI_Label_Array[obj.TypeID].text,
                 &obj.box.width, &obj.box.height);
     }
-    LCD_DrawWindowedImageFromFile(obj.box.x, obj.box.y, "devo8.bmp",
-            obj.box.width, obj.box.height, obj.box.x, obj.box.y);
+    GUI_DrawBackground(obj.box.x, obj.box.y, obj.box.width, obj.box.height);
 
     for (i = 0; i < 128; i++) {
         if ((GUI_Array[i].CallBack != 0) && (ObjID != i)) {
@@ -735,25 +745,40 @@ void GUI_DrawXYGraph(int id)
         xval = graph->min_x + x * (graph->max_x - graph->min_x) / box->width;
         yval = graph->CallBack(xval, graph->cb_data);
         y = (xval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
-        printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
+        //printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
         LCD_DrawPixelXY(x + box->x, box->y + box->height - y , 0xFFE0); //Yellow
     }
 }
 
 void GUI_DrawBarGraph(int id)
 {
+#define TRANSPARENT_BARGRAPH
     struct guiBox *box = &GUI_Array[id].box;
     struct guiBarGraph *graph = &GUI_BarGraph_Array[GUI_Array[id].TypeID];
+    int height = box->height - 2;
+    int width  = box->width - 2;
+    int x = box->x + 1;
+    int y = box->y + 1;
 
-    LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
+    LCD_DrawRect(box->x, box->y, box->width, box->height, 0xFFFF);
+    
     s32 val = graph->CallBack(graph->cb_data);
 
-    printf("H: (%d, %d) -> (%d, %d)\n", box->x, box->y, val, box->height);
     if (graph->direction == BAR_HORIZONTAL) {
-        val = box->width * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(box->x, box->y, val, box->height, 0xFFE0);
+        val = width * (val - graph->min) / (graph->max - graph->min);
+        LCD_FillRect(x, y, val, height, 0xFFE0);
+#ifdef TRANSPARENT_BARGRAPH
+        GUI_DrawBackground(x + val, y, width - val, height);
+#else
+        LCD_FillRect(x + val, y, width - val, height, 0x0000);
+#endif
     } else {
-        val = box->height * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(box->x, box->y + box->height - val, box->width, val, 0xFFE0);
+        val = height * (val - graph->min) / (graph->max - graph->min);
+        LCD_FillRect(x, y + (height - val), width, val, 0xFFE0);
+#ifdef TRANSPARENT_BARGRAPH
+        GUI_DrawBackground(x, y, width, height - val);
+#else
+        LCD_FillRect(x, y, width, height - val, 0x0000);
+#endif
     }
 }

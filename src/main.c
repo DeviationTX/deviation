@@ -243,7 +243,9 @@ void event_loop(void *param)
                 bar[i] = GUI_CreateBarGraph(10 + 20 * i, 10, 10, 220, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, showchan_cb, (void *)((long)i));
             }
         } else {
-            GUI_RemoveObj(bar[i]);
+            for(i = 0; i < NUM_CHANNELS; i++) {
+                GUI_RemoveObj(bar[i]);
+            }
         }
         ReDraw = 1;
     }

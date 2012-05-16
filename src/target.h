@@ -37,12 +37,16 @@ void SignOn();
 /* Display Functions */
 void LCD_Init();
 
+enum DrawDir {
+    DRAW_NWSE,
+    DRAW_SWNE,
+};
+
     /* Primitives */
 void LCD_DrawPixel(unsigned int color);
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color);
-void LCD_DrawStart(void);
+void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir);
 void LCD_DrawStop(void);
-void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
 void LCD_Clear(unsigned int color);
     /* Strings */
 void LCD_PrintCharXY(unsigned int x, unsigned int y, const char c);
@@ -65,7 +69,7 @@ void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);
 void LCD_FillRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);
 void LCD_DrawTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
 void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
-void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off);
+void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off);
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
 u8 LCD_ImageIsTransparent(const char *file);
 void LCD_CalibrateTouch(void);

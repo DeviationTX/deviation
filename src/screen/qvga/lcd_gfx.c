@@ -24,8 +24,7 @@ All text above must be included in any redistribution
 
 void LCD_Clear(unsigned int color){
         uint16_t zeile, spalte;
-        LCD_SetDrawArea(0, 0, (320-1), (240-1));
-        LCD_DrawStart();
+        LCD_DrawStart(0, 0, (320-1), (240-1), DRAW_NWSE);
         for(zeile = 0; zeile < 240; zeile++){
                 for(spalte = 0; spalte < 320; spalte++){
                         LCD_DrawPixel(color);
@@ -38,16 +37,14 @@ void LCD_Clear(unsigned int color){
 
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
 				 int16_t h, uint16_t color) {
-    LCD_SetDrawArea(x, y, x, y + h);
-    LCD_DrawStart();
+    LCD_DrawStart(x, y, x, y + h, DRAW_NWSE);
     while(h--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
 
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
-    LCD_SetDrawArea(x, y, x + w, y);
-    LCD_DrawStart();
+    LCD_DrawStart(x, y, x + w, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
@@ -217,8 +214,7 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
-    LCD_SetDrawArea(x, y, x + w, y + h);
-    LCD_DrawStart();
+    LCD_DrawStart(x, y, x + w - 1, y + h, DRAW_NWSE);
     w *= h;
     while(w--)
         LCD_DrawPixel(color);
@@ -347,7 +343,7 @@ u8 LCD_ImageIsTransparent(const char *file)
 
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
+    	printf("DEBUG: LCD_ImageIsTransparent: Buffer read issue?\n");
         return 0;
     }
     compression = *((u32 *)(buf + 0x1e));
@@ -363,15 +359,20 @@ u8 LCD_ImageIsTransparent(const char *file)
     }
     return 0;
 }
-void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h, u16 x_off, u16 y_off)
+void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
     u16 i, j;
     FILE *fh;
     u8 transparent = 0;
     u8 buf[320 * 2];
+
+    if (w == 0 || h == 0)
+        return;
+
     fh = fopen(file, "r");
     if(! fh) {
-        LCD_FillRect(x, y, w, h, 0);
+        if (w > 0 && h > 0)
+            LCD_FillRect(x, y, w, h, 0);
         return;
     }
     u32 img_w, img_h, offset, compression;
@@ -409,19 +410,19 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
     offset = *((u32 *)(buf + 0x0a));
     img_w = *((u32 *)(buf + 0x12));
     img_h = *((u32 *)(buf + 0x16));
+    if(w < 0)
+        w = img_w;
+    if(h < 0)
+        h = img_h;
     if(w + x_off > img_w || h + y_off > img_h)
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         return;
     }
-    if(w == 0)
-        w = img_w;
-    if(h == 0)
-        h = img_h;
 
     offset += (img_w * (img_h - (y_off + h)) + x_off) * 2;
     fseek(fh, offset, SEEK_SET);
-    LCD_DrawStart();
+    LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_SWNE);
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
         fread(buf, 2 * w, 1, fh);
@@ -436,12 +437,9 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
                 color++;
             }
         } else {
-            LCD_SetDrawArea(x, y + h - j - 1, x + w - 1, y + h - j - 1);
-            LCD_DrawStart();
             for (i = 0; i < w; i++ ) {
                 LCD_DrawPixel(*color++);
             }
-            LCD_DrawStop();
         }
         if(w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
@@ -453,5 +451,5 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, u16 w, u16 h,
 
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
 {
-    LCD_DrawWindowedImageFromFile(x, y, file, 0, 0, 0, 0);
+    LCD_DrawWindowedImageFromFile(x, y, file, -1, -1, 0, 0);
 }

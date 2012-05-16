@@ -237,12 +237,26 @@ int SPITouch_IRQ()
     return gui.mouse;
 }
 
-void LCD_DrawStart(void) {
+void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
+{
+    gui.xstart = x0;
+    gui.ystart = y0;
+    gui.xend   = x1;
+    gui.yend   = y1;
+    gui.x = x0;
+    if (dir == DRAW_NWSE) {
+        gui.y = y0;
+        gui.dir = 1;
+    } else if (dir == DRAW_SWNE) {
+        gui.y = y1;
+        gui.dir = -1;
+    }
 #ifndef HAS_EVENT_LOOP
     Fl::check();
     Fl::flush();
 #endif
 }
+
 void LCD_DrawStop(void) {
     image->redraw();
     //Fl::redraw();
@@ -251,16 +265,6 @@ void LCD_DrawStop(void) {
 #endif
 }
 
-
-void LCD_SetDrawArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
-{
-    gui.xstart = x0;
-    gui.ystart = y0;
-    gui.xend   = x1;
-    gui.yend   = y1;
-    gui.x = x0;
-    gui.y = y0;
-}
 
 void LCD_DrawPixel(unsigned int color)
 {
@@ -272,17 +276,17 @@ void LCD_DrawPixel(unsigned int color)
     gui.image[3*(320*gui.y+gui.x)] = r;
     gui.image[3*(320*gui.y+gui.x)+1] = g;
     gui.image[3*(320*gui.y+gui.x)+2] = b;
-    gui.x++;
 #else
     fl_begin_offscreen(gui.image);
     Fl_Color c = fl_rgb_color(r, g, b);
     fl_color(c);
-    fl_point(gui.x++, gui.y);
+    fl_point(gui.x, gui.y);
     fl_end_offscreen();
 #endif
+    gui.x++;
     if(gui.x > gui.xend) {
         gui.x = gui.xstart;
-        gui.y++;
+        gui.y += gui.dir;
     }
 }
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
