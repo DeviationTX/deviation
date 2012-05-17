@@ -26,23 +26,35 @@ $(TARGET).elf: $(LINKFILE) $(OBJS)
 clean:
 	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
 
+-include $(OBJS:.o=.P)
+
 $(OBJS): | $(ODIR)
 
 $(ODIR):
 	@mkdir -p $@
 
+## The autodependencymagic below was adapeted from:
+## http://mad-scientist.net/make/autodep.html
+dollar = $$
 define define_compile_rules
 $(ODIR)/%.o: $(1)%.c
 	@echo " + Compiling '$$<'"
-	$(CC) $$(CFLAGS) -c -o $$@ $$<
+	$(CC) $$(CFLAGS) -MD -c -o $$@ $$<
+	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
+            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
+                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
+            rm -f $(ODIR)/$$*.d
 
 $(ODIR)/%.o: $(1)%.cpp
-	$(CXX) $$(CFLAGS) -c -o $$@ $$<
+	$(CXX) $$(CFLAGS) -MD -c -o $$@ $$<
+	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
+            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
+                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
+            rm -f $(ODIR)/$$*.d
+
 endef
 $(foreach directory,$(sort $(dir $(SRCS))),$(eval $(call define_compile_rules,$(directory))))
 
-
-	
 # phony targets
 .PHONY: clean
 
