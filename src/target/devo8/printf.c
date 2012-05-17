@@ -40,7 +40,11 @@ static void printchar(char **str, int c)
 		++(*str);
 	}
 	else {
-		putchar(c);
+		//Always send '\n\r'
+		if(c != '\r')
+			putchar(c);
+		if(c == '\n')
+			putchar('\r');
 	}
 }
 

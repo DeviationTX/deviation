@@ -51,15 +51,15 @@ void LCD_CalibrateTouch(void)
     draw_target(300, 220);
     get_coords(&t2);
 
-    printf("T1:(%d, %d)\n\r", t1.x, t1.y);
-    printf("T2:(%d, %d)\n\r", t2.x, t2.y);
+    printf("T1:(%d, %d)\n", t1.x, t1.y);
+    printf("T2:(%d, %d)\n", t2.x, t2.y);
     xscale = t2.x - t1.x;
     xscale = 280 * 0x10000 / xscale;
     yscale = t2.y - t1.y;
     yscale = 200 * 0x10000 / yscale;
     xoff = 20 - t1.x * xscale / 0x10000;
     yoff = 20 - t1.y * yscale / 0x10000;
-    printf("Debug: scale(%d, %d) offset(%d, %d)\n\r", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
+    printf("Debug: scale(%d, %d) offset(%d, %d)\n", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
     SPITouch_Calibrate(xscale, yscale, xoff, yoff);
 }
     

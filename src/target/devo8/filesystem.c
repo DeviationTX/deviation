@@ -23,7 +23,7 @@ static FATFS fat;
 void FS_Mount()
 {
     int res = pf_mount(&fat);
-    DBGFS("Mount: %d\n\r", res);
+    DBGFS("Mount: %d\n", res);
 }
 
 void FS_Unmount()
@@ -39,11 +39,11 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
     (void)stream;
     if(bytes >= 0x10000) {
-        printf("Size %d is bigger than allowed read 0xFFFF\n\r", bytes);
+        printf("Size %d is bigger than allowed read 0xFFFF\n", bytes);
         return 0;
     }
     res = pf_read(ptr, (WORD)bytes, &len);
-    DBGFS("fread %d: req: %d got: %d\n\r", res, bytes, len);
+    DBGFS("fread %d: req: %d got: %d\n", res, bytes, len);
     return len / size;
 }
 
@@ -51,7 +51,7 @@ FILE *fopen(const char *path, const char *mode)
 {
     (void)mode;
     int res = pf_open(path);
-    DBGFS("fopen %s: %d\n\r", path, res);
+    DBGFS("fopen %s: %d\n", path, res);
     return res ? 0 : (FILE *)&fat;
 }
 
@@ -68,7 +68,7 @@ int fseek(FILE *stream, long offset, int whence) {
     else if(whence == SEEK_END)
         offset += fat.fsize;
     int res = pf_lseek(offset);
-    DBGFS("fseek(%d): %d, %d -> %d\n\r", (int)res, (int)offset, (int)whence, (int)fat.fptr);
+    DBGFS("fseek(%d): %d, %d -> %d\n", (int)res, (int)offset, (int)whence, (int)fat.fptr);
     return res;
 }
 

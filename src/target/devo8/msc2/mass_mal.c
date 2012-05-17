@@ -67,7 +67,7 @@ uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uin
   switch (lun)
   {
     case 0:
-      //DBG("Writing: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
+      //DBG("Writing: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
       SPIFlash_WriteBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8 *)Writebuff);
       //NAND_Write(Memory_Offset, Writebuff, Transfer_Length);
       break;
@@ -90,7 +90,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
   {
     case 0:
       //NAND_Read(Memory_Offset, Readbuff, Transfer_Length);
-      //DBG("Reading: 0x%08x %d\n\r", (unsigned int)Memory_Offset, (int)Transfer_Length);
+      //DBG("Reading: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
       SPIFlash_ReadBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8*)Readbuff);
       break;
     default:

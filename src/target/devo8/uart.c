@@ -65,17 +65,17 @@ void SignOn()
     u8 mfgdata[6];
     u8 tmp[8];
     
-    printf("\n\rOpen Whatever\n\r");
+    printf("\nOpen Whatever\n");
     /* Check CPU type */
 
     memcpy(tmp, pBLString, 7);
     tmp[7] = 0;
     
-    printf("BootLoader    : '%s'\n\r",tmp);
-    printf("Power         : '%s'\n\r",Power == 0 ? "100mW" : "10mW" );
-    printf("SPI Flash     : '%X'\n\r",(unsigned int)SPIFlash_ReadID());
+    printf("BootLoader    : '%s'\n",tmp);
+    printf("Power         : '%s'\n",Power == 0 ? "100mW" : "10mW" );
+    printf("SPI Flash     : '%X'\n",(unsigned int)SPIFlash_ReadID());
     CYRF_GetMfgData(mfgdata);
-    printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n\r",
+    printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n",
             mfgdata[0],
             mfgdata[1],
             mfgdata[2],

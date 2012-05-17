@@ -152,7 +152,7 @@ void SPIFlash_EraseSector(u32 sectorAddress)
  */
 void SPIFlash_BulkErase()
 {
-    printf("BulkErase...\n\r");
+    printf("BulkErase...\n");
 
     WriteFlashWriteEnable();
 
@@ -169,7 +169,7 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
 {
     u32 i;
 
-    printf("WriteBytes...\n\r");
+    printf("WriteBytes...\n");
     
     DisableHWRYBY();
 

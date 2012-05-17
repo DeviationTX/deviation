@@ -89,7 +89,7 @@ int main(void)
 
 	LCD_Clear(0x0000);
         LCD_PrintStringXY(40, 10, "Hello\n");
-        printf("Hello\n\r");
+        printf("Hello\n");
 
         USB_Enable();
 	//gpio_set(GPIOB, GPIO10);

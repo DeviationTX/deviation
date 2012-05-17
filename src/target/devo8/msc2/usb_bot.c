@@ -66,7 +66,7 @@ void Mass_Storage_In (void)
       switch (CBW.CB[0])
       {
         case SCSI_READ10:
-          //DBG("SCSI_READ10\n\r");
+          //DBG("SCSI_READ10\n");
           SCSI_Read10_Cmd(CBW.bLUN , SCSI_LBA , SCSI_BlkLen);
           break;
       }
@@ -110,7 +110,7 @@ void Mass_Storage_Out (void)
     case BOT_DATA_OUT:
       if (CMD == SCSI_WRITE10)
       {
-        DBG("SCSI_WRITE10\n\r");
+        DBG("SCSI_WRITE10\n");
         SCSI_Write10_Cmd(CBW.bLUN , SCSI_LBA , SCSI_BlkLen);
         break;
       }
@@ -176,106 +176,106 @@ void CBW_Decode(void)
       switch (CBW.CB[0])
       {
         case SCSI_REQUEST_SENSE:
-          //DBG("SCSI_REQUEST_SENSE\n\r");
+          //DBG("SCSI_REQUEST_SENSE\n");
           SCSI_RequestSense_Cmd (CBW.bLUN);
           break;
         case SCSI_INQUIRY:
-          //DBG("SCSI_INQUIRY\n\r");
+          //DBG("SCSI_INQUIRY\n");
           SCSI_Inquiry_Cmd(CBW.bLUN);
           break;
         case SCSI_START_STOP_UNIT:
-          //DBG("SCSI_START_STOP_UNIT\n\r");
+          //DBG("SCSI_START_STOP_UNIT\n");
           SCSI_Start_Stop_Unit_Cmd(CBW.bLUN);
           break;
         case SCSI_ALLOW_MEDIUM_REMOVAL:
-          //DBG("SCSI_ALLOW_MEDIUM_REMOVAL\n\r");
+          //DBG("SCSI_ALLOW_MEDIUM_REMOVAL\n");
           SCSI_Start_Stop_Unit_Cmd(CBW.bLUN);
           break;
         case SCSI_MODE_SENSE6:
-          //DBG("SCSI_MODE_SENSE6\n\r");
+          //DBG("SCSI_MODE_SENSE6\n");
           SCSI_ModeSense6_Cmd (CBW.bLUN);
           break;
         case SCSI_MODE_SENSE10:
-          //DBG("SCSI_MODE_SENSE10\n\r");
+          //DBG("SCSI_MODE_SENSE10\n");
           SCSI_ModeSense10_Cmd (CBW.bLUN);
           break;
         case SCSI_READ_FORMAT_CAPACITIES:
-          DBG("SCSI_READ_FORMAT_CAPACITIES\n\r");
+          DBG("SCSI_READ_FORMAT_CAPACITIES\n");
           SCSI_ReadFormatCapacity_Cmd(CBW.bLUN);
           break;
         case SCSI_READ_CAPACITY10:
-          //DBG("SCSI_READ_CAPACITY10\n\r");
+          //DBG("SCSI_READ_CAPACITY10\n");
           SCSI_ReadCapacity10_Cmd(CBW.bLUN);
           break;
         case SCSI_TEST_UNIT_READY:
-          //DBG("SCSI_TEST_UNIT_READY\n\r");
+          //DBG("SCSI_TEST_UNIT_READY\n");
           SCSI_TestUnitReady_Cmd(CBW.bLUN);
           break;
         case SCSI_READ10:
-          //DBG("SCSI_READ10\n\r");
+          //DBG("SCSI_READ10\n");
           SCSI_Read10_Cmd(CBW.bLUN, SCSI_LBA , SCSI_BlkLen);
           break;
         case SCSI_WRITE10:
-          //DBG("SCSI_WRITE10\r");
+          //DBG("SCSI_WRITE10");
           SCSI_Write10_Cmd(CBW.bLUN, SCSI_LBA , SCSI_BlkLen);
           break;
         case SCSI_VERIFY10:
-          //DBG("SCSI_VERIFY10\r");
+          //DBG("SCSI_VERIFY10");
           SCSI_Verify10_Cmd(CBW.bLUN);
           break;
         case SCSI_FORMAT_UNIT:
-          DBG("SCSI_FORMAT_UNIT\n\r");
+          DBG("SCSI_FORMAT_UNIT\n");
           SCSI_Format_Cmd(CBW.bLUN);
           break;
           /*Unsupported command*/
 
         case SCSI_MODE_SELECT10:
-          //DBG("SCSI_MODE_SELECT10\n\r");
+          //DBG("SCSI_MODE_SELECT10\n");
           SCSI_Mode_Select10_Cmd(CBW.bLUN);
           break;
         case SCSI_MODE_SELECT6:
-          //DBG("SCSI_MODE_SELECT6\n\r");
+          //DBG("SCSI_MODE_SELECT6\n");
           SCSI_Mode_Select6_Cmd(CBW.bLUN);
           break;
 
         case SCSI_SEND_DIAGNOSTIC:
-          //DBG("SCSI_SEND_DIAGNOSTIC\n\r");
+          //DBG("SCSI_SEND_DIAGNOSTIC\n");
           SCSI_Send_Diagnostic_Cmd(CBW.bLUN);
           break;
         case SCSI_READ6:
-          //DBG("SCSI_READ6\n\r");
+          //DBG("SCSI_READ6\n");
           SCSI_Read6_Cmd(CBW.bLUN);
           break;
         case SCSI_READ12:
-          //DBG("SCSI_READ12\n\r");
+          //DBG("SCSI_READ12\n");
           SCSI_Read12_Cmd(CBW.bLUN);
           break;
         case SCSI_READ16:
-          //DBG("SCSI_READ16\n\r");
+          //DBG("SCSI_READ16\n");
           SCSI_Read16_Cmd(CBW.bLUN);
           break;
         case SCSI_READ_CAPACITY16:
-          //DBG("SCSI_READ_CAPACITY16\n\r");
+          //DBG("SCSI_READ_CAPACITY16\n");
           SCSI_READ_CAPACITY16_Cmd(CBW.bLUN);
           break;
         case SCSI_WRITE6:
-          DBG("SCSI_WRITE6\n\r");
+          DBG("SCSI_WRITE6\n");
           SCSI_Write6_Cmd(CBW.bLUN);
           break;
         case SCSI_WRITE12:
-          DBG("SCSI_WRITE12\n\r");
+          DBG("SCSI_WRITE12\n");
           SCSI_Write12_Cmd(CBW.bLUN);
           break;
         case SCSI_WRITE16:
-          DBG("SCSI_WRITE16\n\r");
+          DBG("SCSI_WRITE16\n");
           SCSI_Write16_Cmd(CBW.bLUN);
           break;
         case SCSI_VERIFY12:
-          //DBG("SCSI_VERIFY12\n\r");
+          //DBG("SCSI_VERIFY12\n");
           SCSI_Verify12_Cmd(CBW.bLUN);
           break;
         case SCSI_VERIFY16:
-          //DBG("SCSI_VERIFY16\n\r");
+          //DBG("SCSI_VERIFY16\n");
           SCSI_Verify16_Cmd(CBW.bLUN);
           break;
 

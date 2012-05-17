@@ -336,7 +336,7 @@ void GUI_DrawObject(int ObjID)
             struct guiImage dgImage;
             dgBox = GUI_Array[ObjID].box;
             dgImage = GUI_Array[ObjID].box.image;
-            printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n\r", dgBox.x,
+            printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", dgBox.x,
                     dgBox.y, dgBox.width, dgBox.height);
             LCD_DrawWindowedImageFromFile(dgBox.x, dgBox.y, dgImage.file,
                     dgBox.width, dgBox.height, dgImage.x_off, dgImage.y_off);
