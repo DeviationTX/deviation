@@ -22,10 +22,12 @@ struct guiFrame GUI_Frame_Array[16];
 struct guiDialog GUI_Dialog_Array[8];
 struct guiXYGraph GUI_XYGraph_Array[2];
 struct guiBarGraph GUI_BarGraph_Array[32];
+struct guiTextSelect GUI_TextSelect_Array[16];
 static u8 FullRedraw;
 
 static void GUI_DrawBarGraph(int id);
 static void GUI_DrawXYGraph(int id);
+static void GUI_DrawTextSelect(int id);
 
 int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *text, u16 titleColor, u16 fontColor,
@@ -92,6 +94,54 @@ int GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
     return objLoc;
 
 }
+int GUI_CreateTextSelect(u16 x, u16 y, u16 width, u16 height, u16 fontColor,
+        void (*select_cb)(int ObjID, void *data),
+        const char *(*value_cb)(int ObjID, int value, void *data),
+        void *cb_data)
+{
+    struct guiBox box;
+    struct guiImage image;
+    struct guiTextSelect select;
+    struct guiObject obj;
+
+    image.file = "textselect.bmp";
+    image.x_off = 0;
+    image.y_off = 0;
+
+    box.x = x;
+    box.y = y;
+    box.width = width;
+    box.height = height;
+    box.image = image;
+
+    obj.CallBack = (void *) 0x1;
+    obj.Type = TextSelect;
+    OBJ_SET_DISABLED(obj, 0);
+    OBJ_SET_MODAL(obj, 0);
+    OBJ_SET_DIRTY(obj, 1);
+    OBJ_SET_TRANSPARENT(obj, 0); //Even if the bmp has transparency, the redraw function will handle it
+    obj.box = box;
+
+    select.fontColor = fontColor;
+    select.ValueCB   = value_cb;
+    select.SelectCB  = select_cb;
+    select.cb_data   = cb_data;
+    select.inuse = 1;
+
+    int objLoc = GUI_GetFreeObj();
+    int objTSLoc = GUI_GetFreeGUIObj(TextSelect);
+    if (objLoc == -1)
+        return -1;
+    if (objTSLoc == -1)
+        return -1;
+    obj.GUIID = objLoc;
+    obj.TypeID = objTSLoc;
+    GUI_Array[objLoc] = obj;
+    GUI_TextSelect_Array[objTSLoc] = select;
+
+    return objLoc;
+}
+
 int GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
 {
     struct guiBox labelBox;
@@ -290,6 +340,13 @@ int GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     GUI_BarGraph_Array[objBarGraphLoc] = graph;
     return objLoc;
 }
+
+u8 coords_in_box(struct guiBox *box, struct touch *coords)
+{
+    return(coords->x >= box->x && coords->x <= (box->x + box->width)
+        && coords->y >= box->y && coords->y <= (box->y + box->height));
+}
+
 void GUI_DrawObject(int ObjID)
 {
     if (GUI_Array[ObjID].CallBack != 0) {
@@ -366,6 +423,9 @@ void GUI_DrawObject(int ObjID)
         case BarGraph:
             GUI_DrawBarGraph(ObjID);
             break;
+        case TextSelect:
+            GUI_DrawTextSelect(ObjID);
+            break;
         }
     }
     OBJ_SET_DIRTY(GUI_Array[ObjID], 0);
@@ -436,6 +496,9 @@ void GUI_RemoveObj(int objID)
     case BarGraph:
         GUI_BarGraph_Array[GUI_Array[objID].TypeID].inuse = 0;
         break;
+    case TextSelect:
+        GUI_TextSelect_Array[GUI_Array[objID].TypeID].inuse = 0;
+        break;
     }
     GUI_Array[objID] = blankObj;
     FullRedraw = 1;
@@ -496,6 +559,11 @@ int GUI_GetFreeGUIObj(enum GUIType guiType)
             break;
         case BarGraph:
             if (GUI_BarGraph_Array[i].inuse == 0) {
+                return i;
+            }
+            break;
+        case TextSelect:
+            if (GUI_TextSelect_Array[i].inuse == 0) {
                 return i;
             }
             break;
@@ -652,6 +720,7 @@ void GUI_DrawWindow(int ObjID)
                     case Dropdown:
                     case XYGraph:
                     case BarGraph:
+                    case TextSelect:
                     case Dialog: {
                         GUI_DrawObject(i);
                     }
@@ -683,27 +752,38 @@ u8 GUI_CheckTouch(struct touch coords)
     u8 modalActive;
     modalActive = GUI_CheckModal();
     for (i = 0; i < 128; i++) {
-        struct guiObject currentObject = GUI_Array[i];
-        if ((currentObject.CallBack != 0) && ! OBJ_IS_DISABLED(currentObject)
-                && ((modalActive == 0) || OBJ_IS_MODAL(currentObject)))
+        struct guiObject *obj = &GUI_Array[i];
+        if ((obj->CallBack != 0) && ! OBJ_IS_DISABLED(*obj)
+                && ((modalActive == 0) || OBJ_IS_MODAL(*obj)))
         {
-            switch (currentObject.Type) {
+            switch (obj->Type) {
             case UnknownGUI:
                 break;
-            case Button: {
-                if (coords.x >= currentObject.box.x
-                        && coords.x
-                                <= (currentObject.box.width
-                                        + currentObject.box.x)
-                        && coords.y >= currentObject.box.y
-                        && coords.y
-                                <= (currentObject.box.height
-                                        + currentObject.box.y))
-                {
-                    currentObject.CallBack(i);
+            case Button:
+                if (coords_in_box(&obj->box, &coords)) {
+                    obj->CallBack(i);
+                    OBJ_SET_DIRTY(*obj, 1);
                     redraw = 1;
                 }
-            }
+                break;
+            case TextSelect:
+                if(coords_in_box(&obj->box, &coords)) {
+                    struct guiBox box = obj->box;
+                    struct guiTextSelect *select = &GUI_TextSelect_Array[obj->TypeID];
+                    redraw = 1;
+                    OBJ_SET_DIRTY(*obj, 1);
+                    box.width = 16;
+                    if (coords_in_box(&box, &coords)) {
+                        select->ValueCB(i, -1, select->cb_data);
+                        break;
+                    }
+                    box.x = obj->box.x + obj->box.width - 16;
+                    if (coords_in_box(&box, &coords)) {
+                        select->ValueCB(i, 1, select->cb_data);
+                        break;
+                    }
+                    select->SelectCB(i, select->cb_data);
+                }
                 break;
             case Dialog:
                 break; /* Dialogs are handled by buttons */
@@ -781,4 +861,18 @@ void GUI_DrawBarGraph(int id)
         LCD_FillRect(x, y, width, height - val, 0x0000);
 #endif
     }
+}
+
+void GUI_DrawTextSelect(int id)
+{
+    u16 x, y, w, h;
+    struct guiBox *box = &GUI_Array[id].box;
+    struct guiTextSelect *select = &GUI_TextSelect_Array[GUI_Array[id].TypeID];
+    LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file, box->width, box->height, box->image.x_off, box->image.y_off);
+    const char *str =select->ValueCB(id, 0, select->cb_data);
+    LCD_SetFontColor(select->fontColor);
+    LCD_GetStringDimensions((const u8 *)str, &w, &h);
+    x = box->x + (box->width - w) / 2;
+    y = box->y + (box->height - h) / 2;
+    LCD_PrintStringXY(x, y, str);
 }

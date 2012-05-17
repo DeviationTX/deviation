@@ -77,6 +77,7 @@ static char ra[40];
 static char t1[40];
 static char t2[40];
 static int show_mixer = 0;
+static int touch_down = 0;
 static int bar[NUM_CHANNELS];
 int lblButtons;
 void initialize_status()
@@ -114,6 +115,23 @@ void initialize_status()
         (void)data;
         return val;
     }
+    const char *ts_cb(int id, int value, void *data) {
+        (void)data;
+        static int idx = 0;
+        const char *str[] = {
+             "None",
+             "String 1",
+             "String 2",
+             };
+        if(value > 0) {
+            if(idx < 2)
+                idx++;
+        } else if(value < 0) {
+            if(idx)
+                idx--;
+        }
+        return str[idx];
+    }
     s16 bar_cb(void *data) {
         (void)data;
         static int val = 100;
@@ -148,6 +166,7 @@ void initialize_status()
     int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
     int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
     int tstXYGraph = GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
+    int testTxtSel1 = GUI_CreateTextSelect(10,180,128,16,0x0000, NULL, ts_cb, NULL);
     int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
     int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
     int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
@@ -242,7 +261,12 @@ void event_loop(void *param)
             sprintf(t2,"%s",s);
             //ReDraw = 1;
         }
-        ReDraw |= GUI_CheckTouch(t);
+        if (! touch_down) {
+            ReDraw |= GUI_CheckTouch(t);
+            touch_down = 1;
+        }
+    } else {
+        touch_down = 0;
     }
     if (show_mixer & 0x80) {
         show_mixer &= 0x7F;

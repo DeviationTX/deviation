@@ -28,6 +28,7 @@ enum GUIType {
     Dialog,
     XYGraph,
     BarGraph,
+    TextSelect,
 };
 struct guiImage {
     const char *file;
@@ -93,6 +94,14 @@ struct guiDialog {
     void (*CallBack)(int ObjID, struct guiDialogReturn gDR);
     u8 inuse;
 };
+
+struct guiTextSelect {
+    u16 fontColor;
+    const char *(*ValueCB)(int ObjID, int dir, void *data);
+    void (*SelectCB)(int ObjID, void *data);
+    void *cb_data;
+    u8 inuse;
+};
 #define OBJ_IS_DISABLED(x)    ((x).flags & 0x01) /* bool: UI element is not 'active' */
 #define OBJ_IS_MODAL(x)       ((x).flags & 0x02) /* bool: UI element is active and all non-model elements are not */
 #define OBJ_IS_DIRTY(x)       ((x).flags & 0x04) /* bool: UI element needs redraw */
@@ -123,6 +132,10 @@ int GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x,
         s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval, void * data), void * cb_data);
 int GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
+int GUI_CreateTextSelect(u16 x, u16 y, u16 width, u16 height, u16 fontColor,
+        void (*select_cb)(int ObjID, void *data),
+        const char *(*value_cb)(int ObjID, int value, void *data),
+        void *cb_data);
 u8 GUI_CheckTouch(struct touch coords);
 void GUI_DrawScreen(void);
 void GUI_RefreshScreen(void);
