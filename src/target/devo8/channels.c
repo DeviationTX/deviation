@@ -27,12 +27,23 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
 
-    // This is just to fill in dummy values
-    for(i = 0; i < INP_HAS_CALIBRATION; i++) {
-        Transmitter.calibration[i].max = CHAN_MAX_VALUE;
-        Transmitter.calibration[i].min = CHAN_MIN_VALUE;
-        Transmitter.calibration[i].zero = 0;
-    }
+    // This is just to fill in something before calibration
+    //Throttle (mode 1)
+    Transmitter.calibration[0].max = 3698;
+    Transmitter.calibration[0].min = 489;
+    Transmitter.calibration[0].zero = (Transmitter.calibration[0].max + Transmitter.calibration[0].min) / 2;
+    //Rudder
+    Transmitter.calibration[1].max = 3867;
+    Transmitter.calibration[1].min = 569;
+    Transmitter.calibration[1].zero = (Transmitter.calibration[1].max + Transmitter.calibration[1].min) / 2;
+    //Elevator (mode 1)
+    Transmitter.calibration[2].max = 3549;
+    Transmitter.calibration[2].min = 354;
+    Transmitter.calibration[2].zero = (Transmitter.calibration[2].max + Transmitter.calibration[2].min) / 2;
+    //Alileron
+    Transmitter.calibration[3].max = 3813;
+    Transmitter.calibration[3].min = 530;
+    Transmitter.calibration[3].zero = (Transmitter.calibration[3].max + Transmitter.calibration[3].min) / 2;
 }
 
 s16 CHAN_ReadInput(int channel)
@@ -45,13 +56,15 @@ s16 CHAN_ReadInput(int channel)
     case INP_AILERON:  value = ADC1_Read(12); break;
     }
     if(channel <= INP_HAS_CALIBRATION) {
-        u16 max = Transmitter.calibration[channel - 1].max;
-        u16 min = Transmitter.calibration[channel - 1].min;
-        u16 zero = Transmitter.calibration[channel - 1].zero;
+        s32 max = Transmitter.calibration[channel - 1].max;
+        s32 min = Transmitter.calibration[channel - 1].min;
+        s32 zero = Transmitter.calibration[channel - 1].zero;
         if(! zero) {
             //If this input doesn't have a zero, calculate from max/min
             zero = ((u32)max + min) / 2;
         }
+        max -= zero;
+        min -= zero;
         if(value >= zero) {
             value = ((s32)value - zero) * CHAN_MAX_VALUE / max;
         } else {
