@@ -42,7 +42,16 @@ int main() {
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
     LCD_Clear(0x0000);
-
+    LCD_SetFont(6);
+    LCD_SetFontColor(0xffff);
+#if 0
+    printf("Showing display\n\r");
+    LCD_PrintStringXY(10, 10, "Hello");
+    while(1) {
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+#endif
 #ifdef BL_DUMP
     dump_bootloader();
 #endif

@@ -35,7 +35,8 @@ void lcd_cmd(uint8_t addr, uint8_t data)
 void lcd_set_pos(unsigned int x0, unsigned int y0)
 {
     if (invert)
-        y0 - 319 - y0;
+        y0 = 239 - y0;
+    //printf("lcd_set_pos: %d, %d\n\r", x0, y0);
     lcd_cmd(0x03, (x0>>0)); //set x0
     lcd_cmd(0x02, (x0>>8)); //set x0
     lcd_cmd(0x07, (y0>>0)); //set y0
@@ -56,13 +57,17 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
 {
-  invert = 0;
   if (dir == DRAW_SWNE) {
-    unsigned int y = 319 - y0;
-    y0 = 319 - y1;
+    unsigned int y = 239 - y0;
+    y0 = 239 - y1;
     y1 = y;
     invert = 1;
+    lcd_cmd(0x16, 0x28); //MY=0 MX=0 MV=1 ML=0 BGR=1
+  } else {
+    invert = 0;
+    lcd_cmd(0x16, 0x68); //MY=0 MX=1 MV=1 ML=0 BGR=1
   }
+  //printf("LCD_DrawStart: (%d, %d) - (%d, %d)\n\r", x0, y0, x1, y1);
   lcd_cmd(0x03, (x0>>0)); //set x0
   lcd_cmd(0x02, (x0>>8)); //set x0
   lcd_cmd(0x05, (x1>>0)); //set x1

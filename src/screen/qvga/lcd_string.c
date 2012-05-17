@@ -83,7 +83,7 @@ static struct {
     unsigned int x;
     unsigned int y;
     u16          color;
-} cur_str = { &Fonts[6], 0, 0, 0, 0xffff};
+} cur_str;
 
 u8 get_width(u8 c)
 {
@@ -118,7 +118,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
             offset += (c - cur_str.font->first_char) * WIDTH(cur_str.font) * row_bytes;
             width = WIDTH(cur_str.font);
         }
-        LCD_DrawStart(x, y, width, HEIGHT(cur_str.font), DRAW_NWSE);
+        LCD_DrawStart(x, y, x + width - 1,  y + HEIGHT(cur_str.font) - 1, DRAW_NWSE);
         for (col = 0; col < width; col++)
         {
             const u8 *data = offset++;
@@ -160,10 +160,7 @@ void LCD_SetXY(unsigned int x, unsigned int y)
 void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str)
 {
     LCD_SetXY(x, y);
-    while(*str != 0) {
-        LCD_PrintChar(*str);
-        str++;
-    }
+    LCD_PrintString(str);
 }
 
 void LCD_PrintString(const char *str)
@@ -188,6 +185,7 @@ void LCD_PrintChar(const char c)
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
     *height = HEIGHT(cur_str.font);
     *width = 0;
+    //printf("String: %s\n\r", str);
     while(*str) {
         if(*str == '\n') {
             *height += HEIGHT(cur_str.font) + LINE_SPACING;
@@ -196,7 +194,7 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
         }
         str++;
     }
-    //printf("String: %s\nW: %d   H: %d\n",str,(int)*width,(int)*height);
+    //printf("W: %d   H: %d\n\r",(int)*width,(int)*height);
 }
 
 void LCD_SetFontColor(u16 color) {
