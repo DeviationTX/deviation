@@ -14,9 +14,8 @@
  */
 
 #include "target.h"
+#include "pages.h"
 #include "gui/gui.h"
-
-extern void TEST_init_mixer();
 
 static char buttonstr[80];
 static char voltagestr[8];
@@ -24,7 +23,6 @@ static char te[40];
 static char ra[40];
 static char t1[40];
 static char t2[40];
-static guiObject_t *bar[NUM_CHANNELS];
 static guiObject_t *lblVoltage;
 static guiObject_t *lblTE;
 static guiObject_t *lblRA;
@@ -122,30 +120,13 @@ void PAGE_TestInit(int page)
     GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
     GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
 
-    TEST_init_mixer();
     // do a master redraw
     GUI_DrawScreen();
 }
 
-s16 showchan_cb(void *data)
-{
-    long ch = (long)data;
-    return Channels[ch];
-}
-
 void PAGE_TestEvent()
 {
-    static u32 last_buttons = 0;
-    static u8 show_mixer = 0;
     char s[80];
-    int i;
-
-    u32 buttons = ScanButtons();
-    if(buttons != last_buttons) {
-        u32 buttons = ScanButtons();
-        if((buttons & 0x04) == 0)
-            show_mixer = 0x80 | (show_mixer & 0x01 ? 0 : 1);
-    }
 
     u16 voltage = PWR_ReadVoltage();
     sprintf(s, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
@@ -168,22 +149,9 @@ void PAGE_TestEvent()
         sprintf(ra,"%s",s);
         GUI_Redraw(lblRA);
     }
-    if (show_mixer & 0x80) {
-        show_mixer &= 0x7F;
-        if(show_mixer) {
-            TEST_init_mixer();
-            for(i = 0; i < NUM_CHANNELS; i++) {
-                bar[i] = GUI_CreateBarGraph(10 + 20 * i, 10, 10, 220, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, showchan_cb, (void *)((long)i));
-            }
-        } else {
-            for(i = 0; i < NUM_CHANNELS; i++) {
-                GUI_RemoveObj(bar[i]);
-            }
-        }
-    }
-    if (show_mixer) {
-        for(i = 0; i < NUM_CHANNELS; i++) {
-            GUI_Redraw(bar[i]);
-        }
-    }
+}
+
+int PAGE_TestCanChange()
+{
+    return (! GUI_IsModal());
 }

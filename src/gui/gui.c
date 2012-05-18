@@ -73,6 +73,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     obj->CallBack = (void *) 0x1;
     obj->widget = dialog;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(box->image.file));
+    OBJ_SET_MODAL(obj, 1);
     connect_object(obj);
 
     dialog->text = text;
@@ -392,6 +393,12 @@ void GUI_DrawObjects(void)
     }
 }
 
+void GUI_RemoveAllObjects()
+{
+    while(objHEAD)
+        GUI_RemoveObj(objHEAD);
+}
+
 void GUI_RemoveObj(struct guiObject *obj)
 {
     switch (obj->Type) {
@@ -433,12 +440,16 @@ void GUI_RemoveObj(struct guiObject *obj)
     obj->CallBack = (void *)0;
     // Reattach linked list
     struct guiObject *prev = objHEAD;
-    while(prev) {
-        if(prev->next == obj) {
-            prev->next = obj->next;
-            break;
+    if (prev == obj) {
+        objHEAD = obj->next;
+    } else {
+        while(prev) {
+            if(prev->next == obj) {
+                prev->next = obj->next;
+                break;
+            }
+            prev = prev->next;
         }
-        prev = prev->next;
     }
     FullRedraw = 1;
 }
@@ -532,7 +543,7 @@ void GUI_DrawScreen(void)
     FullRedraw = 0;
 }
 
-u8 GUI_CheckModal(void)
+u8 GUI_IsModal(void)
 {
     return GUI_Dialog_Array[0].inuse;
 }
@@ -569,21 +580,16 @@ void GUI_RefreshScreen(void)
         GUI_DrawScreen();
         return;
     }
-    if(GUI_CheckModal()) {
-        u8 redraw = 0;
-        struct guiObject *dialog = NULL;
+    if(GUI_IsModal()) {
         struct guiObject *obj = objHEAD;
         while(obj) {
             if(OBJ_IS_MODAL(obj) && OBJ_IS_DIRTY(obj)) {
-                redraw = 1;
-            }
-            if(obj->Type == Dialog) {
-                dialog = obj;
+                if (obj->parent)
+                    GUI_DrawObject(obj->parent);
+                else
+                    GUI_DrawObject(obj);
             }
             obj = obj->next;
-        }
-        if(redraw && dialog) {
-            GUI_DrawObject(dialog);
         }
     } else {
         struct guiObject *obj = objHEAD;
@@ -608,7 +614,7 @@ u8 GUI_CheckTouch(struct touch coords)
 {
     u8 redraw = 0;
     u8 modalActive;
-    modalActive = GUI_CheckModal();
+    modalActive = GUI_IsModal();
     struct guiObject *obj = objHEAD;
     while(obj) {
         if ((obj->CallBack != 0) && ! OBJ_IS_DISABLED(obj)

@@ -14,6 +14,7 @@
  */
 
 #include "target.h"
+#include "pages.h"
 #include "gui/gui.h"
 
 static const char *templates[] = {
@@ -63,6 +64,11 @@ void PAGE_MixerInit(int page)
 
 void PAGE_MixerEvent()
 {
+}
+
+int PAGE_MixerCanChange()
+{
+    return 1;
 }
 
 static const char *mixertype_cb(guiObject_t *obj, int value, void *data)

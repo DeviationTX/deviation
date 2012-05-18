@@ -56,3 +56,16 @@ void CYRF_GetMfgData(u8 data[]) {
 void SignOn() {}
 
 void FS_Mount() {}
+
+void CYRF_ConfigRxTx(u32 TxRx) {(void)TxRx;}
+void CYRF_ConfigRFChannel(u8 ch) {(void)ch;}
+void CYRF_ConfigCRCSeed(u8 crc) {(void)crc;}
+void CYRF_StartReceive() {}
+void CYRF_ConfigSOPCode(u32 idx) {(void)idx;}
+void CYRF_ReadDataPacket(u8 dpbuffer[]) {(void)dpbuffer;}
+u8 CYRF_ReadRSSI(u32 dodummyread)
+{
+    return rand();
+}
+
+

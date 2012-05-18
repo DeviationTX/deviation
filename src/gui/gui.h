@@ -151,4 +151,6 @@ void GUI_RefreshScreen(void);
 void GUI_Redraw(guiObject_t *obj);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(guiObject_t *obj);
+void GUI_RemoveAllObjects();
+u8 GUI_IsModal(void);
 #endif /* GUI_H_ */

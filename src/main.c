@@ -1,3 +1,17 @@
+/*
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Foobar is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "target.h"
 #include "misc.h"
@@ -7,12 +21,8 @@ void event_loop(void *);
 void channel_scanner();
 void dump_bootloader();
 extern void start_event_loop();
+extern void TEST_init_mixer();
 
-#define PAGEINIT  PAGE_TestInit
-#define PAGEEVENT PAGE_TestEvent
-
-//#define PAGEINIT  PAGE_MixerInit
-//#define PAGEEVENT PAGE_MixerEvent
 
 int main() {
     PWR_Init();
@@ -46,12 +56,9 @@ int main() {
 #ifdef BL_DUMP
     dump_bootloader();
 #endif
-#if SCANNER
-    channel_scanner();
-#endif
 #ifdef STATUS_SCREEN
-    //PAGE_InitMixer(0);
-    PAGEINIT(0);
+    TEST_init_mixer();
+    PAGE_Init();
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
 #else
@@ -81,15 +88,19 @@ void event_loop(void *param)
          * */
         if(buttons != last_buttons) {
             char buttonstring[33];
-            last_buttons = buttons;
-            if((buttons & 0x01) == 0)
-                LCD_CalibrateTouch();
-            if((buttons & 0x02) == 0)
-                USB_Connect();
             for(i = 0; i < 32; i++)
                 buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
             buttonstring[32] = 0;
             printf("Buttons: %s\n",buttonstring);
+            last_buttons = buttons;
+            if((buttons & 0x01) == 0)
+                LCD_CalibrateTouch();
+            else if((buttons & 0x02) == 0)
+                USB_Connect();
+            else if((buttons & 0x04) == 0)
+                PAGE_Change(1);
+            else if((buttons & 0x08) == 0)
+                PAGE_Change(-1);
         }
     }
     if(SPITouch_IRQ()) {
@@ -104,7 +115,7 @@ void event_loop(void *param)
     }
     MIX_CalcChannels();
 
-    PAGEEVENT();
+    PAGE_Event();
 
     if (CLOCK_getms() > last_redraw + 100) {
         /* Redraw everything */
@@ -112,83 +123,6 @@ void event_loop(void *param)
         last_redraw = CLOCK_getms();
     }
 }
-
-#if SCANNER
-void channel_scanner()
-{
-#define NUM_CHANNELS    0x50
-
-    u32 i,j,k;
-    u8 dpbuffer[16];
-    u8 channelnoise[NUM_CHANNELS];
-    u8 channel = 0x04;
-
-    CYRF_ConfigRxTx(1);
-    CYRF_ConfigCRCSeed(0);
-    CYRF_ConfigSOPCode(0);
-
-    while(1)
-    {
-        if(PWR_CheckPowerSwitch())
-        PWR_Shutdown();
-
-        CYRF_ConfigRFChannel(channel);
-        CYRF_StartReceive();
-        Delay(10);
-
-        CYRF_ReadDataPacket(dpbuffer);
-        channelnoise[channel] = CYRF_ReadRSSI(1);
-
-        printf("%02X : %d\n",channel,channelnoise[channel]);
-
-        channel++;
-        if(channel == NUM_CHANNELS)
-        {
-            channel = 0x04;
-            LCD_Clear(0x0000);
-
-            for(i=4;i<NUM_CHANNELS;i++)
-            {
-                LCD_SetDrawArea(30 + (3*i), 30, 31 + (3*i), 190);
-                LCD_DrawStart();
-                for(k=0;k<16; k++)
-                {
-                    for(j=0; j<2; j++)
-                    {
-                        if(k < (15 - channelnoise[i]))
-                        {
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                            LCD_DrawPixel(0xF000);
-                        }
-                        else
-                        {
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                            LCD_DrawPixel(0xFFFF);
-                        }
-                    }
-                }
-                LCD_DrawStop();
-            }
-        }
-    }
-}
-#endif
 
 #ifdef BL_DUMP
 void dump_bootloader()
