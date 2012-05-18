@@ -1,3 +1,5 @@
+# Use VERBOSE=1 to enable verbose make
+
 TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
 include target/$(TARGET)/Makefile.inc
@@ -19,27 +21,32 @@ ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
 CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
+CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS)
+	@echo " + Building '$@'"
 ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 endif
 
+# The following enables quiet output unless you use VERBOSE=1
+# Note that this must be after the 1st rule so that it doesn't execute by default
+$(VERBOSE).SILENT:
+
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
-
--include $(OBJS:.o=.P)
 
 $(OBJS): | $(ODIR)
 
 $(ODIR):
 	@mkdir -p $@
 
-## The autodependencymagic below was adapeted from:
+## The autodependency magic below was adapeted from:
 ## http://mad-scientist.net/make/autodep.html
+-include $(OBJS:.o=.P)
 dollar = $$
 define define_compile_rules
 $(ODIR)/%.o: $(1)%.c
@@ -51,7 +58,8 @@ $(ODIR)/%.o: $(1)%.c
             rm -f $(ODIR)/$$*.d
 
 $(ODIR)/%.o: $(1)%.cpp
-	$(CXX) $$(CFLAGS) -MD -c -o $$@ $$<
+	@echo " + Compiling '$$<'"
+	$(CXX) $$(CXXFLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
