@@ -364,6 +364,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     u16 i, j;
     FILE *fh;
     u8 transparent = 0;
+    u8 row_has_transparency = 0;
     u8 buf[320 * 2];
 
     if (w == 0 || h == 0)
@@ -428,11 +429,23 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         fread(buf, 2 * w, 1, fh);
         u16 *color = (u16 *)buf;
         if(transparent) {
+            u8 last_pixel_transparent = row_has_transparency;
+            row_has_transparency = 0;
             for (i = 0; i < w; i++ ) {
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
-                    *color = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
-                    LCD_DrawPixelXY(x + i, y + h - j - 1, *color);
+                    u16 c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
+                    if(last_pixel_transparent) {
+                        LCD_DrawPixelXY(x + i, y + h - j - 1, c);
+                        last_pixel_transparent = 0;
+                    } else {
+                        LCD_DrawPixel(c);
+                    }
+                } else {
+                    //When we see a transparent pixel, the next real pixel
+                    // will need to be drawn with XY coordinates
+                    row_has_transparency = 1;
+                    last_pixel_transparent = 1;
                 }
                 color++;
             }

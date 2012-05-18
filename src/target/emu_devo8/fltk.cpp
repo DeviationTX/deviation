@@ -293,21 +293,10 @@ void LCD_DrawPixel(unsigned int color)
 }
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
-    u8 r, g, b;
-    r = (color >> 8) & 0xf8;
-    g = (color >> 3) & 0xfc;
-    b = (color << 3) & 0xf8;
-#ifdef ALT_DRAW
-    gui.image[3*(320*y+x)] = r;
-    gui.image[3*(320*y+x)+1] = g;
-    gui.image[3*(320*y+x)+2] = b;
-#else
-    fl_begin_offscreen(gui.image);
-    Fl_Color c = fl_rgb_color(r, g, b);
-    fl_color(c);
-    fl_point(x, y);
-    fl_end_offscreen();
-#endif
+    gui.xstart = x; //This is to emulate how the LCD behaves
+    gui.x = x;
+    gui.y = y;
+    LCD_DrawPixel(color);
 }
 
 u32 ScanButtons()
