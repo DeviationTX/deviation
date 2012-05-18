@@ -689,7 +689,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         s32 xval, yval;
         xval = graph->min_x + x * (graph->max_x - graph->min_x) / box->width;
         yval = graph->CallBack(xval, graph->cb_data);
-        y = (xval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
+        y = (yval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
         //printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
         LCD_DrawPixelXY(x + box->x, box->y + box->height - y , 0xFFE0); //Yellow
     }

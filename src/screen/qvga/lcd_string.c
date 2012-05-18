@@ -72,7 +72,7 @@ const struct FONT_DEF Fonts[] = {
     {0x80 | 10, 15, 0x20, 0x80, FontArial_14},
     {0x80 | 10, 15, 0x20, 0x80, FontArial_bold_14},
     {0x80 | 10, 12, 0x20, 0x80, FontCorsiva_12},
-    {0},
+    {0, 0, 0, 0, 0},
     };
 
 #define LINE_SPACING 2
@@ -142,7 +142,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 
 void LCD_SetFont(unsigned int idx)
 {
-    int i;
+    unsigned int i;
     for(i = 0; i <= idx; i++) {
         if(Fonts[i].width == 0)
             return;

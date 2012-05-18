@@ -14,6 +14,7 @@
  */
 
 #include "petit_io.h"
+#include "target.h"
 
 #define SECTOR_OFFSET 36
 
@@ -79,6 +80,9 @@ DRESULT disk_writep (
 	}
 
 	return res;
+#else
+	(void)buff;
+	(void)sc;
 #endif
 	return RES_NOTRDY;
 }

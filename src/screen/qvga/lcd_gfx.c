@@ -415,7 +415,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         w = img_w;
     if(h < 0)
         h = img_h;
-    if(w + x_off > img_w || h + y_off > img_h)
+    if((u16)w + x_off > img_w || (u16)h + y_off > img_h)
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         return;
@@ -454,7 +454,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                 LCD_DrawPixel(*color++);
             }
         }
-        if(w < img_w) {
+        if((u16)w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
         }
     }

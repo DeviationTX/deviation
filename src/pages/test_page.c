@@ -57,6 +57,7 @@ void PAGE_TestInit(int page)
         sprintf(buttonmessage,"%s","Button 3 Pushed");
     }
     void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
+        (void)gDR;
         GUI_RemoveObj(obj);
     }
     s16 xy_cb(s16 val, void *data) {
@@ -65,6 +66,7 @@ void PAGE_TestInit(int page)
     }
     const char *ts_cb(guiObject_t *obj, int value, void *data) {
         (void)data;
+        (void)obj;
         static int idx = 0;
         const char *str[] = {
              "None",

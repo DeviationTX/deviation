@@ -57,7 +57,7 @@ void PAGE_ScannerEvent()
             {
                 for(j=0; j<2; j++)
                 {
-                    if(k < (15 - channelnoise[i]))
+                    if(k < (u8)(15 - channelnoise[i]))
                     {
                         LCD_DrawPixel(0xF000);
                         LCD_DrawPixel(0xF000);

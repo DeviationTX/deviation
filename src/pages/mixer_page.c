@@ -73,6 +73,7 @@ int PAGE_MixerCanChange()
 
 static const char *mixertype_cb(guiObject_t *obj, int value, void *data)
 {
+    (void)obj;
     long idx = (long)data;
     if(value > 0) {
         if(cur_template[idx] < 3)

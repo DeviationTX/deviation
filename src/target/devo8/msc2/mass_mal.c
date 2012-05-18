@@ -108,6 +108,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
 *******************************************************************************/
 uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
 {
+  (void)lun;
   SPIFlash_EraseSector(Memory_Offset + (SECTOR_OFFSET * 0x1000));
   return MAL_OK;
 }
@@ -120,6 +121,7 @@ uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
 *******************************************************************************/
 uint16_t MAL_GetStatus (uint8_t lun)
 {
+  (void)lun;
   return MAL_OK;
 }
 

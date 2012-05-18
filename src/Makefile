@@ -20,7 +20,7 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
-CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 

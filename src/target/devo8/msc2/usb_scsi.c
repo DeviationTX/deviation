@@ -143,6 +143,7 @@ void SCSI_ReadCapacity10_Cmd(uint8_t lun)
 *******************************************************************************/
 void SCSI_ModeSense6_Cmd (uint8_t lun)
 {
+  (void)lun;
   Transfer_Data_Request(Mode_Sense6_data, MODE_SENSE6_DATA_LEN);
 }
 
@@ -155,6 +156,7 @@ void SCSI_ModeSense6_Cmd (uint8_t lun)
 *******************************************************************************/
 void SCSI_ModeSense10_Cmd (uint8_t lun)
 {
+  (void)lun;
   Transfer_Data_Request(Mode_Sense10_data, MODE_SENSE10_DATA_LEN);
 }
 
@@ -167,6 +169,7 @@ void SCSI_ModeSense10_Cmd (uint8_t lun)
 *******************************************************************************/
 void SCSI_RequestSense_Cmd (uint8_t lun)
 {
+  (void)lun;
   uint8_t Request_Sense_data_Length;
 
   if (CBW.CB[4] <= REQUEST_SENSE_DATA_LEN)
@@ -190,6 +193,7 @@ void SCSI_RequestSense_Cmd (uint8_t lun)
 *******************************************************************************/
 void Set_Scsi_Sense_Data(uint8_t lun, uint8_t Sens_Key, uint8_t Asc)
 {
+  (void)lun;
   Scsi_Sense_Data[2] = Sens_Key;
   Scsi_Sense_Data[12] = Asc;
 }
@@ -203,6 +207,7 @@ void Set_Scsi_Sense_Data(uint8_t lun, uint8_t Sens_Key, uint8_t Asc)
 *******************************************************************************/
 void SCSI_Start_Stop_Unit_Cmd(uint8_t lun)
 {
+  (void)lun;
   Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
 }
 
@@ -215,7 +220,6 @@ void SCSI_Start_Stop_Unit_Cmd(uint8_t lun)
 *******************************************************************************/
 void SCSI_Read10_Cmd(uint8_t lun , uint32_t LBA , uint32_t BlockNbr)
 {
-
   if (Bot_State == BOT_IDLE)
   {
     if (!(SCSI_Address_Management(CBW.bLUN, SCSI_READ10, LBA, BlockNbr)))/*address out of range*/
@@ -289,6 +293,7 @@ void SCSI_Write10_Cmd(uint8_t lun , uint32_t LBA , uint32_t BlockNbr)
 *******************************************************************************/
 void SCSI_Verify10_Cmd(uint8_t lun)
 {
+  (void)lun;
   if ((CBW.dDataLength == 0) && !(CBW.CB[1] & BLKVFY))/* BLKVFY not set*/
   {
     Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
@@ -309,6 +314,7 @@ void SCSI_Verify10_Cmd(uint8_t lun)
 *******************************************************************************/
 void SCSI_Valid_Cmd(uint8_t lun)
 {
+  (void)lun;
   if (CBW.dDataLength != 0)
   {
     Bot_Abort(BOTH_DIR);
@@ -370,6 +376,7 @@ void SCSI_Format_Cmd(uint8_t lun)
 *******************************************************************************/
 void SCSI_Invalid_Cmd(uint8_t lun)
 {
+  (void)lun;
   if (CBW.dDataLength == 0)
   {
     Bot_Abort(DIR_IN);

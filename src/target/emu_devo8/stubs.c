@@ -32,7 +32,7 @@ void CLOCK_Init() {}
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
-void SPI_FlashBlockWriteEnable(u8 enable) {};
+void SPI_FlashBlockWriteEnable(u8 enable) {(void)enable;}
 void SPITouch_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {
@@ -65,6 +65,7 @@ void CYRF_ConfigSOPCode(u32 idx) {(void)idx;}
 void CYRF_ReadDataPacket(u8 dpbuffer[]) {(void)dpbuffer;}
 u8 CYRF_ReadRSSI(u32 dodummyread)
 {
+    (void)dodummyread;
     return rand();
 }
 

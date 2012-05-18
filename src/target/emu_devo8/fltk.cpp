@@ -175,6 +175,8 @@ void start_event_loop() {
 
 void close_window(Fl_Widget *widget, void *param)
 {
+    (void)widget;
+    (void)param;
     exit(0);
 }
 

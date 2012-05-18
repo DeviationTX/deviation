@@ -18,7 +18,6 @@
 
 void CHAN_Init()
 {
-    int i;
     ADC_Init();
 
     /* configure channels for analog */

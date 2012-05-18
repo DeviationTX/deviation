@@ -23,7 +23,6 @@
 	If not, uncomment the define below and
 	replace outbyte(c) by your own function call.
 
-#define putchar(c) outbyte(c)
 */
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/usart.h>
@@ -31,6 +30,7 @@
 
 #include <stdarg.h>
 
+#undef putchar
 #define putchar(c) usart_send_blocking(USART1, c)
 
 static void printchar(char **str, int c)
