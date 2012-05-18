@@ -43,7 +43,7 @@ static const char *inp[] = {
     "", "D/R", "D/R-C1", "D/R-C2"
 };
 
-void PAGE_InitMixer(int page)
+void PAGE_MixerInit(int page)
 {
     int init_y = 16;
     int i;
@@ -59,6 +59,10 @@ void PAGE_InitMixer(int page)
         GUI_CreateLabel(240, row, switch_str[i], 0x0000);
     }
     GUI_DrawScreen();
+}
+
+void PAGE_MixerEvent()
+{
 }
 
 static const char *mixertype_cb(guiObject_t *obj, int value, void *data)

@@ -150,7 +150,10 @@ s16 CURVE_Interpolate(struct Curve *curve, s16 value);
 void MIX_CalcChannels();
 
 /* GUI Pages */
-void PAGE_InitMixer(int page);
+void PAGE_MixerInit(int page);
+void PAGE_MixerEvent();
+void PAGE_TestInit(int page);
+void PAGE_TestEvent();
 
 /* Abstract bootloader access */
 enum {
