@@ -59,6 +59,7 @@ int main() {
     channel_scanner();
 #endif
 #ifdef STATUS_SCREEN
+    //PAGE_InitMixer(0);
     initialize_status();
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
@@ -78,8 +79,9 @@ static char t1[40];
 static char t2[40];
 static int show_mixer = 0;
 static int touch_down = 0;
-static int bar[NUM_CHANNELS];
-int lblButtons;
+static guiObject_t *bar[NUM_CHANNELS];
+static guiObject_t *lblButtons;
+static guiObject_t *lblVoltage;
 void initialize_status()
 {
     static char strBootLoader[80],strSPIFlash[80],strMfg[80];
@@ -96,26 +98,26 @@ void initialize_status()
     sprintf(t2," ");
     /* GUI Callbacks */
 
-    void PushMeButton1(int objID) {
-        GUI_RemoveObj(objID);
+    void PushMeButton1(guiObject_t *obj) {
+        GUI_RemoveObj(obj);
         sprintf(buttonmessage,"%s","Button 1 Pushed");
     }
-    void PushMeButton2(int objID) {
-        GUI_RemoveObj(objID);
+    void PushMeButton2(guiObject_t *obj) {
+        GUI_RemoveObj(obj);
         sprintf(buttonmessage,"%s","Button 2 Pushed");
     }
-    void PushMeButton3(int objID) {
-        GUI_RemoveObj(objID);
+    void PushMeButton3(guiObject_t *obj) {
+        GUI_RemoveObj(obj);
         sprintf(buttonmessage,"%s","Button 3 Pushed");
     }
-    void openDialogPush(int objID, struct guiDialogReturn gDR) {
-        GUI_RemoveObj(objID);
+    void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
+        GUI_RemoveObj(obj);
     }
     s16 xy_cb(s16 val, void *data) {
         (void)data;
         return val;
     }
-    const char *ts_cb(int id, int value, void *data) {
+    const char *ts_cb(guiObject_t *obj, int value, void *data) {
         (void)data;
         static int idx = 0;
         const char *str[] = {
@@ -153,27 +155,27 @@ void initialize_status()
     }
 
     /* Create some GUI elements */
-    int frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
-    int frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
-    int lblSPIFlash = GUI_CreateLabel(10,60,strSPIFlash,0x0000);
-    int lblBootLoader = GUI_CreateLabel(10,45,strBootLoader,0x0000);
-    int lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
+    guiObject_t *frmStatusBar = GUI_CreateFrame(0,0,320,24,statusBar);
+    guiObject_t *frmBattery = GUI_CreateFrame(270,1,48,22,batteryImg);
+    guiObject_t *lblSPIFlash = GUI_CreateLabel(10,60,strSPIFlash,0x0000);
+    guiObject_t *lblBootLoader = GUI_CreateLabel(10,45,strBootLoader,0x0000);
+    guiObject_t *lblMfg = GUI_CreateLabel(10,30,strMfg,0x0000);
     lblButtons = GUI_CreateLabel(10,75,buttonstr,0x0000);
-    int lblVoltage = GUI_CreateLabel(267,8,voltagestr,0x0f00);
-    int lblTE = GUI_CreateLabel(10,110,te,0xffff);
-    int lblRA = GUI_CreateLabel(10,140,ra,0xffff);
-    int lblT1 = GUI_CreateLabel(10,125,t1,0xffff);
-    int lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
-    int lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
-    int tstXYGraph = GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
-    int testTxtSel1 = GUI_CreateTextSelect(10,180,128,16,0x0000, NULL, ts_cb, NULL);
-    int testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
-    int testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
-    int testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
-    int openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
+    lblVoltage = GUI_CreateLabel(267,8,voltagestr,0x0f00);
+    guiObject_t *lblTE = GUI_CreateLabel(10,110,te,0xffff);
+    guiObject_t *lblRA = GUI_CreateLabel(10,140,ra,0xffff);
+    guiObject_t *lblT1 = GUI_CreateLabel(10,125,t1,0xffff);
+    guiObject_t *lblT2 = GUI_CreateLabel(10,155,t2,0xffff);
+    guiObject_t *lblButtonMessage = GUI_CreateLabel(100,170,buttonmessage,0xffff);
+    guiObject_t *tstXYGraph = GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
+    guiObject_t *testTxtSel1 = GUI_CreateTextSelect(10,180,128,16,0x0000, NULL, ts_cb, NULL);
+    guiObject_t *testButton1 = GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
+    guiObject_t *testButton2 = GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
+    guiObject_t *testButton3 = GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
+    guiObject_t *openDialog = GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
 
     /* little bit of code to stop variable warnings */
-    if (frmStatusBar && frmBattery && lblButtonMessage && lblButtons && lblVoltage &&
+    if (frmStatusBar && frmBattery && lblButtonMessage && lblButtons &&
         lblTE && lblRA && lblT1 && lblT2 && lblSPIFlash && lblBootLoader && lblMfg &&
         testButton1 && testButton2 && testButton3 && openDialog)
     {/*Just here to avoid warnings*/}
@@ -215,24 +217,25 @@ void event_loop(void *param)
             if((buttons & 0x04) == 0)
                 show_mixer = 0x80 | (show_mixer & 0x01 ? 0 : 1);
             for(i = 0; i < 32; i++)
-            buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
+                buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
             buttonstring[32] = 0;
             printf("Buttons: %s\n",buttonstring);
-            sprintf(buttonstr,"Buttons:\n%s",buttonstring);
-            GUI_Redraw(lblButtons);
+            //sprintf(buttonstr,"Buttons:\n%s",buttonstring);
+            //GUI_Redraw(lblButtons);
             //GUI_DrawWindow(lblButtons);
-            ReDraw = 1;
+            //ReDraw = 1;
         }
     }
-    {
+    if(1) {
         u16 voltage = PWR_ReadVoltage();
         sprintf(s, "%2d.%03d\n", voltage >> 12, voltage & 0x0fff);
         if (strcmp(s,voltagestr) != 0) {
             sprintf(voltagestr,"%s",s);
-            //ReDraw = 1;
+            GUI_Redraw(lblVoltage);
+            ReDraw = 1;
         }
     }
-    {
+    if(1) {
         u16 throttle = CHAN_ReadInput(INP_THROTTLE);
         u16 rudder   = CHAN_ReadInput(INP_RUDDER);
         u16 aileron  = CHAN_ReadInput(INP_AILERON);
@@ -252,15 +255,6 @@ void event_loop(void *param)
         struct touch t = SPITouch_GetCoords();
         printf("x : %4d y : %4d\n", t.x, t.y);
         sprintf(s, "x : %4d y : %4d\n", t.x, t.y);
-        if (strcmp(s,t1) != 0) {
-            sprintf(t1,"%s",s);
-            //ReDraw = 1;
-        }
-        sprintf(s, "z1: %4d z2: %4d\n", t.z1, t.z2);
-        if (strcmp(s,t2) != 0) {
-            sprintf(t2,"%s",s);
-            //ReDraw = 1;
-        }
         if (! touch_down) {
             ReDraw |= GUI_CheckTouch(t);
             touch_down = 1;
@@ -268,7 +262,7 @@ void event_loop(void *param)
     } else {
         touch_down = 0;
     }
-    if (show_mixer & 0x80) {
+    if (1 && (show_mixer & 0x80)) {
         show_mixer &= 0x7F;
         if(show_mixer) {
             TEST_init_mixer();
