@@ -1,14 +1,66 @@
-There are multiple targets available for building the Whippet application:
+There are multiple targets available for building the Deviation firmware:
 
 devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
         It requires the gnu arm toolchain including gcc, newlib, and libopencm3
-        Here is a convenient script to download and build all components:
-           https://github.com/esden/summon-arm-toolchain
+        To build, use:
+           make
 
 emu_devo8: This will build on the native platform (no cross-compiler needed)
            The main purpose of this target is to facilitate GUI development.
+           This target requires FLTK to be installed.  See below for
+           installing build enviornments
+           For Linux:
+             make TARGET=emu_devo8
+           For Windows:
+             make TARGET=emu_devo8 WINDOWS=1
+           Cross-compile for Windows on Linux:
+             make TARGET=emu_devo8 WINDOWS=1 CROSS=i586-mingw32msvc-
 
 the default target is 'devo8'
 
-To build:
-make TARGET=<target>
+Installing the build environment:
+
+#################################
+Building for ARM (on Linux):
+    I use the following script to install a cross-compiled gcc,
+    and the relevant libraries:
+           https://github.com/esden/summon-arm-toolchain
+#################################
+
+#################################
+Builing the Windows binary on Linux
+    Install fltk:
+           apt-get install mingw32 mingw32-binutils mingw32-runtime
+           <Download and unpack fltk source code>
+           ./configure --disable-largefile --enable-localjpeg \
+                       --enable-localzlib --enable-localpng \
+                       --disable-gl --host=i586-mingw32msvc \
+                       --prefix=/opt/fltk-w32
+           make
+           sudo make install
+#################################
+
+#################################
+Building the Windows binary on Windows
+#################################
+    Install MingW:
+    * Download the mingw installer from here: sourceforge.net/projects/mingw/files/Ins...0120426.exe/download
+    * Run the installer, and select 'C++', 'MSYS' and the 'Developer Toolkit'
+
+    Install fltk:
+    * Download fltk from here: www.fltk.org/software.php?VERSION=1.3.0&...-1.3.0-source.tar.gz
+    * Start msys (you should have an icon, but otherwise run C:\MingW\msys\1.0\msys.bat
+    * mkdir src
+    * cd src
+    * Untar fltk: tar -xzf <path to fltk download> (you can get to your C: drive in mingw using /c/Users/<user>/Downloads for example)
+    * cd fltk-1.3.0
+    * ./configure
+    * make
+    * make install
+
+    Install Deviation:
+    * Download the source code for deviation. You'll need mercurial to keep track of changes (which will require installing python), but you can manually download a zip of the source from bitbucket.org/PhracturedBlue/deviation
+    * cd ~/src
+    * cp -pf <path to deviation src code> deviation
+    * cd deviation/src
+
