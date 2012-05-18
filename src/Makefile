@@ -22,7 +22,7 @@ CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/
 EXEEXT   ?= elf
 
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS)
-ifndef SRC_CXX
+ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
