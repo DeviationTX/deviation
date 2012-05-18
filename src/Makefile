@@ -15,16 +15,21 @@ SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 
-ODIR     = objs/$(TARGET)
+ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
 CFLAGS   := $(CFLAGS) -g -Wall -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
+EXEEXT   ?= elf
 
-$(TARGET).elf: $(LINKFILE) $(OBJS)
+$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS)
+ifndef SRC_CXX
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
+else
+	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
+endif
 
 clean:
-	rm -f $(TARGET).elf $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
+	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
 
 -include $(OBJS:.o=.P)
 

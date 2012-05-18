@@ -1,6 +1,7 @@
 bin$
 dfu$
 elf$
+exe$
 list$
 gz$
 src/gz*

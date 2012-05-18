@@ -189,12 +189,14 @@ void LCD_Init()
   for(i = 0; i < 10; i++) {
       //This will leak memory for the labels, but it won't be much
       char *str;
-      asprintf(&str, "Ch %d", i);
+      str = (char *)malloc(8);
+      sprintf(str, "Ch %d", i);
       gui.raw[i] = new Fl_Output(370, 20 * i + 20, 50, 15, str);
       gui.raw[i]->textsize(10);
       gui.final[i] = new Fl_Output(430, 20 * i + 20, 50, 15);
       gui.final[i]->textsize(10);
-      asprintf(&str, "Ch %d", i + 10);
+      str = (char *)malloc(8);
+      sprintf(str, "Ch %d", i + 10);
       gui.raw[i+10] = new Fl_Output(530, 20 * i + 20, 50, 15, str);
       gui.raw[i+10]->textsize(10);
       gui.final[i+10] = new Fl_Output(590, 20 * i + 20, 50, 15);
