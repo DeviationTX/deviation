@@ -149,6 +149,9 @@ s16 CURVE_Interpolate(struct Curve *curve, s16 value);
 /* Mixer functions */
 void MIX_CalcChannels();
 
+/* GUI Pages */
+void PAGE_InitMixer(int page);
+
 /* Abstract bootloader access */
 enum {
     BL_ID = 0,
