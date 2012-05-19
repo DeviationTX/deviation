@@ -105,7 +105,7 @@ void event_loop(void *param)
     }
     if(SPITouch_IRQ()) {
         struct touch t = SPITouch_GetCoords();
-        printf("x : %4d y : %4d\n", t.x, t.y);
+        //printf("x : %4d y : %4d\n", t.x, t.y);
         if (! touch_down) {
             GUI_CheckTouch(t);
             touch_down = 1;

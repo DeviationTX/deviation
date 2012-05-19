@@ -44,17 +44,9 @@ void PAGE_TestInit(int page)
     sprintf(t2," ");
     /* GUI Callbacks */
 
-    void PushMeButton1(guiObject_t *obj) {
+    void PushMeButton(guiObject_t *obj, void *data) {
         GUI_RemoveObj(obj);
-        sprintf(buttonmessage,"%s","Button 1 Pushed");
-    }
-    void PushMeButton2(guiObject_t *obj) {
-        GUI_RemoveObj(obj);
-        sprintf(buttonmessage,"%s","Button 2 Pushed");
-    }
-    void PushMeButton3(guiObject_t *obj) {
-        GUI_RemoveObj(obj);
-        sprintf(buttonmessage,"%s","Button 3 Pushed");
+        sprintf(buttonmessage,"%s",(const char *)data);
     }
     void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
         (void)gDR;
@@ -116,10 +108,9 @@ void PAGE_TestInit(int page)
     GUI_CreateLabel(10,155,t2,0xffff);
     GUI_CreateLabel(100,170,buttonmessage,0xffff);
     GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL);
-    GUI_CreateTextSelect(10,180,128,16,0x0000, NULL, ts_cb, NULL);
-    GUI_CreateButton(10,200,89,23,button1,0x0000,PushMeButton1);
-    GUI_CreateButton(110,200,89,23,button2,0x0000,PushMeButton2);
-    GUI_CreateButton(210,200,89,23,button3,0x0000,PushMeButton3);
+    GUI_CreateButton(10,200,BUTTON_90,button1,0x0000,PushMeButton, "Button 1 Pushed");
+    GUI_CreateButton(110,200,BUTTON_90,button2,0x0000,PushMeButton, "Button 2 Pushed");
+    GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");
     GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
 
     // do a master redraw

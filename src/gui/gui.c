@@ -30,7 +30,7 @@ static u8 FullRedraw;
 static void GUI_DrawObject(struct guiObject *obj);
 static struct guiObject *GUI_GetFreeObj(void);
 static void *GUI_GetFreeGUIObj(enum GUIType guiType);
-static void dgCallback(struct guiObject *obj);
+static void dgCallback(struct guiObject *obj, void *data);
 static void GUI_DrawBarGraph(struct guiObject *obj);
 static void GUI_DrawXYGraph(struct guiObject *obj);
 static void GUI_DrawTextSelect(struct guiObject *obj);
@@ -70,10 +70,10 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     box->image.y_off = 0;
 
     obj->Type = Dialog;
-    obj->CallBack = (void *) 0x1;
     obj->widget = dialog;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(box->image.file));
     OBJ_SET_MODAL(obj, 1);
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     dialog->text = text;
@@ -92,7 +92,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     switch (dgType) {
     case dtOk:
         dialog->button[0] = GUI_CreateButton(((x + width) / 2) - 10,
-                ((y + height) - 27), 89, 23, "Ok", 0x0000, dgCallback);
+                ((y + height) - 27), BUTTON_90, "Ok", 0x0000, dgCallback, NULL);
         OBJ_SET_MODAL(dialog->button[0], 1);
         dialog->button[0]->parent = obj;
         break;
@@ -104,7 +104,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
 
 }
 
-guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, u16 width, u16 height, u16 fontColor,
+guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data)
@@ -118,19 +118,28 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, u16 width, u16 height, u16 fontC
 
     box = &obj->box;
 
-    box->image.file = "textselect.bmp";
+    switch (type) {
+        case TEXTSELECT_128:
+            box->image.file = "spin128.bmp";
+            break;
+        case TEXTSELECT_64:
+            box->image.file = "spin64.bmp";
+            break;
+        case TEXTSELECT_96:
+            box->image.file = "spin96.bmp";
+            break;
+    }
     box->image.x_off = 0;
     box->image.y_off = 0;
 
     box->x = x;
     box->y = y;
-    box->width = width;
-    box->height = height;
+    LCD_ImageDimensions(box->image.file, &box->width, &box->height);
 
     obj->Type = TextSelect;
-    obj->CallBack = (void *) 0x1;
     obj->widget = select;
     OBJ_SET_TRANSPARENT(obj, 0); //Even if the bmp has transparency, the redraw function will handle it
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     select->fontColor = fontColor;
@@ -157,9 +166,9 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
     LCD_GetStringDimensions((const u8 *)text, &box->width, &box->height);
 
     obj->Type = Label;
-    obj->CallBack = (void *) 0x1; /* no call back yet for labels */
     obj->widget = label;
     OBJ_SET_TRANSPARENT(obj, 1);
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     label->text = text;
@@ -190,9 +199,9 @@ guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *im
     box->height = height;
 
     obj->Type = Frame;
-    obj->CallBack = (void *) 0x1;
     obj->widget = frame;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(image));
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     frame->inuse = 1;
@@ -201,8 +210,8 @@ guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *im
 
 }
 
-guiObject_t *GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
-        u16 fontColor, void (*CallBack)(struct guiObject *obj))
+guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
+        u16 fontColor, void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
     struct guiButton *button = GUI_GetFreeGUIObj(Button);
     struct guiObject *obj    = GUI_GetFreeObj();
@@ -214,27 +223,31 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *t
 
     box = &obj->box;
 
-    box->image.file = "gui.bmp";
+    switch (type) {
+        case BUTTON_90: box->image.file = "btn90.bmp"; break;
+        case BUTTON_45: box->image.file = "btn45.bmp"; break;
+    }
     box->image.x_off = 0;
     box->image.y_off = 0;
 
     box->x = x;
     box->y = y;
-    box->width = width;
-    box->height = height;
+    LCD_ImageDimensions(box->image.file, &box->width, &box->height);
 
     obj->Type = Button;
     obj->widget = button;
-    obj->CallBack = *CallBack;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(box->image.file));
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     LCD_GetStringDimensions((u8 *) text, &text_w, &text_h);
     button->inuse = 1;
     button->text = text;
-    button->text_x_off = (width - text_w) / 2 + x;
-    button->text_y_off = (height - text_h) / 2 + y;
+    button->text_x_off = (box->width - text_w) / 2 + x;
+    button->text_y_off = (box->height - text_h) / 2 + y + 2;
     button->fontColor = fontColor;
+    button->CallBack = CallBack;
+    button->cb_data = cb_data;
 
     return obj;
 }
@@ -258,9 +271,9 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     box->height = height;
 
     obj->Type = XYGraph;
-    obj->CallBack = (void *) 0x1;
     obj->widget = graph;
     OBJ_SET_TRANSPARENT(obj, 0);
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     graph->min_x = min_x;
@@ -293,9 +306,9 @@ guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     box->height = height;
 
     obj->Type = BarGraph;
-    obj->CallBack = (void *) 0x1;
     obj->widget = graph;
     OBJ_SET_TRANSPARENT(obj, 0);
+    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     graph->min = min;
@@ -317,67 +330,65 @@ u8 coords_in_box(struct guiBox *box, struct touch *coords)
 void GUI_DrawObject(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
-    if (obj->CallBack != 0) {
-        switch (obj->Type) {
-        case UnknownGUI:
-            break;
-        case Button:
-        {
-            struct guiButton *button = (struct guiButton *)obj->widget;
-            LCD_DrawWindowedImageFromFile(box->x, box->y,
-                    box->image.file, box->width, box->height,
-                    box->image.x_off, box->image.y_off);
-            LCD_SetFontColor(button->fontColor);
-            LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
-            break;
-        }
-        case Label:
-        {
-            struct guiLabel *label = (struct guiLabel *)obj->widget;
-            LCD_SetFontColor(label->fontColor);
-            LCD_PrintStringXY(box->x, box->y, label->text);
-            break;
-        }
-        case Frame:
-        {
-            LCD_DrawWindowedImageFromFile(box->x, box->y,
-                    box->image.file, box->width, box->height,
-                    box->image.x_off, box->image.y_off);
-            break;
-        }
-        case Dialog: {
-            struct guiDialog *dialog = (struct guiDialog *)obj->widget;
-            printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
-                    box->y, box->width, box->height);
-            LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file,
-                    box->width, box->height, box->image.x_off, box->image.y_off);
-            LCD_SetFontColor(dialog->titleColor);
-            LCD_PrintStringXY(box->x + 5, (box->y + 10), dialog->title);
-            LCD_SetFontColor(dialog->fontColor);
-            LCD_PrintStringXY(box->x + 5, (box->y + ((box->height / 2) - 4)),
-                    dialog->text);
-            int i;
-            for (i=0;i<4;i++) {
-                if (dialog->button[i] != NULL) {
-                    GUI_DrawObject(dialog->button[i]);
-                }
+    switch (obj->Type) {
+    case UnknownGUI:
+        break;
+    case Button:
+    {
+        struct guiButton *button = (struct guiButton *)obj->widget;
+        LCD_DrawWindowedImageFromFile(box->x, box->y,
+                box->image.file, box->width, box->height,
+                box->image.x_off, box->image.y_off);
+        LCD_SetFontColor(button->fontColor);
+        LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
+        break;
+    }
+    case Label:
+    {
+        struct guiLabel *label = (struct guiLabel *)obj->widget;
+        LCD_SetFontColor(label->fontColor);
+        LCD_PrintStringXY(box->x, box->y, label->text);
+        break;
+    }
+    case Frame:
+    {
+        LCD_DrawWindowedImageFromFile(box->x, box->y,
+                box->image.file, box->width, box->height,
+                box->image.x_off, box->image.y_off);
+        break;
+    }
+    case Dialog: {
+        struct guiDialog *dialog = (struct guiDialog *)obj->widget;
+        printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
+                box->y, box->width, box->height);
+        LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file,
+                box->width, box->height, box->image.x_off, box->image.y_off);
+        LCD_SetFontColor(dialog->titleColor);
+        LCD_PrintStringXY(box->x + 5, (box->y + 10), dialog->title);
+        LCD_SetFontColor(dialog->fontColor);
+        LCD_PrintStringXY(box->x + 5, (box->y + ((box->height / 2) - 4)),
+                dialog->text);
+        int i;
+        for (i=0;i<4;i++) {
+            if (dialog->button[i] != NULL) {
+                GUI_DrawObject(dialog->button[i]);
             }
-            break;
         }
-        case CheckBox:
-            break;
-        case Dropdown:
-            break;
-        case XYGraph:
-            GUI_DrawXYGraph(obj);
-            break;
-        case BarGraph:
-            GUI_DrawBarGraph(obj);
-            break;
-        case TextSelect:
-            GUI_DrawTextSelect(obj);
-            break;
-        }
+        break;
+    }
+    case CheckBox:
+        break;
+    case Dropdown:
+        break;
+    case XYGraph:
+        GUI_DrawXYGraph(obj);
+        break;
+    case BarGraph:
+        GUI_DrawBarGraph(obj);
+        break;
+    case TextSelect:
+        GUI_DrawTextSelect(obj);
+        break;
     }
     OBJ_SET_DIRTY(obj, 0);
 }
@@ -437,7 +448,7 @@ void GUI_RemoveObj(struct guiObject *obj)
         ((struct guiTextSelect *)obj->widget)->inuse = 0;
         break;
     }
-    obj->CallBack = (void *)0;
+    OBJ_SET_USED(obj, 0);
     // Reattach linked list
     struct guiObject *prev = objHEAD;
     if (prev == obj) {
@@ -459,7 +470,7 @@ struct guiObject *GUI_GetFreeObj(void)
     int i;
     struct guiObject *obj;
     for (i = 0; i < 256; i++) {
-        if (GUI_Array[i].CallBack == 0) {
+        if (! OBJ_IS_USED(&GUI_Array[i])) {
             obj = &GUI_Array[i];
             obj->next = NULL;
             obj->parent = NULL;
@@ -548,8 +559,9 @@ u8 GUI_IsModal(void)
     return GUI_Dialog_Array[0].inuse;
 }
 
-void dgCallback(struct guiObject *obj)
+void dgCallback(struct guiObject *obj, void *data)
 {
+    (void)data;
     struct guiDialogReturn gDR;
     struct guiDialog *dialog = (struct guiDialog *)obj->parent->widget;
     if (dialog->button[0] == obj) {
@@ -617,15 +629,17 @@ u8 GUI_CheckTouch(struct touch coords)
     modalActive = GUI_IsModal();
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if ((obj->CallBack != 0) && ! OBJ_IS_DISABLED(obj)
-                && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
+        if (! OBJ_IS_DISABLED(obj)
+            && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
         {
             switch (obj->Type) {
             case UnknownGUI:
                 break;
             case Button:
                 if (coords_in_box(&obj->box, &coords)) {
-                    obj->CallBack(obj);
+                    struct guiButton *button = (struct guiButton *)obj->widget;
+                    if(button)
+                        button->CallBack(obj, button->cb_data);
                     OBJ_SET_DIRTY(obj, 1);
                     redraw = 1;
                 }
@@ -741,6 +755,6 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     LCD_SetFontColor(select->fontColor);
     LCD_GetStringDimensions((const u8 *)str, &w, &h);
     x = box->x + (box->width - w) / 2;
-    y = box->y + (box->height - h) / 2;
+    y = box->y + 2 + (box->height - h) / 2;
     LCD_PrintStringXY(x, y, str);
 }

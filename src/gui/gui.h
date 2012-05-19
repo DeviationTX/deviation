@@ -17,6 +17,16 @@ enum BarGraphDirection {
     BAR_HORIZONTAL,
     BAR_VERTICAL
 };
+enum TextSelectType {
+    TEXTSELECT_128,
+    TEXTSELECT_64,
+    TEXTSELECT_96,
+};
+
+enum ButtonType {
+    BUTTON_90,
+    BUTTON_45,
+};
 
 struct guiDialogReturn {
     u8 buttonPushed;
@@ -57,9 +67,7 @@ struct guiBox {
 
 struct guiObject {
     enum GUIType Type;
-    void (*CallBack)(struct guiObject *obj);
     struct guiBox box;
-    int GUIID;
     u8 flags;
     void *widget;
     struct guiObject *next;
@@ -79,6 +87,8 @@ struct guiButton {
     u16 text_x_off;
     u16 text_y_off;
     u16 fontColor;
+    void (*CallBack)(struct guiObject *obj, void *data);
+    void *cb_data;
     u8 inuse;
 };
 
@@ -119,14 +129,16 @@ struct guiTextSelect {
     void *cb_data;
     u8 inuse;
 };
-#define OBJ_IS_DISABLED(x)    ((x)->flags & 0x01) /* bool: UI element is not 'active' */
-#define OBJ_IS_MODAL(x)       ((x)->flags & 0x02) /* bool: UI element is active and all non-model elements are not */
-#define OBJ_IS_DIRTY(x)       ((x)->flags & 0x04) /* bool: UI element needs redraw */
-#define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x08) /* bool: UI element has transparency */
-#define OBJ_SET_DISABLED(x,y)    (x)->flags = y ? (x)->flags | 0x01 : (x)->flags & ~0x01
-#define OBJ_SET_MODAL(x,y)       (x)->flags = y ? (x)->flags | 0x02 : (x)->flags & ~0x02
-#define OBJ_SET_DIRTY(x,y)       (x)->flags = y ? (x)->flags | 0x04 : (x)->flags & ~0x04
-#define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x08 : (x)->flags & ~0x08
+#define OBJ_IS_USED(x)        ((x)->flags & 0x01) /* bool: UI element is in use */
+#define OBJ_IS_DISABLED(x)    ((x)->flags & 0x02) /* bool: UI element is not 'active' */
+#define OBJ_IS_MODAL(x)       ((x)->flags & 0x04) /* bool: UI element is active and all non-model elements are not */
+#define OBJ_IS_DIRTY(x)       ((x)->flags & 0x08) /* bool: UI element needs redraw */
+#define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
+#define OBJ_SET_USED(x,y)        (x)->flags = y ? (x)->flags | 0x01 : (x)->flags & ~0x01
+#define OBJ_SET_DISABLED(x,y)    (x)->flags = y ? (x)->flags | 0x02 : (x)->flags & ~0x02
+#define OBJ_SET_MODAL(x,y)       (x)->flags = y ? (x)->flags | 0x04 : (x)->flags & ~0x04
+#define OBJ_SET_DIRTY(x,y)       (x)->flags = y ? (x)->flags | 0x08 : (x)->flags & ~0x08
+#define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
 #endif
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
@@ -135,13 +147,13 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         enum DialogType dgType);
 guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
-guiObject_t *GUI_CreateButton(u16 x, u16 y, u16 width, u16 height, const char *text,
-        u16 fontColor, void (*CallBack)(guiObject_t *obj));
+guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
+        u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x,
         s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval, void * data), void * cb_data);
 guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
-guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, u16 width, u16 height, u16 fontColor,
+guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);

@@ -20,6 +20,7 @@
  */
 
 #include "target.h"
+#include "mixer.h"
 
 #define SWASH_INV_ELEVATOR_MASK   1
 #define SWASH_INV_AILERON_MASK    2
@@ -29,41 +30,6 @@
 #define MIX_CYC2 (NUM_TX_INPUTS + 2)
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
-#define CURVE_TYPE(x) x.num_points
-#define NO_CURVE   0x00
-#define MIN_MAX    0x80
-#define ZERO_MAX   0x81
-#define GT_ZERO    0x82
-#define LT_ZERO    0x83
-#define ABSVAL     0x84
-
-enum MuxType {
-    MUX_REPLACE,
-    MUX_MULTIPLY,
-    MUX_ADD,
-};
-
-enum SwashType {
-    SWASH_TYPE_NONE,
-    SWASH_TYPE_120,
-    SWASH_TYPE_120X,
-    SWASH_TYPE_140,
-    SWASH_TYPE_90,
-};
-struct Mixer {
-    u8 src;
-    u8 dest;
-    u8 sw;
-    struct Curve curve;
-    s8 scaler;
-    s8 offset;
-    enum MuxType mux;
-};
-
-struct Limit {
-    s8 max;
-    s8 min;
-};
 
 struct Model {
     enum SwashType swash_type;
@@ -74,7 +40,9 @@ struct Model {
     s8 trim[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_CHANNELS];
+    u8 template[NUM_CHANNELS];
 };
+
 struct Model Model;
 s16 Channels[NUM_CHANNELS];
 struct Transmitter Transmitter;
@@ -272,5 +240,31 @@ void TEST_init_mixer()
     for(i = 0; i < NUM_CHANNELS; i++) {
         Model.limits[i].max = 100;
         Model.limits[i].min = -100;
+        Model.template[i] = MIXERTEMPLATE_NONE;
     }
+}
+
+
+int MIX_GetTemplate(int ch)
+{
+    return Model.template[ch];
+};
+
+void MIX_SetTemplate(int ch, int value)
+{
+    Model.template[ch] = value;
+};
+
+int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
+{
+    int idx = 0;
+    int i;
+    for(i = NUM_MIXERS - 1; i >= 0; i--) {
+        if (Model.mixers[i].dest == ch) {
+            mixers[idx++] = Model.mixers[i];
+            if(idx == count)
+                return count;
+        }
+    }
+    return idx;
 }

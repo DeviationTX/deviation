@@ -359,6 +359,26 @@ u8 LCD_ImageIsTransparent(const char *file)
     }
     return 0;
 }
+
+u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
+{
+    FILE *fh;
+    u8 buf[0x1a];
+    fh = fopen(file, "r");
+    if(! fh) {
+        return 0;
+    }
+
+    if(fread(buf, 0x1a, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
+    {
+    	printf("DEBUG: LCD_ImageDimensions: Buffer read issue?\n");
+        return 0;
+    }
+    *w = *((u32 *)(buf + 0x12));
+    *h = *((u32 *)(buf + 0x16));
+    return 1;
+}
+
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
     u16 i, j;
@@ -370,6 +390,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     if (w == 0 || h == 0)
         return;
 
+    if (w % 2)
+        printf("Odd\n");
     fh = fopen(file, "r");
     if(! fh) {
         if (w > 0 && h > 0)

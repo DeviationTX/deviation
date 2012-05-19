@@ -72,6 +72,7 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off);
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
 u8 LCD_ImageIsTransparent(const char *file);
+u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h);
 void LCD_CalibrateTouch(void);
 
 /* Touchscreen */
