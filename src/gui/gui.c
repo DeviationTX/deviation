@@ -638,15 +638,18 @@ u8 GUI_CheckTouch(struct touch coords)
                     OBJ_SET_DIRTY(obj, 1);
                     box.width = 16;
                     if (coords_in_box(&box, &coords)) {
-                        select->ValueCB(obj, -1, select->cb_data);
+                        if (select->ValueCB)
+                            select->ValueCB(obj, -1, select->cb_data);
                         break;
                     }
                     box.x = obj->box.x + obj->box.width - 16;
                     if (coords_in_box(&box, &coords)) {
-                        select->ValueCB(obj, 1, select->cb_data);
+                        if (select->ValueCB)
+                            select->ValueCB(obj, 1, select->cb_data);
                         break;
                     }
-                    select->SelectCB(obj, select->cb_data);
+                    if (select->SelectCB)
+                        select->SelectCB(obj, select->cb_data);
                 }
                 break;
             case Dialog:
