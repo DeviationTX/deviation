@@ -254,7 +254,9 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
-                      s16 (*Callback)(s16 xval, void *data), void *cb_data)
+                      s16 (*Callback)(s16 xval, void *data), 
+                      u8 (*touch_cb)(s16 x, s16 y, void *data),
+                      void *cb_data)
 {
     struct guiXYGraph *graph = GUI_GetFreeGUIObj(XYGraph);
     struct guiObject  *obj   = GUI_GetFreeObj();
@@ -282,6 +284,7 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     graph->max_y = max_y;
     graph->inuse = 1;
     graph->CallBack = Callback;
+    graph->touch_cb = touch_cb;
     graph->cb_data = cb_data;
 
     return obj;
@@ -624,7 +627,6 @@ void GUI_RefreshScreen(void)
 
 u8 GUI_CheckTouch(struct touch coords)
 {
-    u8 redraw = 0;
     u8 modalActive;
     modalActive = GUI_IsModal();
     struct guiObject *obj = objHEAD;
@@ -638,32 +640,40 @@ u8 GUI_CheckTouch(struct touch coords)
             case Button:
                 if (coords_in_box(&obj->box, &coords)) {
                     struct guiButton *button = (struct guiButton *)obj->widget;
-                    if(button->CallBack)
+                    if(button->CallBack) {
+                        OBJ_SET_DIRTY(obj, 1);
                         button->CallBack(obj, button->cb_data);
-                    OBJ_SET_DIRTY(obj, 1);
-                    redraw = 1;
+                        return 1;
+                    }
+                    return 0;
                 }
                 break;
             case TextSelect:
                 if(coords_in_box(&obj->box, &coords)) {
                     struct guiBox box = obj->box;
                     struct guiTextSelect *select = (struct guiTextSelect *)obj->widget;
-                    redraw = 1;
-                    OBJ_SET_DIRTY(obj, 1);
                     box.width = 16;
                     if (coords_in_box(&box, &coords)) {
-                        if (select->ValueCB)
+                        if (select->ValueCB) {
+                            OBJ_SET_DIRTY(obj, 1);
                             select->ValueCB(obj, -1, select->cb_data);
-                        break;
+                            return 1;
+                        }
                     }
                     box.x = obj->box.x + obj->box.width - 16;
                     if (coords_in_box(&box, &coords)) {
-                        if (select->ValueCB)
+                        if (select->ValueCB) {
+                            OBJ_SET_DIRTY(obj, 1);
                             select->ValueCB(obj, 1, select->cb_data);
-                        break;
+                            return 1;
+                        }
                     }
-                    if (select->SelectCB)
+                    if (select->SelectCB) {
+                        OBJ_SET_DIRTY(obj, 1);
                         select->SelectCB(obj, select->cb_data);
+                        return 1;
+                    }
+                    return 0;
                 }
                 break;
             case Dialog:
@@ -677,6 +687,20 @@ u8 GUI_CheckTouch(struct touch coords)
             case Dropdown:
                 break;
             case XYGraph:
+                if(coords_in_box(&obj->box, &coords)) {
+                    struct guiXYGraph *graph = (struct guiXYGraph *)obj->widget;
+                    if (graph->touch_cb) {
+                        s32 x, y;
+                        x = (s32)(coords.x - obj->box.x) * (1 + graph->max_x - graph->min_x) / obj->box.width + graph->min_x;
+                        y = (s32)(obj->box.height -1 - (coords.y - obj->box.y))
+                            * (1 + graph->max_y - graph->min_y) / obj->box.height + graph->min_y;
+                        if(graph->touch_cb(x, y, graph->cb_data)) {
+                            OBJ_SET_DIRTY(obj, 1);
+                            return 1;
+                        }
+                    }
+                    return 0;
+                }
                 break;
             case BarGraph:
                 break;
@@ -684,7 +708,7 @@ u8 GUI_CheckTouch(struct touch coords)
         }
         obj = obj->next;
     }
-    return redraw;
+    return 0;
 }
 
 void GUI_DrawXYGraph(struct guiObject *obj)

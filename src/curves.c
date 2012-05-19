@@ -80,6 +80,7 @@ static void okcancel_cb(guiObject_t *obj, void *data);
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_value_cb(guiObject_t *obj, int dir, void *data);
+static u8 touch_cb(s16 x, s16 y, void *data);
 
 struct curve_edit {
     struct Curve curve;
@@ -112,7 +113,7 @@ void CURVE_Edit(struct Curve *curve, void *data)
     edit.graph = GUI_CreateXYGraph(120, 40, 190, 190,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, &edit.curve);
+                              (s16 (*)(s16,  void *))CURVE_Evaluate, touch_cb, &edit.curve);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
@@ -186,4 +187,12 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
         case 12: return "12";
         default: return "0";
     }
+}
+
+static u8 touch_cb(s16 x, s16 y, void *data)
+{
+    (void)data;
+    (void)x;
+    edit.curve.points[edit.pointnum] = RANGE_TO_PCT(y);
+    return 1;
 }

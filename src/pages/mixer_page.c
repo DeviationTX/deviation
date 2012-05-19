@@ -151,7 +151,7 @@ static void show_simple()
     graph = GUI_CreateXYGraph(10, 118, 300, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, &mixer.curve);
+                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer.curve);
 }
 
 const char *set_number_cb(guiObject_t *obj, int dir, void *data)

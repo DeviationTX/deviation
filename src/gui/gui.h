@@ -98,6 +98,7 @@ struct guiXYGraph {
     s16 max_x;
     s16 max_y;
     s16 (*CallBack)(s16 xval, void * data);
+    u8 (*touch_cb)(s16 x, s16 y, void *data);
     void *cb_data;
     u8 inuse;
 };
@@ -150,7 +151,9 @@ guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *im
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x,
-        s16 min_y, s16 max_x, s16 max_y, s16 (*Callback)(s16 xval, void * data), void * cb_data);
+        s16 min_y, s16 max_x, s16 max_y,
+        s16 (*Callback)(s16 xval, void * data),
+        u8 (*touch_cb)(s16 x, s16 y, void *data), void * cb_data);
 guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
 guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,
