@@ -638,7 +638,7 @@ u8 GUI_CheckTouch(struct touch coords)
             case Button:
                 if (coords_in_box(&obj->box, &coords)) {
                     struct guiButton *button = (struct guiButton *)obj->widget;
-                    if(button)
+                    if(button->CallBack)
                         button->CallBack(obj, button->cb_data);
                     OBJ_SET_DIRTY(obj, 1);
                     redraw = 1;
@@ -702,14 +702,16 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
         LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
     }
+    LCD_DrawStart(box->x, box->y, box->x + box->width - 1, box->y + box->height - 1, DRAW_NWSE);
     for (x = 0; x < box->width; x++) {
         s32 xval, yval;
-        xval = graph->min_x + x * (graph->max_x - graph->min_x) / box->width;
+        xval = graph->min_x + x * (1 + graph->max_x - graph->min_x) / box->width;
         yval = graph->CallBack(xval, graph->cb_data);
-        y = (yval - graph->min_y) * box->height / (graph->max_y - graph->min_y);
+        y = (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
         //printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
-        LCD_DrawPixelXY(x + box->x, box->y + box->height - y , 0xFFE0); //Yellow
+        LCD_DrawPixelXY(x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
     }
+    LCD_DrawStop();
 }
 
 void GUI_DrawBarGraph(struct guiObject *obj)

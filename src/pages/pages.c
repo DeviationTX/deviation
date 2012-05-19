@@ -34,7 +34,7 @@ static u8 page;
 
 void PAGE_Init()
 {
-    page = 0;
+    page = 1;
     pages[page].init(0);
 }
 

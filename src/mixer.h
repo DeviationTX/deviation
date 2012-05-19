@@ -1,13 +1,27 @@
 #ifndef _MIXER_H_
 #define _MIXER_H_
 
-#define CURVE_TYPE(x) x.num_points
-#define NO_CURVE   0x00
-#define MIN_MAX    0x80
-#define ZERO_MAX   0x81
-#define GT_ZERO    0x82
-#define LT_ZERO    0x83
-#define ABSVAL     0x84
+enum CurveType {
+    CURVE_NONE,
+    CURVE_MIN_MAX,
+    CURVE_ZERO_MAX,
+    CURVE_GT_ZERO,
+    CURVE_LT_ZERO,
+    CURVE_ABSVAL,
+    CURVE_3POINT,
+    CURVE_5POINT,
+    CURVE_7POINT,
+    CURVE_9POINT,
+    CURVE_11POINT,
+    CURVE_13POINT,
+};
+#define CURVE_MAX CURVE_13POINT
+
+
+struct Curve {
+    enum CurveType type;
+    s8 points[MAX_POINTS];
+};
 
 enum TemplateType {
     MIXERTEMPLATE_NONE,
@@ -45,7 +59,13 @@ struct Limit {
     s8 min;
 };
 
+/* Curve functions */
+s16 CURVE_Evaluate(s16 value, struct Curve *curve);
+const char *CURVE_GetName(struct Curve *curve);
+
+/* Mixer functions */
 int MIX_GetMixers(int ch, struct Mixer *mixers, int count);
+void MIX_GetLimit(int ch, struct Limit *limit);
 void MIX_SetTemplate(int ch, int value);
 int MIX_GetTemplate(int ch);
 

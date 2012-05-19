@@ -20,11 +20,6 @@ struct Calibration {
     u16 zero;
 };
 
-struct Curve {
-    u8 num_points;
-    s8 points[MAX_POINTS];
-};
-
 struct Transmitter {
     struct Calibration calibration[NUM_INPUTS];
 };
@@ -143,9 +138,6 @@ void USB_Connect();
 /* Filesystem */
 void FS_Mount();
 void FS_Unmount();
-
-/* Curve functions */
-s16 CURVE_Interpolate(struct Curve *curve, s16 value);
 
 /* Mixer functions */
 void MIX_CalcChannels();

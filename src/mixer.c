@@ -151,15 +151,7 @@ void apply_mixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
     }
 
     //2nd: apply curve
-    switch (CURVE_TYPE(mixer->curve)) {
-        case NO_CURVE:  break;
-        case MIN_MAX:  value = (value < 0) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE; break;
-        case ZERO_MAX: value = (value < 0) ? 0 : CHAN_MAX_VALUE; break;
-        case GT_ZERO:  value = (value < 0) ? 0 : value; break;
-        case LT_ZERO:  value = (value > 0) ? 0 : value; break;
-        case ABSVAL:   value = (value < 0) ? -value : value; break;
-        default:       value = CURVE_Interpolate(&mixer->curve, value); break;
-    }
+    value = CURVE_Evaluate(value, &mixer->curve);
 
     //3rd: apply scaler and offset
     value = value * mixer->scaler / 100 + PCT_TO_RANGE(mixer->offset);
@@ -225,7 +217,7 @@ void TEST_init_mixer()
     Model.mixers[0].dest  =  10;
 
     //Test curves
-    Model.mixers[1].curve.num_points = 3;
+    Model.mixers[1].curve.type = CURVE_3POINT;
     Model.mixers[1].curve.points[0] = 75;
     Model.mixers[1].curve.points[1] = 10;
     Model.mixers[1].curve.points[2] = 75;
@@ -267,4 +259,8 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
         }
     }
     return idx;
+}
+void MIX_GetLimit(int ch, struct Limit *limit)
+{
+    *limit = Model.limits[ch];
 }
