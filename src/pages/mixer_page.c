@@ -21,6 +21,8 @@
 struct Mixer mixer;
 struct Limit limit;
 guiObject_t *graph;
+u8 channel;
+
 static const char *channel_name[] = {
     "Ch1", "Ch2", "Ch3", "Ch4",
     "Ch5", "Ch6", "Ch7", "Ch8",
@@ -36,7 +38,7 @@ static u8 cur_template[ENTRIES_PER_PAGE];
 
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void templateselect_cb(guiObject_t *obj, void *data);
-static void show_simple(int ch);
+static void show_simple();
 
 static const char *inp[] = {
     "THR", "RUD", "ELE", "AIL",
@@ -105,32 +107,36 @@ static void templateselect_cb(guiObject_t *obj, void *data)
     long idx = (long)data;
     int template = MIX_GetTemplate(idx);
     if (template == MIXERTEMPLATE_SIMPLE) {
-        GUI_RemoveAllObjects();
-        show_simple(idx);
+        modifying_template = 1;
+        MIX_GetMixers(idx, &mixer, 1);
+        MIX_GetLimit(idx, &limit);
+        channel = idx;
+        show_simple();
     } else {
         return;
     }
 }
 
 const char *set_number_cb(guiObject_t *obj, int dir, void *data);
-const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
+void curveselect_cb(guiObject_t *obj, void *data);
 const char *set_source_cb(guiObject_t *obj, int dir, void *data);
-static void show_simple(int ch)
+static void okcancel_cb(guiObject_t *obj, void *data);
+static void show_simple()
 {
     const char *name = template_name(MIXERTEMPLATE_SIMPLE);
-    MIX_GetMixers(ch, &mixer, 1);
-    MIX_GetLimit(ch, &limit);
+    GUI_RemoveAllObjects();
 
     //Row 0
-    GUI_CreateLabel(10, 10, channel_name[ch], 0x0000);
+    GUI_CreateLabel(10, 10, channel_name[channel], 0x0000);
     GUI_CreateLabel(40, 10, name, 0x0000);
-    GUI_CreateButton(126, 6, BUTTON_90, "Cancel", 0x0000, NULL, NULL);
-    GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, NULL, NULL);
+    GUI_CreateButton(126, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
     //Row 1
     GUI_CreateLabel(10, 40, "Src:", 0x0000);
     GUI_CreateTextSelect(50, 40, TEXTSELECT_96, 0x0000, NULL, set_source_cb, NULL);
     GUI_CreateLabel(170, 40, "Curve:", 0x0000);
-    GUI_CreateTextSelect(214, 40, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, &mixer.curve);
+    GUI_CreateTextSelect(214, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &show_simple);
     //Row 2
     GUI_CreateLabel(10, 66, "Scale:", 0x0000);
     GUI_CreateTextSelect(50, 66, TEXTSELECT_96, 0x0000, NULL, set_number_cb, &mixer.scaler);
@@ -158,9 +164,10 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return "Ch1";
 }
 
-const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
+static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
-    struct Curve *curve = (struct Curve *)data;
+    (void)data;
+    struct Curve *curve = &mixer.curve;
     if(dir > 0 && curve->type < CURVE_MAX) {
         curve->type++;
         GUI_Redraw(graph);
@@ -169,4 +176,18 @@ const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(graph);
     }
     return CURVE_GetName(curve);
+}
+
+void curveselect_cb(guiObject_t *obj, void *data)
+{
+    CURVE_Edit(&mixer.curve, data);   
+}
+
+static void okcancel_cb(guiObject_t *obj, void *data)
+{
+    if (data) {
+        //Save mixer here
+    }
+    GUI_RemoveAllObjects();
+    PAGE_MixerInit(0);
 }
