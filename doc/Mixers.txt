@@ -1,0 +1,41 @@
+The mixer system in Deviation is based on the ER9X firmware, but is not identical
+
+##################
+# Mixer overview #
+##################
+Each mixer is made up of a Source, a Destination, a Scalar, an Offset, a Switch,
+and a Curve.
+
+Essentially a mixer can be thought of as implementing the following routine:
+if (Switch) then
+    Destination = f(Curve, Source) * Scalar + Offset
+endif
+
+A mixer can take another mixer's Destination as its Source, so mixers can be layered
+to create arbitrarily complex control functions
+
+At the end, each active output channel will have at least one mixer as its Destination
+
+Mixers are defined in an order such that their pre-requisites are met before they are
+evaluated.  Circular dependencies are not supported.
+
+##################
+# Mixer Ordering #
+##################
+In order to evaluate all mixers in a single pass, the mixers are maintained in an
+ordered list.  The rule in creating a mixer is that if its Source or Switch are
+the outputs of other mixers, then it must be defined after those definitions.
+
+In order to ensure this, whenever a mixer is edited, all mixers are reordered to
+achieve the above goal.
+
+###################
+# Mixer Templates #
+###################
+Because building mixer rules can be complicated, several predefined templates are
+available.  Each of these has a customized configuration screen exposing the
+relevant options.  A template can configure multiple mixers via a single screen,
+hiding the complexity of connetcing them together properly.
+
+Note that if a mixer template is used, and the template is changed, all the
+mixers associated with that template will be lost
