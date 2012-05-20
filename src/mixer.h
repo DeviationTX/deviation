@@ -23,6 +23,9 @@ struct Curve {
     s8 points[MAX_POINTS];
 };
 
+//The followingis defined bythe target
+extern const char *tx_input_str[NUM_TX_INPUTS];
+
 enum TemplateType {
     MIXERTEMPLATE_NONE,
     MIXERTEMPLATE_SIMPLE,
@@ -65,7 +68,13 @@ const char *CURVE_GetName(struct Curve *curve);
 
 /* Mixer functions */
 int MIX_GetMixers(int ch, struct Mixer *mixers, int count);
+int MIX_SetMixers(struct Mixer *mixers, int count);
+
 void MIX_GetLimit(int ch, struct Limit *limit);
-void MIX_SetTemplate(int ch, int value);
-int MIX_GetTemplate(int ch);
+void MIX_SetLimit(int ch, struct Limit *limit);
+
+void MIX_SetTemplate(int ch, enum TemplateType value);
+enum TemplateType MIX_GetTemplate(int ch);
+
+void MIX_InitMixer(struct Mixer *mixer, u8 ch);
 #endif

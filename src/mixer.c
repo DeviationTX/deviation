@@ -237,12 +237,12 @@ void TEST_init_mixer()
 }
 
 
-int MIX_GetTemplate(int ch)
+enum TemplateType MIX_GetTemplate(int ch)
 {
     return Model.template[ch];
 };
 
-void MIX_SetTemplate(int ch, int value)
+void MIX_SetTemplate(int ch, enum TemplateType value)
 {
     Model.template[ch] = value;
 };
@@ -252,7 +252,7 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
     int idx = 0;
     int i;
     for(i = NUM_MIXERS - 1; i >= 0; i--) {
-        if (Model.mixers[i].dest == ch) {
+        if (Model.mixers[i].src && Model.mixers[i].dest == ch) {
             mixers[idx++] = Model.mixers[i];
             if(idx == count)
                 return count;
@@ -260,7 +260,34 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
     }
     return idx;
 }
+
+int MIX_SetMixers(struct Mixer *mixers, int count)
+{
+    int i;
+    (void)count;
+    for(i = NUM_MIXERS - 1; i >= 0; i--) {
+        if (! Model.mixers[i].src) {
+            Model.mixers[i] = *mixers;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void MIX_GetLimit(int ch, struct Limit *limit)
 {
     *limit = Model.limits[ch];
+}
+
+void MIX_SetLimit(int ch, struct Limit *limit)
+{
+    Model.limits[ch] = *limit;
+}
+
+void MIX_InitMixer(struct Mixer *mixer, u8 ch)
+{
+    mixer->src = ch + 1;
+    mixer->dest = ch;
+    mixer->scaler = 100;
+    mixer->offset = 0;
 }

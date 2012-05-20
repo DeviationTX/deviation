@@ -15,6 +15,13 @@
 #include "target.h"
 #include "fltk.h"
 
+const char *tx_input_str[NUM_TX_INPUTS] = {
+    "THR",
+    "RUD",
+    "ELE",
+    "AIL"
+};
+
 s16 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;

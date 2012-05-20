@@ -85,36 +85,12 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     struct Curve *curve = &edit.curve;
-    static char str[5];
-    if (dir > 0) {
-        if (curve->points[edit.pointnum] < 100) {
-            if (dir == 1) {
-                //short_press
-                curve->points[edit.pointnum]++;
-            } else {
-                //long_press
-                curve->points[edit.pointnum] += 5;
-                if (curve->points[edit.pointnum] > 100)
-                    curve->points[edit.pointnum] = 100;
-            }
-            GUI_Redraw(edit.graph);
-        }
-    } else if (dir < 0) {
-        if (curve->points[edit.pointnum] > -100) {
-            if (dir == -1) {
-                //short_press
-                curve->points[edit.pointnum]--;
-            } else {
-                //long_press
-                curve->points[edit.pointnum] -= 5;
-                if (curve->points[edit.pointnum] < -100)
-                    curve->points[edit.pointnum] = -100;
-            }
-            GUI_Redraw(edit.graph);
-        }
+    s8 old_pointval = curve->points[edit.pointnum];
+    const char *ret = PAGEMIX_SetNumberCB(obj, dir, &curve->points[edit.pointnum]);
+    if (old_pointval != curve->points[edit.pointnum]) {
+        GUI_Redraw(edit.graph);
     }
-    sprintf(str, "%d", curve->points[edit.pointnum]);
-    return str;
+    return ret;
 }
    
 static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)

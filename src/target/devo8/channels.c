@@ -16,6 +16,13 @@
 #include "target.h"
 #include "devo8.h"
 
+const char *tx_input_str[NUM_TX_INPUTS] = {
+    "THR",
+    "RUD",
+    "ELE",
+    "AIL"
+};
+    
 void CHAN_Init()
 {
     ADC_Init();
