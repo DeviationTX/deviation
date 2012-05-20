@@ -236,7 +236,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 
     obj->Type = Button;
     obj->widget = button;
-    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(box->image.file));
+    OBJ_SET_TRANSPARENT(obj, 0); //No need to set transparency since the image cannot be overlapped, and the file can't change
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
@@ -625,7 +625,7 @@ void GUI_RefreshScreen(void)
     }
 }
 
-u8 GUI_CheckTouch(struct touch coords)
+u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
     u8 modalActive;
     modalActive = GUI_IsModal();
@@ -638,7 +638,7 @@ u8 GUI_CheckTouch(struct touch coords)
             case UnknownGUI:
                 break;
             case Button:
-                if (coords_in_box(&obj->box, &coords)) {
+                if (coords_in_box(&obj->box, coords)) {
                     struct guiButton *button = (struct guiButton *)obj->widget;
                     if(button->CallBack) {
                         OBJ_SET_DIRTY(obj, 1);
@@ -649,22 +649,22 @@ u8 GUI_CheckTouch(struct touch coords)
                 }
                 break;
             case TextSelect:
-                if(coords_in_box(&obj->box, &coords)) {
+                if(coords_in_box(&obj->box, coords)) {
                     struct guiBox box = obj->box;
                     struct guiTextSelect *select = (struct guiTextSelect *)obj->widget;
                     box.width = 16;
-                    if (coords_in_box(&box, &coords)) {
+                    if (coords_in_box(&box, coords)) {
                         if (select->ValueCB) {
                             OBJ_SET_DIRTY(obj, 1);
-                            select->ValueCB(obj, -1, select->cb_data);
+                            select->ValueCB(obj, long_press ? -2 : -1, select->cb_data);
                             return 1;
                         }
                     }
                     box.x = obj->box.x + obj->box.width - 16;
-                    if (coords_in_box(&box, &coords)) {
+                    if (coords_in_box(&box, coords)) {
                         if (select->ValueCB) {
                             OBJ_SET_DIRTY(obj, 1);
-                            select->ValueCB(obj, 1, select->cb_data);
+                            select->ValueCB(obj, long_press ? 2 : 1, select->cb_data);
                             return 1;
                         }
                     }
@@ -687,12 +687,12 @@ u8 GUI_CheckTouch(struct touch coords)
             case Dropdown:
                 break;
             case XYGraph:
-                if(coords_in_box(&obj->box, &coords)) {
+                if(coords_in_box(&obj->box, coords)) {
                     struct guiXYGraph *graph = (struct guiXYGraph *)obj->widget;
                     if (graph->touch_cb) {
                         s32 x, y;
-                        x = (s32)(coords.x - obj->box.x) * (1 + graph->max_x - graph->min_x) / obj->box.width + graph->min_x;
-                        y = (s32)(obj->box.height -1 - (coords.y - obj->box.y))
+                        x = (s32)(coords->x - obj->box.x) * (1 + graph->max_x - graph->min_x) / obj->box.width + graph->min_x;
+                        y = (s32)(obj->box.height -1 - (coords->y - obj->box.y))
                             * (1 + graph->max_y - graph->min_y) / obj->box.height + graph->min_y;
                         if(graph->touch_cb(x, y, graph->cb_data)) {
                             OBJ_SET_DIRTY(obj, 1);

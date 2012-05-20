@@ -107,7 +107,7 @@ void event_loop(void *param)
         struct touch t = SPITouch_GetCoords();
         //printf("x : %4d y : %4d\n", t.x, t.y);
         if (! touch_down) {
-            GUI_CheckTouch(t);
+            GUI_CheckTouch(&t, 0);
             touch_down = 1;
         }
     } else {
@@ -118,6 +118,13 @@ void event_loop(void *param)
     PAGE_Event();
 
     if (CLOCK_getms() > last_redraw + 100) {
+        if (touch_down) {
+            if (touch_down++ >= 5) {
+                //Long-press
+                struct touch t = SPITouch_GetCoords();
+                GUI_CheckTouch(&t, 1);
+            }
+        }
         /* Redraw everything */
         GUI_RefreshScreen();
         last_redraw = CLOCK_getms();

@@ -160,7 +160,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);
-u8 GUI_CheckTouch(struct touch coords);
+u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
 void GUI_DrawScreen(void);
 void GUI_RefreshScreen(void);
 void GUI_Redraw(guiObject_t *obj);

@@ -62,7 +62,6 @@ struct Limit {
 /* Curve functions */
 s16 CURVE_Evaluate(s16 value, struct Curve *curve);
 const char *CURVE_GetName(struct Curve *curve);
-void CURVE_Edit(struct Curve *curve, void *data);
 
 /* Mixer functions */
 int MIX_GetMixers(int ch, struct Mixer *mixers, int count);

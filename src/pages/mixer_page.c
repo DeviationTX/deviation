@@ -17,6 +17,7 @@
 #include "pages.h"
 #include "gui/gui.h"
 #include "mixer.h"
+#include "mixer_page.h"
 
 struct Mixer mixer;
 struct Limit limit;
@@ -72,7 +73,7 @@ void PAGE_MixerEvent()
 
 int PAGE_MixerCanChange()
 {
-    return modifying_template;
+    return ! modifying_template;
 }
 
 const char *template_name(enum TemplateType template)
@@ -180,7 +181,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 
 void curveselect_cb(guiObject_t *obj, void *data)
 {
-    CURVE_Edit(&mixer.curve, data);   
+    MIXPAGE_EditCurves(&mixer.curve, data);   
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)

@@ -107,7 +107,6 @@ void PAGE_TestInit(int page)
     GUI_CreateLabel(10,125,t1,0xffff);
     GUI_CreateLabel(10,155,t2,0xffff);
     GUI_CreateLabel(100,170,buttonmessage,0xffff);
-    GUI_CreateXYGraph(40, 110, 100, 100, -10, -10, 40, 40, xy_cb, NULL, NULL);
     GUI_CreateButton(10,200,BUTTON_90,button1,0x0000,PushMeButton, "Button 1 Pushed");
     GUI_CreateButton(110,200,BUTTON_90,button2,0x0000,PushMeButton, "Button 2 Pushed");
     GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");
