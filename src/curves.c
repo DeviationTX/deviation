@@ -27,6 +27,45 @@ s16 interpolate(struct Curve *curve, s16 value)
     return PCT_TO_RANGE(curve->points[num_points - 1]);
 }
 
+/* This camefrom er9x/th9x
+ * expo-funktion:
+ * ---------------
+ * kmplot
+ * f(x,k)=exp(ln(x)*k/10) ;P[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+ * f(x,k)=x*x*x*k/10 + x*(1-k/10) ;P[0,1,2,3,4,5,6,7,8,9,10]
+ * f(x,k)=x*x*k/10 + x*(1-k/10) ;P[0,1,2,3,4,5,6,7,8,9,10]
+ * f(x,k)=1+(x-1)*(x-1)*(x-1)*k/10 + (x-1)*(1-k/10) ;P[0,1,2,3,4,5,6,7,8,9,10]
+ */
+
+s16 expou(u32 x, u16 k)
+{
+    // k*x*x*x + (1-k)*x
+    // 0 <= k <= 100
+    #define KMAX 100
+    u32 val = (x * x / CHAN_MAX_VALUE * x / CHAN_MAX_VALUE * k
+               + (KMAX - k) * x + KMAX / 2) / KMAX;
+    return val;
+}
+s16 expo(struct Curve *curve, s16 value)
+{
+
+    s16  y;
+    s16 k = curve->points[0];
+    u8 neg = value < 0;
+
+    if (k == 0)
+        return value;
+
+    if (neg)
+        value = -value; //absval
+
+    if (k < 0) {
+        y = CHAN_MAX_VALUE - expou(CHAN_MAX_VALUE - value, -k);
+    }else{
+        y = expou(value, k);
+    }
+    return neg ? -y : y;
+}
 
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 {
@@ -37,6 +76,7 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
         case CURVE_GT_ZERO:  return (xval < 0) ? 0 : xval;
         case CURVE_LT_ZERO:  return (xval > 0) ? 0 : xval;
         case CURVE_ABSVAL:   return (xval < 0) ? -xval : xval;
+        case CURVE_EXPO:     return expo(curve, xval);
         default:             return interpolate(curve, xval);
     }
 }
@@ -50,6 +90,7 @@ const char *CURVE_GetName(struct Curve *curve)
         case CURVE_GT_ZERO:  return "> 0";
         case CURVE_LT_ZERO:  return "< 0";
         case CURVE_ABSVAL:   return "ABSVAL";
+        case CURVE_EXPO:     return "EXPO";
         case CURVE_3POINT:   return "3 Point";
         case CURVE_5POINT:   return "5 Point";
         case CURVE_7POINT:   return "7 Point";

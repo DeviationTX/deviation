@@ -36,7 +36,7 @@ static struct curve_edit edit;
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
-    if (curve->type < CURVE_3POINT)
+    if (curve->type < CURVE_EXPO)
         return;
     GUI_RemoveAllObjects();
     edit.parent = (void (*)(void))data;
@@ -47,8 +47,10 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     GUI_CreateTextSelect(125, 10, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
     GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
 
-    GUI_CreateLabel(10, 40, "Point:", 0x0000);
-    GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
+    if (curve->type >= CURVE_3POINT) {
+        GUI_CreateLabel(10, 40, "Point:", 0x0000);
+        GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
+    }
 
     GUI_CreateLabel(10, 86, "Value:", 0x0000);
     edit.value = GUI_CreateTextSelect(10, 106, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
@@ -63,12 +65,14 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     struct Curve *curve = &edit.curve;
-    if(dir > 0 && curve->type < CURVE_MAX) {
-        curve->type++;
-        GUI_Redraw(edit.graph);
-    } else if(dir < 0 && curve->type > CURVE_3POINT) {
-        curve->type--;
-        GUI_Redraw(edit.graph);
+    if (curve->type >= CURVE_3POINT) {
+        if(dir > 0 && curve->type < CURVE_MAX) {
+            curve->type++;
+            GUI_Redraw(edit.graph);
+        } else if(dir < 0 && curve->type > CURVE_3POINT) {
+            curve->type--;
+            GUI_Redraw(edit.graph);
+        }
     }
     return CURVE_GetName(curve);
 }
@@ -98,15 +102,17 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     struct Curve *curve = &edit.curve;
-    if(dir > 0) {
-        if(edit.pointnum < (curve->type - CURVE_3POINT) * 2 + 2) {
-            edit.pointnum++;
-            GUI_Redraw(edit.value);
-        }
-    } else if(dir < 0) {
-        if(edit.pointnum) {
-            edit.pointnum--;
-            GUI_Redraw(edit.value);
+    if (curve->type >= CURVE_3POINT) {
+        if(dir > 0) {
+            if(edit.pointnum < (curve->type - CURVE_3POINT) * 2 + 2) {
+                edit.pointnum++;
+                GUI_Redraw(edit.value);
+            }
+        } else if(dir < 0) {
+            if(edit.pointnum) {
+                edit.pointnum--;
+                GUI_Redraw(edit.value);
+            }
         }
     }
     switch(edit.pointnum) {
