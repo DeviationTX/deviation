@@ -168,4 +168,5 @@ void GUI_DrawObjects(void);
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 u8 GUI_IsModal(void);
+s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
 #endif /* GUI_H_ */

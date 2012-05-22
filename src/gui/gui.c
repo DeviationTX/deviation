@@ -784,3 +784,26 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     y = box->y + 2 + (box->height - h) / 2;
     LCD_PrintStringXY(x, y, str);
 }
+
+s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed)
+{
+    u8 changed = 0;
+    if (dir > 0) {
+        if (value < max) {
+           value += (dir > 1) ? longstep : shortstep;
+           if (value > max)
+               value = max;
+           changed = 1;
+        }
+    } else if (dir < 0) {
+        if (value > min) {
+           value -= (dir < 1) ? longstep : shortstep;
+           if (value < min)
+               value = min;
+           changed = 1;
+        }
+    }
+    if(_changed)
+        *_changed = changed;
+    return value;
+}

@@ -65,14 +65,11 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     struct Curve *curve = &edit.curve;
+    u8 changed;
     if (curve->type >= CURVE_3POINT) {
-        if(dir > 0 && curve->type < CURVE_MAX) {
-            curve->type++;
+        curve->type = GUI_TextSelectHelper(curve->type, CURVE_3POINT, CURVE_MAX, dir, 1, 1, &changed);
+        if (changed)
             GUI_Redraw(edit.graph);
-        } else if(dir < 0 && curve->type > CURVE_3POINT) {
-            curve->type--;
-            GUI_Redraw(edit.graph);
-        }
     }
     return CURVE_GetName(curve);
 }
@@ -103,17 +100,10 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     struct Curve *curve = &edit.curve;
     if (curve->type >= CURVE_3POINT) {
-        if(dir > 0) {
-            if(edit.pointnum < (curve->type - CURVE_3POINT) * 2 + 2) {
-                edit.pointnum++;
-                GUI_Redraw(edit.value);
-            }
-        } else if(dir < 0) {
-            if(edit.pointnum) {
-                edit.pointnum--;
-                GUI_Redraw(edit.value);
-            }
-        }
+        u8 changed;
+        edit.pointnum = GUI_TextSelectHelper(edit.pointnum, 0, (curve->type - CURVE_3POINT) * 2 + 2, dir, 1, 1, &changed);
+        if (changed)
+            GUI_Redraw(edit.value);
     }
     switch(edit.pointnum) {
         case 0: return "0";
