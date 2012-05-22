@@ -251,7 +251,7 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
 {
     int idx = 0;
     int i;
-    for(i = NUM_MIXERS - 1; i >= 0; i--) {
+    for(i = 0; i < NUM_MIXERS; i++) {
         if (Model.mixers[i].src && Model.mixers[i].dest == ch) {
             mixers[idx++] = Model.mixers[i];
             if(idx == count)
@@ -261,16 +261,112 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
     return idx;
 }
 
+int compact_mixers() {
+    u8 max = NUM_MIXERS;
+    u8 i = 0;
+    u8 j;
+    while(i < max) {
+        if(! Model.mixers[i].src) {
+            //Found an empty space so move all following mixers down 1 and decrease max
+            for (j = i + 1; j < max; j++) {
+                Model.mixers[j - 1] = Model.mixers[j];
+            }
+            max--;
+        } else {
+            //Found a used mixer so go to the next one
+            i++;
+        }
+    }
+    return i;
+}
+
+u8 find_dependencies(u8 ch, u8 *deps)
+{
+    u8 found = 0;
+    u8 i;
+    struct Mixer *mixer;
+    for (i = 0; i < NUM_CHANNELS; i++)
+        deps[i] = 0;
+    for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
+        if (mixer->src && mixer->dest == ch) {
+            found = 1;
+            if (mixer->src > NUM_INPUTS && mixer->src != NUM_INPUTS + 1 + ch) {
+                deps[mixer->src - NUM_INPUTS - 1] = 1;
+            } 
+            if (mixer->sw > NUM_INPUTS) {
+                deps[mixer->sw - NUM_INPUTS - 1] = 1;
+            }
+        }
+    }
+    return found;
+}
+
+void fix_mixer_dependencies(u8 mixer_count)
+{
+    u8 dependencies[NUM_CHANNELS];
+    u8 placed[NUM_CHANNELS];
+    u8 pos = 0;
+    u8 last_count = 0;
+    u8 i;
+    struct Mixer mixers[NUM_MIXERS];
+    for (i = 0; i < NUM_MIXERS; i++) {
+        mixers[i].src = 0;
+    }
+    for (i = 0; i < NUM_CHANNELS; i++) {
+        placed[i] = 0;
+    }
+    while(mixer_count || last_count != mixer_count) {
+        last_count = mixer_count;
+        for (i = 0; i < NUM_CHANNELS; i++) {
+            if (placed[i])
+                continue;
+            if (! find_dependencies(i, dependencies)) {
+                placed[i] = 0;
+                continue;
+            }
+            u8 ok = 1;
+            u8 j;
+            // determine if all dependencies have been placed
+            for (j = 0; j < NUM_CHANNELS; j++) {
+                if (dependencies[i] && ! placed[i]) {
+                    ok = 0;
+                    break;
+                }
+            }
+            if (ok) {
+                u8 num = MIX_GetMixers(i, &mixers[pos], NUM_MIXERS);
+                pos += num;
+                mixer_count -= num;
+                placed[i] = 1;
+            }
+        }
+    }
+    if (mixer_count) {
+        printf("Could not place all mixers!\n");
+        return;
+    }
+    for (i = 0; i < NUM_MIXERS; i++)
+        Model.mixers[i] = mixers[i];
+}
+
 int MIX_SetMixers(struct Mixer *mixers, int count)
 {
     int i;
-    (void)count;
-    for(i = NUM_MIXERS - 1; i >= 0; i--) {
-        if (! Model.mixers[i].src) {
-            Model.mixers[i] = *mixers;
-            return 1;
-        }
+    u8 dest = mixers[0].dest;
+    //Remove all mixers for this channel
+    for (i = 0; i < NUM_MIXERS; i++) {
+        if (Model.mixers[i].src && Model.mixers[i].dest == dest)
+            Model.mixers[i].src = 0;
     }
+    u8 pos = compact_mixers();
+    if (pos + count > NUM_MIXERS) {
+        printf("Need %d free mixers, but only %d are available\n", count, NUM_MIXERS - pos);
+        return 0;
+    }
+    for (i = 0; i < count; i++) {
+        Model.mixers[pos++] = mixers[i++];
+    }
+    fix_mixer_dependencies(pos);
     return 0;
 }
 
