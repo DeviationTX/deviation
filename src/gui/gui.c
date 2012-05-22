@@ -797,7 +797,7 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 l
         }
     } else if (dir < 0) {
         if (value > min) {
-           value -= (dir < 1) ? longstep : shortstep;
+           value -= (dir < -1) ? longstep : shortstep;
            if (value < min)
                value = min;
            changed = 1;
