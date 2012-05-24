@@ -321,7 +321,7 @@ void fix_mixer_dependencies(u8 mixer_count)
             if (placed[i])
                 continue;
             if (! find_dependencies(i, dependencies)) {
-                placed[i] = 0;
+                placed[i] = 1;
                 continue;
             }
             u8 ok = 1;
@@ -364,7 +364,8 @@ int MIX_SetMixers(struct Mixer *mixers, int count)
         return 0;
     }
     for (i = 0; i < count; i++) {
-        Model.mixers[pos++] = mixers[i++];
+        if (mixers[i].src)
+            Model.mixers[pos++] = mixers[i];
     }
     fix_mixer_dependencies(pos);
     return 0;
