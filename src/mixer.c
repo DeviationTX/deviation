@@ -205,7 +205,7 @@ void TEST_init_mixer()
     Model.mixers[0].src = 1;
     Model.mixers[0].dest = 0;
 
-    for (i = 0; i < NUM_INPUTS; i++) {
+    for (i = 0; i < 4; i++) {
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = i;
         Model.mixers[i].scaler = 100;
@@ -383,8 +383,12 @@ void MIX_SetLimit(int ch, struct Limit *limit)
 
 void MIX_InitMixer(struct Mixer *mixer, u8 ch)
 {
+    int i;
     mixer->src = ch + 1;
     mixer->dest = ch;
     mixer->scaler = 100;
     mixer->offset = 0;
+    mixer->curve.type = CURVE_NONE;
+    for (i = 0; i < MAX_POINTS; i++)
+        mixer->curve.points[i] = 0;
 }
