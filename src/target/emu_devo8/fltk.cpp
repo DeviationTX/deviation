@@ -32,7 +32,7 @@ extern "C" {
 }
 
 
-u8 keymap[32] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
+u8 keymap[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
 
 static struct {
     s32 xscale;
@@ -77,7 +77,7 @@ public:
                 return 1;
             }
             switch(Fl::event_key()) {
-            case 'x':
+            case '\\':
                 gui.powerdown = 1;
                 return 1;
             case 'q':
@@ -111,6 +111,24 @@ public:
             case 'f':
                 if(--gui.aileron < 0)
                     gui.aileron = 0;
+                return 1;
+            case 'z':
+                gui.gear = ! gui.gear;
+                return 1;
+            case 'x':
+                gui.rud_dr = ! gui.rud_dr;
+                return 1;
+            case 'c':
+                gui.ele_dr = ! gui.ele_dr;
+                return 1;
+            case 'v':
+                gui.ail_dr = ! gui.ail_dr;
+                return 1;
+            case 'b':
+                gui.mix = (gui.mix + 1) % 3;
+                return 1;
+            case 'n':
+                gui.fmod = (gui.fmod + 1) % 3;
                 return 1;
             }
         case FL_KEYUP:
@@ -192,13 +210,13 @@ void LCD_Init()
       //This will leak memory for the labels, but it won't be much
       char *str;
       str = (char *)malloc(8);
-      sprintf(str, "Ch %d", i);
+      sprintf(str, "Ch %d", i + 1);
       gui.raw[i] = new Fl_Output(370, 20 * i + 20, 50, 15, str);
       gui.raw[i]->textsize(10);
       gui.final[i] = new Fl_Output(430, 20 * i + 20, 50, 15);
       gui.final[i]->textsize(10);
       str = (char *)malloc(8);
-      sprintf(str, "Ch %d", i + 10);
+      sprintf(str, "Ch %d", i + 11);
       gui.raw[i+10] = new Fl_Output(530, 20 * i + 20, 50, 15, str);
       gui.raw[i+10]->textsize(10);
       gui.final[i+10] = new Fl_Output(590, 20 * i + 20, 50, 15);

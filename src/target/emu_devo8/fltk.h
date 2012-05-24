@@ -16,6 +16,12 @@ struct Gui {
     int  rudder;
     int  elevator;
     int  aileron;
+    int  rud_dr;
+    int  ail_dr;
+    int  ele_dr;
+    int  gear;
+    int  mix;
+    int  fmod;
     u8  powerdown;
     u8  mouse;
     u16 mousex, mousey;

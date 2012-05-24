@@ -19,7 +19,17 @@ const char *tx_input_str[NUM_TX_INPUTS] = {
     "THR",
     "RUD",
     "ELE",
-    "AIL"
+    "AIL",
+    "RUD_D/R",
+    "ELE_D/R",
+    "AIL D/R",
+    "GEAR",
+    "MIX0",
+    "MIX1",
+    "MIX2",
+    "FMODE0",
+    "FMODE1",
+    "FMODE2",
 };
 
 s16 CHAN_ReadInput(int channel)
@@ -30,6 +40,16 @@ s16 CHAN_ReadInput(int channel)
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
         case INP_ELEVATOR: return CHAN_MIN_VALUE + step * gui.elevator;
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
+        case INP_RUD_DR:   return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_ELE_DR:   return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_AIL_DR:   return gui.ail_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_GEAR:     return gui.gear   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX0:     return gui.mix == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX1:     return gui.mix == 1  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX2:     return gui.mix == 2  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD0:    return gui.fmod == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD1:    return gui.fmod == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD2:    return gui.fmod == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
     return 0;
 }
