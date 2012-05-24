@@ -417,7 +417,12 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    MIXPAGE_EditCurves(&cur_mixer->curve, data);   
+    struct Curve *curve;
+    switch (cur_template) {
+        case MIXERTEMPLATE_EXPO: curve = &mixer[1].curve; break;
+        default:                 curve = &cur_mixer->curve; break;
+    }
+    MIXPAGE_EditCurves(curve, data);   
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)
