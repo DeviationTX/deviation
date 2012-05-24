@@ -392,7 +392,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         return tx_input_str[*source - 1];
     }
     if(*source <= NUM_INPUTS) {
-        sprintf(tmpstr, "CYC%d", *source - NUM_TX_INPUTS - 1);
+        sprintf(tmpstr, "CYC%d", *source - NUM_TX_INPUTS);
         return tmpstr;
     }
     return channel_name[*source - NUM_INPUTS - 1];
@@ -453,6 +453,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
             mixer[0].sw = 0;
             mixer[0].mux = MUX_REPLACE;
             MIX_SetMixers(mixer, 2);
+            break;
             
         }
     }
