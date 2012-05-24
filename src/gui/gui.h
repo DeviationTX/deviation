@@ -9,6 +9,7 @@
 #ifndef GUI_H_
 #define GUI_H_
 
+#define RGB888_to_RGB565(r, g, b) (((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3))
 enum DialogType {
     dtOk, dtOkCancel
 };
@@ -97,6 +98,8 @@ struct guiXYGraph {
     s16 min_y;
     s16 max_x;
     s16 max_y;
+    u16 grid_x;
+    u16 grid_y;
     s16 (*CallBack)(s16 xval, void * data);
     u8 (*touch_cb)(s16 x, s16 y, void *data);
     void *cb_data;
@@ -150,10 +153,12 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
 guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
-guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height, s16 min_x,
-        s16 min_y, s16 max_x, s16 max_y,
-        s16 (*Callback)(s16 xval, void * data),
-        u8 (*touch_cb)(s16 x, s16 y, void *data), void * cb_data);
+guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
+                      s16 min_x, s16 min_y, s16 max_x, s16 max_y,
+                      u16 gridx, u16 gridy,
+                      s16 (*Callback)(s16 xval, void *data), 
+                      u8 (*touch_cb)(s16 x, s16 y, void *data),
+                      void *cb_data);
 guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
 guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,

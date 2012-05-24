@@ -58,6 +58,8 @@ void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color);
 void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color);
 void LCD_DrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color);
+void LCD_DrawDashedVLine(int16_t x, int16_t y, int16_t h, int16_t space, uint16_t color);
+void LCD_DrawDashedHLine(int16_t x, int16_t y, int16_t w, int16_t space, uint16_t color);
 void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color);
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color);
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color);

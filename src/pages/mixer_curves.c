@@ -57,6 +57,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     edit.graph = GUI_CreateXYGraph(120, 40, 190, 190,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                               (s16 (*)(s16,  void *))CURVE_Evaluate, touch_cb, &edit.curve);
 }
 

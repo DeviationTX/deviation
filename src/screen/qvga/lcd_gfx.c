@@ -1,4 +1,4 @@
-/***********************************
+/************************************
 This is a our graphics core library, for all our displays. 
 We'll be adapting all the
 existing libaries to use this core to make updating, support 
@@ -47,6 +47,27 @@ void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
     LCD_DrawStart(x, y, x + w, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
+    LCD_DrawStop();
+}
+
+void LCD_DrawDashedHLine(int16_t x, int16_t y, 
+			 int16_t w, int16_t space, uint16_t color)
+{
+    LCD_DrawStart(x, y, x + w, y, DRAW_NWSE);
+    int16_t x1;
+    for (x1 = 0; x1 < w; x1++)
+        if ((x1 / space) & 0x01)
+            LCD_DrawPixelXY(x1 + x, y, color);
+    LCD_DrawStop();
+}
+
+void LCD_DrawDashedVLine(int16_t x, int16_t y, 
+			 int16_t h, int16_t space, uint16_t color) {
+    LCD_DrawStart(x, y, x, y + h, DRAW_NWSE);
+    int16_t y1;
+    for (y1 = 0; y1 < h; y1++)
+        if ((y1 / space) & 0x01)
+            LCD_DrawPixelXY(x, y1 + y, color);
     LCD_DrawStop();
 }
 

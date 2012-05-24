@@ -254,6 +254,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
+                      u16 gridx, u16 gridy,
                       s16 (*Callback)(s16 xval, void *data), 
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data)
@@ -282,6 +283,8 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     graph->min_y = min_y;
     graph->max_x = max_x;
     graph->max_y = max_y;
+    graph->grid_x = gridx;
+    graph->grid_y = gridy;
     graph->inuse = 1;
     graph->CallBack = Callback;
     graph->touch_cb = touch_cb;
@@ -717,6 +720,13 @@ void GUI_DrawXYGraph(struct guiObject *obj)
     struct guiXYGraph *graph = (struct guiXYGraph *)obj->widget;
     u32 x, y;
 
+    inline u32 VAL_TO_X(s32 xval)
+    {
+        return box->x + (xval - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x);
+    }
+    inline u32 VAL_TO_Y(s32 yval) {
+        return box->y + box->height - (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
+    }
     LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
     if (graph->min_x < 0 && graph->max_x > 0) {
         int x = box->x + box->width * (0 - graph->min_x) / (graph->max_x - graph->min_x);
@@ -726,7 +736,24 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
         LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
     }
-    LCD_DrawStart(box->x, box->y, box->x + box->width - 1, box->y + box->height - 1, DRAW_NWSE);
+    if (graph->grid_x) {
+        int xval;
+        for (xval = graph->min_x + graph->grid_x; xval < graph->max_x; xval += graph->grid_x) {
+            if (! xval)
+                continue;
+            x = VAL_TO_X(xval);
+            LCD_DrawDashedVLine(x, box->y, box->height, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+        }
+    }
+    if (graph->grid_y) {
+        int yval;
+        for (yval = graph->min_y + graph->grid_y; yval < graph->max_y; yval += graph->grid_y) {
+            if (! yval)
+                continue;
+            y = VAL_TO_Y(yval);
+            LCD_DrawDashedHLine(box->x, y, box->width, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+        }
+    }
     for (x = 0; x < box->width; x++) {
         s32 xval, yval;
         xval = graph->min_x + x * (1 + graph->max_x - graph->min_x) / box->width;

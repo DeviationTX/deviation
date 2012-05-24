@@ -215,6 +215,7 @@ static void show_simple()
     graph = GUI_CreateXYGraph(COL1_TEXT, 118, 300, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              0, 0,
                               (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[0].curve);
 }
 
@@ -247,6 +248,7 @@ static void show_dr()
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              0, 0,
                               (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[0].curve);
 }
 
@@ -279,6 +281,7 @@ static void show_expo()
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              0, 0,
                               (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[1].curve);
 }
 
@@ -308,6 +311,7 @@ static void show_complex()
     graph = GUI_CreateXYGraph(COL2_TEXT, 118, 140, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              0, 0,
                               (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &cur_mixer->curve);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 144, "Mux:", 0x0000);
