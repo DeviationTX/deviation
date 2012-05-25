@@ -46,21 +46,13 @@ struct Model {
 struct Model Model;
 s16 Channels[NUM_CHANNELS];
 struct Transmitter Transmitter;
-static void apply_mixer(struct Mixer *mixer, s16 *raw, s16 *mixed);
 static void create_cyclic_inputs (s16 *raw);
 static s16 apply_limits(s16 value, int channel);
 static u8 switch_is_on(u8 sw, s16 *raw, s16 *mixed);
 
-void MIX_CalcChannels()
+void MIX_EvalMixers(s16 *raw, s16 *mixed)
 {
-    s16 raw[NUM_INPUTS + 1];
-    s16 mixed[NUM_CHANNELS];
     int i;
-    //1st step: read input data (sticks, switches, etc) and calibrate
-    for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        raw[i] = CHAN_ReadInput(i);
-    }
-
     //2nd step: calculate virtual channels (CCPM, etc)
     create_cyclic_inputs(raw);
 
@@ -73,15 +65,27 @@ void MIX_CalcChannels()
             break;
         }
         //apply_mixer updates mixed[mirer->dest]
-        apply_mixer(mixer, raw, mixed);
+        MIX_ApplyMixer(mixer, raw, mixed);
     }
 
+}
+
+void MIX_CalcChannels()
+{
+    s16 raw[NUM_INPUTS + 1];
+    s16 mixed[NUM_CHANNELS];
+    int i;
+    //1st step: read input data (sticks, switches, etc) and calibrate
+    for (i = 1; i <= NUM_TX_INPUTS; i++) {
+        raw[i] = CHAN_ReadInput(i);
+    }
+    //2nd and 3rd steps
+    MIX_EvalMixers(raw, mixed);
     //4th step: apply limits
     for (i = 0; i < NUM_CHANNELS; i++) {
         Channels[i] = apply_limits(mixed[i], i);
     }
 }
-
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  ((x))   //  1024 => 1024
 void create_cyclic_inputs(s16 *raw)
@@ -131,7 +135,7 @@ void create_cyclic_inputs(s16 *raw)
     }
 }
 
-void apply_mixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
+void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
 {
     s16 value;
     if (! switch_is_on(mixer->sw, raw, mixed)) {

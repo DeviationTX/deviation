@@ -79,4 +79,8 @@ void MIX_SetTemplate(int ch, enum TemplateType value);
 enum TemplateType MIX_GetTemplate(int ch);
 
 void MIX_InitMixer(struct Mixer *mixer, u8 ch);
+
+void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed);
+void MIX_EvalMixers(s16 *raw, s16 *mixed);
+
 #endif

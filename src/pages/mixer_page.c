@@ -25,7 +25,9 @@ struct Limit limit;
 guiObject_t *graph;
 u8 channel;
 u8 num_mixers;
+u8 num_complex_mixers;
 static char tmpstr[5];
+static s16 raw[NUM_INPUTS + 1];
 
 static const char *channel_name[] = {
     "Ch1", "Ch2", "Ch3", "Ch4",
@@ -44,6 +46,9 @@ static enum CurveType old_curvetype;
 static const char *template_name(enum TemplateType template);
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void templateselect_cb(guiObject_t *obj, void *data);
+static void sync_mixers();
+static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
+static s16 eval_mixer_cb(s16 xval, void * data);
 
 static void show_none();
 static void show_simple();
@@ -78,6 +83,20 @@ void PAGE_MixerInit(int page)
 
 void PAGE_MixerEvent()
 {
+    if(graph && cur_mixer) {
+        u8 changed = 0;
+        s16 chan;
+        int i;
+        for (i = 1; i <= NUM_TX_INPUTS; i++) {
+            chan = CHAN_ReadInput(i);
+            if (chan != raw[i]) {
+                raw[i] = chan;
+                changed = 1;
+            }
+        }
+        if (changed)
+            GUI_Redraw(graph);
+    }
 }
 
 int PAGE_MixerCanChange()
@@ -100,6 +119,7 @@ static const char *template_name(enum TemplateType template)
 static void change_template()
 {
     cur_mixer = mixer;
+    sync_mixers();
     switch(cur_template)  {
     case MIXERTEMPLATE_NONE:
         show_none();
@@ -153,12 +173,12 @@ static void templateselect_cb(guiObject_t *obj, void *data)
     modifying_template = 1;
     MIX_GetLimit(idx, &limit);
     channel = idx;
-    num_mixers = 1;
+    num_complex_mixers = 0;
     for(i = 0; i < sizeof(mixer) / sizeof(struct Mixer); i++)
         MIX_InitMixer(mixer + i, idx);
 
     if (cur_template != MIXERTEMPLATE_NONE) {
-        MIX_GetMixers(idx, mixer, sizeof(mixer) / sizeof(struct Mixer));
+        num_complex_mixers = MIX_GetMixers(idx, mixer, sizeof(mixer) / sizeof(struct Mixer));
     }
     change_template();
 }
@@ -169,7 +189,6 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
 const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
 const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
-const char *set_expoval_cb(guiObject_t *obj, int dir, void *data);
 static void okcancel_cb(guiObject_t *obj, void *data);
 
 static void show_titlerow()
@@ -183,6 +202,7 @@ static void show_titlerow()
 static void show_none()
 {
     GUI_RemoveAllObjects();
+    graph = NULL;
     //Row 0
     show_titlerow();
 }
@@ -203,20 +223,19 @@ static void show_simple()
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &show_simple);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, "Scale:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].scaler);
     GUI_CreateLabel(COL2_TEXT, 66, "Offset:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].offset);
+    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].offset);
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 92, "Max:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.max);
+    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.max);
     GUI_CreateLabel(COL2_TEXT, 92, "Min:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.min);
+    GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.min);
     //Row 5
     graph = GUI_CreateXYGraph(COL1_TEXT, 118, 300, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[0].curve);
+                              0, 0, eval_mixer_cb, NULL, &mixer[0].curve);
 }
 
 static void show_dr()
@@ -231,25 +250,24 @@ static void show_dr()
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &show_dr);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, "Scale:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].scaler);
     GUI_CreateLabel(COL2_TEXT, 66, "Offset:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].offset);
+    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].offset);
     //Row 3
     GUI_CreateLabel(COL1_TEXT, 92, "D/R:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[1].scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[1].scaler);
     GUI_CreateLabel(COL2_TEXT, 92, "Switch:", 0x0000);
     GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &mixer[1].sw);
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 118, "Max:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.max);
+    GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.max);
     GUI_CreateLabel(COL2_TEXT, 118, "Min:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.min);
+    GUI_CreateTextSelect(COL2_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.min);
     //Row 5
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[0].curve);
+                              0, 0, eval_mixer_cb, NULL, &mixer[0].curve);
 }
 
 static void show_expo()
@@ -263,26 +281,25 @@ static void show_expo()
     GUI_CreateLabel(COL1_TEXT, 40, "Src:", 0x0000);
     GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &mixer[0].src);
     GUI_CreateLabel(COL2_TEXT, 40, "Expo:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_expoval_cb, &show_expo);
+    GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_number100_cb, &mixer[1].curve.points[0]);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, "Scale:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].scaler);
     GUI_CreateLabel(COL2_TEXT, 66, "Offset:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mixer[0].offset);
+    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[0].offset);
     //Row 3
     GUI_CreateLabel(COL2_TEXT, 92, "Switch:", 0x0000);
     GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &mixer[1].sw);
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 118, "Max:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.max);
+    GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.max);
     GUI_CreateLabel(COL2_TEXT, 118, "Min:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.min);
+    GUI_CreateTextSelect(COL2_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.min);
     //Row 5
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &mixer[1].curve);
+                              0, 0, eval_mixer_cb, NULL, &mixer[1].curve);
 }
 
 static void show_complex()
@@ -297,22 +314,21 @@ static void show_complex()
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &show_complex);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, "Scale:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &cur_mixer->scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &cur_mixer->scaler);
     GUI_CreateLabel(COL2_TEXT, 66, "Offset:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &cur_mixer->offset);
+    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &cur_mixer->offset);
     //Row 3
     GUI_CreateLabel(COL1_TEXT, 92, "Max:", 0x0000);
-    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.max);
+    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.max);
     GUI_CreateLabel(COL2_TEXT, 92, "Min:", 0x0000);
-    GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &limit.min);
+    GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &limit.min);
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 118, "Switch:", 0x0000);
     GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &cur_mixer->sw);
     graph = GUI_CreateXYGraph(COL2_TEXT, 118, 140, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, &cur_mixer->curve);
+                              0, 0, eval_mixer_cb, NULL, &cur_mixer->curve);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 144, "Mux:", 0x0000);
     GUI_CreateTextSelect(COL1_VALUE, 144, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
@@ -324,6 +340,20 @@ static void show_complex()
     GUI_CreateTextSelect(COL1_VALUE, 196, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
 }
 
+static s16 eval_mixer_cb(s16 xval, void * data)
+{
+    (void) data;
+    int i;
+    s16 mixed[NUM_CHANNELS];
+    s16 oldval = raw[cur_mixer->src];
+    raw[cur_mixer->src] = xval;
+    MIX_EvalMixers(raw, mixed);
+    for (i = 0; i < num_mixers; i++)
+        MIX_ApplyMixer(&mixer[i], raw, mixed);
+    raw[cur_mixer->src] = oldval;
+    return mixed[mixer[1].dest];
+}
+
 const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -333,11 +363,67 @@ const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data)
     return tmpstr;
 }
 
+void sync_mixers()
+{
+    switch(cur_template) {
+    case MIXERTEMPLATE_NONE:
+        num_mixers = 0;
+        break;
+    case MIXERTEMPLATE_SIMPLE:
+        mixer[0].sw = 0;
+        mixer[0].mux = MUX_REPLACE;
+        num_mixers = 1;
+        break;
+    case MIXERTEMPLATE_COMPLEX:
+        num_mixers = num_complex_mixers;
+        break;
+    case MIXERTEMPLATE_DR:
+        mixer[1].src = mixer[0].src;
+        mixer[1].dest = mixer[0].dest;
+        mixer[1].curve = mixer[0].curve;
+        mixer[1].mux = MUX_REPLACE;
+        //Scale the offset by the value of scaler ???
+        mixer[1].offset = (s32)mixer[0].offset * mixer[1].scaler / mixer[0].scaler;
+        mixer[0].sw = 0;
+        mixer[0].mux = MUX_REPLACE;
+        num_mixers = 2;
+        break;
+    case MIXERTEMPLATE_EXPO:
+        mixer[0].curve.type = CURVE_NONE;
+        mixer[1].src = mixer[0].src;
+        mixer[1].dest = mixer[0].dest;
+        mixer[1].mux = MUX_REPLACE;
+        mixer[1].offset = mixer[0].offset;
+        mixer[1].scaler = mixer[0].scaler;
+        mixer[0].sw = 0;
+        mixer[0].mux = MUX_REPLACE;
+        num_mixers = 2;
+        break;
+    }
+}
+
+const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 changed;
+    s8 *value = (s8 *)data;
+    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, &changed);
+    sprintf(tmpstr, "%d", *value);
+    if (changed) {
+        sync_mixers();
+        GUI_Redraw(graph);
+    }
+    return tmpstr;
+}
+
 const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    cur_mixer->mux = GUI_TextSelectHelper(cur_mixer->mux, MUX_REPLACE, MUX_ADD, dir, 1, 1, NULL);
+    u8 changed;
+    cur_mixer->mux = GUI_TextSelectHelper(cur_mixer->mux, MUX_REPLACE, MUX_ADD, dir, 1, 1, &changed);
+    if (changed)
+        GUI_Redraw(graph);
     switch(cur_mixer->mux) {
         case MUX_REPLACE:  return "replace";
         case MUX_MULTIPLY: return "mult";
@@ -350,11 +436,14 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
+    u8 changed;
     num_mixers = GUI_TextSelectHelper(
                      num_mixers,
                      1 + (cur_mixer - mixer),
                      1 + sizeof(mixer) / sizeof(struct Mixer),
-                     dir, 1, 1, NULL);
+                     dir, 1, 1, &changed);
+    if (changed)
+        GUI_Redraw(graph);
     sprintf(tmpstr, "%d", num_mixers);
     return tmpstr;
 }
@@ -374,21 +463,15 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     return tmpstr;
 }
 
-const char *set_expoval_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    s8 origval = mixer[1].curve.points[0];
-    const char *str = PAGEMIX_SetNumberCB(obj, dir, &mixer[1].curve.points[0]);
-    if (origval != mixer[1].curve.points[0])
-        GUI_Redraw(graph);
-    return str;
-}
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    *source = GUI_TextSelectHelper(*source, 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
+    u8 changed;
+    *source = GUI_TextSelectHelper(*source, 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    if (changed)
+        GUI_Redraw(graph);
     if(! *source) {
         return "None";
     }
@@ -432,40 +515,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
         //Save mixer here
         MIX_SetLimit(channel, &limit);
         MIX_SetTemplate(channel, cur_template);
-        switch(cur_template) {
-        case MIXERTEMPLATE_NONE:
-            mixer[0].src = 0;
-        case MIXERTEMPLATE_SIMPLE:
-            mixer[0].sw = 0;
-            mixer[0].mux = MUX_REPLACE;
-        case MIXERTEMPLATE_COMPLEX:
-            MIX_SetMixers(mixer, 1);
-            break;
-        case MIXERTEMPLATE_DR:
-            mixer[1].src = mixer[0].src;
-            mixer[1].dest = mixer[0].dest;
-            mixer[1].curve = mixer[0].curve;
-            mixer[1].mux = MUX_REPLACE;
-            //Scale the offset by the value of scaler ???
-            mixer[1].offset = (s32)mixer[0].offset * mixer[1].scaler / mixer[0].scaler;
-            mixer[0].sw = 0;
-            mixer[0].mux = MUX_REPLACE;
-            MIX_SetMixers(mixer, 2);
-            break;
-        case MIXERTEMPLATE_EXPO:
-            mixer[0].curve.type = CURVE_NONE;
-            mixer[1].src = mixer[0].src;
-            mixer[1].dest = mixer[0].dest;
-            mixer[1].mux = MUX_REPLACE;
-            mixer[1].offset = mixer[0].offset;
-            mixer[1].scaler = mixer[0].scaler;
-            mixer[0].sw = 0;
-            mixer[0].mux = MUX_REPLACE;
-            MIX_SetMixers(mixer, 2);
-            break;
-            
-        }
+        MIX_SetMixers(mixer, num_mixers);
     }
     GUI_RemoveAllObjects();
+    graph = NULL;
     PAGE_MixerInit(0);
 }
