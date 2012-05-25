@@ -252,7 +252,7 @@ static void show_expo_dr()
     //Row 3
     GUI_CreateLabel(18, 74, "High-Rate", 0x0000);
     if (mixer[1].sw)
-        GUI_CreateButton(115, 70, BUTTON_90, "Med-Rate", 0x0000, toggle_link_cb, (void *)0);
+        GUI_CreateButton(115, 70, BUTTON_90, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
     if (mixer[2].sw)
         GUI_CreateButton(219, 70, BUTTON_90, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
     //Row 4
