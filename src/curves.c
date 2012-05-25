@@ -50,9 +50,10 @@ s16 expo(struct Curve *curve, s16 value)
 {
 
     s16  y;
-    s16 k = curve->points[0];
+    s16 k;
     u8 neg = value < 0;
 
+    k = neg ? curve->points[1] : curve->points[0];
     if (k == 0)
         return value;
 

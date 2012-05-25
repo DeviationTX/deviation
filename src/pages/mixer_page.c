@@ -42,7 +42,6 @@ static const char *channel_name[] = {
 static char input_str[ENTRIES_PER_PAGE][6];
 static char switch_str[ENTRIES_PER_PAGE][7];
 static enum TemplateType cur_template;
-static enum CurveType old_curvetype;
 
 static const char *template_name(enum TemplateType template);
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
@@ -140,22 +139,11 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if(dir > 0) {
-        if(cur_template < MIXERTEMPLATE_MAX) {
-            if (cur_template == MIXERTEMPLATE_EXPO_DR)
-                mixer[1].curve.type = old_curvetype;
-            cur_template++;
-            change_template();
-            return "";
-        }
-    } else if(dir < 0) {
-        if(cur_template) {
-            if (cur_template == MIXERTEMPLATE_EXPO_DR)
-                mixer[1].curve.type = old_curvetype;
-            cur_template--;
-            change_template();
-            return "";
-        }
+    u8 changed;
+    cur_template = GUI_TextSelectHelper(cur_template, 0, MIXERTEMPLATE_MAX, dir, 1, 1, &changed);
+    if (changed) {
+        change_template();
+        return "";
     }
     return template_name(cur_template);
 }
@@ -171,6 +159,7 @@ static void templateselect_cb(guiObject_t *obj, void *data)
     MIX_GetLimit(idx, &limit);
     channel = idx;
     num_complex_mixers = 0;
+    link_curves = 0xff;
     for(i = 0; i < sizeof(mixer) / sizeof(struct Mixer); i++)
         MIX_InitMixer(mixer + i, idx);
 
@@ -270,16 +259,16 @@ static void show_expo_dr()
     GUI_CreateTextSelect(8, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mixer[0]);
     if (mixer[1].sw) {
         if((link_curves & 0x01)) {
-            GUI_CreateTextSelect(112, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mixer[1]);
-        } else {
             GUI_CreateLabel(140, 102, "Linked", 0x0000);
+        } else {
+            GUI_CreateTextSelect(112, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mixer[1]);
         }
     }
     if (mixer[2].sw) {
         if((link_curves & 0x02)) {
-            GUI_CreateTextSelect(216, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mixer[2]);
-        } else {
             GUI_CreateLabel(244, 102, "Linked", 0x0000);
+        } else {
+            GUI_CreateTextSelect(216, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mixer[2]);
         }
     }
     //Row 5
@@ -289,7 +278,7 @@ static void show_expo_dr()
         GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[1].scaler);
     if (mixer[2].sw)
         GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mixer[2].scaler);
-    graph = GUI_CreateXYGraph(COL1_TEXT, 150, 300, 86,
+    graph = GUI_CreateXYGraph(COL1_TEXT, 150, 86, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, &mixer[0].curve);
@@ -429,8 +418,10 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     u8 changed;
     cur_mixer->mux = GUI_TextSelectHelper(cur_mixer->mux, MUX_REPLACE, MUX_ADD, dir, 1, 1, &changed);
-    if (changed)
+    if (changed) {
         GUI_Redraw(graph);
+        sync_mixers();
+    }
     switch(cur_mixer->mux) {
         case MUX_REPLACE:  return "replace";
         case MUX_MULTIPLY: return "mult";
@@ -449,8 +440,10 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
                      1 + (cur_mixer - mixer),
                      1 + sizeof(mixer) / sizeof(struct Mixer),
                      dir, 1, 1, &changed);
-    if (changed)
+    if (changed) {
         GUI_Redraw(graph);
+        sync_mixers();
+    }
     sprintf(tmpstr, "%d", num_mixers);
     return tmpstr;
 }
@@ -477,8 +470,10 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     u8 changed;
     *source = GUI_TextSelectHelper(*source, 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
-    if (changed)
+    if (changed) {
         GUI_Redraw(graph);
+        sync_mixers();
+    }
     if(! *source) {
         return "None";
     }
@@ -526,8 +521,10 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     struct Mixer *mix = (struct Mixer *)data;
     mix->curve.type = GUI_TextSelectHelper(mix->curve.type, 0, CURVE_MAX, dir, 1, 1, &changed);
-    if (changed)
+    if (changed) {
         GUI_Redraw(graph);
+        sync_mixers();
+    }
     return CURVE_GetName(&mix->curve);
 }
 

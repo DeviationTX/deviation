@@ -394,7 +394,7 @@ void MIX_InitMixer(struct Mixer *mixer, u8 ch)
     mixer->dest = ch;
     mixer->scaler = 100;
     mixer->offset = 0;
-    mixer->curve.type = CURVE_NONE;
+    mixer->curve.type = CURVE_EXPO;
     for (i = 0; i < MAX_POINTS; i++)
         mixer->curve.points[i] = 0;
 }
