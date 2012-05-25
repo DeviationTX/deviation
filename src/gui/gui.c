@@ -730,21 +730,14 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         return box->y + box->height - (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
     }
     LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
-    if (graph->min_x < 0 && graph->max_x > 0) {
-        int x = box->x + box->width * (0 - graph->min_x) / (graph->max_x - graph->min_x);
-        LCD_DrawFastVLine(x, box->y, box->height, 0xFFFF);
-    }
-    if (graph->min_y < 0 && graph->max_y > 0) {
-        y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
-        LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
-    }
     if (graph->grid_x) {
         int xval;
         for (xval = graph->min_x + graph->grid_x; xval < graph->max_x; xval += graph->grid_x) {
             if (! xval)
                 continue;
             x = VAL_TO_X(xval);
-            LCD_DrawDashedVLine(x, box->y, box->height, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            //LCD_DrawDashedVLine(x, box->y, box->height, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            LCD_DrawFastVLine(x, box->y, box->height, RGB888_to_RGB565(0x30, 0x30, 0x30));
         }
     }
     if (graph->grid_y) {
@@ -753,16 +746,30 @@ void GUI_DrawXYGraph(struct guiObject *obj)
             if (! yval)
                 continue;
             y = VAL_TO_Y(yval);
-            LCD_DrawDashedHLine(box->x, y, box->width, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            //LCD_DrawDashedHLine(box->x, y, box->width, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            LCD_DrawFastHLine(box->x, y, box->width, RGB888_to_RGB565(0x30, 0x30, 0x30));
         }
     }
+    if (graph->min_x < 0 && graph->max_x > 0) {
+        int x = box->x + box->width * (0 - graph->min_x) / (graph->max_x - graph->min_x);
+        LCD_DrawFastVLine(x, box->y, box->height, 0xFFFF);
+    }
+    if (graph->min_y < 0 && graph->max_y > 0) {
+        y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
+        LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
+    }
+    u16 lastx, lasty;
     for (x = 0; x < box->width; x++) {
         s32 xval, yval;
         xval = graph->min_x + x * (1 + graph->max_x - graph->min_x) / box->width;
         yval = graph->CallBack(xval, graph->cb_data);
         y = (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
         //printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
-        LCD_DrawPixelXY(x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
+        if (x != 0) {
+            LCD_DrawLine(lastx, lasty, x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
+        }
+        lastx = x + box->x;
+        lasty = box->y + box->height - y - 1;
     }
     LCD_DrawStop();
     if (graph->point_cb) {
