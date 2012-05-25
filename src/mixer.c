@@ -138,6 +138,8 @@ void create_cyclic_inputs(s16 *raw)
 void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
 {
     s16 value;
+    if (!mixer->src)
+        return;
     if (! switch_is_on(mixer->sw, raw, mixed)) {
         // Switch is off, so this mixer is not active
         return;

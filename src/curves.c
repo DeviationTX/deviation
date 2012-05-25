@@ -84,7 +84,7 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 const char *CURVE_GetName(struct Curve *curve)
 {
     switch (curve->type) {
-        case CURVE_NONE: return "None";
+        case CURVE_NONE: return "1-to-1";
         case CURVE_MIN_MAX:  return "Min/Max";
         case CURVE_ZERO_MAX: return "Zero/Max";
         case CURVE_GT_ZERO:  return "> 0";
