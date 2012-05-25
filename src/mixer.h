@@ -79,7 +79,10 @@ enum TemplateType MIX_GetTemplate(int ch);
 
 void MIX_InitMixer(struct Mixer *mixer, u8 ch);
 
-void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed);
-void MIX_EvalMixers(s16 *raw, s16 *mixed);
+void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw);
+void MIX_EvalMixers(s16 *raw);
+u8 MIX_ReadInputs(s16 *raw);
+void MIX_CreateCyclicInputs(s16 *raw);
+struct Mixer *MIX_GetAllMixers();
 
 #endif

@@ -28,7 +28,7 @@ u8 num_mixers;
 u8 num_complex_mixers;
 u8 link_curves;
 static char tmpstr[5];
-static s16 raw[NUM_INPUTS + 1];
+static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
 
 static const char *channel_name[] = {
     "Ch1", "Ch2", "Ch3", "Ch4",
@@ -84,17 +84,7 @@ void PAGE_MixerInit(int page)
 void PAGE_MixerEvent()
 {
     if(graph && cur_mixer) {
-        u8 changed = 0;
-        s16 chan;
-        int i;
-        for (i = 1; i <= NUM_TX_INPUTS; i++) {
-            chan = CHAN_ReadInput(i);
-            if (chan != raw[i]) {
-                raw[i] = chan;
-                changed = 1;
-            }
-        }
-        if (changed)
+        if(MIX_ReadInputs(raw))
             GUI_Redraw(graph);
     }
 }
@@ -327,18 +317,25 @@ s16 eval_mixer_cb(s16 xval, void * data)
 {
     (void) data;
     int i;
-    s16 mixed[NUM_CHANNELS];
     s16 oldval = raw[cur_mixer->src];
-    raw[cur_mixer->src] = xval;
-    MIX_EvalMixers(raw, mixed);
+    if (cur_mixer->src <= NUM_TX_INPUTS)
+        raw[cur_mixer->src] = xval;
+    MIX_CreateCyclicInputs(raw);
+    if (cur_mixer->src > NUM_TX_INPUTS)
+        raw[cur_mixer->src] = xval;
+    struct Mixer *mix = MIX_GetAllMixers();
+    for (i = 0; i < NUM_MIXERS; i++) {
+        if(mix->src != 0 && mix->dest != cur_mixer->dest)
+            MIX_ApplyMixer(mix, raw);
+    }
     for (i = 0; i < num_mixers; i++)
-        MIX_ApplyMixer(&mixer[i], raw, mixed);
+        MIX_ApplyMixer(&mixer[i], raw);
     raw[cur_mixer->src] = oldval;
-    if (mixed[cur_mixer->dest] > CHAN_MAX_VALUE)
+    if (raw[cur_mixer->dest + NUM_INPUTS + 1] > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
-    if (mixed[cur_mixer->dest]  < CHAN_MIN_VALUE)
+    if (raw[cur_mixer->dest + NUM_INPUTS + 1]  < CHAN_MIN_VALUE)
         return CHAN_MIN_VALUE;
-    return mixed[cur_mixer->dest];
+    return raw[cur_mixer->dest + NUM_INPUTS + 1];
 }
 
 u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)

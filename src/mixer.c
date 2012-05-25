@@ -46,16 +46,17 @@ struct Model {
 struct Model Model;
 s16 Channels[NUM_CHANNELS];
 struct Transmitter Transmitter;
-static void create_cyclic_inputs (s16 *raw);
 static s16 apply_limits(s16 value, int channel);
-static u8 switch_is_on(u8 sw, s16 *raw, s16 *mixed);
+static u8 switch_is_on(u8 sw, s16 *raw);
 
-void MIX_EvalMixers(s16 *raw, s16 *mixed)
+struct Mixer *MIX_GetAllMixers()
+{
+    return Model.mixers;
+}
+
+void MIX_EvalMixers(s16 *raw)
 {
     int i;
-    //2nd step: calculate virtual channels (CCPM, etc)
-    create_cyclic_inputs(raw);
-
     //3rd step: apply mixers
     for (i = 0; i < NUM_MIXERS; i++) {
         struct Mixer *mixer = &Model.mixers[i];
@@ -65,30 +66,46 @@ void MIX_EvalMixers(s16 *raw, s16 *mixed)
             break;
         }
         //apply_mixer updates mixed[mirer->dest]
-        MIX_ApplyMixer(mixer, raw, mixed);
+        MIX_ApplyMixer(mixer, raw);
     }
 
+}
+
+u8 MIX_ReadInputs(s16 *raw)
+{
+    u8 changed;
+    u8 i;
+    //1st step: read input data (sticks, switches, etc) and calibrate
+    for (i = 1; i <= NUM_TX_INPUTS; i++) {
+        s16 value = CHAN_ReadInput(i);
+        if (value != raw[i]) {
+            changed = 1;
+            raw[i] = CHAN_ReadInput(i);
+        }
+    }
+    return changed;
 }
 
 void MIX_CalcChannels()
 {
-    s16 raw[NUM_INPUTS + 1];
-    s16 mixed[NUM_CHANNELS];
+    //We retain this array so that we can refer to the prevous values in the next iteration
+    static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
     int i;
-    //1st step: read input data (sticks, switches, etc) and calibrate
-    for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        raw[i] = CHAN_ReadInput(i);
-    }
-    //2nd and 3rd steps
-    MIX_EvalMixers(raw, mixed);
+    //1st step: Read Tx inputs
+    MIX_ReadInputs(raw);
+    //2nd step: calculate virtual channels (CCPM, etc)
+    MIX_CreateCyclicInputs(raw);
+    //3rd steps
+    MIX_EvalMixers(raw);
+
     //4th step: apply limits
     for (i = 0; i < NUM_CHANNELS; i++) {
-        Channels[i] = apply_limits(mixed[i], i);
+        Channels[i] = apply_limits(raw[i - NUM_INPUTS - 1], i);
     }
 }
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  ((x))   //  1024 => 1024
-void create_cyclic_inputs(s16 *raw)
+void MIX_CreateCyclicInputs(s16 *raw)
 {
     if (! Model.swash_type)
         return;
@@ -135,26 +152,17 @@ void create_cyclic_inputs(s16 *raw)
     }
 }
 
-void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
+void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
 {
     s16 value;
     if (!mixer->src)
         return;
-    if (! switch_is_on(mixer->sw, raw, mixed)) {
+    if (! switch_is_on(mixer->sw, raw)) {
         // Switch is off, so this mixer is not active
         return;
     }
     //1st: Get source value
-    if (mixer->src < NUM_INPUTS + 1) {
-        // Mixer is using raw input as its source
-        value = raw[mixer->src];
-    } else if (mixer->src == NUM_INPUTS + 1 + mixer->dest) {
-        // Mixer is using itself (retain)
-        value = Channels[mixer->dest];
-    } else {
-        // Mixer is using another output-channel as its source
-        value = mixed[mixer->src - NUM_INPUTS - 1];
-    }
+    value = raw[mixer->src];
 
     //2nd: apply curve
     value = CURVE_Evaluate(value, &mixer->curve);
@@ -165,13 +173,13 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw, s16 *mixed)
     //4th: multiplex result
     switch(mixer->mux) {
     case MUX_REPLACE:
-        mixed[mixer->dest] = value;
+        raw[mixer->dest + NUM_INPUTS + 1] = value;
         break;
     case MUX_MULTIPLY:
-        mixed[mixer->dest] *= (s32)value / CHAN_MAX_VALUE;
+        raw[mixer->dest + NUM_INPUTS + 1] *= (s32)value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
-        mixed[mixer->dest] += value;
+        raw[mixer->dest + NUM_INPUTS + 1] += value;
         break;
     }
 }
@@ -185,16 +193,13 @@ s16 apply_limits(s16 value, int channel)
     return value;
 }
 
-u8 switch_is_on(u8 sw, s16 *raw, s16 *mixed)
+u8 switch_is_on(u8 sw, s16 *raw)
 {
     if(sw == 0) {
         // No switch selected is the same as an on switch
         return 1;
     }
-    if(sw <= NUM_INPUTS) {
-        return (raw[sw] > 0);
-    }
-    return (mixed[sw - NUM_INPUTS] > 0);
+    return (raw[sw] > 0);
 }
 
 
