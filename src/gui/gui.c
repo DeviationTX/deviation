@@ -255,7 +255,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
-                      s16 (*Callback)(s16 xval, void *data), 
+                      s16 (*Callback)(s16 xval, void *data),
+                      u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data),
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data)
 {
@@ -287,6 +288,7 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     graph->grid_y = gridy;
     graph->inuse = 1;
     graph->CallBack = Callback;
+    graph->point_cb = point_cb;
     graph->touch_cb = touch_cb;
     graph->cb_data = cb_data;
 
@@ -763,6 +765,24 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         LCD_DrawPixelXY(x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
     }
     LCD_DrawStop();
+    if (graph->point_cb) {
+        u8 pos = 0;
+        s16 xval, yval;
+        while (graph->point_cb(&xval, &yval, pos++, graph->cb_data)) {
+            s16 x1 = VAL_TO_X(xval);
+            s16 y1 = VAL_TO_Y(yval);
+            s16 x2 = x1 + 2;
+            s16 y2 = y1 + 2;
+            //bounds check
+            x1 = ( x1 < 2 + box->x) ? box->x : x1 - 2;
+            y1 = ( y1 < 2 + box->y) ? box->y : y1 - 2;
+            if ( x2 >= box->x + box->width)
+                x2 = box->x + box->width - 1;
+            if ( y2 >= box->y + box->height)
+                y2 = box->y + box->height - 1;
+            LCD_FillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, RGB888_to_RGB565(0x00, 0xFF, 0xFF));
+        }
+    }
 }
 
 void GUI_DrawBarGraph(struct guiObject *obj)

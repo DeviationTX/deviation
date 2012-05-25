@@ -58,7 +58,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
-                              (s16 (*)(s16,  void *))CURVE_Evaluate, touch_cb, &edit.curve);
+                              (s16 (*)(s16,  void *))CURVE_Evaluate, NULL, touch_cb, &edit.curve);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)

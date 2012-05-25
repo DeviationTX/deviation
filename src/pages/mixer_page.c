@@ -49,6 +49,7 @@ static void templateselect_cb(guiObject_t *obj, void *data);
 static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
 static s16 eval_mixer_cb(s16 xval, void * data);
+static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
 
 static void show_none();
 static void show_simple();
@@ -235,7 +236,7 @@ static void show_simple()
     graph = GUI_CreateXYGraph(COL1_TEXT, 118, 300, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, NULL, &mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mixer[0].curve);
 }
 
 static void show_dr()
@@ -267,7 +268,7 @@ static void show_dr()
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, NULL, &mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mixer[0].curve);
 }
 
 static void show_expo()
@@ -299,7 +300,7 @@ static void show_expo()
     graph = GUI_CreateXYGraph(COL1_TEXT, 144, 300, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, NULL, &mixer[1].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mixer[1].curve);
 }
 
 static void show_complex()
@@ -328,7 +329,7 @@ static void show_complex()
     graph = GUI_CreateXYGraph(COL2_TEXT, 118, 140, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, NULL, &cur_mixer->curve);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &cur_mixer->curve);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 144, "Mux:", 0x0000);
     GUI_CreateTextSelect(COL1_VALUE, 144, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
@@ -340,7 +341,7 @@ static void show_complex()
     GUI_CreateTextSelect(COL1_VALUE, 196, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
 }
 
-static s16 eval_mixer_cb(s16 xval, void * data)
+s16 eval_mixer_cb(s16 xval, void * data)
 {
     (void) data;
     int i;
@@ -352,6 +353,15 @@ static s16 eval_mixer_cb(s16 xval, void * data)
         MIX_ApplyMixer(&mixer[i], raw, mixed);
     raw[cur_mixer->src] = oldval;
     return mixed[mixer[1].dest];
+}
+
+u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
+{
+    if (pos != 0)
+        return 0;
+    *x = raw[cur_mixer->src];
+    *y = eval_mixer_cb(*x, data);
+    return 1;
 }
 
 const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data)

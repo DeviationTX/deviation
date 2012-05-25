@@ -101,6 +101,7 @@ struct guiXYGraph {
     u16 grid_x;
     u16 grid_y;
     s16 (*CallBack)(s16 xval, void * data);
+    u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data);
     u8 (*touch_cb)(s16 x, s16 y, void *data);
     void *cb_data;
     u8 inuse;
@@ -157,6 +158,7 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
                       s16 (*Callback)(s16 xval, void *data), 
+                      u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data),
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data);
 guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
