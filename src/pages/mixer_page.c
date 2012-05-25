@@ -334,6 +334,10 @@ s16 eval_mixer_cb(s16 xval, void * data)
     for (i = 0; i < num_mixers; i++)
         MIX_ApplyMixer(&mixer[i], raw, mixed);
     raw[cur_mixer->src] = oldval;
+    if (mixed[cur_mixer->dest] > CHAN_MAX_VALUE)
+        return CHAN_MAX_VALUE;
+    if (mixed[cur_mixer->dest]  < CHAN_MIN_VALUE)
+        return CHAN_MIN_VALUE;
     return mixed[cur_mixer->dest];
 }
 
@@ -342,6 +346,10 @@ u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     if (pos != 0)
         return 0;
     *x = raw[cur_mixer->src];
+    if (*x > CHAN_MAX_VALUE)
+        *x = CHAN_MAX_VALUE;
+    else if (*x  < CHAN_MIN_VALUE)
+        *x = CHAN_MIN_VALUE;
     *y = eval_mixer_cb(*x, data);
     return 1;
 }
