@@ -80,7 +80,8 @@ struct guiObject {
 };
 
 struct guiLabel {
-    const char *text;
+    const char *(*CallBack)(struct guiObject *obj, void *data);
+    void *cb_data;
     u16 fontColor;
     u8 inuse;
 };
@@ -154,7 +155,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         const char *text, u16 titleColor, u16 fontColor,
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType);
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor);
+guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *obj, void *data), u16 fontColor, void *data);
 guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);

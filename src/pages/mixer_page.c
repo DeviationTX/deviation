@@ -41,12 +41,12 @@ void PAGE_MixerInit(int page)
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
         void *ptr = (void *)((long)i);
         int row = init_y + 28 * i;
-        GUI_CreateLabel(10, row, channel_name[ENTRIES_PER_PAGE * page + i], 0x0000);
+        GUI_CreateButton(10, row, BUTTON_48x16, channel_name[ENTRIES_PER_PAGE * page + i], 0x0000, NULL, ptr);
         strcpy(mp->input_str[i], (i < 4) ? inp[i] : "");
-        GUI_CreateLabel(40, row, mp->input_str[i], 0x0000);
+        GUI_CreateLabel(40, row, NULL, 0x0000, mp->input_str[i]);
         GUI_CreateButton(100, row - 4, BUTTON_90, MIXPAGE_TemplateName(MIX_GetTemplate(i)), 0x0000, templateselect_cb, ptr);
         strcpy(mp->switch_str[i], (i < 4) ? inp[i+4] : "");
-        GUI_CreateLabel(240, row, mp->switch_str[i], 0x0000);
+        GUI_CreateLabel(240, row, NULL, 0x0000, mp->switch_str[i]);
     }
     GUI_DrawScreen();
 }

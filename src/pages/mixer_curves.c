@@ -41,13 +41,13 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
 
     if (curve->type >= CURVE_3POINT) {
-        GUI_CreateLabel(10, 40, "Point:", 0x0000);
+        GUI_CreateLabel(10, 40, NULL, 0x0000, "Point:");
         GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
     } else {
-        GUI_CreateLabel(10, 40, "Pos/Neg:", 0x0000);
+        GUI_CreateLabel(10, 40, NULL, 0x0000, "Pos/Neg:");
         GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
     }
-    GUI_CreateLabel(10, 86, "Value:", 0x0000);
+    GUI_CreateLabel(10, 86, NULL, 0x0000, "Value:");
     edit->value = GUI_CreateTextSelect(10, 106, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
     edit->graph = GUI_CreateXYGraph(120, 40, 190, 190,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,

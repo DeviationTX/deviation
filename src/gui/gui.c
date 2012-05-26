@@ -31,6 +31,8 @@ static void GUI_DrawObject(struct guiObject *obj);
 static struct guiObject *GUI_GetFreeObj(void);
 static void *GUI_GetFreeGUIObj(enum GUIType guiType);
 static void dgCallback(struct guiObject *obj, void *data);
+
+static void GUI_DrawLabel(struct guiObject *obj);
 static void GUI_DrawBarGraph(struct guiObject *obj);
 static void GUI_DrawXYGraph(struct guiObject *obj);
 static void GUI_DrawTextSelect(struct guiObject *obj);
@@ -151,7 +153,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     return obj;
 }
 
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
+guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *, void *), u16 fontColor, void *data)
 {
     struct guiLabel  *label = GUI_GetFreeGUIObj(Label);
     struct guiObject *obj = GUI_GetFreeObj();
@@ -163,15 +165,17 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *text, u16 fontColor)
     box = &obj->box;
     box->x = x;
     box->y = y;
-    LCD_GetStringDimensions((const u8 *)text, &box->width, &box->height);
+    box->width = 0;
+    box->height = 0;
 
     obj->Type = Label;
     obj->widget = label;
-    OBJ_SET_TRANSPARENT(obj, 1);
+    OBJ_SET_TRANSPARENT(obj, 0);  //Deal with transparency during drawing
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
-    label->text = text;
+    label->CallBack = Callback;
+    label->cb_data = data;
     label->fontColor = fontColor;
     label->inuse = 1;
 
@@ -357,9 +361,7 @@ void GUI_DrawObject(struct guiObject *obj)
     }
     case Label:
     {
-        struct guiLabel *label = (struct guiLabel *)obj->widget;
-        LCD_SetFontColor(label->fontColor);
-        LCD_PrintStringXY(box->x, box->y, label->text);
+        GUI_DrawLabel(obj);
         break;
     }
     case Frame:
@@ -620,11 +622,6 @@ void GUI_RefreshScreen(void)
         while(obj) {
             if(OBJ_IS_DIRTY(obj)) {
                 if(OBJ_IS_TRANSPARENT(obj)) {
-                    // Labels are special because they can change size
-                    if (obj->Type == Label) {
-                        struct guiLabel *label = (struct guiLabel *)obj->widget;
-                        LCD_GetStringDimensions((const u8 *)label->text, &obj->box.width, &obj->box.height);
-                    }
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
                 GUI_DrawObject(obj);
@@ -718,6 +715,20 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
         obj = obj->next;
     }
     return 0;
+}
+
+void GUI_DrawLabel(struct guiObject *obj)
+{
+    struct guiLabel *label = (struct guiLabel *)obj->widget;
+    const char *str;
+    if (label->CallBack)
+        str = label->CallBack(obj, label->cb_data);
+    else
+        str = (const char *)label->cb_data;
+    LCD_GetStringDimensions((const u8 *)str, &obj->box.width, &obj->box.height);
+    GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+    LCD_SetFontColor(label->fontColor);
+    LCD_PrintStringXY(obj->box.x, obj->box.y, str);
 }
 
 void GUI_DrawXYGraph(struct guiObject *obj)
