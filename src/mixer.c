@@ -61,7 +61,7 @@ void MIX_EvalMixers(s16 *raw)
     for (i = 0; i < NUM_MIXERS; i++) {
         struct Mixer *mixer = &Model.mixers[i];
         // Linkers are pre-ordred such that we can process them in order
-        if (mixer->src == 0) {
+        if (MIX_SRC(mixer->src) == 0) {
             // Mixer is not defined so we are done
             break;
         }
@@ -155,14 +155,17 @@ void MIX_CreateCyclicInputs(s16 *raw)
 void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
 {
     s16 value;
-    if (!mixer->src)
+    if (! MIX_SRC(mixer->src))
         return;
     if (! switch_is_on(mixer->sw, raw)) {
         // Switch is off, so this mixer is not active
         return;
     }
     //1st: Get source value
-    value = raw[mixer->src];
+    value = raw[MIX_SRC(mixer->src)];
+    //Invert if necessary
+    if (MIX_SRC_IS_INV(mixer->src))
+        value = - value;
 
     //2nd: apply curve
     value = CURVE_Evaluate(value, &mixer->curve);
@@ -195,11 +198,16 @@ s16 apply_limits(s16 value, int channel)
 
 u8 switch_is_on(u8 sw, s16 *raw)
 {
+    u8 is_neg = MIX_SRC_IS_INV(sw);
+    sw = MIX_SRC(sw);
     if(sw == 0) {
         // No switch selected is the same as an on switch
         return 1;
     }
-    return (raw[sw] > 0);
+    s16 value = raw[sw];
+    if (is_neg)
+        value = - value;
+    return (value > 0);
 }
 
 
@@ -263,7 +271,7 @@ int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
     int idx = 0;
     int i;
     for(i = 0; i < NUM_MIXERS; i++) {
-        if (Model.mixers[i].src && Model.mixers[i].dest == ch) {
+        if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == ch) {
             mixers[idx++] = Model.mixers[i];
             if(idx == count)
                 return count;
@@ -277,7 +285,7 @@ int compact_mixers() {
     u8 i = 0;
     u8 j;
     while(i < max) {
-        if(! Model.mixers[i].src) {
+        if(! MIX_SRC(Model.mixers[i].src)) {
             //Found an empty space so move all following mixers down 1 and decrease max
             for (j = i + 1; j < max; j++) {
                 Model.mixers[j - 1] = Model.mixers[j];
@@ -299,13 +307,13 @@ u8 find_dependencies(u8 ch, u8 *deps)
     for (i = 0; i < NUM_CHANNELS; i++)
         deps[i] = 0;
     for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
-        if (mixer->src && mixer->dest == ch) {
+        if (MIX_SRC(mixer->src) && mixer->dest == ch) {
             found = 1;
-            if (mixer->src > NUM_INPUTS && mixer->src != NUM_INPUTS + 1 + ch) {
-                deps[mixer->src - NUM_INPUTS - 1] = 1;
+            if (MIX_SRC(mixer->src) > NUM_INPUTS && MIX_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
+                deps[MIX_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
             } 
-            if (mixer->sw > NUM_INPUTS) {
-                deps[mixer->sw - NUM_INPUTS - 1] = 1;
+            if (MIX_SRC(mixer->sw) > NUM_INPUTS) {
+                deps[MIX_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
             }
         }
     }
@@ -366,7 +374,7 @@ int MIX_SetMixers(struct Mixer *mixers, int count)
     u8 dest = mixers[0].dest;
     //Remove all mixers for this channel
     for (i = 0; i < NUM_MIXERS; i++) {
-        if (Model.mixers[i].src && Model.mixers[i].dest == dest)
+        if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
             Model.mixers[i].src = 0;
     }
     u8 pos = compact_mixers();
@@ -375,7 +383,7 @@ int MIX_SetMixers(struct Mixer *mixers, int count)
         return 0;
     }
     for (i = 0; i < count; i++) {
-        if (mixers[i].src)
+        if (MIX_SRC(mixers[i].src))
             Model.mixers[pos++] = mixers[i];
     }
     fix_mixer_dependencies(pos);

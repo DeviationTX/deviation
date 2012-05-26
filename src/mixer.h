@@ -48,6 +48,9 @@ enum SwashType {
     SWASH_TYPE_140,
     SWASH_TYPE_90,
 };
+#define MIX_SRC(x) ((x) & 0x7F)
+#define MIX_SRC_IS_INV(x) ((x) & 0x80)
+#define MIX_SET_SRC_INV(x, y) x = (y) ? ((x) | 0x80) : ((x) & ~0x80)
 struct Mixer {
     u8 src;
     u8 dest;
