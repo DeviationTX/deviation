@@ -23,6 +23,8 @@ struct page {
     int (*can_change)();
 };
 
+struct pagemem pagemem;
+
 static const struct page pages[] = {
     {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},
     {PAGE_MixerInit, PAGE_MixerEvent, PAGE_MixerCanChange},

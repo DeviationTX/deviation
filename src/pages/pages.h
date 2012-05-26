@@ -1,6 +1,16 @@
 #ifndef _PAGES_H_
 #define _PAGES_H_
 
+#include "mixer_page.h"
+
+struct pagemem {
+    union {
+        struct mixer_page mixer_page;
+    } u;
+};
+
+extern struct pagemem pagemem;
+
 /* Mixer */
 void PAGE_MixerInit(int page);
 void PAGE_MixerEvent();
