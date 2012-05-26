@@ -65,7 +65,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     box->y = y;
     box->width = width;
     box->height = height;
-    box->image.file = "dialog.bmp";
+    box->image.file = "images/dialog.bmp";
     box->image.x_off = 0;
     box->image.y_off = 0;
 
@@ -120,13 +120,13 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
 
     switch (type) {
         case TEXTSELECT_128:
-            box->image.file = "spin128.bmp";
+            box->image.file = "images/spin128.bmp";
             break;
         case TEXTSELECT_64:
-            box->image.file = "spin64.bmp";
+            box->image.file = "images/spin64.bmp";
             break;
         case TEXTSELECT_96:
-            box->image.file = "spin96.bmp";
+            box->image.file = "images/spin96.bmp";
             break;
     }
     box->image.x_off = 0;
@@ -224,8 +224,12 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     box = &obj->box;
 
     switch (type) {
-        case BUTTON_90: box->image.file = "btn90.bmp"; break;
-        case BUTTON_45: box->image.file = "btn45.bmp"; break;
+        case BUTTON_90: box->image.file = "images/btn90_24.bmp"; break;
+        case BUTTON_45: box->image.file = "images/btn46_24.bmp"; break;
+        case BUTTON_96x16: box->image.file = "images/btn96_16.bmp"; break;
+        case BUTTON_64x16: box->image.file = "images/btn64_16.bmp"; break;
+        case BUTTON_48x16: box->image.file = "images/btn48_16.bmp"; break;
+        case BUTTON_32x16: box->image.file = "images/btn32_16.bmp"; break;
     }
     box->image.x_off = 0;
     box->image.y_off = 0;
@@ -546,7 +550,7 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
-    LCD_DrawWindowedImageFromFile(x, y, "devo8.bmp", w, h, x, y);
+    LCD_DrawWindowedImageFromFile(x, y, "images/devo8.bmp", w, h, x, y);
 }
 
 void GUI_DrawScreen(void)

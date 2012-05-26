@@ -35,8 +35,8 @@ void PAGE_TestInit(int page)
     static const char *button1 = "Button 1";
     static const char *button2 = "Button 2";
     static const char *button3 = "Button 3";
-    static const char *statusBar = "bar.bmp";
-    static const char *batteryImg = "bat.bmp";
+    static const char *statusBar = "images/bar.bmp";
+    static const char *batteryImg = "images/bat.bmp";
 
     sprintf(buttonstr,"buttons");
     sprintf(buttonmessage," ");

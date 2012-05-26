@@ -27,6 +27,10 @@ enum TextSelectType {
 enum ButtonType {
     BUTTON_90,
     BUTTON_45,
+    BUTTON_96x16,
+    BUTTON_64x16,
+    BUTTON_48x16,
+    BUTTON_32x16,
 };
 
 struct guiDialogReturn {
