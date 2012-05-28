@@ -4,8 +4,6 @@
 #include "mixer.h"
 #include "gui/gui.h"
 
-#define ENTRIES_PER_PAGE 8
-
 struct curve_edit {
     struct Curve curve;
     struct Curve *curveptr;
@@ -27,8 +25,6 @@ struct mixer_page {
     char tmpstr[10];
     s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
 
-    char input_str[ENTRIES_PER_PAGE][6];
-    char switch_str[ENTRIES_PER_PAGE][7];
     enum TemplateType cur_template;
 
     struct curve_edit edit;
@@ -40,6 +36,8 @@ const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data);
 void MIXPAGE_EditCurves(struct Curve *curve, void *data);
 const char *MIXPAGE_TemplateName(enum TemplateType template);
 void MIXPAGE_ChangeTemplate();
+const char *MIXPAGE_SourceName(u8 src);
+void MIXPAGE_EditLimits();
 
 #endif
 

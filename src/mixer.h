@@ -62,6 +62,9 @@ struct Mixer {
 };
 
 struct Limit {
+    u8 reverse;
+    u8 safetysw;
+    s8 safetyval;
     s8 max;
     s8 min;
 };
@@ -88,4 +91,5 @@ u8 MIX_ReadInputs(s16 *raw);
 void MIX_CreateCyclicInputs(s16 *raw);
 struct Mixer *MIX_GetAllMixers();
 
+s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
 #endif

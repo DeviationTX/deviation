@@ -46,7 +46,6 @@ struct Model {
 struct Model Model;
 s16 Channels[NUM_CHANNELS];
 struct Transmitter Transmitter;
-static s16 apply_limits(s16 value, int channel);
 static u8 switch_is_on(u8 sw, s16 *raw);
 
 struct Mixer *MIX_GetAllMixers()
@@ -100,7 +99,7 @@ void MIX_CalcChannels()
 
     //4th step: apply limits
     for (i = 0; i < NUM_CHANNELS; i++) {
-        Channels[i] = apply_limits(raw[i - NUM_INPUTS - 1], i);
+        Channels[i] = MIX_ApplyLimits(i, &Model.limits[i], raw);
     }
 }
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
@@ -187,12 +186,17 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
     }
 }
 
-s16 apply_limits(s16 value, int channel)
+s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
 {
-    if(value > PCT_TO_RANGE(Model.limits[channel].max))
-        value = PCT_TO_RANGE(Model.limits[channel].max);
-    else if( value < PCT_TO_RANGE(Model.limits[channel].min))
-        value = PCT_TO_RANGE(Model.limits[channel].min);
+    s16 value = raw[NUM_INPUTS + 1 + channel];
+    if (limit->reverse)
+        value = -value;
+    if (MIX_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw))
+        value = PCT_TO_RANGE(Model.limits[channel].safetyval);
+    else if (value > PCT_TO_RANGE(limit->max))
+        value = PCT_TO_RANGE(limit->max);
+    else if( value < PCT_TO_RANGE(limit->min))
+        value = PCT_TO_RANGE(limit->min);
     return value;
 }
 

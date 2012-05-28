@@ -100,13 +100,13 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
-void sourceselect_cb(guiObject_t *obj, void *data);
-void curveselect_cb(guiObject_t *obj, void *data);
-const char *set_source_cb(guiObject_t *obj, int dir, void *data);
-const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
-const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
-const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
-const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
+static void sourceselect_cb(guiObject_t *obj, void *data);
+static void curveselect_cb(guiObject_t *obj, void *data);
+static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
 static void okcancel_cb(guiObject_t *obj, void *data);
 
 static void show_titlerow()
@@ -410,7 +410,7 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     return mp->tmpstr;
 }
 
-const char *show_source_name(u8 src)
+const char *MIXPAGE_SourceName(u8 src)
 {
     u8 is_neg = MIX_SRC_IS_INV(src);
     src = MIX_SRC(src);
@@ -448,7 +448,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(mp->graph);
         sync_mixers();
     }
-    return show_source_name(*source);
+    return MIXPAGE_SourceName(*source);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
@@ -467,7 +467,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(mp->graph);
         }
     }
-    return show_source_name(*source);
+    return MIXPAGE_SourceName(*source);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
