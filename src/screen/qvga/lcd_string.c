@@ -26,6 +26,7 @@
 #include "font_system_8x8ord.h"
 #include "font_system_5x8.h"
 #include "font_system_7x8.h"
+#include "font_trebuchet_48.h"
 
 /* The font bitfield is designed to be backwards compatible with standard
  * GLCD 8bit bit-fields, but to also support upto 32x32 proportional fonts
@@ -43,8 +44,8 @@
  * bytes represents a single column of pixels.  This will be repeated for
  * the width of the font.
  * The column chunk can be thought of as a little-endian number of 8, 16, 24,
- * or 32 bits, with the low-order bit representing the top row, and the
- * 'height'-th bit representing the bottom row.
+ * 32, 40, 48, 54 or 64 bits, with the low-order bit representing the top row,
+ * and the 'height'-th bit representing the bottom row.
  *
  * Example: Here is a '!' as a 1x10 bit-field:
  *        *    1
@@ -72,6 +73,7 @@ const struct FONT_DEF Fonts[] = {
     {0x80 | 10, 15, 0x20, 0x80, FontArial_14},
     {0x80 | 10, 15, 0x20, 0x80, FontArial_bold_14},
     {0x80 | 10, 12, 0x20, 0x80, FontCorsiva_12},
+    {0x80 | 34, 48, 0x25, 0x3a, FontTrebuchet_MS_48},
     {0, 0, 0, 0, 0},
     };
 
@@ -99,7 +101,7 @@ u8 get_width(u8 c)
 void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 {
     u8 row, col, width;
-    u8 row_bytes = HEIGHT(cur_str.font) > 16 ? 4 : HEIGHT(cur_str.font) > 8 ? 2 : 1;
+    u8 row_bytes = (HEIGHT(cur_str.font) - 1) / 8 + 1;
     const u8 *offset = cur_str.font->font_table;
     // Check if the requested character is available
     if ((c >= cur_str.font->first_char) && (c <= cur_str.font->last_char))
