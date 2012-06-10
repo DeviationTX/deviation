@@ -16,7 +16,9 @@ enum DialogType {
 
 enum BarGraphDirection {
     BAR_HORIZONTAL,
-    BAR_VERTICAL
+    BAR_VERTICAL,
+    TRIM_HORIZONTAL,
+    TRIM_VERTICAL,
 };
 enum TextSelectType {
     TEXTSELECT_128,

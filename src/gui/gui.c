@@ -810,6 +810,8 @@ void GUI_DrawXYGraph(struct guiObject *obj)
 void GUI_DrawBarGraph(struct guiObject *obj)
 {
 #define TRANSPARENT_BARGRAPH
+#define TRIM_THICKNESS 10
+#define TRIM_MARGIN 1
     struct guiBox *box = &obj->box;
     struct guiBarGraph *graph = (struct guiBarGraph *)obj->widget;
     int height = box->height - 2;
@@ -821,7 +823,8 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     
     s32 val = graph->CallBack(graph->cb_data);
 
-    if (graph->direction == BAR_HORIZONTAL) {
+    switch(graph->direction) {
+    case BAR_HORIZONTAL: {
         val = width * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y, val, height, 0xFFE0);
 #ifdef TRANSPARENT_BARGRAPH
@@ -829,7 +832,9 @@ void GUI_DrawBarGraph(struct guiObject *obj)
 #else
         LCD_FillRect(x + val, y, width - val, height, 0x0000);
 #endif
-    } else {
+        break;
+    }
+    case BAR_VERTICAL: {
         val = height * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y + (height - val), width, val, 0xFFE0);
 #ifdef TRANSPARENT_BARGRAPH
@@ -837,6 +842,24 @@ void GUI_DrawBarGraph(struct guiObject *obj)
 #else
         LCD_FillRect(x, y, width, height - val, 0x0000);
 #endif
+        break;
+    }
+    case TRIM_HORIZONTAL: {
+        val = (TRIM_THICKNESS / 2) + (width - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
+        GUI_DrawBackground(x, y, width, height);
+//        LCD_DrawFastHLine(x, y + height / 2, width, 0x0000); //Main axis
+        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Center
+        LCD_FillRect(x + val - TRIM_THICKNESS / 2, y + TRIM_MARGIN, TRIM_THICKNESS, height - TRIM_MARGIN * 2, 0x0000);
+        break;
+    }
+    case TRIM_VERTICAL: {
+        val = (TRIM_THICKNESS / 2) + (height - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
+        GUI_DrawBackground(x, y, width, height);
+//        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Main axis
+        LCD_DrawFastHLine(x, y + height / 2, width, 0xFFFF); //Center
+        LCD_FillRect(x + TRIM_MARGIN, y + val - TRIM_THICKNESS / 2, width - TRIM_MARGIN * 2, TRIM_THICKNESS, 0x0000);
+        break;
+    }
     }
 }
 
