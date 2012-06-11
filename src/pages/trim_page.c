@@ -102,7 +102,7 @@ void PAGE_TrimInit(int page)
         GUI_CreateButton(10, 26*i + 42, BUTTON_48x16, MIXPAGE_SourceName(trim[i].src), 0x0000, edit_cb, NULL);
         GUI_CreateLabel(72, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].neg));
         GUI_CreateLabel(134, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].pos));
-        GUI_CreateLabel(196, 26*i + 44, show_int_cb, 0x0000, (void *)((long)trim[i].step));
+        GUI_CreateTextSelect(196, 26*i + 42, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &trim[i].step);
     }
     GUI_DrawScreen();
 }
