@@ -92,6 +92,7 @@ void PAGE_TrimInit(int page)
 {
     (void)page;
     int i;
+    tp->modifying_trim = 0;
     GUI_CreateLabel(10, 5, NULL, 0x0000, "Trim");
     GUI_CreateLabel(10, 24, NULL, 0x0000, "Input");
     GUI_CreateLabel(72, 24, NULL, 0x0000, "Trim Neg");
