@@ -50,7 +50,8 @@ void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height);
-void LCD_SetFont(unsigned int idx);
+u8 LCD_SetFont(unsigned int idx);
+u8  LCD_GetFont();
 void LCD_SetFontColor(u16 color);
     /* Graphics */
 void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color);
@@ -143,6 +144,7 @@ void FS_Unmount();
 
 /* Mixer functions */
 void MIX_CalcChannels();
+void MIX_UpdateTrim(u32 buttons);
 
 /* GUI Pages */
 void PAGE_Init();

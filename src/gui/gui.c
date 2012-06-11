@@ -177,6 +177,7 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *
     label->CallBack = Callback;
     label->cb_data = data;
     label->fontColor = fontColor;
+    label->fontName = LCD_GetFont();
     label->inuse = 1;
 
     return obj;
@@ -721,14 +722,22 @@ void GUI_DrawLabel(struct guiObject *obj)
 {
     struct guiLabel *label = (struct guiLabel *)obj->widget;
     const char *str;
+    u16 old_w = obj->box.width;
+    u16 old_h = obj->box.height;
     if (label->CallBack)
         str = label->CallBack(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
+    u8 old_font = LCD_SetFont(label->fontName);
     LCD_GetStringDimensions((const u8 *)str, &obj->box.width, &obj->box.height);
-    GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+    if (old_w < obj->box.width)
+        old_w = obj->box.width;
+    if (old_h < obj->box.height)
+        old_h = obj->box.height;
+    GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
     LCD_SetFontColor(label->fontColor);
     LCD_PrintStringXY(obj->box.x, obj->box.y, str);
+    LCD_SetFont(old_font);
 }
 
 void GUI_DrawXYGraph(struct guiObject *obj)
@@ -857,7 +866,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         GUI_DrawBackground(x, y, width, height);
 //        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Main axis
         LCD_DrawFastHLine(x, y + height / 2, width, 0xFFFF); //Center
-        LCD_FillRect(x + TRIM_MARGIN, y + val - TRIM_THICKNESS / 2, width - TRIM_MARGIN * 2, TRIM_THICKNESS, 0x0000);
+        LCD_FillRect(x + TRIM_MARGIN, y + (height - val) - TRIM_THICKNESS / 2, width - TRIM_MARGIN * 2, TRIM_THICKNESS, 0x0000);
         break;
     }
     }

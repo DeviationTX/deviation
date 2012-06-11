@@ -142,14 +142,21 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
     }
 }
 
-void LCD_SetFont(unsigned int idx)
+u8 LCD_SetFont(unsigned int idx)
 {
     unsigned int i;
+    u8 old = LCD_GetFont();
     for(i = 0; i <= idx; i++) {
         if(Fonts[i].width == 0)
-            return;
+            return old;
     }
     cur_str.font = &Fonts[idx];
+    return old;
+}
+
+u8 LCD_GetFont()
+{
+    return cur_str.font - Fonts;
 }
 
 void LCD_SetXY(unsigned int x, unsigned int y)

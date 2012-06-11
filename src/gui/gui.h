@@ -85,6 +85,7 @@ struct guiLabel {
     const char *(*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
     u16 fontColor;
+    u8 fontName;
     u8 inuse;
 };
 struct guiFrame {
