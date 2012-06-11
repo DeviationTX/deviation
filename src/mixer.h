@@ -26,6 +26,7 @@ struct Curve {
 
 //The followingis defined bythe target
 extern const char *tx_input_str[NUM_TX_INPUTS];
+extern const char *tx_button_str[NUM_TX_BUTTONS];
 
 enum TemplateType {
     MIXERTEMPLATE_NONE,
@@ -69,6 +70,13 @@ struct Limit {
     s8 min;
 };
 
+struct Trim {
+    u8 src;
+    u8 pos;
+    u8 neg;
+    u8 step;
+};
+
 /* Curve functions */
 s16 CURVE_Evaluate(s16 value, struct Curve *curve);
 const char *CURVE_GetName(struct Curve *curve);
@@ -90,6 +98,8 @@ void MIX_EvalMixers(s16 *raw);
 u8 MIX_ReadInputs(s16 *raw);
 void MIX_CreateCyclicInputs(s16 *raw);
 struct Mixer *MIX_GetAllMixers();
+
+struct Trim *MIX_GetAllTrims();
 
 s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
 #endif

@@ -32,7 +32,7 @@ extern "C" {
 }
 
 
-u8 keymap[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
+u8 keymap[] = { 'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
 
 static struct {
     s32 xscale;
@@ -54,6 +54,9 @@ public:
     int get_button(int key)
     {
         int i = 0;
+        if(Fl::event_shift() && key >= 'a') {
+            key -= 'a' - 'A';
+        }
         while(keymap[i] != 0) {
             if(key == keymap[i])
                 return i;

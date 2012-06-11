@@ -37,7 +37,7 @@ struct Model {
     u8 Elevator_Stick;
     u8 Aileron_Stick;
     u8 Collective_Stick;
-    s8 trim[NUM_TRIMS];
+    struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_CHANNELS];
     u8 template[NUM_CHANNELS];
@@ -45,12 +45,20 @@ struct Model {
 
 struct Model Model;
 s16 Channels[NUM_CHANNELS];
+s8 Trims[NUM_TRIMS];
+
 struct Transmitter Transmitter;
 static u8 switch_is_on(u8 sw, s16 *raw);
+static s8 get_trim(u8 src);
 
 struct Mixer *MIX_GetAllMixers()
 {
     return Model.mixers;
+}
+
+struct Trim *MIX_GetAllTrims()
+{
+    return Model.trims;
 }
 
 void MIX_EvalMixers(s16 *raw)
@@ -108,9 +116,10 @@ void MIX_CreateCyclicInputs(s16 *raw)
 {
     if (! Model.swash_type)
         return;
-
-    s16 elevator   = raw[Model.Elevator_Stick] + Model.trim[Model.Elevator_Stick];
-    s16 aileron    = raw[Model.Aileron_Stick]  + Model.trim[Model.Aileron_Stick];
+    s8 ele_trim = get_trim(Model.Elevator_Stick);
+    s8 ail_trim = get_trim(Model.Aileron_Stick);
+    s16 elevator   = raw[Model.Elevator_Stick] + ele_trim;
+    s16 aileron    = raw[Model.Aileron_Stick]  + ail_trim;
     s16 collective = raw[Model.Collective_Stick];
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
@@ -200,6 +209,16 @@ s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
     return value;
 }
 
+s8 get_trim(u8 src)
+{
+    int i;
+    for (i = 0; i < NUM_TRIMS; i++) {
+        if (Model.trims[i].src == src)
+            return Trims[i];
+    }
+    return 0;
+}
+  
 u8 switch_is_on(u8 sw, s16 *raw)
 {
     u8 is_neg = MIX_SRC_IS_INV(sw);
@@ -232,30 +251,20 @@ void TEST_init_mixer()
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = i;
         Model.mixers[i].scaler = 100;
+        Model.trims[i].src = i + 1;
+        Model.trims[i].neg = i * 2 + 1;
+        Model.trims[i].pos = i * 2 + 2;
+        Model.trims[i].step = 10;
     }
-
-    //Test simple scaler
-    Model.mixers[0].scaler = -50;
-    Model.mixers[0].offset = +50;
-    Model.mixers[0].dest  =  10;
-
-    //Test curves
-    Model.mixers[1].curve.type = CURVE_3POINT;
-    Model.mixers[1].curve.points[0] = 75;
-    Model.mixers[1].curve.points[1] = 10;
-    Model.mixers[1].curve.points[2] = 75;
-
-    Model.mixers[4].src = NUM_INPUTS + 10 + 1;
-    Model.mixers[4].dest = 0;
-    
-    Model.mixers[5].src  = NUM_INPUTS + 10 + 1;
-    Model.mixers[5].dest = 0;
-    Model.mixers[5].mux  = MUX_ADD;
 
     for(i = 0; i < NUM_CHANNELS; i++) {
         Model.limits[i].max = 100;
         Model.limits[i].min = -100;
-        Model.template[i] = MIXERTEMPLATE_NONE;
+        if (i < 4) {
+            Model.template[i] = MIXERTEMPLATE_SIMPLE;
+        } else {
+            Model.template[i] = MIXERTEMPLATE_NONE;
+        }
     }
 }
 
@@ -414,4 +423,23 @@ void MIX_InitMixer(struct Mixer *mixer, u8 ch)
     mixer->curve.type = CURVE_EXPO;
     for (i = 0; i < MAX_POINTS; i++)
         mixer->curve.points[i] = 0;
+}
+
+void MIX_UpdateTrim(u32 buttons)
+{
+    int i;
+    for (i = 0; i < NUM_TRIMS; i++) {
+        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
+            Trims[i] -= Model.trims[i].step;
+            if (Trims[i] < -100) {
+                Trims[i] = -100;
+            }
+        }
+        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
+            Trims[i] += Model.trims[i].step;
+            if (Trims[i] > 100) {
+                Trims[i] = 100;
+            }
+        }
+    }
 }

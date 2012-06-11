@@ -32,6 +32,23 @@ const char *tx_input_str[NUM_TX_INPUTS] = {
     "FMODE2",
 };
 
+const char *tx_button_str[] = {
+    "THR-",
+    "THR+",
+    "RUD-",
+    "RUD+",
+    "ELE-",
+    "ELE+",
+    "AIL-",
+    "AIL+",
+    "LEFT-",
+    "LEFT+",
+    "RIGHT-",
+    "RIGHT+",
+    "Left",
+    "Right",
+};
+
 s16 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;

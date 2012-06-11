@@ -93,14 +93,20 @@ void event_loop(void *param)
             buttonstring[32] = 0;
             printf("Buttons: %s\n",buttonstring);
             last_buttons = buttons;
-            if((buttons & 0x01) == 0)
+            MIX_UpdateTrim(buttons);
+            if(CHAN_ButtonIsPressed(buttons, 0)) {
+printf("1\n");
                 LCD_CalibrateTouch();
-            else if((buttons & 0x02) == 0)
+            } else if(CHAN_ButtonIsPressed(buttons, 0)) {
+printf("2\n");
                 USB_Connect();
-            else if((buttons & 0x04) == 0)
+            }else if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
+printf("3: %d\n", buttons);
                 PAGE_Change(1);
-            else if((buttons & 0x08) == 0)
+            } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
+printf("4: %d\n", buttons);
                 PAGE_Change(-1);
+            }
         }
     }
     if(SPITouch_IRQ()) {

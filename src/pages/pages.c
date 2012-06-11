@@ -26,17 +26,19 @@ struct page {
 struct pagemem pagemem;
 
 static const struct page pages[] = {
-    {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},
+    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainCanChange},
     {PAGE_MixerInit, PAGE_MixerEvent, PAGE_MixerCanChange},
+    {PAGE_TrimInit, PAGE_TrimEvent, PAGE_TrimCanChange},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestCanChange},
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerCanChange},
+    {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},
 };
 
 static u8 page;
 
 void PAGE_Init()
 {
-    page = 1;
+    page = 0;
     pages[page].init(0);
 }
 
