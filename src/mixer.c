@@ -430,16 +430,12 @@ void MIX_UpdateTrim(u32 buttons)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            Trims[i] -= Model.trims[i].step;
-            if (Trims[i] < -100) {
-                Trims[i] = -100;
-            }
+            int tmp = (int)(Trims[i]) - Model.trims[i].step;
+            Trims[i] = tmp < -100 ? -100 : tmp;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            Trims[i] += Model.trims[i].step;
-            if (Trims[i] > 100) {
-                Trims[i] = 100;
-            }
+            int tmp = (int)(Trims[i]) + Model.trims[i].step;
+            Trims[i] = tmp > 100 ? 100 : tmp;
         }
     }
 }
