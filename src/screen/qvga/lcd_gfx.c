@@ -236,8 +236,8 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     LCD_DrawStart(x, y, x + w - 1, y + h, DRAW_NWSE);
-    w *= h;
-    while(w--)
+    u32 bytes = w * h;
+    while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
@@ -411,8 +411,6 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     if (w == 0 || h == 0)
         return;
 
-    if (w % 2)
-        printf("Odd\n");
     fh = fopen(file, "r");
     if(! fh) {
         if (w > 0 && h > 0)
