@@ -100,7 +100,7 @@ void PAGE_TrimInit(int page)
     GUI_CreateLabel(196, 24, NULL, 0x0000, "Trim Step");
     struct Trim *trim = MIX_GetAllTrims();
     for (i = 0; i < NUM_TRIMS; i++) {
-        GUI_CreateButton(10, 26*i + 42, BUTTON_48x16, MIXPAGE_SourceName(trim[i].src), 0x0000, edit_cb, NULL);
+        GUI_CreateButton(10, 26*i + 42, BUTTON_48x16, MIXPAGE_SourceName(trim[i].src), 0x0000, edit_cb, (void *)((long)i));
         GUI_CreateLabel(72, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].neg));
         GUI_CreateLabel(134, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].pos));
         GUI_CreateTextSelect(196, 26*i + 42, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &trim[i].step);
