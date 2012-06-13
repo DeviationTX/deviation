@@ -235,8 +235,8 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
+    u32 bytes = (u32)w * h;
     LCD_DrawStart(x, y, x + w - 1, y + h, DRAW_NWSE);
-    u32 bytes = w * h;
     while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
@@ -365,8 +365,10 @@ u8 LCD_ImageIsTransparent(const char *file)
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
     	printf("DEBUG: LCD_ImageIsTransparent: Buffer read issue?\n");
+        fclose(fh);
         return 0;
     }
+    fclose(fh);
     compression = *((u32 *)(buf + 0x1e));
     if(compression == 3)
     {
@@ -392,9 +394,11 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 
     if(fread(buf, 0x1a, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
+        fclose(fh);
     	printf("DEBUG: LCD_ImageDimensions: Buffer read issue?\n");
         return 0;
     }
+    fclose(fh);
     *w = *((u32 *)(buf + 0x12));
     *h = *((u32 *)(buf + 0x16));
     return 1;
@@ -421,6 +425,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
 
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
+        fclose(fh);
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
         return;
     }
@@ -430,6 +435,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
        || (compression != 0 && compression != 3)  /* BI_RGB or BI_BITFIELDS */
       )
     {
+        fclose(fh);
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct\n");
     	return;
     }
@@ -445,6 +451,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
            || *((u16 *)(buf + 0x3a)) != 0x07e0
            || *((u16 *)(buf + 0x3e)) != 0x001f)
         {
+            fclose(fh);
             printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct second check\n");
             return;
         }
@@ -459,6 +466,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     if((u16)w + x_off > img_w || (u16)h + y_off > img_h)
     {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
+        fclose(fh);
         return;
     }
 

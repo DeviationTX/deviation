@@ -136,7 +136,11 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
 
     box->x = x;
     box->y = y;
-    LCD_ImageDimensions(box->image.file, &box->width, &box->height);
+    if(! LCD_ImageDimensions(box->image.file, &box->width, &box->height)) {
+        printf("Couldn't locate file: %s\n", box->image.file);
+        box->width = 20;
+        box->height = 10;
+    }
 
     obj->Type = TextSelect;
     obj->widget = select;
@@ -241,7 +245,11 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 
     box->x = x;
     box->y = y;
-    LCD_ImageDimensions(box->image.file, &box->width, &box->height);
+    if(! LCD_ImageDimensions(box->image.file, &box->width, &box->height)) {
+        printf("Couldn't locate file: %s\n", box->image.file);
+        box->width = 20;
+        box->height = 10;
+    }
 
     obj->Type = Button;
     obj->widget = button;
