@@ -1,0 +1,61 @@
+I've been playing with a V911 transmitter which contains the A7105 FSK Tx/Rx chip. This transmitter uses 3-wire SPI to send data which makes it easy to look at.
+The V911 is compatible with the Turnigy 9X/FlySky FS-TH9X, though it is only a 4-channel heli.
+
+Initial analysis shows that all channel data is sent in 22-byte frames every ~1.5ms
+
+The data in the frame is apparently not encrypted, and each channel is sent as a 16bit little-endian word.
+
+The A7105 Data sheet can be found here:
+
+After power-on, the following steps are initiated:
+1) A7105 is reset send (0x00, 0x00)
+2) Send 32bit address to address 0x06: 0x5475c52a
+3) Program the A7105 control registers as follows:
+Code:
+
+0x00: --, 42, 00, 14, 00, --, --, 00, 00, 00, 00, 01, 21, 05, 00, 50
+0x10: 9e, 4b, 00, 02, 16, 2b, 12, 00, 62, 80, 80, 00, 0a, 32, c3, 0f
+0x20: 13, c3, 00, --, 00, 00, 3b, 00, 17, 47, 80, 03, 01, 45, 18, 00
+0x30: 01, 0f, --
+
+4) Put the A7105 into the 'Standby' state (Strobe = 0xa0)
+5) Write '1' to address 0x02 to start the IF Filter Bank calibration
+6) Poll address 0x02 until it returns '0' indicating calibration is complete
+7) Read IF calibration info from Address 0x22
+8) Write VCO Current calibration to 0x24 (value = 0x13)
+9) Write VCO Bank calibration limits to 0x26 (value = 0x3b)
+10) Write channel to Address 0x0f (value = 0x00)
+11) Write '2' to address 0x02 to start VCO bank Calibration
+12) Poll address 0x02 until it returns '0' indicating calibration is complete
+13) Read VCO calibration from Address 0x25 (test for success?)
+14) Write channel to Address 0x0f (value = 0xa0)
+15) Write '2' to Address 0x02 to start VCO bank Calibration
+16) Poll address 0x02 until it returns '0' indicating calibration is complete
+17) Read VCO calibration from Address 0x25 (test for success?)
+18) Write manual VCO Bank calibration to Address 0x25 (value = 0x08) ???
+19) Put the A7105 into the 'Standby' state (Strobe = 0xa0)
+20) Start sending frames as follows
+
+Frames are sent each 1.46ms. Each frame consists of sending a 'FIFO Write Pointer Reset' (Strobe = 0xe0), 22 bytes of data, setting the channel (via the 0x0f register) and then sending 'TX mode' (Strobe = 0x0d) to actually initiate the transfer
+
+The frame data is not encrypted, and is 16-bit little endian. the data appears to be as follows.
+Fo each channel the minimum value I observed was ~ 0x03e8 and the maximum was ~ 0x07ca.
+
+word 1: 0x05aa for 3 seconds, and then 0x5505
+word 2: 0x01f3
+word 3: 0x2000
+word 4: aileron.
+word 5: elevator.
+word 6: throttle.
+word 7: rudder.
+word 8: 0x02c3
+word 9: 0x02ed
+word 10:????
+word 11: 0x0000
+
+Word 10 seems to vary between 0x0024 and 0x0fff, but there are only a few discrete values observed: 0x0024, 0x0032, 0x0100, 0x0200, 0x0ffe, 0x0fff.
+It does not seem to be dependent on the rest of the data, so it isn't any sort of checksum, and it doesn't move in a predictable fashion.
+
+When I get my FlySky 9x, I'll probably try to send different patterns through the module and see which channels map where.
+
+Also, there is still work to do to determine how the Bank Calibration data is used 

@@ -12,7 +12,8 @@ AS       = $(CROSS)as
 CP       = $(CROSS)objcopy
 DUMP     = $(CROSS)objdump
 
-SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/$(SCREENSIZE)/*.c) $(wildcard gui/*.c) $(wildcard pages/*.c)
+SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/$(SCREENSIZE)/*.c) $(wildcard gui/*.c) $(wildcard pages/*.c) \
+		$(wildcard protocol/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
