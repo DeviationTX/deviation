@@ -23,6 +23,7 @@ const u8 A7105_regs[] = {
     0x13, 0xc3, 0x00,  -1,  0x00, 0x00, 0x3b, 0x00, 0x17, 0x47, 0x80, 0x03, 0x01, 0x45, 0x18, 0x00,
     0x01, 0x0f,  -1,
 };
+static u16 packet[11];
 
 void FLYSKY_Initialize() {
     int i;
@@ -83,8 +84,26 @@ void FLYSKY_Initialize() {
     A7105_Strobe(A7105_STANDBY);
 }
 
-void FLYSKY_SendPacket()
+void FLYSKY_BuildPacket()
 {
-
+    int i;
+    //-100% =~ 0x03e8
+    //+100% =~ 0x07ca
+    //Calculate:
+    //Center = 0x5d9
+    //1 %    = 5
+    packet[0] = 0x5aa;
+    packet[1] = 0x1f3;
+    packet[2] = 0x2000;
+    for (i= 0; i < 8; i++) {
+        if (i > NUM_CHANNELS) {
+            packet[i + 3] = 0;
+            continue;
+        }
+        s32 value = (s32)Channels[i] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
+        if (value < 0)
+            value = 0;
+        packet[3 + i] = (u16)value;
+    }
 }
 #endif
