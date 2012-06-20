@@ -1,0 +1,19 @@
+A 16 byte data packet is sent every 2.4msec
+1.2msec after transmit, register 0x04 is checked to verify transmit status and ACK from Rx
+
+Thye 1st byte of the data packet is one of:
+0x85 - This appears to be used to transmit model data between transmitters
+0x87 - Sent every 10 packets
+0x8a - 
+       Only sent for the 1st 10sec or so.
+       1st 2 bytes indicate number of pakcets left before we stop sending 0x8a packets
+       bytes 6-9 contain the cyrf6936 ID.  This is used as an XOR for 0x87, 0x8b, and 0x8c packets
+       This packet is sent before every 0x8a or 0x8b packet
+0x8b -
+0x8c -
+       0x8b and 0x8c packets are alternating packets.  I assume these are the channel data
+       each packet appears to contain 4 16bit values
+
+Packets 0x87, 0x8a, and 0x8b are 'encrypted' by xoring with the cyrf6936 id.  This is a 4 byte value.
+       xoring is done by xoring the 1st 12 bytes of the packet (not including the cmd byte) as 3 dwords
+       with the id.  i.e. pkt[1..4] ^ id, pkt[5-8] ^ id, pkt[9-12] ^ id
