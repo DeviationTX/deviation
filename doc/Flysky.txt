@@ -40,22 +40,31 @@ Frames are sent each 1.46ms. Each frame consists of sending a 'FIFO Write Pointe
 
 The frame data is not encrypted, and is 16-bit little endian. the data appears to be as follows.
 Fo each channel the minimum value I observed was ~ 0x03e8 and the maximum was ~ 0x07ca.
+         TX1                 TX2
+word 1:       0xaa05/0x5505
+word 2: 0x01f3             0x0002
+word 3: 0x2000             0x7000
+word 4:         aileron
+word 5:         elevator
+word 6:         throttle
+word 7:         rudder
+word 8: 0x02c3             0xedfc
+word 9: 0x02ed             0x02eb
+word 10:        see below
+word 11:        0x0000
 
-word 1: 0x05aa for 3 seconds, and then 0x5505
-word 2: 0x01f3
-word 3: 0x2000
-word 4: aileron.
-word 5: elevator.
-word 6: throttle.
-word 7: rudder.
-word 8: 0x02c3
-word 9: 0x02ed
-word 10:????
-word 11: 0x0000
+Word 1 is 0xaa05 until 3 seconds have elapsed and the throttle has been broughtto its minimum value.  It then changes to 0x5505 at the same time that the Tx starts cycling between channels
 
-Word 10 seems to vary between 0x0024 and 0x0fff, but there are only a few discrete values observed: 0x0024, 0x0032, 0x0100, 0x0200, 0x0ffe, 0x0fff.
-It does not seem to be dependent on the rest of the data, so it isn't any sort of checksum, and it doesn't move in a predictable fashion.
+word 8 and 9 are likely to be channels 5 and 6
 
-When I get my FlySky 9x, I'll probably try to send different patterns through the module and see which channels map where.
+Word 10 seems to continuously cycle between 10 states (changeing state every frame):
+State 1     : 0x100, 0x200, or 0x300 (almost always 0x200)
+State 2     : 0x23 or 0x24 (almost always 0x24)
+State 3     : 0x32
+State 4 - 10: 0xffe or 0xfff 
 
-Also, there is still work to do to determine how the Bank Calibration data is used 
+The Tx channel will be 01 until initialization is done and the throttle is brought to 0.  At ~ 3 seconds, data is transmitted on multiple channels.  Channel ordering is dependent on Transmitter?
+Tx2: 0a, 5a, 50, a0, 14, 64, 46, 96, 1e, 6e, 3c, 8c, 28, 78, 32, 82
+Tx1: 79, 29, 6f, 1f, 83, 33, 65, 25, 8d, 3d, 5b, 0b, 97, 47, 51, 01
+
+
