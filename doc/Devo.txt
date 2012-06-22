@@ -1,19 +1,34 @@
 A 16 byte data packet is sent every 2.4msec
 1.2msec after transmit, register 0x04 is checked to verify transmit status and ACK from Rx
 
-Thye 1st byte of the data packet is one of:
+The 1st byte of the data packet is one of:
 0x85 - This appears to be used to transmit model data between transmitters
 0x87 - Sent every 10 packets
 0x8a - 
        Only sent for the 1st 10sec or so.
        1st 2 bytes indicate number of pakcets left before we stop sending 0x8a packets
        bytes 6-9 contain the cyrf6936 ID.  This is used as an XOR for 0x87, 0x8b, and 0x8c packets
-       This packet is sent before every 0x8a or 0x8b packet
+       This packet is sent before every 0x8b or 0x8c packet for the 1st 10 seconds)
+       If FixedID is in use, 0x8a is never sent, and 0x87 is sent instead
 0x8b -
 0x8c -
-       0x8b and 0x8c packets are alternating packets.  I assume these are the channel data
-       each packet appears to contain 4 16bit values
+       0x8b and 0x8c packets are alternating packets.  These are the channel data
+       each packet contains 4 16bit values (bytes 1 - 8) which are LSB 1st
+       The sticks return '0' when centered and seem to max out at 0x640 at either end
+       the upper-nibble of byte 9 indicates whether the channel value is positive/or negative
+       I.e at the end of stick travel the value is 0x640 and bit 9.x indicates which end the stick is at
 
 Packets 0x87, 0x8a, and 0x8b are 'encrypted' by xoring with the cyrf6936 id.  This is a 4 byte value.
        xoring is done by xoring the 1st 12 bytes of the packet (not including the cmd byte) as 3 dwords
        with the id.  i.e. pkt[1..4] ^ id, pkt[5-8] ^ id, pkt[9-12] ^ id
+
+The transmit channel is changed every 4 packets.  It appears to cycle between 3 values, 4 channels apart.  For instance:
+       0x04, 0x08, 0x0c, 0x04, 0x08, 0x0c, ...
+
+Packet 0x8b
+0x8b:  aaaa bbbb cccc dddd f? ?? ?? ?? ?? ?? ??
+    aaaa: Elevator 9.7 is set when stick is below center
+    bbbb: Aileron  9.6 is set when stick is right of center
+    cccc: Throttle 9.5 is set when stick is below center
+    dddd: Rudder   9.4 is set when stick is right of center
+    f: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
