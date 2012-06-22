@@ -4,10 +4,16 @@ A 16 byte data packet is sent every 2.4msec
 The 1st byte of the data packet is one of:
 0x85 - This appears to be used to transmit model data between transmitters
 0x87 - Sent every 10 packets
+       I do not know what the data is, however, I've only ever seen bytes 1-9 to be 0
+       Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
 0x8a - 
        Only sent for the 1st 10sec or so.
-       1st 2 bytes indicate number of pakcets left before we stop sending 0x8a packets
+       bytes 1 and 2  are a LSB-first word indicating the number of packets left before we stop sending 0x8a packets
+       bytes 3, 4, 5 are the transmit channels that will be used to transmit data in a round-robin configuration
        bytes 6-9 contain the cyrf6936 ID.  This is used as an XOR for 0x87, 0x8b, and 0x8c packets
+       bytes 10-12 are the same as for the 8b/8c packets (but are not scrambled)
+       bytes 13-15 are the Fixed ID (though it isn't actually enabled) and ARE scrambled with the least-significant
+          3 bytes of th cyrf6936 ID
        This packet is sent before every 0x8b or 0x8c packet for the 1st 10 seconds)
        If FixedID is in use, 0x8a is never sent, and 0x87 is sent instead
 0x8b -
@@ -19,16 +25,23 @@ The 1st byte of the data packet is one of:
        I.e at the end of stick travel the value is 0x640 and bit 9.x indicates which end the stick is at
 
 Packets 0x87, 0x8a, and 0x8b are 'encrypted' by xoring with the cyrf6936 id.  This is a 4 byte value.
-       xoring is done by xoring the 1st 12 bytes of the packet (not including the cmd byte) as 3 dwords
-       with the id.  i.e. pkt[1..4] ^ id, pkt[5-8] ^ id, pkt[9-12] ^ id
+       xoring is done by xoring all but the 1st byte of the  packet (i.e. everything but the cmd byte) 
+       with the id.  i.e. pkt[1..4] ^ id, pkt[5-8] ^ id, pkt[9-12] ^ id, pkt[13-15] ^ (least significant 3 bytes of id)
 
 The transmit channel is changed every 4 packets.  It appears to cycle between 3 values, 4 channels apart.  For instance:
        0x04, 0x08, 0x0c, 0x04, 0x08, 0x0c, ...
 
 Packet 0x8b
-0x8b:  aaaa bbbb cccc dddd f? ?? ?? ?? ?? ?? ??
+0x8b:  aaaa bbbb cccc dddd ff gg hh ii jjjjjj
     aaaa: Elevator 9.7 is set when stick is below center
     bbbb: Aileron  9.6 is set when stick is right of center
     cccc: Throttle 9.5 is set when stick is below center
     dddd: Rudder   9.4 is set when stick is right of center
-    f: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
+    ff: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
+        The lower nibble is always '0x0b'
+    gg: The upper nibble is one of '0x00', '0x80', '0xc0'
+        The lower nibble is the number of packets that will be transmitted (after this one) before the next
+        transmitter channel is selected
+    hh: The next transmitter channel that will be selected
+    ii: The transmitter channel that will be selected afterthe next one (2 away)
+    jjjjjj: Thye Fixed ID value (LSB 1st, 24bit value)
