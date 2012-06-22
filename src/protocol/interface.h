@@ -1,7 +1,7 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
-#ifdef HAS_A7105
+#ifdef PROTO_HAS_A7105
 enum A7105_State {
     A7105_SLEEP     = 0x80,
     A7105_IDLE      = 0x90,

@@ -2,7 +2,8 @@
 #define _DEVO8_TARGET_H_
 
 //Protocols
-#define HAS_A7105
+#define PROTO_HAS_A7105
+#define PROTO_HAS_DEVO
 
 #define NUM_TX_BUTTONS 14
 #define NUM_TX_INPUTS 14 

@@ -38,7 +38,7 @@ Packet 0x8b
     cccc: Throttle 9.5 is set when stick is below center
     dddd: Rudder   9.4 is set when stick is right of center
     ff: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
-        The lower nibble is always '0x0b'
+        The lower nibble is '0x0b' on the Devo8 and '0x09' on the Devo6. Perhaps it is num_channels + 3?
     gg: The upper nibble is one of '0x00', '0x80', '0xc0'
         The lower nibble is the number of packets that will be transmitted (after this one) before the next
         transmitter channel is selected
