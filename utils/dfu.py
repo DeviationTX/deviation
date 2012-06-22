@@ -19,7 +19,26 @@ def cstring(string):
 def compute_crc(data):
   return 0xFFFFFFFF & -zlib.crc32(data) -1
 
-def parse(file,dump_images=False):
+def encrypt(data, offset):
+    result = ""
+    for val in map(ord, data):
+        if(val >= 0x80 and val <= 0xcf - offset):
+            val += offset
+        elif(val >= 0xd0 - offset and val < 0xd0):
+            val -= (0x50 - offset)
+        result += chr(val)
+    return result
+def decrypt(data, offset):
+    result = ""
+    for val in map(ord, data):
+        if(val >= 0x80 + offset and val <= 0xcf):
+            val -= offset
+        elif(val >= 0x80 and val < 0x80 + offset):
+            val += (0x50 - offset)
+        result += chr(val)
+    return result
+
+def parse(file,dump_images=False,crypt=0):
   print 'File: "%s"' % file
   data = open(file,'rb').read()
   crc = compute_crc(data[:-4])
@@ -43,6 +62,7 @@ def parse(file,dump_images=False):
       image, target = target[:esize], target[esize:]
       if dump_images:
         out = '%s.target%d.image%d.bin' % (file,t,e)
+        image = decrypt(image, crypt)
         open(out,'wb').write(image)
         print '    DUMPED IMAGE TO "%s"' % out
     if len(target):
@@ -55,23 +75,13 @@ def parse(file,dump_images=False):
   if data:
     print "PARSE ERROR"
 
-def encrypt(data):
-    result = ""
-    for val in map(ord, data):
-        if(val >= 0x80 and val <= 0xc7):
-            val += 8
-        elif(val >= 0xc8 and val < 0xd0):
-            val -= 0x48
-        result += chr(val)
-    return result
-
-def build(file,targets,device=DEFAULT_DEVICE):
+def build(file,targets,device=DEFAULT_DEVICE,crypt=0):
   data = ''
   for t,target in enumerate(targets):
     tdata = ''
     for image in target:
       tdata += struct.pack('<2I',image['address'],len(image['data']))
-      tdata += encrypt(image['data'])
+      tdata += encrypt(image['data'],crypt)
     tdata = struct.pack('<6sBI255s2I','Target',0,1,'ST...',len(tdata),len(target)) + tdata
     data += tdata
   data  = struct.pack('<5sBIB','DfuSe',1,len(data)+11,len(targets)) + data
@@ -92,6 +102,8 @@ if __name__=="__main__":
     help="build for DEVICE, defaults to %s" % DEFAULT_DEVICE, metavar="DEVICE")
   parser.add_option("-d", "--dump", action="store_true", dest="dump_images",
     default=False, help="dump contained images to current directory")
+  parser.add_option("-c", "--crypt", action="store", type="int", dest="crypt",
+    default=False, help="use scramble offset of 'xx' (6, 7, 8, 10, 12)")
   (options, args) = parser.parse_args()
 
   if options.binfiles and len(args)==1:
@@ -120,13 +132,13 @@ if __name__=="__main__":
     except:
       print "Invalid device '%s'." % device
       sys.exit(1)
-    build(outfile,[target],device)
+    build(outfile,[target],device,crypt=options.crypt)
   elif len(args)==1:
     infile = args[0]
     if not os.path.isfile(infile):
       print "Unreadable file '%s'." % infile
       sys.exit(1)
-    parse(infile, dump_images=options.dump_images)
+    parse(infile, dump_images=options.dump_images,crypt=options.crypt)
   else:
     parser.print_help()
     sys.exit(1)

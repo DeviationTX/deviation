@@ -10,7 +10,7 @@ LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-T$(LINKFILE) -Wl,-Map=$(TARGET).m
 
 all = $(TARGET).dfu
 $(TARGET).dfu: $(TARGET).bin
-	../utils/dfu.py -b 0x08004000:$< $@
+	../utils/dfu.py -c 8 -b 0x08004000:$< $@
 	../utils/get_mem_usage.pl $(TARGET).map
 
 $(TARGET).bin: $(TARGET).elf
