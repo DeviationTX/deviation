@@ -5,6 +5,7 @@ use Getopt::Long;
 my $mfgid = "";
 my @xor = (0, 0, 0, 0);
 my $showchan = 0;
+my $telem = 1;
 GetOptions("mfgid=s" => \$mfgid, "chan" => \$showchan);
 if($mfgid) {
     @xor = map {hex($_)} split(/ /, $mfgid);
@@ -19,9 +20,10 @@ my $start = 0;
 my @data = ();
 
 while(<>) {
-    my($time, $framenum, $data) = split(/,/, $_);
+    my($time, $framenum, $data, $din) = (/^(\S+),(\S+),(\S+),(\S+)/);
     next unless($time && $framenum && $data);
     $data = hex($data);
+    $din = hex($din);
     if($framenum != $last_frame) {
         if(@data) {
             if(grep {$data[0] eq $_} ("87", "8b", "8c")) {
@@ -32,14 +34,27 @@ while(<>) {
                 $data[13] = sprintf("%02x", hex($data[13]) ^ $xor[0]);
                 $data[14] = sprintf("%02x", hex($data[14]) ^ $xor[1]);
                 $data[15] = sprintf("%02x", hex($data[15]) ^ $xor[2]);
+            } elsif(grep {$data[0] eq $_} ("30", "31")) {
+                for(my $i = 0; $i < 15; $i++) {
+                    $data[$i + 1] = sprintf("%02x", hex($data[$i + 1]) ^ $xor[$i % 4]);
+                }
             }
-            printf("%15s: @data\n", $start);
+            printf("%15s%s @data\n", $start, $ok == 1 ? ":" : "#");
         }
         @data = ();
         $last_frame = $framenum;
         $start = $time;
-        $ok = ($data == 0xa0 || ($showchan && $data == 0x80)); #include channel change
-    } elsif($ok) {
+        if ($data == 0xa0 || ($showchan && $data == 0x80)) {
+            $ok = 1;
+        } elsif($telem && $data == 0x21) {
+            $ok = 2;
+            #push @data, sprintf("%02x", $data);
+        } else {
+            $ok = 0;
+        }
+    } elsif($ok == 1) {
         push @data, sprintf("%02x", $data);
+    } elsif($ok == 2) {
+        push @data, sprintf("%02x", $din);
     }
 }

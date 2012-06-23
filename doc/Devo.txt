@@ -1,10 +1,15 @@
 A 16 byte data packet is sent every 2.4msec
-1.2msec after transmit, register 0x04 is checked to verify transmit status and ACK from Rx
+If telemetry is disabled, register 0x04 is checked 1.2msec after transmit to verify transmit status and ACK from Rx
+If telemetry is enabled, register 0x04 is polled starting 0.9msec after transmit to verify transmission complete.
+    Polling is repeated every ~11 usec.
+
 
 The 1st byte of the data packet is one of:
 0x85 - This appears to be used to transmit model data between transmitters
 0x87 - Sent every 10 packets
-       I do not know what the data is, however, I've only ever seen bytes 1-9 to be 0
+       This packet contains the fail-safe info for the 1st 8 data-channels
+       bytes 1-8 represent a signed 8-bit value -125 to 125 for each of the 1st 8 channels
+       byte 9 is a bit-field indicating for which channels failsafe is enabled
        Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
 0x8a - 
        Only sent for the 1st 10sec or so.
@@ -32,16 +37,74 @@ The transmit channel is changed every 4 packets.  It appears to cycle between 3 
        0x04, 0x08, 0x0c, 0x04, 0x08, 0x0c, ...
 
 Packet 0x8b
-0x8b:  aaaa bbbb cccc dddd ff gg hh ii jjjjjj
+0x8b:  aaaa bbbb cccc dddd ee ff gg hh iiiiii
     aaaa: Elevator 9.7 is set when stick is below center
     bbbb: Aileron  9.6 is set when stick is right of center
     cccc: Throttle 9.5 is set when stick is below center
     dddd: Rudder   9.4 is set when stick is right of center
-    ff: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
+    ee: The upper nibble of byte 9 corresponds to whether the current stick value is positive or negative
         The lower nibble is '0x0b' on the Devo8 and '0x09' on the Devo6. Perhaps it is num_channels + 3?
-    gg: The upper nibble is one of '0x00', '0x80', '0xc0'
+    ff: The upper nibble is one of '0x00', '0x80', '0xc0'
         The lower nibble is the number of packets that will be transmitted (after this one) before the next
         transmitter channel is selected
-    hh: The next transmitter channel that will be selected
-    ii: The transmitter channel that will be selected afterthe next one (2 away)
-    jjjjjj: Thye Fixed ID value (LSB 1st, 24bit value)
+    gg: The next transmitter channel that will be selected
+    hh: The transmitter channel that will be selected afterthe next one (2 away)
+    iiiiii: The Fixed ID value (LSB 1st, 24bit value)
+
+Packet 0x87
+0x87:  aa bb cc dd ee ff gg hh ii jj kk ll mmmmmm
+    aa: Elevator -100 to 100
+    bb: Aileron  -100 to 100
+    cc: Throttle -100 to 100
+    dd: Rudder   -100 to 100
+    ee: Ch 5     -100 to 100
+    ff: Ch 6     -100 to 100
+    gg: Ch 7     -100 to 100
+    hh: Ch 8     -100 to 100
+    ii: Failsafe on/off bit.  MSB=ele, LSB = Ch8
+    j, k, l, m match f, g, h, i from 0x8b above
+
+Telemetry
+    23usec after the Tx packet is ACKed, a telemetry query starts
+    It consists of configuring the GPIO for Rx
+    60usec after GPIOs are configured, the IRQ_RX_STATUS_ADDR (0x07) is polled for incoming data
+    Polling continues until it is time to send the next data packet at which pointthe GPIO is reconfigured for Tx
+
+    If Register 0x07 sets bit 5 (RXB16) indicating a 16byte packet has been received, the ipacket is fetched.  Next the
+    RX_ATATUS_ADDR is checked for completion, and the CYRF state is reset for receieve by sending 0x87 to Register 05
+
+    The telemetry packet is as follows:
+    
+    Telemetry data is transmitted as 2 16 byte packets
+    Packets are sent every 2.4msec.  They are processed between data packets (apparently after the ACK is checked)
+
+    The 1st byte of the packet is either 0x30 or 0x31
+    All bytes exceptfor the 1st are scrambled with the Transmiter MfgId as per the Tx packets
+    Like the Tx packets, each telemetry packet appears to conatain 4 16bit LCB-1st channels
+
+Given the the only available telemetry module at the moment is the ladybird, which only reports voltage,
+most of the telemetry data is still unknown
+Packet 0x30
+  30   0000 2800 0000 0000 00 00 f4 01 284209
+0x30:  aaaa bbbb cccc ???? ?? ?? gg ?? iiiiii
+    aaaa: Voltage1 measured in 1/10 of a volt (3.5v will be 35 or 0x0028) (guess)
+    bbbb: Voltage2 measured in 1/10 of a volt (output of ladybird confirmed)
+    aaaa: Voltage3 measured in 1/10 of a volt (3.5v will be 35 or 0x0028) (guess)
+      gg: LSB represents which channels are active  Value=4 indicates Voltage2 (guess)
+    iiiiii: The Fixed ID value as per the 8b/8c packets 
+
+Packet 0x31
+  31   ffff ffff 0000 0000 0000 0000 284209
+0x31:  ???? ???? ???? ???? ???? ???? iiiiii
+
+    The GPIO setting to changefrom Tx to Rx are as follows:
+    Register      Value
+     0x0E          0x20
+     0x0F          0x28
+     0x05          0x87  : Put CYRF6936 into Rx mode
+
+    The GPIO setting to changefrom Rx to Tx are as follows:
+    Register      Value
+     0x0E          0x80
+     0x0F          0x2C
+
