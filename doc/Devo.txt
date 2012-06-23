@@ -11,6 +11,10 @@ The 1st byte of the data packet is one of:
        bytes 1-8 represent a signed 8-bit value -125 to 125 for each of the 1st 8 channels
        byte 9 is a bit-field indicating for which channels failsafe is enabled
        Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
+0x88 - 
+       This packet is never sent for <=8 channel transmitters
+       For 10ch and 12ch transmitters it is sent (as 0xa8 or 0xc8) alternating with 0x87 to provide failsafe info
+       for the upper 8 channels
 0x8a - 
        Only sent for the 1st 10sec or so.
        bytes 1 and 2  are a LSB-first word indicating the number of packets left before we stop sending 0x8a packets
