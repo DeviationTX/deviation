@@ -3,8 +3,16 @@ If telemetry is disabled, register 0x04 is checked 1.2msec after transmit to ver
 If telemetry is enabled, register 0x04 is polled starting 0.9msec after transmit to verify transmission complete.
     Polling is repeated every ~11 usec.
 
+The 1st byte of the data packet indicates the packet type.
+The upper nibble indicates the number of channels:
+2402  : 0x60 (Note that this is a 4 channel receiver, so it is 'weird'.  Also, it does not send 0x67 or 0x6c packets)
+Devo6 : 0x60
+Devo7 : 0x70
+Devo8 : 0x80
+Devo10: 0xa0
+Devo12: 0xc0
 
-The 1st byte of the data packet is one of:
+The packet types are as follows:
 0x85 - This appears to be used to transmit model data between transmitters
 0x87 - Sent every 10 packets
        This packet contains the fail-safe info for the 1st 8 data-channels
