@@ -1,6 +1,14 @@
 #ifndef _MIXER_H_
 #define _MIXER_H_
 
+//MAX = 10000
+//MIN = -10000
+#define CHAN_MULTIPLIER 100
+#define PCT_TO_RANGE(x) ((s16)x * CHAN_MULTIPLIER)
+#define RANGE_TO_PCT(x) ((s16)x / CHAN_MULTIPLIER)
+#define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
+#define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
+
 enum CurveType {
     CURVE_NONE,
     CURVE_MIN_MAX,

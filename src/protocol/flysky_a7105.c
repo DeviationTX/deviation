@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "interface.h"
+#include "mixer.h"
 
 #ifdef PROTO_HAS_A7105
 const u8 A7105_regs[] = {

@@ -95,16 +95,12 @@ void event_loop(void *param)
             last_buttons = buttons;
             MIX_UpdateTrim(buttons);
             if(CHAN_ButtonIsPressed(buttons, 0)) {
-printf("1\n");
                 LCD_CalibrateTouch();
             } else if(CHAN_ButtonIsPressed(buttons, 0)) {
-printf("2\n");
                 USB_Connect();
             }else if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
-printf("3: %d\n", buttons);
                 PAGE_Change(1);
             } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
-printf("4: %d\n", buttons);
                 PAGE_Change(-1);
             }
         }

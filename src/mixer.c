@@ -244,9 +244,6 @@ void TEST_init_mixer()
     Model.Aileron_Stick    = INP_AILERON;
     Model.Collective_Stick = INP_THROTTLE;
 
-    Model.mixers[0].src = 1;
-    Model.mixers[0].dest = 0;
-
     for (i = 0; i < 4; i++) {
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = i;

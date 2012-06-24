@@ -10,23 +10,15 @@
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
 #define NUM_CHANNELS 12
 
-//MAX = 10000
-//MIN = -10000
-#define CHAN_MULTIPLIER 100
-#define PCT_TO_RANGE(x) ((s16)x * CHAN_MULTIPLIER)
-#define RANGE_TO_PCT(x) ((s16)x / CHAN_MULTIPLIER)
-#define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
-#define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
-
 #define NUM_TRIMS 6
 #define MAX_POINTS 13
 #define NUM_MIXERS 16
 
 #define INP_NONE     0
-#define INP_THROTTLE 1
-#define INP_RUDDER   2
-#define INP_ELEVATOR 3
-#define INP_AILERON  4
+#define INP_AILERON  1
+#define INP_ELEVATOR 2
+#define INP_THROTTLE 3
+#define INP_RUDDER   4
 #define INP_RUD_DR   5
 #define INP_ELE_DR   6
 #define INP_AIL_DR   7 
@@ -57,8 +49,6 @@ enum {
     BUT_LEFT,
     BUT_RIGHT,
 };
-
-#define BUT_THRTRIM_POS
 
 #define CHAN_ButtonIsPressed(buttons, btn) (btn && ! ((buttons) & (1 << (btn - 1))))
 #endif //_DEVO8_TARGET_H_

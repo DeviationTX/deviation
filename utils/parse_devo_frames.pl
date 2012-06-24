@@ -26,11 +26,11 @@ while(<>) {
     $din = hex($din);
     if($framenum != $last_frame) {
         if(@data) {
-            if(grep {$data[0] eq $_} ("87", "8b", "8c")) {
+            if($data[0] =~ /^[678ac][78bcd]$/) {
                 for(my $i = 0; $i < 15; $i++) {
                     $data[$i + 1] = sprintf("%02x", hex($data[$i + 1]) ^ $xor[$i % 4]);
                 }
-            } elsif($data[0] eq "8a") {
+            } elsif($data[0] =~ /^[678ac]a$/) {
                 $data[13] = sprintf("%02x", hex($data[13]) ^ $xor[0]);
                 $data[14] = sprintf("%02x", hex($data[14]) ^ $xor[1]);
                 $data[15] = sprintf("%02x", hex($data[15]) ^ $xor[2]);

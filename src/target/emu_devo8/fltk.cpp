@@ -29,6 +29,7 @@
 extern "C" {
 #include "target.h"
 #include "fltk.h"
+#include "mixer.h"
 }
 
 

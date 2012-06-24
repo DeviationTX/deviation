@@ -14,15 +14,26 @@
 */
 #include <libopencm3/stm32/f1/gpio.h>
 #include "target.h"
+#include "mixer.h"
 #include "devo8.h"
 
 const char *tx_input_str[NUM_TX_INPUTS] = {
     "THR",
     "RUD",
     "ELE",
-    "AIL"
+    "AIL",
+    "RUD_D/R",
+    "ELE_D/R",
+    "AIL D/R",
+    "GEAR",
+    "MIX0",
+    "MIX1",
+    "MIX2",
+    "FMODE0",
+    "FMODE1",
+    "FMODE2",
 };
-    
+
 void CHAN_Init()
 {
     ADC_Init();

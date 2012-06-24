@@ -31,12 +31,12 @@ void PAGE_MainInit(int page)
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
-    mp->trimObj[0] = GUI_CreateBarGraph(10, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[0]);
-    mp->trimObj[1] = GUI_CreateBarGraph(30, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[1]);
-    mp->trimObj[2] = GUI_CreateBarGraph(300, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
-    mp->trimObj[3] = GUI_CreateBarGraph(165, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
+    mp->trimObj[0] = GUI_CreateBarGraph(10, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
+    mp->trimObj[1] = GUI_CreateBarGraph(30, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
+    mp->trimObj[2] = GUI_CreateBarGraph(300, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
+    mp->trimObj[3] = GUI_CreateBarGraph(165, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[0]);
     LCD_SetFont(9);
-    mp->throttleObj = GUI_CreateLabel(50, 120, show_throttle_cb, 0x0000, &Channels[0]);
+    mp->throttleObj = GUI_CreateLabel(50, 120, show_throttle_cb, 0x0000, &Channels[INP_THROTTLE - 1]);
     LCD_SetFont(6);
     GUI_DrawScreen();
 }
@@ -51,8 +51,8 @@ void PAGE_MainEvent()
         }
     }
     
-    if(mp->throttle != Channels[0]) {
-        mp->throttle = Channels[0];
+    if(mp->throttle != Channels[INP_THROTTLE - 1]) {
+        mp->throttle = Channels[INP_THROTTLE - 1];
         GUI_Redraw(mp->throttleObj);
     }
 }

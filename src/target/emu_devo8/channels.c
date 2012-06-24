@@ -14,6 +14,7 @@
 */
 #include "target.h"
 #include "fltk.h"
+#include "mixer.h"
 
 const char *tx_input_str[NUM_TX_INPUTS] = {
     "THR",

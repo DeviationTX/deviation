@@ -18,6 +18,33 @@
 
 static const u16 columns[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};
+static const u8 buttonmap[] = {
+    BUT_LEFT,        BUT_RIGHT,       BUT_ENTER,       BUT_AILTRIM_POS, BUT_AILTRIM_NEG,
+    BUT_DOWN,        BUT_UP,          BUT_EXIT,        BUT_RUDTRIM_NEG, BUT_RUDTRIM_POS,
+    BUT_NOCON_1,     BUT_RGTTRIM_NEG, BUT_RGTTRIM_POS, BUT_LFTTRIM_POS, BUT_LFTTRIM_NEG,
+    BUT_ELETRIM_NEG, BUT_THRTRIM_POS, BUT_ELETRIM_POS, BUT_NOCON_2,     BUT_THRTRIM_NEG,
+    };
+    
+const char *tx_button_str[] = {
+    "AIL-",
+    "AIL+",
+    "ELE-",
+    "ELE+",
+    "THR-",
+    "THR+",
+    "RUD-",
+    "RUD+",
+    "LEFT-",
+    "LEFT+",
+    "RIGHT-",
+    "RIGHT+",
+    "Left",
+    "Right",
+    "Down",
+    "Up",
+    "Enter"
+    "Exit",
+};
 #define COL_PORT GPIOB
 #define COL_PORT_MASK (GPIO6 | GPIO7 | GPIO8 | GPIO9)
 #define ROW_PORT GPIOE
@@ -60,7 +87,7 @@ u32 ScanButtons()
         gpio_set(COL_PORT, *c);
         for(r = rows; *r != 0xffff; r++) {
             if(but & *r) {
-                result |= (1 << idx);
+                result |= 1 << (buttonmap[idx] - 1);
             }
             idx++;
         }

@@ -382,8 +382,8 @@ void GUI_DrawObject(struct guiObject *obj)
     }
     case Dialog: {
         struct guiDialog *dialog = (struct guiDialog *)obj->widget;
-        printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
-                box->y, box->width, box->height);
+        //printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
+        //        box->y, box->width, box->height);
         LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file,
                 box->width, box->height, box->image.x_off, box->image.y_off);
         LCD_SetFontColor(dialog->titleColor);
