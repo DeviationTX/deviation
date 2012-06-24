@@ -61,6 +61,7 @@ void USB_HandleISR()
     USB_Istr();
 }
 
+/*
 void USB_Connect()
 {
     //Wait for button release
@@ -74,6 +75,7 @@ void USB_Connect()
         ;
     USB_Disable(1);
 }
+*/
 
 #ifdef USB_TEST
 int main(void)

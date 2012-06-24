@@ -33,7 +33,7 @@ extern "C" {
 }
 
 
-u8 keymap[] = { 'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0};
+u16 keymap[] = { 'F', 'R', 'D', 'E', 'A', 'Q', 'S', 'W', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, FL_Enter, FL_Escape, 0 };
 
 static struct {
     s32 xscale;
@@ -325,6 +325,8 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 
 u32 ScanButtons()
 {
+    //Force rescan
+    Fl::check();
     return ~gui.buttons;
 }
 

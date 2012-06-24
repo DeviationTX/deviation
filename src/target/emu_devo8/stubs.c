@@ -19,8 +19,8 @@
 #include "target.h"
 
 
-void USB_Connect() {}
-
+void USB_Enable(u8 use_interrupt) {(void)use_interrupt;}
+void USB_Disable() {}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
@@ -55,7 +55,7 @@ void CYRF_GetMfgData(u8 data[]) {
 }
 void SignOn() {}
 
-void FS_Mount() {}
+int FS_Mount() {return 1;}
 
 void CYRF_ConfigRxTx(u32 TxRx) {(void)TxRx;}
 void CYRF_ConfigRFChannel(u8 ch) {(void)ch;}

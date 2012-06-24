@@ -133,13 +133,13 @@ void SOUND_Disable();
 void UART_Initialize();
 
 /* USB*/
-void USB_Enable(u8 use_iinterrupt);
+void USB_Enable(u8 use_interrupt);
 void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
 
 /* Filesystem */
-void FS_Mount();
+int FS_Mount();
 void FS_Unmount();
 
 /* Mixer functions */

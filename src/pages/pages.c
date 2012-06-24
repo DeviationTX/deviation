@@ -32,6 +32,7 @@ static const struct page pages[] = {
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestCanChange},
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerCanChange},
     {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},
+    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBCanChange},
 };
 
 static u8 page;

@@ -5,7 +5,7 @@
 #define PROTO_HAS_A7105
 #define PROTO_HAS_DEVO
 
-#define NUM_TX_BUTTONS 14
+#define NUM_TX_BUTTONS 18
 #define NUM_TX_INPUTS 14 
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
 #define NUM_CHANNELS 12
@@ -34,20 +34,24 @@
 
 enum {
     BUT_NONE = 0,
+    BUT_AILTRIM_NEG,
+    BUT_AILTRIM_POS,
+    BUT_ELETRIM_NEG,
+    BUT_ELETRIM_POS,
     BUT_THRTRIM_NEG,
     BUT_THRTRIM_POS,
     BUT_RUDTRIM_NEG,
     BUT_RUDTRIM_POS,
-    BUT_ELETRIM_NEG,
-    BUT_ELETRIM_POS,
-    BUT_AILTRIM_NEG,
-    BUT_AILTRIM_POS,
     BUT_LFTTRIM_NEG,
     BUT_LFTTRIM_POS,
     BUT_RGTTRIM_NEG,
     BUT_RGTTRIM_POS,
     BUT_LEFT,
     BUT_RIGHT,
+    BUT_DOWN,
+    BUT_UP,
+    BUT_ENTER,
+    BUT_EXIT,
 };
 
 #define CHAN_ButtonIsPressed(buttons, btn) (btn && ! ((buttons) & (1 << (btn - 1))))

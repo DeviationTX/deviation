@@ -45,4 +45,8 @@ void PAGE_ScannerInit(int page);
 void PAGE_ScannerEvent();
 int PAGE_ScannerCanChange();
 
+/* USB */
+void PAGE_USBInit(int page);
+void PAGE_USBEvent();
+int PAGE_USBCanChange();
 #endif

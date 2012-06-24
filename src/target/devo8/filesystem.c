@@ -20,10 +20,11 @@ static FATFS fat;
 
 #define DBGFS if(0) printf
 
-void FS_Mount()
+int FS_Mount()
 {
     int res = pf_mount(&fat);
     DBGFS("Mount: %d\n", res);
+    return (res == FR_OK);
 }
 
 void FS_Unmount()

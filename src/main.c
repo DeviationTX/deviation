@@ -38,12 +38,15 @@ int main() {
     UART_Initialize();
     SPITouch_Init();
     SOUND_Init();
-    FS_Mount();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
     LCD_Clear(0x0000);
     LCD_SetFont(6);
     LCD_SetFontColor(0xffff);
+    if(! FS_Mount()) {
+        LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
+        USB_Connect();
+    }
 
 #if 0
     printf("Showing display\n");
@@ -94,11 +97,7 @@ void event_loop(void *param)
             printf("Buttons: %s\n",buttonstring);
             last_buttons = buttons;
             MIX_UpdateTrim(buttons);
-            if(CHAN_ButtonIsPressed(buttons, 0)) {
-                LCD_CalibrateTouch();
-            } else if(CHAN_ButtonIsPressed(buttons, 0)) {
-                USB_Connect();
-            }else if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
+            if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
                 PAGE_Change(1);
             } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
                 PAGE_Change(-1);
