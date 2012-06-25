@@ -5,7 +5,7 @@ If telemetry is enabled, register 0x04 is polled starting 0.9msec after transmit
 
 The 1st byte of the data packet indicates the packet type.
 The upper nibble indicates the number of channels:
-2402  : 0x60 (Note that this is a 4 channel receiver, so it is 'weird'.  Also, it does not send 0x67 or 0x6c packets)
+2402  : 0x60 (Note that this is a 4 channel transmitter, so it is 'weird'.  Also, it does not send 0x67 or 0x6c packets)
 Devo6 : 0x60
 Devo7 : 0x70
 Devo8 : 0x80
@@ -65,14 +65,14 @@ Packet 0x8b
 
 Packet 0x87
 0x87:  aa bb cc dd ee ff gg hh ii jj kk ll mmmmmm
-    aa: Elevator -100 to 100
-    bb: Aileron  -100 to 100
-    cc: Throttle -100 to 100
-    dd: Rudder   -100 to 100
-    ee: Ch 5     -100 to 100
-    ff: Ch 6     -100 to 100
-    gg: Ch 7     -100 to 100
-    hh: Ch 8     -100 to 100
+    aa: Elevator -125 to 125
+    bb: Aileron  -125 to 125
+    cc: Throttle -125 to 125
+    dd: Rudder   -125 to 125
+    ee: Ch 5     -125 to 125
+    ff: Ch 6     -125 to 125
+    gg: Ch 7     -125 to 125
+    hh: Ch 8     -125 to 125
     ii: Failsafe on/off bit.  MSB=ele, LSB = Ch8
     j, k, l, m match f, g, h, i from 0x8b above
 
