@@ -26,7 +26,7 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-#define SECTOR_OFFSET 36
+#define SECTOR_OFFSET 54
 uint32_t Mass_Memory_Size[2] = {0x1000 * (1024 - SECTOR_OFFSET), 0};
 uint32_t Mass_Block_Size[2] = {4096, 0};
 uint32_t Mass_Block_Count[2] = {1024 - SECTOR_OFFSET, 0};
