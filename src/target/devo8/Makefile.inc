@@ -5,7 +5,7 @@ SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/$(TARGET)/msc2/*.c
 SCREENSIZE = qvga
 LINKFILE = target/$(TARGET)/$(TARGET).ld
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Itarget/$(TARGET)/msc2/lib -Itarget/$(TARGET)/msc2
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Itarget/$(TARGET)/msc2/lib -Itarget/$(TARGET)/msc2 -fno-builtin-printf 
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-T$(LINKFILE) -Wl,-Map=$(TARGET).map,--cref -lopencm3_stm32f1 -lc -lnosys
 
 all = $(TARGET).dfu
