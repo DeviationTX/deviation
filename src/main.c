@@ -23,7 +23,6 @@ void dump_bootloader();
 extern void start_event_loop();
 extern void TEST_init_mixer();
 
-
 int main() {
     PWR_Init();
     CLOCK_Init();
@@ -40,6 +39,7 @@ int main() {
     SOUND_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
+
     LCD_Clear(0x0000);
     LCD_SetFont(6);
     LCD_SetFontColor(0xffff);
@@ -50,7 +50,7 @@ int main() {
 
 #if 0
     printf("Showing display\n");
-    LCD_PrintStringXY(10, 10, "Hello");
+    LCD_PrintStringXY(10, 20, "Hello");
     while(1) {
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
