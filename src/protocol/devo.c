@@ -68,7 +68,7 @@ void add_pkt_suffix()
 
 void build_unk_pkt()
 {
-    packet[0] = num_channels | 0x07;
+    packet[0] = (num_channels << 4) | 0x07;
     memset(packet + 1, 0, 8);
     packet[9] = 0;
     add_pkt_suffix();
@@ -76,7 +76,7 @@ void build_unk_pkt()
 
 void build_bind_pkt()
 {
-    packet[0] = num_channels | 0x0a;
+    packet[0] = (num_channels << 4) | 0x0a;
     packet[1] = bind_counter & 0xff;
     packet[2] = (bind_counter >> 8);
     packet[3] = radio_ch[0];
@@ -97,20 +97,20 @@ void build_bind_pkt()
 void build_data_pkt()
 {
     u8 i;
-    packet[0] = num_channels | (0x0b + ch_idx);
-    u8 sign = num_channels + 3;
+    packet[0] = (num_channels << 4) | (0x0b + ch_idx);
+    u8 sign = 0x0b;
     for (i = 0; i < 4; i++) {
         s32 value = (s32)Channels[ch_idx * 4 + i] * 0x640 / CHAN_MAX_VALUE;
         if(value < 0) {
             value = -value;
             sign |= 1 << (7 - i);
         }
-        packet[2 * i] = value & 0xff;
-        packet[2 * i + 1] = (value >> 8) & 0xff;
+        packet[2 * i + 1] = value & 0xff;
+        packet[2 * i + 2] = (value >> 8) & 0xff;
     }
     packet[9] = sign;
     ch_idx = ch_idx + 1;
-    if (ch_idx * 4 > num_channels)
+    if (ch_idx * 4 >= num_channels)
         ch_idx = 0;
     add_pkt_suffix();
 }
@@ -118,30 +118,12 @@ void build_data_pkt()
 void set_radio_channels()
 {
     //FIXME: Query free channels
-    radio_ch[0] = 0x04;
-    radio_ch[1] = 0x08;
-    radio_ch[2] = 0x0c;
+    radio_ch[0] = 0x08;
+    radio_ch[1] = 0x0c;
+    radio_ch[2] = 0x04;
     //Makes code a little easier to duplicate these here
     radio_ch[3] = radio_ch[0];
     radio_ch[4] = radio_ch[1];
-}
-
-void DEVO_Initialize() {
-    set_radio_channels();
-    radio_ch_ptr = radio_ch;
-    //FIXME: Read cyrfmfg_id here
-    //FIXME: Properly setnumber of channels;
-    num_channels = 8;
-    pkt_num = 0;
-    ch_idx = 0;
-
-    if(! use_fixedid) {
-        bind_counter = 0x1388;
-        state = DEVO_BIND;
-    } else {
-        state = DEVO_BOUND_1;
-        bind_counter = 0;
-    }
 }
 
 void DEVO_BuildPacket()
@@ -155,6 +137,7 @@ void DEVO_BuildPacket()
         case DEVO_BIND_SENDCH:
             bind_counter--;
             build_data_pkt();
+            //scramble_pkt();
             state = (bind_counter <= 0) ? DEVO_BOUND_1 : DEVO_BIND;
             break;
         case DEVO_BOUND_1:
@@ -176,5 +159,41 @@ void DEVO_BuildPacket()
             state = DEVO_BOUND_1;
             break;
     }
+    pkt_num++;
+    if(pkt_num == PKTS_PER_CHANNEL)
+        pkt_num = 0;
 }
+
+void devo_cb()
+{
+    int i;
+    DEVO_BuildPacket();
+    for(i = 0; i < 16; i++) {
+        printf("%02x ", packet[i]);
+    }
+    printf("\n");
+}
+
+void DEVO_Initialize()
+{
+    set_radio_channels();
+    radio_ch_ptr = radio_ch;
+    CYRF_GetMfgData(cyrfmfg_id);
+    //FIXME: Read cyrfmfg_id here
+    //FIXME: Properly setnumber of channels;
+    num_channels = 8;
+    pkt_num = 0;
+    ch_idx = 0;
+    fixed_id = 0x094228;
+
+    if(! use_fixedid) {
+        bind_counter = 0x1388;
+        state = DEVO_BIND;
+    } else {
+        state = DEVO_BOUND_1;
+        bind_counter = 0;
+    }
+    CLOCK_StartTimer(2400, devo_cb);
+}
+
 #endif

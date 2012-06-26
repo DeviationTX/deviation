@@ -25,10 +25,7 @@ void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
 void CHAN_Init() {}
-
 void SOUND_Init() {}
-void CLOCK_Init() {}
-
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
@@ -50,7 +47,7 @@ u8 *BOOTLOADER_Read(int idx) {
 void UART_Initialize() {}
 void CYRF_Initialize() {}
 void CYRF_GetMfgData(u8 data[]) { 
-    u8 d[] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    u8 d[] = { 0xf8, 0xa4, 0x79, 0x00, 0x00, 0x00};
     memcpy(data, d, 6);
 }
 void SignOn() {}

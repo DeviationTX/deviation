@@ -263,6 +263,7 @@ void TEST_init_mixer()
             Model.template[i] = MIXERTEMPLATE_NONE;
         }
     }
+    PROTOCOL_Init(PROTOCOL_DEVO);
 }
 
 

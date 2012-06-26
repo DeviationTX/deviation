@@ -17,8 +17,14 @@
 #include "target.h"
 
 #include <libopencm3/stm32/systick.h>
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/nvic.h>
+
 
 u32 msecs;
+void (*timer_callback)(void);
 
 void CLOCK_Init()
 {
@@ -33,6 +39,68 @@ void CLOCK_Init()
     msecs = 0;
     /* Start counting. */
     systick_counter_enable();
+
+    /* Setup timer for Transmitter */
+    timer_callback = NULL;
+    /* Enable TIM2 clock. */
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM4EN);
+
+    /* Enable TIM2 interrupt. */
+    nvic_enable_irq(NVIC_TIM4_IRQ);
+    nvic_set_priority(NVIC_TIM4_IRQ, 1);
+
+    timer_disable_counter(TIM4);
+    /* Reset TIM2 peripheral. */
+    timer_reset(TIM4);
+
+    /* Timer global mode:
+     * - No divider
+     * - Alignment edge
+     * - Direction up
+     */
+    timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT,
+                   TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+
+    /* timer updates each microsecond */
+    timer_set_prescaler(TIM4, 72);
+
+    /* Enable preload. */
+    timer_disable_preload(TIM4);
+
+    /* Continous mode. */
+    timer_continuous_mode(TIM4);
+
+    /* Disable outputs. */
+    timer_disable_oc_output(TIM4, TIM_OC1);
+    timer_disable_oc_output(TIM4, TIM_OC2);
+    timer_disable_oc_output(TIM4, TIM_OC3);
+    timer_disable_oc_output(TIM4, TIM_OC4);
+
+    /* Enable commutation interrupt. */
+    timer_enable_irq(TIM4, TIM_DIER_UIE);
+
+
+}
+
+void CLOCK_StartTimer(u16 us, void (*cb)(void))
+{
+    /* Counter enable. */
+    timer_disable_counter(TIM4);
+    timer_set_period(TIM4, us);
+    timer_callback = cb;
+    timer_enable_counter(TIM4);
+}
+
+void CLOCK_StopTimer() {
+    timer_disable_counter(TIM4);
+}
+
+void tim4_isr()
+{
+    timer_clear_flag(TIM4, TIM_SR_UIF);
+    if(timer_callback) {
+        timer_callback();
+    }
 }
 
 u32 CLOCK_getms()

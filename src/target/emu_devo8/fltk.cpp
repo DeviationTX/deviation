@@ -17,6 +17,9 @@
 #include <string.h>
 #include <sys/timeb.h>
 #include <time.h>
+#include <signal.h>
+#include <unistd.h>
+
 
 #include <FL/Fl.H>
 #include <FL/x.H>
@@ -44,6 +47,8 @@ static struct {
 
 static Fl_Window *main_window;
 static Fl_Box    *image;
+static u8 alarmtime;
+static void (*timer_callback)(void);
 void update_channels(void *);
 
 #define WINDOW Fl_Window
@@ -356,6 +361,35 @@ u32 CLOCK_getms()
   
     ftime(&tp);
     return (tp.time * 1000) + tp.millitm;
+}
+void ALARMhandler(int sig)
+{
+    (void)sig;
+    signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
+    if(timer_callback)
+        timer_callback();
+    signal(SIGALRM, ALARMhandler);     /* reinstall the handler    */
+    alarm(alarmtime);
+}
+
+void CLOCK_StartTimer(u16 us, void (*cb)(void))
+{
+    alarmtime = us > 1000 ? us /= 1000 : 1;
+    timer_callback = cb;
+    signal(SIGALRM, ALARMhandler);
+    alarm(alarmtime);
+}
+
+void CLOCK_StopTimer()
+{
+    signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
+    alarm(0);
+}
+
+void CLOCK_Init()
+{
+    alarmtime = 0;
+    timer_callback = NULL;
 }
 }
 

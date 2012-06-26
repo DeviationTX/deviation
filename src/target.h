@@ -98,6 +98,9 @@ void PWR_Shutdown();
 /* Clock functions */
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
+void CLOCK_StartTimer(u16 us, void (*cb)(void));
+void CLOCK_StopTimer();
+
 /* Sticks */
 void CHAN_Init();
 s16  CHAN_ReadInput(int channel);
@@ -150,6 +153,14 @@ void MIX_UpdateTrim(u32 buttons);
 void PAGE_Init();
 void PAGE_Change(int dir);
 void PAGE_Event();
+
+/* Protocol */
+enum Protocols {
+    PROTOCOL_FLYSKY,
+    PROTOCOL_DEVO,
+};
+void PROTOCOL_Init(enum Protocols p);
+void PROTOCOL_DeInit();
 
 /* Abstract bootloader access */
 enum {
