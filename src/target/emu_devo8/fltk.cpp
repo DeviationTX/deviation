@@ -17,8 +17,10 @@
 #include <string.h>
 #include <sys/timeb.h>
 #include <time.h>
+#ifndef WIN32
 #include <signal.h>
 #include <unistd.h>
+#endif
 
 
 #include <FL/Fl.H>
@@ -49,6 +51,9 @@ static Fl_Window *main_window;
 static Fl_Box    *image;
 static u8 alarmtime;
 static void (*timer_callback)(void);
+#ifdef WIN32
+static u32 lastalarm;
+#endif
 void update_channels(void *);
 
 #define WINDOW Fl_Window
@@ -355,13 +360,7 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
     calibration.yoffset = yoff;
 }
 
-u32 CLOCK_getms()
-{
-    struct timeb tp;
-  
-    ftime(&tp);
-    return (tp.time * 1000) + tp.millitm;
-}
+#ifndef WIN32
 void ALARMhandler(int sig)
 {
     (void)sig;
@@ -385,11 +384,39 @@ void CLOCK_StopTimer()
     signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
     alarm(0);
 }
+#else
+void CLOCK_StartTimer(u16 us, void (*cb)(void))
+{
+    struct timeb tp;
+    ftime(&tp);
+    lastalarm = (tp.time * 1000) + tp.millitm;
+    alarmtime = us;
+    timer_callback = cb;
+}
 
+void CLOCK_StopTimer()
+{
+    timer_callback = NULL;
+}
+#endif
 void CLOCK_Init()
 {
     alarmtime = 0;
     timer_callback = NULL;
 }
-}
 
+u32 CLOCK_getms()
+{
+    struct timeb tp;
+    u32 t;
+    ftime(&tp);
+    t = (tp.time * 1000) + tp.millitm;
+#ifdef WIN32
+    if (timer_callback && t - lastalarm > alarmtime) {
+        lastalarm = t;
+        timer_callback();
+    }
+#endif        
+    return t;
+}
+}
