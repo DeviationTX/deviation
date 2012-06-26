@@ -49,7 +49,7 @@ static struct {
 
 static Fl_Window *main_window;
 static Fl_Box    *image;
-static u8 alarmtime;
+static u16 alarmtime;
 static void (*timer_callback)(void);
 #ifdef WIN32
 static u32 lastalarm;
@@ -412,7 +412,7 @@ u32 CLOCK_getms()
     ftime(&tp);
     t = (tp.time * 1000) + tp.millitm;
 #ifdef WIN32
-    if (timer_callback && t - lastalarm > alarmtime) {
+    if (timer_callback && (t - lastalarm > alarmtime)) {
         lastalarm = t;
         timer_callback();
     }
