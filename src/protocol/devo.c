@@ -138,7 +138,7 @@ void DEVO_BuildPacket()
         case DEVO_BIND_SENDCH:
             bind_counter--;
             build_data_pkt();
-            //scramble_pkt();
+            scramble_pkt();
             state = (bind_counter <= 0) ? DEVO_BOUND_1 : DEVO_BIND;
             break;
         case DEVO_BOUND_1:
