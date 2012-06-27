@@ -98,7 +98,7 @@ void PWR_Shutdown();
 /* Clock functions */
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
-void CLOCK_StartTimer(u16 us, void (*cb)(void));
+void CLOCK_StartTimer(u16 us, u16 (*cb)(void));
 void CLOCK_StopTimer();
 
 /* Sticks */

@@ -24,7 +24,7 @@
 
 
 u32 msecs;
-void (*timer_callback)(void);
+u16 (*timer_callback)(void);
 
 void CLOCK_Init()
 {
@@ -42,7 +42,7 @@ void CLOCK_Init()
 
     /* Setup timer for Transmitter */
     timer_callback = NULL;
-    /* Enable TIM2 clock. */
+    /* Enable TIM4 clock. */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM4EN);
 
     /* Enable TIM2 interrupt. */
@@ -50,7 +50,7 @@ void CLOCK_Init()
     nvic_set_priority(NVIC_TIM4_IRQ, 1);
 
     timer_disable_counter(TIM4);
-    /* Reset TIM2 peripheral. */
+    /* Reset TIM4 peripheral. */
     timer_reset(TIM4);
 
     /* Timer global mode:
@@ -63,8 +63,9 @@ void CLOCK_Init()
 
     /* timer updates each microsecond */
     timer_set_prescaler(TIM4, 72);
+    timer_set_period(TIM4, 65535);
 
-    /* Enable preload. */
+    /* Disable preload. */
     timer_disable_preload(TIM4);
 
     /* Continous mode. */
@@ -76,31 +77,45 @@ void CLOCK_Init()
     timer_disable_oc_output(TIM4, TIM_OC3);
     timer_disable_oc_output(TIM4, TIM_OC4);
 
-    /* Enable commutation interrupt. */
-    timer_enable_irq(TIM4, TIM_DIER_UIE);
+    /* Enable CCP1 */
+    timer_disable_oc_clear(TIM4, TIM_OC1);
+    timer_disable_oc_preload(TIM4, TIM_OC1);
+    timer_set_oc_slow_mode(TIM4, TIM_OC1);
+    timer_set_oc_mode(TIM4, TIM_OC1, TIM_OCM_FROZEN);
 
+    /* Disable CCP1 interrupt. */
+    timer_disable_irq(TIM4, TIM_DIER_CC1IE);
 
-}
-
-void CLOCK_StartTimer(u16 us, void (*cb)(void))
-{
-    /* Counter enable. */
-    timer_disable_counter(TIM4);
-    timer_set_period(TIM4, us);
-    timer_callback = cb;
     timer_enable_counter(TIM4);
 }
 
+void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+{
+    timer_callback = cb;
+    /* Counter enable. */
+    u16 t = timer_get_counter(TIM4);
+    /* Set the capture compare value for OC1. */
+    timer_set_oc_value(TIM4, TIM_OC1, us + t);
+
+    timer_clear_flag(TIM4, TIM_SR_CC1IF);
+    timer_enable_irq(TIM4, TIM_DIER_CC1IE);
+}
+
 void CLOCK_StopTimer() {
-    timer_disable_counter(TIM4);
+    timer_disable_irq(TIM4, TIM_DIER_CC1IE);
 }
 
 void tim4_isr()
 {
-    timer_clear_flag(TIM4, TIM_SR_UIF);
     if(timer_callback) {
-        timer_callback();
+        u16 us = timer_callback();
+        timer_clear_flag(TIM4, TIM_SR_CC1IF);
+        if (us) {
+            timer_set_oc_value(TIM4, TIM_OC1, 10000 + TIM_CCR1(TIM4));
+            return;
+        }
     }
+    CLOCK_StopTimer();
 }
 
 u32 CLOCK_getms()

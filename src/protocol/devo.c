@@ -164,7 +164,7 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 
-void devo_cb()
+u16 devo_cb()
 {
     int i;
     DEVO_BuildPacket();
@@ -172,6 +172,7 @@ void devo_cb()
         printf("%02x ", packet[i]);
     }
     printf("\n");
+    return 2400;
 }
 
 void DEVO_Initialize()

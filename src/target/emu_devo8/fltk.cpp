@@ -49,9 +49,9 @@ static struct {
 
 static Fl_Window *main_window;
 static Fl_Box    *image;
-static u16 alarmtime;
-static void (*timer_callback)(void);
+static u16 (*timer_callback)(void);
 #ifdef WIN32
+static u16 alarmtime;
 static u32 lastalarm;
 #endif
 void update_channels(void *);
@@ -365,15 +365,19 @@ void ALARMhandler(int sig)
 {
     (void)sig;
     signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
-    if(timer_callback)
-        timer_callback();
-    signal(SIGALRM, ALARMhandler);     /* reinstall the handler    */
-    alarm(alarmtime);
+    if(timer_callback) {
+        u16 us = timer_callback();
+        if (us > 0) {
+            u16 alarmtime = us > 1000 ? us /= 1000 : 1;
+            signal(SIGALRM, ALARMhandler);     /* reinstall the handler    */
+            alarm(alarmtime);
+        }
+    }
 }
 
-void CLOCK_StartTimer(u16 us, void (*cb)(void))
+void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
 {
-    alarmtime = us > 1000 ? us /= 1000 : 1;
+    u16 alarmtime = us > 1000 ? us /= 1000 : 1;
     timer_callback = cb;
     signal(SIGALRM, ALARMhandler);
     alarm(alarmtime);
@@ -401,7 +405,6 @@ void CLOCK_StopTimer()
 #endif
 void CLOCK_Init()
 {
-    alarmtime = 0;
     timer_callback = NULL;
 }
 
@@ -412,9 +415,9 @@ u32 CLOCK_getms()
     ftime(&tp);
     t = (tp.time * 1000) + tp.millitm;
 #ifdef WIN32
-    if (timer_callback && (t - lastalarm > alarmtime)) {
+    if (timer_callback && alarmtime && (t - lastalarm > alarmtime)) {
         lastalarm = t;
-        timer_callback();
+        alarmtime = timer_callback();
     }
 #endif        
     return t;
