@@ -125,6 +125,9 @@ void CYRF_StartReceive();
 void CYRF_ConfigSOPCode(u32 idx);
 u8 CYRF_ReadRSSI(u32 dodummyread);
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
+void CYRF_WriteDataPacket(u8 dpbuffer[]); 
+void CYRF_WriteRegister(u8 address, u8 data);
+u8 CYRF_ReadRegister(u8 address);
 
 /* Sound */
 void SOUND_Init();

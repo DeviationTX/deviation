@@ -38,6 +38,7 @@ enum PktState {
 
 static s16 bind_counter;
 static enum PktState state;
+static u8 txState;
 static u8 packet[16];
 static u32 fixed_id;
 static u8 radio_ch[5];
@@ -166,13 +167,20 @@ void DEVO_BuildPacket()
 
 u16 devo_cb()
 {
-    int i;
-    DEVO_BuildPacket();
-    for(i = 0; i < 16; i++) {
-        printf("%02x ", packet[i]);
+    if (txState == 0) {
+        txState = 1;
+        CYRF_WriteDataPacket(packet);
+        DEVO_BuildPacket();
+        return 1200;
     }
-    printf("\n");
-    return 2400;
+    txState = 0;
+    while(! (CYRF_ReadRegister(0x04) & 0x02))
+        ;
+    if(pkt_num == 1) {
+        radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
+        CYRF_WriteRegister(0x00, *radio_ch_ptr);
+    }
+    return 1200;
 }
 
 void DEVO_Initialize()
@@ -185,6 +193,7 @@ void DEVO_Initialize()
     num_channels = 8;
     pkt_num = 0;
     ch_idx = 0;
+    txState = 0;
     fixed_id = 0x094228;
 
     if(! use_fixedid) {
@@ -194,6 +203,7 @@ void DEVO_Initialize()
         state = DEVO_BOUND_1;
         bind_counter = 0;
     }
+    DEVO_BuildPacket();
     CLOCK_StartTimer(2400, devo_cb);
 }
 

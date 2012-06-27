@@ -24,7 +24,7 @@
 
 void Delay(uint32_t);
 
-static void WriteRegister(u8 address, u8 data)
+void CYRF_WriteRegister(u8 address, u8 data)
 {
     CS_LO();
     spi_xfer(SPI2, 0x80 | address);
@@ -45,7 +45,7 @@ static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
     CS_HI();
 }
 
-static void ReadRegister(u8 address, u8 data[], u8 length)
+static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
 {
     unsigned char i;
 
@@ -58,6 +58,16 @@ static void ReadRegister(u8 address, u8 data[], u8 length)
     CS_HI();
 }
 
+u8 CYRF_ReadRegister(u8 address)
+{
+    u8 data;
+
+    CS_LO();
+    spi_xfer(SPI2, address);
+    data = spi_xfer(SPI2, 0);
+    CS_HI();
+    return data;
+}
 
 void CYRF_Initialize()
 {
@@ -96,28 +106,28 @@ void CYRF_Initialize()
     Delay(50);
 
     /* Initialise CYRF chip */
-    WriteRegister(0x1D, 0x39);
-    WriteRegister(0x03, 0x0B);
-    WriteRegister(0x06, 0x4A);
-    WriteRegister(0x0B, 0x00);
-    WriteRegister(0x0D, 0x04);
-    WriteRegister(0x0E, 0x20);
-    WriteRegister(0x10, 0xA4);
-    WriteRegister(0x11, 0x05);
-    WriteRegister(0x12, 0x0E);
-    WriteRegister(0x1B, 0x55);
-    WriteRegister(0x1C, 0x05);
-    WriteRegister(0x32, 0x3C);
-    WriteRegister(0x35, 0x14);
-    WriteRegister(0x39, 0x01);
-    WriteRegister(0x1E, 0x10);
-    WriteRegister(0x1F, 0x00);
-    WriteRegister(0x01, 0x10);
-    WriteRegister(0x0C, 0xC0);
-    WriteRegister(0x0F, 0x10);
-    WriteRegister(0x27, 0x02);
-    WriteRegister(0x28, 0x02);
-    WriteRegister(0x0F, 0x28);
+    CYRF_WriteRegister(0x1D, 0x39);
+    CYRF_WriteRegister(0x03, 0x0B);
+    CYRF_WriteRegister(0x06, 0x4A);
+    CYRF_WriteRegister(0x0B, 0x00);
+    CYRF_WriteRegister(0x0D, 0x04);
+    CYRF_WriteRegister(0x0E, 0x20);
+    CYRF_WriteRegister(0x10, 0xA4);
+    CYRF_WriteRegister(0x11, 0x05);
+    CYRF_WriteRegister(0x12, 0x0E);
+    CYRF_WriteRegister(0x1B, 0x55);
+    CYRF_WriteRegister(0x1C, 0x05);
+    CYRF_WriteRegister(0x32, 0x3C);
+    CYRF_WriteRegister(0x35, 0x14);
+    CYRF_WriteRegister(0x39, 0x01);
+    CYRF_WriteRegister(0x1E, 0x10);
+    CYRF_WriteRegister(0x1F, 0x00);
+    CYRF_WriteRegister(0x01, 0x10);
+    CYRF_WriteRegister(0x0C, 0xC0);
+    CYRF_WriteRegister(0x0F, 0x10);
+    CYRF_WriteRegister(0x27, 0x02);
+    CYRF_WriteRegister(0x28, 0x02);
+    CYRF_WriteRegister(0x0F, 0x28);
 
 }
 /*
@@ -126,12 +136,12 @@ void CYRF_Initialize()
 void CYRF_GetMfgData(u8 data[])
 {
     /* Fuses power on */
-    WriteRegister(0x25, 0xFF);
+    CYRF_WriteRegister(0x25, 0xFF);
 
-    ReadRegister(0x25, data, 6);
+    ReadRegisterMulti(0x25, data, 6);
 
     /* Fuses power off */
-    WriteRegister(0x25, 0x00); 
+    CYRF_WriteRegister(0x25, 0x00); 
 }
 /*
  * 0 - Tx else Rx
@@ -140,13 +150,13 @@ void CYRF_ConfigRxTx(u32 TxRx)
 {
     if(TxRx)
     {
-        WriteRegister(0x0E,0x80);
-        WriteRegister(0x0F,0x2C);
+        CYRF_WriteRegister(0x0E,0x80);
+        CYRF_WriteRegister(0x0F,0x2C);
     }
     else
     {
-        WriteRegister(0x0E,0x20);
-        WriteRegister(0x0F,0x28);
+        CYRF_WriteRegister(0x0E,0x20);
+        CYRF_WriteRegister(0x0F,0x28);
     }
 }
 /*
@@ -154,15 +164,15 @@ void CYRF_ConfigRxTx(u32 TxRx)
  */
 void CYRF_ConfigRFChannel(u8 ch)
 {
-    WriteRegister(0x00,ch);
+    CYRF_WriteRegister(0x00,ch);
 }
 /*
  *
  */
 void CYRF_ConfigCRCSeed(u8 crc)
 {
-    WriteRegister(0x15,crc);
-    WriteRegister(0x16,crc);
+    CYRF_WriteRegister(0x15,crc);
+    CYRF_WriteRegister(0x16,crc);
 }
 /*
  *
@@ -199,26 +209,33 @@ void CYRF_ConfigSOPCode(u32 idx)
  */
 void CYRF_StartReceive()
 {
-    WriteRegister(0x05,0x87);
+    CYRF_WriteRegister(0x05,0x87);
 }
 
 void CYRF_ReadDataPacket(u8 dpbuffer[])
 {
-    ReadRegister(0x21, dpbuffer, 0x10);
+    ReadRegisterMulti(0x21, dpbuffer, 0x10);
+}
+
+void CYRF_WriteDataPacket(u8 dpbuffer[])
+{
+    CYRF_WriteRegister(0x02, 0x40);
+    WriteRegisterMulti(0x20, dpbuffer, 16);
+    CYRF_WriteRegister(0x02, 0xBF);
 }
 
 u8 CYRF_ReadRSSI(u32 dodummyread)
 {
-    u8 result[1];
+    u8 result;
     if(dodummyread)
     {
-        ReadRegister(0x13, result, 1);
+        result = CYRF_ReadRegister(0x13);
     }
-    ReadRegister(0x13, result, 1);
-    if(result[0] & 0x80)
+    result = CYRF_ReadRegister(0x13);
+    if(result & 0x80)
     {
-        ReadRegister(0x13, result, 1);
+        result = CYRF_ReadRegister(0x13);
     }
-    return (result[0] & 0x0F);
+    return (result & 0x0F);
 }
 

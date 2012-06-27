@@ -65,5 +65,21 @@ u8 CYRF_ReadRSSI(u32 dodummyread)
     (void)dodummyread;
     return rand();
 }
-
-
+u8 CYRF_ReadRegister(u8 addr) {
+    if(addr == 0x04) {
+        printf("Transmit successful\n");
+        return 0x9a;
+    };
+    return 0;
+}
+void CYRF_WriteRegister(u8 addr, u8 data) {
+    if(addr == 0x00) {
+        printf("Changed channel to %02x\n", data);
+    }
+}
+void CYRF_WriteDataPacket(u8 data[]) {
+    int i;
+    for(i = 0; i < 16; i++)
+        printf("%02x ", data[i]);
+    printf("\n");
+}
