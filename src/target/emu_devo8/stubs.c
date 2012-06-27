@@ -54,8 +54,6 @@ void SignOn() {}
 
 int FS_Mount() {return 1;}
 
-void CYRF_ConfigRxTx(u32 TxRx) {(void)TxRx;}
-void CYRF_ConfigRFChannel(u8 ch) {(void)ch;}
 void CYRF_ConfigCRCSeed(u8 crc) {(void)crc;}
 void CYRF_StartReceive() {}
 void CYRF_ConfigSOPCode(u32 idx) {(void)idx;}
@@ -72,10 +70,12 @@ u8 CYRF_ReadRegister(u8 addr) {
     };
     return 0;
 }
-void CYRF_WriteRegister(u8 addr, u8 data) {
-    if(addr == 0x00) {
-        printf("Changed channel to %02x\n", data);
-    }
+void CYRF_WriteRegister(u8 addr, u8 data) {(void)addr; (void)data;}
+void CYRF_ConfigRxTx(u32 TxRx) {
+    printf("Switching to %s mode\n", TxRx ? "transmit" : "receive");
+}
+void CYRF_ConfigRFChannel(u8 ch) {
+    printf("Changed channel to %02x\n", ch);
 }
 void CYRF_WriteDataPacket(u8 data[]) {
     int i;

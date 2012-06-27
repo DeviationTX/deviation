@@ -178,7 +178,7 @@ u16 devo_cb()
         ;
     if(pkt_num == 1) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
-        CYRF_WriteRegister(0x00, *radio_ch_ptr);
+        CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
     return 1200;
 }
@@ -188,6 +188,7 @@ void DEVO_Initialize()
     set_radio_channels();
     radio_ch_ptr = radio_ch;
     CYRF_GetMfgData(cyrfmfg_id);
+    CYRF_ConfigRxTx(1);
     //FIXME: Read cyrfmfg_id here
     //FIXME: Properly setnumber of channels;
     num_channels = 8;
