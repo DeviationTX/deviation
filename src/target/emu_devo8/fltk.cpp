@@ -389,7 +389,7 @@ void CLOCK_StopTimer()
     alarm(0);
 }
 #else
-void CLOCK_StartTimer(u16 us, void (*cb)(void))
+void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
 {
     struct timeb tp;
     ftime(&tp);
