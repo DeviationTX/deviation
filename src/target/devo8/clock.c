@@ -111,7 +111,7 @@ void tim4_isr()
         u16 us = timer_callback();
         timer_clear_flag(TIM4, TIM_SR_CC1IF);
         if (us) {
-            timer_set_oc_value(TIM4, TIM_OC1, 10000 + TIM_CCR1(TIM4));
+            timer_set_oc_value(TIM4, TIM_OC1, us + TIM_CCR1(TIM4));
             return;
         }
     }

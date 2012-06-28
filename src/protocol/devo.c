@@ -19,8 +19,12 @@
 
 #ifdef PROTO_HAS_DEVO
 
+//For Debug
+//#define NO_SCRAMBLE
+
 #define PKTS_PER_CHANNEL 4
 #define use_fixedid 0
+
 enum PktState {
     DEVO_BIND,
     DEVO_BIND_SENDCH,
@@ -50,10 +54,14 @@ static u8 ch_idx;
 
 void scramble_pkt()
 {
+#ifdef NO_SCRAMBLE
+    return;
+#else
     u8 i;
     for(i = 0; i < 15; i++) {
         packet[i + 1] ^= cyrfmfg_id[i % 4];
     }
+#endif
 }
 
 void add_pkt_suffix()
@@ -169,14 +177,14 @@ u16 devo_cb()
 {
     if (txState == 0) {
         txState = 1;
-        CYRF_WriteDataPacket(packet);
         DEVO_BuildPacket();
+        CYRF_WriteDataPacket(packet);
         return 1200;
     }
     txState = 0;
     while(! (CYRF_ReadRegister(0x04) & 0x02))
         ;
-    if(pkt_num == 1) {
+    if(pkt_num == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
@@ -189,6 +197,9 @@ void DEVO_Initialize()
     radio_ch_ptr = radio_ch;
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);
+    CYRF_ConfigCRCSeed(0);
+    CYRF_ConfigSOPCode(0);
+    CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Read cyrfmfg_id here
     //FIXME: Properly setnumber of channels;
     num_channels = 8;
@@ -204,7 +215,6 @@ void DEVO_Initialize()
         state = DEVO_BOUND_1;
         bind_counter = 0;
     }
-    DEVO_BuildPacket();
     CLOCK_StartTimer(2400, devo_cb);
 }
 

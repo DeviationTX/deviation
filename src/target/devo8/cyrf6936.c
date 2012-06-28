@@ -144,7 +144,7 @@ void CYRF_GetMfgData(u8 data[])
     CYRF_WriteRegister(0x25, 0x00); 
 }
 /*
- * 0 - Tx else Rx
+ * 1 - Tx else Rx
  */
 void CYRF_ConfigRxTx(u32 TxRx)
 {

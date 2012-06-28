@@ -1,6 +1,9 @@
 #ifndef _DEVO8_TARGET_H_
 #define _DEVO8_TARGET_H_
  
+//Protocols
+#define PROTO_HAS_DEVO
+
 #define NUM_TX_BUTTONS 14
 #define NUM_TX_INPUTS 18
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
