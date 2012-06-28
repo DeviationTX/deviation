@@ -28,6 +28,7 @@ void PAGE_MainInit(int page)
 {
     (void)page;
     int i;
+
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];

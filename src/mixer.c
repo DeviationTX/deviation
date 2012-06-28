@@ -30,9 +30,16 @@
 #define MIX_CYC2 (NUM_TX_INPUTS + 2)
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
+enum Mode {
+    MODE_1,
+    MODE_2,
+    MODE_3,
+    MODE_4,
+};
 
 struct Model {
     enum SwashType swash_type;
+    enum Mode mode;
     u8 swash_invert;
     u8 Elevator_Stick;
     u8 Aileron_Stick;
@@ -78,16 +85,49 @@ void MIX_EvalMixers(s16 *raw)
 
 }
 
+u8 MIXER_MapChannel(u8 channel, enum Mode mode)
+{
+    switch(mode) {
+    case MODE_1:
+       return channel;
+    case MODE_2:
+       switch(channel) {
+       case INP_THROTTLE: return INP_ELEVATOR;
+       case INP_ELEVATOR: return INP_THROTTLE;
+       default: return channel;
+       }
+       break;
+    case MODE_3:
+       switch(channel) {
+       case INP_AILERON:  return INP_RUDDER;
+       case INP_THROTTLE: return INP_ELEVATOR;
+       case INP_ELEVATOR: return INP_THROTTLE;
+       case INP_RUDDER:   return INP_AILERON;
+       default: return channel;
+       }
+       break;
+    case MODE_4:
+       switch(channel) {
+       case INP_AILERON:  return INP_RUDDER;
+       case INP_RUDDER:   return INP_AILERON;
+       default: return channel;
+       }
+       break;
+    }
+    return channel;
+}
+
 u8 MIX_ReadInputs(s16 *raw)
 {
     u8 changed;
     u8 i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        s16 value = CHAN_ReadInput(i);
+        u8 mapped_channel = MIXER_MapChannel(i, Model.mode);
+        s16 value = CHAN_ReadInput(mapped_channel);
         if (value != raw[i]) {
             changed = 1;
-            raw[i] = CHAN_ReadInput(i);
+            raw[i] = value;
         }
     }
     return changed;
@@ -239,6 +279,7 @@ void TEST_init_mixer()
     int i;
     memset(Channels, 0, sizeof(Channels));
     memset(&Model, 0, sizeof(Model));
+    Model.mode = MODE_2;
     Model.swash_type = SWASH_TYPE_120;
     Model.Elevator_Stick   = INP_ELEVATOR;
     Model.Aileron_Stick    = INP_AILERON;
@@ -248,7 +289,7 @@ void TEST_init_mixer()
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = i;
         Model.mixers[i].scaler = 100;
-        Model.trims[i].src = i + 1;
+        Model.trims[i].src = MIXER_MapChannel(i + 1, Model.mode); 
         Model.trims[i].neg = i * 2 + 1;
         Model.trims[i].pos = i * 2 + 2;
         Model.trims[i].step = 10;

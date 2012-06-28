@@ -95,12 +95,12 @@ public:
                 gui.powerdown = 1;
                 return 1;
             case 'q':
-                if(++gui.throttle > 10)
-                    gui.throttle = 10;
+                if(++gui.elevator > 10)
+                    gui.elevator = 10;
                 return 1;
             case 'a':
-                if(--gui.throttle < 0)
-                    gui.throttle = 0;
+                if(--gui.elevator < 0)
+                    gui.elevator = 0;
                 return 1;
             case 'w':
                 if(++gui.rudder > 10)
@@ -111,12 +111,12 @@ public:
                     gui.rudder = 0;
                 return 1;
             case 'e':
-                if(++gui.elevator > 10)
-                    gui.elevator = 10;
+                if(++gui.throttle > 10)
+                    gui.throttle = 10;
                 return 1;
             case 'd':
-                if(--gui.elevator < 0)
-                    gui.elevator = 0;
+                if(--gui.throttle < 0)
+                    gui.throttle = 0;
                 return 1;
             case 'r':
                 if(++gui.aileron > 10)
