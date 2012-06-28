@@ -20,7 +20,7 @@ The packet types are as follows:
        byte 9 is a bit-field indicating for which channels failsafe is enabled
        Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
 0x88 - 
-       This packet is never sent for <=8 channel transmitters
+       This packet is never sent for <8 channel transmitters
        For 10ch and 12ch transmitters it is sent (as 0xa8 or 0xc8) alternating with 0x87 to provide failsafe info
        for the upper 8 channels
 0x8a - 
@@ -59,6 +59,7 @@ Packet 0x8b
     ff: The upper nibble is one of '0x00', '0x80', '0xc0'
         The lower nibble is the number of packets that will be transmitted (after this one) before the next
         transmitter channel is selected
+        Speculation: the upper nibble 0x00 corresponds to non-fixed-id, and 0x80 corresponds to using a fixed-id
     gg: The next transmitter channel that will be selected
     hh: The transmitter channel that will be selected afterthe next one (2 away)
     iiiiii: The Fixed ID value (LSB 1st, 24bit value)
@@ -120,3 +121,11 @@ Packet 0x31
      0x0E          0x80
      0x0F          0x2C
 
+Initialization:
+The Devo initially sets the CRC value and SOP table to 0x00 during binding.
+Once binding is complete the CRC and SOP seem to be changed based on the MfgID
+the SOP can have values 0-9, the CRC can have values 0x00 to 0xFF
+Known values:
+MFGID:               SOP      CRC
+f8 a4 79 00         0x03     0x73
+70 38 73 4b         0x07     0xE3

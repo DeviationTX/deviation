@@ -62,7 +62,7 @@ void CLOCK_Init()
                    TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 
     /* timer updates each microsecond */
-    timer_set_prescaler(TIM4, 72);
+    timer_set_prescaler(TIM4, 72 - 1);
     timer_set_period(TIM4, 65535);
 
     /* Disable preload. */

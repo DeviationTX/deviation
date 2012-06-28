@@ -28,6 +28,7 @@
 enum PktState {
     DEVO_BIND,
     DEVO_BIND_SENDCH,
+    DEVO_BOUND,
     DEVO_BOUND_1,
     DEVO_BOUND_2,
     DEVO_BOUND_3,
@@ -88,9 +89,9 @@ void build_bind_pkt()
     packet[0] = (num_channels << 4) | 0x0a;
     packet[1] = bind_counter & 0xff;
     packet[2] = (bind_counter >> 8);
-    packet[3] = radio_ch[0];
-    packet[4] = radio_ch[1];
-    packet[5] = radio_ch[2];
+    packet[3] = *radio_ch_ptr;
+    packet[4] = *(radio_ch_ptr + 1);
+    packet[5] = *(radio_ch_ptr + 2);
     packet[6] = cyrfmfg_id[0];
     packet[7] = cyrfmfg_id[1];
     packet[8] = cyrfmfg_id[2];
@@ -147,8 +148,9 @@ void DEVO_BuildPacket()
             bind_counter--;
             build_data_pkt();
             scramble_pkt();
-            state = (bind_counter <= 0) ? DEVO_BOUND_1 : DEVO_BIND;
+            state = (bind_counter <= 0) ? DEVO_BOUND : DEVO_BIND;
             break;
+        case DEVO_BOUND:
         case DEVO_BOUND_1:
         case DEVO_BOUND_2:
         case DEVO_BOUND_3:
@@ -184,6 +186,13 @@ u16 devo_cb()
     txState = 0;
     while(! (CYRF_ReadRegister(0x04) & 0x02))
         ;
+    if (state == DEVO_BOUND) {
+        state = DEVO_BOUND_3;
+        CYRF_ConfigRxTx(1);
+        CYRF_ConfigCRCSeed(0x73);
+        CYRF_ConfigSOPCode(3);
+        CYRF_WriteRegister(0x03, 0x0D);
+    }   
     if(pkt_num == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);

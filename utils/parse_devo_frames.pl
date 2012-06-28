@@ -5,8 +5,9 @@ use Getopt::Long;
 my $mfgid = "";
 my @xor = (0, 0, 0, 0);
 my $showchan = 0;
+my $starttime = 0;
 my $telem = 1;
-GetOptions("mfgid=s" => \$mfgid, "chan" => \$showchan);
+GetOptions("mfgid=s" => \$mfgid, "chan" => \$showchan , "time=f" => \$starttime);
 if($mfgid) {
     @xor = map {hex($_)} split(/ /, $mfgid);
     printf "Using mfgid: %02x %02x %02x %02x\n", @xor;
@@ -22,6 +23,7 @@ my @data = ();
 while(<>) {
     my($time, $framenum, $data, $din) = (/^(\S+),(\S+),(\S+),(\S+)/);
     next unless($time && $framenum && $data);
+    $time -= $starttime;
     $data = hex($data);
     $din = hex($din);
     if($framenum != $last_frame) {
@@ -35,11 +37,11 @@ while(<>) {
                 $data[14] = sprintf("%02x", hex($data[14]) ^ $xor[1]);
                 $data[15] = sprintf("%02x", hex($data[15]) ^ $xor[2]);
             } elsif(grep {$data[0] eq $_} ("30", "31")) {
-                for(my $i = 0; $i < 15; $i++) {
+                for(my $i = 0; $i < scalar(@data) - 1; $i++) {
                     $data[$i + 1] = sprintf("%02x", hex($data[$i + 1]) ^ $xor[$i % 4]);
                 }
             }
-            printf("%15s%s @data\n", $start, $ok == 1 ? ":" : "#");
+            printf("%15.6f%s @data\n", $start, $ok == 1 ? ":" : "#");
         }
         @data = ();
         $last_frame = $framenum;
