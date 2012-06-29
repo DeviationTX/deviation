@@ -1,0 +1,68 @@
+Virtually all of the inofrmation in this document was provided by hammer22.  So Thanks!
+DSM2:
+DSM2 data packets consist of 7 channels each.  the packets are formatted as 16bit MSB-1st values
+A packet is sent as follows:
+aaaa bbbb cccc dddd eeee ffff gggg hhhh
+aaaa: The GUID of this Tx/model
+bbbb: Throttle  0x0000 - 0x03FF
+cccc: Aileron   0x0000 - 0x03FF
+dddd: Elevator  0x0000 - 0x03FF
+eeee: Rudder    0x0000 - 0x03FF
+ffff: Flaps     0x0000 - 0x03FF
+gggg: Gear      0x0000 - 0x03FF
+hhhh: Aux1      0x0000 - 0x03FF
+
+Each packet is sent twice, once on channel 'a' and 4msec later on channel 'b'
+If there are more than 7 channels to transmit, the upper channels are transmitted using the same
+packet format 11mec after the the low-channel packet.
+New channel data is transmitted each 22msec
+
+For example:
+ 0msec: Transmit channels 0-7 on channel 'a'
+ 4msec: Transmit channels 0-7 on channel 'b'
+11msec: Transmit channels 8-14 on channel 'a'
+15msec: Transmit channels 8-14 on channel 'b'
+22msec: Transmit channels 0-7 on channel 'a'
+
+New SOP(8 bytes) and Data (16 bytes) codes are sent before each packet.
+
+Binding:
+The bind packet is as follows:
+aa bb cc dd aa bb cc dd eeee ff gg hh ii jjjj
+aa   : 0xff - mfgid[0]
+bb   : 0xff - mfgid[1]
+cc   : 0xff - mfgid[2]
+dd   : 0xff - mfgid[3] + offset
+eeee : 384 + sum of bytes 0 through 7
+ff   : Unknown (value = 0x01)
+gg   : # of channels being transmitted
+hh   : # of packets (1 if num-channels < 8, 2 if num-channels >= 8)
+ii   : Unknown (value = 0x00)
+jjjj : eeee + sum of bytes 8 through 13
+
+SOP/Data/CRC code selection:
+there is one set of SOP, Data, and CRC codes for each transmit channel.
+The SOP and DATA codes come from the Cypress recommended SOP table.
+They are organized in 5 rows of 9 columns with the contenst of each 'cell' being an 8-byte SOP code
+The row is determined by the transmit channel as:
+row = channel modulo 5
+The columns are determined from the mfgid as follows:
+sop-col = (mfgid[0] + mfgid[1] + mfgid[2] + 2) & 0x07
+data-col0 = 7 - sop-col
+data-col1 = data-col0 + 1
+The crc for channel 'a' is NOT(mfgid[1] << 8 + mfgid[0])
+The crc for channel 'b' is (mfgid[1] << 8 + mfgid[0])
+
+Here is the table (note that I've transposed rows and columns to make it easier to read)
+                0                        1                        2                        3                        4
+0    03,BC,6E,8A,EF,BD,FE,F8  83,F7,A8,2D,7A,44,64,D3  40,56,32,D9,0F,D9,5D,97  C0,90,8F,BB,7C,8E,2B,8E  E1,D6,31,26,5F,BD,40,93
+1    88,17,13,3B,2D,BF,06,D6  3F,2C,4E,AA,71,48,7A,C9  8E,4A,D0,A9,A7,FF,20,CA  80,69,26,80,08,F8,49,E7  DC,68,08,99,97,AE,AF,8C
+2    F1,94,30,21,A1,1C,88,A9  17,FF,9E,21,36,90,C7,82  4C,97,9D,BF,B8,3D,B5,BE  7D,2D,49,54,D0,80,40,C1  C3,0E,01,16,0E,32,06,BA
+3    D0,D2,8E,BC,82,2F,E3,B4  BC,5D,9A,5B,EE,7F,42,EB  0C,5D,24,30,9F,CA,6D,BD  B6,F2,E6,1B,80,5A,36,B4  E0,83,01,FA,AB,3E,8F,AC
+4    8C,FA,47,9B,83,A5,66,D0  24,F5,DD,F8,7A,77,74,E7  50,14,33,DE,F1,78,95,AD  42,AE,9C,1C,DA,67,05,F6  5C,D5,9C,B8,46,9C,7D,84
+5    07,BD,9F,26,C8,31,0F,B8  3D,70,7C,94,DC,84,AD,95  0C,3C,FA,F9,F0,F2,10,C9  9B,75,F7,E0,14,8D,B5,80  F1,C6,FE,5C,9D,A5,4F,B7
+6    EF,03,95,89,B4,71,61,9D  1E,6A,F0,37,52,7B,11,D4  F4,DA,06,DB,BF,4E,6F,B3  BF,54,98,B9,B7,30,5A,88  58,B5,B3,DD,0E,28,F1,B0
+7    40,BA,97,D5,86,4F,CC,D1  62,F5,2B,AA,FC,33,BF,AF  9E,08,D1,AE,59,5E,E8,F0  35,D1,FC,97,23,D4,C9,88  5F,30,3B,56,96,45,F4,A1
+8    D7,A1,54,B1,5E,89,AE,86  40,56,32,D9,0F,D9,5D,97  C0,90,8F,BB,7C,8E,2B,8E  88,E1,D6,31,26,5F,BD,40  03,BC,6E,8A,EF,BD,FE,F8
+
+
