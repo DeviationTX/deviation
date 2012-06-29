@@ -59,7 +59,8 @@ Packet 0x8b
     ff: The upper nibble is one of '0x00', '0x80', '0xc0'
         The lower nibble is the number of packets that will be transmitted (after this one) before the next
         transmitter channel is selected
-        Speculation: the upper nibble 0x00 corresponds to non-fixed-id, and 0x80 corresponds to using a fixed-id
+        The upper nibble 0x00 corresponds to non-fixed-id, and 0x80 corresponds to using a fixed-id
+        An upper nible of 0xc0 is used to indicate fixed-id binding is in progress
     gg: The next transmitter channel that will be selected
     hh: The transmitter channel that will be selected afterthe next one (2 away)
     iiiiii: The Fixed ID value (LSB 1st, 24bit value)
