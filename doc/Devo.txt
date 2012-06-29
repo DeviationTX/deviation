@@ -125,8 +125,21 @@ Packet 0x31
 Initialization:
 The Devo initially sets the CRC value and SOP table to 0x00 during binding.
 Once binding is complete the CRC and SOP seem to be changed based on the MfgID
-the SOP can have values 0-9, the CRC can have values 0x00 to 0xFF
+the SOP can have values 0-9 (a pointer to one of the 10 PN strings)
+the CRC can have values 0x01 to 0xFF (0x00 is reserved for bind mode)
+
 Known values:
 MFGID:               SOP      CRC
 f8 a4 79 00         0x03     0x73
 70 38 73 4b         0x07     0xE3
+
+The SOP table is the Cypress recommended one.  See:
+WirelessUSB LP/LPstar and PRoC LP/LPstar Technical Reference Manual
+http://www.cypress.com/?docID=30520
+
+It appears that Walkera calculates the SOP and CRC as per:
+Cypress AN6066: Wireless Binding Methodologies
+http://www.cypress.com/?docID=31871
+
+SOP: ((MfgID[0] << 2) + MfgID[1] + MfgID[2]) % 10
+CRC: (MfgID[0] + (MfgID[1] << 6) + MfgID[2])

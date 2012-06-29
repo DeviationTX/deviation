@@ -175,7 +175,8 @@ void CYRF_ConfigCRCSeed(u8 crc)
     CYRF_WriteRegister(0x16,crc);
 }
 /*
- *
+ * these are the recommended sop codes from Crpress
+ * See "WirelessUSB LP/LPstar and PRoC LP/LPstar Technical Reference Manual"
  */
 static const u8 sopcodes[] = {
     /* 0 */
