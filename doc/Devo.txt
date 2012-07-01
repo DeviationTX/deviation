@@ -152,4 +152,4 @@ Cypress AN6066: Wireless Binding Methodologies
 http://www.cypress.com/?docID=31871
 
 SOP: ((MfgID[0] << 2) + MfgID[1] + MfgID[2]) % 10
-CRC: (MfgID[0] + (MfgID[1] << 6) + MfgID[2]) & 0xff (this value is repeated in the upper and lower byte)
+CRC: (MfgID[0] + (MfgID[1] >> 6) + MfgID[2]) & 0xff (this value is repeated in the upper and lower byte)

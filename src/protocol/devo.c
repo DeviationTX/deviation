@@ -231,8 +231,11 @@ static u16 devo_cb()
     if (state == DEVO_BOUND) {
         /* exit binding state */
         state = DEVO_BOUND_3;
-        u8 crc = cyrfmfg_id[0] + (cyrfmfg_id[1] << 6) + cyrfmfg_id[2];
-        u16 sopidx = ((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2]) % 10;
+        /* crc == 0 isn't allowed, so use 1 if the math results in 0 */
+        u8 crc = (cyrfmfg_id[0] + (cyrfmfg_id[1] >> 6) + cyrfmfg_id[2]);
+        if(! crc)
+            crc = 1;
+        u8 sopidx = (0xff &((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2])) % 10;
         CYRF_ConfigRxTx(1);
         CYRF_ConfigCRCSeed((crc << 8) + crc);
         CYRF_ConfigSOPCode(sopcodes[sopidx]);
