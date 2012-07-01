@@ -16,6 +16,7 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "target.h"
+#include "protocol/interface.h"
 
 #define CS_HI() gpio_set(GPIOB, GPIO12)   
 #define CS_LO() gpio_clear(GPIOB, GPIO12)
@@ -110,6 +111,11 @@ void CYRF_Initialize()
 
     CYRF_Reset();
 }
+
+u8 CYRF_MaxPower()
+{
+    return (*((u8*)0x08001007) == 0) ? CYRF_PWR_100MW : CYRF_PWR_10MW;
+}
 /*
  *
  */
@@ -151,8 +157,8 @@ void CYRF_ConfigRFChannel(u8 ch)
  */
 void CYRF_ConfigCRCSeed(u16 crc)
 {
-    CYRF_WriteRegister(0x15,crc >> 8);
-    CYRF_WriteRegister(0x16,crc & 0xff);
+    CYRF_WriteRegister(0x15,crc & 0xff);
+    CYRF_WriteRegister(0x16,crc >> 8);
 }
 /*
  * these are the recommended sop codes from Crpress
@@ -191,7 +197,6 @@ void CYRF_WritePreamble(u32 preamble)
 {
     CS_LO();
     spi_xfer(SPI2, 0x80 | 0x24);
-    spi_xfer(SPI2, preamble & 0xff);
     spi_xfer(SPI2, preamble & 0xff);
     spi_xfer(SPI2, (preamble >> 8) & 0xff);
     spi_xfer(SPI2, (preamble >> 16) & 0xff);

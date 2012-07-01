@@ -368,7 +368,8 @@ void ALARMhandler(int sig)
     if(timer_callback) {
         u16 us = timer_callback();
         if (us > 0) {
-            u16 alarmtime = us > 1000 ? us /= 1000 : 1;
+            printf("Sleeping: %dus\n", us);
+            u16 alarmtime = 1; //us > 1000 ? us /= 1000 : 1;
             signal(SIGALRM, ALARMhandler);     /* reinstall the handler    */
             alarm(alarmtime);
         }

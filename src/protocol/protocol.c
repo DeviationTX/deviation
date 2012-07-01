@@ -28,12 +28,12 @@ void PROTOCOL_Init(enum Protocols p)
             #endif
             break;
         case PROTOCOL_DEVO:
-            #ifdef PROTO_HAS_DEVO
+            #ifdef PROTO_HAS_CYRF6936
             DEVO_Initialize();
             #endif
             break;
         case PROTOCOL_DSM2:
-            #ifdef PROTO_HAS_DSM2
+            #ifdef PROTO_HAS_CYRF6936
             DSM2_Initialize();
             #endif
             break;

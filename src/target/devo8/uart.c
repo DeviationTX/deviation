@@ -57,32 +57,3 @@ int _write(int file, char *ptr, int len)
     return -1;
     }
 #endif
-
-void SignOn()
-{
-    u8 * pBLString = (u8*)0x08001000;
-    u8 Power =  *((u8*)0x08001007);
-    u8 mfgdata[6];
-    u8 tmp[8];
-    
-    printf("\nOpen Whatever\n");
-    /* Check CPU type */
-
-    memcpy(tmp, pBLString, 7);
-    tmp[7] = 0;
-    
-    printf("BootLoader    : '%s'\n",tmp);
-    printf("Power         : '%s'\n",Power == 0 ? "100mW" : "10mW" );
-    printf("SPI Flash     : '%X'\n",(unsigned int)SPIFlash_ReadID());
-    CYRF_GetMfgData(mfgdata);
-    printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n",
-            mfgdata[0],
-            mfgdata[1],
-            mfgdata[2],
-            mfgdata[3],
-            mfgdata[4],
-            mfgdata[5]);
-    
-}
-
-

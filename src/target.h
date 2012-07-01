@@ -26,8 +26,8 @@ struct Transmitter {
 extern struct Transmitter Transmitter;
 extern s16 Channels[NUM_CHANNELS];
 
-/* General functions */
-void SignOn();
+/* General Functions */
+void ModelName(u8 *var, u8 len);
 
 /* Display Functions */
 void LCD_Init();
@@ -113,24 +113,6 @@ void SPIFlash_BulkErase();
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 void SPI_FlashBlockWriteEnable(u8 enable);
-
-/* SPI CYRF6936 */
-void CYRF_Initialize();
-void CYRF_Reset();
-void CYRF_GetMfgData(u8 data[]);
-
-void CYRF_ConfigRxTx(u32 TxRx);
-void CYRF_ConfigRFChannel(u8 ch);
-void CYRF_ConfigCRCSeed(u16 crc);
-void CYRF_StartReceive();
-void CYRF_ConfigSOPCode(const u8 *sopcodes);
-void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
-u8 CYRF_ReadRSSI(u32 dodummyread);
-void CYRF_ReadDataPacket(u8 dpbuffer[]); 
-void CYRF_WriteDataPacket(u8 dpbuffer[]); 
-void CYRF_WriteRegister(u8 address, u8 data);
-u8 CYRF_ReadRegister(u8 address);
-void CYRF_WritePreamble(u32 preamble);
 
 /* Sound */
 void SOUND_Init();

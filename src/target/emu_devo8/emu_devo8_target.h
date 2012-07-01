@@ -3,8 +3,7 @@
 
 //Protocols
 #define PROTO_HAS_A7105
-#define PROTO_HAS_DEVO
-#define PROTO_HAS_DSM2
+#define PROTO_HAS_CYRF6936
 
 #define NUM_TX_BUTTONS 18
 #define NUM_TX_INPUTS 14 

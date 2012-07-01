@@ -17,8 +17,15 @@
 #include <string.h>
 
 #include "target.h"
+#include "protocol/interface.h"
 
-
+void ModelName(u8 *var, u8 len) {
+    const u8 model[] = "DEVO-08-Emu";
+    if(len > 12)
+         len = 12;
+    memcpy(var, model, len - 1);
+    var[len-1] = 0;
+}
 void USB_Enable(u8 use_interrupt) {(void)use_interrupt;}
 void USB_Disable() {}
 void Initialize_ButtonMatrix() {}
@@ -52,7 +59,6 @@ void CYRF_GetMfgData(u8 data[]) {
     u8 d[] = { 0xd4, 0x62, 0xd6, 0xad, 0xd3, 0xff};
     memcpy(data, d, 6);
 }
-void SignOn() {}
 
 int FS_Mount() {return 1;}
 
@@ -107,3 +113,4 @@ void CYRF_WriteDataPacket(u8 data[]) {
         printf("%02x ", data[i]);
     printf("\n");
 }
+u8 CYRF_MaxPower() { return CYRF_PWR_100MW; }

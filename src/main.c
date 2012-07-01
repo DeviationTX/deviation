@@ -14,12 +14,14 @@
  */
 
 #include "target.h"
+#include "protocol/interface.h"
 #include "misc.h"
 #include "gui/gui.h"
 
 void event_loop(void *);
 void channel_scanner();
 void dump_bootloader();
+void SignOn();
 extern void start_event_loop();
 extern void TEST_init_mixer();
 
@@ -132,6 +134,28 @@ void event_loop(void *param)
     }
 }
 
+void SignOn()
+{
+    u8 Power = CYRF_MaxPower();
+    u8 mfgdata[6];
+    u8 tmp[12];
+    ModelName(tmp, 12);
+    printf("\nOpen Whatever\n");
+    /* Check CPU type */
+
+    printf("BootLoader    : '%s'\n",tmp);
+    printf("Power         : '%s'\n",Power == CYRF_PWR_100MW ? "100mW" : "10mW" );
+    printf("SPI Flash     : '%X'\n",(unsigned int)SPIFlash_ReadID());
+    CYRF_GetMfgData(mfgdata);
+    printf("CYRF Mfg Data : '%02X %02X %02X %02X %02X %02X'\n",
+            mfgdata[0],
+            mfgdata[1],
+            mfgdata[2],
+            mfgdata[3],
+            mfgdata[4],
+            mfgdata[5]);
+    
+}
 #ifdef BL_DUMP
 void dump_bootloader()
 {

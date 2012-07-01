@@ -14,6 +14,7 @@
  */
 
 #include "target.h"
+#include "protocol/interface.h"
 #include "misc.h"
 #include "pages.h"
 

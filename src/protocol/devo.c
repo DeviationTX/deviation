@@ -17,7 +17,7 @@
 #include "interface.h"
 #include "mixer.h"
 
-#ifdef PROTO_HAS_DEVO
+#ifdef PROTO_HAS_CYRF6936
 
 //For Debug
 //#define NO_SCRAMBLE
@@ -143,28 +143,28 @@ void build_data_pkt()
 void cyrf_init()
 {
     /* Initialise CYRF chip */
-    CYRF_WriteRegister(0x1D, 0x39);
-    CYRF_WriteRegister(0x03, 0x0B);
-    CYRF_WriteRegister(0x06, 0x4A);
-    CYRF_WriteRegister(0x0B, 0x00);
-    CYRF_WriteRegister(0x0D, 0x04);
-    CYRF_WriteRegister(0x0E, 0x20);
-    CYRF_WriteRegister(0x10, 0xA4);
-    CYRF_WriteRegister(0x11, 0x05);
-    CYRF_WriteRegister(0x12, 0x0E);
-    CYRF_WriteRegister(0x1B, 0x55);
-    CYRF_WriteRegister(0x1C, 0x05);
-    CYRF_WriteRegister(0x32, 0x3C);
-    CYRF_WriteRegister(0x35, 0x14);
-    CYRF_WriteRegister(0x39, 0x01);
-    CYRF_WriteRegister(0x1E, 0x10);
-    CYRF_WriteRegister(0x1F, 0x00);
-    CYRF_WriteRegister(0x01, 0x10);
-    CYRF_WriteRegister(0x0C, 0xC0);
-    CYRF_WriteRegister(0x0F, 0x10);
-    CYRF_WriteRegister(0x27, 0x02);
-    CYRF_WriteRegister(0x28, 0x02);
-    CYRF_WriteRegister(0x0F, 0x28);
+    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x39);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0B);
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
+    CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
+    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04);
+    CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
+    CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0E);
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
+    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3C);
+    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
+    CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);
+    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x10);
+    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
+    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);
+    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x10);
+    CYRF_WriteRegister(CYRF_27_CLK_OFFSET, 0x02);
+    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x28);
 }
 
 void set_radio_channels()
@@ -236,7 +236,7 @@ static u16 devo_cb()
         CYRF_ConfigRxTx(1);
         CYRF_ConfigCRCSeed((crc << 8) + crc);
         CYRF_ConfigSOPCode(sopcodes[sopidx]);
-        CYRF_WriteRegister(0x03, 0x0D);
+        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0D);
     }   
     if(pkt_num == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;

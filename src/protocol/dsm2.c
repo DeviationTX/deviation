@@ -17,8 +17,9 @@
 #include "interface.h"
 #include "mixer.h"
 
-#ifdef PROTO_HAS_DSM2
+#ifdef PROTO_HAS_CYRF6936
 #define BIND_CHANNEL 0x09
+#define USE_FIXED_MFGID
 #define MODEL 0
 enum {
     DSM2_BIND = 0,
@@ -97,7 +98,11 @@ u8 chidx;
 u8 sop_col;
 u8 data_col;
 u8 state;
+#ifdef USE_FIXED_MFGID
+static const u8 cyrfmfg_id[6] = {0xd4,0x62,0xd6,0xad,0xd3,0xff};
+#else
 static u8 cyrfmfg_id[6];
+#endif
 u8 num_channels;
 u16 crc;
 u8 model;
@@ -147,22 +152,25 @@ static u8 get_pn_row(u8 channel)
 static void cyrf_config()
 {
     u8 data_code[32];
-    CYRF_WriteRegister(0x1d, 0x01);
-    CYRF_WriteRegister(0x28, 0x02);
-    CYRF_WriteRegister(0x32, 0x3c);
-    CYRF_WriteRegister(0x35, 0x14);
+    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
+    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
+    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3c);
+    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
     //0d
-    CYRF_WriteRegister(0x0d, 0x40);
-    CYRF_WriteRegister(0x06, 0x48);
-    CYRF_WriteRegister(0x1b, 0x55);
-    CYRF_WriteRegister(0x1c, 0x05);
-    CYRF_WriteRegister(0x0f, 0x24);
-    CYRF_WriteRegister(0x03, 0x38);
-    CYRF_WriteRegister(0x12, 0x0a);
-    CYRF_WriteRegister(0x0c, 0x80);
-    CYRF_WriteRegister(0x0f, 0x04);
-    CYRF_WriteRegister(0x39, 0x01);
-    CYRF_WritePreamble(0x333304);
+    //CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x40);
+    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //From Devo - Enable PACTL as GPIO
+    CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20); //From Devo
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x48);
+    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
+    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38);
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a);
+    //CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0x80);
+    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //From Devo - Enable XOUT as GPIO
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x04);
+    CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);
+    CYRF_WritePreamble(0x043333);
     //CYRF_ConfigRFChannel(0x61);
     //CYRF_WriteRegister(0x85, 0x83); //setup read
     //0x13, 0x20 //poll RSSI
@@ -172,59 +180,59 @@ static void cyrf_config()
     //0x13, 0x20 //poll RSSI
     //0x09, 0x0f //15 bytes in queue?
     //0x21, 0xf7 ee af f9 f6 a5 57 28 74 6b 84 64 c4 bb 84 //read 15 bytes
-    CYRF_WriteRegister(0x0f, 0x24); //Force IDLE
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24); //Force IDLE
     //0x0f, 0x04 //Read state (Idle)
-    CYRF_WriteRegister(0x29, 0x00); //Clear RX abort
-    CYRF_WriteRegister(0x12, 0x0a); //set pn correlation threshold
-    CYRF_WriteRegister(0x10, 0x4a); //set sop len and threshold
-    CYRF_WriteRegister(0x29, 0x0f); //Clear RX abort?
-    CYRF_WriteRegister(0x03, 0x38); //Set 64chip, SDE mode
-    CYRF_WriteRegister(0x10, 0x4a); //set sop len and threshold
-    CYRF_WriteRegister(0x1f, 0x04); //disable tx CRC
-    CYRF_WriteRegister(0x1e, 0x14); //disable rx crc
-    CYRF_WriteRegister(0x14, 0x02); //set EOP sync == 2
+    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00); //Clear RX abort
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a); //set pn correlation threshold
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
+    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x0f); //Clear RX abort?
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38); //Set 64chip, SDE mode
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
+    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x04); //disable tx CRC
+    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x14); //disable rx crc
+    CYRF_WriteRegister(CYRF_14_EOP_CTRL, 0x02); //set EOP sync == 2
     CYRF_ConfigRFChannel(BIND_CHANNEL); //This seems to be random?
     u8 pn_row = get_pn_row(BIND_CHANNEL);
-    printf("Ch: %d Row: %d SOP: %d Data: %d\n", BIND_CHANNEL, pn_row, sop_col, data_col);
+    //printf("Ch: %d Row: %d SOP: %d Data: %d\n", BIND_CHANNEL, pn_row, sop_col, data_col);
     CYRF_ConfigCRCSeed(crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     memcpy(data_code, pn_bind, 8);
-    memcpy(data_code + 8, pncodes[0][8], 8);
+    memcpy(data_code + 8, pncodes[0][0], 8);
     memcpy(data_code + 16, pncodes[pn_row][data_col], 16);
     CYRF_ConfigDataCode(data_code, 32);
-    CYRF_WriteRegister(0x01, 0x10); //16byte packet
+    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10); //16byte packet
     build_bind_packet();
 }
 
 static void cyrf_configdata()
 {
 //Initialize for reading RSSI
-    CYRF_WriteRegister(0x05, 0x83);
+    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
 //0x13, 0xa6
-    CYRF_WriteRegister(0x29, 0x20);
+    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x20);
 //0x13, 0x20
-    CYRF_WriteRegister(0x0f, 0x24);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
 //0x0f, 0x04
-    CYRF_WriteRegister(0x29, 0x00);
-    CYRF_WriteRegister(0x03, 0x0d);
-    CYRF_WriteRegister(0x10, 0xea);
-    CYRF_WriteRegister(0x1f, 0x00);
-    CYRF_WriteRegister(0x1e, 0x00);
-    CYRF_WriteRegister(0x03, 0x2d);
-    CYRF_WriteRegister(0x12, 0x3f);
-    CYRF_WriteRegister(0x10, 0xff);
+    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0d);
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xea);
+    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
+    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x2d);
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x3f);
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xff);
 //Switch from reading RSSI to Writing
-    CYRF_WriteRegister(0x0f, 0x24);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
 //0x0f, 0x04
-    CYRF_WriteRegister(0x29, 0x00);
-    CYRF_WriteRegister(0x12, 0x0a);
-    CYRF_WriteRegister(0x10, 0xea);
+    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00);
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a);
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xea);
 }
 
 static void set_sop_data_crc()
 {
     u8 pn_row = get_pn_row(ch[chidx]);
-    printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
+    //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
     CYRF_ConfigCRCSeed(chidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
@@ -236,11 +244,15 @@ static u16 dsm2_cb()
         CYRF_WriteDataPacket(packet);
         state += 1;
         return 10000;
-    } else if(state < DSM2_CHANSEL) {
+    } else if(state < DSM2_CH1_WRITE_A) {
+        CYRF_WriteDataPacket(packet);
+        state = DSM2_BIND;
+        return 10000;
         //FIXME: Select channels here
         ch[0] = 0x35;
         ch[1] = 0x0e;
         cyrf_configdata();
+        CYRF_ConfigRxTx(1);
         chidx = 0;
         set_sop_data_crc();
         state = DSM2_CH1_WRITE_A;
@@ -283,7 +295,10 @@ static u16 dsm2_cb()
 void DSM2_Initialize()
 {
     CLOCK_StopTimer();
+    CYRF_Reset();
+#ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
+#endif
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     data_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     sop_col = 8 - data_col;
@@ -291,6 +306,7 @@ void DSM2_Initialize()
     model = MODEL;
 
     cyrf_config();
+    CYRF_ConfigRxTx(1);
     state = DSM2_BIND;
     CLOCK_StartTimer(10000, dsm2_cb);
 }

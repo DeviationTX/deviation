@@ -2,8 +2,7 @@
 #define _DEVO8_TARGET_H_
  
 //Protocols
-#define PROTO_HAS_DEVO
-#define PROTO_HAS_DSM2
+#define PROTO_HAS_CYRF6936
 
 #define NUM_TX_BUTTONS 14
 #define NUM_TX_INPUTS 18
