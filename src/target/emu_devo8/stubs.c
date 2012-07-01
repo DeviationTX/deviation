@@ -46,17 +46,41 @@ u8 *BOOTLOADER_Read(int idx) {
     
 void UART_Initialize() {}
 void CYRF_Initialize() {}
+void CYRF_Reset() {}
 void CYRF_GetMfgData(u8 data[]) { 
-    u8 d[] = { 0xf8, 0xa4, 0x79, 0x00, 0x00, 0x00};
+    //u8 d[] = { 0xf8, 0xa4, 0x79, 0x00, 0x00, 0x00};
+    u8 d[] = { 0xd4, 0x62, 0xd6, 0xad, 0xd3, 0xff};
     memcpy(data, d, 6);
 }
 void SignOn() {}
 
 int FS_Mount() {return 1;}
 
-void CYRF_ConfigCRCSeed(u8 crc) {(void)crc;}
 void CYRF_StartReceive() {}
-void CYRF_ConfigSOPCode(u32 idx) {(void)idx;}
+void CYRF_ConfigCRCSeed(u16 crc) {
+    printf("CRC: %02x %02x\n", crc & 0xff, crc >> 8);
+}
+void CYRF_ConfigSOPCode(const u8 *sopcodes) {
+    int i;
+    printf("SOPCode:");
+    for(i = 7; i >= 0; i--) {
+        printf(" %02x", sopcodes[i]);
+    }
+    printf("\n");
+    return;
+}
+void CYRF_ConfigDataCode(const u8 *datacodes, u8 len) {
+    int i;
+    printf("DATACode:");
+    for(i = len - 1; i >= 0; i--) {
+        printf(" %02x", datacodes[i]);
+    }
+    printf("\n");
+    return;
+}
+void CYRF_WritePreamble(u32 preamble) {
+    printf("Preamble: %02x %02x %02x\n", preamble & 0xff, (preamble >> 8) & 0xff, (preamble >> 16) & 0xff);
+}
 void CYRF_ReadDataPacket(u8 dpbuffer[]) {(void)dpbuffer;}
 u8 CYRF_ReadRSSI(u32 dodummyread)
 {

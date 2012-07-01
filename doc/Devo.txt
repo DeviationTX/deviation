@@ -136,10 +136,20 @@ f8 a4 79 00         0x03     0x73
 The SOP table is the Cypress recommended one.  See:
 WirelessUSB LP/LPstar and PRoC LP/LPstar Technical Reference Manual
 http://www.cypress.com/?docID=30520
+0x91CCF8E291CC373C
+0x0FA239AD0FA1C59B
+0x2AB18FD22AB064EF
+0x507C26DD507CCD66
+0x44F616AD44F6E15C
+0x46AE31B646AECC5A
+0x3CDC829E3CDC78A1
+0x7418656F74198EB9
+0x49C1DF6249C0B1DF
+0x72141A7F7214E597
 
 It appears that Walkera calculates the SOP and CRC as per:
 Cypress AN6066: Wireless Binding Methodologies
 http://www.cypress.com/?docID=31871
 
 SOP: ((MfgID[0] << 2) + MfgID[1] + MfgID[2]) % 10
-CRC: (MfgID[0] + (MfgID[1] << 6) + MfgID[2])
+CRC: (MfgID[0] + (MfgID[1] << 6) + MfgID[2]) & 0xff (this value is repeated in the upper and lower byte)

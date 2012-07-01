@@ -69,6 +69,15 @@ u8 CYRF_ReadRegister(u8 address)
     return data;
 }
 
+void CYRF_Reset()
+{
+    /* Reset the CYRF chip */
+    RS_HI();
+    Delay(50);
+    RS_LO();
+    Delay(50);
+}
+
 void CYRF_Initialize()
 {
     /* Enable SPI2 */
@@ -99,36 +108,7 @@ void CYRF_Initialize()
     spi_set_nss_high(SPI2);
     spi_enable(SPI2);
 
-    /* Reset the CYRF chip */
-    RS_HI();
-    Delay(50);
-    RS_LO();
-    Delay(50);
-
-    /* Initialise CYRF chip */
-    CYRF_WriteRegister(0x1D, 0x39);
-    CYRF_WriteRegister(0x03, 0x0B);
-    CYRF_WriteRegister(0x06, 0x4A);
-    CYRF_WriteRegister(0x0B, 0x00);
-    CYRF_WriteRegister(0x0D, 0x04);
-    CYRF_WriteRegister(0x0E, 0x20);
-    CYRF_WriteRegister(0x10, 0xA4);
-    CYRF_WriteRegister(0x11, 0x05);
-    CYRF_WriteRegister(0x12, 0x0E);
-    CYRF_WriteRegister(0x1B, 0x55);
-    CYRF_WriteRegister(0x1C, 0x05);
-    CYRF_WriteRegister(0x32, 0x3C);
-    CYRF_WriteRegister(0x35, 0x14);
-    CYRF_WriteRegister(0x39, 0x01);
-    CYRF_WriteRegister(0x1E, 0x10);
-    CYRF_WriteRegister(0x1F, 0x00);
-    CYRF_WriteRegister(0x01, 0x10);
-    CYRF_WriteRegister(0x0C, 0xC0);
-    CYRF_WriteRegister(0x0F, 0x10);
-    CYRF_WriteRegister(0x27, 0x02);
-    CYRF_WriteRegister(0x28, 0x02);
-    CYRF_WriteRegister(0x0F, 0x28);
-
+    CYRF_Reset();
 }
 /*
  *
@@ -169,51 +149,23 @@ void CYRF_ConfigRFChannel(u8 ch)
 /*
  *
  */
-void CYRF_ConfigCRCSeed(u8 crc)
+void CYRF_ConfigCRCSeed(u16 crc)
 {
-    CYRF_WriteRegister(0x15,crc);
-    CYRF_WriteRegister(0x16,crc);
+    CYRF_WriteRegister(0x15,crc >> 8);
+    CYRF_WriteRegister(0x16,crc & 0xff);
 }
 /*
  * these are the recommended sop codes from Crpress
  * See "WirelessUSB LP/LPstar and PRoC LP/LPstar Technical Reference Manual"
  */
-static const u8 sopcodes[] = {
-    /* 0 */
-    0x3C,0x37,0xCC,0x91,
-    0xE2,0xF8,0xCC,0x91,
-    /* 1 */
-    0x9B,0xC5,0xA1,0x0F,
-    0xAD,0x39,0xA2,0x0F,
-    /* 2 */
-    0xEF,0x64,0xB0,0x2A,
-    0xD2,0x8F,0xB1,0x2A,
-    /* 3 */
-    0x66,0xCD,0x7C,0x50,
-    0xDD,0x26,0x7C,0x50,
-    /* 4 */
-    0x5C,0xE1,0xF6,0x44,
-    0xAD,0x16,0xF6,0x44,
-    /* 5 */
-    0x5A,0xCC,0xAE,0x46,
-    0xB6,0x31,0xAE,0x46,
-    /* 6 */
-    0xA1,0x78,0xDC,0x3C,
-    0x9E,0x82,0xDC,0x3C,
-    /* 7 */
-    0xB9,0x8E,0x19,0x74,
-    0x6F,0x65,0x18,0x74,
-    /* 8 */
-    0xDF,0xB1,0xC0,0x49,
-    0x62,0xDF,0xC1,0x49,
-    /* 9 */
-    0x97,0xE5,0x14,0x72,
-    0x7F,0x1A,0x14,0x72
-};
-
-void CYRF_ConfigSOPCode(u32 idx)
+void CYRF_ConfigSOPCode(const u8 *sopcodes)
 {
-    WriteRegisterMulti(0x22, &sopcodes[idx * 8], 8);
+    WriteRegisterMulti(0x22, sopcodes, 8);
+}
+
+void CYRF_ConfigDataCode(const u8 *datacodes, u8 len)
+{
+    WriteRegisterMulti(0x23, datacodes, len);
 }
 /*
  *
@@ -233,6 +185,18 @@ void CYRF_WriteDataPacket(u8 dpbuffer[])
     CYRF_WriteRegister(0x02, 0x40);
     WriteRegisterMulti(0x20, dpbuffer, 16);
     CYRF_WriteRegister(0x02, 0xBF);
+}
+
+void CYRF_WritePreamble(u32 preamble)
+{
+    CS_LO();
+    spi_xfer(SPI2, 0x80 | 0x24);
+    spi_xfer(SPI2, preamble & 0xff);
+    spi_xfer(SPI2, preamble & 0xff);
+    spi_xfer(SPI2, (preamble >> 8) & 0xff);
+    spi_xfer(SPI2, (preamble >> 16) & 0xff);
+    CS_HI();
+    
 }
 
 u8 CYRF_ReadRSSI(u32 dodummyread)

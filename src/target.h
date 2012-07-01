@@ -116,18 +116,21 @@ void SPI_FlashBlockWriteEnable(u8 enable);
 
 /* SPI CYRF6936 */
 void CYRF_Initialize();
+void CYRF_Reset();
 void CYRF_GetMfgData(u8 data[]);
 
 void CYRF_ConfigRxTx(u32 TxRx);
 void CYRF_ConfigRFChannel(u8 ch);
-void CYRF_ConfigCRCSeed(u8 crc);
+void CYRF_ConfigCRCSeed(u16 crc);
 void CYRF_StartReceive();
-void CYRF_ConfigSOPCode(u32 idx);
+void CYRF_ConfigSOPCode(const u8 *sopcodes);
+void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
 void CYRF_WriteDataPacket(u8 dpbuffer[]); 
 void CYRF_WriteRegister(u8 address, u8 data);
 u8 CYRF_ReadRegister(u8 address);
+void CYRF_WritePreamble(u32 preamble);
 
 /* Sound */
 void SOUND_Init();
@@ -161,6 +164,7 @@ void PAGE_Event();
 enum Protocols {
     PROTOCOL_FLYSKY,
     PROTOCOL_DEVO,
+    PROTOCOL_DSM2,
 };
 void PROTOCOL_Init(enum Protocols p);
 void PROTOCOL_DeInit();

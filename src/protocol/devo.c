@@ -41,6 +41,21 @@ enum PktState {
     DEVO_BOUND_10,
 };
 
+static const u8 sopcodes[][8] = {
+    /* Note these are in order transmitted (LSB 1st) */
+    /* 0 */ {0x3C,0x37,0xCC,0x91,0xE2,0xF8,0xCC,0x91}, //0x91CCF8E291CC373C
+    /* 1 */ {0x9B,0xC5,0xA1,0x0F,0xAD,0x39,0xA2,0x0F}, //0x0FA239AD0FA1C59B
+    /* 2 */ {0xEF,0x64,0xB0,0x2A,0xD2,0x8F,0xB1,0x2A}, //0x2AB18FD22AB064EF
+    /* 3 */ {0x66,0xCD,0x7C,0x50,0xDD,0x26,0x7C,0x50}, //0x507C26DD507CCD66
+    /* 4 */ {0x5C,0xE1,0xF6,0x44,0xAD,0x16,0xF6,0x44}, //0x44F616AD44F6E15C
+    /* 5 */ {0x5A,0xCC,0xAE,0x46,0xB6,0x31,0xAE,0x46}, //0x46AE31B646AECC5A
+    /* 6 */ {0xA1,0x78,0xDC,0x3C,0x9E,0x82,0xDC,0x3C}, //0x3CDC829E3CDC78A1
+    /* 7 */ {0xB9,0x8E,0x19,0x74,0x6F,0x65,0x18,0x74}, //0x7418656F74198EB9
+    /* 8 */ {0xDF,0xB1,0xC0,0x49,0x62,0xDF,0xC1,0x49}, //0x49C1DF6249C0B1DF
+    /* 9 */ {0x97,0xE5,0x14,0x72,0x7F,0x1A,0x14,0x72}, //0x72141A7F7214E597
+};
+
+
 static s16 bind_counter;
 static enum PktState state;
 static u8 txState;
@@ -125,6 +140,33 @@ void build_data_pkt()
     add_pkt_suffix();
 }
 
+void cyrf_init()
+{
+    /* Initialise CYRF chip */
+    CYRF_WriteRegister(0x1D, 0x39);
+    CYRF_WriteRegister(0x03, 0x0B);
+    CYRF_WriteRegister(0x06, 0x4A);
+    CYRF_WriteRegister(0x0B, 0x00);
+    CYRF_WriteRegister(0x0D, 0x04);
+    CYRF_WriteRegister(0x0E, 0x20);
+    CYRF_WriteRegister(0x10, 0xA4);
+    CYRF_WriteRegister(0x11, 0x05);
+    CYRF_WriteRegister(0x12, 0x0E);
+    CYRF_WriteRegister(0x1B, 0x55);
+    CYRF_WriteRegister(0x1C, 0x05);
+    CYRF_WriteRegister(0x32, 0x3C);
+    CYRF_WriteRegister(0x35, 0x14);
+    CYRF_WriteRegister(0x39, 0x01);
+    CYRF_WriteRegister(0x1E, 0x10);
+    CYRF_WriteRegister(0x1F, 0x00);
+    CYRF_WriteRegister(0x01, 0x10);
+    CYRF_WriteRegister(0x0C, 0xC0);
+    CYRF_WriteRegister(0x0F, 0x10);
+    CYRF_WriteRegister(0x27, 0x02);
+    CYRF_WriteRegister(0x28, 0x02);
+    CYRF_WriteRegister(0x0F, 0x28);
+}
+
 void set_radio_channels()
 {
     //FIXME: Query free channels
@@ -175,7 +217,7 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 
-u16 devo_cb()
+static u16 devo_cb()
 {
     if (txState == 0) {
         txState = 1;
@@ -187,10 +229,13 @@ u16 devo_cb()
     while(! (CYRF_ReadRegister(0x04) & 0x02))
         ;
     if (state == DEVO_BOUND) {
+        /* exit binding state */
         state = DEVO_BOUND_3;
+        u8 crc = cyrfmfg_id[0] + (cyrfmfg_id[1] << 6) + cyrfmfg_id[2];
+        u16 sopidx = ((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2]) % 10;
         CYRF_ConfigRxTx(1);
-        CYRF_ConfigCRCSeed(0x73);
-        CYRF_ConfigSOPCode(3);
+        CYRF_ConfigCRCSeed((crc << 8) + crc);
+        CYRF_ConfigSOPCode(sopcodes[sopidx]);
         CYRF_WriteRegister(0x03, 0x0D);
     }   
     if(pkt_num == 0) {
@@ -202,12 +247,15 @@ u16 devo_cb()
 
 void DEVO_Initialize()
 {
-    set_radio_channels();
-    radio_ch_ptr = radio_ch;
+    CLOCK_StopTimer();
+    CYRF_Reset();
+    cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);
-    CYRF_ConfigCRCSeed(0);
-    CYRF_ConfigSOPCode(0);
+    CYRF_ConfigCRCSeed(0x0000);
+    CYRF_ConfigSOPCode(sopcodes[0]);
+    set_radio_channels();
+    radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Read cyrfmfg_id here
     //FIXME: Properly setnumber of channels;

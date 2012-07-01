@@ -12,6 +12,8 @@ ffff: Flaps     0x0000 - 0x03FF
 gggg: Gear      0x0000 - 0x03FF
 hhhh: Aux1      0x0000 - 0x03FF
 
+The GUID is equal to the inverse of bytes 2-3 in th ebind packet
+
 Each packet is sent twice, once on channel 'a' and 4msec later on channel 'b'
 If there are more than 7 channels to transmit, the upper channels are transmitted using the same
 packet format 11mec after the the low-channel packet.
@@ -45,7 +47,7 @@ there is one set of SOP, Data, and CRC codes for each transmit channel.
 The SOP and DATA codes come from the Cypress recommended SOP table.  the codes are documented here:
 http://www.cypress.com/?docID=15229
 
-They are organized in 5 rows of 9 columns with the contenst of each 'cell' being an 8-byte SOP code
+They are organized in 5 rows of 9 columns with the contenst of each 'cell' being an 8-byte PN code
 The row is determined by the transmit channel as:
 row = channel modulo 5
 The columns are determined from the mfgid as follows:
@@ -56,15 +58,15 @@ The crc for channel 'a' is NOT(mfgid[1] << 8 + mfgid[0])
 The crc for channel 'b' is (mfgid[1] << 8 + mfgid[0])
 
 Here is the table (note that I've transposed rows and columns to make it easier to read)
-                0                        1                        2                        3                        4
-0    03,BC,6E,8A,EF,BD,FE,F8  83,F7,A8,2D,7A,44,64,D3  40,56,32,D9,0F,D9,5D,97  C0,90,8F,BB,7C,8E,2B,8E  E1,D6,31,26,5F,BD,40,93
-1    88,17,13,3B,2D,BF,06,D6  3F,2C,4E,AA,71,48,7A,C9  8E,4A,D0,A9,A7,FF,20,CA  80,69,26,80,08,F8,49,E7  DC,68,08,99,97,AE,AF,8C
-2    F1,94,30,21,A1,1C,88,A9  17,FF,9E,21,36,90,C7,82  4C,97,9D,BF,B8,3D,B5,BE  7D,2D,49,54,D0,80,40,C1  C3,0E,01,16,0E,32,06,BA
-3    D0,D2,8E,BC,82,2F,E3,B4  BC,5D,9A,5B,EE,7F,42,EB  0C,5D,24,30,9F,CA,6D,BD  B6,F2,E6,1B,80,5A,36,B4  E0,83,01,FA,AB,3E,8F,AC
-4    8C,FA,47,9B,83,A5,66,D0  24,F5,DD,F8,7A,77,74,E7  50,14,33,DE,F1,78,95,AD  42,AE,9C,1C,DA,67,05,F6  5C,D5,9C,B8,46,9C,7D,84
-5    07,BD,9F,26,C8,31,0F,B8  3D,70,7C,94,DC,84,AD,95  0C,3C,FA,F9,F0,F2,10,C9  9B,75,F7,E0,14,8D,B5,80  F1,C6,FE,5C,9D,A5,4F,B7
-6    EF,03,95,89,B4,71,61,9D  1E,6A,F0,37,52,7B,11,D4  F4,DA,06,DB,BF,4E,6F,B3  BF,54,98,B9,B7,30,5A,88  58,B5,B3,DD,0E,28,F1,B0
-7    40,BA,97,D5,86,4F,CC,D1  62,F5,2B,AA,FC,33,BF,AF  9E,08,D1,AE,59,5E,E8,F0  35,D1,FC,97,23,D4,C9,88  5F,30,3B,56,96,45,F4,A1
-8    D7,A1,54,B1,5E,89,AE,86  40,56,32,D9,0F,D9,5D,97  C0,90,8F,BB,7C,8E,2B,8E  88,E1,D6,31,26,5F,BD,40  03,BC,6E,8A,EF,BD,FE,F8
+             0                   1                   2                   3                   4
+0    0x03BC6E8AEFBDFEF8  0x83F7A82D7A4464D3  0x405632D90FD95D97  0xC0908FBB7C8E2B8E  0xE1D631265FBD4093
+1    0x8817133B2DBF06D6  0x3F2C4EAA71487AC9  0x8E4AD0A9A7FF20CA  0x8069268008F849E7  0xDC68089997AEAF8C
+2    0xF1943021A11C88A9  0x17FF9E213690C782  0x4C979DBFB83DB5BE  0x7D2D4954D08040C1  0xC30E01160E3206BA
+3    0xD0D28EBC822FE3B4  0xBC5D9A5BEE7F42EB  0x0C5D24309FCA6DBD  0xB6F2E61B805A36B4  0xE08301FAAB3E8FAC
+4    0x8CFA479B83A566D0  0x24F5DDF87A7774E7  0x501433DEF17895AD  0x42AE9C1CDA6705F6  0x5CD59CB8469C7D84
+5    0x07BD9F26C8310FB8  0x3D707C94DC84AD95  0x0C3CFAF9F0F210C9  0x9B75F7E0148DB580  0xF1C6FE5C9DA54FB7
+6    0xEF039589B471619D  0x1E6AF037527B11D4  0xF4DA06DBBF4E6FB3  0xBF5498B9B7305A88  0x58B5B3DD0E28F1B0
+7    0x40BA97D5864FCCD1  0x62F52BAAFC33BFAF  0x9E08D1AE595EE8F0  0x35D1FC9723D4C988  0x5F303B569645F4A1
+8    0xD7A154B15E89AE86  0x405632D90FD95D97  0xC0908FBB7C8E2B8E  0x88E1D631265FBD40  0x03BC6E8AEFBDFEF8
 
 
