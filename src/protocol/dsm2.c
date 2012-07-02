@@ -136,13 +136,20 @@ static void build_bind_packet()
 static void build_data_packet(u8 upper)
 {
     u8 i;
+    static const u8 chmap[] = {6, 0, 2, 4, 3, 1, 5};
     packet[0] = 0xff ^ cyrfmfg_id[2];
     packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
     for (i = 0; i < 7; i++) {
        s32 value = (s32)Channels[upper * 7 + i] * 0x200 / CHAN_MAX_VALUE + 0x200;
-       packet[2*i+2] = (value >> 8) & 0xff;
-       packet[2*i+3] = (value) & 0xff;
+       if (value > 0x3ff)
+           value = 0x3ff;
+       if (value < 0)
+           value = 0;
+       value = value | (i << 10);
+       packet[chmap[i]*2+2] = (value >> 8) & 0xff;
+       packet[chmap[i]*2+3] = (value >> 0) & 0xff;
     }
+
 }
 
 static u8 get_pn_row(u8 channel)
@@ -248,7 +255,7 @@ static void set_sop_data_crc()
     u8 pn_row = get_pn_row(ch[chidx]);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
     CYRF_ConfigRFChannel(ch[chidx]);
-    CYRF_ConfigCRCSeed(chidx ? ~crc : crc);
+    CYRF_ConfigCRCSeed(chidx ? crc : ~crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
 }
@@ -327,7 +334,8 @@ void DSM2_Initialize()
 
     cyrf_config();
     CYRF_ConfigRxTx(1);
-    state = DSM2_BIND;
+    //state = DSM2_BIND;
+    state = DSM2_CHANSEL;
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 #endif
