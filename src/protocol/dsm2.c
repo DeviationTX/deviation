@@ -18,20 +18,20 @@
 #include "mixer.h"
 
 #ifdef PROTO_HAS_CYRF6936
-#define BIND_CHANNEL 0x09
+#define BIND_CHANNEL 0x0d
 #define USE_FIXED_MFGID
 #define MODEL 0
 enum {
     DSM2_BIND = 0,
-    DSM2_CHANSEL = 100,
-    DSM2_CH1_WRITE_A = 200,
-    DSM2_CH1_CHECK_A = 201,
-    DSM2_CH2_WRITE_A = 202,
-    DSM2_CH2_CHECK_A = 203,
-    DSM2_CH1_WRITE_B = 204,
-    DSM2_CH1_CHECK_B = 205,
-    DSM2_CH2_WRITE_B = 206,
-    DSM2_CH2_CHECK_B = 207,
+    DSM2_CHANSEL = 200,
+    DSM2_CH1_WRITE_A = 1000,
+    DSM2_CH1_CHECK_A = 1001,
+    DSM2_CH2_WRITE_A = 1002,
+    DSM2_CH2_CHECK_A = 1003,
+    DSM2_CH1_WRITE_B = 1004,
+    DSM2_CH1_CHECK_B = 1005,
+    DSM2_CH2_WRITE_B = 1006,
+    DSM2_CH2_CHECK_B = 1007,
 };
    
 static const u8 pncodes[5][9][8] = {
@@ -97,7 +97,7 @@ u8 ch[2];
 u8 chidx;
 u8 sop_col;
 u8 data_col;
-u8 state;
+u16 state;
 #ifdef USE_FIXED_MFGID
 static const u8 cyrfmfg_id[6] = {0xd4,0x62,0xd6,0xad,0xd3,0xff};
 #else
@@ -171,15 +171,28 @@ static void cyrf_config()
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x04);
     CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);
     CYRF_WritePreamble(0x043333);
-    //CYRF_ConfigRFChannel(0x61);
-    //CYRF_WriteRegister(0x85, 0x83); //setup read
-    //0x13, 0x20 //poll RSSI
-    //CYRF_WriteRegister(0x92, 0x3f); //set pn correlation threshold
-    //CYRF_WriteRegister(0x90, 0x7f); //disable sop
-    //CYRF_WriteRegister(0x85, 0x83); //setupo read
-    //0x13, 0x20 //poll RSSI
-    //0x09, 0x0f //15 bytes in queue?
+    CYRF_ConfigRFChannel(0x61);
+/* */    
+    CYRF_ConfigRxTx(0);
+    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83); //setup read
+    u8 rssi = CYRF_ReadRegister(CYRF_13_RSSI); //poll RSSI valyue = 0x20
+    printf("Rssi: %02x\n", rssi);
+    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x3f); //set pn correlation threshold
+    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x7f); //disable sop
+    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83); //setupo read
+    rssi = CYRF_ReadRegister(CYRF_13_RSSI);  //poll RSSI value = 0x20
+    printf("Rssi: %02x\n", rssi);
+    Delay(30000);
+    u8 bytes = CYRF_ReadRegister(CYRF_09_RX_COUNT); //0x09, 0x0f //15 bytes in queue?
+    u8 data[32];
+    printf("count: %d", bytes);
+    CYRF_ReadDataPacket(data);
+    for(bytes = 0; bytes < 16; bytes++)
+        printf(" %02x", data[bytes]);
+    printf("\n");
     //0x21, 0xf7 ee af f9 f6 a5 57 28 74 6b 84 64 c4 bb 84 //read 15 bytes
+    CYRF_ConfigRxTx(0);
+    /* */
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24); //Force IDLE
     //0x0f, 0x04 //Read state (Idle)
     CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00); //Clear RX abort
@@ -233,6 +246,7 @@ static void set_sop_data_crc()
 {
     u8 pn_row = get_pn_row(ch[chidx]);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
+    CYRF_ConfigRFChannel(ch[chidx]);
     CYRF_ConfigCRCSeed(chidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
@@ -241,13 +255,18 @@ static void set_sop_data_crc()
 static u16 dsm2_cb()
 {
     if(state < DSM2_CHANSEL) {
-        CYRF_WriteDataPacket(packet);
         state += 1;
-        return 10000;
+        if(state & 1) {
+            CYRF_WriteDataPacket(packet);
+            return 8500;
+        } else {
+            CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS);
+            return 1500;
+        }
     } else if(state < DSM2_CH1_WRITE_A) {
-        CYRF_WriteDataPacket(packet);
-        state = DSM2_BIND;
-        return 10000;
+        //CYRF_WriteDataPacket(packet);
+        //state = DSM2_BIND;
+        //return 10000;
         //FIXME: Select channels here
         ch[0] = 0x35;
         ch[1] = 0x0e;

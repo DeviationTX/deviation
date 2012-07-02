@@ -3,8 +3,10 @@
 enum {
     CYRF_01_TX_LENGTH      = 0x01,
     CYRF_03_TX_CFG         = 0x03,
+    CYRF_04_TX_IRQ_STATUS  = 0x04,
     CYRF_05_RX_CTRL        = 0x05,
     CYRF_06_RX_CFG         = 0x06,
+    CYRF_09_RX_COUNT       = 0x09,
     CYRF_0B_PWR_CTRL       = 0x0B,
     CYRF_0C_XTAL_CTRL      = 0x0C,
     CYRF_0D_IO_CFG         = 0x0D,
@@ -13,6 +15,7 @@ enum {
     CYRF_10_FRAMING_CFG    = 0x10,
     CYRF_11_DATA32_THOLD   = 0x11,
     CYRF_12_DATA64_THOLD   = 0x12,
+    CYRF_13_RSSI           = 0x13,
     CYRF_14_EOP_CTRL       = 0x14,
     CYRF_1B_TX_OFFSET_LSB  = 0x1B,
     CYRF_1C_TX_OFFSET_MSB  = 0x1C,

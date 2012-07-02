@@ -166,12 +166,18 @@ void CYRF_ConfigCRCSeed(u16 crc)
  */
 void CYRF_ConfigSOPCode(const u8 *sopcodes)
 {
-    WriteRegisterMulti(0x22, sopcodes, 8);
+    int i;
+    for(i = 7; i >= 0; i--)
+        CYRF_WriteRegister(0x22, sopcodes[i]);
+    //WriteRegisterMulti(0x22, sopcodes, 8);
 }
 
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len)
 {
-    WriteRegisterMulti(0x23, datacodes, len);
+    int i;
+    for(i = len - 1; i >= 0; i--)
+        CYRF_WriteRegister(0x23, datacodes[i]);
+    //WriteRegisterMulti(0x23, datacodes, len);
 }
 /*
  *
@@ -188,20 +194,32 @@ void CYRF_ReadDataPacket(u8 dpbuffer[])
 
 void CYRF_WriteDataPacket(u8 dpbuffer[])
 {
+    CS_LO();
+        spi_xfer(SPI2, 0xC1);
+    spi_xfer(SPI2, 0x10);
+    spi_xfer(SPI2, 0xC3);
+    CS_HI();
+    WriteRegisterMulti(0x20, dpbuffer, 16);
+/*
     CYRF_WriteRegister(0x02, 0x40);
     WriteRegisterMulti(0x20, dpbuffer, 16);
     CYRF_WriteRegister(0x02, 0xBF);
+*/
 }
 
 void CYRF_WritePreamble(u32 preamble)
 {
+    CYRF_WriteRegister(0x24, (preamble >> 16) & 0xff);
+    CYRF_WriteRegister(0x24, (preamble >> 8) & 0xff);
+    CYRF_WriteRegister(0x24, (preamble >> 0) & 0xff);
+/*
     CS_LO();
     spi_xfer(SPI2, 0x80 | 0x24);
     spi_xfer(SPI2, preamble & 0xff);
     spi_xfer(SPI2, (preamble >> 8) & 0xff);
     spi_xfer(SPI2, (preamble >> 16) & 0xff);
     CS_HI();
-    
+*/
 }
 
 u8 CYRF_ReadRSSI(u32 dodummyread)
