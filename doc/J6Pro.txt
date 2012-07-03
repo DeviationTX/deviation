@@ -1,0 +1,112 @@
+cyrfid for following packets: 49 ec a9 c4 c1 ff
+
+Binding:
+Binding seems to consist of sending data on channel 0x52 and listening for a response on channel 0x53 from the model
+Once a reply has been seen an answer is sent on channel 0x54 (6 times)
+The transmitted packet looks like this:
+01 01 e9 49 ec a9 c4 c1 ff
+aa bb cc dddddddddddd
+aa            Possibly the packet type?
+bb            ???
+cc            ???
+dddddddddddd  mfgid
+
+The packet from the model (ch: 53) looks like this:
+03 01 56 49 ec a9 c4 c1 ff fc ec 2b 4d b9 ff
+03 01 e9 49 ec a9 c4 c1 ff d2 a7 6c c2 ad ff
+aa bb cccccccccccc         dddddddddddd
+aa           Possibly the packet type?
+bb           ???
+cc           ???
+cccccccccccc mfgid
+dddddddddddd rx-mfgid (??)
+
+The response back to the rx (ch: 54) mirrors the packet from the rx (with the exception of the 1st byte):
+05 01 56 49 ec a9 c4 c1 ff fc ec 2b 4d b9 ff
+05 01 e9 49 ec a9 c4 c1 ff d2 a7 6c c2 ad ff
+aa bb cc dddddddddddd      eeeeeeeeeeee
+aa           Possibly the packet type?
+bb           ???
+cc           ???
+cccccccccccc mfgid
+dddddddddddd rx-mfgid (??)
+
+Data transmission:
+After binding, The transmitter scans channels (looking for free channels?) It appears to settle on 3 channels which it uses in
+a group of 4 via the sequence a b c a  a b c a ...
+There is no evidence that the Tx communicates the channel sequence to the Rx.  It appears that b = a + 5 and c = b + 5
+Data packets are sent every 3.4 - 3.75 msec within the sequence.  the pause between sequences is 13.3msec
+It appears that the data packet is in no way associated with the Rx.  Despite the binidng handshake.  Once bound, a given model
+will immediately bind to a given Tx, even if that Tx has subsequently been bound with a different model.
+
+Each channel consists of 10-bits.  The upper 2 bits are packed 4-channels to a byte in bytes 13-15.  The protocol supports
+a total of 12 channels.
+Channel   byte15   byte14   byte13  lower8byte min-seen   max-seen
+01 Ail   ........ ........ ......xx    01       0x064      0x28a (low rates)
+02 Ele   ........ ........ ....xx..    02       0x070      0x29a (low rates)
+03 Thr   ........ ........ ..xx....    03       0x000      0x2fd
+04 Rud   ........ ........ xx......    04       0x06c      0x29a (low rates)
+05 Gear  ........ ......xx ........    05       0x000      0x2fe
+06 Flap  ........ ....xx.. ........    06       0x000      0x2fe
+07 ???   ........ ..xx.... ........    07
+08 ???   ........ xx...... ........    08
+09 ???   ......xx ........ ........    09
+10 ???   ....xx.. ........ ........    10
+11 ???   ..xx.... ........ ........    11
+12 ???   xx...... ........ ........    12
+
+Throttle:
+                 xx                            x
+low:    aa f4 0e 00 fe 00 fe ff ff ff ff ff ff 49 5c 55
+center: aa f4 0e fc fe 00 ff ff ff ff ff ff ff 59 5c 55
+high:   aa f5 0e fd fe 00 fe ff ff ff ff ff ff 79 5c 55
+value is 10-bits: low value is down, high up
+  13.5, 13.4, 3.*
+
+Elevator:
+low:    aa fa 70 00 fd 00 fe ff ff ff ff ff ff 41 5c 55
+center: aa f5 0e 00 fd 00 fe ff ff ff ff ff ff 49 5c 55
+high:   aa fb 9a 00 fd 00 fe ff ff ff ff ff ff 4d 5c 55
+value is 10-bits: low-value is down, high up
+  13.3, 13.2, 2.*
+
+Aileron:
+left:   aa 8a 05 00 fd 00 fe ff ff ff ff ff ff 4b 5c 55
+center: aa f6 0c 00 fd 00 fe ff ff ff ff ff ff 49 5c 55
+right:  aa 64 0f 00 fd 00 fe ff ff ff ff ff ff 48 5c 55
+value is 10-bits: low-value is right, high left
+  13.1, 13.0, 1.*
+
+Rudder:
+left:   aa f6 0e 00 9a 00 fe ff ff ff ff ff ff c9 5c 55
+center: aa f6 0e 00 fd 00 fe ff ff ff ff ff ff 49 5c 55
+right:  aa f6 0e 00 6c 00 fe ff ff ff ff ff ff 09 5c 55
+value is 10-bits: low-value is right, high left
+  13.7, 13.6, 4.*
+
+Flaps:
+off:    aa f6 0e 00 ff 00 fe ff ff ff ff ff ff 49 5c 55
+on:     aa f6 0e 00 ff 00 00 ff ff ff ff ff ff 49 50 55
+value is 10-bits:
+  14.3, 14.2, 6.*
+
+Gear:
+off:    aa f6 0e 00 ff 00 fe ff ff ff ff ff ff 49 5c 55
+on:     aa f6 0e 00 ff fe fe ff ff ff ff ff ff 49 5f 55
+value is 10-bits:
+  14.1, 14.0, 5.*
+
+PN codes:
+The sop code appears to be a rotated version of the recommended code.  Likely based on the CYRF6936 MfgId.
+For instance, on my Transmitter, the code sent is:
+62 df c1 49 df b1 c0 49
+which is a rotated version of the recomended code:
+DF B1 C0 49 62 DF C1 49
+
+The Data-code appears to be hard-coded (not mfgid dependent) as:
+02 f9 93 97 02 fa 5c e3 01 2b f1 db 01 32 be 6f
+which is the reversed default data-code
+
+
+The CRC is 0x0000 during binding.
+After binding, the CRC was 0xab2a
