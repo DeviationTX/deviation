@@ -19,7 +19,7 @@ aa           Possibly the packet type?
 bb           ???
 cc           ???
 cccccccccccc mfgid
-dddddddddddd rx-mfgid (??)
+dddddddddddd rx-mfgid
 
 The response back to the rx (ch: 54) mirrors the packet from the rx (with the exception of the 1st byte):
 05 01 56 49 ec a9 c4 c1 ff fc ec 2b 4d b9 ff
@@ -29,7 +29,7 @@ aa           Possibly the packet type?
 bb           ???
 cc           ???
 cccccccccccc mfgid
-dddddddddddd rx-mfgid (??)
+dddddddddddd rx-mfgid
 
 Data transmission:
 After binding, The transmitter scans channels (looking for free channels?) It appears to settle on 3 channels which it uses in
@@ -55,6 +55,40 @@ Channel   byte15   byte14   byte13  lower8byte min-seen   max-seen
 11 ???   ..xx.... ........ ........    11
 12 ???   xx...... ........ ........    12
 
+PN codes:
+The SOP code table is 19 entries long.
+The index into the SOP table, and the CRC are calculated from the MfgID as:
+sop_idx = (0xff & (MfgID[0] + MfgID[1] + MfgID[2] + MfgID[3] - MfgID[5])) % 19
+crc = ((MfgId[1] - MfgId[4] + MfgId[5]) & 0xFF) + 
+      ((0xFF & (MfgId[2] + MfgId[3] - MfgId[4] + MfgId[5]) ) << 8) 
+The CRC is 0x0000 during binding.
+
+The PN codes for the SOP are transformations of the recommended codes:
+3C37CC91 E2F8CC91
+9BC5A10F AD39A20F
+EF64B02A D28FB12A
+66CD7C50 DD267C50
+5CE1F644 AD16F644
+5ACCAE46 B631AE46
+A178DC3C 9E82DC3C
+B98E1974 6F651874
+DFB1C049 62DFC149
+97E51472 7F1A1472
+82C79036 2103FF17 //Note: the '03' was '9E' in the Cypress recommended table
+E2F8CC91 3C37CC91 //The following are the same as the 1st 8 above,
+AD39A20F 9BC5A10F //but with the upper and lower word swapped
+D28FB12A EF64B02A
+DD267C50 66CD7C50
+AD16F644 5CE1F644
+B631AE46 5ACCAE46
+9E82DC3C A178DC3C
+6F651874 B98E1974
+
+The Data-code is hard-coded (not mfgid dependent) as:
+02 f9 93 97 02 fa 5c e3 01 2b f1 db 01 32 be 6f
+which is the reversed default data-code
+
+Detailed Channel analysis follows:
 Throttle:
                  xx                            x
 low:    aa f4 0e 00 fe 00 fe ff ff ff ff ff ff 49 5c 55
@@ -96,17 +130,4 @@ on:     aa f6 0e 00 ff fe fe ff ff ff ff ff ff 49 5f 55
 value is 10-bits:
   14.1, 14.0, 5.*
 
-PN codes:
-The sop code appears to be a rotated version of the recommended code.  Likely based on the CYRF6936 MfgId.
-For instance, on my Transmitter, the code sent is:
-62 df c1 49 df b1 c0 49
-which is a rotated version of the recomended code:
-DF B1 C0 49 62 DF C1 49
 
-The Data-code appears to be hard-coded (not mfgid dependent) as:
-02 f9 93 97 02 fa 5c e3 01 2b f1 db 01 32 be 6f
-which is the reversed default data-code
-
-
-The CRC is 0x0000 during binding.
-After binding, the CRC was 0xab2a

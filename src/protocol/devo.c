@@ -68,7 +68,7 @@ static u8 cyrfmfg_id[6];
 static u8 num_channels;
 static u8 ch_idx;
 
-void scramble_pkt()
+static void scramble_pkt()
 {
 #ifdef NO_SCRAMBLE
     return;
@@ -80,7 +80,7 @@ void scramble_pkt()
 #endif
 }
 
-void add_pkt_suffix()
+static void add_pkt_suffix()
 {
     //FIXME: upper nibble of byte 9 can be 0x00, 0x80, 0xc0, but which one?
     packet[10] = 0x00 | (PKTS_PER_CHANNEL - pkt_num - 1);
@@ -91,7 +91,7 @@ void add_pkt_suffix()
     packet[15] = (fixed_id >> 16) & 0xff;
 }
 
-void build_unk_pkt()
+static void build_unk_pkt()
 {
     packet[0] = (num_channels << 4) | 0x07;
     memset(packet + 1, 0, 8);
@@ -99,7 +99,7 @@ void build_unk_pkt()
     add_pkt_suffix();
 }
 
-void build_bind_pkt()
+static void build_bind_pkt()
 {
     packet[0] = (num_channels << 4) | 0x0a;
     packet[1] = bind_counter & 0xff;
@@ -119,7 +119,7 @@ void build_bind_pkt()
     packet[15] ^= cyrfmfg_id[2];
 }
 
-void build_data_pkt()
+static void build_data_pkt()
 {
     u8 i;
     packet[0] = (num_channels << 4) | (0x0b + ch_idx);
@@ -140,7 +140,7 @@ void build_data_pkt()
     add_pkt_suffix();
 }
 
-void cyrf_init()
+static void cyrf_init()
 {
     /* Initialise CYRF chip */
     CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x39);
@@ -167,7 +167,7 @@ void cyrf_init()
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x28);
 }
 
-void set_radio_channels()
+static void set_radio_channels()
 {
     //FIXME: Query free channels
     radio_ch[0] = 0x08;

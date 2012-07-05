@@ -2,11 +2,14 @@
 #define _IFACE_CYRF6936_H_
 enum {
     CYRF_01_TX_LENGTH      = 0x01,
+    CYRF_02_TX_CTRL        = 0x02,
     CYRF_03_TX_CFG         = 0x03,
     CYRF_04_TX_IRQ_STATUS  = 0x04,
     CYRF_05_RX_CTRL        = 0x05,
     CYRF_06_RX_CFG         = 0x06,
+    CYRF_07_RX_IRG_STATUS  = 0x07,
     CYRF_09_RX_COUNT       = 0x09,
+    CYRF_0A_RX_LENGTH      = 0x0A,
     CYRF_0B_PWR_CTRL       = 0x0B,
     CYRF_0C_XTAL_CTRL      = 0x0C,
     CYRF_0D_IO_CFG         = 0x0D,
@@ -49,7 +52,8 @@ void CYRF_ConfigSOPCode(const u8 *sopcodes);
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
-void CYRF_WriteDataPacket(u8 dpbuffer[]); 
+void CYRF_WriteDataPacket(u8 dpbuffer[]);
+void CYRF_WriteDataPacketLen(u8 dpbuffer[], u8 len);
 void CYRF_WriteRegister(u8 address, u8 data);
 u8 CYRF_ReadRegister(u8 address);
 void CYRF_WritePreamble(u32 preamble);

@@ -200,11 +200,16 @@ void CYRF_ReadDataPacket(u8 dpbuffer[])
     ReadRegisterMulti(0x21, dpbuffer, 0x10);
 }
 
+void CYRF_WriteDataPacketLen(u8 dpbuffer[], u8 len)
+{
+    CYRF_WriteRegister(CYRF_01_TX_LENGTH, len);
+    CYRF_WriteRegister(0x02, 0x40);
+    WriteRegisterMulti(0x20, dpbuffer, len);
+    CYRF_WriteRegister(0x02, 0xBF);
+}
 void CYRF_WriteDataPacket(u8 dpbuffer[])
 {
-    CYRF_WriteRegister(0x02, 0x40);
-    WriteRegisterMulti(0x20, dpbuffer, 16);
-    CYRF_WriteRegister(0x02, 0xBF);
+    CYRF_WriteDataPacketLen(dpbuffer, 16);
 }
 
 u8 CYRF_ReadRSSI(u32 dodummyread)

@@ -107,10 +107,13 @@ void CYRF_ConfigRxTx(u32 TxRx) {
 void CYRF_ConfigRFChannel(u8 ch) {
     printf("Changed channel to %02x\n", ch);
 }
-void CYRF_WriteDataPacket(u8 data[]) {
+void CYRF_WriteDataPacketLen(u8 data[], u8 len) {
     int i;
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < len; i++)
         printf("%02x ", data[i]);
     printf("\n");
+}
+void CYRF_WriteDataPacket(u8 data[]) {
+    CYRF_WriteDataPacketLen(data, 16);
 }
 u8 CYRF_MaxPower() { return CYRF_PWR_100MW; }

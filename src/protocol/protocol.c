@@ -18,6 +18,7 @@
 void FLYSKY_Initialize();
 void DEVO_Initialize();
 void DSM2_Initialize();
+void J6PRO_Initialize();
 
 void PROTOCOL_Init(enum Protocols p)
 {
@@ -35,6 +36,11 @@ void PROTOCOL_Init(enum Protocols p)
         case PROTOCOL_DSM2:
             #ifdef PROTO_HAS_CYRF6936
             DSM2_Initialize();
+            #endif
+            break;
+        case PROTOCOL_J6PRO:
+            #ifdef PROTO_HAS_CYRF6936
+            J6PRO_Initialize();
             #endif
             break;
     }

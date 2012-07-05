@@ -147,6 +147,7 @@ enum Protocols {
     PROTOCOL_FLYSKY,
     PROTOCOL_DEVO,
     PROTOCOL_DSM2,
+    PROTOCOL_J6PRO,
 };
 void PROTOCOL_Init(enum Protocols p);
 void PROTOCOL_DeInit();
