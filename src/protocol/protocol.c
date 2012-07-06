@@ -14,11 +14,7 @@
  */
 
 #include "target.h"
-
-void FLYSKY_Initialize();
-void DEVO_Initialize();
-void DSM2_Initialize();
-void J6PRO_Initialize();
+#include "interface.h"
 
 void PROTOCOL_Init(enum Protocols p)
 {

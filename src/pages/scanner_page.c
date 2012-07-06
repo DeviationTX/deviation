@@ -18,76 +18,62 @@
 #include "misc.h"
 #include "pages.h"
 
+#define MIN_RADIOCHANNEL     0x04
+#define MAX_RADIOCHANNEL     0x54
+static u8 channelnoise[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
+static guiObject_t *bar[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
+static u8 channel;
+static u8 time_to_scan;
+
+u16 scan_trigger_cb()
+{
+    time_to_scan = 1;
+    return 1250;
+}
+
+static s16 show_bar_cb(void *data)
+{
+    long ch = (long)data;
+    return channelnoise[ch];
+}
+
 void PAGE_ScannerInit(int page)
 {
+    u8 i;
     (void)page;
-    CYRF_ConfigRxTx(1);
+    DEVO_Initialize();  //Switch to DEVO configuration
+    CLOCK_StopTimer();
+    CYRF_ConfigRxTx(0);
     CYRF_ConfigCRCSeed(0);
-    CYRF_ConfigSOPCode(0);
+    //CYRF_ConfigSOPCode(0);
+    time_to_scan = 0;
+    channel = MIN_RADIOCHANNEL;
+    for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
+        bar[i] = GUI_CreateBarGraph(i * 4, 10, 4, 210, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        channelnoise[i] = 0x10;
+    }
+    CLOCK_StartTimer(1250, scan_trigger_cb);
 }
 
 void PAGE_ScannerEvent()
 {
-#define NUM_RADIOCHANNELS    0x50
-
-    u32 i,j,k;
     u8 dpbuffer[16];
-    static u8 channelnoise[NUM_RADIOCHANNELS];
-    static u8 channel = 0x04;
-
-
-    CYRF_ConfigRFChannel(channel);
+    if(time_to_scan) {
+        time_to_scan = 0;
+        CYRF_ConfigRFChannel(channel + MIN_RADIOCHANNEL);
+    CYRF_ReadRSSI(1);
     CYRF_StartReceive();
     Delay(10);
 
     CYRF_ReadDataPacket(dpbuffer);
-    channelnoise[channel] = CYRF_ReadRSSI(1);
+        channelnoise[channel] = CYRF_ReadRSSI(1) & 0x1F;
+        GUI_Redraw(bar[channel]);
 
-    printf("%02X : %d\n",channel,channelnoise[channel]);
+    //printf("%02X : %d\n",channel,channelnoise[channel]);
 
-    channel++;
-    if(channel == NUM_RADIOCHANNELS)
-    {
-        channel = 0x04;
-        LCD_Clear(0x0000);
-
-        for(i=4;i<NUM_RADIOCHANNELS;i++)
-        {
-            LCD_DrawStart(30 + (3*i), 30, 31 + (3*i), 190, DRAW_NWSE);
-            for(k=0;k<16; k++)
-            {
-                for(j=0; j<2; j++)
-                {
-                    if(k < (u8)(15 - channelnoise[i]))
-                    {
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                        LCD_DrawPixel(0xF000);
-                    }
-                    else
-                    {
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                        LCD_DrawPixel(0xFFFF);
-                    }
-                }
-            }
-            LCD_DrawStop();
-        }
+        channel++;
+        if(channel == MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)
+            channel = 0;
     }
 }
 

@@ -23,7 +23,7 @@ struct guiLabel GUI_Label_Array[64];
 struct guiFrame GUI_Frame_Array[16];
 struct guiDialog GUI_Dialog_Array[8];
 struct guiXYGraph GUI_XYGraph_Array[2];
-struct guiBarGraph GUI_BarGraph_Array[32];
+struct guiBarGraph GUI_BarGraph_Array[80];
 struct guiTextSelect GUI_TextSelect_Array[16];
 static u8 FullRedraw;
 

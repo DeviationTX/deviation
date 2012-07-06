@@ -42,7 +42,7 @@ int PAGE_ChantestCanChange()
     return 1;
 }
 
-s16 showchan_cb(void *data)
+static s16 showchan_cb(void *data)
 {
     long ch = (long)data;
     return Channels[ch];

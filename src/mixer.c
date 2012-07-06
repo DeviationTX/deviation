@@ -304,7 +304,7 @@ void TEST_init_mixer()
             Model.template[i] = MIXERTEMPLATE_NONE;
         }
     }
-    PROTOCOL_Init(PROTOCOL_J6PRO);
+    PROTOCOL_Init(PROTOCOL_DEVO);
 }
 
 
