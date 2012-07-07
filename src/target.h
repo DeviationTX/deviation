@@ -50,6 +50,7 @@ void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height);
+void LCD_GetCharDimensions(u8 c, u16 *width, u16 *height);
 u8 LCD_SetFont(unsigned int idx);
 u8  LCD_GetFont();
 void LCD_SetFontColor(u16 color);

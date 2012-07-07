@@ -35,6 +35,11 @@ enum ButtonType {
     BUTTON_32x16,
 };
 
+enum KeyboardType {
+    KEYBOARD_CHAR,
+    KEYBOARD_NUM,
+};
+
 struct guiDialogReturn {
     u8 buttonPushed;
     char strInput[80];
@@ -57,6 +62,7 @@ enum GUIType {
     XYGraph,
     BarGraph,
     TextSelect,
+    Keyboard,
 };
 struct guiImage {
     const char *file;
@@ -77,6 +83,17 @@ struct guiLabel {
     u16 fontColor;
     u8 fontName;
 };
+
+struct guiKeyboard {
+    struct guiImage image;
+    struct touch last_coords;
+    char *text;
+    u8 num_chars;
+    enum KeyboardType type;
+    void (*CallBack)(struct guiObject *obj, void *data);
+    void *cb_data;
+};
+
 struct guiButton {
     struct guiImage image;
     const char *text;
@@ -140,6 +157,7 @@ struct guiObject {
         struct guiBarGraph bar;
         struct guiDialog   dialog;
         struct guiTextSelect textselect;
+        struct guiKeyboard keyboard;
     } o;
 };
 
@@ -176,7 +194,10 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);
+guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
+        void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
+void GUI_TouchRelease();
 void GUI_DrawScreen(void);
 void GUI_RefreshScreen(void);
 void GUI_Redraw(guiObject_t *obj);

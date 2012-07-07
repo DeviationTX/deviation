@@ -114,6 +114,8 @@ void event_loop(void *param)
             touch_down = 1;
         }
     } else {
+        if(touch_down)
+            GUI_TouchRelease();
         touch_down = 0;
     }
     MIX_CalcChannels();
