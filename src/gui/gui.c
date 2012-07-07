@@ -578,6 +578,28 @@ void GUI_RefreshScreen(void)
 
 void GUI_TouchRelease()
 {
+    u8 modalActive;
+    modalActive = GUI_IsModal() ? 1 : 0;
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        if (! OBJ_IS_DISABLED(obj)
+            && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
+        {
+            switch (obj->Type) {
+            case Keyboard:
+            {
+                struct guiKeyboard *keyboard = &obj->o.keyboard;
+                if(keyboard->last_coords.x || keyboard->last_coords.y) {
+                    GUI_DrawKeyboard(obj, NULL);
+                    return;
+                }
+                break;
+            }
+            default: break;
+            }
+        }
+        obj = obj->next;
+    }
 }
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
@@ -961,8 +983,11 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     draw |= kb_draw_key(KEY_W3, Y_OFFSET + KEY_H * 3, 320 - 2 * KEY_W3, KEY_H, space, BG1, BG2, TXT1, coords, last_coords);
     /* DONE */
     draw |= kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, BG3, BG3, TXT2, NULL, NULL);
-    if(coords && draw) {
-        keyboard->last_coords = *coords;
+    if(draw) {
+        if(coords) 
+            keyboard->last_coords = *coords;
+        else if(last_coords)
+            keyboard->last_coords.x = keyboard->last_coords.y = 0;
     }
     return draw;
 }
