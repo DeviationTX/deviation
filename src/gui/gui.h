@@ -172,6 +172,12 @@ struct guiObject {
 #define OBJ_SET_MODAL(x,y)       (x)->flags = y ? (x)->flags | 0x04 : (x)->flags & ~0x04
 #define OBJ_SET_DIRTY(x,y)       (x)->flags = y ? (x)->flags | 0x08 : (x)->flags & ~0x08
 #define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
+
+/* internal use only */
+u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords);
+u8 coords_in_box(struct guiBox *box, struct touch *coords);
+struct guiObject *GUI_GetFreeObj(void);
+void connect_object(struct guiObject *obj);
 #endif
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
