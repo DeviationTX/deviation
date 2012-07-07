@@ -16,20 +16,12 @@
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 
-struct guiObject GUI_Array[128];
+struct guiObject GUI_Array[100];
 struct guiObject *objHEAD = NULL;
-struct guiButton GUI_Button_Array[64];
-struct guiLabel GUI_Label_Array[64];
-struct guiFrame GUI_Frame_Array[16];
-struct guiDialog GUI_Dialog_Array[8];
-struct guiXYGraph GUI_XYGraph_Array[2];
-struct guiBarGraph GUI_BarGraph_Array[80];
-struct guiTextSelect GUI_TextSelect_Array[16];
 static u8 FullRedraw;
 
 static void GUI_DrawObject(struct guiObject *obj);
 static struct guiObject *GUI_GetFreeObj(void);
-static void *GUI_GetFreeGUIObj(enum GUIType guiType);
 static void dgCallback(struct guiObject *obj, void *data);
 
 static void GUI_DrawLabel(struct guiObject *obj);
@@ -54,26 +46,26 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType)
 {
-    struct guiDialog *dialog = GUI_GetFreeGUIObj(Dialog);
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiBox *box ;
+    struct guiDialog *dialog;
 
-    if (dialog == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    dialog = &obj->o.dialog;
 
     box->x = x;
     box->y = y;
     box->width = width;
     box->height = height;
-    box->image.file = "images/dialog.bmp";
-    box->image.x_off = 0;
-    box->image.y_off = 0;
+    dialog->image.file = "images/dialog.bmp";
+    dialog->image.x_off = 0;
+    dialog->image.y_off = 0;
 
     obj->Type = Dialog;
-    obj->widget = dialog;
-    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(box->image.file));
+    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(dialog->image.file));
     OBJ_SET_MODAL(obj, 1);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -84,7 +76,6 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     dialog->titleColor = titleColor;
     dialog->Type = dgType;
     dialog->CallBack = *CallBack;
-    dialog->inuse = 1;
 
     dialog->button[0] = NULL;
     dialog->button[1] = NULL;
@@ -94,9 +85,8 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     switch (dgType) {
     case dtOk:
         dialog->button[0] = GUI_CreateButton(((x + width) / 2) - 10,
-                ((y + height) - 27), BUTTON_90, "Ok", 0x0000, dgCallback, NULL);
+                ((y + height) - 27), BUTTON_90, "Ok", 0x0000, dgCallback, obj);
         OBJ_SET_MODAL(dialog->button[0], 1);
-        dialog->button[0]->parent = obj;
         break;
     case dtOkCancel:
         break;
@@ -111,39 +101,39 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data)
 {
-    struct guiTextSelect *select = GUI_GetFreeGUIObj(TextSelect);
     struct guiObject *obj = GUI_GetFreeObj();
+    struct guiTextSelect *select;
     struct guiBox *box;
 
-    if (select == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    select = &obj->o.textselect;
 
     switch (type) {
         case TEXTSELECT_128:
-            box->image.file = "images/spin128.bmp";
+            select->image.file = "images/spin128.bmp";
             break;
         case TEXTSELECT_64:
-            box->image.file = "images/spin64.bmp";
+            select->image.file = "images/spin64.bmp";
             break;
         case TEXTSELECT_96:
-            box->image.file = "images/spin96.bmp";
+            select->image.file = "images/spin96.bmp";
             break;
     }
-    box->image.x_off = 0;
-    box->image.y_off = 0;
+    select->image.x_off = 0;
+    select->image.y_off = 0;
 
     box->x = x;
     box->y = y;
-    if(! LCD_ImageDimensions(box->image.file, &box->width, &box->height)) {
-        printf("Couldn't locate file: %s\n", box->image.file);
+    if(! LCD_ImageDimensions(select->image.file, &box->width, &box->height)) {
+        printf("Couldn't locate file: %s\n", select->image.file);
         box->width = 20;
         box->height = 10;
     }
 
     obj->Type = TextSelect;
-    obj->widget = select;
     OBJ_SET_TRANSPARENT(obj, 0); //Even if the bmp has transparency, the redraw function will handle it
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -152,28 +142,27 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
-    select->inuse = 1;
 
     return obj;
 }
 
 guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *, void *), u16 fontColor, void *data)
 {
-    struct guiLabel  *label = GUI_GetFreeGUIObj(Label);
     struct guiObject *obj = GUI_GetFreeObj();
+    struct guiLabel  *label;
     struct guiBox    *box;
 
-    if (label == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    label = &obj->o.label;
     box->x = x;
     box->y = y;
     box->width = 0;
     box->height = 0;
 
     obj->Type = Label;
-    obj->widget = label;
     OBJ_SET_TRANSPARENT(obj, 0);  //Deal with transparency during drawing
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -182,38 +171,35 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *
     label->cb_data = data;
     label->fontColor = fontColor;
     label->fontName = LCD_GetFont();
-    label->inuse = 1;
 
     return obj;
 }
 
-guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image)
+guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file)
 {
-    struct guiFrame  *frame = GUI_GetFreeGUIObj(Frame);
     struct guiObject *obj = GUI_GetFreeObj();
+    struct guiImage  *image;
     struct guiBox    *box;
 
-    if (frame == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    image = &obj->o.image;
 
-    box->image.file = image;
-    box->image.x_off = 0;
-    box->image.y_off = 0;
+    image->file = file;
+    image->x_off = 0;
+    image->y_off = 0;
 
     box->x = x;
     box->y = y;
     box->width = width;
     box->height = height;
 
-    obj->Type = Frame;
-    obj->widget = frame;
-    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(image));
+    obj->Type = Image;
+    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(file));
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
-
-    frame->inuse = 1;
 
     return obj;
 
@@ -222,43 +208,42 @@ guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *im
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
-    struct guiButton *button = GUI_GetFreeGUIObj(Button);
     struct guiObject *obj    = GUI_GetFreeObj();
-    struct guiBox *box;
+    struct guiButton *button;
+    struct guiBox    *box;
     u16 text_w, text_h;
 
-    if (button == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    button = &obj->o.button;
 
     switch (type) {
-        case BUTTON_90: box->image.file = "images/btn90_24.bmp"; break;
-        case BUTTON_45: box->image.file = "images/btn46_24.bmp"; break;
-        case BUTTON_96x16: box->image.file = "images/btn96_16.bmp"; break;
-        case BUTTON_64x16: box->image.file = "images/btn64_16.bmp"; break;
-        case BUTTON_48x16: box->image.file = "images/btn48_16.bmp"; break;
-        case BUTTON_32x16: box->image.file = "images/btn32_16.bmp"; break;
+        case BUTTON_90: button->image.file = "images/btn90_24.bmp"; break;
+        case BUTTON_45: button->image.file = "images/btn46_24.bmp"; break;
+        case BUTTON_96x16: button->image.file = "images/btn96_16.bmp"; break;
+        case BUTTON_64x16: button->image.file = "images/btn64_16.bmp"; break;
+        case BUTTON_48x16: button->image.file = "images/btn48_16.bmp"; break;
+        case BUTTON_32x16: button->image.file = "images/btn32_16.bmp"; break;
     }
-    box->image.x_off = 0;
-    box->image.y_off = 0;
+    button->image.x_off = 0;
+    button->image.y_off = 0;
 
     box->x = x;
     box->y = y;
-    if(! LCD_ImageDimensions(box->image.file, &box->width, &box->height)) {
-        printf("Couldn't locate file: %s\n", box->image.file);
+    if(! LCD_ImageDimensions(button->image.file, &box->width, &box->height)) {
+        printf("Couldn't locate file: %s\n", button->image.file);
         box->width = 20;
         box->height = 10;
     }
 
     obj->Type = Button;
-    obj->widget = button;
     OBJ_SET_TRANSPARENT(obj, 0); //No need to set transparency since the image cannot be overlapped, and the file can't change
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     LCD_GetStringDimensions((u8 *) text, &text_w, &text_h);
-    button->inuse = 1;
     button->text = text;
     button->text_x_off = (box->width - text_w) / 2 + x;
     button->text_y_off = (box->height - text_h) / 2 + y + 2;
@@ -277,14 +262,15 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data)
 {
-    struct guiXYGraph *graph = GUI_GetFreeGUIObj(XYGraph);
     struct guiObject  *obj   = GUI_GetFreeObj();
+    struct guiXYGraph *graph;
     struct guiBox    *box;
 
-    if (graph == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    graph = &obj->o.xy;
 
     box->x = x;
     box->y = y;
@@ -292,7 +278,6 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     box->height = height;
 
     obj->Type = XYGraph;
-    obj->widget = graph;
     OBJ_SET_TRANSPARENT(obj, 0);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -303,7 +288,6 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
     graph->max_y = max_y;
     graph->grid_x = gridx;
     graph->grid_y = gridy;
-    graph->inuse = 1;
     graph->CallBack = Callback;
     graph->point_cb = point_cb;
     graph->touch_cb = touch_cb;
@@ -316,14 +300,15 @@ guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min, s16 max, u8 direction,
                       s16 (*Callback)(void *data), void *cb_data)
 {
-    struct guiBarGraph *graph = GUI_GetFreeGUIObj(BarGraph);
     struct guiObject   *obj   = GUI_GetFreeObj();
+    struct guiBarGraph *graph;
     struct guiBox    *box;
 
-    if (graph == NULL || obj == NULL)
+    if (obj == NULL)
         return NULL;
 
     box = &obj->box;
+    graph = &obj->o.bar;
 
     box->x = x;
     box->y = y;
@@ -331,7 +316,6 @@ guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     box->height = height;
 
     obj->Type = BarGraph;
-    obj->widget = graph;
     OBJ_SET_TRANSPARENT(obj, 0);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -339,7 +323,6 @@ guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
     graph->min = min;
     graph->max = max;
     graph->direction = direction;
-    graph->inuse = 1;
     graph->CallBack = Callback;
     graph->cb_data = cb_data;
 
@@ -360,10 +343,10 @@ void GUI_DrawObject(struct guiObject *obj)
         break;
     case Button:
     {
-        struct guiButton *button = (struct guiButton *)obj->widget;
+        struct guiButton *button = &obj->o.button;
         LCD_DrawWindowedImageFromFile(box->x, box->y,
-                box->image.file, box->width, box->height,
-                box->image.x_off, box->image.y_off);
+                button->image.file, box->width, box->height,
+                button->image.x_off, button->image.y_off);
         LCD_SetFontColor(button->fontColor);
         LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
         break;
@@ -373,19 +356,20 @@ void GUI_DrawObject(struct guiObject *obj)
         GUI_DrawLabel(obj);
         break;
     }
-    case Frame:
+    case Image:
     {
+        struct guiImage *image = &obj->o.image;
         LCD_DrawWindowedImageFromFile(box->x, box->y,
-                box->image.file, box->width, box->height,
-                box->image.x_off, box->image.y_off);
+                image->file, box->width, box->height,
+                image->x_off, image->y_off);
         break;
     }
     case Dialog: {
-        struct guiDialog *dialog = (struct guiDialog *)obj->widget;
+        struct guiDialog *dialog = &obj->o.dialog;
         //printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
         //        box->y, box->width, box->height);
-        LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file,
-                box->width, box->height, box->image.x_off, box->image.y_off);
+        LCD_DrawWindowedImageFromFile(box->x, box->y, dialog->image.file,
+                box->width, box->height, dialog->image.x_off, dialog->image.y_off);
         LCD_SetFontColor(dialog->titleColor);
         LCD_PrintStringXY(box->x + 5, (box->y + 10), dialog->title);
         LCD_SetFontColor(dialog->fontColor);
@@ -421,7 +405,7 @@ void GUI_DrawObjects(void)
 
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if(! obj->parent)
+        if(! OBJ_IS_MODAL(obj) || obj->Type == Dialog)
             GUI_DrawObject(obj);
         obj = obj->next;
     }
@@ -435,41 +419,12 @@ void GUI_RemoveAllObjects()
 
 void GUI_RemoveObj(struct guiObject *obj)
 {
-    switch (obj->Type) {
-    case UnknownGUI:
-        break;
-    case Button: 
-        ((struct guiButton *)obj->widget)->inuse = 0;
-        break;
-    case Label:
-        ((struct guiLabel *)obj->widget)->inuse = 0;
-        break;
-    case Frame:
-        ((struct guiFrame *)obj->widget)->inuse = 0;
-        break;
-    case Dialog:
-    {
-        struct guiDialog *dialog = (struct guiDialog *)obj->widget;
-        dialog->inuse = 0;
+    if (obj->Type == Dialog) {
+        struct guiDialog *dialog = &obj->o.dialog;
         int i;
         for (i = 0; i < 4; i++)
             if (dialog->button[i])
                 GUI_RemoveObj(dialog->button[i]);
-        break;
-    }
-    case CheckBox:
-        break;
-    case Dropdown:
-        break;
-    case XYGraph:
-        ((struct guiXYGraph *)obj->widget)->inuse = 0;
-        break;
-    case BarGraph:
-        ((struct guiBarGraph *)obj->widget)->inuse = 0;
-        break;
-    case TextSelect:
-        ((struct guiTextSelect *)obj->widget)->inuse = 0;
-        break;
     }
     OBJ_SET_USED(obj, 0);
     // Reattach linked list
@@ -496,62 +451,10 @@ struct guiObject *GUI_GetFreeObj(void)
         if (! OBJ_IS_USED(&GUI_Array[i])) {
             obj = &GUI_Array[i];
             obj->next = NULL;
-            obj->parent = NULL;
             OBJ_SET_DISABLED(obj, 0);
             OBJ_SET_MODAL(obj, 0);
             OBJ_SET_DIRTY(obj, 1);
             return obj;
-        }
-    }
-    return NULL;
-}
-
-void *GUI_GetFreeGUIObj(enum GUIType guiType)
-{
-    int i;
-    for (i = 0; i < 256; i++) {
-        switch (guiType) {
-        case UnknownGUI:
-            break;
-        case Button:
-            if (GUI_Button_Array[i].inuse == 0) {
-                return &GUI_Button_Array[i];
-            }
-            break;
-        case Label:
-            if (GUI_Label_Array[i].inuse == 0) {
-                return &GUI_Label_Array[i];
-            }
-            break;
-        case Frame:
-            if (GUI_Frame_Array[i].inuse == 0) {
-                return &GUI_Frame_Array[i];
-            }
-            break;
-        case Dialog:
-            if (GUI_Dialog_Array[i].inuse == 0) {
-                return &GUI_Dialog_Array[i];
-            }
-            break;
-        case CheckBox:
-            break;
-        case Dropdown:
-            break;
-        case XYGraph:
-            if (GUI_XYGraph_Array[i].inuse == 0) {
-                return &GUI_XYGraph_Array[i];
-            }
-            break;
-        case BarGraph:
-            if (GUI_BarGraph_Array[i].inuse == 0) {
-                return &GUI_BarGraph_Array[i];
-            }
-            break;
-        case TextSelect:
-            if (GUI_TextSelect_Array[i].inuse == 0) {
-                return &GUI_TextSelect_Array[i];
-            }
-            break;
         }
     }
     return NULL;
@@ -577,16 +480,23 @@ void GUI_DrawScreen(void)
     FullRedraw = 0;
 }
 
-u8 GUI_IsModal(void)
+struct guiObject *GUI_IsModal(void)
 {
-    return GUI_Dialog_Array[0].inuse;
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        if(obj->Type == Dialog && OBJ_IS_USED(obj))
+            return obj;
+        obj = obj->next;
+    }
+    return NULL;
 }
 
 void dgCallback(struct guiObject *obj, void *data)
 {
     (void)data;
     struct guiDialogReturn gDR;
-    struct guiDialog *dialog = (struct guiDialog *)obj->parent->widget;
+    struct guiObject *dlgObj = (struct guiObject *)data;
+    struct guiDialog *dialog = &dlgObj->o.dialog;
     if (dialog->button[0] == obj) {
         gDR.buttonPushed = 0;
     }
@@ -601,7 +511,7 @@ void dgCallback(struct guiObject *obj, void *data)
     }
     gDR.intInput = 0;
     sprintf(gDR.strInput, " ");
-    dialog->CallBack(obj->parent, gDR);
+    dialog->CallBack(dlgObj, gDR);
 }
 
 void GUI_Redraw(struct guiObject *obj)
@@ -611,23 +521,17 @@ void GUI_Redraw(struct guiObject *obj)
 
 void GUI_RefreshScreen(void)
 {
+    struct guiObject *obj;
     if (FullRedraw) {
         GUI_DrawScreen();
         return;
     }
-    if(GUI_IsModal()) {
-        struct guiObject *obj = objHEAD;
-        while(obj) {
-            if(OBJ_IS_MODAL(obj) && OBJ_IS_DIRTY(obj)) {
-                if (obj->parent)
-                    GUI_DrawObject(obj->parent);
-                else
-                    GUI_DrawObject(obj);
-            }
-            obj = obj->next;
+    if((obj = GUI_IsModal())) {
+        if(OBJ_IS_DIRTY(obj)) {
+            GUI_DrawObject(obj);
         }
     } else {
-        struct guiObject *obj = objHEAD;
+        obj = objHEAD;
         while(obj) {
             if(OBJ_IS_DIRTY(obj)) {
                 if(OBJ_IS_TRANSPARENT(obj)) {
@@ -643,7 +547,7 @@ void GUI_RefreshScreen(void)
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
     u8 modalActive;
-    modalActive = GUI_IsModal();
+    modalActive = GUI_IsModal() ? 1 : 0;
     struct guiObject *obj = objHEAD;
     while(obj) {
         if (! OBJ_IS_DISABLED(obj)
@@ -654,7 +558,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Button:
                 if (coords_in_box(&obj->box, coords)) {
-                    struct guiButton *button = (struct guiButton *)obj->widget;
+                    struct guiButton *button = &obj->o.button;
                     if(button->CallBack) {
                         OBJ_SET_DIRTY(obj, 1);
                         button->CallBack(obj, button->cb_data);
@@ -666,7 +570,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case TextSelect:
                 if(coords_in_box(&obj->box, coords)) {
                     struct guiBox box = obj->box;
-                    struct guiTextSelect *select = (struct guiTextSelect *)obj->widget;
+                    struct guiTextSelect *select = &obj->o.textselect;
                     box.width = 16;
                     if (coords_in_box(&box, coords)) {
                         if (select->ValueCB) {
@@ -695,7 +599,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break; /* Dialogs are handled by buttons */
             case Label:
                 break;
-            case Frame:
+            case Image:
                 break;
             case CheckBox:
                 break;
@@ -703,7 +607,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case XYGraph:
                 if(coords_in_box(&obj->box, coords)) {
-                    struct guiXYGraph *graph = (struct guiXYGraph *)obj->widget;
+                    struct guiXYGraph *graph = &obj->o.xy;
                     if (graph->touch_cb) {
                         s32 x, y;
                         x = (s32)(coords->x - obj->box.x) * (1 + graph->max_x - graph->min_x) / obj->box.width + graph->min_x;
@@ -728,7 +632,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 
 void GUI_DrawLabel(struct guiObject *obj)
 {
-    struct guiLabel *label = (struct guiLabel *)obj->widget;
+    struct guiLabel *label = &obj->o.label;
     const char *str;
     u16 old_w = obj->box.width;
     u16 old_h = obj->box.height;
@@ -751,7 +655,7 @@ void GUI_DrawLabel(struct guiObject *obj)
 void GUI_DrawXYGraph(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
-    struct guiXYGraph *graph = (struct guiXYGraph *)obj->widget;
+    struct guiXYGraph *graph = &obj->o.xy;
     u32 x, y;
 
     inline u32 VAL_TO_X(s32 xval)
@@ -830,7 +734,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
 #define TRIM_THICKNESS 10
 #define TRIM_MARGIN 1
     struct guiBox *box = &obj->box;
-    struct guiBarGraph *graph = (struct guiBarGraph *)obj->widget;
+    struct guiBarGraph *graph = &obj->o.bar;
     int height = box->height - 2;
     int width  = box->width - 2;
     int x = box->x + 1;
@@ -884,8 +788,8 @@ void GUI_DrawTextSelect(struct guiObject *obj)
 {
     u16 x, y, w, h;
     struct guiBox *box = &obj->box;
-    struct guiTextSelect *select = (struct guiTextSelect *)obj->widget;
-    LCD_DrawWindowedImageFromFile(box->x, box->y, box->image.file, box->width, box->height, box->image.x_off, box->image.y_off);
+    struct guiTextSelect *select = &obj->o.textselect;
+    LCD_DrawWindowedImageFromFile(box->x, box->y, select->image.file, box->width, box->height, select->image.x_off, select->image.y_off);
     const char *str =select->ValueCB(obj, 0, select->cb_data);
     LCD_SetFontColor(select->fontColor);
     LCD_GetStringDimensions((const u8 *)str, &w, &h);

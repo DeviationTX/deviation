@@ -96,8 +96,8 @@ void PAGE_TestInit(int page)
     }
 
     /* Create some GUI elements */
-    GUI_CreateFrame(0,0,320,24,statusBar);
-    GUI_CreateFrame(270,1,48,22,batteryImg);
+    GUI_CreateImage(0,0,320,24,statusBar);
+    GUI_CreateImage(270,1,48,22,batteryImg);
     GUI_CreateLabel(10,60,NULL, 0x0000, strSPIFlash);
     GUI_CreateLabel(10,45,NULL, 0x0000, strBootLoader);
     GUI_CreateLabel(10,30,NULL, 0x0000, strMfg);

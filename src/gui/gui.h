@@ -50,7 +50,7 @@ enum GUIType {
     UnknownGUI,
     Button,
     Label,
-    Frame,
+    Image,
     CheckBox,
     Dropdown,
     Dialog,
@@ -69,16 +69,6 @@ struct guiBox {
     u16 y;
     u16 width;
     u16 height;
-    struct guiImage image;
-};
-
-struct guiObject {
-    enum GUIType Type;
-    struct guiBox box;
-    u8 flags;
-    void *widget;
-    struct guiObject *next;
-    struct guiObject *parent;
 };
 
 struct guiLabel {
@@ -86,19 +76,15 @@ struct guiLabel {
     void *cb_data;
     u16 fontColor;
     u8 fontName;
-    u8 inuse;
-};
-struct guiFrame {
-    u8 inuse;
 };
 struct guiButton {
+    struct guiImage image;
     const char *text;
     u16 text_x_off;
     u16 text_y_off;
     u16 fontColor;
     void (*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
-    u8 inuse;
 };
 
 struct guiXYGraph {
@@ -112,7 +98,6 @@ struct guiXYGraph {
     u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data);
     u8 (*touch_cb)(s16 x, s16 y, void *data);
     void *cb_data;
-    u8 inuse;
 };
 
 struct guiBarGraph {
@@ -121,10 +106,10 @@ struct guiBarGraph {
     u8 direction;
     s16 (*CallBack)(void * data);
     void *cb_data;
-    u8 inuse;
 };
 
 struct guiDialog {
+    struct guiImage image;
     const char *text;
     const char *title;
     enum DialogType Type;
@@ -132,16 +117,32 @@ struct guiDialog {
     u16 titleColor;
     struct guiObject *button[4];
     void (*CallBack)(guiObject_t *obj, struct guiDialogReturn gDR);
-    u8 inuse;
 };
 
 struct guiTextSelect {
+    struct guiImage image;
     u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);
     void *cb_data;
-    u8 inuse;
 };
+
+struct guiObject {
+    enum GUIType Type;
+    struct guiBox box;
+    u8 flags;
+    struct guiObject *next;
+    union {
+        struct guiImage image;
+        struct guiLabel label;
+        struct guiButton button;
+        struct guiXYGraph xy;
+        struct guiBarGraph bar;
+        struct guiDialog   dialog;
+        struct guiTextSelect textselect;
+    } o;
+};
+
 #define OBJ_IS_USED(x)        ((x)->flags & 0x01) /* bool: UI element is in use */
 #define OBJ_IS_DISABLED(x)    ((x)->flags & 0x02) /* bool: UI element is not 'active' */
 #define OBJ_IS_MODAL(x)       ((x)->flags & 0x04) /* bool: UI element is active and all non-model elements are not */
@@ -159,7 +160,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType);
 guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *obj, void *data), u16 fontColor, void *data);
-guiObject_t *GUI_CreateFrame(u16 x, u16 y, u16 width, u16 height, const char *image);
+guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file);
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
@@ -182,6 +183,6 @@ void GUI_Redraw(guiObject_t *obj);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
-u8 GUI_IsModal(void);
+struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
 #endif /* GUI_H_ */
