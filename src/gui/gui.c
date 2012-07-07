@@ -228,6 +228,7 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
     keyboard->last_coords.x = 0;
     keyboard->last_coords.y = 0;
     keyboard->text = text;
+    keyboard->caps = 1;
     keyboard->num_chars = num_chars;
     keyboard->CallBack = CallBack;
     keyboard->cb_data = cb_data;
@@ -681,7 +682,8 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case BarGraph:
                 break;
             case Keyboard:
-                return GUI_DrawKeyboard(obj, coords);
+                if(! long_press)
+                    return GUI_DrawKeyboard(obj, coords);
                 break;
             }
         }
@@ -894,16 +896,25 @@ static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
     box.y = y + Y_SPACE;
     box.width = width - 2 * X_SPACE;
     box.height = height - 2 * Y_SPACE;
-    if(coords1 && coords_in_box(&box, coords1)) {
-        draw = 1;
+
+    if(coords1 && coords_in_box(&box, coords1 ) && (! coords2 || ! coords_in_box(&box, coords2))) {
+        draw = 2;
         bg_color = bg_color2;
-    } else if(coords2 && coords_in_box(&box, coords2)) {
+    } else if(! coords1 && coords2 && coords_in_box(&box, coords2)) {
         draw = 1;
         bg_color = bg_color1;
     } else if(! coords2&& ! coords1) {
         draw = 1;
         bg_color = bg_color1;
     }
+    /*
+    printf("(%dx%dx%dx%d)", box.x, box.y, box.width, box.height);
+    if(coords1)
+        printf(" coords1: %dx%d", coords1->x, coords1->y);
+    if(coords2)
+        printf(" coords2: %dx%d", coords2->x, coords2->y);
+    printf(" Draw: %d\n", draw);
+    */
     if(! draw)
         return 0;
     LCD_FillRoundRect(box.x, box.y, box.width, box.height, 3, bg_color);
@@ -911,16 +922,38 @@ static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
     LCD_SetXY(x + (width - w) / 2, y + (height - h) / 2);
     LCD_SetFontColor(txt_color);
     LCD_PrintString((const char *)str);
-    return 1;
+    return draw;
 }
 
-static void kb_draw_text(const u8 *str)
+static void kb_draw_text(const char *str)
 {
     u16 w, h;
     LCD_GetCharDimensions('A', &w, &h);
     LCD_FillRoundRect(5, 2, 320 - 10, 24, 3, 0xFFFF);
     LCD_SetXY(10, (24 - h) / 2 + 2);
-    LCD_PrintString((const char *)str);
+    LCD_SetFontColor(0x0000);
+    LCD_PrintString(str);
+}
+
+void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
+{
+    u8 len = strlen(keyboard->text);
+    if(ch == '') {
+        if (len > 0) {
+            keyboard->text[len - 1] = 0;
+            kb_draw_text(keyboard->text);
+        }
+        return;
+    }
+    if (len >= keyboard->num_chars) 
+        return;
+    if(! keyboard->caps && ch >= 'A' && ch <= 'Z') {
+        ch = (ch - 'A') + 'a';
+    }
+    keyboard->caps = 0;
+    keyboard->text[len] = ch;
+    keyboard->text[len+1] = 0;
+    kb_draw_text(keyboard->text);
 }
 u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
 {
@@ -938,6 +971,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     u8 row, i;
     struct guiKeyboard *keyboard = &obj->o.keyboard;
     struct touch *last_coords;
+    u8 pressed;
     const u8 r1[] = "QWERTYUIOP";
     const u8 r2[] =  "ASDFGHJKL";
     const u8 r3[] =   "ZXCVBNM";
@@ -954,7 +988,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     } else {
         last_coords = NULL;
     }
-    kb_draw_text((const u8 *)keyboard->text);
+    kb_draw_text(keyboard->text);
     for(row = 0; row < 3; row++) {
         const u8 *ptr;
         u8 num_chars;
@@ -970,22 +1004,52 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
         y_off = Y_OFFSET + KEY_H * row;
         for(i = 0; i < num_chars; i++) {
             ch[0] = ptr[i];
-            draw |= kb_draw_key(x_off + i * KEY_W1, y_off, KEY_W1, KEY_H, ch, BG1, BG2, TXT1, coords, last_coords);
+            pressed = kb_draw_key(x_off + i * KEY_W1, y_off, KEY_W1, KEY_H, ch, BG1, BG2, TXT1, coords, last_coords);
+            draw |= pressed;
+            if (2 == pressed) {
+                kb_update_string(keyboard, ptr[i]);
+            }
         }
     }
     /* CAPS */
-    draw |= kb_draw_key(0, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, caps, BG2, BG3, TXT2, coords, last_coords);
+    pressed = kb_draw_key(0, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, caps, BG2, BG3, TXT2, coords, last_coords);
+    draw |= pressed;
+    if (pressed == 2) {
+        keyboard->caps ^= 1;
+    }
     /* DEL */
-    draw |= kb_draw_key(320 - KEY_W2, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, del, BG2, BG3, TXT2, coords, last_coords);
+    pressed = kb_draw_key(320 - KEY_W2, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, del, BG2, BG3, TXT2, coords, last_coords);
+    draw |= pressed;
+    if (pressed == 2) {
+        kb_update_string(keyboard, '');
+    }
     /* NUMPAD */
-    draw |= kb_draw_key(0, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, num, BG2, BG3, TXT2, coords, last_coords);
+    pressed = kb_draw_key(0, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, num, BG2, BG3, TXT2, coords, last_coords);
+    draw |= pressed;
+    if (pressed == 2) {
+        //redraw numpad here
+    }
     /* SPACE */
-    draw |= kb_draw_key(KEY_W3, Y_OFFSET + KEY_H * 3, 320 - 2 * KEY_W3, KEY_H, space, BG1, BG2, TXT1, coords, last_coords);
+    pressed = kb_draw_key(KEY_W3, Y_OFFSET + KEY_H * 3, 320 - 2 * KEY_W3, KEY_H, space, BG1, BG2, TXT1, coords, last_coords);
+    draw |= pressed;
+    if (pressed == 2) {
+        kb_update_string(keyboard, ' ');
+    }
+
     /* DONE */
-    draw |= kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, BG3, BG3, TXT2, NULL, NULL);
+    pressed = kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, BG3, BG3, TXT2, coords, last_coords);
+    draw |= pressed;
+    if (pressed == 2) {
+        //Done
+        if (keyboard->CallBack) {
+            keyboard->CallBack(obj, keyboard->cb_data);
+        }
+    }
     if(draw) {
-        if(coords) 
+        OBJ_SET_DIRTY(obj, 1);
+        if(coords) {
             keyboard->last_coords = *coords;
+        }  
         else if(last_coords)
             keyboard->last_coords.x = keyboard->last_coords.y = 0;
     }

@@ -89,6 +89,7 @@ struct guiKeyboard {
     struct touch last_coords;
     char *text;
     u8 num_chars;
+    u8 caps;
     enum KeyboardType type;
     void (*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
