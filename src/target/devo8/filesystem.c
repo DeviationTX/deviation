@@ -48,6 +48,10 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
     return len / size;
 }
 
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    return 0;
+}
 FILE *fopen(const char *path, const char *mode)
 {
     (void)mode;

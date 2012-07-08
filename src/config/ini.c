@@ -21,7 +21,7 @@ http://code.google.com/p/inih/
 static char* rstrip(char* s)
 {
     char* p = s + strlen(s);
-    while (p > s && isspace(*--p))
+    while (p > s && isspace((unsigned char)(*--p)))
         *p = '\0';
     return s;
 }
@@ -29,7 +29,7 @@ static char* rstrip(char* s)
 /* Return pointer to first non-whitespace char in given string. */
 static char* lskip(const char* s)
 {
-    while (*s && isspace(*s))
+    while (*s && isspace((unsigned char)(*s)))
         s++;
     return (char*)s;
 }
@@ -41,7 +41,7 @@ static char* find_char_or_comment(const char* s, char c)
 {
     int was_whitespace = 0;
     while (*s && *s != c && !(was_whitespace && *s == ';')) {
-        was_whitespace = isspace(*s);
+        was_whitespace = isspace((unsigned char)(*s));
         s++;
     }
     return (char*)s;

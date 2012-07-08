@@ -207,6 +207,16 @@ int sprintf(char *out, const char *format, ...)
         return print( &out, format, args );
 }
 
+int fprintf(FILE *fh, const char *format, ...)
+{
+        va_list args;
+        char out[80];
+        char bytes;
+        va_start( args, format );
+        bytes = print((char **)&out, format, args );
+        return fwrite(out, bytes, 1, fh);
+}
+
 #ifdef TEST_PRINTF
 int main(void)
 {
