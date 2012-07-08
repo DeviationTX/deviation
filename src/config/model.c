@@ -51,7 +51,7 @@ static const char MIXER_CURVETYPE[] = "curvetype";
 static const char * const MIXER_CURVETYPE_VAL[] = {
    "none", "min/max", "zero/max", "greater-than-0", "less-than-0", "absval",
    "expo", "3point", "5point", "7point", "9point", "11point", "13point" };
-static const char MIXER_CURVE_POINT[] = "curvepoint";
+static const char MIXER_CURVE_POINTS[] = "points";
 
 /* Section: Channel */
 static const char SECTION_CHANNEL[] = "channel";
@@ -167,17 +167,39 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown Curve type: %s\n", section, value);
             return 1;
         }
-        if (MATCH_START(name, MIXER_CURVE_POINT)) {
-            u8 point = atoi(name + sizeof(MIXER_CURVE_POINT) - 1);
-            if (point > MAX_POINTS) {
-                printf("%s: Curve point %s is not valid (maxpoints = %d\n", section, name, MAX_POINTS);
-                return 0;
+        if (MATCH_KEY(MIXER_CURVE_POINTS)) {
+            u8 point = 0;
+            u8 sign = 0;
+            value_int = 0;
+            const char *ptr = value;
+            // This is a crude version of strtok/atoi
+            while(1) {
+                if(*ptr == ',' || *ptr == '\0') {
+                    value_int = value_int * (sign ? -1 : 1);
+                    if (point >= MAX_POINTS) {
+                        printf("%s: Curve point %s is not valid (maxpoints = %d\n", section, name, MAX_POINTS);
+                        return 0;
+                    }
+                    if (value_int > 100)
+                        value_int = 100;
+                    if (value_int < -100)
+                        value_int = -100;
+                    m->mixers[idx].curve.points[point] = value_int;
+                    sign = 0;
+                    value_int = 0;
+                    if (*ptr == '\0')
+                        return 1;
+                    point++;
+                } else if(*ptr == '-') {
+                    sign = 1;
+                } else if(*ptr >= '0' && *ptr <= '9') {
+                    value_int = value_int * 10 + (*ptr - '0');
+                } else {
+                    printf("%s: Bad value in %s at:%s\n", section, name, ptr);
+                    return 0;
+                }
+                ptr++;
             }
-            if (value_int > 100 || value_int < 100) {
-                printf("%s: Curve point %s is out of range %s is not within -100 <= x <= 100\n", section, name, value);
-                value_int  = 0;
-            }
-            m->mixers[idx].curve.points[point] = value_int;
             return 1;
         }
     }
@@ -294,8 +316,14 @@ u8 CONFIG_WriteModel(const char *file) {
         if(WRITE_FULL_MODEL || m->mixers[idx].curve.type != 0) {
             fprintf(fh, "%s=%s\n", MIXER_CURVETYPE, MIXER_CURVETYPE_VAL[m->mixers[idx].curve.type]);
             u8 num_points = CURVE_NumPoints(&m->mixers[idx].curve);
-            for (i = 0; i < num_points; i++) {
-                fprintf(fh, "%s%d=%d\n", MIXER_CURVE_POINT, i, m->mixers[idx].curve.points[i]);
+            if (num_points > 0) {
+                fprintf(fh, "%s=", MIXER_CURVE_POINTS);
+                for (i = 0; i < num_points; i++) {
+                    fprintf(fh, "%d", m->mixers[idx].curve.points[i]);
+                    if (i != num_points - 1)
+                        fprintf(fh, ",");
+                }
+                fprintf(fh, "\n");
             }
         }
     }
