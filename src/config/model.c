@@ -20,6 +20,8 @@
 #include <string.h>
 
 struct Model Model;
+/*set this to write all model data even if it is the same as the default */
+#define WRITE_FULL_MODEL 0
 
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -256,6 +258,84 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 0;
     }
     return 0;
+}
+
+u8 CONFIG_WriteModel(const char *file) {
+    FILE *fh;
+    u8 idx;
+    u8 i;
+    struct Model *m = &Model;
+    fh = fopen(file, "w");
+    if (! fh) {
+        printf("Couldn't open file: %s\n", file);
+        return 0;
+    }
+    fprintf(fh, "[%s]\n", SECTION_RADIO);
+    fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
+    fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
+    if(WRITE_FULL_MODEL || m->fixed_id != 0)
+        fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, m->fixed_id);
+    fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
+
+    for(idx = 0; idx < NUM_MIXERS; idx++) {
+        if (! WRITE_FULL_MODEL && m->mixers[idx].src == 0)
+            continue;
+        fprintf(fh, "[%s%d]\n", SECTION_MIXER, idx+1);
+        fprintf(fh, "%s=%d\n", MIXER_SOURCE, m->mixers[idx].src);
+        fprintf(fh, "%s=%d\n", MIXER_DEST, m->mixers[idx].dest);
+        if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
+            fprintf(fh, "%s=%d\n", MIXER_SWITCH, m->mixers[idx].sw);
+        if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
+            fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
+        if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
+            fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
+        if(WRITE_FULL_MODEL || m->mixers[idx].mux != 0)
+            fprintf(fh, "%s=%s\n", MIXER_MUXTYPE, MIXER_MUXTYPE_VAL[m->mixers[idx].mux]);
+        if(WRITE_FULL_MODEL || m->mixers[idx].curve.type != 0) {
+            fprintf(fh, "%s=%s\n", MIXER_CURVETYPE, MIXER_CURVETYPE_VAL[m->mixers[idx].curve.type]);
+            u8 num_points = CURVE_NumPoints(&m->mixers[idx].curve);
+            for (i = 0; i < num_points; i++) {
+                fprintf(fh, "%s%d=%d\n", MIXER_CURVE_POINT, i, m->mixers[idx].curve.points[i]);
+            }
+        }
+    }
+    for(idx = 0; idx < NUM_CHANNELS; idx++) {
+        if(!WRITE_FULL_MODEL &&
+           m->limits[idx].reverse == 0 &&
+           m->limits[idx].safetysw == 0 &&
+           m->limits[idx].safetyval == 0 &&
+           m->limits[idx].max == 100 &&
+           m->limits[idx].min == -100 &&
+           m->template[idx] == 0)
+        {
+            continue;
+        }
+        fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
+        if(WRITE_FULL_MODEL || m->limits[idx].reverse != 0)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, m->limits[idx].reverse);
+        if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYSW, m->limits[idx].safetysw);
+        if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
+        if(WRITE_FULL_MODEL || m->limits[idx].max != 100)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
+        if(WRITE_FULL_MODEL || m->limits[idx].min != -100)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, m->limits[idx].min);
+        if(WRITE_FULL_MODEL || m->template[idx] != 0)
+            fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
+    }
+    for(idx = 0; idx < NUM_TRIMS; idx++) {
+        if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
+            continue;
+        fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
+        fprintf(fh, "%s=%d\n", TRIM_SRC, m->trims[idx].src);
+        fprintf(fh, "%s=%d\n", TRIM_POS, m->trims[idx].pos);
+        fprintf(fh, "%s=%d\n", TRIM_NEG, m->trims[idx].neg);
+        if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
+            fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
+    }
+    fclose(fh);
+    return 1;
 }
 
 void clear_model()

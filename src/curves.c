@@ -102,3 +102,20 @@ const char *CURVE_GetName(struct Curve *curve)
     return "Unknown";
 }
 
+u8 CURVE_NumPoints(struct Curve *curve)
+{
+    switch (curve->type) {
+        case CURVE_NONE:
+        case CURVE_MIN_MAX:
+        case CURVE_ZERO_MAX:
+        case CURVE_GT_ZERO:
+        case CURVE_LT_ZERO:
+        case CURVE_ABSVAL:
+            return 0;
+        case CURVE_EXPO:
+             return 2;
+        default:
+             return (curve->type - CURVE_EXPO) * 2 + 1;
+    }
+}
+
