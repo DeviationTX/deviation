@@ -3,6 +3,7 @@
 
 #include "mixer.h"
 struct Model {
+    char name[24];
     enum Protocols protocol;
     u8 num_channels;
     u16 fixed_id;

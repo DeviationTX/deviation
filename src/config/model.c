@@ -23,6 +23,7 @@ struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 #define WRITE_FULL_MODEL 0
 
+static const char MODEL_NAME[] = "name";
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
 
@@ -83,6 +84,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
     #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
     #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
+    if (MATCH_SECTION("") && MATCH_KEY(MODEL_NAME)) {
+        strncpy(m->name, value, sizeof(m->name)-1);
+        m->name[sizeof(m->name)-1] = 0;
+        return 1;
+    }
     if (MATCH_SECTION(SECTION_RADIO)) {
         if (MATCH_KEY(RADIO_PROTOCOL)) {
             for (i = 0; i < NUM_STR_ELEMS(RADIO_PROTOCOL_VAL); i++) {
@@ -279,6 +285,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         printf("%s: Unknown trim setting: %s\n", section, name);
         return 0;
     }
+    printf("Unkown Section: '%s'\n", section);
     return 0;
 }
 
