@@ -9,6 +9,13 @@
 #define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
 
+enum Mode {
+    MODE_1,
+    MODE_2,
+    MODE_3,
+    MODE_4,
+};
+
 enum CurveType {
     CURVE_NONE,
     CURVE_MIN_MAX,
@@ -65,7 +72,7 @@ struct Mixer {
     u8 dest;
     u8 sw;
     struct Curve curve;
-    s8 scaler;
+    s8 scalar;
     s8 offset;
     enum MuxType mux;
 };

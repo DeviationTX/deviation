@@ -39,6 +39,7 @@ void PAGE_TestInit(int page)
     static const char *statusBar = "images/bar.bmp";
     static const char *batteryImg = "images/bat.bmp";
 
+    CLOCK_StopTimer();
     sprintf(buttonstr,"buttons");
     sprintf(buttonmessage," ");
     sprintf(t1," ");
@@ -112,6 +113,7 @@ void PAGE_TestInit(int page)
     GUI_CreateButton(110,200,BUTTON_90,button2,0x0000,PushMeButton, "Button 2 Pushed");
     GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");
     GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
+    //GUI_CreateKeyboard(KEYBOARD_CHAR, buttonstr, 20, &PushMeButton, buttonstr);
 
     // do a master redraw
     GUI_DrawScreen();

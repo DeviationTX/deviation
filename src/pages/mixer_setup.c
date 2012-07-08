@@ -141,7 +141,7 @@ static void show_simple()
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, NULL, 0x0000, "Scale:");
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
     GUI_CreateLabel(COL2_TEXT, 66, NULL, 0x0000, "Offset:");
     GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 4
@@ -204,11 +204,11 @@ static void show_expo_dr()
     }
     //Row 5
     GUI_CreateLabel(8, 122, NULL, 0x0000, "Scale:");
-    GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scaler);
+    GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
     if (MIX_SRC(mp->mixer[1].sw))
-        GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scaler);
+        GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
     if (MIX_SRC(mp->mixer[2].sw))
-        GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scaler);
+        GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
     mp->graph = GUI_CreateXYGraph(COL1_TEXT, 150, 86, 86,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -228,7 +228,7 @@ static void show_complex()
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, mp->cur_mixer);
     //Row 2
     GUI_CreateLabel(COL1_TEXT, 66, NULL, 0x0000, "Scale:");
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->scaler);
+    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->scalar);
     GUI_CreateLabel(COL2_TEXT, 66, NULL, 0x0000, "Offset:");
     GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->offset);
     //Row 3

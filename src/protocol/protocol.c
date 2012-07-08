@@ -39,6 +39,9 @@ void PROTOCOL_Init(enum Protocols p)
             J6PRO_Initialize();
             #endif
             break;
+        case PROTOCOL_NONE:
+            CLOCK_StopTimer();
+            break;
     }
 }
 

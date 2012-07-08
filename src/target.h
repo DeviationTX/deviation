@@ -145,11 +145,22 @@ void PAGE_Event();
 
 /* Protocol */
 enum Protocols {
+    PROTOCOL_NONE,
     PROTOCOL_FLYSKY,
     PROTOCOL_DEVO,
     PROTOCOL_DSM2,
     PROTOCOL_J6PRO,
 };
+
+enum TxPower {
+    TXPOWER_300uW,
+    TXPOWER_1mW,
+    TXPOWER_3mW,
+    TXPOWER_10mW,
+    TXPOWER_30mW,
+    TXPOWER_100mW,
+};
+
 void PROTOCOL_Init(enum Protocols p);
 void PROTOCOL_DeInit();
 

@@ -21,6 +21,7 @@
 
 #include "target.h"
 #include "mixer.h"
+#include "config/model.h"
 
 #define SWASH_INV_ELEVATOR_MASK   1
 #define SWASH_INV_AILERON_MASK    2
@@ -30,27 +31,6 @@
 #define MIX_CYC2 (NUM_TX_INPUTS + 2)
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
-enum Mode {
-    MODE_1,
-    MODE_2,
-    MODE_3,
-    MODE_4,
-};
-
-struct Model {
-    enum SwashType swash_type;
-    enum Mode mode;
-    u8 swash_invert;
-    u8 Elevator_Stick;
-    u8 Aileron_Stick;
-    u8 Collective_Stick;
-    struct Trim trims[NUM_TRIMS];
-    struct Mixer mixers[NUM_MIXERS];
-    struct Limit limits[NUM_CHANNELS];
-    u8 template[NUM_CHANNELS];
-};
-
-struct Model Model;
 s16 Channels[NUM_CHANNELS];
 s8 Trims[NUM_TRIMS];
 
@@ -218,8 +198,8 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
     //2nd: apply curve
     value = CURVE_Evaluate(value, &mixer->curve);
 
-    //3rd: apply scaler and offset
-    value = value * mixer->scaler / 100 + PCT_TO_RANGE(mixer->offset);
+    //3rd: apply scalar and offset
+    value = value * mixer->scalar / 100 + PCT_TO_RANGE(mixer->offset);
 
     //4th: multiplex result
     switch(mixer->mux) {
@@ -276,19 +256,20 @@ u8 switch_is_on(u8 sw, s16 *raw)
 
 void TEST_init_mixer()
 {
-    int i;
     memset(Channels, 0, sizeof(Channels));
-    memset(&Model, 0, sizeof(Model));
+    //memset(&Model, 0, sizeof(Model));
+    CONFIG_ReadModel("models/model1.ini");
     Model.mode = MODE_2;
     Model.swash_type = SWASH_TYPE_120;
     Model.Elevator_Stick   = INP_ELEVATOR;
     Model.Aileron_Stick    = INP_AILERON;
     Model.Collective_Stick = INP_THROTTLE;
-
+/*
+    int i;
     for (i = 0; i < 4; i++) {
         Model.mixers[i].src = i + 1;
         Model.mixers[i].dest = i;
-        Model.mixers[i].scaler = 100;
+        Model.mixers[i].scalar = 100;
         Model.trims[i].src = MIXER_MapChannel(i + 1, Model.mode); 
         Model.trims[i].neg = i * 2 + 1;
         Model.trims[i].pos = i * 2 + 2;
@@ -304,7 +285,8 @@ void TEST_init_mixer()
             Model.template[i] = MIXERTEMPLATE_NONE;
         }
     }
-    PROTOCOL_Init(PROTOCOL_DEVO);
+*/
+    PROTOCOL_Init(PROTOCOL_NONE);
 }
 
 
@@ -457,7 +439,7 @@ void MIX_InitMixer(struct Mixer *mixer, u8 ch)
     int i;
     mixer->src = ch + 1;
     mixer->dest = ch;
-    mixer->scaler = 100;
+    mixer->scalar = 100;
     mixer->offset = 0;
     mixer->curve.type = CURVE_EXPO;
     for (i = 0; i < MAX_POINTS; i++)
