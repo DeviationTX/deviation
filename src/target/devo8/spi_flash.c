@@ -165,7 +165,7 @@ void SPIFlash_BulkErase()
 /*
  * Length should be multiple of 2
  */
-void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
+void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 {
     u32 i;
 
@@ -180,8 +180,8 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
     spi_xfer(SPI1, (u8)(writeAddress >> 16));
     spi_xfer(SPI1, (u8)(writeAddress >>  8));
     spi_xfer(SPI1, (u8)(writeAddress));
-    spi_xfer(SPI1, buffer[0]);
-    spi_xfer(SPI1, buffer[1]);
+    spi_xfer(SPI1, ~buffer[0]);
+    spi_xfer(SPI1, ~buffer[1]);
     CS_HI();
 
     WaitForWriteComplete();
@@ -190,8 +190,8 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer)
     {
         CS_LO();
         spi_xfer(SPI1, 0xAD);
-        spi_xfer(SPI1, buffer[i]);
-        spi_xfer(SPI1, buffer[i+1]);
+        spi_xfer(SPI1, ~buffer[i]);
+        spi_xfer(SPI1, ~buffer[i+1]);
         CS_HI();
 
         WaitForWriteComplete();
@@ -213,7 +213,7 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 
     for(i=0;i<length;i++)
     {
-        buffer[i] = spi_xfer(SPI1, 0);
+        buffer[i] = ~spi_xfer(SPI1, 0);
     }
 
     CS_HI();

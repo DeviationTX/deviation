@@ -50,12 +50,21 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-    return 0;
+    (void)stream;
+    WORD len;
+    int res;
+
+    res = pf_write(ptr, size * nmemb, &len);
+    DBGFS("fwrite %d: req: %d got: %d\n", res, size * nmemb, len);
+    return (len == size * nmemb) ? nmemb : 0;
 }
+
 FILE *fopen(const char *path, const char *mode)
 {
     (void)mode;
     int res = pf_open(path);
+    if (mode[0] == 'w')
+        pf_maximize_file_size(); //When writing a file, make sure it takes up the full sector
     DBGFS("fopen %s: %d\n", path, res);
     return res ? 0 : (FILE *)&fat;
 }

@@ -56,36 +56,37 @@ DRESULT disk_readp (
 /* Write Partial Sector                                                  */
 /*-----------------------------------------------------------------------*/
 
+DRESULT disk_writep_rand (
+	const BYTE* src,		/* Pointer to the destination object */
+	DWORD sector,			/* Sector number (LBA) */
+	WORD sofs,			/* Offset in the sector */
+	WORD count			/* Byte count (bit15:destination) */
+)
+{
+	SPIFlash_WriteBytes((sector + SECTOR_OFFSET) * 0x1000 + sofs, count, src);
+	return RES_OK;
+}
+
 DRESULT disk_writep (
 	const BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
 	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
 )
 {
-#if 0
-	DRESULT res;
-
+	static DWORD pos;
 
 	if (!buff) {
 		if (sc) {
-
 			// Initiate write process
-
+			pos = (sc + SECTOR_OFFSET) * 0x1000;
 		} else {
-
 			// Finalize write process
-
+			pos = 0;
 		}
 	} else {
-
 		// Send data to the disk
-
+		SPIFlash_WriteBytes(pos, sc, buff);
+		pos += sc;
 	}
-
-	return res;
-#else
-	(void)buff;
-	(void)sc;
-#endif
-	return RES_NOTRDY;
+	return RES_OK;
 }
 

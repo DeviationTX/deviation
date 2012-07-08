@@ -836,6 +836,7 @@ FRESULT pf_open (
 	if (!dir[0] || (dir[DIR_Attr] & AM_DIR))	/* It is a directory */
 		return FR_NO_FILE;
 
+	fs->dir_entry = dj.sect * SECTOR_SIZE + (WORD)((dj.index % DIR_ENTRIES_PER_SECTOR) * 32);
 	fs->org_clust = LD_CLUST(dir);			/* File start cluster */
 	fs->fsize = LD_DWORD(dir+DIR_FileSize);	/* File size */
 	fs->fptr = 0;						/* File pointer */
@@ -909,6 +910,24 @@ fr_abort:
 /* Write File                                                            */
 /*-----------------------------------------------------------------------*/
 #if _USE_WRITE
+
+FRESULT pf_maximize_file_size()
+{
+	FATFS *fs = FatFs;
+	DWORD size;
+        BYTE data[4];
+	if (!fs) return FR_NOT_ENABLED;		/* Check file system */
+	if (!(fs->flag & FA_OPENED))		/* Check if opened */
+		return FR_NOT_OPENED;
+	size = fs->fsize;
+	if ((size & 0x0FFF) == 0)			/* File already maximized */
+		return FR_OK;
+	size = size | 0x0FFF;
+        ST_DWORD(data, size);
+        disk_writep_rand(data, fs->dir_entry / SECTOR_SIZE, fs->dir_entry % SECTOR_SIZE + DIR_FileSize, 2);
+	fs->fsize = size;
+	return FR_OK;
+}
 
 FRESULT pf_write (
 	const void* buff,	/* Pointer to the data to be written */

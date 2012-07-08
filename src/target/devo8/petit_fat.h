@@ -33,7 +33,7 @@
 
 #define	_USE_LSEEK	1	/* 1:Enable pf_lseek() */
 
-#define	_USE_WRITE	0	/* 1:Enable pf_write() */
+#define	_USE_WRITE	1	/* 1:Enable pf_write() */
 
 #define _FS_FAT12	1	/* 1:Enable FAT12 support */
 #define _FS_FAT32	0	/* 1:Enable FAT32 support */
@@ -89,6 +89,7 @@ typedef struct {
 	CLUST	org_clust;	/* File start cluster */
 	CLUST	curr_clust;	/* File current cluster */
 	DWORD	dsect;		/* File current data sector */
+	DWORD   dir_entry;	/* Pointer to the directory object for opened file */
 } FATFS;
 
 
@@ -139,6 +140,7 @@ FRESULT pf_mount (FATFS*);						/* Mount/Unmount a logical drive */
 FRESULT pf_open (const char*);					/* Open a file */
 FRESULT pf_read (void*, WORD, WORD*);			/* Read data from the open file */
 FRESULT pf_write (const void*, WORD, WORD*);	/* Write data to the open file */
+FRESULT pf_maximize_file_size();
 FRESULT pf_lseek (DWORD);						/* Move file pointer of the open file */
 FRESULT pf_opendir (DIR*, const char*);			/* Open a directory */
 FRESULT pf_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */

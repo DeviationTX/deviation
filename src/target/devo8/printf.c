@@ -30,6 +30,9 @@
 
 #include <stdarg.h>
 
+#ifdef printf
+    #undef printf
+#endif
 #undef putchar
 #define putchar(c) usart_send_blocking(USART1, c)
 
