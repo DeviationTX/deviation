@@ -114,6 +114,7 @@ void PAGE_TestInit(int page)
     GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");
     GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
     //GUI_CreateKeyboard(KEYBOARD_CHAR, buttonstr, 20, &PushMeButton, buttonstr);
+    //GUI_CreateListBox(100, 20, 200, 202, 20, 5, &string_cb, NULL, NULL, NULL);
 
     // do a master redraw
     GUI_DrawScreen();

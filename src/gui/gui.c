@@ -28,6 +28,17 @@ static void GUI_DrawBarGraph(struct guiObject *obj);
 static void GUI_DrawXYGraph(struct guiObject *obj);
 static void GUI_DrawTextSelect(struct guiObject *obj);
 
+static void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
+static u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
+
+#define ARROW_UP 0
+#define ARROW_DOWN 16
+#define ARROW_RIGHT 32
+#define ARROW_LEFT 48
+#define ARROW_WIDTH 16
+#define ARROW_HEIGHT 16
+const char ARROW_FILE[] = "images/arrows.bmp";
+
 void connect_object(struct guiObject *obj)
 {
     if (objHEAD == NULL) {
@@ -253,6 +264,50 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     return obj;
 }
 
+guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+        const char *(*string_cb)(u8 idx, void *data),
+        void (*select_cb)(struct guiObject *obj, s16 selected, void *data),
+        void (*longpress_cb)(struct guiObject *obj, s16 selected, void *data),
+        void *cb_data)
+{
+    struct guiObject  *obj = GUI_GetFreeObj();
+    struct guiListbox *listbox;
+    struct guiBox     *box;
+    u16 text_w, text_h;
+
+    if (obj == NULL)
+        return NULL;
+
+    box = &obj->box;
+    listbox = &obj->o.listbox;
+
+    box->x = x;
+    box->y = y;
+    box->width = width;
+    box->height = height;
+
+    obj->Type = Listbox;
+    OBJ_SET_TRANSPARENT(obj, 0);
+    OBJ_SET_USED(obj, 1);
+    connect_object(obj);
+
+    LCD_GetCharDimensions('A', &text_w, &text_h);
+    listbox->text_height = text_h + 2;  //LINE_SPACING = 2
+    listbox->entries_per_page = (height + 2) / listbox->text_height;
+    if (listbox->entries_per_page > item_count)
+        listbox->entries_per_page = item_count;
+    listbox->item_count = item_count;
+    listbox->cur_pos = 0;
+    listbox->selected = selected;
+    
+    listbox->string_cb = string_cb;
+    listbox->select_cb = select_cb;
+    listbox->longpress_cb = longpress_cb;
+    listbox->cb_data = cb_data;
+
+    return obj;
+}
+
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
@@ -395,8 +450,12 @@ void GUI_DrawObject(struct guiObject *obj)
     case TextSelect:
         GUI_DrawTextSelect(obj);
         break;
+    case Listbox:
+        GUI_DrawListbox(obj, 1);
+        break;
     case Keyboard:
         GUI_DrawKeyboard(obj, NULL);
+        break;
     }
     OBJ_SET_DIRTY(obj, 0);
 }
@@ -621,6 +680,11 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                     return 0;
                 }
                 break;
+            case Listbox:
+                if(coords_in_box(&obj->box, coords)) {
+                    return GUI_TouchListbox(obj, coords, long_press);
+                }
+                break;
             case Dialog:
                 break; /* Dialogs are handled by buttons */
             case Label:
@@ -651,6 +715,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Keyboard:
                 if(! long_press)
+                    //Note that this only works because the keyboard encompasses the whole screen
                     return GUI_DrawKeyboard(obj, coords);
                 break;
             }
@@ -851,3 +916,77 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 l
     return value;
 }
 
+void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
+{
+    #define BG1 RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
+    #define BG2 RGB888_to_RGB565(0x44, 0x44, 0x44)
+    #define FG  RGB888_to_RGB565(0x00, 0x00, 0x00)
+    u8 i;
+    struct guiListbox *listbox = &obj->o.listbox;
+    if (redraw_all) {
+        LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - ARROW_WIDTH, obj->box.height, BG1);
+        LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y, ARROW_WIDTH, obj->box.height, BG2);
+        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
+                ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_UP, 0);
+        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.width - ARROW_HEIGHT,
+                ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_DOWN, 0);
+    }
+    LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
+    if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
+        LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
+                     obj->box.width - ARROW_WIDTH, listbox->text_height, BG2);
+    printf("%d: %d\n", listbox->entries_per_page, listbox->text_height);
+    for(i = 0; i < listbox->entries_per_page; i++) {
+        const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
+        LCD_PrintString(str);
+        LCD_PrintString("\n");
+    }
+}
+
+u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
+{
+    struct guiListbox *listbox = &obj->o.listbox;
+    struct guiBox box;
+    u8 i;
+    box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+    box.y = obj->box.y;
+    box.width = ARROW_WIDTH;
+    box.height = ARROW_HEIGHT;
+    if(coords_in_box(&box, coords)) {
+        if(listbox->cur_pos > 0) {
+            listbox->cur_pos--;
+            OBJ_SET_DIRTY(obj, 1);
+            return 1;
+        }
+        return 0;
+    }
+    box.y = obj->box.y + obj->box.height - ARROW_HEIGHT;
+    if(coords_in_box(&box, coords)) {
+        if(listbox->cur_pos < listbox->item_count - 1) {
+            listbox->cur_pos++;
+            OBJ_SET_DIRTY(obj, 1);
+            return 1;
+        }
+        return 0;
+    }
+    box.x = obj->box.x;
+    box.width = obj->box.width - ARROW_WIDTH;
+    box.height = listbox->text_height;
+    for (i = 0; i < listbox->entries_per_page; i++) {
+        box.y = obj->box.y + i * listbox->text_height;
+        if (coords_in_box(&box, coords)) {
+            u8 selected = i + listbox->cur_pos;
+            if (selected != listbox->selected) {
+                listbox->selected = selected;
+                if (listbox->select_cb)
+                    listbox->select_cb(obj, selected, listbox->cb_data);
+                OBJ_SET_DIRTY(obj, 1);
+                return 1;
+            } else if (long_press && listbox->longpress_cb) {
+                listbox->longpress_cb(obj, selected, listbox->cb_data);
+            }
+            return 0;
+        }
+    }
+    return 0;
+}
