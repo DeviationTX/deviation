@@ -258,8 +258,8 @@ void TEST_init_mixer()
 {
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
-    CONFIG_ReadModel("models/model1.ini");
-    CONFIG_WriteModel("models/model1a.ini");
+    CONFIG_ReadModel(1);
+    CONFIG_WriteModel(2);
     Model.mode = MODE_2;
     Model.swash_type = SWASH_TYPE_120;
     Model.Elevator_Stick   = INP_ELEVATOR;

@@ -21,6 +21,8 @@ struct Model {
 };
 extern struct Model Model;
 
-u8 CONFIG_ReadModel(const char *file);
-u8 CONFIG_WriteModel(const char *file);
+u8 CONFIG_ReadModel(u8 model_num);
+u8 CONFIG_WriteModel(u8 model_num);
+u8 CONFIG_SaveModelIfNeeded();
+u8 CONFIG_GetCurrentModel();
 #endif /*_MODEL_H_*/

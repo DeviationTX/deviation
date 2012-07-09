@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "model.h"
+#include "misc.h"
 #include "ini.h"
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +23,8 @@
 struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 #define WRITE_FULL_MODEL 0
-
+static u32 crc32;
+static u8 current_model;
 static const char MODEL_NAME[] = "name";
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -289,11 +291,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     return 0;
 }
 
-u8 CONFIG_WriteModel(const char *file) {
+static void get_model_file(char *file, u8 model_num)
+{
+    sprintf(file, "models/model%d.ini", model_num);
+}
+
+u8 CONFIG_WriteModel(u8 model_num) {
+    char file[20];
     FILE *fh;
     u8 idx;
     u8 i;
     struct Model *m = &Model;
+    get_model_file(file, model_num);
     fh = fopen(file, "w");
     if (! fh) {
         printf("Couldn't open file: %s\n", file);
@@ -389,11 +398,27 @@ void clear_model()
     }
 }
 
-u8 CONFIG_ReadModel(const char *file) {
+u8 CONFIG_ReadModel(u8 model_num) {
+    char file[20];
+    current_model = model_num;
+    get_model_file(file, model_num);
     clear_model();
     if (ini_parse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
+    crc32 = Crc(&Model, sizeof(Model));
     return 1;
+}
+
+u8 CONFIG_SaveModelIfNeeded() {
+    u32 newCrc = Crc(&Model, sizeof(Model));
+    if (crc32 == newCrc)
+        return 0;
+    CONFIG_WriteModel(current_model);
+    return 1;
+}
+
+u8 CONFIG_GetCurrentModel() {
+    return current_model;
 }
