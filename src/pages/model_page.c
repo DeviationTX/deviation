@@ -31,6 +31,9 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
+
+extern void MODELPage_ShowLoadSave(int loadsave);
+
 void PAGE_ModelInit(int page)
 {
     (void)page;
@@ -79,7 +82,7 @@ static void loadsave_cb(guiObject_t *obj, void *data)
     (void)obj;
     long loadsave = (long)data;
     (void)loadsave;
-    //MODEL_ShowLoadSave(loadsave);
+    MODELPage_ShowLoadSave(loadsave);
 }
 
 static void changename_done_cb(guiObject_t *obj, void *data)

@@ -402,7 +402,6 @@ void GUI_DrawObject(struct guiObject *obj)
                 button->image.file, box->width, box->height,
                 button->image.x_off, button->image.y_off);
         LCD_SetFontColor(button->fontColor);
-printf("%s\n", button->text);
         LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
         break;
     }
@@ -929,14 +928,13 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y, ARROW_WIDTH, obj->box.height, BG2);
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_UP, 0);
-        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.width - ARROW_HEIGHT,
+        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.height - ARROW_HEIGHT,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_DOWN, 0);
     }
     LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
         LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                      obj->box.width - ARROW_WIDTH, listbox->text_height, BG2);
-    printf("%d: %d\n", listbox->entries_per_page, listbox->text_height);
     for(i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
         LCD_PrintString(str);

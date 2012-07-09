@@ -72,9 +72,10 @@ int ini_parse_file(FILE* file,
     char* value;
     int lineno = 0;
     int error = 0;
+    int done = 0;
 
     /* Scan through file line by line */
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (done != -1 && fgets(line, sizeof(line), file) != NULL) {
         lineno++;
 
         start = line;
@@ -128,7 +129,9 @@ int ini_parse_file(FILE* file,
 
                 /* Valid name[=:]value pair found, call handler */
                 strncpy0(prev_name, name, sizeof(prev_name));
-                if (!handler(user, section, name, value) && !error)
+                
+                done = handler(user, section, name, value);
+                if (done != 1 && !error)
                     error = lineno;
             }
             else if (!error) {
