@@ -402,6 +402,7 @@ void GUI_DrawObject(struct guiObject *obj)
                 button->image.file, box->width, box->height,
                 button->image.x_off, button->image.y_off);
         LCD_SetFontColor(button->fontColor);
+printf("%s\n", button->text);
         LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
         break;
     }

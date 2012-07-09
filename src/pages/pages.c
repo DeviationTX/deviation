@@ -29,6 +29,7 @@ static const struct page pages[] = {
     {PAGE_MainInit, PAGE_MainEvent, PAGE_MainCanChange},
     {PAGE_MixerInit, PAGE_MixerEvent, PAGE_MixerCanChange},
     {PAGE_TrimInit, PAGE_TrimEvent, PAGE_TrimCanChange},
+    {PAGE_ModelInit, PAGE_ModelEvent, PAGE_ModelCanChange},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestCanChange},
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerCanChange},
     {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},

@@ -26,17 +26,27 @@ struct Model Model;
 static u32 crc32;
 static u8 current_model;
 static const char MODEL_NAME[] = "name";
+static const char MODEL_TYPE[] = "type";
+const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
-static const char * const RADIO_PROTOCOL_VAL[] = { "none", "devo", "dsm2", "j6pro" };
+const char * const RADIO_PROTOCOL_VAL[] = {
+     "none",
+#ifdef PROTO_HAS_A7105
+     "flysky",
+#endif
+#ifdef PROTO_HAS_CYRF6936
+     "devo", "dsm2", "j6pro"
+#endif
+     };
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
-static const char * const RADIO_TX_POWER_VAL[] = { "300uw", "1mw", "3mw", "10mw", "30mw", "100mw" };
+const char * const RADIO_TX_POWER_VAL[] = { "300uw", "1mw", "3mw", "10mw", "30mw", "100mw" };
 
 /* Section: Mixer */
 static const char SECTION_MIXER[]   = "mixer";
@@ -89,6 +99,16 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (MATCH_SECTION("") && MATCH_KEY(MODEL_NAME)) {
         strncpy(m->name, value, sizeof(m->name)-1);
         m->name[sizeof(m->name)-1] = 0;
+        return 1;
+    }
+    if (MATCH_SECTION("") && MATCH_KEY(MODEL_TYPE)) {
+        for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
+            if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
+                m->type = i;
+                return 1;
+            }
+        }
+        printf("Unknown model type: %s\n", value);
         return 1;
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
@@ -308,6 +328,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
         printf("Couldn't open file: %s\n", file);
         return 0;
     }
+    fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+    if(WRITE_FULL_MODEL || m->type != 0)
+        fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
     fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);

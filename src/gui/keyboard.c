@@ -231,18 +231,19 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     /* DONE */
     pressed = kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, BG3, BG3, TXT2, coords, last_coords);
     draw |= pressed;
-    if (pressed == 2) {
-        //Done
-        if (keyboard->CallBack) {
-            keyboard->CallBack(obj, keyboard->cb_data);
-        }
-    }
     if(draw) {
         if(coords) {
             keyboard->last_coords = *coords;
         }  
         else if(last_coords)
             keyboard->last_coords.x = keyboard->last_coords.y = 0;
+    }
+    /* Handling done has to happen last, as the callback may destroy the object */
+    if (pressed == 2) {
+        //Done
+        if (keyboard->CallBack) {
+            keyboard->CallBack(obj, keyboard->cb_data);
+        }
     }
     return draw;
 }

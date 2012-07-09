@@ -4,6 +4,7 @@
 #include "mixer.h"
 struct Model {
     char name[24];
+    enum ModelType type;
     enum Protocols protocol;
     u8 num_channels;
     u16 fixed_id;
@@ -20,6 +21,8 @@ struct Model {
     u8 template[NUM_CHANNELS];
 };
 extern struct Model Model;
+extern const char * const RADIO_TX_POWER_VAL[];
+extern const char * const RADIO_PROTOCOL_VAL[];
 
 u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);

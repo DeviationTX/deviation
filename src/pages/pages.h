@@ -30,6 +30,11 @@ void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
 int PAGE_TrimCanChange();
 
+/* Model */
+void PAGE_ModelInit(int page);
+void PAGE_ModelEvent();
+int PAGE_ModelCanChange();
+
 /* Test */
 void PAGE_TestInit(int page);
 void PAGE_TestEvent();
