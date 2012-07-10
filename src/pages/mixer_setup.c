@@ -388,6 +388,7 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
                      1 + sizeof(mp->mixer) / sizeof(struct Mixer),
                      dir, 1, 1, &changed);
     if (changed) {
+        mp->num_complex_mixers = mp->num_mixers;
         GUI_Redraw(mp->graph);
         sync_mixers();
     }

@@ -92,7 +92,7 @@ void templateselect_cb(guiObject_t *obj, void *data)
     mp->modifying_template = 1;
     MIX_GetLimit(idx, &mp->limit);
     mp->channel = idx;
-    mp->num_complex_mixers = 0;
+    mp->num_complex_mixers = 1;
     mp->link_curves = 0xff;
     for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++)
         MIX_InitMixer(mp->mixer + i, idx);
