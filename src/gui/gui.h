@@ -192,7 +192,7 @@ struct guiObject {
 #define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
 
 /* internal use only */
-u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords);
+u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords, u8 long_press);
 u8 coords_in_box(struct guiBox *box, struct touch *coords);
 struct guiObject *GUI_GetFreeObj(void);
 void connect_object(struct guiObject *obj);

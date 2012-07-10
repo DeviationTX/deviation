@@ -47,6 +47,16 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
     return obj;
 }
 
+static void make_box(struct guiBox *box, u16 x, u16 y, u16 width, u16 height)
+{
+    #define X_SPACE 3
+    #define Y_SPACE 7
+    box->x = x + X_SPACE;
+    box->y = y + Y_SPACE;
+    box->width = width - 2 * X_SPACE;
+    box->height = height - 2 * Y_SPACE;
+}
+
 static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
      u32 color1, u32 color2, struct touch *coords1, struct touch *coords2)
 {
@@ -55,13 +65,7 @@ static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
     u16 fg_color;
     struct guiBox box;
     u8 draw = 0;
-    #define X_SPACE 3
-    #define Y_SPACE 7
-    box.x = x + X_SPACE;
-    box.y = y + Y_SPACE;
-    box.width = width - 2 * X_SPACE;
-    box.height = height - 2 * Y_SPACE;
-
+    make_box(&box, x, y, width, height);
     if(coords1 && coords_in_box(&box, coords1 ) && (! coords2 || ! coords_in_box(&box, coords2))) {
         draw = 2;
         bg_color = color2 >> 16;
@@ -123,7 +127,7 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
     keyboard->text[len+1] = 0;
     kb_draw_text(keyboard->text);
 }
-u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
+u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords, u8 long_press)
 {
 #define Y_OFFSET 30
 #define KEY_H 52
@@ -152,16 +156,29 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     const u8 done[] = "DONE";
     u8 draw = 0;
     u8 ch[2];
+
+    if (long_press) {
+        /* DEL */
+        struct guiBox box;
+        make_box(&box, 320 - KEY_W2, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H);
+        if (coords_in_box(&box, coords) && strlen(keyboard->text)) {
+            keyboard->text[0] = 0;
+            kb_draw_text(keyboard->text);
+            return 1;
+        }
+        return 0;
+    }
     ch[1] = 0;
     if(keyboard->last_coords.x != 0 || keyboard->last_coords.y != 0) {
         last_coords = &keyboard->last_coords;
     } else {
         last_coords = NULL;
     }
+
     if(! last_coords && ! coords) {
         LCD_FillRect(0, 0, 320, 240, FILL);
+        kb_draw_text(keyboard->text);
     }
-    kb_draw_text(keyboard->text);
     for(row = 0; row < 3; row++) {
         const u8 *ptr;
         u8 num_chars;
@@ -218,7 +235,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
         keyboard->type = keyboard->type == KEYBOARD_CHAR ? KEYBOARD_NUM : KEYBOARD_CHAR;
         keyboard->last_coords.x = 0;
         keyboard->last_coords.y = 0;
-        u8 ret = GUI_DrawKeyboard(obj, NULL);
+        u8 ret = GUI_DrawKeyboard(obj, NULL, 0);
         keyboard->last_coords = *coords;
         return ret;
         

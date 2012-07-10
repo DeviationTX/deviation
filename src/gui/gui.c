@@ -462,7 +462,7 @@ void GUI_DrawObject(struct guiObject *obj)
         GUI_DrawListbox(obj, 1);
         break;
     case Keyboard:
-        GUI_DrawKeyboard(obj, NULL);
+        GUI_DrawKeyboard(obj, NULL, 0);
         break;
     }
     OBJ_SET_DIRTY(obj, 0);
@@ -626,7 +626,7 @@ void GUI_TouchRelease()
             {
                 struct guiKeyboard *keyboard = &obj->o.keyboard;
                 if(keyboard->last_coords.x || keyboard->last_coords.y) {
-                    GUI_DrawKeyboard(obj, NULL);
+                    GUI_DrawKeyboard(obj, NULL, 0);
                     return;
                 }
                 break;
@@ -722,9 +722,8 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case BarGraph:
                 break;
             case Keyboard:
-                if(! long_press)
-                    //Note that this only works because the keyboard encompasses the whole screen
-                    return GUI_DrawKeyboard(obj, coords);
+                //Note that this only works because the keyboard encompasses the whole screen
+                return GUI_DrawKeyboard(obj, coords, long_press);
                 break;
             }
         }
