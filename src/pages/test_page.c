@@ -99,16 +99,16 @@ void PAGE_TestInit(int page)
     /* Create some GUI elements */
     GUI_CreateImage(0,0,320,24,statusBar);
     GUI_CreateImage(270,1,48,22,batteryImg);
-    GUI_CreateLabel(10,60,NULL, 0x0000, strSPIFlash);
-    GUI_CreateLabel(10,45,NULL, 0x0000, strBootLoader);
-    GUI_CreateLabel(10,30,NULL, 0x0000, strMfg);
-    GUI_CreateLabel(10,75,NULL, 0x0000, buttonstr);
-    lblVoltage = GUI_CreateLabel(267,8,NULL, 0x0f00, voltagestr);
-    lblTE = GUI_CreateLabel(10,110,NULL, 0xffff, te);
-    lblRA = GUI_CreateLabel(10,140,NULL, 0xffff, ra);
-    GUI_CreateLabel(10,125,NULL, 0xffff, t1);
-    GUI_CreateLabel(10,155,NULL, 0xffff, t2);
-    GUI_CreateLabel(100,170,NULL, 0xffff, buttonmessage);
+    GUI_CreateLabel(10,60,NULL, DEFAULT_FONT, strSPIFlash);
+    GUI_CreateLabel(10,45,NULL, DEFAULT_FONT, strBootLoader);
+    GUI_CreateLabel(10,30,NULL, DEFAULT_FONT, strMfg);
+    GUI_CreateLabel(10,75,NULL, DEFAULT_FONT, buttonstr);
+    lblVoltage = GUI_CreateLabel(267,8,NULL, BATTERY_FONT, voltagestr);
+    lblTE = GUI_CreateLabel(10,110,NULL, FONT1, te);
+    lblRA = GUI_CreateLabel(10,140,NULL, FONT1, ra);
+    GUI_CreateLabel(10,125,NULL, FONT1, t1);
+    GUI_CreateLabel(10,155,NULL, FONT1, t2);
+    GUI_CreateLabel(100,170,NULL, FONT1, buttonmessage);
     GUI_CreateButton(10,200,BUTTON_90,button1,0x0000,PushMeButton, "Button 1 Pushed");
     GUI_CreateButton(110,200,BUTTON_90,button2,0x0000,PushMeButton, "Button 2 Pushed");
     GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");

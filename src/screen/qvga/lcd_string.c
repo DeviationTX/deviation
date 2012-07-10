@@ -62,7 +62,19 @@
  *  So this would appear as '0x7F, 0x03' in the font table
  *
  */
-
+const char * const FontNames[10] = {
+    "system5x7",
+    "system5x8",
+    "system7x8",
+    "system8x8",
+    "system8x8bold",
+    "system8x8thin",
+    "arial14",
+    "arial14bold",
+    "corsiva12",
+    "trebuchet48",
+};
+    
 const struct FONT_DEF Fonts[] = {
     {5, 7, 0x20, 0x80, FontSystem5x7},
     {5, 8, 32, 128, FontSystem5x8},
@@ -146,6 +158,7 @@ u8 LCD_SetFont(unsigned int idx)
 {
     unsigned int i;
     u8 old = LCD_GetFont();
+    idx--;
     for(i = 0; i <= idx; i++) {
         if(Fonts[i].width == 0)
             return old;
@@ -156,7 +169,7 @@ u8 LCD_SetFont(unsigned int idx)
 
 u8 LCD_GetFont()
 {
-    return cur_str.font - Fonts;
+    return (cur_str.font - Fonts) + 1;
 }
 
 void LCD_SetXY(unsigned int x, unsigned int y)

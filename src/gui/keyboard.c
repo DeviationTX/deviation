@@ -15,6 +15,7 @@
 #include "target.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
+#include "config/display.h"
 
 guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
         void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
@@ -47,10 +48,11 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
 }
 
 static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
-     u16 bg_color1, u16 bg_color2, u16 txt_color, struct touch *coords1, struct touch *coords2)
+     u32 color1, u32 color2, struct touch *coords1, struct touch *coords2)
 {
     u16 w, h;
     u16 bg_color;
+    u16 fg_color;
     struct guiBox box;
     u8 draw = 0;
     #define X_SPACE 3
@@ -62,13 +64,16 @@ static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
 
     if(coords1 && coords_in_box(&box, coords1 ) && (! coords2 || ! coords_in_box(&box, coords2))) {
         draw = 2;
-        bg_color = bg_color2;
+        bg_color = color2 >> 16;
+        fg_color = color2 & 0xffff;
     } else if(! coords1 && coords2 && coords_in_box(&box, coords2)) {
         draw = 1;
-        bg_color = bg_color1;
+        bg_color = color1 >> 16;
+        fg_color = color1 & 0xffff;
     } else if(! coords2&& ! coords1) {
         draw = 1;
-        bg_color = bg_color1;
+        bg_color = color1 >> 16;
+        fg_color = color1 & 0xffff;
     }
     /*
     printf("(%dx%dx%dx%d)", box.x, box.y, box.width, box.height);
@@ -83,7 +88,7 @@ static u8 kb_draw_key(u16 x, u16 y, u16 width, u16 height, const u8 *str,
     LCD_FillRoundRect(box.x, box.y, box.width, box.height, 3, bg_color);
     LCD_GetStringDimensions(str, &w, &h);
     LCD_SetXY(x + (width - w) / 2, y + (height - h) / 2);
-    LCD_SetFontColor(txt_color);
+    LCD_SetFontColor(fg_color);
     LCD_PrintString((const char *)str);
     return draw;
 }
@@ -125,13 +130,10 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
 #define KEY_W1 32
 #define KEY_W2 (32 + 12)
 #define KEY_W3 (32 + 18)
-#define BG1 RGB888_to_RGB565(0xe2, 0xe4, 0xe6)
-#define BG2 RGB888_to_RGB565(0x8f, 0x95, 0xa1)
-#define BG3 RGB888_to_RGB565(0x32, 0x70, 0xdf)
-#define BG  RGB888_to_RGB565(0x6b, 0x73, 0x80)
-#define TXT1 0x0000
-#define TXT2 0xffff
-//#define BG3
+#define KEY1 ((Display.keyboard.bg_key1 << 16) | Display.keyboard.fg_key1)    //RGB888_to_RGB565(0xe2, 0xe4, 0xe6) , 0x0000
+#define KEY2 ((Display.keyboard.bg_key2 << 16) | Display.keyboard.fg_key2)    //RGB888_to_RGB565(0x8f, 0x95, 0xa1) , 0x0000
+#define KEY3 ((Display.keyboard.bg_key3 << 16) | Display.keyboard.fg_key3)    //RGB888_to_RGB565(0x32, 0x70, 0xdf) , 0xffff
+#define FILL  Display.keyboard.fill_color  //RGB888_to_RGB565(0x6b, 0x73, 0x80)
     u8 row, i;
     struct guiKeyboard *keyboard = &obj->o.keyboard;
     struct touch *last_coords;
@@ -157,7 +159,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
         last_coords = NULL;
     }
     if(! last_coords && ! coords) {
-        LCD_FillRect(0, 0, 320, 240, BG);
+        LCD_FillRect(0, 0, 320, 240, FILL);
     }
     kb_draw_text(keyboard->text);
     for(row = 0; row < 3; row++) {
@@ -185,7 +187,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
         y_off = Y_OFFSET + KEY_H * row;
         for(i = 0; i < num_chars; i++) {
             ch[0] = ptr[i];
-            pressed = kb_draw_key(x_off + i * KEY_W1, y_off, KEY_W1, KEY_H, ch, BG1, BG2, TXT1, coords, last_coords);
+            pressed = kb_draw_key(x_off + i * KEY_W1, y_off, KEY_W1, KEY_H, ch, KEY1, KEY2, coords, last_coords);
             draw |= pressed;
             if (2 == pressed) {
                 kb_update_string(keyboard, ptr[i]);
@@ -194,14 +196,14 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     }
     if(keyboard->type == KEYBOARD_CHAR) {
         /* CAPS */
-        pressed = kb_draw_key(0, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, caps, BG2, BG3, TXT2, coords, last_coords);
+        pressed = kb_draw_key(0, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, caps, KEY2, KEY3, coords, last_coords);
         draw |= pressed;
         if (pressed == 2) {
             keyboard->caps ^= 1;
         }
     }
     /* DEL */
-    pressed = kb_draw_key(320 - KEY_W2, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, del, BG2, BG3, TXT2, coords, last_coords);
+    pressed = kb_draw_key(320 - KEY_W2, Y_OFFSET + KEY_H * 2, KEY_W2, KEY_H, del, KEY2, KEY3, coords, last_coords);
     draw |= pressed;
     if (pressed == 2) {
         kb_update_string(keyboard, '');
@@ -209,7 +211,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
     /* NUMPAD */
     pressed = kb_draw_key(0, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H,
                           keyboard->type == KEYBOARD_CHAR ? num : chars,
-                          BG2, BG3, TXT2, coords, last_coords);
+                          KEY2, KEY3, coords, last_coords);
     draw |= pressed;
     if (pressed == 2) {
         //redraw numpad here
@@ -222,14 +224,14 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords)
         
     }
     /* SPACE */
-    pressed = kb_draw_key(KEY_W3, Y_OFFSET + KEY_H * 3, 320 - 2 * KEY_W3, KEY_H, space, BG1, BG2, TXT1, coords, last_coords);
+    pressed = kb_draw_key(KEY_W3, Y_OFFSET + KEY_H * 3, 320 - 2 * KEY_W3, KEY_H, space, KEY1, KEY2, coords, last_coords);
     draw |= pressed;
     if (pressed == 2) {
         kb_update_string(keyboard, ' ');
     }
 
     /* DONE */
-    pressed = kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, BG3, BG3, TXT2, coords, last_coords);
+    pressed = kb_draw_key(320 - KEY_W3, Y_OFFSET + KEY_H * 3, KEY_W3, KEY_H, done, KEY3, KEY3, coords, last_coords);
     draw |= pressed;
     if(draw) {
         if(coords) {

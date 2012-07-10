@@ -21,9 +21,9 @@ static void draw_page(u8 enable)
 {
     GUI_RemoveAllObjects();
     if(enable == 0) {
-        GUI_CreateLabel(100, 100, NULL, 0x0000, "USB File System is disabled\nPress 'Ent' to enable");
+        GUI_CreateLabel(100, 100, NULL, DEFAULT_FONT, "USB File System is disabled\nPress 'Ent' to enable");
     } else {
-        GUI_CreateLabel(100, 100, NULL, 0x0000, "USB File System is enabled\nPress 'Ent' to disable");
+        GUI_CreateLabel(100, 100, NULL, DEFAULT_FONT, "USB File System is enabled\nPress 'Ent' to disable");
     }
 }
 

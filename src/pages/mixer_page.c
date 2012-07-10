@@ -48,13 +48,13 @@ void PAGE_MixerInit(int page)
                 break;
         GUI_CreateButton(124, row, BUTTON_64x16, MIXPAGE_TemplateName(template), 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
-            GUI_CreateLabel(60, row+2, show_source, 0x0000, &mix[idx].src);
+            GUI_CreateLabel(60, row+2, show_source, DEFAULT_FONT, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx+1].sw) {
-                    GUI_CreateLabel(192, row+2, show_source, 0x0000, &mix[idx+1].sw);
+                    GUI_CreateLabel(192, row+2, show_source, DEFAULT_FONT, &mix[idx+1].sw);
                 }
                 if (mix[idx+2].sw) {
-                    GUI_CreateLabel(256, row+2, show_source, 0x0000, &mix[idx+2].sw);
+                    GUI_CreateLabel(256, row+2, show_source, DEFAULT_FONT, &mix[idx+2].sw);
                 }
             }
         }

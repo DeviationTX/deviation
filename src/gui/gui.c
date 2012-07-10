@@ -156,7 +156,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     return obj;
 }
 
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *, void *), u16 fontColor, void *data)
+guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *, void *), struct FontDesc font, void *data)
 {
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiLabel  *label;
@@ -179,8 +179,9 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *
 
     label->CallBack = Callback;
     label->cb_data = data;
-    label->fontColor = fontColor;
-    label->fontName = LCD_GetFont();
+    label->font = font;
+    if (! label->font.font)
+        label->font.font = Display.default_font.font;
 
     return obj;
 }
@@ -735,14 +736,14 @@ void GUI_DrawLabel(struct guiObject *obj)
         str = label->CallBack(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
-    u8 old_font = LCD_SetFont(label->fontName);
+    u8 old_font = LCD_SetFont(label->font.font);
     LCD_GetStringDimensions((const u8 *)str, &obj->box.width, &obj->box.height);
     if (old_w < obj->box.width)
         old_w = obj->box.width;
     if (old_h < obj->box.height)
         old_h = obj->box.height;
     GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
-    LCD_SetFontColor(label->fontColor);
+    LCD_SetFontColor(label->font.color);
     LCD_PrintStringXY(obj->box.x, obj->box.y, str);
     LCD_SetFont(old_font);
 }

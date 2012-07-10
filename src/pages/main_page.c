@@ -36,9 +36,7 @@ void PAGE_MainInit(int page)
     mp->trimObj[3] = GUI_CreateBarGraph(30, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
     mp->trimObj[1] = GUI_CreateBarGraph(300, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
     mp->trimObj[0] = GUI_CreateBarGraph(165, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[0]);
-    LCD_SetFont(9);
-    mp->throttleObj = GUI_CreateLabel(50, 120, show_throttle_cb, 0x0000, &Channels[INP_THROTTLE - 1]);
-    LCD_SetFont(6);
+    mp->throttleObj = GUI_CreateLabel(50, 120, show_throttle_cb, THROTTLE_FONT, &Channels[INP_THROTTLE - 1]);
     GUI_DrawScreen();
 }
 

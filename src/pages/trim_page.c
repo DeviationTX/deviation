@@ -76,15 +76,15 @@ void edit_cb(guiObject_t *obj, void *data)
     GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
 
     //Row 1
-    GUI_CreateLabel(10, 40, NULL, 0x0000, "Input:");
+    GUI_CreateLabel(10, 40, NULL, DEFAULT_FONT, "Input:");
     GUI_CreateTextSelect(70, 40, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &tp->trim.src);
     //Row 2
-    GUI_CreateLabel(10, 66, NULL, 0x0000, "Trim -");
+    GUI_CreateLabel(10, 66, NULL, DEFAULT_FONT, "Trim -");
     GUI_CreateTextSelect(70, 66, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.neg);
-    GUI_CreateLabel(170, 66, NULL, 0x0000, "Trim +:");
+    GUI_CreateLabel(170, 66, NULL, DEFAULT_FONT, "Trim +:");
     GUI_CreateTextSelect(210, 66, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.pos);
     //Row 3
-    GUI_CreateLabel(10, 92, NULL, 0x0000, "Trim Step:");
+    GUI_CreateLabel(10, 92, NULL, DEFAULT_FONT, "Trim Step:");
     GUI_CreateTextSelect(70, 92, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &tp->trim.step);
 }
 
@@ -93,16 +93,16 @@ void PAGE_TrimInit(int page)
     (void)page;
     int i;
     tp->modifying_trim = 0;
-    GUI_CreateLabel(10, 5, NULL, 0x0000, "Trim");
-    GUI_CreateLabel(10, 24, NULL, 0x0000, "Input");
-    GUI_CreateLabel(72, 24, NULL, 0x0000, "Trim Neg");
-    GUI_CreateLabel(134, 24, NULL, 0x0000, "Trim Pos");
-    GUI_CreateLabel(196, 24, NULL, 0x0000, "Trim Step");
+    GUI_CreateLabel(10, 5, NULL, DEFAULT_FONT, "Trim");
+    GUI_CreateLabel(10, 24, NULL, DEFAULT_FONT, "Input");
+    GUI_CreateLabel(72, 24, NULL, DEFAULT_FONT, "Trim Neg");
+    GUI_CreateLabel(134, 24, NULL, DEFAULT_FONT, "Trim Pos");
+    GUI_CreateLabel(196, 24, NULL, DEFAULT_FONT, "Trim Step");
     struct Trim *trim = MIX_GetAllTrims();
     for (i = 0; i < NUM_TRIMS; i++) {
         GUI_CreateButton(10, 26*i + 42, BUTTON_48x16, MIXPAGE_SourceName(trim[i].src), 0x0000, edit_cb, (void *)((long)i));
-        GUI_CreateLabel(72, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].neg));
-        GUI_CreateLabel(134, 26*i + 44, NULL, 0x0000, (void *)button_name(trim[i].pos));
+        GUI_CreateLabel(72, 26*i + 44, NULL, DEFAULT_FONT, (void *)button_name(trim[i].neg));
+        GUI_CreateLabel(134, 26*i + 44, NULL, DEFAULT_FONT, (void *)button_name(trim[i].pos));
         GUI_CreateTextSelect(196, 26*i + 42, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &trim[i].step);
     }
     GUI_DrawScreen();

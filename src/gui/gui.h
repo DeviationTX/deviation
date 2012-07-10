@@ -46,6 +46,11 @@ struct guiDialogReturn {
     int intInput;
 };
 
+struct FontDesc {
+    u8 font;
+    u16 color;
+};
+
 #ifndef ENABLE_GUIOBJECT
 typedef void guiObject_t;
 #else
@@ -81,8 +86,7 @@ struct guiBox {
 struct guiLabel {
     const char *(*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
-    u16 fontColor;
-    u8 fontName;
+    struct FontDesc font;
 };
 
 struct guiKeyboard {
@@ -198,7 +202,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         const char *text, u16 titleColor, u16 fontColor,
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType);
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *obj, void *data), u16 fontColor, void *data);
+guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *obj, void *data), struct FontDesc font, void *data);
 guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file);
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
@@ -232,4 +236,7 @@ void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
+
+#include "config/display.h"
+
 #endif /* GUI_H_ */

@@ -28,17 +28,17 @@ void MIXPAGE_EditLimits()
     GUI_RemoveAllObjects();
     show_titlerow();
     //Row 1
-    GUI_CreateLabel(10, 40, NULL, 0x0000, "Reverse:");
+    GUI_CreateLabel(10, 40, NULL, DEFAULT_FONT, "Reverse:");
     GUI_CreateTextSelect(100, 40, TEXTSELECT_96, 0x0000, NULL, reverse_cb, (void *)((long)mp->channel));
     //Row 1
-    GUI_CreateLabel(10, 66, NULL, 0x0000, "Safety:");
+    GUI_CreateLabel(10, 66, NULL, DEFAULT_FONT, "Safety:");
     GUI_CreateTextSelect(70, 66, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    GUI_CreateLabel(170, 66, NULL, 0x0000, "Value:");
+    GUI_CreateLabel(170, 66, NULL, DEFAULT_FONT, "Value:");
     GUI_CreateTextSelect(210, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
     //Row 2
-    GUI_CreateLabel(10, 92, NULL, 0x0000, "Min:");
+    GUI_CreateLabel(10, 92, NULL, DEFAULT_FONT, "Min:");
     GUI_CreateTextSelect(70, 92, TEXTSELECT_96, 0x0000, NULL, set_number150_cb, &mp->limit.min);
-    GUI_CreateLabel(170, 92, NULL, 0x0000, "Max:");
+    GUI_CreateLabel(170, 92, NULL, DEFAULT_FONT, "Max:");
     GUI_CreateTextSelect(210, 92, TEXTSELECT_96, 0x0000, NULL, set_number150_cb, &mp->limit.max);
 }
 
@@ -84,7 +84,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 
 static void show_titlerow()
 {
-    GUI_CreateLabel(10, 10, NULL, 0x0000, (void *)channel_name[mp->channel]);
+    GUI_CreateLabel(10, 10, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
     GUI_CreateButton(150, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
     GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
 }

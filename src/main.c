@@ -41,10 +41,10 @@ int main() {
     SOUND_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
     SignOn();
-
+    CONFIG_ReadDisplay();
     LCD_Clear(0x0000);
-    LCD_SetFont(6);
-    LCD_SetFontColor(0xffff);
+    LCD_SetFont(Display.default_font.font);
+    LCD_SetFontColor(Display.default_font.color);
     if(! FS_Mount()) {
         LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
         USB_Connect();
