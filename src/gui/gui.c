@@ -919,14 +919,16 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 l
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
-    #define BG1 RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
-    #define BG2 RGB888_to_RGB565(0x44, 0x44, 0x44)
-    #define FG  RGB888_to_RGB565(0x00, 0x00, 0x00)
-    u8 i;
+    #define FILL        Display.listbox.bg_color    // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
+    #define TEXT        Display.listbox.fg_color    // 0x0000
+    #define SELECT      Display.listbox.bg_select   // RGB888_to_RGB565(0x44, 0x44, 0x44)
+    #define SELECT_TXT  Display.listbox.fg_select   // 0xFFFF
+    #define BAR         Display.listbox.bar_color   // RGB888_to_RGB565(0x44, 0x44, 0x44)
+    u8 i, old;
     struct guiListbox *listbox = &obj->o.listbox;
     if (redraw_all) {
-        LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - ARROW_WIDTH, obj->box.height, BG1);
-        LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y, ARROW_WIDTH, obj->box.height, BG2);
+        LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - ARROW_WIDTH, obj->box.height, FILL);
+        LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y, ARROW_WIDTH, obj->box.height, BAR);
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_UP, 0);
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.height - ARROW_HEIGHT,
@@ -935,15 +937,16 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
     LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
         LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
-                     obj->box.width - ARROW_WIDTH, listbox->text_height, BG2);
+                     obj->box.width - ARROW_WIDTH, listbox->text_height, SELECT);
+    old = LCD_SetFont(Display.listbox.font ? Display.listbox.font : Display.default_font.font);
     for(i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
-        LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? 0xFFFF : 0x0000);
+        LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? SELECT_TXT : TEXT);
        
         LCD_PrintString(str);
         LCD_PrintString("\n");
     }
-    LCD_SetFontColor(0x0000);
+    LCD_SetFont(old);
 }
 
 u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)

@@ -20,10 +20,20 @@ struct disp_keyboard {
     u16 bg_key3;
 };
 
+struct disp_listbox {
+    u16 font;
+    u16 bg_color;
+    u16 fg_color;
+    u16 bg_select;
+    u16 fg_select;
+    u16 bar_color;
+};
+
 struct display_settings {
     struct FontDesc default_font;
     struct FontDesc label[NUM_LABELS];
     struct disp_keyboard keyboard;
+    struct disp_listbox listbox;
 };
 
 extern struct display_settings Display;

@@ -123,6 +123,32 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    if(MATCH_START(section, "listbox")) {
+        if(MATCH_KEY(FONT)) {
+            d->listbox.font = get_font(value);
+            return 1;
+        }
+        if(MATCH_KEY("bg_color")) {
+            d->listbox.bg_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY("fg_color")) {
+            d->listbox.fg_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY("bg_select")) {
+            d->listbox.bg_select = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY("fg_select")) {
+            d->listbox.fg_select = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY("bar_color")) {
+            d->listbox.bar_color = get_color(value);
+            return 1;
+        }
+    }
     return 0;
 }
 
