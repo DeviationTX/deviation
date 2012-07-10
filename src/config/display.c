@@ -144,8 +144,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->listbox.fg_select = get_color(value);
             return 1;
         }
-        if(MATCH_KEY("bar_color")) {
-            d->listbox.bar_color = get_color(value);
+        if(MATCH_KEY("bg_bar")) {
+            d->listbox.bg_bar = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY("fg_bar")) {
+            d->listbox.fg_bar = get_color(value);
             return 1;
         }
     }

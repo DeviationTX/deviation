@@ -26,7 +26,8 @@ struct disp_listbox {
     u16 fg_color;
     u16 bg_select;
     u16 fg_select;
-    u16 bar_color;
+    u16 bg_bar;
+    u16 fg_bar;
 };
 
 struct display_settings {

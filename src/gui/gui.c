@@ -275,6 +275,7 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
     struct guiListbox *listbox;
     struct guiBox     *box;
     u16 text_w, text_h;
+    s16 pos;
 
     if (obj == NULL)
         return NULL;
@@ -299,6 +300,12 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
         listbox->entries_per_page = item_count;
     listbox->item_count = item_count;
     listbox->cur_pos = 0;
+    if(selected >= 0) {
+        pos = selected - (listbox->entries_per_page / 2);
+        if (pos < 0)
+            pos = 0;
+        listbox->cur_pos = pos;
+    }
     listbox->selected = selected;
     
     listbox->string_cb = string_cb;
@@ -919,21 +926,27 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 l
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
+    #define BAR_HEIGHT 10
     #define FILL        Display.listbox.bg_color    // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
     #define TEXT        Display.listbox.fg_color    // 0x0000
     #define SELECT      Display.listbox.bg_select   // RGB888_to_RGB565(0x44, 0x44, 0x44)
     #define SELECT_TXT  Display.listbox.fg_select   // 0xFFFF
-    #define BAR         Display.listbox.bar_color   // RGB888_to_RGB565(0x44, 0x44, 0x44)
+    #define BAR_BG      Display.listbox.bg_bar      // RGB888_to_RGB565(0x44, 0x44, 0x44)
+    #define BAR_FG      Display.listbox.fg_bar      // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
+    
     u8 i, old;
+    u8 bar;
     struct guiListbox *listbox = &obj->o.listbox;
     if (redraw_all) {
         LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - ARROW_WIDTH, obj->box.height, FILL);
-        LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y, ARROW_WIDTH, obj->box.height, BAR);
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_UP, 0);
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.height - ARROW_HEIGHT,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_DOWN, 0);
     }
+    bar = listbox->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / listbox->item_count;
+    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT, ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
+    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT + bar, ARROW_WIDTH, BAR_HEIGHT, BAR_FG);
     LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
         LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
