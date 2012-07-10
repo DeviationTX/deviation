@@ -33,12 +33,12 @@ static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
 const char * const RADIO_PROTOCOL_VAL[] = {
-     "none",
+     "None",
 #ifdef PROTO_HAS_A7105
-     "flysky",
+     "Flysky",
 #endif
 #ifdef PROTO_HAS_CYRF6936
-     "devo", "dsm2", "j6pro"
+     "DEVO", "DSM2", "J6Pro"
 #endif
      };
 
@@ -46,7 +46,7 @@ static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
-const char * const RADIO_TX_POWER_VAL[] = { "300uw", "1mw", "3mw", "10mw", "30mw", "100mw" };
+const char * const RADIO_TX_POWER_VAL[] = { "300uW", "1mW", "3mW", "10mW", "30mW", "100mW" };
 
 /* Section: Mixer */
 static const char SECTION_MIXER[]   = "mixer";
