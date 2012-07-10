@@ -266,8 +266,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(struct guiObject *obj, s16 selected, void *data),
-        void (*longpress_cb)(struct guiObject *obj, s16 selected, void *data),
+        void (*select_cb)(struct guiObject *obj, u16 selected, void *data),
+        void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
         void *cb_data)
 {
     struct guiObject  *obj = GUI_GetFreeObj();
@@ -937,9 +937,12 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
                      obj->box.width - ARROW_WIDTH, listbox->text_height, BG2);
     for(i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
+        LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? 0xFFFF : 0x0000);
+       
         LCD_PrintString(str);
         LCD_PrintString("\n");
     }
+    LCD_SetFontColor(0x0000);
 }
 
 u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
@@ -978,11 +981,11 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
             if (selected != listbox->selected) {
                 listbox->selected = selected;
                 if (listbox->select_cb)
-                    listbox->select_cb(obj, selected, listbox->cb_data);
+                    listbox->select_cb(obj, (u16)selected, listbox->cb_data);
                 OBJ_SET_DIRTY(obj, 1);
                 return 1;
             } else if (long_press && listbox->longpress_cb) {
-                listbox->longpress_cb(obj, selected, listbox->cb_data);
+                listbox->longpress_cb(obj, (u16)selected, listbox->cb_data);
             }
             return 0;
         }

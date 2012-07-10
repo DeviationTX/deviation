@@ -19,27 +19,24 @@
 void PROTOCOL_Init(enum Protocols p)
 {
     switch(p) {
+        #ifdef PROTO_HAS_A7105
         case PROTOCOL_FLYSKY:
-            #ifdef PROTO_HAS_A7105
             FLYSKY_Initialize();
-            #endif
             break;
+        #endif
+        #ifdef PROTO_HAS_CYRF6936
         case PROTOCOL_DEVO:
-            #ifdef PROTO_HAS_CYRF6936
             DEVO_Initialize();
-            #endif
             break;
         case PROTOCOL_DSM2:
-            #ifdef PROTO_HAS_CYRF6936
             DSM2_Initialize();
-            #endif
             break;
         case PROTOCOL_J6PRO:
-            #ifdef PROTO_HAS_CYRF6936
             J6PRO_Initialize();
-            #endif
             break;
+        #endif
         case PROTOCOL_NONE:
+        default:
             CLOCK_StopTimer();
             break;
     }

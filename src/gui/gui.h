@@ -113,8 +113,8 @@ struct guiListbox {
     u8 cur_pos;
     s16 selected;
     const char * (*string_cb)(u8 idx, void * data);
-    void (*select_cb)(struct guiObject *obj, s16 selected, void * data);
-    void (*longpress_cb)(struct guiObject *obj, s16 selected, void * data);
+    void (*select_cb)(struct guiObject *obj, u16 selected, void * data);
+    void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
     void *cb_data;
 };
 
@@ -204,8 +204,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(guiObject_t *obj, s16 selected, void *data),
-        void (*longpress_cb)(guiObject_t *obj, s16 selected, void *data),
+        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
+        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
         void *cb_data);
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,

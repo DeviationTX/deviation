@@ -20,6 +20,7 @@
 #include "config/ini.h"
 
 static char file[30];
+static int selected;
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     long idx = (long)user;
@@ -30,21 +31,34 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     return 1;
 }
 
+static void select_cb(guiObject_t *obj, u16 sel, void *data)
+{
+    (void)obj;
+    (void)data;
+    selected = sel + 1;
+}
 static const char *string_cb(u8 idx, void *data)
 {
     (void)data;
     FILE *fh;
     sprintf(file, "models/model%d.ini", idx + 1);
     fh = fopen(file, "r");
-    sprintf(file, "NONE");
+    sprintf(file, "%d: NONE", idx + 1);
     if (fh)
         ini_parse_file(fh, ini_handler, (void *)((long)(idx + 1)));
     return file;
 }
 static void okcancel_cb(guiObject_t *obj, void *data)
 {
+    int msg = (long)data;
     (void)obj;
-    (void)data;
+    if (msg == 1) {
+        CONFIG_SaveModelIfNeeded();
+        CONFIG_ReadModel(selected);
+    } else if (msg == 2) {
+        CONFIG_WriteModel(selected);
+        CONFIG_ReadModel(selected);  //Reload the model after saving to switch (for future saves)
+    }
     GUI_RemoveAllObjects();
     PAGE_ModelInit(0);
 }
@@ -54,7 +68,7 @@ void MODELPage_ShowLoadSave(int loadsave)
     u8 num_models;
     GUI_RemoveAllObjects();
     GUI_CreateButton(150, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_45, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateButton(264, 6, BUTTON_45, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
     for (num_models = 1; num_models <= 100; num_models++) {
         sprintf(file, "models/model%d.ini", num_models);
         FILE *fh = fopen(file, "r");
@@ -62,5 +76,6 @@ void MODELPage_ShowLoadSave(int loadsave)
             break;
     }
     num_models--;
-    GUI_CreateListBox(110, 40, 100, 190, num_models, CONFIG_GetCurrentModel(), &string_cb, NULL, NULL, NULL);
+    selected = CONFIG_GetCurrentModel();
+    GUI_CreateListBox(110, 40, 100, 190, num_models, selected-1, string_cb, select_cb, NULL, NULL);
 }
