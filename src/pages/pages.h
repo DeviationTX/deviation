@@ -4,12 +4,14 @@
 #include "mixer_page.h"
 #include "main_page.h"
 #include "trim_page.h"
+#include "model_page.h"
 
 struct pagemem {
     union {
         struct main_page main_page;
         struct mixer_page mixer_page;
         struct trim_page trim_page;
+        struct model_page model_page;
     } u;
 };
 
