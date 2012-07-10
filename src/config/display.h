@@ -3,11 +3,11 @@
 
 #include "gui/gui.h"
 
-#define DEFAULT_FONT  (Display.default_font)
-#define THROTTLE_FONT (Display.label[0])
-#define BATTERY_FONT  (Display.label[1])
-#define FONT1         (Display.label[2])
-#define NUM_LABELS 3
+#define DEFAULT_FONT  (Display.font[0])
+#define THROTTLE_FONT (Display.font[1])
+#define BATTERY_FONT  (Display.font[2])
+#define MISC1_FONT    (Display.font[3])
+#define NUM_LABELS 4
 
 struct disp_keyboard {
     u8 font;
@@ -31,8 +31,7 @@ struct disp_listbox {
 };
 
 struct display_settings {
-    struct FontDesc default_font;
-    struct FontDesc label[NUM_LABELS];
+    struct FontDesc font[NUM_LABELS];
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
 };

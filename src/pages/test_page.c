@@ -104,11 +104,11 @@ void PAGE_TestInit(int page)
     GUI_CreateLabel(10,30,NULL, DEFAULT_FONT, strMfg);
     GUI_CreateLabel(10,75,NULL, DEFAULT_FONT, buttonstr);
     lblVoltage = GUI_CreateLabel(267,8,NULL, BATTERY_FONT, voltagestr);
-    lblTE = GUI_CreateLabel(10,110,NULL, FONT1, te);
-    lblRA = GUI_CreateLabel(10,140,NULL, FONT1, ra);
-    GUI_CreateLabel(10,125,NULL, FONT1, t1);
-    GUI_CreateLabel(10,155,NULL, FONT1, t2);
-    GUI_CreateLabel(100,170,NULL, FONT1, buttonmessage);
+    lblTE = GUI_CreateLabel(10,110,NULL, MISC1_FONT, te);
+    lblRA = GUI_CreateLabel(10,140,NULL, MISC1_FONT, ra);
+    GUI_CreateLabel(10,125,NULL, MISC1_FONT, t1);
+    GUI_CreateLabel(10,155,NULL, MISC1_FONT, t2);
+    GUI_CreateLabel(100,170,NULL, MISC1_FONT, buttonmessage);
     GUI_CreateButton(10,200,BUTTON_90,button1,0x0000,PushMeButton, "Button 1 Pushed");
     GUI_CreateButton(110,200,BUTTON_90,button2,0x0000,PushMeButton, "Button 2 Pushed");
     GUI_CreateButton(210,200,BUTTON_90,button3,0x0000,PushMeButton, "Button 3 Pushed");

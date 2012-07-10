@@ -181,7 +181,7 @@ guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *
     label->cb_data = data;
     label->font = font;
     if (! label->font.font)
-        label->font.font = Display.default_font.font;
+        label->font.font = DEFAULT_FONT.font;
 
     return obj;
 }
@@ -951,7 +951,7 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
         LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                      obj->box.width - ARROW_WIDTH, listbox->text_height, SELECT);
-    old = LCD_SetFont(Display.listbox.font ? Display.listbox.font : Display.default_font.font);
+    old = LCD_SetFont(Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font);
     for(i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
         LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? SELECT_TXT : TEXT);

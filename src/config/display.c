@@ -22,6 +22,7 @@
 #include <string.h>
 
 static const char FONT[] = "font";
+static const char * const FONT_VAL[] = { "default", "throttle", "battery", "misc1"};
 static const char COLOR[] = "color";
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
@@ -69,25 +70,16 @@ static int handle_label(struct FontDesc *label, const char *name, const char *va
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct display_settings *d = (struct display_settings *)user;
-    if(MATCH_SECTION("default")) {
-        if (handle_label(&d->default_font, name, value))
-            return 1;
-        return 1;
-    }
-    if(MATCH_START(section, "label")) {
-        u8 idx = atoi(section + sizeof("label")-1);
-        if(idx == 0) {
-            printf("Couldn't parse label: %s\n", section);
-            return 0;
+    if(MATCH_START(section, FONT) && strlen(section) > sizeof(FONT)) {
+        u8 idx;
+        for (idx = 0; idx < NUM_STR_ELEMS(FONT_VAL); idx++) {
+            if (0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
+                handle_label(&d->font[idx], name, value);
+                return 1;
+            }
         }
-        if (idx > NUM_LABELS) {
-            printf("%s: Greater than allowed # of labels: %d\n", section, NUM_LABELS);
-            return 1;
-        }
-        idx--;
-        if (handle_label(&d->label[idx], name, value))
-            return 1;
-        return 1;
+        printf("Couldn't parse font: %s\n", section);
+        return 0;
     }
     if(MATCH_START(section, "keyboard")) {
         if(MATCH_KEY(FONT)) {
@@ -159,7 +151,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 u8 CONFIG_ReadDisplay()
 {
     memset(&Display, 0, sizeof(Display));
-    Display.default_font.font = 7;
-    Display.default_font.color = 0xffff;
+    DEFAULT_FONT.font = 7;
+    DEFAULT_FONT.color = 0xffff;
     return ini_parse("images/config.ini", ini_handler, (void *)&Display);
 }

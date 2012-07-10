@@ -43,8 +43,8 @@ int main() {
     SignOn();
     CONFIG_ReadDisplay();
     LCD_Clear(0x0000);
-    LCD_SetFont(Display.default_font.font);
-    LCD_SetFontColor(Display.default_font.color);
+    LCD_SetFont(DEFAULT_FONT.font);
+    LCD_SetFontColor(DEFAULT_FONT.color);
     if(! FS_Mount()) {
         LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
         USB_Connect();
