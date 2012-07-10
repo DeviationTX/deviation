@@ -944,7 +944,8 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.height - ARROW_HEIGHT,
                 ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_DOWN, 0);
     }
-    bar = listbox->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / listbox->item_count;
+    u16 denom = (listbox->item_count == listbox->entries_per_page) ?  1 : listbox->item_count - listbox->entries_per_page;
+    bar = listbox->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / denom;
     LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT, ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
     LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT + bar, ARROW_WIDTH, BAR_HEIGHT, BAR_FG);
     LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
@@ -972,8 +973,11 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
     box.width = ARROW_WIDTH;
     box.height = ARROW_HEIGHT;
     if(coords_in_box(&box, coords)) {
-        if(listbox->cur_pos > 0) {
-            listbox->cur_pos--;
+        s16 new_pos = (s16)listbox->cur_pos - (long_press ? listbox->entries_per_page : 1);
+        if (new_pos < 0)
+            new_pos = 0;
+        if(listbox->cur_pos != new_pos) {
+            listbox->cur_pos = (u16)new_pos;
             OBJ_SET_DIRTY(obj, 1);
             return 1;
         }
@@ -981,8 +985,11 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
     }
     box.y = obj->box.y + obj->box.height - ARROW_HEIGHT;
     if(coords_in_box(&box, coords)) {
-        if(listbox->cur_pos < listbox->item_count - 1) {
-            listbox->cur_pos++;
+        s16 new_pos = (s16)listbox->cur_pos + (long_press ? listbox->entries_per_page : 1);
+        if (new_pos > listbox->item_count - listbox->entries_per_page)
+            new_pos = listbox->item_count - listbox->entries_per_page;
+        if(listbox->cur_pos != new_pos) {
+            listbox->cur_pos = (u16)new_pos;
             OBJ_SET_DIRTY(obj, 1);
             return 1;
         }
