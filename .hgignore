@@ -10,6 +10,9 @@ map$
 src/objs
 src/push
 push
+.o$
+utils/midicsv/csvmidi
+utils/midicsv/midicsv
 .cproject
 .project
 /objs/
