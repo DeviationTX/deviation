@@ -18,6 +18,7 @@
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
+static u8 Volume;
 static u8 next_note;
 static u8 num_notes;
 struct NoteMap {
@@ -25,7 +26,7 @@ struct NoteMap {
     u16 note;
 };
 static const struct NoteMap note_map[] = {
-    {"a",  220}, {"ax", 233}, {"b",  247},
+    {"xx",    0}, {"a",  220}, {"ax", 233}, {"b",  247},
 
     {"c0", 262}, {"cx0",277}, {"d0", 294}, {"dx0",311}, {"e0", 330}, {"f0", 349},
     {"fx0",370}, {"g0", 392}, {"gx0",415}, {"a0", 440}, {"ax0",466}, {"b0", 494},
@@ -55,6 +56,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     u16 i;
     const char *requested_sec = (const char *)user;
     if (strcasecmp(section, requested_sec) == 0) {
+        if (strcasecmp("volume", name) == 0) {
+            Volume = atoi(value);
+            if (Volume > 100)
+                Volume = 100;
+        }
         for(i = 0; i < NUM_NOTES; i++) {
             if(strcasecmp(note_map[i].str, name) == 0) {
                 Notes[num_notes].note = i;
@@ -77,12 +83,13 @@ void MUSIC_Play(enum Music music)
 {
     num_notes = 0;
     next_note = 1;
+    Volume = 100;
     if(ini_parse("media/sound.ini", ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read images/sound.ini\n");
         return;
     }
     if(! num_notes)
         return;
-    SOUND_SetFrequency(note_map[Notes[0].note].note, 50);
+    SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
     SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
 }

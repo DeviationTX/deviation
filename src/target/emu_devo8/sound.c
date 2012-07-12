@@ -53,6 +53,10 @@ struct {
 void SOUND_SetFrequency(u16 freq, u8 volume)
 {
     int i;
+    if (freq == 0) {
+        paData.table_size = TABLE_SIZE;
+        volume = 0;
+    }
     paData.table_size = SAMPLE_RATE / freq;
     for(i = 0; i < paData.table_size; i++)
         paData.sine[i] = (float)volume / 100.0 * sin( ((double)i/(double)paData.table_size) * M_PI * 2. );
