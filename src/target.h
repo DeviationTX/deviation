@@ -120,9 +120,15 @@ void SPI_FlashBlockWriteEnable(u8 enable);
 
 /* Sound */
 void SOUND_Init();
-void SOUND_SetPeriod(u16 period);
-void SOUND_Enable();
-void SOUND_Disable();
+void SOUND_SetFrequency(u16 freq, u8 volume);
+void SOUND_Start(u16 msec, u16 (*next_note_cb)());
+void SOUND_Stop();
+
+/* Music */
+enum Music {
+    MUSIC_STARTUP = 0,
+};
+void MUSIC_Play(enum Music music);
 
 /* UART & Debug */
 void UART_Initialize();

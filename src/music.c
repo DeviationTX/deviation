@@ -1,0 +1,88 @@
+/*
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Deviation is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "target.h"
+#include "config/ini.h"
+#include <stdlib.h>
+
+static struct {u8 note; u8 duration;} Notes[100];
+static u8 next_note;
+static u8 num_notes;
+struct NoteMap {
+    const char str[4];
+    u16 note;
+};
+static const struct NoteMap note_map[] = {
+    {"a",  220}, {"ax", 233}, {"b",  247},
+
+    {"c0", 262}, {"cx0",277}, {"d0", 294}, {"dx0",311}, {"e0", 330}, {"f0", 349},
+    {"fx0",370}, {"g0", 392}, {"gx0",415}, {"a0", 440}, {"ax0",466}, {"b0", 494},
+
+    {"c1", 523}, {"cx1",554}, {"d1", 587}, {"dx1",622}, {"e1", 659}, {"f1", 698},
+    {"fx1",740}, {"g1", 784}, {"gx1",831}, {"a1", 880}, {"ax1",932}, {"b1", 988},
+
+    {"c2", 1047},{"cx2",1109},{"d2", 1175},{"dx2",1245},{"e2", 1319},{"f2", 1397},
+    {"fx2",1480},{"g2", 1568},{"gx2",1661},{"a2", 1760},{"ax2",1865},{"b2", 1976},
+
+    {"c3", 2093},{"cx3",2217},{"d3", 2349},{"dx3",2489},{"e3", 2637},{"f3", 2794},
+    {"fx3",2960},{"g3", 3136},{"gx3",3322},{"a3", 3520},{"ax3",3729},{"b3", 3951},
+
+    {"c4", 4186},{"cx4",4435},{"d4", 4699},{"dx4",4978},{"e4", 5274},{"f4", 5588},
+    {"fx4",5920},{"g4", 6272},{"gx4",6645},{"a4", 7080},{"ax4",7459},{"b4", 7902},
+};
+
+static const char const *sections[] = {
+    "startup",
+};
+
+#define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))
+
+    
+static int ini_handler(void* user, const char* section, const char* name, const char* value)
+{
+    u16 i;
+    const char *requested_sec = (const char *)user;
+    if (strcasecmp(section, requested_sec) == 0) {
+        for(i = 0; i < NUM_NOTES; i++) {
+            if(strcasecmp(note_map[i].str, name) == 0) {
+                Notes[num_notes].note = i;
+                Notes[num_notes].duration = atoi(value) / 10; //convert from msec to centi-secs
+                num_notes++;
+                return 1;
+            }
+        }
+    }
+    return 1;
+}
+u16 next_note_cb() {
+    if (next_note == num_notes)
+        return 0;
+    SOUND_SetFrequency(note_map[Notes[next_note].note].note, 100);
+    return Notes[next_note++].duration * 10;
+}
+
+void MUSIC_Play(enum Music music)
+{
+    num_notes = 0;
+    next_note = 1;
+    if(ini_parse("media/sound.ini", ini_handler, (void *)sections[music])) {
+        printf("ERROR: Could not read images/sound.ini\n");
+        return;
+    }
+    if(! num_notes)
+        return;
+    SOUND_SetFrequency(note_map[Notes[0].note].note, 50);
+    SOUND_Start((u16)Notes[0].duration * 10, next_note_cb);
+}

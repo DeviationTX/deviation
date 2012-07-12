@@ -38,6 +38,11 @@ Builing the Windows binary on Linux
                        --prefix=/opt/fltk-w32
            make
            sudo make install
+    Install portaudio:
+           <Download and unpack portaudio source code>
+           ./configure --prefix=/opt/portaudio-w32
+           make
+           sudo make install
 #################################
 
 #################################
@@ -48,12 +53,22 @@ Building the Windows binary on Windows
     * Run the installer, and select 'C++', 'MSYS' and the 'Developer Toolkit'
 
     Install fltk:
-    * Download fltk from here: www.fltk.org/software.php?VERSION=1.3.0&...-1.3.0-source.tar.gz
+    * Download fltk from here: http://fltk.org/software.php?VERSION=1.3.0&FILE=fltk/1.3.0/fltk-1.3.0-source.tar.gz
     * Start msys (you should have an icon, but otherwise run C:\MingW\msys\1.0\msys.bat
     * mkdir src
     * cd src
     * Untar fltk: tar -xzf <path to fltk download> (you can get to your C: drive in mingw using /c/Users/<user>/Downloads for example)
     * cd fltk-1.3.0
+    * ./configure
+    * make
+    * make install
+
+    Install portaudio:
+    * Download portaudio from here: http://www.portaudio.com/archives/pa_stable_v19_20111121.tgz
+    * Start msys (you should have an icon, but otherwise run C:\MingW\msys\1.0\msys.bat
+    * cd src
+    * Untar portaudio: tar -xzf <path to portaudio download> (you can get to your C: drive in mingw using /c/Users/<user>/Downloads for example)
+    * cd portaudio
     * ./configure
     * make
     * make install

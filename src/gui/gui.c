@@ -37,7 +37,7 @@ static u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_
 #define ARROW_LEFT 48
 #define ARROW_WIDTH 16
 #define ARROW_HEIGHT 16
-const char ARROW_FILE[] = "images/arrows.bmp";
+const char ARROW_FILE[] = "media/arrows.bmp";
 
 void connect_object(struct guiObject *obj)
 {
@@ -70,7 +70,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     box->y = y;
     box->width = width;
     box->height = height;
-    dialog->image.file = "images/dialog.bmp";
+    dialog->image.file = "media/dialog.bmp";
     dialog->image.x_off = 0;
     dialog->image.y_off = 0;
 
@@ -123,13 +123,13 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
 
     switch (type) {
         case TEXTSELECT_128:
-            select->image.file = "images/spin128.bmp";
+            select->image.file = "media/spin128.bmp";
             break;
         case TEXTSELECT_64:
-            select->image.file = "images/spin64.bmp";
+            select->image.file = "media/spin64.bmp";
             break;
         case TEXTSELECT_96:
-            select->image.file = "images/spin96.bmp";
+            select->image.file = "media/spin96.bmp";
             break;
     }
     select->image.x_off = 0;
@@ -231,12 +231,12 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     button = &obj->o.button;
 
     switch (type) {
-        case BUTTON_90: button->image.file = "images/btn90_24.bmp"; break;
-        case BUTTON_45: button->image.file = "images/btn46_24.bmp"; break;
-        case BUTTON_96x16: button->image.file = "images/btn96_16.bmp"; break;
-        case BUTTON_64x16: button->image.file = "images/btn64_16.bmp"; break;
-        case BUTTON_48x16: button->image.file = "images/btn48_16.bmp"; break;
-        case BUTTON_32x16: button->image.file = "images/btn32_16.bmp"; break;
+        case BUTTON_90: button->image.file = "media/btn90_24.bmp"; break;
+        case BUTTON_45: button->image.file = "media/btn46_24.bmp"; break;
+        case BUTTON_96x16: button->image.file = "media/btn96_16.bmp"; break;
+        case BUTTON_64x16: button->image.file = "media/btn64_16.bmp"; break;
+        case BUTTON_48x16: button->image.file = "media/btn48_16.bmp"; break;
+        case BUTTON_32x16: button->image.file = "media/btn32_16.bmp"; break;
     }
     button->image.x_off = 0;
     button->image.y_off = 0;
@@ -532,7 +532,7 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
-    LCD_DrawWindowedImageFromFile(x, y, "images/devo8.bmp", w, h, x, y);
+    LCD_DrawWindowedImageFromFile(x, y, "media/devo8.bmp", w, h, x, y);
 }
 
 void GUI_DrawScreen(void)

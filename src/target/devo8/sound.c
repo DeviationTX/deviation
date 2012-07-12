@@ -50,13 +50,18 @@ void SOUND_Init()
     timer_enable_preload(TIM2);
 }
 
-/* period = 14400000 / frequency */
-/* A Period of 65535 gives a ~ 220Hz tone */
-/* 50% duty-cylce is max-volume */
-void SOUND_SetPeriod(u16 period)
+void SOUND_SetFrequency(u16 freq, u8 volume)
 {
+    /* volume is between 0 and 100 */
+    /* period = 14400000 / frequency */
+    /* A Period of 65535 gives a ~ 220Hz tone */
+    /* 50% duty-cylce is max-volume */
+    u16 period = 14400000 / frequency;
+    if (volume > 100)
+        volume = 100;
+    u16 duty_cycle = volume * (period >> 1) / 100;
     timer_set_period(TIM2, period);
-    timer_set_oc_value(TIM2, TIM_OC2, period >> 1); //50% duty cycle
+    timer_set_oc_value(TIM2, TIM_OC2, duty_cycle);
 }
 
 void SOUND_Enable()

@@ -32,7 +32,6 @@ void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
 void CHAN_Init() {}
-void SOUND_Init() {}
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }

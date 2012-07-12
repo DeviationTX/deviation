@@ -153,5 +153,5 @@ u8 CONFIG_ReadDisplay()
     memset(&Display, 0, sizeof(Display));
     DEFAULT_FONT.font = 7;
     DEFAULT_FONT.color = 0xffff;
-    return ini_parse("images/config.ini", ini_handler, (void *)&Display);
+    return ini_parse("media/config.ini", ini_handler, (void *)&Display);
 }

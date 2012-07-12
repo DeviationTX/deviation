@@ -1,7 +1,7 @@
 SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp)
 SRC_C  = $(wildcard target/$(TARGET)/*.c)
 
-LFLAGS = -lfltk
+LFLAGS = -lfltk -lportaudio
 SCREENSIZE = qvga
 all = $(TARGET)
 

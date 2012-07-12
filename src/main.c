@@ -49,6 +49,7 @@ int main() {
         LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
         USB_Connect();
     }
+    MUSIC_Play(MUSIC_STARTUP);
 
 #if 0
     printf("Showing display\n");
