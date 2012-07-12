@@ -62,7 +62,8 @@ int ini_parse_file(FILE* file,
                    void* user)
 {
     /* Uses a fair bit of stack (use heap instead if you need to) */
-    char line[MAX_LINE];
+    char data[MAX_LINE];
+    char *line, *eol;
     char section[MAX_SECTION] = "";
     char prev_name[MAX_NAME] = "";
 
@@ -73,9 +74,36 @@ int ini_parse_file(FILE* file,
     int lineno = 0;
     int error = 0;
     int done = 0;
+    int len = 0;
 
     /* Scan through file line by line */
-    while (done != -1 && fgets(line, sizeof(line), file) != NULL) {
+    line = eol = data + sizeof(data);
+    while (1) {
+        if(done == -1)
+            break;
+        if (eol >= data + sizeof(data) -1) {
+            //No end of line
+            if(data != line)
+                memmove(data, line, eol - line);
+            eol = data + (eol - line);
+            line = data;
+            int bytes = fread(eol, 1, sizeof(data) - (eol - data), file);
+            len = eol - data + bytes;
+        } else if(eol != data) {
+            line = eol + 1;
+        }
+        if (line >= data + len || *line == '\0')
+            break;
+        for (eol = line; eol < data + len; eol++) {
+            if(*eol == '\n') {
+                *eol = '\0';
+                break;
+            }
+        }
+        if (eol == data + len) {
+            continue;
+        }
+        //printf("%d: %s\n", lineno, line);
         lineno++;
 
         start = line;
