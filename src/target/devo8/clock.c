@@ -15,6 +15,7 @@
 
 
 #include "target.h"
+#include "devo8.h"
 
 #include <libopencm3/stm32/systick.h>
 #include <libopencm3/stm32/timer.h>
@@ -25,6 +26,8 @@
 
 u32 msecs;
 u16 (*timer_callback)(void);
+u8 msec_callbacks;
+u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 
 void CLOCK_Init()
 {
@@ -37,6 +40,7 @@ void CLOCK_Init()
     systick_interrupt_enable();
 
     msecs = 0;
+    msec_callbacks = 0;
     /* Start counting. */
     systick_counter_enable();
 
@@ -123,7 +127,25 @@ u32 CLOCK_getms()
     return msecs;
 }
 
+void CLOCK_SetMsecCallback(enum MsecCallback cb, u32 msec)
+{
+    msec_cbtime[cb] = msecs + msec;
+    msec_callbacks |= (1 << cb);
+}
+void CLOCK_ClearMsecCallback(enum MsecCallback cb)
+{
+    msec_callbacks &= ~(1 << cb);
+}
 void sys_tick_handler(void)
 {
 	msecs++;
+        if(msec_callbacks & (1 << TIMER_SOUND)) {
+            if (msecs == msec_cbtime[TIMER_SOUND]) {
+                u16 ms = SOUND_Callback();
+                if(! ms)
+                    msec_callbacks &= ~(1 << TIMER_SOUND);
+                else
+                    msec_cbtime[TIMER_SOUND] = msecs + ms;
+            }
+        }
 }

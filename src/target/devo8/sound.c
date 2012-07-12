@@ -18,6 +18,9 @@
 #include <libopencm3/stm32/timer.h>
 
 #include "target.h"
+#include "devo8.h"
+
+static u16(*Callback)();
 
 void SOUND_Init()
 {
@@ -50,7 +53,7 @@ void SOUND_Init()
     timer_enable_preload(TIM2);
 }
 
-void SOUND_SetFrequency(u16 freq, u8 volume)
+void SOUND_SetFrequency(u16 frequency, u8 volume)
 {
     /* volume is between 0 and 100 */
     /* period = 14400000 / frequency */
@@ -64,12 +67,21 @@ void SOUND_SetFrequency(u16 freq, u8 volume)
     timer_set_oc_value(TIM2, TIM_OC2, duty_cycle);
 }
 
-void SOUND_Enable()
+void SOUND_Start(u16 msec, u16(*next_note_cb)())
 {
+    CLOCK_SetMsecCallback(TIMER_SOUND, msec);
+    Callback = next_note_cb;
     timer_enable_counter(TIM2);
 }
 
-void SOUND_Disable()
+void SOUND_Stop()
 {
+    CLOCK_ClearMsecCallback(TIMER_SOUND);
     timer_disable_counter(TIM2);
+}
+
+u32 SOUND_Callback()
+{
+    u16 msec = Callback();
+    return msec;
 }
