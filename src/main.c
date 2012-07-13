@@ -50,9 +50,9 @@ int main() {
     {
         u32 buttons = ScanButtons();
         if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || ! FS_Mount()) {
-            LCD_SetFont(0);
+            LCD_SetFont(1);
             LCD_SetFontColor(0xffff);
-            LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
+            LCD_PrintStringXY(10, 10, "Install filesystem, then press 'ENT'");
             USB_Connect();
         }
     }
