@@ -26,6 +26,7 @@ extern void start_event_loop();
 extern void TEST_init_mixer();
 
 int main() {
+
     PWR_Init();
     CLOCK_Init();
     Initialize_ButtonMatrix();
@@ -40,15 +41,25 @@ int main() {
     SPITouch_Init();
     SOUND_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+
+    if(PWR_CheckPowerSwitch())
+        PWR_Shutdown();
+
     SignOn();
-    CONFIG_ReadDisplay();
     LCD_Clear(0x0000);
+    {
+        u32 buttons = ScanButtons();
+        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || ! FS_Mount()) {
+            LCD_SetFont(0);
+            LCD_SetFontColor(0xffff);
+            LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
+            USB_Connect();
+        }
+    }
+    CONFIG_ReadDisplay();
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.color);
-    if(! FS_Mount()) {
-        LCD_PrintStringXY(10, 10, "Install filesystem, thn press 'ENT'");
-        USB_Connect();
-    }
+
     MUSIC_Play(MUSIC_STARTUP);
 
 #if 0

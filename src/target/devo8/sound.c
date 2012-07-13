@@ -83,5 +83,7 @@ void SOUND_Stop()
 u32 SOUND_Callback()
 {
     u16 msec = Callback();
+    if(! msec)
+        SOUND_Stop();
     return msec;
 }

@@ -18,6 +18,12 @@
 
 static FATFS fat;
 
+#ifdef SHOW_LOADTIME
+  #include "target.h"
+  #include <libopencm3/stm32/usart.h>
+  static u32 ms;
+  static char f[80];
+#endif
 #define DBGFS if(0) printf
 
 int FS_Mount()
@@ -62,6 +68,10 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 FILE *fopen(const char *path, const char *mode)
 {
     (void)mode;
+#ifdef SHOW_LOADTIME
+    strcpy(f, path);
+    ms = CLOCK_getms();
+#endif
     int res = pf_open(path);
     if (mode[0] == 'w')
         pf_maximize_file_size(); //When writing a file, make sure it takes up the full sector
@@ -72,6 +82,31 @@ FILE *fopen(const char *path, const char *mode)
 int fclose(FILE *fp)
 {
     (void)fp;
+#ifdef SHOW_LOADTIME
+/*  The system hangs if we try to do a printf on the filename,
+    or modify the ordering of the below in any way,
+    but the below code DOES work if enabled */
+    u32 t = CLOCK_getms();
+
+    printf("fclose: %d", (int)(t - ms));
+    usart_send_blocking(USART1, ' ');
+    usart_send_blocking(USART1, f[0]);
+    usart_send_blocking(USART1, f[1]);
+    usart_send_blocking(USART1, f[2]);
+    usart_send_blocking(USART1, f[3]);
+    usart_send_blocking(USART1, f[4]);
+    usart_send_blocking(USART1, f[5]);
+    usart_send_blocking(USART1, f[6]);
+    usart_send_blocking(USART1, f[7]);
+    usart_send_blocking(USART1, f[8]);
+    usart_send_blocking(USART1, f[9]);
+    usart_send_blocking(USART1, f[10]);
+    usart_send_blocking(USART1, f[11]);
+    usart_send_blocking(USART1, f[12]);
+    usart_send_blocking(USART1, f[13]);
+    usart_send_blocking(USART1, '\n');
+    usart_send_blocking(USART1, '\r');
+#endif
     return 0;
 }
 

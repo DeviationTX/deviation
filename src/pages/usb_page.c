@@ -82,6 +82,7 @@ int PAGE_USBCanChange()
 void USB_Connect()
 {
     USB_Enable(1);
+    wait_release();
     wait_press();
     wait_release();
     USB_Disable(1);

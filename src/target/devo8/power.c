@@ -53,13 +53,15 @@ void PWR_Shutdown()
 
 int PWR_CheckPowerSwitch()
 {
-    static u16 debounce = 0;
+    //static u16 debounce = 0;
     if(gpio_get(GPIOA, GPIO3)) {
+/*
         debounce++;
     } else {
         debounce = 0;
     }
     if(debounce >= 0x40) {
+*/
         return 1;
     }
     return 0;

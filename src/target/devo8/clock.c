@@ -91,6 +91,9 @@ void CLOCK_Init()
     timer_disable_irq(TIM4, TIM_DIER_CC1IE);
 
     timer_enable_counter(TIM4);
+    /* wait for system to start up and stabilize */
+    while(msecs < 100)
+        ;
 }
 
 void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
