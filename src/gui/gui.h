@@ -56,6 +56,27 @@ typedef void guiObject_t;
 #else
 typedef struct guiObject guiObject_t;
 
+enum ImageNames {
+    FILE_BTN90_24,
+    FILE_BTN46_24,
+    FILE_BTN96_16,
+    FILE_BTN64_16,
+    FILE_BTN48_16,
+    FILE_BTN32_16,
+    FILE_ARROW_16_UP,
+    FILE_ARROW_16_DOWN,
+    FILE_ARROW_16_RIGHT,
+    FILE_ARROW_16_LEFT,
+};
+struct ImageMap {
+    const char *file;
+    u8 width;
+    u8 height;
+    u16 x_off;
+    u16 y_off;
+};
+const struct ImageMap image_map[FILE_ARROW_16_LEFT+1];
+
 enum GUIType {
     UnknownGUI,
     Button,
@@ -90,7 +111,6 @@ struct guiLabel {
 };
 
 struct guiKeyboard {
-    struct guiImage image;
     struct touch last_coords;
     char *text;
     u8 num_chars;
@@ -155,7 +175,7 @@ struct guiDialog {
 };
 
 struct guiTextSelect {
-    struct guiImage image;
+    const struct ImageMap *button;
     u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);

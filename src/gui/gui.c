@@ -31,13 +31,26 @@ static void GUI_DrawTextSelect(struct guiObject *obj);
 static void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
 static u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
 
-#define ARROW_UP 0
-#define ARROW_DOWN 16
-#define ARROW_RIGHT 32
-#define ARROW_LEFT 48
+const struct ImageMap image_map[] = {
+    {"media/btn90_24.bmp", 90, 24, 0, 0}, /*FILE_BTN90_24 */
+    {"media/btn46_24.bmp", 46, 24, 0, 0}, /*FILE_BTN46_24 */
+    {"media/btn96_16.bmp", 96, 16, 0, 0}, /*FILE_BTN96_16 */
+    {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
+    {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */
+    {"media/btn32_16.bmp", 32, 16, 0, 0}, /*FILE_BTN32_16 */
+    {"media/arrows16.bmp", 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
+    {"media/arrows16.bmp", 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
+    {"media/arrows16.bmp", 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
+    {"media/arrows16.bmp", 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
+};
+#define DRAW_NORMAL 0
+#define DRAW_SELECTED 1
+#define ARROW_LEFT  (&image_map[FILE_ARROW_16_LEFT])
+#define ARROW_RIGHT (&image_map[FILE_ARROW_16_RIGHT])
+#define ARROW_UP    (&image_map[FILE_ARROW_16_UP])
+#define ARROW_DOWN  (&image_map[FILE_ARROW_16_DOWN])
 #define ARROW_WIDTH 16
 #define ARROW_HEIGHT 16
-const char ARROW_FILE[] = "media/arrows.bmp";
 
 void connect_object(struct guiObject *obj)
 {
@@ -123,25 +136,21 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
 
     switch (type) {
         case TEXTSELECT_128:
-            select->image.file = "media/spin128.bmp";
+            select->button = &image_map[FILE_BTN96_16];
             break;
         case TEXTSELECT_64:
-            select->image.file = "media/spin64.bmp";
+            select->button = &image_map[FILE_BTN32_16];
             break;
         case TEXTSELECT_96:
-            select->image.file = "media/spin96.bmp";
+            select->button = &image_map[FILE_BTN64_16];
             break;
     }
-    select->image.x_off = 0;
-    select->image.y_off = 0;
+
+    box->height = select->button->height;
+    box->width = select->button->width + 2 * ARROW_WIDTH;
 
     box->x = x;
     box->y = y;
-    if(! LCD_ImageDimensions(select->image.file, &box->width, &box->height)) {
-        printf("Couldn't locate file: %s\n", select->image.file);
-        box->width = 20;
-        box->height = 10;
-    }
 
     obj->Type = TextSelect;
     OBJ_SET_TRANSPARENT(obj, 0); //Even if the bmp has transparency, the redraw function will handle it
@@ -894,12 +903,23 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     }
 }
 
+void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
+{
+    LCD_DrawWindowedImageFromFile(x, y, map->file, map->width, map->height,
+                                  map->x_off, map->y_off + idx * map->height);
+}
+
 void GUI_DrawTextSelect(struct guiObject *obj)
 {
     u16 x, y, w, h;
     struct guiBox *box = &obj->box;
     struct guiTextSelect *select = &obj->o.textselect;
-    LCD_DrawWindowedImageFromFile(box->x, box->y, select->image.file, box->width, box->height, select->image.x_off, select->image.y_off);
+    GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                        box->y, select->button, DRAW_NORMAL);
+    GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT, DRAW_NORMAL);
+    GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
+                        box->y, ARROW_RIGHT, DRAW_NORMAL);
+
     const char *str =select->ValueCB(obj, 0, select->cb_data);
     LCD_SetFontColor(select->fontColor);
     LCD_GetStringDimensions((const u8 *)str, &w, &h);
@@ -946,18 +966,24 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
     struct guiListbox *listbox = &obj->o.listbox;
     if (redraw_all) {
         LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - ARROW_WIDTH, obj->box.height, FILL);
-        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
-                ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_UP, 0);
-        LCD_DrawWindowedImageFromFile(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + obj->box.height - ARROW_HEIGHT,
-                ARROW_FILE, ARROW_WIDTH, ARROW_HEIGHT, ARROW_DOWN, 0);
+        GUI_DrawImageHelper(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y,
+                            ARROW_UP, DRAW_NORMAL);
+        GUI_DrawImageHelper(obj->box.x + obj->box.width - ARROW_WIDTH,
+                            obj->box.y + obj->box.height - ARROW_HEIGHT,
+                            ARROW_DOWN, DRAW_NORMAL);
     }
     u16 denom = (listbox->item_count == listbox->entries_per_page) ?  1 : listbox->item_count - listbox->entries_per_page;
     bar = listbox->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / denom;
-    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT, ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
-    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH, obj->box.y + ARROW_HEIGHT + bar, ARROW_WIDTH, BAR_HEIGHT, BAR_FG);
+    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH,
+                 obj->box.y + ARROW_HEIGHT, ARROW_WIDTH,
+                 obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
+    LCD_FillRect(obj->box.x + obj->box.width - ARROW_WIDTH,
+                 obj->box.y + ARROW_HEIGHT + bar,
+                 ARROW_WIDTH, BAR_HEIGHT, BAR_FG);
     LCD_SetXY(obj->box.x + 5, obj->box.y + 1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page)
-        LCD_FillRect(obj->box.x, obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
+        LCD_FillRect(obj->box.x,
+                     obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                      obj->box.width - ARROW_WIDTH, listbox->text_height, SELECT);
     old = LCD_SetFont(Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font);
     for(i = 0; i < listbox->entries_per_page; i++) {
