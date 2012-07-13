@@ -418,7 +418,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Button:
     {
         struct guiButton *button = &obj->o.button;
-        GUI_DrawImageHelper(box->x, box->y, button->image, 0);
+        GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
         LCD_SetFontColor(button->fontColor);
         LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
         break;
@@ -631,6 +631,14 @@ void GUI_TouchRelease()
 {
     if (objTOUCHED) {
         switch (objTOUCHED->Type) {
+        case Button:
+          {
+            struct guiButton *button = &objTOUCHED->o.button;
+            OBJ_SET_DIRTY(objTOUCHED, 1);
+            if(button->CallBack)
+                button->CallBack(objTOUCHED, button->cb_data);
+            break;
+          }
         case TextSelect:
             GUI_TouchTextSelect(objTOUCHED, NULL, -1);
             break;
@@ -659,13 +667,11 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Button:
                 if (coords_in_box(&obj->box, coords)) {
-                    struct guiButton *button = &obj->o.button;
-                    if(button->CallBack) {
-                        OBJ_SET_DIRTY(obj, 1);
-                        button->CallBack(obj, button->cb_data);
-                        return 1;
-                    }
-                    return 0;
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
+                    OBJ_SET_DIRTY(obj, 1);
+                    return 1;
                 }
                 break;
             case TextSelect:
@@ -895,9 +901,11 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     struct guiTextSelect *select = &obj->o.textselect;
     GUI_DrawImageHelper(box->x + ARROW_WIDTH,
                         box->y, select->button, DRAW_NORMAL);
-    GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT, DRAW_NORMAL);
+    GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
+                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
     GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                        box->y, ARROW_RIGHT, DRAW_NORMAL);
+                        box->y, ARROW_RIGHT,
+                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
 
     const char *str =select->ValueCB(obj, 0, select->cb_data);
     LCD_SetFontColor(select->fontColor);
@@ -952,12 +960,14 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
             OBJ_SET_DIRTY(obj, 1);
             select->ValueCB(obj, 1, select->cb_data);
             return 1;
-        } else if(select->state == 0x02) {
+        } else if(select->state == 0x04) {
             select->state = 0;
             OBJ_SET_DIRTY(obj, 1);
             select->SelectCB(obj, select->cb_data);
             return 1;
         }
+        printf("Error: Should not get here\n");
+        return 0;
     }
     box.width = ARROW_WIDTH;
     if (coords_in_box(&box, coords)) {
