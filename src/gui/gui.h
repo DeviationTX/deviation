@@ -179,6 +179,7 @@ struct guiDialog {
 
 struct guiTextSelect {
     const struct ImageMap *button;
+    u8 state;
     u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);

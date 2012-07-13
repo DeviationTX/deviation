@@ -18,6 +18,7 @@
 
 struct guiObject GUI_Array[100];
 struct guiObject *objHEAD = NULL;
+struct guiObject *objTOUCHED = NULL;
 static u8 FullRedraw;
 
 static void GUI_DrawObject(struct guiObject *obj);
@@ -26,7 +27,9 @@ static void dgCallback(struct guiObject *obj, void *data);
 static void GUI_DrawLabel(struct guiObject *obj);
 static void GUI_DrawBarGraph(struct guiObject *obj);
 static void GUI_DrawXYGraph(struct guiObject *obj);
+
 static void GUI_DrawTextSelect(struct guiObject *obj);
+u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 static void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
 static u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
@@ -46,8 +49,8 @@ const struct ImageMap image_map[] = {
     {"media/arrows16.bmp", 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
     {"media/arrows16.bmp", 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
 };
-#define DRAW_NORMAL 0
-#define DRAW_SELECTED 1
+#define DRAW_NORMAL  0
+#define DRAW_PRESSED 1
 #define ARROW_LEFT  (&image_map[FILE_ARROW_16_LEFT])
 #define ARROW_RIGHT (&image_map[FILE_ARROW_16_RIGHT])
 #define ARROW_UP    (&image_map[FILE_ARROW_16_UP])
@@ -160,6 +163,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
+    select->state     = 0;
     select->fontColor = fontColor;
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
@@ -508,6 +512,8 @@ void GUI_RemoveObj(struct guiObject *obj)
             if (dialog->button[i])
                 GUI_RemoveObj(dialog->button[i]);
     }
+    if (objTOUCHED == obj)
+        objTOUCHED = NULL;
     OBJ_SET_USED(obj, 0);
     // Reattach linked list
     struct guiObject *prev = objHEAD;
@@ -629,29 +635,22 @@ void GUI_RefreshScreen(void)
 
 void GUI_TouchRelease()
 {
-    u8 modalActive;
-    modalActive = GUI_IsModal() ? 1 : 0;
-    struct guiObject *obj = objHEAD;
-    while(obj) {
-        if (! OBJ_IS_DISABLED(obj)
-            && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
+    if (objTOUCHED) {
+        switch (objTOUCHED->Type) {
+        case TextSelect:
+            GUI_TouchTextSelect(objTOUCHED, NULL, -1);
+            break;
+        case Keyboard:
         {
-            switch (obj->Type) {
-            case Keyboard:
-            {
-                struct guiKeyboard *keyboard = &obj->o.keyboard;
-                if(keyboard->last_coords.x || keyboard->last_coords.y) {
-                    GUI_DrawKeyboard(obj, NULL, 0);
-                    return;
-                }
-                break;
-            }
-            default: break;
-            }
+            GUI_DrawKeyboard(objTOUCHED, NULL, 0);
+            break;
         }
-        obj = obj->next;
+        default: break;
+        }
+        objTOUCHED = NULL;
     }
 }
+
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
     u8 modalActive;
@@ -677,30 +676,10 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case TextSelect:
                 if(coords_in_box(&obj->box, coords)) {
-                    struct guiBox box = obj->box;
-                    struct guiTextSelect *select = &obj->o.textselect;
-                    box.width = 16;
-                    if (coords_in_box(&box, coords)) {
-                        if (select->ValueCB) {
-                            OBJ_SET_DIRTY(obj, 1);
-                            select->ValueCB(obj, long_press ? -2 : -1, select->cb_data);
-                            return 1;
-                        }
-                    }
-                    box.x = obj->box.x + obj->box.width - 16;
-                    if (coords_in_box(&box, coords)) {
-                        if (select->ValueCB) {
-                            OBJ_SET_DIRTY(obj, 1);
-                            select->ValueCB(obj, long_press ? 2 : 1, select->cb_data);
-                            return 1;
-                        }
-                    }
-                    if (select->SelectCB) {
-                        OBJ_SET_DIRTY(obj, 1);
-                        select->SelectCB(obj, select->cb_data);
-                        return 1;
-                    }
-                    return 0;
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
+                    return GUI_TouchTextSelect(obj, coords, long_press);
                 }
                 break;
             case Listbox:
@@ -738,6 +717,9 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Keyboard:
                 //Note that this only works because the keyboard encompasses the whole screen
+                if (objTOUCHED && objTOUCHED != obj)
+                    return 0;
+                objTOUCHED = obj;
                 return GUI_DrawKeyboard(obj, coords, long_press);
                 break;
             }
@@ -952,6 +934,71 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 l
     if(_changed)
         *_changed = changed;
     return value;
+}
+
+u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type)
+{
+    struct guiBox box = obj->box;
+    struct guiTextSelect *select = &obj->o.textselect;
+
+    if (press_type < 0) {
+        if(! select->state) {
+            return 0;
+        } else if(select->state & 0x80) {
+            select->state = 0;
+            OBJ_SET_DIRTY(obj, 1);
+            return 1;
+        } else if(select->state == 0x01) {
+            select->state = 0;
+            OBJ_SET_DIRTY(obj, 1);
+            select->ValueCB(obj, -1, select->cb_data);
+            return 1;
+        } else if(select->state == 0x02) {
+            select->state = 0;
+            OBJ_SET_DIRTY(obj, 1);
+            select->ValueCB(obj, 1, select->cb_data);
+            return 1;
+        } else if(select->state == 0x02) {
+            select->state = 0;
+            OBJ_SET_DIRTY(obj, 1);
+            select->SelectCB(obj, select->cb_data);
+            return 1;
+        }
+    }
+    box.width = ARROW_WIDTH;
+    if (coords_in_box(&box, coords)) {
+        if (! press_type) {
+            if (! select->state) {
+                select->state = 0x01;
+                OBJ_SET_DIRTY(obj, 1);
+            }
+        } else if (select->ValueCB) {
+            OBJ_SET_DIRTY(obj, 1);
+            select->ValueCB(obj, -2, select->cb_data);
+            select->state |= 0x80;
+        }
+        return 1;
+    }
+    box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+    if (coords_in_box(&box, coords)) {
+        if (! press_type) {
+            if (! select->state) {
+                select->state = 0x02;
+                OBJ_SET_DIRTY(obj, 1);
+            }
+        } else if (select->ValueCB) {
+            OBJ_SET_DIRTY(obj, 1);
+            select->ValueCB(obj, 2, select->cb_data);
+            select->state |= 0x80;
+        }
+        return 1;
+    }
+    if (! press_type && ! select->state && select->SelectCB) {
+        OBJ_SET_DIRTY(obj, 1);
+        select->state = 0x04;
+        return 1;
+    }
+    return 0;
 }
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
