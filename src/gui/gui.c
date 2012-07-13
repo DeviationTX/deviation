@@ -38,6 +38,9 @@ const struct ImageMap image_map[] = {
     {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
     {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */
     {"media/btn32_16.bmp", 32, 16, 0, 0}, /*FILE_BTN32_16 */
+    {"media/spin96.bmp",   96, 16, 0, 0}, /*FILE_SPIN96 */
+    {"media/spin64.bmp",   64, 16, 0, 0}, /*FILE_SPIN64 */
+    {"media/spin32.bmp",   32, 16, 0, 0}, /*FILE_SPIN32 */
     {"media/arrows16.bmp", 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
     {"media/arrows16.bmp", 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
     {"media/arrows16.bmp", 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
@@ -136,13 +139,13 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
 
     switch (type) {
         case TEXTSELECT_128:
-            select->button = &image_map[FILE_BTN96_16];
+            select->button = &image_map[FILE_SPIN96];
             break;
         case TEXTSELECT_64:
-            select->button = &image_map[FILE_BTN32_16];
+            select->button = &image_map[FILE_SPIN32];
             break;
         case TEXTSELECT_96:
-            select->button = &image_map[FILE_BTN64_16];
+            select->button = &image_map[FILE_SPIN64];
             break;
     }
 
