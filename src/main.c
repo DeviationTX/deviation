@@ -115,6 +115,10 @@ void event_loop(void *param)
                 PAGE_Change(1);
             } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
                 PAGE_Change(-1);
+            } else if(CHAN_ButtonIsPressed(buttons, BUT_UP)) {
+                GUI_Select(BUT_LEFT);
+            } else if(CHAN_ButtonIsPressed(buttons, BUT_DOWN)) {
+                GUI_Select(BUT_RIGHT);
             }
         }
     }

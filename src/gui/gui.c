@@ -16,9 +16,12 @@
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 
+#define TEST_SELECT 1
+
 struct guiObject GUI_Array[100];
 struct guiObject *objHEAD = NULL;
 struct guiObject *objTOUCHED = NULL;
+struct guiObject *objSELECTED = NULL;
 static u8 FullRedraw;
 
 static void GUI_DrawObject(struct guiObject *obj);
@@ -160,7 +163,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     box->y = y;
 
     obj->Type = TextSelect;
-    OBJ_SET_TRANSPARENT(obj, 0); //Even if the bmp has transparency, the redraw function will handle it
+    OBJ_SET_TRANSPARENT(obj, TEST_SELECT); //Even if the bmp has transparency, the redraw function will handle it
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
@@ -262,7 +265,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     box->height = button->image->height;
 
     obj->Type = Button;
-    OBJ_SET_TRANSPARENT(obj, 0); //No need to set transparency since the image cannot be overlapped, and the file can't change
+    OBJ_SET_TRANSPARENT(obj, TEST_SELECT); //No need to set transparency since the image cannot be overlapped, and the file can't change
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
@@ -475,6 +478,9 @@ void GUI_DrawObject(struct guiObject *obj)
         GUI_DrawKeyboard(obj, NULL, 0);
         break;
     }
+    if (obj == objSELECTED) {
+        LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, 0x0000);
+    }
     OBJ_SET_DIRTY(obj, 0);
     OBJ_SET_SHOWN(obj, 1);
 }
@@ -508,6 +514,8 @@ void GUI_RemoveObj(struct guiObject *obj)
     }
     if (objTOUCHED == obj)
         objTOUCHED = NULL;
+    if (objSELECTED == obj)
+        objSELECTED = NULL;
     OBJ_SET_USED(obj, 0);
     // Reattach linked list
     struct guiObject *prev = objHEAD;
@@ -727,6 +735,47 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
         obj = obj->next;
     }
     return 0;
+}
+
+void GUI_Select(u32 button)
+{
+#if TEST_SELECT
+    if (! objHEAD)
+        return;
+    if (button == BUT_RIGHT || (button == BUT_LEFT && ! objSELECTED)) {
+        struct guiObject *obj = objSELECTED;
+        if (!obj)
+            obj = objHEAD;
+        else
+            obj = obj->next;
+        while(obj) {
+            if (obj->Type == Button || obj->Type == TextSelect) {
+                if (objSELECTED)
+                    OBJ_SET_DIRTY(objSELECTED, 1);
+                objSELECTED = obj;
+                OBJ_SET_DIRTY(obj, 1);
+                return;
+            }
+            obj = obj->next;
+        }
+    } else if (button == BUT_LEFT) {
+        struct guiObject *obj = objHEAD, *objLast = NULL;
+        while(obj) {
+            if (obj == objSELECTED) {
+                OBJ_SET_DIRTY(objSELECTED, 1);
+                if (objLast) {
+                    objSELECTED = objLast;
+                    OBJ_SET_DIRTY(objSELECTED, 1);
+                }
+                return;
+            }
+            if (obj->Type == Button || obj->Type == TextSelect)
+                objLast = obj;
+            obj = obj->next;
+        }
+    }
+#endif
+    return;
 }
 
 void GUI_DrawLabel(struct guiObject *obj)

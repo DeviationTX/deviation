@@ -262,6 +262,7 @@ void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
+void GUI_Select(u32 button);
 
 #include "config/display.h"
 
