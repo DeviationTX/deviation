@@ -59,7 +59,6 @@ void PAGE_MixerInit(int page)
             }
         }
     }
-    GUI_DrawScreen();
 }
 
 static const char *show_source(guiObject_t *obj, void *data)

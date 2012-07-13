@@ -466,6 +466,7 @@ void GUI_DrawObject(struct guiObject *obj)
         break;
     }
     OBJ_SET_DIRTY(obj, 0);
+    OBJ_SET_SHOWN(obj, 1);
 }
 
 void GUI_DrawObjects(void)
@@ -483,6 +484,7 @@ void GUI_RemoveAllObjects()
 {
     while(objHEAD)
         GUI_RemoveObj(objHEAD);
+    FullRedraw = 1;
 }
 
 void GUI_RemoveObj(struct guiObject *obj)
@@ -522,6 +524,7 @@ struct guiObject *GUI_GetFreeObj(void)
             OBJ_SET_DISABLED(obj, 0);
             OBJ_SET_MODAL(obj, 0);
             OBJ_SET_DIRTY(obj, 1);
+            OBJ_SET_SHOWN(obj, 0);
             return obj;
         }
     }
@@ -748,7 +751,8 @@ void GUI_DrawLabel(struct guiObject *obj)
         old_w = obj->box.width;
     if (old_h < obj->box.height)
         old_h = obj->box.height;
-    GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
+    if (OBJ_IS_SHOWN(obj))
+        GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
     LCD_SetFontColor(label->font.color);
     LCD_PrintStringXY(obj->box.x, obj->box.y, str);
     LCD_SetFont(old_font);
@@ -851,7 +855,8 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         val = width * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y, val, height, 0xFFE0);
 #ifdef TRANSPARENT_BARGRAPH
-        GUI_DrawBackground(x + val, y, width - val, height);
+        if (OBJ_IS_SHOWN(obj))
+            GUI_DrawBackground(x + val, y, width - val, height);
 #else
         LCD_FillRect(x + val, y, width - val, height, 0x0000);
 #endif
@@ -861,7 +866,8 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         val = height * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y + (height - val), width, val, 0xFFE0);
 #ifdef TRANSPARENT_BARGRAPH
-        GUI_DrawBackground(x, y, width, height - val);
+        if (OBJ_IS_SHOWN(obj))
+            GUI_DrawBackground(x, y, width, height - val);
 #else
         LCD_FillRect(x, y, width, height - val, 0x0000);
 #endif
@@ -869,7 +875,8 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     }
     case TRIM_HORIZONTAL: {
         val = (TRIM_THICKNESS / 2) + (width - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
-        GUI_DrawBackground(x, y, width, height);
+        if (OBJ_IS_SHOWN(obj))
+            GUI_DrawBackground(x, y, width, height);
 //        LCD_DrawFastHLine(x, y + height / 2, width, 0x0000); //Main axis
         LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Center
         LCD_FillRect(x + val - TRIM_THICKNESS / 2, y + TRIM_MARGIN, TRIM_THICKNESS, height - TRIM_MARGIN * 2, 0x0000);
@@ -877,7 +884,8 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     }
     case TRIM_VERTICAL: {
         val = (TRIM_THICKNESS / 2) + (height - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
-        GUI_DrawBackground(x, y, width, height);
+        if (OBJ_IS_SHOWN(obj))
+            GUI_DrawBackground(x, y, width, height);
 //        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Main axis
         LCD_DrawFastHLine(x, y + height / 2, width, 0xFFFF); //Center
         LCD_FillRect(x + TRIM_MARGIN, y + (height - val) - TRIM_THICKNESS / 2, width - TRIM_MARGIN * 2, TRIM_THICKNESS, 0x0000);

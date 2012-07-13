@@ -117,7 +117,6 @@ void PAGE_TestInit(int page)
     //GUI_CreateListBox(100, 20, 200, 202, 20, 5, &string_cb, NULL, NULL, NULL);
 
     // do a master redraw
-    GUI_DrawScreen();
 }
 
 void PAGE_TestEvent()

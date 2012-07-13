@@ -41,6 +41,7 @@ static u8 page;
 void PAGE_Init()
 {
     page = 0;
+    GUI_RemoveAllObjects();
     pages[page].init(0);
 }
 
