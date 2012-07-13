@@ -23,6 +23,7 @@ static u8 FullRedraw;
 
 static void GUI_DrawObject(struct guiObject *obj);
 static void dgCallback(struct guiObject *obj, void *data);
+void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx);
 
 static void GUI_DrawLabel(struct guiObject *obj);
 static void GUI_DrawBarGraph(struct guiObject *obj);
@@ -247,23 +248,18 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     button = &obj->o.button;
 
     switch (type) {
-        case BUTTON_90: button->image.file = "media/btn90_24.bmp"; break;
-        case BUTTON_45: button->image.file = "media/btn46_24.bmp"; break;
-        case BUTTON_96x16: button->image.file = "media/btn96_16.bmp"; break;
-        case BUTTON_64x16: button->image.file = "media/btn64_16.bmp"; break;
-        case BUTTON_48x16: button->image.file = "media/btn48_16.bmp"; break;
-        case BUTTON_32x16: button->image.file = "media/btn32_16.bmp"; break;
+        case BUTTON_90: button->image = &image_map[FILE_BTN90_24]; break;
+        case BUTTON_45: button->image = &image_map[FILE_BTN46_24]; break;
+        case BUTTON_96x16: button->image = &image_map[FILE_BTN96_16]; break;
+        case BUTTON_64x16: button->image = &image_map[FILE_BTN64_16]; break;
+        case BUTTON_48x16: button->image = &image_map[FILE_BTN48_16]; break;
+        case BUTTON_32x16: button->image = &image_map[FILE_BTN32_16]; break;
     }
-    button->image.x_off = 0;
-    button->image.y_off = 0;
 
     box->x = x;
     box->y = y;
-    if(! LCD_ImageDimensions(button->image.file, &box->width, &box->height)) {
-        printf("Couldn't locate file: %s\n", button->image.file);
-        box->width = 20;
-        box->height = 10;
-    }
+    box->width = button->image->width;
+    box->height = button->image->height;
 
     obj->Type = Button;
     OBJ_SET_TRANSPARENT(obj, 0); //No need to set transparency since the image cannot be overlapped, and the file can't change
@@ -422,9 +418,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Button:
     {
         struct guiButton *button = &obj->o.button;
-        LCD_DrawWindowedImageFromFile(box->x, box->y,
-                button->image.file, box->width, box->height,
-                button->image.x_off, button->image.y_off);
+        GUI_DrawImageHelper(box->x, box->y, button->image, 0);
         LCD_SetFontColor(button->fontColor);
         LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
         break;

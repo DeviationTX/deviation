@@ -124,7 +124,7 @@ struct guiKeyboard {
 };
 
 struct guiButton {
-    struct guiImage image;
+    const struct ImageMap *image;
     const char *text;
     u16 text_x_off;
     u16 text_y_off;
