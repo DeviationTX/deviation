@@ -4,8 +4,8 @@ elf$
 exe$
 list$
 gz$
-src/gz*
-src/elf*
+#src/gz*
+#src/elf*
 map$
 src/objs
 src/push

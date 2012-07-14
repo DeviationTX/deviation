@@ -217,8 +217,41 @@ struct guiObject {
 #define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
 #define OBJ_SET_SHOWN(x,y)       (x)->flags = y ? (x)->flags | 0x20 : (x)->flags & ~0x20
 
+#define DRAW_NORMAL  0
+#define DRAW_PRESSED 1
+#define ARROW_LEFT  (&image_map[FILE_ARROW_16_LEFT])
+#define ARROW_RIGHT (&image_map[FILE_ARROW_16_RIGHT])
+#define ARROW_UP    (&image_map[FILE_ARROW_16_UP])
+#define ARROW_DOWN  (&image_map[FILE_ARROW_16_DOWN])
+#define ARROW_WIDTH 16
+#define ARROW_HEIGHT 16
+
 /* internal use only */
+#define TEST_SELECT 1
+struct guiObject *objHEAD;
+struct guiObject *objTOUCHED;
+struct guiObject *objSELECTED;
+
 u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords, u8 long_press);
+
+void GUI_DrawTextSelect(struct guiObject *obj);
+u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type);
+
+void GUI_DrawXYGraph(struct guiObject *obj);
+u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press);
+
+void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
+u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
+
+void GUI_DrawLabel(struct guiObject *obj);
+void GUI_DrawDialog(struct guiObject *obj);
+void GUI_DrawImage(struct guiObject *obj);
+void GUI_DrawButton(struct guiObject *obj);
+void GUI_DrawBarGraph(struct guiObject *obj);
+
+void GUI_DrawObject(struct guiObject *obj);
+void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h);
+void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx);
 u8 coords_in_box(struct guiBox *box, struct touch *coords);
 struct guiObject *GUI_GetFreeObj(void);
 void connect_object(struct guiObject *obj);
