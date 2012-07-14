@@ -81,6 +81,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         printf("Couldn't parse font: %s\n", section);
         return 0;
     }
+    if(MATCH_START(section, "select")) {
+        if(MATCH_KEY(COLOR)) {
+            d->select_color = get_color(value);
+            return 1;
+        }
+    }
     if(MATCH_START(section, "keyboard")) {
         if(MATCH_KEY(FONT)) {
             d->keyboard.font = get_font(value);

@@ -74,7 +74,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Keyboard:   GUI_DrawKeyboard(obj, NULL, 0); break;
     }
     if (obj == objSELECTED) {
-        LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, 0x0000);
+        LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, Display.select_color);
     }
     OBJ_SET_DIRTY(obj, 0);
     OBJ_SET_SHOWN(obj, 1);

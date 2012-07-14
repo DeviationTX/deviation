@@ -34,6 +34,7 @@ struct display_settings {
     struct FontDesc font[NUM_LABELS];
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
+    u16 select_color;
 };
 
 extern struct display_settings Display;
