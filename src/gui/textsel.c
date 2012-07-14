@@ -52,7 +52,9 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     box->y = y;
 
     obj->Type = TextSelect;
-    OBJ_SET_TRANSPARENT(obj, TEST_SELECT); //Even if the bmp has transparency, the redraw function will handle it
+    //Even though the image cannot be overlapped, the file can change under press and select states
+    //So we need transparency set
+    OBJ_SET_TRANSPARENT(obj, 1);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
@@ -176,3 +178,16 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
     return 0;
 }
 
+void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
+{
+    struct touch coords;
+    coords.y = obj->box.y + 1;
+    if (button == BUT_RIGHT) {
+        coords.x = obj->box.x + obj->box.width + 1 - ARROW_WIDTH;
+    } else if(button == BUT_LEFT) {
+        coords.x = obj->box.x + 1;
+    } else {
+        return;
+    }
+    GUI_TouchTextSelect(obj, &coords, press_type);
+}

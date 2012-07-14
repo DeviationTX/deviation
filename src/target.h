@@ -108,6 +108,7 @@ void CLOCK_StopTimer();
 /* Sticks */
 void CHAN_Init();
 s16  CHAN_ReadInput(int channel);
+#define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
 
 /* SPI Flash */
 void SPIFlash_Init();

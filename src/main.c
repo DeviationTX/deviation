@@ -91,6 +91,7 @@ void event_loop(void *param)
     /* Some needed variables */
     static u32 last_buttons = 0;
     static u8 touch_down = 0;
+    static u8 button_time = 0;
     static u32 last_redraw = 0;
     (void)(param);
 
@@ -104,21 +105,19 @@ void event_loop(void *param)
          * We beed to handle screen redraws here
          * */
         if(buttons != last_buttons) {
+            button_time = 0;
             char buttonstring[33];
             for(i = 0; i < 32; i++)
-                buttonstring[i] = (buttons & (1 << i)) ? '0' : '1';
+                buttonstring[i] = (buttons & (1 << i)) ? '1' : '0';
             buttonstring[32] = 0;
             printf("Buttons: %s\n",buttonstring);
             last_buttons = buttons;
+            buttons = GUI_Select(buttons, 0);
             MIX_UpdateTrim(buttons);
             if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
                 PAGE_Change(1);
             } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
                 PAGE_Change(-1);
-            } else if(CHAN_ButtonIsPressed(buttons, BUT_UP)) {
-                GUI_Select(BUT_LEFT);
-            } else if(CHAN_ButtonIsPressed(buttons, BUT_DOWN)) {
-                GUI_Select(BUT_RIGHT);
             }
         }
     }
@@ -139,12 +138,12 @@ void event_loop(void *param)
     PAGE_Event();
 
     if (CLOCK_getms() > last_redraw + 100) {
-        if (touch_down) {
-            if (touch_down++ >= 5) {
-                //Long-press
-                struct touch t = SPITouch_GetCoords();
-                GUI_CheckTouch(&t, 1);
-            }
+        if (touch_down && touch_down++ >= 5) {
+            //Long-press
+            struct touch t = SPITouch_GetCoords();
+            GUI_CheckTouch(&t, 1);
+        } else if (last_buttons && button_time++ >= 4) {
+            GUI_Select(last_buttons, 1); //Long Press
         }
         /* Redraw everything */
         GUI_RefreshScreen();

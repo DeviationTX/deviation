@@ -86,7 +86,7 @@ u32 ScanButtons()
         u16 but = gpio_port_read(ROW_PORT);
         gpio_set(COL_PORT, *c);
         for(r = rows; *r != 0xffff; r++) {
-            if(but & *r) {
+            if(! (but & *r)) {
                 result |= 1 << (buttonmap[idx] - 1);
             }
             idx++;

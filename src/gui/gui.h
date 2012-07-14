@@ -227,7 +227,6 @@ struct guiObject {
 #define ARROW_HEIGHT 16
 
 /* internal use only */
-#define TEST_SELECT 1
 struct guiObject *objHEAD;
 struct guiObject *objTOUCHED;
 struct guiObject *objSELECTED;
@@ -236,6 +235,7 @@ u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords, u8 long_press);
 
 void GUI_DrawTextSelect(struct guiObject *obj);
 u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type);
+void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type);
 
 void GUI_DrawXYGraph(struct guiObject *obj);
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press);
@@ -295,7 +295,7 @@ void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
-void GUI_Select(u32 button);
+u32 GUI_Select(u32 button, u8 long_press);
 
 #include "config/display.h"
 

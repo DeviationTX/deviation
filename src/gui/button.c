@@ -47,7 +47,9 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     box->height = button->image->height;
 
     obj->Type = Button;
-    OBJ_SET_TRANSPARENT(obj, TEST_SELECT); //No need to set transparency since the image cannot be overlapped, and the file can't change
+    //Even though the image cannot be overlapped, the file can change under press and select states
+    //So we need transparency set
+    OBJ_SET_TRANSPARENT(obj, 1);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
 

@@ -337,7 +337,7 @@ u32 ScanButtons()
 {
     //Force rescan
     Fl::check();
-    return ~gui.buttons;
+    return gui.buttons;
 }
 
 int PWR_CheckPowerSwitch()

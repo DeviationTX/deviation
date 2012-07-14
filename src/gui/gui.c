@@ -20,6 +20,7 @@ struct guiObject GUI_Array[100];
 struct guiObject *objHEAD = NULL;
 struct guiObject *objTOUCHED = NULL;
 struct guiObject *objSELECTED = NULL;
+static u32 lastbutton = 0;
 static u8 FullRedraw;
 
 
@@ -297,45 +298,98 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
     return 0;
 }
 
-void GUI_Select(u32 button)
+u32 GUI_Select(u32 button, u8 long_press)
 {
-#if TEST_SELECT
-    if (! objHEAD)
-        return;
-    if (button == BUT_RIGHT || (button == BUT_LEFT && ! objSELECTED)) {
-        struct guiObject *obj = objSELECTED;
-        if (!obj)
-            obj = objHEAD;
-        else
-            obj = obj->next;
-        while(obj) {
-            if (obj->Type == Button || obj->Type == TextSelect) {
-                if (objSELECTED)
-                    OBJ_SET_DIRTY(objSELECTED, 1);
-                objSELECTED = obj;
-                OBJ_SET_DIRTY(obj, 1);
-                return;
-            }
-            obj = obj->next;
-        }
-    } else if (button == BUT_LEFT) {
-        struct guiObject *obj = objHEAD, *objLast = NULL;
-        while(obj) {
-            if (obj == objSELECTED) {
-                OBJ_SET_DIRTY(objSELECTED, 1);
-                if (objLast) {
-                    objSELECTED = objLast;
-                    OBJ_SET_DIRTY(objSELECTED, 1);
+    u32 mask = CHAN_ButtonMask(BUT_UP) |
+               CHAN_ButtonMask(BUT_DOWN) |
+               CHAN_ButtonMask(BUT_LEFT) |
+               CHAN_ButtonMask(BUT_RIGHT) |
+               CHAN_ButtonMask(BUT_ENTER) |
+               CHAN_ButtonMask(BUT_EXIT);
+
+    if ((lastbutton & mask) && ! (button & mask)) {
+        if (objSELECTED && objTOUCHED == objSELECTED && (
+             CHAN_ButtonIsPressed(lastbutton, BUT_LEFT) ||
+             CHAN_ButtonIsPressed(lastbutton, BUT_RIGHT) ||
+             CHAN_ButtonIsPressed(lastbutton, BUT_ENTER)))
+        {
+            GUI_TouchRelease();
+        } else if (CHAN_ButtonIsPressed(lastbutton, BUT_DOWN) ||
+                   (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_UP)))
+        {
+            struct guiObject *obj = objSELECTED;
+
+            obj = obj ? obj->next : objHEAD;
+            while(obj) {
+                if (obj->Type == Button || obj->Type == TextSelect) {
+                    if (objSELECTED)
+                        OBJ_SET_DIRTY(objSELECTED, 1);
+                    objSELECTED = obj;
+                    OBJ_SET_DIRTY(obj, 1);
+                    break;
                 }
-                return;
+                obj = obj->next;
             }
-            if (obj->Type == Button || obj->Type == TextSelect)
-                objLast = obj;
-            obj = obj->next;
+        } else if (CHAN_ButtonIsPressed(lastbutton, BUT_UP)) {
+            struct guiObject *obj = objHEAD, *objLast = NULL;
+
+            while(obj) {
+                if (obj == objSELECTED) {
+                    OBJ_SET_DIRTY(objSELECTED, 1);
+                    if (objLast) {
+                        objSELECTED = objLast;
+                        OBJ_SET_DIRTY(objSELECTED, 1);
+                    }
+                    break;
+                }
+                if (obj->Type == Button || obj->Type == TextSelect)
+                    objLast = obj;
+                obj = obj->next;
+            }
+        } else if (CHAN_ButtonIsPressed(lastbutton, BUT_EXIT)) {
+            OBJ_SET_DIRTY(objSELECTED, 1);
+            objSELECTED = NULL;
         }
+        lastbutton = 0;
+        return button;
     }
-#endif
-    return;
+    if (! objHEAD || ! (button & mask))
+        return button;
+
+    lastbutton = button;
+
+    if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
+        CHAN_ButtonIsPressed(button, BUT_UP) ||
+        CHAN_ButtonIsPressed(button, BUT_EXIT))
+    {
+        button = button & ~mask;
+    }
+    if (objSELECTED) {
+        if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            if (! objTOUCHED || objTOUCHED == objSELECTED) {
+                if (objSELECTED->Type == TextSelect) {
+                    GUI_PressTextSelect(objSELECTED, BUT_ENTER, long_press);
+                } else {
+                    struct touch coords;
+                    coords.x = objSELECTED->box.x + (objSELECTED->box.width >> 1);
+                    coords.y = objSELECTED->box.y + (objSELECTED->box.height >> 1);
+                    GUI_CheckTouch(&coords, long_press);
+                }
+            }
+        } else if (objSELECTED->Type == TextSelect) {
+            if (! objTOUCHED || objTOUCHED == objSELECTED) {
+                if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+                    GUI_PressTextSelect(objSELECTED, BUT_RIGHT, long_press);
+                    objTOUCHED = objSELECTED;
+                } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
+                    GUI_PressTextSelect(objSELECTED, BUT_LEFT, long_press);
+                    objTOUCHED = objSELECTED;
+                }
+            }
+        }
+        button = button & ~mask;
+    }
+    return button;
 }
 
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
