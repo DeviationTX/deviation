@@ -1,0 +1,115 @@
+Thanks to rcH4x0r and renatopub for the data.
+
+These transmitters use a CYRF6936 based solution.
+
+Data is transmitted every 2.8 msec using 16-byte packets
+Every 8 data packets, a beacon packet containing the channel selection info. There is likely other info present, such as failsafe values, etc.
+The channel hopping appears to consist of 3 channels used for 4 data packets before transition. The channels are likely randomly chosen based on RSSI feedback.  The channel hopping is used, regardless of packet type.
+
+All packets (bind, data, beacon) share the same counter (low-nibble of byte 12)
+
+Data Packet:
+Each channel is 10-bits.  All 8 channels are encoded in a single packet.
+The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: throttle LSB
+1  bb: aileron  LSB
+2  cc: elevator LSB
+3  dd: rudder   LSB
+4  ee: thr,ail,ele,rud MSB
+5  ff: ch5? LSB
+6  gg: ch6? LSB
+7  hh: ch7? LSB
+8  ii: ch8? LSB
+9  jj: ch4-8 MSB
+10 kk: TxID LSB?
+11 ll: TxID MSB?
+12 mm: high=nibble TxID? low-nibble = counter (0x0 - 0xB)
+13 nn: channel_direction
+14 oo: xor 0x25 with bytes 0-13
+15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
+
+The smallest value observed is 0x000, the largest 0x190 (low rates?)
+Channel   byte9    byte4   lower8byte
+01 Thr   ........ xx......    00
+02 Ail   ........ ..xx....    01
+03 Ele   ........ ....xx..    02
+04 Rud   ........ ......xx    03
+06 ???   ..xx.... ........    06
+
+the channel direction (byte 13) is set as follows.
+bit 0 : Throttle : 1 when value > prev value
+bit 1 : Aileron  : 1 when value < prev value
+bit 2 : Elevator : 1 when value < prev value
+bit 3 : Rudder   : 1 when value > prev value
+bit 4 : ???      : 1 when value ? prev value
+bit 5 : ???      : 1 when value < prev value
+bit 6 : ???      : 1 when value ? prev value
+bit 7 : ???      : 1 when value ? prev value
+
+The TxID is either the fixed or random ID chosen for this session.
+It is a 20 bit value consisting of bytes 10, 11, and the upper 4 bits of byte 12
+
+Beacon:
+The checksum offset is different for beacon vs data packets.
+The only other way I've found so far to differentiate between beacon and data packets is that
+byte 9 will have bit 4 set in a bind packet.  this is probably due to lack of data sets
+rather than actually a set bit, however
+
+00 00 00 00 20 00 26 3D 31 99 E5 2E 65 0B 2A EC
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: ??
+1  bb: ??
+2  cc: ??
+3  dd: ??
+4  ee: ??
+5  ff: ??
+6  gg: 1st channel
+7  hh: 2nd channel
+8  ii: 3rd channel
+9  jj: ??
+10 kk: TxID LSB?
+11 ll: TxID MSB?
+12 mm: low-nibble = counter (0x0 - 0xB)
+13 nn: ???
+14 oo: xor 0x1C with bytes 0-13
+15 pp: checksum (0x1C + sum(bytes 0-13)) modulo 0x100
+
+Initialization:
+The CYRFID does not seem to be used in the protocol. SOP codes are used, but seem to be only set during initialization.  The only one I've seen so far is:
+DF B1 C0 49 62 DF C1 49
+More info on how they are selected is still needed. The CRC code appears to be disabled.
+
+
+After channel selection, bind packets are sent (only if in random-id mode):
+RandomID 1:
+C5 34 15 3B 60 26 FF 00 00 32 16 96 E4 00 15 B5
+RandomID 2:
+C5 34 26 3D 60 31 FF 00 00 32 E5 2E 63 00 FB B9
+RandomID 3:
+C5 34 44 38 60 1D FF 00 00 32 4C 6C 03 00 3B 03
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: ???
+1  bb: ???
+2  cc: 1st channel
+3  dd: 2nd channel
+4  ee: ???
+5  ff: 3rd channel
+6  gg: ???
+7  hh: ???
+8  ii: ???
+9  jj: ???
+10 kk: TxID LSB?
+11 ll: TxID MSB?
+12 mm: low-nibble = counter (0x0 - 0xB)
+13 nn: ???
+14 oo: xor 0x25 with bytes 0-13
+15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
+
+The packets seem to be identical (for a given session) except for the counter and crc (bytes 12, 14, 15)
+bytes 2,3, and 5 contain the 3 channels selected for broadcast.
+
