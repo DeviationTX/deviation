@@ -22,12 +22,10 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
 {
     struct guiObject   *obj = GUI_GetFreeObj();
     struct guiKeyboard *keyboard;
-    struct guiBox      *box;
 
     if (obj == NULL)
         return NULL;
 
-    box = &obj->box;
     keyboard = &obj->o.keyboard;
     obj->Type = Keyboard;
     OBJ_SET_USED(obj, 1);
