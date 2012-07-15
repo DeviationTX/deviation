@@ -5,7 +5,8 @@ If telemetry is enabled, register 0x04 is polled starting 0.9msec after transmit
 
 The 1st byte of the data packet indicates the packet type.
 The upper nibble indicates the number of channels:
-2402D : 0x60 (Note that this is a 4 channel transmitter, so it is 'weird'.  Also, it does not send 0x67 or 0x6c packets)
+2402D : 0x60 (Note that this is a 4 channel transmitter, so it is 'weird'.
+              Also, it does not send 0x67 or 0x6c packets)
 Devo6 : 0x60
 Devo7 : 0x70
 Devo8 : 0x80
@@ -13,39 +14,50 @@ Devo10: 0xa0
 Devo12: 0xc0
 
 The packet types are as follows:
-0x85 - This appears to be used to transmit model data between transmitters
-0x87 - Sent every 10 packets
+0x85 -
+       This appears to be used to transmit model data between transmitters
+0x87 -
+       Sent every 10 packets
        This packet contains the fail-safe info for the 1st 8 data-channels
-       bytes 1-8 represent a signed 8-bit value -125 to 125 for each of the 1st 8 channels
-       byte 9 is a bit-field indicating for which channels failsafe is enabled
-       Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
-0x88 - 
-       This packet is never sent for <8 channel transmitters
-       For 10ch and 12ch transmitters it is sent (as 0xa8 or 0xc8) alternating with 0x87 to provide failsafe info
-       for the upper 8 channels
+       bytes 1-8 represent a signed 8-bit value -125 to 125 for each of the 1st
+       8 channels byte 9 is a bit-field indicating for which channels failsafe
+       is enabled Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
+0x88 -
+       This packet is never sent for <=8 channel transmitters
+       For 10ch and 12ch transmitters it is sent (as 0xa8 or 0xc8) alternating
+       with 0x87 to provide failsafe info for the upper 8 channels
 0x8a - 
        Only sent for the 1st 10sec or so.
-       bytes 1 and 2  are a LSB-first word indicating the number of packets left before we stop sending 0x8a packets
-       bytes 3, 4, 5 are the transmit channels that will be used to transmit data in a round-robin configuration
-       bytes 6-9 contain the cyrf6936 ID.  This is used as an XOR for 0x87, 0x8b, and 0x8c packets
+       bytes 1 and 2  are a LSB-first word indicating the number of packets
+       left before we stop sending 0x8a packets bytes 3, 4, 5 are the transmit
+       channels that will be used to transmit data in a round-robin
+       configuration bytes 6-9 contain the cyrf6936 ID.  This is used as an XOR
+       for 0x87, 0x8b, and 0x8c packets
        bytes 10-12 are the same as for the 8b/8c packets (but are not scrambled)
-       bytes 13-15 are the Fixed ID (though it isn't actually enabled) and ARE scrambled with the least-significant
-          3 bytes of th cyrf6936 ID
+       bytes 13-15 are the Fixed ID (though it isn't actually enabled) and ARE
+       scrambled with the least-significant 3 bytes of th cyrf6936 ID
        This packet is sent before every 0x8b or 0x8c packet for the 1st 10 seconds)
        If FixedID is in use, 0x8a is never sent, and 0x87 is sent instead
 0x8b -
 0x8c -
-       0x8b and 0x8c packets are alternating packets.  These are the channel data
-       each packet contains 4 16bit values (bytes 1 - 8) which are LSB 1st
-       The sticks return '0' when centered and seem to max out at 0x640 at either end
-       the upper-nibble of byte 9 indicates whether the channel value is positive/or negative
-       I.e at the end of stick travel the value is 0x640 and bit 9.x indicates which end the stick is at
+       0x8b and 0x8c packets are alternating packets.  These are the channel
+       data each packet contains 4 16bit values (bytes 1 - 8) which are LSB 1st
+       The sticks return '0' when centered and seem to max out at 0x640 at
+       either end the upper-nibble of byte 9 indicates whether the channel value
+       is positive/or negative I.e at the end of stick travel the value is 0x640
+       and bit 9.x indicates which end the stick is at
 
-Packets 0x87, 0x8a, and 0x8b are 'encrypted' by xoring with the cyrf6936 id.  This is a 4 byte value.
-       xoring is done by xoring all but the 1st byte of the  packet (i.e. everything but the cmd byte) 
-       with the id.  i.e. pkt[1..4] ^ id, pkt[5-8] ^ id, pkt[9-12] ^ id, pkt[13-15] ^ (least significant 3 bytes of id)
+Packets 0x87, 0x8a, and 0x8b are 'encrypted' by xoring with the cyrf6936 id.
+       This is a 4 byte value.
+       xoring is done by xoring all but the 1st byte of the  packet (i.e.
+       everything but the cmd byte) with the id.  i.e. 
+       pkt[1..4] ^ id,
+       pkt[5-8] ^ id,
+       pkt[9-12] ^ id,
+       pkt[13-15] ^ (least significant 3 bytes of id)
 
-The transmit channel is changed every 4 packets.  It appears to cycle between 3 values, 4 channels apart.  For instance:
+The transmit channel is changed every 4 packets.  It appears to cycle between 3
+        values, 4 channels apart.  For instance:
        0x04, 0x08, 0x0c, 0x04, 0x08, 0x0c, ...
 
 Packet 0x8b
@@ -85,7 +97,7 @@ Telemetry
     Polling continues until it is time to send the next data packet at which pointthe GPIO is reconfigured for Tx
 
     If Register 0x07 sets bit 5 (RXB16) indicating a 16byte packet has been received, the ipacket is fetched.  Next the
-    RX_ATATUS_ADDR is checked for completion, and the CYRF state is reset for receieve by sending 0x87 to Register 05
+    RX_STATUS_ADDR is checked for completion, and the CYRF state is reset for receieve by sending 0x87 to Register 05
 
     The telemetry packet is as follows:
     

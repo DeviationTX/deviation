@@ -24,9 +24,9 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 7  hh: ch7? LSB
 8  ii: ch8? LSB
 9  jj: ch4-8 MSB
-10 kk: TxID LSB?
-11 ll: TxID MSB?
-12 mm: high=nibble TxID? low-nibble = counter (0x0 - 0xB)
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
 13 nn: channel_direction
 14 oo: xor 0x25 with bytes 0-13
 15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
@@ -49,14 +49,15 @@ bit 5 : ???      : 1 when value < prev value
 bit 6 : ???      : 1 when value ? prev value
 bit 7 : ???      : 1 when value ? prev value
 
-The TxID is either the fixed or random ID chosen for this session.
-It is a 20 bit value consisting of bytes 10, 11, and the upper 4 bits of byte 12
+The TxID is a 20 bit value.  Either a fixed or random ID chosen for this session.
+TxID1 = FixedId & 0xFF
+TxID2 = ((FixedId >> 6) & 0xFF) | (FixedId >> 18)
+TxID3 = ((FixedId >> 14) & 0xFF) & 0xFF
 
 Beacon:
 The checksum offset is different for beacon vs data packets.
-The only other way I've found so far to differentiate between beacon and data packets is that
-byte 9 will have bit 4 set in a bind packet.  this is probably due to lack of data sets
-rather than actually a set bit, however
+Byte 9 will be either 99, 1b, or e4 for beacon packets (none of which are valid for data packets)
+The beacon packet alternates between an odd and even packet (set by byte 4.6)
 
 00 00 00 00 20 00 26 3D 31 99 E5 2E 65 0B 2A EC
 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
@@ -65,16 +66,16 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 1  bb: ??
 2  cc: ??
 3  dd: ??
-4  ee: ??
+4  ee: ?? bit 6 indicates odd/even beacon packets.  Bit 5=??.  Bit 2=??
 5  ff: ??
 6  gg: 1st channel
 7  hh: 2nd channel
 8  ii: 3rd channel
-9  jj: ??
-10 kk: TxID LSB?
-11 ll: TxID MSB?
-12 mm: low-nibble = counter (0x0 - 0xB)
-13 nn: ???
+9  jj: Tx mode 0x99 = randomID, 0x1b = fixedID, 0xe4 = set fixed ID (sent for 11 seconds)
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: channel-direction (same value as previous data packet)
 14 oo: xor 0x1C with bytes 0-13
 15 pp: checksum (0x1C + sum(bytes 0-13)) modulo 0x100
 
@@ -103,9 +104,9 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 7  hh: ???
 8  ii: ???
 9  jj: ???
-10 kk: TxID LSB?
-11 ll: TxID MSB?
-12 mm: low-nibble = counter (0x0 - 0xB)
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
 13 nn: ???
 14 oo: xor 0x25 with bytes 0-13
 15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
