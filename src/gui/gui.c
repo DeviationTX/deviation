@@ -346,7 +346,7 @@ u32 GUI_Select(u32 button, u8 long_press)
                     objLast = obj;
                 obj = obj->next;
             }
-        } else if (CHAN_ButtonIsPressed(lastbutton, BUT_EXIT)) {
+        } else if (objSELECTED && CHAN_ButtonIsPressed(lastbutton, BUT_EXIT)) {
             OBJ_SET_DIRTY(objSELECTED, 1);
             objSELECTED = NULL;
         }
