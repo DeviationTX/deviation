@@ -186,6 +186,8 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
         coords.x = obj->box.x + obj->box.width + 1 - ARROW_WIDTH;
     } else if(button == BUT_LEFT) {
         coords.x = obj->box.x + 1;
+    } else if(button == BUT_ENTER) {
+        coords.x = obj->box.x + (obj->box.width >> 1);
     } else {
         return;
     }

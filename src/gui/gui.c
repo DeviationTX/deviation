@@ -369,6 +369,7 @@ u32 GUI_Select(u32 button, u8 long_press)
             if (! objTOUCHED || objTOUCHED == objSELECTED) {
                 if (objSELECTED->Type == TextSelect) {
                     GUI_PressTextSelect(objSELECTED, BUT_ENTER, long_press);
+                    objTOUCHED = objSELECTED;
                 } else {
                     struct touch coords;
                     coords.x = objSELECTED->box.x + (objSELECTED->box.width >> 1);
