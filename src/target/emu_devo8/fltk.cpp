@@ -38,7 +38,7 @@ extern "C" {
 }
 
 
-u16 keymap[] = { 'F', 'R', 'D', 'E', 'A', 'Q', 'S', 'W', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, ' '/*FL_Enter*/, FL_Escape, 0 };
+u16 keymap[] = { 'F', 'R', 'D', 'E', 'A', 'Q', 'S', 'W', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
 
 static struct {
     s32 xscale;
@@ -78,6 +78,7 @@ public:
     int handle(int event)
     {
         int key;
+        const char *k;
         switch(event) {
         case FL_FOCUS:
         case FL_UNFOCUS:
@@ -85,7 +86,10 @@ public:
         case FL_KEYDOWN:
         //case FL_SHORTCUT:
             redraw();
-            key = get_button(Fl::event_key());
+            k = Fl::event_text();
+            key = get_button(k[0]);
+            if(key < 0)
+                key = get_button(Fl::event_key());
             if(key >= 0) {
                 gui.buttons |= (1 << key);
                 return 1;
@@ -146,7 +150,10 @@ public:
                 return 1;
             }
         case FL_KEYUP:
-            key = get_button(Fl::event_key());
+            k = Fl::event_text();
+            key = get_button(k[0]);
+            if(key < 0)
+                key = get_button(Fl::event_key());
             if(key >= 0) {
                 gui.buttons &= ~(1 << key);
             }
