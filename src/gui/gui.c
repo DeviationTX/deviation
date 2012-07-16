@@ -298,6 +298,52 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
     return 0;
 }
 
+struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
+{
+    struct guiObject *obj = origObj, *foundObj = NULL;
+
+    if (! objHEAD)
+        return NULL;
+    obj = obj ? obj->next : objHEAD;
+    while(obj) {
+        if (obj->Type == Button || obj->Type == TextSelect) {
+            foundObj = obj;
+            break;
+        }
+        obj = obj->next;
+    }
+    if (! foundObj && origObj) {
+        return GUI_GetNextSelectable(NULL);
+    }
+    return obj;
+}
+struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
+{
+    struct guiObject *obj = objHEAD, *objLast = NULL;
+    if (obj == NULL)
+        return GUI_GetNextSelectable(objHEAD);
+    while(obj) {
+        if (obj == origObj)
+            break;
+        if (obj->Type == Button || obj->Type == TextSelect)
+            objLast = obj;
+        obj = obj->next;
+    }
+    if (obj && ! objLast) {
+        obj = obj->next;
+        while(obj) {
+            if (obj == origObj)
+                break;
+            if (obj->Type == Button || obj->Type == TextSelect)
+                objLast = obj;
+            obj = obj->next;
+        }
+    }
+    if (! objLast)
+        return origObj;
+    return objLast;
+}
+
 u32 GUI_Select(u32 button, u8 long_press)
 {
     u32 mask = CHAN_ButtonMask(BUT_UP) |
@@ -317,34 +363,20 @@ u32 GUI_Select(u32 button, u8 long_press)
         } else if (CHAN_ButtonIsPressed(lastbutton, BUT_DOWN) ||
                    (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_UP)))
         {
-            struct guiObject *obj = objSELECTED;
-
-            obj = obj ? obj->next : objHEAD;
-            while(obj) {
-                if (obj->Type == Button || obj->Type == TextSelect) {
-                    if (objSELECTED)
-                        OBJ_SET_DIRTY(objSELECTED, 1);
-                    objSELECTED = obj;
-                    OBJ_SET_DIRTY(obj, 1);
-                    break;
-                }
-                obj = obj->next;
+            struct guiObject *obj = GUI_GetNextSelectable(objSELECTED);
+            if (obj && obj != objSELECTED) {
+                if (objSELECTED)
+                    OBJ_SET_DIRTY(objSELECTED, 1);
+                objSELECTED = obj;
+                OBJ_SET_DIRTY(obj, 1);
             }
         } else if (CHAN_ButtonIsPressed(lastbutton, BUT_UP)) {
-            struct guiObject *obj = objHEAD, *objLast = NULL;
-
-            while(obj) {
-                if (obj == objSELECTED) {
+            struct guiObject *obj = GUI_GetPrevSelectable(objSELECTED);
+            if (obj && obj != objSELECTED) {
+                if (objSELECTED)
                     OBJ_SET_DIRTY(objSELECTED, 1);
-                    if (objLast) {
-                        objSELECTED = objLast;
-                        OBJ_SET_DIRTY(objSELECTED, 1);
-                    }
-                    break;
-                }
-                if (obj->Type == Button || obj->Type == TextSelect)
-                    objLast = obj;
-                obj = obj->next;
+                objSELECTED = obj;
+                OBJ_SET_DIRTY(obj, 1);
             }
         } else if (objSELECTED && CHAN_ButtonIsPressed(lastbutton, BUT_EXIT)) {
             OBJ_SET_DIRTY(objSELECTED, 1);

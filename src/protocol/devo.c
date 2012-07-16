@@ -91,7 +91,7 @@ static void add_pkt_suffix()
     packet[15] = (fixed_id >> 16) & 0xff;
 }
 
-static void build_unk_pkt()
+static void build_beacon_pkt()
 {
     packet[0] = (num_channels << 4) | 0x07;
     memset(packet + 1, 0, 8);
@@ -207,7 +207,7 @@ void DEVO_BuildPacket()
             state++;
             break;
         case DEVO_BOUND_10:
-            build_unk_pkt();
+            build_beacon_pkt();
             scramble_pkt();
             state = DEVO_BOUND_1;
             break;
