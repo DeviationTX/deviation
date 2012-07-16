@@ -33,8 +33,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     button = &obj->o.button;
 
     switch (type) {
-        case BUTTON_90: button->image = &image_map[FILE_BTN90_24]; break;
-        case BUTTON_45: button->image = &image_map[FILE_BTN46_24]; break;
+        case BUTTON_96: button->image = &image_map[FILE_BTN96_24]; break;
+        case BUTTON_48: button->image = &image_map[FILE_BTN48_24]; break;
         case BUTTON_96x16: button->image = &image_map[FILE_BTN96_16]; break;
         case BUTTON_64x16: button->image = &image_map[FILE_BTN64_16]; break;
         case BUTTON_48x16: button->image = &image_map[FILE_BTN48_16]; break;

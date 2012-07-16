@@ -27,8 +27,8 @@ enum TextSelectType {
 };
 
 enum ButtonType {
-    BUTTON_90,
-    BUTTON_45,
+    BUTTON_96,
+    BUTTON_48,
     BUTTON_96x16,
     BUTTON_64x16,
     BUTTON_48x16,
@@ -57,8 +57,8 @@ typedef void guiObject_t;
 typedef struct guiObject guiObject_t;
 
 enum ImageNames {
-    FILE_BTN90_24,
-    FILE_BTN46_24,
+    FILE_BTN96_24,
+    FILE_BTN48_24,
     FILE_BTN96_16,
     FILE_BTN64_16,
     FILE_BTN48_16,

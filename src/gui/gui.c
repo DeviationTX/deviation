@@ -25,8 +25,8 @@ static u8 FullRedraw;
 
 
 const struct ImageMap image_map[] = {
-    {"media/btn90_24.bmp", 90, 24, 0, 0}, /*FILE_BTN90_24 */
-    {"media/btn46_24.bmp", 46, 24, 0, 0}, /*FILE_BTN46_24 */
+    {"media/btn96_24.bmp", 96, 24, 0, 0}, /*FILE_BTN96_24 */
+    {"media/btn48_24.bmp", 48, 24, 0, 0}, /*FILE_BTN48_24 */
     {"media/btn96_16.bmp", 96, 16, 0, 0}, /*FILE_BTN96_16 */
     {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
     {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */

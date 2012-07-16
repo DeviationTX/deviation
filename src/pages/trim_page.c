@@ -72,14 +72,14 @@ void edit_cb(guiObject_t *obj, void *data)
     tp->trim = trim[tp->index];
    
     GUI_RemoveAllObjects();
-    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(267, 6, BUTTON_45, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 6, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 
     //Row 1
     GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Input:");
     GUI_CreateTextSelect(72, 48, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &tp->trim.src);
     //Row 2
-    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Trim -");
+    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Trim -:");
     GUI_CreateTextSelect(72, 72, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.neg);
     GUI_CreateLabel(176, 72, NULL, DEFAULT_FONT, "Trim +:");
     GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.pos);

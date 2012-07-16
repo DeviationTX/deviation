@@ -117,8 +117,8 @@ static void show_titlerow()
 {
     GUI_CreateLabel(COL1_TEXT, 12, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
     GUI_CreateTextSelect(COL1_VALUE, 10, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(267, 6, BUTTON_45, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 6, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 }
 
 static void show_none()
@@ -183,9 +183,9 @@ static void show_expo_dr()
     //Row 3
     GUI_CreateLabel(18, 74, NULL, DEFAULT_FONT, "High-Rate");
     if (mp->mixer[1].sw)
-        GUI_CreateButton(115, 70, BUTTON_90, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
+        GUI_CreateButton(115, 70, BUTTON_96, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
     if (mp->mixer[2].sw)
-        GUI_CreateButton(219, 70, BUTTON_90, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
+        GUI_CreateButton(219, 70, BUTTON_96, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(COL1_TEXT, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     if (mp->mixer[1].sw) {
