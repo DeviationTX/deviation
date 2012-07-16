@@ -66,8 +66,8 @@ void MODELPage_ShowLoadSave(int loadsave)
 {
     u8 num_models;
     GUI_RemoveAllObjects();
-    GUI_CreateButton(150, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_45, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(267, 6, BUTTON_45, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
     for (num_models = 1; num_models <= 100; num_models++) {
         sprintf(mp->tmpstr, "models/model%d.ini", num_models);
         FILE *fh = fopen(mp->tmpstr, "r");
@@ -76,5 +76,5 @@ void MODELPage_ShowLoadSave(int loadsave)
     }
     num_models--;
     mp->selected = CONFIG_GetCurrentModel();
-    GUI_CreateListBox(110, 40, 100, 190, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(61, 40, 198, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
 }

@@ -36,33 +36,35 @@ void PAGE_ModelInit(int page)
 {
     (void)page;
     mp->editing = 0;
-    GUI_CreateButton(20, 10, BUTTON_64x16, "Load", 0x0000, loadsave_cb, (void *)0L);
-    GUI_CreateButton(236, 10, BUTTON_64x16, "Save As", 0x0000, loadsave_cb, (void *)1L);
+    //GUI_CreateButton(176, 8, BUTTON_64x16, "Load", 0x0000, loadsave_cb, (void *)0L);
+    //GUI_CreateButton(248, 8, BUTTON_64x16, "Save As", 0x0000, loadsave_cb, (void *)1L);
+    GUI_CreateButton(90, 8, BUTTON_90, "Load", 0x0000, loadsave_cb, (void *)0L);
+    GUI_CreateButton(188, 8, BUTTON_90, "Save As", 0x0000, loadsave_cb, (void *)1L);
 
-    GUI_CreateLabel(20, 30, NULL, DEFAULT_FONT, "Model Name:");
-    GUI_CreateButton(160, 30, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);
+    GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Model Name:");
+    GUI_CreateButton(136, 48, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);
 
-    GUI_CreateLabel(20, 50, NULL, DEFAULT_FONT, "Model Type:");
-    GUI_CreateTextSelect(160, 50, TEXTSELECT_96, 0x0000, NULL, typeselect_cb, NULL);
+    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Model Type:");
+    GUI_CreateTextSelect(136, 72, TEXTSELECT_96, 0x0000, NULL, typeselect_cb, NULL);
 
-    GUI_CreateLabel(20, 70, NULL, DEFAULT_FONT, "Number of Channels:");
-    GUI_CreateTextSelect(160, 70, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+    GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Number of Channels:");
+    GUI_CreateTextSelect(136, 96, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
 
-    GUI_CreateLabel(20, 90, NULL, DEFAULT_FONT, "Mode:");
-    GUI_CreateTextSelect(160, 90, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
+    GUI_CreateLabel(8, 120, NULL, DEFAULT_FONT, "Mode:");
+    GUI_CreateTextSelect(136, 120, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
 
-    GUI_CreateLabel(20, 110, NULL, DEFAULT_FONT, "Tx Power:");
-    GUI_CreateTextSelect(160, 110, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
+    GUI_CreateLabel(8, 144, NULL, DEFAULT_FONT, "Tx Power:");
+    GUI_CreateTextSelect(136, 144, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
 
-    GUI_CreateLabel(20, 130, NULL, DEFAULT_FONT, "Protocol:");
-    GUI_CreateTextSelect(160, 130, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
+    GUI_CreateLabel(8, 168, NULL, DEFAULT_FONT, "Protocol:");
+    GUI_CreateTextSelect(136, 168, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
 
     if(Model.fixed_id == 0)
         sprintf(mp->fixed_id, "None");
     else
         sprintf(mp->fixed_id, "%d", Model.fixed_id);
-    GUI_CreateLabel(20, 150, NULL, DEFAULT_FONT, "Fixed ID:");
-    GUI_CreateButton(160, 150, BUTTON_96x16, mp->fixed_id, 0x0000, fixedid_cb, NULL);
+    GUI_CreateLabel(8, 192, NULL, DEFAULT_FONT, "Fixed ID:");
+    GUI_CreateButton(136, 192, BUTTON_96x16, mp->fixed_id, 0x0000, fixedid_cb, NULL);
 }
 
 void PAGE_ModelEvent()

@@ -36,20 +36,20 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         edit->pointnum = -1;
     edit->curve = *curve;
     edit->curveptr = curve;
-    GUI_CreateButton(10, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateTextSelect(125, 10, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
-    GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateTextSelect(8, 10, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
+    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(267, 6, BUTTON_45, "OK", 0x0000, okcancel_cb, (void *)1);
 
     if (curve->type >= CURVE_3POINT) {
-        GUI_CreateLabel(10, 40, NULL, DEFAULT_FONT, "Point:");
-        GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
+        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Point:");
+        GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
     } else {
-        GUI_CreateLabel(10, 40, NULL, DEFAULT_FONT, "Pos/Neg:");
-        GUI_CreateTextSelect(10, 60, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
+        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Pos/Neg:");
+        GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
     }
-    GUI_CreateLabel(10, 86, NULL, DEFAULT_FONT, "Value:");
-    edit->value = GUI_CreateTextSelect(10, 106, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
-    edit->graph = GUI_CreateXYGraph(120, 40, 190, 190,
+    GUI_CreateLabel(8, 80, NULL, DEFAULT_FONT, "Value:");
+    edit->value = GUI_CreateTextSelect(8, 96, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
+    edit->graph = GUI_CreateXYGraph(112, 36, 200, 200,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

@@ -28,18 +28,18 @@ void MIXPAGE_EditLimits()
     GUI_RemoveAllObjects();
     show_titlerow();
     //Row 1
-    GUI_CreateLabel(10, 40, NULL, DEFAULT_FONT, "Reverse:");
-    GUI_CreateTextSelect(100, 40, TEXTSELECT_96, 0x0000, NULL, reverse_cb, (void *)((long)mp->channel));
+    GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Reverse:");
+    GUI_CreateTextSelect(72, 48, TEXTSELECT_96, 0x0000, NULL, reverse_cb, (void *)((long)mp->channel));
     //Row 1
-    GUI_CreateLabel(10, 66, NULL, DEFAULT_FONT, "Safety:");
-    GUI_CreateTextSelect(70, 66, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    GUI_CreateLabel(170, 66, NULL, DEFAULT_FONT, "Value:");
-    GUI_CreateTextSelect(210, 66, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
+    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Safety:");
+    GUI_CreateTextSelect(72, 72, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+    GUI_CreateLabel(176, 72, NULL, DEFAULT_FONT, "Value:");
+    GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
     //Row 2
-    GUI_CreateLabel(10, 92, NULL, DEFAULT_FONT, "Min:");
-    GUI_CreateTextSelect(70, 92, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.min);
-    GUI_CreateLabel(170, 92, NULL, DEFAULT_FONT, "Max:");
-    GUI_CreateTextSelect(210, 92, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.max);
+    GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Min:");
+    GUI_CreateTextSelect(72, 96, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.min);
+    GUI_CreateLabel(176, 96, NULL, DEFAULT_FONT, "Max:");
+    GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.max);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -84,9 +84,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 
 static void show_titlerow()
 {
-    GUI_CreateLabel(10, 10, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
-    GUI_CreateButton(150, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateLabel(8, 12, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
+    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(267, 6, BUTTON_45, "OK", 0x0000, okcancel_cb, (void *)1);
 }
 
 const char *reverse_cb(guiObject_t *obj, int dir, void *data)

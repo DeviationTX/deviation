@@ -109,12 +109,16 @@ static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
 static void okcancel_cb(guiObject_t *obj, void *data);
 
+#define COL1_TEXT   8
+#define COL1_VALUE  56
+#define COL2_TEXT  168
+#define COL2_VALUE 216
 static void show_titlerow()
 {
-    GUI_CreateLabel(10, 10, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
-    GUI_CreateTextSelect(40, 10, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButton(150, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_45, "Ok", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateLabel(COL1_TEXT, 12, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
+    GUI_CreateTextSelect(COL1_VALUE, 10, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_CreateButton(169, 6, BUTTON_90, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(267, 6, BUTTON_45, "OK", 0x0000, okcancel_cb, (void *)1);
 }
 
 static void show_none()
@@ -125,32 +129,28 @@ static void show_none()
     show_titlerow();
 }
 
-#define COL1_TEXT   10
-#define COL1_VALUE  60
-#define COL2_TEXT  170
-#define COL2_VALUE 214
 static void show_simple()
 {
     GUI_RemoveAllObjects();
     //Row 0
     show_titlerow();
     //Row 1
-    GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, "Src:");
-    GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, "Curve:");
-    GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
+    GUI_CreateLabel(COL1_TEXT, 48, NULL, DEFAULT_FONT, "Src:");
+    GUI_CreateTextSelect(COL1_VALUE, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
+    GUI_CreateLabel(COL2_TEXT, 48, NULL, DEFAULT_FONT, "Curve:");
+    GUI_CreateTextSelect(COL2_VALUE, 48, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
-    GUI_CreateLabel(COL1_TEXT, 66, NULL, DEFAULT_FONT, "Scale:");
-    GUI_CreateTextSelect(COL1_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    GUI_CreateLabel(COL2_TEXT, 66, NULL, DEFAULT_FONT, "Offset:");
-    GUI_CreateTextSelect(COL2_VALUE, 66, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
+    GUI_CreateLabel(COL1_TEXT, 72, NULL, DEFAULT_FONT, "Scale:");
+    GUI_CreateTextSelect(COL1_VALUE, 72, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
+    GUI_CreateLabel(COL2_TEXT, 72, NULL, DEFAULT_FONT, "Offset:");
+    GUI_CreateTextSelect(COL2_VALUE, 72, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 4
-    GUI_CreateLabel(COL1_TEXT, 92, NULL, DEFAULT_FONT, "Max:");
-    GUI_CreateTextSelect(COL1_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
-    GUI_CreateLabel(COL2_TEXT, 92, NULL, DEFAULT_FONT, "Min:");
-    GUI_CreateTextSelect(COL2_VALUE, 92, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
+    GUI_CreateLabel(COL1_TEXT, 96, NULL, DEFAULT_FONT, "Max:");
+    GUI_CreateTextSelect(COL1_VALUE, 96, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
+    GUI_CreateLabel(COL2_TEXT, 96, NULL, DEFAULT_FONT, "Min:");
+    GUI_CreateTextSelect(COL2_VALUE, 96, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
     //Row 5
-    mp->graph = GUI_CreateXYGraph(COL1_TEXT, 118, 300, 112,
+    mp->graph = GUI_CreateXYGraph(COL1_TEXT, 120, 304, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0].curve);
@@ -177,7 +177,7 @@ static void show_expo_dr()
     GUI_CreateLabel(132, 32, NULL, DEFAULT_FONT, "Switch1");
     GUI_CreateLabel(236, 32, NULL, DEFAULT_FONT, "Switch2");
     //Row 2
-    GUI_CreateTextSelect(8, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
+    GUI_CreateTextSelect(COL1_TEXT, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
     GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
     GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
@@ -187,7 +187,7 @@ static void show_expo_dr()
     if (mp->mixer[2].sw)
         GUI_CreateButton(219, 70, BUTTON_90, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
     //Row 4
-    GUI_CreateTextSelect(8, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
+    GUI_CreateTextSelect(COL1_TEXT, 100, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     if (mp->mixer[1].sw) {
         if((mp->link_curves & 0x01)) {
             GUI_CreateLabel(140, 102, NULL, DEFAULT_FONT, "Linked");
@@ -203,13 +203,13 @@ static void show_expo_dr()
         }
     }
     //Row 5
-    GUI_CreateLabel(8, 122, NULL, DEFAULT_FONT, "Scale:");
+    GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, "Scale:");
     GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
     if (MIX_SRC(mp->mixer[1].sw))
         GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
     if (MIX_SRC(mp->mixer[2].sw))
         GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
-    mp->graph = GUI_CreateXYGraph(COL1_TEXT, 150, 86, 86,
+    mp->graph = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0].curve);
@@ -239,7 +239,7 @@ static void show_complex()
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 118, NULL, DEFAULT_FONT, "Switch:");
     GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
-    mp->graph = GUI_CreateXYGraph(COL2_TEXT, 118, 140, 112,
+    mp->graph = GUI_CreateXYGraph(COL2_TEXT, 118, 144, 114,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->cur_mixer->curve);
