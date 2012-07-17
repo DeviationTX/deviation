@@ -199,4 +199,5 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
 13 nn: Fixed-----------   F0      F1     00
 14 oo: xor w/bytes 0-13   00      3A     25
+15 pp: sum w/bytes 0-13   00      3A     25
 
