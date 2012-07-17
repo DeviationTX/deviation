@@ -134,7 +134,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 6  gg: 00
 7  hh: 00
 8  ii: gear = bit0, flaps = bit 1
-9  jj: values a5, a6, 04 repeating
+9  jj: values a5, a6, 04 repeating (I've also seen 00, a1, a2 and 08, a9, aa)
 10 kk: TxID1
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)

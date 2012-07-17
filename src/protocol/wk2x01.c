@@ -131,11 +131,12 @@ static void build_data_pkt_2601()
         packet[i] = value & 0xff;
         msb = (msb << 2) | ((value >> 8) & 0x03);
     }
-    packet[5] = msb;
+    packet[4] = msb;
+    packet[5] = 0;
     packet[6] = 0;
     packet[7] = 0;
-    packet[8] = 0;
-    packet[9] = (get_channel(5) ? 1 : 0) | (get_channel(6) ? 2 : 0);
+    packet[8] = (get_channel(5) ? 1 : 0) | (get_channel(6) ? 2 : 0);
+    packet[9] = 0x04 | (pkt_num % 3) | (pkt_num % 3 == 0 ? 0x00 : 0xa0); //FIXME: Thislogic isn't right
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
