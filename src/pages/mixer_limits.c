@@ -95,8 +95,8 @@ const char *reverse_cb(guiObject_t *obj, int dir, void *data)
     (void)dir;
     (void)data;
     if (dir > 0)
-        mp->limit.reverse = 1;
+        mp->limit.flags |= CH_REVERSE;
     else if (dir < 0)
-        mp->limit.reverse = 0;
-    return mp->limit.reverse ? "Inverse" : "Normal";
+        mp->limit.flags &= ~CH_REVERSE;
+    return (mp->limit.flags & CH_REVERSE) ? "Inverse" : "Normal";
 }

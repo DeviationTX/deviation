@@ -162,7 +162,7 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);
     CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0);
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x10);
-    CYRF_WriteRegister(CYRF_27_CLK_OFFSET, 0x02);
+    CYRF_WriteRegister(CYRF_27_CLK_OVERRIDE, 0x02);
     CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x28);
 }

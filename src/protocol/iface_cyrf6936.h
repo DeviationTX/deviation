@@ -25,7 +25,7 @@ enum {
     CYRF_1D_MODE_OVERRIDE  = 0x1D,
     CYRF_1E_RX_OVERRIDE    = 0x1E,
     CYRF_1F_TX_OVERRIDE    = 0x1F,
-    CYRF_27_CLK_OFFSET     = 0x27,
+    CYRF_27_CLK_OVERRIDE   = 0x27,
     CYRF_28_CLK_EN         = 0x28,
     CYRF_29_RX_ABORT       = 0x29,
     CYRF_32_AUTO_CAL_TIME  = 0x32,

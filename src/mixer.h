@@ -77,12 +77,18 @@ struct Mixer {
     enum MuxType mux;
 };
 
+enum LimitFlags {
+    CH_REVERSE     = 0x01,
+    CH_FAILSAFE_EN = 0x02,
+};
+
 struct Limit {
-    u8 reverse;
+    u8 flags;
     u8 safetysw;
     s8 safetyval;
     s8 max;
     s8 min;
+    s8 failsafe;
 };
 
 struct Trim {

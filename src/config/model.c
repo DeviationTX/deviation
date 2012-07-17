@@ -244,7 +244,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         s16 value_int = atoi(value);
         if (MATCH_KEY(CHAN_LIMIT_REVERSE)) {
-            m->limits[idx].reverse = value_int;
+            if (value_int)
+                m->limits[idx].flags |= CH_REVERSE;
+            else
+                m->limits[idx].flags &= ~CH_REVERSE;
             return 1;
         }
         if (MATCH_KEY(CHAN_LIMIT_SAFETYSW)) {
@@ -368,7 +371,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     for(idx = 0; idx < NUM_CHANNELS; idx++) {
         if(!WRITE_FULL_MODEL &&
-           m->limits[idx].reverse == 0 &&
+           m->limits[idx].flags == 0 &&
            m->limits[idx].safetysw == 0 &&
            m->limits[idx].safetyval == 0 &&
            m->limits[idx].max == 100 &&
@@ -378,8 +381,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             continue;
         }
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
-        if(WRITE_FULL_MODEL || m->limits[idx].reverse != 0)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, m->limits[idx].reverse);
+        if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
         if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYSW, m->limits[idx].safetysw);
         if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
