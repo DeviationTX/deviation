@@ -1,0 +1,202 @@
+Thanks to rcH4x0r and renatopub for the data.
+
+These transmitters use a CYRF6936 based solution.
+
+Data is transmitted every 2.8 msec using 16-byte packets
+
+After initialization, the Transmitter scans the RSSI for each channel 0x00 to
+0x4f 30 times.  The 3 frequencies with the lowest RSSI are chosen for transmit
+
+All packets sent from this point, will be sent on one of the 3 selected
+frequencies.  Every 4 packets, the next channel is chosen in a round-robin
+fashion.  Additionally all packets contain a sequence number from 0 to 12,
+incrementing one after each packet.  All packets are 16 bits in length.
+
+Next, if the radio is a 4 or 6 channel, or if it is 8channel without a fixed ID,
+a random 20bit ID is chosen, and Binding packets are sent.  The radio sends
+~3000 binding packets, which contain the chosen ID, and the chosen 3 frequencies.
+If the radio is 8 channel, and a FixedID is selected, the radio skips the binding
+stage.
+
+After binding, data packets are sent.  A single data packet contains upto 8
+channels of data in 10bit/channel.  The 4, 6, and 8 channel radios, all have
+slightly different data packet syntax, but all contain the chosen ID and the proper
+sequence number.
+
+For 8-channel radio, a beacon packet is sent every 8 data packets.  This beacon
+contains failsafe values for either the low-4 or upper-4 channels (alternating each
+time the beacon is sent.  the beacon also contains the chosen frequencies and ID,
+allowing the Rx to locate the proper Tx without binding packets.
+
+The TxID is a 20 bit value.  Either a fixed or random ID chosen for this session.
+TxID1 = FixedId & 0xFF
+TxID2 = ((FixedId >> 6) & 0xFF) | (FixedId >> 18)
+TxID3 = ((FixedId >> 14) & 0xFF) & 0xFF
+
+
+#########################
+# 8-channel Data Packet #
+#########################
+Each channel is 10-bits.  All 8 channels are encoded in a single packet.
+The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: throttle LSB
+1  bb: aileron  LSB
+2  cc: elevator LSB
+3  dd: rudder   LSB
+4  ee: thr,ail,ele,rud MSB
+5  ff: ch5? LSB
+6  gg: ch6? LSB
+7  hh: ch7? LSB
+8  ii: ch8? LSB
+9  jj: ch4-8 MSB
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: channel_direction
+14 oo: xor 0x25 with bytes 0-13
+15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
+
+The smallest value observed is 0x000, the largest 0x190 (low rates?)
+Channel   byte9    byte4   lower8byte
+01 Thr   ........ xx......    00
+02 Ail   ........ ..xx....    01
+03 Ele   ........ ....xx..    02
+04 Rud   ........ ......xx    03
+06 ???   ..xx.... ........    06
+
+the channel direction (byte 13) is set as follows.
+bit 0 : Throttle : 1 when value > prev value
+bit 1 : Aileron  : 1 when value < prev value
+bit 2 : Elevator : 1 when value < prev value
+bit 3 : Rudder   : 1 when value > prev value
+bit 4 : ???      : 1 when value ? prev value
+bit 5 : ???      : 1 when value < prev value
+bit 6 : ???      : 1 when value ? prev value
+bit 7 : ???      : 1 when value ? prev value
+
+
+###########################
+# 8-channel Beacon Packet #
+###########################
+The checksum offset is different for beacon vs data packets.
+Byte 9 will be either 99, 1b, or e4 for beacon packets
+(none of which are valid for data packets)
+The beacon packet alternates between an odd and even packet (set by byte 4.6)
+
+00 00 00 00 20 00 26 3D 31 99 E5 2E 65 0B 2A EC
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: failsafe enable
+1  bb: elevator/gear failsafe
+2  cc: aileron/flap failsafe
+3  dd: throttle/aux2 failsafe
+4  ee: ?? bit 6 indicates even=0/odd=1 beacon packets.  Bit 5=??.  Bit 2=??
+5  ff: rudder/aux3 failsafe
+6  gg: 1st channel
+7  hh: 2nd channel
+8  ii: 3rd channel
+9  jj: Tx mode 0x99 = randomID, 0x1b = fixedID, 0xe4 = set fixed ID (sent for 11 seconds)
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: channel-direction (same value as previous data packet)
+14 oo: xor 0x1C with bytes 0-13
+15 pp: checksum (0x1C + sum(bytes 0-13)) modulo 0x100
+
+byte 0 is a bitmask indicating which failsafe channels are enabled:
+76543210      channel
+.......x      elevator (even)
+......x.      aileron  (even)
+.....x..      throttle (even)
+....x...      rudder   (even)
+...x....      gear     (odd)
+..x.....      flaps    (odd)
+.x......      aux2     (odd)
+x.......      aux3     (odd)
+
+#########################
+# 6-channel Data Packet #
+#########################
+Each channel is 10-bits.  All 6 channels are encoded in a single packet.
+The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: throttle LSB
+1  bb: aileron  LSB
+2  cc: elevator LSB
+3  dd: rudder   LSB
+4  ee: thr,ail,ele,rud MSB
+5  ff: 00
+6  gg: 00
+7  hh: 00
+8  ii: gear = bit0, flaps = bit 1
+9  jj: values a5, a6, 04 repeating
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: somehow tied to rudder value.  Gyro or pitch?
+14 oo: xor 0x3a with bytes 0-13
+15 pp: checksum (0x3A + sum(bytes 0-13)) modulo 0x100
+
+#########################
+# 4-channel Data Packet #
+#########################
+Each channel is 10-bits.  The radio sends thetrim values as seperate 10bit
+values (resulting in a syntax similar to the 8-channel radio
+The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+
+0  aa: elevator LSB
+1  bb: elevator trim LSB
+2  cc: aileron LSB
+3  dd: aileron trim LSB
+4  ee: ele, ele-trim, ail, ail-trim MSB
+5  ff: throttle LSB
+6  gg: trottle trim LSB
+7  hh: rudder LSB
+8  ii: rudder trim LSB
+9  jj: thr, thr-trim, rud, rud-trim MSB
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: Unknown.  Different radios seem to do different things with this byte.  It is probably unused
+14 oo: xor 0x00 with bytes 0-13
+15 pp: checksum (0x00 + sum(bytes 0-13)) modulo 0x100
+
+#########################
+# 4/6/8 Channel Binding #
+#########################
+The CYRFID does not seem to be used in the protocol. A single SOP code is usedi
+for all 4/6/8 channel radios.
+SOP: DF B1 C0 49 62 DF C1 49
+
+8Channel:
+C5 34 15 3B 60 26 FF 00 00 32 16 96 E4 00 15 B5
+6Channel:
+b9 45 28 1d b0 3d ff 00 00 32 2d f0 64 f1 fb 0d
+4Channel:
+a5 23 3d 1f d0 14 ff 00 00 32 19 bd d4 f0 2d d3
+
+aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+                         4ch     6ch    8ch
+0  aa: Fixed-----------   A5      B9     C5
+1  bb: Fixed-----------   23      45     34
+2  cc: 1st channel
+3  dd: 2nd channel
+4  ee: Fixed-----------   D0      B0     60
+5  ff: 3rd channel
+6  gg: Fixed-----------   FF      FF     FF
+7  hh: Fixed-----------   00      00     00
+8  ii: Fixed-----------   00      00     00
+9  jj: Fixed-----------   32      32     32
+10 kk: TxID1
+11 ll: TxID2
+12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
+13 nn: Fixed-----------   F0      F1     00
+14 oo: xor w/bytes 0-13   00      3A     25
+
