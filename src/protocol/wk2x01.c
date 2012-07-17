@@ -67,6 +67,7 @@ static void add_pkt_crc(u8 init)
 }
 static const char init_2801[] = {0xc5, 0x34, 0x60, 0x00, 0x25};
 static const char init_2601[] = {0xb9, 0x45, 0xb0, 0xf1, 0x3a};
+static const char init_2401[] = {0xa5, 0x23, 0xd0, 0xf0, 0x00};
 static void build_bind_pkt(const char *init)
 {
     packet[0] = init[0];
@@ -96,6 +97,30 @@ static u16 get_channel(u8 ch)
     return value;
 }
 
+static void build_data_pkt_2401()
+{
+    const u8 ch_map[] = {5, 2, 0, 7};
+    u8 i;
+    u16 msb = 0;
+    chan_dir = 0;
+    for (i = 0; i < 4; i++) {
+        u16 value = get_channel(i);
+        packet[ch_map[i]] = value & 0xff;
+        msb |= ((value >> 8) & 0x03) << (2 * (7 - ch_map[i]));
+    }
+    packet[1] = 0x00; // LSB Elevator Trim
+    packet[3] = 0x00; // LSB Aileron Trim
+    packet[4] = msb >> 8; //Ele/Ail MSB
+    packet[6] = 0x00; // LSB Throttle Trim
+    packet[8] = 0x00; // LSB Rudder Trim
+    packet[9] = (msb << 2) & 0xff; //Thr/Rud MSB
+    packet[10]  = (fixed_id >> 0)  & 0xff;
+    packet[11] = (fixed_id >> 8)  & 0xff;
+    packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
+    packet[13] = 0xf0; //FIXME - What is this?
+    add_pkt_crc(0x00);
+}
+
 static void build_data_pkt_2601()
 {
     u8 i;
@@ -103,7 +128,6 @@ static void build_data_pkt_2601()
     chan_dir = 0;
     for (i = 0; i < 4; i++) {
         u16 value = get_channel(i);
-        last_chan_val[i] = value;
         packet[i] = value & 0xff;
         msb = (msb << 2) | ((value >> 8) & 0x03);
     }
@@ -257,6 +281,17 @@ void WK_BuildPacket_2601()
     pkt_num = (pkt_num + 1) % 12;
 }
 
+void WK_BuildPacket_2401()
+{
+    if (bind_counter) {
+        bind_counter--;
+        build_bind_pkt(init_2401);
+    } else {
+        build_data_pkt_2401();
+    }
+    pkt_num = (pkt_num + 1) % 12;
+}
+
 static u16 wk_cb()
 {
     if (txState == 0) {
@@ -265,6 +300,8 @@ static u16 wk_cb()
             WK_BuildPacket_2801();
         else if(Model.type == PROTOCOL_WK2601)
             WK_BuildPacket_2601();
+        else if(Model.type == PROTOCOL_WK2401)
+            WK_BuildPacket_2401();
 
         CYRF_WriteDataPacket(packet);
         return 1600;
