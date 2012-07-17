@@ -65,14 +65,15 @@ static void add_pkt_crc(u8 init)
     packet[14] = xor;
     packet[15] = add & 0xff;
 }
-
-static void build_bind_pkt_2801()
+static const char init_2801[] = {0xc5, 0x34, 0x60, 0x00, 0x25};
+static const char init_2601[] = {0xb9, 0x45, 0xb0, 0xf1, 0x3a};
+static void build_bind_pkt(const char *init)
 {
-    packet[0] = 0xc5;
-    packet[1] = 0x34;
+    packet[0] = init[0];
+    packet[1] = init[1];
     packet[2] = radio_ch[0];
     packet[3] = radio_ch[1];
-    packet[4] = 0x60;
+    packet[4] = init[2];
     packet[5] = radio_ch[2];
     packet[6] = 0xff;
     packet[7] = 0x00;
@@ -81,8 +82,42 @@ static void build_bind_pkt_2801()
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
-    packet[13] = 0x00;
-    add_pkt_crc(0x25);
+    packet[13] = init[3];
+    add_pkt_crc(init[4]);
+}
+
+static u16 get_channel(u8 ch)
+{
+    s32 value = (s32)Channels[ch] * 0xC8 / CHAN_MAX_VALUE + 0xC8;
+    if (value < 0)
+        value = 0;
+    if (value > 0x1ff)
+        value = 0x1ff;
+    return value;
+}
+
+static void build_data_pkt_2601()
+{
+    u8 i;
+    u8 msb = 0;
+    chan_dir = 0;
+    for (i = 0; i < 4; i++) {
+        u16 value = get_channel(i);
+        last_chan_val[i] = value;
+        packet[i] = value & 0xff;
+        msb = (msb << 2) | ((value >> 8) & 0x03);
+    }
+    packet[5] = msb;
+    packet[6] = 0;
+    packet[7] = 0;
+    packet[8] = 0;
+    packet[9] = (get_channel(5) ? 1 : 0) | (get_channel(6) ? 2 : 0);
+    packet[10]  = (fixed_id >> 0)  & 0xff;
+    packet[11] = (fixed_id >> 8)  & 0xff;
+    packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
+    packet[13] = get_channel(4); //Pitch?
+
+    add_pkt_crc(0x3A);
 }
 
 static void build_data_pkt_2801()
@@ -94,11 +129,7 @@ static void build_data_pkt_2801()
     for (i = 0; i < 8; i++) {
         if (i == 4)
             offset = 1;
-        s32 value = (s32)Channels[i] * 0xC8 / CHAN_MAX_VALUE + 0xC8;
-        if (value < 0)
-            value = 0;
-        if (value > 0x1ff)
-            value = 0x1ff;
+        u16 value = get_channel(i);
         //FIXME: The 'chan_dir' may just be 'reverse'
         if (value != last_chan_val[i]) {
             if ((i & 0x03) == 0 || (i & 0x03) == 3) {
@@ -189,11 +220,11 @@ static void set_radio_channels()
     radio_ch[2] = 0x04;
 }
 
-void WK_BuildPacket()
+void WK_BuildPacket_2801()
 {
     switch(state) {
         case WK_BIND:
-            build_bind_pkt_2801();
+            build_bind_pkt(init_2801);
             if (--bind_counter == 0)
                 state = WK_BOUND_1;
             break;
@@ -215,12 +246,26 @@ void WK_BuildPacket()
     pkt_num = (pkt_num + 1) % 12;
 }
 
+void WK_BuildPacket_2601()
+{
+    if (bind_counter) {
+        bind_counter--;
+        build_bind_pkt(init_2601);
+    } else {
+        build_data_pkt_2601();
+    }
+    pkt_num = (pkt_num + 1) % 12;
+}
 
 static u16 wk_cb()
 {
     if (txState == 0) {
         txState = 1;
-        WK_BuildPacket();
+        if(Model.type == PROTOCOL_WK2801) 
+            WK_BuildPacket_2801();
+        else if(Model.type == PROTOCOL_WK2601)
+            WK_BuildPacket_2601();
+
         CYRF_WriteDataPacket(packet);
         return 1600;
     }
