@@ -82,8 +82,12 @@ int ini_parse_file(FILE* file,
         if(done == -1)
             break;
         if (eol >= data + sizeof(data) -1) {
-            //No end of line
-            if(data != line)
+            if (eol == data + sizeof(data) -1) {
+                //last character in data read is an eol
+                line = eol;
+            }
+            if(data != line )
+                //No end of line
                 memmove(data, line, eol - line);
             eol = data + (eol - line);
             line = data;
@@ -103,7 +107,7 @@ int ini_parse_file(FILE* file,
         if (eol == data + len) {
             continue;
         }
-        //printf("%d: %s\n", lineno, line);
+        printf("%d: %s\n", lineno, line);
         lineno++;
 
         start = line;
