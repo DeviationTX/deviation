@@ -13,7 +13,7 @@ ifdef WINDOWS
         LFLAGS := $(LFLAGS) -mno-cygwin
         CFLAGS := $(CFLAGS) -mno-cygwin
     endif
-    LFLAGS := -L$(FLTK_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32
+    LFLAGS := -L$(FLTK_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio
     CFLAGS := -I$(FLTK_DIR)/include -DWIN32 $(CFLAGS)
     EXEEXT = exe
     ODIREXT = -w32
