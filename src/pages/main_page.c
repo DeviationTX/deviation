@@ -62,10 +62,10 @@ void PAGE_MainInit(int page)
     mp->pitchObj = GUI_CreateLabelBox(16, 90, 100, 40, &THROTTLE_FONT,
                                       show_throttle_cb, &Channels[5]);
     //Timer
-    mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 25, &TIMER_FONT,
+    mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 24, &TIMER_FONT,
                                       show_throttle_cb, &Channels[5]);
     //Telemetry value
-    mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 25, &TIMER_FONT,
+    mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
                                           show_throttle_cb, &Channels[5]);
     //Icon
     if(Model.icon[0]) {
