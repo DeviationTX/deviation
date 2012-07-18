@@ -25,9 +25,9 @@ struct Model Model;
 #define WRITE_FULL_MODEL 0
 static u32 crc32;
 static u8 current_model;
-static const char MODEL_NAME[] = "name";
-static const char MODEL_ICON[] = "icon";
-static const char MODEL_TYPE[] = "type";
+const char *MODEL_NAME = "name";
+const char *MODEL_ICON = "icon";
+const char *MODEL_TYPE = "type";
 const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -103,19 +103,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 1;
     }
     if (MATCH_SECTION("") && MATCH_KEY(MODEL_ICON)) {
-        strcpy(m->icon, "media/");
-        strncpy(m->icon + 6, value, 12);
-        m->icon[19] = 0;
+        CONFIG_ParseModelName(m->icon, value);
         return 1;
     }
     if (MATCH_SECTION("") && MATCH_KEY(MODEL_TYPE)) {
-        for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
-            if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
-                m->type = i;
-                return 1;
-            }
-        }
-        printf("Unknown model type: %s\n", value);
         return 1;
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
@@ -456,4 +447,39 @@ u8 CONFIG_SaveModelIfNeeded() {
 
 u8 CONFIG_GetCurrentModel() {
     return current_model;
+}
+
+const char *CONFIG_GetIcon(enum ModelType type) {
+    const char *const icons[] = {
+       "media/heli.bmp",
+       "media/plane.bmp",
+    };
+    return icons[type];
+}
+
+const char *CONFIG_GetCurrentIcon() {
+    if(Model.icon[0]) {
+        return Model.icon;
+    } else {
+        return CONFIG_GetIcon(Model.type);
+    }
+}
+
+void CONFIG_ParseModelName(char *name, const char *value)
+{
+    strcpy(name, "media/");
+    strncpy(name + 6, value, 12);
+    name[19] = 0;
+}
+
+enum ModelType CONFIG_ParseModelType(const char *value)
+{
+    u8 i;
+    for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
+        if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
+            return i;
+        }
+    }
+    printf("Unknown model type: %s\n", value);
+    return 0;
 }
