@@ -115,10 +115,10 @@ static void okcancel_cb(guiObject_t *obj, void *data);
 #define COL2_VALUE 216
 static void show_titlerow()
 {
-    GUI_CreateLabel(COL1_TEXT, 12, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
-    GUI_CreateTextSelect(COL1_VALUE, 10, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateLabel(COL1_TEXT, 10, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
+    GUI_CreateTextSelect(COL1_VALUE, 8, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 }
 
 static void show_none()

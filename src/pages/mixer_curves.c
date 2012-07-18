@@ -36,9 +36,9 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         edit->pointnum = -1;
     edit->curve = *curve;
     edit->curveptr = curve;
-    GUI_CreateTextSelect(8, 10, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
-    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateTextSelect(8, 8, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
+    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 
     if (curve->type >= CURVE_3POINT) {
         GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Point:");

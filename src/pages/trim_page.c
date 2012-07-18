@@ -72,8 +72,8 @@ void edit_cb(guiObject_t *obj, void *data)
     tp->trim = trim[tp->index];
    
     GUI_RemoveAllObjects();
-    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 
     //Row 1
     GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Input:");
@@ -93,7 +93,7 @@ void PAGE_TrimInit(int page)
     (void)page;
     int i;
     tp->modifying_trim = 0;
-    GUI_CreateLabel(8, 12, NULL, DEFAULT_FONT, "Trim");
+    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Trim");
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Input");
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, "Trim Neg");
     GUI_CreateLabel(136, 40, NULL, DEFAULT_FONT, "Trim Pos");

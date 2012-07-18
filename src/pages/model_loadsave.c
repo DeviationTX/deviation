@@ -66,8 +66,8 @@ void MODELPage_ShowLoadSave(int loadsave)
 {
     u8 num_models;
     GUI_RemoveAllObjects();
-    GUI_CreateButton(160, 6, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 6, BUTTON_48, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
+    GUI_CreateButton(264, 4, BUTTON_48, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
     for (num_models = 1; num_models <= 100; num_models++) {
         sprintf(mp->tmpstr, "models/model%d.ini", num_models);
         FILE *fh = fopen(mp->tmpstr, "r");

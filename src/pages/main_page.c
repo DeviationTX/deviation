@@ -40,7 +40,7 @@ void PAGE_MainInit(int page)
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
-    mp->nameObj = GUI_CreateLabelBox(90, 2, 125, 25, &MODELNAME_FONT,
+    mp->nameObj = GUI_CreateLabelBox(90, 6, 125, 25, &MODELNAME_FONT,
                                       NULL, Model.name);
 
     //Throttle
@@ -77,7 +77,7 @@ void PAGE_MainInit(int page)
     if (Display.show_bat_icon) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(275,5, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
+        GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
     }   
 }
 
@@ -96,7 +96,6 @@ void PAGE_MainEvent()
         GUI_Redraw(mp->throttleObj);
     }
 }
-
 
 int PAGE_MainCanChange()
 {
@@ -118,6 +117,7 @@ const char *voltage_cb(guiObject_t *obj, void *data) {
     sprintf(mp->tmpstr, "%2d.%03dV", voltage >> 12, voltage & 0x0fff);
     return mp->tmpstr;
 }
+
 s16 trim_cb(void * data)
 {
     s8 *trim = (s8 *)data;
