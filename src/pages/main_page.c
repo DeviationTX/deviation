@@ -104,7 +104,7 @@ const char *voltage_cb(guiObject_t *obj, void *data) {
     (void)obj;
     (void)data;
     u16 voltage = PWR_ReadVoltage();
-    sprintf(mp->tmpstr, "%2d.%03dV", voltage >> 12, voltage & 0x0fff);
+    sprintf(mp->tmpstr, "%2d.%02dV", voltage >> 12, (voltage & 0x0fff) / 10);
     return mp->tmpstr;
 }
 
