@@ -20,10 +20,23 @@
 #include "config/ini.h"
 
 static struct model_page * const mp = &pagemem.u.model_page;
-static int ini_handler(void* user, const char* section, const char* name, const char* value)
+
+static int ini_handle_icon(void* user, const char* section, const char* name, const char* value)
+{
+    (void)user;
+    if(section[0] == '\0' && strcasecmp(name, MODEL_ICON) == 0) {
+        CONFIG_ParseModelName(mp->iconstr, value);
+    }
+    if(section[0] == '\0' && strcasecmp(name, MODEL_TYPE) == 0) {
+        mp->modeltype = CONFIG_ParseModelType(value);
+    }
+    return 1;
+}
+
+static int ini_handle_name(void* user, const char* section, const char* name, const char* value)
 {
     long idx = (long)user;
-    if(section[0] == '\0' && strcasecmp(name, "name") == 0) {
+    if(section[0] == '\0' && strcasecmp(name, MODEL_NAME) == 0) {
         sprintf(mp->tmpstr, "%d: %s", (int)idx, value);
         return -1;
     }
@@ -34,7 +47,18 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
 {
     (void)obj;
     (void)data;
+    const char *ico;
     mp->selected = sel + 1;
+    GUI_RemoveObj(mp->icon);
+    sprintf(mp->tmpstr, "models/model%d.ini", mp->selected);
+    mp->modeltype = 0;
+    mp->iconstr[0] = 0;
+    ini_parse(mp->tmpstr, ini_handle_icon, NULL);
+    if (mp->iconstr[0])
+        ico = mp->iconstr;
+    else
+        ico = CONFIG_GetIcon(mp->modeltype);
+    mp->icon = GUI_CreateImage(10, 88, 96, 96, ico);
 }
 static const char *string_cb(u8 idx, void *data)
 {
@@ -44,7 +68,7 @@ static const char *string_cb(u8 idx, void *data)
     fh = fopen(mp->tmpstr, "r");
     sprintf(mp->tmpstr, "%d: NONE", idx + 1);
     if (fh)
-        ini_parse_file(fh, ini_handler, (void *)((long)(idx + 1)));
+        ini_parse_file(fh, ini_handle_name, (void *)((long)(idx + 1)));
     return mp->tmpstr;
 }
 static void okcancel_cb(guiObject_t *obj, void *data)
@@ -76,5 +100,6 @@ void MODELPage_ShowLoadSave(int loadsave)
     }
     num_models--;
     mp->selected = CONFIG_GetCurrentModel();
-    GUI_CreateListBox(61, 40, 198, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(120, 40, 198, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
+    mp->icon = GUI_CreateImage(10, 88, 96, 96, CONFIG_GetCurrentIcon());
 }

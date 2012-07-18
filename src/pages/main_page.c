@@ -31,11 +31,6 @@ void PAGE_MainInit(int page)
 {
     (void)page;
     int i;
-    const char *const icons[] = {
-       "media/heli.bmp",
-       "media/plane.bmp",
-    };
-    const char *ico;
 
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
@@ -68,12 +63,7 @@ void PAGE_MainInit(int page)
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
                                           show_throttle_cb, &Channels[5]);
     //Icon
-    if(Model.icon[0]) {
-        ico = Model.icon;
-    } else {
-        ico = icons[Model.type];
-    }
-    mp->iconObj = GUI_CreateImage(205, 40, 96, 96, ico);
+    mp->iconObj = GUI_CreateImage(205, 40, 96, 96, CONFIG_GetCurrentIcon());
     if (Display.show_bat_icon) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {

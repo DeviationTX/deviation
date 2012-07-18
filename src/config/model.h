@@ -2,6 +2,12 @@
 #define _MODEL_H_
 
 #include "mixer.h"
+
+/* INI file consts */
+const char *MODEL_NAME;
+const char *MODEL_ICON;
+const char *MODEL_TYPE;
+
 struct Model {
     char name[24];
     char icon[20];
@@ -29,4 +35,8 @@ u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);
 u8 CONFIG_SaveModelIfNeeded();
 u8 CONFIG_GetCurrentModel();
+const char *CONFIG_GetIcon(enum ModelType type);
+const char *CONFIG_GetCurrentIcon();
+enum ModelType CONFIG_ParseModelType(const char *value);
+void CONFIG_ParseModelName(char *name, const char *value);
 #endif /*_MODEL_H_*/
