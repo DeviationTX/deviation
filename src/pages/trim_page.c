@@ -93,7 +93,7 @@ void PAGE_TrimInit(int page)
     (void)page;
     int i;
     tp->modifying_trim = 0;
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Trim");
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Trim");
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Input");
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, "Trim Neg");
     GUI_CreateLabel(136, 40, NULL, DEFAULT_FONT, "Trim Pos");

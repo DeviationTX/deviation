@@ -36,7 +36,7 @@ void PAGE_MixerInit(int page)
     int init_y = 40;
     int i;
     mp->modifying_template = 0;
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Mixer");
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
     struct Mixer *mix = MIX_GetAllMixers();
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
         u8 idx;

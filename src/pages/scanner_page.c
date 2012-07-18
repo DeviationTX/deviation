@@ -47,7 +47,7 @@ void PAGE_ScannerInit(int page)
     CYRF_ConfigCRCSeed(0);
     //CYRF_ConfigSOPCode(0);
 
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Scanner");
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Scanner");
 
     time_to_scan = 0;
     channel = MIN_RADIOCHANNEL;

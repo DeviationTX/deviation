@@ -23,7 +23,7 @@ static s16 showchan_cb(void *data);
 void PAGE_ChantestInit(int page)
 {
     (void)page;
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Channels");
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Channels");
 
     int i;
     for(i = 0; i < NUM_CHANNELS; i++) {

@@ -22,7 +22,7 @@
 #include <string.h>
 
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "modelname", "throttle", "timer", "battery", "misc1"};
+static const char * const FONT_VAL[] = { "default", "modelname", "title", "throttle", "timer", "battery", "misc1"};
 static const char COLOR[] = "color";
 static const char FILL_COLOR[] = "fill_color";
 static const char OUTLINE_COLOR[] = "edge_color";

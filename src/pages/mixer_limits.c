@@ -84,7 +84,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 
 static void show_titlerow()
 {
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, (void *)channel_name[mp->channel]);
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, (void *)channel_name[mp->channel]);
     GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
     GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
 }

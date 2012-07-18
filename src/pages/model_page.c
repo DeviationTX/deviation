@@ -36,7 +36,7 @@ void PAGE_ModelInit(int page)
 {
     (void)page;
     mp->editing = 0;
-    GUI_CreateLabel(8, 10, NULL, DEFAULT_FONT, "Model");
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Model");
 
     GUI_CreateButton(90, 4, BUTTON_96, "Load", 0x0000, loadsave_cb, (void *)0L);
     GUI_CreateButton(188, 4, BUTTON_96, "Save As", 0x0000, loadsave_cb, (void *)1L);
