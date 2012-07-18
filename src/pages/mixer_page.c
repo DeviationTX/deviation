@@ -29,26 +29,27 @@ static void templateselect_cb(guiObject_t *obj, void *data);
 static void limitselect_cb(guiObject_t *obj, void *data);
 static const char *show_source(guiObject_t *obj, void *data);
 
-#define ENTRIES_PER_PAGE 9
+#define ENTRIES_PER_PAGE 8
 
 void PAGE_MixerInit(int page)
 {
-    int init_y = 8;
+    int init_y = 40;
     int i;
     mp->modifying_template = 0;
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
     struct Mixer *mix = MIX_GetAllMixers();
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
         u8 idx;
-        int row = init_y + 26 * i;
+        int row = init_y + 24 * i;
         u8 ch = ENTRIES_PER_PAGE * page + i;
         enum TemplateType template = MIX_GetTemplate(ch);
-        GUI_CreateButton(10, row, BUTTON_48x16, channel_name[ENTRIES_PER_PAGE * page + i], 0x0000, limitselect_cb, (void *)((long)ch));
+        GUI_CreateButton(8, row, BUTTON_48x16, channel_name[ENTRIES_PER_PAGE * page + i], 0x0000, limitselect_cb, (void *)((long)ch));
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].dest == ch)
                 break;
         GUI_CreateButton(124, row, BUTTON_64x16, MIXPAGE_TemplateName(template), 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
-            GUI_CreateLabel(60, row+2, show_source, DEFAULT_FONT, &mix[idx].src);
+            GUI_CreateLabel(64, row+2, show_source, DEFAULT_FONT, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx+1].sw) {
                     GUI_CreateLabel(192, row+2, show_source, DEFAULT_FONT, &mix[idx+1].sw);

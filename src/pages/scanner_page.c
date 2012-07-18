@@ -46,10 +46,13 @@ void PAGE_ScannerInit(int page)
     CYRF_ConfigRxTx(0);
     CYRF_ConfigCRCSeed(0);
     //CYRF_ConfigSOPCode(0);
+
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Scanner");
+
     time_to_scan = 0;
     channel = MIN_RADIOCHANNEL;
     for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
-        bar[i] = GUI_CreateBarGraph(i * 4, 10, 4, 210, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        bar[i] = GUI_CreateBarGraph(i * 4, 40, 4, 192, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
         channelnoise[i] = 0x10;
     }
     CLOCK_StartTimer(1250, scan_trigger_cb);

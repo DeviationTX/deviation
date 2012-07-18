@@ -36,10 +36,10 @@ void PAGE_ModelInit(int page)
 {
     (void)page;
     mp->editing = 0;
-    //GUI_CreateButton(176, 8, BUTTON_64x16, "Load", 0x0000, loadsave_cb, (void *)0L);
-    //GUI_CreateButton(248, 8, BUTTON_64x16, "Save As", 0x0000, loadsave_cb, (void *)1L);
-    GUI_CreateButton(90, 8, BUTTON_96, "Load", 0x0000, loadsave_cb, (void *)0L);
-    GUI_CreateButton(188, 8, BUTTON_96, "Save As", 0x0000, loadsave_cb, (void *)1L);
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Model");
+
+    GUI_CreateButton(90, 4, BUTTON_96, "Load", 0x0000, loadsave_cb, (void *)0L);
+    GUI_CreateButton(188, 4, BUTTON_96, "Save As", 0x0000, loadsave_cb, (void *)1L);
 
     GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Model Name:");
     GUI_CreateButton(136, 48, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);

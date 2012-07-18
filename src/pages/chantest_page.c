@@ -23,9 +23,11 @@ static s16 showchan_cb(void *data);
 void PAGE_ChantestInit(int page)
 {
     (void)page;
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Channels");
+
     int i;
     for(i = 0; i < NUM_CHANNELS; i++) {
-        bar[i] = GUI_CreateBarGraph(10 + 20 * i, 10, 10, 220, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, showchan_cb, (void *)((long)i));
+        bar[i] = GUI_CreateBarGraph(8 + 24 * i, 56, 10, 160, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, showchan_cb, (void *)((long)i));
     }
 }
 

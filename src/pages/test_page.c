@@ -71,7 +71,7 @@ void PAGE_TestInit(int page)
     static const char *button1 = "Button 1";
     static const char *button2 = "Button 2";
     static const char *button3 = "Button 3";
-    static const char *statusBar = "media/bar.bmp";
+    //static const char *statusBar = "media/bar.bmp";
     static const char *batteryImg = "media/bat.bmp";
 
     CLOCK_StopTimer();
@@ -97,10 +97,10 @@ void PAGE_TestInit(int page)
     }
 
     /* Create some GUI elements */
-    GUI_CreateImage(0,0,320,24,statusBar);
+    //GUI_CreateImage(0,0,320,24,statusBar);
     GUI_CreateImage(270,1,48,22,batteryImg);
     GUI_CreateLabel(10,60,NULL, DEFAULT_FONT, strSPIFlash);
-    GUI_CreateLabel(10,45,NULL, DEFAULT_FONT, strBootLoader);
+    GUI_CreateLabel(10,48,NULL, DEFAULT_FONT, strBootLoader);
     GUI_CreateLabel(10,30,NULL, DEFAULT_FONT, strMfg);
     GUI_CreateLabel(10,75,NULL, DEFAULT_FONT, buttonstr);
     lblVoltage = GUI_CreateLabel(267,8,NULL, BATTERY_FONT, voltagestr);
