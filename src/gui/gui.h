@@ -273,7 +273,10 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         enum DialogType dgType);
 #define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, data)
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc, const char *(*Callback)(guiObject_t *obj, void *data), void *data);
-guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file);
+
+#define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file)
+guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file);
+
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,

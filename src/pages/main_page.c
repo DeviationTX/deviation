@@ -64,11 +64,14 @@ void PAGE_MainInit(int page)
                                           show_throttle_cb, &Channels[5]);
     //Icon
     mp->iconObj = GUI_CreateImage(205, 40, 96, 96, CONFIG_GetCurrentIcon());
+    //Battery
     if (Display.show_bat_icon) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {
         GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
-    }   
+    }
+    //TxPower
+    GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp");
 }
 
 void PAGE_MainEvent()

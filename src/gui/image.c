@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file)
+guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file)
 {
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiImage  *image;
@@ -31,8 +31,8 @@ guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *fi
     image = &obj->o.image;
 
     image->file = file;
-    image->x_off = 0;
-    image->y_off = 0;
+    image->x_off = x_off;
+    image->y_off = y_off;
 
     box->x = x;
     box->y = y;
