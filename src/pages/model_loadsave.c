@@ -58,7 +58,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         ico = mp->iconstr;
     else
         ico = CONFIG_GetIcon(mp->modeltype);
-    mp->icon = GUI_CreateImage(10, 88, 96, 96, ico);
+    mp->icon = GUI_CreateImage(8, 88, 96, 96, ico);
 }
 static const char *string_cb(u8 idx, void *data)
 {
@@ -100,6 +100,6 @@ void MODELPage_ShowLoadSave(int loadsave)
     }
     num_models--;
     mp->selected = CONFIG_GetCurrentModel();
-    GUI_CreateListBox(120, 40, 198, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
-    mp->icon = GUI_CreateImage(10, 88, 96, 96, CONFIG_GetCurrentIcon());
+    GUI_CreateListBox(112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
+    mp->icon = GUI_CreateImage(8, 88, 96, 96, CONFIG_GetCurrentIcon());
 }
