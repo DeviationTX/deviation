@@ -22,8 +22,14 @@
 #include <string.h>
 
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "throttle", "battery", "misc1"};
+static const char * const FONT_VAL[] = { "default", "modelname", "throttle", "timer", "battery", "misc1"};
 static const char COLOR[] = "color";
+static const char FILL_COLOR[] = "fill_color";
+static const char OUTLINE_COLOR[] = "edge_color";
+static const char FONT_COLOR[] = "font_color";
+static const char BOX[] = "box_type";
+static const char * const BOX_VAL[] = { "none", "center", "fill", "outline" };
+
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
@@ -54,15 +60,31 @@ u16 get_color(const char *value) {
     return RGB888_to_RGB565(r, g, b);
 }
 
-static int handle_label(struct FontDesc *label, const char *name, const char *value)
+static int handle_label(struct LabelDesc *label, const char *name, const char *value)
 {
     if(MATCH_KEY(FONT)) {
         label->font = get_font(value);
         return 1;
     }
-    if(MATCH_KEY(COLOR)) {
-        label->color = get_color(value);
+    if(MATCH_KEY(FONT_COLOR)) {
+        label->font_color = get_color(value);
         return 1;
+    }
+    if(MATCH_KEY(FILL_COLOR)) {
+        label->fill_color = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(OUTLINE_COLOR)) {
+        label->outline_color = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(BOX)) {
+        u8 idx;
+        for (idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
+            if(MATCH_VALUE(BOX_VAL[idx])) {
+                label->style = idx;
+            }
+        }
     }
     return 0;
 }
@@ -80,6 +102,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         printf("Couldn't parse font: %s\n", section);
         return 0;
+    }
+    if(MATCH_START(section, "general")) {
+        if(MATCH_KEY("bat_icon")) {
+            d->show_bat_icon = atoi(value);
+            return 1;
+        }
     }
     if(MATCH_START(section, "select")) {
         if(MATCH_KEY(COLOR)) {
@@ -151,6 +179,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    printf("Could not handle [%s] %s=%s\n", section, name, value);
     return 0;
 }
 
@@ -158,6 +187,6 @@ u8 CONFIG_ReadDisplay()
 {
     memset(&Display, 0, sizeof(Display));
     DEFAULT_FONT.font = 7;
-    DEFAULT_FONT.color = 0xffff;
+    DEFAULT_FONT.font_color = 0xffff;
     return ini_parse("media/config.ini", ini_handler, (void *)&Display);
 }

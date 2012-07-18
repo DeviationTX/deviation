@@ -16,27 +16,69 @@
 #include "target.h"
 #include "pages.h"
 #include "gui/gui.h"
+#include "config/model.h"
 
 static struct main_page * const mp = &pagemem.u.main_page;
 s16 trim_cb(void * data);
 const char *show_throttle_cb(guiObject_t *obj, void *data);
+const char *voltage_cb(guiObject_t *obj, void *data);
 s16 trim_cb(void * data);
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
+
 
 void PAGE_MainInit(int page)
 {
     (void)page;
     int i;
+    const char *const icons[] = {
+       "media/heli.bmp",
+       "media/plane.bmp",
+    };
+    const char *ico;
 
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
-    mp->trimObj[2] = GUI_CreateBarGraph(10, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
-    mp->trimObj[3] = GUI_CreateBarGraph(30, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
-    mp->trimObj[1] = GUI_CreateBarGraph(300, 50, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
-    mp->trimObj[0] = GUI_CreateBarGraph(165, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[0]);
-    mp->throttleObj = GUI_CreateLabel(50, 120, show_throttle_cb, THROTTLE_FONT, &Channels[INP_THROTTLE - 1]);
+    mp->nameObj = GUI_CreateLabelBox(90, 2, 125, 25, &MODELNAME_FONT,
+                                      NULL, Model.name);
+
+    //Throttle
+    mp->trimObj[2] = GUI_CreateBarGraph(130, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
+    //Rudder
+    mp->trimObj[3] = GUI_CreateBarGraph(5, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
+    //Elevator
+    mp->trimObj[1] = GUI_CreateBarGraph(180, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
+    //Aileron
+    mp->trimObj[0] = GUI_CreateBarGraph(190, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[0]);
+    //Trim_L
+    mp->trimObj[4] = GUI_CreateBarGraph(145, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
+    //Trim_R
+    mp->trimObj[5] = GUI_CreateBarGraph(165, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
+    //Throttle
+    mp->throttleObj = GUI_CreateLabelBox(16, 40, 100, 40, &THROTTLE_FONT,
+                                         show_throttle_cb, &Channels[INP_THROTTLE - 1]);
+    //Pitch
+    mp->pitchObj = GUI_CreateLabelBox(16, 90, 100, 40, &THROTTLE_FONT,
+                                      show_throttle_cb, &Channels[5]);
+    //Timer
+    mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 25, &TIMER_FONT,
+                                      show_throttle_cb, &Channels[5]);
+    //Telemetry value
+    mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 25, &TIMER_FONT,
+                                          show_throttle_cb, &Channels[5]);
+    //Icon
+    if(Model.icon[0]) {
+        ico = Model.icon;
+    } else {
+        ico = icons[Model.type];
+    }
+    mp->iconObj = GUI_CreateImage(205, 40, 96, 96, ico);
+    if (Display.show_bat_icon) {
+        GUI_CreateImage(270,1,48,22,"media/bat.bmp");
+    } else {
+        GUI_CreateLabelBox(275,5, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
+    }   
 }
 
 void PAGE_MainEvent()
@@ -69,6 +111,13 @@ const char *show_throttle_cb(guiObject_t *obj, void *data)
     return mp->tmpstr;
 }
 
+const char *voltage_cb(guiObject_t *obj, void *data) {
+    (void)obj;
+    (void)data;
+    u16 voltage = PWR_ReadVoltage();
+    sprintf(mp->tmpstr, "%2d.%03dV", voltage >> 12, voltage & 0x0fff);
+    return mp->tmpstr;
+}
 s16 trim_cb(void * data)
 {
     s8 *trim = (s8 *)data;

@@ -40,15 +40,25 @@ enum KeyboardType {
     KEYBOARD_NUM,
 };
 
+enum LabelType {
+    NO_BOX,
+    CENTER,
+    FILL,
+    TRANSPARENT,
+};
+
 struct guiDialogReturn {
     u8 buttonPushed;
     char strInput[80];
     int intInput;
 };
 
-struct FontDesc {
+struct LabelDesc {
     u8 font;
-    u16 color;
+    u16 font_color;
+    u16 fill_color;
+    u16 outline_color;
+    enum LabelType style;
 };
 
 #ifndef ENABLE_GUIOBJECT
@@ -110,7 +120,7 @@ struct guiBox {
 struct guiLabel {
     const char *(*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
-    struct FontDesc font;
+    struct LabelDesc desc;
 };
 
 struct guiKeyboard {
@@ -261,7 +271,8 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         const char *text, u16 titleColor, u16 fontColor,
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType);
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *obj, void *data), struct FontDesc font, void *data);
+#define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, data)
+guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc, const char *(*Callback)(guiObject_t *obj, void *data), void *data);
 guiObject_t *GUI_CreateImage(u16 x, u16 y, u16 width, u16 height, const char *file);
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);

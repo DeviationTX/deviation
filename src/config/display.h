@@ -3,11 +3,13 @@
 
 #include "gui/gui.h"
 
-#define DEFAULT_FONT  (Display.font[0])
-#define THROTTLE_FONT (Display.font[1])
-#define BATTERY_FONT  (Display.font[2])
-#define MISC1_FONT    (Display.font[3])
-#define NUM_LABELS 4
+#define DEFAULT_FONT   (Display.font[0])
+#define MODELNAME_FONT (Display.font[1])
+#define THROTTLE_FONT  (Display.font[2])
+#define TIMER_FONT     (Display.font[3])
+#define BATTERY_FONT   (Display.font[4])
+#define MISC1_FONT     (Display.font[5])
+#define NUM_LABELS 6
 
 struct disp_keyboard {
     u8 font;
@@ -31,10 +33,11 @@ struct disp_listbox {
 };
 
 struct display_settings {
-    struct FontDesc font[NUM_LABELS];
+    struct LabelDesc font[NUM_LABELS];
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
     u16 select_color;
+    u8 show_bat_icon;
 };
 
 extern struct display_settings Display;

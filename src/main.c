@@ -58,7 +58,7 @@ int main() {
     }
     CONFIG_ReadDisplay();
     LCD_SetFont(DEFAULT_FONT.font);
-    LCD_SetFontColor(DEFAULT_FONT.color);
+    LCD_SetFontColor(DEFAULT_FONT.font_color);
 
     MUSIC_Play(MUSIC_STARTUP);
 

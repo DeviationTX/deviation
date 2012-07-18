@@ -4,6 +4,7 @@
 #include "mixer.h"
 struct Model {
     char name[24];
+    char icon[20];
     enum ModelType type;
     enum Protocols protocol;
     u8 num_channels;

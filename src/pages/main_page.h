@@ -5,6 +5,11 @@
 struct main_page {
     guiObject_t *trimObj[TRIMS_TO_SHOW];
     guiObject_t *throttleObj;
+    guiObject_t *pitchObj;
+    guiObject_t *timerObj;
+    guiObject_t *telemetryObj;
+    guiObject_t *iconObj;
+    guiObject_t *nameObj;
     s16 throttle;
     s8 trims[TRIMS_TO_SHOW];
     char tmpstr[8];

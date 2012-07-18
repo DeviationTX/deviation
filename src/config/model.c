@@ -26,6 +26,7 @@ struct Model Model;
 static u32 crc32;
 static u8 current_model;
 static const char MODEL_NAME[] = "name";
+static const char MODEL_ICON[] = "icon";
 static const char MODEL_TYPE[] = "type";
 const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
 /* Section: Radio */
@@ -99,6 +100,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (MATCH_SECTION("") && MATCH_KEY(MODEL_NAME)) {
         strncpy(m->name, value, sizeof(m->name)-1);
         m->name[sizeof(m->name)-1] = 0;
+        return 1;
+    }
+    if (MATCH_SECTION("") && MATCH_KEY(MODEL_ICON)) {
+        strcpy(m->icon, "media/");
+        strncpy(m->icon + 6, value, 12);
+        m->icon[19] = 0;
         return 1;
     }
     if (MATCH_SECTION("") && MATCH_KEY(MODEL_TYPE)) {
@@ -332,6 +339,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         return 0;
     }
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+    if(m->icon[0] != 0)
+        fprintf(fh, "%s=%s\n", MODEL_TYPE, m->icon);
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
