@@ -66,13 +66,10 @@ void GUI_DrawXYGraph(struct guiObject *obj)
     struct guiXYGraph *graph = &obj->o.xy;
     u32 x, y;
 
-    inline u32 VAL_TO_X(s32 xval)
-    {
-        return box->x + (xval - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x);
-    }
-    inline u32 VAL_TO_Y(s32 yval) {
-        return box->y + box->height - (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
-    }
+    #define VAL_TO_X(xval) \
+        (u32)(box->x + (((s32)(xval)) - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x))
+    #define VAL_TO_Y(yval) \
+        (u32)(box->y + box->height - (((s32)(yval)) - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y))
     LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
     if (graph->grid_x) {
         int xval;

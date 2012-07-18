@@ -64,10 +64,10 @@ s16 show_curve_cb(s16 xval, void *data)
     if (edit->pointnum < 0) {
         oldpoint = edit->curve.points[1];
         edit->curve.points[1] = edit->curve.points[0];
-    }
-    yval = CURVE_Evaluate(xval, &edit->curve);
-    if (edit->pointnum < 0) {
+        yval = CURVE_Evaluate(xval, &edit->curve);
         edit->curve.points[1] = oldpoint;
+    } else {
+        yval = CURVE_Evaluate(xval, &edit->curve);
     }
     return yval;
 }

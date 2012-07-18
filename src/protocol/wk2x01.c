@@ -297,11 +297,11 @@ static u16 wk_cb()
 {
     if (txState == 0) {
         txState = 1;
-        if(Model.type == PROTOCOL_WK2801) 
+        if(Model.protocol == PROTOCOL_WK2801) 
             WK_BuildPacket_2801();
-        else if(Model.type == PROTOCOL_WK2601)
+        else if(Model.protocol == PROTOCOL_WK2601)
             WK_BuildPacket_2601();
-        else if(Model.type == PROTOCOL_WK2401)
+        else if(Model.protocol == PROTOCOL_WK2401)
             WK_BuildPacket_2401();
 
         CYRF_WriteDataPacket(packet);

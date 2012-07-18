@@ -157,7 +157,7 @@ static void cyrf_bindinit()
        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
        //0.062792# 0f 05
        CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x40);
-       build_bind_packet(1); //01 01 e9 49 ec a9 c4 c1 ff
+       build_bind_packet(); //01 01 e9 49 ec a9 c4 c1 ff
        //CYRF_WriteDataPacketLen(packet, 0x09);
 }
 static void cyrf_datainit()

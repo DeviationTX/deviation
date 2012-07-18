@@ -1,7 +1,7 @@
 SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp)
 SRC_C  = $(wildcard target/$(TARGET)/*.c)
 
-LFLAGS = -lfltk -lportaudio
+LFLAGS = -lfltk
 SCREENSIZE = qvga
 all = $(TARGET)
 
@@ -17,4 +17,10 @@ ifdef WINDOWS
     CFLAGS := -I$(FLTK_DIR)/include -DWIN32 $(CFLAGS)
     EXEEXT = exe
     ODIREXT = -w32
+else
+    ifndef SOUND
+        CFLAGS := -DNO_SOUND
+    else
+        LFLAGS := $(LFLAGS) -lportaudio
+    endif
 endif

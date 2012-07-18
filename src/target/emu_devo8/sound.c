@@ -25,7 +25,6 @@
  */
 #include <stdio.h>
 #include <math.h>
-#include "portaudio.h"
 #include "target.h"
 
 #define SAMPLE_RATE   (44100)
@@ -36,6 +35,14 @@
 #endif
 
 #define TABLE_SIZE   (250)
+#ifdef NO_SOUND
+void SOUND_SetFrequency(u16 freq, u8 volume) {(void)freq; (void)volume;}
+void SOUND_Init() {}
+void SOUND_Start(u16 msec, u16(*next_note_cb)()) {(void)msec; (void)next_note_cb;}
+void SOUND_Stop() {}
+#else
+
+#include "portaudio.h"
 
 struct {
     PaStreamParameters outputParameters;
@@ -46,7 +53,7 @@ struct {
     int phase;
     const int *ptr;
     int duration;
-    
+    int enable;
     char message[20];
 } paData;
 
@@ -56,8 +63,9 @@ void SOUND_SetFrequency(u16 freq, u8 volume)
     if (freq == 0) {
         paData.table_size = TABLE_SIZE;
         volume = 0;
+    } else {
+        paData.table_size = SAMPLE_RATE / freq;
     }
-    paData.table_size = SAMPLE_RATE / freq;
     for(i = 0; i < paData.table_size; i++)
         paData.sine[i] = (float)volume / 100.0 * sin( ((double)i/(double)paData.table_size) * M_PI * 2. );
 }
@@ -105,11 +113,15 @@ void SOUND_Init()
     PaError err;
     memset(&paData, 0, sizeof(paData));
     err = Pa_Initialize();
-    if( err != paNoError )
+    if( err != paNoError ) {
+        printf("Sound initialization failed.  Disabling sound\n");
+        Pa_Terminate();
         return;
+    }
     paData.outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (paData.outputParameters.device == paNoDevice) {
       printf("Error: No default output device.\n");
+      Pa_Terminate();
       return;
     }
     paData.outputParameters.channelCount = 2;       /* stereo output */
@@ -117,9 +129,13 @@ void SOUND_Init()
     paData.outputParameters.suggestedLatency =
               Pa_GetDeviceInfo( paData.outputParameters.device )->defaultLowOutputLatency;
     paData.outputParameters.hostApiSpecificStreamInfo = NULL;
+    paData.enable = 1;
 }
+
 void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
     PaError err;
+    if (! paData.enable)
+        return;
     paData.duration = SAMPLE_RATE * (long)msec / 1000;
     err = Pa_OpenStream(
               &paData.stream,
@@ -130,12 +146,23 @@ void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
               paClipOff,      /* we won't output out of range samples so don't bother clipping them */
               paCallback,
               next_note_cb);
-    if (err != paNoError)
+    if (err != paNoError) {
+        printf("Sound Failed.  Disabling\n");
+        paData.enable = 0;
+        Pa_Terminate();
         return;
-    Pa_StartStream(paData.stream);
+    }
+    err = Pa_StartStream(paData.stream);
+    if(err != paNoError) {
+        printf("Sound Failed.  Disabling\n");
+        paData.enable = 0;
+        Pa_Terminate();
+        return;
+    }
 }
 
 void SOUND_Stop()
 {
     Pa_StopStream( paData.stream );
 }
+#endif

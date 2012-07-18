@@ -27,12 +27,47 @@ static char t2[40];
 static guiObject_t *lblVoltage;
 static guiObject_t *lblTE;
 static guiObject_t *lblRA;
+static char buttonmessage[30];
 
+void PushMeButton(guiObject_t *obj, void *data) {
+    GUI_RemoveObj(obj);
+    sprintf(buttonmessage,"%s",(const char *)data);
+}
+void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
+    (void)gDR;
+    GUI_RemoveObj(obj);
+}
+s16 xy_cb(s16 val, void *data) {
+    (void)data;
+    return val;
+}
+const char *ts_cb(guiObject_t *obj, int value, void *data) {
+    (void)data;
+    (void)obj;
+    static int idx = 0;
+    const char *str[] = {
+         "None",
+         "String 1",
+         "String 2",
+         };
+    if(value > 0) {
+        if(idx < 2)
+            idx++;
+    } else if(value < 0) {
+        if(idx)
+            idx--;
+    }
+    return str[idx];
+}
+s16 bar_cb(void *data) {
+    (void)data;
+    static int val = 100;
+    return val++;
+}
 void PAGE_TestInit(int page)
 {
     (void)page;
     static char strBootLoader[80],strSPIFlash[80],strMfg[80];
-    static char buttonmessage[30];
     static const char *button1 = "Button 1";
     static const char *button2 = "Button 2";
     static const char *button3 = "Button 3";
@@ -46,41 +81,6 @@ void PAGE_TestInit(int page)
     sprintf(t2," ");
     /* GUI Callbacks */
 
-    void PushMeButton(guiObject_t *obj, void *data) {
-        GUI_RemoveObj(obj);
-        sprintf(buttonmessage,"%s",(const char *)data);
-    }
-    void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
-        (void)gDR;
-        GUI_RemoveObj(obj);
-    }
-    s16 xy_cb(s16 val, void *data) {
-        (void)data;
-        return val;
-    }
-    const char *ts_cb(guiObject_t *obj, int value, void *data) {
-        (void)data;
-        (void)obj;
-        static int idx = 0;
-        const char *str[] = {
-             "None",
-             "String 1",
-             "String 2",
-             };
-        if(value > 0) {
-            if(idx < 2)
-                idx++;
-        } else if(value < 0) {
-            if(idx)
-                idx--;
-        }
-        return str[idx];
-    }
-    s16 bar_cb(void *data) {
-        (void)data;
-        static int val = 100;
-        return val++;
-    }
     {
         u8 * pBLString = BOOTLOADER_Read(BL_ID);
         u8 mfgdata[6];

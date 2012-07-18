@@ -1,7 +1,7 @@
 #ifndef _MAIN_PAGE_H_
 #define _MAIN_PAGE_H_
 
-#define TRIMS_TO_SHOW 4
+#define TRIMS_TO_SHOW 6
 struct main_page {
     guiObject_t *trimObj[TRIMS_TO_SHOW];
     guiObject_t *throttleObj;

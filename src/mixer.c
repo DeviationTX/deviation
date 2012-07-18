@@ -131,7 +131,7 @@ void MIX_CalcChannels()
     }
 }
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
-#define REZ_SWASH_Y(x)  ((x))   //  1024 => 1024
+#define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
 void MIX_CreateCyclicInputs(s16 *raw)
 {
     if (! Model.swash_type)
