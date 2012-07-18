@@ -65,7 +65,7 @@ void PAGE_MainInit(int page)
     //Icon
     mp->iconObj = GUI_CreateImage(205, 40, 96, 96, CONFIG_GetCurrentIcon());
     //Battery
-    if (Display.show_bat_icon) {
+    if (Display.flags & SHOW_BAT_ICON) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {
         GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL);

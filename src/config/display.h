@@ -33,12 +33,26 @@ struct disp_listbox {
     u16 fg_bar;
 };
 
+struct disp_bargraph {
+    u16 bg_color;
+    u16 fg_color;
+    u16 outline_color;
+};
+
+enum DispFlags {
+    BAR_TRANSPARENT   = 0x01,
+    TRIM_TRANSPARENT  = 0x02,
+    SHOW_BAT_ICON     = 0x80,
+};
+
 struct display_settings {
     struct LabelDesc font[NUM_LABELS];
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
+    struct disp_bargraph bargraph;
+    struct disp_bargraph trim;
     u16 select_color;
-    u8 show_bat_icon;
+    enum DispFlags flags;
 };
 
 extern struct display_settings Display;

@@ -24,9 +24,12 @@
 static const char FONT[] = "font";
 static const char * const FONT_VAL[] = { "default", "modelname", "title", "throttle", "timer", "battery", "misc1"};
 static const char COLOR[] = "color";
-static const char FILL_COLOR[] = "fill_color";
-static const char OUTLINE_COLOR[] = "edge_color";
+static const char BG_COLOR[] = "bg_color";
+static const char FG_COLOR[] = "fg_color";
+static const char OUTLINE_COLOR[] = "outline_color";
 static const char FONT_COLOR[] = "font_color";
+static const char IS_TRANSPARENT[] = "transparent";
+static const char * const BARGRAPH_VAL[] = { "bargraph", "trim" };
 static const char BOX[] = "box_type";
 static const char * const BOX_VAL[] = { "none", "center", "fill", "outline" };
 
@@ -36,6 +39,7 @@ static const char * const BOX_VAL[] = { "none", "center", "fill", "outline" };
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
+#define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
 
 extern const char * const FontNames[10];
 
@@ -70,7 +74,7 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
         label->font_color = get_color(value);
         return 1;
     }
-    if(MATCH_KEY(FILL_COLOR)) {
+    if(MATCH_KEY(BG_COLOR)) {
         label->fill_color = get_color(value);
         return 1;
     }
@@ -89,11 +93,41 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
     return 0;
 }
 
+static int handle_bargraph(struct display_settings *d, u8 idx, const char *name, const char *value)
+{
+    struct disp_bargraph *graph;
+    enum DispFlags flag;
+    if (idx == 0) {
+        graph = &d->bargraph;
+        flag = BAR_TRANSPARENT;
+    } else {
+        graph = &d->trim;
+        flag = TRIM_TRANSPARENT;
+    }
+    if(MATCH_KEY(BG_COLOR)) {
+        graph->bg_color = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(FG_COLOR)) {
+        graph->fg_color = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(OUTLINE_COLOR)) {
+        graph->outline_color = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(IS_TRANSPARENT)) {
+        d->flags = SET_FLAG(d->flags, atoi(value), flag);
+        return 1;
+    }
+    return 0;
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
+    u8 idx;
     struct display_settings *d = (struct display_settings *)user;
     if(MATCH_START(section, FONT) && strlen(section) > sizeof(FONT)) {
-        u8 idx;
         for (idx = 0; idx < NUM_STR_ELEMS(FONT_VAL); idx++) {
             if (0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
                 handle_label(&d->font[idx], name, value);
@@ -105,7 +139,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     if(MATCH_START(section, "general")) {
         if(MATCH_KEY("bat_icon")) {
-            d->show_bat_icon = atoi(value);
+            d->flags = SET_FLAG(d->flags, atoi(value), SHOW_BAT_ICON);
             return 1;
         }
     }
@@ -144,7 +178,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->keyboard.fg_key3 = get_color(value);
             return 1;
         }
-        if(MATCH_KEY("fill_color")) {
+        if(MATCH_KEY(BG_COLOR)) {
             d->keyboard.fill_color = get_color(value);
             return 1;
         }
@@ -154,11 +188,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->listbox.font = get_font(value);
             return 1;
         }
-        if(MATCH_KEY("bg_color")) {
+        if(MATCH_KEY(BG_COLOR)) {
             d->listbox.bg_color = get_color(value);
             return 1;
         }
-        if(MATCH_KEY("fg_color")) {
+        if(MATCH_KEY(FG_COLOR)) {
             d->listbox.fg_color = get_color(value);
             return 1;
         }
@@ -176,6 +210,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if(MATCH_KEY("fg_bar")) {
             d->listbox.fg_bar = get_color(value);
+            return 1;
+        }
+    }
+    for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
+        if(MATCH_SECTION(BARGRAPH_VAL[idx])) {
+            handle_bargraph(d, idx, name, value);
             return 1;
         }
     }

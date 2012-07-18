@@ -58,54 +58,72 @@ void GUI_DrawBarGraph(struct guiObject *obj)
 #define TRIM_MARGIN 1
     struct guiBox *box = &obj->box;
     struct guiBarGraph *graph = &obj->o.bar;
+    struct disp_bargraph *disp;
     int height = box->height - 2;
     int width  = box->width - 2;
     int x = box->x + 1;
     int y = box->y + 1;
 
-    LCD_DrawRect(box->x, box->y, box->width, box->height, 0xFFFF);
+    disp = graph->direction == BAR_HORIZONTAL ||
+           graph->direction == BAR_VERTICAL
+             ? &Display.bargraph
+             : &Display.trim;
+
+    LCD_DrawRect(box->x, box->y, box->width, box->height, disp->outline_color);
     
     s32 val = graph->CallBack(graph->cb_data);
 
     switch(graph->direction) {
     case BAR_HORIZONTAL: {
         val = width * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(x, y, val, height, 0xFFE0);
-#ifdef TRANSPARENT_BARGRAPH
-        if (OBJ_IS_SHOWN(obj))
-            GUI_DrawBackground(x + val, y, width - val, height);
-#else
-        LCD_FillRect(x + val, y, width - val, height, 0x0000);
-#endif
+        LCD_FillRect(x, y, val, height, disp->fg_color);
+        if (Display.flags & BAR_TRANSPARENT) {
+            if (OBJ_IS_SHOWN(obj))
+                GUI_DrawBackground(x + val, y, width - val, height);
+        } else {
+            LCD_FillRect(x + val, y, width - val, height, disp->bg_color);
+        }
         break;
     }
     case BAR_VERTICAL: {
         val = height * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(x, y + (height - val), width, val, 0xFFE0);
-#ifdef TRANSPARENT_BARGRAPH
-        if (OBJ_IS_SHOWN(obj))
-            GUI_DrawBackground(x, y, width, height - val);
-#else
-        LCD_FillRect(x, y, width, height - val, 0x0000);
-#endif
+        LCD_FillRect(x, y + (height - val), width, val, disp->fg_color);
+        if (Display.flags & BAR_TRANSPARENT) {
+            if (OBJ_IS_SHOWN(obj))
+                GUI_DrawBackground(x, y, width, height - val);
+        } else {
+            LCD_FillRect(x, y, width, height - val, disp->bg_color);
+        }
         break;
     }
     case TRIM_HORIZONTAL: {
         val = (TRIM_THICKNESS / 2) + (width - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
-        if (OBJ_IS_SHOWN(obj))
-            GUI_DrawBackground(x, y, width, height);
+        if (Display.flags & TRIM_TRANSPARENT) {
+            if (OBJ_IS_SHOWN(obj))
+                GUI_DrawBackground(x, y, width, height);
+        } else {
+            LCD_FillRect(x, y, width, height, disp->bg_color);
+        }
 //        LCD_DrawFastHLine(x, y + height / 2, width, 0x0000); //Main axis
-        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Center
-        LCD_FillRect(x + val - TRIM_THICKNESS / 2, y + TRIM_MARGIN, TRIM_THICKNESS, height - TRIM_MARGIN * 2, 0x0000);
+        LCD_DrawFastVLine(x + width / 2, y, height, disp->outline_color); //Center
+        LCD_FillRect(x + val - TRIM_THICKNESS / 2,
+                     y + TRIM_MARGIN,
+                     TRIM_THICKNESS, height - TRIM_MARGIN * 2, disp->fg_color);
         break;
     }
     case TRIM_VERTICAL: {
         val = (TRIM_THICKNESS / 2) + (height - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
-        if (OBJ_IS_SHOWN(obj))
-            GUI_DrawBackground(x, y, width, height);
+        if (Display.flags & TRIM_TRANSPARENT) {
+            if (OBJ_IS_SHOWN(obj))
+                GUI_DrawBackground(x, y, width, height);
+        } else {
+            LCD_FillRect(x, y, width, height, disp->bg_color);
+        }
 //        LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Main axis
-        LCD_DrawFastHLine(x, y + height / 2, width, 0xFFFF); //Center
-        LCD_FillRect(x + TRIM_MARGIN, y + (height - val) - TRIM_THICKNESS / 2, width - TRIM_MARGIN * 2, TRIM_THICKNESS, 0x0000);
+        LCD_DrawFastHLine(x, y + height / 2, width, disp->outline_color); //Center
+        LCD_FillRect(x + TRIM_MARGIN,
+                     y + (height - val) - TRIM_THICKNESS / 2,
+                     width - TRIM_MARGIN * 2, TRIM_THICKNESS, disp->fg_color);
         break;
     }
     }
