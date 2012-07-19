@@ -100,6 +100,6 @@ static const char *channum_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     long ch = (long)data;
-    sprintf(cp->tmpstr, "%d", (int)ch);
+    sprintf(cp->tmpstr, "%d", (int)ch+1);
     return cp->tmpstr;
 }
