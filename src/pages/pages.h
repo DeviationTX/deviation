@@ -5,6 +5,7 @@
 #include "main_page.h"
 #include "trim_page.h"
 #include "model_page.h"
+#include "chantest_page.h"
 
 struct pagemem {
     union {
@@ -12,6 +13,7 @@ struct pagemem {
         struct mixer_page mixer_page;
         struct trim_page trim_page;
         struct model_page model_page;
+        struct chantest_page chantest_page;
     } u;
 };
 

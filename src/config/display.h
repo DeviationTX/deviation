@@ -9,8 +9,9 @@
 #define THROTTLE_FONT  (Display.font[3])
 #define TIMER_FONT     (Display.font[4])
 #define BATTERY_FONT   (Display.font[5])
-#define MISC1_FONT     (Display.font[6])
-#define NUM_LABELS 7
+#define CHAN_FONT      (Display.font[6])
+#define MISC1_FONT     (Display.font[7])
+#define NUM_LABELS 8
 
 struct disp_keyboard {
     u8 font;
