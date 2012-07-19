@@ -103,6 +103,7 @@ enum GUIType {
     TextSelect,
     Listbox,
     Keyboard,
+    Scrollbar,
 };
 struct guiImage {
     const char *file;
@@ -133,6 +134,15 @@ struct guiKeyboard {
     void *cb_data;
 };
 
+struct guiScrollbar {
+    u8 state;
+    u8 num_items;
+    u8 cur_pos;
+    struct guiObject *parent;
+    u8 (*callback)(struct guiObject *obj, u8 pos, s8 dir, void *data);
+    void *cb_data;
+};
+
 struct guiButton {
     const struct ImageMap *image;
     const char *text;
@@ -149,6 +159,7 @@ struct guiListbox {
     u8 item_count;
     u8 cur_pos;
     s16 selected;
+    struct guiObject *scrollbar;
     const char * (*string_cb)(u8 idx, void * data);
     void (*select_cb)(struct guiObject *obj, u16 selected, void * data);
     void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
@@ -211,6 +222,7 @@ struct guiObject {
         struct guiTextSelect textselect;
         struct guiListbox listbox;
         struct guiKeyboard keyboard;
+        struct guiScrollbar scrollbar;
     } o;
 };
 
@@ -258,6 +270,8 @@ void GUI_DrawDialog(struct guiObject *obj);
 void GUI_DrawImage(struct guiObject *obj);
 void GUI_DrawButton(struct guiObject *obj);
 void GUI_DrawBarGraph(struct guiObject *obj);
+void GUI_DrawScrollbar(struct guiObject *obj);
+u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 void GUI_DrawObject(struct guiObject *obj);
 void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h);
@@ -299,6 +313,10 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         void *cb_data);
 guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
         void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+guiObject_t *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
+        u8 num_items, guiObject_t *parent,
+        u8 (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
+
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
 void GUI_TouchRelease();
 void GUI_DrawScreen(void);

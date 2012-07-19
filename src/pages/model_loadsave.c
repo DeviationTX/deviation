@@ -99,6 +99,7 @@ void MODELPage_ShowLoadSave(int loadsave)
             break;
     }
     num_models--;
+num_models = 100;
     mp->selected = CONFIG_GetCurrentModel();
     GUI_CreateListBox(112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, NULL);
     mp->icon = GUI_CreateImage(8, 88, 96, 96, CONFIG_GetCurrentIcon());
