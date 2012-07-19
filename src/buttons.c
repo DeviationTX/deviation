@@ -17,6 +17,9 @@
 
 static buttonAction_t *buttonHEAD = NULL;
 u32 last_buttons;
+u8 long_press;
+
+static buttonAction_t *buttonPressed = NULL;
 u16 button_time;
 
 u8 BUTTON_RegisterCallback(buttonAction_t *action, u32 button, u8 flags,
@@ -92,8 +95,9 @@ u32 BUTTON_Handler(u8 flags)
                 testflags = BUTTON_PRESS;
             } else {
                 testbutton = last_buttons;
-                testflags = BUTTON_RELEASE;
+                testflags = BUTTON_RELEASE | (long_press ? BUTTON_HAD_LONGPRESS : 0);
             }
+            long_press = 0;
             last_buttons = buttons;
         } else {
             return buttons;
@@ -102,14 +106,20 @@ u32 BUTTON_Handler(u8 flags)
         if (last_buttons && button_time++ >= 4 && (button_time & 0x01)) {
             testbutton = last_buttons;
             testflags = BUTTON_LONGPRESS;
+            long_press = 1;
         } else {
             return 0;
         }
     }
     while(ptr) {
         if ((ptr->button & testbutton) && (ptr->flags & testflags)) {
-            if(ptr->callback(testbutton, testflags, ptr->data))
-                return 0;
+            if(!(testflags & BUTTON_RELEASE) || buttonPressed == ptr) {
+                if(ptr->callback(testbutton, testflags, ptr->data)) {
+                    if (testflags & BUTTON_PRESS)
+                        buttonPressed = ptr;
+                    return 0;
+                }
+            }
         }
         ptr = ptr->next;
     }

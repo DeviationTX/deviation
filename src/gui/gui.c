@@ -407,6 +407,8 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         {
             GUI_TouchRelease();
             return 1;
+        } else if (flags & BUTTON_HAD_LONGPRESS) {
+            return 0;
         } else if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
                    (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_UP)))
         {
@@ -441,7 +443,7 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         CHAN_ButtonIsPressed(button, BUT_UP) ||
         CHAN_ButtonIsPressed(button, BUT_EXIT))
     {
-        return 1;
+        return (flags & BUTTON_LONGPRESS) ? 0 : 1;
     }
     if (objSELECTED) {
         if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
