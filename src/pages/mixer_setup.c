@@ -108,6 +108,7 @@ static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
 static void okcancel_cb(guiObject_t *obj, void *data);
+static u8 touch_cb(s16 x, s16 y, void *data);
 
 #define COL1_TEXT   8
 #define COL1_VALUE  56
@@ -150,10 +151,10 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 96, NULL, DEFAULT_FONT, "Min:");
     GUI_CreateTextSelect(COL2_VALUE, 96, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
     //Row 5
-    mp->graph = GUI_CreateXYGraph(COL1_TEXT, 120, 304, 112,
+    mp->graph = GUI_CreateXYGraph(104, 120, 112, 112,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0].curve);
 }
 
 void toggle_link_cb(guiObject_t *obj, void *data)
@@ -212,7 +213,7 @@ static void show_expo_dr()
     mp->graph = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0].curve);
 }
 
 
@@ -239,10 +240,10 @@ static void show_complex()
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 118, NULL, DEFAULT_FONT, "Switch:");
     GUI_CreateTextSelect(COL1_VALUE, 118, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
-    mp->graph = GUI_CreateXYGraph(COL2_TEXT, 118, 144, 114,
+    mp->graph = GUI_CreateXYGraph(182, 118, 114, 114,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->cur_mixer->curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->cur_mixer->curve);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 144, NULL, DEFAULT_FONT, "Mux:");
     GUI_CreateTextSelect(COL1_VALUE, 144, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
@@ -519,4 +520,20 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     GUI_RemoveAllObjects();
     mp->graph = NULL;
     PAGE_MixerInit(0);
+}
+
+static u8 touch_cb(s16 x, s16 y, void *data)
+{
+    (void)x;
+    (void)y;
+    struct Curve *curve = (struct Curve *)data;
+    void *func;
+    switch (mp->cur_template) {
+        case MIXERTEMPLATE_EXPO_DR: func = show_expo_dr; break;
+        case MIXERTEMPLATE_SIMPLE:  func = show_simple; break;
+        case MIXERTEMPLATE_COMPLEX: func = show_complex; break;
+        default: return 0;
+    }
+    MIXPAGE_EditCurves(curve, func);   
+    return 1;
 }
