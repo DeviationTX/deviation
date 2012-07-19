@@ -107,7 +107,7 @@ int ini_parse_file(FILE* file,
         if (eol == data + len) {
             continue;
         }
-        printf("%d: %s\n", lineno, line);
+        //printf("%d: %s\n", lineno, line);
         lineno++;
 
         start = line;
