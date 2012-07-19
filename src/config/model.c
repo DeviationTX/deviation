@@ -39,7 +39,7 @@ const char * const RADIO_PROTOCOL_VAL[] = {
      "Flysky",
 #endif
 #ifdef PROTO_HAS_CYRF6936
-     "DEVO", "DSM2", "J6Pro"
+     "DEVO", "WK2801", "WK2601", "WK2401", "DSM2", "J6Pro"
 #endif
      };
 
