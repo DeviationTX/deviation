@@ -4,13 +4,22 @@ TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
 include target/$(TARGET)/Makefile.inc
 
-CC       ?= $(CROSS)gcc
-CXX      ?= $(CROSS)g++
-LD       ?= $(CROSS)ld
-AR       ?= $(CROSS)ar
-AS       ?= $(CROSS)as
-CP       ?= $(CROSS)objcopy
-DUMP     ?= $(CROSS)objdump
+ifdef CROSS
+    CC   = $(CROSS)gcc
+    CXX  = $(CROSS)g++
+    LD   = $(CROSS)ld
+    AR   = $(CROSS)ar
+    AS   = $(CROSS)as
+    CP   = $(CROSS)objcopy
+    DUMP = $(CROSS)objdump
+endif
+CC   ?= gcc
+CXX  ?= g++
+LD   ?= ld
+AR   ?= ar
+AS   ?= as
+CP   ?= objcopy
+DUMP ?= objdump
 
 SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/$(SCREENSIZE)/*.c) $(wildcard gui/*.c) $(wildcard pages/*.c) \
 		$(wildcard protocol/*.c) $(wildcard config/*.c)

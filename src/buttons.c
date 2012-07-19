@@ -30,7 +30,7 @@ u8 BUTTON_RegisterCallback(buttonAction_t *action, u32 button, u8 flags,
     if (! (flags & BUTTON_PRIORITY)) {
         while(ptr) {
             if((ptr->button & button) && (ptr->flags & flags) & ! (ptr->flags & BUTTON_PRIORITY)) {
-                printf("Button %d with flags %d is already assigned\n", button, flags);
+                printf("Button %08x with flags %d is already assigned\n", (unsigned int)button, flags);
                 memset(action, 0, sizeof(buttonAction_t));
                 return 0;
             }
