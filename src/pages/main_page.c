@@ -35,7 +35,7 @@ void PAGE_MainInit(int page)
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
-    mp->nameObj = GUI_CreateLabelBox(90, 6, 125, 25, &MODELNAME_FONT,
+    mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, Model.name);
 
     //Throttle
