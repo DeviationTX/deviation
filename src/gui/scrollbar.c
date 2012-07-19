@@ -16,7 +16,10 @@
 #include "target.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
+#include "buttons.h"
 #include "config/display.h"
+
+static u8 button_cb(u32 button, u8 flags, void *data);
 
 #define PRESS_UP     0x01
 #define RELEASE_UP   0x02
@@ -53,6 +56,7 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
     scrollbar->num_items = num_items;
     scrollbar->cur_pos = 0;
     scrollbar->state = RELEASE_UP | RELEASE_DOWN;
+    BUTTON_RegisterCallback(&scrollbar->action, CHAN_ButtonMask(BUT_DOWN) | CHAN_ButtonMask(BUT_UP), BUTTON_LONGPRESS, button_cb, obj);
 
     return obj;
 }
@@ -145,4 +149,18 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
     return 0;
 }
 
+static u8 button_cb(u32 button, u8 flags, void *data)
+{
+    struct guiObject *obj = (struct guiObject *)data;
+    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
 
+    if (!(flags & BUTTON_LONGPRESS))
+        return 0;
+    s8 dir = (button & CHAN_ButtonMask(BUT_DOWN)) ? 2 : -2;
+    u8 newpos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos,dir, scrollbar->cb_data);
+    if (newpos != scrollbar->cur_pos) {
+        scrollbar->cur_pos = newpos;
+        OBJ_SET_DIRTY(obj, 1);
+    }
+    return 1;
+}

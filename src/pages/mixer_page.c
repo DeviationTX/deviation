@@ -130,6 +130,8 @@ void limitselect_cb(guiObject_t *obj, void *data)
 }
 
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
+    (void)parent;
+    (void)data;
     s16 newpos;
     if (direction > 0) {
         newpos = pos + (direction > 1 ? ENTRIES_PER_PAGE : 1);

@@ -66,6 +66,8 @@ typedef void guiObject_t;
 #else
 typedef struct guiObject guiObject_t;
 
+#include "buttons.h"
+
 enum ImageNames {
     FILE_BTN96_24,
     FILE_BTN48_24,
@@ -138,6 +140,7 @@ struct guiScrollbar {
     u8 state;
     u8 num_items;
     u8 cur_pos;
+    buttonAction_t action;
     struct guiObject *parent;
     u8 (*callback)(struct guiObject *obj, u8 pos, s8 dir, void *data);
     void *cb_data;
@@ -328,7 +331,7 @@ void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);
 struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
-u32 GUI_Select(u32 button, u8 long_press);
+void GUI_HandleButtons(u8 enable);
 
 #include "config/display.h"
 

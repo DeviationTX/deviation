@@ -21,6 +21,7 @@
 
 #include "target.h"
 #include "mixer.h"
+#include "buttons.h"
 #include "config/model.h"
 
 #define SWASH_INV_ELEVATOR_MASK   1
@@ -33,10 +34,12 @@
 
 s16 Channels[NUM_CHANNELS];
 s8 Trims[NUM_TRIMS];
-
 struct Transmitter Transmitter;
+
+static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
 static s8 get_trim(u8 src);
+static u8 update_trim(u32 buttons, u8 flags, void *data);
 
 struct Mixer *MIX_GetAllMixers()
 {
@@ -256,6 +259,7 @@ u8 switch_is_on(u8 sw, s16 *raw)
 
 void TEST_init_mixer()
 {
+    int i;
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
     CONFIG_ReadModel(1);
@@ -264,29 +268,13 @@ void TEST_init_mixer()
     Model.Elevator_Stick   = INP_ELEVATOR;
     Model.Aileron_Stick    = INP_AILERON;
     Model.Collective_Stick = INP_THROTTLE;
-/*
-    int i;
-    for (i = 0; i < 4; i++) {
-        Model.mixers[i].src = i + 1;
-        Model.mixers[i].dest = i;
-        Model.mixers[i].scalar = 100;
-        Model.trims[i].src = MIXER_MapChannel(i + 1, Model.mode); 
-        Model.trims[i].neg = i * 2 + 1;
-        Model.trims[i].pos = i * 2 + 2;
-        Model.trims[i].step = 10;
-    }
-
-    for(i = 0; i < NUM_CHANNELS; i++) {
-        Model.limits[i].max = 100;
-        Model.limits[i].min = -100;
-        if (i < 4) {
-            Model.template[i] = MIXERTEMPLATE_SIMPLE;
-        } else {
-            Model.template[i] = MIXERTEMPLATE_NONE;
-        }
-    }
-*/
     PROTOCOL_Init(PROTOCOL_NONE);
+    u32 mask = 0;
+    for (i = 0; i < NUM_TRIMS; i++) {
+        mask |= CHAN_ButtonMask(Model.trims[i].neg);
+        mask |= CHAN_ButtonMask(Model.trims[i].pos);
+    }
+    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS, update_trim, NULL);
 }
 
 
@@ -447,8 +435,10 @@ void MIX_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
-void MIX_UpdateTrim(u32 buttons)
+u8 update_trim(u32 buttons, u8 flags, void *data)
 {
+    (void)data;
+    (void)flags;
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
@@ -460,4 +450,5 @@ void MIX_UpdateTrim(u32 buttons)
             Trims[i] = tmp > 100 ? 100 : tmp;
         }
     }
+    return 1;
 }

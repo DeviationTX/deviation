@@ -146,7 +146,6 @@ void FS_Unmount();
 
 /* Mixer functions */
 void MIX_CalcChannels();
-void MIX_UpdateTrim(u32 buttons);
 
 /* GUI Pages */
 void PAGE_Init();
