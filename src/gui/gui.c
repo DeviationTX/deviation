@@ -92,6 +92,22 @@ void GUI_DrawObjects(void)
     }
 }
 
+void GUI_RemoveHierObjects(struct guiObject *obj)
+{
+    struct guiObject *parent = objHEAD;
+    if(obj == objHEAD) {
+        GUI_RemoveAllObjects();
+        return;
+    }
+    while(parent && parent->next != obj)
+        parent = parent->next;
+    if(! parent)
+        return;
+    while(parent->next)
+        GUI_RemoveObj(parent->next);
+    FullRedraw = 1;
+}
+
 void GUI_RemoveAllObjects()
 {
     while(objHEAD)

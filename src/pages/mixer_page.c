@@ -28,22 +28,28 @@ const char *channel_name[] = {
 static void templateselect_cb(guiObject_t *obj, void *data);
 static void limitselect_cb(guiObject_t *obj, void *data);
 static const char *show_source(guiObject_t *obj, void *data);
+static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 
-#define ENTRIES_PER_PAGE 8
-
-void PAGE_MixerInit(int page)
+#define ENTRIES_PER_PAGE (8 > NUM_CHANNELS ? NUM_CHANNELS : 8)
+#define MAX_SCROLL (NUM_CHANNELS > ENTRIES_PER_PAGE ? NUM_CHANNELS - ENTRIES_PER_PAGE : NUM_CHANNELS)
+void show_page()
 {
     int init_y = 40;
     int i;
-    mp->modifying_template = 0;
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
+    if (mp->firstObj) {
+        GUI_RemoveHierObjects(mp->firstObj); 
+        mp->firstObj = NULL;
+    }
     struct Mixer *mix = MIX_GetAllMixers();
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
+        guiObject_t *obj;
         u8 idx;
         int row = init_y + 24 * i;
-        u8 ch = ENTRIES_PER_PAGE * page + i;
+        u8 ch = mp->top_channel + i;
         enum TemplateType template = MIX_GetTemplate(ch);
-        GUI_CreateButton(8, row, BUTTON_48x16, channel_name[ENTRIES_PER_PAGE * page + i], 0x0000, limitselect_cb, (void *)((long)ch));
+        obj = GUI_CreateButton(8, row, BUTTON_48x16, channel_name[ch], 0x0000, limitselect_cb, (void *)((long)ch));
+        if (! mp->firstObj)
+            mp->firstObj = obj;
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].dest == ch)
                 break;
@@ -60,6 +66,17 @@ void PAGE_MixerInit(int page)
             }
         }
     }
+}
+
+void PAGE_MixerInit(int page)
+{
+    (void)page;
+    mp->modifying_template = 0;
+    mp->firstObj = NULL;
+    mp->top_channel = 0;
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
+    GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
+    show_page();
 }
 
 static const char *show_source(guiObject_t *obj, void *data)
@@ -111,3 +128,22 @@ void limitselect_cb(guiObject_t *obj, void *data)
     mp->channel = ch;
     MIXPAGE_EditLimits();
 }
+
+static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
+    s16 newpos;
+    if (direction > 0) {
+        newpos = pos + (direction > 1 ? ENTRIES_PER_PAGE : 1);
+        if (newpos > MAX_SCROLL)
+            newpos = MAX_SCROLL;
+    } else {
+        newpos = pos - (direction < -1 ? ENTRIES_PER_PAGE : 1);
+        if (newpos < 0)
+            newpos = 0;
+    }
+    if (newpos != pos) {
+        mp->top_channel = newpos;
+        show_page();
+    }
+    return newpos;
+}
+

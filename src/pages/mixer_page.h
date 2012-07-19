@@ -11,9 +11,12 @@ struct curve_edit {
     s8 pointnum;
     guiObject_t *graph;
     guiObject_t *value;
+    
 };
 struct mixer_page {
     u8 modifying_template;
+    u8 top_channel;
+    guiObject_t *firstObj;
     struct Mixer mixer[5];
     struct Mixer *cur_mixer;
     struct Limit limit;

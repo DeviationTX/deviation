@@ -325,6 +325,7 @@ void GUI_Redraw(guiObject_t *obj);
 void GUI_DrawObjects(void);
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
+void GUI_RemoveHierObjects(guiObject_t *obj);
 struct guiObject *GUI_IsModal(void);
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
 u32 GUI_Select(u32 button, u8 long_press);
