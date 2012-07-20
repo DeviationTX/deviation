@@ -39,6 +39,10 @@ struct disp_bargraph {
     u16 fg_color;
     u16 outline_color;
 };
+struct disp_scrollbar {
+    u16 bg_color;
+    u16 fg_color;
+};
 
 enum DispFlags {
     BAR_TRANSPARENT   = 0x01,
@@ -50,6 +54,7 @@ struct display_settings {
     struct LabelDesc font[NUM_LABELS];
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
+    struct disp_scrollbar scrollbar;
     struct disp_bargraph bargraph;
     struct disp_bargraph trim;
     u16 select_color;

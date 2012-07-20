@@ -9,7 +9,8 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
+ Ystb
+ou should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -204,12 +205,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->listbox.fg_select = get_color(value);
             return 1;
         }
-        if(MATCH_KEY("bg_bar")) {
-            d->listbox.bg_bar = get_color(value);
+    }
+    if(MATCH_START(section, "scrollbar")) {
+        if(MATCH_KEY(BG_COLOR)) {
+            d->scrollbar.bg_color = get_color(value);
             return 1;
         }
-        if(MATCH_KEY("fg_bar")) {
-            d->listbox.fg_bar = get_color(value);
+        if(MATCH_KEY(FG_COLOR)) {
+            d->scrollbar.fg_color = get_color(value);
             return 1;
         }
     }

@@ -64,8 +64,8 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
 void GUI_DrawScrollbar(struct guiObject *obj)
 {
     #define BAR_HEIGHT 10
-    #define BAR_BG      Display.listbox.bg_bar      // RGB888_to_RGB565(0x44, 0x44, 0x44)
-    #define BAR_FG      Display.listbox.fg_bar      // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
+    #define BAR_BG      Display.scrollbar.bg_color      // RGB888_to_RGB565(0x44, 0x44, 0x44)
+    #define BAR_FG      Display.scrollbar.fg_color      // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
     struct guiScrollbar *scrollbar = &obj->o.scrollbar;
     //if (scrollbar->state & (PRESS_UP | RELEASE_UP)) {
     GUI_DrawImageHelper(obj->box.x, obj->box.y, ARROW_UP, scrollbar->state & PRESS_UP ? DRAW_PRESSED : DRAW_NORMAL);
