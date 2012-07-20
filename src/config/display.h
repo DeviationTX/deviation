@@ -11,7 +11,8 @@
 #define BATTERY_FONT   (Display.font[5])
 #define CHAN_FONT      (Display.font[6])
 #define MISC1_FONT     (Display.font[7])
-#define NUM_LABELS 8
+#define BOLD_FONT      (Display.font[8])
+#define NUM_LABELS 9
 
 struct disp_keyboard {
     u8 font;
