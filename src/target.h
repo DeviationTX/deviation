@@ -155,9 +155,6 @@ void PAGE_Event();
 /* Protocol */
 enum Protocols {
     PROTOCOL_NONE,
-#ifdef PROTO_HAS_A7105
-    PROTOCOL_FLYSKY,
-#endif
 #ifdef PROTO_HAS_CYRF6936
     PROTOCOL_DEVO,
     PROTOCOL_WK2801,
@@ -165,6 +162,9 @@ enum Protocols {
     PROTOCOL_WK2401,
     PROTOCOL_DSM2,
     PROTOCOL_J6PRO,
+#endif
+#ifdef PROTO_HAS_A7105
+    PROTOCOL_FLYSKY,
 #endif
 };
 
