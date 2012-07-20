@@ -38,7 +38,7 @@ void PAGE_MainInit(int page)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
-                                      NULL, Model.name);
+                                      NULL, press_icon_cb, Model.name);
 
     //Throttle
     mp->trimObj[2] = GUI_CreateBarGraph(130, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
@@ -54,16 +54,16 @@ void PAGE_MainInit(int page)
     mp->trimObj[5] = GUI_CreateBarGraph(165, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
     //Throttle
     mp->throttleObj = GUI_CreateLabelBox(16, 40, 100, 40, &THROTTLE_FONT,
-                                         show_throttle_cb, &Channels[INP_THROTTLE - 1]);
+                                         show_throttle_cb, NULL, &Channels[INP_THROTTLE - 1]);
     //Pitch
     mp->pitchObj = GUI_CreateLabelBox(16, 90, 100, 40, &THROTTLE_FONT,
-                                      show_throttle_cb, &Channels[5]);
+                                      show_throttle_cb, NULL, &Channels[5]);
     //Timer
     mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 24, &TIMER_FONT,
-                                      show_throttle_cb, &Channels[5]);
+                                      show_throttle_cb, NULL, &Channels[5]);
     //Telemetry value
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
-                                          show_throttle_cb, &Channels[5]);
+                                          show_throttle_cb, NULL, &Channels[5]);
     //Icon
     mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, NULL);
  
@@ -71,7 +71,7 @@ void PAGE_MainInit(int page)
     if (Display.flags & SHOW_BAT_ICON) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
+        GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL, NULL);
     }
     //TxPower
     GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);

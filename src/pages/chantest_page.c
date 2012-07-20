@@ -45,22 +45,22 @@ void PAGE_ChantestInit(int page)
     u16 offset = (320 + (SEPERATION - 10) - SEPERATION * count) / 2;
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 40,
-                                      SEPERATION, 10, &CHAN_FONT, channum_cb, (void *)((long)i));
+                                      SEPERATION, 10, &CHAN_FONT, channum_cb, NULL, (void *)((long)i));
         cp->bar[i] = GUI_CreateBarGraph(offset + SEPERATION * i, 50, 10, height,
                                     CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                                     showchan_cb, (void *)((long)i));
         cp->value[i] = GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
-                                      SEPERATION, 10, &CHAN_FONT, value_cb, (void *)((long)i));
+                                      SEPERATION, 10, &CHAN_FONT, value_cb, NULL, (void *)((long)i));
         cp->pctvalue[i] = RANGE_TO_PCT(Channels[i]);
     }
     for(i = count; i < Model.num_channels; i++) {
         GUI_CreateLabelBox(offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 215 - height,
-                                      SEPERATION, 10, &CHAN_FONT, channum_cb, (void *)((long)i));
+                                      SEPERATION, 10, &CHAN_FONT, channum_cb, NULL, (void *)((long)i));
         cp->bar[i] = GUI_CreateBarGraph(offset + SEPERATION * (i - count), 224 - height, 10, height,
                                     CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                                     showchan_cb, (void *)((long)i));
         cp->value[i] = GUI_CreateLabelBox(offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 225,
-                                      SEPERATION, 10, &CHAN_FONT, value_cb, (void *)((long)i));
+                                      SEPERATION, 10, &CHAN_FONT, value_cb, NULL, (void *)((long)i));
         cp->pctvalue[i] = RANGE_TO_PCT(Channels[i]);
     }
 }

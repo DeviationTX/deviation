@@ -62,12 +62,12 @@ void GUI_DrawObject(struct guiObject *obj)
 {
     switch (obj->Type) {
     case UnknownGUI: break;
+    case CheckBox:   break;
+    case Dropdown:   break;
     case Button:     GUI_DrawButton(obj);            break;
     case Label:      GUI_DrawLabel(obj);             break;
     case Image:      GUI_DrawImage(obj);             break;
     case Dialog:     GUI_DrawDialog(obj);            break;
-    case CheckBox:   break;
-    case Dropdown:   break;
     case XYGraph:    GUI_DrawXYGraph(obj);           break;
     case BarGraph:   GUI_DrawBarGraph(obj);          break;
     case TextSelect: GUI_DrawTextSelect(obj);        break;
@@ -246,6 +246,9 @@ void GUI_TouchRelease()
         case Image:
             GUI_TouchImage(objTOUCHED, NULL, -1);
             break;
+        case Label:
+            GUI_TouchLabel(objTOUCHED, NULL, -1);
+            break;
         case TextSelect:
             GUI_TouchTextSelect(objTOUCHED, NULL, -1);
             break;
@@ -274,7 +277,6 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             switch (obj->Type) {
             case UnknownGUI:
             case Dialog:
-            case Label:
             case CheckBox:
             case Dropdown:
             case BarGraph:
@@ -296,6 +298,16 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                         return 0;
                     objTOUCHED = obj;
                     return GUI_TouchImage(obj, coords, long_press);
+                }
+                break;
+            case Label:
+                if (obj->o.label.pressCallback &&
+                    coords_in_box(&obj->box, coords))
+                {
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
+                    return GUI_TouchLabel(obj, coords, long_press);
                 }
                 break;
             case TextSelect:

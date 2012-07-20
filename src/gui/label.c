@@ -18,43 +18,9 @@
 #include "gui.h"
 #include "config/display.h"
 
-#if 0
-guiObject_t *GUI_CreateLabel(u16 x, u16 y, const char *(*Callback)(guiObject_t *, void *), struct LabelDesc font, void *data)
-{
-    struct guiObject *obj = GUI_GetFreeObj();
-    struct guiLabel  *label;
-    struct guiBox    *box;
-
-    if (obj == NULL)
-        return NULL;
-
-    box = &obj->box;
-    label = &obj->o.label;
-    box->x = x;
-    box->y = y;
-    box->width = 0;
-    box->height = 0;
-
-    obj->Type = Label;
-    OBJ_SET_TRANSPARENT(obj, 0);  //Deal with transparency during drawing
-    OBJ_SET_USED(obj, 1);
-    connect_object(obj);
-
-    label->type = TRANSPARENT;
-    label->CallBack = Callback;
-    label->cb_data = data;
-    label->desc.font = font.font;
-    label->desc.font_color = font.color;
-    label->desc.style = NO_BOX;
-
-    if (! label->desc.font)
-        label->desc.font = DEFAULT_FONT.font;
-
-    return obj;
-}
-#endif
-
-guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc, const char *(*Callback)(guiObject_t *, void *), void *data)
+guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc,
+             const char *(*strCallback)(guiObject_t *, void *),
+             void (*pressCallback)(guiObject_t *obj, s8 press_type, void *data),void *data)
 {
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiLabel  *label;
@@ -78,7 +44,8 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct Labe
     label->desc = *desc;
     if (x == 0 || y == 0)
         label->desc.style = NO_BOX;
-    label->CallBack = Callback;
+    label->strCallback = strCallback;
+    label->pressCallback = pressCallback;
     label->cb_data = data;
     if (! label->desc.font)
         label->desc.font = DEFAULT_FONT.font;
@@ -92,8 +59,8 @@ void GUI_DrawLabel(struct guiObject *obj)
     const char *str;
     u16 txt_w, txt_h;
     u16 txt_x, txt_y;
-    if (label->CallBack)
-        str = label->CallBack(obj, label->cb_data);
+    if (label->strCallback)
+        str = label->strCallback(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
     u8 old_font = LCD_SetFont(label->desc.font);
@@ -136,3 +103,10 @@ void GUI_DrawLabel(struct guiObject *obj)
     LCD_SetFont(old_font);
 }
 
+u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type)
+{
+    (void)coords;
+    struct guiLabel *label = &obj->o.label;
+    label->pressCallback(obj, press_type, label->cb_data);
+    return 1;
+}
