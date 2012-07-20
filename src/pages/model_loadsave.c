@@ -49,7 +49,6 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     (void)data;
     const char *ico;
     mp->selected = sel + 1;
-    GUI_RemoveObj(mp->icon);
     sprintf(mp->tmpstr, "models/model%d.ini", mp->selected);
     mp->modeltype = 0;
     mp->iconstr[0] = 0;
@@ -58,7 +57,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         ico = mp->iconstr;
     else
         ico = CONFIG_GetIcon(mp->modeltype);
-    mp->icon = GUI_CreateImage(8, 88, 96, 96, ico);
+    GUI_ChangeImage(mp->icon, ico, 0, 0);
 }
 static const char *string_cb(u8 idx, void *data)
 {
