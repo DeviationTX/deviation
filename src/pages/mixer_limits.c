@@ -21,7 +21,7 @@ static void sourceselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static const char *reverse_cb(guiObject_t *obj, int dir, void *data);
 static void show_titlerow();
-static const char *set_number125_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
 
 void MIXPAGE_EditLimits()
 {
@@ -37,9 +37,9 @@ void MIXPAGE_EditLimits()
     GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
     //Row 2
     GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Min:");
-    GUI_CreateTextSelect(64, 96, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.min);
+    GUI_CreateTextSelect(64, 96, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
     GUI_CreateLabel(176, 96, NULL, DEFAULT_FONT, "Max:");
-    GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, NULL, set_number125_cb, &mp->limit.max);
+    GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -59,11 +59,14 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return MIXPAGE_SourceName(*source);
 }
 
-const char *set_number125_cb(guiObject_t *obj, int dir, void *data)
+const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -125, 125, dir, 1, 5, NULL);
+    if (value == &mp->limit.min)
+        *value = GUI_TextSelectHelper(*value, -125, mp->limit.max, dir, 1, 5, NULL);
+    else
+        *value = GUI_TextSelectHelper(*value, mp->limit.min, 125, dir, 1, 5, NULL);
     sprintf(mp->tmpstr, "%d", *value);
     return mp->tmpstr;
 }

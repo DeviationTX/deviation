@@ -351,7 +351,9 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, &changed);
+    s8 min = (value == &mp->limit.max) ? mp->limit.min : -100;
+    s8 max = (value == &mp->limit.min) ? mp->limit.max : 100;
+    *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
     sprintf(mp->tmpstr, "%d", *value);
     if (changed) {
         sync_mixers();
