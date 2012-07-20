@@ -48,6 +48,10 @@ const char *tx_button_str[] = {
     "RIGHT+",
     "Left",
     "Right",
+    "Up",
+    "Down",
+    "Enter",
+    "Exit",
 };
 
 s16 CHAN_ReadInput(int channel)
