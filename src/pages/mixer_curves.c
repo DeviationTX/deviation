@@ -140,7 +140,7 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
         case 10: return "11";
         case 11: return "12";
         case 12: return "13";
-        default: return "0";
+        default: return "1";
     }
 }
 
