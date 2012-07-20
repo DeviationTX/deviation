@@ -42,10 +42,10 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 
     if (curve->type >= CURVE_3POINT) {
         GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Point:");
-        GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
+        edit->pointsel = GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
     } else {
         GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Pos/Neg:");
-        GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
+        edit->pointsel = GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
     }
     GUI_CreateLabel(8, 80, NULL, DEFAULT_FONT, "Value:");
     edit->value = GUI_CreateTextSelect(8, 96, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
@@ -80,8 +80,10 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     if (curve->type >= CURVE_3POINT) {
         curve->type = GUI_TextSelectHelper(curve->type, CURVE_3POINT, CURVE_MAX, dir, 1, 1, &changed);
-        if (changed)
+        if (changed) {
             GUI_Redraw(edit->graph);
+            GUI_Redraw(edit->pointsel);
+        }
     }
     return CURVE_GetName(curve);
 }
@@ -119,7 +121,8 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
     struct Curve *curve = &edit->curve;
     if (curve->type >= CURVE_3POINT) {
         u8 changed;
-        edit->pointnum = GUI_TextSelectHelper(edit->pointnum, 0, (curve->type - CURVE_3POINT) * 2 + 2, dir, 1, 1, &changed);
+        u8 max = (curve->type - CURVE_3POINT) * 2 + 2;
+        edit->pointnum = GUI_TextSelectHelper(edit->pointnum, 0, max, dir, 1, 1, &changed);
         if (changed)
             GUI_Redraw(edit->value);
     }

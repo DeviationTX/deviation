@@ -11,6 +11,7 @@ struct curve_edit {
     s8 pointnum;
     guiObject_t *graph;
     guiObject_t *value;
+    guiObject_t *pointsel;
     
 };
 

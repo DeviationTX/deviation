@@ -90,22 +90,23 @@ void GUI_DrawTextSelect(struct guiObject *obj)
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed)
 {
-    u8 changed = 0;
+    u8 changed;
+    s32 oldval = value;
     if (dir > 0) {
         if (value < max) {
            value += (dir > 1) ? longstep : shortstep;
-           if (value > max)
-               value = max;
-           changed = 1;
         }
     } else if (dir < 0) {
         if (value > min) {
            value -= (dir < -1) ? longstep : shortstep;
-           if (value < min)
-               value = min;
-           changed = 1;
         }
     }
+    if (value > max) {
+        value = max;
+    } else if (value < min) {
+        value = min;
+    }
+    changed = (value == oldval) ? 0 : 1;
     if(_changed)
         *_changed = changed;
     return value;
