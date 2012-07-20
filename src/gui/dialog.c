@@ -39,12 +39,10 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     box->y = y;
     box->width = width;
     box->height = height;
-    dialog->image.file = "media/dialog.bmp";
-    dialog->image.x_off = 0;
-    dialog->image.y_off = 0;
+    dialog->file = "media/dialog.bmp";
 
     obj->Type = Dialog;
-    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(dialog->image.file));
+    OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(dialog->file));
     OBJ_SET_MODAL(obj, 1);
     OBJ_SET_USED(obj, 1);
     connect_object(obj);
@@ -81,8 +79,8 @@ void GUI_DrawDialog(struct guiObject *obj)
     struct guiDialog *dialog = &obj->o.dialog;
     //printf("Draw Dialog: X: %d Y: %d WIDTH: %d HEIGHT: %d\n", box->x,
     //        box->y, box->width, box->height);
-    LCD_DrawWindowedImageFromFile(box->x, box->y, dialog->image.file,
-            box->width, box->height, dialog->image.x_off, dialog->image.y_off);
+    LCD_DrawWindowedImageFromFile(box->x, box->y, dialog->file,
+            box->width, box->height, 0, 0);
     LCD_SetFontColor(dialog->titleColor);
     LCD_PrintStringXY(box->x + 5, (box->y + 10), dialog->title);
     LCD_SetFontColor(dialog->fontColor);

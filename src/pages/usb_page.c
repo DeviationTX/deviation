@@ -56,6 +56,7 @@ static void wait_release()
 void PAGE_USBInit(int page)
 {
     (void)page;
+    PAGE_SetModal(0);
     draw_page(0);
 }
 
@@ -72,11 +73,6 @@ void PAGE_USBEvent()
         USB_Disable(1);
         draw_page(0);
     }
-}
-
-int PAGE_USBCanChange()
-{
-    return 1;
 }
 
 void USB_Connect()

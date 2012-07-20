@@ -145,8 +145,3 @@ void PAGE_TestEvent()
         GUI_Redraw(lblRA);
     }
 }
-
-int PAGE_TestCanChange()
-{
-    return (! GUI_IsModal());
-}

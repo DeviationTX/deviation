@@ -79,7 +79,6 @@ void GUI_DrawObject(struct guiObject *obj)
         LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, Display.select_color);
     }
     OBJ_SET_DIRTY(obj, 0);
-    OBJ_SET_SHOWN(obj, 1);
 }
 
 void GUI_DrawObjects(void)
@@ -165,7 +164,6 @@ struct guiObject *GUI_GetFreeObj(void)
             OBJ_SET_DISABLED(obj, 0);
             OBJ_SET_MODAL(obj, 0);
             OBJ_SET_DIRTY(obj, 1);
-            OBJ_SET_SHOWN(obj, 0);
             return obj;
         }
     }
@@ -245,14 +243,15 @@ void GUI_TouchRelease()
                 button->CallBack(objTOUCHED, button->cb_data);
             break;
           }
+        case Image:
+            GUI_TouchImage(objTOUCHED, NULL, -1);
+            break;
         case TextSelect:
             GUI_TouchTextSelect(objTOUCHED, NULL, -1);
             break;
         case Keyboard:
-        {
             GUI_DrawKeyboard(objTOUCHED, NULL, 0);
             break;
-        }
         case Scrollbar:
             GUI_TouchScrollbar(objTOUCHED, NULL, -1);
             break;
@@ -267,12 +266,18 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
     u8 modalActive;
     modalActive = GUI_IsModal() ? 1 : 0;
     struct guiObject *obj = objHEAD;
+    
     while(obj) {
         if (! OBJ_IS_DISABLED(obj)
             && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
         {
             switch (obj->Type) {
             case UnknownGUI:
+            case Dialog:
+            case Label:
+            case CheckBox:
+            case Dropdown:
+            case BarGraph:
                 break;
             case Button:
                 if (coords_in_box(&obj->box, coords)) {
@@ -281,6 +286,16 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                     objTOUCHED = obj;
                     OBJ_SET_DIRTY(obj, 1);
                     return 1;
+                }
+                break;
+            case Image:
+                if (obj->o.image.callback &&
+                    coords_in_box(&obj->box, coords))
+                {
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
+                    return GUI_TouchImage(obj, coords, long_press);
                 }
                 break;
             case TextSelect:
@@ -293,25 +308,19 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Listbox:
                 if(coords_in_box(&obj->box, coords)) {
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
                     return GUI_TouchListbox(obj, coords, long_press);
                 }
                 break;
-            case Dialog:
-                break; /* Dialogs are handled by buttons */
-            case Label:
-                break;
-            case Image:
-                break;
-            case CheckBox:
-                break;
-            case Dropdown:
-                break;
             case XYGraph:
                 if(coords_in_box(&obj->box, coords)) {
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
+                    objTOUCHED = obj;
                     return GUI_TouchXYGraph(obj, coords, long_press);
                 }
-                break;
-            case BarGraph:
                 break;
             case Keyboard:
                 //Note that this only works because the keyboard encompasses the whole screen
@@ -322,6 +331,8 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Scrollbar:
                 if(coords_in_box(&obj->box, coords)) {
+                    if (objTOUCHED && objTOUCHED != obj)
+                        return 0;
                     objTOUCHED = obj;
                     return GUI_TouchScrollbar(obj, coords, long_press);
                 }

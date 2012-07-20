@@ -60,14 +60,13 @@ static void okcancel_cb(guiObject_t *obj, void *data)
         trim[tp->index] = tp->trim;
     }
     GUI_RemoveAllObjects();
-    tp->modifying_trim = 0;
     PAGE_TrimInit(0);
 }
 void edit_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     struct Trim *trim = MIX_GetAllTrims();
-    tp->modifying_trim = 1;
+    PAGE_SetModal(1);
     tp->index = (long)data;
     tp->trim = trim[tp->index];
    
@@ -92,7 +91,7 @@ void PAGE_TrimInit(int page)
 {
     (void)page;
     int i;
-    tp->modifying_trim = 0;
+    PAGE_SetModal(0);
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Trim");
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Input");
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, "Trim Neg");
@@ -111,8 +110,3 @@ void PAGE_TrimEvent()
 {
 }
 
-
-int PAGE_TrimCanChange()
-{
-    return ! tp->modifying_trim;
-}

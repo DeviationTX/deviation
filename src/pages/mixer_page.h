@@ -16,7 +16,6 @@ struct curve_edit {
 };
 
 struct mixer_page {
-    u8 modifying_template;
     u8 top_channel;
     guiObject_t *firstObj;
     struct Mixer mixer[5];

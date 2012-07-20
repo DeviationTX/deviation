@@ -30,12 +30,10 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
 
-extern void MODELPage_ShowLoadSave(int loadsave);
-
 void PAGE_ModelInit(int page)
 {
     (void)page;
-    mp->editing = 0;
+    PAGE_SetModal(0);
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Model");
 
     GUI_CreateButton(90, 4, BUTTON_96, "Load", 0x0000, loadsave_cb, (void *)0L);
@@ -71,18 +69,13 @@ void PAGE_ModelEvent()
 {
 }
 
-int PAGE_ModelCanChange()
-{
-    return ! mp->editing;
-}
-
 /* Button callbacks */
 static void loadsave_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     long loadsave = (long)data;
-    mp->editing = 1;
-    MODELPage_ShowLoadSave(loadsave);
+    PAGE_SetModal(1);
+    MODELPage_ShowLoadSave(loadsave, PAGE_ModelInit);
 }
 
 static void changename_done_cb(guiObject_t *obj, void *data)
@@ -95,7 +88,7 @@ static void changename_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    mp->editing = 1;
+    PAGE_SetModal(1);
     GUI_RemoveAllObjects();
     GUI_CreateKeyboard(KEYBOARD_CHAR, Model.name, sizeof(Model.name)-1, changename_done_cb, NULL);
 }
@@ -111,7 +104,7 @@ static void fixedid_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    mp->editing = 1;
+    PAGE_SetModal(1);
     if(Model.fixed_id == 0)
         mp->fixed_id[0] = 0;
     GUI_RemoveAllObjects();

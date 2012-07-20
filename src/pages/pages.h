@@ -22,40 +22,34 @@ extern struct pagemem pagemem;
 /* Main */
 void PAGE_MainInit(int page);
 void PAGE_MainEvent();
-int PAGE_MainCanChange();
+u8 PAGE_SetModal(u8 _modal);
 
 /* Mixer */
 void PAGE_MixerInit(int page);
 void PAGE_MixerEvent();
-int PAGE_MixerCanChange();
 
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
-int PAGE_TrimCanChange();
 
 /* Model */
 void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
-int PAGE_ModelCanChange();
+void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 
 /* Test */
 void PAGE_TestInit(int page);
 void PAGE_TestEvent();
-int PAGE_TestCanChange();
 
 /* Chantest */
 void PAGE_ChantestInit(int page);
 void PAGE_ChantestEvent();
-int PAGE_ChantestCanChange();
 
 /* Scanner */
 void PAGE_ScannerInit(int page);
 void PAGE_ScannerEvent();
-int PAGE_ScannerCanChange();
 
 /* USB */
 void PAGE_USBInit(int page);
 void PAGE_USBEvent();
-int PAGE_USBCanChange();
 #endif

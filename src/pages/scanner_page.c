@@ -41,6 +41,7 @@ void PAGE_ScannerInit(int page)
 {
     u8 i;
     (void)page;
+    PAGE_SetModal(0);
     DEVO_Initialize();  //Switch to DEVO configuration
     CLOCK_StopTimer();
     CYRF_ConfigRxTx(0);
@@ -80,7 +81,3 @@ void PAGE_ScannerEvent()
     }
 }
 
-int PAGE_ScannerCanChange()
-{
-    return 1;
-}

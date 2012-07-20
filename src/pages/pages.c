@@ -20,34 +20,34 @@
 struct page {
     void (*init)(int i);
     void (*event)();
-    int (*can_change)();
 };
 
 struct pagemem pagemem;
 
 static const struct page pages[] = {
-    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainCanChange},
-    {PAGE_MixerInit, PAGE_MixerEvent, PAGE_MixerCanChange},
-    {PAGE_TrimInit, PAGE_TrimEvent, PAGE_TrimCanChange},
-    {PAGE_ModelInit, PAGE_ModelEvent, PAGE_ModelCanChange},
-    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestCanChange},
-    {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerCanChange},
-    {PAGE_TestInit, PAGE_TestEvent, PAGE_TestCanChange},
-    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBCanChange},
+    {PAGE_MainInit, PAGE_MainEvent},
+    {PAGE_MixerInit, PAGE_MixerEvent},
+    {PAGE_TrimInit, PAGE_TrimEvent},
+    {PAGE_ModelInit, PAGE_ModelEvent},
+    {PAGE_ChantestInit, PAGE_ChantestEvent},
+    {PAGE_ScannerInit, PAGE_ScannerEvent},
+    {PAGE_TestInit, PAGE_TestEvent},
+    {PAGE_USBInit, PAGE_USBEvent},
 };
 
 static u8 page;
-
+static u8 modal;
 void PAGE_Init()
 {
     page = 0;
+    modal = 0;
     GUI_RemoveAllObjects();
     pages[page].init(0);
 }
 
 void PAGE_Change(int dir)
 {
-    if (! pages[page].can_change())
+    if ( modal || GUI_IsModal())
         return;
     if (dir == 0)
         return;
@@ -68,4 +68,11 @@ void PAGE_Change(int dir)
 void PAGE_Event()
 {
     pages[page].event();
+}
+
+u8 PAGE_SetModal(u8 _modal)
+{
+    u8 old = modal;
+    modal = _modal;
+    return old;
 }

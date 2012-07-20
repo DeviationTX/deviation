@@ -28,6 +28,7 @@ void PAGE_ChantestInit(int page)
 {
     #define SEPERATION 36
     (void)page;
+    PAGE_SetModal(0);
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Channels");
 
     int i;
@@ -75,11 +76,6 @@ void PAGE_ChantestEvent()
             cp->pctvalue[i] = v;
         }
     }
-}
-
-int PAGE_ChantestCanChange()
-{
-    return 1;
 }
 
 static s16 showchan_cb(void *data)

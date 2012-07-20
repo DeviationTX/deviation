@@ -23,6 +23,8 @@ s16 trim_cb(void * data);
 const char *show_throttle_cb(guiObject_t *obj, void *data);
 const char *voltage_cb(guiObject_t *obj, void *data);
 s16 trim_cb(void * data);
+void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
+
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
 
@@ -31,7 +33,7 @@ void PAGE_MainInit(int page)
 {
     (void)page;
     int i;
-
+    PAGE_SetModal(0);
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
@@ -63,7 +65,8 @@ void PAGE_MainInit(int page)
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
                                           show_throttle_cb, &Channels[5]);
     //Icon
-    mp->iconObj = GUI_CreateImage(205, 40, 96, 96, CONFIG_GetCurrentIcon());
+    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, NULL);
+ 
     //Battery
     if (Display.flags & SHOW_BAT_ICON) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
@@ -71,7 +74,7 @@ void PAGE_MainInit(int page)
         GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp");
+    GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
 }
 
 void PAGE_MainEvent()
@@ -88,11 +91,6 @@ void PAGE_MainEvent()
         mp->throttle = Channels[INP_THROTTLE - 1];
         GUI_Redraw(mp->throttleObj);
     }
-}
-
-int PAGE_MainCanChange()
-{
-    return 1;
 }
 
 const char *show_throttle_cb(guiObject_t *obj, void *data)
@@ -115,4 +113,14 @@ s16 trim_cb(void * data)
 {
     s8 *trim = (s8 *)data;
     return *trim;
+}
+
+void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
+{
+    (void)data;
+    (void)obj;
+    if(press_type == -1) {
+        PAGE_SetModal(1);
+        MODELPage_ShowLoadSave(0, PAGE_MainInit);
+    }
 }

@@ -71,7 +71,7 @@ void show_page()
 void PAGE_MixerInit(int page)
 {
     (void)page;
-    mp->modifying_template = 0;
+    PAGE_SetModal(0);
     mp->firstObj = NULL;
     mp->top_channel = 0;
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
@@ -94,11 +94,6 @@ void PAGE_MixerEvent()
     }
 }
 
-int PAGE_MixerCanChange()
-{
-    return ! mp->modifying_template;
-}
-
 void templateselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -106,7 +101,7 @@ void templateselect_cb(guiObject_t *obj, void *data)
     u8 i;
 
     mp->cur_template = MIX_GetTemplate(idx);
-    mp->modifying_template = 1;
+    PAGE_SetModal(1);
     MIX_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;

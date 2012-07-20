@@ -111,6 +111,8 @@ struct guiImage {
     const char *file;
     u16 x_off;
     u16 y_off;
+    void (*callback)(struct guiObject *obj, s8 press_type, void *data);
+    void *cb_data;
 };
 
 struct guiBox {
@@ -191,7 +193,7 @@ struct guiBarGraph {
 };
 
 struct guiDialog {
-    struct guiImage image;
+    const char *file;
     const char *text;
     const char *title;
     enum DialogType Type;
@@ -275,6 +277,7 @@ void GUI_DrawButton(struct guiObject *obj);
 void GUI_DrawBarGraph(struct guiObject *obj);
 void GUI_DrawScrollbar(struct guiObject *obj);
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type);
+u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 void GUI_DrawObject(struct guiObject *obj);
 void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h);
@@ -291,8 +294,9 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
 #define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, data)
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc, const char *(*Callback)(guiObject_t *obj, void *data), void *data);
 
-#define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file)
-guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file);
+#define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file, NULL, NULL)
+guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
+        void (*CallBack)(guiObject_t *obj, s8 press_type, void *data), void *cb_data);
 
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
@@ -330,8 +334,10 @@ void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);
 struct guiObject *GUI_IsModal(void);
-s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
 void GUI_HandleButtons(u8 enable);
+
+s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
+void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_off);
 
 #include "config/display.h"
 

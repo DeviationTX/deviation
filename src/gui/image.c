@@ -18,7 +18,8 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file)
+guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
+    void (*CallBack)(guiObject_t *obj, s8 press_type, void *data), void *cb_data)
 {
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiImage  *image;
@@ -33,6 +34,8 @@ guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_of
     image->file = file;
     image->x_off = x_off;
     image->y_off = y_off;
+    image->callback = CallBack;
+    image->cb_data = cb_data;
 
     box->x = x;
     box->y = y;
@@ -55,4 +58,24 @@ void GUI_DrawImage(struct guiObject *obj)
     LCD_DrawWindowedImageFromFile(box->x, box->y,
             image->file, box->width, box->height,
             image->x_off, image->y_off);
+}
+
+
+u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type)
+{
+    (void)coords;
+    struct guiImage *image = &obj->o.image;
+    image->callback(obj, press_type, image->cb_data);
+    return 1;
+}
+
+void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_off)
+{
+    struct guiImage *image = &obj->o.image;
+    if (image->file != file || image->x_off != x_off || image->y_off != y_off) {
+        image->file = file;
+        image->x_off = x_off;
+        image->y_off = y_off;
+        OBJ_SET_DIRTY(obj, 1);
+    }
 }
