@@ -72,7 +72,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case BarGraph:   GUI_DrawBarGraph(obj);          break;
     case TextSelect: GUI_DrawTextSelect(obj);        break;
     case Listbox:    GUI_DrawListbox(obj, 1);        break;
-    case Keyboard:   GUI_DrawKeyboard(obj, NULL, 0); break;
+    case Keyboard:   GUI_DrawKeyboard(obj);          break;
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
     }
     if (obj == objSELECTED) {
@@ -253,7 +253,7 @@ void GUI_TouchRelease()
             GUI_TouchTextSelect(objTOUCHED, NULL, -1);
             break;
         case Keyboard:
-            GUI_DrawKeyboard(objTOUCHED, NULL, 0);
+            GUI_TouchKeyboard(objTOUCHED, NULL, -1);
             break;
         case Scrollbar:
             GUI_TouchScrollbar(objTOUCHED, NULL, -1);
@@ -339,7 +339,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 if (objTOUCHED && objTOUCHED != obj)
                     return 0;
                 objTOUCHED = obj;
-                return GUI_DrawKeyboard(obj, coords, long_press);
+                return GUI_TouchKeyboard(obj, coords, long_press);
                 break;
             case Scrollbar:
                 if(coords_in_box(&obj->box, coords)) {

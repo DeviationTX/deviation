@@ -130,11 +130,12 @@ struct guiLabel {
 };
 
 struct guiKeyboard {
-    struct touch last_coords;
+    u8 lastchar;
     char *text;
     u8 num_chars;
     u8 caps;
     enum KeyboardType type;
+    buttonAction_t action;
     void (*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
 };
@@ -259,7 +260,8 @@ struct guiObject *objHEAD;
 struct guiObject *objTOUCHED;
 struct guiObject *objSELECTED;
 
-u8 GUI_DrawKeyboard(struct guiObject *obj, struct touch *coords, u8 long_press);
+void GUI_DrawKeyboard(struct guiObject *obj);
+u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 void GUI_DrawTextSelect(struct guiObject *obj);
 u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type);
