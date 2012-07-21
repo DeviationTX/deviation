@@ -49,6 +49,7 @@ static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
 static s16 eval_mixer_cb(s16 xval, void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
 
+static void show_titlerow();
 static void show_none();
 static void show_simple();
 static void show_expo_dr();
@@ -66,10 +67,16 @@ const char *MIXPAGE_TemplateName(enum TemplateType template)
     }
 }
 
-void MIXPAGE_ChangeTemplate()
+void MIXPAGE_ChangeTemplate(int show_header)
 {
     mp->cur_mixer = mp->mixer;
     sync_mixers();
+    if (show_header) {
+        GUI_RemoveAllObjects();
+        show_titlerow();
+    } else {
+        GUI_RemoveHierObjects(mp->firstObj); 
+    }
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
         show_none();
@@ -93,7 +100,7 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     mp->cur_template = GUI_TextSelectHelper(mp->cur_template, 0, MIXERTEMPLATE_MAX, dir, 1, 1, &changed);
     if (changed) {
-        MIXPAGE_ChangeTemplate();
+        MIXPAGE_ChangeTemplate(0);
         return "";
     }
     return MIXPAGE_TemplateName(mp->cur_template);
@@ -124,19 +131,15 @@ static void show_titlerow()
 
 static void show_none()
 {
-    GUI_RemoveAllObjects();
+    mp->firstObj = NULL;   
     mp->graph = NULL;
     //Row 0
-    show_titlerow();
 }
 
 static void show_simple()
 {
-    GUI_RemoveAllObjects();
-    //Row 0
-    show_titlerow();
     //Row 1
-    GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, "Src:");
+    mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, "Src:");
     GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
     GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, "Curve:");
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
@@ -169,12 +172,9 @@ void toggle_link_cb(guiObject_t *obj, void *data)
 
 static void show_expo_dr()
 {
-    GUI_RemoveAllObjects();
     sync_mixers();
-    //Row 0
-    show_titlerow();
     //Row 1
-    GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, "Src");
+    mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, "Src");
     GUI_CreateLabel(132, 34, NULL, DEFAULT_FONT, "Switch1");
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, "Switch2");
     //Row 2
@@ -219,13 +219,8 @@ static void show_expo_dr()
 
 static void show_complex()
 {
-    GUI_RemoveAllObjects();
-    //Row 0
-    show_titlerow();
-	
-	
     //Row 1
-    GUI_CreateLabel(COL1_TEXT, 40, NULL, BOLD_FONT, "Mixers:");
+    mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, BOLD_FONT, "Mixers:");
     GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
     GUI_CreateLabel(COL2_TEXT, 40, NULL, BOLD_FONT, "Page:");
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);

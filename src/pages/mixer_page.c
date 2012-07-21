@@ -112,7 +112,7 @@ void templateselect_cb(guiObject_t *obj, void *data)
     if (mp->cur_template != MIXERTEMPLATE_NONE) {
         mp->num_complex_mixers = MIX_GetMixers(idx, mp->mixer, sizeof(mp->mixer) / sizeof(struct Mixer));
     }
-    MIXPAGE_ChangeTemplate();
+    MIXPAGE_ChangeTemplate(1);
 }
 
 void limitselect_cb(guiObject_t *obj, void *data)

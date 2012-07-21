@@ -12,7 +12,6 @@ struct curve_edit {
     guiObject_t *graph;
     guiObject_t *value;
     guiObject_t *pointsel;
-    
 };
 
 struct mixer_page {
@@ -39,7 +38,7 @@ extern const char *channel_name[];
 const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data);
 void MIXPAGE_EditCurves(struct Curve *curve, void *data);
 const char *MIXPAGE_TemplateName(enum TemplateType template);
-void MIXPAGE_ChangeTemplate();
+void MIXPAGE_ChangeTemplate(int show_header);
 const char *MIXPAGE_SourceName(u8 src);
 void MIXPAGE_EditLimits();
 
