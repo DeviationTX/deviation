@@ -130,8 +130,13 @@ static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
     const char *str;
     if ( c == '\x06') { //DONE
         str = "DONE";
-        bg_color = Display.keyboard.bg_key3;
-        fg_color = Display.keyboard.fg_key3;
+        if (pressed) {
+            bg_color = Display.keyboard.bg_key2;
+            fg_color = Display.keyboard.fg_key2;
+        } else {
+            bg_color = Display.keyboard.bg_key3;
+            fg_color = Display.keyboard.fg_key3;
+        }
     } else if (c < ' ') { //CAPS, DEL, NUMPAD
         if      (c == '\x09') str = "CAPS";
         else if (c == '\x08') str = "DEL";
