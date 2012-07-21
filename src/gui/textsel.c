@@ -26,6 +26,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiTextSelect *select;
     struct guiBox *box;
+    enum ImageNames fileidx;
 
     if (obj == NULL)
         return NULL;
@@ -34,16 +35,11 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     select = &obj->o.textselect;
 
     switch (type) {
-        case TEXTSELECT_128:
-            select->button = &image_map[FILE_SPIN96];
-            break;
-        case TEXTSELECT_64:
-            select->button = &image_map[FILE_SPIN32];
-            break;
-        case TEXTSELECT_96:
-            select->button = &image_map[FILE_SPIN64];
-            break;
+        case TEXTSELECT_128: fileidx = select_cb ? FILE_SPINPRESS96 : FILE_SPIN96; break;
+        case TEXTSELECT_96:  fileidx = select_cb ? FILE_SPINPRESS64 : FILE_SPIN64; break;
+        case TEXTSELECT_64:  fileidx = select_cb ? FILE_SPINPRESS32 : FILE_SPIN32; break;
     }
+    select->button = &image_map[fileidx];
 
     box->height = select->button->height;
     box->width = select->button->width + 2 * ARROW_WIDTH;
