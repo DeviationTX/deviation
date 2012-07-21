@@ -17,20 +17,34 @@
 #include "gui.h"
 #include "config/display.h"
 
+enum DrawCmds {
+    KB_DRAW,
+    KB_COMPARE_AND_PRESS,
+    KB_PRESS,
+    KB_RELEASE,
+};
+
+
 static u8 press_cb(u32 button, u8 flags, void *data);
-static const char *alpha[] = {
+static const char * const alpha[] = {
           "QWERTYUIOP",
           "ASDFGHJKL",
     "\x09" "ZXCVBNM" "\x08",
     "\x01" " " "\x06",
 };
-static const char *mixed[] = {
+static const char * const mixed[] = {
           "1234567890",
           "-/:;()$&@\"",
             ".,?!'"    "\x08",
        "\x02" " "      "\x06",
 };
-static const char **array[] = { alpha, mixed };
+static const char * const numpad[] = {
+          "123",
+          "456",
+          "789" "\x08",
+           "0" "\x06",
+};
+static const char * const * const array[] = { alpha, numpad, mixed };
 
 guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
         void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
@@ -156,32 +170,29 @@ static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
     LCD_PrintString((const char *)str);
 }
 
-u8 get_first_char(const char *str)
+static u8 get_first_char(const char *str)
 {
     const char *ptr = str;
     while(*ptr < 32)
         ptr++;
     return ptr - str;
 }
-u8 get_last_char(const char *str)
+static u8 get_last_char(const char *str)
 {
     const char *ptr = str + strlen(str);
     while(*ptr < 32)
         ptr--;
     return ptr - str;
 }
-#define KB_DRAW 0
-#define KB_COMPARE_AND_PRESS 1
-#define KB_PRESS   2
-#define KB_RELEASE 3
-char set_case(char c, u8 caps)
+
+static char set_case(char c, u8 caps)
 {
     if (! caps && c >= 'A' && c <= 'Z')
         return (c - 'A' + 'a');
     return c;
 }
 
-char keyboard_cmd(u8 cmd, struct guiKeyboard *keyboard, struct touch *coords)
+static char keyboard_cmd(enum DrawCmds cmd, struct guiKeyboard *keyboard, struct touch *coords)
 {
 #define Y_OFFSET 30
 #define KEY_H 52
@@ -190,7 +201,7 @@ char keyboard_cmd(u8 cmd, struct guiKeyboard *keyboard, struct touch *coords)
 #define KEY_W3 (32 + 18)
     char lastchar = keyboard->lastchar;
     struct guiBox box;
-    const char **keys = array[keyboard->type];
+    const char * const *keys = array[keyboard->type];
 
     u8 row, i;
     for(row = 0; row < 4; row++) {
@@ -259,7 +270,7 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
             keyboard->caps = ! keyboard->caps;
             keyboard_cmd(KB_DRAW, keyboard, NULL);
         } else if (keyboard->lastchar == '\x01' || keyboard->lastchar == '\x02') { //Numpad
-            keyboard->type = ! keyboard->type;
+            keyboard->type = keyboard->type == KEYBOARD_ALPHA ? KEYBOARD_SPECIAL : KEYBOARD_ALPHA;
             OBJ_SET_DIRTY(obj, 1);
         } else {
             keyboard_cmd(KB_RELEASE, keyboard, NULL);
@@ -279,7 +290,7 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
     return 1;
 }
 
-void find_row_col(const char **keys, char c, u8 *row, u8 *col)
+static void find_row_col(const char * const *keys, char c, u8 *row, u8 *col)
 {
     u8 i, j;
     for(j = 0; j < 4; j++) {
@@ -297,12 +308,12 @@ static u8 press_cb(u32 button, u8 flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
     struct guiKeyboard *keyboard = &obj->o.keyboard;
-    const char **keys;
+    const char * const *keys;
     if (CHAN_ButtonIsPressed(button, BUT_EXIT))
         return 1;
     if(flags & BUTTON_PRESS) {
         if(! keyboard->lastchar) {
-            keyboard->lastchar = keyboard->type == KEYBOARD_CHAR ? 'Q' : '1';
+            keyboard->lastchar = keyboard->type == KEYBOARD_ALPHA ? 'Q' : '1';
             keyboard_cmd(KB_PRESS, keyboard, NULL);
             return 1;
         }
@@ -327,7 +338,7 @@ static u8 press_cb(u32 button, u8 flags, void *data)
             }
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             kb_update_string(keyboard, keyboard->lastchar);
-            return;
+            return 1;
         }
         if (keys[row][col] != keyboard->lastchar) {
             if (keyboard->lastchar)

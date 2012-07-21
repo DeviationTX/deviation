@@ -36,8 +36,9 @@ enum ButtonType {
 };
 
 enum KeyboardType {
-    KEYBOARD_CHAR,
+    KEYBOARD_ALPHA,
     KEYBOARD_NUM,
+    KEYBOARD_SPECIAL,
 };
 
 enum LabelType {

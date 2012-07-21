@@ -90,7 +90,7 @@ static void changename_cb(guiObject_t *obj, void *data)
     (void)data;
     PAGE_SetModal(1);
     GUI_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_CHAR, Model.name, sizeof(Model.name)-1, changename_done_cb, NULL);
+    GUI_CreateKeyboard(KEYBOARD_ALPHA, Model.name, sizeof(Model.name)-1, changename_done_cb, NULL);
 }
 
 static void fixedid_done_cb(guiObject_t *obj, void *data)
