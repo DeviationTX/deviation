@@ -129,6 +129,9 @@ void GUI_RemoveObj(struct guiObject *obj)
     case Scrollbar:
         BUTTON_UnregisterCallback(&obj->o.scrollbar.action);
         break;
+    case Keyboard:
+        BUTTON_UnregisterCallback(&obj->o.keyboard.action);
+        break;
     default: break;
     }
     

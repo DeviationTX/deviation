@@ -277,9 +277,11 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
             kb_update_string(keyboard, keyboard->lastchar);
         }
         if (keyboard->lastchar == '\x06') { //DONE
-            BUTTON_UnregisterCallback(&keyboard->action);
+            keyboard->lastchar = '\0';
             if (keyboard->CallBack)
                 keyboard->CallBack(obj, keyboard->cb_data);
+            //After DONE it is possible that obj and keyboard are invalid
+            return 1;
         }
         keyboard->lastchar = '\0';
     } else if (press_type == 1 && keyboard->lastchar == '\x08') {
