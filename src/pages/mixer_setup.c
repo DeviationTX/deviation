@@ -93,6 +93,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
     }
 }
 
+
 static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -147,7 +148,7 @@ static void show_simple()
     mp->graph = GUI_CreateXYGraph(112, 64, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
     //Row 4
     GUI_CreateLabel(COL1_TEXT, 192, NULL, DEFAULT_FONT, "Scale:");
     GUI_CreateTextSelect(COL1_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
@@ -213,7 +214,7 @@ static void show_expo_dr()
     mp->graph = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0].curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
 }
 
 
@@ -244,7 +245,7 @@ static void show_complex()
     mp->graph = GUI_CreateXYGraph(192, 88, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->cur_mixer->curve);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->cur_mixer);
     //Row 7
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, "Min:");
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
@@ -493,18 +494,16 @@ void sourceselect_cb(guiObject_t *obj, void *data)
     GUI_Redraw(mp->graph);
 }
 
+void graph_cb()
+{
+    MIXPAGE_ChangeTemplate(1);
+}
+
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     struct Mixer *mix = (struct Mixer *)data;
-    void *func;
-    switch (mp->cur_template) {
-        case MIXERTEMPLATE_EXPO_DR: func = show_expo_dr; break;
-        case MIXERTEMPLATE_SIMPLE:  func = show_simple; break;
-        case MIXERTEMPLATE_COMPLEX: func = show_complex; break;
-        default: return;
-    }
-    MIXPAGE_EditCurves(&mix->curve, func);   
+    MIXPAGE_EditCurves(&mix->curve, graph_cb);   
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)
@@ -525,14 +524,6 @@ static u8 touch_cb(s16 x, s16 y, void *data)
 {
     (void)x;
     (void)y;
-    struct Curve *curve = (struct Curve *)data;
-    void *func;
-    switch (mp->cur_template) {
-        case MIXERTEMPLATE_EXPO_DR: func = show_expo_dr; break;
-        case MIXERTEMPLATE_SIMPLE:  func = show_simple; break;
-        case MIXERTEMPLATE_COMPLEX: func = show_complex; break;
-        default: return 0;
-    }
-    MIXPAGE_EditCurves(curve, func);   
+    curveselect_cb(NULL, data);
     return 1;
 }
