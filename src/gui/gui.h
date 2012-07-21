@@ -270,6 +270,7 @@ u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press);
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
 u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
+void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type);
 
 void GUI_DrawLabel(struct guiObject *obj);
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type);
@@ -283,6 +284,7 @@ void GUI_DrawButton(struct guiObject *obj);
 void GUI_DrawBarGraph(struct guiObject *obj);
 void GUI_DrawScrollbar(struct guiObject *obj);
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type);
+void GUI_SetScrollbar(struct guiObject *obj, u8 pos);
 
 void GUI_DrawObject(struct guiObject *obj);
 void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h);

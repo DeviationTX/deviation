@@ -22,6 +22,8 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static const char *reverse_cb(guiObject_t *obj, int dir, void *data);
 static void show_titlerow();
 static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
+static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 
 void MIXPAGE_EditLimits()
 {
@@ -30,16 +32,19 @@ void MIXPAGE_EditLimits()
     //Row 1
     GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Reverse:");
     GUI_CreateTextSelect(64, 48, TEXTSELECT_96, 0x0000, NULL, reverse_cb, (void *)((long)mp->channel));
-    //Row 1
-    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Safety:");
-    GUI_CreateTextSelect(64, 72, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    GUI_CreateLabel(176, 72, NULL, DEFAULT_FONT, "Value:");
-    GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
     //Row 2
-    GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Min:");
-    GUI_CreateTextSelect(64, 96, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
-    GUI_CreateLabel(176, 96, NULL, DEFAULT_FONT, "Max:");
-    GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
+    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Min:");
+    GUI_CreateTextSelect(64, 72, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
+    GUI_CreateLabel(176, 72, NULL, DEFAULT_FONT, "Max:");
+    GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
+    //Row 3
+    GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Failsafe:");
+    GUI_CreateTextSelect(64, 96, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
+    //Row 4
+    GUI_CreateLabel(8, 120, NULL, DEFAULT_FONT, "Safety:");
+    GUI_CreateTextSelect(64, 120, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+    GUI_CreateLabel(176, 120, NULL, DEFAULT_FONT, "Value:");
+    GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -69,6 +74,24 @@ const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
         *value = GUI_TextSelectHelper(*value, mp->limit.min, 125, dir, 1, 5, NULL);
     sprintf(mp->tmpstr, "%d", *value);
     return mp->tmpstr;
+}
+
+void toggle_failsafe_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    mp->limit.flags = (mp->limit.flags & CH_FAILSAFE_EN)
+          ? (mp->limit.flags & ~CH_FAILSAFE_EN)
+          : (mp->limit.flags | CH_FAILSAFE_EN);
+}
+
+const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    if (!(mp->limit.flags & CH_FAILSAFE_EN))
+        return "Off";
+    return PAGEMIX_SetNumberCB(obj, dir, &mp->limit.failsafe);
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)

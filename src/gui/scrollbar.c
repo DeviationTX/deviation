@@ -84,6 +84,15 @@ void GUI_DrawScrollbar(struct guiObject *obj)
     //}
 }
 
+void GUI_SetScrollbar(struct guiObject *obj, u8 pos)
+{
+    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    if (scrollbar->cur_pos != pos) {
+        scrollbar->cur_pos = pos;
+        OBJ_SET_DIRTY(obj, 1);
+    }
+}
+
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type)
 {
     struct guiScrollbar *scrollbar = &obj->o.scrollbar;

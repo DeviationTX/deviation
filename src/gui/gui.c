@@ -364,7 +364,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         return NULL;
     obj = obj ? obj->next : objHEAD;
     while(obj) {
-        if (obj->Type == Button || obj->Type == TextSelect) {
+        if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox) {
             foundObj = obj;
             break;
         }
@@ -383,7 +383,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     while(obj) {
         if (obj == origObj)
             break;
-        if (obj->Type == Button || obj->Type == TextSelect)
+        if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox)
             objLast = obj;
         obj = obj->next;
     }
@@ -392,7 +392,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         while(obj) {
             if (obj == origObj)
                 break;
-            if (obj->Type == Button || obj->Type == TextSelect)
+            if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox)
                 objLast = obj;
             obj = obj->next;
         }
@@ -469,10 +469,16 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         return (flags & BUTTON_LONGPRESS) ? 0 : 1;
     }
     if (objSELECTED) {
+        void(*press)(struct guiObject *obj, u32 button, u8 press_type) = NULL;
+        if (objSELECTED->Type == TextSelect) {
+            press = GUI_PressTextSelect;
+        } else if(objSELECTED->Type == Listbox) {
+            press = GUI_PressListbox;
+        }
         if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             if (! objTOUCHED || objTOUCHED == objSELECTED) {
-                if (objSELECTED->Type == TextSelect) {
-                    GUI_PressTextSelect(objSELECTED, BUT_ENTER, flags & BUTTON_LONGPRESS);
+                if (press) {
+                    press(objSELECTED, BUT_ENTER, flags & BUTTON_LONGPRESS);
                     objTOUCHED = objSELECTED;
                     return 1;
                 } else {
@@ -483,14 +489,14 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
                     return 1;
                 }
             }
-        } else if (objSELECTED->Type == TextSelect) {
+        } else if (press) {
             if (! objTOUCHED || objTOUCHED == objSELECTED) {
                 if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-                    GUI_PressTextSelect(objSELECTED, BUT_RIGHT, flags & BUTTON_LONGPRESS);
+                    press(objSELECTED, BUT_RIGHT, flags & BUTTON_LONGPRESS);
                     objTOUCHED = objSELECTED;
                     return 1;
                 } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-                    GUI_PressTextSelect(objSELECTED, BUT_LEFT, flags & BUTTON_LONGPRESS);
+                    press(objSELECTED, BUT_LEFT, flags & BUTTON_LONGPRESS);
                     objTOUCHED = objSELECTED;
                     return 1;
                 }

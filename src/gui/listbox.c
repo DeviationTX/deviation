@@ -93,6 +93,8 @@ static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
             new_pos = listbox->item_count - listbox->entries_per_page;
         if(listbox->cur_pos != new_pos) {
             listbox->cur_pos = (u16)new_pos;
+            if(listbox->selected < listbox->cur_pos)
+                listbox->selected = listbox->cur_pos;
             OBJ_SET_DIRTY(parent, 1);
         }
     } else if (direction < 0) {
@@ -101,6 +103,8 @@ static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
             new_pos = 0;
         if(listbox->cur_pos != new_pos) {
             listbox->cur_pos = (u16)new_pos;
+            if(listbox->selected >= listbox->cur_pos + listbox->entries_per_page)
+                listbox->selected = listbox->cur_pos + listbox->entries_per_page - 1;
             OBJ_SET_DIRTY(parent, 1);
         }
     }
@@ -161,4 +165,31 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
         }
     }
     return 0;
+}
+
+void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type)
+{
+    struct guiListbox *listbox = &obj->o.listbox;
+    (void)press_type;
+    if (button == BUT_RIGHT) {
+        if (listbox->selected < listbox->item_count - 1) {
+            listbox->selected++;
+            if (listbox->selected >= listbox->cur_pos + listbox->entries_per_page)
+                GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, 1, NULL));
+            if (listbox->select_cb)
+                listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
+            OBJ_SET_DIRTY(obj, 1);
+        }
+    } else if(button == BUT_LEFT) {
+        if (listbox->selected > 0) {
+            listbox->selected--;
+            if (listbox->selected < listbox->cur_pos)
+                GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, -1, NULL));
+            if (listbox->select_cb)
+                listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
+            OBJ_SET_DIRTY(obj, 1);
+        }
+    } else if(button == BUT_ENTER && listbox->longpress_cb) {
+        listbox->longpress_cb(obj, (u16)listbox->selected, listbox->cb_data);
+    }
 }
