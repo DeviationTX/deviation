@@ -305,7 +305,25 @@ static void find_row_col(const char * const *keys, char c, u8 *row, u8 *col)
         }
     }
 }
-           
+
+static u8 calc_column(const char *old_row, const char *new_row, s8 col)
+{
+    u8 old_first = get_first_char(old_row);
+    u8 old_last  = get_last_char(old_row);
+    u8 old_len = 1 + old_last - old_first;
+    u8 new_first = get_first_char(new_row);
+    u8 new_last  = get_last_char(new_row);
+    u8 new_len = 1 + new_last - new_first;
+    col -= old_first + old_len / 2;
+    col = new_first + new_len / 2 + col;
+    if (col < new_first) {
+        col = new_first;
+    } else if (col > new_last) {
+        col = new_last;
+    }
+    return col;
+}
+
 static u8 press_cb(u32 button, u8 flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
@@ -330,16 +348,29 @@ static u8 press_cb(u32 button, u8 flags, void *data)
                 col--;
         } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
             if (row < 3) {
+                col = calc_column(keys[row], keys[row+1], col);
                 row++;
-                col = col * strlen(keys[row]) / strlen(keys[row-1]) ;
             }
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             if (row > 0) {
+                col = calc_column(keys[row], keys[row-1], col);
                 row--;
-                col = col * strlen(keys[row]) / strlen(keys[row+1]) ;
             }
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            kb_update_string(keyboard, keyboard->lastchar);
+            if (keyboard->lastchar == '\x09') { //CAPS
+                keyboard->caps = ! keyboard->caps;
+                keyboard_cmd(KB_DRAW, keyboard, NULL);
+            } else if (keyboard->lastchar == '\x01' || keyboard->lastchar == '\x02') { //Numpad
+                keyboard->type = keyboard->type == KEYBOARD_ALPHA ? KEYBOARD_SPECIAL : KEYBOARD_ALPHA;
+                OBJ_SET_DIRTY(obj, 1);
+            } else {
+                kb_update_string(keyboard, keyboard->lastchar);
+            }
+            if (keyboard->lastchar == '\x06') { //DONE
+                if (keyboard->CallBack)
+                    keyboard->CallBack(obj, keyboard->cb_data);
+                    //After DONE it is possible that obj and keyboard are invalid
+            }
             return 1;
         }
         if (keys[row][col] != keyboard->lastchar) {
