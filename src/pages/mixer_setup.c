@@ -61,7 +61,7 @@ const char *MIXPAGE_TemplateName(enum TemplateType template)
     switch(template) {
     case MIXERTEMPLATE_NONE :   return "None";
     case MIXERTEMPLATE_SIMPLE:  return "Simple";
-    case MIXERTEMPLATE_EXPO_DR: return "Expo & D/R";
+    case MIXERTEMPLATE_EXPO_DR: return "Expo&DR";
     case MIXERTEMPLATE_COMPLEX: return "Complex";
     default:                    return "Unknown";
     }
