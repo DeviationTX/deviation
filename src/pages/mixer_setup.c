@@ -266,7 +266,7 @@ static void show_complex()
     mp->graph = GUI_CreateXYGraph(192, 88, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->cur_mixer);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
     //Row 7
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, "Min:");
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
