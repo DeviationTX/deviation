@@ -17,6 +17,7 @@ struct curve_edit {
 struct mixer_page {
     u8 top_channel;
     guiObject_t *firstObj;
+    guiObject_t *expoObj[6];
     struct Mixer mixer[5];
     struct Mixer *cur_mixer;
     struct Limit limit;

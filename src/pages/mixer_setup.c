@@ -48,6 +48,7 @@ static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
 static s16 eval_mixer_cb(s16 xval, void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
+static void toggle_link_cb(guiObject_t *obj, void *data);
 
 static void show_titlerow();
 static void show_none();
@@ -77,6 +78,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
     } else {
         GUI_RemoveHierObjects(mp->firstObj); 
     }
+    memset(mp->expoObj, 0, sizeof(mp->expoObj));
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
         show_none();
@@ -161,6 +163,42 @@ static void show_simple()
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
 }
 
+static void update_rate_widgets(u8 idx)
+{
+    const struct { const char *txt; u16 x1; u16 x2;} rateInfo[2] = {
+        {"Mid-Rate", 112, 140},
+        {"Low-Rate", 216, 244},
+    };
+    if (mp->mixer[idx+1].sw) {
+        if (! mp->expoObj[3*idx]) {
+            mp->expoObj[3*idx] = GUI_CreateButton(rateInfo[idx].x1, 72, BUTTON_96x16, rateInfo[idx].txt, 0x0000,
+                                                  toggle_link_cb, (void *)((long)idx));
+        }
+        if (mp->expoObj[3*idx+1])
+            GUI_RemoveObj(mp->expoObj[3*idx+1]);
+        if(mp->link_curves & (1 << idx)) 
+            mp->expoObj[3*idx+1] = GUI_CreateLabel(rateInfo[idx].x2, 98, NULL, DEFAULT_FONT, "Linked");
+        else
+            mp->expoObj[3*idx+1] = GUI_CreateTextSelect(rateInfo[idx].x1, 96, TEXTSELECT_96, 0x0000, curveselect_cb,
+                                                  set_curvename_cb, &mp->mixer[idx+1]);
+        if (mp->expoObj[3*idx+2]) {
+            GUI_RemoveObj(mp->expoObj[3*idx+2]);
+            mp->expoObj[3*idx+2] = NULL;
+        }
+        if (MIX_SRC(mp->mixer[idx+1].sw))
+            mp->expoObj[3*idx+2] = GUI_CreateTextSelect(rateInfo[idx].x1, 120, TEXTSELECT_96, 0x0000, NULL,
+                                                     set_number100_cb, &mp->mixer[idx+1].scalar);
+    } else {
+        u8 i;
+        for(i = 0; i < 3; i++) {
+            if (mp->expoObj[3*idx+i]) {
+                GUI_RemoveObj(mp->expoObj[3*idx+i]);
+                mp->expoObj[3*idx+i] = NULL;
+            }
+        }
+    }
+}
+
 void toggle_link_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -168,7 +206,7 @@ void toggle_link_cb(guiObject_t *obj, void *data)
        mp->link_curves ^= 0x02;
     else
        mp->link_curves ^= 0x01;
-    show_expo_dr();
+    update_rate_widgets(data ? 1 : 0);
 }
 
 static void show_expo_dr()
@@ -180,37 +218,20 @@ static void show_expo_dr()
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, "Switch2");
     //Row 2
     GUI_CreateTextSelect(COL1_TEXT, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
-    GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabel(24, 74, NULL, DEFAULT_FONT, "High-Rate");
-    if (mp->mixer[1].sw)
-        GUI_CreateButton(112, 72, BUTTON_96x16, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
-    if (mp->mixer[2].sw)
-        GUI_CreateButton(216, 72, BUTTON_96x16, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
-    if (mp->mixer[1].sw) {
-        if((mp->link_curves & 0x01)) {
-            GUI_CreateLabel(140, 98, NULL, DEFAULT_FONT, "Linked");
-        } else {
-            GUI_CreateTextSelect(112, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
-        }
-    }
-    if (mp->mixer[2].sw) {
-        if((mp->link_curves & 0x02)) {
-            GUI_CreateLabel(244, 98, NULL, DEFAULT_FONT, "Linked");
-        } else {
-            GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
-        }
-    }
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, "Scale:");
     GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    if (MIX_SRC(mp->mixer[1].sw))
-        GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
-    if (MIX_SRC(mp->mixer[2].sw))
-        GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
+    //Mid-Rate
+    GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
+    update_rate_widgets(0);
+    //Low-Rate
+    GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
+    update_rate_widgets(1);
+
     mp->graph = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -406,6 +427,7 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     cur = GUI_TextSelectHelper(cur, 1, mp->num_mixers, dir, 1, 1, &changed);
     if (changed) {
         mp->cur_mixer = mp->mixer + (cur - 1);
+        GUI_RemoveHierObjects(mp->firstObj); 
         show_complex();
     }
     sprintf(mp->tmpstr, "%d", cur);
@@ -463,8 +485,11 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
     MIX_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        if ((! MIX_SRC(oldsrc) || ! MIX_SRC(*source)) && (source == &mp->mixer[1].sw || source == &mp->mixer[2].sw)) {
-            show_expo_dr();
+        if ((!! MIX_SRC(oldsrc)) ^ (!! MIX_SRC(*source))) {
+            if(data == &mp->mixer[1].sw)
+                update_rate_widgets(0);
+            else if(data == &mp->mixer[2].sw)
+                update_rate_widgets(1);
         } else {    
             GUI_Redraw(mp->graph);
         }
