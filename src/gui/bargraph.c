@@ -78,8 +78,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         val = width * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y, val, height, disp->fg_color);
         if (Display.flags & BAR_TRANSPARENT) {
-            if (OBJ_IS_SHOWN(obj))
-                GUI_DrawBackground(x + val, y, width - val, height);
+            GUI_DrawBackground(x + val, y, width - val, height);
         } else {
             LCD_FillRect(x + val, y, width - val, height, disp->bg_color);
         }
@@ -89,8 +88,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         val = height * (val - graph->min) / (graph->max - graph->min);
         LCD_FillRect(x, y + (height - val), width, val, disp->fg_color);
         if (Display.flags & BAR_TRANSPARENT) {
-            if (OBJ_IS_SHOWN(obj))
-                GUI_DrawBackground(x, y, width, height - val);
+            GUI_DrawBackground(x, y, width, height - val);
         } else {
             LCD_FillRect(x, y, width, height - val, disp->bg_color);
         }
@@ -99,8 +97,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     case TRIM_HORIZONTAL: {
         val = (TRIM_THICKNESS / 2) + (width - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
         if (Display.flags & TRIM_TRANSPARENT) {
-            if (OBJ_IS_SHOWN(obj))
-                GUI_DrawBackground(x, y, width, height);
+            GUI_DrawBackground(x, y, width, height);
         } else {
             LCD_FillRect(x, y, width, height, disp->bg_color);
         }
@@ -114,8 +111,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     case TRIM_VERTICAL: {
         val = (TRIM_THICKNESS / 2) + (height - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
         if (Display.flags & TRIM_TRANSPARENT) {
-            if (OBJ_IS_SHOWN(obj))
-                GUI_DrawBackground(x, y, width, height);
+            GUI_DrawBackground(x, y, width, height);
         } else {
             LCD_FillRect(x, y, width, height, disp->bg_color);
         }

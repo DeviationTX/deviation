@@ -260,9 +260,9 @@ struct guiObject {
 #define ARROW_HEIGHT 16
 
 /* internal use only */
-struct guiObject *objHEAD;
-struct guiObject *objTOUCHED;
-struct guiObject *objSELECTED;
+extern struct guiObject *objHEAD;
+extern struct guiObject *objTOUCHED;
+extern struct guiObject *objSELECTED;
 
 void GUI_DrawKeyboard(struct guiObject *obj);
 u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type);
@@ -344,7 +344,6 @@ void GUI_TouchRelease();
 void GUI_DrawScreen(void);
 void GUI_RefreshScreen(void);
 void GUI_Redraw(guiObject_t *obj);
-void GUI_DrawObjects(void);
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);

@@ -16,10 +16,14 @@
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 
-struct guiObject GUI_Array[100];
+#define SCREEN_WIDTH  320
+#define SCREEN_HEIGHT 240
+
 struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
 struct guiObject *objSELECTED = NULL;
+
+static struct guiObject GUI_Array[100];
 static buttonAction_t button_action;
 static u8 FullRedraw;
 
@@ -180,6 +184,8 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
+    if(FullRedraw && w != SCREEN_WIDTH && h != SCREEN_HEIGHT)
+        return;  //Optimization to prevent partial redraw when it isn't needed
     LCD_DrawWindowedImageFromFile(x, y, "media/devo8.bmp", w, h, x, y);
 }
 
@@ -192,6 +198,7 @@ void GUI_DrawScreen(void)
     /*
      * Then we need to draw any supporting GUI
      */
+    FullRedraw = 1;
     GUI_DrawObjects();
     FullRedraw = 0;
 }

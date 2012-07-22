@@ -76,13 +76,10 @@ void GUI_DrawLabel(struct guiObject *obj)
             old_h = txt_h;
         obj->box.width = txt_w;
         obj->box.height = txt_h;
-        if (OBJ_IS_SHOWN(obj))
-            GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
+        GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
     } else {
         if (label->desc.style == TRANSPARENT || label->desc.style == CENTER) {
-            if (OBJ_IS_SHOWN(obj)) {
-                GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-            }
+            GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
         } else {
             LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, label->desc.fill_color);
         }
