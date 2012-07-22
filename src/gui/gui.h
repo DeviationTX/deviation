@@ -238,17 +238,15 @@ struct guiObject {
 };
 
 #define OBJ_IS_USED(x)        ((x)->flags & 0x01) /* bool: UI element is in use */
-#define OBJ_IS_DISABLED(x)    ((x)->flags & 0x02) /* bool: UI element is not 'active' */
+#define OBJ_IS_HIDDEN(x)      ((x)->flags & 0x02) /* bool: UI element is not visible */
 #define OBJ_IS_MODAL(x)       ((x)->flags & 0x04) /* bool: UI element is active and all non-model elements are not */
 #define OBJ_IS_DIRTY(x)       ((x)->flags & 0x08) /* bool: UI element needs redraw */
 #define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
-#define OBJ_IS_SHOWN(x)       ((x)->flags & 0x20) /* bool: UI element has transparency */
 #define OBJ_SET_USED(x,y)        (x)->flags = y ? (x)->flags | 0x01 : (x)->flags & ~0x01
-#define OBJ_SET_DISABLED(x,y)    (x)->flags = y ? (x)->flags | 0x02 : (x)->flags & ~0x02
+#define OBJ_SET_HIDDEN(x,y)      (x)->flags = y ? (x)->flags | 0x02 : (x)->flags & ~0x02
 #define OBJ_SET_MODAL(x,y)       (x)->flags = y ? (x)->flags | 0x04 : (x)->flags & ~0x04
 #define OBJ_SET_DIRTY(x,y)       (x)->flags = y ? (x)->flags | 0x08 : (x)->flags & ~0x08
 #define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
-#define OBJ_SET_SHOWN(x,y)       (x)->flags = y ? (x)->flags | 0x20 : (x)->flags & ~0x20
 
 #define DRAW_NORMAL  0
 #define DRAW_PRESSED 1
@@ -347,6 +345,8 @@ void GUI_Redraw(guiObject_t *obj);
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);
+void GUI_SetHidden(guiObject_t *obj, u8 state);
+
 struct guiObject *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
 

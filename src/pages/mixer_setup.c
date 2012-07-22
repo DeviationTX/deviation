@@ -165,37 +165,23 @@ static void show_simple()
 
 static void update_rate_widgets(u8 idx)
 {
-    const struct { const char *txt; u16 x1; u16 x2;} rateInfo[2] = {
-        {"Mid-Rate", 112, 140},
-        {"Low-Rate", 216, 244},
-    };
-    if (mp->mixer[idx+1].sw) {
-        if (! mp->expoObj[3*idx]) {
-            mp->expoObj[3*idx] = GUI_CreateButton(rateInfo[idx].x1, 72, BUTTON_96x16, rateInfo[idx].txt, 0x0000,
-                                                  toggle_link_cb, (void *)((long)idx));
+    u8 mix = idx + 1;
+    idx *=4;
+    if (MIX_SRC(mp->mixer[mix].sw)) {
+        GUI_SetHidden(mp->expoObj[idx], 0);
+        if(mp->link_curves & mix) {
+            GUI_SetHidden(mp->expoObj[idx+1], 0);
+            GUI_SetHidden(mp->expoObj[idx+2], 1);
+        } else {
+            GUI_SetHidden(mp->expoObj[idx+1], 1);
+            GUI_SetHidden(mp->expoObj[idx+2], 0);
         }
-        if (mp->expoObj[3*idx+1])
-            GUI_RemoveObj(mp->expoObj[3*idx+1]);
-        if(mp->link_curves & (1 << idx)) 
-            mp->expoObj[3*idx+1] = GUI_CreateLabel(rateInfo[idx].x2, 98, NULL, DEFAULT_FONT, "Linked");
-        else
-            mp->expoObj[3*idx+1] = GUI_CreateTextSelect(rateInfo[idx].x1, 96, TEXTSELECT_96, 0x0000, curveselect_cb,
-                                                  set_curvename_cb, &mp->mixer[idx+1]);
-        if (mp->expoObj[3*idx+2]) {
-            GUI_RemoveObj(mp->expoObj[3*idx+2]);
-            mp->expoObj[3*idx+2] = NULL;
-        }
-        if (MIX_SRC(mp->mixer[idx+1].sw))
-            mp->expoObj[3*idx+2] = GUI_CreateTextSelect(rateInfo[idx].x1, 120, TEXTSELECT_96, 0x0000, NULL,
-                                                     set_number100_cb, &mp->mixer[idx+1].scalar);
+        GUI_SetHidden(mp->expoObj[idx+3], 0);
     } else {
-        u8 i;
-        for(i = 0; i < 3; i++) {
-            if (mp->expoObj[3*idx+i]) {
-                GUI_RemoveObj(mp->expoObj[3*idx+i]);
-                mp->expoObj[3*idx+i] = NULL;
-            }
-        }
+        GUI_SetHidden(mp->expoObj[idx], 1);
+        GUI_SetHidden(mp->expoObj[idx+1], 1);
+        GUI_SetHidden(mp->expoObj[idx+2], 1);
+        GUI_SetHidden(mp->expoObj[idx+3], 1);
     }
 }
 
@@ -218,18 +204,28 @@ static void show_expo_dr()
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, "Switch2");
     //Row 2
     GUI_CreateTextSelect(COL1_TEXT, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
+    GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
+    GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabel(24, 74, NULL, DEFAULT_FONT, "High-Rate");
+    mp->expoObj[0] = GUI_CreateButton(112, 72, BUTTON_96x16, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
+    mp->expoObj[4] = GUI_CreateButton(216, 72, BUTTON_96x16, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
+    //The following 2 items are mutex.  One is always hidden
+    mp->expoObj[1] = GUI_CreateLabel(140, 98, NULL, DEFAULT_FONT, "Linked");
+    mp->expoObj[2] = GUI_CreateTextSelect(112, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
+    //The following 2 items are mutex.  One is always hidden
+    mp->expoObj[5] = GUI_CreateLabel(244, 98, NULL, DEFAULT_FONT, "Linked");
+    mp->expoObj[6] = GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, "Scale:");
     GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    //Mid-Rate
-    GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
+    mp->expoObj[3] = GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
+    mp->expoObj[7] = GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
+
+    //Enable/Disable the relevant widgets
     update_rate_widgets(0);
-    //Low-Rate
-    GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     update_rate_widgets(1);
 
     mp->graph = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,

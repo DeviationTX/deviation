@@ -28,6 +28,7 @@ static buttonAction_t button_action;
 static u8 FullRedraw;
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
+static void GUI_DrawObjects(void);
 
 const struct ImageMap image_map[] = {
     {"media/btn96_24.bmp", 96, 24, 0, 0}, /*FILE_BTN96_24 */
@@ -93,8 +94,11 @@ void GUI_DrawObjects(void)
 
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if(! OBJ_IS_MODAL(obj) || obj->Type == Dialog)
+        if(! OBJ_IS_HIDDEN(obj) &&
+           (! OBJ_IS_MODAL(obj) || obj->Type == Dialog))
+        {
             GUI_DrawObject(obj);
+        }
         obj = obj->next;
     }
 }
@@ -163,6 +167,18 @@ void GUI_RemoveObj(struct guiObject *obj)
     FullRedraw = 1;
 }
 
+void GUI_SetHidden(struct guiObject *obj, u8 state)
+{
+    if((!!state) == (!! OBJ_IS_HIDDEN(obj)))
+        return;
+    OBJ_SET_HIDDEN(obj, state);
+    if (state) {
+        FullRedraw = 1;
+    } else {
+        OBJ_SET_DIRTY(obj, 1);
+    }
+}
+
 struct guiObject *GUI_GetFreeObj(void)
 {
     int i;
@@ -171,7 +187,7 @@ struct guiObject *GUI_GetFreeObj(void)
         if (! OBJ_IS_USED(&GUI_Array[i])) {
             obj = &GUI_Array[i];
             obj->next = NULL;
-            OBJ_SET_DISABLED(obj, 0);
+            OBJ_SET_HIDDEN(obj, 0);
             OBJ_SET_MODAL(obj, 0);
             OBJ_SET_DIRTY(obj, 1);
             return obj;
@@ -227,13 +243,13 @@ void GUI_RefreshScreen(void)
         return;
     }
     if((obj = GUI_IsModal())) {
-        if(OBJ_IS_DIRTY(obj)) {
+        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
             GUI_DrawObject(obj);
         }
     } else {
         obj = objHEAD;
         while(obj) {
-            if(OBJ_IS_DIRTY(obj)) {
+            if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
                 if(OBJ_IS_TRANSPARENT(obj)) {
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
@@ -284,7 +300,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
     struct guiObject *obj = objHEAD;
     
     while(obj) {
-        if (! OBJ_IS_DISABLED(obj)
+        if (! OBJ_IS_HIDDEN(obj)
             && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
         {
             switch (obj->Type) {
@@ -377,7 +393,9 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         return NULL;
     obj = obj ? obj->next : objHEAD;
     while(obj) {
-        if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox) {
+        if (! OBJ_IS_HIDDEN(obj) &&
+            (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+        {
             foundObj = obj;
             break;
         }
@@ -396,8 +414,11 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     while(obj) {
         if (obj == origObj)
             break;
-        if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox)
+        if (! OBJ_IS_HIDDEN(obj) &&
+            (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+        {
             objLast = obj;
+        }
         obj = obj->next;
     }
     if (obj && ! objLast) {
@@ -405,8 +426,11 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         while(obj) {
             if (obj == origObj)
                 break;
-            if (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox)
+            if (! OBJ_IS_HIDDEN(obj) &&
+                (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+            {
                 objLast = obj;
+            }
             obj = obj->next;
         }
     }
