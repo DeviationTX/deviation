@@ -24,6 +24,7 @@ const char *show_throttle_cb(guiObject_t *obj, void *data);
 const char *voltage_cb(guiObject_t *obj, void *data);
 s16 trim_cb(void * data);
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
+void press_menu_cb(guiObject_t *obj, s8 press_type, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
@@ -37,6 +38,10 @@ void PAGE_MainInit(int page)
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
+
+    //Me nu
+    mp->iconObj = GUI_CreateImageOffset(8, 4, 24, 24, 0, 0, "media/menu.bmp", press_menu_cb, NULL);
+ 
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
@@ -122,5 +127,15 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
     if(press_type == -1) {
         PAGE_SetModal(1);
         MODELPage_ShowLoadSave(0, PAGE_MainInit);
+    }
+}
+
+void press_menu_cb(guiObject_t *obj, s8 press_type, void *data)
+{
+    (void)data;
+    (void)obj;
+    if(press_type == -1) {
+        //PAGE_SetModal(1);
+        //MODELPage_ShowLoadSave(0, PAGE_MainInit);
     }
 }
