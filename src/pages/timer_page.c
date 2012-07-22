@@ -35,6 +35,7 @@ void PAGE_TimerInit(int page)
     (void)page;
     int i;
     PAGE_SetModal(0);
+    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Timer");
     for (i = 0; i < NUM_TIMERS; i++) {
         u8 x = 48 + i * 96;
         //Row 1
