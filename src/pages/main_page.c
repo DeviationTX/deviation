@@ -39,9 +39,9 @@ void PAGE_MainInit(int page)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
 
-    //Me nu
-    mp->iconObj = GUI_CreateImageOffset(8, 4, 24, 24, 0, 0, "media/menu.bmp", press_menu_cb, NULL);
- 
+    //Menu
+    mp->menuObj = GUI_CreateImageOffset(8, 4, 24, 24, 0, 0, "media/menu.bmp", press_menu_cb, NULL);
+
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
