@@ -2,6 +2,7 @@
 #define _MODEL_H_
 
 #include "mixer.h"
+#include "timer.h"
 
 /* INI file consts */
 const char *MODEL_NAME;
@@ -25,6 +26,7 @@ struct Model {
     struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_CHANNELS];
+    struct Timer timer[NUM_TIMERS];
     u8 template[NUM_CHANNELS];
 };
 extern struct Model Model;

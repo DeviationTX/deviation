@@ -4,6 +4,7 @@
 #include "mixer_page.h"
 #include "main_page.h"
 #include "trim_page.h"
+#include "timer_page.h"
 #include "model_page.h"
 #include "chantest_page.h"
 
@@ -13,6 +14,7 @@ struct pagemem {
         struct mixer_page mixer_page;
         struct trim_page trim_page;
         struct model_page model_page;
+        struct timer_page timer_page;
         struct chantest_page chantest_page;
     } u;
 };
@@ -31,6 +33,10 @@ void PAGE_MixerEvent();
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
+
+/* Timer */
+void PAGE_TimerInit(int page);
+void PAGE_TimerEvent();
 
 /* Model */
 void PAGE_ModelInit(int page);
