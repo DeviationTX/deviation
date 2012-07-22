@@ -242,12 +242,16 @@ static void show_expo_dr()
 static void show_complex()
 {
     //Row 1
-    mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, BOLD_FONT, "Mixers:");
-    GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
-    GUI_CreateLabel(COL2_TEXT, 40, NULL, BOLD_FONT, "Page:");
-    GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
+    if (! mp->expoObj[0]) {
+        mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, BOLD_FONT, "Mixers:");
+        GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
+        GUI_CreateLabel(COL2_TEXT, 40, NULL, BOLD_FONT, "Page:");
+        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
+    } else {
+        GUI_RemoveHierObjects(mp->expoObj[0]);
+    }
     //Row 2
-    GUI_CreateLabel(COL1_TEXT, 64, NULL, DEFAULT_FONT, "Switch:");
+    mp->expoObj[0] = GUI_CreateLabel(COL1_TEXT, 64, NULL, DEFAULT_FONT, "Switch:");
     GUI_CreateTextSelect(COL1_VALUE, 64, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
     GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, "Mux:");
     GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
@@ -427,7 +431,6 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     cur = GUI_TextSelectHelper(cur, 1, mp->num_mixers, dir, 1, 1, &changed);
     if (changed) {
         mp->cur_mixer = mp->mixer + (cur - 1);
-        GUI_RemoveHierObjects(mp->firstObj); 
         show_complex();
     }
     sprintf(mp->tmpstr, "%d", cur);
