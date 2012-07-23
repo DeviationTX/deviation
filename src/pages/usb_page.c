@@ -17,6 +17,8 @@
 #include "pages.h"
 #include "gui/gui.h"
 
+static struct usb_page * const up = &pagemem.u.usb_page;
+
 static void draw_page(u8 enable)
 {
     GUI_RemoveAllObjects();
@@ -55,17 +57,11 @@ static void wait_release()
     printf("Released\n");
 }
 
-void PAGE_USBInit(int page)
+u8 usb_cb(u32 button, u8 flags, void *data)
 {
-    (void)page;
-    PAGE_SetModal(0);
-    draw_page(0);
-}
-
-void PAGE_USBEvent()
-{
-    u32 buttons = ScanButtons();
-    if (CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
+    (void)button;
+    (void)data;
+    if(flags == BUTTON_RELEASE) {
         draw_page(1);
         GUI_RefreshScreen();
         USB_Enable(1);
@@ -75,6 +71,24 @@ void PAGE_USBEvent()
         USB_Disable(1);
         draw_page(0);
     }
+    return 1;
+}
+
+void PAGE_USBInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    draw_page(0);
+    BUTTON_RegisterCallback(&up->action, CHAN_ButtonMask(BUT_ENTER), BUTTON_PRESS | BUTTON_RELEASE, usb_cb, NULL);
+}
+
+void PAGE_USBExit()
+{
+    BUTTON_UnregisterCallback(&up->action);
+}
+
+void PAGE_USBEvent()
+{
 }
 
 void USB_Connect()

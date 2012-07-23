@@ -21,23 +21,24 @@
 struct page {
     void (*init)(int i);
     void (*event)();
+    void (*exit)();
 };
 
 struct pagemem pagemem;
 
 static const struct page pages[] = {
-    {PAGE_MainInit, PAGE_MainEvent},
-    {NULL, NULL},
-    {PAGE_ModelInit, PAGE_ModelEvent},
-    {PAGE_MixerInit, PAGE_MixerEvent},
-    {PAGE_TrimInit, PAGE_TrimEvent},
-    {PAGE_TimerInit, PAGE_TimerEvent},
-    {NULL, NULL},
-    {PAGE_ChantestInit, PAGE_ChantestEvent},
-    {PAGE_ScannerInit, PAGE_ScannerEvent},
-    //{PAGE_TestInit, PAGE_TestEvent},
-    {PAGE_USBInit, PAGE_USBEvent},
-    {NULL, NULL},
+    {PAGE_MainInit, PAGE_MainEvent, NULL},
+    {NULL, NULL, NULL},
+    {PAGE_ModelInit, PAGE_ModelEvent, NULL},
+    {PAGE_MixerInit, PAGE_MixerEvent, NULL},
+    {PAGE_TrimInit, PAGE_TrimEvent, NULL},
+    {PAGE_TimerInit, PAGE_TimerEvent, NULL},
+    {NULL, NULL, NULL},
+    {PAGE_ChantestInit, PAGE_ChantestEvent, NULL},
+    {PAGE_ScannerInit, PAGE_ScannerEvent, NULL},
+    //{PAGE_TestInit, PAGE_TestEvent, NULL},
+    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit},
+    {NULL, NULL, NULL},
 };
 
 static u8 page;
@@ -53,17 +54,23 @@ void PAGE_Init()
 void PAGE_SetSection(u8 section)
 {
     u8 p;
+    u8 newpage = page;
     u8 sec = 0;
     for(p = 0; p < sizeof(pages) / sizeof(struct page); p++) {
         if(sec == section) {
-            page = p;
+            newpage = p;
             break;
         }
         if (pages[p].init == NULL)
             sec++;
     }
-    GUI_RemoveAllObjects();
-    pages[page].init(0);
+    if (newpage != page) {
+        if (pages[page].exit)
+            pages[page].exit();
+        page = newpage;
+        GUI_RemoveAllObjects();
+        pages[page].init(0);
+    }
 }
 
 void PAGE_Change(int dir)
@@ -88,6 +95,8 @@ void PAGE_Change(int dir)
     }
     if (page == nextpage)
         return;
+    if (pages[page].exit)
+        pages[page].exit();
     page = nextpage;
     GUI_RemoveAllObjects();
     pages[page].init(0);

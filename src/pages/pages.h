@@ -7,6 +7,7 @@
 #include "timer_page.h"
 #include "model_page.h"
 #include "chantest_page.h"
+#include "usb_page.h"
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1
@@ -19,6 +20,7 @@ struct pagemem {
         struct model_page model_page;
         struct timer_page timer_page;
         struct chantest_page chantest_page;
+        struct usb_page usb_page;
     } u;
 };
 
@@ -64,4 +66,5 @@ void PAGE_ScannerEvent();
 /* USB */
 void PAGE_USBInit(int page);
 void PAGE_USBEvent();
+void PAGE_USBExit();
 #endif
