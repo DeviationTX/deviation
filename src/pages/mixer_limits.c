@@ -105,7 +105,6 @@ static void okcancel_cb(guiObject_t *obj, void *data)
         MIX_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
-    mp->graph = NULL;
     PAGE_MixerInit(0);
 }
 

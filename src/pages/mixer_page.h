@@ -21,7 +21,7 @@ struct mixer_page {
     struct Mixer mixer[5];
     struct Mixer *cur_mixer;
     struct Limit limit;
-    guiObject_t *graph;
+    guiObject_t *graphs[3];
     u8 channel;
     u8 num_mixers;
     u8 num_complex_mixers;

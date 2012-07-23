@@ -88,9 +88,14 @@ static const char *show_source(guiObject_t *obj, void *data)
 
 void PAGE_MixerEvent()
 {
-    if(mp->graph && mp->cur_mixer) {
-        if(MIX_ReadInputs(mp->raw))
-            GUI_Redraw(mp->graph);
+    if (mp->cur_mixer && mp->graphs[0]) {
+        if(MIX_ReadInputs(mp->raw)) {
+            GUI_Redraw(mp->graphs[0]);
+            if (mp->graphs[1])
+                GUI_Redraw(mp->graphs[1]);
+            if (mp->graphs[2])
+                GUI_Redraw(mp->graphs[2]);
+        }
     }
 }
 
