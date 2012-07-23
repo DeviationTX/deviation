@@ -26,6 +26,8 @@ const char *voltage_cb(guiObject_t *obj, void *data);
 s16 trim_cb(void * data);
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
 void press_icon2_cb(guiObject_t *obj, void *data);
+void press_timer_cb(guiObject_t *obj, s8 press_type, void *data);
+const char *show_timer_cb(guiObject_t *obj, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
@@ -63,10 +65,10 @@ void PAGE_MainInit(int page)
                                       show_throttle_cb, NULL, &Channels[5]);
     //Timer
     mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 24, &TIMER_FONT,
-                                      show_throttle_cb, NULL, &Channels[5]);
+                                      show_timer_cb, press_timer_cb, (void *)0);
     //Telemetry value
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
-                                          show_throttle_cb, NULL, &Channels[5]);
+                                      show_timer_cb, press_timer_cb, (void *)1);
     //Icon
     mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
  
@@ -93,6 +95,14 @@ void PAGE_MainEvent()
     if(mp->throttle != Channels[INP_THROTTLE - 1]) {
         mp->throttle = Channels[INP_THROTTLE - 1];
         GUI_Redraw(mp->throttleObj);
+    }
+    if(mp->timer[0] != TIMER_GetValue(0)) {
+        mp->timer[0] = TIMER_GetValue(0);
+        GUI_Redraw(mp->timerObj);
+    }
+    if(mp->timer[1] != TIMER_GetValue(1)) {
+        mp->timer[1] = TIMER_GetValue(1);
+        GUI_Redraw(mp->telemetryObj);
     }
 }
 
@@ -136,4 +146,23 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
 void press_icon2_cb(guiObject_t *obj, void *data)
 {
     press_icon_cb(obj, -1, data);
+}
+
+void press_timer_cb(guiObject_t *obj, s8 press_type, void *data)
+{
+    (void)obj;
+    if(press_type == -1 && ! mp->ignore_release) 
+        TIMER_StartStop((long)data);
+    mp->ignore_release = 0;
+    if(press_type == 1) {
+        TIMER_Reset((long)data);
+        mp->ignore_release = 1;
+    }
+}
+
+const char *show_timer_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    TIMER_SetString(mp->tmpstr, TIMER_GetValue((long)data));
+    return mp->tmpstr;
 }

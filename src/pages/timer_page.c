@@ -74,6 +74,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     MIX_SET_SRC_INV(src, is_neg);
     if (changed) {
         timer->src = src;
+        TIMER_Reset(idx);
     }
     return MIXPAGE_SourceName(src);
 }
@@ -83,6 +84,7 @@ void toggle_source_cb(guiObject_t *obj, void *data)
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
     MIX_SET_SRC_INV(timer->src, ! MIX_SRC_IS_INV(timer->src));
+    TIMER_Reset(idx);
     GUI_Redraw(obj);
 }
 
@@ -90,8 +92,11 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 idx = (long)data;
+    u8 changed;
     struct Timer *timer = &Model.timer[idx];
-    timer->type = GUI_TextSelectHelper(timer->type, 0, 1, dir, 1, 1, NULL);
+    timer->type = GUI_TextSelectHelper(timer->type, 0, 1, dir, 1, 1, &changed);
+    if (changed)
+        TIMER_Reset(idx);
     update_countdown(idx);
     switch (timer->type) {
     case TIMER_STOPWATCH: return "stopwatch";
@@ -105,6 +110,7 @@ void toggle_timertype_cb(guiObject_t *obj, void *data)
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
     timer->type = ! timer->type;
+    TIMER_Reset(idx);
     update_countdown(idx);
     GUI_Redraw(obj);
 }
@@ -113,11 +119,11 @@ const char *set_start_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     u8 idx = (long)data;
+    u8 changed;
     struct Timer *timer = &Model.timer[idx];
-    timer->timer = GUI_TextSelectHelper(timer->timer, 0, TIMER_MAX_VAL, dir, 5, 30, NULL);
-    u8 h = timer->timer / 3600;
-    u8 m = (timer->timer - h*3600) / 60;
-    u8 s = timer->timer -h*3600 - m*60;
-    sprintf(tp->timer, "%02d:%02d:%02d", h, m, s);
+    timer->timer = GUI_TextSelectHelper(timer->timer, 0, TIMER_MAX_VAL, dir, 5, 30, &changed);
+    if (changed)
+        TIMER_Reset(idx);
+    TIMER_SetString(tp->timer, timer->timer);
     return tp->timer;
 }

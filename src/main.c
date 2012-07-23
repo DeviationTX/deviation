@@ -18,6 +18,7 @@
 #include "misc.h"
 #include "gui/gui.h"
 #include "buttons.h"
+#include "timer.h"
 
 void event_loop(void *);
 
@@ -134,6 +135,7 @@ void event_loop(void *param)
     PAGE_Event();
 
     if (CLOCK_getms() > last_redraw + 100) {
+        TIMER_Update();
         if (touch_down && touch_down++ >= 5) {
             //Long-press
             struct touch t = SPITouch_GetCoords();
