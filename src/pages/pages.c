@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "pages.h"
+#include "icons.h"
 #include "gui/gui.h"
 
 struct page {
@@ -26,14 +27,17 @@ struct pagemem pagemem;
 
 static const struct page pages[] = {
     {PAGE_MainInit, PAGE_MainEvent},
+    {NULL, NULL},
+    {PAGE_ModelInit, PAGE_ModelEvent},
     {PAGE_MixerInit, PAGE_MixerEvent},
     {PAGE_TrimInit, PAGE_TrimEvent},
     {PAGE_TimerInit, PAGE_TimerEvent},
-    {PAGE_ModelInit, PAGE_ModelEvent},
+    {NULL, NULL},
     {PAGE_ChantestInit, PAGE_ChantestEvent},
     {PAGE_ScannerInit, PAGE_ScannerEvent},
-    {PAGE_TestInit, PAGE_TestEvent},
+    //{PAGE_TestInit, PAGE_TestEvent},
     {PAGE_USBInit, PAGE_USBEvent},
+    {NULL, NULL},
 };
 
 static u8 page;
@@ -46,23 +50,46 @@ void PAGE_Init()
     pages[page].init(0);
 }
 
+void PAGE_SetSection(u8 section)
+{
+    u8 p;
+    u8 sec = 0;
+    for(p = 0; p < sizeof(pages) / sizeof(struct page); p++) {
+        if(sec == section) {
+            page = p;
+            break;
+        }
+        if (pages[p].init == NULL)
+            sec++;
+    }
+    GUI_RemoveAllObjects();
+    pages[page].init(0);
+}
+
 void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (dir == 0)
-        return;
-    GUI_RemoveAllObjects();
+    u8 nextpage = page;
     if(dir > 0) {
-        page++;
-        if (page >= sizeof(pages) / sizeof(struct page))
-            page = 0;
+        if (pages[nextpage+1].init != NULL) {
+            nextpage++;
+        } else {
+            while(nextpage && pages[nextpage-1].init != NULL)
+              nextpage--;
+        } 
     } else if (dir < 0) {
-        if (page == 0)
-            page = sizeof(pages) / sizeof(struct page) - 1;
-        else
-            page--;
+        if (nextpage && pages[nextpage-1].init != NULL) {
+            nextpage--;
+        } else {
+            while(pages[nextpage+1].init != NULL)
+                nextpage++;
+        }
     }
+    if (page == nextpage)
+        return;
+    page = nextpage;
+    GUI_RemoveAllObjects();
     pages[page].init(0);
 }
 
@@ -76,4 +103,20 @@ u8 PAGE_SetModal(u8 _modal)
     u8 old = modal;
     modal = _modal;
     return old;
+}
+
+void changepage_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    if((long)data == 0) {
+        PAGE_SetSection(SECTION_MAIN);
+    } else if ((long)data == 1) {
+        PAGE_Change(1);
+    }
+}
+void PAGE_ShowHeader(const char *title)
+{
+    GUI_CreateIcon(0, 1, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
+    GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
 }

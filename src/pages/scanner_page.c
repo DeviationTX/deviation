@@ -42,13 +42,14 @@ void PAGE_ScannerInit(int page)
     u8 i;
     (void)page;
     PAGE_SetModal(0);
+    PAGE_ShowHeader("Scanner");
+
     DEVO_Initialize();  //Switch to DEVO configuration
     CLOCK_StopTimer();
     CYRF_ConfigRxTx(0);
     CYRF_ConfigCRCSeed(0);
     //CYRF_ConfigSOPCode(0);
 
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Scanner");
 
     time_to_scan = 0;
     channel = MIN_RADIOCHANNEL;

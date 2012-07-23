@@ -74,7 +74,7 @@ void PAGE_MixerInit(int page)
     PAGE_SetModal(0);
     mp->firstObj = NULL;
     mp->top_channel = 0;
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Mixer");
+    PAGE_ShowHeader("Mixer");
     GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
     show_page();
 }

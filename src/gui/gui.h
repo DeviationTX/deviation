@@ -62,6 +62,13 @@ struct LabelDesc {
     enum LabelType style;
 };
 
+struct ImageMap {
+    const char *file;
+    u8 width;
+    u8 height;
+    u16 x_off;
+    u16 y_off;
+};
 #ifndef ENABLE_GUIOBJECT
 typedef void guiObject_t;
 #else
@@ -86,13 +93,6 @@ enum ImageNames {
     FILE_ARROW_16_DOWN,
     FILE_ARROW_16_RIGHT,
     FILE_ARROW_16_LEFT,
-};
-struct ImageMap {
-    const char *file;
-    u8 width;
-    u8 height;
-    u16 x_off;
-    u16 y_off;
 };
 const struct ImageMap image_map[FILE_ARROW_16_LEFT+1];
 
@@ -313,6 +313,9 @@ guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_of
 
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
+        void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(guiObject_t *obj, u16 selected, void *data),

@@ -21,7 +21,6 @@
 
 static struct model_page * const mp = &pagemem.u.model_page;
 
-static void loadsave_cb(guiObject_t *obj, void *data);
 static void changename_cb(guiObject_t *obj, void *data);
 static void fixedid_cb(guiObject_t *obj, void *data);
 static const char *typeselect_cb(guiObject_t *obj, int dir, void *data);
@@ -29,40 +28,53 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
+static const char *fileselect_cb(guiObject_t *obj, int dir, void *data);
+static void toggle_file_cb(guiObject_t *obj, void *data);
 
 void PAGE_ModelInit(int page)
 {
     (void)page;
+    u8 row;
+
+    mp->file_state = 0;
     PAGE_SetModal(0);
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Model");
+    PAGE_ShowHeader("Model");
 
-    GUI_CreateButton(90, 4, BUTTON_96, "Load", 0x0000, loadsave_cb, (void *)0L);
-    GUI_CreateButton(188, 4, BUTTON_96, "Save As", 0x0000, loadsave_cb, (void *)1L);
+    row = 46;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "File:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, toggle_file_cb, fileselect_cb, NULL);
 
-    GUI_CreateLabel(8, 48, NULL, DEFAULT_FONT, "Model Name:");
-    GUI_CreateButton(136, 48, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
+    GUI_CreateButton(136, row, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);
 
-    GUI_CreateLabel(8, 72, NULL, DEFAULT_FONT, "Model Type:");
-    GUI_CreateTextSelect(136, 72, TEXTSELECT_96, 0x0000, NULL, typeselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, typeselect_cb, NULL);
 
-    GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Number of Channels:");
-    GUI_CreateTextSelect(136, 96, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Number of Channels:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
 
-    GUI_CreateLabel(8, 120, NULL, DEFAULT_FONT, "Mode:");
-    GUI_CreateTextSelect(136, 120, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Mode:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
 
-    GUI_CreateLabel(8, 144, NULL, DEFAULT_FONT, "Tx Power:");
-    GUI_CreateTextSelect(136, 144, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Tx Power:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
 
-    GUI_CreateLabel(8, 168, NULL, DEFAULT_FONT, "Protocol:");
-    GUI_CreateTextSelect(136, 168, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Protocol:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
 
+    row += 24;
     if(Model.fixed_id == 0)
         sprintf(mp->fixed_id, "None");
     else
         sprintf(mp->fixed_id, "%d", Model.fixed_id);
-    GUI_CreateLabel(8, 192, NULL, DEFAULT_FONT, "Fixed ID:");
-    GUI_CreateButton(136, 192, BUTTON_96x16, mp->fixed_id, 0x0000, fixedid_cb, NULL);
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Fixed ID:");
+    GUI_CreateButton(136, row, BUTTON_96x16, mp->fixed_id, 0x0000, fixedid_cb, NULL);
 }
 
 void PAGE_ModelEvent()
@@ -70,14 +82,6 @@ void PAGE_ModelEvent()
 }
 
 /* Button callbacks */
-static void loadsave_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    long loadsave = (long)data;
-    PAGE_SetModal(1);
-    MODELPage_ShowLoadSave(loadsave, PAGE_ModelInit);
-}
-
 static void changename_done_cb(guiObject_t *obj, void *data)
 {
     (void)data;
@@ -115,11 +119,8 @@ static void fixedid_cb(guiObject_t *obj, void *data)
 static const char *typeselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    u8 changed;
-    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(obj);
-    }
+    (void)obj;
+    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, NULL);
     switch (Model.type) {
         case 0: return "Helicopter";
         default: return "Airplane";
@@ -129,22 +130,16 @@ static const char *typeselect_cb(guiObject_t *obj, int dir, void *data)
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    u8 changed;
-    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_CHANNELS, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(obj);
-    }
+    (void)obj;
+    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_CHANNELS, dir, 1, 1, NULL);
     sprintf(mp->tmpstr, "%d", Model.num_channels);
     return mp->tmpstr;
 }
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    u8 changed;
-    Model.mode = GUI_TextSelectHelper(Model.mode, MODE_1, MODE_4, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(obj);
-    }
+    (void)obj;
+    Model.mode = GUI_TextSelectHelper(Model.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
     sprintf(mp->tmpstr, "Mode %d", Model.mode + 1);
     return mp->tmpstr;
 }
@@ -152,20 +147,34 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    u8 changed;
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_300uW, TXPOWER_100mW, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(obj);
-    }
+    (void)obj;
+    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_300uW, TXPOWER_100mW, dir, 1, 1, NULL);
     return RADIO_TX_POWER_VAL[Model.tx_power];
 }
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    u8 changed;
-    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_J6PRO, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(obj);
-    }
+    (void)obj;
+    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_J6PRO, dir, 1, 1, NULL);
     return RADIO_PROTOCOL_VAL[Model.protocol];
+}
+static const char *fileselect_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 1, dir, 1, 1, NULL);
+    if (mp->file_state == 0)
+        return "Load...";
+    else if (mp->file_state == 1)
+        return "Copy To...";
+    else
+        return "";
+}
+
+static void toggle_file_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    PAGE_SetModal(1);
+    MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
 }

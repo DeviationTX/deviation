@@ -29,7 +29,7 @@ void PAGE_ChantestInit(int page)
     #define SEPERATION 36
     (void)page;
     PAGE_SetModal(0);
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Channels");
+    PAGE_ShowHeader("Channels");
 
     int i;
     u8 height;

@@ -20,6 +20,8 @@
 static void draw_page(u8 enable)
 {
     GUI_RemoveAllObjects();
+    PAGE_ShowHeader("USB");
+
     if(enable == 0) {
         GUI_CreateLabel(100, 100, NULL, DEFAULT_FONT, "USB File System is disabled\nPress 'Ent' to enable");
     } else {

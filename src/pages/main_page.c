@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "pages.h"
+#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
@@ -24,6 +25,7 @@ const char *show_throttle_cb(guiObject_t *obj, void *data);
 const char *voltage_cb(guiObject_t *obj, void *data);
 s16 trim_cb(void * data);
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
+void press_icon2_cb(guiObject_t *obj, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
@@ -37,6 +39,7 @@ void PAGE_MainInit(int page)
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
+    GUI_CreateIcon(0, 1, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
@@ -65,7 +68,7 @@ void PAGE_MainInit(int page)
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
                                           show_throttle_cb, NULL, &Channels[5]);
     //Icon
-    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, NULL);
+    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
  
     //Battery
     if (Display.flags & SHOW_BAT_ICON) {
@@ -117,10 +120,20 @@ s16 trim_cb(void * data)
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
 {
-    (void)data;
     (void)obj;
     if(press_type == -1) {
-        PAGE_SetModal(1);
-        MODELPage_ShowLoadSave(0, PAGE_MainInit);
+        if ((long)data == 0) {
+            PAGE_SetSection(SECTION_OPTIONS);
+        } else if ((long)data == 1) {
+            PAGE_SetSection(SECTION_MODEL);
+        } else {
+            PAGE_SetModal(1);
+            MODELPage_ShowLoadSave(0, PAGE_MainInit);
+        }
     }
+}
+
+void press_icon2_cb(guiObject_t *obj, void *data)
+{
+    press_icon_cb(obj, -1, data);
 }

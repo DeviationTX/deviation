@@ -8,6 +8,9 @@
 #include "model_page.h"
 #include "chantest_page.h"
 
+#define SECTION_MAIN    0
+#define SECTION_MODEL   1
+#define SECTION_OPTIONS 2
 struct pagemem {
     union {
         struct main_page main_page;
@@ -21,10 +24,13 @@ struct pagemem {
 
 extern struct pagemem pagemem;
 
+void PAGE_ShowHeader(const char *title);
+u8 PAGE_SetModal(u8 _modal);
+void PAGE_SetSection(u8 section);
+
 /* Main */
 void PAGE_MainInit(int page);
 void PAGE_MainEvent();
-u8 PAGE_SetModal(u8 _modal);
 
 /* Mixer */
 void PAGE_MixerInit(int page);

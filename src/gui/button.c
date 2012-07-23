@@ -64,12 +64,49 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     return obj;
 }
 
+guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
+        void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
+{
+    struct guiObject *obj    = GUI_GetFreeObj();
+    struct guiButton *button;
+    struct guiBox    *box;
+
+    if (obj == NULL)
+        return NULL;
+
+    box = &obj->box;
+    button = &obj->o.button;
+    button->image = image;
+
+    box->x = x;
+    box->y = y;
+    box->width = button->image->width;
+    box->height = button->image->height;
+
+    obj->Type = Button;
+    //Even though the image cannot be overlapped, the file can change under press and select states
+    //So we need transparency set
+    OBJ_SET_TRANSPARENT(obj, 1);
+    OBJ_SET_USED(obj, 1);
+    connect_object(obj);
+
+    button->text = NULL;
+    button->text_x_off = 0;
+    button->text_y_off = 0;
+    button->CallBack = CallBack;
+    button->cb_data = cb_data;
+
+    return obj;
+}
+
 void GUI_DrawButton(struct guiObject *obj)
 {
     struct guiButton *button = &obj->o.button;
     struct guiBox *box = &obj->box;
 
     GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
-    LCD_SetFontColor(button->fontColor);
-    LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
+    if (button->text) {
+       LCD_SetFontColor(button->fontColor);
+       LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
+    }
 }
