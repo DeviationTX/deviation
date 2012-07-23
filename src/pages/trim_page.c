@@ -92,7 +92,7 @@ void PAGE_TrimInit(int page)
     (void)page;
     int i;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("trim");
+    PAGE_ShowHeader("Trim");
 
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Input");
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, "Trim Neg");
