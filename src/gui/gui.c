@@ -84,7 +84,9 @@ void GUI_DrawObject(struct guiObject *obj)
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
     }
     if (obj == objSELECTED) {
-        LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, Display.select_color);
+        int i;
+        for(i = 0; i < Display.select_width; i++)
+            LCD_DrawRect(obj->box.x+i, obj->box.y+i, obj->box.width-2*i, obj->box.height-2*i, Display.select_color);
     }
     OBJ_SET_DIRTY(obj, 0);
 }

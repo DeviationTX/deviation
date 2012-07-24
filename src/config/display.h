@@ -59,6 +59,7 @@ struct display_settings {
     struct disp_bargraph bargraph;
     struct disp_bargraph trim;
     u16 select_color;
+    u8 select_width;
     enum DispFlags flags;
 };
 

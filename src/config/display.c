@@ -149,6 +149,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->select_color = get_color(value);
             return 1;
         }
+        if(MATCH_KEY("width")) {
+            d->select_width = atoi(value);
+            return 1;
+        }
     }
     if(MATCH_START(section, "keyboard")) {
         if(MATCH_KEY(FONT)) {
