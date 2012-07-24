@@ -39,7 +39,6 @@ guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height,
 
     obj->Type = BarGraph;
     OBJ_SET_TRANSPARENT(obj, 0);
-    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     graph->min = min;

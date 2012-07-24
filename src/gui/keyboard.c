@@ -56,7 +56,6 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
         return NULL;
 
     obj->Type = Keyboard;
-    OBJ_SET_USED(obj, 1);
     OBJ_SET_MODAL(obj, 1);
     connect_object(obj);
 

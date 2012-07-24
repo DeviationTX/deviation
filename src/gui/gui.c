@@ -187,9 +187,9 @@ struct guiObject *GUI_GetFreeObj(void)
         if (! OBJ_IS_USED(&GUI_Array[i])) {
             obj = &GUI_Array[i];
             obj->next = NULL;
-            OBJ_SET_HIDDEN(obj, 0);
-            OBJ_SET_MODAL(obj, 0);
+            obj->flags= 0;
             OBJ_SET_DIRTY(obj, 1);
+            OBJ_SET_USED(obj, 1);
             return obj;
         }
     }
@@ -393,8 +393,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         return NULL;
     obj = obj ? obj->next : objHEAD;
     while(obj) {
-        if (! OBJ_IS_HIDDEN(obj) &&
-            (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
         {
             foundObj = obj;
             break;
@@ -414,8 +413,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     while(obj) {
         if (obj == origObj)
             break;
-        if (! OBJ_IS_HIDDEN(obj) &&
-            (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
         {
             objLast = obj;
         }
@@ -426,8 +424,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         while(obj) {
             if (obj == origObj)
                 break;
-            if (! OBJ_IS_HIDDEN(obj) &&
-                (obj->Type == Button || obj->Type == TextSelect || obj->Type == Listbox))
+            if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
             {
                 objLast = obj;
             }
@@ -543,6 +540,17 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
     }
     return 0;
 }
+guiObject_t *GUI_GetSelected()
+{
+    return objSELECTED;
+}
+
+void GUI_SetSelected(guiObject_t *obj)
+{
+    objSELECTED = obj;
+    OBJ_SET_DIRTY(obj, 1);
+}
+
 
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
 {

@@ -44,7 +44,6 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     obj->Type = Dialog;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(dialog->file));
     OBJ_SET_MODAL(obj, 1);
-    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     dialog->text = text;

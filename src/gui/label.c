@@ -38,7 +38,7 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct Labe
 
     obj->Type = Label;
     OBJ_SET_TRANSPARENT(obj, 0);  //Deal with transparency during drawing
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, pressCallback ? 1 :0);
     connect_object(obj);
 
     label->desc = *desc;

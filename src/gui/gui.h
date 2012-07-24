@@ -242,11 +242,13 @@ struct guiObject {
 #define OBJ_IS_MODAL(x)       ((x)->flags & 0x04) /* bool: UI element is active and all non-model elements are not */
 #define OBJ_IS_DIRTY(x)       ((x)->flags & 0x08) /* bool: UI element needs redraw */
 #define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
-#define OBJ_SET_USED(x,y)        (x)->flags = y ? (x)->flags | 0x01 : (x)->flags & ~0x01
-#define OBJ_SET_HIDDEN(x,y)      (x)->flags = y ? (x)->flags | 0x02 : (x)->flags & ~0x02
-#define OBJ_SET_MODAL(x,y)       (x)->flags = y ? (x)->flags | 0x04 : (x)->flags & ~0x04
-#define OBJ_SET_DIRTY(x,y)       (x)->flags = y ? (x)->flags | 0x08 : (x)->flags & ~0x08
-#define OBJ_SET_TRANSPARENT(x,y) (x)->flags = y ? (x)->flags | 0x10 : (x)->flags & ~0x10
+#define OBJ_IS_SELECTABLE(x)  ((x)->flags & 0x20) /* bool: UI element can be selected */
+#define OBJ_SET_USED(x,y)        (x)->flags = (y) ? (x)->flags | 0x01 : (x)->flags & ~0x01
+#define OBJ_SET_HIDDEN(x,y)      (x)->flags = (y) ? (x)->flags | 0x02 : (x)->flags & ~0x02
+#define OBJ_SET_MODAL(x,y)       (x)->flags = (y) ? (x)->flags | 0x04 : (x)->flags & ~0x04
+#define OBJ_SET_DIRTY(x,y)       (x)->flags = (y) ? (x)->flags | 0x08 : (x)->flags & ~0x08
+#define OBJ_SET_TRANSPARENT(x,y) (x)->flags = (y) ? (x)->flags | 0x10 : (x)->flags & ~0x10
+#define OBJ_SET_SELECTABLE(x,y)  (x)->flags = (y) ? (x)->flags | 0x20 : (x)->flags & ~0x20
 
 #define DRAW_NORMAL  0
 #define DRAW_PRESSED 1
@@ -349,12 +351,14 @@ void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);
 void GUI_SetHidden(guiObject_t *obj, u8 state);
+guiObject_t *GUI_GetSelected();
+void GUI_SetSelected(guiObject_t *obj);
 
-struct guiObject *GUI_IsModal(void);
+guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
-void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_off);
+void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
 #include "config/display.h"
 

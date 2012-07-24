@@ -50,7 +50,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     //Even though the image cannot be overlapped, the file can change under press and select states
     //So we need transparency set
     OBJ_SET_TRANSPARENT(obj, 1);
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
     LCD_GetStringDimensions((u8 *) text, &text_w, &text_h);
@@ -87,7 +87,7 @@ guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
     //Even though the image cannot be overlapped, the file can change under press and select states
     //So we need transparency set
     OBJ_SET_TRANSPARENT(obj, 1);
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
     button->text = NULL;

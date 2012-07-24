@@ -33,6 +33,7 @@ void PAGE_SetSection(u8 section);
 /* Main */
 void PAGE_MainInit(int page);
 void PAGE_MainEvent();
+void PAGE_MainExit();
 
 /* Mixer */
 void PAGE_MixerInit(int page);

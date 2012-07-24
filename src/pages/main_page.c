@@ -28,6 +28,7 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
 void press_icon2_cb(guiObject_t *obj, void *data);
 void press_timer_cb(guiObject_t *obj, s8 press_type, void *data);
 const char *show_timer_cb(guiObject_t *obj, void *data);
+static u8 action_cb(u32 button, u8 flags, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
@@ -38,13 +39,22 @@ void PAGE_MainInit(int page)
     (void)page;
     int i;
     PAGE_SetModal(0);
+    BUTTON_RegisterCallback(&mp->action,
+          CHAN_ButtonMask(BUT_ENTER)
+          | CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_UP)
+          | CHAN_ButtonMask(BUT_DOWN),
+          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
     for (i = 0; i < TRIMS_TO_SHOW; i++)
         mp->trims[i] = Trims[i];
     mp->throttle = Channels[0];
-    GUI_CreateIcon(0, 1, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+    mp->optsObj = GUI_CreateIcon(0, 1, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
+    //Icon
+    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
     //Throttle
     mp->trimObj[2] = GUI_CreateBarGraph(130, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
     //Rudder
@@ -69,8 +79,6 @@ void PAGE_MainInit(int page)
     //Telemetry value
     mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
                                       show_timer_cb, press_timer_cb, (void *)1);
-    //Icon
-    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
  
     //Battery
     if (Display.flags & SHOW_BAT_ICON) {
@@ -104,6 +112,11 @@ void PAGE_MainEvent()
         mp->timer[1] = TIMER_GetValue(1);
         GUI_Redraw(mp->telemetryObj);
     }
+}
+
+void PAGE_MainExit()
+{
+    BUTTON_UnregisterCallback(&mp->action);
 }
 
 const char *show_throttle_cb(guiObject_t *obj, void *data)
@@ -165,4 +178,23 @@ const char *show_timer_cb(guiObject_t *obj, void *data)
     (void)obj;
     TIMER_SetString(mp->tmpstr, TIMER_GetValue((long)data));
     return mp->tmpstr;
+}
+
+static u8 action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if(! GUI_GetSelected()) {
+        if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            mp->ignore_release = 1;
+            GUI_SetSelected(mp->optsObj);
+        }
+        return 1;
+    } else {
+        if(mp->ignore_release) {
+            if (flags & BUTTON_RELEASE)
+                mp->ignore_release = 0;
+            return 1;
+        }
+        return 0;
+    }
 }

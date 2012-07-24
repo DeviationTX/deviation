@@ -51,7 +51,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     //Even though the image cannot be overlapped, the file can change under press and select states
     //So we need transparency set
     OBJ_SET_TRANSPARENT(obj, 1);
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
     select->state     = 0;

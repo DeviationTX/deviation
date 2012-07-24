@@ -46,7 +46,7 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
 
     obj->Type = Listbox;
     OBJ_SET_TRANSPARENT(obj, 0);
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
     LCD_GetCharDimensions('A', &text_w, &text_h);

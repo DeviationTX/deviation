@@ -46,7 +46,6 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
 
     obj->Type = Scrollbar;
     OBJ_SET_TRANSPARENT(obj, 0);
-    OBJ_SET_USED(obj, 1);
     connect_object(obj);
 
     scrollbar = &obj->o.scrollbar;

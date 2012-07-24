@@ -44,7 +44,7 @@ guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_of
 
     obj->Type = Image;
     OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(file));
-    OBJ_SET_USED(obj, 1);
+    OBJ_SET_SELECTABLE(obj, CallBack ? 1 :0);
     connect_object(obj);
 
     return obj;
