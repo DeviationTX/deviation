@@ -151,6 +151,7 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
             PAGE_SetSection(SECTION_MODEL);
         } else {
             PAGE_SetModal(1);
+            PAGE_MainExit();
             MODELPage_ShowLoadSave(0, PAGE_MainInit);
         }
     }
