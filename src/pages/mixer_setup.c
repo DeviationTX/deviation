@@ -22,6 +22,7 @@ static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
 static s16 eval_mixer_cb(s16 xval, void * data);
+static s16 eval_chan_cb(void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
 static void toggle_link_cb(guiObject_t *obj, void *data);
 
@@ -249,6 +250,9 @@ static void show_complex()
     //Row 6
     GUI_CreateLabel(COL1_TEXT, 180, NULL, DEFAULT_FONT, "Offset:");
     GUI_CreateTextSelect(COL1_VALUE, 180, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->offset);
+    mp->graphs[1] = GUI_CreateBarGraph(COL2_TEXT, 88, 10, 120,
+                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+                              eval_chan_cb, NULL);
     mp->graphs[0] = GUI_CreateXYGraph(192, 88, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -262,32 +266,42 @@ static void show_complex()
 
 s16 eval_mixer_cb(s16 xval, void * data)
 {
-    struct Mixer *cur_mixer = (struct Mixer *)data;
+    struct Mixer *mix = (struct Mixer *)data;
+    if (MIX_SRC_IS_INV(mix->src))
+        xval = -xval;
+    s16 yval = CURVE_Evaluate(xval, &mix->curve);
+    yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
+
+    if (yval > PCT_TO_RANGE(mp->limit.max))
+        yval = PCT_TO_RANGE(mp->limit.max);
+    else if (yval < PCT_TO_RANGE(mp->limit.min))
+        yval = PCT_TO_RANGE(mp->limit.min);
+
+    if (yval > CHAN_MAX_VALUE)
+        yval = CHAN_MAX_VALUE;
+    else if (yval <CHAN_MIN_VALUE)
+        yval = CHAN_MIN_VALUE;
+
+    return yval;
+}
+s16 eval_chan_cb(void * data)
+{
+    (void)data;
     int i;
-    u8 src = MIX_SRC(cur_mixer->src);
-    s16 oldval = mp->raw[src];
-    if (src <= NUM_TX_INPUTS)
-        mp->raw[src] = xval;
     MIX_CreateCyclicInputs(mp->raw);
-    if (src > NUM_TX_INPUTS)
-        mp->raw[src] = xval;
     struct Mixer *mix = MIX_GetAllMixers();
     for (i = 0; i < NUM_MIXERS; i++) {
-        if(MIX_SRC(mix->src) != 0 && mix->dest != cur_mixer->dest)
+        if(MIX_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
             MIX_ApplyMixer(mix, mp->raw);
     }
-    u8 old_sw = cur_mixer->sw;
-    cur_mixer->sw = 0;
-    //for (i = 0; i < mp->num_mixers; i++)
-    //    MIX_ApplyMixer(&mp->mixer[i], mp->raw);
-    MIX_ApplyMixer(cur_mixer, mp->raw);
-    cur_mixer->sw = old_sw;
-    mp->raw[src] = oldval;
-    if (mp->raw[cur_mixer->dest + NUM_INPUTS + 1] > CHAN_MAX_VALUE)
+    for (i = 0; i < mp->num_mixers; i++)
+        MIX_ApplyMixer(&mp->mixer[i], mp->raw);
+    s16 value = MIX_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw);
+    if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
-    if (mp->raw[cur_mixer->dest + NUM_INPUTS + 1]  < CHAN_MIN_VALUE)
+    if (value < CHAN_MIN_VALUE)
         return CHAN_MIN_VALUE;
-    return mp->raw[cur_mixer->dest + NUM_INPUTS + 1];
+    return value;
 }
 
 u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
