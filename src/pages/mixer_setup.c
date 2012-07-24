@@ -104,10 +104,10 @@ static u8 touch_cb(s16 x, s16 y, void *data);
 #define COL2_VALUE 216
 static void show_titlerow()
 {
-    GUI_CreateLabel(COL1_TEXT, 10, NULL, TITLE_FONT, (void *)channel_name[mp->channel]);
+    GUI_CreateLabel(COL1_TEXT, 10, MIXPAGE_ChannelNameCB, TITLE_FONT, NULL);
     GUI_CreateTextSelect(COL1_VALUE, 8, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
+    PAGE_CreateCancelButton(160, 4, okcancel_cb);
+    PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
 
 static void show_none()
@@ -174,6 +174,12 @@ void toggle_link_cb(guiObject_t *obj, void *data)
     update_rate_widgets(data ? 1 : 0);
 }
 
+static const char *show_rate_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    return (long)data == 0 ? "Mid-Rate" : "Low-Rate";
+}
+
 static void show_expo_dr()
 {
     sync_mixers();
@@ -187,8 +193,8 @@ static void show_expo_dr()
     GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabel(24, 74, NULL, DEFAULT_FONT, "High-Rate");
-    mp->expoObj[0] = GUI_CreateButton(112, 72, BUTTON_96x16, "Mid-Rate", 0x0000, toggle_link_cb, (void *)0);
-    mp->expoObj[4] = GUI_CreateButton(216, 72, BUTTON_96x16, "Low-Rate", 0x0000, toggle_link_cb, (void *)1);
+    mp->expoObj[0] = GUI_CreateButton(112, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
+    mp->expoObj[4] = GUI_CreateButton(216, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
@@ -437,32 +443,6 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     return mp->tmpstr;
 }
 
-const char *MIXPAGE_SourceName(u8 src)
-{
-    u8 is_neg = MIX_SRC_IS_INV(src);
-    src = MIX_SRC(src);
-
-    if(! src) {
-        return "None";
-    }
-    if(src <= NUM_TX_INPUTS) {
-        if (is_neg) {
-            sprintf(mp->tmpstr, "!%s", tx_input_str[src - 1]);
-            return mp->tmpstr;
-        }
-        return tx_input_str[src - 1];
-    }
-    if(src <= NUM_INPUTS) {
-        sprintf(mp->tmpstr, "%sCYC%d", is_neg ? "!" : "", src - NUM_TX_INPUTS);
-        return mp->tmpstr;
-    }
-    if (is_neg) {
-        sprintf(mp->tmpstr, "!%s", channel_name[src - NUM_INPUTS - 1]);
-        return mp->tmpstr;
-    }
-    return channel_name[src - NUM_INPUTS - 1];
-}
-
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
@@ -475,7 +455,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         sync_mixers();
         redraw_graphs();
     }
-    return MIXPAGE_SourceName(*source);
+    return MIXER_SourceName(mp->tmpstr, *source);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
@@ -498,7 +478,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             redraw_graphs();
         }
     }
-    return MIXPAGE_SourceName(*source);
+    return MIXER_SourceName(mp->tmpstr, *source);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)

@@ -85,14 +85,20 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     mp->return_page(0);
 }
 
+const char *show_loadsave_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    return (long)data == 1 ? "Save" : "Load";
+}
+
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
     u8 num_models;
     GUI_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->return_page = return_page;
-    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 4, BUTTON_48, loadsave ? "Save" : "Load", 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    PAGE_CreateCancelButton(160, 4, okcancel_cb);
+    GUI_CreateButton(264, 4, BUTTON_48, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
     for (num_models = 1; num_models <= 100; num_models++) {
         sprintf(mp->tmpstr, "models/model%d.ini", num_models);
         FILE *fh = fopen(mp->tmpstr, "r");

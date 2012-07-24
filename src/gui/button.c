@@ -18,13 +18,13 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
-        u16 fontColor, void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
+guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
+    const char *(*strCallback)(struct guiObject *, void *), u16 fontColor,
+    void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
     struct guiObject *obj    = GUI_GetFreeObj();
     struct guiButton *button;
     struct guiBox    *box;
-    u16 text_w, text_h;
 
     if (obj == NULL)
         return NULL;
@@ -53,11 +53,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *te
     OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
-    LCD_GetStringDimensions((u8 *) text, &text_w, &text_h);
-    button->text = text;
-    button->text_x_off = (box->width - text_w) / 2 + x;
-    button->text_y_off = (box->height - text_h) / 2 + y + 2;
     button->fontColor = fontColor;
+    button->strCallback = strCallback;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
 
@@ -90,9 +87,7 @@ guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
     OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
-    button->text = NULL;
-    button->text_x_off = 0;
-    button->text_y_off = 0;
+    button->strCallback = NULL;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
 
@@ -103,10 +98,19 @@ void GUI_DrawButton(struct guiObject *obj)
 {
     struct guiButton *button = &obj->o.button;
     struct guiBox *box = &obj->box;
+    const char *txt;
+    u16 x_off, y_off;
 
     GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
-    if (button->text) {
-       LCD_SetFontColor(button->fontColor);
-       LCD_PrintStringXY(button->text_x_off, button->text_y_off, button->text);
+    if (button->strCallback) {
+        u16 text_w, text_h;
+        txt = button->strCallback(obj, button->cb_data);
+        if (txt) {
+            LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+            x_off = (box->width - text_w) / 2 + box->x;
+            y_off = (box->height - text_h) / 2 + box->y + 2;
+           LCD_SetFontColor(button->fontColor);
+           LCD_PrintStringXY(x_off, y_off, txt);
+        }
     }
 }

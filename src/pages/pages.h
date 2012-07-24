@@ -29,6 +29,8 @@ extern struct pagemem pagemem;
 void PAGE_ShowHeader(const char *title);
 u8 PAGE_SetModal(u8 _modal);
 void PAGE_SetSection(u8 section);
+guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data));
+guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data));
 
 /* Main */
 void PAGE_MainInit(int page);

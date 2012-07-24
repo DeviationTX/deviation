@@ -76,7 +76,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         timer->src = src;
         TIMER_Reset(idx);
     }
-    return MIXPAGE_SourceName(src);
+    return MIXER_SourceName(tp->tmpstr, src);
 }
 
 void toggle_source_cb(guiObject_t *obj, void *data)

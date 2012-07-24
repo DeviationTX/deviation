@@ -452,3 +452,20 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     }
     return 1;
 }
+
+const char *MIXER_SourceName(char *str, u8 src)
+{
+    u8 is_neg = MIX_SRC_IS_INV(src);
+    src = MIX_SRC(src);
+
+    if(! src) {
+        sprintf(str, "None");
+    } else if(src <= NUM_TX_INPUTS) {
+        sprintf(str, "%s%s", is_neg ? "!" : "", tx_input_str[src - 1]);
+    } else if(src <= NUM_INPUTS) {
+        sprintf(str, "%sCYC%d", is_neg ? "!" : "", src - NUM_TX_INPUTS);
+    } else {
+        sprintf(str, "%sCh%d", is_neg ? "!" : "", src - NUM_INPUTS);
+    }
+    return str;
+}

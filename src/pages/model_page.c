@@ -31,6 +31,12 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *fileselect_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_file_cb(guiObject_t *obj, void *data);
 
+const char *show_text_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    return (const char *)data;
+}
+
 void PAGE_ModelInit(int page)
 {
     (void)page;
@@ -46,7 +52,7 @@ void PAGE_ModelInit(int page)
 
     row += 24;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
-    GUI_CreateButton(136, row, BUTTON_96x16, Model.name, 0x0000, changename_cb, NULL);
+    GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
 
     row += 24;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
@@ -74,7 +80,7 @@ void PAGE_ModelInit(int page)
     else
         sprintf(mp->fixed_id, "%d", Model.fixed_id);
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Fixed ID:");
-    GUI_CreateButton(136, row, BUTTON_96x16, mp->fixed_id, 0x0000, fixedid_cb, NULL);
+    GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
 }
 
 void PAGE_ModelEvent()

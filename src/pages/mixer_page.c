@@ -18,17 +18,24 @@
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
-const char *channel_name[] = {
-    "Ch1", "Ch2", "Ch3", "Ch4",
-    "Ch5", "Ch6", "Ch7", "Ch8",
-    "Ch9", "Ch10", "Ch11", "Ch12",
-    "Ch13", "Ch14", "Ch15", "Ch16"
-};
-
 static void templateselect_cb(guiObject_t *obj, void *data);
 static void limitselect_cb(guiObject_t *obj, void *data);
 static const char *show_source(guiObject_t *obj, void *data);
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
+
+const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    return MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+}
+
+static const char *template_name_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    u8 ch = (long)data;
+    enum TemplateType template = MIX_GetTemplate(ch);
+    return MIXPAGE_TemplateName(template);
+}
 
 #define ENTRIES_PER_PAGE (8 > NUM_CHANNELS ? NUM_CHANNELS : 8)
 #define MAX_SCROLL (NUM_CHANNELS > ENTRIES_PER_PAGE ? NUM_CHANNELS - ENTRIES_PER_PAGE : NUM_CHANNELS)
@@ -46,15 +53,15 @@ void show_page()
         u8 idx;
         int row = init_y + 24 * i;
         u8 ch = mp->top_channel + i;
-        enum TemplateType template = MIX_GetTemplate(ch);
-        obj = GUI_CreateButton(8, row, BUTTON_48x16, channel_name[ch], 0x0000, limitselect_cb, (void *)((long)ch));
+        obj = GUI_CreateButton(8, row, BUTTON_48x16, MIXPAGE_ChannelNameCB, 0x0000, limitselect_cb, (void *)((long)ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].dest == ch)
                 break;
-        GUI_CreateButton(124, row, BUTTON_64x16, MIXPAGE_TemplateName(template), 0x0000, templateselect_cb, (void *)((long)ch));
+        GUI_CreateButton(124, row, BUTTON_64x16, template_name_cb, 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
+            enum TemplateType template = MIX_GetTemplate(ch);
             GUI_CreateLabel(64, row+2, show_source, DEFAULT_FONT, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx+1].sw) {
@@ -83,7 +90,7 @@ static const char *show_source(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 *source = (u8 *)data;
-    return MIXPAGE_SourceName(*source);
+    return MIXER_SourceName(mp->tmpstr, *source);
 }
 
 void PAGE_MixerEvent()
