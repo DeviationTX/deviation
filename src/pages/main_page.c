@@ -69,7 +69,7 @@ void PAGE_MainInit(int page)
     mp->trimObj[5] = GUI_CreateBarGraph(165, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
     //Throttle
     mp->throttleObj = GUI_CreateLabelBox(16, 40, 100, 40, &THROTTLE_FONT,
-                                         show_throttle_cb, NULL, &Channels[INP_THROTTLE - 1]);
+                                         show_throttle_cb, NULL, &Channels[0]);
     //Pitch
     mp->pitchObj = GUI_CreateLabelBox(16, 90, 100, 40, &THROTTLE_FONT,
                                       show_throttle_cb, NULL, &Channels[5]);
@@ -100,8 +100,8 @@ void PAGE_MainEvent()
         }
     }
     
-    if(mp->throttle != Channels[INP_THROTTLE - 1]) {
-        mp->throttle = Channels[INP_THROTTLE - 1];
+    if(mp->throttle != Channels[0]) {
+        mp->throttle = Channels[0];
         GUI_Redraw(mp->throttleObj);
     }
     if(mp->timer[0] != TIMER_GetValue(0)) {
