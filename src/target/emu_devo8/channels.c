@@ -17,10 +17,10 @@
 #include "mixer.h"
 
 const char *tx_input_str[NUM_TX_INPUTS] = {
+    "AIL",
+    "ELE",
     "THR",
     "RUD",
-    "ELE",
-    "AIL",
     "RUD_D/R",
     "ELE_D/R",
     "AIL D/R",
