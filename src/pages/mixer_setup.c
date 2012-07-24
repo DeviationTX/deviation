@@ -34,17 +34,6 @@ static void show_complex();
 static void redraw_graphs();
 
 
-const char *MIXPAGE_TemplateName(enum TemplateType template)
-{
-    switch(template) {
-    case MIXERTEMPLATE_NONE :   return "None";
-    case MIXERTEMPLATE_SIMPLE:  return "Simple";
-    case MIXERTEMPLATE_EXPO_DR: return "Expo&DR";
-    case MIXERTEMPLATE_COMPLEX: return "Complex";
-    default:                    return "Unknown";
-    }
-}
-
 void MIXPAGE_ChangeTemplate(int show_header)
 {
     mp->cur_mixer = mp->mixer;
@@ -84,7 +73,7 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_ChangeTemplate(0);
         return "";
     }
-    return MIXPAGE_TemplateName(mp->cur_template);
+    return MIXER_TemplateName(mp->cur_template);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);

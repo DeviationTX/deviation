@@ -34,7 +34,7 @@ static const char *template_name_cb(guiObject_t *obj, void *data)
     (void)obj;
     u8 ch = (long)data;
     enum TemplateType template = MIX_GetTemplate(ch);
-    return MIXPAGE_TemplateName(template);
+    return MIXER_TemplateName(template);
 }
 
 #define ENTRIES_PER_PAGE (8 > NUM_CHANNELS ? NUM_CHANNELS : 8)

@@ -469,3 +469,13 @@ const char *MIXER_SourceName(char *str, u8 src)
     }
     return str;
 }
+const char *MIXER_TemplateName(enum TemplateType template)
+{
+    switch(template) {
+    case MIXERTEMPLATE_NONE :   return "None";
+    case MIXERTEMPLATE_SIMPLE:  return "Simple";
+    case MIXERTEMPLATE_EXPO_DR: return "Expo&DR";
+    case MIXERTEMPLATE_COMPLEX: return "Complex";
+    default:                    return "Unknown";
+    }
+}

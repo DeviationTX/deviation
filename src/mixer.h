@@ -125,4 +125,5 @@ struct Trim *MIX_GetAllTrims();
 
 s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
 const char *MIXER_SourceName(char *str, u8 src);
+const char *MIXER_TemplateName(enum TemplateType t);
 #endif
