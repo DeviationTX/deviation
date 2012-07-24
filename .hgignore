@@ -17,3 +17,5 @@ utils/midicsv/midicsv
 .project
 /objs/
 ^local/
+glob:*.orig
+glob:*.dll
