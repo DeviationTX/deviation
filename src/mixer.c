@@ -479,3 +479,11 @@ const char *MIXER_TemplateName(enum TemplateType template)
     default:                    return "Unknown";
     }
 }
+
+const char *MIXER_ButtonName(u8 button)
+{
+    if (! button) {
+        return "None";
+    }
+    return tx_button_str[button - 1];
+}

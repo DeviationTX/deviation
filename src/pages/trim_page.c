@@ -43,20 +43,12 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return MIXER_SourceName(tp->tmpstr, *source);
 }
 
-const char *button_name(u8 button)
-{
-    if (! button) {
-        return "None";
-    }
-    return tx_button_str[button - 1];
-
-}
 const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *button = (u8 *)data;
     *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
-    return button_name(*button);
+    return MIXER_ButtonName(*button);
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)
@@ -110,8 +102,8 @@ void PAGE_TrimInit(int page)
     for (i = 0; i < NUM_TRIMS; i++) {
         GUI_CreateButton(8, 24*i + 64, BUTTON_48x16,
             trimsource_name_cb, 0x0000, edit_cb, (void *)((long)i));
-        GUI_CreateLabel(72, 24*i + 66, NULL, DEFAULT_FONT, (void *)button_name(trim[i].neg));
-        GUI_CreateLabel(136, 24*i + 66, NULL, DEFAULT_FONT, (void *)button_name(trim[i].pos));
+        GUI_CreateLabel(72, 24*i + 66, NULL, DEFAULT_FONT, (void *)MIXER_ButtonName(trim[i].neg));
+        GUI_CreateLabel(136, 24*i + 66, NULL, DEFAULT_FONT, (void *)MIXER_ButtonName(trim[i].pos));
         GUI_CreateTextSelect(200, 24*i + 64, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &trim[i].step);
     }
 }
