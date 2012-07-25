@@ -104,6 +104,8 @@ const char *CURVE_GetName(struct Curve *curve);
 u8 CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
+s16 *MIX_GetInputs();
+
 int MIX_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIX_SetMixers(struct Mixer *mixers, int count);
 
@@ -124,4 +126,7 @@ struct Mixer *MIX_GetAllMixers();
 struct Trim *MIX_GetAllTrims();
 
 s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
+const char *MIXER_SourceName(char *str, u8 src);
+const char *MIXER_TemplateName(enum TemplateType t);
+const char *MIXER_ButtonName(u8 src);
 #endif

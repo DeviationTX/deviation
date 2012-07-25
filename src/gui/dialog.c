@@ -60,9 +60,9 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
 
     switch (dgType) {
     case dtOk:
-        dialog->button[0] = GUI_CreateButton(((x + width) / 2) - 10,
-                ((y + height) - 27), BUTTON_96, "Ok", 0x0000, dgCallback, obj);
-        OBJ_SET_MODAL(dialog->button[0], 1);
+        //dialog->button[0] = GUI_CreateButton(((x + width) / 2) - 10,
+        //        ((y + height) - 27), BUTTON_96, "Ok", 0x0000, dgCallback, obj);
+        //OBJ_SET_MODAL(dialog->button[0], 1);
         break;
     case dtOkCancel:
         break;

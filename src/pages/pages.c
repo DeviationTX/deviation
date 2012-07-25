@@ -114,6 +114,10 @@ u8 PAGE_SetModal(u8 _modal)
     return old;
 }
 
+u8 PAGE_GetModal()
+{
+    return modal;
+}
 void changepage_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -128,4 +132,19 @@ void PAGE_ShowHeader(const char *title)
     GUI_CreateIcon(0, 1, &icons[ICON_EXIT], changepage_cb, (void *)0);
     GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
     GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+}
+
+static const char *okcancelstr_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    return data ? "OK" : "Cancel";
+}
+
+guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
+{
+    return GUI_CreateButton(x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
+}
+guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
+{
+    return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }

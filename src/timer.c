@@ -52,11 +52,32 @@ u16 TIMER_GetValue(u8 timer)
     return timer_val[timer] / 1000;
 }
 
+void TIMER_Init()
+{
+    u8 i;
+    for (i = 0; i < NUM_TIMERS; i++)
+        TIMER_Reset(i);
+}
+
 void TIMER_Update()
 {
     u8 i;
     u32 t = CLOCK_getms();
     for (i = 0; i < NUM_TIMERS; i++) {
+        if (Model.timer[i].type == TIMER_COUNTDOWN && ! timer_val[i])
+            continue;
+        s16 *raw = MIX_GetInputs();
+        if (Model.timer[i].src) {
+            s16 val = raw[MIX_SRC(Model.timer[i].src)];
+            if (MIX_SRC_IS_INV(Model.timer[i].src))
+                val = -val;
+            u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
+            if (new_state != timer_state[i]) {
+                if (new_state)
+                    last_time[i] = t;
+                timer_state[i] = new_state;
+            }
+         }
         if (timer_state[i]) {
             u32 delta = t - last_time[i];
             if (Model.timer[i].type == TIMER_STOPWATCH) {
@@ -67,6 +88,7 @@ void TIMER_Update()
                 }else {
                     timer_val[i] = 0;
                     timer_state[i] = 0;
+                    MUSIC_Play(MUSIC_ALARM1 + i);
                 }
             }
             last_time[i] = t;

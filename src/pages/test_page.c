@@ -31,8 +31,17 @@ static char buttonmessage[30];
 
 void PushMeButton(guiObject_t *obj, void *data) {
     GUI_RemoveObj(obj);
-    sprintf(buttonmessage,"%s",(const char *)data);
+    u8 num = (long)data;
+    sprintf(buttonmessage,"Button %d Pushed",num);
 }
+
+static const char *show_text_cb(guiObject_t *obj, void *data) {
+    (void)obj;
+    u8 num = (long)data;
+    sprintf(buttonstr,"Button %d", num);
+    return buttonstr;
+}
+
 void openDialogPush(guiObject_t *obj, struct guiDialogReturn gDR) {
     (void)gDR;
     GUI_RemoveObj(obj);
@@ -68,9 +77,6 @@ void PAGE_TestInit(int page)
 {
     (void)page;
     static char strBootLoader[80],strSPIFlash[80],strMfg[80];
-    static const char *button1 = "Button 1";
-    static const char *button2 = "Button 2";
-    static const char *button3 = "Button 3";
     //static const char *statusBar = "media/bar.bmp";
     static const char *batteryImg = "media/bat.bmp";
 
@@ -109,9 +115,9 @@ void PAGE_TestInit(int page)
     GUI_CreateLabel(10,125,NULL, MISC1_FONT, t1);
     GUI_CreateLabel(10,155,NULL, MISC1_FONT, t2);
     GUI_CreateLabel(100,170,NULL, MISC1_FONT, buttonmessage);
-    GUI_CreateButton(10,200,BUTTON_96,button1,0x0000,PushMeButton, "Button 1 Pushed");
-    GUI_CreateButton(110,200,BUTTON_96,button2,0x0000,PushMeButton, "Button 2 Pushed");
-    GUI_CreateButton(210,200,BUTTON_96,button3,0x0000,PushMeButton, "Button 3 Pushed");
+    GUI_CreateButton(10,200,BUTTON_96,show_text_cb,0x0000, PushMeButton, (void *)1);
+    GUI_CreateButton(110,200,BUTTON_96,show_text_cb,0x0000, PushMeButton, (void *)2);
+    GUI_CreateButton(210,200,BUTTON_96,show_text_cb,0x0000, PushMeButton, "Button 3 Pushed");
     GUI_CreateDialog(70,50,180,130,"Deviation","Welcome to\nDeviation",0xffff,0x0000,openDialogPush,dtOk);
     //GUI_CreateKeyboard(KEYBOARD_CHAR, buttonstr, 20, &PushMeButton, buttonstr);
     //GUI_CreateListBox(100, 20, 200, 202, 20, 5, &string_cb, NULL, NULL, NULL);

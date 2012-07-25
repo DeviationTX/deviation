@@ -93,6 +93,8 @@ void PAGE_MainInit(int page)
 void PAGE_MainEvent()
 {
     int i;
+    if (PAGE_GetModal())
+        return;
     for(i = 0; i < TRIMS_TO_SHOW; i++) {
         if (mp->trims[i] != Trims[i]) {
             mp->trims[i] = Trims[i];

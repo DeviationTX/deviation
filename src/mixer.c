@@ -36,6 +36,7 @@ s16 Channels[NUM_CHANNELS];
 s8 Trims[NUM_TRIMS];
 struct Transmitter Transmitter;
 
+static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
 static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
 static s8 get_trim(u8 src);
@@ -119,7 +120,6 @@ u8 MIX_ReadInputs(s16 *raw)
 void MIX_CalcChannels()
 {
     //We retain this array so that we can refer to the prevous values in the next iteration
-    static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
     int i;
     //1st step: Read Tx inputs
     MIX_ReadInputs(raw);
@@ -133,6 +133,11 @@ void MIX_CalcChannels()
         Channels[i] = MIX_ApplyLimits(i, &Model.limits[i], raw);
     }
 }
+s16 *MIX_GetInputs()
+{
+    return raw;
+}
+
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
 void MIX_CreateCyclicInputs(s16 *raw)
@@ -451,4 +456,39 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+const char *MIXER_SourceName(char *str, u8 src)
+{
+    u8 is_neg = MIX_SRC_IS_INV(src);
+    src = MIX_SRC(src);
+
+    if(! src) {
+        sprintf(str, "None");
+    } else if(src <= NUM_TX_INPUTS) {
+        sprintf(str, "%s%s", is_neg ? "!" : "", tx_input_str[src - 1]);
+    } else if(src <= NUM_INPUTS) {
+        sprintf(str, "%sCYC%d", is_neg ? "!" : "", src - NUM_TX_INPUTS);
+    } else {
+        sprintf(str, "%sCh%d", is_neg ? "!" : "", src - NUM_INPUTS);
+    }
+    return str;
+}
+const char *MIXER_TemplateName(enum TemplateType template)
+{
+    switch(template) {
+    case MIXERTEMPLATE_NONE :   return "None";
+    case MIXERTEMPLATE_SIMPLE:  return "Simple";
+    case MIXERTEMPLATE_EXPO_DR: return "Expo&DR";
+    case MIXERTEMPLATE_COMPLEX: return "Complex";
+    default:                    return "Unknown";
+    }
+}
+
+const char *MIXER_ButtonName(u8 button)
+{
+    if (! button) {
+        return "None";
+    }
+    return tx_button_str[button - 1];
 }

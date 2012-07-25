@@ -156,10 +156,8 @@ struct guiScrollbar {
 
 struct guiButton {
     const struct ImageMap *image;
-    const char *text;
-    u16 text_x_off;
-    u16 text_y_off;
     u16 fontColor;
+    const char *(*strCallback)(struct guiObject *obj, void *data);
     void (*CallBack)(struct guiObject *obj, void *data);
     void *cb_data;
 };
@@ -313,8 +311,9 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct Labe
 guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
         void (*CallBack)(guiObject_t *obj, s8 press_type, void *data), void *cb_data);
 
-guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *text,
+guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *(*strCallback)(guiObject_t *, void *),
         u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 

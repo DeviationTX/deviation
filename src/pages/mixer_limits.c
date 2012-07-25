@@ -62,7 +62,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 is_neg = MIX_SRC_IS_INV(*source);
     *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
     MIX_SET_SRC_INV(*source, is_neg);
-    return MIXPAGE_SourceName(*source);
+    return MIXER_SourceName(mp->tmpstr, *source);
 }
 
 const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
@@ -110,9 +110,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 
 static void show_titlerow()
 {
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, (void *)channel_name[mp->channel]);
-    GUI_CreateButton(160, 4, BUTTON_96, "Cancel", 0x0000, okcancel_cb, (void *)0);
-    GUI_CreateButton(264, 4, BUTTON_48, "OK", 0x0000, okcancel_cb, (void *)1);
+    GUI_CreateLabel(8, 10, MIXPAGE_ChannelNameCB, TITLE_FONT, NULL);
+    PAGE_CreateCancelButton(160, 4, okcancel_cb);
+    PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
 
 const char *reverse_cb(guiObject_t *obj, int dir, void *data)

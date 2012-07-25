@@ -82,11 +82,45 @@ static const char * const CHAN_TEMPLATE_VAL[]  = { "none", "simple", "expo_dr", 
 /* Section: Trim */
 static const char SECTION_TRIM[] = "trim";
 
-static const char TRIM_SRC[]  = "src";
+#define TRIM_SOURCE MIXER_SOURCE
 static const char TRIM_POS[]  = "pos";
 static const char TRIM_NEG[]  = "neg";
 static const char TRIM_STEP[] = "step";
+
+/* Section: Timer */
+static const char SECTION_TIMER[] = "timer";
+
+#define TIMER_SOURCE  MIXER_SOURCE
+#define TIMER_TYPE MODEL_TYPE
+static const char * const TIMER_TYPE_VAL[] = { "stopwatch", "countdown" };
+static const char TIMER_TIME[] = "time";
 /* End */
+
+static u8 get_source(const char *section, const char *value)
+{
+    u8 i;
+    const char *ptr = (value[0] == '!') ? value + 1 : value;
+    char cmp[10];
+    for (i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+        if(strcasecmp(MIXER_SourceName(cmp, i), ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | i;
+        }
+    }
+    printf("%s: Could not parse Source %s\n", section, value);
+    return 0;
+}
+
+static u8 get_button(const char *section, const char *value)
+{
+    u8 i;
+    for (i = 0; i <= NUM_TX_BUTTONS; i++) {
+        if(strcasecmp(MIXER_ButtonName(i), value) == 0) {
+            return i;
+        }
+    }
+    printf("%s: Could not parse Button %s\n", section, value);
+    return 0;
+}
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
@@ -154,7 +188,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         s16 value_int = atoi(value);
         if (MATCH_KEY(MIXER_SOURCE)) {
-            m->mixers[idx].src = value_int;
+            m->mixers[idx].src = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(MIXER_DEST)) {
@@ -289,16 +323,16 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         idx--;
         s16 value_int = atoi(value);
-        if (MATCH_KEY(TRIM_SRC)) {
-            m->trims[idx].src = value_int;
+        if (MATCH_KEY(TRIM_SOURCE)) {
+            m->trims[idx].src = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(TRIM_POS)) {
-            m->trims[idx].pos = value_int;
+            m->trims[idx].pos = get_button(section, value);
             return 1;
         }
         if (MATCH_KEY(TRIM_NEG)) {
-            m->trims[idx].neg = value_int;
+            m->trims[idx].neg = get_button(section, value);
             return 1;
         }
         if (MATCH_KEY(TRIM_STEP)) {
@@ -307,6 +341,36 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         printf("%s: Unknown trim setting: %s\n", section, name);
         return 0;
+    }
+    if (MATCH_START(section, SECTION_TIMER)) {
+        u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
+        if (idx == 0) {
+            printf("Unknown Trim: %s\n", section);
+            return 0;
+        }
+        if (idx > NUM_TIMERS) {
+            printf("%s: Only %d timers are supported\n", section, NUM_TIMERS);
+            return 1;
+        }
+        idx--;
+        if (MATCH_KEY(TIMER_TYPE)) {
+            for (i = 0; i < NUM_STR_ELEMS(TIMER_TYPE_VAL); i++) {
+                if (MATCH_VALUE(TIMER_TYPE_VAL[i])) {
+                    m->timer[idx].type = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown timer type: %s\n", section, value);
+            return 1;
+        }
+        if (MATCH_KEY(TIMER_SOURCE)) {
+            m->timer[idx].src = get_source(section, value);
+            return 1;
+        }
+        if (MATCH_KEY(TIMER_TIME)) {
+            m->timer[idx].timer = atoi(value);
+            return 1;
+        }
     }
     printf("Unkown Section: '%s'\n", section);
     return 0;
@@ -331,7 +395,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(m->icon[0] != 0)
-        fprintf(fh, "%s=%s\n", MODEL_TYPE, m->icon);
+        fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 6);
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
@@ -345,7 +409,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (! WRITE_FULL_MODEL && m->mixers[idx].src == 0)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_MIXER, idx+1);
-        fprintf(fh, "%s=%d\n", MIXER_SOURCE, m->mixers[idx].src);
+        fprintf(fh, "%s=%s\n", MIXER_SOURCE, MIXER_SourceName(file, m->mixers[idx].src));
         fprintf(fh, "%s=%d\n", MIXER_DEST, m->mixers[idx].dest);
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
             fprintf(fh, "%s=%d\n", MIXER_SWITCH, m->mixers[idx].sw);
@@ -398,11 +462,22 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
-        fprintf(fh, "%s=%d\n", TRIM_SRC, m->trims[idx].src);
-        fprintf(fh, "%s=%d\n", TRIM_POS, m->trims[idx].pos);
-        fprintf(fh, "%s=%d\n", TRIM_NEG, m->trims[idx].neg);
+        fprintf(fh, "%s=%s\n", TRIM_SOURCE, MIXER_SourceName(file, m->trims[idx].src));
+        fprintf(fh, "%s=%s\n", TRIM_POS, MIXER_ButtonName(m->trims[idx].pos));
+        fprintf(fh, "%s=%s\n", TRIM_NEG, MIXER_ButtonName(m->trims[idx].neg));
         if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
+    }
+    for(idx = 0; idx < NUM_TIMERS; idx++) {
+        if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
+            continue;
+        fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
+        if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
+            fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
+        if (WRITE_FULL_MODEL || m->timer[idx].src != 0)
+            fprintf(fh, "%s=%s\n", TIMER_SOURCE, MIXER_SourceName(file, m->timer[idx].src));
+        if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
+            fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
     }
     fclose(fh);
     return 1;
@@ -433,6 +508,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
+    TIMER_Init();
     crc32 = Crc(&Model, sizeof(Model));
     return 1;
 }
