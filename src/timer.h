@@ -18,4 +18,5 @@ void TIMER_StartStop(u8 timer);
 void TIMER_Reset(u8 timer);
 u16 TIMER_GetValue(u8 timer);
 void TIMER_Update();
+void TIMER_Init();
 #endif

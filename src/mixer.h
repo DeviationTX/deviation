@@ -104,6 +104,8 @@ const char *CURVE_GetName(struct Curve *curve);
 u8 CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
+s16 *MIX_GetInputs();
+
 int MIX_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIX_SetMixers(struct Mixer *mixers, int count);
 

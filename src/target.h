@@ -128,6 +128,8 @@ void SOUND_Stop();
 /* Music */
 enum Music {
     MUSIC_STARTUP = 0,
+    MUSIC_ALARM1,
+    MUSIC_ALARM2,
 };
 void MUSIC_Play(enum Music music);
 
