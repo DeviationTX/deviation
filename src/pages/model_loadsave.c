@@ -88,7 +88,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 const char *show_loadsave_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    return (long)data == 1 ? "Save" : "Load";
+    return ((long)data) == 2 ? "Save" : "Load";
 }
 
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))

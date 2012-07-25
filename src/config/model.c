@@ -88,6 +88,20 @@ static const char TRIM_NEG[]  = "neg";
 static const char TRIM_STEP[] = "step";
 /* End */
 
+static u8 get_source(const char *section, const char *value)
+{
+    u8 i;
+    const char *ptr = (value[0] == '!') ? value + 1 : value;
+    char cmp[10];
+    for (i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+        if(strcasecmp(MIXER_SourceName(cmp, i), ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | i;
+        }
+    }
+    printf("%s: Could not parse Source %s\n", section, value);
+    return 0;
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct Model *m = (struct Model *)user;
@@ -154,7 +168,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         s16 value_int = atoi(value);
         if (MATCH_KEY(MIXER_SOURCE)) {
-            m->mixers[idx].src = value_int;
+            m->mixers[idx].src = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(MIXER_DEST)) {
@@ -290,7 +304,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         s16 value_int = atoi(value);
         if (MATCH_KEY(TRIM_SRC)) {
-            m->trims[idx].src = value_int;
+            m->trims[idx].src = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(TRIM_POS)) {
@@ -345,7 +359,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (! WRITE_FULL_MODEL && m->mixers[idx].src == 0)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_MIXER, idx+1);
-        fprintf(fh, "%s=%d\n", MIXER_SOURCE, m->mixers[idx].src);
+        fprintf(fh, "%s=%s\n", MIXER_SOURCE, MIXER_SourceName(file, m->mixers[idx].src));
         fprintf(fh, "%s=%d\n", MIXER_DEST, m->mixers[idx].dest);
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
             fprintf(fh, "%s=%d\n", MIXER_SWITCH, m->mixers[idx].sw);
@@ -398,7 +412,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
-        fprintf(fh, "%s=%d\n", TRIM_SRC, m->trims[idx].src);
+        fprintf(fh, "%s=%s\n", TRIM_SRC, MIXER_SourceName(file, m->trims[idx].src));
         fprintf(fh, "%s=%d\n", TRIM_POS, m->trims[idx].pos);
         fprintf(fh, "%s=%d\n", TRIM_NEG, m->trims[idx].neg);
         if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
