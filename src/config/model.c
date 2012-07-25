@@ -345,7 +345,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(m->icon[0] != 0)
-        fprintf(fh, "%s=%s\n", MODEL_TYPE, m->icon);
+        fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon);
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);

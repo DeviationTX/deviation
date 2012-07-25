@@ -114,6 +114,10 @@ u8 PAGE_SetModal(u8 _modal)
     return old;
 }
 
+u8 PAGE_GetModal()
+{
+    return modal;
+}
 void changepage_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
