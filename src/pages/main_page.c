@@ -170,7 +170,7 @@ void press_timer_cb(guiObject_t *obj, s8 press_type, void *data)
     if(press_type == -1 && ! mp->ignore_release) 
         TIMER_StartStop((long)data);
     mp->ignore_release = 0;
-    if(press_type == 1) {
+    if(press_type > 0) {
         TIMER_Reset((long)data);
         mp->ignore_release = 1;
     }
