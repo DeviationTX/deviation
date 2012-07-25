@@ -73,7 +73,6 @@ void TIMER_Update()
                 val = -val;
             u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
             if (new_state != timer_state[i]) {
-                printf("Changing state to %d\n", new_state);
                 if (new_state)
                     last_time[i] = t;
                 timer_state[i] = new_state;
