@@ -37,4 +37,17 @@
 #define ICON_W 96
 #define ICON_H 96
 #define GRAPH_H 59
+
+#define ICO_CNTR_X 145
+#define ICO1_CNTR_Y 40
+#define ICO2_CNTR_Y 88
+#define ICO3_CNTR_Y 136
+#define ICO4_CNTR_Y 184
+
+#define ICO_LR_Y 182
+#define ICO_LR_SPACE 40
+#define ICO_L_X 10
+
+#define ICO_W 32
+#define ICO_H 32
 #endif
