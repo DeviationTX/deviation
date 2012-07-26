@@ -151,78 +151,165 @@ const char *iconsel_cb(guiObject_t *obj, int dir, void *data)
         build_image();
     return icon[i] ? "Enable" : "Disable";
 }
-void build_image()
+
+u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
+{
+    u8 i;
+    switch(widget) {
+    case TRIM1:
+    case TRIM2:
+        if (! trims)
+            return 0;
+        *y = TRIM_12_Y;
+        *w = VTRIM_W;
+        *h = VTRIM_H;
+        if (widget == TRIM1) {
+            *x = trims == TRIMS_4OUTSIDE ? OUTTRIM_1_X : INTRIM_1_X;
+        } else {
+            *x = trims == TRIMS_4OUTSIDE ? OUTTRIM_2_X : INTRIM_2_X;
+        }
+        return 1;
+    case TRIM3:
+    case TRIM4:
+        if (! trims)
+            return 0;
+        *x = (widget == TRIM3) ? TRIM_3_X : TRIM_4_X;
+        *y = TRIM_34_Y;
+        *w = HTRIM_W;
+        *h = HTRIM_H;
+        return 1;
+    case TRIM5:
+    case TRIM6:
+        if (trims != TRIMS_6)
+            return 0;
+        *x = (widget == TRIM5) ? TRIM_5_X : TRIM_6_X;
+        *y = TRIM_56_Y;
+        *w = VTRIM_W;
+        *h = VTRIM_H;
+        return 1;
+    case TOGGLE4:
+        if (trims == TRIMS_6)
+            return 0;
+        //Fall-through
+    case TOGGLE1:
+    case TOGGLE2:
+    case TOGGLE3:
+        *w = TOGGLE_W;
+        *h = TOGGLE_H;
+        if (trims != TRIMS_6) {
+            *x = TOGGLE_CNTR_X;
+            *y = TOGGLE_CNTR_Y + (widget - TOGGLE1) * TOGGLE_CNTR_SPACE;
+            return 1;
+        }
+        if (! box[3] && (box[2] || barsize == 0)) {
+            *x = TOGGLE_L_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
+            *y = TOGGLE_LR_Y;
+            return 1;
+        } else if (! box[7] && (box[6] || barsize == 0 || (barsize == 1 && !box[2] && !box[3]))) {
+            *x = TOGGLE_R_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
+            *y = TOGGLE_LR_Y;
+            return 1;
+        }
+    case BOX1:
+    case BOX2:
+    case BOX3:
+    case BOX4:
+    case BOX5:
+    case BOX6:
+    case BOX7:
+    case BOX8:
+        i = widget-BOX1;
+        if(box[i]) {
+            *x = box_pos[i].x;
+            if (trims == TRIMS_4OUTSIDE)
+                *x += i < 4 ? 24 : -24;
+            *y = box_pos[i].y;
+            *w = box_pos[i].w;
+            *h = box_pos[i].h;
+            return 1;
+        }
+    case MODEL_ICO:
+        if (! box[4] && ! box[5]) {
+            *x = MODEL_ICO_X;
+            if (trims == TRIMS_4OUTSIDE)
+                *x -= 24;
+        } else if(! box[0] && ! box[1]) {
+            *x = 320 - MODEL_ICO_X - MODEL_ICO_W;
+            if (trims == TRIMS_4OUTSIDE)
+                *x += 24;
+        } else
+            return 0;
+        *y = MODEL_ICO_Y;
+        *w = MODEL_ICO_W;
+        *h = MODEL_ICO_H;
+        return 1;
+    case BAR1:
+    case BAR2:
+    case BAR3:
+    case BAR4:
+    case BAR5:
+    case BAR6:
+    case BAR7:
+    case BAR8:
+        if(! barsize)
+            return 0;
+        *y = BOX26_Y;
+        *w = 10;
+        *h = GRAPH_H;
+        i = 0;
+        if(! box[2] && ! box[3]) {
+            if (trims <= 1) {
+                i = 4;
+                if (widget <= BAR4) {
+                    *x = 24+24+30*(widget - BAR1);
+                    return 1;
+                }
+            } else {
+                i = 3;
+                if (widget <= BAR3) {
+                    *x = 24+30*(widget - BAR1);
+                    return 1;
+                }
+            }
+        }
+        if((! box[6] && ! box[7]) && (barsize == 2 || box[2] || box[3])) {
+            if (trims <= 1) {
+                if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
+                    *x = 320 - 24 - 24 - 3*30 + 30 *(widget - (BAR1+i));
+                    return 1;
+                }
+            } else {
+                if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 3)) {
+                    *x = 320 - 24 - 3*30 + 30 *(widget - (BAR1+i));
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+static void draw_rect(enum MainWidget widget, const struct LabelDesc *desc)
+{
+    u16 x, y, w, h;
+    if (MAINPAGE_GetWidgetLoc(widget, &x, &y, &w, &h)) {
+        GUI_CreateRect(CALC_X(x), CALC_Y(y), CALC_W(w), CALC_H(h), desc);
+    }
+}
+static void build_image()
 {
     int i;
     if(imageObj)
        GUI_RemoveHierObjects(imageObj);
     imageObj = GUI_CreateRect(IMAGE_X, IMAGE_Y, CALC_W(320), CALC_H(240-32), &outline);
-
-    if (trims == TRIMS_4OUTSIDE) {
-        GUI_CreateRect(CALC_X(OUTTRIM_1_X), CALC_Y(TRIM_12_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-        GUI_CreateRect(CALC_X(OUTTRIM_2_X), CALC_Y(TRIM_12_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-    } else if(trims == TRIMS_4INSIDE || trims == TRIMS_6) {
-        GUI_CreateRect(CALC_X(INTRIM_1_X), CALC_Y(TRIM_12_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-        GUI_CreateRect(CALC_X(INTRIM_2_X), CALC_Y(TRIM_12_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-    }
-    if (trims > 0) {
-        GUI_CreateRect(CALC_X(TRIM_3_X), CALC_Y(TRIM_34_Y), CALC_W(HTRIM_W), CALC_H(HTRIM_H), &fill_black);
-        GUI_CreateRect(CALC_X(TRIM_4_X), CALC_Y(TRIM_34_Y), CALC_W(HTRIM_W), CALC_H(HTRIM_H), &fill_black);
-    }
-    if (trims == TRIMS_6) {
-        GUI_CreateRect(CALC_X(TRIM_5_X), CALC_Y(TRIM_56_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-        GUI_CreateRect(CALC_X(TRIM_6_X), CALC_Y(TRIM_56_Y), CALC_W(VTRIM_W), CALC_H(VTRIM_H), &fill_black);
-        if (! box[3] && (barsize == 0 || (barsize == 1 && !box[6] && !box[7]))) {
-            GUI_CreateRect(CALC_X(ICO_L_X + 0*ICO_LR_SPACE), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-            GUI_CreateRect(CALC_X(ICO_L_X + 1*ICO_LR_SPACE), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-            GUI_CreateRect(CALC_X(ICO_L_X + 2*ICO_LR_SPACE), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-        } else if (! box[7] && (barsize == 0 || (barsize == 1 && !box[2] && !box[3]))) {
-            GUI_CreateRect(CALC_X(320 - ICO_L_X - 2*ICO_LR_SPACE - ICO_W), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-            GUI_CreateRect(CALC_X(320 - ICO_L_X - 1*ICO_LR_SPACE - ICO_W), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-            GUI_CreateRect(CALC_X(320 - ICO_L_X - 0*ICO_LR_SPACE - ICO_W), CALC_Y(ICO_LR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-        } 
-    } else {
-        GUI_CreateRect(CALC_X(ICO_CNTR_X), CALC_Y(ICO1_CNTR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-        GUI_CreateRect(CALC_X(ICO_CNTR_X), CALC_Y(ICO2_CNTR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-        GUI_CreateRect(CALC_X(ICO_CNTR_X), CALC_Y(ICO3_CNTR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-        GUI_CreateRect(CALC_X(ICO_CNTR_X), CALC_Y(ICO4_CNTR_Y), CALC_W(ICO_W), CALC_H(ICO_H), &fill_black);
-    }
-    for (i = 0; i < 8; i++) {
-        if(box[i]) {
-            u16 x = box_pos[i].x;
-            if (trims == TRIMS_4OUTSIDE)
-                x += i < 4 ? 24 : -24;
-            GUI_CreateRect(CALC_X(x), CALC_Y(box_pos[i].y), CALC_W(box_pos[i].w), CALC_H(box_pos[i].h), &fill_white);
-        }
-    }
-    if (! box[4] && ! box[5])
-        GUI_CreateRect(CALC_X(ICON_X), CALC_Y(ICON_Y), CALC_W(ICON_W), CALC_H(ICON_H), &fill_black);
-    else if (! box[0] && ! box[1])
-        GUI_CreateRect(CALC_X(320 - ICON_X - ICON_W), CALC_Y(ICON_Y), CALC_W(ICON_W), CALC_H(ICON_H), &fill_black);
-    if (barsize) {
-        if (barsize == 2 || (! box[2] && ! box[3])) {
-            if (trims <= 1) {
-                for(i = 0; i < 4; i++) {
-                    GUI_CreateRect(CALC_X(24+24+30*i), CALC_Y(BOX26_Y), CALC_W(10), CALC_H(GRAPH_H), &fill_black);
-                }
-            } else {
-                for(i = 0; i < 3; i++) {
-                    GUI_CreateRect(CALC_X(24+30*i), CALC_Y(BOX26_Y), CALC_W(10), CALC_H(GRAPH_H), &fill_black);
-                }
-            }
-        }
-        if (barsize == 2 || (box[2] || box[3])) {
-            if (trims <= 1) {
-                for(i = 0; i < 4; i++) {
-                    GUI_CreateRect(CALC_X(204-24+30*i), CALC_Y(BOX26_Y), CALC_W(10), CALC_H(GRAPH_H), &fill_black);
-                }
-            } else {
-                for(i = 0; i < 3; i++) {
-                    GUI_CreateRect(CALC_X(204+30*i), CALC_Y(BOX26_Y), CALC_W(10), CALC_H(GRAPH_H), &fill_black);
-                }
-            }
-        }
-    }
+    for(i = TRIM1; i <= TRIM6; i++)
+        draw_rect(i, &fill_black);
+    for(i = TOGGLE1; i <= TOGGLE4; i++)
+        draw_rect(i, &fill_black);
+    for(i = BOX1; i <= BOX8; i++)
+        draw_rect(i, &fill_white);
+    draw_rect(MODEL_ICO, &fill_black);
+    for(i = BAR1; i <= BAR8; i++)
+        draw_rect(i, &fill_black);
 }
 
 #define MAX_PAGE 1
