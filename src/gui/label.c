@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc,
+guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, void *data),void *data)
 {

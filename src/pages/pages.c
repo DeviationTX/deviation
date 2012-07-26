@@ -28,6 +28,7 @@ struct pagemem pagemem;
 
 static const struct page pages[] = {
     {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit},
+    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
     {PAGE_MixerInit, PAGE_MixerEvent, NULL},
     {PAGE_TrimInit, PAGE_TrimEvent, NULL},

@@ -82,6 +82,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Listbox:    GUI_DrawListbox(obj, 1);        break;
     case Keyboard:   GUI_DrawKeyboard(obj);          break;
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
+    case Rect:       GUI_DrawRect(obj);              break;
     }
     if (obj == objSELECTED) {
         int i;
@@ -311,6 +312,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case CheckBox:
             case Dropdown:
             case BarGraph:
+            case Rect:
                 break;
             case Button:
                 if (coords_in_box(&obj->box, coords)) {

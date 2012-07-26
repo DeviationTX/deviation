@@ -71,4 +71,8 @@ void PAGE_ScannerEvent();
 void PAGE_USBInit(int page);
 void PAGE_USBEvent();
 void PAGE_USBExit();
+
+void PAGE_MainCfgEvent();
+void PAGE_MainCfgInit(int page);
+
 #endif

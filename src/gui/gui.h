@@ -110,6 +110,7 @@ enum GUIType {
     Listbox,
     Keyboard,
     Scrollbar,
+    Rect,
 };
 struct guiImage {
     const char *file;
@@ -216,6 +217,10 @@ struct guiTextSelect {
     void *cb_data;
 };
 
+struct guiRect {
+    struct LabelDesc desc;
+};
+
 struct guiObject {
     enum GUIType Type;
     struct guiBox box;
@@ -232,6 +237,7 @@ struct guiObject {
         struct guiListbox listbox;
         struct guiKeyboard keyboard;
         struct guiScrollbar scrollbar;
+        struct guiRect rect;
     } o;
 };
 
@@ -290,6 +296,8 @@ void GUI_DrawScrollbar(struct guiObject *obj);
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type);
 void GUI_SetScrollbar(struct guiObject *obj, u8 pos);
 
+void GUI_DrawRect(struct guiObject *obj);
+
 void GUI_DrawObject(struct guiObject *obj);
 void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h);
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx);
@@ -303,7 +311,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
         enum DialogType dgType);
 #define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, NULL, data)
-guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, struct LabelDesc *desc,
+guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, void *data),void *data);
 
@@ -340,6 +348,7 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
 guiObject_t *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
         u8 num_items, guiObject_t *parent,
         u8 (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
+guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc);
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
 void GUI_TouchRelease();
