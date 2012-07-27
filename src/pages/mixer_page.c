@@ -79,6 +79,7 @@ void PAGE_MixerInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
+    memset(mp, 0, sizeof(*mp));
     mp->firstObj = NULL;
     mp->top_channel = 0;
     PAGE_ShowHeader("Mixer");

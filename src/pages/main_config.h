@@ -90,4 +90,6 @@ enum MainWidget {
 #define TOGGLE_R_X (320 - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLE_W)
 /*************************************/
 
+u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h);
+
 #endif

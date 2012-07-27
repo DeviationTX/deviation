@@ -18,26 +18,29 @@
 #include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
+#include "main_config.h"
 
 static struct main_page * const mp = &pagemem.u.main_page;
-s16 trim_cb(void * data);
-const char *show_throttle_cb(guiObject_t *obj, void *data);
+const char *show_box_cb(guiObject_t *obj, void *data);
 const char *voltage_cb(guiObject_t *obj, void *data);
-s16 trim_cb(void * data);
+static s16 trim_cb(void * data);
+static s16 bar_cb(void * data);
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
 void press_icon2_cb(guiObject_t *obj, void *data);
-void press_timer_cb(guiObject_t *obj, s8 press_type, void *data);
+void press_box_cb(guiObject_t *obj, s8 press_type, void *data);
 const char *show_timer_cb(guiObject_t *obj, void *data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 extern s8 Trims[NUM_TRIMS];
 
+static s16 get_boxval(u8 idx);
 
 void PAGE_MainInit(int page)
 {
     (void)page;
     int i;
+    u16 x, y, w, h;
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
@@ -46,39 +49,42 @@ void PAGE_MainInit(int page)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
-    for (i = 0; i < TRIMS_TO_SHOW; i++)
-        mp->trims[i] = Trims[i];
-    mp->throttle = Channels[0];
+
     mp->optsObj = GUI_CreateIcon(0, 1, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
     //Icon
-    mp->iconObj = GUI_CreateImageOffset(205, 40, 96, 96, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
-    //Throttle
-    mp->trimObj[2] = GUI_CreateBarGraph(130, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[2]);
-    //Rudder
-    mp->trimObj[3] = GUI_CreateBarGraph(5, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[3]);
-    //Elevator
-    mp->trimObj[1] = GUI_CreateBarGraph(180, 75, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
-    //Aileron
-    mp->trimObj[0] = GUI_CreateBarGraph(190, 220, 125, 10, -100, 100, TRIM_HORIZONTAL, trim_cb, &Trims[0]);
-    //Trim_L
-    mp->trimObj[4] = GUI_CreateBarGraph(145, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
-    //Trim_R
-    mp->trimObj[5] = GUI_CreateBarGraph(165, 40, 10, 140, -100, 100, TRIM_VERTICAL, trim_cb, &Trims[1]);
-    //Throttle
-    mp->throttleObj = GUI_CreateLabelBox(16, 40, 100, 40, &THROTTLE_FONT,
-                                         show_throttle_cb, NULL, &Channels[0]);
-    //Pitch
-    mp->pitchObj = GUI_CreateLabelBox(16, 90, 100, 40, &THROTTLE_FONT,
-                                      show_throttle_cb, NULL, &Channels[5]);
-    //Timer
-    mp->timerObj = GUI_CreateLabelBox(16, 150, 100, 24, &TIMER_FONT,
-                                      show_timer_cb, press_timer_cb, (void *)0);
-    //Telemetry value
-    mp->telemetryObj = GUI_CreateLabelBox(16, 185, 100, 24, &TIMER_FONT,
-                                      show_timer_cb, press_timer_cb, (void *)1);
+    if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
+        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
+
+    for(i = 0; i < 6; i++) {
+        mp->trims[i] = Trims[i];
+        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
+            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Trims[i]);
+        else
+            mp->trimObj[i] = NULL;
+    }
+    for(i = 0; i < 8; i++) {
+        if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
+            mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
+            mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h, &THROTTLE_FONT, show_box_cb, press_box_cb, (void *)((long)Model.pagecfg.box[i]));
+        } else {
+            mp->boxval[i] = 0;
+            mp->boxObj[i] = NULL;
+        }
+    }
+    for(i = 0; i < 8; i++) {
+        if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
+            mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
+            mp->barObj[i] = GUI_CreateBarGraph(x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+                                               bar_cb, (void *)((long)Model.pagecfg.bar[i]));
+        } else {
+            mp->barval[i] = 0;
+            mp->barObj[i] = NULL;
+        }
+    }
  
     //Battery
     if (Display.flags & SHOW_BAT_ICON) {
@@ -95,25 +101,38 @@ void PAGE_MainEvent()
     int i;
     if (PAGE_GetModal())
         return;
-    for(i = 0; i < TRIMS_TO_SHOW; i++) {
+    for(i = 0; i < 6; i++) {
+        if (! mp->trimObj[i])
+            continue;
         if (mp->trims[i] != Trims[i]) {
             mp->trims[i] = Trims[i];
             GUI_Redraw(mp->trimObj[i]);
         }
     }
-    
-    if(mp->throttle != Channels[0]) {
-        mp->throttle = Channels[0];
-        GUI_Redraw(mp->throttleObj);
+    for(i = 0; i < 8; i++) {
+        if (! mp->boxObj[i])
+            continue;
+        s16 val = get_boxval(Model.pagecfg.box[i]);
+        if (mp->boxval[i] != val) {
+            mp->boxval[i] = val;
+            GUI_Redraw(mp->boxObj[i]);
+        }
     }
-    if(mp->timer[0] != TIMER_GetValue(0)) {
-        mp->timer[0] = TIMER_GetValue(0);
-        GUI_Redraw(mp->timerObj);
+    for(i = 0; i < 8; i++) {
+        if (! mp->barObj[i])
+            continue;
+        if (mp->barval[i] != Channels[Model.pagecfg.bar[i]-1]) {
+            mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
+            GUI_Redraw(mp->barObj[i]);
+        }
     }
-    if(mp->timer[1] != TIMER_GetValue(1)) {
-        mp->timer[1] = TIMER_GetValue(1);
-        GUI_Redraw(mp->telemetryObj);
-    }
+}
+
+s16 get_boxval(u8 idx)
+{
+    if(idx == 1 || idx == 2)
+        return TIMER_GetValue(idx-1);
+    return Channels[idx-3];
 }
 
 void PAGE_MainExit()
@@ -121,11 +140,14 @@ void PAGE_MainExit()
     BUTTON_UnregisterCallback(&mp->action);
 }
 
-const char *show_throttle_cb(guiObject_t *obj, void *data)
+const char *show_box_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    s16 *throttle = (s16 *)data;
-    sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(*throttle));
+    u8 idx = (long)data;
+    if(idx < 3)
+        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx-1));
+    else
+        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(Channels[idx-3]));
     return mp->tmpstr;
 }
 
@@ -141,6 +163,12 @@ s16 trim_cb(void * data)
 {
     s8 *trim = (s8 *)data;
     return *trim;
+}
+
+s16 bar_cb(void * data)
+{
+    u8 idx = (long)data;
+    return Channels[idx-1];
 }
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
@@ -164,23 +192,19 @@ void press_icon2_cb(guiObject_t *obj, void *data)
     press_icon_cb(obj, -1, data);
 }
 
-void press_timer_cb(guiObject_t *obj, s8 press_type, void *data)
+void press_box_cb(guiObject_t *obj, s8 press_type, void *data)
 {
     (void)obj;
+    u8 idx = (long)data;
+    if (idx > 2)
+        return;
     if(press_type == -1 && ! mp->ignore_release) 
-        TIMER_StartStop((long)data);
+        TIMER_StartStop(idx-1);
     mp->ignore_release = 0;
     if(press_type > 0) {
-        TIMER_Reset((long)data);
+        TIMER_Reset(idx-1);
         mp->ignore_release = 1;
     }
-}
-
-const char *show_timer_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    TIMER_SetString(mp->tmpstr, TIMER_GetValue((long)data));
-    return mp->tmpstr;
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)

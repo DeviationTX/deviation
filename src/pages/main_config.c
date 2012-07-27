@@ -220,6 +220,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
             *y = TOGGLE_LR_Y;
             return 1;
         }
+        return 0;
     case BOX1:
     case BOX2:
     case BOX3:
@@ -238,6 +239,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
             *h = box_pos[i].h;
             return 1;
         }
+        return 0;
     case MODEL_ICO:
         if (! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]) {
             *x = MODEL_ICO_X;
@@ -295,6 +297,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
                 }
             }
         }
+        return 0;
     }
     return 0;
 }
