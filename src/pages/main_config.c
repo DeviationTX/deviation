@@ -385,6 +385,7 @@ void PAGE_MainCfgInit(int page)
     firstObj = NULL;
 
     page_num = page;
+    PAGE_ShowHeader("Main Page Cfg");
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
     show_page();
 }

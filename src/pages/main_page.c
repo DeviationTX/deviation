@@ -44,8 +44,8 @@ void PAGE_MainInit(int page)
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
-//          | CHAN_ButtonMask(BUT_LEFT)
-//          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);

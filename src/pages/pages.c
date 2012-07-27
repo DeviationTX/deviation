@@ -28,13 +28,13 @@ struct pagemem pagemem;
 
 static const struct page pages[] = {
     {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit},
-    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
     {PAGE_MixerInit, PAGE_MixerEvent, NULL},
     {PAGE_TrimInit, PAGE_TrimEvent, NULL},
     {PAGE_ModelInit, PAGE_ModelEvent, NULL},
     {PAGE_TimerInit, PAGE_TimerEvent, NULL},
     {NULL, NULL, NULL},
+    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {PAGE_ChantestInit, PAGE_ChantestEvent, NULL},
     {PAGE_ScannerInit, PAGE_ScannerEvent, NULL},
     //{PAGE_TestInit, PAGE_TestEvent, NULL},
