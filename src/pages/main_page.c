@@ -138,10 +138,10 @@ void PAGE_MainEvent()
     for(i = 0; i < 4; i++) {
         if (! mp->toggleObj[i])
             continue;
-        u8 src = Model.pagecfg.toggle[i];
+        u8 src = MIX_SRC(Model.pagecfg.toggle[i]);
         s16 *raw = MIX_GetInputs();
         s16 val = (src <= NUM_INPUTS) ? raw[src] : Channels[src - NUM_INPUTS -1];
-        GUI_SetHidden(mp->toggleObj[i], val < 0);
+        GUI_SetHidden(mp->toggleObj[i], MIX_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
     }
 }
 

@@ -144,22 +144,25 @@ const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
         build_image();
     return MIXER_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
 }
-const char *iconlabel_cb(guiObject_t *obj, void *data)
+const char *toggle_sel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Toggle%d:", i+1);
+    sprintf(str, "Toggle%d", i+1);
     return str;
 }
 
-const char *iconsel_cb(guiObject_t *obj, int dir, void *data)
+const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     u8 i = (long)data;
     u8 changed;
-    Model.pagecfg.toggle[i] = GUI_TextSelectHelper(Model.pagecfg.toggle[i], 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);   
-    if (changed)
+    u8 val = MIX_SRC(Model.pagecfg.toggle[i]);
+    val = GUI_TextSelectHelper(val, 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);   
+    if (changed) {
+        Model.pagecfg.toggle[i] = MIX_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
         build_image();
+    }
     return MIXER_SourceName(str, Model.pagecfg.toggle[i]);
 }
 
@@ -338,6 +341,13 @@ void iconpress_cb(guiObject_t *obj, void *data)
     if(Model.pagecfg.toggle[(long)data])
         select_toggle_icon((long)data);
 }
+void toggle_inv_cb(guiObject_t *obj, void *data)
+{
+    if(Model.pagecfg.toggle[(long)data]) {
+        Model.pagecfg.toggle[(long)data] ^= 0x80;
+        GUI_Redraw(obj);
+    }
+}
 
 static void show_page()
 {
@@ -360,14 +370,14 @@ static void show_page()
             y+= 24;
         }
     } else if (page_num == 1) {
-        firstObj = GUI_CreateLabel(COL1_VALUE, 40, iconlabel_cb, DEFAULT_FONT, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)0);
-        GUI_CreateLabel(COL1_VALUE, 64, iconlabel_cb, DEFAULT_FONT, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)1);
-        GUI_CreateLabel(COL1_VALUE, 88, iconlabel_cb, DEFAULT_FONT, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)2);
-        GUI_CreateLabel(COL1_VALUE, 112, iconlabel_cb, DEFAULT_FONT, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)3);
+        firstObj = GUI_CreateButton(COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
+        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
+        GUI_CreateButton(COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
+        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
+        GUI_CreateButton(COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
+        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
+        GUI_CreateButton(COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
+        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
