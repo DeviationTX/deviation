@@ -141,7 +141,7 @@ void PAGE_MainEvent()
         u8 src = Model.pagecfg.toggle[i];
         s16 *raw = MIX_GetInputs();
         s16 val = (src <= NUM_INPUTS) ? raw[src] : Channels[src - NUM_INPUTS -1];
-        GUI_SetHidden(mp->toggleObj[i], val > 0);
+        GUI_SetHidden(mp->toggleObj[i], val < 0);
     }
 }
 
