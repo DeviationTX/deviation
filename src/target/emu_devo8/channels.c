@@ -34,14 +34,14 @@ const char *tx_input_str[NUM_TX_INPUTS] = {
 };
 
 const char *tx_button_str[] = {
+    "AIL-",
+    "AIL+",
+    "ELE-",
+    "ELE+",
     "THR-",
     "THR+",
     "RUD-",
     "RUD+",
-    "ELE-",
-    "ELE+",
-    "AIL-",
-    "AIL+",
     "LEFT-",
     "LEFT+",
     "RIGHT-",
