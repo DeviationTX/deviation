@@ -31,6 +31,8 @@ enum MainWidget {
     BAR8,
 };
 
+#define TOGGLE_FILE "media/toggle.bmp"
+
 /*************************************/
 /* Trims */
 #define OUTTRIM_OFFSET 24

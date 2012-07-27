@@ -104,6 +104,7 @@ static const char * const GUI_BARSIZE_VAL[] = { "none", "half", "full"};
 #define GUI_SOURCE MIXER_SOURCE
 #define GUI_TIMER SECTION_TIMER
 static const char GUI_TOGGLE[] = "toggle";
+static const char GUI_TGLICO[] = "tglico";
 static const char GUI_BAR[] = "bar";
 static const char GUI_BOX[] = "box";
 /* End */
@@ -454,6 +455,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->pagecfg.toggle[idx] = get_source(section, value);
             return 1;
         }
+        if (MATCH_START(name, GUI_TGLICO)) {
+            u8 idx = name[6] - '1';
+            if (idx >= 4) {
+                printf("%s: Unkown key: %s\n", section, name);
+                return 1;
+            }
+            m->pagecfg.tglico[idx] = atoi(value);
+            return 1;
+        }
     }
     printf("Unkown Section: '%s'\n", section);
     return 0;
@@ -591,6 +601,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->pagecfg.toggle[idx]) {
             u8 val = m->pagecfg.toggle[idx];
             fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, MIXER_SourceName(file, val));
+            if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
+                fprintf(fh, "%s%d=%d\n", GUI_TGLICO, idx+1, m->pagecfg.tglico[idx]);
         }
     }
     fclose(fh);

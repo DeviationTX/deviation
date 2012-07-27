@@ -10,6 +10,7 @@ struct main_page {
     guiObject_t *trimObj[6];
     guiObject_t *boxObj[8];
     guiObject_t *barObj[8];
+    guiObject_t *toggleObj[4];
     u8 ignore_release;
     s8 trims[6];
     s16 boxval[8];

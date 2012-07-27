@@ -61,6 +61,7 @@ const struct {
 
 static void build_image();
 static void show_page();
+static void select_toggle_icon(u8 idx);
 
 const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -331,6 +332,12 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     }
     return page_num;
 }
+void iconpress_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    if(Model.pagecfg.toggle[(long)data])
+        select_toggle_icon((long)data);
+}
 
 static void show_page()
 {
@@ -354,13 +361,13 @@ static void show_page()
         }
     } else if (page_num == 1) {
         firstObj = GUI_CreateLabel(COL1_VALUE, 40, iconlabel_cb, DEFAULT_FONT, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)0);
+        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)0);
         GUI_CreateLabel(COL1_VALUE, 64, iconlabel_cb, DEFAULT_FONT, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)1);
+        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)1);
         GUI_CreateLabel(COL1_VALUE, 88, iconlabel_cb, DEFAULT_FONT, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)2);
+        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)2);
         GUI_CreateLabel(COL1_VALUE, 112, iconlabel_cb, DEFAULT_FONT, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)3);
+        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, iconpress_cb, iconsel_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
@@ -373,15 +380,48 @@ static void show_page()
 }
 void PAGE_MainCfgInit(int page)
 {
-    (void)page;
     PAGE_SetModal(0);
     imageObj = NULL;
     firstObj = NULL;
 
-    page_num = 0;
+    page_num = page;
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
     show_page();
 }
 void PAGE_MainCfgEvent()
 {
 }
+
+void tglico_select_cb(guiObject_t *obj, s8 press_type, void *data)
+{
+    (void)obj;
+    if (press_type == -1) {
+        u16 pos = (long)data;
+        u8 idx = pos >> 8;
+        pos &= 0xff;
+        Model.pagecfg.tglico[idx] = pos;
+        GUI_RemoveAllObjects();
+        PAGE_MainCfgInit(1);
+    }
+}
+
+void select_toggle_icon(u8 idx)
+{
+    long pos = 0;
+    u16 w, h, x, y;
+    u8 i, j;
+    GUI_RemoveAllObjects();
+    PAGE_SetModal(1);
+    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
+    u8 count = w / 32;
+    for(j = 0; j < 5; j++) {
+        y = 40 + j * 40;
+        for(i = 0; i < 8; i++,pos++) {
+            if (pos >= count)
+                break;
+            x = 4 + i*40;
+            GUI_CreateImageOffset(x, y, 32, 31, pos * 32, 0, TOGGLE_FILE, tglico_select_cb, (void *)((idx << 8) | pos));
+        }
+    }
+}
+

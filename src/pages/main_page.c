@@ -87,7 +87,12 @@ void PAGE_MainInit(int page)
             mp->barObj[i] = NULL;
         }
     }
- 
+    for(i = 0; i < 4; i++) {
+        if(! Model.pagecfg.toggle[i])
+            continue;
+        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h))
+            mp->toggleObj[i] = GUI_CreateImageOffset(x, y, 32, 31, Model.pagecfg.tglico[i]*32, 0, TOGGLE_FILE, NULL, NULL);
+    }
     //Battery
     if (Display.flags & SHOW_BAT_ICON) {
         GUI_CreateImage(270,1,48,22,"media/bat.bmp");
@@ -127,6 +132,14 @@ void PAGE_MainEvent()
             mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
             GUI_Redraw(mp->barObj[i]);
         }
+    }
+    for(i = 0; i < 4; i++) {
+        if (! mp->toggleObj[i])
+            continue;
+        u8 src = Model.pagecfg.toggle[i];
+        s16 *raw = MIX_GetInputs();
+        s16 val = (src <= NUM_INPUTS) ? raw[src] : Channels[src - NUM_INPUTS -1];
+        GUI_SetHidden(mp->toggleObj[i], val > 0);
     }
 }
 
