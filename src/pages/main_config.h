@@ -33,6 +33,8 @@ enum MainWidget {
 
 /*************************************/
 /* Trims */
+#define OUTTRIM_OFFSET 24
+
 #define VTRIM_W 10
 #define VTRIM_H 140
 #define HTRIM_W 125
@@ -73,7 +75,12 @@ enum MainWidget {
 #define MODEL_ICO_H 96
 /*************************************/
 
+#define GRAPH1_X BOX0123_X
+#define GRAPH2_X (320 - BOX_W - GRAPH1_X)
+#define GRAPH_Y BOX26_Y
 #define GRAPH_H 59
+#define GRAPH_W 10
+#define GRAPH_SPACE ((BOX_W - GRAPH_W) / 3)
 
 /*************************************/
 /* Toggle Icons */

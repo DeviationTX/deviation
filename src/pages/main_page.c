@@ -75,7 +75,9 @@ void PAGE_MainInit(int page)
             mp->boxObj[i] = NULL;
         }
     }
-    for(i = 0; i < 8; i++) {
+    for(i = 0; i < 10; i++) {
+        if (i >= NUM_CHANNELS)
+            break;
         if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
             mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
             mp->barObj[i] = GUI_CreateBarGraph(x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,

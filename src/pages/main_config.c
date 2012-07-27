@@ -106,7 +106,7 @@ const char *boxlabel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Box %d:", i);
+    sprintf(str, "Box %d:", i+1);
     return str;
 }
 
@@ -129,7 +129,7 @@ const char *barlabel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Bar %d:", i);
+    sprintf(str, "Bar %d:", i+1);
     return str;
 }
 
@@ -147,7 +147,7 @@ const char *iconlabel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Toggle %d:", i);
+    sprintf(str, "Toggle%d:", i+1);
     return str;
 }
 
@@ -156,7 +156,7 @@ const char *iconsel_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 i = (long)data;
     u8 changed;
-    Model.pagecfg.toggle[i] = GUI_TextSelectHelper(Model.pagecfg.toggle[i], 0, 1, dir, 1, 1, &changed);   
+    Model.pagecfg.toggle[i] = GUI_TextSelectHelper(Model.pagecfg.toggle[i], 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed)
         build_image();
     return MIXER_SourceName(str, Model.pagecfg.toggle[i]);
@@ -233,7 +233,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         if(Model.pagecfg.box[i]) {
             *x = box_pos[i].x;
             if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x += i < 4 ? 24 : -24;
+                *x += i < 4 ? OUTTRIM_OFFSET : -OUTTRIM_OFFSET;
             *y = box_pos[i].y;
             *w = box_pos[i].w;
             *h = box_pos[i].h;
@@ -244,11 +244,11 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         if (! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]) {
             *x = MODEL_ICO_X;
             if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x -= 24;
+                *x -= OUTTRIM_OFFSET;
         } else if(! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]) {
             *x = 320 - MODEL_ICO_X - MODEL_ICO_W;
             if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x += 24;
+                *x += OUTTRIM_OFFSET;
         } else
             return 0;
         *y = MODEL_ICO_Y;
@@ -265,36 +265,25 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     case BAR8:
         if(! Model.pagecfg.barsize)
             return 0;
-        *y = BOX26_Y;
-        *w = 10;
+        *y = GRAPH_Y;
+        *w = GRAPH_W;
         *h = GRAPH_H;
         i = 0;
         if(! Model.pagecfg.box[2] && ! Model.pagecfg.box[3]) {
-            if (Model.pagecfg.trims <= 1) {
-                i = 4;
-                if (widget <= BAR4) {
-                    *x = 24+24+30*(widget - BAR1);
-                    return 1;
-                }
-            } else {
-                i = 3;
-                if (widget <= BAR3) {
-                    *x = 24+30*(widget - BAR1);
-                    return 1;
-                }
+            i = 4;
+            if (widget <= BAR4) {
+                *x = GRAPH1_X + GRAPH_SPACE * (widget - BAR1);
+                if (Model.pagecfg.trims <= 1)
+                    *x += OUTTRIM_OFFSET;
+                return 1;
             }
         }
         if((! Model.pagecfg.box[6] && ! Model.pagecfg.box[7]) && (Model.pagecfg.barsize == 2 || Model.pagecfg.box[2] || Model.pagecfg.box[3])) {
-            if (Model.pagecfg.trims <= 1) {
-                if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
-                    *x = 320 - 24 - 24 - 3*30 + 30 *(widget - (BAR1+i));
-                    return 1;
-                }
-            } else {
-                if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 3)) {
-                    *x = 320 - 24 - 3*30 + 30 *(widget - (BAR1+i));
-                    return 1;
-                }
+            if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
+                *x = GRAPH2_X + GRAPH_SPACE * (widget - (BAR1+i));
+                if (Model.pagecfg.trims <= 1)
+                    *x -= OUTTRIM_OFFSET;
+                return 1;
             }
         }
         return 0;
@@ -365,13 +354,13 @@ static void show_page()
         }
     } else if (page_num == 1) {
         firstObj = GUI_CreateLabel(COL1_VALUE, 40, iconlabel_cb, DEFAULT_FONT, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)0);
+        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)0);
         GUI_CreateLabel(COL1_VALUE, 64, iconlabel_cb, DEFAULT_FONT, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)1);
+        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)1);
         GUI_CreateLabel(COL1_VALUE, 88, iconlabel_cb, DEFAULT_FONT, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE, 88, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)2);
+        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)2);
         GUI_CreateLabel(COL1_VALUE, 112, iconlabel_cb, DEFAULT_FONT, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE, 112, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)3);
+        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, NULL, iconsel_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
