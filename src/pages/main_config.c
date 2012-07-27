@@ -23,11 +23,6 @@
 #define TRIMS_4OUTSIDE 1
 #define TRIMS_4INSIDE  2
 #define TRIMS_6        3
-u8 trims;
-u8 barsize;
-u8 box[8];
-u8 bar[8];
-u8 icon[4];
 char str[20];
 u8 page_num;
 
@@ -69,11 +64,13 @@ static void show_page();
 
 const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)data;
+    (void)obj;
     u8 changed;
-    trims = GUI_TextSelectHelper(trims, 0, 3, dir, 1, 1, &changed);   
+    Model.pagecfg.trims = GUI_TextSelectHelper(Model.pagecfg.trims, 0, 3, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    switch(trims) {
+    switch(Model.pagecfg.trims) {
     case 0 : return "NoTrim";
     case 1 : return "OutTrim";
     case 2 : return "InTrim";
@@ -84,18 +81,20 @@ const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
 
 const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)data;
+    (void)obj;
     u8 changed;
     u8 maxbar;
-    if ((box[2] || box[3]) && (box[6] || box[7]))
+    if ((Model.pagecfg.box[2] || Model.pagecfg.box[3]) && (Model.pagecfg.box[6] || Model.pagecfg.box[7]))
         maxbar = 0;
-    else if (box[2] || box[3] || box[6] || box[7])
+    else if (Model.pagecfg.box[2] || Model.pagecfg.box[3] || Model.pagecfg.box[6] || Model.pagecfg.box[7])
         maxbar = 1;
     else
         maxbar = 2;
-    barsize = GUI_TextSelectHelper(barsize, 0, maxbar, dir, 1, 1, &changed);   
+    Model.pagecfg.barsize = GUI_TextSelectHelper(Model.pagecfg.barsize, 0, maxbar, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    switch(barsize) {
+    switch(Model.pagecfg.barsize) {
     case 0 : return "NoGraphs";
     case 1 : return "HalfGraphs";
     case 2 : return "FullGraphs";
@@ -105,6 +104,7 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
 
 const char *boxlabel_cb(guiObject_t *obj, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
     sprintf(str, "Box %d:", i);
     return str;
@@ -112,15 +112,22 @@ const char *boxlabel_cb(guiObject_t *obj, void *data)
 
 const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
     u8 changed;
-    box[i] = GUI_TextSelectHelper(box[i], 0, 1, dir, 1, 1, &changed);   
+    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    return box[i] ? "Enable" : "Disable";
+    if (Model.pagecfg.box[i] == 1)
+        return "Timer1";
+    if (Model.pagecfg.box[i] == 2)
+        return "Timer2";
+    
+    return MIXER_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
 }
 const char *barlabel_cb(guiObject_t *obj, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
     sprintf(str, "Bar %d:", i);
     return str;
@@ -128,28 +135,31 @@ const char *barlabel_cb(guiObject_t *obj, void *data)
 
 const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
     u8 changed;
-    bar[i] = GUI_TextSelectHelper(bar[i], 0, 1, dir, 1, 1, &changed);   
+    Model.pagecfg.bar[i] = GUI_TextSelectHelper(Model.pagecfg.bar[i], 0, NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    return bar[i] ? "Enable" : "Disable";
+    return MIXER_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
 }
 const char *iconlabel_cb(guiObject_t *obj, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Icon %d:", i);
+    sprintf(str, "Toggle %d:", i);
     return str;
 }
 
 const char *iconsel_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     u8 i = (long)data;
     u8 changed;
-    icon[i] = GUI_TextSelectHelper(icon[i], 0, 1, dir, 1, 1, &changed);   
+    Model.pagecfg.toggle[i] = GUI_TextSelectHelper(Model.pagecfg.toggle[i], 0, 1, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    return icon[i] ? "Enable" : "Disable";
+    return MIXER_SourceName(str, Model.pagecfg.toggle[i]);
 }
 
 u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
@@ -158,20 +168,20 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     switch(widget) {
     case TRIM1:
     case TRIM2:
-        if (! trims)
+        if (! Model.pagecfg.trims)
             return 0;
         *y = TRIM_12_Y;
         *w = VTRIM_W;
         *h = VTRIM_H;
         if (widget == TRIM1) {
-            *x = trims == TRIMS_4OUTSIDE ? OUTTRIM_1_X : INTRIM_1_X;
+            *x = Model.pagecfg.trims == TRIMS_4OUTSIDE ? OUTTRIM_1_X : INTRIM_1_X;
         } else {
-            *x = trims == TRIMS_4OUTSIDE ? OUTTRIM_2_X : INTRIM_2_X;
+            *x = Model.pagecfg.trims == TRIMS_4OUTSIDE ? OUTTRIM_2_X : INTRIM_2_X;
         }
         return 1;
     case TRIM3:
     case TRIM4:
-        if (! trims)
+        if (! Model.pagecfg.trims)
             return 0;
         *x = (widget == TRIM3) ? TRIM_3_X : TRIM_4_X;
         *y = TRIM_34_Y;
@@ -180,7 +190,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         return 1;
     case TRIM5:
     case TRIM6:
-        if (trims != TRIMS_6)
+        if (Model.pagecfg.trims != TRIMS_6)
             return 0;
         *x = (widget == TRIM5) ? TRIM_5_X : TRIM_6_X;
         *y = TRIM_56_Y;
@@ -188,7 +198,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         *h = VTRIM_H;
         return 1;
     case TOGGLE4:
-        if (trims == TRIMS_6)
+        if (Model.pagecfg.trims == TRIMS_6)
             return 0;
         //Fall-through
     case TOGGLE1:
@@ -196,16 +206,16 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     case TOGGLE3:
         *w = TOGGLE_W;
         *h = TOGGLE_H;
-        if (trims != TRIMS_6) {
+        if (Model.pagecfg.trims != TRIMS_6) {
             *x = TOGGLE_CNTR_X;
             *y = TOGGLE_CNTR_Y + (widget - TOGGLE1) * TOGGLE_CNTR_SPACE;
             return 1;
         }
-        if (! box[3] && (box[2] || barsize == 0)) {
+        if (! Model.pagecfg.box[3] && (Model.pagecfg.box[2] || Model.pagecfg.barsize == 0)) {
             *x = TOGGLE_L_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
             *y = TOGGLE_LR_Y;
             return 1;
-        } else if (! box[7] && (box[6] || barsize == 0 || (barsize == 1 && !box[2] && !box[3]))) {
+        } else if (! Model.pagecfg.box[7] && (Model.pagecfg.box[6] || Model.pagecfg.barsize == 0 || (Model.pagecfg.barsize == 1 && !Model.pagecfg.box[2] && !Model.pagecfg.box[3]))) {
             *x = TOGGLE_R_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
             *y = TOGGLE_LR_Y;
             return 1;
@@ -219,9 +229,9 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     case BOX7:
     case BOX8:
         i = widget-BOX1;
-        if(box[i]) {
+        if(Model.pagecfg.box[i]) {
             *x = box_pos[i].x;
-            if (trims == TRIMS_4OUTSIDE)
+            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
                 *x += i < 4 ? 24 : -24;
             *y = box_pos[i].y;
             *w = box_pos[i].w;
@@ -229,13 +239,13 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
             return 1;
         }
     case MODEL_ICO:
-        if (! box[4] && ! box[5]) {
+        if (! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]) {
             *x = MODEL_ICO_X;
-            if (trims == TRIMS_4OUTSIDE)
+            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
                 *x -= 24;
-        } else if(! box[0] && ! box[1]) {
+        } else if(! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]) {
             *x = 320 - MODEL_ICO_X - MODEL_ICO_W;
-            if (trims == TRIMS_4OUTSIDE)
+            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
                 *x += 24;
         } else
             return 0;
@@ -251,14 +261,14 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     case BAR6:
     case BAR7:
     case BAR8:
-        if(! barsize)
+        if(! Model.pagecfg.barsize)
             return 0;
         *y = BOX26_Y;
         *w = 10;
         *h = GRAPH_H;
         i = 0;
-        if(! box[2] && ! box[3]) {
-            if (trims <= 1) {
+        if(! Model.pagecfg.box[2] && ! Model.pagecfg.box[3]) {
+            if (Model.pagecfg.trims <= 1) {
                 i = 4;
                 if (widget <= BAR4) {
                     *x = 24+24+30*(widget - BAR1);
@@ -272,8 +282,8 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
                 }
             }
         }
-        if((! box[6] && ! box[7]) && (barsize == 2 || box[2] || box[3])) {
-            if (trims <= 1) {
+        if((! Model.pagecfg.box[6] && ! Model.pagecfg.box[7]) && (Model.pagecfg.barsize == 2 || Model.pagecfg.box[2] || Model.pagecfg.box[3])) {
+            if (Model.pagecfg.trims <= 1) {
                 if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
                     *x = 320 - 24 - 24 - 3*30 + 30 *(widget - (BAR1+i));
                     return 1;
@@ -315,6 +325,7 @@ static void build_image()
 #define MAX_PAGE 1
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
+    (void)pos;
     (void)parent;
     (void)data;
     s8 newpos = (s8)page_num + direction;
@@ -374,13 +385,6 @@ void PAGE_MainCfgInit(int page)
     PAGE_SetModal(0);
     imageObj = NULL;
     firstObj = NULL;
-
-    trims = 3;
-    box[0] = 1;
-    box[1] = 1;
-    box[2] = 1;
-    box[3] = 1;
-    barsize = 1;
 
     page_num = 0;
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);

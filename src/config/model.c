@@ -94,6 +94,18 @@ static const char SECTION_TIMER[] = "timer";
 #define TIMER_TYPE MODEL_TYPE
 static const char * const TIMER_TYPE_VAL[] = { "stopwatch", "countdown" };
 static const char TIMER_TIME[] = "time";
+
+/* Section: Gui-QVGA */
+static const char SECTION_GUI_QVGA[] = "gui-qvga";
+#define GUI_TRIM SECTION_TRIM
+static const char * const GUI_TRIM_VAL[] = { "none", "4out", "4in", "6"};
+static const char GUI_BARSIZE[] = "barsize";
+static const char * const GUI_BARSIZE_VAL[] = { "none", "half", "full"};
+#define GUI_SOURCE MIXER_SOURCE
+#define GUI_TIMER SECTION_TIMER
+static const char GUI_TOGGLE[] = "toggle";
+static const char GUI_BAR[] = "bar";
+static const char GUI_BOX[] = "box";
 /* End */
 
 static u8 get_source(const char *section, const char *value)
@@ -369,6 +381,77 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(TIMER_TIME)) {
             m->timer[idx].timer = atoi(value);
+            return 1;
+        }
+    }
+    if (MATCH_START(section, SECTION_GUI_QVGA)) {
+        if (MATCH_KEY(GUI_TRIM)) {
+            for (i = 0; i < NUM_STR_ELEMS(GUI_TRIM_VAL); i++) {
+                if (MATCH_VALUE(GUI_TRIM_VAL[i])) {
+                    m->pagecfg.trims = i;
+                    break;
+                }
+            }
+            return 1;
+        }
+        if (MATCH_KEY(GUI_BARSIZE)) {
+            for (i = 0; i < NUM_STR_ELEMS(GUI_BARSIZE_VAL); i++) {
+                if (MATCH_VALUE(GUI_BARSIZE_VAL[i])) {
+                    m->pagecfg.barsize = i;
+                    break;
+                }
+            }
+            return 1;
+        }
+        if (MATCH_START(name, GUI_BOX)) {
+            u8 idx = name[3] - '1';
+            if (idx >= 8) {
+                printf("%s: Unkown key: %s\n", section, name);
+                return 1;
+            }
+            if (MATCH_START(value, GUI_TIMER)) {
+                i = value[5] - '1';
+                if (i < 2)
+                    m->pagecfg.box[idx] = i+1;
+                else
+                    printf("%s: Unknown timer: %s\n", section, value);
+                return 1;
+            }
+            u8 src = get_source(section, value);
+            if(src > 0) {
+                if(src <= NUM_INPUTS) {
+                    printf("%s: Illegal input for box: %s\n", section, value);
+                    return 1;
+                }
+                src -= NUM_INPUTS - 2;
+            }
+            m->pagecfg.box[idx] = src;
+            return 1;
+        }
+        if (MATCH_START(name, GUI_BAR)) {
+            u8 idx = name[3] - '1';
+            if (idx >= 8) {
+                printf("%s: Unkown key: %s\n", section, name);
+                return 1;
+            }
+            u8 src = get_source(section, value);
+            if(src > 0) {
+                if(src <= NUM_INPUTS) {
+                    printf("%s: Illegal input for bargraph: %s\n", section, value);
+                    return 1;
+                }
+                src -= NUM_INPUTS;
+            }
+            m->pagecfg.bar[idx] = src;
+            return 1;
+        }
+        if (MATCH_START(name, GUI_TOGGLE)) {
+            u8 idx = name[6] - '1';
+            if (idx >= 4) {
+                printf("%s: Unkown key: %s\n", section, name);
+                return 1;
+            }
+            m->pagecfg.toggle[idx] = get_source(section, value);
             return 1;
         }
     }

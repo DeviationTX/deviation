@@ -3,6 +3,7 @@
 
 #include "mixer.h"
 #include "timer.h"
+#include "pagecfg.h"
 
 /* INI file consts */
 const char *MODEL_NAME;
@@ -28,6 +29,7 @@ struct Model {
     struct Limit limits[NUM_CHANNELS];
     struct Timer timer[NUM_TIMERS];
     u8 template[NUM_CHANNELS];
+    struct PageCfg pagecfg;
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[];
