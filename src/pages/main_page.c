@@ -51,6 +51,8 @@ void PAGE_MainInit(int page)
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
 
     mp->optsObj = GUI_CreateIcon(0, 1, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+    if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
+        GUI_CreateIcon(32, 1, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
     mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);

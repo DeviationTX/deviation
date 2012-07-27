@@ -20,4 +20,5 @@ const struct ImageMap icons[] = {
     {"media/exit.bmp",     32, 31, 0, 0}, /* ICON_EXIT */
     {"media/options.bmp",  32, 31, 0, 0}, /* ICON_OPTIONS */
     {"media/nextpage.bmp", 32, 31, 0, 0}, /* ICON_NEXTPAGE */
+    {"media/modelico.bmp", 32, 31, 0, 0}, /* ICON_MODELICO */
 };

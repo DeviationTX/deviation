@@ -5,8 +5,9 @@ enum Icons {
     ICON_EXIT,
     ICON_OPTIONS,
     ICON_NEXTPAGE,
+    ICON_MODELICO,
 };
 
-const struct ImageMap icons[ICON_NEXTPAGE+1];
+const struct ImageMap icons[ICON_MODELICO+1];
 
 #endif
