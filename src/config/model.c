@@ -562,6 +562,37 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
     }
+    fprintf(fh, "[%s]\n", SECTION_GUI_QVGA);
+    if (WRITE_FULL_MODEL || m->pagecfg.trims)
+        fprintf(fh, "%s=%s\n", GUI_TRIM, GUI_TRIM_VAL[m->pagecfg.trims]);
+    if (WRITE_FULL_MODEL || m->pagecfg.barsize)
+        fprintf(fh, "%s=%s\n", GUI_TRIM, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
+    for(idx = 0; idx < 8; idx++) {
+        if (WRITE_FULL_MODEL || m->pagecfg.box[idx]) {
+            if(m->pagecfg.box[idx] == 1 || m->pagecfg.box[idx] == 2) {
+                fprintf(fh, "%s%d=%s%d\n", GUI_BOX, idx+1, GUI_TIMER, m->pagecfg.box[idx]);
+            } else {
+                u8 val = m->pagecfg.box[idx];
+                if (val)
+                    val += NUM_INPUTS-2;
+                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, MIXER_SourceName(file, val));
+            }
+        }
+    }
+    for(idx = 0; idx < 8; idx++) {
+        if (WRITE_FULL_MODEL || m->pagecfg.bar[idx]) {
+            u8 val = m->pagecfg.bar[idx];
+            if (val)
+                val += NUM_INPUTS;
+            fprintf(fh, "%s%d=%s\n", GUI_BAR, idx+1, MIXER_SourceName(file, val));
+        }
+    }
+    for(idx = 0; idx < 4; idx++) {
+        if (WRITE_FULL_MODEL || m->pagecfg.toggle[idx]) {
+            u8 val = m->pagecfg.toggle[idx];
+            fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, MIXER_SourceName(file, val));
+        }
+    }
     fclose(fh);
     return 1;
 }
