@@ -29,8 +29,8 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
-static const char *fileselect_cb(guiObject_t *obj, int dir, void *data);
-static void toggle_file_cb(guiObject_t *obj, void *data);
+static const char *file_val_cb(guiObject_t *obj, int dir, void *data);
+static void file_press_cb(guiObject_t *obj, void *data);
 
 const char *show_text_cb(guiObject_t *obj, void *data)
 {
@@ -49,7 +49,7 @@ void PAGE_ModelInit(int page)
 
     row = 46;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "File:");
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, toggle_file_cb, fileselect_cb, NULL);
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
 
     row += 24;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
@@ -139,7 +139,7 @@ void type_press_cb(guiObject_t *obj, void *data)
     (void)obj;
     if(Model.type == 0) {
         GUI_RemoveAllObjects();
-        PAGE_ModelConfig();
+        MODELPAGE_Config();
     }
 }
 
@@ -174,23 +174,29 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_J6PRO, dir, 1, 1, NULL);
     return RADIO_PROTOCOL_VAL[Model.protocol];
 }
-static const char *fileselect_cb(guiObject_t *obj, int dir, void *data)
+static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 1, dir, 1, 1, NULL);
+    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 2, dir, 1, 1, NULL);
     if (mp->file_state == 0)
         return "Load...";
     else if (mp->file_state == 1)
         return "Copy To...";
+    else if (mp->file_state == 2)
+        return "Template..";
     else
         return "";
 }
 
-static void toggle_file_cb(guiObject_t *obj, void *data)
+static void file_press_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
     PAGE_SetModal(1);
-    MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
+    if (mp->file_state == 2) {
+        MODELPage_Template();
+    } else {
+        MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
+    }
 }

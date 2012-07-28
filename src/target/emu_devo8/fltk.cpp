@@ -38,7 +38,7 @@ extern "C" {
 }
 
 
-u16 keymap[] = { 'F', 'R', 'D', 'E', 'A', 'Q', 'S', 'W', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
+u16 keymap[] = { 'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
 
 static struct {
     s32 xscale;

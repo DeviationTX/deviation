@@ -58,6 +58,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
         //Save trim here
         struct Trim *trim = MIX_GetAllTrims();
         trim[tp->index] = tp->trim;
+        MIX_RegisterTrimButtons();
     }
     GUI_RemoveAllObjects();
     PAGE_TrimInit(0);

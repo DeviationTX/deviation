@@ -54,7 +54,8 @@ void PAGE_TimerEvent();
 void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
-void PAGE_ModelConfig();
+void MODELPAGE_Config();
+void MODELPage_Template();
 
 /* Test */
 void PAGE_TestInit(int page);

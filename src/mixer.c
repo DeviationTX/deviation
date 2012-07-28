@@ -264,7 +264,6 @@ u8 switch_is_on(u8 sw, s16 *raw)
 
 void TEST_init_mixer()
 {
-    int i;
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
     CONFIG_ReadModel(1);
@@ -274,6 +273,12 @@ void TEST_init_mixer()
     Model.Aileron_Stick    = INP_AILERON;
     Model.Collective_Stick = INP_THROTTLE;
     PROTOCOL_Init(PROTOCOL_NONE);
+}
+
+void MIX_RegisterTrimButtons()
+{
+    int i;
+    BUTTON_UnregisterCallback(&button_action);
     u32 mask = 0;
     for (i = 0; i < NUM_TRIMS; i++) {
         mask |= CHAN_ButtonMask(Model.trims[i].neg);
@@ -281,8 +286,6 @@ void TEST_init_mixer()
     }
     BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS, update_trim, NULL);
 }
-
-
 enum TemplateType MIX_GetTemplate(int ch)
 {
     return Model.template[ch];

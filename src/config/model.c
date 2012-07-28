@@ -635,6 +635,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         return 0;
     }
     TIMER_Init();
+    MIX_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
     return 1;
 }

@@ -65,7 +65,7 @@ static void show_titlerow(const char *header)
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
 
-void PAGE_ModelConfig()
+void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
     show_titlerow(Model.type == 0 ? "Helicopter" : "Airplane");
