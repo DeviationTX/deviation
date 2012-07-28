@@ -83,7 +83,7 @@ void print_buttons(u32 buttons)
 u32 BUTTON_Handler(u8 flags)
 {
     buttonAction_t *ptr = buttonHEAD;
-    u32 testbutton;
+    u32 testbutton = 0;
     u8 testflags;
     if(! flags) {
         u32 buttons = ScanButtons();
