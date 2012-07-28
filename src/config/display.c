@@ -23,7 +23,7 @@ ou should have received a copy of the GNU General Public License
 #include <string.h>
 
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "modelname", "title", "throttle", "timer", "battery", "channel", "misc1", "bold"};
+static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "tiny", "bold", "narrow", "small"};
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
 static const char FG_COLOR[] = "fg_color";
@@ -41,20 +41,8 @@ static const char * const BOX_VAL[] = { "none", "center", "fill", "outline" };
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 #define SET_FLAG(var, value, flag) ((value) ? ((var) | (flag)) : ((var) & ~(flag)))
-
-extern const char * const FontNames[10];
-
+extern u8 FONT_GetFromString(const char *);
 struct display_settings Display;
-u8 get_font(const char *value) {
-    u8 i;
-    for (i = 0; i < NUM_STR_ELEMS(FontNames); i++) {
-       if(MATCH_VALUE(FontNames[i])) {
-           return i + 1;
-       }
-    }
-    printf("Unknown font: %s\n", value);
-    return 0;
-}
 
 u16 get_color(const char *value) {
     u8 r, g, b;
@@ -68,7 +56,7 @@ u16 get_color(const char *value) {
 static int handle_label(struct LabelDesc *label, const char *name, const char *value)
 {
     if(MATCH_KEY(FONT)) {
-        label->font = get_font(value);
+        label->font = FONT_GetFromString(value);
         return 1;
     }
     if(MATCH_KEY(FONT_COLOR)) {
@@ -156,7 +144,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     if(MATCH_START(section, "keyboard")) {
         if(MATCH_KEY(FONT)) {
-            d->keyboard.font = get_font(value);
+            d->keyboard.font = FONT_GetFromString(value);
             return 1;
         }
         if(MATCH_KEY("bg_key1")) {
@@ -190,7 +178,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     }
     if(MATCH_START(section, "listbox")) {
         if(MATCH_KEY(FONT)) {
-            d->listbox.font = get_font(value);
+            d->listbox.font = FONT_GetFromString(value);
             return 1;
         }
         if(MATCH_KEY(BG_COLOR)) {

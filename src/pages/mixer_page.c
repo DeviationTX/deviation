@@ -29,6 +29,14 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
     return MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
 }
 
+const char *chan_name_proto_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+    strcat(mp->tmpstr,"(THR)");
+    return mp->tmpstr;
+}
+
 static const char *template_name_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -53,22 +61,22 @@ void show_page()
         u8 idx;
         int row = init_y + 24 * i;
         u8 ch = mp->top_channel + i;
-        obj = GUI_CreateButton(8, row, BUTTON_48x16, MIXPAGE_ChannelNameCB, 0x0000, limitselect_cb, (void *)((long)ch));
+        obj = GUI_CreateButton(4, row, BUTTON_64x16, chan_name_proto_cb, 0x0000, limitselect_cb, (void *)((long)ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].dest == ch)
                 break;
-        GUI_CreateButton(124, row, BUTTON_64x16, template_name_cb, 0x0000, templateselect_cb, (void *)((long)ch));
+        GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIX_GetTemplate(ch);
-            GUI_CreateLabel(64, row+2, show_source, DEFAULT_FONT, &mix[idx].src);
+            GUI_CreateLabelBox(68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx+1].sw) {
-                    GUI_CreateLabel(192, row+2, show_source, DEFAULT_FONT, &mix[idx+1].sw);
+                    GUI_CreateLabelBox(200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
                 }
                 if (mix[idx+2].sw) {
-                    GUI_CreateLabel(256, row+2, show_source, DEFAULT_FONT, &mix[idx+2].sw);
+                    GUI_CreateLabelBox(252, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
                 }
             }
         }

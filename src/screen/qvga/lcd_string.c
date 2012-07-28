@@ -18,14 +18,12 @@
 #include "fonts.h"
 
 #include "font_arial_14.h"
-#include "font_arial_bold_14.h"
-#include "font_corsiva_12.h"
+#include "font_arial_14_bold.h"
+#include "font_arial_14_narrow.h"
+#include "font_arial_14_narrow_bold.h"
+#include "font_arial_10.h"
+#include "font_arial_10_narrow.h"
 #include "font_system_5x7.h"
-#include "font_system_8x8thin.h"
-#include "font_system_8x8thick.h"
-#include "font_system_8x8ord.h"
-#include "font_system_5x8.h"
-#include "font_system_7x8.h"
 #include "font_trebuchet_48.h"
 
 /* The font bitfield is designed to be backwards compatible with standard
@@ -62,29 +60,26 @@
  *  So this would appear as '0x7F, 0x03' in the font table
  *
  */
-const char * const FontNames[10] = {
+static const char * const FontNames[] = {
     "system5x7",
-    "system5x8",
-    "system7x8",
-    "system8x8",
-    "system8x8bold",
-    "system8x8thin",
+    "arial10",
+    "arial10narrow",
     "arial14",
     "arial14bold",
-    "corsiva12",
+    "arial14narrow",
+    "arial14narrowbold",
     "trebuchet48",
+    "",
 };
     
 const struct FONT_DEF Fonts[] = {
     {5, 7, 0x20, 0x80, FontSystem5x7},
-    {5, 8, 32, 128, FontSystem5x8},
-    {7, 8, 32, 128, FontSystem7x8},
-    {8, 8, 32, 128, Font8x8ord},
-    {8, 8, 32, 128, Font8x8thk},
-    {8, 8, 0x20, 0x80, Font8x8thn},
+    {0x80 | 10, 10, 0x20, 0x7F, FontArial_10},
+    {0x80 | 10, 12, 0x20, 0x7F, FontArial_10_Narrow},
     {0x80 | 10, 15, 0x20, 0x80, FontArial_14},
-    {0x80 | 10, 15, 0x20, 0x80, FontArial_bold_14},
-    {0x80 | 10, 12, 0x20, 0x80, FontCorsiva_12},
+    {0x80 | 10, 15, 0x20, 0x80, FontArial_14_Bold},
+    {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_Narrow},
+    {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_NarrowBold},
     {0x80 | 34, 48, 0x25, 0x3a, FontTrebuchet_MS_48},
     {0, 0, 0, 0, 0},
     };
@@ -98,6 +93,16 @@ static struct {
     unsigned int y;
     u16          color;
 } cur_str;
+
+u8 FONT_GetFromString(const char *value)
+{
+    int i;
+    for (i = 0; FontNames[i][0]; i++)
+        if(strcasecmp(FontNames[i], value) == 0) {
+            return 1 + i;
+        }
+    return 0;
+}
 
 u8 get_width(u8 c)
 {

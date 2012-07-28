@@ -71,7 +71,10 @@ void PAGE_MainInit(int page)
     for(i = 0; i < 8; i++) {
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
-            mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h, &THROTTLE_FONT, show_box_cb, press_box_cb, (void *)((long)Model.pagecfg.box[i]));
+            mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
+                                i & 0x02 ? &SMALLBOX_FONT : &BIGBOX_FONT,
+                                show_box_cb, press_box_cb,
+                                (void *)((long)Model.pagecfg.box[i]));
         } else {
             mp->boxval[i] = 0;
             mp->boxObj[i] = NULL;

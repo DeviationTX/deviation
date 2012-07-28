@@ -16,7 +16,7 @@ while(<>) {
     if(/(\S+?)(\d+)x(\d+)\[\] =/) {
         ($name, $array_w, $array_h) = ($1, $2, $3);
     }
-    next unless(/\/\/ Code for char (\S+)/);
+    next unless(/\/\/ Code for char (.)/);
     my $char = ord($1);
     my @data;
     while(/0x(\S\S)/g) {
@@ -53,10 +53,14 @@ foreach my $c (@chars) {
 printf "\n    // font data\n";
 foreach my $c (@chars) {
     printf "    // Char: 0x%02x(%s)\n", $c->[0], chr($c->[0]);
-    for (my $i = 0; $i < $c->[1]; $i++) {
-        my($start, $end) = (2 + $i * $bpc, $i * $bpc + $bpc + 1);
-        printf "    " . join ", ", map {sprintf "0x%02x", $_} @$c[$start..$end];
-        printf ",\n";
+    if ($bpc > 1) {
+        for (my $i = 0; $i < $c->[1]; $i++) {
+            my($start, $end) = (2 + $i * $bpc, $i * $bpc + $bpc + 1);
+            printf "    " . join ", ", map {sprintf "0x%02x", $_} @$c[$start..$end];
+            printf ",\n";
+        }
+    } else {
+        printf "    %s,\n", join ", ", map {sprintf "0x%02x", $_} @$c[2 .. $c->[1]+1];
     }
 }
 printf "\n};";

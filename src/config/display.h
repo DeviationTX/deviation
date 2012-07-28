@@ -6,13 +6,14 @@
 #define DEFAULT_FONT   (Display.font[0])
 #define MODELNAME_FONT (Display.font[1])
 #define TITLE_FONT     (Display.font[2])
-#define THROTTLE_FONT  (Display.font[3])
-#define TIMER_FONT     (Display.font[4])
+#define BIGBOX_FONT    (Display.font[3])
+#define SMALLBOX_FONT  (Display.font[4])
 #define BATTERY_FONT   (Display.font[5])
-#define CHAN_FONT      (Display.font[6])
-#define MISC1_FONT     (Display.font[7])
-#define BOLD_FONT      (Display.font[8])
-#define NUM_LABELS 9
+#define TINY_FONT      (Display.font[6])
+#define BOLD_FONT      (Display.font[7])
+#define NARROW_FONT    (Display.font[8])
+#define SMALL_FONT     (Display.font[9])
+#define NUM_LABELS 10
 
 struct disp_keyboard {
     u8 font;
