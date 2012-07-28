@@ -34,6 +34,26 @@ struct {
   {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_SIMPLE},
 };
 
+struct {
+    struct Mixer mix[7];
+    u8 template[4];
+} _4chdr =
+{
+  {
+/* Mixer - Throttle*/
+    {INP_THROTTLE, 0, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - Rudder*/
+    {INP_RUDDER,   1, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_RUDDER,   1, INP_RUD_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+/* Mixer - Elevator*/
+    {INP_ELEVATOR, 2, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_ELEVATOR, 2, INP_ELE_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+/* Mixer - Aileron*/
+    {INP_AILERON,  3, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_AILERON,  3, INP_AIL_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+  },
+  {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR},
+};
 const struct Trim trims[] = {
     {INP_ELEVATOR, BUT_TRIM1_POS, BUT_TRIM1_NEG, 10},
     {INP_THROTTLE, BUT_TRIM2_POS, BUT_TRIM2_NEG, 10},
@@ -84,6 +104,12 @@ void simple_template() {
     memcpy(Model.template, simple.template, sizeof(simple.template));
     Model.num_channels = 4;
 }
+void _4chdr_template() {
+
+    memcpy(Model.mixers, _4chdr.mix, sizeof(_4chdr.mix));
+    memcpy(Model.template, _4chdr.template, sizeof(_4chdr.template));
+    Model.num_channels = 4;
+}
 
 void TEMPLATE_Apply(enum Templates tmpl)
 {
@@ -105,6 +131,7 @@ void TEMPLATE_Apply(enum Templates tmpl)
 
     switch(tmpl) {
         case TEMPLATE_4CH_SIMPLE: simple_template(); break;
+        case TEMPLATE_4CH_DR:     _4chdr_template(); break;
         default: break;
     }
     adjust_for_protocol();
