@@ -69,9 +69,9 @@ void MIX_EvalMixers(s16 *raw)
 
 }
 
-u8 MIXER_MapChannel(u8 channel, enum Mode mode)
+u8 MIXER_MapChannel(u8 channel)
 {
-    switch(mode) {
+    switch(Model.mode) {
     case MODE_1:
        return channel;
     case MODE_2:
@@ -107,7 +107,7 @@ u8 MIX_ReadInputs(s16 *raw)
     u8 i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        u8 mapped_channel = MIXER_MapChannel(i, Model.mode);
+        u8 mapped_channel = MIXER_MapChannel(i);
         s16 value = CHAN_ReadInput(mapped_channel);
         if (value != raw[i]) {
             changed = 1;

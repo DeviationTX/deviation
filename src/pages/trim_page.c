@@ -32,7 +32,7 @@ const char *trimsource_name_cb(guiObject_t *obj, void *data)
     (void)obj;
     u8 i = (long)data;
     struct Trim *trim = MIX_GetAllTrims();
-    return MIXER_SourceName(tp->tmpstr, trim[i].src);
+    return MIXER_SourceName(tp->tmpstr, MIXER_MapChannel(trim[i].src));
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -40,7 +40,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 *source = (u8 *)data;
     *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
-    return MIXER_SourceName(tp->tmpstr, *source);
+    return MIXER_SourceName(tp->tmpstr, MIXER_MapChannel(*source));
 }
 
 const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
