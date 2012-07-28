@@ -35,7 +35,7 @@ const char *chan_name_proto_cb(guiObject_t *obj, void *data)
     (void)obj;
     char tmp1[5];
     char tmp2[5];
-    if ((long)data < PROTO_MAP_LEN) {
+    if ((long)data < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         MIXER_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
         MIXER_SourceName(tmp2, ProtocolChannelMap[Model.protocol][(long)data]);
         sprintf(mp->tmpstr,"%s-%s", tmp1, tmp2);
