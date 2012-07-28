@@ -21,6 +21,7 @@
 #define BIND_CHANNEL 0x0d
 #define USE_FIXED_MFGID
 #define MODEL 0
+
 enum {
     DSM2_BIND = 0,
     DSM2_CHANSEL = 200,

@@ -16,6 +16,24 @@
 #include "target.h"
 #include "interface.h"
 
+static const u8 const _eatrg[PROTO_MAP_LEN] = ORDER_EATRG;
+static const u8 const _taerg[PROTO_MAP_LEN] = ORDER_EATRG;
+
+const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
+    NULL,
+#ifdef PROTO_HAS_CYRF6936
+    _eatrg, //DEVO
+    _eatrg, //2801
+    _eatrg, //2601
+    _eatrg, //2401
+    _taerg, //DSM2
+    _eatrg, //J6PRO
+#endif
+#ifdef PROTO_HAS_A7105
+    _eatrg, //Flysky
+#endif
+};
+
 void PROTOCOL_Init(enum Protocols p)
 {
     switch(p) {

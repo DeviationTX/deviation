@@ -168,7 +168,10 @@ enum Protocols {
 #ifdef PROTO_HAS_A7105
     PROTOCOL_FLYSKY,
 #endif
+    PROTOCOL_COUNT,
 };
+extern const u8 *ProtocolChannelMap[PROTOCOL_COUNT];
+#define PROTO_MAP_LEN 5
 
 enum ModelType {
     MODELTYPE_HELI,

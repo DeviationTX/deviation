@@ -62,32 +62,10 @@ const struct Trim trims[] = {
 };
 
 /* Because '\0' is a string terminator, the map is indexed from 1 */
-const char * const ProtocolChannelMap[] = {
-    "", /* PROTOCOL_NONE */
-#ifdef PROTO_HAS_CYRF6936
-    /* PROTOCOL_DEVO */
-    "\x01\x02\x03\x04",
-    /* PROTOCOL_WK2801 */
-    "\x01\x02\x03\x04",
-    /* PROTOCOL_WK2601 */
-    "\x01\x02\x03\x04",
-    /* PROTOCOL_WK2401 */
-    "\x01\x02\x03\x04",
-    /* PROTOCOL_DSM2 */
-    "\x01\x02\x03\x04",
-    /* PROTOCOL_J6PRO */
-    "\x01\x02\x03\x04",
-#endif
-#ifdef PROTO_HAS_A7105
-    /* PROTOCOL_FLYSKY */
-    "\x01\x02\x03\x04",
-#endif
-};
-
 void adjust_for_protocol()
 {
-    const char *map = ProtocolChannelMap[Model.protocol];
-    u8 len = strlen(map);
+    const u8 *map = ProtocolChannelMap[Model.protocol];
+    u8 len = PROTO_MAP_LEN;
     int i;
     for(i = 0; i < NUM_MIXERS; i++) {
         if (! Model.mixers[i].src)

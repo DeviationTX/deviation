@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "pages.h"
+#include "config/model.h"
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
@@ -32,8 +33,15 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
 const char *chan_name_proto_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
-    strcat(mp->tmpstr,"(THR)");
+    char tmp1[5];
+    char tmp2[5];
+    if ((long)data < PROTO_MAP_LEN) {
+        MIXER_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
+        MIXER_SourceName(tmp2, ProtocolChannelMap[Model.protocol][(long)data]);
+        sprintf(mp->tmpstr,"%s-%s", tmp1, tmp2);
+    } else {
+        MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+    }
     return mp->tmpstr;
 }
 
