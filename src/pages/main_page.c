@@ -28,7 +28,6 @@ static s16 bar_cb(void * data);
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
 void press_icon2_cb(guiObject_t *obj, void *data);
 void press_box_cb(guiObject_t *obj, s8 press_type, void *data);
-const char *show_timer_cb(guiObject_t *obj, void *data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 
 extern s16 Channels[NUM_CHANNELS];

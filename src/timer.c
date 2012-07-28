@@ -23,10 +23,13 @@ static u32 last_time[NUM_TIMERS];
 
 void TIMER_SetString(char *str, u16 time)
 {
-    u8 h = time / 3600;
-    u8 m = (time - h*3600) / 60;
-    u8 s = time -h*3600 - m*60;
-    sprintf(str, "%02d:%02d:%02d", h, m, s);
+    //u8 h = time / 3600;
+    //u8 m = (time - h*3600) / 60;
+    //u8 s = time -h*3600 - m*60;
+    //sprintf(str, "%02d:%02d:%02d", h, m, s);
+    u8 m = time / 60;
+    u8 s = time - m*60;
+    sprintf(str, "%02d:%02d", m, s);
 }
 
 void TIMER_StartStop(u8 timer)

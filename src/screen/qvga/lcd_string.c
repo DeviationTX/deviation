@@ -23,6 +23,8 @@
 #include "font_arial_14_narrow_bold.h"
 #include "font_arial_10.h"
 #include "font_arial_10_narrow.h"
+#include "font_arial_18_bold.h"
+#include "font_arial_24_bold.h"
 #include "font_system_5x7.h"
 #include "font_trebuchet_48.h"
 
@@ -68,6 +70,8 @@ static const char * const FontNames[] = {
     "arial14bold",
     "arial14narrow",
     "arial14narrowbold",
+    "arial18bold",
+    "arial24bold",
     "trebuchet48",
     "",
 };
@@ -80,6 +84,8 @@ const struct FONT_DEF Fonts[] = {
     {0x80 | 10, 15, 0x20, 0x80, FontArial_14_Bold},
     {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_Narrow},
     {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_NarrowBold},
+    {0x80 | 15, 15, 0x20, 0x5b, FontArial_18_Bold},
+    {0x80 | 27, 23, 0x20, 0x5b, FontArial_24_Bold},
     {0x80 | 34, 48, 0x25, 0x3a, FontTrebuchet_MS_48},
     {0, 0, 0, 0, 0},
     };
@@ -101,6 +107,7 @@ u8 FONT_GetFromString(const char *value)
         if(strcasecmp(FontNames[i], value) == 0) {
             return 1 + i;
         }
+    printf("Unknown font: %s\n", value);
     return 0;
 }
 
