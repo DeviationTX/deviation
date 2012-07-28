@@ -23,7 +23,8 @@ static struct model_page * const mp = &pagemem.u.model_page;
 
 static void changename_cb(guiObject_t *obj, void *data);
 static void fixedid_cb(guiObject_t *obj, void *data);
-static const char *typeselect_cb(guiObject_t *obj, int dir, void *data);
+static const char *type_val_cb(guiObject_t *obj, int dir, void *data);
+static void type_press_cb(guiObject_t *obj, void *data);
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
@@ -56,7 +57,7 @@ void PAGE_ModelInit(int page)
 
     row += 24;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, typeselect_cb, NULL);
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
 
     row += 24;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Number of Channels:");
@@ -122,7 +123,7 @@ static void fixedid_cb(guiObject_t *obj, void *data)
 }
 
 /* Text Select Callback */
-static const char *typeselect_cb(guiObject_t *obj, int dir, void *data)
+static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
@@ -130,6 +131,15 @@ static const char *typeselect_cb(guiObject_t *obj, int dir, void *data)
     switch (Model.type) {
         case 0: return "Helicopter";
         default: return "Airplane";
+    }
+}
+void type_press_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    (void)obj;
+    if(Model.type == 0) {
+        GUI_RemoveAllObjects();
+        PAGE_ModelConfig();
     }
 }
 
