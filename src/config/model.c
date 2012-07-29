@@ -75,6 +75,7 @@ static const char CHAN_LIMIT_SAFETYSW[] = "safetysw";
 static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
 static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
+static const char CHAN_SUBTRIM[] = "subtrim";
 
 static const char CHAN_TEMPLATE[] = "template";
 static const char * const CHAN_TEMPLATE_VAL[]  = { "none", "simple", "expo_dr", "complex" };
@@ -309,6 +310,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
             m->limits[idx].min = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_SUBTRIM)) {
+            m->limits[idx].subtrim = value_int;
             return 1;
         }
         if (MATCH_KEY(CHAN_TEMPLATE)) {
@@ -548,6 +553,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
         if(WRITE_FULL_MODEL || m->limits[idx].min != -100)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, m->limits[idx].min);
+        if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
+            fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->template[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
     }

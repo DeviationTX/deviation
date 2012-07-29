@@ -23,6 +23,7 @@ static const char *reverse_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_reverse_cb(guiObject_t *obj, void *data);
 static void show_titlerow();
 static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 
@@ -46,6 +47,9 @@ void MIXPAGE_EditLimits()
     GUI_CreateTextSelect(64, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
     GUI_CreateLabel(176, 112, NULL, DEFAULT_FONT, "Max:");
     GUI_CreateTextSelect(216, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
+    //Row 5
+    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, "Subtrim:");
+    GUI_CreateTextSelect(64, 136, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -74,6 +78,15 @@ const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
     else
         *value = GUI_TextSelectHelper(*value, mp->limit.min, 125, dir, 1, 5, NULL);
     sprintf(mp->tmpstr, "%d", *value);
+    return mp->tmpstr;
+}
+
+const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    s8 *value = (s8 *)data;
+    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
+    sprintf(mp->tmpstr, "%d.%d", *value / 10, *value % 10);
     return mp->tmpstr;
 }
 

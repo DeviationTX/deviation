@@ -89,6 +89,7 @@ struct Limit {
     s8 max;
     s8 min;
     s8 failsafe;
+    s8 subtrim;
 };
 
 struct Trim {

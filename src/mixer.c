@@ -226,6 +226,7 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
 s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
 {
     s16 value = raw[NUM_INPUTS + 1 + channel];
+    value += PCT_TO_RANGE(limit->subtrim) / 10;
     if (limit->flags & CH_REVERSE)
         value = -value;
     if (MIX_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw))

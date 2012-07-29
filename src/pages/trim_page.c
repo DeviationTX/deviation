@@ -43,7 +43,7 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
     return MIXER_ButtonName(*button);
 }
 
-const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
+static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     s8 *value = (s8 *)data;
@@ -51,6 +51,7 @@ const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tp->tmpstr, "%d.%d", *value / 10, *value % 10);
     return tp->tmpstr;
 }
+
 static void okcancel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
