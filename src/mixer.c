@@ -33,13 +33,13 @@
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
 s16 Channels[NUM_CHANNELS];
-s8 Trims[NUM_TRIMS];
+s16 Trims[NUM_TRIMS];
 struct Transmitter Transmitter;
 
 static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
 static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
-static s8 get_trim(u8 src);
+static s16 get_trim(u8 src);
 static u8 update_trim(u32 buttons, u8 flags, void *data);
 
 struct Mixer *MIX_GetAllMixers()
@@ -197,8 +197,8 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
         // Switch is off, so this mixer is not active
         return;
     }
-    //1st: Get source value
-    value = raw[MIX_SRC(mixer->src)];
+    //1st: Get source value with trim
+    value = raw[MIX_SRC(mixer->src)] + get_trim(MIX_SRC(mixer->src));
     //Invert if necessary
     if (MIX_SRC_IS_INV(mixer->src))
         value = - value;
@@ -237,12 +237,13 @@ s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
     return value;
 }
 
-s8 get_trim(u8 src)
+s16 get_trim(u8 src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
-        if (Model.trims[i].src == src)
-            return Trims[i];
+        if (MIXER_MapChannel(Model.trims[i].src) == src) {
+            return PCT_TO_RANGE((s16)Trims[i] * Model.trims[i].step / 10) / 10;
+        }
     }
     return 0;
 }
@@ -450,11 +451,11 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Trims[i]) - Model.trims[i].step;
+            int tmp = (int)(Trims[i]) - 10;
             Trims[i] = tmp < -100 ? -100 : tmp;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Trims[i]) + Model.trims[i].step;
+            int tmp = (int)(Trims[i]) + 10;
             Trims[i] = tmp > 100 ? 100 : tmp;
         }
     }

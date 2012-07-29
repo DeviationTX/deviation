@@ -19,14 +19,6 @@
 
 static struct trim_page * const tp = &pagemem.u.trim_page;
 
-const char *show_int_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    long num = (long)data;
-    sprintf(tp->tmpstr, "%ld", num);
-    return tp->tmpstr;
-}
-
 const char *trimsource_name_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -51,6 +43,14 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
     return MIXER_ButtonName(*button);
 }
 
+const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    s8 *value = (s8 *)data;
+    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
+    sprintf(tp->tmpstr, "%d.%d", *value / 10, *value % 10);
+    return tp->tmpstr;
+}
 static void okcancel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -85,7 +85,7 @@ void edit_cb(guiObject_t *obj, void *data)
     GUI_CreateTextSelect(216, 72, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.pos);
     //Row 3
     GUI_CreateLabel(8, 96, NULL, DEFAULT_FONT, "Trim Step:");
-    GUI_CreateTextSelect(72, 96, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &tp->trim.step);
+    GUI_CreateTextSelect(72, 96, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &tp->trim.step);
 }
 
 void PAGE_TrimInit(int page)
@@ -105,7 +105,7 @@ void PAGE_TrimInit(int page)
             trimsource_name_cb, 0x0000, edit_cb, (void *)((long)i));
         GUI_CreateLabel(72, 24*i + 66, NULL, DEFAULT_FONT, (void *)MIXER_ButtonName(trim[i].neg));
         GUI_CreateLabel(136, 24*i + 66, NULL, DEFAULT_FONT, (void *)MIXER_ButtonName(trim[i].pos));
-        GUI_CreateTextSelect(200, 24*i + 64, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &trim[i].step);
+        GUI_CreateTextSelect(200, 24*i + 64, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &trim[i].step);
     }
 }
 
