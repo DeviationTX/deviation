@@ -26,17 +26,17 @@
 char str[20];
 u8 page_num;
 
-#define COL1_VALUE 5
-#define COL2_VALUE 45
-#define COL3_VALUE 162
-#define COL4_VALUE 202
+#define COL1_VALUE 8
+#define COL2_VALUE 48
+#define COL3_VALUE 160
+#define COL4_VALUE 200
 const struct LabelDesc outline = {0, 0, 0, 0, TRANSPARENT};
 const struct LabelDesc fill_white = {0, 0, 0xFFFF, 0, FILL};
 const struct LabelDesc fill_black = {0, 0, 0, 0, FILL};
 guiObject_t *imageObj;
 guiObject_t *firstObj;
 
-#define IMAGE_X 157
+#define IMAGE_X 163
 #define IMAGE_Y 40
 #define CALC_X(x) ((x) * 10 / 24 + IMAGE_X)
 #define CALC_Y(y) (((y)-32) * 10 / 24 + IMAGE_Y)
@@ -72,10 +72,10 @@ const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.trims) {
-    case 0 : return "NoTrim";
-    case 1 : return "OutTrim";
-    case 2 : return "InTrim";
-    case 3 : return "6Trim";
+    case 0 : return "No Trims";
+    case 1 : return "4 Outside";
+    case 2 : return "4 Inside";
+    case 3 : return "6 Trims";
     default: return "";
     }
 }
@@ -96,9 +96,9 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.barsize) {
-    case 0 : return "NoGraphs";
-    case 1 : return "HalfGraphs";
-    case 2 : return "FullGraphs";
+    case 0 : return "No Bars";
+    case 1 : return "4 Bars";
+    case 2 : return "8 Bars";
     default: return "";
     }
 }
@@ -360,8 +360,10 @@ static void show_page()
 
     u16 y = 144;
     if (page_num == 0) {
-        firstObj = GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
-        GUI_CreateTextSelect(COL1_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
+        GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, "Trims:");
+        firstObj = GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
+        GUI_CreateLabel(COL1_VALUE, 64, NULL, DEFAULT_FONT, "Bars:");
+        GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, boxtxtsel_cb, (void *)i);
@@ -375,13 +377,13 @@ static void show_page()
         }
     } else if (page_num == 1) {
         firstObj = GUI_CreateButton(COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE+10, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
+        GUI_CreateTextSelect(COL2_VALUE+12, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
         GUI_CreateButton(COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE+10, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
+        GUI_CreateTextSelect(COL2_VALUE+12, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
         GUI_CreateButton(COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE+10, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
+        GUI_CreateTextSelect(COL2_VALUE+12, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
         GUI_CreateButton(COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE+10, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
+        GUI_CreateTextSelect(COL2_VALUE+12, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
@@ -403,7 +405,7 @@ void PAGE_MainCfgInit(int page)
     firstObj = NULL;
 
     page_num = page;
-    PAGE_ShowHeader("Main Page Cfg");
+    PAGE_ShowHeader("Main Page Config");
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
     show_page();
 }
