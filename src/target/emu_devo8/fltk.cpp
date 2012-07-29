@@ -192,17 +192,15 @@ void update_channels(void *params)
     if(! gui.raw[0])
         return;
 
-    for(int i = 0; i < 20; i++) {
-        if(i < NUM_INPUTS) {
-            sprintf(str, "%6.2f%%", 100.0 * (float)CHAN_ReadInput(i + 1) / CHAN_MAX_VALUE);
-            if(strcmp(str, gui.raw[i]->value()))
-                changed |= gui.raw[i]->value(str);
-        }
-        if(i < NUM_CHANNELS) {
-            sprintf(str, "%6.2f%%", 100.0 * (float)Channels[i] / CHAN_MAX_VALUE);
-            if(strcmp(str, gui.final[i]->value()))
-                changed |= gui.final[i]->value(str);
-        }
+    for(int i = 0; i < 14; i++) {
+        sprintf(str, "%6.2f%%", 100.0 * (float)CHAN_ReadInput(i + 1) / CHAN_MAX_VALUE);
+        if(strcmp(str, gui.raw[i]->value()))
+            changed |= gui.raw[i]->value(str);
+    }
+    for(int i = 0; i < 12; i++) {
+        sprintf(str, "%6.2f%%", 100.0 * (float)Channels[i] / CHAN_MAX_VALUE);
+        if(strcmp(str, gui.final[i]->value()))
+            changed |= gui.final[i]->value(str);
     }
 }
 extern "C" {
@@ -227,26 +225,28 @@ void LCD_Init()
   image = new image_box(0, 0, 320, 240);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
-  for(i = 0; i < 10; i++) {
+  for(i = 0; i < 7; i++) {
+      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, tx_input_str[i]);
+      gui.raw[i]->textsize(10);
+      gui.raw[i+7] = new Fl_Output(535, 20 * i + 5, 60, 15, tx_input_str[i+7]);
+      gui.raw[i+7]->textsize(10);
+  }
+  for(i = 0; i < 4; i++) {
       //This will leak memory for the labels, but it won't be much
       char *str;
-      str = (char *)malloc(8);
-      sprintf(str, "Ch %d", i + 1);
-      gui.raw[i] = new Fl_Output(370, 20 * i + 20, 50, 15, str);
-      gui.raw[i]->textsize(10);
-      gui.final[i] = new Fl_Output(430, 20 * i + 20, 50, 15);
+      str = (char *)malloc(5);
+      sprintf(str, "Ch%d", i + 1);
+      gui.final[i] = new Fl_Output(370, 20 * i + 20*7 + 15, 50, 15, str);
       gui.final[i]->textsize(10);
-      str = (char *)malloc(8);
-      sprintf(str, "Ch %d", i + 11);
-      gui.raw[i+10] = new Fl_Output(530, 20 * i + 20, 50, 15, str);
-      gui.raw[i+10]->textsize(10);
-      gui.final[i+10] = new Fl_Output(590, 20 * i + 20, 50, 15);
-      gui.final[i+10]->textsize(10);
+      str = (char *)malloc(5);
+      sprintf(str, "Ch%d", i + 5);
+      gui.final[i+4] = new Fl_Output(470, 20 * i + 20*7+ 15, 50, 15, str);
+      gui.final[i+4]->textsize(10);
+      str = (char *)malloc(5);
+      sprintf(str, "Ch%d", i + 9);
+      gui.final[i+8] = new Fl_Output(580, 20 * i + 20*7+ 15, 50, 15, str);
+      gui.final[i+8]->textsize(10);
   }
-  new Fl_Box(370, 0, 50, 20,"Raw");
-  new Fl_Box(430, 0, 50, 20,"Final");
-  new Fl_Box(530, 0, 50, 20,"Raw");
-  new Fl_Box(590, 0, 50, 20,"Final");
   //Fl_Box box(320, 0, 320, 240);
   //Fl_Output out(320, 0, 30, 10);
   main_window->end();
