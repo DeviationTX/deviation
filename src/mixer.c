@@ -243,7 +243,7 @@ s16 get_trim(u8 src)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            return PCT_TO_RANGE((s16)Trims[i] * Model.trims[i].step / 10) / 10;
+            return PCT_TO_RANGE((s16)Trims[i] * Model.trims[i].step / 10);
         }
     }
     return 0;
@@ -286,7 +286,7 @@ void MIX_RegisterTrimButtons()
         mask |= CHAN_ButtonMask(Model.trims[i].neg);
         mask |= CHAN_ButtonMask(Model.trims[i].pos);
     }
-    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS, update_trim, NULL);
+    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS, update_trim, NULL);
 }
 enum TemplateType MIX_GetTemplate(int ch)
 {
@@ -450,16 +450,24 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     (void)data;
     (void)flags;
     int i;
+    static u8 short_press = 1;
+    if (flags & BUTTON_PRESS)
+        short_press = 1;
+    s8 step = flags & BUTTON_LONGPRESS ? (10 - short_press) : 1;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Trims[i]) - 10;
+            int tmp = (int)(Trims[i]) - step;
             Trims[i] = tmp < -100 ? -100 : tmp;
+            break;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Trims[i]) + 10;
+            int tmp = (int)(Trims[i]) + step;
             Trims[i] = tmp > 100 ? 100 : tmp;
+            break;
         }
     }
+    if (flags & BUTTON_LONGPRESS)
+        short_press = 0;
     return 1;
 }
 

@@ -628,7 +628,7 @@ void clear_model()
         Model.limits[i].min = -100;
     }
     for (i = 0; i < NUM_TRIMS; i++) {
-        Model.trims[i].step = 10;
+        Model.trims[i].step = 1;
     }
 }
 
