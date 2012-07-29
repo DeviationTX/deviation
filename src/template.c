@@ -65,14 +65,15 @@ const struct Trim trims[] = {
 void adjust_for_protocol()
 {
     const u8 *map = ProtocolChannelMap[Model.protocol];
-    u8 len = PROTO_MAP_LEN;
-    int i;
+    if(! map)
+        return;
+    int i, ch;
     for(i = 0; i < NUM_MIXERS; i++) {
         if (! Model.mixers[i].src)
             return;
-        u8 src = Model.mixers[i].src;
-        if (src < len)
-            Model.mixers[i].src = map[Model.mixers[i].src] - 1;
+        for(ch = 0; ch < PROTO_MAP_LEN; ch++)
+            if (map[ch] == Model.mixers[i].src)
+                Model.mixers[i].dest = ch;
     }
 }
 
