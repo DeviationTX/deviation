@@ -43,4 +43,5 @@ const char *CONFIG_GetIcon(enum ModelType type);
 const char *CONFIG_GetCurrentIcon();
 enum ModelType CONFIG_ParseModelType(const char *value);
 void CONFIG_ParseModelName(char *name, const char *value);
+void CONFIG_ResetModel();
 #endif /*_MODEL_H_*/

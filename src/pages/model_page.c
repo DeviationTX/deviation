@@ -180,13 +180,15 @@ static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 2, dir, 1, 1, NULL);
+    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 3, dir, 1, 1, NULL);
     if (mp->file_state == 0)
         return "Load...";
     else if (mp->file_state == 1)
         return "Copy To...";
     else if (mp->file_state == 2)
         return "Template..";
+    else if (mp->file_state == 3)
+        return "Reset";
     else
         return "";
 }
@@ -196,7 +198,10 @@ static void file_press_cb(guiObject_t *obj, void *data)
     (void)obj;
     (void)data;
     PAGE_SetModal(1);
-    if (mp->file_state == 2) {
+    if (mp->file_state == 3) {
+        CONFIG_ResetModel();
+        GUI_RedrawAllObjects();
+    } else if (mp->file_state == 2) {
         MODELPage_Template();
     } else {
         MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);

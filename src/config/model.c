@@ -490,7 +490,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
 static void get_model_file(char *file, u8 model_num)
 {
-    sprintf(file, "models/model%d.ini", model_num);
+    if (model_num == 0)
+        sprintf(file, "models/default.ini");
+    else
+        sprintf(file, "models/model%d.ini", model_num);
 }
 
 u8 CONFIG_WriteModel(u8 model_num) {
@@ -671,6 +674,14 @@ u8 CONFIG_SaveModelIfNeeded() {
         return 0;
     CONFIG_WriteModel(Transmitter.current_model);
     return 1;
+}
+
+void CONFIG_ResetModel()
+{
+    u8 model_num = Transmitter.current_model;
+    CONFIG_ReadModel(0);
+    Transmitter.current_model = model_num;
+    sprintf(Model.name, "Model%d", model_num);
 }
 
 u8 CONFIG_GetCurrentModel() {

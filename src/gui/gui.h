@@ -356,6 +356,7 @@ void GUI_TouchRelease();
 void GUI_DrawScreen(void);
 void GUI_RefreshScreen(void);
 void GUI_Redraw(guiObject_t *obj);
+void GUI_RedrawAllObjects();
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);

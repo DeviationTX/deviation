@@ -55,6 +55,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini
 	cp tx_template.ini filesystem/tx.ini
 	mkdir filesystem/models 2> /dev/null || true 
 	echo name=Model1 > filesystem/models/model1.ini && cat model_template.ini >> filesystem/models/model1.ini
+	cp model_template.ini filesystem/models/default.ini
 	number=2 ; while [ $$number -le 30 ] ; do \
 		cp model_template.ini filesystem/models/model$$number.ini; \
 		number=`expr $$number + 1`; \

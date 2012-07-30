@@ -238,6 +238,11 @@ void GUI_Redraw(struct guiObject *obj)
     OBJ_SET_DIRTY(obj, 1);
 }
 
+void GUI_RedrawAllObjects()
+{
+    FullRedraw = 1;
+}
+
 void GUI_RefreshScreen(void)
 {
     struct guiObject *obj;
