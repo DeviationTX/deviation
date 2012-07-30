@@ -468,6 +468,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             redraw_graphs();
         }
     }
+    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 
