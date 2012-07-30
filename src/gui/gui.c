@@ -560,6 +560,14 @@ void GUI_SetSelected(guiObject_t *obj)
     OBJ_SET_DIRTY(obj, 1);
 }
 
+void GUI_SetSelectable(guiObject_t *obj, u8 selectable)
+{
+    OBJ_SET_SELECTABLE(obj, selectable);
+    if(objSELECTED == obj && ! selectable) {
+        objSELECTED = NULL;
+        OBJ_SET_DIRTY(obj, 1);
+    }
+}
 
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
 {

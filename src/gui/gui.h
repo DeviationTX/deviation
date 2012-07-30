@@ -363,6 +363,7 @@ void GUI_RemoveHierObjects(guiObject_t *obj);
 void GUI_SetHidden(guiObject_t *obj, u8 state);
 guiObject_t *GUI_GetSelected();
 void GUI_SetSelected(guiObject_t *obj);
+void GUI_SetSelectable(guiObject_t *obj, u8 selectable);
 
 guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);

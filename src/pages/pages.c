@@ -126,13 +126,20 @@ void changepage_cb(guiObject_t *obj, void *data)
         PAGE_SetSection(SECTION_MAIN);
     } else if ((long)data == 1) {
         PAGE_Change(1);
+    } else if ((long)data == -1) {
+        PAGE_Change(-1);
     }
 }
 void PAGE_ShowHeader(const char *title)
 {
-    GUI_CreateIcon(0, 1, &icons[ICON_EXIT], changepage_cb, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
-    GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    guiObject_t *obj;
+    obj = GUI_CreateIcon(0, 1, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    GUI_SetSelectable(obj, 0);
+    obj = GUI_CreateIcon(34, 1, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_SetSelectable(obj, 0);
+    GUI_CreateLabel(74, 10, NULL, TITLE_FONT, (void *)title);
+    obj = GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    GUI_SetSelectable(obj, 0);
 }
 
 static const char *okcancelstr_cb(guiObject_t *obj, void *data)

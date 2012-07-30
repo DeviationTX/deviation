@@ -4,6 +4,7 @@
 enum Icons {
     ICON_EXIT,
     ICON_OPTIONS,
+    ICON_PREVPAGE,
     ICON_NEXTPAGE,
     ICON_MODELICO,
 };
