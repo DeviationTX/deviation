@@ -226,7 +226,7 @@ void LCD_Init()
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
   for(i = 0; i < 7; i++) {
-      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, tx_input_str[i]);
+      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : tx_input_str[i]);
       gui.raw[i]->textsize(10);
       gui.raw[i+7] = new Fl_Output(535, 20 * i + 5, 60, 15, tx_input_str[i+7]);
       gui.raw[i+7]->textsize(10);

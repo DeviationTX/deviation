@@ -41,6 +41,7 @@ struct Curve {
 
 //The followingis defined bythe target
 extern const char *tx_input_str[NUM_TX_INPUTS];
+extern const char *tx_stick_names[4];
 extern const char *tx_button_str[NUM_TX_BUTTONS];
 
 enum TemplateType {
