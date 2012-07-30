@@ -80,10 +80,10 @@ void show_page()
             enum TemplateType template = MIX_GetTemplate(ch);
             GUI_CreateLabelBox(68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
-                if (mix[idx+1].sw) {
+                if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
                     GUI_CreateLabelBox(200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
                 }
-                if (mix[idx+2].sw) {
+                if (mix[idx].src == mix[idx+2].src && mix[idx].dest == mix[idx+2].dest && mix[idx+2].sw) {
                     GUI_CreateLabelBox(252, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
                 }
             }

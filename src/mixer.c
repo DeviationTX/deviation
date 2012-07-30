@@ -401,11 +401,13 @@ void fix_mixer_dependencies(u8 mixer_count)
 int MIX_SetMixers(struct Mixer *mixers, int count)
 {
     int i;
-    u8 dest = mixers[0].dest;
-    //Remove all mixers for this channel
-    for (i = 0; i < NUM_MIXERS; i++) {
-        if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
-            Model.mixers[i].src = 0;
+    if (count) {
+        u8 dest = mixers[0].dest;
+        //Remove all mixers for this channel
+        for (i = 0; i < NUM_MIXERS; i++) {
+            if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
+                Model.mixers[i].src = 0;
+        }
     }
     u8 pos = compact_mixers();
     if (pos + count > NUM_MIXERS) {

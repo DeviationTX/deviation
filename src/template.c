@@ -68,13 +68,20 @@ void adjust_for_protocol()
     if(! map)
         return;
     int i, ch;
+    u8 template[NUM_CHANNELS];
+    memcpy(template, Model.template, sizeof(template));
     for(i = 0; i < NUM_MIXERS; i++) {
         if (! Model.mixers[i].src)
-            return;
+            break;
         for(ch = 0; ch < PROTO_MAP_LEN; ch++)
-            if (map[ch] == Model.mixers[i].src)
+            if (map[ch] == Model.mixers[i].src) {
+                template[ch] = Model.template[Model.mixers[i].dest];
                 Model.mixers[i].dest = ch;
+                break;
+            }
     }
+    memcpy(Model.template, template, sizeof(template));
+    MIX_SetMixers(NULL, 0);
 }
 
 void simple_template() {

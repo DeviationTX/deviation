@@ -336,7 +336,9 @@ void sync_mixers()
         mp->num_mixers = mp->num_complex_mixers;
         break;
     case MIXERTEMPLATE_EXPO_DR:
+        mp->num_mixers = 1;
         if (MIX_SRC(mp->mixer[1].sw)) {
+            mp->num_mixers++;
             mp->mixer[1].src    = mp->mixer[0].src;
             mp->mixer[1].dest   = mp->mixer[0].dest;
             mp->mixer[1].mux    = MUX_REPLACE;
@@ -347,6 +349,7 @@ void sync_mixers()
             mp->mixer[1].src = 0;
         }
         if (MIX_SRC(mp->mixer[2].sw)) {
+            mp->num_mixers++;
             mp->mixer[2].src    = mp->mixer[0].src;
             mp->mixer[2].dest   = mp->mixer[0].dest;
             mp->mixer[2].mux    = MUX_REPLACE;
@@ -359,7 +362,6 @@ void sync_mixers()
         mp->mixer[0].mux = MUX_REPLACE;
         mp->mixer[0].offset = 0;
         mp->mixer[0].sw = 0;
-        mp->num_mixers = 3;
         break;
     }
 }
