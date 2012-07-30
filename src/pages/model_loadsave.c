@@ -66,8 +66,10 @@ static const char *string_cb(u8 idx, void *data)
     sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     fh = fopen(mp->tmpstr, "r");
     sprintf(mp->tmpstr, "%d: NONE", idx + 1);
-    if (fh)
+    if (fh) {
         ini_parse_file(fh, ini_handle_name, (void *)((long)(idx + 1)));
+        fclose(fh);
+    }
     return mp->tmpstr;
 }
 static void okcancel_cb(guiObject_t *obj, void *data)
@@ -104,6 +106,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
         FILE *fh = fopen(mp->tmpstr, "r");
         if (! fh)
             break;
+        fclose(fh);
     }
     num_models--;
     mp->selected = CONFIG_GetCurrentModel();
