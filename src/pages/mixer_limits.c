@@ -55,8 +55,10 @@ void MIXPAGE_EditLimits()
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;
-    MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
-    GUI_Redraw(obj);
+    if(MIX_SRC(*source)) {
+        MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
+        GUI_Redraw(obj);
+    }
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -66,6 +68,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 is_neg = MIX_SRC_IS_INV(*source);
     *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
     MIX_SET_SRC_INV(*source, is_neg);
+    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 

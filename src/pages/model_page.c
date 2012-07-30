@@ -128,6 +128,8 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, NULL);
+    GUI_TextSelectEnablePress(obj, Model.type == 0);
+
     switch (Model.type) {
         case 0: return "Helicopter";
         default: return "Airplane";

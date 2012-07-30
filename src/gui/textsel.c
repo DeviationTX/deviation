@@ -26,7 +26,6 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiTextSelect *select;
     struct guiBox *box;
-    enum ImageNames fileidx;
 
     if (obj == NULL)
         return NULL;
@@ -34,13 +33,8 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     box = &obj->box;
     select = &obj->o.textselect;
 
-    switch (type) {
-        case TEXTSELECT_128: fileidx = select_cb ? FILE_SPINPRESS96 : FILE_SPIN96; break;
-        case TEXTSELECT_96:  fileidx = select_cb ? FILE_SPINPRESS64 : FILE_SPIN64; break;
-        case TEXTSELECT_64:  fileidx = select_cb ? FILE_SPINPRESS32 : FILE_SPIN32; break;
-    }
-    select->button = &image_map[fileidx];
-
+    select->type = type;
+    GUI_TextSelectEnablePress(obj, select_cb ? 1 : 0);
     box->height = select->button->height;
     box->width = select->button->width + 2 * ARROW_WIDTH;
 
@@ -68,6 +62,9 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     u16 x, y, w, h;
     struct guiBox *box = &obj->box;
     struct guiTextSelect *select = &obj->o.textselect;
+    //Call the callback 1st in case it calls GUI_TextSelectEnablePress
+    const char *str =select->ValueCB(obj, 0, select->cb_data);
+
     GUI_DrawImageHelper(box->x + ARROW_WIDTH,
                         box->y, select->button, DRAW_NORMAL);
     GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
@@ -76,7 +73,6 @@ void GUI_DrawTextSelect(struct guiObject *obj)
                         box->y, ARROW_RIGHT,
                         select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
 
-    const char *str =select->ValueCB(obj, 0, select->cb_data);
     LCD_SetFontColor(select->fontColor);
     LCD_GetStringDimensions((const u8 *)str, &w, &h);
     x = box->x + (box->width - w) / 2;
@@ -189,4 +185,19 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
         return;
     }
     GUI_TouchTextSelect(obj, &coords, press_type);
+}
+
+void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
+{
+    struct guiTextSelect *select = &obj->o.textselect;
+    enum ImageNames fileidx;
+    switch (select->type) {
+        case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;
+        case TEXTSELECT_96:  fileidx = enable ? FILE_SPINPRESS64 : FILE_SPIN64; break;
+        case TEXTSELECT_64:  fileidx = enable ? FILE_SPINPRESS32 : FILE_SPIN32; break;
+    }
+    if (select->button != &image_map[fileidx]) {
+        select->button = &image_map[fileidx];
+        OBJ_SET_DIRTY(obj, 1);
+    }
 }

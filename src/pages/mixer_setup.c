@@ -444,6 +444,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         sync_mixers();
         redraw_graphs();
     }
+    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 
@@ -481,15 +482,18 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         sync_mixers();
         redraw_graphs();
     }
+    GUI_TextSelectEnablePress(obj, mix->curve.type >= CURVE_EXPO);
     return CURVE_GetName(&mix->curve);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;
-    MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
-    GUI_Redraw(obj);
-    redraw_graphs();
+    if (MIX_SRC(*source)) {
+        MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
+        GUI_Redraw(obj);
+        redraw_graphs();
+    }
 }
 
 void graph_cb()
@@ -501,8 +505,10 @@ void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     struct Mixer *mix = (struct Mixer *)data;
-    memset(mp->graphs, 0, sizeof(mp->graphs));
-    MIXPAGE_EditCurves(&mix->curve, graph_cb);   
+    if (mix->curve.type >= CURVE_EXPO) {
+        memset(mp->graphs, 0, sizeof(mp->graphs));
+        MIXPAGE_EditCurves(&mix->curve, graph_cb);
+    }
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)

@@ -211,6 +211,7 @@ struct guiDialog {
 struct guiTextSelect {
     const struct ImageMap *button;
     u8 state;
+    enum TextSelectType type;
     u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);
@@ -366,6 +367,7 @@ guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
+void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
 #include "config/display.h"

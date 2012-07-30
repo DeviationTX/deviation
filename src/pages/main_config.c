@@ -163,6 +163,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
         Model.pagecfg.toggle[i] = MIX_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
         build_image();
     }
+    GUI_TextSelectEnablePress(obj, MIX_SRC(Model.pagecfg.toggle[i]));
     return MIXER_SourceName(str, Model.pagecfg.toggle[i]);
 }
 
@@ -343,7 +344,7 @@ void iconpress_cb(guiObject_t *obj, void *data)
 }
 void toggle_inv_cb(guiObject_t *obj, void *data)
 {
-    if(Model.pagecfg.toggle[(long)data]) {
+    if(MIX_SRC(Model.pagecfg.toggle[(long)data])) {
         Model.pagecfg.toggle[(long)data] ^= 0x80;
         GUI_Redraw(obj);
     }

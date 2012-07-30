@@ -76,6 +76,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         timer->src = src;
         TIMER_Reset(idx);
     }
+    GUI_TextSelectEnablePress(obj, MIX_SRC(src));
     return MIXER_SourceName(tp->tmpstr, src);
 }
 
@@ -83,9 +84,11 @@ void toggle_source_cb(guiObject_t *obj, void *data)
 {
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    MIX_SET_SRC_INV(timer->src, ! MIX_SRC_IS_INV(timer->src));
-    TIMER_Reset(idx);
-    GUI_Redraw(obj);
+    if(MIX_SRC(timer->src)) {
+        MIX_SET_SRC_INV(timer->src, ! MIX_SRC_IS_INV(timer->src));
+        TIMER_Reset(idx);
+        GUI_Redraw(obj);
+    }
 }
 
 const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
