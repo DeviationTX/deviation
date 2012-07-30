@@ -15,6 +15,7 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include "target.h"
 #include "mixer.h"
+#include "config/tx.h"
 #include "devo8.h"
 
 const char *tx_input_str[NUM_TX_INPUTS] = {
@@ -44,23 +45,6 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
 
-    // This is just to fill in something before calibration
-    //Throttle (mode 1)
-    Transmitter.calibration[0].max = 3698;
-    Transmitter.calibration[0].min = 489;
-    Transmitter.calibration[0].zero = (Transmitter.calibration[0].max + Transmitter.calibration[0].min) / 2;
-    //Rudder
-    Transmitter.calibration[1].max = 3867;
-    Transmitter.calibration[1].min = 569;
-    Transmitter.calibration[1].zero = (Transmitter.calibration[1].max + Transmitter.calibration[1].min) / 2;
-    //Elevator (mode 1)
-    Transmitter.calibration[2].max = 3549;
-    Transmitter.calibration[2].min = 354;
-    Transmitter.calibration[2].zero = (Transmitter.calibration[2].max + Transmitter.calibration[2].min) / 2;
-    //Alileron
-    Transmitter.calibration[3].max = 3813;
-    Transmitter.calibration[3].min = 530;
-    Transmitter.calibration[3].zero = (Transmitter.calibration[3].max + Transmitter.calibration[3].min) / 2;
 }
 
 s16 CHAN_ReadInput(int channel)

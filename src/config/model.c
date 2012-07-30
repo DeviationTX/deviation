@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "model.h"
+#include "tx.h"
 #include "misc.h"
 #include "ini.h"
 #include <stdlib.h>
@@ -24,7 +25,6 @@ struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 #define WRITE_FULL_MODEL 0
 static u32 crc32;
-static u8 current_model;
 const char *MODEL_NAME = "name";
 const char *MODEL_ICON = "icon";
 const char *MODEL_TYPE = "type";
@@ -634,7 +634,7 @@ void clear_model()
 
 u8 CONFIG_ReadModel(u8 model_num) {
     char file[20];
-    current_model = model_num;
+    Transmitter.current_model = model_num;
     get_model_file(file, model_num);
     clear_model();
     if (ini_parse(file, ini_handler, &Model)) {
@@ -651,12 +651,12 @@ u8 CONFIG_SaveModelIfNeeded() {
     u32 newCrc = Crc(&Model, sizeof(Model));
     if (crc32 == newCrc)
         return 0;
-    CONFIG_WriteModel(current_model);
+    CONFIG_WriteModel(Transmitter.current_model);
     return 1;
 }
 
 u8 CONFIG_GetCurrentModel() {
-    return current_model;
+    return Transmitter.current_model;
 }
 
 const char *CONFIG_GetIcon(enum ModelType type) {

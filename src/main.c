@@ -20,6 +20,7 @@
 #include "buttons.h"
 #include "timer.h"
 #include "config/model.h"
+#include "config/tx.h"
 
 void event_loop(void *);
 
@@ -62,6 +63,7 @@ int main() {
             USB_Connect();
         }
     }
+    CONFIG_LoadTx();
     CONFIG_ReadDisplay();
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
@@ -117,6 +119,7 @@ void event_loop(void *param)
 
     if(PWR_CheckPowerSwitch()) {
         CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
         PWR_Shutdown();
     }
     BUTTON_Handler(0);

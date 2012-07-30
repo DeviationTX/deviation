@@ -23,6 +23,7 @@
 #include "mixer.h"
 #include "buttons.h"
 #include "config/model.h"
+#include "config/tx.h"
 
 #define SWASH_INV_ELEVATOR_MASK   1
 #define SWASH_INV_AILERON_MASK    2
@@ -33,7 +34,6 @@
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
 s16 Channels[NUM_CHANNELS];
-s16 Trims[NUM_TRIMS];
 struct Transmitter Transmitter;
 
 static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
@@ -243,7 +243,7 @@ s16 get_trim(u8 src)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            return PCT_TO_RANGE((s16)Trims[i] * Model.trims[i].step / 10);
+            return PCT_TO_RANGE((s16)Transmitter.Trims[i] * Model.trims[i].step / 10);
         }
     }
     return 0;
@@ -268,7 +268,7 @@ void TEST_init_mixer()
 {
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
-    CONFIG_ReadModel(1);
+    CONFIG_ReadModel(CONFIG_GetCurrentModel());
     Model.mode = MODE_2;
     Model.swash_type = SWASH_TYPE_120;
     Model.Elevator_Stick   = INP_ELEVATOR;
@@ -456,13 +456,13 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     s8 step = flags & BUTTON_LONGPRESS ? (10 - short_press) : 1;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Trims[i]) - step;
-            Trims[i] = tmp < -100 ? -100 : tmp;
+            int tmp = (int)(Transmitter.Trims[i]) - step;
+            Transmitter.Trims[i] = tmp < -100 ? -100 : tmp;
             break;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Trims[i]) + step;
-            Trims[i] = tmp > 100 ? 100 : tmp;
+            int tmp = (int)(Transmitter.Trims[i]) + step;
+            Transmitter.Trims[i] = tmp > 100 ? 100 : tmp;
             break;
         }
     }

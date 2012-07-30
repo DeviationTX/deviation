@@ -16,6 +16,7 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "target.h"
+#include "config/tx.h"
 
 #define START  (1 << 7)
 
@@ -47,13 +48,6 @@ PA7 : SPI1_MOSI
 #define CS_LO() gpio_clear(GPIOB, GPIO0)
 #define pen_is_down() (! gpio_get(GPIOB, GPIO5))
 
-struct {
-    s32 xscale;
-    s32 yscale;
-    s32 xoffset;
-    s32 yoffset;
-} calibration;
-
 u8 read_channel(u8 address)
 {
     spi_xfer(SPI1, address);
@@ -84,7 +78,7 @@ void SPITouch_Init()
     CS_LO();
     spi_xfer(SPI1, RESET);
     CS_HI();
-    SPITouch_Calibrate(197312, 147271, -404, -20); /* Read from my Tx */
+    //SPITouch_Calibrate(197312, 147271, -404, -20); /* Read from my Tx */
 #if 0
     /* SCK, MOSI */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
@@ -117,10 +111,10 @@ struct touch SPITouch_GetCoords()
     res.z1 = read_channel(READ_Z1);
     res.z2 = read_channel(READ_Z2);
     CS_HI();
-    res.x = res.x * calibration.xscale / 0x10000 + calibration.xoffset;
+    res.x = res.x * Transmitter.touch.xscale / 0x10000 + Transmitter.touch.xoffset;
     if(res.x & 0x8000)
         res.x = 0;
-    res.y = res.y * calibration.yscale / 0x10000 + calibration.yoffset;
+    res.y = res.y * Transmitter.touch.yscale / 0x10000 + Transmitter.touch.yoffset;
     if(res.y & 0x8000)
         res.y = 0;
     return res;
@@ -133,8 +127,8 @@ int SPITouch_IRQ()
 
 void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
 {
-    calibration.xscale = xscale;
-    calibration.yscale = yscale;
-    calibration.xoffset = xoff;
-    calibration.yoffset = yoff;
+    Transmitter.touch.xscale = xscale;
+    Transmitter.touch.yscale = yscale;
+    Transmitter.touch.xoffset = xoff;
+    Transmitter.touch.yoffset = yoff;
 }

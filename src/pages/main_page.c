@@ -18,6 +18,7 @@
 #include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
+#include "config/tx.h"
 #include "main_config.h"
 
 static struct main_page * const mp = &pagemem.u.main_page;
@@ -31,7 +32,6 @@ void press_box_cb(guiObject_t *obj, s8 press_type, void *data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
-extern s8 Trims[NUM_TRIMS];
 
 static s16 get_boxval(u8 idx);
 
@@ -61,9 +61,9 @@ void PAGE_MainInit(int page)
         GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
 
     for(i = 0; i < 6; i++) {
-        mp->trims[i] = Trims[i];
+        mp->trims[i] = Transmitter.Trims[i];
         if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Trims[i]);
+            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Transmitter.Trims[i]);
         else
             mp->trimObj[i] = NULL;
     }
@@ -115,8 +115,8 @@ void PAGE_MainEvent()
     for(i = 0; i < 6; i++) {
         if (! mp->trimObj[i])
             continue;
-        if (mp->trims[i] != Trims[i]) {
-            mp->trims[i] = Trims[i];
+        if (mp->trims[i] != Transmitter.Trims[i]) {
+            mp->trims[i] = Transmitter.Trims[i];
             GUI_Redraw(mp->trimObj[i]);
         }
     }

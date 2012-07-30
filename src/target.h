@@ -17,16 +17,6 @@ typedef uint64_t u64;
 //Load target-specific include
 #include TARGET_H
 
-struct Calibration {
-    u16 max;
-    u16 min;
-    u16 zero;
-};
-
-struct Transmitter {
-    struct Calibration calibration[NUM_INPUTS];
-};
-extern struct Transmitter Transmitter;
 extern s16 Channels[NUM_CHANNELS];
 
 /* General Functions */
