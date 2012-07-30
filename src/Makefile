@@ -41,6 +41,7 @@ ifeq ("$(SRC_CXX)", " ")
 else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 endif
+	cp model_template.ini models/model1.ini
 
 # The following enables quiet output unless you use VERBOSE=1
 # Note that this must be after the 1st rule so that it doesn't execute by default

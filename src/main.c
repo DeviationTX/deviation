@@ -114,8 +114,10 @@ void event_loop(void *param)
     static u32 last_redraw = 0;
     (void)(param);
 
-    if(PWR_CheckPowerSwitch())
+    if(PWR_CheckPowerSwitch()) {
+        CONFIG_SaveModelIfNeeded();
         PWR_Shutdown();
+    }
     BUTTON_Handler(0);
 
     if(SPITouch_IRQ()) {
