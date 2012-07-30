@@ -30,18 +30,21 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
+MODELDIR = filesystem/models
+
 CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
-$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS)
+$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) | $(MODELDIR)
 	@echo " + Building '$@'"
 ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 endif
-	cp model_template.ini models/model1.ini
+	cp model_template.ini filesystem/models/model1.ini
+	cp tx_template.ini filesystem/tx.ini
 
 # The following enables quiet output unless you use VERBOSE=1
 # Note that this must be after the 1st rule so that it doesn't execute by default
@@ -53,6 +56,9 @@ clean:
 $(OBJS): | $(ODIR)
 
 $(ODIR):
+	@mkdir -p $@
+
+$(MODELDIR):
 	@mkdir -p $@
 
 ## The autodependency magic below was adapeted from:

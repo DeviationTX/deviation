@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "buttons.h"
 #include "timer.h"
+#include "config/model.h"
 
 void event_loop(void *);
 

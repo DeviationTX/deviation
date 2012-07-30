@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "target.h"
 #include "protocol/interface.h"
@@ -59,7 +60,7 @@ void CYRF_GetMfgData(u8 data[]) {
     memcpy(data, d, 6);
 }
 
-int FS_Mount() {return 1;}
+int FS_Mount() {chdir("filesystem"); return 1;}
 
 void CYRF_StartReceive() {}
 void CYRF_ConfigCRCSeed(u16 crc) {

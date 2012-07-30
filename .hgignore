@@ -17,5 +17,6 @@ utils/midicsv/midicsv
 .project
 /objs/
 ^local/
-src/models/
+src/filesystem/models/
+src/filesystem/tx.ini
 glob:*.dll
