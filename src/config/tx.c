@@ -27,6 +27,9 @@ static u32 crc32;
 
 const char CURRENT_MODEL[] = "current_model";
 
+const char SECTION_TRIM[] = "trim";
+const char TRIM_VALUE[] = "value";
+
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
 const char CALIBRATE_MIN[] = "min";
@@ -52,6 +55,21 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (section[0] == '\0') {
         if (MATCH_KEY(CURRENT_MODEL)) {
             t->current_model = value_int;
+            return 1;
+        }
+    }
+    if(MATCH_SECTION(SECTION_TRIM)) {
+        if(MATCH_START(name, TRIM_VALUE) && strlen(name) >= sizeof(TRIM_VALUE)) {
+            u8 idx = atoi(name + sizeof(TRIM_VALUE)-1);
+            if(idx == 0) {
+                printf("%s: Unkown Trim %s\n", section, name);
+                return 0;
+            }
+            if(idx > NUM_TRIMS) {
+                printf("%s: Only %d trims are supported\n", section, NUM_TRIMS);
+                return 0;
+            }
+            t->Trims[idx-1] = value_int;
             return 1;
         }
     }
@@ -121,8 +139,12 @@ void CONFIG_WriteTx()
         return;
     }
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
+    fprintf(fh, "[%s]\n", SECTION_TRIM);
+    for(i = 0; i < NUM_TRIMS; i++) {
+        fprintf(fh, "  %s%d=%d\n", TRIM_VALUE, i+1, t->Trims[i]);
+    }
     for(i = 0; i < 4; i++) {
-        fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i);
+        fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MIN, t->calibration[i].min);
         fprintf(fh, "  %s=%d\n", CALIBRATE_ZERO, t->calibration[i].zero);
