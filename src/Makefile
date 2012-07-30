@@ -2,6 +2,7 @@
 
 TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
+NUM_MODELS ?= 30
 include target/$(TARGET)/Makefile.inc
 
 ifdef CROSS
@@ -36,15 +37,28 @@ CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H=
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
-$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) | $(MODELDIR)
+LAST_MODEL := filesystem/models/model$(NUM_MODELS).ini
+
+
+.PHONY: $(LAST_MODEL)
+
+$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LAST_MODEL)
 	@echo " + Building '$@'"
 ifeq ("$(SRC_CXX)", " ")
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 endif
-	cp model_template.ini filesystem/models/model1.ini
+
+$(LAST_MODEL): model_template.ini tx_template.ini | $(MODEL_DIR)
+	@echo " + Copying template files"
 	cp tx_template.ini filesystem/tx.ini
+	echo name=Model1 > filesystem/models/model1.ini && cat model_template.ini >> filesystem/models/model1.ini
+	number=2 ; while [ $$number -le 30 ] ; do \
+		cp model_template.ini filesystem/models/model$$number.ini; \
+		number=`expr $$number + 1`; \
+		done
+
 
 # The following enables quiet output unless you use VERBOSE=1
 # Note that this must be after the 1st rule so that it doesn't execute by default

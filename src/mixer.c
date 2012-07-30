@@ -269,12 +269,10 @@ void TEST_init_mixer()
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
-    Model.mode = MODE_2;
-    Model.swash_type = SWASH_TYPE_120;
     Model.Elevator_Stick   = INP_ELEVATOR;
     Model.Aileron_Stick    = INP_AILERON;
     Model.Collective_Stick = INP_THROTTLE;
-    PROTOCOL_Init(PROTOCOL_NONE);
+    PROTOCOL_Init(Model.protocol);
 }
 
 void MIX_RegisterTrimButtons()

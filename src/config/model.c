@@ -27,8 +27,10 @@ struct Model Model;
 static u32 crc32;
 const char *MODEL_NAME = "name";
 const char *MODEL_ICON = "icon";
+const char *MODEL_MODE = "mode";
 const char *MODEL_TYPE = "type";
 const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
+
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
 
@@ -145,17 +147,29 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
     #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
     #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
-    if (MATCH_SECTION("") && MATCH_KEY(MODEL_NAME)) {
-        strncpy(m->name, value, sizeof(m->name)-1);
-        m->name[sizeof(m->name)-1] = 0;
-        return 1;
-    }
-    if (MATCH_SECTION("") && MATCH_KEY(MODEL_ICON)) {
-        CONFIG_ParseModelName(m->icon, value);
-        return 1;
-    }
-    if (MATCH_SECTION("") && MATCH_KEY(MODEL_TYPE)) {
-        return 1;
+    if (MATCH_SECTION("")) {
+        if(MATCH_KEY(MODEL_NAME)) {
+            strncpy(m->name, value, sizeof(m->name)-1);
+            m->name[sizeof(m->name)-1] = 0;
+            return 1;
+        }
+        if (MATCH_KEY(MODEL_ICON)) {
+            CONFIG_ParseModelName(m->icon, value);
+            return 1;
+        }
+        if (MATCH_KEY(MODEL_TYPE)) {
+            for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
+                if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
+                    m->type = i;
+                    return 1;
+                }
+            }
+            return 0;
+        }
+        if (MATCH_KEY(MODEL_MODE)) {
+            m->mode = atoi(value)-1;
+            return 1;
+        }
     }
     if (MATCH_SECTION(SECTION_RADIO)) {
         if (MATCH_KEY(RADIO_PROTOCOL)) {
@@ -186,7 +200,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("Unknown Tx power: %s\n", value);
             return 1;
         }
-        printf("Unkown Radio Key: %s\n", name);
+        printf("Unknown Radio Key: %s\n", name);
         return 0;
     }
     if (MATCH_START(section, SECTION_MIXER)) {
@@ -492,6 +506,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         return 0;
     }
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+    if(WRITE_FULL_MODEL || m->mode != 0)
+        fprintf(fh, "%s=%d\n", MODEL_MODE, m->mode);
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 6);
     if(WRITE_FULL_MODEL || m->type != 0)
@@ -644,6 +660,8 @@ u8 CONFIG_ReadModel(u8 model_num) {
     TIMER_Init();
     MIX_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
+    if(! Model.name[0])
+        sprintf(Model.name, "Model%d", model_num);
     return 1;
 }
 
