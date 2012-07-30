@@ -72,7 +72,7 @@ void edit_cb(guiObject_t *obj, void *data)
     tp->index = (long)data;
     tp->trim = trim[tp->index];
    
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 

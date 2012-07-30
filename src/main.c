@@ -29,9 +29,6 @@ void SignOn();
 extern void start_event_loop();
 extern void TEST_init_mixer();
 
-static u8 page_change_cb(u32 buttons, u8 flags, void *data);
-static buttonAction_t button_action;
-
 int main() {
 
     PWR_Init();
@@ -70,9 +67,6 @@ int main() {
 
     MUSIC_Play(MUSIC_STARTUP);
     GUI_HandleButtons(1);
-    BUTTON_RegisterCallback(&button_action,
-        CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
-        BUTTON_PRESS, page_change_cb, NULL);
 
 #if 0
     printf("Showing display\n");
@@ -96,18 +90,6 @@ int main() {
 #endif
     return 0;
 #endif
-}
-
-u8 page_change_cb(u32 buttons, u8 flags, void *data)
-{
-    (void)data;
-    (void)flags;
-    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
-        PAGE_Change(1);
-    } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
-        PAGE_Change(-1);
-    }
-    return 1;
 }
 
 void event_loop(void *param)

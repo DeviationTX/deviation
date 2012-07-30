@@ -30,6 +30,7 @@ void PAGE_ShowHeader(const char *title);
 u8 PAGE_SetModal(u8 _modal);
 u8 PAGE_GetModal();
 void PAGE_SetSection(u8 section);
+void PAGE_RemoveAllObjects();
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data));
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data));
 

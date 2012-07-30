@@ -21,7 +21,7 @@ static struct usb_page * const up = &pagemem.u.usb_page;
 
 static void draw_page(u8 enable)
 {
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_ShowHeader("USB");
 
     if(enable == 0) {

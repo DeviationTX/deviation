@@ -52,7 +52,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
 
 void MODELPage_Template()
 {
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->selected = 0;
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, "Templates");

@@ -422,7 +422,7 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, void *data)
         u8 idx = pos >> 8;
         pos &= 0xff;
         Model.pagecfg.tglico[idx] = pos;
-        GUI_RemoveAllObjects();
+        PAGE_RemoveAllObjects();
         PAGE_MainCfgInit(1);
     }
 }
@@ -432,7 +432,7 @@ void select_toggle_icon(u8 idx)
     long pos = 0;
     u16 w, h, x, y;
     u8 i, j;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
     u8 count = w / 32;

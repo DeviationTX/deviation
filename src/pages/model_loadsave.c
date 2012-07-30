@@ -96,7 +96,7 @@ const char *show_loadsave_cb(guiObject_t *obj, void *data)
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
     u8 num_models;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->return_page = return_page;
     PAGE_CreateCancelButton(160, 4, okcancel_cb);

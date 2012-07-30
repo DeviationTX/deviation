@@ -29,7 +29,7 @@ static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 
 void MIXPAGE_EditLimits()
 {
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     show_titlerow();
     //Row 1
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Reverse:");

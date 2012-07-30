@@ -18,6 +18,14 @@
 #include "icons.h"
 #include "gui/gui.h"
 
+static buttonAction_t button_action;
+
+static void (*enter_cmd)(guiObject_t *obj, void *data);
+void *enter_data;
+static void (*exit_cmd)(guiObject_t *obj, void *data);
+void *exit_data;
+static u8 page_change_cb(u32 buttons, u8 flags, void *data);
+
 struct page {
     void (*init)(int i);
     void (*event)();
@@ -49,6 +57,12 @@ void PAGE_Init()
     page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
+    enter_cmd = NULL;
+    exit_cmd = NULL;
+    BUTTON_RegisterCallback(&button_action,
+        CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
+        | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
+        BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
     pages[page].init(0);
 }
 
@@ -99,7 +113,7 @@ void PAGE_Change(int dir)
     if (pages[page].exit)
         pages[page].exit();
     page = nextpage;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     pages[page].init(0);
 }
 
@@ -139,6 +153,8 @@ void PAGE_ShowHeader(const char *title)
     GUI_SetSelectable(obj, 0);
     obj = GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
     GUI_SetSelectable(obj, 0);
+    exit_cmd = changepage_cb;
+    exit_data = NULL;
 }
 
 static const char *okcancelstr_cb(guiObject_t *obj, void *data)
@@ -147,11 +163,51 @@ static const char *okcancelstr_cb(guiObject_t *obj, void *data)
     return data ? "OK" : "Cancel";
 }
 
+u8 page_change_cb(u32 buttons, u8 flags, void *data)
+{
+    (void)data;
+    (void)flags;
+    if (flags & BUTTON_LONGPRESS) {
+        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) && enter_cmd) {
+            void (*cmd)(guiObject_t *obj, void *data) = enter_cmd;
+            PAGE_RemoveAllObjects();
+            cmd(NULL, enter_data);
+            return 1;
+        }
+        if(CHAN_ButtonIsPressed(buttons, BUT_EXIT) && exit_cmd) {
+            void (*cmd)(guiObject_t *obj, void *data) = exit_cmd;
+            PAGE_RemoveAllObjects();
+            cmd(NULL, exit_data);
+            return 1;
+        }
+        return 0;
+    }
+    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
+        PAGE_Change(1);
+        return 1;
+    } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
+        PAGE_Change(-1);
+        return 1;
+    }
+    return 0;
+}
+
+void PAGE_RemoveAllObjects()
+{
+    enter_cmd = NULL;
+    exit_cmd = NULL;
+    GUI_RemoveAllObjects();
+}
+
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
 {
+    exit_cmd = CallBack;
+    exit_data = (void *)0;
     return GUI_CreateButton(x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
 }
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
 {
+    enter_cmd = CallBack;
+    enter_data = (void *)1;
     return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }

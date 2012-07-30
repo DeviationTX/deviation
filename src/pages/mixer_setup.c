@@ -39,7 +39,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
     mp->cur_mixer = mp->mixer;
     sync_mixers();
     if (show_header) {
-        GUI_RemoveAllObjects();
+        PAGE_RemoveAllObjects();
         show_titlerow();
     } else {
         GUI_RemoveHierObjects(mp->firstObj); 

@@ -29,7 +29,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     if (curve->type < CURVE_EXPO)
         return;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
     if (curve->type == CURVE_EXPO && curve->points[0] == curve->points[1])

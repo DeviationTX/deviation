@@ -100,7 +100,7 @@ static void changename_cb(guiObject_t *obj, void *data)
     (void)obj;
     (void)data;
     PAGE_SetModal(1);
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     GUI_CreateKeyboard(KEYBOARD_ALPHA, Model.name, sizeof(Model.name)-1, changename_done_cb, NULL);
 }
 
@@ -118,7 +118,7 @@ static void fixedid_cb(guiObject_t *obj, void *data)
     PAGE_SetModal(1);
     if(Model.fixed_id == 0)
         mp->fixed_id[0] = 0;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 6, fixedid_done_cb, NULL);
 }
 
@@ -140,7 +140,7 @@ void type_press_cb(guiObject_t *obj, void *data)
     (void)data;
     (void)obj;
     if(Model.type == 0) {
-        GUI_RemoveAllObjects();
+        PAGE_RemoveAllObjects();
         MODELPAGE_Config();
     }
 }
