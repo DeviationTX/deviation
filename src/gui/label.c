@@ -107,3 +107,8 @@ u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type)
     label->pressCallback(obj, press_type, label->cb_data);
     return 1;
 }
+void GUI_SetLabelDesc(struct guiObject *obj, struct LabelDesc *desc)
+{
+    struct guiLabel *label = &obj->o.label;
+    label->desc = *desc;
+}

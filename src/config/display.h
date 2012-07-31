@@ -13,7 +13,9 @@
 #define BOLD_FONT      (Display.font[7])
 #define NARROW_FONT    (Display.font[8])
 #define SMALL_FONT     (Display.font[9])
-#define NUM_LABELS 10
+#define BIGBOXNEG_FONT   (Display.font[10])
+#define SMALLBOXNEG_FONT (Display.font[11])
+#define NUM_LABELS 12
 
 struct disp_keyboard {
     u8 font;

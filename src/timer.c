@@ -18,18 +18,25 @@
 #include "config/model.h"
 
 static u8 timer_state[NUM_TIMERS];
-static u32 timer_val[NUM_TIMERS];
-static u32 last_time[NUM_TIMERS];
+static s32 timer_val[NUM_TIMERS];
+static s32 last_time[NUM_TIMERS];
 
-void TIMER_SetString(char *str, u16 time)
+void TIMER_SetString(char *str, s16 time)
 {
     //u8 h = time / 3600;
     //u8 m = (time - h*3600) / 60;
     //u8 s = time -h*3600 - m*60;
     //sprintf(str, "%02d:%02d:%02d", h, m, s);
+    char neg;
+    if (time < 0) {
+        neg = 1;
+        time = -time;
+    } else {
+        neg = 0;
+    }
     u8 m = time / 60;
     u8 s = time - m*60;
-    sprintf(str, "%02d:%02d", m, s);
+    sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
 }
 
 void TIMER_StartStop(u8 timer)
@@ -50,7 +57,7 @@ void TIMER_Reset(u8 timer)
     }
 }
 
-u16 TIMER_GetValue(u8 timer)
+s16 TIMER_GetValue(u8 timer)
 {
     return timer_val[timer] / 1000;
 }
@@ -67,8 +74,6 @@ void TIMER_Update()
     u8 i;
     u32 t = CLOCK_getms();
     for (i = 0; i < NUM_TIMERS; i++) {
-        if (Model.timer[i].type == TIMER_COUNTDOWN && ! timer_val[i])
-            continue;
         s16 *raw = MIX_GetInputs();
         if (Model.timer[i].src) {
             s16 val = raw[MIX_SRC(Model.timer[i].src)];
@@ -82,17 +87,14 @@ void TIMER_Update()
             }
          }
         if (timer_state[i]) {
-            u32 delta = t - last_time[i];
+            s32 delta = t - last_time[i];
             if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {
-                if (timer_val[i] > delta) {
-                    timer_val[i] -= delta;
-                }else {
-                    timer_val[i] = 0;
-                    timer_state[i] = 0;
+                if (timer_val[i] > 0 && timer_val[i] < delta) {
                     MUSIC_Play(MUSIC_ALARM1 + i);
                 }
+                timer_val[i] -= delta;
             }
             last_time[i] = t;
         }

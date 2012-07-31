@@ -315,6 +315,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, void *data),void *data);
+void GUI_SetLabelDesc(guiObject_t *obj, struct LabelDesc *desc);
 
 #define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file, NULL, NULL)
 guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,

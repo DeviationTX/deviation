@@ -35,6 +35,15 @@ extern s16 Channels[NUM_CHANNELS];
 
 static s16 get_boxval(u8 idx);
 
+struct LabelDesc *get_box_font(u8 idx, u8 neg)
+{
+    if(neg) {
+        return idx & 0x02 ? &SMALLBOXNEG_FONT : &BIGBOXNEG_FONT;
+    } else {
+        return idx & 0x02 ? &SMALLBOX_FONT : &BIGBOX_FONT;
+    }
+}
+
 void PAGE_MainInit(int page)
 {
     (void)page;
@@ -71,7 +80,7 @@ void PAGE_MainInit(int page)
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
             mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
-                                i & 0x02 ? &SMALLBOX_FONT : &BIGBOX_FONT,
+                                get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
                                 show_box_cb, press_box_cb,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else {
@@ -125,6 +134,12 @@ void PAGE_MainEvent()
             continue;
         s16 val = get_boxval(Model.pagecfg.box[i]);
         if (mp->boxval[i] != val) {
+            if((Model.pagecfg.box[i] == 1 || Model.pagecfg.box[i] == 2)
+               && ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)))
+            {
+                //Timer
+                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, val < 0));
+            }
             mp->boxval[i] = val;
             GUI_Redraw(mp->boxObj[i]);
         }

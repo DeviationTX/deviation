@@ -22,7 +22,7 @@
 #include <string.h>
 
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "tiny", "bold", "narrow", "small"};
+static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "tiny", "bold", "narrow", "small", "bigboxneg", "smallboxneg"};
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
 static const char FG_COLOR[] = "fg_color";
