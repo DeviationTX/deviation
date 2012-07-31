@@ -13,10 +13,10 @@ struct Timer {
     enum TimerType type;
 };
 
-void TIMER_SetString(char *str, s16 time);
+void TIMER_SetString(char *str, s32 time);
 void TIMER_StartStop(u8 timer);
 void TIMER_Reset(u8 timer);
-s16 TIMER_GetValue(u8 timer);
+s32 TIMER_GetValue(u8 timer);
 void TIMER_Update();
 void TIMER_Init();
 #endif

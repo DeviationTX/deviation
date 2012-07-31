@@ -13,7 +13,7 @@ struct main_page {
     guiObject_t *toggleObj[4];
     u8 ignore_release;
     s8 trims[6];
-    s16 boxval[8];
+    s32 boxval[8];
     s16 barval[8];
     char tmpstr[8];
 };

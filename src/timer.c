@@ -21,7 +21,7 @@ static u8 timer_state[NUM_TIMERS];
 static s32 timer_val[NUM_TIMERS];
 static s32 last_time[NUM_TIMERS];
 
-void TIMER_SetString(char *str, s16 time)
+void TIMER_SetString(char *str, s32 time)
 {
     //u8 h = time / 3600;
     //u8 m = (time - h*3600) / 60;
@@ -34,6 +34,7 @@ void TIMER_SetString(char *str, s16 time)
     } else {
         neg = 0;
     }
+    time = time / 1000; //Convert to seconds
     u8 m = time / 60;
     u8 s = time - m*60;
     sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
@@ -57,9 +58,9 @@ void TIMER_Reset(u8 timer)
     }
 }
 
-s16 TIMER_GetValue(u8 timer)
+s32 TIMER_GetValue(u8 timer)
 {
-    return timer_val[timer] / 1000;
+    return timer_val[timer];
 }
 
 void TIMER_Init()

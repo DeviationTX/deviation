@@ -127,6 +127,6 @@ const char *set_start_cb(guiObject_t *obj, int dir, void *data)
     timer->timer = GUI_TextSelectHelper(timer->timer, 0, TIMER_MAX_VAL, dir, 5, 30, &changed);
     if (changed)
         TIMER_Reset(idx);
-    TIMER_SetString(tp->timer, timer->timer);
+    TIMER_SetString(tp->timer, timer->timer*1000);
     return tp->timer;
 }

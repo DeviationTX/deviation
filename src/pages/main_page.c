@@ -132,14 +132,18 @@ void PAGE_MainEvent()
     for(i = 0; i < 8; i++) {
         if (! mp->boxObj[i])
             continue;
-        s16 val = get_boxval(Model.pagecfg.box[i]);
-        if (mp->boxval[i] != val) {
-            if((Model.pagecfg.box[i] == 1 || Model.pagecfg.box[i] == 2)
-               && ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)))
-            {
+        s32 val = get_boxval(Model.pagecfg.box[i]);
+        if (Model.pagecfg.box[i] <= 2) {
+            if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
                 //Timer
                 GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, val < 0));
+                mp->boxval[i] = val;
+                GUI_Redraw(mp->boxObj[i]);
+            } else if (mp->boxval[i] / 1000 != val /1000) {
+                mp->boxval[i] = val;
+                GUI_Redraw(mp->boxObj[i]);
             }
+        } else if (mp->boxval[i] != val) {
             mp->boxval[i] = val;
             GUI_Redraw(mp->boxObj[i]);
         }
