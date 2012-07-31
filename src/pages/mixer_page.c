@@ -134,12 +134,24 @@ void templateselect_cb(guiObject_t *obj, void *data)
     MIX_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
-    mp->link_curves = 0xff;
     for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++)
         MIX_InitMixer(mp->mixer + i, idx);
 
     if (mp->cur_template != MIXERTEMPLATE_NONE) {
         mp->num_complex_mixers = MIX_GetMixers(idx, mp->mixer, sizeof(mp->mixer) / sizeof(struct Mixer));
+    }
+    mp->link_curves = 0xff;
+    if (mp->cur_template == MIXERTEMPLATE_EXPO_DR) {
+        if (mp->num_complex_mixers > 1) {
+            if (memcmp(&mp->mixer[1].curve, &mp->mixer[0].curve, sizeof(struct Curve)) != 0) {
+                mp->link_curves &= ~0x01;
+            }
+            if (mp->num_complex_mixers > 2) {
+                if (memcmp(&mp->mixer[2].curve, &mp->mixer[0].curve, sizeof(struct Curve)) != 0) {
+                    mp->link_curves &= ~0x02;
+                }
+            }
+        }
     }
     MIXPAGE_ChangeTemplate(1);
 }

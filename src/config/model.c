@@ -90,6 +90,14 @@ static const char TRIM_POS[]  = "pos";
 static const char TRIM_NEG[]  = "neg";
 static const char TRIM_STEP[] = "step";
 
+/* Section: Heli */
+static const char SECTION_SWASH[] = "swash";
+#define SWASH_TYPE MODEL_TYPE
+static const char SWASH_COLLECTIVE[] = "collective_ch";
+static const char SWASH_AIL_INV[] = "ail_inv";
+static const char SWASH_ELE_INV[] = "ele_inv";
+static const char SWASH_COL_INV[] = "col_inv";
+
 /* Section: Timer */
 static const char SECTION_TIMER[] = "timer";
 
@@ -379,6 +387,38 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         printf("%s: Unknown trim setting: %s\n", section, name);
         return 0;
     }
+    if (MATCH_SECTION(SECTION_SWASH)) {
+        if (MATCH_KEY(SWASH_TYPE)) {
+            for (i = SWASH_TYPE_NONE; i <= SWASH_TYPE_90; i++) {
+                if(strcasecmp(MIXER_SwashType(i), value) == 0) {
+                    m->swash_type = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown swash_type: %s\n", section, value);
+            return 1;
+        }
+        if (MATCH_KEY(SWASH_COLLECTIVE)) {
+            m->collective_source = get_source(section, value);
+            return 1;
+        }
+        s16 value_int = atoi(value);
+        if (MATCH_KEY(SWASH_ELE_INV)) {
+            if (value_int) 
+                m->swash_invert |= 0x01;
+            return 1;
+        }
+        if (MATCH_KEY(SWASH_AIL_INV)) {
+            if (value_int) 
+                m->swash_invert |= 0x02;
+            return 1;
+        }
+        if (MATCH_KEY(SWASH_COL_INV)) {
+            if (value_int) 
+                m->swash_invert |= 0x04;
+            return 1;
+        }
+    }
     if (MATCH_START(section, SECTION_TIMER)) {
         u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
         if (idx == 0) {
@@ -594,6 +634,17 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", TRIM_NEG, MIXER_ButtonName(m->trims[idx].neg));
         if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
+    }
+    if (WRITE_FULL_MODEL || m->swash_type) {
+        fprintf(fh, "[%s]\n", SECTION_SWASH);
+        fprintf(fh, "%s=%s\n", SWASH_TYPE, MIXER_SwashType(m->swash_type));
+        fprintf(fh, "%s=%s\n", SWASH_COLLECTIVE, MIXER_SourceName(file, m->collective_source));
+        if (WRITE_FULL_MODEL || m->swash_invert & 0x01)
+            fprintf(fh, "%s=1\n", SWASH_ELE_INV);
+        if (WRITE_FULL_MODEL || m->swash_invert & 0x02)
+            fprintf(fh, "%s=1\n", SWASH_AIL_INV);
+        if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
+            fprintf(fh, "%s=1\n", SWASH_COL_INV);
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)

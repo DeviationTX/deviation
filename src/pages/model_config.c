@@ -18,27 +18,24 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+static struct model_page * const mp = &pagemem.u.model_page;
+
 static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
     Model.swash_type = GUI_TextSelectHelper(Model.swash_type, 0 , SWASH_TYPE_90, dir, 1, 1, NULL);
-    switch(Model.swash_type) {
-        case SWASH_TYPE_NONE: return "None";
-        case SWASH_TYPE_120:  return "120";
-        case SWASH_TYPE_120X: return "120X";
-        case SWASH_TYPE_140:  return "140";
-        case SWASH_TYPE_90:   return "90";
-    }
-    return "";
+    return MIXER_SwashType(Model.swash_type);
 }
 
 static const char *swashinv_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    (void)data;
-    Model.swash_invert = GUI_TextSelectHelper(Model.swash_invert, 0 , 1, dir, 1, 1, NULL);
-    switch(Model.swash_invert) {
+    u8 mask = (long)data;
+    u8 val = Model.swash_invert & mask ? 1 : 0;
+    val = GUI_TextSelectHelper(val, 0 , 1, dir, 1, 1, NULL);
+    Model.swash_invert = val ? Model.swash_invert | mask : Model.swash_invert & ~mask;
+    switch(val) {
         case 0: return "Normal";
         case 1: return "Inverted";
     }
@@ -46,8 +43,8 @@ static const char *swashinv_val_cb(guiObject_t *obj, int dir, void *data)
 }
 void swashinv_press_cb(guiObject_t *obj, void *data)
 {
-    (void)data;
-    Model.swash_invert ^= 1;
+    u8 mask = (long)data;
+    Model.swash_invert ^= mask;
     GUI_Redraw(obj);
 }
 
@@ -65,14 +62,32 @@ static void show_titlerow(const char *header)
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
 
+static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void) obj;
+    u8 *source = (u8 *)data;
+    *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
+    return MIXER_SourceName(mp->tmpstr, *source);
+}
 void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
     show_titlerow(Model.type == 0 ? "Helicopter" : "Airplane");
     if (Model.type == 0) {
-        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "SwashType:");
-        GUI_CreateTextSelect(136, 40, TEXTSELECT_96, 0x0000, NULL, swash_val_cb, NULL);
-        GUI_CreateLabel(8, 64, NULL, DEFAULT_FONT, "SwashInv:");
-        GUI_CreateTextSelect(136, 64, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, NULL);
+        u8 i = 40;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "SwashType:");
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swash_val_cb, NULL);
+        i+=24;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "COL Src:");
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &Model.collective_source);
+        i+=24;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "ELE Inv:");
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)1);
+        i+=24;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "AIL Inv:");
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)2);
+        i+=24;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "COL Inv:");
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)4);
     }
 }

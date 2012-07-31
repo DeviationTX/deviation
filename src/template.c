@@ -54,6 +54,37 @@ struct {
   },
   {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR},
 };
+
+#define COLLECTIVE_CH 9
+struct {
+    struct Mixer mix[11];
+    u8 template[10];
+} heli6ch =
+{
+  {
+/* Mixer - CYC1 */
+    {NUM_TX_INPUTS+1, 0, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - CYC2 */
+    {NUM_TX_INPUTS+2, 1, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - CYC3 */
+    {NUM_TX_INPUTS+3, 2, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - Rudder */
+    {INP_RUDDER,      3, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - Throttle */
+    {INP_THROTTLE,    4, INP_FMOD0, {CURVE_5POINT, {-100, -20, 30, 70, 90}},  100, 0, MUX_REPLACE},
+    {INP_THROTTLE,    4, INP_FMOD1, {CURVE_5POINT, {80, 70, 60, 70, 100}},    100, 0, MUX_REPLACE},
+    {INP_THROTTLE,    4, INP_FMOD2, {CURVE_5POINT, {100, 90, 80, 90, 100}},   100, 0, MUX_REPLACE},
+/* Mixer - Gyro */
+    {0x80 | INP_GEAR, 5, 0, {0, {0}}, 30, 0, MUX_REPLACE},
+/* Mixer - Collective */
+    {INP_THROTTLE,    COLLECTIVE_CH, INP_FMOD0, {CURVE_5POINT, {-30,  -15, 0, 50, 100}},  70, 0, MUX_REPLACE},
+    {INP_THROTTLE,    COLLECTIVE_CH, INP_FMOD1, {CURVE_5POINT, {-100, -50, 0, 50, 100}},  70, 0, MUX_REPLACE},
+    {INP_THROTTLE,    COLLECTIVE_CH, INP_FMOD2, {CURVE_5POINT, {-100, -50, 0, 50, 100}},  70, 0, MUX_REPLACE},
+  },
+  {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_SIMPLE,
+   MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_SIMPLE, 0, 0, 0, MIXERTEMPLATE_EXPO_DR,}
+};
+
 const struct Trim trims[] = {
     {INP_ELEVATOR, BUT_TRIM1_POS, BUT_TRIM1_NEG, 10},
     {INP_THROTTLE, BUT_TRIM2_POS, BUT_TRIM2_NEG, 10},
@@ -89,12 +120,24 @@ void simple_template() {
     memcpy(Model.mixers, simple.mix, sizeof(simple.mix));
     memcpy(Model.template, simple.template, sizeof(simple.template));
     Model.num_channels = 4;
+    adjust_for_protocol();
 }
 void _4chdr_template() {
 
     memcpy(Model.mixers, _4chdr.mix, sizeof(_4chdr.mix));
     memcpy(Model.template, _4chdr.template, sizeof(_4chdr.template));
     Model.num_channels = 4;
+    adjust_for_protocol();
+}
+
+void heli_6ch_template() {
+    memcpy(Model.mixers, heli6ch.mix, sizeof(heli6ch.mix));
+    memcpy(Model.template, heli6ch.template, sizeof(heli6ch.template));
+    Model.num_channels = 6;
+    Model.collective_source = COLLECTIVE_CH + NUM_INPUTS + 1;
+    Model.swash_type = SWASH_TYPE_120;
+    Model.swash_invert = 0;
+    Model.type = 0;
 }
 
 void TEMPLATE_Apply(enum Templates tmpl)
@@ -118,8 +161,8 @@ void TEMPLATE_Apply(enum Templates tmpl)
     switch(tmpl) {
         case TEMPLATE_4CH_SIMPLE: simple_template(); break;
         case TEMPLATE_4CH_DR:     _4chdr_template(); break;
+        case TEMPLATE_6CH_HELI:   heli_6ch_template(); break;
         default: break;
     }
-    adjust_for_protocol();
     MIX_RegisterTrimButtons();
 }

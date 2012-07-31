@@ -144,11 +144,11 @@ void MIX_CreateCyclicInputs(s16 *raw)
 {
     if (! Model.swash_type)
         return;
-    s8 ele_trim = get_trim(Model.Elevator_Stick);
-    s8 ail_trim = get_trim(Model.Aileron_Stick);
-    s16 elevator   = raw[Model.Elevator_Stick] + ele_trim;
-    s16 aileron    = raw[Model.Aileron_Stick]  + ail_trim;
-    s16 collective = raw[Model.Collective_Stick];
+    s8 ele_trim = get_trim(MIXER_MapChannel(INP_ELEVATOR));
+    s8 ail_trim = get_trim(MIXER_MapChannel(INP_AILERON));
+    s16 elevator   = raw[INP_ELEVATOR] + ele_trim;
+    s16 aileron    = raw[INP_AILERON]  + ail_trim;
+    s16 collective = raw[Model.collective_source];
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
@@ -269,9 +269,6 @@ void TEST_init_mixer()
     memset(Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
-    Model.Elevator_Stick   = INP_ELEVATOR;
-    Model.Aileron_Stick    = INP_AILERON;
-    Model.Collective_Stick = INP_THROTTLE;
     PROTOCOL_Init(Model.protocol);
 }
 
@@ -504,4 +501,16 @@ const char *MIXER_ButtonName(u8 button)
         return "None";
     }
     return tx_button_str[button - 1];
+}
+
+const char *MIXER_SwashType(enum SwashType swash_type)
+{
+    switch(swash_type) {
+        case SWASH_TYPE_NONE: return "None";
+        case SWASH_TYPE_120:  return "120";
+        case SWASH_TYPE_120X: return "120X";
+        case SWASH_TYPE_140:  return "140";
+        case SWASH_TYPE_90:   return "90";
+    }
+    return "";
 }
