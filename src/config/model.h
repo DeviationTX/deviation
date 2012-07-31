@@ -9,6 +9,7 @@
 const char *MODEL_NAME;
 const char *MODEL_ICON;
 const char *MODEL_TYPE;
+const char *MODEL_TEMPLATE;
 
 struct Model {
     char name[24];
@@ -42,4 +43,5 @@ const char *CONFIG_GetCurrentIcon();
 enum ModelType CONFIG_ParseModelType(const char *value);
 void CONFIG_ParseModelName(char *name, const char *value);
 void CONFIG_ResetModel();
+u8 CONFIG_ReadTemplate(u8 template_num);
 #endif /*_MODEL_H_*/

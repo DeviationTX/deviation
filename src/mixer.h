@@ -135,4 +135,6 @@ const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_ButtonName(u8 src);
 const char *MIXER_SwashType(enum SwashType);
 u8 MIXER_MapChannel(u8 channel);
+void MIXER_AdjustForProtocol();
+
 #endif

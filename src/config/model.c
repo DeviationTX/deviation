@@ -25,10 +25,14 @@ struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 #define WRITE_FULL_MODEL 0
 static u32 crc32;
+static u8 auto_map;
+
 const char *MODEL_NAME = "name";
 const char *MODEL_ICON = "icon";
 const char *MODEL_MODE = "mode";
 const char *MODEL_TYPE = "type";
+const char *MODEL_TEMPLATE = "template";
+const char *MODEL_AUTOMAP = "automap";
 const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
 
 /* Section: Radio */
@@ -79,7 +83,7 @@ static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
 static const char CHAN_SUBTRIM[] = "subtrim";
 
-static const char CHAN_TEMPLATE[] = "template";
+#define CHAN_TEMPLATE MODEL_TEMPLATE
 static const char * const CHAN_TEMPLATE_VAL[]  = { "none", "simple", "expo_dr", "complex" };
 
 /* Section: Trim */
@@ -166,6 +170,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->name[sizeof(m->name)-1] = 0;
             return 1;
         }
+        if(MATCH_KEY(MODEL_TEMPLATE)) {
+            //A dummy rule
+            return 1;
+        }
         if (MATCH_KEY(MODEL_ICON)) {
             CONFIG_ParseModelName(m->icon, value);
             return 1;
@@ -181,6 +189,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(MODEL_MODE)) {
             m->mode = atoi(value)-1;
+            return 1;
+        }
+        if (MATCH_KEY(MODEL_AUTOMAP)) {
+            auto_map = atoi(value);
             return 1;
         }
     }
@@ -237,7 +249,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MIXER_SWITCH)) {
-            m->mixers[idx].sw = value_int;
+            m->mixers[idx].sw = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(MIXER_SCALAR)) {
@@ -303,6 +315,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
             return 1;
         }
+        printf("%s: Couldn't parse key: %s\n", section, name);
+        return 0;
     }
     if (MATCH_START(section, SECTION_CHANNEL)) {
         u8 idx = atoi(section + sizeof(SECTION_CHANNEL)-1);
@@ -529,7 +543,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-    printf("Unkown Section: '%s'\n", section);
+    printf("Unknown Section: '%s'\n", section);
     return 0;
 }
 
@@ -694,10 +708,18 @@ u8 CONFIG_WriteModel(u8 model_num) {
     return 1;
 }
 
-void clear_model()
+void clear_model(u8 full)
 {
     u8 i;
-    memset(&Model, 0, sizeof(Model));
+    if (full) {
+        memset(&Model, 0, sizeof(Model));
+    } else {
+        memset(Model.mixers,   0, sizeof(Model.mixers));
+        memset(Model.template, 0, sizeof(Model.template));
+        memset(Model.trims,    0, sizeof(Model.trims));
+        Model.swash_type = SWASH_TYPE_NONE;
+        Model.swash_invert = 0;
+    }
     for(i = 0; i < NUM_MIXERS; i++) {
         Model.mixers[i].scalar = 100;
     }
@@ -714,11 +736,14 @@ u8 CONFIG_ReadModel(u8 model_num) {
     char file[20];
     Transmitter.current_model = model_num;
     get_model_file(file, model_num);
-    clear_model();
+    clear_model(1);
+    auto_map = 0;
     if (ini_parse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
+    if(auto_map)
+        MIXER_AdjustForProtocol();
     TIMER_Init();
     MIX_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
@@ -780,4 +805,20 @@ enum ModelType CONFIG_ParseModelType(const char *value)
     }
     printf("Unknown model type: %s\n", value);
     return 0;
+}
+
+u8 CONFIG_ReadTemplate(u8 template_num) {
+    char file[20];
+    clear_model(0);
+
+    sprintf(file, "template/tmpl%d.ini", template_num);
+    auto_map = 0;
+    if (ini_parse(file, ini_handler, &Model)) {
+        printf("Failed to parse Model file: %s\n", file);
+        return 0;
+    }
+    if(auto_map)
+        MIXER_AdjustForProtocol();
+    MIX_RegisterTrimButtons();
+    return 1;
 }

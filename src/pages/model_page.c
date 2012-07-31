@@ -201,8 +201,6 @@ static void file_press_cb(guiObject_t *obj, void *data)
     if (mp->file_state == 3) {
         CONFIG_ResetModel();
         GUI_RedrawAllObjects();
-    } else if (mp->file_state == 2) {
-        MODELPage_Template();
     } else {
         MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
     }
