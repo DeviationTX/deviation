@@ -511,6 +511,10 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
     {
         return (flags & BUTTON_LONGPRESS) ? 0 : 1;
     }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && flags & BUTTON_LONGPRESS) {
+        //long-press on enter is ignored so it can be handled by the menu
+        return 0;
+    }
     if (objSELECTED) {
         void(*press)(struct guiObject *obj, u32 button, u8 press_type) = NULL;
         if (objSELECTED->Type == TextSelect) {
