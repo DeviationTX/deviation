@@ -124,18 +124,36 @@ static const char GUI_BAR[] = "bar";
 static const char GUI_BOX[] = "box";
 /* End */
 
+s8 mapstrcasecmp(const char *s1, const char *s2)
+{
+    int i = 0;
+    while(1) {
+        if(s1[i] == s2[i]
+           || (s2[i] >= 'a' && s1[i] + ('a'-'A') == s2[i])
+           || (s1[i] >= 'a' && s2[i] + ('a'-'A') == s1[i])
+           || (s2[i] == ' ' && s1[i] == '_')
+           || (s1[i] == ' ' && s2[i] == '_'))
+        {
+            if(s1[i] == '\0')
+                return 0;
+            i++;
+            continue;
+        }
+        return(s1[i] < s2[i] ? -1 : 1);
+    }
+}
 static u8 get_source(const char *section, const char *value)
 {
     u8 i;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     char cmp[10];
     for (i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
-        if(strcasecmp(MIXER_SourceName(cmp, i), ptr) == 0) {
+        if(mapstrcasecmp(MIXER_SourceName(cmp, i), ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | i;
         }
     }
     for (i = 0; i < 4; i++) {
-        if(strcasecmp(tx_stick_names[i], ptr) == 0) {
+        if(mapstrcasecmp(tx_stick_names[i], ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | i;
         }
     }
@@ -245,7 +263,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MIXER_DEST)) {
-            m->mixers[idx].dest = value_int;
+            m->mixers[idx].dest = get_source(section, value) - NUM_INPUTS - 1;
             return 1;
         }
         if (MATCH_KEY(MIXER_SWITCH)) {
@@ -586,7 +604,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_MIXER, idx+1);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, MIXER_SourceName(file, m->mixers[idx].src));
-        fprintf(fh, "%s=%d\n", MIXER_DEST, m->mixers[idx].dest);
+        fprintf(fh, "%s=%s\n", MIXER_DEST, MIXER_SourceName(file, m->mixers[idx].dest + NUM_INPUTS + 1));
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
             fprintf(fh, "%s=%d\n", MIXER_SWITCH, m->mixers[idx].sw);
         if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
