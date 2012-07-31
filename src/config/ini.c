@@ -16,7 +16,12 @@ http://code.google.com/p/inih/
 #define MAX_LINE 200
 #define MAX_SECTION 50
 #define MAX_NAME 50
-
+//#define DEBUG_FGETS
+#ifdef DEBUG_FGETS
+    #define dbgini printf
+#else
+    #define dbgini if(0) printf
+#endif
 /* Strip whitespace chars off end of given string, in place. Return s. */
 static char* rstrip(char* s)
 {
@@ -79,10 +84,12 @@ int ini_parse_file(FILE* file,
     /* Scan through file line by line */
     line = eol = data + sizeof(data);
     while (1) {
+        dbgini("*Start: %d : '%s' LINE: %ld, EOL: %ld\n", len, eol, line - data, eol -line);
         if(done == -1)
             break;
         if (eol >= data + sizeof(data) -1) {
             if (eol == data + sizeof(data) -1) {
+                dbgini("**Setting Last Char\n");
                 //last character in data read is an eol
                 line = eol;
             }
@@ -93,17 +100,21 @@ int ini_parse_file(FILE* file,
             line = data;
             int bytes = fread(eol, 1, sizeof(data) - (eol - data), file);
             len = eol - data + bytes;
-        } else if(eol != data) {
+            dbgini("*Read: %d : '%s' LINE: %ld, EOL: %ld\n", len, line, line - data, eol -line);
+        } else if(eol != data || *eol == '\0') {
             line = eol + 1;
         }
-        if (line >= data + len || *line == '\0')
+        if (line >= data + len || *line == '\0') {
+            dbgini("**End of file\n");
             break;
+        }
         for (eol = line; eol < data + len; eol++) {
             if(*eol == '\n') {
                 *eol = '\0';
                 break;
             }
         }
+        dbgini("*Find EOL: %d : '%s' LINE: %ld, EOL: %ld\n", len, line, line - data, eol -line);
         if (eol == data + len) {
             continue;
         }
