@@ -55,6 +55,34 @@ struct {
   {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR},
 };
 
+struct {
+    struct Mixer mix[11];
+    u8 template[6];
+} plane6ch =
+{
+  {
+/* Mixer - Throttle*/
+    {INP_THROTTLE, 0, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - Rudder*/
+    {INP_RUDDER,   1, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_RUDDER,   1, INP_RUD_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+/* Mixer - Elevator*/
+    {INP_ELEVATOR, 2, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_ELEVATOR, 2, INP_ELE_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+/* Mixer - Aileron*/
+    {INP_AILERON,  3, 0, {0, {0}}, 100, 0, MUX_REPLACE},
+    {INP_AILERON,  3, INP_AIL_DR, {0, {0}}, 60, 0, MUX_REPLACE},
+/* Mixer - Gear */
+    {INP_GEAR, 4, 0, {CURVE_MIN_MAX, {0}}, 100, 0, MUX_REPLACE},
+/* Mixer - Flaps*/
+    {INP_MIX0,  5, INP_MIX0, {0, {0}}, -100, 0, MUX_REPLACE},
+    {INP_MIX0,  5, INP_MIX1, {0, {0}},    0, 0, MUX_REPLACE},
+    {INP_MIX0,  5, INP_MIX2, {0, {0}},  100, 0, MUX_REPLACE},
+  },
+  {MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR, MIXERTEMPLATE_EXPO_DR,
+   MIXERTEMPLATE_SIMPLE, MIXERTEMPLATE_EXPO_DR},
+};
+
 #define COLLECTIVE_CH 9
 struct {
     struct Mixer mix[11];
@@ -130,6 +158,15 @@ void _4chdr_template() {
     adjust_for_protocol();
 }
 
+void plane_6ch_template() {
+    memcpy(Model.mixers, plane6ch.mix, sizeof(plane6ch.mix));
+    memcpy(Model.template, plane6ch.template, sizeof(plane6ch.template));
+    Model.num_channels = 6;
+    Model.type = 1;
+    adjust_for_protocol();
+}
+
+
 void heli_6ch_template() {
     memcpy(Model.mixers, heli6ch.mix, sizeof(heli6ch.mix));
     memcpy(Model.template, heli6ch.template, sizeof(heli6ch.template));
@@ -161,6 +198,7 @@ void TEMPLATE_Apply(enum Templates tmpl)
     switch(tmpl) {
         case TEMPLATE_4CH_SIMPLE: simple_template(); break;
         case TEMPLATE_4CH_DR:     _4chdr_template(); break;
+        case TEMPLATE_6CH_PLANE:  plane_6ch_template(); break;
         case TEMPLATE_6CH_HELI:   heli_6ch_template(); break;
         default: break;
     }
