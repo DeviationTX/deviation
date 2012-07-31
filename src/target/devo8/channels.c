@@ -35,6 +35,13 @@ const char *tx_input_str[NUM_TX_INPUTS] = {
     "FMODE2",
 };
 
+const char *tx_stick_names[4] = {
+    "RIGHT_H",
+    "LEFT_V",
+    "RIGHT_V",
+    "LEFT_H",
+};
+
 void CHAN_Init()
 {
     ADC_Init();

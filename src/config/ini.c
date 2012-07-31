@@ -84,7 +84,7 @@ int ini_parse_file(FILE* file,
     /* Scan through file line by line */
     line = eol = data + sizeof(data);
     while (1) {
-        dbgini("*Start: %d : '%s' LINE: %ld, EOL: %ld\n", len, eol, line - data, eol -line);
+        dbgini("*Start: %d : '%s' LINE: %d, EOL: %d\n", len, eol, (int)(line - data), (int)(eol - line));
         if(done == -1)
             break;
         if (eol >= data + sizeof(data) -1) {
@@ -100,7 +100,7 @@ int ini_parse_file(FILE* file,
             line = data;
             int bytes = fread(eol, 1, sizeof(data) - (eol - data), file);
             len = eol - data + bytes;
-            dbgini("*Read: %d : '%s' LINE: %ld, EOL: %ld\n", len, line, line - data, eol -line);
+            dbgini("*Read: %d : '%s' LINE: %d, EOL: %d\n", len, line, (int)(line - data), (int)(eol -line));
         } else if(eol != data || *eol == '\0') {
             line = eol + 1;
         }
@@ -114,7 +114,7 @@ int ini_parse_file(FILE* file,
                 break;
             }
         }
-        dbgini("*Find EOL: %d : '%s' LINE: %ld, EOL: %ld\n", len, line, line - data, eol -line);
+        dbgini("*Find EOL: %d : '%s' LINE: %d, EOL: %d\n", len, line, (int)(line - data), (int)(eol -line));
         if (eol == data + len) {
             continue;
         }
