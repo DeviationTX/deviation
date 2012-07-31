@@ -24,13 +24,9 @@ static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, void *data);
 static const char *channum_cb(guiObject_t *obj, void *data);
 
-void PAGE_ChantestInit(int page)
+static void show_page()
 {
     #define SEPERATION 36
-    (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader("Channels");
-
     int i;
     u8 height;
     u8 count;
@@ -63,6 +59,34 @@ void PAGE_ChantestInit(int page)
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)((long)i));
         cp->pctvalue[i] = RANGE_TO_PCT(Channels[i]);
     }
+}
+void PAGE_ChantestInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_ShowHeader("Channels");
+    cp->return_page = NULL;
+    show_page();
+}
+
+static void okcancel_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    if(cp->return_page) {
+        PAGE_SetModal(0);
+        PAGE_RemoveAllObjects();
+        cp->return_page(1);
+    }
+}
+
+void PAGE_ChantestModal(void(*return_page)(int page))
+{
+    PAGE_SetModal(1);
+    cp->return_page = return_page;
+    PAGE_RemoveAllObjects();
+    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    show_page();
 }
 
 void PAGE_ChantestEvent()

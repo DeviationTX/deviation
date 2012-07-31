@@ -65,6 +65,7 @@ void PAGE_TestEvent();
 /* Chantest */
 void PAGE_ChantestInit(int page);
 void PAGE_ChantestEvent();
+void PAGE_ChantestModal(void(*return_page)(int page));
 
 /* Scanner */
 void PAGE_ScannerInit(int page);

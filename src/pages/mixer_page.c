@@ -16,6 +16,7 @@
 #include "target.h"
 #include "pages.h"
 #include "config/model.h"
+#include "icons.h"
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
@@ -91,6 +92,13 @@ void show_page()
     }
 }
 
+void show_chantest_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_ChantestModal(PAGE_MixerInit);
+}
+
 void PAGE_MixerInit(int page)
 {
     (void)page;
@@ -98,7 +106,8 @@ void PAGE_MixerInit(int page)
     memset(mp, 0, sizeof(*mp));
     mp->firstObj = NULL;
     mp->top_channel = 0;
-    PAGE_ShowHeader("Mixer");
+    PAGE_ShowHeader("        Mixer");
+    GUI_CreateIcon(34, 1, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
     GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
     show_page();
 }
