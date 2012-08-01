@@ -1,25 +1,35 @@
-The script below should build deviation on Mac OS X.
+The script util/build-osx.sh should download dependencies and 
+build the deviation emu on Mac OS X. An Xcode installation is required.
 
-#!/bin/bash
+To create a cross-compile environment, get summon-arm-toolchain from github:
 
-mkdir deviation-build
-cd deviation-build
-curl -o fltk-1.3.0-source.tar.gz http://ftp.easysw.com/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz
-tar xzvf fltk-1.3.0-source.tar.gz
-cd fltk-1.3.0
+https://raw.github.com/esden/summon-arm-toolchain/master/summon-arm-toolchain
+
+and patch it:
+
+patch -p0 < util/summon-arm-toolchain.patch summon-arm-toolchain
+
+Then create a directory /usr/local/arm-none-eabi-gcc and chown it to the
+user you're compiling the toolchain with. Then run the patched
+summon-arm-toolchain and wait.
+
+To build deviation, extend your PATH:
+
+export PATH=$PATH:/usr/local/arm-none-eabi-gcc/bin
+
+and run make inside the src directory.
+
+To flash the firmware to your Tx (no warranties here!), grab libusb from
+http://www.libusb.org/wiki/libusb-1.0 and dfu-util from
+http://dfu-util.gnumonks.org/.
+
+Unpack, compile and install both with
+
 ./configure
-make
+make 
 sudo make install
-cd ..
 
-curl -o pa_stable_v19_20111121.tgz http://www.portaudio.com/archives/pa_stable_v19_20111121.tgz
-tar xzvf pa_stable_v19_20111121.tgz
-cd portaudio
-./configure
-make
-cd ..
+Flash devo8.dfu with
 
-hg clone https://bitbucket.org/PhracturedBlue/deviation
-cd deviation/src
-make TARGET=emu_devo8 LFLAGS="`fltk-config --ldflags`"
+dfu-util -a 0 -D devo8.dfu
 

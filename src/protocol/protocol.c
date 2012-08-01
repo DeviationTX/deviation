@@ -46,6 +46,11 @@ void PROTOCOL_Init(enum Protocols p)
         case PROTOCOL_DEVO:
             DEVO_Initialize();
             break;
+        case PROTOCOL_WK2801:
+        case PROTOCOL_WK2601:
+        case PROTOCOL_WK2401:
+            WK2x01_Initialize();
+            break;
         case PROTOCOL_DSM2:
             DSM2_Initialize();
             break;
