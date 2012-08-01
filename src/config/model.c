@@ -587,7 +587,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(WRITE_FULL_MODEL || m->mode != 0)
-        fprintf(fh, "%s=%d\n", MODEL_MODE, m->mode);
+        fprintf(fh, "%s=%d\n", MODEL_MODE, m->mode+1);
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 6);
     if(WRITE_FULL_MODEL || m->type != 0)
