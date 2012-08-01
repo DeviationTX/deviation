@@ -47,35 +47,38 @@ void PAGE_ModelInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader("Model");
 
-    row = 46;
+    row = 40;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "File:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
 
-    row += 24;
+
+    row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
 
-    row += 24;
+    row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
 
-    row += 24;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Number of Channels:");
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
-
-    row += 24;
+    row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Mode:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
 
-    row += 24;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Tx Power:");
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
 
-    row += 24;
+    row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Protocol:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
 
-    row += 24;
+    row += 20;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Number of Channels:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+
+
+    row += 32;
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Tx Power:");
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
+
+    row += 20;
     if(Model.fixed_id == 0)
         sprintf(mp->fixed_id, "None");
     else
