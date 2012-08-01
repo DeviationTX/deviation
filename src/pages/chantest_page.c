@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "pages.h"
+#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
@@ -85,7 +86,11 @@ void PAGE_ChantestModal(void(*return_page)(int page))
     PAGE_SetModal(1);
     cp->return_page = return_page;
     PAGE_RemoveAllObjects();
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+
+    //PAGE_CreateOkButton(264, 4, okcancel_cb);
+    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], okcancel_cb, (void *)0);
+    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Channels");
+
     show_page();
 }
 

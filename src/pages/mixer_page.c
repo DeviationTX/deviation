@@ -106,8 +106,8 @@ void PAGE_MixerInit(int page)
     memset(mp, 0, sizeof(*mp));
     mp->firstObj = NULL;
     mp->top_channel = 0;
-    PAGE_ShowHeader("        Mixer");
-    GUI_CreateIcon(34, 1, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    PAGE_ShowHeader("Mixer");
+    GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
     GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
     show_page();
 }

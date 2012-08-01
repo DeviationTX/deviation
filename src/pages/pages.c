@@ -147,11 +147,11 @@ void changepage_cb(guiObject_t *obj, void *data)
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
-    GUI_CreateIcon(0, 1, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
     GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
-    obj = GUI_CreateIcon(254, 1, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    obj = GUI_CreateIcon(256, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     GUI_SetSelectable(obj, 0);
-    obj = GUI_CreateIcon(288, 1, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    obj = GUI_CreateIcon(288, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
     GUI_SetSelectable(obj, 0);
     exit_cmd = changepage_cb;
     exit_data = NULL;
