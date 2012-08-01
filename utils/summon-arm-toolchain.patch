@@ -1,0 +1,10 @@
+23c23
+< PREFIX=${HOME}/sat	# Install location of your final toolchain
+---
+> PREFIX=/usr/local/arm-none-eabi	# Install location of your final toolchain
+32c32
+< OOCD_EN=1
+---
+> OOCD_EN=0
+139d138
+< GDB=gdb-7.3.1
