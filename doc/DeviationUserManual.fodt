@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:generator>LibreOffice/3.5$Windows_x86 LibreOffice_project/7122e39-92ed229-498d286-15e43b4-d70da21</meta:generator><dc:title>Deviation Firmware User’s Manual</dc:title><dc:subject>Version 0.1</dc:subject><meta:creation-date>2012-08-02T00:51:00Z</meta:creation-date><dc:date>2012-08-01T18:02:09.16</dc:date><meta:print-date>2012-08-01T23:31:00Z</meta:print-date><meta:editing-cycles>3</meta:editing-cycles><meta:editing-duration>P0D</meta:editing-duration><meta:document-statistic meta:character-count="6983" meta:image-count="11" meta:non-whitespace-character-count="5943" meta:object-count="0" meta:page-count="11" meta:paragraph-count="150" meta:table-count="3" meta:word-count="1140"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="" xlink:href="Deviation.odt/Normal.dotm"/></office:meta>
+ <office:meta><meta:generator>LibreOffice/3.5$Windows_x86 LibreOffice_project/7122e39-92ed229-498d286-15e43b4-d70da21</meta:generator><dc:title>Deviation Firmware User’s Manual</dc:title><dc:subject>Version 0.1</dc:subject><meta:creation-date>2012-08-02T00:51:00Z</meta:creation-date><dc:date>2012-08-02T07:13:08.64</dc:date><meta:print-date>2012-08-01T23:31:00Z</meta:print-date><meta:editing-cycles>6</meta:editing-cycles><meta:editing-duration>PT10H18M39S</meta:editing-duration><meta:document-statistic meta:table-count="4" meta:image-count="11" meta:object-count="0" meta:page-count="13" meta:paragraph-count="195" meta:word-count="1821" meta:character-count="10862" meta:non-whitespace-character-count="9167"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="" xlink:href="Deviation.odt/Normal.dotm"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="int">0</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="int">75353</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="int">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="int">36594</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="int">14527</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="int">36620</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="int">15348</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="int">18297</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="int">2272</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="int">10689</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="int">32711</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="int">36592</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="int">14526</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="int">75353</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="int">36618</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="int">90699</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -99,10 +99,14 @@
  </office:settings>
  <office:scripts>
   <office:script script:language="ooo:Basic">
-   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ooo:library-embedded ooo:name="Standard"/>
+   </ooo:libraries>
   </office:script>
  </office:scripts>
  <office:font-face-decls>
+  <style:font-face style:name="Mangal" svg:font-family="Mangal"/>
+  <style:font-face style:name="OpenSymbol" svg:font-family="OpenSymbol"/>
   <style:font-face style:name="Cambria" svg:font-family="Cambria" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
@@ -153,7 +157,7 @@
    <style:paragraph-properties fo:line-height="100%" fo:text-align="start" style:justify-single-word="false" fo:keep-together="auto" fo:orphans="2" fo:widows="2" fo:hyphenation-ladder-count="no-limit" fo:break-before="auto" fo:break-after="auto" fo:background-color="transparent" fo:padding="0in" fo:border="none" style:shadow="none" fo:keep-with-next="auto" text:number-lines="true" text:line-number="0" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:tab-stop-distance="0.5in" style:snap-to-layout-grid="true" style:writing-mode="lr-tb">
     <style:background-image/>
    </style:paragraph-properties>
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-position="0% 100%" style:font-name="Times New Roman" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="false" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-combine="none" style:text-scale="100%" style:font-relief="none" fo:hyphenate="true"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-position="0% 100%" style:font-name="Times New Roman" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal" style:letter-kerning="false" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-combine="none" style:text-scale="100%" style:font-relief="none" fo:hyphenate="true" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:default-style>
   <style:default-style style:family="table">
    <style:table-properties table:border-model="collapsing"/>
@@ -168,38 +172,46 @@
   </style:style>
   <style:style style:name="Text_20_body" style:display-name="Text body" style:family="paragraph" style:parent-style-name="Standard" style:class="text">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0.0835in"/>
+   <style:text-properties fo:font-size="12pt"/>
   </style:style>
-  <style:style style:name="Heading_20_1" style:display-name="Heading 1" style:family="paragraph" style:parent-style-name="Normal" style:next-style-name="Normal" style:default-outline-level="1" style:class="text">
-   <style:paragraph-properties fo:margin-top="0.3335in" fo:margin-bottom="0in" fo:keep-together="always" fo:hyphenation-ladder-count="no-limit" fo:keep-with-next="always"/>
-   <style:text-properties fo:color="#365f91" style:font-name="Cambria" fo:font-size="14pt" fo:font-weight="bold" style:font-name-asian="Times New Roman" style:font-size-asian="14pt" style:font-weight-asian="bold" style:font-name-complex="Times New Roman" style:font-size-complex="14pt" style:font-weight-complex="bold" fo:hyphenate="false"/>
-  </style:style>
-  <style:style style:name="Normal" style:family="paragraph">
-   <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt" fo:hyphenate="false"/>
-  </style:style>
-  <style:style style:name="Balloon_20_Text" style:display-name="Balloon Text" style:family="paragraph" style:parent-style-name="Normal">
-   <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties style:font-name="Tahoma" fo:font-size="8pt" style:font-size-asian="8pt" style:font-name-complex="Tahoma" style:font-size-complex="8pt" fo:hyphenate="false"/>
+  <style:style style:name="List" style:family="paragraph" style:parent-style-name="Text_20_body" style:class="list">
+   <style:text-properties style:font-size-asian="12pt" style:font-name-complex="Mangal"/>
   </style:style>
   <style:style style:name="Caption" style:family="paragraph" style:parent-style-name="Normal" style:next-style-name="Normal" style:class="extra">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0.139in" fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties fo:color="#4f81bd" fo:font-size="9pt" fo:font-weight="bold" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold" fo:hyphenate="false"/>
+   <style:text-properties fo:color="#4f81bd" fo:font-size="9pt" fo:font-weight="bold" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+  </style:style>
+  <style:style style:name="Index" style:family="paragraph" style:parent-style-name="Standard" style:class="index">
+   <style:paragraph-properties text:number-lines="false" text:line-number="0"/>
+   <style:text-properties style:font-size-asian="12pt" style:font-name-complex="Mangal"/>
+  </style:style>
+  <style:style style:name="Heading_20_1" style:display-name="Heading 1" style:family="paragraph" style:parent-style-name="Normal" style:next-style-name="Normal" style:default-outline-level="1" style:class="text">
+   <style:paragraph-properties fo:margin-top="0.3335in" fo:margin-bottom="0in" fo:keep-together="always" fo:hyphenation-ladder-count="no-limit" fo:keep-with-next="always"/>
+   <style:text-properties fo:color="#365f91" style:font-name="Cambria" fo:font-size="14pt" fo:font-weight="bold" style:font-name-asian="Times New Roman" style:font-size-asian="14pt" style:font-weight-asian="bold" style:font-name-complex="Times New Roman" style:font-size-complex="14pt" style:font-weight-complex="bold" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+  </style:style>
+  <style:style style:name="Normal" style:family="paragraph">
+   <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"/>
+   <style:text-properties fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+  </style:style>
+  <style:style style:name="Balloon_20_Text" style:display-name="Balloon Text" style:family="paragraph" style:parent-style-name="Normal">
+   <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"/>
+   <style:text-properties style:font-name="Tahoma" fo:font-size="8pt" style:font-size-asian="8pt" style:font-name-complex="Tahoma" style:font-size-complex="8pt" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="Normal_20__28_Web_29_" style:display-name="Normal (Web)" style:family="paragraph" style:parent-style-name="Normal">
    <style:paragraph-properties fo:margin-top="0.0693in" fo:margin-bottom="0.0693in" fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties fo:hyphenate="false"/>
+   <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="TOC_20_Heading" style:display-name="TOC Heading" style:family="paragraph" style:parent-style-name="Heading_20_1" style:next-style-name="Normal" style:default-outline-level="" style:list-style-name="">
    <style:paragraph-properties fo:line-height="115%" fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties style:language-asian="ja" style:country-asian="JP" fo:hyphenate="false"/>
+   <style:text-properties style:language-asian="ja" style:country-asian="JP" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="TOC_20_1" style:display-name="TOC 1" style:family="paragraph" style:parent-style-name="Normal" style:next-style-name="Normal" style:auto-update="true">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0.0693in" fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties fo:hyphenate="false"/>
+   <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="No_20_Spacing" style:display-name="No Spacing" style:family="paragraph">
    <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"/>
-   <style:text-properties style:font-name="Calibri" fo:font-size="11pt" style:font-name-asian="Times New Roman" style:font-size-asian="11pt" style:language-asian="ja" style:country-asian="JP" style:font-name-complex="Times New Roman" style:font-size-complex="11pt" fo:hyphenate="false"/>
+   <style:text-properties style:font-name="Calibri" fo:font-size="11pt" style:font-name-asian="Times New Roman" style:font-size-asian="11pt" style:language-asian="ja" style:country-asian="JP" style:font-name-complex="Times New Roman" style:font-size-complex="11pt" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="Header" style:family="paragraph" style:parent-style-name="Normal" style:class="extra">
    <style:paragraph-properties fo:hyphenation-ladder-count="no-limit">
@@ -208,7 +220,7 @@
      <style:tab-stop style:position="6.5in" style:type="right"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties fo:hyphenate="false"/>
+   <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="Footer" style:family="paragraph" style:parent-style-name="Normal" style:class="extra">
    <style:paragraph-properties fo:hyphenation-ladder-count="no-limit">
@@ -217,7 +229,7 @@
      <style:tab-stop style:position="6.5in" style:type="right"/>
     </style:tab-stops>
    </style:paragraph-properties>
-   <style:text-properties fo:hyphenate="false"/>
+   <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
   <style:style style:name="Table_20_Contents" style:display-name="Table Contents" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
    <style:paragraph-properties text:number-lines="false" text:line-number="0"/>
@@ -226,6 +238,25 @@
   <style:style style:name="Contents_20_Heading" style:display-name="Contents Heading" style:family="paragraph" style:parent-style-name="Heading" style:class="index">
    <style:paragraph-properties fo:margin="100%" fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:text-indent="0in" style:auto-text-indent="false" text:number-lines="false" text:line-number="0"/>
    <style:text-properties fo:font-size="16pt" fo:font-weight="bold" style:font-size-asian="16pt" style:font-weight-asian="bold" style:font-size-complex="16pt" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="Contents_20_1" style:display-name="Contents 1" style:family="paragraph" style:parent-style-name="Index" style:class="index">
+   <style:paragraph-properties fo:margin="100%" fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0.0701in" fo:text-indent="0in" style:auto-text-indent="false">
+    <style:tab-stops>
+     <style:tab-stop style:position="6.9252in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+   <style:text-properties fo:font-size="12pt"/>
+  </style:style>
+  <style:style style:name="Heading_20_2" style:display-name="Heading 2" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:default-outline-level="2" style:class="text">
+   <style:text-properties fo:font-size="14pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="14pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-size-complex="14pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="Contents_20_2" style:display-name="Contents 2" style:family="paragraph" style:parent-style-name="Index" style:class="index">
+   <style:paragraph-properties fo:margin="100%" fo:margin-left="0.1965in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0.0701in" fo:text-indent="0in" style:auto-text-indent="false">
+    <style:tab-stops>
+     <style:tab-stop style:position="6.7283in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+   <style:text-properties fo:font-size="12pt"/>
   </style:style>
   <style:style style:name="Default_20_Paragraph_20_Font" style:display-name="Default Paragraph Font" style:family="text"/>
   <style:style style:name="Balloon_20_Text_20_Char" style:display-name="Balloon Text Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
@@ -251,6 +282,14 @@
   </style:style>
   <style:style style:name="Internet_20_link" style:display-name="Internet link" style:family="text">
    <style:text-properties fo:color="#000080" fo:language="zxx" fo:country="none" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:language-asian="zxx" style:country-asian="none" style:language-complex="zxx" style:country-complex="none"/>
+  </style:style>
+  <style:style style:name="Line_20_numbering" style:display-name="Line numbering" style:family="text"/>
+  <style:style style:name="Visited_20_Internet_20_Link" style:display-name="Visited Internet Link" style:family="text">
+   <style:text-properties fo:color="#800000" fo:language="zxx" fo:country="none" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:language-asian="zxx" style:country-asian="none" style:language-complex="zxx" style:country-complex="none"/>
+  </style:style>
+  <style:style style:name="Index_20_Link" style:display-name="Index Link" style:family="text"/>
+  <style:style style:name="Bullet_20_Symbols" style:display-name="Bullet Symbols" style:family="text">
+   <style:text-properties style:font-name="OpenSymbol" style:font-name-asian="OpenSymbol" style:font-name-complex="OpenSymbol"/>
   </style:style>
   <style:style style:name="Graphics" style:family="graphic"/>
   <text:outline-style style:name="Outline">
@@ -305,7 +344,7 @@
   </text:outline-style>
   <text:notes-configuration text:note-class="footnote" style:num-format="1" text:start-value="0" text:footnotes-position="page" text:start-numbering-at="document"/>
   <text:notes-configuration text:note-class="endnote" style:num-format="i" text:start-value="0"/>
-  <text:linenumbering-configuration text:number-lines="false" text:offset="0.1965in" style:num-format="1" text:number-position="left" text:increment="5"/>
+  <text:linenumbering-configuration text:style-name="Line_20_numbering" text:number-lines="false" text:offset="0.1965in" style:num-format="1" text:number-position="left" text:increment="5"/>
  </office:styles>
  <office:automatic-styles>
   <style:style style:name="Table1" style:family="table" style:master-page-name="MPF0">
@@ -356,6 +395,27 @@
   <style:style style:name="Table3.A1" style:family="table-cell">
    <style:table-cell-properties fo:padding-left="0.075in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #000000"/>
   </style:style>
+  <style:style style:name="Table4" style:family="table">
+   <style:table-properties style:width="6in" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Table4.A" style:family="table-column">
+   <style:table-column-properties style:column-width="1.7708in" style:rel-column-width="2550*"/>
+  </style:style>
+  <style:style style:name="Table4.B" style:family="table-column">
+   <style:table-column-properties style:column-width="4.2292in" style:rel-column-width="6090*"/>
+  </style:style>
+  <style:style style:name="Table4.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.0382in" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="Table4.B1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.0382in" fo:border="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="Table4.A2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.0382in" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
+  <style:style style:name="Table4.B2" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0.0382in" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+  </style:style>
   <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Footer">
    <style:paragraph-properties fo:text-align="end" style:justify-single-word="false"/>
   </style:style>
@@ -379,34 +439,60 @@
    <style:paragraph-properties fo:break-before="page"/>
    <style:text-properties fo:color="#4f81bd" fo:font-size="9pt" fo:font-weight="bold" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
   </style:style>
-  <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Normal">
+  <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:paragraph-properties fo:break-before="page"/>
+  </style:style>
+  <style:style style:name="P9" style:family="paragraph" style:parent-style-name="Normal">
    <style:paragraph-properties fo:keep-with-next="always"/>
   </style:style>
-  <style:style style:name="P9" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
+  <style:style style:name="P10" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in"/>
   </style:style>
-  <style:style style:name="P10" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
+  <style:style style:name="P11" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" fo:text-align="end" style:justify-single-word="false"/>
   </style:style>
-  <style:style style:name="P11" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
+  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Normal_20__28_Web_29_">
    <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" fo:text-align="center" style:justify-single-word="false"/>
   </style:style>
-  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Normal">
+  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Normal">
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
   </style:style>
-  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Normal">
+  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Normal">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-indent="0.5in" style:auto-text-indent="false"/>
   </style:style>
-  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="TOC_20_1">
+  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="TOC_20_1">
    <style:paragraph-properties>
     <style:tab-stops>
      <style:tab-stop style:position="6in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
     </style:tab-stops>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P16" style:family="paragraph" style:parent-style-name="Contents_20_1">
+   <style:paragraph-properties>
+    <style:tab-stops>
+     <style:tab-stop style:position="6in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="Contents_20_2">
+   <style:paragraph-properties>
+    <style:tab-stops>
+     <style:tab-stop style:position="5.8035in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt"/>
+  </style:style>
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:paragraph-properties fo:break-before="page"/>
   </style:style>
+  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name="">
+   <style:paragraph-properties fo:keep-together="always" fo:hyphenation-ladder-count="no-limit" fo:break-before="page"/>
+   <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+  </style:style>
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L1"/>
+  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2"/>
   <style:style style:name="T1" style:family="text">
    <style:text-properties style:font-name="Cambria" fo:font-size="40pt" style:font-name-asian="Times New Roman" style:font-size-asian="40pt" style:font-name-complex="Times New Roman" style:font-size-complex="40pt"/>
   </style:style>
@@ -434,6 +520,110 @@
     <style:columns fo:column-count="1" fo:column-gap="0in"/>
    </style:section-properties>
   </style:style>
+  <text:list-style style:name="L1">
+   <text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.5in" fo:text-indent="-0.25in" fo:margin-left="0.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.75in" fo:text-indent="-0.25in" fo:margin-left="0.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="3" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1in" fo:text-indent="-0.25in" fo:margin-left="1in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="4" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.25in" fo:text-indent="-0.25in" fo:margin-left="1.25in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="5" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.5in" fo:text-indent="-0.25in" fo:margin-left="1.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="6" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.75in" fo:text-indent="-0.25in" fo:margin-left="1.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="7" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2in" fo:text-indent="-0.25in" fo:margin-left="2in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="8" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.25in" fo:text-indent="-0.25in" fo:margin-left="2.25in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="9" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.5in" fo:text-indent="-0.25in" fo:margin-left="2.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="10" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.75in" fo:text-indent="-0.25in" fo:margin-left="2.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+  </text:list-style>
+  <text:list-style style:name="L2">
+   <text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.5in" fo:text-indent="-0.25in" fo:margin-left="0.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.75in" fo:text-indent="-0.25in" fo:margin-left="0.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="3" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1in" fo:text-indent="-0.25in" fo:margin-left="1in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="4" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.25in" fo:text-indent="-0.25in" fo:margin-left="1.25in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="5" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.5in" fo:text-indent="-0.25in" fo:margin-left="1.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="6" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.75in" fo:text-indent="-0.25in" fo:margin-left="1.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="7" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2in" fo:text-indent="-0.25in" fo:margin-left="2in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="8" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.25in" fo:text-indent="-0.25in" fo:margin-left="2.25in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="9" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.5in" fo:text-indent="-0.25in" fo:margin-left="2.5in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+   <text:list-level-style-bullet text:level="10" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+    <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+     <style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.75in" fo:text-indent="-0.25in" fo:margin-left="2.75in"/>
+    </style:list-level-properties>
+   </text:list-level-style-bullet>
+  </text:list-style>
   <style:style style:name="gr1" style:family="graphic">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.028in" svg:stroke-color="#385d8a" svg:stroke-opacity="100%" draw:fill="none" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
   </style:style>
@@ -555,7 +745,7 @@
   <style:master-page style:name="Standard" style:page-layout-name="pm1"/>
   <style:master-page style:name="MP0" style:page-layout-name="pm2">
    <style:footer>
-    <text:p text:style-name="P1">Page | <text:page-number text:select-page="current">11</text:page-number> </text:p>
+    <text:p text:style-name="P1">Page | <text:page-number text:select-page="current">13</text:page-number> </text:p>
     <text:p text:style-name="Footer"/>
    </style:footer>
   </style:master-page>
@@ -578,7 +768,7 @@
     </table:table-row>
     <table:table-row table:style-name="Table1.2">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P4"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T1">Deviation Firmware User</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T1">’</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T1">s Manual</text:span></text:span></text:p>
+      <text:p text:style-name="P4"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T1">Deviation Firmware User’s Manual</text:span></text:span></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table1.3">
@@ -615,32 +805,35 @@
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="P6"/>
    <text:p text:style-name="TOC_20_Heading"/>
-   <text:table-of-content text:style-name="Sect1" text:name="_TOC0">
+   <text:table-of-content text:style-name="Sect1" text:name="Table of Contents1">
     <text:table-of-content-source text:outline-level="3" text:use-index-marks="false">
      <text:index-title-template text:style-name="Contents_20_Heading">Table of Contents</text:index-title-template>
-     <text:table-of-content-entry-template text:outline-level="1" text:style-name="TOC_20_1">
-      <text:index-entry-link-start/>
+     <text:table-of-content-entry-template text:outline-level="1" text:style-name="Contents_20_1">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
       <text:index-entry-page-number/>
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
-     <text:table-of-content-entry-template text:outline-level="2" text:style-name="Normal">
-      <text:index-entry-link-start/>
+     <text:table-of-content-entry-template text:outline-level="2" text:style-name="Contents_20_2">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
       <text:index-entry-page-number/>
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
-     <text:table-of-content-entry-template text:outline-level="3" text:style-name="Normal">
-      <text:index-entry-link-start/>
+     <text:table-of-content-entry-template text:outline-level="3" text:style-name="Contents_20_3">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
       <text:index-entry-page-number/>
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="4" text:style-name="Contents_20_4">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -648,7 +841,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="5" text:style-name="Contents_20_5">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -656,7 +849,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="6" text:style-name="Contents_20_6">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -664,7 +857,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="7" text:style-name="Contents_20_7">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -672,7 +865,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="8" text:style-name="Contents_20_8">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -680,7 +873,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="9" text:style-name="Contents_20_9">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -688,7 +881,7 @@
       <text:index-entry-link-end/>
      </text:table-of-content-entry-template>
      <text:table-of-content-entry-template text:outline-level="10" text:style-name="Contents_20_10">
-      <text:index-entry-link-start/>
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
       <text:index-entry-chapter/>
       <text:index-entry-text/>
       <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
@@ -697,36 +890,107 @@
      </text:table-of-content-entry-template>
     </text:table-of-content-source>
     <text:index-body>
-     <text:index-title text:style-name="Sect1" text:name="_TOC0_Head">
+     <text:index-title text:style-name="Sect1" text:name="Table of Contents1_Head">
       <text:p text:style-name="Contents_20_Heading">Table of Contents</text:p>
      </text:index-title>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__874_1550650428">Overview<text:tab/>3</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__876_1550650428">Main Page<text:tab/>4</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__878_1550650428">Emulator<text:tab/>5</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__880_1550650428">Main Page Configuration<text:tab/>6</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__882_1550650428">Mixer<text:tab/>7</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__884_1550650428">Simple Template:<text:tab/>8</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__886_1550650428">Expo &amp; Dual-Rate Template:<text:tab/>8</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__888_1550650428">Complex Template:<text:tab/>9</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__890_1550650428">Channel configuration:<text:tab/>10</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__892_1550650428">Trims:<text:tab/>10</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__894_1550650428">Model Page:<text:tab/>11</text:a></text:p>
-     <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="#__RefHeading__896_1550650428">Timer Page:<text:tab/>11</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__874_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Overview<text:tab/>3</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__4239_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Installation<text:tab/>4</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__4253_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Filesystem<text:tab/>4</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__876_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Main Page<text:tab/>5</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__878_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Emulator<text:tab/>6</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__880_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Main Page Configuration<text:tab/>7</text:a></text:p>
+     <text:p text:style-name="P17"><text:a xlink:type="simple" xlink:href="#__RefHeading__5233_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Preview<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P17"><text:a xlink:type="simple" xlink:href="#__RefHeading__5235_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Trim Postions<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P17"><text:a xlink:type="simple" xlink:href="#__RefHeading__4594_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">BarGraphs<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P17"><text:a xlink:type="simple" xlink:href="#__RefHeading__5237_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Boxes<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P17"><text:a xlink:type="simple" xlink:href="#__RefHeading__5239_308040813" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Toggle Icons<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__882_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Mixer<text:tab/>9</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__884_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Simple Template:<text:tab/>10</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__886_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Expo &amp; Dual-Rate Template:<text:tab/>10</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__888_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Complex Template:<text:tab/>11</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__890_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Channel configuration:<text:tab/>12</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__892_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Trims:<text:tab/>12</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__894_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Model Page:<text:tab/>13</text:a></text:p>
+     <text:p text:style-name="P16"><text:a xlink:type="simple" xlink:href="#__RefHeading__896_1550650428" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">Timer Page:<text:tab/>13</text:a></text:p>
     </text:index-body>
    </text:table-of-content>
    <text:p text:style-name="Normal"/>
-   <text:p text:style-name="Normal"/>
-   <text:p text:style-name="Normal"/>
-   <text:h text:style-name="P15" text:outline-level="1"><text:bookmark-start text:name="_Toc331606777"/><text:bookmark-start text:name="__RefHeading__874_1550650428"/>Overview<text:bookmark-end text:name="_Toc331606777"/><text:bookmark-end text:name="__RefHeading__874_1550650428"/></text:h>
+   <text:h text:style-name="P8" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__874_1550650428"/><text:bookmark-start text:name="_Toc331606777"/>Overview<text:bookmark-end text:name="__RefHeading__874_1550650428"/><text:bookmark-end text:name="_Toc331606777"/></text:h>
    <text:p text:style-name="Normal">Deviation is a replacement firmware for the Walkera Devo© series transmitters. <text:s/>The primary goal is to add support for multiple protocols, opening the full potential of this platform.</text:p>
    <text:p text:style-name="Normal">The core of the Deviation firmware is the mixer system, which is modeled after the system used in the Er9X firmward for the Turnigy/Flysky9x© transmitters.</text:p>
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">Deviation also brings USB filesystem support, making it easy to manage the transmitter from any PC without the need for specialized upload/download tools.</text:p>
    <text:p text:style-name="Normal"/>
-   <text:p text:style-name="Normal">Deviation has been designed for ultimate configurability. <text:s/>All model and transmitter configuration is controlled through text files which the firmware can read and write. <text:s/>It is easy to know exactly what is configured, as well as to modify the configuration either through the transmitter or with a text editor. <text:s/>The main screen is very configurable; any mix of channel data, timers or telemetry can be displayed, and configured per-model.</text:p>
+   <text:p text:style-name="Normal">Deviation has been designed for ultimate configurability. <text:s/>All model and transmitter configuration is controlled through text files which the firmware (or user) can read and write. <text:s/>It is easy to know exactly what is configured, as well as to modify the configuration either through the transmitter or with a text editor. <text:s/>The main screen is very configurable; any mix of channel data, timers or telemetry can be displayed, and configured per-model. <text:s/>Deviation also supports easy theming with full control over the images, fonts, and colors.</text:p>
    <text:p text:style-name="Normal"/>
-   <text:p text:style-name="Normal">Deviation can store up to 255 different models.</text:p>
-   <text:h text:style-name="P15" text:outline-level="1"><text:bookmark-start text:name="_Toc331606778"/><text:bookmark-start text:name="__RefHeading__876_1550650428"/>Main Page<text:bookmark-end text:name="_Toc331606778"/><text:bookmark-end text:name="__RefHeading__876_1550650428"/></text:h>
+   <text:p text:style-name="Normal">Deviation can store up to 255 different models, and uses a portable syntax that should allow sharing models between any transmitter supported by Deviation in the future.</text:p>
+   <text:h text:style-name="P20" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__4239_308040813"/>Installation<text:bookmark-end text:name="__RefHeading__4239_308040813"/></text:h>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4241_308040813"/>Installation of Deviation is done just like upgrading the Walkera firmware.<text:bookmark-end text:name="__RefHeading__4241_308040813"/></text:p>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4243_308040813"/>Note that Deviation will NOT overwrite Walkera models stored on the Tx. <text:s/>While they cannot be accessed by Deviation, they will be safely preserved should the Walkera firmware ever ned to be reinstalled.<text:bookmark-end text:name="__RefHeading__4243_308040813"/></text:p>
+   <text:p text:style-name="Normal"/>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4245_308040813"/>First install the deviation-x.yy.dfu using the Walkera ‘DfuSe USB Upgrade’ tool.<text:bookmark-end text:name="__RefHeading__4245_308040813"/></text:p>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4247_308040813"/>There are 2 options on how to install the libraries.<text:bookmark-end text:name="__RefHeading__4247_308040813"/></text:p>
+   <text:p text:style-name="Normal"/>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4249_308040813"/>If previously the Walkera firmware was installed, the fastest solution is to use the ‘DfuSe’ tool to install the deviation library.<text:bookmark-end text:name="__RefHeading__4249_308040813"/></text:p>
+   <text:p text:style-name="Normal"/>
+   <text:p text:style-name="Normal"><text:bookmark-start text:name="__RefHeading__4251_308040813"/>Alternatively (or if this is an upgrade from a previous Deviation version) power off the Tx, and power back on holding the ‘Ent’ button (with the USB cable still plugged in). <text:s/>This will start the Tx in USB mode. <text:s/>Windows will now detect the transmitter as a USB drive. <text:s/>If the deviation lib was not installed, Windows will ask to format the drive. <text:s/>Format using the default options. <text:s/>Next unzip the deviation-lib-x.yy.zip to the Tx USB drive.<text:bookmark-end text:name="__RefHeading__4251_308040813"/></text:p>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__4253_308040813"/>Filesystem<text:bookmark-end text:name="__RefHeading__4253_308040813"/></text:h>
+   <text:p text:style-name="Normal">Deviation stores all configuration, bitmaps, and models as regular files on the USB filesystem.The directory structure is as follows:</text:p>
+   <text:p text:style-name="Normal"/>
+   <table:table table:name="Table4" table:style-name="Table4">
+    <table:table-column table:style-name="Table4.A"/>
+    <table:table-column table:style-name="Table4.B"/>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A1" office:value-type="string">
+      <text:p text:style-name="P18">\tx.ini</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B1" office:value-type="string">
+      <text:p text:style-name="P18">Transmitter config. <text:s/>Includes trim settings, calibration data, and the last-used model number</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P18">\media\config.ini</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P18">The color scheme and fonts for the transmitter</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P18">\media\*.bmp</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P18">Images used for the current Tx theme</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P18">\models\default.ini</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P18">The default model, loaded whenever a model is cleared</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P18">\models\model*.ini</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P18">Configuration files for each model. <text:s/>Due to a limitation in the firmware, Deviation cnanot create new files. <text:s/>It is therefore necessary to have a modelxx.ini for each model regardless of whether it is currently in use.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P18">\templates\tmpl*.ini</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P18">Configuration files used when loading predefined templates. <text:s/>These are nearly identical to the model configuration files, however they do not necessarily define all parameters</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="Normal"/>
+   <text:h text:style-name="P8" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__876_1550650428"/><text:bookmark-start text:name="_Toc331606778"/>Main Page<text:bookmark-end text:name="__RefHeading__876_1550650428"/><text:bookmark-end text:name="_Toc331606778"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr1" draw:name="Text Box 11" text:anchor-type="paragraph" svg:x="1.8902in" svg:y="0.152in" svg:width="1.5575in" style:rel-width="scale" svg:height="0.3228in" style:rel-height="scale" draw:z-index="19">
      <draw:text-box>
       <text:p text:style-name="Normal">Transmitter Power</text:p>
@@ -1605,7 +1869,7 @@
    <text:p text:style-name="Normal">Trims: The trim display can be configured to show either 4 or 6trims</text:p>
    <text:p text:style-name="Normal">Model Configuration Pages: <text:s/>Selecting the model icon provides access to the model configuration pages</text:p>
    <text:p text:style-name="P7"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606779"/><text:bookmark-start text:name="__RefHeading__878_1550650428"/>Emulator<text:bookmark-end text:name="_Toc331606779"/><text:bookmark-end text:name="__RefHeading__878_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__878_1550650428"/><text:bookmark-start text:name="_Toc331606779"/>Emulator<text:bookmark-end text:name="__RefHeading__878_1550650428"/><text:bookmark-end text:name="_Toc331606779"/></text:h>
    <text:p text:style-name="Normal">The emulator provides a side-screen displaying the current virtual-stick/switch states as well as the Channel output that would be received by the servos</text:p>
    <text:p text:style-name="Normal">The emulator controls are as follows:</text:p>
    <text:p text:style-name="Normal"/>
@@ -1672,7 +1936,7 @@
       <text:p text:style-name="Normal">R/F</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Right-Horizonatl trim</text:p>
+      <text:p text:style-name="P9">Right-Horizonatl trim</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1680,7 +1944,7 @@
       <text:p text:style-name="Normal">z</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Gear</text:p>
+      <text:p text:style-name="P9">Gear</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1688,7 +1952,7 @@
       <text:p text:style-name="Normal">x</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Rudder Dual-Rate switch</text:p>
+      <text:p text:style-name="P9">Rudder Dual-Rate switch</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1696,7 +1960,7 @@
       <text:p text:style-name="Normal">c</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Elevator Dual-Rate switch</text:p>
+      <text:p text:style-name="P9">Elevator Dual-Rate switch</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1704,7 +1968,7 @@
       <text:p text:style-name="Normal">v</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Aileron Dual-Rate switch</text:p>
+      <text:p text:style-name="P9">Aileron Dual-Rate switch</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1712,7 +1976,7 @@
       <text:p text:style-name="Normal">b</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Mix 0/1/2 switch</text:p>
+      <text:p text:style-name="P9">Mix 0/1/2 switch</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1720,7 +1984,7 @@
       <text:p text:style-name="Normal">n</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">FMode 0/1/2 switch</text:p>
+      <text:p text:style-name="P9">FMode 0/1/2 switch</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1728,7 +1992,7 @@
       <text:p text:style-name="Normal">\</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Power off</text:p>
+      <text:p text:style-name="P9">Power off</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1736,7 +2000,7 @@
       <text:p text:style-name="Normal">Left-arrow</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Left</text:p>
+      <text:p text:style-name="P9">Left</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1744,7 +2008,7 @@
       <text:p text:style-name="Normal">Right-arrow</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Right</text:p>
+      <text:p text:style-name="P9">Right</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1752,7 +2016,7 @@
       <text:p text:style-name="Normal">Up-arrow</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Up</text:p>
+      <text:p text:style-name="P9">Up</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1760,7 +2024,7 @@
       <text:p text:style-name="Normal">Down-arrow</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Down</text:p>
+      <text:p text:style-name="P9">Down</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1768,7 +2032,7 @@
       <text:p text:style-name="Normal">Enter</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Ent</text:p>
+      <text:p text:style-name="P9">Ent</text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -1776,15 +2040,15 @@
       <text:p text:style-name="Normal">Escape</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P8">Exit</text:p>
+      <text:p text:style-name="P9">Exit</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
    <text:p text:style-name="Caption">Table 1: Emulator Controls</text:p>
    <text:p text:style-name="P6"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606780"/><text:bookmark-start text:name="__RefHeading__880_1550650428"/>Main Page Configuration<text:bookmark-end text:name="_Toc331606780"/><text:bookmark-end text:name="__RefHeading__880_1550650428"/></text:h>
-   <text:p text:style-name="P9"/>
-   <text:p text:style-name="P10"><draw:frame draw:style-name="fr1" draw:name="Text Box 67" text:anchor-type="paragraph" svg:x="0.7492in" svg:y="2.8543in" svg:width="1.5102in" style:rel-width="scale" svg:height="0.4689in" style:rel-height="scale" draw:z-index="55">
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__880_1550650428"/><text:bookmark-start text:name="_Toc331606780"/>Main Page Configuration<text:bookmark-end text:name="__RefHeading__880_1550650428"/><text:bookmark-end text:name="_Toc331606780"/></text:h>
+   <text:p text:style-name="P10"/>
+   <text:p text:style-name="P11"><draw:frame draw:style-name="fr1" draw:name="Text Box 67" text:anchor-type="paragraph" svg:x="0.7492in" svg:y="2.8543in" svg:width="1.5102in" style:rel-width="scale" svg:height="0.5201in" style:rel-height="scale" draw:z-index="55">
      <draw:text-box>
       <text:p text:style-name="Normal">Text box enable</text:p>
       <text:p text:style-name="Normal">and contents</text:p>
@@ -1821,19 +2085,19 @@
       <text:p text:style-name="Normal"/>
      </draw:text-box>
     </draw:frame></text:p>
-   <text:p text:style-name="P10"/>
-   <text:p text:style-name="P10"><draw:connector text:anchor-type="paragraph" draw:z-index="60" draw:name="Straight Arrow Connector 73" draw:style-name="gr25" draw:type="line" svg:x1="4.5311in" svg:y1="0.0563in" svg:x2="4.5311in" svg:y2="1.1083in" svg:d="m11509 143v2672">
+   <text:p text:style-name="P11"/>
+   <text:p text:style-name="P11"><draw:connector text:anchor-type="paragraph" draw:z-index="60" draw:name="Straight Arrow Connector 73" draw:style-name="gr25" draw:type="line" svg:x1="4.5311in" svg:y1="0.0563in" svg:x2="4.5311in" svg:y2="1.1083in" svg:d="m11509 143v2672">
      <text:p/>
     </draw:connector></text:p>
-   <text:p text:style-name="P10"><draw:frame draw:style-name="fr1" draw:name="Text Box 54" text:anchor-type="paragraph" svg:x="4.7189in" svg:y="0.0083in" svg:width="0.9165in" style:rel-width="scale" svg:height="0.3228in" style:rel-height="scale" draw:z-index="49">
+   <text:p text:style-name="P11"><draw:frame draw:style-name="fr1" draw:name="Text Box 54" text:anchor-type="paragraph" svg:x="4.7189in" svg:y="0.0083in" svg:width="0.9165in" style:rel-width="scale" svg:height="0.3228in" style:rel-height="scale" draw:z-index="49">
      <draw:text-box>
       <text:p text:style-name="Normal">Prev Page</text:p>
       <text:p text:style-name="Normal"/>
      </draw:text-box>
     </draw:frame></text:p>
-   <text:p text:style-name="P10"/>
-   <text:p text:style-name="P10"/>
-   <text:p text:style-name="P10"><draw:connector text:anchor-type="paragraph" draw:z-index="58" draw:name="Straight Arrow Connector 70" draw:style-name="gr24" draw:type="line" svg:x1="2.2811in" svg:y1="1.9228in" svg:x2="2.6457in" svg:y2="1.9228in" svg:d="m5794 4884h926">
+   <text:p text:style-name="P11"/>
+   <text:p text:style-name="P11"/>
+   <text:p text:style-name="P11"><draw:connector text:anchor-type="paragraph" draw:z-index="58" draw:name="Straight Arrow Connector 70" draw:style-name="gr24" draw:type="line" svg:x1="2.2811in" svg:y1="1.9228in" svg:x2="2.6457in" svg:y2="1.9228in" svg:d="m5794 4884h926">
      <text:p/>
     </draw:connector><draw:frame draw:style-name="fr1" draw:name="Text Box 65" text:anchor-type="paragraph" svg:x="0.7492in" svg:y="0.0252in" svg:width="1.5102in" style:rel-width="scale" svg:height="0.5126in" style:rel-height="scale" draw:z-index="53">
      <draw:text-box>
@@ -2172,7 +2436,7 @@
       </office:binary-data>
      </draw:image>
     </draw:frame></text:p>
-   <text:p text:style-name="P11"><draw:connector text:anchor-type="paragraph" draw:z-index="68" draw:name="Straight Arrow Connector 81" draw:style-name="gr29" draw:type="line" svg:x1="4.5311in" svg:y1="0.4646in" svg:x2="4.5311in" svg:y2="1.5165in" svg:d="m11509 1180v2672">
+   <text:p text:style-name="P12"><draw:connector text:anchor-type="paragraph" draw:z-index="68" draw:name="Straight Arrow Connector 81" draw:style-name="gr29" draw:type="line" svg:x1="4.5311in" svg:y1="0.4646in" svg:x2="4.5311in" svg:y2="1.5165in" svg:d="m11509 1180v2672">
      <text:p/>
     </draw:connector><draw:frame draw:style-name="fr1" draw:name="Text Box 80" text:anchor-type="paragraph" svg:x="2.9165in" svg:y="0.1398in" svg:width="1.7291in" style:rel-width="scale" svg:height="0.3228in" style:rel-height="scale" draw:z-index="67">
      <draw:text-box>
@@ -2201,12 +2465,12 @@
       <text:p text:style-name="Normal"/>
      </draw:text-box>
     </draw:frame></text:p>
-   <text:p text:style-name="P11"/>
-   <text:p text:style-name="P11"/>
-   <text:p text:style-name="P11"/>
-   <text:p text:style-name="P11"/>
-   <text:p text:style-name="P11"/>
-   <text:p text:style-name="P10"><draw:connector text:anchor-type="paragraph" draw:z-index="71" draw:name="Straight Arrow Connector 84" draw:style-name="gr30" draw:type="line" svg:x1="2.2602in" svg:y1="0.8437in" svg:x2="2.6252in" svg:y2="0.8437in" svg:d="m5741 2143h927">
+   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P11"><draw:connector text:anchor-type="paragraph" draw:z-index="71" draw:name="Straight Arrow Connector 84" draw:style-name="gr30" draw:type="line" svg:x1="2.2602in" svg:y1="0.8437in" svg:x2="2.6252in" svg:y2="0.8437in" svg:d="m5741 2143h927">
      <text:p/>
     </draw:connector><draw:frame draw:style-name="fr1" draw:name="Text Box 82" text:anchor-type="paragraph" svg:x="0.7492in" svg:y="0.6146in" svg:width="1.5102in" style:rel-width="scale" svg:height="0.511in" style:rel-height="scale" draw:z-index="69">
      <draw:text-box>
@@ -2546,12 +2810,46 @@
     </draw:frame></text:p>
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">The Main Page Configuration page provides full control of the main-page layout. <text:s/>The number of boxes, their size and location, and their contents can all be controlled from here. <text:s/>Additionally bar-graphs, toggle-icons, and trims can be configured as well.</text:p>
+   <text:p text:style-name="Normal"/>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__5233_308040813"/><text:soft-page-break/>Preview<text:bookmark-end text:name="__RefHeading__5233_308040813"/></text:h>
+   <text:p text:style-name="Text_20_body">The preview box portrays an approximation of <text:s/>the current configuration, and can be used as a reference to see how changing options will effect the main screen.</text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__5235_308040813"/>Trim Postions<text:bookmark-end text:name="__RefHeading__5235_308040813"/></text:h>
+   <text:p text:style-name="Text_20_body">There are 3 options for the Trim Positions:</text:p>
+   <text:list xml:id="list26694000" text:style-name="L1">
+    <text:list-item>
+     <text:p text:style-name="P21">4 outside: Only 4 trims are shown, and they will be placed at the screen edges</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P21">4 inside: Only 4 trims are shown, and they are placeat the middle of the screen</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P21">6 Trims: 6 trims are shown., all placed towards the inside</text:p>
+    </text:list-item>
+   </text:list>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__4594_308040813"/>BarGraphs<text:bookmark-end text:name="__RefHeading__4594_308040813"/></text:h>
+   <text:p text:style-name="Text_20_body">Bargraphs are used to visualize the state of up to 8 output channels. <text:s/>There are 3 possible configurations:</text:p>
+   <text:list xml:id="list26742247" text:style-name="L2">
+    <text:list-item>
+     <text:p text:style-name="P22">None: Bargraphs are disabled and will not be displayed</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P22">4 bars: Up to 4 bars will be displayed using one side of the screen</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P22">8 bars: up to 8 bars will be displayed using both sides of the screen</text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="Text_20_body">Bargraphs will only be displayed if there is room for them. <text:s/>For ‘4 bars’ mode, either boxes 3&amp;4 or 7&amp;8 need to be disabled. <text:s/>For ‘8 bars’, four boxes: 3, 4, 7 and 8 all ned to be disabled.</text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__5237_308040813"/>Boxes<text:bookmark-end text:name="__RefHeading__5237_308040813"/></text:h>
+   <text:p text:style-name="Text_20_body">Boxes are used to display interesting text values <text:s/>Boxes 1, 2, 5, and 6 are large boxes with a big font. <text:s/>Boxes 3, 4, 7, and 8 are smaller and use a smaller font. <text:s/>Currently a box can display one of the timers or one of the output channels.</text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading__5239_308040813"/>Toggle Icons<text:bookmark-end text:name="__RefHeading__5239_308040813"/></text:h>
+   <text:p text:style-name="Text_20_body">Toggle icons are used to display the state of an input or output channel. <text:s/>A toggle is either on (value &gt; 0) or off (value &lt;= 0). <text:s/>Each toggle can have a different icon shown when it is active. <text:s/>Up to 4 toggles can be displayed. <text:s/>If only 4 trims are shown, the 4 toggles will replace the area used by trims 5&amp;6. <text:s/>If 6 trims are shown, only 3 toggles can be shown and they will be placed either in place of box 4 or box 8. <text:s/>The toggles will only be shown if there is room for them (no box or bar-graph is using that space). </text:p>
    <text:p text:style-name="P6"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606781"/><text:bookmark-start text:name="__RefHeading__882_1550650428"/>Mixer<text:bookmark-end text:name="_Toc331606781"/><text:bookmark-end text:name="__RefHeading__882_1550650428"/></text:h>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"><draw:connector text:anchor-type="paragraph" draw:z-index="32" draw:name="Straight Arrow Connector 26" draw:style-name="gr11" draw:type="line" svg:x1="4.5417in" svg:y1="-0.0925in" svg:x2="4.5417in" svg:y2="0.7709in" svg:d="m11536-236v2194">
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__882_1550650428"/><text:bookmark-start text:name="_Toc331606781"/>Mixer<text:bookmark-end text:name="__RefHeading__882_1550650428"/><text:bookmark-end text:name="_Toc331606781"/></text:h>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"><draw:connector text:anchor-type="paragraph" draw:z-index="32" draw:name="Straight Arrow Connector 26" draw:style-name="gr11" draw:type="line" svg:x1="4.5417in" svg:y1="-0.0925in" svg:x2="4.5417in" svg:y2="0.7709in" svg:d="m11536-236v2194">
      <text:p/>
     </draw:connector><draw:frame draw:style-name="fr1" draw:name="Text Box 25" text:anchor-type="paragraph" svg:x="4.4689in" svg:y="-0.4165in" svg:width="0.9165in" style:rel-width="scale" svg:height="0.3228in" style:rel-height="scale" draw:z-index="31">
      <draw:text-box>
@@ -2578,12 +2876,12 @@
     </draw:frame><draw:connector text:anchor-type="paragraph" draw:z-index="38" draw:name="Straight Arrow Connector 34" draw:style-name="gr14" draw:type="line" svg:x1="1.5209in" svg:y1="-0.0925in" svg:x2="1.5209in" svg:y2="0.7709in" svg:d="m3863-236v2194">
      <text:p/>
     </draw:connector></text:p>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"><draw:connector text:anchor-type="paragraph" draw:z-index="36" draw:name="Straight Arrow Connector 32" draw:style-name="gr13" draw:type="line" svg:x1="3.8437in" svg:y1="0.0126in" svg:x2="3.8437in" svg:y2="0.3874in" svg:d="m9763 32v952">
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"><draw:connector text:anchor-type="paragraph" draw:z-index="36" draw:name="Straight Arrow Connector 32" draw:style-name="gr13" draw:type="line" svg:x1="3.8437in" svg:y1="0.0126in" svg:x2="3.8437in" svg:y2="0.3874in" svg:d="m9763 32v952">
      <text:p/>
     </draw:connector></text:p>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"><draw:frame draw:style-name="fr1" draw:name="Text Box 35" text:anchor-type="paragraph" svg:x="3.552in" svg:y="2.7437in" svg:width="1.7291in" style:rel-width="scale" svg:height="0.5327in" style:rel-height="scale" draw:z-index="39">
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"><draw:frame draw:style-name="fr1" draw:name="Text Box 35" text:anchor-type="paragraph" svg:x="3.552in" svg:y="2.7437in" svg:width="1.7291in" style:rel-width="scale" svg:height="0.5327in" style:rel-height="scale" draw:z-index="39">
      <draw:text-box>
       <text:p text:style-name="Normal">Switches that effect the channel</text:p>
       <text:p text:style-name="Normal"/>
@@ -2966,18 +3264,18 @@
       </office:binary-data>
      </draw:image>
     </draw:frame></text:p>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
-   <text:p text:style-name="P12"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
+   <text:p text:style-name="P13"/>
    <text:p text:style-name="Normal">The Deviation mixer is modeled after the Er9x implementation. <text:s/>Each output channel is composed of a series of one or more mixers each of which consists of a single input, an activation switch, and a function/curve that modifies the mixer output. <text:s/>This is a very powerful capability, but it is requires a lot of understanding to make full use of. <text:s/>In order to simplify implementation, there are 3 templates that have been defined to make defining channels easier.</text:p>
    <text:p text:style-name="P6"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606782"/><text:bookmark-start text:name="__RefHeading__884_1550650428"/>Simple Template:<text:bookmark-end text:name="_Toc331606782"/><text:bookmark-end text:name="__RefHeading__884_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__884_1550650428"/><text:bookmark-start text:name="_Toc331606782"/>Simple Template:<text:bookmark-end text:name="__RefHeading__884_1550650428"/><text:bookmark-end text:name="_Toc331606782"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 43" text:anchor-type="as-char" svg:y="0in" svg:width="3.2602in" style:rel-width="scale" svg:height="2.4898in" style:rel-height="scale" draw:z-index="4"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAATkAAADvCAIAAAAGkzQgAAAAAXNSR0IArs4c6QAANstJREFU
        eF7tfS23JEeSZT2dAu8nDFzYsMGABQMWFlggMEBgzxyBBQINBBYILGgoMECggcACgQECCwQW
@@ -3249,7 +3547,7 @@
    <text:p text:style-name="Normal">The simple template is the simplest manner of defining a channel. <text:s/>It allows defining a primary-input (stick, switch, or other channel), and applying a curve or function to that input. <text:s/>The result can also be scaled or have an alternate zero-offset</text:p>
    <text:p text:style-name="Normal">Selecting the ‘Curve’ spinbox or the graph will allow configuring the Curve in the case that a multi-point curve or Expo-rate are chosen.</text:p>
    <text:p text:style-name="Normal"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606783"/><text:bookmark-start text:name="__RefHeading__886_1550650428"/>Expo &amp; Dual-Rate Template:<text:bookmark-end text:name="_Toc331606783"/><text:bookmark-end text:name="__RefHeading__886_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__886_1550650428"/><text:bookmark-start text:name="_Toc331606783"/>Expo &amp; Dual-Rate Template:<text:bookmark-end text:name="__RefHeading__886_1550650428"/><text:bookmark-end text:name="_Toc331606783"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 44" text:anchor-type="as-char" svg:y="0in" svg:width="3.2811in" style:rel-width="scale" svg:height="2.5311in" style:rel-height="scale" draw:z-index="5"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAATsAAADzCAIAAAB2cib9AAAAAXNSR0IArs4c6QAALblJREFU
        eF7tXS2MJUly7h4NaGhouHDhQQMDI2vBgQELBpysBQcWLBhLBgsMFg44WQMODDgw4MDIOrDg
@@ -3477,7 +3775,7 @@
    <text:p text:style-name="Normal">The Expo/Dual-Rate template is a more sophisticated template designed to allow use of toggle or 3-way switches to manipulate an input. <text:s/>The primary-input (stick, switch, or other channel), can have a different curve/function and scaling for each toggle-switch position</text:p>
    <text:p text:style-name="P6"/>
    <text:p text:style-name="Normal"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606784"/><text:bookmark-start text:name="__RefHeading__888_1550650428"/>Complex Template:<text:bookmark-end text:name="_Toc331606784"/><text:bookmark-end text:name="__RefHeading__888_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__888_1550650428"/><text:bookmark-start text:name="_Toc331606784"/>Complex Template:<text:bookmark-end text:name="__RefHeading__888_1550650428"/><text:bookmark-end text:name="_Toc331606784"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 45" text:anchor-type="as-char" svg:y="0in" svg:width="3.2811in" style:rel-width="scale" svg:height="2.4374in" style:rel-height="scale" draw:z-index="6"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAATsAAADqCAIAAABSq3WuAAAAAXNSR0IArs4c6QAANvhJREFU
        eF7tfS243ciR9r3zGFwYaGg4MCAgYEBAgEGAwQKDAIMFBgEGHzBYYGiwwCDAIGBAgMECg4AB
@@ -3748,7 +4046,7 @@
    <text:p text:style-name="Normal">The Complex template unlocks the full power of the mixer system. <text:s/>For a given channel, any number of mixers can be applied to affect the final result. <text:s/>Each mixer is applied based on whether the specified switch is active, and can either replace, add to, or multiply to the previous mixers for this channel. <text:s/>Using this system it should be possible to define an output channel as a combination of any number of inputs.</text:p>
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">A given mixer can be considered to have the general form:</text:p>
-   <text:p text:style-name="Normal">M(x) = if(<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Switch</text:span></text:span>) { <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Src</text:span></text:span> * <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Curve</text:span></text:span> * <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Scale</text:span></text:span> + <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Offs</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">e</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">t</text:span></text:span>} else {0}</text:p>
+   <text:p text:style-name="Normal">M(x) = if(<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Switch</text:span></text:span>) { <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Src</text:span></text:span> * <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Curve</text:span></text:span> * <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Scale</text:span></text:span> + <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T3">Offset</text:span></text:span>} else {0}</text:p>
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">The combination of mixers for a given output channel is defined by the Mux type:</text:p>
    <text:p text:style-name="Normal">For a ‘Replace’ mux:</text:p>
@@ -3756,13 +4054,13 @@
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">For a ‘Multiply’ mux:</text:p>
    <text:p text:style-name="Normal">Cx = if(Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n</text:span></text:span>) {M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n</text:span></text:span>} else {1} * if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n-1</text:span></text:span>) {M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n-1</text:span></text:span>} else {1} * … *</text:p>
-   <text:p text:style-name="P13">if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>) { M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>} else {1}</text:p>
+   <text:p text:style-name="P14">if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>) { M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>} else {1}</text:p>
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">For an ‘Add’ mux:</text:p>
    <text:p text:style-name="Normal">Cx = if(Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n</text:span></text:span>) {M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n</text:span></text:span>} else {0} + if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n-1</text:span></text:span>) {M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">n-1</text:span></text:span>} else {0} + … +</text:p>
-   <text:p text:style-name="P13">if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>) { M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>} else {0}</text:p>
+   <text:p text:style-name="P14">if (Switch<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>) { M<text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T4">0</text:span></text:span>} else {0}</text:p>
    <text:p text:style-name="P6"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606785"/><text:bookmark-start text:name="__RefHeading__890_1550650428"/>Channel configuration:<text:bookmark-end text:name="_Toc331606785"/><text:bookmark-end text:name="__RefHeading__890_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__890_1550650428"/><text:bookmark-start text:name="_Toc331606785"/>Channel configuration:<text:bookmark-end text:name="__RefHeading__890_1550650428"/><text:bookmark-end text:name="_Toc331606785"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 46" text:anchor-type="as-char" svg:y="0in" svg:width="3.3126in" style:rel-width="scale" svg:height="2.4689in" style:rel-height="scale" draw:z-index="7"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAT4AAADtCAIAAACph45SAAAAAXNSR0IArs4c6QAAO6FJREFU
        eF7tfa26JEeSZV19Be5jCArOIywUaCDQQGCAwACBBgIDBBYICgwo0ECggYCAwACBBgILFixY
@@ -4054,7 +4352,7 @@
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">The Channel configuration provides the ability to configure the final channel outputs. <text:s/>Capabilities such as channel reverse and failsafe-values are applied here. <text:s/>Also available are controls for end-points, subtrim, and a safety switch (which could be used to ensure that a motor cannot spin-up while working on a model)</text:p>
    <text:p text:style-name="Normal"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606786"/><text:bookmark-start text:name="__RefHeading__892_1550650428"/>Trims:<text:bookmark-end text:name="_Toc331606786"/><text:bookmark-end text:name="__RefHeading__892_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__892_1550650428"/><text:bookmark-start text:name="_Toc331606786"/>Trims:<text:bookmark-end text:name="__RefHeading__892_1550650428"/><text:bookmark-end text:name="_Toc331606786"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 47" text:anchor-type="as-char" svg:y="0in" svg:width="3.3126in" style:rel-width="scale" svg:height="2.5in" style:rel-height="scale" draw:z-index="8"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAT4AAADwCAIAAAAWz58XAAAAAXNSR0IArs4c6QAAQ+1JREFU
        eF7tfS14HMuSpXQ/gwYLBAYICgoaLDB4wGCAwAKDAQIDDAYYDDBYYGhoMMBggMEDBgMEHjAY
@@ -4385,7 +4683,7 @@
     </draw:frame></text:p>
    <text:p text:style-name="Normal">The trim page allows assigning the trim buttons an trim step. <text:s/>Under normal circumstances it should not be necessary to modify the trim configuration, however in some cases it may be desireable to repurpose unused trims. <text:s/>The Trim-step defines how sensitive the trims are to input. <text:s/>The maximum number of trim steps is +/-100. <text:s/>So a step size of 0.1 will allow a full +/- 10% of trim adjustment on the servo.</text:p>
    <text:p text:style-name="P6"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606787"/><text:bookmark-start text:name="__RefHeading__894_1550650428"/>Model Page:<text:bookmark-end text:name="_Toc331606787"/><text:bookmark-end text:name="__RefHeading__894_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__894_1550650428"/><text:bookmark-start text:name="_Toc331606787"/>Model Page:<text:bookmark-end text:name="__RefHeading__894_1550650428"/><text:bookmark-end text:name="_Toc331606787"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 48" text:anchor-type="as-char" svg:y="0in" svg:width="3.3126in" style:rel-width="scale" svg:height="2.4689in" style:rel-height="scale" draw:z-index="9"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAT4AAADtCAIAAACph45SAAAAAXNSR0IArs4c6QAARbdJREFU
        eF7tfS+cHD1z5uz7M1i44IDhwgUHDAIMDhgcMAgwCDAIMAgw+IBBgEGAoUGAwQcMAgwCDAIM
@@ -4725,7 +5023,7 @@
    <text:p text:style-name="Normal"/>
    <text:p text:style-name="Normal">The model page allows loading and copying models, as well as loading predefined model templates. <text:s/>It also provides configuration options for the current model, including the Model name; Helicopter/Airplane specific configurations; Transmit Protocol; Number of channels to send to the receiver; Transmit Power; and whether a FixedID is enabled.</text:p>
    <text:p text:style-name="Normal"/>
-   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="_Toc331606788"/><text:bookmark-start text:name="__RefHeading__896_1550650428"/>Timer Page:<text:bookmark-end text:name="_Toc331606788"/><text:bookmark-end text:name="__RefHeading__896_1550650428"/></text:h>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__896_1550650428"/><text:bookmark-start text:name="_Toc331606788"/>Timer Page:<text:bookmark-end text:name="__RefHeading__896_1550650428"/><text:bookmark-end text:name="_Toc331606788"/></text:h>
    <text:p text:style-name="Normal"><draw:frame draw:style-name="fr2" draw:name="Picture 49" text:anchor-type="as-char" svg:y="0in" svg:width="3.302in" style:rel-width="scale" svg:height="2.4689in" style:rel-height="scale" draw:z-index="10"><draw:image>
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAT0AAADtCAIAAABCsDVRAAAAAXNSR0IArs4c6QAARIBJREFU
        eF7tfS1wHUuW5tVbgQsaCDyg2Ggg0EBggEEDx0YDgwECCwwFFhgMMBhgMLFhsMDQYIBBgwcG
