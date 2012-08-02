@@ -95,6 +95,7 @@ public:
                 return 1;
             }
             switch(Fl::event_key()) {
+            case '\'':
             case '\\':
                 gui.powerdown = 1;
                 return 1;
