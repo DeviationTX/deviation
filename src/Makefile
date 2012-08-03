@@ -32,8 +32,12 @@ ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
 MODELDIR = filesystem/models
-
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"'
+ifeq "$(wildcard ../.hg )" ""
+  HGVERSION = "\"Unknown\""
+else
+  HGVERSION = "\"$(PACKAGE) `hg parents --template '{node|short}'`\""
+endif
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"' -DHGVERSION=$(HGVERSION)
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
@@ -103,7 +107,8 @@ $(foreach directory,$(sort $(dir $(SRCS))),$(eval $(call define_compile_rules,$(
 
 # phony targets
 .PHONY: clean
-
+hg_version.h:
+	touch hg_version.h
 # recompile if the Makefile changes
 $(OBJS): Makefile
 
