@@ -94,6 +94,10 @@ public:
                 gui.buttons |= (1 << key);
                 return 1;
             }
+			if (!strcmp(k, "\\") || !strcmp(k, "\'")) {
+                gui.powerdown = 1;
+                return 1;
+            }
             switch(Fl::event_key()) {
             case '\'':
             case '\\':
