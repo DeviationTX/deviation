@@ -693,7 +693,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if (WRITE_FULL_MODEL || m->pagecfg.trims)
         fprintf(fh, "%s=%s\n", GUI_TRIM, GUI_TRIM_VAL[m->pagecfg.trims]);
     if (WRITE_FULL_MODEL || m->pagecfg.barsize)
-        fprintf(fh, "%s=%s\n", GUI_TRIM, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
+        fprintf(fh, "%s=%s\n", GUI_BARSIZE, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
     for(idx = 0; idx < 8; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.box[idx]) {
             if(m->pagecfg.box[idx] == 1 || m->pagecfg.box[idx] == 2) {
