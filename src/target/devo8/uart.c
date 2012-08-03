@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 void UART_Initialize()
 {
@@ -42,7 +43,6 @@ void UART_Initialize()
     usart_enable(USART1);
 }
 
-#if 0
 /* Doesnt work :( */
 int _write(int file, char *ptr, int len)
 {
@@ -55,5 +55,4 @@ int _write(int file, char *ptr, int len)
     }
     errno = EIO;
     return -1;
-    }
-#endif
+}
