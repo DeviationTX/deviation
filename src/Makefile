@@ -73,6 +73,9 @@ $(VERBOSE).SILENT:
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
 
+flash: devo8.dfu
+	dfu-util -a 0 -D devo8.dfu
+
 $(OBJS): | $(ODIR)
 
 $(ODIR):
