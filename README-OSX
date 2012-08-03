@@ -1,5 +1,10 @@
 The script util/build-osx.sh should download dependencies and 
 build the deviation emu on Mac OS X. An Xcode installation is required.
+Alternatively fetch fltk:
+port install fltk-devel
+
+and build the emulator with:
+make TARGET=emu-devo8
 
 To create a cross-compile environment, get summon-arm-toolchain from github:
 
@@ -13,7 +18,10 @@ You will need macports and the following build-dependencies as well (these
 instructions can also be found in the summon-arm-toolchain README
 port install gmp mpfr libmpc wget libftdi
 
-Then create a directory /usr/local/arm-none-eabi-gcc and chown it to the
+You may need to update DARWIN_OPT_PATH in summon_arm_toolchain to point at
+/opt/local if you used macports as above
+
+Then create a directory /usr/local/arm-none-eabi and chown it to the
 user you're compiling the toolchain with. Then run the patched
 summon-arm-toolchain and wait.
 
