@@ -17,7 +17,7 @@ struct Model {
     enum ModelType type;
     enum Protocols protocol;
     u8 num_channels;
-    u16 fixed_id;
+    u32 fixed_id;
     enum TxPower tx_power;
     enum SwashType swash_type;
     enum Mode mode;

@@ -122,7 +122,7 @@ static void fixedid_cb(guiObject_t *obj, void *data)
     if(Model.fixed_id == 0)
         mp->fixed_id[0] = 0;
     PAGE_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 6, fixedid_done_cb, NULL);
+    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 99999, fixedid_done_cb, NULL);
 }
 
 /* Text Select Callback */
