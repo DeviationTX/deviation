@@ -126,7 +126,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 
 static void show_titlerow()
 {
-    GUI_CreateLabel(8, 10, MIXPAGE_ChannelNameCB, TITLE_FONT, NULL);
+    GUI_CreateLabel(8, 10, MIXPAGE_ChannelNameCB, TITLE_FONT, (void *)(long)mp->channel);
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
