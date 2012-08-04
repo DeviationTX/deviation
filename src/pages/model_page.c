@@ -82,7 +82,7 @@ void PAGE_ModelInit(int page)
     if(Model.fixed_id == 0)
         sprintf(mp->fixed_id, "None");
     else
-        sprintf(mp->fixed_id, "%d", Model.fixed_id);
+        sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Fixed ID:");
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
 }

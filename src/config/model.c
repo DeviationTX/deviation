@@ -596,7 +596,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
     fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
     if(WRITE_FULL_MODEL || m->fixed_id != 0)
-        fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, m->fixed_id);
+        fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
 
     for(idx = 0; idx < NUM_MIXERS; idx++) {
