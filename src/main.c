@@ -114,7 +114,6 @@ void event_loop(void *param)
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
         PWR_Shutdown();
-        Delay(1000000);
         
     }
     BUTTON_Handler(0);
