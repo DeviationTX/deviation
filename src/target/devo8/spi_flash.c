@@ -175,6 +175,24 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 
     WriteFlashWriteEnable();
 
+    if (writeAddress & 0x01 || length & 0x01) {
+        //Can only use fast mode if the address and data are even
+        while (length) {
+            CS_LO();
+            spi_xfer(SPI1, 0x02);
+            spi_xfer(SPI1, (u8)(writeAddress >> 16));
+            spi_xfer(SPI1, (u8)(writeAddress >>  8));
+            spi_xfer(SPI1, (u8)(writeAddress));
+            spi_xfer(SPI1, ~(*buffer));
+            CS_HI();
+            writeAddress++;
+            buffer++;
+            length--;
+            WaitForWriteComplete();
+        }
+        WriteFlashWriteDisable();
+        return;
+    }
     CS_LO();
     spi_xfer(SPI1, 0xAD);
     spi_xfer(SPI1, (u8)(writeAddress >> 16));

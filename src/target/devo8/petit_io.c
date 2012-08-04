@@ -78,6 +78,7 @@ DRESULT disk_writep (
 		if (sc) {
 			// Initiate write process
 			pos = (sc + SECTOR_OFFSET) * 0x1000;
+			SPIFlash_EraseSector(pos);
 		} else {
 			// Finalize write process
 			pos = 0;
