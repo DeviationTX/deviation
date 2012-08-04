@@ -20,3 +20,5 @@ utils/midicsv/midicsv
 src/filesystem/models/
 src/filesystem/tx.ini
 glob:*.dll
+glob:*~
+.DS_Store
