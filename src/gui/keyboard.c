@@ -16,6 +16,7 @@
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 #include "config/display.h"
+#include <stdlib.h>
 
 enum DrawCmds {
     KB_DRAW,
@@ -46,7 +47,7 @@ static const char * const numpad[] = {
 };
 static const char * const * const array[] = { alpha, numpad, mixed };
 
-guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
+guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, s32 max_size,
         void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
     struct guiObject   *obj = GUI_GetFreeObj();
@@ -64,7 +65,7 @@ guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars
     keyboard->lastchar = '\0';
     keyboard->text = text;
     keyboard->caps = 0;
-    keyboard->num_chars = num_chars;
+    keyboard->max_size = max_size;
     BUTTON_RegisterCallback(&keyboard->action,
          CHAN_ButtonMask(BUT_LEFT)
          | CHAN_ButtonMask(BUT_RIGHT)
@@ -100,7 +101,13 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
         }
         return;
     }
-    if (len >= keyboard->num_chars) 
+    if (keyboard->type == KEYBOARD_NUM) {
+        u32 val = atoi(keyboard->text);
+        val = val * 10 + (ch - '0');
+        if (val > keyboard->max_size)
+            return;
+    }
+    if (len >= keyboard->max_size) 
         return;
     if(! keyboard->caps && ch >= 'A' && ch <= 'Z') {
         ch = (ch - 'A') + 'a';

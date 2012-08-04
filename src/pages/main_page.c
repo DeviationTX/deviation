@@ -33,7 +33,7 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 
 extern s16 Channels[NUM_CHANNELS];
 
-static s16 get_boxval(u8 idx);
+static s32 get_boxval(u8 idx);
 
 struct LabelDesc *get_box_font(u8 idx, u8 neg)
 {
@@ -166,7 +166,7 @@ void PAGE_MainEvent()
     }
 }
 
-s16 get_boxval(u8 idx)
+s32 get_boxval(u8 idx)
 {
     if(idx == 1 || idx == 2)
         return TIMER_GetValue(idx-1);

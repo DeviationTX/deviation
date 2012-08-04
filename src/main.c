@@ -91,6 +91,7 @@ int main() {
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
 #else
+    CLOCK_StartWatchdog();
     while(1)
         event_loop(NULL);
 #endif
@@ -105,6 +106,7 @@ void event_loop(void *param)
     static u32 last_redraw = 0;
     (void)(param);
 
+    CLOCK_ResetWatchdog();
     if(PWR_CheckPowerSwitch()) {
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();

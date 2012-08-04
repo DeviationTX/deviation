@@ -137,7 +137,7 @@ struct guiLabel {
 struct guiKeyboard {
     u8 lastchar;
     char *text;
-    u8 num_chars;
+    s32 max_size;
     u8 caps;
     enum KeyboardType type;
     buttonAction_t action;
@@ -345,7 +345,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);
-guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, u8 num_chars,
+guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, s32 max_size,
         void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
 guiObject_t *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
         u8 num_items, guiObject_t *parent,
