@@ -169,54 +169,81 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 {
     u32 i;
 
-    printf("WriteBytes...\n");
-    
     DisableHWRYBY();
 
-    WriteFlashWriteEnable();
+    if(!length) return; // just in case...
 
-    if (writeAddress & 0x01 || length & 0x01) {
-        //Can only use fast mode if the address and data are even
-        while (length) {
-            CS_LO();
-            spi_xfer(SPI1, 0x02);
-            spi_xfer(SPI1, (u8)(writeAddress >> 16));
-            spi_xfer(SPI1, (u8)(writeAddress >>  8));
-            spi_xfer(SPI1, (u8)(writeAddress));
-            spi_xfer(SPI1, ~(*buffer));
-            CS_HI();
-            writeAddress++;
-            buffer++;
-            length--;
-            WaitForWriteComplete();
-        }
-        WriteFlashWriteDisable();
-        return;
+    // Write single byte at the start, if writeAddress is odd
+
+    if(writeAddress & 0x01) { 
+        //printf("SPI write slow start\r\n");
+        SPIFlash_WriteByte(writeAddress,buffer[0]);
+        buffer++;
+        writeAddress++;
+        length--;       
     }
-    CS_LO();
-    spi_xfer(SPI1, 0xAD);
-    spi_xfer(SPI1, (u8)(writeAddress >> 16));
-    spi_xfer(SPI1, (u8)(writeAddress >>  8));
-    spi_xfer(SPI1, (u8)(writeAddress));
-    spi_xfer(SPI1, ~buffer[0]);
-    spi_xfer(SPI1, ~buffer[1]);
-    CS_HI();
+    
+    // More than one byte left to write -> write even number of bytes in fast mode
+    if(length>1) { 
+        u32 fast_write_length=length&0xFFFFFFFE;
+        
+        //printf("SPI write fast mode, length %d\r\n", fast_write_length);
+        WriteFlashWriteEnable();
 
-    WaitForWriteComplete();
-
-    for(i=2;i<length;i+=2)
-    {
         CS_LO();
         spi_xfer(SPI1, 0xAD);
-        spi_xfer(SPI1, ~buffer[i]);
-        spi_xfer(SPI1, ~buffer[i+1]);
+        spi_xfer(SPI1, (u8)(writeAddress >> 16));
+        spi_xfer(SPI1, (u8)(writeAddress >>  8));
+        spi_xfer(SPI1, (u8)(writeAddress));
+        spi_xfer(SPI1, ~buffer[0]);
+        spi_xfer(SPI1, ~buffer[1]);
         CS_HI();
 
         WaitForWriteComplete();
+
+        for(i=2;i<fast_write_length;i+=2)
+        {
+            CS_LO();
+            spi_xfer(SPI1, 0xAD);
+            spi_xfer(SPI1, ~buffer[i]);
+            spi_xfer(SPI1, ~buffer[i+1]);
+            CS_HI();
+
+            WaitForWriteComplete();
+        }
+        WriteFlashWriteDisable();
+        
+        length-=fast_write_length;
+        buffer+=fast_write_length;
+        writeAddress+=fast_write_length;                
     }
 
-    WriteFlashWriteDisable();
+    // zero or one bytes left to write now
+    if(length) {
+       //printf("SPI write slow finish\r\n");
+       SPIFlash_WriteByte(writeAddress, buffer[0]);
+       
+    }
+
 }
+
+void SPIFlash_WriteByte(u32 writeAddress, const u8 byte) {
+   DisableHWRYBY();
+   WriteFlashWriteEnable();
+   CS_LO();
+   spi_xfer(SPI1, 0x02);
+   spi_xfer(SPI1, (u8)(writeAddress >> 16));
+   spi_xfer(SPI1, (u8)(writeAddress >>  8));
+   spi_xfer(SPI1, (u8)(writeAddress));
+   spi_xfer(SPI1, ~byte);
+   CS_HI();
+   WaitForWriteComplete();
+   WriteFlashWriteDisable();
+
+}
+
+
+
 /*
  *
  */

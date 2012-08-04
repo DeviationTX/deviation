@@ -66,7 +66,10 @@ int main() {
         USB_Connect();
     }
 
+    printf("File system mounted.\r\n");
+
     CONFIG_LoadTx();
+    printf("tx.ini loaded\r\n");
     CONFIG_ReadDisplay();
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
@@ -111,6 +114,8 @@ void event_loop(void *param)
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
         PWR_Shutdown();
+        Delay(1000000);
+        
     }
     BUTTON_Handler(0);
 

@@ -24,9 +24,8 @@
 
 #include "petit_fat.h"
 
-#define dbgprintf(args...) printf(args)
-
-//#define dbgprintf(args...)
+//#define dbgprintf(args...) printf(args)
+#define dbgprintf(args...)
 
 static FATFS fat;
 static bool file_open=false;
