@@ -34,6 +34,9 @@ void PWR_Init(void) {}
 u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
 void CHAN_Init() {}
 
+void CLOCK_StartWatchdog() {}
+void CLOCK_ResetWatchdog() {}
+
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPI_FlashBlockWriteEnable(u8 enable) {(void)enable;}

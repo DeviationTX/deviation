@@ -22,7 +22,17 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/nvic.h>
+#include <libopencm3/stm32/iwdg.h>
 
+//The following is from an unreleased libopencm3
+//We should remove it eventually
+#if 1
+void iwdg_start(void);
+void iwdg_set_period_ms(u32 period);
+bool iwdg_reload_busy(void);
+bool iwdg_prescaler_busy(void);
+void iwdg_reset(void);
+#endif
 
 u32 msecs;
 u16 (*timer_callback)(void);
@@ -108,6 +118,16 @@ void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
     timer_enable_irq(TIM4, TIM_DIER_CC1IE);
 }
 
+void CLOCK_StartWatchdog()
+{
+    iwdg_set_period_ms(1000);
+    iwdg_start();
+}
+
+void CLOCK_ResetWatchdog()
+{
+    iwdg_reset();
+}
 void CLOCK_StopTimer() {
     timer_disable_irq(TIM4, TIM_DIER_CC1IE);
 }
