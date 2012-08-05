@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include "target.h"
 #include "mixer.h"
@@ -44,6 +45,7 @@ const char *tx_stick_names[4] = {
 
 void CHAN_Init()
 {
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
     ADC_Init();
 
     /* configure channels for analog */
@@ -52,6 +54,13 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
 
+    /* configure switches for digital I/O */
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+                   GPIO6 | GPIO7 | GPIO8 | GPIO9
+                   | GPIO10 | GPIO11 | GPIO12 | GPIO13);
+    gpio_set(GPIOC,
+                   GPIO6 | GPIO7 | GPIO8 | GPIO9
+                   | GPIO10 | GPIO11 | GPIO12 | GPIO13);
 }
 
 s16 CHAN_ReadInput(int channel)
@@ -62,6 +71,17 @@ s16 CHAN_ReadInput(int channel)
     case INP_RUDDER:   value = ADC1_Read(11); break;
     case INP_ELEVATOR: value = ADC1_Read(10); break;
     case INP_AILERON:  value = ADC1_Read(12); break;
+    case INP_RUD_DR:   value = ! gpio_get(GPIOC, GPIO8); break;
+    case INP_ELE_DR:   value = ! gpio_get(GPIOC, GPIO7); break;
+    case INP_AIL_DR:   value = ! gpio_get(GPIOC, GPIO11); break;
+    case INP_GEAR:     value = ! gpio_get(GPIOC, GPIO6); break;
+    case INP_MIX0:     value = ! gpio_get(GPIOC, GPIO13); break;
+    case INP_MIX1:     value = (gpio_get(GPIOC, GPIO12) && gpio_get(GPIOC, GPIO13)); break;
+    case INP_MIX2:     value = ! gpio_get(GPIOC, GPIO12); break;
+    case INP_FMOD0:    value = ! gpio_get(GPIOC, GPIO10); break;
+    case INP_FMOD1:    value = (gpio_get(GPIOC, GPIO9) && gpio_get(GPIOC, GPIO10)); break;
+    case INP_FMOD2:    value = ! gpio_get(GPIOC, GPIO9); break;
+
     }
     if(channel <= INP_HAS_CALIBRATION) {
         s32 max = Transmitter.calibration[channel - 1].max;

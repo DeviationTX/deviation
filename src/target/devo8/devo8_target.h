@@ -4,8 +4,8 @@
 //Protocols
 #define PROTO_HAS_CYRF6936
 
-#define NUM_TX_BUTTONS 14
-#define NUM_TX_INPUTS 18
+#define NUM_TX_BUTTONS 18
+#define NUM_TX_INPUTS 14
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
 #define NUM_CHANNELS 12
 
