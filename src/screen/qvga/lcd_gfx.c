@@ -416,6 +416,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         return;
 
     fh = fopen(file, "rb");
+    setbuf(fh, 0);
     if(! fh) {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
         if (w > 0 && h > 0)
