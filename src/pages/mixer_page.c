@@ -19,7 +19,7 @@
 #include "icons.h"
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
-
+static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, void *data);
 static void limitselect_cb(guiObject_t *obj, void *data);
 static const char *show_source(guiObject_t *obj, void *data);
@@ -96,6 +96,8 @@ void show_chantest_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     (void)obj;
+    
+    show_chantest = 1;
     PAGE_ChantestModal(PAGE_MixerInit);
 }
 
@@ -104,6 +106,7 @@ void PAGE_MixerInit(int page)
     (void)page;
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
+    show_chantest = 0;
     mp->firstObj = NULL;
     mp->top_channel = 0;
     PAGE_ShowHeader("Mixer");
@@ -121,6 +124,10 @@ static const char *show_source(guiObject_t *obj, void *data)
 
 void PAGE_MixerEvent()
 {
+    if (show_chantest) {
+        PAGE_ChantestEvent();
+        return;
+    }
     if (mp->cur_mixer && mp->graphs[0]) {
         if(MIX_ReadInputs(mp->raw)) {
             GUI_Redraw(mp->graphs[0]);

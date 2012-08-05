@@ -53,6 +53,7 @@ static void show_page(u8 num_bars)
         cp->value[i] = GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)((long)i));
     }
+    offset = (320 + (SEPERATION - 10) - SEPERATION * (num_bars - count)) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 - height,
                                       SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)((long)i));
