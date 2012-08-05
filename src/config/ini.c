@@ -16,12 +16,7 @@ http://code.google.com/p/inih/
 #define MAX_LINE 200
 #define MAX_SECTION 50
 #define MAX_NAME 50
-//#define DEBUG_FGETS
-#ifdef DEBUG_FGETS
-    #define dbgini printf
-#else
-    #define dbgini if(0) printf
-#endif
+
 /* Strip whitespace chars off end of given string, in place. Return s. */
 static char* rstrip(char* s)
 {
@@ -67,8 +62,7 @@ int ini_parse_file(FILE* file,
                    void* user)
 {
     /* Uses a fair bit of stack (use heap instead if you need to) */
-    char data[MAX_LINE];
-    char *line, *eol;
+    char line[MAX_LINE];
     char section[MAX_SECTION] = "";
     char prev_name[MAX_NAME] = "";
 
@@ -79,46 +73,9 @@ int ini_parse_file(FILE* file,
     int lineno = 0;
     int error = 0;
     int done = 0;
-    int len = 0;
 
     /* Scan through file line by line */
-    line = eol = data + sizeof(data);
-    while (1) {
-        dbgini("*Start: %d : '%s' LINE: %d, EOL: %d\n", len, eol, (int)(line - data), (int)(eol - line));
-        if(done == -1)
-            break;
-        if (eol >= data + sizeof(data) -1) {
-            if (eol == data + sizeof(data) -1) {
-                dbgini("**Setting Last Char\n");
-                //last character in data read is an eol
-                line = eol;
-            }
-            if(data != line )
-                //No end of line
-                memmove(data, line, eol - line);
-            eol = data + (eol - line);
-            line = data;
-            int bytes = fread(eol, 1, sizeof(data) - (eol - data), file);
-            len = eol - data + bytes;
-            dbgini("*Read: %d : '%s' LINE: %d, EOL: %d\n", len, line, (int)(line - data), (int)(eol -line));
-        } else if(eol != data || *eol == '\0') {
-            line = eol + 1;
-        }
-        if (line >= data + len || *line == '\0') {
-            dbgini("**End of file\n");
-            break;
-        }
-        for (eol = line; eol < data + len; eol++) {
-            if(*eol == '\n') {
-                *eol = '\0';
-                break;
-            }
-        }
-        dbgini("*Find EOL: %d : '%s' LINE: %d, EOL: %d\n", len, line, (int)(line - data), (int)(eol -line));
-        if (eol == data + len) {
-            continue;
-        }
-        //printf("%d: %s\n", lineno, line);
+    while (done != -1 && fgets(line, sizeof(line), file) != NULL) {
         lineno++;
 
         start = line;
@@ -172,7 +129,7 @@ int ini_parse_file(FILE* file,
 
                 /* Valid name[=:]value pair found, call handler */
                 strncpy0(prev_name, name, sizeof(prev_name));
-                
+
                 done = handler(user, section, name, value);
                 if (done != 1 && !error)
                     error = lineno;
