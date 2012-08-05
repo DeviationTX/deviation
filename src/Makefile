@@ -113,5 +113,5 @@ $(foreach directory,$(sort $(dir $(SRCS))),$(eval $(call define_compile_rules,$(
 hg_version.h:
 	touch hg_version.h
 # recompile if the Makefile changes
-$(OBJS): Makefile
+$(OBJS): Makefile target/$(TARGET)/Makefile.inc
 
