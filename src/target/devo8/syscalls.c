@@ -20,12 +20,13 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fcntl.h>
 #include <libopencm3/stm32/usart.h>
 
 #include "petit_fat.h"
 
 //#define dbgprintf(args...) printf(args)
-#define dbgprintf(args...)
+#define dbgprintf(args...) 
 
 static FATFS fat;
 static bool file_open=false;
@@ -69,7 +70,9 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
     } else {
         int res=pf_open(file);
         if(res==FR_OK) {
-            dbgprintf("_open_r: pf_open (%s) ok\r\n", file);
+            dbgprintf("_open_r: pf_open (%s) flags: %d, mode: %d ok\r\n", file, flags, mode);
+            if (flags & O_CREAT)
+                pf_maximize_file_size();
             file_open=true;
             return 3;  
         } else {
