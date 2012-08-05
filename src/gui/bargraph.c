@@ -71,7 +71,10 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     LCD_DrawRect(box->x, box->y, box->width, box->height, disp->outline_color);
     
     s32 val = graph->CallBack(graph->cb_data);
-
+    if (val < graph->min)
+        val = graph->min;
+    else if (val > graph->max)
+        val = graph->max;
     switch(graph->direction) {
     case BAR_HORIZONTAL: {
         val = width * (val - graph->min) / (graph->max - graph->min);
