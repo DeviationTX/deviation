@@ -4,6 +4,7 @@ SRC_C  = $(wildcard target/$(TARGET)/*.c)
 LFLAGS = -lfltk
 SCREENSIZE = qvga
 all = $(TARGET)
+CFLAGS := -DEMULATOR
 
 ifdef WINDOWS
     #CROSS=i586-mingw32msvc-
@@ -20,7 +21,7 @@ ifdef WINDOWS
     ODIREXT = -w32
 else
     ifndef SOUND
-        CFLAGS := -DNO_SOUND
+        CFLAGS := -DNO_SOUND $(CFLAGS)
     else
         LFLAGS := $(LFLAGS) -lportaudio
     endif

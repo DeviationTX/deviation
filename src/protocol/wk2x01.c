@@ -23,6 +23,13 @@
 #define PKTS_PER_CHANNEL 4
 #define use_fixedid 0
 
+//Fewer bind packets in the emulator so we can get right to the important bits
+#ifdef EMULATOR
+#define BIND_COUNT 3
+#else
+#define BIND_COUNT 2980
+#endif
+
 enum PktState {
     WK_BIND,
     WK_BOUND_1,
@@ -156,6 +163,7 @@ static void build_data_pkt_2801()
             offset = 1;
         u16 value = get_channel(i);
         //FIXME: The 'chan_dir' may just be 'reverse'
+#if 0
         if (value != last_chan_val[i]) {
             if ((i & 0x03) == 0 || (i & 0x03) == 3) {
                 chan_dir |= (value > last_chan_val[i] ? 1 : 0) << i;
@@ -163,11 +171,12 @@ static void build_data_pkt_2801()
                 chan_dir |= (value < last_chan_val[i] ? 1 : 0) << i;
             }
         }
+#endif
         last_chan_val[i] = value;
         packet[i+offset] = value & 0xff;
         msb = (msb << 2) | ((value >> 8) & 0x03);
     }
-    packet[5] = msb >> 8;
+    packet[4] = msb >> 8;
     packet[9] = msb  & 0xff;
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
@@ -337,7 +346,7 @@ void WK2x01_Initialize()
                ((Model.fixed_id)       & 0x0000ff);
 
     if(! use_fixedid) {
-        bind_counter = 2980;
+        bind_counter = BIND_COUNT;
         state = WK_BIND;
     } else {
         state = WK_BOUND_1;
