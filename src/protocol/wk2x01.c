@@ -106,21 +106,21 @@ static u16 get_channel(u8 ch)
 
 static void build_data_pkt_2401()
 {
-    const u8 ch_map[] = {5, 2, 0, 7};
     u8 i;
     u16 msb = 0;
     chan_dir = 0;
-    for (i = 0; i < 4; i++) {
-        u16 value = get_channel(i);
-        packet[ch_map[i]] = value & 0xff;
-        msb |= ((value >> 8) & 0x03) << (2 * (7 - ch_map[i]));
+    u8 offset = 0;
+    for (i = 0; i < 8; i++) {
+        if (i == 4)
+            offset = 1;
+        u16 value = (i & 0x01) ? 0x200 : get_channel(i >> 1);
+        packet[i+offset] = value & 0xff;
+        msb = (msb << 2) | ((value >> 8) & 0x03);
     }
-    packet[1] = 0x00; // LSB Elevator Trim
-    packet[3] = 0x00; // LSB Aileron Trim
     packet[4] = msb >> 8; //Ele/Ail MSB
-    packet[6] = 0x00; // LSB Throttle Trim
-    packet[8] = 0x00; // LSB Rudder Trim
-    packet[9] = (msb << 2) & 0xff; //Thr/Rud MSB
+    packet[9] = msb & 0xff; //Thr/Rud MSB
+//u8 tmp[] = {0x70, 0x00, 0x02, 0x00, 0x2a, 0x0e, 0x00, 0xfc, 0x00, 0xa6, 0xe0, 0xbd, 0xd4, 0xf0};
+//memcpy(packet, tmp, sizeof(tmp));
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
@@ -341,10 +341,13 @@ void WK2x01_Initialize()
     last_beacon = 0;
     chan_dir = 0;
     memset(last_chan_val, 0, sizeof(last_chan_val));
-    fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
+    if (! Model.fixed_id) {
+        fixed_id = 0x00012345;
+    } else {
+        fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
                ((Model.fixed_id >> 10) & 0x000300) |
                ((Model.fixed_id)       & 0x0000ff);
-
+    }
     if(! use_fixedid) {
         bind_counter = BIND_COUNT;
         state = WK_BIND;
