@@ -17,24 +17,45 @@
 #include "protocol/interface.h"
 #include "misc.h"
 #include "pages.h"
+#include "scanner_page.h"
+#include "config/model.h"
 
-#define MIN_RADIOCHANNEL     0x04
-#define MAX_RADIOCHANNEL     0x54
-static u8 channelnoise[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
-static guiObject_t *bar[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
-static u8 channel;
-static u8 time_to_scan;
+#define sp (pagemem.u.scanner_page)
 
 u16 scan_trigger_cb()
 {
-    time_to_scan = 1;
+    sp.time_to_scan = 1;
     return 1250;
 }
 
 static s16 show_bar_cb(void *data)
 {
     long ch = (long)data;
-    return channelnoise[ch];
+    return sp.channelnoise[ch];
+}
+
+static const char *enablestr_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    return sp.enable ? "Turn Off" : "Turn On";
+}
+static void press_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    sp.enable ^= 1;
+    if (sp.enable) {
+        DEVO_Initialize();  //Switch to DEVO configuration
+        CLOCK_StopTimer();
+        CYRF_ConfigRxTx(0);
+        CYRF_ConfigCRCSeed(0);
+        CLOCK_StartTimer(1250, scan_trigger_cb);
+        //CYRF_ConfigSOPCode(0);
+    } else {
+        CLOCK_StopTimer();
+        PROTOCOL_Init(Model.protocol);
+    }
+    GUI_Redraw(obj);
 }
 
 void PAGE_ScannerInit(int page)
@@ -43,42 +64,43 @@ void PAGE_ScannerInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader("Scanner");
+    sp.enable = 0;
+    GUI_CreateButton(112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
 
-    DEVO_Initialize();  //Switch to DEVO configuration
-    CLOCK_StopTimer();
-    CYRF_ConfigRxTx(0);
-    CYRF_ConfigCRCSeed(0);
-    //CYRF_ConfigSOPCode(0);
-
-
-    time_to_scan = 0;
-    channel = MIN_RADIOCHANNEL;
+    sp.time_to_scan = 0;
+    sp.channel = MIN_RADIOCHANNEL;
     for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
-        bar[i] = GUI_CreateBarGraph(i * 4, 40, 4, 192, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
-        channelnoise[i] = 0x10;
+        sp.bar[i] = GUI_CreateBarGraph(i * 4, 70, 4, 162, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        sp.channelnoise[i] = 0x10;
     }
-    CLOCK_StartTimer(1250, scan_trigger_cb);
 }
 
 void PAGE_ScannerEvent()
 {
     u8 dpbuffer[16];
-    if(time_to_scan) {
-        time_to_scan = 0;
-        CYRF_ConfigRFChannel(channel + MIN_RADIOCHANNEL);
+    if(! sp.enable)
+        return;
+    if(sp.time_to_scan) {
+        sp.time_to_scan = 0;
+        CYRF_ConfigRFChannel(sp.channel + MIN_RADIOCHANNEL);
     CYRF_ReadRSSI(1);
     CYRF_StartReceive();
     Delay(10);
 
     CYRF_ReadDataPacket(dpbuffer);
-        channelnoise[channel] = CYRF_ReadRSSI(1) & 0x1F;
-        GUI_Redraw(bar[channel]);
+        sp.channelnoise[sp.channel] = CYRF_ReadRSSI(1) & 0x1F;
+        GUI_Redraw(sp.bar[sp.channel]);
 
-    //printf("%02X : %d\n",channel,channelnoise[channel]);
+    //printf("%02X : %d\n",sp.channel,sp.channelnoise[sp.channel]);
 
-        channel++;
-        if(channel == MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)
-            channel = 0;
+        sp.channel++;
+        if(sp.channel == MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)
+            sp.channel = 0;
     }
 }
 
+void PAGE_ScannerExit()
+{
+    if(sp.enable)
+        PROTOCOL_Init(Model.protocol);
+}
