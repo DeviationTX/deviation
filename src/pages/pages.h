@@ -9,6 +9,7 @@
 #include "chantest_page.h"
 #include "scanner_page.h"
 #include "usb_page.h"
+#include "calibrate_page.h"
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1
@@ -23,6 +24,7 @@ struct pagemem {
         struct chantest_page chantest_page;
         struct scanner_page scanner_page;
         struct usb_page usb_page;
+        struct calibrate_page calibrate_page;
     } u;
 };
 
@@ -79,6 +81,10 @@ void PAGE_ScannerExit();
 void PAGE_USBInit(int page);
 void PAGE_USBEvent();
 void PAGE_USBExit();
+
+/* USB */
+void PAGE_CalibrateInit(int page);
+void PAGE_CalibrateEvent();
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);

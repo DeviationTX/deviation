@@ -82,3 +82,7 @@ s16 CHAN_ReadInput(int channel)
     }
     return 0;
 }
+s32 CHAN_ReadRawInput(int channel)
+{
+    return CHAN_ReadInput(channel);
+}

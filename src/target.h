@@ -65,7 +65,6 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
 u8 LCD_ImageIsTransparent(const char *file);
 u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h);
-void LCD_CalibrateTouch(void);
 
 /* Touchscreen */
 struct touch {
@@ -100,6 +99,7 @@ void CLOCK_ResetWatchdog();
 /* Sticks */
 void CHAN_Init();
 s16  CHAN_ReadInput(int channel);
+s32  CHAN_ReadRawInput(int channel);
 #define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
 
 /* SPI Flash */

@@ -17,7 +17,6 @@
 #include "protocol/interface.h"
 #include "misc.h"
 #include "pages.h"
-#include "scanner_page.h"
 #include "config/model.h"
 
 #define sp (pagemem.u.scanner_page)

@@ -48,6 +48,7 @@ static const struct page pages[] = {
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
     //{PAGE_TestInit, PAGE_TestEvent, NULL},
     {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit},
+    {PAGE_CalibrateInit, PAGE_CalibrateEvent, NULL},
     {NULL, NULL, NULL},
 };
 

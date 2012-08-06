@@ -63,9 +63,9 @@ void CHAN_Init()
                    | GPIO10 | GPIO11 | GPIO12 | GPIO13);
 }
 
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadRawInput(int channel)
 {
-    u16 value;
+    s32 value;
     switch(channel) {
     case INP_THROTTLE: value = ADC1_Read(13); break;
     case INP_RUDDER:   value = ADC1_Read(11); break;
@@ -81,8 +81,12 @@ s16 CHAN_ReadInput(int channel)
     case INP_FMOD0:    value = ! gpio_get(GPIOC, GPIO10); break;
     case INP_FMOD1:    value = (gpio_get(GPIOC, GPIO9) && gpio_get(GPIOC, GPIO10)); break;
     case INP_FMOD2:    value = ! gpio_get(GPIOC, GPIO9); break;
-
     }
+    return value;
+}
+s16 CHAN_ReadInput(int channel)
+{
+    s32 value = CHAN_ReadRawInput(channel);
     if(channel <= INP_HAS_CALIBRATION) {
         s32 max = Transmitter.calibration[channel - 1].max;
         s32 min = Transmitter.calibration[channel - 1].min;
