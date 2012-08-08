@@ -105,7 +105,7 @@ s16 CHAN_ReadInput(int channel)
     } else {
         value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
-    if (channel == INP_THROTTLE)
+    if (channel == INP_THROTTLE || channel == INP_RUDDER)
         value = -value;
     return value;
 }
