@@ -31,7 +31,7 @@ Building for ARM (on Windows):
         http://www.yagarto.de/#download
     1a) add YAGARTO to your PATH (I like to put this into ~/.profile
         so it is there each time I start msys)
-        export PATH=/mingw/stm32:$PATH
+        export PATH=/mingw/stm32/bin:$PATH
     2) download and unpack libopencm3
        download here (rename to .zip if needed): https://github.com/libopencm3/libopencm3/zipball/master
        unzip into ~/src/
