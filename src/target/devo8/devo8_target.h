@@ -9,7 +9,7 @@
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
 #define NUM_CHANNELS 12
 
-#define NUM_TRIMS 4
+#define NUM_TRIMS 6
 #define MAX_POINTS 13
 #define NUM_MIXERS 16
 

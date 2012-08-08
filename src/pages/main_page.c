@@ -168,7 +168,7 @@ s32 get_boxval(u8 idx)
 {
     if(idx == 1 || idx == 2)
         return TIMER_GetValue(idx-1);
-    return Channels[idx-3];
+    return RANGE_TO_PCT(Channels[idx-3]);
 }
 
 void PAGE_MainExit()
