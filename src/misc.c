@@ -4,8 +4,10 @@ void Delay(u32 count)
 {
     while(count) {
         int i = 0; //72000;
-        while(i)
+        while(i) {
             i--;
+            asm volatile ("nop"); // prevent the optimizer from removing this loop
+        }
         count--;
     }
 }

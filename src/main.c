@@ -33,15 +33,14 @@ int main() {
 
     PWR_Init();
     CLOCK_Init();
+    UART_Initialize();
     Initialize_ButtonMatrix();
-    Delay(0x2710);
 
     LCD_Init();
     CHAN_Init();
 
     SPIFlash_Init();
     CYRF_Initialize();
-    UART_Initialize();
     SPITouch_Init();
     SOUND_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash

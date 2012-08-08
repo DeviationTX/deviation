@@ -17,7 +17,7 @@ typedef uint64_t u64;
 //Load target-specific include
 #include TARGET_H
 
-extern s16 Channels[NUM_CHANNELS];
+extern volatile s16 Channels[NUM_CHANNELS];
 
 /* General Functions */
 void ModelName(u8 *var, u8 len);

@@ -33,7 +33,20 @@
 #define MIX_CYC2 (NUM_TX_INPUTS + 2)
 #define MIX_CYC3 (NUM_TX_INPUTS + 3)
 
-s16 Channels[NUM_CHANNELS];
+// Channels should be volatile:
+// This array is written from the main event loop
+// and read from an interrupt service routine.
+// volatile makes sure, each access to the array
+// will be an actual access to the memory location
+// an element is stored in.
+// If it is omitted, the optimizer might create a 
+// "short cut", removing seemingly unneccessary memory accesses,
+// and thereby preventing the propagation of an update from
+// the main loop to the interrupt routine (since the optimizer
+// has no clue about interrupts)
+
+volatile s16 Channels[NUM_CHANNELS];
+
 struct Transmitter Transmitter;
 
 static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
@@ -266,7 +279,7 @@ u8 switch_is_on(u8 sw, s16 *raw)
 
 void TEST_init_mixer()
 {
-    memset(Channels, 0, sizeof(Channels));
+    memset((void *)Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     PROTOCOL_Init(Model.protocol);

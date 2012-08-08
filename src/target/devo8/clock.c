@@ -34,7 +34,7 @@ bool iwdg_prescaler_busy(void);
 void iwdg_reset(void);
 #endif
 
-u32 msecs;
+volatile u32 msecs;
 u16 (*timer_callback)(void);
 u8 msec_callbacks;
 u32 msec_cbtime[NUM_MSEC_CALLBACKS];

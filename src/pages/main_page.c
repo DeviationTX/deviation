@@ -31,8 +31,6 @@ void press_icon2_cb(guiObject_t *obj, void *data);
 void press_box_cb(guiObject_t *obj, s8 press_type, void *data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 
-extern s16 Channels[NUM_CHANNELS];
-
 static s32 get_boxval(u8 idx);
 
 struct LabelDesc *get_box_font(u8 idx, u8 neg)
