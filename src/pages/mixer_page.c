@@ -129,7 +129,7 @@ void PAGE_MixerEvent()
         return;
     }
     if (mp->cur_mixer && mp->graphs[0]) {
-        if(MIX_ReadInputs(mp->raw)) {
+        if(MIX_ReadInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
             GUI_Redraw(mp->graphs[0]);
             if (mp->graphs[1])
                 GUI_Redraw(mp->graphs[1]);

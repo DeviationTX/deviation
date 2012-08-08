@@ -24,6 +24,7 @@
 #include "buttons.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include <stdlib.h>
 
 #define SWASH_INV_ELEVATOR_MASK   1
 #define SWASH_INV_AILERON_MASK    2
@@ -114,15 +115,15 @@ u8 MIXER_MapChannel(u8 channel)
     return channel;
 }
 
-u8 MIX_ReadInputs(s16 *raw)
+u8 MIX_ReadInputs(s16 *raw, u8 threshold)
 {
-    u8 changed;
+    u8 changed = 0;
     u8 i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
         u8 mapped_channel = MIXER_MapChannel(i);
         s16 value = CHAN_ReadInput(mapped_channel);
-        if (value != raw[i]) {
+        if (abs(value - raw[i]) > threshold) {
             changed = 1;
             raw[i] = value;
         }
@@ -135,7 +136,7 @@ void MIX_CalcChannels()
     //We retain this array so that we can refer to the prevous values in the next iteration
     int i;
     //1st step: Read Tx inputs
-    MIX_ReadInputs(raw);
+    MIX_ReadInputs(raw, 0);
     //2nd step: calculate virtual channels (CCPM, etc)
     MIX_CreateCyclicInputs(raw);
     //3rd steps
