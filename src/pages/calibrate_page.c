@@ -18,8 +18,16 @@
 #include "gui/gui.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "icons.h"
 
 #define cp (pagemem.u.calibrate_page)
+enum calibType {
+    CALIB_NONE,
+    CALIB_TOUCH,
+    CALIB_TOUCH_TEST,
+    CALIB_STICK,
+    CALIB_STICK_TEST,
+};
 
 static void get_coords(struct touch *t)
 {
@@ -129,36 +137,72 @@ static const char *calibratestr_cb(guiObject_t *obj, void *data)
     (void)obj;
     return (long)data & 1 ? "Calibrate" : "Test";
 }
+const char *coords_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(cp.tmpstr, "%d*%d-%d-%d", cp.coords.x, cp.coords.y, cp.coords.z1, cp.coords.z2);
+    return cp.tmpstr;
+}
+
+static void okcancel_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    PAGE_CalibrateInit(0);
+}
 
 static void press_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     cp.enable = (long)data;
+    if (cp.enable == CALIB_TOUCH_TEST) {
+        PAGE_RemoveAllObjects();
+        PAGE_SetModal(1);
+        //PAGE_CreateOkButton(264, 4, okcancel_cb);
+        GUI_CreateIcon(0, 0, &icons[ICON_EXIT], okcancel_cb, (void *)0);
+        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Touch Test");
+        cp.textbox = GUI_CreateLabelBox(85, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
+        memset(&cp.coords, 0, sizeof(cp.coords));
+    }
 }
 void PAGE_CalibrateInit(int page)
 {
     (void)page;
-    cp.enable = 0;
+    cp.enable = CALIB_NONE;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader("Calibrate");
 
     GUI_CreateLabelBox(20, 106, 0, 0, &DEFAULT_FONT, NULL, NULL, "Screen");
-    GUI_CreateButton(80, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)1);
-    // GUI_CreateButton(180, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)2);
+    GUI_CreateButton(80, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+    GUI_CreateButton(180, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
     GUI_CreateLabelBox(20, 146, 0, 0, &DEFAULT_FONT, NULL, NULL, "Sticks");
-    GUI_CreateButton(80, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)3);
-    // GUI_CreateButton(180, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)4);
+    GUI_CreateButton(80, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+    // GUI_CreateButton(180, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
 }
 
 void PAGE_CalibrateEvent()
 {
     switch(cp.enable) {
-        case 1: calibrate_touch(); break;
-        case 2: break;
-        case 3: calibrate_sticks(); break;
-        case 4: break;
-        default: break;
+    case CALIB_TOUCH:
+        calibrate_touch();
+        break;
+    case CALIB_TOUCH_TEST: {
+        struct touch t;
+        if (SPITouch_IRQ()) {
+            t = SPITouch_GetCoords();
+            if (memcmp(&t, &cp.coords, sizeof(t)) != 0)
+                cp.coords = t;
+                GUI_Redraw(cp.textbox);
+        }
+        break;
+    }
+    case CALIB_STICK:
+        calibrate_sticks();
+        break;
+    case CALIB_STICK_TEST:
+    default: break;
     }
 }
 
