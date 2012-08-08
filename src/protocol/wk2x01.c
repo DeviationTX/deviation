@@ -342,12 +342,14 @@ void WK2x01_Initialize()
     chan_dir = 0;
     memset(last_chan_val, 0, sizeof(last_chan_val));
     if (! Model.fixed_id) {
-        fixed_id = 0x00012345;
+        fixed_id = 0x00FFFFFF;
     } else {
         fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
                ((Model.fixed_id >> 10) & 0x000300) |
                ((Model.fixed_id)       & 0x0000ff);
     }
+    if (Model.protocol == PROTOCOL_WK2401)
+        fixed_id |= 0x01;  //Fixed ID must be odd for 2401
     if(! use_fixedid) {
         bind_counter = BIND_COUNT;
         state = WK_BIND;
