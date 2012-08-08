@@ -86,7 +86,7 @@ void PAGE_MainInit(int page)
             mp->boxObj[i] = NULL;
         }
     }
-    for(i = 0; i < 10; i++) {
+    for(i = 0; i < 8; i++) {
         if (i >= NUM_CHANNELS)
             break;
         if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {

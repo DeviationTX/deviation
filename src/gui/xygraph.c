@@ -98,7 +98,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
         LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
     }
-    u16 lastx, lasty;
+    u16 lastx = 0, lasty = 0;
     for (x = 0; x < box->width; x++) {
         s32 xval, yval;
         xval = graph->min_x + x * (1 + graph->max_x - graph->min_x) / box->width;

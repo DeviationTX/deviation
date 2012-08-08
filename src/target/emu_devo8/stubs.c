@@ -63,7 +63,7 @@ void CYRF_GetMfgData(u8 data[]) {
     memcpy(data, d, 6);
 }
 
-int FS_Mount() {chdir("filesystem"); return 1;}
+int FS_Mount() {return ! chdir("filesystem");}
 
 void CYRF_StartReceive() {}
 void CYRF_ConfigCRCSeed(u16 crc) {

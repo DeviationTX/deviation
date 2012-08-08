@@ -195,6 +195,7 @@ void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
         case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;
         case TEXTSELECT_96:  fileidx = enable ? FILE_SPINPRESS64 : FILE_SPIN64; break;
         case TEXTSELECT_64:  fileidx = enable ? FILE_SPINPRESS32 : FILE_SPIN32; break;
+        default: fileidx = FILE_SPIN32; break;
     }
     if (select->button != &image_map[fileidx]) {
         select->button = &image_map[fileidx];

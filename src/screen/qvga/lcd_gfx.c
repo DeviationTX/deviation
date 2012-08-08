@@ -478,7 +478,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     LCD_DrawStart(x, y, x + w - 1, y + h - 1, DRAW_SWNE);
     /* Bitmap start is at lower-left corner */
     for (j = 0; j < h; j++) {
-        fread(buf, 2 * w, 1, fh);
+        if (fread(buf, 2 * w, 1, fh) != 1)
+            break;
         u16 *color = (u16 *)buf;
         if(transparent) {
             u8 last_pixel_transparent = row_has_transparency;

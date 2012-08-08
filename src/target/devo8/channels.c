@@ -65,7 +65,7 @@ void CHAN_Init()
 
 s32 CHAN_ReadRawInput(int channel)
 {
-    s32 value;
+    s32 value = 0;
     switch(channel) {
     case INP_THROTTLE: value = ADC1_Read(13); break;
     case INP_RUDDER:   value = ADC1_Read(11); break;

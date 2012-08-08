@@ -102,11 +102,11 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
         return;
     }
     if (keyboard->type == KEYBOARD_NUM) {
-        u32 val = atoi(keyboard->text);
+        s32 val = atoi(keyboard->text);
         val = val * 10 + (ch - '0');
         if (val > keyboard->max_size)
             return;
-        sprintf(keyboard->text, "%d", val);
+        sprintf(keyboard->text, "%d", (int)val);
         kb_draw_text(keyboard->text);
         return;
     }
@@ -351,7 +351,7 @@ static u8 press_cb(u32 button, u8 flags, void *data)
             keyboard_cmd(KB_PRESS, keyboard, NULL);
             return 1;
         }
-        u8 row, col;
+        u8 row = 0, col= 0;
         keys = array[keyboard->type];
         find_row_col(keys, keyboard->lastchar, &row, &col);
         if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {

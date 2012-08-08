@@ -84,7 +84,7 @@ u32 BUTTON_Handler(u8 flags)
 {
     buttonAction_t *ptr = buttonHEAD;
     u32 testbutton = 0;
-    u8 testflags;
+    u8 testflags = 0;
     if(! flags) {
         u32 buttons = ScanButtons();
         if(buttons != last_buttons) {
