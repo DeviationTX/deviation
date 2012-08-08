@@ -461,24 +461,39 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     (void)data;
     (void)flags;
     int i;
-    static u8 short_press = 1;
+    static u8 step_size = 1;
     if (flags & BUTTON_PRESS)
-        short_press = 1;
-    s8 step = flags & BUTTON_LONGPRESS ? (10 - short_press) : 1;
+        step_size = 1;
+    if (flags & BUTTON_LONGPRESS) {
+        if (step_size == 1)
+            step_size = 9;
+        else if (step_size == 9)
+            step_size = 10;
+    }
+    if (! step_size)
+        return 1;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Transmitter.Trims[i]) - step;
-            Transmitter.Trims[i] = tmp < -100 ? -100 : tmp;
+            int tmp = (int)(Transmitter.Trims[i]) - step_size;
+            if ((int)(Transmitter.Trims[i]) > 0 && tmp <= 0) {
+                Transmitter.Trims[i] = 0;
+                step_size = 0;
+            } else {
+                Transmitter.Trims[i] = tmp < -100 ? -100 : tmp;
+            }
             break;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Transmitter.Trims[i]) + step;
-            Transmitter.Trims[i] = tmp > 100 ? 100 : tmp;
+            int tmp = (int)(Transmitter.Trims[i]) + step_size;
+            if ((int)(Transmitter.Trims[i]) < 0 && tmp >= 0) {
+                Transmitter.Trims[i] = 0;
+                step_size = 0;
+            } else {
+                Transmitter.Trims[i] = tmp > 100 ? 100 : tmp;
+            }
             break;
         }
     }
-    if (flags & BUTTON_LONGPRESS)
-        short_press = 0;
     return 1;
 }
 

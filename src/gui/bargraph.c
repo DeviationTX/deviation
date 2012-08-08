@@ -75,10 +75,16 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         val = graph->min;
     else if (val > graph->max)
         val = graph->max;
+    s32 center = (graph->max + graph->min) / 2;
+    u16 color = val > center
+                ? disp->fg_color_pos
+                : val < center
+                  ? disp->fg_color_neg
+                  : disp->fg_color_zero;
     switch(graph->direction) {
     case BAR_HORIZONTAL: {
         val = width * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(x, y, val, height, disp->fg_color);
+        LCD_FillRect(x, y, val, height, color);
         if (Display.flags & BAR_TRANSPARENT) {
             GUI_DrawBackground(x + val, y, width - val, height);
         } else {
@@ -88,7 +94,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
     }
     case BAR_VERTICAL: {
         val = height * (val - graph->min) / (graph->max - graph->min);
-        LCD_FillRect(x, y + (height - val), width, val, disp->fg_color);
+        LCD_FillRect(x, y + (height - val), width, val, color);
         if (Display.flags & BAR_TRANSPARENT) {
             GUI_DrawBackground(x, y, width, height - val);
         } else {
@@ -107,7 +113,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         LCD_DrawFastVLine(x + width / 2, y, height, disp->outline_color); //Center
         LCD_FillRect(x + val - TRIM_THICKNESS / 2,
                      y + TRIM_MARGIN,
-                     TRIM_THICKNESS, height - TRIM_MARGIN * 2, disp->fg_color);
+                     TRIM_THICKNESS, height - TRIM_MARGIN * 2, color);
         break;
     }
     case TRIM_VERTICAL: {
@@ -121,7 +127,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         LCD_DrawFastHLine(x, y + height / 2, width, disp->outline_color); //Center
         LCD_FillRect(x + TRIM_MARGIN,
                      y + (height - val) - TRIM_THICKNESS / 2,
-                     width - TRIM_MARGIN * 2, TRIM_THICKNESS, disp->fg_color);
+                     width - TRIM_MARGIN * 2, TRIM_THICKNESS, color);
         break;
     }
     }

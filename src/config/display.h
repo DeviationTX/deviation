@@ -40,7 +40,9 @@ struct disp_listbox {
 
 struct disp_bargraph {
     u16 bg_color;
-    u16 fg_color;
+    u16 fg_color_pos;
+    u16 fg_color_neg;
+    u16 fg_color_zero;
     u16 outline_color;
 };
 struct disp_scrollbar {

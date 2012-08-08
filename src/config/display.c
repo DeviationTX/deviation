@@ -26,6 +26,9 @@ static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbo
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
 static const char FG_COLOR[] = "fg_color";
+static const char FG_COLOR_POS[] = "fg_color_pos";
+static const char FG_COLOR_NEG[] = "fg_color_neg";
+static const char FG_COLOR_ZERO[] = "fg_color_zero";
 static const char OUTLINE_COLOR[] = "outline_color";
 static const char FONT_COLOR[] = "font_color";
 static const char IS_TRANSPARENT[] = "transparent";
@@ -97,7 +100,19 @@ static int handle_bargraph(struct display_settings *d, u8 idx, const char *name,
         return 1;
     }
     if(MATCH_KEY(FG_COLOR)) {
-        graph->fg_color = get_color(value);
+        graph->fg_color_pos = graph->fg_color_neg = graph->fg_color_zero = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(FG_COLOR_POS)) {
+        graph->fg_color_pos = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(FG_COLOR_NEG)) {
+        graph->fg_color_neg = get_color(value);
+        return 1;
+    }
+    if(MATCH_KEY(FG_COLOR_ZERO)) {
+        graph->fg_color_zero = get_color(value);
         return 1;
     }
     if(MATCH_KEY(OUTLINE_COLOR)) {
