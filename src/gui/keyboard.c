@@ -106,6 +106,9 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
         val = val * 10 + (ch - '0');
         if (val > keyboard->max_size)
             return;
+        sprintf(keyboard->text, "%d", val);
+        kb_draw_text(keyboard->text);
+        return;
     }
     if (len >= keyboard->max_size) 
         return;
