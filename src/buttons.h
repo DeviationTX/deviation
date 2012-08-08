@@ -13,6 +13,7 @@ enum ButtonFlags {
     BUTTON_PRESS         = 0x01,
     BUTTON_RELEASE       = 0x02,
     BUTTON_LONGPRESS     = 0x04,
+    BUTTON_REPEAT        = 0x20,
     BUTTON_HAD_LONGPRESS = 0x40,
     BUTTON_PRIORITY      = 0x80,
 };

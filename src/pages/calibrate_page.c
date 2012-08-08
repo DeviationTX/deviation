@@ -18,7 +18,6 @@
 #include "gui/gui.h"
 #include "config/tx.h"
 #include "config/model.h"
-#include "icons.h"
 
 #define cp (pagemem.u.calibrate_page)
 enum calibType {
@@ -182,9 +181,7 @@ static void press_cb(guiObject_t *obj, void *data)
     if (cp.enable == CALIB_TOUCH) {
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
-        //PAGE_CreateOkButton(264, 4, okcancel_cb);
-        GUI_CreateIcon(0, 0, &icons[ICON_EXIT], okcancel_cb, (void *)0);
-        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Touch Calibrate");
+        PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb);
         cp.textbox = GUI_CreateLabelBox(XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
         cp.textbox1 = GUI_CreateLabelBox(130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
         memset(&cp.coords, 0, sizeof(cp.coords));
@@ -193,9 +190,7 @@ static void press_cb(guiObject_t *obj, void *data)
     if (cp.enable == CALIB_TOUCH_TEST) {
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
-        //PAGE_CreateOkButton(264, 4, okcancel_cb);
-        GUI_CreateIcon(0, 0, &icons[ICON_EXIT], okcancel_cb, (void *)0);
-        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Touch Test");
+        PAGE_ShowHeader_ExitOnly("Touch Test", okcancel_cb);
         cp.textbox = GUI_CreateLabelBox(60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
         memset(&cp.coords, 0, sizeof(cp.coords));
     }

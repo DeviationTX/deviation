@@ -31,6 +31,7 @@ struct pagemem {
 extern struct pagemem pagemem;
 
 void PAGE_ShowHeader(const char *title);
+void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, void *data));
 u8 PAGE_SetModal(u8 _modal);
 u8 PAGE_GetModal();
 void PAGE_SetSection(u8 section);

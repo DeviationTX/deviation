@@ -15,7 +15,6 @@
 
 #include "target.h"
 #include "pages.h"
-#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
@@ -102,9 +101,7 @@ void PAGE_ChantestModal(void(*return_page)(int page))
     cp->type = 0;
     PAGE_RemoveAllObjects();
 
-    //PAGE_CreateOkButton(264, 4, okcancel_cb);
-    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], okcancel_cb, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Channels");
+    PAGE_ShowHeader_ExitOnly("Channels", okcancel_cb);
 
     show_page(Model.num_channels);
 }

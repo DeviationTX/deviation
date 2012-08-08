@@ -105,7 +105,7 @@ u32 BUTTON_Handler(u8 flags)
     } else if (flags == BUTTON_LONGPRESS) {
         if (last_buttons && button_time++ >= 4 && (button_time & 0x01)) {
             testbutton = last_buttons;
-            testflags = BUTTON_LONGPRESS;
+            testflags = BUTTON_LONGPRESS | (long_press ? BUTTON_REPEAT : 0);
             long_press = 1;
         } else {
             return 0;
