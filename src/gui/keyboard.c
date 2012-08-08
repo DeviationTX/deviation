@@ -160,6 +160,7 @@ static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
         }
     } else {
         ch[0] = c;
+        ch[1] = 0;
         str = ch;
         if (pressed) {
             bg_color = Display.keyboard.bg_key2;
