@@ -111,6 +111,7 @@ static void fixedid_done_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     Model.fixed_id = atoi(mp->fixed_id);
+printf("Convert %s => %d\n", mp->fixed_id, Model.fixed_id);
     GUI_RemoveObj(obj);
     PAGE_ModelInit(0);
 }

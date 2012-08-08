@@ -281,7 +281,13 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
         keyboard->lastchar = c;
     } else if (press_type == -1 && keyboard->lastchar) {
         //Key Release
-        if (keyboard->lastchar == '\x09') { //CAPS
+        if (keyboard->lastchar == '\x06') { //DONE
+            keyboard->lastchar = '\0';
+            if (keyboard->CallBack)
+                keyboard->CallBack(obj, keyboard->cb_data);
+            //After DONE it is possible that obj and keyboard are invalid
+            return 1;
+        } else if (keyboard->lastchar == '\x09') { //CAPS
             keyboard->caps = ! keyboard->caps;
             keyboard_cmd(KB_DRAW, keyboard, NULL);
         } else if (keyboard->lastchar == '\x01' || keyboard->lastchar == '\x02') { //Numpad
@@ -290,13 +296,6 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
         } else {
             keyboard_cmd(KB_RELEASE, keyboard, NULL);
             kb_update_string(keyboard, keyboard->lastchar);
-        }
-        if (keyboard->lastchar == '\x06') { //DONE
-            keyboard->lastchar = '\0';
-            if (keyboard->CallBack)
-                keyboard->CallBack(obj, keyboard->cb_data);
-            //After DONE it is possible that obj and keyboard are invalid
-            return 1;
         }
         keyboard->lastchar = '\0';
     } else if (press_type == 1 && keyboard->lastchar == '\x08') {
