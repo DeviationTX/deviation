@@ -573,6 +573,11 @@ void GUI_SetSelectable(guiObject_t *obj, u8 selectable)
     }
 }
 
+u8 GUI_ObjectNeedsRedraw(guiObject_t *obj)
+{
+    return OBJ_IS_DIRTY(obj);
+}
+
 void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
 {
     LCD_DrawWindowedImageFromFile(x, y, map->file, map->width, map->height,
