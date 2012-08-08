@@ -98,13 +98,16 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
         LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
     }
-    u16 lastx = 0, lasty = 0;
+    u16 lastx = box->x;
+    u16 lasty = box->y + box->height -1;
+    LCD_DrawStart(box->x, box->y, box->x + box->width - 1, box->y + box->height - 1, DRAW_NWSE);
     for (x = 0; x < box->width; x++) {
         s32 xval, yval;
         xval = graph->min_x + x * (1 + graph->max_x - graph->min_x) / box->width;
         yval = graph->CallBack(xval, graph->cb_data);
         y = (yval - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y);
-        //printf("(%d, %d) -> (%d, %d)\n", (int)x, (int)y, (int)xval, (int)yval);
+        //printf("(%d, %d - %d, %d) -> (%d, %d)\n",
+        //       (int)lastx, (int)lasty, (int)x, (int)y, (int)xval, (int)yval);
         if (x != 0) {
             LCD_DrawLine(lastx, lasty, x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
         }
