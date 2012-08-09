@@ -163,7 +163,7 @@ const char *show_msg_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(cp.tmpstr, "Touch taget %d", cp.state < 3 ? 1 : 2);
+    sprintf(cp.tmpstr, "Touch target %d", cp.state < 3 ? 1 : 2);
     return cp.tmpstr;
 }
 
@@ -181,10 +181,12 @@ static void press_cb(guiObject_t *obj, void *data)
     if (cp.enable == CALIB_TOUCH) {
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
-        PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb);
+        //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
+        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Touch Calibrate");
         cp.textbox = GUI_CreateLabelBox(XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
         cp.textbox1 = GUI_CreateLabelBox(130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
         memset(&cp.coords, 0, sizeof(cp.coords));
+        SPITouch_Calibrate(0x10000, 0x10000, 0, 0);
         cp.state = 0;
     }
     if (cp.enable == CALIB_TOUCH_TEST) {
