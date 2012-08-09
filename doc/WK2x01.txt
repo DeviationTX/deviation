@@ -55,11 +55,12 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 10 kk: TxID1
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
-13 nn: channel_direction
+13 nn: sign bit.  set to 1 for each channel when the value < 0.  Uses same mask as failsafe below
 14 oo: xor 0x25 with bytes 0-13
 15 pp: checksum (0x25 + sum(bytes 0-13)) modulo 0x100
 
-The smallest value observed is 0x000, the largest 0x190 (low rates?)
+A value of 0x000 is servo center. The largest value is 0x190 (whch corresponds to 100% servo throw)
+Positive/negative servo direction is controlled by byte 13
 Channel   byte9    byte4   lower8byte
 01 Thr   ........ xx......    00
 02 Ail   ........ ..xx....    01
@@ -102,7 +103,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 10 kk: TxID1
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
-13 nn: channel-direction (same value as previous data packet)
+13 nn: sign bit.  set to 1 for each channel when the value < 0.  Uses same mask as failsafe below
 14 oo: xor 0x1C with bytes 0-13
 15 pp: checksum (0x1C + sum(bytes 0-13)) modulo 0x100
 

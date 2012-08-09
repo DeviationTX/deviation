@@ -56,7 +56,6 @@ static u32 fixed_id;
 static u8 radio_ch[3];
 static u8 *radio_ch_ptr;
 static u8 pkt_num;
-static u16 last_chan_val[8];
 static u8 chan_dir;
 static u8 last_beacon;
 
@@ -96,12 +95,23 @@ static void build_bind_pkt(const char *init)
 
 static u16 get_channel(u8 ch)
 {
-#define MAX_CHAN_VAL 0x3ef
+#define MAX_CHAN_VAL 0x3EF
     s32 value = (s32)Channels[ch] * (MAX_CHAN_VAL / 2) / CHAN_MAX_VALUE + (MAX_CHAN_VAL / 2);
     if (value < 0)
         value = 0;
-    if (value > MAX_CHAN_VAL)
-        value = MAX_CHAN_VAL;
+    if (value > 0x3ff)
+        value = 0x3ff;
+    return value;
+}
+
+static s16 get_channel_2801(u8 ch)
+{
+#define CHAN_SCALAR 0x190
+    s32 value = (s32)Channels[ch] * CHAN_SCALAR / CHAN_MAX_VALUE;
+    if (value < -0x3ff)
+        value = -0x3ff;
+    if (value > 0x3ff)
+        value = 0x3ff;
     return value;
 }
 
@@ -158,31 +168,23 @@ static void build_data_pkt_2801()
     u8 i;
     u16 msb = 0;
     u8 offset = 0;
-    chan_dir = 0;
+    u8 sign = 0;
     for (i = 0; i < 8; i++) {
         if (i == 4)
             offset = 1;
-        u16 value = get_channel(i);
-        //FIXME: The 'chan_dir' may just be 'reverse'
-#if 0
-        if (value != last_chan_val[i]) {
-            if ((i & 0x03) == 0 || (i & 0x03) == 3) {
-                chan_dir |= (value > last_chan_val[i] ? 1 : 0) << i;
-            } else {
-                chan_dir |= (value < last_chan_val[i] ? 1 : 0) << i;
-            }
-        }
-#endif
-        last_chan_val[i] = value;
-        packet[i+offset] = value & 0xff;
-        msb = (msb << 2) | ((value >> 8) & 0x03);
+        s16 value = get_channel_2801(i);
+        u16 mag = value < 0 ? -value : value;
+        packet[i+offset] = mag & 0xff;
+        msb = (msb << 2) | ((mag >> 8) & 0x03);
+        if (value < 0)
+            sign |= 1 << i;
     }
     packet[4] = msb >> 8;
     packet[9] = msb  & 0xff;
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
-    packet[13] = chan_dir;
+    packet[13] = sign;
     add_pkt_crc(0x25);
 }
 
@@ -215,7 +217,7 @@ static void build_beacon_pkt_2801()
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
-    packet[13] = chan_dir;
+    packet[13] = 0x00; //Does this matter?  in the docs it is the same as the data packet
     add_pkt_crc(0x1C);
 }
 
@@ -341,7 +343,6 @@ void WK2x01_Initialize()
     txState = 0;
     last_beacon = 0;
     chan_dir = 0;
-    memset(last_chan_val, 0, sizeof(last_chan_val));
     if (! Model.fixed_id) {
         fixed_id = 0x00FFFFFF;
     } else {
