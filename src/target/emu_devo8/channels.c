@@ -55,8 +55,8 @@ const char *tx_button_str[] = {
     "TRIM_R+",
     "Left",
     "Right",
-    "Up",
     "Down",
+    "Up",
     "Enter",
     "Exit",
 };
