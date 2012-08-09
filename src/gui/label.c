@@ -110,5 +110,7 @@ u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type)
 void GUI_SetLabelDesc(struct guiObject *obj, struct LabelDesc *desc)
 {
     struct guiLabel *label = &obj->o.label;
+    if (memcmp(&label->desc, desc, sizeof(struct LabelDesc)) != 0)
+        OBJ_SET_DIRTY(obj, 1);
     label->desc = *desc;
 }
