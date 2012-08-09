@@ -31,7 +31,7 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
     return MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
 }
 
-const char *chan_name_proto_cb(guiObject_t *obj, void *data)
+const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
 {
     (void)obj;
     char tmp1[5];
@@ -70,7 +70,7 @@ void show_page()
         u8 idx;
         int row = init_y + 24 * i;
         u8 ch = mp->top_channel + i;
-        obj = GUI_CreateButton(4, row, BUTTON_64x16, chan_name_proto_cb, 0x0000, limitselect_cb, (void *)((long)ch));
+        obj = GUI_CreateButton(4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB, 0x0000, limitselect_cb, (void *)((long)ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
         for (idx = 0; idx < NUM_MIXERS; idx++)

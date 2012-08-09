@@ -93,8 +93,7 @@ static u8 touch_cb(s16 x, s16 y, void *data);
 #define COL2_VALUE 216
 static void show_titlerow()
 {
-printf("Dest: %d\n", mp->cur_mixer->dest);
-    GUI_CreateLabel(COL1_TEXT, 10, MIXPAGE_ChannelNameCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
+    GUI_CreateLabel(4, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
     GUI_CreateTextSelect(COL1_VALUE, 8, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     PAGE_CreateOkButton(264, 4, okcancel_cb);
