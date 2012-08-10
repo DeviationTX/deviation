@@ -86,7 +86,10 @@ static void build_bind_pkt(const char *init)
     packet[7] = 0x00;
     packet[8] = 0x00;
     packet[9] = 0x32;
-    packet[10]  = (fixed_id >> 0)  & 0xff;
+    if (Model.protocol == PROTOCOL_WK2401)
+        packet[10]  = 0x10 | ((fixed_id >> 0)  & 0x0e);
+    else
+        packet[10]  = (fixed_id >> 0) & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
     packet[13] = init[3];
@@ -130,9 +133,7 @@ static void build_data_pkt_2401()
     }
     packet[4] = msb >> 8; //Ele/Ail MSB
     packet[9] = msb & 0xff; //Thr/Rud MSB
-//u8 tmp[] = {0x70, 0x00, 0x02, 0x00, 0x2a, 0x0e, 0x00, 0xfc, 0x00, 0xa6, 0xe0, 0xbd, 0xd4, 0xf0};
-//memcpy(packet, tmp, sizeof(tmp));
-    packet[10]  = (fixed_id >> 0)  & 0xff;
+    packet[10]  = 0xe0 | ((fixed_id >> 0)  & 0x0e);
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
     packet[13] = 0xf0; //FIXME - What is this?
@@ -344,7 +345,11 @@ void WK2x01_Initialize()
     last_beacon = 0;
     chan_dir = 0;
     if (! Model.fixed_id) {
-        fixed_id = 0x00FFFFFF;
+        u8 cyrfmfg_id[6];
+        CYRF_GetMfgData(cyrfmfg_id);
+        fixed_id = ((u32)cyrfmfg_id[0] << 16) |
+                   ((u32)cyrfmfg_id[1] << 8) |
+                   ((u32)cyrfmfg_id[2]);
     } else {
         fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
                ((Model.fixed_id >> 10) & 0x000300) |
