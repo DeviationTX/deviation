@@ -96,25 +96,13 @@ static void build_bind_pkt(const char *init)
     add_pkt_crc(init[4]);
 }
 
-static u16 get_channel(u8 ch)
+static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 {
-#define MAX_CHAN_VAL 0x400
-    s32 value = (s32)Channels[ch] * (MAX_CHAN_VAL / 2) / CHAN_MAX_VALUE + (MAX_CHAN_VAL / 2);
-    if (value < 0)
-        value = 0;
-    if (value > 0x3ff)
-        value = 0x3ff;
-    return value;
-}
-
-static s16 get_channel_2801(u8 ch)
-{
-#define CHAN_SCALAR 0x190
-    s32 value = (s32)Channels[ch] * CHAN_SCALAR / CHAN_MAX_VALUE;
-    if (value < -0x3ff)
-        value = -0x3ff;
-    if (value > 0x3ff)
-        value = 0x3ff;
+    s32 value = (s32)Channels[ch] * scale / CHAN_MAX_VALUE + center;
+    if (value < center - range)
+        value = center - range;
+    if (value > center + range)
+        value = center + range;
     return value;
 }
 
@@ -127,7 +115,7 @@ static void build_data_pkt_2401()
     for (i = 0; i < 8; i++) {
         if (i == 4)
             offset = 1;
-        u16 value = (i & 0x01) ? 0x200 : get_channel(i >> 1);
+        u16 value = (i & 0x01) ? 0x200 : get_channel(i >> 1, 0x200, 0x200, 0x1FF);
         packet[i+offset] = value & 0xff;
         msb = (msb << 2) | ((value >> 8) & 0x03);
     }
@@ -146,20 +134,24 @@ static void build_data_pkt_2601()
     u8 msb = 0;
     chan_dir = 0;
     for (i = 0; i < 4; i++) {
-        u16 value = get_channel(i);
-        packet[i] = value & 0xff;
-        msb = (msb << 2) | ((value >> 8) & 0x03);
+        s16 value = get_channel(i, 0x190, 0, 0x1FF);
+        u16 mag = value < 0 ? -value : value;
+        packet[i] = mag & 0xff;
+        msb = (msb << 2) | ((mag >> 8) & 0x01) | (value < 0 ? 0x02 : 0x00);
     }
+    u16 gyro = get_channel(3, 400, 500, 400);
     packet[4] = msb;
     packet[5] = 0;
     packet[6] = 0;
     packet[7] = 0;
-    packet[8] = (get_channel(5) ? 1 : 0) | (get_channel(6) ? 2 : 0);
-    packet[9] = 0x04 | (pkt_num % 3) | (pkt_num % 3 == 0 ? 0x00 : 0xa0); //FIXME: Thislogic isn't right
+    packet[8] = (get_channel(4, 0x190, 0, 0x1FF) > 0 ? 1 : 0)
+                | (get_channel(5, 0x190, 0, 0x1FF) > 0 ? 2 : 0);
+    packet[9] = (pkt_num % 3 == 0 ? 0x00 : 0xa0)
+                |((gyro >> 6) & 0x0c) | (pkt_num % 3);
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
-    packet[13] = get_channel(4); //Pitch?
+    packet[13] = gyro & 0xff;
 
     add_pkt_crc(0x3A);
 }
@@ -173,7 +165,7 @@ static void build_data_pkt_2801()
     for (i = 0; i < 8; i++) {
         if (i == 4)
             offset = 1;
-        s16 value = get_channel_2801(i);
+        s16 value = get_channel(i, 0x190, 0, 0x3FF);
         u16 mag = value < 0 ? -value : value;
         packet[i+offset] = mag & 0xff;
         msb = (msb << 2) | ((mag >> 8) & 0x03);

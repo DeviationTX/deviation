@@ -37,8 +37,10 @@ TxID3 = ((FixedId >> 14) & 0xFF) & 0xFF
 #########################
 # 8-channel Data Packet #
 #########################
-Each channel is 10-bits.  All 8 channels are encoded in a single packet.
+Each channel is 11-bits (10-bits + 1 sign bit).  All 8 channels are encoded in a single packet.
 The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+Channel data is signed in ones-complement encoding
+
 90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 
@@ -123,6 +125,10 @@ x.......      aux3     (odd)
 #########################
 Each channel is 10-bits.  All 6 channels are encoded in a single packet.
 The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
+Channel data is signed in ones-complement.
+The Gyro is unsigned with values ranging from 100 to 900
+Trim data is mixed into the channel data but is NOT included in the Gyro data
+
 90 01 0E 04 40 90 0E 90 90 45 E5 2E 67 0B 82 90
 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 
@@ -135,11 +141,13 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 6  gg: 00
 7  hh: 00
 8  ii: gear = bit0, flaps = bit 1
-9  jj: values a5, a6, 04 repeating (I've also seen 00, a1, a2 and 08, a9, aa)
+9  jj:  bits 3:2 are MSB of the Gyro control, other bits unknown.
+        bits 1:0 cycle 0, 1, 2 for each packet
+        bits 7:4 seem to always be 'a' or '0'
 10 kk: TxID1
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
-13 nn: somehow tied to rudder value.  Gyro or pitch?
+13 nn: LSB of Gyro
 14 oo: xor 0x3a with bytes 0-13
 15 pp: checksum (0x3A + sum(bytes 0-13)) modulo 0x100
 
