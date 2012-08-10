@@ -98,7 +98,7 @@ static void build_bind_pkt(const char *init)
 
 static u16 get_channel(u8 ch)
 {
-#define MAX_CHAN_VAL 0x3EF
+#define MAX_CHAN_VAL 0x400
     s32 value = (s32)Channels[ch] * (MAX_CHAN_VAL / 2) / CHAN_MAX_VALUE + (MAX_CHAN_VAL / 2);
     if (value < 0)
         value = 0;
