@@ -12,11 +12,11 @@ frequencies.  Every 4 packets, the next channel is chosen in a round-robin
 fashion.  Additionally all packets contain a sequence number from 0 to 12,
 incrementing one after each packet.  All packets are 16 bits in length.
 
-Next, if the radio is a 4 or 6 channel, or if it is 8channel without a fixed ID,
-a random 20bit ID is chosen, and Binding packets are sent.  The radio sends
-~3000 binding packets, which contain the chosen ID, and the chosen 3 frequencies.
-If the radio is 8 channel, and a FixedID is selected, the radio skips the binding
-stage.
+Next, if the radio is a 4 channel, a 12bit random ID is chosen.  If is is a 6
+channel or if it is 8channel without a fixed ID, a random 20bit ID is chosen,
+and Binding packets are sent.  The radio sends ~3000 binding packets, which
+contain the chosen ID, and the chosen 3 frequencies.  If the radio is 8 channel,
+and a FixedID is selected, the radio skips the binding stage.
 
 After binding, data packets are sent.  A single data packet contains upto 8
 channels of data in 10bit/channel.  The 4, 6, and 8 channel radios, all have
@@ -162,7 +162,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 7  hh: rudder LSB
 8  ii: rudder trim LSB
 9  jj: thr, thr-trim, rud, rud-trim MSB
-10 kk: TxID1
+10 kk: bit 0 and 4 must be zero.  Otherwise, this value is apparently random
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
 13 nn: Unknown.  Different radios seem to do different things with this byte.  It is probably unused
@@ -195,7 +195,7 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 7  hh: Fixed-----------   00      00     00
 8  ii: Fixed-----------   00      00     00
 9  jj: Fixed-----------   32      32     32
-10 kk: TxID1
+10 kk: TxID1 for 6/8 ch.  For 4ch, the requirement seems to be only that bit 4 is set and bit 0 is clear
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
 13 nn: Fixed-----------   F0      F1     00
