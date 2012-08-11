@@ -154,7 +154,7 @@ static u8 get_source(const char *section, const char *value)
     }
     for (i = 0; i < 4; i++) {
         if(mapstrcasecmp(tx_stick_names[i], ptr) == 0) {
-            return ((ptr == value) ? 0 : 0x80) | i;
+            return ((ptr == value) ? 0 : 0x80) | (i + 1);
         }
     }
     printf("%s: Could not parse Source %s\n", section, value);
@@ -659,8 +659,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TRIM, idx+1);
         fprintf(fh, "%s=%s\n", TRIM_SOURCE,
-             m->trims[idx].src < 4 
-             ? tx_stick_names[m->trims[idx].src]
+             m->trims[idx].src >= 1 && m->trims[idx].src <= 4 
+             ? tx_stick_names[m->trims[idx].src-1]
              : MIXER_SourceName(file, m->trims[idx].src));
         fprintf(fh, "%s=%s\n", TRIM_POS, MIXER_ButtonName(m->trims[idx].pos));
         fprintf(fh, "%s=%s\n", TRIM_NEG, MIXER_ButtonName(m->trims[idx].neg));
