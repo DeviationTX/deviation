@@ -140,7 +140,7 @@ int FS_Mount();
 void FS_Unmount();
 
 /* Mixer functions */
-void MIX_CalcChannels();
+void MIXER_CalcChannels();
 
 /* GUI Pages */
 void PAGE_Init();

@@ -50,7 +50,7 @@ static const char *template_name_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 ch = (long)data;
-    enum TemplateType template = MIX_GetTemplate(ch);
+    enum TemplateType template = MIXER_GetTemplate(ch);
     return MIXER_TemplateName(template);
 }
 
@@ -64,7 +64,7 @@ void show_page()
         GUI_RemoveHierObjects(mp->firstObj); 
         mp->firstObj = NULL;
     }
-    struct Mixer *mix = MIX_GetAllMixers();
+    struct Mixer *mix = MIXER_GetAllMixers();
     for (i = 0; i < ENTRIES_PER_PAGE; i++) {
         guiObject_t *obj;
         u8 idx;
@@ -78,7 +78,7 @@ void show_page()
                 break;
         GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
-            enum TemplateType template = MIX_GetTemplate(ch);
+            enum TemplateType template = MIXER_GetTemplate(ch);
             GUI_CreateLabelBox(68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
@@ -129,7 +129,7 @@ void PAGE_MixerEvent()
         return;
     }
     if (mp->cur_mixer && mp->graphs[0]) {
-        if(MIX_ReadInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+        if(MIXER_ReadInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
             GUI_Redraw(mp->graphs[0]);
             if (mp->graphs[1])
                 GUI_Redraw(mp->graphs[1]);
@@ -145,16 +145,16 @@ void templateselect_cb(guiObject_t *obj, void *data)
     long idx = (long)data;
     u8 i;
 
-    mp->cur_template = MIX_GetTemplate(idx);
+    mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
-    MIX_GetLimit(idx, &mp->limit);
+    MIXER_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
     for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++)
-        MIX_InitMixer(mp->mixer + i, idx);
+        MIXER_InitMixer(mp->mixer + i, idx);
 
     if (mp->cur_template != MIXERTEMPLATE_NONE) {
-        mp->num_complex_mixers = MIX_GetMixers(idx, mp->mixer, sizeof(mp->mixer) / sizeof(struct Mixer));
+        mp->num_complex_mixers = MIXER_GetMixers(idx, mp->mixer, sizeof(mp->mixer) / sizeof(struct Mixer));
     }
     mp->link_curves = 0xff;
     if (mp->cur_template == MIXERTEMPLATE_EXPO_DR) {
@@ -176,7 +176,7 @@ void limitselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     long ch = (long)data;
-    MIX_GetLimit(ch, &mp->limit);
+    MIXER_GetLimit(ch, &mp->limit);
     mp->channel = ch;
     MIXPAGE_EditLimits();
 }

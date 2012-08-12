@@ -105,7 +105,7 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
     struct Curve *curve = &edit->curve;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
     s8 old_pointval = curve->points[pointnum];
-    const char *ret = PAGEMIX_SetNumberCB(obj, dir, &curve->points[pointnum]);
+    const char *ret = PAGEMIXER_SetNumberCB(obj, dir, &curve->points[pointnum]);
     if (old_pointval != curve->points[pointnum]) {
         GUI_Redraw(edit->graph);
         if (edit->pointnum < 0)

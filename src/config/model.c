@@ -763,7 +763,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     if(auto_map)
         MIXER_AdjustForProtocol();
     TIMER_Init();
-    MIX_RegisterTrimButtons();
+    MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
     if(! Model.name[0])
         sprintf(Model.name, "Model%d", model_num);
@@ -837,6 +837,6 @@ u8 CONFIG_ReadTemplate(u8 template_num) {
     }
     if(auto_map)
         MIXER_AdjustForProtocol();
-    MIX_RegisterTrimButtons();
+    MIXER_RegisterTrimButtons();
     return 1;
 }

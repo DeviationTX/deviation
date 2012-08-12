@@ -68,15 +68,15 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    u8 is_neg = MIX_SRC_IS_INV(timer->src);
+    u8 is_neg = MIXER_SRC_IS_INV(timer->src);
     u8 changed;
-    u8 src = GUI_TextSelectHelper(MIX_SRC(timer->src), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
-    MIX_SET_SRC_INV(src, is_neg);
+    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    MIXER_SET_SRC_INV(src, is_neg);
     if (changed) {
         timer->src = src;
         TIMER_Reset(idx);
     }
-    GUI_TextSelectEnablePress(obj, MIX_SRC(src));
+    GUI_TextSelectEnablePress(obj, MIXER_SRC(src));
     return MIXER_SourceName(tp->tmpstr, src);
 }
 
@@ -84,8 +84,8 @@ void toggle_source_cb(guiObject_t *obj, void *data)
 {
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    if(MIX_SRC(timer->src)) {
-        MIX_SET_SRC_INV(timer->src, ! MIX_SRC_IS_INV(timer->src));
+    if(MIXER_SRC(timer->src)) {
+        MIXER_SET_SRC_INV(timer->src, ! MIXER_SRC_IS_INV(timer->src));
         TIMER_Reset(idx);
         GUI_Redraw(obj);
     }

@@ -30,9 +30,9 @@
 #define SWASH_INV_AILERON_MASK    2
 #define SWASH_INV_COLLECTIVE_MASK 4
 
-#define MIX_CYC1 (NUM_TX_INPUTS + 1)
-#define MIX_CYC2 (NUM_TX_INPUTS + 2)
-#define MIX_CYC3 (NUM_TX_INPUTS + 3)
+#define MIXER_CYC1 (NUM_TX_INPUTS + 1)
+#define MIXER_CYC2 (NUM_TX_INPUTS + 2)
+#define MIXER_CYC3 (NUM_TX_INPUTS + 3)
 
 // Channels should be volatile:
 // This array is written from the main event loop
@@ -56,29 +56,29 @@ static u8 switch_is_on(u8 sw, s16 *raw);
 static s16 get_trim(u8 src);
 static u8 update_trim(u32 buttons, u8 flags, void *data);
 
-struct Mixer *MIX_GetAllMixers()
+struct Mixer *MIXER_GetAllMixers()
 {
     return Model.mixers;
 }
 
-struct Trim *MIX_GetAllTrims()
+struct Trim *MIXER_GetAllTrims()
 {
     return Model.trims;
 }
 
-void MIX_EvalMixers(s16 *raw)
+void MIXER_EvalMixers(s16 *raw)
 {
     int i;
     //3rd step: apply mixers
     for (i = 0; i < NUM_MIXERS; i++) {
         struct Mixer *mixer = &Model.mixers[i];
         // Linkers are pre-ordred such that we can process them in order
-        if (MIX_SRC(mixer->src) == 0) {
+        if (MIXER_SRC(mixer->src) == 0) {
             // Mixer is not defined so we are done
             break;
         }
         //apply_mixer updates mixed[mirer->dest]
-        MIX_ApplyMixer(mixer, raw);
+        MIXER_ApplyMixer(mixer, raw);
     }
 
 }
@@ -115,7 +115,7 @@ u8 MIXER_MapChannel(u8 channel)
     return channel;
 }
 
-u8 MIX_ReadInputs(s16 *raw, u8 threshold)
+u8 MIXER_ReadInputs(s16 *raw, u8 threshold)
 {
     u8 changed = 0;
     u8 i;
@@ -131,30 +131,30 @@ u8 MIX_ReadInputs(s16 *raw, u8 threshold)
     return changed;
 }
 
-void MIX_CalcChannels()
+void MIXER_CalcChannels()
 {
     //We retain this array so that we can refer to the prevous values in the next iteration
     int i;
     //1st step: Read Tx inputs
-    MIX_ReadInputs(raw, 0);
+    MIXER_ReadInputs(raw, 0);
     //2nd step: calculate virtual channels (CCPM, etc)
-    MIX_CreateCyclicInputs(raw);
+    MIXER_CreateCyclicInputs(raw);
     //3rd steps
-    MIX_EvalMixers(raw);
+    MIXER_EvalMixers(raw);
 
     //4th step: apply limits
     for (i = 0; i < NUM_CHANNELS; i++) {
-        Channels[i] = MIX_ApplyLimits(i, &Model.limits[i], raw);
+        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw);
     }
 }
-s16 *MIX_GetInputs()
+s16 *MIXER_GetInputs()
 {
     return raw;
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-void MIX_CreateCyclicInputs(s16 *raw)
+void MIXER_CreateCyclicInputs(s16 *raw)
 {
     if (! Model.swash_type)
         return;
@@ -174,47 +174,47 @@ void MIX_CreateCyclicInputs(s16 *raw)
     case SWASH_TYPE_120:
         elevator = REZ_SWASH_Y(elevator);
         aileron  = REZ_SWASH_X(aileron);
-        raw[MIX_CYC1] = collective - elevator;
-        raw[MIX_CYC2] = collective + elevator/2 + aileron;
-        raw[MIX_CYC3] = collective + elevator/2 - aileron;
+        raw[MIXER_CYC1] = collective - elevator;
+        raw[MIXER_CYC2] = collective + elevator/2 + aileron;
+        raw[MIXER_CYC3] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
         elevator = REZ_SWASH_X(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIX_CYC1] = collective - aileron;
-        raw[MIX_CYC2] = collective + aileron/2 + elevator;
-        raw[MIX_CYC3] = collective + aileron/2 - elevator;
+        raw[MIXER_CYC1] = collective - aileron;
+        raw[MIXER_CYC2] = collective + aileron/2 + elevator;
+        raw[MIXER_CYC3] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
         elevator = REZ_SWASH_Y(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIX_CYC1] = collective - elevator;
-        raw[MIX_CYC2] = collective + elevator + aileron;
-        raw[MIX_CYC3] = collective + elevator - aileron;
+        raw[MIXER_CYC1] = collective - elevator;
+        raw[MIXER_CYC2] = collective + elevator + aileron;
+        raw[MIXER_CYC3] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
         elevator = REZ_SWASH_Y(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIX_CYC1] = collective - elevator;
-        raw[MIX_CYC2] = collective + aileron;
-        raw[MIX_CYC3] = collective - aileron;
+        raw[MIXER_CYC1] = collective - elevator;
+        raw[MIXER_CYC2] = collective + aileron;
+        raw[MIXER_CYC3] = collective - aileron;
         break;
     }
 }
 
-void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
+void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
 {
     s16 value;
-    if (! MIX_SRC(mixer->src))
+    if (! MIXER_SRC(mixer->src))
         return;
     if (! switch_is_on(mixer->sw, raw)) {
         // Switch is off, so this mixer is not active
         return;
     }
     //1st: Get source value with trim
-    value = raw[MIX_SRC(mixer->src)] + get_trim(MIX_SRC(mixer->src));
+    value = raw[MIXER_SRC(mixer->src)] + get_trim(MIXER_SRC(mixer->src));
     //Invert if necessary
-    if (MIX_SRC_IS_INV(mixer->src))
+    if (MIXER_SRC_IS_INV(mixer->src))
         value = - value;
 
     //2nd: apply curve
@@ -237,13 +237,13 @@ void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw)
     }
 }
 
-s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
 {
     s16 value = raw[NUM_INPUTS + 1 + channel];
     value += PCT_TO_RANGE(limit->subtrim) / 10;
     if (limit->flags & CH_REVERSE)
         value = -value;
-    if (MIX_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw))
+    if (MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw))
         value = PCT_TO_RANGE(Model.limits[channel].safetyval);
     else if (value > PCT_TO_RANGE(limit->max))
         value = PCT_TO_RANGE(limit->max);
@@ -265,8 +265,8 @@ s16 get_trim(u8 src)
   
 u8 switch_is_on(u8 sw, s16 *raw)
 {
-    u8 is_neg = MIX_SRC_IS_INV(sw);
-    sw = MIX_SRC(sw);
+    u8 is_neg = MIXER_SRC_IS_INV(sw);
+    sw = MIXER_SRC(sw);
     if(sw == 0) {
         // No switch selected is the same as an on switch
         return 1;
@@ -278,7 +278,7 @@ u8 switch_is_on(u8 sw, s16 *raw)
 }
 
 
-void TEST_init_mixer()
+void MIXER_Init()
 {
     memset((void *)Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
@@ -286,7 +286,7 @@ void TEST_init_mixer()
     PROTOCOL_Init(Model.protocol);
 }
 
-void MIX_RegisterTrimButtons()
+void MIXER_RegisterTrimButtons()
 {
     int i;
     BUTTON_UnregisterCallback(&button_action);
@@ -297,22 +297,22 @@ void MIX_RegisterTrimButtons()
     }
     BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS, update_trim, NULL);
 }
-enum TemplateType MIX_GetTemplate(int ch)
+enum TemplateType MIXER_GetTemplate(int ch)
 {
     return Model.template[ch];
 };
 
-void MIX_SetTemplate(int ch, enum TemplateType value)
+void MIXER_SetTemplate(int ch, enum TemplateType value)
 {
     Model.template[ch] = value;
 };
 
-int MIX_GetMixers(int ch, struct Mixer *mixers, int count)
+int MIXER_GetMixers(int ch, struct Mixer *mixers, int count)
 {
     int idx = 0;
     int i;
     for(i = 0; i < NUM_MIXERS; i++) {
-        if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == ch) {
+        if (MIXER_SRC(Model.mixers[i].src) && Model.mixers[i].dest == ch) {
             mixers[idx++] = Model.mixers[i];
             if(idx == count)
                 return count;
@@ -326,7 +326,7 @@ int compact_mixers() {
     u8 i = 0;
     u8 j;
     while(i < max) {
-        if(! MIX_SRC(Model.mixers[i].src)) {
+        if(! MIXER_SRC(Model.mixers[i].src)) {
             //Found an empty space so move all following mixers down 1 and decrease max
             for (j = i + 1; j < max; j++) {
                 Model.mixers[j - 1] = Model.mixers[j];
@@ -348,13 +348,13 @@ u8 find_dependencies(u8 ch, u8 *deps)
     for (i = 0; i < NUM_CHANNELS; i++)
         deps[i] = 0;
     for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
-        if (MIX_SRC(mixer->src) && mixer->dest == ch) {
+        if (MIXER_SRC(mixer->src) && mixer->dest == ch) {
             found = 1;
-            if (MIX_SRC(mixer->src) > NUM_INPUTS && MIX_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
-                deps[MIX_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->src) > NUM_INPUTS && MIXER_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
+                deps[MIXER_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
             } 
-            if (MIX_SRC(mixer->sw) > NUM_INPUTS) {
-                deps[MIX_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->sw) > NUM_INPUTS) {
+                deps[MIXER_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
             }
         }
     }
@@ -394,7 +394,7 @@ void fix_mixer_dependencies(u8 mixer_count)
                 }
             }
             if (ok) {
-                u8 num = MIX_GetMixers(i, &mixers[pos], NUM_MIXERS);
+                u8 num = MIXER_GetMixers(i, &mixers[pos], NUM_MIXERS);
                 pos += num;
                 mixer_count -= num;
                 placed[i] = 1;
@@ -409,14 +409,14 @@ void fix_mixer_dependencies(u8 mixer_count)
         Model.mixers[i] = mixers[i];
 }
 
-int MIX_SetMixers(struct Mixer *mixers, int count)
+int MIXER_SetMixers(struct Mixer *mixers, int count)
 {
     int i;
     if (count) {
         u8 dest = mixers[0].dest;
         //Remove all mixers for this channel
         for (i = 0; i < NUM_MIXERS; i++) {
-            if (MIX_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
+            if (MIXER_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
                 Model.mixers[i].src = 0;
         }
     }
@@ -426,24 +426,24 @@ int MIX_SetMixers(struct Mixer *mixers, int count)
         return 0;
     }
     for (i = 0; i < count; i++) {
-        if (MIX_SRC(mixers[i].src))
+        if (MIXER_SRC(mixers[i].src))
             Model.mixers[pos++] = mixers[i];
     }
     fix_mixer_dependencies(pos);
     return 0;
 }
 
-void MIX_GetLimit(int ch, struct Limit *limit)
+void MIXER_GetLimit(int ch, struct Limit *limit)
 {
     *limit = Model.limits[ch];
 }
 
-void MIX_SetLimit(int ch, struct Limit *limit)
+void MIXER_SetLimit(int ch, struct Limit *limit)
 {
     Model.limits[ch] = *limit;
 }
 
-void MIX_InitMixer(struct Mixer *mixer, u8 ch)
+void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
 {
     int i;
     mixer->src = ch + 1;
@@ -499,8 +499,8 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
 
 const char *MIXER_SourceName(char *str, u8 src)
 {
-    u8 is_neg = MIX_SRC_IS_INV(src);
-    src = MIX_SRC(src);
+    u8 is_neg = MIXER_SRC_IS_INV(src);
+    src = MIXER_SRC(src);
 
     if(! src) {
         sprintf(str, "None");
@@ -563,5 +563,5 @@ void MIXER_AdjustForProtocol()
             }
     }
     memcpy(Model.template, template, sizeof(template));
-    MIX_SetMixers(NULL, 0);
+    MIXER_SetMixers(NULL, 0);
 }

@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "protocol/interface.h"
+#include "mixer.h"
 #include "misc.h"
 #include "gui/gui.h"
 #include "buttons.h"
@@ -22,33 +23,19 @@
 #include "config/model.h"
 #include "config/tx.h"
 
-void event_loop(void *);
+void Init();
+void Banner();
+void EventLoop();
 
-void dump_bootloader();
-void SignOn();
-extern void start_event_loop();
-extern void TEST_init_mixer();
+u32 next_redraw=0;
 
 int main() {
+    
+    Init();
+    Banner();
 
-    PWR_Init();
-    CLOCK_Init();
-    UART_Initialize();
-    Initialize_ButtonMatrix();
+    if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 
-    LCD_Init();
-    CHAN_Init();
-
-    SPIFlash_Init();
-    CYRF_Initialize();
-    SPITouch_Init();
-    SOUND_Init();
-    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
-
-    if(PWR_CheckPowerSwitch())
-        PWR_Shutdown();
-
-    SignOn();
     LCD_Clear(0x0000);
 
     LCD_SetFont(1);
@@ -65,90 +52,42 @@ int main() {
         USB_Connect();
     }
 
-    printf("File system mounted.\r\n");
-
     CONFIG_LoadTx();
-    printf("tx.ini loaded\r\n");
     CONFIG_ReadDisplay();
+
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
     MUSIC_Play(MUSIC_STARTUP);
     GUI_HandleButtons(1);
 
-#if 0
-    printf("Showing display\n");
-    LCD_PrintStringXY(10, 20, "Hello");
-    while(1) {
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-#endif
-#ifdef BL_DUMP
-    dump_bootloader();
-#endif
-#ifdef STATUS_SCREEN
-    TEST_init_mixer();
+    MIXER_Init();
     PAGE_Init();
-#ifdef HAS_EVENT_LOOP
-    start_event_loop();
-#else
+    
     CLOCK_StartWatchdog();
-    while(1)
-        event_loop(NULL);
-#endif
-    return 0;
-#endif
+    
+    next_redraw = CLOCK_getms()+100;
+    
+    for(;;) EventLoop();
 }
 
-void event_loop(void *param)
-{
-    /* Some needed variables */
-    static u8 touch_down = 0;
-    static u32 last_redraw = 0;
-    (void)(param);
+void Init() {
+    PWR_Init();
+    CLOCK_Init();
+    UART_Initialize();
+    Initialize_ButtonMatrix();
 
-    CLOCK_ResetWatchdog();
-    if(PWR_CheckPowerSwitch()) {
-        CONFIG_SaveModelIfNeeded();
-        CONFIG_SaveTxIfNeeded();
-        PWR_Shutdown();
-        
-    }
-    BUTTON_Handler(0);
+    LCD_Init();
+    CHAN_Init();
 
-    if(SPITouch_IRQ()) {
-        struct touch t = SPITouch_GetCoords();
-        //printf("x : %4d y : %4d\n", t.x, t.y);
-        if (! touch_down) {
-            GUI_CheckTouch(&t, 0);
-            touch_down = 1;
-        }
-    } else {
-        if(touch_down)
-            GUI_TouchRelease();
-        touch_down = 0;
-    }
-    MIX_CalcChannels();
-
-    PAGE_Event();
-
-    if (CLOCK_getms() > last_redraw + 100) {
-        TIMER_Update();
-        if (touch_down && touch_down++ >= 5) {
-            //Long-press
-            struct touch t = SPITouch_GetCoords();
-            GUI_CheckTouch(&t, 1);
-        } else {
-            BUTTON_Handler(BUTTON_LONGPRESS);
-        }
-        /* Redraw everything */
-        GUI_RefreshScreen();
-        last_redraw = CLOCK_getms();
-    }
+    SPIFlash_Init();
+    CYRF_Initialize();
+    SPITouch_Init();
+    SOUND_Init();
+    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
 }
 
-void SignOn()
+void Banner()
 {
     u8 Power = CYRF_MaxPower();
     u8 mfgdata[6];
@@ -170,35 +109,52 @@ void SignOn()
             mfgdata[5]);
     
 }
-#ifdef BL_DUMP
-void dump_bootloader()
+
+void EventLoop()
 {
-    LCD_PrintStringXY(40, 10, "Dumping");
+    /* Some needed variables */
+    static u8 touch_down = 0;
 
-    printf("Erase...\n");
-
-    SPIFlash_EraseSector(0x2000);
-    SPIFlash_EraseSector(0x3000);
-    SPIFlash_EraseSector(0x4000);
-    SPIFlash_EraseSector(0x5000);
-
-    printf("Pgm 2\n");
-    SPIFlash_WriteBytes(0x2000, 0x1000, (u8*)0x08000000);
-    printf("Pgm 3\n");
-    SPIFlash_WriteBytes(0x3000, 0x1000, (u8*)0x08001000);
-    printf("Pgm 4\n");
-    SPIFlash_WriteBytes(0x4000, 0x1000, (u8*)0x08002000);
-    printf("Pgm 5\n");
-    SPIFlash_WriteBytes(0x5000, 0x1000, (u8*)0x08003000);
-    printf("Done\n");
-
-    LCD_Clear(0x0000);
-    LCD_PrintStringXY(40, 10, "Done");
-
-    while(1)
-    {
-        if(PWR_CheckPowerSwitch())
+    CLOCK_ResetWatchdog();
+    if(PWR_CheckPowerSwitch()) {
+        CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
         PWR_Shutdown();
+        
+    }
+
+    MIXER_CalcChannels();
+
+    BUTTON_Handler();
+
+    if(SPITouch_IRQ()) {
+        struct touch t = SPITouch_GetCoords();
+        //printf("x : %4d y : %4d\n", t.x, t.y);
+        if (! touch_down) {
+            GUI_CheckTouch(&t, 0);
+            touch_down = 1;
+        }
+    } else {
+        if(touch_down)
+            GUI_TouchRelease();
+        touch_down = 0;
+    }
+
+    PAGE_Event();
+
+    if (CLOCK_getms() > next_redraw) {
+        TIMER_Update();
+        if (touch_down) {
+            touch_down++;
+            if(touch_down >= 5) {
+                //Long-press
+                struct touch t = SPITouch_GetCoords();
+                GUI_CheckTouch(&t, 1);
+            }
+        }
+
+        /* Redraw everything */
+        GUI_RefreshScreen();
+        next_redraw = CLOCK_getms() + 100;
     }
 }
-#endif
