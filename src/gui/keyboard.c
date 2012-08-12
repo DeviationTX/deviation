@@ -267,7 +267,7 @@ void GUI_DrawKeyboard(struct guiObject *obj)
 #define FILL  Display.keyboard.fill_color  //RGB888_to_RGB565(0x6b, 0x73, 0x80)
     struct guiKeyboard *keyboard = &obj->o.keyboard;
 
-    LCD_FillRect(0, 0, 320, 240, FILL);
+    LCD_Clear(FILL);
     keyboard_cmd(KB_DRAW, keyboard, NULL);
     kb_draw_text(keyboard->text);
     return;
