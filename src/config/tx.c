@@ -129,6 +129,7 @@ void CONFIG_LoadTx()
 {
     memset(&Transmitter, 0, sizeof(Transmitter));
     Transmitter.current_model = 1;
+    Transmitter.mode = 2;
     ini_parse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
