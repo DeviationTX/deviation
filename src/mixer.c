@@ -282,7 +282,6 @@ void MIXER_Init()
 {
     memset((void *)Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
-    CONFIG_ReadModel(CONFIG_GetCurrentModel());
     PROTOCOL_Init(Model.protocol);
 }
 

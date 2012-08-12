@@ -54,6 +54,7 @@ int main() {
 
     CONFIG_LoadTx();
     CONFIG_ReadDisplay();
+    CONFIG_ReadModel(CONFIG_GetCurrentModel());
 
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
