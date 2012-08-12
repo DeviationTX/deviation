@@ -190,6 +190,10 @@ void PAGE_ChantestEvent()
     }
 }
 
+void PAGE_ChantestExit()
+{
+    BUTTON_UnregisterCallback(&cp->action);
+}
 static s16 showchan_cb(void *data)
 {
     long ch = (long)data;
