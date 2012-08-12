@@ -1,6 +1,8 @@
 #ifndef _TX_H_
 #define _TX_H
 
+#include "mixer.h"
+
 struct StickCalibration {
     u16 max;
     u16 min;
@@ -16,6 +18,7 @@ struct TouchCalibration {
 
 struct Transmitter {
     u8 current_model;
+    enum Mode mode;
     s16 Trims[NUM_TRIMS];
     struct StickCalibration calibration[NUM_INPUTS];
     struct TouchCalibration touch;

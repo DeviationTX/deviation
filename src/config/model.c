@@ -29,7 +29,6 @@ static u8 auto_map;
 
 const char *MODEL_NAME = "name";
 const char *MODEL_ICON = "icon";
-const char *MODEL_MODE = "mode";
 const char *MODEL_TYPE = "type";
 const char *MODEL_TEMPLATE = "template";
 const char *MODEL_AUTOMAP = "automap";
@@ -204,10 +203,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 }
             }
             return 0;
-        }
-        if (MATCH_KEY(MODEL_MODE)) {
-            m->mode = atoi(value)-1;
-            return 1;
         }
         if (MATCH_KEY(MODEL_AUTOMAP)) {
             auto_map = atoi(value);
