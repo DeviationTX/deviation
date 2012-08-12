@@ -27,6 +27,8 @@ void Init();
 void Banner();
 void EventLoop();
 
+void TOUCH_Handler(); // temporarily in main()
+
 u32 next_redraw=0;
 
 int main() {
@@ -113,10 +115,8 @@ void Banner()
 
 void EventLoop()
 {
-    /* Some needed variables */
-    static u8 touch_down = 0;
-
     CLOCK_ResetWatchdog();
+
     if(PWR_CheckPowerSwitch()) {
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
@@ -127,35 +127,45 @@ void EventLoop()
     MIXER_CalcChannels();
 
     BUTTON_Handler();
-
-    if(SPITouch_IRQ()) {
-        struct touch t = SPITouch_GetCoords();
-        //printf("x : %4d y : %4d\n", t.x, t.y);
-        if (! touch_down) {
-            GUI_CheckTouch(&t, 0);
-            touch_down = 1;
-        }
-    } else {
-        if(touch_down)
-            GUI_TouchRelease();
-        touch_down = 0;
-    }
+    TOUCH_Handler();
 
     PAGE_Event();
 
     if (CLOCK_getms() > next_redraw) {
         TIMER_Update();
-        if (touch_down) {
-            touch_down++;
-            if(touch_down >= 5) {
-                //Long-press
-                struct touch t = SPITouch_GetCoords();
-                GUI_CheckTouch(&t, 1);
-            }
-        }
-
-        /* Redraw everything */
         GUI_RefreshScreen();
         next_redraw = CLOCK_getms() + 100;
     }
+}
+
+void TOUCH_Handler() {
+    u32 pen_down=0;
+
+    static u32 pen_down_last=0;
+    static u32 pen_down_long_at=0;
+
+    struct touch t;
+    
+    if(SPITouch_IRQ()) {
+        pen_down=1;
+        t=SPITouch_GetCoords();
+        pen_down_long_at=CLOCK_getms()+500;
+    } else {
+        pen_down=0;
+    }
+ 
+    if(pen_down && (!pen_down_last)) {
+        GUI_CheckTouch(&t, 0);
+    }
+    
+    if(!pen_down && pen_down_last) {
+        GUI_TouchRelease();
+    }
+    
+    if(pen_down && pen_down_last) {
+        if(CLOCK_getms()>pen_down_long_at) {
+            GUI_CheckTouch(&t, 1);
+        }
+    }
+    pen_down_last=pen_down;
 }
