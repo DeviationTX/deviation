@@ -16,12 +16,23 @@
 #include "target.h"
 #include "protocol/interface.h"
 
+void A7105_Initialize()
+{
+}
+
 void A7105_WriteReg(u8 addr, u8 value)
 {
     (void)addr;
     (void)value;
     //send(addr);
     //send(value);
+}
+
+void A7105_WriteData(u8 *data, u8 len, u8 channel)
+{
+    (void)data;
+    (void)len;
+    (void)channel;
 }
 
 u8 A7105_ReadReg(u8 addr)
