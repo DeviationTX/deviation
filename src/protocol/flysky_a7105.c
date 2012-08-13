@@ -28,6 +28,7 @@ static const u8 A7105_regs[] = {
 static const u8 channels[] = {
     0x0a, 0x5a, 0x50, 0xa0, 0x14, 0x64, 0x46, 0x96, 0x1e, 0x6e, 0x3c, 0x8c, 0x28, 0x78, 0x32, 0x82
 };
+static const u8 id[] = { 0x02, 0x00, 0x00, 0x70 };
 static const u8 *chanptr;
 static u8 packet[22];
 static u16 counter;
@@ -102,10 +103,10 @@ static void flysky_build_packet(u8 init)
     //1 %    = 5
     packet[0] = 0x05;
     packet[1] = init ? 0xaa : 0x55;
-    packet[2] = 0xF3;
-    packet[3] = 0x01;
-    packet[4] = 0x00;  //0x2000 is the 'unique id'
-    packet[5] = 0x20;
+    packet[2] = id[0];
+    packet[3] = id[1];
+    packet[4] = id[2];
+    packet[5] = id[3];
     for (i = 0; i < 8; i++) {
         if (i > NUM_CHANNELS) {
             packet[6 + i*2] = 0;
