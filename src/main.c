@@ -41,6 +41,9 @@ int main() {
 
     SPIFlash_Init();
     CYRF_Initialize();
+#ifdef PROTO_HAS_A7105
+    A7105_Initialize();
+#endif
     SPITouch_Init();
     SOUND_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash

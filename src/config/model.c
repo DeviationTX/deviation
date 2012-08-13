@@ -42,7 +42,7 @@ static const char RADIO_PROTOCOL[] = "protocol";
 const char * const RADIO_PROTOCOL_VAL[] = {
      "None",
 #ifdef PROTO_HAS_CYRF6936
-     "DEVO", "WK2801", "WK2601", "WK2401", "DSM2", "J6Pro"
+     "DEVO", "WK2801", "WK2601", "WK2401", "DSM2", "J6Pro",
 #endif
 #ifdef PROTO_HAS_A7105
      "Flysky",

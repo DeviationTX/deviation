@@ -17,7 +17,9 @@ enum A7105_MASK {
     A7105_MASK_VBCF = 1 << 3,
 };
 
+void A7105_Initialize();
 void A7105_WriteReg(u8 addr, u8 value);
+void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel);
 u8 A7105_ReadReg(u8 addr);
 void A7105_Reset();
 void A7105_WriteID(u32 id);
