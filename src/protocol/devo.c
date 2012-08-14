@@ -16,6 +16,7 @@
 #include "target.h"
 #include "interface.h"
 #include "mixer.h"
+#include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
 
@@ -23,7 +24,6 @@
 //#define NO_SCRAMBLE
 
 #define PKTS_PER_CHANNEL 4
-#define use_fixedid 0
 
 enum PktState {
     DEVO_BIND,
@@ -266,12 +266,13 @@ void DEVO_Initialize()
     pkt_num = 0;
     ch_idx = 0;
     txState = 0;
-    fixed_id = 0x094228;
 
-    if(! use_fixedid) {
+    if(! Model.fixed_id) {
+        fixed_id = 0x094228;
         bind_counter = 0x1388;
         state = DEVO_BIND;
     } else {
+        fixed_id = Model.fixed_id;
         state = DEVO_BOUND_1;
         bind_counter = 0;
     }
