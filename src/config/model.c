@@ -92,6 +92,7 @@ static const char SECTION_TRIM[] = "trim";
 static const char TRIM_POS[]  = "pos";
 static const char TRIM_NEG[]  = "neg";
 static const char TRIM_STEP[] = "step";
+static const char TRIM_VALUE[] = "value";
 
 /* Section: Heli */
 static const char SECTION_SWASH[] = "swash";
@@ -411,6 +412,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->trims[idx].step = value_int;
             return 1;
         }
+        if (MATCH_KEY(TRIM_VALUE)) {
+            m->trims[idx].value = value_int;
+            return 1;
+        }
         printf("%s: Unknown trim setting: %s\n", section, name);
         return 0;
     }
@@ -659,6 +664,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", TRIM_NEG, MIXER_ButtonName(m->trims[idx].neg));
         if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
+        if(WRITE_FULL_MODEL || m->trims[idx].value)
+            fprintf(fh, "%s=%d\n", TRIM_VALUE, m->trims[idx].value);
     }
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);

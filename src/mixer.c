@@ -257,7 +257,7 @@ s16 get_trim(u8 src)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            return PCT_TO_RANGE((s16)Transmitter.Trims[i] * Model.trims[i].step / 10);
+            return PCT_TO_RANGE(Model.trims[i].value * Model.trims[i].step / 10);
         }
     }
     return 0;
@@ -473,22 +473,22 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
         return 1;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Transmitter.Trims[i]) - step_size;
-            if ((int)(Transmitter.Trims[i]) > 0 && tmp <= 0) {
-                Transmitter.Trims[i] = 0;
+            int tmp = (int)(Model.trims[i].value) - step_size;
+            if ((int)(Model.trims[i].value) > 0 && tmp <= 0) {
+                Model.trims[i].value = 0;
                 step_size = 0;
             } else {
-                Transmitter.Trims[i] = tmp < -100 ? -100 : tmp;
+                Model.trims[i].value = tmp < -100 ? -100 : tmp;
             }
             break;
         }
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Transmitter.Trims[i]) + step_size;
-            if ((int)(Transmitter.Trims[i]) < 0 && tmp >= 0) {
-                Transmitter.Trims[i] = 0;
+            int tmp = (int)(Model.trims[i].value) + step_size;
+            if ((int)(Model.trims[i].value) < 0 && tmp >= 0) {
+                Model.trims[i].value = 0;
                 step_size = 0;
             } else {
-                Transmitter.Trims[i] = tmp > 100 ? 100 : tmp;
+                Model.trims[i].value = tmp > 100 ? 100 : tmp;
             }
             break;
         }

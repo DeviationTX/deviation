@@ -68,9 +68,9 @@ void PAGE_MainInit(int page)
         GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
 
     for(i = 0; i < 6; i++) {
-        mp->trims[i] = Transmitter.Trims[i];
+        mp->trims[i] = Model.trims[i].value;
         if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Transmitter.Trims[i]);
+            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
         else
             mp->trimObj[i] = NULL;
     }
@@ -122,8 +122,8 @@ void PAGE_MainEvent()
     for(i = 0; i < 6; i++) {
         if (! mp->trimObj[i])
             continue;
-        if (mp->trims[i] != Transmitter.Trims[i]) {
-            mp->trims[i] = Transmitter.Trims[i];
+        if (mp->trims[i] != Model.trims[i].value) {
+            mp->trims[i] = Model.trims[i].value;
             GUI_Redraw(mp->trimObj[i]);
         }
     }

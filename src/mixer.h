@@ -98,6 +98,7 @@ struct Trim {
     u8 pos;
     u8 neg;
     u8 step;
+    s16 value;
 };
 
 /* Curve functions */

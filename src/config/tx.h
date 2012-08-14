@@ -19,7 +19,6 @@ struct TouchCalibration {
 struct Transmitter {
     u8 current_model;
     enum Mode mode;
-    s16 Trims[NUM_TRIMS];
     struct StickCalibration calibration[NUM_INPUTS];
     struct TouchCalibration touch;
 };
