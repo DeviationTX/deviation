@@ -33,13 +33,19 @@ void A7105_WriteData(u8 *data, u8 len, u8 channel)
     (void)data;
     (void)len;
     (void)channel;
+    int i;
+    printf("%02x:", channel);
+    for(i = 0; i < len; i++)
+        printf(" %02x", data[i]);
+    printf("\n");
 }
 
 u8 A7105_ReadReg(u8 addr)
 {
+    (void)addr;
     //send(0x40 | addr)
     //return read();
-    return addr;
+    return 0x00;
 }
 
 void A7105_Reset()

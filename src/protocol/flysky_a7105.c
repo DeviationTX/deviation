@@ -20,6 +20,13 @@
 
 #ifdef PROTO_HAS_A7105
 
+//Fewer bind packets in the emulator so we can get right to the important bits
+#ifdef EMULATOR
+#define BIND_COUNT 3
+#else
+#define BIND_COUNT 2500
+#endif
+
 static const u8 A7105_regs[] = {
      -1,  0x42, 0x00, 0x14, 0x00,  -1 ,  -1 , 0x00, 0x00, 0x00, 0x00, 0x01, 0x21, 0x05, 0x00, 0x50,
     0x9e, 0x4b, 0x00, 0x02, 0x16, 0x2b, 0x12, 0x00, 0x62, 0x80, 0x80, 0x00, 0x0a, 0x32, 0xc3, 0x0f,
@@ -135,8 +142,8 @@ static void flysky_build_packet(u8 init)
         s32 value = (s32)Channels[i] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
         if (value < 0)
             value = 0;
-        packet[6 + i] = value & 0xff;
-        packet[7 + i] = (value >> 8) & 0xff;
+        packet[6 + i*2] = value & 0xff;
+        packet[7 + i*2] = (value >> 8) & 0xff;
     }
 }
 static u16 flysky_cb()
@@ -165,7 +172,7 @@ void FLYSKY_Initialize() {
     chanrow = id % 16;
     chancol = 0;
     chanoffset = (id & 0xff) / 16;
-    counter = 2500;
+    counter = BIND_COUNT;
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
