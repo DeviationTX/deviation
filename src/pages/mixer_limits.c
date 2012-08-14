@@ -41,7 +41,7 @@ void MIXPAGE_EditLimits()
     GUI_CreateLabel(8, 88, NULL, DEFAULT_FONT, "Safety:");
     GUI_CreateTextSelect(64, 88, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
     GUI_CreateLabel(176, 88, NULL, DEFAULT_FONT, "Value:");
-    GUI_CreateTextSelect(216, 88, TEXTSELECT_96, 0x0000, NULL, PAGEMIX_SetNumberCB, &mp->limit.safetyval);
+    GUI_CreateTextSelect(216, 88, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
     //Row 4
     GUI_CreateLabel(8, 112, NULL, DEFAULT_FONT, "Min:");
     GUI_CreateTextSelect(64, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
@@ -55,8 +55,8 @@ void MIXPAGE_EditLimits()
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;
-    if(MIX_SRC(*source)) {
-        MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
+    if(MIXER_SRC(*source)) {
+        MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
         GUI_Redraw(obj);
     }
 }
@@ -65,10 +65,10 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIX_SRC_IS_INV(*source);
-    *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
-    MIX_SET_SRC_INV(*source, is_neg);
-    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
+    u8 is_neg = MIXER_SRC_IS_INV(*source);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
+    MIXER_SET_SRC_INV(*source, is_neg);
+    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 
@@ -108,7 +108,7 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     if (!(mp->limit.flags & CH_FAILSAFE_EN))
         return "Off";
-    return PAGEMIX_SetNumberCB(obj, dir, &mp->limit.failsafe);
+    return PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.failsafe);
 }
 
 static void okcancel_cb(guiObject_t *obj, void *data)
@@ -116,9 +116,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     (void)obj;
     if (data) {
         //Save mixer here
-        MIX_SetLimit(mp->channel, &mp->limit);
-        MIX_SetTemplate(mp->channel, mp->cur_template);
-        MIX_SetMixers(mp->mixer, mp->num_mixers);
+        MIXER_SetLimit(mp->channel, &mp->limit);
+        MIXER_SetTemplate(mp->channel, mp->cur_template);
+        MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
     PAGE_MixerInit(0);

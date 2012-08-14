@@ -23,7 +23,7 @@ const char *trimsource_name_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    struct Trim *trim = MIX_GetAllTrims();
+    struct Trim *trim = MIXER_GetAllTrims();
     return MIXER_SourceName(tp->tmpstr, MIXER_MapChannel(trim[i].src));
 }
 
@@ -31,7 +31,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
     return MIXER_SourceName(tp->tmpstr, MIXER_MapChannel(*source));
 }
 
@@ -57,9 +57,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     (void)obj;
     if (data) {
         //Save trim here
-        struct Trim *trim = MIX_GetAllTrims();
+        struct Trim *trim = MIXER_GetAllTrims();
         trim[tp->index] = tp->trim;
-        MIX_RegisterTrimButtons();
+        MIXER_RegisterTrimButtons();
     }
     GUI_RemoveAllObjects();
     PAGE_TrimInit(0);
@@ -67,7 +67,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
 void edit_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    struct Trim *trim = MIX_GetAllTrims();
+    struct Trim *trim = MIXER_GetAllTrims();
     PAGE_SetModal(1);
     tp->index = (long)data;
     tp->trim = trim[tp->index];
@@ -100,7 +100,7 @@ void PAGE_TrimInit(int page)
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, "Trim Neg");
     GUI_CreateLabel(136, 40, NULL, DEFAULT_FONT, "Trim Pos");
     GUI_CreateLabel(200, 40, NULL, DEFAULT_FONT, "Trim Step");
-    struct Trim *trim = MIX_GetAllTrims();
+    struct Trim *trim = MIXER_GetAllTrims();
     for (i = 0; i < NUM_TRIMS; i++) {
         GUI_CreateButton(8, 24*i + 64, BUTTON_48x16,
             trimsource_name_cb, 0x0000, edit_cb, (void *)((long)i));

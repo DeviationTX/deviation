@@ -36,7 +36,7 @@ struct mixer_page {
 
 extern const char *channel_name[];
 
-const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data);
+const char *PAGEMIXER_SetNumberCB(guiObject_t *obj, int dir, void *data);
 void MIXPAGE_EditCurves(struct Curve *curve, void *data);
 const char *MIXPAGE_TemplateName(enum TemplateType template);
 const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data);

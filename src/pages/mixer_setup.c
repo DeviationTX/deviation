@@ -133,7 +133,7 @@ static void update_rate_widgets(u8 idx)
 {
     u8 mix = idx + 1;
     idx *=4;
-    if (MIX_SRC(mp->mixer[mix].sw)) {
+    if (MIXER_SRC(mp->mixer[mix].sw)) {
         GUI_SetHidden(mp->expoObj[idx], 0);
         if(mp->link_curves & mix) {
             GUI_SetHidden(mp->expoObj[idx+1], 0);
@@ -262,7 +262,7 @@ static void show_complex()
 s16 eval_mixer_cb(s16 xval, void * data)
 {
     struct Mixer *mix = (struct Mixer *)data;
-    if (MIX_SRC_IS_INV(mix->src))
+    if (MIXER_SRC_IS_INV(mix->src))
         xval = -xval;
     s16 yval = CURVE_Evaluate(xval, &mix->curve);
     yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
@@ -283,15 +283,15 @@ s16 eval_chan_cb(void * data)
 {
     (void)data;
     int i;
-    MIX_CreateCyclicInputs(mp->raw);
-    struct Mixer *mix = MIX_GetAllMixers();
+    MIXER_CreateCyclicInputs(mp->raw);
+    struct Mixer *mix = MIXER_GetAllMixers();
     for (i = 0; i < NUM_MIXERS; i++) {
-        if(MIX_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
-            MIX_ApplyMixer(mix, mp->raw);
+        if(MIXER_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
+            MIXER_ApplyMixer(mix, mp->raw);
     }
     for (i = 0; i < mp->num_mixers; i++)
-        MIX_ApplyMixer(&mp->mixer[i], mp->raw);
-    s16 value = MIX_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw);
+        MIXER_ApplyMixer(&mp->mixer[i], mp->raw);
+    s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw);
     if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
     if (value < CHAN_MIN_VALUE)
@@ -303,7 +303,7 @@ u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
 {
     if (pos != 0)
         return 0;
-    *x = mp->raw[MIX_SRC(mp->cur_mixer->src)];
+    *x = mp->raw[MIXER_SRC(mp->cur_mixer->src)];
     if (*x > CHAN_MAX_VALUE)
         *x = CHAN_MAX_VALUE;
     else if (*x  < CHAN_MIN_VALUE)
@@ -312,7 +312,7 @@ u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     return 1;
 }
 
-const char *PAGEMIX_SetNumberCB(guiObject_t *obj, int dir, void *data)
+const char *PAGEMIXER_SetNumberCB(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     s8 *value = (s8 *)data;
@@ -337,7 +337,7 @@ void sync_mixers()
         break;
     case MIXERTEMPLATE_EXPO_DR:
         mp->num_mixers = 1;
-        if (MIX_SRC(mp->mixer[1].sw)) {
+        if (MIXER_SRC(mp->mixer[1].sw)) {
             mp->num_mixers++;
             mp->mixer[1].src    = mp->mixer[0].src;
             mp->mixer[1].dest   = mp->mixer[0].dest;
@@ -348,7 +348,7 @@ void sync_mixers()
         } else {
             mp->mixer[1].src = 0;
         }
-        if (MIX_SRC(mp->mixer[2].sw)) {
+        if (MIXER_SRC(mp->mixer[2].sw)) {
             mp->num_mixers++;
             mp->mixer[2].src    = mp->mixer[0].src;
             mp->mixer[2].dest   = mp->mixer[0].dest;
@@ -438,15 +438,15 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIX_SRC_IS_INV(*source);
+    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
-    *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
-    MIX_SET_SRC_INV(*source, is_neg);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
         sync_mixers();
         redraw_graphs();
     }
-    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
+    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 
@@ -454,14 +454,14 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIX_SRC_IS_INV(*source);
+    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
     u8 oldsrc = *source;
-    *source = GUI_TextSelectHelper(MIX_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
-    MIX_SET_SRC_INV(*source, is_neg);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
         sync_mixers();
-        if ((!! MIX_SRC(oldsrc)) ^ (!! MIX_SRC(*source))) {
+        if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
             if(data == &mp->mixer[1].sw)
                 update_rate_widgets(0);
             else if(data == &mp->mixer[2].sw)
@@ -470,7 +470,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             redraw_graphs();
         }
     }
-    GUI_TextSelectEnablePress(obj, MIX_SRC(*source));
+    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
     return MIXER_SourceName(mp->tmpstr, *source);
 }
 
@@ -492,8 +492,8 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;
-    if (MIX_SRC(*source)) {
-        MIX_SET_SRC_INV(*source, ! MIX_SRC_IS_INV(*source));
+    if (MIXER_SRC(*source)) {
+        MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
         GUI_Redraw(obj);
         redraw_graphs();
     }
@@ -519,9 +519,9 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     (void)obj;
     if (data) {
         //Save mixer here
-        MIX_SetLimit(mp->channel, &mp->limit);
-        MIX_SetTemplate(mp->channel, mp->cur_template);
-        MIX_SetMixers(mp->mixer, mp->num_mixers);
+        MIXER_SetLimit(mp->channel, &mp->limit);
+        MIXER_SetTemplate(mp->channel, mp->cur_template);
+        MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
     memset(mp->graphs, 0, sizeof(mp->graphs));

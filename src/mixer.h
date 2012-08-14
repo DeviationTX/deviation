@@ -65,9 +65,9 @@ enum SwashType {
     SWASH_TYPE_140,
     SWASH_TYPE_90,
 };
-#define MIX_SRC(x) ((x) & 0x7F)
-#define MIX_SRC_IS_INV(x) ((x) & 0x80)
-#define MIX_SET_SRC_INV(x, y) x = (y) ? ((x) | 0x80) : ((x) & ~0x80)
+#define MIXER_SRC(x) ((x) & 0x7F)
+#define MIXER_SRC_IS_INV(x) ((x) & 0x80)
+#define MIXER_SET_SRC_INV(x, y) x = (y) ? ((x) | 0x80) : ((x) & ~0x80)
 struct Mixer {
     u8 src;
     u8 dest;
@@ -106,35 +106,38 @@ const char *CURVE_GetName(struct Curve *curve);
 u8 CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
-s16 *MIX_GetInputs();
+s16 *MIXER_GetInputs();
 
-int MIX_GetMixers(int ch, struct Mixer *mixers, int count);
-int MIX_SetMixers(struct Mixer *mixers, int count);
+int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
+int MIXER_SetMixers(struct Mixer *mixers, int count);
 
-void MIX_GetLimit(int ch, struct Limit *limit);
-void MIX_SetLimit(int ch, struct Limit *limit);
+void MIXER_GetLimit(int ch, struct Limit *limit);
+void MIXER_SetLimit(int ch, struct Limit *limit);
 
-void MIX_SetTemplate(int ch, enum TemplateType value);
-enum TemplateType MIX_GetTemplate(int ch);
+void MIXER_SetTemplate(int ch, enum TemplateType value);
+enum TemplateType MIXER_GetTemplate(int ch);
 
-void MIX_InitMixer(struct Mixer *mixer, u8 ch);
+void MIXER_InitMixer(struct Mixer *mixer, u8 ch);
 
-void MIX_ApplyMixer(struct Mixer *mixer, s16 *raw);
-void MIX_EvalMixers(s16 *raw);
-u8 MIX_ReadInputs(s16 *raw, u8 threshold);
-void MIX_CreateCyclicInputs(s16 *raw);
-struct Mixer *MIX_GetAllMixers();
+void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw);
+void MIXER_EvalMixers(s16 *raw);
+u8   MIXER_ReadInputs(s16 *raw, u8 threshold);
+void MIXER_CreateCyclicInputs(s16 *raw);
 
-struct Trim *MIX_GetAllTrims();
+struct Mixer *MIXER_GetAllMixers();
 
-void MIX_RegisterTrimButtons();
+struct Trim *MIXER_GetAllTrims();
 
-s16 MIX_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
+void MIXER_RegisterTrimButtons();
+
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
 const char *MIXER_SourceName(char *str, u8 src);
 const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_ButtonName(u8 src);
 const char *MIXER_SwashType(enum SwashType);
 u8 MIXER_MapChannel(u8 channel);
 void MIXER_AdjustForProtocol();
+
+void MIXER_Init();
 
 #endif

@@ -209,9 +209,9 @@ void update_channels(void *params)
     }
 }
 extern "C" {
-extern void event_loop(void *);
+extern void EventLoop(void *);
 void start_event_loop() {
-    Fl::add_idle(event_loop);
+    Fl::add_idle(EventLoop);
     Fl::run();
 }
 

@@ -16,11 +16,9 @@
 #include "buttons.h"
 
 static buttonAction_t *buttonHEAD = NULL;
-u32 last_buttons;
-u8 long_press;
-
 static buttonAction_t *buttonPressed = NULL;
-u16 button_time;
+
+void exec_callbacks(u32, enum ButtonFlags);
 
 u8 BUTTON_RegisterCallback(buttonAction_t *action, u32 button, u8 flags,
                  u8 (*callback)(u32 button, u8 flags, void *data), void *data)
@@ -80,48 +78,61 @@ void print_buttons(u32 buttons)
     printf("Buttons: %s\n",buttonstring);
 }
 
-u32 BUTTON_Handler(u8 flags)
+void BUTTON_Handler()
 {
-    buttonAction_t *ptr = buttonHEAD;
-    u32 testbutton = 0;
-    u8 testflags = 0;
-    if(! flags) {
-        u32 buttons = ScanButtons();
-        if(buttons != last_buttons) {
-            button_time = 0;
-            print_buttons(buttons);
-            if (buttons) {
-                testbutton = buttons;
-                testflags = BUTTON_PRESS;
-            } else {
-                testbutton = last_buttons;
-                testflags = BUTTON_RELEASE | (long_press ? BUTTON_HAD_LONGPRESS : 0);
-            }
-            long_press = 0;
-            last_buttons = buttons;
+    static u32 last_buttons = 0;
+    static u32 last_buttons_pressed = 0;
+
+    static u32 long_press_at = 0;
+    static u8  longpress_release = 0;
+
+    u32 buttons = ScanButtons();
+
+    u32 buttons_pressed=   buttons  & (~last_buttons);
+    u32 buttons_released=(~buttons) &   last_buttons;
+
+    if(buttons_pressed) {
+        exec_callbacks(buttons_pressed, BUTTON_PRESS);
+        last_buttons_pressed = buttons_pressed;
+        long_press_at = CLOCK_getms()+500;
+        longpress_release = 0;
+    }
+    
+    if(buttons_released) {
+        if(!longpress_release) {
+            exec_callbacks(buttons_released, BUTTON_RELEASE);
         } else {
-            return buttons;
-        }
-    } else if (flags == BUTTON_LONGPRESS) {
-        if (last_buttons && button_time++ >= 4 && (button_time & 0x01)) {
-            testbutton = last_buttons;
-            testflags = BUTTON_LONGPRESS | (long_press ? BUTTON_REPEAT : 0);
-            long_press = 1;
-        } else {
-            return 0;
+            exec_callbacks(buttons_released, BUTTON_RELEASE | BUTTON_HAD_LONGPRESS);
         }
     }
+
+    if(buttons && (buttons == last_buttons)) {
+        if(CLOCK_getms()>long_press_at) {
+           exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
+           longpress_release=1;
+           long_press_at += 100;
+        }
+    }
+
+    last_buttons=buttons;    
+}    
+
+void exec_callbacks(u32 buttons, enum ButtonFlags flags) {
+    buttonAction_t *ptr = buttonHEAD;
+
     while(ptr) {
-        if ((ptr->button & testbutton) && (ptr->flags & testflags)) {
-            if(!(testflags & BUTTON_RELEASE) || buttonPressed == ptr) {
-                if(ptr->callback(testbutton, testflags, ptr->data)) {
-                    if (testflags & BUTTON_PRESS)
+        if ((ptr->button & buttons) && (ptr->flags & flags)) {
+            if(!(flags & BUTTON_RELEASE) || buttonPressed == ptr) {
+                //We only send a release to the button that accepted a press
+                if(ptr->callback(buttons, flags, ptr->data)) {
+                    //Exit after the 1st action accepts the button
+                    if (flags & BUTTON_PRESS)
                         buttonPressed = ptr;
-                    return 0;
+                    return;
                 }
             }
         }
         ptr = ptr->next;
     }
-    return testbutton;
-}
+
+}  

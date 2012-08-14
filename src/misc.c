@@ -35,8 +35,3 @@ u32 Crc(void *buffer, u32 size)
    return ~crc;
 }
 
-void Hang()
-{
-    while(1)
-        ;
-}

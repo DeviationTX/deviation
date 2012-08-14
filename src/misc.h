@@ -4,5 +4,4 @@
 
 void Delay(u32 count);
 u32 Crc(void *buffer, u32 size);
-void Hang();
 #endif
