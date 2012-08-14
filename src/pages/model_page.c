@@ -17,6 +17,8 @@
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+#include "config/tx.h"
+
 #include <stdlib.h>
 
 static struct model_page * const mp = &pagemem.u.model_page;
@@ -160,8 +162,8 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.mode = GUI_TextSelectHelper(Model.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
-    sprintf(mp->tmpstr, "Mode %d", Model.mode + 1);
+    Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
+    sprintf(mp->tmpstr, "Mode %d", Transmitter.mode);
     return mp->tmpstr;
 }
 

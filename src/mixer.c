@@ -85,7 +85,7 @@ void MIXER_EvalMixers(s16 *raw)
 
 u8 MIXER_MapChannel(u8 channel)
 {
-    switch(Model.mode) {
+    switch(Transmitter.mode) {
     case MODE_1:
        return channel;
     case MODE_2:
@@ -282,7 +282,6 @@ void MIXER_Init()
 {
     memset((void *)Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
-    CONFIG_ReadModel(CONFIG_GetCurrentModel());
     PROTOCOL_Init(Model.protocol);
 }
 

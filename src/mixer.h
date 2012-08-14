@@ -10,10 +10,10 @@
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
 
 enum Mode {
-    MODE_1,
-    MODE_2,
-    MODE_3,
-    MODE_4,
+    MODE_1=1,
+    MODE_2=2,
+    MODE_3=3,
+    MODE_4=4
 };
 
 enum CurveType {

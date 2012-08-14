@@ -27,6 +27,8 @@ static u32 crc32;
 
 const char CURRENT_MODEL[] = "current_model";
 
+const char MODE[]="mode";
+
 const char SECTION_TRIM[] = "trim";
 const char TRIM_VALUE[] = "value";
 
@@ -55,6 +57,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (section[0] == '\0') {
         if (MATCH_KEY(CURRENT_MODEL)) {
             t->current_model = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(MODE)) {
+            t->mode = atoi(value);
             return 1;
         }
     }
@@ -123,6 +129,7 @@ void CONFIG_LoadTx()
 {
     memset(&Transmitter, 0, sizeof(Transmitter));
     Transmitter.current_model = 1;
+    Transmitter.mode = MODE_2;
     ini_parse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
@@ -139,6 +146,7 @@ void CONFIG_WriteTx()
         return;
     }
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
+    fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "[%s]\n", SECTION_TRIM);
     for(i = 0; i < NUM_TRIMS; i++) {
         fprintf(fh, "  %s%d=%d\n", TRIM_VALUE, i+1, t->Trims[i]);

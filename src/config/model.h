@@ -20,7 +20,6 @@ struct Model {
     u32 fixed_id;
     enum TxPower tx_power;
     enum SwashType swash_type;
-    enum Mode mode;
     u8 swash_invert;
     u8 collective_source;
     struct Trim trims[NUM_TRIMS];
