@@ -117,8 +117,6 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     if (data) {
         //Save mixer here
         MIXER_SetLimit(mp->channel, &mp->limit);
-        MIXER_SetTemplate(mp->channel, mp->cur_template);
-        MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
     PAGE_MixerInit(0);
