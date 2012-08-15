@@ -70,6 +70,11 @@ s16 expo(struct Curve *curve, s16 value)
 
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 {
+    //interpolation doesn't work if theinput is out of bounds, so bound it here
+    if (xval > CHAN_MAX_VALUE)
+        xval = CHAN_MAX_VALUE;
+    else if (xval < CHAN_MIN_VALUE)
+        xval = CHAN_MIN_VALUE;
     switch (curve->type) {
         case CURVE_NONE:     return xval;
         case CURVE_FIXED:    return CHAN_MAX_VALUE;
