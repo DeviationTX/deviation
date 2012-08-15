@@ -18,6 +18,7 @@ enum Mode {
 
 enum CurveType {
     CURVE_NONE,
+    CURVE_FIXED,
     CURVE_MIN_MAX,
     CURVE_ZERO_MAX,
     CURVE_GT_ZERO,
