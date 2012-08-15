@@ -95,13 +95,19 @@ s16 CHAN_ReadInput(int channel)
             //If this input doesn't have a zero, calculate from max/min
             zero = ((u32)max + min) / 2;
         }
-        max -= zero;
-        min -= zero;
+        // Derate min and max by 1% to ensure we can get all the way to 100%
+        max = (max - zero) * 99 / 100;
+        min = (min - zero) * 99 / 100;
         if(value >= zero) {
-            value = ((s32)value - zero) * CHAN_MAX_VALUE / max;
+            value = (value - zero) * CHAN_MAX_VALUE / max;
         } else {
-            value = ((s32)value - zero) * CHAN_MIN_VALUE / min;
+            value = (value - zero) * CHAN_MIN_VALUE / min;
         }
+        //Bound output
+        if (value > CHAN_MAX_VALUE)
+            value = CHAN_MAX_VALUE;
+        if (value < CHAN_MIN_VALUE)
+            value = CHAN_MIN_VALUE;
     } else {
         value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
