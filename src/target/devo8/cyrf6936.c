@@ -227,3 +227,41 @@ u8 CYRF_ReadRSSI(u32 dodummyread)
     return (result & 0x0F);
 }
 
+//NOTE: This routine will reset the CRC Seed
+void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace)
+{
+    #define NUM_FREQ 80
+    #define FREQ_OFFSET 4
+    u8 rssi[NUM_FREQ];
+    int i;
+    int j;
+    memset(channels, 0, sizeof(u8) * len);
+    CYRF_ConfigCRCSeed(0x0000);
+    CYRF_ConfigRxTx(0);
+    //Wait for pre-amp to switch from sned to receive
+    Delay(1000);
+    for(i = 0; i < NUM_FREQ; i++) {
+        CYRF_ConfigRFChannel(i + FREQ_OFFSET);
+        CYRF_ReadRegister(0x13);
+        CYRF_StartReceive();
+        Delay(10);
+        rssi[i] = CYRF_ReadRegister(0x13);
+    }
+
+    for (i = 0; i < len; i++) {
+        channels[i] = FREQ_OFFSET;
+        for (j = FREQ_OFFSET; j < NUM_FREQ; j++) {
+            if (rssi[j] < rssi[channels[i]]) {
+                channels[i] = j;
+            }
+            
+        }
+        for (j = channels[i] - minspace; j < channels[i] + minspace; j++) {
+            //Ensure we don't reuse any channels within minspace of the selected channel again
+            if (j < 0 || j >= NUM_FREQ)
+                continue;
+            rssi[j] = 0xff;
+        }
+    }
+    CYRF_ConfigRxTx(1);
+}

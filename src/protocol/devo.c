@@ -169,10 +169,13 @@ static void cyrf_init()
 
 static void set_radio_channels()
 {
-    //FIXME: Query free channels
-    radio_ch[0] = 0x08;
-    radio_ch[1] = 0x0c;
-    radio_ch[2] = 0x04;
+    int i;
+    CYRF_FindBestChannels(radio_ch, 3, 4);
+    printf("Radio Channels:");
+    for (i = 0; i < 3; i++) {
+        printf(" %02x", radio_ch[i]);
+    }
+    printf("\n");
     //Makes code a little easier to duplicate these here
     radio_ch[3] = radio_ch[0];
     radio_ch[4] = radio_ch[1];
@@ -260,7 +263,6 @@ void DEVO_Initialize()
     set_radio_channels();
     radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);
-    //FIXME: Read cyrfmfg_id here
     //FIXME: Properly setnumber of channels;
     num_channels = 8;
     pkt_num = 0;
@@ -268,7 +270,9 @@ void DEVO_Initialize()
     txState = 0;
 
     if(! Model.fixed_id) {
-        fixed_id = 0x094228;
+        fixed_id = ((radio_ch[0] ^ cyrfmfg_id[0] ^ cyrfmfg_id[3]) << 16)
+                 | ((radio_ch[1] ^ cyrfmfg_id[1] ^ cyrfmfg_id[4]) << 8)
+                 | ((radio_ch[2] ^ cyrfmfg_id[2] ^ cyrfmfg_id[5]) << 0);
         bind_counter = 0x1388;
         state = DEVO_BIND;
     } else {

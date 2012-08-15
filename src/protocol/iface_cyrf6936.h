@@ -58,4 +58,5 @@ void CYRF_WriteRegister(u8 address, u8 data);
 u8 CYRF_ReadRegister(u8 address);
 void CYRF_WritePreamble(u32 preamble);
 u8 CYRF_MaxPower();
+void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace);
 #endif
