@@ -67,7 +67,7 @@ s16 CHAN_ReadInput(int channel)
     switch(channel) {
         case INP_THROTTLE: return CHAN_MIN_VALUE + step * gui.throttle;
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
-        case INP_ELEVATOR: return CHAN_MIN_VALUE + step * gui.elevator;
+        case INP_ELEVATOR: return 110 * (CHAN_MIN_VALUE + step * gui.elevator) / 100;
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
         case INP_RUD_DR:   return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_ELE_DR:   return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;

@@ -108,6 +108,7 @@ u8 CURVE_NumPoints(struct Curve *curve)
 {
     switch (curve->type) {
         case CURVE_NONE:
+        case CURVE_FIXED:
         case CURVE_MIN_MAX:
         case CURVE_ZERO_MAX:
         case CURVE_GT_ZERO:
