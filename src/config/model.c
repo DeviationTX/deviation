@@ -604,7 +604,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, MIXER_SourceName(file, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, MIXER_SourceName(file, m->mixers[idx].dest + NUM_INPUTS + 1));
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
-            fprintf(fh, "%s=%d\n", MIXER_SWITCH, m->mixers[idx].sw);
+            fprintf(fh, "%s=%s\n", MIXER_SWITCH, MIXER_SourceName(file, m->mixers[idx].sw));
         if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
             fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
         if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
