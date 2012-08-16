@@ -16,6 +16,7 @@
 #include "target.h"
 #include "interface.h"
 #include "mixer.h"
+#include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
 #define BIND_CHANNEL 0x0d
@@ -332,6 +333,7 @@ void DSM2_Initialize()
     model = MODEL;
 
     cyrf_config();
+    CYRF_SetPower(Model.tx_power);
     CYRF_ConfigRxTx(1);
     //state = DSM2_BIND;
     state = DSM2_CHANSEL;

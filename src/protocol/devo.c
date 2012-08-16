@@ -256,6 +256,7 @@ void DEVO_Initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
+    CYRF_SetPower(Model.tx_power);
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);
     CYRF_ConfigCRCSeed(0x0000);

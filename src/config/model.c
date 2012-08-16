@@ -52,7 +52,7 @@ static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
-const char * const RADIO_TX_POWER_VAL[] = { "300uW", "1mW", "3mW", "10mW", "30mW", "100mW" };
+const char * const RADIO_TX_POWER_VAL[] = { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
 /* Section: Mixer */
 static const char SECTION_MIXER[]   = "mixer";

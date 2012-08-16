@@ -330,6 +330,7 @@ void WK2x01_Initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
+    CYRF_SetPower(Model.tx_power);
     CYRF_ConfigRxTx(1);
     set_radio_channels();
     radio_ch_ptr = radio_ch;

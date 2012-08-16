@@ -171,7 +171,7 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_300uW, TXPOWER_100mW, dir, 1, 1, NULL);
+    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_300uW, TXPOWER_LAST-1, dir, 1, 1, NULL);
     return RADIO_TX_POWER_VAL[Model.tx_power];
 }
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)

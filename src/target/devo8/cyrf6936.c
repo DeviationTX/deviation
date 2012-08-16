@@ -152,6 +152,12 @@ void CYRF_ConfigRFChannel(u8 ch)
 {
     CYRF_WriteRegister(0x00,ch);
 }
+
+void CYRF_SetPower(u8 power)
+{
+    CYRF_WriteRegister(0x03, power & 0x07);
+}
+
 /*
  *
  */

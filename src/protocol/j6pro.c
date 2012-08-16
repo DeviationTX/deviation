@@ -16,6 +16,7 @@
 #include "target.h"
 #include "interface.h"
 #include "mixer.h"
+#include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
 
@@ -137,6 +138,7 @@ static void cyrf_init()
 #ifndef USE_FIXED_MFGID
        CYRF_GetMfgData(cyrfmfg_id);
 #endif
+       CYRF_SetPower(Model.tx_power);
 }
 static void cyrf_bindinit()
 {

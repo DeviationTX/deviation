@@ -172,12 +172,15 @@ enum ModelType {
 };
 
 enum TxPower {
+    TXPOWER_100uW,
     TXPOWER_300uW,
     TXPOWER_1mW,
     TXPOWER_3mW,
     TXPOWER_10mW,
     TXPOWER_30mW,
     TXPOWER_100mW,
+    TXPOWER_150mW,
+    TXPOWER_LAST,
 };
 
 void PROTOCOL_Init(enum Protocols p);

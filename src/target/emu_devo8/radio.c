@@ -15,6 +15,7 @@
 
 #include "target.h"
 #include "protocol/interface.h"
+#include "config/model.h"
 
 #include <stdlib.h>
 
@@ -125,6 +126,9 @@ void CYRF_ConfigRxTx(u32 TxRx) {
 }
 void CYRF_ConfigRFChannel(u8 ch) {
     printf("Changed channel to %02x\n", ch);
+}
+void CYRF_SetPower(u8 power) {
+    printf("Set Tx Power to %s\n", RADIO_TX_POWER_VAL[power]);
 }
 void CYRF_WriteDataPacketLen(u8 data[], u8 len) {
     int i;
