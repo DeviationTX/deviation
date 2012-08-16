@@ -228,11 +228,17 @@ u8 CYRF_ReadRSSI(u32 dodummyread)
 }
 
 //NOTE: This routine will reset the CRC Seed
-void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace)
+void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
 {
     #define NUM_FREQ 80
     #define FREQ_OFFSET 4
     u8 rssi[NUM_FREQ];
+
+    if (min < FREQ_OFFSET)
+        min = FREQ_OFFSET;
+    if (max > NUM_FREQ)
+        max = NUM_FREQ;
+
     int i;
     int j;
     memset(channels, 0, sizeof(u8) * len);
@@ -249,8 +255,8 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace)
     }
 
     for (i = 0; i < len; i++) {
-        channels[i] = FREQ_OFFSET;
-        for (j = FREQ_OFFSET; j < NUM_FREQ; j++) {
+        channels[i] = min;
+        for (j = min; j < max; j++) {
             if (rssi[j] < rssi[channels[i]]) {
                 channels[i] = j;
             }

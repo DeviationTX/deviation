@@ -244,10 +244,13 @@ static void cyrf_init()
 
 static void set_radio_channels()
 {
-    //FIXME: Query free channels
-    radio_ch[0] = 0x08;
-    radio_ch[1] = 0x0c;
-    radio_ch[2] = 0x04;
+    int i;
+    CYRF_FindBestChannels(radio_ch, 3, 4, 4, 80);
+    printf("Radio Channels:");
+    for (i = 0; i < 3; i++) {
+        printf(" %02x", radio_ch[i]);
+    }
+    printf("\n");
 }
 
 void WK_BuildPacket_2801()
@@ -339,9 +342,9 @@ void WK2x01_Initialize()
     if (! Model.fixed_id) {
         u8 cyrfmfg_id[6];
         CYRF_GetMfgData(cyrfmfg_id);
-        fixed_id = ((u32)cyrfmfg_id[0] << 16) |
-                   ((u32)cyrfmfg_id[1] << 8) |
-                   ((u32)cyrfmfg_id[2]);
+        fixed_id = ((radio_ch[0] ^ cyrfmfg_id[0] ^ cyrfmfg_id[3]) << 16)
+                 | ((radio_ch[1] ^ cyrfmfg_id[1] ^ cyrfmfg_id[4]) << 8)
+                 | ((radio_ch[2] ^ cyrfmfg_id[2] ^ cyrfmfg_id[5]) << 0);
     } else {
         fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
                ((Model.fixed_id >> 10) & 0x000300) |

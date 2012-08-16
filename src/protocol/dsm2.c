@@ -276,9 +276,7 @@ static u16 dsm2_cb()
         //CYRF_WriteDataPacket(packet);
         //state = DSM2_BIND;
         //return 10000;
-        //FIXME: Select channels here
-        ch[0] = 0x35;
-        ch[1] = 0x0e;
+        CYRF_FindBestChannels(ch, 2, 5, 4, 80);
         cyrf_configdata();
         CYRF_ConfigRxTx(1);
         chidx = 0;

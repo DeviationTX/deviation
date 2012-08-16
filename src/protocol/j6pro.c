@@ -176,9 +176,7 @@ static void set_radio_channels()
 {
     //FIXME: Query free channels
     //lowest channel is 0x08, upper channel is 0x4d?
-    radio_ch[0] = 0x0f;
-    radio_ch[1] = radio_ch[0] + 5;
-    radio_ch[2] = radio_ch[1] + 5;
+    CYRF_FindBestChannels(radio_ch, 3, 5, 8, 77);
     radio_ch[3] = radio_ch[0];
 }
 

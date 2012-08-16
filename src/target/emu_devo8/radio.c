@@ -137,15 +137,18 @@ void CYRF_WriteDataPacket(u8 data[]) {
 }
 u8 CYRF_MaxPower() { return CYRF_PWR_100MW; }
 
-void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace)
+void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
 {
     int i;
-    int j = 4;
+    if (min < 4)
+        min = 4;
+    if (max > 80)
+        max = 80;
     memset(channels, 0, sizeof(u8) * len);
     for (i = 0; i < len; i++) {
-        channels[i] = j;
-        j = j + minspace;
-        if (j > 80)
+        channels[i] = min;
+        min = min + minspace;
+        if (min > max)
             break;
     }
 }
