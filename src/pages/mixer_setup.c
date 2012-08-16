@@ -276,8 +276,9 @@ s16 eval_mixer_cb(s16 xval, void * data)
         yval = CHAN_MAX_VALUE;
     else if (yval <CHAN_MIN_VALUE)
         yval = CHAN_MIN_VALUE;
-    if (mp->limit.flags & CH_REVERSE)
-        yval = -yval;
+    //Don't showchannel-reverse on the graph (but do show input reverse)
+    //if (mp->limit.flags & CH_REVERSE)
+    //    yval = -yval;
     return yval;
 }
 s16 eval_chan_cb(void * data)
