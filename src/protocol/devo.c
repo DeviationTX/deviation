@@ -144,7 +144,7 @@ static void cyrf_init()
 {
     /* Initialise CYRF chip */
     CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x39);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0B);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
     CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04);
@@ -242,7 +242,7 @@ static u16 devo_cb()
         CYRF_ConfigRxTx(1);
         CYRF_ConfigCRCSeed((crc << 8) + crc);
         CYRF_ConfigSOPCode(sopcodes[sopidx]);
-        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0D);
+        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     }   
     if(pkt_num == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
@@ -256,7 +256,6 @@ void DEVO_Initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
-    CYRF_SetPower(Model.tx_power);
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);
     CYRF_ConfigCRCSeed(0x0000);

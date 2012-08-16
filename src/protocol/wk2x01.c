@@ -217,7 +217,7 @@ static void build_beacon_pkt_2801()
 static void cyrf_init()
 {
     /* Initialise CYRF chip */
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x2B);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
     CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0);
@@ -330,7 +330,6 @@ void WK2x01_Initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
-    CYRF_SetPower(Model.tx_power);
     CYRF_ConfigRxTx(1);
     set_radio_channels();
     radio_ch_ptr = radio_ch;

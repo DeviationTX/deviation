@@ -138,7 +138,6 @@ static void cyrf_init()
 #ifndef USE_FIXED_MFGID
        CYRF_GetMfgData(cyrfmfg_id);
 #endif
-       CYRF_SetPower(Model.tx_power);
 }
 static void cyrf_bindinit()
 {
@@ -249,6 +248,7 @@ static u16 j6pro_cb()
             state = state + 1;
             return 4600; //4.6msec
         case J6PRO_CHANSEL:
+            CYRF_SetPower(Model.tx_power);
             set_radio_channels();
             cyrf_datainit();
         case J6PRO_CHAN_1:

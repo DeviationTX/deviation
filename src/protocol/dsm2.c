@@ -237,11 +237,11 @@ static void cyrf_configdata()
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
 //0x0f, 0x04
     CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x0d);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xea);
     CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
     CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x2d);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
     CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x3f);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xff);
 //Switch from reading RSSI to Writing
@@ -333,7 +333,6 @@ void DSM2_Initialize()
     model = MODEL;
 
     cyrf_config();
-    CYRF_SetPower(Model.tx_power);
     CYRF_ConfigRxTx(1);
     //state = DSM2_BIND;
     state = DSM2_CHANSEL;
