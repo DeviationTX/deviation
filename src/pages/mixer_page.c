@@ -35,13 +35,16 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
 {
     (void)obj;
     char tmp1[5];
-    char tmp2[5];
     if ((long)data < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
-        MIXER_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
-        MIXER_SourceName(tmp2, ProtocolChannelMap[Model.protocol][(long)data]);
-        sprintf(mp->tmpstr,"%s-%s", tmp1, tmp2);
+        MIXER_SourceName(tmp1, ProtocolChannelMap[Model.protocol][(long)data]);
+        sprintf(mp->tmpstr,"%s%d-%s",
+            (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
+            (int)((long)data + 1), tmp1);
     } else {
-        MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+        MIXER_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
+        sprintf(mp->tmpstr,"%s%s",
+                (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
+                tmp1);
     }
     return mp->tmpstr;
 }
