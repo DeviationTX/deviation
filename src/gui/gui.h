@@ -48,12 +48,6 @@ enum LabelType {
     TRANSPARENT,
 };
 
-struct guiDialogReturn {
-    u8 buttonPushed;
-    char strInput[80];
-    int intInput;
-};
-
 struct LabelDesc {
     u8 font;
     u16 font_color;
@@ -198,14 +192,11 @@ struct guiBarGraph {
 };
 
 struct guiDialog {
-    const char *file;
-    const char *text;
+    struct guiBox txtbox;
     const char *title;
-    enum DialogType Type;
-    u16 fontColor;
-    u16 titleColor;
-    struct guiObject *button[4];
-    void (*CallBack)(guiObject_t *obj, struct guiDialogReturn gDR);
+    const char *(*string_cb)(guiObject_t *obj, void *data);
+    void (*CallBack)(u8 state, void *data);
+    void *cbData;
 };
 
 struct guiTextSelect {
@@ -287,6 +278,7 @@ void GUI_DrawLabel(struct guiObject *obj);
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 void GUI_DrawDialog(struct guiObject *obj);
+void GUI_DialogDrawBackground(u16 x, u16 y, u16 w, u16 h);
 
 void GUI_DrawImage(struct guiObject *obj);
 u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type);
@@ -308,9 +300,9 @@ void connect_object(struct guiObject *obj);
 #endif
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
-        const char *text, u16 titleColor, u16 fontColor,
-        void (*CallBack)(guiObject_t *obj, struct guiDialogReturn),
-        enum DialogType dgType);
+        const char *(*string_cb)(guiObject_t *obj, void *data),
+        void (*CallBack)(u8 state, void *data),
+        enum DialogType dgType, void *data);
 #define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, NULL, data)
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, void *),

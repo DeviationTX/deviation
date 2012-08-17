@@ -97,8 +97,7 @@ void GUI_DrawObjects(void)
 
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if(! OBJ_IS_HIDDEN(obj) &&
-           (! OBJ_IS_MODAL(obj) || obj->Type == Dialog))
+        if(! OBJ_IS_HIDDEN(obj))
         {
             GUI_DrawObject(obj);
         }
@@ -133,11 +132,7 @@ void GUI_RemoveObj(struct guiObject *obj)
 {
     switch(obj->Type) {
     case Dialog: {
-        struct guiDialog *dialog = &obj->o.dialog;
-        int i;
-        for (i = 0; i < 4; i++)
-            if (dialog->button[i])
-                GUI_RemoveObj(dialog->button[i]);
+        GUI_RemoveHierObjects(obj->next);
         break;
     }
     case Scrollbar:
@@ -226,7 +221,7 @@ struct guiObject *GUI_IsModal(void)
 {
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if(obj->Type == Dialog && OBJ_IS_USED(obj))
+        if(OBJ_IS_MODAL(obj) && OBJ_IS_USED(obj) && ! OBJ_IS_HIDDEN(obj))
             return obj;
         obj = obj->next;
     }
@@ -250,21 +245,20 @@ void GUI_RefreshScreen(void)
         GUI_DrawScreen();
         return;
     }
-    if((obj = GUI_IsModal())) {
-        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
-            GUI_DrawObject(obj);
-        }
-    } else {
-        obj = objHEAD;
-        while(obj) {
-            if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
-                if(OBJ_IS_TRANSPARENT(obj)) {
+    struct guiObject *modalObj = GUI_IsModal();
+    obj = objHEAD;
+    while(obj) {
+        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+            if(OBJ_IS_TRANSPARENT(obj)) {
+                if (modalObj && modalObj->Type == Dialog) {
+                    GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                } else {
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
-                GUI_DrawObject(obj);
             }
-            obj = obj->next;
+            GUI_DrawObject(obj);
         }
+        obj = obj->next;
     }
 }
 
