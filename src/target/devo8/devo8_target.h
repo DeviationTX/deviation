@@ -12,7 +12,7 @@
 
 #define NUM_TRIMS 6
 #define MAX_POINTS 13
-#define NUM_MIXERS 16
+#define NUM_MIXERS (NUM_CHANNELS * 4)
 
 #define INP_NONE     0
 #define INP_AILERON  1

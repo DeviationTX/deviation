@@ -412,7 +412,17 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
 {
     int i;
     if (count) {
+        int mixer_count = 0;
         u8 dest = mixers[0].dest;
+        //Determine if we have enough free mixers
+        for (i = 0; i < NUM_MIXERS; i++) {
+            if (MIXER_SRC(Model.mixers[i].src) && Model.mixers[i].dest != dest)
+                mixer_count++;
+        }
+        if (mixer_count + count > NUM_MIXERS) {
+            printf("Need %d free mixers, but only %d are available\n", count, NUM_MIXERS - mixer_count);
+            return 0;
+        }
         //Remove all mixers for this channel
         for (i = 0; i < NUM_MIXERS; i++) {
             if (MIXER_SRC(Model.mixers[i].src) && Model.mixers[i].dest == dest)
@@ -420,16 +430,12 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
         }
     }
     u8 pos = compact_mixers();
-    if (pos + count > NUM_MIXERS) {
-        printf("Need %d free mixers, but only %d are available\n", count, NUM_MIXERS - pos);
-        return 0;
-    }
     for (i = 0; i < count; i++) {
         if (MIXER_SRC(mixers[i].src))
             Model.mixers[pos++] = mixers[i];
     }
     fix_mixer_dependencies(pos);
-    return 0;
+    return 1;
 }
 
 void MIXER_GetLimit(int ch, struct Limit *limit)
