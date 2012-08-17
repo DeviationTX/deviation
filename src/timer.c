@@ -75,9 +75,14 @@ void TIMER_Update()
     u8 i;
     u32 t = CLOCK_getms();
     for (i = 0; i < NUM_TIMERS; i++) {
-        s16 *raw = MIXER_GetInputs();
         if (Model.timer[i].src) {
-            s16 val = raw[MIXER_SRC(Model.timer[i].src)];
+            s16 val;
+            if (Model.timer[i].src <= NUM_INPUTS) {
+                s16 *raw = MIXER_GetInputs();
+                val = raw[MIXER_SRC(Model.timer[i].src)];
+            } else {
+                val = Channels[MIXER_SRC(Model.timer[i].src) - NUM_INPUTS - 1];
+            }
             if (MIXER_SRC_IS_INV(Model.timer[i].src))
                 val = -val;
             u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
