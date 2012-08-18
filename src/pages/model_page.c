@@ -91,6 +91,8 @@ static void changename_done_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     GUI_RemoveObj(obj);
+    //Save model info here so it shows up on the model page
+    CONFIG_SaveModelIfNeeded();
     PAGE_ModelInit(0);
 }
 static void changename_cb(guiObject_t *obj, void *data)
