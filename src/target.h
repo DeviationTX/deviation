@@ -22,6 +22,10 @@ extern volatile s16 Channels[NUM_CHANNELS];
 /* General Functions */
 void ModelName(u8 *var, u8 len);
 
+/* Backlight Functions */
+void BACKLIGHT_Init();
+void BACKLIGHT_Brightness(u8 brightness);
+
 /* Display Functions */
 void LCD_Init();
 

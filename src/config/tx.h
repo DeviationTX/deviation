@@ -19,6 +19,7 @@ struct TouchCalibration {
 struct Transmitter {
     u8 current_model;
     enum Mode mode;
+    u8 brightness;
     struct StickCalibration calibration[NUM_INPUTS];
     struct TouchCalibration touch;
 };

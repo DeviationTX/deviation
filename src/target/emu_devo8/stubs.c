@@ -57,3 +57,5 @@ u8 *BOOTLOADER_Read(int idx) {
 void UART_Initialize() {}
 int FS_Mount() {return ! chdir("filesystem");}
 
+void BACKLIGHT_Init() {}
+void BACKLIGHT_Brightness(u8 brightness) { printf("Brightness: %d\n", brightness); }

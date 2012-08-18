@@ -15,7 +15,6 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/fsmc.h>
-#include <libopencm3/stm32/timer.h>
 #include "target.h"
 #include "misc.h"
 
@@ -84,31 +83,6 @@ void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
 void LCD_DrawStop(void)
 {
   return;
-}
-
-void lcd_init_backlight()
-{
-
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO1);
-
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM3EN);
-    timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT,
-                    TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    timer_set_period(TIM3, 0x2CF);
-    timer_set_prescaler(TIM3, 0);
-    timer_generate_event(TIM3, TIM_EGR_UG);
-    //timer_set_repetition_counter(TIM3, 0);
-    timer_set_oc_mode(TIM3, TIM_OC4, TIM_OCM_PWM1);
-    timer_enable_oc_preload(TIM3, TIM_OC4);
-
-    timer_set_oc_polarity_low(TIM3, TIM_OC4);
-    timer_enable_oc_output(TIM3, TIM_OC4);
-
-    timer_set_oc_value(TIM3, TIM_OC4, 0x168);
-    timer_enable_preload(TIM3);
-    timer_enable_counter(TIM3);
 }
 
 void LCD_Init()
@@ -195,7 +169,5 @@ void LCD_Init()
   lcd_cmd(0x28, 0x38);
   Delay(40);
   lcd_cmd(0x28, 0x3C);
-
-  lcd_init_backlight();
 }
 

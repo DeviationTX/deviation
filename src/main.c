@@ -58,6 +58,7 @@ int main() {
     CONFIG_ReadDisplay();
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
 
+    BACKLIGHT_Brightness(Transmitter.brightness);
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
@@ -94,6 +95,7 @@ void Init() {
 #endif
     SPITouch_Init();
     SOUND_Init();
+    BACKLIGHT_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
 }
 

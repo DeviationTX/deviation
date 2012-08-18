@@ -44,10 +44,10 @@ void PWR_Init(void)
 
 void PWR_Shutdown()
 {
+    BACKLIGHT_Brightness(0);
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(HSI);
     gpio_clear(GPIOA, GPIO2);
-    gpio_clear(GPIOB, GPIO1);
     while(1) ;
 }
 
