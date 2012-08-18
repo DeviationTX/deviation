@@ -84,6 +84,14 @@ enum LimitFlags {
     CH_FAILSAFE_EN = 0x02,
 };
 
+enum LimitMask {
+    APPLY_REVERSE = 0x01,
+    APPLY_LIMITS  = 0x02,
+    APPLY_SAFETY  = 0x04,
+    APPLY_SUBTRIM = 0x08,
+    APPLY_ALL     = 0xFF,
+};
+
 struct Limit {
     u8 flags;
     u8 safetysw;
@@ -109,6 +117,7 @@ u8 CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
 s16 *MIXER_GetInputs();
+s16 MIXER_GetChannel(u8 channel, enum LimitMask flags);
 
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIXER_SetMixers(struct Mixer *mixers, int count);
@@ -132,7 +141,7 @@ struct Trim *MIXER_GetAllTrims();
 
 void MIXER_RegisterTrimButtons();
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw);
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags);
 const char *MIXER_SourceName(char *str, u8 src);
 const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_ButtonName(u8 src);

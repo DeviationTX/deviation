@@ -90,7 +90,7 @@ void PAGE_MainInit(int page)
         if (i >= NUM_CHANNELS)
             break;
         if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
-            mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
+            mp->barval[i] = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
             mp->barObj[i] = GUI_CreateBarGraph(x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                                                bar_cb, (void *)((long)Model.pagecfg.bar[i]));
         } else {
@@ -146,11 +146,13 @@ void PAGE_MainEvent()
             GUI_Redraw(mp->boxObj[i]);
         }
     }
+    s16 *raw = MIXER_GetInputs();
     for(i = 0; i < 8; i++) {
         if (! mp->barObj[i])
             continue;
-        if (mp->barval[i] != Channels[Model.pagecfg.bar[i]-1]) {
-            mp->barval[i] = Channels[Model.pagecfg.bar[i]-1];
+        s16 chan = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
+        if (mp->barval[i] != chan) {
+            mp->barval[i] = chan;
             GUI_Redraw(mp->barObj[i]);
         }
     }
@@ -158,8 +160,7 @@ void PAGE_MainEvent()
         if (! mp->toggleObj[i])
             continue;
         u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);
-        s16 *raw = MIXER_GetInputs();
-        s16 val = (src <= NUM_INPUTS) ? raw[src] : Channels[src - NUM_INPUTS -1];
+        s16 val = raw[src];
         GUI_SetHidden(mp->toggleObj[i], MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
     }
 }
@@ -168,7 +169,7 @@ s32 get_boxval(u8 idx)
 {
     if(idx == 1 || idx == 2)
         return TIMER_GetValue(idx-1);
-    return RANGE_TO_PCT(Channels[idx-3]);
+    return RANGE_TO_PCT(MIXER_GetChannel(idx-3, APPLY_SAFETY));
 }
 
 void PAGE_MainExit()
@@ -180,10 +181,11 @@ const char *show_box_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    if(idx < 3)
+    if(idx < 3) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx-1));
-    else
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(Channels[idx-3]));
+    } else {
+        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx-3, APPLY_SAFETY)));
+    }
     return mp->tmpstr;
 }
 
@@ -204,7 +206,7 @@ s16 trim_cb(void * data)
 s16 bar_cb(void * data)
 {
     u8 idx = (long)data;
-    return Channels[idx-1];
+    return MIXER_GetChannel(idx-1, APPLY_SAFETY);
 }
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)

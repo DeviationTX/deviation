@@ -81,7 +81,7 @@ void TIMER_Update()
                 s16 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].src)];
             } else {
-                val = Channels[MIXER_SRC(Model.timer[i].src) - NUM_INPUTS - 1];
+                val = MIXER_GetChannel(Model.timer[i].src - NUM_INPUTS - 1, APPLY_SAFETY);
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].src))
                 val = -val;

@@ -144,12 +144,17 @@ void MIXER_CalcChannels()
 
     //4th step: apply limits
     for (i = 0; i < NUM_CHANNELS; i++) {
-        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw);
+        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, APPLY_ALL);
     }
 }
 s16 *MIXER_GetInputs()
 {
     return raw;
+}
+
+s16 MIXER_GetChannel(u8 channel, enum LimitMask flags)
+{
+    return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, flags);
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
@@ -237,18 +242,21 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     }
 }
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw)
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags)
 {
     s16 value = raw[NUM_INPUTS + 1 + channel];
-    value += PCT_TO_RANGE(limit->subtrim) / 10;
-    if (limit->flags & CH_REVERSE)
+    if (flags & APPLY_SUBTRIM)
+        value += PCT_TO_RANGE(limit->subtrim) / 10;
+    if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
         value = -value;
-    if (MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw))
+    if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw)) {
         value = PCT_TO_RANGE(Model.limits[channel].safetyval);
-    else if (value > PCT_TO_RANGE(limit->max))
-        value = PCT_TO_RANGE(limit->max);
-    else if( value < PCT_TO_RANGE(limit->min))
-        value = PCT_TO_RANGE(limit->min);
+    } else if (flags & APPLY_LIMITS) {
+        if (value > PCT_TO_RANGE(limit->max))
+            value = PCT_TO_RANGE(limit->max);
+        else if( value < PCT_TO_RANGE(limit->min))
+            value = PCT_TO_RANGE(limit->min);
+    }
     return value;
 }
 
