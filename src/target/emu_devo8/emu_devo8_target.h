@@ -5,6 +5,8 @@
 #define PROTO_HAS_A7105
 #define PROTO_HAS_CYRF6936
 
+#define MIN_BRIGHTNESS 0
+
 #define NUM_TX_BUTTONS 18
 #define NUM_TX_INPUTS 14 
 #define NUM_INPUTS (NUM_TX_INPUTS + 3)
