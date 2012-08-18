@@ -1,6 +1,7 @@
 #ifndef _DEVO8_TARGET_H_
 #define _DEVO8_TARGET_H_
- 
+
+#define MIN_BRIGHTNESS 1 
 //Protocols
 #define PROTO_HAS_CYRF6936
 #define PROTO_HAS_A7105

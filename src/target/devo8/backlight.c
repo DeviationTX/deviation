@@ -36,7 +36,7 @@ void BACKLIGHT_Init()
     timer_set_oc_mode(TIM3, TIM_OC4, TIM_OCM_PWM1);
     timer_enable_oc_preload(TIM3, TIM_OC4);
 
-    timer_set_oc_polarity_low(TIM3, TIM_OC4);
+    timer_set_oc_polarity_high(TIM3, TIM_OC4);
     timer_enable_oc_output(TIM3, TIM_OC4);
 
     timer_enable_preload(TIM3);

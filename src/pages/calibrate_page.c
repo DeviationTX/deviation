@@ -181,7 +181,8 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness, 0, 9, dir, 1, 1, &changed);
+    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness, 
+                                  MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
     if (changed)
         BACKLIGHT_Brightness(Transmitter.brightness);
     if (Transmitter.brightness == 0)
