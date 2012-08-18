@@ -222,17 +222,23 @@ void LCD_GetCharDimensions(u8 c, u16 *width, u16 *height) {
 }
 
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
+    int line_width = 0;
     *height = HEIGHT(cur_str.font);
     *width = 0;
     //printf("String: %s\n", str);
     while(*str) {
         if(*str == '\n') {
             *height += HEIGHT(cur_str.font) + LINE_SPACING;
+            if(line_width > *width)
+                *width = line_width;
+            line_width = 0;
         } else {
-            *width += get_width(*str) + CHAR_SPACING;
+            line_width += get_width(*str) + CHAR_SPACING;
         }
         str++;
     }
+    if(line_width > *width)
+        *width = line_width;
     //printf("W: %d   H: %d\n",(int)*width,(int)*height);
 }
 
