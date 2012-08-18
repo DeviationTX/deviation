@@ -297,6 +297,7 @@ void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx);
 u8 coords_in_box(struct guiBox *box, struct touch *coords);
 struct guiObject *GUI_GetFreeObj(void);
 void connect_object(struct guiObject *obj);
+void GUI_HandleModalButtons(u8 enable);
 #endif
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,

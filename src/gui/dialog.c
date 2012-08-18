@@ -63,7 +63,6 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         but = GUI_CreateButton(x + (width - 96) / 2, y + height - 27,
                         BUTTON_96, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
         OBJ_SET_MODAL(but, 1);
-        
         break;
     case dtOkCancel:
         but = GUI_CreateButton(x + width - 5 - 48, y + height - 27,
@@ -75,6 +74,8 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         OBJ_SET_MODAL(but, 1);
         break;
     }
+    GUI_HandleModalButtons(1);
+    objSELECTED = but;
     return obj;
 }
 

@@ -25,6 +25,7 @@ struct guiObject *objSELECTED = NULL;
 
 static struct guiObject GUI_Array[100];
 static buttonAction_t button_action;
+static buttonAction_t button_modalaction;
 static u8 FullRedraw;
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
@@ -132,6 +133,7 @@ void GUI_RemoveObj(struct guiObject *obj)
 {
     switch(obj->Type) {
     case Dialog: {
+        GUI_HandleModalButtons(0);
         GUI_RemoveHierObjects(obj->next);
         break;
     }
@@ -394,9 +396,10 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
 
     if (! objHEAD)
         return NULL;
+    u8 modalActive = GUI_IsModal() ? 1 : 0;
     obj = obj ? obj->next : objHEAD;
     while(obj) {
-        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
         {
             foundObj = obj;
             break;
@@ -413,10 +416,11 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     struct guiObject *obj = objHEAD, *objLast = NULL;
     if (obj == NULL)
         return GUI_GetNextSelectable(objHEAD);
+    u8 modalActive = GUI_IsModal() ? 1 : 0;
     while(obj) {
         if (obj == origObj)
             break;
-        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
         {
             objLast = obj;
         }
@@ -427,7 +431,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         while(obj) {
             if (obj == origObj)
                 break;
-            if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
+            if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
             {
                 objLast = obj;
             }
@@ -456,18 +460,34 @@ void GUI_HandleButtons(u8 enable)
                 NULL);
 }
 
+void GUI_HandleModalButtons(u8 enable)
+{
+    if (! enable)
+        BUTTON_UnregisterCallback(&button_modalaction);
+    else 
+        BUTTON_RegisterCallback(&button_modalaction,
+                0xFFFFFFFF,
+                BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+                handle_buttons,
+                NULL);
+}
+
 u8 handle_buttons(u32 button, u8 flags, void *data)
 {
     (void)data;
+    //When modal, we capture all button presses
+    u8 modalActive = GUI_IsModal() ? 1 : 0;
     if (flags & BUTTON_RELEASE) {
         if (objSELECTED && objTOUCHED == objSELECTED && (
              CHAN_ButtonIsPressed(button, BUT_LEFT) ||
              CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
              CHAN_ButtonIsPressed(button, BUT_ENTER)))
         {
+            //Button is emulating a touch, so send a release
             GUI_TouchRelease();
             return 1;
         } else if (flags & BUTTON_HAD_LONGPRESS) {
+            //ignore long-press release
             return 0;
         } else if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
                    (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_UP)))
@@ -494,20 +514,20 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
             objSELECTED = NULL;
             return 1;
         }
-        return 0;
+        return modalActive;
     }
     if (! objHEAD)
-        return 0;
+        return modalActive;
 
     if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
         CHAN_ButtonIsPressed(button, BUT_UP) ||
         CHAN_ButtonIsPressed(button, BUT_EXIT))
     {
-        return (flags & BUTTON_LONGPRESS) ? 0 : 1;
+        return (flags & BUTTON_LONGPRESS) ? modalActive : 1;
     }
     if (CHAN_ButtonIsPressed(button, BUT_ENTER) && flags & BUTTON_LONGPRESS) {
         //long-press on enter is ignored so it can be handled by the menu
-        return 0;
+        return modalActive;
     }
     if (objSELECTED) {
         void(*press)(struct guiObject *obj, u32 button, u8 press_type) = NULL;
@@ -545,7 +565,7 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         }
         return 1;
     }
-    return 0;
+    return modalActive;
 }
 guiObject_t *GUI_GetSelected()
 {
