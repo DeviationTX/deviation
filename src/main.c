@@ -70,6 +70,9 @@ int main() {
     
     CLOCK_StartWatchdog();
     
+    MIXER_CalcChannels();
+    PROTOCOL_Init(0);
+
     next_redraw = CLOCK_getms()+100;
     
 #ifdef HAS_EVENT_LOOP
