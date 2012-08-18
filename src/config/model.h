@@ -28,6 +28,7 @@ struct Model {
     struct Timer timer[NUM_TIMERS];
     u8 template[NUM_CHANNELS];
     struct PageCfg pagecfg;
+    u8 safety[NUM_INPUTS + NUM_CHANNELS];
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[];

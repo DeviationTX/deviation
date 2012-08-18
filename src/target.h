@@ -150,6 +150,7 @@ void MIXER_CalcChannels();
 void PAGE_Init();
 void PAGE_Change(int dir);
 void PAGE_Event();
+void PAGE_ShowSafetyDialog();
 
 /* Protocol */
 enum Protocols {
@@ -187,8 +188,10 @@ enum TxPower {
     TXPOWER_LAST,
 };
 
-void PROTOCOL_Init(enum Protocols p);
+void PROTOCOL_Init(u8 force);
 void PROTOCOL_DeInit();
+u8 PROTOCOL_WaitingForSafe();
+u32 PROTOCOL_CheckSafe();
 
 /* Abstract bootloader access */
 enum {

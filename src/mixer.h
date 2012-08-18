@@ -9,6 +9,13 @@
 #define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
 
+enum Safety {
+    SAFE_NONE,
+    SAFE_MIN,
+    SAFE_ZERO,
+    SAFE_MAX,
+};
+
 enum Mode {
     MODE_1=1,
     MODE_2=2,

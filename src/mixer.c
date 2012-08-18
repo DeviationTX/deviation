@@ -290,7 +290,6 @@ void MIXER_Init()
 {
     memset((void *)Channels, 0, sizeof(Channels));
     //memset(&Model, 0, sizeof(Model));
-    PROTOCOL_Init(Model.protocol);
 }
 
 void MIXER_RegisterTrimButtons()

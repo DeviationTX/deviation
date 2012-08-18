@@ -110,6 +110,10 @@ static const char SECTION_TIMER[] = "timer";
 static const char * const TIMER_TYPE_VAL[] = { "stopwatch", "countdown" };
 static const char TIMER_TIME[] = "time";
 
+/* Section: Safety */
+static const char SECTION_SAFETY[] = "safety";
+static const char * const SAFETY_VAL[] = { "none", "min", "zero", "max" };
+
 /* Section: Gui-QVGA */
 static const char SECTION_GUI_QVGA[] = "gui-qvga";
 #define GUI_TRIM SECTION_TRIM
@@ -481,6 +485,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    if (MATCH_START(section, SECTION_SAFETY)) {
+        u8 src = get_source(section, name);
+        if(src) {
+            u8 i;
+            for (i = 0; i < NUM_STR_ELEMS(SAFETY_VAL); i++) {
+                if (MATCH_VALUE(SAFETY_VAL[i])) {
+                    m->safety[src-1] = i;
+                    return 1;
+                }
+            }
+        }
+    }
     if (MATCH_START(section, SECTION_GUI_QVGA)) {
         if (MATCH_KEY(GUI_TRIM)) {
             for (i = 0; i < NUM_STR_ELEMS(GUI_TRIM_VAL); i++) {
@@ -688,6 +704,12 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, MIXER_SourceName(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
+    }
+    fprintf(fh, "[%s]\n", SECTION_SAFETY);
+    for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+        if (WRITE_FULL_MODEL || m->safety[i]) {
+            fprintf(fh, "%s=%s\n", MIXER_SourceName(file, i + 1), SAFETY_VAL[m->safety[i]]);
+        }
     }
     fprintf(fh, "[%s]\n", SECTION_GUI_QVGA);
     if (WRITE_FULL_MODEL || m->pagecfg.trims)

@@ -83,12 +83,19 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     int msg = (long)data;
     (void)obj;
     if (msg == 1) {
+        /* Load Model */
         CONFIG_SaveModelIfNeeded();
+        PROTOCOL_DeInit();
         CONFIG_ReadModel(mp->selected);
+        /* Need to recaclulate channels to see if we're in a safe state */
+        MIXER_CalcChannels();
+        PROTOCOL_Init(0);
     } else if (msg == 2) {
+        /* Save Model */
         CONFIG_WriteModel(mp->selected);
         CONFIG_ReadModel(mp->selected);  //Reload the model after saving to switch (for future saves)
     } else if (msg == 3) {
+        /* Load Template */
         CONFIG_ReadTemplate(mp->selected);
     }
     GUI_RemoveAllObjects();
@@ -101,6 +108,11 @@ const char *show_loadsave_cb(guiObject_t *obj, void *data)
     return ((long)data) == 2 ? "Save" : "Load";
 }
 
+/* loadsave values:
+ * 0 : Load Model
+ * 1 : Save Model
+ * 2 : Load Template
+ */
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
     u8 num_models;

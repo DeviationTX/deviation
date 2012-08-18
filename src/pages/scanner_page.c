@@ -52,7 +52,7 @@ static void press_cb(guiObject_t *obj, void *data)
         //CYRF_ConfigSOPCode(0);
     } else {
         CLOCK_StopTimer();
-        PROTOCOL_Init(Model.protocol);
+        PROTOCOL_Init(0);
     }
     GUI_Redraw(obj);
 }
@@ -101,5 +101,5 @@ void PAGE_ScannerEvent()
 void PAGE_ScannerExit()
 {
     if(sp.enable)
-        PROTOCOL_Init(Model.protocol);
+        PROTOCOL_Init(0);
 }

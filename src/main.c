@@ -141,6 +141,8 @@ void EventLoop()
     PAGE_Event();
 
     if (CLOCK_getms() > next_redraw) {
+        if (PROTOCOL_WaitingForSafe())
+            PAGE_ShowSafetyDialog();
         TIMER_Update();
         GUI_RefreshScreen();
         next_redraw = CLOCK_getms() + 100;

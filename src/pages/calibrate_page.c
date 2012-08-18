@@ -98,7 +98,7 @@ static void calibrate_sticks(void)
     for (i = 0; i < 4; i++) {
         printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
     }
-    PROTOCOL_Init(Model.protocol);
+    PROTOCOL_Init(0);
     PAGE_CalibrateInit(0);
 }
 

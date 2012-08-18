@@ -15,9 +15,11 @@
 
 #include "target.h"
 #include "interface.h"
+#include "config/model.h"
 
 static const u8 const _eatrg[PROTO_MAP_LEN] = ORDER_EATRG;
 static const u8 const _taerg[PROTO_MAP_LEN] = ORDER_EATRG;
+u8 proto_ready;
 
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     NULL,
@@ -34,9 +36,14 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
 #endif
 };
 
-void PROTOCOL_Init(enum Protocols p)
+void PROTOCOL_Init(u8 force)
 {
-    switch(p) {
+    if (! force && PROTOCOL_CheckSafe()) {
+        proto_ready = 0;
+        return;
+    }
+    proto_ready = 1;
+    switch(Model.protocol) {
         #ifdef PROTO_HAS_A7105
         case PROTOCOL_FLYSKY:
             FLYSKY_Initialize();
@@ -68,4 +75,32 @@ void PROTOCOL_Init(enum Protocols p)
 void PROTOCOL_DeInit()
 {
     CLOCK_StopTimer();
+    proto_ready = 1;
 }
+
+u8 PROTOCOL_WaitingForSafe()
+{
+    return ! proto_ready;
+}
+
+u32 PROTOCOL_CheckSafe()
+{
+    int i;
+    s16 *raw = MIXER_GetInputs();
+    u32 unsafe = 0;
+    for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+        if (! Model.safety[i])
+            continue;
+        s16 val = RANGE_TO_PCT((i < NUM_INPUTS)
+                      ? raw[i+1]
+                      : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
+        if (Model.safety[i] == SAFE_MIN && val > -99)
+            unsafe |= 1 << i;
+        else if (Model.safety[i] == SAFE_ZERO && (val < -1 || val > 1))
+            unsafe |= 1 << i;
+        else if (Model.safety[i] == SAFE_MAX && val < 99)
+            unsafe |= 1 << i;
+    }
+    return unsafe;
+}
+
