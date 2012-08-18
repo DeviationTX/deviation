@@ -28,7 +28,6 @@ static void fixedid_cb(guiObject_t *obj, void *data);
 static const char *type_val_cb(guiObject_t *obj, int dir, void *data);
 static void type_press_cb(guiObject_t *obj, void *data);
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
-static const char *modeselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data);
@@ -53,7 +52,6 @@ void PAGE_ModelInit(int page)
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "File:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
 
-
     row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
@@ -61,11 +59,6 @@ void PAGE_ModelInit(int page)
     row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
-
-    row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Mode:");
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
-
 
     row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Protocol:");
@@ -156,14 +149,6 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_CHANNELS, dir, 1, 1, NULL);
     sprintf(mp->tmpstr, "%d", Model.num_channels);
-    return mp->tmpstr;
-}
-static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
-    sprintf(mp->tmpstr, "Mode %d", Transmitter.mode);
     return mp->tmpstr;
 }
 

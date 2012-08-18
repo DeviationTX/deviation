@@ -167,6 +167,28 @@ const char *show_msg_cb(guiObject_t *obj, void *data)
     return cp.tmpstr;
 }
 
+static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
+    sprintf(cp.tmpstr, "Mode %d", Transmitter.mode);
+    return cp.tmpstr;
+}
+
+static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed;
+    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness, 0, 9, dir, 1, 1, &changed);
+    if (changed)
+        BACKLIGHT_Brightness(Transmitter.brightness);
+    if (Transmitter.brightness == 0)
+        return "Off";
+    sprintf(cp.tmpstr, "%d", Transmitter.brightness);
+    return cp.tmpstr;
+}
 static void okcancel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -203,14 +225,23 @@ void PAGE_CalibrateInit(int page)
     cp.enable = CALIB_NONE;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader("Calibrate");
+    PAGE_ShowHeader("Configure");
 
-    GUI_CreateLabelBox(20, 106, 0, 0, &DEFAULT_FONT, NULL, NULL, "Screen");
-    GUI_CreateButton(80, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
-    GUI_CreateButton(180, 100, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
-    GUI_CreateLabelBox(20, 146, 0, 0, &DEFAULT_FONT, NULL, NULL, "Sticks");
-    GUI_CreateButton(80, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
-    // GUI_CreateButton(180, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
+    u8 row = 40;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Mode");
+    GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
+    row += 24;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Backlight");
+    GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, brightness_select_cb, NULL);
+    row += 32;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Screen");
+    GUI_CreateButton(90, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+    GUI_CreateButton(190, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
+
+    row += 32;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Sticks");
+    GUI_CreateButton(90, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+    // GUI_CreateButton(190, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
 }
 
 
