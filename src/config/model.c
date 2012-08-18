@@ -356,7 +356,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(CHAN_LIMIT_SAFETYSW)) {
-            m->limits[idx].safetysw = value_int;
+            m->limits[idx].safetysw = get_source(section, value);
             return 1;
         }
         if (MATCH_KEY(CHAN_LIMIT_SAFETYVAL)) {
@@ -656,7 +656,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
         if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYSW, m->limits[idx].safetysw);
+            fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, MIXER_SourceName(file, m->limits[idx].safetysw));
         if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
         if(WRITE_FULL_MODEL || m->limits[idx].max != 100)
