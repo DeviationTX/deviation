@@ -87,7 +87,7 @@ void PAGE_MainInit(int page)
         }
     }
     for(i = 0; i < 8; i++) {
-        if (i >= NUM_CHANNELS)
+        if (i >= NUM_CHANNELS || i >= Model.num_channels)
             break;
         if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
             mp->barval[i] = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);

@@ -88,6 +88,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
         PROTOCOL_DeInit();
         CONFIG_ReadModel(mp->selected);
         /* Need to recaclulate channels to see if we're in a safe state */
+        MIXER_Init();
         MIXER_CalcChannels();
         PROTOCOL_Init(0);
     } else if (msg == 2) {

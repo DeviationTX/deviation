@@ -289,6 +289,7 @@ u8 switch_is_on(u8 sw, s16 *raw)
 void MIXER_Init()
 {
     memset((void *)Channels, 0, sizeof(Channels));
+    memset((void *)raw, 0, sizeof(raw));
     //memset(&Model, 0, sizeof(Model));
 }
 
