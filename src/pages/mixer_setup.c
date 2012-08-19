@@ -36,7 +36,12 @@ static void redraw_graphs();
 
 void MIXPAGE_ChangeTemplate(int show_header)
 {
-    mp->cur_mixer = mp->mixer;
+    if (mp->cur_template != MIXERTEMPLATE_COMPLEX
+        || mp->cur_mixer < mp->mixer
+        || mp->cur_mixer > mp->mixer + mp->num_mixers)
+    {
+        mp->cur_mixer = mp->mixer;
+    }
     sync_mixers();
     if (show_header) {
         PAGE_RemoveAllObjects();
