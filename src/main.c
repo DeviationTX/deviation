@@ -29,7 +29,10 @@ void EventLoop();
 
 void TOUCH_Handler(); // temporarily in main()
 
+#define SCREEN_UPDATE_MSEC 100
+#define CHAN_UPDATE_MSEC   5
 u32 next_redraw=0;
+u32 next_scan=0;
 
 int main() {
     
@@ -73,7 +76,8 @@ int main() {
     MIXER_CalcChannels();
     PROTOCOL_Init(0);
 
-    next_redraw = CLOCK_getms()+100;
+    next_redraw = CLOCK_getms()+SCREEN_UPDATE_MSEC;
+    next_scan = CLOCK_getms()+CHAN_UPDATE_MSEC;
     
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
@@ -136,19 +140,20 @@ void EventLoop()
         
     }
 
-    MIXER_CalcChannels();
-
-    BUTTON_Handler();
-    TOUCH_Handler();
-
-    PAGE_Event();
+    if (CLOCK_getms() > next_scan) {
+        MIXER_CalcChannels();
+        BUTTON_Handler();
+        TOUCH_Handler();
+        PAGE_Event();
+        next_scan = CLOCK_getms() + CHAN_UPDATE_MSEC;
+    }
 
     if (CLOCK_getms() > next_redraw) {
         if (PROTOCOL_WaitingForSafe())
             PAGE_ShowSafetyDialog();
         TIMER_Update();
         GUI_RefreshScreen();
-        next_redraw = CLOCK_getms() + 100;
+        next_redraw = CLOCK_getms() + SCREEN_UPDATE_MSEC;
     }
 }
 

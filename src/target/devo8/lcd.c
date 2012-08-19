@@ -171,3 +171,14 @@ void LCD_Init()
   lcd_cmd(0x28, 0x3C);
 }
 
+void LCD_Sleep()
+{
+    lcd_cmd(0x28, 0x38);
+    Delay(40);
+    lcd_cmd(0x1f, 0x89);
+    Delay(40);
+    lcd_cmd(0x28, 0x04);
+    Delay(40);
+    lcd_cmd(0x19, 0x00);
+    Delay(5);
+}

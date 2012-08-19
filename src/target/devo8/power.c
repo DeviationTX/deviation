@@ -44,6 +44,7 @@ void PWR_Init(void)
 
 void PWR_Shutdown()
 {
+    printf("Shutdown\n");
     BACKLIGHT_Brightness(0);
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(HSI);
