@@ -16,10 +16,10 @@ void Delay(u32 count)
 // C99 winzip crc function, by Scott Duplichan
 //We could use the internal CRC implementation in the STM32, but this is really small
 //and perfomrance isn't really an issue
-u32 Crc(void *buffer, u32 size)
+u32 Crc(const void *buffer, u32 size)
 {
    u32 crc = ~0;
-   u8  *position = buffer;
+   const u8  *position = buffer;
 
    while (size--) 
       {

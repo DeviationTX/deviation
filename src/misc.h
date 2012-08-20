@@ -3,5 +3,5 @@
 #include "target.h"
 
 void Delay(u32 count);
-u32 Crc(void *buffer, u32 size);
+u32 Crc(const void *buffer, u32 size);
 #endif
