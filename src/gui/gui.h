@@ -110,6 +110,7 @@ struct guiImage {
     const char *file;
     u16 x_off;
     u16 y_off;
+    u32 crc;
     void (*callback)(struct guiObject *obj, s8 press_type, void *data);
     void *cb_data;
 };

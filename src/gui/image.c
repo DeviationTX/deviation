@@ -14,6 +14,7 @@
  */
 
 #include "target.h"
+#include "misc.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 #include "config/display.h"
@@ -36,6 +37,7 @@ guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_of
     image->y_off = y_off;
     image->callback = CallBack;
     image->cb_data = cb_data;
+    image->crc = Crc(file, strlen(file));
 
     box->x = x;
     box->y = y;
@@ -72,7 +74,9 @@ u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type)
 void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_off)
 {
     struct guiImage *image = &obj->o.image;
-    if (image->file != file || image->x_off != x_off || image->y_off != y_off) {
+    //Use a CRC for comparison because the filename may change without the pointer changing
+    u32 crc = Crc(file, strlen(file));
+    if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
         image->file = file;
         image->x_off = x_off;
         image->y_off = y_off;
