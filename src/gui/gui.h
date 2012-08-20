@@ -362,7 +362,7 @@ u8 GUI_ObjectNeedsRedraw(guiObject_t *obj);
 guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
 
-s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed);
+s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed);
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 

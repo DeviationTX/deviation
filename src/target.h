@@ -127,6 +127,7 @@ enum Music {
     MUSIC_STARTUP = 0,
     MUSIC_ALARM1,
     MUSIC_ALARM2,
+    MUSIC_BATT_ALARM,
 };
 void MUSIC_Play(enum Music music);
 

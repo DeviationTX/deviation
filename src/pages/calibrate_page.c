@@ -190,6 +190,16 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(cp.tmpstr, "%d", Transmitter.brightness);
     return cp.tmpstr;
 }
+static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed;
+    Transmitter.batt_alarm = GUI_TextSelectHelper(Transmitter.batt_alarm, 
+                              3300, 12000, dir, 50, 500, &changed);
+    sprintf(cp.tmpstr, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
+    return cp.tmpstr;
+}
 static void okcancel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -234,6 +244,9 @@ void PAGE_CalibrateInit(int page)
     row += 24;
     GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Backlight");
     GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, brightness_select_cb, NULL);
+    row += 24;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Batt Alarm");
+    GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, batalarm_select_cb, NULL);
     row += 32;
     GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Screen");
     GUI_CreateButton(90, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);

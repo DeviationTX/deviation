@@ -31,6 +31,8 @@ const char MODE[]="mode";
 
 const char BRIGHTNESS[] = "brightness";
 
+const char BATT_ALARM[] = "batt_alarm";
+
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
 const char CALIBRATE_MIN[] = "min";
@@ -64,6 +66,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(BRIGHTNESS)) {
             t->brightness = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(BATT_ALARM)) {
+            t->batt_alarm = atoi(value);
             return 1;
         }
     }
@@ -137,6 +143,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
+    fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     for(i = 0; i < 4; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);

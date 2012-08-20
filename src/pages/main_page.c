@@ -105,10 +105,13 @@ void PAGE_MainInit(int page)
             mp->toggleObj[i] = GUI_CreateImageOffset(x, y, 32, 31, Model.pagecfg.tglico[i]*32, 0, TOGGLE_FILE, NULL, NULL);
     }
     //Battery
+    mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        GUI_CreateImage(270,1,48,22,"media/bat.bmp");
+        mp->battObj = GUI_CreateImage(270,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(275,10, 0, 0, &BATTERY_FONT, voltage_cb, NULL, NULL);
+        mp->battObj = GUI_CreateLabelBox(275,10, 0, 0,
+                        mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
+                        voltage_cb, NULL, NULL);
     }
     //TxPower
     GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
@@ -163,6 +166,17 @@ void PAGE_MainEvent()
         s16 val = raw[src];
         GUI_SetHidden(mp->toggleObj[i], MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
     }
+    s16 batt = PWR_ReadVoltage();
+    if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
+        
+        mp->battery = batt;
+        if(Display.flags & SHOW_BAT_ICON) {
+            //FIXME
+        } else {
+            GUI_SetLabelDesc(mp->battObj, batt < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT);
+        }
+        GUI_Redraw(mp->battObj);
+    }
 }
 
 s32 get_boxval(u8 idx)
@@ -192,8 +206,7 @@ const char *show_box_cb(guiObject_t *obj, void *data)
 const char *voltage_cb(guiObject_t *obj, void *data) {
     (void)obj;
     (void)data;
-    u16 voltage = PWR_ReadVoltage();
-    sprintf(mp->tmpstr, "%2d.%02dV", voltage >> 12, (voltage & 0x0fff) / 10);
+    sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
     return mp->tmpstr;
 }
 

@@ -80,7 +80,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     LCD_PrintStringXY(x, y, str);
 }
 
-s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u8 shortstep, u8 longstep, u8 *_changed)
+s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed)
 {
     u8 changed;
     s32 oldval = value;

@@ -9,15 +9,16 @@
 #define BIGBOX_FONT    (Display.font[3])
 #define SMALLBOX_FONT  (Display.font[4])
 #define BATTERY_FONT   (Display.font[5])
-#define TINY_FONT      (Display.font[6])
-#define BOLD_FONT      (Display.font[7])
-#define NARROW_FONT    (Display.font[8])
-#define SMALL_FONT     (Display.font[9])
-#define BIGBOXNEG_FONT   (Display.font[10])
-#define SMALLBOXNEG_FONT (Display.font[11])
-#define DIALOGTITLE_FONT (Display.font[12])
-#define DIALOGBODY_FONT  (Display.font[13])
-#define NUM_LABELS 14
+#define BATTALARM_FONT (Display.font[6])
+#define TINY_FONT      (Display.font[7])
+#define BOLD_FONT      (Display.font[8])
+#define NARROW_FONT    (Display.font[9])
+#define SMALL_FONT     (Display.font[10])
+#define BIGBOXNEG_FONT   (Display.font[11])
+#define SMALLBOXNEG_FONT (Display.font[12])
+#define DIALOGTITLE_FONT (Display.font[13])
+#define DIALOGBODY_FONT  (Display.font[14])
+#define NUM_LABELS 15
 
 struct disp_keyboard {
     u8 font;

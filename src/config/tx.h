@@ -1,5 +1,5 @@
 #ifndef _TX_H_
-#define _TX_H
+#define _TX_H_
 
 #include "mixer.h"
 
@@ -20,6 +20,7 @@ struct Transmitter {
     u8 current_model;
     enum Mode mode;
     u8 brightness;
+    u16 batt_alarm;
     struct StickCalibration calibration[NUM_INPUTS];
     struct TouchCalibration touch;
 };

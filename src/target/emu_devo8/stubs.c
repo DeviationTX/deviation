@@ -31,7 +31,7 @@ void USB_Enable(u8 use_interrupt) {(void)use_interrupt;}
 void USB_Disable() {}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
-u16  PWR_ReadVoltage() { return ((5 << 12) | 500); }
+u16  PWR_ReadVoltage() { return (5500); }
 void CHAN_Init() {}
 
 void CLOCK_StartWatchdog() {}

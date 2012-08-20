@@ -28,6 +28,7 @@ void Banner();
 void EventLoop();
 
 void TOUCH_Handler(); // temporarily in main()
+void BATTERY_Check();
 
 #define SCREEN_UPDATE_MSEC 100
 #define CHAN_UPDATE_MSEC   5
@@ -152,6 +153,7 @@ void EventLoop()
         if (PROTOCOL_WaitingForSafe())
             PAGE_ShowSafetyDialog();
         TIMER_Update();
+        BATTERY_Check();
         GUI_RefreshScreen();
         next_redraw = CLOCK_getms() + SCREEN_UPDATE_MSEC;
     }
@@ -189,4 +191,16 @@ void TOUCH_Handler() {
         }
     }
     pen_down_last=pen_down;
+}
+
+void BATTERY_Check()
+{
+    static u8 warned = 0;
+    u16 battery = PWR_ReadVoltage();
+    if (battery < Transmitter.batt_alarm && ! warned) {
+        MUSIC_Play(MUSIC_BATT_ALARM);
+        warned = 1;
+    } else if (battery > Transmitter.batt_alarm + 200) {
+        warned = 0;
+    }
 }

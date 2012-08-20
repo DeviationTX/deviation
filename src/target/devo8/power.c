@@ -68,15 +68,12 @@ int PWR_CheckPowerSwitch()
     return 0;
 }
 
-/* Return fixed-point(4.12) volatge */
+/* Return milivolts */
 u16 PWR_ReadVoltage(void)
 {
-    u16 v_fp;
     u32 v = ADC1_Read(14);
     /* Compute voltage from y = 0.0021x + 0.3026 */
-    /* Multily the above by 4096 to putthe voltage in the upper nibble */
-    v = v * 1564 / 181 + 1239;
-    v_fp = v & 0xf000;
-    v_fp |= ((v & 0x0fff) * 1000) >> 12;
-    return v_fp;
+    /* Multily the above by 1000 to get milivolts */
+    v = v * 21 / 10 + 303;
+    return v;
 }

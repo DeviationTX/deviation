@@ -11,7 +11,9 @@ struct main_page {
     guiObject_t *boxObj[8];
     guiObject_t *barObj[8];
     guiObject_t *toggleObj[4];
+    guiObject_t *battObj;
     u8 ignore_release;
+    s16 battery;
     s8 trims[6];
     s32 boxval[8];
     s16 barval[8];
