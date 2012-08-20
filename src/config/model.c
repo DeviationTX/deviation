@@ -830,9 +830,7 @@ const char *CONFIG_GetCurrentIcon() {
 
 void CONFIG_ParseModelName(char *name, const char *value)
 {
-    strcpy(name, "media/");
-    strncpy(name + 6, value, 12);
-    name[19] = 0;
+    sprintf(name, "media/%s", value);
 }
 
 enum ModelType CONFIG_ParseModelType(const char *value)

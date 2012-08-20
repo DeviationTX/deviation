@@ -76,6 +76,7 @@ void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_o
         image->file = file;
         image->x_off = x_off;
         image->y_off = y_off;
+        OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(file));
         OBJ_SET_DIRTY(obj, 1);
     }
 }
