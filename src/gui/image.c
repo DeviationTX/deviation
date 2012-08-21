@@ -77,6 +77,7 @@ void GUI_ChangeImage(struct guiObject *obj, const char *file, u16 x_off, u16 y_o
     //Use a CRC for comparison because the filename may change without the pointer changing
     u32 crc = Crc(file, strlen(file));
     if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
+        image->crc = crc;
         image->file = file;
         image->x_off = x_off;
         image->y_off = y_off;
