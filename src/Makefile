@@ -71,7 +71,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini
 $(VERBOSE).SILENT:
 
 clean:
-	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o
+	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o $(ODIR)/*.P
 
 flash: devo8.dfu
 	dfu-util -a 0 -D devo8.dfu
