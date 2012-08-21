@@ -18,7 +18,7 @@
 #include "config/model.h"
 
 static const u8 const _eatrg[PROTO_MAP_LEN] = ORDER_EATRG;
-static const u8 const _taerg[PROTO_MAP_LEN] = ORDER_EATRG;
+static const u8 const _taerg[PROTO_MAP_LEN] = ORDER_TAERG;
 static u8 proto_state;
 static u32 bind_time;
 #define PROTO_READY   0x01
