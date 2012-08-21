@@ -29,7 +29,6 @@ void EventLoop();
 
 void TOUCH_Handler(); // temporarily in main()
 void BATTERY_Check();
-void CheckProtocolDialogs();
 
 #define SCREEN_UPDATE_MSEC 100
 #define CHAN_UPDATE_MSEC   5
@@ -152,7 +151,7 @@ void EventLoop()
     }
 
     if (CLOCK_getms() > next_redraw) {
-        CheckProtocolDialogs();
+        PROTOCOL_CheckDialogs();
         TIMER_Update();
         BATTERY_Check();
         GUI_RefreshScreen();
@@ -206,19 +205,3 @@ void BATTERY_Check()
     }
 }
 
-void CheckProtocolDialogs()
-{
-    static u8 state = 0;
-    if (PROTOCOL_WaitingForSafe()) {
-        PAGE_ShowSafetyDialog();
-    } else {
-        if (PROTOCOL_Binding()) {
-            PAGE_ShowBindingDialog(state);
-            state = 1;
-        } else if (state == 1) {
-            PAGE_CloseBindingDialog();
-            MUSIC_Play(MUSIC_DONE_BINDING);
-            state = 0;
-        }
-    }
-}

@@ -23,6 +23,7 @@ static u8 proto_state;
 static u32 bind_time;
 #define PROTO_READY   0x01
 #define PROTO_BINDING 0x02
+#define PROTO_BINDDLG 0x04
 
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     NULL,
@@ -41,7 +42,7 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
 
 void PROTOCOL_Init(u8 force)
 {
-   proto_state = 0;
+    proto_state = 0;
     if (! force && PROTOCOL_CheckSafe()) {
         return;
     }
@@ -132,3 +133,18 @@ u32 PROTOCOL_CheckSafe()
     return unsafe;
 }
 
+void PROTOCOL_CheckDialogs()
+{
+    if (PROTOCOL_WaitingForSafe()) {
+        PAGE_ShowSafetyDialog();
+    } else {
+        if (PROTOCOL_Binding()) {
+            PAGE_ShowBindingDialog(proto_state & PROTO_BINDDLG);
+            proto_state |= PROTO_BINDDLG;
+        } else if (proto_state & PROTO_BINDDLG) {
+            PAGE_CloseBindingDialog();
+            MUSIC_Play(MUSIC_DONE_BINDING);
+            proto_state &= ~PROTO_BINDDLG;
+        }
+    }
+}
