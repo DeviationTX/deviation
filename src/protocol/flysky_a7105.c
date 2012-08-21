@@ -152,6 +152,8 @@ static u16 flysky_cb()
         flysky_build_packet(1);
         A7105_WriteData(packet, 22, 1);
         counter--;
+        if (! counter)
+            PROTOCOL_SetBindState(0);
     } else {
         flysky_build_packet(0);
         A7105_WriteData(packet, 22, tx_channels[chanrow][chancol]-chanoffset);
@@ -173,6 +175,7 @@ void FLYSKY_Initialize() {
     chancol = 0;
     chanoffset = (id & 0xff) / 16;
     counter = BIND_COUNT;
+    PROTOCOL_SetBindState(2500 * 1460 / 1000); //msec
     CLOCK_StartTimer(2400, flysky_cb);
 }
 

@@ -128,6 +128,7 @@ enum Music {
     MUSIC_ALARM1,
     MUSIC_ALARM2,
     MUSIC_BATT_ALARM,
+    MUSIC_DONE_BINDING,
 };
 void MUSIC_Play(enum Music music);
 
@@ -152,6 +153,8 @@ void PAGE_Init();
 void PAGE_Change(int dir);
 void PAGE_Event();
 void PAGE_ShowSafetyDialog();
+void PAGE_CloseBindingDialog();
+void PAGE_ShowBindingDialog(u8 update);
 
 /* Protocol */
 enum Protocols {
@@ -193,6 +196,8 @@ void PROTOCOL_Init(u8 force);
 void PROTOCOL_DeInit();
 u8 PROTOCOL_WaitingForSafe();
 u32 PROTOCOL_CheckSafe();
+u32 PROTOCOL_Binding();
+void PROTOCOL_SetBindState(u32 msec);
 
 /* Abstract bootloader access */
 enum {

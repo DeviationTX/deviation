@@ -258,8 +258,10 @@ void WK_BuildPacket_2801()
     switch(state) {
         case WK_BIND:
             build_bind_pkt(init_2801);
-            if (--bind_counter == 0)
+            if (--bind_counter == 0) {
+                PROTOCOL_SetBindState(0);
                 state = WK_BOUND_1;
+            }
             break;
         case WK_BOUND_1:
         case WK_BOUND_2:
@@ -355,6 +357,7 @@ void WK2x01_Initialize()
     if(! use_fixedid) {
         bind_counter = BIND_COUNT;
         state = WK_BIND;
+        PROTOCOL_SetBindState(2980 * 2800 / 1000);
     } else {
         state = WK_BOUND_1;
         bind_counter = 0;

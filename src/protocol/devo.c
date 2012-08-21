@@ -25,6 +25,12 @@
 
 #define PKTS_PER_CHANNEL 4
 
+#ifdef EMULATOR
+#define BIND_COUNT 4
+#else
+#define BIND_COUNT 0x1388
+#endif
+
 enum PktState {
     DEVO_BIND,
     DEVO_BIND_SENDCH,
@@ -193,7 +199,12 @@ void DEVO_BuildPacket()
             bind_counter--;
             build_data_pkt();
             scramble_pkt();
-            state = (bind_counter <= 0) ? DEVO_BOUND : DEVO_BIND;
+            if (bind_counter <= 0) {
+                state = DEVO_BOUND;
+                PROTOCOL_SetBindState(0);
+            } else {
+                state = DEVO_BIND;
+            }
             break;
         case DEVO_BOUND:
         case DEVO_BOUND_1:
@@ -273,8 +284,9 @@ void DEVO_Initialize()
         fixed_id = ((u32)(radio_ch[0] ^ cyrfmfg_id[0] ^ cyrfmfg_id[3]) << 16)
                  | ((u32)(radio_ch[1] ^ cyrfmfg_id[1] ^ cyrfmfg_id[4]) << 8)
                  | ((u32)(radio_ch[2] ^ cyrfmfg_id[2] ^ cyrfmfg_id[5]) << 0);
-        bind_counter = 0x1388;
+        bind_counter = BIND_COUNT;
         state = DEVO_BIND;
+        PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
     } else {
         fixed_id = Model.fixed_id;
         state = DEVO_BOUND_1;

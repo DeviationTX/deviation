@@ -23,9 +23,15 @@
 #define USE_FIXED_MFGID
 #define MODEL 0
 
+#ifdef EMULATOR
+#define BIND_COUNT 2
+#else
+#define BIND_COUNT 200
+#endif
+
 enum {
     DSM2_BIND = 0,
-    DSM2_CHANSEL = 200,
+    DSM2_CHANSEL = BIND_COUNT,
     DSM2_CH1_WRITE_A = 1000,
     DSM2_CH1_CHECK_A = 1001,
     DSM2_CH2_WRITE_A = 1002,
@@ -283,6 +289,7 @@ static u16 dsm2_cb()
         chidx = 0;
         set_sop_data_crc();
         state = DSM2_CH1_WRITE_A;
+        PROTOCOL_SetBindState(0);
         return 10000;
     } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B) {
         build_data_packet(state == DSM2_CH1_WRITE_B);
@@ -334,8 +341,10 @@ void DSM2_Initialize()
 
     cyrf_config();
     CYRF_ConfigRxTx(1);
-    //state = DSM2_BIND;
-    state = DSM2_CHANSEL;
+    state = DSM2_BIND;
+    //state = DSM2_CHANSEL;
+    if (state == DSM2_BIND)
+        PROTOCOL_SetBindState(200 * 10); //msecs
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 #endif

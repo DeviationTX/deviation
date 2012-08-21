@@ -248,6 +248,7 @@ static u16 j6pro_cb()
             state = state + 1;
             return 4600; //4.6msec
         case J6PRO_CHANSEL:
+            PROTOCOL_SetBindState(0);
             CYRF_SetPower(Model.tx_power);
             set_radio_channels();
             cyrf_datainit();
@@ -279,6 +280,7 @@ void J6PRO_Initialize()
     cyrf_init();
     num_channels = 8;
     state = J6PRO_BIND;
+    PROTOCOL_SetBindState(0xFFFFFFFF);
     //state = J6PRO_CHANSEL; //FIXME: Support skipping bind phase
     CLOCK_StartTimer(2400, j6pro_cb);
 }

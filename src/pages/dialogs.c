@@ -14,6 +14,7 @@
  */
 
 #include "target.h"
+#include "misc.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
@@ -23,7 +24,10 @@
 static guiObject_t *dialog = NULL;
 static char dlgstr[DLG_STR_LEN];
 
-static void ok_cb(u8 state, void * data)
+/******************/
+/*  Safety Dialog */
+/******************/
+static void safety_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
@@ -66,6 +70,42 @@ void PAGE_ShowSafetyDialog()
         }
     } else {
         dlgstr[0] = 0;
-        dialog = GUI_CreateDialog(10, 42, 300, 188, "Safety", NULL, ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(10, 42, 300, 188, "Safety", NULL, safety_ok_cb, dtOk, dlgstr);
+    }
+}
+
+/******************/
+/* Binding Dialog */
+/******************/
+static void binding_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    dialog = NULL;
+}
+
+void PAGE_CloseBindingDialog()
+{
+    if (dialog) {
+        GUI_RemoveObj(dialog);
+        dialog = 0;
+    }
+}
+
+void PAGE_ShowBindingDialog(u8 update)
+{
+    char tmpstr[40] = "";
+    if (update && ! dialog)
+        return;
+    u32 crc = Crc(dlgstr, strlen(dlgstr));
+    u32 bind_time = PROTOCOL_Binding();
+    if (bind_time != 0xFFFFFFFF)
+        sprintf(tmpstr, "\nBinding will end in %d seconds", (int)bind_time / 1000);
+    sprintf(dlgstr, "Binding is in progress\nMake sure model is on\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s", tmpstr);
+    u32 crc_new = Crc(dlgstr, strlen(dlgstr));
+    if (dialog && crc != crc_new) {
+        GUI_Redraw(dialog);
+    } else if(! dialog) {
+        dialog = GUI_CreateDialog(10, 42, 300, 188, "Binding", NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
