@@ -36,8 +36,8 @@ static const char *swashinv_val_cb(guiObject_t *obj, int dir, void *data)
     val = GUI_TextSelectHelper(val, 0 , 1, dir, 1, 1, NULL);
     Model.swash_invert = val ? Model.swash_invert | mask : Model.swash_invert & ~mask;
     switch(val) {
-        case 0: return "Normal";
-        case 1: return "Inverted";
+        case 0: return _tr("Normal");
+        case 1: return _tr("Inverted");
     }
     return "";
 }
@@ -72,22 +72,22 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
-    show_titlerow(Model.type == 0 ? "Helicopter" : "Airplane");
+    show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
     if (Model.type == 0) {
         u8 i = 40;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "SwashType:");
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("SwashType:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swash_val_cb, NULL);
         i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "COL Src:");
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Src:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &Model.collective_source);
         i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "ELE Inv:");
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("ELE Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)1);
         i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "AIL Inv:");
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("AIL Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)2);
         i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, "COL Inv:");
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)4);
     }
 }

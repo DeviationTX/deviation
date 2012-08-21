@@ -41,7 +41,7 @@
 // will be an actual access to the memory location
 // an element is stored in.
 // If it is omitted, the optimizer might create a 
-// "short cut", removing seemingly unneccessary memory accesses,
+// 'short cut', removing seemingly unneccessary memory accesses,
 // and thereby preventing the propagation of an update from
 // the main loop to the interrupt routine (since the optimizer
 // has no clue about interrupts)
@@ -516,39 +516,39 @@ const char *MIXER_SourceName(char *str, u8 src)
     src = MIXER_SRC(src);
 
     if(! src) {
-        sprintf(str, "None");
+        sprintf(str, _tr("None"));
     } else if(src <= NUM_TX_INPUTS) {
-        sprintf(str, "%s%s", is_neg ? "!" : "", tx_input_str[src - 1]);
+        sprintf(str, "%s%s", is_neg ? "!" : "", _tr(tx_input_str[src - 1]));
     } else if(src <= NUM_INPUTS) {
-        sprintf(str, "%sCYC%d", is_neg ? "!" : "", src - NUM_TX_INPUTS);
+        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("CYC"), src - NUM_TX_INPUTS);
     } else {
-        sprintf(str, "%sCh%d", is_neg ? "!" : "", src - NUM_INPUTS);
+        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     }
     return str;
 }
 const char *MIXER_TemplateName(enum TemplateType template)
 {
     switch(template) {
-    case MIXERTEMPLATE_NONE :   return "None";
-    case MIXERTEMPLATE_SIMPLE:  return "Simple";
-    case MIXERTEMPLATE_EXPO_DR: return "Expo&DR";
-    case MIXERTEMPLATE_COMPLEX: return "Complex";
-    default:                    return "Unknown";
+    case MIXERTEMPLATE_NONE :   return _tr("None");
+    case MIXERTEMPLATE_SIMPLE:  return _tr("Simple");
+    case MIXERTEMPLATE_EXPO_DR: return _tr("Expo&DR");
+    case MIXERTEMPLATE_COMPLEX: return _tr("Complex");
+    default:                    return _tr("Unknown");
     }
 }
 
 const char *MIXER_ButtonName(u8 button)
 {
     if (! button) {
-        return "None";
+        return _tr("None");
     }
-    return tx_button_str[button - 1];
+    return _tr(tx_button_str[button - 1]);
 }
 
 const char *MIXER_SwashType(enum SwashType swash_type)
 {
     switch(swash_type) {
-        case SWASH_TYPE_NONE: return "None";
+        case SWASH_TYPE_NONE: return _tr("None");
         case SWASH_TYPE_120:  return "120";
         case SWASH_TYPE_120X: return "120X";
         case SWASH_TYPE_140:  return "140";

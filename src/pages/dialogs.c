@@ -57,7 +57,7 @@ void PAGE_ShowSafetyDialog()
                 s16 val = RANGE_TO_PCT((i < NUM_INPUTS)
                               ? raw[i+1]
                               : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
-                sprintf(tmpdlg + strlen(tmpdlg), "%s is %d%%, safe value = %d%%\n",
+                sprintf(tmpdlg + strlen(tmpdlg), _tr("%s is %d%%, safe value = %d%%\n"),
                         MIXER_SourceName(tmpstr, i + 1),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
@@ -70,7 +70,7 @@ void PAGE_ShowSafetyDialog()
         }
     } else {
         dlgstr[0] = 0;
-        dialog = GUI_CreateDialog(10, 42, 300, 188, "Safety", NULL, safety_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -100,12 +100,12 @@ void PAGE_ShowBindingDialog(u8 update)
     u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
     if (bind_time != 0xFFFFFFFF)
-        sprintf(tmpstr, "\nBinding will end in %d seconds", (int)bind_time / 1000);
-    sprintf(dlgstr, "Binding is in progress\nMake sure model is on\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s", tmpstr);
+        sprintf(tmpstr, _tr("\nBinding will end in %d seconds"), (int)bind_time / 1000);
+    sprintf(dlgstr, _tr("Binding is in progress\nMake sure model is on\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s"), tmpstr);
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(10, 42, 300, 188, "Binding", NULL, binding_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }

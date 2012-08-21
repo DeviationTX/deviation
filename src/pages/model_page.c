@@ -46,39 +46,39 @@ void PAGE_ModelInit(int page)
 
     mp->file_state = 0;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Model");
+    PAGE_ShowHeader(_tr("Model"));
 
     row = 40;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "File:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("File:"));
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
 
     row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Name:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Name:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
 
     row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Model Type:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Type:"));
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
 
     row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Protocol:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Number of Channels:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Number of Channels:"));
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
 
 
     row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Tx Power:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Tx Power:"));
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
 
     row += 20;
     if(Model.fixed_id == 0)
-        sprintf(mp->fixed_id, "None");
+        sprintf(mp->fixed_id, _tr("None"));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, "Fixed ID:");
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
 }
 
@@ -131,8 +131,8 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     GUI_TextSelectEnablePress(obj, Model.type == 0);
 
     switch (Model.type) {
-        case 0: return "Helicopter";
-        default: return "Airplane";
+        case 0: return _tr("Helicopter");
+        default: return _tr("Airplane");
     }
 }
 void type_press_cb(guiObject_t *obj, void *data)
@@ -174,13 +174,13 @@ static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 3, dir, 1, 1, NULL);
     if (mp->file_state == 0)
-        return "Load...";
+        return _tr("Load...");
     else if (mp->file_state == 1)
-        return "Copy To...";
+        return _tr("Copy To...");
     else if (mp->file_state == 2)
-        return "Template..";
+        return _tr("Template..");
     else if (mp->file_state == 3)
-        return "Reset";
+        return _tr("Reset");
     else
         return "";
 }

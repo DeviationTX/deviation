@@ -32,23 +32,23 @@ void MIXPAGE_EditLimits()
     PAGE_RemoveAllObjects();
     show_titlerow();
     //Row 1
-    GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Reverse:");
+    GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, _tr("Reverse:"));
     GUI_CreateTextSelect(64, 40, TEXTSELECT_96, 0x0000, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
     //Row 2
-    GUI_CreateLabel(8, 64, NULL, DEFAULT_FONT, "Failsafe:");
+    GUI_CreateLabel(8, 64, NULL, DEFAULT_FONT, _tr("Failsafe:"));
     GUI_CreateTextSelect(64, 64, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
     //Row 3
-    GUI_CreateLabel(8, 88, NULL, DEFAULT_FONT, "Safety:");
+    GUI_CreateLabel(8, 88, NULL, DEFAULT_FONT, _tr("Safety:"));
     GUI_CreateTextSelect(64, 88, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    GUI_CreateLabel(176, 88, NULL, DEFAULT_FONT, "Value:");
+    GUI_CreateLabel(176, 88, NULL, DEFAULT_FONT, _tr("Value:"));
     GUI_CreateTextSelect(216, 88, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
     //Row 4
-    GUI_CreateLabel(8, 112, NULL, DEFAULT_FONT, "Min:");
+    GUI_CreateLabel(8, 112, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(64, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
-    GUI_CreateLabel(176, 112, NULL, DEFAULT_FONT, "Max:");
+    GUI_CreateLabel(176, 112, NULL, DEFAULT_FONT, _tr("Max:"));
     GUI_CreateTextSelect(216, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
     //Row 5
-    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, "Subtrim:");
+    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, _tr("Subtrim:"));
     GUI_CreateTextSelect(64, 136, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
 }
 
@@ -107,7 +107,7 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     if (!(mp->limit.flags & CH_FAILSAFE_EN))
-        return "Off";
+        return _tr("Off");
     return PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.failsafe);
 }
 
@@ -138,7 +138,7 @@ const char *reverse_cb(guiObject_t *obj, int dir, void *data)
         mp->limit.flags |= CH_REVERSE;
     else if (dir < 0)
         mp->limit.flags &= ~CH_REVERSE;
-    return (mp->limit.flags & CH_REVERSE) ? "Reversed" : "Normal";
+    return (mp->limit.flags & CH_REVERSE) ? _tr("Reversed") : _tr("Normal");
 }
 
 void toggle_reverse_cb(guiObject_t *obj, void *data)

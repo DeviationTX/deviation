@@ -41,13 +41,13 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 
     if (curve->type >= CURVE_3POINT) {
-        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Point:");
+        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, _tr("Point:"));
         edit->pointsel = GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_pointnum_cb, NULL);
     } else {
-        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, "Pos/Neg:");
+        GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, _tr("Pos/Neg:"));
         edit->pointsel = GUI_CreateTextSelect(8, 56, TEXTSELECT_96, 0x0000, NULL, set_expopoint_cb, NULL);
     }
-    GUI_CreateLabel(8, 80, NULL, DEFAULT_FONT, "Value:");
+    GUI_CreateLabel(8, 80, NULL, DEFAULT_FONT, _tr("Value:"));
     edit->value = GUI_CreateTextSelect(8, 96, TEXTSELECT_96, 0x0000, NULL, set_value_cb, NULL);
     edit->graph = GUI_CreateXYGraph(112, 36, 200, 200,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
@@ -156,9 +156,9 @@ const char *set_expopoint_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(edit->graph);
     }
     switch(edit->pointnum) {
-        case -1: return "Symmetric";
-        case 0: return "Pos";
-        case 1: return "Neg";
+        case -1: return _tr("Symmetric");
+        case 0: return _tr("Pos");
+        case 1: return _tr("Neg");
         default: return "-";
     }
 }

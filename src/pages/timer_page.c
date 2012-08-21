@@ -35,18 +35,18 @@ void PAGE_TimerInit(int page)
     (void)page;
     int i;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Timer");
+    PAGE_ShowHeader(_tr("Timer"));
 
     for (i = 0; i < NUM_TIMERS; i++) {
         u8 x = 48 + i * 96;
         //Row 1
-        GUI_CreateLabel(8, x, NULL, DEFAULT_FONT, (void *)timerstr[i]);
+        GUI_CreateLabel(8, x, NULL, DEFAULT_FONT, (void *)_tr(timerstr[i]));
         GUI_CreateTextSelect(72, x, TEXTSELECT_96, 0x0000, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
-        GUI_CreateLabel(8, x+24, NULL, DEFAULT_FONT, "Switch:");
+        GUI_CreateLabel(8, x+24, NULL, DEFAULT_FONT, _tr("Switch:"));
         GUI_CreateTextSelect(72, x+24, TEXTSELECT_96, 0x0000, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
-        tp->startLabelObj[i] = GUI_CreateLabel(8, x+48, NULL, DEFAULT_FONT, "Start:");
+        tp->startLabelObj[i] = GUI_CreateLabel(8, x+48, NULL, DEFAULT_FONT, _tr("Start:"));
         tp->startObj[i] = GUI_CreateTextSelect(72, x+48, TEXTSELECT_96, 0x0000, NULL, set_start_cb, (void *)(long)i);
 
         update_countdown(i);
@@ -102,8 +102,8 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
         TIMER_Reset(idx);
     update_countdown(idx);
     switch (timer->type) {
-    case TIMER_STOPWATCH: return "stopwatch";
-    case TIMER_COUNTDOWN: return "countdown";
+    case TIMER_STOPWATCH: return _tr("stopwatch");
+    case TIMER_COUNTDOWN: return _tr("countdown");
     }
     return "";
 }

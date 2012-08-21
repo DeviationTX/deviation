@@ -37,7 +37,7 @@ static const char *enablestr_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    return sp.enable ? "Turn Off" : "Turn On";
+    return sp.enable ? _tr("Turn Off") : _tr("Turn On");
 }
 static void press_cb(guiObject_t *obj, void *data)
 {
@@ -62,7 +62,7 @@ void PAGE_ScannerInit(int page)
     u8 i;
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Scanner");
+    PAGE_ShowHeader(_tr("Scanner"));
     sp.enable = 0;
     GUI_CreateButton(112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
 

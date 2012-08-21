@@ -66,7 +66,7 @@ static void calibrate_sticks(void)
     }
     LCD_Clear(0x0000);
     LCD_SetFontColor(0xFFFF);
-    LCD_PrintStringXY(40, 10, "Center all sticks and touch the screen");
+    LCD_PrintStringXY(40, 10, _tr("Center all sticks and touch the screen"));
     for (i = 0; i < 4; i++) {
         Transmitter.calibration[i].max = 0x0000;
         Transmitter.calibration[i].min = 0xFFFF;
@@ -77,7 +77,7 @@ static void calibrate_sticks(void)
         Transmitter.calibration[i].zero = value;
     }
     LCD_Clear(0x0000);
-    LCD_PrintStringXY(40, 10, "Move each stick to full max\nand min values then back to center.\nTouch the screen when finished");
+    LCD_PrintStringXY(40, 10, _tr("Move each stick to full max\nand min values then back to center.\nTouch the screen when finished"));
     while(! SPITouch_IRQ()) {
         CLOCK_ResetWatchdog();
         if(PWR_CheckPowerSwitch())
@@ -149,7 +149,7 @@ static void calibrate_touch(void)
 static const char *calibratestr_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    return (long)data & 1 ? "Calibrate" : "Test";
+    return (long)data & 1 ? _tr("Calibrate") : _tr("Test");
 }
 const char *coords_cb(guiObject_t *obj, void *data)
 {
@@ -163,7 +163,7 @@ const char *show_msg_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(cp.tmpstr, "Touch target %d", cp.state < 3 ? 1 : 2);
+    sprintf(cp.tmpstr, _tr("Touch target %d"), cp.state < 3 ? 1 : 2);
     return cp.tmpstr;
 }
 
@@ -172,7 +172,7 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
-    sprintf(cp.tmpstr, "Mode %d", Transmitter.mode);
+    sprintf(cp.tmpstr, _tr("Mode %d"), Transmitter.mode);
     return cp.tmpstr;
 }
 
@@ -186,7 +186,7 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         BACKLIGHT_Brightness(Transmitter.brightness);
     if (Transmitter.brightness == 0)
-        return "Off";
+        return _tr("Off");
     sprintf(cp.tmpstr, "%d", Transmitter.brightness);
     return cp.tmpstr;
 }
@@ -215,7 +215,7 @@ static void press_cb(guiObject_t *obj, void *data)
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
         //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
-        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, "Touch Calibrate");
+        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
         cp.textbox = GUI_CreateLabelBox(XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
         cp.textbox1 = GUI_CreateLabelBox(130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
         memset(&cp.coords, 0, sizeof(cp.coords));
@@ -225,7 +225,7 @@ static void press_cb(guiObject_t *obj, void *data)
     if (cp.enable == CALIB_TOUCH_TEST) {
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
-        PAGE_ShowHeader_ExitOnly("Touch Test", okcancel_cb);
+        PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
         cp.textbox = GUI_CreateLabelBox(60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
         memset(&cp.coords, 0, sizeof(cp.coords));
     }
@@ -236,24 +236,24 @@ void PAGE_CalibrateInit(int page)
     cp.enable = CALIB_NONE;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader("Configure");
+    PAGE_ShowHeader(_tr("Configure"));
 
     u8 row = 40;
-    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Mode");
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
     row += 24;
-    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Backlight");
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight"));
     GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, brightness_select_cb, NULL);
     row += 24;
-    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Batt Alarm");
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Batt Alarm"));
     GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, batalarm_select_cb, NULL);
     row += 32;
-    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Screen");
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Screen"));
     GUI_CreateButton(90, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
     GUI_CreateButton(190, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
 
     row += 32;
-    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, "Sticks");
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
     GUI_CreateButton(90, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
     // GUI_CreateButton(190, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
 }

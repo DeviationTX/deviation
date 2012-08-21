@@ -19,6 +19,9 @@ typedef uint64_t u64;
 
 extern volatile s16 Channels[NUM_CHANNELS];
 
+/* Temproary definition until we have real translation */
+#define _tr(x) x
+
 /* General Functions */
 void ModelName(u8 *var, u8 len);
 

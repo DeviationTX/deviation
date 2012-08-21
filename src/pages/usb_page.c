@@ -23,13 +23,13 @@ static struct usb_page * const up = &pagemem.u.usb_page;
 static void draw_page(u8 enable)
 {
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader("USB");
+    PAGE_ShowHeader(_tr("USB"));
 
-    if(enable == 0) {
-        GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, "Deviation FW\nversion: " HGVERSION "\nUSB File System is disabled\nPress 'Ent' to enable");
-    } else {
-        GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, "Deviation FW\nversion: " HGVERSION "\nUSB File System is enabled\nPress 'Ent' to disable");
-    }
+    sprintf(up->tmpstr, "%s" HGVERSION "\n%s%s",
+            _tr("Deviation FW\nversion: "),
+            _tr("USB File System is disabled\nPress 'Ent' to "),
+            _tr(enable == 0 ? "enable" : "disable"));
+    GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, up->tmpstr);
 }
 
 static void wait_press()

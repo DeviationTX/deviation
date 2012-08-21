@@ -91,22 +91,22 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 const char *CURVE_GetName(struct Curve *curve)
 {
     switch (curve->type) {
-        case CURVE_NONE: return "1-to-1";
-        case CURVE_FIXED: return "Fixed";
-        case CURVE_MIN_MAX:  return "Min/Max";
-        case CURVE_ZERO_MAX: return "Zero/Max";
-        case CURVE_GT_ZERO:  return "> 0";
-        case CURVE_LT_ZERO:  return "< 0";
-        case CURVE_ABSVAL:   return "ABSVAL";
-        case CURVE_EXPO:     return "EXPO";
-        case CURVE_3POINT:   return "3 Point";
-        case CURVE_5POINT:   return "5 Point";
-        case CURVE_7POINT:   return "7 Point";
-        case CURVE_9POINT:   return "9 Point";
-        case CURVE_11POINT:  return "11 Point";
-        case CURVE_13POINT:  return "13 Point";
+        case CURVE_NONE: return _tr("1-to-1");
+        case CURVE_FIXED: return _tr("Fixed");
+        case CURVE_MIN_MAX:  return _tr("Min/Max");
+        case CURVE_ZERO_MAX: return _tr("Zero/Max");
+        case CURVE_GT_ZERO:  return _tr("> 0");
+        case CURVE_LT_ZERO:  return _tr("< 0");
+        case CURVE_ABSVAL:   return _tr("ABSVAL");
+        case CURVE_EXPO:     return _tr("EXPO");
+        case CURVE_3POINT:   return _tr("3 Point");
+        case CURVE_5POINT:   return _tr("5 Point");
+        case CURVE_7POINT:   return _tr("7 Point");
+        case CURVE_9POINT:   return _tr("9 Point");
+        case CURVE_11POINT:  return _tr("11 Point");
+        case CURVE_13POINT:  return _tr("13 Point");
     }
-    return "Unknown";
+    return _tr("Unknown");
 }
 
 u8 CURVE_NumPoints(struct Curve *curve)

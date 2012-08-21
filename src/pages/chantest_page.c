@@ -69,9 +69,9 @@ const char *lockstr_cb(guiObject_t *obj, void *data)
     (void)obj;
     (void)data;
     if(cp->is_locked == 1 || cp->is_locked == 2)
-        return "Touch to Unlock";
+        return _tr("Touch to Unlock");
     else
-        return "Touch to Lock";
+        return _tr("Touch to Lock");
 }
 
 static void show_button_page()
@@ -95,7 +95,7 @@ void PAGE_ChantestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Channels");
+    PAGE_ShowHeader(_tr("Channels"));
     cp->return_page = NULL;
     cp->type = 0;
     show_bar_page(Model.num_channels);
@@ -105,7 +105,7 @@ void PAGE_InputtestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Inputs");
+    PAGE_ShowHeader(_tr("Inputs"));
     cp->return_page = NULL;
     cp->type = 1;
     show_bar_page(NUM_INPUTS);
@@ -115,7 +115,7 @@ void PAGE_ButtontestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader("Buttons");
+    PAGE_ShowHeader(_tr("Buttons"));
     cp->return_page = NULL;
     cp->type = 2;
     show_button_page();
@@ -139,7 +139,7 @@ void PAGE_ChantestModal(void(*return_page)(int page))
     cp->type = 0;
     PAGE_RemoveAllObjects();
 
-    PAGE_ShowHeader_ExitOnly("Channels", okcancel_cb);
+    PAGE_ShowHeader_ExitOnly(_tr("Channels"), okcancel_cb);
 
     show_bar_page(Model.num_channels);
 }

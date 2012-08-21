@@ -72,10 +72,10 @@ const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.trims) {
-    case 0 : return "No Trims";
-    case 1 : return "4 Outside";
-    case 2 : return "4 Inside";
-    case 3 : return "6 Trims";
+    case 0 : return _tr("No Trims");
+    case 1 : return _tr("4 Outside");
+    case 2 : return _tr("4 Inside");
+    case 3 : return _tr("6 Trims");
     default: return "";
     }
 }
@@ -96,9 +96,9 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.barsize) {
-    case 0 : return "No Bars";
-    case 1 : return "4 Bars";
-    case 2 : return "8 Bars";
+    case 0 : return _tr("No Bars");
+    case 1 : return _tr("4 Bars");
+    case 2 : return _tr("8 Bars");
     default: return "";
     }
 }
@@ -107,7 +107,7 @@ const char *boxlabel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Box %d:", i+1);
+    sprintf(str, _tr("Box %d:"), i+1);
     return str;
 }
 
@@ -120,9 +120,9 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     if (Model.pagecfg.box[i] == 1)
-        return "Timer1";
+        return _tr("Timer1");
     if (Model.pagecfg.box[i] == 2)
-        return "Timer2";
+        return _tr("Timer2");
     
     return MIXER_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
 }
@@ -130,7 +130,7 @@ const char *barlabel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Bar %d:", i+1);
+    sprintf(str, _tr("Bar %d:"), i+1);
     return str;
 }
 
@@ -148,7 +148,7 @@ const char *toggle_sel_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, "Toggle%d", i+1);
+    sprintf(str, _tr("Toggle%d"), i+1);
     return str;
 }
 
@@ -361,9 +361,9 @@ static void show_page()
 
     u16 y = 144;
     if (page_num == 0) {
-        GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, "Trims:");
+        GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
         firstObj = GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
-        GUI_CreateLabel(COL1_VALUE, 64, NULL, DEFAULT_FONT, "Bars:");
+        GUI_CreateLabel(COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars:"));
         GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
@@ -406,7 +406,7 @@ void PAGE_MainCfgInit(int page)
     firstObj = NULL;
 
     page_num = page;
-    PAGE_ShowHeader("Main Page Config");
+    PAGE_ShowHeader(_tr("Main Page Config"));
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
     show_page();
 }

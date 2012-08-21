@@ -49,12 +49,12 @@ int main() {
 
     u32 buttons = ScanButtons();
     if(CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
-        LCD_PrintStringXY(10, 10, "USB Storage mode, press 'ENT' to exit.");
+        LCD_PrintStringXY(10, 10, _tr("USB Storage mode, press 'ENT' to exit."));
         USB_Connect();
     }
     
     while(!FS_Mount()) {
-        LCD_PrintStringXY(10, 10, "Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.");
+        LCD_PrintStringXY(10, 10, _tr("Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit."));
         USB_Connect();
     }
 
