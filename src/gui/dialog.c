@@ -91,7 +91,6 @@ void GUI_DrawDialog(struct guiObject *obj)
         LCD_PrintStringXY(dialog->txtbox.x, (box->y + 5), dialog->title);
     } else if(dialog->txtbox.width) {
         // NOTE: We assume all redraw events after the 1st are incremental!
-printf("Old size: (%dx%d) - (%dx%d)\n", dialog->txtbox.x, dialog->txtbox.y, dialog->txtbox.width, dialog->txtbox.height);
         GUI_DialogDrawBackground(dialog->txtbox.x, dialog->txtbox.y,
                                  dialog->txtbox.width, dialog->txtbox.height);
     }
@@ -101,7 +100,6 @@ printf("Old size: (%dx%d) - (%dx%d)\n", dialog->txtbox.x, dialog->txtbox.y, dial
                          : (const char *)dialog->cbData;
     LCD_GetStringDimensions((const u8 *)str, &dialog->txtbox.width, &dialog->txtbox.height);
     dialog->txtbox.y = box->y + (box->height - dialog->txtbox.height) / 2;
-printf("New size: (%dx%d) - (%dx%d)\n", dialog->txtbox.x, dialog->txtbox.y, dialog->txtbox.width, dialog->txtbox.height);
     LCD_PrintStringXY(dialog->txtbox.x, dialog->txtbox.y, str);
 }
 
