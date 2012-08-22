@@ -1,16 +1,8 @@
 #ifndef _CHANTEST_PAGE_H_
 #define _CHANTEST_PAGE_H_
 #include "buttons.h"
-#if NUM_CHANNELS > NUM_INPUTS
-    #define NUM_TEST_BARS NUM_CHANNELS
-#else
-    #define NUM_TEST_BARS NUM_INPUTS
-#endif
-#if NUM_BUTTONS > NUM_TEST_BARS
-    #define NUM_VALUES NUM_BUTTONS
-#else
-    #define NUM_VALUES NUM_TEST_BARS
-#endif
+#define NUM_TEST_BARS ((NUM_CHANNELS > NUM_INPUTS) ? NUM_CHANNELS : NUM_INPUTS)
+#define NUM_VALUES ((NUM_TX_BUTTONS > NUM_TEST_BARS) ? NUM_TX_BUTTONS : NUM_TEST_BARS)
 
 struct chantest_page {
     u8 type;

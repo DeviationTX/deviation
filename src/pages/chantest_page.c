@@ -40,7 +40,7 @@ static void show_bar_page(u8 num_bars)
         height = 155;
         count = num_bars;
     }
-  
+printf("Num bars: %d, %d %d %d\n", cp->num_bars, NUM_TEST_BARS, NUM_CHANNELS, NUM_INPUTS);
     u16 offset = (320 + (SEPERATION - 10) - SEPERATION * count) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
@@ -74,6 +74,13 @@ const char *lockstr_cb(guiObject_t *obj, void *data)
         return _tr("Touch to Lock");
 }
 
+const char *button_str_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    int button = (long)data;
+    return INPUT_ButtonName(button + 1);
+}
+
 static void show_button_page()
 {
     #define X_STEP 95
@@ -83,7 +90,7 @@ static void show_button_page()
     cp->bar[0] = GUI_CreateLabelBox(100, 40, 0, 0, &DEFAULT_FONT, lockstr_cb, NULL, NULL);
     for (i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(10 + X_STEP * (i % 3), y, 0, 0,
-                         &DEFAULT_FONT, NULL, NULL, (void *)tx_button_str[i]);
+                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
         cp->value[i] = GUI_CreateLabelBox(70 + X_STEP * (i % 3), y, 16, 16,
                          &SMALLBOX_FONT, NULL, NULL, (void *)"");
         if ((i % 3) == 2)
@@ -218,7 +225,7 @@ static const char *channum_cb(guiObject_t *obj, void *data)
             *p = '\n';
             p++;
         }
-        MIXER_SourceName(p, ch+1);
+        INPUT_SourceName(p, ch+1);
         if (! (ch & 0x01)) {
             sprintf(p + strlen(p), "\n");
         }

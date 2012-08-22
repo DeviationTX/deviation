@@ -58,7 +58,7 @@ void PAGE_ShowSafetyDialog()
                               ? raw[i+1]
                               : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
                 sprintf(tmpdlg + strlen(tmpdlg), _tr("%s is %d%%, safe value = %d%%\n"),
-                        MIXER_SourceName(tmpstr, i + 1),
+                        INPUT_SourceName(tmpstr, i + 1),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
                     break;

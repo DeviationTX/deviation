@@ -510,22 +510,6 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
     return 1;
 }
 
-const char *MIXER_SourceName(char *str, u8 src)
-{
-    u8 is_neg = MIXER_SRC_IS_INV(src);
-    src = MIXER_SRC(src);
-
-    if(! src) {
-        sprintf(str, _tr("None"));
-    } else if(src <= NUM_TX_INPUTS) {
-        sprintf(str, "%s%s", is_neg ? "!" : "", _tr(tx_input_str[src - 1]));
-    } else if(src <= NUM_INPUTS) {
-        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("CYC"), src - NUM_TX_INPUTS);
-    } else {
-        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
-    }
-    return str;
-}
 const char *MIXER_TemplateName(enum TemplateType template)
 {
     switch(template) {
@@ -535,14 +519,6 @@ const char *MIXER_TemplateName(enum TemplateType template)
     case MIXERTEMPLATE_COMPLEX: return _tr("Complex");
     default:                    return _tr("Unknown");
     }
-}
-
-const char *MIXER_ButtonName(u8 button)
-{
-    if (! button) {
-        return _tr("None");
-    }
-    return _tr(tx_button_str[button - 1]);
 }
 
 const char *MIXER_SwashType(enum SwashType swash_type)

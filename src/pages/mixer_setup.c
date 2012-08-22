@@ -454,7 +454,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         redraw_graphs();
     }
     GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
-    return MIXER_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(mp->tmpstr, *source);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
@@ -478,7 +478,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
-    return MIXER_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(mp->tmpstr, *source);
 }
 
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)

@@ -16,51 +16,6 @@
 #include "fltk.h"
 #include "mixer.h"
 
-const char *tx_input_str[NUM_TX_INPUTS] = {
-    "AIL",
-    "ELE",
-    "THR",
-    "RUD",
-    "RUD DR",
-    "ELE DR",
-    "AIL DR",
-    "GEAR",
-    "MIX0",
-    "MIX1",
-    "MIX2",
-    "FMODE0",
-    "FMODE1",
-    "FMODE2",
-};
-
-const char *tx_stick_names[4] = {
-    "RIGHT_H",
-    "LEFT_V",
-    "RIGHT_V",
-    "LEFT_H",
-};
-
-const char *tx_button_str[] = {
-    "TRIMLV-",
-    "TRIMLV+",
-    "TRIMRV-",
-    "TRIMRV+",
-    "TRIMLH-",
-    "TRIMLH+",
-    "TRIMRH-",
-    "TRIMRH+",
-    "TRIM_L-",
-    "TRIM_L+",
-    "TRIM_R-",
-    "TRIM_R+",
-    "Left",
-    "Right",
-    "Down",
-    "Up",
-    "Enter",
-    "Exit",
-};
-
 s16 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;

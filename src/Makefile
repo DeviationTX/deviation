@@ -37,7 +37,7 @@ ifeq "$(wildcard ../.hg )" ""
 else
   HGVERSION = "\"$(PACKAGE) `hg parents --template '{node|short}'`\""
 endif
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 '-DTARGET_H="target/$(TARGET)/$(TARGET)_target.h"' -DHGVERSION=$(HGVERSION)
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION=$(HGVERSION)
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 

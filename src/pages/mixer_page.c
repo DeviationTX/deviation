@@ -28,7 +28,7 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
 {
     (void)obj;
-    return MIXER_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+    return INPUT_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
 }
 
 const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
@@ -36,12 +36,12 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
     (void)obj;
     char tmp1[5];
     if ((long)data < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
-        MIXER_SourceName(tmp1, ProtocolChannelMap[Model.protocol][(long)data]);
+        INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][(long)data]);
         sprintf(mp->tmpstr,"%s%d-%s",
             (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
             (int)((long)data + 1), tmp1);
     } else {
-        MIXER_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
+        INPUT_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
         sprintf(mp->tmpstr,"%s%s",
                 (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
                 tmp1);
@@ -122,7 +122,7 @@ static const char *show_source(guiObject_t *obj, void *data)
 {
     (void)obj;
     u8 *source = (u8 *)data;
-    return MIXER_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(mp->tmpstr, *source);
 }
 
 void PAGE_MixerEvent()

@@ -67,7 +67,7 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 *source = (u8 *)data;
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, NULL);
-    return MIXER_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(mp->tmpstr, *source);
 }
 void MODELPAGE_Config()
 {

@@ -28,7 +28,7 @@ static void draw_page(u8 enable)
     sprintf(up->tmpstr, "%s" HGVERSION "\n%s%s",
             _tr("Deviation FW\nversion: "),
             _tr("USB File System is disabled\nPress 'Ent' to "),
-            _tr(enable == 0 ? "enable" : "disable"));
+            enable == 0 ? _tr("enable") : _tr("disable"));
     GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, up->tmpstr);
 }
 

@@ -19,32 +19,12 @@
 static const u16 columns[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};
 static const u8 buttonmap[] = {
-    BUT_LEFT,        BUT_RIGHT,       BUT_ENTER,       BUT_TRIM4_POS,   BUT_TRIM4_NEG,
-    BUT_DOWN,        BUT_UP,          BUT_EXIT,        BUT_TRIM3_NEG,   BUT_TRIM3_POS,
-    BUT_NOCON_1,     BUT_TRIM6_NEG,   BUT_TRIM6_POS,   BUT_TRIM5_POS,   BUT_TRIM5_NEG,
-    BUT_TRIM1_NEG,   BUT_TRIM2_POS,   BUT_TRIM1_POS,   BUT_NOCON_2,     BUT_TRIM2_NEG,
+    BUT_LEFT,        BUT_RIGHT,       BUT_ENTER,       BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG,
+    BUT_DOWN,        BUT_UP,          BUT_EXIT,        BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS,
+    BUT_LAST,        BUT_TRIM_R_NEG,  BUT_TRIM_R_POS,  BUT_TRIM_L_POS,  BUT_TRIM_L_NEG,
+    BUT_TRIM_LV_NEG, BUT_TRIM_RV_POS, BUT_TRIM_LV_POS, BUT_LAST,        BUT_TRIM_RV_NEG,
     };
     
-const char *tx_button_str[] = {
-    "TRIMLV-",
-    "TRIMLV+",
-    "TRIMRV-",
-    "TRIMRV+",
-    "TRIMLH-",
-    "TRIMLH+",
-    "TRIMRH-",
-    "TRIMRH+",
-    "TRIM_L-",
-    "TRIM_L+",
-    "TRIM_R-",
-    "TRIM_R+",
-    "Left",
-    "Right",
-    "Down",
-    "Up",
-    "Enter",
-    "Exit",
-};
 #define COL_PORT GPIOB
 #define COL_PORT_MASK (GPIO6 | GPIO7 | GPIO8 | GPIO9)
 #define ROW_PORT GPIOE

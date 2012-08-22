@@ -19,30 +19,6 @@
 #include "config/tx.h"
 #include "devo8.h"
 
-const char *tx_input_str[NUM_TX_INPUTS] = {
-    "AIL",
-    "ELE",
-    "THR",
-    "RUD",
-    "RUD DR",
-    "ELE DR",
-    "AIL DR",
-    "GEAR",
-    "MIX0",
-    "MIX1",
-    "MIX2",
-    "FMODE0",
-    "FMODE1",
-    "FMODE2",
-};
-
-const char *tx_stick_names[4] = {
-    "RIGHT_H",
-    "LEFT_V",
-    "RIGHT_V",
-    "LEFT_H",
-};
-
 void CHAN_Init()
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);

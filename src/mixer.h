@@ -48,9 +48,7 @@ struct Curve {
 };
 
 //The followingis defined bythe target
-extern const char *tx_input_str[NUM_TX_INPUTS];
 extern const char *tx_stick_names[4];
-extern const char *tx_button_str[NUM_TX_BUTTONS];
 
 enum TemplateType {
     MIXERTEMPLATE_NONE,
@@ -149,13 +147,14 @@ struct Trim *MIXER_GetAllTrims();
 void MIXER_RegisterTrimButtons();
 
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags);
-const char *MIXER_SourceName(char *str, u8 src);
 const char *MIXER_TemplateName(enum TemplateType t);
-const char *MIXER_ButtonName(u8 src);
 const char *MIXER_SwashType(enum SwashType);
 u8 MIXER_MapChannel(u8 channel);
 void MIXER_AdjustForProtocol();
 
 void MIXER_Init();
+
+const char *INPUT_SourceName(char *str, u8 src);
+const char *INPUT_ButtonName(u8 src);
 
 #endif

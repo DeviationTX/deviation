@@ -15,12 +15,32 @@ typedef uint64_t u64;
 //#define printf if(0) printf
 
 //Load target-specific include
-#include TARGET_H
+#include "target_defs.h"
 
+#define CHANDEF(x) INP_##x,
+enum {
+    INP_NONE,
+    #include "capabilities.h"
+    INP_LAST,
+};
+#undef CHANDEF
+
+#define BUTTONDEF(x) BUT_##x,
+enum {
+    BUT_NONE,
+    #include "capabilities.h"
+    BUT_LAST,
+};
+#undef BUTTONDEF
+
+#define NUM_TX_INPUTS (INP_LAST - 1)
+#define NUM_INPUTS (NUM_TX_INPUTS + 3)
+#define NUM_TX_BUTTONS (BUT_LAST - 1)
 extern volatile s16 Channels[NUM_CHANNELS];
 
 /* Temproary definition until we have real translation */
 #define _tr(x) x
+#define _tr_noop(x) x
 
 /* General Functions */
 void ModelName(u8 *var, u8 len);

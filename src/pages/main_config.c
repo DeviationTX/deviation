@@ -124,7 +124,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     if (Model.pagecfg.box[i] == 2)
         return _tr("Timer2");
     
-    return MIXER_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
+    return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
 }
 const char *barlabel_cb(guiObject_t *obj, void *data)
 {
@@ -142,7 +142,7 @@ const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
     Model.pagecfg.bar[i] = GUI_TextSelectHelper(Model.pagecfg.bar[i], 0, NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    return MIXER_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
+    return INPUT_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
 }
 const char *toggle_sel_cb(guiObject_t *obj, void *data)
 {
@@ -164,7 +164,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
         build_image();
     }
     GUI_TextSelectEnablePress(obj, MIXER_SRC(Model.pagecfg.toggle[i]));
-    return MIXER_SourceName(str, Model.pagecfg.toggle[i]);
+    return INPUT_SourceName(str, Model.pagecfg.toggle[i]);
 }
 
 u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)

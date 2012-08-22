@@ -21,6 +21,7 @@
 static struct timer_page * const tp = &pagemem.u.timer_page;
 
 static void update_countdown(u8 idx);
+const char *timer_str_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_source_cb(guiObject_t *obj, void *data);
 static void toggle_timertype_cb(guiObject_t *obj, void *data);
@@ -29,9 +30,6 @@ static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
 
 void PAGE_TimerInit(int page)
 {
-    const char * const timerstr[] = {
-        "Timer 1:", "Timer 2:"
-    };
     (void)page;
     int i;
     PAGE_SetModal(0);
@@ -40,7 +38,7 @@ void PAGE_TimerInit(int page)
     for (i = 0; i < NUM_TIMERS; i++) {
         u8 x = 48 + i * 96;
         //Row 1
-        GUI_CreateLabel(8, x, NULL, DEFAULT_FONT, (void *)_tr(timerstr[i]));
+        GUI_CreateLabel(8, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
         GUI_CreateTextSelect(72, x, TEXTSELECT_96, 0x0000, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         GUI_CreateLabel(8, x+24, NULL, DEFAULT_FONT, _tr("Switch:"));
@@ -63,6 +61,14 @@ void update_countdown(u8 idx)
     GUI_SetHidden(tp->startLabelObj[idx], hide);
 }
 
+const char *timer_str_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    int i = (long)data;
+    sprintf(tp->tmpstr, "%s %d:", _tr("Timer"), i + 1);
+    return tp->tmpstr;
+}
+
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
@@ -77,7 +83,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         TIMER_Reset(idx);
     }
     GUI_TextSelectEnablePress(obj, MIXER_SRC(src));
-    return MIXER_SourceName(tp->tmpstr, src);
+    return INPUT_SourceName(tp->tmpstr, src);
 }
 
 void toggle_source_cb(guiObject_t *obj, void *data)
