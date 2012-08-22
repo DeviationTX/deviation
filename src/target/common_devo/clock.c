@@ -15,7 +15,7 @@
 
 
 #include "common.h"
-#include "devo8.h"
+#include "devo.h"
 
 #include <libopencm3/stm32/systick.h>
 #include <libopencm3/stm32/timer.h>

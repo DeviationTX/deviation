@@ -1,5 +1,5 @@
-#ifndef _DEVO8_H_
-#define _DEVO8_H_
+#ifndef _DEVO_H_
+#define _DEVO_H_
 
 void ADC_Init(void);
 u16 ADC1_Read(u8 channel);

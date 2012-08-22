@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f1/adc.h>
 #include <libopencm3/stm32/f1/rcc.h>
-#include "devo8.h"
+#include "devo.h"
 
 void ADC_Init(void)
 {

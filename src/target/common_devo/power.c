@@ -16,7 +16,6 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/scb.h>
 #include "common.h"
-#include "devo8.h"
 
 void PWR_Init(void)
 {
@@ -66,14 +65,4 @@ int PWR_CheckPowerSwitch()
         return 1;
     }
     return 0;
-}
-
-/* Return milivolts */
-u16 PWR_ReadVoltage(void)
-{
-    u32 v = ADC1_Read(14);
-    /* Compute voltage from y = 0.0021x + 0.3026 */
-    /* Multily the above by 1000 to get milivolts */
-    v = v * 21 / 10 + 303;
-    return v;
 }

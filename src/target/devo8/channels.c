@@ -17,7 +17,7 @@
 #include "common.h"
 #include "mixer.h"
 #include "config/tx.h"
-#include "devo8.h"
+#include "../common_devo/devo.h"
 
 void CHAN_Init()
 {
