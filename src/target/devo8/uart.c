@@ -15,7 +15,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/gpio.h>
-#include "target.h"
+#include "common.h"
 
 #include <stdio.h>
 #include <string.h>

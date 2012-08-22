@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "target.h"
+#include "common.h"
 #include "gui/gui.h"
 #include "icons.h"
 

@@ -13,10 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #include "protocol/interface.h"
 #include "mixer.h"
-#include "misc.h"
 #include "gui/gui.h"
 #include "buttons.h"
 #include "timer.h"
@@ -113,7 +112,7 @@ void Banner()
     u8 Power = CYRF_MaxPower();
     u8 mfgdata[6];
     u8 tmp[12];
-    ModelName(tmp, 12);
+    TxName(tmp, 12);
     printf("\nDeviation\n");
     /* Check CPU type */
 

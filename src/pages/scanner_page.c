@@ -13,9 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #include "protocol/interface.h"
-#include "misc.h"
 #include "pages.h"
 #include "config/model.h"
 

@@ -14,7 +14,7 @@ All text above must be included in any redistribution
 ****************************************/
 
 
-#include "target.h"
+#include "common.h"
 #include <stdlib.h>
 #include <stdio.h>
 

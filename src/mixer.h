@@ -154,7 +154,4 @@ void MIXER_AdjustForProtocol();
 
 void MIXER_Init();
 
-const char *INPUT_SourceName(char *str, u8 src);
-const char *INPUT_ButtonName(u8 src);
-
 #endif

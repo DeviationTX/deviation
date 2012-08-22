@@ -1,4 +1,4 @@
-#include "target.h"
+#include "common.h"
 
 u8* BOOTLOADER_Read(int idx) {
     u32 ret = 0x00000000;
@@ -8,7 +8,7 @@ u8* BOOTLOADER_Read(int idx) {
     return (u8*)ret;
 }
 
-void ModelName(u8 *var, u8 len)
+void TxName(u8 *var, u8 len)
 {
     const u8 * pBLString = (u8*)0x08001000;
     if(len > 8)

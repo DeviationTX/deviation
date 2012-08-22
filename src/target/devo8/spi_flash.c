@@ -15,7 +15,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
-#include "target.h"
+#include "common.h"
 
 #define CS_HI() gpio_set(GPIOB, GPIO2)
 #define CS_LO() gpio_clear(GPIOB, GPIO2)

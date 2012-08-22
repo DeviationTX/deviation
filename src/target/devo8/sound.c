@@ -17,7 +17,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/timer.h>
 
-#include "target.h"
+#include "common.h"
 #include "devo8.h"
 
 static u16(*Callback)();

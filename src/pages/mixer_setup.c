@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #include "pages.h"
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;

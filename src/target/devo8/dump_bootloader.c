@@ -1,4 +1,4 @@
-#include "target.h"
+#include "common.h"
 
 void dump_bootloader()
 {

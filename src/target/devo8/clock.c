@@ -14,7 +14,7 @@
  */
 
 
-#include "target.h"
+#include "common.h"
 #include "devo8.h"
 
 #include <libopencm3/stm32/systick.h>

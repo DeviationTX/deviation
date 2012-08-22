@@ -13,8 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
-#include "misc.h"
+#include "common.h"
 #include "ini.h"
 #include "gui/gui.h"
 #include "tx.h"

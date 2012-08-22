@@ -17,10 +17,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "target.h"
+#include "common.h"
 #include "protocol/interface.h"
 
-void ModelName(u8 *var, u8 len) {
+void TxName(u8 *var, u8 len) {
     const u8 model[] = "DEVO-08-Emu";
     if(len > 12)
          len = 12;

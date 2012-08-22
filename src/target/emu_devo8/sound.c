@@ -25,7 +25,7 @@
  */
 #include <stdio.h>
 #include <math.h>
-#include "target.h"
+#include "common.h"
 
 #define SAMPLE_RATE   (44100)
 #define FRAMES_PER_BUFFER  (64)

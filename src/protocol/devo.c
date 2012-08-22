@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"

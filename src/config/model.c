@@ -13,10 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #include "model.h"
 #include "tx.h"
-#include "misc.h"
 #include "ini.h"
 #include <stdlib.h>
 #include <string.h>

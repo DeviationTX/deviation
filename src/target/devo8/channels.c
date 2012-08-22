@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
-#include "target.h"
+#include "common.h"
 #include "mixer.h"
 #include "config/tx.h"
 #include "devo8.h"

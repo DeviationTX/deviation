@@ -19,7 +19,7 @@
  http://code.google.com/p/th9x/
  */
 
-#include "target.h"
+#include "common.h"
 #include "mixer.h"
 
 #define INPNAME_AILERON  _tr("AIL")

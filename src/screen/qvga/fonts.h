@@ -20,7 +20,7 @@ Dt 08.06.2006
 
 /* Extern definitions */
 
-#include "target.h"
+#include "common.h"
 
 struct FONT_DEF 
 {

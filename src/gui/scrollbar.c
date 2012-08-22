@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "target.h"
+#include "common.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 #include "buttons.h"

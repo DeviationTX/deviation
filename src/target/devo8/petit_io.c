@@ -14,7 +14,7 @@
  */
 
 #include "petit_io.h"
-#include "target.h"
+#include "common.h"
 
 //SECTOR_OFFSET is also defined in target/devo8/msc2/mass_mal.c
 //Make sure they both match!

@@ -32,7 +32,7 @@
 #include <FL/fl_draw.H>
 
 extern "C" {
-#include "target.h"
+#include "common.h"
 #include "fltk.h"
 #include "mixer.h"
 }
