@@ -38,7 +38,7 @@ extern "C" {
 }
 
 
-u16 keymap[] = { 'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
+static const u16 keymap[] = { 'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
 
 static struct {
     s32 xscale;
@@ -231,12 +231,14 @@ void LCD_Init()
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
   for(i = 0; i < 7; i++) {
-      char *tmpstr, tmpstr1[10];;
-      asprintf(&tmpstr, "%s", INPUT_SourceName(tmpstr1, i + 1));
-      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : tmpstr);
+      char *label;
+      label = (char *)malloc(10);
+      INPUT_SourceName(label, i + 1);
+      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
       gui.raw[i]->textsize(10);
-      asprintf(&tmpstr, "%s", INPUT_SourceName(tmpstr1, i + 8));
-      gui.raw[i+7] = new Fl_Output(535, 20 * i + 5, 60, 15, tmpstr);
+      label = (char *)malloc(10);
+      INPUT_SourceName(label, i + 8);
+      gui.raw[i+7] = new Fl_Output(535, 20 * i + 5, 60, 15, label);
       gui.raw[i+7]->textsize(10);
   }
   for(i = 0; i < 4; i++) {
