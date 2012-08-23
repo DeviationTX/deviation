@@ -286,6 +286,8 @@ void WK_BuildPacket_2601()
     if (bind_counter) {
         bind_counter--;
         build_bind_pkt(init_2601);
+        if (bind_counter == 0)
+            PROTOCOL_SetBindState(0);
     } else {
         build_data_pkt_2601();
     }
@@ -297,6 +299,8 @@ void WK_BuildPacket_2401()
     if (bind_counter) {
         bind_counter--;
         build_bind_pkt(init_2401);
+        if (bind_counter == 0)
+            PROTOCOL_SetBindState(0);
     } else {
         build_data_pkt_2401();
     }
