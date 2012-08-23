@@ -103,7 +103,9 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         break;
     }
     case TRIM_HORIZONTAL: {
+    case TRIM_INVHORIZONTAL:
         val = (TRIM_THICKNESS / 2) + (width - TRIM_THICKNESS) * (val - graph->min) / (graph->max - graph->min);
+        s16 xpos = graph->direction == TRIM_HORIZONTAL ? x + val : x + width - val;
         if (Display.flags & TRIM_TRANSPARENT) {
             GUI_DrawBackground(x, y, width, height);
         } else {
@@ -111,7 +113,7 @@ void GUI_DrawBarGraph(struct guiObject *obj)
         }
 //        LCD_DrawFastHLine(x, y + height / 2, width, 0x0000); //Main axis
         LCD_DrawFastVLine(x + width / 2, y, height, disp->outline_color); //Center
-        LCD_FillRect(x + val - TRIM_THICKNESS / 2,
+        LCD_FillRect(xpos - TRIM_THICKNESS / 2,
                      y + TRIM_MARGIN,
                      TRIM_THICKNESS, height - TRIM_MARGIN * 2, color);
         break;

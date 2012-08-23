@@ -18,6 +18,7 @@ enum BarGraphDirection {
     BAR_HORIZONTAL,
     BAR_VERTICAL,
     TRIM_HORIZONTAL,
+    TRIM_INVHORIZONTAL,
     TRIM_VERTICAL,
 };
 enum TextSelectType {

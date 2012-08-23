@@ -70,7 +70,7 @@ void PAGE_MainInit(int page)
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
         if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
+            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
         else
             mp->trimObj[i] = NULL;
     }
