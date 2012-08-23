@@ -48,7 +48,8 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     s8 *value = (s8 *)data;
     *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
-    sprintf(tp->tmpstr, "%d.%d", *value / 10, *value % 10);
+    s8 val = *value < 0 ? -*value : *value;
+    sprintf(tp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "",val / 10, val % 10);
     return tp->tmpstr;
 }
 
