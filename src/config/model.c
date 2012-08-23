@@ -677,7 +677,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
              : INPUT_SourceName(file, m->trims[idx].src));
         fprintf(fh, "%s=%s\n", TRIM_POS, INPUT_ButtonName(m->trims[idx].pos));
         fprintf(fh, "%s=%s\n", TRIM_NEG, INPUT_ButtonName(m->trims[idx].neg));
-        if(WRITE_FULL_MODEL || m->trims[idx].step != 10)
+        if(WRITE_FULL_MODEL || m->trims[idx].step != 1)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
         if(WRITE_FULL_MODEL || m->trims[idx].value)
             fprintf(fh, "%s=%d\n", TRIM_VALUE, m->trims[idx].value);
