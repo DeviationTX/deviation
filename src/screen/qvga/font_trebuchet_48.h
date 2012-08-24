@@ -10,7 +10,11 @@
  * bytes/col   : 6
  */
 
-const uint8_t FontTrebuchet_MS_48[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_Trebuchet_MS_48[] = {
+    0x25, 0x39, 0x00
+};
+const uint8_t Font_Trebuchet_MS_48[] = {
     //font widths
     0x22, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1c, 0x01, 0x10, 0x0d,
     0x01, 0x1e, 0x10, 0x1d, 0x1b, 0x20, 0x1a, 0x1d, 0x1e, 0x1c,
@@ -412,3 +416,6 @@ const uint8_t FontTrebuchet_MS_48[] = {
     0x00, 0xc0, 0xff, 0x01, 0x00, 0x00,
 
 };
+#else //FONTDECL
+FONTDECL(0x80 | 34, 48, CharRange_Trebuchet_MS_48, Font_Trebuchet_MS_48, "trebuchet48")
+#endif //FONTDECL

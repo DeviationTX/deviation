@@ -15,18 +15,17 @@
 #include "common.h"
 #include "fonts.h"
 
-#include "fonts.h"
-
-#include "font_arial_14.h"
-#include "font_arial_14_bold.h"
-#include "font_arial_14_narrow.h"
-#include "font_arial_14_narrow_bold.h"
-#include "font_arial_10.h"
-#include "font_arial_10_narrow.h"
-#include "font_arial_18_bold.h"
-#include "font_arial_24_bold.h"
-#include "font_system_5x7.h"
-#include "font_trebuchet_48.h"
+struct FONT_DEF 
+{
+	u8 width;     	/* Character width for storage         */
+	u8 height;  		/* Character height for storage        */
+        const u8 *range;  /* Array containing the ranges of supported characters */
+	const u8 *font_table;       /* Font table start address in memory  */
+};
+#define WIDTH(x)           (0x7F & x->width)
+#define HEIGHT(x)          (x->height)
+#define IS_PROPORTIONAL(x) (0x80 & x->width)
+const struct FONT_DEF Fonts[];
 
 /* The font bitfield is designed to be backwards compatible with standard
  * GLCD 8bit bit-fields, but to also support upto 32x32 proportional fonts
@@ -62,7 +61,13 @@
  *  So this would appear as '0x7F, 0x03' in the font table
  *
  */
+#define FONTDECL(w, h, range, font, name) name,
 static const char * const FontNames[] = {
+    #include "fonts.h"
+    "",
+};
+#undef FONTDECL
+#if 0
     "system5x7",
     "arial10",
     "arial10narrow",
@@ -74,9 +79,15 @@ static const char * const FontNames[] = {
     "arial24bold",
     "trebuchet48",
     "",
-};
-    
+#endif
+
+#define FONTDECL(w, h, range, font, name) {w, h, range, font},
 const struct FONT_DEF Fonts[] = {
+    #include "fonts.h"
+    {0, 0, 0, 0},
+};
+#undef FONTDECL
+#if 0
     {5, 7, 0x20, 0x80, FontSystem5x7},
     {0x80 | 10, 10, 0x20, 0x7F, FontArial_10},
     {0x80 | 10, 12, 0x20, 0x7F, FontArial_10_Narrow},
@@ -89,7 +100,7 @@ const struct FONT_DEF Fonts[] = {
     {0x80 | 34, 48, 0x25, 0x3a, FontTrebuchet_MS_48},
     {0, 0, 0, 0, 0},
     };
-
+#endif
 #define LINE_SPACING 2
 #define CHAR_SPACING 1
 static struct {
@@ -111,59 +122,87 @@ u8 FONT_GetFromString(const char *value)
     return 0;
 }
 
+const u8 *char_offset(u8 c, const struct FONT_DEF *font, u8 *width)
+{
+    u32 offset = 0;
+    u32 count = 0;
+    int found = 0;
+    const u8 *ptr = font->range;
+    u8 row_bytes = (HEIGHT(cur_str.font) - 1) / 8 + 1;
+    while(*ptr) {
+        int i;
+        for (i = *ptr; i <= *(ptr+1); i++) {
+            if (c == i) {
+                found = 1;
+                if (IS_PROPORTIONAL(font)) {
+                    *width = font->font_table[count];
+                } else {
+                    *width = WIDTH(font);
+                    return font->font_table + offset * row_bytes * (*width);
+                }
+            }
+            if (IS_PROPORTIONAL(font)) {
+                if (! found) {
+                    //Keep track of the width of this character
+                    offset += font->font_table[count] * row_bytes;
+                }
+                //Keep track of the number of bytes in the width table
+                count++;
+            } else {
+                //Keep track of number of characters to this point
+                offset++;
+            }
+        }
+        ptr += 2;
+    }
+    if(! found)
+        return NULL;
+    return font->font_table + count + offset;
+}
+
 u8 get_width(u8 c)
 {
-    if ((c < cur_str.font->first_char) || (c > cur_str.font->last_char))
-        return 0;
-    if (IS_PROPORTIONAL(cur_str.font)) {
-        return *(cur_str.font->font_table + c - cur_str.font->first_char);
-    } else {
-        return WIDTH(cur_str.font);
+    const u8 *ptr = cur_str.font->range;
+    const u8 *pos = cur_str.font->font_table;
+    while(*ptr) {
+        if (c >= *ptr && c <= *(ptr+1)) {
+            return IS_PROPORTIONAL(cur_str.font)
+                          ? *(pos + (c - *ptr))
+                          : WIDTH(cur_str.font);
+        }
+        pos += (*(ptr+1) - *ptr);
     }
+    return 0;
 }
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
 {
     u8 row, col, width;
-    u8 row_bytes = (HEIGHT(cur_str.font) - 1) / 8 + 1;
-    const u8 *offset = cur_str.font->font_table;
+    if(c == 'B') 
+printf("Found !\n");
+    const u8 *offset = char_offset(c, cur_str.font, &width);
+    if (! offset)
+        return;
     // Check if the requested character is available
-    if ((c >= cur_str.font->first_char) && (c <= cur_str.font->last_char))
+    LCD_DrawStart(x, y, x + width - 1,  y + HEIGHT(cur_str.font) - 1, DRAW_NWSE);
+    for (col = 0; col < width; col++)
     {
-        // Check if font is proportional
-        if (IS_PROPORTIONAL(cur_str.font)) {
-            const u8 *proportional_width = offset;
-            // Add up width of all characters up to 'c'
-            for(row = cur_str.font->first_char; row < c; row++) {
-                offset += (*proportional_width++) * row_bytes;
-            }
-            width = *proportional_width;
-            // Move offset past width table
-            offset += cur_str.font->last_char - cur_str.font->first_char;
-        } else {
-            offset += (c - cur_str.font->first_char) * WIDTH(cur_str.font) * row_bytes;
-            width = WIDTH(cur_str.font);
-        }
-        LCD_DrawStart(x, y, x + width - 1,  y + HEIGHT(cur_str.font) - 1, DRAW_NWSE);
-        for (col = 0; col < width; col++)
+        const u8 *data = offset++;
+        u8 bit = 0;
+        // Data is right aligned,adrawn top to bottom
+        for (row = 0; row < HEIGHT(cur_str.font); ++row)
         {
-            const u8 *data = offset++;
-            u8 bit = 0;
-            // Data is right aligned,adrawn top to bottom
-            for (row = 0; row < HEIGHT(cur_str.font); ++row)
-            {
-                if (bit == 8) {
-                    data = offset++;
-                    bit = 0;
-                }
-                if (*data & (1 << bit)) {
-                    LCD_DrawPixelXY(x + col, y + row, cur_str.color);
-                }
-                bit++;
+            if (bit == 8) {
+                data = offset++;
+                bit = 0;
             }
+            if (*data & (1 << bit)) {
+                LCD_DrawPixelXY(x + col, y + row, cur_str.color);
+            }
+            bit++;
         }
-        LCD_DrawStop();
     }
+    LCD_DrawStop();
 }
 
 u8 LCD_SetFont(unsigned int idx)

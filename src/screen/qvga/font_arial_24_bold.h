@@ -10,7 +10,11 @@
  * bytes/col   : 3
  */
 
-const uint8_t FontArial_24_Bold[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_Arial_24_Bold[] = {
+    0x20, 0x5a, 0x00
+};
+const uint8_t Font_Arial_24_Bold[] = {
     //font widths
     0x05, 0x00, 0x00, 0x00, 0x00, 0x17, 0x00, 0x00, 0x00, 0x00,
     0x0b, 0x0e, 0x00, 0x09, 0x06, 0x08, 0x0e, 0x0a, 0x0e, 0x0e,
@@ -798,3 +802,6 @@ const uint8_t FontArial_24_Bold[] = {
     0x0f, 0x00, 0x1e,
 
 };
+#else //FONTDECL
+FONTDECL(0x80 | 27, 23, CharRange_Arial_24_Bold, Font_Arial_24_Bold, "arial24bold")
+#endif //FONTDECL

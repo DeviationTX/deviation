@@ -10,7 +10,11 @@
  * bytes/col   : 2
  */
 
-const uint8_t FontArial_10[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_Arial_10[] = {
+    0x20, 0x7e, 0x00
+};
+const uint8_t Font_Arial_10[] = {
     //font widths
     0x02, 0x02, 0x03, 0x05, 0x05, 0x09, 0x06, 0x01, 0x03, 0x03,
     0x03, 0x05, 0x02, 0x03, 0x02, 0x03, 0x05, 0x03, 0x05, 0x05,
@@ -561,3 +565,6 @@ const uint8_t FontArial_10[] = {
     0x08, 0x00,
 
 };
+#else //FONTDECL
+FONTDECL(0x80 | 10, 10, CharRange_Arial_10, Font_Arial_10, "arial10")
+#endif //FONTDECL

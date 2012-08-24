@@ -12,7 +12,11 @@
 //first_char = 0x20 
 //last_char = 0x80
 
-const uint8_t FontSystem5x7[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_System5x7[] = {
+    0x20, 0x7F, 0x00
+};
+const uint8_t Font_System5x7[] = {
     // Fixed width; char width table not used !!!!
     // font data
     0x00, 0x00, 0x00, 0x00, 0x00,// (space)
@@ -112,4 +116,7 @@ const uint8_t FontSystem5x7[] = {
         0x08, 0x08, 0x2A, 0x1C, 0x08,// ->
         0x08, 0x1C, 0x2A, 0x08, 0x08 // <-
 };
+#else //FONTDECL
+FONTDECL(5, 7, CharRange_System5x7, Font_System5x7, "system5x7")
+#endif //FONTDECL
 

@@ -100,7 +100,7 @@ void PAGE_ShowBindingDialog(u8 update)
     u32 bind_time = PROTOCOL_Binding();
     if (bind_time != 0xFFFFFFFF)
         sprintf(tmpstr, _tr("\n\nBinding will end in %d seconds"), (int)bind_time / 1000);
-    sprintf(dlgstr, _tr("Binding is in progress\nMake sure model is on\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s"), tmpstr);
+    sprintf(dlgstr, _tr("!Binding is in progress\nMake sure model is on\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s"), tmpstr);
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);

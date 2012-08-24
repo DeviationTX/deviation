@@ -50,3 +50,44 @@ u32 Crc(const void *buffer, u32 size)
    return ~crc;
 }
 
+/* Note that the following does no error checking on whether the string
+ * is valid utf-8 or even if the length is ok.  Caveat Emptor.
+ */
+const char *utf8_to_u32(const char *str, u32 *ch)
+{
+    if(! (*str & 0x80)) {
+        *ch = *str;
+        return str + 1;
+    }
+    if((*str & 0xE0) == 0xC0) {
+        /* 2 bytes */
+        *ch = ((0x1F & *str) << 6) | (0x3F & *(str + 1));
+        return str + 2;
+    }
+    if((*str & 0xF0) == 0xE0) {
+        /* 3 bytes */
+        *ch = ((0x0F & *str) << 12) | ((0x3F & *(str + 1)) << 6) | (0x3F & *(str + 2));
+        return str + 3;
+    }
+    if((*str & 0xF8) == 0xF0) {
+        /* 4 bytes */
+        *ch = ((0x07 & *str) << 18) | ((0x3F & *(str + 1)) << 12)
+              | ((0x3F & *(str + 2)) << 6) | (0x3F & *(str + 3));
+        return str + 4;
+    }
+    if((*str & 0xFC) == 0xF8) {
+        /* 5 bytes */
+        *ch = ((0x03 & *str) << 24) | ((0x3F & *(str + 1)) << 18)
+              | ((0x3F & *(str + 2)) << 12) | ((0x3F & *(str + 3)) << 6)
+              | (0x3F & *(str + 4));
+        return str + 5;
+    }
+    if((*str & 0xFE) == 0xFC) {
+        /* 6 bytes */
+        *ch = ((0x01 & *str) << 30) | ((0x3F & *(str + 1)) << 24)
+              | ((0x3F & *(str + 2)) << 18) | ((0x3F & *(str + 3)) << 12)
+              | ((0x3F & *(str + 4)) << 6) | (0x3F & *(str + 5));;
+        return str + 6;
+    }
+    return NULL;
+}

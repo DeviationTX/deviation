@@ -10,7 +10,11 @@
  * bytes/col   : 2
  */
 
-const uint8_t FontArial_14_NarrowBold[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_Arial_14_NarrowBold[] = {
+    0x20, 0x7e, 0x00
+};
+const uint8_t Font_Arial_14_NarrowBold[] = {
     //font widths
     0x02, 0x03, 0x05, 0x07, 0x05, 0x0a, 0x09, 0x02, 0x03, 0x03,
     0x05, 0x06, 0x02, 0x04, 0x02, 0x03, 0x06, 0x04, 0x06, 0x06,
@@ -665,3 +669,6 @@ const uint8_t FontArial_14_NarrowBold[] = {
     0x60, 0x00,
 
 };
+#else //FONTDECL
+FONTDECL(0x80 | 10, 15, CharRange_Arial_14_NarrowBold, Font_Arial_14_NarrowBold, "arial14narrowbold")
+#endif //FONTDECL

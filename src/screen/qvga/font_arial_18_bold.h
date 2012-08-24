@@ -10,7 +10,11 @@
  * bytes/col   : 2
  */
 
-const uint8_t FontArial_18_Bold[] = {
+#ifndef FONTDECL
+const uint8_t CharRange_Arial_18_Bold[] = {
+    0x20, 0x5a, 0x00
+};
+const uint8_t Font_Arial_18_Bold[] = {
     //font widths
     0x04, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x03, 0x00, 0x00,
     0x06, 0x08, 0x00, 0x04, 0x03, 0x05, 0x08, 0x06, 0x08, 0x07,
@@ -484,3 +488,6 @@ const uint8_t FontArial_18_Bold[] = {
     0x07, 0x30,
 
 };
+#else //FONTDECL
+FONTDECL(0x80 | 15, 15, CharRange_Arial_18_Bold, Font_Arial_18_Bold, "arial18bold")
+#endif //FONTDECL
