@@ -11,7 +11,7 @@
  */
 
 #ifndef FONTDECL
-const uint8_t CharRange_Arial_10[] = {
+const uint32_t CharRange_Arial_10[] = {
     0x20, 0x7e, 0x00
 };
 const uint8_t Font_Arial_10[] = {

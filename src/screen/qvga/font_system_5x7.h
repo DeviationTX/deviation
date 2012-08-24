@@ -13,7 +13,7 @@
 //last_char = 0x80
 
 #ifndef FONTDECL
-const uint8_t CharRange_System5x7[] = {
+const uint32_t CharRange_System5x7[] = {
     0x20, 0x7F, 0x00
 };
 const uint8_t Font_System5x7[] = {

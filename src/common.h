@@ -24,13 +24,13 @@ extern volatile s16 Channels[NUM_CHANNELS];
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);
     /* Strings */
-void LCD_PrintCharXY(unsigned int x, unsigned int y, const char c);
-void LCD_PrintChar(const char c);
+void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c);
+void LCD_PrintChar(u32 c);
 void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str);
 void LCD_PrintString(const char *str);
 void LCD_SetXY(unsigned int x, unsigned int y);
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height);
-void LCD_GetCharDimensions(u8 c, u16 *width, u16 *height);
+void LCD_GetCharDimensions(u32 c, u16 *width, u16 *height);
 u8 LCD_SetFont(unsigned int idx);
 u8  LCD_GetFont();
 void LCD_SetFontColor(u16 color);
@@ -125,5 +125,6 @@ const char *INPUT_ButtonName(u8 src);
 /* Misc */
 void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
+const char *utf8_to_u32(const char *str, u32 *ch);
 
 #endif

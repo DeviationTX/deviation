@@ -19,7 +19,7 @@ struct FONT_DEF
 {
 	u8 width;     	/* Character width for storage         */
 	u8 height;  		/* Character height for storage        */
-        const u8 *range;  /* Array containing the ranges of supported characters */
+        const u32 *range;  /* Array containing the ranges of supported characters */
 	const u8 *font_table;       /* Font table start address in memory  */
 };
 #define WIDTH(x)           (0x7F & x->width)
@@ -127,10 +127,10 @@ const u8 *char_offset(u8 c, const struct FONT_DEF *font, u8 *width)
     u32 offset = 0;
     u32 count = 0;
     int found = 0;
-    const u8 *ptr = font->range;
+    const u32 *ptr = font->range;
     u8 row_bytes = (HEIGHT(cur_str.font) - 1) / 8 + 1;
     while(*ptr) {
-        int i;
+        uint32_t i;
         for (i = *ptr; i <= *(ptr+1); i++) {
             if (c == i) {
                 found = 1;
@@ -160,9 +160,9 @@ const u8 *char_offset(u8 c, const struct FONT_DEF *font, u8 *width)
     return font->font_table + count + offset;
 }
 
-u8 get_width(u8 c)
+u8 get_width(u32 c)
 {
-    const u8 *ptr = cur_str.font->range;
+    const u32 *ptr = cur_str.font->range;
     const u8 *pos = cur_str.font->font_table;
     while(*ptr) {
         if (c >= *ptr && c <= *(ptr+1)) {
@@ -171,15 +171,14 @@ u8 get_width(u8 c)
                           : WIDTH(cur_str.font);
         }
         pos += (*(ptr+1) - *ptr);
+        ptr += 2;
     }
     return 0;
 }
 
-void LCD_PrintCharXY(unsigned int x, unsigned int y, char c)
+void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    if(c == 'B') 
-printf("Found !\n");
     const u8 *offset = char_offset(c, cur_str.font, &width);
     if (! offset)
         return;
@@ -239,12 +238,13 @@ void LCD_PrintStringXY(unsigned int x, unsigned int y, const char *str)
 void LCD_PrintString(const char *str)
 {
     while(*str != 0) {
-        LCD_PrintChar(*str);
-        str++;
+        u32 ch;
+        str = utf8_to_u32(str, &ch);
+        LCD_PrintChar(ch);
     }
 }
 
-void LCD_PrintChar(const char c)
+void LCD_PrintChar(u32 c)
 {
     if(c == '\n') {
         cur_str.x = cur_str.x_start;
@@ -255,7 +255,7 @@ void LCD_PrintChar(const char c)
     }
 }
 
-void LCD_GetCharDimensions(u8 c, u16 *width, u16 *height) {
+void LCD_GetCharDimensions(u32 c, u16 *width, u16 *height) {
     *height = HEIGHT(cur_str.font);
     *width = get_width(c);
 }
@@ -266,15 +266,16 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
     *width = 0;
     //printf("String: %s\n", str);
     while(*str) {
-        if(*str == '\n') {
+        u32 ch;
+        str = (const u8 *)utf8_to_u32((const char *)str, &ch);
+        if(ch == '\n') {
             *height += HEIGHT(cur_str.font) + LINE_SPACING;
             if(line_width > *width)
                 *width = line_width;
             line_width = 0;
         } else {
-            line_width += get_width(*str) + CHAR_SPACING;
+            line_width += get_width(ch) + CHAR_SPACING;
         }
-        str++;
     }
     if(line_width > *width)
         *width = line_width;

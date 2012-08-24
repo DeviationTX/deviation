@@ -11,7 +11,7 @@
  */
 
 #ifndef FONTDECL
-const uint8_t CharRange_Trebuchet_MS_48[] = {
+const uint32_t CharRange_Trebuchet_MS_48[] = {
     0x25, 0x39, 0x00
 };
 const uint8_t Font_Trebuchet_MS_48[] = {

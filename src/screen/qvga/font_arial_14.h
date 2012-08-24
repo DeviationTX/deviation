@@ -13,7 +13,7 @@
 //first_char = 0x20
 //last_char = 0x80
 #ifndef FONTDECL
-const uint8_t CharRange_Arial_14[] = {
+const uint32_t CharRange_Arial_14[] = {
     0x20, 0x7f, 0x00
 };
 const uint8_t Font_Arial_14[] = {

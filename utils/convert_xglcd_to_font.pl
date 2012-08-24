@@ -199,7 +199,7 @@ sub write_font
     printf " * bytes/col   : %d\n", $bpc;
     printf " */\n\n";
     printf "#ifndef FONTDECL\n";
-    printf "const uint8_t ${range_var}[] = {\n    ";
+    printf "const uint32_t ${range_var}[] = {\n    ";
     foreach my $r (@{ $template->{range} }) {
         printf "0x%02x, 0x%02x, ", $r->[0], $r->[1];
     }
