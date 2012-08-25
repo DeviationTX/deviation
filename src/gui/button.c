@@ -108,7 +108,7 @@ void GUI_DrawButton(struct guiObject *obj)
         if (txt) {
             LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
             x_off = (box->width - text_w) / 2 + box->x;
-            y_off = (box->height - text_h) / 2 + box->y + 2;
+            y_off = (box->height - text_h) / 2 + box->y + 1;
            LCD_SetFontColor(button->fontColor);
            LCD_PrintStringXY(x_off, y_off, txt);
         }

@@ -122,7 +122,7 @@ u8 FONT_GetFromString(const char *value)
     return 0;
 }
 
-const u8 *char_offset(u8 c, const struct FONT_DEF *font, u8 *width)
+const u8 *char_offset(u32 c, const struct FONT_DEF *font, u8 *width)
 {
     u32 offset = 0;
     u32 count = 0;
@@ -170,9 +170,10 @@ u8 get_width(u32 c)
                           ? *(pos + (c - *ptr))
                           : WIDTH(cur_str.font);
         }
-        pos += (*(ptr+1) - *ptr);
+        pos += (*(ptr+1) - *ptr) + 1;
         ptr += 2;
     }
+    //printf("Didn't find character: %d\n", c);
     return 0;
 }
 
