@@ -103,7 +103,7 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
     }
 }
 
-const char *boxlabel_cb(guiObject_t *obj, void *data)
+const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
@@ -126,7 +126,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     
     return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
 }
-const char *barlabel_cb(guiObject_t *obj, void *data)
+const char *barlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
@@ -144,7 +144,7 @@ const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
         build_image();
     return INPUT_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
 }
-const char *toggle_sel_cb(guiObject_t *obj, void *data)
+const char *toggle_sel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
@@ -336,7 +336,7 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     }
     return page_num;
 }
-void iconpress_cb(guiObject_t *obj, void *data)
+void iconpress_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if(Model.pagecfg.toggle[(long)data])
@@ -414,7 +414,7 @@ void PAGE_MainCfgEvent()
 {
 }
 
-void tglico_select_cb(guiObject_t *obj, s8 press_type, void *data)
+void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     if (press_type == -1) {

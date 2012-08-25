@@ -21,8 +21,8 @@
 static struct chantest_page * const cp = &pagemem.u.chantest_page;
 
 static s16 showchan_cb(void *data);
-static const char *value_cb(guiObject_t *obj, void *data);
-static const char *channum_cb(guiObject_t *obj, void *data);
+static const char *value_cb(guiObject_t *obj, const void *data);
+static const char *channum_cb(guiObject_t *obj, const void *data);
 
 static void show_bar_page(u8 num_bars)
 {
@@ -45,7 +45,7 @@ printf("Num bars: %d, %d %d %d\n", cp->num_bars, NUM_TEST_BARS, NUM_CHANNELS, NU
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)((long)i));
+                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
         cp->bar[i] = GUI_CreateBarGraph(offset + SEPERATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)((long)i));
@@ -64,7 +64,7 @@ printf("Num bars: %d, %d %d %d\n", cp->num_bars, NUM_TEST_BARS, NUM_CHANNELS, NU
     }
 }
 
-const char *lockstr_cb(guiObject_t *obj, void *data)
+const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -74,7 +74,7 @@ const char *lockstr_cb(guiObject_t *obj, void *data)
         return _tr("Touch to Lock");
 }
 
-const char *button_str_cb(guiObject_t *obj, void *data)
+const char *button_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int button = (long)data;
@@ -128,7 +128,7 @@ void PAGE_ButtontestInit(int page)
     show_button_page();
 }
 
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -207,7 +207,7 @@ static s16 showchan_cb(void *data)
     return cp->pctvalue[ch];
 }
 
-static const char *value_cb(guiObject_t *obj, void *data)
+static const char *value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
@@ -215,7 +215,7 @@ static const char *value_cb(guiObject_t *obj, void *data)
     return cp->tmpstr;
 }
 
-static const char *channum_cb(guiObject_t *obj, void *data)
+static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;

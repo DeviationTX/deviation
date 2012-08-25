@@ -146,12 +146,12 @@ static void calibrate_touch(void)
     }
 }
 
-static const char *calibratestr_cb(guiObject_t *obj, void *data)
+static const char *calibratestr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return (long)data & 1 ? _tr("Calibrate") : _tr("Test");
 }
-const char *coords_cb(guiObject_t *obj, void *data)
+const char *coords_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -159,7 +159,7 @@ const char *coords_cb(guiObject_t *obj, void *data)
     return cp.tmpstr;
 }
 
-const char *show_msg_cb(guiObject_t *obj, void *data)
+const char *show_msg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -200,14 +200,14 @@ static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(cp.tmpstr, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
     return cp.tmpstr;
 }
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
     PAGE_CalibrateInit(0);
 }
 
-static void press_cb(guiObject_t *obj, void *data)
+static void press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     cp.enable = (long)data;

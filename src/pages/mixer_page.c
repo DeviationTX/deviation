@@ -20,18 +20,18 @@
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static u8 show_chantest;
-static void templateselect_cb(guiObject_t *obj, void *data);
-static void limitselect_cb(guiObject_t *obj, void *data);
-static const char *show_source(guiObject_t *obj, void *data);
+static void templateselect_cb(guiObject_t *obj, const void *data);
+static void limitselect_cb(guiObject_t *obj, const void *data);
+static const char *show_source(guiObject_t *obj, const void *data);
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 
-const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, void *data)
+const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return INPUT_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
 }
 
-const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
+const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
     char tmp1[5];
@@ -49,7 +49,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, void *data)
     return mp->tmpstr;
 }
 
-static const char *template_name_cb(guiObject_t *obj, void *data)
+static const char *template_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 ch = (long)data;
@@ -95,7 +95,7 @@ void show_page()
     }
 }
 
-void show_chantest_cb(guiObject_t *obj, void *data)
+void show_chantest_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
@@ -118,7 +118,7 @@ void PAGE_MixerInit(int page)
     show_page();
 }
 
-static const char *show_source(guiObject_t *obj, void *data)
+static const char *show_source(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 *source = (u8 *)data;
@@ -142,7 +142,7 @@ void PAGE_MixerEvent()
     }
 }
 
-void templateselect_cb(guiObject_t *obj, void *data)
+void templateselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long idx = (long)data;
@@ -175,7 +175,7 @@ void templateselect_cb(guiObject_t *obj, void *data)
     MIXPAGE_ChangeTemplate(1);
 }
 
-void limitselect_cb(guiObject_t *obj, void *data)
+void limitselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;

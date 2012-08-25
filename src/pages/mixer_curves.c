@@ -17,7 +17,7 @@
 #include "pages.h"
 
 static struct curve_edit * const edit = &pagemem.u.mixer_page.edit;
-static void okcancel_cb(guiObject_t *obj, void *data);
+static void okcancel_cb(guiObject_t *obj, const void *data);
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_expopoint_cb(guiObject_t *obj, int dir, void *data);
@@ -87,7 +87,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     }
     return CURVE_GetName(curve);
 }
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if (data) {

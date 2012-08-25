@@ -22,13 +22,13 @@
 #include "main_config.h"
 
 static struct main_page * const mp = &pagemem.u.main_page;
-const char *show_box_cb(guiObject_t *obj, void *data);
-const char *voltage_cb(guiObject_t *obj, void *data);
+const char *show_box_cb(guiObject_t *obj, const void *data);
+const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
 static s16 bar_cb(void * data);
-void press_icon_cb(guiObject_t *obj, s8 press_type, void *data);
-void press_icon2_cb(guiObject_t *obj, void *data);
-void press_box_cb(guiObject_t *obj, s8 press_type, void *data);
+void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
+void press_icon2_cb(guiObject_t *obj, const void *data);
+void press_box_cb(guiObject_t *obj, s8 press_type, const void *data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 
 static s32 get_boxval(u8 idx);
@@ -191,7 +191,7 @@ void PAGE_MainExit()
     BUTTON_UnregisterCallback(&mp->action);
 }
 
-const char *show_box_cb(guiObject_t *obj, void *data)
+const char *show_box_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
@@ -203,7 +203,7 @@ const char *show_box_cb(guiObject_t *obj, void *data)
     return mp->tmpstr;
 }
 
-const char *voltage_cb(guiObject_t *obj, void *data) {
+const char *voltage_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
     sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
@@ -222,7 +222,7 @@ s16 bar_cb(void * data)
     return MIXER_GetChannel(idx-1, APPLY_SAFETY);
 }
 
-void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
+void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     if(press_type == -1) {
@@ -238,12 +238,12 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, void *data)
     }
 }
 
-void press_icon2_cb(guiObject_t *obj, void *data)
+void press_icon2_cb(guiObject_t *obj, const void *data)
 {
     press_icon_cb(obj, -1, data);
 }
 
-void press_box_cb(guiObject_t *obj, s8 press_type, void *data)
+void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;

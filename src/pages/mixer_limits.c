@@ -111,7 +111,7 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     return PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.failsafe);
 }
 
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if (data) {

@@ -20,10 +20,10 @@
 
 static buttonAction_t button_action;
 
-static void (*enter_cmd)(guiObject_t *obj, void *data);
-void *enter_data;
-static void (*exit_cmd)(guiObject_t *obj, void *data);
-void *exit_data;
+static void (*enter_cmd)(guiObject_t *obj, const void *data);
+static const void *enter_data;
+static void (*exit_cmd)(guiObject_t *obj, const void *data);
+static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
 
 struct page {
@@ -136,7 +136,7 @@ u8 PAGE_GetModal()
 {
     return modal;
 }
-void changepage_cb(guiObject_t *obj, void *data)
+void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if((long)data == 0) {
@@ -160,7 +160,7 @@ void PAGE_ShowHeader(const char *title)
     exit_data = NULL;
 }
 
-void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, void *data))
+void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
 {
     enter_cmd = CallBack;
     enter_data = (void *)1;
@@ -170,7 +170,7 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
     GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
 }
 
-static const char *okcancelstr_cb(guiObject_t *obj, void *data)
+static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return data ? _tr("OK") : _tr("Cancel");
@@ -184,13 +184,13 @@ u8 page_change_cb(u32 buttons, u8 flags, void *data)
         if (flags & BUTTON_REPEAT)
             return 0;
         if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) && enter_cmd) {
-            void (*cmd)(guiObject_t *obj, void *data) = enter_cmd;
+            void (*cmd)(guiObject_t *obj, const void *data) = enter_cmd;
             PAGE_RemoveAllObjects();
             cmd(NULL, enter_data);
             return 1;
         }
         if(CHAN_ButtonIsPressed(buttons, BUT_EXIT) && exit_cmd) {
-            void (*cmd)(guiObject_t *obj, void *data) = exit_cmd;
+            void (*cmd)(guiObject_t *obj, const void *data) = exit_cmd;
             PAGE_RemoveAllObjects();
             cmd(NULL, exit_data);
             return 1;
@@ -214,13 +214,13 @@ void PAGE_RemoveAllObjects()
     GUI_RemoveAllObjects();
 }
 
-guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
+guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
 {
     exit_cmd = CallBack;
     exit_data = (void *)0;
     return GUI_CreateButton(x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
 }
-guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, void *data))
+guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
 {
     enter_cmd = CallBack;
     enter_data = (void *)1;

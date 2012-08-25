@@ -32,13 +32,13 @@ static s16 show_bar_cb(void *data)
     return sp.channelnoise[ch];
 }
 
-static const char *enablestr_cb(guiObject_t *obj, void *data)
+static const char *enablestr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
     return sp.enable ? _tr("Turn Off") : _tr("Turn On");
 }
-static void press_cb(guiObject_t *obj, void *data)
+static void press_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     sp.enable ^= 1;

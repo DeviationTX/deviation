@@ -19,7 +19,7 @@
 
 static struct trim_page * const tp = &pagemem.u.trim_page;
 
-const char *trimsource_name_cb(guiObject_t *obj, void *data)
+const char *trimsource_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
@@ -53,7 +53,7 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     return tp->tmpstr;
 }
 
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if (data) {
@@ -65,7 +65,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     GUI_RemoveAllObjects();
     PAGE_TrimInit(0);
 }
-void edit_cb(guiObject_t *obj, void *data)
+void edit_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     struct Trim *trim = MIXER_GetAllTrims();

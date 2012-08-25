@@ -112,8 +112,8 @@ struct guiImage {
     u16 x_off;
     u16 y_off;
     u32 crc;
-    void (*callback)(struct guiObject *obj, s8 press_type, void *data);
-    void *cb_data;
+    void (*callback)(struct guiObject *obj, s8 press_type, const void *data);
+    const void *cb_data;
 };
 
 struct guiBox {
@@ -125,9 +125,9 @@ struct guiBox {
 
 struct guiLabel {
     struct LabelDesc desc;
-    const char *(*strCallback)(struct guiObject *obj, void *data);
-    void (*pressCallback)(struct guiObject *obj, s8 press_type, void *data);
-    void *cb_data;
+    const char *(*strCallback)(struct guiObject *obj, const void *data);
+    void (*pressCallback)(struct guiObject *obj, s8 press_type, const void *data);
+    const void *cb_data;
 };
 
 struct guiKeyboard {
@@ -154,9 +154,9 @@ struct guiScrollbar {
 struct guiButton {
     const struct ImageMap *image;
     u16 fontColor;
-    const char *(*strCallback)(struct guiObject *obj, void *data);
-    void (*CallBack)(struct guiObject *obj, void *data);
-    void *cb_data;
+    const char *(*strCallback)(struct guiObject *obj, const void *data);
+    void (*CallBack)(struct guiObject *obj, const void *data);
+    const void *cb_data;
 };
 
 struct guiListbox {
@@ -308,19 +308,21 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
         enum DialogType dgType, void *data);
 #define GUI_CreateLabel(x, y, cb, desc, data) GUI_CreateLabelBox(x, y, 0, 0, &desc, cb, NULL, data)
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
-             const char *(*strCallback)(guiObject_t *, void *),
-             void (*pressCallback)(guiObject_t *obj, s8 press_type, void *data),void *data);
+             const char *(*strCallback)(guiObject_t *, const void *),
+             void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
+             const void *data);
 void GUI_SetLabelDesc(guiObject_t *obj, struct LabelDesc *desc);
 
 #define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file, NULL, NULL)
 guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
-        void (*CallBack)(guiObject_t *obj, s8 press_type, void *data), void *cb_data);
+        void (*CallBack)(guiObject_t *obj, s8 press_type, const void *data), const void *cb_data);
 
-guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type, const char *(*strCallback)(guiObject_t *, void *),
-        u16 fontColor, void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
+        const char *(*strCallback)(guiObject_t *, const void *),
+        u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
-        void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+        void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),

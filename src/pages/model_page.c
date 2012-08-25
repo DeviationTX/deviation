@@ -23,8 +23,8 @@
 
 static struct model_page * const mp = &pagemem.u.model_page;
 
-static void changename_cb(guiObject_t *obj, void *data);
-static void fixedid_cb(guiObject_t *obj, void *data);
+static void changename_cb(guiObject_t *obj, const void *data);
+static void fixedid_cb(guiObject_t *obj, const void *data);
 static const char *type_val_cb(guiObject_t *obj, int dir, void *data);
 static void type_press_cb(guiObject_t *obj, void *data);
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
@@ -33,7 +33,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data);
 static void file_press_cb(guiObject_t *obj, void *data);
 
-const char *show_text_cb(guiObject_t *obj, void *data)
+const char *show_text_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return (const char *)data;
@@ -75,7 +75,7 @@ void PAGE_ModelInit(int page)
 
     row += 20;
     if(Model.fixed_id == 0)
-        sprintf(mp->fixed_id, _tr("None"));
+        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
@@ -95,7 +95,7 @@ static void changename_done_cb(guiObject_t *obj, void *data)
     CONFIG_SaveModelIfNeeded();
     PAGE_ModelInit(0);
 }
-static void changename_cb(guiObject_t *obj, void *data)
+static void changename_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -111,7 +111,7 @@ static void fixedid_done_cb(guiObject_t *obj, void *data)
     GUI_RemoveObj(obj);
     PAGE_ModelInit(0);
 }
-static void fixedid_cb(guiObject_t *obj, void *data)
+static void fixedid_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;

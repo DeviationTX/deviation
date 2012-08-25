@@ -21,7 +21,7 @@
 static struct timer_page * const tp = &pagemem.u.timer_page;
 
 static void update_countdown(u8 idx);
-const char *timer_str_cb(guiObject_t *obj, void *data);
+const char *timer_str_cb(guiObject_t *obj, const void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_source_cb(guiObject_t *obj, void *data);
 static void toggle_timertype_cb(guiObject_t *obj, void *data);
@@ -61,7 +61,7 @@ void update_countdown(u8 idx)
     GUI_SetHidden(tp->startLabelObj[idx], hide);
 }
 
-const char *timer_str_cb(guiObject_t *obj, void *data)
+const char *timer_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;

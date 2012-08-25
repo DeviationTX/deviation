@@ -78,7 +78,7 @@ static const char *string_cb(u8 idx, void *data)
     }
     return mp->tmpstr;
 }
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     int msg = (long)data;
     (void)obj;
@@ -103,7 +103,7 @@ static void okcancel_cb(guiObject_t *obj, void *data)
     mp->return_page(0);
 }
 
-const char *show_loadsave_cb(guiObject_t *obj, void *data)
+const char *show_loadsave_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return ((long)data) == 2 ? _tr("Save") : _tr("Load");

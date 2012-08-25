@@ -48,7 +48,7 @@ void swashinv_press_cb(guiObject_t *obj, void *data)
     GUI_Redraw(obj);
 }
 
-void okcancel_cb(guiObject_t *obj, void *data)
+void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;

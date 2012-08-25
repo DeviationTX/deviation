@@ -19,8 +19,8 @@
 #include "config/display.h"
 
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
-    const char *(*strCallback)(struct guiObject *, void *), u16 fontColor,
-    void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
+    const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
+    void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
     struct guiObject *obj    = GUI_GetFreeObj();
     struct guiButton *button;
@@ -62,7 +62,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
 }
 
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
-        void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
+        void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
     struct guiObject *obj    = GUI_GetFreeObj();
     struct guiButton *button;

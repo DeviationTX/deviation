@@ -24,7 +24,7 @@ static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
 static s16 eval_mixer_cb(s16 xval, void * data);
 static s16 eval_chan_cb(void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
-static void toggle_link_cb(guiObject_t *obj, void *data);
+static void toggle_link_cb(guiObject_t *obj, const void *data);
 
 static void show_titlerow();
 static void show_none();
@@ -89,7 +89,7 @@ static const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
-static void okcancel_cb(guiObject_t *obj, void *data);
+static void okcancel_cb(guiObject_t *obj, const void *data);
 static u8 touch_cb(s16 x, s16 y, void *data);
 
 #define COL1_TEXT   8
@@ -158,7 +158,7 @@ static void update_rate_widgets(u8 idx)
     }
 }
 
-void toggle_link_cb(guiObject_t *obj, void *data)
+void toggle_link_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if(data)
@@ -168,7 +168,7 @@ void toggle_link_cb(guiObject_t *obj, void *data)
     update_rate_widgets(data ? 1 : 0);
 }
 
-static const char *show_rate_cb(guiObject_t *obj, void *data)
+static const char *show_rate_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return (long)data == 0 ? _tr("Mid-Rate") : _tr("Low-Rate");
@@ -521,7 +521,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     }
 }
 
-static void okcancel_cb(guiObject_t *obj, void *data)
+static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     if (data) {

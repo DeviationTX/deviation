@@ -18,10 +18,10 @@
 #include "gui.h"
 #include "config/display.h"
 
-static void dlgbut_pressok_cb(struct guiObject *obj, void *data);
-static void dlgbut_presscancel_cb(struct guiObject *obj, void *data);
-const char *dlgbut_strok_cb(struct guiObject *obj, void *data);
-const char *dlgbut_strcancel_cb(struct guiObject *obj, void *data);
+static void dlgbut_pressok_cb(struct guiObject *obj, const void *data);
+static void dlgbut_presscancel_cb(struct guiObject *obj, const void *data);
+const char *dlgbut_strok_cb(struct guiObject *obj, const void *data);
+const char *dlgbut_strcancel_cb(struct guiObject *obj, const void *data);
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *(*string_cb)(guiObject_t *obj, void *data),
@@ -116,25 +116,25 @@ void DialogClose(struct guiObject *obj, u8 state)
     GUI_RemoveObj(obj);
     func(state, data);
 }
-void dlgbut_pressok_cb(struct guiObject *obj, void *data)
+void dlgbut_pressok_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     struct guiObject *dlgObj = (struct guiObject *)data;
     DialogClose(dlgObj, 1);
 }
-void dlgbut_presscancel_cb(struct guiObject *obj, void *data)
+void dlgbut_presscancel_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     struct guiObject *dlgObj = (struct guiObject *)data;
     DialogClose(dlgObj, 0);
 }
-const char * dlgbut_strok_cb(struct guiObject *obj, void *data)
+const char * dlgbut_strok_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     (void)data;
     return "Ok";
 }
-const char * dlgbut_strcancel_cb(struct guiObject *obj, void *data)
+const char * dlgbut_strcancel_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     (void)data;

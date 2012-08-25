@@ -19,7 +19,7 @@
 #include "config/display.h"
 
 guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
-    void (*CallBack)(guiObject_t *obj, s8 press_type, void *data), void *cb_data)
+    void (*CallBack)(guiObject_t *obj, s8 press_type, const void *data), const void *cb_data)
 {
     struct guiObject *obj = GUI_GetFreeObj();
     struct guiImage  *image;
