@@ -21,6 +21,7 @@ static char strings[4096];
 #define MAX_STRINGS 256
 #define MAX_LINE 200
 
+#define dbg_printf if(0) printf
 struct str_map {
     u16 hash;
     u16 pos;
@@ -33,6 +34,7 @@ const char *_tr(const char *str)
         return str;
     }
     u16 hash = fnv_16_str(str);
+    dbg_printf("%d: %s\n", hash, str);
     for(i = 0; i < MAX_STRINGS; i++) {
         if(lookupmap[i].pos == 0xffff)
             return str;
@@ -40,6 +42,33 @@ const char *_tr(const char *str)
             return strings + lookupmap[i].pos;
     }
     return str;
+}
+
+unsigned fix_crlf(char *str)
+{
+    unsigned len = strlen(str);
+    unsigned i, j;
+    for (i = 0; i < len; i++) {
+        char replace = '\0';
+        if (str[i] == '\r' || str[i] == '\n') {
+            str[i] = '\0';
+            return i;
+        }
+        if (str[i] == '\\') {
+            if (str[i+1] == 'n') {
+                replace = '\n';
+            } else if(str[i+1] == 't') {
+                replace = '\t';
+            }
+        }
+        if (replace) {
+            str[i] = replace;
+            for(j = i + 2; j < len; j++)
+                str[j - 1] = str[j];
+            len--;
+        }
+    }
+    return len;
 }
 
 void CONFIG_ReadLang(const char *file)
@@ -58,34 +87,19 @@ void CONFIG_ReadLang(const char *file)
     while (fgets(line, sizeof(line), fh) != NULL) {
         u16 hash;
         if(line[0] == ':') {
-            unsigned i;
-            unsigned len = strlen(line);
-            for(i = 0; i < len; i++) {
-                if(line[i] == 0x0a) {
-                    line[i] = 0;
-                    break;
-                }
-                if(line[i] == 0x0d)
-                    line[i] = 0x0a;
-            }
+            fix_crlf(line+1);
             hash = fnv_16_str(line + 1);
+            dbg_printf("%d: %s\n", hash, line);
             if (fgets(line, sizeof(line), fh) == NULL) {
                 break;
             }
             line[MAX_LINE-1] = 0;
-            len = strlen(line);
-            if (len > 2 && line[len-2] == '\n') {
-                line[len-2] = 0;
-                len--;
-            }
-            for(i = 0; i < len; i++) {
-                if(line[i] == 0x0d)
-                    line[i] = 0x0a;
-            }
+            unsigned len = fix_crlf(line);
             if (pos + len > sizeof(strings)) {
                 printf("Out of space processing %s\n", line);
                 break;
             }
+            dbg_printf("\t: %s\n", line);
             lookup->hash = hash;
             lookup->pos = pos;
             lookup++;

@@ -1,2 +1,2 @@
-:Binding is in progressMake sure model is onPressing OK will NOT cancel binding procedurebut will allow full control of Tx.%s
-Kötési folyamatban vanGyőződjön meg róla, a modell aAz OK gomb megnyomásával NEMtörölni kötelező eljárásde lehetővé teszi, hogy teljes mértékben ellenőrzése Tx.%s
+:Binding is in progress\nMake sure model is on\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s
+Kötési folyamatban van\nGyőződjön meg róla, a modell a\nAz OK gomb megnyomásával NEM\ntörölni kötelező eljárás\nde lehetővé teszi, hogy teljes mértékben ellenőrzése Tx.%s
