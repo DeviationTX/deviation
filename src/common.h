@@ -18,8 +18,9 @@ typedef uint64_t u64;
 extern volatile s16 Channels[NUM_CHANNELS];
 
 /* Temproary definition until we have real translation */
-#define _tr(x) x
 #define _tr_noop(x) x
+const char *_tr(const char *str);
+void CONFIG_ReadLang(const char *file);
 
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);
