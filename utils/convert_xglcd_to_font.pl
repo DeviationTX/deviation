@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 # this script takes on stdin the ouput of the MikroElectronica GLCD FontCreator
-# in 'mikroC' X-GLCD lib format
+# with the '-old' switch, the input should be in 'mikroC' X-GLCD lib format
+# without it, the format should be in 'new GLCD' format
 # The output is a font file compatible with the LCD routines
 
 use warnings;
@@ -49,18 +50,40 @@ my $font_name;
 
 main();
 
+sub help
+{
+    my @t = sort(keys(%templates));
+    print <<EOF;
+	$0 [switches] > <font_file>
+	or
+	$0 [switches] -export
+
+	switches:
+	-template <template>  : Select rnage of characters. Valid options:
+                                @t
+        -old                  : Use X-GLCD input format
+        -name                 : The name of the font to generate
+        -export               : Create a directory named <name> containing each character
+        -import <dir>         : Create font from characters stored in <dir>
+EOF
+    exit 0;
+}
 sub main
 {
     my $range;
     my $export;
     my $import;
     my $old;
+    my $help;
     GetOptions(
          "template=s"  => \$template,
          "export"      => \$export,
-         "import=s"      => \$import,
+         "import=s"    => \$import,
          "old"         => \$old,
+         "help"        => \$help,
          "name=s"      => \$font_name);
+    help() if($help);
+
     if(! $template) {
         $template = $templates{"ascii"};
     } else {
@@ -85,6 +108,7 @@ sub main
 sub filter_chars {
     return if(! $template->{"range"} && ! $template->{"exclude"});
     my @chars = keys(%font);
+    #Remove characters that are in exclude list or not in range
     foreach my $char (@chars) {
         if ($template->{"exclude"}) {
             if(grep {$char == $_} @{ $template->{"exclude"} }) {
@@ -105,6 +129,7 @@ sub filter_chars {
             }
         }
     }
+    #Adjust ranges based on existing characters
     my @ranges = @{ $template->{"range"} };
     for(my $i = 0; $i < scalar(@ranges); $i++) {
         while($ranges[$i][0] <= $ranges[$i][1]) {
@@ -126,6 +151,15 @@ sub filter_chars {
         }
     }
     $template->{"range"} = [@ranges];
+    #Add any missing characters
+    foreach my $range (@ranges) {
+        foreach my $char ($range->[0]..$range->[1]) {
+            if(!$font{char}) {
+                printf STDERR "Did not find character $char\n";
+                $font{$char} = [0];
+            }
+        }
+    }
 }
 
 sub optimize
