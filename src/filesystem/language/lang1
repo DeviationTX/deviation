@@ -1,5 +1,11 @@
 magyar
+:Safety
+Biztonsági ellenőrzés
+:%s is %d%%, safe value = %d%%\n
+%s értéke %d%%, a biztonságos érték = %d%%\n
+:Binding
+Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.%s
 :\n\nBinding will end in %d seconds...
-\n\nKapcsolódás vége %d másdperc múlva...
+\n\nKapcsolódás vége %d másodperc múlva...
