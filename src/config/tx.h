@@ -18,6 +18,7 @@ struct TouchCalibration {
 
 struct Transmitter {
     u8 current_model;
+    u8 language;
     enum Mode mode;
     u8 brightness;
     u16 batt_alarm;

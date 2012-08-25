@@ -88,6 +88,7 @@ void PAGE_USBExit();
 /* USB */
 void PAGE_CalibrateInit(int page);
 void PAGE_CalibrateEvent();
+void LANGPage_Select(void(*return_page)(int page));
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);

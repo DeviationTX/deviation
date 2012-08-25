@@ -60,7 +60,7 @@ int main() {
     CONFIG_LoadTx();
     CONFIG_ReadDisplay();
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
-    CONFIG_ReadLang("language/lang.hu");
+    CONFIG_ReadLang(Transmitter.language);
 
     BACKLIGHT_Brightness(Transmitter.brightness);
     LCD_SetFont(DEFAULT_FONT.font);

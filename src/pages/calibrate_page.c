@@ -230,6 +230,22 @@ static void press_cb(guiObject_t *obj, const void *data)
         memset(&cp.coords, 0, sizeof(cp.coords));
     }
 }
+
+static const char *langstr_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    return _tr("Change");
+}
+
+static void lang_select_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_SetModal(1);
+    LANGPage_Select(PAGE_CalibrateInit);
+}
+
 void PAGE_CalibrateInit(int page)
 {
     (void)page;
@@ -239,6 +255,9 @@ void PAGE_CalibrateInit(int page)
     PAGE_ShowHeader(_tr("Configure"));
 
     u8 row = 40;
+    GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language"));
+    GUI_CreateButton(90, row, BUTTON_96, langstr_cb, 0x0000, lang_select_cb, NULL);
+    row += 24;
     GUI_CreateLabelBox(20, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(90, row+6, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
     row += 24;

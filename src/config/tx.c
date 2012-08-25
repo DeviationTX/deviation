@@ -26,6 +26,8 @@ static u32 crc32;
 
 const char CURRENT_MODEL[] = "current_model";
 
+const char LANGUAGE[] = "language";
+
 const char MODE[]="mode";
 
 const char BRIGHTNESS[] = "brightness";
@@ -57,6 +59,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (section[0] == '\0') {
         if (MATCH_KEY(CURRENT_MODEL)) {
             t->current_model = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(LANGUAGE)) {
+            t->language = value_int;
             return 1;
         }
         if (MATCH_KEY(MODE)) {
@@ -140,6 +146,7 @@ void CONFIG_WriteTx()
         return;
     }
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
+    fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);

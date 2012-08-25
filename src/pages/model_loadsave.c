@@ -103,7 +103,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     mp->return_page(0);
 }
 
-const char *show_loadsave_cb(guiObject_t *obj, const void *data)
+static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return ((long)data) == 2 ? _tr("Save") : _tr("Load");
