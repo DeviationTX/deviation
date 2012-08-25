@@ -1,2 +1,4 @@
-:Binding is in progressMake sure model is onPressing OK will NOT cancel binding procedurebut will allow full control of Tx.%s
-Kötési folyamatban vanGyőződjön meg róla, a modell aAz OK gomb megnyomásával NEMtörölni kötelező eljárásde lehetővé teszi, hogy teljes mértékben ellenőrzése Tx.%s
+:Binding is in progress...Make sure model is on!Pressing OK will NOT cancel binding procedurebut will allow full control of Tx.%s
+Kapcsolódás folyamatban...Győződjön meg róla, hogy a modell be van kapcsolva!Az OK gomb NEM szakítja meg a kapcsolódást,csak lehetővé teszi a rádió használatát.%s
+:Binding will end in %d seconds...
+Kapcsolódás vége %d másdperc múlva...
