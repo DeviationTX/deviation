@@ -93,7 +93,7 @@ void PAGE_CloseBindingDialog()
 
 void PAGE_ShowBindingDialog(u8 update)
 {
-    char tmpstr[40] = "";
+    char tmpstr[80] = "";
     if (update && ! dialog)
         return;
     u32 crc = Crc(dlgstr, strlen(dlgstr));
