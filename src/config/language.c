@@ -16,6 +16,7 @@
 #include "common.h"
 #include <stdlib.h>
 #include "tx.h"
+#include "ini.h"
 
 u16 fnv_16_str(const char *str);
 static char strings[4096];
@@ -74,7 +75,7 @@ unsigned fix_crlf(char *str)
 
 void CONFIG_ReadLang(u8 idx)
 {
-    char file[20];
+    char file[30];
     struct str_map *lookup = lookupmap;
     unsigned pos = 0;
     char line[MAX_LINE];
@@ -83,7 +84,7 @@ void CONFIG_ReadLang(u8 idx)
     Transmitter.language = 0;
     if (! idx)
         return;
-    sprintf(file, "language/lang%d", idx);
+    sprintf(file, "language/lang%d.txt", idx);
     FILE *fh = fopen(file, "r");
     if (! fh) {
         printf("Couldn't open language file: %s\n", file);
@@ -115,6 +116,17 @@ void CONFIG_ReadLang(u8 idx)
     lookup->pos = 0xFFFF;
     fclose(fh);
     Transmitter.language = idx;
+}
+
+int CONFIG_IniParse(const char* filename,
+         int (*handler)(void*, const char*, const char*, const char*),
+         void* user)
+{
+    u16 tmpval = lookupmap[0].pos;
+    lookupmap[0].pos = 0xffff; //Disable Language parsing;
+    int result = ini_parse(filename, handler, user);
+    lookupmap[0].pos = tmpval;
+    return result;
 }
 
 /* The following section containing the FNV hash is in the public domain

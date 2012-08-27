@@ -14,7 +14,6 @@
  */
 
 #include "common.h"
-#include "ini.h"
 #include "gui/gui.h"
 #include "tx.h"
 
@@ -130,7 +129,7 @@ void CONFIG_LoadTx()
     Transmitter.current_model = 1;
     Transmitter.mode = MODE_2;
     Transmitter.brightness = 9;
-    ini_parse("tx.ini", ini_handler, (void *)&Transmitter);
+    CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
 }

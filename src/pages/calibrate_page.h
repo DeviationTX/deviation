@@ -10,6 +10,6 @@ struct calibrate_page {
     struct touch coords;
     struct touch coords1;
     void(*return_page)(int page);
-    char tmpstr[20];
+    char tmpstr[30];
 };
 #endif

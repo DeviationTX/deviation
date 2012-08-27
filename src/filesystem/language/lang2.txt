@@ -1,0 +1,349 @@
+Deutsch
+:AIL
+QUE
+:ELE
+HÖH
+:THR
+GAS
+:RUD
+RUD
+:RUD DR
+RUD DR
+:ELE DR
+HÖH DR
+:AIL DR
+QUE DR
+:GEAR
+FAHR
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:FMODE0
+FMOD0
+:FMODE1
+FMOD1
+:FMODE2
+FMOD2
+:TRIMLV-
+TRIMLV-
+:TRIMLV+
+TRIMLV+
+:TRIMRV-
+TRIMRV-
+:TRIMRV+
+TRIMRV+
+:TRIMLH-
+TRIMLH-
+:TRIMLH+
+TRIMLH+
+:TRIMRH-
+TRIMRH-
+:TRIMRH+
+TRIMRH+
+:TRIM_L-
+TRIM_L-
+:TRIM_L+
+TRIM_L+
+:TRIM_R-
+TRIM_R-
+:TRIM_R+
+TRIM_R+
+:Left
+Links
+:Right
+Rechts
+:Down
+Runter
+:Up
+Hoch
+:Enter
+Eingabe
+:Exit
+Beenden
+:RIGHT_H
+RECHTS_H
+:LEFT_V
+LINKS_V
+:RIGHT_V
+RECHTS_V
+:LEFT_H
+LINKS_H
+:None
+Kein
+:CYC
+TAUM
+:Ch
+K
+:OK
+OK
+:Cancel
+Abbruch
+:Unknown
+Unbekannt
+:Load
+Lade
+:Center all sticks and touch the screen
+Zentriere alle Stick, tippe dann auf den Bildschirm.
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Bewege alle Sticks zu den Vollausschlägen, und\ndann zurück in die Mitte. Tippe auf den\nBildschirm.
+:Calibrate
+Kalibrieren
+:Test
+Testen
+:Touch target %d
+Tippe auf Ziel %d
+:Mode %d
+Modus %d
+:Off
+Aus
+:Touch Calibrate
+Touchscreen kalibrieren
+:Touch Test
+Touchscreen testen
+:Change
+Wechseln
+:Configure
+Konfigurieren
+:Language
+Sprache
+:Mode
+Modus
+:Backlight
+Hintergrundbeleuchtung
+:Batt Alarm
+Akkuwarner
+:Screen
+Bildschirm
+:Sticks
+Sticks
+:Turn Off
+Ausschalten
+:Turn On
+Einschalten
+:Scanner
+Scanner
+:No Trims
+Keine Trimmung
+:4 Outside
+4 außen
+:4 Inside
+4 innen
+:6 Trims
+6 Trimmungen
+:No Bars
+Keine Balken
+:4 Bars
+4 Balken
+:8 Bars
+8 Balken
+:Box %d:
+Kasten %d:
+:Timer1
+Zeit1
+:Timer2
+Zeit2
+:Bar %d:
+Balken %d:
+:Toggle%d
+Schalter%d
+:Trims:
+Trimmung:
+:Bars:
+Balken:
+:Main Page Config
+Hauptseitenkonfiguration
+:Timer
+Zeit
+:Switch:
+Schalter:
+:Start:
+Start:
+:stopwatch
+Stoppuhr
+:countdown
+Countdown
+:Normal
+Normal
+:Inverted
+Umgekehrt
+:Helicopter
+Hubschrauber
+:Airplane
+Flugzeug
+:SwashType:
+Taumelscheibe:
+:COL Src:
+FIXME
+:ELE Inv:
+FIXME
+:AIL Inv:
+FIXME
+:COL Inv:
+FIXME
+:Input:
+Eingabe:
+:Trim -:
+Trimmung -:
+:Trim +:
+Trimmung +:
+:Trim Step:
+Trimmschritt:
+:Trim
+Trimmung
+:Src:
+Quelle:
+:Curve:
+Kurve:
+:Scale:
+Skalierung:
+:Offset:
+Offset:
+:Min:
+Min:
+:Max:
+Max:
+:Mid-Rate
+Mittel
+:Low-Rate
+Niedrig
+:Src
+Quelle
+:Switch1
+Schalter1
+:Switch2
+Schalter2
+:High-Rate
+Hoch
+:Linked
+Verknüpft
+:Mixers:
+Mixer:
+:Page:
+Seite:
+:Mux:
+Mux:
+:replace
+ersetzen
+:mult
+*
+:add
++
+:Reverse:
+Umkehr:
+:Failsafe:
+Ausfallschutz:
+:Safety:
+Sicherheit:
+:Value:
+Wert:
+:Subtrim:
+Untertrimmung:
+:Reversed
+Umgekehrt
+:Point:
+Punkt:
+:Pos/Neg:
++/-:
+:Symmetric
+Symmetrisch
+:Pos
++
+:Neg
+-
+:Save
+Speichern
+:Touch to Unlock
+Antippen zum entsperren
+:Touch to Lock
+Antippen zum sperren
+:Channels
+Kanäle
+:Inputs
+Eingaben
+:Buttons
+Tasten
+:Model
+Modell
+:File:
+Datei:
+:Model Name:
+Modellname:
+:Model Type:
+Modelltyp:
+:Protocol:
+Protokoll:
+:Number of Channels:
+Anzahl Kanäle:
+:Tx Power:
+Sendeleistung:
+:Fixed ID:
+Fixe ID:
+:Load...
+Laden...
+:Copy To...
+Kopieren...
+:Template..
+Vorlage...
+:Reset
+Reset
+:USB
+USB
+:Deviation FW\nversion: 
+Deviation FW\nVersion:
+:USB File System is disabled\nPress 'Ent' to 
+USB Dateisystem deaktiviert\nDrücke 'ENT' zum
+:enable
+aktivieren
+:disable
+deaktivieren
+:%s is %d%%, safe value = %d%%\n
+%s %d%%, Ausfallwert = %d%%\n
+:Safety
+Ausfallschutz
+:\n\nBinding will end in %d seconds...
+\n\nBindevorgang endet in %d Sekunden...
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s
+Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.%s
+:Binding
+Binden
+:Simple
+Einfach
+:Expo&DR
+Expo&DR
+:Complex
+Komplex
+:USB Storage mode, press 'ENT' to exit.
+USB Modus, drücke 'ENT' zum beenden.
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+Dateisystem nicht gefunden. Installiere das Dateisystem per USB, dann drücke 'ENT' zum beenden.
+:1-to-1
+1-zu-1
+:Fixed
+Fest
+:Min/Max
+Min/Max
+:Zero/Max
+Null/Max
+:> 0
+> 0
+:< 0
+< 0
+:ABSVAL
+Absolut
+:EXPO
+Expo
+:3 Point
+3 Punkt
+:5 Point
+5 Punkt
+:7 Point
+7 Punkt
+:9 Point
+9 Punkt
+:11 Point
+11 Punkt
+:13 Point
+13 Punkt

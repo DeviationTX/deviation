@@ -16,7 +16,6 @@
 #include "common.h"
 #include "model.h"
 #include "tx.h"
-#include "ini.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -777,7 +776,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     get_model_file(file, model_num);
     clear_model(1);
     auto_map = 0;
-    if (ini_parse(file, ini_handler, &Model)) {
+    if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
@@ -850,7 +849,7 @@ u8 CONFIG_ReadTemplate(u8 template_num) {
 
     sprintf(file, "template/tmpl%d.ini", template_num);
     auto_map = 0;
-    if (ini_parse(file, ini_handler, &Model)) {
+    if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }

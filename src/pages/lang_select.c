@@ -34,15 +34,15 @@ static const char *string_cb(u8 idx, void *data)
     if (idx == 0) {
         return "English";
     }
-    sprintf(cp.tmpstr, "language/lang%d", idx);
+    sprintf(cp.tmpstr, "language/lang%d.txt", idx);
     fh = fopen(cp.tmpstr, "r");
     if (fh) {
         fgets(cp.tmpstr, sizeof(cp.tmpstr), fh);
         fclose(fh);
         unsigned len = strlen(cp.tmpstr);
         if(strlen(cp.tmpstr) && cp.tmpstr[0] != ':') {
-            cp.tmpstr[len-2] = '\0';
-           return cp.tmpstr;
+            cp.tmpstr[len-1] = '\0';
+            return cp.tmpstr;
         }
     }
     return _tr("Unknown");
@@ -73,7 +73,7 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     GUI_CreateButton(264, 4, BUTTON_48, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
     for (num_lang = 1; num_lang <= 100; num_lang++) {
-        sprintf(cp.tmpstr, "language/lang%d", num_lang);
+        sprintf(cp.tmpstr, "language/lang%d.txt", num_lang);
         FILE *fh = fopen(cp.tmpstr, "r");
         if (! fh)
             break;

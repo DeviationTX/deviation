@@ -14,7 +14,6 @@
  */
 
 #include "common.h"
-#include "config/ini.h"
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -88,7 +87,7 @@ void MUSIC_Play(enum Music music)
     num_notes = 0;
     next_note = 1;
     Volume = 100;
-    if(ini_parse("media/sound.ini", ini_handler, (void *)sections[music])) {
+    if(CONFIG_IniParse("media/sound.ini", ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read images/sound.ini\n");
         return;
     }

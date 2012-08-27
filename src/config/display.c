@@ -14,7 +14,6 @@
  */
 
 #include "common.h"
-#include "ini.h"
 #include "gui/gui.h"
 #include "display.h"
 #include <stdlib.h>
@@ -236,5 +235,5 @@ u8 CONFIG_ReadDisplay()
     memset(&Display, 0, sizeof(Display));
     DEFAULT_FONT.font = 7;
     DEFAULT_FONT.font_color = 0xffff;
-    return ini_parse("media/config.ini", ini_handler, (void *)&Display);
+    return CONFIG_IniParse("media/config.ini", ini_handler, (void *)&Display);
 }
