@@ -1,8 +1,8 @@
-Deutsch
+ï»¿Deutsch
 :AIL
 QUE
 :ELE
-HÖH
+HÃ–H
 :THR
 GAS
 :RUD
@@ -10,7 +10,7 @@ RUD
 :RUD DR
 RUD DR
 :ELE DR
-HÖH DR
+HÃ–H DR
 :AIL DR
 QUE DR
 :GEAR
@@ -88,7 +88,7 @@ Lade
 :Center all sticks and touch the screen
 Zentriere alle Stick, tippe dann auf den Bildschirm.
 :Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Bewege alle Sticks zu den Vollausschlägen, und\ndann zurück in die Mitte. Tippe auf den\nBildschirm.
+Bewege alle Sticks zu den VollausschlÃ¤gen, und\ndann zurÃ¼ck in die Mitte. Tippe auf den\nBildschirm.
 :Calibrate
 Kalibrieren
 :Test
@@ -128,7 +128,7 @@ Scanner
 :No Trims
 Keine Trimmung
 :4 Outside
-4 außen
+4 auÃŸen
 :4 Inside
 4 innen
 :6 Trims
@@ -218,7 +218,7 @@ Schalter2
 :High-Rate
 Hoch
 :Linked
-Verknüpft
+VerknÃ¼pft
 :Mixers:
 Mixer:
 :Page:
@@ -260,7 +260,7 @@ Antippen zum entsperren
 :Touch to Lock
 Antippen zum sperren
 :Channels
-Kanäle
+KanÃ¤le
 :Inputs
 Eingaben
 :Buttons
@@ -276,7 +276,7 @@ Modelltyp:
 :Protocol:
 Protokoll:
 :Number of Channels:
-Anzahl Kanäle:
+Anzahl KanÃ¤le:
 :Tx Power:
 Sendeleistung:
 :Fixed ID:
@@ -294,7 +294,7 @@ USB
 :Deviation FW\nversion: 
 Deviation FW\nVersion:
 :USB File System is disabled\nPress 'Ent' to 
-USB Dateisystem deaktiviert\nDrücke 'ENT' zum
+USB Dateisystem deaktiviert\nDrÃ¼cke 'ENT' zum
 :enable
 aktivieren
 :disable
@@ -306,7 +306,7 @@ Ausfallschutz
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s
-Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.%s
+Bindevorgang lÃ¤uft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.%s
 :Binding
 Binden
 :Simple
@@ -316,9 +316,9 @@ Expo&DR
 :Complex
 Komplex
 :USB Storage mode, press 'ENT' to exit.
-USB Modus, drücke 'ENT' zum beenden.
+USB Modus, drÃ¼cke 'ENT' zum beenden.
 :Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Dateisystem nicht gefunden. Installiere das Dateisystem per USB, dann drücke 'ENT' zum beenden.
+Dateisystem nicht gefunden. Installiere das Dateisystem per USB, dann drÃ¼cke 'ENT' zum beenden.
 :1-to-1
 1-zu-1
 :Fixed
