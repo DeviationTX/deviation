@@ -416,13 +416,13 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         return;
 
     fh = fopen(file, "rb");
-    setbuf(fh, 0);
     if(! fh) {
     	printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
         if (w > 0 && h > 0)
             LCD_FillRect(x, y, w, h, 0);
         return;
     }
+    setbuf(fh, 0);
     u32 img_w, img_h, offset, compression;
 
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
