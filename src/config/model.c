@@ -772,6 +772,7 @@ void clear_model(u8 full)
 
 u8 CONFIG_ReadModel(u8 model_num) {
     char file[20];
+    crc32 = 0;
     Transmitter.current_model = model_num;
     get_model_file(file, model_num);
     clear_model(1);

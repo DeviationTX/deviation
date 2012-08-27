@@ -376,6 +376,7 @@ void fix_mixer_dependencies(u8 mixer_count)
     u8 last_count = 0;
     u8 i;
     struct Mixer mixers[NUM_MIXERS];
+    memset(mixers, 0, sizeof(mixers));
     for (i = 0; i < NUM_MIXERS; i++) {
         mixers[i].src = 0;
     }
