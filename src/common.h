@@ -21,6 +21,7 @@ extern volatile s16 Channels[NUM_CHANNELS];
 #define _tr_noop(x) x
 const char *_tr(const char *str);
 void CONFIG_ReadLang(u8 idx);
+void CONFIG_EnableLanguage(int state);
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
          void* user);

@@ -118,6 +118,16 @@ void CONFIG_ReadLang(u8 idx)
     Transmitter.language = idx;
 }
 
+void CONFIG_EnableLanguage(int state)
+{
+    static u16 disable = 0xffff;
+    if (! state) {
+        disable = lookupmap[0].pos;
+        lookupmap[0].pos = 0xffff;
+    } else {
+        lookupmap[0].pos = disable;
+    }
+}
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
          void* user)

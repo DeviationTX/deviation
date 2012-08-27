@@ -144,6 +144,7 @@ void CONFIG_WriteTx()
         printf("Couldn't open tx.ini\n");
         return;
     }
+    CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
     fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
@@ -161,6 +162,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "  %s=%d\n", TOUCH_XOFFSET, (int)t->touch.xoffset);
     fprintf(fh, "  %s=%d\n", TOUCH_YOFFSET, (int)t->touch.yoffset);
 
+    CONFIG_EnableLanguage(1);
     fclose(fh);
 }
 

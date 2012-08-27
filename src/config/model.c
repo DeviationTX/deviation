@@ -599,6 +599,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         printf("Couldn't open file: %s\n", file);
         return 0;
     }
+    CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 6);
@@ -742,6 +743,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 fprintf(fh, "%s%d=%d\n", GUI_TGLICO, idx+1, m->pagecfg.tglico[idx]);
         }
     }
+    CONFIG_EnableLanguage(1);
     fclose(fh);
     return 1;
 }
