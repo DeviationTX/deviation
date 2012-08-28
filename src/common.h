@@ -113,6 +113,8 @@ void PROTOCOL_DeInit();
 u8 PROTOCOL_WaitingForSafe();
 u32 PROTOCOL_CheckSafe();
 u32 PROTOCOL_Binding();
+u8 PROTOCOL_AutoBindEnabled();
+void PROTOCOL_Bind();
 void PROTOCOL_SetBindState(u32 msec);
 void PROTOCOL_CheckDialogs();
 

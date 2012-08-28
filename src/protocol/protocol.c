@@ -17,7 +17,7 @@
 #include "interface.h"
 #include "config/model.h"
 
-#define PROTODEF(proto, map, init, name) extern void init();
+#define PROTODEF(proto, map, cmd, name) extern u32 cmd(enum ProtoCmds);
 #include "protocol.h"
 #undef PROTODEF
 
@@ -30,14 +30,14 @@ static u32 bind_time;
 #define PROTO_BINDING 0x02
 #define PROTO_BINDDLG 0x04
 
-#define PROTODEF(proto, map, init, name) map,
+#define PROTODEF(proto, map, cmd, name) map,
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     NULL,
     #include "protocol.h"
 };
 #undef PROTODEF
 
-#define PROTODEF(proto, map, init, name) name,
+#define PROTODEF(proto, map, cmd, name) name,
 const char * const ProtocolNames[PROTOCOL_COUNT] = {
     "None",
     #include "protocol.h"
@@ -52,7 +52,7 @@ void PROTOCOL_Init(u8 force)
     }
     proto_state |= PROTO_READY;
     
-    #define PROTODEF(proto, map, init, name) case proto: init(); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_INIT); break;
     switch(Model.protocol) {
         #include "protocol.h"
         case PROTOCOL_NONE:
@@ -118,6 +118,31 @@ u32 PROTOCOL_CheckSafe()
             unsafe |= 1 << i;
     }
     return unsafe;
+}
+
+u8 PROTOCOL_AutoBindEnabled()
+{
+    u8 binding = 0;
+    #define PROTODEF(proto, map, cmd, name) case proto: binding = cmd(PROTOCMD_CHECK_AUTOBIND); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default:
+            binding = 0;
+    }
+    #undef PROTODEF
+    return binding;
+}
+
+void PROTOCOL_Bind()
+{
+    #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_BIND); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default: break;
+    }
+    #undef PROTODEF
 }
 
 void PROTOCOL_CheckDialogs()

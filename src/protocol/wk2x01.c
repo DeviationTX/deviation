@@ -331,7 +331,7 @@ static u16 wk_cb()
     return 1200;
 }
 
-void WK2x01_Initialize()
+static void initialize()
 {
     CLOCK_StopTimer();
     CYRF_Reset();
@@ -370,4 +370,14 @@ void WK2x01_Initialize()
     CLOCK_StartTimer(2800, wk_cb);
 }
 
+u32 WK2x01_Cmds(enum ProtoCmds cmd)
+{
+    switch(cmd) {
+        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND:
+            return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
+        default: break;
+    }
+    return 0;
+}
 #endif

@@ -7,7 +7,7 @@ struct model_page {
     char fixed_id[7];
     u8 file_state;
 /*Load save */
-    guiObject_t *icon;
+    guiObject_t *obj;
     u8 selected;
     void(*return_page)(int page);
     enum ModelType modeltype;

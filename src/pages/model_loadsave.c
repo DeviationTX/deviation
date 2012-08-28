@@ -49,7 +49,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     (void)data;
     const char *ico;
     mp->selected = sel + 1;
-    if(! mp->icon)
+    if(! mp->obj)
         return;
     sprintf(mp->tmpstr, "models/model%d.ini", mp->selected);
     mp->modeltype = 0;
@@ -59,7 +59,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         ico = mp->iconstr;
     else
         ico = CONFIG_GetIcon(mp->modeltype);
-    GUI_ChangeImage(mp->icon, ico, 0, 0);
+    GUI_ChangeImage(mp->obj, ico, 0, 0);
 }
 static const char *string_cb(u8 idx, void *data)
 {
@@ -120,7 +120,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->return_page = return_page;
-    mp->icon = NULL;
+    mp->obj = NULL;
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     GUI_CreateButton(264, 4, BUTTON_48, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
     for (num_models = 1; num_models <= 100; num_models++) {
@@ -138,5 +138,5 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     mp->selected = loadsave == 2 ? 1 : CONFIG_GetCurrentModel();
     GUI_CreateListBox(112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
     if (loadsave != 2)
-        mp->icon = GUI_CreateImage(8, 88, 96, 96, CONFIG_GetCurrentIcon());
+        mp->obj = GUI_CreateImage(8, 88, 96, 96, CONFIG_GetCurrentIcon());
 }

@@ -326,12 +326,18 @@ static u16 dsm2_cb()
     return 0;
 }
 
-void DSM2_Initialize()
+static void initialize()
 {
     CLOCK_StopTimer();
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
+   if (Model.fixedid) {
+       cyrfmfg_id[0] ^= (Model.fixedid >> 0) & 0xff;
+       cyrfmfg_id[1] ^= (Model.fixedid >> 8) & 0xff;
+       cyrfmfg_id[2] ^= (Model.fixedid >> 16) & 0xff;
+       cyrfmfg_id[3] ^= (Model.fixedid >> 24) & 0xff;
+   }
 #endif
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
@@ -347,4 +353,15 @@ void DSM2_Initialize()
         PROTOCOL_SetBindState(200 * 10); //msecs
     CLOCK_StartTimer(10000, dsm2_cb);
 }
+
+u32 DSM2_Cmds(enum ProtoCmds cmd)
+{
+    switch(cmd) {
+        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        default: break;
+    }
+    return 0;
+}
+
 #endif

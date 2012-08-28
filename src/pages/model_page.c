@@ -25,6 +25,8 @@ static struct model_page * const mp = &pagemem.u.model_page;
 
 static void changename_cb(guiObject_t *obj, const void *data);
 static void fixedid_cb(guiObject_t *obj, const void *data);
+static void bind_cb(guiObject_t *obj, const void *data);
+static void configure_bind_button();
 static const char *type_val_cb(guiObject_t *obj, int dir, void *data);
 static void type_press_cb(guiObject_t *obj, void *data);
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
@@ -80,6 +82,8 @@ void PAGE_ModelInit(int page)
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
+    mp->obj = GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, bind_cb, _tr("Bind"));
+    configure_bind_button();
 }
 
 void PAGE_ModelEvent()
@@ -120,6 +124,18 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
         mp->fixed_id[0] = 0;
     PAGE_RemoveAllObjects();
     GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, NULL);
+}
+
+static void bind_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    PROTOCOL_Bind();
+}
+
+static void configure_bind_button()
+{
+    GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
 }
 
 /* Text Select Callback */
@@ -165,7 +181,10 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, NULL);
+    u8 changed;
+    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
+    if (changed)
+        configure_bind_button();
     return ProtocolNames[Model.protocol];
 }
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data)

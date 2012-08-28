@@ -17,6 +17,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "config/tx.h"
 
 #ifdef PROTO_HAS_A7105
 
@@ -162,14 +163,14 @@ static u16 flysky_cb()
     return 1460;
 }
 
-void FLYSKY_Initialize() {
+static void initialize() {
     CLOCK_StopTimer();
     A7105_Reset();
     flysky_init();
     if (Model.fixed_id) {
         id = Model.fixed_id;
     } else {
-        id = 0x70000002;
+        id = Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter));
     }
     chanrow = id % 16;
     chancol = 0;
@@ -179,4 +180,13 @@ void FLYSKY_Initialize() {
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
+u32 FLYSKY_Cmds(enum ProtoCmds cmd)
+{
+    switch(cmd) {
+        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
+        default: break;
+    }
+    return 0;
+}
 #endif

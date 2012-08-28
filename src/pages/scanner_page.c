@@ -19,7 +19,7 @@
 #include "config/model.h"
 
 #define sp (pagemem.u.scanner_page)
-extern void DEVO_Initialize();
+extern u32 DEVO_Cmds(int);
 
 u16 scan_trigger_cb()
 {
@@ -44,7 +44,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     (void)data;
     sp.enable ^= 1;
     if (sp.enable) {
-        DEVO_Initialize();  //Switch to DEVO configuration
+        DEVO_Cmds(0);  //Switch to DEVO configuration
         CLOCK_StopTimer();
         CYRF_ConfigRxTx(0);
         CYRF_ConfigCRCSeed(0);

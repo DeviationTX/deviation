@@ -262,7 +262,7 @@ static u16 devo_cb()
     return 1200;
 }
 
-void DEVO_Initialize()
+static void initialize()
 {
     CLOCK_StopTimer();
     CYRF_Reset();
@@ -293,6 +293,16 @@ void DEVO_Initialize()
         bind_counter = 0;
     }
     CLOCK_StartTimer(2400, devo_cb);
+}
+
+u32 DEVO_Cmds(enum ProtoCmds cmd)
+{
+    switch(cmd) {
+        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
+        default: break;
+    }
+    return 0;
 }
 
 #endif
