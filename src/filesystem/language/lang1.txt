@@ -146,7 +146,7 @@ Időzítő1
 :Timer2
 Időzítő2
 :Bar %d:
-Oszlop%1:
+Oszlop%d:
 :Toggle%d
 Jelzés%1
 :Trims:
