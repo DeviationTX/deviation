@@ -30,7 +30,7 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
     struct guiListbox *listbox;
     struct guiBox     *box;
     u16 text_w, text_h;
-    s16 pos;
+    s16 pos = 0;
     u8 sb_entries;
 
     if (obj == NULL)
@@ -55,17 +55,17 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
     if (listbox->entries_per_page > item_count) {
         listbox->entries_per_page = item_count;
         sb_entries = item_count;
+        pos = 0;
     } else {
         sb_entries = item_count - listbox->entries_per_page;
+        if(selected >= 0) {
+            pos = selected - (listbox->entries_per_page / 2);
+            if (pos < 0)
+                pos = 0;
+        }
     }
+    listbox->cur_pos = pos;
     listbox->item_count = item_count;
-    listbox->cur_pos = 0;
-    if(selected >= 0) {
-        pos = selected - (listbox->entries_per_page / 2);
-        if (pos < 0)
-            pos = 0;
-        listbox->cur_pos = pos;
-    }
     listbox->selected = selected;
     
     listbox->string_cb = string_cb;
