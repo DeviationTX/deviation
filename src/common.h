@@ -80,22 +80,15 @@ void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
 
 /* Protocol */
+#define PROTODEF(proto, map, init, name) proto,
 enum Protocols {
     PROTOCOL_NONE,
-#ifdef PROTO_HAS_CYRF6936
-    PROTOCOL_DEVO,
-    PROTOCOL_WK2801,
-    PROTOCOL_WK2601,
-    PROTOCOL_WK2401,
-    PROTOCOL_DSM2,
-    PROTOCOL_J6PRO,
-#endif
-#ifdef PROTO_HAS_A7105
-    PROTOCOL_FLYSKY,
-#endif
+    #include "protocol/protocol.h"
     PROTOCOL_COUNT,
 };
+#undef PROTODEF
 extern const u8 *ProtocolChannelMap[PROTOCOL_COUNT];
+extern const char * const ProtocolNames[PROTOCOL_COUNT];
 #define PROTO_MAP_LEN 5
 
 enum ModelType {

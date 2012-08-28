@@ -17,28 +17,32 @@
 #include "interface.h"
 #include "config/model.h"
 
-static const u8 const _eatrg[PROTO_MAP_LEN] = ORDER_EATRG;
-static const u8 const _taerg[PROTO_MAP_LEN] = ORDER_TAERG;
+#define PROTODEF(proto, map, init, name) extern void init();
+#include "protocol.h"
+#undef PROTODEF
+
+static const u8 const EATRG[PROTO_MAP_LEN] = ORDER_EATRG;
+static const u8 const TAERG[PROTO_MAP_LEN] = ORDER_TAERG;
+
 static u8 proto_state;
 static u32 bind_time;
 #define PROTO_READY   0x01
 #define PROTO_BINDING 0x02
 #define PROTO_BINDDLG 0x04
 
+#define PROTODEF(proto, map, init, name) map,
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     NULL,
-#ifdef PROTO_HAS_CYRF6936
-    _eatrg, //DEVO
-    _eatrg, //2801
-    _eatrg, //2601
-    _eatrg, //2401
-    _taerg, //DSM2
-    _eatrg, //J6PRO
-#endif
-#ifdef PROTO_HAS_A7105
-    _eatrg, //Flysky
-#endif
+    #include "protocol.h"
 };
+#undef PROTODEF
+
+#define PROTODEF(proto, map, init, name) name,
+const char * const ProtocolNames[PROTOCOL_COUNT] = {
+    "None",
+    #include "protocol.h"
+};
+#undef PROTODEF
 
 void PROTOCOL_Init(u8 force)
 {
@@ -47,33 +51,16 @@ void PROTOCOL_Init(u8 force)
         return;
     }
     proto_state |= PROTO_READY;
+    
+    #define PROTODEF(proto, map, init, name) case proto: init(); break;
     switch(Model.protocol) {
-        #ifdef PROTO_HAS_A7105
-        case PROTOCOL_FLYSKY:
-            FLYSKY_Initialize();
-            break;
-        #endif
-        #ifdef PROTO_HAS_CYRF6936
-        case PROTOCOL_DEVO:
-            DEVO_Initialize();
-            break;
-        case PROTOCOL_WK2801:
-        case PROTOCOL_WK2601:
-        case PROTOCOL_WK2401:
-            WK2x01_Initialize();
-            break;
-        case PROTOCOL_DSM2:
-            DSM2_Initialize();
-            break;
-        case PROTOCOL_J6PRO:
-            J6PRO_Initialize();
-            break;
-        #endif
+        #include "protocol.h"
         case PROTOCOL_NONE:
         default:
             CLOCK_StopTimer();
             break;
     }
+    #undef PROTODEF
 }
 
 void PROTOCOL_DeInit()

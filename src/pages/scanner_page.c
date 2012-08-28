@@ -19,6 +19,7 @@
 #include "config/model.h"
 
 #define sp (pagemem.u.scanner_page)
+extern void DEVO_Initialize();
 
 u16 scan_trigger_cb()
 {

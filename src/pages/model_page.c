@@ -166,7 +166,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, NULL);
-    return RADIO_PROTOCOL_VAL[Model.protocol];
+    return ProtocolNames[Model.protocol];
 }
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
 {

@@ -36,15 +36,7 @@ const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
 static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
-const char * const RADIO_PROTOCOL_VAL[] = {
-     "None",
-#ifdef PROTO_HAS_CYRF6936
-     "DEVO", "WK2801", "WK2601", "WK2401", "DSM2", "J6Pro",
-#endif
-#ifdef PROTO_HAS_A7105
-     "Flysky",
-#endif
-     };
+#define RADIO_PROTOCOL_VAL ProtocolNames
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
