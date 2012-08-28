@@ -88,8 +88,18 @@ static void scramble_pkt()
 
 static void add_pkt_suffix()
 {
-    //FIXME: upper nibble of byte 9 can be 0x00, 0x80, 0xc0, but which one?
-    packet[10] = 0x00 | (PKTS_PER_CHANNEL - pkt_num - 1);
+    u8 bind_state;
+    if (fixed_id) {
+        if (bind_counter) {
+            bind_state = 0xc0;
+        } else {
+            bind_state = 0x80;
+        }
+    } else {
+        bind_state = 0x00;
+    }
+    
+    packet[10] = bind_state | (PKTS_PER_CHANNEL - pkt_num - 1);
     packet[11] = *(radio_ch_ptr + 1);
     packet[12] = *(radio_ch_ptr + 2);
     packet[13] = fixed_id  & 0xff;
@@ -199,7 +209,7 @@ void DEVO_BuildPacket()
             bind_counter--;
             build_data_pkt();
             scramble_pkt();
-            if (bind_counter <= 0) {
+            if (bind_counter == 0) {
                 state = DEVO_BOUND;
                 PROTOCOL_SetBindState(0);
             } else {
@@ -219,6 +229,11 @@ void DEVO_BuildPacket()
             build_data_pkt();
             scramble_pkt();
             state++;
+            if (bind_counter) {
+                bind_counter--;
+                if (bind_counter == 0)
+                    PROTOCOL_SetBindState(0);
+            }
             break;
         case DEVO_BOUND_10:
             build_beacon_pkt();
@@ -262,6 +277,13 @@ static u16 devo_cb()
     return 1200;
 }
 
+static void bind()
+{
+    fixed_id = Model.fixed_id;
+    bind_counter = BIND_COUNT;
+    PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
@@ -300,6 +322,7 @@ u32 DEVO_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
+        case PROTOCMD_BIND:  bind(); return 0;
         default: break;
     }
     return 0;
