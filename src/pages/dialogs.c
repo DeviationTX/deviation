@@ -19,9 +19,10 @@
 #include "config/model.h"
 #include "config/ini.h"
 
-#define DLG_STR_LEN (40 * 5)
+#define DLG_STR_LEN (80 * 5)
 static guiObject_t *dialog = NULL;
 static char dlgstr[DLG_STR_LEN];
+
 
 /******************/
 /*  Safety Dialog */
@@ -45,25 +46,24 @@ void PAGE_ShowSafetyDialog()
         } else {
             int i;
             int count = 0;
-            char tmpstr[10];
-            char tmpdlg[DLG_STR_LEN];
+            char tmpstr[20];
             const s8 safeval[4] = {0, -100, 0, 100};
             s16 *raw = MIXER_GetInputs();
-            tmpdlg[0] = 0;
+            u32 crc = Crc(dlgstr, strlen(dlgstr));
+            dlgstr[0] = 0;
             for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
                 if (! (unsafe & (1 << i)))
                     continue;
                 s16 val = RANGE_TO_PCT((i < NUM_INPUTS)
                               ? raw[i+1]
                               : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
-                sprintf(tmpdlg + strlen(tmpdlg), _tr("%s is %d%%, safe value = %d%%\n"),
+                sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, safe value = %d%%\n"),
                         INPUT_SourceName(tmpstr, i + 1),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
                     break;
             }
-            if (strcmp(dlgstr, tmpdlg) != 0) {
-                memcpy(dlgstr, tmpdlg, sizeof(dlgstr));
+            if (crc != Crc(dlgstr, strlen(dlgstr))) {
                 GUI_Redraw(dialog);
             }
         }
@@ -93,14 +93,15 @@ void PAGE_CloseBindingDialog()
 
 void PAGE_ShowBindingDialog(u8 update)
 {
-    char tmpstr[80] = "";
     if (update && ! dialog)
         return;
     u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
-    if (bind_time != 0xFFFFFFFF)
-        sprintf(tmpstr, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
-    sprintf(dlgstr, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.%s"), tmpstr);
+    strncpy(dlgstr, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(dlgstr));
+    u32 len = strlen(dlgstr);
+    if (bind_time != 0xFFFFFFFF && len < sizeof(dlgstr))
+        sprintf(dlgstr + len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
+    dlgstr[sizeof(dlgstr) - 1] = 0;
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);
