@@ -326,7 +326,7 @@ static u16 dsm2_cb()
     return 0;
 }
 
-static void initialize()
+static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     CYRF_Reset();
@@ -347,18 +347,21 @@ static void initialize()
 
     cyrf_config();
     CYRF_ConfigRxTx(1);
-    state = DSM2_BIND;
-    //state = DSM2_CHANSEL;
-    if (state == DSM2_BIND)
+    if (bind) {
+        state = DSM2_BIND;
         PROTOCOL_SetBindState(200 * 10); //msecs
+    } else {
+        state = DSM2_CHANSEL;
+    }
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 
 u32 DSM2_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        case PROTOCMD_BIND:  initialize(1); return 0;
         default: break;
     }
     return 0;

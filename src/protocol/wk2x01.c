@@ -186,7 +186,16 @@ static void build_beacon_pkt_2801()
     last_beacon ^= 1;
     u8 i;
     u8 en = 0;
-
+    u8 bind_state;
+    if (Model.fixed_id) {
+        if (bind_counter) {
+            bind_state = 0xe4;
+        } else {
+            bind_state = 0x1b;
+        }
+    } else {
+        bind_state = 0x99;
+    }
     for (i = 0; i < 4; i++) {
         if (Model.limits[fail_map[i + last_beacon * 4]].flags & CH_FAILSAFE_EN) {
             s32 value = Model.limits[fail_map[i + last_beacon * 4]].failsafe + 128;
@@ -206,7 +215,7 @@ static void build_beacon_pkt_2801()
     packet[6] = radio_ch[0];
     packet[7] = radio_ch[1];
     packet[8] = radio_ch[2];
-    packet[9] = Model.fixed_id ? 0x1b : 0x99; //FIXME: Handle fixed-id programming (0xe4)
+    packet[9] = bind_state;
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
@@ -276,6 +285,11 @@ void WK_BuildPacket_2801()
         case WK_BOUND_8:
             build_beacon_pkt_2801();
             state = WK_BOUND_1;
+            if (bind_counter) {
+                bind_counter--;
+                if (bind_counter == 0)
+                    PROTOCOL_SetBindState(0);
+            }
             break;
     }
     pkt_num = (pkt_num + 1) % 12;
@@ -331,6 +345,17 @@ static u16 wk_cb()
     return 1200;
 }
 
+static void bind()
+{
+    if((Model.protocol != PROTOCOL_WK2801) || (! Model.fixed_id))
+        return;
+    fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
+           ((Model.fixed_id >> 10) & 0x000300) |
+           ((Model.fixed_id)       & 0x0000ff);
+    bind_counter = BIND_COUNT / 8 + 1;
+    PROTOCOL_SetBindState(2980 * 2800 / 1000);
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
@@ -376,6 +401,7 @@ u32 WK2x01_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
+        case PROTOCMD_BIND:  bind(); return 0;
         default: break;
     }
     return 0;

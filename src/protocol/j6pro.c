@@ -279,23 +279,27 @@ static u16 j6pro_cb()
     return 0;
 }
 
-static void initialize()
+static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
     num_channels = 8;
-    state = J6PRO_BIND;
-    PROTOCOL_SetBindState(0xFFFFFFFF);
-    //state = J6PRO_CHANSEL; //FIXME: Support skipping bind phase
+    if (bind) {
+        state = J6PRO_BIND;
+        PROTOCOL_SetBindState(0xFFFFFFFF);
+    } else {
+        state = J6PRO_CHANSEL;
+    }
     CLOCK_StartTimer(2400, j6pro_cb);
 }
 
 u32 J6PRO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
+        case PROTOCMD_BIND:  initialize(1); return 0;
         default: break;
     }
     return 0;

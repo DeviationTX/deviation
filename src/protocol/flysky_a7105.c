@@ -163,7 +163,7 @@ static u16 flysky_cb()
     return 1460;
 }
 
-static void initialize() {
+static void initialize(u8 bind) {
     CLOCK_StopTimer();
     A7105_Reset();
     flysky_init();
@@ -175,16 +175,21 @@ static void initialize() {
     chanrow = id % 16;
     chancol = 0;
     chanoffset = (id & 0xff) / 16;
-    counter = BIND_COUNT;
-    PROTOCOL_SetBindState(2500 * 1460 / 1000); //msec
+    if (bind || ! Model.fixed_id) {
+        counter = BIND_COUNT;
+        PROTOCOL_SetBindState(2500 * 1460 / 1000); //msec
+    } else {
+        counter = 0;
+    }
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
 u32 FLYSKY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
+        case PROTOCMD_BIND:  initialize(1); return 0;
         default: break;
     }
     return 0;
