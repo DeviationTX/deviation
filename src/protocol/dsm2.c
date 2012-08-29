@@ -20,7 +20,6 @@
 
 #ifdef PROTO_HAS_CYRF6936
 #define BIND_CHANNEL 0x0d
-#define USE_FIXED_MFGID
 #define MODEL 0
 
 #ifdef EMULATOR
@@ -332,11 +331,11 @@ static void initialize(u8 bind)
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
-   if (Model.fixedid) {
-       cyrfmfg_id[0] ^= (Model.fixedid >> 0) & 0xff;
-       cyrfmfg_id[1] ^= (Model.fixedid >> 8) & 0xff;
-       cyrfmfg_id[2] ^= (Model.fixedid >> 16) & 0xff;
-       cyrfmfg_id[3] ^= (Model.fixedid >> 24) & 0xff;
+   if (Model.fixed_id) {
+       cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+       cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+       cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+       cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
    }
 #endif
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
