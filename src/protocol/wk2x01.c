@@ -21,7 +21,6 @@
 #ifdef PROTO_HAS_CYRF6936
 
 #define PKTS_PER_CHANNEL 4
-#define use_fixedid 0
 
 //Fewer bind packets in the emulator so we can get right to the important bits
 #ifdef EMULATOR
@@ -383,7 +382,7 @@ static void initialize()
     }
     if (Model.protocol == PROTOCOL_WK2401)
         fixed_id |= 0x01;  //Fixed ID must be odd for 2401
-    if(! use_fixedid) {
+    if(Model.protocol == PROTOCOL_WK2801 && ! Model.fixed_id) {
         bind_counter = BIND_COUNT;
         state = WK_BIND;
         PROTOCOL_SetBindState(2980 * 2800 / 1000);

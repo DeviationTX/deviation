@@ -73,6 +73,7 @@ static u8 pkt_num;
 static u8 cyrfmfg_id[6];
 static u8 num_channels;
 static u8 ch_idx;
+static u8 use_fixed_id;
 
 static void scramble_pkt()
 {
@@ -89,8 +90,8 @@ static void scramble_pkt()
 static void add_pkt_suffix()
 {
     u8 bind_state;
-    if (fixed_id) {
-        if (bind_counter) {
+    if (use_fixed_id) {
+        if (bind_counter > 0) {
             bind_state = 0xc0;
         } else {
             bind_state = 0x80;
@@ -98,7 +99,6 @@ static void add_pkt_suffix()
     } else {
         bind_state = 0x00;
     }
-    
     packet[10] = bind_state | (PKTS_PER_CHANNEL - pkt_num - 1);
     packet[11] = *(radio_ch_ptr + 1);
     packet[12] = *(radio_ch_ptr + 2);
@@ -156,6 +156,19 @@ static void build_data_pkt()
     add_pkt_suffix();
 }
 
+static void cyrf_set_bound_sop_code()
+{
+    /* crc == 0 isn't allowed, so use 1 if the math results in 0 */
+    u8 crc = (cyrfmfg_id[0] + (cyrfmfg_id[1] >> 6) + cyrfmfg_id[2]);
+    if(! crc)
+        crc = 1;
+    u8 sopidx = (0xff &((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2])) % 10;
+    CYRF_ConfigRxTx(1);
+    CYRF_ConfigCRCSeed((crc << 8) + crc);
+    CYRF_ConfigSOPCode(sopcodes[sopidx]);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+}
+
 static void cyrf_init()
 {
     /* Initialise CYRF chip */
@@ -209,7 +222,7 @@ void DEVO_BuildPacket()
             bind_counter--;
             build_data_pkt();
             scramble_pkt();
-            if (bind_counter == 0) {
+            if (bind_counter <= 0) {
                 state = DEVO_BOUND;
                 PROTOCOL_SetBindState(0);
             } else {
@@ -229,7 +242,7 @@ void DEVO_BuildPacket()
             build_data_pkt();
             scramble_pkt();
             state++;
-            if (bind_counter) {
+            if (bind_counter > 0) {
                 bind_counter--;
                 if (bind_counter == 0)
                     PROTOCOL_SetBindState(0);
@@ -260,15 +273,7 @@ static u16 devo_cb()
     if (state == DEVO_BOUND) {
         /* exit binding state */
         state = DEVO_BOUND_3;
-        /* crc == 0 isn't allowed, so use 1 if the math results in 0 */
-        u8 crc = (cyrfmfg_id[0] + (cyrfmfg_id[1] >> 6) + cyrfmfg_id[2]);
-        if(! crc)
-            crc = 1;
-        u8 sopidx = (0xff &((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2])) % 10;
-        CYRF_ConfigRxTx(1);
-        CYRF_ConfigCRCSeed((crc << 8) + crc);
-        CYRF_ConfigSOPCode(sopcodes[sopidx]);
-        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+        cyrf_set_bound_sop_code();
     }   
     if(pkt_num == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
@@ -281,6 +286,7 @@ static void bind()
 {
     fixed_id = Model.fixed_id;
     bind_counter = BIND_COUNT;
+    use_fixed_id = 1;
     PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
 }
 
@@ -294,6 +300,7 @@ static void initialize()
     CYRF_ConfigCRCSeed(0x0000);
     CYRF_ConfigSOPCode(sopcodes[0]);
     set_radio_channels();
+    use_fixed_id = 0;
     radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
@@ -311,8 +318,10 @@ static void initialize()
         PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
     } else {
         fixed_id = Model.fixed_id;
+        use_fixed_id = 0;
         state = DEVO_BOUND_1;
         bind_counter = 0;
+        cyrf_set_bound_sop_code();
     }
     CLOCK_StartTimer(2400, devo_cb);
 }
