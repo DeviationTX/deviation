@@ -126,7 +126,7 @@ Bekapcsol
 :Scanner
 Szkenner
 :No Trims
-Nincs trim
+Nincs
 :4 Outside
 4 kívül
 :4 Inside
@@ -148,7 +148,7 @@ Időzítő2
 :Bar %d:
 Oszlop%d:
 :Toggle%d
-Jelzés%1
+Jelzés%d
 :Trims:
 Trim:
 :Bars:
@@ -224,7 +224,7 @@ Mixerek:
 :Page:
 Oldal:
 :Mux:
-Mux:
+Művelet:
 :replace
 cserél
 :mult
