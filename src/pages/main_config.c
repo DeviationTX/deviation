@@ -26,10 +26,10 @@
 char str[20];
 u8 page_num;
 
-#define COL1_VALUE 8
-#define COL2_VALUE 48
-#define COL3_VALUE 160
-#define COL4_VALUE 200
+#define COL1_VALUE 4
+#define COL2_VALUE 56
+#define COL3_VALUE 156
+#define COL4_VALUE 204
 const struct LabelDesc outline = {0, 0, 0, 0, TRANSPARENT};
 const struct LabelDesc fill_white = {0, 0, 0xFFFF, 0, FILL};
 const struct LabelDesc fill_black = {0, 0, 0, 0, FILL};
@@ -378,13 +378,13 @@ static void show_page()
         }
     } else if (page_num == 1) {
         firstObj = GUI_CreateButton(COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE+12, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
+        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
         GUI_CreateButton(COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE+12, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
+        GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
         GUI_CreateButton(COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE+12, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
+        GUI_CreateTextSelect(COL2_VALUE, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
         GUI_CreateButton(COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE+12, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
+        GUI_CreateTextSelect(COL2_VALUE, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
