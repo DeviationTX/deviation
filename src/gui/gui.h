@@ -289,7 +289,6 @@ void GUI_DrawButton(struct guiObject *obj);
 void GUI_DrawBarGraph(struct guiObject *obj);
 void GUI_DrawScrollbar(struct guiObject *obj);
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type);
-void GUI_SetScrollbar(struct guiObject *obj, u8 pos);
 
 void GUI_DrawRect(struct guiObject *obj);
 
@@ -344,9 +343,12 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
         void *cb_data);
 guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, s32 max_size,
         void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
+
 guiObject_t *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
         u8 num_items, guiObject_t *parent,
         u8 (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
+void GUI_SetScrollbar(guiObject_t *obj, u8 pos);
+
 guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc);
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);

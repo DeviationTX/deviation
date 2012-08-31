@@ -172,11 +172,7 @@ void GUI_SetHidden(struct guiObject *obj, u8 state)
     if((!!state) == (!! OBJ_IS_HIDDEN(obj)))
         return;
     OBJ_SET_HIDDEN(obj, state);
-    if (state) {
-        FullRedraw = 1;
-    } else {
-        OBJ_SET_DIRTY(obj, 1);
-    }
+    OBJ_SET_DIRTY(obj, 1);
 }
 
 struct guiObject *GUI_GetFreeObj(void)
@@ -250,15 +246,16 @@ void GUI_RefreshScreen(void)
     struct guiObject *modalObj = GUI_IsModal();
     obj = objHEAD;
     while(obj) {
-        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
-            if(OBJ_IS_TRANSPARENT(obj)) {
+        if(OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+            if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
                 if (modalObj && modalObj->Type == Dialog) {
                     GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 } else {
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
             }
-            GUI_DrawObject(obj);
+            if(! OBJ_IS_HIDDEN(obj))
+                GUI_DrawObject(obj);
         }
         obj = obj->next;
     }

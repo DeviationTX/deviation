@@ -78,7 +78,6 @@ static const char *template_name_cb(guiObject_t *obj, const void *data)
 }
 
 #define ENTRIES_PER_PAGE (8 > NUM_CHANNELS ? NUM_CHANNELS : 8)
-#define MAX_SCROLL (NUM_CHANNELS > ENTRIES_PER_PAGE ? NUM_CHANNELS - ENTRIES_PER_PAGE : NUM_CHANNELS)
 void show_page()
 {
     int init_y = 40;
@@ -137,11 +136,13 @@ void PAGE_MixerInit(int page)
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
     mp->top_channel = page;
+    mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > ENTRIES_PER_PAGE ? Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE : Model.num_channels + NUM_VIRT_CHANNELS;
     show_chantest = 0;
     mp->firstObj = NULL;
     PAGE_ShowHeader("Mixer");
     GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
-    GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
+    guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);
+    GUI_SetScrollbar(obj, page);
     show_page();
 }
 
@@ -216,8 +217,8 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     s16 newpos;
     if (direction > 0) {
         newpos = pos + (direction > 1 ? ENTRIES_PER_PAGE : 1);
-        if (newpos > MAX_SCROLL)
-            newpos = MAX_SCROLL;
+        if (newpos > mp->max_scroll)
+            newpos = mp->max_scroll;
     } else {
         newpos = pos - (direction < -1 ? ENTRIES_PER_PAGE : 1);
         if (newpos < 0)

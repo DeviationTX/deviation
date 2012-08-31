@@ -296,7 +296,7 @@ s16 get_trim(u8 src)
     }
     return 0;
 }
-  
+
 u8 switch_is_on(u8 sw, s16 *raw)
 {
     u8 is_neg = MIXER_SRC_IS_INV(sw);
@@ -537,6 +537,15 @@ u8 update_trim(u32 buttons, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+u8 MIXER_SourceHasTrim(u8 src)
+{
+    int i;
+    for (i = 0; i < NUM_TRIMS; i++)
+        if (MIXER_MapChannel(Model.trims[i].src) == src)
+            return 1;
+    return 0;
 }
 
 const char *MIXER_TemplateName(enum TemplateType template)

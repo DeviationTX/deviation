@@ -128,7 +128,7 @@ u8 PROTOCOL_AutoBindEnabled()
         #include "protocol.h"
         case PROTOCOL_NONE:
         default:
-            binding = 0;
+            binding = 1;
     }
     #undef PROTODEF
     return binding;
