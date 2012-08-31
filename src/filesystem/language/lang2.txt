@@ -193,6 +193,8 @@ Trimmung +:
 Trimmschritt:
 :Trim
 Trimmung
+:No Trim
+Keine Trimmung
 :Src:
 Quelle:
 :Curve:

@@ -97,9 +97,9 @@ static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
 static void okcancel_cb(guiObject_t *obj, const void *data);
 static u8 touch_cb(s16 x, s16 y, void *data);
 
-#define COL1_TEXT   8
+#define COL1_TEXT   4
 #define COL1_VALUE  56
-#define COL2_TEXT  168
+#define COL2_TEXT  164
 #define COL2_VALUE 216
 static void show_titlerow()
 {
@@ -123,8 +123,6 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
-    GUI_CreateButton(COL1_TEXT, 64, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
-
     mp->graphs[0] = GUI_CreateXYGraph(112, 64, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -135,6 +133,7 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
     GUI_CreateTextSelect(COL2_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 5
+    GUI_CreateButton(COL1_VALUE, 216, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
@@ -264,7 +263,6 @@ static void show_complex()
     GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
     GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
     //Row 3
-    GUI_CreateButton(COL1_VALUE, 82, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     GUI_CreateLabel(COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
     GUI_CreateTextSelect(COL1_VALUE, 98, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
     //Row 4
@@ -284,6 +282,7 @@ static void show_complex()
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
     //Row 7
+    GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);

@@ -193,6 +193,8 @@ Trim +:
 Trim lépés:
 :Trim
 Trim
+:No Trim
+Nincs Trim
 :Src:
 Forrás:
 :Curve:
