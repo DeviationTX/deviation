@@ -40,7 +40,6 @@ static void show_bar_page(u8 num_bars)
         height = 155;
         count = num_bars;
     }
-printf("Num bars: %d, %d %d %d\n", cp->num_bars, NUM_TEST_BARS, NUM_CHANNELS, NUM_INPUTS);
     u16 offset = (320 + (SEPERATION - 10) - SEPERATION * count) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {

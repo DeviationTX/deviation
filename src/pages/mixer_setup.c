@@ -25,6 +25,8 @@ static s16 eval_mixer_cb(s16 xval, void * data);
 static s16 eval_chan_cb(void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
 static void toggle_link_cb(guiObject_t *obj, const void *data);
+static const char *show_trim_cb(guiObject_t *obj, const void *data);
+static void toggle_trim_cb(guiObject_t *obj, const void *data);
 
 static void show_titlerow();
 static void show_none();
@@ -53,6 +55,9 @@ void MIXPAGE_ChangeTemplate(int show_header)
     memset(mp->graphs, 0, sizeof(mp->graphs));
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
+    case MIXERTEMPLATE_CYC1:
+    case MIXERTEMPLATE_CYC2:
+    case MIXERTEMPLATE_CYC3:
         show_none();
         break;
     case MIXERTEMPLATE_SIMPLE:
@@ -118,6 +123,8 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
+    GUI_CreateButton(COL1_TEXT, 64, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+
     mp->graphs[0] = GUI_CreateXYGraph(112, 64, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -128,10 +135,12 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
     GUI_CreateTextSelect(COL2_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 5
+    /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
     GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
+    */
 }
 
 static void update_rate_widgets(u8 idx)
@@ -158,6 +167,20 @@ static void update_rate_widgets(u8 idx)
     }
 }
 
+static const char *show_trim_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return (long)mp->cur_mixer->apply_trim ? _tr("Trim") : _tr("No Trim");
+}
+
+static void toggle_trim_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    mp->cur_mixer->apply_trim ^= 0x01;
+}
+
 void toggle_link_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -178,7 +201,9 @@ static void show_expo_dr()
 {
     sync_mixers();
     //Row 1
-    mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
+    //mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
+    mp->firstObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+
     GUI_CreateLabel(132, 34, NULL, DEFAULT_FONT, _tr("Switch1"));
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, _tr("Switch2"));
     //Row 2
@@ -239,6 +264,7 @@ static void show_complex()
     GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
     GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
     //Row 3
+    GUI_CreateButton(COL1_VALUE, 82, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     GUI_CreateLabel(COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
     GUI_CreateTextSelect(COL1_VALUE, 98, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
     //Row 4
@@ -258,10 +284,12 @@ static void show_complex()
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
     //Row 7
+    /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
     GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
+    */
 }
 
 s16 eval_mixer_cb(s16 xval, void * data)
@@ -272,10 +300,12 @@ s16 eval_mixer_cb(s16 xval, void * data)
     s16 yval = CURVE_Evaluate(xval, &mix->curve);
     yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
 
-    if (yval > PCT_TO_RANGE(mp->limit.max))
-        yval = PCT_TO_RANGE(mp->limit.max);
-    else if (yval < PCT_TO_RANGE(mp->limit.min))
-        yval = PCT_TO_RANGE(mp->limit.min);
+    if(mix->dest < NUM_OUT_CHANNELS) {
+        if (yval > PCT_TO_RANGE(mp->limit.max))
+            yval = PCT_TO_RANGE(mp->limit.max);
+        else if (yval < PCT_TO_RANGE(mp->limit.min))
+            yval = PCT_TO_RANGE(mp->limit.min);
+    }
 
     if (yval > CHAN_MAX_VALUE)
         yval = CHAN_MAX_VALUE;
@@ -290,7 +320,6 @@ s16 eval_chan_cb(void * data)
 {
     (void)data;
     int i;
-    MIXER_CreateCyclicInputs(mp->raw);
     struct Mixer *mix = MIXER_GetAllMixers();
     for (i = 0; i < NUM_MIXERS; i++) {
         if(MIXER_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
@@ -332,6 +361,9 @@ void sync_mixers()
 {
     switch(mp->cur_template) {
     case MIXERTEMPLATE_NONE:
+    case MIXERTEMPLATE_CYC1:
+    case MIXERTEMPLATE_CYC2:
+    case MIXERTEMPLATE_CYC3:
         mp->num_mixers = 0;
         break;
     case MIXERTEMPLATE_SIMPLE:
@@ -447,7 +479,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
         sync_mixers();
@@ -464,7 +496,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
     u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
     u8 oldsrc = *source;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
         sync_mixers();
@@ -532,7 +564,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     }
     GUI_RemoveAllObjects();
     memset(mp->graphs, 0, sizeof(mp->graphs));
-    PAGE_MixerInit(0);
+    PAGE_MixerInit(mp->top_channel);
 }
 
 static u8 touch_cb(s16 x, s16 y, void *data)
@@ -553,5 +585,8 @@ void redraw_graphs()
         GUI_Redraw(mp->graphs[0]);
         break;
     case MIXERTEMPLATE_NONE: break;
+    case MIXERTEMPLATE_CYC1: break;
+    case MIXERTEMPLATE_CYC2: break;
+    case MIXERTEMPLATE_CYC3: break;
     }
 }

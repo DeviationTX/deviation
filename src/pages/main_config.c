@@ -158,7 +158,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
     u8 i = (long)data;
     u8 changed;
     u8 val = MIXER_SRC(Model.pagecfg.toggle[i]);
-    val = GUI_TextSelectHelper(val, 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);   
+    val = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);   
     if (changed) {
         Model.pagecfg.toggle[i] = MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
         build_image();

@@ -24,7 +24,7 @@ enum {
 #undef BUTTONDEF
 
 #define NUM_TX_INPUTS (INP_LAST - 1)
-#define NUM_INPUTS (NUM_TX_INPUTS + 3)
+#define NUM_INPUTS (NUM_TX_INPUTS)
 #define NUM_TX_BUTTONS (BUT_LAST - 1)
 
 /* The following functions must be provided by every target */

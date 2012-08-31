@@ -8,7 +8,8 @@
 #define RANGE_TO_PCT(x) ((s16)(x) / CHAN_MULTIPLIER)
 #define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
-
+#define NUM_CHANNELS (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS)
+#define NUM_SOURCES (NUM_INPUTS + NUM_CHANNELS)
 enum Safety {
     SAFE_NONE,
     SAFE_MIN,
@@ -55,8 +56,11 @@ enum TemplateType {
     MIXERTEMPLATE_SIMPLE,
     MIXERTEMPLATE_EXPO_DR,
     MIXERTEMPLATE_COMPLEX,
+    MIXERTEMPLATE_CYC1,
+    MIXERTEMPLATE_CYC2,
+    MIXERTEMPLATE_CYC3,
 };
-#define MIXERTEMPLATE_MAX MIXERTEMPLATE_COMPLEX
+#define MIXERTEMPLATE_MAX MIXERTEMPLATE_CYC3
 
 enum MuxType {
     MUX_REPLACE,
@@ -81,6 +85,7 @@ struct Mixer {
     struct Curve curve;
     s8 scalar;
     s8 offset;
+    u8 apply_trim;
     enum MuxType mux;
 };
 

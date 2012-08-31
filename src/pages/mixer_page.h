@@ -27,7 +27,7 @@ struct mixer_page {
     u8 num_complex_mixers;
     u8 link_curves;
     char tmpstr[10];
-    s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
+    s16 raw[NUM_SOURCES + 1];
 
     enum TemplateType cur_template;
 

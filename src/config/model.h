@@ -24,11 +24,11 @@ struct Model {
     u8 collective_source;
     struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
-    struct Limit limits[NUM_CHANNELS];
+    struct Limit limits[NUM_OUT_CHANNELS];
     struct Timer timer[NUM_TIMERS];
     u8 template[NUM_CHANNELS];
     struct PageCfg pagecfg;
-    u8 safety[NUM_INPUTS + NUM_CHANNELS];
+    u8 safety[NUM_SOURCES];
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[];

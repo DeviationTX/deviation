@@ -135,7 +135,7 @@ static void flysky_build_packet(u8 init)
     packet[4] = (id >> 16) & 0xff;
     packet[5] = (id >> 24) & 0xff;
     for (i = 0; i < 8; i++) {
-        if (i > NUM_CHANNELS) {
+        if (i > Model.num_channels) {
             packet[6 + i*2] = 0;
             packet[7 + i*2] = 0;
             continue;

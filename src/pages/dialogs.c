@@ -51,7 +51,7 @@ void PAGE_ShowSafetyDialog()
             s16 *raw = MIXER_GetInputs();
             u32 crc = Crc(dlgstr, strlen(dlgstr));
             dlgstr[0] = 0;
-            for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+            for(i = 0; i < NUM_SOURCES; i++) {
                 if (! (unsafe & (1 << i)))
                     continue;
                 s16 val = RANGE_TO_PCT((i < NUM_INPUTS)

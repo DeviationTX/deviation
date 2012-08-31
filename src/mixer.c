@@ -46,15 +46,17 @@
 // the main loop to the interrupt routine (since the optimizer
 // has no clue about interrupts)
 
-volatile s16 Channels[NUM_CHANNELS];
+volatile s16 Channels[NUM_OUT_CHANNELS];
 
 struct Transmitter Transmitter;
 
-static s16 raw[NUM_INPUTS + NUM_CHANNELS + 1];
+static s16 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
 static s16 get_trim(u8 src);
 static u8 update_trim(u32 buttons, u8 flags, void *data);
+
+static s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -137,13 +139,22 @@ void MIXER_CalcChannels()
     int i;
     //1st step: Read Tx inputs
     MIXER_ReadInputs(raw, 0);
-    //2nd step: calculate virtual channels (CCPM, etc)
-    MIXER_CreateCyclicInputs(raw);
     //3rd steps
     MIXER_EvalMixers(raw);
 
-    //4th step: apply limits
-    for (i = 0; i < NUM_CHANNELS; i++) {
+    //4th step: apply auto-templates
+    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
+        switch(Model.template[i]) {
+            case MIXERTEMPLATE_CYC1:
+            case MIXERTEMPLATE_CYC2:
+            case MIXERTEMPLATE_CYC3:
+                raw[NUM_INPUTS+i+1] = MIXER_CreateCyclicOutput(raw,
+                                             Model.template[i] - MIXERTEMPLATE_CYC1 + 1);
+                break;
+        }
+    }
+    //5th step: apply limits
+    for (i = 0; i < NUM_OUT_CHANNELS; i++) {
         Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, APPLY_ALL);
     }
 }
@@ -159,15 +170,15 @@ s16 MIXER_GetChannel(u8 channel, enum LimitMask flags)
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-void MIXER_CreateCyclicInputs(s16 *raw)
+s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
 {
-    if (! Model.swash_type)
-        return;
-    s8 ele_trim = get_trim(MIXER_MapChannel(INP_ELEVATOR));
-    s8 ail_trim = get_trim(MIXER_MapChannel(INP_AILERON));
-    s16 elevator   = raw[INP_ELEVATOR] + ele_trim;
-    s16 aileron    = raw[INP_AILERON]  + ail_trim;
-    s16 collective = raw[Model.collective_source];
+    s16 cyc[3];
+    if (! Model.swash_type) {
+        return raw[NUM_INPUTS + NUM_OUT_CHANNELS + cycnum];
+    }
+    s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
+    s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
+    s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
@@ -175,36 +186,41 @@ void MIXER_CreateCyclicInputs(s16 *raw)
 
     switch(Model.swash_type) {
     case SWASH_TYPE_NONE:
+        cyc[0] = aileron;
+        cyc[1] = elevator;
+        cyc[2] = collective;
         break;
     case SWASH_TYPE_120:
-        elevator = REZ_SWASH_Y(elevator);
         aileron  = REZ_SWASH_X(aileron);
-        raw[MIXER_CYC1] = collective - elevator;
-        raw[MIXER_CYC2] = collective + elevator/2 + aileron;
-        raw[MIXER_CYC3] = collective + elevator/2 - aileron;
+        elevator = REZ_SWASH_Y(elevator);
+        cyc[0] = collective - elevator;
+        cyc[1] = collective + elevator/2 + aileron;
+        cyc[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
         elevator = REZ_SWASH_X(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIXER_CYC1] = collective - aileron;
-        raw[MIXER_CYC2] = collective + aileron/2 + elevator;
-        raw[MIXER_CYC3] = collective + aileron/2 - elevator;
+        cyc[0] = collective - aileron;
+        cyc[1] = collective + aileron/2 + elevator;
+        cyc[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
         elevator = REZ_SWASH_Y(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIXER_CYC1] = collective - elevator;
-        raw[MIXER_CYC2] = collective + elevator + aileron;
-        raw[MIXER_CYC3] = collective + elevator - aileron;
+        cyc[0] = collective - elevator;
+        cyc[1] = collective + elevator + aileron;
+        cyc[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
         elevator = REZ_SWASH_Y(elevator);
         aileron = REZ_SWASH_Y(aileron);
-        raw[MIXER_CYC1] = collective - elevator;
-        raw[MIXER_CYC2] = collective + aileron;
-        raw[MIXER_CYC3] = collective - aileron;
+        cyc[0] = collective - elevator;
+        cyc[1] = collective + aileron;
+        cyc[2] = collective - aileron;
         break;
     }
+    
+    return cyc[cycnum-1];
 }
 
 void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
@@ -217,7 +233,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
         return;
     }
     //1st: Get source value with trim
-    value = raw[MIXER_SRC(mixer->src)] + get_trim(MIXER_SRC(mixer->src));
+    value = raw[MIXER_SRC(mixer->src)];
     //Invert if necessary
     if (MIXER_SRC_IS_INV(mixer->src))
         value = - value;
@@ -231,20 +247,28 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     //4th: multiplex result
     switch(mixer->mux) {
     case MUX_REPLACE:
-        raw[mixer->dest + NUM_INPUTS + 1] = value;
         break;
     case MUX_MULTIPLY:
-        raw[mixer->dest + NUM_INPUTS + 1] *= (s32)value / CHAN_MAX_VALUE;
+        value = raw[mixer->dest + NUM_INPUTS + 1] * (s32)value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
-        raw[mixer->dest + NUM_INPUTS + 1] += value;
+        value = raw[mixer->dest + NUM_INPUTS + 1] + value;
         break;
     }
+
+    //5th: apply trim
+    if (mixer->apply_trim)
+        value = value + get_trim(MIXER_SRC(mixer->src));
+
+    raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags)
 {
     s16 value = raw[NUM_INPUTS + 1 + channel];
+    if (channel >= NUM_OUT_CHANNELS)
+        return value;
+
     if (flags & APPLY_SUBTRIM)
         value += PCT_TO_RANGE(limit->subtrim) / 10;
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
@@ -380,9 +404,7 @@ void fix_mixer_dependencies(u8 mixer_count)
     for (i = 0; i < NUM_MIXERS; i++) {
         mixers[i].src = 0;
     }
-    for (i = 0; i < NUM_CHANNELS; i++) {
-        placed[i] = 0;
-    }
+    memset(placed, 0, sizeof(placed));
     while(mixer_count || last_count != mixer_count) {
         last_count = mixer_count;
         for (i = 0; i < NUM_CHANNELS; i++) {
@@ -449,12 +471,16 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
 
 void MIXER_GetLimit(int ch, struct Limit *limit)
 {
-    *limit = Model.limits[ch];
+    if (ch < NUM_OUT_CHANNELS)
+        *limit = Model.limits[ch];
+    else
+        memset(limit, 0, sizeof(struct Limit));
 }
 
 void MIXER_SetLimit(int ch, struct Limit *limit)
 {
-    Model.limits[ch] = *limit;
+    if (ch < NUM_OUT_CHANNELS)
+        Model.limits[ch] = *limit;
 }
 
 void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
@@ -518,6 +544,9 @@ const char *MIXER_TemplateName(enum TemplateType template)
     case MIXERTEMPLATE_SIMPLE:  return _tr("Simple");
     case MIXERTEMPLATE_EXPO_DR: return _tr("Expo&DR");
     case MIXERTEMPLATE_COMPLEX: return _tr("Complex");
+    case MIXERTEMPLATE_CYC1:    return _tr("Cyclic1");
+    case MIXERTEMPLATE_CYC2:    return _tr("Cyclic2");
+    case MIXERTEMPLATE_CYC3:    return _tr("Cyclic3");
     default:                    return _tr("Unknown");
     }
 }

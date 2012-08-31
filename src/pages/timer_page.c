@@ -76,7 +76,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     struct Timer *timer = &Model.timer[idx];
     u8 is_neg = MIXER_SRC_IS_INV(timer->src);
     u8 changed;
-    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, NUM_INPUTS + NUM_CHANNELS, dir, 1, 1, &changed);
+    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(src, is_neg);
     if (changed) {
         timer->src = src;

@@ -104,7 +104,7 @@ u32 PROTOCOL_CheckSafe()
     int i;
     s16 *raw = MIXER_GetInputs();
     u32 unsafe = 0;
-    for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+    for(i = 0; i < NUM_SOURCES; i++) {
         if (! Model.safety[i])
             continue;
         s16 val = RANGE_TO_PCT((i < NUM_INPUTS)

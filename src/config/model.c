@@ -52,6 +52,7 @@ static const char MIXER_DEST[] = "dest";
 static const char MIXER_SWITCH[] = "switch";
 static const char MIXER_SCALAR[] = "scalar";
 static const char MIXER_OFFSET[] = "offset";
+static const char MIXER_USETRIM[] = "usetrim";
 
 static const char MIXER_MUXTYPE[] = "muxtype";
 static const char * const MIXER_MUXTYPE_VAL[]  = { "replace", "multiply", "add" };
@@ -141,7 +142,7 @@ static u8 get_source(const char *section, const char *value)
     u8 i;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     char cmp[10];
-    for (i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+    for (i = 0; i < NUM_SOURCES; i++) {
         if(mapstrcasecmp(INPUT_SourceName(cmp, i), ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | i;
         }
@@ -268,6 +269,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->mixers[idx].offset = value_int;
             return 1;
         }
+        if (MATCH_KEY(MIXER_USETRIM)) {
+            m->mixers[idx].apply_trim = value_int;
+            return 1;
+        }
         if (MATCH_KEY(MIXER_MUXTYPE)) {
             for (i = 0; i < NUM_STR_ELEMS(MIXER_MUXTYPE_VAL); i++) {
                 if (MATCH_VALUE(MIXER_MUXTYPE_VAL[i])) {
@@ -332,8 +337,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("Unknown Channel: %s\n", section);
             return 0;
         }
-        if (idx > NUM_CHANNELS) {
-            printf("%s: Only %d channels are supported\n", section, NUM_CHANNELS);
+        if (idx > NUM_OUT_CHANNELS) {
+            printf("%s: Only %d channels are supported\n", section, NUM_OUT_CHANNELS);
             return 1;
         }
         idx--;
@@ -385,7 +390,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 0;
         }
         if (idx > NUM_TRIMS) {
-            printf("%s: Only %d trims are supported\n", section, NUM_CHANNELS);
+            printf("%s: Only %d trims are supported\n", section, NUM_TRIMS);
             return 1;
         }
         idx--;
@@ -616,6 +621,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
         if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
             fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
+        if(WRITE_FULL_MODEL || m->mixers[idx].apply_trim != 0)
+            fprintf(fh, "%s=%d\n", MIXER_USETRIM, m->mixers[idx].apply_trim);
         if(WRITE_FULL_MODEL || m->mixers[idx].mux != 0)
             fprintf(fh, "%s=%s\n", MIXER_MUXTYPE, MIXER_MUXTYPE_VAL[m->mixers[idx].mux]);
         if(WRITE_FULL_MODEL || m->mixers[idx].curve.type != 0) {
@@ -697,7 +704,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
     }
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(i = 0; i < NUM_INPUTS + NUM_CHANNELS; i++) {
+    for(i = 0; i < NUM_SOURCES; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
             fprintf(fh, "%s=%s\n", INPUT_SourceName(file, i + 1), SAFETY_VAL[m->safety[i]]);
         }
@@ -755,7 +762,7 @@ void clear_model(u8 full)
     for(i = 0; i < NUM_MIXERS; i++) {
         Model.mixers[i].scalar = 100;
     }
-    for(i = 0; i < NUM_CHANNELS; i++) {
+    for(i = 0; i < NUM_OUT_CHANNELS; i++) {
         Model.limits[i].max = 100;
         Model.limits[i].min = -100;
     }

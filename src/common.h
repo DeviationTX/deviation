@@ -15,7 +15,7 @@ typedef uint64_t u64;
 
 #include "target.h"
 
-extern volatile s16 Channels[NUM_CHANNELS];
+extern volatile s16 Channels[NUM_OUT_CHANNELS];
 
 /* Temproary definition until we have real translation */
 #define _tr_noop(x) x

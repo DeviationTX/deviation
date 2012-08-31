@@ -34,16 +34,36 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data)
 const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    char tmp1[5];
-    if ((long)data < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
-        INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][(long)data]);
+    u8 ch = (long)data;
+    char tmp1[10];
+
+    /* See if we need to name the cyclic virtual channels */
+    if (Model.type == MODELTYPE_HELI
+        && (ch >= NUM_OUT_CHANNELS && ch < NUM_OUT_CHANNELS + 3))
+    {
+        int i;
+        for (i = 0; i < Model.num_channels; i++) {
+            if (Model.template[i] == MIXERTEMPLATE_CYC1
+                || Model.template[i] == MIXERTEMPLATE_CYC2
+                || Model.template[i] == MIXERTEMPLATE_CYC2)
+            {
+                switch(ch - NUM_OUT_CHANNELS) {
+                    case 0: sprintf(mp->tmpstr, "%s - %s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
+                    case 1: sprintf(mp->tmpstr, "%s - %s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
+                    case 2: sprintf(mp->tmpstr, "%s - %s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
+                }
+            }
+        }
+    }
+    if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
+        INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][ch]);
         sprintf(mp->tmpstr,"%s%d-%s",
-            (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
-            (int)((long)data + 1), tmp1);
+            (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
+            (int)(ch + 1), tmp1);
     } else {
-        INPUT_SourceName(tmp1, (long)data + NUM_INPUTS + 1);
+        INPUT_SourceName(tmp1, ch + NUM_INPUTS + 1);
         sprintf(mp->tmpstr,"%s%s",
-                (Model.limits[(long)data].flags & CH_REVERSE) ? "!" : "",
+                (ch < Model.num_channels && Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
                 tmp1);
     }
     return mp->tmpstr;
@@ -73,13 +93,21 @@ void show_page()
         u8 idx;
         int row = init_y + 24 * i;
         u8 ch = mp->top_channel + i;
-        obj = GUI_CreateButton(4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB, 0x0000, limitselect_cb, (void *)((long)ch));
+        if (ch >= Model.num_channels)
+            ch += (NUM_OUT_CHANNELS - Model.num_channels);
+        if (ch < NUM_OUT_CHANNELS)
+            obj = GUI_CreateButton(4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
+                                   0x0000, limitselect_cb, (void *)((long)ch));
+        else
+            obj = GUI_CreateLabelBox(4, row, 64, 16, &DEFAULT_FONT,
+                                   MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
+        GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000,
+                         templateselect_cb, (void *)((long)ch));
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].dest == ch)
                 break;
-        GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000, templateselect_cb, (void *)((long)ch));
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
             GUI_CreateLabelBox(68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
@@ -106,12 +134,11 @@ void show_chantest_cb(guiObject_t *obj, const void *data)
 
 void PAGE_MixerInit(int page)
 {
-    (void)page;
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
+    mp->top_channel = page;
     show_chantest = 0;
     mp->firstObj = NULL;
-    mp->top_channel = 0;
     PAGE_ShowHeader("Mixer");
     GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
     GUI_CreateScrollbar(304, 32, 208, MAX_SCROLL, NULL, scroll_cb, NULL);
@@ -147,7 +174,6 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long idx = (long)data;
     u8 i;
-
     mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
     MIXER_GetLimit(idx, &mp->limit);

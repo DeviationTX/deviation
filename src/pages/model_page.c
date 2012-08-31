@@ -165,7 +165,7 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_CHANNELS, dir, 1, 1, NULL);
+    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_OUT_CHANNELS, dir, 1, 1, NULL);
     sprintf(mp->tmpstr, "%d", Model.num_channels);
     return mp->tmpstr;
 }

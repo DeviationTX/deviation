@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "mixer.h"
+#include "config/model.h"
 
 #define INPNAME_AILERON  _tr("AIL")
 #define INPNAME_ELEVATOR _tr("ELE")
@@ -78,10 +79,10 @@ const char *INPUT_SourceName(char *str, u8 src)
         };
         #undef CHANDEF
         sprintf(str, "%s%s", is_neg ? "!" : "", ptr);
-    } else if(src <= NUM_INPUTS) {
-        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("CYC"), src - NUM_TX_INPUTS);
-    } else {
+    } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
+    } else {
+        sprintf(str, "%s%d", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
     }
     return str;
 }
