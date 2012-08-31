@@ -20,9 +20,6 @@
 #include "config/model.h"
 #include "main_config.h"
 
-#define TRIMS_4OUTSIDE 1
-#define TRIMS_4INSIDE  2
-#define TRIMS_6        3
 char str[20];
 u8 page_num;
 
@@ -72,11 +69,11 @@ const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.trims) {
-    case 0 : return _tr("No Trims");
-    case 1 : return _tr("4 Outside");
-    case 2 : return _tr("4 Inside");
-    case 3 : return _tr("6 Trims");
-    default: return "";
+    case TRIMS_NONE :    return _tr("No Trims");
+    case TRIMS_4OUTSIDE: return _tr("4 Outside");
+    case TRIMS_4INSIDE:  return _tr("4 Inside");
+    case TRIMS_6:        return _tr("6 Trims");
+    default:             return "";
     }
 }
 
@@ -96,10 +93,10 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         build_image();
     switch(Model.pagecfg.barsize) {
-    case 0 : return _tr("No Bars");
-    case 1 : return _tr("4 Bars");
-    case 2 : return _tr("8 Bars");
-    default: return "";
+    case BARS_NONE: return _tr("No Bars");
+    case BARS_4:    return _tr("4 Bars");
+    case BARS_8:    return _tr("8 Bars");
+    default:        return "";
     }
 }
 
@@ -268,7 +265,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     case BAR6:
     case BAR7:
     case BAR8:
-        if(! Model.pagecfg.barsize)
+        if(Model.pagecfg.barsize == BARS_NONE)
             return 0;
         *y = GRAPH_Y;
         *w = GRAPH_W;
@@ -283,7 +280,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
                 return 1;
             }
         }
-        if((! Model.pagecfg.box[6] && ! Model.pagecfg.box[7]) && (Model.pagecfg.barsize == 2 || Model.pagecfg.box[2] || Model.pagecfg.box[3])) {
+        if((! Model.pagecfg.box[6] && ! Model.pagecfg.box[7]) && (Model.pagecfg.barsize == BARS_8 || Model.pagecfg.box[2] || Model.pagecfg.box[3])) {
             if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
                 *x = GRAPH2_X + GRAPH_SPACE * (widget - (BAR1+i));
                 if (Model.pagecfg.trims <= 1)

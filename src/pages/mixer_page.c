@@ -45,7 +45,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
         for (i = 0; i < Model.num_channels; i++) {
             if (Model.template[i] == MIXERTEMPLATE_CYC1
                 || Model.template[i] == MIXERTEMPLATE_CYC2
-                || Model.template[i] == MIXERTEMPLATE_CYC2)
+                || Model.template[i] == MIXERTEMPLATE_CYC3)
             {
                 switch(ch - NUM_OUT_CHANNELS) {
                     case 0: sprintf(mp->tmpstr, "%s - %s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;

@@ -15,6 +15,7 @@ enum Safety {
     SAFE_MIN,
     SAFE_ZERO,
     SAFE_MAX,
+    SAFE_COUNT,
 };
 
 enum Mode {
@@ -66,6 +67,7 @@ enum MuxType {
     MUX_REPLACE,
     MUX_MULTIPLY,
     MUX_ADD,
+    MUX_LAST,
 };
 
 enum SwashType {
@@ -74,6 +76,7 @@ enum SwashType {
     SWASH_TYPE_120X,
     SWASH_TYPE_140,
     SWASH_TYPE_90,
+    SWASH_TYPE_LAST,
 };
 #define MIXER_SRC(x) ((x) & 0x7F)
 #define MIXER_SRC_IS_INV(x) ((x) & 0x80)

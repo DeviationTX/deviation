@@ -6,6 +6,7 @@
 enum TimerType {
     TIMER_STOPWATCH,
     TIMER_COUNTDOWN,
+    TIMER_LAST,
 };
 struct Timer {
     u8 src;

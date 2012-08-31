@@ -110,6 +110,7 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     switch (timer->type) {
     case TIMER_STOPWATCH: return _tr("stopwatch");
     case TIMER_COUNTDOWN: return _tr("countdown");
+    case TIMER_LAST: break;
     }
     return "";
 }

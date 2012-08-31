@@ -435,6 +435,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
         case MUX_REPLACE:  return _tr("replace");
         case MUX_MULTIPLY: return _tr("mult");
         case MUX_ADD:      return _tr("add");
+        case MUX_LAST: break;
     }
     return "";
 }

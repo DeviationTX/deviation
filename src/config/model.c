@@ -30,7 +30,7 @@ const char *MODEL_ICON = "icon";
 const char *MODEL_TYPE = "type";
 const char *MODEL_TEMPLATE = "template";
 const char *MODEL_AUTOMAP = "automap";
-const char * const MODEL_TYPE_VAL[] = { "heli", "plane" };
+const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
 
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -42,7 +42,8 @@ static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
-const char * const RADIO_TX_POWER_VAL[] = { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
+const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
 /* Section: Mixer */
 static const char SECTION_MIXER[]   = "mixer";
@@ -55,10 +56,10 @@ static const char MIXER_OFFSET[] = "offset";
 static const char MIXER_USETRIM[] = "usetrim";
 
 static const char MIXER_MUXTYPE[] = "muxtype";
-static const char * const MIXER_MUXTYPE_VAL[]  = { "replace", "multiply", "add" };
+static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply", "add" };
 
 static const char MIXER_CURVETYPE[] = "curvetype";
-static const char * const MIXER_CURVETYPE_VAL[] = {
+static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
    "none", "fixed", "min/max", "zero/max", "greater-than-0", "less-than-0", "absval",
    "expo", "3point", "5point", "7point", "9point", "11point", "13point" };
 static const char MIXER_CURVE_POINTS[] = "points";
@@ -72,9 +73,14 @@ static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
 static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
 static const char CHAN_SUBTRIM[] = "subtrim";
-
 #define CHAN_TEMPLATE MODEL_TEMPLATE
-static const char * const CHAN_TEMPLATE_VAL[]  = { "none", "simple", "expo_dr", "complex" };
+static const char * const CHAN_TEMPLATE_VAL[MIXERTEMPLATE_MAX+1] =
+     { "none", "simple", "expo_dr", "complex", "cyclic1", "cyclic2", "cyclic3" };
+
+/* Section: Virtual Channel */
+static const char SECTION_VIRTCHAN[] = "virtchan";
+#define VCHAN_TEMPLATE CHAN_TEMPLATE
+#define VCHAN_TEMPLATE_VAL CHAN_TEMPLATE_VAL
 
 /* Section: Trim */
 static const char SECTION_TRIM[] = "trim";
@@ -98,19 +104,19 @@ static const char SECTION_TIMER[] = "timer";
 
 #define TIMER_SOURCE  MIXER_SOURCE
 #define TIMER_TYPE MODEL_TYPE
-static const char * const TIMER_TYPE_VAL[] = { "stopwatch", "countdown" };
+static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" };
 static const char TIMER_TIME[] = "time";
 
 /* Section: Safety */
 static const char SECTION_SAFETY[] = "safety";
-static const char * const SAFETY_VAL[] = { "none", "min", "zero", "max" };
+static const char * const SAFETY_VAL[SAFE_MAX+1] = { "none", "min", "zero", "max" };
 
 /* Section: Gui-QVGA */
 static const char SECTION_GUI_QVGA[] = "gui-qvga";
 #define GUI_TRIM SECTION_TRIM
-static const char * const GUI_TRIM_VAL[] = { "none", "4out", "4in", "6"};
+static const char * const GUI_TRIM_VAL[TRIMS_LAST] = { "none", "4out", "4in", "6"};
 static const char GUI_BARSIZE[] = "barsize";
-static const char * const GUI_BARSIZE_VAL[] = { "none", "half", "full"};
+static const char * const GUI_BARSIZE_VAL[BARS_LAST] = { "none", "half", "full"};
 #define GUI_SOURCE MIXER_SOURCE
 #define GUI_TIMER SECTION_TIMER
 static const char GUI_TOGGLE[] = "toggle";
@@ -383,6 +389,30 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         printf("%s: Unknown key: %s\n", section, name);
         return 0;
     }
+    if (MATCH_START(section, SECTION_VIRTCHAN)) {
+        u8 idx = atoi(section + sizeof(SECTION_VIRTCHAN)-1);
+        if (idx == 0) {
+            printf("Unknown Virtual Channel: %s\n", section);
+            return 0;
+        }
+        if (idx > NUM_VIRT_CHANNELS) {
+            printf("%s: Only %d virtual channels are supported\n", section, NUM_VIRT_CHANNELS);
+            return 1;
+        }
+        idx = idx + NUM_OUT_CHANNELS - 1;
+        if (MATCH_KEY(VCHAN_TEMPLATE)) {
+            for (i = 0; i < NUM_STR_ELEMS(VCHAN_TEMPLATE_VAL); i++) {
+                if (MATCH_VALUE(VCHAN_TEMPLATE_VAL[i])) {
+                    m->template[idx] = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown template: %s\n", section, value);
+            return 1;
+        }
+        printf("%s: Unknown key: %s\n", section, name);
+        return 0;
+    }
     if (MATCH_START(section, SECTION_TRIM)) {
         u8 idx = atoi(section + sizeof(SECTION_TRIM)-1);
         if (idx == 0) {
@@ -639,7 +669,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             }
         }
     }
-    for(idx = 0; idx < NUM_CHANNELS; idx++) {
+    for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
         if(!WRITE_FULL_MODEL &&
            m->limits[idx].flags == 0 &&
            m->limits[idx].safetysw == 0 &&
@@ -665,6 +695,14 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->template[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
+    }
+    for(idx = 0; idx < NUM_VIRT_CHANNELS; idx++) {
+        if(!WRITE_FULL_MODEL && m->template[idx+NUM_OUT_CHANNELS] == 0) {
+            continue;
+        }
+        fprintf(fh, "[%s%d]\n", SECTION_VIRTCHAN, idx+1);
+        if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0)
+            fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->template[idx+NUM_OUT_CHANNELS]]);
     }
     for(idx = 0; idx < NUM_TRIMS; idx++) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)

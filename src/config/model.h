@@ -31,8 +31,7 @@ struct Model {
     u8 safety[NUM_SOURCES];
 };
 extern struct Model Model;
-extern const char * const RADIO_TX_POWER_VAL[];
-extern const char * const RADIO_PROTOCOL_VAL[];
+extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
 
 u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);

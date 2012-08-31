@@ -218,6 +218,7 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
         cyc[1] = collective + aileron;
         cyc[2] = collective - aileron;
         break;
+    case SWASH_TYPE_LAST: break;
     }
     
     return cyc[cycnum-1];
@@ -254,6 +255,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     case MUX_ADD:
         value = raw[mixer->dest + NUM_INPUTS + 1] + value;
         break;
+    case MUX_LAST: break;
     }
 
     //5th: apply trim
@@ -559,6 +561,7 @@ const char *MIXER_SwashType(enum SwashType swash_type)
         case SWASH_TYPE_120X: return "120X";
         case SWASH_TYPE_140:  return "140";
         case SWASH_TYPE_90:   return "90";
+        case SWASH_TYPE_LAST: break;
     }
     return "";
 }
