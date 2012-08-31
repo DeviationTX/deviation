@@ -123,8 +123,9 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
-    GUI_CreateButton(COL1_TEXT, 64, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
-
+    mp->trimObj = GUI_CreateButton(COL1_TEXT, 64, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+        GUI_SetHidden(mp->trimObj, 1);
     mp->graphs[0] = GUI_CreateXYGraph(112, 64, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -202,7 +203,11 @@ static void show_expo_dr()
     sync_mixers();
     //Row 1
     //mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
-    mp->firstObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->firstObj = mp->trimObj;
+
+    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+        GUI_SetHidden(mp->trimObj, 1);
 
     GUI_CreateLabel(132, 34, NULL, DEFAULT_FONT, _tr("Switch1"));
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, _tr("Switch2"));
@@ -264,7 +269,10 @@ static void show_complex()
     GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
     GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
     //Row 3
-    GUI_CreateButton(COL1_VALUE, 82, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->trimObj = GUI_CreateButton(COL1_VALUE, 82, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+        GUI_SetHidden(mp->trimObj, 1);
+        
     GUI_CreateLabel(COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
     GUI_CreateTextSelect(COL1_VALUE, 98, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
     //Row 4
@@ -483,6 +491,10 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
+        if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+            GUI_SetHidden(mp->trimObj, 0);
+        else
+            GUI_SetHidden(mp->trimObj, 1);
         sync_mixers();
         redraw_graphs();
     }
