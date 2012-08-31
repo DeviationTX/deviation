@@ -107,18 +107,18 @@ Ki
 Váltás
 :Configure
 Konfigurálás
-:Language
-Nyelv
-:Mode
-Mód
-:Backlight
-Fényerő
-:Batt Alarm
-Telepf. riaszt.
-:Screen
-Képernyő
-:Sticks
-Botkormány
+:Language:
+Nyelv:
+:Stick Mode:
+Mód:
+:Backlight:
+Fényerő:
+:Battery Alarm:
+Tápfesz. riasztás:
+:Touch Screen:
+Képernyő:
+:Sticks:
+Botkormány:
 :Turn Off
 Kikapcsol
 :Turn On
@@ -281,6 +281,8 @@ Csatornák száma:
 Kimenő teljesítmény:
 :Fixed ID:
 Fix ID:
+:Bind
+Csatol
 :Load...
 Betöltés...
 :Copy To...

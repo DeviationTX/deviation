@@ -107,18 +107,18 @@ Touchscreen testen
 Wechseln
 :Configure
 Konfigurieren
-:Language
-Sprache
-:Mode
-Modus
-:Backlight
-Hintergrundbeleuchtung
-:Batt Alarm
-Akkuwarner
-:Screen
-Bildschirm
-:Sticks
-Sticks
+:Language:
+Sprache:
+:Stick Mode:
+Modus:
+:Backlight:
+Hintergrundbeleuchtung:
+:Battery Alarm:
+Akkuwarner:
+:Touch Screen:
+Bildschirm:
+:Sticks:
+Sticks:
 :Turn Off
 Ausschalten
 :Turn On
@@ -281,6 +281,8 @@ Anzahl Kanäle:
 Sendeleistung:
 :Fixed ID:
 Fixe ID:
+:Bind
+Binden
 :Load...
 Laden...
 :Copy To...
