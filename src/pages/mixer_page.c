@@ -141,7 +141,8 @@ void PAGE_MixerInit(int page)
     mp->firstObj = NULL;
     PAGE_ShowHeader("Mixer");
     GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
-    GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);
+    guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);
+    GUI_SetScrollbar(obj, page);
     show_page();
 }
 
