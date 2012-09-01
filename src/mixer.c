@@ -158,6 +158,7 @@ void MIXER_CalcChannels()
         Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, APPLY_ALL);
     }
 }
+
 s16 *MIXER_GetInputs()
 {
     return raw;
@@ -293,7 +294,7 @@ s16 get_trim(u8 src)
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            return PCT_TO_RANGE(Model.trims[i].value * Model.trims[i].step / 10);
+            return PCT_TO_RANGE((s32)Model.trims[i].value * Model.trims[i].step) / 10;
         }
     }
     return 0;
