@@ -236,6 +236,23 @@ void GUI_RedrawAllObjects()
     FullRedraw = 1;
 }
 
+void GUI_HideObjects(struct guiObject *modalObj)
+{
+    struct guiObject *obj;
+    obj = objHEAD;
+    while(obj) {
+        if(OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
+            if (modalObj && modalObj->Type == Dialog) {
+                GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+            } else {
+                GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+            }
+            OBJ_SET_DIRTY(obj, 0);
+        }
+        obj = obj->next;
+    }
+}
+
 void GUI_RefreshScreen(void)
 {
     struct guiObject *obj;
@@ -244,9 +261,10 @@ void GUI_RefreshScreen(void)
         return;
     }
     struct guiObject *modalObj = GUI_IsModal();
+    GUI_HideObjects(modalObj);
     obj = objHEAD;
     while(obj) {
-        if(OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
             if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
                 if (modalObj && modalObj->Type == Dialog) {
                     GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
