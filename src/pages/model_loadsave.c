@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/ini.h"
+#include <stdlib.h>
 
 static struct model_page * const mp = &pagemem.u.model_page;
 
@@ -37,7 +38,7 @@ static int ini_handle_name(void* user, const char* section, const char* name, co
 {
     long idx = (long)user;
     if(section[0] == '\0' && (strcasecmp(name, MODEL_NAME) == 0 || strcasecmp(name, MODEL_TEMPLATE) == 0)) {
-        sprintf(mp->tmpstr, "%d: %s", (int)idx, value);
+        sprintf(mp->tmpstr, "%d: %s", abs(idx), idx < 0 ? _tr(value) : value);
         return -1;
     }
     return 1;
@@ -73,7 +74,10 @@ static const char *string_cb(u8 idx, void *data)
     fh = fopen(mp->tmpstr, "r");
     sprintf(mp->tmpstr, "%d: NONE", idx + 1);
     if (fh) {
-        ini_parse_file(fh, ini_handle_name, (void *)((long)(idx + 1)));
+        long user = idx + 1;
+        if ((long)data == 2)
+            user = -user;
+        ini_parse_file(fh, ini_handle_name, (void *)user);
         fclose(fh);
     }
     return mp->tmpstr;
