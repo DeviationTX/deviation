@@ -272,8 +272,7 @@ void GUI_RefreshScreen(void)
                     GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
             }
-            if(! OBJ_IS_HIDDEN(obj))
-                GUI_DrawObject(obj);
+            GUI_DrawObject(obj);
         }
         obj = obj->next;
     }
