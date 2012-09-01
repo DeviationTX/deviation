@@ -245,21 +245,21 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 0;
     }
     if (MATCH_START(section, SECTION_MIXER)) {
-        u8 idx = atoi(section + sizeof(SECTION_MIXER)-1);
-        if (idx == 0) {
-            printf("%s: Unknown Mixer\n", section);
-            return 0;
+        int idx;
+        for (idx = 0; idx < NUM_MIXERS; idx++) {
+            if(m->mixers[idx].src == 0)
+                break;
         }
-        if (idx > NUM_MIXERS) {
-            printf("%s: Only %d mixers are supported\n", section, NUM_MIXERS);
-            return 1;
-        }
-        idx--;
         s16 value_int = atoi(value);
         if (MATCH_KEY(MIXER_SOURCE)) {
+            if (idx == NUM_MIXERS) {
+                printf("%s: Only %d mixers are supported\n", section, NUM_MIXERS);
+                return 1;
+            }
             m->mixers[idx].src = get_source(section, value);
             return 1;
         }
+        idx--;
         if (MATCH_KEY(MIXER_DEST)) {
             m->mixers[idx].dest = get_source(section, value) - NUM_INPUTS - 1;
             return 1;
@@ -647,7 +647,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     for(idx = 0; idx < NUM_MIXERS; idx++) {
         if (! WRITE_FULL_MODEL && m->mixers[idx].src == 0)
             continue;
-        fprintf(fh, "[%s%d]\n", SECTION_MIXER, idx+1);
+        fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceName(file, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceName(file, m->mixers[idx].dest + NUM_INPUTS + 1));
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
@@ -656,7 +656,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
         if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
             fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
-        if(WRITE_FULL_MODEL || m->mixers[idx].apply_trim != 0)
+        if(WRITE_FULL_MODEL || m->mixers[idx].apply_trim != 1)
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, m->mixers[idx].apply_trim);
         if(WRITE_FULL_MODEL || m->mixers[idx].mux != 0)
             fprintf(fh, "%s=%s\n", MIXER_MUXTYPE, MIXER_MUXTYPE_VAL[m->mixers[idx].mux]);
@@ -830,6 +830,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
+    MIXER_SetMixers(NULL, 0);
     if(auto_map)
         MIXER_AdjustForProtocol();
     TIMER_Init();
