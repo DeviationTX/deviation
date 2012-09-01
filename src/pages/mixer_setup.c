@@ -123,7 +123,6 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
     GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
-        GUI_SetHidden(mp->trimObj, 1);
     mp->graphs[0] = GUI_CreateXYGraph(112, 64, 120, 120,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -270,9 +269,6 @@ static void show_complex()
     GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
     GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
     //Row 3
-    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-        GUI_SetHidden(mp->trimObj, 1);
-        
     GUI_CreateLabel(COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
     GUI_CreateTextSelect(COL1_VALUE, 98, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
     //Row 4
