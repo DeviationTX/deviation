@@ -105,7 +105,7 @@ void show_page()
         GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000,
                          templateselect_cb, (void *)((long)ch));
         for (idx = 0; idx < NUM_MIXERS; idx++)
-            if (mix[idx].dest == ch)
+            if (mix[idx].src && mix[idx].dest == ch)
                 break;
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
