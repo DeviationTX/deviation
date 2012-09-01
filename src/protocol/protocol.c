@@ -21,8 +21,12 @@
 #include "protocol.h"
 #undef PROTODEF
 
-static const u8 const EATRG[PROTO_MAP_LEN] = ORDER_EATRG;
-static const u8 const TAERG[PROTO_MAP_LEN] = ORDER_TAERG;
+static const u8 const EATRG[PROTO_MAP_LEN] =
+    { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR };
+static const u8 const TAERG[PROTO_MAP_LEN] = 
+    { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR };
+static const u8 const AETRG[PROTO_MAP_LEN] = 
+    { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR };
 
 static u8 proto_state;
 static u32 bind_time;

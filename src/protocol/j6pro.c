@@ -92,14 +92,13 @@ void build_data_packet()
 {
     u8 i;
     u32 upperbits = 0;
-    s8 channel_map[] = {0, 1, 2, 3, 4, 5, 6, 7};
     packet[0] = 0xaa; //FIXME what is this?
     for (i = 0; i < 12; i++) {
-        if (channel_map[i] < 0 || channel_map[i] >= num_channels) {
+        if (i >= num_channels) {
             packet[i+1] = 0xff;
             continue;
         }
-        s32 value = (s32)Channels[channel_map[i]] * 0x400 / CHAN_MAX_VALUE + 0x200;
+        s32 value = (s32)Channels[i] * 0x200 / CHAN_MAX_VALUE + 0x200;
         if (value < 0)
             value = 0;
         if (value > 0x3ff)
