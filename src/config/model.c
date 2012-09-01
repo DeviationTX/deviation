@@ -73,6 +73,7 @@ static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
 static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
 static const char CHAN_SUBTRIM[] = "subtrim";
+#define CHAN_SCALAR   MIXER_SCALAR
 #define CHAN_TEMPLATE MODEL_TEMPLATE
 static const char * const CHAN_TEMPLATE_VAL[MIXERTEMPLATE_MAX+1] =
      { "none", "simple", "expo_dr", "complex", "cyclic1", "cyclic2", "cyclic3" };
@@ -369,7 +370,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
-            m->limits[idx].min = value_int;
+            m->limits[idx].min = -value_int;
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_SCALAR)) {
+            m->limits[idx].servoscale = value_int;
             return 1;
         }
         if (MATCH_KEY(CHAN_SUBTRIM)) {
@@ -674,8 +679,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].flags == 0 &&
            m->limits[idx].safetysw == 0 &&
            m->limits[idx].safetyval == 0 &&
-           m->limits[idx].max == 100 &&
-           m->limits[idx].min == -100 &&
+           m->limits[idx].max == 125 &&
+           m->limits[idx].min == 125 &&
+           m->limits[idx].servoscale == 100 &&
            m->template[idx] == 0)
         {
             continue;
@@ -687,12 +693,14 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceName(file, m->limits[idx].safetysw));
         if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
-        if(WRITE_FULL_MODEL || m->limits[idx].max != 100)
+        if(WRITE_FULL_MODEL || m->limits[idx].max != 125)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
-        if(WRITE_FULL_MODEL || m->limits[idx].min != -100)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, m->limits[idx].min);
+        if(WRITE_FULL_MODEL || m->limits[idx].min != 125)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
         if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
+        if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
+            fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
         if(WRITE_FULL_MODEL || m->template[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
     }
@@ -799,10 +807,12 @@ void clear_model(u8 full)
     }
     for(i = 0; i < NUM_MIXERS; i++) {
         Model.mixers[i].scalar = 100;
+        Model.mixers[i].apply_trim = 1;
     }
     for(i = 0; i < NUM_OUT_CHANNELS; i++) {
-        Model.limits[i].max = 100;
-        Model.limits[i].min = -100;
+        Model.limits[i].max = 125;
+        Model.limits[i].min = 125;
+        Model.limits[i].servoscale = 100;
     }
     for (i = 0; i < NUM_TRIMS; i++) {
         Model.trims[i].step = 1;

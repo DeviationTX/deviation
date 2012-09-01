@@ -308,12 +308,14 @@ s16 eval_mixer_cb(s16 xval, void * data)
     s16 yval = CURVE_Evaluate(xval, &mix->curve);
     yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
 
+    /* Min/Max is a servo limit, shouldn't be shown here
     if(mix->dest < NUM_OUT_CHANNELS) {
         if (yval > PCT_TO_RANGE(mp->limit.max))
             yval = PCT_TO_RANGE(mp->limit.max);
         else if (yval < PCT_TO_RANGE(mp->limit.min))
             yval = PCT_TO_RANGE(mp->limit.min);
     }
+    */
 
     if (yval > CHAN_MAX_VALUE)
         yval = CHAN_MAX_VALUE;
@@ -418,8 +420,8 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     s8 *value = (s8 *)data;
-    s8 min = (value == &mp->limit.max) ? mp->limit.min : -100;
-    s8 max = (value == &mp->limit.min) ? mp->limit.max : 100;
+    s8 min = -100; //(value == &mp->limit.max) ? mp->limit.min : -100;
+    s8 max = 100; //(value == &mp->limit.min) ? mp->limit.max : 100;
     *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
     sprintf(mp->tmpstr, "%d", *value);
     if (changed) {

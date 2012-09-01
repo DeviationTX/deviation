@@ -273,6 +273,8 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask 
 
     if (flags & APPLY_SUBTRIM)
         value += PCT_TO_RANGE(limit->subtrim) / 10;
+    if (flags & APPLY_SCALAR)
+        value = (s32)value * limit->servoscale / 100;
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
         value = -value;
     if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw)) {
@@ -280,8 +282,8 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask 
     } else if (flags & APPLY_LIMITS) {
         if (value > PCT_TO_RANGE(limit->max))
             value = PCT_TO_RANGE(limit->max);
-        else if( value < PCT_TO_RANGE(limit->min))
-            value = PCT_TO_RANGE(limit->min);
+        else if( value < PCT_TO_RANGE(-(int)limit->min))
+            value = PCT_TO_RANGE(-(int)limit->min);
     }
     return value;
 }

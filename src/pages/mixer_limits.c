@@ -48,8 +48,11 @@ void MIXPAGE_EditLimits()
     GUI_CreateLabel(176, 112, NULL, DEFAULT_FONT, _tr("Max:"));
     GUI_CreateTextSelect(216, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
     //Row 5
-    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, _tr("Subtrim:"));
-    GUI_CreateTextSelect(64, 136, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
+    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, _tr("Scale:"));
+    GUI_CreateTextSelect(64, 136, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
+    //Row 6
+    GUI_CreateLabel(8, 160, NULL, DEFAULT_FONT, _tr("Subtrim:"));
+    GUI_CreateTextSelect(64, 160, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -75,12 +78,16 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    s8 *value = (s8 *)data;
-    if (value == &mp->limit.min)
-        *value = GUI_TextSelectHelper(*value, -125, mp->limit.max, dir, 1, 5, NULL);
-    else
-        *value = GUI_TextSelectHelper(*value, mp->limit.min, 125, dir, 1, 5, NULL);
-    sprintf(mp->tmpstr, "%d", *value);
+    u8 *ptr = (u8 *)data;
+    int value = *ptr;
+    if (ptr == &mp->limit.min) {
+        value = GUI_TextSelectHelper(-value, -250, 0, dir, 1, 5, NULL);
+        *ptr = -value;
+    } else {
+        value = GUI_TextSelectHelper(value, 0, 250, dir, 1, 5, NULL);
+        *ptr = value;
+    }
+    sprintf(mp->tmpstr, "%d", value);
     return mp->tmpstr;
 }
 

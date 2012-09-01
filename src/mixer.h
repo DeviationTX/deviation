@@ -102,6 +102,7 @@ enum LimitMask {
     APPLY_LIMITS  = 0x02,
     APPLY_SAFETY  = 0x04,
     APPLY_SUBTRIM = 0x08,
+    APPLY_SCALAR  = 0x10,
     APPLY_ALL     = 0xFF,
 };
 
@@ -109,8 +110,9 @@ struct Limit {
     u8 flags;
     u8 safetysw;
     s8 safetyval;
-    s8 max;
-    s8 min;
+    u8 max;
+    u8 min;
+    u8 servoscale;
     s8 failsafe;
     s8 subtrim;
 };
