@@ -1,6 +1,8 @@
 #ifndef _MIXER_H_
 #define _MIXER_H_
 
+#define DEFAULT_SERVO_LIMIT 150
+
 //MAX = 10000
 //MIN = -10000
 #define CHAN_MULTIPLIER 100

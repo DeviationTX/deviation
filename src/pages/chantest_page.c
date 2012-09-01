@@ -187,7 +187,7 @@ void PAGE_ChantestEvent()
     }
     s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
-        s8 v = RANGE_TO_PCT(cp->type ? raw[i+1] : Channels[i]);
+        int v = RANGE_TO_PCT(cp->type ? raw[i+1] : Channels[i]);
         if (v != cp->pctvalue[i]) {
             GUI_Redraw(cp->bar[i]);
             GUI_Redraw(cp->value[i]);

@@ -11,7 +11,7 @@ struct chantest_page {
     void(*return_page)(int page);
     guiObject_t *bar[NUM_TEST_BARS];
     guiObject_t *value[NUM_VALUES];
-    s8 pctvalue[NUM_TEST_BARS];
+    s16 pctvalue[NUM_TEST_BARS];
     char tmpstr[10];
     struct buttonAction action;
 };

@@ -192,29 +192,33 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
         cyc[2] = collective;
         break;
     case SWASH_TYPE_120:
-        aileron  = REZ_SWASH_X(aileron);
-        elevator = REZ_SWASH_Y(elevator);
+        aileron  = 60 * aileron / 100;
+        elevator = 60 * elevator / 100;
+        collective = 60 * collective / 100;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator/2 + aileron;
         cyc[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
-        elevator = REZ_SWASH_X(elevator);
-        aileron = REZ_SWASH_Y(aileron);
+        aileron  = 60 * aileron / 100;
+        elevator = 60 * elevator / 100;
+        collective = 60 * collective / 100;
         cyc[0] = collective - aileron;
         cyc[1] = collective + aileron/2 + elevator;
         cyc[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
-        elevator = REZ_SWASH_Y(elevator);
-        aileron = REZ_SWASH_Y(aileron);
+        aileron  = 60 * aileron / 100;
+        elevator = 60 * elevator / 100;
+        collective = 60 * collective / 100;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator + aileron;
         cyc[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
-        elevator = REZ_SWASH_Y(elevator);
-        aileron = REZ_SWASH_Y(aileron);
+        aileron  = 60 * aileron / 100;
+        elevator = 60 * elevator / 100;
+        collective = 60 * collective / 100;
         cyc[0] = collective - elevator;
         cyc[1] = collective + aileron;
         cyc[2] = collective - aileron;

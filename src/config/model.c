@@ -679,8 +679,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].flags == 0 &&
            m->limits[idx].safetysw == 0 &&
            m->limits[idx].safetyval == 0 &&
-           m->limits[idx].max == 125 &&
-           m->limits[idx].min == 125 &&
+           m->limits[idx].max == DEFAULT_SERVO_LIMIT &&
+           m->limits[idx].min == DEFAULT_SERVO_LIMIT &&
            m->limits[idx].servoscale == 100 &&
            m->template[idx] == 0)
         {
@@ -693,9 +693,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceName(file, m->limits[idx].safetysw));
         if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
-        if(WRITE_FULL_MODEL || m->limits[idx].max != 125)
+        if(WRITE_FULL_MODEL || m->limits[idx].max != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
-        if(WRITE_FULL_MODEL || m->limits[idx].min != 125)
+        if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
         if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
@@ -810,8 +810,8 @@ void clear_model(u8 full)
         Model.mixers[i].apply_trim = 1;
     }
     for(i = 0; i < NUM_OUT_CHANNELS; i++) {
-        Model.limits[i].max = 125;
-        Model.limits[i].min = 125;
+        Model.limits[i].max = DEFAULT_SERVO_LIMIT;
+        Model.limits[i].min = DEFAULT_SERVO_LIMIT;
         Model.limits[i].servoscale = 100;
     }
     for (i = 0; i < NUM_TRIMS; i++) {
