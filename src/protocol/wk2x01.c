@@ -18,6 +18,8 @@
 #include "mixer.h"
 #include "config/model.h"
 
+#include <stdlib.h>
+
 #ifdef PROTO_HAS_CYRF6936
 
 #define PKTS_PER_CHANNEL 4
@@ -111,12 +113,22 @@ static void build_data_pkt_2401()
     u16 msb = 0;
     chan_dir = 0;
     u8 offset = 0;
-    for (i = 0; i < 8; i++) {
-        if (i == 4)
+    for (i = 0; i < 4; i++) {
+        if (i == 2)
             offset = 1;
-        u16 value = (i & 0x01) ? 0x200 : get_channel(i >> 1, 0x200, 0x200, 0x1FF);
-        packet[i+offset] = value & 0xff;
-        msb = (msb << 2) | ((value >> 8) & 0x03);
+        s16 value = get_channel(i, 0x800, 0, 0xA00); //12 bits, allow value to go to 125%
+        u16 base = abs(value) >> 2;  //10 bits is the base value
+        u16 trim = abs(value) & 0x03; //lowest 2 bits represent trim
+        if (base >= 0x200) {  //if value is > 100%, remainder goes to trim
+            trim = 4 *(base - 0x200);
+            base = 0x1ff;
+        }
+        base = (value >= 0) ? 0x200 + base : 0x200 - base;
+        trim = (value >= 0) ? 0x200 + trim : 0x200 - trim;
+     
+        packet[2*i+offset]   = base & 0xff;
+        packet[2*i+offset+1] = trim & 0xff;
+        msb = (msb << 4) | ((base >> 6) & 0x0c) | ((trim >> 8) & 0x03);
     }
     packet[4] = msb >> 8; //Ele/Ail MSB
     packet[9] = msb & 0xff; //Thr/Rud MSB
