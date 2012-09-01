@@ -126,7 +126,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetLimit(mp->channel, &mp->limit);
     }
     GUI_RemoveAllObjects();
-    PAGE_MixerInit(0);
+    PAGE_MixerInit(mp->top_channel);
 }
 
 static void show_titlerow()
