@@ -53,6 +53,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
     }
     memset(mp->expoObj, 0, sizeof(mp->expoObj));
     memset(mp->graphs, 0, sizeof(mp->graphs));
+    mp->trimObj = NULL;
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
     case MIXERTEMPLATE_CYC1:
@@ -133,10 +134,11 @@ static void show_simple()
     GUI_CreateLabel(COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
     GUI_CreateTextSelect(COL2_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 5
+    /*
     mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
-    /*
+
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
     GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
@@ -202,12 +204,14 @@ static void show_expo_dr()
 {
     sync_mixers();
     //Row 1
-    //mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
+    mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
+    /*
     mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     mp->firstObj = mp->trimObj;
 
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
+    */
 
     GUI_CreateLabel(132, 34, NULL, DEFAULT_FONT, _tr("Switch1"));
     GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, _tr("Switch2"));
@@ -392,6 +396,7 @@ void sync_mixers()
             mp->mixer[1].dest   = mp->mixer[0].dest;
             mp->mixer[1].mux    = MUX_REPLACE;
             mp->mixer[1].offset = 0;
+            mp->mixer[1].apply_trim = mp->mixer[0].apply_trim;
             if (mp->link_curves & 0x01)
                 mp->mixer[1].curve = mp->mixer[0].curve;
         } else {
@@ -403,6 +408,7 @@ void sync_mixers()
             mp->mixer[2].dest   = mp->mixer[0].dest;
             mp->mixer[2].mux    = MUX_REPLACE;
             mp->mixer[2].offset = 0;
+            mp->mixer[2].apply_trim = mp->mixer[0].apply_trim;
             if (mp->link_curves & 0x02)
                 mp->mixer[2].curve = mp->mixer[0].curve;
         } else {
@@ -493,10 +499,12 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-            GUI_SetHidden(mp->trimObj, 0);
-        else
-            GUI_SetHidden(mp->trimObj, 1);
+        if(mp->trimObj) {
+            if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+                GUI_SetHidden(mp->trimObj, 0);
+            else
+                GUI_SetHidden(mp->trimObj, 1);
+        }
         sync_mixers();
         redraw_graphs();
     }
