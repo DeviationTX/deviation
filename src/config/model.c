@@ -614,6 +614,43 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
+void write_mixer(FILE *fh, struct Model *m, u8 channel)
+{
+    int idx;
+    int i;
+    char tmpstr[20];
+    for(idx = 0; idx < NUM_MIXERS; idx++) {
+        if (! WRITE_FULL_MODEL && (m->mixers[idx].src == 0 || m->mixers[idx].dest != channel))
+            continue;
+        fprintf(fh, "[%s]\n", SECTION_MIXER);
+        fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceName(tmpstr, m->mixers[idx].src));
+        fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceName(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
+        if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
+            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceName(tmpstr, m->mixers[idx].sw));
+        if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
+            fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
+        if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
+            fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
+        if(WRITE_FULL_MODEL || m->mixers[idx].apply_trim != 1)
+            fprintf(fh, "%s=%d\n", MIXER_USETRIM, m->mixers[idx].apply_trim);
+        if(WRITE_FULL_MODEL || m->mixers[idx].mux != 0)
+            fprintf(fh, "%s=%s\n", MIXER_MUXTYPE, MIXER_MUXTYPE_VAL[m->mixers[idx].mux]);
+        if(WRITE_FULL_MODEL || m->mixers[idx].curve.type != 0) {
+            fprintf(fh, "%s=%s\n", MIXER_CURVETYPE, MIXER_CURVETYPE_VAL[m->mixers[idx].curve.type]);
+            u8 num_points = CURVE_NumPoints(&m->mixers[idx].curve);
+            if (num_points > 0) {
+                fprintf(fh, "%s=", MIXER_CURVE_POINTS);
+                for (i = 0; i < num_points; i++) {
+                    fprintf(fh, "%d", m->mixers[idx].curve.points[i]);
+                    if (i != num_points - 1)
+                        fprintf(fh, ",");
+                }
+                fprintf(fh, "\n");
+            }
+        }
+    }
+}
+
 u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
@@ -638,37 +675,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if(WRITE_FULL_MODEL || m->fixed_id != 0)
         fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
-
-    for(idx = 0; idx < NUM_MIXERS; idx++) {
-        if (! WRITE_FULL_MODEL && m->mixers[idx].src == 0)
-            continue;
-        fprintf(fh, "[%s]\n", SECTION_MIXER);
-        fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceName(file, m->mixers[idx].src));
-        fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceName(file, m->mixers[idx].dest + NUM_INPUTS + 1));
-        if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
-            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceName(file, m->mixers[idx].sw));
-        if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
-            fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
-        if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
-            fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
-        if(WRITE_FULL_MODEL || m->mixers[idx].apply_trim != 1)
-            fprintf(fh, "%s=%d\n", MIXER_USETRIM, m->mixers[idx].apply_trim);
-        if(WRITE_FULL_MODEL || m->mixers[idx].mux != 0)
-            fprintf(fh, "%s=%s\n", MIXER_MUXTYPE, MIXER_MUXTYPE_VAL[m->mixers[idx].mux]);
-        if(WRITE_FULL_MODEL || m->mixers[idx].curve.type != 0) {
-            fprintf(fh, "%s=%s\n", MIXER_CURVETYPE, MIXER_CURVETYPE_VAL[m->mixers[idx].curve.type]);
-            u8 num_points = CURVE_NumPoints(&m->mixers[idx].curve);
-            if (num_points > 0) {
-                fprintf(fh, "%s=", MIXER_CURVE_POINTS);
-                for (i = 0; i < num_points; i++) {
-                    fprintf(fh, "%d", m->mixers[idx].curve.points[i]);
-                    if (i != num_points - 1)
-                        fprintf(fh, ",");
-                }
-                fprintf(fh, "\n");
-            }
-        }
-    }
+    fprintf(fh, "\n");
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
         if(!WRITE_FULL_MODEL &&
            m->limits[idx].flags == 0 &&
@@ -679,6 +686,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].servoscale == 100 &&
            m->template[idx] == 0)
         {
+            write_mixer(fh, m, idx);
             continue;
         }
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
@@ -698,14 +706,17 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
         if(WRITE_FULL_MODEL || m->template[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
+        write_mixer(fh, m, idx);
+        fprintf(fh, "\n");
     }
     for(idx = 0; idx < NUM_VIRT_CHANNELS; idx++) {
-        if(!WRITE_FULL_MODEL && m->template[idx+NUM_OUT_CHANNELS] == 0) {
-            continue;
+        if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0) {
+            fprintf(fh, "[%s%d]\n", SECTION_VIRTCHAN, idx+1);
+            if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0)
+                fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->template[idx+NUM_OUT_CHANNELS]]);
         }
-        fprintf(fh, "[%s%d]\n", SECTION_VIRTCHAN, idx+1);
-        if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0)
-            fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->template[idx+NUM_OUT_CHANNELS]]);
+        write_mixer(fh, m, idx+NUM_OUT_CHANNELS);
+        fprintf(fh, "\n");
     }
     for(idx = 0; idx < NUM_TRIMS; idx++) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
