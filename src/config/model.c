@@ -95,7 +95,6 @@ static const char TRIM_VALUE[] = "value";
 /* Section: Heli */
 static const char SECTION_SWASH[] = "swash";
 #define SWASH_TYPE MODEL_TYPE
-static const char SWASH_COLLECTIVE[] = "collective_ch";
 static const char SWASH_AIL_INV[] = "ail_inv";
 static const char SWASH_ELE_INV[] = "ele_inv";
 static const char SWASH_COL_INV[] = "col_inv";
@@ -464,10 +463,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown swash_type: %s\n", section, value);
             return 1;
         }
-        if (MATCH_KEY(SWASH_COLLECTIVE)) {
-            m->collective_source = get_source(section, value);
-            return 1;
-        }
         s16 value_int = atoi(value);
         if (MATCH_KEY(SWASH_ELE_INV)) {
             if (value_int) 
@@ -730,7 +725,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);
         fprintf(fh, "%s=%s\n", SWASH_TYPE, MIXER_SwashType(m->swash_type));
-        fprintf(fh, "%s=%s\n", SWASH_COLLECTIVE, INPUT_SourceName(file, m->collective_source));
         if (WRITE_FULL_MODEL || m->swash_invert & 0x01)
             fprintf(fh, "%s=1\n", SWASH_ELE_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x02)

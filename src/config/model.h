@@ -21,7 +21,6 @@ struct Model {
     enum TxPower tx_power;
     enum SwashType swash_type;
     u8 swash_invert;
-    u8 collective_source;
     struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_OUT_CHANNELS];

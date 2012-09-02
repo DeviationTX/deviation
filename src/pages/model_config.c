@@ -62,13 +62,6 @@ static void show_titlerow(const char *header)
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 }
 
-static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 *source = (u8 *)data;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, NULL);
-    return INPUT_SourceName(mp->tmpstr, *source);
-}
 void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
@@ -77,9 +70,6 @@ void MODELPAGE_Config()
         u8 i = 40;
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("SwashType:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swash_val_cb, NULL);
-        i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Src:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &Model.collective_source);
         i+=24;
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("ELE Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)1);
