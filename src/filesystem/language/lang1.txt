@@ -1,353 +1,362 @@
 ﻿Magyar 
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%, a biztonságos érték = %d%%\n
+:1-to-1
+1 az 1
+:11 Point
+11 pont
+:13 Point
+13 pont
+:3 Point
+3 pont
+:4 Bars
+4 oszlop
+:4 Inside
+4 belül
+:4 Outside
+4 kívül
+>:4Ch w/ Dual-Rates
+:5 Point
+5 pont
+:6 Trims
+6 trim
+>:6Ch Airplane
+>:6Ch Helicopter
+:7 Point
+7 pont
+:8 Bars
+8 oszlop
+:9 Point
+9 pont
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+ABSZ.É.
 :AIL
 AIL
-:ELE
-ELE
-:THR
-THR
-:RUD
-RUD
-:RUD DR
-RUD DR
-:ELE DR
-ELE DR
 :AIL DR
 AIL DR
-:GEAR
-GEAR
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+:AIL Inv:
+Csűrés inv.:
+:Airplane
+Repülőgép
+:Backlight:
+Fényerő:
+:Bar %d:
+Oszlop%d:
+:Bars:
+Oszlop:
+:Battery Alarm:
+Tápfesz. riasztás:
+:Bind
+Csatol
+:Binding
+Kapcsolódás a modellhez
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
+:Box %d:
+Doboz%d:
+:Buttons
+Gombok
+>:COL
+:COL Inv:
+Kollektív inv.:
+:COL Src:
+Kollektív forrás:
+:CYC
+CYC
+:Calibrate
+Kalibrálás
+:Cancel
+Mégsem
+:Center all sticks and touch the screen
+Állítsa középállásba a botkormányokat,\nés érintse meg a képernyőt!
+:Ch
+Cs
+:Change
+Váltás
+:Channels
+Csatornák
+:Complex
+Komplex
+:Configure
+Konfigurálás
+:Copy To...
+Másolás...
+:Curve:
+Görbe:
+>:Cyclic1
+>:Cyclic2
+>:Cyclic3
+:Deviation FW\nversion: 
+Deviation fw.\nverzió:
+:Down
+Le
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+Magasság inv.:
+:EXPO
+EXP.
+:Enter
+Enter
+:Exit
+Exit
+:Expo&DR
+Expó+DR
 :FMODE0
 FMODE0
 :FMODE1
 FMODE1
 :FMODE2
 FMODE2
-:TRIMLV-
-TRIM_BF-
-:TRIMLV+
-TRIM_BF+
-:TRIMRV-
-TRIM_JF-
-:TRIMRV+
-TRIM_JF+
-:TRIMLH-
-TRIM_BV+
-:TRIMLH+
-TRIM_BV+
-:TRIMRH-
-TRIM_JV+
-:TRIMRH+
-TRIM_JV+
-:TRIM_L-
-TRIM_B+
-:TRIM_L+
-TRIM_B+
-:TRIM_R-
-TRIM_J-
-:TRIM_R+
-TRIM_J+
-:Left
-Bal
-:Right
-Jobb
-:Down
-Le
-:Up
-Fel
-:Enter
-Enter
-:Exit
-Exit
-:RIGHT_H
-JOBB_V
-:LEFT_V
-BAL_F
-:RIGHT_V
-JOBB_F
-:LEFT_H
-BAL_V
-:None
-Nincs
-:CYC
-CYC
-:Ch
-Cs
-:OK
-OK
-:Cancel
-Mégsem
-:Unknown
-Ismeretlen
-:Load
-Betöltés
-:Center all sticks and touch the screen
-Állítsa középállásba a botkormányokat,\nés érintse meg a képernyőt!
-:\nMove each stick to full max\nand min values then back to center.\nTouch the screen when finished
-\nMozgassa a botkormányokat\nvégkitérésig, majd vissza középre!\nÉrintse meg a képernyőt, ha kész...
-:Calibrate
-Kalibrálás
-:Test
-Teszt
-:Touch target %d
-Érintse meg a(z) %d pontot!
-:Mode %d
-Mód %d
-:Off
-Ki
-:Touch Calibrate
-Érintés kalibrálás
-:Touch Test
-Érintés teszt
-:Change
-Váltás
-:Configure
-Konfigurálás
-:Language:
-Nyelv:
-:Stick Mode:
-Mód:
-:Backlight:
-Fényerő:
-:Battery Alarm:
-Tápfesz. riasztás:
-:Touch Screen:
-Képernyő:
-:Sticks:
-Botkormány:
-:Turn Off
-Kikapcsol
-:Turn On
-Bekapcsol
-:Scanner
-Szkenner
-:No Trims
-Nincs
-:4 Outside
-4 kívül
-:4 Inside
-4 belül
-:6 Trims
-6 trim
-:No Bars
-Nincs
-:4 Bars
-4 oszlop
-:8 Bars
-8 oszlop
-:Box %d:
-Doboz%d:
-:Timer1
-Időzítő1
-:Timer2
-Időzítő2
-:Bar %d:
-Oszlop%d:
-:Toggle%d
-Jelzés%d
-:Trims:
-Trim:
-:Bars:
-Oszlop:
-:Main Page Config
-Főablak konfiguráció
-:Timer
-Időzítő
-:Switch:
-Kapcsoló:
-:Start:
-Start:
-:stopwatch
-Stopper
-:countdown
-Időzítő
-:Normal
-Normál
-:Inverted
-Inverz
+:Failsafe:
+Hibaérték:
+:File:
+Fájl:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+A fájlrendszert nem lehet csatolni!\nUSB-n keresztül formázza a fájlrendszert, majd a kilépéshez nyomja meg az 'ENT'-t!
+:Fixed
+Fix
+:Fixed ID:
+Fix ID:
+:GEAR
+GEAR
 :Helicopter
 Helikopter
-:Airplane
-Repülőgép
-:SwashType:
-Imbolygó típusa:
-:COL Src:
-Kollektív forrás:
-:ELE Inv:
-Magasság inv.:
-:AIL Inv:
-Csűrés inv.:
-:COL Inv:
-Kollektív inv.:
+:High-Rate
+Magas
 :Input:
 Bemenet:
-:Trim -:
-Trim -:
-:Trim +:
-Trim +:
-:Trim Step:
-Trim lépés:
-:Trim
-Trim
-:No Trim
-Nincs Trim
-:Src:
-Forrás:
-:Curve:
-Görbe:
-:Scale:
-Skála:
-:Offset:
-Eltolás:
-:Min:
-Min:
+:Inputs
+Bemenetek
+:Inverted
+Inverz
+:LEFT_H
+BAL_V
+:LEFT_V
+BAL_F
+:Language:
+Nyelv:
+:Left
+Bal
+:Linked
+Csatolt
+:Load
+Betöltés
+:Load...
+Betöltés...
+:Low-Rate
+Alacsony
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main Page Config
+Főablak konfiguráció
 :Max:
 Max:
 :Mid-Rate
 Közepes
-:Low-Rate
-Alacsony
-:Src
-Forrás
-:Switch1
-Kapcs.1
-:Switch2
-Kapcs.2
-:High-Rate
-Magas
-:Linked
-Csatolt
+:Min/Max
+Min/Max
+:Min:
+Min:
 :Mixers:
 Mixerek:
-:Page:
-Oldal:
-:Mux:
-Művelet:
-:replace
-cserél
-:mult
-szoroz
-:add
-hozzáad
-:Reverse:
-Invertálás:
-:Failsafe:
-Hibaérték:
-:Safety:
-Biztonság:
-:Value:
-Érték:
-:Subtrim:
-Subtrim
-:Reversed
-Inverz
-:Point:
-Pont:
-:Pos/Neg:
-Poz/Neg:
-:Symmetric
-Szimmetr.
-:Pos
-Poz.
-:Neg
-Neg.
-:Save
-Mentés
-:Touch to Unlock
-Érintse meg a feloldáshoz
-:Touch to Lock
-Érintse meg a zároláshoz
-:Channels
-Csatornák
-:Inputs
-Bemenetek
-:Buttons
-Gombok
+:Mode %d
+Mód %d
 :Model
 Modell
-:File:
-Fájl:
 :Model Name:
 Modell név:
 :Model Type:
 Modell típus:
-:Protocol:
-Protokol:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Mozgassa a botkormányokat\nvégkitérésig, majd vissza középre!\nÉrintse meg a képernyőt, ha kész...
+:Mux:
+Művelet:
+:Neg
+Neg.
+:No Bars
+Nincs
+:No Trim
+Nincs Trim
+:No Trims
+Nincs
+:None
+Nincs
+:Normal
+Normál
 :Number of Channels:
 Csatornák száma:
-:Tx Power:
-Kimenő teljesítmény:
-:Fixed ID:
-Fix ID:
-:Bind
-Csatol
-:Load...
-Betöltés...
-:Copy To...
-Másolás...
-:Template..
-Sablon...
+:OK
+OK
+:Off
+Ki
+:Offset:
+Eltolás:
+:Page:
+Oldal:
+:Point:
+Pont:
+:Pos
+Poz.
+:Pos/Neg:
+Poz/Neg:
+:Protocol:
+Protokol:
+:RIGHT_H
+JOBB_V
+:RIGHT_V
+JOBB_F
+:RUD
+RUD
+:RUD DR
+RUD DR
 :Reset
 Törlés
-:USB
-USB
-:Deviation FW\nversion: 
-Deviation fw.\nverzió:
-:USB File System is disabled\nPress 'Ent' to 
-\nAz USB fájlrendszer letiltva\nNyomjon 'ENT'-t az 
-:enable
-engedélyezéshez
-:disable
-letiltáshoz
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%, a biztonságos érték = %d%%\n
+:Reverse:
+Invertálás:
+:Reversed
+Inverz
+:Right
+Jobb
 :Safety
 Biztonsági ellenőrzés
-:\n\nBinding will end in %d seconds...
-\n\nKapcsolódás vége %d másodperc múlva...
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
-:Binding
-Kapcsolódás a modellhez
+:Safety:
+Biztonság:
+:Save
+Mentés
+:Scale:
+Skála:
+:Scanner
+Szkenner
 :Simple
 Egyszerű
-:Expo&DR
-Expó+DR
-:Complex
-Komplex
+>:Simple 4 Channel
+:Src
+Forrás
+:Src:
+Forrás:
+:Start:
+Start:
+:Stick Mode:
+Mód:
+:Sticks:
+Botkormány:
+:Subtrim:
+Subtrim
+:SwashType:
+Imbolygó típusa:
+:Switch1
+Kapcs.1
+:Switch2
+Kapcs.2
+:Switch:
+Kapcsoló:
+:Symmetric
+Szimmetr.
+:THR
+THR
+:TRIMLH+
+TRIM_BV+
+:TRIMLH-
+TRIM_BV+
+:TRIMLV+
+TRIM_BF+
+:TRIMLV-
+TRIM_BF-
+:TRIMRH+
+TRIM_JV+
+:TRIMRH-
+TRIM_JV+
+:TRIMRV+
+TRIM_JF+
+:TRIMRV-
+TRIM_JF-
+:TRIM_L+
+TRIM_B+
+:TRIM_L-
+TRIM_B+
+:TRIM_R+
+TRIM_J+
+:TRIM_R-
+TRIM_J-
+:Template..
+Sablon...
+:Test
+Teszt
+:Timer
+Időzítő
+:Timer1
+Időzítő1
+:Timer2
+Időzítő2
+:Toggle%d
+Jelzés%d
+:Touch Calibrate
+Érintés kalibrálás
+:Touch Screen:
+Képernyő:
+:Touch Test
+Érintés teszt
+:Touch target %d
+Érintse meg a(z) %d pontot!
+:Touch to Lock
+Érintse meg a zároláshoz
+:Touch to Unlock
+Érintse meg a feloldáshoz
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Trim lépés:
+:Trims:
+Trim:
+:Turn Off
+Kikapcsol
+:Turn On
+Bekapcsol
+:Tx Power:
+Kimenő teljesítmény:
+:USB
+USB
+:USB File System is disabled\nPress 'Ent' to 
+\nAz USB fájlrendszer letiltva\nNyomjon 'ENT'-t az 
 :USB Storage mode, press 'ENT' to exit.
 USB mód, a kilépéshez nyomja meg az 'ENT'-t!
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-A fájlrendszert nem lehet csatolni!\nUSB-n keresztül formázza a fájlrendszert, majd a kilépéshez nyomja meg az 'ENT'-t!
-:1-to-1
-1 az 1
-:Fixed
-Fix
-:Min/Max
-Min/Max
+:Unknown
+Ismeretlen
+:Up
+Fel
+:Value:
+Érték:
+>:Virt
 :Zero/Max
 Nulla/Max
-:> 0
-> 0
-:< 0
-< 0
-:ABSVAL
-ABSZ.É.
-:EXPO
-EXP.
-:3 Point
-3 pont
-:5 Point
-5 pont
-:7 Point
-7 pont
-:9 Point
-9 pont
-:11 Point
-11 pont
-:13 Point
-13 pont
+:\n\nBinding will end in %d seconds...
+\n\nKapcsolódás vége %d másodperc múlva...
+:add
+hozzáad
+:countdown
+Időzítő
+:disable
+letiltáshoz
+:enable
+engedélyezéshez
+:mult
+szoroz
+:replace
+cserél
+:stopwatch
+Stopper

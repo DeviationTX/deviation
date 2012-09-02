@@ -77,7 +77,7 @@ flash: devo8.dfu
 	dfu-util -a 0 -D devo8.dfu
 
 language:
-	../utils/extract_strings.pl > lang.txt
+	../utils/extract_strings.pl -update
 	
 $(OBJS): | $(ODIR)
 

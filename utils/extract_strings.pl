@@ -2,6 +2,10 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
+my $update;
+
+GetOptions("update" => \$update);
 my @files = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @out;
 foreach (@files) {
@@ -18,10 +22,45 @@ foreach (`head -n 1 filesystem/template/tmpl*.ini`) {
         push @out, $1;
     }
 }
-my %uniq = map {$_ => 1} @out;
-foreach (sort keys %uniq) {
-    print ":$_\n";
+my %uniq = map {$_ => undef} @out;
+
+if(! $update) {
+    foreach (sort keys %uniq) {
+        print ":$_\n";
+    }
+    exit 0;
 }
+
+foreach my $file (glob "filesystem/language/lang*.txt") {
+    my %strings = %uniq;
+    my %unused;
+    open my $fh, "<", $file;
+    my $name = <$fh>;
+    while(<$fh>) {
+        chomp;
+        if(/^:(.*)/) {
+            my $next = <$fh>;
+            chomp $next;
+            if (! exists $uniq{$1}) {
+                $unused{$1} = 1;
+            }
+            $strings{$1} = $next;
+        }
+    }
+    open $fh, ">", $file;
+    print $fh $name;
+    foreach (sort keys %strings) {
+        if ($unused{$_}) {
+            print $fh "<:$_\n<$strings{$_}\n";
+        } elsif(! defined($strings{$_})) {
+            print $fh ">:$_\n";
+        } else {
+            print $fh ":$_\n$strings{$_}\n";
+        }
+    }
+    close $fh;
+}
+
 # | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap | grep -v 'msgstr ""' | grep -v "^#" | grep -v "^$"
 
 #: pages/dialogs.c:100
