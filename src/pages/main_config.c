@@ -404,7 +404,8 @@ void PAGE_MainCfgInit(int page)
 
     page_num = page;
     PAGE_ShowHeader(_tr("Main Page Config"));
-    GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
+    guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
+    GUI_SetScrollbar(obj, page);
     show_page();
 }
 void PAGE_MainCfgEvent()
