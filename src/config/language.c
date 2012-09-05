@@ -75,16 +75,32 @@ unsigned fix_crlf(char *str)
 
 void CONFIG_ReadLang(u8 idx)
 {
+    u8 cnt = 0;;
     char file[30];
+    char filename[13];
     struct str_map *lookup = lookupmap;
     unsigned pos = 0;
+    int type;
     char line[MAX_LINE];
 
     lookupmap[0].pos = 0xffff;
     Transmitter.language = 0;
     if (! idx)
         return;
-    sprintf(file, "language/lang%d.txt", idx);
+    if (! FS_OpenDir("language"))
+        return;
+    while((type = FS_ReadDir(filename)) != 0) {
+        if (type == 1 && strncasecmp(filename, "lang", 4) == 0) {
+            cnt++;
+            if (cnt == idx) {
+                sprintf(file, "language/%s", filename);
+                break;
+            }
+        }
+    }
+    FS_CloseDir();
+    if(cnt != idx)
+        return;
     FILE *fh = fopen(file, "r");
     if (! fh) {
         printf("Couldn't open language file: %s\n", file);

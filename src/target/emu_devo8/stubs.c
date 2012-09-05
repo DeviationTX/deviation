@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "common.h"
 #include "protocol/interface.h"
@@ -56,6 +57,25 @@ u8 *BOOTLOADER_Read(int idx) {
     
 void UART_Initialize() {}
 int FS_Mount() {return ! chdir("filesystem");}
+
+static DIR *dh;
+int FS_OpenDir(const char *path)
+{
+    dh = opendir(path);
+    return (dh != NULL);
+}
+int FS_ReadDir(char *path)
+{
+    struct dirent *dir = readdir(dh);
+    if (! dir)
+        return 0;
+    strncpy(path, dir->d_name, 13);
+    return 1;
+}
+
+void FS_CloseDir() {
+    closedir(dh);
+}
 
 void BACKLIGHT_Init() {}
 void BACKLIGHT_Brightness(u8 brightness) { printf("Brightness: %d\n", brightness); }

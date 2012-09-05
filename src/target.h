@@ -113,6 +113,10 @@ void USB_Connect();
 /* Filesystem */
 int FS_Mount();
 void FS_Unmount();
+int FS_OpenDir(const char *path);
+int FS_ReadDir(char *path);
+void FS_CloseDir();
+
 
 /* Abstract bootloader access */
 enum {

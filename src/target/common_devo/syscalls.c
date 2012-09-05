@@ -29,6 +29,7 @@
 #define dbgprintf(args...) 
 
 static FATFS fat;
+static DIR   dir;
 static bool file_open=false;
 
 int FS_Mount();
@@ -57,6 +58,33 @@ int FS_Mount()
 void FS_Unmount()
 {
     pf_mount(0);
+}
+
+int FS_OpenDir(const char *path)
+{
+    
+    FRESULT res = pf_opendir(&dir, path);
+    dbgprintf("Opendir: %d\n", res);
+    return (res == FR_OK);
+}
+
+/* Return:
+   0 : Error
+   1 : File
+   2 : Dir
+*/
+int FS_ReadDir(char *path)
+{
+    FILINFO fi;
+    if (pf_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
+        return 0;
+    dbgprintf("Read: %s %d\n", fi.fname, fi.fattrib);
+    strncpy(path, fi.fname, 13);
+    return fi.fattrib & AM_DIR ? 2 : 1;
+}
+
+void FS_CloseDir()
+{
 }
 
 int _open_r (struct _reent *r, const char *file, int flags, int mode) {

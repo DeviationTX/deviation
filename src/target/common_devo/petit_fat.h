@@ -29,7 +29,7 @@
 #define SECTOR_SIZE     4096
 #define	_USE_READ	1	/* 1:Enable pf_read() */
 
-#define	_USE_DIR	0	/* 1:Enable pf_opendir() and pf_readdir() */
+#define	_USE_DIR	1	/* 1:Enable pf_opendir() and pf_readdir() */
 
 #define	_USE_LSEEK	1	/* 1:Enable pf_lseek() */
 
