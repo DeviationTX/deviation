@@ -15,13 +15,16 @@
 4 belül
 :4 Outside
 4 kívül
->:4Ch w/ Dual-Rates
+:4Ch w/ Dual-Rates
+4 csat. + DR
 :5 Point
 5 pont
 :6 Trims
 6 trim
->:6Ch Airplane
->:6Ch Helicopter
+:6Ch Airplane
+6 csat. repülőgép
+:6Ch Helicopter
+6 csat. helikopter
 :7 Point
 7 pont
 :8 Bars
@@ -60,7 +63,8 @@ Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcs
 Doboz%d:
 :Buttons
 Gombok
->:COL
+:COL
+COL
 :COL Inv:
 Kollektív inv.:
 :COL Src:
@@ -87,9 +91,12 @@ Konfigurálás
 Másolás...
 :Curve:
 Görbe:
->:Cyclic1
->:Cyclic2
->:Cyclic3
+:Cyclic1
+Ciklikus1
+:Cyclic2
+Ciklikus2
+:Cyclic3
+Ciklikus3
 :Deviation FW\nversion: 
 Deviation fw.\nverzió:
 :Down
@@ -240,7 +247,8 @@ Skála:
 Szkenner
 :Simple
 Egyszerű
->:Simple 4 Channel
+:Simple 4 Channel
+Egyszerű 4 csat.
 :Src
 Forrás
 :Src:
