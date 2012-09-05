@@ -241,7 +241,7 @@ void GUI_HideObjects(struct guiObject *modalObj)
     struct guiObject *obj;
     obj = objHEAD;
     while(obj) {
-        if(OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
+        if(OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
             if (modalObj && modalObj->Type == Dialog) {
                 GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
             } else {
