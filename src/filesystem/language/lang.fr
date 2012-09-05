@@ -1,0 +1,364 @@
+Français
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%,valeur sécu. = %d%%\n
+:1-to-1
+1 vers 1
+:11 Point
+11 points
+:13 Point
+13 points
+:3 Point
+3 points
+:4 Bars
+4 Barres
+:4 Inside
+4 Intérieurs
+:4 Outside
+4 Extérieurs
+>:4Ch w/ Dual-Rates
+:5 Point
+5 points
+:6 Trims
+6 Trims
+>:6Ch Airplane
+>:6Ch Helicopter
+:7 Point
+7 points
+:8 Bars
+8 Barres
+:9 Point
+9 points
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+ValAbs
+:AIL
+AIL
+:AIL DR
+AIL DR
+:AIL Inv:
+:Sens aileron
+:Airplane
+Avion
+:Backlight:
+Rétroéclairage:
+:Bar %d:
+Barre %d:
+:Bars:
+Barres:
+:Battery Alarm:
+Alarme batterie:
+:Bind
+Appairage
+:Binding
+Appairage
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Appairage en cours...\nAssurez vous que le récepteur fonctionne\n\nAppuyer sur OK n'annulera pas la procédure \nmais permettra le contrôle du TX.
+:Box %d:
+Box%d:
+:Buttons
+Boutons
+:COL
+pas
+:COL Inv:
+:Sens du pas
+:CYC
+CYC
+:Calibrate
+Calibration
+:Cancel
+Annuler
+:Center all sticks and touch the screen
+Mettre les manches au neutre et toucher l'écran
+:Ch
+Ch
+:Change
+Changer
+:Channels
+Voies
+:Complex
+Complexe
+:Configure
+Configurer
+:Copy To...
+Copier...
+:Curve:
+Courbe:
+:Cyclic1
+Cyclique1
+:Cyclic2
+Cyclique2
+:Cyclic3
+Cyclique3
+:Deviation FW\nversion: 
+Deviation FW\nversion:
+:Down
+Bas
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+:Sens profondeur
+:EXPO
+EXP.
+:Enter
+Entrée
+:Exit
+Sortie
+:Expo&DR
+Expo&DR 
+:FMODE0
+FMODE0
+:FMODE1
+FMODE1
+:FMODE2
+FMODE2
+:Failsafe:
+Failsafe:
+:File:
+Fichier:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+Le système de fichier ne peut être monté.\nAppuyer sur ;ENT' pour sortir.
+:Fixed
+Fixe
+:Fixed ID:
+ID fixe:
+:GEAR
+GEAR
+:Helicopter
+Helicoptère
+:High-Rate
+Déb. Haut
+:Input:
+Entrée:
+:Inputs
+Entrées
+:Inverted
+Inversé
+:LEFT_H
+GAUCHE_H
+:LEFT_V
+GAUCHE_V
+:Language:
+Langage:
+:Left
+Gauche
+:Linked
+Lié
+:Load
+Charger
+:Load...
+Charger...
+:Low-Rate
+Déb. bas
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main Page Config
+Page de config. principale
+:Max:
+Max:
+:Mid-Rate
+Déb. Med
+:Min/Max
+Min/Max
+:Min:
+Min:
+:Mixers:
+Mixers:
+:Mode %d
+Mode %d
+:Model
+Modèle
+:Model Name:
+Nom de modèle:
+:Model Type:
+Type de modèle:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Bouger chaque manche en position\nmin et max puis revenir au centre. \nToucher ensuite l'écran 
+:Mux:
+Opération:
+:Neg
+Neg.
+:No Bars
+Désactivé
+:No Trim
+Pas de Trim
+:No Trims
+Pas de Trim
+:None
+Néant
+:Normal
+Normal
+:Number of Channels:
+Nombre de voies:
+:OK
+OK
+:Off
+Off
+:Offset:
+Offset:
+:Page:
+Page:
+:Point:
+Point:
+:Pos
+Pos.
+:Pos/Neg:
+Pos./Neg.:
+:Protocol:
+Protocole:
+:RIGHT_H
+DROITE_H
+:RIGHT_V
+DROITE_V
+:RUD
+RUD
+:RUD DR
+RUD DR
+:Reset
+Reset
+:Reverse:
+Sens:
+:Reversed
+Inversé
+:Right
+Droite
+:Safety
+Sécurité
+:Safety:
+Sécurité:
+:Save
+Sauve
+:Scale:
+Echelle:
+:Scanner
+Scanner
+:Simple
+Simple
+>:Simple 4 Channel
+:Src
+Source
+:Src:
+Source:
+:Start:
+Start:
+:Stick Mode:
+Mode de pilotage:
+:Sticks:
+Manches:
+:Subtrim:
+Subtrim
+:SwashType:
+Plateau cyclique:
+:Switch1
+Inter1
+:Switch2
+Inter2
+:Switch:
+Commande:
+:Symmetric
+Symétrique
+:THR
+THR
+:TRIMLH+
+TRIMGH+
+:TRIMLH-
+TRIMGH+
+:TRIMLV+
+TRIMGV+
+:TRIMLV-
+TRIMGV-
+:TRIMRH+
+TRIMDH+
+:TRIMRH-
+TRIMDH+
+:TRIMRV+
+TRIMDV+
+:TRIMRV-
+TRIMDV-
+:TRIM_L+
+TRIM_G+
+:TRIM_L-
+TRIM_G+
+:TRIM_R+
+TRIM_D+
+:TRIM_R-
+TRIM_D-
+:Template..
+Modèle...
+:Test
+Test
+:Timer
+Timer
+:Timer1
+Timer1
+:Timer2
+Timer2
+:Toggle%d
+Boutton%d
+:Touch Calibrate
+Calibration du tactile
+:Touch Screen:
+Ecran tactile:
+:Touch Test
+Test du tactile
+:Touch target %d
+Toucher la cible %d 
+:Touch to Lock
+Toucher pour verrouiller
+:Touch to Unlock
+Toucher pour déverrouiller
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Finesse:
+:Trims:
+Trim:
+:Turn Off
+Désactiver
+:Turn On
+Activer
+:Tx Power:
+Puissance TX:
+:USB
+USB
+:USB File System is disabled\nPress 'Ent' to 
+Gestion USB désactivée \nAppuyer sur 'ENT' pour
+:USB Storage mode, press 'ENT' to exit.
+Mode de stockage USB, appuyer sur 'ENT' pour sortir.
+:Unknown
+Inconnu
+:Up
+Haut
+:Value:
+Valeur:
+>:Virt
+:Zero/Max
+0/Max
+:\n\nBinding will end in %d seconds...
+\n\nFin d'appairande dans %d secondes...
+:add
+Ajouter
+:countdown
+Décompte
+:disable
+Désactiver
+:enable
+Activer
+:mult
+Mult.
+:replace
+Remplacer
+:stopwatch
+Chronomètre

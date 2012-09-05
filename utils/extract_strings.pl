@@ -31,7 +31,7 @@ if(! $update) {
     exit 0;
 }
 
-foreach my $file (glob "filesystem/language/lang*.txt") {
+foreach my $file (glob "filesystem/language/lang*") {
     my %strings = %uniq;
     my %unused;
     open my $fh, "<", $file;
