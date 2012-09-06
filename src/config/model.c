@@ -901,9 +901,28 @@ enum ModelType CONFIG_ParseModelType(const char *value)
 
 u8 CONFIG_ReadTemplate(u8 template_num) {
     char file[20];
-    clear_model(0);
+    char filename[13];
+    int type;
 
-    sprintf(file, "template/tmpl%d.ini", template_num);
+    if (! FS_OpenDir("template")) {
+        printf("Failed to read dir 'template'\n");
+        return 0;
+    }
+    while((type = FS_ReadDir(filename)) != 0) {
+        if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
+            template_num--;
+            if (template_num == 0){
+                sprintf(file, "template/%s", filename);
+                break;
+            }
+        }
+    }
+    FS_CloseDir();
+    if(template_num) {
+        printf("Failed to find template #%d\n", template_num);
+        return 0;
+    }
+    clear_model(0);
     auto_map = 0;
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);

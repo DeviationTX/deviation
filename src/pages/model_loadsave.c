@@ -66,8 +66,22 @@ static const char *string_cb(u8 idx, void *data)
 {
     (void)data;
     FILE *fh;
-    if ((long)data == 2) {
-        sprintf(mp->tmpstr, "template/tmpl%d.ini", idx + 1);
+    if ((long)data == 2) { //Template
+        char filename[13];
+        int type;
+        int count = 0;
+        if (! FS_OpenDir("template"))
+            return _tr("Unknown");
+        while((type = FS_ReadDir(filename)) != 0) {
+            if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
+                count++;
+                if (idx + 1 == count) {
+                    sprintf(mp->tmpstr, "template/%s", filename);
+                    break;
+                }
+            }
+        }
+        FS_CloseDir();
     } else {
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }
@@ -120,25 +134,34 @@ static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
  */
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
-    u8 num_models;
+    u8 num_models = 0;
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->return_page = return_page;
     mp->obj = NULL;
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     GUI_CreateButton(264, 4, BUTTON_48, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
-    for (num_models = 1; num_models <= 100; num_models++) {
-        if (loadsave == 2) {
-            sprintf(mp->tmpstr, "template/tmpl%d.ini", num_models);
-        } else {
-            sprintf(mp->tmpstr, "models/model%d.ini", num_models);
+    if (loadsave == 2) { //Template
+        if (FS_OpenDir("template")) {
+            char filename[13];
+            int type;
+            while((type = FS_ReadDir(filename)) != 0) {
+                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
+                    num_models++;
+                }
+            }
+            FS_CloseDir();
         }
-        FILE *fh = fopen(mp->tmpstr, "r");
-        if (! fh)
-            break;
-        fclose(fh);
+    } else {
+        for (num_models = 1; num_models <= 100; num_models++) {
+            sprintf(mp->tmpstr, "models/model%d.ini", num_models);
+            FILE *fh = fopen(mp->tmpstr, "r");
+            if (! fh)
+                break;
+            fclose(fh);
+        }
+        num_models--;
     }
-    num_models--;
     mp->selected = loadsave == 2 ? 1 : CONFIG_GetCurrentModel();
     GUI_CreateListBox(112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
     if (loadsave != 2)
