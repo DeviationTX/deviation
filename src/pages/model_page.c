@@ -210,6 +210,7 @@ static void file_press_cb(guiObject_t *obj, void *data)
     (void)data;
     if (mp->file_state == 3) {
         CONFIG_ResetModel();
+        CONFIG_SaveModelIfNeeded();
         GUI_RedrawAllObjects();
     } else {
         PAGE_SetModal(1);
