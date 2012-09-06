@@ -101,6 +101,8 @@ void GUI_DrawObjects(void)
         if(! OBJ_IS_HIDDEN(obj))
         {
             GUI_DrawObject(obj);
+        } else {
+            OBJ_SET_DIRTY(obj, 0);
         }
         obj = obj->next;
     }
