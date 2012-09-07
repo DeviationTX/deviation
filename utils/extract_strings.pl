@@ -16,7 +16,7 @@ foreach (@files) {
     s/^.*?"(.*)"\s*$/$1/;
     $out[-1] .= $_;
 }
-foreach (`head -n 1 filesystem/template/tmpl*.ini`) {
+foreach (`head -n 1 filesystem/template/*.ini`) {
     chomp;
     if(/template=(.*?)\s*$/) {
         push @out, $1;

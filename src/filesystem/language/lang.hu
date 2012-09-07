@@ -64,11 +64,9 @@ Doboz%d:
 :Buttons
 Gombok
 :COL
-COL
+Kollektív
 :COL Inv:
 Kollektív inv.:
-:COL Src:
-Kollektív forrás:
 :CYC
 CYC
 :Calibrate
@@ -97,6 +95,8 @@ Ciklikus1
 Ciklikus2
 :Cyclic3
 Ciklikus3
+:Default
+Default
 :Deviation FW\nversion: 
 Deviation fw.\nverzió:
 :Down

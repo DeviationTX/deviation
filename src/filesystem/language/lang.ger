@@ -63,8 +63,6 @@ Tasten
 >:COL
 :COL Inv:
 FIXME
-:COL Src:
-FIXME
 :CYC
 TAUM
 :Calibrate
@@ -90,6 +88,8 @@ Kurve:
 >:Cyclic1
 >:Cyclic2
 >:Cyclic3
+:Default
+Default
 :Deviation FW\nversion: 
 Deviation FW\nVersion:
 :Down

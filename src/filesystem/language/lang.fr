@@ -92,6 +92,8 @@ Cyclique1
 Cyclique2
 :Cyclic3
 Cyclique3
+:Default
+Défaut
 :Deviation FW\nversion: 
 Deviation FW\nversion:
 :Down
