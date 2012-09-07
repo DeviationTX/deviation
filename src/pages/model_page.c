@@ -58,7 +58,7 @@ void PAGE_ModelInit(int page)
     row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Name:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
-    GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, "Icon");
+    GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
 
     row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Type:"));
