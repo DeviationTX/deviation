@@ -194,7 +194,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MODEL_ICON)) {
-            CONFIG_ParseModelName(m->icon, value);
+            CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
         if (MATCH_KEY(MODEL_TYPE)) {
@@ -666,7 +666,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(m->icon[0] != 0)
-        fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 6);
+        fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
@@ -868,8 +868,8 @@ u8 CONFIG_GetCurrentModel() {
 
 const char *CONFIG_GetIcon(enum ModelType type) {
     const char *const icons[] = {
-       "media/heli.bmp",
-       "media/plane.bmp",
+       "modelico/heli.bmp",
+       "modelico/plane.bmp",
     };
     return icons[type];
 }
@@ -882,9 +882,9 @@ const char *CONFIG_GetCurrentIcon() {
     }
 }
 
-void CONFIG_ParseModelName(char *name, const char *value)
+void CONFIG_ParseIconName(char *name, const char *value)
 {
-    sprintf(name, "media/%s", value);
+    sprintf(name, "modelico/%s", value);
 }
 
 enum ModelType CONFIG_ParseModelType(const char *value)

@@ -1,9 +1,16 @@
 #ifndef _MODEL_PAGE_H_
 #define _MODEL_PAGE_H_
 
+enum {
+   LOAD_MODEL,
+   SAVE_MODEL,
+   LOAD_TEMPLATE,
+   LOAD_ICON,
+};
+
 struct model_page {
     char tmpstr[30];
-    char iconstr[20];
+    char iconstr[24];
     char fixed_id[7];
     u8 file_state;
 /*Load save */

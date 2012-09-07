@@ -26,7 +26,7 @@ static int ini_handle_icon(void* user, const char* section, const char* name, co
 {
     (void)user;
     if(section[0] == '\0' && strcasecmp(name, MODEL_ICON) == 0) {
-        CONFIG_ParseModelName(mp->iconstr, value);
+        CONFIG_ParseIconName(mp->iconstr, value);
     }
     if(section[0] == '\0' && strcasecmp(name, MODEL_TYPE) == 0) {
         mp->modeltype = CONFIG_ParseModelType(value);
@@ -52,21 +52,41 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     mp->selected = sel + 1;
     if(! mp->obj)
         return;
-    sprintf(mp->tmpstr, "models/model%d.ini", mp->selected);
-    mp->modeltype = 0;
-    mp->iconstr[0] = 0;
-    ini_parse(mp->tmpstr, ini_handle_icon, NULL);
-    if (mp->iconstr[0])
-        ico = mp->iconstr;
-    else
+    if ((long)data == LOAD_ICON) {
         ico = CONFIG_GetIcon(mp->modeltype);
+        if (sel > 0 && FS_OpenDir("modelico")) {
+            char filename[13];
+            int count = 0;
+            int type;
+            while((type = FS_ReadDir(filename)) != 0) {
+                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
+                    count++;
+                    if (sel == count) {
+                        CONFIG_ParseIconName(mp->iconstr, filename);
+                        ico = mp->iconstr;
+                        break;
+                    }
+                }
+            }
+            FS_CloseDir();
+        }
+    } else {
+        sprintf(mp->tmpstr, "models/model%d.ini", mp->selected);
+        mp->modeltype = 0;
+        mp->iconstr[0] = 0;
+        ini_parse(mp->tmpstr, ini_handle_icon, NULL);
+        if (mp->iconstr[0])
+            ico = mp->iconstr;
+        else
+            ico = CONFIG_GetIcon(mp->modeltype);
+    }
     GUI_ChangeImage(mp->obj, ico, 0, 0);
 }
 static const char *string_cb(u8 idx, void *data)
 {
     (void)data;
     FILE *fh;
-    if ((long)data == 2) { //Template
+    if ((long)data == LOAD_TEMPLATE) { //Template
         char filename[13];
         int type;
         int count = 0;
@@ -82,6 +102,25 @@ static const char *string_cb(u8 idx, void *data)
             }
         }
         FS_CloseDir();
+    } else if ((long)data == LOAD_ICON) { //Icon
+        char filename[13];
+        int type;
+        int count = 1;
+        if (idx == 0)
+            return _tr("Default");
+        if (! FS_OpenDir("modelico"))
+            return _tr("Unknown");
+        while((type = FS_ReadDir(filename)) != 0) {
+            if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
+                count++;
+                if (idx + 1 == count) {
+                    strncpy(mp->tmpstr, filename, sizeof(filename));
+                    return mp->tmpstr;
+                }
+            }
+        }
+        FS_CloseDir();
+        return _tr("Unknown");
     } else {
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }
@@ -89,7 +128,7 @@ static const char *string_cb(u8 idx, void *data)
     sprintf(mp->tmpstr, "%d: NONE", idx + 1);
     if (fh) {
         long user = idx + 1;
-        if ((long)data == 2)
+        if ((long)data == LOAD_TEMPLATE)
             user = -user;
         ini_parse_file(fh, ini_handle_name, (void *)user);
         fclose(fh);
@@ -100,7 +139,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     int msg = (long)data;
     (void)obj;
-    if (msg == 1) {
+    if (msg == LOAD_MODEL + 1) {
         /* Load Model */
         CONFIG_SaveModelIfNeeded();
         PROTOCOL_DeInit();
@@ -109,13 +148,18 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_Init();
         MIXER_CalcChannels();
         PROTOCOL_Init(0);
-    } else if (msg == 2) {
+    } else if (msg == SAVE_MODEL + 1) {
         /* Save Model */
         CONFIG_WriteModel(mp->selected);
         CONFIG_ReadModel(mp->selected);  //Reload the model after saving to switch (for future saves)
-    } else if (msg == 3) {
+    } else if (msg == LOAD_TEMPLATE + 1) {
         /* Load Template */
         CONFIG_ReadTemplate(mp->selected);
+    } else if (msg == LOAD_ICON + 1) {
+        if (mp->selected == 1)
+            Model.icon[0] = 0;
+        else
+            strcpy(Model.icon, mp->iconstr);
     }
     GUI_RemoveAllObjects();
     mp->return_page(0);
@@ -124,13 +168,14 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return ((long)data) == 2 ? _tr("Save") : _tr("Load");
+    return ((long)data) == SAVE_MODEL + 1 ? _tr("Save") : _tr("Load");
 }
 
 /* loadsave values:
  * 0 : Load Model
  * 1 : Save Model
  * 2 : Load Template
+ * 3 : Load Icon
  */
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
@@ -141,7 +186,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     mp->obj = NULL;
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     GUI_CreateButton(264, 4, BUTTON_48, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
-    if (loadsave == 2) { //Template
+    if (loadsave == LOAD_TEMPLATE) { //Template
         if (FS_OpenDir("template")) {
             char filename[13];
             int type;
@@ -152,6 +197,23 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
             }
             FS_CloseDir();
         }
+        mp->selected = 1;
+    } else if (loadsave == LOAD_ICON) { //Icon
+        num_models = 1;
+        mp->selected = 1;
+        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
+        if (FS_OpenDir("modelico")) {
+            char filename[13];
+            int type;
+            while((type = FS_ReadDir(filename)) != 0) {
+                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
+                    num_models++;
+                    if(Model.icon[0] && strncasecmp(Model.icon+9, filename, 13) == 0) {
+                        mp->selected = num_models;
+                    }
+                }
+            }
+        }
     } else {
         for (num_models = 1; num_models <= 100; num_models++) {
             sprintf(mp->tmpstr, "models/model%d.ini", num_models);
@@ -161,9 +223,16 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
             fclose(fh);
         }
         num_models--;
+        mp->selected = CONFIG_GetCurrentModel();
+        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
     }
-    mp->selected = loadsave == 2 ? 1 : CONFIG_GetCurrentModel();
+    if (loadsave == SAVE_MODEL) {
+        mp->selected = 0;
+    } else if (loadsave == LOAD_ICON) {
+    } else {
+        mp->selected = CONFIG_GetCurrentModel();
+    }
     GUI_CreateListBox(112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
-    if (loadsave != 2)
-        mp->obj = GUI_CreateImage(8, 88, 96, 96, CONFIG_GetCurrentIcon());
+    if (loadsave != LOAD_TEMPLATE)
+        mp->obj = GUI_CreateImage(8, 88, 96, 96, mp->iconstr);
 }

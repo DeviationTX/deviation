@@ -13,7 +13,7 @@ const char *MODEL_TEMPLATE;
 
 struct Model {
     char name[24];
-    char icon[20];
+    char icon[24];
     enum ModelType type;
     enum Protocols protocol;
     u8 num_channels;
@@ -39,7 +39,7 @@ u8 CONFIG_GetCurrentModel();
 const char *CONFIG_GetIcon(enum ModelType type);
 const char *CONFIG_GetCurrentIcon();
 enum ModelType CONFIG_ParseModelType(const char *value);
-void CONFIG_ParseModelName(char *name, const char *value);
+void CONFIG_ParseIconName(char *name, const char *value);
 void CONFIG_ResetModel();
 u8 CONFIG_ReadTemplate(u8 template_num);
 #endif /*_MODEL_H_*/

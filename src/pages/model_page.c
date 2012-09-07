@@ -34,6 +34,7 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data);
 static void file_press_cb(guiObject_t *obj, void *data);
+static void changeicon_cb(guiObject_t *obj, const void *data);
 
 const char *show_text_cb(guiObject_t *obj, const void *data)
 {
@@ -57,6 +58,7 @@ void PAGE_ModelInit(int page)
     row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Name:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
+    GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, "Icon");
 
     row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Type:"));
@@ -216,4 +218,11 @@ static void file_press_cb(guiObject_t *obj, void *data)
         PAGE_SetModal(1);
         MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
     }
+}
+
+static void changeicon_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    MODELPage_ShowLoadSave(3, PAGE_ModelInit);
 }
