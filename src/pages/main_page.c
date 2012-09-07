@@ -260,11 +260,12 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 
 static u8 action_cb(u32 button, u8 flags, void *data)
 {
-    (void)data;
     if(! GUI_GetSelected()) {
         if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             mp->ignore_release = 1;
             GUI_SetSelected(mp->optsObj);
+        } else {
+            MIXER_UpdateTrim(button, flags, data);
         }
         return 1;
     } else {

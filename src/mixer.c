@@ -54,7 +54,6 @@ static s16 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
 static s16 get_trim(u8 src);
-static u8 update_trim(u32 buttons, u8 flags, void *data);
 
 static s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum);
 
@@ -272,7 +271,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
 
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags)
 {
-    s16 value = raw[NUM_INPUTS + 1 + channel];
+    s16 value = raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
     if (channel >= NUM_OUT_CHANNELS)
         return value;
 
@@ -335,7 +334,7 @@ void MIXER_RegisterTrimButtons()
         mask |= CHAN_ButtonMask(Model.trims[i].neg);
         mask |= CHAN_ButtonMask(Model.trims[i].pos);
     }
-    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS, update_trim, NULL);
+    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS, MIXER_UpdateTrim, NULL);
 }
 enum TemplateType MIXER_GetTemplate(int ch)
 {
@@ -505,7 +504,7 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
-u8 update_trim(u32 buttons, u8 flags, void *data)
+u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
 {
     (void)data;
     (void)flags;

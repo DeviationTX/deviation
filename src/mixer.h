@@ -164,6 +164,7 @@ const char *MIXER_SwashType(enum SwashType);
 u8 MIXER_SourceHasTrim(u8 src);
 u8 MIXER_MapChannel(u8 channel);
 void MIXER_AdjustForProtocol();
+u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data);
 
 void MIXER_Init();
 
