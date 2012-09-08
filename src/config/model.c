@@ -614,14 +614,16 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
-void write_mixer(FILE *fh, struct Model *m, u8 channel)
+u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 {
     int idx;
     int i;
     char tmpstr[20];
+    u8 changed = 0;
     for(idx = 0; idx < NUM_MIXERS; idx++) {
         if (! WRITE_FULL_MODEL && (m->mixers[idx].src == 0 || m->mixers[idx].dest != channel))
             continue;
+        changed = 1;
         fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceName(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceName(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
@@ -649,6 +651,7 @@ void write_mixer(FILE *fh, struct Model *m, u8 channel)
             }
         }
     }
+    return changed;
 }
 
 u8 CONFIG_WriteModel(u8 model_num) {
@@ -686,7 +689,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].servoscale == 100 &&
            m->template[idx] == 0)
         {
-            write_mixer(fh, m, idx);
+            if (write_mixer(fh, m, idx))
+                fprintf(fh, "\n");
             continue;
         }
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
@@ -715,8 +719,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0)
                 fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->template[idx+NUM_OUT_CHANNELS]]);
         }
-        write_mixer(fh, m, idx+NUM_OUT_CHANNELS);
-        fprintf(fh, "\n");
+        if (write_mixer(fh, m, idx+NUM_OUT_CHANNELS))
+            fprintf(fh, "\n");
     }
     for(idx = 0; idx < NUM_TRIMS; idx++) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
