@@ -1,5 +1,5 @@
 # Use VERBOSE=1 to enable verbose make
-
+TYPE     ?= dev
 TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
 NUM_MODELS ?= 30
@@ -41,7 +41,14 @@ else
     HGVERSION := $(shell hg parents --template '${TARGET}-{node|short}')
   endif
 endif
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION="\"${HGVERSION}\""
+
+ifeq "$(TYPE)" "dev"
+  CFLAGS   := $(CFLAGS) -g
+else
+  CFLAGS   := $(CFLAGS) -O2
+endif
+
+CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
