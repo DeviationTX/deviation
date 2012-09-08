@@ -43,7 +43,7 @@ else
 endif
 
 ifeq "$(TYPE)" "dev"
-  CFLAGS   := $(CFLAGS) -g
+  CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 else
   CFLAGS   := $(CFLAGS) -O2
 endif
@@ -75,14 +75,6 @@ $(LAST_MODEL): model_template.ini tx_template.ini
 		cp model_template.ini filesystem/models/model$$number.ini; \
 		number=`expr $$number + 1`; \
 		done
-
-# Rebuild on hg version change.
-# From http://mercurial.selenic.com/wiki/VersioningWithMake
-$(ODIR)/version.o: $(ODIR)/hgstamp
-.PHONY: $(ODIR)/hgstamp
-$(ODIR)/hgstamp:
-	[ -f $@ ] || touch $@
-	echo $(HGVERSION) | cmp -s $@ - || echo $(HGVERSION) > $@
 
 # The following enables quiet output unless you use VERBOSE=1
 # Note that this must be after the 1st rule so that it doesn't execute by default
@@ -129,10 +121,16 @@ $(ODIR)/%.o: $(1)%.cpp
 endef
 $(foreach directory,$(sort $(dir $(SRCS))),$(eval $(call define_compile_rules,$(directory))))
 
+# Rebuild on hg version change.
+# From http://mercurial.selenic.com/wiki/VersioningWithMake
+$(ODIR)/version.o: $(ODIR)/hgstamp
+.PHONY: $(ODIR)/hgstamp
+$(ODIR)/hgstamp:
+	[ -f $@ ] || touch $@
+	echo $(HGVERSION) | cmp -s $@ - || echo $(HGVERSION) > $@
+
 # phony targets
 .PHONY: clean
-hg_version.h:
-	touch hg_version.h
 # recompile if the Makefile changes
 $(OBJS): Makefile target/$(TARGET)/Makefile.inc
 
