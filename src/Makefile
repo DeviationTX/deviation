@@ -33,11 +33,11 @@ OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:
 
 MODELDIR = filesystem/models
 ifeq "$(wildcard ../.hg )" ""
-  HGVERSION = "\"Unknown\""
+  HGVERSION := "\"${TARGET}-Unknown\""
 else
-  HGVERSION = "\"$(PACKAGE) `hg parents --template '{node|short}'`\""
+  HGVERSION := $(shell if [[ `hg parents --template {latesttagdistance}` == 1 ]]; then hg parents --template {latesttag}; else hg parents --template '{node|short}'; fi)
 endif
-CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION=$(HGVERSION)
+CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 
@@ -65,6 +65,13 @@ $(LAST_MODEL): model_template.ini tx_template.ini
 		number=`expr $$number + 1`; \
 		done
 
+# Rebuild on hg version change.
+# From http://mercurial.selenic.com/wiki/VersioningWithMake
+$(ODIR)/version.o: $(ODIR)/hgstamp
+.PHONY: $(ODIR)/hgstamp
+$(ODIR)/hgstamp:
+	[ -f $@ ] || touch $@
+	echo $(HGVERSION) | cmp -s $@ - || echo $(HGVERSION) > $@
 
 # The following enables quiet output unless you use VERBOSE=1
 # Note that this must be after the 1st rule so that it doesn't execute by default

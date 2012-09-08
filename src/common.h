@@ -16,7 +16,7 @@ typedef uint64_t u64;
 #include "target.h"
 
 extern volatile s16 Channels[NUM_OUT_CHANNELS];
-
+extern const char DeviationVersion[32];
 /* Temproary definition until we have real translation */
 #define _tr_noop(x) x
 const char *_tr(const char *str);

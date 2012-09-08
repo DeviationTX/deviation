@@ -17,7 +17,6 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-static const char firmware_version[] = HGVERSION;
 static struct usb_page * const up = &pagemem.u.usb_page;
 
 static void draw_page(u8 enable)
@@ -25,8 +24,8 @@ static void draw_page(u8 enable)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("USB"));
 
-    sprintf(up->tmpstr, "%s" HGVERSION "\n%s%s",
-            _tr("Deviation FW\nversion: "),
+    sprintf(up->tmpstr, "%s%s\n%s%s",
+            _tr("Deviation FW\nversion: "), DeviationVersion,
             _tr("USB File System is disabled\nPress 'Ent' to "),
             enable == 0 ? _tr("enable") : _tr("disable"));
     GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, up->tmpstr);
