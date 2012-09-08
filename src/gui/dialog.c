@@ -57,7 +57,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     dialog->txtbox.width = 0;
     dialog->txtbox.height = 0;
 
-    struct guiObject *but;
+    struct guiObject *but = NULL;
     switch (dgType) {
     case dtOk:
         but = GUI_CreateButton(x + (width - 96) / 2, y + height - 27,

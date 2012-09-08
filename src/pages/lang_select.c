@@ -52,7 +52,8 @@ static const char *string_cb(u8 idx, void *data)
     if(idx == 0) {
         fh = fopen(cp.tmpstr, "r");
         if (fh) {
-            fgets(cp.tmpstr, sizeof(cp.tmpstr), fh);
+            if(fgets(cp.tmpstr, sizeof(cp.tmpstr), fh) == NULL)
+                cp.tmpstr[0] = 0;
             fclose(fh);
             unsigned len = strlen(cp.tmpstr);
             if(strlen(cp.tmpstr) && cp.tmpstr[0] != ':') {
