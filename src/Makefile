@@ -35,7 +35,11 @@ MODELDIR = filesystem/models
 ifeq "$(wildcard ../.hg )" ""
   HGVERSION := "\"${TARGET}-Unknown\""
 else
-  HGVERSION := $(shell if [[ `hg parents --template {latesttagdistance}` == 1 ]]; then hg parents --template {latesttag}; else hg parents --template '{node|short}'; fi)
+  ifeq "$(shell hg parents --template {latesttagdistance})" "1"
+    HGVERSION := $(shell hg parents --template '${TARGET}-{latesttag}')
+  else
+    HGVERSION := $(shell hg parents --template '${TARGET}-{node|short}')
+  endif
 endif
 CFLAGS   := $(CFLAGS) -g -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
