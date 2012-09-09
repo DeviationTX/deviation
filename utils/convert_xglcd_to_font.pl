@@ -10,7 +10,7 @@ use Getopt::Long;
 use Data::Dumper;
 
 my %templates = (
-    "none" => {},
+    "auto" => {},
     "number" => {
        range => [[0x25, 0x39]],
        exclude => [38, 39, 40, 41, 42, 44],
@@ -20,6 +20,9 @@ my %templates = (
     },
     "asciicaps" => {
        range => [[0x20, 0x5a]],
+    },
+    "cyrillic" => {
+       range => [[0x0400, 0x045f]],
     },
     "european" => {
        range => [[0x20, 0x7e], [0xa1, 0xff]],
@@ -106,7 +109,7 @@ sub main
     }
 }
 sub filter_chars {
-    return if(! $template->{"range"} && ! $template->{"exclude"});
+    #return if(! $template->{"range"} && ! $template->{"exclude"});
     my @chars = keys(%font);
     #Remove characters that are in exclude list or not in range
     foreach my $char (@chars) {
@@ -130,36 +133,22 @@ sub filter_chars {
         }
     }
     #Adjust ranges based on existing characters
-    my @ranges = @{ $template->{"range"} };
-    for(my $i = 0; $i < scalar(@ranges); $i++) {
-        while($ranges[$i][0] <= $ranges[$i][1]) {
-            last if ( $font{$ranges[$i][0]});
-            $ranges[$i][0]++;
-        }
-        if ($ranges[$i][0] > $ranges[$i][1]) {
-            splice(@ranges, $i, 1);
-            $i--;
-            next;
-        }
-        while($ranges[$i][1] >= $ranges[$i][0]) {
-            last if ( $font{$ranges[$i][1]});
-            $ranges[$i][1]--;
-        }
-        if ($ranges[$i][0] > $ranges[$i][1]) {
-            splice(@ranges, $i, 1);
-            $i--;
-        }
-    }
-    $template->{"range"} = [@ranges];
-    #Add any missing characters
-    foreach my $range (@ranges) {
-        foreach my $char ($range->[0]..$range->[1]) {
-            if(!$font{char}) {
-                printf STDERR "Did not find character $char\n";
-                $font{$char} = [0];
+    my @ranges = ();
+    my $start = 0;
+    my $end = 0;
+    foreach my $char (sort {$a <=> $b} @chars) {
+        if($char != $end +1) {
+            if ($end != 0) {
+                push @ranges, [$start, $end];
             }
+            $start = $char;
+            $end = $char;
+        } else {
+            $end++;
         }
     }
+    push @ranges, [$start, $end];
+    $template->{"range"} = [@ranges];
 }
 
 sub optimize
@@ -340,7 +329,11 @@ sub export_font
 {
     mkdir $font_name;
     `echo $array_h > $font_name/height`;
-    my $zero = get_height($font{65}, "top");
+    my $above_line_char = $font{65};
+    if (! $above_line_char) {
+        $above_line_char = $font{ (sort {$a <=> $b} keys(%font))[0] };
+    }
+    my $zero = get_height($above_line_char, "top");
     print "$zero\n";
     foreach my $char (keys %font) {
         my $h1 = get_height($font{$char}, "top");
