@@ -15,13 +15,16 @@ Français
 4 Intérieurs
 :4 Outside
 4 Extérieurs
->:4Ch w/ Dual-Rates
+:4Ch w/ Dual-Rates
+4ch et Double deb.
 :5 Point
 5 points
 :6 Trims
 6 Trims
->:6Ch Airplane
->:6Ch Helicopter
+:6Ch Airplane
+6ch Avion
+:6Ch Helicopter
+6ch Hélicoptère
 :7 Point
 7 points
 :8 Bars
@@ -145,7 +148,7 @@ GAUCHE_H
 :LEFT_V
 GAUCHE_V
 :Language:
-Langage:
+Langue:
 :Left
 Gauche
 :Linked
@@ -163,7 +166,7 @@ MIX1
 :MIX2
 MIX2
 :Main Page Config
-Page de config. principale
+Config. de la page principale
 :Max:
 Max:
 :Mid-Rate
@@ -272,7 +275,7 @@ THR
 :TRIMLH+
 TRIMGH+
 :TRIMLH-
-TRIMGH+
+TRIMGH-
 :TRIMLV+
 TRIMGV+
 :TRIMLV-
@@ -280,7 +283,7 @@ TRIMGV-
 :TRIMRH+
 TRIMDH+
 :TRIMRH-
-TRIMDH+
+TRIMDH-
 :TRIMRV+
 TRIMDV+
 :TRIMRV-
@@ -288,7 +291,7 @@ TRIMDV-
 :TRIM_L+
 TRIM_G+
 :TRIM_L-
-TRIM_G+
+TRIM_G-
 :TRIM_R+
 TRIM_D+
 :TRIM_R-
@@ -304,7 +307,7 @@ Timer1
 :Timer2
 Timer2
 :Toggle%d
-Boutton%d
+Voyant%d
 :Touch Calibrate
 Calibration du tactile
 :Touch Screen:
@@ -349,7 +352,7 @@ Valeur:
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...
-\n\nFin d'appairande dans %d secondes...
+\n\nFin d'appairage dans %d secondes...
 :add
 Ajouter
 :countdown
