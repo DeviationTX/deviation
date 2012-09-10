@@ -2,7 +2,7 @@ SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp)
 SRC_C  = $(wildcard target/$(TARGET)/*.c)
 
 LFLAGS = -lfltk
-SCREENSIZE = qvga
+SCREENSIZE = 320x240x16
 all = $(TARGET)
 CFLAGS := -DEMULATOR
 

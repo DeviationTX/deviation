@@ -23,6 +23,7 @@
 #define LCD_CMD *(volatile uint8_t *)(LCD_CMD_ADDR)
 #define LCD_DATA *(volatile uint8_t *)(LCD_DATA_ADDR)
 
+//The screen is 129 characters, but we'll only expoise 128 of them
 #define LCD_WIDTH 129
 #define LCD_PAGES 8
 static u8 img[LCD_WIDTH * LCD_PAGES];
@@ -132,7 +133,6 @@ void LCD_Init()
  
 }
 
-
 void LCD_Clear(unsigned int val)
 {
     int i,j;
@@ -187,7 +187,7 @@ void LCD_DrawStop(void)
 void LCD_DrawPixel(unsigned int color)
 {
     int y = ypos;
-    int x = 128 - xpos;
+    int x = LCD_WIDTH - 2 - xpos; //We want to map 0 -> 127 and 127 -> 0
 
     if (ypos > 31)
         y = ypos - 32;
