@@ -1,6 +1,7 @@
 #ifndef _FLTK_H_
 #define FLTK_H_
 
+#include "emu.h"
 #define ALT_DRAW
 
 #ifndef Fl_Output_H
@@ -29,7 +30,7 @@ struct Gui {
     Fl_Output *final[20];
     u32 last_redraw;
 #ifdef ALT_DRAW
-    u8  image[320*240*3];
+    u8  image[LCD_WIDTH*LCD_HEIGHT*3];
 #else
     Fl_Offscreen image;
 #endif

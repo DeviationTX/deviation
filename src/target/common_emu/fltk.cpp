@@ -183,12 +183,13 @@ public:
     }
     void draw() {
 #ifdef ALT_DRAW
-      fl_draw_image(gui.image, 0, 0, 320,240, 3, 0);
+      fl_draw_image(gui.image, x(), y(), w(), h(), 3, 0);
 #else
       fl_copy_offscreen(x(), y(), w(), h(), gui.image, 0, 0);
 #endif
     }
 };
+
 void update_channels(void *params)
 {
     (void)params;
@@ -226,11 +227,12 @@ void LCD_Init()
 {
   int i;
   Fl::visual(FL_RGB);
-  main_window = new mywin(640,240);
-  image = new image_box(0, 0, 320, 240);
+  int height = (LCD_HEIGHT > 15 + (INP_LAST - 1) * 10 + 85) ? LCD_HEIGHT : 15 + (INP_LAST - 1) * 10 + 85;
+  main_window = new mywin(LCD_WIDTH + 320,height);
+  image = new image_box(0, (height - LCD_HEIGHT) / 2, LCD_WIDTH, LCD_HEIGHT);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
-  for(i = 0; i < 7; i++) {
+  for(i = 0; i < (INP_LAST - 1) / 2; i++) {
       char *label;
       label = (char *)malloc(10);
       INPUT_SourceName(label, i + 1);
@@ -246,15 +248,15 @@ void LCD_Init()
       char *str;
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 1);
-      gui.final[i] = new Fl_Output(370, 20 * i + 20*7 + 15, 50, 15, str);
+      gui.final[i] = new Fl_Output(LCD_WIDTH + 50, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 5);
-      gui.final[i+4] = new Fl_Output(470, 20 * i + 20*7+ 15, 50, 15, str);
+      gui.final[i+4] = new Fl_Output(LCD_WIDTH + 150, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+4]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 9);
-      gui.final[i+8] = new Fl_Output(580, 20 * i + 20*7+ 15, 50, 15, str);
+      gui.final[i+8] = new Fl_Output(LCD_WIDTH + 260, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+8]->textsize(10);
   }
   //Fl_Box box(320, 0, 320, 240);
