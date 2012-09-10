@@ -27,6 +27,8 @@
 #define INPNAME_ELEVATOR _tr("ELE")
 #define INPNAME_THROTTLE _tr("THR")
 #define INPNAME_RUDDER   _tr("RUD")
+#define INPNAME_AUX4     _tr("AUX4")
+#define INPNAME_AUX5     _tr("AUX5")
 #define INPNAME_RUD_DR   _tr("RUD DR")
 #define INPNAME_ELE_DR   _tr("ELE DR")
 #define INPNAME_AIL_DR   _tr("AIL DR")
