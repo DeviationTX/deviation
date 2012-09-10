@@ -33,7 +33,7 @@ OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:
 
 MODELDIR = filesystem/models
 ifeq "$(wildcard ../.hg )" ""
-  HGVERSION := "\"${TARGET}-Unknown\""
+  HGVERSION := ${TARGET}-Unknown
 else
   ifeq "$(shell hg parents --template {latesttagdistance})" "1"
     HGVERSION := $(shell hg parents --template '${TARGET}-{latesttag}')
