@@ -182,11 +182,7 @@ public:
     image_box(int X, int Y, int W, int H) : Fl_Box(X, Y, W, H) {
     }
     void draw() {
-#ifdef ALT_DRAW
       fl_draw_image(gui.image, x(), y(), w(), h(), 3, 0);
-#else
-      fl_copy_offscreen(x(), y(), w(), h(), gui.image, 0, 0);
-#endif
     }
 };
 
@@ -268,14 +264,6 @@ void LCD_Init()
   Fl::add_check(update_channels);
   Fl::wait();
   gui.last_redraw = CLOCK_getms();
-#ifndef ALT_DRAW
-  main_window->make_current();
-  gui.image = fl_create_offscreen(320, 240);
-  fl_begin_offscreen(gui.image);
-  fl_color(FL_BLACK);
-  fl_rectf(0, 0, 320, 240);
-  fl_end_offscreen();
-#endif
 }
 
 struct touch SPITouch_GetCoords() {
@@ -320,30 +308,6 @@ void LCD_DrawStop(void) {
 #endif
 }
 
-
-void LCD_DrawPixel(unsigned int color)
-{
-    u8 r, g, b;
-    r = (color >> 8) & 0xf8;
-    g = (color >> 3) & 0xfc;
-    b = (color << 3) & 0xf8;
-#ifdef ALT_DRAW
-    gui.image[3*(320*gui.y+gui.x)] = r;
-    gui.image[3*(320*gui.y+gui.x)+1] = g;
-    gui.image[3*(320*gui.y+gui.x)+2] = b;
-#else
-    fl_begin_offscreen(gui.image);
-    Fl_Color c = fl_rgb_color(r, g, b);
-    fl_color(c);
-    fl_point(gui.x, gui.y);
-    fl_end_offscreen();
-#endif
-    gui.x++;
-    if(gui.x > gui.xend) {
-        gui.x = gui.xstart;
-        gui.y += gui.dir;
-    }
-}
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
     gui.xstart = x; //This is to emulate how the LCD behaves
