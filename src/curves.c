@@ -10,17 +10,17 @@
     {-100, -83, -67, -50, -33, -17, 0, 17, 33, 50, 67, 83, 100}
 */
 
-s16 interpolate(struct Curve *curve, s16 value)
+s16 interpolate(struct Curve *curve, s32 value)
 {
     int i;
     int num_points = (curve->type - CURVE_3POINT) * 2 + 3;
-    int step = 2 * 10000 / (num_points - 1) ;
+    s32 step = 2 * 10000 / (num_points - 1) ;
     for (i = 0; i < num_points - 1; i++) {
-        s16 x = -10000 + i * step;
-        s16 pos1 = PCT_TO_RANGE(x / 100);
-        s16 pos2 = PCT_TO_RANGE((x + step) / 100);
+        s32 x = -10000 + i * step;
+        s32 pos1 = PCT_TO_RANGE(x / 100);
+        s32 pos2 = PCT_TO_RANGE((x + step) / 100);
         if(value >= pos1 && value <= pos2) {
-            s32 tmp = ((s32)value - pos1) * (curve->points[i + 1] - curve->points[i]) / (pos2 - pos1) + curve->points[i];
+            s32 tmp = (value - pos1) * (curve->points[i + 1] - curve->points[i]) / (pos2 - pos1) + curve->points[i];
             return PCT_TO_RANGE(tmp);
         }
     }
@@ -46,11 +46,11 @@ s16 expou(u32 x, u16 k)
                + (KMAX - k) * x + KMAX / 2) / KMAX;
     return val;
 }
-s16 expo(struct Curve *curve, s16 value)
+s16 expo(struct Curve *curve, s32 value)
 {
 
-    s16  y;
-    s16 k;
+    s32  y;
+    s32 k;
     u8 neg = value < 0;
 
     k = neg ? curve->points[1] : curve->points[0];
