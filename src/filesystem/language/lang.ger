@@ -40,6 +40,8 @@ QUE
 QUE DR
 :AIL Inv:
 FIXME
+>:AUX4
+>:AUX5
 :Airplane
 Flugzeug
 :Backlight:
@@ -130,6 +132,7 @@ FAHR
 Hubschrauber
 :High-Rate
 Hoch
+>:Icon
 :Input:
 Eingabe:
 :Inputs
@@ -168,6 +171,7 @@ Mittel
 Min/Max
 :Min:
 Min:
+>:Mixer
 :Mixers:
 Mixer:
 :Mode %d
@@ -228,6 +232,7 @@ Umkehr:
 Umgekehrt
 :Right
 Rechts
+>:Safe Val:
 :Safety
 Ausfallschutz
 :Safety:

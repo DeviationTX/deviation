@@ -16,15 +16,15 @@
 :4 Outside
 4 снаружи
 :4Ch w/ Dual-Rates
-4-канала с ДР
+4-канала с дв.расходами
 :5 Point
 5 точек
 :6 Trims
 6 триммеров
 :6Ch Airplane
-6-кан. самолет
+6-канальный самолет
 :6Ch Helicopter
-6-кан. вертолет
+6-канальный вертолет
 :7 Point
 7 точек
 :8 Bars
@@ -43,6 +43,8 @@
 Элер ДР
 :AIL Inv:
 Элер Инв:
+>:AUX4
+>:AUX5
 :Airplane
 Самолет
 :Backlight:
@@ -76,7 +78,7 @@
 :Center all sticks and touch the screen
 Отцентруйте все стики и прикоснитесь к экрану
 :Ch
-Канал
+Канал 
 :Change
 Изменить
 :Channels
@@ -84,9 +86,9 @@
 :Complex
 Комплекс
 :Configure
-Настройка
+Настройки передатчика
 :Copy To...
-Копировать в...
+Копир. в...
 :Curve:
 Кривая:
 :Cyclic1
@@ -98,7 +100,7 @@
 :Default
 Умолчание
 :Deviation FW\nversion: 
-Deviation ПО\nверсия: 
+Прошивка Deviation\nверсия: 
 :Down
 Вниз
 :ELE
@@ -137,6 +139,8 @@ Deviation ПО\nверсия:
 Вертолет
 :High-Rate
 Высокий расход
+:Icon
+Значок
 :Input:
 Ввод:
 :Inputs
@@ -175,6 +179,8 @@ Deviation ПО\nверсия:
 Мин/Макс
 :Min:
 Мин.:
+:Mixer
+Микшер
 :Mixers:
 Микшер:
 :Mode %d
@@ -235,6 +241,8 @@ OK
 Реверс
 :Right
 Вправо
+:Safe Val:
+Безопасное значение:
 :Safety
 Безопасность
 :Safety:
@@ -340,7 +348,7 @@ OK
 :USB
 USB
 :USB File System is disabled\nPress 'Ent' to 
-Файловая система USB отключена\nНажмите 'ENT' для 
+\nФайловая система USB отключена.\nПри включении передатчика\nнажмите 'ENT' для 
 :USB Storage mode, press 'ENT' to exit.
 Режим USB, нажмите 'ENT' для выхода.
 :Unknown

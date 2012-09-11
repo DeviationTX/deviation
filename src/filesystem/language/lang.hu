@@ -43,6 +43,8 @@ AIL
 AIL DR
 :AIL Inv:
 Csűrés inv.:
+>:AUX4
+>:AUX5
 :Airplane
 Repülőgép
 :Backlight:
@@ -177,6 +179,7 @@ Közepes
 Min/Max
 :Min:
 Min:
+>:Mixer
 :Mixers:
 Mixerek:
 :Mode %d
@@ -237,6 +240,7 @@ Invertálás:
 Inverz
 :Right
 Jobb
+>:Safe Val:
 :Safety
 Biztonsági ellenőrzés
 :Safety:

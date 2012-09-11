@@ -43,6 +43,8 @@ AIL
 AIL DR
 :AIL Inv:
 :Sens aileron
+>:AUX4
+>:AUX5
 :Airplane
 Avion
 :Backlight:
@@ -137,6 +139,7 @@ GEAR
 Helicoptère
 :High-Rate
 Déb. Haut
+>:Icon
 :Input:
 Entrée:
 :Inputs
@@ -175,6 +178,7 @@ Déb. Med
 Min/Max
 :Min:
 Min:
+>:Mixer
 :Mixers:
 Mixers:
 :Mode %d
@@ -235,6 +239,7 @@ Sens:
 Inversé
 :Right
 Droite
+>:Safe Val:
 :Safety
 Sécurité
 :Safety:
