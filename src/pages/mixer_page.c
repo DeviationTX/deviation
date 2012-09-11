@@ -35,7 +35,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 ch = (long)data;
-    char tmp1[10];
+    char tmp1[20];
 
     /* See if we need to name the cyclic virtual channels */
     if (Model.type == MODELTYPE_HELI
@@ -139,7 +139,7 @@ void PAGE_MixerInit(int page)
     mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > ENTRIES_PER_PAGE ? Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE : Model.num_channels + NUM_VIRT_CHANNELS;
     show_chantest = 0;
     mp->firstObj = NULL;
-    PAGE_ShowHeader("Mixer");
+    PAGE_ShowHeader(_tr("Mixer"));
     GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
     guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);
     GUI_SetScrollbar(obj, page);

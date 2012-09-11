@@ -21,7 +21,7 @@
 u16 fnv_16_str(const char *str);
 static char strings[4096];
 #define MAX_STRINGS 256
-#define MAX_LINE 200
+#define MAX_LINE 300
 
 #define dbg_printf if(0) printf
 struct str_map {

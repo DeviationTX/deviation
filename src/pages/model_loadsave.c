@@ -184,8 +184,8 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     PAGE_SetModal(1);
     mp->return_page = return_page;
     mp->obj = NULL;
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    GUI_CreateButton(264, 4, BUTTON_48, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    PAGE_CreateCancelButton(112, 4, okcancel_cb);
+    GUI_CreateButton(216, 4, BUTTON_96, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
     if (loadsave == LOAD_TEMPLATE) { //Template
         if (FS_OpenDir("template")) {
             char filename[13];

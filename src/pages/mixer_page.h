@@ -28,7 +28,7 @@ struct mixer_page {
     u8 num_mixers;
     u8 num_complex_mixers;
     u8 link_curves;
-    char tmpstr[10];
+    char tmpstr[30];
     s16 raw[NUM_SOURCES + 1];
 
     enum TemplateType cur_template;
