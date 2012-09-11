@@ -36,21 +36,21 @@
 :> 0
 > 0
 :ABSVAL
-Абсолютное
+Абсолют.
 :AIL
-ЭЛЕР
+Элер
 :AIL DR
-ЭЛЕР ДР
+Элер ДР
 :AIL Inv:
-ЭЛЕР Инв:
+Элер Инв:
 :Airplane
 Самолет
 :Backlight:
 Подсветка:
 :Bar %d:
-Полоса %d:
+Полоса%d
 :Bars:
-Полосы:
+Полоса:
 :Battery Alarm:
 Сигнал батареи:
 :Bind
@@ -58,17 +58,17 @@
 :Binding
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменяет процедуру привязки,\nно позволит управлять передатчиком.
+Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Box %d:
 Бокс %d:
 :Buttons
 Кнопки
 :COL
-КОЛЛ
+Колл
 :COL Inv:
 КОЛЛ Инв:
 :CYC
-ЦИКЛ
+Цикл
 :Calibrate
 Калибровка
 :Cancel
@@ -76,13 +76,13 @@
 :Center all sticks and touch the screen
 Отцентруйте все стики и прикоснитесь к экрану
 :Ch
-Кан
+Канал
 :Change
 Изменить
 :Channels
 Каналы
 :Complex
-Комплексный
+Комплекс
 :Configure
 Настройка
 :Copy To...
@@ -98,17 +98,17 @@
 :Default
 Умолчание
 :Deviation FW\nversion: 
-Deviation FW\nверсия:
+Deviation ПО\nверсия: 
 :Down
 Вниз
 :ELE
-РВЫС
+РВыс
 :ELE DR
-РВЫС ДР
+РВыс ДР
 :ELE Inv:
-РВЫС Инв:
+РВыс Инв:
 :EXPO
-ЭКСПО
+Экспо.
 :Enter
 Ввод
 :Exit
@@ -128,11 +128,11 @@ Deviation FW\nверсия:
 :Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
 Фаловая система не монтируется. Создайте файловую систему через USB, затем нажмите 'ENT' для выхода.
 :Fixed
-Фиксированный
+Фиксир.
 :Fixed ID:
-Фикс. ID:
+Фиксированный ID:
 :GEAR
-ШАССИ
+Шасси
 :Helicopter
 Вертолет
 :High-Rate
@@ -144,9 +144,9 @@ Deviation FW\nверсия:
 :Inverted
 Инвертированный
 :LEFT_H
-ЛЕВЫЙ_H
+ЛЕВЫЙ_Г
 :LEFT_V
-ЛЕВЫЙ_V
+ЛЕВЫЙ_В
 :Language:
 Язык:
 :Left
@@ -176,7 +176,7 @@ Deviation FW\nверсия:
 :Min:
 Мин.:
 :Mixers:
-Микшеры:
+Микшер:
 :Mode %d
 Режим %d
 :Model
@@ -186,7 +186,7 @@ Deviation FW\nверсия:
 :Model Type:
 Тип модели:
 :Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Переместите каждый стик до макс.\nи мин. значения, затем верните в центр.\nНажмите на экран после завешения.
+Переместите каждый стик до макс.\nи мин. значения, затем верните в центр.\nНажмите на экран после завершения.
 :Mux:
 Мульт:
 :Neg
@@ -200,7 +200,7 @@ Deviation FW\nверсия:
 :None
 Нет
 :Normal
-Нормально
+Норма
 :Number of Channels:
 Количество каналов:
 :OK
@@ -208,9 +208,9 @@ OK
 :Off
 Выкл.
 :Offset:
-Смещение:
+Смещ.:
 :Page:
-Страница:
+Стр.:
 :Point:
 Точка:
 :Pos
@@ -220,9 +220,9 @@ OK
 :Protocol:
 Протокол:
 :RIGHT_H
-ПРАВЫЙ_H
+ПРАВЫЙ_Г
 :RIGHT_V
-ПРАВЫЙ_V
+ПРАВЫЙ_В
 :RUD
 РНапр
 :RUD DR
@@ -242,7 +242,7 @@ OK
 :Save
 Сохранить
 :Scale:
-Масштаб:
+Масшт.:
 :Scanner
 Сканер
 :Simple
@@ -250,9 +250,9 @@ OK
 :Simple 4 Channel
 Простой 4-канала
 :Src
-Ист.
+Источник
 :Src:
-Ист.:
+Источник:
 :Start:
 Старт:
 :Stick Mode:
@@ -264,39 +264,39 @@ OK
 :SwashType:
 Тип авт.перекоса:
 :Switch1
-Переключатель1
+Перекл.1
 :Switch2
-Переключатель2
+Перекл.2
 :Switch:
-Переключатель:
+Перекл.:
 :Symmetric
 Симметричный
 :THR
-ГАЗ
+Газ
 :TRIMLH+
-TRIMLH+
+ТримЛГ+
 :TRIMLH-
-TRIMLH-
+ТримЛГ-
 :TRIMLV+
-TRIMLV+
+ТримЛВ+
 :TRIMLV-
-TRIMLV-
+ТримЛВ-
 :TRIMRH+
-TRIMRH+
+ТримПГ+
 :TRIMRH-
-TRIMRH-
+ТримПГ-
 :TRIMRV+
-TRIMRV+
+ТримПВ+
 :TRIMRV-
-TRIMRV-
+ТримПВ-
 :TRIM_L+
-TRIM_L+
+Трим_Л+
 :TRIM_L-
-TRIM_L-
+Трим_Л-
 :TRIM_R+
-TRIM_R+
+Трим_П+
 :TRIM_R-
-TRIM_R-
+Трим_П-
 :Template..
 Шаблон...
 :Test
@@ -308,13 +308,13 @@ TRIM_R-
 :Timer2
 Таймер2
 :Toggle%d
-Тумблер%d
+Перекл%d
 :Touch Calibrate
 Нажать калибровку
 :Touch Screen:
 Сенс. экран:
 :Touch Test
-Тест сенс.экрана
+Нажать тест
 :Touch target %d
 Нажать цель %d
 :Touch to Lock
@@ -324,13 +324,13 @@ TRIM_R-
 :Trim
 Триммер
 :Trim +:
-Триммер +:
+Триммер+:
 :Trim -:
-Триммер -:
+Триммер-:
 :Trim Step:
 Шаг триммера:
 :Trims:
-Триммеры:
+Триммер:
 :Turn Off
 Выключить
 :Turn On
@@ -340,16 +340,17 @@ TRIM_R-
 :USB
 USB
 :USB File System is disabled\nPress 'Ent' to 
-Файловая система USB отключена\nНажмите 'ENT' для
+Файловая система USB отключена\nНажмите 'ENT' для 
 :USB Storage mode, press 'ENT' to exit.
-режима USB, нажмите 'ENT' для выхода.
+Режим USB, нажмите 'ENT' для выхода.
 :Unknown
 Неизвестный
 :Up
 Вверх
 :Value:
 Значение:
->:Virt
+:Virt
+Вирт.
 :Zero/Max
 Ноль/Макс.
 :\n\nBinding will end in %d seconds...
@@ -357,11 +358,11 @@ USB
 :add
 добавить
 :countdown
-Обр.отсчет
+обр.отсчет
 :disable
-отключить
+выключения
 :enable
-включить
+включения
 :mult
 умножить
 :replace
