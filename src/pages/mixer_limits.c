@@ -31,28 +31,38 @@ void MIXPAGE_EditLimits()
 {
     PAGE_RemoveAllObjects();
     show_titlerow();
+    int y = 40;
     //Row 1
-    GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, _tr("Reverse:"));
-    GUI_CreateTextSelect(64, 40, TEXTSELECT_96, 0x0000, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Reverse:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
+    y += 24;
     //Row 2
-    GUI_CreateLabel(8, 64, NULL, DEFAULT_FONT, _tr("Failsafe:"));
-    GUI_CreateTextSelect(64, 64, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Failsafe:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
+    y += 24;
     //Row 3
-    GUI_CreateLabel(8, 88, NULL, DEFAULT_FONT, _tr("Safety:"));
-    GUI_CreateTextSelect(64, 88, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    GUI_CreateLabel(176, 88, NULL, DEFAULT_FONT, _tr("Value:"));
-    GUI_CreateTextSelect(216, 88, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safety:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+    y += 24;
     //Row 4
-    GUI_CreateLabel(8, 112, NULL, DEFAULT_FONT, _tr("Min:"));
-    GUI_CreateTextSelect(64, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
-    GUI_CreateLabel(176, 112, NULL, DEFAULT_FONT, _tr("Max:"));
-    GUI_CreateTextSelect(216, 112, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safe Val:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+    y += 24;
     //Row 5
-    GUI_CreateLabel(8, 136, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(64, 136, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
+    y += 24;
     //Row 6
-    GUI_CreateLabel(8, 160, NULL, DEFAULT_FONT, _tr("Subtrim:"));
-    GUI_CreateTextSelect(64, 160, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Max:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
+    y += 24;
+    //Row 5
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Scale:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
+    y += 24;
+    //Row 6
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Subtrim:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)

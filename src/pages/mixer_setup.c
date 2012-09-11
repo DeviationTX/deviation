@@ -204,7 +204,7 @@ static void show_expo_dr()
 {
     sync_mixers();
     //Row 1
-    mp->firstObj = GUI_CreateLabel(40, 34, NULL, DEFAULT_FONT, _tr("Src"));
+    mp->firstObj = GUI_CreateLabelBox(COL1_TEXT, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Src"));
     /*
     mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     mp->firstObj = mp->trimObj;
@@ -213,23 +213,23 @@ static void show_expo_dr()
         GUI_SetHidden(mp->trimObj, 1);
     */
 
-    GUI_CreateLabel(132, 34, NULL, DEFAULT_FONT, _tr("Switch1"));
-    GUI_CreateLabel(236, 34, NULL, DEFAULT_FONT, _tr("Switch2"));
+    GUI_CreateLabelBox(112, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
+    GUI_CreateLabelBox(216, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
     //Row 2
     GUI_CreateTextSelect(COL1_TEXT, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
     GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
     GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
-    GUI_CreateLabel(24, 74, NULL, DEFAULT_FONT, _tr("High-Rate"));
+    GUI_CreateLabelBox(COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
     mp->expoObj[0] = GUI_CreateButton(112, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
     mp->expoObj[4] = GUI_CreateButton(216, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
-    mp->expoObj[1] = GUI_CreateLabel(140, 98, NULL, DEFAULT_FONT, _tr("Linked"));
+    mp->expoObj[1] = GUI_CreateLabelBox(112, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
     mp->expoObj[2] = GUI_CreateTextSelect(112, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
     //The following 2 items are mutex.  One is always hidden
-    mp->expoObj[5] = GUI_CreateLabel(244, 98, NULL, DEFAULT_FONT, _tr("Linked"));
+    mp->expoObj[5] = GUI_CreateLabelBox(216, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
     mp->expoObj[6] = GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
     //Row 5
     GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Scale:"));
@@ -260,9 +260,9 @@ static void show_complex()
 {
     //Row 1
     if (! mp->expoObj[0]) {
-        mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, BOLD_FONT, _tr("Mixers:"));
+        mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
         GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
-        GUI_CreateLabel(COL2_TEXT, 40, NULL, BOLD_FONT, _tr("Page:"));
+        GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
         GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
     } else {
         GUI_RemoveHierObjects(mp->expoObj[0]);
