@@ -425,6 +425,14 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
     }
 }
 
+static void tglico_cancel_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_RemoveAllObjects();
+    PAGE_MainCfgInit(1);
+}
+
 void select_toggle_icon(u8 idx)
 {
     long pos = 0;
@@ -434,12 +442,16 @@ void select_toggle_icon(u8 idx)
     PAGE_SetModal(1);
     LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
     u8 count = w / 32;
+    u8 cursel = Model.pagecfg.tglico[idx];
+    PAGE_CreateCancelButton(216, 4, tglico_cancel_cb);
     for(j = 0; j < 5; j++) {
         y = 40 + j * 40;
         for(i = 0; i < 8; i++,pos++) {
             if (pos >= count)
                 break;
             x = 4 + i*40;
+            if (pos == cursel)
+                GUI_CreateRect(x-1, y-1, 34, 33, &outline);
             GUI_CreateImageOffset(x, y, 32, 31, pos * 32, 0, TOGGLE_FILE, tglico_select_cb, (void *)((idx << 8) | pos));
         }
     }
