@@ -99,8 +99,6 @@ u8 MIXER_MapChannel(u8 channel)
     case MODE_3:
        switch(channel) {
        case INP_AILERON:  return INP_RUDDER;
-       case INP_THROTTLE: return INP_ELEVATOR;
-       case INP_ELEVATOR: return INP_THROTTLE;
        case INP_RUDDER:   return INP_AILERON;
        default: return channel;
        }
@@ -108,6 +106,8 @@ u8 MIXER_MapChannel(u8 channel)
     case MODE_4:
        switch(channel) {
        case INP_AILERON:  return INP_RUDDER;
+       case INP_THROTTLE: return INP_ELEVATOR;
+       case INP_ELEVATOR: return INP_THROTTLE;
        case INP_RUDDER:   return INP_AILERON;
        default: return channel;
        }
