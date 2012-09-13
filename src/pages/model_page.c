@@ -70,7 +70,7 @@ void PAGE_ModelInit(int page)
 
     row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Number of Channels:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+    mp->chanObj = GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
 
 
     row += 32;
@@ -167,7 +167,7 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, NUM_OUT_CHANNELS, dir, 1, 1, NULL);
+    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, PROTOCOL_NumChannels(), dir, 1, 1, NULL);
     sprintf(mp->tmpstr, "%d", Model.num_channels);
     return mp->tmpstr;
 }
@@ -185,8 +185,11 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
-    if (changed)
+    if (changed) {
+        Model.num_channels = PROTOCOL_NumChannels();
+        GUI_Redraw(mp->chanObj);
         configure_bind_button();
+    }
     return ProtocolNames[Model.protocol];
 }
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data)

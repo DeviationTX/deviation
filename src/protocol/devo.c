@@ -332,6 +332,7 @@ u32 DEVO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
         case PROTOCMD_BIND:  bind(); return 0;
+        case PROTOCMD_NUMCHAN: return 12;
         default: break;
     }
     return 0;

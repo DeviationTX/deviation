@@ -190,6 +190,7 @@ u32 FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
         case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_NUMCHAN: return 8;
         default: break;
     }
     return 0;

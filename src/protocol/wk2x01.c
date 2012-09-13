@@ -413,6 +413,12 @@ u32 WK2x01_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
         case PROTOCMD_BIND:  bind(); return 0;
+        case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
+                                      ? 8
+                                      : (Model.protocol == PROTOCOL_WK2601)
+                                        ? 6
+                                        : 4;
+
         default: break;
     }
     return 0;

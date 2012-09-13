@@ -149,6 +149,21 @@ void PROTOCOL_Bind()
     #undef PROTODEF
 }
 
+int PROTOCOL_NumChannels()
+{
+    int num_channels = NUM_OUT_CHANNELS;
+    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = cmd(PROTOCMD_NUMCHAN); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default: break;
+    }
+    #undef PROTODEF
+    if (num_channels > NUM_OUT_CHANNELS)
+        num_channels = NUM_OUT_CHANNELS;
+    return num_channels;
+}
+
 void PROTOCOL_CheckDialogs()
 {
     if (PROTOCOL_WaitingForSafe()) {
