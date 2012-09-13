@@ -19,26 +19,28 @@
 #include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
-#define BIND_CHANNEL 0x0d
+#define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
+//During binding we will send BIND_COUNT/2 packets
+//One packet each 10msec
 #ifdef EMULATOR
+#define USE_FIXED_MFGID
 #define BIND_COUNT 2
 #else
-#define BIND_COUNT 200
+#define BIND_COUNT 600
 #endif
-
 enum {
     DSM2_BIND = 0,
-    DSM2_CHANSEL = BIND_COUNT,
-    DSM2_CH1_WRITE_A = 1000,
-    DSM2_CH1_CHECK_A = 1001,
-    DSM2_CH2_WRITE_A = 1002,
-    DSM2_CH2_CHECK_A = 1003,
-    DSM2_CH1_WRITE_B = 1004,
-    DSM2_CH1_CHECK_B = 1005,
-    DSM2_CH2_WRITE_B = 1006,
-    DSM2_CH2_CHECK_B = 1007,
+    DSM2_CHANSEL     = BIND_COUNT + 0,
+    DSM2_CH1_WRITE_A = BIND_COUNT + 1,
+    DSM2_CH1_CHECK_A = BIND_COUNT + 2,
+    DSM2_CH2_WRITE_A = BIND_COUNT + 3,
+    DSM2_CH2_CHECK_A = BIND_COUNT + 4,
+    DSM2_CH1_WRITE_B = BIND_COUNT + 5,
+    DSM2_CH1_CHECK_B = BIND_COUNT + 6,
+    DSM2_CH2_WRITE_B = BIND_COUNT + 7,
+    DSM2_CH2_CHECK_B = BIND_COUNT + 8,
 };
    
 static const u8 pncodes[5][9][8] = {
@@ -133,19 +135,24 @@ static void build_bind_packet()
     packet[9] = sum & 0xff;
     packet[10] = 0x01; //???
     packet[11] = num_channels;
-    packet[12] = 0xa2; //???
+    packet[12] = num_channels < 8 ? 0x01 : 0x02; //FIXME: This changes for DSMX
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)
         sum += packet[i];
     packet[14] = sum >> 8;
     packet[15] = sum & 0xff;
 }
+
 static void build_data_packet(u8 upper)
 {
     u8 i;
     static const u8 chmap[] = {6, 0, 2, 4, 3, 1, 5};
-    packet[0] = 0xff ^ cyrfmfg_id[2];
+    packet[0] = (0xff ^ cyrfmfg_id[2]);
     packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
+#if DSMX
+    packet[0] = cyrfmfg_id[2];
+    packet[1] = cyrfmfg_id[3] + model;
+#endif
     for (i = 0; i < 7; i++) {
        s32 value = (s32)Channels[upper * 7 + i] * 0x200 / CHAN_MAX_VALUE + 0x200;
        if (value > 0x3ff)
@@ -162,11 +169,13 @@ static void build_data_packet(u8 upper)
 static u8 get_pn_row(u8 channel)
 {
     return channel % 5;
+#if DSMX
+    return (channel - 2) % 5;
+#endif
 }
 
 static void cyrf_config()
 {
-    u8 data_code[32];
     CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
     CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
     CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3c);
@@ -219,6 +228,12 @@ static void cyrf_config()
     CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x04); //disable tx CRC
     CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x14); //disable rx crc
     CYRF_WriteRegister(CYRF_14_EOP_CTRL, 0x02); //set EOP sync == 2
+    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10); //16byte packet
+}
+
+void initialize_bind_state()
+{
+    u8 data_code[32];
     CYRF_ConfigRFChannel(BIND_CHANNEL); //This seems to be random?
     u8 pn_row = get_pn_row(BIND_CHANNEL);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", BIND_CHANNEL, pn_row, sop_col, data_col);
@@ -228,7 +243,6 @@ static void cyrf_config()
     memcpy(data_code + 16, pncodes[0][8], 8);
     memcpy(data_code + 24, pn_bind, 8);
     CYRF_ConfigDataCode(data_code, 32);
-    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10); //16byte packet
     build_bind_packet();
 }
 
@@ -262,7 +276,7 @@ static void set_sop_data_crc()
     u8 pn_row = get_pn_row(ch[chidx]);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
     CYRF_ConfigRFChannel(ch[chidx]);
-    CYRF_ConfigCRCSeed(chidx ? crc : ~crc);
+    CYRF_ConfigCRCSeed(chidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
 }
@@ -270,25 +284,28 @@ static void set_sop_data_crc()
 static u16 dsm2_cb()
 {
     if(state < DSM2_CHANSEL) {
+        //Binding
         state += 1;
         if(state & 1) {
+            //Send packet on even states
+            //Note state has already incremented,
+            // so this is actually 'even' state
             CYRF_WriteDataPacket(packet);
             return 8500;
         } else {
+            //Check status on odd states
             CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS);
             return 1500;
         }
     } else if(state < DSM2_CH1_WRITE_A) {
-        //CYRF_WriteDataPacket(packet);
-        //state = DSM2_BIND;
-        //return 10000;
-        CYRF_FindBestChannels(ch, 2, 5, 4, 80);
+        //Select channels and configure for writing data
+        CYRF_FindBestChannels(ch, 2, 10, 1, 79);
         cyrf_configdata();
         CYRF_ConfigRxTx(1);
         chidx = 0;
         set_sop_data_crc();
         state = DSM2_CH1_WRITE_A;
-        PROTOCOL_SetBindState(0);
+        PROTOCOL_SetBindState(0);  //Turn off Bind dialog
         return 10000;
     } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B) {
         build_data_packet(state == DSM2_CH1_WRITE_B);
@@ -348,7 +365,8 @@ static void initialize(u8 bind)
     CYRF_ConfigRxTx(1);
     if (bind) {
         state = DSM2_BIND;
-        PROTOCOL_SetBindState(200 * 10); //msecs
+        PROTOCOL_SetBindState((BIND_COUNT > 200 ? BIND_COUNT / 2 : 200) * 10); //msecs
+        initialize_bind_state();
     } else {
         state = DSM2_CHANSEL;
     }
