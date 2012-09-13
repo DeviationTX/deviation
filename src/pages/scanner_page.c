@@ -45,6 +45,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     sp.enable ^= 1;
     if (sp.enable) {
         DEVO_Cmds(0);  //Switch to DEVO configuration
+        PROTOCOL_SetBindState(0); //Disable binding message
         CLOCK_StopTimer();
         CYRF_ConfigRxTx(0);
         CYRF_ConfigCRCSeed(0);
