@@ -143,12 +143,12 @@ void MIXER_CalcChannels()
 
     //4th step: apply auto-templates
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        switch(Model.template[i]) {
+        switch(Model.templates[i]) {
             case MIXERTEMPLATE_CYC1:
             case MIXERTEMPLATE_CYC2:
             case MIXERTEMPLATE_CYC3:
                 raw[NUM_INPUTS+i+1] = MIXER_CreateCyclicOutput(raw,
-                                             Model.template[i] - MIXERTEMPLATE_CYC1 + 1);
+                                             Model.templates[i] - MIXERTEMPLATE_CYC1 + 1);
                 break;
         }
     }
@@ -338,12 +338,12 @@ void MIXER_RegisterTrimButtons()
 }
 enum TemplateType MIXER_GetTemplate(int ch)
 {
-    return Model.template[ch];
+    return Model.templates[ch];
 };
 
 void MIXER_SetTemplate(int ch, enum TemplateType value)
 {
-    Model.template[ch] = value;
+    Model.templates[ch] = value;
 };
 
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count)
@@ -588,17 +588,17 @@ void MIXER_AdjustForProtocol()
         return;
     int i, ch;
     u8 template[NUM_CHANNELS];
-    memcpy(template, Model.template, sizeof(template));
+    memcpy(template, Model.templates, sizeof(template));
     for(i = 0; i < NUM_MIXERS; i++) {
         if (! Model.mixers[i].src)
             break;
         for(ch = 0; ch < PROTO_MAP_LEN; ch++)
             if (map[ch] == Model.mixers[i].src) {
-                template[ch] = Model.template[Model.mixers[i].dest];
+                template[ch] = Model.templates[Model.mixers[i].dest];
                 Model.mixers[i].dest = ch;
                 break;
             }
     }
-    memcpy(Model.template, template, sizeof(template));
+    memcpy(Model.templates, template, sizeof(template));
     MIXER_SetMixers(NULL, 0);
 }

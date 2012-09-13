@@ -30,6 +30,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
+#include <Fl/fl_ask.H>
 
 extern "C" {
 #include "common.h"
@@ -216,6 +217,13 @@ void close_window(Fl_Widget *widget, void *param)
 {
     (void)widget;
     (void)param;
+    char tmp[256];
+    sprintf(tmp, "%s && %s\n", _tr("Save"), _tr("Exit"));
+    if(0 == fl_choice(" ", tmp, _tr("Exit"), NULL)) {
+        printf("Saving\n");
+        CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
+    }
     exit(0);
 }
 

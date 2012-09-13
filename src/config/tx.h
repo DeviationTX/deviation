@@ -28,6 +28,5 @@ struct Transmitter {
 
 extern struct Transmitter Transmitter;
 void CONFIG_LoadTx();
-void CONFIG_SaveTxIfNeeded();
 
 #endif

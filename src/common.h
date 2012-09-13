@@ -30,6 +30,8 @@ void CONFIG_EnableLanguage(int state);
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
          void* user);
+u8 CONFIG_SaveModelIfNeeded();
+void CONFIG_SaveTxIfNeeded();
 
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);

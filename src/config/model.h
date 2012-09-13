@@ -25,7 +25,7 @@ struct Model {
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_OUT_CHANNELS];
     struct Timer timer[NUM_TIMERS];
-    u8 template[NUM_CHANNELS];
+    u8 templates[NUM_CHANNELS];
     struct PageCfg pagecfg;
     u8 safety[NUM_SOURCES];
 };
@@ -34,7 +34,6 @@ extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
 
 u8 CONFIG_ReadModel(u8 model_num);
 u8 CONFIG_WriteModel(u8 model_num);
-u8 CONFIG_SaveModelIfNeeded();
 u8 CONFIG_GetCurrentModel();
 const char *CONFIG_GetIcon(enum ModelType type);
 const char *CONFIG_GetCurrentIcon();

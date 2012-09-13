@@ -391,7 +391,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if (MATCH_KEY(CHAN_TEMPLATE)) {
             for (i = 0; i < NUM_STR_ELEMS(CHAN_TEMPLATE_VAL); i++) {
                 if (MATCH_VALUE(CHAN_TEMPLATE_VAL[i])) {
-                    m->template[idx] = i;
+                    m->templates[idx] = i;
                     return 1;
                 }
             }
@@ -415,7 +415,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if (MATCH_KEY(VCHAN_TEMPLATE)) {
             for (i = 0; i < NUM_STR_ELEMS(VCHAN_TEMPLATE_VAL); i++) {
                 if (MATCH_VALUE(VCHAN_TEMPLATE_VAL[i])) {
-                    m->template[idx] = i;
+                    m->templates[idx] = i;
                     return 1;
                 }
             }
@@ -695,7 +695,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].max == DEFAULT_SERVO_LIMIT &&
            m->limits[idx].min == DEFAULT_SERVO_LIMIT &&
            m->limits[idx].servoscale == 100 &&
-           m->template[idx] == 0)
+           m->templates[idx] == 0)
         {
             if (write_mixer(fh, m, idx))
                 fprintf(fh, "\n");
@@ -716,16 +716,16 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
             fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
-        if(WRITE_FULL_MODEL || m->template[idx] != 0)
-            fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->template[idx]]);
+        if(WRITE_FULL_MODEL || m->templates[idx] != 0)
+            fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
         write_mixer(fh, m, idx);
         fprintf(fh, "\n");
     }
     for(idx = 0; idx < NUM_VIRT_CHANNELS; idx++) {
-        if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0) {
+        if(WRITE_FULL_MODEL || m->templates[idx+NUM_OUT_CHANNELS] != 0) {
             fprintf(fh, "[%s%d]\n", SECTION_VIRTCHAN, idx+1);
-            if(WRITE_FULL_MODEL || m->template[idx+NUM_OUT_CHANNELS] != 0)
-                fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->template[idx+NUM_OUT_CHANNELS]]);
+            if(WRITE_FULL_MODEL || m->templates[idx+NUM_OUT_CHANNELS] != 0)
+                fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->templates[idx+NUM_OUT_CHANNELS]]);
         }
         if (write_mixer(fh, m, idx+NUM_OUT_CHANNELS))
             fprintf(fh, "\n");
@@ -817,7 +817,7 @@ void clear_model(u8 full)
         memset(&Model, 0, sizeof(Model));
     } else {
         memset(Model.mixers,   0, sizeof(Model.mixers));
-        memset(Model.template, 0, sizeof(Model.template));
+        memset(Model.templates, 0, sizeof(Model.templates));
         memset(Model.trims,    0, sizeof(Model.trims));
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
