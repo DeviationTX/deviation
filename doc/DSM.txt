@@ -38,9 +38,10 @@ dd   : 0xff - mfgid[3] + offset
 eeee : 384 + sum of bytes 0 through 7
 ff   : Unknown (value = 0x01)
 gg   : # of channels being transmitted
-hh   : # of packets (1 if num-channels < 8, 2 if num-channels >= 8)
+hh   : # of packets (1 if num-channels < 8, 2 if num-channels >= 8) for DSM2
 ii   : Unknown (value = 0x00)
 jjjj : eeee + sum of bytes 8 through 13
+The bind channel can be any odd channel between 0x01 and 0x4f
 
 SOP/Data/CRC code selection:
 there is one set of SOP, Data, and CRC codes for each transmit channel.
