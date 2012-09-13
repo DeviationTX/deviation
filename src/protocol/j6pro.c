@@ -23,8 +23,6 @@
 //For Debug
 //#define NO_SCRAMBLE
 
-#define USE_FIXED_MFGID
-
 enum PktState {
     J6PRO_BIND,
     J6PRO_BIND_01,
@@ -136,11 +134,11 @@ static void cyrf_init()
        CYRF_WritePreamble(0x023333);
 #ifndef USE_FIXED_MFGID
        CYRF_GetMfgData(cyrfmfg_id);
-       if (Model.fixedid) {
-           cyrfmfg_id[0] ^= (Model.fixedid >> 0) & 0xff;
-           cyrfmfg_id[1] ^= (Model.fixedid >> 8) & 0xff;
-           cyrfmfg_id[2] ^= (Model.fixedid >> 16) & 0xff;
-           cyrfmfg_id[3] ^= (Model.fixedid >> 24) & 0xff;
+       if (Model.fixed_id) {
+           cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+           cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+           cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+           cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
        }
 #endif
 }
