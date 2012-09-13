@@ -464,7 +464,7 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
     mp->num_mixers = GUI_TextSelectHelper(
                      mp->num_mixers,
                      1 + (mp->cur_mixer - mp->mixer),
-                     1 + sizeof(mp->mixer) / sizeof(struct Mixer),
+                     sizeof(mp->mixer) / sizeof(struct Mixer),
                      dir, 1, 1, &changed);
     if (changed) {
         mp->num_complex_mixers = mp->num_mixers;

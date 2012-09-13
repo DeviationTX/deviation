@@ -20,7 +20,7 @@ struct mixer_page {
     guiObject_t *firstObj;
     guiObject_t *trimObj;
     guiObject_t *expoObj[8];
-    struct Mixer mixer[5];
+    struct Mixer mixer[10];
     struct Mixer *cur_mixer;
     struct Limit limit;
     guiObject_t *graphs[3];
