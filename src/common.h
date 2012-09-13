@@ -126,6 +126,7 @@ void PROTOCOL_CheckDialogs();
 
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);
+const char *INPUT_MapSourceName(u8 idx, u8 *val);
 const char *INPUT_ButtonName(u8 src);
 
 /* Misc */

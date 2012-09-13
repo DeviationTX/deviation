@@ -146,7 +146,9 @@ s8 mapstrcasecmp(const char *s1, const char *s2)
 static u8 get_source(const char *section, const char *value)
 {
     u8 i;
+    u8 val;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
+    const char *tmp;
     char cmp[10];
     for (i = 0; i < NUM_SOURCES; i++) {
         if(mapstrcasecmp(INPUT_SourceName(cmp, i), ptr) == 0) {
@@ -156,6 +158,12 @@ static u8 get_source(const char *section, const char *value)
     for (i = 0; i < 4; i++) {
         if(mapstrcasecmp(tx_stick_names[i], ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | (i + 1);
+        }
+    }
+    i = 0;
+    while((tmp = INPUT_MapSourceName(i++, &val))) {
+        if(mapstrcasecmp(tmp, ptr) == 0) {
+            return ((ptr == value) ? 0 : 0x80) | val;
         }
     }
     printf("%s: Could not parse Source %s\n", section, value);

@@ -90,6 +90,16 @@ const char *INPUT_SourceName(char *str, u8 src)
     return str;
 }
 
+const char *INPUT_MapSourceName(u8 idx, u8 *val)
+{
+    int i = 0;
+    #define CHANMAP(old, new) if(idx == i++) { *val = INP_##new; return INPNAME_##old;}
+    #include "capabilities.h"
+    #undef CHANMAP
+    return NULL;
+}
+
+
 const char *INPUT_ButtonName(u8 button)
 {
     if (! button) {
