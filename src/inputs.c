@@ -81,11 +81,11 @@ const char *INPUT_SourceName(char *str, u8 src)
             #include "capabilities.h"
         };
         #undef CHANDEF
-        sprintf(str, "%s%s", is_neg ? "!" : "", ptr);
+        snprintf(str, 30, "%s%s", is_neg ? "!" : "", ptr);
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
-        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
+        snprintf(str, 30, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     } else {
-        sprintf(str, "%s%d", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
+        snprintf(str, 30, "%s%d", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
     }
     return str;
 }

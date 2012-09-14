@@ -20,7 +20,7 @@
 #include "config/model.h"
 #include "main_config.h"
 
-char str[20];
+char str[30];
 u8 page_num;
 
 #define COL1_VALUE 4

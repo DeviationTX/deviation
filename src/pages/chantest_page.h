@@ -12,7 +12,7 @@ struct chantest_page {
     guiObject_t *bar[NUM_TEST_BARS];
     guiObject_t *value[NUM_VALUES];
     s16 pctvalue[NUM_TEST_BARS];
-    char tmpstr[10];
+    char tmpstr[31];
     struct buttonAction action;
 };
 

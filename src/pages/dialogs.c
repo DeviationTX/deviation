@@ -46,7 +46,7 @@ void PAGE_ShowSafetyDialog()
         } else {
             int i;
             int count = 0;
-            char tmpstr[20];
+            char tmpstr[30];
             const s8 safeval[4] = {0, -100, 0, 100};
             s16 *raw = MIXER_GetInputs();
             u32 crc = Crc(dlgstr, strlen(dlgstr));

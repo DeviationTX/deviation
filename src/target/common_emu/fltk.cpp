@@ -220,7 +220,6 @@ void close_window(Fl_Widget *widget, void *param)
     char tmp[256];
     sprintf(tmp, "%s && %s\n", _tr("Save"), _tr("Exit"));
     if(0 == fl_choice(" ", tmp, _tr("Exit"), NULL)) {
-        printf("Saving\n");
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
     }
