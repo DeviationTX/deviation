@@ -97,6 +97,7 @@
 Цикл2
 :Cyclic3
 Цикл3
+>:DR
 :Default
 Умолчание
 :Deviation FW\nversion: 

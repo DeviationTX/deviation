@@ -43,8 +43,10 @@ AIL
 AIL DR
 :AIL Inv:
 Csűrés inv.:
->:AUX4
->:AUX5
+:AUX4
+AUX4
+:AUX5
+AUX5
 :Airplane
 Repülőgép
 :Backlight:
@@ -97,6 +99,7 @@ Ciklikus1
 Ciklikus2
 :Cyclic3
 Ciklikus3
+>:DR
 :Default
 Default
 :Deviation FW\nversion: 
@@ -179,7 +182,8 @@ Közepes
 Min/Max
 :Min:
 Min:
->:Mixer
+:Mixer
+Mixer
 :Mixers:
 Mixerek:
 :Mode %d
@@ -240,7 +244,8 @@ Invertálás:
 Inverz
 :Right
 Jobb
->:Safe Val:
+:Safe Val:
+Bizt. érték:
 :Safety
 Biztonsági ellenőrzés
 :Safety:
@@ -355,7 +360,8 @@ Ismeretlen
 Fel
 :Value:
 Érték:
->:Virt
+:Virt
+Virt.
 :Zero/Max
 Nulla/Max
 :\n\nBinding will end in %d seconds...
