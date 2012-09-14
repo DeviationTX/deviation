@@ -134,3 +134,7 @@ $(ODIR)/hgstamp:
 # recompile if the Makefile changes
 $(OBJS): Makefile target/$(TARGET)/Makefile.inc
 
+release:
+	make TARGET=devo8 TYPE=prd
+	make TARGET=devo6 TYPE=prd
+	make TARGET=emu_devo8 TYPE=prd

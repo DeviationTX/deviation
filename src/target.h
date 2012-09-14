@@ -79,6 +79,10 @@ void CLOCK_StopTimer();
 void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
 
+/*PWM/PPM functions */
+void PWM_Initialize();
+void PPM_Enable(u16 low_time, volatile u16 *pulses);
+
 /* Sticks */
 void CHAN_Init();
 s16  CHAN_ReadInput(int channel);

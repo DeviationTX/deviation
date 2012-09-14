@@ -156,3 +156,12 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
             break;
     }
 }
+
+void PWM_Initialize() {}
+void PPM_Enable(u16 low_time, volatile u16 *pulses) {
+    int i;
+    printf("PPM: low=%d ", (int)low_time);
+    for(i = 0; pulses[i]; i++)
+        printf("%04d ", pulses[i]);
+    printf("\n");
+}
