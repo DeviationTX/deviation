@@ -311,18 +311,18 @@ static u16 dsm2_cb()
         build_data_packet(state == DSM2_CH1_WRITE_B);
         CYRF_WriteDataPacket(packet);
         state++;
-        return 2000;
+        return 2190;
     } else if(state == DSM2_CH2_WRITE_A || state == DSM2_CH2_WRITE_B) {
         CYRF_WriteDataPacket(packet);
         state++;
-        return 2000;
+        return 2190;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
         while(! (CYRF_ReadRegister(0x04) & 0x02))
             ;
         chidx = !chidx;
         set_sop_data_crc();
         state++;
-        return 2000;
+        return 1820;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
         while(! (CYRF_ReadRegister(0x04) & 0x02))
             ;
@@ -331,7 +331,7 @@ static u16 dsm2_cb()
         if (state == DSM2_CH2_CHECK_A) {
             if (num_channels < 8) {
                 state = DSM2_CH1_WRITE_A;
-                return 22000 - 6000;
+                return 15800;
             }
             state = DSM2_CH1_WRITE_B;
             return 11000 - 6000;
