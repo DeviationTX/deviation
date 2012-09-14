@@ -84,7 +84,7 @@ void CYRF_GetMfgData(u8 data[]) {
 
 void CYRF_StartReceive() {}
 void CYRF_ConfigCRCSeed(u16 crc) {
-    printf("CRC: %02x %02x\n", crc & 0xff, crc >> 8);
+    printf("CRC: LSB=%02x MSB=%02x\n", crc & 0xff, crc >> 8);
 }
 void CYRF_ConfigSOPCode(const u8 *sopcodes) {
     int i;

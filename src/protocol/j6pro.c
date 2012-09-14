@@ -63,13 +63,14 @@ static const u8 sopcodes[][8] = {
     {0x9E, 0x82, 0xDC, 0x3C, 0xA1, 0x78, 0xDC, 0x3C},
     {0x6F, 0x65, 0x18, 0x74, 0xB9, 0x8E, 0x19, 0x74},
 };
-#define USE_FIXED_MFGID
+
 static enum PktState state;
 static u8 packet[16];
 static u8 radio_ch[4];
 static u8 num_channels;
 #ifdef USE_FIXED_MFGID
-static const u8 cyrfmfg_id[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
+//static const u8 cyrfmfg_id[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
+static const u8 cyrfmfg_id[6] = {0x49, 0xec, 0xa9, 0xc4, 0xc1, 0xff};
 #else
 static u8 cyrfmfg_id[6];
 #endif
@@ -169,7 +170,7 @@ static void cyrf_datainit()
 /* Use when already bound */
        //0.094007# 0f 05
        u8 sop_idx = (0xff & (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[5])) % 19;
-       u8 crc =  (0xff & (cyrfmfg_id[1] - cyrfmfg_id[4] + cyrfmfg_id[5])) |
+       u16 crc =  (0xff & (cyrfmfg_id[1] - cyrfmfg_id[4] + cyrfmfg_id[5])) |
                 ((0xff & (cyrfmfg_id[2] + cyrfmfg_id[3] - cyrfmfg_id[4] + cyrfmfg_id[5])) << 8);
        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
        CYRF_ConfigSOPCode(sopcodes[sop_idx]);
@@ -255,6 +256,7 @@ static u16 j6pro_cb()
             CYRF_SetPower(Model.tx_power);
             set_radio_channels();
             cyrf_datainit();
+            state = J6PRO_CHAN_1;
         case J6PRO_CHAN_1:
             build_data_packet();
             //return 3400;
