@@ -43,8 +43,10 @@
 Элер ДР
 :AIL Inv:
 Элер Инв:
->:AUX4
->:AUX5
+:AUX4
+AUX4
+:AUX5
+AUX5
 :Airplane
 Самолет
 :Backlight:
@@ -68,7 +70,7 @@
 :COL
 Колл
 :COL Inv:
-КОЛЛ Инв:
+Колл Инв:
 :CYC
 Цикл
 :Calibrate
@@ -97,7 +99,8 @@
 Цикл2
 :Cyclic3
 Цикл3
->:DR
+:DR
+ДР
 :Default
 Умолчание
 :Deviation FW\nversion: 
@@ -216,6 +219,7 @@ OK
 Выкл.
 :Offset:
 Смещ.:
+>:On
 :Page:
 Стр.:
 :Point:
@@ -224,6 +228,7 @@ OK
 +
 :Pos/Neg:
 +/-:
+>:Press 'Ent' to turn USB Filesystem: 
 :Protocol:
 Протокол:
 :RIGHT_H
@@ -349,8 +354,6 @@ OK
 Мощность:
 :USB
 USB
-:USB File System is disabled\nPress 'Ent' to 
-\nФайловая система USB отключена.\nПри включении передатчика\nнажмите 'ENT' для 
 :USB Storage mode, press 'ENT' to exit.
 Режим USB, нажмите 'ENT' для выхода.
 :Unknown
@@ -362,17 +365,13 @@ USB
 :Virt
 Вирт.
 :Zero/Max
-Ноль/Макс.
+Ноль/Макс
 :\n\nBinding will end in %d seconds...
 \n\nПривязка завершится через %d секунд...
 :add
 добавить
 :countdown
 обр.отсчет
-:disable
-выключения
-:enable
-включения
 :mult
 умножить
 :replace

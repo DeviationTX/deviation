@@ -218,6 +218,7 @@ OK
 Ki
 :Offset:
 Eltolás:
+>:On
 :Page:
 Oldal:
 :Point:
@@ -226,6 +227,7 @@ Pont:
 Poz.
 :Pos/Neg:
 Poz/Neg:
+>:Press 'Ent' to turn USB Filesystem: 
 :Protocol:
 Protokol:
 :RIGHT_H
@@ -351,8 +353,6 @@ Bekapcsol
 Kimenő teljesítmény:
 :USB
 USB
-:USB File System is disabled\nPress 'Ent' to 
-\nAz USB fájlrendszer letiltva\nNyomjon 'ENT'-t az 
 :USB Storage mode, press 'ENT' to exit.
 USB mód, a kilépéshez nyomja meg az 'ENT'-t!
 :Unknown
@@ -371,10 +371,6 @@ Nulla/Max
 hozzáad
 :countdown
 Időzítő
-:disable
-letiltáshoz
-:enable
-engedélyezéshez
 :mult
 szoroz
 :replace

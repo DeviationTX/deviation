@@ -26,7 +26,7 @@ static void draw_page(u8 enable)
 
     sprintf(up->tmpstr, "%s%s\n%s%s",
             _tr("Deviation FW\nversion: "), DeviationVersion,
-            _tr("Press 'Ent' to turn USB Filesyatem: "),
+            _tr("Press 'Ent' to turn USB Filesystem: "),
             enable == 0 ? _tr("On") : _tr("Off"));
     GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
 }

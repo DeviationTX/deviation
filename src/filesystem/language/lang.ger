@@ -207,6 +207,7 @@ OK
 Aus
 :Offset:
 Offset:
+>:On
 :Page:
 Seite:
 :Point:
@@ -215,6 +216,7 @@ Punkt:
 +
 :Pos/Neg:
 +/-:
+>:Press 'Ent' to turn USB Filesystem: 
 :Protocol:
 Protokoll:
 :RIGHT_H
@@ -338,8 +340,6 @@ Einschalten
 Sendeleistung:
 :USB
 USB
-:USB File System is disabled\nPress 'Ent' to 
-USB Dateisystem deaktiviert\nDrücke 'ENT' zum
 :USB Storage mode, press 'ENT' to exit.
 USB Modus, drücke 'ENT' zum beenden.
 :Unknown
@@ -357,10 +357,6 @@ Null/Max
 +
 :countdown
 Countdown
-:disable
-deaktivieren
-:enable
-aktivieren
 :mult
 *
 :replace

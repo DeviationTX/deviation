@@ -214,6 +214,7 @@ OK
 Off
 :Offset:
 Offset:
+>:On
 :Page:
 Page:
 :Point:
@@ -222,6 +223,7 @@ Point:
 Pos.
 :Pos/Neg:
 Pos./Neg.:
+>:Press 'Ent' to turn USB Filesystem: 
 :Protocol:
 Protocole:
 :RIGHT_H
@@ -345,8 +347,6 @@ Activer
 Puissance TX:
 :USB
 USB
-:USB File System is disabled\nPress 'Ent' to 
-Gestion USB désactivée \nAppuyer sur 'ENT' pour
 :USB Storage mode, press 'ENT' to exit.
 Mode de stockage USB, appuyer sur 'ENT' pour sortir.
 :Unknown
@@ -364,10 +364,6 @@ Valeur:
 Ajouter
 :countdown
 Décompte
-:disable
-Désactiver
-:enable
-Activer
 :mult
 Mult.
 :replace
