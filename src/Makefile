@@ -134,7 +134,16 @@ $(ODIR)/hgstamp:
 # recompile if the Makefile changes
 $(OBJS): Makefile target/$(TARGET)/Makefile.inc
 
+zip: $(TARGET).dfu
+	mv $(TARGET).dfu deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).zip
+	zip --move deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+
+fs:
+	ver=`echo $(HGVERSION) | sed -e 's/$(TARGET)-//'`; rm -f deviation-filesystem-$$ver.zip; zip -r deviation-filesystem-$$ver.zip filesystem
+	
 release:
-	make TARGET=devo8 TYPE=prd
-	make TARGET=devo6 TYPE=prd
-	make TARGET=emu_devo8 TYPE=prd
+	make TARGET=devo8 TYPE=prd zip
+	make TARGET=devo6 TYPE=prd zip
+	make fs
+	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
