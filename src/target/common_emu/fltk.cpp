@@ -30,7 +30,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
-#include <Fl/fl_ask.H>
+#include <FL/fl_ask.H>
 
 extern "C" {
 #include "common.h"
