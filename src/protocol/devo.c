@@ -304,7 +304,7 @@ static void initialize()
     radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
-    num_channels = 8;
+    num_channels = ((Model.num_channels + 3) >> 2) * 4;
     pkt_num = 0;
     ch_idx = 0;
     txState = 0;
