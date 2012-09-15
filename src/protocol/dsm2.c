@@ -103,7 +103,7 @@ static const u8 pncodes[5][9][8] = {
 };
 static const u8 pn_bind[] = { 0xc6,0x94,0x22,0xfe,0x48,0xe6,0x57,0x4e };
 u8 packet[16];
-u8 ch[2];
+u8 channels[2];
 u8 chidx;
 u8 sop_col;
 u8 data_col;
@@ -273,9 +273,9 @@ static void cyrf_configdata()
 
 static void set_sop_data_crc()
 {
-    u8 pn_row = get_pn_row(ch[chidx]);
+    u8 pn_row = get_pn_row(channels[chidx]);
     //printf("Ch: %d Row: %d SOP: %d Data: %d\n", ch[chidx], pn_row, sop_col, data_col);
-    CYRF_ConfigRFChannel(ch[chidx]);
+    CYRF_ConfigRFChannel(channels[chidx]);
     CYRF_ConfigCRCSeed(chidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
@@ -299,7 +299,7 @@ static u16 dsm2_cb()
         }
     } else if(state < DSM2_CH1_WRITE_A) {
         //Select channels and configure for writing data
-        CYRF_FindBestChannels(ch, 2, 10, 1, 79);
+        //CYRF_FindBestChannels(ch, 2, 10, 1, 79);
         cyrf_configdata();
         CYRF_ConfigRxTx(1);
         chidx = 0;
@@ -355,6 +355,10 @@ static void initialize(u8 bind)
        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
    }
 #endif
+    channels[0] = (cyrfmfg_id[0] + cyrfmfg_id[2] + cyrfmfg_id[4]
+                   + ((Model.fixed_id >> 0) & 0xff) + ((Model.fixed_id >> 16) & 0xff)) % 39 + 1;
+    channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
+                   + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
