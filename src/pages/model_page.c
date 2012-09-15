@@ -42,6 +42,13 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     return (const char *)data;
 }
 
+const char *show_bindtext_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return PROTOCOL_AutoBindEnabled() ? _tr("Re-Init") : _tr("Bind");
+}
+
 void PAGE_ModelInit(int page)
 {
     (void)page;
@@ -84,7 +91,7 @@ void PAGE_ModelInit(int page)
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
     GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
-    mp->obj = GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, bind_cb, _tr("Bind"));
+    mp->obj = GUI_CreateButton(236, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
     configure_bind_button();
 }
 
@@ -132,12 +139,16 @@ static void bind_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    PROTOCOL_Bind();
+    if (PROTOCOL_AutoBindEnabled())
+        PROTOCOL_Init(0);
+    else
+        PROTOCOL_Bind();
 }
 
 static void configure_bind_button()
 {
-    GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
+    GUI_Redraw(mp->obj);
+    //GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
 }
 
 /* Text Select Callback */

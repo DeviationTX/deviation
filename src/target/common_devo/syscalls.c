@@ -140,7 +140,10 @@ int _write_r (struct _reent *r, int fd, char * ptr, int len)
     (void)r;
     if(fd==1 || fd==2) {
         int index;
-  
+
+        if (0 == (USART_CR1(USART1) & USART_CR1_UE))
+            return len; //Don't send if USART is disabled
+
         for(index=0; index<len; index++) {
             if (ptr[index] == '\n') {
                 usart_send_blocking(USART1,'\r');

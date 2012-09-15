@@ -57,7 +57,7 @@ static void calibrate_sticks(void)
 {
     int i;
     struct touch t1;
-    CLOCK_StopTimer();
+    PROTOCOL_DeInit();
 
     while(SPITouch_IRQ()) {
         CLOCK_ResetWatchdog();

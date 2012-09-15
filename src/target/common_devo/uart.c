@@ -43,3 +43,7 @@ void UART_Initialize()
     usart_enable(USART1);
 }
 
+void UART_Stop()
+{
+    usart_disable(USART1);
+}

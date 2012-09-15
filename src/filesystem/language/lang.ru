@@ -234,6 +234,7 @@ OK
 РНапр
 :RUD DR
 РНапр ДР
+>:Re-Init
 :Reset
 Сброс
 :Reverse:

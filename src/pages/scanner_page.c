@@ -44,6 +44,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     (void)data;
     sp.enable ^= 1;
     if (sp.enable) {
+        PROTOCOL_DeInit();
         DEVO_Cmds(0);  //Switch to DEVO configuration
         PROTOCOL_SetBindState(0); //Disable binding message
         CLOCK_StopTimer();
@@ -52,7 +53,6 @@ static void press_cb(guiObject_t *obj, const void *data)
         CLOCK_StartTimer(1250, scan_trigger_cb);
         //CYRF_ConfigSOPCode(0);
     } else {
-        CLOCK_StopTimer();
         PROTOCOL_Init(0);
     }
     GUI_Redraw(obj);

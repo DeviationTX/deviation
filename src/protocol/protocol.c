@@ -50,6 +50,7 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
 
 void PROTOCOL_Init(u8 force)
 {
+    PROTOCOL_DeInit();
     proto_state = 0;
     if (! force && PROTOCOL_CheckSafe()) {
         return;
@@ -70,6 +71,7 @@ void PROTOCOL_Init(u8 force)
 void PROTOCOL_DeInit()
 {
     CLOCK_StopTimer();
+    PWM_Stop();
     proto_state = PROTO_READY;
 }
 

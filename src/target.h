@@ -81,6 +81,8 @@ void CLOCK_ResetWatchdog();
 
 /*PWM/PPM functions */
 void PWM_Initialize();
+void PWM_Stop();
+void PWM_Set(int);
 void PPM_Enable(u16 low_time, volatile u16 *pulses);
 
 /* Sticks */
@@ -107,6 +109,7 @@ void SOUND_Stop();
 
 /* UART & Debug */
 void UART_Initialize();
+void UART_Stop();
 
 /* USB*/
 void USB_Enable(u8 use_interrupt);
