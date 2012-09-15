@@ -49,6 +49,7 @@ static const char const *sections[] = {
     "alarm2",
     "batt_alarm",
     "done_binding",
+    "timer_warning",
 };
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))

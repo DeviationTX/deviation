@@ -72,6 +72,7 @@ enum Music {
     MUSIC_ALARM2,
     MUSIC_BATT_ALARM,
     MUSIC_DONE_BINDING,
+    MUSIC_TIMER_WARNING,
 };
 void MUSIC_Play(enum Music music);
 

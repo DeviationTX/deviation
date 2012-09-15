@@ -17,6 +17,7 @@
 #include "timer.h"
 #include "config/model.h"
 
+#define BEEP_INTERVAL 60000 // 60 seconds
 static u8 timer_state[NUM_TIMERS];
 static s32 timer_val[NUM_TIMERS];
 static s32 last_time[NUM_TIMERS];
@@ -97,6 +98,21 @@ void TIMER_Update()
             if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {
+                s32 warn_time;
+                // Beep 1 for each second at the last 15 seconds
+                if (timer_val[i] > 1000 && timer_val[i] < 16000) {
+                    warn_time = ((timer_val[i] / 1000) * 1000);
+                    if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
+                        MUSIC_Play(MUSIC_TIMER_WARNING);
+                    }
+                }
+                // Beep 1 for each minute past 0
+                if (timer_val[i] < 0) {
+                    warn_time = ((timer_val[i] - BEEP_INTERVAL) / BEEP_INTERVAL) * BEEP_INTERVAL;
+                    if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
+                        MUSIC_Play(MUSIC_TIMER_WARNING);
+                    }
+                }
                 if (timer_val[i] > 0 && timer_val[i] < delta) {
                     MUSIC_Play(MUSIC_ALARM1 + i);
                 }
