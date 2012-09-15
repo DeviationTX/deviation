@@ -10,12 +10,11 @@ map$
 src/objs
 src/push
 push
-.o$
+glob:*.o
 utils/midicsv/csvmidi
 utils/midicsv/midicsv
-.cproject
-.project
-/objs/
+#.cproject
+#.project
 ^local/
 src/filesystem/models/
 src/filesystem/tx.ini
