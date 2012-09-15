@@ -26,15 +26,16 @@ static void draw_page(u8 enable)
 
     sprintf(up->tmpstr, "%s%s\n%s%s",
             _tr("Deviation FW\nversion: "), DeviationVersion,
-            _tr("USB File System is disabled\nPress 'Ent' to "),
-            enable == 0 ? _tr("enable") : _tr("disable"));
-    GUI_CreateLabel(100, 80, NULL, DEFAULT_FONT, up->tmpstr);
+            _tr("Press 'Ent' to turn USB Filesyatem: "),
+            enable == 0 ? _tr("On") : _tr("Off"));
+    GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
 }
 
 static void wait_press()
 {
     printf("Wait Press\n");
     while(1) {
+        CLOCK_ResetWatchdog();
         u32 buttons = ScanButtons();
         if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
             break;
@@ -48,6 +49,7 @@ static void wait_release()
 {
     printf("Wait Release\n");
     while(1) {
+        CLOCK_ResetWatchdog();
         u32 buttons = ScanButtons();
         if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
             break;
