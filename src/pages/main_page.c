@@ -50,6 +50,8 @@ void PAGE_MainInit(int page)
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
+          | CHAN_ButtonMask(BUT_EXIT)
+          | CHAN_ButtonMask(BUT_LEFT)
           | CHAN_ButtonMask(BUT_LEFT)
           | CHAN_ButtonMask(BUT_RIGHT)
           | CHAN_ButtonMask(BUT_UP)
@@ -264,6 +266,10 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             mp->ignore_release = 1;
             GUI_SetSelected(mp->optsObj);
+        }else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            mp->ignore_release = 1;
+            TIMER_Reset(0);
+            TIMER_Reset(1);
         } else {
             MIXER_UpdateTrim(button, flags, data);
         }
