@@ -365,7 +365,8 @@ int compact_mixers() {
     u8 i = 0;
     u8 j;
     while(i < max) {
-        if(! MIXER_SRC(Model.mixers[i].src)) {
+        u8 src = MIXER_SRC(Model.mixers[i].src);
+        if(! src || Model.templates[Model.mixers[i].dest] == 0) {
             //Found an empty space so move all following mixers down 1 and decrease max
             for (j = i + 1; j < max; j++) {
                 Model.mixers[j - 1] = Model.mixers[j];
@@ -376,6 +377,8 @@ int compact_mixers() {
             i++;
         }
     }
+    //Zero outunused mixers
+    memset(Model.mixers + max, 0, sizeof(struct Mixer) * (NUM_MIXERS - max));
     return i;
 }
 

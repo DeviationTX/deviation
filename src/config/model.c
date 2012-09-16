@@ -150,7 +150,7 @@ static u8 get_source(const char *section, const char *value)
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     const char *tmp;
     char cmp[10];
-    for (i = 0; i < NUM_SOURCES; i++) {
+    for (i = 0; i <= NUM_SOURCES; i++) {
         if(mapstrcasecmp(INPUT_SourceName(cmp, i), ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | i;
         }
