@@ -53,7 +53,7 @@ struct Transmitter Transmitter;
 static s16 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
 static u8 switch_is_on(u8 sw, s16 *raw);
-static s16 get_trim(u8 src);
+static s32 get_trim(u8 src);
 
 static s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum);
 
@@ -230,7 +230,7 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
 
 void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
 {
-    s16 value;
+    s32 value;
     if (! MIXER_SRC(mixer->src))
         return;
     if (! switch_is_on(mixer->sw, raw)) {
@@ -266,12 +266,18 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     if (mixer->apply_trim)
         value = value + get_trim(MIXER_SRC(mixer->src));
 
+    //Ensure we don't overflow
+    if (value > INT16_MAX)
+        value = INT16_MAX;
+    else if (value < INT16_MIN)
+        value = INT16_MIN;
+
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags)
 {
-    s16 value = raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
+    s32 value = raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
     if (channel >= NUM_OUT_CHANNELS)
         return value;
 
@@ -288,11 +294,16 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask 
             value = PCT_TO_RANGE(limit->max);
         else if( value < PCT_TO_RANGE(-(int)limit->min))
             value = PCT_TO_RANGE(-(int)limit->min);
-    }
+    } else {
+        if (value > INT16_MAX)
+            value = INT16_MAX;
+        else if (value < INT16_MIN)
+            value = INT16_MIN;
+    }      
     return value;
 }
 
-s16 get_trim(u8 src)
+s32 get_trim(u8 src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
