@@ -24,7 +24,7 @@ static char strings[4096];
 #define MAX_LINE 300
 
 #define dbg_printf if(0) printf
-struct str_map {
+static struct str_map {
     u16 hash;
     u16 pos;
 } lookupmap[MAX_STRINGS];
@@ -110,6 +110,10 @@ void CONFIG_ReadLang(u8 idx)
         u16 hash;
         if(line[0] == ':') {
             fix_crlf(line+1);
+            if (lookup - lookupmap == MAX_STRINGS - 1) {
+                printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
+                break;
+            }
             hash = fnv_16_str(line + 1);
             dbg_printf("%d: %s\n", hash, line);
             if (fgets(line, sizeof(line), fh) == NULL) {
@@ -125,7 +129,7 @@ void CONFIG_ReadLang(u8 idx)
             lookup->hash = hash;
             lookup->pos = pos;
             lookup++;
-            strncpy(strings + pos, line, sizeof(line));
+            strncpy(strings + pos, line, len);
             pos += len + 1;
         }
     }
