@@ -99,7 +99,8 @@ Ciklikus1
 Ciklikus2
 :Cyclic3
 Ciklikus3
->:DR
+:DR
+DR
 :Default
 Default
 :Deviation FW\nversion: 
@@ -218,7 +219,8 @@ OK
 Ki
 :Offset:
 Eltolás:
->:On
+:On
+Be
 :Page:
 Oldal:
 :Point:
@@ -227,7 +229,8 @@ Pont:
 Poz.
 :Pos/Neg:
 Poz/Neg:
->:Press 'Ent' to turn USB Filesystem: 
+:Press 'Ent' to turn USB Filesystem: 
+/nNyomjon 'ENT'-t, hogy az USB:
 :Protocol:
 Protokol:
 :RIGHT_H
@@ -238,7 +241,8 @@ JOBB_F
 RUD
 :RUD DR
 RUD DR
->:Re-Init
+:Re-Init
+Csatol
 :Reset
 Törlés
 :Reverse:
