@@ -117,13 +117,14 @@ enum TxPower {
 void PROTOCOL_Init(u8 force);
 void PROTOCOL_DeInit();
 u8 PROTOCOL_WaitingForSafe();
-u32 PROTOCOL_CheckSafe();
+u64 PROTOCOL_CheckSafe();
 u32 PROTOCOL_Binding();
 u8 PROTOCOL_AutoBindEnabled();
 void PROTOCOL_Bind();
 void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
 void PROTOCOL_CheckDialogs();
+int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);

@@ -519,12 +519,19 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
     }
     if (MATCH_START(section, SECTION_SAFETY)) {
-        u8 src = get_source(section, name);
-        if(src) {
+        int found = 0;
+        u8 src;
+        if (MATCH_KEY("auto")) {
+            src = 0;
+            found = 1;
+        } else {
+            src = get_source(section, name);
+        }
+        if(found || src) {
             u8 i;
             for (i = 0; i < NUM_STR_ELEMS(SAFETY_VAL); i++) {
                 if (MATCH_VALUE(SAFETY_VAL[i])) {
-                    m->safety[src-1] = i;
+                    m->safety[src] = i;
                     return 1;
                 }
             }
@@ -767,9 +774,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
     }
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(i = 0; i < NUM_SOURCES; i++) {
+    for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
-            fprintf(fh, "%s=%s\n", INPUT_SourceName(file, i + 1), SAFETY_VAL[m->safety[i]]);
+            fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceName(file, i), SAFETY_VAL[m->safety[i]]);
         }
     }
     fprintf(fh, "[%s]\n", SECTION_GUI_QVGA);

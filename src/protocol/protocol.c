@@ -105,23 +105,44 @@ void PROTOCOL_SetBindState(u32 msec)
     }
 }
 
-u32 PROTOCOL_CheckSafe()
+int PROTOCOL_MapChannel(int input, int default_ch)
+{
+    int i;
+    if (ProtocolChannelMap[Model.protocol]) {
+        for(i = 0; i < PROTO_MAP_LEN; i++) {
+            if (ProtocolChannelMap[Model.protocol][i] == input) {
+                default_ch = NUM_INPUTS + i;
+                break;
+            }
+        }
+    }
+    return default_ch;
+}
+
+u64 PROTOCOL_CheckSafe()
 {
     int i;
     s16 *raw = MIXER_GetInputs();
-    u32 unsafe = 0;
-    for(i = 0; i < NUM_SOURCES; i++) {
+    u64 unsafe = 0;
+    for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! Model.safety[i])
             continue;
-        s16 val = RANGE_TO_PCT((i < NUM_INPUTS)
-                      ? raw[i+1]
-                      : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
+        int ch;
+        if (i == 0) {
+            //Auto mode (choose 'THR' channel (or CH3)
+            ch = PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2);
+        } else {
+            ch = i-1;
+        }
+        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+                      ? raw[ch+1]
+                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
         if (Model.safety[i] == SAFE_MIN && val > -99)
-            unsafe |= 1 << i;
+            unsafe |= 1LL << i;
         else if (Model.safety[i] == SAFE_ZERO && (val < -1 || val > 1))
-            unsafe |= 1 << i;
+            unsafe |= 1LL << i;
         else if (Model.safety[i] == SAFE_MAX && val < 99)
-            unsafe |= 1 << i;
+            unsafe |= 1LL << i;
     }
     return unsafe;
 }

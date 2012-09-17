@@ -38,7 +38,7 @@ static void safety_ok_cb(u8 state, void * data)
 void PAGE_ShowSafetyDialog()
 {
     if (dialog) {
-        u32 unsafe = PROTOCOL_CheckSafe();
+        u64 unsafe = PROTOCOL_CheckSafe();
         if (! unsafe) {
             GUI_RemoveObj(dialog);
             dialog = NULL;
@@ -51,14 +51,16 @@ void PAGE_ShowSafetyDialog()
             s16 *raw = MIXER_GetInputs();
             u32 crc = Crc(dlgstr, strlen(dlgstr));
             dlgstr[0] = 0;
-            for(i = 0; i < NUM_SOURCES; i++) {
-                if (! (unsafe & (1 << i)))
+            for(i = 0; i < NUM_SOURCES + 1; i++) {
+                if (! (unsafe & (1LL << i)))
                     continue;
-                s16 val = RANGE_TO_PCT((i < NUM_INPUTS)
-                              ? raw[i+1]
-                              : MIXER_GetChannel(i - (NUM_INPUTS), APPLY_SAFETY));
+                int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
+              
+                s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+                              ? raw[ch+1]
+                              : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
                 sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, safe value = %d%%\n"),
-                        INPUT_SourceName(tmpstr, i + 1),
+                        INPUT_SourceName(tmpstr, ch + 1),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
                     break;
