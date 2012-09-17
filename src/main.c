@@ -135,6 +135,15 @@ void EventLoop()
 {
     CLOCK_ResetWatchdog();
 
+#ifdef HEAP_DEBUG
+    static int heap = 0;
+    int h = _sbrk_r(NULL, 0);
+    if(h > heap) {
+        printf("heap: %x\n", h);
+        heap = h;
+    }
+#endif
+
     if(PWR_CheckPowerSwitch()) {
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();

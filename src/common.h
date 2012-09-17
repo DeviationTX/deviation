@@ -5,11 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#if (! defined BUILDTYPE_DEV)
-  //Use this instead of printf(args...) because this will avoid
-  //compile warnings
-  #define printf if(0) printf
-#endif
+#include "std.h"
+
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
