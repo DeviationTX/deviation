@@ -15,13 +15,16 @@
 4 innen
 :4 Outside
 4 außen
->:4Ch w/ Dual-Rates
+:4Ch w/ Dual-Rates
+4K mit DR
 :5 Point
 5 Punkt
 :6 Trims
 6 Trimmungen
->:6Ch Airplane
->:6Ch Helicopter
+:6Ch Airplane
+6-Kanal Flugzeug
+:6Ch Helicopter
+6-Kanal Heli
 :7 Point
 7 Punkt
 :8 Bars
@@ -38,14 +41,13 @@ Absolut
 QUE
 :AIL DR
 QUE DR
-:AIL Inv:
-FIXME
+>:AIL Inv:
 >:AUX4
 >:AUX5
 :Airplane
 Flugzeug
 :Backlight:
-Hintergrundbeleuchtung:
+Helligkeit:
 :Bar %d:
 Balken %d:
 :Bars:
@@ -76,7 +78,7 @@ Zentriere alle Stick, tippe dann auf den Bildschirm.
 :Ch
 K
 :Change
-Wechseln
+Wählen
 :Channels
 Kanäle
 :Complex
@@ -98,9 +100,9 @@ Deviation FW\nVersion:
 :Down
 Runter
 :ELE
-HÖH
+HOE
 :ELE DR
-HÖH DR
+HOE DR
 :ELE Inv:
 FIXME
 :EXPO
@@ -130,10 +132,11 @@ Fixe ID:
 :GEAR
 FAHR
 :Helicopter
-Hubschrauber
+Heli
 :High-Rate
 Hoch
->:Icon
+:Icon
+Bild
 :Input:
 Eingabe:
 :Inputs
@@ -207,7 +210,8 @@ OK
 Aus
 :Offset:
 Offset:
->:On
+:On
+Ein
 :Page:
 Seite:
 :Point:
@@ -216,7 +220,8 @@ Punkt:
 +
 :Pos/Neg:
 +/-:
->:Press 'Ent' to turn USB Filesystem: 
+:Press 'Ent' to turn USB Filesystem: 
+'Ent' schaltet USB-Verbindung: 
 :Protocol:
 Protokoll:
 :RIGHT_H
@@ -227,7 +232,8 @@ RECHTS_V
 RUD
 :RUD DR
 RUD DR
->:Re-Init
+:Re-Init
+Neu binden
 :Reset
 Reset
 :Reverse:
@@ -325,11 +331,11 @@ Antippen zum entsperren
 :Trim
 Trimmung
 :Trim +:
-Trimmung +:
+Trim +:
 :Trim -:
-Trimmung -:
+Trim -:
 :Trim Step:
-Trimmschritt:
+Schritt:
 :Trims:
 Trimmung:
 :Turn Off
