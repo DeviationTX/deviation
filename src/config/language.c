@@ -120,7 +120,7 @@ void CONFIG_ReadLang(u8 idx)
                 break;
             }
             line[MAX_LINE-1] = 0;
-            unsigned len = fix_crlf(line);
+            unsigned len = fix_crlf(line) + 1;
             if (pos + len > sizeof(strings)) {
                 printf("Out of space processing %s\n", line);
                 break;
@@ -130,7 +130,7 @@ void CONFIG_ReadLang(u8 idx)
             lookup->pos = pos;
             lookup++;
             strncpy(strings + pos, line, len);
-            pos += len + 1;
+            pos += len;
         }
     }
     lookup->pos = 0xFFFF;
