@@ -6,7 +6,7 @@
 #if (! defined BUILDTYPE_DEV)
   //Use this instead of printf(args...) because this will avoid
   //compile warnings
-  #define printf if(1) iprintf
+  #define printf if(0) iprintf
 #else
   #define printf iprintf
 #endif
