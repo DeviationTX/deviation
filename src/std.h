@@ -6,13 +6,13 @@
 #if (! defined BUILDTYPE_DEV)
   //Use this instead of printf(args...) because this will avoid
   //compile warnings
-  #define printf if(0) iprintf
+  #define printf if(0) printf
 #else
-  #define printf iprintf
+//  #define printf iprintf
 #endif
-#define sprintf siprintf
-#define snprintf sniprintf
-#define fprintf fiprintf
+//#define sprintf siprintf
+//#define snprintf sniprintf
+//#define fprintf fiprintf
 //#define fread(a, b, c, d) 0
 //#define fopen(a, b) -1
 //#define fclose if(0) fclose
