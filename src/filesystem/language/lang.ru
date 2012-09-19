@@ -20,7 +20,7 @@
 :5 Point
 5 точек
 :6 Trims
-6 триммеров
+6 тримм.
 :6Ch Airplane
 6-канальный самолет
 :6Ch Helicopter
@@ -206,7 +206,7 @@ AUX5
 :No Trim
 Без триммера
 :No Trims
-Без триммеров
+Без тримм.
 :None
 Нет
 :Normal
@@ -219,7 +219,8 @@ OK
 Выкл.
 :Offset:
 Смещ.:
->:On
+:On
+Вкл.
 :Page:
 Стр.:
 :Point:
@@ -228,7 +229,8 @@ OK
 +
 :Pos/Neg:
 +/-:
->:Press 'Ent' to turn USB Filesystem: 
+:Press 'Ent' to turn USB Filesystem: 
+\nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние: 
 :Protocol:
 Протокол:
 :RIGHT_H
@@ -239,7 +241,8 @@ OK
 РНапр
 :RUD DR
 РНапр ДР
->:Re-Init
+:Re-Init
+Привязка
 :Reset
 Сброс
 :Reverse:
@@ -285,7 +288,7 @@ OK
 :Switch:
 Перекл.:
 :Symmetric
-Симметричный
+Симметр.
 :THR
 Газ
 :TRIMLH+
@@ -339,9 +342,9 @@ OK
 :Trim
 Триммер
 :Trim +:
-Триммер+:
+Трим +:
 :Trim -:
-Триммер-:
+Трим -:
 :Trim Step:
 Шаг триммера:
 :Trims:
@@ -363,7 +366,7 @@ USB
 :Value:
 Значение:
 :Virt
-Вирт.
+Вирт. 
 :Zero/Max
 Ноль/Макс
 :\n\nBinding will end in %d seconds...
