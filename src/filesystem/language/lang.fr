@@ -43,8 +43,10 @@ AIL
 AIL DR
 :AIL Inv:
 :Sens aileron
->:AUX4
->:AUX5
+:AUX4
+AUX4
+:AUX5
+AUX5
 :Airplane
 Avion
 :Backlight:
@@ -97,7 +99,8 @@ Cyclique1
 Cyclique2
 :Cyclic3
 Cyclique3
->:DR
+:DR
+DR
 :Default
 Défaut
 :Deviation FW\nversion: 
@@ -140,7 +143,8 @@ GEAR
 Helicoptère
 :High-Rate
 Déb. Haut
->:Icon
+:Icon
+Icône
 :Input:
 Entrée:
 :Inputs
@@ -179,7 +183,8 @@ Déb. Med
 Min/Max
 :Min:
 Min:
->:Mixer
+:Mixer
+Mixer
 :Mixers:
 Mixers:
 :Mode %d
@@ -214,7 +219,8 @@ OK
 Off
 :Offset:
 Offset:
->:On
+:On
+On
 :Page:
 Page:
 :Point:
@@ -223,7 +229,8 @@ Point:
 Pos.
 :Pos/Neg:
 Pos./Neg.:
->:Press 'Ent' to turn USB Filesystem: 
+:Press 'Ent' to turn USB Filesystem: 
+Presser 'Ent' pour passer en mode USB
 :Protocol:
 Protocole:
 :RIGHT_H
@@ -234,7 +241,8 @@ DROITE_V
 RUD
 :RUD DR
 RUD DR
->:Re-Init
+:Re-Init
+Réinitialiser
 :Reset
 Reset
 :Reverse:
@@ -243,7 +251,8 @@ Sens:
 Inversé
 :Right
 Droite
->:Safe Val:
+:Safe Val:
+Val. Sécu
 :Safety
 Sécurité
 :Safety:
@@ -256,7 +265,8 @@ Echelle:
 Scanner
 :Simple
 Simple
->:Simple 4 Channel
+:Simple 4 Channel
+4Ch. Simple
 :Src
 Source
 :Src:
@@ -355,7 +365,8 @@ Inconnu
 Haut
 :Value:
 Valeur:
->:Virt
+:Virt
+Virt
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...
