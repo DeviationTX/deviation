@@ -1,0 +1,381 @@
+﻿简体中文
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%, 安定值 = %d%%\n
+:1-to-1
+1比1
+:11 Point
+11 点
+:13 Point
+13 点
+:3 Point
+3 点
+:4 Bars
+4 Bars
+:4 Inside
+4 内
+:4 Outside
+4 外
+:4Ch w/ Dual-Rates
+4通和舵量
+:5 Point
+5 点
+:6 Trims
+6 微调
+:6Ch Airplane
+6通 固定翼
+:6Ch Helicopter
+6通 直升机
+:7 Point
+7 点
+:8 Bars
+8 Bars
+:9 Point
+9 点
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+绝对值
+:AIL
+副翼
+:AIL DR
+副翼舵量
+:AIL Inv:
+副翼逆转
+:AUX4
+辅助4
+:AUX5
+辅助5
+:Airplane
+固定翼
+:Backlight:
+背光:
+:Bar %d:
+Bar %d
+:Bars:
+Bars:
+:Battery Alarm:
+电池警报:
+:Bind
+对频
+:Binding
+对频中
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+正在对频中...\n请确保模型已接电!\n按「确认」不会中止对频\n但会退回操控权
+:Box %d:
+箱 %d:
+:Buttons
+按键
+:COL
+Колл
+:COL Inv:
+Колл Инв:
+:CYC
+循环
+:Calibrate
+校准
+:Cancel
+取消
+:Center all sticks and touch the screen
+把遥杆置中再点触屏
+:Ch
+通
+:Change
+更改
+:Channels
+通道
+:Complex
+复杂
+:Configure
+设定
+:Copy To...
+复制到...
+:Curve:
+曲线:
+:Cyclic1
+循环1
+:Cyclic2
+循环2
+:Cyclic3
+循环3
+:DR
+舵量
+:Default
+默认
+:Deviation FW\nversion: 
+Deviation\n固件版本: 
+:Down
+下
+:ELE
+升降
+:ELE DR
+升降舵量
+:ELE Inv:
+升降逆转:
+:EXPO
+曲线
+:Enter
+输入
+:Exit
+退出
+:Expo&DR
+曲线与舵量
+:FMODE0
+常规飞行
+:FMODE1
+特技飞行1
+:FMODE2
+特技飞行2
+:Failsafe:
+失控保护:
+:File:
+文档:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+文档系统加载失败。请透过USB创建文档系统後按「输入」退出。
+:Fixed
+固定
+:Fixed ID:
+固定ID码:
+:GEAR
+起落架
+:Helicopter
+直升机
+:High-Rate
+高速率
+:Icon
+图标
+:Input:
+输入:
+:Inputs
+输入
+:Inverted
+逆转
+:LEFT_H
+左水平
+:LEFT_V
+左垂直
+:Language:
+语言:
+:Left
+左
+:Linked
+连锁的
+:Load
+下载
+:Load...
+下载中...
+:Low-Rate
+低速率
+:MIX0
+混控0
+:MIX1
+混控1
+:MIX2
+混控2
+:Main Page Config
+主设完页
+:Max:
+上限:
+:Mid-Rate
+中速率
+:Min/Max
+上限/下限
+:Min:
+下限:
+:Mixer
+程式混控
+:Mixers:
+程式混控:
+:Mode %d
+模式 %d
+:Model
+模型
+:Model Name:
+模型命名:
+:Model Type:
+机型选择:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+把每支遥杆推到上下限\n再回中。完成後点触屏结束。
+:Mux:
+复用器:
+:Neg
+负
+:No Bars
+没Bars
+:No Trim
+没微调
+:No Trims
+没微调
+:None
+没有
+:Normal
+正常
+:Number of Channels:
+通道数量:
+:OK
+确认
+:Off
+关闭
+:Offset:
+抵消:
+:On
+开启
+:Page:
+页:
+:Point:
+点:
+:Pos
+正
+:Pos/Neg:
+正/负:
+>:Press 'Ent' to turn USB Filesystem: 
+:Protocol:
+协议:
+:RIGHT_H
+右水平
+:RIGHT_V
+右垂直
+:RUD
+方向舵
+:RUD DR
+方向舵舵量
+>:Re-Init
+:Reset
+重启
+:Reverse:
+逆转:
+:Reversed
+逆转
+:Right
+右
+:Safe Val:
+安定值:
+:Safety
+安全
+:Safety:
+安全:
+:Save
+保存
+:Scale:
+比例:
+:Scanner
+扫描器 
+:Simple
+简单
+:Simple 4 Channel
+简单4通道
+:Src
+来源
+:Src:
+来源:
+:Start:
+开始:
+:Stick Mode:
+遥杆模式:
+:Sticks:
+遥杆:
+:Subtrim:
+系统微调:
+:SwashType:
+斜盘类型:
+:Switch1
+开关1
+:Switch2
+开关2
+:Switch:
+开关:
+:Symmetric
+对称
+:THR
+油门
+:TRIMLH+
+微调LH+
+:TRIMLH-
+微调LH-
+:TRIMLV+
+微调Lv+
+:TRIMLV-
+微调LV-
+:TRIMRH+
+微调RH+
+:TRIMRH-
+微调RH-
+:TRIMRV+
+微调RV+
+:TRIMRV-
+微调RV-
+:TRIM_L+
+微调L+
+:TRIM_L-
+微调L-
+:TRIM_R+
+微调R+
+:TRIM_R-
+微调R-
+:Template..
+模板..
+:Test
+测试
+:Timer
+定时器
+:Timer1
+定时器1
+:Timer2
+定时器2
+:Toggle%d
+开关%d
+:Touch Calibrate
+触屏校准
+:Touch Screen:
+触屏:
+:Touch Test
+触屏测试
+:Touch target %d
+触碰对象 %d
+:Touch to Lock
+触碰上锁
+:Touch to Unlock
+触碰解锁
+:Trim
+微调
+:Trim +:
+微调+:
+:Trim -:
+微调-:
+:Trim Step:
+微调步宽:
+:Trims:
+微调:
+:Turn Off
+关机
+:Turn On
+开机
+:Tx Power:
+发射功率:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+USB储存模式，按「输入」退出。
+:Unknown
+不知名
+:Up
+上
+:Value:
+数值:
+:Virt
+垂直
+:Zero/Max
+零/上限
+:\n\nBinding will end in %d seconds...
+\n\n%d秒後对频结束...
+:add
+加
+:countdown
+倒数
+:mult
+多次的
+:replace
+替换
+:stopwatch
+秒表

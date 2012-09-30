@@ -28,9 +28,9 @@
 //#define dbgprintf(args...) printf(args)
 #define dbgprintf(args...) 
 
-static FATFS fat;
+static FATFS fat[2];
 static DIR   dir;
-static bool file_open=false;
+static bool file_open[2]= {false, false};
 
 int FS_Mount();
 void FS_Unmount();
@@ -50,7 +50,8 @@ int _isatty_r(struct _reent *r, int fd);
 
 int FS_Mount()
 {
-    int res = pf_mount(&fat);
+    int res = pf_mount(&fat[0]);
+    fat[1] = fat[0];
     dbgprintf("Mount: %d\n", res);
     return (res == FR_OK);
 }
@@ -92,17 +93,19 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
-    if(file_open) {
+    int fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) ? 4 : 3;
+    if(file_open[fd-3]) {
         dbgprintf("_open_r: file already open.\n");
         return -1;
     } else {
+        pf_switchfile(&fat[fd-3]);
         int res=pf_open(file);
         if(res==FR_OK) {
             dbgprintf("_open_r: pf_open (%s) flags: %d, mode: %d ok\r\n", file, flags, mode);
             if (flags & O_CREAT)
                 pf_maximize_file_size();
-            file_open=true;
-            return 3;  
+            file_open[fd-3]=true;
+            return fd;  
         } else {
             dbgprintf("_open_r: pf_open failed\r\n");
             return -1;
@@ -112,8 +115,8 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
 
 int _close_r (struct _reent *r, int fd) {
     (void)r;
-    if(fd==3) {
-       file_open=false;
+    if(fd>2) {
+       file_open[fd-3]=false;
        dbgprintf("_close_r: file closed.\r\n");
     }
     return 0;
@@ -122,9 +125,10 @@ int _close_r (struct _reent *r, int fd) {
 int _read_r (struct _reent *r, int fd, char * ptr, int len)
 {
     (void)r;
-    if(fd==3 && file_open) {
+    if(fd>2 && file_open[fd-3]) {
         if(len <= 0xffff) {
             WORD bytes_read;
+            pf_switchfile(&fat[fd-3]);
             int res=pf_read(ptr, len, &bytes_read);
             dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
             if(res==FR_OK) return bytes_read;
@@ -151,9 +155,10 @@ int _write_r (struct _reent *r, int fd, char * ptr, int len)
             usart_send_blocking(USART1, ptr[index]);
         }    
         return len;
-    } else if(fd==3) {
-        if(file_open) {
+    } else if(fd>2) {
+        if(file_open[fd-3]) {
             WORD bytes_written;
+            pf_switchfile(&fat[fd-3]);
             int res=pf_write(ptr, len, &bytes_written);
             dbgprintf("_write_r: len %d, bytes_written %d, result %d\r\n",len, bytes_written, res);
             if(res==FR_OK) return bytes_written;
@@ -168,15 +173,16 @@ int _lseek_r (struct _reent *r, int fd, int ptr, int dir)
 {
     (void)r;
     
-    if(fd==3 && file_open) {
+    if(fd>2 && file_open[fd-3]) {
         if(dir==SEEK_CUR) {
-            ptr += fat.fptr;
+            ptr += fat[fd-3].fptr;
         } else if (dir==SEEK_END) {
-            ptr += fat.fsize;
+            ptr += fat[fd-3].fsize;
         }
+        pf_switchfile(&fat[fd-3]);
         int res=pf_lseek(ptr);
         if(res==FR_OK) {
-           return fat.fptr;
+           return fat[fd-3].fptr;
         }
     }
     errno=EINVAL;

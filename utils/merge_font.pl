@@ -33,7 +33,9 @@ $above = $height - $below;
 #build final character set
 my %final;
 foreach my $dir (@ARGV) {
-    foreach my $ch (keys %{ $char{$dir} }) {
+    foreach my $ch (keys %{ $char{$ARGV[0]} }) {
+        $final{$ch} ||= undef;
+        next unless($char{$dir}{$ch});
         if(! $final{$ch} && $char{$dir}{$ch}{above} <= $above && $char{$dir}{$ch}{below} <= $below) {
             $final{$ch} = {dir => $dir, name => $char{$dir}{$ch}{name} };
         }
@@ -42,8 +44,12 @@ foreach my $dir (@ARGV) {
 
 #write set
 mkdir("$ARGV[0]_merged");
-foreach my $c (keys %final) {
-    system("cp $final{$c}{dir}/$final{$c}{name} $ARGV[0]_merged/");
+foreach my $ch (sort keys %final) {
+    if(! $final{$ch}) {
+        print "WARNING: No character found for $ch that fits size requirements\n";
+    } else {
+        system("cp $final{$ch}{dir}/$final{$ch}{name} $ARGV[0]_merged/");
+    }
 }
 $height = $above + $below;
 system("echo $height > $ARGV[0]_merged/height");

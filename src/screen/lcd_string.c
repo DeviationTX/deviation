@@ -13,31 +13,11 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
-#include "fonts.h"
 
-struct FONT_DEF 
-{
-	u8 width;     	/* Character width for storage         */
-	u8 height;  		/* Character height for storage        */
-        const u32 *range;  /* Array containing the ranges of supported characters */
-	const u8 *font_table;       /* Font table start address in memory  */
-};
-#define WIDTH(x)           (0x7F & x->width)
-#define HEIGHT(x)          (x->height)
-#define IS_PROPORTIONAL(x) (0x80 & x->width)
-const struct FONT_DEF Fonts[];
-
-/* The font bitfield is designed to be backwards compatible with standard
- * GLCD 8bit bit-fields, but to also support upto 32x32 proportional fonts
- *
- * For fixed fonts, the 'width' field of struct FONT_DEF will be the character
- * width.  For proportional fonts, the 'width' filed will be ORed with 0x80
- *
- * If the font is proportional, the 'font_table' will begin with a list of u8
- * values which represent the width of each character.  The font data follows
- * immediately afterwards.
- * If the font is fixed-width, the font data starts at the beginning of the
- * 'font_table'
+/*
+ * The font 'font_table' begins with a list of u24 values which represent
+ * the offeset (from the beginning of the font file) of each character.
+ * The font data follows immediately afterwards.
  *
  * The font data is represented as a bit-field.  A chunk of 1, 2, 3, or 4
  * bytes represents a single column of pixels.  This will be repeated for
@@ -61,50 +41,24 @@ const struct FONT_DEF Fonts[];
  *  So this would appear as '0x7F, 0x03' in the font table
  *
  */
-#define FONTDECL(w, h, range, font, name) name,
-static const char * const FontNames[] = {
-    #include "fonts.h"
-    "",
-};
-#undef FONTDECL
-#if 0
-    "system5x7",
-    "arial10",
-    "arial10narrow",
-    "arial14",
-    "arial14bold",
-    "arial14narrow",
-    "arial14narrowbold",
-    "arial18bold",
-    "arial24bold",
-    "trebuchet48",
-    "",
-#endif
-
-#define FONTDECL(w, h, range, font, name) {w, h, range, font},
-const struct FONT_DEF Fonts[] = {
-    #include "fonts.h"
-    {0, 0, 0, 0},
-};
-#undef FONTDECL
-#if 0
-    {5, 7, 0x20, 0x80, FontSystem5x7},
-    {0x80 | 10, 10, 0x20, 0x7F, FontArial_10},
-    {0x80 | 10, 12, 0x20, 0x7F, FontArial_10_Narrow},
-    {0x80 | 10, 15, 0x20, 0x80, FontArial_14},
-    {0x80 | 10, 15, 0x20, 0x80, FontArial_14_Bold},
-    {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_Narrow},
-    {0x80 | 10, 15, 0x20, 0x7F, FontArial_14_NarrowBold},
-    {0x80 | 15, 15, 0x20, 0x5b, FontArial_18_Bold},
-    {0x80 | 27, 23, 0x20, 0x5b, FontArial_24_Bold},
-    {0x80 | 34, 48, 0x25, 0x3a, FontTrebuchet_MS_48},
-    {0, 0, 0, 0, 0},
-    };
-#endif
 #define LINE_SPACING 2
 #define CHAR_SPACING 1
+#define RANGE_TABLE_SIZE 20
+#define NUM_FONTS 10
+
+#define HEIGHT(x) x.height
+char FontNames[NUM_FONTS][9];
+
+struct font_def 
+{
+        u8 idx;
+        FILE *fh;
+        u8 font[60];
+	u8 height;  		/* Character height for storage        */
+        u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
+};
 static struct {
-    const struct FONT_DEF *font;
+    struct font_def font;
     unsigned int x_start;
     unsigned int x;
     unsigned int y;
@@ -114,73 +68,71 @@ static struct {
 u8 FONT_GetFromString(const char *value)
 {
     int i;
-    for (i = 0; FontNames[i][0]; i++)
-        if(strcasecmp(FontNames[i], value) == 0) {
-            return 1 + i;
+    for (i = 0; i < NUM_FONTS; i++) {
+        if (FontNames[i][0] == 0) {
+            strncpy(FontNames[i], value, 13);
+            return i + 1;
         }
+        if(strcasecmp(FontNames[i], value) == 0) {
+            return i + 1;
+        }
+    }
     printf("Unknown font: %s\n", value);
     return 0;
 }
 
-const u8 *char_offset(u32 c, const struct FONT_DEF *font, u8 *width)
+u8 get_char_range(u32 c, u32 *begin, u32 *end)
 {
     u32 offset = 0;
-    u32 count = 0;
-    int found = 0;
-    const u32 *ptr = font->range;
-    u8 row_bytes = (HEIGHT(cur_str.font) - 1) / 8 + 1;
-    while(*ptr) {
-        uint32_t i;
-        for (i = *ptr; i <= *(ptr+1); i++) {
-            if (c == i) {
-                found = 1;
-                if (IS_PROPORTIONAL(font)) {
-                    *width = font->font_table[count];
-                } else {
-                    *width = WIDTH(font);
-                    return font->font_table + offset * row_bytes * (*width);
-                }
-            }
-            if (IS_PROPORTIONAL(font)) {
-                if (! found) {
-                    //Keep track of the width of this character
-                    offset += font->font_table[count] * row_bytes;
-                }
-                //Keep track of the number of bytes in the width table
-                count++;
-            } else {
-                //Keep track of number of characters to this point
-                offset++;
-            }
+    u32 pos = 5;
+    u16 *range = cur_str.font.range;
+    while(1) {
+        if (range[0] == 0 && range[1] == 0)
+            break;
+        if (c >= range[0] && c <= range[1]) {
+            pos += 3 * (offset + c - range[0]);
+        } else {
+            offset += range[1] + 1 - range[0];
         }
-        ptr += 2;
+        range += 2;
+        pos += 4;
     }
-    if(! found)
-        return NULL;
-    return font->font_table + count + offset;
+    fseek(cur_str.font.fh, pos, SEEK_SET);
+    u8 *font = cur_str.font.font;
+    fread(font, 6, 1, cur_str.font.fh);
+    *begin = font[0] | (font[1] << 8) | (font[2] << 16);
+    *end   = font[3] | (font[4] << 8) | (font[5] << 16);
+    return 1;
+}
+
+const u8 *char_offset(u32 c, u8 *width)
+{
+    u32 begin;
+    u32 end;
+    u8 *font = cur_str.font.font;
+
+    u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
+    get_char_range(c, &begin, &end);
+    *width = (end - begin) / row_bytes;
+    fseek(cur_str.font.fh, begin, SEEK_SET);
+    fread(font, end - begin, 1, cur_str.font.fh);
+    return font;
 }
 
 u8 get_width(u32 c)
 {
-    const u32 *ptr = cur_str.font->range;
-    const u8 *pos = cur_str.font->font_table;
-    while(*ptr) {
-        if (c >= *ptr && c <= *(ptr+1)) {
-            return IS_PROPORTIONAL(cur_str.font)
-                          ? *(pos + (c - *ptr))
-                          : WIDTH(cur_str.font);
-        }
-        pos += (*(ptr+1) - *ptr) + 1;
-        ptr += 2;
-    }
-    //printf("Didn't find character: %d\n", c);
-    return 0;
-}
+    u32 begin;
+    u32 end;
+
+    u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
+    get_char_range(c, &begin, &end);
+    return (end - begin) / row_bytes;
+} 
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    const u8 *offset = char_offset(c, cur_str.font, &width);
+    const u8 *offset = char_offset(c, &width);
     if (! offset)
         return;
     // Check if the requested character is available
@@ -205,22 +157,59 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     LCD_DrawStop();
 }
 
+u8 open_font(unsigned int idx)
+{
+    char font[20];
+    if (! idx)
+        return 0;
+    sprintf(font, "media/%s.fon", FontNames[idx-1]);
+    if(cur_str.font.fh) {
+        fclose(cur_str.font.fh);
+        cur_str.font.fh = NULL;
+    }
+    cur_str.font.fh = fopen(font, "rb");
+    if (! cur_str.font.fh) {
+        printf("Couldn't open font file: %s\n", font);
+        return 0;
+    }
+    setbuf(cur_str.font.fh, 0);
+    if(fread(&cur_str.font.height, 1, 1, cur_str.font.fh) != 1) {
+        printf("Failed to read height from font\n");
+        fclose(cur_str.font.fh);
+        cur_str.font.fh = NULL;
+        return 0;
+    }
+    cur_str.font.idx = idx;
+    idx = 0;
+    u8 *f = (u8 *)font;
+    while(1) {
+        if (fread(f, 4, 1, cur_str.font.fh) != 1) {
+            printf("Failed to parse font range table\n");
+            fclose(cur_str.font.fh);
+            cur_str.font.fh = NULL;
+            return 0;
+        }
+        u16 start_c = f[0] | (f[1] << 8);
+        u16 end_c = f[2] | (f[3] << 8);
+        cur_str.font.range[idx++] = start_c;
+        cur_str.font.range[idx++] = end_c;
+        if (start_c == 0 && end_c == 0)
+            break;
+    }
+    return 1;
+}
+
 u8 LCD_SetFont(unsigned int idx)
 {
-    unsigned int i;
     u8 old = LCD_GetFont();
-    idx--;
-    for(i = 0; i <= idx; i++) {
-        if(Fonts[i].width == 0)
-            return old;
-    }
-    cur_str.font = &Fonts[idx];
+    if (! open_font(idx))
+        open_font(old);
     return old;
 }
 
 u8 LCD_GetFont()
 {
-    return (cur_str.font - Fonts) + 1;
+    return cur_str.font.idx;
 }
 
 void LCD_SetXY(unsigned int x, unsigned int y)

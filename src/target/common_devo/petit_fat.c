@@ -728,7 +728,11 @@ BYTE check_fs (	/* 0:The FAT boot record, 1:Valid boot record but not an FAT, 2:
 
 --------------------------------------------------------------------------*/
 
-
+FRESULT pf_switchfile (FATFS *fs)
+{
+    FatFs = fs;
+    return FR_OK;
+}
 
 /*-----------------------------------------------------------------------*/
 /* Mount/Unmount a Locical Drive                                         */

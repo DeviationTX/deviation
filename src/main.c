@@ -43,17 +43,14 @@ int main() {
 
     LCD_Clear(0x0000);
 
-    LCD_SetFont(1);
-    LCD_SetFontColor(0xffff);
-
     u32 buttons = ScanButtons();
     if(CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
-        LCD_PrintStringXY(10, 10, _tr("USB Storage mode, press 'ENT' to exit."));
+        //LCD_PrintStringXY(10, 10, _tr("USB Storage mode, press 'ENT' to exit."));
         USB_Connect();
     }
     
     while(!FS_Mount()) {
-        LCD_PrintStringXY(10, 10, _tr("Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit."));
+        //LCD_PrintStringXY(10, 10, _tr("Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit."));
         USB_Connect();
     }
 
@@ -61,6 +58,9 @@ int main() {
     CONFIG_ReadDisplay();
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     CONFIG_ReadLang(Transmitter.language);
+
+    LCD_SetFont(1);
+    LCD_SetFontColor(0xffff);
 
     BACKLIGHT_Brightness(Transmitter.brightness);
     LCD_SetFont(DEFAULT_FONT.font);

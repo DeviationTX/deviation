@@ -50,6 +50,7 @@ my $array_w = 0;
 my $array_h = 0;
 my $name = "";
 my $font_name;
+my $baseline;
 
 main();
 
@@ -78,17 +79,20 @@ sub main
     my $import;
     my $old;
     my $help;
+    my $bin;
     GetOptions(
          "template=s"  => \$template,
          "export"      => \$export,
          "import=s"    => \$import,
          "old"         => \$old,
          "help"        => \$help,
-         "name=s"      => \$font_name);
+         "name=s"      => \$font_name,
+         "baseline=i"  => \$baseline,
+         "bin"         => \$bin);
     help() if($help);
 
     if(! $template) {
-        $template = $templates{"ascii"};
+        $template = $templates{"auto"};
     } else {
         $template = $templates{$template};
     }
@@ -104,6 +108,8 @@ sub main
     optimize();
     if($export) {
         export_font();
+    } elsif($bin) {
+        write_bin_font();
     } else {
         write_font();
     }
@@ -329,11 +335,16 @@ sub export_font
 {
     mkdir $font_name;
     `echo $array_h > $font_name/height`;
-    my $above_line_char = $font{65};
-    if (! $above_line_char) {
-        $above_line_char = $font{ (sort {$a <=> $b} keys(%font))[0] };
+    my $zero;
+    if(defined $baseline) {
+        $zero = $baseline;
+    } else {
+        my $above_line_char = $font{65};
+        if (! $above_line_char) {
+            $above_line_char = $font{ (sort {$a <=> $b} keys(%font))[0] };
+        }
+        $zero = get_height($above_line_char, "top");
     }
-    my $zero = get_height($above_line_char, "top");
     print "$zero\n";
     foreach my $char (keys %font) {
         my $h1 = get_height($font{$char}, "top");
@@ -443,4 +454,51 @@ sub write_font
     printf "\n#else //FONTDECL\n";
     printf "FONTDECL(0x80 | $max_width, $array_h, $range_var, $font_var, \"$font_name\")\n";
     printf "#endif //FONTDECL\n";
+}
+
+sub write_bin_font
+{
+    my $pos = 5;
+    my $bpc = int(($array_h - 1) / 8) + 1;
+    my @chars = sort {$a <=> $b} keys(%font);
+
+    print chr($array_h); #Character height
+    foreach my $r (@{ $template->{range} }) {
+        print chr(($r->[0] >> 0) & 0xff); #range start
+        print chr(($r->[0] >> 8) & 0xff);
+        print chr(($r->[1] >> 0) & 0xff);
+        print chr(($r->[1] >> 8) & 0xff); #range end
+        $pos += 4;
+    }
+    print chr(0) . chr(0) . chr(0) . chr(0); #End of range table
+
+    #Char offset
+    $pos += (1 + scalar(@chars)) * 3; # length of offset table
+    foreach my $c (@chars) {
+        my $width = $font{$c}[0];
+        print chr(($pos >> 0) & 0xff); #position of character (relative to top of file)
+        print chr(($pos >> 8) & 0xff);
+        print chr(($pos >> 16) & 0xff);
+        $pos += $width * $bpc;
+    }
+    print chr(($pos >> 0) & 0xff); #defines the width of the last character
+    print chr(($pos >> 8) & 0xff);
+    print chr(($pos >> 16) & 0xff);
+    foreach my $c (@chars) {
+        my @cols = @{ $font{$c}};
+        my $width = shift @cols;
+        if ($bpc > 1) {
+            for (my $i = 0; $i < $width; $i++) {
+                my @vals;
+                my $val = $cols[$i];
+                for(my $j = 0; $j < $bpc; $j++) {
+                    push @vals, $val & 0xff;
+                    $val = $val >> 8;
+                }
+                map { print chr($_) } @vals;
+            }
+        } else {
+            map { print chr($_) } @cols;
+        }
+    }
 }
