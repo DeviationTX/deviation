@@ -1,0 +1,383 @@
+﻿Nederlands
+:%s is %d%%, safe value = %d%%\n
+%s is %d%%, veilige waarde = %d%%\n
+:1-to-1
+1-op-1
+:11 Point
+11 punten
+:13 Point
+13 punten
+:3 Point
+3 punten
+:4 Bars
+4 balken
+:4 Inside
+4 binnen
+:4 Outside
+4 buiten
+>:4Ch w/ Dual-Rates
+>4-kan. met Dual-Rates
+:5 Point
+5 punten
+:6 Trims
+6 trims
+>:6Ch Airplane
+>6-kan. vliegtuig
+>:6Ch Helicopter
+>6-kan. helikopter
+:7 Point
+7 punten
+:8 Bars
+8 balken
+:9 Point
+9 punten
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+absolute waarde
+:AIL
+AIL
+:AIL DR
+AIL DR
+:AIL Inv:
+AIL omg:
+>:AUX4
+>AUX4
+>:AUX5
+>AUX5
+:Airplane
+Vliegtuig
+:Backlight:
+Helderheid:
+:Bar %d:
+Balk %d:
+:Bars:
+Balken:
+:Battery Alarm:
+Batterijalarm:
+:Bind
+Koppelen
+:Binding
+Bezig met koppelen
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
+:Box %d:
+Kader %d:
+:Buttons
+Knoppen
+>:COL
+>COL
+:COL Inv:
+COL omg:
+:CYC
+CYC
+:Calibrate
+Kalibreren
+:Cancel
+Annuleren
+:Center all sticks and touch the screen
+Centreer alle sticks en raak scherm aan
+:Ch
+Kan
+:Change
+Aanpassen
+:Channels
+Kanalen
+:Complex
+Complex
+:Configure
+Configureren
+:Copy To...
+Kopieer...
+:Curve:
+Curve:
+>:Cyclic1
+>Cyclic1
+>:Cyclic2
+>Cyclic2
+>:Cyclic3
+>Cyclic3
+>:DR
+>DR
+:Default
+Standaard
+:Deviation FW\nversion: 
+Deviation FW\nVersie: 
+:Down
+Omlaag
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+ELE inv:
+:EXPO
+Expo
+:Enter
+Toepassen
+:Exit
+Stoppen
+:Expo&DR
+Expo&DR
+:FMODE0
+FMODE0
+:FMODE1
+FMODE1
+:FMODE2
+FMODE2
+:Failsafe:
+Veilige modus:
+:File:
+Bestand:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+Bestandssysteem kon niet worden gekoppeld. Creëer dit via USB, kies daarna 'ENT' om te stoppen.
+:Fixed
+Vast
+:Fixed ID:
+Vast ID:
+:GEAR
+GEA
+:Helicopter
+Helikopter
+:High-Rate
+Hoog
+>:Icon
+>Icoon
+:Input:
+Invoer:
+:Inputs
+Invoeren
+:Inverted
+Omgekeerd
+:LEFT_H
+LINKS_H
+:LEFT_V
+LINKS_V
+:Language:
+Taal:
+:Left
+Links
+:Linked
+Verbonden
+:Load
+Laad
+:Load...
+Laad...
+:Low-Rate
+Laag
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main Page Config
+Configuratie hoofdscherm
+:Max:
+Max:
+:Mid-Rate
+Middel
+:Min/Max
+Min/Max
+:Min:
+Min:
+>:Mixer
+>Mixer
+:Mixers:
+Mixers:
+:Mode %d
+Mode %d
+:Model
+Model
+:Model Name:
+Modelnaam:
+:Model Type:
+Modeltype:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Beweeg de sticks naar alle\nuitersten en terug naar het midden.\nRaak daarna het scherm aan.
+:Mux:
+Mux:
+:Neg
+-
+:No Bars
+Geen balken
+:No Trim
+Geen trim
+:No Trims
+Geen trims
+:None
+Geen
+:Normal
+Normaal
+:Number of Channels:
+Aantal kanelen:
+:OK
+OK
+:Off
+Uit
+:Offset:
+Offset:
+>:On
+>Aan
+:Page:
+Pagina:
+:Point:
+Punt:
+:Pos
++
+:Pos/Neg:
++/-:
+>:Press 'Ent' to turn USB Filesystem:
+>Druk op 'ENT' om USB-bestandssysteem te activeren
+:Protocol:
+Protocol:
+:RIGHT_H
+RECHTS_H
+:RIGHT_V
+RECHTS_V
+:RUD
+RUD
+:RUD DR
+RUD DR
+>:Re-Init
+>Herinitialiseren
+:Reset
+Reset
+:Reverse:
+Keer om:
+:Reversed
+Omgekeerd
+:Right
+Rechts
+>:Safe Val:
+>Veilige waarde:
+:Safety
+Veiligheid
+:Safety:
+Veiligheid:
+:Save
+OPslaan
+:Scale:
+Schaal:
+:Scanner
+Scanner
+:Simple
+Eenvoudig
+>:Simple 4 Channel
+>Eenvoudig 4 kanalen
+:Src
+Bron
+:Src:
+Bron:
+:Start:
+Start:
+:Stick Mode:
+Stickmodus:
+:Sticks:
+Sticks:
+:Subtrim:
+Fijnafstelling:
+:SwashType:
+Type tuimelschijf:
+:Switch1
+Schakelaar1
+:Switch2
+Schakelaar2
+:Switch:
+Schakelaar:
+:Symmetric
+Symmetrisch
+:THR
+THR
+:TRIMLH+
+TRIMLH+
+:TRIMLH-
+TRIMLH-
+:TRIMLV+
+TRIMLV+
+:TRIMLV-
+TRIMLV-
+:TRIMRH+
+TRIMRH+
+:TRIMRH-
+TRIMRH-
+:TRIMRV+
+TRIMRV+
+:TRIMRV-
+TRIMRV-
+:TRIM_L+
+TRIM_L+
+:TRIM_L-
+TRIM_L-
+:TRIM_R+
+TRIM_R+
+:TRIM_R-
+TRIM_R-
+:Template..
+Sjabloon...
+:Test
+Testen
+:Timer
+Timer
+:Timer1
+Timer1
+:Timer2
+Timer2
+:Toggle%d
+Schakel%d
+:Touch Calibrate
+Aanraakscherm kalibreren
+:Touch Screen:
+Aanraakscherm:
+:Touch Test
+Aanraakscherm testen
+:Touch target %d
+Raak indicator %d aan
+:Touch to Lock
+Raak aan om vast te zetten
+:Touch to Unlock
+Raak aan om los te maken
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Trimstap:
+:Trims:
+Trims:
+:Turn Off
+Uitschakelen
+:Turn On
+Inschakelen
+:Tx Power:
+Zendvermogen:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+USB-massaopslagmodus, druk op 'ENT' om te stoppen.
+:Unknown
+Onbekend
+:Up
+Omhoog
+:Value:
+Waarde:
+>:Virt
+>Virt
+:Zero/Max
+Nul/Max
+:\n\nBinding will end in %d seconds...
+\n\nKoppeling eindigt over %d seconden...
+:add
++
+:countdown
+Aftellen
+:mult
+*
+:replace
+Vervangen
+:stopwatch
+Stopwatch
