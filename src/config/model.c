@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "model.h"
+#include "telemetry.h"
 #include "tx.h"
 #include <stdlib.h>
 #include <string.h>
@@ -123,6 +124,7 @@ static const char GUI_TOGGLE[] = "toggle";
 static const char GUI_TGLICO[] = "tglico";
 static const char GUI_BAR[] = "bar";
 static const char GUI_BOX[] = "box";
+static const char GUI_TELEMETRY[] = "telemetry";
 /* End */
 
 s8 mapstrcasecmp(const char *s1, const char *s2)
@@ -565,7 +567,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             if (MATCH_START(value, GUI_TIMER)) {
                 i = value[5] - '1';
                 if (i < 2)
-                    m->pagecfg.box[idx] = i+1;
+                    m->pagecfg.box[idx] = i + Box_Timer1;
+                else
+                    printf("%s: Unknown timer: %s\n", section, value);
+                return 1;
+            }
+            if (MATCH_START(value, GUI_TELEMETRY)) {
+                i = value[9] - '1';
+                if (i < 2)
+                    m->pagecfg.box[idx] = i + Box_Telemetry1;
                 else
                     printf("%s: Unknown timer: %s\n", section, value);
                 return 1;
@@ -576,7 +586,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     printf("%s: Illegal input for box: %s\n", section, value);
                     return 1;
                 }
-                src -= NUM_INPUTS - 2;
+                src -= NUM_INPUTS + 1 - Box_LAST;
             }
             m->pagecfg.box[idx] = src;
             return 1;
@@ -786,8 +796,10 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", GUI_BARSIZE, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
     for(idx = 0; idx < 8; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.box[idx]) {
-            if(m->pagecfg.box[idx] == 1 || m->pagecfg.box[idx] == 2) {
+            if(m->pagecfg.box[idx] == Box_Timer1 || m->pagecfg.box[idx] == Box_Timer2) {
                 fprintf(fh, "%s%d=%s%d\n", GUI_BOX, idx+1, GUI_TIMER, m->pagecfg.box[idx]);
+            } else if(m->pagecfg.box[idx] == Box_Telemetry1 || m->pagecfg.box[idx] == Box_Telemetry2) {
+                fprintf(fh, "%s%d=%s%d\n", GUI_BOX, idx+1, GUI_TELEMETRY, m->pagecfg.box[idx] - Box_Telemetry1 + 1);
             } else {
                 u8 val = m->pagecfg.box[idx];
                 if (val)

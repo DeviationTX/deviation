@@ -105,7 +105,7 @@ Telemetry
     Packets are sent every 2.4msec.  They are processed between data packets (apparently after the ACK is checked)
 
     The 1st byte of the packet is either 0x30 or 0x31
-    All bytes exceptfor the 1st are scrambled with the Transmiter MfgId as per the Tx packets
+    All bytes except for the 1st are scrambled with the Transmiter MfgId as per the Tx packets
     Like the Tx packets, each telemetry packet appears to conatain 4 16bit LCB-1st channels
 
 Given the the only available telemetry module at the moment is the ladybird, which only reports voltage,

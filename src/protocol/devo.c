@@ -16,6 +16,7 @@
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
+#include "telemetry.h"
 #include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
@@ -23,6 +24,7 @@
 //For Debug
 //#define NO_SCRAMBLE
 
+#define TELEMETRY 1
 #define PKTS_PER_CHANNEL 4
 
 #ifdef EMULATOR
@@ -156,6 +158,21 @@ static void build_data_pkt()
     add_pkt_suffix();
 }
 
+static void parse_telemetry_packet()
+{
+    if(packet[0] != 0x30 && packet[0] != 0x31)
+        return;
+    scramble_pkt(); //This will unscramble the packet
+    if (packet[0] == 0x30) {
+        if(packet[11] & 0x01)
+            Telemetry.volt1 = packet[1];
+        if(packet[11] & 0x02)
+            Telemetry.volt2 = packet[2];
+        if(packet[11] & 0x04)
+            Telemetry.volt3 = packet[3];
+    }
+}
+
 static void cyrf_set_bound_sop_code()
 {
     /* crc == 0 isn't allowed, so use 1 if the math results in 0 */
@@ -259,6 +276,51 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 
+static u16 devo_telemetry_cb()
+{
+    if (txState == 0) {
+        txState = 1;
+        DEVO_BuildPacket();
+        CYRF_WriteDataPacket(packet);
+        return 900;
+    }
+    int delay = 100;
+    if (txState == 1) {
+        while(! (CYRF_ReadRegister(0x04) & 0x02))
+            ;
+        if (state == DEVO_BOUND) {
+            /* exit binding state */
+            state = DEVO_BOUND_3;
+            cyrf_set_bound_sop_code();
+        }
+        if(pkt_num == 0 || bind_counter > 0) {
+            delay = 1500;
+            txState = 15;
+        } else {
+            CYRF_ConfigRxTx(0); //Receive mode
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+        }
+    } else {
+        if(CYRF_ReadRegister(0x07) & 0x20) {
+            CYRF_ReadDataPacket(packet);
+            parse_telemetry_packet();
+            delay = 100 * (16 - txState);
+            txState = 15;
+        }
+    }
+    txState++;
+    if(txState == 16) { //2.3msec have passed
+        CYRF_ConfigRxTx(1); //Write mode
+        if(pkt_num == 0) {
+            radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
+            CYRF_ConfigRFChannel(*radio_ch_ptr);
+        }
+        txState = 0;
+    }
+    return delay;
+}
+
 static u16 devo_cb()
 {
     if (txState == 0) {
@@ -302,6 +364,7 @@ static void initialize()
     set_radio_channels();
     use_fixed_id = 0;
     radio_ch_ptr = radio_ch;
+    memset(&Telemetry, 0, sizeof(Telemetry));
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
     num_channels = ((Model.num_channels + 3) >> 2) * 4;
@@ -323,7 +386,11 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    CLOCK_StartTimer(2400, devo_cb);
+    if (TELEMETRY) {
+        CLOCK_StartTimer(2400, devo_telemetry_cb);
+    } else {
+        CLOCK_StartTimer(2400, devo_cb);
+    }
 }
 
 u32 DEVO_Cmds(enum ProtoCmds cmd)

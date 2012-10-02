@@ -20,6 +20,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "main_config.h"
+#include "telemetry.h"
 
 static struct main_page * const mp = &pagemem.u.main_page;
 const char *show_box_cb(guiObject_t *obj, const void *data);
@@ -183,9 +184,11 @@ void PAGE_MainEvent()
 
 s32 get_boxval(u8 idx)
 {
-    if(idx == 1 || idx == 2)
-        return TIMER_GetValue(idx-1);
-    return RANGE_TO_PCT(MIXER_GetChannel(idx-3, APPLY_SAFETY));
+    if(idx == Box_Timer1 || idx == Box_Timer2)
+        return TIMER_GetValue(idx - Box_Timer1);
+    if(idx == Box_Telemetry1 || idx == Box_Telemetry2)
+        return TELEMETRY_GetValue(idx - Box_Telemetry1);
+    return RANGE_TO_PCT(MIXER_GetChannel(idx - Box_LAST, APPLY_SAFETY));
 }
 
 void PAGE_MainExit()
@@ -197,10 +200,12 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    if(idx < 3) {
-        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx-1));
+    if (idx == Box_Timer1 || idx == Box_Timer2) {
+        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - Box_Timer1));
+    } else if (idx == Box_Telemetry1 || idx == Box_Telemetry2) {
+        TELEMETRY_SetString(mp->tmpstr, TELEMETRY_GetValue(idx - Box_Telemetry1));
     } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx-3, APPLY_SAFETY)));
+        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - Box_LAST, APPLY_SAFETY)));
     }
     return mp->tmpstr;
 }

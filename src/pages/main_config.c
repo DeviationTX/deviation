@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "main_config.h"
+#include "telemetry.h"
 
 char str[30];
 u8 page_num;
@@ -116,10 +117,14 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
     if (changed)
         build_image();
-    if (Model.pagecfg.box[i] == 1)
+    if (Model.pagecfg.box[i] == Box_Timer1)
         return _tr("Timer1");
-    if (Model.pagecfg.box[i] == 2)
+    if (Model.pagecfg.box[i] == Box_Timer2)
         return _tr("Timer2");
+    if (Model.pagecfg.box[i] == Box_Telemetry1)
+        return _tr("Telemetry1");
+    if (Model.pagecfg.box[i] == Box_Telemetry2)
+        return _tr("Telemetry2");
     
     return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
 }
