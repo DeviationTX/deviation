@@ -53,7 +53,7 @@ struct font_def
 {
         u8 idx;
         FILE *fh;
-        u8 font[60];
+        u8 font[80];
 	u8 height;  		/* Character height for storage        */
         u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
 };
@@ -115,6 +115,11 @@ const u8 *char_offset(u32 c, u8 *width)
     get_char_range(c, &begin, &end);
     *width = (end - begin) / row_bytes;
     fseek(cur_str.font.fh, begin, SEEK_SET);
+    if (end - begin > sizeof(cur_str.font.font)) {
+        printf("Character '%04d' is larger than allowed size\n", c);
+        end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
+        *width = (end - begin) / row_bytes;
+    }
     fread(font, end - begin, 1, cur_str.font.fh);
     return font;
 }
