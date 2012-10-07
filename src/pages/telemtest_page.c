@@ -20,28 +20,11 @@
 
 #define tp (pagemem.u.telemtest_page)
 
-static const char *volt_cb(guiObject_t *obj, const void *data)
+static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u32 val = Telemetry.volt[(long)data];
-    sprintf(tp.str, "%d.%dV", val/10, val % 10);
-    return tp.str;
-}
-
-static const char *temp_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u32 val = Telemetry.temp[(long)data];
-    sprintf(tp.str, "%dC", val);
-    return tp.str;
-}
-
-static const char *rpm_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u32 val = Telemetry.rpm[(long)data];
-    sprintf(tp.str, "%d", val);
-    return tp.str;
+    return TELEMETRY_SetString(tp.str, val);
 }
 
 static const char *raw_cb(guiObject_t *obj, const void *data)
@@ -64,27 +47,27 @@ void PAGE_TelemtestInit(int page)
 
     u16 y = 40;
     GUI_CreateLabelBox(20,  y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Volt1:"));
-    tp.volt[0] = GUI_CreateLabelBox(55,  y, 40, 16, &DEFAULT_FONT, volt_cb, NULL, (void *)0L);
+    tp.volt[0] = GUI_CreateLabelBox(55,  y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)0L);
     GUI_CreateLabelBox(130, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Volt2:"));
-    tp.volt[1] = GUI_CreateLabelBox(165, y, 40, 16, &DEFAULT_FONT, volt_cb, NULL, (void *)1L);
+    tp.volt[1] = GUI_CreateLabelBox(165, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)1L);
     GUI_CreateLabelBox(240, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Volt3:"));
-    tp.volt[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, volt_cb, NULL, (void *)2L);
+    tp.volt[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)2L);
     y = 60;
     GUI_CreateLabelBox(10, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Temp1:"));
-    tp.temp[0] = GUI_CreateLabelBox(50,  y, 40, 16, &DEFAULT_FONT, temp_cb, NULL, (void *)0L);
+    tp.temp[0] = GUI_CreateLabelBox(50,  y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)3L);
     GUI_CreateLabelBox(90, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Temp2:"));
-    tp.temp[1] = GUI_CreateLabelBox(130, y, 40, 16, &DEFAULT_FONT, temp_cb, NULL, (void *)1L);
+    tp.temp[1] = GUI_CreateLabelBox(130, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)4L);
     GUI_CreateLabelBox(170, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Temp3:"));
-    tp.temp[2] = GUI_CreateLabelBox(210, y, 40, 16, &DEFAULT_FONT, temp_cb, NULL, (void *)2L);
+    tp.temp[2] = GUI_CreateLabelBox(210, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)5L);
     GUI_CreateLabelBox(250, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Temp4:"));
-    tp.temp[3] = GUI_CreateLabelBox(290, y, 40, 16, &DEFAULT_FONT, temp_cb, NULL, (void *)3L);
+    tp.temp[3] = GUI_CreateLabelBox(290, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)6L);
     y = 80;
     GUI_CreateLabelBox(20,  y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM1:"));
-    tp.rpm[0] = GUI_CreateLabelBox(55,  y, 40, 16, &DEFAULT_FONT, rpm_cb, NULL, (void *)0L);
+    tp.rpm[0] = GUI_CreateLabelBox(55,  y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)7L);
     GUI_CreateLabelBox(130, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM2:"));
-    tp.rpm[1] = GUI_CreateLabelBox(165, y, 40, 16, &DEFAULT_FONT, rpm_cb, NULL, (void *)1L);
+    tp.rpm[1] = GUI_CreateLabelBox(165, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)8L);
     GUI_CreateLabelBox(240, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM3:"));
-    tp.rpm[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, rpm_cb, NULL, (void *)2L);
+    tp.rpm[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)9L);
 
     tp.line[0] = GUI_CreateLabelBox(20,  180, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)1L);
     tp.line[1] = GUI_CreateLabelBox(20,  200, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)2L);

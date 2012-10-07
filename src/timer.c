@@ -41,6 +41,12 @@ void TIMER_SetString(char *str, s32 time)
     sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
 }
 
+const char *TIMER_Name(char *str, u8 timer)
+{
+    sprintf(str, "%s%d", _tr("Timer"), timer+1);
+    return str;
+}
+
 void TIMER_StartStop(u8 timer)
 {
     timer_state[timer] ^= 1;

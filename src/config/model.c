@@ -559,26 +559,23 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_START(name, GUI_BOX)) {
+            char str[20];
             u8 idx = name[3] - '1';
             if (idx >= 8) {
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
-            if (MATCH_START(value, GUI_TIMER)) {
-                i = value[5] - '1';
-                if (i < 2)
-                    m->pagecfg.box[idx] = i + Box_Timer1;
-                else
-                    printf("%s: Unknown timer: %s\n", section, value);
-                return 1;
+            for(i = 0; i < NUM_TIMERS; i++) {
+                if(mapstrcasecmp(value, TIMER_Name(str, i)) == 0) {
+                    m->pagecfg.box[idx] = i + 1;
+                    return 1;
+                }
             }
-            if (MATCH_START(value, GUI_TELEMETRY)) {
-                i = value[9] - '1';
-                if (i < 2)
-                    m->pagecfg.box[idx] = i + Box_Telemetry1;
-                else
-                    printf("%s: Unknown timer: %s\n", section, value);
-                return 1;
+            for(i = 0; i < NUM_TELEM; i++) {
+                if(mapstrcasecmp(value, TELEMETRY_Name(str, i)) == 0) {
+                    m->pagecfg.box[idx] = i + 1 + NUM_TIMERS;
+                    return 1;
+                }
             }
             u8 src = get_source(section, value);
             if(src > 0) {
@@ -586,7 +583,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     printf("%s: Illegal input for box: %s\n", section, value);
                     return 1;
                 }
-                src -= NUM_INPUTS + 1 - Box_LAST;
+                src -= NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1);
             }
             m->pagecfg.box[idx] = src;
             return 1;
@@ -796,14 +793,14 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", GUI_BARSIZE, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
     for(idx = 0; idx < 8; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.box[idx]) {
-            if(m->pagecfg.box[idx] == Box_Timer1 || m->pagecfg.box[idx] == Box_Timer2) {
-                fprintf(fh, "%s%d=%s%d\n", GUI_BOX, idx+1, GUI_TIMER, m->pagecfg.box[idx]);
-            } else if(m->pagecfg.box[idx] == Box_Telemetry1 || m->pagecfg.box[idx] == Box_Telemetry2) {
-                fprintf(fh, "%s%d=%s%d\n", GUI_BOX, idx+1, GUI_TELEMETRY, m->pagecfg.box[idx] - Box_Telemetry1 + 1);
+            if(m->pagecfg.box[idx] && m->pagecfg.box[idx] <= NUM_TIMERS) {
+                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TIMER_Name(file, m->pagecfg.box[idx]-1));
+            } else if(m->pagecfg.box[idx] && m->pagecfg.box[idx] - NUM_TIMERS <= NUM_TELEM) {
+                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TELEMETRY_Name(file, m->pagecfg.box[idx]-NUM_TIMERS-1));
             } else {
                 u8 val = m->pagecfg.box[idx];
                 if (val)
-                    val += NUM_INPUTS-2;
+                    val += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
                 fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, INPUT_SourceName(file, val));
             }
         }

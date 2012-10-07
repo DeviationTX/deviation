@@ -25,7 +25,28 @@ s32 TELEMETRY_GetValue(int idx)
         return Telemetry.volt[2];
 }
 
-void TELEMETRY_SetString(char *str, s32 value)
+const char * TELEMETRY_SetString(char *str, u8 telem)
 {
-    sprintf(str, "%d.%dV", (int)value /10, (int)value % 10);
+    if(telem < 3) {
+        sprintf(str, "%d.%dV", (int)Telemetry.volt[telem] /10, (int)Telemetry.volt[telem] % 10);
+    } else if(telem < 7) {
+        sprintf(str, "%dC", (int)Telemetry.temp[telem-3]);
+    } else if(telem < 10) {
+        sprintf(str, "%d", (int)Telemetry.rpm[telem-7]);
+    }
+    return str;
+}
+
+const char * TELEMETRY_Name(char *str, u8 telem)
+{
+    if(telem < 3) {
+        sprintf(str, "%s%d", _tr("TelemV"), telem+1);
+    } else if(telem < 7) {
+        sprintf(str, "%s%d", _tr("TelemT"), telem - 2);
+    } else if(telem < 10) {
+        sprintf(str, "%s%d", _tr("TelemRPM"), telem - 6);
+    } else {
+        return "";
+    }
+    return str;
 }

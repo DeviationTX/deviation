@@ -1,15 +1,7 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-enum {
-    Box_None,
-    Box_Timer1,
-    Box_Timer2,
-    Box_Telemetry1,
-    Box_Telemetry2,
-    Box_LAST,
-};
-
+#define NUM_TELEM 10
 struct Telemetry {
     u16 volt[3];
     u8 temp[4];
@@ -19,5 +11,6 @@ struct Telemetry {
 };
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
-void TELEMETRY_SetString(char *str, s32 value);
+const char * TELEMETRY_SetString(char *str, u8 telem);
+const char * TELEMETRY_Name(char *str, u8 telem);
 #endif

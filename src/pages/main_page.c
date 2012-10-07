@@ -184,11 +184,11 @@ void PAGE_MainEvent()
 
 s32 get_boxval(u8 idx)
 {
-    if(idx == Box_Timer1 || idx == Box_Timer2)
-        return TIMER_GetValue(idx - Box_Timer1);
-    if(idx == Box_Telemetry1 || idx == Box_Telemetry2)
-        return TELEMETRY_GetValue(idx - Box_Telemetry1);
-    return RANGE_TO_PCT(MIXER_GetChannel(idx - Box_LAST, APPLY_SAFETY));
+    if (idx <= NUM_TIMERS)
+        return TIMER_GetValue(idx - 1);
+    if(idx - NUM_TIMERS <= NUM_TELEM)
+        return TELEMETRY_GetValue(idx - NUM_TIMERS - 1);
+    return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY));
 }
 
 void PAGE_MainExit()
@@ -200,12 +200,12 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    if (idx == Box_Timer1 || idx == Box_Timer2) {
-        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - Box_Timer1));
-    } else if (idx == Box_Telemetry1 || idx == Box_Telemetry2) {
-        TELEMETRY_SetString(mp->tmpstr, TELEMETRY_GetValue(idx - Box_Telemetry1));
+    if (idx <= NUM_TIMERS) {
+        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
+    } else if(idx - NUM_TIMERS <= NUM_TELEM) {
+        TELEMETRY_SetString(mp->tmpstr, idx - NUM_TIMERS - 1);
     } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - Box_LAST, APPLY_SAFETY)));
+        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY)));
     }
     return mp->tmpstr;
 }

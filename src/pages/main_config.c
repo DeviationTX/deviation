@@ -118,16 +118,13 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
     if (changed && (old_val == 0 || Model.pagecfg.box[i] == 0))
         build_image();
-    if (Model.pagecfg.box[i] == Box_Timer1)
-        return _tr("Timer1");
-    if (Model.pagecfg.box[i] == Box_Timer2)
-        return _tr("Timer2");
-    if (Model.pagecfg.box[i] == Box_Telemetry1)
-        return _tr("Telemetry1");
-    if (Model.pagecfg.box[i] == Box_Telemetry2)
-        return _tr("Telemetry2");
-    
-    return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - 2 + NUM_INPUTS : 0);
+    if (Model.pagecfg.box[i]) {
+        if (Model.pagecfg.box[i] <= NUM_TIMERS)
+            return TIMER_Name(str, Model.pagecfg.box[i] - 1);
+        else if( Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM)
+            return TELEMETRY_Name(str, Model.pagecfg.box[i] - 1 - NUM_TIMERS);
+    }
+    return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
 }
 const char *barlabel_cb(guiObject_t *obj, const void *data)
 {
