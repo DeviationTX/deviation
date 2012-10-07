@@ -164,12 +164,17 @@ static void parse_telemetry_packet()
         return;
     scramble_pkt(); //This will unscramble the packet
     if (packet[0] == 0x30) {
-        if(packet[11] & 0x01)
-            Telemetry.volt1 = packet[1];
-        if(packet[11] & 0x02)
-            Telemetry.volt2 = packet[2];
-        if(packet[11] & 0x04)
-            Telemetry.volt3 = packet[3];
+        Telemetry.volt[0] = packet[2]; //In 1/10 of Volts
+        Telemetry.volt[1] = packet[3]; //In 1/10 of Volts
+        Telemetry.volt[2] = packet[4]; //In 1/10 of Volts
+        memcpy(Telemetry.line1, packet+1, 12);
+    }
+    if (packet[1] == 0x31) {
+        Telemetry.temp[0] = packet[1] - 20; //In degrees-C
+        Telemetry.temp[1] = packet[2] - 20; //In degrees-C
+        Telemetry.temp[2] = packet[3] - 20; //In degrees-C
+        Telemetry.temp[3] = packet[4] - 20; //In degrees-C
+        memcpy(Telemetry.line2, packet+1, 12);
     }
 }
 
@@ -365,6 +370,9 @@ static void initialize()
     use_fixed_id = 0;
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
+    strcpy((char *)Telemetry.line1, "abcdefghijkl");
+    strcpy((char *)Telemetry.line2, "123456789012");
+
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
     num_channels = ((Model.num_channels + 3) >> 2) * 4;

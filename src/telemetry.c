@@ -20,9 +20,9 @@ s32 TELEMETRY_GetValue(int idx)
 {
     (void)idx;
     if(idx == 0)
-        return Telemetry.volt2;
+        return Telemetry.volt[1];
     else
-        return Telemetry.volt3;
+        return Telemetry.volt[2];
 }
 
 void TELEMETRY_SetString(char *str, s32 value)

@@ -10,6 +10,7 @@
 #include "scanner_page.h"
 #include "usb_page.h"
 #include "calibrate_page.h"
+#include "telemtest_page.h"
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1
@@ -25,6 +26,7 @@ struct pagemem {
         struct scanner_page scanner_page;
         struct usb_page usb_page;
         struct calibrate_page calibrate_page;
+        struct telemtest_page telemtest_page;
     } u;
 };
 
@@ -93,4 +95,7 @@ void LANGPage_Select(void(*return_page)(int page));
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
 
+/* Telemetry Test */
+void PAGE_TelemtestInit(int page);
+void PAGE_TelemtestEvent();
 #endif

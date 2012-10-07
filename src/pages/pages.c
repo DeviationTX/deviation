@@ -44,6 +44,7 @@ static const struct page pages[] = {
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
     {PAGE_CalibrateInit, PAGE_CalibrateEvent, NULL},
+    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
     {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
     {PAGE_ButtontestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
