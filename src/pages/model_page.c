@@ -129,8 +129,13 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     PAGE_SetModal(1);
-    if(Model.fixed_id == 0)
-        mp->fixed_id[0] = 0;
+    if(Model.fixed_id == 0) {
+        u32 id = PROTOCOL_CurrentID();
+        if (id)
+            sprintf(mp->fixed_id, "%d", id);
+        else
+            mp->fixed_id[0] = 0;
+    }
     PAGE_RemoveAllObjects();
     GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, NULL);
 }

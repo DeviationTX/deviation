@@ -124,6 +124,7 @@ void PROTOCOL_Bind();
 void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
 void PROTOCOL_CheckDialogs();
+u32 PROTOCOL_CurrentID();
 int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */

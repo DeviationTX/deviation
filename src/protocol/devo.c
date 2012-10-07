@@ -384,6 +384,7 @@ static void initialize()
         fixed_id = ((u32)(radio_ch[0] ^ cyrfmfg_id[0] ^ cyrfmfg_id[3]) << 16)
                  | ((u32)(radio_ch[1] ^ cyrfmfg_id[1] ^ cyrfmfg_id[4]) << 8)
                  | ((u32)(radio_ch[2] ^ cyrfmfg_id[2] ^ cyrfmfg_id[5]) << 0);
+        fixed_id = fixed_id % 1000000;
         bind_counter = BIND_COUNT;
         state = DEVO_BIND;
         PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
@@ -408,6 +409,7 @@ u32 DEVO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
         case PROTOCMD_BIND:  bind(); return 0;
         case PROTOCMD_NUMCHAN: return 12;
+        case PROTOCMD_CURRENT_ID:  return fixed_id;
         default: break;
     }
     return 0;
