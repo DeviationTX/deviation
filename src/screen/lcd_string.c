@@ -116,7 +116,7 @@ const u8 *char_offset(u32 c, u8 *width)
     *width = (end - begin) / row_bytes;
     fseek(cur_str.font.fh, begin, SEEK_SET);
     if (end - begin > sizeof(cur_str.font.font)) {
-        printf("Character '%04d' is larger than allowed size\n", c);
+        printf("Character '%04d' is larger than allowed size\n", (int)c);
         end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
         *width = (end - begin) / row_bytes;
     }
