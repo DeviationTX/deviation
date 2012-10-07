@@ -4,6 +4,6 @@
 
 struct usb_page {
     struct buttonAction action;
-    char tmpstr[80];
+    char tmpstr[200];
 };
 #endif
