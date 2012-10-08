@@ -71,17 +71,32 @@ void PAGE_TelemtestInit(int page)
 
     tp.line[0] = GUI_CreateLabelBox(20,  180, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)1L);
     tp.line[1] = GUI_CreateLabelBox(20,  200, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)2L);
-    
+    tp.telem = Telemetry;
 }
 void PAGE_TelemtestEvent() {
     int i;
     for(i = 0; i < 3; i++) {
-        GUI_Redraw(tp.volt[i]);
-        GUI_Redraw(tp.rpm[i]);
+        if (Telemetry.volt[i] != tp.telem.volt[i]) {
+            GUI_Redraw(tp.volt[i]);
+            tp.telem.volt[i] = Telemetry.volt[i];
+        }
+        if (Telemetry.rpm[i] != tp.telem.rpm[i]) {
+            GUI_Redraw(tp.rpm[i]);
+            tp.telem.rpm[i] = Telemetry.rpm[i];
+        }
     }
     for(i = 0; i < 4; i++) {
-        GUI_Redraw(tp.temp[i]);
+        if (Telemetry.temp[i] != tp.telem.temp[i]) {
+            GUI_Redraw(tp.temp[i]);
+            tp.telem.temp[i] = Telemetry.temp[i];
+        }
     }
-    GUI_Redraw(tp.line[0]);
-    GUI_Redraw(tp.line[1]);
+    if (memcmp(tp.telem.line1, Telemetry.line1, 12) != 0) {
+        GUI_Redraw(tp.line[0]);
+        memcpy(tp.telem.line1, Telemetry.line1, 12);
+    }
+    if (memcmp(tp.telem.line2, Telemetry.line2, 12) != 0) {
+        GUI_Redraw(tp.line[1]);
+        memcpy(tp.telem.line2, Telemetry.line2, 12);
+    }
 }
