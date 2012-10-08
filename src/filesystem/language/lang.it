@@ -1,0 +1,383 @@
+Italiano
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%, valore sicuro  = %d%%\n
+:1-to-1
+1 a 1
+:11 Point
+11 Punti
+:13 Point
+13 Punti
+:3 Point
+3 Punti
+:4 Bars                                    
+4 Barre
+:4 Inside
+4 Interno
+:4 Outside
+4 Esterno
+:4Ch w/ Dual-Rates
+4Ch con DualRate
+:5 Point
+5 Punti
+:6 Trims
+6 Trim
+:6Ch Airplane
+Aereo 6Ch
+:6Ch Helicopter
+Elicottero 6Ch
+:7 Point
+7 Punti
+:8 Bars
+8 Barre
+:9 Point
+9 Punti
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+ValAss
+:AIL
+ALE
+:AIL DR
+DR ALE
+:AIL Inv:
+:Direzione degli Alettoni
+:AUX4
+AUX4
+:AUX5
+AUX5
+:Airplane
+Aereo
+:Backlight:
+Luminosità:
+:Bar %d:
+Barra %d:
+:Bars:                                             
+Barre:
+:Battery Alarm:
+Allarme batteria:
+:Bind
+Bind
+:Binding
+Binding
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Binding in corso...\nAssicuratevi che il modello sia acceso\n\nIl tasto OK non interrompera' la procedura di binding\nma permettera' il controllo della TX.
+:Box %d:
+Box%d:
+:Buttons
+Bottone
+:COL
+Collettivo
+:COL Inv:
+:Direzione del Collettivo
+:CYC
+Ciclico
+:Calibrate
+Calibrazione
+:Cancel
+Cancella
+:Center all sticks and touch the screen
+Centrate tutti gli stick e toccate lo schermo
+:Ch
+Ch
+:Change
+Cambia
+:Channels
+Canale
+:Complex
+Complesso
+:Configure
+Configura
+:Copy To...
+Copia...
+:Curve:
+Curva:
+:Cyclic1
+Ciclico1
+:Cyclic2
+Ciclico2
+:Cyclic3
+Ciclico3
+:DR
+DR
+:Default
+Default
+:Deviation FW\nversion:
+Versione dell'\nFW Deviation:
+:Down
+Giu'
+:ELE
+ELE
+:ELE DR
+DR ELE
+:ELE Inv:
+ELE Inv
+:EXPO
+Esponenziale
+:Enter
+Entra
+:Exit
+Esci
+:Expo&DR
+Esp.&DR
+:FMODE0
+FMODE0
+:FMODE1
+FMODE1
+:FMODE2
+FMODE2
+:Failsafe:
+Failsafe:
+:File:
+File:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+Il filesystem non può essere montato. Create il FS tramite USB, quindi premere 'ENT' per uscire.
+:Fixed
+Fisso
+:Fixed ID:
+ID Fisso:
+:GEAR
+CARRELLO
+:Helicopter
+Elicottero
+:High-Rate
+Rate Alto
+:Icon
+Icona
+:Input:
+Ingresso:
+:Inputs
+Ingressi
+:Inverted
+Inverso
+:LEFT_H 
+SINISTRA_H
+:LEFT_V
+SINISTRA_V
+:Language:
+Lingua:
+:Left
+Sinistra
+:Linked
+Linkato
+:Load
+Carica
+:Load...
+Carica...
+:Low-Rate
+Rate basso
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main Page Config
+Pagina principale di Conf
+:Max:
+Max:
+:Mid-Rate
+Rate Medio
+:Min/Max
+Min/Max
+:Min:
+Min:
+:Mixer
+Mixer
+:Mixers:
+Mixers:
+:Mode %d
+Modo %d
+:Model
+Modello
+:Model Name:
+Nome del Modello:
+:Model Type:
+Tipo del Modello:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Muovere ciascuno stick al max\ne al min quindi tornare al centro\nTocca lo schermo quando hai finito
+:Mux:
+Operazione:
+:Neg
+Neg.
+:No Bars
+No Bars
+:No Trim
+No Trim
+:No Trims
+No Trims
+:None
+Nessuno
+:Normal
+Normale
+:Number of Channels:
+Nuero di Canali:
+:OK
+OK
+:Off
+Off
+:Offset:
+Offset:
+:On
+On
+:Page:
+Pagina:
+:Point:
+Punto:
+:Pos
+Pos.
+:Pos/Neg:
+Pos./Neg.:
+:Press 'Ent' to turn USB Filesystem:
+Premi 'Ent' per attivare il Filesystem USB:
+:Protocol:
+Protocollo:
+:RIGHT_H
+DESTRA_H
+:RIGHT_V
+DESTRA_V
+:RUD
+TIMONE
+:RUD DR
+DR TIMONE
+:Re-Init
+Reinizializza
+:Reset
+Reset
+:Reverse:
+Inverso:
+:Reversed
+Rovesciato:
+:Right
+Destra
+:Safe Val:
+Val. sicuro
+:Safety
+Sicurezza
+:Safety:
+Sicurezza:
+:Save
+Salva
+:Scale:
+Scala:
+:Scanner
+Scanner
+:Simple
+Sempl.
+:Simple 4 Channel
+4Ch. Semplici
+:Src
+Sorgente
+:Src:
+Sorgente:
+:Start:
+Avvia:
+:Stick Mode:
+Modo di volo:
+:Sticks:
+Sticks:
+:Subtrim:
+Subtrim
+:SwashType:
+Piatto:
+:Switch1
+Interr1
+:Switch2
+Interr2
+:Switch:
+Interrutore:
+:Symmetric
+Simmetrico
+:THR
+ACCEL
+:TRIMLH+
+TRIMGH+
+:TRIMLH-
+TRIMGH-
+:TRIMLV+
+TRIMGV+
+:TRIMLV-
+TRIMGV-
+:TRIMRH+
+TRIMDH+
+:TRIMRH-
+TRIMDH-
+:TRIMRV+
+TRIMDV+
+:TRIMRV-
+TRIMDV-
+:TRIM_L+
+TRIM_G+
+:TRIM_L-
+TRIM_G-
+:TRIM_R+
+TRIM_D+
+:TRIM_R-
+TRIM_D-
+:Template..
+Modello..
+:Test
+Test
+:Timer
+Timer
+:Timer1
+Timer1
+:Timer2
+Timer2
+:Toggle%d
+Alterna%d
+:Touch Calibrate
+Calibrazione del Touchscreen
+:Touch Screen:
+Touch Screen:
+:Touch Test
+Test del Touchscreen
+:Touch target %d
+Tocca %d
+:Touch to Lock
+Tocca per bloccare
+:Touch to Unlock
+Tocca per sbloccare
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Trim fine:
+:Trims:
+Trim:
+:Turn Off
+Disattiva
+:Turn On
+Attiva
+:Tx Power:
+Potenza di TX:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+Modo archivio USB, premere 'ENT' per uscire.
+:Unknown
+Sconosciuto
+:Up
+Su'
+:Value:
+valore:
+:Virt
+Virt
+:Zero/Max
+0/Max
+:\n\nBinding will end in %d seconds...
+\n\nIl Binding finira' tra %d secondi...
+:add
+aggiungi
+:countdown
+countdown
+:mult
+Mult.
+:replace
+Sostituisci
+:stopwatch
+Cronometro
