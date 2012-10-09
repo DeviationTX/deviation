@@ -370,8 +370,8 @@ static void initialize()
     use_fixed_id = 0;
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
-    strcpy((char *)Telemetry.line1, "abcdefghijkl");
-    strcpy((char *)Telemetry.line2, "123456789012");
+    memcpy(Telemetry.line1, "abcdefghijkl", 12);
+    memcpy(Telemetry.line2, "123456789012", 12);
 
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
