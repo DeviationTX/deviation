@@ -23,7 +23,7 @@
 static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u32 val = Telemetry.volt[(long)data];
+    u32 val = (long)data;
     return TELEMETRY_SetString(tp.str, val);
 }
 
