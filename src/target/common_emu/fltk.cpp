@@ -36,6 +36,7 @@ extern "C" {
 #include "common.h"
 #include "fltk.h"
 #include "mixer.h"
+#include "config/tx.h"
 }
 
 
@@ -213,6 +214,24 @@ void start_event_loop() {
     Fl::run();
 }
 
+void set_stick_positions()
+{
+    gui.throttle = 5;
+    gui.elevator = 5;
+    gui.aileron  = 5;
+    gui.rudder   = 5;
+    switch(Transmitter.mode) {
+    case MODE_1:
+    case MODE_3:
+       gui.throttle = 0;
+       break;
+    case MODE_2:
+    case MODE_4:
+       gui.elevator = 0;
+       break;
+    }
+}
+
 void close_window(Fl_Widget *widget, void *param)
 {
     (void)widget;
@@ -271,6 +290,7 @@ void LCD_Init()
   Fl::add_check(update_channels);
   Fl::wait();
   gui.last_redraw = CLOCK_getms();
+  gui.init = 1;
 }
 
 struct touch SPITouch_GetCoords() {

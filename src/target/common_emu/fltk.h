@@ -29,7 +29,10 @@ struct Gui {
     Fl_Output *final[20];
     u32 last_redraw;
     u8  image[LCD_WIDTH*LCD_HEIGHT*3];
+    u8 init;
 } gui;
 
 extern struct Gui gui;
+void set_stick_positions();
+
 #endif

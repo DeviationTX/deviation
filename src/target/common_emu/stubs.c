@@ -20,6 +20,7 @@
 
 #include "common.h"
 #include "protocol/interface.h"
+#include "fltk.h"
 
 void TxName(u8 *var, u8 len) {
     const u8 model[] = "DEVO-08-Emu";
@@ -36,7 +37,15 @@ u16  PWR_ReadVoltage() { return (5500); }
 void CHAN_Init() {}
 
 void CLOCK_StartWatchdog() {}
-void CLOCK_ResetWatchdog() {}
+void CLOCK_ResetWatchdog() {
+    //This isn't an intuitive placeeeeeto initializethe sticks
+    //But it needs to be done after reading the config fies
+    //And this is the easiest place I could find.
+    if(gui.init) {
+        gui.init = 0;
+        set_stick_positions();
+    }
+}
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
