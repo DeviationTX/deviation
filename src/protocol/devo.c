@@ -164,12 +164,12 @@ static void parse_telemetry_packet()
         return;
     scramble_pkt(); //This will unscramble the packet
     if (packet[0] == 0x30) {
-        Telemetry.volt[0] = packet[2]; //In 1/10 of Volts
+        Telemetry.volt[0] = packet[1]; //In 1/10 of Volts
         Telemetry.volt[1] = packet[3]; //In 1/10 of Volts
-        Telemetry.volt[2] = packet[4]; //In 1/10 of Volts
+        Telemetry.volt[2] = packet[5]; //In 1/10 of Volts
         memcpy(Telemetry.line1, packet+1, 12);
     }
-    if (packet[1] == 0x31) {
+    if (packet[0] == 0x31) {
         Telemetry.temp[0] = packet[1] - 20; //In degrees-C
         Telemetry.temp[1] = packet[2] - 20; //In degrees-C
         Telemetry.temp[2] = packet[3] - 20; //In degrees-C
