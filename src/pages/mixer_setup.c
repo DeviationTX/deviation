@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
+#include "config/model.h"
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
@@ -43,6 +44,9 @@ void MIXPAGE_ChangeTemplate(int show_header)
         || mp->cur_mixer > mp->mixer + mp->num_mixers)
     {
         mp->cur_mixer = mp->mixer;
+    }
+    if (Model.type == MODELTYPE_PLANE && mp->cur_template > MIXERTEMPLATE_MAX_PLANE) {
+        mp->cur_template = MIXERTEMPLATE_NONE;
     }
     sync_mixers();
     if (show_header) {
@@ -79,7 +83,7 @@ static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
-    mp->cur_template = GUI_TextSelectHelper(mp->cur_template, 0, MIXERTEMPLATE_MAX, dir, 1, 1, &changed);
+    mp->cur_template = GUI_TextSelectHelper(mp->cur_template, 0, Model.type == MODELTYPE_HELI ? MIXERTEMPLATE_MAX_HELI : MIXERTEMPLATE_MAX_PLANE, dir, 1, 1, &changed);
     if (changed) {
         MIXPAGE_ChangeTemplate(0);
         return "";
