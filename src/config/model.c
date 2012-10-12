@@ -71,6 +71,7 @@ static const char SECTION_CHANNEL[] = "channel";
 static const char CHAN_LIMIT_REVERSE[] = "reverse";
 static const char CHAN_LIMIT_SAFETYSW[] = "safetysw";
 static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
+static const char CHAN_LIMIT_FAILSAFE[] = "failsafe";
 static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
 static const char CHAN_SUBTRIM[] = "subtrim";
@@ -364,6 +365,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 m->limits[idx].flags |= CH_REVERSE;
             else
                 m->limits[idx].flags &= ~CH_REVERSE;
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_LIMIT_FAILSAFE)) {
+            if(strcasecmp("off", value) == 0) {
+                m->limits[idx].flags &= ~CH_FAILSAFE_EN;
+            } else {
+                m->limits[idx].failsafe = value_int;
+                m->limits[idx].flags |= CH_FAILSAFE_EN;
+            }
             return 1;
         }
         if (MATCH_KEY(CHAN_LIMIT_SAFETYSW)) {
@@ -720,6 +730,13 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
         if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
             fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceName(file, m->limits[idx].safetysw));
+        if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
+            if(m->limits[idx].flags & CH_FAILSAFE_EN) {
+                fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
+            } else {
+                fprintf(fh, "%s=Off\n", CHAN_LIMIT_FAILSAFE);
+            }
+        }
         if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
         if(WRITE_FULL_MODEL || m->limits[idx].max != DEFAULT_SERVO_LIMIT)
