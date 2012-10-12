@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
+#include <stdlib.h>
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static void sourceselect_cb(guiObject_t *obj, void *data);
@@ -106,7 +107,7 @@ const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     s8 *value = (s8 *)data;
     *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
-    sprintf(mp->tmpstr, "%d.%d", *value / 10, *value % 10);
+    sprintf(mp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "", abs(*value) / 10, abs(*value) % 10);
     return mp->tmpstr;
 }
 
