@@ -84,7 +84,7 @@ void TIMER_Update()
     for (i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src) {
             s16 val;
-            if (Model.timer[i].src <= NUM_INPUTS) {
+            if (MIXER_SRC(Model.timer[i].src) <= NUM_INPUTS) {
                 s16 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].src)];
             } else {
