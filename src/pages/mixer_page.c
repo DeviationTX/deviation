@@ -141,14 +141,15 @@ static const char *reorder_text_cb(u8 idx)
 static void reorder_return_cb(u8 *list)
 {
     if (list) {
-        int i, j;
+        int i, j, k = 0;
         struct Mixer tmpmix[NUM_MIXERS];
-        for(i = 0; i <NUM_MIXERS; i++) {
-            tmpmix[i] = Model.mixers[i];
-            for(j = 0; j < NUM_CHANNELS; j++) {
-                if(tmpmix[i].dest == list[j]-1) {
-                    tmpmix[i].dest = j;
-                    break;
+        memset(tmpmix, 0, sizeof(tmpmix));
+        for(j = 0; j < NUM_CHANNELS; j++) {
+            for(i = 0; i <NUM_MIXERS; i++) {
+                if(Model.mixers[i].src && Model.mixers[i].dest == list[j]-1) {
+                    memcpy(&tmpmix[k], &Model.mixers[i], sizeof(struct Mixer));
+                    tmpmix[k].dest = j;
+                    k++;
                 }
             }
         }
@@ -167,6 +168,7 @@ static void reorder_return_cb(u8 *list)
         }
         memcpy(Model.templates, tmptemplates, sizeof(Model.templates));
         memcpy(Model.limits, tmplimits, sizeof(Model.limits));
+        MIXER_SetMixers(NULL, 0);
     }
     PAGE_MixerInit(mp->top_channel);
 }
