@@ -3,6 +3,7 @@
 
 #include "mixer.h"
 #include "gui/gui.h"
+#define NUM_COMPLEX_MIXERS 10
 
 struct curve_edit {
     struct Curve curve;
@@ -20,7 +21,7 @@ struct mixer_page {
     guiObject_t *firstObj;
     guiObject_t *trimObj;
     guiObject_t *expoObj[8];
-    struct Mixer mixer[10];
+    struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *cur_mixer;
     struct Limit limit;
     guiObject_t *graphs[3];
@@ -30,6 +31,7 @@ struct mixer_page {
     u8 link_curves;
     char tmpstr[30];
     s16 raw[NUM_SOURCES + 1];
+    u8 list[NUM_COMPLEX_MIXERS];
 
     enum TemplateType cur_template;
 

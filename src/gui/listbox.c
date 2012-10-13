@@ -82,6 +82,16 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
     return obj;
 }
 
+void GUI_ListBoxSelect(struct guiObject *obj, u16 selected)
+{
+    struct guiListbox *listbox = &obj->o.listbox;
+    listbox->selected = selected;
+    if (listbox->select_cb)
+        listbox->select_cb(obj, (u16)selected, listbox->cb_data);
+    OBJ_SET_DIRTY(obj, 1);
+}
+    
+
 static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;

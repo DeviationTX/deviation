@@ -29,6 +29,9 @@ static void toggle_link_cb(guiObject_t *obj, const void *data);
 static const char *show_trim_cb(guiObject_t *obj, const void *data);
 static void toggle_trim_cb(guiObject_t *obj, const void *data);
 
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
+static void reorder_cb(guiObject_t *obj, void *data);
+
 static void show_titlerow();
 static void show_none();
 static void show_simple();
@@ -267,7 +270,7 @@ static void show_complex()
         mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
         GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
         GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
-        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
+        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, reorder_cb, set_mixernum_cb, NULL);
     } else {
         GUI_RemoveHierObjects(mp->expoObj[0]);
     }
@@ -468,7 +471,7 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
     mp->num_mixers = GUI_TextSelectHelper(
                      mp->num_mixers,
                      1 + (mp->cur_mixer - mp->mixer),
-                     sizeof(mp->mixer) / sizeof(struct Mixer),
+                     NUM_COMPLEX_MIXERS,
                      dir, 1, 1, &changed);
     if (changed) {
         mp->num_complex_mixers = mp->num_mixers;
@@ -578,6 +581,49 @@ void curveselect_cb(guiObject_t *obj, void *data)
         memset(mp->graphs, 0, sizeof(mp->graphs));
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }
+}
+
+static const char *reorder_text_cb(u8 idx)
+{
+    if(! idx)
+        return "";
+    if(idx == 255)
+        return _tr("New");
+    sprintf(mp->tmpstr, "Mixer %d", idx);
+    return mp->tmpstr;
+}
+static void reorder_return_cb(u8 *list)
+{
+    int i;
+    if (list) {
+        struct Mixer tmpmix[NUM_COMPLEX_MIXERS];
+        int new_cur_mixer = mp->cur_mixer - mp->mixer;
+        for(i = 0; i < NUM_COMPLEX_MIXERS; i++) {
+            if(list[i] == 0)
+                break;
+            if(list[i] == 255) {
+                memset(&tmpmix[i], 0, sizeof(struct Mixer));
+            } else {
+                tmpmix[i] = mp->mixer[list[i]-1];
+                if(mp->cur_mixer - mp->mixer == list[i]-1)
+                    new_cur_mixer = i;
+            }
+        }
+        mp->cur_mixer = mp->mixer + new_cur_mixer;
+        if (mp->cur_mixer - mp->mixer >= i)
+            mp->cur_mixer = mp->mixer + i - 1;
+        memcpy(mp->mixer, tmpmix, sizeof(mp->mixer));
+        mp->num_complex_mixers = i;
+    }
+    MIXPAGE_ChangeTemplate(1);
+}
+void reorder_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_ShowReorderList(mp->list, mp->num_mixers,mp->cur_mixer - mp->mixer,
+                         NUM_COMPLEX_MIXERS,
+                         reorder_text_cb, reorder_return_cb);
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)

@@ -328,6 +328,8 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
         void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
         void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
         void *cb_data);
+void GUI_ListBoxSelect(guiObject_t *obj, u16 selected);
+
 guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
