@@ -89,6 +89,8 @@ Csatornák
 Komplex
 :Configure
 Konfigurálás
+:Copy To
+Másolás
 :Copy To...
 Másolás...
 :Curve:
@@ -149,6 +151,8 @@ Ikon
 Bemenet:
 :Inputs
 Bemenetek
+:Insert
+Beszúrás
 :Inverted
 Inverz
 :LEFT_H
@@ -195,12 +199,18 @@ Modell
 Modell név:
 :Model Type:
 Modell típus:
+:Move Down
+Lejjebb
+:Move Up
+Feljebb
 :Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
 Mozgassa a botkormányokat\nvégkitérésig, majd vissza középre!\nÉrintse meg a képernyőt, ha kész...
 :Mux:
 Művelet:
 :Neg
 Neg.
+:New
+Új
 :No Bars
 Nincs
 :No Trim
@@ -237,12 +247,20 @@ Protokol:
 JOBB_V
 :RIGHT_V
 JOBB_F
+:RPM1:
+Ford1:
+:RPM2:
+Ford2:
+:RPM3:
+Ford3:
 :RUD
 RUD
 :RUD DR
 RUD DR
 :Re-Init
 Csatol
+:Remove
+Törlés
 :Reset
 Törlés
 :Reverse:
@@ -315,6 +333,22 @@ TRIM_B-
 TRIM_J+
 :TRIM_R-
 TRIM_J-
+:TelemRPM
+TelemFord
+:TelemT
+TelemHőm
+:TelemV
+TelemFesz
+:Telemetry
+Telemtria
+:Temp1:
+Hőm1:
+:Temp2:
+Hőm2:
+:Temp3:
+Hőm3:
+:Temp4:
+Hőm4:
 :Template..
 Sablon...
 :Test
@@ -367,6 +401,12 @@ Fel
 Érték:
 :Virt
 Virt.
+:Volt1:
+Fesz1:
+:Volt2:
+Fesz2:
+:Volt3:
+Fesz3:
 :Zero/Max
 Nulla/Max
 :\n\nBinding will end in %d seconds...
