@@ -377,7 +377,12 @@ int compact_mixers() {
     u8 j;
     while(i < max) {
         u8 src = MIXER_SRC(Model.mixers[i].src);
-        if(! src || Model.templates[Model.mixers[i].dest] == 0) {
+        if(! src 
+           || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_NONE
+           || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC1
+           || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC2
+           || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC3)
+        {
             //Found an empty space so move all following mixers down 1 and decrease max
             for (j = i + 1; j < max; j++) {
                 Model.mixers[j - 1] = Model.mixers[j];
