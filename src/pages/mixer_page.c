@@ -131,6 +131,53 @@ void show_chantest_cb(guiObject_t *obj, const void *data)
     PAGE_ChantestModal(PAGE_MixerInit);
 }
 
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
+static const char *reorder_text_cb(u8 idx)
+{
+    long i = idx-1;
+    return MIXPAGE_ChanNameProtoCB(NULL, (void *)i);
+}
+
+static void reorder_return_cb(u8 *list)
+{
+    if (list) {
+        int i, j;
+        struct Mixer tmpmix[NUM_MIXERS];
+        for(i = 0; i <NUM_MIXERS; i++) {
+            tmpmix[i] = Model.mixers[i];
+            for(j = 0; j < NUM_CHANNELS; j++) {
+                if(tmpmix[i].dest == list[j]-1) {
+                    tmpmix[i].dest = j;
+                    break;
+                }
+            }
+        }
+        memcpy(Model.mixers, tmpmix, sizeof(Model.mixers));
+        struct Limit tmplimits[NUM_OUT_CHANNELS];
+        u8 tmptemplates[NUM_CHANNELS];
+        for(j = 0; j < NUM_CHANNELS; j++) {
+            if(j < NUM_OUT_CHANNELS) {
+               if(list[j]-1 < NUM_OUT_CHANNELS) {
+                   tmplimits[j] = Model.limits[list[j]-1]; 
+               } else {
+                   MIXER_SetDefaultLimit(&tmplimits[j]);
+               }
+            }
+            tmptemplates[j] = Model.templates[list[j]-1];
+        }
+        memcpy(Model.templates, tmptemplates, sizeof(Model.templates));
+        memcpy(Model.limits, tmplimits, sizeof(Model.limits));
+    }
+    PAGE_MixerInit(mp->top_channel);
+}
+
+void reorder_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_ShowReorderList(mp->list, NUM_CHANNELS, 0, 0, reorder_text_cb, reorder_return_cb);
+}
+
 void PAGE_MixerInit(int page)
 {
     PAGE_SetModal(0);
@@ -140,7 +187,8 @@ void PAGE_MixerInit(int page)
     show_chantest = 0;
     mp->firstObj = NULL;
     PAGE_ShowHeader(_tr("Mixer"));
-    GUI_CreateIcon(224, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    GUI_CreateIcon(192, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    GUI_CreateIcon(224, 0, &icons[ICON_ORDER], reorder_cb, NULL);
     guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);
     GUI_SetScrollbar(obj, page);
     show_page();

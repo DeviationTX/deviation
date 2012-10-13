@@ -600,6 +600,13 @@ const char *MIXER_SwashType(enum SwashType swash_type)
     return "";
 }
 
+void MIXER_SetDefaultLimit(struct Limit *limit)
+{
+    limit->max = DEFAULT_SERVO_LIMIT;
+    limit->min = DEFAULT_SERVO_LIMIT;
+    limit->servoscale = 100;
+}
+
 void MIXER_AdjustForProtocol()
 {
     const u8 *map = ProtocolChannelMap[Model.protocol];

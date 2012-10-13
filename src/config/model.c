@@ -860,9 +860,7 @@ void clear_model(u8 full)
         Model.mixers[i].apply_trim = 1;
     }
     for(i = 0; i < NUM_OUT_CHANNELS; i++) {
-        Model.limits[i].max = DEFAULT_SERVO_LIMIT;
-        Model.limits[i].min = DEFAULT_SERVO_LIMIT;
-        Model.limits[i].servoscale = 100;
+        MIXER_SetDefaultLimit(&Model.limits[i]);
     }
     for (i = 0; i < NUM_TRIMS; i++) {
         Model.trims[i].step = 1;

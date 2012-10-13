@@ -8,8 +8,10 @@ enum Icons {
     ICON_NEXTPAGE,
     ICON_CHANTEST,
     ICON_MODELICO,
+    ICON_ORDER,
+    ICON_LAST,
 };
 
-const struct ImageMap icons[ICON_MODELICO+1];
+const struct ImageMap icons[ICON_LAST];
 
 #endif

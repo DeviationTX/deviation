@@ -161,6 +161,7 @@ struct Trim *MIXER_GetAllTrims();
 void MIXER_RegisterTrimButtons();
 
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags);
+void MIXER_SetDefaultLimit(struct Limit *limit);
 const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_SwashType(enum SwashType);
 u8 MIXER_SourceHasTrim(u8 src);
