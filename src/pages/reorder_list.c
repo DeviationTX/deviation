@@ -106,11 +106,11 @@ void press_button_cb(guiObject_t *obj, const void *data)
         break;
     case INSERT:
         if(rl.count < rl.max) {
-            for(tmp = rl.count; tmp > rl.selected+1; tmp--)
+            for(tmp = rl.count; tmp > rl.selected; tmp--)
                 rl.list[tmp] = rl.list[tmp-1];
             rl.count++;
-            rl.list[rl.selected+1] = 255;
-            GUI_Redraw(rl.listbox);
+            rl.list[rl.selected] = 255;
+            GUI_ListBoxSelect(rl.listbox, rl.selected + 1);
         }
         break;
     case REMOVE:
