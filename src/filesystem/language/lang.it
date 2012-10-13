@@ -36,11 +36,11 @@ Elicottero 6Ch
 :> 0
 > 0
 :ABSVAL
-ValAss
+V_ASSOL
 :AIL
-ALE
+ALET
 :AIL DR
-DR ALE
+DR ALET
 :AIL Inv:
 :Direzione degli Alettoni
 :AUX4
@@ -50,10 +50,10 @@ AUX5
 :Airplane
 Aereo
 :Backlight:
-Luminosit�:
+Luminosità
 :Bar %d:
 Barra %d:
-:Bars:                                             
+:Bars:
 Barre:
 :Battery Alarm:
 Allarme batteria:
@@ -62,15 +62,15 @@ Bind
 :Binding
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Binding in corso...\nAssicuratevi che il modello sia acceso\n\nIl tasto OK non interrompera' la procedura di binding\nma permettera' il controllo della TX.
+Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
 :Box %d:
 Box%d:
 :Buttons
-Bottone
+Bottoni
 :COL
-Collettivo
+Collet.
 :COL Inv:
-:Direzione del Collettivo
+:Collet.Inv.
 :CYC
 Ciclico
 :Calibrate
@@ -78,7 +78,7 @@ Calibrazione
 :Cancel
 Cancella
 :Center all sticks and touch the screen
-Centrate tutti gli stick e toccate lo schermo
+Centra tutti gli stick e tocca lo schermo
 :Ch
 Ch
 :Change
@@ -90,7 +90,7 @@ Complesso
 :Configure
 Configura
 :Copy To...
-Copia...
+Salva su...
 :Curve:
 Curva:
 :Cyclic1
@@ -104,13 +104,13 @@ DR
 :Default
 Default
 :Deviation FW\nversion:
-Versione dell'\nFW Deviation:
+Versione del\nFW Deviation:
 :Down
-Giu'
+Giù
 :ELE
-ELE
+ELEV
 :ELE DR
-DR ELE
+DR ELEV
 :ELE Inv:
 ELE Inv
 :EXPO
@@ -122,17 +122,17 @@ Esci
 :Expo&DR
 Esp.&DR
 :FMODE0
-FMODE0
+FMOD0
 :FMODE1
-FMODE1
+FMOD1
 :FMODE2
-FMODE2
+FMOD2
 :Failsafe:
 Failsafe:
 :File:
 File:
 :Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Il filesystem non pu� essere montato. Create il FS tramite USB, quindi premere 'ENT' per uscire.
+Il filesystem non può essere montato. Crea il FS tramite USB, quindi premi 'ENT' per uscire.
 :Fixed
 Fisso
 :Fixed ID:
@@ -151,7 +151,7 @@ Ingresso:
 Ingressi
 :Inverted
 Inverso
-:LEFT_H 
+:LEFT_H
 SINISTRA_H
 :LEFT_V
 SINISTRA_V
@@ -174,7 +174,7 @@ MIX1
 :MIX2
 MIX2
 :Main Page Config
-Pagina principale di Conf
+Pagina di Configurazione
 :Max:
 Max:
 :Mid-Rate
@@ -196,7 +196,7 @@ Nome del Modello:
 :Model Type:
 Tipo del Modello:
 :Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Muovere ciascuno stick al max\ne al min quindi tornare al centro\nTocca lo schermo quando hai finito
+Muovi ciascuno stick al max\ne al min quindi torna al centro\nTocca lo schermo quando hai finito
 :Mux:
 Operazione:
 :Neg
@@ -240,7 +240,7 @@ DESTRA_V
 :RUD
 TIMONE
 :RUD DR
-DR TIMONE
+DRTIMONE
 :Re-Init
 Reinizializza
 :Reset
@@ -252,7 +252,7 @@ Rovesciato:
 :Right
 Destra
 :Safe Val:
-Val. sicuro
+Val.Sicuro
 :Safety
 Sicurezza
 :Safety:
@@ -292,25 +292,25 @@ Simmetrico
 :THR
 ACCEL
 :TRIMLH+
-TRIMGH+
+TRIMSO+
 :TRIMLH-
-TRIMGH-
+TRIMSO-
 :TRIMLV+
-TRIMGV+
+TRIMSV+
 :TRIMLV-
-TRIMGV-
+TRIMSV-
 :TRIMRH+
-TRIMDH+
+TRIMDO+
 :TRIMRH-
-TRIMDH-
+TRIMDO-
 :TRIMRV+
 TRIMDV+
 :TRIMRV-
 TRIMDV-
 :TRIM_L+
-TRIM_G+
+TRIM_S+
 :TRIM_L-
-TRIM_G-
+TRIM_S-
 :TRIM_R+
 TRIM_D+
 :TRIM_R-
@@ -328,11 +328,11 @@ Timer2
 :Toggle%d
 Alterna%d
 :Touch Calibrate
-Calibrazione del Touchscreen
+Calibrazione dello schermo
 :Touch Screen:
-Touch Screen:
+Schermo:
 :Touch Test
-Test del Touchscreen
+Test dello schermo
 :Touch target %d
 Tocca %d
 :Touch to Lock
@@ -362,15 +362,15 @@ Modo archivio USB, premere 'ENT' per uscire.
 :Unknown
 Sconosciuto
 :Up
-Su'
+Sù
 :Value:
 valore:
 :Virt
-Virt
+Virtuale
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...
-\n\nIl Binding finira' tra %d secondi...
+\n\nIl Binding finirà tra %d secondi...
 :add
 aggiungi
 :countdown
