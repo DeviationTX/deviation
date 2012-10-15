@@ -83,6 +83,7 @@ void PAGE_Event();
 void PAGE_ShowSafetyDialog();
 void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
+void PAGE_ShowLowBattDialog();
 
 /* Protocol */
 #define PROTODEF(proto, map, init, name) proto,

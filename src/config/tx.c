@@ -14,6 +14,7 @@
  */
 
 #include "common.h"
+#include "target.h"
 #include "gui/gui.h"
 #include "tx.h"
 
@@ -32,6 +33,7 @@ const char MODE[]="mode";
 const char BRIGHTNESS[] = "brightness";
 
 const char BATT_ALARM[] = "batt_alarm";
+const char BATT_CRITICAL[] = "batt_critical";
 
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
@@ -74,6 +76,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(BATT_ALARM)) {
             t->batt_alarm = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(BATT_CRITICAL)) {
+            t->batt_critical = atoi(value);
             return 1;
         }
     }
@@ -129,6 +135,8 @@ void CONFIG_LoadTx()
     Transmitter.current_model = 1;
     Transmitter.mode = MODE_2;
     Transmitter.brightness = 9;
+    Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
+    Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
@@ -150,6 +158,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
+    fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     for(i = 0; i < 4; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);

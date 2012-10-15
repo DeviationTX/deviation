@@ -111,3 +111,22 @@ void PAGE_ShowBindingDialog(u8 update)
         dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
+
+/**********************/
+/* Low battery Dialog */
+/**********************/
+static void lowbatt_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    dialog = NULL;
+}
+
+void PAGE_ShowLowBattDialog()
+{
+    if (dialog)
+        return;
+    strncpy(dlgstr, _tr("Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!"), sizeof(dlgstr));
+    dlgstr[sizeof(dlgstr) - 1] = 0;
+    dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Low Battery"), NULL, lowbatt_ok_cb, dtOk, dlgstr);
+}

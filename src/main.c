@@ -27,7 +27,7 @@ void Banner();
 void EventLoop();
 
 void TOUCH_Handler(); // temporarily in main()
-void BATTERY_Check();
+u8 BATTERY_Check();
 
 #define SCREEN_UPDATE_MSEC 100
 #define CHAN_UPDATE_MSEC   5
@@ -145,10 +145,11 @@ void EventLoop()
 #endif
 
     if(PWR_CheckPowerSwitch()) {
-        CONFIG_SaveModelIfNeeded();
-        CONFIG_SaveTxIfNeeded();
+        if(! (BATTERY_Check() & 0x01)) {
+            CONFIG_SaveModelIfNeeded();
+            CONFIG_SaveTxIfNeeded();
+        }
         PWR_Shutdown();
-        
     }
 
     if (CLOCK_getms() > next_scan) {
@@ -202,15 +203,26 @@ void TOUCH_Handler() {
     pen_down_last=pen_down;
 }
 
-void BATTERY_Check()
+u8 BATTERY_Check()
 {
     static u8 warned = 0;
     u16 battery = PWR_ReadVoltage();
-    if (battery < Transmitter.batt_alarm && ! warned) {
+    if (battery < Transmitter.batt_alarm && ! (warned & 0x02)) {
         MUSIC_Play(MUSIC_BATT_ALARM);
-        warned = 1;
+        warned |= 0x02;
     } else if (battery > Transmitter.batt_alarm + 200) {
-        warned = 0;
+        warned &= ~0x02;
     }
+    if (battery < Transmitter.batt_critical && ! (warned & 0x01)) {
+        CONFIG_SaveModelIfNeeded();
+        CONFIG_SaveTxIfNeeded();
+        SPI_FlashBlockWriteEnable(0); //Disable writing to all banks of SPIFlash
+        warned |= 0x01;
+        PAGE_ShowLowBattDialog();
+    } else if (battery > Transmitter.batt_critical + 200) {
+        warned &= ~0x01;
+        SPI_FlashBlockWriteEnable(1); //Disable writing to all banks of SPIFlash
+    }
+    return warned;
 }
 

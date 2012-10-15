@@ -22,6 +22,7 @@ struct Transmitter {
     enum Mode mode;
     u8 brightness;
     u16 batt_alarm;
+    u16 batt_critical;
     struct StickCalibration calibration[NUM_INPUTS];
     struct TouchCalibration touch;
 };
