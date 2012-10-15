@@ -6,8 +6,7 @@ struct Telemetry {
     u16 volt[3];
     u8 temp[4];
     u16 rpm[3];
-    u8 line1[12];
-    u8 line2[12];
+    u8 line[7][12];
 };
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
