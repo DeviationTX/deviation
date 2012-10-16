@@ -31,12 +31,7 @@ static const char *raw_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u32 val = (long)data;
-    int i;
-    u8 *ptr = Telemetry.line[val];
-    for(i = 0; i < 12; i++) {
-        sprintf(tp.str + 2*i, "%02x", *ptr++);
-    }
-    return tp.str;
+    return TELEMETRY_GetGPS(tp.str, val);
 }
 
 void PAGE_TelemtestInit(int page)
@@ -69,13 +64,11 @@ void PAGE_TelemtestInit(int page)
     GUI_CreateLabelBox(240, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM3:"));
     tp.rpm[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)9L);
 
-    tp.line[0] = GUI_CreateLabelBox(20,  100, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)0L);
-    tp.line[1] = GUI_CreateLabelBox(20,  120, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)1L);
-    tp.line[2] = GUI_CreateLabelBox(20,  140, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)2L);
-    tp.line[3] = GUI_CreateLabelBox(20,  160, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)3L);
-    tp.line[4] = GUI_CreateLabelBox(20,  180, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)4L);
-    tp.line[5] = GUI_CreateLabelBox(20,  200, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)5L);
-    tp.line[6] = GUI_CreateLabelBox(20,  220, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)6L);
+    tp.line[0] = GUI_CreateLabelBox(20,  140, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)0L);
+    tp.line[1] = GUI_CreateLabelBox(20,  160, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)1L);
+    tp.line[2] = GUI_CreateLabelBox(20,  180, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)2L);
+    tp.line[3] = GUI_CreateLabelBox(20,  200, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)3L);
+    tp.line[4] = GUI_CreateLabelBox(20,  220, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)4L);
     tp.telem = Telemetry;
 }
 void PAGE_TelemtestEvent() {
@@ -96,10 +89,12 @@ void PAGE_TelemtestEvent() {
             tp.telem.temp[i] = Telemetry.temp[i];
         }
     }
-    for(i = 0; i < 7; i++) {
-        if (memcmp(tp.telem.line[i], Telemetry.line[i], 12) != 0) {
-            GUI_Redraw(tp.line[i]);
-            memcpy(tp.telem.line[i], Telemetry.line[i], 12);
-        }
+    if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
+        tp.telem.gps = Telemetry.gps;
+        GUI_Redraw(tp.line[0]);
+        GUI_Redraw(tp.line[1]);
+        GUI_Redraw(tp.line[2]);
+        GUI_Redraw(tp.line[3]);
+        GUI_Redraw(tp.line[4]);
     }
 }

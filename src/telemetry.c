@@ -37,6 +37,38 @@ const char * TELEMETRY_SetString(char *str, u8 telem)
     return str;
 }
 
+const char * TELEMETRY_GetGPS(char *str, u8 line)
+{
+    int h, m, s, ss;
+    switch(line) {
+    case 0: 
+        h = Telemetry.gps.longitude / 1000 / 60 / 60;
+        m = (Telemetry.gps.longitude - h * 1000 * 60 * 60) / 1000 / 60;
+        s = (Telemetry.gps.longitude - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
+        ss = Telemetry.gps.longitude % 1000;
+        sprintf(str, "Long: %03d %02d %02d.%03d", h, m, s, ss);
+        break;
+    case 1: 
+        h = Telemetry.gps.latitude / 1000 / 60 / 60;
+        m = (Telemetry.gps.latitude - h * 1000 * 60 * 60) / 1000 / 60;
+        s = (Telemetry.gps.latitude - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
+        ss = Telemetry.gps.latitude % 1000;
+        sprintf(str, "Lat: %03d %02d %02d.%03d", h, m, s, ss);
+        break;
+    case 2:
+        sprintf(str, "Alt: %d.%03dm", (int)Telemetry.gps.altitude / 1000, (int)Telemetry.gps.altitude % 1000);
+        break;
+    case 3:
+        sprintf(str, "Speed: %d.%03dm/s", (int)Telemetry.gps.velocity / 1000, (int)Telemetry.gps.velocity % 1000);
+        break;
+    case 4:
+        sprintf(str, "%02d:%02d:%02d %04d-%02d-%02d",
+                (int)Telemetry.gps.hour, (int)Telemetry.gps.min, (int)Telemetry.gps.sec,
+                (int)Telemetry.gps.year, (int)Telemetry.gps.month, (int)Telemetry.gps.day);
+        break;
+    }
+    return str;
+}
 const char * TELEMETRY_Name(char *str, u8 telem)
 {
     if(telem < 3) {

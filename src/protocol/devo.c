@@ -158,14 +158,37 @@ static void build_data_pkt()
     add_pkt_suffix();
 }
 
-static void parse_telemetry_packet()
+static s32 float_to_int(u8 *ptr)
+{
+    s32 value = 0;
+    int seen_decimal = 0;
+    for(int i = 0; i < 7; i++) {
+        if(ptr[i] == '.') {
+            value *= 1000;
+            seen_decimal = 100;
+            continue;
+        }
+        if(ptr[i] == 0)
+            break;
+        if(seen_decimal) {
+            value += (ptr[i] - '0') * seen_decimal;
+            seen_decimal /= 10;
+            if(! seen_decimal)
+                break;
+        } else {
+            value = value * 10 + (ptr[i] - '0');
+        }
+    }
+    return value;
+}
+static void parse_telemetry_packet(u8 *packet)
 {
     if((packet[0] & 0xF0) != 0x30)
         return;
     scramble_pkt(); //This will unscramble the packet
-    if (packet[0] < 0x37) {
-        memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
-    }
+    //if (packet[0] < 0x37) {
+    //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
+    //}
     if (packet[0] == 0x30) {
         Telemetry.volt[0] = packet[1]; //In 1/10 of Volts
         Telemetry.volt[1] = packet[3]; //In 1/10 of Volts
@@ -179,6 +202,44 @@ static void parse_telemetry_packet()
         Telemetry.temp[2] = packet[3] - 20; //In degrees-C
         Telemetry.temp[3] = packet[4] - 20; //In degrees-C
     }
+    /* GPS Data
+       32: 30333032302e3832373045fb  = 030°20.8270E
+       33: 353935342e373737364e0700  = 59°54.776N
+       34: 31322e380000004d4d4e45fb  = 12.8 MMNE (altitude maybe)?
+       35: 000000000000302e30300000  = 0.00 (probably speed)
+       36: 313832353532313531303132  = 2012-10-15 18:25:52 (UTC)
+    */
+    if (packet[0] == 0x32) {
+        Telemetry.gps.longitude = ((packet[1]-'0') * 100 + (packet[2]-'0') * 10 + (packet[3]-'0')) * 3600000
+                                  + ((packet[4]-'0') * 10 + (packet[5]-'0')) * 60000
+                                  + ((packet[7]-'0') * 1000 + (packet[8]-'0') * 100
+                                     + (packet[9]-'0') * 10 + (packet[10]-'0')) * 6;
+        if (packet[11] == 'W')
+            Telemetry.gps.longitude *= -1;
+    }
+    if (packet[0] == 0x33) {
+        Telemetry.gps.latitude = ((packet[1]-'0') * 10 + (packet[2]-'0')) * 3600000
+                                  + ((packet[3]-'0') * 10 + (packet[4]-'0')) * 60000
+                                  + ((packet[6]-'0') * 1000 + (packet[7]-'0') * 100
+                                     + (packet[8]-'0') * 10 + (packet[9]-'0')) * 6;
+        if (packet[10] == 'S')
+            Telemetry.gps.latitude *= -1;
+    }
+    if (packet[0] == 0x34) {
+        Telemetry.gps.altitude = float_to_int(packet+1);
+    }
+    if (packet[0] == 0x35) {
+        Telemetry.gps.velocity = float_to_int(packet+7);
+    }
+    if (packet[0] == 0x36) {
+        Telemetry.gps.hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
+        Telemetry.gps.min   = (packet[3]-'0') * 10 + (packet[4]-'0');
+        Telemetry.gps.sec   = (packet[5]-'0') * 10 + (packet[6]-'0');
+        Telemetry.gps.day   = (packet[7]-'0') * 10 + (packet[8]-'0');
+        Telemetry.gps.month = (packet[9]-'0') * 10 + (packet[10]-'0');
+        Telemetry.gps.year  = 2000 + (packet[11]-'0') * 10 + (packet[12]-'0');
+    }
+        
 }
 
 static void cyrf_set_bound_sop_code()
@@ -312,7 +373,7 @@ static u16 devo_telemetry_cb()
     } else {
         if(CYRF_ReadRegister(0x07) & 0x20) {
             CYRF_ReadDataPacket(packet);
-            parse_telemetry_packet();
+            parse_telemetry_packet(packet);
             delay = 100 * (16 - txState);
             txState = 15;
         }
@@ -373,9 +434,13 @@ static void initialize()
     use_fixed_id = 0;
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
-    for(int i = 0; i < 7; i++)
-        memset(Telemetry.line[i], 0x11 * (1+i), 12);
-
+    /*
+    parse_telemetry_packet("203020.8270E\0");
+    parse_telemetry_packet("35954.776N\0\0");
+    parse_telemetry_packet("412.8\0\0\0MMNE\0");
+    parse_telemetry_packet("5\0\0\0\0\0\00.00\0\0");
+    parse_telemetry_packet("6182552151012");
+    */
     CYRF_ConfigRFChannel(*radio_ch_ptr);
     //FIXME: Properly setnumber of channels;
     num_channels = ((Model.num_channels + 3) >> 2) * 4;
