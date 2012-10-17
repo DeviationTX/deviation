@@ -62,7 +62,7 @@ static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply"
 static const char MIXER_CURVETYPE[] = "curvetype";
 static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
    "none", "fixed", "min/max", "zero/max", "greater-than-0", "less-than-0", "absval",
-   "expo", "3point", "5point", "7point", "9point", "11point", "13point" };
+   "expo", "deadband", "3point", "5point", "7point", "9point", "11point", "13point" };
 static const char MIXER_CURVE_POINTS[] = "points";
 
 /* Section: Channel */

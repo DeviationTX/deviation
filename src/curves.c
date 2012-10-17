@@ -1,6 +1,8 @@
 #include "common.h"
 #include "mixer.h"
 
+#include <stdlib.h>
+
 /*
     {-100, 0, 100},
     {-100, -50, 0, 50, 100},
@@ -68,6 +70,19 @@ s16 expo(struct Curve *curve, s32 value)
     return neg ? -y : y;
 }
 
+s16 deadband(struct Curve *curve, s32 value)
+{
+    u8 neg = value < 0;
+    s32 k = neg ? (u8)curve->points[1] : (u8)curve->points[0];
+
+    if (k == 0)
+        return value;
+    if (abs(value) < k * CHAN_MULTIPLIER / 10)
+        return 0;
+    s32 minmax = neg ? CHAN_MIN_VALUE: CHAN_MAX_VALUE;
+    return (1000 * (value - minmax) + (1000 - k) * minmax) / (1000 - k);
+}
+
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 {
     //interpolation doesn't work if theinput is out of bounds, so bound it here
@@ -84,6 +99,7 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
         case CURVE_LT_ZERO:  return (xval > 0) ? 0 : xval;
         case CURVE_ABSVAL:   return (xval < 0) ? -xval : xval;
         case CURVE_EXPO:     return expo(curve, xval);
+        case CURVE_DEADBAND: return deadband(curve, xval);
         default:             return interpolate(curve, xval);
     }
 }
@@ -99,6 +115,7 @@ const char *CURVE_GetName(struct Curve *curve)
         case CURVE_LT_ZERO:  return _tr("< 0");
         case CURVE_ABSVAL:   return _tr("ABSVAL");
         case CURVE_EXPO:     return _tr("EXPO");
+        case CURVE_DEADBAND: return _tr("Deadband");
         case CURVE_3POINT:   return _tr("3 Point");
         case CURVE_5POINT:   return _tr("5 Point");
         case CURVE_7POINT:   return _tr("7 Point");
@@ -121,6 +138,7 @@ u8 CURVE_NumPoints(struct Curve *curve)
         case CURVE_ABSVAL:
             return 0;
         case CURVE_EXPO:
+        case CURVE_DEADBAND:
              return 2;
         default:
              return (curve->type + 1 - CURVE_3POINT) * 2 + 1;

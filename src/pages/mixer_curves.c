@@ -32,8 +32,11 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
-    if (curve->type == CURVE_EXPO && curve->points[0] == curve->points[1])
+    if ((curve->type == CURVE_EXPO || curve->type == CURVE_DEADBAND)
+        && curve->points[0] == curve->points[1])
+    {
         edit->pointnum = -1;
+    }
     edit->curve = *curve;
     edit->curveptr = curve;
     GUI_CreateTextSelect(8, 8, TEXTSELECT_96, 0x0000, NULL, set_curvename_cb, NULL);
@@ -102,10 +105,18 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
+    const char *ret;
     struct Curve *curve = &edit->curve;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
     s8 old_pointval = curve->points[pointnum];
-    const char *ret = PAGEMIXER_SetNumberCB(obj, dir, &curve->points[pointnum]);
+    if(curve->type == CURVE_DEADBAND) {
+        curve->points[pointnum] = (s8)GUI_TextSelectHelper((u8)curve->points[pointnum], 0, 255, dir, 1, 5, NULL);
+        ret = pagemem.u.mixer_page.tmpstr;
+        sprintf(pagemem.u.mixer_page.tmpstr, "%d.%d", (u8)curve->points[pointnum] / 10, (u8)curve->points[pointnum] % 10);
+        ret = pagemem.u.mixer_page.tmpstr;
+    } else {
+        ret = PAGEMIXER_SetNumberCB(obj, dir, &curve->points[pointnum]);
+    }
     if (old_pointval != curve->points[pointnum]) {
         GUI_Redraw(edit->graph);
         if (edit->pointnum < 0)
