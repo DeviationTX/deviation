@@ -123,7 +123,7 @@ u8 CURVE_NumPoints(struct Curve *curve)
         case CURVE_EXPO:
              return 2;
         default:
-             return (curve->type - CURVE_EXPO) * 2 + 1;
+             return (curve->type + 1 - CURVE_3POINT) * 2 + 1;
     }
 }
 
