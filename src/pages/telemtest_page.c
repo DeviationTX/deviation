@@ -57,12 +57,10 @@ void PAGE_TelemtestInit(int page)
     GUI_CreateLabelBox(250, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("Temp4:"));
     tp.temp[3] = GUI_CreateLabelBox(290, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)6L);
     y = 80;
-    GUI_CreateLabelBox(20,  y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM1:"));
-    tp.rpm[0] = GUI_CreateLabelBox(55,  y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)7L);
-    GUI_CreateLabelBox(130, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM2:"));
-    tp.rpm[1] = GUI_CreateLabelBox(165, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)8L);
-    GUI_CreateLabelBox(240, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM3:"));
-    tp.rpm[2] = GUI_CreateLabelBox(275, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)9L);
+    GUI_CreateLabelBox(90,  y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM1:"));
+    tp.rpm[0] = GUI_CreateLabelBox(125, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)7L);
+    GUI_CreateLabelBox(170, y, 40, 16, &DEFAULT_FONT, NULL, NULL, _tr("RPM2:"));
+    tp.rpm[1] = GUI_CreateLabelBox(205, y, 40, 16, &DEFAULT_FONT, telem_cb, NULL, (void *)8L);
 
     tp.line[0] = GUI_CreateLabelBox(20,  140, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)0L);
     tp.line[1] = GUI_CreateLabelBox(20,  160, 280, 16, &DEFAULT_FONT, raw_cb, NULL, (void *)1L);
@@ -78,6 +76,8 @@ void PAGE_TelemtestEvent() {
             GUI_Redraw(tp.volt[i]);
             tp.telem.volt[i] = Telemetry.volt[i];
         }
+    }
+    for(i = 0; i < 2; i++) {
         if (Telemetry.rpm[i] != tp.telem.rpm[i]) {
             GUI_Redraw(tp.rpm[i]);
             tp.telem.rpm[i] = Telemetry.rpm[i];
