@@ -67,13 +67,17 @@ endif
 
 $(LAST_MODEL): model_template.ini tx_template.ini
 	@echo " + Copying template files"
-	cp tx_template.ini filesystem/tx.ini
-	mkdir filesystem/models 2> /dev/null || true 
-	echo 'name=Model1' > filesystem/models/model1.ini && cat model_template.ini >> filesystem/models/model1.ini
-	cp model_template.ini filesystem/models/default.ini
-	number=2 ; while [ $$number -le 30 ] ; do \
-		cp model_template.ini filesystem/models/model$$number.ini; \
-		number=`expr $$number + 1`; \
+	for tx in devo8 devo10; do \
+		cp -prf filesystem/common/* filesystem/$$tx/; \
+		cp tx_template.ini filesystem/$$tx/tx.ini; \
+		mkdir filesystem/$$tx/models 2> /dev/null || true; \
+		echo 'name=Model1' > filesystem/$$tx/models/model1.ini; \
+		cat model_template.ini >> filesystem/$$tx/models/model1.ini; \
+		cp model_template.ini filesystem/$$tx/models/default.ini; \
+		number=2 ; while [ $$number -le 30 ] ; do \
+			cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
+			number=`expr $$number + 1`; \
+			done; \
 		done
 
 # The following enables quiet output unless you use VERBOSE=1
