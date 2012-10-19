@@ -23,7 +23,8 @@ CP   ?= objcopy
 DUMP ?= objdump
 
 SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
-                $(wildcard gui/*.c) $(wildcard pages/*.c) $(wildcard protocol/*.c) $(wildcard config/*.c)
+                $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard protocol/*.c) \
+                $(wildcard config/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)

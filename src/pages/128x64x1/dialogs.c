@@ -1,0 +1,131 @@
+/*
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Deviation is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "common.h"
+#include "pages.h"
+#include "gui/gui.h"
+#include "config/model.h"
+#include "config/ini.h"
+
+#define DLG_STR_LEN LCD_WIDTH//(80 * 5)
+static guiObject_t *dialog = NULL;
+static char dlgstr[DLG_STR_LEN];
+
+/******************/
+/*  Safety Dialog */
+/******************/
+static void safety_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    dialog = NULL;
+    PROTOCOL_Init(1);
+}
+
+void PAGE_ShowSafetyDialog()
+{
+    if (dialog == NULL) {
+    	dlgstr[0] = 0;
+    	dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtNone, dlgstr);
+    	return;
+    }
+	u64 unsafe = PROTOCOL_CheckSafe();
+	if (! unsafe) {
+		GUI_RemoveObj(dialog);
+		dialog = NULL;
+		PROTOCOL_Init(0);
+		return;
+	}
+	int i;
+	int count = 0;
+	char tmpstr[30];
+	const s8 safeval[4] = {0, -100, 0, 100};
+	s16 *raw = MIXER_GetInputs();
+	u32 crc = Crc(dlgstr, strlen(dlgstr));
+	dlgstr[0] = 0;
+	for(i = 0; i < NUM_SOURCES + 1; i++) {
+		if (! (unsafe & (1LL << i)))
+			continue;
+		int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
+
+		s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+					  ? raw[ch+1]
+					  : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
+		sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, \nsafe value = %d%%"),
+				INPUT_SourceName(tmpstr, ch + 1),
+				val, safeval[Model.safety[i]]);
+		if (++count >= 5)
+			break;
+	}
+	if (crc != Crc(dlgstr, strlen(dlgstr))) {
+		GUI_Redraw(dialog);
+	}
+}
+
+/******************/
+/* Binding Dialog */
+/******************/
+static void binding_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    PROTOCOL_SetBindState(0); // interrupt the binding
+    GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
+    dialog = NULL;
+}
+
+void PAGE_CloseBindingDialog()
+{
+    if (dialog) {
+    	GUI_RemoveObj(dialog);
+    	GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
+        dialog = NULL;
+    }
+}
+
+void PAGE_ShowBindingDialog(u8 update)
+{
+    if (update && ! dialog)
+        return;
+    u32 crc = Crc(dlgstr, strlen(dlgstr));
+    u32 bind_time = PROTOCOL_Binding();
+    if (bind_time != 0xFFFFFFFF )
+        sprintf(dlgstr, _tr("Binding... %d seconds\nPress ENT to stop"), (int)bind_time / 1000);
+    u32 crc_new = Crc(dlgstr, strlen(dlgstr));
+    if (dialog && crc != crc_new) {
+        GUI_Redraw(dialog);
+    } else if(! dialog) {
+        dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, binding_ok_cb, dtOk, dlgstr);
+    }
+}
+
+/**********************/
+/* Low battery Dialog */
+/**********************/
+static void lowbatt_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    dialog = NULL;
+}
+
+void PAGE_ShowLowBattDialog()
+{
+    if (dialog)
+        return;
+    strncpy(dlgstr, _tr("Battery to low, \ncan't save!"), sizeof(dlgstr));
+    dlgstr[sizeof(dlgstr) - 1] = 0;
+    dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+}
