@@ -50,7 +50,7 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struc
     label->cb_data = data;
     if (! label->desc.font)
         label->desc.font = DEFAULT_FONT.font;
-
+    label->blink_count = 0;
     return obj;
 }
 
@@ -64,7 +64,7 @@ void GUI_DrawLabel(struct guiObject *obj)
         str = label->strCallback(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
-    u8 old_font = LCD_SetFont(label->desc.font);
+    LCD_SetFont(label->desc.font);
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
     if (label->desc.style == NO_BOX) {
         txt_x = obj->box.x;
@@ -78,9 +78,28 @@ void GUI_DrawLabel(struct guiObject *obj)
         obj->box.width = txt_w;
         obj->box.height = txt_h;
         GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
+    } else if (label->desc.style == UNDERLINE) {
+        txt_x = obj->box.x;
+        txt_y = obj->box.y;
+        u16 old_w = obj->box.width;
+        u16 old_h = obj->box.height;
+        if (old_w < txt_w)
+            old_w = txt_w;
+        if (old_h < txt_h)
+            old_h = txt_h;
+        GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
+        LCD_DrawFastHLine(obj->box.x, old_h, old_w, 1);
     } else {
-        if (label->desc.style == TRANSPARENT || label->desc.style == CENTER) {
-            GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+        if (label->desc.style == INVERTED || obj == objSELECTED) {
+            u16 w = obj->box.width;
+            u16 h = obj->box.height;
+            if (w < txt_w)
+                w = txt_w;
+            if (h < txt_h)
+                h = txt_h;
+            LCD_FillRect(obj->box.x, obj->box.y, w, h, 1);
+        } else if (label->desc.style == TRANSPARENT || label->desc.style == CENTER || label->desc.style == LEFT) {
+           GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
         } else {
             LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, label->desc.fill_color);
         }
@@ -91,14 +110,25 @@ void GUI_DrawLabel(struct guiObject *obj)
             txt_y = obj->box.y + (obj->box.height - txt_h) / 2;
         else
             txt_y = obj->box.y;
-        if (obj->box.width > txt_w)
+        if (obj->box.width > txt_w && label->desc.style != LEFT)
             txt_x = obj->box.x + (obj->box.width - txt_w) / 2;
         else
             txt_x = obj->box.x;
     }
-    LCD_SetFontColor(label->desc.font_color);
+    label->blink_count++;
+    if (label->desc.style == BLINK ) {
+        if (label->blink_count > 10) {
+            label->blink_count = 0;
+            LCD_SetFontColor(label->desc.font_color);
+        } else {
+            LCD_SetFontColor(~label->desc.font_color);
+        }
+    } else if (label->desc.style == INVERTED || obj == objSELECTED) {
+        LCD_SetFontColor(~label->desc.font_color);
+    } else {
+        LCD_SetFontColor(label->desc.font_color);
+    }
     LCD_PrintStringXY(txt_x, txt_y, str);
-    LCD_SetFont(old_font);
 }
 
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type)

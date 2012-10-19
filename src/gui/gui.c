@@ -1,5 +1,5 @@
 /*
- This project is free software: you can redistribute it and/or modify
+ This project is ffree software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
@@ -15,9 +15,9 @@
 #include "common.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
+#include "target_defs.h"
 
-#define SCREEN_WIDTH  320
-#define SCREEN_HEIGHT 240
+#include "_gui.c"
 
 struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
@@ -31,24 +31,6 @@ static u8 FullRedraw;
 static u8 handle_buttons(u32 button, u8 flags, void*data);
 static void GUI_DrawObjects(void);
 
-const struct ImageMap image_map[] = {
-    {"media/btn96_24.bmp", 96, 24, 0, 0}, /*FILE_BTN96_24 */
-    {"media/btn48_24.bmp", 48, 24, 0, 0}, /*FILE_BTN48_24 */
-    {"media/btn96_16.bmp", 96, 16, 0, 0}, /*FILE_BTN96_16 */
-    {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
-    {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */
-    {"media/btn32_16.bmp", 32, 16, 0, 0}, /*FILE_BTN32_16 */
-    {"media/spin96.bmp",   96, 16, 0, 0}, /*FILE_SPIN96 */
-    {"media/spin64.bmp",   64, 16, 0, 0}, /*FILE_SPIN64 */
-    {"media/spin32.bmp",   32, 16, 0, 0}, /*FILE_SPIN32 */
-    {"media/spinp96.bmp",   96, 16, 0, 0}, /*FILE_SPINPRESS96 */
-    {"media/spinp64.bmp",   64, 16, 0, 0}, /*FILE_SPINPRESS64 */
-    {"media/spinp32.bmp",   32, 16, 0, 0}, /*FILE_SPINPRESS32 */
-    {"media/arrows16.bmp", 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
-    {"media/arrows16.bmp", 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
-    {"media/arrows16.bmp", 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
-    {"media/arrows16.bmp", 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
-};
 void connect_object(struct guiObject *obj)
 {
     if (objHEAD == NULL) {
@@ -85,11 +67,8 @@ void GUI_DrawObject(struct guiObject *obj)
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
     case Rect:       GUI_DrawRect(obj);              break;
     }
-    if (obj == objSELECTED) {
-        int i;
-        for(i = 0; i < Display.select_width; i++)
-            LCD_DrawRect(obj->box.x+i, obj->box.y+i, obj->box.width-2*i, obj->box.height-2*i, Display.select_color);
-    }
+    if (obj == objSELECTED)
+        _gui_hilite_selected(obj);
     OBJ_SET_DIRTY(obj, 0);
 }
 
@@ -198,9 +177,10 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
-    if(FullRedraw && w != SCREEN_WIDTH && h != SCREEN_HEIGHT)
+    if(FullRedraw && w != LCD_WIDTH//SCREEN_WIDTH
+            && h != LCD_HEIGHT) //SCREEN_HEIGHT)
         return;  //Optimization to prevent partial redraw when it isn't needed
-    LCD_DrawWindowedImageFromFile(x, y, "media/devo8.bmp", w, h, x, y);
+    _gui_draw_background(x, y, w, h);
 }
 
 void GUI_DrawScreen(void)
@@ -208,7 +188,7 @@ void GUI_DrawScreen(void)
     /*
      * First we need to draw the main background
      *  */
-    GUI_DrawBackground(0, 0, 320, 240);
+    GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);//320, 240);
     /*
      * Then we need to draw any supporting GUI
      */
@@ -590,6 +570,12 @@ guiObject_t *GUI_GetSelected()
 
 void GUI_SetSelected(guiObject_t *obj)
 {
+    if (obj == NULL) {
+        return;
+    }
+    if (objSELECTED != NULL && objSELECTED != obj) { // bug fix: should set old obj dirty as well
+        OBJ_SET_DIRTY(objSELECTED, 1);
+    }
     objSELECTED = obj;
     OBJ_SET_DIRTY(obj, 1);
 }

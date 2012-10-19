@@ -2,7 +2,7 @@ SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common_emu/*.cpp
 SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_emu/*.c)
 
 LFLAGS = -lfltk
-SCREENSIZE = 128x64x2
+SCREENSIZE = 128x64x1
 all = $(TARGET)
 CFLAGS := -DEMULATOR
 

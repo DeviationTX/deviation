@@ -47,28 +47,3 @@ void LCD_Clear(unsigned int color) {
     (void)color;
     memset(gui.image, 0xaa, sizeof(gui.image));
 }
-
-/* stubs */
-u8 LCD_ImageIsTransparent(const char *file)
-{
-    (void) file;
-    assert(0);
-}
-
-u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
-{
-    (void)file;
-    (void)w;
-    (void)h;
-    assert(0);
-}
-
-void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
-{
-    assert(0);
-}
-
-void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
-{
-    assert(0);
-}

@@ -9,9 +9,11 @@
 #ifndef GUI_H_
 #define GUI_H_
 
+#include "_gui.h"
+
 #define RGB888_to_RGB565(r, g, b) (((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3))
 enum DialogType {
-    dtOk, dtOkCancel
+    dtOk, dtOkCancel, dtNone,
 };
 
 enum BarGraphDirection {
@@ -27,15 +29,6 @@ enum TextSelectType {
     TEXTSELECT_96,
 };
 
-enum ButtonType {
-    BUTTON_96,
-    BUTTON_48,
-    BUTTON_96x16,
-    BUTTON_64x16,
-    BUTTON_48x16,
-    BUTTON_32x16,
-};
-
 enum KeyboardType {
     KEYBOARD_ALPHA,
     KEYBOARD_NUM,
@@ -47,6 +40,10 @@ enum LabelType {
     CENTER,
     FILL,
     TRANSPARENT,
+    LEFT,
+    INVERTED,
+    UNDERLINE,
+    BLINK,
 };
 
 struct LabelDesc {
@@ -71,25 +68,7 @@ typedef struct guiObject guiObject_t;
 
 #include "buttons.h"
 
-enum ImageNames {
-    FILE_BTN96_24,
-    FILE_BTN48_24,
-    FILE_BTN96_16,
-    FILE_BTN64_16,
-    FILE_BTN48_16,
-    FILE_BTN32_16,
-    FILE_SPIN96,
-    FILE_SPIN64,
-    FILE_SPIN32,
-    FILE_SPINPRESS96,
-    FILE_SPINPRESS64,
-    FILE_SPINPRESS32,
-    FILE_ARROW_16_UP,
-    FILE_ARROW_16_DOWN,
-    FILE_ARROW_16_RIGHT,
-    FILE_ARROW_16_LEFT,
-};
-const struct ImageMap image_map[FILE_ARROW_16_LEFT+1];
+const struct ImageMap image_map[IMAGE_MAP_END];
 
 enum GUIType {
     UnknownGUI,
@@ -125,16 +104,19 @@ struct guiBox {
 
 struct guiLabel {
     struct LabelDesc desc;
+    u8 blink_count;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*pressCallback)(struct guiObject *obj, s8 press_type, const void *data);
     const void *cb_data;
 };
 
 struct guiKeyboard {
+    u8 last_row;
+    u8 last_col;
     u8 lastchar;
     char *text;
     s32 max_size;
-    u8 caps;
+    u8 flags;
     enum KeyboardType type;
     buttonAction_t action;
     void (*CallBack)(struct guiObject *obj, void *data);
@@ -250,12 +232,6 @@ struct guiObject {
 
 #define DRAW_NORMAL  0
 #define DRAW_PRESSED 1
-#define ARROW_LEFT  (&image_map[FILE_ARROW_16_LEFT])
-#define ARROW_RIGHT (&image_map[FILE_ARROW_16_RIGHT])
-#define ARROW_UP    (&image_map[FILE_ARROW_16_UP])
-#define ARROW_DOWN  (&image_map[FILE_ARROW_16_DOWN])
-#define ARROW_WIDTH 16
-#define ARROW_HEIGHT 16
 
 /* internal use only */
 extern struct guiObject *objHEAD;
@@ -299,6 +275,8 @@ u8 coords_in_box(struct guiBox *box, struct touch *coords);
 struct guiObject *GUI_GetFreeObj(void);
 void connect_object(struct guiObject *obj);
 void GUI_HandleModalButtons(u8 enable);
+int GUI_ButtonWidth(enum ButtonType type);
+int GUI_ButtonHeight(enum ButtonType type);
 #endif
 
 guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
@@ -369,6 +347,8 @@ void GUI_SetSelectable(guiObject_t *obj, u8 selectable);
 u8 GUI_ObjectNeedsRedraw(guiObject_t *obj);
 guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
+struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj);
+struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj);
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed);
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);

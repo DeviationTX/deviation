@@ -18,6 +18,8 @@
 #include "gui.h"
 #include "config/display.h"
 
+#include "_button.c"
+
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
     const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
@@ -32,14 +34,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
     box = &obj->box;
     button = &obj->o.button;
 
-    switch (type) {
-        case BUTTON_96: button->image = &image_map[FILE_BTN96_24]; break;
-        case BUTTON_48: button->image = &image_map[FILE_BTN48_24]; break;
-        case BUTTON_96x16: button->image = &image_map[FILE_BTN96_16]; break;
-        case BUTTON_64x16: button->image = &image_map[FILE_BTN64_16]; break;
-        case BUTTON_48x16: button->image = &image_map[FILE_BTN48_16]; break;
-        case BUTTON_32x16: button->image = &image_map[FILE_BTN32_16]; break;
-    }
+    button->image = _button_image_map(type);
 
     box->x = x;
     box->y = y;
@@ -101,16 +96,49 @@ void GUI_DrawButton(struct guiObject *obj)
     const char *txt;
     u16 x_off, y_off;
 
-    GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
-    if (button->strCallback) {
-        u16 text_w, text_h;
-        txt = button->strCallback(obj, button->cb_data);
-        if (txt) {
-            LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
-            x_off = (box->width - text_w) / 2 + box->x;
-            y_off = (box->height - text_h) / 2 + box->y + 1;
-           LCD_SetFontColor(button->fontColor);
-           LCD_PrintStringXY(x_off, y_off, txt);
+    if (button->image->file != NULL) {
+        GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
+        if (button->strCallback) {
+            u16 text_w, text_h;
+            txt = button->strCallback(obj, button->cb_data);
+            if (txt) {
+                LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+                x_off = (box->width - text_w) / 2 + box->x;
+                y_off = (box->height - text_h) / 2 + box->y + 1;
+                LCD_SetFontColor(button->fontColor);
+                LCD_PrintStringXY(x_off, y_off, txt);
+            }
         }
+    } else {  // plate-text button for Devo 10
+        if (button->strCallback)
+            txt = button->strCallback(obj, button->cb_data);
+        else
+            txt = (const char *)button->cb_data;
+        u16 text_w, text_h;
+        LCD_SetFont(DEFAULT_FONT.font);
+        LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+        if (obj == objSELECTED) {
+            LCD_FillRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3, 1);
+            LCD_SetFontColor(0);
+        }  else {
+            LCD_FillRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3, 0); // clear the background
+            LCD_DrawRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3,  1);
+            LCD_SetFontColor(1);
+        }
+        x_off = (box->width - text_w) / 2 + box->x +1;
+        y_off = (box->height - text_h) / 2 + box->y + 1;
+        LCD_PrintStringXY(x_off, y_off, txt);
     }
+}
+
+int GUI_ButtonWidth(enum ButtonType type)
+{
+    const struct ImageMap *map = _button_image_map(type);
+    return map->width;
+}
+
+int GUI_ButtonHeight(enum ButtonType type)
+{
+    const struct ImageMap *map = _button_image_map(type);
+    return map->height;
 }

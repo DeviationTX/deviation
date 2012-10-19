@@ -13,19 +13,15 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include <stdlib.h>
-#include <stdio.h>
-
-void LCD_Clear(unsigned int color){
-        uint16_t zeile, spalte;
-        LCD_DrawStart(0, 0, (320-1), (240-1), DRAW_NWSE);
-        for(zeile = 0; zeile < 240; zeile++){
-                for(spalte = 0; spalte < 320; spalte++){
-                        LCD_DrawPixel(color);
-                }
-        }
-        LCD_DrawStop();
-
-        return;
+const struct ImageMap *_button_image_map(enum ButtonType type)
+{
+    switch (type) {
+        case BUTTON_96:    return &image_map[FILE_BTN96_24]; break;
+        case BUTTON_48:    return &image_map[FILE_BTN48_24]; break;
+        case BUTTON_96x16: return &image_map[FILE_BTN96_16]; break;
+        case BUTTON_64x16: return &image_map[FILE_BTN64_16]; break;
+        case BUTTON_48x16: return &image_map[FILE_BTN48_16]; break;
+        case BUTTON_32x16: return &image_map[FILE_BTN32_16]; break;
+    }
+    return NULL;
 }

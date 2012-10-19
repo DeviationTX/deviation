@@ -2,7 +2,7 @@ CROSS    = arm-none-eabi-
 
 SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_devo/*.c) $(wildcard target/common_devo/msc2/*.c) $(wildcard target/common_devo/msc2/lib/*.c)
 
-SCREENSIZE = 64x128x2
+SCREENSIZE = 128x64x1
 LINKFILE = target/$(TARGET)/$(TARGET).ld
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Itarget/common_devo/msc2/lib -Itarget/common_devo/msc2 -fno-builtin-printf 

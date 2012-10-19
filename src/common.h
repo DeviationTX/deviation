@@ -70,6 +70,9 @@ enum Music {
     MUSIC_BATT_ALARM,
     MUSIC_DONE_BINDING,
     MUSIC_TIMER_WARNING,
+    MUSIC_KEY_PRESSING,
+    MUSIC_SAVING,
+    MUSIC_MAXLEN,
 };
 void MUSIC_Play(enum Music music);
 

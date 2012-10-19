@@ -48,7 +48,7 @@ else
   CFLAGS   := $(CFLAGS) -O2
 endif
 
-CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -DHGVERSION="\"${HGVERSION}\""
+CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 

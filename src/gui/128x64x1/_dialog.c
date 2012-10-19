@@ -12,20 +12,18 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+#define DIALOG_HEADER_Y 0
+void _draw_dialog_box(struct guiBox *box, int x, const char *title)
+{
+    (void)x;
+    (void)title;
+    //Don't show title in devo10 as its screen has limited space
+    LCD_FillRect(box->x, box->y, box->width, box->height, 0);  // clear the background
+    LCD_DrawRoundRect(box->x, box->y, box->width, box->height,  3, 1);
+    LCD_DrawRoundRect(box->x +1, box->y +1, box->width -2, box->height -2,  3, 1);
+}
 
-#include "common.h"
-#include <stdlib.h>
-#include <stdio.h>
-
-void LCD_Clear(unsigned int color){
-        uint16_t zeile, spalte;
-        LCD_DrawStart(0, 0, (320-1), (240-1), DRAW_NWSE);
-        for(zeile = 0; zeile < 240; zeile++){
-                for(spalte = 0; spalte < 320; spalte++){
-                        LCD_DrawPixel(color);
-                }
-        }
-        LCD_DrawStop();
-
-        return;
+void _dialog_draw_background(u16 x, u16 y, u16 w, u16 h)
+{
+    LCD_FillRoundRect(x, y, w, h, 3, 0);
 }

@@ -1,5 +1,5 @@
 /*
- This project is free software: you can redistribute it and/or modify
+ This project is ffree software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
@@ -13,19 +13,16 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include <stdlib.h>
-#include <stdio.h>
+const struct ImageMap image_map[] = {
+    {NULL, 32, 15, 0, 0}, /*DRAW_BTN32_15 */
+};
 
-void LCD_Clear(unsigned int color){
-        uint16_t zeile, spalte;
-        LCD_DrawStart(0, 0, (320-1), (240-1), DRAW_NWSE);
-        for(zeile = 0; zeile < 240; zeile++){
-                for(spalte = 0; spalte < 320; spalte++){
-                        LCD_DrawPixel(color);
-                }
-        }
-        LCD_DrawStop();
+void _gui_hilite_selected(struct guiObject *obj)
+{
+    (void)obj;
+}
 
-        return;
+void _gui_draw_background(int x, int y, int w, int h)
+{
+    LCD_FillRect(x, y, w, h, 0x0);  // clear the area
 }
