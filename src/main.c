@@ -170,6 +170,8 @@ void EventLoop()
 }
 
 void TOUCH_Handler() {
+    if(! HAS_TOUCH)
+        return;
     u32 pen_down=0;
 
     static u32 pen_down_last=0;
