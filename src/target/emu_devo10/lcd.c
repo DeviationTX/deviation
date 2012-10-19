@@ -18,22 +18,27 @@
 #include "common.h"
 #include "../common_emu/fltk.h"
 
+static int logical_lcd_width = LCD_WIDTH*2;
+/*
+ * // since devo10's screen is too small in emulator , we have it zoomed by 2 for both rows and columns
+ * color = 0x0 means white, other value means black
+ */
 void LCD_DrawPixel(unsigned int color)
 {
     u8 c;
     int row, col;
     int i, j;
-    c = color ? 0x00 : 0xaa;
+    // for emulator of devo 10, 0x0 means white while others mean black
+    c = color ? 0x00 : 0xaa; // 0xaa is grey color(not dot)
 
     //Fill in 4 dots
     row = 2 * gui.y;
     col = 2 * gui.x;
-    printf("(%d, %d) => %d\n", gui.x, gui.y, 3*(LCD_WIDTH * row) + col);
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
-            gui.image[3*(LCD_WIDTH * (row + i) + col + j) + 0] = c;
-            gui.image[3*(LCD_WIDTH * (row + i) + col + j) + 1] = c;
-            gui.image[3*(LCD_WIDTH * (row + i) + col + j) + 2] = c;
+            gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
+            gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
+            gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
         }
     }
     gui.x++;
@@ -44,6 +49,7 @@ void LCD_DrawPixel(unsigned int color)
 }
 
 void LCD_Clear(unsigned int color) {
-    (void)color;
-    memset(gui.image, 0xaa, sizeof(gui.image));
+	(void)color;
+	memset(gui.image, 0xaa, sizeof(gui.image));
+
 }

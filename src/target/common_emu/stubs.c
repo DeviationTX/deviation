@@ -23,7 +23,7 @@
 #include "fltk.h"
 
 void TxName(u8 *var, u8 len) {
-    const u8 model[] = "DEVO-08-Emu";
+    const u8 model[] = EMU_STRING;
     if(len > 12)
          len = 12;
     memcpy(var, model, len - 1);
@@ -55,7 +55,7 @@ void SPITouch_Init() {}
 u8 *BOOTLOADER_Read(int idx) {
     static u8 str[3][80] = {
         "",
-        "Devo8 Emu"
+        EMU_STRING,
         };
     u8 ret = 0;
     switch(idx) {

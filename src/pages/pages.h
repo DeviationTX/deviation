@@ -11,6 +11,7 @@
 #include "usb_page.h"
 #include "calibrate_page.h"
 #include "telemtest_page.h"
+#include "config/display.h"
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1

@@ -96,7 +96,7 @@ public:
                 gui.buttons |= (1 << key);
                 return 1;
             }
-			if (!strcmp(k, "\\") || !strcmp(k, "\'")) {
+            if (!strcmp(k, "\\") || !strcmp(k, "\'")) {
                 gui.powerdown = 1;
                 return 1;
             }
@@ -155,6 +155,22 @@ public:
             case 'n':
                 gui.fmod = (gui.fmod + 1) % 3;
                 return 1;
+            case 't':
+                if(++gui.aux4 > 10)
+                    gui.aux4 = 10;
+                return 1;
+            case 'g':
+                if(--gui.aux4 < 0)
+                    gui.aux4 = 0;
+                return 1;
+            case 'y':
+                if(++gui.aux5 > 10)
+                    gui.aux5 = 10;
+                return 1;
+            case 'h':
+                if(--gui.aux5 < 0)
+                    gui.aux5 = 0;
+                return 1;
             }
         case FL_KEYUP:
             k = Fl::event_text();
@@ -196,7 +212,7 @@ void update_channels(void *params)
     if(! gui.raw[0])
         return;
 
-    for(int i = 0; i < 14; i++) {
+    for(int i = 0; i < INP_LAST -1; i++) {
         sprintf(str, "%6.2f%%", 100.0 * (float)CHAN_ReadInput(i + 1) / CHAN_MAX_VALUE);
         if(strcmp(str, gui.raw[i]->value()))
             changed |= gui.raw[i]->value(str);
@@ -249,36 +265,42 @@ void LCD_Init()
 {
   int i;
   Fl::visual(FL_RGB);
-  int height = (LCD_HEIGHT > 15 + (INP_LAST - 1) * 10 + 85) ? LCD_HEIGHT : 15 + (INP_LAST - 1) * 10 + 85;
-  main_window = new mywin(LCD_WIDTH + 320,height);
-  image = new image_box(0, (height - LCD_HEIGHT) / 2, LCD_WIDTH, LCD_HEIGHT);
+  // 85 is for 4 rows' height
+  int lcdScreenWidth = LCD_WIDTH * LCD_WIDTH_MULT;
+  int lcdScreenHeight = LCD_HEIGHT * LCD_HEIGHT_MULT;
+
+  int height = (lcdScreenHeight > INP_LAST + (INP_LAST - 1) * 10 + 85) ?
+                lcdScreenHeight : INP_LAST + (INP_LAST - 1) * 10 + 85;
+  main_window = new mywin(lcdScreenWidth + 320,height);
+  image = new image_box(0, (height - lcdScreenHeight) / 2, lcdScreenWidth, lcdScreenHeight);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
-  for(i = 0; i < (INP_LAST - 1) / 2; i++) {
+  int mid = (INP_LAST - 1) / 2;
+  for(i = 0; i < mid; i++) {
       char *label;
       label = (char *)malloc(10);
       INPUT_SourceName(label, i + 1);
-      gui.raw[i] = new Fl_Output(395, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
+      gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
       gui.raw[i]->textsize(10);
       label = (char *)malloc(10);
-      INPUT_SourceName(label, i + 8);
-      gui.raw[i+7] = new Fl_Output(535, 20 * i + 5, 60, 15, label);
-      gui.raw[i+7]->textsize(10);
+      INPUT_SourceName(label, i + mid + 1);
+      gui.raw[i+mid] = new Fl_Output(lcdScreenWidth + 230, 20 * i + 5, 60, 15, label);
+      gui.raw[i+mid]->textsize(10);
   }
   for(i = 0; i < 4; i++) {
       //This will leak memory for the labels, but it won't be much
       char *str;
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 1);
-      gui.final[i] = new Fl_Output(LCD_WIDTH + 50, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i] = new Fl_Output(lcdScreenWidth + 50, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 5);
-      gui.final[i+4] = new Fl_Output(LCD_WIDTH + 150, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i+4] = new Fl_Output(lcdScreenWidth + 150, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+4]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 9);
-      gui.final[i+8] = new Fl_Output(LCD_WIDTH + 260, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i+8] = new Fl_Output(lcdScreenWidth + 260, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+8]->textsize(10);
   }
   //Fl_Box box(320, 0, 320, 240);

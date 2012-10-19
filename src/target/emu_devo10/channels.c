@@ -24,8 +24,8 @@ s16 CHAN_ReadInput(int channel)
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
         case INP_ELEVATOR: return CHAN_MIN_VALUE + step * gui.elevator;
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
-        case INP_AUX4:     return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_AUX5:     return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_AUX4:     return CHAN_MIN_VALUE + step * gui.aux4;
+        case INP_AUX5:     return CHAN_MIN_VALUE + step * gui.aux5;
         case INP_RUD_DR:   return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_ELE_DR:   return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_AIL_DR:   return gui.ail_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;

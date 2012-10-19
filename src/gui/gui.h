@@ -354,6 +354,4 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
-#include "config/display.h"
-
 #endif /* GUI_H_ */

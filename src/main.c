@@ -21,6 +21,7 @@
 #include "timer.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "config/display.h"
 
 void Init();
 void Banner();

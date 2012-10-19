@@ -16,6 +16,7 @@
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 #include "target_defs.h"
+#include "config/display.h"
 
 #include "_gui.c"
 

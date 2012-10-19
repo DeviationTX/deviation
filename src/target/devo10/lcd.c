@@ -16,6 +16,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/fsmc.h>
 #include "common.h"
+#include "gui/gui.h"
 
 #define LCD_CMD_ADDR ((uint32_t)FSMC_BANK1_BASE) /* Register Address */
 #define LCD_DATA_ADDR ((uint32_t)FSMC_BANK1_BASE + 0x10000) /* Data Address */
@@ -24,10 +25,10 @@
 #define LCD_DATA *(volatile uint8_t *)(LCD_DATA_ADDR)
 
 //The screen is 129 characters, but we'll only expoise 128 of them
-#define LCD_WIDTH 129
+#define PHY_LCD_WIDTH 129
 #define LCD_PAGES 8
-static u8 img[LCD_WIDTH * LCD_PAGES];
-static u8 dirty[LCD_WIDTH];
+static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
+static u8 dirty[PHY_LCD_WIDTH];
 static u8 xstart, xend;
 static u8 xpos, ypos;
 static enum DrawDir dir;
@@ -135,14 +136,16 @@ void LCD_Init()
 
 void LCD_Clear(unsigned int val)
 {
-    int i,j;
+    /* int i,j;
     val = (val & 0xFF);
     for (i=0; i<LCD_PAGES; i++) {
         lcd_set_page_address(i);
         lcd_set_column_address(0);
-        for (j=0;j<=LCD_WIDTH;j++)
+        for (j=0;j<PHY_LCD_WIDTH;j++)
             LCD_DATA = val;
-    }
+    } */
+	// Bug fix: above method doesn't work properly, especially during keyboard type changing.
+	LCD_FillRect(0, 0, LCD_WIDTH, LCD_HEIGHT, val);
 }
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)
@@ -168,7 +171,7 @@ void LCD_DrawStop(void)
     int p, c;
     for (p = 0; p < LCD_PAGES; p++) {
         int init = 0;
-        for (c = 0; c < LCD_WIDTH; c++) {
+        for (c = 0; c < PHY_LCD_WIDTH; c++) {
             if(dirty[c] & (1 << p)) {
                 if(! init) {
                     lcd_set_page_address(p);
@@ -176,7 +179,7 @@ void LCD_DrawStop(void)
                 } else if(col+1 != c) {
                     lcd_set_column_address(c);
                 }
-                LCD_DATA = img[p * LCD_WIDTH + c];
+                LCD_DATA = img[p * PHY_LCD_WIDTH + c];
                 col = c;
             }
         }
@@ -187,7 +190,7 @@ void LCD_DrawStop(void)
 void LCD_DrawPixel(unsigned int color)
 {
     int y = ypos;
-    int x = LCD_WIDTH - 2 - xpos; //We want to map 0 -> 127 and 127 -> 0
+    int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
 
     if (ypos > 31)
         y = ypos - 32;
@@ -199,9 +202,9 @@ void LCD_DrawPixel(unsigned int color)
     int ycol = y / 8;
     int ybit = y & 0x07;
     if(color) {
-        img[ycol * LCD_WIDTH + x] |= 1 << ybit;
+        img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
     } else {
-        img[ycol * LCD_WIDTH + x] &= ~(1 << ybit);
+        img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
     }
     dirty[x] |= 1 << ycol;
     xpos++;

@@ -24,7 +24,7 @@ static const u8 buttonmap[] = {
     BUT_LAST,        BUT_TRIM_R_NEG,  BUT_TRIM_R_POS,  BUT_TRIM_L_POS,  BUT_TRIM_L_NEG,
     BUT_TRIM_LV_NEG, BUT_TRIM_RV_POS, BUT_TRIM_LV_POS, BUT_LAST,        BUT_TRIM_RV_NEG,
     };
-    
+
 #define COL_PORT GPIOB
 #define COL_PORT_MASK (GPIO4 | GPIO5 | GPIO8 | GPIO9)
 #define ROW_PORT GPIOE
@@ -44,11 +44,9 @@ void Initialize_ButtonMatrix()
   
   /* PortB 4, 5, 8, 9 are open-drain output */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_PUSHPULL, GPIO6 | GPIO7 | GPIO8 | GPIO9);
+                GPIO_CNF_OUTPUT_PUSHPULL, GPIO4 | GPIO5 | GPIO8 | GPIO9);
 
-  /* PB.4 = 1, PB.5 = 0, PB.8 = 1, PB.9 = 1 */
-  gpio_set(GPIOB, GPIO4 | GPIO8 | GPIO9);
-  gpio_clear(GPIOB, GPIO5);
+  gpio_set(GPIOB, GPIO4 | GPIO5| GPIO8 | GPIO9);
 
   /* PortE 2-6 are pull-up inputs */
   gpio_set_mode(GPIOE, GPIO_MODE_INPUT,

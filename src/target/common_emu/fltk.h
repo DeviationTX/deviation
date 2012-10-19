@@ -1,6 +1,7 @@
 #ifndef _FLTK_H_
 #define FLTK_H_
 
+#include "gui/gui.h"
 #include "emu.h"
 
 #ifndef Fl_Output_H
@@ -22,13 +23,16 @@ struct Gui {
     int  gear;
     int  mix;
     int  fmod;
+    int aux4;
+    int aux5;
+
     u8  powerdown;
     u8  mouse;
     u16 mousex, mousey;
-    Fl_Output *raw[20];
-    Fl_Output *final[20];
+    Fl_Output *raw[INP_LAST-1];
+    Fl_Output *final[12];
     u32 last_redraw;
-    u8  image[LCD_WIDTH*LCD_HEIGHT*3];
+    u8  image[LCD_WIDTH*LCD_WIDTH_MULT*LCD_HEIGHT*LCD_HEIGHT_MULT*3];
     u8 init;
 } gui;
 
