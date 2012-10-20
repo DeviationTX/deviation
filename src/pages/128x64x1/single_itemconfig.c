@@ -69,7 +69,7 @@ void PAGE_SingleItemConfigInit(int page)
 	struct LabelDesc labelDesc;
 	labelDesc.font = DEFAULT_FONT.font;
 	labelDesc.font_color = 0xffff;
-	labelDesc.style = CENTER;  // set selected will invert the color aumatically
+	labelDesc.style = LABEL_CENTER;  // set selected will invert the color aumatically
 	labelDesc.outline_color = 1;
 	labelDesc.fill_color = labelDesc.outline_color; // not to draw box
 

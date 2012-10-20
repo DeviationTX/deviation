@@ -115,7 +115,7 @@ void PAGE_ShowHeader(const char *title)
     struct LabelDesc labelDesc;
     labelDesc.font = DEFAULT_FONT.font;
     labelDesc.font_color = 0xffff;
-    labelDesc.style = UNDERLINE;
+    labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
 	GUI_CreateLabelBox(0, 0, LCD_WIDTH, 0, &labelDesc, NULL, NULL, title);
 	GUI_CreateRect(0, MENU_ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc); // draw a line only

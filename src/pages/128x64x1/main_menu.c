@@ -40,7 +40,7 @@ void PAGE_MainMenuInit(int page)
     struct LabelDesc labelDesc;
 	labelDesc.font = DEFAULT_FONT.font;
 	labelDesc.font_color = 0xffff;
-	labelDesc.style = LEFT;
+	labelDesc.style = LABEL_LEFT;
 	labelDesc.outline_color = 1;
 	labelDesc.fill_color = labelDesc.outline_color; // to not draw box
     for (i = 0; i < MAIN_MENU_ITEM_COUNT; i++) {

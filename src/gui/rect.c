@@ -47,12 +47,12 @@ guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct La
 void GUI_DrawRect(struct guiObject *obj)
 {
     struct guiRect *rect = &obj->o.rect;
-    if (rect->desc.style == TRANSPARENT) {
+    if (rect->desc.style == LABEL_TRANSPARENT) {
         GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
     } else {
         LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, rect->desc.fill_color);
     }
-    if (rect->desc.style == TRANSPARENT || rect->desc.fill_color != rect->desc.outline_color) {
+    if (rect->desc.style == LABEL_TRANSPARENT || rect->desc.fill_color != rect->desc.outline_color) {
         LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, rect->desc.outline_color);
     }
 }

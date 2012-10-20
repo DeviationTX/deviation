@@ -36,14 +36,14 @@ enum KeyboardType {
 };
 
 enum LabelType {
-    NO_BOX,
-    CENTER,
-    FILL,
-    TRANSPARENT,
-    LEFT,
-    INVERTED,
-    UNDERLINE,
-    BLINK,
+    LABEL_NO_BOX,
+    LABEL_CENTER,
+    LABEL_FILL,
+    LABEL_TRANSPARENT,
+    LABEL_LEFT,
+    LABEL_INVERTED,
+    LABEL_UNDERLINE,
+    LABEL_BLINK,
 };
 
 struct LabelDesc {

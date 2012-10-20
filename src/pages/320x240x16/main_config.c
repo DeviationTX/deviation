@@ -28,9 +28,9 @@ u8 page_num;
 #define COL2_VALUE 56
 #define COL3_VALUE 156
 #define COL4_VALUE 204
-const struct LabelDesc outline = {0, 0, 0, 0, TRANSPARENT};
-const struct LabelDesc fill_white = {0, 0, 0xFFFF, 0, FILL};
-const struct LabelDesc fill_black = {0, 0, 0, 0, FILL};
+const struct LabelDesc outline = {0, 0, 0, 0, LABEL_TRANSPARENT};
+const struct LabelDesc fill_white = {0, 0, 0xFFFF, 0, LABEL_FILL};
+const struct LabelDesc fill_black = {0, 0, 0, 0, LABEL_FILL};
 guiObject_t *imageObj;
 guiObject_t *firstObj;
 

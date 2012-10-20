@@ -51,7 +51,7 @@ void PAGE_CalibrateInit(int page)
     struct LabelDesc labelDesc;
 	labelDesc.font = DEFAULT_FONT.font;
 	labelDesc.font_color = 0xffff;
-	labelDesc.style = CENTER;
+	labelDesc.style = LABEL_CENTER;
 	labelDesc.outline_color = 1;
 	labelDesc.fill_color = labelDesc.outline_color; // not to draw box
     u8 row = 8;

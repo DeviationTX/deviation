@@ -72,7 +72,7 @@ void show_menuItems(u8 startIdx)
 	struct LabelDesc labelDesc;
 	labelDesc.font = DEFAULT_FONT.font;
 	labelDesc.font_color = 0xffff;
-	labelDesc.style = LEFT;
+	labelDesc.style = LABEL_LEFT;
 	labelDesc.outline_color = 1;
 	labelDesc.fill_color = labelDesc.outline_color; // not to draw box
 	u8 idx_stringWidth = 15;
@@ -168,7 +168,7 @@ void draw_scrollBar(u8 current_pos, u8 total_count){
 	struct LabelDesc labelDesc;
 	labelDesc.font = DEFAULT_FONT.font;
 	labelDesc.font_color = 0xffff;
-	labelDesc.style = LEFT;
+	labelDesc.style = LABEL_LEFT;
 	labelDesc.outline_color = 1;
 	labelDesc.fill_color = labelDesc.outline_color;
 	smp->scrollBar1 = GUI_CreateRect(x, y, w, h, &labelDesc);
