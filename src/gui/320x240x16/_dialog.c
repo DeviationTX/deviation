@@ -18,6 +18,7 @@ void _draw_dialog_box(struct guiBox *box, int x, const char *title)
     LCD_DrawRect(box->x, box->y, box->width, box->height, DIALOGTITLE_FONT.fill_color);
     LCD_FillRect(box->x, box->y, box->width, DIALOG_HEADER_Y, DIALOGTITLE_FONT.fill_color);
     LCD_FillRect(box->x + 1, box->y + DIALOG_HEADER_Y, box->width - 2, box->height - DIALOG_HEADER_Y - 1, DIALOGBODY_FONT.fill_color);
+    LCD_SetFont(DIALOGTITLE_FONT.font);
     LCD_SetFontColor(DIALOGTITLE_FONT.font_color);
     LCD_PrintStringXY(x, (box->y + 5), title);
 }
