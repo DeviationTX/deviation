@@ -61,6 +61,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file);
 u8 LCD_ImageIsTransparent(const char *file);
 u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h);
+void LCD_DrawUSBLogo(int lcd_width, int lcd_height);
 
 /* Music */
 enum Music {

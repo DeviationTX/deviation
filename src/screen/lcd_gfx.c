@@ -506,3 +506,28 @@ void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
 {
     LCD_DrawWindowedImageFromFile(x, y, file, -1, -1, 0, 0);
 }
+
+void LCD_DrawRLE(const u8 *data, int len, u32 color)
+{
+    while(len) {
+        u32 c = (*data & 0x80) ? color : 0;
+        for(int i = 0; i < (*data & 0x7f); i++) {
+            LCD_DrawPixel(c);
+        }
+        data++;
+        len--;
+    }
+}
+
+extern u8 usb_logo[];
+void LCD_DrawUSBLogo(int lcd_width, int lcd_height)
+{
+    int width = (usb_logo[0] << 8) |  usb_logo[1];
+    int height= (usb_logo[2] << 8) |  usb_logo[3];
+    int size  = (usb_logo[4] << 8) |  usb_logo[5];
+    int x = (lcd_width - width) / 2;
+    int y = (lcd_height - height) / 2;
+    LCD_DrawStart(x, y, x + width-1, y + height, DRAW_NWSE);
+    LCD_DrawRLE(usb_logo+6, size, 0xffff);
+    LCD_DrawStop();
+}
