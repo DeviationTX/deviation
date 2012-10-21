@@ -137,9 +137,9 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 2  cc: elevator LSB
 3  dd: rudder   LSB
 4  ee: thr,ail,ele,rud MSB
-5  ff: 00
-6  gg: 00
-7  hh: 00
+5  ff: slight impact on aux1 (?)
+6  gg: throttle/Aux2 trim (?)
+7  hh: channel reverse: bit 6 = ch1, bit 0=ch7 (?)
 8  ii: gear = bit0, flaps = bit 1
 9  jj:  bits 3:2 are MSB of the Gyro control, other bits unknown.
         bits 1:0 cycle 0, 1, 2 for each packet
