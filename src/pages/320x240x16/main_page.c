@@ -126,8 +126,12 @@ void PAGE_MainInit(int page)
 void PAGE_MainEvent()
 {
     int i;
-    if (PAGE_GetModal())
+    if (PAGE_GetModal()) {
+        if(pagemem.modal_page == 2) {
+            PAGE_TelemtestEvent();
+        }
         return;
+    }
     for(i = 0; i < 6; i++) {
         if (! mp->trimObj[i])
             continue;
@@ -253,6 +257,7 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
         } else {
             PAGE_SetModal(1);
             PAGE_MainExit();
+            pagemem.modal_page = 1;
             MODELPage_ShowLoadSave(0, PAGE_MainInit);
         }
     }
@@ -267,14 +272,20 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    if (idx > 2)
-        return;
-    if(press_type == -1 && ! mp->ignore_release) 
-        TIMER_StartStop(idx-1);
-    mp->ignore_release = 0;
-    if(press_type > 0) {
-        TIMER_Reset(idx-1);
-        mp->ignore_release = 1;
+    if (idx <= NUM_TIMERS) {
+        if(press_type == -1 && ! mp->ignore_release) 
+            TIMER_StartStop(idx-1);
+        mp->ignore_release = 0;
+        if(press_type > 0) {
+            TIMER_Reset(idx-1);
+            mp->ignore_release = 1;
+        }
+    } else if (idx - NUM_TIMERS <= NUM_TELEM) {
+        if(press_type == -1) {
+            pagemem.modal_page = 2;
+            PAGE_MainExit();
+            PAGE_TelemtestModal(PAGE_MainInit, 0);
+        }
     }
 }
 

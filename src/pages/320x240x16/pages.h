@@ -29,6 +29,7 @@ struct pagemem {
         struct calibrate_page calibrate_page;
         struct telemtest_page telemtest_page;
     } u;
+    u8 modal_page;
 };
 
 extern struct pagemem pagemem;
@@ -99,4 +100,5 @@ void PAGE_MainCfgInit(int page);
 /* Telemetry Test */
 void PAGE_TelemtestInit(int page);
 void PAGE_TelemtestEvent();
+void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 #endif

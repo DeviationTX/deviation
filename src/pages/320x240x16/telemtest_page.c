@@ -35,12 +35,8 @@ static const char *raw_cb(guiObject_t *obj, const void *data)
     return TELEMETRY_GetGPS(tp.str, val);
 }
 
-void PAGE_TelemtestInit(int page)
+static void show_page()
 {
-    (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Telemetry"));
-
     u16 y = 40;
     GUI_CreateLabelBox(20,  y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Volt1:"));
     tp.volt[0] = GUI_CreateLabelBox(55,  y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)0L);
@@ -73,6 +69,38 @@ void PAGE_TelemtestInit(int page)
     tp.telem.time[1] = 0;
     tp.telem.time[2] = 0;
 }
+
+static void okcancel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    if(tp.return_page) {
+        PAGE_SetModal(0);
+        PAGE_RemoveAllObjects();
+        tp.return_page(tp.return_val);
+    }
+}
+
+void PAGE_TelemtestInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(_tr("Telemetry"));
+    show_page();
+}
+
+void PAGE_TelemtestModal(void(*return_page)(int page), int page)
+{
+    PAGE_SetModal(1);
+    tp.return_page = return_page;
+    tp.return_val = page;
+    PAGE_RemoveAllObjects();
+
+    PAGE_ShowHeader_ExitOnly(_tr("Telemetry"), okcancel_cb);
+
+    show_page();
+}
+
 void PAGE_TelemtestEvent() {
     int i;
     u32 time = CLOCK_getms();
@@ -138,3 +166,4 @@ void PAGE_TelemtestEvent() {
             GUI_SetLabelDesc(tp.line[i], font);
     }
 }
+
