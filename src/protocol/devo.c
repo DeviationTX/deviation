@@ -195,12 +195,14 @@ static void parse_telemetry_packet(u8 *packet)
         Telemetry.volt[2] = packet[5]; //In 1/10 of Volts
         Telemetry.rpm[0]  = packet[7] * 120; //In RPM
         Telemetry.rpm[1]  = packet[9] * 120; //In RPM
+        Telemetry.time[0] = CLOCK_getms();
     }
     if (packet[0] == 0x31) {
         Telemetry.temp[0] = packet[1] - 20; //In degrees-C
         Telemetry.temp[1] = packet[2] - 20; //In degrees-C
         Telemetry.temp[2] = packet[3] - 20; //In degrees-C
         Telemetry.temp[3] = packet[4] - 20; //In degrees-C
+        Telemetry.time[1] = CLOCK_getms();
     }
     /* GPS Data
        32: 30333032302e3832373045fb  = 030°20.8270E
@@ -210,6 +212,7 @@ static void parse_telemetry_packet(u8 *packet)
        36: 313832353532313531303132  = 2012-10-15 18:25:52 (UTC)
     */
     if (packet[0] == 0x32) {
+        Telemetry.time[2] = CLOCK_getms();
         Telemetry.gps.longitude = ((packet[1]-'0') * 100 + (packet[2]-'0') * 10 + (packet[3]-'0')) * 3600000
                                   + ((packet[4]-'0') * 10 + (packet[5]-'0')) * 60000
                                   + ((packet[7]-'0') * 1000 + (packet[8]-'0') * 100
@@ -218,6 +221,7 @@ static void parse_telemetry_packet(u8 *packet)
             Telemetry.gps.longitude *= -1;
     }
     if (packet[0] == 0x33) {
+        Telemetry.time[2] = CLOCK_getms();
         Telemetry.gps.latitude = ((packet[1]-'0') * 10 + (packet[2]-'0')) * 3600000
                                   + ((packet[3]-'0') * 10 + (packet[4]-'0')) * 60000
                                   + ((packet[6]-'0') * 1000 + (packet[7]-'0') * 100
@@ -226,12 +230,15 @@ static void parse_telemetry_packet(u8 *packet)
             Telemetry.gps.latitude *= -1;
     }
     if (packet[0] == 0x34) {
+        Telemetry.time[2] = CLOCK_getms();
         Telemetry.gps.altitude = float_to_int(packet+1);
     }
     if (packet[0] == 0x35) {
+        Telemetry.time[2] = CLOCK_getms();
         Telemetry.gps.velocity = float_to_int(packet+7);
     }
     if (packet[0] == 0x36) {
+        Telemetry.time[2] = CLOCK_getms();
         Telemetry.gps.hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
         Telemetry.gps.min   = (packet[3]-'0') * 10 + (packet[4]-'0');
         Telemetry.gps.sec   = (packet[5]-'0') * 10 + (packet[6]-'0');

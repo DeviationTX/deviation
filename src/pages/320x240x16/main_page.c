@@ -81,8 +81,10 @@ void PAGE_MainInit(int page)
     for(i = 0; i < 8; i++) {
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
+            int font = ((Model.pagecfg.box[i] <= NUM_TIMERS && mp->boxval[i] < 0) ||
+                        ((u8)(Model.pagecfg.box[i] - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
             mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
-                                get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
+                                get_box_font(i, font),
                                 show_box_cb, press_box_cb,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else {
@@ -145,6 +147,16 @@ void PAGE_MainEvent()
                 mp->boxval[i] = val;
                 GUI_Redraw(mp->boxObj[i]);
             } else if (mp->boxval[i] / 1000 != val /1000) {
+                mp->boxval[i] = val;
+                GUI_Redraw(mp->boxObj[i]);
+            }
+        } else if (Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM) {
+            u32 time = CLOCK_getms();
+            if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
+                Telemetry.time[0] = 0;
+                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 1));
+            } else if(Telemetry.time[0] && mp->boxval[i] != val) {
+                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 0));
                 mp->boxval[i] = val;
                 GUI_Redraw(mp->boxObj[i]);
             }

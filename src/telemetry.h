@@ -2,6 +2,7 @@
 #define _TELEMETRY_H_
 
 #define NUM_TELEM 9
+#define TELEM_ERROR_TIME 5000
 struct gps {
     s32 latitude;
     s32 longitude;
@@ -20,6 +21,7 @@ struct Telemetry {
     u8 temp[4];
     u16 rpm[2];
     struct gps gps;
+    u32 time[3];
 };
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);

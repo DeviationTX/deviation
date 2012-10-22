@@ -10,6 +10,7 @@
 #define SMALLBOX_FONT  (Display.font[4])
 #define BATTERY_FONT   (Display.font[5])
 #define BATTALARM_FONT (Display.font[6])
+#define ERROR_FONT     (Display.font[6])  //Same as BATTALARM_FONT
 #define TINY_FONT      (Display.font[7])
 #define BOLD_FONT      (Display.font[8])
 #define NARROW_FONT    (Display.font[9])
