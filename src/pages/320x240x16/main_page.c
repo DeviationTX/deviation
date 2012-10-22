@@ -48,6 +48,7 @@ void PAGE_MainInit(int page)
     (void)page;
     int i;
     u16 x, y, w, h;
+    memset(mp, 0, sizeof(struct main_page));
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
