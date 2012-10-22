@@ -134,14 +134,15 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     if(cp->return_page) {
         PAGE_SetModal(0);
         PAGE_RemoveAllObjects();
-        cp->return_page(1);
+        cp->return_page(cp->return_val);
     }
 }
 
-void PAGE_ChantestModal(void(*return_page)(int page))
+void PAGE_ChantestModal(void(*return_page)(int page), int page)
 {
     PAGE_SetModal(1);
     cp->return_page = return_page;
+    cp->return_val = page;
     cp->type = 0;
     PAGE_RemoveAllObjects();
 

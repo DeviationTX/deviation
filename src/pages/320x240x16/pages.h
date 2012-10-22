@@ -76,7 +76,7 @@ void PAGE_InputtestInit(int page);
 void PAGE_ButtontestInit(int page);
 void PAGE_ChantestEvent();
 void PAGE_ChantestExit();
-void PAGE_ChantestModal(void(*return_page)(int page));
+void PAGE_ChantestModal(void(*return_page)(int page), int page);
 
 /* Scanner */
 void PAGE_ScannerInit(int page);

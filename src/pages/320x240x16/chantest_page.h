@@ -9,6 +9,7 @@ struct chantest_page {
     u8 num_bars;
     u8 is_locked;
     void(*return_page)(int page);
+    int return_val;
     guiObject_t *bar[NUM_TEST_BARS];
     guiObject_t *value[NUM_VALUES];
     s16 pctvalue[NUM_TEST_BARS];

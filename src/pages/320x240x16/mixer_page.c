@@ -128,7 +128,7 @@ void show_chantest_cb(guiObject_t *obj, const void *data)
     (void)obj;
     
     show_chantest = 1;
-    PAGE_ChantestModal(PAGE_MixerInit);
+    PAGE_ChantestModal(PAGE_MixerInit, mp->top_channel);
 }
 
 void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
