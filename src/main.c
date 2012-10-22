@@ -48,6 +48,8 @@ int main() {
     if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount()) {
         LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);
         USB_Connect();
+        LCD_Clear(0x0000);
+        FS_Mount();
     }
     
     CONFIG_LoadTx();
