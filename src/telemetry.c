@@ -18,11 +18,14 @@
 struct Telemetry Telemetry;
 s32 TELEMETRY_GetValue(int idx)
 {
-    (void)idx;
-    if(idx == 0)
-        return Telemetry.volt[1];
-    else
-        return Telemetry.volt[2];
+    if(idx < 3) {
+        return Telemetry.volt[idx];
+    } else if(idx < 7) {
+        return Telemetry.temp[idx-3];
+    } else if(idx < 9) {
+        return Telemetry.rpm[idx-7];
+    }
+    return 0;
 }
 
 const char * TELEMETRY_SetString(char *str, u8 telem)

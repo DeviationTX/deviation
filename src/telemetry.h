@@ -1,7 +1,7 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-#define NUM_TELEM 10
+#define NUM_TELEM 9
 struct gps {
     s32 latitude;
     s32 longitude;

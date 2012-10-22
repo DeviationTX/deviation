@@ -138,7 +138,7 @@ void PAGE_MainEvent()
         if (! mp->boxObj[i])
             continue;
         s32 val = get_boxval(Model.pagecfg.box[i]);
-        if (Model.pagecfg.box[i] <= 2) {
+        if (Model.pagecfg.box[i] <= NUM_TIMERS) {
             if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
                 //Timer
                 GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, val < 0));
