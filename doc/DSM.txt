@@ -2,17 +2,16 @@ Virtually all of the inofrmation in this document was provided by hammer22.  So 
 DSM2:
 DSM2 data packets consist of 7 channels each.  the packets are formatted as 16bit MSB-1st values
 A packet is sent as follows:
-aaaa bbbb cccc dddd eeee ffff gggg hhhh
-aaaa: The GUID of this Tx/model
-bbbb: Throttle  0x0000 - 0x03FF
-cccc: Aileron   0x0000 - 0x03FF
-dddd: Elevator  0x0000 - 0x03FF
-eeee: Rudder    0x0000 - 0x03FF
-ffff: Flaps     0x0000 - 0x03FF
-gggg: Gear      0x0000 - 0x03FF
-hhhh: Aux1      0x0000 - 0x03FF
-
-The GUID is equal to the inverse of bytes 2-3 in th ebind packet
+aa bb cccc dddd eeee ffff gggg hhhh iiii
+aa: If DSM2: 0xff - mfgid[2], if DSMX mfgid[2]
+bb: If DSM2: 0xff - mfgid[3] + offset, if DSMX mfgid[3] + offset (see binding)
+cccc: Throttle  0x0000 - 0x03FF
+dddd: Aileron   0x0000 - 0x03FF
+eeee: Elevator  0x0000 - 0x03FF
+ffff: Rudder    0x0000 - 0x03FF
+gggg: Flaps     0x0000 - 0x03FF
+hhhh: Gear      0x0000 - 0x03FF
+iiii: Aux1      0x0000 - 0x03FF
 
 Each packet is sent twice, once on channel 'a' and 4msec later on channel 'b'
 If there are more than 7 channels to transmit, the upper channels are transmitted using the same
@@ -38,10 +37,39 @@ dd   : 0xff - mfgid[3] + offset
 eeee : 384 + sum of bytes 0 through 7
 ff   : Unknown (value = 0x01)
 gg   : # of channels being transmitted
-hh   : # of packets (1 if num-channels < 8, 2 if num-channels >= 8) for DSM2
+hh   : Transmitter capabilities
+     : HP6DSM (DSM2): 0x01
+     : DX6i   (DSMX): 0xA2
+     : DX8    (DSM2): 0x12
+     : DX8    (DSMX): 0xB2
+     : DM9    (DSM2): 0x02
+# of packets (1 if num-channels < 8, 2 if num-channels >= 8) for DSM2
 ii   : Unknown (value = 0x00)
 jjjj : eeee + sum of bytes 8 through 13
 The bind channel can be any odd channel between 0x01 and 0x4f
+The SOP and CRC are set as below for the chosen bind channel
+the DATA code is 32 bytes.  The 1st 16 bytes are as defined below for the bind channel.
+The 2nd 16 bytes are always:
+D7A154B15E89AE86 C69422FE48E6574E
+
+Once the Rx detectes that the bind packet is no longer being sent, it
+will transmit a confirmation on the same channel using the fillowing 16byte DATA code:
+98881BE430790384 060C12181E247110
+
+The confirmation data is:
+aa bb cc dd ee ff gg hh ii jj
+aa: byte[0] of bind packet
+bb: byte[1] of bind packet
+cc: byte[2] of bind packet
+dd: byte[3] of bind packet
+ee: byte[10] of bind packet (always 0x01)
+ff: # of supported channels(?)
+    AR7000=0x07, AR6010=0x07, AR6210=0x07
+gg: requested packet type
+    AR6210 connected to HP6DSM(DSM2): 0x01 (DSM2 requested)
+    AR7000 connected to DX6i (DSMX):  0x01 (DSM2 requested)
+    AR6010 connected to DX6i (DSMX):  0xA2 (DSMX requested)
+hh: byte[13] of bind packet (always 0x00)
 
 SOP/Data/CRC code selection:
 there is one set of SOP, Data, and CRC codes for each transmit channel.
