@@ -55,6 +55,7 @@ D7A154B15E89AE86 C69422FE48E6574E
 Once the Rx detectes that the bind packet is no longer being sent, it
 will transmit a confirmation on the same channel using the fillowing 16byte DATA code:
 98881BE430790384 060C12181E247110
+It is not required that the Tx receives or acts upon this packet
 
 The confirmation data is:
 aa bb cc dd ee ff gg hh ii jj
