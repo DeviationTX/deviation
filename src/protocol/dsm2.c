@@ -13,12 +13,14 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
 #ifdef PROTO_HAS_CYRF6936
+#define RANDOM_CHANNELS 1
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
@@ -135,7 +137,10 @@ static void build_bind_packet()
     packet[9] = sum & 0xff;
     packet[10] = 0x01; //???
     packet[11] = num_channels;
-    packet[12] = num_channels < 8 ? 0x01 : 0x02; //FIXME: This changes for DSMX
+    packet[12] = num_channels < 8 ? 0x01 : 0x02;
+#if DSMX
+    packet[12] = num_channels < 8 ? 0xa2 : 0xb3;
+#endif
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)
         sum += packet[i];
@@ -355,17 +360,32 @@ static void initialize(u8 bind)
        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
    }
 #endif
-    channels[0] = (cyrfmfg_id[0] + cyrfmfg_id[2] + cyrfmfg_id[4]
-                   + ((Model.fixed_id >> 0) & 0xff) + ((Model.fixed_id >> 16) & 0xff)) % 39 + 1;
-    channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
-                   + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
+    cyrf_config();
+
+    if (RANDOM_CHANNELS) {
+        u8 tmpch[10];
+        CYRF_FindBestChannels(tmpch, 10, 5, 3, 75);
+        u8 idx = rand() % 10;
+        channels[0] = tmpch[idx];
+        while(1) {
+           idx = rand() % 10;
+           if (tmpch[idx] != channels[0])
+               break;
+        }
+        channels[1] = tmpch[idx];
+    } else {
+        channels[0] = (cyrfmfg_id[0] + cyrfmfg_id[2] + cyrfmfg_id[4]
+                      + ((Model.fixed_id >> 0) & 0xff) + ((Model.fixed_id >> 16) & 0xff)) % 39 + 1;
+        channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
+                      + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
+    }
+    printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
     num_channels = 6;
     model = MODEL;
 
-    cyrf_config();
     CYRF_ConfigRxTx(1);
     if (bind) {
         state = DSM2_BIND;
