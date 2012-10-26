@@ -254,7 +254,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     //Wait for pre-amp to switch from sned to receive
     Delay(1000);
     for(i = 0; i < NUM_FREQ; i++) {
-        CYRF_ConfigRFChannel(i + FREQ_OFFSET);
+        CYRF_ConfigRFChannel(i);
         CYRF_ReadRegister(0x13);
         CYRF_StartReceive();
         Delay(10);
