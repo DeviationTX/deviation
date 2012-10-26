@@ -15,6 +15,8 @@
 #include <libopencm3/stm32/f1/adc.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include "devo.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 void ADC_Init(void)
 {
@@ -47,6 +49,15 @@ void ADC_Init(void)
 
     adc_reset_calibration(ADC1);
     adc_calibration(ADC1);
+
+    //Build a RNG seed using ADC 14, 16, 17
+    u32 seed = 0;
+    for(int i = 0; i < 8; i++) {
+        seed = seed << 4 | ((ADC1_Read(16) & 0x03) << 2) | (ADC1_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
+        seed ^= ADC1_Read(14) << i; //Get a couple more random bits from Voltage sensor
+    }
+    printf("RNG Seed: %08x\n", (int)seed);
+    srand(seed);
 }
 
 u16 ADC1_Read(u8 channel)
