@@ -1,17 +1,46 @@
 Virtually all of the inofrmation in this document was provided by hammer22.  So Thanks!
 DSM2:
+
 DSM2 data packets consist of 7 channels each.  the packets are formatted as 16bit MSB-1st values
-A packet is sent as follows:
+Data can be either 10 or 11 bits.
+6-channel DSM2 = 10bit
+8-channel DSM2 = 11bit
+All DSMx appears to be 11bit
+
+A packet consists of a Tx ID + upto 7 channels of data
+each 16bit data value is defined as:
+10bit:
+a 0 bbbb cccccccccc
+11bit:
+a bbbb  ccccccccccc
+
+a:    0 for 1st data packet, 1 for 2nd data packet
+bbbb: the channel number of this packet
+cc..: 10 or 11bit channel data (MSB 1st)
+
+Channel assignment appears to be:
+0: Throttle
+1: Aileron
+2: Elevator
+3: Rudder
+4: Gear
+5: Aux1
+6: Aux2
+7: Aux3
+
+
+Data packets are defined as:
 aa bb cccc dddd eeee ffff gggg hhhh iiii
 aa: If DSM2: 0xff - mfgid[2], if DSMX mfgid[2]
 bb: If DSM2: 0xff - mfgid[3] + offset, if DSMX mfgid[3] + offset (see binding)
-cccc: Throttle  0x0000 - 0x03FF
-dddd: Aileron   0x0000 - 0x03FF
-eeee: Elevator  0x0000 - 0x03FF
-ffff: Rudder    0x0000 - 0x03FF
-gggg: Flaps     0x0000 - 0x03FF
-hhhh: Gear      0x0000 - 0x03FF
-iiii: Aux1      0x0000 - 0x03FF
+cccc: Channel
+dddd: Channel
+eeee: Channel
+ffff: Channel
+gggg: Channel
+hhhh: Channel
+iiii: Channel
+
 
 Each packet is sent twice, once on channel 'a' and 4msec later on channel 'b'
 If there are more than 7 channels to transmit, the upper channels are transmitted using the same
