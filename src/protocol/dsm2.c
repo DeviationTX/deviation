@@ -23,6 +23,7 @@
 #define RANDOM_CHANNELS 1
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
+#define DSMX 0
 
 //During binding we will send BIND_COUNT/2 packets
 //One packet each 10msec
@@ -103,7 +104,17 @@ static const u8 pncodes[5][9][8] = {
   /* Col 8 */ {0x03, 0xBC, 0x6E, 0x8A, 0xEF, 0xBD, 0xFE, 0xF8}
 },
 };
+
 static const u8 pn_bind[] = { 0xc6,0x94,0x22,0xfe,0x48,0xe6,0x57,0x4e };
+
+static const u8 ch_map4[] = {0, 1, 2, 3};    //Guess
+static const u8 ch_map5[] = {0, 1, 2, 3, 4, 0xff, 0xff, 0xff}; //Guess
+static const u8 ch_map6[] = {1, 5, 2, 3, 0, 4, 0xff, 0xff}; //HP6DSM
+static const u8 ch_map7[] = {1, 5, 2, 4, 3, 6, 0, 0xff}; //DX6i
+static const u8 ch_map8[] = {1, 5, 2, 3, 6, 0xff, 0xff, 4, 0, 7, 0xff, 0xff, 0xff, 0xff}; //DX8
+static const u8 ch_map9[] = {3, 2, 1, 5, 0, 4, 6, 7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
+static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9};
+
 u8 packet[16];
 u8 channels[2];
 u8 chidx;
@@ -151,32 +162,41 @@ static void build_bind_packet()
 static void build_data_packet(u8 upper)
 {
     u8 i;
-    static const u8 chmap[] = {6, 0, 2, 4, 3, 1, 5};
-    packet[0] = (0xff ^ cyrfmfg_id[2]);
-    packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
+    const u8 *chmap = ch_map[num_channels - 4];
+    if(upper)
+        chmap += 7;
 #if DSMX
     packet[0] = cyrfmfg_id[2];
     packet[1] = cyrfmfg_id[3] + model;
+#else
+    packet[0] = (0xff ^ cyrfmfg_id[2]);
+    packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
 #endif
+    u8 bits = (DSMX || num_channels > 7) ? 11 : 10;
+    u16 max = 1 << bits;
     for (i = 0; i < 7; i++) {
-       s32 value = (s32)Channels[upper * 7 + i] * 0x200 / CHAN_MAX_VALUE + 0x200;
-       if (value > 0x3ff)
-           value = 0x3ff;
-       if (value < 0)
-           value = 0;
-       value = value | (i << 10);
-       packet[chmap[i]*2+2] = (value >> 8) & 0xff;
-       packet[chmap[i]*2+3] = (value >> 0) & 0xff;
+       s32 value;
+       if (chmap[i] == 0xff) {
+           value = 0xffff;
+       } else {
+           value = (s32)Channels[chmap[upper * 7 + i]] * (max / 2) / CHAN_MAX_VALUE + (max / 2);
+           if (value >= bits)
+               value = bits-1;
+           else if (value < 0)
+               value = 0;
+           value = (upper ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
+       }
+       packet[i*2+2] = (value >> 8) & 0xff;
+       packet[i*2+3] = (value >> 0) & 0xff;
     }
-
 }
 
 static u8 get_pn_row(u8 channel)
 {
-    return channel % 5;
 #if DSMX
     return (channel - 2) % 5;
 #endif
+    return channel % 5;
 }
 
 static void cyrf_config()
@@ -379,12 +399,26 @@ static void initialize(u8 bind)
         channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
                       + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
     }
+    /*
+    channels[0] = 0;
+    channels[1] = 0;
+    if (Model.fixed_id == 0)
+        Model.fixed_id = 0x2b9d2952;
+    cyrfmfg_id[0] = 0xff ^ ((Model.fixed_id >> 24) & 0xff);
+    cyrfmfg_id[1] = 0xff ^ ((Model.fixed_id >> 16) & 0xff);
+    cyrfmfg_id[2] = 0xff ^ ((Model.fixed_id >> 8) & 0xff);
+    cyrfmfg_id[3] = 0xff ^ ((Model.fixed_id >> 0) & 0xff);
     printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
+    */
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
-    num_channels = 6;
     model = MODEL;
+    num_channels = Model.num_channels;
+    if (num_channels < 4)
+        num_channels = 4;
+    else if (num_channels > 9)
+        num_channels = 9;
 
     CYRF_ConfigRxTx(1);
     if (bind) {
@@ -403,7 +437,7 @@ u32 DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 14;
+        case PROTOCMD_NUMCHAN: return 9;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? Model.fixed_id : 0;
         default: break;
     }
