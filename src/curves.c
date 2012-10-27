@@ -76,11 +76,12 @@ s16 deadband(struct Curve *curve, s32 value)
     s32 k = neg ? (u8)curve->points[1] : (u8)curve->points[0];
 
     if (k == 0)
-        return value;
-    if (abs(value) < k * CHAN_MULTIPLIER / 10)
+        return CHAN_MAX_VALUE;
+    value = abs(value);
+    if (value < k * CHAN_MULTIPLIER / 10)
         return 0;
-    s32 minmax = neg ? CHAN_MIN_VALUE: CHAN_MAX_VALUE;
-    return (1000 * (value - minmax) + (1000 - k) * minmax) / (1000 - k);
+    s32 max = CHAN_MAX_VALUE;
+    return max * ((1000 * (value - max) + (1000 - k) * max) / (1000 - k)) / value;
 }
 
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
