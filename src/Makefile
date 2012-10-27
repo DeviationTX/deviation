@@ -145,10 +145,11 @@ zip: $(TARGET).dfu
 	zip --move deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
 
 fs:
-	ver=`echo $(HGVERSION) | sed -e 's/$(TARGET)-//'`; rm -f deviation-filesystem-$$ver.zip; zip -r deviation-filesystem-$$ver.zip filesystem
+	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 	
 release:
 	make TARGET=devo8 TYPE=prd zip
 	make TARGET=devo6 TYPE=prd zip
-	make fs
+	make TARGET=devo8 fs
+	make TARGET=devo10 fs
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
