@@ -102,6 +102,7 @@ void GUI_DrawButton(struct guiObject *obj)
             u16 text_w, text_h;
             txt = button->strCallback(obj, button->cb_data);
             if (txt) {
+                LCD_SetFont(DEFAULT_FONT.font);
                 LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
                 x_off = (box->width - text_w) / 2 + box->x;
                 y_off = (box->height - text_h) / 2 + box->y + 1;
