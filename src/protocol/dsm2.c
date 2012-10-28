@@ -107,12 +107,12 @@ static const u8 pncodes[5][9][8] = {
 
 static const u8 pn_bind[] = { 0xc6,0x94,0x22,0xfe,0x48,0xe6,0x57,0x4e };
 
-static const u8 ch_map4[] = {0, 1, 2, 3};    //Guess
-static const u8 ch_map5[] = {0, 1, 2, 3, 4, 0xff, 0xff, 0xff}; //Guess
-static const u8 ch_map6[] = {1, 5, 2, 3, 0, 4, 0xff, 0xff}; //HP6DSM
-static const u8 ch_map7[] = {1, 5, 2, 4, 3, 6, 0, 0xff}; //DX6i
-static const u8 ch_map8[] = {1, 5, 2, 3, 6, 0xff, 0xff, 4, 0, 7, 0xff, 0xff, 0xff, 0xff}; //DX8
-static const u8 ch_map9[] = {3, 2, 1, 5, 0, 4, 6, 7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
+static const u8 ch_map4[] = {0, 1, 2, 3, 0xff, 0xff, 0xff};    //Guess
+static const u8 ch_map5[] = {0, 1, 2, 3, 4,    0xff, 0xff}; //Guess
+static const u8 ch_map6[] = {1, 5, 2, 3, 0,    4,    0xff}; //HP6DSM
+static const u8 ch_map7[] = {1, 5, 2, 4, 3,    6,    0}; //DX6i
+static const u8 ch_map8[] = {1, 5, 2, 3, 6,    0xff, 0xff, 4, 0, 7,    0xff, 0xff, 0xff, 0xff}; //DX8
+static const u8 ch_map9[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9};
 
 u8 packet[16];
@@ -172,7 +172,7 @@ static void build_data_packet(u8 upper)
     packet[0] = (0xff ^ cyrfmfg_id[2]);
     packet[1] = (0xff ^ cyrfmfg_id[3]) + model;
 #endif
-    u8 bits = (DSMX || num_channels > 7) ? 11 : 10;
+    u8 bits = 10; //(DSMX || num_channels > 7) ? 11 : 10;
     u16 max = 1 << bits;
     for (i = 0; i < 7; i++) {
        s32 value;
