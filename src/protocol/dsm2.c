@@ -176,12 +176,12 @@ static void build_data_packet(u8 upper)
     u16 max = 1 << bits;
     for (i = 0; i < 7; i++) {
        s32 value;
-       if (chmap[i] == 0xff) {
+       if (chmap[upper*7 + i] == 0xff) {
            value = 0xffff;
        } else {
            value = (s32)Channels[chmap[upper * 7 + i]] * (max / 2) / CHAN_MAX_VALUE + (max / 2);
-           if (value >= bits)
-               value = bits-1;
+           if (value >= max)
+               value = max-1;
            else if (value < 0)
                value = 0;
            value = (upper ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
