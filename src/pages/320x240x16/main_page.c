@@ -220,7 +220,7 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
     if (idx <= NUM_TIMERS) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
     } else if(idx - NUM_TIMERS <= NUM_TELEM) {
-        TELEMETRY_SetString(mp->tmpstr, idx - NUM_TIMERS - 1);
+        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS - 1);
     } else {
         sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY)));
     }

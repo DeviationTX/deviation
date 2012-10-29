@@ -3,6 +3,24 @@
 
 #define NUM_TELEM 9
 #define TELEM_ERROR_TIME 5000
+
+enum {
+    TELEM_VOLT1,
+    TELEM_VOLT2,
+    TELEM_VOLT3,
+    TELEM_TEMP1,
+    TELEM_TEMP2,
+    TELEM_TEMP3,
+    TELEM_TEMP4,
+    TELEM_RPM1,
+    TELEM_RPM2,
+    TELEM_GPS_LAT,
+    TELEM_GPS_LONG,
+    TELEM_GPS_ALT,
+    TELEM_GPS_SPEED,
+    TELEM_GPS_TIME,
+};
+
 struct gps {
     s32 latitude;
     s32 longitude;
@@ -25,7 +43,6 @@ struct Telemetry {
 };
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
-const char * TELEMETRY_SetString(char *str, u8 telem);
-const char * TELEMETRY_GetGPS(char *str, u8 line);
+const char * TELEMETRY_GetValueStr(char *str, u8 telem);
 const char * TELEMETRY_Name(char *str, u8 telem);
 #endif

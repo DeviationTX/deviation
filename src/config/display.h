@@ -19,7 +19,9 @@
 #define SMALLBOXNEG_FONT (Display.font[12])
 #define DIALOGTITLE_FONT (Display.font[13])
 #define DIALOGBODY_FONT  (Display.font[14])
-#define NUM_LABELS 15
+#define NORMALBOX_FONT     (Display.font[15])
+#define NORMALBOXNEG_FONT  (Display.font[16])
+#define NUM_LABELS 17
 
 struct disp_keyboard {
     u8 font;

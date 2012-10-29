@@ -20,50 +20,67 @@
 
 #define tp (pagemem.u.telemtest_page)
 
-#define TELEM_FONT TITLE_FONT
+#define TELEM_FONT NORMALBOX_FONT
+#define TELEM_TXT_FONT DEFAULT_FONT
+#define TELEM_ERR_FONT NORMALBOXNEG_FONT
 static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u32 val = (long)data;
-    return TELEMETRY_SetString(tp.str, val);
+    return TELEMETRY_GetValueStr(tp.str, val);
 }
 
-static const char *raw_cb(guiObject_t *obj, const void *data)
+static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u32 val = (long)data;
-    return TELEMETRY_GetGPS(tp.str, val);
+    long val = (long)data;
+    switch(val) {
+        case TELEM_VOLT1: sprintf(tp.str, "%s%d", _tr("Volt"), 1); break;
+        case TELEM_VOLT2: sprintf(tp.str, "%s%d", _tr("Volt"), 2); break;
+        case TELEM_VOLT3: sprintf(tp.str, "%s%d", _tr("Volt"), 3); break;
+        case TELEM_RPM1:  sprintf(tp.str, "%s%d",  _tr("RPM"), 1);  break;
+        case TELEM_RPM2:  sprintf(tp.str, "%s%d",  _tr("RPM"), 2);  break;
+        case TELEM_TEMP1: sprintf(tp.str, "%s%d", _tr("Temp"), 1); break;
+        case TELEM_TEMP2: sprintf(tp.str, "%s%d", _tr("Temp"), 2); break;
+        case TELEM_TEMP3: sprintf(tp.str, "%s%d", _tr("Temp"), 3); break;
+        case TELEM_TEMP4: sprintf(tp.str, "%s%d", _tr("Temp"), 4); break;
+        case TELEM_GPS_LONG:   strcpy(tp.str, _tr("Longitude")); break;
+        case TELEM_GPS_LAT:    strcpy(tp.str, _tr("Latitude")); break;
+        case TELEM_GPS_ALT:    strcpy(tp.str, _tr("Altitude")); break;
+        case TELEM_GPS_SPEED:  strcpy(tp.str, _tr("Speed")); break;
+        case TELEM_GPS_TIME:   strcpy(tp.str, _tr("Time")); break;
+        default: tp.str[0] = '\0'; break;
+     }
+     return tp.str;
 }
 
 static void show_page()
 {
-    u16 y = 40;
-    GUI_CreateLabelBox(20,  y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Volt1:"));
-    tp.volt[0] = GUI_CreateLabelBox(55,  y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)0L);
-    GUI_CreateLabelBox(130, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Volt2:"));
-    tp.volt[1] = GUI_CreateLabelBox(165, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)1L);
-    GUI_CreateLabelBox(240, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Volt3:"));
-    tp.volt[2] = GUI_CreateLabelBox(275, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)2L);
-    y = 60;
-    GUI_CreateLabelBox(10, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Temp1:"));
-    tp.temp[0] = GUI_CreateLabelBox(50,  y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)3L);
-    GUI_CreateLabelBox(90, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Temp2:"));
-    tp.temp[1] = GUI_CreateLabelBox(130, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)4L);
-    GUI_CreateLabelBox(170, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Temp3:"));
-    tp.temp[2] = GUI_CreateLabelBox(210, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)5L);
-    GUI_CreateLabelBox(250, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("Temp4:"));
-    tp.temp[3] = GUI_CreateLabelBox(290, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)6L);
-    y = 80;
-    GUI_CreateLabelBox(90,  y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("RPM1:"));
-    tp.rpm[0] = GUI_CreateLabelBox(125, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)7L);
-    GUI_CreateLabelBox(170, y, 40, 16, &TELEM_FONT, NULL, NULL, _tr("RPM2:"));
-    tp.rpm[1] = GUI_CreateLabelBox(205, y, 40, 16, &ERROR_FONT, telem_cb, NULL, (void *)8L);
-
-    tp.line[0] = GUI_CreateLabelBox(20,  140, 280, 16, &ERROR_FONT, raw_cb, NULL, (void *)0L);
-    tp.line[1] = GUI_CreateLabelBox(20,  160, 280, 16, &ERROR_FONT, raw_cb, NULL, (void *)1L);
-    tp.line[2] = GUI_CreateLabelBox(20,  180, 280, 16, &ERROR_FONT, raw_cb, NULL, (void *)2L);
-    tp.line[3] = GUI_CreateLabelBox(20,  200, 280, 16, &ERROR_FONT, raw_cb, NULL, (void *)3L);
-    tp.line[4] = GUI_CreateLabelBox(20,  220, 280, 16, &ERROR_FONT, raw_cb, NULL, (void *)4L);
+    const u8 row_height = 20;
+    for(long i = 0; i < 4; i++) {
+        GUI_CreateLabelBox(20, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+                           label_cb, NULL, (void *)(TELEM_TEMP1+i));
+        tp.temp[i] = GUI_CreateLabelBox(60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+                           telem_cb, NULL, (void *)(TELEM_TEMP1+1));
+    }
+    for(long i = 0; i < 3; i++) {
+        GUI_CreateLabelBox(120, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+                           label_cb, NULL, (void *)(TELEM_VOLT1+i));
+        tp.volt[i] = GUI_CreateLabelBox(155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+                           telem_cb, NULL, (void *)(TELEM_VOLT1+1));
+    }
+    for(long i = 0; i < 2; i++) {
+        GUI_CreateLabelBox(220, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+                           label_cb, NULL, (void *)(TELEM_RPM1+i));
+        tp.rpm[i]  = GUI_CreateLabelBox(255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+                           telem_cb, NULL, (void *)(TELEM_RPM1+1));
+    }
+    for(long i = 0; i < 5; i++) {
+        GUI_CreateLabelBox(20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,
+                           label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+        tp.gps[i]  = GUI_CreateLabelBox(100,  140 + i*row_height, 200, 16, &TELEM_ERR_FONT,
+                           telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+    }
     tp.telem = Telemetry;
     tp.telem.time[0] = 0;
     tp.telem.time[1] = 0;
@@ -125,12 +142,12 @@ void PAGE_TelemtestEvent() {
     if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
         tp.telem.gps = Telemetry.gps;
         for(i = 0; i < 5; i++)
-            GUI_Redraw(tp.line[i]);
+            GUI_Redraw(tp.gps[i]);
     }
     if(Telemetry.time[0] && (time - Telemetry.time[0] > TELEM_ERROR_TIME || tp.telem.time[0] == 0)) {
         struct LabelDesc *font;
         if (time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-            font = &ERROR_FONT;
+            font = &TELEM_ERR_FONT;
             Telemetry.time[0] = 0;
         } else {
             font = &TELEM_FONT;
@@ -144,7 +161,7 @@ void PAGE_TelemtestEvent() {
     if(Telemetry.time[1] && (time - Telemetry.time[1] > TELEM_ERROR_TIME || tp.telem.time[1] == 0)) {
         struct LabelDesc *font;
         if (time - Telemetry.time[1] > TELEM_ERROR_TIME) {
-            font = &ERROR_FONT;
+            font = &TELEM_ERR_FONT;
             Telemetry.time[1] = 0;
         } else {
             font = &TELEM_FONT;
@@ -156,14 +173,14 @@ void PAGE_TelemtestEvent() {
     if(Telemetry.time[2] && (time - Telemetry.time[2] > TELEM_ERROR_TIME || tp.telem.time[2] == 0)) {
         struct LabelDesc *font;
         if (time - Telemetry.time[2] > TELEM_ERROR_TIME) {
-            font = &ERROR_FONT;
+            font = &TELEM_ERR_FONT;
             Telemetry.time[2] = 0;
         } else {
             font = &TELEM_FONT;
         }
         tp.telem.time[2] = Telemetry.time[2];
         for(i = 0; i < 5; i++)
-            GUI_SetLabelDesc(tp.line[i], font);
+            GUI_SetLabelDesc(tp.gps[i], font);
     }
 }
 
