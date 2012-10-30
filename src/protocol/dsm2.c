@@ -184,7 +184,7 @@ static void build_data_packet(u8 upper)
                value = max-1;
            else if (value < 0)
                value = 0;
-           value = (upper ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
+           value = (upper && i == 0 ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
        }
        packet[i*2+2] = (value >> 8) & 0xff;
        packet[i*2+3] = (value >> 0) & 0xff;

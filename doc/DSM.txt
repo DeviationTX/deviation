@@ -14,7 +14,7 @@ a 0 bbbb cccccccccc
 11bit:
 a bbbb  ccccccccccc
 
-a:    0 for 1st data packet, 1 for 2nd data packet
+a:    0 for 1st data packet, 1 for 1st channel in 2nd data packet
 bbbb: the channel number of this packet
 cc..: 10 or 11bit channel data (MSB 1st)
 
