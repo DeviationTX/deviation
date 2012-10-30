@@ -67,13 +67,13 @@ static void show_page()
         GUI_CreateLabelBox(120, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_VOLT1+i));
         tp.volt[i] = GUI_CreateLabelBox(155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_VOLT1+1));
+                           telem_cb, NULL, (void *)(TELEM_VOLT1+i));
     }
     for(long i = 0; i < 2; i++) {
         GUI_CreateLabelBox(220, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_RPM1+i));
         tp.rpm[i]  = GUI_CreateLabelBox(255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_RPM1+1));
+                           telem_cb, NULL, (void *)(TELEM_RPM1+i));
     }
     for(long i = 0; i < 5; i++) {
         GUI_CreateLabelBox(20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,

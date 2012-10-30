@@ -35,17 +35,23 @@ const char * TELEMETRY_GetValueStr(char *str, u8 telem)
         case TELEM_VOLT1:
         case TELEM_VOLT2:
         case TELEM_VOLT3:
-            sprintf(str, "%d.%dV", (int)Telemetry.volt[telem] /10, (int)Telemetry.volt[telem] % 10);
+            sprintf(str, "%d.%dV",
+                    (int)Telemetry.volt[telem-TELEM_VOLT1] /10,
+                    (int)Telemetry.volt[telem-TELEM_VOLT1] % 10);
             break;
         case TELEM_TEMP1:
         case TELEM_TEMP2:
         case TELEM_TEMP3:
         case TELEM_TEMP4:
-            sprintf(str, "%dC", (int)Telemetry.temp[telem-3]);
+            if (Telemetry.temp[telem-TELEM_TEMP1] == 0) {
+                strcpy(str, "----");
+            } else {
+                sprintf(str, "%dC", (int)Telemetry.temp[telem-TELEM_TEMP1]);
+            }
             break;
         case TELEM_RPM1:
         case TELEM_RPM2:
-            sprintf(str, "%d", (int)Telemetry.rpm[telem-7]);
+            sprintf(str, "%d", (int)Telemetry.rpm[telem-TELEM_RPM1]);
             break;
         case TELEM_GPS_LONG:
             h = Telemetry.gps.longitude / 1000 / 60 / 60;
