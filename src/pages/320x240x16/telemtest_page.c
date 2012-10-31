@@ -34,24 +34,7 @@ static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long val = (long)data;
-    switch(val) {
-        case TELEM_VOLT1: sprintf(tp.str, "%s%d", _tr("Volt"), 1); break;
-        case TELEM_VOLT2: sprintf(tp.str, "%s%d", _tr("Volt"), 2); break;
-        case TELEM_VOLT3: sprintf(tp.str, "%s%d", _tr("Volt"), 3); break;
-        case TELEM_RPM1:  sprintf(tp.str, "%s%d",  _tr("RPM"), 1);  break;
-        case TELEM_RPM2:  sprintf(tp.str, "%s%d",  _tr("RPM"), 2);  break;
-        case TELEM_TEMP1: sprintf(tp.str, "%s%d", _tr("Temp"), 1); break;
-        case TELEM_TEMP2: sprintf(tp.str, "%s%d", _tr("Temp"), 2); break;
-        case TELEM_TEMP3: sprintf(tp.str, "%s%d", _tr("Temp"), 3); break;
-        case TELEM_TEMP4: sprintf(tp.str, "%s%d", _tr("Temp"), 4); break;
-        case TELEM_GPS_LONG:   strcpy(tp.str, _tr("Longitude")); break;
-        case TELEM_GPS_LAT:    strcpy(tp.str, _tr("Latitude")); break;
-        case TELEM_GPS_ALT:    strcpy(tp.str, _tr("Altitude")); break;
-        case TELEM_GPS_SPEED:  strcpy(tp.str, _tr("Speed")); break;
-        case TELEM_GPS_TIME:   strcpy(tp.str, _tr("Time")); break;
-        default: tp.str[0] = '\0'; break;
-     }
-     return tp.str;
+    return TELEMETRY_ShortName(tp.str, val);
 }
 
 static void show_page()

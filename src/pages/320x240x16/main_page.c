@@ -204,7 +204,7 @@ s32 get_boxval(u8 idx)
     if (idx <= NUM_TIMERS)
         return TIMER_GetValue(idx - 1);
     if(idx - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_GetValue(idx - NUM_TIMERS - 1);
+        return TELEMETRY_GetValue(idx - NUM_TIMERS);
     return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY));
 }
 
@@ -220,7 +220,7 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
     if (idx <= NUM_TIMERS) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
     } else if(idx - NUM_TIMERS <= NUM_TELEM) {
-        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS - 1);
+        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS);
     } else {
         sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY)));
     }

@@ -239,12 +239,18 @@ static void parse_telemetry_packet(u8 *packet)
     }
     if (packet[0] == 0x36) {
         Telemetry.time[2] = CLOCK_getms();
-        Telemetry.gps.hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
-        Telemetry.gps.min   = (packet[3]-'0') * 10 + (packet[4]-'0');
-        Telemetry.gps.sec   = (packet[5]-'0') * 10 + (packet[6]-'0');
-        Telemetry.gps.day   = (packet[7]-'0') * 10 + (packet[8]-'0');
-        Telemetry.gps.month = (packet[9]-'0') * 10 + (packet[10]-'0');
-        Telemetry.gps.year  = 2000 + (packet[11]-'0') * 10 + (packet[12]-'0');
+        u8 hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
+        u8 min   = (packet[3]-'0') * 10 + (packet[4]-'0');
+        u8 sec   = (packet[5]-'0') * 10 + (packet[6]-'0');
+        u8 day   = (packet[7]-'0') * 10 + (packet[8]-'0');
+        u8 month = (packet[9]-'0') * 10 + (packet[10]-'0');
+        u8 year  = (packet[11]-'0') * 10 + (packet[12]-'0'); // + 2000
+        Telemetry.gps.time = ((year & 0x3F) << 26)
+                           | ((month & 0x0F) << 22)
+                           | ((day & 0x1F) << 17)
+                           | ((hour & 0x1F) << 12)
+                           | ((min & 0x3F) << 6)
+                           | ((sec & 0x3F) << 0);
     }
         
 }

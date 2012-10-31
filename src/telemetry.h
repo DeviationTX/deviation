@@ -5,7 +5,7 @@
 #define TELEM_ERROR_TIME 5000
 
 enum {
-    TELEM_VOLT1,
+    TELEM_VOLT1 = 1,
     TELEM_VOLT2,
     TELEM_VOLT3,
     TELEM_TEMP1,
@@ -20,18 +20,23 @@ enum {
     TELEM_GPS_SPEED,
     TELEM_GPS_TIME,
 };
+enum {
+    TELEMFLAG_ALARM1 = 0x00,
+    TELEMFLAG_ALARM2 = 0x02,
+    TELEMFLAG_ALARM3 = 0x04,
+    TELEMFLAG_ALARM4 = 0x08,
+    TELEMFLAG_ALARM5 = 0x10,
+    TELEMFLAG_ALARM6 = 0x20,
+    TELEMFLAG_FEET   = 0x40,
+    TELEMFLAG_FAREN  = 0x80,
+};
 
 struct gps {
     s32 latitude;
     s32 longitude;
     s32 altitude;
     s32 velocity;
-    u8  hour;
-    u8  min;
-    u8  sec;
-    u8  day;
-    u8  month;
-    u16 year;
+    u32 time;
 };
 
 struct Telemetry {
@@ -44,5 +49,8 @@ struct Telemetry {
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
 const char * TELEMETRY_GetValueStr(char *str, u8 telem);
+const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value);
 const char * TELEMETRY_Name(char *str, u8 telem);
+const char * TELEMETRY_ShortName(char *str, u8 telem);
+s32 TELEMETRY_GetMaxValue(u8 telem);
 #endif

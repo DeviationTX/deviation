@@ -11,6 +11,7 @@
 #include "usb_page.h"
 #include "calibrate_page.h"
 #include "telemtest_page.h"
+#include "telemconfig_page.h"
 #include "config/display.h"
 
 #define SECTION_MAIN    0
@@ -28,6 +29,7 @@ struct pagemem {
         struct usb_page usb_page;
         struct calibrate_page calibrate_page;
         struct telemtest_page telemtest_page;
+        struct telemconfig_page telemconfig_page;
     } u;
     u8 modal_page;
 };
@@ -101,4 +103,9 @@ void PAGE_MainCfgInit(int page);
 void PAGE_TelemtestInit(int page);
 void PAGE_TelemtestEvent();
 void PAGE_TelemtestModal(void(*return_page)(int page), int page);
+
+/* Telemetry Config */
+void PAGE_TelemconfigInit(int page);
+void PAGE_TelemconfigEvent();
+
 #endif

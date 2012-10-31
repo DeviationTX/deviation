@@ -40,6 +40,7 @@ static const struct page pages[] = {
     {PAGE_MixerInit, PAGE_MixerEvent, NULL},
     {PAGE_ModelInit, PAGE_ModelEvent, NULL},
     {PAGE_TimerInit, PAGE_TimerEvent, NULL},
+    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL},
     {PAGE_TrimInit, PAGE_TrimEvent, NULL},
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
