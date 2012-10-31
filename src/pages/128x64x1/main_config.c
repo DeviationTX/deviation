@@ -122,7 +122,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
         if (Model.pagecfg.box[i] <= NUM_TIMERS)
             return TIMER_Name(str, Model.pagecfg.box[i] - 1);
         else if( Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM)
-            return TELEMETRY_Name(str, Model.pagecfg.box[i] - 1 - NUM_TIMERS);
+            return TELEMETRY_Name(str, Model.pagecfg.box[i] - NUM_TIMERS);
     }
     return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
 }
