@@ -14,6 +14,7 @@
  */
 
 #include "common.h"
+#include "music.h"
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -53,6 +54,12 @@ static const char const *sections[] = {
     "key_pressing",
     "saving",
     "max_len",
+    "telem_alarm1",
+    "telem_alarm2",
+    "telem_alarm3",
+    "telem_alarm4",
+    "telem_alarm5",
+    "telem_alarm6",
 };
 
 #define NUM_NOTES (sizeof(note_map) / sizeof(struct NoteMap))

@@ -3,6 +3,7 @@
 
 #include "mixer.h"
 #include "timer.h"
+#include "telemetry.h"
 #include "pagecfg.h"
 
 /* INI file consts */
@@ -28,9 +29,9 @@ struct Model {
     u8 templates[NUM_CHANNELS];
     struct PageCfg pagecfg;
     u8 safety[NUM_SOURCES+1];
-    u8 telem_alarm[6];
+    u8 telem_alarm[TELEM_NUM_ALARMS];
+    u16 telem_alarm_val[TELEM_NUM_ALARMS];
     u8 telem_flags;
-    u16 telem_alarm_val[6];
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

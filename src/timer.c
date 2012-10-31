@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "timer.h"
+#include "music.h"
 #include "config/model.h"
 
 #define BEEP_INTERVAL 60000 // 60 seconds

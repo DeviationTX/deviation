@@ -33,7 +33,7 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     int val = (long)data;
     u8 changed;
     Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
-        TELEM_VOLT1, TELEM_RPM2, dir, 1, 1, &changed);
+        0, TELEM_RPM2, dir, 1, 1, &changed);
     if (changed) {
         GUI_Redraw(tp.valueObj[val]);
     }
@@ -93,7 +93,7 @@ static const char *units_cb(guiObject_t *obj, int dir, void *data)
         }
         if (data) {
             //Celcius/Farenheit: redraw values
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < TELEM_NUM_ALARMS; i++)
                 GUI_Redraw(tp.valueObj[i]);
         }
     }
@@ -113,7 +113,7 @@ void PAGE_TelemconfigInit(int page)
 
     GUI_CreateTextSelect(10, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)1L);
     GUI_CreateTextSelect(182, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)0L);
-    for (long i = 0; i < 6; i++) {
+    for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);
         GUI_CreateTextSelect(65, 70 + row_height * i, TEXTSELECT_96, 0x0000, NULL, telem_name_cb, (void *)i);

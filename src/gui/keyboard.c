@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "music.h"
 #define ENABLE_GUIOBJECT
 #include "gui.h"
 #include "config/display.h"

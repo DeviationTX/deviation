@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "common.h"
+#include "music.h"
 #include "config/model.h"
 #include "telemetry.h"
 
@@ -88,10 +89,20 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             sprintf(str, "%03d %02d %02d.%03d", h, m, s, ss);
             break;
         case TELEM_GPS_ALT:
-            sprintf(str, "%d.%03dm", (int)value / 1000, (int)value % 1000);
+            if (Model.telem_flags & TELEMFLAG_FEET) {
+                value = value * 328 / 100;
+                sprintf(str, "%d.%03dft", (int)value / 1000, (int)value % 1000);
+            } else {
+                sprintf(str, "%d.%03dm", (int)value / 1000, (int)value % 1000);
+            }
             break;
         case TELEM_GPS_SPEED:
-            sprintf(str, "%d.%03dm/s", (int)value / 1000, (int)value % 1000);
+            if (Model.telem_flags & TELEMFLAG_FEET) {
+                value = value * 2237 / 1000;
+                sprintf(str, "%d.%02dmph", (int)value / 1000, (int)(value / 10) % 100);
+            } else {
+                sprintf(str, "%d.%03dm/s", (int)value / 1000, (int)value % 1000);
+            }
             break;
         case TELEM_GPS_TIME:
         {
@@ -142,6 +153,7 @@ const char * TELEMETRY_Name(char *str, u8 telem)
 const char * TELEMETRY_ShortName(char *str, u8 telem)
 {
     switch(telem) {
+        case 0: strcpy(str, _tr("None")); break;
         case TELEM_VOLT1: sprintf(str, "%s%d", _tr("Volt"), 1); break;
         case TELEM_VOLT2: sprintf(str, "%s%d", _tr("Volt"), 2); break;
         case TELEM_VOLT3: sprintf(str, "%s%d", _tr("Volt"), 3); break;
@@ -177,5 +189,36 @@ s32 TELEMETRY_GetMaxValue(u8 telem)
             return 255;
         default:
             return 0;
+    }
+}
+
+void TELEMETRY_Alarm()
+{
+    static u8 alarm;
+    for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
+        if(! Model.telem_alarm[i])
+            continue;
+        u8 idx = Model.telem_alarm[i];
+        s32 value = TELEMETRY_GetValue(idx);
+        s32 hysteresis = (idx == TELEM_RPM1 || idx == TELEM_RPM2) ? 500 : 5;
+        if (Model.telem_flags & (1 << i)) {
+            if (value <= Model.telem_alarm_val[i]) {
+                if(! (alarm & (1 << i))) {
+                    alarm |= 1 << i;
+                    MUSIC_Play(MUSIC_TELEMALARM1 + i);
+                }
+            } else if (value > (s32)Model.telem_alarm_val[i] + hysteresis) {
+                alarm &= ~(1 << i);
+            }
+        } else {
+            if (value >= Model.telem_alarm_val[i]) {
+                if(! (alarm & (1 << i))) {
+                    alarm |= 1 << i;
+                    MUSIC_Play(MUSIC_TELEMALARM1 + i);
+                }
+            } else if (value < (s32)Model.telem_alarm_val[i] - hysteresis) {
+                alarm &= ~(1 << i);
+            }
+        }
     }
 }

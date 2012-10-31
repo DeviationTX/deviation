@@ -113,6 +113,18 @@ static const char TIMER_TIME[] = "time";
 static const char SECTION_SAFETY[] = "safety";
 static const char * const SAFETY_VAL[SAFE_MAX+1] = { "none", "min", "zero", "max" };
 
+/* Section: Telemetry */
+static const char SECTION_TELEMETRY[] = "telemetry";
+static const char TELEM_TEMP[] = "temp";
+static const char * const TELEM_TEMP_VAL[2] = { "celcius", "farenheit"};
+static const char TELEM_LENGTH[] = "length";
+static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
+
+static const char SECTION_TELEMALARM[] = "telemalarm";
+static const char TELEM_SRC[] = "source";
+static const char TELEM_ABOVE[] =  "above";
+static const char TELEM_VALUE[] = "value";
+
 /* Section: Gui-QVGA */
 static const char SECTION_GUI_QVGA[] = "gui-qvga";
 #define GUI_TRIM SECTION_TRIM
@@ -503,7 +515,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if (MATCH_START(section, SECTION_TIMER)) {
         u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
         if (idx == 0) {
-            printf("Unknown Trim: %s\n", section);
+            printf("Unknown Timer: %s\n", section);
             return 0;
         }
         if (idx > NUM_TIMERS) {
@@ -527,6 +539,52 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(TIMER_TIME)) {
             m->timer[idx].timer = atoi(value);
+            return 1;
+        }
+    }
+    if (MATCH_SECTION(SECTION_TELEMETRY)) {
+        if (MATCH_KEY(TELEM_TEMP)) {
+            if(strcasecmp(TELEM_TEMP_VAL[1], value) == 0)
+                m->telem_flags |= TELEMFLAG_FAREN;
+            return 1;
+        }
+        if (MATCH_KEY(TELEM_LENGTH)) {
+            if(strcasecmp(TELEM_LENGTH_VAL[1], value) == 0)
+                m->telem_flags |= TELEMFLAG_FEET;
+            return 1;
+        }
+    }
+    if (MATCH_START(section, SECTION_TELEMALARM)) {
+        u8 idx = atoi(section + sizeof(SECTION_TELEMALARM)-1);
+        if (idx == 0) {
+            printf("Unknown Telem-alarm: %s\n", section);
+            return 0;
+        }
+        if (idx > TELEM_NUM_ALARMS) {
+            printf("%s: Only %d timers are supported\n", section, TELEM_NUM_ALARMS);
+            return 1;
+        }
+        idx--;
+        if (MATCH_KEY(TELEM_SRC)) {
+            char str[20];
+            for(i = TELEM_VOLT1; i <= TELEM_RPM2; i++) {
+                if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
+                    m->telem_alarm[idx] = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown telemetry src: %s\n", section, value);
+            return 0;
+        }
+        if (MATCH_KEY(TELEM_ABOVE)) {
+            if (atoi(value))
+                m->telem_flags |= 1 << idx;
+            else
+                m->telem_flags &= ~(1 << idx);
+            return 1;
+        }
+        if (MATCH_KEY(TELEM_VALUE)) {
+            m->telem_alarm_val[idx] = atoi(value);
             return 1;
         }
     }
@@ -796,6 +854,24 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
+    }
+    if(WRITE_FULL_MODEL || (m->telem_flags & (TELEMFLAG_FEET | TELEMFLAG_FAREN))) {
+        fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
+        if (WRITE_FULL_MODEL || (m->telem_flags & TELEMFLAG_FAREN)) {
+            fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(m->telem_flags & TELEMFLAG_FAREN) ? 1 : 0]);
+        }
+        if (WRITE_FULL_MODEL || (m->telem_flags & TELEMFLAG_FEET)) {
+            fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(m->telem_flags & TELEMFLAG_FEET) ? 1 : 0]);
+        }
+    }
+    for(idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
+        if (! WRITE_FULL_MODEL && ! m->telem_alarm[idx])
+            continue;
+        fprintf(fh, "[%s%d]\n", SECTION_TELEMALARM, idx+1);
+        fprintf(fh, "%s=%s\n", TELEM_SRC, TELEMETRY_ShortName(file, m->telem_alarm[idx]));
+        if(WRITE_FULL_MODEL || (m->telem_flags & (1 << idx)))
+            fprintf(fh, "%s=%d\n", TELEM_ABOVE, (m->telem_flags & (1 << idx)) ? 1 : 0);
+        fprintf(fh, "%s=%d\n", TELEM_VALUE, m->telem_alarm_val[idx]);
     }
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
     for(i = 0; i < NUM_SOURCES + 1; i++) {

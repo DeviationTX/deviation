@@ -14,6 +14,7 @@
  */
 
 #include "common.h"
+#include "music.h"
 #include "interface.h"
 #include "config/model.h"
 

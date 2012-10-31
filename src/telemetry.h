@@ -3,6 +3,7 @@
 
 #define NUM_TELEM 9
 #define TELEM_ERROR_TIME 5000
+#define TELEM_NUM_ALARMS 6
 
 enum {
     TELEM_VOLT1 = 1,
@@ -53,4 +54,5 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value);
 const char * TELEMETRY_Name(char *str, u8 telem);
 const char * TELEMETRY_ShortName(char *str, u8 telem);
 s32 TELEMETRY_GetMaxValue(u8 telem);
+void TELEMETRY_Alarm();
 #endif

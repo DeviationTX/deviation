@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "buttons.h"
 #include "timer.h"
+#include "music.h"
 #include "config/model.h"
 #include "config/tx.h"
 #include "config/display.h"
@@ -161,6 +162,7 @@ void EventLoop()
     if (CLOCK_getms() > next_redraw) {
         PROTOCOL_CheckDialogs();
         TIMER_Update();
+        TELEMETRY_Alarm();
         BATTERY_Check();
         GUI_RefreshScreen();
         next_redraw = CLOCK_getms() + SCREEN_UPDATE_MSEC;

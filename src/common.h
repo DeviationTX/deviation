@@ -64,18 +64,6 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h);
 void LCD_DrawUSBLogo(int lcd_width, int lcd_height);
 
 /* Music */
-enum Music {
-    MUSIC_STARTUP = 0,
-    MUSIC_ALARM1,
-    MUSIC_ALARM2,
-    MUSIC_BATT_ALARM,
-    MUSIC_DONE_BINDING,
-    MUSIC_TIMER_WARNING,
-    MUSIC_KEY_PRESSING,
-    MUSIC_SAVING,
-    MUSIC_MAXLEN,
-};
-void MUSIC_Play(enum Music music);
 
 /* Mixer functions */
 void MIXER_CalcChannels();
