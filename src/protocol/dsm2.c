@@ -150,7 +150,7 @@ static void build_bind_packet()
     packet[11] = num_channels;
     packet[12] = num_channels < 8 ? 0x01 : 0x02;
 #if DSMX
-    packet[12] = num_channels < 8 ? 0xa2 : 0xb3;
+    packet[12] = num_channels < 8 ? 0xa2 : 0xb2;
 #endif
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)

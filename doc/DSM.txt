@@ -18,6 +18,8 @@ a:    0 for 1st data packet, 1 for 1st channel in 2nd data packet
 bbbb: the channel number of this packet
 cc..: 10 or 11bit channel data (MSB 1st)
 
+The channel data will be 0xffff if the specific channel slot is unused
+
 Channel assignment appears to be:
 0: Throttle
 1: Aileron
