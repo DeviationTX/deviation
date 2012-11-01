@@ -55,32 +55,42 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
     scrollbar->num_items = num_items;
     scrollbar->cur_pos = 0;
     scrollbar->state = RELEASE_UP | RELEASE_DOWN;
-    BUTTON_RegisterCallback(&scrollbar->action, CHAN_ButtonMask(BUT_DOWN) | CHAN_ButtonMask(BUT_UP), BUTTON_LONGPRESS, button_cb, obj);
+    if (ARROW_UP != NULL)  // don't catch key events for devo10
+        BUTTON_RegisterCallback(&scrollbar->action, CHAN_ButtonMask(BUT_DOWN) | CHAN_ButtonMask(BUT_UP), BUTTON_LONGPRESS, button_cb, obj);
 
     return obj;
 }
 
 void GUI_DrawScrollbar(struct guiObject *obj)
 {
-    #define BAR_HEIGHT 10
-    #define BAR_BG      Display.scrollbar.bg_color      // RGB888_to_RGB565(0x44, 0x44, 0x44)
-    #define BAR_FG      Display.scrollbar.fg_color      // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
     struct guiScrollbar *scrollbar = &obj->o.scrollbar;
-    //if (scrollbar->state & (PRESS_UP | RELEASE_UP)) {
-    GUI_DrawImageHelper(obj->box.x, obj->box.y, ARROW_UP, scrollbar->state & PRESS_UP ? DRAW_PRESSED : DRAW_NORMAL);
-    //}
-    //if (scrollbar->state & (PRESS_DOWN | RELEASE_DOWN)) {
-    GUI_DrawImageHelper(obj->box.x, obj->box.y + obj->box.height - ARROW_HEIGHT,
-                        ARROW_DOWN, scrollbar->state & PRESS_DOWN ? DRAW_PRESSED : DRAW_NORMAL);
-    //}
-    //if (! (scrollbar->state & (PRESS_UP | PRESS_DOWN))) {
-        u8 bar = scrollbar->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - BAR_HEIGHT) / scrollbar->num_items;
-        LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT,
-                     ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
-        LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT + bar,
-                     ARROW_WIDTH, BAR_HEIGHT, BAR_FG);
-        //scrollbar->state = 0;
-    //}
+    u16 bar_height = 10;  // Bug fix: After the logic view is introduce , a coordinate can be larger than 10000
+    if (ARROW_UP == NULL) { // plate-text scroll bar for devo10
+        bar_height = 6;
+        u16 bar_x = obj->box.x - obj->box.width/2;
+        GUI_DrawBackground(bar_x, obj->box.y, obj->box.width, obj->box.height);
+        LCD_DrawFastVLine(obj->box.x, obj->box.y, obj->box.height, 0xffff);
+        u16 bar_y = scrollbar->cur_pos * (obj->box.height- bar_height)/(scrollbar->num_items -1)+ obj->box.y;
+        LCD_DrawRect(bar_x, bar_y, obj->box.width, bar_height, 0xffff);
+    } else {
+        #define BAR_BG      Display.scrollbar.bg_color      // RGB888_to_RGB565(0x44, 0x44, 0x44)
+        #define BAR_FG      Display.scrollbar.fg_color      // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
+        //if (scrollbar->state & (PRESS_UP | RELEASE_UP)) {
+        GUI_DrawImageHelper(obj->box.x, obj->box.y, ARROW_UP, scrollbar->state & PRESS_UP ? DRAW_PRESSED : DRAW_NORMAL);
+        //}
+        //if (scrollbar->state & (PRESS_DOWN | RELEASE_DOWN)) {
+        GUI_DrawImageHelper(obj->box.x, obj->box.y + obj->box.height - ARROW_HEIGHT,
+                            ARROW_DOWN, scrollbar->state & PRESS_DOWN ? DRAW_PRESSED : DRAW_NORMAL);
+        //}
+        //if (! (scrollbar->state & (PRESS_UP | PRESS_DOWN))) {
+            u8 bar = scrollbar->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - bar_height) / scrollbar->num_items;
+            LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT,
+                         ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
+            LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT + bar,
+                         ARROW_WIDTH, bar_height, BAR_FG);
+            //scrollbar->state = 0;
+        //}
+    }
 }
 
 void GUI_SetScrollbar(struct guiObject *obj, u8 pos)

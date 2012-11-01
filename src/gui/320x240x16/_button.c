@@ -22,6 +22,7 @@ const struct ImageMap *_button_image_map(enum ButtonType type)
         case BUTTON_64x16: return &image_map[FILE_BTN64_16]; break;
         case BUTTON_48x16: return &image_map[FILE_BTN48_16]; break;
         case BUTTON_32x16: return &image_map[FILE_BTN32_16]; break;
+        default: return NULL;
     }
     return NULL;
 }

@@ -89,6 +89,19 @@ guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
     return obj;
 }
 
+guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+    const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
+    void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
+{
+    struct guiObject  *obj = GUI_CreateButton(x, y, BUTTON_DEVO10, strCallback, fontColor, CallBack, cb_data);
+    struct guiButton *button = &obj->o.button;
+    struct guiBox *box = &obj->box;
+    button->desc = *desc;
+    box->width = width;
+    box->height = height;
+    return obj;
+}
+
 void GUI_DrawButton(struct guiObject *obj)
 {
     struct guiButton *button = &obj->o.button;
@@ -111,25 +124,51 @@ void GUI_DrawButton(struct guiObject *obj)
             }
         }
     } else {  // plate-text button for Devo 10
+#define BUTTON_ROUND 3
         if (button->strCallback)
             txt = button->strCallback(obj, button->cb_data);
         else
             txt = (const char *)button->cb_data;
         u16 text_w, text_h;
-        LCD_SetFont(DEFAULT_FONT.font);
+        u16 w = box->width;
+        u16 h = box->height;
+        LCD_SetFont(button->desc.font);
         LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+        if (box->width == 0)
+            w = text_w;
+        if (box->height == 0)
+            h = text_h;
         if (obj == objSELECTED) {
-            LCD_FillRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3, 1);
+            LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 1);
             LCD_SetFontColor(0);
         }  else {
-            LCD_FillRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3, 0); // clear the background
-            LCD_DrawRoundRect(obj->box.x, obj->box.y, box->width, box->height , 3,  1);
-            LCD_SetFontColor(1);
+            LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
+            LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
+            LCD_SetFontColor(0xffff);
         }
-        x_off = (box->width - text_w) / 2 + box->x +1;
-        y_off = (box->height - text_h) / 2 + box->y + 1;
+        // bug fix: if the string width is wider than box width, e.g. changing to Chinese, x_off might be very big(actuall
+        //itis negative)
+        if (box->width > text_w)
+            x_off = (box->width - text_w) / 2 + box->x +1;
+        else
+            x_off = box->x +1;
+        if (box->height > text_h)
+            y_off = (box->height - text_h) / 2 + box->y + 1;
+        else
+            y_off = box->y;
         LCD_PrintStringXY(x_off, y_off, txt);
     }
+}
+
+// the following method should be obsoleted in the future, and use GUI_CreateButtonPlateText() instead
+void GUI_CustomizeButton(struct guiObject *obj, const struct LabelDesc *desc, u16 width, u16 height)
+{
+    // provide a way to customize buttton font, height and width as this constructor doesn't provide the way
+    struct guiButton *button = &obj->o.button;
+    struct guiBox *box = &obj->box;
+    button->desc = *desc;
+    box->width = width;
+    box->height = height;
 }
 
 int GUI_ButtonWidth(enum ButtonType type)

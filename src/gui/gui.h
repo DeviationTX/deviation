@@ -27,6 +27,7 @@ enum TextSelectType {
     TEXTSELECT_128,
     TEXTSELECT_64,
     TEXTSELECT_96,
+    TEXTSELECT_DEVO10, // indication for textsel specically in devo10
 };
 
 enum KeyboardType {
@@ -40,10 +41,18 @@ enum LabelType {
     LABEL_CENTER,
     LABEL_FILL,
     LABEL_TRANSPARENT,
-    LABEL_LEFT,
+    LABEL_LEFT,    // align left and top vertically
     LABEL_INVERTED,
     LABEL_UNDERLINE,
+    LABEL_LEFTCENTER, // align left and center vertically
+    LABEL_BOX,
+    LABEL_BRACKET,
     LABEL_BLINK,
+};
+
+enum ListBoxType {
+    LISTBOX_DEVO10,
+    LISTBOX_OTHERS,
 };
 
 struct LabelDesc {
@@ -104,7 +113,6 @@ struct guiBox {
 
 struct guiLabel {
     struct LabelDesc desc;
-    u8 blink_count;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*pressCallback)(struct guiObject *obj, s8 press_type, const void *data);
     const void *cb_data;
@@ -134,6 +142,7 @@ struct guiScrollbar {
 };
 
 struct guiButton {
+    struct LabelDesc desc;
     const struct ImageMap *image;
     u16 fontColor;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
@@ -142,6 +151,7 @@ struct guiButton {
 };
 
 struct guiListbox {
+    struct LabelDesc desc;
     u8 text_height;
     u8 entries_per_page;
     u8 item_count;
@@ -152,6 +162,7 @@ struct guiListbox {
     void (*select_cb)(struct guiObject *obj, u16 selected, void * data);
     void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
     void *cb_data;
+    enum ListBoxType style;
 };
 
 struct guiXYGraph {
@@ -191,6 +202,7 @@ struct guiTextSelect {
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);
     void *cb_data;
+    struct LabelDesc desc;
 };
 
 struct guiRect {
@@ -288,6 +300,8 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struc
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
              const void *data);
+void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
+        const char *str, const struct LabelDesc *desc, u8 is_selected);
 void GUI_SetLabelDesc(guiObject_t *obj, struct LabelDesc *desc);
 
 #define GUI_CreateImage(x, y, w,h, file) GUI_CreateImageOffset(x, y, w, h, 0, 0, file, NULL, NULL)
@@ -297,11 +311,20 @@ guiObject_t *GUI_CreateImageOffset(u16 x, u16 y, u16 width, u16 height, u16 x_of
 guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
         const char *(*strCallback)(guiObject_t *, const void *),
         u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
-
+guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+        const char *(*strCallback)(guiObject_t *, const void *),
+        u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+void GUI_CustomizeButton(guiObject_t *, const struct LabelDesc *desc, u16 width, u16 height);
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+        const char *(*string_cb)(u8 idx, void *data),
+        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
+        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
+        void *cb_data);
+guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+        const struct LabelDesc *desc,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
         void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
@@ -318,6 +341,10 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
 guiObject_t *GUI_CreateBarGraph(u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
 guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        void *cb_data);
+guiObject_t *GUI_CreateTextSelectPlate(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);
@@ -340,8 +367,10 @@ void GUI_RedrawAllObjects();
 void GUI_RemoveObj(guiObject_t *obj);
 void GUI_RemoveAllObjects();
 void GUI_RemoveHierObjects(guiObject_t *obj);
+void GUI_DrawObjects(void);
 void GUI_SetHidden(guiObject_t *obj, u8 state);
 guiObject_t *GUI_GetSelected();
+u8 GUI_IsSelectable(guiObject_t *obj);
 void GUI_SetSelected(guiObject_t *obj);
 void GUI_SetSelectable(guiObject_t *obj, u8 selectable);
 u8 GUI_ObjectNeedsRedraw(guiObject_t *obj);
@@ -354,4 +383,16 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
+#define LOGICAL_VIEW_BOUNDARY 5000 // a coordinate that is >= 5000 is a relative coordinate
+#define GUI_IsLogicViewCoordinate(x) (x)>= LOGICAL_VIEW_BOUNDARY
+u8 GUI_IsObjectInsideCurrentView(u8 view_id, struct guiObject *obj);
+u8 GUI_IsCoordinateInsideLogicalView(u8 view_id, u16 *x, u16 *y);
+void GUI_SetupLogicalView(u8 view_id, u16 view_orgin_relativeX, u16 view_orgin_relativeY, u8 width, u8 height,
+        u8 view_origin_absoluteX, u8 view_origin_absoluteY);
+u16 GUI_MapToLogicalView(u8 view_id, u16 x_or_y);
+void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY);
+void GUI_ScrollLogicalView(u8 view_id, s16 y_offset);
+void GUI_ScrollLogicalViewToObject(u8 view_id, struct guiObject *obj, s8 direction);
+s16 GUI_GetLogicalViewOriginRelativeY(u8 view_id);
+s8 GUI_GetViewId(u16 x, u16 y) ;
 #endif /* GUI_H_ */

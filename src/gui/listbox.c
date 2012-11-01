@@ -18,6 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
+#include "_listbox.c"
 static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
@@ -68,6 +69,7 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
     listbox->item_count = item_count;
     listbox->selected = selected;
     
+    listbox->style = LISTBOX_OTHERS;
     listbox->string_cb = string_cb;
     listbox->select_cb = select_cb;
     listbox->longpress_cb = longpress_cb;
@@ -79,6 +81,22 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
               sb_entries,
               obj,
               scroll_cb, NULL);
+    return obj;
+}
+
+guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+        const struct LabelDesc *desc,
+        const char *(*string_cb)(u8 idx, void *data),
+        void (*select_cb)(struct guiObject *obj, u16 selected, void *data),
+        void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
+        void *cb_data)
+{
+    struct guiObject  *obj = GUI_CreateListBox(x, y, width, height, item_count, selected,
+            string_cb, select_cb, longpress_cb, cb_data);
+    struct guiListbox *listbox = &obj->o.listbox;
+    listbox->desc = *desc;
+    listbox->style = LISTBOX_DEVO10;
+    GUI_SetSelected(obj);
     return obj;
 }
 
@@ -123,13 +141,14 @@ static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
-    #define FILL        Display.listbox.bg_color    // RGB888_to_RGB565(0xaa, 0xaa, 0xaa)
-    #define TEXT        Display.listbox.fg_color    // 0x0000
-    #define SELECT      Display.listbox.bg_select   // RGB888_to_RGB565(0x44, 0x44, 0x44)
-    #define SELECT_TXT  Display.listbox.fg_select   // 0xFFFF
-    
     u8 i, old;
     struct guiListbox *listbox = &obj->o.listbox;
+    unsigned int font;
+    if (listbox->style == LISTBOX_DEVO10) {
+        font = listbox->desc.font;
+    } else {
+        font = Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font;
+    }
     if (redraw_all) {
         LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, FILL);
     }
@@ -138,11 +157,11 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         LCD_FillRect(obj->box.x,
                      obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                      obj->box.width, listbox->text_height, SELECT);
-    old = LCD_SetFont(Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font);
+    old = LCD_SetFont(font);
     for(i = 0; i < listbox->entries_per_page; i++) {
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
         LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? SELECT_TXT : TEXT);
-       
+
         LCD_PrintString(str);
         LCD_PrintString("\n");
     }

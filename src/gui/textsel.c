@@ -57,6 +57,48 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     return obj;
 }
 
+guiObject_t *GUI_CreateTextSelectPlate(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        void *cb_data)
+{
+    struct guiObject *obj = GUI_GetFreeObj();
+    struct guiTextSelect *select;
+    struct guiBox *box;
+
+    if (obj == NULL)
+        return NULL;
+
+    box = &obj->box;
+    select = &obj->o.textselect;
+
+    select->type = TEXTSELECT_DEVO10;
+    box->height = height;
+    box->width = width;
+
+    box->x = x;
+    box->y = y;
+
+    obj->Type = TextSelect;
+    OBJ_SET_SELECTABLE(obj, 1);
+    connect_object(obj);
+
+    select->button    = NULL; 
+    select->state     = 0;
+    select->fontColor = 0xffff;
+    select->desc       = *desc;
+    select->ValueCB   = value_cb;
+    select->SelectCB  = select_cb;
+    select->cb_data   = cb_data;
+
+    GUI_TextSelectEnablePress(obj, select_cb ? 1 : 0);
+
+    if ((width == 0 || height == 0) && select->desc.style != LABEL_UNDERLINE)
+        select->desc.style = LABEL_NO_BOX;
+
+    return obj;
+}
+
 void GUI_DrawTextSelect(struct guiObject *obj)
 {
     u16 x, y, w, h;
@@ -65,19 +107,35 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     //Call the callback 1st in case it calls GUI_TextSelectEnablePress
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
-    GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                        box->y, select->button, DRAW_NORMAL);
-    GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
-                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-    GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                        box->y, ARROW_RIGHT,
-                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+    if (select->type != TEXTSELECT_DEVO10) {
+        GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                            box->y, select->button, DRAW_NORMAL);
+        GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
+                            select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+        GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
+                            box->y, ARROW_RIGHT,
+                            select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
 
-    LCD_SetFontColor(select->fontColor);
-    LCD_GetStringDimensions((const u8 *)str, &w, &h);
-    x = box->x + (box->width - w) / 2;
-    y = box->y + 2 + (box->height - h) / 2;
-    LCD_PrintStringXY(x, y, str);
+        LCD_SetFontColor(select->fontColor);
+        LCD_GetStringDimensions((const u8 *)str, &w, &h);
+        x = box->x + (box->width - w) / 2;
+        y = box->y + 2 + (box->height - h) / 2;
+        LCD_PrintStringXY(x, y, str);
+    } else {   // plate text select for devo 10, copy most behavior from label.c
+        u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
+        u16 x1 = box->x + ARROW_WIDTH -1;
+        LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
+        LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
+        //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
+        x1 = box->x + box->width - ARROW_WIDTH;
+        u16 x2 = box->x + box->width -1;
+        //LCD_DrawFastHLine(x1, y, ARROW_WIDTH, 0xffff); //"+"
+        //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
+        LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
+        LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
+        GUI_DrawLabelHelper(box->x + ARROW_WIDTH +1, box->y,box->width - ARROW_WIDTH -ARROW_WIDTH -2, obj->box.height,
+                str, &select->desc, obj == objSELECTED);
+    }
 }
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed)
@@ -190,6 +248,13 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
 {
     struct guiTextSelect *select = &obj->o.textselect;
+    if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
+        if (enable)
+            select->desc.style = LABEL_BOX;
+        else
+            select->desc.style = LABEL_CENTER;
+        return;
+    }
     enum ImageNames fileidx;
     switch (select->type) {
         case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;

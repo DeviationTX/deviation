@@ -21,6 +21,7 @@ enum ImageNames {
 #define IMAGE_MAP_END (FILE_ARROW_16_LEFT + 1)
 
 enum ButtonType {
+    BUTTON_DEVO10,
     BUTTON_96,
     BUTTON_48,
     BUTTON_96x16,

@@ -30,7 +30,6 @@ static buttonAction_t button_modalaction;
 static u8 FullRedraw;
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
-static void GUI_DrawObjects(void);
 
 void connect_object(struct guiObject *obj)
 {
@@ -588,6 +587,11 @@ void GUI_SetSelectable(guiObject_t *obj, u8 selectable)
         objSELECTED = NULL;
         OBJ_SET_DIRTY(obj, 1);
     }
+}
+
+u8 GUI_IsSelectable(guiObject_t *obj)
+{
+    return OBJ_IS_SELECTABLE(obj);
 }
 
 u8 GUI_ObjectNeedsRedraw(guiObject_t *obj)

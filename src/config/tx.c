@@ -31,6 +31,7 @@ const char LANGUAGE[] = "language";
 const char MODE[]="mode";
 
 const char BRIGHTNESS[] = "brightness";
+const char CONTRAST[] = "contrast";
 
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
@@ -72,6 +73,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(BRIGHTNESS)) {
             t->brightness = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(CONTRAST)) {
+            t->contrast = atoi(value);
             return 1;
         }
         if (MATCH_KEY(BATT_ALARM)) {
@@ -135,6 +140,7 @@ void CONFIG_LoadTx()
     Transmitter.current_model = 1;
     Transmitter.mode = MODE_2;
     Transmitter.brightness = 9;
+    Transmitter.contrast = 5;
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
@@ -157,6 +163,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
+    fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     for(i = 0; i < 4; i++) {

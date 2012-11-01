@@ -17,6 +17,8 @@ const struct ImageMap *_button_image_map(enum ButtonType type)
 {
     switch (type) {
         case BUTTON_DEVO10: return &image_map[DRAW_BTN32_15]; break;
+        default:
+            break;
     }
     return NULL;
 }

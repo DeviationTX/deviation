@@ -18,6 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
+static u8  blink_count = 0;
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
@@ -43,14 +44,13 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struc
     connect_object(obj);
 
     label->desc = *desc;
-    if (x == 0 || y == 0)
+    if ((width == 0 || height == 0) && label->desc.style != LABEL_UNDERLINE && label->desc.style != LABEL_UNDERLINE)
         label->desc.style = LABEL_NO_BOX;
     label->strCallback = strCallback;
     label->pressCallback = pressCallback;
     label->cb_data = data;
     if (! label->desc.font)
         label->desc.font = DEFAULT_FONT.font;
-    label->blink_count = 0;
     return obj;
 }
 
@@ -58,75 +58,118 @@ void GUI_DrawLabel(struct guiObject *obj)
 {
     struct guiLabel *label = &obj->o.label;
     const char *str;
-    u16 txt_w, txt_h;
-    u16 txt_x, txt_y;
     if (label->strCallback)
         str = label->strCallback(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
-    LCD_SetFont(label->desc.font);
+    GUI_DrawLabelHelper(obj->box.x, obj->box.y, obj->box.width, obj->box.height, str, &label->desc, obj == objSELECTED);
+}
+
+/**
+ * this hepler is created to let TextSelect share the label drawing behavior for Devo10
+ */
+void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, const char *str,
+        const struct LabelDesc *desc, u8 is_selected)
+{
+    u16 txt_w, txt_h;
+    u16 txt_x, txt_y;
+    u16 w = obj_width;
+    u16 h = obj_height;
+    LCD_SetFont(desc->font);
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
-    if (label->desc.style == LABEL_NO_BOX) {
-        txt_x = obj->box.x;
-        txt_y = obj->box.y;
-        u16 old_w = obj->box.width;
-        u16 old_h = obj->box.height;
-        if (old_w < txt_w)
-            old_w = txt_w;
-        if (old_h < txt_h)
-            old_h = txt_h;
-        obj->box.width = txt_w;
-        obj->box.height = txt_h;
-        GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
-    } else if (label->desc.style == LABEL_UNDERLINE) {
-        txt_x = obj->box.x;
-        txt_y = obj->box.y;
-        u16 old_w = obj->box.width;
-        u16 old_h = obj->box.height;
-        if (old_w < txt_w)
-            old_w = txt_w;
-        if (old_h < txt_h)
-            old_h = txt_h;
-        GUI_DrawBackground(obj->box.x, obj->box.y, old_w, old_h);
-        LCD_DrawFastHLine(obj->box.x, old_h, old_w, 1);
-    } else {
-        if (label->desc.style == LABEL_INVERTED || obj == objSELECTED) {
-            u16 w = obj->box.width;
-            u16 h = obj->box.height;
-            if (w < txt_w)
-                w = txt_w;
-            if (h < txt_h)
-                h = txt_h;
-            LCD_FillRect(obj->box.x, obj->box.y, w, h, 1);
-        } else if (label->desc.style == LABEL_TRANSPARENT || label->desc.style == LABEL_CENTER || label->desc.style == LABEL_LEFT) {
-           GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-        } else {
-            LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, label->desc.fill_color);
+    if (desc->style == LABEL_BOX) {  // draw round rect for the textsel widget when it is pressable
+        if (obj_width == 0)
+            w = txt_w;
+        if (obj_height == 0)
+            h = txt_h;
+        GUI_DrawBackground(obj_x, obj_y, w, h);
+        if (is_selected) {
+            LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
+        }  else {
+            LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 0); // clear the background
+            LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
         }
-        if (label->desc.style == LABEL_TRANSPARENT || label->desc.fill_color != label->desc.outline_color) {
-            LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, label->desc.outline_color);
-        }
-        if (obj->box.height > txt_h)
-            txt_y = obj->box.y + (obj->box.height - txt_h) / 2;
+        if (obj_height > txt_h)
+            txt_y = obj_y + (obj_height - txt_h) / 2;
         else
-            txt_y = obj->box.y;
-        if (obj->box.width > txt_w && label->desc.style != LABEL_LEFT)
-            txt_x = obj->box.x + (obj->box.width - txt_w) / 2;
+            txt_y = obj_y;
+        if (obj_width > txt_w && desc->style != LABEL_LEFT)
+            txt_x = obj_x + (obj_width - txt_w) / 2;
         else
-            txt_x = obj->box.x;
+            txt_x = obj_x;
     }
-    label->blink_count++;
-    if (label->desc.style == LABEL_BLINK ) {
-        if (label->blink_count > 10) {
-            label->blink_count = 0;
-            LCD_SetFontColor(label->desc.font_color);
-        } else {
-            LCD_SetFontColor(~label->desc.font_color);
-        }
-    } else if (label->desc.style == LABEL_INVERTED || obj == objSELECTED) {
-        LCD_SetFontColor(~label->desc.font_color);
+    else if (desc->style == LABEL_INVERTED || is_selected) {
+        if (w < txt_w)
+            w = txt_w;
+        if (h < txt_h)
+            h = txt_h;
+        LCD_FillRect(obj_x, obj_y, w, h, 0xffff);
+        if (obj_height > txt_h)
+            txt_y = obj_y + (obj_height - txt_h) / 2;
+        else
+            txt_y = obj_y;
+        if (obj_width > txt_w && desc->style != LABEL_LEFT)
+            txt_x = obj_x + (obj_width - txt_w) / 2;
+        else
+            txt_x = obj_x;
+    } else if (desc->style == LABEL_NO_BOX) {
+        txt_x = obj_x;
+        txt_y = obj_y;
+        u16 old_w = obj_width;
+        u16 old_h = obj_height;
+        if (old_w < txt_w)
+            old_w = txt_w;
+        if (old_h < txt_h)
+            old_h = txt_h;
+        obj_width = txt_w;
+        obj_height = txt_h;
+        GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
+    } else if (desc->style == LABEL_UNDERLINE) {
+        txt_x = obj_x;
+        txt_y = obj_y;
+        u16 old_w = obj_width;
+        u16 old_h = obj_height;
+        if (old_w < txt_w)
+            old_w = txt_w;
+        if (old_h < txt_h)
+            old_h = txt_h;
+        GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
+        LCD_DrawFastHLine(obj_x, old_h, old_w, 1);
+        if (obj_height > txt_h)
+            txt_y = obj_y + (obj_height - txt_h) / 2;
+        else
+            txt_y = obj_y;
     } else {
-        LCD_SetFontColor(label->desc.font_color);
+        if (desc->style == LABEL_TRANSPARENT || desc->style == LABEL_CENTER || desc->style == LABEL_LEFT || desc->style == LABEL_LEFTCENTER) {
+           GUI_DrawBackground(obj_x, obj_y, obj_width, obj_height);
+        } else {
+            LCD_FillRect(obj_x, obj_y, obj_width, obj_height, desc->fill_color);
+        }
+        if (desc->style == LABEL_TRANSPARENT || desc->fill_color != desc->outline_color) {
+            LCD_DrawRect(obj_x, obj_y, obj_width, obj_height, desc->outline_color);
+        }
+        if (obj_height > txt_h)
+            txt_y = obj_y + (obj_height - txt_h) / 2;
+        else
+            txt_y = obj_y;
+        if (obj_width > txt_w && desc->style != LABEL_LEFT &&  desc->style != LABEL_LEFTCENTER)
+            txt_x = obj_x + (obj_width - txt_w) / 2;
+        else
+            txt_x = obj_x;
+    }
+
+    if (desc->style == LABEL_BLINK ) {
+        blink_count++;
+        if (blink_count > 100) {
+            blink_count = 0;
+            LCD_SetFontColor(desc->font_color);
+        } else {
+            LCD_SetFontColor(~desc->font_color);
+        }
+    } else if (desc->style == LABEL_INVERTED || is_selected) {
+        LCD_SetFontColor(~desc->font_color);
+    } else {
+        LCD_SetFontColor(desc->font_color);
     }
     LCD_PrintStringXY(txt_x, txt_y, str);
 }
