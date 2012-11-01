@@ -139,7 +139,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     u8 row, col, width;
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {
-        printf("Could not locate character U-%04x\n", c);
+        printf("Could not locate character U-%04x\n", (int)c);
         return;
     }
     // Check if the requested character is available
