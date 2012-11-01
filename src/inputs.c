@@ -93,6 +93,9 @@ const char *INPUT_SourceName(char *str, u8 src)
 const char *INPUT_MapSourceName(u8 idx, u8 *val)
 {
     int i = 0;
+    (void)i;  // to remove warning for compiling devo10
+    (void)idx;
+    (void)val;
     #define CHANMAP(old, new) if(idx == i++) { *val = INP_##new; return INPNAME_##old;}
     #include "capabilities.h"
     #undef CHANMAP
