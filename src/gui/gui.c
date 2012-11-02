@@ -516,11 +516,13 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         return modalActive;
 
     if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
-        CHAN_ButtonIsPressed(button, BUT_UP) ||
-        CHAN_ButtonIsPressed(button, BUT_EXIT))
+        CHAN_ButtonIsPressed(button, BUT_UP))
     {
         return (flags & BUTTON_LONGPRESS) ? modalActive : 1;
     }
+    if (CHAN_ButtonIsPressed(button, BUT_EXIT))
+        return (flags & BUTTON_LONGPRESS) ? modalActive : objSELECTED ? 1 : 0;
+
     if (CHAN_ButtonIsPressed(button, BUT_ENTER) && flags & BUTTON_LONGPRESS) {
         //long-press on enter is ignored so it can be handled by the menu
         return modalActive;

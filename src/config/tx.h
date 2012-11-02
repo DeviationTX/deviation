@@ -24,7 +24,7 @@ struct Transmitter {
     u8 contrast;
     u16 batt_alarm;
     u16 batt_critical;
-    struct StickCalibration calibration[NUM_INPUTS];
+    struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;
 };
 

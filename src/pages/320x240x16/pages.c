@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 
 static buttonAction_t button_action;
+static u8 (*ActionCB)(u32 button, u8 flags, void *data);
 
 static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
@@ -44,7 +45,7 @@ static const struct page pages[] = {
     {PAGE_TrimInit, PAGE_TrimEvent, NULL},
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
-    {PAGE_CalibrateInit, PAGE_CalibrateEvent, NULL},
+    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL},
     {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
     {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
@@ -178,10 +179,18 @@ static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
     return data ? _tr("OK") : _tr("Cancel");
 }
 
+void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
+{
+    ActionCB = callback;
+}
+
 u8 page_change_cb(u32 buttons, u8 flags, void *data)
 {
     (void)data;
     (void)flags;
+    if (ActionCB != NULL)
+        return ActionCB(buttons, flags, data);
+
     if (flags & BUTTON_LONGPRESS) {
         if (flags & BUTTON_REPEAT)
             return 0;

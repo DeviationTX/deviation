@@ -9,7 +9,7 @@
 #include "chantest_page.h"
 #include "scanner_page.h"
 #include "usb_page.h"
-#include "calibrate_page.h"
+#include "../common/tx_configure.h"
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
 #include "config/display.h"
@@ -27,7 +27,7 @@ struct pagemem {
         struct chantest_page chantest_page;
         struct scanner_page scanner_page;
         struct usb_page usb_page;
-        struct calibrate_page calibrate_page;
+        struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;
         struct telemconfig_page telemconfig_page;
     } u;
@@ -44,6 +44,7 @@ void PAGE_SetSection(u8 section);
 void PAGE_RemoveAllObjects();
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
+void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data));
 
 /* Main */
 void PAGE_MainInit(int page);
@@ -92,8 +93,8 @@ void PAGE_USBEvent();
 void PAGE_USBExit();
 
 /* USB */
-void PAGE_CalibrateInit(int page);
-void PAGE_CalibrateEvent();
+void PAGE_TxConfigureInit(int page);
+void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));
 
 void PAGE_MainCfgEvent();

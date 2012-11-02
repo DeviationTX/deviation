@@ -24,6 +24,7 @@ static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
+static u8 action_cb(u32 button, u8 flags, void *data);
 
 struct page {
     void (*init)(int i);
@@ -39,18 +40,17 @@ static const struct page pages[] = {
     {PAGE_MainMenuInit, NULL, PAGE_MainMenuExit, "MainMenu"},
     {PAGE_SubMenuInit, NULL, PAGE_SubMenuExit, "SubMenu" },
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
-    {PAGE_CalibrateInit, PAGE_CalibrateEvent, PAGE_CalibrateExit, "Calibrate"},
     {PAGE_SingleItemConfigInit, NULL, PAGE_SingleItemConfigExit, "SingItem"},
-    {PAGE_ProtocolSelectInit, NULL, PAGE_ProtocolSelectExit, "ProtoSele"},
-/*    {PAGE_MixerInit, PAGE_MixerEvent, NULL},
-    {PAGE_ModelInit, PAGE_ModelEvent, NULL},
-    {PAGE_TimerInit, PAGE_TimerEvent, NULL},
-    {PAGE_TrimInit, PAGE_TrimEvent, NULL},
+    {PAGE_MultiItemsConfigInit, NULL, PAGE_MultiItemsConfigExit, "MulItems"},
+    {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
+    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
+    {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},
+    {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
+    {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
+
+    /*
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
-    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
-    {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
-    {PAGE_ButtontestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
     //{PAGE_TestInit, PAGE_TestEvent, NULL},
     {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit},
@@ -59,6 +59,8 @@ static const struct page pages[] = {
 
 static u8 page;
 static u8 modal;
+static struct buttonAction action;
+static u8 (*ActionCB)(u32 button, u8 flags, void *data);
 void PAGE_Init()
 {
     page = 0;
@@ -66,6 +68,17 @@ void PAGE_Init()
     GUI_RemoveAllObjects();
     enter_cmd = NULL;
     exit_cmd = NULL;
+    ActionCB = NULL;
+    // For Devo10, there is no need to register and then unregister buttons in almost every page
+    // since all buttons are needed in all pages, so we just register them in this common page
+    BUTTON_RegisterCallback(&action,
+          CHAN_ButtonMask(BUT_ENTER)
+          | CHAN_ButtonMask(BUT_EXIT)
+          | CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_UP)
+          | CHAN_ButtonMask(BUT_DOWN),
+          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
     pages[page].init(0);
 }
 
@@ -76,26 +89,26 @@ void PAGE_ChangeByName(const char *pageName, u8 menuPage)
     u8 p;
     u8 newpage = page;
     for(p = 0; p < sizeof(pages) / sizeof(struct page); p++) {
-    	if (strncmp(pages[p].pageName, pageName, PAGE_NAME_MAX) == 0) {
-    		newpage = p;
-    		break;
-    	}
-	}
+        if (strncmp(pages[p].pageName, pageName, PAGE_NAME_MAX) == 0) {
+            newpage = p;
+            break;
+        }
+    }
     if (newpage != page) {
-		if (pages[page].exit)
-			pages[page].exit();
-		page = newpage;
-		PAGE_RemoveAllObjects();
-		pages[page].init(menuPage);
-	}
+        if (pages[page].exit)
+            pages[page].exit();
+        page = newpage;
+        PAGE_RemoveAllObjects();
+        pages[page].init(menuPage);
+    }
 }
 
 void PAGE_Event()
 {
-	if (pages[page].event != NULL)
-	{
-		pages[page].event();
-	}
+    if (pages[page].event != NULL)
+    {
+        pages[page].event();
+    }
 }
 
 u8 PAGE_SetModal(u8 _modal)
@@ -117,8 +130,17 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-	GUI_CreateLabelBox(0, 0, LCD_WIDTH, 0, &labelDesc, NULL, NULL, title);
-	GUI_CreateRect(0, MENU_ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc); // draw a line only
+    GUI_CreateLabelBox(0, 0, LCD_WIDTH, MENU_ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
+}
+
+void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
+{
+    struct LabelDesc labelDesc;
+    labelDesc.font = font;
+    labelDesc.font_color = 0xffff;
+    labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.outline_color = 1;
+    GUI_CreateLabelBox(0, 0, width, height, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
@@ -158,3 +180,43 @@ guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj
     return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }
 
+void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
+{
+    ActionCB = callback;
+}
+
+static u8 action_cb(u32 button, u8 flags, void *data)
+{
+    u8 result = 0;
+    if (ActionCB != NULL)
+        result = ActionCB(button, flags, data);
+    return result;
+}
+
+void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
+        guiObject_t *scroll_bar)
+{
+    guiObject_t *obj;
+    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
+        obj = GUI_GetSelected();
+        if (direction > 0) {
+            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+        } else {
+            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+        }
+    }
+    *selectedIdx += direction;
+    *selectedIdx %= total_items;
+    if (selectedIdx == 0) {
+        GUI_SetRelativeOrigin(view_id, 0, 0);
+    } else {
+        if (*selectedIdx < 0)
+            *selectedIdx = total_items + *selectedIdx;
+        obj = GUI_GetSelected();
+        if (!GUI_IsObjectInsideCurrentView(view_id, obj))
+            GUI_ScrollLogicalViewToObject(view_id, obj, direction);
+    }
+    *view_origin_relativeY = GUI_GetLogicalViewOriginRelativeY(view_id);
+    if (scroll_bar != NULL)
+        GUI_SetScrollbar(scroll_bar, *selectedIdx);
+}

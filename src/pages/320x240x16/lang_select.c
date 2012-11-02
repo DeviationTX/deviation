@@ -19,7 +19,7 @@
 #include "config/tx.h"
 #include <string.h>
 
-#define cp (pagemem.u.calibrate_page)
+#define cp (pagemem.u.tx_configure_page)
 
 static void select_cb(guiObject_t *obj, u16 sel, void *data)
 {
