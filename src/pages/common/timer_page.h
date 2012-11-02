@@ -1,5 +1,5 @@
-#ifndef _TIMER_PAGE_H_
-#define _TIMER_PAGE_H_
+#ifndef __TIMER_PAGE_H_
+#define __TIMER_PAGE_H_
 #include "timer.h"
 struct timer_page {
     guiObject_t *startObj[NUM_TIMERS];

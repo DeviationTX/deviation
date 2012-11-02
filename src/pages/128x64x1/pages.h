@@ -3,7 +3,7 @@
 
 #include "../common/mixer_page.h"
 #include "../_trim_page.h"
-#include "../_timer_page.h"
+#include "../common/timer_page.h"
 #include "../common/model_page.h"
 #include "../common/chantest_page.h"
 #include "../common/tx_configure.h"

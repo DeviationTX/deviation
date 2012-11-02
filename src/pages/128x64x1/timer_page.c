@@ -18,122 +18,92 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-static struct timer_page * const tp = &pagemem.u.timer_page;
+#include "../common/_timer_page.c"
 
-static void update_countdown(u8 idx);
-const char *timer_str_cb(guiObject_t *obj, const void *data);
-static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
-static void toggle_source_cb(guiObject_t *obj, void *data);
-static void toggle_timertype_cb(guiObject_t *obj, void *data);
-static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
+static u8 _action_cb(u32 button, u8 flags, void *data);
+#define VIEW_ID 0
+static s8 current_page = 0;
+static u8 view_height;
+static guiObject_t *scroll_bar;
 
-void PAGE_TimerInit(int page)
+static void _show_page()
 {
-    (void)page;
-    int i;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Timer"));
+    PAGE_SetActionCB(_action_cb);
+    u8 space = ITEM_HEIGHT + 5;
+    // create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    view_height = space * 3;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, view_height, view_origin_absoluteX, view_origin_absoluteY);
 
-    for (i = 0; i < NUM_TIMERS; i++) {
-        u8 x = 48 + i * 96;
+    u8 y = 0;
+    u8 w = 65;
+    u8 x = 55;
+    for (u8 i = 0; i < NUM_TIMERS; i++) {
+        y = i * (space * 3);
         //Row 1
-        GUI_CreateLabel(8, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
-        GUI_CreateTextSelect(72, x, TEXTSELECT_96, 0x0000, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
+        guiObject_t *obj =GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
+        if (i == 0)
+            GUI_SetSelected(obj);
+
         //Row 2
-        GUI_CreateLabel(8, x+24, NULL, DEFAULT_FONT, _tr("Switch:"));
-        GUI_CreateTextSelect(72, x+24, TEXTSELECT_96, 0x0000, toggle_source_cb, set_source_cb, (void *)(long)i);
+        y += space;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch:"));
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
-        tp->startLabelObj[i] = GUI_CreateLabel(8, x+48, NULL, DEFAULT_FONT, _tr("Start:"));
-        tp->startObj[i] = GUI_CreateTextSelect(72, x+48, TEXTSELECT_96, 0x0000, NULL, set_start_cb, (void *)(long)i);
+        y += space;
+        tp->startLabelObj[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
+                ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+        tp->startObj[i] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)i);
 
         update_countdown(i);
     }
+    space = ITEM_HEIGHT + 1;
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, NUM_TIMERS, NULL, NULL, NULL);
 }
 
-void PAGE_TimerEvent()
+static void _navigate_items(s8 direction)
 {
-}
-void update_countdown(u8 idx)
-{
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH;
-    GUI_SetHidden(tp->startObj[idx], hide);
-    GUI_SetHidden(tp->startLabelObj[idx], hide);
-}
-
-const char *timer_str_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    int i = (long)data;
-    sprintf(tp->tmpstr, "%s %d:", _tr("Timer"), i + 1);
-    return tp->tmpstr;
-}
-
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 idx = (long)data;
-    struct Timer *timer = &Model.timer[idx];
-    u8 is_neg = MIXER_SRC_IS_INV(timer->src);
-    u8 changed;
-    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(src, is_neg);
-    if (changed) {
-        timer->src = src;
-        TIMER_Reset(idx);
+    guiObject_t *obj = GUI_GetSelected();
+    if (direction > 0) {
+        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+    } else {
+        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
     }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(src));
-    return INPUT_SourceName(tp->tmpstr, src);
-}
-
-void toggle_source_cb(guiObject_t *obj, void *data)
-{
-    u8 idx = (long)data;
-    struct Timer *timer = &Model.timer[idx];
-    if(MIXER_SRC(timer->src)) {
-        MIXER_SET_SRC_INV(timer->src, ! MIXER_SRC_IS_INV(timer->src));
-        TIMER_Reset(idx);
-        GUI_Redraw(obj);
+    obj = GUI_GetSelected();
+    if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
+        current_page = (current_page + direction)%NUM_TIMERS;
+        if (current_page < 0)
+            current_page = NUM_TIMERS -1; //rewind to last page
+        if (current_page == 0)
+            GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
+        else
+            GUI_ScrollLogicalView(VIEW_ID, view_height);
     }
+    GUI_SetScrollbar(scroll_bar, current_page);
 }
 
-const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
+static u8 _action_cb(u32 button, u8 flags, void *data)
 {
-    (void) obj;
-    u8 idx = (long)data;
-    u8 changed;
-    struct Timer *timer = &Model.timer[idx];
-    timer->type = GUI_TextSelectHelper(timer->type, 0, 1, dir, 1, 1, &changed);
-    if (changed)
-        TIMER_Reset(idx);
-    update_countdown(idx);
-    switch (timer->type) {
-    case TIMER_STOPWATCH: return _tr("stopwatch");
-    case TIMER_COUNTDOWN: return _tr("countdown");
-    case TIMER_LAST: break;
+    (void)data;
+    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            _navigate_items(-1);
+        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
+            _navigate_items(1);
+        } else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
     }
-    return "";
-}
-
-void toggle_timertype_cb(guiObject_t *obj, void *data)
-{
-    u8 idx = (long)data;
-    struct Timer *timer = &Model.timer[idx];
-    timer->type = ! timer->type;
-    TIMER_Reset(idx);
-    update_countdown(idx);
-    GUI_Redraw(obj);
-}
-
-const char *set_start_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 idx = (long)data;
-    u8 changed;
-    struct Timer *timer = &Model.timer[idx];
-    timer->timer = GUI_TextSelectHelper(timer->timer, 0, TIMER_MAX_VAL, dir, 5, 30, &changed);
-    if (changed)
-        TIMER_Reset(idx);
-    TIMER_SetString(tp->timer, timer->timer*1000);
-    return tp->timer;
+    return 1;
 }
