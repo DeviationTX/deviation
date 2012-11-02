@@ -11,7 +11,7 @@ typedef enum  {
 } monitor_type;
 
 struct chantest_page {
-	monitor_type type;
+    monitor_type type;
     u8 num_bars;
     u8 is_locked;
     void(*return_page)(int page);
