@@ -11,6 +11,7 @@ typedef enum  {
     battery,
     powerAmplifier,
     modelName,
+    mixerMode,
 } single_itemConfigType;
 
 struct single_itemCofig_page {
@@ -22,6 +23,6 @@ struct single_itemCofig_page {
     guiObject_t *keyboardObj;
     guiObject_t *buttonObj;
     char tmpstr[20];
-    char item_name[MAX_ITEM_COUNT][20];
+    char item_content[MAX_ITEM_COUNT][20];
 };
 #endif

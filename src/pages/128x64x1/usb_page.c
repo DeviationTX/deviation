@@ -81,12 +81,11 @@ void PAGE_USBInit(int page)
     (void)page;
     PAGE_SetModal(0);
     draw_page(0);
-    BUTTON_RegisterCallback(&up->action, CHAN_ButtonMask(BUT_ENTER), BUTTON_PRESS | BUTTON_RELEASE, usb_cb, NULL);
+    PAGE_SetActionCB(usb_cb);
 }
 
 void PAGE_USBExit()
 {
-    BUTTON_UnregisterCallback(&up->action);
 }
 
 void PAGE_USBEvent()
