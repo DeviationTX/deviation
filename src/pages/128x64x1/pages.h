@@ -1,7 +1,7 @@
 #ifndef _PAGES_H_
 #define _PAGES_H_
 
-#include "mixer_page.h"
+#include "../common/mixer_page.h"
 #include "../_trim_page.h"
 #include "../_timer_page.h"
 #include "../_model_page.h"

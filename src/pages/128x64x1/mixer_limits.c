@@ -12,158 +12,202 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "common.h"
 #include "pages.h"
+#include <stdlib.h>
 
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
-static void sourceselect_cb(guiObject_t *obj, void *data);
-static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
-static const char *reverse_cb(guiObject_t *obj, int dir, void *data);
-static void toggle_reverse_cb(guiObject_t *obj, void *data);
-static void show_titlerow();
-static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
-static void toggle_failsafe_cb(guiObject_t *obj, void *data);
+#include "../common/_mixer_limits.c"
 
-void MIXPAGE_EditLimits()
+static u8 action_cb(u32 button, u8 flags, void *data);
+static void revert_cb(guiObject_t *obj, const void *data);
+static void _toggle_reverse_cb_in_live(guiObject_t *obj, void *data);
+static const char *_reverse_cb_in_live(guiObject_t *obj, int dir, void *data);
+
+#define LEFT_VIEW_ID 0
+#define FIRST_PAGE_ITEM_IDX  1  // 0 is the button obj
+#define LONG_PRESS_STEP 10  // for devo10, would prefer 10 instead
+
+static s8 current_selected_item;
+static guiObject_t *titleObj = NULL;
+static struct Limit origin_limit;
+
+static void _show_titlerow()
 {
-    PAGE_RemoveAllObjects();
-    show_titlerow();
-    int y = 40;
-    //Row 1
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Reverse:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
-    y += 24;
-    //Row 2
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Failsafe:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
-    y += 24;
-    //Row 3
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safety:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    y += 24;
-    //Row 4
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safe Val:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
-    y += 24;
-    //Row 5
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
-    y += 24;
-    //Row 6
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Max:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
-    y += 24;
-    //Row 5
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
-    y += 24;
-    //Row 6
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Subtrim:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
+    (void)okcancel_cb;
+    mp->are_limits_changed = 0;
+    PAGE_SetActionCB(action_cb);
+    mp->entries_per_page = 4;
+    memset(mp->itemObj, 0, sizeof(mp->itemObj));
+    memcpy(&origin_limit, (const void *)&mp->limit, sizeof(origin_limit)); // back up for reverting purpose
+
+    mp->labelDesc.style = LABEL_UNDERLINE;
+    titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &mp->labelDesc,
+            MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
+    u8 w = 50;
+    mp->itemObj[0] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CustomizeButton(mp->itemObj[0] , &mp->labelDesc, w, ITEM_HEIGHT);
+
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 h = LCD_HEIGHT - view_origin_absoluteY ;
+    GUI_SetupLogicalView(LEFT_VIEW_ID, 0, 0, LCD_WIDTH -5, h, view_origin_absoluteX, view_origin_absoluteY);
 }
 
-void sourceselect_cb(guiObject_t *obj, void *data)
+static void _show_limits()
 {
-    u8 *source = (u8 *)data;
-    if(MIXER_SRC(*source)) {
-        MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
-        GUI_Redraw(obj);
-    }
+    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
+    current_selected_item = 0;
+
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 1;
+    u8 w = 60;
+    u8 y = 0;
+    u8 x1 = 60;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Reverse:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, _toggle_reverse_cb_in_live, _reverse_cb_in_live, (void *)((long)mp->channel));
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Failsafe:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, toggle_failsafe_cb, set_failsafe_cb, NULL);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Safety:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Safe Val:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Min:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.min);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Max:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.max);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Scale:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.servoscale);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Subtrim:"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_trimstep_cb, &mp->limit.subtrim);
+
+    // The following items are not draw in the logical view;
+    y = space;
+    x = LCD_WIDTH - 3;
+    u8 h = LCD_HEIGHT - y ;
+    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
+    mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
+    GUI_SetSelected(mp->itemObj[1]);
 }
 
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, NULL);
-    MIXER_SET_SRC_INV(*source, is_neg);
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
+void _toggle_reverse_cb_in_live(guiObject_t *obj, void *data) {
+    toggle_reverse_cb(obj, data);
+    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+    GUI_Redraw(mp->itemObj[0]);
 }
 
-const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
+const char *_reverse_cb_in_live(guiObject_t *obj, int dir, void *data)
 {
+    const char *ret_str = reverse_cb(obj, dir, data);
+    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+    GUI_Redraw(mp->itemObj[0]);
+    return ret_str;
+}
+
+void revert_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
     (void)obj;
-    u8 *ptr = (u8 *)data;
-    int value = *ptr;
-    if (ptr == &mp->limit.min) {
-        value = GUI_TextSelectHelper(-value, -250, 0, dir, 1, 5, NULL);
-        *ptr = -value;
+    memcpy(&mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
+    MIXER_SetLimit(mp->channel, &mp->limit);  // save
+    GUI_DrawScreen();
+}
+
+static void navigate_items(s8 direction)
+{
+    guiObject_t *obj = GUI_GetSelected();
+    u8 last_item = mp->max_scroll + FIRST_PAGE_ITEM_IDX -1;
+    if (direction > 0) {
+        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     } else {
-        value = GUI_TextSelectHelper(value, 0, 250, dir, 1, 5, NULL);
-        *ptr = value;
+        if (obj == mp->itemObj[0])
+            current_selected_item = mp->max_scroll;
+        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
     }
-    sprintf(mp->tmpstr, "%d", value);
-    return mp->tmpstr;
-}
-
-const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
-    sprintf(mp->tmpstr, "%d.%d", *value / 10, *value % 10);
-    return mp->tmpstr;
-}
-
-void toggle_failsafe_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    mp->limit.flags = (mp->limit.flags & CH_FAILSAFE_EN)
-          ? (mp->limit.flags & ~CH_FAILSAFE_EN)
-          : (mp->limit.flags | CH_FAILSAFE_EN);
-}
-
-const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)data;
-    if (!(mp->limit.flags & CH_FAILSAFE_EN))
-        return _tr("Off");
-    return PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.failsafe);
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if (data) {
-        //Save mixer here
-        MIXER_SetLimit(mp->channel, &mp->limit);
+    obj = GUI_GetSelected();
+    if (obj == mp->itemObj[0]) {
+        current_selected_item = -1;
+        GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+    } else {
+        current_selected_item += direction;
+        if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
+            // selected item is out of the view, scroll the view
+            if (obj == mp->itemObj[FIRST_PAGE_ITEM_IDX])
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+            else if (obj == mp->itemObj[last_item]) {
+                u8 pages = mp->max_scroll/mp->entries_per_page;
+                if (mp->max_scroll%mp->entries_per_page != 0)
+                    pages++;
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, (pages -1) * (ITEM_HEIGHT +1) * 4);
+            }
+            else
+                GUI_ScrollLogicalView(LEFT_VIEW_ID, (ITEM_HEIGHT +1) *direction);
+        }
     }
-    GUI_RemoveAllObjects();
-    PAGE_MixerInit(mp->top_channel);
+    GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
 }
 
-static void show_titlerow()
+static u8 action_cb(u32 button, u8 flags, void *data)
 {
-    GUI_CreateLabel(8, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)(long)mp->channel);
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
-}
-
-const char *reverse_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)dir;
     (void)data;
-    if (dir > 0)
-        mp->limit.flags |= CH_REVERSE;
-    else if (dir < 0)
-        mp->limit.flags &= ~CH_REVERSE;
-    return (mp->limit.flags & CH_REVERSE) ? _tr("Reversed") : _tr("Normal");
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
+            PAGE_MixerInit(mp->top_channel);
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            navigate_items(-1);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            navigate_items(1);
+        } else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }
-
-void toggle_reverse_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    mp->limit.flags = (mp->limit.flags & CH_REVERSE)
-          ? (mp->limit.flags & ~CH_REVERSE)
-          : (mp->limit.flags | CH_REVERSE);
-}
-

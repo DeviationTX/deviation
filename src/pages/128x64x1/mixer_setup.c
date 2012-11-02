@@ -12,604 +12,463 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "common.h"
 #include "pages.h"
+#include "config/model.h"
 
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
+#include "../common/_mixer_setup.c"
 
-static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
-static void sync_mixers();
-static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
-static s16 eval_mixer_cb(s16 xval, void * data);
-static s16 eval_chan_cb(void * data);
-static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
-static void toggle_link_cb(guiObject_t *obj, const void *data);
-static const char *show_trim_cb(guiObject_t *obj, const void *data);
-static void toggle_trim_cb(guiObject_t *obj, const void *data);
+#define FIRST_PAGE_ITEM_IDX  2  // 0 is the template obj and 1 is the button obj
+#define LEFT_VIEW_WIDTH  60
+#define LEFT_VIEW_ID 0
+#define RIGHT_VIEW_ID 1
+#define RIGHT_VIEW_HEIGHT 49
+static s8 current_selected_item;
 
-static void show_titlerow();
-static void show_none();
-static void show_simple();
-static void show_expo_dr();
-static void show_complex();
-static void redraw_graphs();
+static u8 action_cb(u32 button, u8 flags, void *data);
+static void _show_expo_dr_switch(u8 switch_no);
+static void _sourceselect_cb(guiObject_t *obj, void *data);
+static const char *_set_drsource_cb(guiObject_t *obj, int dir, void *data);
+static u8 _action_cb_switch(u32 button, u8 flags, void *data);
 
-
-void MIXPAGE_ChangeTemplate(int show_header)
+static void _show_titlerow()
 {
-    if (mp->cur_template != MIXERTEMPLATE_COMPLEX
-        || mp->cur_mixer < mp->mixer
-        || mp->cur_mixer > mp->mixer + mp->num_mixers)
-    {
-        mp->cur_mixer = mp->mixer;
-    }
-    sync_mixers();
-    if (show_header) {
-        PAGE_RemoveAllObjects();
-        show_titlerow();
-    } else {
-        GUI_RemoveHierObjects(mp->firstObj); 
-    }
-    memset(mp->expoObj, 0, sizeof(mp->expoObj));
-    memset(mp->graphs, 0, sizeof(mp->graphs));
-    mp->trimObj = NULL;
-    switch(mp->cur_template)  {
-    case MIXERTEMPLATE_NONE:
-    case MIXERTEMPLATE_CYC1:
-    case MIXERTEMPLATE_CYC2:
-    case MIXERTEMPLATE_CYC3:
-        show_none();
-        break;
-    case MIXERTEMPLATE_SIMPLE:
-        show_simple();
-        break;
-    case MIXERTEMPLATE_EXPO_DR:
-        show_expo_dr();
-        break;
-    case MIXERTEMPLATE_COMPLEX:
-        show_complex();
-        break;
-    }
+    PAGE_SetActionCB(action_cb);
+    mp->entries_per_page = 2;
+    memset(mp->itemObj, 0, sizeof(mp->itemObj));
+
+    mp->labelDesc.style = LABEL_UNDERLINE;
+    GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &mp->labelDesc,
+            MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
+    u8 x =40;
+    u8 w = 50;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[0] = GUI_CreateTextSelectPlate(x, 0,  w, ITEM_HEIGHT, &mp->labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_SetSelected(mp->itemObj[0]);
+    w = 30;
+    mp->itemObj[1] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CustomizeButton(mp->itemObj[1] , &mp->labelDesc, w, ITEM_HEIGHT);
+
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 h = LCD_HEIGHT - view_origin_absoluteY ;
+    GUI_SetupLogicalView(LEFT_VIEW_ID, 0, 0, LEFT_VIEW_WIDTH, h, view_origin_absoluteX, view_origin_absoluteY);
 }
 
-
-static const char *templatetype_cb(guiObject_t *obj, int dir, void *data)
+static void _show_simple()
 {
-    (void)obj;
-    (void)data;
-    u8 changed;
-    mp->cur_template = GUI_TextSelectHelper(mp->cur_template, 0, MIXERTEMPLATE_MAX, dir, 1, 1, &changed);
-    if (changed) {
-        MIXPAGE_ChangeTemplate(0);
-        return "";
-    }
-    return MIXER_TemplateName(mp->cur_template);
-}
+    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
+    current_selected_item = -1;
 
-static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
-static void sourceselect_cb(guiObject_t *obj, void *data);
-static void curveselect_cb(guiObject_t *obj, void *data);
-static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
-static const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data);
-static void okcancel_cb(guiObject_t *obj, const void *data);
-static u8 touch_cb(s16 x, s16 y, void *data);
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 1;
+    u8 w = LEFT_VIEW_WIDTH;
+    u8 y = 0;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    mp->firstObj = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Src:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb,
+            set_source_cb, &mp->mixer[0].src);
 
-#define COL1_TEXT   4
-#define COL1_VALUE  56
-#define COL2_TEXT  164
-#define COL2_VALUE 216
-static void show_titlerow()
-{
-    GUI_CreateLabel(4, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
-    GUI_CreateTextSelect(COL1_VALUE, 8, TEXTSELECT_96, 0x0000, NULL, templatetype_cb, (void *)((long)mp->channel));
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
-}
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Curve:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
 
-static void show_none()
-{
-    mp->firstObj = NULL;   
-    //Row 0
-}
+    y += space;  // out of current logical view, won't show by default
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL,_tr("Scale:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL,
+            set_number100_cb, &mp->mixer[0].scalar);
 
-static void show_simple()
-{
-    //Row 1
-    mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Src:"));
-    GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
-    GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
-    //Row 2
-    mp->graphs[0] = GUI_CreateXYGraph(112, 64, 120, 120,
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Offset:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL,
+            set_number100_cb, &mp->mixer[0].offset);
+
+    // The following items are not draw in the logical view;
+    mp->graphs[0] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
-    //Row 4
-    GUI_CreateLabel(COL1_TEXT, 192, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(COL1_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    GUI_CreateLabel(COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
-    GUI_CreateTextSelect(COL2_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
-    //Row 5
-    /*
-    mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+                              0, 0, eval_mixer_cb, curpos_cb, touch_cb,
+                              &mp->mixer[0]);
+
+    y = space;
+    x = LEFT_VIEW_WIDTH +3;
+    u8 h = LCD_HEIGHT - y ;
+    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
+    mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
+}
+
+static void _show_complex()
+{
+    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
+    current_selected_item = -1;
+
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 1;
+    u8 w = LEFT_VIEW_WIDTH;
+    u8 y = 0;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    //Row 1
+    if (! mp->expoObj[0]) {
+        mp->firstObj = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+                &mp->labelDesc, NULL, NULL, _tr("Mixers:"));
+        y += space;
+        mp->labelDesc.style = LABEL_CENTER;
+        mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+                w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_nummixers_cb, NULL);
+
+        y += space;
+        mp->labelDesc.style = LABEL_LEFTCENTER;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+                        &mp->labelDesc, NULL, NULL, _tr("Page:"));
+        y += space;
+        mp->labelDesc.style = LABEL_CENTER;
+        mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+                w, ITEM_HEIGHT, &mp->labelDesc, reorder_cb, set_mixernum_cb, NULL);
+    } else {
+        GUI_RemoveHierObjects(mp->expoObj[0]);
+    }
+
+    //Row 2
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    mp->expoObj[0] = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Switch:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Mux:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_mux_cb, NULL);
+
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Src:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Curve:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, curveselect_cb, set_curvename_cb, mp->cur_mixer);
+
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Scale:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_number100_cb, &mp->cur_mixer->scalar);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Offset:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_number100_cb, &mp->cur_mixer->offset);
+
+    y += space;
+    mp->trimObj = GUI_CreateButton(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), BUTTON_DEVO10, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->itemObj[mp->max_scroll++] = mp->trimObj;
+    GUI_CustomizeButton(mp->trimObj, &mp->labelDesc, w, ITEM_HEIGHT);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
 
-    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
-    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
-    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
-    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
-    */
+
+    // The following items are not draw in the logical view;
+    mp->graphs[1] = GUI_CreateBarGraph(LEFT_VIEW_WIDTH +8, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, 5, RIGHT_VIEW_HEIGHT,
+                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
+    mp->graphs[0] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+                                  CHAN_MIN_VALUE, CHAN_MIN_VALUE,
+                                  CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                                  0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
+
+    y = space;
+    x = LEFT_VIEW_WIDTH +3;
+    u8 h = LCD_HEIGHT - y ;
+    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
+    mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
 }
 
-static void update_rate_widgets(u8 idx)
+static void _show_expo_dr()
 {
-    u8 mix = idx + 1;
-    idx *=4;
-    if (MIXER_SRC(mp->mixer[mix].sw)) {
-        GUI_SetHidden(mp->expoObj[idx], 0);
-        if(mp->link_curves & mix) {
-            GUI_SetHidden(mp->expoObj[idx+1], 0);
-            GUI_SetHidden(mp->expoObj[idx+2], 1);
-        } else {
-            GUI_SetHidden(mp->expoObj[idx+1], 1);
-            GUI_SetHidden(mp->expoObj[idx+2], 0);
-        }
-        GUI_SetHidden(mp->expoObj[idx+3], 0);
-        GUI_SetHidden(mp->graphs[mix], 0);
-    } else {
-        GUI_SetHidden(mp->expoObj[idx], 1);
-        GUI_SetHidden(mp->expoObj[idx+1], 1);
-        GUI_SetHidden(mp->expoObj[idx+2], 1);
-        GUI_SetHidden(mp->expoObj[idx+3], 1);
-        GUI_SetHidden(mp->graphs[mix], 1);
-    }
-}
+    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
+    current_selected_item = -1;
 
-static const char *show_trim_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return (long)mp->cur_mixer->apply_trim ? _tr("Trim") : _tr("No Trim");
-}
-
-static void toggle_trim_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    mp->cur_mixer->apply_trim ^= 0x01;
-}
-
-void toggle_link_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if(data)
-       mp->link_curves ^= 0x02;
-    else
-       mp->link_curves ^= 0x01;
-    update_rate_widgets(data ? 1 : 0);
-}
-
-static const char *show_rate_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    return (long)data == 0 ? _tr("Mid-Rate") : _tr("Low-Rate");
-}
-
-static void show_expo_dr()
-{
     sync_mixers();
-    //Row 1
-    mp->firstObj = GUI_CreateLabelBox(COL1_TEXT, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Src"));
-    /*
-    mp->trimObj = GUI_CreateButton(COL1_TEXT, 32, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
-    mp->firstObj = mp->trimObj;
 
-    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-        GUI_SetHidden(mp->trimObj, 1);
-    */
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 1;
+    u8 w = LEFT_VIEW_WIDTH;
+    u8 y = 0;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    mp->firstObj = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Src:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
 
-    GUI_CreateLabelBox(112, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
-    GUI_CreateLabelBox(216, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
-    //Row 2
-    GUI_CreateTextSelect(COL1_TEXT, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateTextSelect(112, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
-    GUI_CreateTextSelect(216, 48, TEXTSELECT_96, 0x0000, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
-    //Row 3
-    GUI_CreateLabelBox(COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
-    mp->expoObj[0] = GUI_CreateButton(112, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
-    mp->expoObj[4] = GUI_CreateButton(216, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
-    //Row 4
-    GUI_CreateTextSelect(COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
-    //The following 2 items are mutex.  One is always hidden
-    mp->expoObj[1] = GUI_CreateLabelBox(112, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
-    mp->expoObj[2] = GUI_CreateTextSelect(112, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
-    //The following 2 items are mutex.  One is always hidden
-    mp->expoObj[5] = GUI_CreateLabelBox(216, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
-    mp->expoObj[6] = GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
-    //Row 5
-    GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    mp->expoObj[3] = GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
-    mp->expoObj[7] = GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("High-Rate"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc,  curveselect_cb, set_curvename_cb, &mp->mixer[0]);
 
-    mp->graphs[0] = GUI_CreateXYGraph(COL1_TEXT, 140, 96, 96,
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Scale:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc,  NULL, set_number100_cb, &mp->mixer[0].scalar);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Switch1"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+                w, ITEM_HEIGHT, &mp->labelDesc,  _sourceselect_cb, _set_drsource_cb, (void *)((long)1));//&mp->mixer[1].sw);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Switch2"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+                w, ITEM_HEIGHT, &mp->labelDesc,  _sourceselect_cb, _set_drsource_cb, (void *)((long)2)); //&mp->mixer[2].sw);
+
+    GUI_SetupLogicalView(RIGHT_VIEW_ID, 0, 0, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT);
+    // The following items are draw in the right logical view,
+    // the right view will be scroll up/down by changed the switch 1/2 options
+    y = 0;
+    mp->graphs[0] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
+                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
-    mp->graphs[1] = GUI_CreateXYGraph(112, 140, 96, 96,
+    y += RIGHT_VIEW_HEIGHT;
+    mp->graphs[1] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
+                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[1]);
-    mp->graphs[2] = GUI_CreateXYGraph(216, 140, 96, 96,
+    y += RIGHT_VIEW_HEIGHT;
+    mp->graphs[2] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
+                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[2]);
 
-    //Enable/Disable the relevant widgets
-    update_rate_widgets(0);
-    update_rate_widgets(1);
+    // The following items are not draw in the logical view;
+    y = space;
+    x = LEFT_VIEW_WIDTH +3;
+    u8 h = LCD_HEIGHT - y ;
+    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
+    mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
 }
 
-
-static void show_complex()
+static const char *_set_drsource_cb(guiObject_t *obj, int dir, void *data)
 {
-    //Row 1
-    if (! mp->expoObj[0]) {
-        mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
-        GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
-        GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
-        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_mixernum_cb, NULL);
-    } else {
-        GUI_RemoveHierObjects(mp->expoObj[0]);
-    }
-    //Row 2
-    mp->expoObj[0] = GUI_CreateLabel(COL1_TEXT, 64, NULL, DEFAULT_FONT, _tr("Switch:"));
-    GUI_CreateTextSelect(COL1_VALUE, 64, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
-    GUI_CreateLabel(COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
-    GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, set_mux_cb, NULL);
-    //Row 3
-    GUI_CreateLabel(COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
-    GUI_CreateTextSelect(COL1_VALUE, 98, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
-    //Row 4
-    GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Curve:"));
-    GUI_CreateTextSelect(COL1_VALUE, 122, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, mp->cur_mixer);
-    //Row 5
-    GUI_CreateLabel(COL1_TEXT, 156, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(COL1_VALUE, 156, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->scalar);
-    //Row 6
-    GUI_CreateLabel(COL1_TEXT, 180, NULL, DEFAULT_FONT, _tr("Offset:"));
-    GUI_CreateTextSelect(COL1_VALUE, 180, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->offset);
-    mp->graphs[1] = GUI_CreateBarGraph(COL2_TEXT, 88, 10, 120,
-                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
-                              eval_chan_cb, NULL);
-    mp->graphs[0] = GUI_CreateXYGraph(192, 88, 120, 120,
-                              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
-    //Row 7
-    GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
-    mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
-    if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-        GUI_SetHidden(mp->trimObj, 1);
-    /*
-    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
-    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
-    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
-    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
-    */
+    u8 switch_no = (long)data;
+    return set_drsource_cb(obj, dir, &mp->mixer[switch_no].sw);
 }
 
-s16 eval_mixer_cb(s16 xval, void * data)
-{
-    struct Mixer *mix = (struct Mixer *)data;
-    if (MIXER_SRC_IS_INV(mix->src))
-        xval = -xval;
-    s16 yval = CURVE_Evaluate(xval, &mix->curve);
-    yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
-
-    /* Min/Max is a servo limit, shouldn't be shown here
-    if(mix->dest < NUM_OUT_CHANNELS) {
-        if (yval > PCT_TO_RANGE(mp->limit.max))
-            yval = PCT_TO_RANGE(mp->limit.max);
-        else if (yval < PCT_TO_RANGE(mp->limit.min))
-            yval = PCT_TO_RANGE(mp->limit.min);
-    }
-    */
-
-    if (yval > CHAN_MAX_VALUE)
-        yval = CHAN_MAX_VALUE;
-    else if (yval <CHAN_MIN_VALUE)
-        yval = CHAN_MIN_VALUE;
-    //Don't showchannel-reverse on the graph (but do show input reverse)
-    //if (mp->limit.flags & CH_REVERSE)
-    //    yval = -yval;
-    return yval;
-}
-s16 eval_chan_cb(void * data)
-{
-    (void)data;
-    int i;
-    struct Mixer *mix = MIXER_GetAllMixers();
-    for (i = 0; i < NUM_MIXERS; i++) {
-        if(MIXER_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
-            MIXER_ApplyMixer(mix, mp->raw);
-    }
-    for (i = 0; i < mp->num_mixers; i++)
-        MIXER_ApplyMixer(&mp->mixer[i], mp->raw);
-    s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, APPLY_ALL);
-    if (value > CHAN_MAX_VALUE)
-        return CHAN_MAX_VALUE;
-    if (value < CHAN_MIN_VALUE)
-        return CHAN_MIN_VALUE;
-    return value;
-}
-
-u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
-{
-    if (pos != 0)
-        return 0;
-    *x = mp->raw[MIXER_SRC(mp->cur_mixer->src)];
-    if (*x > CHAN_MAX_VALUE)
-        *x = CHAN_MAX_VALUE;
-    else if (*x  < CHAN_MIN_VALUE)
-        *x = CHAN_MIN_VALUE;
-    *y = eval_mixer_cb(*x, data);
-    return 1;
-}
-
-const char *PAGEMIXER_SetNumberCB(guiObject_t *obj, int dir, void *data)
+static void _sourceselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
-    sprintf(mp->tmpstr, "%d", *value);
-    return mp->tmpstr;
+    //sourceselect_cb(obj, data);
+    u8 switch_no = (long)data;
+    if (mp->mixer[switch_no].sw != 0)
+        _show_expo_dr_switch(switch_no);
 }
 
-void sync_mixers()
-{
-    switch(mp->cur_template) {
-    case MIXERTEMPLATE_NONE:
-    case MIXERTEMPLATE_CYC1:
-    case MIXERTEMPLATE_CYC2:
-    case MIXERTEMPLATE_CYC3:
-        mp->num_mixers = 0;
-        break;
-    case MIXERTEMPLATE_SIMPLE:
-        mp->mixer[0].sw = 0;
-        mp->mixer[0].mux = MUX_REPLACE;
-        mp->num_mixers = 1;
-        break;
-    case MIXERTEMPLATE_COMPLEX:
-        mp->num_mixers = mp->num_complex_mixers;
-        break;
-    case MIXERTEMPLATE_EXPO_DR:
-        mp->num_mixers = 1;
-        if (MIXER_SRC(mp->mixer[1].sw)) {
-            mp->num_mixers++;
-            mp->mixer[1].src    = mp->mixer[0].src;
-            mp->mixer[1].dest   = mp->mixer[0].dest;
-            mp->mixer[1].mux    = MUX_REPLACE;
-            mp->mixer[1].offset = 0;
-            mp->mixer[1].apply_trim = mp->mixer[0].apply_trim;
-            if (mp->link_curves & 0x01)
-                mp->mixer[1].curve = mp->mixer[0].curve;
-        } else {
-            mp->mixer[1].src = 0;
-        }
-        if (MIXER_SRC(mp->mixer[2].sw)) {
-            mp->num_mixers++;
-            mp->mixer[2].src    = mp->mixer[0].src;
-            mp->mixer[2].dest   = mp->mixer[0].dest;
-            mp->mixer[2].mux    = MUX_REPLACE;
-            mp->mixer[2].offset = 0;
-            mp->mixer[2].apply_trim = mp->mixer[0].apply_trim;
-            if (mp->link_curves & 0x02)
-                mp->mixer[2].curve = mp->mixer[0].curve;
-        } else {
-            mp->mixer[2].src = 0;
-        }
-        mp->mixer[0].mux = MUX_REPLACE;
-        mp->mixer[0].offset = 0;
-        mp->mixer[0].sw = 0;
-        break;
-    }
-}
-
-const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
+static const char *_title_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u8 changed;
-    s8 *value = (s8 *)data;
-    s8 min = -100; //(value == &mp->limit.max) ? mp->limit.min : -100;
-    s8 max = 100; //(value == &mp->limit.min) ? mp->limit.max : 100;
-    *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
-    sprintf(mp->tmpstr, "%d", *value);
-    if (changed) {
-        sync_mixers();
-        redraw_graphs();
-    }
-    return mp->tmpstr;
+    u8 switch_no = (long)data;
+    sprintf(mp->tmpstr, "Switch%d", switch_no);
+    return _tr(mp->tmpstr);
 }
 
-const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
+static void _show_expo_dr_switch(u8 switch_no)  // switch_no = 1 or 2
 {
-    (void)obj;
-    (void)data;
-    u8 changed;
-    mp->cur_mixer->mux = GUI_TextSelectHelper(mp->cur_mixer->mux, MUX_REPLACE, MUX_ADD, dir, 1, 1, &changed);
-    if (changed) {
-        redraw_graphs();
-        sync_mixers();
-    }
-    switch(mp->cur_mixer->mux) {
-        case MUX_REPLACE:  return _tr("replace");
-        case MUX_MULTIPLY: return _tr("mult");
-        case MUX_ADD:      return _tr("add");
-        case MUX_LAST: break;
-    }
-    return "";
-}
-
-const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)data;
-    u8 changed;
-    mp->num_mixers = GUI_TextSelectHelper(
-                     mp->num_mixers,
-                     1 + (mp->cur_mixer - mp->mixer),
-                     sizeof(mp->mixer) / sizeof(struct Mixer),
-                     dir, 1, 1, &changed);
-    if (changed) {
-        mp->num_complex_mixers = mp->num_mixers;
-        redraw_graphs();
-        sync_mixers();
-    }
-    sprintf(mp->tmpstr, "%d", mp->num_mixers);
-    return mp->tmpstr;
-}
-
-const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)data;
-    u8 cur = (mp->cur_mixer - mp->mixer) + 1;
-    u8 changed;
-    cur = GUI_TextSelectHelper(cur, 1, mp->num_mixers, dir, 1, 1, &changed);
-    if (changed) {
-        mp->cur_mixer = mp->mixer + (cur - 1);
-        show_complex();
-    }
-    sprintf(mp->tmpstr, "%d", cur);
-    return mp->tmpstr;
-}
-
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
-    u8 changed;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
-    if (changed) {
-        if(mp->trimObj) {
-            if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-                GUI_SetHidden(mp->trimObj, 0);
-            else
-                GUI_SetHidden(mp->trimObj, 1);
-        }
-        sync_mixers();
-        redraw_graphs();
-    }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
-}
-
-const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
-    u8 changed;
-    u8 oldsrc = *source;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
-    if (changed) {
-        sync_mixers();
-        if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
-            if(data == &mp->mixer[1].sw)
-                update_rate_widgets(0);
-            else if(data == &mp->mixer[2].sw)
-                update_rate_widgets(1);
-        } else {    
-            redraw_graphs();
-        }
-    }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
-}
-
-static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    struct Mixer *mix = (struct Mixer *)data;
-    mix->curve.type = GUI_TextSelectHelper(mix->curve.type, 0, CURVE_MAX, dir, 1, 1, &changed);
-    if (changed) {
-        sync_mixers();
-        redraw_graphs();
-    }
-    GUI_TextSelectEnablePress(obj, mix->curve.type >= CURVE_EXPO);
-    return CURVE_GetName(&mix->curve);
-}
-
-void sourceselect_cb(guiObject_t *obj, void *data)
-{
-    u8 *source = (u8 *)data;
-    if (MIXER_SRC(*source)) {
-        MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
-        GUI_Redraw(obj);
-        redraw_graphs();
-    }
-}
-
-void graph_cb()
-{
-    MIXPAGE_ChangeTemplate(1);
-}
-
-void curveselect_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    struct Mixer *mix = (struct Mixer *)data;
-    if (mix->curve.type >= CURVE_EXPO) {
-        memset(mp->graphs, 0, sizeof(mp->graphs));
-        MIXPAGE_EditCurves(&mix->curve, graph_cb);
-    }
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if (data) {
-        //Save mixer here
-        MIXER_SetLimit(mp->channel, &mp->limit);
-        MIXER_SetTemplate(mp->channel, mp->cur_template);
-        MIXER_SetMixers(mp->mixer, mp->num_mixers);
-    }
     GUI_RemoveAllObjects();
-    memset(mp->graphs, 0, sizeof(mp->graphs));
-    PAGE_MixerInit(mp->top_channel);
+    PAGE_SetActionCB(_action_cb_switch); // don't change mp->itemObj , must keep expo_dr page items
+
+    mp->labelDesc.style = LABEL_UNDERLINE;
+    GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &mp->labelDesc,
+            _title_cb, NULL, (void *)(long)switch_no);
+
+    u8 w = 48;
+    mp->labelDesc.style = LABEL_CENTER;
+    guiObject_t *obj = GUI_CreateTextSelectPlate(LCD_WIDTH - w -5, 0, w, ITEM_HEIGHT, &mp->labelDesc,
+            sourceselect_cb, set_drsource_cb, &mp->mixer[switch_no].sw);
+    GUI_SetSelected(obj);
+
+    /* w = 30;  // no need the save button
+    obj = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, _save_switch_cb, (void *)_tr("Save"));
+    GUI_CustomizeButton(obj , &mp->labelDesc, w, ITEM_HEIGHT);*/
+
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 h = LCD_HEIGHT - view_origin_absoluteY ;
+    GUI_SetupLogicalView(LEFT_VIEW_ID, 0, 0, LEFT_VIEW_WIDTH, h, view_origin_absoluteX, view_origin_absoluteY);
+
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 1;
+    w = LEFT_VIEW_WIDTH;
+    u8 y = 0;
+    u8 idx = (switch_no -1) * 4;
+    mp->expoObj[idx] = GUI_CreateButton(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            BUTTON_DEVO10, show_rate_cb, 0x0000, toggle_link_cb, (void *)(switch_no-1));
+    GUI_CustomizeButton(mp->expoObj[idx], &mp->labelDesc, w, ITEM_HEIGHT);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    mp->expoObj[idx +1] = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc, NULL, NULL, _tr("Linked"));
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->expoObj[idx +2] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc,  curveselect_cb, set_curvename_cb, &mp->mixer[switch_no]);
+
+    y += space;
+    mp->labelDesc.style = LABEL_LEFTCENTER;
+    mp->expoObj[9] = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &mp->labelDesc, NULL, NULL, _tr("Scale:"));
+    y += space;
+    mp->labelDesc.style = LABEL_CENTER;
+    mp->expoObj[idx +3] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &mp->labelDesc,  NULL, set_number100_cb, &mp->mixer[switch_no].scalar);
+
+    mp->graphs[switch_no] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
+              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[switch_no]);
+    //Enable/Disable the relevant widgets
+    update_rate_widgets(switch_no - 1);
 }
 
-static u8 touch_cb(s16 x, s16 y, void *data)
+static void navigate_items(s8 direction)
 {
-    (void)x;
-    (void)y;
-    curveselect_cb(NULL, data);
+    guiObject_t *obj = GUI_GetSelected();
+    u8 last_item = mp->max_scroll + FIRST_PAGE_ITEM_IDX -1;
+    if (direction > 0) {
+        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+    } else {
+        if (obj == mp->itemObj[0])
+            current_selected_item = mp->max_scroll;
+        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+    }
+    obj = GUI_GetSelected();
+    if (obj == mp->itemObj[0] || obj == mp->itemObj[1]) {
+        current_selected_item = -1;
+        GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+    } else {
+        current_selected_item += direction;
+        if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
+            // selected item is out of the view, scroll the view
+            if (obj == mp->itemObj[FIRST_PAGE_ITEM_IDX])
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+            else if (obj == mp->itemObj[last_item]) {
+                u8 pages = mp->max_scroll/mp->entries_per_page;
+                if (mp->max_scroll%mp->entries_per_page != 0)
+                    pages++;
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, (pages -1) * (ITEM_HEIGHT +1) * 4);
+            }
+            else
+                GUI_ScrollLogicalView(LEFT_VIEW_ID, (ITEM_HEIGHT +1) *2*direction);
+        }
+    }
+    GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
+}
+
+static u8 action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
+            PAGE_MixerInit(mp->top_channel);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) { // press enter to enter curves setup
+            /* guiObject_t *obj = GUI_GetSelected();
+            if (obj != mp->itemObj[1]) {
+                GUI_SetSelected(mp->itemObj[1]); // quick jump to save button
+                LCD_SetRelativeOrigin(0, 0);
+                okcancel_cb(obj, (void *)((long)1));
+            } else
+                return 0; */
+            return 0;
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            navigate_items(-1);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            navigate_items(1);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
     return 1;
 }
-void redraw_graphs()
+
+static u8 _action_cb_switch(u32 button, u8 flags, void *data)
 {
-    switch(mp->cur_template) {
-    case MIXERTEMPLATE_EXPO_DR:
-        GUI_Redraw(mp->graphs[1]);
-        GUI_Redraw(mp->graphs[2]);
-    case MIXERTEMPLATE_COMPLEX:
-    case MIXERTEMPLATE_SIMPLE:
-        GUI_Redraw(mp->graphs[0]);
-        break;
-    case MIXERTEMPLATE_NONE: break;
-    case MIXERTEMPLATE_CYC1: break;
-    case MIXERTEMPLATE_CYC2: break;
-    case MIXERTEMPLATE_CYC3: break;
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            MIXPAGE_ChangeTemplate(1);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
     }
+    return 1;
 }
