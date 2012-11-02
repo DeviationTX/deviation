@@ -1,5 +1,5 @@
-#ifndef _MODEL_PAGE_H_
-#define _MODEL_PAGE_H_
+#ifndef __MODEL_PAGE_H_
+#define __MODEL_PAGE_H_
 
 enum {
    LOAD_MODEL,
@@ -16,7 +16,9 @@ struct model_page {
     guiObject_t *chanObj;
 /*Load save */
     guiObject_t *obj;
-    u8 selected;
+    guiObject_t *scroll_bar;
+    s8 selected;
+    u8 total_items;
     void(*return_page)(int page);
     enum ModelType modeltype;
 };

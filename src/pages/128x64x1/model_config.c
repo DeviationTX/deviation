@@ -18,66 +18,74 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-static struct model_page * const mp = &pagemem.u.model_page;
+#include "../common/_model_config.c"
 
-static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    (void)data;
-    Model.swash_type = GUI_TextSelectHelper(Model.swash_type, 0 , SWASH_TYPE_90, dir, 1, 1, NULL);
-    return MIXER_SwashType(Model.swash_type);
-}
+#define VIEW_ID 0
 
-static const char *swashinv_val_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 mask = (long)data;
-    u8 val = Model.swash_invert & mask ? 1 : 0;
-    val = GUI_TextSelectHelper(val, 0 , 1, dir, 1, 1, NULL);
-    Model.swash_invert = val ? Model.swash_invert | mask : Model.swash_invert & ~mask;
-    switch(val) {
-        case 0: return _tr("Normal");
-        case 1: return _tr("Inverted");
-    }
-    return "";
-}
-void swashinv_press_cb(guiObject_t *obj, void *data)
-{
-    u8 mask = (long)data;
-    Model.swash_invert ^= mask;
-    GUI_Redraw(obj);
-}
-
-void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    GUI_RemoveAllObjects();
-    PAGE_ModelInit(0);
-}
-
+static u8 _action_cb(u32 button, u8 flags, void *data);
 static void show_titlerow(const char *header)
 {
-    GUI_CreateLabel(8, 10, NULL, TITLE_FONT, (void *)header);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_ShowHeader(header);
+    //u8 w = 40;
+    // I don't think there is a need for the save button
+    //GUI_CreateButtonPlateText(LCD_WIDTH - w -5, 0,
+    //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, _tr("Save"));
 }
 
 void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
+    PAGE_SetActionCB(_action_cb);
     show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
+
+    // Even though there are just 4 rows here, still create a logical view for future expanding
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 space = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+        view_origin_absoluteX, view_origin_absoluteY);
+    u8 w = 60;
+    u8 x = 63;
     if (Model.type == 0) {
-        u8 i = 40;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("SwashType:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swash_val_cb, NULL);
-        i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("ELE Inv:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)1);
-        i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("AIL Inv:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)2);
-        i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Inv:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)4);
+        u8 row = 0;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("SwashType:"));
+        guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
+        GUI_SetSelected(obj);
+
+        row += space;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Inv:"));
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)1);
+
+        row += space;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Inv:"));
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)2);
+
+        row += space;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("COL Inv:"));
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)4);
+
     }
+}
+
+static u8 _action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ModelInit(-1);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }

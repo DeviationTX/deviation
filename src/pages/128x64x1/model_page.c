@@ -21,227 +21,147 @@
 
 #include <stdlib.h>
 
-static struct model_page * const mp = &pagemem.u.model_page;
+#define HELI_LABEL "Heli"  // string too long for devo10, so define it separately for devo8 and devo10
+#define PLANE_LABEL "Plane"
+#include "../common/_model_page.c"
 
-static void changename_cb(guiObject_t *obj, const void *data);
-static void fixedid_cb(guiObject_t *obj, const void *data);
-static void bind_cb(guiObject_t *obj, const void *data);
-static void configure_bind_button();
-static const char *type_val_cb(guiObject_t *obj, int dir, void *data);
-static void type_press_cb(guiObject_t *obj, void *data);
-static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data);
-static const char *powerselect_cb(guiObject_t *obj, int dir, void *data);
-static const char *protoselect_cb(guiObject_t *obj, int dir, void *data);
-static const char *file_val_cb(guiObject_t *obj, int dir, void *data);
-static void file_press_cb(guiObject_t *obj, void *data);
-static void changeicon_cb(guiObject_t *obj, const void *data);
+static u8 _action_cb(u32 button, u8 flags, void *data);
+static void _navigate_items(s8 direction);
 
-const char *show_text_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    return (const char *)data;
-}
-
-const char *show_bindtext_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return PROTOCOL_AutoBindEnabled() ? _tr("Re-Init") : _tr("Bind");
-}
+#define VIEW_ID 0
+static u8 callback_result;
+static s8 selected = 0;
 
 void PAGE_ModelInit(int page)
 {
-    (void)page;
-    u8 row;
-
-    mp->file_state = 0;
+    if (page < 0 && selected > 0) // enter this page from childen page , so we need to get its previous selected item
+        page = selected;
+    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
+    PAGE_RemoveAllObjects();
+    mp->file_state = 0;
     PAGE_ShowHeader(_tr("Model"));
+    selected = 0;
+    mp->total_items = 0;
 
-    row = 40;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("File:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 space = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+        view_origin_absoluteX, view_origin_absoluteY);
 
-    row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Name:"));
-    GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, changename_cb, Model.name);
-    GUI_CreateButton(236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
+    u8 row = 0;
+    u8 w = 63;
+    u8 x = 60;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("File:"));
+    guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, file_press_cb, file_val_cb, NULL);
+    GUI_SetSelected(obj);
+    mp->total_items++;
 
-    row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Model Type:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model Name:"));
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        w, ITEM_HEIGHT, &DEFAULT_FONT, show_text_cb, 0x0000, _changename_cb, Model.name);
+    mp->total_items++;
 
-    row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model Type:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, type_press_cb, type_val_cb, NULL);
+    mp->total_items++;
 
-    row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Number of Channels:"));
-    mp->chanObj = GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Channel #:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, numchanselect_cb, NULL);
+    mp->total_items++;
 
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Tx Power:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, powerselect_cb, NULL);
+    mp->total_items++;
 
-    row += 32;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Tx Power:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
-
-    row += 20;
-    if(Model.fixed_id == 0)
-        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
-    else
-        sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
-    GUI_CreateButton(136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
-    mp->obj = GUI_CreateButton(236, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
-    configure_bind_button();
+    // The following items are not draw in the logical view;
+    mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, mp->total_items, NULL, NULL, NULL);
+    if (page > 0)
+        _navigate_items(page);
 }
 
-void PAGE_ModelEvent()
+static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
 {
-}
-
-/* Button callbacks */
-static void changename_done_cb(guiObject_t *obj, void *data)
-{
+    (void)obj;
     (void)data;
     GUI_RemoveObj(obj);
-    //Save model info here so it shows up on the model page
-    CONFIG_SaveModelIfNeeded();
-    PAGE_ModelInit(0);
-}
-static void changename_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_SetModal(1);
-    PAGE_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_ALPHA, Model.name, sizeof(Model.name)-1, changename_done_cb, NULL);
-}
-
-static void fixedid_done_cb(guiObject_t *obj, void *data)
-{
-    (void)data;
-    Model.fixed_id = atoi(mp->fixed_id);
-    GUI_RemoveObj(obj);
-    PAGE_ModelInit(0);
-}
-static void fixedid_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_SetModal(1);
-    if(Model.fixed_id == 0) {
-        u32 id = PROTOCOL_CurrentID();
-        if (id)
-            sprintf(mp->fixed_id, "%d", (int)id);
-        else
-            mp->fixed_id[0] = 0;
-    }
-    PAGE_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, NULL);
-}
-
-static void bind_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    if (PROTOCOL_AutoBindEnabled())
-        PROTOCOL_Init(0);
-    else
-        PROTOCOL_Bind();
-}
-
-static void configure_bind_button()
-{
-    GUI_Redraw(mp->obj);
-    //GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
-}
-
-/* Text Select Callback */
-static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, NULL);
-    GUI_TextSelectEnablePress(obj, Model.type == 0);
-
-    switch (Model.type) {
-        case 0: return _tr("Helicopter");
-        default: return _tr("Airplane");
-    }
-}
-void type_press_cb(guiObject_t *obj, void *data)
-{
-    (void)data;
-    (void)obj;
-    if(Model.type == 0) {
-        PAGE_RemoveAllObjects();
-        MODELPAGE_Config();
-    }
-}
-
-static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, PROTOCOL_NumChannels(), dir, 1, 1, NULL);
-    sprintf(mp->tmpstr, "%d", Model.num_channels);
-    return mp->tmpstr;
-}
-
-static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, TXPOWER_LAST-1, dir, 1, 1, NULL);
-    return RADIO_TX_POWER_VAL[Model.tx_power];
-}
-static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
-    if (changed) {
-        Model.num_channels = PROTOCOL_NumChannels();
-        GUI_Redraw(mp->chanObj);
-        configure_bind_button();
-    }
-    return ProtocolNames[Model.protocol];
-}
-static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    mp->file_state = GUI_TextSelectHelper(mp->file_state, 0, 3, dir, 1, 1, NULL);
-    if (mp->file_state == 0)
-        return _tr("Load...");
-    else if (mp->file_state == 1)
-        return _tr("Copy To...");
-    else if (mp->file_state == 2)
-        return _tr("Template..");
-    else if (mp->file_state == 3)
-        return _tr("Reset");
-    else
-        return "";
-}
-
-static void file_press_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    if (mp->file_state == 3) {
-        CONFIG_ResetModel();
+    if (callback_result == 1) {  // only change name when DONE is hit, otherwise, discard the change
+        strncpy(Model.name, (const char *)mp->tmpstr, sizeof(Model.name));
+        //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
-        GUI_RedrawAllObjects();
-    } else {
-        PAGE_SetModal(1);
-        MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
     }
+    PAGE_ModelInit(-1);
 }
 
-static void changeicon_cb(guiObject_t *obj, const void *data)
+static void _changename_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    MODELPage_ShowLoadSave(3, PAGE_ModelInit);
+    PAGE_SetModal(1);
+    PAGE_RemoveAllObjects();
+    strcpy(mp->tmpstr, (const char *)Model.name); // Don't change model name directly
+    GUI_CreateKeyboard(KEYBOARD_ALPHA, mp->tmpstr, 10, // no more than 10 chars is allowed for model name
+            _changename_done_cb, (void *)&callback_result);
+}
+
+static void _navigate_items(s8 direction)
+{
+    guiObject_t *obj;
+    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
+        obj = GUI_GetSelected();
+        if (direction > 0) {
+            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+        } else {
+            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+        }
+    }
+    selected += direction;
+    selected %= mp->total_items;
+    if (selected == 0) {
+        GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
+    } else if (selected < 0) {
+        selected = mp->total_items - 1;
+        u8 pages = mp->total_items /PAGE_ITEM_COUNT;
+        GUI_SetRelativeOrigin(VIEW_ID, 0, pages * PAGE_ITEM_COUNT * (ITEM_HEIGHT +1));
+    } else {
+        obj = GUI_GetSelected();
+        if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
+            GUI_ScrollLogicalView(VIEW_ID, (ITEM_HEIGHT +1) *direction);
+        }
+    }
+    GUI_SetScrollbar(mp->scroll_bar, selected);
+}
+
+static u8 _action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            _navigate_items(-1);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            _navigate_items(1);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }
