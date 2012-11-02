@@ -37,41 +37,41 @@ static void safety_ok_cb(u8 state, void * data)
 void PAGE_ShowSafetyDialog()
 {
     if (dialog == NULL) {
-    	dlgstr[0] = 0;
-    	dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtNone, dlgstr);
-    	return;
+        dlgstr[0] = 0;
+        dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, dlgstr);
+        return;
     }
-	u64 unsafe = PROTOCOL_CheckSafe();
-	if (! unsafe) {
-		GUI_RemoveObj(dialog);
-		dialog = NULL;
-		PROTOCOL_Init(0);
-		return;
-	}
-	int i;
-	int count = 0;
-	char tmpstr[30];
-	const s8 safeval[4] = {0, -100, 0, 100};
-	s16 *raw = MIXER_GetInputs();
-	u32 crc = Crc(dlgstr, strlen(dlgstr));
-	dlgstr[0] = 0;
-	for(i = 0; i < NUM_SOURCES + 1; i++) {
-		if (! (unsafe & (1LL << i)))
-			continue;
-		int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
+    u64 unsafe = PROTOCOL_CheckSafe();
+    if (! unsafe) {
+        GUI_RemoveObj(dialog);
+        dialog = NULL;
+        PROTOCOL_Init(0);
+        return;
+    }
+    int i;
+    int count = 0;
+    char tmpstr[30];
+    const s8 safeval[4] = {0, -100, 0, 100};
+    s16 *raw = MIXER_GetInputs();
+    u32 crc = Crc(dlgstr, strlen(dlgstr));
+    dlgstr[0] = 0;
+    for(i = 0; i < NUM_SOURCES + 1; i++) {
+        if (! (unsafe & (1LL << i)))
+            continue;
+        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
 
-		s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
-					  ? raw[ch+1]
-					  : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-		sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, \nsafe value = %d%%"),
-				INPUT_SourceName(tmpstr, ch + 1),
-				val, safeval[Model.safety[i]]);
-		if (++count >= 5)
-			break;
-	}
-	if (crc != Crc(dlgstr, strlen(dlgstr))) {
-		GUI_Redraw(dialog);
-	}
+        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+                      ? raw[ch+1]
+                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
+        sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, \nsafe value = %d%%"),
+                INPUT_SourceName(tmpstr, ch + 1),
+                val, safeval[Model.safety[i]]);
+        if (++count >= 5)
+            break;
+    }
+    if (crc != Crc(dlgstr, strlen(dlgstr))) {
+        GUI_Redraw(dialog);
+    }
 }
 
 /******************/
@@ -89,8 +89,8 @@ static void binding_ok_cb(u8 state, void * data)
 void PAGE_CloseBindingDialog()
 {
     if (dialog) {
-    	GUI_RemoveObj(dialog);
-    	GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
+        GUI_RemoveObj(dialog);
+        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
         dialog = NULL;
     }
 }
