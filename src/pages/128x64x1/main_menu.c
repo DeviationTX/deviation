@@ -30,10 +30,7 @@ void PAGE_MainMenuInit(int page)
     PAGE_SetActionCB(action_cb);
     PAGE_ShowHeader(_tr("Main Menu"));
 
-    if (Traditional_mixer == 0)
-        mmp->menu_item_name = (char **)menu_item_name_deviation;
-    else
-        mmp->menu_item_name = (char **)menu_item_name_tradition;
+    mmp->menu_item_name = (char **)menu_item_name_deviation;
     mmp->main_menu_count = 0;
     while (mmp->menu_item_name[mmp->main_menu_count] != 0) mmp->main_menu_count++;
 
@@ -119,16 +116,10 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data)
     else if (!strcmp("Func Conf", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Model Conf", str) && Traditional_mixer == 1) {
-        PAGE_ChangeByName("SubMenu", 1);
-    }
-    else if (!strcmp("Tx Conf", str) && Traditional_mixer == 1) {
-        PAGE_ChangeByName("SubMenu", 2);
-    }
-    else if (!strcmp("Model Conf", str) && Traditional_mixer == 0) {
+    else if (!strcmp("Model Conf", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Tx Conf", str) && Traditional_mixer == 0) {
+    else if (!strcmp("Tx Conf", str)) {
         PAGE_ChangeByName("SubMenu", 1);
     }
 }

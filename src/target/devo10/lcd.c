@@ -29,8 +29,8 @@
 #define LCD_PAGES 8
 static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
 static u8 dirty[PHY_LCD_WIDTH];
-static u8 xstart, xend;
-static u8 xpos, ypos;
+static u16 xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
+static u16 xpos, ypos;
 static enum DrawDir dir;
 
 void lcd_display(uint8_t on)
@@ -60,7 +60,7 @@ void lcd_set_start_line(int line)
 }
 
 //Electronic Volume Control
-void lcd_set_brightness(int b)
+void LCD_set_contrast(int b)
 {
   LCD_CMD = 0x81;
   LCD_CMD = b & 0x3F;
@@ -114,7 +114,7 @@ void LCD_Init()
     LCD_CMD = 0x24;
 
     //Electronic volume control (18) -> LCD brightness; 0x20; default=32d
-    lcd_set_brightness(0x25);
+    LCD_set_contrast(0x25);
     Delay(5);
 
     //Power control setting (16); V/B, V/R, V/F are used
@@ -189,13 +189,25 @@ void LCD_DrawStop(void)
 
 void LCD_DrawPixel(unsigned int color)
 {
-    int y = ypos;
-    int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
+	u16 absolute_x0 = xpos;
+	u16 absolute_y0 = ypos;
+	// if x and y are relative coordinate and inside a logical view, convert them to absolute coordinates
+	// it they are absolute coordinate, just draw it as usual
+	if (GUI_IsLogicViewCoordinate(absolute_y0) || GUI_IsLogicViewCoordinate(absolute_x0)) {
+		s8 view_id = GUI_GetViewId(absolute_x0, absolute_y0);
+		if (view_id >=0 ) {
+			if (!GUI_IsCoordinateInsideLogicalView(view_id, &absolute_x0, &absolute_y0))
+				return; // don't draw relative coordinate if it is outside the view;
+		}
+	}
 
-    if (ypos > 31)
-        y = ypos - 32;
+    int y = absolute_y0;
+    int x = PHY_LCD_WIDTH - 1 - absolute_x0; //We want to map 0 -> 128 and 128 -> 0
+
+    if (absolute_y0 > 31)
+        y = absolute_y0 - 32;
     else
-        y = ypos + 32;
+        y = absolute_y0 + 32;
     if (dir == DRAW_SWNE)
         y = 63 - y;
     

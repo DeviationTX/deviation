@@ -16,6 +16,7 @@
 #include <assert.h>
 
 #include "common.h"
+#include "gui/gui.h"
 #include "../common_emu/fltk.h"
 
 static int logical_lcd_width = LCD_WIDTH*2;
@@ -25,6 +26,17 @@ static int logical_lcd_width = LCD_WIDTH*2;
  */
 void LCD_DrawPixel(unsigned int color)
 {
+	u16 absolute_x0 = gui.x;
+	u16 absolute_y0 = gui.y;
+	// if x and y are relative coordinate and inside a logical view, convert them to absolute coordinates
+	// it they are absolute coordinate, just draw it as usual
+	if (GUI_IsLogicViewCoordinate(absolute_y0) || GUI_IsLogicViewCoordinate(absolute_x0)) {
+		s8 view_id = GUI_GetViewId(absolute_x0, absolute_y0);
+		if (view_id >=0 ) {
+			if (!GUI_IsCoordinateInsideLogicalView(view_id, &absolute_x0, &absolute_y0))
+				return; // don't draw relative coordinate if it is outside the view;
+		}
+	}
     u8 c;
     int row, col;
     int i, j;
@@ -32,8 +44,8 @@ void LCD_DrawPixel(unsigned int color)
     c = color ? 0x00 : 0xaa; // 0xaa is grey color(not dot)
 
     //Fill in 4 dots
-    row = 2 * gui.y;
-    col = 2 * gui.x;
+    row = 2 * absolute_y0;
+    col = 2 * absolute_x0;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
@@ -52,4 +64,9 @@ void LCD_Clear(unsigned int color) {
 	(void)color;
 	memset(gui.image, 0xaa, sizeof(gui.image));
 
+}
+
+void LCD_set_contrast(int c) {
+	(void)c;
+	// nothing to do
 }

@@ -12,17 +12,6 @@ static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static void navigate_item(short direction, u8 step);
 
 #define SUBMENU_COUNT 3
-static const char *title0[] = {"Function Config", "Model Config", "Tx Config"};  // _tr(
-static const char *menu_item_name_traditional0[] =  // _tr(
-    {"Reverse Switch", "Travel Adjust", "Sub Trim", "D/R & Exp", "Thro hold", "Mix To Throttle",
-      "Tail Curve", "Fail Safe", "Trainer", 0};
-static const char *menu_item_name_traditional1[] =  // _tr(
-    {"Model Select", "Model Name", "Protocol&Binding", "Mixer Mode","Type Select", "Swash Type", "Trim Step", "Power Amplifier", "Sensor Setting",
-      "Stick Position", "Device Select","Device Output",  "Model Copy", "Model Transmit", "Model Receive", 0};
-static const char *menu_item_name_traditional2[] = // _tr(
-    {"Language", "Display", "Battery Alarm", "Calibration", "Buzzer", "Vibrator", "Stick Mode", "Stick Direction",
-      "About", 0};
-
 static const char *title1[] = {"Model Config", "Tx Config"};  // _tr(
 static const char *menu_item_name_deviation0[] = // _tr(
     {"Mixer", "Model", "Protocol&Binding", "Timer", "Trim", "Mixer Mode", 0};
@@ -60,10 +49,7 @@ void PAGE_SubMenuExit()
 void show_menuItems(u8 startIdx)
 {
     GUI_RemoveAllObjects();
-    if (Traditional_mixer == 1)
-        PAGE_ShowHeader(_tr(title0[sub_menu_item]));
-    else
-        PAGE_ShowHeader(_tr(title1[sub_menu_item]));
+    PAGE_ShowHeader(_tr(title1[sub_menu_item]));
 
     int i;
     u8 row = MENU_ITEM_START_ROW;
@@ -96,31 +82,15 @@ void show_menuItems(u8 startIdx)
 
 void get_menu_itemName()
 {
-    if (Traditional_mixer == 1) {
-        switch(sub_menu_item) {
-        case 0:
-            smp->menu_item_name = (char **)&menu_item_name_traditional0[0];
-            break;
-        case 1:
-            smp->menu_item_name = (char **)&menu_item_name_traditional1[0];
-            break;
-        case 2:
-            smp->menu_item_name = (char **)&menu_item_name_traditional2[0];
-            break;
-        default:
-            return;
-        }
-    } else {
-        switch(sub_menu_item) {
-        case 0:
-            smp->menu_item_name = (char **)&menu_item_name_deviation0[0];
-            break;
-        case 1:
-            smp->menu_item_name = (char **)&menu_item_name_deviation1[0];
-            break;
-        default:
-            return;
-        }
+    switch(sub_menu_item) {
+    case 0:
+        smp->menu_item_name = (char **)&menu_item_name_deviation0[0];
+        break;
+    case 1:
+        smp->menu_item_name = (char **)&menu_item_name_deviation1[0];
+        break;
+    default:
+        return;
     }
 }
 
