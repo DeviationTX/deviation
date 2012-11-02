@@ -6,7 +6,7 @@
 #include "trim_page.h"
 #include "timer_page.h"
 #include "model_page.h"
-#include "chantest_page.h"
+#include "../common/chantest_page.h"
 #include "scanner_page.h"
 #include "usb_page.h"
 #include "../common/tx_configure.h"

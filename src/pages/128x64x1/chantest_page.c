@@ -18,208 +18,168 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-static struct chantest_page * const cp = &pagemem.u.chantest_page;
+#include "../common/_chantest_page.c"
 
-static s16 showchan_cb(void *data);
-static const char *value_cb(guiObject_t *obj, const void *data);
-//static const char *channum_cb(guiObject_t *obj, const void *data);
+static u8 _action_cb(u32 button, u8 flags, void *data);
+static const char *_channum_cb(guiObject_t *obj, const void *data);
+static const char *_title_cb(guiObject_t *obj, const void *data);
+static const char *_page_cb(guiObject_t *obj, const void *data);
+static void _press_cb(guiObject_t *obj, const void *data);
+#define VIEW_ID 0
+static u8 current_page = 0;
+static u8 view_height;
+static guiObject_t *scroll_bar;
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static void _show_bar_page(u8 num_bars)
 {
-	(void)data;
-	if (flags & BUTTON_PRESS) {
-		if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-			PAGE_ChangeByName("MainMenu", 0);
-		} else {
-			// only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-			return 0;
-		}
-	}
-	return 1;
-}
-
-static void show_bar_page(u8 num_bars)
-{
-    #define SEPERATION
+    current_page = 0;
     int i;
-    u8 height;
-    u8 count;
-    if (num_bars > 12)
-        num_bars = 12;
+    if (num_bars > 18)
+        num_bars = 18;
     cp->num_bars = num_bars;
-    height = 4;
-    u8 width = 59; // better to be even
-    count = num_bars;
-    u16 offset = 0;
-    u8 separation = (LCD_HEIGHT - offset*2)*2/ count;
-    u8 x, y;
+    u8 count = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    y = offset;
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = 9;
+    view_height = LCD_HEIGHT -view_origin_absoluteY;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH, view_height, view_origin_absoluteX, view_origin_absoluteY);
+
+    u8 x = 0;
+    u8 space = ITEM_HEIGHT + 2;
+    s8 y = -space;
+    u8 height = 4 ;
+    u8 width = 59; // better to be even
+    struct LabelDesc desc;
+    desc.font = TINY_FONT.font;
+    desc.style = LABEL_LEFT;
+    desc.font_color = 1;
+    desc.fill_color = desc.outline_color = 0xffff; // not to draw box
+
+    GUI_CreateLabelBox(0 , 0, 30, 9, &desc, _title_cb, NULL, (void *)NULL);
+
     for(i = 0; i < count; i++) {
-    	if (i%2 ==0) {
-    		x = 1;
-    		y += separation -1;
-    	} else {
-    		x = 65;
-    	}
-    	//GUI_CreateLabelBox(x + 25, y - 8,
-    	//			0, 0, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
-		cp->bar[i] = GUI_CreateBarGraph(x , y, width, height,
-									-125, 125, TRIM_HORIZONTAL,
-									showchan_cb,
-									(void *)((long)i));
-		cp->value[i] = GUI_CreateLabelBox(x + 10, y- 7,
-		                              32, 7, &TINY_FONT, value_cb, NULL, (void *)((long)i));
+        if (i%2 ==0) {
+            x = 0;
+            y += space;
+        } else {
+            x = 63;
+
+        }
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID,x) , GUI_MapToLogicalView(VIEW_ID, y),
+                0, 7, &desc, _channum_cb, NULL, (void *)(long)i);
+        cp->value[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, x + 37), GUI_MapToLogicalView(VIEW_ID, y),
+                        23, 7 , &desc, value_cb, NULL, (void *)((long)i));
+        cp->bar[i] = GUI_CreateBarGraph(GUI_MapToLogicalView(VIEW_ID, x) , GUI_MapToLogicalView(VIEW_ID, y + 8),
+                width, height, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)((long)i));
+
     }
-}
 
-const char *lockstr_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(cp->is_locked == 1 || cp->is_locked == 2)
-        return _tr("Touch to Unlock");
-    else
-        return _tr("Touch to Lock");
-}
+    u8 w = 18;
+    guiObject_t * obj = GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, 8, &desc, _page_cb, 0x0000, _press_cb, NULL);
+    GUI_SetSelected(obj);
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH -3, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
 
-const char *button_str_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    int button = (long)data;
-    return INPUT_ButtonName(button + 1);
-}
-
-static void show_button_page()
-{
-    #define X_STEP 95
-    int i;
-    cp->is_locked = 3;
-    int y = 64;
-    cp->bar[0] = GUI_CreateLabelBox(100, 40, 0, 0, &DEFAULT_FONT, lockstr_cb, NULL, NULL);
-    for (i = 0; i < NUM_TX_BUTTONS; i++) {
-        GUI_CreateLabelBox(10 + X_STEP * (i % 3), y, 0, 0,
-                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
-        cp->value[i] = GUI_CreateLabelBox(70 + X_STEP * (i % 3), y, 16, 16,
-                         &SMALLBOX_FONT, NULL, NULL, (void *)"");
-        if ((i % 3) == 2)
-            y += 24;
-    }
 }
 
 void PAGE_ChantestInit(int page)
 {
-    (void)page;
+    (void)channum_cb; // remove compile warning as this method is not used here
+    (void)show_button_page; // to remove compile warning as this method is not used in devo10
+    (void)okcancel_cb;
     PAGE_SetModal(0);
-    BUTTON_RegisterCallback(&cp->action,
-          CHAN_ButtonMask(BUT_EXIT),
-          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
+    PAGE_SetActionCB(_action_cb);
+    GUI_RemoveAllObjects();
     cp->return_page = NULL;
-    cp->type = 0;
-	// Todo: handle over 12 channels in 2 pages
-	u8 channel_no = Model.num_channels;
-	if (channel_no > 10) channel_no = 10;
-    show_bar_page(channel_no); //Model.num_channels);
-}
-
-void PAGE_InputtestInit(int page)
-{
-    (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Inputs"));
-    cp->return_page = NULL;
-    cp->type = 1;
-    show_bar_page(NUM_INPUTS);
-}
-
-void PAGE_ButtontestInit(int page)
-{
-    (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Buttons"));
-    cp->return_page = NULL;
-    cp->type = 2;
-    show_button_page();
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(cp->return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        cp->return_page(1);
+    if (page > 0)
+        cp->return_val = page;
+    if(cp->type == MONITOR_RAWINPUT )
+        _show_bar_page(NUM_INPUTS);
+    else {
+        cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
+        _show_bar_page(Model.num_channels);
     }
+
 }
 
-void PAGE_ChantestModal(void(*return_page)(int page))
+void PAGE_ChantestModal(void(*return_page)(int page), int page)
 {
-    PAGE_SetModal(1);
+    cp->type = MONITOR_CHANNELOUTPUT;
+    PAGE_ChantestInit(page);
     cp->return_page = return_page;
-    cp->type = 0;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(_tr("Channels"), okcancel_cb);
-
-    show_bar_page(Model.num_channels);
+    cp->return_val = page;
 }
-u8 button_capture_cb(u32 button, u8 flags, void *data)
+
+static void _navigate_pages()
 {
-    (void)button;
-    (void)flags;
+    if (current_page ==0)
+        GUI_SetRelativeOrigin(VIEW_ID, 0, view_height);
+    else
+        GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
+    current_page = !current_page;
+    GUI_SetScrollbar(scroll_bar, current_page);
+}
+
+static u8 _action_cb(u32 button, u8 flags, void *data)
+{
     (void)data;
+    if (flags & BUTTON_PRESS) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
+                PAGE_ChangeByName("TxConfig", -1);
+            else
+                PAGE_ChangeByName("SubMenu", sub_menu_item);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            _navigate_pages();
+        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
+            _navigate_pages();
+        } else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
     return 1;
 }
 
-void PAGE_ChantestEvent()
-{
-    int i;
-    s16 *raw = MIXER_GetInputs();
-    for(i = 0; i < cp->num_bars; i++) {
-        int v = RANGE_TO_PCT(cp->type ? raw[i+1] : Channels[i]);
-        if (v != cp->pctvalue[i]) {
-            GUI_Redraw(cp->bar[i]);
-            GUI_Redraw(cp->value[i]);
-            cp->pctvalue[i] = v;
-        }
-    }
-}
-
-void PAGE_ChantestExit()
-{
-    BUTTON_UnregisterCallback(&cp->action);
-}
-static s16 showchan_cb(void *data)
-{
-    long ch = (long)data;
-    return cp->pctvalue[ch];
-}
-
-static const char *value_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long ch = (long)data;
-    sprintf(cp->tmpstr, "%d", cp->pctvalue[ch]);
-    return cp->tmpstr;
-}
-
-/* static const char *channum_cb(guiObject_t *obj, const void *data)
+static const char *_channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
     if (cp->type) {
-        char *p = cp->tmpstr;
-        if (ch & 0x01) {
-            *p = '\n';
-            p++;
-        }
-        INPUT_SourceName(p, ch+1);
-        if (! (ch & 0x01)) {
-            sprintf(p + strlen(p), "\n");
-        }
+       INPUT_SourceName(cp->tmpstr, ch+1);
     } else {
-       sprintf(cp->tmpstr, "\n%d", (int)ch+1);
+       sprintf(cp->tmpstr, "%d", (int)ch+1);
     }
     return cp->tmpstr;
-} */
+}
+
+static const char *_title_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    if (cp->type == MONITOR_RAWINPUT) {
+        strcpy(cp->tmpstr, (const char *)"Stick Input");
+    } else {
+        strcpy(cp->tmpstr, (const char *)"Channel Output");
+    }
+    return cp->tmpstr;
+}
+
+static const char *_page_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    strcpy(cp->tmpstr, (const char *)"->");
+    if (cp->type == MONITOR_RAWINPUT) {
+        strcpy(cp->tmpstr, (const char *)"<-");
+    }
+    return cp->tmpstr;
+}
+
+static void _press_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_CHANNELOUTPUT: MONITOR_RAWINPUT;
+    PAGE_ChantestInit(0);
+}
