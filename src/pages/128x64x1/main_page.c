@@ -34,6 +34,7 @@ static s16 trim_cb(void * data);
 static u8 action_cb(u32 button, u8 flags, void *data);
 const char *power_to_string();
 static s32 get_boxval(u8 idx);
+static s16 last_battery = 0;
 
 /*
  * Main page
@@ -47,14 +48,7 @@ void PAGE_MainInit(int page)
     int i;
     u16 x, y, w, h;
     PAGE_SetModal(0);
-    BUTTON_RegisterCallback(&mp->action,
-          CHAN_ButtonMask(BUT_ENTER)
-          | CHAN_ButtonMask(BUT_EXIT)
-          | CHAN_ButtonMask(BUT_LEFT)
-          | CHAN_ButtonMask(BUT_RIGHT)
-          | CHAN_ButtonMask(BUT_UP)
-          | CHAN_ButtonMask(BUT_DOWN),
-          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
+    PAGE_SetActionCB(action_cb);
 
     //mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     //if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
@@ -66,8 +60,8 @@ void PAGE_MainInit(int page)
     GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
 
     //heli/plane Icon
-	if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-		GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
+    if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
+        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
 
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
@@ -83,7 +77,7 @@ void PAGE_MainInit(int page)
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
             mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
                                 //get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
-            					&TINY_FONT,
+                                &TINY_FONT,
                                 show_box_cb, NULL,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else { // i = 3 - 7
@@ -93,10 +87,7 @@ void PAGE_MainInit(int page)
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
-    mp->battObj = GUI_CreateLabelBox(85,1, 40, 8,
-                            //mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
-            				&TINY_FONT, // 7x5 font
-                            voltage_cb, NULL, NULL);
+    mp->battObj = GUI_CreateLabelBox(85,1, 40, 8, &TINY_FONT,  voltage_cb, NULL, NULL);
     //TxPower
     GUI_CreateLabelBox(54,1, 0, 0,&TINY_FONT, power_to_string, NULL, NULL);
 }
@@ -138,11 +129,6 @@ void PAGE_MainEvent()
     s16 batt = PWR_ReadVoltage();
     if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
         mp->battery = batt;
-        if(Display.flags & SHOW_BAT_ICON) {
-            //FIXME
-        } else {
-            //GUI_SetLabelDesc(mp->battObj, batt < Transmitter.batt_alarm ? &BATTALARM_FONT : &TINY_FONT);//&BATTERY_FONT);
-        }
         GUI_Redraw(mp->battObj);
     }
 #ifdef DEBUG_KEY_INPUT
@@ -152,26 +138,25 @@ void PAGE_MainEvent()
 
 void PAGE_MainExit()
 {
-    BUTTON_UnregisterCallback(&mp->action);
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)
 {
-	if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-		PAGE_ChangeByName("MainMenu", 0);
-	}
-	else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
-		mp->ignore_release = 1;
-		TIMER_StartStop(0);
-		TIMER_StartStop(1);
-	} else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-		TIMER_Reset(0);
-		TIMER_Reset(1);;
-	}
-	else {
-		MIXER_UpdateTrim(button, flags, data);
-	}
-	return 1;
+    if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+        PAGE_ChangeByName("MainMenu", 0);
+    }
+    else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
+        mp->ignore_release = 1;
+        TIMER_StartStop(0);
+        TIMER_StartStop(1);
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+        TIMER_Reset(0);
+        TIMER_Reset(1);;
+    }
+    else {
+        MIXER_UpdateTrim(button, flags, data);
+    }
+    return 1;
 }
 
 s32 get_boxval(u8 idx)
@@ -198,16 +183,20 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 }
 
 const char *voltage_cb(guiObject_t *obj, const void *data) {
-	static u8 voltageClear = 0;
+    static u8 voltageClear = 0;
     (void)obj;
     (void)data;
-    sprintf(mp->tmpstr, "%2d.%02dv", mp->battery / 1000, (mp->battery % 1000) / 10);
-	if (mp->battery < Transmitter.batt_alarm) {  // let the voltage label flashed when low voltage
-		voltageClear = !voltageClear;
-		if (voltageClear) {
-			mp->tmpstr[0] = 0;
-		}
-	}
+    if (mp->battery - last_battery < 0 || mp->battery  - last_battery > 100){
+        last_battery = mp->battery; // to avoid blinking in battery display
+
+    }
+    sprintf(mp->tmpstr, "%2d.%02dv", last_battery / 1000, (last_battery % 1000) / 10);
+    if (mp->battery < Transmitter.batt_alarm) {  // let the voltage label flashed when low voltage
+        voltageClear = !voltageClear;
+        if (voltageClear) {
+            mp->tmpstr[0] = 0;
+        }
+    }
 #ifdef DEBUG_KEY_INPUT
     int i = ScanButtons();
     sprintf(mp->tmpstr, "%x", i);
@@ -276,5 +265,5 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
  */
 const char *power_to_string()
 {
-	return RADIO_TX_POWER_VAL[Model.tx_power];
+    return RADIO_TX_POWER_VAL[Model.tx_power];
 }
