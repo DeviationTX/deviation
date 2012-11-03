@@ -52,7 +52,7 @@ void PAGE_ModelInit(int page)
     GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Number of Channels:"));
+    GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("# Channels:"));
     mp->chanObj = GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
 
 

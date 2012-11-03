@@ -1,6 +1,12 @@
 ﻿Nederlands
+:# Channels:
+# Kanelen:
 :%s is %d%%, safe value = %d%%\n
 %s is %d%%, veilige waarde = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%s is %d%%,\nveilige waarde = %d%%\n
+>:+
+>:-
 :1-to-1
 1-op-1
 :11 Point
@@ -15,16 +21,16 @@
 4 binnen
 :4 Outside
 4 buiten
->:4Ch w/ Dual-Rates
->4-kan. met Dual-Rates
+:4Ch w/ Dual-Rates
+4-kan. met Dual-Rates
 :5 Point
 5 punten
 :6 Trims
 6 trims
->:6Ch Airplane
->6-kan. vliegtuig
->:6Ch Helicopter
->6-kan. helikopter
+:6Ch Airplane
+6-kan. vliegtuig
+:6Ch Helicopter
+6-kan. helikopter
 :7 Point
 7 punten
 :8 Bars
@@ -43,32 +49,37 @@ AIL
 AIL DR
 :AIL Inv:
 AIL omg:
->:AUX4
->AUX4
->:AUX5
->AUX5
+:AUX4
+AUX4
+:AUX5
+AUX5
 :Airplane
 Vliegtuig
+>:Alarm
+>:Altitude
 :Backlight:
 Helderheid:
 :Bar %d:
 Balk %d:
 :Bars:
 Balken:
+>:Basic Config
 :Battery Alarm:
 Batterijalarm:
+>:Battery too low,\ncan't save!
 :Bind
 Koppelen
 :Binding
 Bezig met koppelen
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
+>:Binding... %d seconds\nPress ENT to stop
 :Box %d:
 Kader %d:
 :Buttons
 Knoppen
->:COL
->COL
+:COL
+COL
 :COL Inv:
 COL omg:
 :CYC
@@ -77,8 +88,8 @@ CYC
 Kalibreren
 :Cancel
 Annuleren
-:Center all sticks and touch the screen
-Centreer alle sticks en raak scherm aan
+>:Celcius
+>:Center all sticks\nthen press ENT
 :Ch
 Kan
 :Change
@@ -89,22 +100,27 @@ Kanalen
 Complex
 :Configure
 Configureren
+>:Contrast:
+>:Copy To
 :Copy To...
 Kopieer...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Curve:
->:Cyclic1
->Cyclic1
->:Cyclic2
->Cyclic2
->:Cyclic3
->Cyclic3
->:DR
->DR
+:Cyclic1
+Cyclic1
+:Cyclic2
+Cyclic2
+:Cyclic3
+Cyclic3
+:DR
+DR
+>:Deadband
 :Default
 Standaard
-:Deviation FW\nversion: 
-Deviation FW\nVersie: 
+:Deviation FW\nversion:
+Deviation FW\nVersie:
+>:Dn
 :Down
 Omlaag
 :ELE
@@ -127,12 +143,12 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
+>:Fahrenheit
 :Failsafe:
 Veilige modus:
+>:Feet
 :File:
 Bestand:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Bestandssysteem kon niet worden gekoppeld. Creëer dit via USB, kies daarna 'ENT' om te stoppen.
 :Fixed
 Vast
 :Fixed ID:
@@ -143,12 +159,13 @@ GEA
 Helikopter
 :High-Rate
 Hoog
->:Icon
->Icoon
+:Icon
+Icoon
 :Input:
 Invoer:
 :Inputs
 Invoeren
+>:Insert
 :Inverted
 Omgekeerd
 :LEFT_H
@@ -157,6 +174,7 @@ LINKS_H
 LINKS_V
 :Language:
 Taal:
+>:Latitude
 :Left
 Links
 :Linked
@@ -165,6 +183,8 @@ Verbonden
 Laad
 :Load...
 Laad...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Laag
 :MIX0
@@ -173,34 +193,41 @@ MIX0
 MIX1
 :MIX2
 MIX2
+>:Main Menu
 :Main Page Config
 Configuratie hoofdscherm
 :Max:
 Max:
+>:Meters
 :Mid-Rate
 Middel
 :Min/Max
 Min/Max
 :Min:
 Min:
->:Mixer
->Mixer
+:Mixer
+Mixer
+>:Mixer Mode
 :Mixers:
 Mixers:
 :Mode %d
 Mode %d
 :Model
 Model
+>:Model Config
 :Model Name:
 Modelnaam:
 :Model Type:
 Modeltype:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Beweeg de sticks naar alle\nuitersten en terug naar het midden.\nRaak daarna het scherm aan.
+>:Monitor
+>:Move Down
+>:Move Up
+>:Move sticks\nto max & min\nthen press ENT
 :Mux:
 Mux:
 :Neg
 -
+>:New
 :No Bars
 Geen balken
 :No Trim
@@ -211,16 +238,15 @@ Geen trims
 Geen
 :Normal
 Normaal
-:Number of Channels:
-Aantal kanelen:
 :OK
 OK
 :Off
 Uit
 :Offset:
 Offset:
->:On
->Aan
+>:Ok
+:On
+Aan
 :Page:
 Pagina:
 :Point:
@@ -229,30 +255,40 @@ Punt:
 +
 :Pos/Neg:
 +/-:
->:Press 'Ent' to turn USB Filesystem:
->Druk op 'ENT' om USB-bestandssysteem te activeren
+:Press 'Ent' to turn USB Filesystem:
+Druk op 'ENT' om USB-bestandssysteem te activeren
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to start\ncalibration\nPress EXT to exit
+>:Press ENT to turn \nUSB drive: 
+>:Procotol:
+>:Protocol&Binding
 :Protocol:
 Protocol:
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
+>:RPM
 :RUD
 RUD
 :RUD DR
 RUD DR
->:Re-Init
->Herinitialiseren
+:Re-Init
+Herinitialiseren
+>:Remove
 :Reset
 Reset
 :Reverse:
 Keer om:
 :Reversed
 Omgekeerd
+>:Revert
 :Right
 Rechts
->:Safe Val:
->Veilige waarde:
+:Safe Val:
+Veilige waarde:
 :Safety
 Veiligheid
 :Safety:
@@ -265,14 +301,16 @@ Schaal:
 Scanner
 :Simple
 Eenvoudig
->:Simple 4 Channel
->Eenvoudig 4 kanalen
+:Simple 4 Channel
+Eenvoudig 4 kanalen
+>:Speed
 :Src
 Bron
 :Src:
 Bron:
 :Start:
 Start:
+>:Step:
 :Stick Mode:
 Stickmodus:
 :Sticks:
@@ -315,16 +353,18 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
+>:TelemRPM
+>:TelemT
+>:TelemV
+>:Telemetry
+>:Temp
 :Template..
 Sjabloon...
 :Test
 Testen
+>:Time
 :Timer
 Timer
-:Timer1
-Timer1
-:Timer2
-Timer2
 :Toggle%d
 Schakel%d
 :Touch Calibrate
@@ -353,20 +393,20 @@ Trims:
 Uitschakelen
 :Turn On
 Inschakelen
+>:Tx Config
 :Tx Power:
 Zendvermogen:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-USB-massaopslagmodus, druk op 'ENT' om te stoppen.
 :Unknown
 Onbekend
 :Up
 Omhoog
 :Value:
 Waarde:
->:Virt
->Virt
+:Virt
+Virt
+>:Volt
 :Zero/Max
 Nul/Max
 :\n\nBinding will end in %d seconds...

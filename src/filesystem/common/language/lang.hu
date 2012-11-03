@@ -1,6 +1,12 @@
 ﻿Magyar 
+:# Channels:
+# Csatornák:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, a biztonságos érték = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%s = %d%%,\na biztonságos érték = %d%%\n
+>:+
+>:-
 :1-to-1
 1 az 1
 :11 Point
@@ -49,20 +55,25 @@ AUX4
 AUX5
 :Airplane
 Repülőgép
+>:Alarm
+>:Altitude
 :Backlight:
 Fényerő:
 :Bar %d:
 Oszlop%d:
 :Bars:
 Oszlop:
+>:Basic Config
 :Battery Alarm:
 Tápfesz. riasztás:
+>:Battery too low,\ncan't save!
 :Bind
 Csatol
 :Binding
 Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
+>:Binding... %d seconds\nPress ENT to stop
 :Box %d:
 Doboz%d:
 :Buttons
@@ -77,8 +88,8 @@ CYC
 Kalibrálás
 :Cancel
 Mégsem
-:Center all sticks and touch the screen
-Állítsa középállásba a botkormányokat,\nés érintse meg a képernyőt!
+>:Celcius
+>:Center all sticks\nthen press ENT
 :Ch
 Cs
 :Change
@@ -89,10 +100,12 @@ Csatornák
 Komplex
 :Configure
 Konfigurálás
+>:Contrast:
 :Copy To
 Másolás
 :Copy To...
 Másolás...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Görbe:
 :Cyclic1
@@ -103,10 +116,12 @@ Ciklikus2
 Ciklikus3
 :DR
 DR
+>:Deadband
 :Default
 Default
-:Deviation FW\nversion: 
+:Deviation FW\nversion:
 Deviation fw.\nverzió:
+>:Dn
 :Down
 Le
 :ELE
@@ -129,12 +144,12 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
+>:Fahrenheit
 :Failsafe:
 Hibaérték:
+>:Feet
 :File:
 Fájl:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-A fájlrendszert nem lehet csatolni!\nUSB-n keresztül formázza a fájlrendszert, majd a kilépéshez nyomja meg az 'ENT'-t!
 :Fixed
 Fix
 :Fixed ID:
@@ -161,6 +176,7 @@ BAL_V
 BAL_F
 :Language:
 Nyelv:
+>:Latitude
 :Left
 Bal
 :Linked
@@ -169,6 +185,8 @@ Csatolt
 Betöltés
 :Load...
 Betöltés...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Alacsony
 :MIX0
@@ -177,10 +195,12 @@ MIX0
 MIX1
 :MIX2
 MIX2
+>:Main Menu
 :Main Page Config
 Főablak konfiguráció
 :Max:
 Max:
+>:Meters
 :Mid-Rate
 Közepes
 :Min/Max
@@ -189,22 +209,24 @@ Min/Max
 Min:
 :Mixer
 Mixer
+>:Mixer Mode
 :Mixers:
 Mixerek:
 :Mode %d
 Mód %d
 :Model
 Modell
+>:Model Config
 :Model Name:
 Modell név:
 :Model Type:
 Modell típus:
+>:Monitor
 :Move Down
 Lejjebb
 :Move Up
 Feljebb
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Mozgassa a botkormányokat\nvégkitérésig, majd vissza középre!\nÉrintse meg a képernyőt, ha kész...
+>:Move sticks\nto max & min\nthen press ENT
 :Mux:
 Művelet:
 :Neg
@@ -221,14 +243,13 @@ Nincs
 Nincs
 :Normal
 Normál
-:Number of Channels:
-Csatornák száma:
 :OK
 OK
 :Off
 Ki
 :Offset:
 Eltolás:
+>:Ok
 :On
 Be
 :Page:
@@ -239,20 +260,23 @@ Pont:
 Poz.
 :Pos/Neg:
 Poz/Neg:
-:Press 'Ent' to turn USB Filesystem: 
-\nNyomjon 'ENT'-t, hogy az USB: 
+:Press 'Ent' to turn USB Filesystem:
+\nNyomjon 'ENT'-t, hogy az USB:
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to start\ncalibration\nPress EXT to exit
+>:Press ENT to turn \nUSB drive: 
+>:Procotol:
+>:Protocol&Binding
 :Protocol:
 Protokol:
 :RIGHT_H
 JOBB_V
 :RIGHT_V
 JOBB_F
-:RPM1:
-Ford1:
-:RPM2:
-Ford2:
-:RPM3:
-Ford3:
+:RPM
+Ford
 :RUD
 RUD
 :RUD DR
@@ -267,6 +291,7 @@ Törlés
 Invertálás:
 :Reversed
 Inverz
+>:Revert
 :Right
 Jobb
 :Safe Val:
@@ -285,12 +310,14 @@ Szkenner
 Egyszerű
 :Simple 4 Channel
 Egyszerű 4 csat.
+>:Speed
 :Src
 Forrás
 :Src:
 Forrás:
 :Start:
 Start:
+>:Step:
 :Stick Mode:
 Mód:
 :Sticks:
@@ -341,24 +368,15 @@ TelemHőm
 TelemFesz
 :Telemetry
 Telemtria
-:Temp1:
-Hőm1:
-:Temp2:
-Hőm2:
-:Temp3:
-Hőm3:
-:Temp4:
-Hőm4:
+:Temp
+Hőm:
 :Template..
 Sablon...
 :Test
 Teszt
+>:Time
 :Timer
 Időzítő
-:Timer1
-Időzítő1
-:Timer2
-Időzítő2
 :Toggle%d
 Jelzés%d
 :Touch Calibrate
@@ -387,12 +405,11 @@ Trim:
 Kikapcsol
 :Turn On
 Bekapcsol
+>:Tx Config
 :Tx Power:
 Kimenő teljesítmény:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-USB mód, a kilépéshez nyomja meg az 'ENT'-t!
 :Unknown
 Ismeretlen
 :Up
@@ -401,12 +418,8 @@ Fel
 Érték:
 :Virt
 Virt.
-:Volt1:
-Fesz1:
-:Volt2:
-Fesz2:
-:Volt3:
-Fesz3:
+:Volt
+Fesz
 :Zero/Max
 Nulla/Max
 :\n\nBinding will end in %d seconds...

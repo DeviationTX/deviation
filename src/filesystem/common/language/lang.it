@@ -1,6 +1,11 @@
 Italiano
+:# Channels:
+# Canali:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valore sicuro  = %d%%\n
+>:%s is %d%%,\nsafe value = %d%%
+>:+
+>:-
 :1-to-1
 1 a 1
 :11 Point
@@ -9,7 +14,7 @@ Italiano
 13 Punti
 :3 Point
 3 Punti
-:4 Bars                                    
+:4 Bars
 4 Barre
 :4 Inside
 4 Interno
@@ -49,20 +54,25 @@ AUX4
 AUX5
 :Airplane
 Aereo
+>:Alarm
+>:Altitude
 :Backlight:
 Luminosità
 :Bar %d:
 Barra %d:
 :Bars:
 Barre:
+>:Basic Config
 :Battery Alarm:
 Allarme batteria:
+>:Battery too low,\ncan't save!
 :Bind
 Bind
 :Binding
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
+>:Binding... %d seconds\nPress ENT to stop
 :Box %d:
 Box%d:
 :Buttons
@@ -77,8 +87,8 @@ Ciclico
 Calibrazione
 :Cancel
 Cancella
-:Center all sticks and touch the screen
-Centra tutti gli stick e tocca lo schermo
+>:Celcius
+>:Center all sticks\nthen press ENT
 :Ch
 Ch
 :Change
@@ -89,8 +99,11 @@ Canale
 Complesso
 :Configure
 Configura
+>:Contrast:
+>:Copy To
 :Copy To...
 Salva su...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Curva:
 :Cyclic1
@@ -101,10 +114,12 @@ Ciclico2
 Ciclico3
 :DR
 DR
+>:Deadband
 :Default
 Default
 :Deviation FW\nversion:
 Versione del\nFW Deviation:
+>:Dn
 :Down
 Giù
 :ELE
@@ -127,12 +142,12 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
+>:Fahrenheit
 :Failsafe:
 Failsafe:
+>:Feet
 :File:
 File:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Il filesystem non può essere montato. Crea il FS tramite USB, quindi premi 'ENT' per uscire.
 :Fixed
 Fisso
 :Fixed ID:
@@ -149,6 +164,7 @@ Icona
 Ingresso:
 :Inputs
 Ingressi
+>:Insert
 :Inverted
 Inverso
 :LEFT_H
@@ -157,6 +173,7 @@ SINISTRA_H
 SINISTRA_V
 :Language:
 Lingua:
+>:Latitude
 :Left
 Sinistra
 :Linked
@@ -165,6 +182,8 @@ Linkato
 Carica
 :Load...
 Carica...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Rate basso
 :MIX0
@@ -173,10 +192,12 @@ MIX0
 MIX1
 :MIX2
 MIX2
+>:Main Menu
 :Main Page Config
 Pagina di Configurazione
 :Max:
 Max:
+>:Meters
 :Mid-Rate
 Rate Medio
 :Min/Max
@@ -185,22 +206,27 @@ Min/Max
 Min:
 :Mixer
 Mixer
+>:Mixer Mode
 :Mixers:
 Mixers:
 :Mode %d
 Modo %d
 :Model
 Modello
+>:Model Config
 :Model Name:
 Nome del Modello:
 :Model Type:
 Tipo del Modello:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Muovi ciascuno stick al max\ne al min quindi torna al centro\nTocca lo schermo quando hai finito
+>:Monitor
+>:Move Down
+>:Move Up
+>:Move sticks\nto max & min\nthen press ENT
 :Mux:
 Operazione:
 :Neg
 Neg.
+>:New
 :No Bars
 No Bars
 :No Trim
@@ -211,14 +237,13 @@ No Trims
 Nessuno
 :Normal
 Normale
-:Number of Channels:
-Nuero di Canali:
 :OK
 OK
 :Off
 Off
 :Offset:
 Offset:
+>:Ok
 :On
 On
 :Page:
@@ -231,24 +256,34 @@ Pos.
 Pos./Neg.:
 :Press 'Ent' to turn USB Filesystem:
 Premi 'Ent' per attivare il Filesystem USB:
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to start\ncalibration\nPress EXT to exit
+>:Press ENT to turn \nUSB drive: 
+>:Procotol:
+>:Protocol&Binding
 :Protocol:
 Protocollo:
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
 DESTRA_V
+>:RPM
 :RUD
 TIMONE
 :RUD DR
 DRTIMONE
 :Re-Init
 Reinizializza
+>:Remove
 :Reset
 Reset
 :Reverse:
 Inverso:
 :Reversed
 Rovesciato:
+>:Revert
 :Right
 Destra
 :Safe Val:
@@ -267,12 +302,14 @@ Scanner
 Sempl.
 :Simple 4 Channel
 4Ch. Semplici
+>:Speed
 :Src
 Sorgente
 :Src:
 Sorgente:
 :Start:
 Avvia:
+>:Step:
 :Stick Mode:
 Modo di volo:
 :Sticks:
@@ -315,16 +352,18 @@ TRIM_S-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
+>:TelemRPM
+>:TelemT
+>:TelemV
+>:Telemetry
+>:Temp
 :Template..
 Modello..
 :Test
 Test
+>:Time
 :Timer
 Timer
-:Timer1
-Timer1
-:Timer2
-Timer2
 :Toggle%d
 Alterna%d
 :Touch Calibrate
@@ -353,12 +392,11 @@ Trim:
 Disattiva
 :Turn On
 Attiva
+>:Tx Config
 :Tx Power:
 Potenza di TX:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-Modo archivio USB, premere 'ENT' per uscire.
 :Unknown
 Sconosciuto
 :Up
@@ -367,6 +405,7 @@ Sù
 valore:
 :Virt
 Virtuale
+>:Volt
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...

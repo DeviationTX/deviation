@@ -53,7 +53,7 @@ void PAGE_ShowSafetyDialog()
         s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-        sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, \nsafe value = %d%%"),
+        sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%,\nsafe value = %d%%"),
                 INPUT_SourceName(tmpstr, ch + 1),
                 val, safeval[Model.safety[i]]);
         if (++count >= 5)
@@ -105,7 +105,7 @@ void PAGE_ShowLowBattDialog()
 {
     if (dialog)
         return;
-    strncpy(dlgstr, _tr("Battery to low, \ncan't save!"), sizeof(dlgstr));
+    strncpy(dlgstr, _tr("Battery too low,\ncan't save!"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
     dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }

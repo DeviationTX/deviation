@@ -72,11 +72,11 @@ void    refresh_page_info(u8    ignore_labels)    {
         strncpy(mcp->item_content[i],    ProtocolNames[Model.protocol],    sizeof(mcp->item_content[i]));
         i++;
         if    (!ignore_labels)
-            strncpy(mcp->label[i],    _tr("Channel#:"),    sizeof(mcp->label[i]));
+            strncpy(mcp->label[i],    _tr("# Channels:"),    sizeof(mcp->label[i]));
         sprintf(mcp->item_content[i],    "%d",    Model.num_channels);
         i++;
         if    (!ignore_labels)
-            strncpy(mcp->label[i],    _tr("Fixed    ID:"),    sizeof(mcp->label[i]));
+            strncpy(mcp->label[i],    _tr("Fixed ID:"),    sizeof(mcp->label[i]));
         if(Model.fixed_id    ==    0)
             strncpy((char    *)mcp->item_content[i],    _tr("None"),    sizeof(mcp->tmpstr));
         else

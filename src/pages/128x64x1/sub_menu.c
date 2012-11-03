@@ -12,11 +12,16 @@ static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static void navigate_item(short direction, u8 step);
 
 #define SUBMENU_COUNT 3
-static const char *title1[] = {"Model Config", "Tx Config"};  // _tr(
-static const char *menu_item_name_deviation0[] = // _tr(
-    {"Mixer", "Model", "Protocol&Binding", "Timer", "Trim", "Mixer Mode", 0};
-static const char *menu_item_name_deviation1[] = // _tr(
-    {"Basic Config", "Monitor", "Scaner", "USB", 0};
+static const char *title1[] = {_tr_noop("Model Config"), _tr_noop("Tx Config")};
+static const char *menu_item_name_deviation0[] = {
+     _tr_noop("Mixer"), _tr_noop("Model"),
+     _tr_noop("Protocol&Binding"),_tr_noop("Timer"),
+     _tr_noop("Trim"), _tr_noop("Mixer Mode"), 0
+};
+static const char *menu_item_name_deviation1[] = {
+     _tr_noop("Basic Config"), _tr_noop("Monitor"),
+     _tr_noop("Scanner"), _tr_noop("USB"), 0
+};
 
 u8 sub_menu_item = 0;  // global variable to let other page get back to the right sub menu
 static u8 selected_menu_idx[SUBMENU_COUNT] = {0, 0, 0};

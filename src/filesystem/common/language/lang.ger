@@ -1,6 +1,12 @@
 ﻿Deutsch
+:# Channels:
+Kanäle:
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, Ausfallwert = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%s %d%%,\nAusfallwert = %d%%\n
+>:+
+>:-
 :1-to-1
 1-zu-1
 :11 Point
@@ -41,40 +47,46 @@ Absolut
 QUE
 :AIL DR
 QUE DR
->:AIL Inv:
+:AIL Inv:
+:AUX4
 >:AUX4
->:AUX5
-:Airplane
-Flugzeug
+:AUX5
+Airplane
+>:Airplane
+>:Alarm
+>:Altitude
 :Backlight:
 Helligkeit:
 :Bar %d:
 Balken %d:
 :Bars:
 Balken:
+>:Basic Config
 :Battery Alarm:
 Akkuwarner:
+>:Battery too low,\ncan't save!
 :Bind
 Binden
 :Binding
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.
+>:Binding... %d seconds\nPress ENT to stop
 :Box %d:
 Kasten %d:
 :Buttons
 Tasten
->:COL
-:COL Inv:
-FIXME
+:COL
+COL Inv:
+>:COL Inv:
 :CYC
 TAUM
 :Calibrate
 Kalibrieren
 :Cancel
 Abbruch
-:Center all sticks and touch the screen
-Zentriere alle Stick, tippe dann auf den Bildschirm.
+>:Celcius
+>:Center all sticks\nthen press ENT
 :Ch
 K
 :Change
@@ -85,18 +97,25 @@ Kanäle
 Komplex
 :Configure
 Konfigurieren
+>:Contrast:
+>:Copy To
 :Copy To...
 Kopieren...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Kurve:
->:Cyclic1
+:Cyclic1
+:Cyclic2
 >:Cyclic2
->:Cyclic3
+:Cyclic3
+:DR
 >:DR
+>:Deadband
 :Default
 Default
-:Deviation FW\nversion: 
+:Deviation FW\nversion:
 Deviation FW\nVersion:
+>:Dn
 :Down
 Runter
 :ELE
@@ -119,12 +138,12 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
+>:Fahrenheit
 :Failsafe:
 Ausfallschutz:
+>:Feet
 :File:
 Datei:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Dateisystem nicht gefunden. Installiere das Dateisystem per USB, dann drücke 'ENT' zum beenden.
 :Fixed
 Fest
 :Fixed ID:
@@ -141,6 +160,7 @@ Bild
 Eingabe:
 :Inputs
 Eingaben
+>:Insert
 :Inverted
 Umgekehrt
 :LEFT_H
@@ -149,6 +169,7 @@ LINKS_H
 LINKS_V
 :Language:
 Sprache:
+>:Latitude
 :Left
 Links
 :Linked
@@ -157,6 +178,8 @@ Verknüpft
 Lade
 :Load...
 Laden...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Niedrig
 :MIX0
@@ -165,33 +188,40 @@ MIX0
 MIX1
 :MIX2
 MIX2
+>:Main Menu
 :Main Page Config
 Hauptseitenkonfiguration
 :Max:
 Max:
+>:Meters
 :Mid-Rate
 Mittel
 :Min/Max
 Min/Max
 :Min:
 Min:
->:Mixer
-:Mixers:
-Mixer:
+:Mixer
+Mixers:
+>:Mixer Mode
+>:Mixers:
 :Mode %d
 Modus %d
 :Model
 Modell
+>:Model Config
 :Model Name:
 Modellname:
 :Model Type:
 Modelltyp:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Bewege alle Sticks zu den Vollausschlägen, und\ndann zurück in die Mitte. Tippe auf den\nBildschirm.
+>:Monitor
+>:Move Down
+>:Move Up
+>:Move sticks\nto max & min\nthen press ENT
 :Mux:
 Mux:
 :Neg
 -
+>:New
 :No Bars
 Keine Balken
 :No Trim
@@ -202,14 +232,13 @@ Keine Trimmung
 Kein
 :Normal
 Normal
-:Number of Channels:
-Anzahl Kanäle:
 :OK
 OK
 :Off
 Aus
 :Offset:
 Offset:
+>:Ok
 :On
 Ein
 :Page:
@@ -220,31 +249,40 @@ Punkt:
 +
 :Pos/Neg:
 +/-:
-:Press 'Ent' to turn USB Filesystem: 
-'Ent' schaltet USB-Verbindung: 
+>:Press 'Ent' to turn USB Filesystem:
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to start\ncalibration\nPress EXT to exit
+>:Press ENT to turn \nUSB drive: 
+>:Procotol:
+>:Protocol&Binding
 :Protocol:
 Protokoll:
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
+>:RPM
 :RUD
 RUD
 :RUD DR
 RUD DR
 :Re-Init
 Neu binden
+>:Remove
 :Reset
 Reset
 :Reverse:
 Umkehr:
 :Reversed
 Umgekehrt
+>:Revert
 :Right
 Rechts
->:Safe Val:
-:Safety
-Ausfallschutz
+:Safe Val:
+Safety
+>:Safety
 :Safety:
 Sicherheit:
 :Save
@@ -255,13 +293,15 @@ Skalierung:
 Scanner
 :Simple
 Einfach
->:Simple 4 Channel
-:Src
-Quelle
+:Simple 4 Channel
+Src
+>:Speed
+>:Src
 :Src:
 Quelle:
 :Start:
 Start:
+>:Step:
 :Stick Mode:
 Modus:
 :Sticks:
@@ -304,16 +344,18 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
+>:TelemRPM
+>:TelemT
+>:TelemV
+>:Telemetry
+>:Temp
 :Template..
 Vorlage...
 :Test
 Testen
+>:Time
 :Timer
 Zeit
-:Timer1
-Zeit1
-:Timer2
-Zeit2
 :Toggle%d
 Schalter%d
 :Touch Calibrate
@@ -342,21 +384,21 @@ Trimmung:
 Ausschalten
 :Turn On
 Einschalten
+>:Tx Config
 :Tx Power:
 Sendeleistung:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-USB Modus, drücke 'ENT' zum beenden.
 :Unknown
 Unbekannt
 :Up
 Hoch
 :Value:
 Wert:
->:Virt
-:Zero/Max
-Null/Max
+:Virt
+Zero/Max
+>:Volt
+>:Zero/Max
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :add

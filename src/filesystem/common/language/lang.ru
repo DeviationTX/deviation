@@ -1,6 +1,11 @@
 ﻿Russian
+:# Channels:
+# каналов:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, безопасное значение = %d%%\n
+>:%s is %d%%,\nsafe value = %d%%
+>:+
+>:-
 :1-to-1
 1-к-1
 :11 Point
@@ -49,20 +54,25 @@ AUX4
 AUX5
 :Airplane
 Самолет
+>:Alarm
+>:Altitude
 :Backlight:
 Подсветка:
 :Bar %d:
 Полоса%d
 :Bars:
 Полоса:
+>:Basic Config
 :Battery Alarm:
 Сигнал батареи:
+>:Battery too low,\ncan't save!
 :Bind
 Привязка
 :Binding
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
+>:Binding... %d seconds\nPress ENT to stop
 :Box %d:
 Бокс %d:
 :Buttons
@@ -77,8 +87,8 @@ AUX5
 Калибровка
 :Cancel
 Отмена
-:Center all sticks and touch the screen
-Отцентруйте все стики и прикоснитесь к экрану
+>:Celcius
+>:Center all sticks\nthen press ENT
 :Ch
 Канал 
 :Change
@@ -89,8 +99,11 @@ AUX5
 Комплекс
 :Configure
 Настройки передатчика
+>:Contrast:
+>:Copy To
 :Copy To...
 Копир. в...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Кривая:
 :Cyclic1
@@ -101,10 +114,12 @@ AUX5
 Цикл3
 :DR
 ДР
+>:Deadband
 :Default
 Умолчание
-:Deviation FW\nversion: 
-Прошивка Deviation\nверсия: 
+:Deviation FW\nversion:
+Прошивка Deviation\nверсия:
+>:Dn
 :Down
 Вниз
 :ELE
@@ -127,12 +142,12 @@ AUX5
 ПРежим1
 :FMODE2
 ПРежим2
+>:Fahrenheit
 :Failsafe:
 Отказоустойчивость:
+>:Feet
 :File:
 Файл:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Фаловая система не монтируется. Создайте файловую систему через USB, затем нажмите 'ENT' для выхода.
 :Fixed
 Фиксир.
 :Fixed ID:
@@ -149,6 +164,7 @@ AUX5
 Ввод:
 :Inputs
 Вводы
+>:Insert
 :Inverted
 Инвертированный
 :LEFT_H
@@ -157,6 +173,7 @@ AUX5
 ЛЕВЫЙ_В
 :Language:
 Язык:
+>:Latitude
 :Left
 Левый
 :Linked
@@ -165,6 +182,8 @@ AUX5
 Загрузить
 :Load...
 Загрузка...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Низкий расход
 :MIX0
@@ -173,10 +192,12 @@ AUX5
 МИКШ1
 :MIX2
 МИКШ2
+>:Main Menu
 :Main Page Config
 Главная страница настройки
 :Max:
 Макс.:
+>:Meters
 :Mid-Rate
 Средний расход
 :Min/Max
@@ -185,22 +206,27 @@ AUX5
 Мин.:
 :Mixer
 Микшер
+>:Mixer Mode
 :Mixers:
 Микшер:
 :Mode %d
 Режим %d
 :Model
 Модель
+>:Model Config
 :Model Name:
 Имя модели:
 :Model Type:
 Тип модели:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Переместите каждый стик до макс.\nи мин. значения, затем верните в центр.\nНажмите на экран после завершения.
+>:Monitor
+>:Move Down
+>:Move Up
+>:Move sticks\nto max & min\nthen press ENT
 :Mux:
 Мульт:
 :Neg
 -
+>:New
 :No Bars
 Без полос
 :No Trim
@@ -211,14 +237,13 @@ AUX5
 Нет
 :Normal
 Норма
-:Number of Channels:
-Количество каналов:
 :OK
 OK
 :Off
 Выкл.
 :Offset:
 Смещ.:
+>:Ok
 :On
 Вкл.
 :Page:
@@ -229,26 +254,36 @@ OK
 +
 :Pos/Neg:
 +/-:
-:Press 'Ent' to turn USB Filesystem: 
-\nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние: 
+:Press 'Ent' to turn USB Filesystem:
+\nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние:
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to start\ncalibration\nPress EXT to exit
+>:Press ENT to turn \nUSB drive: 
+>:Procotol:
+>:Protocol&Binding
 :Protocol:
 Протокол:
 :RIGHT_H
 ПРАВЫЙ_Г
 :RIGHT_V
 ПРАВЫЙ_В
+>:RPM
 :RUD
 РНапр
 :RUD DR
 РНапр ДР
 :Re-Init
 Привязка
+>:Remove
 :Reset
 Сброс
 :Reverse:
 Реверс:
 :Reversed
 Реверс
+>:Revert
 :Right
 Вправо
 :Safe Val:
@@ -267,12 +302,14 @@ OK
 Простой
 :Simple 4 Channel
 Простой 4-канала
+>:Speed
 :Src
 Источник
 :Src:
 Источник:
 :Start:
 Старт:
+>:Step:
 :Stick Mode:
 Режим стиков:
 :Sticks:
@@ -315,16 +352,18 @@ OK
 Трим_П+
 :TRIM_R-
 Трим_П-
+>:TelemRPM
+>:TelemT
+>:TelemV
+>:Telemetry
+>:Temp
 :Template..
 Шаблон...
 :Test
 Тест
+>:Time
 :Timer
 Таймер
-:Timer1
-Таймер1
-:Timer2
-Таймер2
 :Toggle%d
 Перекл%d
 :Touch Calibrate
@@ -353,12 +392,11 @@ OK
 Выключить
 :Turn On
 Включить
+>:Tx Config
 :Tx Power:
 Мощность:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-Режим USB, нажмите 'ENT' для выхода.
 :Unknown
 Неизвестный
 :Up
@@ -367,6 +405,7 @@ USB
 Значение:
 :Virt
 Вирт. 
+>:Volt
 :Zero/Max
 Ноль/Макс
 :\n\nBinding will end in %d seconds...
