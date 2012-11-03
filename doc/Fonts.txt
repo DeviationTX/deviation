@@ -1,32 +1,23 @@
 Instructions for building Fonts
 
-Deviation fonts are created using the 'GLCD Font Creator' from MikroElectonica (for Windows).
+Deviation fonts are built from BDF font files.  BDF files are bitmapped fonts that used to be commonly used by X11.  In the past Deviation fonts were built with the 'GLCD Font Creator' from MikroElectonica (for Windows).
 
-The Deviation characters are built from true-type fonts.  A single deviation font may utilize characters of multiple font-size.  The requirement is to find a set of characters that can fit within the required height.
+The BDF files that ship with Deviation are built from TrueType fonts.
+specificlaly the following fonts are used:
+Ubuntu-Condensed
+FireflySung
+WenQuanYiZenHei-Mono
 
-For instance, Deviation's '12pt' font requires that the maximum height above the font baseline be 12 pixels, and below the baseline be 3 pixels (total height = 15)
-
-1) Create relevant font files for each font-size:
-    Open GLCD Font Creator
-    File->New Font-> Import An Existing System Font
-    Select a font family and style (Deviation's default font is 'Ubuntu condensed' which is an open-source font
-    Select a font size
-    select a minimum and maximum character range
-    Disable all optimization
-    Export for TFT and new GLCD
-    select 'mikroC'
-    copy to clipboard and paste into a file (ubuntu_narrow_10.txt for instance)
-
-2) Repeat step (1) for each font size needed (For ubuntu narrow, we need sizes 9-12)
-3) Create individual character files from each font file
-    utils/convert_xglcd_to_font.pl ubuntu_narrow_10.txt -export -name ubuntu_narrow_10
-    The above command will create a directory names 'ubuntu_narrow_10' with one file per character
-    note that if your charcter range does not include character 65 ('A') you must specify the baseline manually.  this is done via:
-        -baseline 11
-    The baseline can be determined by counting pixels (from the top) in GLCD of a charcter that does not cross the baseline (any capital letter in English)
-4) Repeat step(3) for each font file generated
-5) Merge font directories to build final font-dir
-    utils/merge_font.pl -height 15 ubuntu12 ubuntu11 ubuntu10 ubuntu9 ubuntu8
-6) Build font
-    utils/convert_xglcd_to_font.pl -import ubuntu12_merged -name Ubuntu_Narrow_12 -bin > src/filesystem/media/ubuntu12.fon
-    utils/convert_xglcd_to_font.pl -import ubuntu12_merged -name Ubuntu_Narrow_12
+To build a new font:
+1) Get the required inputs.  On linux, the libfreetype2 library is used
+   to convert truetype to BDF.  It also requires Python and the freetype-py library:
+   http://code.google.com/p/freetype-py
+2) Build the BDF file:
+   Here is an example for a 15px font:
+   utils/build_bdf.py --size 15 --ascent 12 -b font15.bdf --ttf Ubuntu-C.ttf --ttf FireflySung.ttf --space 4
+   And here is an example for a 12px font:
+   utils/build_bdf.py --size 12 --ascent 10 -b font12.bdf --ttf Ubuntu-C.ttf --ttf FireflySung.ttf --space 3
+3) Convert the BDF file to a Deviuation FON file:
+   utils/bdf_to_font.pl -maxsize 15 -mode bin font15.bdf -out font15 -minspace 8
+   utils/bdf_to_font.pl -maxsize 12 -mode bin font12.bdf -out font12 -minspace 8
+   Note that 'minspace' should be tuned so thatthe reported # of ranges < 20
