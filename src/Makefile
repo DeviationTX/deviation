@@ -67,7 +67,7 @@ else
 endif
 
 $(LAST_MODEL): model_template.ini tx_template.ini \
-               filesystem/devo10/media/11normal.fon filesystem/devo8/media/15normal.fon
+               filesystem/devo10/media/12normal.fon filesystem/devo8/media/15normal.fon
 	@echo " + Copying template files"
 	for tx in devo8 devo10; do \
 		cp -prf filesystem/common/* filesystem/$$tx/; \
@@ -104,8 +104,8 @@ $(MODELDIR):
 	@mkdir -p $@
 
 #Fonts
-filesystem/devo10/media/11normal.fon: fonts/11normal.bdf
-	../utils/bdf_to_font.pl -maxsize 11 -mode bin $< -out $@ -minspace 8
+filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
+	../utils/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
 
 filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
 	../utils/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
@@ -158,6 +158,7 @@ fs:
 release:
 	make TARGET=devo8 TYPE=prd zip
 	make TARGET=devo6 TYPE=prd zip
+	make TARGET=devo10 TYPE=prd zip
 	make TARGET=devo8 fs
 	make TARGET=devo10 fs
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
