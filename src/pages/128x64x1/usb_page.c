@@ -17,86 +17,32 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-static struct usb_page * const up = &pagemem.u.usb_page;
+#include "../common/_usb_page.c"
+static u8 _action_cb(u32 button, u8 flags, void *data);
 
-static void draw_page(u8 enable)
+static void _draw_page(u8 enable)
 {
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("USB"));
+    PAGE_SetActionCB(_action_cb);
 
-    sprintf(up->tmpstr, "%s%s\n%s%s",
-            _tr("Deviation FW\nversion: "), DeviationVersion,
-            _tr("Press 'Ent' to turn USB Filesystem: "),
+    sprintf(up->tmpstr, "%s%s",
+            _tr("Press ENT to turn \nUSB drive: "),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(0, 15, LCD_WIDTH, 40, &DEFAULT_FONT, NULL, NULL, up->tmpstr);
 }
 
-static void wait_press()
+static u8 _action_cb(u32 button, u8 flags, void *data)
 {
-    printf("Wait Press\n");
-    while(1) {
-        CLOCK_ResetWatchdog();
-        u32 buttons = ScanButtons();
-        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
-            break;
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-    printf("Pressed\n");
-}
-
-static void wait_release()
-{
-    printf("Wait Release\n");
-    while(1) {
-        CLOCK_ResetWatchdog();
-        u32 buttons = ScanButtons();
-        if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
-            break;
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-    printf("Released\n");
-}
-
-u8 usb_cb(u32 button, u8 flags, void *data)
-{
-    (void)button;
     (void)data;
-    if(flags == BUTTON_RELEASE) {
-        draw_page(1);
-        GUI_RefreshScreen();
-        USB_Enable(1);
-        wait_release();
-        wait_press();
-        wait_release();
-        USB_Disable(1);
-        draw_page(0);
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
     }
     return 1;
-}
-
-void PAGE_USBInit(int page)
-{
-    (void)page;
-    PAGE_SetModal(0);
-    draw_page(0);
-    PAGE_SetActionCB(usb_cb);
-}
-
-void PAGE_USBExit()
-{
-}
-
-void PAGE_USBEvent()
-{
-}
-
-void USB_Connect()
-{
-    USB_Enable(1);
-    wait_release();
-    wait_press();
-    wait_release();
-    USB_Disable(1);
 }

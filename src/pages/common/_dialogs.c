@@ -13,21 +13,35 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "pages.h"
-#include "gui/gui.h"
 
-#include "../common/_usb_page.c"
+#define DLG_STR_LEN (80 * 5)
+static guiObject_t *dialog = NULL;
+static char dlgstr[DLG_STR_LEN];
+static u8 disable_safety = 0;//by default =0, means enable
 
-static void _draw_page(u8 enable)
+/******************/
+/*  Safety Dialog */
+/******************/
+static void safety_ok_cb(u8 state, void * data)
 {
-    PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("USB"));
-
-    sprintf(up->tmpstr, "%s%s\n%s%s",
-            _tr("Deviation FW\nversion: "), DeviationVersion,
-            _tr("Press 'Ent' to turn USB Filesystem: "),
-            enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
+    (void)state;
+    (void)data;
+    dialog = NULL;
+    PROTOCOL_Init(1);
 }
 
+/**********************/
+/* Low battery Dialog */
+/**********************/
+static void lowbatt_ok_cb(u8 state, void * data)
+{
+    (void)state;
+    (void)data;
+    dialog = NULL;
+}
+
+
+void PAGE_DisableSafetyDialog(u8 disable)
+{
+    disable_safety = disable;
+}

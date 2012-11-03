@@ -1,7 +1,7 @@
 #ifndef _DEVO8_TARGET_H_
 #define _DEVO8_TARGET_H_
 
-#define MIN_BRIGHTNESS 1 
+#define MIN_BRIGHTNESS 0
 #define HAS_TOUCH 0
 
 #define DEFAULT_BATTERY_ALARM 8000

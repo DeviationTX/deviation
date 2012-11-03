@@ -119,7 +119,7 @@ struct Limit {
     u8 min;
     u8 servoscale;
     s8 failsafe;
-    s8 subtrim;
+    s16 subtrim;  // need to support value greater than 250
 };
 
 struct Trim {

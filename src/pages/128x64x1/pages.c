@@ -47,13 +47,13 @@ static const struct page pages[] = {
     {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},
     {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
     {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
+    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
 
     /*
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
     {NULL, NULL, NULL},
     {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
     //{PAGE_TestInit, PAGE_TestEvent, NULL},
-    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit},
 */
 };
 
@@ -82,7 +82,7 @@ void PAGE_Init()
     pages[page].init(0);
 }
 
-void PAGE_ChangeByName(const char *pageName, u8 menuPage)
+void PAGE_ChangeByName(const char *pageName, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;

@@ -180,5 +180,7 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
         PAGE_ChangeByName("Trim", 0);
     } else if (!strcmp("Timer", str)) {
         PAGE_ChangeByName("Timer", 0);
+    } else if (!strcmp("USB", str)) {
+        PAGE_ChangeByName("USB", 0);
     }
 }

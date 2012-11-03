@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data);
+
 const struct ImageMap image_map[] = {
     {NULL, 32, 15, 0, 0}, /*DRAW_BTN32_15 */
 };
@@ -141,4 +143,37 @@ s8 GUI_GetViewId(u16 x, u16 y) {
     return -1;
 }
 
+// Bug fix: Unlike devo8, devo10's page always has 1 default selected objects. When a dialog, e.g. saftydialog,
+// got poped up, the following statement in handle_buttons() will never get satisfied, the dialog hence is stuck.
+// ...
+//    if (! objTOUCHED || objTOUCHED == objSELECTED) {
+// So the modal buttons handler must separate, hence devo8's modal button handling logic keeps as current
+// while have a new logic for devo10
+void GUI_HandleModalButtons(u8 enable)
+{
+    if (! enable)
+        BUTTON_UnregisterCallback(&button_modalaction);
+    else
+        BUTTON_RegisterCallback(&button_modalaction,
+                0xFFFFFFFF,
+                BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+                _handle_modalbuttons_devo10,
+                NULL);
+}
+
+static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT) || CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            objTOUCHED = objModalButton;
+            GUI_TouchRelease();
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
 

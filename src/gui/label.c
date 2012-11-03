@@ -77,7 +77,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
     u16 h = obj_height;
     LCD_SetFont(desc->font);
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
-    if (desc->style == LABEL_BOX) {  // draw round rect for the textsel widget when it is pressable
+    if (desc->style == LABEL_BOX || desc->style == LABEL_BRACKET) {  // draw round rect for the textsel widget when it is pressable
         if (obj_width == 0)
             w = txt_w;
         if (obj_height == 0)
@@ -87,7 +87,19 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
         }  else {
             LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 0); // clear the background
-            LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
+
+            if (desc->style == LABEL_BRACKET) {
+                u16 y1 = obj_y + 2;
+                u16 y2 = obj_y + obj_height -3;
+                u16 x1 = obj_x + obj_width - 1;
+                LCD_DrawLine(obj_x, y1, obj_x + 2, obj_y, 1);
+                LCD_DrawLine(obj_x, y2, obj_x + 2, obj_y + obj_height -1, 1);
+                LCD_DrawLine(obj_x, y1, obj_x, y2, 1);
+                LCD_DrawLine(x1, y1, x1 - 2, obj_y, 1);
+                LCD_DrawLine(x1, y2, x1 - 2, obj_y + obj_height -1, 1);
+                LCD_DrawLine(x1, y1, x1, y2, 1);
+            } else
+                LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
         }
         if (obj_height > txt_h)
             txt_y = obj_y + (obj_height - txt_h) / 2;

@@ -13,6 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
+#include "gui/gui.h"
 
 /*
  * The font 'font_table' begins with a list of u24 values which represent
@@ -41,7 +42,7 @@
  *  So this would appear as '0x7F, 0x03' in the font table
  *
  */
-#define LINE_SPACING 2
+//#define LINE_SPACING 2 // move to _gui.h as devo10's line spacing is different from devo8's
 #define CHAR_SPACING 1
 #define RANGE_TABLE_SIZE 20
 #define NUM_FONTS 10
@@ -54,7 +55,7 @@ struct font_def
         u8 idx;
         FILE *fh;
         u8 font[80];
-	u8 height;  		/* Character height for storage        */
+    u8 height;          /* Character height for storage        */
         u16 range[2 * (RANGE_TABLE_SIZE + 1)];  /* Array containing the ranges of supported characters */
 };
 static struct {

@@ -87,6 +87,8 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
 
 static void calibrate_sticks(void)
 {
+    // bug fix: should turn of safety dialog during calibrating, or it might fail when stick is not calibrated and safety setting is on
+    PAGE_DisableSafetyDialog(1);
     PROTOCOL_DeInit();
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
@@ -101,6 +103,13 @@ static void calibrate_sticks(void)
             PWR_Shutdown();
         BUTTON_Handler();
         GUI_RefreshScreen();
+        for (u8 i = 0; i < INP_HAS_CALIBRATION; i++) {
+            s32 value = CHAN_ReadRawInput(i + 1);
+            if (value > Transmitter.calibration[i].max)
+                Transmitter.calibration[i].max = value;
+            else if (value < Transmitter.calibration[i].min)
+                Transmitter.calibration[i].min = value;
+        }
         if (calibrate_state == CALI_SUCCESS || calibrate_state == CALI_EXIT)
             break;
     }
@@ -109,6 +118,7 @@ static void calibrate_sticks(void)
     
     PROTOCOL_Init(0);
     PAGE_TxConfigureInit(0);
+    PAGE_DisableSafetyDialog(0);
 }
 
 static void calibrate_touch(void)
@@ -236,7 +246,8 @@ static void press_cb(guiObject_t *obj, const void *data)
         PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
         cp->textbox = GUI_CreateLabelBox(60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
         memset(&cp->coords, 0, sizeof(cp->coords));
-    }
+    } else if (cp->enable == CALIB_STICK)
+        calibrate_state = CALI_NOTSTART; // bug fix: must reset state before calibrating
 }
 
 static const char *langstr_cb(guiObject_t *obj, const void *data)

@@ -38,3 +38,4 @@ enum ButtonType {
 #define ARROW_DOWN  (&image_map[FILE_ARROW_16_DOWN])
 #define ARROW_WIDTH 16
 #define ARROW_HEIGHT 16
+#define LINE_SPACING 2

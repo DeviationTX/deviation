@@ -1,171 +1,119 @@
 /*
-    This    project    is    free    software:    you    can    redistribute    it    and/or    modify
-    it    under    the    terms    of    the    GNU    General    Public    License    as    published    by
-    the    Free    Software    Foundation,    either    version    3    of    the    License,    or
-    (at    your    option)    any    later    version.
+ This project is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    Deviation    is    distributed    in    the    hope    that    it    will    be    useful,
-    but    WITHOUT    ANY    WARRANTY;    without    even    the    implied    warranty    of
-    MERCHANTABILITY    or    FITNESS    FOR    A    PARTICULAR    PURPOSE.        See    the
-    GNU    General    Public    License    for    more    details.
+ Deviation is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You    should    have    received    a    copy    of    the    GNU    General    Public    License
-    along    with    Deviation.        If    not,    see    <http://www.gnu.org/licenses/>.
-    */
+ You should have received a copy of the GNU General Public License
+ along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include    "common.h"
-#include    "pages.h"
-#include    "gui/gui.h"
+#include "common.h"
+#include "pages.h"
+#include "gui/gui.h"
 
-struct    {
-                void(*return_page)(u8    *);
-                const    char    *(*text_cb)(u8    idx);
-                guiObject_t    *listbox;
-                guiObject_t    *textsel;
-                u8    *list;
-                u8    count;
-                u8    selected;
-                u8    max;
-                u8    copyto;
-}    rl;
-enum    {
-                MOVE_UP,
-                MOVE_DOWN,
-                APPLY,
-                INSERT,
-                REMOVE,
-};
+#include "../common/_reorder_list.c"
 
-static    const    char    *string_cb(u8    idx,    void    *data)
+#define VIEW_ID 0
+static u8 total_items;
+static s8 current_selected = 0;
+
+static u8 _action_cb(u32 button, u8 flags, void *data);
+
+static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {
-                (void)data;
-                return    rl.text_cb(rl.list[idx]);
+    (void)obj;
+    switch((long)(data)) {
+        case MOVE_UP:   return _tr("Up");
+        case MOVE_DOWN: return _tr("Dn");
+        case APPLY:     return _tr("Copy To");
+        case INSERT:    return _tr("+");
+        case REMOVE:    return _tr("-");
+    }
+    return "";
 }
 
-static    void    select_cb(guiObject_t    *obj,    u16    sel,    void    *data)
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *))
 {
-                (void)obj;
-                (void)data;
-                if(sel    <    rl.count)        {
-                                rl.copyto    =    sel;
-                                rl.selected    =    sel;
-                                GUI_Redraw(rl.textsel);
-                }    else    {
-                                GUI_ListBoxSelect(rl.listbox,    rl.selected);
-                }
+    rl.return_page = return_page;
+    rl.list = list;
+    rl.selected = selected;
+    rl.copyto = selected;
+    rl.count = count;
+    rl.text_cb = text_cb;
+    rl.max = max_allowed;
+    if (rl.max < count)
+        rl.max = count;
+
+    PAGE_RemoveAllObjects();
+    PAGE_SetModal(1);
+    PAGE_SetActionCB(_action_cb);
+    total_items = 0;
+    current_selected = 0;
+    int i;
+    for(i = 0; i < rl.max; i++) {
+        if (i < count)
+            list[i] = i+1;
+        else
+            list[i] = 0;
+    }
+
+    u8 space = ITEM_HEIGHT + 1;
+    u8 y = 0;
+    u8 w = 55;
+
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY =  0;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, w, LCD_HEIGHT , view_origin_absoluteX, view_origin_absoluteY);
+
+    guiObject_t *obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2, ITEM_HEIGHT,
+            &DEFAULT_FONT,  _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
+    GUI_SetSelected(obj);
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, w/2), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2 , ITEM_HEIGHT,
+            &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
+    y += space;
+    rl.textsel = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w, ITEM_HEIGHT,
+            &DEFAULT_FONT, NULL, copy_val_cb, NULL);
+    y += space;
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w, ITEM_HEIGHT,
+            &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
+    if (max_allowed) {
+        y += space;
+        GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2, ITEM_HEIGHT,
+                    &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
+        GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, w/2), GUI_MapToLogicalView(VIEW_ID, y), w/2 - 2, ITEM_HEIGHT,
+                    &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
+    }
+    y += space;
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, (w -30)/2), GUI_MapToLogicalView(VIEW_ID, y), 30, ITEM_HEIGHT,
+        &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
+
+    u8 x = w + 4;
+    rl.listbox = GUI_CreateListBoxPlateText(x, 0, LCD_WIDTH - x +1, LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
+        string_cb, select_cb, NULL, NULL);
+
+    total_items = y/space + 1;
 }
 
-static    void    okcancel_cb(guiObject_t    *obj,    const    void    *data)
-{
-                (void)obj;
-                GUI_RemoveAllObjects();
-                if    (data)    {
-                                rl.return_page(rl.list);
-                }
-                rl.return_page(NULL);
-}
 
-static    const    char    *show_button_cb(guiObject_t    *obj,    const    void    *data)
+static u8 _action_cb(u32 button, u8 flags, void *data)
 {
-                (void)obj;
-                switch((long)(data))    {
-                                case    MOVE_UP:            return    _tr("Move    Up");
-                                case    MOVE_DOWN:    return    _tr("Move    Down");
-                                case    APPLY:                    return    _tr("Copy    To");
-                                case    INSERT:                return    _tr("Insert");
-                                case    REMOVE:                return    _tr("Remove");
-                }
-                return    "";
-}
-
-void    press_button_cb(guiObject_t    *obj,    const    void    *data)
-{
-                (void)obj;
-                u8    tmp;
-                switch((long)data)    {
-                case    MOVE_UP:
-                                if(rl.selected    >    0)    {
-                                                tmp    =    rl.list[rl.selected-1];
-                                                rl.list[rl.selected-1]    =    rl.list[rl.selected];
-                                                rl.list[rl.selected]    =    tmp;
-                                                GUI_ListBoxSelect(rl.listbox,    rl.selected    -    1);
-                                }
-                                break;
-                case    MOVE_DOWN:
-                                if(rl.selected    <    rl.count    -    1)    {
-                                                tmp    =    rl.list[rl.selected+1];
-                                                rl.list[rl.selected+1]    =    rl.list[rl.selected];
-                                                rl.list[rl.selected]    =    tmp;
-                                                GUI_ListBoxSelect(rl.listbox,    rl.selected    +    1);
-                                }
-                                break;
-                case    APPLY:
-                                if(rl.selected    !=    rl.copyto)
-                                                rl.list[rl.copyto]    =    rl.list[rl.selected];
-                                GUI_Redraw(rl.listbox);
-                                break;
-                case    INSERT:
-                                if(rl.count    <    rl.max)    {
-                                                for(tmp    =    rl.count;    tmp    >    rl.selected;    tmp--)
-                                                                rl.list[tmp]    =    rl.list[tmp-1];
-                                                rl.count++;
-                                                rl.list[rl.selected]    =    255;
-                                                GUI_ListBoxSelect(rl.listbox,    rl.selected    +    1);
-                                }
-                                break;
-                case    REMOVE:
-                                if(rl.count    >    1)    {
-                                                for(tmp    =    rl.selected;    tmp    <    rl.count;    tmp++)
-                                                                rl.list[tmp]    =    rl.list[tmp+1];
-                                                rl.list[rl.count]    =    0;
-                                                rl.count--;
-                                                if(rl.selected    ==    rl.count)
-                                                                rl.selected--;
-                                                GUI_ListBoxSelect(rl.listbox,    rl.selected);
-                                }
-                                break;
-                }
-                return;
-}
-
-const    char    *copy_val_cb(guiObject_t    *obj,    int    dir,    void    *data)
-{
-                (void)obj;
-                (void)data;
-                rl.copyto    =    GUI_TextSelectHelper(rl.copyto,    0,    rl.count    -    1,    dir,    1,    5,    NULL);
-                return(rl.text_cb(rl.list[rl.copyto]));
-}
-void    PAGE_ShowReorderList(u8    *list,    u8    count,    u8    selected,    u8    max_allowed,    const    char    *(*text_cb)(u8    idx),    void(*return_page)(u8    *))
-{
-                rl.return_page    =    return_page;
-                rl.list    =    list;
-                rl.selected    =    selected;
-                rl.copyto    =    selected;
-                rl.count    =    count;
-                rl.text_cb    =    text_cb;
-                rl.max    =    max_allowed;
-                if    (rl.max    <    count)
-                                rl.max    =    count;
-
-                PAGE_RemoveAllObjects();
-                PAGE_SetModal(1);
-                int    i;
-                for(i    =    0;    i    <    rl.max;    i++)    {
-                                if    (i    <    count)
-                                                list[i]    =    i+1;
-                                else
-                                                list[i]    =    0;
-                }
-                PAGE_CreateCancelButton(160,    4,    okcancel_cb);
-                PAGE_CreateOkButton(264,    4,    okcancel_cb);
-                GUI_CreateButton(8,    40,    BUTTON_96x16,    show_button_cb,    0x0000,    press_button_cb,    (void    *)MOVE_UP);
-                GUI_CreateButton(8,    60,    BUTTON_96x16,    show_button_cb,    0x0000,    press_button_cb,    (void    *)MOVE_DOWN);
-
-                rl.textsel    =    GUI_CreateTextSelect(8,    90,    TEXTSELECT_96,    0x0000,    NULL,    copy_val_cb,    NULL);
-                GUI_CreateButton(8,    110,    BUTTON_96x16,    show_button_cb,    0x0000,    press_button_cb,    (void    *)APPLY);
-                if    (max_allowed)    {
-                                GUI_CreateButton(8,    140,    BUTTON_96x16,    show_button_cb,    0x0000,    press_button_cb,    (void    *)INSERT);
-                                GUI_CreateButton(8,    160,    BUTTON_96x16,    show_button_cb,    0x0000,    press_button_cb,    (void    *)REMOVE);
-                }
-                rl.listbox    =    GUI_CreateListBox(112,    40,    200,    192,    rl.max,    selected,    string_cb,    select_cb,    NULL,    NULL);
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            GUI_RemoveAllObjects();
+            rl.return_page(NULL);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }

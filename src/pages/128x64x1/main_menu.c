@@ -9,9 +9,6 @@ static struct main_menu_page * const mmp = &pagemem.u.main_menu_page;
 static u8 action_cb(u32 button, u8 flags, void *data);
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 
-static const char *menu_item_name_tradition[] = {
-    "Func Conf", "Model Conf", "Tx Conf", "Monitor", "Thro Curve", "Pit Curve", 0
-};
 static const char *menu_item_name_deviation[] = {
     "Model Conf", "Tx Conf", 0
 };

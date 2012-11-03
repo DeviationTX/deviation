@@ -57,7 +57,7 @@ void BACKLIGHT_Brightness(u8 brightness)
     } else {
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO1);
-        u32 duty_cycle = 720 * brightness / 9;
+        u32 duty_cycle = 360 * brightness / 9;  // 720 is too bright,
         timer_set_oc_value(TIM3, TIM_OC4, duty_cycle);
         timer_enable_counter(TIM3);
     }

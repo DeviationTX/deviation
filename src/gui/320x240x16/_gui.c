@@ -43,3 +43,21 @@ void _gui_draw_background(int x, int y, int w, int h)
 {
     LCD_DrawWindowedImageFromFile(x, y, "media/devo8.bmp", w, h, x, y);
 }
+
+// Bug fix: Unlike devo8, devo10's page always has 1 default selected objects. When a dialog, e.g. saftydialog,
+// got poped up, the following statement in handle_buttons() will never get satisfied, the dialog hence is stuck.
+// ...
+//    if (! objTOUCHED || objTOUCHED == objSELECTED) {
+// So the modal buttons handler must separate, hence devo8's modal button handling logic keeps as current
+// while have a new logic for devo10
+void GUI_HandleModalButtons(u8 enable)
+{
+    if (! enable)
+        BUTTON_UnregisterCallback(&button_modalaction);
+    else
+        BUTTON_RegisterCallback(&button_modalaction,
+                0xFFFFFFFF,
+                BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+                handle_buttons,
+                NULL);
+}

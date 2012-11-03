@@ -144,10 +144,20 @@ void GUI_DrawButton(struct guiObject *obj)
         }  else {
             LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
             LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
+            /* Bracket style button, disable temporarily
+            u16 y1 = obj->box.y + 2;
+            u16 y2 = obj->box.y + obj->box.height -3;
+            u16 x1 = obj->box.x + obj->box.width - 1;
+            LCD_DrawLine(obj->box.x, y1, obj->box.x + 2, obj->box.y, 1);
+            LCD_DrawLine(obj->box.x, y2, obj->box.x + 2, obj->box.y + obj->box.height -1, 1);
+            LCD_DrawLine(obj->box.x, y1, obj->box.x, y2, 1);
+            LCD_DrawLine(x1, y1, x1 - 2, obj->box.y, 1);
+            LCD_DrawLine(x1, y2, x1 - 2, obj->box.y + obj->box.height -1, 1);
+            LCD_DrawLine(x1, y1, x1, y2, 1); */
             LCD_SetFontColor(0xffff);
         }
         // bug fix: if the string width is wider than box width, e.g. changing to Chinese, x_off might be very big(actuall
-        //itis negative)
+        //it is negative)
         if (box->width > text_w)
             x_off = (box->width - text_w) / 2 + box->x +1;
         else

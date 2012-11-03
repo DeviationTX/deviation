@@ -8,7 +8,7 @@
 #include "../common/model_page.h"
 #include "../common/chantest_page.h"
 #include "scanner_page.h"
-#include "usb_page.h"
+#include "../common/usb_page.h"
 #include "../common/tx_configure.h"
 #include "telemtest_page.h"
 #include "telemconfig_page.h"

@@ -249,6 +249,7 @@ struct guiObject {
 extern struct guiObject *objHEAD;
 extern struct guiObject *objTOUCHED;
 extern struct guiObject *objSELECTED;
+extern struct guiObject *objModalButton;
 
 void GUI_DrawKeyboard(struct guiObject *obj);
 u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type);

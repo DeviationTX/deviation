@@ -41,3 +41,4 @@ enum ButtonType {
 #define ARROW_DOWN  NULL
 #define ARROW_WIDTH 3
 #define ARROW_HEIGHT 3
+#define LINE_SPACING 1

@@ -19,23 +19,13 @@
 #include "config/model.h"
 #include "config/ini.h"
 
-#define DLG_STR_LEN LCD_WIDTH//(80 * 5)
-static guiObject_t *dialog = NULL;
-static char dlgstr[DLG_STR_LEN];
-
-/******************/
-/*  Safety Dialog */
-/******************/
-static void safety_ok_cb(u8 state, void * data)
-{
-    (void)state;
-    (void)data;
-    dialog = NULL;
-    PROTOCOL_Init(1);
-}
+#include "../common/_dialogs.c"
 
 void PAGE_ShowSafetyDialog()
 {
+    if (disable_safety) {
+        return; // don't show safety dialog when calibrating
+    }
     if (dialog == NULL) {
         dlgstr[0] = 0;
         dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, dlgstr);
@@ -111,16 +101,6 @@ void PAGE_ShowBindingDialog(u8 update)
     }
 }
 
-/**********************/
-/* Low battery Dialog */
-/**********************/
-static void lowbatt_ok_cb(u8 state, void * data)
-{
-    (void)state;
-    (void)data;
-    dialog = NULL;
-}
-
 void PAGE_ShowLowBattDialog()
 {
     if (dialog)
@@ -129,3 +109,5 @@ void PAGE_ShowLowBattDialog()
     dlgstr[sizeof(dlgstr) - 1] = 0;
     dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
+
+

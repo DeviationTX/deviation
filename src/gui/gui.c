@@ -18,11 +18,10 @@
 #include "target_defs.h"
 #include "config/display.h"
 
-#include "_gui.c"
-
 struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
 struct guiObject *objSELECTED = NULL;
+struct guiObject *objModalButton = NULL;
 
 static struct guiObject GUI_Array[100];
 static buttonAction_t button_action;
@@ -30,6 +29,7 @@ static buttonAction_t button_modalaction;
 static u8 FullRedraw;
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
+#include "_gui.c"
 
 void connect_object(struct guiObject *obj)
 {
@@ -456,18 +456,6 @@ void GUI_HandleButtons(u8 enable)
                 NULL);
 }
 
-void GUI_HandleModalButtons(u8 enable)
-{
-    if (! enable)
-        BUTTON_UnregisterCallback(&button_modalaction);
-    else 
-        BUTTON_RegisterCallback(&button_modalaction,
-                0xFFFFFFFF,
-                BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
-                handle_buttons,
-                NULL);
-}
-
 u8 handle_buttons(u32 button, u8 flags, void *data)
 {
     (void)data;
@@ -516,13 +504,11 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         return modalActive;
 
     if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
-        CHAN_ButtonIsPressed(button, BUT_UP))
+        CHAN_ButtonIsPressed(button, BUT_UP) ||
+        CHAN_ButtonIsPressed(button, BUT_EXIT))
     {
         return (flags & BUTTON_LONGPRESS) ? modalActive : 1;
     }
-    if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-        return (flags & BUTTON_LONGPRESS) ? modalActive : objSELECTED ? 1 : 0;
-
     if (CHAN_ButtonIsPressed(button, BUT_ENTER) && flags & BUTTON_LONGPRESS) {
         //long-press on enter is ignored so it can be handled by the menu
         return modalActive;

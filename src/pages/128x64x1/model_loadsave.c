@@ -23,18 +23,36 @@
 #include "../common/_model_loadsave.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
+static void _press_cb(guiObject_t *obj, u16 selected, void *data);
+
+static u8 load_save;
 
 static void _show_buttons(int loadsave)
 {
+    (void)show_loadsave_cb;
+    load_save = loadsave;
     PAGE_SetActionCB(_action_cb);
-    u8 w = 40;
-    GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    if (loadsave == LOAD_TEMPLATE || loadsave == LOAD_MODEL)
+        PAGE_ShowHeader(_tr("Press ENT to load:"));
+    else if (loadsave == SAVE_MODEL)
+        PAGE_ShowHeader(_tr("Press ENT to copy to:"));
+    //u8 w = 40;
+    //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
 }
 
 static void _show_list(int loadsave,u8 num_models)
 {
-    GUI_CreateListBoxPlateText(0, ITEM_HEIGHT + 2, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT - 2, num_models, mp->selected-1, &DEFAULT_FONT,
-            string_cb, select_cb, NULL, (void *)(long)loadsave);
+    guiObject_t *obj = GUI_CreateListBoxPlateText(0, ITEM_HEIGHT + 2, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -6, num_models, mp->selected-1, &TINY_FONT,
+        string_cb, select_cb, _press_cb, (void *)(long)loadsave);
+    GUI_SetSelected(obj);
+}
+
+static void _press_cb(guiObject_t *obj, u16 selected, void *data)
+{
+    (void)obj;
+    (void)data;
+    mp->selected = selected + 1;
+    okcancel_cb(NULL, (void *)(long)(load_save +1));
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

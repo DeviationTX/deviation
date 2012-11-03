@@ -23,24 +23,24 @@ All text above must be included in any redistribution
 #define swap(x, y) {int __tmp = x; x = y; y = __tmp;}
 
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
-				 int16_t h, uint16_t color) {
-    LCD_DrawStart(x, y, x, y + h, DRAW_NWSE);
+                 int16_t h, uint16_t color) {
+    LCD_DrawStart(x, y, x, y + h -1, DRAW_NWSE); // bug fix: should be y+ h-1
     while(h--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
 
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
-    LCD_DrawStart(x, y, x + w, y, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
     while(w--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
 }
 
 void LCD_DrawDashedHLine(int16_t x, int16_t y, 
-			 int16_t w, int16_t space, uint16_t color)
+             int16_t w, int16_t space, uint16_t color)
 {
-    LCD_DrawStart(x, y, x + w, y, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w -1, y, DRAW_NWSE);
     int16_t x1;
     for (x1 = 0; x1 < w; x1++)
         if ((x1 / space) & 0x01)
@@ -49,8 +49,8 @@ void LCD_DrawDashedHLine(int16_t x, int16_t y,
 }
 
 void LCD_DrawDashedVLine(int16_t x, int16_t y, 
-			 int16_t h, int16_t space, uint16_t color) {
-    LCD_DrawStart(x, y, x, y + h, DRAW_NWSE);
+             int16_t h, int16_t space, uint16_t color) {
+    LCD_DrawStart(x, y, x, y + h -1, DRAW_NWSE);
     int16_t y1;
     for (y1 = 0; y1 < h; y1++)
         if ((y1 / space) & 0x01)
@@ -60,7 +60,7 @@ void LCD_DrawDashedVLine(int16_t x, int16_t y,
 
 // used to do circles and roundrects!
 void fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
-			    uint8_t cornername, int16_t delta, uint16_t color) {
+                uint8_t cornername, int16_t delta, uint16_t color) {
 
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
@@ -223,7 +223,7 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
     u32 bytes = (u32)w * h;
-    LCD_DrawStart(x, y, x + w - 1, y + h, DRAW_NWSE);
+    LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE); // Bug fix: should be y+h-1 instead of y+h
     while(bytes--)
         LCD_DrawPixel(color);
     LCD_DrawStop();
@@ -351,7 +351,7 @@ u8 LCD_ImageIsTransparent(const char *file)
 
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
-    	printf("DEBUG: LCD_ImageIsTransparent: Buffer read issue?\n");
+        printf("DEBUG: LCD_ImageIsTransparent: Buffer read issue?\n");
         fclose(fh);
         return 0;
     }
@@ -382,7 +382,7 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
     if(fread(buf, 0x1a, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
         fclose(fh);
-    	printf("DEBUG: LCD_ImageDimensions: Buffer read issue?\n");
+        printf("DEBUG: LCD_ImageDimensions: Buffer read issue?\n");
         return 0;
     }
     fclose(fh);
@@ -404,7 +404,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
 
     fh = fopen(file, "rb");
     if(! fh) {
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
         if (w > 0 && h > 0)
             LCD_FillRect(x, y, w, h, 0);
         return;
@@ -415,7 +415,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     if(fread(buf, 0x46, 1, fh) != 1 || buf[0] != 'B' || buf[1] != 'M')
     {
         fclose(fh);
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
         return;
     }
     compression = *((u32 *)(buf + 0x1e));
@@ -425,8 +425,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
       )
     {
         fclose(fh);
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct\n");
-    	return;
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: BMP Format not correct\n");
+        return;
     }
     if(compression == 3)
     {
@@ -454,7 +454,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         h = img_h;
     if((u16)w + x_off > img_w || (u16)h + y_off > img_h)
     {
-    	printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: Dimensions asked for are out of bounds\n");
         printf("size: (%d x %d) bounds(%d x %d)\n", (u16)img_w, (u16)img_h, (u16)(w + x_off), (u16)(h + y_off));
         fclose(fh);
         return;

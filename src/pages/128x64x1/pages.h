@@ -8,7 +8,7 @@
 #include "../common/chantest_page.h"
 #include "../common/tx_configure.h"
 #include "scanner_page.h"
-#include "usb_page.h"
+#include "../common/usb_page.h"
 #include "telemtest_page.h"
 #include "config/display.h"
 
@@ -52,7 +52,7 @@ u8 PAGE_GetModal();
 void PAGE_RemoveAllObjects();
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
-void PAGE_ChangeByName(const char *pageName, u8 page);
+void PAGE_ChangeByName(const char *pageName, s8 page);
 void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data));
 void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
         guiObject_t *scroll_bar);
