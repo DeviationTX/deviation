@@ -5,8 +5,10 @@
 %s = %d%%, a biztonságos érték = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\na biztonságos érték = %d%%\n
->:+
->:-
+:+
++
+:-
+-
 :1-to-1
 1 az 1
 :11 Point
@@ -55,25 +57,30 @@ AUX4
 AUX5
 :Airplane
 Repülőgép
->:Alarm
->:Altitude
+:Alarm
+Riasztás
+:Altitude
+Magasság
 :Backlight:
 Fényerő:
 :Bar %d:
 Oszlop%d:
 :Bars:
 Oszlop:
->:Basic Config
+:Basic Config
+Alap beállítás
 :Battery Alarm:
 Tápfesz. riasztás:
->:Battery too low,\ncan't save!
+:Battery too low,\ncan't save!
+Tápfesz. túl alacsony,\nnem tudok menteni!
 :Bind
 Csatol
 :Binding
 Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
->:Binding... %d seconds\nPress ENT to stop
+:Binding... %d seconds\nPress ENT to stop
+Kapcsolódás... %d másodperc\nNyomjon ENT-t a leállításához
 :Box %d:
 Doboz%d:
 :Buttons
@@ -88,8 +95,10 @@ CYC
 Kalibrálás
 :Cancel
 Mégsem
->:Celcius
->:Center all sticks\nthen press ENT
+:Celcius
+Celsius
+:Center all sticks\nthen press ENT
+Állítsa középre a botkormányokat\nés nyomjon ENT-t
 :Ch
 Cs
 :Change
@@ -100,12 +109,14 @@ Csatornák
 Komplex
 :Configure
 Konfigurálás
->:Contrast:
+:Contrast:
+Kontraszt:
 :Copy To
 Másolás
 :Copy To...
 Másolás...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+A telepfeszültség kritikusan alacsony!\nA beállítások el lettek mentve,\nde a további változtatások\nNEM lesznek elmentve!\n\nCseréljen elemet!
 :Curve:
 Görbe:
 :Cyclic1
@@ -116,12 +127,14 @@ Ciklikus2
 Ciklikus3
 :DR
 DR
->:Deadband
+:Deadband
+Holtsáv
 :Default
 Default
 :Deviation FW\nversion:
 Deviation fw.\nverzió:
->:Dn
+:Dn
+Le
 :Down
 Le
 :ELE
@@ -144,10 +157,12 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
->:Fahrenheit
+:Fahrenheit
+Fahrenheit
 :Failsafe:
 Hibaérték:
->:Feet
+:Feet
+Láb
 :File:
 Fájl:
 :Fixed
@@ -176,7 +191,8 @@ BAL_V
 BAL_F
 :Language:
 Nyelv:
->:Latitude
+:Latitude
+Szélesség
 :Left
 Bal
 :Linked
@@ -185,8 +201,10 @@ Csatolt
 Betöltés
 :Load...
 Betöltés...
->:Longitude
->:Low Battery
+:Longitude
+Hosszúság
+:Low Battery
+Telep üres
 :Low-Rate
 Alacsony
 :MIX0
@@ -195,12 +213,14 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main Menu
+:Main Menu
+Főmenü
 :Main Page Config
 Főablak konfiguráció
 :Max:
 Max:
->:Meters
+:Meters
+Méter
 :Mid-Rate
 Közepes
 :Min/Max
@@ -209,24 +229,28 @@ Min/Max
 Min:
 :Mixer
 Mixer
->:Mixer Mode
+:Mixer Mode
+Mixer mód
 :Mixers:
 Mixerek:
 :Mode %d
 Mód %d
 :Model
 Modell
->:Model Config
+:Model Config
+Modell konfig.
 :Model Name:
 Modell név:
 :Model Type:
 Modell típus:
 >:Monitor
+Monitor
 :Move Down
 Lejjebb
 :Move Up
 Feljebb
->:Move sticks\nto max & min\nthen press ENT
+:Move sticks\nto max & min\nthen press ENT
+Mozgassa a botokat\nmin-max\nés nyomjon ENT-t
 :Mux:
 Művelet:
 :Neg
@@ -249,7 +273,8 @@ OK
 Ki
 :Offset:
 Eltolás:
->:Ok
+:Ok
+OK
 :On
 Be
 :Page:
@@ -262,13 +287,20 @@ Poz.
 Poz/Neg:
 :Press 'Ent' to turn USB Filesystem:
 \nNyomjon 'ENT'-t, hogy az USB:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
->:Procotol:
->:Protocol&Binding
+:Press ENT to change:
+Változtatáshoz ENT:
+:Press ENT to copy to:
+Másolás ENT:
+:Press ENT to load:
+Betöltés ENT:
+:Press ENT to start\ncalibration\nPress EXT to exit
+Kalibrálás ENT\nkilépés EXT
+:Press ENT to turn \nUSB drive: 
+Nyomjon ENT-t\n az USB:
+:Procotol:
+Protokoll:
+:Protocol&Binding
+Protokoll&Csatolás
 :Protocol:
 Protokol:
 :RIGHT_H
@@ -291,7 +323,8 @@ Törlés
 Invertálás:
 :Reversed
 Inverz
->:Revert
+:Revert
+Mégsem
 :Right
 Jobb
 :Safe Val:
@@ -310,14 +343,16 @@ Szkenner
 Egyszerű
 :Simple 4 Channel
 Egyszerű 4 csat.
->:Speed
+:Speed
+Sebesség
 :Src
 Forrás
 :Src:
 Forrás:
 :Start:
 Start:
->:Step:
+:Step:
+Lépés
 :Stick Mode:
 Mód:
 :Sticks:
@@ -374,7 +409,8 @@ Hőm:
 Sablon...
 :Test
 Teszt
->:Time
+:Time
+Idő
 :Timer
 Időzítő
 :Toggle%d
@@ -405,7 +441,8 @@ Trim:
 Kikapcsol
 :Turn On
 Bekapcsol
->:Tx Config
+:Tx Config
+Táv. konfig.
 :Tx Power:
 Kimenő teljesítmény:
 :USB
