@@ -20,6 +20,8 @@ sub main {
                "minspace=i" => \$minspace, 
                "maxsize=i" => \$maxsize);
     my $char = read_bdf(shift @ARGV);
+
+    $out =~ s/\.fon$//;
     if($mode =~ /analyze/) {
         analyze_chars($char);
     }

@@ -16,7 +16,7 @@ foreach (@files) {
     s/^.*?"(.*)"\s*$/$1/;
     $out[-1] .= $_;
 }
-foreach (`head -n 1 filesystem/template/*.ini`) {
+foreach (`head -n 1 filesystem/common/template/*.ini`) {
     chomp;
     if(/template=(.*?)\s*$/) {
         push @out, $1;
@@ -31,20 +31,22 @@ if(! $update) {
     exit 0;
 }
 
-foreach my $file (glob "filesystem/language/lang*") {
+foreach my $file (glob "filesystem/common/language/lang*") {
     my %strings = %uniq;
     my %unused;
     open my $fh, "<", $file;
     my $name = <$fh>;
     while(<$fh>) {
         chomp;
-        if(/^:(.*)/) {
+        if(/^:(.*)/) {               #/^([<>]?):(.*)/)
+            my($eng) = ($1);
             my $next = <$fh>;
             chomp $next;
-            if (! exists $uniq{$1}) {
-                $unused{$1} = 1;
+            #($next) = ($next =~ /^.(.*)/) if ($missing);
+            if (! exists $uniq{$eng}) {
+                $unused{$eng} = 1;
             }
-            $strings{$1} = $next;
+            $strings{$eng} = $next;
         }
     }
     open $fh, ">", $file;

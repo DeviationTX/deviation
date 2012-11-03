@@ -18,10 +18,10 @@ def main():
     max_ascent = 10
     space = 3
     name = "Deviation"
-    fonts = ('./Ubuntu-C.ttf',
-             './fireflysung.ttf',
-             './wqy-zenhei.ttc'
-             )
+    fonts = [['./Ubuntu-C.ttf', 0],
+             ['./fireflysung.ttf', 0],
+             ['./wqy-zenhei.ttc', 0],
+             ]
     usage = """
 %prog [-s|--size <size>] [-a|--ascent <ascent>] [-b|--bdffile <file>] [-t|--ttf <ttf1,ttf2,...>]
 """
@@ -33,7 +33,7 @@ def main():
     parser.add_option("-b", "--bdffile", action="store", dest="bdffile",
         default = name+".bdf", help="BDF file to create")
     parser.add_option("-t", "--ttf", action="append", dest="ttf",
-        help="Input ttf files to use (order is important)")
+        help="Input ttf files to use (order is important).  Append ':#' to force max font-size")
     parser.add_option("-d", "--debug", action="store_true", dest="debug",
         default=False, help="enable debug output")
     parser.add_option("-p", "--space", action="store", type="int", dest="space",
@@ -41,20 +41,29 @@ def main():
     (options, args) = parser.parse_args()
 
     if options.ttf:
-        fonts = options.ttf
+        fonts = []
+        for ttf in options.ttf:
+            f = ttf.rsplit(":", 1)
+            if len(f) == 1:
+                fonts.append([f[0], 0])
+            else:
+                fonts.append([f[0], int(f[1])])
     if options.ascent:
         max_ascent = options.ascent
     if options.size:
         target_size = options.size
     if options.space:
         space = options.space
+
     faces = []
-    for f in fonts:
+    for (f, s) in fonts:
         if not os.path.exists(f):
             print "Could not locate " + f + "Skipping\n"
             continue
         print "Using TTF file: " + f
-        faces.append(Face(f))
+        if s == 0:
+            s = target_size+1
+        faces.append([Face(f), s])
     max_descent = target_size - max_ascent
     char_set = [[0, 0x20, 0x7e],
                  [0, 0xa1, 0x101],
@@ -78,15 +87,16 @@ def main():
             #for each character
             uc = unichr(c)
             face = 0
-            for f in faces:
+            for (f,s) in faces:
                 if f.get_char_index(uc) != 0:
                     face = f
+                    maxsize = s
                     break
             if face == 0:
                 print "No character found for " + `c`
                 continue
             #we have found a character
-            for size in range(target_size+1, target_size-8, -1):
+            for size in range(maxsize, target_size-8, -1):
                 face.set_char_size( size*64 )
                 face.load_char(uc, FT_LOAD_RENDER | FT_LOAD_TARGET_MONO )
                 rows   = face.glyph.bitmap.rows
