@@ -1,6 +1,75 @@
-﻿繁體中文
+繁體中文
+:Main Menu
+主菜單
+:Bind
+對頻
+:Stick Mode：
+搖桿模式
+:Swash Type：
+斜盤類型
+:Power Amplifier
+發射功率
+:Model Name：
+模型命名
+:Model Type:
+機型選擇
+:About
+關於本軟件
+:D/R & Exp
+雙向舵量/曲線
+:Func Conf
+功能設置
+:Function Config
+功能設置
+:Model Conf
+模型設置
+:Model Config
+模型設置
+:Tx Conf
+遙控設置
+:Tx Config
+遙控設置
+:Thro Curve
+油門曲線
+:Pit Curve
+螺距曲線
+:Monitor
+通道監控
+:Binding... %d seconds\nPress ENT to stop
+對頻中...%d秒\n按ENT鍵中止對頻
+:Ok
+確定
+:Cancel
+取消
+:%s is %d%%, \nsafe value = %d%%
+%s值為%d%%, \n安全值應為%d%%
+:Battery to low, \ncan't save!
+電壓過低,\n無法保存修改!
+:Protocol
+協議
+:Channel#
+通道數
+:Protocol&Binding
+協議、對頻
+:Fixed ID
+固定ID碼
+:Heli
+直升機
+:Plane
+固定翼
+:Backlight
+背光
+:Contrast
+對比度
+:Language
+語言
+:Battery Alarm
+電量報警
+:test
+測試
+
 :%s is %d%%, safe value = %d%%\n
-%s = %d%%, 安定值 = %d%%\n
+%s = %d%%, 熄火保護 = %d%%\n
 :1-to-1
 1比1
 :11 Point
@@ -22,9 +91,9 @@
 :6 Trims
 6 微調
 :6Ch Airplane
-6通 固定翼
+6通固定翼
 :6Ch Helicopter
-6通 直升機
+6通直升機
 :7 Point
 7 點
 :8 Bars
@@ -37,6 +106,8 @@
 > 0
 :ABSVAL
 絕對值
+:ELE
+升降
 :AIL
 副翼
 :AIL DR
@@ -47,18 +118,11 @@
 輔助4
 :AUX5
 輔助5
-:Airplane
-固定翼
-:Backlight:
-背光:
 :Bar %d:
 Bar %d
 :Bars:
 Bars:
-:Battery Alarm:
-電池警報:
-:Bind
-對頻
+
 :Binding
 對頻中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
@@ -67,30 +131,26 @@ Bars:
 箱 %d:
 :Buttons
 按鍵
-:COL
-Колл
-:COL Inv:
-Колл Инв:
 :CYC
 循環
-:Calibrate
-校準
+:Calibration
+搖桿校準
 :Cancel
 取消
 :Center all sticks and touch the screen
-把遙杆置中再點觸屏
+把搖桿置中再點觸屏
 :Ch
-通
+通道
 :Change
 更改
 :Channels
 通道
 :Complex
-復雜
+混合
 :Configure
 設定
 :Copy To...
-復制到...
+複製到...
 :Curve:
 曲線:
 :Cyclic1
@@ -103,44 +163,30 @@ Bars:
 舵量
 :Default
 默認
-:Deviation FW\nversion: 
-Deviation\n固件版本: 
-:Down
-下
-:ELE
-升降
-:ELE DR
-升降舵量
-:ELE Inv:
-升降逆轉:
-:EXPO
-曲線
+:Deviation FW\nversion:
+Deviation\n固件版本:
 :Enter
 輸入
 :Exit
 退出
-:Expo&DR
-曲線與舵量
+
 :FMODE0
 常規飛行
 :FMODE1
-特技飛行1
+3D飛行1
 :FMODE2
-特技飛行2
-:Failsafe:
-失控保護:
+3D飛行2
+:Fail Safe
+失控保護
 :File:
 文檔:
 :Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
 文檔系統加載失敗。請透過USB創建文檔系統後按「輸入」退出。
 :Fixed
 固定
-:Fixed ID:
-固定ID碼:
+
 :GEAR
-起落架
-:Helicopter
-直升機
+尾舵
 :High-Rate
 高速率
 :Icon
@@ -155,16 +201,15 @@ Deviation\n固件版本:
 左水平
 :LEFT_V
 左垂直
-:Language:
-語言:
+
 :Left
 左
 :Linked
-連鎖的
+關聯
 :Load
-下載
+讀取
 :Load...
-下載中...
+讀取..
 :Low-Rate
 低速率
 :MIX0
@@ -173,8 +218,6 @@ Deviation\n固件版本:
 混控1
 :MIX2
 混控2
-:Main Page Config
-主設完頁
 :Max:
 上限:
 :Mid-Rate
@@ -191,14 +234,11 @@ Deviation\n固件版本:
 模式 %d
 :Model
 模型
-:Model Name:
-模型命名:
-:Model Type:
-機型選擇:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-把每支遙杆推到上下限\n再回中。完成後點觸屏結束。
+
+:Move each stick to full max\nand min values​​ then back to center.\nTouch the screen when finished
+把每支搖桿推到上下限\n再回中。完成後點觸屏結束。
 :Mux:
-復用器:
+疊加:
 :Neg
 負
 :No Bars
@@ -208,11 +248,11 @@ Deviation\n固件版本:
 :No Trims
 沒微調
 :None
-沒有
+無
 :Normal
 正常
 :Number of Channels:
-通道數量:
+通道數:
 :OK
 確認
 :Off
@@ -229,7 +269,7 @@ Deviation\n固件版本:
 正
 :Pos/Neg:
 正/負:
->:Press 'Ent' to turn USB Filesystem: 
+>:Press 'Ent' to turn USB Filesystem:
 :Protocol:
 協議:
 :RIGHT_H
@@ -237,20 +277,20 @@ Deviation\n固件版本:
 :RIGHT_V
 右垂直
 :RUD
-方向舵
+方向
 :RUD DR
 方向舵舵量
 >:Re-Init
 :Reset
 重啟
 :Reverse:
-逆轉:
+方向:
 :Reversed
-逆轉
+反轉
 :Right
 右
 :Safe Val:
-安定值:
+安全值:
 :Safety
 安全
 :Safety:
@@ -260,7 +300,7 @@ Deviation\n固件版本:
 :Scale:
 比例:
 :Scanner
-掃描器 
+掃描器
 :Simple
 簡單
 :Simple 4 Channel
@@ -271,14 +311,13 @@ Deviation\n固件版本:
 來源:
 :Start:
 開始:
-:Stick Mode:
-遙杆模式:
-:Sticks:
-遙杆:
-:Subtrim:
-系統微調:
-:SwashType:
-斜盤類型:
+:Stick Mode
+搖桿模式
+:Stick Direction
+搖桿方向
+:Sub Trim
+舵機微調
+
 :Switch1
 開關1
 :Switch2
@@ -345,26 +384,25 @@ Deviation\n固件版本:
 微調-:
 :Trim Step:
 微調步寬:
-:Trims:
-微調:
+:Sub Trim
+微調
 :Turn Off
 關機
 :Turn On
 開機
-:Tx Power:
-發射功率:
+
 :USB
 USB
 :USB Storage mode, press 'ENT' to exit.
 USB儲存模式，按「輸入」退出。
 :Unknown
-不知名
+無名
 :Up
 上
 :Value:
 數值:
 :Virt
-垂直
+虛擬
 :Zero/Max
 零/上限
 :\n\nBinding will end in %d seconds...
@@ -378,4 +416,174 @@ USB儲存模式，按「輸入」退出。
 :replace
 替換
 :stopwatch
-秒表
+秒錶
+:Normal
+姝ｅ父
+:Number of Channels:
+閫氶亾鏁搁噺:
+:OK
+纰鸿獚
+:Off
+闂滈枆
+:Offset:
+鎶垫秷:
+:On
+闁嬪暉
+:Page:
+闋�
+:Point:
+榛�
+:Pos
+姝�
+:Pos/Neg:
+姝�璨�
+>:Press 'Ent' to turn USB Filesystem: 
+:Protocol:
+鍗旇:
+:RIGHT_H
+鍙虫按骞�
+:RIGHT_V
+鍙冲瀭鐩�
+:RUD
+鏂瑰悜鑸�
+:RUD DR
+鏂瑰悜鑸佃埖閲�
+>:Re-Init
+:Reset
+閲嶅暉
+:Reverse:
+閫嗚綁:
+:Reversed
+閫嗚綁
+:Right
+鍙�
+:Safe Val:
+瀹夊畾鍊�
+:Safety
+瀹夊叏
+:Safety:
+瀹夊叏:
+:Save
+淇濆瓨
+:Scale:
+姣斾緥:
+:Scanner
+鎺冩弿鍣�
+:Simple
+绨″柈
+:Simple 4 Channel
+绨″柈4閫氶亾
+:Src
+渚嗘簮
+:Src:
+渚嗘簮:
+:Start:
+闁嬪:
+:Stick Mode:
+閬欐潌妯″紡:
+:Sticks:
+閬欐潌:
+:Subtrim:
+绯荤当寰:
+:SwashType:
+鏂滅洡椤炲瀷:
+:Switch1
+闁嬮棞1
+:Switch2
+闁嬮棞2
+:Switch:
+闁嬮棞:
+:Symmetric
+灏嶇ū
+:THR
+娌归杸
+:TRIMLH+
+寰LH+
+:TRIMLH-
+寰LH-
+:TRIMLV+
+寰Lv+
+:TRIMLV-
+寰LV-
+:TRIMRH+
+寰RH+
+:TRIMRH-
+寰RH-
+:TRIMRV+
+寰RV+
+:TRIMRV-
+寰RV-
+:TRIM_L+
+寰L+
+:TRIM_L-
+寰L-
+:TRIM_R+
+寰R+
+:TRIM_R-
+寰R-
+:Template..
+妯℃澘..
+:Test
+娓│
+:Timer
+瀹氭檪鍣�
+:Timer1
+瀹氭檪鍣�
+:Timer2
+瀹氭檪鍣�
+:Toggle%d
+闁嬮棞%d
+:Touch Calibrate
+瑙稿睆鏍℃簴
+:Touch Screen:
+瑙稿睆:
+:Touch Test
+瑙稿睆娓│
+:Touch target %d
+瑙哥灏嶈薄 %d
+:Touch to Lock
+瑙哥涓婇帠
+:Touch to Unlock
+瑙哥瑙ｉ帠
+:Trim
+寰
+:Trim +:
+寰+:
+:Trim -:
+寰-:
+:Trim Step:
+寰姝ュ:
+:Trims:
+寰:
+:Turn Off
+闂滄
+:Turn On
+闁嬫
+:Tx Power:
+鐧煎皠鍔熺巼:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+USB鍎插瓨妯″紡锛屾寜銆岃几鍏ャ�閫�嚭銆�
+:Unknown
+涓嶇煡鍚�
+:Up
+涓�
+:Value:
+鏁稿�:
+:Virt
+鍨傜洿
+:Zero/Max
+闆�涓婇檺
+:\n\nBinding will end in %d seconds...
+\n\n%d绉掑緦灏嶉牷绲愭潫...
+:add
+鍔�
+:countdown
+鍊掓暩
+:mult
+澶氭鐨�
+:replace
+鏇挎彌
+:stopwatch
+绉掕〃

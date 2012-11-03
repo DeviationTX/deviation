@@ -1,6 +1,75 @@
 ﻿简体中文
+:Main Menu
+主菜单
+:Bind
+对频
+:Stick Mode：
+摇杆模式
+:Swash Type：
+斜盘类型
+:Power Amplifier
+发射功率
+:Model Name：
+模型命名
+:Model Type:
+机型选择
+:About
+关于本软件
+:D/R & Exp
+双向舵量/曲线
+:Func Conf
+功能设置
+:Function Config
+功能设置
+:Model Conf
+模型设置
+:Model Config
+模型设置
+:Tx Conf
+遥控设置
+:Tx Config
+遥控设置
+:Thro Curve
+油门曲线
+:Pit Curve
+螺距曲线
+:Monitor
+通道监控
+:Binding... %d seconds\nPress ENT to stop
+对频中...%d秒\n按ENT键中止对频
+:Ok
+确定
+:Cancel
+取消
+:%s is %d%%, \nsafe value = %d%%
+%s值为%d%%, \n安全值应为%d%%
+:Battery to low, \ncan't save!
+电压过低,\n无法保存修改!
+:Protocol
+协议
+:Channel#
+通道数
+:Protocol&Binding
+协议、对频
+:Fixed ID
+固定ID码
+:Heli
+直升机
+:Plane
+固定翼
+:Backlight
+背光
+:Contrast
+对比度
+:Language
+语言
+:Battery Alarm
+电量报警
+:test
+测试
+
 :%s is %d%%, safe value = %d%%\n
-%s = %d%%, 安定值 = %d%%\n
+%s = %d%%, 熄火保护 = %d%%\n
 :1-to-1
 1比1
 :11 Point
@@ -22,9 +91,9 @@
 :6 Trims
 6 微调
 :6Ch Airplane
-6通 固定翼
+6通固定翼
 :6Ch Helicopter
-6通 直升机
+6通直升机
 :7 Point
 7 点
 :8 Bars
@@ -37,6 +106,8 @@
 > 0
 :ABSVAL
 绝对值
+:ELE
+升降
 :AIL
 副翼
 :AIL DR
@@ -47,18 +118,11 @@
 辅助4
 :AUX5
 辅助5
-:Airplane
-固定翼
-:Backlight:
-背光:
 :Bar %d:
 Bar %d
 :Bars:
 Bars:
-:Battery Alarm:
-电池警报:
-:Bind
-对频
+
 :Binding
 对频中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
@@ -67,26 +131,22 @@ Bars:
 箱 %d:
 :Buttons
 按键
-:COL
-Колл
-:COL Inv:
-Колл Инв:
 :CYC
 循环
-:Calibrate
-校准
+:Calibration
+摇杆校准
 :Cancel
 取消
 :Center all sticks and touch the screen
-把遥杆置中再点触屏
+把摇杆置中再点触屏
 :Ch
-通
+通道
 :Change
 更改
 :Channels
 通道
 :Complex
-复杂
+混合
 :Configure
 设定
 :Copy To...
@@ -105,42 +165,28 @@ Bars:
 默认
 :Deviation FW\nversion: 
 Deviation\n固件版本: 
-:Down
-下
-:ELE
-升降
-:ELE DR
-升降舵量
-:ELE Inv:
-升降逆转:
-:EXPO
-曲线
 :Enter
 输入
 :Exit
 退出
-:Expo&DR
-曲线与舵量
+
 :FMODE0
 常规飞行
 :FMODE1
-特技飞行1
+3D飞行1
 :FMODE2
-特技飞行2
-:Failsafe:
-失控保护:
+3D飞行2
+:Fail Safe
+失控保护
 :File:
 文档:
 :Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
 文档系统加载失败。请透过USB创建文档系统後按「输入」退出。
 :Fixed
 固定
-:Fixed ID:
-固定ID码:
+
 :GEAR
-起落架
-:Helicopter
-直升机
+尾舵
 :High-Rate
 高速率
 :Icon
@@ -155,16 +201,15 @@ Deviation\n固件版本:
 左水平
 :LEFT_V
 左垂直
-:Language:
-语言:
+
 :Left
 左
 :Linked
-连锁的
+关联
 :Load
-下载
+读取
 :Load...
-下载中...
+读取..
 :Low-Rate
 低速率
 :MIX0
@@ -173,8 +218,6 @@ Deviation\n固件版本:
 混控1
 :MIX2
 混控2
-:Main Page Config
-主设完页
 :Max:
 上限:
 :Mid-Rate
@@ -191,14 +234,11 @@ Deviation\n固件版本:
 模式 %d
 :Model
 模型
-:Model Name:
-模型命名:
-:Model Type:
-机型选择:
+
 :Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-把每支遥杆推到上下限\n再回中。完成後点触屏结束。
+把每支摇杆推到上下限\n再回中。完成後点触屏结束。
 :Mux:
-复用器:
+叠加:
 :Neg
 负
 :No Bars
@@ -208,11 +248,11 @@ Deviation\n固件版本:
 :No Trims
 没微调
 :None
-没有
+无
 :Normal
 正常
 :Number of Channels:
-通道数量:
+通道数:
 :OK
 确认
 :Off
@@ -237,20 +277,20 @@ Deviation\n固件版本:
 :RIGHT_V
 右垂直
 :RUD
-方向舵
+方向
 :RUD DR
 方向舵舵量
 >:Re-Init
 :Reset
 重启
 :Reverse:
-逆转:
+方向:
 :Reversed
-逆转
+反转
 :Right
 右
 :Safe Val:
-安定值:
+安全值:
 :Safety
 安全
 :Safety:
@@ -271,14 +311,13 @@ Deviation\n固件版本:
 来源:
 :Start:
 开始:
-:Stick Mode:
-遥杆模式:
-:Sticks:
-遥杆:
-:Subtrim:
-系统微调:
-:SwashType:
-斜盘类型:
+:Stick Mode
+摇杆模式
+:Stick Direction
+摇杆方向
+:Sub Trim
+舵机微调
+
 :Switch1
 开关1
 :Switch2
@@ -345,26 +384,25 @@ Deviation\n固件版本:
 微调-:
 :Trim Step:
 微调步宽:
-:Trims:
-微调:
+:Sub Trim
+微调
 :Turn Off
 关机
 :Turn On
 开机
-:Tx Power:
-发射功率:
+
 :USB
 USB
 :USB Storage mode, press 'ENT' to exit.
 USB储存模式，按「输入」退出。
 :Unknown
-不知名
+无名
 :Up
 上
 :Value:
 数值:
 :Virt
-垂直
+虚拟
 :Zero/Max
 零/上限
 :\n\nBinding will end in %d seconds...
@@ -379,3 +417,4 @@ USB储存模式，按「输入」退出。
 替换
 :stopwatch
 秒表
+
