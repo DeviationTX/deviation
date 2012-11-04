@@ -5,7 +5,7 @@
 #include "gui/gui.h"
 #include "buttons.h"
 #define NUM_COMPLEX_MIXERS 10
-#define LONG_PRESS_STEP 10  // for devo8, would be 5 instead
+#define LONG_PRESS_STEP 5
 #define SUBTRIM_RANGE 500  // subtrim <100 is insufficient
 
 struct curve_edit {

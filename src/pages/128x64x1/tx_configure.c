@@ -109,8 +109,10 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     Transmitter.contrast = GUI_TextSelectHelper(Transmitter.contrast,
                                   MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
-    if (changed)
-        BACKLIGHT_Brightness(Transmitter.brightness);
+    if (changed) {
+        int contrast = 0x20 + Transmitter.contrast * 0xC / 9;
+        LCD_set_contrast(contrast);
+    }
     if (Transmitter.contrast == 0)
         return _tr("Off");
     sprintf(cp->tmpstr, "%d", Transmitter.contrast);

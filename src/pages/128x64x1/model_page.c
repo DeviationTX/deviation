@@ -34,6 +34,11 @@ static s8 selected = 0;
 
 void PAGE_ModelInit(int page)
 {
+    //Todo: refactor the binding page later on
+    (void)fixedid_cb;
+    (void)bind_cb;
+    (void)protoselect_cb;
+    (void)changeicon_cb;
     if (page < 0 && selected > 0) // enter this page from childen page , so we need to get its previous selected item
         page = selected;
     PAGE_SetActionCB(_action_cb);

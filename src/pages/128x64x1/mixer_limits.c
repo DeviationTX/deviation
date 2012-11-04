@@ -25,7 +25,6 @@ static const char *_reverse_cb_in_live(guiObject_t *obj, int dir, void *data);
 
 #define LEFT_VIEW_ID 0
 #define FIRST_PAGE_ITEM_IDX  1  // 0 is the button obj
-#define LONG_PRESS_STEP 10  // for devo10, would prefer 10 instead
 
 static s8 current_selected_item;
 static guiObject_t *titleObj = NULL;
