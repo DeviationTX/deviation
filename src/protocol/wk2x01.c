@@ -414,11 +414,13 @@ u32 WK2x01_Cmds(enum ProtoCmds cmd)
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
         case PROTOCMD_BIND:  bind(); return 0;
         case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
-                                      ? 8
-                                      : (Model.protocol == PROTOCOL_WK2601)
-                                        ? 6
-                                        : 4;
-
+              ? 8
+              : (Model.protocol == PROTOCOL_WK2601)
+                ? 6
+                : 4;
+        case PROTOCMD_SET_TXPOWER:
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
+            break;
         default: break;
     }
     return 0;
