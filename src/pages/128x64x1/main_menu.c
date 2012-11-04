@@ -10,7 +10,7 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 
 static const char *menu_item_name_deviation[] = {
-    "Model Conf", "Tx Conf", 0
+    _tr_noop("Model Conf"), _tr_noop("Tx Conf"), 0
 };
 
 static s8 selected_menu_idx = 0;
