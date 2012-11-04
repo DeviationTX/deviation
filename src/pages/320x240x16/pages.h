@@ -11,7 +11,7 @@
 #include "../common/usb_page.h"
 #include "../common/tx_configure.h"
 #include "telemtest_page.h"
-#include "telemconfig_page.h"
+#include "../common/telemconfig_page.h"
 #include "config/display.h"
 
 #define SECTION_MAIN    0

@@ -7,10 +7,11 @@
 #include "../common/timer_page.h"
 #include "../common/model_page.h"
 #include "../common/chantest_page.h"
-#include "../common/tx_configure.h"
 #include "scanner_page.h"
 #include "../common/usb_page.h"
+#include "../common/tx_configure.h"
 #include "telemtest_page.h"
+#include "../common/telemconfig_page.h"
 #include "config/display.h"
 
 #include "main_menu.h"
@@ -21,22 +22,23 @@
 struct pagemem {
     union {
         struct main_page main_page;
-        struct main_menu_page main_menu_page;
-        struct sub_menu_page sub_menu_page;
-        struct chantest_page chantest_page;
-        struct tx_configure_page tx_configure_page;
-        struct single_itemCofig_page single_itemCofig_page;
-        struct multi_items_config_page multi_items_config_page;
-
-
-        struct telemtest_page telemtest_page;
         struct mixer_page mixer_page;
         struct trim_page trim_page;
         struct model_page model_page;
         struct timer_page timer_page;
+        struct chantest_page chantest_page;
         struct scanner_page scanner_page;
         struct usb_page usb_page;
+        struct tx_configure_page tx_configure_page;
+        struct telemtest_page telemtest_page;
+        struct telemconfig_page telemconfig_page;
+
+        struct main_menu_page main_menu_page;
+        struct sub_menu_page sub_menu_page;
+        struct single_itemCofig_page single_itemCofig_page;
+        struct multi_items_config_page multi_items_config_page;
     } u;
+    u8 modal_page;
 };
 #define PAGE_NAME_MAX 10
 #define ITEM_HEIGHT 12
