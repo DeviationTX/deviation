@@ -52,7 +52,7 @@ void PAGE_MainInit(int page)
             0, 0, &SMALL_FONT, NULL, NULL, Model.name);
 
     // Logo label
-    GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
+    //GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
 
     //heli/plane Icon
     struct LabelDesc desc = DEFAULT_FONT;
