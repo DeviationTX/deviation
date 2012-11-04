@@ -2,7 +2,7 @@
 #define _PAGES_H_
 
 #include "../common/mixer_page.h"
-#include "main_page.h"
+#include "../common/main_page.h"
 #include "../common/trim_page.h"
 #include "../common/timer_page.h"
 #include "../common/model_page.h"

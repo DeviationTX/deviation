@@ -22,19 +22,11 @@
 #include "main_config.h"
 #include "telemetry.h"
 
-//#ifdef DEBUG_KEY_INPUT  // To debug button press codes in real devo10
+#include "../common/_main_page.c"
 
-static struct main_page * const mp = &pagemem.u.main_page;
-const char *show_box_cb(guiObject_t *obj, const void *data);
-const char *voltage_cb(guiObject_t *obj, const void *data);
-static s16 trim_cb(void * data);
-//void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
-//void press_icon2_cb(guiObject_t *obj, const void *data);
-//void press_box_cb(guiObject_t *obj, s8 press_type, const void *data);
-static u8 action_cb(u32 button, u8 flags, void *data);
-const char *power_to_string();
-static s32 get_boxval(u8 idx);
-static s16 last_battery = 0;
+static const char *_power_to_string();
+#define BATTERY_SCAN_MSEC 2000 // refresh battery for every 2sec to avoid its label blinking
+static u32 next_scan=0;
 
 /*
  * Main page
@@ -44,24 +36,31 @@ static s16 last_battery = 0;
  */
 void PAGE_MainInit(int page)
 {
+    (void)bar_cb;
     (void)page;
     int i;
     u16 x, y, w, h;
     PAGE_SetModal(0);
-    PAGE_SetActionCB(action_cb);
+    PAGE_SetActionCB(_action_cb);
+    next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     //mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     //if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
     //    GUI_CreateIcon(32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
-    mp->nameObj = GUI_CreateLabelBox(64, 12, 70, 10, &SMALL_FONT, NULL, NULL, Model.name);
+    mp->nameObj = GUI_CreateLabelBox(0, 1, //64, 12,
+            0, 0, &SMALL_FONT, NULL, NULL, Model.name);
 
     // Logo label
     GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
 
     //heli/plane Icon
+    struct LabelDesc desc = DEFAULT_FONT;
+    desc.font_color = 1;
+    desc.fill_color = 1;
     if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
+        GUI_CreateRect(x, y, w, h, &desc);
+        //GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
 
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
@@ -89,10 +88,9 @@ void PAGE_MainInit(int page)
     mp->battery = PWR_ReadVoltage();
     mp->battObj = GUI_CreateLabelBox(85,1, 40, 8, &TINY_FONT,  voltage_cb, NULL, NULL);
     //TxPower
-    GUI_CreateLabelBox(54,1, 0, 0,&TINY_FONT, power_to_string, NULL, NULL);
+    GUI_CreateLabelBox(85, 12,  //54,1,
+            40, 8,&TINY_FONT, _power_to_string, NULL, NULL);
 }
-
-
 
 void PAGE_MainEvent()
 {
@@ -126,21 +124,21 @@ void PAGE_MainEvent()
             GUI_Redraw(mp->boxObj[i]);
         }
     }
-    s16 batt = PWR_ReadVoltage();
-    if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
-        mp->battery = batt;
-        GUI_Redraw(mp->battObj);
+    if (CLOCK_getms() > next_scan)  {  // don't need to check battery too frequently, to avoid blink of the battery label
+        next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
+        s16 batt = PWR_ReadVoltage();
+        if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
+            mp->battery = batt;
+            GUI_Redraw(mp->battObj);
+        }
     }
-#ifdef DEBUG_KEY_INPUT
-    GUI_Redraw(mp->battObj); //  remove this line
-#endif
 }
 
 void PAGE_MainExit()
 {
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         PAGE_ChangeByName("MainMenu", 0);
@@ -159,99 +157,6 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     return 1;
 }
 
-s32 get_boxval(u8 idx)
-{
-    if (idx <= NUM_TIMERS)
-        return TIMER_GetValue(idx - 1);
-    if(idx - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_GetValue(idx - NUM_TIMERS);
-    return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY));
-}
-
-const char *show_box_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 idx = (long)data;
-    if (idx <= NUM_TIMERS) {
-        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
-    } else if(idx - NUM_TIMERS <= NUM_TELEM) {
-        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS);
-    } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY)));
-    }
-    return mp->tmpstr;
-}
-
-const char *voltage_cb(guiObject_t *obj, const void *data) {
-    static u8 voltageClear = 0;
-    (void)obj;
-    (void)data;
-    if (mp->battery - last_battery < 0 || mp->battery  - last_battery > 100){
-        last_battery = mp->battery; // to avoid blinking in battery display
-
-    }
-    sprintf(mp->tmpstr, "%2d.%02dv", last_battery / 1000, (last_battery % 1000) / 10);
-    if (mp->battery < Transmitter.batt_alarm) {  // let the voltage label flashed when low voltage
-        voltageClear = !voltageClear;
-        if (voltageClear) {
-            mp->tmpstr[0] = 0;
-        }
-    }
-#ifdef DEBUG_KEY_INPUT
-    int i = ScanButtons();
-    sprintf(mp->tmpstr, "%x", i);
-#endif
-    return mp->tmpstr;
-}
-
-s16 trim_cb(void * data)
-{
-    s8 *trim = (s8 *)data;
-    return *trim;
-}
-
-/* s16 bar_cb(void * data)
-{
-    u8 idx = (long)data;
-    return MIXER_GetChannel(idx-1, APPLY_SAFETY);
-}
-
-void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if(press_type == -1) {
-        if ((long)data == 0) {
-            PAGE_SetSection(SECTION_OPTIONS);
-        } else if ((long)data == 1) {
-            PAGE_SetSection(SECTION_MODEL);
-        } else {
-            PAGE_SetModal(1);
-            PAGE_MainExit();
-            MODELPage_ShowLoadSave(0, PAGE_MainInit);
-        }
-    }
-}
-
-void press_icon2_cb(guiObject_t *obj, const void *data)
-{
-    press_icon_cb(obj, -1, data);
-}
-
-void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    u8 idx = (long)data;
-    if (idx > 2)
-        return;
-    if(press_type == -1 && ! mp->ignore_release) 
-        TIMER_StartStop(idx-1);
-    mp->ignore_release = 0;
-    if(press_type > 0) {
-        TIMER_Reset(idx-1);
-        mp->ignore_release = 1;
-    }
-}*/
-
 /**
  * Below are defined in the common.h
  *  TXPOWER_100uW,  // -10db
@@ -263,7 +168,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
  *  TXPOWER_100mW, // 20db
  *  TXPOWER_150mW, // 22db
  */
-const char *power_to_string()
+static const char *_power_to_string()
 {
     return RADIO_TX_POWER_VAL[Model.tx_power];
 }

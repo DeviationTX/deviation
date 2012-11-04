@@ -22,26 +22,7 @@
 #include "main_config.h"
 #include "telemetry.h"
 
-static struct main_page * const mp = &pagemem.u.main_page;
-const char *show_box_cb(guiObject_t *obj, const void *data);
-const char *voltage_cb(guiObject_t *obj, const void *data);
-static s16 trim_cb(void * data);
-static s16 bar_cb(void * data);
-void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
-void press_icon2_cb(guiObject_t *obj, const void *data);
-void press_box_cb(guiObject_t *obj, s8 press_type, const void *data);
-static u8 action_cb(u32 button, u8 flags, void *data);
-
-static s32 get_boxval(u8 idx);
-
-struct LabelDesc *get_box_font(u8 idx, u8 neg)
-{
-    if(neg) {
-        return idx & 0x02 ? &SMALLBOXNEG_FONT : &BIGBOXNEG_FONT;
-    } else {
-        return idx & 0x02 ? &SMALLBOX_FONT : &BIGBOX_FONT;
-    }
-}
+#include "../common/_main_page.c"
 
 void PAGE_MainInit(int page)
 {
@@ -58,7 +39,7 @@ void PAGE_MainInit(int page)
           | CHAN_ButtonMask(BUT_RIGHT)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
-          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
+          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
     mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
@@ -199,51 +180,9 @@ void PAGE_MainEvent()
     }
 }
 
-s32 get_boxval(u8 idx)
-{
-    if (idx <= NUM_TIMERS)
-        return TIMER_GetValue(idx - 1);
-    if(idx - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_GetValue(idx - NUM_TIMERS);
-    return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY));
-}
-
 void PAGE_MainExit()
 {
     BUTTON_UnregisterCallback(&mp->action);
-}
-
-const char *show_box_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 idx = (long)data;
-    if (idx <= NUM_TIMERS) {
-        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
-    } else if(idx - NUM_TIMERS <= NUM_TELEM) {
-        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS);
-    } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY)));
-    }
-    return mp->tmpstr;
-}
-
-const char *voltage_cb(guiObject_t *obj, const void *data) {
-    (void)obj;
-    (void)data;
-    sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
-    return mp->tmpstr;
-}
-
-s16 trim_cb(void * data)
-{
-    s8 *trim = (s8 *)data;
-    return *trim;
-}
-
-s16 bar_cb(void * data)
-{
-    u8 idx = (long)data;
-    return MIXER_GetChannel(idx-1, APPLY_SAFETY);
 }
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
@@ -289,7 +228,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
     }
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     if(! GUI_GetSelected()) {
         if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
