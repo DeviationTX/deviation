@@ -3,9 +3,12 @@
 # каналов:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, безопасное значение = %d%%\n
->:%s is %d%%,\nsafe value = %d%%
->:+
->:-
+:%s is %d%%,\nsafe value = %d%%
+%s = %d%%,\nбезопасное значение = %d%%
+:+
++
+:-
+-
 :1-to-1
 1-к-1
 :11 Point
@@ -54,25 +57,30 @@ AUX4
 AUX5
 :Airplane
 Самолет
->:Alarm
->:Altitude
+:Alarm
+Сигнал
+:Altitude
+Высота
 :Backlight:
 Подсветка:
 :Bar %d:
 Полоса%d
 :Bars:
 Полоса:
->:Basic Config
+:Basic Config
+Основная настройка
 :Battery Alarm:
 Сигнал батареи:
->:Battery too low,\ncan't save!
+:Battery too low,\ncan't save!
+Батарея разряжена,\nсохранение невозможно!
 :Bind
 Привязка
 :Binding
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
->:Binding... %d seconds\nPress ENT to stop
+:Binding... %d seconds\nPress ENT to stop
+Привязка... %d секунд\nНажмите ENT для остановки
 :Box %d:
 Бокс %d:
 :Buttons
@@ -87,8 +95,10 @@ AUX5
 Калибровка
 :Cancel
 Отмена
->:Celcius
->:Center all sticks\nthen press ENT
+:Celcius
+Цельсий
+:Center all sticks\nthen press ENT
+Отцентруйте все стики,\nзатем нажмите ENT
 :Ch
 Канал 
 :Change
@@ -99,11 +109,14 @@ AUX5
 Комплекс
 :Configure
 Настройки передатчика
->:Contrast:
->:Copy To
+:Contrast:
+Контраст:
+:Copy To
+Копир. в
 :Copy To...
 Копир. в...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Обнаружен критический разряд батареи.\nНастройки сохранены.\nДальнейшие изменения настроек\nне будут сохраняться.\n\nНемедленно замените батарею!
 :Curve:
 Кривая:
 :Cyclic1
@@ -114,12 +127,14 @@ AUX5
 Цикл3
 :DR
 ДР
->:Deadband
+:Deadband
+Мертвая зона
 :Default
 Умолчание
 :Deviation FW\nversion:
 Прошивка Deviation\nверсия:
->:Dn
+:Dn
+Вниз
 :Down
 Вниз
 :ELE
@@ -142,10 +157,12 @@ AUX5
 ПРежим1
 :FMODE2
 ПРежим2
->:Fahrenheit
+:Fahrenheit
+Фаренгейт
 :Failsafe:
 Отказоустойчивость:
->:Feet
+:Feet
+Фут
 :File:
 Файл:
 :Fixed
@@ -164,16 +181,18 @@ AUX5
 Ввод:
 :Inputs
 Вводы
->:Insert
+:Insert
+Вставить
 :Inverted
-Инвертированный
+Реверс
 :LEFT_H
 ЛЕВЫЙ_Г
 :LEFT_V
 ЛЕВЫЙ_В
 :Language:
 Язык:
->:Latitude
+:Latitude
+Широта
 :Left
 Левый
 :Linked
@@ -182,8 +201,10 @@ AUX5
 Загрузить
 :Load...
 Загрузка...
->:Longitude
->:Low Battery
+:Longitude
+Долгота
+:Low Battery
+Батарея разряжена
 :Low-Rate
 Низкий расход
 :MIX0
@@ -192,12 +213,14 @@ AUX5
 МИКШ1
 :MIX2
 МИКШ2
->:Main Menu
+:Main Menu
+Главное меню
 :Main Page Config
 Главная страница настройки
 :Max:
 Макс.:
->:Meters
+:Meters
+Метры
 :Mid-Rate
 Средний расход
 :Min/Max
@@ -206,27 +229,34 @@ AUX5
 Мин.:
 :Mixer
 Микшер
->:Mixer Mode
+:Mixer Mode
+Режим микшера
 :Mixers:
 Микшер:
 :Mode %d
 Режим %d
 :Model
 Модель
->:Model Config
+:Model Config
+Модель
 :Model Name:
 Имя модели:
 :Model Type:
 Тип модели:
->:Monitor
->:Move Down
->:Move Up
->:Move sticks\nto max & min\nthen press ENT
+:Monitor
+Монитор
+:Move Down
+Вниз
+:Move Up
+Вверх
+:Move sticks\nto max & min\nthen press ENT
+Переместите стики\nв максимум и минимум,\nзатем нажмите ENT
 :Mux:
 Мульт:
 :Neg
 -
->:New
+:New
+Новый
 :No Bars
 Без полос
 :No Trim
@@ -243,7 +273,8 @@ OK
 Выкл.
 :Offset:
 Смещ.:
->:Ok
+:Ok
+ОК
 :On
 Вкл.
 :Page:
@@ -256,34 +287,44 @@ OK
 +/-:
 :Press 'Ent' to turn USB Filesystem:
 \nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
->:Procotol:
->:Protocol&Binding
+:Press ENT to change:
+Нажмите ENT для изменения:
+:Press ENT to copy to:
+Нажмите ENT для копирования в:
+:Press ENT to load:
+Нажмите ENT для загрузки:
+:Press ENT to start\ncalibration\nPress EXT to exit
+Нажмите ENT для старта\nкалибровки\nНажмите EXT для выхода
+:Press ENT to turn \nUSB drive: 
+Нажмите ENT для перевода\nUSB диска в состояние:
+:Procotol:
+Протокол:
+:Protocol&Binding
+Протокол и привязка
 :Protocol:
 Протокол:
 :RIGHT_H
 ПРАВЫЙ_Г
 :RIGHT_V
 ПРАВЫЙ_В
->:RPM
+:RPM
+RPM
 :RUD
 РНапр
 :RUD DR
 РНапр ДР
 :Re-Init
 Привязка
->:Remove
+:Remove
+Удалить
 :Reset
 Сброс
 :Reverse:
 Реверс:
 :Reversed
 Реверс
->:Revert
+:Revert
+Отменить
 :Right
 Вправо
 :Safe Val:
@@ -302,14 +343,16 @@ OK
 Простой
 :Simple 4 Channel
 Простой 4-канала
->:Speed
+:Speed
+Скорость
 :Src
 Источник
 :Src:
 Источник:
 :Start:
 Старт:
->:Step:
+:Step:
+Шаг
 :Stick Mode:
 Режим стиков:
 :Sticks:
@@ -352,16 +395,22 @@ OK
 Трим_П+
 :TRIM_R-
 Трим_П-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
->:Temp
+:TelemRPM
+ТелеRPM
+:TelemT
+ТелеT
+:TelemV
+ТелеV
+:Telemetry
+Телеметрия
+:Temp
+Темп.
 :Template..
 Шаблон...
 :Test
 Тест
->:Time
+:Time
+Время
 :Timer
 Таймер
 :Toggle%d
@@ -392,7 +441,8 @@ OK
 Выключить
 :Turn On
 Включить
->:Tx Config
+:Tx Config
+Передатчик
 :Tx Power:
 Мощность:
 :USB
@@ -405,7 +455,8 @@ USB
 Значение:
 :Virt
 Вирт. 
->:Volt
+:Volt
+Вольт
 :Zero/Max
 Ноль/Макс
 :\n\nBinding will end in %d seconds...
