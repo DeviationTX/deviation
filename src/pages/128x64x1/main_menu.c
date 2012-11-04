@@ -10,7 +10,7 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 
 static const char *menu_item_name_deviation[] = {
-    _tr_noop("Model Conf"), _tr_noop("Tx Conf"), 0
+    _tr_noop("Model Config"), _tr_noop("Tx Config"), 0
 };
 
 static s8 selected_menu_idx = 0;
@@ -113,10 +113,10 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data)
     else if (!strcmp("Func Conf", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Model Conf", str)) {
+    else if (!strcmp("Model Config", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Tx Conf", str)) {
+    else if (!strcmp("Tx Config", str)) {
         PAGE_ChangeByName("SubMenu", 1);
     }
 }
