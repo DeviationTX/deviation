@@ -20,6 +20,7 @@
 
 #include "_listbox.c"
 static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
+static u8 press_cb(u32 button, u8 flags, void *data);
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
@@ -27,65 +28,13 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
         void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
         void *cb_data)
 {
-    struct guiObject  *obj = GUI_GetFreeObj();
-    struct guiListbox *listbox;
-    struct guiBox     *box;
-    u16 text_w, text_h;
-    s16 pos = 0;
-    u8 sb_entries;
-
-    if (obj == NULL)
-        return NULL;
-
-    box = &obj->box;
-    listbox = &obj->o.listbox;
-
-    box->x = x;
-    box->y = y;
-    box->width = width - ARROW_WIDTH;
-    box->height = height;
-
-    obj->Type = Listbox;
-    OBJ_SET_TRANSPARENT(obj, 0);
-    OBJ_SET_SELECTABLE(obj, 1);
-    connect_object(obj);
-
-    LCD_GetCharDimensions('A', &text_w, &text_h);
-    listbox->text_height = text_h + LINE_SPACING;  //LINE_SPACING is defined in _gui.h
-    listbox->entries_per_page = (height + 2) / listbox->text_height;
-    if (listbox->entries_per_page > item_count) {
-        listbox->entries_per_page = item_count;
-        sb_entries = item_count;
-        pos = 0;
-    } else {
-        sb_entries = item_count - listbox->entries_per_page;
-        if(selected >= 0) {
-            pos = selected - (listbox->entries_per_page / 2);
-            if (pos < 0)
-                pos = 0;
-        }
-    }
-    listbox->cur_pos = pos;
-    listbox->item_count = item_count;
-    listbox->selected = selected;
-    
-    listbox->style = LISTBOX_OTHERS;
-    listbox->string_cb = string_cb;
-    listbox->select_cb = select_cb;
-    listbox->longpress_cb = longpress_cb;
-    listbox->cb_data = cb_data;
-    listbox->scrollbar = GUI_CreateScrollbar(
-              x + width - ARROW_WIDTH,
-              y,
-              height,
-              sb_entries,
-              obj,
-              scroll_cb, NULL);
+    guiObject_t *obj = GUI_CreateListBoxPlateText(x, y, width, height, item_count, selected, NULL, LISTBOX_KEY_RIGHTLEFT,
+            string_cb, select_cb, longpress_cb, cb_data);
     return obj;
 }
 
 guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const struct LabelDesc *desc,
+        const struct LabelDesc *desc, enum ListBoxNavigateKeyType keyType,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(struct guiObject *obj, u16 selected, void *data),
         void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
@@ -114,10 +63,17 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
     OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
-    listbox->desc = *desc;
-    LCD_SetFont(listbox->desc.font);
-    LCD_GetCharDimensions('A', &text_w, &text_h);
-    listbox->text_height = text_h;  //no extra spacing text height in devo10
+    if (desc != NULL) {
+        listbox->style = LISTBOX_DEVO10;
+        listbox->desc = *desc;
+        LCD_SetFont(listbox->desc.font);
+        LCD_GetCharDimensions('A', &text_w, &text_h);
+        listbox->text_height = text_h;  //no extra spacing text height in devo10
+    } else {
+        listbox->style = LISTBOX_OTHERS;
+        LCD_GetCharDimensions('A', &text_w, &text_h);
+        listbox->text_height = text_h + LINE_SPACING;  //LINE_SPACING is defined in _gui.h
+    }
     listbox->entries_per_page = (height + 2) / listbox->text_height;
     if (listbox->entries_per_page > item_count) {
         listbox->entries_per_page = item_count;
@@ -134,8 +90,7 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
     listbox->cur_pos = pos;
     listbox->item_count = item_count;
     listbox->selected = selected;
-
-    listbox->style = LISTBOX_DEVO10;
+    listbox->key_style = keyType;
     listbox->string_cb = string_cb;
     listbox->select_cb = select_cb;
     listbox->longpress_cb = longpress_cb;
@@ -147,6 +102,20 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
               sb_entries,
               obj,
               scroll_cb, NULL);
+    if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT)
+        BUTTON_RegisterCallback(&listbox->action,
+                 CHAN_ButtonMask(BUT_LEFT)
+                 | CHAN_ButtonMask(BUT_RIGHT)
+                 | CHAN_ButtonMask(BUT_ENTER),
+                 BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+                 press_cb, obj);
+    else
+        BUTTON_RegisterCallback(&listbox->action,
+                 CHAN_ButtonMask(BUT_UP)
+                 | CHAN_ButtonMask(BUT_DOWN)
+                 | CHAN_ButtonMask(BUT_ENTER),
+                 BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+                 press_cb, obj);
     return obj;
 }
 
@@ -159,7 +128,6 @@ void GUI_ListBoxSelect(struct guiObject *obj, u16 selected)
     OBJ_SET_DIRTY(obj, 1);
 }
     
-
 static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
@@ -267,6 +235,59 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
     return 0;
 }
 
+static u8 press_cb(u32 button, u8 flags, void *data)
+{   // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN, so the listbox can change navigate key-sets now
+    struct guiObject *obj = (struct guiObject *)data;
+    struct guiListbox *listbox = &obj->o.listbox;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        // devo10's right/left buttons are upside down compared with devo8's
+        u8 move_down_button = BUT_RIGHT;
+        u8 move_up_button = BUT_LEFT;
+        if (listbox->style == LISTBOX_DEVO10) {
+            if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT) {
+                move_down_button = BUT_LEFT;
+                move_up_button = BUT_RIGHT;
+            } else {
+                move_down_button = BUT_DOWN;
+                move_up_button = BUT_UP;
+            }
+        }
+        if (CHAN_ButtonIsPressed(button, move_down_button)) {
+            if (listbox->selected < listbox->item_count - 1) {
+                listbox->selected++;
+                if (listbox->selected >= listbox->cur_pos + listbox->entries_per_page)
+                    GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, 1, NULL));
+                if (listbox->select_cb)
+                    listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
+                OBJ_SET_DIRTY(obj, 1);
+            }
+        } else if (CHAN_ButtonIsPressed(button, move_up_button)) {
+            if (listbox->selected > 0) {
+                listbox->selected--;
+                if (listbox->selected < listbox->cur_pos)
+                    GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, -1, NULL));
+                if (listbox->select_cb)
+                    listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
+                OBJ_SET_DIRTY(obj, 1);
+            }
+        } else if(CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            if (objSELECTED != obj)
+                return 0; // when the listbox is not selected ,don't catch ENTER key
+            if (listbox->longpress_cb)
+                listbox->longpress_cb(obj, (u16)listbox->selected, listbox->cb_data);
+            else
+                listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+
+}
+
+/*
 void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type)
 {
     struct guiListbox *listbox = &obj->o.listbox;
@@ -275,8 +296,13 @@ void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type)
     u8 move_down_button = BUT_RIGHT;
     u8 move_up_button = BUT_LEFT;
     if (listbox->style == LISTBOX_DEVO10) {
-        move_down_button = BUT_LEFT;
-        move_up_button = BUT_RIGHT;
+        if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT) {
+            move_down_button = BUT_LEFT;
+            move_up_button = BUT_RIGHT;
+        } else {
+            move_down_button = BUT_DOWN;
+            move_up_button = BUT_UP;
+        }
     }
     if (button == move_down_button) {
         if (listbox->selected < listbox->item_count - 1) {
@@ -299,4 +325,4 @@ void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type)
     } else if(button == BUT_ENTER && listbox->longpress_cb) {
         listbox->longpress_cb(obj, (u16)listbox->selected, listbox->cb_data);
     }
-}
+} */

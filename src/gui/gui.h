@@ -55,6 +55,11 @@ enum ListBoxType {
     LISTBOX_OTHERS,
 };
 
+enum ListBoxNavigateKeyType {
+    LISTBOX_KEY_UPDOWN,
+    LISTBOX_KEY_RIGHTLEFT,
+};
+
 struct LabelDesc {
     u8 font;
     u16 font_color;
@@ -163,6 +168,8 @@ struct guiListbox {
     void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
     void *cb_data;
     enum ListBoxType style;
+    enum ListBoxNavigateKeyType key_style;
+    buttonAction_t action; // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN
 };
 
 struct guiXYGraph {
@@ -325,7 +332,7 @@ guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_coun
         void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
         void *cb_data);
 guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const struct LabelDesc *desc,
+        const struct LabelDesc *desc, enum ListBoxNavigateKeyType keyType,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
         void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),

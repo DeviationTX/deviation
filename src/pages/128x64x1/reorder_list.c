@@ -24,6 +24,8 @@ static u8 total_items;
 static s8 current_selected = 0;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
+static void _okcancel_cb(guiObject_t *obj, const void *data);
+static struct buttonAction action;
 
 static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {
@@ -52,7 +54,6 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
 
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
-    PAGE_SetActionCB(_action_cb);
     total_items = 0;
     current_selected = 0;
     int i;
@@ -92,23 +93,50 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     }
     y += space;
     GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, (w -30)/2), GUI_MapToLogicalView(VIEW_ID, y), 30, ITEM_HEIGHT,
-        &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
+        &DEFAULT_FONT, NULL, 0x0000, _okcancel_cb, (void *)_tr("Save"));
 
     u8 x = w + 4;
     rl.listbox = GUI_CreateListBoxPlateText(x, 0, LCD_WIDTH - x +1, LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
-        string_cb, select_cb, NULL, NULL);
+        LISTBOX_KEY_RIGHTLEFT, string_cb, select_cb, NULL, NULL);
 
     total_items = y/space + 1;
+
+    PAGE_SetActionCB(NULL);
+    // we need to grab the key handler from the listbox to let rl.textsel catch left/right keys when it is selected
+    // hence registerCallback has to be used here
+    BUTTON_RegisterCallback(&action,
+            CHAN_ButtonMask(BUT_ENTER)
+            | CHAN_ButtonMask(BUT_EXIT)
+            | CHAN_ButtonMask(BUT_LEFT)
+            | CHAN_ButtonMask(BUT_RIGHT)
+            | CHAN_ButtonMask(BUT_UP)
+            | CHAN_ButtonMask(BUT_DOWN),
+            BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+            _action_cb, obj);
 }
 
+static void _okcancel_cb(guiObject_t *obj, const void *data)
+{
+    BUTTON_UnregisterCallback(&action);
+    okcancel_cb(obj, data);
+}
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            BUTTON_UnregisterCallback(&action);
             GUI_RemoveAllObjects();
             rl.return_page(NULL);
+        } else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && (rl.textsel == GUI_GetSelected())) {
+            // catch the left/right keys when r1.textsel is selected
+            copy_val_cb(NULL, 1, NULL);
+            GUI_Redraw(rl.textsel);
+
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)&& (rl.textsel == GUI_GetSelected())) {
+            copy_val_cb(NULL, -1, NULL);
+            GUI_Redraw(rl.textsel);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

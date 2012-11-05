@@ -124,6 +124,9 @@ void GUI_RemoveObj(struct guiObject *obj)
     case Keyboard:
         BUTTON_UnregisterCallback(&obj->o.keyboard.action);
         break;
+    case Listbox:
+        BUTTON_UnregisterCallback(&obj->o.listbox.action);
+        break;
     default: break;
     }
     
@@ -517,9 +520,10 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
         void(*press)(struct guiObject *obj, u32 button, u8 press_type) = NULL;
         if (objSELECTED->Type == TextSelect) {
             press = GUI_PressTextSelect;
-        } else if(objSELECTED->Type == Listbox) {
-            press = GUI_PressListbox;
         }
+        //else if(objSELECTED->Type == Listbox) {  // Bug fix for issue #81, listbox should handle up/down as well
+        //    press = GUI_PressListbox;
+        //}
         if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             if (! objTOUCHED || objTOUCHED == objSELECTED) {
                 if (press) {
