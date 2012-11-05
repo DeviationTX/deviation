@@ -37,7 +37,6 @@ static void _show_bar_page(u8 num_bars)
     if (num_bars > 18)
         num_bars = 18;
     cp->num_bars = num_bars;
-    u8 count = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     // Create a logical view
     u8 view_origin_absoluteX = 0;
@@ -58,7 +57,7 @@ static void _show_bar_page(u8 num_bars)
 
     GUI_CreateLabelBox(0 , 0, 30, 9, &desc, _title_cb, NULL, (void *)NULL);
 
-    for(i = 0; i < count; i++) {
+    for(i = 0; i < num_bars; i++) {
         if (i%2 ==0) {
             x = 0;
             y += space;
@@ -78,8 +77,13 @@ static void _show_bar_page(u8 num_bars)
     u8 w = 18;
     guiObject_t * obj = GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, 8, &desc, _page_cb, 0x0000, _press_cb, NULL);
     GUI_SetSelected(obj);
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH -3, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
-
+    u8 pages = num_bars/8;
+    if (num_bars%8!= 0)
+        pages++;
+    if (pages > 1)
+        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH -3, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
+    else
+        scroll_bar = NULL;
 }
 
 void PAGE_ChantestInit(int page)
@@ -117,7 +121,8 @@ static void _navigate_pages()
     else
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
     current_page = !current_page;
-    GUI_SetScrollbar(scroll_bar, current_page);
+    if (scroll_bar != NULL)
+        GUI_SetScrollbar(scroll_bar, current_page);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

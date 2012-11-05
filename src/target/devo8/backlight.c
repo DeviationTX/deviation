@@ -63,3 +63,8 @@ void BACKLIGHT_Brightness(u8 brightness)
     }
 }
 
+void LCD_Contrast(u8 contrast)
+{
+    (void)contrast; // dummy method for devo8. Only valid in devo10 now
+}
+

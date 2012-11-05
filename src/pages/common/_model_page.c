@@ -33,7 +33,13 @@ static void _changename_done_cb(guiObject_t *obj, void *data);
 const char *show_text_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return (const char *)data;
+    strcpy(mp->tmpstr, (const char *)data);
+    if (strlen(mp->tmpstr) > 8) {// don't show full name if length >8
+        mp->tmpstr[8] = '.';
+        mp->tmpstr[9] = '.';
+        mp->tmpstr[10] = '\0';
+    }
+    return mp->tmpstr;
 }
 
 const char *show_bindtext_cb(guiObject_t *obj, const void *data)
@@ -52,7 +58,7 @@ static void fixedid_done_cb(guiObject_t *obj, void *data)
     (void)data;
     Model.fixed_id = atoi(mp->fixed_id);
     GUI_RemoveObj(obj);
-    PAGE_ModelInit(0);
+    PAGE_ModelInit(-1); // must be -1 for devo10 to get back to correct page
 }
 static void fixedid_cb(guiObject_t *obj, const void *data)
 {

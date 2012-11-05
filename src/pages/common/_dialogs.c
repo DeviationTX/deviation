@@ -18,6 +18,7 @@
 static guiObject_t *dialog = NULL;
 static char dlgstr[DLG_STR_LEN];
 static u8 disable_safety = 0;//by default =0, means enable
+static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
 /*  Safety Dialog */
@@ -27,6 +28,8 @@ static void safety_ok_cb(u8 state, void * data)
     (void)state;
     (void)data;
     dialog = NULL;
+    if (current_selected_obj != NULL)
+        GUI_SetSelected(current_selected_obj);
     PROTOCOL_Init(1);
 }
 
@@ -37,6 +40,8 @@ static void lowbatt_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
+    if (current_selected_obj != NULL)
+        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
 }
 

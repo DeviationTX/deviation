@@ -59,11 +59,11 @@ void lcd_set_start_line(int line)
   LCD_CMD = (line & 0x3F) | 0x40; 
 }
 
-//Electronic Volume Control
-void LCD_set_contrast(int b)
+void LCD_Contrast(u8 contrast)
 {
-  LCD_CMD = 0x81;
-  LCD_CMD = b & 0x3F;
+    int data = 0x20 + contrast * 0xC / 9;
+    LCD_CMD = 0x81;
+    LCD_CMD = data & 0x3F;
 }
 
 void LCD_Init()
@@ -114,7 +114,8 @@ void LCD_Init()
     LCD_CMD = 0x24;
 
     //Electronic volume control (18) -> LCD brightness; 0x20; default=32d
-    LCD_set_contrast(0x25);
+    LCD_CMD = 0x81;
+    LCD_CMD = 0x25 & 0x3F; // = LCD_Contrast(5);
     Delay(5);
 
     //Power control setting (16); V/B, V/R, V/F are used

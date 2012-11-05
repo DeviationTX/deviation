@@ -28,6 +28,7 @@ void PAGE_ShowSafetyDialog()
     }
     if (dialog == NULL) {
         dlgstr[0] = 0;
+        current_selected_obj = GUI_GetSelected();
         dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, dlgstr);
         return;
     }
@@ -72,15 +73,14 @@ static void binding_ok_cb(u8 state, void * data)
     (void)state;
     (void)data;
     PROTOCOL_SetBindState(0); // interrupt the binding
-    GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
-    dialog = NULL;
+    PAGE_CloseBindingDialog();
 }
 
 void PAGE_CloseBindingDialog()
 {
     if (dialog) {
         GUI_RemoveObj(dialog);
-        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(dialog));
+        GUI_SetSelected(current_selected_obj);
         dialog = NULL;
     }
 }
@@ -92,12 +92,13 @@ void PAGE_ShowBindingDialog(u8 update)
     u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
     if (bind_time != 0xFFFFFFFF )
-        sprintf(dlgstr, _tr("Binding... %d seconds\nPress ENT to stop"), (int)bind_time / 1000);
+        sprintf(dlgstr, _tr("Binding...\n%d seconds\nPress ENT to stop"), (int)bind_time / 1000);
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, binding_ok_cb, dtOk, dlgstr);
+        current_selected_obj = GUI_GetSelected();
+        dialog = GUI_CreateDialog(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -107,6 +108,7 @@ void PAGE_ShowLowBattDialog()
         return;
     strncpy(dlgstr, _tr("Battery too low,\ncan't save!"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
+    current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
 

@@ -16,8 +16,6 @@
 
 #include "main_menu.h"
 #include "sub_menu.h"
-#include "single_itemconfig.h"
-#include "multi_items_config.h"
 
 struct pagemem {
     union {
@@ -35,13 +33,12 @@ struct pagemem {
 
         struct main_menu_page main_menu_page;
         struct sub_menu_page sub_menu_page;
-        struct single_itemCofig_page single_itemCofig_page;
-        struct multi_items_config_page multi_items_config_page;
     } u;
     u8 modal_page;
 };
 #define PAGE_NAME_MAX 10
 #define ITEM_HEIGHT 12
+#define PREVIOUS_ITEM -1
 
 extern struct pagemem pagemem;
 extern u8 sub_menu_item;  // global variable to let other page get back to the right sub menu

@@ -58,10 +58,8 @@ int main() {
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     CONFIG_ReadLang(Transmitter.language);
 
-    LCD_SetFont(1);
-    LCD_SetFontColor(0xffff);
-
     BACKLIGHT_Brightness(Transmitter.brightness);
+    LCD_Contrast(Transmitter.contrast);
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 

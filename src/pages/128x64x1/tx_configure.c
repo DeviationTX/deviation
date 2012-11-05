@@ -27,20 +27,21 @@
 #define VIEW_ID 0
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static void _navigate_items(s8 direction);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
+static s16 view_origin_relativeY;
+static s8 current_selected = 0;  // do not use current_selected as it shares the same structure with other pages by using union
 
 void PAGE_TxConfigureInit(int page)
 {
-    if (page < 0 && cp->selected > 0) // enter this page from childen page , so we need to get its previous selected item
-        page = cp->selected;
+    if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous selected item
+        page = current_selected;
     cp->enable = CALIB_NONE;
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Configure"));
     cp->total_items = 0;
-    cp->selected = 0;
+    current_selected = 0;
 
     // Create a logical view
     u8 view_origin_absoluteX = 0;
@@ -83,7 +84,7 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Battery Alarm:"));
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Batt Alarm:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, batalarm_select_cb, NULL);
     cp->total_items++;
@@ -99,7 +100,7 @@ void PAGE_TxConfigureInit(int page)
     // The following items are not draw in the logical view;
     cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, cp->total_items, NULL, NULL, NULL);
     if (page > 0)
-        _navigate_items(page);
+        PAGE_NavigateItems(page, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
 }
 
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
@@ -110,8 +111,7 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     Transmitter.contrast = GUI_TextSelectHelper(Transmitter.contrast,
                                   MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
     if (changed) {
-        int contrast = 0x20 + Transmitter.contrast * 0xC / 9;
-        LCD_set_contrast(contrast);
+        LCD_Contrast(Transmitter.contrast);
     }
     if (Transmitter.contrast == 0)
         return _tr("Off");
@@ -119,33 +119,6 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     return cp->tmpstr;
 }
 
-static void _navigate_items(s8 direction)
-{
-    guiObject_t *obj;
-    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
-        obj = GUI_GetSelected();
-        if (direction > 0) {
-            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
-        } else {
-            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
-        }
-    }
-    cp->selected += direction;
-    cp->selected %= cp->total_items;
-    if (cp->selected == 0) {
-        GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    } else if (cp->selected < 0) {
-        cp->selected = cp->total_items - 1;
-        u8 pages = cp->total_items /PAGE_ITEM_COUNT;
-        GUI_SetRelativeOrigin(VIEW_ID, 0, pages * PAGE_ITEM_COUNT * (ITEM_HEIGHT +1));
-    } else {
-        obj = GUI_GetSelected();
-        if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
-            GUI_ScrollLogicalView(VIEW_ID, (ITEM_HEIGHT +1) *direction);
-        }
-    }
-    GUI_SetScrollbar(cp->scroll_bar, cp->selected);
-}
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
@@ -154,9 +127,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByName("SubMenu", sub_menu_item);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            _navigate_items(-1);
+            PAGE_NavigateItems(-1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            _navigate_items(1);
+            PAGE_NavigateItems(1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

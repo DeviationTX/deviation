@@ -40,8 +40,6 @@ static const struct page pages[] = {
     {PAGE_MainMenuInit, NULL, PAGE_MainMenuExit, "MainMenu"},
     {PAGE_SubMenuInit, NULL, PAGE_SubMenuExit, "SubMenu" },
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
-    {PAGE_SingleItemConfigInit, NULL, PAGE_SingleItemConfigExit, "SingItem"},
-    {PAGE_MultiItemsConfigInit, NULL, PAGE_MultiItemsConfigExit, "MulItems"},
     {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
     {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
     {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},

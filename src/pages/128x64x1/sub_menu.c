@@ -15,8 +15,9 @@ static void navigate_item(short direction, u8 step);
 static const char *title1[] = {_tr_noop("Model Config"), _tr_noop("Tx Config")};
 static const char *menu_item_name_deviation0[] = {
      _tr_noop("Mixer"), _tr_noop("Model"),
-     _tr_noop("Protocol&Binding"),_tr_noop("Timer"),
-     _tr_noop("Trim"), _tr_noop("Mixer Mode"), 0
+     _tr_noop("Timer"),
+     _tr_noop("Trim"), //_tr_noop("Mixer Mode"),
+     0
 };
 static const char *menu_item_name_deviation1[] = {
      _tr_noop("Basic Config"), _tr_noop("Monitor"),
@@ -82,7 +83,10 @@ void show_menuItems(u8 startIdx)
     u8 y = MENU_ITEM_HEIGHT + 1;
     u8 x = LCD_WIDTH - ARROW_WIDTH +1;
     u8 h = LCD_HEIGHT - y ;
-    smp->scroll_bar = GUI_CreateScrollbar(x, y, h, smp->menu_item_count, NULL, NULL, NULL);
+    if (smp->menu_item_count > PAGE_ITEM_COUNT)
+        smp->scroll_bar = GUI_CreateScrollbar(x, y, h, smp->menu_item_count, NULL, NULL, NULL);
+    else
+        smp->scroll_bar = NULL;
 }
 
 void get_menu_itemName()
@@ -121,7 +125,8 @@ void navigate_item(short direction, u8 step)
         selected_menu_idx[sub_menu_item] > current_page_start_idx[sub_menu_item] + PAGE_ITEM_COUNT -1) {
         show_menuItems(selected_menu_idx[sub_menu_item]);
     }
-    GUI_SetScrollbar(smp->scroll_bar, selected_menu_idx[sub_menu_item]);
+    if (smp->scroll_bar != NULL)
+        GUI_SetScrollbar(smp->scroll_bar, selected_menu_idx[sub_menu_item]);
     GUI_SetSelected(smp->menuItemObj[selected_menu_idx[sub_menu_item] - current_page_start_idx[sub_menu_item]]);
 
 }
@@ -157,28 +162,14 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
     const char *str = (const char *)data;
     if (!strcmp("Calibration", str)) {
         PAGE_ChangeByName("Calibrate", 0);
-    } else if (!strcmp("Protocol&Binding", str)) {
-        PAGE_ChangeByName("MulItems", protocol);
-    } else if (!strcmp("Language", str)) {
-        PAGE_ChangeByName("SingItem", language);
-    } else if (!strcmp("Stick Mode", str)) {
-        PAGE_ChangeByName("SingItem", stickMode);
-    } else if (!strcmp("Power Amplifier", str)) {
-        PAGE_ChangeByName("SingItem", powerAmplifier);
-    } else if (!strcmp("Swash Type", str)) {
-        PAGE_ChangeByName("SingItem", swashType);
-    } else if (!strcmp("Model Name", str)) {
-        PAGE_ChangeByName("SingItem", modelName);
-    } else if (!strcmp("Display", str)) {
-        PAGE_ChangeByName("MulItems", display);
     } else if (!strcmp("Mixer Mode", str)) {
         //PAGE_ChangeByName("SingItem", mixerMode);
     } else if (!strcmp("Mixer", str)) {
         PAGE_ChangeByName("Mixer", 0);
     } else if (!strcmp("Basic Config", str)) {
-        PAGE_ChangeByName("TxConfig", 0);
+        PAGE_ChangeByName("TxConfig", PREVIOUS_ITEM);
     } else if (!strcmp("Model", str)) {
-        PAGE_ChangeByName("ModelCon", 0);
+        PAGE_ChangeByName("ModelCon", PREVIOUS_ITEM);
     } else if (!strcmp("Monitor", str)) {
         PAGE_ChangeByName("Monitor", 0);
     } else if (!strcmp("Trim", str)) {

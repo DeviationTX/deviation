@@ -50,11 +50,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             switch (calibrate_state){
             case CALI_NOTSTART:
-                for (u8 i = 0; i < INP_HAS_CALIBRATION; i++) {
-                    Transmitter.calibration[i].max = 0x0000;
-                    Transmitter.calibration[i].min = 0xFFFF;
-                }
-                sprintf(cp->tmpstr, "%s", _tr("Center all sticks\nthen press ENT"));
+                sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
                 GUI_Redraw(cp->textbox);
                 calibrate_state = CALI_CENTER;
                 break;
@@ -65,7 +61,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     Transmitter.calibration[i].min = 0xFFFF;
                     Transmitter.calibration[i].zero = value;
                 }
-                sprintf(cp->tmpstr, "%s", _tr("Move sticks\nto max & min\nthen press ENT"));
+                sprintf(cp->tmpstr, "%s", _tr("Move sticks and knobs\nto Max & Min positions\nthen press ENT"));
                 GUI_Redraw(cp->textbox);
                 calibrate_state = CALI_MAXMIN;
                 break;
@@ -117,7 +113,7 @@ static void calibrate_sticks(void)
         memcpy(Transmitter.calibration, cp->calibration, sizeof(cp->calibration));
     
     PROTOCOL_Init(0);
-    PAGE_TxConfigureInit(0);
+    PAGE_TxConfigureInit(-1);
     PAGE_DisableSafetyDialog(0);
 }
 

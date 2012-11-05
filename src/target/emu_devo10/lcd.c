@@ -65,8 +65,3 @@ void LCD_Clear(unsigned int color) {
 	memset(gui.image, 0xaa, sizeof(gui.image));
 
 }
-
-void LCD_set_contrast(int c) {
-	(void)c;
-	// nothing to do
-}

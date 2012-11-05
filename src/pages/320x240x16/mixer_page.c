@@ -35,6 +35,8 @@ static void _show_title(int page)
 
 static void _show_page()
 {
+    // Note for future maintenance: DO NOT use logical view to draw all the channel items at a time for this page:  I just
+    // gave it a try, it spent very long time to construct all the 30 items and could trigger watch-dog to reboot !!!
     int init_y = 40;
     int i;
     if (mp->firstObj) {

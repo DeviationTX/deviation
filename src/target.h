@@ -38,7 +38,7 @@ void BACKLIGHT_Brightness(u8 brightness);
 
 /* Display Functions */
 void LCD_Init();
-void LCD_set_contrast(int c);
+void LCD_Contrast(u8 contrast);
 
     /* Primitives */
 enum DrawDir {
