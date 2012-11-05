@@ -94,8 +94,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown Calibration\n", section);
             return 0;
         }
-        if (idx > 4) {
-            printf("%s: Only 4 calibrations are supported\n", section);
+        if (idx > INP_HAS_CALIBRATION) {
+            printf("%s: Only %d calibrations are supported\n", section, INP_HAS_CALIBRATION);
             return 1;
         }
         idx--;
@@ -166,7 +166,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
-    for(i = 0; i < 4; i++) {
+    for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MIN, t->calibration[i].min);
