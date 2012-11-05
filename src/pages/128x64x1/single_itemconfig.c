@@ -23,13 +23,13 @@
 
 static struct single_itemCofig_page * const sicp = &pagemem.u.single_itemCofig_page;
 const char *title[] = {  // _tr(  following items need to put in lang files
-    "Language",
-    "Stick Mode",
-    "Swash Type",
-    "Battery Alarm",
-    "Power Amplifier",
-    "Fixed Id",
-    "Model Name",
+    _tr_noop("Language"),
+    _tr_noop("Stick mode"),
+    _tr_noop("Swash type"),
+    _tr_noop("Battery alarm"),
+    _tr_noop("Power amplifier"),
+    _tr_noop("Fixed ID"),
+    _tr_noop("Model name"),
 };
 
 static u8 action_cb(u32 button, u8 flags, void *data);

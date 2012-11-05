@@ -62,7 +62,7 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Stick Mode:"));
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, modeselect_cb, NULL);
     cp->total_items++;
@@ -83,7 +83,7 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Battery Alarm:"));
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, batalarm_select_cb, NULL);
     cp->total_items++;

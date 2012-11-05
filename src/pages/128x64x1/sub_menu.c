@@ -12,14 +12,14 @@ static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static void navigate_item(short direction, u8 step);
 
 #define SUBMENU_COUNT 3
-static const char *title1[] = {_tr_noop("Model Config"), _tr_noop("Tx Config")};
+static const char *title1[] = {_tr_noop("Model config"), _tr_noop("Transmitter config")};
 static const char *menu_item_name_deviation0[] = {
-     _tr_noop("Mixer"), _tr_noop("Model"),
-     _tr_noop("Protocol&Binding"),_tr_noop("Timer"),
-     _tr_noop("Trim"), _tr_noop("Mixer Mode"), 0
+     _tr_noop("Mixer config"), _tr_noop("Model setup"),
+     _tr_noop("Binding"),_tr_noop("Timers"),
+     _tr_noop("Trims"), _tr_noop("Mixer mode"), 0
 };
 static const char *menu_item_name_deviation1[] = {
-     _tr_noop("Basic Config"), _tr_noop("Monitor"),
+     _tr_noop("Basic config"), _tr_noop("Monitor"),
      _tr_noop("Scanner"), _tr_noop("USB"), 0
 };
 
@@ -157,33 +157,33 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
     const char *str = (const char *)data;
     if (!strcmp("Calibration", str)) {
         PAGE_ChangeByName("Calibrate", 0);
-    } else if (!strcmp("Protocol&Binding", str)) {
+    } else if (!strcmp("Binding", str)) {
         PAGE_ChangeByName("MulItems", protocol);
     } else if (!strcmp("Language", str)) {
         PAGE_ChangeByName("SingItem", language);
-    } else if (!strcmp("Stick Mode", str)) {
+    } else if (!strcmp("Stick mode", str)) {
         PAGE_ChangeByName("SingItem", stickMode);
-    } else if (!strcmp("Power Amplifier", str)) {
+    } else if (!strcmp("Power amplifier", str)) {
         PAGE_ChangeByName("SingItem", powerAmplifier);
-    } else if (!strcmp("Swash Type", str)) {
+    } else if (!strcmp("Swash type", str)) {
         PAGE_ChangeByName("SingItem", swashType);
-    } else if (!strcmp("Model Name", str)) {
+    } else if (!strcmp("Model name", str)) {
         PAGE_ChangeByName("SingItem", modelName);
     } else if (!strcmp("Display", str)) {
         PAGE_ChangeByName("MulItems", display);
-    } else if (!strcmp("Mixer Mode", str)) {
+    } else if (!strcmp("Mixer mode", str)) {
         //PAGE_ChangeByName("SingItem", mixerMode);
-    } else if (!strcmp("Mixer", str)) {
+    } else if (!strcmp("Mixer config", str)) {
         PAGE_ChangeByName("Mixer", 0);
-    } else if (!strcmp("Basic Config", str)) {
+    } else if (!strcmp("Basic config", str)) {
         PAGE_ChangeByName("TxConfig", 0);
-    } else if (!strcmp("Model", str)) {
+    } else if (!strcmp("Model setup", str)) {
         PAGE_ChangeByName("ModelCon", 0);
     } else if (!strcmp("Monitor", str)) {
         PAGE_ChangeByName("Monitor", 0);
-    } else if (!strcmp("Trim", str)) {
+    } else if (!strcmp("Trims", str)) {
         PAGE_ChangeByName("Trim", 0);
-    } else if (!strcmp("Timer", str)) {
+    } else if (!strcmp("Timers", str)) {
         PAGE_ChangeByName("Timer", 0);
     } else if (!strcmp("USB", str)) {
         PAGE_ChangeByName("USB", 0);

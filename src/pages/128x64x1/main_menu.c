@@ -10,7 +10,7 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 
 static const char *menu_item_name_deviation[] = {
-    _tr_noop("Model Config"), _tr_noop("Tx Config"), 0
+    _tr_noop("Model config"), _tr_noop("Transmitter config"), 0
 };
 
 static s8 selected_menu_idx = 0;
@@ -25,7 +25,7 @@ void PAGE_MainMenuInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(action_cb);
-    PAGE_ShowHeader(_tr("Main Menu"));
+    PAGE_ShowHeader(_tr("Main menu"));
 
     mmp->menu_item_name = (char **)menu_item_name_deviation;
     mmp->main_menu_count = 0;
@@ -113,10 +113,10 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data)
     else if (!strcmp("Func Conf", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Model Config", str)) {
+    else if (!strcmp("Model config", str)) {
         PAGE_ChangeByName("SubMenu", 0);
     }
-    else if (!strcmp("Tx Config", str)) {
+    else if (!strcmp("Transmitter config", str)) {
         PAGE_ChangeByName("SubMenu", 1);
     }
 }
