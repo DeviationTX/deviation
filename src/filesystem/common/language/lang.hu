@@ -1,6 +1,6 @@
 ﻿Magyar 
 :# Channels:
-# Csatornák:
+Csatornák:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, a biztonságos érték = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -58,7 +58,7 @@ AUX5
 :Airplane
 Repülőgép
 :Alarm
-Riasztás
+Riasztás 
 :Altitude
 Magasság
 :Backlight:
@@ -67,8 +67,10 @@ Fényerő:
 Oszlop%d:
 :Bars:
 Oszlop:
-:Basic Config
+:Basic config
 Alap beállítás
+:Batt alarm:
+Tápfesz. riasztás:
 :Battery Alarm:
 Tápfesz. riasztás:
 :Battery too low,\ncan't save!
@@ -79,8 +81,8 @@ Csatol
 Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
-:Binding... %d seconds\nPress ENT to stop
-Kapcsolódás... %d másodperc\nNyomjon ENT-t a leállításához
+:Binding...\n%d seconds\nPress ENT to stop
+Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 :Box %d:
 Doboz%d:
 :Buttons
@@ -97,12 +99,14 @@ Kalibrálás
 Mégsem
 :Celcius
 Celsius
-:Center all sticks\nthen press ENT
-Állítsa középre a botkormányokat\nés nyomjon ENT-t
+:Center all \nsticks and knobs\nthen press ENT
+Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
 Cs
 :Change
 Váltás
+:Channel Output
+Csatorna kimenet
 :Channels
 Csatornák
 :Complex
@@ -171,6 +175,8 @@ Fix
 Fix ID:
 :GEAR
 GEAR
+:Heli
+Heli
 :Helicopter
 Helikopter
 :High-Rate
@@ -213,7 +219,7 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Menu
+:Main menu
 Főmenü
 :Main Page Config
 Főablak konfiguráció
@@ -229,19 +235,23 @@ Min/Max
 Min:
 :Mixer
 Mixer
-:Mixer Mode
-Mixer mód
 :Mixers:
 Mixerek:
 :Mode %d
 Mód %d
 :Model
 Modell
-:Model Config
+:Model config
 Modell konfig.
 :Model Name:
 Modell név:
 :Model Type:
+Modell típus:
+:Model name:
+Modell név:
+:Model setup
+Modell konfig.
+:Model type:
 Modell típus:
 :Monitor
 Monitor
@@ -249,8 +259,8 @@ Monitor
 Lejjebb
 :Move Up
 Feljebb
-:Move sticks\nto max & min\nthen press ENT
-Mozgassa a botokat\nmin-max\nés nyomjon ENT-t
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Mozgassa a botokat és potikat\nmin-tól max-ig\nés nyomjon ENT-t
 :Mux:
 Művelet:
 :Neg
@@ -279,6 +289,8 @@ OK
 Be
 :Page:
 Oldal:
+:Plane
+Repülő
 :Point:
 Pont:
 :Pos
@@ -286,7 +298,7 @@ Poz.
 :Pos/Neg:
 Poz/Neg:
 :Press 'Ent' to turn USB Filesystem:
-\nNyomjon 'ENT'-t, hogy az USB:
+\nNyomjon 'ENT'-t, hogy az USB: 
 :Press ENT to change:
 Változtatáshoz ENT:
 :Press ENT to copy to:
@@ -296,19 +308,15 @@ Betöltés ENT:
 :Press ENT to start\ncalibration\nPress EXT to exit
 Kalibrálás ENT\nkilépés EXT
 :Press ENT to turn \nUSB drive: 
-Nyomjon ENT-t\n az USB:
-:Procotol:
-Protokoll:
-:Protocol&Binding
-Protokoll&Csatolás
+Nyomjon ENT-t \naz USB: 
 :Protocol:
-Protokol:
+Protokoll:
 :RIGHT_H
 JOBB_V
 :RIGHT_V
 JOBB_F
 :RPM
-Ford
+Ford.
 :RUD
 RUD
 :RUD DR
@@ -353,7 +361,11 @@ Forrás:
 Start:
 :Step:
 Lépés
+:Stick Input
+Bemenetek
 :Stick Mode:
+Mód:
+:Stick mode:
 Mód:
 :Sticks:
 Botkormány:
@@ -404,7 +416,7 @@ TelemFesz
 :Telemetry
 Telemtria
 :Temp
-Hőm:
+Hőm.
 :Template..
 Sablon...
 :Test
@@ -413,6 +425,8 @@ Teszt
 Idő
 :Timer
 Időzítő
+:Timers
+Időzítők
 :Toggle%d
 Jelzés%d
 :Touch Calibrate
@@ -424,9 +438,11 @@ Képernyő:
 :Touch target %d
 Érintse meg a(z) %d pontot!
 :Touch to Lock
-Érintse meg a zároláshoz
+Érintse meg a zároláshoz  
 :Touch to Unlock
 Érintse meg a feloldáshoz
+:Transmitter config
+Távirányító konfig.
 :Trim
 Trim
 :Trim +:
@@ -435,16 +451,18 @@ Trim +:
 Trim -:
 :Trim Step:
 Trim lépés:
+:Trims
+Trim-ek
 :Trims:
-Trim:
+Trim-ek:
 :Turn Off
 Kikapcsol
 :Turn On
 Bekapcsol
-:Tx Config
-Táv. konfig.
 :Tx Power:
-Kimenő teljesítmény:
+Kimenő telj.:
+:Tx power:
+Kimenő telj.:
 :USB
 USB
 :Unknown
@@ -456,7 +474,7 @@ Fel
 :Virt
 Virt.
 :Volt
-Fesz
+Fesz.
 :Zero/Max
 Nulla/Max
 :\n\nBinding will end in %d seconds...
