@@ -163,9 +163,11 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, (const char *)"Stick Input");
+        //strcpy(cp->tmpstr, (const char *)"Stick Input");
+        strcpy(cp->tmpstr, _tr("Stick Input"));
     } else {
-        strcpy(cp->tmpstr, (const char *)"Channel Output");
+        //strcpy(cp->tmpstr, (const char *)"Channel Output");
+        strcpy(cp->tmpstr, _tr("Channel Output"));
     }
     return cp->tmpstr;
 }
