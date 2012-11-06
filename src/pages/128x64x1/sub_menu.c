@@ -12,15 +12,15 @@ static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static void navigate_item(short direction, u8 step);
 
 #define SUBMENU_COUNT 3
-static const char *title1[] = {_tr_noop("Model Config"), _tr_noop("Tx Config")};
+static const char *title1[] = {_tr_noop("Model config"), _tr_noop("Transmitter config")};
 static const char *menu_item_name_deviation0[] = {
-     _tr_noop("Mixer"), _tr_noop("Model"),
-     _tr_noop("Timer"),
-     _tr_noop("Trim"), //_tr_noop("Mixer Mode"),
+     _tr_noop("Mixer"), _tr_noop("Model setup"),
+     _tr_noop("Timers"),
+     _tr_noop("Trims"), //_tr_noop("Mixer Mode"),
      0
 };
 static const char *menu_item_name_deviation1[] = {
-     _tr_noop("Basic Config"), _tr_noop("Monitor"),
+     _tr_noop("Basic config"), _tr_noop("Monitor"),
      _tr_noop("Scanner"), _tr_noop("USB"), 0
 };
 
@@ -166,15 +166,15 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
         //PAGE_ChangeByName("SingItem", mixerMode);
     } else if (!strcmp("Mixer", str)) {
         PAGE_ChangeByName("Mixer", 0);
-    } else if (!strcmp("Basic Config", str)) {
+    } else if (!strcmp("Basic config", str)) {
         PAGE_ChangeByName("TxConfig", PREVIOUS_ITEM);
-    } else if (!strcmp("Model", str)) {
+    } else if (!strcmp("Model setup", str)) {
         PAGE_ChangeByName("ModelCon", PREVIOUS_ITEM);
     } else if (!strcmp("Monitor", str)) {
         PAGE_ChangeByName("Monitor", 0);
-    } else if (!strcmp("Trim", str)) {
+    } else if (!strcmp("Trims", str)) {
         PAGE_ChangeByName("Trim", 0);
-    } else if (!strcmp("Timer", str)) {
+    } else if (!strcmp("Timers", str)) {
         PAGE_ChangeByName("Timer", 0);
     } else if (!strcmp("USB", str)) {
         PAGE_ChangeByName("USB", 0);
