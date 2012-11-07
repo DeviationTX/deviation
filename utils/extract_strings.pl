@@ -4,8 +4,9 @@ use warnings;
 
 use Getopt::Long;
 my $update;
+my $lang;
 
-GetOptions("update" => \$update);
+GetOptions("update" => \$update, "language=s" => \$lang);
 my @files = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @out;
 foreach (@files) {
@@ -31,7 +32,10 @@ if(! $update) {
     exit 0;
 }
 
-foreach my $file (glob "filesystem/common/language/lang*") {
+@files = glob($lang ?
+              "filesystem/common/language/lang*.$lang"
+              : "filesystem/common/language/lang*");
+foreach my $file (@files) {
     my %strings = %uniq;
     my %unused;
     open my $fh, "<", $file;
