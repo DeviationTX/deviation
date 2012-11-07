@@ -32,13 +32,13 @@ static void draw_target(u16 x, u16 y)
 }
 
 enum calibrateState {
-    CALI_NOTSTART,
     CALI_CENTER,
     CALI_MAXMIN,
     CALI_SUCCESS,
+    CALI_SUCCESSEXIT,
     CALI_EXIT,
 };
-static enum calibrateState calibrate_state = CALI_NOTSTART;
+static enum calibrateState calibrate_state;
 
 static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
 {
@@ -49,11 +49,6 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
             calibrate_state = CALI_EXIT;
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             switch (calibrate_state){
-            case CALI_NOTSTART:
-                sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
-                GUI_Redraw(cp->textbox);
-                calibrate_state = CALI_CENTER;
-                break;
             case CALI_CENTER:
                 for (i = 0; i < INP_HAS_CALIBRATION; i++) {
                     s32 value = CHAN_ReadRawInput(i + 1);
@@ -69,7 +64,12 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                 for (i = 0; i < INP_HAS_CALIBRATION; i++) {
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
+                sprintf(cp->tmpstr, "%s", _tr("Calibration done."));
+                GUI_Redraw(cp->textbox);
                 calibrate_state = CALI_SUCCESS;
+                break;
+            case CALI_SUCCESS:
+                calibrate_state = CALI_SUCCESSEXIT;
                 break;
             default: break;
             }
@@ -89,8 +89,9 @@ static void calibrate_sticks(void)
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
-    sprintf(cp->tmpstr, "%s", _tr("Press ENT to start\ncalibration\nPress EXT to exit"));
-    cp->textbox = GUI_CreateLabelBox(1, 1, LCD_WIDTH-1, LCD_HEIGHT-1, &NARROW_FONT, NULL, NULL, cp->tmpstr);
+    sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
+    cp->textbox = GUI_CreateLabelBox(1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
+            LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, cp->tmpstr);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
     while(1) {
@@ -106,14 +107,14 @@ static void calibrate_sticks(void)
             else if (value < Transmitter.calibration[i].min)
                 Transmitter.calibration[i].min = value;
         }
-        if (calibrate_state == CALI_SUCCESS || calibrate_state == CALI_EXIT)
+        if (calibrate_state == CALI_SUCCESSEXIT || calibrate_state == CALI_EXIT)
             break;
     }
     if (calibrate_state == CALI_EXIT)
         memcpy(Transmitter.calibration, cp->calibration, sizeof(cp->calibration));
     
     PROTOCOL_Init(0);
-    PAGE_TxConfigureInit(-1);
+    PAGE_TxConfigureInit(-1);   // should be -1 so that devo10 can get back to previous item selection
     PAGE_DisableSafetyDialog(0);
 }
 
@@ -243,7 +244,7 @@ static void press_cb(guiObject_t *obj, const void *data)
         cp->textbox = GUI_CreateLabelBox(60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
         memset(&cp->coords, 0, sizeof(cp->coords));
     } else if (cp->enable == CALIB_STICK)
-        calibrate_state = CALI_NOTSTART; // bug fix: must reset state before calibrating
+        calibrate_state = CALI_CENTER; // bug fix: must reset state before calibrating
 }
 
 static const char *langstr_cb(guiObject_t *obj, const void *data)
