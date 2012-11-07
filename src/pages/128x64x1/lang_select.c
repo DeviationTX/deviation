@@ -69,7 +69,7 @@ void LANGPage_Select(void(*return_page)(int page))
 
     // The following items are not draw in the logical view;
     if (cp->total_items > PAGE_ITEM_COUNT)
-        cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, cp->total_items, NULL, NULL, NULL);
+        cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
     if ( Transmitter.language > 0)
         PAGE_NavigateItems(Transmitter.language, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
 }

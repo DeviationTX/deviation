@@ -122,18 +122,19 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         y = box->y + 2 + (box->height - h) / 2;
         LCD_PrintStringXY(x, y, str);
     } else {   // plate text select for devo 10, copy most behavior from label.c
+        u8 arrow_width = ARROW_WIDTH - 1;
         u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
-        u16 x1 = box->x + ARROW_WIDTH -1;
+        u16 x1 = box->x + arrow_width -1;
         LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
         LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
         //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
-        x1 = box->x + box->width - ARROW_WIDTH;
+        x1 = box->x + box->width - arrow_width;
         u16 x2 = box->x + box->width -1;
         //LCD_DrawFastHLine(x1, y, ARROW_WIDTH, 0xffff); //"+"
         //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
         LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
         LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
-        GUI_DrawLabelHelper(box->x + ARROW_WIDTH +1, box->y,box->width - ARROW_WIDTH -ARROW_WIDTH -2, obj->box.height,
+        GUI_DrawLabelHelper(box->x + arrow_width +1, box->y,box->width - arrow_width -arrow_width -2, obj->box.height,
                 str, &select->desc, obj == objSELECTED);
     }
 }

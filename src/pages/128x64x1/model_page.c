@@ -111,7 +111,7 @@ void PAGE_ModelInit(int page)
     mp->total_items++;
 
     // The following items are not draw in the logical view;
-    mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, mp->total_items, NULL, NULL, NULL);
+    mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
     if (page > 0)
         PAGE_NavigateItems(page, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, mp->scroll_bar);
 }

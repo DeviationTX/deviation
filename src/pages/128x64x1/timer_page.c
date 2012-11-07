@@ -66,7 +66,7 @@ static void _show_page()
         update_countdown(i);
     }
     space = ITEM_HEIGHT + 1;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, NUM_TIMERS, NULL, NULL, NULL);
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, NUM_TIMERS, NULL, NULL, NULL);
 }
 
 static void _navigate_items(s8 direction)

@@ -74,14 +74,14 @@ static void _show_bar_page(u8 num_bars)
 
     }
 
-    u8 w = 18;
-    guiObject_t * obj = GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, 8, &desc, _page_cb, 0x0000, _press_cb, NULL);
+    u8 w = 14;
+    guiObject_t * obj = GUI_CreateButtonPlateText(LCD_WIDTH -w, 0, w, 8, &desc, _page_cb, 0x0000, _press_cb, NULL);
     GUI_SetSelected(obj);
     u8 pages = num_bars/8;
     if (num_bars%8!= 0)
         pages++;
     if (pages > 1)
-        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH -3, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
+        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
     else
         scroll_bar = NULL;
 }
@@ -116,13 +116,14 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void _navigate_pages()
 {
+    if (scroll_bar == NULL) // no page scroll
+        return;
     if (current_page ==0)
         GUI_SetRelativeOrigin(VIEW_ID, 0, view_height);
     else
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
     current_page = !current_page;
-    if (scroll_bar != NULL)
-        GUI_SetScrollbar(scroll_bar, current_page);
+    GUI_SetScrollbar(scroll_bar, current_page);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -163,10 +164,8 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        //strcpy(cp->tmpstr, (const char *)"Stick Input");
         strcpy(cp->tmpstr, _tr("Stick Input"));
     } else {
-        //strcpy(cp->tmpstr, (const char *)"Channel Output");
         strcpy(cp->tmpstr, _tr("Channel Output"));
     }
     return cp->tmpstr;
@@ -176,9 +175,9 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    strcpy(cp->tmpstr, (const char *)"->");
+    strcpy(cp->tmpstr, "->");
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, (const char *)"<-");
+        strcpy(cp->tmpstr, "<-");
     }
     return cp->tmpstr;
 }

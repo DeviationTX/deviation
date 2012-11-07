@@ -60,7 +60,7 @@ static void _show_page()
 
         y += space;
     }
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - 3, space, LCD_HEIGHT- space, max_items, NULL, NULL, NULL);
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, max_items, NULL, NULL, NULL);
 
     GUI_SetSelected(itemObj[selectedIdx]);
     // when entering this page from its children page, we need to scroll the view to its previous position

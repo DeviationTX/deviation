@@ -127,8 +127,8 @@ static void _show_limits()
             w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_trimstep_cb, &mp->limit.subtrim);
 
     // The following items are not draw in the logical view;
-    y = space;
-    x = LCD_WIDTH - 3;
+    y = ITEM_HEIGHT;
+    x = LCD_WIDTH - ARROW_WIDTH;
     u8 h = LCD_HEIGHT - y ;
     mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);

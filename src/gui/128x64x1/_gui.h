@@ -39,6 +39,6 @@ enum ButtonType {
 #define ARROW_RIGHT (&image_map[DRAW_BTN32_15])
 #define ARROW_UP    NULL
 #define ARROW_DOWN  NULL
-#define ARROW_WIDTH 3
+#define ARROW_WIDTH 4
 #define ARROW_HEIGHT 3
 #define LINE_SPACING 1
