@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
-#include "icons.h"
+//#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
@@ -40,6 +40,7 @@ void PAGE_MainInit(int page)
     (void)page;
     int i;
     u16 x, y, w, h;
+    memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
@@ -86,44 +87,14 @@ void PAGE_MainInit(int page)
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
-    mp->battObj = GUI_CreateLabelBox(85,1, 40, 8, &TINY_FONT,  voltage_cb, NULL, NULL);
+    mp->battObj = GUI_CreateLabelBox(88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
     //TxPower
     GUI_CreateLabelBox(85, 12,  //54,1,
             40, 8,&TINY_FONT, _power_to_string, NULL, NULL);
 }
 
-void PAGE_MainEvent()
+static void _check_voltage()
 {
-    int i;
-    if (PAGE_GetModal())
-        return;
-    for(i = 0; i < 6; i++) {
-        if (! mp->trimObj[i])
-            continue;
-        if (mp->trims[i] != Model.trims[i].value) {
-            mp->trims[i] = Model.trims[i].value;
-            GUI_Redraw(mp->trimObj[i]);
-        }
-    }
-    for(i = 0; i < 8; i++) {
-        if (! mp->boxObj[i])
-            continue;
-        s32 val = get_boxval(Model.pagecfg.box[i]);
-        if (Model.pagecfg.box[i] <= 2) {
-            if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
-                //Timer
-                //GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, val < 0));
-                mp->boxval[i] = val;
-                GUI_Redraw(mp->boxObj[i]);
-            } else if (mp->boxval[i] / 1000 != val /1000) {
-                mp->boxval[i] = val;
-                GUI_Redraw(mp->boxObj[i]);
-            }
-        } else if (mp->boxval[i] != val) {
-            mp->boxval[i] = val;
-            GUI_Redraw(mp->boxObj[i]);
-        }
-    }
     if (CLOCK_getms() > next_scan)  {  // don't need to check battery too frequently, to avoid blink of the battery label
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
@@ -142,14 +113,25 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         PAGE_ChangeByName("MainMenu", 0);
-    }
-    else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
         mp->ignore_release = 1;
         TIMER_StartStop(0);
         TIMER_StartStop(1);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_DOWN)) {
         TIMER_Reset(0);
         TIMER_Reset(1);;
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) { // hot key to change brightness
+        u8 changed;
+        Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
+              MIN_BRIGHTNESS, 9, 1, 1, 1, &changed);
+        if (changed)
+            BACKLIGHT_Brightness(Transmitter.brightness);
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) { // hot key to change brightness
+        u8 changed;
+        Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
+              MIN_BRIGHTNESS, 9, -1, 1, 1, &changed);
+        if (changed)
+            BACKLIGHT_Brightness(Transmitter.brightness);
     }
     else {
         MIXER_UpdateTrim(button, flags, data);
