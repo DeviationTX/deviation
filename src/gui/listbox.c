@@ -95,6 +95,10 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
     listbox->select_cb = select_cb;
     listbox->longpress_cb = longpress_cb;
     listbox->cb_data = cb_data;
+
+    // bug fix: the total items of scroll-bar is 0-based while devo10 is 1-based
+    // 0-based for sum is not a good idea.
+    sb_entries++;
     listbox->scrollbar = GUI_CreateScrollbar(
               x + width - ARROW_WIDTH,
               y,
@@ -102,6 +106,8 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
               sb_entries,
               obj,
               scroll_cb, NULL);
+    if (listbox->item_count <= listbox->entries_per_page)
+        GUI_SetHidden(listbox->scrollbar, 1);
     if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT)
         BUTTON_RegisterCallback(&listbox->action,
                  CHAN_ButtonMask(BUT_LEFT)
@@ -162,20 +168,17 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
     u8 i;
     struct guiListbox *listbox = &obj->o.listbox;
     unsigned int font;
-    u8 scroll_width = 0;
+    if (listbox->item_count <= listbox->entries_per_page)
+        GUI_SetHidden(listbox->scrollbar, 1);
+    else
+        GUI_SetHidden(listbox->scrollbar, 0);
     if (listbox->style == LISTBOX_DEVO10) {
         font = listbox->desc.font;
-        scroll_width = ARROW_WIDTH;
-        if (redraw_all) {
-            LCD_FillRect(obj->box.x, obj->box.y, obj->box.width - scroll_width, obj->box.height +1, FILL);
-        }
-        if (obj == objSELECTED)
-            LCD_DrawFastVLine(obj->box.x, obj->box.y, obj->box.height, 0xffff); // draw a vertical line to indicate being selected
-    } else {
-        if (redraw_all) {
-            LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, FILL);
-        }
+   } else {
         font = Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font;
+    }
+    if (redraw_all) {
+        LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, FILL);
     }
     LCD_SetXY(obj->box.x + 5, obj->box.y + LINE_SPACING -1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page) {
@@ -184,11 +187,11 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
             if (obj != objSELECTED)  // only draw a box when the listbox is not selected
                 LCD_DrawRect(obj->box.x,
                     obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height + LINE_SPACING),
-                    obj->box.width  - scroll_width, listbox->text_height, SELECT);
+                    obj->box.width, listbox->text_height, SELECT);
             else
                 LCD_FillRect(obj->box.x,
                     obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height + LINE_SPACING),
-                    obj->box.width  - scroll_width, listbox->text_height, SELECT);
+                    obj->box.width, listbox->text_height, SELECT);
         } else {
             LCD_FillRect(obj->box.x,
             obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height),
@@ -244,10 +247,7 @@ static u8 press_cb(u32 button, u8 flags, void *data)
         u8 move_down_button = BUT_RIGHT;
         u8 move_up_button = BUT_LEFT;
         if (listbox->style == LISTBOX_DEVO10) {
-            if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT) {
-                move_down_button = BUT_LEFT;
-                move_up_button = BUT_RIGHT;
-            } else {
+            if (listbox->key_style != LISTBOX_KEY_RIGHTLEFT) {
                 move_down_button = BUT_DOWN;
                 move_up_button = BUT_UP;
             }
@@ -287,42 +287,3 @@ static u8 press_cb(u32 button, u8 flags, void *data)
 
 }
 
-/*
-void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type)
-{
-    struct guiListbox *listbox = &obj->o.listbox;
-    (void)press_type;
-    // devo10's right/left buttons are upside down
-    u8 move_down_button = BUT_RIGHT;
-    u8 move_up_button = BUT_LEFT;
-    if (listbox->style == LISTBOX_DEVO10) {
-        if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT) {
-            move_down_button = BUT_LEFT;
-            move_up_button = BUT_RIGHT;
-        } else {
-            move_down_button = BUT_DOWN;
-            move_up_button = BUT_UP;
-        }
-    }
-    if (button == move_down_button) {
-        if (listbox->selected < listbox->item_count - 1) {
-            listbox->selected++;
-            if (listbox->selected >= listbox->cur_pos + listbox->entries_per_page)
-                GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, 1, NULL));
-            if (listbox->select_cb)
-                listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
-            OBJ_SET_DIRTY(obj, 1);
-        }
-    } else if(button == move_up_button) {
-        if (listbox->selected > 0) {
-            listbox->selected--;
-            if (listbox->selected < listbox->cur_pos)
-                GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, -1, NULL));
-            if (listbox->select_cb)
-                listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
-            OBJ_SET_DIRTY(obj, 1);
-        }
-    } else if(button == BUT_ENTER && listbox->longpress_cb) {
-        listbox->longpress_cb(obj, (u16)listbox->selected, listbox->cb_data);
-    }
-} */

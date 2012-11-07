@@ -68,11 +68,11 @@ void GUI_DrawScrollbar(struct guiObject *obj)
     if (ARROW_UP == NULL) { // plate-text scroll bar for devo10
         if (scrollbar->num_items >1) { // bug fix: avoid divided by 0
             bar_height = 6;
-            u16 bar_x = obj->box.x - obj->box.width/2;
-            GUI_DrawBackground(bar_x, obj->box.y, obj->box.width, obj->box.height);
-            LCD_DrawFastVLine(obj->box.x, obj->box.y, obj->box.height, 0xffff);
+			// Improve scroll bar apperance for devo10
+            GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+            LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, 0xffff);
             u16 bar_y = scrollbar->cur_pos * (obj->box.height- bar_height)/(scrollbar->num_items -1)+ obj->box.y;
-            LCD_DrawRect(bar_x, bar_y, obj->box.width, bar_height, 0xffff);
+            LCD_FillRect(obj->box.x, bar_y, obj->box.width, bar_height, 0xffff);
         }
     } else {
         #define BAR_BG      Display.scrollbar.bg_color      // RGB888_to_RGB565(0x44, 0x44, 0x44)
