@@ -150,7 +150,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
         if (old_h < txt_h)
             old_h = txt_h;
         GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
-        LCD_DrawFastHLine(obj_x, old_h, old_w, 1);
+        LCD_DrawFastHLine(obj_x, obj_y + old_h -1, old_w, 1); // bug fix: get right y position
         if (obj_height > txt_h)
             txt_y = obj_y + (obj_height - txt_h) / 2;
         else

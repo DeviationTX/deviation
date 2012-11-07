@@ -16,7 +16,7 @@
 #include "common.h"
 #include "pages.h"
 #include "config/model.h"
-#include "icons.h"
+//#include "icons.h"
 
 #include "../common/_mixer_page.c"
 

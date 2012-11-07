@@ -1,6 +1,5 @@
 #include "common.h"
 #include "pages.h"
-#include "icons.h"
 #include "gui/gui.h"
 
 static struct sub_menu_page * const smp = &pagemem.u.sub_menu_page;
@@ -16,13 +15,15 @@ static const char *title1[] = {_tr_noop("Model config"), _tr_noop("Transmitter c
 static const char *menu_item_name_deviation0[] = {
      _tr_noop("Mixer"), _tr_noop("Model setup"),
      _tr_noop("Timers"),
+     _tr_noop("Telemetry config"),
      _tr_noop("Trims"), //_tr_noop("Mixer Mode"),
      0
 };
 static const char *menu_item_name_deviation1[] = {
      _tr_noop("Basic config"), _tr_noop("Monitor"),
-     _tr_noop("Telemetry monitor"), _tr_noop("Telemetry config"),
-     _tr_noop("Scanner"), _tr_noop("USB"), 0
+     _tr_noop("Telemetry monitor"),
+     //_tr_noop("Scanner"),
+     _tr_noop("USB"), 0
 };
 
 u8 sub_menu_item = 0;  // global variable to let other page get back to the right sub menu
@@ -47,6 +48,8 @@ void PAGE_SubMenuInit(int page)
     while (smp->menu_item_name[smp->menu_item_count] !=0) smp->menu_item_count++;
     show_menuItems(current_page_start_idx[sub_menu_item]);
     GUI_SetSelected(smp->menuItemObj[selected_menu_idx[sub_menu_item] - current_page_start_idx[sub_menu_item]]);
+    if (smp->scroll_bar != NULL)
+        GUI_SetScrollbar(smp->scroll_bar, selected_menu_idx[sub_menu_item]);
 }
 
 void PAGE_SubMenuExit()

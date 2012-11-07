@@ -1,6 +1,6 @@
 #include "common.h"
 #include "pages.h"
-#include "icons.h"
+//#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
@@ -32,7 +32,8 @@ void PAGE_MainMenuInit(int page)
     while (mmp->menu_item_name[mmp->main_menu_count] != 0) mmp->main_menu_count++;
 
     int i;
-    u8 row = MENU_ITEM_START_ROW;
+    u8 space = ITEM_HEIGHT + 1;
+    u8 row = space;
     u8 col = 1;
     struct LabelDesc labelDesc;
     labelDesc.font = DEFAULT_FONT.font;
@@ -43,9 +44,9 @@ void PAGE_MainMenuInit(int page)
     for (i = 0; i < mmp->main_menu_count; i++) {
         mmp->menuItemObj[i] = GUI_CreateLabelBox(col, row, 0, 0,
                 &labelDesc, PAGE_menuitem_cb, press_cb, (const void *)mmp->menu_item_name[i]);
-        row += MENU_ITEM_HEIGHT;
-        if (row + MENU_ITEM_HEIGHT> LCD_HEIGHT) {
-            row = MENU_ITEM_START_ROW;
+        row += ITEM_HEIGHT;
+        if (row + ITEM_HEIGHT> LCD_HEIGHT) {
+            row = space;
             col = 66;
         }
     }
@@ -58,6 +59,18 @@ void PAGE_MainMenuExit()
 {
 }
 
+static void navigate_items(s8 direction, s8 step)
+{
+    selected_menu_idx += direction*step;
+    if (selected_menu_idx < 0 ) {  // bug fix: push right/left then up/down keys might let selected_menu_idx <0, lead to crash
+        selected_menu_idx = mmp->main_menu_count -1;
+    }
+    if (selected_menu_idx >= mmp->main_menu_count) {
+        selected_menu_idx %=  mmp->main_menu_count;
+    }
+    GUI_SetSelected(mmp->menuItemObj[selected_menu_idx]);
+}
+
 u8 action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
@@ -65,29 +78,13 @@ u8 action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByName("MainPage", 0);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            selected_menu_idx--;
-            if (selected_menu_idx < 0 ) {
-                selected_menu_idx = mmp->main_menu_count -1;
-            }
-            GUI_SetSelected(mmp->menuItemObj[selected_menu_idx]);
+            navigate_items(-1, 1);
         }else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            selected_menu_idx++;
-            if (selected_menu_idx >= mmp->main_menu_count) {
-                selected_menu_idx = 0;
-            }
-            GUI_SetSelected(mmp->menuItemObj[selected_menu_idx]);
+            navigate_items(1, 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            selected_menu_idx -= PAGE_ITEM_COUNT;
-            if (selected_menu_idx < 0) {
-                selected_menu_idx = mmp->main_menu_count + selected_menu_idx;
-            }
-            GUI_SetSelected(mmp->menuItemObj[selected_menu_idx]);
+            navigate_items(-1, mmp->main_menu_count > PAGE_ITEM_COUNT? PAGE_ITEM_COUNT :mmp->main_menu_count);
         }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
-            selected_menu_idx += PAGE_ITEM_COUNT;
-            if (selected_menu_idx >= mmp->main_menu_count) {
-                selected_menu_idx %=  mmp->main_menu_count;
-            }
-            GUI_SetSelected(mmp->menuItemObj[selected_menu_idx]);
+            navigate_items(1, mmp->main_menu_count > PAGE_ITEM_COUNT? PAGE_ITEM_COUNT :mmp->main_menu_count);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

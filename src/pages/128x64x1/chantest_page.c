@@ -24,9 +24,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
-static void _press_cb(guiObject_t *obj, const void *data);
+static void _navigate_items(s8 direction);
 #define VIEW_ID 0
 static u8 current_page = 0;
+static u8 total_items = 3;
 static u8 view_height;
 static guiObject_t *scroll_bar;
 
@@ -38,24 +39,36 @@ static void _show_bar_page(u8 num_bars)
         num_bars = 18;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = 9;
-    view_height = LCD_HEIGHT -view_origin_absoluteY;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH, view_height, view_origin_absoluteX, view_origin_absoluteY);
+
+    GUI_CreateLabelBox(0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
+    struct LabelDesc desc;
+    desc.font = DEFAULT_FONT.font;
+    desc.outline_color = desc.fill_color = 1;
+    desc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
+    desc.font_color = 1; // bug fix: if the font_color doesn't assign, the string might not be shown
+    GUI_CreateRect(0, ITEM_HEIGHT , LCD_WIDTH, 1, &desc);
 
     u8 x = 0;
-    u8 space = ITEM_HEIGHT + 2;
-    s8 y = -space;
-    u8 height = 4 ;
+    u8 height = 7;
     u8 width = 59; // better to be even
-    struct LabelDesc desc;
-    desc.font = TINY_FONT.font;
-    desc.style = LABEL_LEFT;
-    desc.font_color = 1;
-    desc.fill_color = desc.outline_color = 0xffff; // not to draw box
-
-    GUI_CreateLabelBox(0 , 0, 30, 9, &desc, _title_cb, NULL, (void *)NULL);
+    u8 page_item_count = 8;
+    if (cp->type == MONITOR_RAWINPUT) {
+        desc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
+        height = 12;
+        page_item_count = 6;
+        view_height = 51; // can only show 3 rows: (12 + 5) x 3
+    } else {
+        desc.font = TINY_FONT.font;  // only digits, can use smaller font to show more channels
+        height = 7;
+        page_item_count = 8;
+        view_height = 48; // can only show 4 rows: (7 + 5) x 4
+    }
+    u8 space = height + 5;
+    s8 y = -space;
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH, view_height, view_origin_absoluteX, view_origin_absoluteY);
 
     for(i = 0; i < num_bars; i++) {
         if (i%2 ==0) {
@@ -63,25 +76,23 @@ static void _show_bar_page(u8 num_bars)
             y += space;
         } else {
             x = 63;
-
         }
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID,x) , GUI_MapToLogicalView(VIEW_ID, y),
-                0, 7, &desc, _channum_cb, NULL, (void *)(long)i);
+                0, height, &desc, _channum_cb, NULL, (void *)(long)i);
         cp->value[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, x + 37), GUI_MapToLogicalView(VIEW_ID, y),
-                        23, 7 , &desc, value_cb, NULL, (void *)((long)i));
-        cp->bar[i] = GUI_CreateBarGraph(GUI_MapToLogicalView(VIEW_ID, x) , GUI_MapToLogicalView(VIEW_ID, y + 8),
-                width, height, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)((long)i));
-
+                        23, height, &TINY_FONT, value_cb, NULL, (void *)((long)i));
+        cp->bar[i] = GUI_CreateBarGraph(GUI_MapToLogicalView(VIEW_ID, x) , GUI_MapToLogicalView(VIEW_ID, y + height),
+                width, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)((long)i));
     }
 
-    u8 w = 14;
-    guiObject_t * obj = GUI_CreateButtonPlateText(LCD_WIDTH -w, 0, w, 8, &desc, _page_cb, 0x0000, _press_cb, NULL);
-    GUI_SetSelected(obj);
-    u8 pages = num_bars/8;
-    if (num_bars%8!= 0)
-        pages++;
-    if (pages > 1)
-        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY, 2, NULL, NULL, NULL);
+    u8 w = 10;
+    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+    u8 total_items = num_bars/page_item_count;
+    if (num_bars%page_item_count!= 0)
+        total_items++;
+    if (total_items > 1)
+        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY,
+                LCD_HEIGHT - view_origin_absoluteY, total_items, NULL, NULL, NULL);
     else
         scroll_bar = NULL;
 }
@@ -114,16 +125,29 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     cp->return_val = page;
 }
 
-static void _navigate_pages()
+static void _navigate_items(s8 direction)
 {
     if (scroll_bar == NULL) // no page scroll
         return;
-    if (current_page ==0)
-        GUI_SetRelativeOrigin(VIEW_ID, 0, view_height);
-    else
+    current_page += direction;
+    if (current_page <=0) {
+        current_page = 0;
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    current_page = !current_page;
+    }  else {
+        if (current_page >= total_items)
+            current_page = total_items -1;
+        GUI_ScrollLogicalView(VIEW_ID, direction* view_height);
+    }
     GUI_SetScrollbar(scroll_bar, current_page);
+}
+
+static void _navigate_pages(s8 direction)
+{
+    if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
+            (direction == 1 && cp->type == MONITOR_CHANNELOUTPUT)) {
+        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_CHANNELOUTPUT: MONITOR_RAWINPUT;
+        PAGE_ChantestInit(0);
+    }
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -136,10 +160,15 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             else
                 PAGE_ChangeByName("SubMenu", sub_menu_item);
         }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            _navigate_pages();
+            _navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
-            _navigate_pages();
-        } else {
+            _navigate_items(1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+            _navigate_pages(1);
+        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            _navigate_pages(-1);
+        }
+        else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;
         }
@@ -151,7 +180,7 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    if (cp->type) {
+    if (cp->type == MONITOR_RAWINPUT) {
        INPUT_SourceName(cp->tmpstr, ch+1);
     } else {
        sprintf(cp->tmpstr, "%d", (int)ch+1);
@@ -164,9 +193,9 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, _tr("Stick Input"));
+        strcpy(cp->tmpstr, (const char *)_tr("Stick input"));
     } else {
-        strcpy(cp->tmpstr, _tr("Channel Output"));
+        strcpy(cp->tmpstr, (const char *)_tr("Channel output"));
     }
     return cp->tmpstr;
 }
@@ -175,17 +204,9 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    strcpy(cp->tmpstr, "->");
+    strcpy(cp->tmpstr, (const char *)"->");  //this is actually used as an icon don't translate t
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, "<-");
+        strcpy(cp->tmpstr, (const char *)"<-");
     }
     return cp->tmpstr;
-}
-
-static void _press_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_CHANNELOUTPUT: MONITOR_RAWINPUT;
-    PAGE_ChantestInit(0);
 }

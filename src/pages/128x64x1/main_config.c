@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
-#include "icons.h"
+//#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "main_config.h"
@@ -438,7 +438,9 @@ static void tglico_cancel_cb(guiObject_t *obj, const void *data)
 
 void select_toggle_icon(u8 idx)
 {
-    long pos = 0;
+    (void)tglico_cancel_cb;
+    (void)idx; // not used page, to be refactored later on
+    /* long pos = 0;
     u16 w, h, x, y;
     u8 i, j;
     PAGE_RemoveAllObjects();
@@ -457,6 +459,6 @@ void select_toggle_icon(u8 idx)
                 GUI_CreateRect(x-1, y-1, 34, 33, &outline);
             GUI_CreateImageOffset(x, y, 32, 31, pos * 32, 0, TOGGLE_FILE, tglico_select_cb, (void *)((idx << 8) | pos));
         }
-    }
+    } */
 }
 
