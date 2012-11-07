@@ -42,7 +42,7 @@ static void _show_buttons(int loadsave)
 
 static void _show_list(int loadsave,u8 num_models)
 {
-    guiObject_t *obj = GUI_CreateListBoxPlateText(0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -2, num_models,
+    guiObject_t *obj = GUI_CreateListBoxPlateText(0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1, num_models,
         mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
         string_cb, select_cb, _press_cb, (void *)(long)loadsave);
     GUI_SetSelected(obj);

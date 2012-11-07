@@ -20,7 +20,6 @@
 #include "../common/_reorder_list.c"
 
 #define VIEW_ID 0
-static u8 total_items;
 static s8 current_selected = 0;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -34,8 +33,8 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
         case MOVE_UP:   return _tr("Up");
         case MOVE_DOWN: return _tr("Dn");
         case APPLY:     return _tr("Copy To");
-        case INSERT:    return _tr("+");
-        case REMOVE:    return _tr("-");
+        case INSERT:    return "+";
+        case REMOVE:    return "-";
     }
     return "";
 }
@@ -54,7 +53,6 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
 
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
-    total_items = 0;
     current_selected = 0;
     int i;
     for(i = 0; i < rl.max; i++) {
@@ -96,10 +94,9 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
         &DEFAULT_FONT, NULL, 0x0000, _okcancel_cb, (void *)_tr("Save"));
 
     u8 x = w + 4;
-    rl.listbox = GUI_CreateListBoxPlateText(x, 0, LCD_WIDTH - x +1, LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
+    rl.listbox = GUI_CreateListBoxPlateText(x, 0, LCD_WIDTH - x , LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
         LISTBOX_KEY_RIGHTLEFT, string_cb, select_cb, NULL, NULL);
-
-    total_items = y/space + 1;
+    GUI_SetSelectable(rl.listbox, 0);
 
     PAGE_SetActionCB(NULL);
     // we need to grab the key handler from the listbox to let rl.textsel catch left/right keys when it is selected
