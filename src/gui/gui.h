@@ -48,6 +48,7 @@ enum LabelType {
     LABEL_BOX,
     LABEL_BRACKET,
     LABEL_BLINK,
+    LABEL_SQUAREBOX,
 };
 
 enum ListBoxType {

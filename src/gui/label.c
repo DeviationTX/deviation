@@ -77,18 +77,22 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
     u16 h = obj_height;
     LCD_SetFont(desc->font);
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
-    if (desc->style == LABEL_BOX || desc->style == LABEL_BRACKET) {  // draw round rect for the textsel widget when it is pressable
+    if (desc->style == LABEL_BOX || desc->style == LABEL_BRACKET || desc->style == LABEL_SQUAREBOX) {
+        // draw round rect for the textsel widget when it is pressable
         if (obj_width == 0)
             w = txt_w;
         if (obj_height == 0)
             h = txt_h;
         GUI_DrawBackground(obj_x, obj_y, w, h);
         if (is_selected) {
-            LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
+            if (desc->style == LABEL_SQUAREBOX)
+                LCD_FillRect(obj_x, obj_y, w, h , 1);
+            else
+                LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
         }  else {
-            LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 0); // clear the background
-
-            if (desc->style == LABEL_BRACKET) {
+            if (desc->style == LABEL_SQUAREBOX)
+                LCD_DrawRect(obj_x, obj_y, w, h, 1);
+            else if (desc->style == LABEL_BRACKET) {
                 u16 y1 = obj_y + 2;
                 u16 y2 = obj_y + obj_height -3;
                 u16 x1 = obj_x + obj_width - 1;
