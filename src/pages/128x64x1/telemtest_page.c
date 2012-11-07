@@ -51,7 +51,7 @@ static void _show_page1()
     u8 row = space;
     w = 35;
     struct LabelDesc desc = TINY_FONT;
-    for(u8 i = 0; i < 4; i++) {
+    for(long i = 0; i < 4; i++) {
         u8 x = 8;
         desc.style = LABEL_LEFTCENTER;
         GUI_CreateLabelBox(0,  row, 8, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
@@ -92,7 +92,7 @@ static void _show_page2()
     u8 row = 0;
     struct LabelDesc desc = TINY_FONT;
     desc.style = LABEL_SQUAREBOX;
-    for(u8 i = 0; i < 5; i++) {
+    for(long i = 0; i < 5; i++) {
 
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT,  label_cb, NULL, (void *)(TELEM_GPS_LAT+i));

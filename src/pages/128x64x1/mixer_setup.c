@@ -367,7 +367,7 @@ static void _show_expo_dr_switch(u8 switch_no)  // switch_no = 1 or 2
     u8 y = 0;
     u8 idx = (switch_no -1) * 4;
     mp->expoObj[idx] = GUI_CreateButton(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            BUTTON_DEVO10, show_rate_cb, 0x0000, toggle_link_cb, (void *)(switch_no-1));
+            BUTTON_DEVO10, show_rate_cb, 0x0000, toggle_link_cb, (void *)(switch_no-1L));
     GUI_CustomizeButton(mp->expoObj[idx], &mp->labelDesc, w, ITEM_HEIGHT);
 
     y += space;
