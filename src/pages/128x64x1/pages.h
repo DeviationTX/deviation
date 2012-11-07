@@ -7,10 +7,10 @@
 #include "../common/timer_page.h"
 #include "../common/model_page.h"
 #include "../common/chantest_page.h"
-#include "scanner_page.h"
+//#include "scanner_page.h"
 #include "../common/usb_page.h"
 #include "../common/tx_configure.h"
-#include "telemtest_page.h"
+#include "../common/telemtest_page.h"
 #include "../common/telemconfig_page.h"
 #include "config/display.h"
 
@@ -25,7 +25,7 @@ struct pagemem {
         struct model_page model_page;
         struct timer_page timer_page;
         struct chantest_page chantest_page;
-        struct scanner_page scanner_page;
+        //struct scanner_page scanner_page;
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;
@@ -68,13 +68,6 @@ void PAGE_MainMenuExit();
 // Sub Menu
 void PAGE_SubMenuInit(int page);
 void PAGE_SubMenuExit();
-
-// Language select
-void PAGE_SingleItemConfigInit();
-void PAGE_SingleItemConfigExit();
-
-void PAGE_MultiItemsConfigInit();
-void PAGE_MultiItemsConfigExit();
 
 // Mixer
 void PAGE_MixerInit(int page);
@@ -120,8 +113,6 @@ void PAGE_USBExit();
 // Calibrate
 void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
-void PAGE_CalibrateInit(int page);
-void PAGE_CalibrateEvent();
 void LANGPage_Select(void(*return_page)(int page));
 
 void PAGE_MainCfgEvent();
@@ -130,4 +121,10 @@ void PAGE_MainCfgInit(int page);
 /* Telemetry Test */
 void PAGE_TelemtestInit(int page);
 void PAGE_TelemtestEvent();
+void PAGE_TelemtestModal(void(*return_page)(int page), int page);
+
+/* Telemetry Config */
+void PAGE_TelemconfigInit(int page);
+void PAGE_TelemconfigEvent();
+
 #endif

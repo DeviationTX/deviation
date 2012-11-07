@@ -10,7 +10,7 @@
 #include "scanner_page.h"
 #include "../common/usb_page.h"
 #include "../common/tx_configure.h"
-#include "telemtest_page.h"
+#include "../common/telemtest_page.h"
 #include "../common/telemconfig_page.h"
 #include "config/display.h"
 

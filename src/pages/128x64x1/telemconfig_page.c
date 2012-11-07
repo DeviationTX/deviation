@@ -19,108 +19,142 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-#define tp pagemem.u.telemconfig_page
-static const char *label_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    sprintf(tp.str, "%s%d", _tr("Alarm"), (int)((long)data)+1);
-    return tp.str;
-}
+#include "../common/_telemconfig_page.c"
 
-static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    int val = (long)data;
-    u8 changed;
-    Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
-        0, TELEM_RPM2, dir, 1, 1, &changed);
-    if (changed) {
-        GUI_Redraw(tp.valueObj[val]);
-    }
-    return TELEMETRY_ShortName(tp.str, Model.telem_alarm[val]);
-}
+static u8 _action_cb(u32 button, u8 flags, void *data);
+static u8 _action_cb_changeunit(u32 button, u8 flags, void *data);
+static void _press_cb(guiObject_t *obj, const void *data);
+static const char *idx_cb(guiObject_t *obj, const void *data);
+static void show_page_selectunit();
 
-static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    int val = (long)data;
-    u8 changed;
-    u8 type = (Model.telem_flags & (1 << val)) ? 1 : 0;
-    type = GUI_TextSelectHelper(type, 0, 1, dir, 1, 1, &changed);
-    if (changed) {
-        if (type) {
-            Model.telem_flags |= 1 << val;
-        } else {
-            Model.telem_flags &= ~(1 << val);
-        }
-    }
-    return type ? "<=" : ">=";
-}
+#define VIEW_ID 0
 
-static const char *limit_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    int val = (long)data;
-    if (Model.telem_alarm[val] == 0) {
-        return "----";
-    }
-    s32 max = TELEMETRY_GetMaxValue(Model.telem_alarm[val]);
-    
-    u8 small_step = 1;
-    u8 big_step = 10;
-    if (Model.telem_alarm[val] == TELEM_RPM1 || Model.telem_alarm[val] == TELEM_RPM2) {
-        small_step = 10;
-        big_step = 100;
-    }
-
-    Model.telem_alarm_val[val] = GUI_TextSelectHelper(Model.telem_alarm_val[val],
-        0, max, dir, small_step, big_step, NULL);
-    return TELEMETRY_GetValueStrByValue(tp.str, Model.telem_alarm[val], Model.telem_alarm_val[val]);
-}
-
-static const char *units_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 changed;
-    u8 mask = data ? TELEMFLAG_FAREN : TELEMFLAG_FEET;
-    u8 type = (Model.telem_flags & mask) ? 1 : 0;
-    type = GUI_TextSelectHelper(type, 0, 1, dir, 1, 1, &changed);
-    if (changed) {
-        if (type) {
-            Model.telem_flags |= mask;
-        } else {
-            Model.telem_flags &= ~mask;
-        }
-        if (data) {
-            //Celcius/Farenheit: redraw values
-            for(int i = 0; i < TELEM_NUM_ALARMS; i++)
-                GUI_Redraw(tp.valueObj[i]);
-        }
-    }
-    if (data) {
-        return type ? _tr("Fahrenheit") : _tr("Celcius");
-    } else {
-        return type ? _tr("Feet") : _tr("Meters");
-    }
-}
+static u8 total_items;
+static guiObject_t *scroll_bar;
+static guiObject_t *firstObj;
+static s8 current_selected = 0;
+static s16 view_origin_relativeY = 0;
 
 void PAGE_TelemconfigInit(int page)
 {
-   (void)page;
-    const u8 row_height = 25;
+    (void)label_cb;
+    if (page < 0)
+        page = current_selected;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Telemetry"));
+    PAGE_RemoveAllObjects();
+    PAGE_SetActionCB(_action_cb);
+    // no header for devo10 to show more items //PAGE_ShowHeader(_tr("Telemetry"));
+    PAGE_ShowHeader(""); // to draw a underline only
+    current_selected = 0;
+    total_items = 0;
 
-    GUI_CreateTextSelect(10, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)1L);
-    GUI_CreateTextSelect(182, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)0L);
-    for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
-        GUI_CreateLabelBox(10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
-           label_cb, NULL, (void *)i);
-        GUI_CreateTextSelect(65, 70 + row_height * i, TEXTSELECT_96, 0x0000, NULL, telem_name_cb, (void *)i);
-        GUI_CreateTextSelect(166, 70 + row_height * i, TEXTSELECT_64, 0x0000, NULL, gtlt_cb, (void *)i);
-        tp.valueObj[i] = GUI_CreateTextSelect(235, 70 + row_height * i, TEXTSELECT_64, 0x0000, NULL, limit_cb, (void *)i);
+    firstObj = GUI_CreateButtonPlateText(63, 0 , 65, ITEM_HEIGHT,
+            &DEFAULT_FONT, NULL, 0x0000, _press_cb, (void *)_tr("Change Unit"));
+    GUI_SetSelected(firstObj);
+
+    // Create 1 logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 space = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+            view_origin_absoluteX, view_origin_absoluteY);
+
+    u8 row = 0;
+    u8 w1 = 42;
+    u8 w2 = 23;
+    u8 w3 = 40;
+    u8 i;
+    for (i = 0; i < TELEM_NUM_ALARMS; i++) {
+        u8 x = 9;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)i);
+        x += w1 + 5;
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)i);
+        x += w2 + 3;
+        tp.valueObj[i] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w3, ITEM_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)i);
+        total_items++;
+        row += space;
     }
+    total_items *= 3;
+    total_items++;
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
+    if (page > 0)
+        PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
 }
 
-void PAGE_TelemconfigEvent() {
+
+static void show_page_selectunit()
+{
+    PAGE_RemoveAllObjects();
+    PAGE_SetActionCB(_action_cb_changeunit);
+    PAGE_ShowHeader(_tr("Change Unit")); // to draw a underline only
+
+    u8 space = ITEM_HEIGHT + 1;
+    u8 row = space;
+    u8 w = 70;
+    GUI_CreateLabelBox(0, row, 80, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Temperature"));
+    row += space;
+    firstObj = GUI_CreateTextSelectPlate(50, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
+    row += space;
+    GUI_CreateLabelBox(0, row, 80, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Distance"));
+    row += space;
+    GUI_CreateTextSelectPlate(50, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
+    GUI_SetSelected(firstObj);
 }
+
+static void _press_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    show_page_selectunit();
+}
+
+static const char *idx_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    u8 idx = (long)data;
+    sprintf(tp.str, "%d", idx+1);
+    return tp.str;
+}
+
+static u8 _action_cb_changeunit(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_TelemconfigInit(PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static u8 _action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
+            show_page_selectunit(); // long press ENT to enter change unit page
+        }
+        else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
+

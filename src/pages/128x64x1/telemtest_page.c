@@ -18,68 +18,55 @@
 #include "telemetry.h"
 #include "gui/gui.h"
 
-#define tp (pagemem.u.telemtest_page)
+#include "../common/_telemtest_page.c"
 
-#define TELEM_FONT NORMALBOX_FONT
-#define TELEM_TXT_FONT DEFAULT_FONT
-#define TELEM_ERR_FONT NORMALBOXNEG_FONT
-static const char *telem_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u32 val = (long)data;
-    return TELEMETRY_GetValueStr(tp.str, val);
-}
+typedef enum {
+    telemetry_basic,
+    telemetry_gps,
+} TeleMetryMonitorType;
 
-static const char *label_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long val = (long)data;
-    switch(val) {
-        case TELEM_VOLT1: sprintf(tp.str, "%s%d", _tr("Volt"), 1); break;
-        case TELEM_VOLT2: sprintf(tp.str, "%s%d", _tr("Volt"), 2); break;
-        case TELEM_VOLT3: sprintf(tp.str, "%s%d", _tr("Volt"), 3); break;
-        case TELEM_RPM1:  sprintf(tp.str, "%s%d",  _tr("RPM"), 1);  break;
-        case TELEM_RPM2:  sprintf(tp.str, "%s%d",  _tr("RPM"), 2);  break;
-        case TELEM_TEMP1: sprintf(tp.str, "%s%d", _tr("Temp"), 1); break;
-        case TELEM_TEMP2: sprintf(tp.str, "%s%d", _tr("Temp"), 2); break;
-        case TELEM_TEMP3: sprintf(tp.str, "%s%d", _tr("Temp"), 3); break;
-        case TELEM_TEMP4: sprintf(tp.str, "%s%d", _tr("Temp"), 4); break;
-        case TELEM_GPS_LONG:   strcpy(tp.str, _tr("Longitude")); break;
-        case TELEM_GPS_LAT:    strcpy(tp.str, _tr("Latitude")); break;
-        case TELEM_GPS_ALT:    strcpy(tp.str, _tr("Altitude")); break;
-        case TELEM_GPS_SPEED:  strcpy(tp.str, _tr("Speed")); break;
-        case TELEM_GPS_TIME:   strcpy(tp.str, _tr("Time")); break;
-        default: tp.str[0] = '\0'; break;
-     }
-     return tp.str;
-}
+static u8 _action_cb(u32 button, u8 flags, void *data);
+static const char *_page_cb(guiObject_t *obj, const void *data);
+static void _press_cb(guiObject_t *obj, const void *data);
+static void _show_page2();
+static const char *idx_cb(guiObject_t *obj, const void *data);
 
-static void show_page()
+#define VIEW_ID 0
+static TeleMetryMonitorType current_page = telemetry_basic;
+static s8 current_item = 0;
+static guiObject_t *scroll_bar;
+
+static void _show_page1()
 {
-    const u8 row_height = 20;
-    for(long i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(20, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_TEMP1+i));
-        tp.temp[i] = GUI_CreateLabelBox(60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_TEMP1+1));
-    }
-    for(long i = 0; i < 3; i++) {
-        GUI_CreateLabelBox(120, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_VOLT1+i));
-        tp.volt[i] = GUI_CreateLabelBox(155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_VOLT1+1));
-    }
-    for(long i = 0; i < 2; i++) {
-        GUI_CreateLabelBox(220, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_RPM1+i));
-        tp.rpm[i]  = GUI_CreateLabelBox(255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_RPM1+1));
-    }
-    for(long i = 0; i < 5; i++) {
-        GUI_CreateLabelBox(20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
-        tp.gps[i]  = GUI_CreateLabelBox(100,  140 + i*row_height, 200, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+    PAGE_RemoveAllObjects();
+    u8 w = 35;
+    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
+    GUI_CreateLabelBox(8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp:"));
+    GUI_CreateLabelBox(w + 13, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Volt:"));
+    GUI_CreateLabelBox(w + w + 18, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("RPM:"));
+    w = 10;
+    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+
+    u8 space = ITEM_HEIGHT +1;
+    u8 row = space;
+    w = 35;
+    struct LabelDesc desc = TINY_FONT;
+    for(u8 i = 0; i < 4; i++) {
+        u8 x = 8;
+        desc.style = LABEL_LEFTCENTER;
+        GUI_CreateLabelBox(0,  row, 8, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
+        desc.style = LABEL_SQUAREBOX;
+        tp.temp[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc,
+                          telem_cb, NULL, (void *)(TELEM_TEMP1+1));
+        if (i < 3) {
+            x = x + w + 5;
+            tp.volt[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_VOLT1+i));
+        }
+        if (i < 2) {
+            x = x + w + 5;
+            tp.rpm[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_RPM1+i));
+        }
+        row += space;
     }
     tp.telem = Telemetry;
     tp.telem.time[0] = 0;
@@ -87,100 +74,135 @@ static void show_page()
     tp.telem.time[2] = 0;
 }
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
+static void _show_page2()
+{
+    PAGE_RemoveAllObjects();
+    current_item = 0;
+    PAGE_ShowHeader(_tr_noop("GPS")); // to draw a underline only
+    u8 w = 10;
+    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+
+    // Create a logical view
+    u8 space = ITEM_HEIGHT + 1;
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = space;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - space ,
+            view_origin_absoluteX, view_origin_absoluteY);
+
+    u8 row = 0;
+    struct LabelDesc desc = TINY_FONT;
+    desc.style = LABEL_SQUAREBOX;
+    for(u8 i = 0; i < 5; i++) {
+
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT,  label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+        row += space;
+        tp.gps[i]  = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                LCD_WIDTH - ARROW_WIDTH - 3, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+        row += space;
+
+    }
+    tp.telem = Telemetry;
+    tp.telem.time[0] = 0;
+    tp.telem.time[1] = 0;
+    tp.telem.time[2] = 0;
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, 3, NULL, NULL, NULL);
+}
+
+static const char *idx_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    (void)data;
-    if(tp.return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        tp.return_page(tp.return_val);
-    }
+    u8 idx = (long)data;
+    sprintf(tp.str, "%d", idx+1);
+    return tp.str;
 }
 
 void PAGE_TelemtestInit(int page)
 {
+    (void)okcancel_cb;
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Telemetry"));
-    show_page();
+    PAGE_SetActionCB(_action_cb);
+    memset(tp.volt, 0, sizeof(tp.volt));
+    memset(tp.temp, 0, sizeof(tp.temp));
+    memset(tp.rpm, 0, sizeof(tp.rpm));
+    if (current_page== telemetry_gps)
+        _show_page2();
+    else
+        _show_page1();
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 {
-    PAGE_SetModal(1);
-    tp.return_page = return_page;
-    tp.return_val = page;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(_tr("Telemetry"), okcancel_cb);
-
-    show_page();
+    (void)return_page;
+    (void)page;
 }
 
-void PAGE_TelemtestEvent() {
-    int i;
-    u32 time = CLOCK_getms();
-    for(i = 0; i < 3; i++) {
-        if (Telemetry.volt[i] != tp.telem.volt[i]) {
-            GUI_Redraw(tp.volt[i]);
-            tp.telem.volt[i] = Telemetry.volt[i];
-        }
+static const char *_page_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    if (current_page== telemetry_gps)
+        strcpy(tp.str, (const char *)"<-");
+    else
+        strcpy(tp.str, (const char *)"->");
+    return tp.str;
+}
+
+static void _press_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
+    if (current_page== telemetry_gps)
+        _show_page2();
+    else
+        _show_page1();
+}
+
+static void _navigate_items(s8 direction)
+{
+    if (scroll_bar == NULL) // no page scroll
+        return;
+    current_item += direction;
+    if (current_item <=0) {
+        current_item = 0;
+        GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
+    }  else {
+        if (current_item >= 3)
+            current_page = 2;
+        GUI_ScrollLogicalView(VIEW_ID, direction *(LCD_HEIGHT - ITEM_HEIGHT));
     }
-    for(i = 0; i < 2; i++) {
-        if (Telemetry.rpm[i] != tp.telem.rpm[i]) {
-            GUI_Redraw(tp.rpm[i]);
-            tp.telem.rpm[i] = Telemetry.rpm[i];
-        }
-    }
-    for(i = 0; i < 4; i++) {
-        if (Telemetry.temp[i] != tp.telem.temp[i]) {
-            GUI_Redraw(tp.temp[i]);
-            tp.telem.temp[i] = Telemetry.temp[i];
-        }
-    }
-    if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
-        tp.telem.gps = Telemetry.gps;
-        for(i = 0; i < 5; i++)
-            GUI_Redraw(tp.gps[i]);
-    }
-    if(Telemetry.time[0] && (time - Telemetry.time[0] > TELEM_ERROR_TIME || tp.telem.time[0] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[0] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[0] = Telemetry.time[0];
-        for(i = 0; i < 3; i++)
-            GUI_SetLabelDesc(tp.volt[i], font);
-        for(i = 0; i < 2; i++)
-            GUI_SetLabelDesc(tp.rpm[i], font);
-    }
-    if(Telemetry.time[1] && (time - Telemetry.time[1] > TELEM_ERROR_TIME || tp.telem.time[1] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[1] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[1] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[1] = Telemetry.time[1];
-        for(i = 0; i < 4; i++)
-            GUI_SetLabelDesc(tp.temp[i], font);
-    }
-    if(Telemetry.time[2] && (time - Telemetry.time[2] > TELEM_ERROR_TIME || tp.telem.time[2] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[2] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[2] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[2] = Telemetry.time[2];
-        for(i = 0; i < 5; i++)
-            GUI_SetLabelDesc(tp.gps[i], font);
+    GUI_SetScrollbar(scroll_bar, current_item);
+}
+
+static void _navigate_pages(s8 direction)
+{
+    if ((direction == -1 && current_page == telemetry_gps) ||
+            (direction == 1 && current_page == telemetry_basic)) {
+        _press_cb(NULL, NULL);
     }
 }
 
+static u8 _action_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            _navigate_items(-1);
+        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
+            _navigate_items(1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+            _navigate_pages(1);
+        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            _navigate_pages(-1);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}

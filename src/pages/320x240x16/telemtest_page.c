@@ -18,24 +18,7 @@
 #include "telemetry.h"
 #include "gui/gui.h"
 
-#define tp (pagemem.u.telemtest_page)
-
-#define TELEM_FONT NORMALBOX_FONT
-#define TELEM_TXT_FONT DEFAULT_FONT
-#define TELEM_ERR_FONT NORMALBOXNEG_FONT
-static const char *telem_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u32 val = (long)data;
-    return TELEMETRY_GetValueStr(tp.str, val);
-}
-
-static const char *label_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long val = (long)data;
-    return TELEMETRY_ShortName(tp.str, val);
-}
+#include "../common/_telemtest_page.c"
 
 static void show_page()
 {
@@ -70,17 +53,6 @@ static void show_page()
     tp.telem.time[2] = 0;
 }
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(tp.return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        tp.return_page(tp.return_val);
-    }
-}
-
 void PAGE_TelemtestInit(int page)
 {
     (void)page;
@@ -100,70 +72,3 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 
     show_page();
 }
-
-void PAGE_TelemtestEvent() {
-    int i;
-    u32 time = CLOCK_getms();
-    for(i = 0; i < 3; i++) {
-        if (Telemetry.volt[i] != tp.telem.volt[i]) {
-            GUI_Redraw(tp.volt[i]);
-            tp.telem.volt[i] = Telemetry.volt[i];
-        }
-    }
-    for(i = 0; i < 2; i++) {
-        if (Telemetry.rpm[i] != tp.telem.rpm[i]) {
-            GUI_Redraw(tp.rpm[i]);
-            tp.telem.rpm[i] = Telemetry.rpm[i];
-        }
-    }
-    for(i = 0; i < 4; i++) {
-        if (Telemetry.temp[i] != tp.telem.temp[i]) {
-            GUI_Redraw(tp.temp[i]);
-            tp.telem.temp[i] = Telemetry.temp[i];
-        }
-    }
-    if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
-        tp.telem.gps = Telemetry.gps;
-        for(i = 0; i < 5; i++)
-            GUI_Redraw(tp.gps[i]);
-    }
-    if(Telemetry.time[0] && (time - Telemetry.time[0] > TELEM_ERROR_TIME || tp.telem.time[0] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[0] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[0] = Telemetry.time[0];
-        for(i = 0; i < 3; i++)
-            GUI_SetLabelDesc(tp.volt[i], font);
-        for(i = 0; i < 2; i++)
-            GUI_SetLabelDesc(tp.rpm[i], font);
-    }
-    if(Telemetry.time[1] && (time - Telemetry.time[1] > TELEM_ERROR_TIME || tp.telem.time[1] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[1] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[1] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[1] = Telemetry.time[1];
-        for(i = 0; i < 4; i++)
-            GUI_SetLabelDesc(tp.temp[i], font);
-    }
-    if(Telemetry.time[2] && (time - Telemetry.time[2] > TELEM_ERROR_TIME || tp.telem.time[2] == 0)) {
-        struct LabelDesc *font;
-        if (time - Telemetry.time[2] > TELEM_ERROR_TIME) {
-            font = &TELEM_ERR_FONT;
-            Telemetry.time[2] = 0;
-        } else {
-            font = &TELEM_FONT;
-        }
-        tp.telem.time[2] = Telemetry.time[2];
-        for(i = 0; i < 5; i++)
-            GUI_SetLabelDesc(tp.gps[i], font);
-    }
-}
-

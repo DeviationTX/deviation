@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
-#include "icons.h"
+//#include "icons.h"
 #include "gui/gui.h"
 
 //static buttonAction_t button_action;
@@ -36,7 +36,7 @@ struct page {
 struct pagemem pagemem;
 
 static const struct page pages[] = {
-    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},  // Note: the page name lenth should not exceed 10 chars
+    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},  // Note: the page name length should not exceed 10 chars
     {PAGE_MainMenuInit, NULL, PAGE_MainMenuExit, "MainMenu"},
     {PAGE_SubMenuInit, NULL, PAGE_SubMenuExit, "SubMenu" },
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
@@ -46,6 +46,8 @@ static const struct page pages[] = {
     {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
     {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
     {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
+    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
+    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
 
     /*
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
@@ -128,7 +130,7 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(0, 0, LCD_WIDTH, MENU_ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
@@ -143,39 +145,25 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
 {
-    enter_cmd = CallBack;
+    (void)title;
+    (void)CallBack;
+    (void)enter_cmd;
+    (void)enter_data;
+    (void)exit_cmd;
+    (void)exit_data;
+    /*    enter_cmd = CallBack;
     enter_data = (void *)1;
     exit_cmd = CallBack;
     exit_data = (void *)0;
     GUI_CreateIcon(0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
+    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title); */
 }
-
-static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    return data ? _tr("OK") : _tr("Cancel");
-}
-
 
 void PAGE_RemoveAllObjects()
 {
     enter_cmd = NULL;
     exit_cmd = NULL;
     GUI_RemoveAllObjects();
-}
-
-guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
-{
-    exit_cmd = CallBack;
-    exit_data = (void *)0;
-    return GUI_CreateButton(x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
-}
-guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
-{
-    enter_cmd = CallBack;
-    enter_data = (void *)1;
-    return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }
 
 void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
@@ -205,7 +193,7 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
     }
     *selectedIdx += direction;
     *selectedIdx %= total_items;
-    if (selectedIdx == 0) {
+    if (*selectedIdx == 0) {
         GUI_SetRelativeOrigin(view_id, 0, 0);
     } else {
         if (*selectedIdx < 0)
