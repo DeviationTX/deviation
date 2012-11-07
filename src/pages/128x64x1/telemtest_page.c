@@ -168,9 +168,9 @@ static void _navigate_items(s8 direction)
     if (current_item <=0) {
         current_item = 0;
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    }  else {
-        if (current_item >= 3)
-            current_page = 2;
+    }  else if (current_item > 2) {
+        current_item = 2;
+    } else {
         GUI_ScrollLogicalView(VIEW_ID, direction *(LCD_HEIGHT - ITEM_HEIGHT));
     }
     GUI_SetScrollbar(scroll_bar, current_item);
