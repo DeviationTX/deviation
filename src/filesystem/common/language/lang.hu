@@ -5,10 +5,6 @@ Csatornák:
 %s = %d%%, a biztonságos érték = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\na biztonságos érték = %d%%\n
-:+
-+
-:-
--
 :1-to-1
 1 az 1
 :11 Point
@@ -70,9 +66,9 @@ Oszlop:
 :Basic config
 Alap beállítás
 :Batt alarm:
-Tápfesz. riasztás:
+Fesz. riasztás:
 :Battery Alarm:
-Tápfesz. riasztás:
+Fesz. riasztás:
 :Battery too low,\ncan't save!
 Tápfesz. túl alacsony,\nnem tudok menteni!
 :Bind
@@ -95,6 +91,8 @@ Kollektív inv.:
 CYC
 :Calibrate
 Kalibrálás
+:Calibration done.
+Kalibrálás kész.
 :Cancel
 Mégsem
 :Celcius
@@ -105,8 +103,10 @@ Celsius
 Cs
 :Change
 Váltás
-:Channel Output
-Csatorna kimenet
+:Change Unit
+Mértékegys.
+:Channel output
+Csatornák
 :Channels
 Csatornák
 :Complex
@@ -137,6 +137,8 @@ Holtsáv
 Default
 :Deviation FW\nversion:
 Deviation fw.\nverzió:
+:Distance
+Távolság
 :Dn
 Le
 :Down
@@ -146,7 +148,7 @@ ELE
 :ELE DR
 ELE DR
 :ELE Inv:
-Magasság inv.:
+Magassági inv.:
 :EXPO
 EXP.
 :Enter
@@ -175,6 +177,8 @@ Fix
 Fix ID:
 :GEAR
 GEAR
+:GPS
+GPS
 :Heli
 Heli
 :Helicopter
@@ -219,13 +223,13 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main menu
-Főmenü
 :Main Page Config
 Főablak konfiguráció
+:Main menu
+Főmenü
 :Max:
 Max:
-:Meters
+:Meter
 Méter
 :Mid-Rate
 Közepes
@@ -241,12 +245,12 @@ Mixerek:
 Mód %d
 :Model
 Modell
-:Model config
-Modell konfig.
 :Model Name:
 Modell név:
 :Model Type:
 Modell típus:
+:Model config
+Modell konfig.
 :Model name:
 Modell név:
 :Model setup
@@ -315,8 +319,8 @@ Protokoll:
 JOBB_V
 :RIGHT_V
 JOBB_F
-:RPM
-Ford.
+:RPM:
+Ford.:
 :RUD
 RUD
 :RUD DR
@@ -361,16 +365,16 @@ Forrás:
 Start:
 :Step:
 Lépés
-:Stick Input
-Bemenetek
 :Stick Mode:
 Mód:
+:Stick input
+Bemenetek
 :Stick mode:
 Mód:
 :Sticks:
 Botkormány:
 :Subtrim:
-Subtrim
+Subtrim:
 :SwashType:
 Imbolygó típusa:
 :Switch1
@@ -415,8 +419,16 @@ TelemHőm
 TelemFesz
 :Telemetry
 Telemtria
+:Telemetry config
+Telemetria konfig.
+:Telemetry monitor
+Telemetria adatok
 :Temp
 Hőm.
+:Temp:
+Hőm.:
+:Temperature
+Hőmérséklet
 :Template..
 Sablon...
 :Test
@@ -475,6 +487,8 @@ Fel
 Virt.
 :Volt
 Fesz.
+:Volt:
+Fesz.:
 :Zero/Max
 Nulla/Max
 :\n\nBinding will end in %d seconds...
