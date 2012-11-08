@@ -46,7 +46,12 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
     u8 i;
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            calibrate_state = CALI_EXIT;
+            // bug fix: when most users see the "Calibration done", it is very likely tha they will press ext to exit,
+            // then all calibration data are rollback, and cause the calibration failed -- what a tough bug!!
+            if (calibrate_state == CALI_SUCCESS)
+                calibrate_state = CALI_SUCCESSEXIT;
+            else
+                calibrate_state = CALI_EXIT;
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             switch (calibrate_state){
             case CALI_CENTER:

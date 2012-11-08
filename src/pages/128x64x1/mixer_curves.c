@@ -38,7 +38,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     edit->curveptr = curve;
 
     struct LabelDesc labelDesc;
-    labelDesc.font = TINY_FONT.font;
+    labelDesc.font = DEFAULT_FONT.font;
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_CENTER;
     labelDesc.outline_color = 0xffff;
