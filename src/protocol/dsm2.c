@@ -359,10 +359,10 @@ static u16 dsm2_cb()
                 return 15800;
             }
             state = DSM2_CH1_WRITE_B;
-            return 11000 - 6000;
+            return 4800;
         }
         state = DSM2_CH1_WRITE_A;
-        return 11000 - 6000;
+        return 4800;
     } 
     return 0;
 }
