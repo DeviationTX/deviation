@@ -46,7 +46,9 @@ sub read_bdf {
         if(/FONT_DESCENT\s+(\d+)/) {
             ${descent} = $1;
         }
-        if(/ENCODING\s+(\d+)/) {
+        if(/STARTCHAR\s+uni(\S\S\S\S)\s*$/) {
+            $current_char = hex($1);
+        } elsif(/ENCODING\s+(\d+)/) {
             $current_char = $1;
         } elsif(/BBX\s+(\S+) (\S+) (\S+) (\S+)/) {
             $char{$current_char}{bbox} = [$1, $2, $3, $4];

@@ -83,7 +83,7 @@ def main():
     num_chars = 0
     chardata = ""
     for r in char_set:
-        for c in range(r[1], r[2]):
+        for c in range(r[1], r[2]+1):
             #for each character
             uc = unichr(c)
             face = 0
@@ -114,7 +114,7 @@ def main():
                 bitmap = face.glyph.bitmap
                 pitch  = face.glyph.bitmap.pitch
                 if options.debug:
-                    print "(%02d) %d: %d, %d, %d" %(size, c, width, ascent, descent)
+                    print "(%s %02d) %05d/%04x: %d, %d, %d" %(face.family_name, size, c, c, width, ascent, descent)
                 if c == 32:
                     width = space
                 num_chars += 1
