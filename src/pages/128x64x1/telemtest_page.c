@@ -72,6 +72,8 @@ static void _show_page1()
     tp.telem.time[0] = 0;
     tp.telem.time[1] = 0;
     tp.telem.time[2] = 0;
+    // bug fix: scroll_bar must be initialized, otherwise it will caused crash when checked against NULL(press UP/DOWN keys)
+    scroll_bar = NULL;
 }
 
 static void _show_page2()

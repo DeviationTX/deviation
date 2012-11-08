@@ -101,7 +101,7 @@ void Init() {
     SPITouch_Init();
     SOUND_Init();
     BACKLIGHT_Init();
-    BACKLIGHT_Brightness(9);
+    BACKLIGHT_Brightness(1);
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
 }
 
