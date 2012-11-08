@@ -259,6 +259,16 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     case MUX_ADD:
         value = raw[mixer->dest + NUM_INPUTS + 1] + value;
         break;
+    case MUX_MAX:
+        value = raw[mixer->dest + NUM_INPUTS + 1] > value
+                  ? raw[mixer->dest + NUM_INPUTS + 1]
+                  : value;
+        break;
+    case MUX_MIN:
+        value = raw[mixer->dest + NUM_INPUTS + 1] < value
+                  ? raw[mixer->dest + NUM_INPUTS + 1]
+                  : value;
+        break;
     case MUX_LAST: break;
     }
 

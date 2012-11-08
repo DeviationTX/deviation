@@ -57,7 +57,7 @@ static const char MIXER_OFFSET[] = "offset";
 static const char MIXER_USETRIM[] = "usetrim";
 
 static const char MIXER_MUXTYPE[] = "muxtype";
-static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply", "add" };
+static const char * const MIXER_MUXTYPE_VAL[MUX_LAST]  = { "replace", "multiply", "add", "max", "min" };
 
 static const char MIXER_CURVETYPE[] = "curvetype";
 static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {

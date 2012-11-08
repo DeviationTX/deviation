@@ -72,6 +72,8 @@ enum MuxType {
     MUX_REPLACE,
     MUX_MULTIPLY,
     MUX_ADD,
+    MUX_MAX,
+    MUX_MIN,
     MUX_LAST,
 };
 

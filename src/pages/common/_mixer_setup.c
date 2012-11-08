@@ -305,7 +305,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
-    mp->cur_mixer->mux = GUI_TextSelectHelper(mp->cur_mixer->mux, MUX_REPLACE, MUX_ADD, dir, 1, 1, &changed);
+    mp->cur_mixer->mux = GUI_TextSelectHelper(mp->cur_mixer->mux, MUX_REPLACE, MUX_LAST-1, dir, 1, 1, &changed);
     if (changed) {
         redraw_graphs();
         sync_mixers();
@@ -314,6 +314,8 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
         case MUX_REPLACE:  return _tr("replace");
         case MUX_MULTIPLY: return _tr("mult");
         case MUX_ADD:      return _tr("add");
+        case MUX_MAX:      return _tr("max");
+        case MUX_MIN:      return _tr("min");
         case MUX_LAST: break;
     }
     return "";
