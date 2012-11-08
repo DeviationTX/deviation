@@ -43,8 +43,17 @@ static const char *string_cb(u8 idx, void *data)
                 cp->tmpstr[0] = 0;
             fclose(fh);
             unsigned len = strlen(cp->tmpstr);
-            if(strlen(cp->tmpstr) && cp->tmpstr[0] != ':') {
+            if(len && cp->tmpstr[0] != ':') {
                 cp->tmpstr[len-1] = '\0';
+                if ((u8)cp->tmpstr[0] == 0xef
+                    && (u8)cp->tmpstr[1] == 0xbb
+                    && (u8)cp->tmpstr[2] == 0xbf)
+                {
+                    //Remove BOM
+                    for(u32 i = 3; i < len; i++)
+                        cp->tmpstr[i-3] = cp->tmpstr[i];
+                    len -= 3;
+                }
                 return cp->tmpstr;
             }
         }
