@@ -146,6 +146,7 @@ static void _show_complex()
                 w, ITEM_HEIGHT, &mp->labelDesc, reorder_cb, set_mixernum_cb, NULL);
     } else {
         GUI_RemoveHierObjects(mp->expoObj[0]);
+        y += 3*space;
     }
 
     //Row 2
