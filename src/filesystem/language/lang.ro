@@ -1,0 +1,495 @@
+﻿Română 
+:# Channels:
+Canale:
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%, valoare de siguranță = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%s = %d%%,\nvaloare de siguranță = %d%%\n
+:+
++
+:-
+-
+:1-to-1
+1 la 1
+:11 Point
+11 puncte
+:13 Point
+13 puncte
+:3 Point
+3 puncte
+:4 Bars
+4 bare
+:4 Inside
+4 pe interior
+:4 Outside
+4 pe exterior
+:4Ch w/ Dual-Rates
+4 can. + D/R
+:5 Point
+5 puncte
+:6 Trims
+6 trimuri
+:6Ch Airplane
+6 avion
+:6Ch Helicopter
+6 canale, elicopter
+:7 Point
+7 puncte
+:8 Bars
+8 bare
+:9 Point
+9 puncte
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+VAL ABS
+:AIL
+AIL
+:AIL DR
+AIL DR
+:AIL Inv:
+AIL Inv.:
+:AUX4
+AUX4
+:AUX5
+AUX5
+:Airplane
+Avion
+:Alarm
+Alarmă 
+:Altitude
+Altitudine
+:Backlight:
+Iluminare:
+:Bar %d:
+Bara %d:
+:Bars:
+Bare:
+:Basic config
+Configurare
+:Batt alarm:
+Alarmă bat.:
+:Battery Alarm:
+Alarmă baterie:
+:Battery too low,\ncan't save!
+Nivel baterie scăzut,\nnu pot salva!
+:Bind
+Bind
+:Binding
+Conectare
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
+:Binding...\n%d seconds\nPress ENT to stop
+Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
+:Box %d:
+Box%d:
+:Buttons
+Butoane
+:COL
+Colectiv
+:COL Inv:
+Colectiv inv.:
+:CYC
+CYC
+:Calibrate
+Calibrare
+:Cancel
+Anuleaz[
+:Celcius
+Celsius
+:Center all \nsticks and knobs\nthen press ENT
+Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
+:Ch
+Ch
+:Change
+Modifică
+:Channel Output
+Ieșire canal
+:Channels
+Canale
+:Complex
+Complex
+:Configure
+Configurează
+:Contrast:
+Contrast:
+:Copy To
+Copiază
+:Copy To...
+Copiază în...
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Nivelul de încărcare al bateriei critic!\nSetările au fost salvate,\norice modificare ulterioară\nNU va mai fi salvată.\n\nÎncărcați sau schimbați bateriile!
+:Curve:
+Curba:
+:Cyclic1
+Ciclic1
+:Cyclic2
+Ciclic2
+:Cyclic3
+Ciclic3
+:DR
+DR
+:Deadband
+Bandă moartă
+:Default
+Default
+:Deviation FW\nversion:
+Deviation fw.\nversiune:
+:Dn
+Js
+:Down
+Jos
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+ELE inv.:
+:EXPO
+EXP.
+:Enter
+Enter
+:Exit
+Exit
+:Expo&DR
+Expo+DR
+:FMODE0
+FMODE0
+:FMODE1
+FMODE1
+:FMODE2
+FMODE2
+:Fahrenheit
+Fahrenheit
+:Failsafe:
+Failsafe:
+:Feet
+Picioare
+:File:
+Fișier:
+:Fixed
+Fix
+:Fixed ID:
+ID Fix:
+:GEAR
+GEAR
+:Heli
+Heli
+:Helicopter
+Elicopter
+:High-Rate
+Pos0
+:Icon
+Icon
+:Input:
+Intrare:
+:Inputs
+Intrări
+:Insert
+Inserare
+:Inverted
+Inversat
+:LEFT_H
+STÂNGA_H
+:LEFT_V
+STÂNGA_V
+:Language:
+Limbă:
+:Latitude
+Latitudine
+:Left
+Stânga
+:Linked
+Legat
+:Load
+Încarcă
+:Load...
+Încarcă...
+:Longitude
+Longitudine
+:Low Battery
+Nivel bat. scăzut
+:Low-Rate
+Pos2
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main menu
+Meniu principal
+:Main Page Config
+Configurare
+:Max:
+Max:
+:Meters
+Metri
+:Mid-Rate
+Pos1
+:Min/Max
+Min/Max
+:Min:
+Min:
+:Mixer
+Configurare mixer
+:Mixers:
+Mixere:
+:Mode %d
+Mod %d
+:Model
+Model
+:Model config
+Configurare model
+:Model Name:
+Nume model:
+:Model Type:
+Tip model:
+:Model name:
+Nume model:
+:Model setup
+Profil model
+:Model type:
+Tip model:
+:Monitor
+Monitor
+:Move Down
+Mișcă în jos
+:Move Up
+Mișcă în sus
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Mută stick-urile și potențiometrele\nla MAX și MIN\ndupă care apasă ENT
+:Mux:
+Mux:
+:Neg
+Neg.
+:New
+Now
+:No Bars
+Nici o bară
+:No Trim
+Nici un trim
+:No Trims
+Nici un trim
+:None
+Nimic
+:Normal
+Normal
+:OK
+OK
+:Off
+Oprit
+:Offset:
+Offset:
+:Ok
+OK
+:On
+Pornit
+:Page:
+Pagină:
+:Plane
+Avion
+:Point:
+Punct:
+:Pos
+Poz.
+:Pos/Neg:
+Poz/Neg:
+:Press 'Ent' to turn USB Filesystem:
+\nApasă ENT pentru a seta modul USB: 
+:Press ENT to change:
+Apasaă ENT pentru schimbare:
+:Press ENT to copy to:
+Apasa ENT pentru copiere:
+:Press ENT to load:
+Apasă ENT pentru incarcare:
+:Press ENT to start\ncalibration\nPress EXT to exit
+Apasă ENT pentru a începe calibrarea\nApasă EXT pentru a ieși
+:Press ENT to turn \nUSB drive: 
+Apasă ENT pentru a seta\nmodul USB: 
+:Protocol:
+Protocol:
+:RIGHT_H
+DREAPTA_V
+:RIGHT_V
+DREAPTA_F
+:RPM
+RPM
+:RUD
+RUD
+:RUD DR
+RUD DR
+:Re-Init
+Re-init
+:Remove
+Șterge
+:Reset
+Resetează
+:Reverse:
+Invers:
+:Reversed
+Inversat
+:Revert
+Inversează
+:Right
+Dreapta
+:Safe Val:
+Valoare sig.:
+:Safety
+Siguranță
+:Safety:
+Siguranță:
+:Save
+Salv.
+:Scale:
+Scara:
+:Scanner
+Scaner
+:Simple
+Simplu
+:Simple 4 Channel
+Simplu 4 canale
+:Speed
+Viteză
+:Src
+Sursa
+:Src:
+Sursa:
+:Start:
+Start:
+:Step:
+Pas:
+:Stick Input
+Stick intrare
+:Stick Mode:
+Mod:
+:Stick mode:
+Mod:
+:Sticks:
+Stick-uri:
+:Subtrim:
+Subtrim
+:SwashType:
+Tip platou:
+:Switch1
+Într.1
+:Switch2
+Într.2
+:Switch:
+Activator:
+:Symmetric
+Simetric.
+:THR
+THR
+:TRIMLH+
+TRIM_BV+
+:TRIMLH-
+TRIM_BV-
+:TRIMLV+
+TRIM_BF+
+:TRIMLV-
+TRIM_BF-
+:TRIMRH+
+TRIM_JV+
+:TRIMRH-
+TRIM_JV-
+:TRIMRV+
+TRIM_JF+
+:TRIMRV-
+TRIM_JF-
+:TRIM_L+
+TRIM_B+
+:TRIM_L-
+TRIM_B-
+:TRIM_R+
+TRIM_J+
+:TRIM_R-
+TRIM_J-
+:TelemRPM
+TelemRPM
+:TelemT
+TelemT
+:TelemV
+TelemV
+:Telemetry
+Telemetrie
+:Telemetry config
+Telemetrie
+:Change unit
+Unitate masură
+:Temp
+Temp.
+:Template..
+Șablon...
+:Test
+Test
+:Time
+Timp
+:Timer
+Timer
+:Timers
+Timere
+:Toggle%d
+Într.%d
+:Touch Calibrate
+Calibrare ecran
+:Touch Screen:
+Ecran tactil::
+:Touch Test
+Test tactil
+:Touch target %d
+Atinge punctul %d
+:Touch to Lock
+Apasă pentru a încuia  
+:Touch to Unlock
+Apasă pentru a descuia
+:Transmitter config
+Configurare radio
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Pas trim:
+:Trims
+Trim-uri
+:Trims:
+Trim-uri:
+:Turn Off
+Oprește
+:Turn On
+Pornește
+:Tx Power:
+Putere radio:
+:Tx power:
+Putere radio:
+:USB
+USB
+:Unknown
+Necunoscut
+:Up
+Sus
+:Value:
+Valoare:
+:Virt
+Virt.
+:Volt
+Volt
+:Zero/Max
+Zero/Max
+:\n\nBinding will end in %d seconds...
+\n\nConectarea se va încheia în %d secunde...
+:add
+aditiv
+:countdown
+countdown
+:mult
+mult.
+:replace
+înloc.
+:stopwatch
+crono
