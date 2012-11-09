@@ -17,7 +17,10 @@ To build a new font:
    utils/build_bdf.py --size 15 --ascent 12 -b font15.bdf --ttf Ubuntu-C.ttf --ttf FireflySung.ttf --space 4
    And here is an example for a 12px font:
    utils/build_bdf.py --space 3 -s 12 -a 10 -b font12.bdf -t AR-PL-New-Sung.ttf:11 -t Ubuntu-C.ttf:11 -t fireflysung.ttf:12
-   (note that AR-PL-New-Sung.ttf is a subset of firflysung.ttf contating only 0x00-0x7F glyphs)
+   utils/build_bdf.py --space 3 -s 12 -a 10 -b font12.bdf -t Firefly-Latin.ttf:11 -t fireflysung.ttf:12
+   (note that Firefly-Latin.ttf is a subset of firflysung.ttf contating glyphs < 0x4E00.  It has been hand optimized for 11px bitmapped glyphs)
+   Here is an example for the 24bold font:
+   utils/build_bdf.py -s 23 -a 23 -b test.bdf -r 32-32,37-37,42-58,60-62,65-90 -d -p 6 -t trebucbd.ttf:31
 
 3) Convert the BDF file to a Deviuation FON file:
    utils/bdf_to_font.pl -maxsize 15 -mode bin font15.bdf -out font15 -minspace 8

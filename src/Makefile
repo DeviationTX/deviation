@@ -32,6 +32,10 @@ SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
 ODIR     = objs/$(TARGET)$(ODIREXT)
 OBJS 	 = $(addprefix $(ODIR)/, $(notdir $(SRC_C:.c=.o) $(SRC_S:.s=.o) $(SRC_CXX:.cpp=.o)))
 
+FONTS    = filesystem/devo10/media/12normal.fon \
+           filesystem/devo8/media/15normal.fon \
+           filesystem/devo8/media/23bold.fon
+
 MODELDIR = filesystem/models
 ifeq "$(wildcard ../.hg )" ""
   HGVERSION := ${TARGET}-Unknown
@@ -66,8 +70,7 @@ else
 	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
 endif
 
-$(LAST_MODEL): model_template.ini tx_template.ini \
-               filesystem/devo10/media/12normal.fon filesystem/devo8/media/15normal.fon
+$(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	@echo " + Copying template files"
 	for tx in devo8 devo10; do \
 		cp -prf filesystem/common/* filesystem/$$tx/; \
@@ -109,6 +112,9 @@ filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
 
 filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
 	../utils/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
+
+filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
+	../utils/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
 ## The autodependency magic below was adapeted from:
 ## http://mad-scientist.net/make/autodep.html

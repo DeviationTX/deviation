@@ -22,6 +22,21 @@ def main():
              ['./fireflysung.ttf', 0],
              ['./wqy-zenhei.ttc', 0],
              ]
+    char_set = [[0, 0x20, 0x7e],
+                 [0, 0xa1, 0x101],
+                 [0, 0x0112, 0x0113],
+                 [0, 0x012a, 0x012b],
+                 [0, 0x0132, 0x0133],
+                 [0, 0x014c, 0x014d],
+                 [0, 0x0150, 0x0153],
+                 [0, 0x0160, 0x0161],
+                 [0, 0x016a, 0x016b],
+                 [0, 0x0170, 0x0171],
+                 [0, 0x0174, 0x0177],
+                 [0, 0x017d, 0x017e],
+                 [0, 0x0400, 0x045f],
+                 [0, 0x1e80, 0x1e83],
+                 [1, 0x4e00, 0x9fff]]
     usage = """
 %prog [-s|--size <size>] [-a|--ascent <ascent>] [-b|--bdffile <file>] [-t|--ttf <ttf1,ttf2,...>]
 """
@@ -32,6 +47,8 @@ def main():
         default=False, help="Specify row # of baseline")
     parser.add_option("-b", "--bdffile", action="store", dest="bdffile",
         default = name+".bdf", help="BDF file to create")
+    parser.add_option("-r", "--range", action="store", dest="range",
+        default=False, help="Specify range of chars")
     parser.add_option("-t", "--ttf", action="append", dest="ttf",
         help="Input ttf files to use (order is important).  Append ':#' to force max font-size")
     parser.add_option("-d", "--debug", action="store_true", dest="debug",
@@ -54,7 +71,14 @@ def main():
         target_size = options.size
     if options.space:
         space = options.space
+    if options.range:
+        char_set = []
+        for r in options.range.split(","):
+            print r
+            (start, end) = r.split("-")
+            char_set.append([0, int(start), int(end)])
 
+    print char_set
     faces = []
     for (f, s) in fonts:
         if not os.path.exists(f):
@@ -65,21 +89,6 @@ def main():
             s = target_size+1
         faces.append([Face(f), s])
     max_descent = target_size - max_ascent
-    char_set = [[0, 0x20, 0x7e],
-                 [0, 0xa1, 0x101],
-                 [0, 0x0112, 0x0113],
-                 [0, 0x012a, 0x012b],
-                 [0, 0x0132, 0x0133],
-                 [0, 0x014c, 0x014d],
-                 [0, 0x0150, 0x0153],
-                 [0, 0x0160, 0x0161],
-                 [0, 0x016a, 0x016b],
-                 [0, 0x0170, 0x0171],
-                 [0, 0x0174, 0x0177],
-                 [0, 0x017d, 0x017e],
-                 [0, 0x0400, 0x045f],
-                 [0, 0x1e80, 0x1e83],
-                 [1, 0x4e00, 0x9fff]]
     num_chars = 0
     chardata = ""
     for r in char_set:
@@ -114,7 +123,7 @@ def main():
                 bitmap = face.glyph.bitmap
                 pitch  = face.glyph.bitmap.pitch
                 if options.debug:
-                    print "(%s %02d) %05d/%04x: %d, %d, %d" %(face.family_name, size, c, c, width, ascent, descent)
+                    print "(%s %02d) %05d/%04x: w:%d, a:%d, d:%d p:%d" %(face.family_name, size, c, c, width, ascent, descent, pitch)
                 if c == 32:
                     width = space
                 num_chars += 1
@@ -126,8 +135,9 @@ def main():
                 chardata += "BITMAP\n"
                 idx = 0
                 for i in bitmap.buffer:
+                    if (idx % pitch) < int((width + 7) / 8):
+                        chardata += "%02X" % (i)
                     idx += 1
-                    chardata += "%02X" % (i)
                     if (idx % pitch) == 0:
                         chardata += "\n"
                 chardata += "ENDCHAR\n"
