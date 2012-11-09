@@ -1,5 +1,6 @@
 #define LCD_WIDTH 320
 #define LCD_HEIGHT 240
+#define LCD_DEPTH 16
 enum ImageNames {
     FILE_BTN96_24,
     FILE_BTN48_24,

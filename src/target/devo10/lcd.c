@@ -31,7 +31,7 @@ static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
 static u8 dirty[PHY_LCD_WIDTH];
 static u16 xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
 static u16 xpos, ypos;
-static enum DrawDir dir;
+static s8 dir;
 
 void lcd_display(uint8_t on)
 {
@@ -151,12 +151,16 @@ void LCD_Clear(unsigned int val)
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)
 {
-    (void)y1;
-    dir = _dir;
+    if (_dir == DRAW_SWNE) {
+        ypos = y1;  // bug fix: must do it this way to draw bmp
+        dir = -1;
+    } else {
+        ypos = y0;
+        dir = 1;
+    }
     xstart = x0;
     xend = x1;
     xpos = x0;
-    ypos = y0;
 }
 /* Screen coordinates are as follows:
  * (128, 32)   ....   (0, 32)
@@ -209,8 +213,7 @@ void LCD_DrawPixel(unsigned int color)
         y = absolute_y0 - 32;
     else
         y = absolute_y0 + 32;
-    if (dir == DRAW_SWNE)
-        y = 63 - y;
+
     
     int ycol = y / 8;
     int ybit = y & 0x07;
@@ -223,7 +226,7 @@ void LCD_DrawPixel(unsigned int color)
     xpos++;
     if (xpos > xend) {
         xpos = xstart;
-        ypos++;
+        ypos += dir;
     }
 }
 

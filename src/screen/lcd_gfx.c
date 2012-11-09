@@ -17,6 +17,7 @@ All text above must be included in any redistribution
 #include "common.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "gui/gui.h"
 
 /* helper functions */
 
@@ -491,6 +492,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
             }
         } else {
             for (i = 0; i < w; i++ ) {
+                if (LCD_DEPTH == 1)
+                    *color = *color < 0x2fff? 0xffff:0;
                 LCD_DrawPixel(*color++);
             }
         }
