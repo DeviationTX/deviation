@@ -1,14 +1,10 @@
 ﻿Russian
 :# Channels:
-# каналов:
+Каналы:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, безопасное значение = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\nбезопасное значение = %d%%
-:+
-+
-:-
--
 :1-to-1
 1-к-1
 :11 Point
@@ -67,8 +63,10 @@ AUX5
 Полоса%d
 :Bars:
 Полоса:
-:Basic Config
+:Basic config
 Основная настройка
+:Batt alarm:
+Сигнал батареи:
 :Battery Alarm:
 Сигнал батареи:
 :Battery too low,\ncan't save!
@@ -93,16 +91,22 @@ AUX5
 Цикл
 :Calibrate
 Калибровка
+:Calibration done.
+Калибровка выполнена.
 :Cancel
 Отмена
 :Celcius
 Цельсий
-:Center all sticks\nthen press ENT
-Отцентруйте все стики,\nзатем нажмите ENT
+:Center all \nsticks and knobs\nthen press ENT
+Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал 
 :Change
 Изменить
+:Change Unit
+Изменить единицу
+:Channel output
+Выход канала
 :Channels
 Каналы
 :Complex
@@ -133,6 +137,8 @@ AUX5
 Умолчание
 :Deviation FW\nversion:
 Прошивка Deviation\nверсия:
+:Distance
+Расстояние
 :Dn
 Вниз
 :Down
@@ -171,6 +177,10 @@ AUX5
 Фиксированный ID:
 :GEAR
 Шасси
+:GPS
+GPS
+:Heli
+Вертолет
 :Helicopter
 Вертолет
 :High-Rate
@@ -194,7 +204,7 @@ AUX5
 :Latitude
 Широта
 :Left
-Левый
+Влево
 :Linked
 Связанный
 :Load
@@ -213,14 +223,14 @@ AUX5
 МИКШ1
 :MIX2
 МИКШ2
+:Main Page Config
+Главная страница
 :Main Menu
 Главное меню
-:Main Page Config
-Главная страница настройки
 :Max:
 Макс.:
-:Meters
-Метры
+:Meter
+Метр
 :Mid-Rate
 Средний расход
 :Min/Max
@@ -229,19 +239,23 @@ AUX5
 Мин.:
 :Mixer
 Микшер
-:Mixer Mode
-Режим микшера
 :Mixers:
 Микшер:
 :Mode %d
 Режим %d
 :Model
 Модель
-:Model Config
-Модель
 :Model Name:
 Имя модели:
 :Model Type:
+Тип модели:
+:Model config
+Модель
+:Model name:
+Имя модели:
+:Model setup
+Модель
+:Model type:
 Тип модели:
 :Monitor
 Монитор
@@ -249,8 +263,8 @@ AUX5
 Вниз
 :Move Up
 Вверх
-:Move sticks\nto max & min\nthen press ENT
-Переместите стики\nв максимум и минимум,\nзатем нажмите ENT
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Переместите стики и ручки\nв максимум и минимум,\nзатем нажмите ENT
 :Mux:
 Мульт:
 :Neg
@@ -279,6 +293,8 @@ OK
 Вкл.
 :Page:
 Стр.:
+:Plane
+Самолет
 :Point:
 Точка:
 :Pos
@@ -298,10 +314,6 @@ OK
 :Press ENT to turn \nUSB drive: 
 Нажмите ENT для перевода\nUSB диска в состояние:
 :Procotol:
-Протокол:
-:Protocol&Binding
-Протокол и привязка
-:Protocol:
 Протокол:
 :RIGHT_H
 ПРАВЫЙ_Г
@@ -355,6 +367,10 @@ RPM
 Шаг
 :Stick Mode:
 Режим стиков:
+:Stick input
+Ввод стика
+:Stick mode:
+Режим стиков:
 :Sticks:
 Стики:
 :Subtrim:
@@ -403,8 +419,16 @@ RPM
 ТелеV
 :Telemetry
 Телеметрия
+:Telemetry config
+Телеметрия
+:Telemetry monitor
+Монитор телеметрии
 :Temp
 Темп.
+:Temp:
+Темп.:
+:Temperature
+Температура
 :Template..
 Шаблон...
 :Test
@@ -413,6 +437,8 @@ RPM
 Время
 :Timer
 Таймер
+:Timers
+Таймеры
 :Toggle%d
 Перекл%d
 :Touch Calibrate
@@ -427,6 +453,8 @@ RPM
 Нажать для блокировки
 :Touch to Unlock
 Нажать для разблокировки
+:Transmitter config
+Передатчик
 :Trim
 Триммер
 :Trim +:
@@ -437,13 +465,15 @@ RPM
 Шаг триммера:
 :Trims:
 Триммер:
+:Trims:
+Триммер:
 :Turn Off
 Выключить
 :Turn On
 Включить
-:Tx Config
-Передатчик
 :Tx Power:
+Мощность:
+:Tx power:
 Мощность:
 :USB
 USB
@@ -457,6 +487,8 @@ USB
 Вирт. 
 :Volt
 Вольт
+:Volt:
+Вольт:
 :Zero/Max
 Ноль/Макс
 :\n\nBinding will end in %d seconds...
