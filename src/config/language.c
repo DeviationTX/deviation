@@ -19,7 +19,7 @@
 #include "ini.h"
 
 u16 fnv_16_str(const char *str);
-static char strings[4096];
+static char strings[8192];
 #define MAX_STRINGS 256
 #define MAX_LINE 300
 
