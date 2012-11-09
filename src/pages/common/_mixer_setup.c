@@ -123,8 +123,7 @@ static void update_rate_widgets(u8 idx)
             GUI_SetHidden(mp->expoObj[idx+2], 0);
         }
         GUI_SetHidden(mp->expoObj[idx+3], 0);
-        if (mp->graphs[2]) //Devo10 only has 1 XY graph
-            GUI_SetHidden(mp->graphs[mix], 0);
+        GUI_SetHidden(mp->graphs[mix], 0);
         if (mp->expoObj[9] != NULL)  // used for devo10 only
             GUI_SetHidden(mp->expoObj[9], 0);
     } else {
@@ -132,8 +131,7 @@ static void update_rate_widgets(u8 idx)
         GUI_SetHidden(mp->expoObj[idx+1], 1);
         GUI_SetHidden(mp->expoObj[idx+2], 1);
         GUI_SetHidden(mp->expoObj[idx+3], 1);
-        if (mp->graphs[2]) //Devo10 only has 1 XY graph
-            GUI_SetHidden(mp->graphs[mix], 1);
+        GUI_SetHidden(mp->graphs[mix], 1);
         if (mp->expoObj[9] != NULL)  // used for devo10 only
             GUI_SetHidden(mp->expoObj[9], 1);
     }
