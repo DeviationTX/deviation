@@ -81,7 +81,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(""); // to draw a line only
 
-    u8 w = 30;
+    u8 w = 38;
     GUI_CreateButtonPlateText(LCD_WIDTH - w - 5, 0, w, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
 
