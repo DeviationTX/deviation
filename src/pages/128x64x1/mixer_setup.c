@@ -284,28 +284,14 @@ static void _show_expo_dr()
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
                 w, ITEM_HEIGHT, &mp->labelDesc,  _sourceselect_cb, _set_drsource_cb, (void *)((long)2)); //&mp->mixer[2].sw);
 
-    GUI_SetupLogicalView(RIGHT_VIEW_ID, 0, 0, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1);
-    // The following items are draw in the right logical view,
     // the right view will be scroll up/down by changed the switch 1/2 options
     y = 0;
-    mp->graphs[0] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
-                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    mp->graphs[1] = GUI_CreateBarGraph(LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
+                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
+    mp->graphs[0] = GUI_CreateXYGraph(77 , LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
-    y += RIGHT_VIEW_HEIGHT;
-    mp->graphs[1] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
-                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
-                              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[1]);
-    y += RIGHT_VIEW_HEIGHT;
-    mp->graphs[2] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
-                            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT , RIGHT_VIEW_HEIGHT,
-                              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[2]);
-
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0]);
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
@@ -388,10 +374,12 @@ static void _show_expo_dr_switch(u8 switch_no)  // switch_no = 1 or 2
     mp->expoObj[idx +3] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &mp->labelDesc,  NULL, set_number100_cb, &mp->mixer[switch_no].scalar);
 
-    mp->graphs[switch_no] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    mp->graphs[1] = GUI_CreateBarGraph(LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
+                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
+    mp->graphs[0] = GUI_CreateXYGraph(77 , LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[switch_no]);
+              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[switch_no]);
     //Enable/Disable the relevant widgets
     update_rate_widgets(switch_no - 1);
 }
