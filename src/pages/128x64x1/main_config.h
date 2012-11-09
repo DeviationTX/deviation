@@ -60,9 +60,9 @@ enum MainWidget {
 
 #define BOX0123_X 3 //16
 #define BOX4567_X 66 //204
-#define BOX_W     50 //100
-#define BOX0145_H 8 //40
-#define BOX2367_H 8 //24
+#define BOX_W     40 //100
+#define BOX0145_H 9 //40
+#define BOX2367_H 9 //24
 
 #define BOX04_Y 22 //40
 #define BOX15_Y 31 //90
@@ -72,9 +72,9 @@ enum MainWidget {
 /*************************************/
 /* Model Icon */
 #define MODEL_ICO_X 75
-#define MODEL_ICO_Y 24
-#define MODEL_ICO_W 48
-#define MODEL_ICO_H 32
+#define MODEL_ICO_Y 20
+#define MODEL_ICO_W 52
+#define MODEL_ICO_H 36
 /*************************************/
 
 #define GRAPH1_X BOX0123_X

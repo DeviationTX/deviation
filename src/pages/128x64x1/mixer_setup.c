@@ -109,6 +109,7 @@ static void _show_simple()
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb,
                               &mp->mixer[0]);
+    mp->graphs[1] = mp->graphs[2] = NULL;
 
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
@@ -221,6 +222,7 @@ static void _show_complex()
                                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                                   0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
+    mp->graphs[2] = NULL;
 
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
@@ -292,19 +294,19 @@ static void _show_expo_dr()
                             GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[0]);
     y += RIGHT_VIEW_HEIGHT;
     mp->graphs[1] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
                             GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[1]);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[1]);
     y += RIGHT_VIEW_HEIGHT;
     mp->graphs[2] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
                             GUI_MapToLogicalView(RIGHT_VIEW_ID, y), RIGHT_VIEW_HEIGHT , RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[2]);
+                              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[2]);
 
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;
@@ -391,7 +393,7 @@ static void _show_expo_dr_switch(u8 switch_no)  // switch_no = 1 or 2
     mp->graphs[switch_no] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-              0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[switch_no]);
+              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[switch_no]);
     //Enable/Disable the relevant widgets
     update_rate_widgets(switch_no - 1);
 }
@@ -426,6 +428,14 @@ static void navigate_items(s8 direction)
             else
                 GUI_ScrollLogicalView(LEFT_VIEW_ID, (ITEM_HEIGHT +1) *2*direction);
         }
+    }
+    if (mp->graphs[1] != NULL && mp->graphs[2] != NULL) { // indicate that it is the expo&dr page
+        if (obj == mp->itemObj[mp->max_scroll])
+            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
+        else if (obj == mp->itemObj[mp->max_scroll + 1])
+            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
+        else
+            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
     }
     GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
 }
