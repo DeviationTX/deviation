@@ -56,17 +56,13 @@ void PAGE_MainInit(int page)
     //GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
 
     //heli/plane Icon
-    struct LabelDesc desc = DEFAULT_FONT;
-    desc.font_color = 1;
-    desc.fill_color = 1;
     if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateRect(x, y, w, h, &desc);
-        //GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
+        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
 
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
-        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
+        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h)) // bug fix, devo10's horizontal trim seems to opposite  to that of devo8
+            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_HORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
         else
             mp->trimObj[i] = NULL;
     }
@@ -76,8 +72,7 @@ void PAGE_MainInit(int page)
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) { // i = 0, 1, 2
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
             mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
-                                //get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
-                                &TINY_FONT,
+                                get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
                                 show_box_cb, NULL,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else { // i = 3 - 7
@@ -89,7 +84,7 @@ void PAGE_MainInit(int page)
     mp->battery = PWR_ReadVoltage();
     mp->battObj = GUI_CreateLabelBox(88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
     //TxPower
-    GUI_CreateLabelBox(85, 12,  //54,1,
+    GUI_CreateLabelBox(88, 12,  //54,1,
             40, 8,&TINY_FONT, _power_to_string, NULL, NULL);
 }
 
@@ -98,6 +93,13 @@ static void _check_voltage()
     if (CLOCK_getms() > next_scan)  {  // don't need to check battery too frequently, to avoid blink of the battery label
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
+        if (batt < Transmitter.batt_alarm) {
+            struct LabelDesc desc;
+            memcpy(&desc, &TINY_FONT, sizeof(desc));
+            desc.style = LABEL_BLINK;
+            GUI_SetLabelDesc(mp->battObj, &desc);
+            GUI_Redraw(mp->battObj);
+        }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;
             GUI_Redraw(mp->battObj);

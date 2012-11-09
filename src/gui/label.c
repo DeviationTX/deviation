@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-static u8  blink_count = 0;
+static u16  blink_fontcolor = 0xffff;
 guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
@@ -175,13 +175,8 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
     }
 
     if (desc->style == LABEL_BLINK ) {
-        blink_count++;
-        if (blink_count > 100) {
-            blink_count = 0;
-            LCD_SetFontColor(desc->font_color);
-        } else {
-            LCD_SetFontColor(~desc->font_color);
-        }
+        blink_fontcolor = ~blink_fontcolor;
+        LCD_SetFontColor(blink_fontcolor);
     } else if (desc->style == LABEL_INVERTED || is_selected) {
         LCD_SetFontColor(~desc->font_color);
     } else {
