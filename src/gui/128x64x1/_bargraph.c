@@ -42,9 +42,16 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
         LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // 100% position
         LCD_DrawFastVLine(xpos, box->y + box->height-1, 2, 1);
     }
-    val = (box->width -1) * (val - graph->min) / (graph->max - graph->min);
-    xpos = graph->direction == TRIM_HORIZONTAL ? box->x + val: box->x + box->width -1 - val;
-    LCD_DrawFastVLine(xpos, box->y , box->height, 1);
+    s32 val_scale = (box->width -1) * (val - graph->min) / (graph->max - graph->min);
+    xpos = graph->direction == TRIM_HORIZONTAL
+              ? box->x + val_scale
+              : box->x + box->width -1 - val_scale;
+    s32 center = (graph->max + graph->min) / 2;
+    if (val == center) {
+        LCD_FillRect(xpos - 1, box->y, 3, box->height, 1);
+    } else {
+        LCD_DrawFastVLine(xpos, box->y , box->height, 1);
+    }
 }
 
 void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 color,
@@ -67,7 +74,12 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
         LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
         LCD_DrawFastHLine(box->x + box->width -1, ypos, 2, 1);
     }
-    val = (box->height -1) * (val - graph->min) / (graph->max - graph->min);
-    ypos = box->y + box->height -1 - val;
-    LCD_DrawFastHLine(box->x, ypos , box->width, 1);
+    s32 center = (graph->max + graph->min) / 2;
+    s32 val_scale = (box->height -1) * (val - graph->min) / (graph->max - graph->min);
+    ypos = box->y + box->height -1 - val_scale;
+    if (val == center) {
+        LCD_FillRect(box->x, ypos - 1, box->width, 3, 1);
+    } else {
+        LCD_DrawFastHLine(box->x, ypos , box->width, 1);
+    }
 }
