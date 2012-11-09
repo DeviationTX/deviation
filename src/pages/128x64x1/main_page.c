@@ -94,10 +94,8 @@ static void _check_voltage()
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            struct LabelDesc desc;
-            memcpy(&desc, &TINY_FONT, sizeof(desc));
-            desc.style = LABEL_BLINK;
-            GUI_SetLabelDesc(mp->battObj, &desc);
+            labelDesc.style = LABEL_BLINK;
+            GUI_SetLabelDesc(mp->battObj, &labelDesc);
             GUI_Redraw(mp->battObj);
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {

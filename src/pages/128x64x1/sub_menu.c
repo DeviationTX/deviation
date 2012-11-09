@@ -65,12 +65,7 @@ void show_menuItems(u8 startIdx)
     u8 space = ITEM_HEIGHT + 1;
     u8 row = space;
     u8 col = 1;
-    struct LabelDesc labelDesc;
-    labelDesc.font = DEFAULT_FONT.font;
-    labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_LEFT;
-    labelDesc.outline_color = 1;
-    labelDesc.fill_color = labelDesc.outline_color; // not to draw box
     u8 idx_stringWidth = 15;
     u8 idx_stringYOffset = 1;
     current_page_start_idx[sub_menu_item] = startIdx;

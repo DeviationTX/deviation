@@ -42,6 +42,7 @@ struct pagemem {
 
 extern struct pagemem pagemem;
 extern u8 sub_menu_item;  // global variable to let other page get back to the right sub menu
+extern struct LabelDesc labelDesc;
 
 void PAGE_ShowHeader(const char *title);
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height);

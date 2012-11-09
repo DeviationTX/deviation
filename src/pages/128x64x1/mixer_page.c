@@ -40,11 +40,6 @@ static void _show_page()
     u8 h = 12;
     int i;
     GUI_RemoveAllObjects();
-    mp->labelDesc.font = DEFAULT_FONT.font;
-    mp->labelDesc.font_color = 0xffff;
-    mp->labelDesc.style = LABEL_LEFT;
-    mp->labelDesc.outline_color = 0xffff;
-    mp->labelDesc.fill_color = mp->labelDesc.outline_color;
 
     struct Mixer *mix = MIXER_GetAllMixers();
     guiObject_t *obj;
@@ -52,32 +47,32 @@ static void _show_page()
         u8 idx;
         int row = init_y + (h +1) * i;
         u8 w = 40;
-        mp->labelDesc.style = LABEL_LEFT;
+        labelDesc.style = LABEL_LEFT;
         u8 ch = mp->top_channel + i;
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
         if (ch < NUM_OUT_CHANNELS) {
-            //obj = GUI_CreateLabelBox(x, row, w, h, &mp->labelDesc,
+            //obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
             //        MIXPAGE_ChanNameProtoCB, limitselect_cb, (const void *)((long)ch));
             //GUI_SetSelectable(obj, 1);
             obj = GUI_CreateButton(x, row, BUTTON_DEVO10, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
-            GUI_CustomizeButton(obj, &mp->labelDesc, w, h);
+            GUI_CustomizeButton(obj, &labelDesc, w, h);
         }
         else {
-            obj = GUI_CreateLabelBox(x, row, w, h, &mp->labelDesc,
+            obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
                                    MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)ch));
             GUI_SetSelectable(obj, 0);
         }
         mp->itemObj[i *2] = obj;
 
         w = 53;
-        mp->labelDesc.style = LABEL_CENTER;
-        //obj = GUI_CreateLabelBox(70, row, w, h, &mp->labelDesc, template_name_cb, templateselect_cb, (const void *)((long)ch));
+        labelDesc.style = LABEL_CENTER;
+        //obj = GUI_CreateLabelBox(70, row, w, h, &labelDesc, template_name_cb, templateselect_cb, (const void *)((long)ch));
         //GUI_SetSelectable(obj, 1);
         obj = GUI_CreateButton(69, row, BUTTON_DEVO10, template_name_cb, 0,
                 templateselect_cb, (void *)((long)ch));
-        GUI_CustomizeButton(obj, &mp->labelDesc, w, h);
+        GUI_CustomizeButton(obj, &labelDesc, w, h);
         mp->itemObj[i *2 +1] = obj;
 
         w = 24;
@@ -87,7 +82,7 @@ static void _show_page()
 
         if (idx != NUM_MIXERS) {
             //enum TemplateType template = MIXER_GetTemplate(ch);
-            obj = GUI_CreateLabelBox(43, row, w, h, &mp->labelDesc, show_source, NULL, &mix[idx].src);
+            obj = GUI_CreateLabelBox(43, row, w, h, &labelDesc, show_source, NULL, &mix[idx].src);
             GUI_SetSelectable(obj, 0);
         }
     }

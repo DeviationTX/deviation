@@ -26,7 +26,7 @@ static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
 static void _navigate_items(s8 direction);
 #define VIEW_ID 0
-static u8 current_page = 0;
+static s8 current_page = 0; // bug fix
 static u8 total_items = 3;
 static u8 view_height;
 static guiObject_t *scroll_bar;
@@ -41,24 +41,20 @@ static void _show_bar_page(u8 num_bars)
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
 
     GUI_CreateLabelBox(0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
-    struct LabelDesc desc;
-    desc.font = DEFAULT_FONT.font;
-    desc.outline_color = desc.fill_color = 1;
-    desc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
-    desc.font_color = 1; // bug fix: if the font_color doesn't assign, the string might not be shown
-    GUI_CreateRect(0, ITEM_HEIGHT , LCD_WIDTH, 1, &desc);
+    labelDesc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
+    GUI_CreateRect(0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
 
     u8 x = 0;
     u8 height = 7;
     u8 width = 59; // better to be even
     u8 page_item_count = 8;
     if (cp->type == MONITOR_RAWINPUT) {
-        desc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
+        labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = 12;
         page_item_count = 6;
         view_height = 51; // can only show 3 rows: (12 + 5) x 3
     } else {
-        desc.font = TINY_FONT.font;  // only digits, can use smaller font to show more channels
+        labelDesc.font = TINY_FONT.font;  // only digits, can use smaller font to show more channels
         height = 7;
         page_item_count = 8;
         view_height = 48; // can only show 4 rows: (7 + 5) x 4
@@ -78,7 +74,7 @@ static void _show_bar_page(u8 num_bars)
             x = 63;
         }
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID,x) , GUI_MapToLogicalView(VIEW_ID, y),
-                0, height, &desc, _channum_cb, NULL, (void *)(long)i);
+                0, height, &labelDesc, _channum_cb, NULL, (void *)(long)i);
         cp->value[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, x + 37), GUI_MapToLogicalView(VIEW_ID, y),
                         23, height, &TINY_FONT, value_cb, NULL, (void *)((long)i));
         cp->bar[i] = GUI_CreateBarGraph(GUI_MapToLogicalView(VIEW_ID, x) , GUI_MapToLogicalView(VIEW_ID, y + height),
@@ -133,9 +129,9 @@ static void _navigate_items(s8 direction)
     if (current_page <=0) {
         current_page = 0;
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    }  else {
-        if (current_page >= total_items)
-            current_page = total_items -1;
+    } else if (current_page >= total_items)
+        current_page = total_items -1;
+    else {
         GUI_ScrollLogicalView(VIEW_ID, direction* view_height);
     }
     GUI_SetScrollbar(scroll_bar, current_page);
@@ -155,6 +151,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            labelDesc.font = DEFAULT_FONT.font;
             if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
                 PAGE_ChangeByName("TxConfig", -1);
             else

@@ -50,21 +50,21 @@ static void _show_page1()
     u8 space = ITEM_HEIGHT +1;
     u8 row = space;
     w = 35;
-    struct LabelDesc desc = TINY_FONT;
+    labelDesc.font = TINY_FONT.font;
     for(long i = 0; i < 4; i++) {
         u8 x = 8;
-        desc.style = LABEL_LEFTCENTER;
+        labelDesc.style = LABEL_LEFTCENTER;
         GUI_CreateLabelBox(0,  row, 8, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
-        desc.style = LABEL_SQUAREBOX;
-        tp.temp[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc,
+        labelDesc.style = LABEL_SQUAREBOX;
+        tp.temp[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &labelDesc,
                           telem_cb, NULL, (void *)(TELEM_TEMP1+1));
         if (i < 3) {
             x = x + w + 5;
-            tp.volt[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_VOLT1+i));
+            tp.volt[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_VOLT1+i));
         }
         if (i < 2) {
             x = x + w + 5;
-            tp.rpm[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_RPM1+i));
+            tp.rpm[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_RPM1+i));
         }
         row += space;
     }
@@ -92,15 +92,15 @@ static void _show_page2()
             view_origin_absoluteX, view_origin_absoluteY);
 
     u8 row = 0;
-    struct LabelDesc desc = TINY_FONT;
-    desc.style = LABEL_SQUAREBOX;
+    labelDesc.font = TINY_FONT.font;
+    labelDesc.style = LABEL_SQUAREBOX;
     for(long i = 0; i < 5; i++) {
 
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT,  label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
         row += space;
         tp.gps[i]  = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-                LCD_WIDTH - ARROW_WIDTH - 3, ITEM_HEIGHT, &desc, telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+                LCD_WIDTH - ARROW_WIDTH - 3, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
         row += space;
 
     }
@@ -191,6 +191,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByName("SubMenu", sub_menu_item);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             _navigate_items(-1);

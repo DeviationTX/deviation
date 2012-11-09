@@ -39,12 +39,12 @@ static void _show_titlerow()
     memset(mp->itemObj, 0, sizeof(mp->itemObj));
     memcpy(&origin_limit, (const void *)&mp->limit, sizeof(origin_limit)); // back up for reverting purpose
 
-    mp->labelDesc.style = LABEL_UNDERLINE;
-    titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &mp->labelDesc,
+    labelDesc.style = LABEL_UNDERLINE;
+    titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     u8 w = 50;
     mp->itemObj[0] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, revert_cb, (void *)_tr("Revert"));
-    GUI_CustomizeButton(mp->itemObj[0] , &mp->labelDesc, w, ITEM_HEIGHT);
+    GUI_CustomizeButton(mp->itemObj[0] , &labelDesc, w, ITEM_HEIGHT);
 
     // Create a logical view
     u8 view_origin_absoluteX = 0;
@@ -63,68 +63,68 @@ static void _show_limits()
     u8 w = 60;
     u8 y = 0;
     u8 x1 = 60;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Reverse:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Reverse:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, _toggle_reverse_cb_in_live, _reverse_cb_in_live, (void *)((long)mp->channel));
+            w, ITEM_HEIGHT, &labelDesc, _toggle_reverse_cb_in_live, _reverse_cb_in_live, (void *)((long)mp->channel));
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Failsafe:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Failsafe:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, toggle_failsafe_cb, set_failsafe_cb, NULL);
+            w, ITEM_HEIGHT, &labelDesc, toggle_failsafe_cb, set_failsafe_cb, NULL);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Safety:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Safety:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+            w, ITEM_HEIGHT, &labelDesc, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Safe Val:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Safe Val:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+            w, ITEM_HEIGHT, &labelDesc, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Min:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Min:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.min);
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.min);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Max:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Max:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.max);
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.max);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Scale:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Scale:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_limits_cb, &mp->limit.servoscale);
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.servoscale);
 
     y += space;
-    mp->labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &mp->labelDesc, NULL, NULL, _tr("Subtrim:"));
-    mp->labelDesc.style = LABEL_CENTER;
+            &labelDesc, NULL, NULL, _tr("Subtrim:"));
+    labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &mp->labelDesc, NULL, set_trimstep_cb, &mp->limit.subtrim);
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_trimstep_cb, &mp->limit.subtrim);
 
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;

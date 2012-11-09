@@ -35,12 +35,6 @@ void PAGE_MainMenuInit(int page)
     u8 space = ITEM_HEIGHT + 1;
     u8 row = space;
     u8 col = 1;
-    struct LabelDesc labelDesc;
-    labelDesc.font = DEFAULT_FONT.font;
-    labelDesc.font_color = 0xffff;
-    labelDesc.style = LABEL_LEFT;
-    labelDesc.outline_color = 1;
-    labelDesc.fill_color = labelDesc.outline_color; // not to draw box
     for (i = 0; i < mmp->main_menu_count; i++) {
         mmp->menuItemObj[i] = GUI_CreateLabelBox(col, row, 0, 0,
                 &labelDesc, PAGE_menuitem_cb, press_cb, (const void *)mmp->menu_item_name[i]);

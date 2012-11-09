@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 
 //static buttonAction_t button_action;
+struct LabelDesc labelDesc; // create a style-customizable font so that it can be shared for all pages
 
 static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
@@ -80,6 +81,10 @@ void PAGE_Init()
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
     pages[page].init(0);
+
+    labelDesc.font = DEFAULT_FONT.font;
+    labelDesc.style = LABEL_LEFT;
+    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff; // not to draw box
 }
 
 void PAGE_ChangeByName(const char *pageName, s8 menuPage)

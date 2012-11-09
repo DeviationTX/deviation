@@ -21,7 +21,6 @@ struct curve_edit {
 
 struct mixer_page {
     struct buttonAction action;
-    struct LabelDesc labelDesc;
     u8 are_limits_changed;
     u8 top_channel;
     u8 max_scroll;
