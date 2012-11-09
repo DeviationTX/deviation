@@ -53,6 +53,7 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
+    select->enable = 1;
 
     return obj;
 }
@@ -90,6 +91,7 @@ guiObject_t *GUI_CreateTextSelectPlate(u16 x, u16 y, u16 width, u16 height, cons
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
+    select->enable = 1;
 
     GUI_TextSelectEnablePress(obj, select_cb ? 1 : 0);
 
@@ -108,32 +110,42 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
     if (select->type != TEXTSELECT_DEVO10) {
-        GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                            box->y, select->button, DRAW_NORMAL);
-        GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
-                            select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-        GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                            box->y, ARROW_RIGHT,
-                            select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-
-        LCD_SetFontColor(select->fontColor);
+        if (select->enable) {
+            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                                box->y, select->button, DRAW_NORMAL);
+            GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
+                                select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+            GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
+                                box->y, ARROW_RIGHT,
+                                select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+            LCD_SetFontColor(select->fontColor);
+        }
+        else { // don't show arrow parts when it is disabled
+            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                box->y, select->button, DRAW_PRESSED);
+            LCD_SetFontColor(0xffff);
+        }
         LCD_GetStringDimensions((const u8 *)str, &w, &h);
         x = box->x + (box->width - w) / 2;
         y = box->y + 2 + (box->height - h) / 2;
         LCD_PrintStringXY(x, y, str);
     } else {   // plate text select for devo 10, copy most behavior from label.c
         u8 arrow_width = ARROW_WIDTH - 1;
-        u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
-        u16 x1 = box->x + arrow_width -1;
-        LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
-        LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
-        //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
-        x1 = box->x + box->width - arrow_width;
-        u16 x2 = box->x + box->width -1;
-        //LCD_DrawFastHLine(x1, y, ARROW_WIDTH, 0xffff); //"+"
-        //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
-        LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
-        LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
+        if (select->enable) {
+            u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
+            u16 x1 = box->x + arrow_width -1;
+            LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
+            LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
+            //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
+            x1 = box->x + box->width - arrow_width;
+            u16 x2 = box->x + box->width -1;
+            //LCD_DrawFastHLine(x1, y, ARROW_WIDTH, 0xffff); //"+"
+            //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
+            LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
+            LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
+        } else {
+            GUI_DrawBackground(box->x, box->y, box->width, box->height);
+        }
         GUI_DrawLabelHelper(box->x + arrow_width +1, box->y,box->width - arrow_width -arrow_width -2, obj->box.height,
                 str, &select->desc, obj == objSELECTED);
     }
@@ -267,4 +279,19 @@ void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
         select->button = &image_map[fileidx];
         OBJ_SET_DIRTY(obj, 1);
     }
+}
+
+void GUI_TextSelectEnable(struct guiObject *obj, u8 enable)
+{
+    struct guiTextSelect *select = &obj->o.textselect;
+    if (select->enable != enable) {
+        select->enable = enable;
+        OBJ_SET_DIRTY(obj, 1);
+    }
+}
+
+u8 GUI_IsTextSelectEnabled(struct guiObject *obj)
+{
+    struct guiTextSelect *select = &obj->o.textselect;
+    return select->enable;
 }

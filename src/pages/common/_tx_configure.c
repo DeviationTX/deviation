@@ -39,6 +39,7 @@ enum calibrateState {
     CALI_EXIT,
 };
 static enum calibrateState calibrate_state;
+static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data);
 
 static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
 {
@@ -202,7 +203,7 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness, 
+    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
                                   MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
     if (changed)
         BACKLIGHT_Brightness(Transmitter.brightness);
@@ -211,6 +212,40 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(cp->tmpstr, "%d", Transmitter.brightness);
     return cp->tmpstr;
 }
+
+static const char *auto_dimmer_value_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    if (GUI_IsTextSelectEnabled(obj)) {
+        u8 changed;
+        Transmitter.auto_dimmer.backlight_dim_value = GUI_TextSelectHelper(Transmitter.auto_dimmer.backlight_dim_value,
+                MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
+    }
+    if (Transmitter.auto_dimmer.backlight_dim_value == 0)
+        return _tr("Off");
+    sprintf(cp->tmpstr, "%d", Transmitter.auto_dimmer.backlight_dim_value);
+    return cp->tmpstr;
+}
+
+static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    u8 changed;
+    u16 dimmer_timmer = Transmitter.auto_dimmer.timer/1000;
+    dimmer_timmer = GUI_TextSelectHelper(dimmer_timmer,
+            MIN_BACKLIGHT_DIMTIME, MAX_BACKLIGHT_DIMTIME, dir, 5, 10, &changed);
+    if (changed)
+        Transmitter.auto_dimmer.timer = dimmer_timmer * 1000;
+    if (dimmer_timmer == 0) {
+        GUI_TextSelectEnable(cp->dimmer_target, 0);
+        return _tr("Off");
+    }
+    GUI_TextSelectEnable(cp->dimmer_target, 1);
+    TIMER_SetString(cp->tmpstr, Transmitter.auto_dimmer.timer);
+    return cp->tmpstr;
+}
+
 static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

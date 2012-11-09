@@ -2,6 +2,7 @@
 #define _TX_H_
 
 #include "mixer.h"
+#include "autodimmer.h"
 
 struct StickCalibration {
     u16 max;
@@ -26,6 +27,7 @@ struct Transmitter {
     u16 batt_critical;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;
+    struct AutoDimmer auto_dimmer;
 };
 
 extern struct Transmitter Transmitter;

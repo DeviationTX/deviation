@@ -14,6 +14,7 @@
  */
 #include "common.h"
 #include "buttons.h"
+#include "autodimmer.h"
 
 static buttonAction_t *buttonHEAD = NULL;
 static buttonAction_t *buttonPressed = NULL;
@@ -92,6 +93,7 @@ void BUTTON_Handler()
     u32 buttons_released=(~buttons) &   last_buttons;
 
     if(buttons_pressed) {
+        AUTODIMMER_Check();
         exec_callbacks(buttons_pressed, BUTTON_PRESS);
         last_buttons_pressed = buttons_pressed;
         long_press_at = CLOCK_getms()+500;

@@ -211,6 +211,7 @@ struct guiTextSelect {
     void (*SelectCB)(guiObject_t *obj, void *data);
     void *cb_data;
     struct LabelDesc desc;
+    u8 enable;
 };
 
 struct guiRect {
@@ -390,6 +391,8 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj);
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed);
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);
+void GUI_TextSelectEnable(struct guiObject *obj, u8 enable);
+u8 GUI_IsTextSelectEnabled(struct guiObject *obj);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
 #define LOGICAL_VIEW_BOUNDARY 5000 // a coordinate that is >= 5000 is a relative coordinate

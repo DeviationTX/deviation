@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/tx.h"
 #include "config/model.h"
+#include "autodimmer.h"
 
 #define MAX_BATTERY_ALARM 12000
 #define MIN_BATTERY_ALARM 5500
@@ -80,6 +81,20 @@ void PAGE_TxConfigureInit(int page)
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Contrast:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, _contrast_select_cb, NULL);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer time:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x +10), GUI_MapToLogicalView(VIEW_ID, row),
+                w -10, ITEM_HEIGHT, &DEFAULT_FONT, NULL, auto_dimmer_time_cb, NULL);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target:"));
+    cp->dimmer_target = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + 10), GUI_MapToLogicalView(VIEW_ID, row),
+                w -10, ITEM_HEIGHT, &DEFAULT_FONT, NULL, auto_dimmer_value_cb, NULL);
     cp->total_items++;
 
     row += space;
