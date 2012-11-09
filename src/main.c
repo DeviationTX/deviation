@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "buttons.h"
 #include "timer.h"
+#include "autodimmer.h"
 #include "music.h"
 #include "config/model.h"
 #include "config/tx.h"
