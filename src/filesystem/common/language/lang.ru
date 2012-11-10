@@ -444,7 +444,7 @@ RPM
 :Touch Calibrate
 Нажать калибровку
 :Touch Screen:
-Сенс. экран:
+Сенсорн. экран:
 :Touch Test
 Нажать тест
 :Touch target %d
@@ -503,3 +503,8 @@ USB
 заменить
 :stopwatch
 секундомер
+:Dimmer Time:
+Время гашения:
+:Dimmer Target:
+Гашение до:
+
