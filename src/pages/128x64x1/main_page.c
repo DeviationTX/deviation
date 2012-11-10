@@ -94,9 +94,11 @@ static void _check_voltage()
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            labelDesc.style = LABEL_BLINK;
-            GUI_SetLabelDesc(mp->battObj, &labelDesc);
+            enum LabelType oldStyle = TINY_FONT.style;  // bug fix
+            TINY_FONT.style = LABEL_BLINK;
+            GUI_SetLabelDesc(mp->battObj, &TINY_FONT);
             GUI_Redraw(mp->battObj);
+            TINY_FONT.style = oldStyle;
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;
