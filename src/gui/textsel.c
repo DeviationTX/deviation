@@ -257,7 +257,9 @@ void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
 {
     struct guiTextSelect *select = &obj->o.textselect;
     if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
-        if (enable)
+        if (select->enable == 0)
+            select->desc.style = LABEL_CENTER;
+        else if (enable)
             select->desc.style = LABEL_BOX;
         else
             select->desc.style = LABEL_CENTER;
