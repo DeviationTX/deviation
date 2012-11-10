@@ -17,6 +17,9 @@ typedef uint64_t u64;
 
 #include "target.h"
 
+#define SCREEN_UPDATE_MSEC 100
+#define CHAN_UPDATE_MSEC   5
+
 extern volatile s16 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[32];
 /* Temproary definition until we have real translation */

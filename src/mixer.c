@@ -154,7 +154,7 @@ void MIXER_CalcChannels()
     }
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, APPLY_ALL);
+        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, Channels, APPLY_ALL);
     }
 }
 
@@ -165,7 +165,7 @@ s16 *MIXER_GetInputs()
 
 s16 MIXER_GetChannel(u8 channel, enum LimitMask flags)
 {
-    return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, flags);
+    return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, Channels, flags);
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
@@ -285,9 +285,10 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags)
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *_raw,
+                      volatile s16 *_Channels, enum LimitMask flags)
 {
-    s32 value = raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
+    s32 value = _raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
     if (channel >= NUM_OUT_CHANNELS)
         return value;
 
@@ -297,7 +298,15 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask 
         value = (s32)value * limit->servoscale / 100;
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
         value = -value;
-    if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, raw)) {
+    //degrees / 100msec
+    if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
+        s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * CHAN_UPDATE_MSEC / 100;
+        if (value - _Channels[channel] > rate)
+            value = _Channels[channel] + rate;
+        else if(value - _Channels[channel] < -rate)
+            value = _Channels[channel] - rate;
+    }
+    if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, _raw)) {
         value = PCT_TO_RANGE(Model.limits[channel].safetyval);
     } else if (flags & APPLY_LIMITS) {
         if (value > PCT_TO_RANGE(limit->max))

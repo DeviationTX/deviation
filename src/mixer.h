@@ -110,6 +110,7 @@ enum LimitMask {
     APPLY_SAFETY  = 0x04,
     APPLY_SUBTRIM = 0x08,
     APPLY_SCALAR  = 0x10,
+    APPLY_SPEED   = 0x80,
     APPLY_ALL     = 0xFF,
 };
 
@@ -121,6 +122,7 @@ struct Limit {
     u8 min;
     u8 servoscale;
     s8 failsafe;
+    u8 speed;     //measured in degrees/100msec
     s16 subtrim;  // need to support value greater than 250
 };
 
@@ -163,7 +165,8 @@ struct Trim *MIXER_GetAllTrims();
 
 void MIXER_RegisterTrimButtons();
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *raw, enum LimitMask flags);
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *_raw,
+                      volatile s16 *_Channels, enum LimitMask flags);
 void MIXER_SetDefaultLimit(struct Limit *limit);
 const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_SwashType(enum SwashType);

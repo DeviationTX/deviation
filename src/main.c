@@ -32,8 +32,6 @@ void EventLoop();
 void TOUCH_Handler(); // temporarily in main()
 u8 BATTERY_Check();
 
-#define SCREEN_UPDATE_MSEC 100
-#define CHAN_UPDATE_MSEC   5
 u32 next_redraw=0;
 u32 next_scan=0;
 

@@ -22,37 +22,42 @@
 static void _show_limits()
 {
     int y = 40;
+    int height = 20;
     //Row 1
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Reverse:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
-    y += 24;
+    y += height;
     //Row 2
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Failsafe:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
-    y += 24;
+    y += height + 6;
     //Row 3
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safety:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
-    y += 24;
+    y += height;
     //Row 4
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safe Val:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
-    y += 24;
+    y += height + 6;
     //Row 5
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
-    y += 24;
+    y += height;
     //Row 6
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Max:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
-    y += 24;
+    y += height;
     //Row 5
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Scale:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
-    y += 24;
+    y += height + 6;
     //Row 6
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Subtrim:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);
+    y += height;
+    //Row 7
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Speed:"));
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.speed);
 }
 
 static void _show_titlerow()

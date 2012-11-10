@@ -204,7 +204,7 @@ s16 eval_chan_cb(void * data)
     }
     for (i = 0; i < mp->num_mixers; i++)
         MIXER_ApplyMixer(&mp->mixer[i], mp->raw);
-    s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, APPLY_ALL);
+    s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, NULL, APPLY_ALL);
     if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
     if (value < CHAN_MIN_VALUE)

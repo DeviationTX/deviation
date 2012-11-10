@@ -120,6 +120,14 @@ static void _show_limits()
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc, NULL, set_trimstep_cb, &mp->limit.subtrim);
 
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &labelDesc, NULL, NULL, _tr("Speed:"));
+    labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.speed);
+
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;
     x = LCD_WIDTH - ARROW_WIDTH;
