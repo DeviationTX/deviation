@@ -20,29 +20,23 @@
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static void revert_cb(guiObject_t *obj, const void *data);
-static void _toggle_reverse_cb_in_live(guiObject_t *obj, void *data);
-static const char *_reverse_cb_in_live(guiObject_t *obj, int dir, void *data);
 
 #define LEFT_VIEW_ID 0
 #define FIRST_PAGE_ITEM_IDX  1  // 0 is the button obj
 
 static s8 current_selected_item;
-static guiObject_t *titleObj = NULL;
-static struct Limit origin_limit;
 
 static void _show_titlerow()
 {
     (void)okcancel_cb;
-    mp->are_limits_changed = 0;
     PAGE_SetActionCB(action_cb);
     mp->entries_per_page = 4;
     memset(mp->itemObj, 0, sizeof(mp->itemObj));
-    memcpy(&origin_limit, (const void *)&mp->limit, sizeof(origin_limit)); // back up for reverting purpose
 
     labelDesc.style = LABEL_UNDERLINE;
-    titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
-            MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     u8 w = 50;
+    titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH - w, ITEM_HEIGHT, &labelDesc,
+            MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     mp->itemObj[0] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, revert_cb, (void *)_tr("Revert"));
     GUI_CustomizeButton(mp->itemObj[0] , &labelDesc, w, ITEM_HEIGHT);
 
@@ -68,7 +62,7 @@ static void _show_limits()
             &labelDesc, NULL, NULL, _tr("Reverse:"));
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc, _toggle_reverse_cb_in_live, _reverse_cb_in_live, (void *)((long)mp->channel));
+            w, ITEM_HEIGHT, &labelDesc, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
@@ -133,20 +127,6 @@ static void _show_limits()
     mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
     GUI_SetSelected(mp->itemObj[1]);
-}
-
-void _toggle_reverse_cb_in_live(guiObject_t *obj, void *data) {
-    toggle_reverse_cb(obj, data);
-    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
-    GUI_Redraw(mp->itemObj[0]);
-}
-
-const char *_reverse_cb_in_live(guiObject_t *obj, int dir, void *data)
-{
-    const char *ret_str = reverse_cb(obj, dir, data);
-    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
-    GUI_Redraw(mp->itemObj[0]);
-    return ret_str;
 }
 
 void revert_cb(guiObject_t *obj, const void *data)

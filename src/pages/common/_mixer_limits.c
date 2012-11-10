@@ -12,6 +12,8 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+static guiObject_t *titleObj = NULL;
+static struct Limit origin_limit;
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static void sourceselect_cb(guiObject_t *obj, void *data);
@@ -28,6 +30,8 @@ static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 void MIXPAGE_EditLimits()
 {
     PAGE_RemoveAllObjects();
+    mp->are_limits_changed = 0;
+    memcpy(&origin_limit, (const void *)&mp->limit, sizeof(origin_limit)); // back up for reverting purpose
     _show_titlerow();
     _show_limits();
 }
@@ -113,6 +117,9 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     if (data) {
         //Save mixer here
         MIXER_SetLimit(mp->channel, &mp->limit);
+    } else {
+        memcpy(&mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
+        MIXER_SetLimit(mp->channel, &mp->limit);  // save
     }
     GUI_RemoveAllObjects();
     PAGE_MixerInit(mp->top_channel);
@@ -121,13 +128,16 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 const char *reverse_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    (void)dir;
     (void)data;
-    mp->are_limits_changed |= 1;
-    if (dir > 0)
+    if (dir > 0 && ! (mp->limit.flags & CH_REVERSE)) {
         mp->limit.flags |= CH_REVERSE;
-    else if (dir < 0)
+        mp->are_limits_changed |= 1;
+        GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+    } else if (dir < 0 && (mp->limit.flags & CH_REVERSE)) {
         mp->limit.flags &= ~CH_REVERSE;
+        mp->are_limits_changed |= 1;
+        GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+    }
     return (mp->limit.flags & CH_REVERSE) ? _tr("Reversed") : _tr("Normal");
 }
 
@@ -139,5 +149,6 @@ void toggle_reverse_cb(guiObject_t *obj, void *data)
     mp->limit.flags = (mp->limit.flags & CH_REVERSE)
           ? (mp->limit.flags & ~CH_REVERSE)
           : (mp->limit.flags | CH_REVERSE);
+    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
 }
 

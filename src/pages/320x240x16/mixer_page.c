@@ -79,11 +79,6 @@ static void _show_page()
     }
 }
 
-static void _determine_save_in_live()
-{
-    //only support in devo10, do nothing for devo8
-}
-
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)data;

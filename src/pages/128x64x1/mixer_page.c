@@ -95,14 +95,6 @@ static void _show_page()
     mp->scroll_bar = GUI_CreateScrollbar(x, 0, LCD_HEIGHT, Model.num_channels + NUM_VIRT_CHANNELS, NULL, NULL, NULL);
 }
 
-static void _determine_save_in_live()
-{
-    if (mp->are_limits_changed) {
-        mp->are_limits_changed = 0;
-        MIXER_SetLimit(mp->channel, &mp->limit); // save limits' change in live
-    }
-}
-
 void navigate_item(s8 direction, u8 step)
 {
     struct guiObject *obj = GUI_GetSelected();

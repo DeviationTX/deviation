@@ -153,6 +153,14 @@ static const char *show_source(guiObject_t *obj, const void *data)
     return INPUT_SourceName(mp->tmpstr, *source);
 }
 
+static void _determine_save_in_live()
+{
+    if (mp->are_limits_changed) {
+        mp->are_limits_changed = 0;
+        MIXER_SetLimit(mp->channel, &mp->limit); // save limits' change in live
+    }
+}
+
 void PAGE_MixerEvent()
 {
     _determine_save_in_live();
