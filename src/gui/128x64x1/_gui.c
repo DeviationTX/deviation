@@ -107,13 +107,14 @@ void GUI_ScrollLogicalViewToObject(u8 view_id, struct guiObject *obj, s8 directi
     if (_view_orgin_relativeX[view_id] < 0 || _view_orgin_relativeY[view_id] < 0)
         return ; // the whole view is hidden ,hence the coordinat won't need to draw
     struct guiBox *box = &obj->box;
-    s16 origin_y = box->y - _view_boundary[view_id];
+    s16 relative_y = box->y - _view_boundary[view_id];
+    s16 offset = 0;
     if (direction <0)   {// scroll up
-        origin_y = origin_y - (_view_height[view_id] - box->height);
-        if (origin_y <0)
-            origin_y = 0;
+        offset = relative_y - _view_orgin_relativeY[view_id];
+    } else {
+        offset = relative_y + box->height - (_view_orgin_relativeY[view_id] + _view_height[view_id]);
     }
-    GUI_SetRelativeOrigin(view_id, _view_orgin_relativeX[view_id], origin_y);
+    GUI_ScrollLogicalView(view_id, offset);
 }
 
 void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY)

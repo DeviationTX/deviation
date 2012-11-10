@@ -34,7 +34,7 @@ static void _show_simple();
 static void _show_expo_dr();
 static void _show_complex();
 static void redraw_graphs();
-
+static void _update_rate_widgets(u8 idx);
 
 void MIXPAGE_ChangeTemplate(int show_header)
 {
@@ -107,36 +107,6 @@ static void show_none()
     //Row 0
 }
 
-static void update_rate_widgets(u8 idx)
-{
-    u8 mix = idx + 1;
-    idx *=4;
-    if (mp->expoObj[idx] == NULL)
-        return;   // the switches' setting page in devo10 is separate from EXPO&DR page, so we need to check here
-    if (MIXER_SRC(mp->mixer[mix].sw)) {
-        GUI_SetHidden(mp->expoObj[idx], 0);
-        if(mp->link_curves & mix) {
-            GUI_SetHidden(mp->expoObj[idx+1], 0);
-            GUI_SetHidden(mp->expoObj[idx+2], 1);
-        } else {
-            GUI_SetHidden(mp->expoObj[idx+1], 1);
-            GUI_SetHidden(mp->expoObj[idx+2], 0);
-        }
-        GUI_SetHidden(mp->expoObj[idx+3], 0);
-        GUI_SetHidden(mp->graphs[mix], 0);
-        if (mp->expoObj[9] != NULL)  // used for devo10 only
-            GUI_SetHidden(mp->expoObj[9], 0);
-    } else {
-        GUI_SetHidden(mp->expoObj[idx], 1);
-        GUI_SetHidden(mp->expoObj[idx+1], 1);
-        GUI_SetHidden(mp->expoObj[idx+2], 1);
-        GUI_SetHidden(mp->expoObj[idx+3], 1);
-        GUI_SetHidden(mp->graphs[mix], 1);
-        if (mp->expoObj[9] != NULL)  // used for devo10 only
-            GUI_SetHidden(mp->expoObj[9], 1);
-    }
-}
-
 static const char *show_trim_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -158,7 +128,7 @@ void toggle_link_cb(guiObject_t *obj, const void *data)
        mp->link_curves ^= 0x02;
     else
        mp->link_curves ^= 0x01;
-    update_rate_widgets(data ? 1 : 0);
+    _update_rate_widgets(data ? 1 : 0);
 }
 
 static const char *show_rate_cb(guiObject_t *obj, const void *data)
@@ -289,6 +259,10 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     s8 *value = (s8 *)data;
+    if (!GUI_IsTextSelectEnabled(obj) ) {
+        sprintf(mp->tmpstr, "%d", *value);
+        return mp->tmpstr;
+    }
     s8 min = -100; //(value == &mp->limit.max) ? mp->limit.min : -100;
     s8 max = 100; //(value == &mp->limit.min) ? mp->limit.max : 100;
     *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
@@ -390,9 +364,9 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
         sync_mixers();
         if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
             if(data == &mp->mixer[1].sw)
-                update_rate_widgets(0);
+                _update_rate_widgets(0);
             else if(data == &mp->mixer[2].sw)
-                update_rate_widgets(1);
+                _update_rate_widgets(1);
         } else {    
             redraw_graphs();
         }
@@ -404,7 +378,10 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    (void)obj;
+    if (!GUI_IsTextSelectEnabled(obj)) {
+        strcpy(mp->tmpstr, _tr("Linked"));
+        return mp->tmpstr;
+    }
     u8 changed;
     struct Mixer *mix = (struct Mixer *)data;
     mix->curve.type = GUI_TextSelectHelper(mix->curve.type, 0, CURVE_MAX, dir, 1, 1, &changed);
@@ -434,6 +411,9 @@ void graph_cb()
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
+    if (!GUI_IsTextSelectEnabled(obj)) {
+        return;
+    }
     struct Mixer *mix = (struct Mixer *)data;
     if (mix->curve.type >= CURVE_EXPO) {
         memset(mp->graphs, 0, sizeof(mp->graphs));

@@ -52,6 +52,7 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
     button->strCallback = strCallback;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
+    button->enable = 1;
 
     return obj;
 }
@@ -85,6 +86,7 @@ guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
     button->strCallback = NULL;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
+    button->enable = 1;
 
     return obj;
 }
@@ -143,7 +145,8 @@ void GUI_DrawButton(struct guiObject *obj)
             LCD_SetFontColor(0);
         }  else {
             LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
-            LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
+            if (button->enable)
+                LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
             /* Bracket style button, disable temporarily
             u16 y1 = obj->box.y + 2;
             u16 y2 = obj->box.y + obj->box.height -3;
@@ -191,4 +194,19 @@ int GUI_ButtonHeight(enum ButtonType type)
 {
     const struct ImageMap *map = _button_image_map(type);
     return map->height;
+}
+
+void GUI_ButtonEnable(struct guiObject *obj, u8 enable)
+{
+    struct guiButton *button = &obj->o.button;
+    if (button->enable != enable) {
+        button->enable = enable;
+        OBJ_SET_DIRTY(obj, 1);
+    }
+}
+
+u8 GUI_IsButtonEnabled(struct guiObject *obj)
+{
+    struct guiButton *button = &obj->o.button;
+    return button->enable;
 }

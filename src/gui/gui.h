@@ -154,6 +154,7 @@ struct guiButton {
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*CallBack)(struct guiObject *obj, const void *data);
     const void *cb_data;
+    u8 enable;
 };
 
 struct guiListbox {
@@ -327,6 +328,8 @@ guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, cons
 void GUI_CustomizeButton(guiObject_t *, const struct LabelDesc *desc, u16 width, u16 height);
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+void GUI_ButtonEnable(guiObject_t *obj, u8 enable);
+u8 GUI_IsButtonEnabled(guiObject_t *obj);
 
 guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),

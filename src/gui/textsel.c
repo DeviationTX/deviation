@@ -139,6 +139,8 @@ void GUI_DrawTextSelect(struct guiObject *obj)
             LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
             LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
         } else {
+            if (!select->enable)  // avoid drawing button box when it is disable
+                select->desc.style = LABEL_CENTER;
             GUI_DrawBackground(box->x, box->y, box->width, box->height);
         }
         GUI_DrawLabelHelper(box->x + arrow_width +1, box->y,box->width - arrow_width -arrow_width -2, obj->box.height,
@@ -257,9 +259,7 @@ void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
 {
     struct guiTextSelect *select = &obj->o.textselect;
     if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
-        if (select->enable == 0)
-            select->desc.style = LABEL_CENTER;
-        else if (enable)
+        if (enable)
             select->desc.style = LABEL_BOX;
         else
             select->desc.style = LABEL_CENTER;

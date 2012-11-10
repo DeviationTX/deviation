@@ -24,12 +24,10 @@
 #define RIGHT_VIEW_ID 1
 #define RIGHT_VIEW_HEIGHT 49
 static s8 current_selected_item;
+static u8 expo1_start_id;
+static u8 expo2_start_id;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
-static void _show_expo_dr_switch(u8 switch_no);
-static void _sourceselect_cb(guiObject_t *obj, void *data);
-static const char *_set_drsource_cb(guiObject_t *obj, int dir, void *data);
-static u8 _action_cb_switch(u32 button, u8 flags, void *data);
 
 static void _show_titlerow()
 {
@@ -38,6 +36,7 @@ static void _show_titlerow()
     memset(mp->itemObj, 0, sizeof(mp->itemObj));
 
     labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
     GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
     u8 x =37;
@@ -268,23 +267,59 @@ static void _show_expo_dr()
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[0].scalar);
 
+    // 2nd template
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
             &labelDesc, NULL, NULL, _tr("Switch1"));
+    GUI_CreateRect(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , LEFT_VIEW_WIDTH, 1, &labelDesc);
     y += space;
     labelDesc.style = LABEL_CENTER;
+    expo1_start_id = mp->max_scroll;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-                w, ITEM_HEIGHT, &labelDesc,  _sourceselect_cb, _set_drsource_cb, (void *)((long)1));//&mp->mixer[1].sw);
+                w, ITEM_HEIGHT, &labelDesc,  sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[0] = GUI_CreateButtonPlateText(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) ,
+            w -10, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)0);
+    y += space;
+    labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[2] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &labelDesc, NULL, NULL, _tr("Scale1:"));
+    y += space;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[3] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[1].scalar);
 
+    // 3rd template
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
             &labelDesc, NULL, NULL, _tr("Switch2"));
+    GUI_CreateRect(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , LEFT_VIEW_WIDTH, 1, &labelDesc);
     y += space;
     labelDesc.style = LABEL_CENTER;
+    expo2_start_id = mp->max_scroll;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-                w, ITEM_HEIGHT, &labelDesc,  _sourceselect_cb, _set_drsource_cb, (void *)((long)2)); //&mp->mixer[2].sw);
+                w, ITEM_HEIGHT, &labelDesc,  sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[4] = GUI_CreateButtonPlateText(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) ,
+            w - 10, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)1);
+    y += space;
+    labelDesc.style = LABEL_CENTER;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[6] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
+            &labelDesc, NULL, NULL, _tr("Scale2:"));
+    y += space;
+    mp->itemObj[mp->max_scroll++] = mp->expoObj[7] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[2].scalar);
 
     GUI_SetupLogicalView(RIGHT_VIEW_ID, 0, 0, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1);
     // The following items are draw in the right logical view,
@@ -314,94 +349,34 @@ static void _show_expo_dr()
     u8 h = LCD_HEIGHT - y ;
     mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
-}
 
-static const char *_set_drsource_cb(guiObject_t *obj, int dir, void *data)
-{
-    u8 switch_no = (long)data;
-    return set_drsource_cb(obj, dir, &mp->mixer[switch_no].sw);
-}
-
-static void _sourceselect_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    //sourceselect_cb(obj, data);
-    u8 switch_no = (long)data;
-    if (mp->mixer[switch_no].sw != 0)
-        _show_expo_dr_switch(switch_no);
-}
-
-static const char *_title_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 switch_no = (long)data;
-    sprintf(mp->tmpstr, "Switch%d", switch_no);
-    return _tr(mp->tmpstr);
-}
-
-static void _show_expo_dr_switch(u8 switch_no)  // switch_no = 1 or 2
-{
-    GUI_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb_switch); // don't change mp->itemObj , must keep expo_dr page items
-
-    labelDesc.style = LABEL_UNDERLINE;
-    GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
-            _title_cb, NULL, (void *)(long)switch_no);
-
-    u8 w = 48;
-    labelDesc.style = LABEL_CENTER;
-    guiObject_t *obj = GUI_CreateTextSelectPlate(LCD_WIDTH - w -5, 0, w, ITEM_HEIGHT, &labelDesc,
-            sourceselect_cb, set_drsource_cb, &mp->mixer[switch_no].sw);
-    GUI_SetSelected(obj);
-
-    /* w = 30;  // no need the save button
-    obj = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, _save_switch_cb, (void *)_tr("Save"));
-    GUI_CustomizeButton(obj , &labelDesc, w, ITEM_HEIGHT);*/
-
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    u8 h = LCD_HEIGHT - view_origin_absoluteY ;
-    GUI_SetupLogicalView(LEFT_VIEW_ID, 0, 0, LEFT_VIEW_WIDTH, h, view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 x = 0;
-    u8 space = ITEM_HEIGHT + 1;
-    w = LEFT_VIEW_WIDTH;
-    u8 y = 0;
-    u8 idx = (switch_no -1) * 4;
-    mp->expoObj[idx] = GUI_CreateButton(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            BUTTON_DEVO10, show_rate_cb, 0x0000, toggle_link_cb, (void *)(switch_no-1L));
-    GUI_CustomizeButton(mp->expoObj[idx], &labelDesc, w, ITEM_HEIGHT);
-
-    y += space;
-    labelDesc.style = LABEL_LEFTCENTER;
-    mp->expoObj[idx +1] = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Linked"));
-    labelDesc.style = LABEL_CENTER;
-    mp->expoObj[idx +2] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc,  curveselect_cb, set_curvename_cb, &mp->mixer[switch_no]);
-
-    y += space;
-    labelDesc.style = LABEL_LEFTCENTER;
-    mp->expoObj[9] = GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale:"));
-    y += space;
-    labelDesc.style = LABEL_CENTER;
-    mp->expoObj[idx +3] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[switch_no].scalar);
-
-    mp->graphs[switch_no] = GUI_CreateXYGraph(77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
-              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-              0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[switch_no]);
     //Enable/Disable the relevant widgets
-    update_rate_widgets(switch_no - 1);
+    _update_rate_widgets(0);
+    _update_rate_widgets(1);
+}
+
+static void _update_rate_widgets(u8 idx)
+{
+    u8 mix = idx + 1;
+    idx *=4;
+    if (MIXER_SRC(mp->mixer[mix].sw)) {
+        GUI_ButtonEnable(mp->expoObj[idx], 1);
+        if(mp->link_curves & mix ) {
+            GUI_TextSelectEnable(mp->expoObj[idx +2], 0);
+        } else {
+            GUI_TextSelectEnable(mp->expoObj[idx +2], 1);
+        }
+        GUI_TextSelectEnable(mp->expoObj[idx +3], 1);
+    } else {
+        GUI_ButtonEnable(mp->expoObj[idx], 0);
+        GUI_TextSelectEnable(mp->expoObj[idx +2], 0);
+        GUI_TextSelectEnable(mp->expoObj[idx +3], 0);
+    }
 }
 
 static void navigate_items(s8 direction)
 {
     guiObject_t *obj = GUI_GetSelected();
-    u8 last_item = mp->max_scroll + FIRST_PAGE_ITEM_IDX -1;
     if (direction > 0) {
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     } else {
@@ -417,25 +392,16 @@ static void navigate_items(s8 direction)
         current_selected_item += direction;
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
             // selected item is out of the view, scroll the view
-            if (obj == mp->itemObj[FIRST_PAGE_ITEM_IDX])
-                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
-            else if (obj == mp->itemObj[last_item]) {
-                u8 pages = mp->max_scroll/mp->entries_per_page;
-                if (mp->max_scroll%mp->entries_per_page != 0)
-                    pages++;
-                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, (pages -1) * (ITEM_HEIGHT +1) * 4);
-            }
-            else
-                GUI_ScrollLogicalView(LEFT_VIEW_ID, (ITEM_HEIGHT +1) *2*direction);
+            GUI_ScrollLogicalViewToObject(LEFT_VIEW_ID, obj, direction);
         }
     }
     if (mp->graphs[1] != NULL && mp->graphs[2] != NULL) { // indicate that it is the expo&dr page
-        if (obj == mp->itemObj[mp->max_scroll])
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
-        else if (obj == mp->itemObj[mp->max_scroll + 1])
+        if (current_selected_item < expo1_start_id -FIRST_PAGE_ITEM_IDX)
+            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
+        else if (current_selected_item >= expo2_start_id -FIRST_PAGE_ITEM_IDX)
             GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
         else
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
+            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
     }
     GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
 }
@@ -460,21 +426,6 @@ static u8 action_cb(u32 button, u8 flags, void *data)
             navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
             navigate_items(1);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-static u8 _action_cb_switch(u32 button, u8 flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            MIXPAGE_ChangeTemplate(1);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

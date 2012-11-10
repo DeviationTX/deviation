@@ -112,8 +112,8 @@ static void _show_expo_dr()
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[2]);
 
     //Enable/Disable the relevant widgets
-    update_rate_widgets(0);
-    update_rate_widgets(1);
+    _update_rate_widgets(0);
+    _update_rate_widgets(1);
 }
 
 static void _show_complex()
@@ -163,3 +163,28 @@ static void _show_complex()
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.max);
     */
 }
+
+static void _update_rate_widgets(u8 idx)
+{
+    u8 mix = idx + 1;
+    idx *=4;
+    if (MIXER_SRC(mp->mixer[mix].sw)) {
+        GUI_SetHidden(mp->expoObj[idx], 0);
+        if(mp->link_curves & mix) {
+            GUI_SetHidden(mp->expoObj[idx+1], 0);
+            GUI_SetHidden(mp->expoObj[idx+2], 1);
+        } else {
+            GUI_SetHidden(mp->expoObj[idx+1], 1);
+            GUI_SetHidden(mp->expoObj[idx+2], 0);
+        }
+        GUI_SetHidden(mp->expoObj[idx+3], 0);
+        GUI_SetHidden(mp->graphs[mix], 0);
+    } else {
+        GUI_SetHidden(mp->expoObj[idx], 1);
+        GUI_SetHidden(mp->expoObj[idx+1], 1);
+        GUI_SetHidden(mp->expoObj[idx+2], 1);
+        GUI_SetHidden(mp->expoObj[idx+3], 1);
+        GUI_SetHidden(mp->graphs[mix], 1);
+    }
+}
+
