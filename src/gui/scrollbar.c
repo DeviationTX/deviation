@@ -85,7 +85,7 @@ void GUI_DrawScrollbar(struct guiObject *obj)
                             ARROW_DOWN, scrollbar->state & PRESS_DOWN ? DRAW_PRESSED : DRAW_NORMAL);
         //}
         //if (! (scrollbar->state & (PRESS_UP | PRESS_DOWN))) {
-            u8 bar = scrollbar->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - bar_height) / scrollbar->num_items;
+            u8 bar = scrollbar->cur_pos * (obj->box.height - 2 * ARROW_HEIGHT - bar_height) / (scrollbar->num_items -1);
             LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT,
                          ARROW_WIDTH, obj->box.height - 2 * ARROW_HEIGHT, BAR_BG);
             LCD_FillRect(obj->box.x, obj->box.y + ARROW_HEIGHT + bar,

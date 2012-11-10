@@ -75,16 +75,20 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
         listbox->text_height = text_h + LINE_SPACING;  //LINE_SPACING is defined in _gui.h
     }
     listbox->entries_per_page = (height + 2) / listbox->text_height;
-    if (listbox->entries_per_page > item_count) {
+    if (listbox->entries_per_page >= item_count) {
         listbox->entries_per_page = item_count;
         sb_entries = item_count;
         pos = 0;
     } else {
         sb_entries = item_count - listbox->entries_per_page;
         if(selected >= 0) {
-            pos = selected - (listbox->entries_per_page / 2);
-            if (pos < 0)
-                pos = 0;
+            if (selected < sb_entries) {
+                pos = selected - (listbox->entries_per_page / 2);
+                if (pos < 0)
+                    pos = 0;
+            } else {
+                pos = sb_entries;
+            }
         }
     }
     listbox->cur_pos = pos;
@@ -106,6 +110,7 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
               sb_entries,
               obj,
               scroll_cb, NULL);
+    GUI_SetScrollbar(listbox->scrollbar, pos);
     if (listbox->item_count <= listbox->entries_per_page)
         GUI_SetHidden(listbox->scrollbar, 1);
     if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT)
