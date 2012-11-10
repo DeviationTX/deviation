@@ -110,21 +110,16 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
     if (select->type != TEXTSELECT_DEVO10) {
+        GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                            box->y, select->button, DRAW_NORMAL);
         if (select->enable) {
-            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                                box->y, select->button, DRAW_NORMAL);
             GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
                                 select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
             GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
                                 box->y, ARROW_RIGHT,
                                 select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-            LCD_SetFontColor(select->fontColor);
         }
-        else { // don't show arrow parts when it is disabled
-            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                box->y, select->button, DRAW_PRESSED);
-            LCD_SetFontColor(0xffff);
-        }
+        LCD_SetFontColor(select->fontColor);
         LCD_GetStringDimensions((const u8 *)str, &w, &h);
         x = box->x + (box->width - w) / 2;
         y = box->y + 2 + (box->height - h) / 2;
