@@ -228,11 +228,17 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         }
         return 0;
     case MODEL_ICO:
-        if (! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]) {
+        if ((LCD_DEPTH == 1 && ! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]
+            && ! Model.pagecfg.box[6] && ! Model.pagecfg.box[7])
+           ||(LCD_DEPTH > 1 && ! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]))
+        {
             *x = MODEL_ICO_X;
             if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
                 *x -= OUTTRIM_OFFSET;
-        } else if(! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]) {
+        } else if((LCD_DEPTH == 1 && ! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]
+                 && ! Model.pagecfg.box[2] && ! Model.pagecfg.box[3])
+              ||(LCD_DEPTH > 1 && ! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]))
+        {
             *x = LCD_WIDTH - MODEL_ICO_X - MODEL_ICO_W;
             if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
                 *x += OUTTRIM_OFFSET;
