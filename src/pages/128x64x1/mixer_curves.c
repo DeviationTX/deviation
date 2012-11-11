@@ -42,8 +42,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     GUI_CreateTextSelectPlate(0, 0, w, ITEM_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
     u8 x =40;
     w = 40;
-    saveButton = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, okcancel_cb, (void *)_tr("Save"));
-    GUI_CustomizeButton(saveButton, &labelDesc, w, ITEM_HEIGHT);
+    saveButton = GUI_CreateButtonPlateText(LCD_WIDTH - w, 0, w, ITEM_HEIGHT,&labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
     GUI_CreateRect(0, ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc);
 

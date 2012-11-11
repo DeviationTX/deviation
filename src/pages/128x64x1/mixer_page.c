@@ -55,14 +55,12 @@ static void _show_page()
             //obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
             //        MIXPAGE_ChanNameProtoCB, limitselect_cb, (const void *)((long)ch));
             //GUI_SetSelectable(obj, 1);
-            obj = GUI_CreateButton(x, row, BUTTON_DEVO10, MIXPAGE_ChanNameProtoCB, 0,
+            obj = GUI_CreateButtonPlateText(x, row, w, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
-            GUI_CustomizeButton(obj, &labelDesc, w, h);
         }
         else {
             obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
                                    MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)ch));
-            GUI_SetSelectable(obj, 0);
         }
         mp->itemObj[i *2] = obj;
 
@@ -70,10 +68,8 @@ static void _show_page()
         labelDesc.style = LABEL_CENTER;
         //obj = GUI_CreateLabelBox(70, row, w, h, &labelDesc, template_name_cb, templateselect_cb, (const void *)((long)ch));
         //GUI_SetSelectable(obj, 1);
-        obj = GUI_CreateButton(69, row, BUTTON_DEVO10, template_name_cb, 0,
+        mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(69, row, w, h , &labelDesc, template_name_cb, 0,
                 templateselect_cb, (void *)((long)ch));
-        GUI_CustomizeButton(obj, &labelDesc, w, h);
-        mp->itemObj[i *2 +1] = obj;
 
         w = 24;
         for (idx = 0; idx < NUM_MIXERS; idx++)

@@ -45,8 +45,7 @@ static void _show_titlerow()
     mp->itemObj[0] = GUI_CreateTextSelectPlate(x, 0,  w, ITEM_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
     GUI_SetSelected(mp->itemObj[0]);
     w = 38;
-    mp->itemObj[1] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, okcancel_cb, (void *)_tr("Save"));
-    GUI_CustomizeButton(mp->itemObj[1] , &labelDesc, w, ITEM_HEIGHT);
+    mp->itemObj[1] = GUI_CreateButtonPlateText(LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
 
     // Create a logical view
     u8 view_origin_absoluteX = 0;
@@ -207,9 +206,9 @@ static void _show_complex()
             w, ITEM_HEIGHT, &labelDesc, NULL, set_number100_cb, &mp->cur_mixer->offset);
 
     y += space;
-    mp->trimObj = GUI_CreateButton(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), BUTTON_DEVO10, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+    mp->trimObj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     mp->itemObj[mp->max_scroll++] = mp->trimObj;
-    GUI_CustomizeButton(mp->trimObj, &labelDesc, w, ITEM_HEIGHT);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
 

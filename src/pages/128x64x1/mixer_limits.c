@@ -37,8 +37,8 @@ static void _show_titlerow()
     u8 w = 50;
     titleObj = GUI_CreateLabelBox(0, 0 , LCD_WIDTH - w, ITEM_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
-    mp->itemObj[0] = GUI_CreateButton(LCD_WIDTH - w, 0, BUTTON_DEVO10, NULL, 0, revert_cb, (void *)_tr("Revert"));
-    GUI_CustomizeButton(mp->itemObj[0] , &labelDesc, w, ITEM_HEIGHT);
+    labelDesc.style = LABEL_CENTER;
+    mp->itemObj[0] = GUI_CreateButtonPlateText(LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
 
     // Create a logical view
     u8 view_origin_absoluteX = 0;

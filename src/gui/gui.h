@@ -325,7 +325,6 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
 guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         const char *(*strCallback)(guiObject_t *, const void *),
         u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
-void GUI_CustomizeButton(guiObject_t *, const struct LabelDesc *desc, u16 width, u16 height);
 guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 void GUI_ButtonEnable(guiObject_t *obj, u8 enable);

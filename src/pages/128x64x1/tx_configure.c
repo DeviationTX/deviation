@@ -56,9 +56,8 @@ void PAGE_TxConfigureInit(int page)
     u8 x = 68;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
-    guiObject_t *obj = GUI_CreateButton(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            BUTTON_DEVO10, langstr_cb, 0x0000, lang_select_cb, NULL);
-    GUI_CustomizeButton(obj, &DEFAULT_FONT, w, ITEM_HEIGHT);
+    guiObject_t *obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &labelDesc, langstr_cb, 0x0000, lang_select_cb, NULL);
     GUI_SetSelected(obj);
     cp->total_items++;
 
@@ -107,9 +106,8 @@ void PAGE_TxConfigureInit(int page)
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
-    obj = GUI_CreateButton(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            BUTTON_DEVO10, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
-    GUI_CustomizeButton(obj, &DEFAULT_FONT, w, ITEM_HEIGHT);
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &labelDesc, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
     cp->total_items++;
 
     // The following items are not draw in the logical view;

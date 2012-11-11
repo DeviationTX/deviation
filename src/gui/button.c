@@ -173,17 +173,6 @@ void GUI_DrawButton(struct guiObject *obj)
     }
 }
 
-// the following method should be obsoleted in the future, and use GUI_CreateButtonPlateText() instead
-void GUI_CustomizeButton(struct guiObject *obj, const struct LabelDesc *desc, u16 width, u16 height)
-{
-    // provide a way to customize buttton font, height and width as this constructor doesn't provide the way
-    struct guiButton *button = &obj->o.button;
-    struct guiBox *box = &obj->box;
-    button->desc = *desc;
-    box->width = width;
-    box->height = height;
-}
-
 int GUI_ButtonWidth(enum ButtonType type)
 {
     const struct ImageMap *map = _button_image_map(type);
