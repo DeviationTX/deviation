@@ -49,13 +49,10 @@ static const struct page pages[] = {
     {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
     {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
     {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
+    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
 
-    /*
-    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
-    {NULL, NULL, NULL},
-    {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
-    //{PAGE_TestInit, PAGE_TestEvent, NULL},
-*/
+    //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
+
 };
 
 static u8 page;

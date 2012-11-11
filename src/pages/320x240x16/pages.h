@@ -35,6 +35,7 @@ struct pagemem {
 };
 
 extern struct pagemem pagemem;
+#define TOGGLE_FILE "media/toggle.bmp"
 
 void PAGE_ShowHeader(const char *title);
 void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));

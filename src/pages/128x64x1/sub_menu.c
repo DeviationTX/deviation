@@ -16,7 +16,8 @@ static const char *menu_item_name_deviation0[] = {
      _tr_noop("Mixer"), _tr_noop("Model setup"),
      _tr_noop("Timers"),
      _tr_noop("Telemetry config"),
-     _tr_noop("Trims"), //_tr_noop("Mixer Mode"),
+     _tr_noop("Trims"),
+     _tr_noop("Main page config"),
      0
 };
 static const char *menu_item_name_deviation1[] = {
@@ -115,9 +116,9 @@ void navigate_item(short direction, u8 step)
 {
     short expectedIdx = selected_menu_idx[sub_menu_item] + direction* step;
     if (expectedIdx < 0) {
-        selected_menu_idx[sub_menu_item] = 0;
+        selected_menu_idx[sub_menu_item] = smp->menu_item_count -1; // rewind allowed
     } else if (expectedIdx >= smp->menu_item_count) {
-        selected_menu_idx[sub_menu_item] = smp->menu_item_count -1;
+        selected_menu_idx[sub_menu_item] = 0;
     }else {
         selected_menu_idx[sub_menu_item] = expectedIdx;
     }
@@ -180,5 +181,7 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
         PAGE_ChangeByName("TeleConf", PREVIOUS_ITEM);
     } else if (!strcmp("Telemetry monitor", str)) {
         PAGE_ChangeByName("TeleMoni", PREVIOUS_ITEM);
+    } else if (!strcmp("Main page config", str)) {
+        PAGE_ChangeByName("MainConf", PREVIOUS_ITEM);
     }
 }

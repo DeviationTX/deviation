@@ -19,7 +19,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
-#include "main_config.h"
+#include "../common/main_config.h"
 #include "telemetry.h"
 
 #include "../common/_main_page.c"

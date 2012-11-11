@@ -15,14 +15,10 @@
 
 #include "common.h"
 #include "pages.h"
-//#include "icons.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "main_config.h"
+#include "../common/main_config.h"
 #include "telemetry.h"
-
-char str[30];
-u8 page_num;
 
 #define COL1_VALUE 4
 #define COL2_VALUE 56
@@ -41,424 +37,170 @@ guiObject_t *firstObj;
 #define CALC_W(x) ((x) * 10 / 24)
 #define CALC_H(y) ((y) * 10 / 24)
 
-const struct {
-    u16 x;
-    u16 y;
-    u16 w;
-    u16 h;
-} box_pos[8] = {
-    { BOX0123_X, BOX04_Y, BOX_W, BOX0145_H },
-    { BOX0123_X, BOX15_Y, BOX_W, BOX0145_H },
-    { BOX0123_X, BOX26_Y, BOX_W, BOX2367_H },
-    { BOX0123_X, BOX37_Y, BOX_W, BOX2367_H },
-    { BOX4567_X, BOX04_Y, BOX_W, BOX0145_H },
-    { BOX4567_X, BOX15_Y, BOX_W, BOX0145_H },
-    { BOX4567_X, BOX26_Y, BOX_W, BOX2367_H },
-    { BOX4567_X, BOX37_Y, BOX_W, BOX2367_H },
-};
+/*************************************/
+/* Trims */
+#define OUTTRIM_OFFSET 5
 
-static void build_image();
-static void show_page();
-static void select_toggle_icon(u8 idx);
+#define VTRIM_W 4 //10
+#define VTRIM_H 49 // 140
+#define HTRIM_W 49 //125
+#define HTRIM_H 4 //10
 
-const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    Model.pagecfg.trims = GUI_TextSelectHelper(Model.pagecfg.trims, 0, 3, dir, 1, 1, &changed);   
-    if (changed)
-        build_image();
-    switch(Model.pagecfg.trims) {
-    case TRIMS_NONE :    return _tr("No Trims");
-    case TRIMS_4OUTSIDE: return _tr("4 Outside");
-    case TRIMS_4INSIDE:  return _tr("4 Inside");
-    case TRIMS_6:        return _tr("6 Trims");
-    default:             return "";
-    }
-}
+#define INTRIM_1_X 59 //130
+#define INTRIM_2_X (LCD_WIDTH - INTRIM_1_X - VTRIM_W)
+#define OUTTRIM_1_X 1 //16
+#define OUTTRIM_2_X (LCD_WIDTH - OUTTRIM_1_X - VTRIM_W)
 
-const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    u8 maxbar;
-    if ((Model.pagecfg.box[2] || Model.pagecfg.box[3]) && (Model.pagecfg.box[6] || Model.pagecfg.box[7]))
-        maxbar = 0;
-    else if (Model.pagecfg.box[2] || Model.pagecfg.box[3] || Model.pagecfg.box[6] || Model.pagecfg.box[7])
-        maxbar = 1;
-    else
-        maxbar = 2;
-    Model.pagecfg.barsize = GUI_TextSelectHelper(Model.pagecfg.barsize, 0, maxbar, dir, 1, 1, &changed);   
-    if (changed)
-        build_image();
-    switch(Model.pagecfg.barsize) {
-    case BARS_NONE: return _tr("No Bars");
-    case BARS_4:    return _tr("4 Bars");
-    case BARS_8:    return _tr("8 Bars");
-    default:        return "";
-    }
-}
 
-const char *boxlabel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    sprintf(str, _tr("Box %d:"), i+1);
-    return str;
-}
+#define TRIM_12_Y 10 // 75
 
-const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    u8 changed;
-    int old_val = Model.pagecfg.box[i];
-    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
-    if (changed && (old_val == 0 || Model.pagecfg.box[i] == 0))
-        build_image();
-    if (Model.pagecfg.box[i]) {
-        if (Model.pagecfg.box[i] <= NUM_TIMERS)
-            return TIMER_Name(str, Model.pagecfg.box[i] - 1);
-        else if( Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM)
-            return TELEMETRY_Name(str, Model.pagecfg.box[i] - NUM_TIMERS);
-    }
-    return INPUT_SourceName(str, Model.pagecfg.box[i] ? Model.pagecfg.box[i] - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
-}
-const char *barlabel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    sprintf(str, _tr("Bar %d:"), i+1);
-    return str;
-}
+#define TRIM_3_X 5 //5
+#define TRIM_4_X (LCD_WIDTH - TRIM_3_X - HTRIM_W)
+#define TRIM_34_Y 59 //220
 
-const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    u8 changed;
-    Model.pagecfg.bar[i] = GUI_TextSelectHelper(Model.pagecfg.bar[i], 0, NUM_CHANNELS, dir, 1, 1, &changed);   
-    if (changed)
-        build_image();
-    return INPUT_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
-}
-const char *toggle_sel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    sprintf(str, _tr("Toggle%d"), i+1);
-    return str;
-}
+#define TRIM_5_X 53
+#define TRIM_6_X (LCD_WIDTH - TRIM_5_X - VTRIM_W)
+#define TRIM_56_Y 9
+#define VTRIM_56_H (VTRIM_H - 2)
+/*************************************/
 
-const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    u8 changed;
-    u8 val = MIXER_SRC(Model.pagecfg.toggle[i]);
-    val = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);   
-    if (changed) {
-        Model.pagecfg.toggle[i] = MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
-        build_image();
-    }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(Model.pagecfg.toggle[i]));
-    return INPUT_SourceName(str, Model.pagecfg.toggle[i]);
-}
 
-u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
+#define BOX0123_X 8 //16
+#define BOX4567_X 80 //204
+#define BOX_W     40 //100
+#define BOX0145_H 9 //40
+#define BOX2367_H 9 //24
+
+#define BOX04_Y 22 //40
+#define BOX15_Y 31 //90
+#define BOX26_Y 39 //150
+#define BOX37_Y 49 //185
+
+/*************************************/
+/* Model Icon */
+#define MODEL_ICO_X 75
+#define MODEL_ICO_Y 20
+#define MODEL_ICO_W 52
+#define MODEL_ICO_H 36
+/*************************************/
+
+#define GRAPH1_X BOX0123_X
+#define GRAPH2_X (320 - BOX_W - GRAPH1_X)
+#define GRAPH_Y BOX26_Y
+#define GRAPH_H 59
+#define GRAPH_W 10
+#define GRAPH_SPACE ((BOX_W - GRAPH_W) / 3)
+
+/*************************************/
+/* Toggle Icons */
+#define TOGGLE_W 8
+#define TOGGLE_H 11
+
+#define TOGGLE_CNTR_X 145
+#define TOGGLE_CNTR_Y 40
+#define TOGGLE_CNTR_SPACE 48
+
+#define TOGGLE_LR_Y 11
+#define TOGGLE_LR_SPACE 40
+#define TOGGLE_L_X 8
+#define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLE_W)
+/*************************************/
+
+#include "../common/_main_config.c"
+
+#define VIEW_ID 0
+
+static u8 _action_cb(u32 button, u8 flags, void *data);
+static const char *_swicthlabel_cb(guiObject_t *obj, const void *data);
+
+static s8 current_selected = 0;
+static u8 total_items = 0;
+static s16 view_origin_relativeY;
+static guiObject_t *scroll_bar;
+
+static void _show_page()
 {
+    if (page_num < 0 && current_selected > 0)
+        page_num = current_selected;
+    total_items = 0;
+    current_selected = 0;
+    // Create a logical view
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 space = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+            view_origin_absoluteX, view_origin_absoluteY);
+
+    u8 y = 0;
+    u8 w = 63;
+    u8 x = 56;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trims:"));
+    guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, trimsel_cb, NULL);
+    GUI_SetSelected(obj);
+    total_items++;
+
+    y += space;
     u8 i;
-    switch(widget) {
-    case TRIM1:
-    case TRIM2:
-        if (! Model.pagecfg.trims)
-            return 0;
-        *y = TRIM_12_Y;
-        *w = VTRIM_W;
-        *h = VTRIM_H;
-        if (widget == TRIM1) {
-            *x = Model.pagecfg.trims == TRIMS_4OUTSIDE ? OUTTRIM_1_X : INTRIM_1_X;
-        } else {
-            *x = Model.pagecfg.trims == TRIMS_4OUTSIDE ? OUTTRIM_2_X : INTRIM_2_X;
-        }
-        return 1;
-    case TRIM3:
-    case TRIM4:
-        if (! Model.pagecfg.trims)
-            return 0;
-        *x = (widget == TRIM3) ? TRIM_3_X : TRIM_4_X;
-        *y = TRIM_34_Y;
-        *w = HTRIM_W;
-        *h = HTRIM_H;
-        return 1;
-    case TRIM5:
-    case TRIM6:
-        if (Model.pagecfg.trims != TRIMS_6)
-            return 0;
-        *x = (widget == TRIM5) ? TRIM_5_X : TRIM_6_X;
-        *y = TRIM_56_Y;
-        *w = VTRIM_W;
-        *h = VTRIM_H;
-        return 1;
-    case TOGGLE4:
-        if (Model.pagecfg.trims == TRIMS_6)
-            return 0;
-        //Fall-through
-    case TOGGLE1:
-    case TOGGLE2:
-    case TOGGLE3:
-        *w = TOGGLE_W;
-        *h = TOGGLE_H;
-        if (Model.pagecfg.trims != TRIMS_6) {
-            *x = TOGGLE_CNTR_X;
-            *y = TOGGLE_CNTR_Y + (widget - TOGGLE1) * TOGGLE_CNTR_SPACE;
-            return 1;
-        }
-        if (! Model.pagecfg.box[3] && (Model.pagecfg.box[2] || Model.pagecfg.barsize == 0)) {
-            *x = TOGGLE_L_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
-            *y = TOGGLE_LR_Y;
-            return 1;
-        } else if (! Model.pagecfg.box[7] && (Model.pagecfg.box[6] || Model.pagecfg.barsize == 0 || (Model.pagecfg.barsize == 1 && !Model.pagecfg.box[2] && !Model.pagecfg.box[3]))) {
-            *x = TOGGLE_R_X + (widget - TOGGLE1) * TOGGLE_LR_SPACE;
-            *y = TOGGLE_LR_Y;
-            return 1;
-        }
-        return 0;
-    case BOX1:
-    case BOX2:
-    case BOX3:
-    case BOX4:
-    case BOX5:
-    case BOX6:
-    case BOX7:
-    case BOX8:
-        i = widget-BOX1;
-        if(Model.pagecfg.box[i]) {
-            *x = box_pos[i].x;
-            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x += i < 4 ? OUTTRIM_OFFSET : -OUTTRIM_OFFSET;
-            *y = box_pos[i].y;
-            *w = box_pos[i].w;
-            *h = box_pos[i].h;
-            return 1;
-        }
-        return 0;
-    case MODEL_ICO:
-        if (! Model.pagecfg.box[4] && ! Model.pagecfg.box[5]) {
-            *x = MODEL_ICO_X;
-            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x -= OUTTRIM_OFFSET;
-        } else if(! Model.pagecfg.box[0] && ! Model.pagecfg.box[1]) {
-            *x = 320 - MODEL_ICO_X - MODEL_ICO_W;
-            if (Model.pagecfg.trims == TRIMS_4OUTSIDE)
-                *x += OUTTRIM_OFFSET;
-        } else
-            return 0;
-        *y = MODEL_ICO_Y;
-        *w = MODEL_ICO_W;
-        *h = MODEL_ICO_H;
-        return 1;
-    case BAR1:
-    case BAR2:
-    case BAR3:
-    case BAR4:
-    case BAR5:
-    case BAR6:
-    case BAR7:
-    case BAR8:
-        if(Model.pagecfg.barsize == BARS_NONE)
-            return 0;
-        *y = GRAPH_Y;
-        *w = GRAPH_W;
-        *h = GRAPH_H;
-        i = 0;
-        if(! Model.pagecfg.box[2] && ! Model.pagecfg.box[3]) {
-            i = 4;
-            if (widget <= BAR4) {
-                *x = GRAPH1_X + GRAPH_SPACE * (widget - BAR1);
-                if (Model.pagecfg.trims <= 1)
-                    *x += OUTTRIM_OFFSET;
-                return 1;
-            }
-        }
-        if((! Model.pagecfg.box[6] && ! Model.pagecfg.box[7]) && (Model.pagecfg.barsize == BARS_8 || Model.pagecfg.box[2] || Model.pagecfg.box[3])) {
-            if (widget >= (u8)(BAR1 + i) && widget < (u8)(BAR1 + i + 4)) {
-                *x = GRAPH2_X + GRAPH_SPACE * (widget - (BAR1+i));
-                if (Model.pagecfg.trims <= 1)
-                    *x -= OUTTRIM_OFFSET;
-                return 1;
-            }
-        }
-        return 0;
+    for(i = 0; i < 8; i++) {
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                    0, ITEM_HEIGHT, &DEFAULT_FONT, boxlabel_cb, NULL, (void *)(long)i);
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, boxtxtsel_cb, (void *)(long)i);
+        y+= space;
+        total_items++;
     }
-    return 0;
-}
-static void draw_rect(enum MainWidget widget, const struct LabelDesc *desc)
-{
-    u16 x, y, w, h;
-    if (MAINPAGE_GetWidgetLoc(widget, &x, &y, &w, &h)) {
-        GUI_CreateRect(CALC_X(x), CALC_Y(y), CALC_W(w), CALC_H(h), desc);
+
+    for(i = 0; i < 4; i++) {
+        /* GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                    0, ITEM_HEIGHT, &DEFAULT_FONT, boxlabel_cb, NULL, (void *)(long)i);
+        total_items++; */
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, _swicthlabel_cb, NULL, (void *)(long)i);
+        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                    w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_inv_cb, toggle_val_cb,  (void *)(long)i);
+        y+= space;
+        total_items++;
     }
-}
-static void build_image()
-{
-    int i;
-    if(imageObj)
-       GUI_RemoveHierObjects(imageObj);
-    imageObj = GUI_CreateRect(IMAGE_X, IMAGE_Y, CALC_W(320), CALC_H(240-32), &outline);
-    for(i = TRIM1; i <= TRIM6; i++)
-        draw_rect(i, &fill_black);
-    for(i = TOGGLE1; i <= TOGGLE4; i++)
-        draw_rect(i, &fill_black);
-    for(i = BOX1; i <= BOX8; i++)
-        draw_rect(i, &fill_white);
-    draw_rect(MODEL_ICO, &fill_black);
-    for(i = BAR1; i <= BAR8; i++)
-        draw_rect(i, &fill_black);
+
+    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
+    if (page_num > 0)
+        PAGE_NavigateItems(page_num, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
 }
 
-#define MAX_PAGE 1
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static void _show_title()
 {
-    (void)pos;
-    (void)parent;
-    (void)data;
-    s8 newpos = (s8)page_num + direction;
-    if (newpos < 0)
-        newpos = 0;
-    else if (newpos > MAX_PAGE)
-        newpos = MAX_PAGE;
-    if (newpos != page_num) {
-        page_num = newpos;
-        show_page();
-    }
-    return page_num;
+    PAGE_SetActionCB(_action_cb);
+    GUI_RemoveAllObjects();
+    PAGE_ShowHeader(_tr("Preview: Long-Press ENT"));
 }
-void iconpress_cb(guiObject_t *obj, const void *data)
+
+static const char *_swicthlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if(Model.pagecfg.toggle[(long)data])
-        select_toggle_icon((long)data);
-}
-void toggle_inv_cb(guiObject_t *obj, void *data)
-{
-    if(MIXER_SRC(Model.pagecfg.toggle[(long)data])) {
-        Model.pagecfg.toggle[(long)data] ^= 0x80;
-        GUI_Redraw(obj);
-    }
+    u8 i = (long)data;
+    sprintf(str, _tr("Switch %d:"), i+1);
+    return str;
 }
 
-static void show_page()
-{
-    long i;
-    if (firstObj) {
-        GUI_RemoveHierObjects(firstObj);
-        firstObj = NULL;
-        imageObj = NULL;
-    }
-
-    u16 y = 144;
-    if (page_num == 0) {
-        GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
-        firstObj = GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
-        GUI_CreateLabel(COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars:"));
-        GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
-        for(i = 0; i < 4; i++) {
-            GUI_CreateLabel(COL1_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, boxtxtsel_cb, (void *)i);
-            y+= 24;
-        }
-        y = 144;
-        for(i = 4; i < 8; i++) {
-            GUI_CreateLabel(COL3_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(COL4_VALUE, y, TEXTSELECT_96, 0x0000, NULL, boxtxtsel_cb, (void *)i);
-            y+= 24;
-        }
-    } else if (page_num == 1) {
-        firstObj = GUI_CreateButton(COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
-        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
-        GUI_CreateButton(COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
-        GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
-        GUI_CreateButton(COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
-        GUI_CreateTextSelect(COL2_VALUE, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
-        GUI_CreateButton(COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
-        GUI_CreateTextSelect(COL2_VALUE, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
-        for(i = 0; i < 4; i++) {
-            GUI_CreateLabel(COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
-            y+= 24;
-        }
-        y = 144;
-        for(i = 4; i < 8; i++) {
-            GUI_CreateLabel(COL3_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(COL4_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
-            y+= 24;
-        }
-    }
-    build_image();
-}
-void PAGE_MainCfgInit(int page)
-{
-    PAGE_SetModal(0);
-    imageObj = NULL;
-    firstObj = NULL;
-
-    page_num = page;
-    PAGE_ShowHeader(_tr("Main Page Config"));
-    guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, MAX_PAGE, NULL, scroll_cb, NULL);
-    GUI_SetScrollbar(obj, page);
-    show_page();
-}
-void PAGE_MainCfgEvent()
-{
-}
-
-void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        u16 pos = (long)data;
-        u8 idx = pos >> 8;
-        pos &= 0xff;
-        Model.pagecfg.tglico[idx] = pos;
-        PAGE_RemoveAllObjects();
-        PAGE_MainCfgInit(1);
-    }
-}
-
-static void tglico_cancel_cb(guiObject_t *obj, const void *data)
+u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
-    (void)obj;
-    PAGE_RemoveAllObjects();
-    PAGE_MainCfgInit(1);
-}
-
-void select_toggle_icon(u8 idx)
-{
-    (void)tglico_cancel_cb;
-    (void)idx; // not used page, to be refactored later on
-    /* long pos = 0;
-    u16 w, h, x, y;
-    u8 i, j;
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
-    u8 count = w / 32;
-    u8 cursel = Model.pagecfg.tglico[idx];
-    PAGE_CreateCancelButton(216, 4, tglico_cancel_cb);
-    for(j = 0; j < 5; j++) {
-        y = 40 + j * 40;
-        for(i = 0; i < 8; i++,pos++) {
-            if (pos >= count)
-                break;
-            x = 4 + i*40;
-            if (pos == cursel)
-                GUI_CreateRect(x-1, y-1, 34, 33, &outline);
-            GUI_CreateImageOffset(x, y, 32, 31, pos * 32, 0, TOGGLE_FILE, tglico_select_cb, (void *)((idx << 8) | pos));
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("SubMenu", sub_menu_item);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+            PAGE_ChangeByName("MainPage", 1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
         }
-    } */
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }
-

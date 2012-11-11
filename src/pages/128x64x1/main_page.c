@@ -19,12 +19,15 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
-#include "main_config.h"
+#include "../common/main_config.h"
 #include "telemetry.h"
 
 #include "../common/_main_page.c"
 
 static const char *_power_to_string();
+static u8 _action_preview_cb(u32 button, u8 flags, void *data);
+static const char *show_toggle_cb(guiObject_t *obj, const void *data);
+
 #define BATTERY_SCAN_MSEC 2000 // refresh battery for every 2sec to avoid its label blinking
 static u32 next_scan=0;
 
@@ -37,12 +40,15 @@ static u32 next_scan=0;
 void PAGE_MainInit(int page)
 {
     (void)bar_cb;
-    (void)page;
     int i;
     u16 x, y, w, h;
     memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
     PAGE_SetModal(0);
-    PAGE_SetActionCB(_action_cb);
+    if (page == 1)
+        PAGE_SetActionCB(_action_preview_cb);
+    else
+        PAGE_SetActionCB(_action_cb);
+    GUI_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     //mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
@@ -78,6 +84,19 @@ void PAGE_MainInit(int page)
         } else { // i = 3 - 7
             mp->boxval[i] = 0;
             mp->boxObj[i] = NULL;
+        }
+    }
+
+    for(i = 0; i < 4; i++) {
+        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
+            u8 old_color = TINY_FONT.outline_color;
+            TINY_FONT.outline_color = 0xffff;
+            u8 x1 = x + (w +2)* i;
+            if(! Model.pagecfg.toggle[i])
+                LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
+            else
+                mp->toggleObj[i] = GUI_CreateLabelBox(x1 + 1 , y, w, h, &TINY_FONT, show_toggle_cb, NULL, (void *)(long)i);
+            TINY_FONT.outline_color = old_color;
         }
     }
     //Battery
@@ -141,6 +160,17 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     return 1;
 }
 
+static u8 _action_preview_cb(u32 button, u8 flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByName("MainConf", -1);  // go back to the main config page
+        }
+    }
+    return 1;
+}
+
 /**
  * Below are defined in the common.h
  *  TXPOWER_100uW,  // -10db
@@ -155,4 +185,12 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 static const char *_power_to_string()
 {
     return RADIO_TX_POWER_VAL[Model.tx_power];
+}
+
+static const char *show_toggle_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    u8 i = (long)data;
+    sprintf(mp->tmpstr, "%d", i + 1);
+    return mp->tmpstr;
 }
