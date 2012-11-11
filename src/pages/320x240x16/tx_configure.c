@@ -104,5 +104,6 @@ void PAGE_TxConfigureInit(int page)
     PAGE_ShowHeader(_tr("Configure"));
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
     firstObj = NULL;
+    page_num = 0;
     _show_page();
 }
