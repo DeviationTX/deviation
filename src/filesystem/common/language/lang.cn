@@ -2,19 +2,19 @@
 :# Channels:
 通道数:
 :%s is %d%%, safe value = %d%%\n
-%s = %d%%, 熄火保护 = %d%%\n
+%s当前值为%d%%, 熄火保护设定为%d%%\n
 :%s is %d%%,\nsafe value = %d%%
-%s值为%d%%,\n安全值应为%d%%
+%s当前值为%d%%,\n熄火保护设定为%d%%
 >:+
 >:-
 :1-to-1
 1比1
 :11 Point
-11 点
+11点
 :13 Point
-13 点
+13点
 :3 Point
-3 点
+3点
 :4 Bars
 4 Bars
 :4 Inside
@@ -24,19 +24,19 @@
 :4Ch w/ Dual-Rates
 4通和舵量
 :5 Point
-5 点
+5点
 :6 Trims
-6 微调
+6微调
 :6Ch Airplane
 6通固定翼
 :6Ch Helicopter
 6通直升机
 :7 Point
-7 点
+7点
 :8 Bars
 8 Bars
 :9 Point
-9 点
+9点
 :< 0
 < 0
 :> 0
@@ -62,8 +62,11 @@
 Bar %d
 :Bars:
 Bars:
->:Basic Config
+:Basic config
+基本设置
 :Battery Alarm:
+电量报警:
+:Batt alarm:
 电量报警:
 :Battery too low,\ncan't save!
 电压过低,\n无法保存修改!
@@ -76,7 +79,7 @@ Bars:
 :Binding... %d seconds\nPress ENT to stop
 对频中...%d秒\n按ENT键中止对频
 :Box %d:
-箱 %d:
+%d行:
 :Buttons
 按键
 >:COL
@@ -84,7 +87,7 @@ Bars:
 :CYC
 循环
 :Calibrate
-摇杆校准
+校准
 :Cancel
 取消
 >:Celcius
@@ -93,12 +96,26 @@ Bars:
 通道
 :Change
 更改
+:Change Unit
+单位设置
+:Temperature
+温度单位
+:Celcius
+摄氏度
+:Fahrenheit
+华氏度
+:Distance
+距离单位
+:Meter
+米
+:Feet
+英尺
 :Channels
 通道
 :Complex
-混合
+自定义
 :Configure
-设定
+设置
 :Contrast:
 对比度:
 :Copy To
@@ -132,7 +149,8 @@ Deviation\n固件版本:
 输入
 :Exit
 退出
->:Expo&DR
+:Expo&DR
+三段式
 :FMODE0
 常规飞行
 :FMODE1
@@ -144,7 +162,7 @@ Deviation\n固件版本:
 失控保护:
 >:Feet
 :File:
-文档:
+模型文档:
 :Fixed
 固定
 :Fixed ID:
@@ -153,17 +171,25 @@ Deviation\n固件版本:
 尾舵
 :Helicopter
 直升机
+:Heli
+直升机
+:Plane
+固定翼
 :High-Rate
-高速率
+飞行模式0
 :Icon
 图标
 :Input:
 输入:
 :Inputs
 输入
+:Channel output
+通道输出值
+:Stick input
+摇杆/开关输入值
 >:Insert
 :Inverted
-逆转
+反转
 :LEFT_H
 左水平
 :LEFT_V
@@ -182,21 +208,21 @@ Deviation\n固件版本:
 >:Longitude
 >:Low Battery
 :Low-Rate
-低速率
+飞行模式2
 :MIX0
 混控0
 :MIX1
 混控1
 :MIX2
 混控2
-:Main Menu
+:Main menu
 主菜单
 >:Main Page Config
 :Max:
 上限:
 >:Meters
 :Mid-Rate
-中速率
+飞行模式1
 :Min/Max
 上限/下限
 :Min:
@@ -210,11 +236,13 @@ Deviation\n固件版本:
 模式 %d
 :Model
 模型
-:Model Config
+:Model config
+设置模型
+:Model setup
 模型设置
-:Model Name:
+:Model name:
 模型命名:
-:Model Type:
+:Model type:
 机型选择
 :Monitor
 通道监控
@@ -227,11 +255,11 @@ Deviation\n固件版本:
 负
 >:New
 :No Bars
-没Bars
+无Bars
 :No Trim
-没微调
+无微调
 :No Trims
-没微调
+无微调
 :None
 无
 :Normal
@@ -241,7 +269,7 @@ Deviation\n固件版本:
 :Off
 关闭
 :Offset:
-抵消:
+偏移:
 :Ok
 确定
 :On
@@ -259,9 +287,8 @@ Deviation\n固件版本:
 >:Press ENT to copy to:
 >:Press ENT to load:
 >:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
-:Procotol:
-协议:
+:Press ENT to turn \nUSB drive:
+按ENT键开启\n或关闭U盘: 
 :Protocol&Binding
 协议、对频
 :Protocol:
@@ -274,16 +301,17 @@ Deviation\n固件版本:
 :RUD
 方向
 :RUD DR
-方向舵舵量
+RUD开关
 >:Re-Init
 >:Remove
 :Reset
-重启
+重置
 :Reverse:
-方向:
+反转:
 :Reversed
 反转
->:Revert
+:Revert
+放弃修改
 :Right
 右
 :Safe Val:
@@ -296,23 +324,33 @@ Deviation\n固件版本:
 保存
 :Scale:
 比例:
+:Scale1:
+比例1:
+:Scale2:
+比例2：
 :Scanner
 扫描器 
 :Simple
 简单
 :Simple 4 Channel
-简单4通道
+4通道
 >:Speed
 :Src
-来源
+摇杆输入
 :Src:
-来源:
+摇杆输入:
 :Start:
-开始:
->:Step:
-:Stick Mode:
+起始值:
+:Step:
+步进：
+:Stick mode:
 摇杆模式:
->:Sticks:
+:Sticks:
+摇杆:
+:Dimmer time:
+背光减弱时间
+:Dimmer target:
+背光减弱值
 :Subtrim:
 微调:
 >:SwashType:
@@ -359,9 +397,50 @@ Deviation\n固件版本:
 模板..
 :Test
 测试
->:Time
+:Timers
+定时器设置
 :Timer
 定时器
+:Telemetry config
+双向回传设置
+:Telemetry monitor
+回传数据监控
+:Temp:
+温度:
+:Volt:
+电压:
+:Volt1
+电压1
+:Volt2
+电压2
+:Volt3
+电压3
+:RPM:
+转速:
+:RPM1
+转速1
+:RPM2
+转速2
+:Temp1
+温度1
+:Temp2
+温度2
+:Temp3
+温度3
+:Temp4
+温度4
+:Latitude
+经度
+:Longitude
+纬度
+:Altitude
+高度
+:Speed
+速度
+:Time
+时间
+:Trims
+微调设置
 :Toggle%d
 开关%d
 :Touch Calibrate
@@ -389,9 +468,10 @@ Deviation\n固件版本:
 关机
 :Turn On
 开机
-:Tx Config
-遥控设置
->:Tx Power:
+:Transmitter config
+设置遥控
+:Tx power:
+发射功率:
 :USB
 USB
 :Unknown
@@ -410,7 +490,7 @@ USB
 :add
 加
 :countdown
-倒数
+倒计时
 :mult
 多次的
 :replace
