@@ -29,7 +29,9 @@ static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long val = (long)data;
-    return TELEMETRY_ShortName(tp.str, val);
+    char str[25];
+    sprintf(tp.str, "%s:", TELEMETRY_ShortName(str, val));
+    return tp.str;
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)

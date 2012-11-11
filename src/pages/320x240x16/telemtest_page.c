@@ -24,19 +24,19 @@ static void show_page()
 {
     const u8 row_height = 20;
     for(long i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(20, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(10, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_TEMP1+i));
         tp.temp[i] = GUI_CreateLabelBox(60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_TEMP1+1));
     }
     for(long i = 0; i < 3; i++) {
-        GUI_CreateLabelBox(120, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(110, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_VOLT1+i));
         tp.volt[i] = GUI_CreateLabelBox(155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_VOLT1+i));
     }
     for(long i = 0; i < 2; i++) {
-        GUI_CreateLabelBox(220, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(210, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_RPM1+i));
         tp.rpm[i]  = GUI_CreateLabelBox(255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_RPM1+i));
