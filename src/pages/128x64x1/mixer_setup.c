@@ -280,7 +280,7 @@ static void _show_expo_dr()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[0] = GUI_CreateButtonPlateText(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) ,
-            w -10, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)0);
+            w, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)0);
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[2] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
@@ -307,7 +307,7 @@ static void _show_expo_dr()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[4] = GUI_CreateButtonPlateText(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) ,
-            w - 10, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)1);
+            w, ITEM_HEIGHT, &labelDesc, show_rate_cb, 0xffff, toggle_link_cb, (void *)1);
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[6] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
