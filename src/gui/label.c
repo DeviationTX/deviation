@@ -158,19 +158,22 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
         else
             txt_y = obj_y;
     } else {
+        u8 y_off = 0;
         if (desc->style == LABEL_TRANSPARENT || desc->style == LABEL_CENTER || desc->style == LABEL_LEFT ||
                 desc->style == LABEL_LEFTCENTER || desc->style ==LABEL_BLINK) {
            GUI_DrawBackground(obj_x, obj_y, obj_width, obj_height);
         } else {
             LCD_FillRect(obj_x, obj_y, obj_width, obj_height, desc->fill_color);
+            y_off = 1;
         }
         if (desc->style == LABEL_TRANSPARENT || desc->fill_color != desc->outline_color) {
             LCD_DrawRect(obj_x, obj_y, obj_width, obj_height, desc->outline_color);
+            y_off = 1;
         }
         if (obj_height > txt_h)
             txt_y = obj_y + (obj_height - txt_h) / 2;
         else
-            txt_y = obj_y;
+            txt_y = obj_y + y_off;
         if (obj_width > txt_w && desc->style != LABEL_LEFT &&  desc->style != LABEL_LEFTCENTER)
             txt_x = obj_x + (obj_width - txt_w) / 2;
         else
