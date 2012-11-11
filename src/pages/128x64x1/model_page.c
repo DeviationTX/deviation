@@ -85,6 +85,14 @@ void PAGE_ModelInit(int page)
     mp->total_items++;
 
     row += space;
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, protoselect_cb, NULL);
+    mp->total_items++;
+    mp->obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x +5 ), GUI_MapToLogicalView(VIEW_ID, row),
+            w-10, ITEM_HEIGHT, &DEFAULT_FONT, show_bindtext_cb, 0x0000, bind_cb, NULL);
+    mp->total_items++;
+
+    row += space;
     if(Model.fixed_id == 0)
         strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
@@ -100,14 +108,6 @@ void PAGE_ModelInit(int page)
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("# Channels:"));
     mp->chanObj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, numchanselect_cb, NULL);
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, protoselect_cb, NULL);
-    mp->total_items++;
-    mp->obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x +5 ), GUI_MapToLogicalView(VIEW_ID, row),
-            w-10, ITEM_HEIGHT, &DEFAULT_FONT, show_bindtext_cb, 0x0000, bind_cb, NULL);
     mp->total_items++;
 
     // The following items are not draw in the logical view;
