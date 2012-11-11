@@ -115,9 +115,9 @@ void GUI_DrawButton(struct guiObject *obj)
         GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
         if (button->strCallback) {
             u16 text_w, text_h;
+            LCD_SetFont(DEFAULT_FONT.font); //Set Font here so callback can calculate size
             txt = button->strCallback(obj, button->cb_data);
             if (txt) {
-                LCD_SetFont(DEFAULT_FONT.font);
                 LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
                 x_off = (box->width - text_w) / 2 + box->x;
                 y_off = (box->height - text_h) / 2 + box->y + 1;
@@ -127,6 +127,7 @@ void GUI_DrawButton(struct guiObject *obj)
         }
     } else {  // plate-text button for Devo 10
 #define BUTTON_ROUND 3
+        LCD_SetFont(button->desc.font); //Set Font here so callback can calculate size
         if (button->strCallback)
             txt = button->strCallback(obj, button->cb_data);
         else
@@ -134,7 +135,6 @@ void GUI_DrawButton(struct guiObject *obj)
         u16 text_w, text_h;
         u16 w = box->width;
         u16 h = box->height;
-        LCD_SetFont(button->desc.font);
         LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
         if (box->width == 0)
             w = text_w;

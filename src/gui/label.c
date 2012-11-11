@@ -58,6 +58,8 @@ void GUI_DrawLabel(struct guiObject *obj)
 {
     struct guiLabel *label = &obj->o.label;
     const char *str;
+    //Set font here so the callback can get its dimensions
+    LCD_SetFont(label->desc.font);
     if (label->strCallback)
         str = label->strCallback(obj, label->cb_data);
     else

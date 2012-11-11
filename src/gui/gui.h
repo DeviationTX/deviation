@@ -391,6 +391,7 @@ guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
 struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj);
 struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj);
+void GUI_GetSize(guiObject_t *obj, int *width, int *height);
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed);
 void GUI_TextSelectEnablePress(guiObject_t *obj, u8 enable);

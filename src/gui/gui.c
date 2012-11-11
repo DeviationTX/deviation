@@ -596,3 +596,9 @@ void GUI_DrawImageHelper(u16 x, u16 y, const struct ImageMap *map, u8 idx)
     LCD_DrawWindowedImageFromFile(x, y, map->file, map->width, map->height,
                                   map->x_off, map->y_off + idx * map->height);
 }
+
+void GUI_GetSize(struct guiObject *obj, int *width, int *height)
+{
+    *width = obj->box.width;
+    *height = obj->box.height;
+}

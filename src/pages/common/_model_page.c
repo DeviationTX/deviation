@@ -33,11 +33,23 @@ static void _changename_done_cb(guiObject_t *obj, void *data);
 const char *show_text_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
+    int width; int height;
+    u16 txt_w, txt_h;
     strcpy(mp->tmpstr, (const char *)data);
-    if (strlen(mp->tmpstr) > 8) {// don't show full name if length >8
-        mp->tmpstr[8] = '.';
-        mp->tmpstr[9] = '.';
-        mp->tmpstr[10] = '\0';
+    GUI_GetSize(obj, &width, &height);
+    width -=2;
+    while(1) {
+        LCD_GetStringDimensions((const u8 *)mp->tmpstr, &txt_w, &txt_h);
+        if (txt_w > width) {
+            int len = strlen(mp->tmpstr);
+            if (mp->tmpstr[len-1] == '.')
+                len--;
+            mp->tmpstr[len-3] = '.';
+            mp->tmpstr[len-2] = '.';
+            mp->tmpstr[len-1] = '\0';
+        } else {
+            break;
+        }
     }
     return mp->tmpstr;
 }
