@@ -302,6 +302,27 @@ static void lang_select_cb(guiObject_t *obj, const void *data)
     LANGPage_Select(PAGE_TxConfigureInit);
 }
 
+static const char *units_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 changed;
+    u8 mask = data ? TELEMUNIT_FAREN : TELEMUNIT_FEET;
+    u8 type = (Transmitter.telem & mask) ? 1 : 0;
+    type = GUI_TextSelectHelper(type, 0, 1, dir, 1, 1, &changed);
+    if (changed) {
+        if (type) {
+            Transmitter.telem |= mask;
+        } else {
+            Transmitter.telem &= ~mask;
+        }
+    }
+    if (data) {
+        return type ? _tr("Fahren") : _tr("Celcius");
+    } else {
+        return type ? _tr("Foot") : _tr("Meter");
+    }
+}
+
 void PAGE_TxConfigureEvent()
 {
     switch(cp->enable) {

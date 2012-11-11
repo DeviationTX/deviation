@@ -110,6 +110,19 @@ void PAGE_TxConfigureInit(int page)
             w, ITEM_HEIGHT, &labelDesc, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
     cp->total_items++;
 
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem Temp:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem Dist:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
+    cp->total_items++;
     // The following items are not draw in the logical view;
     cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
     if (page > 0)

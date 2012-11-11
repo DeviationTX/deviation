@@ -28,8 +28,6 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(_tr("Telemetry"));
 
-    GUI_CreateTextSelect(10, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)1L);
-    GUI_CreateTextSelect(182, 40, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)0L);
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);

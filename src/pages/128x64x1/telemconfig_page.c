@@ -22,16 +22,12 @@
 #include "../common/_telemconfig_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static u8 _action_cb_changeunit(u32 button, u8 flags, void *data);
-static void _press_cb(guiObject_t *obj, const void *data);
 static const char *idx_cb(guiObject_t *obj, const void *data);
-static void show_page_selectunit();
 
 #define VIEW_ID 0
 
 static u8 total_items;
 static guiObject_t *scroll_bar;
-static guiObject_t *firstObj;
 static s8 current_selected = 0;
 static s16 view_origin_relativeY = 0;
 
@@ -43,14 +39,9 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
-    // no header for devo10 to show more items //PAGE_ShowHeader(_tr("Telemetry"));
-    PAGE_ShowHeader(""); // to draw a underline only
+    PAGE_ShowHeader(_tr("Telemetry"));
     current_selected = 0;
     total_items = 0;
-
-    firstObj = GUI_CreateButtonPlateText(63, 0 , 65, ITEM_HEIGHT,
-            &DEFAULT_FONT, NULL, 0x0000, _press_cb, (void *)_tr("Change Unit"));
-    GUI_SetSelected(firstObj);
 
     // Create 1 logical view
     u8 view_origin_absoluteX = 0;
@@ -86,33 +77,6 @@ void PAGE_TelemconfigInit(int page)
         PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
 }
 
-
-static void show_page_selectunit()
-{
-    PAGE_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb_changeunit);
-    PAGE_ShowHeader(_tr("Change Unit")); // to draw a underline only
-
-    u8 space = ITEM_HEIGHT + 1;
-    u8 row = space;
-    u8 w = 70;
-    GUI_CreateLabelBox(0, row, 80, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Temperature"));
-    row += space;
-    firstObj = GUI_CreateTextSelectPlate(50, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
-    row += space;
-    GUI_CreateLabelBox(0, row, 80, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Distance"));
-    row += space;
-    GUI_CreateTextSelectPlate(50, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
-    GUI_SetSelected(firstObj);
-}
-
-static void _press_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    show_page_selectunit();
-}
-
 static const char *idx_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -121,29 +85,12 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
     return tp.str;
 }
 
-static u8 _action_cb_changeunit(u32 button, u8 flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_TelemconfigInit(PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByName("SubMenu", sub_menu_item);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
-            show_page_selectunit(); // long press ENT to enter change unit page
         }
         else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);

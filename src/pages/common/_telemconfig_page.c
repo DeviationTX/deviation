@@ -72,31 +72,5 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     return TELEMETRY_GetValueStrByValue(tp.str, Model.telem_alarm[val], Model.telem_alarm_val[val]);
 }
 
-static const char *units_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)obj;
-    u8 changed;
-    u8 mask = data ? TELEMFLAG_FAREN : TELEMFLAG_FEET;
-    u8 type = (Model.telem_flags & mask) ? 1 : 0;
-    type = GUI_TextSelectHelper(type, 0, 1, dir, 1, 1, &changed);
-    if (changed) {
-        if (type) {
-            Model.telem_flags |= mask;
-        } else {
-            Model.telem_flags &= ~mask;
-        }
-        if (data) {
-            //Celcius/Farenheit: redraw values
-            for(int i = 0; i < TELEM_NUM_ALARMS; i++)
-                GUI_Redraw(tp.valueObj[i]);
-        }
-    }
-    if (data) {
-        return type ? _tr("Fahrenheit") : _tr("Celcius");
-    } else {
-        return type ? _tr("Feet") : _tr("Meter");
-    }
-}
-
 void PAGE_TelemconfigEvent() {
 }

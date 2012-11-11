@@ -15,6 +15,7 @@
 #include "common.h"
 #include "music.h"
 #include "config/model.h"
+#include "config/tx.h"
 #include "telemetry.h"
 
 struct Telemetry Telemetry;
@@ -63,8 +64,8 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             if (value == 0) {
                 strcpy(str, "----");
             } else {
-                if (Model.telem_flags & TELEMFLAG_FAREN) {
-                    sprintf(str, "%dF", ((int)value * 9 + 288)/ 5);
+                if (Transmitter.telem & TELEMUNIT_FAREN) {
+                    sprintf(str, "%dF", ((int)value * 9 + 160)/ 5);
                 } else {
                     sprintf(str, "%dC", (int)value);
                 }
@@ -89,7 +90,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             sprintf(str, "%03d %02d %02d.%03d", h, m, s, ss);
             break;
         case TELEM_GPS_ALT:
-            if (Model.telem_flags & TELEMFLAG_FEET) {
+            if (Transmitter.telem & TELEMUNIT_FEET) {
                 value = value * 328 / 100;
                 sprintf(str, "%d.%03dft", (int)value / 1000, (int)value % 1000);
             } else {
@@ -97,7 +98,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             }
             break;
         case TELEM_GPS_SPEED:
-            if (Model.telem_flags & TELEMFLAG_FEET) {
+            if (Transmitter.telem & TELEMUNIT_FEET) {
                 value = value * 2237 / 1000;
                 sprintf(str, "%d.%02dmph", (int)value / 1000, (int)(value / 10) % 100);
             } else {

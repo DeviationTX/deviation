@@ -114,12 +114,6 @@ static const char SECTION_SAFETY[] = "safety";
 static const char * const SAFETY_VAL[SAFE_MAX+1] = { "none", "min", "zero", "max" };
 
 /* Section: Telemetry */
-static const char SECTION_TELEMETRY[] = "telemetry";
-static const char TELEM_TEMP[] = "temp";
-static const char * const TELEM_TEMP_VAL[2] = { "celcius", "farenheit"};
-static const char TELEM_LENGTH[] = "length";
-static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
-
 static const char SECTION_TELEMALARM[] = "telemalarm";
 static const char TELEM_SRC[] = "source";
 static const char TELEM_ABOVE[] =  "above";
@@ -542,18 +536,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-    if (MATCH_SECTION(SECTION_TELEMETRY)) {
-        if (MATCH_KEY(TELEM_TEMP)) {
-            if(strcasecmp(TELEM_TEMP_VAL[1], value) == 0)
-                m->telem_flags |= TELEMFLAG_FAREN;
-            return 1;
-        }
-        if (MATCH_KEY(TELEM_LENGTH)) {
-            if(strcasecmp(TELEM_LENGTH_VAL[1], value) == 0)
-                m->telem_flags |= TELEMFLAG_FEET;
-            return 1;
-        }
-    }
     if (MATCH_START(section, SECTION_TELEMALARM)) {
         u8 idx = atoi(section + sizeof(SECTION_TELEMALARM)-1);
         if (idx == 0) {
@@ -854,15 +836,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
-    }
-    if(WRITE_FULL_MODEL || (m->telem_flags & (TELEMFLAG_FEET | TELEMFLAG_FAREN))) {
-        fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
-        if (WRITE_FULL_MODEL || (m->telem_flags & TELEMFLAG_FAREN)) {
-            fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(m->telem_flags & TELEMFLAG_FAREN) ? 1 : 0]);
-        }
-        if (WRITE_FULL_MODEL || (m->telem_flags & TELEMFLAG_FEET)) {
-            fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(m->telem_flags & TELEMFLAG_FEET) ? 1 : 0]);
-        }
     }
     for(idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
         if (! WRITE_FULL_MODEL && ! m->telem_alarm[idx])

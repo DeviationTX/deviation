@@ -52,6 +52,13 @@ const char SECTION_AUTODIMMER[] = "autodimmer";
 const char AUTODIMMER_TIME[] = "timer";
 const char AUTODIMMER_DIMVALUE[] = "dimvalue";
 
+/* Section: Telemetry */
+static const char SECTION_TELEMETRY[] = "telemetry";
+static const char TELEM_TEMP[] = "temp";
+static const char * const TELEM_TEMP_VAL[2] = { "celcius", "farenheit"};
+static const char TELEM_LENGTH[] = "length";
+static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
+
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
@@ -145,6 +152,18 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    if (MATCH_SECTION(SECTION_TELEMETRY)) {
+        if (MATCH_KEY(TELEM_TEMP)) {
+            if(strcasecmp(TELEM_TEMP_VAL[1], value) == 0)
+                t->telem |= TELEMUNIT_FAREN;
+            return 1;
+        }
+        if (MATCH_KEY(TELEM_LENGTH)) {
+            if(strcasecmp(TELEM_LENGTH_VAL[1], value) == 0)
+                t->telem |= TELEMUNIT_FEET;
+            return 1;
+        }
+    }
     printf("Unknown values section: %s key: %s\n", section, name);
     return 0;
 }
@@ -197,6 +216,10 @@ void CONFIG_WriteTx()
     fprintf(fh, "[%s]\n", SECTION_AUTODIMMER);
     fprintf(fh, "%s=%u\n", AUTODIMMER_TIME, t->auto_dimmer.timer);
     fprintf(fh, "%s=%u\n", AUTODIMMER_DIMVALUE, t->auto_dimmer.backlight_dim_value);
+
+    fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
+    fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(t->telem & TELEMUNIT_FAREN) ? 1 : 0]);
+    fprintf(fh, "%s=%s\n", TELEM_LENGTH, TELEM_LENGTH_VAL[(t->telem & TELEMUNIT_FEET) ? 1 : 0]);
 
     CONFIG_EnableLanguage(1);
     fclose(fh);

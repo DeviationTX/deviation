@@ -3,6 +3,7 @@
 
 #include "mixer.h"
 #include "autodimmer.h"
+#include "telemetry.h"
 
 struct StickCalibration {
     u16 max;
@@ -20,9 +21,10 @@ struct TouchCalibration {
 struct Transmitter {
     u8 current_model;
     u8 language;
-    enum Mode mode;
     u8 brightness;
     u8 contrast;
+    u8 telem;
+    enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

@@ -28,10 +28,12 @@ enum {
     TELEMFLAG_ALARM4 = 0x08,
     TELEMFLAG_ALARM5 = 0x10,
     TELEMFLAG_ALARM6 = 0x20,
-    TELEMFLAG_FEET   = 0x40,
-    TELEMFLAG_FAREN  = 0x80,
 };
 
+enum {
+    TELEMUNIT_FEET   = 0x40,
+    TELEMUNIT_FAREN  = 0x80,
+};
 struct gps {
     s32 latitude;
     s32 longitude;
