@@ -24,7 +24,8 @@ static const char *menu_item_name_deviation1[] = {
      _tr_noop("Basic config"), _tr_noop("Monitor"),
      _tr_noop("Telemetry monitor"),
      //_tr_noop("Scanner"),
-     _tr_noop("USB"), 0
+     _tr_noop("USB"), _tr_noop("About"),
+     0
 };
 
 u8 sub_menu_item = 0;  // global variable to let other page get back to the right sub menu
@@ -183,5 +184,7 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
         PAGE_ChangeByName("TeleMoni", PREVIOUS_ITEM);
     } else if (!strcmp("Main page config", str)) {
         PAGE_ChangeByName("MainConf", PREVIOUS_ITEM);
+    } else if (!strcmp("About", str)) {
+        PAGE_ChangeByName("About", PREVIOUS_ITEM);
     }
 }

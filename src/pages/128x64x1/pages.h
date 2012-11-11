@@ -128,4 +128,5 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
 
+void PAGE_AboutInit(int page);
 #endif

@@ -50,9 +50,9 @@ static const struct page pages[] = {
     {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
     {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
+    {PAGE_AboutInit, NULL, NULL, "About"},
 
     //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
-
 };
 
 static u8 page;
