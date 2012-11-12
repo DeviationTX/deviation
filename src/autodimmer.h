@@ -3,7 +3,7 @@
 #include "timer.h"
 
 struct AutoDimmer {
-    u16 timer;
+    u32 timer;  //bug fix: overflow when timer > 1minutes
     u8 backlight_dim_value;
 };
 
