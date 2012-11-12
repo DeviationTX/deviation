@@ -163,11 +163,13 @@ static void _determine_save_in_live()
 
 void PAGE_MixerEvent()
 {
-    _determine_save_in_live();
     if (show_chantest) {
         PAGE_ChantestEvent();
         return;
     }
+    // bug fix: when entering chantest modal page from the mixer page, the mp structure might be set to wrong value
+    // and will clear all limit data in devo8, simply because all structures inside the pagemem are unions and share the same memory
+    _determine_save_in_live();
     if (mp->cur_mixer && mp->graphs[0]) {
         if(MIXER_ReadInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
             GUI_Redraw(mp->graphs[0]);

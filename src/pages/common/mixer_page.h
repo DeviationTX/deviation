@@ -28,6 +28,7 @@ struct mixer_page {
     guiObject_t *scroll_bar;
     guiObject_t *itemObj[NUM_OUT_CHANNELS *2 + NUM_VIRT_CHANNELS];
     guiObject_t *trimObj;
+    guiObject_t *safeValObj;
     guiObject_t *expoObj[10];
     struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *cur_mixer;

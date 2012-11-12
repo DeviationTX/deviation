@@ -26,6 +26,8 @@ static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_failsafe_cb(guiObject_t *obj, void *data);
+static void update_safe_val_state();
+static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data);
 
 void MIXPAGE_EditLimits()
 {
@@ -46,6 +48,16 @@ void sourceselect_cb(guiObject_t *obj, void *data)
     }
 }
 
+static void update_safe_val_state()
+{
+    if (!mp->limit.safetysw) {
+        GUI_TextSelectEnable(mp->safeValObj, 0);
+        mp->limit.safetyval = 0;
+    }
+    else
+        GUI_TextSelectEnable(mp->safeValObj, 1);
+}
+
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
@@ -54,9 +66,22 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 isCurrentItemChanged = 0;
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
+    update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
     MIXER_SET_SRC_INV(*source, is_neg);
     GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
     return INPUT_SourceName(mp->tmpstr, *source);
+}
+
+static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    if (!GUI_IsTextSelectEnabled(obj))
+        return "0";
+    s8 oldValue = mp->limit.safetyval;
+    const char *str = PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.safetyval);
+    if (oldValue!= mp->limit.safetyval)
+        mp->are_limits_changed |= 1;
+    return str;
 }
 
 const char *set_limits_cb(guiObject_t *obj, int dir, void *data)

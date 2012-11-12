@@ -37,7 +37,7 @@ static void _show_limits()
     y += height;
     //Row 4
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safe Val:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+    mp->safeValObj = GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_safeval_cb, NULL);
     y += height + 6;
     //Row 5
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));

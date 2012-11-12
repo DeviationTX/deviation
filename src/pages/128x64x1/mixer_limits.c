@@ -85,8 +85,8 @@ static void _show_limits()
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
             &labelDesc, NULL, NULL, _tr("Safe Val:"));
     labelDesc.style = LABEL_CENTER;
-    mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc, NULL, PAGEMIXER_SetNumberCB, &mp->limit.safetyval);
+    mp->safeValObj = mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_safeval_cb, NULL);
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
