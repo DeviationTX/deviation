@@ -75,6 +75,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	for tx in devo8 devo10; do \
 		cp -prf filesystem/common/media filesystem/$$tx/; \
 		cp -prf filesystem/common/template filesystem/$$tx/; \
+		mkdir filesystem/$$tx/language 2> /dev/null || true; \
                 ../utils/extract_strings.pl -target $$tx; \
 		cp tx_template.ini filesystem/$$tx/tx.ini; \
 		mkdir filesystem/$$tx/models 2> /dev/null || true; \
