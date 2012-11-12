@@ -52,6 +52,11 @@ const char SECTION_AUTODIMMER[] = "autodimmer";
 const char AUTODIMMER_TIME[] = "timer";
 const char AUTODIMMER_DIMVALUE[] = "dimvalue";
 
+const char SECTION_TIMERSETTINGS[] = "countdowntimersettings";
+const char TIMERSETTINGS_PREALERT_TIME[] = "prealerttime";
+const char TIMERSETTINGS_PREALERT_INTERVAL[] = "prealertinterval";
+const char TIMERSETTINGS_TIMEUP_INTERVAL[] = "timeupinterval";
+
 /* Section: Telemetry */
 static const char SECTION_TELEMETRY[] = "telemetry";
 static const char TELEM_TEMP[] = "temp";
@@ -152,6 +157,20 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    if (MATCH_SECTION(SECTION_TIMERSETTINGS)) {
+        if (MATCH_KEY(TIMERSETTINGS_PREALERT_TIME)) {
+            t->countdown_timer_settings.prealert_time = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(TIMERSETTINGS_PREALERT_INTERVAL)) {
+            t->countdown_timer_settings.prealert_interval = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(TIMERSETTINGS_TIMEUP_INTERVAL)) {
+            t->countdown_timer_settings.timeup_interval = value_int;
+            return 1;
+        }
+    }
     if (MATCH_SECTION(SECTION_TELEMETRY)) {
         if (MATCH_KEY(TELEM_TEMP)) {
             if(strcasecmp(TELEM_TEMP_VAL[1], value) == 0)
@@ -179,6 +198,9 @@ void CONFIG_LoadTx()
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
     Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
+    Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
+    Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
+    Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
@@ -216,6 +238,10 @@ void CONFIG_WriteTx()
     fprintf(fh, "[%s]\n", SECTION_AUTODIMMER);
     fprintf(fh, "%s=%u\n", AUTODIMMER_TIME, t->auto_dimmer.timer);
     fprintf(fh, "%s=%u\n", AUTODIMMER_DIMVALUE, t->auto_dimmer.backlight_dim_value);
+    fprintf(fh, "[%s]\n", SECTION_TIMERSETTINGS);
+    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_TIME, t->countdown_timer_settings.prealert_time);
+    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_INTERVAL, t->countdown_timer_settings.prealert_interval);
+    fprintf(fh, "%s=%u\n", TIMERSETTINGS_TIMEUP_INTERVAL, t->countdown_timer_settings.timeup_interval);
 
     fprintf(fh, "[%s]\n", SECTION_TELEMETRY);
     fprintf(fh, "%s=%s\n", TELEM_TEMP, TELEM_TEMP_VAL[(t->telem & TELEMUNIT_FAREN) ? 1 : 0]);

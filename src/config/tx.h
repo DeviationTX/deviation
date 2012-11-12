@@ -30,6 +30,7 @@ struct Transmitter {
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;
     struct AutoDimmer auto_dimmer;
+    struct CountDownTimerSettings countdown_timer_settings;
 };
 
 extern struct Transmitter Transmitter;

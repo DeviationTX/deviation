@@ -246,6 +246,37 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
     return cp->tmpstr;
 }
 
+static const char *prealert_time_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    u8 changed;
+    u16 prealert_time = Transmitter.countdown_timer_settings.prealert_time/1000;
+    prealert_time = GUI_TextSelectHelper(prealert_time,
+            MIN_PERALERT_TIME, MAX_PERALERT_TIME, dir, 5, 10, &changed);
+    if (changed)
+        Transmitter.countdown_timer_settings.prealert_time = prealert_time * 1000;
+    if (prealert_time == 0)
+        return _tr("Off");
+    TIMER_SetString(cp->tmpstr, Transmitter.countdown_timer_settings.prealert_time);
+    return cp->tmpstr;
+}
+
+static const char *timer_interval_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u16 *value = (u16 *)data;
+    u8 changed;
+    u16 interval = *value/1000;
+    interval = GUI_TextSelectHelper(interval, 0, 60, dir, 5, 10, &changed);
+    if (changed)
+        *value = interval * 1000;
+    if (interval == 0)
+        return _tr("Off");
+    sprintf(cp->tmpstr, "%d", interval);
+    return cp->tmpstr;
+}
+
 static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

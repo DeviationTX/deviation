@@ -17,8 +17,8 @@
 #include "timer.h"
 #include "music.h"
 #include "config/model.h"
+#include "config/tx.h"
 
-#define BEEP_INTERVAL 60000 // 60 seconds
 static u8 timer_state[NUM_TIMERS];
 static s32 timer_val[NUM_TIMERS];
 static s32 last_time[NUM_TIMERS];
@@ -106,18 +106,23 @@ void TIMER_Update()
                 timer_val[i] += delta;
             } else {
                 s32 warn_time;
-                // Beep 1 for each second at the last 15 seconds
-                if (timer_val[i] > 1000 && timer_val[i] < 16000) {
-                    warn_time = ((timer_val[i] / 1000) * 1000);
+                // start to beep  for each prealert_interval at the last prealert_time(seconds)
+                if (Transmitter.countdown_timer_settings.prealert_time != 0 &&
+                    Transmitter.countdown_timer_settings.prealert_interval != 0 &&
+                    timer_val[i] > Transmitter.countdown_timer_settings.prealert_interval &&
+                    timer_val[i] < (s32)Transmitter.countdown_timer_settings.prealert_time + 1000) { // give extra 1seconds
+                    warn_time = ((timer_val[i] / Transmitter.countdown_timer_settings.prealert_interval)
+                            * Transmitter.countdown_timer_settings.prealert_interval);
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
                         MUSIC_Play(MUSIC_TIMER_WARNING);
                     }
                 }
-                // Beep 1 for each minute past 0
-                if (timer_val[i] < 0) {
-                    warn_time = ((timer_val[i] - BEEP_INTERVAL) / BEEP_INTERVAL) * BEEP_INTERVAL;
+                // Beep once for each timeup_interval past 0
+                if (timer_val[i] < 0 && Transmitter.countdown_timer_settings.timeup_interval != 0) {
+                    warn_time = ((timer_val[i] - Transmitter.countdown_timer_settings.timeup_interval) / Transmitter.countdown_timer_settings.timeup_interval)
+                            * Transmitter.countdown_timer_settings.timeup_interval;
                     if (timer_val[i] > warn_time && (timer_val[i] - delta) <= warn_time) {
-                        MUSIC_Play(MUSIC_TIMER_WARNING);
+                        MUSIC_Play(MUSIC_ALARM1 + i);
                     }
                 }
                 if (timer_val[i] > 0 && timer_val[i] < delta) {

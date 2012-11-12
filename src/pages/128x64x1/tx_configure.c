@@ -54,6 +54,12 @@ void PAGE_TxConfigureInit(int page)
     u8 row = 0;
     u8 w = 55;
     u8 x = 68;
+    enum LabelType oldType = labelDesc.style;
+    labelDesc.style = LABEL_UNDERLINE;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Generic settings"));
+
+    row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
     guiObject_t *obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
@@ -67,7 +73,23 @@ void PAGE_TxConfigureInit(int page)
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, modeselect_cb, NULL);
     cp->total_items++;
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Batt alarm:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, batalarm_select_cb, NULL);
+    cp->total_items++;
 
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &labelDesc, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("LCD settings"));
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Backlight:"));
@@ -98,35 +120,50 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Batt alarm:"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, batalarm_select_cb, NULL);
+                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Timer settings"));
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Prealert time:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + 10), GUI_MapToLogicalView(VIEW_ID, row),
+            w -10, ITEM_HEIGHT, &DEFAULT_FONT, NULL, prealert_time_cb, (void *)0L);
     cp->total_items++;
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
-    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &labelDesc, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Prealert intvl:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + 15), GUI_MapToLogicalView(VIEW_ID, row),
+            w -15, ITEM_HEIGHT, &DEFAULT_FONT, NULL, timer_interval_cb, &Transmitter.countdown_timer_settings.prealert_interval);
     cp->total_items++;
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem temp:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Timeup intvl:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + 15), GUI_MapToLogicalView(VIEW_ID, row),
+            w -15, ITEM_HEIGHT, &DEFAULT_FONT, NULL, timer_interval_cb, &Transmitter.countdown_timer_settings.timeup_interval);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Telemetry settings"));
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Temp unit:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
     cp->total_items++;
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem dist:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Dist unit:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
     cp->total_items++;
+
     // The following items are not draw in the logical view;
     cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
     if (page > 0)
         PAGE_NavigateItems(page, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
+    labelDesc.style = oldType;
 }
 
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)

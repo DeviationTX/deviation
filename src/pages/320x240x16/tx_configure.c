@@ -61,37 +61,48 @@ static void _show_page()
     u8 space = 22;
     u8 row = 40;
     if (page_num == 0) {
-    firstObj = GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
-    GUI_CreateButton(112, row, BUTTON_96, langstr_cb, 0x0000, lang_select_cb, NULL);
-    row += space + 8;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick Mode:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
-    row += space + 8;
-    GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch Screen:"));
-    GUI_CreateButton(112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
-    GUI_CreateButton(216, row, BUTTON_48, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
-    row += space + 8;
-    GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
-    GUI_CreateButton(112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
-    // GUI_CreateButton(216, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
+        firstObj = GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
+        GUI_CreateButton(112, row, BUTTON_96, langstr_cb, 0x0000, lang_select_cb, NULL);
+        row += space + 8;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, modeselect_cb, NULL);
+        row += space + 8;
+        GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen:"));
+        GUI_CreateButton(112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+        GUI_CreateButton(216, row, BUTTON_48, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
+        row += space + 8;
+        GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
+        GUI_CreateButton(112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
+        // GUI_CreateButton(216, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
     } else {
-    firstObj = GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, brightness_select_cb, NULL);
-    row += space;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer Time:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_time_cb, NULL);
-    row += space;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer Target:"));
-    cp->dimmer_target = GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_value_cb, NULL);
-    row += space;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery Alarm:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, batalarm_select_cb, NULL);
-    row += space;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Telemetry Temp:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)1L);
-    row += space;
-    GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Telemetry Units:"));
-    GUI_CreateTextSelect(112, row, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)0L);
+        firstObj = GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, brightness_select_cb, NULL);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer time:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_time_cb, NULL);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target:"));
+        cp->dimmer_target = GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_value_cb, NULL);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, batalarm_select_cb, NULL);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Telemetry temp:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)1L);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Telemetry units:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_128, 0x0000, NULL, units_cb, (void *)0L);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL,  _tr("Prealert time:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000,NULL, prealert_time_cb, (void *)0L);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Prealert interval:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
+                &Transmitter.countdown_timer_settings.prealert_interval);
+        row += space;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL,_tr("Timeup interval:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
+                &Transmitter.countdown_timer_settings.timeup_interval);
     }
 }
 
