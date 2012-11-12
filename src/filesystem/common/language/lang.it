@@ -4,8 +4,6 @@ Italiano
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valore sicuro  = %d%%\n
 >:%s is %d%%,\nsafe value = %d%%
->:+
->:-
 :1-to-1
 1 a 1
 :11 Point
@@ -52,6 +50,7 @@ DR ALET
 AUX4
 :AUX5
 AUX5
+>:About
 :Airplane
 Aereo
 >:Alarm
@@ -62,8 +61,10 @@ Luminosità
 Barra %d:
 :Bars:
 Barre:
->:Basic Config
-:Battery Alarm:
+>:Basic config
+:Batt alarm:
+Allarme batteria:
+:Battery alarm:
 Allarme batteria:
 >:Battery too low,\ncan't save!
 :Bind
@@ -72,7 +73,7 @@ Bind
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
->:Binding... %d seconds\nPress ENT to stop
+>:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Box%d:
 :Buttons
@@ -85,14 +86,16 @@ Collet.
 Ciclico
 :Calibrate
 Calibrazione
+>:Calibration done.
 :Cancel
 Cancella
 >:Celcius
->:Center all sticks\nthen press ENT
+>:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Ch
 :Change
 Cambia
+>:Channel output
 :Channels
 Canale
 :Complex
@@ -117,8 +120,12 @@ DR
 >:Deadband
 :Default
 Default
+>:Deviation FW version:
 :Deviation FW\nversion:
 Versione del\nFW Deviation:
+>:Dimmer target:
+>:Dimmer time:
+>:Dist unit:
 >:Dn
 :Down
 Giù
@@ -142,18 +149,20 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
->:Fahrenheit
+>:Fahren
 :Failsafe:
 Failsafe:
->:Feet
 :File:
 File:
 :Fixed
 Fisso
 :Fixed ID:
 ID Fisso:
+>:Foot
 :GEAR
 CARRELLO
+>:GPS
+>:Generic settings
 :Helicopter
 Elicottero
 :High-Rate
@@ -167,6 +176,7 @@ Ingressi
 >:Insert
 :Inverted
 Inverso
+>:LCD settings
 :LEFT_H
 SINISTRA_H
 :LEFT_V
@@ -192,12 +202,13 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main Menu
 :Main Page Config
 Pagina di Configurazione
+>:Main menu
+>:Main page config
 :Max:
 Max:
->:Meters
+>:Meter
 :Mid-Rate
 Rate Medio
 :Min/Max
@@ -206,22 +217,22 @@ Min/Max
 Min:
 :Mixer
 Mixer
->:Mixer Mode
 :Mixers:
 Mixers:
 :Mode %d
 Modo %d
 :Model
 Modello
->:Model Config
-:Model Name:
-Nome del Modello:
-:Model Type:
-Tipo del Modello:
+>:Model config
+:Model name:
+Nome del modello:
+>:Model setup
+:Model type:
+Tipo del modello:
 >:Monitor
 >:Move Down
 >:Move Up
->:Move sticks\nto max & min\nthen press ENT
+>:Move sticks and knobs\nto Max & Min positions\nthen press ENT
 :Mux:
 Operazione:
 :Neg
@@ -254,15 +265,16 @@ Punto:
 Pos.
 :Pos/Neg:
 Pos./Neg.:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
 Premi 'Ent' per attivare il Filesystem USB:
 >:Press ENT to change:
 >:Press ENT to copy to:
 >:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
->:Procotol:
->:Protocol&Binding
+>:Press ENT to turn \nUSB drive:
+>:Preview: Long-Press ENT
 :Protocol:
 Protocollo:
 :RIGHT_H
@@ -270,6 +282,7 @@ DESTRA_H
 :RIGHT_V
 DESTRA_V
 >:RPM
+>:RPM:
 :RUD
 TIMONE
 :RUD DR
@@ -294,6 +307,8 @@ Sicurezza
 Sicurezza:
 :Save
 Salva
+>:Scale1:
+>:Scale2:
 :Scale:
 Scala:
 :Scanner
@@ -303,6 +318,7 @@ Sempl.
 :Simple 4 Channel
 4Ch. Semplici
 >:Speed
+>:Speed:
 :Src
 Sorgente
 :Src:
@@ -310,7 +326,8 @@ Sorgente:
 :Start:
 Avvia:
 >:Step:
-:Stick Mode:
+>:Stick input
+:Stick mode:
 Modo di volo:
 :Sticks:
 Sticks:
@@ -318,6 +335,7 @@ Sticks:
 Subtrim
 :SwashType:
 Piatto:
+>:Switch %d:
 :Switch1
 Interr1
 :Switch2
@@ -356,7 +374,14 @@ TRIM_D-
 >:TelemT
 >:TelemV
 >:Telemetry
+>:Telemetry config
+>:Telemetry monitor
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
 >:Temp
+>:Temp unit:
+>:Temp:
 :Template..
 Modello..
 :Test
@@ -364,20 +389,25 @@ Test
 >:Time
 :Timer
 Timer
+>:Timer settings
+>:Timers
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 Alterna%d
 :Touch Calibrate
 Calibrazione dello schermo
-:Touch Screen:
-Schermo:
 :Touch Test
 Test dello schermo
+:Touch screen:
+Schermo:
 :Touch target %d
 Tocca %d
 :Touch to Lock
 Tocca per bloccare
 :Touch to Unlock
 Tocca per sbloccare
+>:Transmitter config
 :Trim
 Trim
 :Trim +:
@@ -386,14 +416,14 @@ Trim +:
 Trim -:
 :Trim Step:
 Trim fine:
+>:Trims
 :Trims:
 Trim:
 :Turn Off
 Disattiva
 :Turn On
 Attiva
->:Tx Config
-:Tx Power:
+:Tx power:
 Potenza di TX:
 :USB
 USB
@@ -406,6 +436,7 @@ valore:
 :Virt
 Virtuale
 >:Volt
+>:Volt:
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...
@@ -414,6 +445,8 @@ Virtuale
 aggiungi
 :countdown
 countdown
+>:max
+>:min
 :mult
 Mult.
 :replace

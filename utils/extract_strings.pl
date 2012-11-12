@@ -35,8 +35,10 @@ foreach (@lines) {
         $str = "";
         $idx++;
     }
-    if(/#:\s+(\S+):\d+$/) {
-        push @files, "$1:$idx";
+    if(/^#:\s+(.*\S)\s*$/) {
+        foreach my $f (split /\s+/, $1) {
+            push @files, "$f:$idx";
+        }
     }
     next unless(/^(msgid|")/);
     if(/^msgid/) {

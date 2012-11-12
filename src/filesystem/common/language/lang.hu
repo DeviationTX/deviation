@@ -51,6 +51,7 @@ Csűrés inv.:
 AUX4
 :AUX5
 AUX5
+>:About
 :Airplane
 Repülőgép
 :Alarm
@@ -67,7 +68,7 @@ Oszlop:
 Alap beállítás
 :Batt alarm:
 Fesz. riasztás:
-:Battery Alarm:
+:Battery alarm:
 Fesz. riasztás:
 :Battery too low,\ncan't save!
 Tápfesz. túl alacsony,\nnem tudok menteni!
@@ -103,8 +104,6 @@ Celsius
 Cs
 :Change
 Váltás
-:Change Unit
-Mértékegys.
 :Channel output
 Csatornák
 :Channels
@@ -135,10 +134,12 @@ DR
 Holtsáv
 :Default
 Default
+>:Deviation FW version:
 :Deviation FW\nversion:
 Deviation fw.\nverzió:
-:Distance
-Távolság
+>:Dimmer target:
+>:Dimmer time:
+>:Dist unit:
 :Dn
 Le
 :Down
@@ -163,24 +164,21 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
-:Fahrenheit
-Fahrenheit
+>:Fahren
 :Failsafe:
 Hibaérték:
-:Feet
-Láb
 :File:
 Fájl:
 :Fixed
 Fix
 :Fixed ID:
 Fix ID:
+>:Foot
 :GEAR
 GEAR
 :GPS
 GPS
-:Heli
-Heli
+>:Generic settings
 :Helicopter
 Helikopter
 :High-Rate
@@ -195,6 +193,7 @@ Bemenetek
 Beszúrás
 :Inverted
 Inverz
+>:LCD settings
 :LEFT_H
 BAL_V
 :LEFT_V
@@ -227,6 +226,7 @@ MIX2
 Főablak konfiguráció
 :Main menu
 Főmenü
+>:Main page config
 :Max:
 Max:
 :Meter
@@ -245,10 +245,6 @@ Mixerek:
 Mód %d
 :Model
 Modell
-:Model Name:
-Modell név:
-:Model Type:
-Modell típus:
 :Model config
 Modell konfig.
 :Model name:
@@ -293,14 +289,15 @@ OK
 Be
 :Page:
 Oldal:
-:Plane
-Repülő
 :Point:
 Pont:
 :Pos
 Poz.
 :Pos/Neg:
 Poz/Neg:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
 \nNyomjon 'ENT'-t, hogy az USB: 
 :Press ENT to change:
@@ -309,16 +306,16 @@ Változtatáshoz ENT:
 Másolás ENT:
 :Press ENT to load:
 Betöltés ENT:
-:Press ENT to start\ncalibration\nPress EXT to exit
-Kalibrálás ENT\nkilépés EXT
-:Press ENT to turn \nUSB drive: 
-Nyomjon ENT-t \naz USB: 
+:Press ENT to turn \nUSB drive:
+Nyomjon ENT-t \naz USB:
+>:Preview: Long-Press ENT
 :Protocol:
 Protokoll:
 :RIGHT_H
 JOBB_V
 :RIGHT_V
 JOBB_F
+>:RPM
 :RPM:
 Ford.:
 :RUD
@@ -347,6 +344,8 @@ Biztonsági ellenőrzés
 Biztonság:
 :Save
 Mentés
+>:Scale1:
+>:Scale2:
 :Scale:
 Skála:
 :Scanner
@@ -357,6 +356,7 @@ Egyszerű
 Egyszerű 4 csat.
 :Speed
 Sebesség
+>:Speed:
 :Src
 Forrás
 :Src:
@@ -365,8 +365,6 @@ Forrás:
 Start:
 :Step:
 Lépés
-:Stick Mode:
-Mód:
 :Stick input
 Bemenetek
 :Stick mode:
@@ -377,6 +375,7 @@ Botkormány:
 Subtrim:
 :SwashType:
 Imbolygó típusa:
+>:Switch %d:
 :Switch1
 Kapcs.1
 :Switch2
@@ -423,12 +422,14 @@ Telemtria
 Telemetria konfig.
 :Telemetry monitor
 Telemetria adatok
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
 :Temp
 Hőm.
+>:Temp unit:
 :Temp:
 Hőm.:
-:Temperature
-Hőmérséklet
 :Template..
 Sablon...
 :Test
@@ -437,16 +438,18 @@ Teszt
 Idő
 :Timer
 Időzítő
+>:Timer settings
 :Timers
 Időzítők
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 Jelzés%d
 :Touch Calibrate
 Érintés kalibrálás
-:Touch Screen:
-Képernyő:
 :Touch Test
 Érintés teszt
+>:Touch screen:
 :Touch target %d
 Érintse meg a(z) %d pontot!
 :Touch to Lock
@@ -471,8 +474,6 @@ Trim-ek:
 Kikapcsol
 :Turn On
 Bekapcsol
-:Tx Power:
-Kimenő telj.:
 :Tx power:
 Kimenő telj.:
 :USB
@@ -497,6 +498,8 @@ Nulla/Max
 hozzáad
 :countdown
 Időzítő
+>:max
+>:min
 :mult
 szoroz
 :replace

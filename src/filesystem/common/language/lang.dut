@@ -5,8 +5,6 @@
 %s is %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s is %d%%,\nveilige waarde = %d%%\n
->:+
->:-
 :1-to-1
 1-op-1
 :11 Point
@@ -53,6 +51,7 @@ AIL omg:
 AUX4
 :AUX5
 AUX5
+>:About
 :Airplane
 Vliegtuig
 >:Alarm
@@ -63,8 +62,9 @@ Helderheid:
 Balk %d:
 :Bars:
 Balken:
->:Basic Config
-:Battery Alarm:
+>:Basic config
+>:Batt alarm:
+:Battery alarm:
 Batterijalarm:
 >:Battery too low,\ncan't save!
 :Bind
@@ -73,7 +73,7 @@ Koppelen
 Bezig met koppelen
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
->:Binding... %d seconds\nPress ENT to stop
+>:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Kader %d:
 :Buttons
@@ -86,14 +86,16 @@ COL omg:
 CYC
 :Calibrate
 Kalibreren
+>:Calibration done.
 :Cancel
 Annuleren
 >:Celcius
->:Center all sticks\nthen press ENT
+>:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Kan
 :Change
 Aanpassen
+>:Channel output
 :Channels
 Kanalen
 :Complex
@@ -118,8 +120,12 @@ DR
 >:Deadband
 :Default
 Standaard
+>:Deviation FW version:
 :Deviation FW\nversion:
 Deviation FW\nVersie:
+>:Dimmer target:
+>:Dimmer time:
+>:Dist unit:
 >:Dn
 :Down
 Omlaag
@@ -143,18 +149,20 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
->:Fahrenheit
+>:Fahren
 :Failsafe:
 Veilige modus:
->:Feet
 :File:
 Bestand:
 :Fixed
 Vast
 :Fixed ID:
 Vast ID:
+>:Foot
 :GEAR
 GEA
+>:GPS
+>:Generic settings
 :Helicopter
 Helikopter
 :High-Rate
@@ -168,6 +176,7 @@ Invoeren
 >:Insert
 :Inverted
 Omgekeerd
+>:LCD settings
 :LEFT_H
 LINKS_H
 :LEFT_V
@@ -193,12 +202,13 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main Menu
 :Main Page Config
 Configuratie hoofdscherm
+>:Main menu
+>:Main page config
 :Max:
 Max:
->:Meters
+>:Meter
 :Mid-Rate
 Middel
 :Min/Max
@@ -207,22 +217,22 @@ Min/Max
 Min:
 :Mixer
 Mixer
->:Mixer Mode
 :Mixers:
 Mixers:
 :Mode %d
 Mode %d
 :Model
 Model
->:Model Config
-:Model Name:
+>:Model config
+:Model name:
 Modelnaam:
-:Model Type:
+>:Model setup
+:Model type:
 Modeltype:
 >:Monitor
 >:Move Down
 >:Move Up
->:Move sticks\nto max & min\nthen press ENT
+>:Move sticks and knobs\nto Max & Min positions\nthen press ENT
 :Mux:
 Mux:
 :Neg
@@ -255,15 +265,16 @@ Punt:
 +
 :Pos/Neg:
 +/-:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
 Druk op 'ENT' om USB-bestandssysteem te activeren
 >:Press ENT to change:
 >:Press ENT to copy to:
 >:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
->:Procotol:
->:Protocol&Binding
+>:Press ENT to turn \nUSB drive:
+>:Preview: Long-Press ENT
 :Protocol:
 Protocol:
 :RIGHT_H
@@ -271,6 +282,7 @@ RECHTS_H
 :RIGHT_V
 RECHTS_V
 >:RPM
+>:RPM:
 :RUD
 RUD
 :RUD DR
@@ -295,6 +307,8 @@ Veiligheid
 Veiligheid:
 :Save
 OPslaan
+>:Scale1:
+>:Scale2:
 :Scale:
 Schaal:
 :Scanner
@@ -304,6 +318,7 @@ Eenvoudig
 :Simple 4 Channel
 Eenvoudig 4 kanalen
 >:Speed
+>:Speed:
 :Src
 Bron
 :Src:
@@ -311,7 +326,8 @@ Bron:
 :Start:
 Start:
 >:Step:
-:Stick Mode:
+>:Stick input
+:Stick mode:
 Stickmodus:
 :Sticks:
 Sticks:
@@ -319,6 +335,7 @@ Sticks:
 Fijnafstelling:
 :SwashType:
 Type tuimelschijf:
+>:Switch %d:
 :Switch1
 Schakelaar1
 :Switch2
@@ -357,7 +374,14 @@ TRIM_R-
 >:TelemT
 >:TelemV
 >:Telemetry
+>:Telemetry config
+>:Telemetry monitor
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
 >:Temp
+>:Temp unit:
+>:Temp:
 :Template..
 Sjabloon...
 :Test
@@ -365,20 +389,25 @@ Testen
 >:Time
 :Timer
 Timer
+>:Timer settings
+>:Timers
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 Schakel%d
 :Touch Calibrate
 Aanraakscherm kalibreren
-:Touch Screen:
-Aanraakscherm:
 :Touch Test
 Aanraakscherm testen
+:Touch screen:
+Aanraakscherm:
 :Touch target %d
 Raak indicator %d aan
 :Touch to Lock
 Raak aan om vast te zetten
 :Touch to Unlock
 Raak aan om los te maken
+>:Transmitter config
 :Trim
 Trim
 :Trim +:
@@ -387,14 +416,14 @@ Trim +:
 Trim -:
 :Trim Step:
 Trimstap:
+>:Trims
 :Trims:
 Trims:
 :Turn Off
 Uitschakelen
 :Turn On
 Inschakelen
->:Tx Config
-:Tx Power:
+:Tx power:
 Zendvermogen:
 :USB
 USB
@@ -407,6 +436,7 @@ Waarde:
 :Virt
 Virt
 >:Volt
+>:Volt:
 :Zero/Max
 Nul/Max
 :\n\nBinding will end in %d seconds...
@@ -415,6 +445,8 @@ Nul/Max
 +
 :countdown
 Aftellen
+>:max
+>:min
 :mult
 *
 :replace

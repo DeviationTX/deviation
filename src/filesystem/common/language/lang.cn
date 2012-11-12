@@ -5,8 +5,6 @@
 %s当前值为%d%%, 熄火保护设定为%d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s当前值为%d%%,\n熄火保护设定为%d%%
->:+
->:-
 :1-to-1
 1比1
 :11 Point
@@ -53,9 +51,11 @@
 辅助4
 :AUX5
 辅助5
+>:About
 >:Airplane
 >:Alarm
->:Altitude
+:Altitude
+高度
 :Backlight:
 背光:
 :Bar %d:
@@ -64,9 +64,9 @@ Bar %d
 Bars:
 :Basic config
 基本设置
-:Battery Alarm:
-电量报警:
 :Batt alarm:
+电量报警:
+:Battery alarm:
 电量报警:
 :Battery too low,\ncan't save!
 电压过低,\n无法保存修改!
@@ -76,8 +76,8 @@ Bars:
 对频中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 正在对频中...\n请确保模型已接电!\n按「确认」不会中止对频\n但会退回操控权
-:Binding... %d seconds\nPress ENT to stop
-对频中...%d秒\n按ENT键中止对频
+:Binding...\n%d seconds\nPress ENT to stop
+对频中...\n%d秒\n按ENT键中止对频
 :Box %d:
 %d行:
 :Buttons
@@ -88,28 +88,18 @@ Bars:
 循环
 :Calibrate
 校准
+>:Calibration done.
 :Cancel
 取消
->:Celcius
->:Center all sticks\nthen press ENT
+:Celcius
+摄氏度
+>:Center all \nsticks and knobs\nthen press ENT
 :Ch
 通道
 :Change
 更改
-:Change Unit
-单位设置
-:Temperature
-温度单位
-:Celcius
-摄氏度
-:Fahrenheit
-华氏度
-:Distance
-距离单位
-:Meter
-米
-:Feet
-英尺
+:Channel output
+通道输出值
 :Channels
 通道
 :Complex
@@ -136,8 +126,14 @@ Bars:
 >:Deadband
 :Default
 默认
+>:Deviation FW version:
 :Deviation FW\nversion:
 Deviation\n固件版本:
+:Dimmer target:
+背光减弱值
+:Dimmer time:
+背光减弱时间
+>:Dist unit:
 >:Dn
 >:Down
 :ELE
@@ -157,24 +153,23 @@ Deviation\n固件版本:
 3D飞行1
 :FMODE2
 3D飞行2
->:Fahrenheit
+:Fahren
+华氏度
 :Failsafe:
 失控保护:
->:Feet
 :File:
 模型文档:
 :Fixed
 固定
 :Fixed ID:
 固定ID码:
+>:Foot
 :GEAR
 尾舵
+>:GPS
+>:Generic settings
 :Helicopter
 直升机
-:Heli
-直升机
-:Plane
-固定翼
 :High-Rate
 飞行模式0
 :Icon
@@ -183,20 +178,18 @@ Deviation\n固件版本:
 输入:
 :Inputs
 输入
-:Channel output
-通道输出值
-:Stick input
-摇杆/开关输入值
 >:Insert
 :Inverted
 反转
+>:LCD settings
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
 :Language:
 语言:
->:Latitude
+:Latitude
+经度
 :Left
 左
 :Linked
@@ -205,7 +198,8 @@ Deviation\n固件版本:
 读取
 :Load...
 读取..
->:Longitude
+:Longitude
+纬度
 >:Low Battery
 :Low-Rate
 飞行模式2
@@ -215,12 +209,14 @@ Deviation\n固件版本:
 混控1
 :MIX2
 混控2
+>:Main Page Config
 :Main menu
 主菜单
->:Main Page Config
+>:Main page config
 :Max:
 上限:
->:Meters
+:Meter
+米
 :Mid-Rate
 飞行模式1
 :Min/Max
@@ -229,7 +225,6 @@ Deviation\n固件版本:
 下限:
 :Mixer
 程式混控
->:Mixer Mode
 :Mixers:
 程式混控:
 :Mode %d
@@ -238,17 +233,17 @@ Deviation\n固件版本:
 模型
 :Model config
 设置模型
-:Model setup
-模型设置
 :Model name:
 模型命名:
+:Model setup
+模型设置
 :Model type:
 机型选择
 :Monitor
 通道监控
 >:Move Down
 >:Move Up
->:Move sticks\nto max & min\nthen press ENT
+>:Move sticks and knobs\nto Max & Min positions\nthen press ENT
 :Mux:
 叠加:
 :Neg
@@ -282,22 +277,26 @@ Deviation\n固件版本:
 正
 :Pos/Neg:
 正/负:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 >:Press 'Ent' to turn USB Filesystem:
 >:Press ENT to change:
 >:Press ENT to copy to:
 >:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
 :Press ENT to turn \nUSB drive:
 按ENT键开启\n或关闭U盘: 
-:Protocol&Binding
-协议、对频
+>:Preview: Long-Press ENT
 :Protocol:
 协议:
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
->:RPM
+:RPM
+转速
+:RPM:
+转速:
 :RUD
 方向
 :RUD DR
@@ -322,19 +321,21 @@ RUD开关
 安全:
 :Save
 保存
-:Scale:
-比例:
 :Scale1:
 比例1:
 :Scale2:
 比例2：
+:Scale:
+比例:
 :Scanner
 扫描器 
 :Simple
 简单
 :Simple 4 Channel
 4通道
->:Speed
+:Speed
+速度
+>:Speed:
 :Src
 摇杆输入
 :Src:
@@ -343,17 +344,16 @@ RUD开关
 起始值:
 :Step:
 步进：
+:Stick input
+摇杆/开关输入值
 :Stick mode:
 摇杆模式:
 :Sticks:
 摇杆:
-:Dimmer time:
-背光减弱时间
-:Dimmer target:
-背光减弱值
 :Subtrim:
 微调:
 >:SwashType:
+>:Switch %d:
 :Switch1
 开关1
 :Switch2
@@ -392,69 +392,47 @@ RUD开关
 >:TelemT
 >:TelemV
 >:Telemetry
->:Temp
-:Template..
-模板..
-:Test
-测试
-:Timers
-定时器设置
-:Timer
-定时器
 :Telemetry config
 双向回传设置
 :Telemetry monitor
 回传数据监控
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
+:Temp
+温度
+>:Temp unit:
 :Temp:
 温度:
-:Volt:
-电压:
-:Volt1
-电压1
-:Volt2
-电压2
-:Volt3
-电压3
-:RPM:
-转速:
-:RPM1
-转速1
-:RPM2
-转速2
-:Temp1
-温度1
-:Temp2
-温度2
-:Temp3
-温度3
-:Temp4
-温度4
-:Latitude
-经度
-:Longitude
-纬度
-:Altitude
-高度
-:Speed
-速度
+:Template..
+模板..
+:Test
+测试
 :Time
 时间
-:Trims
-微调设置
+:Timer
+定时器
+>:Timer settings
+:Timers
+定时器设置
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 开关%d
 :Touch Calibrate
 触屏校准
-:Touch Screen:
-触屏:
 :Touch Test
 触屏测试
+:Touch screen:
+触屏:
 :Touch target %d
 触碰对象 %d
 :Touch to Lock
 触碰上锁
 :Touch to Unlock
 触碰解锁
+:Transmitter config
+设置遥控
 :Trim
 微调
 :Trim +:
@@ -463,13 +441,13 @@ RUD开关
 微调-:
 :Trim Step:
 微调步宽:
+:Trims
+微调设置
 >:Trims:
 :Turn Off
 关机
 :Turn On
 开机
-:Transmitter config
-设置遥控
 :Tx power:
 发射功率:
 :USB
@@ -482,7 +460,10 @@ USB
 数值:
 :Virt
 虚拟
->:Volt
+:Volt
+电压
+:Volt:
+电压:
 :Zero/Max
 零/上限
 :\n\nBinding will end in %d seconds...
@@ -491,6 +472,8 @@ USB
 加
 :countdown
 倒计时
+>:max
+>:min
 :mult
 多次的
 :replace

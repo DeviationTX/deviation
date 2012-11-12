@@ -5,8 +5,6 @@ Kanäle:
 %s %d%%, Ausfallwert = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s %d%%,\nAusfallwert = %d%%\n
->:+
->:-
 :1-to-1
 1-zu-1
 :11 Point
@@ -52,6 +50,7 @@ QUE DR
 >:AUX4
 :AUX5
 Airplane
+>:About
 >:Airplane
 >:Alarm
 >:Altitude
@@ -61,8 +60,10 @@ Helligkeit:
 Balken %d:
 :Bars:
 Balken:
->:Basic Config
-:Battery Alarm:
+>:Basic config
+:Batt alarm:
+Akkuwarner:
+:Battery alarm:
 Akkuwarner:
 >:Battery too low,\ncan't save!
 :Bind
@@ -71,7 +72,7 @@ Binden
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.
->:Binding... %d seconds\nPress ENT to stop
+>:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Kasten %d:
 :Buttons
@@ -83,14 +84,16 @@ COL Inv:
 TAUM
 :Calibrate
 Kalibrieren
+>:Calibration done.
 :Cancel
 Abbruch
 >:Celcius
->:Center all sticks\nthen press ENT
+>:Center all \nsticks and knobs\nthen press ENT
 :Ch
 K
 :Change
 Wählen
+>:Channel output
 :Channels
 Kanäle
 :Complex
@@ -113,8 +116,12 @@ Kurve:
 >:Deadband
 :Default
 Default
+>:Deviation FW version:
 :Deviation FW\nversion:
 Deviation FW\nVersion:
+>:Dimmer target:
+>:Dimmer time:
+>:Dist unit:
 >:Dn
 :Down
 Runter
@@ -138,18 +145,20 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
->:Fahrenheit
+>:Fahren
 :Failsafe:
 Ausfallschutz:
->:Feet
 :File:
 Datei:
 :Fixed
 Fest
 :Fixed ID:
 Fixe ID:
+>:Foot
 :GEAR
 FAHR
+>:GPS
+>:Generic settings
 :Helicopter
 Heli
 :High-Rate
@@ -163,6 +172,7 @@ Eingaben
 >:Insert
 :Inverted
 Umgekehrt
+>:LCD settings
 :LEFT_H
 LINKS_H
 :LEFT_V
@@ -188,12 +198,13 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main Menu
 :Main Page Config
 Hauptseitenkonfiguration
+>:Main menu
+>:Main page config
 :Max:
 Max:
->:Meters
+>:Meter
 :Mid-Rate
 Mittel
 :Min/Max
@@ -202,21 +213,21 @@ Min/Max
 Min:
 :Mixer
 Mixers:
->:Mixer Mode
 >:Mixers:
 :Mode %d
 Modus %d
 :Model
 Modell
->:Model Config
-:Model Name:
+>:Model config
+:Model name:
 Modellname:
-:Model Type:
+>:Model setup
+:Model type:
 Modelltyp:
 >:Monitor
 >:Move Down
 >:Move Up
->:Move sticks\nto max & min\nthen press ENT
+>:Move sticks and knobs\nto Max & Min positions\nthen press ENT
 :Mux:
 Mux:
 :Neg
@@ -249,14 +260,15 @@ Punkt:
 +
 :Pos/Neg:
 +/-:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 >:Press 'Ent' to turn USB Filesystem:
 >:Press ENT to change:
 >:Press ENT to copy to:
 >:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
->:Procotol:
->:Protocol&Binding
+>:Press ENT to turn \nUSB drive:
+>:Preview: Long-Press ENT
 :Protocol:
 Protokoll:
 :RIGHT_H
@@ -264,6 +276,7 @@ RECHTS_H
 :RIGHT_V
 RECHTS_V
 >:RPM
+>:RPM:
 :RUD
 RUD
 :RUD DR
@@ -287,6 +300,8 @@ Safety
 Sicherheit:
 :Save
 Speichern
+>:Scale1:
+>:Scale2:
 :Scale:
 Skalierung:
 :Scanner
@@ -296,13 +311,15 @@ Einfach
 :Simple 4 Channel
 Src
 >:Speed
+>:Speed:
 >:Src
 :Src:
 Quelle:
 :Start:
 Start:
 >:Step:
-:Stick Mode:
+>:Stick input
+:Stick mode:
 Modus:
 :Sticks:
 Sticks:
@@ -310,6 +327,7 @@ Sticks:
 Untertrimmung:
 :SwashType:
 Taumelscheibe:
+>:Switch %d:
 :Switch1
 Schalter1
 :Switch2
@@ -348,7 +366,14 @@ TRIM_R-
 >:TelemT
 >:TelemV
 >:Telemetry
+>:Telemetry config
+>:Telemetry monitor
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
 >:Temp
+>:Temp unit:
+>:Temp:
 :Template..
 Vorlage...
 :Test
@@ -356,20 +381,25 @@ Testen
 >:Time
 :Timer
 Zeit
+>:Timer settings
+>:Timers
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 Schalter%d
 :Touch Calibrate
 Touchscreen kalibrieren
-:Touch Screen:
-Bildschirm:
 :Touch Test
 Touchscreen testen
+:Touch screen:
+Bildschirm:
 :Touch target %d
 Tippe auf Ziel %d
 :Touch to Lock
 Antippen zum sperren
 :Touch to Unlock
 Antippen zum entsperren
+>:Transmitter config
 :Trim
 Trimmung
 :Trim +:
@@ -378,14 +408,14 @@ Trim +:
 Trim -:
 :Trim Step:
 Schritt:
+>:Trims
 :Trims:
 Trimmung:
 :Turn Off
 Ausschalten
 :Turn On
 Einschalten
->:Tx Config
-:Tx Power:
+:Tx power:
 Sendeleistung:
 :USB
 USB
@@ -398,6 +428,7 @@ Wert:
 :Virt
 Zero/Max
 >:Volt
+>:Volt:
 >:Zero/Max
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
@@ -405,6 +436,8 @@ Zero/Max
 +
 :countdown
 Countdown
+>:max
+>:min
 :mult
 *
 :replace

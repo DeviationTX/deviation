@@ -51,6 +51,7 @@
 AUX4
 :AUX5
 AUX5
+>:About
 :Airplane
 Самолет
 :Alarm
@@ -67,7 +68,7 @@ AUX5
 Основная настройка
 :Batt alarm:
 Сигнал батареи:
-:Battery Alarm:
+:Battery alarm:
 Сигнал батареи:
 :Battery too low,\ncan't save!
 Батарея разряжена,\nсохранение невозможно!
@@ -77,7 +78,7 @@ AUX5
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
-:Binding... %d seconds\nPress ENT to stop
+:Binding...\n%d seconds\nPress ENT to stop
 Привязка... %d секунд\nНажмите ENT для остановки
 :Box %d:
 Бокс %d:
@@ -103,8 +104,6 @@ AUX5
 Канал 
 :Change
 Изменить
-:Change Unit
-Изменить единицу
 :Channel output
 Выход канала
 :Channels
@@ -135,10 +134,14 @@ AUX5
 Мертвая зона
 :Default
 Умолчание
+>:Deviation FW version:
 :Deviation FW\nversion:
 Прошивка Deviation\nверсия:
-:Distance
-Расстояние
+:Dimmer target:
+Гашение до:
+:Dimmer time:
+Время гашения:
+>:Dist unit:
 :Dn
 Вниз
 :Down
@@ -163,24 +166,22 @@ AUX5
 ПРежим1
 :FMODE2
 ПРежим2
-:Fahrenheit
+:Fahren
 Фаренгейт
 :Failsafe:
 Отказоустойчивость:
-:Feet
-Фут
 :File:
 Файл:
 :Fixed
 Фиксир.
 :Fixed ID:
 Фиксированный ID:
+>:Foot
 :GEAR
 Шасси
 :GPS
 GPS
-:Heli
-Вертолет
+>:Generic settings
 :Helicopter
 Вертолет
 :High-Rate
@@ -195,6 +196,7 @@ GPS
 Вставить
 :Inverted
 Реверс
+>:LCD settings
 :LEFT_H
 ЛЕВЫЙ_Г
 :LEFT_V
@@ -225,8 +227,10 @@ GPS
 МИКШ2
 :Main Page Config
 Главная страница
-:Main Menu
+:Main menu
 Главное меню
+:Main page config
+Главная страница
 :Max:
 Макс.:
 :Meter
@@ -245,10 +249,6 @@ GPS
 Режим %d
 :Model
 Модель
-:Model Name:
-Имя модели:
-:Model Type:
-Тип модели:
 :Model config
 Модель
 :Model name:
@@ -293,14 +293,15 @@ OK
 Вкл.
 :Page:
 Стр.:
-:Plane
-Самолет
 :Point:
 Точка:
 :Pos
 +
 :Pos/Neg:
 +/-:
+>:Prealert interval:
+>:Prealert intvl:
+>:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
 \nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние:
 :Press ENT to change:
@@ -309,11 +310,10 @@ OK
 Нажмите ENT для копирования в:
 :Press ENT to load:
 Нажмите ENT для загрузки:
-:Press ENT to start\ncalibration\nPress EXT to exit
-Нажмите ENT для старта\nкалибровки\nНажмите EXT для выхода
-:Press ENT to turn \nUSB drive: 
+:Press ENT to turn \nUSB drive:
 Нажмите ENT для перевода\nUSB диска в состояние:
-:Procotol:
+>:Preview: Long-Press ENT
+:Protocol:
 Протокол:
 :RIGHT_H
 ПРАВЫЙ_Г
@@ -321,6 +321,7 @@ OK
 ПРАВЫЙ_В
 :RPM
 RPM
+>:RPM:
 :RUD
 РНапр
 :RUD DR
@@ -347,6 +348,8 @@ RPM
 Безопасность:
 :Save
 Сохранить
+>:Scale1:
+>:Scale2:
 :Scale:
 Масшт.:
 :Scanner
@@ -357,6 +360,7 @@ RPM
 Простой 4-канала
 :Speed
 Скорость
+>:Speed:
 :Src
 Источник
 :Src:
@@ -365,8 +369,6 @@ RPM
 Старт:
 :Step:
 Шаг
-:Stick Mode:
-Режим стиков:
 :Stick input
 Ввод стика
 :Stick mode:
@@ -377,6 +379,7 @@ RPM
 Субтриммер:
 :SwashType:
 Тип авт.перекоса:
+>:Switch %d:
 :Switch1
 Перекл.1
 :Switch2
@@ -423,12 +426,14 @@ RPM
 Телеметрия
 :Telemetry monitor
 Монитор телеметрии
+>:Telemetry settings
+>:Telemetry temp:
+>:Telemetry units:
 :Temp
 Темп.
+>:Temp unit:
 :Temp:
 Темп.:
-:Temperature
-Температура
 :Template..
 Шаблон...
 :Test
@@ -437,16 +442,19 @@ RPM
 Время
 :Timer
 Таймер
+>:Timer settings
 :Timers
 Таймеры
+>:Timeup interval:
+>:Timeup intvl:
 :Toggle%d
 Перекл%d
 :Touch Calibrate
 Нажать калибровку
-:Touch Screen:
-Сенсорн. экран:
 :Touch Test
 Нажать тест
+:Touch screen:
+Сенсорн. экран:
 :Touch target %d
 Нажать цель %d
 :Touch to Lock
@@ -463,16 +471,13 @@ RPM
 Трим -:
 :Trim Step:
 Шаг триммера:
-:Trims:
-Триммер:
+>:Trims
 :Trims:
 Триммер:
 :Turn Off
 Выключить
 :Turn On
 Включить
-:Tx Power:
-Мощность:
 :Tx power:
 Мощность:
 :USB
@@ -497,14 +502,11 @@ USB
 добавить
 :countdown
 обр.отсчет
+>:max
+>:min
 :mult
 умножить
 :replace
 заменить
 :stopwatch
 секундомер
-:Dimmer Time:
-Время гашения:
-:Dimmer Target:
-Гашение до:
-
