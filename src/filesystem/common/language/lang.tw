@@ -1,12 +1,86 @@
 繁體中文
-:# Channels:
-通道數:
+:Main menu
+主菜單
+:Bind
+對頻
+:Stick mode：
+搖桿模式
+:Swash type：
+斜盤類型
+:Power amplifier
+發射功率
+:Model name:
+模型命名:
+:Model type:
+機型選擇
+:About
+關於本軟件
+:D/R & Exp
+雙向舵量/曲線
+:Func Conf
+功能設置
+:Function config
+功能設置
+:Model config
+模型設置
+:Model setup
+模型設置
+:Tx Conf
+遙控設置
+:Basic config
+基本設置
+:Transmitter config
+遙控設置
+:Telemetry monitor
+雙向數據監控
+:Thro Curve
+油門曲線
+:Pit Curve
+螺距曲線
+:Monitor
+通道監控
+:Binding... %d seconds\nPress ENT to stop
+對頻中...%d秒\n按ENT鍵中止對頻
+:Ok
+確定
+:Cancel
+取消
+:%s is %d%%, \nsafe value = %d%%
+%s值為%d%%, \n安全值應為%d%%
+:Battery to low, \ncan't save!
+電壓過低,\n無法保存修改!
+:Protocol
+協議
+:Channel#
+通道數
+:Protocol&Binding
+協議、對頻
+:Fixed ID:
+固定ID碼:
+:Heli
+直升機
+:Plane
+固定翼
+:Backlight:
+背光:
+:Contrast:
+對比度:
+:Language:
+語言:
+:Battery Alarm
+電量報警
+:Batt alarm:
+電量報警
+:test
+測試
+:Dimmer time:
+背光減弱時間:
+:Dimmer target:
+背光減弱值:
+
+
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, 熄火保護 = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s = %d%%,\n熄火保護 = %d%%\n
->:+
->:-
 :1-to-1
 1比1
 :11 Point
@@ -43,52 +117,41 @@
 > 0
 :ABSVAL
 絕對值
+:ELE
+升降
+:ELE DR
+升降開關
 :AIL
 副翼
 :AIL DR
-副翼舵量
+副翼開關
 :AIL Inv:
 副翼逆轉
 :AUX4
 輔助4
 :AUX5
 輔助5
->:Airplane
->:Alarm
->:Altitude
-:Backlight:
-背光:
 :Bar %d:
 Bar %d
 :Bars:
 Bars:
->:Basic Config
-:Battery Alarm:
-電量報警:
-:Battery too low,\ncan't save!
-電壓過低,\n無法保存修改!
-:Bind
-對頻
+
 :Binding
 對頻中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 正在對頻中...\n請確保模型已接電!\n按「確認」不會中止對頻\n但會退回操控權
-:Binding... %d seconds\nPress ENT to stop
-對頻中...%d秒\n按ENT鍵中止對頻
 :Box %d:
-箱 %d:
+第%d項:
 :Buttons
 按鍵
->:COL
->:COL Inv:
 :CYC
 循環
 :Calibrate
-搖桿校準
+校準
 :Cancel
 取消
->:Celcius
->:Center all sticks\nthen press ENT
+:Center all sticks and touch the screen
+把搖桿置中再點觸屏
 :Ch
 通道
 :Change
@@ -99,12 +162,8 @@ Bars:
 混合
 :Configure
 設定
-:Contrast:
-對比度:
->:Copy To
 :Copy To...
 複製到...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 曲線:
 :Cyclic1
@@ -115,43 +174,32 @@ Bars:
 循環3
 :DR
 舵量
->:Deadband
 :Default
 默認
 :Deviation FW\nversion:
 Deviation\n固件版本:
->:Dn
->:Down
-:ELE
-升降
->:ELE DR
->:ELE Inv:
->:EXPO
 :Enter
 輸入
 :Exit
 退出
->:Expo&DR
+
 :FMODE0
 常規飛行
 :FMODE1
 3D飛行1
 :FMODE2
 3D飛行2
->:Fahrenheit
-:Failsafe:
+:Fail Safe
 失控保護
->:Feet
 :File:
 文檔:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+文檔系統加載失敗。請透過USB創建文檔系統後按「輸入」退出。
 :Fixed
 固定
-:Fixed ID:
-固定ID碼:
+
 :GEAR
 尾舵
-:Helicopter
-直升機
 :High-Rate
 高速率
 :Icon
@@ -160,16 +208,13 @@ Deviation\n固件版本:
 輸入:
 :Inputs
 輸入
->:Insert
 :Inverted
 逆轉
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
-:Language:
-語言:
->:Latitude
+
 :Left
 左
 :Linked
@@ -178,8 +223,6 @@ Deviation\n固件版本:
 讀取
 :Load...
 讀取..
->:Longitude
->:Low Battery
 :Low-Rate
 低速率
 :MIX0
@@ -188,12 +231,8 @@ Deviation\n固件版本:
 混控1
 :MIX2
 混控2
-:Main Menu
-主菜單
->:Main Page Config
 :Max:
 上限:
->:Meters
 :Mid-Rate
 中速率
 :Min/Max
@@ -202,26 +241,19 @@ Deviation\n固件版本:
 下限:
 :Mixer
 程式混控
->:Mixer Mode
 :Mixers:
 程式混控:
 :Mode %d
 模式 %d
 :Model
 模型
->:Model Config
->:Model Name:
-:Model Type:
-機型選擇
->:Monitor
->:Move Down
->:Move Up
->:Move sticks\nto max & min\nthen press ENT
+
+:Move each stick to full max\nand min values​​ then back to center.\nTouch the screen when finished
+把每支搖桿推到上下限\n再回中。完成後點觸屏結束。
 :Mux:
 疊加:
 :Neg
 負
->:New
 :No Bars
 沒Bars
 :No Trim
@@ -232,14 +264,14 @@ Deviation\n固件版本:
 無
 :Normal
 正常
+:# Channels:
+通道數:
 :OK
 確認
 :Off
 關閉
 :Offset:
 抵消:
-:Ok
-確定
 :On
 開啟
 :Page:
@@ -250,36 +282,24 @@ Deviation\n固件版本:
 正
 :Pos/Neg:
 正/負:
-:Press 'Ent' to turn USB Filesystem:
-Protocol:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to start\ncalibration\nPress EXT to exit
->:Press ENT to turn \nUSB drive: 
-:Procotol:
-協議:
->:Protocol&Binding
+>:Press 'Ent' to turn USB Filesystem:
 :Protocol:
 協議:
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
->:RPM
 :RUD
 方向
 :RUD DR
-方向舵舵量
-:Re-Init
-Reset
->:Remove
->:Reset
+方向舵開關
+>:Re-Init
+:Reset
+重啟
 :Reverse:
 方向:
 :Reversed
 反轉
->:Revert
 :Right
 右
 :Safe Val:
@@ -298,28 +318,48 @@ Reset
 簡單
 :Simple 4 Channel
 簡單4通道
->:Speed
 :Src
 來源
 :Src:
 來源:
 :Start:
 開始:
->:Step:
-:Stick Mode:
-搖桿模式
-:Sticks:
-閬欐潌:
-:Subtrim:
-微調:
-:SwashType:
-斜盤類型:
-:Switch1
-開關1
-:Switch2
-開關2
-:Switch:
-開關:
+:Stick mode:
+搖桿模式:
+:Stick Direction
+搖桿方向
+:Sub Trim
+舵機微調
+:Trims
+微調
+:Trims:
+微調數目:
+:Switch %d:
+開關%d:
+:Preview: Long-Press ENT
+長按ENT預覽修改
+:Main page config
+定制主頁面
+:Telemetry config
+雙向回傳設置
+:Telemetry
+雙向回傳
+:Channel output
+通道輸出量
+:Stick input
+搖杆/開關輸入量
+:Telem dist:
+距離單位:
+:Telem temp:
+溫度單位:
+:Celcius
+攝氏度
+:Meter
+米
+:Fahren
+華氏度
+:Foot
+英尺
 :Symmetric
 對稱
 :THR
@@ -348,18 +388,18 @@ Reset
 微調R+
 :TRIM_R-
 微調R-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
->:Temp
 :Template..
 模板..
 :Test
 測試
->:Time
-:Timer
+:Timers
 定時器
+:Timer 1
+定時器1
+:Timer 2
+定時器2
+Switch:
+觸發通道:
 :Toggle%d
 開關%d
 :Touch Calibrate
@@ -382,17 +422,17 @@ Reset
 微調-:
 :Trim Step:
 微調步寬:
-:Trims:
-寰:
+:Sub Trim
+微調
 :Turn Off
 關機
 :Turn On
 開機
->:Tx Config
-:Tx Power:
-鐧煎皠鍔熺巼:
+
 :USB
 USB
+:USB Storage mode, press 'ENT' to exit.
+USB儲存模式，按「輸入」退出。
 :Unknown
 無名
 :Up
@@ -401,7 +441,6 @@ USB
 數值:
 :Virt
 虛擬
->:Volt
 :Zero/Max
 零/上限
 :\n\nBinding will end in %d seconds...
@@ -416,3 +455,169 @@ USB
 替換
 :stopwatch
 秒錶
+:Normal
+姝ｅ父
+:Number of Channels:
+閫氶亾鏁搁噺:
+:OK
+纰鸿獚
+:Off
+闂滈枆
+:Offset:
+鎶垫秷:
+:On
+闁嬪暉
+:Page:
+闋�
+:Point:
+榛�
+:Pos
+姝�
+:Pos/Neg:
+姝�璨�
+>:Press 'Ent' to turn USB Filesystem: 
+:Protocol:
+鍗旇:
+:RIGHT_H
+鍙虫按骞�
+:RIGHT_V
+鍙冲瀭鐩�
+>:Re-Init
+:Reset
+閲嶅暉
+:Reverse:
+閫嗚綁:
+:Reversed
+閫嗚綁
+:Right
+鍙�
+:Safe Val:
+瀹夊畾鍊�
+:Safety
+瀹夊叏
+:Safety:
+瀹夊叏:
+:Save
+淇濆瓨
+:Scale:
+姣斾緥:
+:Scanner
+鎺冩弿鍣�
+:Simple
+绨″柈
+:Simple 4 Channel
+绨″柈4閫氶亾
+:Src
+渚嗘簮
+:Src:
+渚嗘簮:
+:Start:
+闁嬪:
+:Stick Mode:
+閬欐潌妯″紡:
+:Sticks:
+搖杆:
+:Subtrim:
+微調:
+:SwashType:
+鏂滅洡椤炲瀷:
+:Switch1
+開關1
+:Switch2
+開關2
+:Switch3
+開關3
+:Switch:
+闁嬮棞:
+:Symmetric
+灏嶇ū
+:THR
+娌归杸
+:TRIMLH+
+寰LH+
+:TRIMLH-
+寰LH-
+:TRIMLV+
+寰Lv+
+:TRIMLV-
+寰LV-
+:TRIMRH+
+寰RH+
+:TRIMRH-
+寰RH-
+:TRIMRV+
+寰RV+
+:TRIMRV-
+寰RV-
+:TRIM_L+
+寰L+
+:TRIM_L-
+寰L-
+:TRIM_R+
+寰R+
+:TRIM_R-
+寰R-
+:Template..
+妯℃澘..
+:Test
+娓│
+:Timer
+瀹氭檪鍣�
+:Timer1
+瀹氭檪鍣�
+:Timer2
+瀹氭檪鍣�
+:Toggle%d
+闁嬮棞%d
+:Touch Calibrate
+瑙稿睆鏍℃簴
+:Touch Screen:
+瑙稿睆:
+:Touch Test
+瑙稿睆娓│
+:Touch target %d
+瑙哥灏嶈薄 %d
+:Touch to Lock
+瑙哥涓婇帠
+:Touch to Unlock
+瑙哥瑙ｉ帠
+:Trim
+寰
+:Trim +:
+寰+:
+:Trim -:
+寰-:
+:Trim Step:
+寰姝ュ:
+:Turn Off
+闂滄
+:Turn On
+闁嬫
+:Tx power:
+發射功率:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+USB鍎插瓨妯″紡锛屾寜銆岃几鍏ャ�閫�嚭銆�
+:Unknown
+涓嶇煡鍚�
+:Up
+涓�
+:Value:
+鏁稿�:
+:Virt
+鍨傜洿
+:Zero/Max
+闆�涓婇檺
+:\n\nBinding will end in %d seconds...
+\n\n%d绉掑緦灏嶉牷绲愭潫...
+:add
+鍔�
+:countdown
+鍊掓暩
+:mult
+澶氭鐨�
+:replace
+鏇挎彌
+:stopwatch
+绉掕〃

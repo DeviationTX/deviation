@@ -112,14 +112,14 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem Temp:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem temp:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
     cp->total_items++;
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem Dist:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Telem dist:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
     cp->total_items++;
