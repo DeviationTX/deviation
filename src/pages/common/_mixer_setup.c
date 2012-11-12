@@ -411,7 +411,7 @@ void graph_cb()
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
-    if (!GUI_IsTextSelectEnabled(obj)) {
+    if (obj && !GUI_IsTextSelectEnabled(obj)) {
         return;
     }
     struct Mixer *mix = (struct Mixer *)data;
