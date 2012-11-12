@@ -73,7 +73,9 @@ endif
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	@echo " + Copying template files"
 	for tx in devo8 devo10; do \
-		cp -prf filesystem/common/* filesystem/$$tx/; \
+		cp -prf filesystem/common/media filesystem/$$tx/; \
+		cp -prf filesystem/common/template filesystem/$$tx/; \
+                ../utils/extract_strings.pl -target $$tx; \
 		cp tx_template.ini filesystem/$$tx/tx.ini; \
 		mkdir filesystem/$$tx/models 2> /dev/null || true; \
 		echo 'name=Model1' > filesystem/$$tx/models/model1.ini; \
