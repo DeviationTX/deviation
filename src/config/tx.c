@@ -236,10 +236,10 @@ void CONFIG_WriteTx()
     fprintf(fh, "  %s=%d\n", TOUCH_XOFFSET, (int)t->touch.xoffset);
     fprintf(fh, "  %s=%d\n", TOUCH_YOFFSET, (int)t->touch.yoffset);
     fprintf(fh, "[%s]\n", SECTION_AUTODIMMER);
-    fprintf(fh, "%s=%u\n", AUTODIMMER_TIME, t->auto_dimmer.timer);
+    fprintf(fh, "%s=%u\n", AUTODIMMER_TIME, (unsigned int)t->auto_dimmer.timer);
     fprintf(fh, "%s=%u\n", AUTODIMMER_DIMVALUE, t->auto_dimmer.backlight_dim_value);
     fprintf(fh, "[%s]\n", SECTION_TIMERSETTINGS);
-    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_TIME, t->countdown_timer_settings.prealert_time);
+    fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_TIME, (unsigned int)t->countdown_timer_settings.prealert_time);
     fprintf(fh, "%s=%u\n", TIMERSETTINGS_PREALERT_INTERVAL, t->countdown_timer_settings.prealert_interval);
     fprintf(fh, "%s=%u\n", TIMERSETTINGS_TIMEUP_INTERVAL, t->countdown_timer_settings.timeup_interval);
 
