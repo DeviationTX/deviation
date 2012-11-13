@@ -47,7 +47,7 @@
 AUX4
 :AUX5
 AUX5
-:About
+:About Deviation
 О программе
 :Airplane
 Самолет

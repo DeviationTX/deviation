@@ -47,8 +47,8 @@ AIL Inv.:
 AUX4
 :AUX5
 AUX5
-:About
-Despre
+:About Deviation
+Despre Deviation
 :Airplane
 Avion
 :Alarm
@@ -89,10 +89,12 @@ Colectiv inv.:
 CYC
 :Calibrate
 Calibrare
->:Calibration done.
+:Calibration done.
+Calibrare efectuată.
 :Cancel
 Anulează
->:Celsius
+:Celsius
+Celsius
 :Center all \nsticks and knobs\nthen press ENT
 Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 :Ch
@@ -298,7 +300,6 @@ Poz.
 Poz/Neg:
 :Prealert intvl:
 Interval prealertă:
-Prealertă:
 :Prealert time:
 Int. Prealertă:
 :Press 'Ent' to turn USB Filesystem:
@@ -437,7 +438,8 @@ Setări telemetrie
 Temp.
 :Temp:
 Temp:
->:Temperature:
+:Temperature:
+Temperatură:
 :Template..
 Șablon...
 :Test
@@ -452,7 +454,6 @@ Setări crono
 Timere
 :Timeup intvl:
 Interval timp:
-Intv. timp:
 :Toggle%d
 Într.%d
 :Touch Calibrate
@@ -489,12 +490,16 @@ Pornește
 Putere radio:
 :USB
 USB
+<:USB Drive
+<Disc USB
 :Unknown
 Necunoscut
 :Up
 Sus
 :Value:
 Valoare:
+<:Version:
+<Versiune
 :Virt
 Virt.
 :Volt

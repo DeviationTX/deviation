@@ -47,7 +47,7 @@ AIL DR
 AUX4
 :AUX5
 AUX5
->:About
+>:About Deviation
 :Airplane
 Avion
 >:Alarm
