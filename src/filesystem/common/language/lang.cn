@@ -1,4 +1,5 @@
 ﻿简体中文
+>:
 :# Channels:
 通道数:
 :%s is %d%%, safe value = %d%%\n
@@ -6,13 +7,13 @@
 :%s is %d%%,\nsafe value = %d%%
 %s当前值为%d%%,\n熄火保护设定为%d%%
 :1-to-1
-1对1
+45度曲线
 :11 Point
-11点
+11点曲线
 :13 Point
-13点
+13点曲线
 :3 Point
-3点
+3点曲线
 :4 Bars
 4柱图
 :4 Inside
@@ -22,7 +23,7 @@
 :4Ch w/ Dual-Rates
 4通直升机
 :5 Point
-5点
+5点曲线
 :6 Trims
 6微调显示
 :6Ch Airplane
@@ -30,11 +31,11 @@
 :6Ch Helicopter
 6通固定翼
 :7 Point
-7点
+7点曲线
 :8 Bars
 8柱图
 :9 Point
-9点
+9点曲线
 :ABSVAL
 绝对值
 :AIL
@@ -47,7 +48,7 @@
 >:AUX5
 :About
 关于本系统
-:Airplane
+>:Airplane
 固定翼
 :Alarm
 报警
@@ -101,7 +102,7 @@
 :Channels
 通道
 :Complex
-组合
+高级模式
 :Configure
 设置
 :Contrast:
@@ -147,13 +148,13 @@ Deviation固件\n版本:
 :ELE Inv:
 升降逆转:
 :EXPO
-指数
+指数曲线
 :Enter
 进入
 :Exit
 退出
 :Expo&DR
-三段式
+3D模式
 :FMODE0
 航线
 :FMODE1
@@ -225,7 +226,7 @@ LCD设置
 :Main page config
 定制主页面
 :Max:
-最大:
+最大舵量:
 :Meter
 米
 :Mid-Rate
@@ -233,7 +234,7 @@ LCD设置
 :Min/Max
 最低/最高
 :Min:
-最低:
+最小舵量:
 :Mixer
 混控
 :Mixers:
@@ -259,7 +260,7 @@ LCD设置
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
 :Mux:
-乘
+作用:
 :Neg
 负
 :New
@@ -271,19 +272,20 @@ LCD设置
 :No Trims
 无
 :None
-未设置
+无
 :Normal
 正常
+:OK
+确定
 :Off
 关闭
 :Offset:
 偏移
-:Ok
-确定
+>:Ok
 :On
 开启
 :Page:
-页:
+页码:
 :Plane
 固定翼
 :Point:
@@ -339,11 +341,11 @@ LCD设置
 :Right
 右
 :Safe Val:
-安全值
+熄火值
 :Safety
-安全检测
+熄火开关
 :Safety:
-安全检测:
+熄火开关:
 :Save
 保存
 :Scale1:
@@ -355,13 +357,13 @@ LCD设置
 :Scanner
 信号扫描
 :Simple
-简单
+简单模式
 :Simple 4 Channel
 4通道
 :Speed
 速度
 :Speed:
-速度:
+舵机速率:
 :Src
 输入
 :Src:
@@ -434,7 +436,8 @@ LCD设置
 温度单位:
 :Telemetry units:
 双向回传单位:
->:Temp
+:Temp
+温度
 :Temp unit:
 温度单位:
 :Temp:
@@ -465,10 +468,8 @@ LCD设置
 触摸屏
 :Touch target %d
 触摸目标%d
-:Touch to Lock
-触摸一次锁定
-:Touch to Unlock
-触摸一次解锁
+>:Touch to Lock
+>:Touch to Unlock
 :Transmitter config
 遥控设置
 :Trim
@@ -506,7 +507,7 @@ LCD设置
 :\n\nBinding will end in %d seconds...
 \n\n对频在%d秒后结束 
 :add
-增加
+附加
 :countdown
 倒计时
 :max
@@ -514,7 +515,7 @@ LCD设置
 :min
 最小
 :mult
-乘
+叠加
 :replace
 替换
 :stopwatch

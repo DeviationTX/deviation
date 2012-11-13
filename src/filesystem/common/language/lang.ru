@@ -35,6 +35,10 @@
 8 полос
 :9 Point
 9 точек
+:< 0
+< 0
+:> 0
+> 0
 :ABSVAL
 Абсолют.
 :AIL
@@ -47,7 +51,8 @@
 AUX4
 :AUX5
 AUX5
->:About
+:About
+О программе
 :Airplane
 Самолет
 :Alarm
@@ -130,14 +135,16 @@ AUX5
 Мертвая зона
 :Default
 Умолчание
->:Deviation FW version:
+:Deviation FW version:
+Версия прошивки:
 :Deviation FW\nversion:
 Прошивка Deviation\nверсия:
 :Dimmer target:
 Гашение до:
 :Dimmer time:
 Время гашения:
->:Dist unit:
+:Dist unit:
+Единица длины:
 :Dn
 Вниз
 :Down
@@ -172,13 +179,14 @@ AUX5
 Фиксир.
 :Fixed ID:
 Фиксированный ID:
->:Foot
+:Foot
+Фут
 :GEAR
 Шасси
 :GPS
 GPS
->:Generic settings
->:Heli
+:Generic settings
+Основные настройки
 :Helicopter
 Вертолет
 :High-Rate
@@ -193,7 +201,8 @@ GPS
 Вставить
 :Inverted
 Реверс
->:LCD settings
+:LCD settings
+Настройки экрана
 :LEFT_H
 ЛЕВЫЙ_Г
 :LEFT_V
@@ -222,6 +231,8 @@ GPS
 МИКШ1
 :MIX2
 МИКШ2
+:Main Page Config
+Главная страница
 :Main menu
 Главное меню
 :Main page config
@@ -276,26 +287,30 @@ GPS
 Нет
 :Normal
 Норма
+:OK
+OK
 :Off
 Выкл.
 :Offset:
 Смещ.:
 :Ok
-Оk
+ОК
 :On
 Вкл.
 :Page:
 Стр.:
->:Plane
 :Point:
 Точка:
 :Pos
 +
 :Pos/Neg:
 +/-:
->:Prealert interval:
->:Prealert intvl:
->:Prealert time:
+:Prealert interval:
+Интервалы до:
+:Prealert intvl:
+Интервалы до:
+:Prealert time:
+Время до сигнала:
 :Press 'Ent' to turn USB Filesystem:
 \nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние:
 :Press ENT to change:
@@ -306,7 +321,8 @@ GPS
 Нажмите ENT для загрузки:
 :Press ENT to turn \nUSB drive:
 Нажмите ENT для перевода\nUSB диска в состояние:
->:Preview: Long-Press ENT
+:Preview: Long-Press ENT
+Просмотр: Длинное нажатие ENT
 :Protocol:
 Протокол:
 :RIGHT_H
@@ -315,7 +331,8 @@ GPS
 ПРАВЫЙ_В
 :RPM
 RPM
->:RPM:
+:RPM:
+RPM
 :RUD
 РНапр
 :RUD DR
@@ -342,8 +359,10 @@ RPM
 Безопасность:
 :Save
 Сохранить
->:Scale1:
->:Scale2:
+:Scale1:
+Масшт.1:
+:Scale2:
+Масшт.2:
 :Scale:
 Масшт.:
 :Scanner
@@ -354,7 +373,8 @@ RPM
 Простой 4-канала
 :Speed
 Скорость
->:Speed:
+:Speed:
+Скорость:
 :Src
 Источник
 :Src:
@@ -373,7 +393,8 @@ RPM
 Субтриммер:
 :SwashType:
 Тип авт.перекоса:
->:Switch %d:
+:Switch %d:
+Перкл. %d:
 :Switch1
 Перекл.1
 :Switch2
@@ -420,12 +441,16 @@ RPM
 Телеметрия
 :Telemetry monitor
 Монитор телеметрии
->:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
+:Telemetry settings
+Настройки телеметрии
+:Telemetry temp:
+Единица темп.:
+:Telemetry units:
+Единица длины:
 :Temp
 Темп.
->:Temp unit:
+:Temp unit:
+Единица темп.:
 :Temp:
 Темп.:
 :Template..
@@ -436,11 +461,14 @@ RPM
 Время
 :Timer
 Таймер
->:Timer settings
+:Timer settings
+Настройки таймера
 :Timers
 Таймеры
->:Timeup interval:
->:Timeup intvl:
+:Timeup interval:
+Интервалы после:
+:Timeup intvl:
+Интервалы после:
 :Toggle%d
 Перекл%d
 :Touch Calibrate
@@ -465,7 +493,8 @@ RPM
 Трим -:
 :Trim Step:
 Шаг триммера:
->:Trims
+:Trims
+Триммер
 :Trims:
 Триммер:
 :Turn Off
@@ -496,8 +525,10 @@ USB
 добавить
 :countdown
 обр.отсчет
->:max
->:min
+:max
+максимум
+:min
+минимум
 :mult
 умножить
 :replace
