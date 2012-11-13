@@ -39,7 +39,7 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
-    PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings\
+    PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
     current_selected = 0;
     total_items = 0;
 
@@ -51,8 +51,8 @@ void PAGE_TelemconfigInit(int page)
             view_origin_absoluteX, view_origin_absoluteY);
 
     u8 row = 0;
-    u8 w1 = 42;
-    u8 w2 = 23;
+    u8 w1 = 44;
+    u8 w2 = 21;
     u8 w3 = 40;
     u8 i;
     for (i = 0; i < TELEM_NUM_ALARMS; i++) {

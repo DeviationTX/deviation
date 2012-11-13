@@ -93,7 +93,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
 
     u8 y = 0;
     u8 x = 60;
-    w = 60;
+    w = 63;
     GUI_CreateLabelBox(GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Input:"));
     guiObject_t *obj1 = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(SUB_VIEW_ID, x), GUI_MapToLogicalView(SUB_VIEW_ID, y),
@@ -103,14 +103,14 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     y += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Trim -:"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(SUB_VIEW_ID, x), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w, ITEM_HEIGHT, &DEFAULT_FONT,  NULL, set_trim_cb, &tp->trim.neg);
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(SUB_VIEW_ID, x-10), GUI_MapToLogicalView(SUB_VIEW_ID, y),
+            w +10, ITEM_HEIGHT, &DEFAULT_FONT,  NULL, set_trim_cb, &tp->trim.neg);
 
     y += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Trim +:"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(SUB_VIEW_ID, x), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w, ITEM_HEIGHT, &DEFAULT_FONT,  NULL,  set_trim_cb, &tp->trim.pos);
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(SUB_VIEW_ID, x-10), GUI_MapToLogicalView(SUB_VIEW_ID, y),
+            w +10, ITEM_HEIGHT, &DEFAULT_FONT,  NULL,  set_trim_cb, &tp->trim.pos);
 
     y += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,

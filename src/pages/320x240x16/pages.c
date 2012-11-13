@@ -176,7 +176,7 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
 static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return data ? _tr("OK") : _tr("Cancel");
+    return data ? _tr("Ok") : _tr("Cancel");
 }
 
 void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
