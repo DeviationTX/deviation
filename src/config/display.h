@@ -21,7 +21,8 @@
 #define DIALOGBODY_FONT  (Display.font[14])
 #define NORMALBOX_FONT     (Display.font[15])
 #define NORMALBOXNEG_FONT  (Display.font[16])
-#define NUM_LABELS 17
+#define SECTION_FONT       (Display.font[17])
+#define NUM_LABELS 18
 
 struct disp_keyboard {
     u8 font;
