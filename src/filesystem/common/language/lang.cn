@@ -1,5 +1,4 @@
 ﻿简体中文
->:
 :# Channels:
 通道数:
 :%s is %d%%, safe value = %d%%\n
@@ -49,7 +48,6 @@
 :About
 关于本系统
 >:Airplane
-固定翼
 :Alarm
 报警
 :Altitude
@@ -89,7 +87,7 @@
 校准完成.
 :Cancel
 取消
-:Celcius
+:Celsius
 摄氏度
 :Center all \nsticks and knobs\nthen press ENT
 将所有\n摇杆和旋钮置中\n然后按ENT
@@ -275,13 +273,12 @@ LCD设置
 无
 :Normal
 正常
-:OK
-确定
 :Off
 关闭
 :Offset:
 偏移
->:Ok
+:Ok
+确定
 :On
 开启
 :Page:

@@ -43,6 +43,8 @@
 副翼DR
 :AIL Inv:
 副翼方向:
+>:AUX4
+>:AUX5
 :About
 關於本軟件
 :Airplane
@@ -89,7 +91,7 @@
 校正完成
 :Cancel
 取消
-:Celcius
+:Celsius
 攝氏
 :Center all \nsticks and knobs\nthen press ENT
 所有搖桿置中\n按 ENT 鍵開始
@@ -130,10 +132,10 @@
 Deviation固件版本:
 :Deviation FW\nversion:
 Deviation\n固件版本:
-:Dimmer time:
-減光啟動時間:
 :Dimmer target:
 減光背光亮度:
+:Dimmer time:
+減光啟動時間:
 :Dist unit:
 距離單位:
 :Dn
@@ -174,6 +176,7 @@ Deviation\n固件版本:
 英尺
 :GEAR
 尾舵
+>:GPS
 :Generic settings
 通用設置
 :Heli
@@ -276,8 +279,6 @@ LCD設置
 無
 :Normal
 正常的
-:OK
-確認
 :Off
 關閉
 :Offset:
@@ -470,6 +471,8 @@ LCD設置
 觸控板:
 :Touch target %d
 點擊目標 %d
+>:Touch to Lock
+>:Touch to Unlock
 :Transmitter config
 發射機設置
 :Trim
@@ -490,6 +493,8 @@ LCD設置
 開啟
 :Tx power:
 發射功率:
+>:USB
+>:Unknown
 :Up
 上
 :Value:

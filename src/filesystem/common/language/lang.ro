@@ -49,7 +49,6 @@ AUX4
 AUX5
 :About
 Despre
->:About Deviation
 :Airplane
 Avion
 :Alarm
@@ -130,6 +129,8 @@ DR
 Bandă moartă
 :Default
 Default
+:Deviation FW version:
+Deviation fw. versiune:
 :Deviation FW\nversion:
 Deviation fw.\nversiune:
 :Dimmer target:
@@ -352,8 +353,10 @@ Siguranță
 Siguranță:
 :Save
 Salv.
->:Scale1:
->:Scale2:
+:Scale1:
+Scara1:
+:Scale2:
+Scara2:
 :Scale:
 Scara:
 :Scanner
@@ -496,15 +499,12 @@ Pornește
 Putere radio:
 :USB
 USB
->:USB Drive
 :Unknown
 Necunoscut
 :Up
 Sus
 :Value:
 Valoare:
-:Version:
-Versiune
 :Virt
 Virt.
 :Volt

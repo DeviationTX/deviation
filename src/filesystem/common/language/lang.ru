@@ -35,10 +35,6 @@
 8 полос
 :9 Point
 9 точек
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 Абсолют.
 :AIL
@@ -97,7 +93,7 @@ AUX5
 Калибровка выполнена.
 :Cancel
 Отмена
-:Celcius
+:Celsius
 Цельсий
 :Center all \nsticks and knobs\nthen press ENT
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
@@ -187,6 +183,7 @@ AUX5
 GPS
 :Generic settings
 Основные настройки
+>:Heli
 :Helicopter
 Вертолет
 :High-Rate
@@ -231,8 +228,6 @@ GPS
 МИКШ1
 :MIX2
 МИКШ2
-:Main Page Config
-Главная страница
 :Main menu
 Главное меню
 :Main page config
@@ -287,18 +282,18 @@ GPS
 Нет
 :Normal
 Норма
-:OK
-OK
 :Off
 Выкл.
 :Offset:
 Смещ.:
 :Ok
-ОК
+Оk
 :On
 Вкл.
 :Page:
 Стр.:
+:Plane
+Самолет
 :Point:
 Точка:
 :Pos

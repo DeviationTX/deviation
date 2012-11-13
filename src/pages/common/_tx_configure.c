@@ -348,7 +348,7 @@ static const char *units_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     if (data) {
-        return type ? _tr("Fahren") : _tr("Celcius");
+        return type ? _tr("Fahren") : _tr("Celsius");
     } else {
         return type ? _tr("Foot") : _tr("Meter");
     }
