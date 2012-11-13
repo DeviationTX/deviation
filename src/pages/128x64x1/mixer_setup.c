@@ -26,6 +26,7 @@
 static s8 current_selected_item;
 static u8 expo1_start_id;
 static u8 expo2_start_id;
+static u8 current_xygraph = 0;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 
@@ -341,6 +342,7 @@ static void _show_expo_dr()
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, &mp->mixer[2]);
+    current_xygraph = 0; // bug fix: this flag is used to reduce screen refresh
 
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;
@@ -395,12 +397,26 @@ static void navigate_items(s8 direction)
         }
     }
     if (mp->graphs[1] != NULL && mp->graphs[2] != NULL) { // indicate that it is the expo&dr page
-        if (current_selected_item < expo1_start_id -FIRST_PAGE_ITEM_IDX)
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
-        else if (current_selected_item >= expo2_start_id -FIRST_PAGE_ITEM_IDX)
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
-        else
+        // Bug description: (only happen in real devo10) When config Expo&DR template, it is most likely that hitting the Save button will fail
+        // it is because in previous design, whenever switching from one widget to another, the xygraph will be redrew and cause
+        // timing issue to interfere with button evenst. To fix the issue, reducing screen-redraw is the key
+        // the flag of current_xygraph is used to avoid unnecessary screen refresh and can fix this bug
+        if (current_selected_item == -1 || current_selected_item < expo1_start_id -FIRST_PAGE_ITEM_IDX) {
+            if (current_xygraph != 0) {
+                current_xygraph = 0;
+                GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
+            }
+        }
+        else if (current_selected_item >= expo2_start_id -FIRST_PAGE_ITEM_IDX) {
+            if (current_xygraph != 2) {
+                current_xygraph = 2;
+                GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
+            }
+        }
+        else if (current_xygraph != 1) {
             GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
+            current_xygraph = 1;
+        }
     }
     GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
 }

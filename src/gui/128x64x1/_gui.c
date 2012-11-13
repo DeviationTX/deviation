@@ -129,8 +129,8 @@ void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY)
     }
     _view_orgin_relativeX[view_id] = new_originX;
     _view_orgin_relativeY[view_id] = new_originY;
-    GUI_DrawBackground(GUI_MapToLogicalView(view_id, new_originX), GUI_MapToLogicalView(view_id, new_originY),
-            _view_width[view_id], _view_height[view_id]);
+    LCD_FillRect(GUI_MapToLogicalView(view_id, new_originX), GUI_MapToLogicalView(view_id, new_originY),
+            _view_width[view_id], _view_height[view_id], 0x0);
     GUI_DrawObjects();
 }
 
