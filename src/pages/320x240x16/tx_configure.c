@@ -105,14 +105,14 @@ static void _show_page()
         firstObj = GUI_CreateLabelBox(16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Timer settings"));
         row += space;
         GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL,  _tr("Prealert time:"));
-        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000,NULL, prealert_time_cb, (void *)0L);
+        GUI_CreateTextSelect(130, row, TEXTSELECT_96, 0x0000,NULL, prealert_time_cb, (void *)0L);
         row += space;
         GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Prealert intvl:"));
-        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
+        GUI_CreateTextSelect(130, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.prealert_interval);
         row += space;
         GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL,_tr("Timeup intvl:"));
-        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
+        GUI_CreateTextSelect(130, row, TEXTSELECT_96, 0x0000, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.timeup_interval);
     }
 }

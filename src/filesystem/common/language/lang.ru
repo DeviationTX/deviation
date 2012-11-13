@@ -179,7 +179,8 @@ AUX5
 GPS
 :Generic settings
 Основные настройки
->:Heli
+:Heli
+Вертолет
 :Helicopter
 Вертолет
 :High-Rate
@@ -206,7 +207,8 @@ GPS
 Широта
 :Left
 Влево
->:Length:
+:Length:
+Длина:
 :Linked
 Связанный
 :Load
@@ -298,7 +300,7 @@ GPS
 :Pos/Neg:
 +/-:
 :Prealert intvl:
-Интервалы до:
+Интервалы перед:
 :Prealert time:
 Время до сигнала:
 :Press 'Ent' to turn USB Filesystem:
@@ -438,7 +440,7 @@ RPM
 :Temp:
 Темп.:
 :Temperature:
-Темп.:
+Температура:
 :Template..
 Шаблон...
 :Test
