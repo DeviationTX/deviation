@@ -47,7 +47,8 @@ Csűrés inv.:
 AUX4
 :AUX5
 AUX5
->:About Deviation
+:About Deviation
+Deviation névjegye
 :Airplane
 Repülőgép
 :Alarm
@@ -61,9 +62,9 @@ Oszlop%d:
 :Bars:
 Oszlop:
 :Basic config
-Alap beállítás
+Beállítások
 :Batt alarm:
-Fesz. riasztás:
+Fesz. riaszt.:
 :Battery alarm:
 Fesz. riasztás:
 :Battery too low,\ncan't save!
@@ -93,7 +94,7 @@ Kalibrálás kész.
 :Cancel
 Mégsem
 :Celsius
-Celsius
+°C
 :Center all \nsticks and knobs\nthen press ENT
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
@@ -131,9 +132,11 @@ Holtsáv
 :Default
 Default
 :Deviation FW version:
-Deviation fw. verzió:
->:Dimmer target:
->:Dimmer time:
+Deviation verzió:
+:Dimmer target:
+Alvó fényerő:
+:Dimmer time:
+Alvó mód ideje:
 :Dn
 Le
 :Down
@@ -158,7 +161,8 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
->:Fahren
+:Fahren
+°F
 :Failsafe:
 Hibaérték:
 :File:
@@ -167,13 +171,16 @@ Fájl:
 Fix
 :Fixed ID:
 Fix ID:
->:Foot
+:Foot
+Láb
 :GEAR
 GEAR
 :GPS
 GPS
->:Generic settings
->:Heli
+:Generic settings
+Általános beállítások
+:Heli
+Heli
 :Helicopter
 Helikopter
 :High-Rate
@@ -188,7 +195,8 @@ Bemenetek
 Beszúrás
 :Inverted
 Inverz
->:LCD settings
+:LCD settings
+LCD beállítások
 :LEFT_H
 BAL_V
 :LEFT_V
@@ -199,7 +207,8 @@ Nyelv:
 Szélesség
 :Left
 Bal
->:Length:
+:Length:
+Hossz:
 :Linked
 Csatolt
 :Load
@@ -221,7 +230,7 @@ MIX2
 :Main menu
 Főmenü
 :Main page config
-Főablak konfiguráció
+Főablak konfig.
 :Max:
 Max:
 :Meter
@@ -282,15 +291,18 @@ Ok
 Be
 :Page:
 Oldal:
->:Plane
+:Plane
+Repülő
 :Point:
 Pont:
 :Pos
 Poz.
 :Pos/Neg:
 Poz/Neg:
->:Prealert intvl:
->:Prealert time:
+:Prealert intvl:
+Előjelz. interv.:
+:Prealert time:
+Előjelz. idő:
 :Press 'Ent' to turn USB Filesystem:
 \nNyomjon 'ENT'-t, hogy az USB: 
 :Press ENT to change:
@@ -300,15 +312,17 @@ Másolás ENT:
 :Press ENT to load:
 Betöltés ENT:
 :Press ENT to turn \nUSB drive:
-Nyomjon ENT-t \naz USB:
->:Preview: Long-Press ENT
+Nyomjon ENT-t \naz USB: 
+:Preview: Long-Press ENT
+Előnézet: hosszú ENT
 :Protocol:
 Protokoll:
 :RIGHT_H
 JOBB_V
 :RIGHT_V
 JOBB_F
->:RPM
+:RPM
+Ford.
 :RPM:
 Ford.:
 :RUD
@@ -337,8 +351,10 @@ Biztonsági ellenőrzés
 Biztonság:
 :Save
 Mentés
->:Scale1:
->:Scale2:
+:Scale1:
+Skála 1:
+:Scale2:
+Skála 2:
 :Scale:
 Skála:
 :Scanner
@@ -349,7 +365,8 @@ Egyszerű
 Egyszerű 4 csat.
 :Speed
 Sebesség
->:Speed:
+:Speed:
+Sebesség:
 :Src
 Forrás
 :Src:
@@ -368,7 +385,8 @@ Botkormány:
 Subtrim:
 :SwashType:
 Imbolygó típusa:
->:Switch %d:
+:Switch %d:
+Kapcs.%d:
 :Switch1
 Kapcs.1
 :Switch2
@@ -415,12 +433,14 @@ Telemtria
 Telemetria konfig.
 :Telemetry monitor
 Telemetria adatok
->:Telemetry settings
+:Telemetry settings
+Telemetria beállítások
 :Temp
 Hőm.
 :Temp:
 Hőm.:
->:Temperature:
+:Temperature:
+Hőmérséklet:
 :Template..
 Sablon...
 :Test
@@ -429,17 +449,20 @@ Teszt
 Idő
 :Timer
 Időzítő
->:Timer settings
+:Timer settings
+Időzítő beállítások
 :Timers
 Időzítők
->:Timeup intvl:
+:Timeup intvl:
+Lejárati interv.:
 :Toggle%d
 Jelzés%d
 :Touch Calibrate
 Érintés kalibrálás
 :Touch Test
 Érintés teszt
->:Touch screen:
+:Touch screen:
+Képernyő:
 :Touch target %d
 Érintse meg a(z) %d pontot!
 :Touch to Lock
@@ -488,8 +511,10 @@ Nulla/Max
 hozzáad
 :countdown
 Időzítő
->:max
->:min
+:max
+max
+:min
+min
 :mult
 szoroz
 :replace
