@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
-#define HELI_LABEL "Helicopter"  // string too long for devo10, so define it separately for devo8 and devo10
-#define PLANE_LABEL "Airplane"
+#define HELI_LABEL _tr_noop("Helicopter")  // string too long for devo10, so define it separately for devo8 and devo10
+#define PLANE_LABEL _tr_noop("Airplane")
 #include "../common/_model_page.c"
 
 void PAGE_ModelInit(int page)

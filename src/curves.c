@@ -112,8 +112,8 @@ const char *CURVE_GetName(struct Curve *curve)
         case CURVE_FIXED: return _tr("Fixed");
         case CURVE_MIN_MAX:  return _tr("Min/Max");
         case CURVE_ZERO_MAX: return _tr("Zero/Max");
-        case CURVE_GT_ZERO:  return _tr("> 0");
-        case CURVE_LT_ZERO:  return _tr("< 0");
+        case CURVE_GT_ZERO:  return "> 0"; //Don't translate these
+        case CURVE_LT_ZERO:  return "< 0"; //Don't translate these
         case CURVE_ABSVAL:   return _tr("ABSVAL");
         case CURVE_EXPO:     return _tr("EXPO");
         case CURVE_DEADBAND: return _tr("Deadband");

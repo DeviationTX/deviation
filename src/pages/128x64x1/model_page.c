@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
-#define HELI_LABEL "Heli"  // string too long for devo10, so define it separately for devo8 and devo10
-#define PLANE_LABEL "Plane"
+#define HELI_LABEL _tr_noop("Heli")  // string too long for devo10, so define it separately for devo8 and devo10
+#define PLANE_LABEL _tr_noop("Plane")
 #include "../common/_model_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
