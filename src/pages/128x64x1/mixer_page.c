@@ -64,13 +64,6 @@ static void _show_page()
         }
         mp->itemObj[i *2] = obj;
 
-        w = 53;
-        labelDesc.style = LABEL_CENTER;
-        //obj = GUI_CreateLabelBox(70, row, w, h, &labelDesc, template_name_cb, templateselect_cb, (const void *)((long)ch));
-        //GUI_SetSelectable(obj, 1);
-        mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(69, row, w, h , &labelDesc, template_name_cb, 0,
-                templateselect_cb, (void *)((long)ch));
-
         w = 24;
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].src && mix[idx].dest == ch)
@@ -81,6 +74,11 @@ static void _show_page()
             obj = GUI_CreateLabelBox(43, row, w, h, &labelDesc, show_source, NULL, &mix[idx].src);
             GUI_SetSelectable(obj, 0);
         }
+
+        w = 53;  //minor fix: change to draw after drawing label of src, if  the length of middle label is too long, the button can be on top of it
+        labelDesc.style = LABEL_CENTER;
+        mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(70, row, w, h , &labelDesc, template_name_cb, 0,
+                templateselect_cb, (void *)((long)ch));
     }
     if (!GUI_IsSelectable(mp->itemObj[selectedIdx])) {
         selectedIdx++;
