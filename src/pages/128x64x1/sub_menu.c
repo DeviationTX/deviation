@@ -22,9 +22,8 @@ static const char *menu_item_name_deviation0[] = {
 };
 static const char *menu_item_name_deviation1[] = {
      _tr_noop("Basic config"), _tr_noop("Monitor"),
-     _tr_noop("Telemetry monitor"),
+     _tr_noop("About"),
      //_tr_noop("Scanner"),
-     _tr_noop("USB"), _tr_noop("About"),
      0
 };
 
@@ -176,12 +175,8 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data){
         PAGE_ChangeByName("Trim", PREVIOUS_ITEM);
     } else if (!strcmp("Timers", str)) {
         PAGE_ChangeByName("Timer", PREVIOUS_ITEM);
-    } else if (!strcmp("USB", str)) {
-        PAGE_ChangeByName("USB", 0);
     } else if (!strcmp("Telemetry config", str)) {
         PAGE_ChangeByName("TeleConf", PREVIOUS_ITEM);
-    } else if (!strcmp("Telemetry monitor", str)) {
-        PAGE_ChangeByName("TeleMoni", PREVIOUS_ITEM);
     } else if (!strcmp("Main page config", str)) {
         PAGE_ChangeByName("MainConf", PREVIOUS_ITEM);
     } else if (!strcmp("About", str)) {

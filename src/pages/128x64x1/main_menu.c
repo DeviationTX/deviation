@@ -10,7 +10,9 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 static void press_cb(guiObject_t *obj, s8 press_type, const void *data);
 
 static const char *menu_item_name_deviation[] = {
-    _tr_noop("Model config"), _tr_noop("Transmitter config"), 0
+    _tr_noop("Model config"), _tr_noop("Transmitter config"),
+    _tr_noop("USB"), _tr_noop("Telemetry monitor"),
+    0
 };
 
 static s8 selected_menu_idx = 0;
@@ -100,14 +102,15 @@ void press_cb(guiObject_t *obj, s8 press_type, const void *data)
     const char *str = (const char *)data;
     if (!strcmp("Timer", str)) { // test only
         PAGE_ChangeByName("Mixer", 0);
-    }
-    else if (!strcmp("Func Conf", str)) {
+    } else if (!strcmp("Func Conf", str)) {
         PAGE_ChangeByName("SubMenu", 0);
-    }
-    else if (!strcmp("Model config", str)) {
+    } else if (!strcmp("Model config", str)) {
         PAGE_ChangeByName("SubMenu", 0);
-    }
-    else if (!strcmp("Transmitter config", str)) {
+    } else if (!strcmp("Transmitter config", str)) {
         PAGE_ChangeByName("SubMenu", 1);
+    } else if (!strcmp("Telemetry monitor", str)) {
+        PAGE_ChangeByName("TeleMoni", 0);
+    } else if (!strcmp("USB", str)) {
+        PAGE_ChangeByName("USB", 0);
     }
 }
