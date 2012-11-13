@@ -26,7 +26,7 @@ void PAGE_TelemconfigInit(int page)
    (void)page;
     const u8 row_height = 25;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Telemetry"));
+    PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
 
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,

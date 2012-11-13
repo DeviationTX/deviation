@@ -186,7 +186,7 @@ static void _show_page()
 
 static void _show_title()
 {
-     PAGE_ShowHeader(_tr("Main Page Config"));
+     PAGE_ShowHeader(_tr("Main page config")); // using the same name as devo10's menu item to reduce language strings
      guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
      GUI_SetScrollbar(obj, page_num);
 }

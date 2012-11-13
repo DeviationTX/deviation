@@ -28,7 +28,7 @@ void PAGE_TimerInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("Timer"));
+    PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
     _show_page();
 }
 

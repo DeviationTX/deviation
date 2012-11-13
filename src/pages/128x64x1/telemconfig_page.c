@@ -39,7 +39,7 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
-    PAGE_ShowHeader(_tr("Telemetry"));
+    PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings\
     current_selected = 0;
     total_items = 0;
 
