@@ -35,10 +35,6 @@
 8 Bars
 :9 Point
 9 點
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 絕對值
 :AIL
@@ -168,6 +164,7 @@ Deviation\n固件版本:
 尾舵
 >:GPS
 >:Generic settings
+>:Heli
 :Helicopter
 直升機
 :High-Rate
@@ -207,7 +204,6 @@ Deviation\n固件版本:
 混控1
 :MIX2
 混控2
->:Main Page Config
 :Main menu
 主菜單
 :Main page config
@@ -258,8 +254,6 @@ Deviation\n固件版本:
 無
 :Normal
 正常
-:OK
-確認
 :Off
 關閉
 :Offset:
@@ -270,6 +264,7 @@ Deviation\n固件版本:
 開啟
 :Page:
 頁:
+>:Plane
 :Point:
 點:
 :Pos
@@ -353,7 +348,6 @@ Deviation\n固件版本:
 :Switch2
 開關2
 >:Switch:
-闁嬮棞:
 :Symmetric
 對稱
 :THR

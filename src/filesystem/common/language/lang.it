@@ -34,10 +34,6 @@ Elicottero 6Ch
 8 Barre
 :9 Point
 9 Punti
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 V_ASSOL
 :AIL
@@ -163,6 +159,7 @@ ID Fisso:
 CARRELLO
 >:GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Elicottero
 :High-Rate
@@ -202,10 +199,9 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Pagina di Configurazione
 >:Main menu
->:Main page config
+:Main page config
+Pagina di Configurazione
 :Max:
 Max:
 >:Meter
@@ -248,17 +244,17 @@ No Trims
 Nessuno
 :Normal
 Normale
-:OK
-OK
 :Off
 Off
 :Offset:
 Offset:
->:Ok
+:Ok
+Ok
 :On
 On
 :Page:
 Pagina:
+>:Plane
 :Point:
 Punto:
 :Pos

@@ -35,10 +35,6 @@ Csatornák:
 8 oszlop
 :9 Point
 9 pont
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 ABSZ.É.
 :AIL
@@ -179,6 +175,7 @@ GEAR
 :GPS
 GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Helikopter
 :High-Rate
@@ -222,11 +219,10 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Főablak konfiguráció
 :Main menu
 Főmenü
->:Main page config
+:Main page config
+Főablak konfiguráció
 :Max:
 Max:
 :Meter
@@ -277,18 +273,17 @@ Nincs
 Nincs
 :Normal
 Normál
-:OK
-OK
 :Off
 Ki
 :Offset:
 Eltolás:
 :Ok
-OK
+Ok
 :On
 Be
 :Page:
 Oldal:
+>:Plane
 :Point:
 Pont:
 :Pos

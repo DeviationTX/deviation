@@ -6,7 +6,7 @@
 :%s is %d%%,\nsafe value = %d%%
 %s当前值为%d%%,\n熄火保护设定为%d%%
 :1-to-1
-1比1
+1对1
 :11 Point
 11点
 :13 Point
@@ -14,96 +14,94 @@
 :3 Point
 3点
 :4 Bars
-4 Bars
+4柱图
 :4 Inside
-4 内
+4内
 :4 Outside
-4 外
+4外
 :4Ch w/ Dual-Rates
-4通和舵量
+4通直升机
 :5 Point
 5点
 :6 Trims
-6微调
+6微调显示
 :6Ch Airplane
-6通固定翼
-:6Ch Helicopter
 6通直升机
+:6Ch Helicopter
+6通固定翼
 :7 Point
 7点
 :8 Bars
-8 Bars
+8柱图
 :9 Point
 9点
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 绝对值
 :AIL
 副翼
 :AIL DR
-副翼舵量
+副翼开关
 :AIL Inv:
 副翼逆转
-:AUX4
-辅助4
-:AUX5
-辅助5
->:About
->:Airplane
->:Alarm
+>:AUX4
+>:AUX5
+:About
+关于本系统
+:Airplane
+固定翼
+:Alarm
+报警
 :Altitude
 高度
 :Backlight:
 背光:
 :Bar %d:
-Bar %d
+柱图%d:
 :Bars:
-Bars:
+柱状图:
 :Basic config
-基本设置
+基本功能设置
 :Batt alarm:
 电量报警:
 :Battery alarm:
 电量报警:
 :Battery too low,\ncan't save!
-电压过低,\n无法保存修改!
+电压过低,\n无法存盘!
 :Bind
 对频
 :Binding
-对频中
+对频
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-正在对频中...\n请确保模型已接电!\n按「确认」不会中止对频\n但会退回操控权
+对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
 :Binding...\n%d seconds\nPress ENT to stop
-对频中...\n%d秒\n按ENT键中止对频
+对频中...\n%d秒后结束\n按ENT中止
 :Box %d:
-%d行:
+第%d栏:
 :Buttons
 按键
 >:COL
 >:COL Inv:
-:CYC
-循环
+>:CYC
 :Calibrate
 校准
->:Calibration done.
+:Calibration done.
+校准完成.
 :Cancel
 取消
 :Celcius
 摄氏度
->:Center all \nsticks and knobs\nthen press ENT
+:Center all \nsticks and knobs\nthen press ENT
+将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
 通道
 :Change
-更改
+改变
 :Channel output
-通道输出值
+通道输出
 :Channels
 通道
 :Complex
-自定义
+组合
 :Configure
 设置
 :Contrast:
@@ -111,77 +109,92 @@ Bars:
 :Copy To
 复制到
 :Copy To...
-复制到...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+复制...
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
 :Curve:
 曲线:
 :Cyclic1
-循环1
+斜盘1
 :Cyclic2
-循环2
+斜盘2
 :Cyclic3
-循环3
+斜盘3
 :DR
 舵量
->:Deadband
+:Deadband
+死区
 :Default
-默认
->:Deviation FW version:
+缺省
+:Deviation FW version:
+Deviation固件版本:
 :Deviation FW\nversion:
-Deviation\n固件版本:
+Deviation固件\n版本:
 :Dimmer target:
-背光减弱值
+背光减弱值:
 :Dimmer time:
-背光减弱时间
->:Dist unit:
->:Dn
->:Down
+背光减弱时间:
+:Dist unit:
+距离单位:
+:Dn
+下
+:Down
+下
 :ELE
 升降
->:ELE DR
->:ELE Inv:
->:EXPO
+:ELE DR
+升降开关
+:ELE Inv:
+升降逆转:
+:EXPO
+指数
 :Enter
-输入
+进入
 :Exit
 退出
 :Expo&DR
 三段式
 :FMODE0
-常规飞行
+航线
 :FMODE1
-3D飞行1
+3D-1
 :FMODE2
-3D飞行2
+3D-2
 :Fahren
 华氏度
 :Failsafe:
-失控保护:
+失控保护
 :File:
-模型文档:
+模型文件:
 :Fixed
 固定
 :Fixed ID:
 固定ID码:
->:Foot
+:Foot
+英尺
 :GEAR
 尾舵
 >:GPS
->:Generic settings
+:Generic settings
+基本设置
+:Heli
+直升机
 :Helicopter
 直升机
 :High-Rate
-飞行模式0
+普通飞行
 :Icon
 图标
 :Input:
 输入:
 :Inputs
 输入
->:Insert
+:Insert
+插入
 :Inverted
-反转
->:LCD settings
+反向
+:LCD settings
+LCD设置
 :LEFT_H
 左水平
 :LEFT_V
@@ -189,171 +202,186 @@ Deviation\n固件版本:
 :Language:
 语言:
 :Latitude
-经度
+纬度
 :Left
 左
 :Linked
 关联
 :Load
-读取
+读入
 :Load...
-读取..
+读入
 :Longitude
-纬度
->:Low Battery
+经度
+:Low Battery
+低电量
 :Low-Rate
-飞行模式2
-:MIX0
-混控0
-:MIX1
-混控1
-:MIX2
-混控2
->:Main Page Config
+3D飞行2
+>:MIX0
+>:MIX1
+>:MIX2
 :Main menu
 主菜单
->:Main page config
+:Main page config
+定制主页面
 :Max:
-上限:
+最大:
 :Meter
 米
 :Mid-Rate
-飞行模式1
+3D飞行1
 :Min/Max
-上限/下限
+最低/最高
 :Min:
-下限:
+最低:
 :Mixer
-程式混控
+混控
 :Mixers:
-程式混控:
+混控:
 :Mode %d
-模式 %d
+模式%d
 :Model
 模型
 :Model config
-设置模型
+模型设置
 :Model name:
 模型命名:
 :Model setup
 模型设置
 :Model type:
-机型选择
+模型类型:
 :Monitor
-通道监控
->:Move Down
->:Move Up
->:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+通道/摇杆监控
+:Move Down
+下移
+:Move Up
+上移
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
 :Mux:
-叠加:
+乘
 :Neg
 负
->:New
+:New
+新增
 :No Bars
-无Bars
-:No Trim
-无微调
-:No Trims
-无微调
-:None
 无
+:No Trim
+无
+:No Trims
+无
+:None
+未设置
 :Normal
 正常
-:OK
-确认
 :Off
 关闭
 :Offset:
-偏移:
+偏移
 :Ok
 确定
 :On
 开启
 :Page:
 页:
+:Plane
+固定翼
 :Point:
 点:
 :Pos
 正
 :Pos/Neg:
 正/负:
->:Prealert interval:
->:Prealert intvl:
->:Prealert time:
->:Press 'Ent' to turn USB Filesystem:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
+:Prealert interval:
+预警间隔:
+:Prealert intvl:
+预警间隔:
+:Prealert time:
+预警时间:
+:Press 'Ent' to turn USB Filesystem:
+按ENT改变USB盘状态:
+:Press ENT to change:
+按ENT更改:
+:Press ENT to copy to:
+按ENT复制:
+:Press ENT to load:
+按ENT读入:
 :Press ENT to turn \nUSB drive:
-按ENT键开启\n或关闭U盘: 
->:Preview: Long-Press ENT
+按ENT更改U盘状态:\n:
+:Preview: Long-Press ENT
+预览主页:长按ENT
 :Protocol:
-协议:
+通信协议:
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
 :RPM
-转速
+转数
 :RPM:
-转速:
+转数:
 :RUD
 方向
 :RUD DR
-RUD开关
->:Re-Init
->:Remove
+方向开关
+:Re-Init
+初始化
+:Remove
+删除
 :Reset
 重置
 :Reverse:
-反转:
+反向
 :Reversed
-反转
+反向
 :Revert
-放弃修改
+回滚修改
 :Right
 右
 :Safe Val:
-安全值:
+安全值
 :Safety
-安全
+安全检测
 :Safety:
-安全:
+安全检测:
 :Save
 保存
 :Scale1:
 比例1:
 :Scale2:
-比例2：
+比例2:
 :Scale:
 比例:
 :Scanner
-扫描器 
+信号扫描
 :Simple
 简单
 :Simple 4 Channel
 4通道
 :Speed
 速度
->:Speed:
+:Speed:
+速度:
 :Src
-摇杆输入
+输入
 :Src:
-摇杆输入:
+输入:
 :Start:
-起始值:
+开始时间:
 :Step:
-步进：
+步进:
 :Stick input
-摇杆/开关输入值
+摇杆输入
 :Stick mode:
 摇杆模式:
 :Sticks:
-摇杆:
+摇杆/旋钮:
 :Subtrim:
 微调:
->:SwashType:
->:Switch %d:
+:SwashType:
+斜盘模式:
+:Switch %d:
+开关 %d:
 :Switch1
 开关1
 :Switch2
@@ -365,45 +393,52 @@ RUD开关
 :THR
 油门
 :TRIMLH+
-微调LH+
+左水平微调+
 :TRIMLH-
-微调LH-
+左水平微调-
 :TRIMLV+
-微调Lv+
+左垂直微调+
 :TRIMLV-
-微调LV-
+左垂直微调-
 :TRIMRH+
-微调RH+
+右水平微调+
 :TRIMRH-
-微调RH-
+右水平微调-
 :TRIMRV+
-微调RV+
+右垂直微调+
 :TRIMRV-
-微调RV-
+右垂直微调+
 :TRIM_L+
-微调L+
+左上微调+
 :TRIM_L-
-微调L-
+左上微调-
 :TRIM_R+
-微调R+
+右上微调+
 :TRIM_R-
-微调R-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
+右上微调-
+:TelemRPM
+转数
+:TelemT
+温度
+:TelemV
+电压
+:Telemetry
+双向回传
 :Telemetry config
 双向回传设置
 :Telemetry monitor
-回传数据监控
->:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
-:Temp
-温度
->:Temp unit:
+双向回传监控
+:Telemetry settings
+双向回传设置
+:Telemetry temp:
+温度单位:
+:Telemetry units:
+双向回传单位:
+>:Temp
+:Temp unit:
+温度单位:
 :Temp:
-温度:
+温度
 :Template..
 模板..
 :Test
@@ -412,70 +447,74 @@ RUD开关
 时间
 :Timer
 定时器
->:Timer settings
-:Timers
+:Timer settings
 定时器设置
->:Timeup interval:
->:Timeup intvl:
+:Timers
+定时器
+:Timeup interval:
+超时报警间隔
+:Timeup intvl:
+超时报警间隔
 :Toggle%d
 开关%d
 :Touch Calibrate
-触屏校准
+触摸屏校准
 :Touch Test
-触屏测试
+触摸屏测试
 :Touch screen:
-触屏:
+触摸屏
 :Touch target %d
-触碰对象 %d
+触摸目标%d
 :Touch to Lock
-触碰上锁
+触摸一次锁定
 :Touch to Unlock
-触碰解锁
+触摸一次解锁
 :Transmitter config
-设置遥控
+遥控设置
 :Trim
 微调
 :Trim +:
-微调+:
+微调+
 :Trim -:
-微调-:
+微调-
 :Trim Step:
-微调步宽:
+微调步进:
 :Trims
-微调设置
->:Trims:
+微调
+:Trims:
+微调数:
 :Turn Off
-关机
+关闭
 :Turn On
-开机
+开启
 :Tx power:
 发射功率:
-:USB
-USB
-:Unknown
-无名
+>:USB
+>:Unknown
 :Up
 上
 :Value:
-数值:
+值:
 :Virt
-虚拟
+虚通道
 :Volt
 电压
 :Volt:
 电压:
 :Zero/Max
-零/上限
+零/最大
 :\n\nBinding will end in %d seconds...
-\n\n%d秒後对频结束...
+\n\n对频在%d秒后结束 
 :add
-加
+增加
 :countdown
 倒计时
->:max
->:min
+:max
+最大
+:min
+最小
 :mult
-多次的
+乘
 :replace
 替换
 :stopwatch

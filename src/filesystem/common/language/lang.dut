@@ -35,10 +35,6 @@
 8 balken
 :9 Point
 9 punten
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 absolute waarde
 :AIL
@@ -163,6 +159,7 @@ Vast ID:
 GEA
 >:GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Helikopter
 :High-Rate
@@ -202,10 +199,9 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Configuratie hoofdscherm
 >:Main menu
->:Main page config
+:Main page config
+Configuratie hoofdscherm
 :Max:
 Max:
 >:Meter
@@ -248,17 +244,17 @@ Geen trims
 Geen
 :Normal
 Normaal
-:OK
-OK
 :Off
 Uit
 :Offset:
 Offset:
->:Ok
+:Ok
+Ok
 :On
 Aan
 :Page:
 Pagina:
+>:Plane
 :Point:
 Punt:
 :Pos

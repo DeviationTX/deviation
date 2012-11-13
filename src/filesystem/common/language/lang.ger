@@ -35,10 +35,6 @@ Kanäle:
 8 Balken
 :9 Point
 9 Punkt
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 Absolut
 :AIL
@@ -159,6 +155,7 @@ Fixe ID:
 FAHR
 >:GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Heli
 :High-Rate
@@ -198,10 +195,9 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Hauptseitenkonfiguration
 >:Main menu
->:Main page config
+:Main page config
+Hauptseitenkonfiguration
 :Max:
 Max:
 >:Meter
@@ -243,17 +239,17 @@ Keine Trimmung
 Kein
 :Normal
 Normal
-:OK
-OK
 :Off
 Aus
 :Offset:
 Offset:
->:Ok
+:Ok
+Ok
 :On
 Ein
 :Page:
 Seite:
+>:Plane
 :Point:
 Punkt:
 :Pos

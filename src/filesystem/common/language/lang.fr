@@ -35,10 +35,6 @@ Français
 8 Barres
 :9 Point
 9 points
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 ValAbs
 :AIL
@@ -163,6 +159,7 @@ ID fixe:
 GEAR
 >:GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Helicoptère
 :High-Rate
@@ -202,10 +199,9 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Config. de la page principale
 >:Main menu
->:Main page config
+:Main page config
+Config. de la page principale
 :Max:
 Max:
 >:Meter
@@ -248,17 +244,17 @@ Pas de Trim
 Néant
 :Normal
 Normal
-:OK
-OK
 :Off
 Off
 :Offset:
 Offset:
->:Ok
+:Ok
+Ok
 :On
 On
 :Page:
 Page:
+>:Plane
 :Point:
 Point:
 :Pos

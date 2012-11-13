@@ -16,15 +16,15 @@ Canale:
 :4 Bars
 4 bare
 :4 Inside
-4 pe interior
+4 int
 :4 Outside
-4 pe exterior
+4 ext
 :4Ch w/ Dual-Rates
 4 can. + D/R
 :5 Point
 5 puncte
 :6 Trims
-6 trimuri
+6
 :6Ch Airplane
 6 avion
 :6Ch Helicopter
@@ -35,10 +35,6 @@ Canale:
 8 bare
 :9 Point
 9 puncte
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 VAL ABS
 :AIL
@@ -51,7 +47,8 @@ AIL Inv.:
 AUX4
 :AUX5
 AUX5
->:About
+:About
+Despre
 :Airplane
 Avion
 :Alarm
@@ -81,7 +78,7 @@ Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT 
 :Binding...\n%d seconds\nPress ENT to stop
 Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 :Box %d:
-Box%d:
+Loc%d:
 :Buttons
 Butoane
 :COL
@@ -133,12 +130,16 @@ DR
 Bandă moartă
 :Default
 Default
->:Deviation FW version:
+:Deviation FW version:
+Versiune Deviation
 :Deviation FW\nversion:
 Deviation fw.\nversiune:
->:Dimmer target:
->:Dimmer time:
->:Dist unit:
+:Dimmer target:
+Ilum. auto
+:Dimmer time:
+Timp auto:
+:Dist unit:
+Masura dist:
 :Dn
 Js
 :Down
@@ -163,7 +164,8 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
->:Fahren
+:Fahren
+Fahren
 :Failsafe:
 Failsafe:
 :File:
@@ -172,11 +174,15 @@ Fișier:
 Fix
 :Fixed ID:
 ID Fix:
->:Foot
+:Foot
+Picior
 :GEAR
 GEAR
->:GPS
->:Generic settings
+:GPS
+GPS
+:Generic settings
+Setări generale
+>:Heli
 :Helicopter
 Elicopter
 :High-Rate
@@ -191,7 +197,8 @@ Intrări
 Inserare
 :Inverted
 Inversat
->:LCD settings
+:LCD settings
+Setări ecran
 :LEFT_H
 STÂNGA_H
 :LEFT_V
@@ -220,14 +227,14 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Configurare
 :Main menu
 Meniu principal
->:Main page config
+:Main page config
+Ecran principal
 :Max:
 Max:
->:Meter
+:Meter
+Metru
 :Mid-Rate
 Pos1
 :Min/Max
@@ -267,34 +274,36 @@ Now
 :No Bars
 Nici o bară
 :No Trim
-Nici un trim
+nimic
 :No Trims
-Nici un trim
+nimic
 :None
-Nimic
+nimic
 :Normal
 Normal
-:OK
-OK
 :Off
 Oprit
 :Offset:
 Offset:
 :Ok
-OK
+Ok
 :On
 Pornit
 :Page:
 Pagină:
+>:Plane
 :Point:
 Punct:
 :Pos
 Poz.
 :Pos/Neg:
 Poz/Neg:
->:Prealert interval:
->:Prealert intvl:
->:Prealert time:
+:Prealert interval:
+Interval prealertă:
+:Prealert intvl:
+Prealertă:
+:Prealert time:
+Int. Prealertă:
 :Press 'Ent' to turn USB Filesystem:
 \nApasă ENT pentru a seta modul USB: 
 :Press ENT to change:
@@ -305,7 +314,8 @@ Apasa ENT pentru copiere:
 Apasă ENT pentru incarcare:
 :Press ENT to turn \nUSB drive:
 Apasă ENT pentru a seta\nmodul USB:
->:Preview: Long-Press ENT
+:Preview: Long-Press ENT
+Test: ține ENT apăsat
 :Protocol:
 Protocol:
 :RIGHT_H
@@ -372,11 +382,10 @@ Stick-uri:
 Subtrim
 :SwashType:
 Tip platou:
->:Switch %d:
-:Switch1
-Într.1
-:Switch2
-Într.2
+:Switch %d:
+Ind. %d
+>:Switch1
+>:Switch2
 :Switch:
 Activator:
 :Symmetric
@@ -417,14 +426,20 @@ TelemV
 Telemetrie
 :Telemetry config
 Telemetrie
->:Telemetry monitor
->:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
+:Telemetry monitor
+Monitor telemetrie
+:Telemetry settings
+Setări telemetrie
+:Telemetry temp:
+Temp. telemetrie:
+:Telemetry units:
+Unități telem.:
 :Temp
 Temp.
->:Temp unit:
->:Temp:
+:Temp unit:
+Unit. temp:
+:Temp:
+Temp:
 :Template..
 Șablon...
 :Test
@@ -433,11 +448,14 @@ Test
 Timp
 :Timer
 Timer
->:Timer settings
+:Timer settings
+Setări crono
 :Timers
 Timere
->:Timeup interval:
->:Timeup intvl:
+:Timeup interval:
+Interval timp:
+:Timeup intvl:
+Intv. timp:
 :Toggle%d
 Într.%d
 :Touch Calibrate
@@ -484,7 +502,8 @@ Valoare:
 Virt.
 :Volt
 Volt
->:Volt:
+:Volt:
+Volt:
 :Zero/Max
 Zero/Max
 :\n\nBinding will end in %d seconds...

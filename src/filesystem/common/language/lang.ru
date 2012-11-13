@@ -35,10 +35,6 @@
 8 полос
 :9 Point
 9 точек
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 Абсолют.
 :AIL
@@ -182,6 +178,7 @@ AUX5
 :GPS
 GPS
 >:Generic settings
+>:Heli
 :Helicopter
 Вертолет
 :High-Rate
@@ -225,8 +222,6 @@ GPS
 МИКШ1
 :MIX2
 МИКШ2
-:Main Page Config
-Главная страница
 :Main menu
 Главное меню
 :Main page config
@@ -281,18 +276,17 @@ GPS
 Нет
 :Normal
 Норма
-:OK
-OK
 :Off
 Выкл.
 :Offset:
 Смещ.:
 :Ok
-ОК
+Оk
 :On
 Вкл.
 :Page:
 Стр.:
+>:Plane
 :Point:
 Точка:
 :Pos
