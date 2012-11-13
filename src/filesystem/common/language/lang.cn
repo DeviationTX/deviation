@@ -2,9 +2,9 @@
 :# Channels:
 通道数:
 :%s is %d%%, safe value = %d%%\n
-%s当前值为%d%%, 熄火保护设定为%d%%\n
+%s当前值为%d%%, 安全开机设定为%d%%\n
 :%s is %d%%,\nsafe value = %d%%
-%s当前值为%d%%,\n熄火保护设定为%d%%
+%s当前值为%d%%,\n安全开机设定为%d%%
 :1-to-1
 45度曲线
 :11 Point
@@ -40,14 +40,15 @@
 :AIL
 副翼
 :AIL DR
-副翼开关
+副翼DR
 :AIL Inv:
 副翼逆转
 >:AUX4
 >:AUX5
 :About
 关于本系统
->:Airplane
+:Airplane
+固定翼
 :Alarm
 报警
 :Altitude
@@ -88,7 +89,7 @@
 :Cancel
 取消
 :Celsius
-摄氏度
+摄氏
 :Center all \nsticks and knobs\nthen press ENT
 将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
@@ -100,7 +101,7 @@
 :Channels
 通道
 :Complex
-高级模式
+多段式
 :Configure
 设置
 :Contrast:
@@ -114,11 +115,11 @@
 :Curve:
 曲线:
 :Cyclic1
-斜盘1
+循环1
 :Cyclic2
-斜盘2
+循环2
 :Cyclic3
-斜盘3
+循环3
 :DR
 舵量
 :Deadband
@@ -138,7 +139,7 @@ Deviation固件版本:
 :ELE
 升降
 :ELE DR
-升降开关
+升降DR
 :ELE Inv:
 升降逆转:
 :EXPO
@@ -148,7 +149,7 @@ Deviation固件版本:
 :Exit
 退出
 :Expo&DR
-3D模式
+三段式
 :FMODE0
 航线
 :FMODE1
@@ -156,7 +157,7 @@ Deviation固件版本:
 :FMODE2
 3D-2
 :Fahren
-华氏度
+华氏
 :Failsafe:
 失控保护
 :File:
@@ -200,13 +201,14 @@ LCD设置
 纬度
 :Left
 左
->:Length:
+:Length:
+距离:
 :Linked
 关联
 :Load
-读入
+读取
 :Load...
-读入
+读取...
 :Longitude
 经度
 :Low Battery
@@ -299,11 +301,11 @@ LCD设置
 :Press ENT to copy to:
 按ENT复制:
 :Press ENT to load:
-按ENT读入:
+按ENT读取:
 :Press ENT to turn \nUSB drive:
-按ENT更改U盘状态:\n:
+按ENT使U盘:
 :Preview: Long-Press ENT
-预览主页:长按ENT
+长按ENT预览主页;EXT返回
 :Protocol:
 通信协议:
 :RIGHT_H
@@ -317,7 +319,7 @@ LCD设置
 :RUD
 方向
 :RUD DR
-方向开关
+方向DR
 :Re-Init
 初始化
 :Remove
@@ -347,7 +349,7 @@ LCD设置
 :Scale:
 比例:
 :Scanner
-信号扫描
+信号扫描器
 :Simple
 简单模式
 :Simple 4 Channel
@@ -387,29 +389,29 @@ LCD设置
 :THR
 油门
 :TRIMLH+
-左水平微调+
+左水平+
 :TRIMLH-
-左水平微调-
+左水平-
 :TRIMLV+
-左垂直微调+
+左垂直+
 :TRIMLV-
-左垂直微调-
+左垂直-
 :TRIMRH+
-右水平微调+
+右水平+
 :TRIMRH-
-右水平微调-
+右水平-
 :TRIMRV+
-右垂直微调+
+右垂直+
 :TRIMRV-
-右垂直微调+
+右垂直+
 :TRIM_L+
-左上微调+
+左上+
 :TRIM_L-
-左上微调-
+左上-
 :TRIM_R+
-右上微调+
+右上+
 :TRIM_R-
-右上微调-
+右上-
 :TelemRPM
 转数
 :TelemT
@@ -429,7 +431,7 @@ LCD设置
 :Temp:
 温度
 :Temperature:
-温度
+温度:
 :Template..
 模板..
 :Test
