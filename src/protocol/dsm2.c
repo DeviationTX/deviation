@@ -163,8 +163,6 @@ static void build_data_packet(u8 upper)
 {
     u8 i;
     const u8 *chmap = ch_map[num_channels - 4];
-    if(upper)
-        chmap += 7;
 #if DSMX
     packet[0] = cyrfmfg_id[2];
     packet[1] = cyrfmfg_id[3] + model;
