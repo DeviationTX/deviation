@@ -137,8 +137,6 @@ AUX5
 Гашение до:
 :Dimmer time:
 Время гашения:
-:Dist unit:
-Единица длины:
 :Dn
 Вниз
 :Down
@@ -208,6 +206,7 @@ GPS
 Широта
 :Left
 Влево
+>:Length:
 :Linked
 Связанный
 :Load
@@ -298,8 +297,6 @@ GPS
 +
 :Pos/Neg:
 +/-:
-:Prealert interval:
-Интервалы до:
 :Prealert intvl:
 Интервалы до:
 :Prealert time:
@@ -436,15 +433,11 @@ RPM
 Монитор телеметрии
 :Telemetry settings
 Настройки телеметрии
-:Telemetry temp:
-Единица темп.:
-:Telemetry units:
-Единица длины:
 :Temp
 Темп.
-:Temp unit:
-Единица темп.:
 :Temp:
+Темп.:
+:Temperature:
 Темп.:
 :Template..
 Шаблон...
@@ -458,8 +451,6 @@ RPM
 Настройки таймера
 :Timers
 Таймеры
-:Timeup interval:
-Интервалы после:
 :Timeup intvl:
 Интервалы после:
 :Toggle%d

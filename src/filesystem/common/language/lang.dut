@@ -120,7 +120,6 @@ Standaard
 Deviation FW Versie:
 >:Dimmer target:
 >:Dimmer time:
->:Dist unit:
 >:Dn
 :Down
 Omlaag
@@ -182,6 +181,7 @@ Taal:
 >:Latitude
 :Left
 Links
+>:Length:
 :Linked
 Verbonden
 :Load
@@ -260,7 +260,6 @@ Punt:
 +
 :Pos/Neg:
 +/-:
->:Prealert interval:
 >:Prealert intvl:
 >:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
@@ -372,11 +371,9 @@ TRIM_R-
 >:Telemetry config
 >:Telemetry monitor
 >:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
 >:Temp
->:Temp unit:
 >:Temp:
+>:Temperature:
 :Template..
 Sjabloon...
 :Test
@@ -386,7 +383,6 @@ Testen
 Timer
 >:Timer settings
 >:Timers
->:Timeup interval:
 >:Timeup intvl:
 :Toggle%d
 Schakel%d

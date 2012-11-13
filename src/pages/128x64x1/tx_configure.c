@@ -147,14 +147,14 @@ void PAGE_TxConfigureInit(int page)
                 0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Telemetry settings"));
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Temp unit:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Temperature:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)1L);
     cp->total_items++;
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Dist unit:"));
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Length:"));
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, units_cb, (void *)0L);
     cp->total_items++;

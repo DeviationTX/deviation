@@ -134,8 +134,6 @@ Deviation固件版本:
 減光背光亮度:
 :Dimmer time:
 減光啟動時間:
-:Dist unit:
-距離單位:
 :Dn
 下
 :Down
@@ -205,6 +203,7 @@ LCD設置
 緯度
 :Left
 左
+>:Length:
 :Linked
 連動
 :Load
@@ -295,8 +294,6 @@ LCD設置
 正
 :Pos/Neg:
 正/負:
-:Prealert interval:
-預警間隔：
 :Prealert intvl:
 預警間隔：
 :Prealert time:
@@ -433,16 +430,11 @@ LCD設置
 遙測數據監控
 :Telemetry settings
 遙測設定
-:Telemetry temp:
-遠端溫度
-:Telemetry units:
-遙測單位
 :Temp
 溫度
-:Temp unit:
-溫度單位
 :Temp:
 溫度：
+>:Temperature:
 :Template..
 模板..
 :Test
@@ -455,8 +447,6 @@ LCD設置
 計時器設定
 :Timers
 計時器
-:Timeup interval:
-超時報警間隔：
 :Timeup intvl:
 超時報警間隔：
 :Toggle%d

@@ -134,7 +134,6 @@ Default
 Deviation fw. verzió:
 >:Dimmer target:
 >:Dimmer time:
->:Dist unit:
 :Dn
 Le
 :Down
@@ -200,6 +199,7 @@ Nyelv:
 Szélesség
 :Left
 Bal
+>:Length:
 :Linked
 Csatolt
 :Load
@@ -289,7 +289,6 @@ Pont:
 Poz.
 :Pos/Neg:
 Poz/Neg:
->:Prealert interval:
 >:Prealert intvl:
 >:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
@@ -417,13 +416,11 @@ Telemetria konfig.
 :Telemetry monitor
 Telemetria adatok
 >:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
 :Temp
 Hőm.
->:Temp unit:
 :Temp:
 Hőm.:
+>:Temperature:
 :Template..
 Sablon...
 :Test
@@ -435,7 +432,6 @@ Időzítő
 >:Timer settings
 :Timers
 Időzítők
->:Timeup interval:
 >:Timeup intvl:
 :Toggle%d
 Jelzés%d

@@ -116,7 +116,6 @@ Default
 Deviation FW version:
 >:Dimmer target:
 >:Dimmer time:
->:Dist unit:
 >:Dn
 :Down
 Runter
@@ -178,6 +177,7 @@ Sprache:
 >:Latitude
 :Left
 Links
+>:Length:
 :Linked
 Verknüpft
 :Load
@@ -255,7 +255,6 @@ Punkt:
 +
 :Pos/Neg:
 +/-:
->:Prealert interval:
 >:Prealert intvl:
 >:Prealert time:
 >:Press 'Ent' to turn USB Filesystem:
@@ -364,11 +363,9 @@ TRIM_R-
 >:Telemetry config
 >:Telemetry monitor
 >:Telemetry settings
->:Telemetry temp:
->:Telemetry units:
 >:Temp
->:Temp unit:
 >:Temp:
+>:Temperature:
 :Template..
 Vorlage...
 :Test
@@ -378,7 +375,6 @@ Testen
 Zeit
 >:Timer settings
 >:Timers
->:Timeup interval:
 >:Timeup intvl:
 :Toggle%d
 Schalter%d

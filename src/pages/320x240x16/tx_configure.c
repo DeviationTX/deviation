@@ -96,10 +96,10 @@ static void _show_page()
         row += space + 8;
         GUI_CreateLabelBox(16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;
-        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Temp unit:"));
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Temperature:"));
         GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, units_cb, (void *)1L);
         row += space;
-        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dist unit:"));
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Length:"));
         GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, units_cb, (void *)0L);
     } else if (page_num == 2) {
         firstObj = GUI_CreateLabelBox(16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Timer settings"));

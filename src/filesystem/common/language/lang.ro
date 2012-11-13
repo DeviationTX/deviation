@@ -135,8 +135,6 @@ Deviation fw. versiune:
 Ilum. auto
 :Dimmer time:
 Timp auto:
-:Dist unit:
-Masura dist:
 :Dn
 Js
 :Down
@@ -207,6 +205,7 @@ Limbă:
 Latitudine
 :Left
 Stânga
+>:Length:
 :Linked
 Legat
 :Load
@@ -297,9 +296,8 @@ Punct:
 Poz.
 :Pos/Neg:
 Poz/Neg:
-:Prealert interval:
-Interval prealertă:
 :Prealert intvl:
+Interval prealertă:
 Prealertă:
 :Prealert time:
 Int. Prealertă:
@@ -435,16 +433,11 @@ Telemetrie
 Monitor telemetrie
 :Telemetry settings
 Setări telemetrie
-:Telemetry temp:
-Temp. telemetrie:
-:Telemetry units:
-Unități telem.:
 :Temp
 Temp.
-:Temp unit:
-Unit. temp:
 :Temp:
 Temp:
+>:Temperature:
 :Template..
 Șablon...
 :Test
@@ -457,9 +450,8 @@ Timer
 Setări crono
 :Timers
 Timere
-:Timeup interval:
-Interval timp:
 :Timeup intvl:
+Interval timp:
 Intv. timp:
 :Toggle%d
 Într.%d

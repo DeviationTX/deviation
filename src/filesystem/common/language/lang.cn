@@ -131,8 +131,6 @@ Deviation固件版本:
 背光减弱值:
 :Dimmer time:
 背光减弱时间:
-:Dist unit:
-距离单位:
 :Dn
 下
 :Down
@@ -202,6 +200,7 @@ LCD设置
 纬度
 :Left
 左
+>:Length:
 :Linked
 关联
 :Load
@@ -289,8 +288,6 @@ LCD设置
 正
 :Pos/Neg:
 正/负:
-:Prealert interval:
-预警间隔:
 :Prealert intvl:
 预警间隔:
 :Prealert time:
@@ -427,15 +424,11 @@ LCD设置
 双向回传监控
 :Telemetry settings
 双向回传设置
-:Telemetry temp:
-温度单位:
-:Telemetry units:
-双向回传单位:
 :Temp
 温度
-:Temp unit:
-温度单位:
 :Temp:
+温度
+:Temperature:
 温度
 :Template..
 模板..
@@ -449,8 +442,6 @@ LCD设置
 定时器设置
 :Timers
 定时器
-:Timeup interval:
-超时报警间隔
 :Timeup intvl:
 超时报警间隔
 :Toggle%d
