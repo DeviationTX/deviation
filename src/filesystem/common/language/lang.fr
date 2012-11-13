@@ -116,9 +116,8 @@ DR
 >:Deadband
 :Default
 Défaut
->:Deviation FW version:
-:Deviation FW\nversion:
-Deviation FW\nversion:
+:Deviation FW version:
+Deviation FW version:
 >:Dimmer target:
 >:Dimmer time:
 >:Dist unit:

@@ -112,9 +112,8 @@ Kurve:
 >:Deadband
 :Default
 Default
->:Deviation FW version:
-:Deviation FW\nversion:
-Deviation FW\nVersion:
+:Deviation FW version:
+Deviation FW version:
 >:Dimmer target:
 >:Dimmer time:
 >:Dist unit:

@@ -133,8 +133,6 @@ AUX5
 Умолчание
 :Deviation FW version:
 Версия прошивки:
-:Deviation FW\nversion:
-Прошивка Deviation\nверсия:
 :Dimmer target:
 Гашение до:
 :Dimmer time:
