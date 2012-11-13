@@ -123,7 +123,8 @@ x.......      aux3     (odd)
 #########################
 # 6-channel Data Packet #
 #########################
-Each channel is 10-bits.  All 6 channels are encoded in a single packet.
+The 6-channel protocol actually provides 7 channels.
+Each channel is 10-bits.  All 7 channels are encoded in a single packet.
 The upper 2 bits are packed, 4 to a byte in bytes 4 and 9.
 Channel data is signed in ones-complement.
 The Gyro is unsigned with values ranging from 100 to 900
@@ -140,10 +141,12 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 5  ff: slight impact on aux1 (?)
 6  gg: throttle/Aux2 trim (?)
 7  hh: channel reverse: bit 6 = ch1, bit 0=ch7 (?)
-8  ii: gear = bit0, flaps = bit 1
+8  ii: gear = bit0, flaps = bit 1, ccpm-mode = bit 7
 9  jj:  bits 3:2 are MSB of the Gyro control, other bits unknown.
         bits 1:0 cycle 0, 1, 2 for each packet
-        bits 7:4 seem to always be 'a' or '0'
+        bits 7:6 appear to act as a trim for channel 4
+        bits 5:4 alter Ch7 by ~25%
+        (in logs, bits 7:4 seem to always be 'a' or '0')
 10 kk: TxID1
 11 ll: TxID2
 12 mm: upper-nibble TxID3, low-nibble = counter (0x0 - 0xB)
