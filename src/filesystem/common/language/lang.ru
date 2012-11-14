@@ -62,7 +62,7 @@ AUX5
 :Bars:
 Полоса:
 :Basic config
-Основная настройка
+Основные настройки
 :Batt alarm:
 Сигнал батареи:
 :Battery alarm:
@@ -128,11 +128,11 @@ AUX5
 :DR
 ДР
 :Deadband
-Мертвая зона
+Мертв.зона
 :Default
 Умолчание
 :Deviation FW version:
-Версия прошивки:
+Версия Deviation:
 :Dimmer target:
 Гашение до:
 :Dimmer time:
@@ -286,7 +286,7 @@ GPS
 :Offset:
 Смещ.:
 :Ok
-Оk
+ОK
 :On
 Вкл.
 :Page:
@@ -314,7 +314,7 @@ GPS
 :Press ENT to turn \nUSB drive:
 Нажмите ENT для перевода\nUSB диска в состояние:
 :Preview: Long-Press ENT
-Просмотр: Длинное нажатие ENT
+Просмотр: Длительное нажатие ENT
 :Protocol:
 Протокол:
 :RIGHT_H
@@ -374,7 +374,7 @@ RPM
 :Start:
 Старт:
 :Step:
-Шаг
+Шаг:
 :Stick input
 Ввод стика
 :Stick mode:
@@ -386,7 +386,7 @@ RPM
 :SwashType:
 Тип авт.перекоса:
 :Switch %d:
-Перкл. %d:
+Перекл. %d:
 :Switch1
 Перекл.1
 :Switch2
