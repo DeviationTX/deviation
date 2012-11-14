@@ -85,7 +85,7 @@ const char *INPUT_SourceName(char *str, u8 src)
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
         snprintf(str, 30, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     } else {
-        snprintf(str, 30, "%s%d", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
+        snprintf(str, 30, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
     }
     return str;
 }
