@@ -40,7 +40,7 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     (void)pos;
     (void)parent;
     (void)data;
-    s8 newpos = (s8)page_num + direction;
+    s8 newpos = (s8)page_num + (direction > 0 ? 1 : -1);
     if (newpos < 0)
         newpos = 0;
     else if (newpos > MAX_PAGE)
