@@ -198,6 +198,21 @@ int PROTOCOL_NumChannels()
         num_channels = NUM_OUT_CHANNELS;
     return num_channels;
 }
+
+int PROTOCOL_DefaultNumChannels()
+{
+    int num_channels = NUM_OUT_CHANNELS;
+    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = cmd(PROTOCMD_DEFAULT_NUMCHAN); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default: break;
+    }
+    #undef PROTODEF
+    if (num_channels > NUM_OUT_CHANNELS)
+        num_channels = NUM_OUT_CHANNELS;
+    return num_channels;
+}
 u32 PROTOCOL_CurrentID()
 {
     u32 id = 0;

@@ -437,6 +437,7 @@ u32 DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return 9;
+        case PROTOCMD_DEFAULT_NUMCHAN: return 7;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? Model.fixed_id : 0;
         case PROTOCMD_SET_TXPOWER:
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
