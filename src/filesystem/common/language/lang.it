@@ -3,7 +3,8 @@ Italiano
 # Canali:
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valore sicuro  = %d%%\n
->:%s is %d%%,\nsafe value = %d%%
+:%s is %d%%,\nsafe value = %d%%
+%s = %d%%, \nvalore sicuro  = %d%%
 :1-to-1
 1 a 1
 :11 Point
@@ -46,30 +47,36 @@ DR ALET
 AUX4
 :AUX5
 AUX5
->:About Deviation
+:About Deviation
+A proposito di Deviation
 :Airplane
 Aereo
->:Alarm
->:Altitude
+:Alarm
+Allarme
+:Altitude
+Altitudine
 :Backlight:
-LuminositÃ 
+Luminosità
 :Bar %d:
 Barra %d:
 :Bars:
 Barre:
->:Basic config
+:Basic config
+Config. di base
 :Batt alarm:
 Allarme batteria:
 :Battery alarm:
 Allarme batteria:
->:Battery too low,\ncan't save!
+:Battery too low,\ncan't save!
+Batteria troppo scarica,\nnon posso salvare!
 :Bind
 Bind
 :Binding
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperÃ  la procedura di binding\nma permetterÃ  il controllo della TX.
->:Binding...\n%d seconds\nPress ENT to stop
+Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
+:Binding...\n%d seconds\nPress ENT to stop
+Binding...\n%d secondi\nPremi ENT per fermare
 :Box %d:
 Box%d:
 :Buttons
@@ -82,27 +89,33 @@ Collet.
 Ciclico
 :Calibrate
 Calibrazione
->:Calibration done.
+:Calibration done.
+Calibrazione completata.
 :Cancel
 Cancella
->:Celsius
->:Center all \nsticks and knobs\nthen press ENT
+:Celsius
+Celsius
+:Center all \nsticks and knobs\nthen press ENT
+Centra tutti gli\nsticks e le manopole\nquindi premi ENT 
 :Ch
 Ch
 :Change
 Cambia
->:Channel output
+:Channel output
+Canale di uscita
 :Channels
 Canale
 :Complex
 Complesso
 :Configure
 Configura
->:Contrast:
->:Copy To
+:Contrast:
+Contrasto:
+:Copy To
 :Copy To...
 Salva su...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarà salvata.\n\nCarica la batteria ora!
 :Curve:
 Curva:
 :Cyclic1
@@ -113,16 +126,20 @@ Ciclico2
 Ciclico3
 :DR
 DR
->:Deadband
+:Deadband
+Zona morta
 :Default
 Default
 :Deviation FW version:
 Versione del FW Deviation:
->:Dimmer target:
->:Dimmer time:
->:Dn
+:Dimmer target:
+Dest. del Dimmer:
+:Dimmer time:
+Durata del Dimmer:
+:Dn
+Dn
 :Down
-GiÃ¹
+Giù
 :ELE
 ELEV
 :ELE DR
@@ -143,7 +160,8 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
->:Fahren
+:Fahren
+Fahren
 :Failsafe:
 Failsafe:
 :File:
@@ -152,12 +170,16 @@ File:
 Fisso
 :Fixed ID:
 ID Fisso:
->:Foot
+:Foot
+Piede
 :GEAR
 CARRELLO
->:GPS
->:Generic settings
->:Heli
+:GPS
+GPS
+:Generic settings
+Settaggi generici
+:Heli
+Eli
 :Helicopter
 Elicottero
 :High-Rate
@@ -168,28 +190,34 @@ Icona
 Ingresso:
 :Inputs
 Ingressi
->:Insert
+:Insert
+Inserisci
 :Inverted
 Inverso
->:LCD settings
+:LCD settings
+Parametri LCD
 :LEFT_H
 SINISTRA_H
 :LEFT_V
 SINISTRA_V
 :Language:
 Lingua:
->:Latitude
+:Latitude
+Latitudine
 :Left
 Sinistra
->:Length:
+:Length:
+Lunghezza:
 :Linked
 Linkato
 :Load
 Carica
 :Load...
 Carica...
->:Longitude
->:Low Battery
+:Longitude
+Longitudine
+:Low Battery
+Batteria scarica
 :Low-Rate
 Rate basso
 :MIX0
@@ -198,12 +226,14 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main menu
+:Main menu
+Menù principale
 :Main page config
 Pagina di Configurazione
 :Max:
 Max:
->:Meter
+:Meter
+Metro
 :Mid-Rate
 Rate Medio
 :Min/Max
@@ -218,21 +248,28 @@ Mixers:
 Modo %d
 :Model
 Modello
->:Model config
+:Model config
+Config. del Modello
 :Model name:
 Nome del modello:
->:Model setup
+:Model setup
+Setup del modello
 :Model type:
 Tipo del modello:
->:Monitor
->:Move Down
->:Move Up
->:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+:Monitor
+Monitor
+:Move Down
+Muovi Giù
+:Move Up
+Muovi Sù
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Muovi gli stick e le manopole\nfino al Max e al Min\nquindi premi ENT
 :Mux:
 Operazione:
 :Neg
 Neg.
->:New
+:New
+Nuovo
 :No Bars
 No Bars
 :No Trim
@@ -253,44 +290,56 @@ Ok
 On
 :Page:
 Pagina:
->:Plane
+:Plane
+Aero
 :Point:
 Punto:
 :Pos
 Pos.
 :Pos/Neg:
 Pos./Neg.:
->:Prealert intvl:
->:Prealert time:
+:Prealert intvl:
+Intervallo di preallarme:
+:Prealert time:
+Tempo di preallarme:
 :Press 'Ent' to turn USB Filesystem:
 Premi 'Ent' per attivare il Filesystem USB:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to turn \nUSB drive:
->:Preview: Long-Press ENT
+:Press ENT to change:
+Premi ENT per cambiare:
+:Press ENT to copy to:
+Premi ENT per copiare su:
+:Press ENT to load:
+Premi ENT per caricare:
+:Press ENT to turn \nUSB drive:
+Premi ENT per attivare il drive USB:
+:Preview: Long-Press ENT
+Anteprima: premi ENT a lungo
 :Protocol:
 Protocollo:
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
 DESTRA_V
->:RPM
->:RPM:
+:RPM
+RPM
+:RPM:
+RPM:
 :RUD
 TIMONE
 :RUD DR
 DRTIMONE
 :Re-Init
 Reinizializza
->:Remove
+:Remove
+Rimuovi
 :Reset
 Reset
 :Reverse:
 Inverso:
 :Reversed
 Rovesciato:
->:Revert
+:Revert
+Inverti
 :Right
 Destra
 :Safe Val:
@@ -301,8 +350,10 @@ Sicurezza
 Sicurezza:
 :Save
 Salva
->:Scale1:
->:Scale2:
+:Scale1:
+Scala1:
+:Scale2:
+Scala2:
 :Scale:
 Scala:
 :Scanner
@@ -311,16 +362,19 @@ Scanner
 Sempl.
 :Simple 4 Channel
 4Ch. Semplici
->:Speed
->:Speed:
+:Speed
+Velocità
+:Speed:
 :Src
 Sorgente
 :Src:
 Sorgente:
 :Start:
 Avvia:
->:Step:
->:Stick input
+:Step:
+Passo:
+:Stick input
+posizione dello stick
 :Stick mode:
 Modo di volo:
 :Sticks:
@@ -329,7 +383,8 @@ Sticks:
 Subtrim
 :SwashType:
 Piatto:
->:Switch %d:
+:Switch %d:
+Interr. %d:
 :Switch1
 Interr1
 :Switch2
@@ -364,26 +419,39 @@ TRIM_S-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
->:Telemetry config
->:Telemetry monitor
->:Telemetry settings
->:Temp
->:Temp:
->:Temperature:
+:TelemRPM
+TelemRPM
+:TelemT
+TelemT
+:TelemV
+TelemV
+:Telemetry
+Telemetria
+:Telemetry config
+Config. etlemetria
+:Telemetry monitor
+Monitor telemetria
+:Telemetry settings
+Settaggi telemetria
+:Temp
+Temp
+:Temp:
+Temp:
+:Temperature:
+Temperatura:
 :Template..
 Modello..
 :Test
 Test
->:Time
+:Time
 :Timer
 Timer
->:Timer settings
->:Timers
->:Timeup intvl:
+:Timer settings
+Config. Timer
+:Timers
+Timers
+:Timeup intvl:
+Durata:
 :Toggle%d
 Alterna%d
 :Touch Calibrate
@@ -398,7 +466,8 @@ Tocca %d
 Tocca per bloccare
 :Touch to Unlock
 Tocca per sbloccare
->:Transmitter config
+:Transmitter config
+Config. trasmittente
 :Trim
 Trim
 :Trim +:
@@ -407,7 +476,8 @@ Trim +:
 Trim -:
 :Trim Step:
 Trim fine:
->:Trims
+:Trims
+Trim:
 :Trims:
 Trim:
 :Turn Off
@@ -421,23 +491,26 @@ USB
 :Unknown
 Sconosciuto
 :Up
-SÃ¹
+Sù
 :Value:
 valore:
 :Virt
 Virtuale
->:Volt
->:Volt:
+:Volt
+Volt
+:Volt:
 :Zero/Max
 0/Max
 :\n\nBinding will end in %d seconds...
-\n\nIl Binding finirÃ  tra %d secondi...
+\n\nIl Binding finirà tra %d secondi...
 :add
 aggiungi
 :countdown
 countdown
->:max
->:min
+:max
+max
+:min
+min
 :mult
 Mult.
 :replace
