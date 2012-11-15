@@ -416,11 +416,11 @@ Unbekannt
 Hoch
 :Value:
 Wert:
-:Virt
-Zero/Max
+>:Virt
 >:Volt
 >:Volt:
->:Zero/Max
+:Zero/Max
+Zero/Max
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :add

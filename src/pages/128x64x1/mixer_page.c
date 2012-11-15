@@ -71,7 +71,7 @@ static void _show_page()
 
         if (idx != NUM_MIXERS) {
             //enum TemplateType template = MIXER_GetTemplate(ch);
-            obj = GUI_CreateLabelBox(43, row, w, h, &labelDesc, show_source, NULL, &mix[idx].src);
+            obj = GUI_CreateLabelBox(42, row, w, h, &labelDesc, show_source, NULL, &mix[idx].src);
             GUI_SetSelectable(obj, 0);
         }
 

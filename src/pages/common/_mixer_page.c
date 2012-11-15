@@ -46,9 +46,9 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
                 || Model.templates[i] == MIXERTEMPLATE_CYC3)
             {
                 switch(ch - NUM_OUT_CHANNELS) {
-                    case 0: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s - %s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
-                    case 1: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s - %s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
-                    case 2: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s - %s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
+                    case 0: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
+                    case 1: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
+                    case 2: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
                 }
             }
         }
