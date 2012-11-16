@@ -268,7 +268,7 @@ static const char *timer_interval_cb(guiObject_t *obj, int dir, void *data)
     u16 *value = (u16 *)data;
     u8 changed;
     u16 interval = *value/1000;
-    interval = GUI_TextSelectHelper(interval, 0, 60, dir, 5, 10, &changed);
+    interval = GUI_TextSelectHelper(interval, 0, 60, dir, 1, 5, &changed);
     if (changed)
         *value = interval * 1000;
     if (interval == 0)
