@@ -14,8 +14,7 @@
 #include "../common/telemconfig_page.h"
 #include "config/display.h"
 
-#include "main_menu.h"
-#include "sub_menu.h"
+#include "menus.h"
 
 struct pagemem {
     union {
@@ -31,17 +30,17 @@ struct pagemem {
         struct telemtest_page telemtest_page;
         struct telemconfig_page telemconfig_page;
 
-        struct main_menu_page main_menu_page;
-        struct sub_menu_page sub_menu_page;
+        struct menu_page menu_page;
     } u;
     u8 modal_page;
 };
 #define PAGE_NAME_MAX 10
 #define ITEM_HEIGHT 12
+#define ITEM_SPACE 13
 #define PREVIOUS_ITEM -1
+#define PAGE_ITEM_MAX 4
 
 extern struct pagemem pagemem;
-extern u8 sub_menu_item;  // global variable to let other page get back to the right sub menu
 extern struct LabelDesc labelDesc;
 
 void PAGE_ShowHeader(const char *title);
@@ -62,6 +61,8 @@ void PAGE_MainInit(int page);
 void PAGE_MainEvent();
 void PAGE_MainExit();
 
+// Menu
+void PAGE_MenuInit(int page);
 // Main Menu
 void PAGE_MainMenuInit(int page);
 void PAGE_MainMenuExit();

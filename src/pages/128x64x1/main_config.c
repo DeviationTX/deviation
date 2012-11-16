@@ -189,7 +189,7 @@ u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("SubMenu", sub_menu_item);
+            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_ChangeByName("MainPage", 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {

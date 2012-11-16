@@ -133,7 +133,8 @@ void PAGE_MainExit()
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-        PAGE_ChangeByName("MainMenu", 0);
+        u8 page = (0 << 4) | MENUTYPE_MAINMENU;
+        PAGE_ChangeByName("Menu", page);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
         mp->ignore_release = 1;
         TIMER_StartStop(0);

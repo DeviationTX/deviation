@@ -30,7 +30,7 @@
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static s16 view_origin_relativeY;
-static s8 current_selected = 0;  // do not use current_selected as it shares the same structure with other pages by using union
+static s8 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
 void PAGE_TxConfigureInit(int page)
 {
@@ -188,7 +188,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("SubMenu", sub_menu_item);
+            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {

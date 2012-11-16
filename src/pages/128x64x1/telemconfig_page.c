@@ -55,12 +55,15 @@ void PAGE_TelemconfigInit(int page)
     u8 w2 = 21;
     u8 w3 = 40;
     u8 i;
+    guiObject_t *obj;
     for (i = 0; i < TELEM_NUM_ALARMS; i++) {
         u8 x = 9;
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)i);
+        if (i == 0)
+            GUI_SetSelected(obj); // select the first item by default
         x += w1 + 5;
         GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)i);
@@ -71,7 +74,6 @@ void PAGE_TelemconfigInit(int page)
         row += space;
     }
     total_items *= 3;
-    total_items++;
     scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
     if (page > 0)
         PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
@@ -90,7 +92,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("SubMenu", sub_menu_item);
+            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
         }
         else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);

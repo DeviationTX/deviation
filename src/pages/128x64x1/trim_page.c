@@ -125,7 +125,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("SubMenu", sub_menu_item);
+            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
         }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, max_items, &selectedIdx, &view_origin_relativeY, scroll_bar);
         }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {

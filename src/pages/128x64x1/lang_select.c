@@ -68,7 +68,7 @@ void LANGPage_Select(void(*return_page)(int page))
     //GUI_CreateListBox(112, 40, 200, 192, num_lang, cp->selected, string_cb, select_cb, NULL, NULL); */
 
     // The following items are not draw in the logical view;
-    if (cp->total_items > PAGE_ITEM_COUNT)
+    if (cp->total_items > PAGE_ITEM_MAX)
         cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
     if ( Transmitter.language > 0)
         PAGE_NavigateItems(Transmitter.language, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);

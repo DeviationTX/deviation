@@ -38,8 +38,7 @@ struct pagemem pagemem;
 
 static const struct page pages[] = {
     {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},  // Note: the page name length should not exceed 10 chars
-    {PAGE_MainMenuInit, NULL, PAGE_MainMenuExit, "MainMenu"},
-    {PAGE_SubMenuInit, NULL, PAGE_SubMenuExit, "SubMenu" },
+    {PAGE_MenuInit, NULL, NULL, "Menu"},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
     {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
     {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
@@ -96,13 +95,11 @@ void PAGE_ChangeByName(const char *pageName, s8 menuPage)
             break;
         }
     }
-    if (newpage != page) {
-        if (pages[page].exit)
-            pages[page].exit();
-        page = newpage;
-        PAGE_RemoveAllObjects();
-        pages[page].init(menuPage);
-    }
+    if (pages[page].exit)
+        pages[page].exit();
+    page = newpage;
+    PAGE_RemoveAllObjects();
+    pages[page].init(menuPage);
 }
 
 void PAGE_Event()
@@ -184,6 +181,8 @@ static u8 action_cb(u32 button, u8 flags, void *data)
 void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
         guiObject_t *scroll_bar)
 {
+    if (total_items == 0)
+        return;  // bug fix: avoid devided by 0
     guiObject_t *obj;
     for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
         obj = GUI_GetSelected();
