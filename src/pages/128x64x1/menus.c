@@ -33,7 +33,7 @@ struct menu_pages menus[] = {
     {_tr_noop("USB"),                MENUTYPE_MAINMENU, 0, "USB",      0},
     {_tr_noop("Telemetry"),          MENUTYPE_MAINMENU, 1, "TeleMoni", PREVIOUS_ITEM},
     // sub menu items 1
-    {_tr_noop("Mixer"),              MENUTYPE_SUBMENU,  0, "Mixer",    PREVIOUS_ITEM},
+    {_tr_noop("Mixer"),              MENUTYPE_SUBMENU,  0, "Mixer",    0},
     {_tr_noop("Model setup"),        MENUTYPE_SUBMENU,  0, "ModelCon", PREVIOUS_ITEM},
     {_tr_noop("Timers"),             MENUTYPE_SUBMENU,  0, "Timer",    PREVIOUS_ITEM},
     {_tr_noop("Telemetry config"),   MENUTYPE_SUBMENU,  0, "TeleConf", PREVIOUS_ITEM},
