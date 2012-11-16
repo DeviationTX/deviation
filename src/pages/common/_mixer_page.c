@@ -177,6 +177,8 @@ void PAGE_MixerEvent()
                 GUI_Redraw(mp->graphs[1]);
             if (mp->graphs[2])
                 GUI_Redraw(mp->graphs[2]);
+            if (mp->bar)
+                GUI_Redraw(mp->bar);
         }
     }
 }

@@ -34,6 +34,7 @@ struct mixer_page {
     struct Mixer *cur_mixer;
     struct Limit limit;
     guiObject_t *graphs[3];
+    guiObject_t *bar;
     u8 channel;
     u8 num_mixers;
     u8 num_complex_mixers;
