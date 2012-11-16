@@ -390,7 +390,9 @@ static void navigate_items(s8 direction)
     obj = GUI_GetSelected();
     if (obj == mp->itemObj[0] || obj == mp->itemObj[1]) {
         current_selected_item = -1;
-        GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+        // Perf improvement on UI drawing for mixer setup: remove unnecessary view refreshing
+        if (obj == mp->itemObj[0] &&direction > 0)
+            GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
     } else {
         current_selected_item += direction;
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
@@ -430,15 +432,6 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
             PAGE_MixerInit(mp->top_channel);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) { // press enter to enter curves setup
-            /* guiObject_t *obj = GUI_GetSelected();
-            if (obj != mp->itemObj[1]) {
-                GUI_SetSelected(mp->itemObj[1]); // quick jump to save button
-                LCD_SetRelativeOrigin(0, 0);
-                okcancel_cb(obj, (void *)((long)1));
-            } else
-                return 0; */
-            return 0;
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
