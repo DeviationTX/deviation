@@ -39,8 +39,7 @@
 绝对值
 :AIL
 副翼
-:AIL DR
-副翼DR
+>:AIL DR
 :AIL Inv:
 副翼逆转
 >:AUX4
@@ -79,9 +78,12 @@
 第%d栏:
 :Buttons
 按键
->:COL
->:COL Inv:
->:CYC
+:COL
+螺距
+:COL Inv:
+螺距方向:
+:CYC
+循环
 :Calibrate
 校准
 :Calibration done.
@@ -129,7 +131,7 @@
 :Deviation FW version:
 Deviation固件版本:
 :Dimmer target:
-背光减弱值:
+背光减弱至:
 :Dimmer time:
 背光减弱时间:
 :Dn
@@ -138,8 +140,7 @@ Deviation固件版本:
 下
 :ELE
 升降
-:ELE DR
-升降DR
+>:ELE DR
 :ELE Inv:
 升降逆转:
 :EXPO
@@ -151,11 +152,11 @@ Deviation固件版本:
 :Expo&DR
 三段式
 :FMODE0
-航线
+FMOD0
 :FMODE1
-3D-1
+FMOD1
 :FMODE2
-3D-2
+FMOD2
 :Fahren
 华氏
 :Failsafe:
@@ -220,10 +221,14 @@ LCD设置
 >:MIX2
 :Main menu
 主菜单
+:Main menu config
+定制主菜单
 :Main page config
 定制主页面
 :Max:
 最大舵量:
+:Menu%d:
+菜单%d
 :Meter
 米
 :Mid-Rate
@@ -276,8 +281,7 @@ LCD设置
 关闭
 :Offset:
 偏移
-:Ok
-确定
+>:Ok
 :On
 开启
 :Page:
@@ -305,7 +309,7 @@ LCD设置
 :Press ENT to turn \nUSB drive:
 按ENT使U盘:
 :Preview: Long-Press ENT
-长按ENT预览主页;EXT返回
+长按ENT预览,EXT返回
 :Protocol:
 通信协议:
 :RIGHT_H
@@ -318,8 +322,7 @@ LCD设置
 转数:
 :RUD
 方向
-:RUD DR
-方向DR
+>:RUD DR
 :Re-Init
 初始化
 :Remove
@@ -351,7 +354,7 @@ LCD设置
 :Scanner
 信号扫描器
 :Simple
-简单模式
+一段式
 :Simple 4 Channel
 4通道
 :Speed
@@ -365,7 +368,7 @@ LCD设置
 :Start:
 开始时间:
 :Step:
-步进:
+幅度:
 :Stick input
 摇杆输入
 :Stick mode:
@@ -467,7 +470,7 @@ LCD设置
 :Trim -:
 微调-
 :Trim Step:
-微调步进:
+微调幅度:
 :Trims
 微调
 :Trims:

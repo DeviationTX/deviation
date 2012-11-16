@@ -1,8 +1,7 @@
 繁體中文
 :# Channels:
 通道數:
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%, 熄火保護 = %d%%\n
+>:%s is %d%%, safe value = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\n熄火保護 = %d%%\n
 :1-to-1
@@ -39,14 +38,15 @@
 絕對值
 :AIL
 副翼
-:AIL DR
-副翼DR
+>:AIL DR
 :AIL Inv:
 副翼方向:
->:AUX4
->:AUX5
+:AUX4
+輔助4
+:AUX5
+輔助5
 :About Deviation
-關於本軟件
+關於 Deviation
 :Airplane
 飛機
 :Alarm
@@ -54,31 +54,26 @@
 :Altitude
 海拔
 :Backlight:
-背光:
+背光亮度:
 :Bar %d:
 條框%d
-:Bars:
-狀態條:
+>:Bars:
 :Basic config
-基本設置
+基本規畫
 :Batt alarm:
 低電警示:
-:Battery alarm:
-低電警示:
+>:Battery alarm:
 :Battery too low,\ncan't save!
 電壓過低,\n無法儲存修改!
 :Bind
 連結
-:Binding
-連結中
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-正在對頻中...\n請確保模型已接電!\n按「確認」不會中止對頻\n但會歸還操控權
+>:Binding
+>:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 :Binding...\n%d seconds\nPress ENT to stop
 對頻中...\n%d秒\n按ENT鍵中止對頻
 :Box %d:
-框 %d:
-:Buttons
-按鍵
+訊息框 %d:
+>:Buttons
 :COL
 螺距
 :COL Inv:
@@ -94,19 +89,17 @@
 :Celsius
 攝氏
 :Center all \nsticks and knobs\nthen press ENT
-所有搖桿置中\n按 ENT 鍵開始
-:Ch
-通道
+所有搖桿置中\n按 ENT 開始進行
+>:Ch
 :Change
 更改
 :Channel output
-通道輸出量
-:Channels
-通道
+輸出通道
+>:Channels
 :Complex
 多段式
 :Configure
-設置
+發射機基本規畫
 :Contrast:
 對比度:
 :Copy To
@@ -129,19 +122,17 @@
 :Default
 預設
 :Deviation FW version:
-Deviation固件版本:
+Deviation 韌體版本：
 :Dimmer target:
-減光背光亮度:
+背光省電亮度:
 :Dimmer time:
-減光啟動時間:
-:Dn
-下
+省電啟動時間:
+>:Dn
 :Down
 下
 :ELE
 升降
-:ELE DR
-升降DR
+>:ELE DR
 :ELE Inv:
 升降方向:
 :EXPO
@@ -153,11 +144,11 @@ Deviation固件版本:
 :Expo&DR
 三段式
 :FMODE0
-常規飛行
+FMOD0
 :FMODE1
-3D 1
+FMOD1
 :FMODE2
-3D 2
+FMOD2
 :Fahren
 華氏
 :Failsafe:
@@ -169,41 +160,38 @@ Deviation固件版本:
 :Fixed ID:
 固定ID:
 :Foot
-英尺
-:GEAR
-尾舵
+英呎
+>:GEAR
 >:GPS
 :Generic settings
-通用設置
+======基本參數======
 :Heli
 直升機
 :Helicopter
 直升機
 :High-Rate
-航線飛行1
-:Icon
-圖示
+高位
+>:Icon
 :Input:
 輸入:
-:Inputs
-輸入
-:Insert
-插入
+>:Inputs
+>:Insert
 :Inverted
 反向的
 :LCD settings
-LCD設置
+======液晶參數======
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
 :Language:
-語言:
+使用語系:
 :Latitude
 緯度
 :Left
 左
->:Length:
+:Length:
+長度單位:
 :Linked
 連動
 :Load
@@ -212,54 +200,50 @@ LCD設置
 載入..
 :Longitude
 經度
-:Low Battery
-低電壓
+>:Low Battery
 :Low-Rate
-3D飛行2
-:MIX0
-混控0
-:MIX1
-混控1
-:MIX2
-混控2
+低位
+>:MIX0
+>:MIX1
+>:MIX2
 :Main menu
 主選單
+:Main menu config
+主選單規畫
 :Main page config
-定制主頁面
+螢幕排列規畫
 :Max:
-上限:
+輸出上限:
+>:Menu%d:
 :Meter
 公尺
 :Mid-Rate
-3D飛行1
+中位
 :Min/Max
 上/下限
 :Min:
-下限:
+輸出下限:
 :Mixer
 混控器
 :Mixers:
-程式混控:
+段數:
 :Mode %d
 模式 %d
-:Model
-模型
+>:Model
 :Model config
-模型設置
+模型規畫
 :Model name:
 模型名稱:
 :Model setup
-模型設置
+模型設定
 :Model type:
 機種選擇:
 :Monitor
 檢視通道內容
-:Move Down
-下移
-:Move Up
-上移
+>:Move Down
+>:Move Up
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
-移動所有搖桿及旋鈕\n先至最小再至最大位置\n最後按ENT  
+移動所有搖桿\n通過上下極限區域\n按 ENT 校準 
 :Mux:
 混合:
 :Neg
@@ -280,8 +264,7 @@ LCD設置
 關閉
 :Offset:
 偏移:
-:Ok
-確定
+>:Ok
 :On
 開啟
 :Page:
@@ -295,11 +278,10 @@ LCD設置
 :Pos/Neg:
 正/負:
 :Prealert intvl:
-預警間隔：
+倒數預警間隔:
 :Prealert time:
-預警時間：
-:Press 'Ent' to turn USB Filesystem:
-按 ENT 讓 USB：
+倒數預警時間:
+>:Press 'Ent' to turn USB Filesystem:
 :Press ENT to change:
 按 ENT 變更:
 :Press ENT to copy to:
@@ -310,8 +292,7 @@ LCD設置
 按 ENT 讓 USB：
 :Preview: Long-Press ENT
 長按 ENT 預覽 EXT 離開
-:Protocol:
-協定:
+>:Protocol:
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -326,8 +307,7 @@ LCD設置
 方向DR
 :Re-Init
 重對頻
-:Remove
-移除
+>:Remove
 :Reset
 重置
 :Reverse:
@@ -340,20 +320,18 @@ LCD設置
 右
 :Safe Val:
 安全值:
-:Safety
-安全
+>:Safety
 :Safety:
 安全開關:
 :Save
 儲存
 :Scale1:
-比例1：
+比例1:
 :Scale2:
-比例2：
+比例2:
 :Scale:
 比例:
-:Scanner
-無線頻道掃描
+>:Scanner
 :Simple
 單段式
 :Simple 4 Channel
@@ -361,27 +339,26 @@ LCD設置
 :Speed
 速率
 :Speed:
-速度:
-:Src
-來源
+舵機速度:
+>:Src
 :Src:
-來源:
+訊號來源:
 :Start:
-開始:
+開始時間:
 :Step:
 步幅
 :Stick input
-搖杆/開關輸入量
+搖桿輸入:
 :Stick mode:
 搖桿模式:
 :Sticks:
-搖桿:
+搖桿校正:
 :Subtrim:
 微調:
 :SwashType:
 十字盤類型:
 :Switch %d:
-開關%d:
+開關框%d:
 :Switch1
 開關1
 :Switch2
@@ -422,19 +399,19 @@ LCD設置
 遠端溫
 :TelemV
 遠端電
-:Telemetry
-遙測
+>:Telemetry
 :Telemetry config
-遙測設定
+遙測規畫
 :Telemetry monitor
-遙測數據監控
+遙測內容
 :Telemetry settings
-遙測設定
+======遙測參數======
 :Temp
 溫度
 :Temp:
-溫度：
->:Temperature:
+溫度:
+:Temperature:
+溫度單位
 :Template..
 模板..
 :Test
@@ -444,25 +421,26 @@ LCD設置
 :Timer
 計時器
 :Timer settings
-計時器設定
+======計時參數======
 :Timers
 計時器
 :Timeup intvl:
-超時報警間隔：
+超時警示間隔:
 :Toggle%d
 開關%d
 :Touch Calibrate
 觸控板校正
 :Touch Test
 觸控測試
-:Touch screen:
-觸控板:
+>:Touch screen:
 :Touch target %d
 點擊目標 %d
->:Touch to Lock
->:Touch to Unlock
+:Touch to Lock
+觸碰上鎖
+:Touch to Unlock
+觸碰解鎖
 :Transmitter config
-發射機設置
+發射機規畫
 :Trim
 微調
 :Trim +:
@@ -474,37 +452,31 @@ LCD設置
 :Trims
 微調
 :Trims:
-微調數目:
-:Turn Off
-關閉
-:Turn On
-開啟
+微調數:
+>:Turn Off
+>:Turn On
 :Tx power:
 發射功率:
 >:USB
->:Unknown
+:Unknown
+未知
 :Up
 上
 :Value:
 數值:
-:Virt
-虛擬
-:Volt
-電壓
+>:Virt
+>:Volt
 :Volt:
 電壓:
 :Zero/Max
 零/上限
-:\n\nBinding will end in %d seconds...
-\n\n%d秒後對頻結束...
+>:\n\nBinding will end in %d seconds...
 :add
 加上
 :countdown
 倒數
-:max
-最大舵量
-:min
-最小舵量
+>:max
+>:min
 :mult
 多重
 :replace
