@@ -28,7 +28,7 @@
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 #define VIEW_ID 0
-static u8 callback_result;
+static long callback_result; // Bug fix: u8 is a wrong data type, causing memory violation and unpredictable behavior in real devo10's modelname editing
 static s16 view_origin_relativeY;
 static s8 current_selected = 0;
 
