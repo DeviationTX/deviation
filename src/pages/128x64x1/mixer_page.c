@@ -21,72 +21,85 @@
 #include "../common/_mixer_page.c"
 
 static u8 selectedIdx = 0;
+static u8 top_channel = 0;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 
 static void _show_title(int page)
 {
     (void)page;
-    mp->entries_per_page = 5;
+    mp->entries_per_page = 2;
     mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > mp->entries_per_page ?
             Model.num_channels + NUM_VIRT_CHANNELS - mp->entries_per_page : Model.num_channels + NUM_VIRT_CHANNELS;
     PAGE_SetActionCB(action_cb);
+    mp->top_channel = top_channel;
 }
 
 static void _show_page()
 {
-    int init_y = 0;
-    u8 x = 0;
     u8 h = 12;
     int i;
     GUI_RemoveAllObjects();
+    PAGE_ShowHeader(_tr("Mixer"));
 
     struct Mixer *mix = MIXER_GetAllMixers();
     guiObject_t *obj;
-    for (i = 0; i < mp->entries_per_page; i++) {
+    u8 space = ITEM_HEIGHT + 1;
+    u8 row = space;
+    u8 w1 = 50;
+    u8 w2 = LCD_WIDTH - w1 - ARROW_WIDTH - 4;
+    for (i = 0; row < space * 5; i++) {
         u8 idx;
-        int row = init_y + (h +1) * i;
-        u8 w = 40;
         labelDesc.style = LABEL_LEFT;
         u8 ch = mp->top_channel + i;
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
         if (ch < NUM_OUT_CHANNELS) {
-            //obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
-            //        MIXPAGE_ChanNameProtoCB, limitselect_cb, (const void *)((long)ch));
-            //GUI_SetSelectable(obj, 1);
-            obj = GUI_CreateButtonPlateText(x, row, w, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+            obj = GUI_CreateButtonPlateText(0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
         }
         else {
-            obj = GUI_CreateLabelBox(x, row, w, h, &labelDesc,
+            obj = GUI_CreateLabelBox(0, row, w1, h, &labelDesc,
                                    MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)ch));
         }
         mp->itemObj[i *2] = obj;
 
-        w = 24;
+        labelDesc.style = LABEL_CENTER;
+        mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(w1 + 2, row, w2, h , &labelDesc, template_name_cb, 0,
+                templateselect_cb, (void *)((long)ch));
+
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].src && mix[idx].dest == ch)
                 break;
-
         if (idx != NUM_MIXERS) {
-            //enum TemplateType template = MIXER_GetTemplate(ch);
-            obj = GUI_CreateLabelBox(42, row, w, h, &labelDesc, show_source, NULL, &mix[idx].src);
-            GUI_SetSelectable(obj, 0);
+            row += space;
+            enum TemplateType template = MIXER_GetTemplate(ch);
+            labelDesc.style = LABEL_LEFTCENTER;
+            GUI_CreateLabelBox(0, row, w1, h, &labelDesc, show_source, NULL, &mix[idx].src);
+            if (template == MIXERTEMPLATE_EXPO_DR) {
+                if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
+                    GUI_CreateLabelBox(w1 + 2, row, 35, h, &labelDesc, show_source, NULL, &mix[idx+1].sw);
+                }
+                if (mix[idx].src == mix[idx+2].src && mix[idx].dest == mix[idx+2].dest && mix[idx+2].sw) {
+                    GUI_CreateLabelBox(w1 + 2 + 37, row, 30, h, &labelDesc, show_source, NULL, &mix[idx+2].sw);
+                }
+            }
         }
-
-        w = 53;  //minor fix: change to draw after drawing label of src, if  the length of middle label is too long, the button can be on top of it
-        labelDesc.style = LABEL_CENTER;
-        mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(70, row, w, h , &labelDesc, template_name_cb, 0,
-                templateselect_cb, (void *)((long)ch));
+        row += space;
     }
+    mp->entries_per_page = i;
+    mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > mp->entries_per_page ?
+            Model.num_channels + NUM_VIRT_CHANNELS - mp->entries_per_page : Model.num_channels + NUM_VIRT_CHANNELS;
     if (!GUI_IsSelectable(mp->itemObj[selectedIdx])) {
         selectedIdx++;
     }
     GUI_SetSelected(mp->itemObj[selectedIdx]);
 
-    x = LCD_WIDTH - ARROW_WIDTH;
-    mp->scroll_bar = GUI_CreateScrollbar(x, 0, LCD_HEIGHT, Model.num_channels + NUM_VIRT_CHANNELS, NULL, NULL, NULL);
+    mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT - ITEM_HEIGHT,
+            Model.num_channels + NUM_VIRT_CHANNELS, NULL, NULL, NULL);
+    u8 current_row = mp->top_channel + selectedIdx/2;
+    if (current_row > 0)
+        GUI_SetScrollbar(mp->scroll_bar, current_row);
 }
 
 void navigate_item(s8 direction, u8 step)
@@ -145,6 +158,7 @@ void navigate_item(s8 direction, u8 step)
         }
         _show_page();
     }
+    top_channel = mp->top_channel; // backup mp->top_channel, so that we can restore previous position when re-entering this page
     current_row = mp->top_channel + selectedIdx/2;
     GUI_SetScrollbar(mp->scroll_bar, current_row);
 }
@@ -160,9 +174,9 @@ u8 action_cb(u32 button, u8 flags, void *data)
         }else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
             navigate_item(1, 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            navigate_item(-1, mp->entries_per_page);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
             navigate_item(1, mp->entries_per_page);
+        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            navigate_item(-1, mp->entries_per_page);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
