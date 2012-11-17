@@ -59,6 +59,7 @@ static const struct page pages[] = {
 
 static u8 page;
 static u8 modal;
+static u8 quick_page_enabled;
 static struct buttonAction action;
 static u8 (*ActionCB)(u32 button, u8 flags, void *data);
 void PAGE_Init()
@@ -79,7 +80,7 @@ void PAGE_Init()
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
-    pages[page].init(0);
+    PAGE_ChangeByName("MainPage", 0);
 
     labelDesc.font = DEFAULT_FONT.font;
     labelDesc.style = LABEL_LEFT;
@@ -101,6 +102,10 @@ void PAGE_ChangeByName(const char *pageName, s8 menuPage)
     if (pages[page].exit)
         pages[page].exit();
     page = newpage;
+    if (pages[page].init == PAGE_MainInit)
+        quick_page_enabled = 1;
+    else if (pages[page].init == PAGE_MenuInit)
+        quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
     pages[page].init(menuPage);
 }
@@ -178,7 +183,7 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     u8 result = 0;
     if (ActionCB != NULL)
         result = ActionCB(button, flags, data);
-    if(! result)
+    if(! result && quick_page_enabled)
         result = PAGE_QuickPage(button, flags, data);
     return result;
 }
