@@ -50,6 +50,7 @@ static const struct page pages[] = {
     {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
     {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
     {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
+    {PAGE_TelemtestGPSInit, PAGE_TelemtestEvent, NULL, "TeleGPS"},
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
     {PAGE_AboutInit, NULL, NULL, "About"},
 

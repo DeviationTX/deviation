@@ -23,6 +23,8 @@
 typedef enum {
     telemetry_basic,
     telemetry_gps,
+    telemetry_basic_single,
+    telemetry_gps_single,
 } TeleMetryMonitorType;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -45,7 +47,8 @@ static void _show_page1()
     GUI_CreateLabelBox(w + 13, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Volt:"));
     GUI_CreateLabelBox(w + w + 18, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("RPM:"));
     w = 10;
-    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+    if(current_page == telemetry_basic)
+        GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
 
     u8 space = ITEM_HEIGHT +1;
     u8 row = space;
@@ -82,7 +85,8 @@ static void _show_page2()
     current_item = 0;
     PAGE_ShowHeader(_tr_noop("GPS")); // to draw a underline only
     u8 w = 10;
-    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+    if(current_page == telemetry_gps)
+        GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
 
     // Create a logical view
     u8 space = ITEM_HEIGHT + 1;
@@ -122,16 +126,32 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
 void PAGE_TelemtestInit(int page)
 {
     (void)okcancel_cb;
-    (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     memset(tp.volt, 0, sizeof(tp.volt));
     memset(tp.temp, 0, sizeof(tp.temp));
     memset(tp.rpm, 0, sizeof(tp.rpm));
-    if (current_page== telemetry_gps)
-        _show_page2();
-    else
+    if (page == 0) {
+        current_page = telemetry_basic_single;
         _show_page1();
+    } else {
+        if (current_page == telemetry_gps) {
+            _show_page2();
+        } else {
+            current_page = telemetry_basic;
+            _show_page1();
+        }
+    }
+}
+
+void PAGE_TelemtestGPSInit(int page)
+{
+    (void)okcancel_cb;
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_SetActionCB(_action_cb);
+    current_page = telemetry_gps_single;
+    _show_page2();
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
@@ -197,9 +217,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             _navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
             _navigate_items(1);
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+        } else if (current_page == telemetry_basic && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
             _navigate_pages(1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+        }  else if (current_page == telemetry_gps && CHAN_ButtonIsPressed(button,BUT_LEFT)) {
             _navigate_pages(-1);
         }
         else {
