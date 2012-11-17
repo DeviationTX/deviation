@@ -17,6 +17,7 @@
 #include "pages.h"
 //#include "icons.h"
 #include "gui/gui.h"
+#include "config/model.h"
 
 //static buttonAction_t button_action;
 struct LabelDesc labelDesc; // create a style-customizable font so that it can be shared for all pages
@@ -26,6 +27,7 @@ static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
 static u8 action_cb(u32 button, u8 flags, void *data);
+void PAGE_ChangeQuick(int dir);
 
 struct page {
     void (*init)(int i);
@@ -175,6 +177,8 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     u8 result = 0;
     if (ActionCB != NULL)
         result = ActionCB(button, flags, data);
+    if(! result)
+        result = PAGE_QuickPage(button, flags, data);
     return result;
 }
 
@@ -206,4 +210,53 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
     *view_origin_relativeY = GUI_GetLogicalViewOriginRelativeY(view_id);
     if (scroll_bar != NULL)
         GUI_SetScrollbar(scroll_bar, *selectedIdx);
+}
+
+void PAGE_ChangeQuick(int dir)
+{
+    int quick = 0;
+    for (int i = 0; i < 4; i++) {
+        if(Model.pagecfg.quickpage[i] && Model.pagecfg.quickpage[i] == page) {
+            quick = i+1;
+            break;
+        }
+    }
+    int increment = dir > 0 ? 1 : NUM_QUICKPAGES;
+    while(1) {
+       quick = (quick + increment) % 5;
+       if (quick == 0 || Model.pagecfg.quickpage[quick-1])
+           break;
+    }
+    if (quick == 0) {
+        PAGE_ChangeByName("MainPage", 0);
+    } else {
+        PAGE_ChangeByName(pages[Model.pagecfg.quickpage[quick-1]].pageName, 0);
+    }
+}
+int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
+{
+    (void)data;
+
+    if((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[0] &&
+       CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[0]))
+    {
+        PAGE_ChangeQuick(1);
+        return 1;
+    } else if ((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[1] &&
+               CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[1]))
+    {
+        PAGE_ChangeQuick(-1);
+        return 1;
+    }
+    return 0;
+}
+const char *PAGE_GetName(int i)
+{
+    if(i == 0)
+        return _tr("None");
+    return _tr(pages[i].pageName);
+}
+int PAGE_GetNumPages()
+{
+    return sizeof(pages) / sizeof(struct page) - 1;
 }

@@ -110,4 +110,5 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
 
+int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 #endif

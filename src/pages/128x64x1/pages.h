@@ -130,4 +130,6 @@ void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
 
 void PAGE_AboutInit(int page);
+
+int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 #endif

@@ -80,6 +80,8 @@ void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
 void PAGE_ShowLowBattDialog();
 void PAGE_DisableSafetyDialog(u8 disable);
+const char *PAGE_GetName(int idx);
+int PAGE_GetNumPages();
 
 /* Protocol */
 #define PROTODEF(proto, map, init, name) proto,

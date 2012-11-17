@@ -132,6 +132,9 @@ static const char GUI_TGLICO[] = "tglico";
 static const char GUI_BAR[] = "bar";
 static const char GUI_BOX[] = "box";
 static const char GUI_TELEMETRY[] = "telemetry";
+static const char GUI_QUICKPAGE[] = "quickpage";
+static const char GUI_QUICKNEXT[] = "quicknext";
+static const char GUI_QUICKPREV[] = "quickprev";
 /* End */
 
 s8 mapstrcasecmp(const char *s1, const char *s2)
@@ -673,6 +676,30 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->pagecfg.tglico[idx] = atoi(value);
             return 1;
         }
+        if (MATCH_START(name, GUI_QUICKPAGE)) {
+            u8 idx = name[9] - '1';
+            if (idx >= NUM_QUICKPAGES) {
+                printf("%s: Only %d quickpages are supported\n", section, NUM_QUICKPAGES);
+                return 1;
+            }
+            int max = PAGE_GetNumPages();
+            for(i = 0; i < max; i++) {
+                if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
+                    m->pagecfg.quickpage[idx] = i;
+                    return 1;
+                }
+            }
+            printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
+            return 1;
+        }
+        if (MATCH_KEY(GUI_QUICKNEXT)) {
+            m->pagecfg.quickbtn[0] = get_button(section, value);
+            return 1;
+        }
+        if (MATCH_KEY(GUI_QUICKPREV)) {
+            m->pagecfg.quickbtn[1] = get_button(section, value);
+            return 1;
+        }
     }
     printf("Unknown Section: '%s'\n", section);
     return 0;
@@ -885,6 +912,18 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceName(file, val));
             if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
                 fprintf(fh, "%s%d=%d\n", GUI_TGLICO, idx+1, m->pagecfg.tglico[idx]);
+        }
+    }
+    if (WRITE_FULL_MODEL || m->pagecfg.quickbtn[0]) {
+        fprintf(fh, "%s=%s\n", GUI_QUICKNEXT, INPUT_ButtonName(m->pagecfg.quickbtn[0]));
+    }
+    if (WRITE_FULL_MODEL || m->pagecfg.quickbtn[1]) {
+        fprintf(fh, "%s=%s\n", GUI_QUICKPREV, INPUT_ButtonName(m->pagecfg.quickbtn[1]));
+    }
+    for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
+        if (WRITE_FULL_MODEL || m->pagecfg.quickpage[idx]) {
+            u8 val = m->pagecfg.quickpage[idx];
+            fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
     CONFIG_EnableLanguage(1);

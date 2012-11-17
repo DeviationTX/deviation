@@ -110,13 +110,13 @@ guiObject_t *firstObj;
 static void select_toggle_icon(u8 idx);
 static void iconpress_cb(guiObject_t *obj, const void *data);
 
-#define MAX_PAGE 1 // bug fix: divided by 0 error; scroll bar is 1-based now
+#define MAX_PAGE 2 // bug fix: divided by 0 error; scroll bar is 1-based now
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;
     (void)data;
-    s8 newpos = (s8)page_num + direction;
+    s8 newpos = (s8)page_num + direction > 0 ? 1 : -1;
     if (newpos < 0)
         newpos = 0;
     else if (newpos > MAX_PAGE)
@@ -145,8 +145,8 @@ static void _show_page()
 
     u16 y = 144;
     if (page_num == 0) {
-        GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
-        firstObj = GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
+        firstObj = GUI_CreateLabel(COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
+        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
         GUI_CreateLabel(COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars:"));
         GUI_CreateTextSelect(COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
         for(i = 0; i < 4; i++) {
@@ -180,6 +180,20 @@ static void _show_page()
             GUI_CreateTextSelect(COL4_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
             y+= 24;
         }
+    } else if (page_num == 2) {
+        y = 40;
+        firstObj = GUI_CreateLabel(COL1_VALUE, y, NULL, DEFAULT_FONT, _tr("Menu +"));
+        GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, buttonsel_cb, (void *)0L);
+        y += 24;
+        GUI_CreateLabel(COL1_VALUE, y, NULL, DEFAULT_FONT, _tr("Menu -"));
+        GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, buttonsel_cb, (void *)1L);
+        y += 34;
+        for (i = 0; i < 4; i++) {
+            GUI_CreateLabel(COL1_VALUE, y, menulabel_cb, DEFAULT_FONT, (void *)i);
+            GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, menusel_cb, (void *)i);
+            y += 24;
+        }
+        return;
     }
     build_image();
 }

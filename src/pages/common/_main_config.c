@@ -330,10 +330,35 @@ void PAGE_MainCfgInit(int page)
     _show_title();
     _show_page();
 }
+
+const char *buttonsel_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void) obj;
+    u8 *button = &Model.pagecfg.quickbtn[data ? 1 : 0];
+    *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
+    return INPUT_ButtonName(*button);
+}
+
+const char *menusel_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void) obj;
+    (void) dir;
+    int i = (long)data;
+    int max_pages = PAGE_GetNumPages();
+    Model.pagecfg.quickpage[i] = GUI_TextSelectHelper(Model.pagecfg.quickpage[i],
+                                     0, max_pages, dir, 1, 1, NULL);
+    return PAGE_GetName(Model.pagecfg.quickpage[i]);
+}
+
+const char *menulabel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    long i = (long)data;
+    sprintf(str, "%s %d", _tr("Menu"), (int)i+1);
+    return str;
+}
+
 void PAGE_MainCfgEvent()
 {
 }
-
-
-
 

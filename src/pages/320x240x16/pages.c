@@ -17,6 +17,7 @@
 #include "pages.h"
 #include "icons.h"
 #include "gui/gui.h"
+#include "config/model.h"
 
 static buttonAction_t button_action;
 static u8 (*ActionCB)(u32 button, u8 flags, void *data);
@@ -28,6 +29,7 @@ static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
 static void PAGE_SwitchByName(const char *name);
 void PAGE_Exit();
+void PAGE_ChangeQuick(int dir);
 
 #define PAGE_NAME_MAX 10
 struct page {
@@ -58,8 +60,6 @@ static const struct page pages[] = {
     {NULL, NULL, NULL, NULL},
 };
 
-static const struct page *curpage;
-
 struct page_group {
     u8 group;
     const char *name;
@@ -82,11 +82,13 @@ struct page_group groups[] = {
     {2, "USB"},
     {255, NULL}
 };
-static u8 page;
+static u8 cur_section;
+static u8 cur_page;
 static u8 modal;
 void PAGE_Init()
 {
-    page = 0;
+    cur_page = sizeof(pages) / sizeof(struct page) - 1;
+    cur_section = 0;
     modal = 0;
     GUI_RemoveAllObjects();
     enter_cmd = NULL;
@@ -101,18 +103,16 @@ void PAGE_Init()
 void PAGE_SetSection(u8 section)
 {
     u8 p;
-    u8 newpage = page;
+    u8 newpage = cur_page;
     for(p = 0; groups[p].name != 0; p++) {
         if(groups[p].group == section) {
             newpage = p;
             break;
         }
     }
-    if (newpage != page) {
-        PAGE_Exit();
-        page = newpage;
-        PAGE_RemoveAllObjects();
-        PAGE_SwitchByName(groups[page].name);
+    if (newpage != cur_page) {
+        cur_section = section;
+        PAGE_SwitchByName(groups[newpage].name);
     }
 }
 
@@ -120,28 +120,26 @@ void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
-    u8 nextpage = page;
+    u8 nextpage = cur_page;
     if(dir > 0) {
-        if (groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[page].group) {
+        if (groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[cur_page].group) {
             nextpage++;
         } else {
-            while(nextpage && groups[nextpage-1].group == groups[page].group)
+            while(nextpage && groups[nextpage-1].group == groups[cur_page].group)
               nextpage--;
         } 
     } else if (dir < 0) {
-        if (nextpage && groups[nextpage-1].group == groups[page].group) {
+        if (nextpage && groups[nextpage-1].group == groups[cur_page].group) {
             nextpage--;
         } else {
-            while(groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[page].group)
+            while(groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[cur_page].group)
                 nextpage++;
         }
     }
-    if (page == nextpage)
+    if (cur_page == nextpage)
         return;
     PAGE_Exit();
-    page = nextpage;
-    PAGE_RemoveAllObjects();
-    PAGE_SwitchByName(groups[page].name);
+    PAGE_SwitchByName(groups[nextpage].name);
 }
 
 void PAGE_SwitchByName(const char *name)
@@ -149,8 +147,13 @@ void PAGE_SwitchByName(const char *name)
     int i = 0;
     while(pages[i].init) {
         if(strcmp(name, pages[i].pageName) == 0) {
-            curpage = &pages[i];
-            curpage->init(0);
+            if (cur_page != i) {
+                PAGE_Exit();
+                cur_page = i;
+                PAGE_RemoveAllObjects();
+                pages[cur_page].init(0);
+            }
+            break;
         }
         i++;
     }
@@ -158,14 +161,14 @@ void PAGE_SwitchByName(const char *name)
 
 void PAGE_Event()
 {
-    if(curpage && curpage->event)
-        curpage->event();
+    if(pages[cur_page].event)
+        pages[cur_page].event();
 }
 
 void PAGE_Exit()
 {
-    if(curpage && curpage->exit)
-        curpage->exit();
+    if(pages[cur_page].exit)
+        pages[cur_page].exit();
 }
 
 u8 PAGE_SetModal(u8 _modal)
@@ -185,9 +188,15 @@ void changepage_cb(guiObject_t *obj, const void *data)
     if((long)data == 0) {
         PAGE_SetSection(SECTION_MAIN);
     } else if ((long)data == 1) {
-        PAGE_Change(1);
+        if (cur_section == 0)
+            PAGE_ChangeQuick(1);
+        else
+            PAGE_Change(1);
     } else if ((long)data == -1) {
-        PAGE_Change(-1);
+        if (cur_section == 0)
+            PAGE_ChangeQuick(-1);
+        else
+            PAGE_Change(-1);
     }
 }
 void PAGE_ShowHeader(const char *title)
@@ -230,7 +239,6 @@ u8 page_change_cb(u32 buttons, u8 flags, void *data)
     (void)flags;
     if (ActionCB != NULL)
         return ActionCB(buttons, flags, data);
-
     if (flags & BUTTON_LONGPRESS) {
         if (flags & BUTTON_REPEAT)
             return 0;
@@ -248,6 +256,8 @@ u8 page_change_cb(u32 buttons, u8 flags, void *data)
         }
         return 0;
     }
+    if(PAGE_QuickPage(buttons, flags, data))
+        return 1;
     if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
         PAGE_Change(1);
         return 1;
@@ -278,3 +288,66 @@ guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj
     return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }
 
+const char *PAGE_GetName(int i)
+{
+    if(i == 0)
+        return _tr("None");
+    return _tr(pages[i].pageName);
+}
+int PAGE_GetNumPages()
+{
+    return sizeof(pages) / sizeof(struct page) - 1;
+}
+
+void PAGE_ChangeQuick(int dir)
+{
+    int quick = 0;
+    for (int i = 0; i < 4; i++) {
+        if(Model.pagecfg.quickpage[i] && Model.pagecfg.quickpage[i] == cur_page) {
+            quick = i+1;
+            break;
+        }
+    }
+    int increment = dir > 0 ? 1 : NUM_QUICKPAGES;
+    while(1) {
+       quick = (quick + increment) % 5;
+       if (quick == 0 || Model.pagecfg.quickpage[quick-1])
+           break;
+    }
+    if (quick == 0) {
+        PAGE_SwitchByName("MainPage");
+    } else {
+        PAGE_SwitchByName(pages[Model.pagecfg.quickpage[quick-1]].pageName);
+    }
+}
+
+int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
+{
+    (void)data;
+    //static s8 press = 0;
+    if(cur_section != 0)
+        return 0;
+
+/*    if (press) {
+        if (flags & BUTTON_RELEASE) {
+            PAGE_ChangeQuick(press);
+            press = 0;
+        }
+        return 1;
+    }
+*/
+    if((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[0] &&
+       CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[0]))
+    {
+        //press = 1;
+        PAGE_ChangeQuick(1);
+        return 1;
+    } else if ((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[1] &&
+               CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[1]))
+    {
+        //press = -1;
+        PAGE_ChangeQuick(-1);
+        return 1;
+    }
+    return 0;
+}

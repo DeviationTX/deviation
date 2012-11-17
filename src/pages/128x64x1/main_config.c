@@ -142,7 +142,7 @@ static void _show_page()
     total_items++;
 
     y += space;
-    u8 i;
+    long i;
     for(i = 0; i < 8; i++) {
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                     0, ITEM_HEIGHT, &DEFAULT_FONT, boxlabel_cb, NULL, (void *)(long)i);
@@ -162,7 +162,26 @@ static void _show_page()
                     w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_inv_cb, toggle_val_cb,  (void *)(long)i);
         y+= space;
         total_items++;
+     }
+     /* Quick page config */
+     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Menu +"));
+     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, buttonsel_cb, (void *)0L);
+     y+= space;
+     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Menu -"));
+     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, buttonsel_cb, (void *)1L);
+     y += space;
+     for (i = 0; i < NUM_QUICKPAGES; i++) {
+         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+             0, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)i);
+         GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)i);
+         y += space;
     }
+    total_items += 6;
 
     scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
     if (page_num > 0)

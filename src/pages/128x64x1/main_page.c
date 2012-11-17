@@ -142,20 +142,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_DOWN)) {
         TIMER_Reset(0);
         TIMER_Reset(1);;
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) { // hot key to change brightness
-        u8 changed;
-        Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
-              MIN_BRIGHTNESS, 9, 1, 1, 1, &changed);
-        if (changed)
-            BACKLIGHT_Brightness(Transmitter.brightness);
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) { // hot key to change brightness
-        u8 changed;
-        Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
-              MIN_BRIGHTNESS, 9, -1, 1, 1, &changed);
-        if (changed)
-            BACKLIGHT_Brightness(Transmitter.brightness);
-    }
-    else {
+    } else if (! PAGE_QuickPage(button, flags, data)) {
         MIXER_UpdateTrim(button, flags, data);
     }
     return 1;

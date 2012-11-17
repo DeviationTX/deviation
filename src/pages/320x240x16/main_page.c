@@ -177,7 +177,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             mp->ignore_release = 1;
             TIMER_Reset(0);
             TIMER_Reset(1);
-        } else {
+        } else if (! PAGE_QuickPage(button, flags, data)) {
             MIXER_UpdateTrim(button, flags, data);
         }
         return 1;
