@@ -61,8 +61,8 @@ Iluminare:
 Bara %d:
 :Bars:
 Bare:
-:Basic config
-Configurare
+<:Basic config
+<Configurare
 :Batt alarm:
 Alarmă bat.:
 :Battery alarm:
@@ -79,8 +79,9 @@ Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT 
 Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 :Box %d:
 Loc%d:
-:Buttons
-Butoane
+>:Button monitor
+<:Buttons
+<Butoane
 :COL
 Colectiv
 :COL Inv:
@@ -101,10 +102,11 @@ Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 Ch
 :Change
 Modifică
+>:Channel monitor
 :Channel output
 Ieșire canal
-:Channels
-Canale
+<:Channels
+<Canale
 :Complex
 Complex
 :Configure
@@ -187,10 +189,11 @@ Elicopter
 Pos0
 :Icon
 Icon
+>:Input monitor
 :Input:
 Intrare:
-:Inputs
-Intrări
+<:Inputs
+<Intrări
 :Insert
 Inserare
 :Inverted
@@ -228,10 +231,14 @@ MIX1
 MIX2
 :Main menu
 Meniu principal
+>:Main page
 :Main page config
 Ecran principal
 :Max:
 Max:
+>:Menu
+>:Menu +
+>:Menu -
 :Meter
 Metru
 :Mid-Rate
@@ -246,18 +253,19 @@ Configurare mixer
 Mixere:
 :Mode %d
 Mod %d
-:Model
-Model
-:Model config
-Configurare model
+<:Model
+<Model
+<:Model config
+<Configurare model
+>:Model menu
 :Model name:
 Nume model:
 :Model setup
 Profil model
 :Model type:
 Tip model:
-:Monitor
-Monitor
+<:Monitor
+<Monitor
 :Move Down
 Mișcă în jos
 :Move Up
@@ -426,8 +434,8 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
-:Telemetry
-Telemetrie
+<:Telemetry
+<Telemetrie
 :Telemetry config
 Telemetrie
 :Telemetry monitor
@@ -470,6 +478,7 @@ Apasă pentru a încuia
 Apasă pentru a descuia
 :Transmitter config
 Configurare radio
+>:Transmitter menu
 :Trim
 Trim
 :Trim +:
@@ -490,16 +499,12 @@ Pornește
 Putere radio:
 :USB
 USB
-<:USB Drive
-<Disc USB
 :Unknown
 Necunoscut
 :Up
 Sus
 :Value:
 Valoare:
-<:Version:
-<Versiune
 :Virt
 Virt.
 :Volt

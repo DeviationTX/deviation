@@ -61,8 +61,8 @@ AUX5
 Полоса%d
 :Bars:
 Полоса:
-:Basic config
-Основные настройки
+<:Basic config
+<Основные настройки
 :Batt alarm:
 Сигнал батареи:
 :Battery alarm:
@@ -79,8 +79,9 @@ AUX5
 Привязка... %d секунд\nНажмите ENT для остановки
 :Box %d:
 Бокс %d:
-:Buttons
-Кнопки
+>:Button monitor
+<:Buttons
+<Кнопки
 :COL
 Колл
 :COL Inv:
@@ -101,10 +102,11 @@ AUX5
 Канал 
 :Change
 Изменить
+>:Channel monitor
 :Channel output
 Выход канала
-:Channels
-Каналы
+<:Channels
+<Каналы
 :Complex
 Комплекс
 :Configure
@@ -187,10 +189,11 @@ GPS
 Высокий расход
 :Icon
 Значок
+>:Input monitor
 :Input:
 Ввод:
-:Inputs
-Вводы
+<:Inputs
+<Вводы
 :Insert
 Вставить
 :Inverted
@@ -229,10 +232,14 @@ GPS
 МИКШ2
 :Main menu
 Главное меню
+>:Main page
 :Main page config
 Главная страница
 :Max:
 Макс.:
+>:Menu
+>:Menu +
+>:Menu -
 :Meter
 Метр
 :Mid-Rate
@@ -247,18 +254,19 @@ GPS
 Микшер:
 :Mode %d
 Режим %d
-:Model
-Модель
-:Model config
-Модель
+<:Model
+<Модель
+<:Model config
+<Модель
+>:Model menu
 :Model name:
 Имя модели:
 :Model setup
 Модель
 :Model type:
 Тип модели:
-:Monitor
-Монитор
+<:Monitor
+<Монитор
 :Move Down
 Вниз
 :Move Up
@@ -427,8 +435,8 @@ RPM
 ТелеT
 :TelemV
 ТелеV
-:Telemetry
-Телеметрия
+<:Telemetry
+<Телеметрия
 :Telemetry config
 Телеметрия
 :Telemetry monitor
@@ -471,6 +479,7 @@ RPM
 Нажать для разблокировки
 :Transmitter config
 Передатчик
+>:Transmitter menu
 :Trim
 Триммер
 :Trim +:

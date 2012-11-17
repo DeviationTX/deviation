@@ -28,10 +28,10 @@ struct menu_pages {
 
 struct menu_pages menus[] = {
     //main menu
-    {PAGEID_MENU, _tr_noop("Model config"),       MENUTYPE_MAINMENU, 0, (0 << 4) | MENUTYPE_SUBMENU},
-    {PAGEID_MENU, _tr_noop("Transmitter config"), MENUTYPE_MAINMENU, 1, (1 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_MENU, _tr_noop("Model menu"),       MENUTYPE_MAINMENU, 0, (0 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_MENU, _tr_noop("Transmitter menu"), MENUTYPE_MAINMENU, 1, (1 << 4) | MENUTYPE_SUBMENU},
     {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, 0},
-    {PAGEID_TELEMMON, NULL, MENUTYPE_MAINMENU, 1, PREVIOUS_ITEM},
+    {PAGEID_ABOUT,    NULL, MENUTYPE_MAINMENU, 1, PREVIOUS_ITEM},
     // sub menu items 1
     {PAGEID_MIXER,    NULL, MENUTYPE_SUBMENU,  0, 0},
     {PAGEID_MODEL,    NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
@@ -42,7 +42,7 @@ struct menu_pages menus[] = {
     // sub menu item 2
     {PAGEID_TXCFG,    NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
     {PAGEID_CHANMON,  NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
-    {PAGEID_ABOUT,    NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
+    {PAGEID_TELEMMON, NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;

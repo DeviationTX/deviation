@@ -24,7 +24,7 @@ void PAGE_AboutInit(int page)
 {
     (void)page;
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("About Deviation"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_ABOUT));
     PAGE_SetActionCB(_action_cb);
 
     strcpy(up->tmpstr, (const char *) _tr("Deviation FW version:"));

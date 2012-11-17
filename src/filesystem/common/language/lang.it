@@ -61,8 +61,8 @@ Luminosità
 Barra %d:
 :Bars:
 Barre:
-:Basic config
-Config. di base
+<:Basic config
+<Config. di base
 :Batt alarm:
 Allarme batteria:
 :Battery alarm:
@@ -79,8 +79,9 @@ Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non int
 Binding...\n%d secondi\nPremi ENT per fermare
 :Box %d:
 Box%d:
-:Buttons
-Bottoni
+>:Button monitor
+<:Buttons
+<Bottoni
 :COL
 Collet.
 :COL Inv:
@@ -101,10 +102,11 @@ Centra tutti gli\nsticks e le manopole\nquindi premi ENT
 Ch
 :Change
 Cambia
+>:Channel monitor
 :Channel output
 Canale di uscita
-:Channels
-Canale
+<:Channels
+<Canale
 :Complex
 Complesso
 :Configure
@@ -113,7 +115,7 @@ Configura
 Contrasto:
 :Copy To
 :Copy To...
-Salva su...
+>:Copy To...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarà salvata.\n\nCarica la batteria ora!
 :Curve:
@@ -186,10 +188,11 @@ Elicottero
 Rate Alto
 :Icon
 Icona
+>:Input monitor
 :Input:
 Ingresso:
-:Inputs
-Ingressi
+<:Inputs
+<Ingressi
 :Insert
 Inserisci
 :Inverted
@@ -228,10 +231,14 @@ MIX1
 MIX2
 :Main menu
 Menù principale
+>:Main page
 :Main page config
 Pagina di Configurazione
 :Max:
 Max:
+>:Menu
+>:Menu +
+>:Menu -
 :Meter
 Metro
 :Mid-Rate
@@ -246,18 +253,19 @@ Mixer
 Mixers:
 :Mode %d
 Modo %d
-:Model
-Modello
-:Model config
-Config. del Modello
+<:Model
+<Modello
+<:Model config
+<Config. del Modello
+>:Model menu
 :Model name:
 Nome del modello:
 :Model setup
 Setup del modello
 :Model type:
 Tipo del modello:
-:Monitor
-Monitor
+<:Monitor
+<Monitor
 :Move Down
 Muovi Giù
 :Move Up
@@ -366,7 +374,7 @@ Sempl.
 Velocità
 :Speed:
 :Src
-Sorgente
+>:Src
 :Src:
 Sorgente:
 :Start:
@@ -425,8 +433,8 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
-:Telemetry
-Telemetria
+<:Telemetry
+<Telemetria
 :Telemetry config
 Config. etlemetria
 :Telemetry monitor
@@ -445,7 +453,7 @@ Modello..
 Test
 :Time
 :Timer
-Timer
+>:Timer
 :Timer settings
 Config. Timer
 :Timers
@@ -468,6 +476,7 @@ Tocca per bloccare
 Tocca per sbloccare
 :Transmitter config
 Config. trasmittente
+>:Transmitter menu
 :Trim
 Trim
 :Trim +:
@@ -500,7 +509,7 @@ Virt
 Volt
 :Volt:
 :Zero/Max
-0/Max
+>:Zero/Max
 :\n\nBinding will end in %d seconds...
 \n\nIl Binding finirà tra %d secondi...
 :add

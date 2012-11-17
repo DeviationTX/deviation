@@ -61,8 +61,8 @@ Fényerő:
 Oszlop%d:
 :Bars:
 Oszlop:
-:Basic config
-Beállítások
+<:Basic config
+<Beállítások
 :Batt alarm:
 Fesz. riaszt.:
 :Battery alarm:
@@ -79,8 +79,9 @@ Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcs
 Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 :Box %d:
 Doboz%d:
-:Buttons
-Gombok
+>:Button monitor
+<:Buttons
+<Gombok
 :COL
 Kollektív
 :COL Inv:
@@ -101,10 +102,11 @@ Mégsem
 Cs
 :Change
 Váltás
+>:Channel monitor
 :Channel output
 Csatornák
-:Channels
-Csatornák
+<:Channels
+<Csatornák
 :Complex
 Komplex
 :Configure
@@ -187,10 +189,11 @@ Helikopter
 Magas
 :Icon
 Ikon
+>:Input monitor
 :Input:
 Bemenet:
-:Inputs
-Bemenetek
+<:Inputs
+<Bemenetek
 :Insert
 Beszúrás
 :Inverted
@@ -229,10 +232,14 @@ MIX1
 MIX2
 :Main menu
 Főmenü
+>:Main page
 :Main page config
 Főablak konfig.
 :Max:
 Max:
+>:Menu
+>:Menu +
+>:Menu -
 :Meter
 Méter
 :Mid-Rate
@@ -247,18 +254,19 @@ Mixer
 Mixerek:
 :Mode %d
 Mód %d
-:Model
-Modell
-:Model config
-Modell konfig.
+<:Model
+<Modell
+<:Model config
+<Modell konfig.
+>:Model menu
 :Model name:
 Modell név:
 :Model setup
 Modell konfig.
 :Model type:
 Modell típus:
-:Monitor
-Monitor
+<:Monitor
+<Monitor
 :Move Down
 Lejjebb
 :Move Up
@@ -427,8 +435,8 @@ TelemFord
 TelemHőm
 :TelemV
 TelemFesz
-:Telemetry
-Telemtria
+<:Telemetry
+<Telemtria
 :Telemetry config
 Telemetria konfig.
 :Telemetry monitor
@@ -471,6 +479,7 @@ Képernyő:
 Érintse meg a feloldáshoz
 :Transmitter config
 Távirányító konfig.
+>:Transmitter menu
 :Trim
 Trim
 :Trim +:

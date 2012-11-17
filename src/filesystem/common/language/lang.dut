@@ -58,7 +58,6 @@ Helderheid:
 Balk %d:
 :Bars:
 Balken:
->:Basic config
 >:Batt alarm:
 :Battery alarm:
 Batterijalarm:
@@ -72,8 +71,9 @@ Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige 
 >:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Kader %d:
-:Buttons
-Knoppen
+>:Button monitor
+<:Buttons
+<Knoppen
 :COL
 COL
 :COL Inv:
@@ -91,9 +91,10 @@ Annuleren
 Kan
 :Change
 Aanpassen
+>:Channel monitor
 >:Channel output
-:Channels
-Kanalen
+<:Channels
+<Kanalen
 :Complex
 Complex
 :Configure
@@ -164,10 +165,11 @@ Helikopter
 Hoog
 :Icon
 Icoon
+>:Input monitor
 :Input:
 Invoer:
-:Inputs
-Invoeren
+<:Inputs
+<Invoeren
 >:Insert
 :Inverted
 Omgekeerd
@@ -199,10 +201,14 @@ MIX1
 :MIX2
 MIX2
 >:Main menu
+>:Main page
 :Main page config
 Configuratie hoofdscherm
 :Max:
 Max:
+>:Menu
+>:Menu +
+>:Menu -
 >:Meter
 :Mid-Rate
 Middel
@@ -216,15 +222,14 @@ Mixer
 Mixers:
 :Mode %d
 Mode %d
-:Model
-Model
->:Model config
+<:Model
+<Model
+>:Model menu
 :Model name:
 Modelnaam:
 >:Model setup
 :Model type:
 Modeltype:
->:Monitor
 >:Move Down
 >:Move Up
 >:Move sticks and knobs\nto Max & Min positions\nthen press ENT
@@ -367,7 +372,6 @@ TRIM_R-
 >:TelemRPM
 >:TelemT
 >:TelemV
->:Telemetry
 >:Telemetry config
 >:Telemetry monitor
 >:Telemetry settings
@@ -399,6 +403,7 @@ Raak aan om vast te zetten
 :Touch to Unlock
 Raak aan om los te maken
 >:Transmitter config
+>:Transmitter menu
 :Trim
 Trim
 :Trim +:

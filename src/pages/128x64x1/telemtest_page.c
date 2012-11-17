@@ -212,7 +212,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_ChangeByID(PAGEID_MENU, 0);
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             _navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
