@@ -84,6 +84,7 @@ if(! $update && ! $target) {
 
 foreach my $file (@files) {
     my %strings = %uniq;
+    my %targetstr;
     my %unused;
     open my $fh, "<", $file;
     my $name = <$fh>;
@@ -98,7 +99,17 @@ foreach my $file (@files) {
                 $unused{$eng} = 1;
             }
             $strings{$eng} = $next;
+        } elsif(/^\|(\S+?):(.*)/) {
+            my($t, $eng) = ($1, $2);
+            my $next = <$fh>;
+            chomp $next;
+            if (! exists $uniq{$eng}) {
+                $unused{$eng} = 1;
+            }
+            $targetstr{$t}{$eng} = $next;
+            $strings{$eng} ||= $next;
         }
+        
     }
     if($target) {
         #if target is specified, we want to return a filtered list of strings
@@ -106,6 +117,8 @@ foreach my $file (@files) {
         $outf =~ s/common/$target/;
         open $fh, ">", $outf;
         print $fh $name;
+        $targetstr{$target} ||= {};
+        %strings = (%strings, %{$targetstr{$target}});
         foreach (sort keys %strings) {
             if(! $unused{$_} && defined($strings{$_})) {
                 print $fh ":$_\n$strings{$_}\n";
@@ -115,13 +128,29 @@ foreach my $file (@files) {
     } else {
         open $fh, ">", $file;
         print $fh $name;
-        foreach (sort keys %strings) {
-            if ($unused{$_}) {
-                print $fh "<:$_\n<$strings{$_}\n";
-            } elsif(! defined($strings{$_})) {
-                print $fh ">:$_\n";
+        foreach my $str (sort (keys(%strings))) {
+            if ($unused{$str}) {
+                if (scalar(grep {defined $targetstr{$_}{$str}} keys(%targetmap)) != scalar(keys(%targetmap))) {
+                    #print generic if not all targetshave a translation
+                    print $fh "<:$str\n<$strings{$str}\n";
+                }
+                foreach my $key (sort keys %targetmap) {
+                    if(defined $targetstr{$key}{$str}) {
+                        print $fh "<|$key:$str\n<$targetstr{$key}{$str}\n";
+                    }
+                }
+            } elsif(! defined($strings{$str})) {
+                print $fh ">:$str\n";
             } else {
-                print $fh ":$_\n$strings{$_}\n";
+                if (scalar(grep {defined $targetstr{$_}{$str}} keys(%targetmap)) != scalar(keys(%targetmap))) {
+                    #print generic if not all targetshave a translation
+                    print $fh ":$str\n$strings{$str}\n";
+                }
+                foreach my $key (sort keys %targetmap) {
+                    if(defined $targetstr{$key}{$str}) {
+                        print $fh "|$key:$str\n$targetstr{$key}{$str}\n";
+                    }
+                }
             }
         }
         close $fh;
