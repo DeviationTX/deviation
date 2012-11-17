@@ -26,36 +26,62 @@ static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
+static void PAGE_SwitchByName(const char *name);
+void PAGE_Exit();
 
+#define PAGE_NAME_MAX 10
 struct page {
     void (*init)(int i);
     void (*event)();
     void (*exit)();
+    const char *pageName;
 };
 
 struct pagemem pagemem;
 
 static const struct page pages[] = {
-    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit},
-    {NULL, NULL, NULL},
-    {PAGE_MixerInit, PAGE_MixerEvent, NULL},
-    {PAGE_ModelInit, PAGE_ModelEvent, NULL},
-    {PAGE_TimerInit, PAGE_TimerEvent, NULL},
-    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL},
-    {PAGE_TrimInit, PAGE_TrimEvent, NULL},
-    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL},
-    {NULL, NULL, NULL},
-    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL},
-    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL},
-    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
-    {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
-    {PAGE_ButtontestInit, PAGE_ChantestEvent, PAGE_ChantestExit},
-    {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
+    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},
+    {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
+    {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},
+    {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
+    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
+    {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
+    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
+    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
+    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
+    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
+    {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "InputMon"},
+    {PAGE_ButtontestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "ButtonMon"},
+    {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit, "Scanner"},
     //{PAGE_TestInit, PAGE_TestEvent, NULL},
-    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit},
-    {NULL, NULL, NULL},
+    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
+    {NULL, NULL, NULL, NULL},
 };
 
+static const struct page *curpage;
+
+struct page_group {
+    u8 group;
+    const char *name;
+};
+
+struct page_group groups[] = {
+    {0, "MainPage"},
+    {1, "Mixer"},
+    {1, "ModelCon"},
+    {1, "Timer"},
+    {1, "TeleConf"},
+    {1, "Trim"},
+    {1, "MainConf"},
+    {2, "TxConfig"},
+    {2, "TeleMoni"},
+    {2, "Monitor"},
+    {2, "InputMon"},
+    {2, "ButtonMon"},
+    {2, "Scanner"},
+    {2, "USB"},
+    {255, NULL}
+};
 static u8 page;
 static u8 modal;
 void PAGE_Init()
@@ -69,28 +95,24 @@ void PAGE_Init()
         CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
         | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
         BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
-    pages[page].init(0);
+    PAGE_SwitchByName("MainPage");
 }
 
 void PAGE_SetSection(u8 section)
 {
     u8 p;
     u8 newpage = page;
-    u8 sec = 0;
-    for(p = 0; p < sizeof(pages) / sizeof(struct page); p++) {
-        if(sec == section) {
+    for(p = 0; groups[p].name != 0; p++) {
+        if(groups[p].group == section) {
             newpage = p;
             break;
         }
-        if (pages[p].init == NULL)
-            sec++;
     }
     if (newpage != page) {
-        if (pages[page].exit)
-            pages[page].exit();
+        PAGE_Exit();
         page = newpage;
         PAGE_RemoveAllObjects();
-        pages[page].init(0);
+        PAGE_SwitchByName(groups[page].name);
     }
 }
 
@@ -100,32 +122,50 @@ void PAGE_Change(int dir)
         return;
     u8 nextpage = page;
     if(dir > 0) {
-        if (pages[nextpage+1].init != NULL) {
+        if (groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[page].group) {
             nextpage++;
         } else {
-            while(nextpage && pages[nextpage-1].init != NULL)
+            while(nextpage && groups[nextpage-1].group == groups[page].group)
               nextpage--;
         } 
     } else if (dir < 0) {
-        if (nextpage && pages[nextpage-1].init != NULL) {
+        if (nextpage && groups[nextpage-1].group == groups[page].group) {
             nextpage--;
         } else {
-            while(pages[nextpage+1].init != NULL)
+            while(groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[page].group)
                 nextpage++;
         }
     }
     if (page == nextpage)
         return;
-    if (pages[page].exit)
-        pages[page].exit();
+    PAGE_Exit();
     page = nextpage;
     PAGE_RemoveAllObjects();
-    pages[page].init(0);
+    PAGE_SwitchByName(groups[page].name);
+}
+
+void PAGE_SwitchByName(const char *name)
+{
+    int i = 0;
+    while(pages[i].init) {
+        if(strcmp(name, pages[i].pageName) == 0) {
+            curpage = &pages[i];
+            curpage->init(0);
+        }
+        i++;
+    }
 }
 
 void PAGE_Event()
 {
-    pages[page].event();
+    if(curpage && curpage->event)
+        curpage->event();
+}
+
+void PAGE_Exit()
+{
+    if(curpage && curpage->exit)
+        curpage->exit();
 }
 
 u8 PAGE_SetModal(u8 _modal)
