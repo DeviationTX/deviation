@@ -22,7 +22,7 @@
 static void _draw_page(u8 enable)
 {
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("USB"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_USB));
 
     sprintf(up->tmpstr, "%s\n%s\n%s\n\n%s %s",
             "www.deviationtx.com",

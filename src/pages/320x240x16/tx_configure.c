@@ -123,7 +123,7 @@ void PAGE_TxConfigureInit(int page)
     cp->enable = CALIB_NONE;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("Configure"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_TXCFG));
     GUI_CreateScrollbar(304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
     firstObj = NULL;
     page_num = 0;

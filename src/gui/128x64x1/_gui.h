@@ -10,6 +10,7 @@ enum ImageNames {
     FILE_BTN64_16,
     FILE_BTN48_16,
     FILE_BTN32_16,
+    FILE_SPIN192,
     FILE_SPIN96,
     FILE_SPIN64,
     FILE_SPIN32,

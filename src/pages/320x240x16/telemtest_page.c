@@ -57,7 +57,7 @@ void PAGE_TelemtestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Telemetry"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMMON));
     show_page();
 }
 
@@ -68,7 +68,7 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
     tp.return_val = page;
     PAGE_RemoveAllObjects();
 
-    PAGE_ShowHeader_ExitOnly(_tr("Telemetry"), okcancel_cb);
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
 
     show_page();
 }

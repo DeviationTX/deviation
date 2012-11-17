@@ -26,7 +26,7 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 static void _show_title(int page)
 {
     mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > ENTRIES_PER_PAGE ? Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE : Model.num_channels + NUM_VIRT_CHANNELS;
-    PAGE_ShowHeader(_tr("Mixer"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_MIXER));
     GUI_CreateIcon(192, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
     GUI_CreateIcon(224, 0, &icons[ICON_ORDER], reorder_cb, NULL);
     guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll, NULL, scroll_cb, NULL);

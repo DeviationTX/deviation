@@ -63,7 +63,7 @@ void PAGE_ChantestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Channels"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
     cp->return_page = NULL;
     cp->type = MONITOR_CHANNELOUTPUT;
     _show_bar_page(Model.num_channels);
@@ -73,7 +73,7 @@ void PAGE_InputtestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Inputs"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
     cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
     _show_bar_page(NUM_INPUTS);
@@ -83,7 +83,7 @@ void PAGE_ButtontestInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Buttons"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_BTNMON));
     cp->return_page = NULL;
     cp->type = MONITOR_BUTTONTEST;
     show_button_page();
@@ -97,7 +97,7 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     cp->type = MONITOR_CHANNELOUTPUT;
     PAGE_RemoveAllObjects();
 
-    PAGE_ShowHeader_ExitOnly(_tr("Channels"), okcancel_cb);
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
 
     _show_bar_page(Model.num_channels);
 }

@@ -24,6 +24,7 @@ enum BarGraphDirection {
     TRIM_VERTICAL,
 };
 enum TextSelectType {
+    TEXTSELECT_224,
     TEXTSELECT_128,
     TEXTSELECT_64,
     TEXTSELECT_96,

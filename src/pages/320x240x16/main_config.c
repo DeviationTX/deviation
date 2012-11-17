@@ -190,7 +190,7 @@ static void _show_page()
         y += 34;
         for (i = 0; i < 4; i++) {
             GUI_CreateLabel(COL1_VALUE, y, menulabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, menusel_cb, (void *)i);
+            GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_224, 0x0000, NULL, menusel_cb, (void *)i);
             y += 24;
         }
         return;
@@ -200,7 +200,7 @@ static void _show_page()
 
 static void _show_title()
 {
-     PAGE_ShowHeader(_tr("Main page config")); // using the same name as devo10's menu item to reduce language strings
+     PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));
      guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
      GUI_SetScrollbar(obj, page_num);
 }

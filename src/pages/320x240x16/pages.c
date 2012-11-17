@@ -27,7 +27,7 @@ static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
-static void PAGE_SwitchByName(const char *name);
+static void PAGE_ChangeByID(enum PageID id);
 void PAGE_Exit();
 void PAGE_ChangeQuick(int dir);
 
@@ -36,51 +36,38 @@ struct page {
     void (*init)(int i);
     void (*event)();
     void (*exit)();
-    const char *pageName;
+    const char *name;
 };
 
 struct pagemem pagemem;
 
+#define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
 static const struct page pages[] = {
-    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},
-    {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
-    {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},
-    {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
-    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
-    {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
-    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
-    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
-    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
-    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
-    {PAGE_InputtestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "InputMon"},
-    {PAGE_ButtontestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "ButtonMon"},
-    {PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit, "Scanner"},
-    //{PAGE_TestInit, PAGE_TestEvent, NULL},
-    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
-    {NULL, NULL, NULL, NULL},
+#include "pagelist.h"
 };
+#undef PAGEDEF
 
 struct page_group {
     u8 group;
-    const char *name;
+    enum PageID id;
 };
 
 struct page_group groups[] = {
-    {0, "MainPage"},
-    {1, "Mixer"},
-    {1, "ModelCon"},
-    {1, "Timer"},
-    {1, "TeleConf"},
-    {1, "Trim"},
-    {1, "MainConf"},
-    {2, "TxConfig"},
-    {2, "TeleMoni"},
-    {2, "Monitor"},
-    {2, "InputMon"},
-    {2, "ButtonMon"},
-    {2, "Scanner"},
-    {2, "USB"},
-    {255, NULL}
+    {0, PAGEID_MAIN},
+    {1, PAGEID_MIXER},
+    {1, PAGEID_MODEL},
+    {1, PAGEID_TIMER},
+    {1, PAGEID_TELEMCFG},
+    {1, PAGEID_TRIM},
+    {1, PAGEID_MAINCFG},
+    {2, PAGEID_TXCFG},
+    {2, PAGEID_TELEMMON},
+    {2, PAGEID_CHANMON},
+    {2, PAGEID_INPUTMON},
+    {2, PAGEID_BTNMON},
+    {2, PAGEID_SCANNER},
+    {2, PAGEID_USB},
+    {255, 0}
 };
 static u8 cur_section;
 static u8 cur_page;
@@ -97,14 +84,14 @@ void PAGE_Init()
         CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
         | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
         BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
-    PAGE_SwitchByName("MainPage");
+    PAGE_ChangeByID(PAGEID_MAIN);
 }
 
 void PAGE_SetSection(u8 section)
 {
     u8 p;
     u8 newpage = cur_page;
-    for(p = 0; groups[p].name != 0; p++) {
+    for(p = 0; groups[p].group != 255; p++) {
         if(groups[p].group == section) {
             newpage = p;
             break;
@@ -112,7 +99,7 @@ void PAGE_SetSection(u8 section)
     }
     if (newpage != cur_page) {
         cur_section = section;
-        PAGE_SwitchByName(groups[newpage].name);
+        PAGE_ChangeByID(groups[newpage].id);
     }
 }
 
@@ -122,7 +109,7 @@ void PAGE_Change(int dir)
         return;
     u8 nextpage = cur_page;
     if(dir > 0) {
-        if (groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[cur_page].group) {
+        if (groups[nextpage+1].group == groups[cur_page].group) {
             nextpage++;
         } else {
             while(nextpage && groups[nextpage-1].group == groups[cur_page].group)
@@ -132,30 +119,23 @@ void PAGE_Change(int dir)
         if (nextpage && groups[nextpage-1].group == groups[cur_page].group) {
             nextpage--;
         } else {
-            while(groups[nextpage+1].name != NULL && groups[nextpage+1].group == groups[cur_page].group)
+            while(groups[nextpage+1].group == groups[cur_page].group)
                 nextpage++;
         }
     }
     if (cur_page == nextpage)
         return;
     PAGE_Exit();
-    PAGE_SwitchByName(groups[nextpage].name);
+    PAGE_ChangeByID(groups[nextpage].id);
 }
 
-void PAGE_SwitchByName(const char *name)
+void PAGE_ChangeByID(enum PageID id)
 {
-    int i = 0;
-    while(pages[i].init) {
-        if(strcmp(name, pages[i].pageName) == 0) {
-            if (cur_page != i) {
-                PAGE_Exit();
-                cur_page = i;
-                PAGE_RemoveAllObjects();
-                pages[cur_page].init(0);
-            }
-            break;
-        }
-        i++;
+    if (cur_page != id) {
+        PAGE_Exit();
+        cur_page = id;
+        PAGE_RemoveAllObjects();
+        pages[cur_page].init(0);
     }
 }
 
@@ -292,7 +272,7 @@ const char *PAGE_GetName(int i)
 {
     if(i == 0)
         return _tr("None");
-    return _tr(pages[i].pageName);
+    return _tr(pages[i].name);
 }
 int PAGE_GetNumPages()
 {
@@ -315,9 +295,9 @@ void PAGE_ChangeQuick(int dir)
            break;
     }
     if (quick == 0) {
-        PAGE_SwitchByName("MainPage");
+        PAGE_ChangeByID(PAGEID_MAIN);
     } else {
-        PAGE_SwitchByName(pages[Model.pagecfg.quickpage[quick-1]].pageName);
+        PAGE_ChangeByID(Model.pagecfg.quickpage[quick-1]);
     }
 }
 

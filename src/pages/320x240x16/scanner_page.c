@@ -63,7 +63,7 @@ void PAGE_ScannerInit(int page)
     u8 i;
     (void)page;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Scanner"));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     sp.enable = 0;
     GUI_CreateButton(112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
 

@@ -20,6 +20,7 @@ const struct ImageMap image_map[] = {
     {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
     {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */
     {"media/btn32_16.bmp", 32, 16, 0, 0}, /*FILE_BTN32_16 */
+    {"media/spin192.bmp", 192, 16, 0, 0}, /*FILE_SPIN192 */
     {"media/spin96.bmp",   96, 16, 0, 0}, /*FILE_SPIN96 */
     {"media/spin64.bmp",   64, 16, 0, 0}, /*FILE_SPIN64 */
     {"media/spin32.bmp",   32, 16, 0, 0}, /*FILE_SPIN32 */

@@ -14,6 +14,12 @@
 #include "../common/telemconfig_page.h"
 #include "config/display.h"
 
+#define PAGEDEF(id, init, event, exit, name) id,
+enum PageID {
+#include "pagelist.h"
+};
+#undef PAGEDEF
+
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1
 #define SECTION_OPTIONS 2
