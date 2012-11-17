@@ -131,7 +131,7 @@ static void _show_page()
     GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
             view_origin_absoluteX, view_origin_absoluteY);
 
-    u8 y = 0;
+    int y = 0;
     u8 w = 63;
     u8 x = 56;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
@@ -177,8 +177,9 @@ static void _show_page()
      for (i = 0; i < NUM_QUICKPAGES; i++) {
          GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
              0, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)i);
-         GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)i);
+         y += space;
+         GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+                120, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)i);
          y += space;
     }
     total_items += 6;

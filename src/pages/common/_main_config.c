@@ -354,7 +354,7 @@ const char *menulabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    sprintf(str, "%s %d", _tr("Menu"), (int)i+1);
+    sprintf(str, "%s %d:", _tr("Menu"), (int)i+1);
     return str;
 }
 
