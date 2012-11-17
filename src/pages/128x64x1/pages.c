@@ -33,12 +33,17 @@ struct page {
     void (*init)(int i);
     void (*event)();
     void (*exit)();
-    const char pageName[PAGE_NAME_MAX+1];
+    const char *pageName;
 };
 
 struct pagemem pagemem;
 
+#define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
 static const struct page pages[] = {
+#include "pagelist.h"
+};
+#undef PAGEDEF
+#if 0
     {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},  // Note: the page name length should not exceed 10 chars
     {PAGE_MenuInit, NULL, NULL, "Menu"},
     {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
@@ -56,6 +61,7 @@ static const struct page pages[] = {
 
     //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
 };
+#endif
 
 static u8 page;
 static u8 modal;
@@ -80,28 +86,20 @@ void PAGE_Init()
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
-    PAGE_ChangeByName("MainPage", 0);
+    PAGE_ChangeByID(PAGEID_MAIN, 0);
 
     labelDesc.font = DEFAULT_FONT.font;
     labelDesc.style = LABEL_LEFT;
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff; // not to draw box
 }
 
-void PAGE_ChangeByName(const char *pageName, s8 menuPage)
+void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
-    u8 p;
-    u8 newpage = page;
-    for(p = 0; p < sizeof(pages) / sizeof(struct page); p++) {
-        if (strncmp(pages[p].pageName, pageName, PAGE_NAME_MAX) == 0) {
-            newpage = p;
-            break;
-        }
-    }
     if (pages[page].exit)
         pages[page].exit();
-    page = newpage;
+    page = id;
     if (pages[page].init == PAGE_MainInit)
         quick_page_enabled = 1;
     else if (pages[page].init == PAGE_MenuInit)
@@ -234,9 +232,9 @@ void PAGE_ChangeQuick(int dir)
            break;
     }
     if (quick == 0) {
-        PAGE_ChangeByName("MainPage", 0);
+        PAGE_ChangeByID(PAGEID_MAIN, 0);
     } else {
-        PAGE_ChangeByName(pages[Model.pagecfg.quickpage[quick-1]].pageName, 0);
+        PAGE_ChangeByID(Model.pagecfg.quickpage[quick-1], 0);
     }
 }
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
@@ -264,5 +262,5 @@ const char *PAGE_GetName(int i)
 }
 int PAGE_GetNumPages()
 {
-    return sizeof(pages) / sizeof(struct page) - 1;
+    return sizeof(pages) / sizeof(struct page);
 }

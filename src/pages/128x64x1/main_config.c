@@ -208,9 +208,9 @@ u8 _action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
-            PAGE_ChangeByName("MainPage", 1);
+            PAGE_ChangeByID(PAGEID_MAIN, 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {

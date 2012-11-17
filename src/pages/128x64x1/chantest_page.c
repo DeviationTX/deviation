@@ -153,9 +153,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;
             if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
-                PAGE_ChangeByName("TxConfig", -1);
+                PAGE_ChangeByID(PAGEID_TXCFG, -1);
             else
-                PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
+                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             _navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {

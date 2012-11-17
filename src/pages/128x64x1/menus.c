@@ -19,31 +19,30 @@
 #include "config/tx.h"
 
 struct menu_pages {
+    enum PageID id;
     const char *name;
     u8 menu_depth;
     u8 menu_num;
-    const char *pagename;
     u8 pagepos;
 };
 
 struct menu_pages menus[] = {
     //main menu
-    {_tr_noop("Model config"),       MENUTYPE_MAINMENU, 0, "Menu", (0 << 4) | MENUTYPE_SUBMENU},
-    {_tr_noop("Transmitter config"), MENUTYPE_MAINMENU, 1, "Menu", (1 << 4) | MENUTYPE_SUBMENU},
-    {_tr_noop("USB"),                MENUTYPE_MAINMENU, 0, "USB",      0},
-    {_tr_noop("Telemetry"),          MENUTYPE_MAINMENU, 1, "TeleMoni", PREVIOUS_ITEM},
+    {PAGEID_MENU, _tr_noop("Model config"),       MENUTYPE_MAINMENU, 0, (0 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_MENU, _tr_noop("Transmitter config"), MENUTYPE_MAINMENU, 1, (1 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, 0},
+    {PAGEID_TELEMMON, NULL, MENUTYPE_MAINMENU, 1, PREVIOUS_ITEM},
     // sub menu items 1
-    {_tr_noop("Mixer"),              MENUTYPE_SUBMENU,  0, "Mixer",    0},
-    {_tr_noop("Model setup"),        MENUTYPE_SUBMENU,  0, "ModelCon", PREVIOUS_ITEM},
-    {_tr_noop("Timers"),             MENUTYPE_SUBMENU,  0, "Timer",    PREVIOUS_ITEM},
-    {_tr_noop("Telemetry config"),   MENUTYPE_SUBMENU,  0, "TeleConf", PREVIOUS_ITEM},
-    {_tr_noop("Trims"),              MENUTYPE_SUBMENU,  0, "Trim",     PREVIOUS_ITEM},
-    {_tr_noop("Main page config"),   MENUTYPE_SUBMENU,  0, "MainConf", PREVIOUS_ITEM},
+    {PAGEID_MIXER,    NULL, MENUTYPE_SUBMENU,  0, 0},
+    {PAGEID_MODEL,    NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
+    {PAGEID_TIMER,    NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
+    {PAGEID_TELEMCFG, NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
+    {PAGEID_TRIM,     NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
+    {PAGEID_MAINCFG,  NULL, MENUTYPE_SUBMENU,  0, PREVIOUS_ITEM},
     // sub menu item 2
-    {_tr_noop("Basic config"),       MENUTYPE_SUBMENU,  1, "TxConfig", PREVIOUS_ITEM},
-    {_tr_noop("Monitor"),            MENUTYPE_SUBMENU,  1, "Monitor",  PREVIOUS_ITEM},
-    {_tr_noop("About Deviation"),    MENUTYPE_SUBMENU,  1, "About",    PREVIOUS_ITEM},
-    {0, 0, 0, 0, 0}
+    {PAGEID_TXCFG,    NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
+    {PAGEID_CHANMON,  NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
+    {PAGEID_ABOUT,    NULL, MENUTYPE_SUBMENU,  1, PREVIOUS_ITEM},
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
@@ -51,7 +50,6 @@ static struct menu_page * const mp = &pagemem.u.menu_page;
 static s8 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static s16 view_origin_relativeY;
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
-static char *last_menu_name;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static const char *idx_string_cb(guiObject_t *obj, const void *data);
@@ -87,7 +85,7 @@ void PAGE_MenuInit(int page)
     u8 idx = 1;
     guiObject_t *obj;
     labelDesc.style = LABEL_LEFTCENTER;
-    for(u8 i=0; menus[i].name != 0; i++) {
+    for(u8 i=0; i < sizeof(menus) / sizeof(struct menu_pages); i++) {
         if (menus[i].menu_depth != menu_item_type)
             continue;
         if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
@@ -122,7 +120,9 @@ const char *menu_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    return _tr(menus[i].name);
+    if (menus[i].name != NULL)
+        return _tr(menus[i].name);
+    return PAGE_GetName(menus[i].id);
 }
 
 const char *idx_string_cb(guiObject_t *obj, const void *data)
@@ -142,9 +142,9 @@ static u8 action_cb(u32 button, u8 flags, void *data)
             u8 group = (menu_type_flag >> 4) &0x0f;
             if (menu_item_type == MENUTYPE_SUBMENU) { // from sub menu back to main menu
                 u8 page = group << 4 | MENUTYPE_MAINMENU;
-                PAGE_ChangeByName("Menu", page);
+                PAGE_ChangeByID(PAGEID_MENU, page);
             } else  // from main menu back to main page
-                PAGE_ChangeByName("MainPage", 0);
+                PAGE_ChangeByID(PAGEID_MAIN, 0);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, mp->scroll_bar);
         } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
@@ -162,7 +162,6 @@ void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     (void)press_type;
     long i = (long)data;
-    last_menu_name = (char *)menus[i].name;
     menu_type_flag = (menus[i].menu_num << 4)| menus[i].menu_depth;
-    PAGE_ChangeByName(menus[i].pagename, menus[i].pagepos);
+    PAGE_ChangeByID(menus[i].id, menus[i].pagepos);
 }

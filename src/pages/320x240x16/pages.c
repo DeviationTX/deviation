@@ -276,7 +276,7 @@ const char *PAGE_GetName(int i)
 }
 int PAGE_GetNumPages()
 {
-    return sizeof(pages) / sizeof(struct page) - 1;
+    return sizeof(pages) / sizeof(struct page);
 }
 
 void PAGE_ChangeQuick(int dir)

@@ -134,7 +134,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         u8 page = (0 << 4) | MENUTYPE_MAINMENU;
-        PAGE_ChangeByName("Menu", page);
+        PAGE_ChangeByID(PAGEID_MENU, page);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
         mp->ignore_release = 1;
         TIMER_StartStop(0);
@@ -153,7 +153,7 @@ static u8 _action_preview_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("MainConf", -1);  // go back to the main config page
+            PAGE_ChangeByID(PAGEID_MAINCFG, -1);  // go back to the main config page
         }
     }
     return 1;

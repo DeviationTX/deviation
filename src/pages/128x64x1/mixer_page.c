@@ -168,7 +168,7 @@ u8 action_cb(u32 button, u8 flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByName("Menu", PREVIOUS_ITEM);
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             navigate_item(-1, 1);
         }else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
