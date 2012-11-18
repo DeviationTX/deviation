@@ -77,9 +77,8 @@ Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT 
 Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 :Box %d:
 Loc%d:
->:Button monitor
-<:Buttons
-<Butoane
+:Button monitor
+Monitor butoane
 :COL
 Colectiv
 :COL Inv:
