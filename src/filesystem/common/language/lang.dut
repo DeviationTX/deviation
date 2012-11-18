@@ -72,8 +72,6 @@ Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige 
 :Box %d:
 Kader %d:
 >:Button monitor
-<:Buttons
-<Knoppen
 :COL
 COL
 :COL Inv:
@@ -93,8 +91,6 @@ Kan
 Aanpassen
 >:Channel monitor
 >:Channel output
-<:Channels
-<Kanalen
 :Complex
 Complex
 :Configure
@@ -168,8 +164,6 @@ Icoon
 >:Input monitor
 :Input:
 Invoer:
-<:Inputs
-<Invoeren
 >:Insert
 :Inverted
 Omgekeerd
@@ -222,8 +216,6 @@ Mixer
 Mixers:
 :Mode %d
 Mode %d
-<:Model
-<Model
 >:Model menu
 :Model name:
 Modelnaam:
@@ -386,6 +378,7 @@ Testen
 :Timer
 Timer
 >:Timer settings
+>:Timer%d:
 >:Timers
 >:Timeup intvl:
 :Toggle%d

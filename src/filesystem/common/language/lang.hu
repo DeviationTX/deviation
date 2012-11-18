@@ -61,8 +61,6 @@ Fényerő:
 Oszlop%d:
 :Bars:
 Oszlop:
-<:Basic config
-<Beállítások
 :Batt alarm:
 Fesz. riaszt.:
 :Battery alarm:
@@ -80,8 +78,6 @@ Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 :Box %d:
 Doboz%d:
 >:Button monitor
-<:Buttons
-<Gombok
 :COL
 Kollektív
 :COL Inv:
@@ -105,8 +101,6 @@ Váltás
 >:Channel monitor
 :Channel output
 Csatornák
-<:Channels
-<Csatornák
 :Complex
 Komplex
 :Configure
@@ -192,8 +186,6 @@ Ikon
 >:Input monitor
 :Input:
 Bemenet:
-<:Inputs
-<Bemenetek
 :Insert
 Beszúrás
 :Inverted
@@ -254,10 +246,6 @@ Mixer
 Mixerek:
 :Mode %d
 Mód %d
-<:Model
-<Modell
-<:Model config
-<Modell konfig.
 >:Model menu
 :Model name:
 Modell név:
@@ -265,8 +253,6 @@ Modell név:
 Modell konfig.
 :Model type:
 Modell típus:
-<:Monitor
-<Monitor
 :Move Down
 Lejjebb
 :Move Up
@@ -435,8 +421,6 @@ TelemFord
 TelemHőm
 :TelemV
 TelemFesz
-<:Telemetry
-<Telemtria
 :Telemetry config
 Telemetria konfig.
 :Telemetry monitor
@@ -459,6 +443,7 @@ Idő
 Időzítő
 :Timer settings
 Időzítő beállítások
+>:Timer%d:
 :Timers
 Időzítők
 :Timeup intvl:

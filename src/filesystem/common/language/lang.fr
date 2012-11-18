@@ -72,8 +72,6 @@ Appairage en cours...\nAssurez vous que le récepteur fonctionne\n\nAppuyer sur 
 :Box %d:
 Box%d:
 >:Button monitor
-<:Buttons
-<Boutons
 :COL
 pas
 :COL Inv:
@@ -93,8 +91,6 @@ Ch
 Changer
 >:Channel monitor
 >:Channel output
-<:Channels
-<Voies
 :Complex
 Complexe
 :Configure
@@ -168,8 +164,6 @@ Icône
 >:Input monitor
 :Input:
 Entrée:
-<:Inputs
-<Entrées
 >:Insert
 :Inverted
 Inversé
@@ -222,8 +216,6 @@ Mixer
 Mixers:
 :Mode %d
 Mode %d
-<:Model
-<Modèle
 >:Model menu
 :Model name:
 Nom de modèle:
@@ -386,6 +378,7 @@ Test
 :Timer
 Timer
 >:Timer settings
+>:Timer%d:
 >:Timers
 >:Timeup intvl:
 :Toggle%d

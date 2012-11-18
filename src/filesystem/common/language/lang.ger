@@ -71,8 +71,6 @@ Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevor
 :Box %d:
 Kasten %d:
 >:Button monitor
-<:Buttons
-<Tasten
 :COL
 COL Inv:
 >:COL Inv:
@@ -91,8 +89,6 @@ K
 Wählen
 >:Channel monitor
 >:Channel output
-<:Channels
-<Kanäle
 :Complex
 Komplex
 :Configure
@@ -164,8 +160,6 @@ Bild
 >:Input monitor
 :Input:
 Eingabe:
-<:Inputs
-<Eingaben
 >:Insert
 :Inverted
 Umgekehrt
@@ -217,8 +211,6 @@ Mixers:
 >:Mixers:
 :Mode %d
 Modus %d
-<:Model
-<Modell
 >:Model menu
 :Model name:
 Modellname:
@@ -378,6 +370,7 @@ Testen
 :Timer
 Zeit
 >:Timer settings
+>:Timer%d:
 >:Timers
 >:Timeup intvl:
 :Toggle%d

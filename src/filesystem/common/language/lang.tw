@@ -57,8 +57,8 @@
 :Bar %d:
 條框%d
 >:Bars:
-:Basic config
-基本規畫
+<:Basic config
+<基本規畫
 :Batt alarm:
 低電警示:
 >:Battery alarm:
@@ -72,7 +72,7 @@
 對頻中...\n%d秒\n按ENT鍵中止對頻
 :Box %d:
 訊息框 %d:
->:Buttons
+>:Button monitor
 :COL
 螺距
 :COL Inv:
@@ -92,9 +92,9 @@
 通道
 :Change
 更改
+>:Channel monitor
 :Channel output
 輸出通道
->:Channels
 :Complex
 多段式
 :Configure
@@ -172,9 +172,9 @@ FMOD2
 :High-Rate
 高位
 >:Icon
+>:Input monitor
 :Input:
 輸入:
->:Inputs
 >:Insert
 :Inverted
 反向的
@@ -208,14 +208,18 @@ FMOD2
 >:MIX2
 :Main menu
 主選單
-:Main menu config
-主選單規畫
+<:Main menu config
+<主選單規畫
+>:Main page
 :Main page config
 螢幕排列規畫
 :Max:
 輸出上限:
-:Menu%d
-選單%d
+>:Menu
+>:Menu +
+>:Menu -
+<:Menu%d
+<選單%d
 :Meter
 公尺
 :Mid-Rate
@@ -230,17 +234,17 @@ FMOD2
 段數:
 :Mode %d
 模式 %d
->:Model
-:Model config
-模型規畫
+<:Model config
+<模型規畫
+>:Model menu
 :Model name:
 模型名稱:
 :Model setup
 模型設定
 :Model type:
 機種選擇:
-:Monitor
-檢視通道內容
+<:Monitor
+<檢視通道內容
 >:Move Down
 >:Move Up
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
@@ -399,10 +403,11 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
-:Telemetry
-檢視遙測內容
+<:Telemetry
+<檢視遙測內容
 :Telemetry config
 遙測規畫
+>:Telemetry monitor
 :Telemetry settings
 ======遙測參數======
 :Temp
@@ -442,6 +447,7 @@ FMOD2
 觸碰解鎖
 :Transmitter config
 發射機規畫
+>:Transmitter menu
 :Trim
 微調
 :Trim +:

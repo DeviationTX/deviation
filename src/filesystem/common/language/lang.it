@@ -61,8 +61,6 @@ Luminosità
 Barra %d:
 :Bars:
 Barre:
-<:Basic config
-<Config. di base
 :Batt alarm:
 Allarme batteria:
 :Battery alarm:
@@ -80,8 +78,6 @@ Binding...\n%d secondi\nPremi ENT per fermare
 :Box %d:
 Box%d:
 >:Button monitor
-<:Buttons
-<Bottoni
 :COL
 Collet.
 :COL Inv:
@@ -105,8 +101,6 @@ Cambia
 >:Channel monitor
 :Channel output
 Canale di uscita
-<:Channels
-<Canale
 :Complex
 Complesso
 :Configure
@@ -191,8 +185,6 @@ Icona
 >:Input monitor
 :Input:
 Ingresso:
-<:Inputs
-<Ingressi
 :Insert
 Inserisci
 :Inverted
@@ -253,10 +245,6 @@ Mixer
 Mixers:
 :Mode %d
 Modo %d
-<:Model
-<Modello
-<:Model config
-<Config. del Modello
 >:Model menu
 :Model name:
 Nome del modello:
@@ -264,8 +252,6 @@ Nome del modello:
 Setup del modello
 :Model type:
 Tipo del modello:
-<:Monitor
-<Monitor
 :Move Down
 Muovi Giù
 :Move Up
@@ -433,8 +419,6 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
-<:Telemetry
-<Telemetria
 :Telemetry config
 Config. etlemetria
 :Telemetry monitor
@@ -456,6 +440,7 @@ Test
 >:Timer
 :Timer settings
 Config. Timer
+>:Timer%d:
 :Timers
 Timers
 :Timeup intvl:
