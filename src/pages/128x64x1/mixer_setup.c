@@ -23,12 +23,13 @@
 #define LEFT_VIEW_ID 0
 #define RIGHT_VIEW_ID 1
 #define RIGHT_VIEW_HEIGHT 49
-static s8 current_selected_item;
+static s8 current_selected_item = 0;
 static u8 expo1_start_id;
 static u8 expo2_start_id;
 static u8 current_xygraph = 0;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
+static void navigate_items(s8 direction);
 
 static void _show_titlerow()
 {
@@ -57,8 +58,7 @@ static void _show_titlerow()
 
 static void _show_simple()
 {
-    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
-    current_selected_item = -1;
+    mp->max_scroll = 2;
 
     u8 x = 0;
     u8 space = ITEM_HEIGHT + 1;
@@ -113,14 +113,19 @@ static void _show_simple()
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
     u8 h = LCD_HEIGHT - y ;
-    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
+
+    // set the focus item back to previous selection in this page
+    if (current_selected_item > 0) {
+        u8 temp = current_selected_item;
+        current_selected_item = 0;
+        navigate_items(temp);
+    }
 }
 
 static void _show_complex()
 {
-    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
-    current_selected_item = -1;
+    mp->max_scroll = 2;
 
     u8 x = 0;
     u8 space = ITEM_HEIGHT + 1;
@@ -226,14 +231,18 @@ static void _show_complex()
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
     u8 h = LCD_HEIGHT - y ;
-    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
+
+    if (current_selected_item > 0) {
+        u8 temp = current_selected_item;
+        current_selected_item = 0;
+        navigate_items(temp);
+    }
 }
 
 static void _show_expo_dr()
 {
-    mp->max_scroll = FIRST_PAGE_ITEM_IDX;
-    current_selected_item = -1;
+    mp->max_scroll = 2;
 
     sync_mixers();
 
@@ -350,12 +359,17 @@ static void _show_expo_dr()
     y = ITEM_HEIGHT;
     x = LEFT_VIEW_WIDTH + ARROW_WIDTH;
     u8 h = LCD_HEIGHT - y ;
-    mp->max_scroll -= FIRST_PAGE_ITEM_IDX;
     mp->scroll_bar = GUI_CreateScrollbar(x, y, h, mp->max_scroll, NULL, NULL, NULL);
 
     //Enable/Disable the relevant widgets
     _update_rate_widgets(0);
     _update_rate_widgets(1);
+
+    if (current_selected_item > 0) {
+        u8 temp = current_selected_item;
+        current_selected_item = 0;
+        navigate_items(temp);
+    }
 }
 
 static void _update_rate_widgets(u8 idx)
@@ -379,22 +393,27 @@ static void _update_rate_widgets(u8 idx)
 
 static void navigate_items(s8 direction)
 {
-    guiObject_t *obj = GUI_GetSelected();
+    guiObject_t *obj;
+    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
+        obj = GUI_GetSelected();
     if (direction > 0) {
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     } else {
-        if (obj == mp->itemObj[0])
-            current_selected_item = mp->max_scroll;
         GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
     }
+    }
     obj = GUI_GetSelected();
+    current_selected_item += direction;
+    current_selected_item %= mp->max_scroll;
+    if (current_selected_item < 0)
+        current_selected_item = mp->max_scroll - 1;
     if (obj == mp->itemObj[0] || obj == mp->itemObj[1]) {
-        current_selected_item = -1;
-        // Perf improvement on UI drawing for mixer setup: remove unnecessary view refreshing
-        if (obj == mp->itemObj[0] &&direction > 0)
+        if (obj == mp->itemObj[0]) {
+            current_selected_item = 0;
+            if (direction > 0)  // Perf improvement on UI drawing for mixer setup: remove unnecessary view refreshing
             GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+        }
     } else {
-        current_selected_item += direction;
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
             // selected item is out of the view, scroll the view
             GUI_ScrollLogicalViewToObject(LEFT_VIEW_ID, obj, direction);
@@ -405,13 +424,13 @@ static void navigate_items(s8 direction)
         // it is because in previous design, whenever switching from one widget to another, the xygraph will be redrew and cause
         // timing issue to interfere with button evenst. To fix the issue, reducing screen-redraw is the key
         // the flag of current_xygraph is used to avoid unnecessary screen refresh and can fix this bug
-        if (current_selected_item == -1 || current_selected_item < expo1_start_id -FIRST_PAGE_ITEM_IDX) {
+        if (current_selected_item >= 0 && current_selected_item < expo1_start_id) {
             if (current_xygraph != 0) {
                 current_xygraph = 0;
                 GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
             }
         }
-        else if (current_selected_item >= expo2_start_id -FIRST_PAGE_ITEM_IDX) {
+        else if (current_selected_item >= expo2_start_id) {
             if (current_xygraph != 2) {
                 current_xygraph = 2;
                 GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
@@ -422,7 +441,7 @@ static void navigate_items(s8 direction)
             current_xygraph = 1;
         }
     }
-    GUI_SetScrollbar(mp->scroll_bar, current_selected_item >=0?current_selected_item :0);
+    GUI_SetScrollbar(mp->scroll_bar, current_selected_item);
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)
@@ -431,6 +450,7 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
+            current_xygraph = 0;
             PAGE_MixerInit(mp->top_channel);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting
