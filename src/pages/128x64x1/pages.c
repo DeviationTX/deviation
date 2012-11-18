@@ -179,6 +179,8 @@ void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
 static u8 action_cb(u32 button, u8 flags, void *data)
 {
     u8 result = 0;
+    if(GUI_IsModal())  //Disable control when a dialog is shown
+        return 0;
     if (ActionCB != NULL)
         result = ActionCB(button, flags, data);
     if(! result && quick_page_enabled)
