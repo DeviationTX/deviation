@@ -1,4 +1,6 @@
 ﻿Russian
+|devo8:# Channels:
+Количество каналов:
 :# Channels:
 Каналы:
 :%s is %d%%, safe value = %d%%\n
@@ -19,8 +21,10 @@
 4 внутри
 :4 Outside
 4 снаружи
-:4Ch w/ Dual-Rates
+|devo8:4Ch w/ Dual-Rates
 4-канала с дв.расходами
+:4Ch w/ Dual-Rates
+4-канала с дв.расх.
 :5 Point
 5 точек
 :6 Trims
@@ -39,8 +43,10 @@
 Абсолют.
 :AIL
 Элер
-:AIL DR
+|devo8:AIL DR
 Элер ДР
+:AIL DR
+ЭЛ.ДР
 :AIL Inv:
 Элер Инв:
 :AUX4
@@ -63,8 +69,10 @@ AUX5
 Полоса:
 <:Basic config
 <Основные настройки
-:Batt alarm:
+|devo8:Batt alarm:
 Сигнал батареи:
+:Batt alarm:
+Сигнал бат.:
 :Battery alarm:
 Сигнал батареи:
 :Battery too low,\ncan't save!
@@ -76,10 +84,11 @@ AUX5
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Binding...\n%d seconds\nPress ENT to stop
-Привязка... %d секунд\nНажмите ENT для остановки
+Привязка...\n%d секунд\nENT для остановки
 :Box %d:
 Бокс %d:
->:Button monitor
+:Button monitor
+Монитор кнопок
 <:Buttons
 <Кнопки
 :COL
@@ -94,15 +103,20 @@ AUX5
 Калибровка выполнена.
 :Cancel
 Отмена
-:Celsius
+|devo8:Celsius
 Цельсий
-:Center all \nsticks and knobs\nthen press ENT
+:Celsius
+С°
+|devo8:Center all \nsticks and knobs\nthen press ENT
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
+:Center all \nsticks and knobs\nthen press ENT
+Отцентруйте все\nстики и ручки,\nзатем нажмите ENT
 :Ch
 Канал 
 :Change
 Изменить
->:Channel monitor
+:Channel monitor
+Монитор каналов
 :Channel output
 Выход канала
 <:Channels
@@ -145,8 +159,10 @@ AUX5
 Вниз
 :ELE
 РВыс
-:ELE DR
+|devo8:ELE DR
 РВыс ДР
+:ELE DR
+РВ.ДР
 :ELE Inv:
 РВыс Инв:
 :EXPO
@@ -157,22 +173,34 @@ AUX5
 Выход
 :Expo&DR
 Экспо&ДР
-:FMODE0
+|devo8:FMODE0
 ПРежим0
-:FMODE1
+:FMODE0
+ПРеж0
+|devo8:FMODE1
 ПРежим1
-:FMODE2
+:FMODE1
+ПРеж1
+|devo8:FMODE2
 ПРежим2
-:Fahren
+:FMODE2
+ПРеж2
+|devo8:Fahren
 Фаренгейт
-:Failsafe:
+:Fahren
+F°
+|devo8:Failsafe:
 Отказоустойчивость:
+:Failsafe:
+Отказоуст.:
 :File:
 Файл:
 :Fixed
 Фиксир.
-:Fixed ID:
+|devo8:Fixed ID:
 Фиксированный ID:
+:Fixed ID:
+Фиксир.ID:
 :Foot
 Фут
 :GEAR
@@ -185,11 +213,14 @@ GPS
 Вертолет
 :Helicopter
 Вертолет
-:High-Rate
+|devo8:High-Rate
 Высокий расход
+:High-Rate
+Выс.расход
 :Icon
 Значок
->:Input monitor
+:Input monitor
+Монитор ввода
 :Input:
 Ввод:
 <:Inputs
@@ -222,8 +253,10 @@ GPS
 Долгота
 :Low Battery
 Батарея разряжена
-:Low-Rate
+|devo8:Low-Rate
 Низкий расход
+:Low-Rate
+Низк.расход
 :MIX0
 МИКШ0
 :MIX1
@@ -232,18 +265,24 @@ GPS
 МИКШ2
 :Main menu
 Главное меню
->:Main page
+:Main page
+Главная страница
 :Main page config
 Главная страница
 :Max:
 Макс.:
->:Menu
->:Menu +
->:Menu -
+:Menu
+Меню
+:Menu +
+Меню +
+:Menu -
+Меню -
 :Meter
 Метр
-:Mid-Rate
+|devo8:Mid-Rate
 Средний расход
+:Mid-Rate
+Ср.расход
 :Min/Max
 Мин/Макс
 :Min:
@@ -258,7 +297,8 @@ GPS
 <Модель
 <:Model config
 <Модель
->:Model menu
+:Model menu
+Меню модели
 :Model name:
 Имя модели:
 :Model setup
@@ -307,22 +347,32 @@ GPS
 +
 :Pos/Neg:
 +/-:
-:Prealert intvl:
+|devo8:Prealert intvl:
 Интервалы перед:
-:Prealert time:
+:Prealert intvl:
+Интерв. перед:
+|devo8:Prealert time:
 Время до сигнала:
+:Prealert time:
+Вр. до сигнала:
 :Press 'Ent' to turn USB Filesystem:
-\nНажмите 'Ent' для перевода файловой\nсистемы USB в состояние:
-:Press ENT to change:
+Нажмите 'Ent' для перевода файловой\nсистемы USB в состояние: 
+|devo8:Press ENT to change:
 Нажмите ENT для изменения:
-:Press ENT to copy to:
+:Press ENT to change:
+ENT для изменения:
+|devo8:Press ENT to copy to:
 Нажмите ENT для копирования в:
-:Press ENT to load:
+:Press ENT to copy to:
+ENT для копирования в:
+|devo8:Press ENT to load:
 Нажмите ENT для загрузки:
+:Press ENT to load:
+ENT для загрузки:
 :Press ENT to turn \nUSB drive:
-Нажмите ENT для перевода\nUSB диска в состояние:
+Нажмите ENT для\nперевода USB диска\nв состояние: 
 :Preview: Long-Press ENT
-Просмотр: Длительное нажатие ENT
+Просмотр: дл.нажатие ENT
 :Protocol:
 Протокол:
 :RIGHT_H
@@ -333,10 +383,14 @@ GPS
 RPM
 :RPM:
 RPM
-:RUD
+|devo8:RUD
 РНапр
-:RUD DR
+:RUD
+РНап
+|Devo8:RUD DR
 РНапр ДР
+:RUD DR
+РН.ДР
 :Re-Init
 Привязка
 :Remove
@@ -351,14 +405,20 @@ RPM
 Отменить
 :Right
 Вправо
-:Safe Val:
+|devo8:Safe Val:
 Безопасное значение:
+:Safe Val:
+Безоп.знач.:
 :Safety
 Безопасность
-:Safety:
+|devo8:Safety:
 Безопасность:
-:Save
+:Safety:
+Безопасн.:
+|devo8:Save
 Сохранить
+:Save
+Сохр.
 :Scale1:
 Масшт.1:
 :Scale2:
@@ -391,8 +451,10 @@ RPM
 Стики:
 :Subtrim:
 Субтриммер:
-:SwashType:
+|devo8:SwashType:
 Тип авт.перекоса:
+:SwashType:
+Тип авт.пер.:
 :Switch %d:
 Перекл. %d:
 :Switch1
@@ -461,8 +523,10 @@ RPM
 Настройки таймера
 :Timers
 Таймеры
-:Timeup intvl:
+|devo8:Timeup intvl:
 Интервалы после:
+:Timeup intvl:
+Интерв. после:
 :Toggle%d
 Перекл%d
 :Touch Calibrate
@@ -479,15 +543,18 @@ RPM
 Нажать для разблокировки
 :Transmitter config
 Передатчик
->:Transmitter menu
+:Transmitter menu
+Меню передатчика
 :Trim
 Триммер
 :Trim +:
-Трим +:
+Трим+:
 :Trim -:
-Трим -:
-:Trim Step:
+Трим-:
+|devo8:Trim Step:
 Шаг триммера:
+:Trim Step:
+Шаг тримм.:
 :Trims
 Триммер
 :Trims:

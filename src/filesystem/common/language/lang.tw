@@ -1,7 +1,8 @@
 繁體中文
 :# Channels:
 通道數:
->:%s is %d%%, safe value = %d%%\n
+:%s is %d%%, safe value = %d%%\n
+%s = %d%%,熄火保護 = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\n熄火保護 = %d%%\n
 :1-to-1
@@ -41,10 +42,8 @@
 >:AIL DR
 :AIL Inv:
 副翼方向:
-:AUX4
-輔助4
-:AUX5
-輔助5
+>:AUX4
+>:AUX5
 :About Deviation
 關於 Deviation
 :Airplane
@@ -58,8 +57,8 @@
 :Bar %d:
 條框%d
 >:Bars:
-<:Basic config
-<基本規畫
+:Basic config
+基本規畫
 :Batt alarm:
 低電警示:
 >:Battery alarm:
@@ -73,13 +72,12 @@
 對頻中...\n%d秒\n按ENT鍵中止對頻
 :Box %d:
 訊息框 %d:
->:Button monitor
+>:Buttons
 :COL
 螺距
 :COL Inv:
 螺距方向:
-:CYC
-循環
+>:CYC
 :Calibrate
 校正
 :Calibration done.
@@ -90,12 +88,13 @@
 攝氏
 :Center all \nsticks and knobs\nthen press ENT
 所有搖桿置中\n按 ENT 開始進行
->:Ch
+:Ch
+通道
 :Change
 更改
->:Channel monitor
 :Channel output
 輸出通道
+>:Channels
 :Complex
 多段式
 :Configure
@@ -127,7 +126,8 @@ Deviation 韌體版本：
 背光省電亮度:
 :Dimmer time:
 省電啟動時間:
->:Dn
+:Dn
+下
 :Down
 下
 :ELE
@@ -172,9 +172,9 @@ FMOD2
 :High-Rate
 高位
 >:Icon
->:Input monitor
 :Input:
 輸入:
+>:Inputs
 >:Insert
 :Inverted
 反向的
@@ -208,16 +208,14 @@ FMOD2
 >:MIX2
 :Main menu
 主選單
-<:Main menu config
-<主選單規畫
->:Main page
+:Main menu config
+主選單規畫
 :Main page config
 螢幕排列規畫
 :Max:
 輸出上限:
->:Menu
->:Menu +
->:Menu -
+:Menu%d
+選單%d
 :Meter
 公尺
 :Mid-Rate
@@ -232,17 +230,17 @@ FMOD2
 段數:
 :Mode %d
 模式 %d
-<:Model config
-<模型規畫
->:Model menu
+>:Model
+:Model config
+模型規畫
 :Model name:
 模型名稱:
 :Model setup
 模型設定
 :Model type:
 機種選擇:
-<:Monitor
-<檢視通道內容
+:Monitor
+檢視通道內容
 >:Move Down
 >:Move Up
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
@@ -306,8 +304,7 @@ FMOD2
 轉速
 :RUD
 方向
-:RUD DR
-方向DR
+>:RUD DR
 :Re-Init
 重對頻
 >:Remove
@@ -402,10 +399,10 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
+:Telemetry
+檢視遙測內容
 :Telemetry config
 遙測規畫
-:Telemetry monitor
-遙測內容
 :Telemetry settings
 ======遙測參數======
 :Temp
@@ -424,6 +421,8 @@ FMOD2
 計時器
 :Timer settings
 ======計時參數======
+:Timer%d:
+計時器%d:
 :Timers
 計時器
 :Timeup intvl:
@@ -443,7 +442,6 @@ FMOD2
 觸碰解鎖
 :Transmitter config
 發射機規畫
->:Transmitter menu
 :Trim
 微調
 :Trim +:
@@ -461,14 +459,15 @@ FMOD2
 :Tx power:
 發射功率:
 >:USB
-:Unknown
-未知
+>:Unknown
 :Up
 上
 :Value:
 數值:
->:Virt
->:Volt
+:Virt
+虛擬
+:Volt
+電壓
 :Volt:
 電壓:
 :Zero/Max

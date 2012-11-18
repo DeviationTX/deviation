@@ -1,6 +1,6 @@
 ﻿简体中文
 :# Channels:
-通道数:
+通道数
 :%s is %d%%, safe value = %d%%\n
 %s当前值为%d%%, 安全开机设定为%d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -41,7 +41,7 @@
 副翼
 >:AIL DR
 :AIL Inv:
-副翼逆转
+副翼方向
 >:AUX4
 >:AUX5
 :About Deviation
@@ -53,17 +53,17 @@
 :Altitude
 高度
 :Backlight:
-背光:
+背光
 :Bar %d:
-柱图%d:
+柱图%d
 :Bars:
-柱状图:
-<:Basic config
-<基本功能设置
+柱状图
+:Basic config
+基本功能设置
 :Batt alarm:
-电量报警:
+电量报警
 :Battery alarm:
-电量报警:
+电量报警
 :Battery too low,\ncan't save!
 电压过低,\n无法存盘!
 :Bind
@@ -75,16 +75,15 @@
 :Binding...\n%d seconds\nPress ENT to stop
 对频中...\n%d秒后结束\n按ENT中止
 :Box %d:
-第%d栏:
->:Button monitor
-<:Buttons
-<按键
+第%d栏
+:Buttons
+按键
 :COL
 螺距
 :COL Inv:
-螺距方向:
+螺距方向
 :CYC
-循环
+CYC
 :Calibrate
 校准
 :Calibration done.
@@ -99,17 +98,16 @@
 通道
 :Change
 改变
->:Channel monitor
 :Channel output
 通道输出
-<:Channels
-<通道
+:Channels
+通道
 :Complex
 多段式
 :Configure
 设置
 :Contrast:
-对比度:
+对比度
 :Copy To
 复制到
 :Copy To...
@@ -117,7 +115,7 @@
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
 :Curve:
-曲线:
+曲线
 :Cyclic1
 循环1
 :Cyclic2
@@ -133,9 +131,9 @@
 :Deviation FW version:
 Deviation固件版本:
 :Dimmer target:
-背光减弱至:
+背光减弱至
 :Dimmer time:
-背光减弱时间:
+背光减弱时间
 :Dn
 下
 :Down
@@ -144,7 +142,7 @@ Deviation固件版本:
 升降
 >:ELE DR
 :ELE Inv:
-升降逆转:
+升降方向
 :EXPO
 指数曲线
 :Enter
@@ -164,11 +162,11 @@ FMOD2
 :Failsafe:
 失控保护
 :File:
-模型文件:
+模型文件
 :Fixed
 固定
 :Fixed ID:
-固定ID码:
+固定ID码
 :Foot
 英尺
 :GEAR
@@ -184,11 +182,10 @@ FMOD2
 普通飞行
 :Icon
 图标
->:Input monitor
 :Input:
-输入:
-<:Inputs
-<输入
+输入
+:Inputs
+输入
 :Insert
 插入
 :Inverted
@@ -200,7 +197,7 @@ LCD设置
 :LEFT_V
 左垂直
 :Language:
-语言:
+语言
 :Latitude
 纬度
 :Left
@@ -224,18 +221,14 @@ LCD设置
 >:MIX2
 :Main menu
 主菜单
-<:Main menu config
-<定制主菜单
->:Main page
+:Main menu config
+定制主菜单
 :Main page config
 定制主页面
 :Max:
-最大舵量:
->:Menu
->:Menu +
->:Menu -
-<:Menu%d:
-<菜单%d
+最大舵量
+:Menu%d
+菜单%d
 :Meter
 米
 :Mid-Rate
@@ -243,26 +236,25 @@ LCD设置
 :Min/Max
 最低/最高
 :Min:
-最小舵量:
+最小舵量
 :Mixer
 混控
 :Mixers:
 混控:
 :Mode %d
 模式%d
-<:Model
-<模型
-<:Model config
-<模型设置
->:Model menu
+:Model
+模型
+:Model config
+模型设置
 :Model name:
-模型命名:
+模型命名
 :Model setup
 模型设置
 :Model type:
-模型类型:
-<:Monitor
-<通道/摇杆监控
+模型类型
+:Monitor
+通道/摇杆监控
 :Move Down
 下移
 :Move Up
@@ -270,7 +262,7 @@ LCD设置
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
 :Mux:
-作用:
+作用
 :Neg
 负
 :New
@@ -293,33 +285,33 @@ LCD设置
 :On
 开启
 :Page:
-页码:
+混控序号
 :Plane
 固定翼
 :Point:
-点:
+点
 :Pos
 正
 :Pos/Neg:
-正/负:
+正/负
 :Prealert intvl:
-预警间隔:
+预警间隔
 :Prealert time:
-预警时间:
+预警时间
 :Press 'Ent' to turn USB Filesystem:
 按ENT改变USB盘状态:
 :Press ENT to change:
-按ENT更改:
+按ENT更改
 :Press ENT to copy to:
-按ENT复制:
+按ENT复制
 :Press ENT to load:
-按ENT读取:
+按ENT读取
 :Press ENT to turn \nUSB drive:
 按ENT使U盘:
 :Preview: Long-Press ENT
 长按ENT预览,EXT返回
 :Protocol:
-通信协议:
+通信协议
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -327,7 +319,7 @@ LCD设置
 :RPM
 转数
 :RPM:
-转数:
+转数
 :RUD
 方向
 >:RUD DR
@@ -350,15 +342,15 @@ LCD设置
 :Safety
 熄火开关
 :Safety:
-熄火开关:
+熄火开关
 :Save
 保存
 :Scale1:
-比例1:
+比例1
 :Scale2:
-比例2:
+比例2
 :Scale:
-比例:
+比例
 :Scanner
 信号扫描器
 :Simple
@@ -368,33 +360,33 @@ LCD设置
 :Speed
 速度
 :Speed:
-舵机速率:
+舵机速率
 :Src
 输入
 :Src:
-输入:
+输入
 :Start:
-开始时间:
+开始时间
 :Step:
-幅度:
+幅度
 :Stick input
 摇杆输入
 :Stick mode:
-摇杆模式:
+摇杆模式
 :Sticks:
-摇杆/旋钮:
+摇杆/旋钮
 :Subtrim:
-微调:
+微调
 :SwashType:
-斜盘模式:
+斜盘模式
 :Switch %d:
-开关 %d:
+开关 %d
 :Switch1
 开关1
 :Switch2
 开关2
 :Switch:
-开关:
+开关
 :Symmetric
 对称
 :THR
@@ -429,12 +421,10 @@ LCD设置
 温度
 :TelemV
 电压
-<:Telemetry
-<双向回传
+:Telemetry
+双向回传监控
 :Telemetry config
 双向回传设置
-:Telemetry monitor
-双向回传监控
 :Telemetry settings
 双向回传设置
 :Temp
@@ -442,7 +432,7 @@ LCD设置
 :Temp:
 温度
 :Temperature:
-温度:
+温度
 :Template..
 模板..
 :Test
@@ -451,6 +441,8 @@ LCD设置
 时间
 :Timer
 定时器
+:Timer%d:
+定时器%d
 :Timer settings
 定时器设置
 :Timers
@@ -471,7 +463,6 @@ LCD设置
 >:Touch to Unlock
 :Transmitter config
 遥控设置
->:Transmitter menu
 :Trim
 微调
 :Trim +:
@@ -479,29 +470,29 @@ LCD设置
 :Trim -:
 微调-
 :Trim Step:
-微调幅度:
+微调幅度
 :Trims
 微调
 :Trims:
-微调数:
+微调数
 :Turn Off
 关闭
 :Turn On
 开启
 :Tx power:
-发射功率:
+发射功率
 >:USB
 >:Unknown
 :Up
 上
 :Value:
-值:
+值
 :Virt
 虚通道
 :Volt
 电压
 :Volt:
-电压:
+电压
 :Zero/Max
 零/最大
 :\n\nBinding will end in %d seconds...
