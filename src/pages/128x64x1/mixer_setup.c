@@ -40,8 +40,8 @@ static void _show_titlerow()
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
     GUI_CreateLabelBox(0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
-    u8 x =37;
-    u8 w = 52;
+    u8 x =40;
+    u8 w = 50;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[0] = GUI_CreateTextSelectPlate(x, 0,  w, ITEM_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
     GUI_SetSelected(mp->itemObj[0]);
@@ -432,6 +432,9 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
             PAGE_MixerInit(mp->top_channel);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
+            // long press enter = save without exiting
+            PAGE_SaveMixerSetup(mp);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
