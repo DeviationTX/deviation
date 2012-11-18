@@ -36,8 +36,8 @@ void iwdg_reset(void);
 
 volatile u32 msecs;
 u16 (*timer_callback)(void);
-u8 msec_callbacks;
-u32 msec_cbtime[NUM_MSEC_CALLBACKS];
+volatile u8 msec_callbacks;
+volatile u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 
 void CLOCK_Init()
 {
@@ -46,6 +46,7 @@ void CLOCK_Init()
 
     /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
     systick_set_reload(9000);
+    nvic_set_priority(NVIC_SYSTICK_IRQ, 0xff); //Low priority
 
     systick_interrupt_enable();
 
@@ -61,7 +62,7 @@ void CLOCK_Init()
 
     /* Enable TIM2 interrupt. */
     nvic_enable_irq(NVIC_TIM4_IRQ);
-    nvic_set_priority(NVIC_TIM4_IRQ, 1);
+    nvic_set_priority(NVIC_TIM4_IRQ, 1); //High priority
 
     timer_disable_counter(TIM4);
     /* Reset TIM4 peripheral. */
@@ -150,18 +151,33 @@ u32 CLOCK_getms()
     return msecs;
 }
 
-void CLOCK_SetMsecCallback(enum MsecCallback cb, u32 msec)
+void CLOCK_SetMsecCallback(int cb, u32 msec)
 {
     msec_cbtime[cb] = msecs + msec;
     msec_callbacks |= (1 << cb);
 }
-void CLOCK_ClearMsecCallback(enum MsecCallback cb)
+void CLOCK_ClearMsecCallback(int cb)
 {
     msec_callbacks &= ~(1 << cb);
 }
 void sys_tick_handler(void)
 {
 	msecs++;
+        if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
+            if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+                //medium priority tasks execute in interrupt and main loop context
+                medium_priority_cb();
+                priority_ready |= 1 << MEDIUM_PRIORITY;
+                msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
+            }
+        }
+        if(msec_callbacks & (1 << LOW_PRIORITY)) {
+            if (msecs == msec_cbtime[LOW_PRIORITY]) {
+                //Low priority tasks execute in the main loop
+                priority_ready |= 1 << LOW_PRIORITY;
+                msec_cbtime[LOW_PRIORITY] = msecs + LOW_PRIORITY_MSEC;
+            }
+        }
         if(msec_callbacks & (1 << TIMER_SOUND)) {
             if (msecs == msec_cbtime[TIMER_SOUND]) {
                 u16 ms = SOUND_Callback();

@@ -4,12 +4,10 @@
 void ADC_Init(void);
 u16 ADC1_Read(u8 channel);
 
-enum MsecCallback {
-    TIMER_SOUND = 0,
+enum {
+    TIMER_SOUND = LAST_PRIORITY,
+    NUM_MSEC_CALLBACKS,
 };
-#define NUM_MSEC_CALLBACKS 1
-
-void CLOCK_SetMsecCallback(enum MsecCallback, u32 msec);
-void CLOCK_ClearMsecCallback(enum MsecCallback);
+void CLOCK_ClearMsecCallback(int MsecCallback);
 u32 SOUND_Callback();
 #endif

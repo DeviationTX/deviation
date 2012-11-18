@@ -17,9 +17,6 @@ typedef uint64_t u64;
 
 #include "target.h"
 
-#define SCREEN_UPDATE_MSEC 100
-#define CHAN_UPDATE_MSEC   5
-
 extern volatile s16 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[32];
 /* Temproary definition until we have real translation */
@@ -138,5 +135,6 @@ const char *INPUT_ButtonName(u8 src);
 void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
-
+extern volatile u8 priority_ready;
+void medium_priority_cb();
 #endif

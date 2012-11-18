@@ -73,10 +73,19 @@ int  PWR_CheckPowerSwitch();
 void PWR_Shutdown();
 
 /* Clock functions */
+#define LOW_PRIORITY_MSEC 100
+#define MEDIUM_PRIORITY_MSEC   5
+enum MsecCallback {
+    MEDIUM_PRIORITY,
+    LOW_PRIORITY,
+    LAST_PRIORITY,
+};
+
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
 void CLOCK_StartTimer(u16 us, u16 (*cb)(void));
 void CLOCK_StopTimer();
+void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
 

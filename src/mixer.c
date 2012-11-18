@@ -300,7 +300,7 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *_raw,
         value = -value;
     //degrees / 100msec
     if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
-        s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * CHAN_UPDATE_MSEC / 100;
+        s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * MEDIUM_PRIORITY_MSEC / 100;
         if (value - _Channels[channel] > rate)
             value = _Channels[channel] + rate;
         else if(value - _Channels[channel] < -rate)

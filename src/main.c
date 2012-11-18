@@ -28,12 +28,10 @@
 void Init();
 void Banner();
 void EventLoop();
+volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
 u8 BATTERY_Check();
-
-u32 next_redraw=0;
-u32 next_scan=0;
 
 int main() {
     
@@ -73,13 +71,17 @@ int main() {
     MIXER_CalcChannels();
     PROTOCOL_Init(0);
 
-    next_redraw = CLOCK_getms()+SCREEN_UPDATE_MSEC;
-    next_scan = CLOCK_getms()+CHAN_UPDATE_MSEC;
-    
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
 #else
-    for(;;) EventLoop();
+    priority_ready = (1 << MEDIUM_PRIORITY) | (1 << LOW_PRIORITY);
+    CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
+    CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
+    while(1) {
+        if(priority_ready) {
+            EventLoop();
+        }
+    }
 #endif
 }
 
@@ -128,6 +130,11 @@ void Banner()
     
 }
 
+void medium_priority_cb()
+{
+    MIXER_CalcChannels();
+}
+
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
@@ -141,6 +148,7 @@ void EventLoop()
     }
 #endif
 
+    priority_ready &= ~(1 << MEDIUM_PRIORITY);
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & 0x01)) {
             CONFIG_SaveModelIfNeeded();
@@ -148,23 +156,18 @@ void EventLoop()
         }
         PWR_Shutdown();
     }
+    BUTTON_Handler();
+    TOUCH_Handler();
 
-    if (CLOCK_getms() > next_scan) {
-        MIXER_CalcChannels();
-        BUTTON_Handler();
-        TOUCH_Handler();
+    if (priority_ready & (1 << LOW_PRIORITY)) {
+        priority_ready  &= ~(1 << LOW_PRIORITY);
         PAGE_Event();
-        next_scan = CLOCK_getms() + CHAN_UPDATE_MSEC;
-    }
-
-    if (CLOCK_getms() > next_redraw) {
         PROTOCOL_CheckDialogs();
         TIMER_Update();
         TELEMETRY_Alarm();
         BATTERY_Check();
         AUTODIMMER_Update();
         GUI_RefreshScreen();
-        next_redraw = CLOCK_getms() + SCREEN_UPDATE_MSEC;
     }
 }
 

@@ -20,6 +20,7 @@ ifdef WINDOWS
     EXEEXT = exe
     ODIREXT = -w32
 else
+    LFLAGS := $(LFLAGS) -lrt
     ifndef SOUND
         CFLAGS := -DNO_SOUND $(CFLAGS)
     else

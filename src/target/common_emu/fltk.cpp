@@ -12,16 +12,18 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define _WIN32_WINNT 0x0500
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/timeb.h>
 #include <time.h>
+#include <errno.h>
 #ifndef WIN32
 #include <signal.h>
 #include <unistd.h>
 #endif
-
 
 #include <FL/Fl.H>
 #include <FL/x.H>
@@ -52,10 +54,6 @@ static struct {
 static Fl_Window *main_window;
 static Fl_Box    *image;
 static u16 (*timer_callback)(void);
-#ifdef WIN32
-static u16 alarmtime;
-static u32 lastalarm;
-#endif
 void update_channels(void *);
 
 #define WINDOW Fl_Window
@@ -324,7 +322,7 @@ struct touch SPITouch_GetCoords() {
 int SPITouch_IRQ()
 {
 #ifndef HAS_EVENT_LOOP
-    Fl::check();
+    //Fl::check();
 #endif
     return gui.mouse;
 }
@@ -368,12 +366,13 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 u32 ScanButtons()
 {
     //Force rescan
-    Fl::check();
+    //Fl::check();
     return gui.buttons;
 }
 
 int PWR_CheckPowerSwitch()
 {
+    Fl::check();
     return gui.powerdown;
 }
 
@@ -392,57 +391,114 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
     calibration.yoffset = yoff;
 }
 
-#ifndef WIN32
-void ALARMhandler(int sig)
+u32 msecs = 0;
+enum {
+    TIMER_ENABLE = LAST_PRIORITY,
+    NUM_MSEC_CALLBACKS,
+};
+u32 msec_cbtime[NUM_MSEC_CALLBACKS];
+u8 timer_enable;
+void ALARMhandler()
 {
-    (void)sig;
-    signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
-    if(timer_callback) {
+    msecs++;
+    //if(msecs % 1000 == 0) printf("msecs %d\n", msecs);
+
+    if(timer_callback && timer_enable & (1 << TIMER_ENABLE) && msecs == msec_cbtime[TIMER_ENABLE]) {
         u16 us = timer_callback();
         if (us > 0) {
-            printf("Sleeping: %dus\n", us);
-            u16 alarmtime = 1; //us > 1000 ? us /= 1000 : 1;
-            signal(SIGALRM, ALARMhandler);     /* reinstall the handler    */
-            alarm(alarmtime);
+            msec_cbtime[TIMER_ENABLE] += us;
         }
+    }
+    if(timer_enable & (1 << MEDIUM_PRIORITY) && msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+        medium_priority_cb();
+        priority_ready |= 1 << MEDIUM_PRIORITY;
+        msec_cbtime[MEDIUM_PRIORITY] += MEDIUM_PRIORITY_MSEC;
+    }
+    if(timer_enable & (1 << LOW_PRIORITY) && msecs == msec_cbtime[LOW_PRIORITY]) {
+        priority_ready |= 1 << LOW_PRIORITY;
+        msec_cbtime[LOW_PRIORITY] += LOW_PRIORITY_MSEC;
     }
 }
 
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
-{
-    u16 alarmtime = us > 1000 ? us /= 1000 : 1;
-    timer_callback = cb;
-    signal(SIGALRM, ALARMhandler);
-    alarm(alarmtime);
+#ifndef WIN32
+void _ALARMhandler(int sig) {
+    (void)sig;
+    ALARMhandler();
 }
 
-void CLOCK_StopTimer()
-{
-    signal(SIGALRM, SIG_IGN);          /* ignore this signal       */
-    alarm(0);
-}
-#else
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
-{
-    struct timeb tp;
-    ftime(&tp);
-    lastalarm = (tp.time * 1000) + tp.millitm;
-    alarmtime = us;
-    timer_callback = cb;
-}
-
-void CLOCK_StopTimer()
-{
-    timer_callback = NULL;
-}
-#endif
 void CLOCK_Init()
 {
+    int Ret;
     timer_callback = NULL;
+    signal(SIGALRM, _ALARMhandler);
+     //create a new timer.
+    timer_t timerid;
+    struct sigevent sig;
+    sig.sigev_notify = SIGEV_SIGNAL;
+    sig.sigev_signo= SIGALRM;
+
+    Ret = timer_create(CLOCK_REALTIME, &sig, &timerid);
+    if(Ret != 0) {
+        printf("timer_create() failed with %d\n", errno);
+        exit(1);
+    }
+    struct itimerspec in, out;
+    in.it_value.tv_sec = 0;
+    in.it_value.tv_nsec = 100 * 1000 * 1000; //100msec
+    in.it_interval.tv_sec = 0;
+    in.it_interval.tv_nsec = 1 * 1000 * 1000; //1msec
+    //issue the periodic timer request here.
+    Ret = timer_settime(timerid, 0, &in, &out);
+    if(Ret != 0) {
+        printf("timer_settime() failed with %d\n", errno);
+        exit(1);
+    }
+}
+#else
+HANDLE mainThread;
+void CALLBACK TimerProc(void* lpParametar, BOOLEAN TimerOrWaitFired)
+{
+    (void)lpParametar;
+    (void)TimerOrWaitFired;
+    SuspendThread(mainThread);
+    ALARMhandler();
+    ResumeThread(mainThread);
+}
+
+void CLOCK_Init()
+{
+    mainThread = OpenThread(THREAD_ALL_ACCESS, FALSE, GetCurrentThreadId());
+    timer_callback = NULL;
+    HANDLE m_timerHandle;
+    BOOL success = CreateTimerQueueTimer(&m_timerHandle, NULL, TimerProc,
+                                         NULL, 100, 1, WT_EXECUTEINTIMERTHREAD);
+    if(!success) {
+        printf("Couldn't start timer\n");
+        exit(1);
+    }
+}
+#endif
+void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+{
+    timer_callback = cb;
+    msec_cbtime[TIMER_ENABLE] = msecs + us;
+    timer_enable |= 1 << TIMER_ENABLE;
+}
+
+void CLOCK_StopTimer()
+{
+    timer_enable &= ~(1 << TIMER_ENABLE);
+}
+void CLOCK_SetMsecCallback(int cb, u32 msec)
+{
+    msec_cbtime[cb] = msecs + msec;
+    timer_enable |= 1 << cb;
 }
 
 u32 CLOCK_getms()
 {
+    return msecs;
+#if 0
     struct timeb tp;
     u32 t;
     ftime(&tp);
@@ -454,5 +510,6 @@ u32 CLOCK_getms()
     }
 #endif        
     return t;
+#endif
 }
 }
