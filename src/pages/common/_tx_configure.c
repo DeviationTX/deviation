@@ -118,7 +118,8 @@ static void calibrate_sticks(void)
     }
     if (calibrate_state == CALI_EXIT)
         memcpy(Transmitter.calibration, cp->calibration, sizeof(cp->calibration));
-    
+
+    PAGE_SetActionCB(NULL);
     PROTOCOL_Init(0);
     PAGE_TxConfigureInit(-1);   // should be -1 so that devo10 can get back to previous item selection
     PAGE_DisableSafetyDialog(0);
