@@ -77,6 +77,7 @@ static void _show_page1()
     tp.telem.time[2] = 0;
     // bug fix: scroll_bar must be initialized, otherwise it will caused crash when checked against NULL(press UP/DOWN keys)
     scroll_bar = NULL;
+    labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
 }
 
 static void _show_page2()
@@ -113,6 +114,7 @@ static void _show_page2()
     tp.telem.time[1] = 0;
     tp.telem.time[2] = 0;
     scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, 3, NULL, NULL, NULL);
+    labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)

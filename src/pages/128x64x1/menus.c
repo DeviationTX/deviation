@@ -106,7 +106,9 @@ void PAGE_MenuInit(int page)
     if (mp->total_items > PAGE_ITEM_MAX) {
         mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT,
                 LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
-    }
+    } else
+        mp->scroll_bar = NULL; //Bug fix: this is a must to let PAGE_NavigateItems() won't set scroll bars' position. Otherwise, the main menu might crash when there is no scroll bar in a menu
+
     if (*mp->current_selected >= mp->total_items)  // when users customize sub menu item to main menu item, this scenario happans
         *mp->current_selected = mp->total_items - 1;
     if (*mp->current_selected > 0) {

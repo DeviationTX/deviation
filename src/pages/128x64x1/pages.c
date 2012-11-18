@@ -233,6 +233,7 @@ void PAGE_ChangeQuick(int dir)
     }
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN, 0);
+    } else if (Model.pagecfg.quickpage[quick-1] == 1) { // bug fix: main menu should not be in quick page
     } else {
         PAGE_ChangeByID(Model.pagecfg.quickpage[quick-1], 0);
     }
@@ -256,11 +257,24 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 }
 const char *PAGE_GetName(int i)
 {
-    if(i == 0)
+    if(i == 0 || i == 1)
         return _tr("None");
     return _tr(pages[i].pageName);
 }
+
+int PAGE_GetStartPage()
+{
+    return 1; // main menu shouldn't be put to quick page
+}
+
 int PAGE_GetNumPages()
 {
     return sizeof(pages) / sizeof(struct page);
+}
+
+void PAGE_SaveMixerSetup(struct mixer_page * const mp)
+{
+    MIXER_SetLimit(mp->channel, &mp->limit);
+    MIXER_SetTemplate(mp->channel, mp->cur_template);
+    MIXER_SetMixers(mp->mixer, mp->num_mixers);
 }

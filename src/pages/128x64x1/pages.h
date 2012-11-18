@@ -49,6 +49,7 @@ struct pagemem {
 extern struct pagemem pagemem;
 extern struct LabelDesc labelDesc;
 
+void PAGE_SaveMixerSetup(struct mixer_page * const mp);
 void PAGE_ShowHeader(const char *title);
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height);
 void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));
@@ -69,13 +70,6 @@ void PAGE_MainExit();
 
 // Menu
 void PAGE_MenuInit(int page);
-// Main Menu
-void PAGE_MainMenuInit(int page);
-void PAGE_MainMenuExit();
-
-// Sub Menu
-void PAGE_SubMenuInit(int page);
-void PAGE_SubMenuExit();
 
 // Mixer
 void PAGE_MixerInit(int page);

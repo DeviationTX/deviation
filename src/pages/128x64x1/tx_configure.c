@@ -48,7 +48,7 @@ void PAGE_TxConfigureInit(int page)
     u8 view_origin_absoluteX = 0;
     u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
     u8 space = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH, LCD_HEIGHT - view_origin_absoluteY ,
             view_origin_absoluteX, view_origin_absoluteY);
 
     u8 row = 0;

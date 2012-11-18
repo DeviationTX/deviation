@@ -86,13 +86,13 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             GUI_RemoveAllObjects();
             edit->parent();
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) { // press enter to enter curves setup
-            guiObject_t *obj = GUI_GetSelected();
-            if (obj != saveButton) {
-                GUI_SetSelected(saveButton); // quick jump to save button
-            } else
-                return 0;
-            return 0;
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
+            // long press enter = save without exiting
+            if (edit->pointnum < 0)
+                edit->curve.points[1] = edit->curve.points[0];
+            *edit->curveptr = edit->curve;
+            struct mixer_page * const mp = &pagemem.u.mixer_page;
+            PAGE_SaveMixerSetup(mp);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
