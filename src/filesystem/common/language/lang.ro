@@ -61,8 +61,6 @@ Iluminare:
 Bara %d:
 :Bars:
 Bare:
-<:Basic config
-<Configurare
 :Batt alarm:
 Alarmă bat.:
 :Battery alarm:
@@ -79,9 +77,8 @@ Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT 
 Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 :Box %d:
 Loc%d:
->:Button monitor
-<:Buttons
-<Butoane
+:Button monitor
+Monitor butoane
 :COL
 Colectiv
 :COL Inv:
@@ -102,11 +99,10 @@ Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 Ch
 :Change
 Modifică
->:Channel monitor
+:Channel monitor
+Monitor canale
 :Channel output
-Ieșire canal
-<:Channels
-<Canale
+Canale
 :Complex
 Complex
 :Configure
@@ -116,11 +112,11 @@ Contrast:
 :Copy To
 Copiază
 :Copy To...
-Copiază în...
+Copiază...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Nivelul de încărcare al bateriei critic!\nSetările au fost salvate,\norice modificare ulterioară\nNU va mai fi salvată.\n\nÎncărcați sau schimbați bateriile!
 :Curve:
-Curba:
+Curbă:
 :Cyclic1
 Ciclic1
 :Cyclic2
@@ -136,7 +132,7 @@ Default
 :Deviation FW version:
 Deviation fw. versiune:
 :Dimmer target:
-Ilum. auto
+Nivel auto
 :Dimmer time:
 Timp auto:
 :Dn
@@ -189,11 +185,10 @@ Elicopter
 Pos0
 :Icon
 Icon
->:Input monitor
+:Input monitor
+Monitor intrări
 :Input:
 Intrare:
-<:Inputs
-<Intrări
 :Insert
 Inserare
 :Inverted
@@ -210,7 +205,8 @@ Limbă:
 Latitudine
 :Left
 Stânga
->:Length:
+:Length:
+Distanță
 :Linked
 Legat
 :Load
@@ -231,14 +227,18 @@ MIX1
 MIX2
 :Main menu
 Meniu principal
->:Main page
+:Main page
+Pagina principală
 :Main page config
 Ecran principal
 :Max:
 Max:
->:Menu
->:Menu +
->:Menu -
+:Menu
+Meniu
+:Menu +
+Meniu +
+:Menu -
+Meniu -
 :Meter
 Metru
 :Mid-Rate
@@ -253,19 +253,14 @@ Configurare mixer
 Mixere:
 :Mode %d
 Mod %d
-<:Model
-<Model
-<:Model config
-<Configurare model
->:Model menu
+:Model menu
+Meniu model
 :Model name:
 Nume model:
 :Model setup
 Profil model
 :Model type:
 Tip model:
-<:Monitor
-<Monitor
 :Move Down
 Mișcă în jos
 :Move Up
@@ -289,13 +284,13 @@ nimic
 :Normal
 Normal
 :Off
-Oprit
+ Oprit
 :Offset:
 Offset:
 :Ok
 Ok
 :On
-Pornit
+ Pornit
 :Page:
 Pagină:
 :Plane
@@ -307,9 +302,9 @@ Poz.
 :Pos/Neg:
 Poz/Neg:
 :Prealert intvl:
-Interval prealertă:
+Interval:
 :Prealert time:
-Int. Prealertă:
+Prealertă:
 :Press 'Ent' to turn USB Filesystem:
 \nApasă ENT pentru a seta modul USB: 
 :Press ENT to change:
@@ -341,7 +336,7 @@ Re-init
 :Remove
 Șterge
 :Reset
-Resetează
+Reset
 :Reverse:
 Invers:
 :Reversed
@@ -363,7 +358,7 @@ Scara1:
 :Scale2:
 Scara2:
 :Scale:
-Scara:
+Scară:
 :Scanner
 Scaner
 :Simple
@@ -373,17 +368,17 @@ Simplu 4 canale
 :Speed
 Viteză
 :Speed:
-Viteza:
+Viteză:
 :Src
 Sursa
 :Src:
-Sursa:
+Sursă:
 :Start:
 Start:
 :Step:
 Pas:
 :Stick input
-Stick intrare
+Intrări
 :Stick mode:
 Mod:
 :Sticks:
@@ -434,8 +429,6 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
-<:Telemetry
-<Telemetrie
 :Telemetry config
 Telemetrie
 :Telemetry monitor
@@ -461,7 +454,7 @@ Setări crono
 :Timers
 Timere
 :Timeup intvl:
-Interval timp:
+Expirare:
 :Toggle%d
 Într.%d
 :Touch Calibrate
@@ -478,7 +471,8 @@ Apasă pentru a încuia
 Apasă pentru a descuia
 :Transmitter config
 Configurare radio
->:Transmitter menu
+:Transmitter menu
+Meniu radio
 :Trim
 Trim
 :Trim +:
@@ -496,7 +490,7 @@ Oprește
 :Turn On
 Pornește
 :Tx power:
-Putere radio:
+Putere tx:
 :USB
 USB
 :Unknown
