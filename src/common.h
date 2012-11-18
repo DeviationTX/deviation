@@ -82,6 +82,7 @@ void PAGE_ShowLowBattDialog();
 void PAGE_DisableSafetyDialog(u8 disable);
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
+int PAGE_GetStartPage();
 
 /* Protocol */
 #define PROTODEF(proto, map, init, name) proto,

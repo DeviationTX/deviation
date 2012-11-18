@@ -274,6 +274,12 @@ const char *PAGE_GetName(int i)
         return _tr("None");
     return _tr(pages[i].name);
 }
+
+int PAGE_GetStartPage()
+{
+    return 0;
+}
+
 int PAGE_GetNumPages()
 {
     return sizeof(pages) / sizeof(struct page);
