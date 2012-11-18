@@ -70,13 +70,6 @@ void PAGE_MainExit();
 
 // Menu
 void PAGE_MenuInit(int page);
-// Main Menu
-void PAGE_MainMenuInit(int page);
-void PAGE_MainMenuExit();
-
-// Sub Menu
-void PAGE_SubMenuInit(int page);
-void PAGE_SubMenuExit();
 
 // Mixer
 void PAGE_MixerInit(int page);
