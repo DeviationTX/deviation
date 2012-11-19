@@ -98,6 +98,7 @@ static void calibrate_sticks(void)
     sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
     cp->textbox = GUI_CreateLabelBox(1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, cp->tmpstr);
+    CLOCK_ClearMsecCallback(MEDIUM_PRIORITY);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
     while(1) {
@@ -118,6 +119,7 @@ static void calibrate_sticks(void)
     }
     if (calibrate_state == CALI_EXIT)
         memcpy(Transmitter.calibration, cp->calibration, sizeof(cp->calibration));
+    CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
 
     PAGE_SetActionCB(NULL);
     PROTOCOL_Init(0);

@@ -86,6 +86,7 @@ u32 CLOCK_getms(void);
 void CLOCK_StartTimer(u16 us, u16 (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
+void CLOCK_ClearMsecCallback(int cb);
 void CLOCK_StartWatchdog();
 void CLOCK_ResetWatchdog();
 
