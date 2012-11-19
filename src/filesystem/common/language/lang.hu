@@ -77,7 +77,8 @@ Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcs
 Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 :Box %d:
 Doboz%d:
->:Button monitor
+:Button monitor
+Nyomógomb ellenőrzés
 :COL
 Kollektív
 :COL Inv:
@@ -98,7 +99,8 @@ Mégsem
 Cs
 :Change
 Váltás
->:Channel monitor
+:Channel monitor
+Csatornák
 :Channel output
 Csatornák
 :Complex
@@ -183,7 +185,8 @@ Helikopter
 Magas
 :Icon
 Ikon
->:Input monitor
+:Input monitor
+Bemenetek
 :Input:
 Bemenet:
 :Insert
@@ -224,14 +227,18 @@ MIX1
 MIX2
 :Main menu
 Főmenü
->:Main page
+:Main page
+Főablak
 :Main page config
 Főablak konfig.
 :Max:
 Max:
->:Menu
->:Menu +
->:Menu -
+:Menu
+Menü
+:Menu +
+Menü +
+:Menu -
+Menü -
 :Meter
 Méter
 :Mid-Rate
@@ -246,7 +253,8 @@ Mixer
 Mixerek:
 :Mode %d
 Mód %d
->:Model menu
+:Model menu
+Modell menü
 :Model name:
 Modell név:
 :Model setup
@@ -443,7 +451,8 @@ Idő
 Időzítő
 :Timer settings
 Időzítő beállítások
->:Timer%d:
+:Timer%d:
+Időzítő%1:
 :Timers
 Időzítők
 :Timeup intvl:
@@ -464,7 +473,8 @@ Képernyő:
 Érintse meg a feloldáshoz
 :Transmitter config
 Távirányító konfig.
->:Transmitter menu
+:Transmitter menu
+Távirányító menü
 :Trim
 Trim
 :Trim +:
