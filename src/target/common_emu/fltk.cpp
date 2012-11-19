@@ -494,6 +494,10 @@ void CLOCK_SetMsecCallback(int cb, u32 msec)
     msec_cbtime[cb] = msecs + msec;
     timer_enable |= 1 << cb;
 }
+void CLOCK_ClearMsecCallback(int cb)
+{
+    timer_enable &= ~(1 << cb);
+}
 
 u32 CLOCK_getms()
 {
