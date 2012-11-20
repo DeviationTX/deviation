@@ -181,10 +181,10 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     u8 result = 0;
     if(GUI_IsModal())  //Disable control when a dialog is shown
         return 0;
-    if (ActionCB != NULL)
-        result = ActionCB(button, flags, data);
-    if(! result && quick_page_enabled)
+    if(! result && quick_page_enabled)  // let the quickpage over other pages
         result = PAGE_QuickPage(button, flags, data);
+    if (!result && ActionCB != NULL)
+        result = ActionCB(button, flags, data);
     return result;
 }
 
@@ -245,14 +245,14 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 {
     (void)data;
 
-    if((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[0] &&
-       CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[0]))
+    if((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(buttons, BUT_UP))
     {
+        BUTTON_InterruptLongPress(); // avoid the quickpage switching continously
         PAGE_ChangeQuick(1);
         return 1;
-    } else if ((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[1] &&
-               CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[1]))
+    } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(buttons, BUT_DOWN))
     {
+        BUTTON_InterruptLongPress();
         PAGE_ChangeQuick(-1);
         return 1;
     }

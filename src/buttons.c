@@ -78,7 +78,7 @@ void print_buttons(u32 buttons)
     buttonstring[32] = 0;
     printf("Buttons: %s\n",buttonstring);
 }
-
+static u8 interrupt_longpress = 0;
 void BUTTON_Handler()
 {
     static u32 last_buttons = 0;
@@ -92,7 +92,7 @@ void BUTTON_Handler()
     u32 buttons_pressed=   buttons  & (~last_buttons);
     u32 buttons_released=(~buttons) &   last_buttons;
 
-    if(buttons_pressed) {
+    if(buttons_pressed && !longpress_release) {
         AUTODIMMER_Check();
         exec_callbacks(buttons_pressed, BUTTON_PRESS);
         last_buttons_pressed = buttons_pressed;
@@ -101,6 +101,8 @@ void BUTTON_Handler()
     }
     
     if(buttons_released) {
+        interrupt_longpress = 0;
+        longpress_release = 0;
         if(!longpress_release) {
             exec_callbacks(buttons_released, BUTTON_RELEASE);
         } else {
@@ -108,16 +110,22 @@ void BUTTON_Handler()
         }
     }
 
-    if(buttons && (buttons == last_buttons)) {
+    if(buttons && (buttons == last_buttons) && !interrupt_longpress) {
         if(CLOCK_getms()>long_press_at) {
-           exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
-           longpress_release=1;
-           long_press_at += 100;
+            exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
+            longpress_release=1;
+            long_press_at += 100;
         }
     }
 
     last_buttons=buttons;    
-}    
+}
+
+void BUTTON_InterruptLongPress()
+{
+    printf("interrupt \n");
+    interrupt_longpress = 1;
+}
 
 void exec_callbacks(u32 buttons, enum ButtonFlags flags) {
     buttonAction_t *ptr = buttonHEAD;

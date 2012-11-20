@@ -9,7 +9,6 @@ PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        NULL,     
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainCfgInit,     PAGE_MainCfgEvent,     NULL,             _tr_noop("Main page config"))
 PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL,             _tr_noop("Transmitter config"))
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,             _tr_noop("Telemetry monitor"))
-PAGEDEF(PAGEID_TELEMGPS, PAGE_TelemtestGPSInit,PAGE_TelemtestEvent,   NULL,             _tr_noop("GPS"))
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Channel monitor"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
 PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,             _tr_noop("About Deviation"))

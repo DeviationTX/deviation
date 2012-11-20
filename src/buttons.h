@@ -24,4 +24,5 @@ u8 BUTTON_RegisterCallback(buttonAction_t *action, u32 button, u8 flags,
                  u8 (*callback)(u32 button, u8 flags, void *data), void *data);
 void BUTTON_UnregisterCallback(buttonAction_t *action);
 void BUTTON_Handler();
+void BUTTON_InterruptLongPress();
 #endif

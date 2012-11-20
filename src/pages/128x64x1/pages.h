@@ -122,7 +122,6 @@ void PAGE_MainCfgInit(int page);
 
 /* Telemetry Test */
 void PAGE_TelemtestInit(int page);
-void PAGE_TelemtestGPSInit(int page);
 void PAGE_TelemtestEvent();
 void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 
