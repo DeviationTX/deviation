@@ -391,7 +391,8 @@ void SPITouch_Calibrate(s32 xscale, s32 yscale, s32 xoff, s32 yoff)
     calibration.yoffset = yoff;
 }
 
-u32 msecs = 0;
+//  bug fix: msecs should be removed as Windows can't guarantee every type of Windows can set timer as short as 1ms
+//u32 msecs = 0;
 enum {
     TIMER_ENABLE = LAST_PRIORITY,
     NUM_MSEC_CALLBACKS,
@@ -400,21 +401,36 @@ u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 u8 timer_enable;
 void ALARMhandler()
 {
-    msecs++;
-    //if(msecs % 1000 == 0) printf("msecs %d\n", msecs);
+    /* msecs++;
+    if(msecs % 1000 == 0) printf("msecs %d\n", msecs);
+    if(msecs%200==0)
+    {   // In my PC, every 200 count = 1 second, so 1 unit of msecs = 5ms, which is the minimum time unit
+        // so the msecs doesn't work in Windows
+        struct timeb tp;
+        u32 t;
+        ftime(&tp);
+        t = (tp.time * 1000) + tp.millitm;
+        printf("%d\n",t);
+    } */
 
-    if(timer_callback && timer_enable & (1 << TIMER_ENABLE) && msecs == msec_cbtime[TIMER_ENABLE]) {
+    if(timer_callback && timer_enable & (1 << TIMER_ENABLE) &&
+            CLOCK_getms() >= msec_cbtime[TIMER_ENABLE]) {
+            //msecs == msec_cbtime[TIMER_ENABLE]) {
         u16 us = timer_callback();
         if (us > 0) {
             msec_cbtime[TIMER_ENABLE] += us;
         }
     }
-    if(timer_enable & (1 << MEDIUM_PRIORITY) && msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+    if(timer_enable & (1 << MEDIUM_PRIORITY) &&
+            CLOCK_getms() >= msec_cbtime[MEDIUM_PRIORITY]) {
+            // msecs == msec_cbtime[MEDIUM_PRIORITY]) {
         medium_priority_cb();
         priority_ready |= 1 << MEDIUM_PRIORITY;
         msec_cbtime[MEDIUM_PRIORITY] += MEDIUM_PRIORITY_MSEC;
     }
-    if(timer_enable & (1 << LOW_PRIORITY) && msecs == msec_cbtime[LOW_PRIORITY]) {
+    if(timer_enable & (1 << LOW_PRIORITY) &&
+            CLOCK_getms() >= msec_cbtime[LOW_PRIORITY]) {
+            // msecs == msec_cbtime[LOW_PRIORITY]) {
         priority_ready |= 1 << LOW_PRIORITY;
         msec_cbtime[LOW_PRIORITY] += LOW_PRIORITY_MSEC;
     }
@@ -481,7 +497,8 @@ void CLOCK_Init()
 void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
 {
     timer_callback = cb;
-    msec_cbtime[TIMER_ENABLE] = msecs + us;
+    msec_cbtime[TIMER_ENABLE] = CLOCK_getms() + us;
+            // msecs + us;
     timer_enable |= 1 << TIMER_ENABLE;
 }
 
@@ -491,7 +508,8 @@ void CLOCK_StopTimer()
 }
 void CLOCK_SetMsecCallback(int cb, u32 msec)
 {
-    msec_cbtime[cb] = msecs + msec;
+    msec_cbtime[cb] = CLOCK_getms() + msec;
+            //msecs + msec;
     timer_enable |= 1 << cb;
 }
 void CLOCK_ClearMsecCallback(int cb)
@@ -501,19 +519,10 @@ void CLOCK_ClearMsecCallback(int cb)
 
 u32 CLOCK_getms()
 {
-    return msecs;
-#if 0
     struct timeb tp;
     u32 t;
     ftime(&tp);
     t = (tp.time * 1000) + tp.millitm;
-#ifdef WIN32
-    if (timer_callback && alarmtime && (t - lastalarm > alarmtime)) {
-        lastalarm = t;
-        alarmtime = timer_callback();
-    }
-#endif        
     return t;
-#endif
 }
 }
