@@ -222,7 +222,7 @@ void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
     for (int i = 0; i < 4; i++) {
-        if(Model.pagecfg.quickpage[i] && Model.pagecfg.quickpage[i] == page) {
+        if(Model.pagecfg.quickpage[i] > 1 && Model.pagecfg.quickpage[i] == page) {
             quick = i+1;
             break;
         }
@@ -230,9 +230,10 @@ void PAGE_ChangeQuick(int dir)
     int increment = dir > 0 ? 1 : NUM_QUICKPAGES;
     while(1) {
        quick = (quick + increment) % 5;
-       if (quick == 0 || Model.pagecfg.quickpage[quick-1])
+       if (quick == 0 || Model.pagecfg.quickpage[quick-1] > 1)
            break;
     }
+printf("quick new:%d\n", quick);
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN, 0);
     } else if (Model.pagecfg.quickpage[quick-1] == 1) { // bug fix: main menu should not be in quick page
