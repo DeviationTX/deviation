@@ -58,8 +58,6 @@
 柱图%d
 :Bars:
 柱状图
-<:Basic config
-<基本功能设置
 :Batt alarm:
 电量报警
 :Battery alarm:
@@ -76,9 +74,8 @@
 对频中...\n%d秒后结束\n按ENT中止
 :Box %d:
 第%d栏
->:Button monitor
-<:Buttons
-<按键
+:Button monitor
+按键监控
 :COL
 螺距
 :COL Inv:
@@ -99,11 +96,10 @@ CYC
 通道
 :Change
 改变
->:Channel monitor
+:Channel monitor
+通道监控
 :Channel output
 通道输出
-<:Channels
-<通道
 :Complex
 多段式
 :Configure
@@ -119,11 +115,11 @@ CYC
 :Curve:
 曲线
 :Cyclic1
-循环1
+CCPM1
 :Cyclic2
-循环2
+CCPM2
 :Cyclic3
-循环3
+CCPM3
 :DR
 舵量
 :Deadband
@@ -184,11 +180,10 @@ FMOD2
 普通飞行
 :Icon
 图标
->:Input monitor
+:Input monitor
+摇杆输入监控
 :Input:
 输入
-<:Inputs
-<输入
 :Insert
 插入
 :Inverted
@@ -224,18 +219,18 @@ LCD设置
 >:MIX2
 :Main menu
 主菜单
-<:Main menu config
-<定制主菜单
->:Main page
+:Main page
+主页面
 :Main page config
 定制主页面
 :Max:
 最大舵量
->:Menu
->:Menu +
->:Menu -
-<:Menu%d
-<菜单%d
+:Menu
+快捷菜单
+:Menu +
+快捷菜单+
+:Menu -
+快捷菜单-
 :Meter
 米
 :Mid-Rate
@@ -250,19 +245,14 @@ LCD设置
 混控:
 :Mode %d
 模式%d
-<:Model
-<模型
-<:Model config
-<模型设置
->:Model menu
+:Model menu
+模型设置
 :Model name:
 模型命名
 :Model setup
 模型设置
 :Model type:
 模型类型
-<:Monitor
-<通道/摇杆监控
 :Move Down
 下移
 :Move Up
@@ -293,7 +283,7 @@ LCD设置
 :On
 开启
 :Page:
-混控序号
+模式1-N
 :Plane
 固定翼
 :Point:
@@ -429,11 +419,10 @@ LCD设置
 温度
 :TelemV
 电压
-<:Telemetry
-<双向回传监控
 :Telemetry config
 双向回传设置
->:Telemetry monitor
+:Telemetry monitor
+双向回传监控
 :Telemetry settings
 双向回传设置
 :Temp
@@ -472,7 +461,8 @@ LCD设置
 >:Touch to Unlock
 :Transmitter config
 遥控设置
->:Transmitter menu
+:Transmitter menu
+遥控设置
 :Trim
 微调
 :Trim +:

@@ -57,8 +57,6 @@
 :Bar %d:
 條框%d
 >:Bars:
-<:Basic config
-<基本規畫
 :Batt alarm:
 低電警示:
 >:Battery alarm:
@@ -208,8 +206,6 @@ FMOD2
 >:MIX2
 :Main menu
 主選單
-<:Main menu config
-<主選單規畫
 >:Main page
 :Main page config
 螢幕排列規畫
@@ -218,8 +214,6 @@ FMOD2
 >:Menu
 >:Menu +
 >:Menu -
-<:Menu%d
-<選單%d
 :Meter
 公尺
 :Mid-Rate
@@ -234,8 +228,6 @@ FMOD2
 段數:
 :Mode %d
 模式 %d
-<:Model config
-<模型規畫
 >:Model menu
 :Model name:
 模型名稱:
@@ -243,8 +235,6 @@ FMOD2
 模型設定
 :Model type:
 機種選擇:
-<:Monitor
-<檢視通道內容
 >:Move Down
 >:Move Up
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
@@ -403,8 +393,6 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
-<:Telemetry
-<檢視遙測內容
 :Telemetry config
 遙測規畫
 >:Telemetry monitor
