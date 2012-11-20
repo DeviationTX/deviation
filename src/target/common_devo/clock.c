@@ -46,7 +46,7 @@ void CLOCK_Init()
 
     /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
     systick_set_reload(9000);
-    nvic_set_priority(NVIC_SYSTICK_IRQ, 0xff); //Low priority
+    nvic_set_priority(NVIC_SYSTICK_IRQ, 0x0); //Highest priority
 
     systick_interrupt_enable();
 
@@ -102,6 +102,13 @@ void CLOCK_Init()
     timer_disable_irq(TIM4, TIM_DIER_CC1IE);
 
     timer_enable_counter(TIM4);
+
+    /* Enable TIM7 interrupt. */
+    /* We are enabling the interrupt but not the timer.
+       We'll manually trigger this via set_pending_interrupt
+     */
+    nvic_enable_irq(NVIC_TIM7_IRQ);
+    nvic_set_priority(NVIC_TIM7_IRQ, 64); //Medium priority
     /* wait for system to start up and stabilize */
     while(msecs < 100)
         ;
@@ -160,13 +167,18 @@ void CLOCK_ClearMsecCallback(int cb)
 {
     msec_callbacks &= ~(1 << cb);
 }
+void tim7_isr()
+{
+    medium_priority_cb();
+}
+
 void sys_tick_handler(void)
 {
 	msecs++;
         if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
             if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
                 //medium priority tasks execute in interrupt and main loop context
-                medium_priority_cb();
+                nvic_set_pending_irq(NVIC_TIM7_IRQ);
                 priority_ready |= 1 << MEDIUM_PRIORITY;
                 msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
             }
