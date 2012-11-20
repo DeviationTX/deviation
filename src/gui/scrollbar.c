@@ -162,6 +162,12 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
     return 0;
 }
 
+u8 GUI_GetScrollbarNumItems(struct guiObject *obj)
+{
+    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    return scrollbar->num_items;
+}
+
 static u8 button_cb(u32 button, u8 flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;

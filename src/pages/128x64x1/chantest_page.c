@@ -27,7 +27,6 @@ static const char *_page_cb(guiObject_t *obj, const void *data);
 static void _navigate_items(s8 direction);
 #define VIEW_ID 0
 static s8 current_page = 0; // bug fix
-static u8 total_items = 3;
 static u8 view_height;
 static guiObject_t *scroll_bar;
 
@@ -126,6 +125,7 @@ static void _navigate_items(s8 direction)
     if (scroll_bar == NULL) // no page scroll
         return;
     current_page += direction;
+    u8 total_items = GUI_GetScrollbarNumItems(scroll_bar);
     if (current_page <=0) {
         current_page = 0;
         GUI_SetRelativeOrigin(VIEW_ID, 0, 0);

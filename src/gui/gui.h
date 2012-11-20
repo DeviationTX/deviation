@@ -368,6 +368,7 @@ guiObject_t *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
         u8 num_items, guiObject_t *parent,
         u8 (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
 void GUI_SetScrollbar(guiObject_t *obj, u8 pos);
+u8 GUI_GetScrollbarNumItems(guiObject_t *obj);
 
 guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc);
 
