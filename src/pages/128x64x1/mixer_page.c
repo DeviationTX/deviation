@@ -54,13 +54,6 @@ static void _show_page()
         u8 ch = mp->top_channel + i;
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
-
-        for (idx = 0; idx < NUM_MIXERS; idx++)
-            if (mix[idx].src && mix[idx].dest == ch)
-                break;
-        if (idx != NUM_MIXERS && row >= space * 4) {//we can't run past the end of the page
-            break;
-        }
         if (ch < NUM_OUT_CHANNELS) {
             obj = GUI_CreateButtonPlateText(0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
@@ -75,8 +68,11 @@ static void _show_page()
         mp->itemObj[i *2 +1] = GUI_CreateButtonPlateText(w1 + 2, row, w2, h , &labelDesc, template_name_cb, 0,
                 templateselect_cb, (void *)((long)ch));
 
+        row += space; // bug fix: dynamically showing/hiding items won't work in devo10, it causes crash when changing template from none to simple/expo/complex
+        for (idx = 0; idx < NUM_MIXERS; idx++)
+            if (mix[idx].src && mix[idx].dest == ch)
+                break;
         if (idx != NUM_MIXERS) {
-            row += space;
             enum TemplateType template = MIXER_GetTemplate(ch);
             labelDesc.style = LABEL_LEFTCENTER;
             GUI_CreateLabelBox(0, row, w1, h, &labelDesc, show_source, NULL, &mix[idx].src);
@@ -91,9 +87,6 @@ static void _show_page()
         }
         row += space;
     }
-    mp->entries_per_page = i;
-    mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > mp->entries_per_page ?
-            Model.num_channels + NUM_VIRT_CHANNELS - mp->entries_per_page : Model.num_channels + NUM_VIRT_CHANNELS;
     if (!GUI_IsSelectable(mp->itemObj[selectedIdx])) {
         selectedIdx++;
     }
