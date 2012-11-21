@@ -21,10 +21,13 @@
 #ifdef PROTO_HAS_A7105
 
 #include <string.h>
+#include <stdlib.h>
 
 static u8 packet[16];
 static u8 channel;
 static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};
+static u32 sessionid;
+static const u32 txid = 0xdb042679;
 static u8 state;
 enum {
     BIND_1,
@@ -120,24 +123,23 @@ static void update_crc()
         sum += packet[i];
     packet[15] = (256 - (sum % 256)) & 0xff;
 }
-static const u8 txid[] = {0xdb, 0x04, 0x26, 0x79};
 static void hubsan_build_bind_packet(u8 state)
 {
     packet[0] = state;
     packet[1] = channel;
-    packet[2] = 0x44; //ID[0]
-    packet[3] = 0xa7; //ID[1]
-    packet[4] = 0x0d; //ID[2]
-    packet[5] = 0x0f; //ID[3]
+    packet[2] = (sessionid >> 24) & 0xff;
+    packet[3] = (sessionid >> 16) & 0xff;
+    packet[4] = (sessionid >>  8) & 0xff;
+    packet[5] = (sessionid >>  0) & 0xff;
     packet[6] = 0x08;
     packet[7] = 0xe4; //???
     packet[8] = 0xea;
     packet[9] = 0x9e;
     packet[10] = 0x50;
-    packet[11] = txid[0];
-    packet[12] = txid[1];
-    packet[13] = txid[2];
-    packet[14] = txid[3];
+    packet[11] = (txid >> 24) & 0xff;
+    packet[12] = (txid >> 16) & 0xff;
+    packet[13] = (txid >>  8) & 0xff;
+    packet[14] = (txid >>  0) & 0xff;
     update_crc();
 }
 
@@ -162,10 +164,10 @@ static void hubsan_build_packet()
     packet[8] = get_channel(0, 0x55, 0x80, 0x80);
     packet[9] = 0x02;
     packet[10] = 0x64;
-    packet[11] = txid[0];
-    packet[12] = txid[1];
-    packet[13] = txid[2];
-    packet[14] = txid[3];
+    packet[11] = (txid >> 24) & 0xff;
+    packet[12] = (txid >> 16) & 0xff;
+    packet[13] = (txid >>  8) & 0xff;
+    packet[14] = (txid >>  0) & 0xff;
     update_crc();
 }
 static u16 hubsan_cb()
@@ -240,6 +242,7 @@ static void initialize() {
     CLOCK_StopTimer();
     A7105_Reset();
     hubsan_init();
+    sessionid = rand();
     channel = allowed_ch[rand() % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
