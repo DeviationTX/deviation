@@ -98,7 +98,7 @@ Binding is complete once the Received data has 'bb' == '09'
 
 Data transmission:
 The Transmitter will transmit 4 data packets on the chosen frequency,
-and then a single packet on freq + 0x23 (modulo 0x82?).
+and then a single packet on freq + 0x23.
 Packets are transmitted 10msec apart
 
 Ex1: 20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
