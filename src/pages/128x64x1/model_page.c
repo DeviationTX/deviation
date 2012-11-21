@@ -58,9 +58,9 @@ void PAGE_ModelInit(int page)
     u8 x = 63;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("File:"));
-    guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, file_press_cb, file_val_cb, NULL);
-    GUI_SetSelected(obj);
+    GUI_Select1stSelectableObj();
     mp->total_items++;
 
     row += space;

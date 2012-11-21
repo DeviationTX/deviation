@@ -412,4 +412,5 @@ void GUI_ScrollLogicalView(u8 view_id, s16 y_offset);
 void GUI_ScrollLogicalViewToObject(u8 view_id, struct guiObject *obj, s8 direction);
 s16 GUI_GetLogicalViewOriginRelativeY(u8 view_id);
 s8 GUI_GetViewId(u16 x, u16 y) ;
+void GUI_Select1stSelectableObj();
 #endif /* GUI_H_ */

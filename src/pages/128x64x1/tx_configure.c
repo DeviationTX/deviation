@@ -63,9 +63,9 @@ void PAGE_TxConfigureInit(int page)
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
-    guiObject_t *obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &labelDesc, langstr_cb, 0x0000, lang_select_cb, NULL);
-    GUI_SetSelected(obj);
+    GUI_Select1stSelectableObj();
     cp->total_items++;
 
     row += space;

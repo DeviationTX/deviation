@@ -76,6 +76,8 @@
 第%d栏
 :Button monitor
 按键监控
+:Buzz volume:
+音量
 :COL
 螺距
 :COL Inv:
@@ -487,6 +489,8 @@ LCD设置
 上
 :Value:
 值
+:Vibration:
+振动
 :Virt
 虚通道
 :Volt

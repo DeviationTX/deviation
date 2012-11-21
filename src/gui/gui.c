@@ -602,3 +602,16 @@ void GUI_GetSize(struct guiObject *obj, int *width, int *height)
     *width = obj->box.width;
     *height = obj->box.height;
 }
+
+void GUI_Select1stSelectableObj()
+{
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        if(OBJ_IS_SELECTABLE(obj))
+        {
+            GUI_SetSelected(obj);
+            return;
+        }
+        obj = obj->next;
+    }
+}
