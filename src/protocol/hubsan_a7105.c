@@ -189,8 +189,8 @@ static u16 hubsan_cb()
            if(! (A7105_ReadReg(A7105_00_MODE) & 0x01))
                break;
         }
-        if (i == 20)
-            printf("Failed to complete write\n");
+        //if (i == 20)
+        //    printf("Failed to complete write\n");
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
         state++;
@@ -242,7 +242,7 @@ static void initialize() {
     channel = 0x32;
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
-    CLOCK_StartTimer(2400, hubsan_cb);
+    CLOCK_StartTimer(10000, hubsan_cb);
 }
 
 u32 HUBSAN_Cmds(enum ProtoCmds cmd)
