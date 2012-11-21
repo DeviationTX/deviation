@@ -11,29 +11,36 @@ Once the handshake starts, packets are transmitted at various rates as shown
 
 Stage 1:
 Once the 1st packet is received, subsequent packets are transmitted at 8msec intervals
+Set the A7105 ID to '55 20 10 41'
 ---- Ex 1 ---
 Tx: 01 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 12
 Rx: 02 3c 2c b5 da b3 00 00 00 00 00 00 00 00 00 54
 Tx: 03 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 10
 Rx: 04 3c 2c b5 da b3 00 00 00 00 00 00 00 00 00 52
-Tx: 01 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 12
-Rx: 02 3c 2c b5 da b3 03 07 20 03 01 00 00 00 00 26
 ---- Ex 2 ---
 Tx: 01 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 84
 Rx: 02 32 44 a7 0d 0f 00 00 00 00 00 00 00 00 00 c5
 Tx: 03 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 82
 Rx: 04 32 44 a7 0d 0f 00 00 00 00 00 00 00 00 00 c3
-Tx: 01 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 84
-Rx: 02 32 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 97
 ---
 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
-aa : current bind state (?)
+aa : current bind state
 bb : chosen frequency
-cc - oo : ??
+ccddeeff : ID to use for this session 
+gg - oo: ??
 pp : checksum
 
 Stage 2:
-the '09' packetit transmitted every 22msec
+Set the A7105 ID to 'cc dd ee ff'  Packets still transmit at 8msec intervals
+---- Ex 1 ---
+Tx: 01 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 12
+Rx: 02 3c 2c b5 da b3 03 07 20 03 01 00 00 00 00 26
+---- Ex 2 ---
+Tx: 01 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 84
+Rx: 02 32 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 97
+
+Stage 3:
+the '09' packet is transmitted every 22msec
 ---- Ex 1 ---
 Tx: 09 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 0a
 Tx: 09 3c 2c b5 da b3 08 e5 ea 9e 50 db 04 26 79 0a
@@ -57,27 +64,30 @@ Rx: 0a 09 2c b5 da b3 03 07 20 03 01 00 00 00 00 51
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 02 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bf
+Rx: 0a 02 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bf
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 03 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 be
+Rx: 0a 03 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 be
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 04 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bd
+Rx: 0a 04 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bd
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 05 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bc
+Rx: 0a 05 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bc
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 06 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bb
+Rx: 0a 06 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 bb
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 07 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 ba
+Rx: 0a 07 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 ba
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 08 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 b9
+Rx: 0a 08 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 b9
 Tx: 09 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 7c
-Tx: 0a 09 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 b8
+Rx: 0a 09 44 a7 0d 0f 03 07 20 03 01 00 00 00 00 b8
 ---
 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 aa : current bind state (?)
-bb : chosen frequency
-cc - oo : ??
+bb : chosen frequency (Tx), count (Rx)
+ccddeeff: chosen ID for this session
+gg - oo : ??
 pp : checksum
+Binding is complete once the Received data has 'bb' == '09'
+
 
 Data transmission:
 The Transmitter will transmit 4 data packets on the chosen frequency,
