@@ -45,7 +45,6 @@ static void _show_titlerow()
     u8 w = 50;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[0] = GUI_CreateTextSelectPlate(x, 0,  w, ITEM_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
-    GUI_SetSelected(mp->itemObj[0]);
     w = 38;
     mp->itemObj[1] = GUI_CreateButtonPlateText(LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
 
@@ -59,6 +58,7 @@ static void _show_titlerow()
 static void _show_simple()
 {
     mp->max_scroll = 2;
+    GUI_Select1stSelectableObj();
 
     u8 x = 0;
     u8 space = ITEM_HEIGHT + 1;
@@ -126,6 +126,7 @@ static void _show_simple()
 static void _show_complex()
 {
     mp->max_scroll = 2;
+    GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
 
     u8 x = 0;
     u8 space = ITEM_HEIGHT + 1;
@@ -152,6 +153,7 @@ static void _show_complex()
     } else {
         GUI_RemoveHierObjects(mp->expoObj[0]);
         y += 3*space;
+        mp->max_scroll += 2; // bug fix
     }
 
     //Row 2
@@ -243,6 +245,7 @@ static void _show_complex()
 static void _show_expo_dr()
 {
     mp->max_scroll = 2;
+    GUI_Select1stSelectableObj();
 
     sync_mixers();
 
@@ -416,7 +419,10 @@ static void navigate_items(s8 direction)
     } else {
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
             // selected item is out of the view, scroll the view
-            GUI_ScrollLogicalViewToObject(LEFT_VIEW_ID, obj, direction);
+            if (obj == mp->itemObj[2])  // bug fix
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+            else
+                GUI_ScrollLogicalViewToObject(LEFT_VIEW_ID, obj, direction);
         }
     }
     if (mp->graphs[1] != NULL && mp->graphs[2] != NULL) { // indicate that it is the expo&dr page
