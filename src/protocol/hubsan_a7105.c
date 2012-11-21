@@ -24,6 +24,7 @@
 
 static u8 packet[16];
 static u8 channel;
+static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};
 static u8 state;
 enum {
     BIND_1,
@@ -239,7 +240,7 @@ static void initialize() {
     CLOCK_StopTimer();
     A7105_Reset();
     hubsan_init();
-    channel = 0x32;
+    channel = allowed_ch[rand() % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
     CLOCK_StartTimer(10000, hubsan_cb);
