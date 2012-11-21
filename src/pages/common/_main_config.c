@@ -331,14 +331,6 @@ void PAGE_MainCfgInit(int page)
     _show_page();
 }
 
-const char *buttonsel_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void) obj;
-    u8 *button = &Model.pagecfg.quickbtn[data ? 1 : 0];
-    *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
-    return INPUT_ButtonName(*button);
-}
-
 const char *menusel_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;

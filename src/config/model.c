@@ -133,9 +133,6 @@ static const char GUI_BAR[] = "bar";
 static const char GUI_BOX[] = "box";
 static const char GUI_TELEMETRY[] = "telemetry";
 static const char GUI_QUICKPAGE[] = "quickpage";
-static const char GUI_QUICKNEXT[] = "quicknext";
-static const char GUI_QUICKPREV[] = "quickprev";
-/* End */
 
 s8 mapstrcasecmp(const char *s1, const char *s2)
 {
@@ -692,14 +689,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
             return 1;
         }
-        if (MATCH_KEY(GUI_QUICKNEXT)) {
-            m->pagecfg.quickbtn[0] = get_button(section, value);
-            return 1;
-        }
-        if (MATCH_KEY(GUI_QUICKPREV)) {
-            m->pagecfg.quickbtn[1] = get_button(section, value);
-            return 1;
-        }
     }
     printf("Unknown Section: '%s'\n", section);
     return 0;
@@ -913,12 +902,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
             if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
                 fprintf(fh, "%s%d=%d\n", GUI_TGLICO, idx+1, m->pagecfg.tglico[idx]);
         }
-    }
-    if (WRITE_FULL_MODEL || m->pagecfg.quickbtn[0]) {
-        fprintf(fh, "%s=%s\n", GUI_QUICKNEXT, INPUT_ButtonName(m->pagecfg.quickbtn[0]));
-    }
-    if (WRITE_FULL_MODEL || m->pagecfg.quickbtn[1]) {
-        fprintf(fh, "%s=%s\n", GUI_QUICKPREV, INPUT_ButtonName(m->pagecfg.quickbtn[1]));
     }
     for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.quickpage[idx]) {

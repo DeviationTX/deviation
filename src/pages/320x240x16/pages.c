@@ -288,7 +288,7 @@ int PAGE_GetNumPages()
 void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < NUM_QUICKPAGES; i++) {
         if(Model.pagecfg.quickpage[i] && Model.pagecfg.quickpage[i] == cur_page) {
             quick = i+1;
             break;
@@ -322,15 +322,17 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
         return 1;
     }
 */
-    if((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[0] &&
-       CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[0]))
-    {
+    int i;
+    for(i = 0; i < NUM_QUICKPAGES; i++)
+        if(Model.pagecfg.quickpage[i])
+            break;
+    if(i == NUM_QUICKPAGES)
+        return 0;
+    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
         //press = 1;
         PAGE_ChangeQuick(1);
         return 1;
-    } else if ((flags & BUTTON_PRESS) && Model.pagecfg.quickbtn[1] &&
-               CHAN_ButtonIsPressed(buttons, Model.pagecfg.quickbtn[1]))
-    {
+    } else if (CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
         //press = -1;
         PAGE_ChangeQuick(-1);
         return 1;

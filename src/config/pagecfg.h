@@ -25,6 +25,5 @@ struct PageCfg {
     u8 toggle[4];
     u8 tglico[4];
     u8 quickpage[NUM_QUICKPAGES];
-    u8 quickbtn[2];
 };
 #endif

@@ -233,7 +233,6 @@ void PAGE_ChangeQuick(int dir)
        if (quick == 0 || Model.pagecfg.quickpage[quick-1] > 1)
            break;
     }
-printf("quick new:%d\n", quick);
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN, 0);
     } else if (Model.pagecfg.quickpage[quick-1] == 1) { // bug fix: main menu should not be in quick page
