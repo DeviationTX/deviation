@@ -9,6 +9,9 @@ for a response after each transmission.  The 1st packet (packet id 0x01) is
 continuously broadcast until a response is received which begins the handshake.
 Once the handshake starts, packets are transmitted at various rates as shown
 
+There do not seem to be any special rules regarding the session ID or transmitter-ID.
+using random values for these (for a given session) seems to work fine
+
 Stage 1:
 Once the 1st packet is received, subsequent packets are transmitted at 8msec intervals
 Set the A7105 ID to '55 20 10 41'
@@ -23,11 +26,13 @@ Rx: 02 32 44 a7 0d 0f 00 00 00 00 00 00 00 00 00 c5
 Tx: 03 32 44 a7 0d 0f 08 e4 ea 9e 50 db 04 26 79 82
 Rx: 04 32 44 a7 0d 0f 00 00 00 00 00 00 00 00 00 c3
 ---
-aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+    aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 aa : current bind state
 bb : chosen frequency
 ccddeeff : ID to use for this session 
-gg - oo: ??
+gg : always Tx 08
+hh-kk : ??
+llmmnnoo: Transmiter ID(?)
 pp : checksum
 
 Stage 2:
@@ -84,7 +89,9 @@ aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
 aa : current bind state (?)
 bb : chosen frequency (Tx), count (Rx)
 ccddeeff: chosen ID for this session
-gg - oo : ??
+gg : always Tx 08
+hh-kk : ??
+llmmnnoo: Transmiter ID(?)
 pp : checksum
 Binding is complete once the Received data has 'bb' == '09'
 
@@ -101,6 +108,7 @@ cc : throttle  observed range: 0x00 - 0xff (smaller is down)
 ee : rudder    observed range: 0x34 - 0xcc (smaller is right)
 gg : elevator  observed range: 0x3e - 0xbc (smaller is up)
 ii : aileron   observed range: 0x45 - 0xc3 (smaller is right)
+llmmnnoo: Transmiter ID(?)
 pp : checksum
 Checksums:
 The checksum is calculated as 256 - ((sum of the 1st 15 bytes) modulo 256)
