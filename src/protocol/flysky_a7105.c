@@ -128,23 +128,22 @@ static void flysky_build_packet(u8 init)
     //Calculate:
     //Center = 0x5d9
     //1 %    = 5
-    packet[0] = 0x05;
-    packet[1] = init ? 0xaa : 0x55;
-    packet[2] = (id >>  0) & 0xff;
-    packet[3] = (id >>  8) & 0xff;
-    packet[4] = (id >> 16) & 0xff;
-    packet[5] = (id >> 24) & 0xff;
+    packet[0] = init ? 0xaa : 0x55;
+    packet[1] = (id >>  0) & 0xff;
+    packet[2] = (id >>  8) & 0xff;
+    packet[3] = (id >> 16) & 0xff;
+    packet[4] = (id >> 24) & 0xff;
     for (i = 0; i < 8; i++) {
         if (i > Model.num_channels) {
+            packet[5 + i*2] = 0;
             packet[6 + i*2] = 0;
-            packet[7 + i*2] = 0;
             continue;
         }
         s32 value = (s32)Channels[i] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
         if (value < 0)
             value = 0;
-        packet[6 + i*2] = value & 0xff;
-        packet[7 + i*2] = (value >> 8) & 0xff;
+        packet[5 + i*2] = value & 0xff;
+        packet[6 + i*2] = (value >> 8) & 0xff;
     }
 }
 static u16 flysky_cb()
@@ -193,6 +192,9 @@ u32 FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return 8;
         case PROTOCMD_DEFAULT_NUMCHAN: return 8;
         case PROTOCMD_CURRENT_ID: return id;
+        case PROTOCMD_SET_TXPOWER:
+            A7105_SetPower(Model.tx_power);
+            break;
         default: break;
     }
     return 0;

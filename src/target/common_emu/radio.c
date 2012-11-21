@@ -42,6 +42,17 @@ void A7105_WriteData(u8 *data, u8 len, u8 channel)
         printf(" %02x", data[i]);
     printf("\n");
 }
+void A7105_ReadData(u8 *data, u8 len)
+{
+    (void)data;
+    (void)len;
+    return;
+}
+
+void A7105_SetPower(int power)
+{
+    printf("Set Tx Power to %s\n", RADIO_TX_POWER_VAL[power]);
+}
 
 u8 A7105_ReadReg(u8 addr)
 {
