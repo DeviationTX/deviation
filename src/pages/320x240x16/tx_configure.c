@@ -80,6 +80,9 @@ static void _show_page()
         GUI_CreateLabelBox(16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
         GUI_CreateButton(112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
         // GUI_CreateButton(216, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
+        row += space + 8;
+        GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume:"));
+        GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, common_select_cb, (void *)&Transmitter.volume);
 
         row += space;
     } else if (page_num == 1) {
@@ -92,7 +95,8 @@ static void _show_page()
         GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_time_cb, NULL);
         row += space;
         GUI_CreateLabelBox(16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target:"));
-        cp->dimmer_target = GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, auto_dimmer_value_cb, NULL);
+        cp->dimmer_target = GUI_CreateTextSelect(112, row, TEXTSELECT_96, 0x0000, NULL, common_select_cb,
+                (void *)&Transmitter.auto_dimmer.backlight_dim_value);
         row += space + 8;
         GUI_CreateLabelBox(16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;

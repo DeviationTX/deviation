@@ -61,7 +61,7 @@ void lcd_set_start_line(int line)
 
 void LCD_Contrast(u8 contrast)
 {
-    int data = 0x20 + contrast * 0xC / 9;
+    int data = 0x20 + contrast * 0xC / 10;
     LCD_CMD = 0x81;
     LCD_CMD = data & 0x3F;
 }

@@ -33,6 +33,8 @@ const char MODE[]="mode";
 
 const char BRIGHTNESS[] = "brightness";
 const char CONTRAST[] = "contrast";
+const char VOLUME[] = "volume";
+const char VIBRATION[] = "vibration";
 
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
@@ -94,6 +96,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(CONTRAST)) {
             t->contrast = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(VOLUME)) {
+            t->volume = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(VIBRATION)) {
+            t->vibration_state = atoi(value);
             return 1;
         }
         if (MATCH_KEY(BATT_ALARM)) {
@@ -192,8 +202,10 @@ void CONFIG_LoadTx()
     memset(&Transmitter, 0, sizeof(Transmitter));
     Transmitter.current_model = 1;
     Transmitter.mode = MODE_2;
-    Transmitter.brightness = 9;
+    Transmitter.brightness = 5;
     Transmitter.contrast = 5;
+    Transmitter.volume = 9;
+    Transmitter.vibration_state = 0; // default to off since only devo10 support it
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
@@ -222,6 +234,8 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
+    fprintf(fh, "%s=%d\n", VOLUME, Transmitter.volume);
+    fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {

@@ -29,6 +29,7 @@
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
+static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static s16 view_origin_relativeY;
 static s8 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
@@ -89,6 +90,20 @@ void PAGE_TxConfigureInit(int page)
 
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, common_select_cb, (void *)&Transmitter.volume);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr("Vibration:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, _vibration_state_cb, &Transmitter.vibration_state);
+    cp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("LCD settings"));
     row += space;
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
@@ -115,7 +130,8 @@ void PAGE_TxConfigureInit(int page)
     GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target:"));
     cp->dimmer_target = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + 10), GUI_MapToLogicalView(VIEW_ID, row),
-                w -10, ITEM_HEIGHT, &DEFAULT_FONT, NULL, auto_dimmer_value_cb, NULL);
+                w -10, ITEM_HEIGHT, &DEFAULT_FONT, NULL, common_select_cb,
+                (void *)&Transmitter.auto_dimmer.backlight_dim_value);
     cp->total_items++;
 
     row += space;
@@ -172,7 +188,7 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     Transmitter.contrast = GUI_TextSelectHelper(Transmitter.contrast,
-                                  MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
+                                  0, 10, dir, 1, 1, &changed);
     if (changed) {
         LCD_Contrast(Transmitter.contrast);
     }
@@ -180,6 +196,17 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Off");
     sprintf(cp->tmpstr, "%d", Transmitter.contrast);
     return cp->tmpstr;
+}
+
+static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    Transmitter.vibration_state = GUI_TextSelectHelper(Transmitter.vibration_state, 0, 1, dir, 1, 1, NULL);
+    if (Transmitter.vibration_state == 0)
+        return _tr("Off");
+    else
+        return _tr("On");
 }
 
 

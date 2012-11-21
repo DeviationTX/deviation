@@ -207,7 +207,7 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
-                                  MIN_BRIGHTNESS, 9, dir, 1, 1, &changed);
+                                  MIN_BRIGHTNESS, 10, dir, 1, 1, &changed);
     if (changed)
         BACKLIGHT_Brightness(Transmitter.brightness);
     if (Transmitter.brightness == 0)
@@ -216,17 +216,16 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
     return cp->tmpstr;
 }
 
-static const char *auto_dimmer_value_cb(guiObject_t *obj, int dir, void *data)
+static const char *common_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
+    u8 *unsigned_data = (u8 *)data;
     if (GUI_IsTextSelectEnabled(obj)) {
-        u8 changed;
-        Transmitter.auto_dimmer.backlight_dim_value = GUI_TextSelectHelper(Transmitter.auto_dimmer.backlight_dim_value,
-                0, 9, dir, 1, 1, &changed);
+        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 10, dir, 1, 1, NULL);
     }
-    if (Transmitter.auto_dimmer.backlight_dim_value == 0)
+    if (*unsigned_data == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", Transmitter.auto_dimmer.backlight_dim_value);
+    sprintf(cp->tmpstr, "%d", *unsigned_data);
     return cp->tmpstr;
 }
 

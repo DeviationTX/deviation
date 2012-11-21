@@ -51,18 +51,27 @@ void SOUND_Init()
     /* ---- */
     /* ARR reload enable */
     timer_enable_preload(TIM2);
+
+    VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
 }
 
 void SOUND_SetFrequency(u16 frequency, u8 volume)
 {
+    if (volume == 0) {
+        //We need to keep the timer running (for the vibration motor, but also in case there is a pause in the music)
+        //But don't want the buzzer running
+        timer_disable_oc_output(TIM2, TIM_OC2);
+    } else {
+        timer_enable_oc_output(TIM2, TIM_OC2);
+    }
     /* volume is between 0 and 100 */
     /* period = 14400000 / frequency */
     /* A Period of 65535 gives a ~ 220Hz tone */
-    /* 50% duty-cylce is max-volume */
-    u16 period = 14400000 / frequency;
-    if (volume > 100)
-        volume = 100;
-    u16 duty_cycle = volume * (period >> 1) / 100;
+    /* The Devo buzzer reaches max-volume with a pw ~ 100us.  That is max volume */
+    /* use quadratic to approximate exponential volume control */
+    u32 period = 14400000 / frequency;
+    /* Taylor series: x + x^2/2 + x^3/6 + x^4/24 */
+    u32 duty_cycle = volume == 100 ? (period >> 1) : (u32)volume * volume * volume * 12 / 10000;
     timer_set_period(TIM2, period);
     timer_set_oc_value(TIM2, TIM_OC2, duty_cycle);
 }
@@ -70,6 +79,7 @@ void SOUND_SetFrequency(u16 frequency, u8 volume)
 void SOUND_Start(u16 msec, u16(*next_note_cb)())
 {
     CLOCK_SetMsecCallback(TIMER_SOUND, msec);
+    VIBRATINGMOTOR_Start();
     Callback = next_note_cb;
     timer_enable_counter(TIM2);
 }
@@ -78,6 +88,7 @@ void SOUND_Stop()
 {
     CLOCK_ClearMsecCallback(TIMER_SOUND);
     timer_disable_counter(TIM2);
+    VIBRATINGMOTOR_Stop();
 }
 
 u32 SOUND_Callback()

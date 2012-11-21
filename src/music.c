@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "music.h"
+#include "config/tx.h"
 #include <stdlib.h>
 
 static struct {u8 note; u8 duration;} Notes[100];
@@ -74,6 +75,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             Volume = atoi(value);
             if (Volume > 100)
                 Volume = 100;
+            // The music volume should be controlled by TX volume setting as well as sound.ini
+            Volume = Transmitter.volume * Volume/10; // = Transmitter.volume * 10 * sound_volume/100;
         }
         for(i = 0; i < NUM_NOTES; i++) {
             if(strcasecmp(note_map[i].str, name) == 0) {
@@ -89,15 +92,17 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 u16 next_note_cb() {
     if (next_note == num_notes)
         return 0;
-    SOUND_SetFrequency(note_map[Notes[next_note].note].note, 100);
+    SOUND_SetFrequency(note_map[Notes[next_note].note].note, Volume);
     return Notes[next_note++].duration * 10;
 }
 
 void MUSIC_Play(enum Music music)
 {
+    /* NOTE: We need to do all this even if volume is zero, because
+       the haptic sensor may be enabled */
     num_notes = 0;
     next_note = 1;
-    Volume = 100;
+    Volume = Transmitter.volume * 10;
     if(CONFIG_IniParse("media/sound.ini", ini_handler, (void *)sections[music])) {
         printf("ERROR: Could not read images/sound.ini\n");
         return;

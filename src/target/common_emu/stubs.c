@@ -89,3 +89,7 @@ void FS_CloseDir() {
 void BACKLIGHT_Init() {}
 void BACKLIGHT_Brightness(u8 brightness) { printf("Brightness: %d\n", brightness); }
 void LCD_Contrast(u8 contrast) { printf("Contrast: %d\n", contrast); }
+
+void VIBRATINGMOTOR_Init() {}
+void VIBRATINGMOTOR_Start() {}
+void VIBRATINGMOTOR() {}

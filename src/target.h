@@ -118,6 +118,11 @@ void SOUND_SetFrequency(u16 freq, u8 volume);
 void SOUND_Start(u16 msec, u16 (*next_note_cb)());
 void SOUND_Stop();
 
+/* Vibrating motor */
+void VIBRATINGMOTOR_Init();
+void VIBRATINGMOTOR_Start();
+void VIBRATINGMOTOR_Stop();
+
 /* UART & Debug */
 void UART_Initialize();
 void UART_Stop();
