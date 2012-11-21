@@ -274,7 +274,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
 
     //5th: apply trim
     if (mixer->apply_trim)
-        value = value + get_trim(MIXER_SRC(mixer->src));
+        value = value + (MIXER_SRC_IS_INV(mixer->src) ? -1 : 1) * get_trim(MIXER_SRC(mixer->src));
 
     //Ensure we don't overflow
     if (value > INT16_MAX)
