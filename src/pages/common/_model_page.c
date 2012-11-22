@@ -126,7 +126,6 @@ void type_press_cb(guiObject_t *obj, void *data)
         MODELPAGE_Config();
     }
 }
-
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
@@ -157,7 +156,17 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         GUI_Redraw(mp->chanObj);
         configure_bind_button();
     }
+    GUI_TextSelectEnablePress(obj, PROTOCOL_GetOptions() ? 1 : 0);
     return ProtocolNames[Model.protocol];
+}
+void proto_press_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    (void)obj;
+    if(PROTOCOL_GetOptions()) {
+        PAGE_RemoveAllObjects();
+        MODELPROTO_Config();
+    }
 }
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
 {

@@ -19,8 +19,6 @@
 #include "config/model.h"
 
 #define sp (pagemem.u.scanner_page)
-extern u32 DEVO_Cmds(int);
-
 u16 scan_trigger_cb()
 {
     sp.time_to_scan = 1;

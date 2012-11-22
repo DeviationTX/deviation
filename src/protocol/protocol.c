@@ -18,10 +18,6 @@
 #include "interface.h"
 #include "config/model.h"
 
-#define PROTODEF(proto, map, cmd, name) extern u32 cmd(enum ProtoCmds);
-#include "protocol.h"
-#undef PROTODEF
-
 static const u8 const EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR };
 static const u8 const TAERG[PROTO_MAP_LEN] = 
@@ -151,7 +147,7 @@ u64 PROTOCOL_CheckSafe()
 u8 PROTOCOL_AutoBindEnabled()
 {
     u8 binding = 0;
-    #define PROTODEF(proto, map, cmd, name) case proto: binding = cmd(PROTOCMD_CHECK_AUTOBIND); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: binding = (unsigned long)cmd(PROTOCMD_CHECK_AUTOBIND); break;
     switch(Model.protocol) {
         #include "protocol.h"
         case PROTOCOL_NONE:
@@ -187,7 +183,7 @@ void PROTOCOL_SetPower()
 int PROTOCOL_NumChannels()
 {
     int num_channels = NUM_OUT_CHANNELS;
-    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = cmd(PROTOCMD_NUMCHAN); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = (unsigned long)cmd(PROTOCMD_NUMCHAN); break;
     switch(Model.protocol) {
         #include "protocol.h"
         case PROTOCOL_NONE:
@@ -202,7 +198,7 @@ int PROTOCOL_NumChannels()
 int PROTOCOL_DefaultNumChannels()
 {
     int num_channels = NUM_OUT_CHANNELS;
-    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = cmd(PROTOCMD_DEFAULT_NUMCHAN); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: num_channels = (unsigned long)cmd(PROTOCMD_DEFAULT_NUMCHAN); break;
     switch(Model.protocol) {
         #include "protocol.h"
         case PROTOCOL_NONE:
@@ -216,7 +212,7 @@ int PROTOCOL_DefaultNumChannels()
 u32 PROTOCOL_CurrentID()
 {
     u32 id = 0;
-    #define PROTODEF(proto, map, cmd, name) case proto: id = cmd(PROTOCMD_CURRENT_ID); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: id = (unsigned long)cmd(PROTOCMD_CURRENT_ID); break;
     switch(Model.protocol) {
         #include "protocol.h"
         case PROTOCOL_NONE:
@@ -227,6 +223,19 @@ u32 PROTOCOL_CurrentID()
     return id;
 }
 
+const char **PROTOCOL_GetOptions()
+{
+    const char **data = NULL;
+    #define PROTODEF(proto, map, cmd, name) case proto: data = (const char **)cmd(PROTOCMD_GETOPTIONS); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default:
+            data = NULL;
+    }
+    #undef PROTODEF
+    return data;
+}
 void PROTOCOL_CheckDialogs()
 {
     if (PROTOCOL_WaitingForSafe()) {

@@ -9,7 +9,12 @@ enum ProtoCmds {
     PROTOCMD_DEFAULT_NUMCHAN,
     PROTOCMD_CURRENT_ID,
     PROTOCMD_SET_TXPOWER,
+    PROTOCMD_GETOPTIONS,
 };
+
+#define PROTODEF(proto, map, cmd, name) extern const void * cmd(enum ProtoCmds);
+#include "protocol.h"
+#undef PROTODEF
 
 #ifdef PROTO_HAS_A7105
 #include "iface_a7105.h"

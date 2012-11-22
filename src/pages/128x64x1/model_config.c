@@ -89,3 +89,40 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+
+void MODELPROTO_Config()
+{
+    PAGE_SetModal(1);
+    PAGE_SetActionCB(_action_cb);
+    show_titlerow(ProtocolNames[Model.protocol]);
+
+    proto_strs = PROTOCOL_GetOptions();
+
+    // Even though there are just 4 rows here, still create a logical view for future expanding
+    u8 view_origin_absoluteX = 0;
+    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
+    u8 space = ITEM_HEIGHT + 1;
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
+        view_origin_absoluteX, view_origin_absoluteY);
+    u8 w = 60;
+    u8 x = 63;
+
+
+    u8 row = 0;
+    int pos = 0;
+    long idx = 0;
+    while(idx < NUM_PROTO_OPTS) {
+        if(proto_strs[pos] == NULL)
+            break;
+        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
+        guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)idx);
+        GUI_SetSelected(obj);
+        while(proto_strs[++pos])
+            ;
+        pos++;
+        idx++;
+        row += space;
+    }
+}

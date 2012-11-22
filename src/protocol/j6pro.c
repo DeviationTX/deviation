@@ -293,14 +293,14 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(2400, j6pro_cb);
 }
 
-u32 J6PRO_Cmds(enum ProtoCmds cmd)
+const void *J6PRO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 12;
-        case PROTOCMD_DEFAULT_NUMCHAN: return 6;
+        case PROTOCMD_NUMCHAN: return (void *)12L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_SET_TXPOWER:
             CYRF_SetPower(Model.tx_power);

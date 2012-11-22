@@ -249,14 +249,14 @@ static void initialize() {
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
-u32 HUBSAN_Cmds(enum ProtoCmds cmd)
+const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return 1; //Always autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return 4;
-        case PROTOCMD_DEFAULT_NUMCHAN: return 4;
+        case PROTOCMD_NUMCHAN: return (void *)4L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_SET_TXPOWER:
             A7105_SetPower(Model.tx_power);

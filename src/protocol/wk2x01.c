@@ -60,6 +60,12 @@ static u8 pkt_num;
 static u8 chan_dir;
 static u8 last_beacon;
 
+static const char *wk2601_opts[] = {
+  _tr_noop("Servo mode"), _tr_noop("Normal"), _tr_noop("120 EPA"), _tr_noop("120 PEA"), NULL,
+  _tr_noop("Thr. rev"), _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
+
 static void add_pkt_crc(u8 init)
 {
     u8 add = init;
@@ -406,21 +412,25 @@ static void initialize()
     CLOCK_StartTimer(2800, wk_cb);
 }
 
-u32 WK2x01_Cmds(enum ProtoCmds cmd)
+const void *WK2x01_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_CHECK_AUTOBIND:
-            return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : 1;
+            return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
         case PROTOCMD_BIND:  bind(); return 0;
         case PROTOCMD_DEFAULT_NUMCHAN:
         case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
-              ? 8
+              ? (void *)8L
               : (Model.protocol == PROTOCOL_WK2601)
-                ? 6
-                : 4;
+                ? (void *)6L
+                : (void *)4L;
         case PROTOCMD_SET_TXPOWER:
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
+            break;
+        case PROTOCMD_GETOPTIONS:
+            if(Model.protocol == PROTOCOL_WK2601)
+                return wk2601_opts;
             break;
         default: break;
     }

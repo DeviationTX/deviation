@@ -124,6 +124,7 @@ int PROTOCOL_NumChannels();
 int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
+const char **PROTOCOL_GetOptions();
 int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */

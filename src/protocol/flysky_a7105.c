@@ -183,15 +183,15 @@ static void initialize(u8 bind) {
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
-u32 FLYSKY_Cmds(enum ProtoCmds cmd)
+const void *FLYSKY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : 1;
+        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 8;
-        case PROTOCMD_DEFAULT_NUMCHAN: return 8;
-        case PROTOCMD_CURRENT_ID: return id;
+        case PROTOCMD_NUMCHAN: return (void *)8L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
+        case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
         case PROTOCMD_SET_TXPOWER:
             A7105_SetPower(Model.tx_power);
             break;

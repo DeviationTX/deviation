@@ -14,6 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
+static const char **proto_strs;
 
 static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -43,11 +44,25 @@ void swashinv_press_cb(guiObject_t *obj, void *data)
     GUI_Redraw(obj);
 }
 
-void okcancel_cb(guiObject_t *obj, const void *data)
+static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    (void)data;
-    GUI_RemoveAllObjects();
-    PAGE_ModelInit(-1);  // devo8 doesn't care the page value, while it must be -1 for devo10
+    long idx = (long)data;
+    u8 count = 0;
+    u8 pos = 0;
+    u8 changed;
+    int i;
+    for(i = 0; i < idx; i++) {
+        while(proto_strs[pos])
+            pos++;
+        pos++;
+    }
+    while(proto_strs[pos+1+count])
+        count++;
+    Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
+    if (changed) {
+        //PROTOCOL_SetOptions();
+    }
+    return _tr(proto_strs[pos+Model.proto_opts[idx]+1]);
 }
 

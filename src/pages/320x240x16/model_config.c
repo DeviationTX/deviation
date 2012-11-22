@@ -20,6 +20,14 @@
 
 #include "../common/_model_config.c"
 
+static void okcancel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    GUI_RemoveAllObjects();
+    PAGE_ModelInit(-1);  // devo8 doesn't care the page value, while it must be -1 for devo10
+}
+
 static void show_titlerow(const char *header)
 {
     GUI_CreateLabel(8, 10, NULL, TITLE_FONT, (void *)header);
@@ -43,5 +51,26 @@ void MODELPAGE_Config()
         i+=24;
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)4);
+    }
+}
+
+void MODELPROTO_Config()
+{
+    PAGE_SetModal(1);
+    show_titlerow(ProtocolNames[Model.protocol]);
+    proto_strs = PROTOCOL_GetOptions();
+    int row = 40;
+    int pos = 0;
+    long idx = 0;
+    while(idx < NUM_PROTO_OPTS) {
+        if(proto_strs[pos] == NULL)
+            break;
+        GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr(proto_strs[pos]));
+        GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, proto_opt_cb, (void *)idx);
+        while(proto_strs[++pos])
+            ;
+        pos++;
+        idx++;
+        row += 24;
     }
 }

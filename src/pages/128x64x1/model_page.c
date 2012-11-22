@@ -86,7 +86,7 @@ void PAGE_ModelInit(int page)
 
     row += space;
     GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, protoselect_cb, NULL);
+            w, ITEM_HEIGHT, &DEFAULT_FONT, proto_press_cb, protoselect_cb, NULL);
     mp->total_items++;
     mp->obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x +5 ), GUI_MapToLogicalView(VIEW_ID, row),
             w-10, ITEM_HEIGHT, &DEFAULT_FONT, show_bindtext_cb, 0x0000, bind_cb, NULL);

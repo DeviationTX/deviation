@@ -49,7 +49,7 @@ void PAGE_ModelInit(int page)
 
     row += 32;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
-    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, NULL, protoselect_cb, NULL);
+    GUI_CreateTextSelect(136, row, TEXTSELECT_96, 0x0000, proto_press_cb, protoselect_cb, NULL);
 
     row += 20;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("# Channels:"));

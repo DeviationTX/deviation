@@ -75,6 +75,7 @@ void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 void MODELPAGE_Config();
+void MODELPROTO_Config();
 void MODELPage_Template();
 
 /* Test */

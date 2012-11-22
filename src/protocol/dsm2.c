@@ -430,22 +430,22 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 
-u32 DSM2_Cmds(enum ProtoCmds cmd)
+const void *DSM2_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return 9;
-        case PROTOCMD_DEFAULT_NUMCHAN: return 7;
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? Model.fixed_id : 0;
+        case PROTOCMD_NUMCHAN: return (void *)9L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_SET_TXPOWER:
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
             break;
         default: break;
     }
-    return 0;
+    return NULL;
 }
 
 #endif
