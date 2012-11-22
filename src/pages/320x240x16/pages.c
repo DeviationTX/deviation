@@ -310,6 +310,7 @@ void PAGE_ChangeQuick(int dir)
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 {
     (void)data;
+    (void)flags;
     //static s8 press = 0;
     if(cur_section != 0)
         return 0;
