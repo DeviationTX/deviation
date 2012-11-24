@@ -121,14 +121,9 @@ void draw_objects_inview(u8 view_id)
 {
     struct guiObject *obj = objHEAD;
     while(obj) {
-        struct guiBox *box = &obj->box;
-        s16 y = box->y;
-        if(! OBJ_IS_HIDDEN(obj) && (GUI_IsObjectInsideCurrentView(view_id, obj)
-                || (OBJ_IS_DIRTY(obj) && y >=0 && y <= LCD_HEIGHT))) // object that is not in the view but in the physical LCD still needs to refresh
+        if(! OBJ_IS_HIDDEN(obj) && GUI_IsObjectInsideCurrentView(view_id, obj))
         {
             GUI_DrawObject(obj);
-        } else {
-            OBJ_SET_DIRTY(obj, 0);
         }
         obj = obj->next;
     }
