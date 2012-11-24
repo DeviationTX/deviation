@@ -248,8 +248,9 @@ void GUI_HideObjects(struct guiObject *modalObj)
 
 void GUI_RefreshScreen(void)
 {
+    struct guiObject *modalObj = GUI_IsModal();
     viewObject_t *viewObj = NULL;
-    if (HAS_LOGICALVIEW)
+    if (HAS_LOGICALVIEW && modalObj == NULL) // bug fix: when a modal obj, e.g. dialog, exists, do not clear any viewpoints
     {
         for (u8 i = 0; i < LOGICALVIEW_COUNT; i++) {
             viewObj = &views[i];
@@ -265,7 +266,6 @@ void GUI_RefreshScreen(void)
         GUI_DrawScreen();
         return;
     }
-    struct guiObject *modalObj = GUI_IsModal();
     GUI_HideObjects(modalObj);
     obj = objHEAD;
     while(obj) {
@@ -274,7 +274,8 @@ void GUI_RefreshScreen(void)
         s16 y = box->y;
         if (GUI_IsLogicViewCoordinate(x)) {  // handle objects  inside views here
             s8 view_id = GUI_GetViewId(x, y);
-            if (!OBJ_IS_HIDDEN(obj) && view_id >= 0 && GUI_IsObjectInsideCurrentView(view_id, obj)) {
+            if (modalObj == NULL   // bug fix: when a modal obj, e.g. dialog, exists, do not redraw any objs in views
+                    && !OBJ_IS_HIDDEN(obj) && view_id >= 0 && GUI_IsObjectInsideCurrentView(view_id, obj)) {
                 if (OBJ_IS_DIRTY(&views[view_id])) { //refresh all objects in the viewpoint when a view marked dirty
                     GUI_DrawObject(obj);
                 } else if (OBJ_IS_DIRTY(obj)) { // otherwise only refresh dirty object
