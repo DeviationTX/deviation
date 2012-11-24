@@ -45,6 +45,16 @@ void swashinv_press_cb(guiObject_t *obj, void *data)
     GUI_Redraw(obj);
 }
 
+static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    int i = (long)data;
+    Model.swashmix[i] = GUI_TextSelectHelper(Model.swashmix[i], 0, 100, dir, 1, 5, NULL);
+    sprintf(mp->tmpstr, "%d", (int)Model.swashmix[i]);
+    return mp->tmpstr;
+}
+
 static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;

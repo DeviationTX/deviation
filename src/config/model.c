@@ -100,6 +100,9 @@ static const char SECTION_SWASH[] = "swash";
 static const char SWASH_AIL_INV[] = "ail_inv";
 static const char SWASH_ELE_INV[] = "ele_inv";
 static const char SWASH_COL_INV[] = "col_inv";
+static const char SWASH_AILMIX[] = "ail_mix";
+static const char SWASH_ELEMIX[] = "ele_mix";
+static const char SWASH_COLMIX[] = "col_mix";
 
 /* Section: Timer */
 static const char SECTION_TIMER[] = "timer";
@@ -505,6 +508,21 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 m->swash_invert |= 0x04;
             return 1;
         }
+        if (MATCH_KEY(SWASH_AILMIX)) {
+            if (value_int) 
+                m->swashmix[0] = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(SWASH_ELEMIX)) {
+            if (value_int) 
+                m->swashmix[1] = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(SWASH_COLMIX)) {
+            if (value_int) 
+                m->swashmix[2] = value_int;
+            return 1;
+        }
     }
     if (MATCH_START(section, SECTION_TIMER)) {
         u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
@@ -841,6 +859,12 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=1\n", SWASH_AIL_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
             fprintf(fh, "%s=1\n", SWASH_COL_INV);
+        if (WRITE_FULL_MODEL || m->swashmix[0] != 60)
+            fprintf(fh, "%s=%d\n", SWASH_AILMIX, m->swashmix[0]);
+        if (WRITE_FULL_MODEL || m->swashmix[1] != 60)
+            fprintf(fh, "%s=%d\n", SWASH_ELEMIX, m->swashmix[1]);
+        if (WRITE_FULL_MODEL || m->swashmix[2] != 60)
+            fprintf(fh, "%s=%d\n", SWASH_COLMIX, m->swashmix[2]);
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
@@ -926,6 +950,9 @@ void clear_model(u8 full)
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
     }
+    Model.swashmix[0] = 60;
+    Model.swashmix[1] = 60;
+    Model.swashmix[2] = 60;
     for(i = 0; i < NUM_MIXERS; i++) {
         Model.mixers[i].scalar = 100;
         Model.mixers[i].apply_trim = 1;

@@ -179,6 +179,7 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
     s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
     s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
     s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
+    int normalize = Model.swashmix[0] + Model.swashmix[1] + Model.swashmix[2];
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
@@ -191,33 +192,33 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
         cyc[2] = collective;
         break;
     case SWASH_TYPE_120:
-        aileron  = 60 * aileron / 100;
-        elevator = 60 * elevator / 100;
-        collective = 60 * collective / 100;
+        aileron  = Model.swashmix[0] * aileron / normalize;
+        elevator = Model.swashmix[1] * elevator / normalize;
+        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator/2 + aileron;
         cyc[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
-        aileron  = 60 * aileron / 100;
-        elevator = 60 * elevator / 100;
-        collective = 60 * collective / 100;
+        aileron  = Model.swashmix[0] * aileron / normalize;
+        elevator = Model.swashmix[1] * elevator / normalize;
+        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - aileron;
         cyc[1] = collective + aileron/2 + elevator;
         cyc[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
-        aileron  = 60 * aileron / 100;
-        elevator = 60 * elevator / 100;
-        collective = 60 * collective / 100;
+        aileron  = Model.swashmix[0] * aileron / normalize;
+        elevator = Model.swashmix[1] * elevator / normalize;
+        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + elevator + aileron;
         cyc[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
-        aileron  = 60 * aileron / 100;
-        elevator = 60 * elevator / 100;
-        collective = 60 * collective / 100;
+        aileron  = Model.swashmix[0] * aileron / normalize;
+        elevator = Model.swashmix[1] * elevator / normalize;
+        collective = Model.swashmix[2] * collective / normalize;
         cyc[0] = collective - elevator;
         cyc[1] = collective + aileron;
         cyc[2] = collective - aileron;
