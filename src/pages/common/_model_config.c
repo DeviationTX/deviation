@@ -12,6 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdlib.h>
 
 static struct model_page * const mp = &pagemem.u.model_page;
 static const char **proto_strs;
@@ -51,7 +52,7 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     u8 count = 0;
     u8 pos = 0;
     u8 changed;
-    int i;
+    int i, start, end;
     for(i = 0; i < idx; i++) {
         while(proto_strs[pos])
             pos++;
@@ -59,10 +60,15 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     }
     while(proto_strs[pos+1+count])
         count++;
-    Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
-    if (changed) {
-        //PROTOCOL_SetOptions();
+    start = atoi(proto_strs[pos+1]);
+    end = atoi(proto_strs[pos+2]);
+    if (count == 2 && (start != 0 || end != 0)) {
+        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], start, end, dir, 1, 1, &changed);
+        sprintf(mp->tmpstr, "%d", Model.proto_opts[idx]);
+        return mp->tmpstr;
+    } else {
+        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
+        return _tr(proto_strs[pos+Model.proto_opts[idx]+1]);
     }
-    return _tr(proto_strs[pos+Model.proto_opts[idx]+1]);
 }
 

@@ -57,14 +57,18 @@ static u32 fixed_id;
 static u8 radio_ch[3];
 static u8 *radio_ch_ptr;
 static u8 pkt_num;
-static u8 chan_dir;
 static u8 last_beacon;
 
 static const char *wk2601_opts[] = {
-  _tr_noop("Servo mode"), _tr_noop("Normal"), _tr_noop("120 EPA"), _tr_noop("120 PEA"), NULL,
-  _tr_noop("Thr. rev"), _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Chan mode"), _tr_noop("5+1"), _tr_noop("Heli"), _tr_noop("6+1"), NULL,
+  _tr_noop("PIT Inv"), _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Pit Limit"), "-100", "100", NULL,
   NULL
 };
+#define WK2601_OPT_CHANMODE  0
+#define WK2601_OPT_PIT_INV   1
+#define WK2601_OPT_PIT_LIMIT 2
+
 
 static void add_pkt_crc(u8 init)
 {
@@ -117,7 +121,6 @@ static void build_data_pkt_2401()
 {
     u8 i;
     u16 msb = 0;
-    chan_dir = 0;
     u8 offset = 0;
     for (i = 0; i < 4; i++) {
         if (i == 2)
@@ -145,30 +148,143 @@ static void build_data_pkt_2401()
     add_pkt_crc(0x00);
 }
 
+#define PCT(pct, max) (((max) * (pct) + 1L) / 1000)
+#define MAXTHR 426 //Measured to provide equal value at +/-0
+static void channels_6plus1_2601(int frame, int *_v1, int *_v2)
+{
+    s16 thr = get_channel(2, 1000, 0, 1000);
+    int v1;
+    int thr_rev = 0, pitch_rev = 0;
+    /*Throttle is computed as follows:
+        val <= -78%    : thr = (100-42.6)% * (-val-78%) / 22% + 42.6%, tcurve=100%, thr_rev=1
+        -78% < val < 0 : thr = 42.6%, tcurve = (-val)/78%, thr_rev=1
+        0 <= val < 78% : thr = 42.6%, tcurve = 100% - val/78%, thr_rev=0
+        78% <= val     : thr = (100-42.6)% * (val-78%) / 22% + 42.6%, tcurve=0, thr_rev=0
+     */
+    if(thr > 0) {
+        if(thr >= 780) { //78%
+            v1 = 0; //thr = 60% * (x - 78%) / 22% + 40%
+            thr = PCT(1000-MAXTHR,512) * (thr-PCT(780,1000)) / PCT(220,1000) + PCT(MAXTHR,512);
+        } else {
+            v1 = 1023 - 1023 * thr / 780;
+            thr = PCT(MAXTHR, 512); //40%
+        }
+    } else {
+        thr = -thr;
+        thr_rev = 1;
+        if(thr >= 780) { //78%
+            v1 = 1023; //thr = 60% * (x - 78%) / 22% + 40%
+            thr = PCT(1000-MAXTHR,512) * (thr-PCT(780,1000)) / PCT(220,1000) + PCT(MAXTHR,512);
+            if (thr >= 512)
+                thr = 511;
+        } else {
+            v1 = 1023 * thr / 780;
+            thr = PCT(MAXTHR, 512); //40%
+        }
+    }
+    if (thr >= 512)
+        thr = 511;
+    packet[2] = thr & 0xff;
+    packet[4] = (packet[4] & 0xF3) | ((thr >> 6) & 0x04);
+
+    s16 pitch= get_channel(5, 0x400, 0, 0x400);
+    if (pitch < 0) {
+        pitch_rev = 1;
+        pitch = -pitch;
+    }
+    if (frame == 1) {
+        //Pitch curve and range
+        if (thr > PCT(MAXTHR, 512)) {
+            //v2 = pit% * ( 1 - (thr% - 40) / 60 * 16%)
+            *_v2 = pitch - pitch * 16 * (thr - PCT(MAXTHR, 512)) / PCT(1000 - MAXTHR, 512) / 100;
+        } else {
+            *_v2 = pitch;
+        }
+        *_v1 = 0;
+    } else if (frame == 2) {
+        //Throttle curve & Expo
+        *_v1 = v1;
+        *_v2 = 512;
+    }
+    packet[7] = (thr_rev << 5) | (pitch_rev << 2); //reverse bits
+    packet[8] = 0;
+}
+
+static void channels_5plus1_2601(int frame, int *v1, int *v2)
+{
+    (void)v1;
+    //Zero out pitch, provide ail, ele, thr, rud, gyr + gear
+    if (frame == 1) {
+        //Pitch curve and range
+        *v2 = 0;
+    }
+    packet[7] = 0;
+    packet[8] = 0;
+}
+static void channels_heli_2601(int frame, int *v1, int *v2)
+{
+    (void)frame;
+    //pitch is controlled by rx
+    //we can only control fmode, pit-reverse and pit/thr rate
+    int pit_rev = 0;
+    if (Model.proto_opts[WK2601_OPT_PIT_INV]) {
+        pit_rev = 1;
+    }
+    s16 pit_rate = get_channel(5, 0x400, 0, 0x400);
+    int fmode = 1;
+    if (pit_rate < 0) {
+        pit_rate = -pit_rate;
+        fmode = 0;
+    }
+    if (frame == 1) {
+        //Pitch curve and range
+        *v1 = pit_rate;
+        *v2 = Model.proto_opts[WK2601_OPT_PIT_LIMIT] * 0x400 / 100 + 0x400;
+    }
+    packet[7] = (pit_rev << 2); //reverse bits
+    packet[8] = fmode ? 0x02 : 0x00;
+}
+
 static void build_data_pkt_2601()
 {
     u8 i;
     u8 msb = 0;
-    chan_dir = 0;
+    u8 frame = (pkt_num % 3);
     for (i = 0; i < 4; i++) {
         s16 value = get_channel(i, 0x190, 0, 0x1FF);
         u16 mag = value < 0 ? -value : value;
         packet[i] = mag & 0xff;
         msb = (msb << 2) | ((mag >> 8) & 0x01) | (value < 0 ? 0x02 : 0x00);
     }
-    u16 gyro = get_channel(3, 400, 500, 400);
     packet[4] = msb;
-    packet[5] = 0;
-    packet[6] = 0;
-    packet[7] = 0;
-    packet[8] = (get_channel(4, 0x190, 0, 0x1FF) > 0 ? 1 : 0)
-                | (get_channel(5, 0x190, 0, 0x1FF) > 0 ? 2 : 0);
-    packet[9] = (pkt_num % 3 == 0 ? 0x00 : 0xa0)
-                |((gyro >> 6) & 0x0c) | (pkt_num % 3);
+    int v1 = 0x200, v2 = 0x200;
+    if (frame == 0) {
+        //Gyro & Rudder mix
+        v1 = get_channel(6, 0x200, 0x200, 0x200);
+        v2 = 512;
+    }
+    if (Model.proto_opts[WK2601_OPT_CHANMODE] == 1) {
+        channels_heli_2601(frame, &v1, &v2);
+    } else if (Model.proto_opts[WK2601_OPT_CHANMODE] == 2) {
+        channels_6plus1_2601(frame, &v1, &v2);
+    } else {
+        channels_5plus1_2601(frame, &v1, &v2);
+    }
+    if (v1 > 1023)
+        v1 = 1023;
+    if (v2 > 1023)
+        v2 = 1023;
+    packet[5] = v2 & 0xff;
+    packet[6] = v1 & 0xff;
+    //packet[7] handled by channel code
+    packet[8] |= (get_channel(4, 0x190, 0, 0x1FF) > 0 ? 1 : 0);
+    packet[9] =  ((v1 >> 4) & 0x30)
+               | ((v2 >> 2) & 0xc0)
+               | 0x04 | frame;
     packet[10]  = (fixed_id >> 0)  & 0xff;
     packet[11] = (fixed_id >> 8)  & 0xff;
     packet[12] = ((fixed_id >> 12) & 0xf0) | pkt_num;
-    packet[13] = gyro & 0xff;
+    packet[13] = 0xff;
 
     add_pkt_crc(0x3A);
 }
@@ -386,7 +502,6 @@ static void initialize()
     pkt_num = 0;
     txState = 0;
     last_beacon = 0;
-    chan_dir = 0;
     if (! Model.fixed_id) {
         u8 cyrfmfg_id[6];
         CYRF_GetMfgData(cyrfmfg_id);
@@ -419,11 +534,15 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
         case PROTOCMD_BIND:  bind(); return 0;
-        case PROTOCMD_DEFAULT_NUMCHAN:
-        case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
+        case PROTOCMD_DEFAULT_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
               ? (void *)8L
               : (Model.protocol == PROTOCOL_WK2601)
                 ? (void *)6L
+                : (void *)4L;
+        case PROTOCMD_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
+              ? (void *)8L
+              : (Model.protocol == PROTOCOL_WK2601)
+                ? (void *)7L
                 : (void *)4L;
         case PROTOCMD_SET_TXPOWER:
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);

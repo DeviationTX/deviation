@@ -20,7 +20,7 @@ struct Model {
     char icon[24];
     enum ModelType type;
     enum Protocols protocol;
-    u8 proto_opts[NUM_PROTO_OPTS];
+    s8 proto_opts[NUM_PROTO_OPTS];
     u8 num_channels;
     u32 fixed_id;
     enum TxPower tx_power;

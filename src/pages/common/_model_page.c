@@ -153,6 +153,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
         Model.num_channels = PROTOCOL_DefaultNumChannels();
+        memset(Model.proto_opts, 0, sizeof(Model.proto_opts)); //This may cause an immediate change in behavior!
         GUI_Redraw(mp->chanObj);
         configure_bind_button();
     }
