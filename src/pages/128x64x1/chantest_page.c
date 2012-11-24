@@ -91,6 +91,10 @@ static void _show_bar_page(u8 num_bars)
                 LCD_HEIGHT - view_origin_absoluteY, total_items, NULL, NULL, NULL);
     else
         scroll_bar = NULL;
+
+    // Bug fix: the labelDesc is shared in many pages, must reset it to DEFAULT_FONT after the page is drawn
+    // Otherwise, page in other language will not display as only the DEFAULT_FONT supports multi-lang
+    labelDesc.font = DEFAULT_FONT.font;
 }
 
 void PAGE_ChantestInit(int page)
