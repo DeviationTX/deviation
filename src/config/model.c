@@ -622,7 +622,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 }
             }
             for(i = 0; i < NUM_TELEM; i++) {
-                if(mapstrcasecmp(value, TELEMETRY_Name(str, i)) == 0) {
+                if(mapstrcasecmp(value, TELEMETRY_Name(str, i+1)) == 0) {
                     m->pagecfg.box[idx] = i + 1 + NUM_TIMERS;
                     return 1;
                 }
@@ -878,7 +878,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             if(m->pagecfg.box[idx] && m->pagecfg.box[idx] <= NUM_TIMERS) {
                 fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TIMER_Name(file, m->pagecfg.box[idx]-1));
             } else if(m->pagecfg.box[idx] && m->pagecfg.box[idx] - NUM_TIMERS <= NUM_TELEM) {
-                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TELEMETRY_Name(file, m->pagecfg.box[idx]-NUM_TIMERS-1));
+                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TELEMETRY_Name(file, m->pagecfg.box[idx]-NUM_TIMERS));
             } else {
                 u8 val = m->pagecfg.box[idx];
                 if (val)
