@@ -68,6 +68,8 @@ void LCD_Contrast(u8 contrast)
 
 void LCD_Init()
 {
+    GUI_ViewInit();
+
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
     rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_FSMCEN);
@@ -132,7 +134,6 @@ void LCD_Init()
     lcd_display(1);
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
- 
 }
 
 void LCD_Clear(unsigned int val)
@@ -199,11 +200,8 @@ void LCD_DrawPixel(unsigned int color)
 	// if x and y are relative coordinate and inside a logical view, convert them to absolute coordinates
 	// it they are absolute coordinate, just draw it as usual
 	if (GUI_IsLogicViewCoordinate(absolute_y0) || GUI_IsLogicViewCoordinate(absolute_x0)) {
-		s8 view_id = GUI_GetViewId(absolute_x0, absolute_y0);
-		if (view_id >=0 ) {
-			if (!GUI_IsCoordinateInsideLogicalView(view_id, &absolute_x0, &absolute_y0))
-				return; // don't draw relative coordinate if it is outside the view;
-		}
+	    if (!GUI_IsCoordinateInsideLogicalView(&absolute_x0, &absolute_y0))
+	        return; // don't draw relative coordinate if it is outside the view;
 	}
 
     int y = absolute_y0;

@@ -263,6 +263,7 @@ void LCD_Init()
 {
   int i;
   Fl::visual(FL_RGB);
+  GUI_ViewInit();
   // 85 is for 4 rows' height
   int lcdScreenWidth = LCD_WIDTH * LCD_WIDTH_MULT;
   int lcdScreenHeight = LCD_HEIGHT * LCD_HEIGHT_MULT;

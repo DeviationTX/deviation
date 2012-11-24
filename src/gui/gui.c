@@ -27,6 +27,7 @@ static struct guiObject GUI_Array[100];
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
+static viewObject_t views[LOGICALVIEW_COUNT]; // The logical view is only available in devo10 currently
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
 #include "_gui.c"
@@ -74,11 +75,18 @@ void GUI_DrawObject(struct guiObject *obj)
 
 void GUI_DrawObjects(void)
 {
-
     struct guiObject *obj = objHEAD;
     while(obj) {
-        if(! OBJ_IS_HIDDEN(obj))
-        {
+        struct guiBox *box = &obj->box;
+        s16 x = box->x;
+        s16 y = box->y;
+        if (GUI_IsLogicViewCoordinate(x)) {  // handle objects  inside views here
+            s8 view_id = GUI_GetViewId(x, y);
+            if (!OBJ_IS_HIDDEN(obj) && view_id >= 0 && GUI_IsObjectInsideCurrentView(view_id, obj)) {
+                GUI_DrawObject(obj); //refresh all objects in the viewpoint
+            } else
+                OBJ_SET_DIRTY(obj, 0);
+        } else if(! OBJ_IS_HIDDEN(obj)) {
             GUI_DrawObject(obj);
         } else {
             OBJ_SET_DIRTY(obj, 0);
@@ -240,6 +248,18 @@ void GUI_HideObjects(struct guiObject *modalObj)
 
 void GUI_RefreshScreen(void)
 {
+    viewObject_t *viewObj = NULL;
+    if (HAS_LOGICALVIEW)
+    {
+        for (u8 i = 0; i < LOGICALVIEW_COUNT; i++) {
+            viewObj = &views[i];
+            if (OBJ_IS_DIRTY(viewObj)) {
+                //printf("Clear view: %d\n\n", i);
+                GUI_DrawBackground(viewObj->origin_absoluteX, viewObj->origin_absoluteY, viewObj->width, viewObj->height);
+            }
+        }
+    }
+
     struct guiObject *obj;
     if (FullRedraw) {
         GUI_DrawScreen();
@@ -249,7 +269,20 @@ void GUI_RefreshScreen(void)
     GUI_HideObjects(modalObj);
     obj = objHEAD;
     while(obj) {
-        if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+        struct guiBox *box = &obj->box;
+        s16 x = box->x;
+        s16 y = box->y;
+        if (GUI_IsLogicViewCoordinate(x)) {  // handle objects  inside views here
+            s8 view_id = GUI_GetViewId(x, y);
+            if (!OBJ_IS_HIDDEN(obj) && view_id >= 0 && GUI_IsObjectInsideCurrentView(view_id, obj)) {
+                if (OBJ_IS_DIRTY(&views[view_id])) { //refresh all objects in the viewpoint when a view marked dirty
+                    GUI_DrawObject(obj);
+                } else if (OBJ_IS_DIRTY(obj)) { // otherwise only refresh dirty object
+                    GUI_DrawObject(obj);
+                } else
+                    OBJ_SET_DIRTY(obj, 0);
+            }
+        } else if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
             if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
                 if (modalObj && modalObj->Type == Dialog) {
                     GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
@@ -260,6 +293,14 @@ void GUI_RefreshScreen(void)
             GUI_DrawObject(obj);
         }
         obj = obj->next;
+    }
+
+    if (HAS_LOGICALVIEW)
+    {
+        for (u8 i = 0; i < LOGICALVIEW_COUNT; i++) {
+            if (OBJ_IS_DIRTY(&views[i]))
+                OBJ_SET_DIRTY(&views[i], 0);  // must rest views' dirty flag at last
+        }
     }
 }
 

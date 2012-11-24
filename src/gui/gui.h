@@ -400,10 +400,25 @@ void GUI_TextSelectEnable(struct guiObject *obj, u8 enable);
 u8 GUI_IsTextSelectEnabled(struct guiObject *obj);
 void GUI_ChangeImage(guiObject_t *obj, const char *file, u16 x_off, u16 y_off);
 
+// logical view, only available in text-based LCD, such as devo10
+struct viewObject {
+    u8 flags;
+    s16 orgin_relativeX;  // can be negative to indicate the whole view is hidden
+    s16 orgin_relativeY; // can be negative to indicate the whole view is hidden
+    u16 width;
+    u16 height;
+    u16 origin_absoluteX;
+    u16 origin_absoluteY;
+    u16 boundary;
+    struct viewObject *next;
+};
+typedef struct viewObject viewObject_t;
+
+#define LOGICALVIEW_COUNT 3
 #define LOGICAL_VIEW_BOUNDARY 5000 // a coordinate that is >= 5000 is a relative coordinate
 #define GUI_IsLogicViewCoordinate(x) (x)>= LOGICAL_VIEW_BOUNDARY
 u8 GUI_IsObjectInsideCurrentView(u8 view_id, struct guiObject *obj);
-u8 GUI_IsCoordinateInsideLogicalView(u8 view_id, u16 *x, u16 *y);
+u8 GUI_IsCoordinateInsideLogicalView(u16 *x, u16 *y);
 void GUI_SetupLogicalView(u8 view_id, u16 view_orgin_relativeX, u16 view_orgin_relativeY, u8 width, u8 height,
         u8 view_origin_absoluteX, u8 view_origin_absoluteY);
 u16 GUI_MapToLogicalView(u8 view_id, u16 x_or_y);
@@ -411,6 +426,7 @@ void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY);
 void GUI_ScrollLogicalView(u8 view_id, s16 y_offset);
 void GUI_ScrollLogicalViewToObject(u8 view_id, struct guiObject *obj, s8 direction);
 s16 GUI_GetLogicalViewOriginRelativeY(u8 view_id);
-s8 GUI_GetViewId(u16 x, u16 y) ;
 void GUI_Select1stSelectableObj();
+s8 GUI_GetViewId(s16 x, s16 y);
+void GUI_ViewInit();
 #endif /* GUI_H_ */

@@ -62,3 +62,21 @@ void GUI_HandleModalButtons(u8 enable)
                 handle_buttons,
                 NULL);
 }
+
+// Below view-related functions are dummy funcitons as the views are only available for devo10
+void GUI_ViewInit() {}
+
+s8 GUI_GetViewId(s16 x, s16 y)
+{
+    (void)x;
+    (void)y;
+    return -1;
+}
+
+u8 GUI_IsObjectInsideCurrentView(u8 view_id, struct guiObject *obj)
+{
+    (void)view_id;
+    (void)obj;
+    return 0;
+}
+
