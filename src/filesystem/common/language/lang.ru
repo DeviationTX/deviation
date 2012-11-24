@@ -11,10 +11,10 @@
 1-к-1
 :11 Point
 11 точек
-:120 EPA
-120 EPA
-:120 PEA
-120 PEA
+<:120 EPA
+<120 EPA
+<:120 PEA
+<120 PEA
 :13 Point
 13 точек
 :3 Point
@@ -31,8 +31,10 @@
 4-канала с дв.расходами
 :5 Point
 5 точек
+>:5+1
 :6 Trims
 6 тримм.
+>:6+1
 :6Ch Airplane
 6-канальный самолет
 :6Ch Helicopter
@@ -115,6 +117,7 @@ AUX5
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал 
+>:Chan mode
 :Change
 Изменить
 :Channel monitor
@@ -273,10 +276,6 @@ GPS
 Макс.:
 :Menu
 Меню
-<:Menu +
-<Меню +
-<:Menu -
-<Меню -
 :Meter
 Метр
 :Mid-Rate
@@ -331,8 +330,10 @@ GPS
 ОK
 :On
 Вкл.
+>:PIT Inv
 :Page:
 Стр.:
+>:Pit Limit
 :Plane
 Самолет
 :Point:
@@ -421,8 +422,8 @@ RPM
 Масшт.:
 :Scanner
 Сканер
-:Servo mode
-Режим серво:
+<:Servo mode
+<Режим серво:
 :Simple
 Простой
 :Simple 4 Channel
@@ -509,8 +510,8 @@ RPM
 Шаблон...
 :Test
 Тест
-:Thr. rev
-Реверс газа:
+<:Thr. rev
+<Реверс газа:
 :Time
 Время
 :Timer

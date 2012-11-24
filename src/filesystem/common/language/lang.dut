@@ -23,8 +23,10 @@
 4-kan. met Dual-Rates
 :5 Point
 5 punten
+>:5+1
 :6 Trims
 6 trims
+>:6+1
 :6Ch Airplane
 6-kan. vliegtuig
 :6Ch Helicopter
@@ -72,6 +74,7 @@ Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige 
 :Box %d:
 Kader %d:
 >:Button monitor
+>:Buzz volume:
 :COL
 COL
 :COL Inv:
@@ -87,6 +90,7 @@ Annuleren
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Kan
+>:Chan mode
 :Change
 Aanpassen
 >:Channel monitor
@@ -201,8 +205,6 @@ Configuratie hoofdscherm
 :Max:
 Max:
 >:Menu
->:Menu +
->:Menu -
 >:Meter
 :Mid-Rate
 Middel
@@ -248,8 +250,10 @@ Offset:
 Ok
 :On
 Aan
+>:PIT Inv
 :Page:
 Pagina:
+>:Pit Limit
 >:Plane
 :Point:
 Punt:
@@ -422,6 +426,7 @@ Onbekend
 Omhoog
 :Value:
 Waarde:
+>:Vibration:
 :Virt
 Virt
 >:Volt

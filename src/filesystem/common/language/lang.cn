@@ -23,8 +23,10 @@
 4通直升机
 :5 Point
 5点曲线
+>:5+1
 :6 Trims
 6微调显示
+>:6+1
 :6Ch Airplane
 6通直升机
 :6Ch Helicopter
@@ -96,6 +98,7 @@ CYC
 将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
 通道
+>:Chan mode
 :Change
 改变
 :Channel monitor
@@ -229,10 +232,10 @@ LCD设置
 最大舵量
 :Menu
 快捷菜单
-:Menu +
-快捷菜单+
-:Menu -
-快捷菜单-
+<:Menu +
+<快捷菜单+
+<:Menu -
+<快捷菜单-
 :Meter
 米
 :Mid-Rate
@@ -284,8 +287,10 @@ LCD设置
 >:Ok
 :On
 开启
+>:PIT Inv
 :Page:
 模式1-N
+>:Pit Limit
 :Plane
 固定翼
 :Point:

@@ -23,8 +23,10 @@ Français
 4ch et Double deb.
 :5 Point
 5 points
+>:5+1
 :6 Trims
 6 Trims
+>:6+1
 :6Ch Airplane
 6ch Avion
 :6Ch Helicopter
@@ -72,6 +74,7 @@ Appairage en cours...\nAssurez vous que le récepteur fonctionne\n\nAppuyer sur 
 :Box %d:
 Box%d:
 >:Button monitor
+>:Buzz volume:
 :COL
 pas
 :COL Inv:
@@ -87,6 +90,7 @@ Annuler
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Ch
+>:Chan mode
 :Change
 Changer
 >:Channel monitor
@@ -201,8 +205,6 @@ Config. de la page principale
 :Max:
 Max:
 >:Menu
->:Menu +
->:Menu -
 >:Meter
 :Mid-Rate
 Déb. Med
@@ -248,8 +250,10 @@ Offset:
 Ok
 :On
 On
+>:PIT Inv
 :Page:
 Page:
+>:Pit Limit
 >:Plane
 :Point:
 Point:
@@ -422,6 +426,7 @@ Inconnu
 Haut
 :Value:
 Valeur:
+>:Vibration:
 :Virt
 Virt
 >:Volt

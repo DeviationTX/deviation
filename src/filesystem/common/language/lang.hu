@@ -23,8 +23,10 @@ Csatornák:
 4 csat. + DR
 :5 Point
 5 pont
+>:5+1
 :6 Trims
 6 trim
+>:6+1
 :6Ch Airplane
 6 csat. repülőgép
 :6Ch Helicopter
@@ -79,6 +81,7 @@ Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 Doboz%d:
 :Button monitor
 Nyomógomb ellenőrzés
+>:Buzz volume:
 :COL
 Kollektív
 :COL Inv:
@@ -97,6 +100,7 @@ Mégsem
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
 Cs
+>:Chan mode
 :Change
 Váltás
 :Channel monitor
@@ -235,10 +239,10 @@ Főablak konfig.
 Max:
 :Menu
 Menü
-:Menu +
-Menü +
-:Menu -
-Menü -
+<:Menu +
+<Menü +
+<:Menu -
+<Menü -
 :Meter
 Méter
 :Mid-Rate
@@ -291,8 +295,10 @@ Eltolás:
 Ok
 :On
 Be
+>:PIT Inv
 :Page:
 Oldal:
+>:Pit Limit
 :Plane
 Repülő
 :Point:
@@ -501,6 +507,7 @@ Ismeretlen
 Fel
 :Value:
 Érték:
+>:Vibration:
 :Virt
 Virt.
 :Volt

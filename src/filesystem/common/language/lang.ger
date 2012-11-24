@@ -23,8 +23,10 @@ Kanäle:
 4K mit DR
 :5 Point
 5 Punkt
+>:5+1
 :6 Trims
 6 Trimmungen
+>:6+1
 :6Ch Airplane
 6-Kanal Flugzeug
 :6Ch Helicopter
@@ -71,6 +73,7 @@ Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevor
 :Box %d:
 Kasten %d:
 >:Button monitor
+>:Buzz volume:
 :COL
 COL Inv:
 >:COL Inv:
@@ -85,6 +88,7 @@ Abbruch
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 K
+>:Chan mode
 :Change
 Wählen
 >:Channel monitor
@@ -197,8 +201,6 @@ Hauptseitenkonfiguration
 :Max:
 Max:
 >:Menu
->:Menu +
->:Menu -
 >:Meter
 :Mid-Rate
 Mittel
@@ -243,8 +245,10 @@ Offset:
 Ok
 :On
 Ein
+>:PIT Inv
 :Page:
 Seite:
+>:Pit Limit
 >:Plane
 :Point:
 Punkt:
@@ -414,6 +418,7 @@ Unbekannt
 Hoch
 :Value:
 Wert:
+>:Vibration:
 >:Virt
 >:Volt
 >:Volt:

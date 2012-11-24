@@ -23,8 +23,10 @@ Italiano
 4Ch con DualRate
 :5 Point
 5 Punti
+>:5+1
 :6 Trims
 6 Trim
+>:6+1
 :6Ch Airplane
 Aereo 6Ch
 :6Ch Helicopter
@@ -78,6 +80,7 @@ Binding...\n%d secondi\nPremi ENT per fermare
 :Box %d:
 Box%d:
 >:Button monitor
+>:Buzz volume:
 :COL
 Collet.
 :COL Inv:
@@ -96,6 +99,7 @@ Celsius
 Centra tutti gli\nsticks e le manopole\nquindi premi ENT 
 :Ch
 Ch
+>:Chan mode
 :Change
 Cambia
 >:Channel monitor
@@ -229,8 +233,6 @@ Pagina di Configurazione
 :Max:
 Max:
 >:Menu
->:Menu +
->:Menu -
 :Meter
 Metro
 :Mid-Rate
@@ -282,8 +284,10 @@ Offset:
 Ok
 :On
 On
+>:PIT Inv
 :Page:
 Pagina:
+>:Pit Limit
 :Plane
 Aero
 :Point:
@@ -488,6 +492,7 @@ Sconosciuto
 Sù
 :Value:
 valore:
+>:Vibration:
 :Virt
 Virt
 :Volt

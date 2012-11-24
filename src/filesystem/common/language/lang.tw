@@ -23,8 +23,10 @@
 4通和舵量
 :5 Point
 5 點
+>:5+1
 :6 Trims
 6 微調
+>:6+1
 :6Ch Airplane
 6動固定翼
 :6Ch Helicopter
@@ -39,8 +41,11 @@
 絕對值
 :AIL
 副翼
+>:AIL DR
 :AIL Inv:
 副翼方向:
+>:AUX4
+>:AUX5
 :About Deviation
 關於 Deviation
 :Airplane
@@ -79,6 +84,7 @@
 螺距
 :COL Inv:
 螺距方向:
+>:CYC
 :Calibrate
 校正
 :Calibration done.
@@ -91,6 +97,7 @@
 所有搖桿置中\n按 ENT 開始進行
 :Ch
 通道
+>:Chan mode
 :Change
 更改
 :Channel monitor
@@ -135,6 +142,7 @@ Deviation 韌體版本：
 下
 :ELE
 升降
+>:ELE DR
 :ELE Inv:
 升降方向:
 :EXPO
@@ -163,6 +171,8 @@ FMOD2
 固定ID:
 :Foot
 英呎
+>:GEAR
+>:GPS
 :Generic settings
 ======基本參數======
 :Heli
@@ -177,6 +187,7 @@ FMOD2
 輸入內容檢視
 :Input:
 輸入:
+>:Insert
 :Inverted
 反向的
 :LCD settings
@@ -204,18 +215,22 @@ FMOD2
 >:Low Battery
 :Low-Rate
 低位
+>:MIX0
+>:MIX1
+>:MIX2
 :Main menu
 主選單
+>:Main page
 :Main page config
 螢幕排列規畫
 :Max:
 輸出上限:
 :Menu
 快顯
-:Menu +
-快顯 +
-:Menu -
-快顯 -
+<:Menu +
+<快顯 +
+<:Menu -
+<快顯 -
 :Meter
 公尺
 :Mid-Rate
@@ -264,10 +279,13 @@ FMOD2
 關閉
 :Offset:
 偏移:
+>:Ok
 :On
 開啟
+>:PIT Inv
 :Page:
 頁碼：
+>:Pit Limit
 :Plane
 飛機
 :Point:
@@ -303,6 +321,7 @@ FMOD2
 轉速
 :RUD
 方向
+>:RUD DR
 :Re-Init
 重對頻
 >:Remove
@@ -318,6 +337,7 @@ FMOD2
 右
 :Safe Val:
 安全值:
+>:Safety
 :Safety:
 安全開關:
 :Save
@@ -398,8 +418,6 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
-<:Telemetry
-<檢視遙測內容
 :Telemetry config
 遙測規畫
 :Telemetry monitor
@@ -464,6 +482,7 @@ FMOD2
 開啟
 :Tx power:
 發射功率:
+>:USB
 :Unknown
 未知
 :Up
@@ -486,6 +505,8 @@ FMOD2
 加上
 :countdown
 倒數
+>:max
+>:min
 :mult
 多重
 :replace
