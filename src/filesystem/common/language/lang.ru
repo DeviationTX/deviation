@@ -11,6 +11,10 @@
 1-к-1
 :11 Point
 11 точек
+:120 EPA
+120 EPA
+:120 PEA
+120 PEA
 :13 Point
 13 точек
 :3 Point
@@ -87,6 +91,8 @@ AUX5
 Бокс %d:
 :Button monitor
 Монитор кнопок
+:Buzz volume:
+Громкость:
 :COL
 Колл
 :COL Inv:
@@ -166,6 +172,8 @@ AUX5
 :Exit
 Выход
 :Expo&DR
+Эксп&ДР
+|devo8:Expo&DR
 Экспо&ДР
 :FMODE0
 ПРеж0
@@ -265,10 +273,10 @@ GPS
 Макс.:
 :Menu
 Меню
-:Menu +
-Меню +
-:Menu -
-Меню -
+<:Menu +
+<Меню +
+<:Menu -
+<Меню -
 :Meter
 Метр
 :Mid-Rate
@@ -375,6 +383,8 @@ RPM
 РНапр
 :RUD DR
 РН.ДР
+|devo8:RUD DR
+РНапр ДР
 :Re-Init
 Привязка
 :Remove
@@ -411,6 +421,8 @@ RPM
 Масшт.:
 :Scanner
 Сканер
+:Servo mode
+Режим серво:
 :Simple
 Простой
 :Simple 4 Channel
@@ -497,6 +509,8 @@ RPM
 Шаблон...
 :Test
 Тест
+:Thr. rev
+Реверс газа:
 :Time
 Время
 :Timer
@@ -557,6 +571,8 @@ USB
 Вверх
 :Value:
 Значение:
+:Vibration:
+Вибрация:
 :Virt
 Вирт. 
 :Volt

@@ -39,11 +39,8 @@
 絕對值
 :AIL
 副翼
->:AIL DR
 :AIL Inv:
 副翼方向:
->:AUX4
->:AUX5
 :About Deviation
 關於 Deviation
 :Airplane
@@ -56,26 +53,32 @@
 背光亮度:
 :Bar %d:
 條框%d
->:Bars:
+:Bars:
+狀態條:
 :Batt alarm:
 低電警示:
->:Battery alarm:
+:Battery alarm:
+低電警示:
 :Battery too low,\ncan't save!
 電壓過低,\n無法儲存修改!
 :Bind
 連結
->:Binding
->:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+:Binding
+連結中
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
 :Binding...\n%d seconds\nPress ENT to stop
 對頻中...\n%d秒\n按ENT鍵中止對頻
 :Box %d:
 訊息框 %d:
->:Button monitor
+:Button monitor
+按鍵內容檢視
+:Buzz volume:
+警示音量:
 :COL
 螺距
 :COL Inv:
 螺距方向:
->:CYC
 :Calibrate
 校正
 :Calibration done.
@@ -90,7 +93,8 @@
 通道
 :Change
 更改
->:Channel monitor
+:Channel monitor
+通道內容檢視
 :Channel output
 輸出通道
 :Complex
@@ -103,7 +107,8 @@
 複製到
 :Copy To...
 複製到...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+電池電壓不足！\n\n使用中的設定已儲存.\n未來更動將不再儲存.\n\n請即更換電池！
 :Curve:
 曲線:
 :Cyclic1
@@ -130,7 +135,6 @@ Deviation 韌體版本：
 下
 :ELE
 升降
->:ELE DR
 :ELE Inv:
 升降方向:
 :EXPO
@@ -159,8 +163,6 @@ FMOD2
 固定ID:
 :Foot
 英呎
->:GEAR
->:GPS
 :Generic settings
 ======基本參數======
 :Heli
@@ -169,11 +171,12 @@ FMOD2
 直升機
 :High-Rate
 高位
->:Icon
->:Input monitor
+:Icon
+圖示
+:Input monitor
+輸入內容檢視
 :Input:
 輸入:
->:Insert
 :Inverted
 反向的
 :LCD settings
@@ -201,19 +204,18 @@ FMOD2
 >:Low Battery
 :Low-Rate
 低位
->:MIX0
->:MIX1
->:MIX2
 :Main menu
 主選單
->:Main page
 :Main page config
 螢幕排列規畫
 :Max:
 輸出上限:
->:Menu
->:Menu +
->:Menu -
+:Menu
+快顯
+:Menu +
+快顯 +
+:Menu -
+快顯 -
 :Meter
 公尺
 :Mid-Rate
@@ -228,15 +230,18 @@ FMOD2
 段數:
 :Mode %d
 模式 %d
->:Model menu
+:Model menu
+模型選單
 :Model name:
 模型名稱:
 :Model setup
 模型設定
 :Model type:
 機種選擇:
->:Move Down
->:Move Up
+:Move Down
+下移
+:Move Up
+上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 移動所有搖桿\n通過上下極限區域\n按 ENT 校準 
 :Mux:
@@ -259,7 +264,6 @@ FMOD2
 關閉
 :Offset:
 偏移:
->:Ok
 :On
 開啟
 :Page:
@@ -287,7 +291,8 @@ FMOD2
 按 ENT 讓 USB：
 :Preview: Long-Press ENT
 長按 ENT 預覽 EXT 離開
->:Protocol:
+:Protocol:
+通訊協定:
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -298,7 +303,6 @@ FMOD2
 轉速
 :RUD
 方向
->:RUD DR
 :Re-Init
 重對頻
 >:Remove
@@ -314,7 +318,6 @@ FMOD2
 右
 :Safe Val:
 安全值:
->:Safety
 :Safety:
 安全開關:
 :Save
@@ -325,7 +328,8 @@ FMOD2
 比例2:
 :Scale:
 比例:
->:Scanner
+:Scanner
+2.4G頻道掃描
 :Simple
 單段式
 :Simple 4 Channel
@@ -334,7 +338,8 @@ FMOD2
 速率
 :Speed:
 舵機速度:
->:Src
+:Src
+訊號來源
 :Src:
 訊號來源:
 :Start:
@@ -393,9 +398,12 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
+<:Telemetry
+<檢視遙測內容
 :Telemetry config
 遙測規畫
->:Telemetry monitor
+:Telemetry monitor
+遙測內容檢視
 :Telemetry settings
 ======遙測參數======
 :Temp
@@ -426,7 +434,8 @@ FMOD2
 觸控板校正
 :Touch Test
 觸控測試
->:Touch screen:
+:Touch screen:
+觸控螢幕:
 :Touch target %d
 點擊目標 %d
 :Touch to Lock
@@ -435,7 +444,8 @@ FMOD2
 觸碰解鎖
 :Transmitter config
 發射機規畫
->:Transmitter menu
+:Transmitter menu
+發射機選單
 :Trim
 微調
 :Trim +:
@@ -448,16 +458,20 @@ FMOD2
 微調
 :Trims:
 微調數:
->:Turn Off
->:Turn On
+:Turn Off
+關閉
+:Turn On
+開啟
 :Tx power:
 發射功率:
->:USB
->:Unknown
+:Unknown
+未知
 :Up
 上
 :Value:
 數值:
+:Vibration:
+震動警示:
 :Virt
 虛擬
 :Volt
@@ -466,13 +480,12 @@ FMOD2
 電壓:
 :Zero/Max
 零/上限
->:\n\nBinding will end in %d seconds...
+:\n\nBinding will end in %d seconds...
+\n\n連結將在 %d 秒內結束
 :add
 加上
 :countdown
 倒數
->:max
->:min
 :mult
 多重
 :replace
