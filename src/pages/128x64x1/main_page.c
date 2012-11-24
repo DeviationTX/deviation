@@ -135,10 +135,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         u8 page = (0 << 4) | MENUTYPE_MAINMENU;
         PAGE_ChangeByID(PAGEID_MENU, page);
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_UP)) {
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
         TIMER_StartStop(0);
         TIMER_StartStop(1);
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) {
         TIMER_Reset(0);
         TIMER_Reset(1);;
     } else if (! PAGE_QuickPage(button, flags, data)) {
