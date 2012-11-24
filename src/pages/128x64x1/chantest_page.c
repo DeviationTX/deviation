@@ -63,7 +63,8 @@ static void _show_bar_page(u8 num_bars)
     // Create a logical view
     u8 view_origin_absoluteX = 0;
     u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH, view_height, view_origin_absoluteX, view_origin_absoluteY);
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH,  // bug fix: should give space for scroll bar
+            view_height, view_origin_absoluteX, view_origin_absoluteY);
 
     for(i = 0; i < num_bars; i++) {
         if (i%2 ==0) {

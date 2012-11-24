@@ -334,9 +334,8 @@ static void _show_expo_dr()
             w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[2].scalar);
 
     GUI_SetupLogicalView(RIGHT_VIEW_ID, 0, 0, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1);
-    // The following items are draw in the right logical view,
-    mp->bar = GUI_CreateBarGraph(LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
-                              CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
+
+    // Bug fix: DO NOT draw too many xygraphes in a page, it will trigger watchdog and reboot when pressing up/down continously
     // the right view will be scroll up/down by changed the switch 1/2 options
     y = 0;
     mp->graphs[0] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
@@ -414,7 +413,7 @@ static void navigate_items(s8 direction)
         if (obj == mp->itemObj[0]) {
             current_selected_item = 0;
             if (direction > 0)  // Perf improvement on UI drawing for mixer setup: remove unnecessary view refreshing
-            GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
         }
     } else {
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {

@@ -117,6 +117,23 @@ void GUI_ScrollLogicalViewToObject(u8 view_id, struct guiObject *obj, s8 directi
     GUI_ScrollLogicalView(view_id, offset);
 }
 
+void draw_objects_inview(u8 view_id)
+{
+    struct guiObject *obj = objHEAD;
+    while(obj) {
+        struct guiBox *box = &obj->box;
+        s16 y = box->y;
+        if(! OBJ_IS_HIDDEN(obj) && (GUI_IsObjectInsideCurrentView(view_id, obj)
+                || (OBJ_IS_DIRTY(obj) && y >=0 && y <= LCD_HEIGHT))) // object that is not in the view but in the physical LCD still needs to refresh
+        {
+            GUI_DrawObject(obj);
+        } else {
+            OBJ_SET_DIRTY(obj, 0);
+        }
+        obj = obj->next;
+    }
+}
+
 void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY)
 {
     if (new_originX < 0 || new_originY < 0) {
@@ -131,7 +148,7 @@ void GUI_SetRelativeOrigin(u8 view_id, s16 new_originX, s16 new_originY)
     _view_orgin_relativeY[view_id] = new_originY;
     LCD_FillRect(GUI_MapToLogicalView(view_id, new_originX), GUI_MapToLogicalView(view_id, new_originY),
             _view_width[view_id], _view_height[view_id], 0x0);
-    GUI_DrawObjects();
+    draw_objects_inview(view_id);
 }
 
 s8 GUI_GetViewId(u16 x, u16 y) {

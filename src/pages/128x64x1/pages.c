@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "pages.h"
-//#include "icons.h"
+#include "music.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
@@ -279,4 +279,6 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     MIXER_SetLimit(mp->channel, &mp->limit);
     MIXER_SetTemplate(mp->channel, mp->cur_template);
     MIXER_SetMixers(mp->mixer, mp->num_mixers);
+    MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini
+    BUTTON_InterruptLongPress();
 }
