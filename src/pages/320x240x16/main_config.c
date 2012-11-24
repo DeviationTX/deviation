@@ -183,7 +183,9 @@ static void _show_page()
     } else if (page_num == 2) {
         y = 40;
         for (i = 0; i < 4; i++) {
-            GUI_CreateLabel(COL1_VALUE, y, menulabel_cb, DEFAULT_FONT, (void *)i);
+            guiObject_t *obj = GUI_CreateLabel(COL1_VALUE, y, menulabel_cb, DEFAULT_FONT, (void *)i);
+            if (i == 0)
+                firstObj = obj;
             GUI_CreateTextSelect(COL2_VALUE, y, TEXTSELECT_224, 0x0000, NULL, menusel_cb, (void *)i);
             y += 24;
         }
