@@ -204,7 +204,7 @@ void CONFIG_LoadTx()
     Transmitter.mode = MODE_2;
     Transmitter.brightness = 5;
     Transmitter.contrast = 5;
-    Transmitter.volume = 9;
+    Transmitter.volume = 10;
     Transmitter.vibration_state = 0; // default to off since only devo10 support it
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
