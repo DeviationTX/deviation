@@ -124,10 +124,19 @@ static void toggle_trim_cb(guiObject_t *obj, const void *data)
 void toggle_link_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if(data)
-       mp->link_curves ^= 0x02;
-    else
-       mp->link_curves ^= 0x01;
+    if(data) {
+        mp->link_curves ^= 0x02;
+        if (mp->link_curves & 0x02) { //Redraw graphs when re-linking
+            sync_mixers();
+            redraw_graphs();
+        }
+    } else {
+        mp->link_curves ^= 0x01;
+        if (mp->link_curves & 0x01) { //Redraw graphs when re-linking
+            sync_mixers();
+            redraw_graphs();
+        }
+    }
     _update_rate_widgets(data ? 1 : 0);
 }
 
