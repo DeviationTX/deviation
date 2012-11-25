@@ -425,7 +425,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     }
     struct Mixer *mix = (struct Mixer *)data;
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
-    if (mix->curve.type == CURVE_EXPO
+    if (mix->curve.type >= CURVE_EXPO
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
         //Do not allow entering a linked graph
         memset(mp->graphs, 0, sizeof(mp->graphs));
