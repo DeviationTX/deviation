@@ -32,9 +32,23 @@ static long callback_result; // Bug fix: u8 is a wrong data type, causing memory
 static s16 view_origin_relativeY;
 static s8 current_selected = 0;
 
+static const char * show_icontext_cb(guiObject_t *obj, const void *data)
+{
+    if(! Model.icon[0])
+        return _tr("Default");
+    int i;
+    strcpy(mp->tmpstr, Model.icon+9);
+    for(i = 0; i < strlen(mp->tmpstr); i++) {
+        if(mp->tmpstr[i] == '.') {
+            mp->tmpstr[i] = '\0';
+            break;
+        }
+    }
+    return mp->tmpstr;
+}
+
 void PAGE_ModelInit(int page)
 {
-    (void)changeicon_cb;
     if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
         page = current_selected;
     PAGE_SetActionCB(_action_cb);
@@ -68,6 +82,13 @@ void PAGE_ModelInit(int page)
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model name:"));
     GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x ), GUI_MapToLogicalView(VIEW_ID, row),
         w, ITEM_HEIGHT, &DEFAULT_FONT, show_text_cb, 0x0000, _changename_cb, Model.name);
+    mp->total_items++;
+
+    row += space;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Icon:"));
+    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, x ), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, show_icontext_cb, 0x0000, changeicon_cb, NULL);
     mp->total_items++;
 
     row += space;
