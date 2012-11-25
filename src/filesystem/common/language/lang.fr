@@ -1,42 +1,44 @@
-Français
+﻿Français
 :# Channels:
-# Voies:
+Nbr canaux
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%,valeur sécu. = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\nvaleur sécu. = %d%%\n
 :1-to-1
-1 vers 1
+1 à 1 
 :11 Point
-11 points
+11 Pts
 :13 Point
-13 points
+13 Pts
 :3 Point
-3 points
+3 Pts
 :4 Bars
 4 Barres
 :4 Inside
-4 Intérieurs
+4 Centraux 
 :4 Outside
-4 Extérieurs
+4 Externes
 :4Ch w/ Dual-Rates
-4ch et Double deb.
+4ch et DR
 :5 Point
-5 points
->:5+1
+5 Pts
+:5+1
+5+1
 :6 Trims
 6 Trims
->:6+1
+:6+1
+6+1
 :6Ch Airplane
 6ch Avion
 :6Ch Helicopter
 6ch Hélicoptère
 :7 Point
-7 points
+7 Pts
 :8 Bars
 8 Barres
 :9 Point
-9 points
+9 Pts
 :ABSVAL
 ValAbs
 :AIL
@@ -44,72 +46,93 @@ AIL
 :AIL DR
 AIL DR
 :AIL Inv:
-:Sens aileron
->:AIL Mix:
+Sens AIL 
+:AIL Mix:
+AIL Mix
 :AUX4
 AUX4
 :AUX5
 AUX5
->:About Deviation
+:About Deviation
+A propos...
 :Airplane
 Avion
->:Alarm
->:Altitude
+:Alarm
+Alarme
+:Altitude
+Altitude
 :Backlight:
-Rétroéclairage:
+Intensité
 :Bar %d:
 Barre %d:
 :Bars:
 Barres:
->:Batt alarm:
+:Batt alarm:
+Alarme batt.
 :Battery alarm:
 Alarme batterie:
->:Battery too low,\ncan't save!
+:Battery too low,\ncan't save!
+Batterie vide,\nEnregistrement impossible!
 :Bind
-Appairage
+Appairer
 :Binding
 Appairage
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Appairage en cours...\nAssurez vous que le récepteur fonctionne\n\nAppuyer sur OK n'annulera pas la procédure \nmais permettra le contrôle du TX.
->:Binding...\n%d seconds\nPress ENT to stop
+Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
+:Binding...\n%d seconds\nPress ENT to stop
+Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
 :Box %d:
 Box%d:
->:Button monitor
->:Buzz volume:
+:Button monitor
+Ctrl des boutons
+:Buzz volume:
+Vol. buzzer
 :COL
 pas
->:COL Inv
+:COL Inv
+Sens du pas
 :COL Inv:
-:Sens du pas
->:COL Limit
->:COL Mix:
+Sens du pas:
+:COL Limit
+Limite pas
+:COL Mix:
+Mixage pas
 :CYC
 CYC
 :Calibrate
-Calibration
->:Calibration done.
+Calibrer
+:Calibration done.
+Calibration terminée.\nAppuyer sur ENT\n pour continuer.
 :Cancel
 Annuler
->:Celsius
->:Center all \nsticks and knobs\nthen press ENT
+:Celsius
+°C
+:Center all \nsticks and knobs\nthen press ENT
+Centrer tous les sticks\net potentiomètres AUX,\n puis presser ENT
 :Ch
 Ch
->:Chan mode
+:Chan mode
+Mode canaux
 :Change
 Changer
->:Channel monitor
->:Channel output
+:Channel monitor
+Ctrl. des Canaux
+:Channel output
+Sorties canaux
 :Complex
 Complexe
 :Configure
 Configurer
->:Contrast:
->:Copy To
+:Contrast:
+Contraste
+:Copy To
+Copier
 :Copy To...
 Copier...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Niveau batterie critique.\nConfiguration enregistrée.\nCharger la batterie SVP.\n Les chgts de configuration\nne seront plus sauver.
 :Curve:
-Courbe:
+Courbe
 :Cyclic1
 Cyclique1
 :Cyclic2
@@ -118,14 +141,18 @@ Cyclique2
 Cyclique3
 :DR
 DR
->:Deadband
+:Deadband
+Deadband
 :Default
 Défaut
 :Deviation FW version:
-Deviation FW version:
->:Dimmer target:
->:Dimmer time:
->:Dn
+Deviation FW version
+:Dimmer target:
+Intens. veille
+:Dimmer time:
+Veille après
+:Dn
+Dn
 :Down
 Bas
 :ELE
@@ -133,8 +160,9 @@ ELE
 :ELE DR
 ELE DR
 :ELE Inv:
-:Sens profondeur
->:ELE Mix:
+Sens profondeur
+:ELE Mix:
+ELE Mix:
 :EXPO
 EXP.
 :Enter
@@ -149,68 +177,85 @@ FMODE0
 FMODE1
 :FMODE2
 FMODE2
->:Fahren
+:Fahren
+°F
 :Failsafe:
 Failsafe:
 :File:
-Fichier:
+Fichier
 :Fixed
 Fixe
 :Fixed ID:
-ID fixe:
->:Foot
+ID fixe
+:Foot
+Pied
 :GEAR
 GEAR
->:GPS
->:Generic settings
->:Heli
+:GPS
+GPS
+:Generic settings
+Réglages
+:Heli
+Heli
 :Helicopter
 Helicoptère
 :High-Rate
-Déb. Haut
+Petit Déb.
 :Icon
 Icône
->:Input monitor
+>:Icon:
+:Input monitor
+Ctrl. des entrées
 :Input:
-Entrée:
->:Insert
+Entrée
+:Insert
+Ajouter
 :Inverted
 Inversé
->:LCD settings
+:LCD settings
+Réglage Ecran
 :LEFT_H
 GAUCHE_H
 :LEFT_V
 GAUCHE_V
 :Language:
 Langue:
->:Latitude
+:Latitude
+Latitude
 :Left
 Gauche
->:Length:
+:Length:
+Unité Long.
 :Linked
 Lié
 :Load
 Charger
 :Load...
 Charger...
->:Longitude
->:Low Battery
+:Longitude
+Longitude
+:Low Battery
+Batterie vide
 :Low-Rate
-Déb. bas
+Grand Déb.
 :MIX0
 MIX0
 :MIX1
 MIX1
 :MIX2
 MIX2
->:Main menu
->:Main page
+:Main menu
+Menu principal
+:Main page
+Ecran d'accueil
 :Main page config
-Config. de la page principale
+Conf. écran accueil
 :Max:
 Max:
->:Menu
->:Meter
+:Menu
+Menu
+:Meter
+Mètre
 :Mid-Rate
 Déb. Med
 :Min/Max
@@ -220,23 +265,29 @@ Min:
 :Mixer
 Mixer
 :Mixers:
-Mixers:
+Nbr mixers
 :Mode %d
 Mode %d
->:Model menu
+:Model menu
+Menu Modèle
 :Model name:
-Nom de modèle:
->:Model setup
+Nom Modèle
+:Model setup
+Config. Modèle
 :Model type:
-Type de modèle:
->:Move Down
->:Move Up
->:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Type Modèle
+:Move Down
+Baisser
+:Move Up
+Monter
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Bouger sticks et pot.\naux min/max de course\n puis appuyer sur ENT
 :Mux:
-Opération:
+Opération
 :Neg
 Neg.
->:New
+:New
+Nouveau
 :No Bars
 Désactivé
 :No Trim
@@ -248,53 +299,65 @@ Néant
 :Normal
 Normal
 :Off
-Off
+Arrêt
 :Offset:
-Offset:
+Offset
 :Ok
 Ok
 :On
-On
+Marche
 :Page:
-Page:
->:Plane
+Page
+:Plane
+Avion
 :Point:
 Point:
 :Pos
 Pos.
 :Pos/Neg:
 Pos./Neg.:
->:Prealert intvl:
->:Prealert time:
+:Prealert intvl:
+Tempo préAlarm
+:Prealert time:
+préAlarme
 :Press 'Ent' to turn USB Filesystem:
-Presser 'Ent' pour passer en mode USB
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to turn \nUSB drive:
->:Preview: Long-Press ENT
+Appuyer sur ENT\n pour passer \n le mode USB sur:
+:Press ENT to change:
+'ENT' pour selectionner
+:Press ENT to copy to:
+'ENT' pour copier
+:Press ENT to load:
+'ENT' pour charger
+:Press ENT to turn \nUSB drive:
+Appuyer sur ENT\n pour passer \n le mode USB sur:
+:Preview: Long-Press ENT
+Aperçu: Appuie-Long ENT
 :Protocol:
-Protocole:
+Protocole
 :RIGHT_H
 DROITE_H
 :RIGHT_V
 DROITE_V
->:RPM
->:RPM:
+:RPM
+T/mn
+:RPM:
+T/mn:
 :RUD
 RUD
 :RUD DR
 RUD DR
 :Re-Init
-Réinitialiser
->:Remove
+Réinit.
+:Remove
+Supprimer
 :Reset
 Reset
 :Reverse:
 Sens:
 :Reversed
 Inversé
->:Revert
+:Revert
+Inverser
 :Right
 Droite
 :Safe Val:
@@ -305,41 +368,48 @@ Sécurité
 Sécurité:
 :Save
 Sauve
->:Scale1:
->:Scale2:
+:Scale1:
+Echelle1:
+:Scale2:
+Echelle2:
 :Scale:
-Echelle:
+Echelle
 :Scanner
 Scanner
 :Simple
 Simple
 :Simple 4 Channel
 4Ch. Simple
->:Speed
->:Speed:
+:Speed
+Vitesse
+:Speed:
+Vitesse:
 :Src
 Source
 :Src:
-Source:
+Source
 :Start:
-Start:
->:Step:
->:Stick input
+Durée:
+:Step:
+<Pas>
+:Stick input
+Entrées  sticks/aux.
 :Stick mode:
-Mode de pilotage:
+Mode
 :Sticks:
-Manches:
+Sticks
 :Subtrim:
 Subtrim
 :SwashType:
-Plateau cyclique:
->:Switch %d:
+Plateau cycl.:
+:Switch %d:
+Inter %d
 :Switch1
 Inter1
 :Switch2
 Inter2
 :Switch:
-Commande:
+Commande
 :Symmetric
 Symétrique
 :THR
@@ -368,26 +438,40 @@ TRIM_G-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry config
->:Telemetry monitor
->:Telemetry settings
->:Temp
->:Temp:
->:Temperature:
+:TelemRPM
+Télém.T/mn
+:TelemT
+Télém.T°
+:TelemV
+Télém.V
+:Telemetry config
+Config. Télémétrie
+:Telemetry monitor
+Ctrl. Télémétrie
+:Telemetry settings
+Réglages télémétrie
+:Temp
+T°
+:Temp:
+T°:
+:Temperature:
+Unité T°
 :Template..
 Modèle...
 :Test
 Test
->:Time
+:Time
+Heure
 :Timer
-Timer
->:Timer settings
->:Timer%d:
->:Timers
->:Timeup intvl:
+Chrono
+:Timer settings
+Réglage Alarme
+:Timer%d:
+Chrono%d
+:Timers
+Chronos
+:Timeup intvl:
+Tempo Alarme
 :Toggle%d
 Voyant%d
 :Touch Calibrate
@@ -402,8 +486,10 @@ Toucher la cible %d
 Toucher pour verrouiller
 :Touch to Unlock
 Toucher pour déverrouiller
->:Transmitter config
->:Transmitter menu
+:Transmitter config
+Config. Emetteur
+:Transmitter menu
+Menu Emetteur
 :Trim
 Trim
 :Trim +:
@@ -412,15 +498,16 @@ Trim +:
 Trim -:
 :Trim Step:
 Finesse:
->:Trims
+:Trims
+Trims
 :Trims:
-Trim:
+Trims:
 :Turn Off
 Désactiver
 :Turn On
 Activer
 :Tx power:
-Puissance TX:
+Puiss. TX
 :USB
 USB
 :Unknown
@@ -429,24 +516,28 @@ Inconnu
 Haut
 :Value:
 Valeur:
->:Vibration:
+:Vibration:
+Vibreur
 :Virt
 Virt
->:Volt
->:Volt:
+:Volt
+Volt
+:Volt:
+Volt:
 :Zero/Max
 0/Max
-:\n\nBinding will end in %d seconds...
-\n\nFin d'appairage dans %d secondes...
+>:\n\nBinding will end in %d seconds...
 :add
-Ajouter
+ajouter
 :countdown
 Décompte
->:max
->:min
+:max
+max
+:min
+min
 :mult
-Mult.
+multiplier
 :replace
-Remplacer
+remplacer
 :stopwatch
 Chronomètre

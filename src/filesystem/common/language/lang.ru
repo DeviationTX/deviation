@@ -27,10 +27,12 @@
 4-канала с дв.расходами
 :5 Point
 5 точек
->:5+1
+:5+1
+5+1
 :6 Trims
 6 тримм.
->:6+1
+:6+1
+6+1
 :6Ch Airplane
 6-канальный самолет
 :6Ch Helicopter
@@ -51,7 +53,8 @@
 Элер ДР
 :AIL Inv:
 Элер Инв:
->:AIL Mix:
+:AIL Mix:
+Элер Микш:
 :AUX4
 AUX4
 :AUX5
@@ -94,11 +97,16 @@ AUX5
 Громкость:
 :COL
 Колл
->:COL Inv
+:COL Inv
+Колл Инв:
 :COL Inv:
 Колл Инв:
->:COL Limit
->:COL Mix:
+|devo8:COL Limit
+Колл Предел:
+:COL Limit
+Колл Предел
+:COL Mix:
+Колл Микш:
 :CYC
 Цикл
 :Calibrate
@@ -117,7 +125,10 @@ AUX5
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал 
->:Chan mode
+|devo8:Chan mode
+Режим канала:
+:Chan mode
+Реж. канала:
 :Change
 Изменить
 :Channel monitor
@@ -168,7 +179,8 @@ AUX5
 РВыс ДР
 :ELE Inv:
 РВыс Инв:
->:ELE Mix:
+:ELE Mix:
+РВыс Микш:
 :EXPO
 Экспо.
 :Enter
@@ -438,7 +450,7 @@ RPM
 :Step:
 Шаг:
 :Stick input
-Ввод стика
+Вводы
 :Stick mode:
 Режим стиков:
 :Sticks:
@@ -524,7 +536,7 @@ RPM
 :Toggle%d
 Перекл%d
 :Touch Calibrate
-Нажать калибровку
+Калибровка экрана
 :Touch Test
 Нажать тест
 :Touch screen:
