@@ -34,9 +34,11 @@ static s8 current_selected = 0;
 
 static const char * show_icontext_cb(guiObject_t *obj, const void *data)
 {
+    (void)data;
+    (void)obj;
+    unsigned int i;
     if(! Model.icon[0])
         return _tr("Default");
-    int i;
     strcpy(mp->tmpstr, Model.icon+9);
     for(i = 0; i < strlen(mp->tmpstr); i++) {
         if(mp->tmpstr[i] == '.') {
