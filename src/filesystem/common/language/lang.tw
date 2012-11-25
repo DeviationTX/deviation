@@ -44,6 +44,7 @@
 >:AIL DR
 :AIL Inv:
 副翼方向:
+>:AIL Mix:
 >:AUX4
 >:AUX5
 :About Deviation
@@ -82,8 +83,11 @@
 警示音量:
 :COL
 螺距
+>:COL Inv
 :COL Inv:
 螺距方向:
+>:COL Limit
+>:COL Mix:
 >:CYC
 :Calibrate
 校正
@@ -145,6 +149,7 @@ Deviation 韌體版本：
 >:ELE DR
 :ELE Inv:
 升降方向:
+>:ELE Mix:
 :EXPO
 曲線
 :Enter
@@ -227,10 +232,6 @@ FMOD2
 輸出上限:
 :Menu
 快顯
-<:Menu +
-<快顯 +
-<:Menu -
-<快顯 -
 :Meter
 公尺
 :Mid-Rate
@@ -282,10 +283,8 @@ FMOD2
 >:Ok
 :On
 開啟
->:PIT Inv
 :Page:
 頁碼：
->:Pit Limit
 :Plane
 飛機
 :Point:

@@ -45,6 +45,7 @@ QUE
 QUE DR
 :AIL Inv:
 :AUX4
+>:AIL Mix:
 >:AUX4
 :AUX5
 Airplane
@@ -76,7 +77,10 @@ Kasten %d:
 >:Buzz volume:
 :COL
 COL Inv:
+>:COL Inv
 >:COL Inv:
+>:COL Limit
+>:COL Mix:
 :CYC
 TAUM
 :Calibrate
@@ -126,6 +130,7 @@ HOE
 HOE DR
 :ELE Inv:
 FIXME
+>:ELE Mix:
 :EXPO
 Expo
 :Enter
@@ -245,10 +250,8 @@ Offset:
 Ok
 :On
 Ein
->:PIT Inv
 :Page:
 Seite:
->:Pit Limit
 >:Plane
 :Point:
 Punkt:

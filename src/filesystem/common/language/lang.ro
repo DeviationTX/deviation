@@ -45,6 +45,7 @@ AIL
 AIL DR
 :AIL Inv:
 AIL Inv.:
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -84,8 +85,11 @@ Monitor butoane
 >:Buzz volume:
 :COL
 Colectiv
+>:COL Inv
 :COL Inv:
 Colectiv inv.:
+>:COL Limit
+>:COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -149,6 +153,7 @@ ELE
 ELE DR
 :ELE Inv:
 ELE inv.:
+>:ELE Mix:
 :EXPO
 EXP.
 :Enter
@@ -239,10 +244,6 @@ Ecran principal
 Max:
 :Menu
 Meniu
-<:Menu +
-<Meniu +
-<:Menu -
-<Meniu -
 :Meter
 Metru
 :Mid-Rate
@@ -295,10 +296,8 @@ Offset:
 Ok
 :On
 Pornit
->:PIT Inv
 :Page:
 Pagină:
->:Pit Limit
 :Plane
 Avion
 :Point:

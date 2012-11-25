@@ -11,10 +11,6 @@
 1-к-1
 :11 Point
 11 точек
-<:120 EPA
-<120 EPA
-<:120 PEA
-<120 PEA
 :13 Point
 13 точек
 :3 Point
@@ -55,6 +51,7 @@
 Элер ДР
 :AIL Inv:
 Элер Инв:
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -97,8 +94,11 @@ AUX5
 Громкость:
 :COL
 Колл
+>:COL Inv
 :COL Inv:
 Колл Инв:
+>:COL Limit
+>:COL Mix:
 :CYC
 Цикл
 :Calibrate
@@ -168,6 +168,7 @@ AUX5
 РВыс ДР
 :ELE Inv:
 РВыс Инв:
+>:ELE Mix:
 :EXPO
 Экспо.
 :Enter
@@ -330,10 +331,8 @@ GPS
 ОK
 :On
 Вкл.
->:PIT Inv
 :Page:
 Стр.:
->:Pit Limit
 :Plane
 Самолет
 :Point:
@@ -422,8 +421,6 @@ RPM
 Масшт.:
 :Scanner
 Сканер
-<:Servo mode
-<Режим серво:
 :Simple
 Простой
 :Simple 4 Channel
@@ -510,8 +507,6 @@ RPM
 Шаблон...
 :Test
 Тест
-<:Thr. rev
-<Реверс газа:
 :Time
 Время
 :Timer

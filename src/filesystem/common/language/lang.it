@@ -45,6 +45,7 @@ ALET
 DR ALET
 :AIL Inv:
 :Direzione degli Alettoni
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -83,8 +84,11 @@ Box%d:
 >:Buzz volume:
 :COL
 Collet.
+>:COL Inv
 :COL Inv:
 :Collet.Inv.
+>:COL Limit
+>:COL Mix:
 :CYC
 Ciclico
 :Calibrate
@@ -146,6 +150,7 @@ ELEV
 DR ELEV
 :ELE Inv:
 ELE Inv
+>:ELE Mix:
 :EXPO
 Esponenziale
 :Enter
@@ -284,10 +289,8 @@ Offset:
 Ok
 :On
 On
->:PIT Inv
 :Page:
 Pagina:
->:Pit Limit
 :Plane
 Aero
 :Point:

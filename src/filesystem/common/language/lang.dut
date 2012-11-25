@@ -45,6 +45,7 @@ AIL
 AIL DR
 :AIL Inv:
 AIL omg:
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -77,8 +78,11 @@ Kader %d:
 >:Buzz volume:
 :COL
 COL
+>:COL Inv
 :COL Inv:
 COL omg:
+>:COL Limit
+>:COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -130,6 +134,7 @@ ELE
 ELE DR
 :ELE Inv:
 ELE inv:
+>:ELE Mix:
 :EXPO
 Expo
 :Enter
@@ -250,10 +255,8 @@ Offset:
 Ok
 :On
 Aan
->:PIT Inv
 :Page:
 Pagina:
->:Pit Limit
 >:Plane
 :Point:
 Punt:

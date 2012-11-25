@@ -45,6 +45,7 @@ AIL
 AIL DR
 :AIL Inv:
 Csűrés inv.:
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -84,8 +85,11 @@ Nyomógomb ellenőrzés
 >:Buzz volume:
 :COL
 Kollektív
+>:COL Inv
 :COL Inv:
 Kollektív inv.:
+>:COL Limit
+>:COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -149,6 +153,7 @@ ELE
 ELE DR
 :ELE Inv:
 Magassági inv.:
+>:ELE Mix:
 :EXPO
 EXP.
 :Enter
@@ -239,10 +244,6 @@ Főablak konfig.
 Max:
 :Menu
 Menü
-<:Menu +
-<Menü +
-<:Menu -
-<Menü -
 :Meter
 Méter
 :Mid-Rate
@@ -295,10 +296,8 @@ Eltolás:
 Ok
 :On
 Be
->:PIT Inv
 :Page:
 Oldal:
->:Pit Limit
 :Plane
 Repülő
 :Point:

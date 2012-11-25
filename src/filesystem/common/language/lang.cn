@@ -44,6 +44,7 @@
 >:AIL DR
 :AIL Inv:
 副翼方向
+>:AIL Mix:
 >:AUX4
 >:AUX5
 :About Deviation
@@ -82,8 +83,11 @@
 音量
 :COL
 螺距
+>:COL Inv
 :COL Inv:
 螺距方向
+>:COL Limit
+>:COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -146,6 +150,7 @@ Deviation固件版本:
 >:ELE DR
 :ELE Inv:
 升降方向
+>:ELE Mix:
 :EXPO
 指数曲线
 :Enter
@@ -232,10 +237,6 @@ LCD设置
 最大舵量
 :Menu
 快捷菜单
-<:Menu +
-<快捷菜单+
-<:Menu -
-<快捷菜单-
 :Meter
 米
 :Mid-Rate
@@ -287,10 +288,8 @@ LCD设置
 >:Ok
 :On
 开启
->:PIT Inv
 :Page:
 模式1-N
->:Pit Limit
 :Plane
 固定翼
 :Point:

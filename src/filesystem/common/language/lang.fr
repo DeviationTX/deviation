@@ -45,6 +45,7 @@ AIL
 AIL DR
 :AIL Inv:
 :Sens aileron
+>:AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -77,8 +78,11 @@ Box%d:
 >:Buzz volume:
 :COL
 pas
+>:COL Inv
 :COL Inv:
 :Sens du pas
+>:COL Limit
+>:COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -130,6 +134,7 @@ ELE
 ELE DR
 :ELE Inv:
 :Sens profondeur
+>:ELE Mix:
 :EXPO
 EXP.
 :Enter
@@ -250,10 +255,8 @@ Offset:
 Ok
 :On
 On
->:PIT Inv
 :Page:
 Page:
->:Pit Limit
 >:Plane
 :Point:
 Point:
