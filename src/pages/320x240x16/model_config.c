@@ -52,11 +52,11 @@ void MODELPAGE_Config()
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Inv:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, swashinv_press_cb, swashinv_val_cb, (void *)4);
         i+=24;
-        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("AIL Mix:"));
-        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swashmix_val_cb, (void *)0);
-        i+=24;
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("ELE Mix:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swashmix_val_cb, (void *)1);
+        i+=24;
+        GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("AIL Mix:"));
+        GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swashmix_val_cb, (void *)0);
         i+=24;
         GUI_CreateLabel(8, i, NULL, DEFAULT_FONT, _tr("COL Mix:"));
         GUI_CreateTextSelect(136, i, TEXTSELECT_96, 0x0000, NULL, swashmix_val_cb, (void *)2);
