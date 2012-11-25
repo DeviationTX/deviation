@@ -23,10 +23,8 @@ Csatornák:
 4 csat. + DR
 :5 Point
 5 pont
->:5+1
 :6 Trims
 6 trim
->:6+1
 :6Ch Airplane
 6 csat. repülőgép
 :6Ch Helicopter
@@ -45,7 +43,8 @@ AIL
 AIL DR
 :AIL Inv:
 Csűrés inv.:
->:AIL Mix:
+:AIL Mix:
+Csűrés mix:
 :AUX4
 AUX4
 :AUX5
@@ -82,14 +81,18 @@ Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 Doboz%d:
 :Button monitor
 Nyomógomb ellenőrzés
->:Buzz volume:
+:Buzz volume:
+Hangerő:
 :COL
 Kollektív
->:COL Inv
+:COL Inv
+Kollektív inv.:
 :COL Inv:
 Kollektív inv.:
->:COL Limit
->:COL Mix:
+:COL Limit
+Koll. limit
+:COL Mix:
+Koll. mix:
 :CYC
 CYC
 :Calibrate
@@ -104,7 +107,8 @@ Mégsem
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
 Cs
->:Chan mode
+:Chan mode
+Csat. mód
 :Change
 Váltás
 :Channel monitor
@@ -153,7 +157,8 @@ ELE
 ELE DR
 :ELE Inv:
 Magassági inv.:
->:ELE Mix:
+:ELE Mix:
+Magassági mix:
 :EXPO
 EXP.
 :Enter
@@ -194,6 +199,8 @@ Helikopter
 Magas
 :Icon
 Ikon
+:Icon:
+Ikon:
 :Input monitor
 Bemenetek
 :Input:
@@ -506,7 +513,8 @@ Ismeretlen
 Fel
 :Value:
 Érték:
->:Vibration:
+:Vibration:
+Rezgés:
 :Virt
 Virt.
 :Volt
