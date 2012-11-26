@@ -439,7 +439,7 @@ static const char *reorder_text_cb(u8 idx)
         return "";
     if(idx == 255)
         return _tr("New");
-    sprintf(mp->tmpstr, "Mixer %d", idx);
+    sprintf(mp->tmpstr, "%s %d", _tr("Mixer"), idx);
     return mp->tmpstr;
 }
 static void reorder_return_cb(u8 *list)
