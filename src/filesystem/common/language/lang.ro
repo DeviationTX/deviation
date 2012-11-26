@@ -23,10 +23,12 @@ Canale:
 4 can. + D/R
 :5 Point
 5 puncte
->:5+1
+:5+1
+5+1
 :6 Trims
 6
->:6+1
+:6+1
+6+1
 :6Ch Airplane
 6 avion
 :6Ch Helicopter
@@ -45,7 +47,8 @@ AIL
 AIL DR
 :AIL Inv:
 AIL Inv.:
->:AIL Mix:
+:AIL Mix:
+AIL Mix:
 :AUX4
 AUX4
 :AUX5
@@ -82,14 +85,18 @@ Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 Loc%d:
 :Button monitor
 Monitor butoane
->:Buzz volume:
+:Buzz volume:
+Volum:
 :COL
 Colectiv
->:COL Inv
+:COL Inv
+COL Inv
 :COL Inv:
 Colectiv inv.:
->:COL Limit
->:COL Mix:
+:COL Limit
+COL Limită
+:COL Mix:
+COL Mix:
 :CYC
 CYC
 :Calibrate
@@ -104,7 +111,8 @@ Celsius
 Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 :Ch
 Ch
->:Chan mode
+:Chan mode
+Mod canale
 :Change
 Modifică
 :Channel monitor
@@ -153,7 +161,8 @@ ELE
 ELE DR
 :ELE Inv:
 ELE inv.:
->:ELE Mix:
+:ELE Mix:
+ELE Mix:
 :EXPO
 EXP.
 :Enter
@@ -506,7 +515,8 @@ Necunoscut
 Sus
 :Value:
 Valoare:
->:Vibration:
+:Vibration:
+Vibrație
 :Virt
 Virt.
 :Volt
