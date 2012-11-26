@@ -44,7 +44,8 @@
 >:AIL DR
 :AIL Inv:
 副翼方向
->:AIL Mix:
+:AIL Mix:
+副翼螺距
 >:AUX4
 >:AUX5
 :About Deviation
@@ -87,7 +88,8 @@
 :COL Inv:
 螺距方向
 >:COL Limit
->:COL Mix:
+:COL Mix:
+螺距
 :CYC
 CYC
 :Calibrate
@@ -102,7 +104,8 @@ CYC
 将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
 通道
->:Chan mode
+:Chan mode
+通道模式
 :Change
 改变
 :Channel monitor
@@ -150,7 +153,8 @@ Deviation固件版本:
 >:ELE DR
 :ELE Inv:
 升降方向
->:ELE Mix:
+:ELE Mix:
+升降螺距
 :EXPO
 指数曲线
 :Enter
@@ -189,6 +193,8 @@ FMOD2
 :High-Rate
 普通飞行
 :Icon
+图标
+:Icon:
 图标
 :Input monitor
 摇杆输入监控

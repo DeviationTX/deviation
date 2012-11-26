@@ -44,7 +44,8 @@
 >:AIL DR
 :AIL Inv:
 副翼方向:
->:AIL Mix:
+:AIL Mix:
+副翼螺距:
 >:AUX4
 >:AUX5
 :About Deviation
@@ -87,7 +88,8 @@
 :COL Inv:
 螺距方向:
 >:COL Limit
->:COL Mix:
+:COL Mix:
+螺距:
 >:CYC
 :Calibrate
 校正
@@ -149,7 +151,8 @@ Deviation 韌體版本：
 >:ELE DR
 :ELE Inv:
 升降方向:
->:ELE Mix:
+:ELE Mix:
+升降螺距:
 :EXPO
 曲線
 :Enter
@@ -188,6 +191,8 @@ FMOD2
 高位
 :Icon
 圖示
+:Icon:
+圖示:
 :Input monitor
 輸入內容檢視
 :Input:
