@@ -159,8 +159,8 @@ static void hubsan_build_packet()
     //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
     packet[0] = 0x20;
     packet[2] = get_channel(2, 0x80, 0x80, 0x80);
-    packet[4] = get_channel(3, 0x80, 0x80, 0x80);
-    packet[6] = get_channel(1, 0x80, 0x80, 0x80);
+    packet[4] = 0xff - get_channel(3, 0x80, 0x80, 0x80); //Rudder is reversed
+    packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80);
     packet[9] = 0x02;
     packet[10] = 0x64;
