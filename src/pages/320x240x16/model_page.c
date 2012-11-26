@@ -76,8 +76,11 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     GUI_RemoveObj(obj);
-    //Save model info here so it shows up on the model page
-    CONFIG_SaveModelIfNeeded();
+    if (callback_result == 1) {
+        strcpy(Model.name, mp->tmpstr);
+        //Save model info here so it shows up on the model page
+        CONFIG_SaveModelIfNeeded();
+    }
     PAGE_ModelInit(0);
 }
 
@@ -87,5 +90,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     (void)data;
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_ALPHA, Model.name, sizeof(Model.name)-1, _changename_done_cb, NULL);
+    strcpy(mp->tmpstr, Model.name);
+    callback_result = 1;
+    GUI_CreateKeyboard(KEYBOARD_ALPHA, mp->tmpstr, sizeof(Model.name)-1, _changename_done_cb, &callback_result);
 }

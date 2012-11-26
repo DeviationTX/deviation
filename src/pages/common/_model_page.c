@@ -14,6 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
+static long callback_result; // Bug fix: u8 is a wrong data type, causing memory violation and unpredictable behavior in real devo10's modelname editing
 
 static void _changename_cb(guiObject_t *obj, const void *data);
 static void fixedid_cb(guiObject_t *obj, const void *data);
@@ -68,7 +69,9 @@ void PAGE_ModelEvent()
 static void fixedid_done_cb(guiObject_t *obj, void *data)
 {
     (void)data;
-    Model.fixed_id = atoi(mp->fixed_id);
+    if (callback_result == 1) {
+        Model.fixed_id = atoi(mp->fixed_id);
+    }
     GUI_RemoveObj(obj);
     PAGE_ModelInit(-1); // must be -1 for devo10 to get back to correct page
 }
@@ -85,7 +88,8 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
             mp->fixed_id[0] = 0;
     }
     PAGE_RemoveAllObjects();
-    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, NULL);
+    callback_result = 1;
+    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, &callback_result);
 }
 
 static void bind_cb(guiObject_t *obj, const void *data)
