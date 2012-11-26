@@ -368,14 +368,13 @@ static u8 press_cb(u32 button, u8 flags, void *data)
     struct guiObject *obj = (struct guiObject *)data;
     struct guiKeyboard *keyboard = &obj->o.keyboard;
     (void)data;
-    if (flags & BUTTON_LONGPRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER) && keyboard->lastchar == '\x08') {
+    if (flags & BUTTON_PRESS || flags & BUTTON_LONGPRESS) {
+        if ( flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_ENTER) && keyboard->lastchar == '\x08') {
             //DEL Long Press erases whole string
             keyboard->text[0] = '\0';
             kb_draw_text(keyboard->text);
         }
-    } else if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) { // allow user to press the EXT key to discard changes
+        else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) { // allow user to press the EXT key to discard changes
             if (keyboard->CallBack) {
                 if (keyboard->cb_data != NULL) {
                     int *result = (int *) keyboard->cb_data;
