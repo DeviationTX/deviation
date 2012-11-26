@@ -57,7 +57,7 @@ static u32 id;
 static u8 chanrow;
 static u8 chancol;
 static u8 chanoffset;
-static u8 packet[22];
+static u8 packet[21];
 static u16 counter;
 
 static void flysky_init()
@@ -150,13 +150,13 @@ static u16 flysky_cb()
 {
     if (counter) {
         flysky_build_packet(1);
-        A7105_WriteData(packet, 22, 1);
+        A7105_WriteData(packet, 21, 1);
         counter--;
         if (! counter)
             PROTOCOL_SetBindState(0);
     } else {
         flysky_build_packet(0);
-        A7105_WriteData(packet, 22, tx_channels[chanrow][chancol]-chanoffset);
+        A7105_WriteData(packet, 21, tx_channels[chanrow][chancol]-chanoffset);
         chancol = (chancol + 1) % 16;
     }
     return 1460;
@@ -169,7 +169,7 @@ static void initialize(u8 bind) {
     if (Model.fixed_id) {
         id = Model.fixed_id;
     } else {
-        id = Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter));
+        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
     }
     chanrow = id % 16;
     chancol = 0;

@@ -159,9 +159,9 @@ static void hubsan_build_packet()
     //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
     packet[0] = 0x20;
     packet[2] = get_channel(2, 0x80, 0x80, 0x80);
-    packet[4] = get_channel(3, 0x55, 0x80, 0x80);
-    packet[6] = get_channel(1, 0x55, 0x80, 0x80);
-    packet[8] = get_channel(0, 0x55, 0x80, 0x80);
+    packet[4] = get_channel(3, 0x80, 0x80, 0x80);
+    packet[6] = get_channel(1, 0x80, 0x80, 0x80);
+    packet[8] = get_channel(0, 0x80, 0x80, 0x80);
     packet[9] = 0x02;
     packet[10] = 0x64;
     packet[11] = (txid >> 24) & 0xff;
