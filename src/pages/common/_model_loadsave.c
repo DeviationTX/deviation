@@ -157,7 +157,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
             strcpy(Model.icon, mp->iconstr);
     }
     GUI_RemoveAllObjects();
-    mp->return_page(0);
+    mp->return_page(-1);  // -1 for devo10 means return to the focus of previous page, which is important so that users don't need to scroll down from the 1st item
 }
 
 static const char *show_loadsave_cb(guiObject_t *obj, const void *data)

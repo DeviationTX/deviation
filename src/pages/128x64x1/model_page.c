@@ -155,7 +155,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    PAGE_SetModal(0);
+    PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
     strcpy(mp->tmpstr, (const char *)Model.name); // Don't change model name directly
     GUI_CreateKeyboard(KEYBOARD_ALPHA, mp->tmpstr, 20, // no more than 20 chars is allowed for model name
