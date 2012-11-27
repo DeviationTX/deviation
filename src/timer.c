@@ -125,7 +125,7 @@ void TIMER_Update()
                         MUSIC_Play(MUSIC_ALARM1 + i);
                     }
                 }
-                if (timer_val[i] > 0 && timer_val[i] < delta) {
+                if (timer_val[i] >= 0 && timer_val[i] < delta) {
                     MUSIC_Play(MUSIC_ALARM1 + i);
                 }
                 timer_val[i] -= delta;
