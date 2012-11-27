@@ -1,0 +1,372 @@
+﻿Afrikaans
+:%s is %d%%, safe value = %d%%\n
+%s %d%%, veilige waarde = %d%%\n
+:1-to-1
+1-tot-1
+:11 Point
+11 Punt
+:13 Point
+13 Punt
+:3 Point
+3 Punt
+:4 Bars
+4 Balke
+:4 Inside
+4 binne
+:4 Outside
+4 buite
+:4Ch w Dual-Rates
+4k met DR
+:5 Point
+5 Punt
+:6 Trims
+6 Trim
+:6Ch Airplane
+6K Vliegtuig
+:6Ch Helicopter
+6K Helikopter
+:7 Point
+7 Punt
+:8 Bars
+8 Balke
+:9 Point
+9 Punt
+:< 0
+< 0
+:> 0
+> 0
+:ABSVAL
+AbsWrde
+:AIL
+AIL
+:AIL DR
+AIL DR
+>:AIL Inv:
+>:AUX4
+>:AUX5
+:Airplane
+Vliegtuig
+:Backlight:
+Skermlig:
+:Bar %d:
+Balk %d:
+:Bars:
+Balke:
+:Battery Alarm:
+Bat Alarm:
+:Bind
+Bind
+:Binding
+Bind...
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Bind in proses...\nMaak seker die model is aan!\n\nOK sal nie die proses stop nie,\maar sal volle beheer toelaat van die Tx.
+:Box %d:
+Kassie %d:
+:Buttons
+Knoppies
+>:COL
+:COL Inv:
+KOL Inv:
+:CYC
+transalte transalte
+TAUM
+:Calibrate
+Kalibreer
+:Cancel
+Kanselleer
+:Center all sticks and touch the screen
+Senter stokke en kliek die skerm
+:Ch
+K
+:Change
+Verander
+:Channels
+Kanale
+:Complex
+Komplex
+:Configure
+Konfigureer
+:Copy To...
+Kopieer na...
+:Curve:
+Kurwe:
+>:Cyclic1
+>:Cyclic2
+>:Cyclic3
+>:DR
+:Default
+Default
+:Deviation FW\nversion: 
+Deviation FW\nVersion:
+:Down
+Af
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+ELE Inv:
+:EXPO
+Expo
+:Enter
+Enter
+:Exit
+Exit
+:Expo&DR
+Expo&DR
+:FMODE0
+FMOD0
+:FMODE1
+FMOD1
+:FMODE2
+FMOD2
+:Failsafe:
+Falingveilig:
+:File:
+Lêer:
+:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
+Lêerstelsel nie gevind. Installeer deur  USB poort, kliek dan 'ENT' om te voltooi.
+:Fixed
+Vaste
+:Fixed ID:
+Vaste ID:
+:GEAR
+Wiele
+:Helicopter
+Helikopter
+:High-Rate
+Hoë tempo
+:Icon
+Icon
+:Input:
+Inset:
+:Inputs
+Insette
+:Inverted
+Omgekeerd
+:LEFT_H
+LINKS_H
+:LEFT_V
+LINKS_V
+:Language:
+Taal: 
+:Left
+Links
+:Linked
+Verbind 
+:Load
+Laai
+:Load...
+Laai...
+:Low-Rate
+Lae Tempo
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main Page Config
+Hoofbladsy Opstel 
+:Max:
+Max:
+:Mid-Rate
+Mid tempo
+:Min/Max
+Min/Max
+:Min:
+Min:
+>:Mixer
+:Mixers:
+Mengers:
+:Mode %d
+Modus %d
+:Model
+Modell
+:Model Name:
+Model name:
+:Model Type:
+Model tipe:
+:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
+Beweeg elke stok na maksimum, dan \nminimum, dan senter. \nRaak skerm wanneer gedoen
+:Mux:
+Mux:
+:Neg
+Neg
+:No Bars
+Geen balke 
+:No Trim
+Geen Trim
+:No Trims
+Geen Trim
+:None
+Geen
+:Normal
+Normal
+:Number of Channels:
+Antal Kanale:
+:OK
+OK
+:Off
+Af
+:Offset:
+Afset:
+:On
+Aan
+:Page:
+Bladsy:
+:Point:
+Punk:
+:Pos
++
+:Pos/Neg:
++/-:
+:Press 'Ent' to turn USB Filesystem: 
+'Druk 'ENT' vir USB aan: 
+:Protocol:
+Protokol:
+:RIGHT_H
+REGS_H
+:RIGHT_V
+REGS_V
+:RUD
+RUD
+:RUD DR
+RUD DR
+:Re-Init
+Her-ini
+:Reset
+Reset
+:Reverse:
+Omkeer:
+:Reversed
+Omgekeerd
+:Right
+Regs
+>:Safe Val:
+:Safety
+VeiligeWaarde
+:Safety:
+Veligheid:
+:Save
+Stoor
+:Scale:
+Skale:
+:Scanner
+Skandeer
+:Simple
+Eenvoudig
+>:Simple 4 Channel
+:Src
+Bron
+:Src:
+Bron:
+:Start:
+Begin:
+:Stick Mode:
+Stok mode:
+:Sticks:
+Stokke:
+:Subtrim:
+Sub trim:
+:SwashType:
+Swash tipe:
+:Switch1
+Skakelaar1
+:Switch2
+Skakelaar2
+:Switch:
+Skakelaar:
+:Symmetric
+Symmetries
+:THR
+THR
+:TRIMLH+
+TRIMLH+
+:TRIMLH-
+TRIMLH-
+:TRIMLV+
+TRIMLV+
+:TRIMLV-
+TRIMLV-
+:TRIMRH+
+TRIMRH+
+:TRIMRH-
+TRIMRH-
+:TRIMRV+
+TRIMRV+
+:TRIMRV-
+TRIMRV-
+:TRIM_L+
+TRIM_L+
+:TRIM_L-
+TRIM_L-
+:TRIM_R+
+TRIM_R+
+:TRIM_R-
+TRIM_R-
+:Template..
+Voorbeeld..
+:Test
+Toets
+:Timer
+Tydhouer
+:Timer1
+Tydhouer1
+:Timer2
+Tydhouer2
+:Toggle%d
+Swaai%d
+:Touch Calibrate
+Skerm kalibrasie 
+:Touch Screen:
+Raakskerm:
+:Touch Test
+Raakskerm toets
+:Touch target %d
+Raak teiken %d
+:Touch to Lock
+Raak om te sluit
+:Touch to Unlock
+Raak om te ontsluit
+:Trim
+Trim
+:Trim +:
+Trim +:
+:Trim -:
+Trim -:
+:Trim Step:
+Trim stap:
+:Trims:
+Trims:
+:Turn Off
+Sit Af
+:Turn On
+Sit Aan
+:Tx Power:
+Sendkrag:
+:USB
+USB
+:USB Storage mode, press 'ENT' to exit.
+USB stoor mode, druk 'ENT' om te voltooi.
+:Unknown
+Onbekend
+:Up
+Op
+:Value:
+Waarde:
+>:Virt
+:Zero/Max
+Zero/Max
+:\n\nBinding will end in %d seconds...
+\n\nBindproses eindig in %d sekonds...
+:add
++
+:countdown
+Countdown
+:mult
+*
+:replace
+vervang
+:stopwatch
+Stophorlosie
