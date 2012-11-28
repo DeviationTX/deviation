@@ -194,6 +194,40 @@ static u8 get_button(const char *section, const char *value)
     return 0;
 }
 
+static int handle_proto_opts(struct Model *m, const char* key, const char* value, const char **opts)
+{
+    const char **popts = opts;
+    int idx = 0;
+    while(*popts) {
+        if(mapstrcasecmp(*popts, key) == 0) {
+            popts++;
+            int start = atoi(popts[0]);
+            int end = atoi(popts[1]);
+            if(popts[2] == 0 && (start != 0 || end != 0)) {
+                m->proto_opts[idx] = atoi(value);
+                return 1;
+            }
+            int val = 0;
+            while(popts[val]) {
+                if(mapstrcasecmp(popts[val], value) == 0) {
+                    m->proto_opts[idx] = val;
+                    return 1;
+                }
+                val++;
+            }
+            printf("Unknown protocol option '%s' for '%s'\n", value, key);
+            return 1;
+        }
+        //Find end of options
+        while(*popts) {
+            popts++;
+        }
+        popts++; //Go to next option
+        idx++;
+    }
+    return 0;
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     struct Model *m = (struct Model *)user;
@@ -260,6 +294,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("Unknown Tx power: %s\n", value);
             return 1;
         }
+        if (handle_proto_opts(m, name, value, PROTOCOL_GetOptions()))
+            return 1;
         printf("Unknown Radio Key: %s\n", name);
         return 0;
     }
@@ -760,6 +796,27 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
     return changed;
 }
 
+static void write_proto_opts(FILE *fh, struct Model *m)
+{
+    const char **opts = PROTOCOL_GetOptions();
+    int idx = 0;
+    while(*opts) {
+        int start = atoi(opts[1]);
+        int end = atoi(opts[2]);
+        if (opts[3] == 0 && (start != 0 || end != 0)) {
+            fprintf(fh, "%s=%d\n",*opts, m->proto_opts[idx]);
+        } else {
+            fprintf(fh, "%s=%s\n",*opts, opts[m->proto_opts[idx]+1]);
+        }
+        opts++;
+        while(*opts) {
+            opts++;
+        }
+        opts++;
+        idx++;
+    }
+}
+
 u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
@@ -783,6 +840,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
     if(WRITE_FULL_MODEL || m->fixed_id != 0)
         fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
+    write_proto_opts(fh, m);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
