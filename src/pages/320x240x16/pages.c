@@ -12,15 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "common.h"
 #include "pages.h"
-#include "icons.h"
-#include "gui/gui.h"
-#include "config/model.h"
-
-static buttonAction_t button_action;
-static u8 (*ActionCB)(u32 button, u8 flags, void *data);
 
 static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
@@ -29,7 +21,6 @@ static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
 static void PAGE_ChangeByID(enum PageID id);
 void PAGE_Exit();
-void PAGE_ChangeQuick(int dir);
 
 #define PAGE_NAME_MAX 10
 struct page {
@@ -39,13 +30,14 @@ struct page {
     const char *name;
 };
 
-struct pagemem pagemem;
 
 #define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
 static const struct page pages[] = {
 #include "pagelist.h"
 };
 #undef PAGEDEF
+static u8 cur_section;
+#include "../common/_pages.c"
 
 struct page_group {
     u8 group;
@@ -69,9 +61,8 @@ struct page_group groups[] = {
     {2, PAGEID_USB},
     {255, 0}
 };
-static u8 cur_section;
-static u8 cur_page;
-static u8 modal;
+
+
 void PAGE_Init()
 {
     cur_page = sizeof(pages) / sizeof(struct page) - 1;
@@ -139,29 +130,6 @@ void PAGE_ChangeByID(enum PageID id)
     }
 }
 
-void PAGE_Event()
-{
-    if(pages[cur_page].event)
-        pages[cur_page].event();
-}
-
-void PAGE_Exit()
-{
-    if(pages[cur_page].exit)
-        pages[cur_page].exit();
-}
-
-u8 PAGE_SetModal(u8 _modal)
-{
-    u8 old = modal;
-    modal = _modal;
-    return old;
-}
-
-u8 PAGE_GetModal()
-{
-    return modal;
-}
 void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -206,11 +174,6 @@ static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     return data ? _tr("Ok") : _tr("Cancel");
-}
-
-void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
-{
-    ActionCB = callback;
 }
 
 u8 page_change_cb(u32 buttons, u8 flags, void *data)
@@ -339,24 +302,4 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
         return 1;
     }
     return 0;
-}
-
-u8 PAGE_TelemStateCheck(char *str, int strlen)
-{
-    s8 state = PROTOCOL_GetTelemetryState();
-    if (state == -1) {
-        snprintf(str, strlen, "%s%s%s",
-            _tr("Telemetry"),
-            LCD_DEPTH == 1?"\n":" ", // no translate for this string
-            _tr("is not supported"));
-        return 0;
-    }
-    else if (state == 0) {
-        snprintf(str, strlen, "%s%s%s",
-            _tr("Telemetry"),
-            LCD_DEPTH == 1?"\n":" ",  // no translate for this string
-            _tr("is turned off"));
-        return 0;
-    }
-    return 1;
 }
