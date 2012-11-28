@@ -93,7 +93,10 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
                 LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
         }  else {
             if (desc->style == LABEL_SQUAREBOX)
-                LCD_DrawRect(obj_x, obj_y, w, h, 1);
+                if (desc->fill_color == 0)
+                    LCD_DrawRect(obj_x, obj_y, w, h, 1);
+                else
+                    LCD_FillRect(obj_x, obj_y, w, h, desc->fill_color);
             else if (desc->style == LABEL_BRACKET) {
                 u16 y1 = obj_y + 2;
                 u16 y2 = obj_y + obj_height -3;

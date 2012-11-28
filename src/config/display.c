@@ -32,7 +32,7 @@ static const char FONT_COLOR[] = "font_color";
 static const char IS_TRANSPARENT[] = "transparent";
 static const char * const BARGRAPH_VAL[] = { "bargraph", "trim" };
 static const char BOX[] = "box_type";
-static const char * const BOX_VAL[] = { "none", "center", "fill", "outline", "underline" };
+static const char * const BOX_VAL[] = { "none", "center", "fill", "outline", "underline", "squarebox" , "inverted"};
 
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0

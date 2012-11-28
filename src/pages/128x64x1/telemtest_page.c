@@ -39,6 +39,7 @@ static guiObject_t *scroll_bar;
 static void _show_page1()
 {
     PAGE_RemoveAllObjects();
+    memset(tp.gps, 0, sizeof(tp.gps));
     u8 w = 35;
     PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
     GUI_CreateLabelBox(8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp:"));
@@ -51,6 +52,8 @@ static void _show_page1()
     u8 row = space;
     w = 35;
     labelDesc.font = TINY_FONT.font;
+    labelDesc.font_color = 0xffff;
+    labelDesc.fill_color = 0;
     for(long i = 0; i < 4; i++) {
         u8 x = 8;
         labelDesc.style = LABEL_LEFTCENTER;
@@ -79,6 +82,9 @@ static void _show_page1()
 
 static void _show_page2()
 {
+    memset(tp.volt, 0, sizeof(tp.volt)); // this is a must
+    memset(tp.temp, 0, sizeof(tp.temp));
+    memset(tp.rpm, 0, sizeof(tp.rpm));
     PAGE_RemoveAllObjects();
     current_item = 0;
     PAGE_ShowHeader(_tr_noop("GPS")); // to draw a underline only
@@ -89,14 +95,15 @@ static void _show_page2()
     u8 space = ITEM_HEIGHT + 1;
     u8 view_origin_absoluteX = 0;
     u8 view_origin_absoluteY = space;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - space ,
+    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -ARROW_WIDTH, LCD_HEIGHT - space ,
             view_origin_absoluteX, view_origin_absoluteY);
 
     u8 row = 0;
     labelDesc.font = TINY_FONT.font;
     labelDesc.style = LABEL_SQUAREBOX;
+    labelDesc.font_color = 0xffff;
+    labelDesc.fill_color = 0;
     for(long i = 0; i < 5; i++) {
-
         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT,  label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
         row += space;
@@ -127,9 +134,6 @@ void PAGE_TelemtestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
-    memset(tp.volt, 0, sizeof(tp.volt));
-    memset(tp.temp, 0, sizeof(tp.temp));
-    memset(tp.rpm, 0, sizeof(tp.rpm));
     if (current_page== telemetry_gps)
         _show_page2();
     else
@@ -178,6 +182,7 @@ static void _navigate_items(s8 direction)
         GUI_ScrollLogicalView(VIEW_ID, direction *(LCD_HEIGHT - ITEM_HEIGHT));
     }
     GUI_SetScrollbar(scroll_bar, current_item);
+    GUI_Redraw(scroll_bar); // must redraw the scroll_bar as the page event keeps refreshing this page
 }
 
 static void _navigate_pages(s8 direction)
