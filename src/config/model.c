@@ -46,6 +46,7 @@ static const char RADIO_TX_POWER[] = "tx_power";
 const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
+static const char SECTION_PROTO_OPTS[] = "protocol_opts";
 /* Section: Mixer */
 static const char SECTION_MIXER[]   = "mixer";
 
@@ -294,10 +295,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("Unknown Tx power: %s\n", value);
             return 1;
         }
-        if (handle_proto_opts(m, name, value, PROTOCOL_GetOptions()))
-            return 1;
         printf("Unknown Radio Key: %s\n", name);
         return 0;
+    }
+    if (MATCH_SECTION(SECTION_PROTO_OPTS)) {
+        return handle_proto_opts(m, name, value, PROTOCOL_GetOptions());
     }
     if (MATCH_START(section, SECTION_MIXER)) {
         int idx;
@@ -800,6 +802,9 @@ static void write_proto_opts(FILE *fh, struct Model *m)
 {
     const char **opts = PROTOCOL_GetOptions();
     int idx = 0;
+    if(! *opts)
+        return;
+    fprintf(fh, "[%s]\n", SECTION_PROTO_OPTS);
     while(*opts) {
         int start = atoi(opts[1]);
         int end = atoi(opts[2]);
@@ -815,6 +820,7 @@ static void write_proto_opts(FILE *fh, struct Model *m)
         opts++;
         idx++;
     }
+    fprintf(fh, "\n");
 }
 
 u8 CONFIG_WriteModel(u8 model_num) {
@@ -840,9 +846,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
     if(WRITE_FULL_MODEL || m->fixed_id != 0)
         fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
-    write_proto_opts(fh, m);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");
+    write_proto_opts(fh, m);
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
         if(!WRITE_FULL_MODEL &&
            m->limits[idx].flags == 0 &&
