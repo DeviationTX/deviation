@@ -78,6 +78,8 @@ static void _show_page1()
     // bug fix: scroll_bar must be initialized, otherwise it will caused crash when checked against NULL(press UP/DOWN keys)
     scroll_bar = NULL;
     labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
+    labelDesc.font_color = 0xffff;
+    labelDesc.outline_color = labelDesc.fill_color = 0; // bug fix: reset to default no-box style
 }
 
 static void _show_page2()
@@ -118,6 +120,8 @@ static void _show_page2()
     tp.telem.time[2] = 0;
     scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, 3, NULL, NULL, NULL);
     labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
+    labelDesc.font_color = 0xffff;
+    labelDesc.outline_color = labelDesc.fill_color = 0; // bug fix: reset to default no-box style
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
@@ -134,6 +138,11 @@ void PAGE_TelemtestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
+    if (telem_state_check() == 0) {
+        GUI_CreateLabelBox(20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        return;
+    }
+
     if (current_page== telemetry_gps)
         _show_page2();
     else
@@ -182,7 +191,7 @@ static void _navigate_items(s8 direction)
         GUI_ScrollLogicalView(VIEW_ID, direction *(LCD_HEIGHT - ITEM_HEIGHT));
     }
     GUI_SetScrollbar(scroll_bar, current_item);
-    GUI_Redraw(scroll_bar); // must redraw the scroll_bar as the page event keeps refreshing this page
+    //GUI_Redraw(scroll_bar); // must redraw the scroll_bar as the page event keeps refreshing this page
 }
 
 static void _navigate_pages(s8 direction)
@@ -200,14 +209,16 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            _navigate_items(-1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
-            _navigate_items(1);
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            _navigate_pages(1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
-            _navigate_pages(-1);
+        } else if (tp.volt[0] != NULL || tp.gps[0] != NULL){ // this indicates whether telem is off or not supported
+            if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+                _navigate_items(-1);
+            }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
+                _navigate_items(1);
+            } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+                _navigate_pages(1);
+            }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+                _navigate_pages(-1);
+            }
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

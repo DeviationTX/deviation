@@ -443,6 +443,7 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
             break;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
     return NULL;

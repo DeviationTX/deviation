@@ -44,8 +44,8 @@ enum LabelType {
     LABEL_TRANSPARENT,
     LABEL_UNDERLINE,
     LABEL_SQUAREBOX,
-    LABEL_LEFT,    // align left and top vertically
     LABEL_INVERTED,
+    LABEL_LEFT,    // align left and top vertically
     LABEL_LEFTCENTER, // align left and center vertically
     LABEL_BOX,
     LABEL_BRACKET,

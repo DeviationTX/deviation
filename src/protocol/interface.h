@@ -10,6 +10,8 @@ enum ProtoCmds {
     PROTOCMD_CURRENT_ID,
     PROTOCMD_SET_TXPOWER,
     PROTOCMD_GETOPTIONS,
+    PROTOCMD_SETOPTIONS,
+    PROTOCMD_TELEMETRYSTATE,
 };
 
 #define PROTODEF(proto, map, cmd, name) extern const void * cmd(enum ProtoCmds);

@@ -340,3 +340,23 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     }
     return 0;
 }
+
+u8 PAGE_TelemStateCheck(char *str, int strlen)
+{
+    s8 state = PROTOCOL_GetTelemetryState();
+    if (state == -1) {
+        snprintf(str, strlen, "%s%s%s",
+            _tr("Telemetry"),
+            LCD_DEPTH == 1?"\n":" ", // no translate for this string
+            _tr("is not supported"));
+        return 0;
+    }
+    else if (state == 0) {
+        snprintf(str, strlen, "%s%s%s",
+            _tr("Telemetry"),
+            LCD_DEPTH == 1?"\n":" ",  // no translate for this string
+            _tr("is turned off"));
+        return 0;
+    }
+    return 1;
+}

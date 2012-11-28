@@ -14,6 +14,7 @@ struct model_page {
     char fixed_id[7];
     u8 file_state;
     guiObject_t *chanObj;
+    guiObject_t *telemStateObj;
 /*Load save */
     guiObject_t *obj;
     guiObject_t *scroll_bar;

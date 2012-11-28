@@ -14,6 +14,15 @@
  */
 
 #define tp pagemem.u.telemconfig_page
+
+static u8 telem_state_check()
+{
+    if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
+        return 0;
+    }
+    return 1;
+}
+
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

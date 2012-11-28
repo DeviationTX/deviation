@@ -28,6 +28,11 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
 
+    if (telem_state_check() == 0) {
+        GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        return;
+    }
+
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);

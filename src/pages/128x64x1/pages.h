@@ -129,6 +129,7 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 /* Telemetry Config */
 void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
+u8 PAGE_TelemStateCheck(char *str, int strlen);
 
 void PAGE_AboutInit(int page);
 

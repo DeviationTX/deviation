@@ -39,6 +39,12 @@ void PAGE_TelemconfigInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
+    if (telem_state_check() == 0) {
+        GUI_CreateLabelBox(20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        tp.valueObj[0] = NULL; // A indication not allow to scroll up/down
+        return;
+    }
+
     PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
     current_selected = 0;
     total_items = 0;
@@ -92,9 +98,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         }
-        else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+        else if (CHAN_ButtonIsPressed(button, BUT_UP) && tp.valueObj[0]!= NULL) {
             PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && tp.valueObj[0] != NULL) {
             PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
         }
         else {

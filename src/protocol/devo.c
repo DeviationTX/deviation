@@ -24,14 +24,25 @@
 //For Debug
 //#define NO_SCRAMBLE
 
-#define TELEMETRY 1
 #define PKTS_PER_CHANNEL 4
 
 #ifdef EMULATOR
+#include <stdlib.h>
 #define BIND_COUNT 4
 #else
 #define BIND_COUNT 0x1388
 #endif
+
+#define TELEMETRY_ENABLE 0x30
+
+static const char *devo_opts[] = {
+  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
+
+typedef enum {
+    PROTOOPTS_TELEMETRY = 0,
+} PROTO_OPTS_DEFINITION;
 
 enum PktState {
     DEVO_BIND,
@@ -189,7 +200,7 @@ static void parse_telemetry_packet(u8 *packet)
     //if (packet[0] < 0x37) {
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
-    if (packet[0] == 0x30) {
+    if (packet[0] == TELEMETRY_ENABLE) {
         Telemetry.volt[0] = packet[1]; //In 1/10 of Volts
         Telemetry.volt[1] = packet[3]; //In 1/10 of Volts
         Telemetry.volt[2] = packet[5]; //In 1/10 of Volts
@@ -384,12 +395,21 @@ static u16 devo_telemetry_cb()
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
         }
     } else {
-        if(CYRF_ReadRegister(0x07) & 0x20) {
+        if(CYRF_ReadRegister(0x07) & 0x20) { // this won't be true in emulator so we need to simulate it somehow
             CYRF_ReadDataPacket(packet);
             parse_telemetry_packet(packet);
             delay = 100 * (16 - txState);
             txState = 15;
         }
+#ifdef EMULATOR
+        u8 telem_bit = rand() % 7; // random number in [0, 7)
+        packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
+        //printf("telem 1st packet: 0x%x\n", packet[0]);
+        parse_telemetry_packet(packet);
+        Telemetry.time[0] =  Telemetry.time[1] =  Telemetry.time[2] = CLOCK_getms();
+        delay = 100 * (16 - txState);
+        txState = 15;
+#endif
     }
     txState++;
     if(txState == 16) { //2.3msec have passed
@@ -476,7 +496,7 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    if (TELEMETRY) {
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY]) {
         CLOCK_StartTimer(2400, devo_telemetry_cb);
     } else {
         CLOCK_StartTimer(2400, devo_cb);
@@ -495,6 +515,13 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_SET_TXPOWER:
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
             break;
+        case PROTOCMD_GETOPTIONS:
+            return devo_opts;
+        case PROTOCMD_SETOPTIONS:
+            PROTOCOL_Init(0);  // only 1 prot_ops item, it is to enable/disable telemetry
+            break;
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)Model.proto_opts[PROTOOPTS_TELEMETRY];
         default: break;
     }
     return 0;

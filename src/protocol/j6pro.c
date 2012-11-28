@@ -305,6 +305,7 @@ const void *J6PRO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_SET_TXPOWER:
             CYRF_SetPower(Model.tx_power);
             break;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
     return 0;

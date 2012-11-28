@@ -75,10 +75,13 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     if (count == 2 && (start != 0 || end != 0)) {
         Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], start, end, dir, 1, 1, &changed);
         sprintf(mp->tmpstr, "%d", Model.proto_opts[idx]);
-        return mp->tmpstr;
+
     } else {
         Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
-        return _tr(proto_strs[pos+Model.proto_opts[idx]+1]);
+        sprintf(mp->tmpstr, "%s", _tr(proto_strs[pos+Model.proto_opts[idx]+1]));
     }
+    if (changed)
+        PROTOCOL_SetOptions();  // for devo, it needs to do protocol init as the telemerty state is changed
+    return mp->tmpstr;
 }
 

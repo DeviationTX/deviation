@@ -121,10 +121,13 @@ void PROTOCOL_Bind();
 void PROTOCOL_SetPower();
 void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
+u8 PROTOCOL_GetTelemCapability();
 int PROTOCOL_DefaultNumChannels();
 void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
 const char **PROTOCOL_GetOptions();
+void PROTOCOL_SetOptions();
+s8 PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */

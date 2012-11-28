@@ -8,7 +8,7 @@ struct telemtest_page {
     guiObject_t *temp[4];
     guiObject_t *rpm[3];
     guiObject_t *gps[5];
-    char str[25];
+    char str[30];
     struct Telemetry telem;
 };
 #endif

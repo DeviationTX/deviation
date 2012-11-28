@@ -282,3 +282,23 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini
     BUTTON_InterruptLongPress();
 }
+
+u8 PAGE_TelemStateCheck(char *str, int strlen)
+{
+    s8 state = PROTOCOL_GetTelemetryState();
+    if (state == -1) {
+        snprintf(str, strlen, "%s%s%s",
+            _tr("Telemetry"),
+            LCD_DEPTH == 1?"\n":" ", // no translate for this string
+            _tr("is not supported"));
+        return 0;
+    }
+    else if (state == 0) {
+        snprintf(str, strlen, "%s%s%s",
+            _tr("Telemetry"),
+            LCD_DEPTH == 1?"\n":" ",  // no translate for this string
+            _tr("is turned off"));
+        return 0;
+    }
+    return 1;
+}

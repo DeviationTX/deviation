@@ -58,6 +58,10 @@ void PAGE_TelemtestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMMON));
+    if (telem_state_check() == 0) {
+        GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        return;
+    }
     show_page();
 }
 
@@ -69,6 +73,10 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
+    if (telem_state_check() == 0) {
+        GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        return;
+    }
 
     show_page();
 }

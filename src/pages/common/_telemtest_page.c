@@ -18,6 +18,20 @@
 #define TELEM_FONT NORMALBOX_FONT
 #define TELEM_TXT_FONT DEFAULT_FONT
 #define TELEM_ERR_FONT NORMALBOXNEG_FONT
+
+static u8 time_count = 0;
+static u8 telem_state_check()
+{
+    if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
+        memset(tp.gps, 0, sizeof(tp.gps));
+        memset(tp.volt, 0, sizeof(tp.volt));
+        memset(tp.temp, 0, sizeof(tp.temp));
+        memset(tp.rpm, 0, sizeof(tp.rpm));
+        return 0;
+    }
+    return 1;
+}
+
 static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -46,6 +60,10 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 }
 
 void PAGE_TelemtestEvent() {
+    time_count ++;
+    //if (time_count < 10) // 100ms x10 = 2seconds, to slow down the refresh rate to once per 2s
+    //    return;
+    time_count = 0;
     int i;
     u32 time = CLOCK_getms();
     for(i = 0; i < 3; i++) {

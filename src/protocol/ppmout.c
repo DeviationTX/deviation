@@ -99,6 +99,7 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)PPMOUT_MAX_CHANNELS);
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
     return 0;

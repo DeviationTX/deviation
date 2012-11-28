@@ -3,6 +3,6 @@
 #include "telemetry.h"
 struct telemconfig_page {
     guiObject_t *valueObj[TELEM_NUM_ALARMS];
-    char str[25];
+    char str[30];
 };
 #endif
