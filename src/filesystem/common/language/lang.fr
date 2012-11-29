@@ -152,7 +152,7 @@ Intens. veille
 :Dimmer time:
 Veille après
 :Dn
-Dn
+Bas
 :Down
 Bas
 :ELE
@@ -357,7 +357,7 @@ Sens:
 :Reversed
 Inversé
 :Revert
-Inverser
+Annuler
 :Right
 Droite
 :Safe Val:
@@ -457,7 +457,7 @@ T°:
 :Temperature:
 Unité T°
 :Template..
-Modèle...
+Gabarit...
 :Test
 Test
 :Time
@@ -526,11 +526,12 @@ Volt
 Volt:
 :Zero/Max
 0/Max
->:\n\nBinding will end in %d seconds...
+:\n\nBinding will end in %d seconds...
+\n\nAppairage terminé dans %d secondes...
 :add
 ajouter
 :countdown
-Décompte
+A rebours
 :max
 max
 :min
