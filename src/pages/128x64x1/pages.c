@@ -12,22 +12,11 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "common.h"
 #include "pages.h"
-#include "music.h"
-#include "gui/gui.h"
-#include "config/model.h"
 
-//static buttonAction_t button_action;
 struct LabelDesc labelDesc; // create a style-customizable font so that it can be shared for all pages
 
-static void (*enter_cmd)(guiObject_t *obj, const void *data);
-static const void *enter_data;
-static void (*exit_cmd)(guiObject_t *obj, const void *data);
-static const void *exit_data;
 static u8 action_cb(u32 button, u8 flags, void *data);
-void PAGE_ChangeQuick(int dir);
 
 struct page {
     void (*init)(int i);
@@ -35,8 +24,6 @@ struct page {
     void (*exit)();
     const char *pageName;
 };
-
-struct pagemem pagemem;
 
 #define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
 static const struct page pages[] = {
@@ -62,23 +49,19 @@ static const struct page pages[] = {
     //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
 };
 #endif
+#include "../common/_pages.c"
 
-static u8 page;
-static u8 modal;
 static u8 quick_page_enabled;
-static struct buttonAction action;
-static u8 (*ActionCB)(u32 button, u8 flags, void *data);
+
 void PAGE_Init()
 {
-    page = 0;
+    cur_page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
-    enter_cmd = NULL;
-    exit_cmd = NULL;
     ActionCB = NULL;
     // For Devo10, there is no need to register and then unregister buttons in almost every page
     // since all buttons are needed in all pages, so we just register them in this common page
-    BUTTON_RegisterCallback(&action,
+    BUTTON_RegisterCallback(&button_action,
           CHAN_ButtonMask(BUT_ENTER)
           | CHAN_ButtonMask(BUT_EXIT)
           | CHAN_ButtonMask(BUT_LEFT)
@@ -97,35 +80,15 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (pages[page].exit)
-        pages[page].exit();
-    page = id;
-    if (pages[page].init == PAGE_MainInit)
+    if (pages[cur_page].exit)
+        pages[cur_page].exit();
+    cur_page = id;
+    if (pages[cur_page].init == PAGE_MainInit)
         quick_page_enabled = 1;
-    else if (pages[page].init == PAGE_MenuInit)
+    else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
-    pages[page].init(menuPage);
-}
-
-void PAGE_Event()
-{
-    if (pages[page].event != NULL)
-    {
-        pages[page].event();
-    }
-}
-
-u8 PAGE_SetModal(u8 _modal)
-{
-    u8 old = modal;
-    modal = _modal;
-    return old;
-}
-
-u8 PAGE_GetModal()
-{
-    return modal;
+    pages[cur_page].init(menuPage);
 }
 
 void PAGE_ShowHeader(const char *title)
@@ -152,28 +115,11 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
 {
     (void)title;
     (void)CallBack;
-    (void)enter_cmd;
-    (void)enter_data;
-    (void)exit_cmd;
-    (void)exit_data;
-    /*    enter_cmd = CallBack;
-    enter_data = (void *)1;
-    exit_cmd = CallBack;
-    exit_data = (void *)0;
-    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title); */
 }
 
 void PAGE_RemoveAllObjects()
 {
-    enter_cmd = NULL;
-    exit_cmd = NULL;
     GUI_RemoveAllObjects();
-}
-
-void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
-{
-    ActionCB = callback;
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)
@@ -222,7 +168,7 @@ void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
     for (int i = 0; i < 4; i++) {
-        if(Model.pagecfg.quickpage[i] > 1 && Model.pagecfg.quickpage[i] == page) {
+        if(Model.pagecfg.quickpage[i] > 1 && Model.pagecfg.quickpage[i] == cur_page) {
             quick = i+1;
             break;
         }
@@ -281,24 +227,4 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     MIXER_SetMixers(mp->mixer, mp->num_mixers);
     MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini
     BUTTON_InterruptLongPress();
-}
-
-u8 PAGE_TelemStateCheck(char *str, int strlen)
-{
-    s8 state = PROTOCOL_GetTelemetryState();
-    if (state == -1) {
-        snprintf(str, strlen, "%s%s%s",
-            _tr("Telemetry"),
-            LCD_DEPTH == 1?"\n":" ", // no translate for this string
-            _tr("is not supported"));
-        return 0;
-    }
-    else if (state == 0) {
-        snprintf(str, strlen, "%s%s%s",
-            _tr("Telemetry"),
-            LCD_DEPTH == 1?"\n":" ",  // no translate for this string
-            _tr("is turned off"));
-        return 0;
-    }
-    return 1;
 }
