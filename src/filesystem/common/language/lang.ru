@@ -101,10 +101,10 @@ AUX5
 Колл Инв:
 :COL Inv:
 Колл Инв:
-|devo8:COL Limit
-Колл Предел:
 :COL Limit
 Колл Предел
+|devo8:COL Limit
+Колл Предел:
 :COL Mix:
 Колл Микш:
 :CYC
@@ -125,10 +125,10 @@ AUX5
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал 
-|devo8:Chan mode
-Режим канала:
 :Chan mode
 Реж. канала:
+|devo8:Chan mode
+Режим канала:
 :Change
 Изменить
 :Channel monitor
@@ -237,6 +237,8 @@ GPS
 Высокий расход
 :Icon
 Значок
+:Icon:
+Значок:
 :Input monitor
 Монитор ввода
 :Input:
