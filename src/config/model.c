@@ -299,7 +299,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 0;
     }
     if (MATCH_SECTION(SECTION_PROTO_OPTS)) {
-        return handle_proto_opts(m, name, value, PROTOCOL_GetOptions());
+        const char **opts = PROTOCOL_GetOptions();
+        if (!opts || ! *opts)
+            return 1;
+        return handle_proto_opts(m, name, value, opts);
     }
     if (MATCH_START(section, SECTION_MIXER)) {
         int idx;
@@ -801,9 +804,9 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 static void write_proto_opts(FILE *fh, struct Model *m)
 {
     const char **opts = PROTOCOL_GetOptions();
-    int idx = 0;
-    if(! *opts)
+    if (!opts || ! *opts)  // bug fix: must check NULL  ptr
         return;
+    int idx = 0;
     fprintf(fh, "[%s]\n", SECTION_PROTO_OPTS);
     while(*opts) {
         int start = atoi(opts[1]);
