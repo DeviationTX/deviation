@@ -19,6 +19,13 @@
 #include "telemetry.h"
 
 struct Telemetry Telemetry;
+static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
+static u8 telem_idx = 0;
+static u8 alarm = 0;
+static u32 alarm_time = 0;
+#define CHECK_DURATION 500
+#define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
+
 s32 TELEMETRY_GetValue(int idx)
 {
     switch (idx) {
@@ -193,33 +200,79 @@ s32 TELEMETRY_GetMaxValue(u8 telem)
     }
 }
 
+//#define DEBUG_TELEMALARM
 void TELEMETRY_Alarm()
 {
-    static u8 alarm;
-    for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
-        if(! Model.telem_alarm[i])
-            continue;
-        u8 idx = Model.telem_alarm[i];
-        s32 value = TELEMETRY_GetValue(idx);
-        s32 hysteresis = (idx == TELEM_RPM1 || idx == TELEM_RPM2) ? 500 : 5;
-        if (Model.telem_flags & (1 << i)) {
-            if (value <= Model.telem_alarm_val[i]) {
-                if(! (alarm & (1 << i))) {
-                    alarm |= 1 << i;
-                    MUSIC_Play(MUSIC_TELEMALARM1 + i);
-                }
-            } else if (value > (s32)Model.telem_alarm_val[i] + hysteresis) {
-                alarm &= ~(1 << i);
+    // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
+    // instead, check 1 of them at a time
+    telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
+    if(! Model.telem_alarm[telem_idx]) {
+        alarm &= ~(1 << telem_idx); // clear this set
+        return;
+    }
+    u8 idx = Model.telem_alarm[telem_idx];
+    s32 value = TELEMETRY_GetValue(idx);
+    if (value == 0) {
+        alarm &= ~(1 << telem_idx); // clear this set
+        return;
+    }
+
+    u32 current_time = CLOCK_getms();
+    if (Model.telem_flags & (1 << telem_idx)) {
+        if (! (alarm & (1 << telem_idx)) && (value <= Model.telem_alarm_val[telem_idx])) {
+            if (alarm_duration[telem_idx] == 0) {
+                alarm_duration[telem_idx] = current_time;
+            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
+                alarm_duration[telem_idx] = 0;
+                alarm |= 1 << telem_idx;
+#ifdef DEBUG_TELEMALARM
+                printf("set: 0x%x\n\n", alarm);
+#endif
             }
-        } else {
-            if (value >= Model.telem_alarm_val[i]) {
-                if(! (alarm & (1 << i))) {
-                    alarm |= 1 << i;
-                    MUSIC_Play(MUSIC_TELEMALARM1 + i);
-                }
-            } else if (value < (s32)Model.telem_alarm_val[i] - hysteresis) {
-                alarm &= ~(1 << i);
+        } else if ((alarm & (1 << telem_idx)) && (value > (s32)Model.telem_alarm_val[telem_idx])) {
+            if (alarm_duration[telem_idx] == 0) {
+                alarm_duration[telem_idx] = current_time;
+            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
+                alarm_duration[telem_idx] = 0;
+                alarm &= ~(1 << telem_idx);
+#ifdef DEBUG_TELEMALARM
+                printf("clear: 0x%x\n\n", alarm);
+#endif
             }
+        } else
+            alarm_duration[telem_idx] = 0;
+    } else {
+        if (! (alarm & (1 << telem_idx)) && (value >= Model.telem_alarm_val[telem_idx])) {
+            if (alarm_duration[telem_idx] == 0) {
+                alarm_duration[telem_idx] = current_time;
+            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
+                alarm_duration[telem_idx] = 0;
+                alarm |= 1 << telem_idx;
+#ifdef DEBUG_TELEMALARM
+                printf("set: 0x%x\n\n", alarm);
+#endif
+            }
+        } else if ((alarm & (1 << telem_idx)) && (value < (s32)Model.telem_alarm_val[telem_idx])) {
+            if (alarm_duration[telem_idx] == 0) {
+                alarm_duration[telem_idx] = current_time;
+            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
+                alarm_duration[telem_idx] = 0;
+                alarm &= ~(1 << telem_idx);
+#ifdef DEBUG_TELEMALARM
+                printf("clear: 0x%x\n\n", alarm);
+#endif
+            }
+        } else
+            alarm_duration[telem_idx] = 0;
+    }
+
+    if ((alarm & (1 << telem_idx))) {
+        if (current_time >= alarm_time + MUSIC_INTERVAL) {
+            alarm_time = current_time;
+#ifdef DEBUG_TELEMALARM
+            printf("beep: %d\n\n", telem_idx);
+#endif
+            MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
         }
     }
 }
