@@ -405,6 +405,8 @@ static u16 devo_telemetry_cb()
         u8 telem_bit = rand() % 7; // random number in [0, 7)
         packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
         //printf("telem 1st packet: 0x%x\n", packet[0]);
+        for(int i = 1; i < 13; i++)
+            packet[i] = rand() % 256;
         parse_telemetry_packet(packet);
         Telemetry.time[0] =  Telemetry.time[1] =  Telemetry.time[2] = CLOCK_getms();
         delay = 100 * (16 - txState);

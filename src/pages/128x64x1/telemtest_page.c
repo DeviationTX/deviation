@@ -60,7 +60,7 @@ static void _show_page1()
         GUI_CreateLabelBox(0,  row, 8, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
         labelDesc.style = LABEL_SQUAREBOX;
         tp.temp[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &labelDesc,
-                          telem_cb, NULL, (void *)(TELEM_TEMP1+1));
+                          telem_cb, NULL, (void *)(TELEM_TEMP1+i));
         if (i < 3) {
             x = x + w + 5;
             tp.volt[i] = GUI_CreateLabelBox(x,  row, w, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_VOLT1+i));
