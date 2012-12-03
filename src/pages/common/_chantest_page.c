@@ -42,7 +42,7 @@ static void show_button_page()
     int i;
     cp->is_locked = 3;
     int y = 64;
-    cp->bar[0] = GUI_CreateLabelBox(100, 40, 0, 0, &DEFAULT_FONT, lockstr_cb, NULL, NULL);
+    cp->bar[0] = GUI_CreateLabelBox(10, 40, 300, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(10 + X_STEP * (i % 3), y, 0, 0,
                          &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
