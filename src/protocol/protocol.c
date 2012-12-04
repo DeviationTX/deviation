@@ -169,17 +169,6 @@ void PROTOCOL_Bind()
     #undef PROTODEF
 }
 
-void PROTOCOL_SetPower()
-{
-    #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_SET_TXPOWER); break;
-    switch(Model.protocol) {
-        #include "protocol.h"
-        case PROTOCOL_NONE:
-        default: break;
-    }
-    #undef PROTODEF
-}
-
 int PROTOCOL_NumChannels()
 {
     int num_channels = NUM_OUT_CHANNELS;

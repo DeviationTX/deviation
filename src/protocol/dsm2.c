@@ -353,6 +353,8 @@ static u16 dsm2_cb()
         chidx = !chidx;
         set_sop_data_crc();
         if (state == DSM2_CH2_CHECK_A) {
+            //Keep transmit power in sync
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
             if (num_channels < 8) {
                 state = DSM2_CH1_WRITE_A;
                 return 15800;
@@ -439,10 +441,6 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)9L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_SET_TXPOWER:
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-            break;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

@@ -474,6 +474,8 @@ static u16 wk_cb()
     if((pkt_num & 0x03) == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
+        //Keep transmit power updated
+        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
     }
     return 1200;
 }
@@ -544,9 +546,6 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
               : (Model.protocol == PROTOCOL_WK2601)
                 ? (void *)7L
                 : (void *)4L;
-        case PROTOCMD_SET_TXPOWER:
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-            break;
         case PROTOCMD_GETOPTIONS:
             if(Model.protocol == PROTOCOL_WK2601)
                 return wk2601_opts;

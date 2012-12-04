@@ -158,6 +158,8 @@ static u16 flysky_cb()
         flysky_build_packet(0);
         A7105_WriteData(packet, 21, tx_channels[chanrow][chancol]-chanoffset);
         chancol = (chancol + 1) % 16;
+        if (! chancol) //Keep transmit power updated
+            A7105_SetPower(Model.tx_power);
     }
     return 1460;
 }
@@ -192,9 +194,6 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
-        case PROTOCMD_SET_TXPOWER:
-            A7105_SetPower(Model.tx_power);
-            break;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

@@ -219,7 +219,6 @@ static u16 hubsan_cb()
         A7105_ReadData(packet, 16);
         if(packet[1] == 9) {
             state = DATA_1;
-            A7105_SetPower(Model.tx_power);
             PROTOCOL_SetBindState(0);
             return 28000; //35.5msec elapsed since last write
         } else {
@@ -227,12 +226,18 @@ static u16 hubsan_cb()
             return 15000; //22.5 msec elapsed since last write
         }
     case DATA_1:
+        //Keep transmit power in sync
+        A7105_SetPower(Model.tx_power);
     case DATA_2:
     case DATA_3:
     case DATA_4:
     case DATA_5:
         hubsan_build_packet();
         A7105_WriteData(packet, 16, state == DATA_5 ? channel + 0x23 : channel);
+        if (state == DATA_5)
+            state = DATA_1;
+        else
+            state++;
         return 10000;
     }
     return 0;
@@ -258,9 +263,6 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)4L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return 0;
-        case PROTOCMD_SET_TXPOWER:
-            A7105_SetPower(Model.tx_power);
-            break;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

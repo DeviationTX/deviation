@@ -434,6 +434,8 @@ static u16 devo_telemetry_cb()
     if(txState == 16) { //2.3msec have passed
         CYRF_ConfigRxTx(1); //Write mode
         if(pkt_num == 0) {
+            //Keep tx power updated
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
             radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
             CYRF_ConfigRFChannel(*radio_ch_ptr);
         }
@@ -459,6 +461,8 @@ static u16 devo_cb()
         cyrf_set_bound_sop_code();
     }   
     if(pkt_num == 0) {
+        //Keep tx power updated
+        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
     }
@@ -532,9 +536,6 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)fixed_id);
-        case PROTOCMD_SET_TXPOWER:
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-            break;
         case PROTOCMD_GETOPTIONS:
             return devo_opts;
         case PROTOCMD_SETOPTIONS:

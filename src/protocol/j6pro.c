@@ -253,11 +253,12 @@ static u16 j6pro_cb()
             return 4600; //4.6msec
         case J6PRO_CHANSEL:
             PROTOCOL_SetBindState(0);
-            CYRF_SetPower(Model.tx_power);
             set_radio_channels();
             cyrf_datainit();
             state = J6PRO_CHAN_1;
         case J6PRO_CHAN_1:
+            //Keep transmit power updated
+            CYRF_SetPower(Model.tx_power);
             build_data_packet();
             //return 3400;
         case J6PRO_CHAN_2:
@@ -302,9 +303,6 @@ const void *J6PRO_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return 0;
-        case PROTOCMD_SET_TXPOWER:
-            CYRF_SetPower(Model.tx_power);
-            break;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

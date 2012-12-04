@@ -118,7 +118,6 @@ u64 PROTOCOL_CheckSafe();
 u32 PROTOCOL_Binding();
 u8 PROTOCOL_AutoBindEnabled();
 void PROTOCOL_Bind();
-void PROTOCOL_SetPower();
 void PROTOCOL_SetBindState(u32 msec);
 int PROTOCOL_NumChannels();
 u8 PROTOCOL_GetTelemCapability();
