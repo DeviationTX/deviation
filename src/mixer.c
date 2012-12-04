@@ -179,7 +179,7 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
     s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
     s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
     s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
-    int normalize = Model.swashmix[0] + Model.swashmix[1] + Model.swashmix[2];
+    int normalize = 100 * (Model.swashmix[0] + Model.swashmix[1] + Model.swashmix[2]) / 180;
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
