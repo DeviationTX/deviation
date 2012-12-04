@@ -87,6 +87,7 @@ static u8 cyrfmfg_id[6];
 static u8 num_channels;
 static u8 ch_idx;
 static u8 use_fixed_id;
+static u8 failsafe_pkt;
 
 static void scramble_pkt()
 {
@@ -120,11 +121,26 @@ static void add_pkt_suffix()
     packet[15] = (fixed_id >> 16) & 0xff;
 }
 
-static void build_beacon_pkt()
+static void build_beacon_pkt(int upper)
 {
-    packet[0] = (num_channels << 4) | 0x07;
-    memset(packet + 1, 0, 8);
-    packet[9] = 0;
+    packet[0] = ((num_channels << 4) | 0x07);
+    u8 enable = 0;
+    int max = 8;
+    int offset = 0;
+    if (upper) {
+        packet[0] += 1;
+        max = 4;
+        offset = 8;
+    }
+    for(int i = 0; i < max; i++) {
+        if (i + offset < Model.num_channels && Model.limits[i+offset].flags & CH_FAILSAFE_EN) {
+            enable |= 0x80 >> i;
+            packet[i+1] = Model.limits[i+offset].failsafe;
+        } else {
+            packet[i+1] = 0;
+        }
+    }
+    packet[9] = enable;
     add_pkt_suffix();
 }
 
@@ -359,7 +375,8 @@ void DEVO_BuildPacket()
             }
             break;
         case DEVO_BOUND_10:
-            build_beacon_pkt();
+            build_beacon_pkt(num_channels > 8 ? failsafe_pkt : 0);
+            failsafe_pkt = failsafe_pkt ? 0 : 1;
             scramble_pkt();
             state = DEVO_BOUND_1;
             break;
@@ -467,6 +484,7 @@ static void initialize()
     CYRF_ConfigSOPCode(sopcodes[0]);
     set_radio_channels();
     use_fixed_id = 0;
+    failsafe_pkt = 0;
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
     /*

@@ -21,7 +21,8 @@ The packet types are as follows:
        This packet contains the fail-safe info for the 1st 8 data-channels
        bytes 1-8 represent a signed 8-bit value -125 to 125 for each of the 1st
        8 channels byte 9 is a bit-field indicating for which channels failsafe
-       is enabled Bytes 10 - 15 are the same as for packets 0x8b and 0x8c
+       is enabled (bit 8 represents channel 1, bit 0 channel 8).   Bytes 10 - 15
+       are the same as for packets 0x8b and 0x8c
 0x88 -
        This packet is never sent for <=8 channel transmitters
        For 10ch and 12ch transmitters it is sent (as 0xa8 or 0xc8) alternating
