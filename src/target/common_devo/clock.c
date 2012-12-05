@@ -62,7 +62,7 @@ void CLOCK_Init()
 
     /* Enable TIM2 interrupt. */
     nvic_enable_irq(NVIC_TIM4_IRQ);
-    nvic_set_priority(NVIC_TIM4_IRQ, 1); //High priority
+    nvic_set_priority(NVIC_TIM4_IRQ, 16); //High priority
 
     timer_disable_counter(TIM4);
     /* Reset TIM4 peripheral. */
@@ -143,7 +143,13 @@ void CLOCK_StopTimer() {
 void tim4_isr()
 {
     if(timer_callback) {
+#ifdef TIMING_DEBUG
+        debug_timing(4, 0);
+#endif
         u16 us = timer_callback();
+#ifdef TIMING_DEBUG
+        debug_timing(4, 1);
+#endif
         timer_clear_flag(TIM4, TIM_SR_CC1IF);
         if (us) {
             timer_set_oc_value(TIM4, TIM_OC1, us + TIM_CCR1(TIM4));

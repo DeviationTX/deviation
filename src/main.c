@@ -132,7 +132,13 @@ void Banner()
 
 void medium_priority_cb()
 {
+#ifdef TIMING_DEBUG
+    debug_timing(3, 0);
+#endif
     MIXER_CalcChannels();
+#ifdef TIMING_DEBUG
+    debug_timing(3, 1);
+#endif
 }
 
 void EventLoop()
@@ -147,7 +153,9 @@ void EventLoop()
         heap = h;
     }
 #endif
-
+#ifdef TIMING_DEBUG
+    debug_timing(0, 0);
+#endif
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & 0x01)) {
@@ -169,6 +177,9 @@ void EventLoop()
         AUTODIMMER_Update();
         GUI_RefreshScreen();
     }
+#ifdef TIMING_DEBUG
+    debug_timing(0, 1);
+#endif
 }
 
 void TOUCH_Handler() {
@@ -231,3 +242,60 @@ u8 BATTERY_Check()
     return warned;
 }
 
+#ifdef TIMING_DEBUG
+void debug_timing(u32 type, int startend)
+{
+    static u32 last_time[2][100];
+    static u32 loop_time[4][101];
+    static u32 loop_pos[4] = {-1, -1, -1, -1};
+    static u32 max_last[2];
+    static u32 max_loop[4];
+    static int save_priority;
+
+    if (type == 0) {
+        if (! startend)
+            save_priority = priority_ready;
+        if (save_priority & (1 << MEDIUM_PRIORITY))
+            debug_timing(2, startend);
+        if (save_priority & (1 << LOW_PRIORITY))
+            debug_timing(1, startend);
+        return;
+    }
+    type--;
+    if (! startend) {
+        u32 t = CLOCK_getms();
+        loop_pos[type] = (loop_pos[type] + 1) % 100;
+        if (type < 2) {
+            last_time[type][loop_pos[type]] = t;
+            if (t - last_time[type][(loop_pos[type] + 99) % 100] > max_last[type])
+                max_last[type] = t - last_time[type][(loop_pos[type] + 99) % 100];
+        }
+        loop_time[type][100] = t;
+    } else {
+        loop_time[type][loop_pos[type]] = CLOCK_getms() - loop_time[type][100];
+        if (loop_time[type][loop_pos[type]] > max_loop[type])
+            max_loop[type] = loop_time[type][loop_pos[type]];
+        if (type == 0 && loop_pos[0] == 99) {
+            unsigned avg_loop[4] = {0, 0, 0, 0};
+            unsigned avg_last[2] = {0, 0};
+            for(int i = 0; i < 99; i++) {
+                for(int t = 0; t < 2; t++) {
+                    u32 delay = last_time[t][(i + loop_pos[t] + 2) % 100] - last_time[t][(i + loop_pos[t] + 1) % 100];
+                    avg_last[t] += delay;
+                }
+                for(int t = 0; t < 4; t++)
+                    avg_loop[t] += loop_time[t][i];
+            }
+            for(int t = 0; t < 4; t++)
+                avg_loop[t] /= 99;
+            avg_last[0] /= 99;
+            avg_last[1] /= 99;
+            printf("Avg: radio: %d mix: %d med: %d/%d low: %d/%d\n", avg_loop[3], avg_loop[2], avg_loop[1], avg_last[1], avg_loop[0], avg_last[0]);
+            printf("Max: radio: %d mix: %d med: %d/%d low: %d/%d\n", max_loop[3], max_loop[2], max_loop[1], max_last[1], max_loop[0], max_last[0]);
+            memset(max_loop, 0, sizeof(max_loop));
+            max_last[0] = 0;
+            max_last[1] = 0;
+        }
+    }
+}
+#endif

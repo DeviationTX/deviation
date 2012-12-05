@@ -417,7 +417,13 @@ void ALARMhandler()
     if(timer_callback && timer_enable & (1 << TIMER_ENABLE) &&
             CLOCK_getms() >= msec_cbtime[TIMER_ENABLE]) {
             //msecs == msec_cbtime[TIMER_ENABLE]) {
+#ifdef TIMING_DEBUG
+        debug_timing(4, 0);
+#endif
         u16 us = timer_callback();
+#ifdef TIMING_DEBUG
+        debug_timing(4, 1);
+#endif
         if (us > 0) {
             msec_cbtime[TIMER_ENABLE] += us;
         }
