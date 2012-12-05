@@ -75,6 +75,7 @@ static const char CHAN_LIMIT_SAFETYVAL[] = "safetyval";
 static const char CHAN_LIMIT_FAILSAFE[] = "failsafe";
 static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
+static const char CHAN_LIMIT_SPEED[] = "speed";
 static const char CHAN_SUBTRIM[] = "subtrim";
 #define CHAN_SCALAR   MIXER_SCALAR
 #define CHAN_TEMPLATE MODEL_TEMPLATE
@@ -440,6 +441,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
             m->limits[idx].min = -value_int;
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_LIMIT_SPEED)) {
+            m->limits[idx].speed = value_int;
             return 1;
         }
         if (MATCH_KEY(CHAN_SCALAR)) {
@@ -884,6 +889,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
         if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
+        if(WRITE_FULL_MODEL || m->limits[idx].speed != 0)
+            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SPEED, m->limits[idx].speed);
         if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
