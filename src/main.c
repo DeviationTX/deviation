@@ -132,6 +132,7 @@ void Banner()
 
 void medium_priority_cb()
 {
+    return;
 #ifdef TIMING_DEBUG
     debug_timing(3, 0);
 #endif
@@ -166,6 +167,7 @@ void EventLoop()
     }
     BUTTON_Handler();
     TOUCH_Handler();
+    MIXER_CalcChannels();
 
     if (priority_ready & (1 << LOW_PRIORITY)) {
         priority_ready  &= ~(1 << LOW_PRIORITY);

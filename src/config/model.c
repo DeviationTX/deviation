@@ -232,6 +232,7 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
+    CLOCK_ResetWatchdog();
     struct Model *m = (struct Model *)user;
     u16 i;
     #define MATCH_SECTION(s) strcasecmp(section, s) == 0

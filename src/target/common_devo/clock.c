@@ -128,7 +128,7 @@ void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
 
 void CLOCK_StartWatchdog()
 {
-    iwdg_set_period_ms(1000);
+    iwdg_set_period_ms(2000);
     iwdg_start();
 }
 
