@@ -20,6 +20,7 @@
 void PWR_Init(void)
 {
     SCB_VTOR = 0x4000;
+    SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT; //sleep immediate on WFI
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
     /* Enable GPIOA so we can manage the power switch */
@@ -65,4 +66,9 @@ int PWR_CheckPowerSwitch()
         return 1;
     }
     return 0;
+}
+
+void PWR_Sleep()
+{
+    asm("wfi");
 }

@@ -33,6 +33,7 @@ void USB_Enable(u8 use_interrupt) {(void)use_interrupt;}
 void USB_Disable() {}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
+void PWR_Sleep() {}
 u16  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
 

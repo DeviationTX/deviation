@@ -19,6 +19,9 @@
 #include "config/tx.h"
 #include "../common_devo/devo.h"
 
+const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 11, 10, 12, 14};
+u16 adc_array_raw[NUM_ADC_CHANNELS] = {0, 0, 0, 0, 0xfff}; //Set battery to max value so it doesn't trigger an alarm before it is read
+
 void CHAN_Init()
 {
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
@@ -43,10 +46,10 @@ s32 CHAN_ReadRawInput(int channel)
 {
     s32 value = 0;
     switch(channel) {
-    case INP_THROTTLE: value = ADC1_Read(13); break;
-    case INP_RUDDER:   value = ADC1_Read(11); break;
-    case INP_ELEVATOR: value = ADC1_Read(10); break;
-    case INP_AILERON:  value = ADC1_Read(12); break;
+    case INP_THROTTLE: value = adc_array_raw[0]; break;
+    case INP_RUDDER:   value = adc_array_raw[1]; break;
+    case INP_ELEVATOR: value = adc_array_raw[2]; break;
+    case INP_AILERON:  value = adc_array_raw[3]; break;
     case INP_RUD_DR:   value = ! gpio_get(GPIOC, GPIO8); break;
     case INP_ELE_DR:   value = ! gpio_get(GPIOC, GPIO7); break;
     case INP_AIL_DR:   value = ! gpio_get(GPIOC, GPIO11); break;

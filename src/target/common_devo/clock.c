@@ -109,6 +109,10 @@ void CLOCK_Init()
      */
     nvic_enable_irq(NVIC_TIM7_IRQ);
     nvic_set_priority(NVIC_TIM7_IRQ, 64); //Medium priority
+    /* Enable DMA Channel1 with same priority as TIM7 */
+    nvic_enable_irq(NVIC_DMA1_CHANNEL1_IRQ);
+    nvic_set_priority(NVIC_DMA1_CHANNEL1_IRQ, 65); //Medium priority
+
     /* wait for system to start up and stabilize */
     while(msecs < 100)
         ;
@@ -175,7 +179,9 @@ void CLOCK_ClearMsecCallback(int cb)
 }
 void tim7_isr()
 {
-    medium_priority_cb();
+    ADC_StartCapture();
+    //ADC completion will trigger update
+    //medium_priority_cb();
 }
 
 void sys_tick_handler(void)

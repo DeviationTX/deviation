@@ -21,7 +21,7 @@
 /* Return milivolts */
 u16 PWR_ReadVoltage(void)
 {
-    u32 v = ADC1_Read(14);
+    u32 v = adc_array_raw[6];
     /* Compute voltage from y = 0.003246x + 0.4208 */
     /* Multily the above by 1000 to get milivolts */
     v = v * 324 / 100 + 421;

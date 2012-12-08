@@ -22,4 +22,5 @@
 #define INP_HAS_CALIBRATION 4
 
 #define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
+
 #endif //_DEVO8_TARGET_H_

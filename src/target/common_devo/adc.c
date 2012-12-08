@@ -14,10 +14,13 @@
 */
 #include <libopencm3/stm32/f1/adc.h>
 #include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/f1/dma.h>
 #include "common.h"
 #include "devo.h"
 #include <stdlib.h>
 #include <stdio.h>
+
+static u16 ADC1_Read(u8 channel);
 
 void ADC_Init(void)
 {
@@ -32,10 +35,10 @@ void ADC_Init(void)
     /* Make sure the ADC doesn't run during config. */
     adc_off(ADC1);
 
-    /* We configure everything for one single conversion. */
-    adc_disable_scan_mode(ADC1);
+    /* We configure to scan the entire group each time conversion is requested. */
+    adc_enable_scan_mode(ADC1);
     adc_set_single_conversion_mode(ADC1);
-    adc_enable_discontinous_mode_regular(ADC1);
+    adc_disable_discontinous_mode_regular(ADC1);
     adc_disable_external_trigger_regular(ADC1);
     adc_set_right_aligned(ADC1);
 
@@ -59,11 +62,38 @@ void ADC_Init(void)
     }
     printf("RNG Seed: %08x\n", (int)seed);
     srand(seed);
+
+    /* Enable DMA clock */
+    rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_DMA1EN);
+    /* no reconfig for every ADC group conversion */
+    dma_enable_circular_mode(DMA1, DMA_CHANNEL1);
+    /* the memory pointer has to be increased, and the peripheral not */
+    dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL1);
+    /* ADC_DR is only 16bit wide in this mode */
+    dma_set_peripheral_size(DMA1, DMA_CHANNEL1, DMA_CCR_PSIZE_16BIT);
+    /*destination memory is also 16 bit wide */
+    dma_set_memory_size(DMA1, DMA_CHANNEL1, DMA_CCR_MSIZE_16BIT);
+    /* direction is from ADC to memory */
+    dma_set_read_from_peripheral(DMA1, DMA_CHANNEL1);
+    /* get the data from the ADC data register */
+    dma_set_peripheral_address(DMA1, DMA_CHANNEL1,(u32) &ADC_DR(ADC1));
+    /* put everything in this array */
+    dma_set_memory_address(DMA1, DMA_CHANNEL1, (u32) &adc_array_raw);
+    /* we convert only 3 values in one adc-group */
+    dma_set_number_of_data(DMA1, DMA_CHANNEL1, NUM_ADC_CHANNELS);
+    /* we want an interrupt after the adc is finished */
+    dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL1);
+
+    /* dma ready to go. waiting til the peripheral gives the first data */
+    dma_enable_channel(DMA1, DMA_CHANNEL1);
+
+    adc_enable_dma(ADC1);
+    adc_set_regular_sequence(ADC1, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
 }
 
 u16 ADC1_Read(u8 channel)
 {
-    u8 channel_array[16];
+    u8 channel_array[1];
     /* Select the channel we want to convert. 16=temperature_sensor. */
     channel_array[0] = channel;
     adc_set_regular_sequence(ADC1, 1, channel_array);
@@ -79,3 +109,16 @@ u16 ADC1_Read(u8 channel)
     return(ADC_DR(ADC1));
 }
 
+void ADC_StartCapture()
+{
+    //while (!(ADC_SR(ADC1) & ADC_SR_EOC));
+    adc_on(ADC1);
+}
+
+void dma1_channel1_isr()
+{
+    medium_priority_cb();
+    /* clear the interrupt flag */
+    DMA_IFCR(DMA1) |= DMA_IFCR_CGIF1;
+
+}

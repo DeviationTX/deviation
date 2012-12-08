@@ -71,6 +71,7 @@ void PWR_Init(void);
 u16  PWR_ReadVoltage(void);
 int  PWR_CheckPowerSwitch();
 void PWR_Shutdown();
+void PWR_Sleep();
 
 /* Clock functions */
 #define LOW_PRIORITY_MSEC 100
