@@ -505,6 +505,8 @@ RPM
 ТелеT
 :TelemV
 ТелеV
+:Telemetry
+Телеметрия
 :Telemetry config
 Телеметрия
 :Telemetry monitor
@@ -597,6 +599,10 @@ USB
 добавить
 :countdown
 обр.отсчет
+:is not supported
+не поддерживается
+:is turned off
+выключена
 :max
 максимум
 :min

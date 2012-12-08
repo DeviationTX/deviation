@@ -46,9 +46,9 @@ AIL
 :AIL DR
 AIL DR
 :AIL Inv:
-Sens AIL 
+Sens AIL
 :AIL Mix:
-AIL Mix
+Mix. AIL
 :AUX4
 AUX4
 :AUX5
@@ -88,15 +88,15 @@ Ctrl des boutons
 :Buzz volume:
 Vol. buzzer
 :COL
-pas
+COL
 :COL Inv
-Sens du pas
+Sens COL
 :COL Inv:
-Sens du pas:
+Sens COL 
 :COL Limit
-Limite pas
+Limite COL 
 :COL Mix:
-Mixage pas
+Mix. COL 
 :CYC
 CYC
 :Calibrate
@@ -160,9 +160,9 @@ ELE
 :ELE DR
 ELE DR
 :ELE Inv:
-Sens profondeur
+Sens ELE 
 :ELE Mix:
-ELE Mix:
+Mix. ELE 
 :EXPO
 EXP.
 :Enter
