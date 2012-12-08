@@ -36,9 +36,11 @@
 #define TELEMETRY_ENABLE 0x30
 
 static const char *devo_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
+#define TELEM_ON 0
+#define TELEM_OFF 1
 
 typedef enum {
     PROTOOPTS_TELEMETRY = 0,
@@ -520,7 +522,7 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    if (Model.proto_opts[PROTOOPTS_TELEMETRY]) {
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
         CLOCK_StartTimer(2400, devo_telemetry_cb);
     } else {
         CLOCK_StartTimer(2400, devo_cb);
@@ -542,7 +544,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             PROTOCOL_Init(0);  // only 1 prot_ops item, it is to enable/disable telemetry
             break;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)Model.proto_opts[PROTOOPTS_TELEMETRY];
+            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
         default: break;
     }
     return 0;
