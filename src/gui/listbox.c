@@ -71,6 +71,7 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
         listbox->text_height = text_h;  //no extra spacing text height in devo10
     } else {
         listbox->style = LISTBOX_OTHERS;
+        LCD_SetFont(Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font);
         LCD_GetCharDimensions('A', &text_w, &text_h);
         listbox->text_height = text_h + LINE_SPACING;  //LINE_SPACING is defined in _gui.h
     }
