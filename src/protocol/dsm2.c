@@ -416,8 +416,8 @@ static void initialize(u8 bind)
     data_col = 7 - sop_col;
     model = MODEL;
     num_channels = Model.num_channels;
-    if (num_channels < 4)
-        num_channels = 4;
+    if (num_channels < 6)
+        num_channels = 6;
     else if (num_channels > 9)
         num_channels = 9;
 
