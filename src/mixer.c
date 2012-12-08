@@ -186,7 +186,7 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum)
     s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
     s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
     s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
-    const int normalize = 60;
+    const int normalize = 100;
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
     if (Model.swash_invert & SWASH_INV_AILERON_MASK)    aileron    = -aileron;
