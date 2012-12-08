@@ -63,6 +63,7 @@ void ADC_Init(void)
     printf("RNG Seed: %08x\n", (int)seed);
     srand(seed);
 
+    /* The following is based on code from here: http://code.google.com/p/rayaairbot */
     /* Enable DMA clock */
     rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_DMA1EN);
     /* no reconfig for every ADC group conversion */
