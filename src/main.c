@@ -74,9 +74,15 @@ int main() {
 #ifdef HAS_EVENT_LOOP
     start_event_loop();
 #else
-    priority_ready = (1 << MEDIUM_PRIORITY) | (1 << LOW_PRIORITY);
+    priority_ready = 0;
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
     CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
+
+    // We need to wait until we've actually measured the ADC twice before showing the display
+    while(! (priority_ready & (1 << MEDIUM_PRIORITY)))
+        ;
+    priority_ready = 0;
+
     while(1) {
         if(priority_ready) {
             EventLoop();

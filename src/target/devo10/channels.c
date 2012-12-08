@@ -20,7 +20,6 @@
 #include "../common_devo/devo.h"
 
 const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 12, 11, 15, 10, 4, 14};
-u16 adc_array_raw[NUM_ADC_CHANNELS] = {0, 0, 0, 0, 0, 0, 0xfff}; //Set battery to max value so it doesn't trigger an alarm before it is read
 
 void CHAN_Init()
 {

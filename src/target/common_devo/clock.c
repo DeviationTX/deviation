@@ -173,10 +173,13 @@ void CLOCK_SetMsecCallback(int cb, u32 msec)
     msec_cbtime[cb] = msecs + msec;
     msec_callbacks |= (1 << cb);
 }
+
 void CLOCK_ClearMsecCallback(int cb)
 {
     msec_callbacks &= ~(1 << cb);
 }
+
+
 void tim7_isr()
 {
     ADC_StartCapture();

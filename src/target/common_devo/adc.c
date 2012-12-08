@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 static u16 ADC1_Read(u8 channel);
+u16 adc_array_raw[NUM_ADC_CHANNELS];
 
 void ADC_Init(void)
 {
