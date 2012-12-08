@@ -119,7 +119,7 @@ int PROTOCOL_MapChannel(int input, int default_ch)
 u64 PROTOCOL_CheckSafe()
 {
     int i;
-    s16 *raw = MIXER_GetInputs();
+    volatile s16 *raw = MIXER_GetInputs();
     u64 unsafe = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! Model.safety[i])

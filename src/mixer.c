@@ -50,12 +50,12 @@ volatile s16 Channels[NUM_OUT_CHANNELS];
 
 struct Transmitter Transmitter;
 
-static s16 raw[NUM_SOURCES + 1];
+static volatile s16 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
-static u8 switch_is_on(u8 sw, s16 *raw);
+static u8 switch_is_on(u8 sw, volatile s16 *raw);
 static s32 get_trim(u8 src);
 
-static s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum);
+static s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -67,7 +67,7 @@ struct Trim *MIXER_GetAllTrims()
     return Model.trims;
 }
 
-void MIXER_EvalMixers(s16 *raw)
+void MIXER_EvalMixers(volatile s16 *raw)
 {
     int i;
     //3rd step: apply mixers
@@ -116,17 +116,24 @@ u8 MIXER_MapChannel(u8 channel)
     return channel;
 }
 
-u8 MIXER_ReadInputs(s16 *raw, u8 threshold)
+static void MIXER_UpdateRawInputs()
 {
-    u8 changed = 0;
-    u8 i;
+    int i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
         u8 mapped_channel = MIXER_MapChannel(i);
-        s16 value = CHAN_ReadInput(mapped_channel);
-        if (abs(value - raw[i]) > threshold) {
+        raw[i] = CHAN_ReadInput(mapped_channel);
+    }
+}
+
+int MIXER_GetCachedInputs(s16 *cache, u8 threshold)
+{
+    int changed = 0;
+    int i;
+    for (i = 1; i <= NUM_TX_INPUTS; i++) {
+        if (abs(raw[i] - cache[i]) > threshold) {
             changed = 1;
-            raw[i] = value;
+            cache[i] = raw[i];
         }
     }
     return changed;
@@ -137,7 +144,7 @@ void MIXER_CalcChannels()
     //We retain this array so that we can refer to the prevous values in the next iteration
     int i;
     //1st step: Read Tx inputs
-    MIXER_ReadInputs(raw, 0);
+    MIXER_UpdateRawInputs();
     //3rd steps
     MIXER_EvalMixers(raw);
 
@@ -158,7 +165,7 @@ void MIXER_CalcChannels()
     }
 }
 
-s16 *MIXER_GetInputs()
+volatile s16 *MIXER_GetInputs()
 {
     return raw;
 }
@@ -170,7 +177,7 @@ s16 MIXER_GetChannel(u8 channel, enum LimitMask flags)
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
+s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum)
 {
     s16 cyc[3];
     if (! Model.swash_type) {
@@ -229,7 +236,7 @@ s16 MIXER_CreateCyclicOutput(s16 *raw, u8 cycnum)
     return cyc[cycnum-1];
 }
 
-void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
 {
     s32 value;
     if (! MIXER_SRC(mixer->src))
@@ -286,7 +293,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw)
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *_raw,
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
                       volatile s16 *_Channels, enum LimitMask flags)
 {
     s32 value = _raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
@@ -334,7 +341,7 @@ s32 get_trim(u8 src)
     return 0;
 }
 
-u8 switch_is_on(u8 sw, s16 *raw)
+u8 switch_is_on(u8 sw, volatile s16 *raw)
 {
     u8 is_neg = MIXER_SRC_IS_INV(sw);
     sw = MIXER_SRC(sw);

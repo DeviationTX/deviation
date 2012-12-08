@@ -86,7 +86,7 @@ void TIMER_Update()
         if (Model.timer[i].src) {
             s16 val;
             if (MIXER_SRC(Model.timer[i].src) <= NUM_INPUTS) {
-                s16 *raw = MIXER_GetInputs();
+                volatile s16 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].src)];
             } else {
                 val = MIXER_GetChannel(Model.timer[i].src - NUM_INPUTS - 1, APPLY_SAFETY);

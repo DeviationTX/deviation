@@ -38,7 +38,7 @@ void PAGE_ShowSafetyDialog()
             int count = 0;
             char tmpstr[30];
             const s8 safeval[4] = {0, -100, 0, 100};
-            s16 *raw = MIXER_GetInputs();
+            volatile s16 *raw = MIXER_GetInputs();
             u32 crc = Crc(dlgstr, strlen(dlgstr));
             dlgstr[0] = 0;
             for(i = 0; i < NUM_SOURCES + 1; i++) {

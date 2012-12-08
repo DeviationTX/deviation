@@ -171,7 +171,7 @@ void PAGE_MixerEvent()
     // and will clear all limit data in devo8, simply because all structures inside the pagemem are unions and share the same memory
     _determine_save_in_live();
     if (mp->cur_mixer && mp->graphs[0]) {
-        if(MIXER_ReadInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
             GUI_Redraw(mp->graphs[0]);
             if (mp->graphs[1])
                 GUI_Redraw(mp->graphs[1]);

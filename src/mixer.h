@@ -140,7 +140,7 @@ const char *CURVE_GetName(struct Curve *curve);
 u8 CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
-s16 *MIXER_GetInputs();
+volatile s16 *MIXER_GetInputs();
 s16 MIXER_GetChannel(u8 channel, enum LimitMask flags);
 
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
@@ -154,10 +154,9 @@ enum TemplateType MIXER_GetTemplate(int ch);
 
 void MIXER_InitMixer(struct Mixer *mixer, u8 ch);
 
-void MIXER_ApplyMixer(struct Mixer *mixer, s16 *raw);
-void MIXER_EvalMixers(s16 *raw);
-u8   MIXER_ReadInputs(s16 *raw, u8 threshold);
-void MIXER_CreateCyclicInputs(s16 *raw);
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw);
+void MIXER_EvalMixers(volatile s16 *raw);
+int MIXER_GetCachedInputs(s16 *raw, u8 threshold);
 
 struct Mixer *MIXER_GetAllMixers();
 
@@ -165,7 +164,7 @@ struct Trim *MIXER_GetAllTrims();
 
 void MIXER_RegisterTrimButtons();
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, s16 *_raw,
+s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
                       volatile s16 *_Channels, enum LimitMask flags);
 void MIXER_SetDefaultLimit(struct Limit *limit);
 const char *MIXER_TemplateName(enum TemplateType t);

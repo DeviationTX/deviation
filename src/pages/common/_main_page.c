@@ -122,7 +122,7 @@ void PAGE_MainEvent()
             GUI_Redraw(mp->boxObj[i]);
         }
     }
-    s16 *raw = MIXER_GetInputs();
+    volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < 8; i++) {
         if (! mp->barObj[i])
             continue;
