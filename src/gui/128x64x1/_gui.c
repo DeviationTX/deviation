@@ -168,8 +168,14 @@ static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT) || CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            objTOUCHED = objModalButton;
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT) ) {
+            objTOUCHED = objModalButton;  // assume the cancel button is the default/modal button
+            GUI_TouchRelease();
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            if (objSELECTED)
+                objTOUCHED = objSELECTED;
+            else
+                objTOUCHED = objModalButton;
             GUI_TouchRelease();
         }
         else {
