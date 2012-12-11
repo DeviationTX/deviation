@@ -22,10 +22,6 @@
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];
 u8 num_channels;
 
-#define MIN_PPM_PW 500
-#define MAX_PPM_PW 1500
-#define NOTCH      400
-
 /* FIXME:  The original imlementation used a PWM to output the PPM signal.
            However, I could not get TIM1 woring properly.
            The current implementation just bit-bangs the output.
@@ -34,16 +30,28 @@ u8 num_channels;
 #ifdef EMULATOR
 #define PERIOD 3000
 #else
-#define PERIOD 20000
+#define PERIOD 22500
 #define BITBANG_PPM
 #endif
+static const char *ppm_opts[] = {
+  _tr_noop("Center PW"),  "1000", "1800", NULL,
+  _tr_noop("Delta PW"),   "100", "700", NULL,
+  _tr_noop("Notch PW"),   "100", "500", NULL,
+  NULL
+};
+enum {
+    CENTER_PW,
+    DELTA_PW,
+    NOTCH_PW,
+};
+
 volatile u8 state;
 static void build_data_pkt()
 {
     int i;
     for (i = 0; i < num_channels; i++) {
-        s32 value = (s32)Channels[i] * (MAX_PPM_PW - MIN_PPM_PW) / 2 / CHAN_MAX_VALUE
-                    + (MAX_PPM_PW - MIN_PPM_PW) / 2 + MIN_PPM_PW;
+        s32 value = (s32)Channels[i] * Model.proto_opts[DELTA_PW] / CHAN_MAX_VALUE
+                    + Model.proto_opts[CENTER_PW];
         pulses[i] = value;
     }
     pulses[num_channels] = 0;
@@ -62,12 +70,14 @@ static u16 ppmout_cb()
         PWM_Set(1);
         if(state == num_channels * 2 + 1) {
             state = 0;
+            if (num_channels > 9)
+                return PERIOD + (num_channels - 9) * 2000 - accum;
             return PERIOD - accum;
         }
         val = pulses[state / 2];
     } else {
         PWM_Set(0);
-        val = NOTCH;
+        val = Model.proto_opts[NOTCH_PW];
     }
     state++;
     accum += val;
@@ -77,7 +87,7 @@ static u16 ppmout_cb()
 static u16 ppmout_cb()
 {
     build_data_pkt();
-    PPM_Enable(NOTCH, pulses); //400us 'flat notch'
+    PPM_Enable(Model.proto_opts[NOTCH_PW], pulses); //400us 'flat notch'
     return PERIOD;
 }
 #endif
@@ -87,6 +97,12 @@ static void initialize()
     CLOCK_StopTimer();
     PWM_Initialize();
     num_channels = Model.num_channels;
+    if (Model.proto_opts[CENTER_PW] == 0) {
+        Model.proto_opts[CENTER_PW] = 1100;
+        Model.proto_opts[DELTA_PW] = 400;
+        Model.proto_opts[NOTCH_PW] = 400;
+    }
+    
     state = 0;
     CLOCK_StartTimer(1000, ppmout_cb);
 }
@@ -99,6 +115,13 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)PPMOUT_MAX_CHANNELS);
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_GETOPTIONS:
+            if (Model.proto_opts[CENTER_PW] == 0) {
+                Model.proto_opts[CENTER_PW] = 1100;
+                Model.proto_opts[DELTA_PW] = 400;
+                Model.proto_opts[NOTCH_PW] = 400;
+            }
+            return ppm_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

@@ -73,7 +73,12 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     start = atoi(proto_strs[pos+1]);
     end = atoi(proto_strs[pos+2]);
     if (count == 2 && (start != 0 || end != 0)) {
-        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], start, end, dir, 1, 1, &changed);
+        int s1 = 1, s2 = 1;
+        if (start < -200 || end > 200) {
+            s1 = 10;
+            s2 = 50;
+        }
+        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], start, end, dir, s1, s2, &changed);
         sprintf(mp->tmpstr, "%d", Model.proto_opts[idx]);
 
     } else {
