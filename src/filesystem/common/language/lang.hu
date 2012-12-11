@@ -111,6 +111,8 @@ Kalibrálás kész.
 Mégsem
 :Celsius
 °C
+:Center PW
+Közép imp. hossz
 :Center all \nsticks and knobs\nthen press ENT
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
@@ -149,6 +151,8 @@ DR
 Holtsáv
 :Default
 Default
+:Delta PW
+Impulzus eltérés
 :Deviation FW version:
 Deviation verzió:
 :Dimmer target:
@@ -307,6 +311,8 @@ Nincs
 Nincs
 :Normal
 Normál
+:Notch PW
+Szünet hossz
 :Off
 Ki
 :Offset:
