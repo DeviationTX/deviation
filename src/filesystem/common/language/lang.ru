@@ -119,6 +119,8 @@ AUX5
 С°
 |devo8:Celsius
 Цельсий
+:Center PW
+Центр ШИ
 :Center all \nsticks and knobs\nthen press ENT
 Отцентруйте все\nстики и ручки,\nзатем нажмите ENT
 |devo8:Center all \nsticks and knobs\nthen press ENT
@@ -161,6 +163,8 @@ AUX5
 Мертв.зона
 :Default
 Умолчание
+:Delta PW
+Дельта ШИ
 :Deviation FW version:
 Версия Deviation:
 :Dimmer target:
@@ -337,6 +341,8 @@ GPS
 Нет
 :Normal
 Норма
+:Notch PW
+Пауза ШИ
 :Off
 Выкл.
 :Offset:
