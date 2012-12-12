@@ -193,8 +193,10 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     MIXER_GetLimit(idx, &mp->limit);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
-    for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++)
+    for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
         MIXER_InitMixer(mp->mixer + i, idx);
+        mp->mixer[i].src = 1;
+    }
 
     if (mp->cur_template != MIXERTEMPLATE_NONE) {
         mp->num_complex_mixers = MIXER_GetMixers(idx, mp->mixer, sizeof(mp->mixer) / sizeof(struct Mixer));

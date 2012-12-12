@@ -344,7 +344,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
+    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
         if(mp->trimObj) {
