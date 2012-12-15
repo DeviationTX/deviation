@@ -433,12 +433,8 @@ RPM
 Сохр.
 |devo8:Save
 Сохранить
-:Scale1:
-Масшт.1:
-:Scale2:
-Масшт.2:
-:Scale:
-Масшт.:
+:Scale%s:
+Масшт.%s:
 :Scanner
 Сканер
 :Simple

@@ -44,7 +44,7 @@ static void _show_simple()
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
     //Row 4
-    GUI_CreateLabel(COL1_TEXT, 192, NULL, DEFAULT_FONT, _tr("Scale:"));
+    GUI_CreateLabel(COL1_TEXT, 192, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(COL1_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
     GUI_CreateLabel(COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
     GUI_CreateTextSelect(COL2_VALUE, 192, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[0].offset);
@@ -93,7 +93,7 @@ static void _show_expo_dr()
     mp->expoObj[5] = GUI_CreateLabelBox(216, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
     mp->expoObj[6] = GUI_CreateTextSelect(216, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
     //Row 5
-    GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Scale:"));
+    GUI_CreateLabel(COL1_TEXT, 122, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
     mp->expoObj[3] = GUI_CreateTextSelect(112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
     mp->expoObj[7] = GUI_CreateTextSelect(216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
@@ -139,7 +139,7 @@ static void _show_complex()
     GUI_CreateLabel(COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Curve:"));
     GUI_CreateTextSelect(COL1_VALUE, 122, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, mp->cur_mixer);
     //Row 5
-    GUI_CreateLabel(COL1_TEXT, 156, NULL, DEFAULT_FONT, _tr("Scale:"));
+    GUI_CreateLabel(COL1_TEXT, 156, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(COL1_VALUE, 156, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->cur_mixer->scalar);
     //Row 6
     GUI_CreateLabel(COL1_TEXT, 180, NULL, DEFAULT_FONT, _tr("Offset:"));

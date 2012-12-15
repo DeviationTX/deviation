@@ -305,10 +305,8 @@ Veiligheid
 Veiligheid:
 :Save
 OPslaan
->:Scale1:
->:Scale2:
-:Scale:
-Schaal:
+:Scale%s:
+Schaal%s:
 :Scanner
 Scanner
 :Simple

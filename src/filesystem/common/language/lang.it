@@ -351,12 +351,8 @@ Sicurezza
 Sicurezza:
 :Save
 Salva
-:Scale1:
-Scala1:
-:Scale2:
-Scala2:
-:Scale:
-Scala:
+:Scale%s:
+Scala%s:
 :Scanner
 Scanner
 :Simple

@@ -30,6 +30,7 @@ struct mixer_page {
     guiObject_t *trimObj;
     guiObject_t *safeValObj;
     guiObject_t *expoObj[10];
+    guiObject_t *negscaleObj;
     struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *cur_mixer;
     struct Limit limit;

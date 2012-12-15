@@ -121,6 +121,7 @@ struct Limit {
     u8 max;
     u8 min;
     u8 servoscale;
+    u8 servoscale_neg;
     s8 failsafe;
     u8 speed;     //measured in degrees/100msec
     s16 subtrim;  // need to support value greater than 250

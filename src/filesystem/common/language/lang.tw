@@ -346,12 +346,8 @@ FMOD2
 安全開關:
 :Save
 儲存
-:Scale1:
-比例1:
-:Scale2:
-比例2:
-:Scale:
-比例:
+:Scale%s:
+比例%s:
 :Scanner
 2.4G頻道掃描
 :Simple

@@ -355,12 +355,8 @@ LCD设置
 熄火开关
 :Save
 保存
-:Scale1:
-比例1
-:Scale2:
-比例2
-:Scale:
-比例
+:Scale%s:
+比例%s
 :Scanner
 信号扫描器
 :Simple

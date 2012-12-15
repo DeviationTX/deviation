@@ -77,6 +77,7 @@ static const char CHAN_LIMIT_MAX[] = "max";
 static const char CHAN_LIMIT_MIN[] = "min";
 static const char CHAN_LIMIT_SPEED[] = "speed";
 static const char CHAN_SUBTRIM[] = "subtrim";
+static const char CHAN_SCALAR_NEG[] = "scalar-";
 #define CHAN_SCALAR   MIXER_SCALAR
 #define CHAN_TEMPLATE MODEL_TEMPLATE
 static const char * const CHAN_TEMPLATE_VAL[MIXERTEMPLATE_MAX+1] =
@@ -450,6 +451,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(CHAN_SCALAR)) {
             m->limits[idx].servoscale = value_int;
+            return 1;
+        }
+        if (MATCH_KEY(CHAN_SCALAR_NEG)) {
+            m->limits[idx].servoscale_neg = value_int;
             return 1;
         }
         if (MATCH_KEY(CHAN_SUBTRIM)) {
@@ -866,6 +871,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
            m->limits[idx].max == DEFAULT_SERVO_LIMIT &&
            m->limits[idx].min == DEFAULT_SERVO_LIMIT &&
            m->limits[idx].servoscale == 100 &&
+           m->limits[idx].servoscale_neg == 0 &&
            m->templates[idx] == 0)
         {
             if (write_mixer(fh, m, idx))
@@ -896,6 +902,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
             fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
+        if(WRITE_FULL_MODEL || m->limits[idx].servoscale_neg != 100)
+            fprintf(fh, "%s=%d\n", CHAN_SCALAR_NEG, m->limits[idx].servoscale_neg);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
         write_mixer(fh, m, idx);

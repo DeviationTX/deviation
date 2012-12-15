@@ -367,12 +367,8 @@ Siguranță
 Siguranță:
 :Save
 Salv.
-:Scale1:
-Scara1:
-:Scale2:
-Scara2:
-:Scale:
-Scară:
+:Scale%s:
+Scară%s:
 :Scanner
 Scaner
 :Simple

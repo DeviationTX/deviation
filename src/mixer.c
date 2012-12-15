@@ -302,8 +302,12 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
 
     if (flags & APPLY_SUBTRIM)
         value += PCT_TO_RANGE(limit->subtrim) / 10;
-    if (flags & APPLY_SCALAR)
-        value = (s32)value * limit->servoscale / 100;
+    if (flags & APPLY_SCALAR) {
+        if (value >= 0 || limit->servoscale_neg == 0)
+            value = (s32)value * limit->servoscale / 100;
+        else
+            value = (s32)value * limit->servoscale_neg / 100;
+    }
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
         value = -value;
     //degrees / 100msec
@@ -632,6 +636,7 @@ void MIXER_SetDefaultLimit(struct Limit *limit)
     limit->max = DEFAULT_SERVO_LIMIT;
     limit->min = DEFAULT_SERVO_LIMIT;
     limit->servoscale = 100;
+    limit->servoscale_neg = 0;  //match servoscale
 }
 
 void MIXER_AdjustForProtocol()

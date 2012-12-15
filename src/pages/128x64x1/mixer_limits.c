@@ -107,10 +107,18 @@ static void _show_limits()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale:"));
+            &labelDesc, scalestring_cb, NULL, (void *)1L);
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.servoscale);
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limitsscale_cb, &mp->limit.servoscale);
+    y += space;
+    labelDesc.style = LABEL_LEFTCENTER;
+    GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
+            &labelDesc, scalestring_cb, NULL, (void *)0);
+    labelDesc.style = LABEL_CENTER;
+    mp->negscaleObj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
+            w, ITEM_HEIGHT, &labelDesc, NULL, set_limitsscale_cb, &mp->limit.servoscale_neg);
+    mp->max_scroll++;
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;

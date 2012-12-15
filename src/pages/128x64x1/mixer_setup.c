@@ -85,7 +85,7 @@ static void _show_simple()
     y += space;  // out of current logical view, won't show by default
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL,_tr("Scale:"));
+            &labelDesc, scalestring_cb, NULL,(void *)0);
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
@@ -198,7 +198,7 @@ static void _show_complex()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale:"));
+            &labelDesc, scalestring_cb, NULL, (void *)0);
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
@@ -273,7 +273,7 @@ static void _show_expo_dr()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale:"));
+            &labelDesc, scalestring_cb, NULL, (void *)0);
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
@@ -301,7 +301,7 @@ static void _show_expo_dr()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale1:"));
+            &labelDesc, scalestring_cb, NULL, (void *)1L);
     y += space;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[3] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[1].scalar);
@@ -328,7 +328,7 @@ static void _show_expo_dr()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Scale2:"));
+            &labelDesc, scalestring_cb, NULL, (void *)2L);
     y += space;
     mp->itemObj[mp->max_scroll++] = mp->expoObj[7] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc,  NULL, set_number100_cb, &mp->mixer[2].scalar);

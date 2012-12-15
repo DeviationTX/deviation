@@ -383,12 +383,8 @@ Biztonsági ellenőrzés
 Biztonság:
 :Save
 Mentés
-:Scale1:
-Skála 1:
-:Scale2:
-Skála 2:
-:Scale:
-Skála:
+:Scale%s:
+Skála%s:
 :Scanner
 Szkenner
 :Simple

@@ -30,7 +30,7 @@ static void _show_limits()
     //Row 2
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Failsafe:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, toggle_failsafe_cb, set_failsafe_cb, NULL);
-    y += height + 6;
+    y += height;
     //Row 3
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safety:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
@@ -38,7 +38,7 @@ static void _show_limits()
     //Row 4
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Safe Val:"));
     mp->safeValObj = GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_safeval_cb, NULL);
-    y += height + 6;
+    y += height;
     //Row 5
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
@@ -48,9 +48,12 @@ static void _show_limits()
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
     y += height;
     //Row 5
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Scale:"));
-    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.servoscale);
-    y += height + 6;
+    GUI_CreateLabel(8, y, scalestring_cb, DEFAULT_FONT, (void *)1L);
+    GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limitsscale_cb, &mp->limit.servoscale);
+    y += height;
+    GUI_CreateLabel(8, y, scalestring_cb, DEFAULT_FONT, (void *)0L);
+    mp->negscaleObj = GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limitsscale_cb, &mp->limit.servoscale_neg);
+    y += height;
     //Row 6
     GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Subtrim:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &mp->limit.subtrim);

@@ -368,12 +368,8 @@ Sécurité
 Sécurité:
 :Save
 Sauve
-:Scale1:
-Echelle1:
-:Scale2:
-Echelle2:
-:Scale:
-Echelle
+:Scale%s:
+Echelle%s:
 :Scanner
 Scanner
 :Simple

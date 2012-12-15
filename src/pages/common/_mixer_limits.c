@@ -23,6 +23,7 @@ static void toggle_reverse_cb(guiObject_t *obj, void *data);
 static void _show_titlerow();
 static void _show_limits();
 static const char *set_limits_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_failsafe_cb(guiObject_t *obj, void *data);
@@ -101,6 +102,39 @@ const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
     sprintf(mp->tmpstr, "%d", value);
     return mp->tmpstr;
 }
+const char *scalestring_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    u8 idx = (long)data;
+    sprintf(mp->tmpstr, _tr("Scale%s:"), idx ? "+" : "-");
+    return mp->tmpstr;
+}
+
+
+const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 *ptr = (u8 *)data;
+    int value = *ptr;
+    u8 isCurrentItemChanged = 0;
+    if(ptr == &mp->limit.servoscale_neg && *ptr == 0)
+        value = mp->limit.servoscale;
+    value = GUI_TextSelectHelper(value, 1, 250, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
+    if (isCurrentItemChanged) {
+        *ptr = value;
+        if (ptr == &mp->limit.servoscale) {
+            if (mp->limit.servoscale_neg == 0)
+                GUI_Redraw(mp->negscaleObj);
+        } else {
+            if (value == mp->limit.servoscale)
+                *ptr = 0;
+        }
+        mp->are_limits_changed = 1;
+    }
+    sprintf(mp->tmpstr, "%d", value);
+    return mp->tmpstr;
+}
+
 
 const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
