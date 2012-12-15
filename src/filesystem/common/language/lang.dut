@@ -91,6 +91,7 @@ Kalibreren
 :Cancel
 Annuleren
 >:Celsius
+>:Center PW
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Kan
@@ -121,6 +122,7 @@ DR
 >:Deadband
 :Default
 Standaard
+>:Delta PW
 :Deviation FW version:
 Deviation FW Versie:
 >:Dimmer target:
@@ -159,6 +161,7 @@ Vast
 :Fixed ID:
 Vast ID:
 >:Foot
+>:Frame Size
 :GEAR
 GEA
 >:GPS
@@ -170,6 +173,7 @@ Helikopter
 Hoog
 :Icon
 Icoon
+>:Icon:
 >:Input monitor
 :Input:
 Invoer:
@@ -207,16 +211,18 @@ MIX2
 >:Main page
 :Main page config
 Configuratie hoofdscherm
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 >:Menu
 >:Meter
 :Mid-Rate
 Middel
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Mixer
 :Mixers:
@@ -247,6 +253,7 @@ Geen trims
 Geen
 :Normal
 Normaal
+>:Notch PW
 :Off
 Uit
 :Offset:
@@ -369,6 +376,7 @@ TRIM_R-
 >:TelemRPM
 >:TelemT
 >:TelemV
+>:Telemetry
 >:Telemetry config
 >:Telemetry monitor
 >:Telemetry settings
@@ -440,6 +448,8 @@ Nul/Max
 +
 :countdown
 Aftellen
+>:is not supported
+>:is turned off
 >:max
 >:min
 :mult

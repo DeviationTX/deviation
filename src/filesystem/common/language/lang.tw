@@ -99,6 +99,7 @@
 取消
 :Celsius
 攝氏
+>:Center PW
 :Center all \nsticks and knobs\nthen press ENT
 所有搖桿置中\n按 ENT 開始進行
 :Ch
@@ -136,6 +137,7 @@
 死區
 :Default
 預設
+>:Delta PW
 :Deviation FW version:
 Deviation 韌體版本：
 :Dimmer target:
@@ -179,6 +181,7 @@ FMOD2
 固定ID:
 :Foot
 英呎
+>:Frame Size
 >:GEAR
 >:GPS
 :Generic settings
@@ -233,18 +236,20 @@ FMOD2
 >:Main page
 :Main page config
 螢幕排列規畫
-:Max:
-輸出上限:
+>:Max Limit:
+<:Max:
+<輸出上限:
 :Menu
 快顯
 :Meter
 公尺
 :Mid-Rate
 中位
+>:Min Limit:
 :Min/Max
 上/下限
-:Min:
-輸出下限:
+<:Min:
+<輸出下限:
 :Mixer
 混控器
 :Mixers:
@@ -281,6 +286,7 @@ FMOD2
 無
 :Normal
 正常的
+>:Notch PW
 :Off
 關閉
 :Offset:
@@ -418,6 +424,7 @@ FMOD2
 遠端溫
 :TelemV
 遠端電
+>:Telemetry
 :Telemetry config
 遙測規畫
 :Telemetry monitor
@@ -505,6 +512,8 @@ FMOD2
 加上
 :countdown
 倒數
+>:is not supported
+>:is turned off
 >:max
 >:min
 :mult

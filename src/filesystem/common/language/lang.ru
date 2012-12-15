@@ -225,6 +225,7 @@ F°
 Фиксированный ID:
 :Foot
 Фут
+>:Frame Size
 :GEAR
 Шасси
 :GPS
@@ -291,8 +292,9 @@ GPS
 Главная страница
 :Main page config
 Главная страница
-:Max:
-Макс.:
+>:Max Limit:
+<:Max:
+<Макс.:
 :Menu
 Меню
 :Meter
@@ -301,10 +303,11 @@ GPS
 Ср.расход
 |devo8:Mid-Rate
 Средний расход
+>:Min Limit:
 :Min/Max
 Мин/Макс
-:Min:
-Мин.:
+<:Min:
+<Мин.:
 :Mixer
 Микшер
 :Mixers:

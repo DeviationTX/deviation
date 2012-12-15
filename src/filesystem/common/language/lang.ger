@@ -89,6 +89,7 @@ Kalibrieren
 :Cancel
 Abbruch
 >:Celsius
+>:Center PW
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 K
@@ -117,6 +118,7 @@ Kurve:
 >:Deadband
 :Default
 Default
+>:Delta PW
 :Deviation FW version:
 Deviation FW version:
 >:Dimmer target:
@@ -155,6 +157,7 @@ Fest
 :Fixed ID:
 Fixe ID:
 >:Foot
+>:Frame Size
 :GEAR
 FAHR
 >:GPS
@@ -166,6 +169,7 @@ Heli
 Hoch
 :Icon
 Bild
+>:Icon:
 >:Input monitor
 :Input:
 Eingabe:
@@ -203,16 +207,18 @@ MIX2
 >:Main page
 :Main page config
 Hauptseitenkonfiguration
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 >:Menu
 >:Meter
 :Mid-Rate
 Mittel
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Mixers:
 >:Mixers:
@@ -242,6 +248,7 @@ Keine Trimmung
 Kein
 :Normal
 Normal
+>:Notch PW
 :Off
 Aus
 :Offset:
@@ -361,6 +368,7 @@ TRIM_R-
 >:TelemRPM
 >:TelemT
 >:TelemV
+>:Telemetry
 >:Telemetry config
 >:Telemetry monitor
 >:Telemetry settings
@@ -431,6 +439,8 @@ Zero/Max
 +
 :countdown
 Countdown
+>:is not supported
+>:is turned off
 >:max
 >:min
 :mult

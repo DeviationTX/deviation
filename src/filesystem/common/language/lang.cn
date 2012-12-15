@@ -100,6 +100,7 @@ CYC
 取消
 :Celsius
 摄氏
+>:Center PW
 :Center all \nsticks and knobs\nthen press ENT
 将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
@@ -138,6 +139,7 @@ CCPM3
 死区
 :Default
 缺省
+>:Delta PW
 :Deviation FW version:
 Deviation固件版本:
 :Dimmer target:
@@ -181,6 +183,7 @@ FMOD2
 固定ID码
 :Foot
 英尺
+>:Frame Size
 :GEAR
 尾舵
 >:GPS
@@ -239,18 +242,20 @@ LCD设置
 主页面
 :Main page config
 定制主页面
-:Max:
-最大舵量
+>:Max Limit:
+<:Max:
+<最大舵量
 :Menu
 快捷菜单
 :Meter
 米
 :Mid-Rate
 3D飞行1
+>:Min Limit:
 :Min/Max
 最低/最高
-:Min:
-最小舵量
+<:Min:
+<最小舵量
 :Mixer
 混控
 :Mixers:
@@ -287,6 +292,7 @@ LCD设置
 无
 :Normal
 正常
+>:Notch PW
 :Off
 关闭
 :Offset:
@@ -427,6 +433,7 @@ LCD设置
 温度
 :TelemV
 电压
+>:Telemetry
 :Telemetry config
 双向回传设置
 :Telemetry monitor
@@ -511,6 +518,8 @@ LCD设置
 附加
 :countdown
 倒计时
+>:is not supported
+>:is turned off
 :max
 最大
 :min

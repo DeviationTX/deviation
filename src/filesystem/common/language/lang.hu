@@ -201,6 +201,7 @@ Fix
 Fix ID:
 :Foot
 Láb
+>:Frame Size
 :GEAR
 GEAR
 :GPS
@@ -263,18 +264,20 @@ Főmenü
 Főablak
 :Main page config
 Főablak konfig.
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 :Menu
 Menü
 :Meter
 Méter
 :Mid-Rate
 Közepes
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Mixer
 :Mixers:

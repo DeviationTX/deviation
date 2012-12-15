@@ -107,6 +107,7 @@ Calibrare efectuată.
 Anulează
 :Celsius
 Celsius
+>:Center PW
 :Center all \nsticks and knobs\nthen press ENT
 Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 :Ch
@@ -145,6 +146,7 @@ DR
 Bandă moartă
 :Default
 Default
+>:Delta PW
 :Deviation FW version:
 Deviation fw. versiune:
 :Dimmer target:
@@ -189,6 +191,7 @@ Fix
 ID Fix:
 :Foot
 Picior
+>:Frame Size
 :GEAR
 GEAR
 :GPS
@@ -203,6 +206,7 @@ Elicopter
 Pos0
 :Icon
 Icon
+>:Icon:
 :Input monitor
 Monitor intrări
 :Input:
@@ -249,18 +253,20 @@ Meniu principal
 Pagina principală
 :Main page config
 Ecran principal
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 :Menu
 Meniu
 :Meter
 Metru
 :Mid-Rate
 Pos1
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Configurare mixer
 :Mixers:
@@ -297,6 +303,7 @@ nimic
 nimic
 :Normal
 Normal
+>:Notch PW
 :Off
 Oprit
 :Offset:
@@ -439,6 +446,7 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
+>:Telemetry
 :Telemetry config
 Telemetrie
 :Telemetry monitor
@@ -527,6 +535,8 @@ Zero/Max
 aditiv
 :countdown
 countdown
+>:is not supported
+>:is turned off
 :max
 max
 :min

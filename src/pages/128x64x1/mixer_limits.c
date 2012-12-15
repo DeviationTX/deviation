@@ -91,7 +91,7 @@ static void _show_limits()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Min:"));
+            &labelDesc, NULL, NULL, _tr("Min Limit:"));
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.min);
@@ -99,7 +99,7 @@ static void _show_limits()
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
     GUI_CreateLabelBox(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y), w, ITEM_HEIGHT,
-            &labelDesc, NULL, NULL, _tr("Max:"));
+            &labelDesc, NULL, NULL, _tr("Max Limit:"));
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.max);

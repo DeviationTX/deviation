@@ -1,6 +1,10 @@
 ﻿Afrikaans
+:# Channels:
+Antal Kanale:
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, veilige waarde = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%s %d%%,\nveilige waarde = %d%%
 :1-to-1
 1-tot-1
 :11 Point
@@ -15,12 +19,14 @@
 4 binne
 :4 Outside
 4 buite
-:4Ch w Dual-Rates
+:4Ch w/ Dual-Rates
 4k met DR
 :5 Point
 5 Punt
+>:5+1
 :6 Trims
 6 Trim
+>:6+1
 :6Ch Airplane
 6K Vliegtuig
 :6Ch Helicopter
@@ -31,10 +37,6 @@
 8 Balke
 :9 Point
 9 Punt
-:< 0
-< 0
-:> 0
-> 0
 :ABSVAL
 AbsWrde
 :AIL
@@ -42,62 +44,80 @@ AIL
 :AIL DR
 AIL DR
 >:AIL Inv:
+>:AIL Mix:
 >:AUX4
 >:AUX5
+>:About Deviation
 :Airplane
 Vliegtuig
+>:Alarm
+>:Altitude
 :Backlight:
 Skermlig:
 :Bar %d:
 Balk %d:
 :Bars:
 Balke:
-:Battery Alarm:
-Bat Alarm:
+>:Batt alarm:
+>:Battery alarm:
+>:Battery too low,\ncan't save!
 :Bind
 Bind
 :Binding
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bind in proses...\nMaak seker die model is aan!\n\nOK sal nie die proses stop nie,\maar sal volle beheer toelaat van die Tx.
+>:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Kassie %d:
-:Buttons
-Knoppies
+>:Button monitor
+>:Buzz volume:
 >:COL
+>:COL Inv
 :COL Inv:
 KOL Inv:
+>:COL Limit
+>:COL Mix:
 :CYC
 transalte transalte
-TAUM
 :Calibrate
 Kalibreer
+>:Calibration done.
 :Cancel
 Kanselleer
-:Center all sticks and touch the screen
-Senter stokke en kliek die skerm
+>:Celsius
+>:Center PW
+>:Center all \nsticks and knobs\nthen press ENT
 :Ch
 K
+>:Chan mode
 :Change
 Verander
-:Channels
-Kanale
+>:Channel monitor
+>:Channel output
 :Complex
 Komplex
 :Configure
 Konfigureer
+>:Contrast:
+>:Copy To
 :Copy To...
 Kopieer na...
+>:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Kurwe:
 >:Cyclic1
 >:Cyclic2
 >:Cyclic3
 >:DR
+>:Deadband
 :Default
 Default
-:Deviation FW\nversion: 
-Deviation FW\nVersion:
+>:Delta PW
+>:Deviation FW version:
+>:Dimmer target:
+>:Dimmer time:
+>:Dn
 :Down
 Af
 :ELE
@@ -106,6 +126,7 @@ ELE
 ELE DR
 :ELE Inv:
 ELE Inv:
+>:ELE Mix:
 :EXPO
 Expo
 :Enter
@@ -120,44 +141,54 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
+>:Fahren
 :Failsafe:
 Falingveilig:
 :File:
 Lêer:
-:Filesystem could not be mounted. Create the FS via USB, then press 'ENT' to exit.
-Lêerstelsel nie gevind. Installeer deur  USB poort, kliek dan 'ENT' om te voltooi.
 :Fixed
 Vaste
 :Fixed ID:
 Vaste ID:
+>:Foot
+>:Frame Size
 :GEAR
 Wiele
+>:GPS
+>:Generic settings
+>:Heli
 :Helicopter
 Helikopter
 :High-Rate
 Hoë tempo
 :Icon
 Icon
+>:Icon:
+>:Input monitor
 :Input:
 Inset:
-:Inputs
-Insette
+>:Insert
 :Inverted
 Omgekeerd
+>:LCD settings
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
 :Language:
 Taal: 
+>:Latitude
 :Left
 Links
+>:Length:
 :Linked
 Verbind 
 :Load
 Laai
 :Load...
 Laai...
+>:Longitude
+>:Low Battery
 :Low-Rate
 Lae Tempo
 :MIX0
@@ -166,33 +197,37 @@ MIX0
 MIX1
 :MIX2
 MIX2
-:Main Page Config
-Hoofbladsy Opstel 
-:Max:
-Max:
+>:Main menu
+>:Main page
+>:Main page config
+>:Max Limit:
+>:Menu
+>:Meter
 :Mid-Rate
 Mid tempo
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
->:Mixer
+:Mixer
+Menger:
 :Mixers:
 Mengers:
 :Mode %d
 Modus %d
-:Model
-Modell
-:Model Name:
+>:Model menu
+:Model name:
 Model name:
-:Model Type:
+>:Model setup
+:Model type:
 Model tipe:
-:Move each stick to full max\nand min values then back to center.\nTouch the screen when finished
-Beweeg elke stok na maksimum, dan \nminimum, dan senter. \nRaak skerm wanneer gedoen
+>:Move Down
+>:Move Up
+>:Move sticks and knobs\nto Max & Min positions\nthen press ENT
 :Mux:
 Mux:
 :Neg
 Neg
+>:New
 :No Bars
 Geen balke 
 :No Trim
@@ -203,44 +238,54 @@ Geen Trim
 Geen
 :Normal
 Normal
-:Number of Channels:
-Antal Kanale:
-:OK
-OK
+>:Notch PW
 :Off
 Af
 :Offset:
 Afset:
+>:Ok
 :On
 Aan
 :Page:
 Bladsy:
+>:Plane
 :Point:
 Punk:
 :Pos
 +
 :Pos/Neg:
 +/-:
-:Press 'Ent' to turn USB Filesystem: 
-'Druk 'ENT' vir USB aan: 
+>:Prealert intvl:
+>:Prealert time:
+:Press 'Ent' to turn USB Filesystem:
+'Druk 'ENT' vir USB aan:
+>:Press ENT to change:
+>:Press ENT to copy to:
+>:Press ENT to load:
+>:Press ENT to turn \nUSB drive:
+>:Preview: Long-Press ENT
 :Protocol:
 Protokol:
 :RIGHT_H
 REGS_H
 :RIGHT_V
 REGS_V
+>:RPM
+>:RPM:
 :RUD
 RUD
 :RUD DR
 RUD DR
 :Re-Init
 Her-ini
+>:Remove
 :Reset
 Reset
 :Reverse:
 Omkeer:
 :Reversed
 Omgekeerd
+>:Revert
 :Right
 Regs
 >:Safe Val:
@@ -257,13 +302,17 @@ Skandeer
 :Simple
 Eenvoudig
 >:Simple 4 Channel
+>:Speed
+>:Speed:
 :Src
 Bron
 :Src:
 Bron:
 :Start:
 Begin:
-:Stick Mode:
+>:Step:
+>:Stick input
+:Stick mode:
 Stok mode:
 :Sticks:
 Stokke:
@@ -271,6 +320,7 @@ Stokke:
 Sub trim:
 :SwashType:
 Swash tipe:
+>:Switch %d:
 :Switch1
 Skakelaar1
 :Switch2
@@ -305,30 +355,43 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
+>:TelemRPM
+>:TelemT
+>:TelemV
+>:Telemetry
+>:Telemetry config
+>:Telemetry monitor
+>:Telemetry settings
+>:Temp
+>:Temp:
+>:Temperature:
 :Template..
 Voorbeeld..
 :Test
 Toets
+>:Time
 :Timer
 Tydhouer
-:Timer1
-Tydhouer1
-:Timer2
-Tydhouer2
+>:Timer settings
+:Timer%d:
+Tydhouer%d:
+>:Timers
+>:Timeup intvl:
 :Toggle%d
 Swaai%d
 :Touch Calibrate
 Skerm kalibrasie 
-:Touch Screen:
-Raakskerm:
 :Touch Test
 Raakskerm toets
+>:Touch screen:
 :Touch target %d
 Raak teiken %d
 :Touch to Lock
 Raak om te sluit
 :Touch to Unlock
 Raak om te ontsluit
+>:Transmitter config
+>:Transmitter menu
 :Trim
 Trim
 :Trim +:
@@ -337,25 +400,27 @@ Trim +:
 Trim -:
 :Trim Step:
 Trim stap:
+>:Trims
 :Trims:
 Trims:
 :Turn Off
 Sit Af
 :Turn On
 Sit Aan
-:Tx Power:
+:Tx power:
 Sendkrag:
 :USB
 USB
-:USB Storage mode, press 'ENT' to exit.
-USB stoor mode, druk 'ENT' om te voltooi.
 :Unknown
 Onbekend
 :Up
 Op
 :Value:
 Waarde:
+>:Vibration:
 >:Virt
+>:Volt
+>:Volt:
 :Zero/Max
 Zero/Max
 :\n\nBinding will end in %d seconds...
@@ -364,6 +429,10 @@ Zero/Max
 +
 :countdown
 Countdown
+>:is not supported
+>:is turned off
+>:max
+>:min
 :mult
 *
 :replace

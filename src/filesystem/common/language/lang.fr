@@ -107,6 +107,7 @@ Calibration terminée.\nAppuyer sur ENT\n pour continuer.
 Annuler
 :Celsius
 °C
+>:Center PW
 :Center all \nsticks and knobs\nthen press ENT
 Centrer tous les sticks\net potentiomètres AUX,\n puis presser ENT
 :Ch
@@ -145,6 +146,7 @@ DR
 Deadband
 :Default
 Défaut
+>:Delta PW
 :Deviation FW version:
 Deviation FW version
 :Dimmer target:
@@ -189,6 +191,7 @@ Fixe
 ID fixe
 :Foot
 Pied
+>:Frame Size
 :GEAR
 GEAR
 :GPS
@@ -250,18 +253,20 @@ Menu principal
 Ecran d'accueil
 :Main page config
 Conf. écran accueil
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 :Menu
 Menu
 :Meter
 Mètre
 :Mid-Rate
 Déb. Med
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Mixer
 :Mixers:
@@ -298,6 +303,7 @@ Pas de Trim
 Néant
 :Normal
 Normal
+>:Notch PW
 :Off
 Arrêt
 :Offset:
@@ -440,6 +446,7 @@ Télém.T/mn
 Télém.T°
 :TelemV
 Télém.V
+>:Telemetry
 :Telemetry config
 Config. Télémétrie
 :Telemetry monitor
@@ -528,6 +535,8 @@ Volt:
 ajouter
 :countdown
 A rebours
+>:is not supported
+>:is turned off
 :max
 max
 :min

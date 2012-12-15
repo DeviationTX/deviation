@@ -99,6 +99,7 @@ Calibrazione completata.
 Cancella
 :Celsius
 Celsius
+>:Center PW
 :Center all \nsticks and knobs\nthen press ENT
 Centra tutti gli\nsticks e le manopole\nquindi premi ENT 
 :Ch
@@ -134,6 +135,7 @@ DR
 Zona morta
 :Default
 Default
+>:Delta PW
 :Deviation FW version:
 Versione del FW Deviation:
 :Dimmer target:
@@ -177,6 +179,7 @@ Fisso
 ID Fisso:
 :Foot
 Piede
+>:Frame Size
 :GEAR
 CARRELLO
 :GPS
@@ -191,6 +194,7 @@ Elicottero
 Rate Alto
 :Icon
 Icona
+>:Icon:
 >:Input monitor
 :Input:
 Ingresso:
@@ -235,17 +239,19 @@ Menù principale
 >:Main page
 :Main page config
 Pagina di Configurazione
-:Max:
-Max:
+>:Max Limit:
+<:Max:
+<Max:
 >:Menu
 :Meter
 Metro
 :Mid-Rate
 Rate Medio
+>:Min Limit:
 :Min/Max
 Min/Max
-:Min:
-Min:
+<:Min:
+<Min:
 :Mixer
 Mixer
 :Mixers:
@@ -281,6 +287,7 @@ No Trims
 Nessuno
 :Normal
 Normale
+>:Notch PW
 :Off
 Off
 :Offset:
@@ -422,6 +429,7 @@ TelemRPM
 TelemT
 :TelemV
 TelemV
+>:Telemetry
 :Telemetry config
 Config. etlemetria
 :Telemetry monitor
@@ -505,6 +513,8 @@ Volt
 aggiungi
 :countdown
 countdown
+>:is not supported
+>:is turned off
 :max
 max
 :min

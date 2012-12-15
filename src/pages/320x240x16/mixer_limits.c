@@ -40,11 +40,11 @@ static void _show_limits()
     mp->safeValObj = GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_safeval_cb, NULL);
     y += height;
     //Row 5
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min:"));
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Min Limit:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.min);
     y += height;
     //Row 6
-    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Max:"));
+    GUI_CreateLabel(8, y, NULL, DEFAULT_FONT, _tr("Max Limit:"));
     GUI_CreateTextSelect(128, y, TEXTSELECT_96, 0x0000, NULL, set_limits_cb, &mp->limit.max);
     y += height;
     //Row 5
