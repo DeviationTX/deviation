@@ -62,7 +62,7 @@ Alarme
 :Altitude
 Altitude
 :Backlight:
-Intensité
+Luminosité
 :Bar %d:
 Barre %d:
 :Bars:
@@ -107,7 +107,8 @@ Calibration terminée.\nAppuyer sur ENT\n pour continuer.
 Annuler
 :Celsius
 °C
->:Center PW
+:Center PW
+Imp. Neutre
 :Center all \nsticks and knobs\nthen press ENT
 Centrer tous les sticks\net potentiomètres AUX,\n puis presser ENT
 :Ch
@@ -146,11 +147,12 @@ DR
 Deadband
 :Default
 Défaut
->:Delta PW
+:Delta PW
+Delta Imp. 
 :Deviation FW version:
 Deviation FW version
 :Dimmer target:
-Intens. veille
+Lum. veille
 :Dimmer time:
 Veille après
 :Dn
@@ -191,7 +193,8 @@ Fixe
 ID fixe
 :Foot
 Pied
->:Frame Size
+:Frame Size
+Larg. Signal
 :GEAR
 GEAR
 :GPS
@@ -206,7 +209,8 @@ Helicoptère
 Petit Déb.
 :Icon
 Icône
->:Icon:
+:Icon:
+Icône
 :Input monitor
 Ctrl. des entrées
 :Input:
@@ -253,7 +257,8 @@ Menu principal
 Ecran d'accueil
 :Main page config
 Conf. écran accueil
->:Max Limit:
+:Max Limit:
+Limite Max
 <:Max:
 <Max:
 :Menu
@@ -262,11 +267,10 @@ Menu
 Mètre
 :Mid-Rate
 Déb. Med
->:Min Limit:
+:Min Limit:
+Limite Min
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mixer
 :Mixers:
@@ -303,7 +307,8 @@ Pas de Trim
 Néant
 :Normal
 Normal
->:Notch PW
+:Notch PW
+Imp. Fin
 :Off
 Arrêt
 :Offset:
@@ -446,7 +451,8 @@ Télém.T/mn
 Télém.T°
 :TelemV
 Télém.V
->:Telemetry
+:Telemetry
+Télémétrie
 :Telemetry config
 Config. Télémétrie
 :Telemetry monitor
@@ -535,8 +541,10 @@ Volt:
 ajouter
 :countdown
 A rebours
->:is not supported
->:is turned off
+:is not supported
+Non supporté
+:is turned off
+éteint
 :max
 max
 :min
