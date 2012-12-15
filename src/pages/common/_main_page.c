@@ -60,7 +60,10 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 const char *voltage_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
-    sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
+    if (mp->battery > 1000)  // bug fix: any value lower than 1v means the DMA reading is not ready
+        sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
+    else
+        mp->tmpstr[0] = 0;
     return mp->tmpstr;
 }
 
