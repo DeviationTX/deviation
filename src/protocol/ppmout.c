@@ -27,22 +27,21 @@ u8 num_channels;
            The current implementation just bit-bangs the output.
            It works fine but is less efficient
 */
-#ifdef EMULATOR
-#define PERIOD 3000
-#else
-#define PERIOD 22500
+#ifndef EMULATOR
 #define BITBANG_PPM
 #endif
 static const char *ppm_opts[] = {
   _tr_noop("Center PW"),  "1000", "1800", NULL,
   _tr_noop("Delta PW"),   "100", "700", NULL,
   _tr_noop("Notch PW"),   "100", "500", NULL,
+  _tr_noop("Period FW"),   "20000", "22500", NULL,
   NULL
 };
 enum {
     CENTER_PW,
     DELTA_PW,
     NOTCH_PW,
+    PERIOD_PW,
 };
 
 volatile u8 state;
@@ -71,8 +70,9 @@ static u16 ppmout_cb()
         if(state == num_channels * 2 + 1) {
             state = 0;
             if (num_channels > 9)
-                return PERIOD + (num_channels - 9) * 2000 - accum;
-            return PERIOD - accum;
+                return num_channels > 9
+                       ? Model.proto_opts[PERIOD_FW] + (num_channels - 9) * 2000 - accum
+                       : Model.proto_opts[PERIOD_FW] - accum;
         }
         val = pulses[state / 2];
     } else {
@@ -88,7 +88,11 @@ static u16 ppmout_cb()
 {
     build_data_pkt();
     PPM_Enable(Model.proto_opts[NOTCH_PW], pulses); //400us 'flat notch'
-    return PERIOD;
+#ifdef EMULATOR
+    return 3000;
+#else
+    return Model.proto_opts[PERIOD_PW];
+#endif
 }
 #endif
 
@@ -101,6 +105,7 @@ static void initialize()
         Model.proto_opts[CENTER_PW] = 1100;
         Model.proto_opts[DELTA_PW] = 400;
         Model.proto_opts[NOTCH_PW] = 400;
+        Model.proto_opts[PERIOD_PW] = 22500;
     }
     
     state = 0;
@@ -120,6 +125,7 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
                 Model.proto_opts[CENTER_PW] = 1100;
                 Model.proto_opts[DELTA_PW] = 400;
                 Model.proto_opts[NOTCH_PW] = 400;
+                Model.proto_opts[PERIOD_PW] = 22500;
             }
             return ppm_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
