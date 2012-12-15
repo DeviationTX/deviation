@@ -218,6 +218,12 @@ void TELEMETRY_Alarm()
     }
 
     u32 current_time = CLOCK_getms();
+    if (current_time - Telemetry.time[0] > TELEM_ERROR_TIME) {
+        // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
+        alarm &= ~(1 << telem_idx); // clear this set
+        return;
+    }
+
     if (Model.telem_flags & (1 << telem_idx)) {
         if (! (alarm & (1 << telem_idx)) && (value <= Model.telem_alarm_val[telem_idx])) {
             if (alarm_duration[telem_idx] == 0) {
