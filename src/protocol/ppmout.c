@@ -71,8 +71,8 @@ static u16 ppmout_cb()
             state = 0;
             if (num_channels > 9)
                 return num_channels > 9
-                       ? Model.proto_opts[PERIOD_FW] + (num_channels - 9) * 2000 - accum
-                       : Model.proto_opts[PERIOD_FW] - accum;
+                       ? Model.proto_opts[PERIOD_PW] + (num_channels - 9) * 2000 - accum
+                       : Model.proto_opts[PERIOD_PW] - accum;
         }
         val = pulses[state / 2];
     } else {
