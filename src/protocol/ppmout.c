@@ -34,7 +34,7 @@ static const char *ppm_opts[] = {
   _tr_noop("Center PW"),  "1000", "1800", NULL,
   _tr_noop("Delta PW"),   "100", "700", NULL,
   _tr_noop("Notch PW"),   "100", "500", NULL,
-  _tr_noop("Period FW"),   "20000", "22500", NULL,
+  _tr_noop("Frame Size"),   "20000", "22500", NULL,
   NULL
 };
 enum {
