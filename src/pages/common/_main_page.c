@@ -82,6 +82,7 @@ s16 bar_cb(void * data)
 void PAGE_MainEvent()
 {
     int i;
+    int clear_time = 0;
     if (PAGE_GetModal()) {
         if(pagemem.modal_page == 2) {
             PAGE_TelemtestEvent();
@@ -113,7 +114,7 @@ void PAGE_MainEvent()
         } else if (Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM) {
             u32 time = CLOCK_getms();
             if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-                Telemetry.time[0] = 0;
+                clear_time = 1;
                 GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 1));
             } else if(Telemetry.time[0] && mp->boxval[i] != val) {
                 GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 0));
@@ -125,6 +126,8 @@ void PAGE_MainEvent()
             GUI_Redraw(mp->boxObj[i]);
         }
     }
+    if (clear_time)
+        Telemetry.time[0] = 0;
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < 8; i++) {
         if (! mp->barObj[i])
