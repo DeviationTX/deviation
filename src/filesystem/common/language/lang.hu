@@ -113,6 +113,8 @@ Mégsem
 °C
 :Center PW
 Közép imp. hossz
+|devo10:Center PW
+Közép imp.
 :Center all \nsticks and knobs\nthen press ENT
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
@@ -152,7 +154,9 @@ Holtsáv
 :Default
 Default
 :Delta PW
-Impulzus eltérés
+Impulzus kitérés
+|devo10:Delta PW
+Kitérés
 :Deviation FW version:
 Deviation verzió:
 :Dimmer target:
@@ -201,7 +205,10 @@ Fix
 Fix ID:
 :Foot
 Láb
->:Frame Size
+:Frame Size
+Keret hossza
+|devo10:Frame Size
+Keret
 :GEAR
 GEAR
 :GPS
@@ -264,20 +271,18 @@ Főmenü
 Főablak
 :Main page config
 Főablak konfig.
->:Max Limit:
-<:Max:
-<Max:
+:Max Limit:
+Max korlát:
 :Menu
 Menü
 :Meter
 Méter
 :Mid-Rate
 Közepes
->:Min Limit:
+:Min Limit:
+Min korlát:
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mixer
 :Mixers:
@@ -316,6 +321,8 @@ Nincs
 Normál
 :Notch PW
 Szünet hossz
+|devo10:Notch PW
+Szünet
 :Off
 Ki
 :Offset:
