@@ -14,13 +14,13 @@ Canale:
 :3 Point
 3 puncte
 :4 Bars
-4 bare
+4 bări
 :4 Inside
 4 int
 :4 Outside
 4 ext
 :4Ch w/ Dual-Rates
-4 can. + D/R
+4CH + D/R
 :5 Point
 5 puncte
 :5+1
@@ -30,9 +30,9 @@ Canale:
 :6+1
 6+1
 :6Ch Airplane
-6 avion
+6CH avion
 :6Ch Helicopter
-6 canale, elicopter
+6CH, elicopter
 :7 Point
 7 puncte
 :8 Bars
@@ -106,7 +106,7 @@ Calibrare efectuată.
 :Cancel
 Anulează
 :Celsius
-Celsius
+C°
 :Center PW
 Centru PW
 :Center all \nsticks and knobs\nthen press ENT
@@ -156,7 +156,7 @@ Nivel auto
 :Dimmer time:
 Timp auto:
 :Dn
-Js
+Jos
 :Down
 Jos
 :ELE
@@ -182,7 +182,7 @@ FMODE1
 :FMODE2
 FMODE2
 :Fahren
-Fahren
+F°
 :Failsafe:
 Failsafe:
 :File:
@@ -194,7 +194,7 @@ ID Fix:
 :Foot
 Picior
 :Frame Size
-Dimens. frame
+Dim. pachet
 :GEAR
 GEAR
 :GPS
@@ -420,29 +420,29 @@ Simetric.
 :THR
 THR
 :TRIMLH+
-TRIM_BV+
+TRIMSH+
 :TRIMLH-
-TRIM_BV-
+TRIMSH-
 :TRIMLV+
-TRIM_BF+
+TRIMSV+
 :TRIMLV-
-TRIM_BF-
+TRIMSV-
 :TRIMRH+
-TRIM_JV+
+TRIMDH+
 :TRIMRH-
-TRIM_JV-
+TRIMDH-
 :TRIMRV+
-TRIM_JF+
+TRIMDV+
 :TRIMRV-
-TRIM_JF-
+TRIMDV-
 :TRIM_L+
-TRIM_B+
+TRIM_S+
 :TRIM_L-
-TRIM_B-
+TRIM_S-
 :TRIM_R+
-TRIM_J+
+TRIM_D+
 :TRIM_R-
-TRIM_J-
+TRIM_D-
 :TelemRPM
 TelemRPM
 :TelemT
@@ -541,7 +541,7 @@ aditiv
 countdown
 :is not supported
 nu este suportat(ă)
->:is turned off
+:is turned off
 este oprit(ă)
 :max
 max
