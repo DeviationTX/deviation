@@ -294,6 +294,8 @@ GPS
 :Main page config
 Главная страница
 :Max Limit:
+Макс.предел:
+|devo8:Max Limit:
 Макс. предел:
 :Menu
 Меню
@@ -304,6 +306,8 @@ GPS
 |devo8:Mid-Rate
 Средний расход
 :Min Limit:
+Мин.предел:
+|devo8:Min Limit:
 Мин. предел:
 :Min/Max
 Мин/Макс
