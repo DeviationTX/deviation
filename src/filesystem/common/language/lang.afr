@@ -1,6 +1,6 @@
 ﻿Afrikaans
 :# Channels:
-Antal Kanale:
+Aantal Kanale:
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -79,7 +79,8 @@ Bind
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bind in proses...\nMaak seker die model is aan!\n\nOK sal nie die proses stop nie,\maar sal volle beheer toelaat van die Tx.
->:Binding...\n%d seconds\nPress ENT to stop
+:Binding...\n%d seconds\nPress ENT to stop
+Bind...\n%d seconds\n Druk ENT om te stop
 :Box %d:
 Kassie %d:
 :Button monitor
@@ -90,13 +91,14 @@ Buzz Volume:
 KOL
 :COL Inv
 KOL Inv
->:COL Inv:
+:COL Inv:
+KOL Inv:
 :COL Limit
-KOL Lomiet
+KOL Limiet
 :COL Mix:
 KOL Meng
 :CYC
-transalte transalte
+CYC
 :Calibrate
 Kalibreer
 :Calibration done.
@@ -123,12 +125,14 @@ Kanaal Uitset
 Komplex
 :Configure
 Konfigureer
->:Contrast:
+:Contrast:
+Kontras:
 :Copy To
 Kopieër na
 :Copy To...
 Kopieër na..
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Battery amper pap.\nOpstelling is gestoor.\nAlle vêrdere opstellings\nword nie gestoor nie.\n\nLaai battery nou!
 :Curve:
 Kurwe:
 :Cyclic1
@@ -177,7 +181,8 @@ FMOD0
 FMOD1
 :FMODE2
 FMOD2
->:Fahren
+:Fahren
+Beweeg
 :Failsafe:
 Falingveilig:
 :File:
@@ -256,10 +261,12 @@ Hoofbladsy opstel.
 Max limiet:
 :Menu
 Menu
->:Meter
+:Meter
+Meter
 :Mid-Rate
 Mid tempo
->:Min Limit:
+:Min Limit:
+Min Limiet:
 :Min/Max
 Min/Max
 :Mixer
@@ -272,7 +279,8 @@ Modus %d
 Model Menu
 :Model name:
 Model name:
->:Model setup
+:Model setup
+Modelopstelling
 :Model type:
 Model tipe:
 :Move Down
@@ -285,7 +293,8 @@ Beweeg stokke en skakelaars na Max & Min/nDruk dan ENT
 Mux:
 :Neg
 Neg
->:New
+:New
+Nuwe
 :No Bars
 Geen balke 
 :No Trim
@@ -338,8 +347,10 @@ Protokol:
 REGS_H
 :RIGHT_V
 REGS_V
->:RPM
->:RPM:
+:RPM
+RPM
+:RPM:
+RPM:
 :RUD
 RUD
 :RUD DR
@@ -396,8 +407,10 @@ Stokke:
 Sub trim:
 :SwashType:
 Swash tipe:
->:Switch %d:
->:Switch1
+:Switch %d:
+Skakelaar $d
+:Switch1
+Skakelaar1
 :Switch2
 Skakelaar2
 :Switch:
