@@ -240,8 +240,6 @@ Menù principale
 :Main page config
 Pagina di Configurazione
 >:Max Limit:
-<:Max:
-<Max:
 >:Menu
 :Meter
 Metro
@@ -250,8 +248,6 @@ Rate Medio
 >:Min Limit:
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mixer
 :Mixers:

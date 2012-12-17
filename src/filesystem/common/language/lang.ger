@@ -208,8 +208,6 @@ MIX2
 :Main page config
 Hauptseitenkonfiguration
 >:Max Limit:
-<:Max:
-<Max:
 >:Menu
 >:Meter
 :Mid-Rate
@@ -217,8 +215,6 @@ Mittel
 >:Min Limit:
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mixers:
 >:Mixers:

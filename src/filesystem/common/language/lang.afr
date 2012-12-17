@@ -23,10 +23,12 @@ Antal Kanale:
 4k met DR
 :5 Point
 5 Punt
->:5+1
+:5+1
+5+1
 :6 Trims
 6 Trim
->:6+1
+:6+1
+6+1
 :6Ch Airplane
 6K Vliegtuig
 :6Ch Helicopter
@@ -43,24 +45,34 @@ AbsWrde
 AIL
 :AIL DR
 AIL DR
->:AIL Inv:
->:AIL Mix:
->:AUX4
->:AUX5
->:About Deviation
+:AIL Inv:
+:AIL Inv:
+:AIL Mix:
+AIL Meng:
+:AUX4
+AUX4
+:AUX5
+AUX5
+:About Deviation
+Deviation Info
 :Airplane
 Vliegtuig
->:Alarm
->:Altitude
+:Alarm
+Alarm
+:Altitude
+Hoogte
 :Backlight:
 Skermlig:
 :Bar %d:
 Balk %d:
 :Bars:
 Balke:
->:Batt alarm:
->:Battery alarm:
->:Battery too low,\ncan't save!
+:Batt alarm:
+Bat Alarm:
+:Battery alarm:
+Battery Alarm:
+:Battery too low,\ncan't save!
+Battery pap,kan\nnie stoor nie!
 :Bind
 Bind
 :Binding
@@ -70,54 +82,77 @@ Bind in proses...\nMaak seker die model is aan!\n\nOK sal nie die proses stop ni
 >:Binding...\n%d seconds\nPress ENT to stop
 :Box %d:
 Kassie %d:
->:Button monitor
->:Buzz volume:
->:COL
->:COL Inv
-:COL Inv:
-KOL Inv:
->:COL Limit
->:COL Mix:
+:Button monitor
+Knoppie Monitor
+:Buzz volume:
+Buzz Volume:
+:COL
+KOL
+:COL Inv
+KOL Inv
+>:COL Inv:
+:COL Limit
+KOL Lomiet
+:COL Mix:
+KOL Meng
 :CYC
 transalte transalte
 :Calibrate
 Kalibreer
->:Calibration done.
+:Calibration done.
+Kalibrasie Voltooi.
 :Cancel
 Kanselleer
->:Celsius
->:Center PW
->:Center all \nsticks and knobs\nthen press ENT
+:Celsius
+Celsius
+:Center PW
+Center PW
+:Center all \nsticks and knobs\nthen press ENT
+Stokke in middel en\nknoppies af\nDruk dan ENT
 :Ch
 K
->:Chan mode
+:Chan mode
+Kanaal Mode
 :Change
 Verander
->:Channel monitor
->:Channel output
+:Channel monitor
+Kanaal Monitor
+:Channel output
+Kanaal Uitset
 :Complex
 Komplex
 :Configure
 Konfigureer
 >:Contrast:
->:Copy To
+:Copy To
+Kopieër na
 :Copy To...
-Kopieer na...
+Kopieër na..
 >:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 :Curve:
 Kurwe:
->:Cyclic1
->:Cyclic2
->:Cyclic3
->:DR
->:Deadband
+:Cyclic1
+Siklies1
+:Cyclic2
+Siklies2
+:Cyclic3
+Siklies3
+:DR
+DR
+:Deadband
+Dooieband
 :Default
 Default
->:Delta PW
->:Deviation FW version:
->:Dimmer target:
->:Dimmer time:
->:Dn
+:Delta PW
+Delta PW
+:Deviation FW version:
+Deviation Sagteware: 
+:Dimmer target:
+Verdof Teiken: 
+:Dimmer time:
+Verdof tyd:
+:Dn
+Af:
 :Down
 Af
 :ELE
@@ -126,7 +161,8 @@ ELE
 ELE DR
 :ELE Inv:
 ELE Inv:
->:ELE Mix:
+:ELE Mix:
+ELE Meng:
 :EXPO
 Expo
 :Enter
@@ -150,45 +186,58 @@ Lêer:
 Vaste
 :Fixed ID:
 Vaste ID:
->:Foot
->:Frame Size
+:Foot
+Voet
+:Frame Size
+Raam Grootte
 :GEAR
 Wiele
->:GPS
->:Generic settings
->:Heli
+:GPS
+GPS
+:Generic settings
+Generies Opstelling
+:Heli
+Heli
 :Helicopter
 Helikopter
 :High-Rate
 Hoë tempo
 :Icon
-Icon
->:Icon:
->:Input monitor
+Ikoon
+:Icon:
+Ikoon
+:Input monitor
+Inset Monitor
 :Input:
 Inset:
->:Insert
+:Insert
+Enter
 :Inverted
 Omgekeerd
->:LCD settings
+:LCD settings
+LCD Opstelling
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
 :Language:
 Taal: 
->:Latitude
+:Latitude
+Breedteraad
 :Left
 Links
->:Length:
+:Length:
+Lengte:
 :Linked
 Verbind 
 :Load
 Laai
 :Load...
 Laai...
->:Longitude
->:Low Battery
+:Longitude
+Lengtegraad
+:Low Battery
+Battery pap
 :Low-Rate
 Lae Tempo
 :MIX0
@@ -197,11 +246,16 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main menu
->:Main page
->:Main page config
->:Max Limit:
->:Menu
+:Main menu
+Hoof Menu
+:Main page
+Hoofbladsy
+:Main page config
+Hoofbladsy opstel. 
+:Max Limit:
+Max limiet:
+:Menu
+Menu
 >:Meter
 :Mid-Rate
 Mid tempo
@@ -214,15 +268,19 @@ Menger:
 Mengers:
 :Mode %d
 Modus %d
->:Model menu
+:Model menu
+Model Menu
 :Model name:
 Model name:
 >:Model setup
 :Model type:
 Model tipe:
->:Move Down
->:Move Up
->:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+:Move Down
+Beweeg Af
+:Move Up
+Beweeg Op
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Beweeg stokke en skakelaars na Max & Min/nDruk dan ENT
 :Mux:
 Mux:
 :Neg
@@ -238,32 +296,42 @@ Geen Trim
 Geen
 :Normal
 Normal
->:Notch PW
+:Notch PW
+Notch PW
 :Off
 Af
 :Offset:
 Afset:
->:Ok
+:Ok
+Ok
 :On
 Aan
 :Page:
 Bladsy:
->:Plane
+:Plane
+Vlak
 :Point:
 Punk:
 :Pos
 +
 :Pos/Neg:
 +/-:
->:Prealert intvl:
->:Prealert time:
+:Prealert intvl:
+Voorwaarsku per:
+:Prealert time:
+Voorwaarsku tyd:
 :Press 'Ent' to turn USB Filesystem:
 'Druk 'ENT' vir USB aan:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to turn \nUSB drive:
->:Preview: Long-Press ENT
+:Press ENT to change:
+Druk ENT om te Verander:
+:Press ENT to copy to:
+Druk ENT om te kopieër na:
+:Press ENT to load:
+Druk ENT om te laai:
+:Press ENT to turn \nUSB drive:
+Druk ENT vir USB aan:
+:Preview: Long-Press ENT
+Voorskou: Lang-druk ENT
 :Protocol:
 Protokol:
 :RIGHT_H
@@ -278,19 +346,22 @@ RUD
 RUD DR
 :Re-Init
 Her-ini
->:Remove
+:Remove
+Verwyder
 :Reset
 Reset
 :Reverse:
 Omkeer:
 :Reversed
 Omgekeerd
->:Revert
+:Revert
+Verander terug
 :Right
 Regs
->:Safe Val:
+:Safe Val:
+Veiligew:
 :Safety
-VeiligeWaarde
+Veiligheid
 :Safety:
 Veligheid:
 :Save
@@ -301,17 +372,22 @@ Skale%s:
 Skandeer
 :Simple
 Eenvoudig
->:Simple 4 Channel
->:Speed
->:Speed:
+:Simple 4 Channel
+Eenvdge 4 kanaal
+:Speed
+Spoed
+:Speed:
+Spoed:
 :Src
 Bron
 :Src:
 Bron:
 :Start:
 Begin:
->:Step:
->:Stick input
+:Step:
+Stap
+:Stick input
+Stokinset
 :Stick mode:
 Stok mode:
 :Sticks:
@@ -321,8 +397,7 @@ Sub trim:
 :SwashType:
 Swash tipe:
 >:Switch %d:
-:Switch1
-Skakelaar1
+>:Switch1
 :Switch2
 Skakelaar2
 :Switch:
@@ -355,43 +430,60 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
->:Telemetry config
->:Telemetry monitor
->:Telemetry settings
->:Temp
->:Temp:
->:Temperature:
+:TelemRPM
+TelemRPM
+:TelemT
+TelemT
+:TelemV
+TelemV
+:Telemetry
+Telemetry
+:Telemetry config
+Telemetry Opstel
+:Telemetry monitor
+Telemetry monitor
+:Telemetry settings
+Telemetry Opstelling
+:Temp
+Temp
+:Temp:
+Temp:
+:Temperature:
+Temperatuur:
 :Template..
 Voorbeeld..
 :Test
 Toets
->:Time
+:Time
+Tyd
 :Timer
 Tydhouer
->:Timer settings
+:Timer settings
+Tydhoueropstelling
 :Timer%d:
 Tydhouer%d:
->:Timers
->:Timeup intvl:
+:Timers
+Tydhouers
+:Timeup intvl:
+Tydaan periode:
 :Toggle%d
-Swaai%d
+Skakel%d
 :Touch Calibrate
 Skerm kalibrasie 
 :Touch Test
 Raakskerm toets
->:Touch screen:
+:Touch screen:
+Raakskerm:
 :Touch target %d
 Raak teiken %d
 :Touch to Lock
 Raak om te sluit
 :Touch to Unlock
 Raak om te ontsluit
->:Transmitter config
->:Transmitter menu
+:Transmitter config
+Sender Opstelling
+:Transmitter menu
+Sender Menu
 :Trim
 Trim
 :Trim +:
@@ -400,7 +492,8 @@ Trim +:
 Trim -:
 :Trim Step:
 Trim stap:
->:Trims
+:Trims
+Trims
 :Trims:
 Trims:
 :Turn Off
@@ -417,10 +510,14 @@ Onbekend
 Op
 :Value:
 Waarde:
->:Vibration:
->:Virt
->:Volt
->:Volt:
+:Vibration:
+Vibrasie
+:Virt
+Virt
+:Volt
+Volt
+:Volt:
+Volt:
 :Zero/Max
 Zero/Max
 :\n\nBinding will end in %d seconds...
@@ -429,10 +526,14 @@ Zero/Max
 +
 :countdown
 Countdown
->:is not supported
->:is turned off
->:max
->:min
+:is not supported
+word nie ondersteun
+:is turned off
+is afgeskakel
+:max
+max
+:min
+min
 :mult
 *
 :replace

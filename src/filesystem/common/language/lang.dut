@@ -212,8 +212,6 @@ MIX2
 :Main page config
 Configuratie hoofdscherm
 >:Max Limit:
-<:Max:
-<Max:
 >:Menu
 >:Meter
 :Mid-Rate
@@ -221,8 +219,6 @@ Middel
 >:Min Limit:
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mixer
 :Mixers:

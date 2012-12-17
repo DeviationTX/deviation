@@ -23,6 +23,12 @@
 4Ch con DualRate
 :5 Point
 5 Puntos
+:5+1
+5+1
+:6 Trims
+6 Trims
+:6+1
+6+1
 :6Ch Airplane
 Avión 6Ch
 :6Ch Helicopter
@@ -85,8 +91,7 @@ Volumen Altavoz:
 PASO
 :COL Inv
 PASO Inv
-:Collet.Inv.
-Paso Inv.
+>:COL Inv:
 :COL Limit
 Paso Limite
 :COL Mix:
@@ -115,6 +120,8 @@ Cambiar
 Monitor canales
 :Channel output
 Salida de canales
+<:Collet.Inv.
+<Paso Inv.
 :Complex
 Complejo
 :Configure
@@ -123,8 +130,6 @@ Configurar
 Contraste:
 :Copy To
 Copiar a
-:Copy To...
-Copiar a...
 :Copy To...
 Copiar a...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
@@ -169,6 +174,18 @@ Exponencial
 Entrar
 :Exit
 Salir
+:Expo&DR
+Expo&DR
+:FMODE0
+FMOD0
+:FMODE1
+FMOD1
+:FMODE2
+FMOD2
+:Fahren
+Fahren
+:Failsafe:
+Failsafe:
 :File:
 Archivo:
 :Fixed
@@ -229,6 +246,12 @@ Longitud
 Bateria baja
 :Low-Rate
 Valor bajo
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
 :Main menu
 Menú principal
 :Main page
@@ -237,10 +260,6 @@ Página principal
 Página configuración
 :Max Limit:
 Límite max
-<:Max:
-Max:
-<Max:
-Max:
 :Menu
 Menú
 :Meter
@@ -251,8 +270,6 @@ Valor Medio
 Límite Min
 :Min/Max
 Min/Max
-<:Min:
-<Min:
 :Mixer
 Mezclas
 :Mixers:
@@ -275,7 +292,6 @@ Mover Arriba
 Mover sticks y ruedas\na posiciones Max y Min\ny pulsar ENT
 :Mux:
 Mezcla:
-Operazione:
 :Neg
 Neg.
 :New
@@ -306,6 +322,10 @@ Página:
 Avión
 :Point:
 Punto:
+:Pos
+Pos.
+:Pos/Neg:
+Pos/Neg:
 :Prealert intvl:
 Intervalo prealerta:
 :Prealert time:
@@ -328,6 +348,10 @@ Protocolo:
 DERECHA_H
 :RIGHT_V
 DERECHA_V
+:RPM
+RPM
+:RPM:
+RPM:
 :RUD
 COLA
 :RUD DR
@@ -356,8 +380,8 @@ Seguridad:
 Guardar
 :Scale%s:
 Escala%s:
-:Scale:
-Escala:
+<:Scale:
+<Escala:
 :Scanner
 Scanner
 :Simple
@@ -398,6 +422,36 @@ Interruptor:
 Simétrico
 :THR
 ACEL
+:TRIMLH+
+TRIMSO+
+:TRIMLH-
+TRIMSO-
+:TRIMLV+
+TRIMSV+
+:TRIMLV-
+TRIMSV-
+:TRIMRH+
+TRIMDO+
+:TRIMRH-
+TRIMDO-
+:TRIMRV+
+TRIMDV+
+:TRIMRV-
+TRIMDV-
+:TRIM_L+
+TRIM_S+
+:TRIM_L-
+TRIM_S-
+:TRIM_R+
+TRIM_D+
+:TRIM_R-
+TRIM_D-
+:TelemRPM
+TelemRPM
+:TelemT
+TelemT
+:TelemV
+TelemV
 :Telemetry
 Telemetría
 :Telemetry config
@@ -406,6 +460,10 @@ Configuración telemetría
 Monitor telemetría
 :Telemetry settings
 Ajustes telemetría
+:Temp
+Temp
+:Temp:
+Temp:
 :Temperature:
 Temperatura:
 :Template..
@@ -442,92 +500,34 @@ Pulsar para desbloquear
 Configuración emisora
 :Transmitter menu
 Menú Emisora
-:Turn Off
-Apagar
-:Turn On
-Encender
-:Tx power:
-Potencia del TX:
-:countdown
-cuentaatras
-:stopwatch
-cronómetro
-:Up
-Arriba
-:add
-añadir
-:is not supported
-no está soportada
-:is turned off
-está apagado
-:replace
-sustituir
-:Trim Step:
-Trim paso:
-:Unknown
-Desconocido
-:Value:
-Valor:
-:Vibration:
-Vibración
-:\n\nBinding will end in %d seconds...
-\n\nEmparejamiento termina en %d segundos...
-:Pos
-Pos.
-:Pos/Neg:
-Pos/Neg:
-:Temp
-Temp
-:Temp:
-Temp:
-:max
-max
-:min
-min
-:mult
-mult
 :Trim
 Trim
 :Trim +:
 Trim +:
 :Trim -:
 Trim -:
-:USB
-USB
+:Trim Step:
+Trim paso:
 :Trims
 Trims
 :Trims:
 Trims:
-:TRIMLH+
-TRIMSO+
-:TRIMLH-
-TRIMSO-
-:TRIMLV+
-TRIMSV+
-:TRIMLV-
-TRIMSV-
-:TRIMRH+
-TRIMDO+
-:TRIMRH-
-TRIMDO-
-:TRIMRV+
-TRIMDV+
-:TRIMRV-
-TRIMDV-
-:TRIM_L+
-TRIM_S+
-:TRIM_L-
-TRIM_S-
-:TRIM_R+
-TRIM_D+
-:TRIM_R-
-TRIM_D-
-:TelemRPM
-TelemRPM
-:TelemT
-TelemT
-:TelemV
-TelemV
+:Turn Off
+Apagar
+:Turn On
+Encender
+:Tx power:
+Potencia del TX:
+:USB
+USB
+:Unknown
+Desconocido
+:Up
+Arriba
+:Value:
+Valor:
+:Vibration:
+Vibración
 :Virt
 Virt
 :Volt
@@ -536,31 +536,23 @@ Volt
 Volt:
 :Zero/Max
 Zero/Max
-:RPM
-RPM
-:RPM:
-RPM:
-:5+1
-5+1
-:6 Trims
-6 Trims
-:6+1
-6+1
-:Expo&DR
-Expo&DR
-:FMODE0
-FMOD0
-:FMODE1
-FMOD1
-:FMODE2
-FMOD2
-:Fahren
-Fahren
-:Failsafe:
-Failsafe:
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+:\n\nBinding will end in %d seconds...
+\n\nEmparejamiento termina en %d segundos...
+:add
+añadir
+:countdown
+cuentaatras
+:is not supported
+no está soportada
+:is turned off
+está apagado
+:max
+max
+:min
+min
+:mult
+mult
+:replace
+sustituir
+:stopwatch
+cronómetro

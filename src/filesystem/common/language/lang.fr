@@ -259,8 +259,6 @@ Ecran d'accueil
 Conf. écran accueil
 :Max Limit:
 Limite Max
-<:Max:
-<Max:
 :Menu
 Menu
 :Meter
