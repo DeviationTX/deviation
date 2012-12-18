@@ -410,44 +410,6 @@ static u16 dsm2_cb()
     return 0;
 }
 
-static u16 dsmx_cb()
-{
-    if(state < DSM2_CHANSEL) {
-        //Binding
-        state += 1;
-        if(state & 1) {
-            //Send packet on even states
-            //Note state has already incremented,
-            // so this is actually 'even' state
-            CYRF_WriteDataPacket(packet);
-            return 8500;
-        } else {
-            //Check status on odd states
-            CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS);
-            return 1500;
-        }
-    } else if(state < DSM2_CH1_WRITE_A) {
-        cyrf_configdata();
-        CYRF_ConfigRxTx(1);
-        chidx = 0;
-        crcidx = 0;
-        set_sop_data_crc();
-        state = DSM2_CH1_WRITE_A;
-        PROTOCOL_SetBindState(0);  //Turn off Bind dialog
-        return 10000;
-    } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B) {
-        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-        set_sop_data_crc();
-        build_data_packet(state == DSM2_CH1_WRITE_B);
-        CYRF_WriteDataPacket(packet);
-        state = state == DSM2_CH1_WRITE_A && num_channels > 7 ? DSM2_CH1_WRITE_B : DSM2_CH1_WRITE_A;
-        chidx = (chidx + 1) % 23;
-        crcidx = !crcidx;
-        return 7000;
-    } 
-    return 0;
-}
-
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
@@ -514,7 +476,7 @@ static void initialize(u8 bind)
     } else {
         state = DSM2_CHANSEL;
     }
-    CLOCK_StartTimer(10000, dsm2_cb); //Model.protocol == PROTOCOL_DSMX ? dsmx_cb : dsm2_cb);
+    CLOCK_StartTimer(10000, dsm2_cb);
 }
 
 const void *DSM2_Cmds(enum ProtoCmds cmd)
