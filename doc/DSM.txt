@@ -132,3 +132,22 @@ Note: Values are LSB 1st
 8    D7A154B15E89AE86  405632D90FD95D97  C0908FBB7C8E2B8E  88E1D631265FBD40  03BC6E8AEFBDFEF8
 
 
+The DSM-X channel hopping algorithm was found by Alexandr Alexandrov and Sergey Gimaev.
+
+Channel hopping
+DSM-X uses a 23-channel hopping sequence.  The sequence is based upon a unique Tx ID.
+
+The channel hopping algorithm uses an LSR and is computed as follows.
+id_tmp = ID = negate(CYRF MFGID + model #)
+foreach idx in (0 .. 22):
+  ok = 0
+  while(ok is 0):
+     id_tmp = id_tmp * 0x0019660D + 0x3C6EF35F   ## Randomization
+     next_ch = ((id_tmp >> 8) MODULO 0x49) + 3      ## Use least-significant byte and must be larger than 3
+     if (next_ch is odd and ID is odd OR next_ch is even and ID is even)
+       AND none of the values in the 'ch' array are equal to next_ch:
+         if 3 <= tmp < 28 and the number of channels in ch that are between 3 and 28 is < 8
+           OR 28 <= tmp < 52 and the number of channels in ch that are between 28 and 52 is < 7
+           OR 53 <= tmp and the number of channels in ch that are greater than 53 is < 8:
+               ok = 1
+  ch[idx] = next_ch
