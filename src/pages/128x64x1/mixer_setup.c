@@ -164,7 +164,7 @@ static void _show_complex()
     y += space;
     labelDesc.style = LABEL_CENTER;
     mp->itemObj[mp->max_scroll++] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
-            w, ITEM_HEIGHT, &labelDesc, sourceselect_cb, set_source_cb, &mp->cur_mixer->sw);
+            w, ITEM_HEIGHT, &labelDesc, sourceselect_cb, set_drsource_cb, &mp->cur_mixer->sw);
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
