@@ -448,10 +448,10 @@ static u16 dsm2_cb()
                 return 9390;
             }
             state = DSM2_CH1_WRITE_B;
-            return 4800;
+            return 5190;
         }
         state = DSM2_CH1_WRITE_A;
-        return 4800;
+        return 5190;
     } 
     return 0;
 }
