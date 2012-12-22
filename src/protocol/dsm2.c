@@ -446,6 +446,7 @@ static u16 dsm2_cb()
                     return 9390 + 6800;
                 }
             }
+            set_sop_data_crc();
             state = DSM2_CH1_WRITE_B;
             return 5190;
         }
