@@ -395,13 +395,11 @@ static u16 dsm2_cb()
     } else if(state == DSM2_CH1_READ_A) {
         //Read telemetry if needed
         state = DSM2_CH1_WRITE_A;
-        if (num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-            if(CYRF_ReadRegister(0x07) & 0x02) {
-               CYRF_ReadDataPacket(packet);
-               parse_telemetry_packet();
-            }
-            CYRF_ConfigRxTx(1); //Write mode
+        if(CYRF_ReadRegister(0x07) & 0x02) {
+           CYRF_ReadDataPacket(packet);
+           parse_telemetry_packet();
         }
+        CYRF_ConfigRxTx(1); //Write mode
         set_sop_data_crc();
         return 6800;
     } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B
@@ -427,25 +425,26 @@ static u16 dsm2_cb()
         while(! (CYRF_ReadRegister(0x04) & 0x02))
             ;
 
-        if (state == DSM2_CH2_CHECK_A) //Keep transmit power in sync
-            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-
-
-        if (num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-            CYRF_ConfigRxTx(0); //Receive mode
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
-        }
-
         if(Model.protocol == PROTOCOL_DSMX)
             chidx = (chidx + 1) % 23;
         else
             chidx = (chidx + 1) % 2;
         crcidx = !crcidx;
         if (state == DSM2_CH2_CHECK_A) {
+            //Keep transmit power in sync
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
             if (num_channels < 8) {
-                state = DSM2_CH1_READ_A;
-                return 9390;
+                if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+                    CYRF_ConfigRxTx(0); //Receive mode
+                    CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+                    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+                    state = DSM2_CH1_READ_A;
+                    return 9390;
+                } else {
+                    set_sop_data_crc();
+                    state = DSM2_CH1_WRITE_A;
+                    return 9390 + 6800;
+                }
             }
             state = DSM2_CH1_WRITE_B;
             return 5190;
