@@ -50,11 +50,12 @@ enum {
     DSM2_CH1_CHECK_A = BIND_COUNT + 2,
     DSM2_CH2_WRITE_A = BIND_COUNT + 3,
     DSM2_CH2_CHECK_A = BIND_COUNT + 4,
-    DSM2_CH1_WRITE_B = BIND_COUNT + 5,
-    DSM2_CH1_CHECK_B = BIND_COUNT + 6,
-    DSM2_CH2_WRITE_B = BIND_COUNT + 7,
-    DSM2_CH2_CHECK_B = BIND_COUNT + 8,
-    DSM2_CH1_READ_A  = BIND_COUNT + 9,
+    DSM2_CH2_READ_A  = BIND_COUNT + 5,
+    DSM2_CH1_WRITE_B = BIND_COUNT + 6,
+    DSM2_CH1_CHECK_B = BIND_COUNT + 7,
+    DSM2_CH2_WRITE_B = BIND_COUNT + 8,
+    DSM2_CH2_CHECK_B = BIND_COUNT + 9,
+    DSM2_CH2_READ_B  = BIND_COUNT + 10,
 };
    
 static const u8 pncodes[5][9][8] = {
@@ -315,6 +316,12 @@ static void set_sop_data_crc()
     CYRF_ConfigCRCSeed(crcidx ? ~crc : crc);
     CYRF_ConfigSOPCode(pncodes[pn_row][sop_col]);
     CYRF_ConfigDataCode(pncodes[pn_row][data_col], 16);
+    /* setup for next iteration */
+    if(Model.protocol == PROTOCOL_DSMX)
+        chidx = (chidx + 1) % 23;
+    else
+        chidx = (chidx + 1) % 2;
+    crcidx = !crcidx;
 }
 
 static void calc_dsmx_channel()
@@ -354,6 +361,8 @@ static void parse_telemetry_packet()
 {
     if((packet[0] & 0x0f) == 0x0f) {
         Telemetry.volt[2] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
+        Telemetry.time[0] = CLOCK_getms();
+        Telemetry.time[1] = Telemetry.time[0];
     } else if ((packet[0] & 0x0f) == 0x0e) {
         Telemetry.rpm[0] = ((packet[2] << 8) | packet[3]); //In RPM
         if (Telemetry.rpm[0] == 0xffff)
@@ -367,6 +376,9 @@ static void parse_telemetry_packet()
 
 static u16 dsm2_cb()
 {
+#define CH1_CH2_DELAY 4010  // Time between write of channel 1 and channel 2
+#define WRITE_DELAY   1550  // Time after write to verify write complete
+#define READ_DELAY     400  // Time before write to check read state, and switch channels
     if(state < DSM2_CHANSEL) {
         //Binding
         state += 1;
@@ -392,16 +404,6 @@ static u16 dsm2_cb()
         PROTOCOL_SetBindState(0);  //Turn off Bind dialog
         set_sop_data_crc();
         return 10000;
-    } else if(state == DSM2_CH1_READ_A) {
-        //Read telemetry if needed
-        state = DSM2_CH1_WRITE_A;
-        if(CYRF_ReadRegister(0x07) & 0x02) {
-           CYRF_ReadDataPacket(packet);
-           parse_telemetry_packet();
-        }
-        CYRF_ConfigRxTx(1); //Write mode
-        set_sop_data_crc();
-        return 6800;
     } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B
            || state == DSM2_CH2_WRITE_A || state == DSM2_CH2_WRITE_B)
     {
@@ -409,49 +411,58 @@ static u16 dsm2_cb()
             build_data_packet(state == DSM2_CH1_WRITE_B);
         CYRF_WriteDataPacket(packet);
         state++;
-        return 1800;
+        return WRITE_DELAY;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
         while(! (CYRF_ReadRegister(0x04) & 0x02))
             ;
-        if(Model.protocol == PROTOCOL_DSMX)
-            chidx = (chidx + 1) % 23;
-        else
-            chidx = (chidx + 1) % 2;
-        crcidx = !crcidx;
         set_sop_data_crc();
         state++;
-        return 2210;
+        return CH1_CH2_DELAY - WRITE_DELAY;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
         while(! (CYRF_ReadRegister(0x04) & 0x02))
             ;
-
-        if(Model.protocol == PROTOCOL_DSMX)
-            chidx = (chidx + 1) % 23;
-        else
-            chidx = (chidx + 1) % 2;
-        crcidx = !crcidx;
         if (state == DSM2_CH2_CHECK_A) {
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-            if (num_channels < 8) {
-                if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-                    CYRF_ConfigRxTx(0); //Receive mode
-                    CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-                    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
-                    state = DSM2_CH1_READ_A;
-                    return 9390;
-                } else {
-                    set_sop_data_crc();
-                    state = DSM2_CH1_WRITE_A;
-                    return 9390 + 6800;
-                }
-            }
-            set_sop_data_crc();
-            state = DSM2_CH1_WRITE_B;
-            return 5190;
         }
-        state = DSM2_CH1_WRITE_A;
-        return 5190;
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+            state++;
+            CYRF_ConfigRxTx(0); //Receive mode
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
+        } else {
+            set_sop_data_crc();
+            if (state == DSM2_CH2_CHECK_A) {
+                if(num_channels < 8) {
+                    state = DSM2_CH1_WRITE_A;
+                    return 22000 - CH1_CH2_DELAY - WRITE_DELAY;
+                }
+                state = DSM2_CH1_WRITE_B;
+            } else {
+                state = DSM2_CH1_WRITE_A;
+            }
+            return 11000 - CH1_CH2_DELAY - WRITE_DELAY;
+        }
+    } else if(state == DSM2_CH2_READ_A || state == DSM2_CH2_READ_B) {
+        //Read telemetry if needed
+        if(CYRF_ReadRegister(0x07) & 0x02) {
+           CYRF_ReadDataPacket(packet);
+           parse_telemetry_packet();
+        }
+        if (state == DSM2_CH2_READ_A && num_channels < 8) {
+            state = DSM2_CH2_READ_B;
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            return 11000;
+        }
+        if (state == DSM2_CH2_READ_A)
+            state = DSM2_CH1_WRITE_B;
+        else
+            state = DSM2_CH1_WRITE_A;
+        CYRF_ConfigRxTx(1); //Write mode
+        set_sop_data_crc();
+        return READ_DELAY;
     } 
     return 0;
 }
