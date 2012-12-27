@@ -23,14 +23,16 @@ Kanäle:
 4K mit DR
 :5 Point
 5 Punkt
->:5+1
+:5+1
+5+1
 :6 Trims
 6 Trimmungen
->:6+1
+:6+1
+6+1
 :6Ch Airplane
-6-Kanal Flugzeug
+6K Flugzeug
 :6Ch Helicopter
-6-Kanal Heli
+6K Helikopter
 :7 Point
 7 Punkt
 :8 Bars
@@ -44,15 +46,21 @@ QUE
 :AIL DR
 QUE DR
 :AIL Inv:
+QUE Inv:
 :AUX4
->:AIL Mix:
->:AUX4
+AUX4
+:AIL Mix:
+QUE Mix:
 :AUX5
-Airplane
->:About Deviation
->:Airplane
->:Alarm
->:Altitude
+AUX5
+:About Deviation
+:Über Deviation
+:Airplane
+Flugzeug
+:Alarm
+Alarm
+:Altitude
+Höhe
 :Backlight:
 Helligkeit:
 :Bar %d:
@@ -63,67 +71,92 @@ Balken:
 Akkuwarner:
 :Battery alarm:
 Akkuwarner:
->:Battery too low,\ncan't save!
+:Battery too low,\ncan't save!
+Akku zu schwach,\nkann nicht speichern!
 :Bind
 Binden
 :Binding
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.
->:Binding...\n%d seconds\nPress ENT to stop
+:Binding...\n%d seconds\nPress ENT to stop
+:Bindevorgang...\n%d Sekunden\nDrücke ENT zum stoppen
 :Box %d:
 Kasten %d:
->:Button monitor
->:Buzz volume:
+:Button monitor
+Knöpfe Anzeige
+:Buzz volume:
+Buzzer Lautstärke:
 :COL
+COL
+:COL Inv
+COL Inv
+:COL Inv:
 COL Inv:
->:COL Inv
->:COL Inv:
->:COL Limit
->:COL Mix:
+:COL Limit
+COL Limit
+:COL Mix:
+COL Mix:
 :CYC
 TAUM
 :Calibrate
 Kalibrieren
->:Calibration done.
+:Calibration done.
+Kalibrierung abgeschlossen.
 :Cancel
 Abbruch
->:Celsius
->:Center PW
->:Center all \nsticks and knobs\nthen press ENT
+:Celsius
+Celsius
+:Center PW
+Zentriere PW
+:Center all \nsticks and knobs\nthen press ENT
+Zentriere alle \nKnüppel und Schalter\ndann drücke ENT
 :Ch
 K
->:Chan mode
+:Chan mode
+K Modus
 :Change
 Wählen
->:Channel monitor
->:Channel output
+:Channel monitor
+Kanal Anzeige
+:Channel output
+Kanal Ausgabe
 :Complex
 Komplex
 :Configure
 Konfigurieren
->:Contrast:
->:Copy To
+:Contrast:
+Kontrast:
+:Copy To
+Kapiere nach
 :Copy To...
-Kopieren...
->:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Kopiere nach...
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+Kritischer Akkustand erkannt.\nEinstellungen wurden gespeichert.\nAlle nachträglichen Einstellungen\nwerden NICHT gespeichert.\n\nAkku umgehend wechseln!
 :Curve:
 Kurve:
 :Cyclic1
+Cyclic1
 :Cyclic2
->:Cyclic2
+Cyclic2
 :Cyclic3
+Cyclic3
 :DR
->:DR
->:Deadband
+DR
+:Deadband
+Deadband
 :Default
-Default
->:Delta PW
+Standard
+:Delta PW
+Delta PW
 :Deviation FW version:
-Deviation FW version:
->:Dimmer target:
->:Dimmer time:
->:Dn
+Deviation FW Version:
+:Dimmer target:
+Dimmer target:
+:Dimmer time:
+Dimmer time:
+:Dn
+Dn
 :Down
 Runter
 :ELE
@@ -131,10 +164,11 @@ HOE
 :ELE DR
 HOE DR
 :ELE Inv:
-FIXME
->:ELE Mix:
+HOE Inv:
+:ELE Mix:
+HOE Mix:
 :EXPO
-Expo
+EXPO
 :Enter
 Eingabe
 :Exit
@@ -142,12 +176,13 @@ Beenden
 :Expo&DR
 Expo&DR
 :FMODE0
-FMOD0
+FMODE0
 :FMODE1
-FMOD1
+FMODE1
 :FMODE2
-FMOD2
->:Fahren
+FMODE2
+:Fahren
+Fahren
 :Failsafe:
 Ausfallschutz:
 :File:
@@ -155,46 +190,59 @@ Datei:
 :Fixed
 Fest
 :Fixed ID:
-Fixe ID:
->:Foot
->:Frame Size
+Feste ID:
+:Foot
+Fuß
+:Frame Size
+Rahmen Größe
 :GEAR
-FAHR
->:GPS
->:Generic settings
->:Heli
-:Helicopter
+FAHRWERK
+:GPS
+GPS
+:Generic settings
+Allgemeine Einstellungen
+:Heli
 Heli
+:Helicopter
+Helikopter
 :High-Rate
 Hoch
 :Icon
 Bild
->:Icon:
->:Input monitor
+:Icon:
+Bild:
+:Input monitor
+Eingabe Anzeige
 :Input:
 Eingabe:
->:Insert
+:Insert
+Einfügen
 :Inverted
 Umgekehrt
->:LCD settings
+:LCD settings
+LCD Einstellungen
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
 :Language:
 Sprache:
->:Latitude
+:Latitude
+Breite
 :Left
 Links
->:Length:
+:Length:
+Länge:
 :Linked
 Verknüpft
 :Load
 Lade
 :Load...
 Laden...
->:Longitude
->:Low Battery
+:Longitude
+Länge
+:Low Battery
+Akku schwach
 :Low-Rate
 Niedrig
 :MIX0
@@ -203,37 +251,50 @@ MIX0
 MIX1
 :MIX2
 MIX2
->:Main menu
->:Main page
+:Main menu
+Hauptmenü
+:Main page
+Startseite
 :Main page config
-Hauptseitenkonfiguration
->:Max Limit:
->:Menu
->:Meter
+Startseitenkonfiguration
+:Max Limit:
+Max Limit:
+:Menu
+Menü
+:Meter
+Meter
 :Mid-Rate
 Mittel
->:Min Limit:
+:Min Limit:
+Min Limit:
 :Min/Max
 Min/Max
 :Mixer
+Mixer
+:Mixers:
 Mixers:
->:Mixers:
 :Mode %d
 Modus %d
->:Model menu
+:Model menu
+Modell Menü
 :Model name:
 Modellname:
->:Model setup
+:Model setup
+Model Einstellungen
 :Model type:
 Modelltyp:
->:Move Down
->:Move Up
->:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+:Move Down
+Nach unten
+:Move Up
+Nach oben
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+Bewege die Knüppel und Schalter\nin die Max & Min Positionen\nDann drücke ENT
 :Mux:
 Mux:
 :Neg
 -
->:New
+:New
+Neu
 :No Bars
 Keine Balken
 :No Trim
@@ -241,10 +302,11 @@ Keine Trimmung
 :No Trims
 Keine Trimmung
 :None
-Kein
+Keine
 :Normal
 Normal
->:Notch PW
+:Notch PW
+Notch PW
 :Off
 Aus
 :Offset:
@@ -255,48 +317,62 @@ Ok
 Ein
 :Page:
 Seite:
->:Plane
+:Plane
+Flugzeug
 :Point:
 Punkt:
 :Pos
 +
 :Pos/Neg:
 +/-:
->:Prealert intvl:
->:Prealert time:
->:Press 'Ent' to turn USB Filesystem:
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to turn \nUSB drive:
->:Preview: Long-Press ENT
+:Prealert intvl:
+Prealert intvl:
+:Prealert time:
+Prealert time:
+:Press 'Ent' to turn USB Filesystem:
+'ENT' schaltet das USB Filesystem:
+:Press ENT to change:
+Drücke ENT zum Ändern:
+:Press ENT to copy to:
+Drücke ENT zum Kopieren:
+:Press ENT to load:
+Drücke ENT zum Laden:
+:Press ENT to turn \nUSB drive:
+ENT schaltet \ndas USB Laufwerk:
+:Preview: Long-Press ENT
+Vorschau: Lange ENT drücken
 :Protocol:
 Protokoll:
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
->:RPM
->:RPM:
+:RPM
+UPM
+:RPM:
+UPM:
 :RUD
 RUD
 :RUD DR
 RUD DR
 :Re-Init
 Neu binden
->:Remove
+:Remove
+Löschen
 :Reset
 Reset
 :Reverse:
 Umkehr:
 :Reversed
 Umgekehrt
->:Revert
+:Revert
+Zurücknehmen
 :Right
 Rechts
 :Safe Val:
-Safety
->:Safety
+Sicherer Wert:
+:Safety
+Sicherheit
 :Safety:
 Sicherheit:
 :Save
@@ -308,25 +384,31 @@ Scanner
 :Simple
 Einfach
 :Simple 4 Channel
-Src
->:Speed
->:Speed:
->:Src
+Einfach 4 Kanäle
+:Speed
+Geschwindigkeit
+:Speed:
+Geschwindigkeit:
+:Src
+Quelle
 :Src:
 Quelle:
 :Start:
 Start:
->:Step:
->:Stick input
+:Step:
+Schritt:
+:Stick input
+Knüppel Eingabe
 :Stick mode:
-Modus:
+Knüppel Modus:
 :Sticks:
-Sticks:
+Knüppel:
 :Subtrim:
 Untertrimmung:
 :SwashType:
 Taumelscheibe:
->:Switch %d:
+:Switch %d:
+Schalter %d:
 :Switch1
 Schalter1
 :Switch2
@@ -361,27 +443,42 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
->:TelemRPM
->:TelemT
->:TelemV
->:Telemetry
->:Telemetry config
->:Telemetry monitor
->:Telemetry settings
->:Temp
->:Temp:
->:Temperature:
+:TelemRPM
+TelemUPM
+:TelemT
+TelemT
+:TelemV
+TelemV
+:Telemetry
+Telemetrie
+:Telemetry config
+Telemetrie Einstellung
+:Telemetry monitor
+Telemetrie Anzeige
+:Telemetry settings
+Telemetrie Einstellungen
+:Temp
+Temperatur
+:Temp:
+Temperatur:
+:Temperature:
+Temperatur:
 :Template..
 Vorlage...
 :Test
 Testen
->:Time
-:Timer
+:Time
 Zeit
->:Timer settings
->:Timer%d:
->:Timers
->:Timeup intvl:
+:Timer
+Timer
+:Timer settings
+Timer Einstellungen
+:Timer%d:
+Timer%d:
+:Timers
+Timer
+:Timeup intvl:
+Timeup intvl:
 :Toggle%d
 Schalter%d
 :Touch Calibrate
@@ -393,11 +490,13 @@ Bildschirm:
 :Touch target %d
 Tippe auf Ziel %d
 :Touch to Lock
-Antippen zum sperren
+Antippen zum Sperren
 :Touch to Unlock
-Antippen zum entsperren
->:Transmitter config
->:Transmitter menu
+Antippen zum Entsperren
+:Transmitter config
+Sender Einstellung
+:Transmitter menu
+Sender Menü
 :Trim
 Trimmung
 :Trim +:
@@ -406,7 +505,8 @@ Trim +:
 Trim -:
 :Trim Step:
 Schritt:
->:Trims
+:Trims
+:Trimmung
 :Trims:
 Trimmung:
 :Turn Off
@@ -423,22 +523,30 @@ Unbekannt
 Hoch
 :Value:
 Wert:
->:Vibration:
->:Virt
->:Volt
->:Volt:
+:Vibration:
+Vibration:
+:Virt
+Virt
+:Volt
+Volt
+:Volt:
+Volt:
 :Zero/Max
-Zero/Max
+Null/Max
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :add
 +
 :countdown
 Countdown
->:is not supported
->:is turned off
->:max
->:min
+:is not supported
+wird nicht unterstützt
+:is turned off
+ist ausgeschaltet
+:max
+max
+:min
+min
 :mult
 *
 :replace
