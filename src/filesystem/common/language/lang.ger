@@ -26,7 +26,7 @@ Kanäle:
 :5+1
 5+1
 :6 Trims
-6 Trimmungen
+6 Trimms
 :6+1
 6+1
 :6Ch Airplane
@@ -78,7 +78,7 @@ Binden
 :Binding
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang, sondern\nerlaubt die Bedienung des Senders.
+Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
 :Binding...\n%d seconds\nPress ENT to stop
 :Bindevorgang...\n%d Sekunden\nDrücke ENT zum stoppen
 :Box %d:
@@ -86,7 +86,7 @@ Kasten %d:
 :Button monitor
 Knöpfe Anzeige
 :Buzz volume:
-Buzzer Lautstärke:
+Buzzer Lautst:
 :COL
 COL
 :COL Inv
@@ -110,13 +110,13 @@ Celsius
 :Center PW
 Zentriere PW
 :Center all \nsticks and knobs\nthen press ENT
-Zentriere alle \nKnüppel und Schalter\ndann drücke ENT
+Zentriere alle \nKnüppel und Hebel\ndann drücke ENT
 :Ch
 K
 :Chan mode
 K Modus
 :Change
-Wählen
+Ändern
 :Channel monitor
 Kanal Anzeige
 :Channel output
@@ -128,23 +128,23 @@ Konfigurieren
 :Contrast:
 Kontrast:
 :Copy To
-Kapiere nach
+Kopiere zu
 :Copy To...
-Kopiere nach...
+Kopieren...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Kritischer Akkustand erkannt.\nEinstellungen wurden gespeichert.\nAlle nachträglichen Einstellungen\nwerden NICHT gespeichert.\n\nAkku umgehend wechseln!
 :Curve:
 Kurve:
 :Cyclic1
-Cyclic1
+Zyklisch1
 :Cyclic2
-Cyclic2
+Zyklisch2
 :Cyclic3
-Cyclic3
+Zyklisch3
 :DR
 DR
 :Deadband
-Deadband
+Totzone
 :Default
 Standard
 :Delta PW
@@ -172,7 +172,7 @@ EXPO
 :Enter
 Eingabe
 :Exit
-Beenden
+EXT
 :Expo&DR
 Expo&DR
 :FMODE0
@@ -182,11 +182,11 @@ FMODE1
 :FMODE2
 FMODE2
 :Fahren
-Fahren
+Fahrenheit
 :Failsafe:
 Ausfallschutz:
 :File:
-Datei:
+Modell:
 :Fixed
 Fest
 :Fixed ID:
@@ -196,7 +196,7 @@ Fuß
 :Frame Size
 Rahmen Größe
 :GEAR
-FAHRWERK
+FAHRW
 :GPS
 GPS
 :Generic settings
@@ -212,7 +212,7 @@ Bild
 :Icon:
 Bild:
 :Input monitor
-Eingabe Anzeige
+Eingaben Anzeige
 :Input:
 Eingabe:
 :Insert
@@ -236,7 +236,7 @@ Länge:
 :Linked
 Verknüpft
 :Load
-Lade
+Laden
 :Load...
 Laden...
 :Longitude
@@ -274,13 +274,13 @@ Mixer
 :Mixers:
 Mixers:
 :Mode %d
-Modus %d
+Mode %d
 :Model menu
 Modell Menü
 :Model name:
 Modellname:
 :Model setup
-Model Einstellungen
+Modell Einstellungen
 :Model type:
 Modelltyp:
 :Move Down
@@ -288,7 +288,7 @@ Nach unten
 :Move Up
 Nach oben
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
-Bewege die Knüppel und Schalter\nin die Max & Min Positionen\nDann drücke ENT
+Bewege die Knüppel und Hebel\nin die Max & Min Positionen\nDann drücke ENT
 :Mux:
 Mux:
 :Neg
@@ -296,13 +296,13 @@ Mux:
 :New
 Neu
 :No Bars
-Keine Balken
-:No Trim
-Keine Trimmung
-:No Trims
-Keine Trimmung
-:None
 Keine
+:No Trim
+Keine
+:No Trims
+Keine
+:None
+Nichts
 :Normal
 Normal
 :Notch PW
@@ -310,7 +310,7 @@ Notch PW
 :Off
 Aus
 :Offset:
-Offset:
+Ausgleich:
 :Ok
 Ok
 :On
@@ -376,17 +376,17 @@ Sicherheit
 :Safety:
 Sicherheit:
 :Save
-Speichern
+Kopieren
 :Scale%s:
 Skalierung%s:
 :Scanner
 Scanner
 :Simple
-Einfach
+Nichts
 :Simple 4 Channel
 Einfach 4 Kanäle
 :Speed
-Geschwindigkeit
+Geschw:
 :Speed:
 Geschwindigkeit:
 :Src
@@ -400,7 +400,7 @@ Schritt:
 :Stick input
 Knüppel Eingabe
 :Stick mode:
-Knüppel Modus:
+Knüppel Mode:
 :Sticks:
 Knüppel:
 :Subtrim:
@@ -408,15 +408,15 @@ Untertrimmung:
 :SwashType:
 Taumelscheibe:
 :Switch %d:
-Schalter %d:
+Hebel %d:
 :Switch1
-Schalter1
+Hebel1
 :Switch2
-Schalter2
+Hebel2
 :Switch:
-Schalter:
+Hebel:
 :Symmetric
-Symmetrisch
+Symmetrie
 :THR
 GAS
 :TRIMLH+
@@ -460,7 +460,7 @@ Telemetrie Einstellungen
 :Temp
 Temperatur
 :Temp:
-Temperatur:
+Temp:
 :Temperature:
 Temperatur:
 :Template..
@@ -480,7 +480,7 @@ Timer
 :Timeup intvl:
 Timeup intvl:
 :Toggle%d
-Schalter%d
+Hebel%d
 :Touch Calibrate
 Touchscreen kalibrieren
 :Touch Test
@@ -494,7 +494,7 @@ Antippen zum Sperren
 :Touch to Unlock
 Antippen zum Entsperren
 :Transmitter config
-Sender Einstellung
+Sender Einstellungen
 :Transmitter menu
 Sender Menü
 :Trim
@@ -506,9 +506,9 @@ Trim -:
 :Trim Step:
 Schritt:
 :Trims
-:Trimmung
+Trimmung
 :Trims:
-Trimmung:
+Trimm:
 :Turn Off
 Ausschalten
 :Turn On
