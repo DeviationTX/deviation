@@ -37,6 +37,7 @@ struct Model {
     u8 telem_alarm[TELEM_NUM_ALARMS];
     u16 telem_alarm_val[TELEM_NUM_ALARMS];
     u8 telem_flags;
+    MixerMode mixer_mode;
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];
@@ -49,5 +50,6 @@ const char *CONFIG_GetCurrentIcon();
 enum ModelType CONFIG_ParseModelType(const char *value);
 void CONFIG_ParseIconName(char *name, const char *value);
 void CONFIG_ResetModel();
-u8 CONFIG_ReadTemplate(u8 template_num);
+u8 CONFIG_ReadTemplateByIndex(u8 template_num);
+u8 CONFIG_ReadTemplate(const char *filename);
 #endif /*_MODEL_H_*/

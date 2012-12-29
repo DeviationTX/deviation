@@ -14,9 +14,9 @@
  */
 
 #include "common.h"
-#include "pages.h"
+#include "../pages.h"
 
-#include "../common/_mixer_curves.c"
+#include "../../common/advanced/_mixer_curves.c"
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static guiObject_t *saveButton;

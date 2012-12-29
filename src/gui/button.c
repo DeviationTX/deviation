@@ -48,6 +48,8 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
     OBJ_SET_SELECTABLE(obj, 1);
     connect_object(obj);
 
+    // bug fix: must set a default font, otherwise language other than English might not be displayed in some dialogs
+    button->desc.font = DEFAULT_FONT.font;
     button->fontColor = fontColor;
     button->strCallback = strCallback;
     button->CallBack = CallBack;

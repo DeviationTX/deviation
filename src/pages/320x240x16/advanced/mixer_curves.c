@@ -14,9 +14,9 @@
  */
 
 #include "common.h"
-#include "pages.h"
+#include "../pages.h"
 
-#include "../common/_mixer_curves.c"
+#include "../../common/advanced/_mixer_curves.c"
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {

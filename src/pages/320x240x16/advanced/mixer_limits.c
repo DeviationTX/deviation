@@ -13,10 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "common.h"
-#include "pages.h"
+#include "../pages.h"
 #include <stdlib.h>
 
-#include "../common/_mixer_limits.c"
+#include "../../common/advanced/_mixer_limits.c"
 
 
 static void _show_limits()

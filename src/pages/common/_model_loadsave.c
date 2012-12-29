@@ -149,7 +149,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         CONFIG_ReadModel(mp->selected);  //Reload the model after saving to switch (for future saves)
     } else if (msg == LOAD_TEMPLATE + 1) {
         /* Load Template */
-        CONFIG_ReadTemplate(mp->selected);
+        CONFIG_ReadTemplateByIndex(mp->selected);
     } else if (msg == LOAD_ICON + 1) {
         if (mp->selected == 1)
             Model.icon[0] = 0;

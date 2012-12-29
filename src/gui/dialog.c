@@ -21,7 +21,7 @@
 #include "_dialog.c"
 
 static void dlgbut_pressok_cb(struct guiObject *obj, const void *data);
-//static void dlgbut_presscancel_cb(struct guiObject *obj, const void *data);
+static void dlgbut_presscancel_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strok_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strcancel_cb(struct guiObject *obj, const void *data);
 
@@ -64,21 +64,18 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     int button_height = GUI_ButtonHeight(DIALOG_BUTTON);
     switch (dgType) {
     case dtOk:
-            but = GUI_CreateButton(x + (width - button_width) / 2, y + height - button_height - 1,
-                        DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-            OBJ_SET_MODAL(but, 1);
-            break;
-    case dtOkCancel:
-    /*
-        but = GUI_CreateButton(x + width - 5 - 48, y + height - 27,
-                         BUTTON_48, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-        OBJ_SET_MODAL(but, 1);
-        but = GUI_CreateButton(x + width -10 - 48 - 96,
-                         y + height - 27,
-                         BUTTON_96, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
+        but = GUI_CreateButton(x + (width - button_width) / 2, y + height - button_height - 1,
+                    DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
         OBJ_SET_MODAL(but, 1);
         break;
-    */
+    case dtOkCancel:
+        but = GUI_CreateButton(x + (width - button_width - button_width) / 2, y + height - button_height - 1,
+                DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
+        OBJ_SET_MODAL(but, 1);
+        but = GUI_CreateButton(x + width/2, y + height - button_height - 1,
+                 DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
+        OBJ_SET_MODAL(but, 1);
+        break;
     case dtNone:
         break;
     }
@@ -131,14 +128,14 @@ void dlgbut_pressok_cb(struct guiObject *obj, const void *data)
     struct guiObject *dlgObj = (struct guiObject *)data;
     DialogClose(dlgObj, 1);
 }
-/*
+
 void dlgbut_presscancel_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     struct guiObject *dlgObj = (struct guiObject *)data;
     DialogClose(dlgObj, 0);
 }
-*/
+
 const char * dlgbut_strok_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;

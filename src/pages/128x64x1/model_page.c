@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "mixer_simple.h"
+#include "simple/simple.h"
 
 #include <stdlib.h>
 
@@ -26,6 +28,7 @@
 #include "../common/_model_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
+static const char *mixermode_cb(guiObject_t *obj, int dir, void *data);
 
 #define VIEW_ID 0
 static s16 view_origin_relativeY;
@@ -132,10 +135,37 @@ void PAGE_ModelInit(int page)
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, numchanselect_cb, NULL);
     mp->total_items++;
 
+    row += space;
+    mp->telemStateObj = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Mixer GUI:"));
+    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, mixermode_cb, NULL);
+    mp->total_items++;
+
     // The following items are not draw in the logical view;
     mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
     if (page > 0)
         PAGE_NavigateItems(page, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, mp->scroll_bar);
+}
+
+static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed = 0;
+    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
+    if (changed && Model.mixer_mode == MIXER_SIMPLE) {
+        if (!SIMPLEMIXER_ValidateTraditionModel()) {
+            Model.mixer_mode = MIXER_ADVANCED;
+            PAGE_ShowInvalidSimpleMixerDialog(mp->telemStateObj);
+        } else {
+            SIMPLEMIXER_SetChannelOrderByProtocol();
+        }
+    }
+    if (Model.mixer_mode == MIXER_ADVANCED)
+        return _tr("Advanced");
+    else
+        return _tr("Simple");
 }
 
 static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,

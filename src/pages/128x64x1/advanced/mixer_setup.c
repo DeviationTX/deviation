@@ -13,10 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "common.h"
-#include "pages.h"
+#include "../pages.h"
 #include "config/model.h"
 
-#include "../common/_mixer_setup.c"
+#include "../../common/advanced/_mixer_setup.c"
 
 #define FIRST_PAGE_ITEM_IDX  2  // 0 is the template obj and 1 is the button obj
 #define LEFT_VIEW_WIDTH  60

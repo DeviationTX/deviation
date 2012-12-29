@@ -16,7 +16,7 @@
 static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data);
 
 const struct ImageMap image_map[] = {
-    {NULL, 32, 15, 0, 0}, /*DRAW_BTN32_15 */
+    {NULL, 37, 15, 0, 0}, /*DRAW_BTN32_18 */
 };
 
 void _gui_hilite_selected(struct guiObject *obj)

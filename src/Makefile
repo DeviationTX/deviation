@@ -24,6 +24,8 @@ DUMP ?= objdump
 
 SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
                 $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard protocol/*.c) \
+                $(wildcard pages/$(SCREENSIZE)/advanced/*.c) \
+                $(wildcard pages/$(SCREENSIZE)/simple/*.c) \
                 $(wildcard config/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)

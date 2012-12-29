@@ -127,7 +127,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     } else {   // plate text select for devo 10, copy most behavior from label.c
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
         u8 arrow_width = ARROW_WIDTH - 1;
-        if (select->enable) {
+        if (select->enable == 1) {
             u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
             u16 x1 = box->x + arrow_width -1;
             LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
@@ -139,7 +139,10 @@ void GUI_DrawTextSelect(struct guiObject *obj)
             //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
             LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
             LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
-        } else {
+        }  else if (select->enable == 2) {  // ENBALBE == 2 means the textsel can be pressed but not be selected
+            select->desc.style = LABEL_BOX;
+        }
+        else {
             if (!select->enable)  // avoid drawing button box when it is disable
                 select->desc.style = LABEL_CENTER;
         }

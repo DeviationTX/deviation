@@ -94,3 +94,19 @@ void PAGE_TelemconfigEvent();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
+
+
+/* Simple Mixer pages */
+void PAGE_ReverseInit(int page);
+void PAGE_TravelAdjInit(int page);
+void PAGE_PitCurvesInit(int page);
+void PAGE_ThroCurvesInit(int page);
+void PAGE_SubtrimInit(int page);
+void PAGE_ThroHoldInit(int page);
+void PAGE_DrExpInit(int page);
+void PAGE_SwashInit(int page);
+void PAGE_GyroSenseInit(int page);
+void PAGE_CurvesEvent();
+void PAGE_SwitchAssignInit(int page);
+void PAGE_FailSafeInit(int page);
+

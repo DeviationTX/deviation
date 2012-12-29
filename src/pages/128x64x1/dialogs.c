@@ -112,4 +112,23 @@ void PAGE_ShowLowBattDialog()
     dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
 
+const char *string_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    strncpy(dlgstr, _tr("Model needs reset\nfor simple mixer"), sizeof(dlgstr));
+    return dlgstr;
+}
+
+void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
+{
+    if (dialog)
+        return;
+
+    dlgstr[sizeof(dlgstr) - 1] = 0;
+    current_selected_obj = GUI_GetSelected();
+    dialog = GUI_CreateDialog(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, string_cb,
+            invalid_simplemixer_cb, dtOkCancel, guiObj);
+}
+
 

@@ -141,4 +141,16 @@ const char *utf8_to_u32(const char *str, u32 *ch);
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
+
+/* Mixer mode */
+typedef enum {
+    MIXER_ADVANCED = 0,
+    MIXER_SIMPLE,
+    MIXER_ALL,
+} MixerMode;
+void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj);
+void SIMPLEMIXER_Preset();
+void SIMPLEMIXER_SetChannelOrderByProtocol();
+u8 SIMPLEMIXER_ValidateTraditionModel();
+
 #endif

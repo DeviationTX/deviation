@@ -32,6 +32,7 @@ const char *MODEL_TYPE = "type";
 const char *MODEL_TEMPLATE = "template";
 const char *MODEL_AUTOMAP = "automap";
 const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
+const char *MODEL_MIXERMODE = "mixermode";
 
 /* Section: Radio */
 static const char SECTION_RADIO[]   = "radio";
@@ -266,6 +267,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(MODEL_AUTOMAP)) {
             auto_map = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(MODEL_MIXERMODE)) {
+            m->mixer_mode = atoi(value);
             return 1;
         }
     }
@@ -851,6 +856,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+    fprintf(fh, "%s=%d\n", MODEL_MIXERMODE, m->mixer_mode);
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)
@@ -1067,6 +1073,8 @@ u8 CONFIG_ReadModel(u8 model_num) {
     crc32 = Crc(&Model, sizeof(Model));
     if(! Model.name[0])
         sprintf(Model.name, "Model%d", model_num);
+
+    SIMPLEMIXER_Preset(); // bug fix: this must be invoked in all modes
     return 1;
 }
 
@@ -1123,11 +1131,9 @@ enum ModelType CONFIG_ParseModelType(const char *value)
     return 0;
 }
 
-u8 CONFIG_ReadTemplate(u8 template_num) {
-    char file[20];
+u8 CONFIG_ReadTemplateByIndex(u8 template_num) {
     char filename[13];
     int type;
-
     if (! FS_OpenDir("template")) {
         printf("Failed to read dir 'template'\n");
         return 0;
@@ -1136,7 +1142,6 @@ u8 CONFIG_ReadTemplate(u8 template_num) {
         if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
             template_num--;
             if (template_num == 0){
-                sprintf(file, "template/%s", filename);
                 break;
             }
         }
@@ -1146,6 +1151,13 @@ u8 CONFIG_ReadTemplate(u8 template_num) {
         printf("Failed to find template #%d\n", template_num);
         return 0;
     }
+    return CONFIG_ReadTemplate(filename);
+}
+
+u8 CONFIG_ReadTemplate(const char *filename) {
+    char file[20];
+
+    sprintf(file, "template/%s", filename);
     clear_model(0);
     auto_map = 0;
     if (CONFIG_IniParse(file, ini_handler, &Model)) {

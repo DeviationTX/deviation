@@ -156,6 +156,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts)); //This may cause an immediate change in behavior!
         GUI_Redraw(mp->chanObj);
+        if (Model.mixer_mode == MIXER_SIMPLE)
+            SIMPLEMIXER_SetChannelOrderByProtocol();
         configure_bind_button();
     }
     GUI_TextSelectEnablePress(obj, PROTOCOL_GetOptions() ? 1 : 0);

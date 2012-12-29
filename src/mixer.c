@@ -26,10 +26,6 @@
 #include "config/tx.h"
 #include <stdlib.h>
 
-#define SWASH_INV_ELEVATOR_MASK   1
-#define SWASH_INV_AILERON_MASK    2
-#define SWASH_INV_COLLECTIVE_MASK 4
-
 #define MIXER_CYC1 (NUM_TX_INPUTS + 1)
 #define MIXER_CYC2 (NUM_TX_INPUTS + 2)
 #define MIXER_CYC3 (NUM_TX_INPUTS + 3)

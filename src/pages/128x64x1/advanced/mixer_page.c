@@ -14,11 +14,11 @@
  */
 
 #include "common.h"
-#include "pages.h"
+#include "../pages.h"
 #include "config/model.h"
 //#include "icons.h"
 
-#include "../common/_mixer_page.c"
+#include "../../common/advanced/_mixer_page.c"
 
 static u8 selectedIdx = 0;
 static u8 top_channel = 0;
