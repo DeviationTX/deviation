@@ -110,3 +110,14 @@ void PAGE_ShowLowBattDialog()
     dlgstr[sizeof(dlgstr) - 1] = 0;
     dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Low Battery"), NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
+
+void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
+{
+    (void)guiObj;
+    if (dialog)
+        return;
+    strncpy(dlgstr, _tr("Model needs to be reset\nin order to iswitch to the simple mixer"), sizeof(dlgstr));
+    dlgstr[sizeof(dlgstr) - 1] = 0;
+    dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Simple Mixer"), NULL,
+            invalid_simplemixer_cb, dtOkCancel, dlgstr);
+}

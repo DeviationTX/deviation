@@ -209,3 +209,21 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
     (void)data;
     MODELPage_ShowLoadSave(3, PAGE_ModelInit);
 }
+
+static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed = 0;
+    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
+    if (changed && Model.mixer_mode == MIXER_SIMPLE) {
+        if (!SIMPLEMIXER_ValidateTraditionModel()) {
+            Model.mixer_mode = MIXER_ADVANCED;
+            PAGE_ShowInvalidSimpleMixerDialog(mp->telemStateObj);
+        } else {
+            SIMPLEMIXER_SetChannelOrderByProtocol();
+        }
+    }
+    return SIMPLEMIXER_ModeName(Model.mixer_mode);
+}
+

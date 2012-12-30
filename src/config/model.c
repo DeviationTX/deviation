@@ -270,7 +270,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MODEL_MIXERMODE)) {
-            m->mixer_mode = atoi(value);
+            for(i = 0; i < 2; i++) {
+                if(MATCH_VALUE(SIMPLEMIXER_ModeName(i)))
+                    m->mixer_mode = i;
+            }
             return 1;
         }
     }
@@ -856,7 +859,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-    fprintf(fh, "%s=%d\n", MODEL_MIXERMODE, m->mixer_mode);
+    fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, SIMPLEMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)

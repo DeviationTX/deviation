@@ -152,5 +152,6 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj);
 void SIMPLEMIXER_Preset();
 void SIMPLEMIXER_SetChannelOrderByProtocol();
 u8 SIMPLEMIXER_ValidateTraditionModel();
+const char *SIMPLEMIXER_ModeName(int mode);
 
 #endif

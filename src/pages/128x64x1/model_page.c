@@ -28,7 +28,6 @@
 #include "../common/_model_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static const char *mixermode_cb(guiObject_t *obj, int dir, void *data);
 
 #define VIEW_ID 0
 static s16 view_origin_relativeY;
@@ -146,26 +145,6 @@ void PAGE_ModelInit(int page)
     mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
     if (page > 0)
         PAGE_NavigateItems(page, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, mp->scroll_bar);
-}
-
-static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed = 0;
-    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
-    if (changed && Model.mixer_mode == MIXER_SIMPLE) {
-        if (!SIMPLEMIXER_ValidateTraditionModel()) {
-            Model.mixer_mode = MIXER_ADVANCED;
-            PAGE_ShowInvalidSimpleMixerDialog(mp->telemStateObj);
-        } else {
-            SIMPLEMIXER_SetChannelOrderByProtocol();
-        }
-    }
-    if (Model.mixer_mode == MIXER_ADVANCED)
-        return _tr("Advanced");
-    else
-        return _tr("Simple");
 }
 
 static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
