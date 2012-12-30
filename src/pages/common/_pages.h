@@ -97,6 +97,7 @@ u8 PAGE_TelemStateCheck(char *str, int strlen);
 
 
 /* Simple Mixer pages */
+void PAGE_ModelMenuInit(int page);
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
 void PAGE_PitCurvesInit(int page);

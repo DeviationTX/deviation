@@ -13,4 +13,18 @@ PAGEDEF(PAGEID_INPUTMON, PAGE_InputtestInit,   PAGE_ChantestEvent,    PAGE_Chant
 PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Button monitor"))
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit, _tr_noop("Scanner"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
+/* Simple */
+PAGEDEF(PAGEID_MODELMENU, PAGE_ModelMenuInit,  NULL,                  NULL,             _tr_noop("Model menu"))
+PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,             _tr_noop("Reverse"))
+PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_CurvesEvent,      NULL,             _tr_noop("D/R & Exp"))
+PAGEDEF(PAGEID_SUBTRIM,  PAGE_SubtrimInit,     NULL,                  NULL,             _tr_noop("Subtrim"))
+PAGEDEF(PAGEID_TRAVELADJ,PAGE_TravelAdjInit,   NULL,                  NULL,             _tr_noop("Travel adjust"))
+PAGEDEF(PAGEID_THROCURVES,PAGE_ThroCurvesInit, PAGE_CurvesEvent,      NULL,             _tr_noop("Throttle curves"))
+PAGEDEF(PAGEID_PITCURVES,PAGE_PitCurvesInit,   PAGE_CurvesEvent,      NULL,             _tr_noop("Pitch curves"))
+PAGEDEF(PAGEID_THROHOLD, PAGE_ThroHoldInit,    NULL,                  NULL,             _tr_noop("Throttle hold"))
+PAGEDEF(PAGEID_GYROSENSE,PAGE_GyroSenseInit,   NULL,                  NULL,             _tr_noop("Gyro sense"))
+PAGEDEF(PAGEID_SWASH,    PAGE_SwashInit,       NULL,                  NULL,             _tr_noop("Swash"))
+PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,             _tr_noop("Fail safe"))
+PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,             _tr_noop("Switch assignment"))
+
 #endif

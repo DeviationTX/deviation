@@ -22,6 +22,11 @@
 
 static void _show_page()
 {
+    if (Model.mixer_mode == MIXER_SIMPLE)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TIMER), MODELMENU_Show);
+    else
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER));
+
     for (u8 i = 0; i < NUM_TIMERS; i++) {
         u8 x = 48 + i * 96;
         //Row 1

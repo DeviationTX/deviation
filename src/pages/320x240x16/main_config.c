@@ -196,7 +196,10 @@ static void _show_page()
 
 static void _show_title()
 {
-     PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));
+     if (Model.mixer_mode == MIXER_SIMPLE)
+         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MAINCFG), MODELMENU_Show);
+     else
+         PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));
      guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
      GUI_SetScrollbar(obj, page_num);
 }

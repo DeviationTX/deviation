@@ -21,7 +21,10 @@
 
 static void _show_page()
 {
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
+    if (Model.mixer_mode == MIXER_SIMPLE)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
+    else
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
     GUI_CreateLabel(8, 40, NULL, DEFAULT_FONT, _tr("Input:"));
     GUI_CreateLabel(72, 40, NULL, DEFAULT_FONT, _tr("Trim -:"));
     GUI_CreateLabel(136, 40, NULL, DEFAULT_FONT, _tr("Trim +:"));

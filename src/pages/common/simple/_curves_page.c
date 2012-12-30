@@ -20,6 +20,8 @@ static CurvesMode curve_mode;
 static u8 pit_hold_state = 0;
 static u8 selectable_bitmaps[7] = {0, 0, 0 ,0 ,0, 0, 0};
 
+static void update_textsel_state();
+
 static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -33,15 +35,7 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
             GUI_SetHidden(mp->itemObj[9], 0);
         else
             GUI_SetHidden(mp->itemObj[9],  1);
-        for (u8 i = 1; i < 8; i++) {
-            u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
-            GUI_TextSelectEnablePress(mp->itemObj[i], 1);
-            if (selectable_bitmap >> (i-1) & 0x01) {
-                GUI_TextSelectEnable(mp->itemObj[i], 1);
-            } else {
-                GUI_TextSelectEnable(mp->itemObj[i], 2);
-            }
-        }
+        update_textsel_state();
         GUI_Redraw(mp->graphs[0]);
         for ( i = 0; i < 9; i++)
             GUI_Redraw(mp->itemObj[i]);
@@ -124,26 +118,13 @@ static void auto_generate_cb(guiObject_t *obj, const void *data)
     GUI_Redraw(mp->graphs[0]);
 }
 
-static void press_cb(guiObject_t *obj, void *data)
-{
-    u8 point_num = (long)data;
-    u8 *selectable_bitmap = &selectable_bitmaps[curve_mode * 4 + pit_mode];
-    if (*selectable_bitmap >> (point_num-1) & 0x01) {
-        GUI_TextSelectEnable(obj, 2);
-        *selectable_bitmap &= ~(1 << (point_num-1));
-    } else {
-        GUI_TextSelectEnable(obj, 1);
-        *selectable_bitmap |= 1 << (point_num-1);
-    }
-}
-
 static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
 {
     if (mp->mixer_ptr[pit_mode] == NULL)
         return "";
     u8 point_num = (long)data;
     struct Curve *curve = &(mp->mixer_ptr[pit_mode]->curve);
-    if (GUI_IsTextSelectEnabled(obj)!= 2) {
+    if (GUI_IsTextSelectEnabled(obj) == 1) {
         u8 changed = 1;
         curve->points[point_num] = GUI_TextSelectHelper(curve->points[point_num], -100, 100, dir, 1, LONG_PRESS_STEP, &changed);
         if (changed)

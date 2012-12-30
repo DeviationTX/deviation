@@ -32,7 +32,10 @@ void PAGE_ModelInit(int page)
 
     mp->file_state = 0;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
+    if (Model.mixer_mode == MIXER_SIMPLE)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
+    else
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     row = 40;
     GUI_CreateLabel(8, row, NULL, DEFAULT_FONT, _tr("File:"));

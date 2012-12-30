@@ -35,6 +35,33 @@ void PAGE_PitCurvesInit(int page)
     show_page(CURVESMODE_PITCH, page);
 }
 
+static void update_textsel_state()
+{
+    for (u8 i = 1; i < 8; i++) {
+        u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
+        GUI_TextSelectEnablePress(mp->itemObj[i], 1);
+        if (selectable_bitmap >> (i-1) & 0x01) {
+            GUI_TextSelectEnable(mp->itemObj[i], 1);
+        } else {
+            GUI_TextSelectEnable(mp->itemObj[i], 2);
+        }
+    }
+}
+
+static void press_cb(guiObject_t *obj, void *data)
+{
+    u8 point_num = (long)data;
+    u8 *selectable_bitmap = &selectable_bitmaps[curve_mode * 4 + pit_mode];
+    if (*selectable_bitmap >> (point_num-1) & 0x01) {
+        GUI_TextSelectEnable(obj, 2);
+        *selectable_bitmap &= ~(1 << (point_num-1));
+    } else {
+        GUI_TextSelectEnable(obj, 1);
+        *selectable_bitmap |= 1 << (point_num-1);
+    }
+}
+
+
 static void show_page(CurvesMode _curve_mode, int page)
 {
     (void)page;
@@ -120,15 +147,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     x += w1;
     mp->itemObj[7] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
 
-    for (u8 i = 1; i < 8; i++) {
-        u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
-        GUI_TextSelectEnablePress(mp->itemObj[i], 1);
-        if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(mp->itemObj[i], 1);
-        } else {
-            GUI_TextSelectEnable(mp->itemObj[i], 2);
-        }
-    }
+    update_textsel_state();
 
     mp->graphs[0] = GUI_CreateXYGraph(77, ITEM_HEIGHT +1, 50, 50,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,

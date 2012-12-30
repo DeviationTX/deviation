@@ -28,6 +28,7 @@ static guiObject_t *scroll_bar;
 
 static void _show_page()
 {
+    PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
     PAGE_SetActionCB(_action_cb);
     u8 space = ITEM_HEIGHT + 5;
     // create a logical view

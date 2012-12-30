@@ -26,7 +26,10 @@ void PAGE_TelemconfigInit(int page)
    (void)page;
     const u8 row_height = 25;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
+    if (Model.mixer_mode == MIXER_SIMPLE)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMCFG), MODELMENU_Show);
+    else
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
 
     if (telem_state_check() == 0) {
         GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);

@@ -32,6 +32,9 @@ struct pagemem {
 };
 
 #define TOGGLE_FILE "media/toggle.bmp"
+#define MODELMENU_FILE "media/modelmnu.bmp"
 
 void PAGE_SetSection(u8 section);
+void PAGE_ChangeByID(enum PageID id);
+void MODELMENU_Show(guiObject_t *obj, const void *data);
 #endif

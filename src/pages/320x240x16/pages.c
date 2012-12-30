@@ -19,7 +19,6 @@ static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
-static void PAGE_ChangeByID(enum PageID id);
 void PAGE_Exit();
 
 #define PAGE_NAME_MAX 10
@@ -52,6 +51,7 @@ struct page_group groups[] = {
     {1, PAGEID_TELEMCFG},
     {1, PAGEID_TRIM},
     {1, PAGEID_MAINCFG},
+    {0x81, PAGEID_MODELMENU},
     {2, PAGEID_TXCFG},
     {2, PAGEID_TELEMMON},
     {2, PAGEID_CHANMON},
@@ -82,6 +82,10 @@ void PAGE_SetSection(u8 section)
 {
     u8 p;
     u8 newpage = cur_page;
+
+    if (section == SECTION_MODEL && Model.mixer_mode == MIXER_SIMPLE)
+        section = 0x80 | SECTION_MODEL;
+
     for(p = 0; groups[p].group != 255; p++) {
         if(groups[p].group == section) {
             newpage = p;
