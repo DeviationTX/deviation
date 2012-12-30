@@ -95,7 +95,10 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 $(VERBOSE).SILENT:
 
 clean:
-	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o $(ODIR)/*.P
+	# rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o $(ODIR)/*.P
+	# delete all build files to really clean the repository folder
+	rm -f devo*.bin devo*.elf devo*.list devo*.map
+	rm -rf objs
 
 flash: devo8.dfu
 	dfu-util -a 0 -D devo8.dfu
@@ -159,9 +162,11 @@ $(ODIR)/hgstamp:
 $(OBJS): Makefile target/$(TARGET)/Makefile.inc
 
 zip: $(TARGET).dfu
-	mv $(TARGET).dfu deviation-$(HGVERSION).dfu
+	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
-	zip --move deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+	# make zipping more compatible with other distributions
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).dfu
 
 fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
