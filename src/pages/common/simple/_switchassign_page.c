@@ -28,7 +28,7 @@ static SwitchTable switch_table[] = {
     {{INP_MIX0,   INP_MIX1,        INP_MIX2},         "MIX 0/1/2"},
     {{INP_FMOD0,  INP_FMOD1,       INP_FMOD2},        "FMOD 0/1/2"},
 };
-static u8 swicth_idx[3];
+static u8 switch_idx[3];
 
 static u8 get_switch_idx(FunctionSwitch switch_type) {
     for (u8 i = 0; i < 6; i++) {
@@ -65,7 +65,7 @@ static void refresh_switches()
 
     // initialize
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type <= SWITCHFUNC_GYROSENSE; switch_type++)
-        swicth_idx[switch_type] = get_switch_idx(switch_type);
+        switch_idx[switch_type] = get_switch_idx(switch_type);
 }
 
 // the only reason not to save changes in live is I don't want to change mixers' switch in the middle of changing options
@@ -73,7 +73,7 @@ void save_changes()
 {
     MUSIC_Play(MUSIC_SAVING);
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type <= SWITCHFUNC_GYROSENSE; switch_type++)
-        mapped_simple_channels.swicthes[switch_type] = switch_table[swicth_idx[switch_type]].switches[0];
+        mapped_simple_channels.swicthes[switch_type] = switch_table[switch_idx[switch_type]].switches[0];
 
     if (Model.limits[mapped_simple_channels.throttle].safetysw)
        Model.limits[mapped_simple_channels.throttle].safetysw = mapped_simple_channels.swicthes[SWITCHFUNC_HOLD];
@@ -91,24 +91,24 @@ void save_changes()
 
         if (mix[i].dest == mapped_simple_channels.gear || mix[i].dest == mapped_simple_channels.aux2) {
             if (gyro_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_GYROSENSE]].switches[gyro_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_GYROSENSE]].switches[gyro_count++];
         } else if (mix[i].dest == mapped_simple_channels.aile) {
             if (drexp_aile_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_FLYMODE]].switches[drexp_aile_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[drexp_aile_count++];
         } else if (mix[i].dest == mapped_simple_channels.elev) {
             if (drexp_elev_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_FLYMODE]].switches[drexp_elev_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[drexp_elev_count++];
         } else if (mix[i].dest == mapped_simple_channels.rudd) {
             if (drexp_rudd_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_FLYMODE]].switches[drexp_rudd_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[drexp_rudd_count++];
         } else if (mix[i].dest == mapped_simple_channels.pitch) {
             if (pit_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_FLYMODE]].switches[pit_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[pit_count++];
             else if (pit_count == 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_HOLD]].switches[0];  // hold curve
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_HOLD]].switches[0];  // hold curve
         } else if (mix[i].dest == mapped_simple_channels.throttle) {
             if (thro_count < 3)
-                mix[i].sw = switch_table[swicth_idx[SWITCHFUNC_FLYMODE]].switches[thro_count++];
+                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[thro_count++];
         }
     }
 }
@@ -117,8 +117,8 @@ static const char *switch_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     FunctionSwitch switch_type = (long)data;
-    swicth_idx[switch_type] = GUI_TextSelectHelper(swicth_idx[switch_type], 0, 5, dir, 1, 1, NULL);
-    strcpy(mp->tmpstr, switch_table[swicth_idx[switch_type]].name);
+    switch_idx[switch_type] = GUI_TextSelectHelper(switch_idx[switch_type], 0, 5, dir, 1, 1, NULL);
+    strcpy(mp->tmpstr, switch_table[switch_idx[switch_type]].name);
     return mp->tmpstr;
 }
 
