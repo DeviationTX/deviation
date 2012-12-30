@@ -20,16 +20,38 @@
 #include "simple.h"
 #include "../../common/simple/_traveladj_page.c"
 
+static void show_page(int page)
+{
+    struct mixer_page * mp = &pagemem.u.mixer_page;
+    if (mp->firstObj) {
+        GUI_RemoveHierObjects(mp->firstObj);
+        mp->firstObj = NULL;       
+    }   
+    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
+        int row = 56 + 22 * i;
+        long ch = page  + i;
+        if (ch >= Model.num_channels)
+            break;
+        MIXER_GetLimit(ch, &mp->limit);
+        guiObject_t *obj = GUI_CreateLabelBox(10, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)ch);
+        if (! mp->firstObj)
+            mp->firstObj = obj;
+        GUI_CreateTextSelect(90, row, TEXTSELECT_96, 0x0000, NULL, traveldown_cb, (void *)ch);
+        GUI_CreateTextSelect(196, row, TEXTSELECT_96, 0x0000, NULL, travelup_cb, (void *)ch);
+    }
+}
+
 void PAGE_TravelAdjInit(int page)
 {
     (void)page;
+    struct mixer_page * mp = &pagemem.u.mixer_page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRAVELADJ), MODELMENU_Show);
-    GUI_CreateLabelBox(108, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(214, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Up"));
-    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
-        int row = 56 + 20 * i;
-        GUI_CreateLabelBox(10, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(i));
-        GUI_CreateTextSelect(108, row, TEXTSELECT_96, 0x0000, NULL, traveldown_cb, (void *)(i));
-        GUI_CreateTextSelect(214, row, TEXTSELECT_96, 0x0000, NULL, travelup_cb, (void *)(i));
-    }
+    mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
+                          Model.num_channels - ENTRIES_PER_PAGE
+                        : 0;
+    mp->firstObj = NULL;
+    GUI_CreateScrollbar(304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    GUI_CreateLabelBox(90, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Down"));
+    GUI_CreateLabelBox(196, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Up"));
+    show_page(page);
 }

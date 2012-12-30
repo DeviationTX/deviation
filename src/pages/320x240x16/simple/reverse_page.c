@@ -22,19 +22,39 @@
 
 static void toggle_reverse_cb(guiObject_t *obj, void *data)
 {
+    (void)obj;
     u8 ch = (long)data;
     if (ch >= NUM_OUT_CHANNELS)
         return;
     Model.limits[ch].flags ^= CH_REVERSE;
 }
+static void show_page(int page)
+{
+    struct mixer_page * mp = &pagemem.u.mixer_page;
+    if (mp->firstObj) {
+        GUI_RemoveHierObjects(mp->firstObj);
+        mp->firstObj = NULL;       
+    }   
+    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
+        int row = 40 + 24 * i;
+        long ch = page  + i;
+        if (ch >= Model.num_channels)
+            break;
+        guiObject_t *obj = GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
+        if (! mp->firstObj)
+            mp->firstObj = obj;
+        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, toggle_reverse_cb, reverse_cb, (void *)(ch));
+    }
+}
+
 void PAGE_ReverseInit(int page)
 {
-    (void)page;
+    struct mixer_page * mp = &pagemem.u.mixer_page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_REVERSE), MODELMENU_Show);
-
-    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
-        int row = 40 + 20 * i;
-        GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(i));
-        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, toggle_reverse_cb, reverse_cb, (void *)(i));
-    }
+    mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
+                          Model.num_channels - ENTRIES_PER_PAGE
+                        : 0;
+    mp->firstObj = NULL;
+    GUI_CreateScrollbar(304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    show_page(page);
 }

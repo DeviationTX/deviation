@@ -20,15 +20,35 @@
 #include "simple.h"
 #include "../../common/simple/_subtrim_page.c"
 
+static void show_page(int page)
+{
+    struct mixer_page * mp = &pagemem.u.mixer_page;
+    if (mp->firstObj) {
+        GUI_RemoveHierObjects(mp->firstObj);
+        mp->firstObj = NULL;       
+    }   
+    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
+        int row = 40 + 24 * i;
+        long ch = page  + i;
+        if (ch >= Model.num_channels)
+            break;
+        MIXER_GetLimit(ch, &mp->limit);
+        guiObject_t *obj = GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
+        if (! mp->firstObj)
+            mp->firstObj = obj;
+        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, NULL, subtrim_cb, (void *)(ch));
+    }
+}
 void PAGE_SubtrimInit(int page)
 {
     (void)page;
+    struct mixer_page * mp = &pagemem.u.mixer_page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SUBTRIM), MODELMENU_Show);
-    for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
-        int row = 40 + 20 * i;
-        MIXER_GetLimit(i, &mp->limit);
-        GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(i));
-        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, NULL, subtrim_cb, (void *)(i));
-    }
+    mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
+                          Model.num_channels - ENTRIES_PER_PAGE
+                        : 0;
+    mp->firstObj = NULL;
+    GUI_CreateScrollbar(304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    show_page(page);
 }
 
