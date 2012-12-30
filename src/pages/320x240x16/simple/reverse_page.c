@@ -20,6 +20,13 @@
 #include "simple.h"
 #include "../../common/simple/_reverse_page.c"
 
+static void toggle_reverse_cb(guiObject_t *obj, void *data)
+{
+    u8 ch = (long)data;
+    if (ch >= NUM_OUT_CHANNELS)
+        return;
+    Model.limits[ch].flags ^= CH_REVERSE;
+}
 void PAGE_ReverseInit(int page)
 {
     (void)page;
@@ -28,6 +35,6 @@ void PAGE_ReverseInit(int page)
     for (long i = 0; i < ENTRIES_PER_PAGE; i++) {
         int row = 40 + 20 * i;
         GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(i));
-        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, NULL, reverse_cb, (void *)(i));
+        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, toggle_reverse_cb, reverse_cb, (void *)(i));
     }
 }
