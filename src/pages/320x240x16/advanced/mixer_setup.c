@@ -123,7 +123,9 @@ static void _show_complex()
         mp->firstObj = GUI_CreateLabel(COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
         GUI_CreateTextSelect(COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
         GUI_CreateLabel(COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
-        GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, reorder_cb, set_mixernum_cb, NULL);
+        guiObject_t *obj = GUI_CreateTextSelect(COL2_VALUE, 40, TEXTSELECT_96, 0x0000, reorder_cb, set_mixernum_cb, NULL);
+        if (! GUI_GetSelected()) //Set the page button to be selected if nothinge else is yet
+            GUI_SetSelected(obj);
     } else {
         GUI_RemoveHierObjects(mp->expoObj[0]);
     }
