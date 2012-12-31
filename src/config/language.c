@@ -20,7 +20,7 @@
 
 u16 fnv_16_str(const char *str);
 static char strings[8192];
-#define MAX_STRINGS 256
+#define MAX_STRINGS 300
 #define MAX_LINE 300
 
 #define dbg_printf if(0) printf
