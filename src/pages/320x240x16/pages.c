@@ -51,7 +51,6 @@ struct page_group groups[] = {
     {1, PAGEID_TELEMCFG},
     {1, PAGEID_TRIM},
     {1, PAGEID_MAINCFG},
-    {0x81, PAGEID_MODELMENU},
     {2, PAGEID_TXCFG},
     {2, PAGEID_TELEMMON},
     {2, PAGEID_CHANMON},
@@ -59,6 +58,7 @@ struct page_group groups[] = {
     {2, PAGEID_BTNMON},
     {2, PAGEID_SCANNER},
     {2, PAGEID_USB},
+    {0x81, PAGEID_MODELMENU},
     {255, 0}
 };
 
