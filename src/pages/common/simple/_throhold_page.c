@@ -29,7 +29,7 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
             Model.limits[mapped_simple_channels.throttle].safetysw =
                     mapped_simple_channels.switches[SWITCHFUNC_HOLD];
             if (Model.limits[mapped_simple_channels.throttle].safetyval == 0)
-                Model.limits[mapped_simple_channels.throttle].safetyval = -100;
+                Model.limits[mapped_simple_channels.throttle].safetyval = -110;
         } else
             Model.limits[mapped_simple_channels.throttle].safetysw = 0;
     }
@@ -52,7 +52,7 @@ static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Off");
     Model.limits[mapped_simple_channels.throttle].safetyval =
             GUI_TextSelectHelper(Model.limits[mapped_simple_channels.throttle].safetyval,
-                    -100, 100, dir, 1, LONG_PRESS_STEP, NULL);
+                    -120, 120, dir, 1, LONG_PRESS_STEP, NULL);
     sprintf(mp->tmpstr, "%d", Model.limits[mapped_simple_channels.throttle].safetyval);
     return mp->tmpstr;
 }

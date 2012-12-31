@@ -78,11 +78,12 @@ static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     if (!GUI_IsTextSelectEnabled(obj))
         return "0";
-    s8 oldValue = mp->limit.safetyval;
-    const char *str = PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.safetyval);
-    if (oldValue!= mp->limit.safetyval)
-        mp->are_limits_changed |= 1;
-    return str;
+    u8 isCurrentItemChanged = 0;
+    // bug fix: safe value should be allow to over +/-100
+    mp->limit.safetyval = GUI_TextSelectHelper(mp->limit.safetyval, -120, 120, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
+    mp->are_limits_changed |= isCurrentItemChanged;
+    sprintf(mp->tmpstr, "%d", mp->limit.safetyval);
+    return mp->tmpstr;
 }
 
 const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
