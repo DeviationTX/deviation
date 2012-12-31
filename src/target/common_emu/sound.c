@@ -39,6 +39,7 @@
 void SOUND_SetFrequency(u16 freq, u8 volume) {(void)freq; (void)volume;}
 void SOUND_Init() {}
 void SOUND_Start(u16 msec, u16(*next_note_cb)()) {(void)msec; (void)next_note_cb;}
+void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)()) {(void)msec; (void)next_note_cb;}
 void SOUND_Stop() {}
 #else
 
@@ -94,6 +95,8 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
         paData.phase+=1;
         paData.duration--;
         if (! paData.duration) {
+            if (next_note_cb == NULL)
+                return paComplete;
             u16 msec = next_note_cb();
             if(! msec)
                 return paComplete;
@@ -132,10 +135,16 @@ void SOUND_Init()
     paData.enable = 1;
 }
 
+void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)())
+{
+    SOUND_Start(msec, next_note_cb);
+}
+
 void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
     PaError err;
     if (! paData.enable)
         return;
+    SOUND_Stop();
     paData.duration = SAMPLE_RATE * (long)msec / 1000;
     err = Pa_OpenStream(
               &paData.stream,

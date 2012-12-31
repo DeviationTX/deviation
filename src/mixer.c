@@ -24,6 +24,8 @@
 #include "buttons.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "music.h"
+#include "target.h"
 #include <stdlib.h>
 
 #define MIXER_CYC1 (NUM_TX_INPUTS + 1)
@@ -550,12 +552,16 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
+static u32 last_trim_music_time = 0;
 u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
 {
+#define TRIM_MUSIC_DURATION 100
+#define START_TONE 1000
     (void)data;
-    (void)flags;
     int i;
-    static u8 step_size = 1;
+    s8 step_size = 1;
+    int tmp;
+    u8 reach_end = 0; // reach either 100 , 0, or -100
     if (flags & BUTTON_PRESS)
         step_size = 1;
     if (flags & BUTTON_LONGPRESS) {
@@ -566,27 +572,57 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
     }
     if (! step_size)
         return 1;
+    u8 volume = 10 * Transmitter.volume;
     for (i = 0; i < NUM_TRIMS; i++) {
-        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg)) {
-            int tmp = (int)(Model.trims[i].value) - step_size;
+        reach_end = 0;
+        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg) || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
+            if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg))
+                step_size = -step_size;
+            tmp = (int)(Model.trims[i].value) + step_size;
+            //print_buttons(buttons);
             if ((int)(Model.trims[i].value) > 0 && tmp <= 0) {
                 Model.trims[i].value = 0;
-                step_size = 0;
-            } else {
-                Model.trims[i].value = tmp < -100 ? -100 : tmp;
-            }
-            break;
-        }
-        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            int tmp = (int)(Model.trims[i].value) + step_size;
-            if ((int)(Model.trims[i].value) < 0 && tmp >= 0) {
+                reach_end = 1;
+            } else if ((int)(Model.trims[i].value) < 0 && tmp >= 0) {
                 Model.trims[i].value = 0;
-                step_size = 0;
+                reach_end = 1;
+            } else if (tmp > 100) {
+                Model.trims[i].value = 100;
+                reach_end = 1;
+            } else if (tmp < -100) {
+                Model.trims[i].value = -100;
+                reach_end = 1;
             } else {
-                Model.trims[i].value = tmp > 100 ? 100 : tmp;
+                Model.trims[i].value = tmp;
             }
-            break;
+
+            if (reach_end && (flags & BUTTON_LONGPRESS))
+                BUTTON_InterruptLongPress();
+
+            if (Model.trims[i].value == 0) {
+                SOUND_SetFrequency(3951, volume);
+                SOUND_StartWithoutVibrating(TRIM_MUSIC_DURATION, NULL);
+            }
+            else if (CLOCK_getms()- last_trim_music_time > TRIM_MUSIC_DURATION + 50) {  // Do not beep too frequently
+                last_trim_music_time = CLOCK_getms();
+                tmp = (Model.trims[i].value >= 0) ? Model.trims[i].value : -Model.trims[i].value;
+                if (step_size >=9 || step_size <= -9)
+                    SOUND_SetFrequency(START_TONE + tmp * 10, volume); // start from "c2" tone, frequence = 1000
+                else  {  //  for small step change: generate 2 different tone for closing to/away from mid-point
+                    if (Model.trims[i].value < 0)
+                        step_size = -step_size;
+                    u16 tone = START_TONE + 300;
+                    if (step_size < 0)
+                        tone = START_TONE;
+                    SOUND_SetFrequency(tone, volume);
+                    //printf("tone: %d\n\n", tone);
+                }
+
+                SOUND_StartWithoutVibrating(TRIM_MUSIC_DURATION, NULL);
+            }
         }
+
+
     }
     return 1;
 }
