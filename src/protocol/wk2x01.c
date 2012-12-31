@@ -61,7 +61,7 @@ static u8 last_beacon;
 
 static const char *wk2601_opts[] = {
   _tr_noop("Chan mode"), _tr_noop("5+1"), _tr_noop("Heli"), _tr_noop("6+1"), NULL,
-  _tr_noop("COL Inv"), _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("COL Inv"), _tr_noop("Normal"), _tr_noop("Inverted"), NULL,
   _tr_noop("COL Limit"), "-100", "100", NULL,
   NULL
 };
