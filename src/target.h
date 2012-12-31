@@ -118,6 +118,7 @@ void SPI_FlashBlockWriteEnable(u8 enable);
 void SOUND_Init();
 void SOUND_SetFrequency(u16 freq, u8 volume);
 void SOUND_Start(u16 msec, u16 (*next_note_cb)());
+void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)());
 void SOUND_Stop();
 
 /* Vibrating motor */
