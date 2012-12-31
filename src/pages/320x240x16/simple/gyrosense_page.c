@@ -39,17 +39,17 @@ void PAGE_GyroSenseInit(int page)
 
     /* Row 1 */
     GUI_CreateLabelBox(10, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
-    GUI_CreateTextSelect(150, 40, TEXTSELECT_96, 0x0000, NULL, gyro_output_cb, NULL);
+    GUI_CreateTextSelect(120, 40, TEXTSELECT_128, 0x0000, NULL, gyro_output_cb, NULL);
 
     /* Row 2 */
     GUI_CreateLabelBox(10, 60, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
-    GUI_CreateTextSelect(150, 60, TEXTSELECT_96, 0x0000, NULL, gyro_val_cb, (void *)0L);
+    GUI_CreateTextSelect(120, 60, TEXTSELECT_128, 0x0000, NULL, gyro_val_cb, (void *)0L);
 
     /* Row 3 */
     GUI_CreateLabelBox(10, 80, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
-    GUI_CreateTextSelect(150, 80, TEXTSELECT_96, 0x0000, NULL, gyro_val_cb, (void *)1);
+    GUI_CreateTextSelect(120, 80, TEXTSELECT_128, 0x0000, NULL, gyro_val_cb, (void *)1);
 
     /* Row 4 */
     GUI_CreateLabelBox(10, 100, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
-    GUI_CreateTextSelect(150, 100, TEXTSELECT_96, 0x0000, NULL, gyro_val_cb, (void *)2);
+    GUI_CreateTextSelect(120, 100, TEXTSELECT_128, 0x0000, NULL, gyro_val_cb, (void *)2);
 }
