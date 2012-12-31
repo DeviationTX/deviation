@@ -49,13 +49,18 @@
 >:AUX4
 >:AUX5
 :About Deviation
-关于本系统
+关于Deviation固件
+:Advanced
+高级模式
 :Airplane
 固定翼
 :Alarm
 报警
 :Altitude
 高度
+:Auto
+自动
+>:Aux2
 :Backlight:
 背光
 :Bar %d:
@@ -84,10 +89,12 @@
 音量
 :COL
 螺距
->:COL Inv
+:COL Inv
+螺距方向
 :COL Inv:
 螺距方向
->:COL Limit
+:COL Limit
+螺距
 :COL Mix:
 螺距
 :CYC
@@ -110,6 +117,8 @@ CYC
 通道模式
 :Change
 改变
+:Channel
+指定通道
 :Channel monitor
 通道监控
 :Channel output
@@ -134,6 +143,8 @@ CCPM1
 CCPM2
 :Cyclic3
 CCPM3
+:D/R & Exp
+舵量及舵机指数
 :DR
 舵量
 :Deadband
@@ -175,6 +186,8 @@ FMOD1
 FMOD2
 :Fahren
 华氏
+:Fail safe
+失控保护
 :Failsafe:
 失控保护
 :File:
@@ -183,6 +196,8 @@ FMOD2
 固定
 :Fixed ID:
 固定ID码
+:Fly mode
+飞行模式
 :Foot
 英尺
 :Frame Size
@@ -190,18 +205,27 @@ FMOD2
 :GEAR
 尾舵
 >:GPS
+>:Gear
 :Generic settings
 基本设置
+:Gyro sense
+锁尾感度
 :Heli
 直升机
 :Helicopter
 直升机
 :High-Rate
 普通飞行
+:Hold position
+熄火油门值
 :Icon
 图标
 :Icon:
 图标
+:Idle 1
+3D飞行1
+:Idle 2
+3D飞行2
 :Input monitor
 摇杆输入监控
 :Input:
@@ -259,8 +283,12 @@ LCD设置
 最低/最高
 :Mixer
 混控
+:Mixer GUI:
+设置界面
 :Mixers:
 混控:
+:Mode
+模式
 :Mode %d
 模式%d
 :Model menu
@@ -293,17 +321,26 @@ LCD设置
 无
 :Normal
 正常
+:Not a traditional\n model, reset it?
+本模型与通用模式\n不兼容, 是否重置？
 :Notch PW
 通道间隔
 :Off
 关闭
 :Offset:
 偏移
->:Ok
+:Ok
+确定
 :On
 开启
+:PIT
+螺距
 :Page:
 模式1-N
+:Pit Mix:
+集体螺距
+:Pitch curves
+螺距曲线
 :Plane
 固定翼
 :Point:
@@ -347,6 +384,8 @@ LCD设置
 删除
 :Reset
 重置
+:Reverse
+舵机正逆转
 :Reverse:
 反向
 :Reversed
@@ -367,10 +406,14 @@ LCD设置
 比例%s
 :Scanner
 信号扫描器
+:Servo
+舵机
 :Simple
 一段式
 :Simple 4 Channel
 4通道
+:Simplfied
+通用模式
 :Speed
 速度
 :Speed:
@@ -389,12 +432,18 @@ LCD设置
 摇杆模式
 :Sticks:
 摇杆/旋钮
+:Subtrim
+微调
 :Subtrim:
 微调
+:Swash
+斜盘设置
 :SwashType:
 斜盘模式
 :Switch %d:
 开关 %d
+:Switch assignment
+开关分配
 :Switch1
 开关1
 :Switch2
@@ -420,7 +469,7 @@ LCD设置
 :TRIMRV+
 右垂直+
 :TRIMRV-
-右垂直+
+右垂直-
 :TRIM_L+
 左上+
 :TRIM_L-
@@ -453,6 +502,12 @@ LCD设置
 模板..
 :Test
 测试
+:Thr hold
+油门熄火
+:Throttle curves
+油门曲线
+:Throttle hold
+油门熄火
 :Time
 时间
 :Timer
@@ -477,10 +532,13 @@ LCD设置
 触摸目标%d
 >:Touch to Lock
 >:Touch to Unlock
+>:Tradition Heli
 :Transmitter config
 遥控设置
 :Transmitter menu
 遥控设置
+:Travel adjust
+舵机行程
 :Trim
 微调
 :Trim +:
@@ -503,6 +561,8 @@ LCD设置
 >:Unknown
 :Up
 上
+:Value
+感度值
 :Value:
 值
 :Vibration:

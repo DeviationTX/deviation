@@ -6,7 +6,7 @@
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\n熄火保護 = %d%%\n
 :1-to-1
-一直線
+等比例
 :11 Point
 11 點
 :13 Point
@@ -50,12 +50,17 @@
 >:AUX5
 :About Deviation
 關於 Deviation
+:Advanced
+進階式
 :Airplane
 飛機
 :Alarm
 警示
 :Altitude
 海拔
+:Auto
+自動
+>:Aux2
 :Backlight:
 背光亮度:
 :Bar %d:
@@ -83,13 +88,15 @@
 :Buzz volume:
 警示音量:
 :COL
-螺距
->:COL Inv
+集體螺距
+:COL Inv
+螺距方向
 :COL Inv:
 螺距方向:
->:COL Limit
+:COL Limit
+集體螺距
 :COL Mix:
-螺距:
+集體螺距:
 >:CYC
 :Calibrate
 校正
@@ -105,9 +112,12 @@
 所有搖桿置中\n按 ENT 開始進行
 :Ch
 通道
->:Chan mode
+:Chan mode
+模式
 :Change
 更改
+:Channel
+指定通道
 :Channel monitor
 通道內容檢視
 :Channel output
@@ -132,6 +142,8 @@
 循環2
 :Cyclic3
 循環3
+:D/R & Exp
+大小動與曲線
 :DR
 大小動
 :Deadband
@@ -173,6 +185,8 @@ FMOD1
 FMOD2
 :Fahren
 華氏
+:Fail safe
+失效保護
 :Failsafe:
 失效保護
 :File:
@@ -181,24 +195,35 @@ FMOD2
 固定
 :Fixed ID:
 固定ID:
+:Fly mode
+飛行模式
 :Foot
 英呎
 :Frame Size
 PPM週期
 >:GEAR
 >:GPS
+>:Gear
 :Generic settings
 ======基本參數======
+:Gyro sense
+鎖尾感度
 :Heli
 直升機
 :Helicopter
 直升機
 :High-Rate
 高位
+:Hold position
+鎖定準位
 :Icon
 圖示
 :Icon:
-圖示:
+圖式:
+:Idle 1
+特技1
+:Idle 2
+特技2
 :Input monitor
 輸入內容檢視
 :Input:
@@ -236,7 +261,8 @@ PPM週期
 >:MIX2
 :Main menu
 主選單
->:Main page
+:Main page
+主螢幕
 :Main page config
 螢幕排列規畫
 :Max Limit:
@@ -253,8 +279,12 @@ PPM週期
 上/下限
 :Mixer
 混控器
+:Mixer GUI:
+混控界面:
 :Mixers:
 段數:
+:Mode
+模式
 :Mode %d
 模式 %d
 :Model menu
@@ -286,18 +316,27 @@ PPM週期
 :None
 無
 :Normal
-正常的
+一般
+:Not a traditional\n model, reset it?
+不相容於通用模式規\n畫的模型檔,重置它?
 :Notch PW
 通道間隔
 :Off
 關閉
 :Offset:
 偏移:
->:Ok
+:Ok
+確定
 :On
 開啟
+:PIT
+螺距
 :Page:
 頁碼：
+:Pit Mix:
+集體螺距:
+:Pitch curves
+螺距曲線
 :Plane
 飛機
 :Point:
@@ -310,7 +349,8 @@ PPM週期
 倒數預警間隔:
 :Prealert time:
 倒數預警時間:
->:Press 'Ent' to turn USB Filesystem:
+:Press 'Ent' to turn USB Filesystem:
+按 ENT 讓 USB 傳輸：
 :Press ENT to change:
 按 ENT 變更:
 :Press ENT to copy to:
@@ -339,6 +379,8 @@ PPM週期
 >:Remove
 :Reset
 重置
+:Reverse
+輸出方向
 :Reverse:
 輸出方向:
 :Reversed
@@ -349,7 +391,8 @@ PPM週期
 右
 :Safe Val:
 安全值:
->:Safety
+:Safety
+安全開關
 :Safety:
 安全開關:
 :Save
@@ -358,10 +401,14 @@ PPM週期
 比例%s:
 :Scanner
 2.4G頻道掃描
+:Servo
+舵機
 :Simple
 單段式
 :Simple 4 Channel
 簡單4通道
+:Simplfied
+通用模式
 :Speed
 速率
 :Speed:
@@ -369,7 +416,7 @@ PPM週期
 :Src
 訊號來源
 :Src:
-訊號來源:
+來源:
 :Start:
 開始時間:
 :Step:
@@ -380,12 +427,18 @@ PPM週期
 搖桿模式:
 :Sticks:
 搖桿校正:
+:Subtrim
+微調
 :Subtrim:
 微調:
+:Swash
+十字盤設定
 :SwashType:
 十字盤類型:
 :Switch %d:
 開關框%d:
+:Switch assignment
+指定切換開關
 :Switch1
 開關1
 :Switch2
@@ -427,7 +480,7 @@ PPM週期
 :TelemV
 遠端電
 :Telemetry
-遙測
+遙測傳輸
 :Telemetry config
 遙測規畫
 :Telemetry monitor
@@ -444,6 +497,12 @@ PPM週期
 模板..
 :Test
 測試
+:Thr hold
+熄火開關
+:Throttle curves
+油門曲線
+:Throttle hold
+熄火開關
 :Time
 時間
 :Timer
@@ -467,13 +526,16 @@ PPM週期
 :Touch target %d
 點擊目標 %d
 :Touch to Lock
-觸碰上鎖
+按此鎖住按鍵不輸出
 :Touch to Unlock
-觸碰解鎖
+按此解除按鍵鎖定
+>:Tradition Heli
 :Transmitter config
 發射機規畫
 :Transmitter menu
 發射機選單
+:Travel adjust
+行程量調整
 :Trim
 微調
 :Trim +:
@@ -497,6 +559,8 @@ PPM週期
 未知
 :Up
 上
+:Value
+數值
 :Value:
 數值:
 :Vibration:
@@ -508,21 +572,23 @@ PPM週期
 :Volt:
 電壓:
 :Zero/Max
-零/上限
+零/最大
 :\n\nBinding will end in %d seconds...
 \n\n連結將在 %d 秒內結束
 :add
-加上
+相加
 :countdown
 倒數
 :is not supported
 並未支援
 :is turned off
 已經關閉
->:max
->:min
+:max
+最大值
+:min
+最小值
 :mult
-多重
+相乘
 :replace
 取代
 :stopwatch
