@@ -270,6 +270,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MODEL_MIXERMODE)) {
+            if (!strcmp(value, "0") || !strcmp(value, "1"))   {// for backward compatibility, older model files use 1 for simplified GUI
+                m->mixer_mode = atoi(value);
+                return 1;
+            }
             for(i = 0; i < 2; i++) {
                 if(MATCH_VALUE(SIMPLEMIXER_ModeName(i)))
                     m->mixer_mode = i;
