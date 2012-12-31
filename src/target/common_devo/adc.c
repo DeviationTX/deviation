@@ -44,6 +44,7 @@ void ADC_Init(void)
     adc_set_right_aligned(ADC1);
 
     /* We want to read the temperature sensor, so we have to enable it. */
+    adc_enable_temperature_sensor(ADC1); 
     adc_set_conversion_time_on_all_channels(ADC1, ADC_SMPR_SMP_28DOT5CYC);
 
     adc_on(ADC1);
@@ -61,6 +62,7 @@ void ADC_Init(void)
         seed = seed << 4 | ((ADC1_Read(16) & 0x03) << 2) | (ADC1_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
         seed ^= ADC1_Read(14) << i; //Get a couple more random bits from Voltage sensor
     }
+    adc_disable_temperature_sensor(ADC1); 
     printf("RNG Seed: %08x\n", (int)seed);
     srand(seed);
 
