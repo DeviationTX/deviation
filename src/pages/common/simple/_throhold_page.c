@@ -27,7 +27,7 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         if (throhold_state == 1) {
             Model.limits[mapped_simple_channels.throttle].safetysw =
-                    mapped_simple_channels.swicthes[SWITCHFUNC_HOLD];
+                    mapped_simple_channels.switches[SWITCHFUNC_HOLD];
             if (Model.limits[mapped_simple_channels.throttle].safetyval == 0)
                 Model.limits[mapped_simple_channels.throttle].safetyval = -100;
         } else

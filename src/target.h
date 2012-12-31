@@ -7,12 +7,14 @@
 
 /* List of channels provided by the Tx */
 #define CHANDEF(x) INP_##x,
+#define UNDEF_INP
 enum {
     INP_NONE,
     #include "capabilities.h"
     INP_LAST,
 };
 #undef CHANDEF
+#undef UNDEF_INP
 
 /* List of buttons provided by the Tx */
 #define BUTTONDEF(x) BUT_##x,

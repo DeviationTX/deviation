@@ -13,6 +13,11 @@
   CHANDEF(FMOD2)
 #endif
 
+#ifdef UNDEF_INP
+#define INP_RUD_DR INP_DR
+#define INP_ELE_DR INP_DR
+#define INP_AIL_DR INP_DR
+#endif
 #ifdef CHANMAP
   CHANMAP(RUD_DR, DR)
   CHANMAP(ELE_DR, DR)

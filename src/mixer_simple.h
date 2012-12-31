@@ -20,7 +20,7 @@ typedef struct {
     u8 pitch;
     u8 gear;
     u8 aux2;
-    u8 swicthes[3];
+    u8 switches[3];
 } MappedSimpleChannels;
 
 #define MAX_TRAVEL_LIMIT 150

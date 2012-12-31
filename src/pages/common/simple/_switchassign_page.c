@@ -33,7 +33,7 @@ static u8 switch_idx[3];
 static u8 get_switch_idx(FunctionSwitch switch_type) {
     for (u8 i = 0; i < 6; i++) {
         for (u8 j = 0; j < 3; j++) {
-            if (mapped_simple_channels.swicthes[switch_type] == switch_table[i].switches[j])
+            if (mapped_simple_channels.switches[switch_type] == switch_table[i].switches[j])
                 return i;
         }
     }
@@ -46,7 +46,7 @@ static void refresh_switches()
     struct Mixer *mix = MIXER_GetAllMixers();
 
     if (Model.limits[mapped_simple_channels.throttle].safetysw)
-        mapped_simple_channels.swicthes[SWITCHFUNC_HOLD] =  Model.limits[mapped_simple_channels.throttle].safetysw;
+        mapped_simple_channels.switches[SWITCHFUNC_HOLD] =  Model.limits[mapped_simple_channels.throttle].safetysw;
     u8 found_gyro_switch = 0;
     u8 found_flymode_switch = 0;
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
@@ -54,10 +54,10 @@ static void refresh_switches()
             continue;
         if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_simple_channels.gear || mix[idx].dest == mapped_simple_channels.aux2)) {
             found_gyro_switch = 1;
-            mapped_simple_channels.swicthes[SWITCHFUNC_GYROSENSE] = mix[idx].sw;
+            mapped_simple_channels.switches[SWITCHFUNC_GYROSENSE] = mix[idx].sw;
         } else if (!found_flymode_switch && mix[idx].dest == NUM_OUT_CHANNELS && mix[idx].sw != 0) { //virt1
             found_flymode_switch = 1;
-            mapped_simple_channels.swicthes[SWITCHFUNC_FLYMODE] = mix[idx].sw;
+            mapped_simple_channels.switches[SWITCHFUNC_FLYMODE] = mix[idx].sw;
         }
         if (found_flymode_switch && found_gyro_switch)
             break;  // don't need to check the rest
@@ -73,10 +73,10 @@ void save_changes()
 {
     MUSIC_Play(MUSIC_SAVING);
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type <= SWITCHFUNC_GYROSENSE; switch_type++)
-        mapped_simple_channels.swicthes[switch_type] = switch_table[switch_idx[switch_type]].switches[0];
+        mapped_simple_channels.switches[switch_type] = switch_table[switch_idx[switch_type]].switches[0];
 
     if (Model.limits[mapped_simple_channels.throttle].safetysw)
-       Model.limits[mapped_simple_channels.throttle].safetysw = mapped_simple_channels.swicthes[SWITCHFUNC_HOLD];
+       Model.limits[mapped_simple_channels.throttle].safetysw = mapped_simple_channels.switches[SWITCHFUNC_HOLD];
 
     u8 gyro_count = 0;
     u8 drexp_aile_count = 0;

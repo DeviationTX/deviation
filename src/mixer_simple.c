@@ -35,9 +35,9 @@ void SIMPLEMIXER_Preset()
     mapped_simple_channels.rudd = 3;
     mapped_simple_channels.gear = GYROOUTPUT_GEAR;
     mapped_simple_channels.aux2 = GYROOUTPUT_AUX2;
-    mapped_simple_channels.swicthes[SWITCHFUNC_HOLD] = INP_RUD_DR;
-    mapped_simple_channels.swicthes[SWITCHFUNC_GYROSENSE] = INP_MIX0;
-    mapped_simple_channels.swicthes[SWITCHFUNC_FLYMODE] = INP_FMOD0;
+    mapped_simple_channels.switches[SWITCHFUNC_HOLD] = INP_RUD_DR;
+    mapped_simple_channels.switches[SWITCHFUNC_GYROSENSE] = INP_MIX0;
+    mapped_simple_channels.switches[SWITCHFUNC_FLYMODE] = INP_FMOD0;
 
     if (Model.protocol == 0) {  // for none protocol, assign any channel to thr is fine
         mapped_simple_channels.throttle = 0;
