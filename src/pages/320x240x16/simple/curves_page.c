@@ -23,7 +23,7 @@
 #include "../../common/simple/_curves_page.c"
 
 static const char *curvepos[] = {
-  "2", "3", "4", "M", "6", "7", "8"
+  _tr_noop("L"), "2", "3", "4", _tr_noop("M"), "6", "7", "8", _tr_noop("H")
 };
 
 static const char *buttonstr_cb(guiObject_t *obj, const void *data)
@@ -94,26 +94,25 @@ static void show_page(CurvesMode _curve_mode, int page)
             mp->mixer_ptr[i]->curve.type = CURVE_9POINT;
     }
     /* Row 1 */
-    GUI_CreateLabelBox(10, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
-    GUI_CreateTextSelect(100, 40, TEXTSELECT_96, 0x0000, NULL, set_mode_cb, (void *)(long)curve_mode);
-    mp->itemObj[9] = GUI_CreateTextSelect(206, 40, TEXTSELECT_64, 0x0000, NULL, set_holdstate_cb, NULL);
+    GUI_CreateButton(20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
+    GUI_CreateLabelBox(92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateTextSelect(140, 40, TEXTSELECT_96, 0x0000, NULL, set_mode_cb, (void *)(long)curve_mode);
+    mp->itemObj[9] = GUI_CreateTextSelect(246, 40, TEXTSELECT_64, 0x0000, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden(mp->itemObj[9], 1);
 
-    /* Row 2 */
-    GUI_CreateLabelBox(4, 60, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Low"));
-    mp->itemObj[0] = GUI_CreateTextSelect(60, 60, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)0L);
-    GUI_CreateLabelBox(125, 60, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("High"));
-    mp->itemObj[8] = GUI_CreateTextSelect(180, 60, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)8L);
-    GUI_CreateButton(260, 60, BUTTON_48x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
-  
     #define COL1 4
     #define COL2 20
     #define COL3 92
-    for(long i = 0; i < 7; i++) {
-        GUI_CreateLabelBox(COL1, 80+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, curvepos[i]);
-        mp->itemObj[i+1] = GUI_CreateTextSelect(COL2, 80+20*i, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)(i+1));
-        GUI_CreateButton(COL3, 80+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)(i+1));
+    /* Row 2 */
+    for(long i = 0; i < 9; i++) {
+        const char *label = curvepos[i];
+        if(label[0] > '9')
+            label = _tr(label);
+        GUI_CreateLabelBox(COL1, 60+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, label);
+        mp->itemObj[i] = GUI_CreateTextSelect(COL2, 60+20*i, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)i);
+        if (i > 0 && i < 8)
+            GUI_CreateButton(COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }
     update_textsel_state();
     mp->graphs[0] = GUI_CreateXYGraph(160, 80, 150, 150,
