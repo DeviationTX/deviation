@@ -86,7 +86,7 @@ static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
         curve->points[1] = curve->points[0];
     }
     if (curve->points[0] == 0)
-        strcpy(mp->tmpstr, "LIN");
+        strcpy(mp->tmpstr, _tr("LIN"));
     else {
         sprintf(mp->tmpstr, "%d", curve->points[0]);
         strcat(mp->tmpstr, "%");
