@@ -151,5 +151,5 @@ u8 SIMPLEMIXER_ValidateTraditionModel()
 
 const char *SIMPLEMIXER_ModeName(int mode)
 {
-    return mode == MIXER_ADVANCED ? _tr("Advanced") : _tr("Simple");
+    return mode == MIXER_ADVANCED ? _tr("Advanced") : _tr("Standard");
 }
