@@ -25,8 +25,8 @@ DUMP ?= objdump
 SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
                 $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard protocol/*.c) \
                 $(wildcard pages/$(SCREENSIZE)/advanced/*.c) \
-                $(wildcard pages/$(SCREENSIZE)/simple/*.c) \
                 $(wildcard config/*.c)
+#                $(wildcard pages/$(SCREENSIZE)/simple/*.c)
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
@@ -52,7 +52,7 @@ endif
 ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 else
-  CFLAGS   := $(CFLAGS) -O2
+  CFLAGS   := $(CFLAGS)
 endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) -DHGVERSION="\"${HGVERSION}\""
