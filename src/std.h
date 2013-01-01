@@ -10,9 +10,9 @@
 #else
 //  #define printf iprintf
 #endif
-//#define sprintf siprintf
-//#define snprintf sniprintf
-//#define fprintf fiprintf
+#define sprintf siprintf
+#define snprintf sniprintf
+#define fprintf fiprintf
 //#define fread(a, b, c, d) 0
 //#define fopen(a, b) -1
 //#define fclose if(0) fclose

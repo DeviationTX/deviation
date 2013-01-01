@@ -53,7 +53,7 @@ void PAGE_DisableSafetyDialog(u8 disable)
 
 static void invalid_simplemixer_cb(u8 state, void *guiObj)
 {
-#define SIMPLE_TEMPLATE "helismpl.ini"
+#define SIMPLE_TEMPLATE "heli_std.ini"
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
     dialog = NULL;
