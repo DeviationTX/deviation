@@ -61,15 +61,14 @@ EXEEXT   ?= elf
 
 LAST_MODEL := filesystem/models/model$(NUM_MODELS).ini
 
-
 .PHONY: $(LAST_MODEL)
 
-$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LAST_MODEL)
+$(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LAST_MODEL) $(LIBOPENCM3)
 	@echo " + Building '$@'"
 ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LFLAGS) $(CFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS)
 endif
 
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
@@ -97,12 +96,18 @@ $(VERBOSE).SILENT:
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list $(TARGET).map $(ODIR)/*.o $(ODIR)/*.P
 
+distclean:
+	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
+	rm -rf objs
+	make -C libopencm3 clean > /dev/null
+	rm -rf deviation*.zip
+
 flash: devo8.dfu
 	dfu-util -a 0 -D devo8.dfu
 
 language:
 	../utils/extract_strings.pl -update
-	
+
 $(OBJS): | $(ODIR)
 
 $(ODIR):
@@ -156,7 +161,7 @@ $(ODIR)/hgstamp:
 # phony targets
 .PHONY: clean
 # recompile if the Makefile changes
-$(OBJS): Makefile target/$(TARGET)/Makefile.inc
+$(OBJS): Makefile target/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES)
 
 zip: $(TARGET).dfu
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu

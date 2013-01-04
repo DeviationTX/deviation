@@ -1,7 +1,7 @@
 There are multiple targets available for building the Deviation firmware:
 
 devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
-        It requires the gnu arm toolchain including gcc, newlib, and libopencm3
+        It requires the gnu arm toolchain including gcc, and newlib
         To build, use:
            make
 
@@ -25,11 +25,6 @@ Building for ARM (on Linux):
     I use the following script to install a cross-compiled gcc,
     and the relevant libraries:
            https://github.com/esden/summon-arm-toolchain
-    I recommend hacking the folloiwng variables in the summon-arm-toolchain script 1st.  We have had
-    quite a bit of trouble with libopencm3 compatibility as they are not currently maintaining
-    backwards compatibility
-        LIBOPENCM3=libopencm3
-        LIBOPENCM3_GIT=83d62e9bfc79e03737c2f1977004bef6e6e20562
 Building for ARM (on Windows):
     Install the arm toolchain:
     1) download and install YAGARTO (install into /mingw/stm32)
@@ -37,16 +32,9 @@ Building for ARM (on Windows):
     1a) add YAGARTO to your PATH (I like to put this into ~/.profile
         so it is there each time I start msys)
         export PATH=/mingw/stm32/bin:$PATH
-    2) download and unpack libopencm3
-       download here (rename to .zip if needed): https://github.com/libopencm3/libopencm3/zipball/83d62e9bfc79e03737c2f1977004bef6e6e20562
-       unzip into ~/src/
-    2a) Fix libopencm3 Makefile
-       modify 'DESTDIR=/usr/local' to 'DESTDIR=/mingw/stm32'
-    2b) Make and install libopencm3
-       make && make install
-    3) ensure python is installed.  If not install it from here:
+    2) ensure python is installed.  If not install it from here:
        http://www.python.org/download/releases/2.7.3/
-    3a) Add python to your msys path:
+    2a) Add python to your msys path:
        export PATH="/c/<path to python>":$PATH
        (e.g. export PATH="/c/Program Files/Python27":$PATH)
 #################################

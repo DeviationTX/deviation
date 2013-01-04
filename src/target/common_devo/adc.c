@@ -33,21 +33,18 @@ void ADC_Init(void)
 
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_ADC1EN);
 
-    /* Make sure the ADC doesn't run during config. */
-    adc_off(ADC1);
-
     /* We configure to scan the entire group each time conversion is requested. */
     adc_enable_scan_mode(ADC1);
     adc_set_single_conversion_mode(ADC1);
-    adc_disable_discontinous_mode_regular(ADC1);
+    adc_disable_discontinuous_mode_regular(ADC1);
     adc_disable_external_trigger_regular(ADC1);
     adc_set_right_aligned(ADC1);
 
     /* We want to read the temperature sensor, so we have to enable it. */
     adc_enable_temperature_sensor(ADC1); 
-    adc_set_conversion_time_on_all_channels(ADC1, ADC_SMPR_SMP_28DOT5CYC);
+    adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_28DOT5CYC);
 
-    adc_on(ADC1);
+    adc_power_on(ADC1);
 
     /* Wait for ADC starting up. */
     for (i = 0; i < 800000; i++)    /* Wait a bit. */
@@ -106,7 +103,7 @@ u16 ADC1_Read(u8 channel)
      * If the ADC_CR2_ON bit is already set -> setting it another time
      * starts the conversion.
      */
-    adc_on(ADC1);
+    adc_start_conversion_direct(ADC1);
 
     /* Wait for end of conversion. */
     while (!(ADC_SR(ADC1) & ADC_SR_EOC));
@@ -116,7 +113,7 @@ u16 ADC1_Read(u8 channel)
 void ADC_StartCapture()
 {
     //while (!(ADC_SR(ADC1) & ADC_SR_EOC));
-    adc_on(ADC1);
+    adc_start_conversion_direct(ADC1);
 }
 
 void dma1_channel1_isr()

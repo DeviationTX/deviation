@@ -1,0 +1,132 @@
+------------------------------------------------------------------------------
+README
+------------------------------------------------------------------------------
+
+The libopencm3 project aims to create an open-source firmware library for
+various ARM Cortex-M3 microcontrollers.
+
+Currently (at least partly) supported microcontrollers:
+
+ - ST STM32F1 series
+ - ST STM32F2 series
+ - ST STM32F4 series
+ - NXP LPC1311/13/42/43
+
+The library is written completely from scratch based on the vendor datasheets,
+programming manuals, and application notes. The code is meant to be used
+with a GCC toolchain for ARM (arm-elf or arm-none-eabi), flashing of the
+code to a microcontroller can be done using the OpenOCD ARM JTAG software.
+
+
+Status and API
+--------------
+
+The libopencm3 project is currently work in progress. Not all subsystems
+of the microcontrollers are supported, yet.
+
+IMPORTANT: The API of the library is NOT yet considered stable! Please do
+           not rely on it, yet! Changes to function names, macro names etc.
+           can happen at any time without prior notice!
+
+
+Building
+--------
+
+ $ make
+
+You may want to override the toolchain (e.g., arm-elf or arm-none-eabi):
+
+ $ PREFIX=arm-none-eabi make
+
+For a more verbose build you can use
+
+ $ make V=1
+
+
+Example projects
+----------------
+
+The library ships with a few small example projects which illustrate how
+individual subsystems of the microcontrollers can be configured and used with
+libopencm3. The makefiles are generally useable for your own projects with
+only minimal changes for the libopencm3 install path (See Installation)
+
+For flashing the 'miniblink' example (after you built libopencm3 and the
+examples by typing 'make' at the top-level directory) onto the Olimex
+STM32-H103 eval board (ST STM32F1 series microcontroller), you can execute:
+
+ $ cd examples/stm32/f1/stm32-h103/miniblink
+ $ make flash
+
+The Makefiles of the examples are configured to use a certain OpenOCD
+flash programmer, you might need to change some of the variables in the
+Makefile if you use a different one.
+
+You can also flash manually like this:
+
+ $ openocd -f interface/jtagkey-tiny.cfg -f target/stm32f1x.cfg
+ $ telnet localhost 4444
+ > reset halt
+ > flash write_image erase foobar.hex
+ > reset
+
+Replace the "jtagkey-tiny.cfg" with whatever JTAG device you are using, and/or
+replace "stm32f1x.cfg" with your respective config file. Replace "foobar.hex"
+with the file name of the image you want to flash.
+
+
+Installation
+------------
+
+ $ make install
+
+This will install the library into /usr/local. (permissions permitting)
+
+If you want to install it elsewhere, use the following syntax:
+
+ $ make DESTDIR=/opt/libopencm3 install
+
+If you want to attempt to install into your toolchain, use this:
+
+ $ make DETECT_TOOLCHAIN=1 install
+
+Note: If you install this into your toolchain, you don't need to pass
+any extra -L or -I flags into your projects.  However, this also means
+you must NOT pass any -L or -I flags that point into the toolchain. This
+_will_ confuse the linker.  (ie, for summon-arm-toolchain, do NOT pass
+-L/home/user/sat/lib) Common symptoms of confusing
+the linker are hard faults caused by branches into arm code.
+You can use objdump to check for this in your final elf.
+
+
+Coding style and development guidelines
+---------------------------------------
+
+See HACKING.
+
+
+License
+-------
+
+The libopencm3 code is released under the terms of the GNU Lesser General
+Public License (LGPL), version 3 or later.
+
+See COPYING.GPL3 and COPYING.LGPL3 for details.
+
+
+Mailing lists
+-------------
+
+ * Developer mailing list (for patches and discussions):
+   https://lists.sourceforge.net/lists/listinfo/libopencm3-devel
+
+ * Commits mailing list (receives one mail per 'git push'):
+   https://lists.sourceforge.net/lists/listinfo/libopencm3-commits
+
+
+Website
+-------
+
+ http://libopencm3.org
+ http://sourceforge.net/projects/libopencm3/
+
