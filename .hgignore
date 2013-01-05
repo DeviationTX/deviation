@@ -4,6 +4,8 @@ elf$
 exe$
 list$
 gz$
+^src/libopencm3/.*\.d$
+^src/libopencm3/.*\.a$
 #src/gz*
 #src/elf*
 map$
