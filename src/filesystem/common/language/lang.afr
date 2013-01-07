@@ -16,7 +16,7 @@ Aantal Kanale:
 :4 Bars
 4 Balke
 :4 Inside
-4 binne
+4 Binne
 :4 Outside
 4 buite
 :4Ch w/ Dual-Rates
@@ -86,7 +86,7 @@ Kassie %d:
 :Button monitor
 Knoppie Monitor
 :Buzz volume:
-Buzz Volume:
+Beep Volume:
 :COL
 KOL
 :COL Inv
@@ -200,7 +200,7 @@ Wiele
 :GPS
 GPS
 :Generic settings
-Generies Opstelling
+Generiese Opstelling
 :Heli
 Heli
 :Helicopter
@@ -228,7 +228,7 @@ LINKS_V
 :Language:
 Taal: 
 :Latitude
-Breedteraad
+Breedtegraad
 :Left
 Links
 :Length:
@@ -330,7 +330,7 @@ Voorwaarsku per:
 :Prealert time:
 Voorwaarsku tyd:
 :Press 'Ent' to turn USB Filesystem:
-'Druk 'ENT' vir USB aan:
+Druk 'ENT' vir USB aan:
 :Press ENT to change:
 Druk ENT om te Verander:
 :Press ENT to copy to:
@@ -450,13 +450,13 @@ TelemT
 :TelemV
 TelemV
 :Telemetry
-Telemetry
+Telemetrie
 :Telemetry config
-Telemetry Opstel
+Telemetrie Konfigurasie
 :Telemetry monitor
-Telemetry monitor
+Telemetrie Monitor
 :Telemetry settings
-Telemetry Opstelling
+Telemetrie Opstelling
 :Temp
 Temp
 :Temp:
