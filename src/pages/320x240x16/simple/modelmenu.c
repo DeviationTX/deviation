@@ -19,34 +19,32 @@
 
 struct menu_s {
     u8 id;
-    const char file[20];
+    struct ImageMap icon;
 };
 static const struct menu_s menus[] = {
-    {PAGEID_MODEL,        "media/mnumodel.bmp"},
-    {PAGEID_REVERSE,      "media/mnurvrse.bmp"},
-    {PAGEID_DREXP,        "media/mnuexpdr.bmp"},
-    {PAGEID_SUBTRIM,      "media/mnusubtr.bmp"},
-    {PAGEID_TRAVELADJ,    "media/mnutradj.bmp"},
-    {PAGEID_THROCURVES,   "media/mnuthrcv.bmp"},
-    {PAGEID_PITCURVES,    "media/mnupitcv.bmp"},
-    {PAGEID_THROHOLD,     "media/mnuthrhd.bmp"},
-    {PAGEID_GYROSENSE,    "media/mnugyro.bmp"},
-    {PAGEID_SWASH,        "media/mnuswash.bmp"},
-    {PAGEID_FAILSAFE,     "media/mnufail.bmp"},
-    {PAGEID_SWITCHASSIGN, "media/mnuswtch.bmp"},
-    {PAGEID_TIMER,        "media/mnutimer.bmp"},
-    {PAGEID_TELEMCFG,     "media/mnutelem.bmp"},
-    {PAGEID_TRIM,         "media/mnutrim.bmp"},
-    {PAGEID_MAINCFG,      "media/mnucfg.bmp"},
+    {PAGEID_MODEL,        {"media/mnumodel.bmp", 48, 47, 0, 0}},
+    {PAGEID_REVERSE,      {"media/mnurvrse.bmp", 48, 47, 0, 0}},
+    {PAGEID_DREXP,        {"media/mnuexpdr.bmp", 48, 47, 0, 0}},
+    {PAGEID_SUBTRIM,      {"media/mnusubtr.bmp", 48, 47, 0, 0}},
+    {PAGEID_TRAVELADJ,    {"media/mnutradj.bmp", 48, 47, 0, 0}},
+    {PAGEID_THROCURVES,   {"media/mnuthrcv.bmp", 48, 47, 0, 0}},
+    {PAGEID_PITCURVES,    {"media/mnupitcv.bmp", 48, 47, 0, 0}},
+    {PAGEID_THROHOLD,     {"media/mnuthrhd.bmp", 48, 47, 0, 0}},
+    {PAGEID_GYROSENSE,    {"media/mnugyro.bmp",  48, 47, 0, 0}},
+    {PAGEID_SWASH,        {"media/mnuswash.bmp", 48, 47, 0, 0}},
+    {PAGEID_FAILSAFE,     {"media/mnufail.bmp",  48, 47, 0, 0}},
+    {PAGEID_SWITCHASSIGN, {"media/mnuswtch.bmp", 48, 47, 0, 0}},
+    {PAGEID_TIMER,        {"media/mnutimer.bmp", 48, 47, 0, 0}},
+    {PAGEID_TELEMCFG,     {"media/mnutelem.bmp", 48, 47, 0, 0}},
+    {PAGEID_TRIM,         {"media/mnutrim.bmp",  48, 47, 0, 0}},
+    {PAGEID_MAINCFG,      {"media/mnucfg.bmp",   48, 47, 0, 0}},
 };
 
-static void ico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
+static void ico_select_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if (press_type == -1) {
-        u16 pos = (long)data;
-        PAGE_ChangeByID(menus[pos].id);
-    }
+    u16 pos = (long)data;
+    PAGE_ChangeByID(menus[pos].id);
 }
 
 static void goto_mainpage(guiObject_t *obj, const void *data)
@@ -69,7 +67,7 @@ void PAGE_ModelMenuInit(int page)
             if (pos >= count)
                 break;
             int x = 12 + i*60;
-            GUI_CreateImageOffset(x, y, 48, 47, 0, 0, menus[pos].file, ico_select_cb, (void *)pos);
+            GUI_CreateIcon(x, y, &menus[pos].icon, ico_select_cb, (void *)pos);
         }
     }
 }
