@@ -116,7 +116,6 @@ static const char *_swicthlabel_cb(guiObject_t *obj, const void *data);
 static s8 current_selected = 0;
 static u8 total_items = 0;
 static s16 view_origin_relativeY;
-static guiObject_t *scroll_bar;
 
 static void _show_page()
 {
@@ -134,9 +133,9 @@ static void _show_page()
     int y = 0;
     u8 w = 63;
     u8 x = 56;
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateLabelBox(&gui->label_trim, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trims:"));
-    guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+    guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->trimsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, trimsel_cb, NULL);
     GUI_SetSelected(obj);
     total_items++;
@@ -144,36 +143,36 @@ static void _show_page()
     y += space;
     long i;
     for(i = 0; i < 8; i++) {
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateLabelBox(&gui->boxlabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                     0, ITEM_HEIGHT, &DEFAULT_FONT, boxlabel_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateTextSelectPlate(&gui->boxsel[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, boxtxtsel_cb, (void *)(long)i);
         y+= space;
         total_items++;
     }
 
     for(i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateLabelBox(&gui->switchlabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, _swicthlabel_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateTextSelectPlate(&gui->switchsel[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
                     w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_inv_cb, toggle_val_cb,  (void *)(long)i);
         y+= space;
         total_items++;
      }
      y += space;
      for (i = 0; i < NUM_QUICKPAGES; i++) {
-         GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+         GUI_CreateLabelBox(&gui->menulabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
              0, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)i);
          y += space;
-         GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+         GUI_CreateTextSelectPlate(&gui->menusel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                 120, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)i);
          y += space;
          total_items++;
     }
 
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
+    GUI_CreateScrollbar(&gui->scroll_bar, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
     if (page_num > 0)
-        PAGE_NavigateItems(page_num, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        PAGE_NavigateItems(page_num, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
 }
 
 static void _show_title()
@@ -200,9 +199,9 @@ u8 _action_cb(u32 button, u8 flags, void *data)
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_ChangeByID(PAGEID_MAIN, 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

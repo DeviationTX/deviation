@@ -20,19 +20,14 @@
 
 #include "_button.c"
 
-guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
+guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType type,
     const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
-    struct guiObject *obj    = GUI_GetFreeObj();
-    struct guiButton *button;
+    struct guiHeader *obj = (guiObject_t *)button;
     struct guiBox    *box;
 
-    if (obj == NULL)
-        return NULL;
-
     box = &obj->box;
-    button = &obj->o.button;
 
     button->image = _button_image_map(type);
 
@@ -59,18 +54,13 @@ guiObject_t *GUI_CreateButton(u16 x, u16 y, enum ButtonType type,
     return obj;
 }
 
-guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
+guiObject_t *GUI_CreateIcon(guiButton_t *button, u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
-    struct guiObject *obj    = GUI_GetFreeObj();
-    struct guiButton *button;
+    struct guiHeader *obj = (guiObject_t *)button;
     struct guiBox    *box;
 
-    if (obj == NULL)
-        return NULL;
-
     box = &obj->box;
-    button = &obj->o.button;
     button->image = image;
 
     box->x = x;
@@ -93,12 +83,11 @@ guiObject_t *GUI_CreateIcon(u16 x, u16 y, const struct ImageMap *image,
     return obj;
 }
 
-guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+guiObject_t *GUI_CreateButtonPlateText(guiButton_t *button, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
     const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
     void (*CallBack)(struct guiObject *obj, const void *data), const void *cb_data)
 {
-    struct guiObject  *obj = GUI_CreateButton(x, y, BUTTON_DEVO10, strCallback, fontColor, CallBack, cb_data);
-    struct guiButton *button = &obj->o.button;
+    guiObject_t *obj = GUI_CreateButton(button, x, y, BUTTON_DEVO10, strCallback, fontColor, CallBack, cb_data);
     struct guiBox *box = &obj->box;
     button->desc = *desc;
     box->width = width;
@@ -108,7 +97,7 @@ guiObject_t *GUI_CreateButtonPlateText(u16 x, u16 y, u16 width, u16 height, cons
 
 void GUI_DrawButton(struct guiObject *obj)
 {
-    struct guiButton *button = &obj->o.button;
+    struct guiButton *button = (struct guiButton *)obj;
     struct guiBox *box = &obj->box;
     const char *txt;
     u16 x_off, y_off;
@@ -189,7 +178,7 @@ int GUI_ButtonHeight(enum ButtonType type)
 
 void GUI_ButtonEnable(struct guiObject *obj, u8 enable)
 {
-    struct guiButton *button = &obj->o.button;
+    struct guiButton *button = (struct guiButton *)obj;
     if (button->enable != enable) {
         button->enable = enable;
         OBJ_SET_DIRTY(obj, 1);
@@ -198,6 +187,6 @@ void GUI_ButtonEnable(struct guiObject *obj, u8 enable)
 
 u8 GUI_IsButtonEnabled(struct guiObject *obj)
 {
-    struct guiButton *button = &obj->o.button;
+    struct guiButton *button = (struct guiButton *)obj;
     return button->enable;
 }

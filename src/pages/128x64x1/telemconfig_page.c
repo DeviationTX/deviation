@@ -27,7 +27,6 @@ static const char *idx_cb(guiObject_t *obj, const void *data);
 #define VIEW_ID 0
 
 static u8 total_items;
-static guiObject_t *scroll_bar;
 static s8 current_selected = 0;
 static s16 view_origin_relativeY = 0;
 
@@ -40,8 +39,8 @@ void PAGE_TelemconfigInit(int page)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
-        tp.valueObj[0] = NULL; // A indication not allow to scroll up/down
+        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        OBJ_SET_USED(&gui->value, 0);  // A indication not allow to scroll up/down
         return;
     }
 
@@ -63,24 +62,24 @@ void PAGE_TelemconfigInit(int page)
     u8 i;
     for (i = 0; i < TELEM_NUM_ALARMS; i++) {
         u8 x = 9;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->idx[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)i);
         x += w1 + 5;
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->gtlt[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)i);
         x += w2 + 3;
-        tp.valueObj[i] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->value[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w3, ITEM_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)i);
         total_items++;
         row += space;
     }
     GUI_Select1stSelectableObj();
     total_items *= 3;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
+    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
     if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
@@ -98,10 +97,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         }
-        else if (CHAN_ButtonIsPressed(button, BUT_UP) && tp.valueObj[0]!= NULL) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && tp.valueObj[0] != NULL) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+        else if (CHAN_ButtonIsPressed(button, BUT_UP) && OBJ_IS_USED(&gui->value[0])) {
+            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && OBJ_IS_USED(&gui->value[0])) {
+            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

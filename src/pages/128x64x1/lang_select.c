@@ -27,6 +27,7 @@ static const char *_string_cb(guiObject_t *obj, const void *data);
 static s8 current_selected;
 static s16 view_origin_relativeY = 0;
 
+#define gui (&gui_objs.u.lang)
 void LANGPage_Select(void(*return_page)(int page))
 {
     PAGE_RemoveAllObjects();
@@ -58,7 +59,7 @@ void LANGPage_Select(void(*return_page)(int page))
     u8 y = 0;
     guiObject_t *obj;
     for (u8 i = 0; i < cp->total_items; i++) {
-        obj = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        obj = GUI_CreateLabelBox(&gui->label[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
             0, ITEM_HEIGHT, &DEFAULT_FONT, _string_cb, NULL, (void *)(long)i);
         GUI_SetSelectable(obj, 1);
         if (i == 0)
@@ -69,9 +70,9 @@ void LANGPage_Select(void(*return_page)(int page))
 
     // The following items are not draw in the logical view;
     if (cp->total_items > PAGE_ITEM_MAX)
-        cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
+        GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
     if ( Transmitter.language > 0)
-        PAGE_NavigateItems(Transmitter.language, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
+        PAGE_NavigateItems(Transmitter.language, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
 }
 
 const char *_string_cb(guiObject_t *obj, const void *data)
@@ -92,9 +93,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             cp->return_page(0);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             //_navigate_items(-1);
-            PAGE_NavigateItems(-1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
+            PAGE_NavigateItems(-1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
+            PAGE_NavigateItems(1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

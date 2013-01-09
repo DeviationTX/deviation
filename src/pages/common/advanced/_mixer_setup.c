@@ -14,6 +14,7 @@
  */
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
+#define gui (&gui_objs.u.advmixcfg)
 
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void sync_mixers();
@@ -54,9 +55,6 @@ void MIXPAGE_ChangeTemplate(int show_header)
     } else {
         GUI_RemoveHierObjects(mp->firstObj); 
     }
-    memset(mp->expoObj, 0, sizeof(mp->expoObj));
-    memset(mp->graphs, 0, sizeof(mp->graphs));
-    mp->trimObj = NULL;
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
     case MIXERTEMPLATE_CYC1:
@@ -347,16 +345,16 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        if(mp->trimObj) {
+        if(OBJ_IS_USED(&gui->trim)) {
             if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-                GUI_SetHidden(mp->trimObj, 0);
+                GUI_SetHidden((guiObject_t *)&gui->trim, 0);
             else
-                GUI_SetHidden(mp->trimObj, 1);
+                GUI_SetHidden((guiObject_t *)&gui->trim, 1);
         }
         sync_mixers();
         redraw_graphs();
     }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(mp->tmpstr, *source);
 }
 
@@ -380,7 +378,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             redraw_graphs();
         }
     }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(mp->tmpstr, *source);
 }
 
@@ -398,7 +396,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         sync_mixers();
         redraw_graphs();
     }
-    GUI_TextSelectEnablePress(obj, mix->curve.type >= CURVE_EXPO);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, mix->curve.type >= CURVE_EXPO);
     return CURVE_GetName(&mix->curve);
 }
 
@@ -428,7 +426,9 @@ void curveselect_cb(guiObject_t *obj, void *data)
     if (mix->curve.type >= CURVE_EXPO
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
         //Do not allow entering a linked graph
-        memset(mp->graphs, 0, sizeof(mp->graphs));
+        OBJ_SET_USED(&gui->graphs[0], 0);
+        OBJ_SET_USED(&gui->graphs[1], 0);
+        OBJ_SET_USED(&gui->graphs[2], 0);
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }
 }
@@ -486,7 +486,9 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
-    memset(mp->graphs, 0, sizeof(mp->graphs));
+    OBJ_SET_USED(&gui->graphs[0], 0);
+    OBJ_SET_USED(&gui->graphs[1], 0);
+    OBJ_SET_USED(&gui->graphs[2], 0);
     PAGE_MixerInit(mp->top_channel);
 }
 
@@ -501,14 +503,14 @@ void redraw_graphs()
 {
     switch(mp->cur_template) {
     case MIXERTEMPLATE_EXPO_DR:
-        if (mp->graphs[1] != NULL)
-            GUI_Redraw(mp->graphs[1]);
-        if (mp->graphs[2] != NULL)
-            GUI_Redraw(mp->graphs[2]);
+        if (OBJ_IS_USED(&gui->graphs[1]))
+            GUI_Redraw(&gui->graphs[1]);
+        if (OBJ_IS_USED(&gui->graphs[2]))
+            GUI_Redraw(&gui->graphs[2]);
     case MIXERTEMPLATE_COMPLEX:
     case MIXERTEMPLATE_SIMPLE:
-        if (mp->graphs[0] != NULL)
-            GUI_Redraw(mp->graphs[0]);
+        if (OBJ_IS_USED(&gui->graphs[0]))
+            GUI_Redraw(&gui->graphs[0]);
         break;
     case MIXERTEMPLATE_NONE: break;
     case MIXERTEMPLATE_CYC1: break;

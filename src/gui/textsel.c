@@ -18,23 +18,18 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fontColor,
+guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type, u16 fontColor,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data)
 {
-    struct guiObject *obj = GUI_GetFreeObj();
-    struct guiTextSelect *select;
+    struct guiObject *obj = (guiObject_t *)select;
     struct guiBox *box;
 
-    if (obj == NULL)
-        return NULL;
-
     box = &obj->box;
-    select = &obj->o.textselect;
 
     select->type = type;
-    GUI_TextSelectEnablePress(obj, select_cb ? 1 : 0);
+    GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
     box->height = select->button->height;
     box->width = select->button->width + 2 * ARROW_WIDTH;
 
@@ -58,20 +53,15 @@ guiObject_t *GUI_CreateTextSelect(u16 x, u16 y, enum TextSelectType type, u16 fo
     return obj;
 }
 
-guiObject_t *GUI_CreateTextSelectPlate(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data)
 {
-    struct guiObject *obj = GUI_GetFreeObj();
-    struct guiTextSelect *select;
+    struct guiObject *obj = (guiObject_t *)select;
     struct guiBox *box;
 
-    if (obj == NULL)
-        return NULL;
-
     box = &obj->box;
-    select = &obj->o.textselect;
 
     select->type = TEXTSELECT_DEVO10;
     box->height = height;
@@ -93,7 +83,7 @@ guiObject_t *GUI_CreateTextSelectPlate(u16 x, u16 y, u16 width, u16 height, cons
     select->cb_data   = cb_data;
     select->enable = 1;
 
-    GUI_TextSelectEnablePress(obj, select_cb ? 1 : 0);
+    GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
     if ((width == 0 || height == 0) && select->desc.style != LABEL_UNDERLINE)
         select->desc.style = LABEL_NO_BOX;
@@ -105,7 +95,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
 {
     u16 x, y, w, h;
     struct guiBox *box = &obj->box;
-    struct guiTextSelect *select = &obj->o.textselect;
+    struct guiTextSelect *select = (struct guiTextSelect *)obj;
     //Call the callback 1st in case it calls GUI_TextSelectEnablePress
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
@@ -178,7 +168,7 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32
 u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_type)
 {
     struct guiBox box = obj->box;
-    struct guiTextSelect *select = &obj->o.textselect;
+    struct guiTextSelect *select = (struct guiTextSelect *)obj;
 
     if (press_type < 0) {
         if(! select->state) {
@@ -258,9 +248,9 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
     GUI_TouchTextSelect(obj, &coords, press_type);
 }
 
-void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
+void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
 {
-    struct guiTextSelect *select = &obj->o.textselect;
+    guiObject_t *obj = (guiObject_t *)select;
     if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
         if (enable)
             select->desc.style = LABEL_BOX;
@@ -282,9 +272,9 @@ void GUI_TextSelectEnablePress(struct guiObject *obj, u8 enable)
     }
 }
 
-void GUI_TextSelectEnable(struct guiObject *obj, u8 enable)
+void GUI_TextSelectEnable(guiTextSelect_t *select, u8 enable)
 {
-    struct guiTextSelect *select = &obj->o.textselect;
+    guiObject_t *obj = (guiObject_t *)select;
     if (select->enable != enable) {
         select->enable = enable;
         OBJ_SET_DIRTY(obj, 1);
@@ -293,6 +283,6 @@ void GUI_TextSelectEnable(struct guiObject *obj, u8 enable)
 
 u8 GUI_IsTextSelectEnabled(struct guiObject *obj)
 {
-    struct guiTextSelect *select = &obj->o.textselect;
+    struct guiTextSelect *select = (struct guiTextSelect *)obj;
     return select->enable;
 }

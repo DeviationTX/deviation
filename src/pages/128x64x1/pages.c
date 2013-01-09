@@ -91,6 +91,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     pages[cur_page].init(menuPage);
 }
 
+static guiLabel_t headerLabel;
 void PAGE_ShowHeader(const char *title)
 {
     struct LabelDesc labelDesc;
@@ -98,7 +99,7 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
@@ -108,7 +109,7 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(0, 0, width, height, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
@@ -135,7 +136,7 @@ static u8 action_cb(u32 button, u8 flags, void *data)
 }
 
 void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
-        guiObject_t *scroll_bar)
+        guiScrollbar_t *scroll_bar)
 {
     if (total_items == 0)
         return;  // bug fix: avoid devided by 0
@@ -161,7 +162,7 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
     }
     *view_origin_relativeY = GUI_GetLogicalViewOriginRelativeY(view_id);
     if (scroll_bar != NULL)
-        GUI_SetScrollbar(scroll_bar, *selectedIdx);
+        GUI_SetScrollbar((guiScrollbar_t *)scroll_bar, *selectedIdx);
 }
 
 void PAGE_ChangeQuick(int dir)

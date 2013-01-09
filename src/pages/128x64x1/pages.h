@@ -3,6 +3,7 @@
 
 #include "../common/_pages.h"
 #include "menus.h"
+#include "guiobj.h"
 
 #define PAGEDEF(id, init, event, exit, name) id,
 enum PageID {
@@ -40,7 +41,7 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height);
 void PAGE_ChangeByID(enum PageID id, s8 page);
 
 void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
-        guiObject_t *scroll_bar);
+        guiScrollbar_t *scroll_bar);
 
 // Menu
 void PAGE_MenuInit(int page);

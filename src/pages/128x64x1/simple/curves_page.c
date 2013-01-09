@@ -39,11 +39,11 @@ static void update_textsel_state()
 {
     for (u8 i = 1; i < 8; i++) {
         u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
-        GUI_TextSelectEnablePress(mp->itemObj[i], 1);
+        GUI_TextSelectEnablePress(&gui->val[i], 1);
         if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(mp->itemObj[i], 1);
+            GUI_TextSelectEnable(&gui->val[i], 1);
         } else {
-            GUI_TextSelectEnable(mp->itemObj[i], 2);
+            GUI_TextSelectEnable(&gui->val[i], 2);
         }
     }
 }
@@ -53,10 +53,10 @@ static void press_cb(guiObject_t *obj, void *data)
     u8 point_num = (long)data;
     u8 *selectable_bitmap = &selectable_bitmaps[curve_mode * 4 + pit_mode];
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
-        GUI_TextSelectEnable(obj, 2);
+        GUI_TextSelectEnable((guiTextSelect_t *)obj, 2);
         *selectable_bitmap &= ~(1 << (point_num-1));
     } else {
-        GUI_TextSelectEnable(obj, 1);
+        GUI_TextSelectEnable((guiTextSelect_t *)obj, 1);
         *selectable_bitmap |= 1 << (point_num-1);
     }
 }
@@ -75,7 +75,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     else
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
-        GUI_CreateLabelBox(0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
     u8 mode_count = 3;
@@ -91,65 +91,65 @@ static void show_page(CurvesMode _curve_mode, int page)
     }
 
     PAGE_ShowHeader(_tr("Mode"));
-    GUI_CreateTextSelectPlate(35, 0, 55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
-    mp->itemObj[9] = GUI_CreateTextSelectPlate(92, 0, 36, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
-        GUI_SetHidden(mp->itemObj[9], 1);
+        GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
     u8 y = ITEM_SPACE;
     u8 w1 = 5;
     u8 w2 = 32;
     u8 x = 0;
     u8 height = 9;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "L");
+    GUI_CreateLabelBox(&gui->vallbl[0], x, y,  w1, height, &TINY_FONT, NULL, NULL, "L");
     x += w1;
-    mp->itemObj[0] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)0);
+    GUI_CreateTextSelectPlate(&gui->val[0], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)0);
     x += w2 + 2;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "H");
+    GUI_CreateLabelBox(&gui->vallbl[8], x, y,  w1, height, &TINY_FONT, NULL, NULL, "H");
     x += w1;
-    mp->itemObj[8] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
+    GUI_CreateTextSelectPlate(&gui->val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
 
     y += height;
     x = 0;
-    GUI_CreateButtonPlateText(x, y, 38, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0, auto_generate_cb, _tr("Auto"));
+    GUI_CreateButtonPlateText(&gui->auto_, x, y, 38, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0, auto_generate_cb, _tr("Auto"));
     x += 39;
-    GUI_CreateLabelBox(x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
+    GUI_CreateLabelBox(&gui->vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
     x += w1;
-    mp->itemObj[4] = GUI_CreateTextSelectPlate(x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
+    GUI_CreateTextSelectPlate(&gui->val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
 
     y += ITEM_SPACE;
     x = 0;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
+    GUI_CreateLabelBox(&gui->vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
     x += w1;
-    mp->itemObj[1] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
+    GUI_CreateTextSelectPlate(&gui->val[1], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
     x += w2 + 2;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
+    GUI_CreateLabelBox(&gui->vallbl[2], x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
     x += w1;
-    mp->itemObj[2] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
+    GUI_CreateTextSelectPlate(&gui->val[2], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
 
     y += height +1;
     x = 0;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
+    GUI_CreateLabelBox(&gui->vallbl[3], x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
     x += w1;
-    mp->itemObj[3] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
+    GUI_CreateTextSelectPlate(&gui->val[3], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
     x += w2 + 2;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
+    GUI_CreateLabelBox(&gui->vallbl[5], x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
     x += w1;
-    mp->itemObj[5] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
+    GUI_CreateTextSelectPlate(&gui->val[5], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
 
     y += height +1;
     x = 0;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
+    GUI_CreateLabelBox(&gui->vallbl[6], x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
     x += w1;
-    mp->itemObj[6] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
+    GUI_CreateTextSelectPlate(&gui->val[6], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
     x += w2 + 2;
-    GUI_CreateLabelBox(x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
+    GUI_CreateLabelBox(&gui->vallbl[7], x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
     x += w1;
-    mp->itemObj[7] = GUI_CreateTextSelectPlate(x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
+    GUI_CreateTextSelectPlate(&gui->val[7], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
 
     update_textsel_state();
 
-    mp->graphs[0] = GUI_CreateXYGraph(77, ITEM_HEIGHT +1, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, 77, ITEM_HEIGHT +1, 50, 50,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                   0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

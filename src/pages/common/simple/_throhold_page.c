@@ -14,6 +14,7 @@
  */
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
+#define gui (&gui_objs.u.stdthold)
 
 static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -35,11 +36,11 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
     }
     if (throhold_state == 1) {
         strcpy(mp->tmpstr, (const char *)_tr("On"));
-        GUI_TextSelectEnable(mp->itemObj[0], 1);
+        GUI_TextSelectEnable(&gui->value, 1);
     }
     else {
         strcpy(mp->tmpstr, (const char *)_tr("Off"));
-        GUI_TextSelectEnable(mp->itemObj[0], 0);
+        GUI_TextSelectEnable(&gui->value, 0);
     }
     return mp->tmpstr;
 }
@@ -48,7 +49,7 @@ static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (!GUI_IsTextSelectEnabled(mp->itemObj[0]) || !Model.limits[mapped_simple_channels.throttle].safetysw)
+    if (!GUI_IsTextSelectEnabled((guiObject_t *)&gui->value) || !Model.limits[mapped_simple_channels.throttle].safetysw)
         return _tr("Off");
     Model.limits[mapped_simple_channels.throttle].safetyval =
             GUI_TextSelectHelper(Model.limits[mapped_simple_channels.throttle].safetyval,

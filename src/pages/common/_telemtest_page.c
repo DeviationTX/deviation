@@ -14,6 +14,7 @@
  */
 
 #define tp (pagemem.u.telemtest_page)
+#define gui (&gui_objs.u.telemtest)
 
 #define TELEM_FONT NORMALBOX_FONT
 #define TELEM_TXT_FONT DEFAULT_FONT
@@ -23,10 +24,7 @@ static u8 time_count = 0;
 static u8 telem_state_check()
 {
     if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
-        memset(tp.gps, 0, sizeof(tp.gps));
-        memset(tp.volt, 0, sizeof(tp.volt));
-        memset(tp.temp, 0, sizeof(tp.temp));
-        memset(tp.rpm, 0, sizeof(tp.rpm));
+        memset(gui, 0, sizeof(*gui));
         return 0;
     }
     return 1;
@@ -68,30 +66,30 @@ void PAGE_TelemtestEvent() {
     u32 time = CLOCK_getms();
     for(i = 0; i < 3; i++) {
         if (Telemetry.volt[i] != tp.telem.volt[i]) {
-            if (tp.volt[i] != NULL)  // in devo10, the item objects are drawn in different pages, so some of them might not exist in a page
-                GUI_Redraw(tp.volt[i]);
+            if (OBJ_IS_USED(&gui->volt[i]))  // in devo10, the item objects are drawn in different pages, so some of them might not exist in a page
+                GUI_Redraw(&gui->volt[i]);
             tp.telem.volt[i] = Telemetry.volt[i];
         }
     }
     for(i = 0; i < 2; i++) {
         if (Telemetry.rpm[i] != tp.telem.rpm[i]) {
-            if (tp.rpm[i] != NULL)
-                GUI_Redraw(tp.rpm[i]);
+            if (OBJ_IS_USED(&gui->rpm[i]))
+                GUI_Redraw(&gui->rpm[i]);
             tp.telem.rpm[i] = Telemetry.rpm[i];
         }
     }
     for(i = 0; i < 4; i++) {
         if (Telemetry.temp[i] != tp.telem.temp[i]) {
-            if (tp.temp[i] != NULL)
-                GUI_Redraw(tp.temp[i]);
+            if (OBJ_IS_USED(&gui->temp[i]))
+                GUI_Redraw(&gui->temp[i]);
             tp.telem.temp[i] = Telemetry.temp[i];
         }
     }
     if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
         tp.telem.gps = Telemetry.gps;
         for(i = 0; i < 5; i++)
-            if (tp.gps[i] != NULL)
-                GUI_Redraw(tp.gps[i]);
+            if (OBJ_IS_USED(&gui->gps[i]))
+                GUI_Redraw(&gui->gps[i]);
     }
     if(Telemetry.time[0] && (time - Telemetry.time[0] > TELEM_ERROR_TIME || tp.telem.time[0] == 0)) {
         struct LabelDesc *font;
@@ -103,11 +101,11 @@ void PAGE_TelemtestEvent() {
         }
         tp.telem.time[0] = Telemetry.time[0];
         for(i = 0; i < 3; i++)
-            if (tp.volt[i] != NULL)
-                GUI_SetLabelDesc(tp.volt[i], font);
+            if (OBJ_IS_USED(&gui->volt[i]))
+                GUI_SetLabelDesc(&gui->volt[i], font);
         for(i = 0; i < 2; i++)
-            if (tp.rpm[i] != NULL)
-                GUI_SetLabelDesc(tp.rpm[i], font);
+            if (OBJ_IS_USED(&gui->rpm[i]))
+                GUI_SetLabelDesc(&gui->rpm[i], font);
     }
     if(Telemetry.time[1] && (time - Telemetry.time[1] > TELEM_ERROR_TIME || tp.telem.time[1] == 0)) {
         struct LabelDesc *font;
@@ -119,8 +117,8 @@ void PAGE_TelemtestEvent() {
         }
         tp.telem.time[1] = Telemetry.time[1];
         for(i = 0; i < 4; i++)
-            if (tp.temp[i] != NULL)
-                GUI_SetLabelDesc(tp.temp[i], font);
+            if (OBJ_IS_USED(&gui->temp[i]))
+                GUI_SetLabelDesc(&gui->temp[i], font);
     }
     if(Telemetry.time[2] && (time - Telemetry.time[2] > TELEM_ERROR_TIME || tp.telem.time[2] == 0)) {
         struct LabelDesc *font;
@@ -132,8 +130,8 @@ void PAGE_TelemtestEvent() {
         }
         tp.telem.time[2] = Telemetry.time[2];
         for(i = 0; i < 5; i++)
-            if (tp.gps[i] != NULL)
-                GUI_SetLabelDesc(tp.gps[i], font);
+            if (OBJ_IS_USED(&gui->gps[i]))
+                GUI_SetLabelDesc(&gui->gps[i], font);
     }
 }
 

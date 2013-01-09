@@ -19,20 +19,15 @@
 #include "config/display.h"
 
 static u16  blink_fontcolor = 0xffff;
-guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
              const void *data)
 {
-    struct guiObject *obj = GUI_GetFreeObj();
-    struct guiLabel  *label;
+    struct guiObject *obj = (guiObject_t *)label;
     struct guiBox    *box;
 
-    if (obj == NULL)
-        return NULL;
-
     box = &obj->box;
-    label = &obj->o.label;
     box->x = x;
     box->y = y;
     box->width = width;
@@ -56,7 +51,7 @@ guiObject_t *GUI_CreateLabelBox(u16 x, u16 y, u16 width, u16 height, const struc
 
 void GUI_DrawLabel(struct guiObject *obj)
 {
-    struct guiLabel *label = &obj->o.label;
+    struct guiLabel *label = (struct guiLabel *)obj;
     const char *str;
     //Set font here so the callback can get its dimensions
     LCD_SetFont(label->desc.font);
@@ -197,13 +192,13 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type)
 {
     (void)coords;
-    struct guiLabel *label = &obj->o.label;
+    struct guiLabel *label = (struct guiLabel *)obj;
     label->pressCallback(obj, press_type, label->cb_data);
     return 1;
 }
-void GUI_SetLabelDesc(struct guiObject *obj, struct LabelDesc *desc)
+void GUI_SetLabelDesc(struct guiLabel *label, struct LabelDesc *desc)
 {
-    struct guiLabel *label = &obj->o.label;
+    guiObject_t *obj = (guiObject_t *)label;
     if (memcmp(&label->desc, desc, sizeof(struct LabelDesc)) != 0)
         OBJ_SET_DIRTY(obj, 1);
     label->desc = *desc;

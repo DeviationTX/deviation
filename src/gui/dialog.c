@@ -25,20 +25,15 @@ static void dlgbut_presscancel_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strok_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strcancel_cb(struct guiObject *obj, const void *data);
 
-guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *title,
+guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *(*string_cb)(guiObject_t *obj, void *data),
         void (*CallBack)(u8 state, void *data),
         enum DialogType dgType, void *data)
 {
-    struct guiObject *obj = GUI_GetFreeObj();
+    struct guiHeader *obj = (guiObject_t *)dialog;
     struct guiBox *box ;
-    struct guiDialog *dialog;
-
-    if (obj == NULL)
-        return NULL;
 
     box = &obj->box;
-    dialog = &obj->o.dialog;
 
     box->x = x;
     box->y = y;
@@ -63,18 +58,20 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
     int button_width  = GUI_ButtonWidth(DIALOG_BUTTON);
     int button_height = GUI_ButtonHeight(DIALOG_BUTTON);
     switch (dgType) {
-    case dtOk:
-        but = GUI_CreateButton(x + (width - button_width) / 2, y + height - button_height - 1,
+    case dtOk: {
+        but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 1,
                     DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
         OBJ_SET_MODAL(but, 1);
+        }
         break;
-    case dtOkCancel:
-        but = GUI_CreateButton(x + (width - button_width - button_width) / 2, y + height - button_height - 1,
+    case dtOkCancel: {
+        GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2, y + height - button_height - 1,
                 DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
         OBJ_SET_MODAL(but, 1);
-        but = GUI_CreateButton(x + width/2, y + height - button_height - 1,
+        but = GUI_CreateButton(&dialog->but2, x + width/2, y + height - button_height - 1,
                  DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
         OBJ_SET_MODAL(but, 1);
+        }
         break;
     case dtNone:
         break;
@@ -89,7 +86,7 @@ guiObject_t *GUI_CreateDialog(u16 x, u16 y, u16 width, u16 height, const char *t
 void GUI_DrawDialog(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
-    struct guiDialog *dialog = &obj->o.dialog;
+    struct guiDialog *dialog = (struct guiDialog *)dialog;
     if (dialog->txtbox.height == 0) {
         _draw_dialog_box(box, dialog->txtbox.x, dialog->title);
     } else if(dialog->txtbox.width) {
@@ -116,7 +113,7 @@ void GUI_DialogDrawBackground(u16 x, u16 y, u16 w, u16 h)
 
 void DialogClose(struct guiObject *obj, u8 state)
 {
-    struct guiDialog *dialog = &obj->o.dialog;
+    struct guiDialog *dialog = (struct guiDialog *)obj;
     void *data = dialog->cbData;
     void (*func)(u8, void*) = dialog->CallBack;
     GUI_RemoveObj(obj);

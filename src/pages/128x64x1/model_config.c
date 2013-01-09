@@ -21,6 +21,8 @@
 #include "../common/_model_config.c"
 
 #define VIEW_ID 0
+#define gui (&gui_objs.u.modelcfg)
+#define guip (&gui_objs.u.modelproto)
 
 static s16 view_origin_relativeY;
 static s8 current_selected;
@@ -54,49 +56,49 @@ void MODELPAGE_Config()
     mp->total_items = 0;
     if (Model.type == 0) {
         u8 row = 0;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->swash, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("SwashType:"));
-        guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->swashsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
         GUI_SetSelected(obj);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->ele, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Inv:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->elesel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)1);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->ail, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Inv:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->ailsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)2);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->col, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("COL Inv:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->colsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, swashinv_press_cb, swashinv_val_cb, (void *)4);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->emix, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->emixsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->amix, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->amixsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
 
         row += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->cmix, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("COL Mix:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->cmixsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
         mp->total_items = 7;
-        mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
+        GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
     }
 }
 
@@ -107,9 +109,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ModelInit(-1);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, mp->scroll_bar);
+            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, mp->scroll_bar);
+            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
@@ -143,11 +145,12 @@ void MODELPROTO_Config()
     while(idx < NUM_PROTO_OPTS) {
         if(proto_strs[pos] == NULL)
             break;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&guip->str[idx], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
-        guiObject_t *obj = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+        guiObject_t *obj = GUI_CreateTextSelectPlate(&guip->sel[idx], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)idx);
-        GUI_SetSelected(obj);
+        if (idx == 0)
+            GUI_SetSelected(obj);
         while(proto_strs[++pos])
             ;
         pos++;

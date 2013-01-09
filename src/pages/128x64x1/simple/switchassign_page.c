@@ -20,6 +20,7 @@
 #include "simple.h"
 #include "../../common/simple/_switchassign_page.c"
 
+#define gui (&gui_objs.u.stdswitch)
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 static s16 view_origin_relativeY;
@@ -47,21 +48,21 @@ void PAGE_SwitchAssignInit(int page)
     u8 row = 0;
     u8 w = 66;
     u8 x = 58;
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->modelbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->mode, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_FLYMODE);
     row += ITEM_SPACE;
 
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->tholdlbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->thold, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_HOLD);
     row += ITEM_SPACE;
 
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->gyrolbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->gyro, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_GYROSENSE);
     row += ITEM_SPACE;
 

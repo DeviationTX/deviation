@@ -7,10 +7,6 @@ struct tx_configure_page {
     u8 state;
     s8 selected;
     u8 total_items;
-    guiObject_t *textbox;
-    guiObject_t *textbox1;
-    guiObject_t *scroll_bar;
-    guiObject_t *dimmer_target;
     struct touch coords;
     struct touch coords1;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

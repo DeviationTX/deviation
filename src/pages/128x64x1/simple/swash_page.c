@@ -36,19 +36,19 @@ void PAGE_SwashInit(int page)
     u8 w = 60;
     u8 x = 63;
     PAGE_ShowHeader(_tr("SwashType:"));
-    GUI_CreateTextSelectPlate(x-3, 0, w + 8, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->type, x-3, 0, w + 8, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
 
     u8 row = ITEM_SPACE;
-    GUI_CreateLabelBox(0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix:"));
-    itemObj[0] = GUI_CreateTextSelectPlate(x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
+    GUI_CreateLabelBox(&gui->lbl[0], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix:"));
+    GUI_CreateTextSelectPlate(&gui->mix[0], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
 
     row += ITEM_SPACE;
-    GUI_CreateLabelBox(0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix:"));
-    itemObj[1] = GUI_CreateTextSelectPlate(x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
+    GUI_CreateLabelBox(&gui->lbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix:"));
+    GUI_CreateTextSelectPlate(&gui->mix[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
 
     row += ITEM_SPACE;
-    GUI_CreateLabelBox(0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Pit Mix:"));
-    itemObj[2] = GUI_CreateTextSelectPlate(x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
+    GUI_CreateLabelBox(&gui->lbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Pit Mix:"));
+    GUI_CreateTextSelectPlate(&gui->mix[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();
     GUI_Select1stSelectableObj();

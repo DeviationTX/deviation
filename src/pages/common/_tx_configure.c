@@ -14,6 +14,8 @@
  */
 
 static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // MACRO is not good when debugging
+#define gui (&gui_objs.u.tx)
+#define guic (&gui_objs.u.calibrate)
 
 enum calibType {
     CALIB_NONE,
@@ -63,7 +65,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     Transmitter.calibration[i].zero = value;
                 }
                 sprintf(cp->tmpstr, "%s", _tr("Move sticks and knobs\nto Max & Min positions\nthen press ENT"));
-                GUI_Redraw(cp->textbox);
+                GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_MAXMIN;
                 break;
             case CALI_MAXMIN:
@@ -71,7 +73,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
                 sprintf(cp->tmpstr, "%s", _tr("Calibration done."));
-                GUI_Redraw(cp->textbox);
+                GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_SUCCESS;
                 break;
             case CALI_SUCCESS:
@@ -96,7 +98,7 @@ static void calibrate_sticks(void)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
     sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
-    cp->textbox = GUI_CreateLabelBox(1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
+    GUI_CreateLabelBox(&guic->msg, 1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, cp->tmpstr);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
@@ -128,7 +130,7 @@ static void calibrate_sticks(void)
 static void calibrate_touch(void)
 {
     if (cp->state == 0 || cp->state == 3) {
-        if (GUI_ObjectNeedsRedraw(cp->textbox))
+        if (GUI_ObjectNeedsRedraw((guiObject_t *)&guic->msg))
             return;
         draw_target(cp->state ? 320 - XCOORD : XCOORD , cp->state ? 240 - YCOORD : YCOORD + 32);
         cp->state++;
@@ -140,10 +142,10 @@ static void calibrate_touch(void)
     } else if (cp->state == 2) {
         if (! SPITouch_IRQ()) {
             cp->coords1 = cp->coords;
-            GUI_RemoveObj(cp->textbox);
-            cp->textbox = GUI_CreateLabelBox(320 - XCOORD - 5, 240 - YCOORD - 5,
+            GUI_RemoveObj((guiObject_t *)&guic->msg);
+            GUI_CreateLabelBox(&guic->msg, 320 - XCOORD - 5, 240 - YCOORD - 5,
                                             11, 11, &SMALLBOX_FONT, NULL, NULL, "");
-            GUI_Redraw(cp->textbox1);
+            GUI_Redraw(&guic->msg1);
             cp->state = 3;
         } else {
             cp->coords = SPITouch_GetCoords();
@@ -238,10 +240,10 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
     if (changed)
         Transmitter.auto_dimmer.timer = dimmer_timmer * 1000;
     if (dimmer_timmer == 0) {
-        GUI_TextSelectEnable(cp->dimmer_target, 0);
+        GUI_TextSelectEnable(&gui->dimtgt, 0);
         return _tr("Off");
     }
-    GUI_TextSelectEnable(cp->dimmer_target, 1);
+    GUI_TextSelectEnable(&gui->dimtgt, 1);
     TIMER_SetString(cp->tmpstr, Transmitter.auto_dimmer.timer);
     return cp->tmpstr;
 }
@@ -302,9 +304,9 @@ static void press_cb(guiObject_t *obj, const void *data)
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
         //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
-        GUI_CreateLabel(40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
-        cp->textbox = GUI_CreateLabelBox(XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
-        cp->textbox1 = GUI_CreateLabelBox(130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
+        GUI_CreateLabel(&guic->title, 40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
+        GUI_CreateLabelBox(&guic->msg, XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
+        GUI_CreateLabelBox(&guic->msg1, 130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
         memset(&cp->coords, 0, sizeof(cp->coords));
         SPITouch_Calibrate(0x10000, 0x10000, 0, 0);
         cp->state = 0;
@@ -312,7 +314,7 @@ static void press_cb(guiObject_t *obj, const void *data)
         PAGE_RemoveAllObjects();
         PAGE_SetModal(1);
         PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
-        cp->textbox = GUI_CreateLabelBox(60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
+        GUI_CreateLabelBox(&guic->msg, 60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
         memset(&cp->coords, 0, sizeof(cp->coords));
     } else if (cp->enable == CALIB_STICK)
         calibrate_state = CALI_CENTER; // bug fix: must reset state before calibrating
@@ -367,7 +369,7 @@ void PAGE_TxConfigureEvent()
             t = SPITouch_GetCoords();
             if (memcmp(&t, &cp->coords, sizeof(t)) != 0)
                 cp->coords = t;
-                GUI_Redraw(cp->textbox);
+                GUI_Redraw(&guic->msg);
         }
         break;
     }

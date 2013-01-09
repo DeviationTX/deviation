@@ -23,7 +23,6 @@ struct guiObject *objTOUCHED  = NULL;
 struct guiObject *objSELECTED = NULL;
 struct guiObject *objModalButton = NULL;
 
-static struct guiObject GUI_Array[100];
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
@@ -42,6 +41,7 @@ void connect_object(struct guiObject *obj)
             ptr = ptr->next;
         ptr->next = obj;
     }
+    obj->next = NULL;
 }
 
 u8 coords_in_box(struct guiBox *box, struct touch *coords)
@@ -127,13 +127,13 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     }
     case Scrollbar:
-        BUTTON_UnregisterCallback(&obj->o.scrollbar.action);
+        BUTTON_UnregisterCallback(&((guiScrollbar_t *)obj)->action);
         break;
     case Keyboard:
-        BUTTON_UnregisterCallback(&obj->o.keyboard.action);
+        BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
         break;
     case Listbox:
-        BUTTON_UnregisterCallback(&obj->o.listbox.action);
+        BUTTON_UnregisterCallback(&((guiListbox_t *)obj)->action);
         break;
     default: break;
     }
@@ -165,23 +165,6 @@ void GUI_SetHidden(struct guiObject *obj, u8 state)
         return;
     OBJ_SET_HIDDEN(obj, state);
     OBJ_SET_DIRTY(obj, 1);
-}
-
-struct guiObject *GUI_GetFreeObj(void)
-{
-    int i;
-    struct guiObject *obj;
-    for (i = 0; i < 256; i++) {
-        if (! OBJ_IS_USED(&GUI_Array[i])) {
-            obj = &GUI_Array[i];
-            obj->next = NULL;
-            obj->flags= 0;
-            OBJ_SET_DIRTY(obj, 1);
-            OBJ_SET_USED(obj, 1);
-            return obj;
-        }
-    }
-    return NULL;
 }
 
 void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
@@ -219,7 +202,7 @@ struct guiObject *GUI_IsModal(void)
     return NULL;
 }
 
-void GUI_Redraw(struct guiObject *obj)
+void _GUI_Redraw(struct guiObject *obj)
 {
     OBJ_SET_DIRTY(obj, 1);
 }
@@ -311,7 +294,7 @@ void GUI_TouchRelease()
         switch (objTOUCHED->Type) {
         case Button:
           {
-            struct guiButton *button = &objTOUCHED->o.button;
+            struct guiButton *button = (struct guiButton *)objTOUCHED;
             OBJ_SET_DIRTY(objTOUCHED, 1);
             if(button->CallBack)
                 button->CallBack(objTOUCHED, button->cb_data);
@@ -366,7 +349,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 }
                 break;
             case Image:
-                if (obj->o.image.callback &&
+                if (((guiImage_t *)obj)->callback &&
                     coords_in_box(&obj->box, coords))
                 {
                     if (objTOUCHED && objTOUCHED != obj)
@@ -376,7 +359,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 }
                 break;
             case Label:
-                if (obj->o.label.pressCallback &&
+                if (((guiLabel_t *)obj)->pressCallback &&
                     coords_in_box(&obj->box, coords))
                 {
                     if (objTOUCHED && objTOUCHED != obj)

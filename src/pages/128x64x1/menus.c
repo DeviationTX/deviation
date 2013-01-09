@@ -18,6 +18,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 
+#define gui (&gui_objs.u.menu)
 struct menu_pages {
     enum PageID id;
     const char *name;
@@ -106,9 +107,9 @@ void PAGE_MenuInit(int page)
             continue;
         if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
                 continue;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->idx[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(long)idx);
-        obj =GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 17), GUI_MapToLogicalView(VIEW_ID, row),
+        obj =GUI_CreateLabelBox(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, 17), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
         GUI_SetSelectable(obj, 1);
         if (idx == 1)
@@ -120,17 +121,18 @@ void PAGE_MenuInit(int page)
 
     mp->total_items = idx-1;
     if (mp->total_items > PAGE_ITEM_MAX) {
-        mp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT,
+        GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT,
                 LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
-    } else
-        mp->scroll_bar = NULL; //Bug fix: this is a must to let PAGE_NavigateItems() won't set scroll bars' position. Otherwise, the main menu might crash when there is no scroll bar in a menu
-
+    } else {
+        //Bug fix: this is a must to let PAGE_NavigateItems() won't set scroll bars' position. Otherwise, the main menu might crash when there is no scroll bar in a menu
+        OBJ_SET_USED(&gui->scroll, 0); 
+    }
     if (*mp->current_selected >= mp->total_items)  // when users customize sub menu item to main menu item, this scenario happans
         *mp->current_selected = mp->total_items - 1;
     if (*mp->current_selected > 0) {
         s8 temp = *mp->current_selected;
         *mp->current_selected = 0;
-        PAGE_NavigateItems(temp, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, mp->scroll_bar);
+        PAGE_NavigateItems(temp, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
     }
 }
 
@@ -164,9 +166,9 @@ static u8 action_cb(u32 button, u8 flags, void *data)
             } else  // from main menu back to main page
                 PAGE_ChangeByID(PAGEID_MAIN, 0);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, mp->scroll_bar);
+            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
         } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, mp->scroll_bar);
+            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

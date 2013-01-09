@@ -27,16 +27,12 @@ static u8 button_cb(u32 button, u8 flags, void *data);
 #define RELEASE_DOWN 0x08
 #define LONGPRESS    0x80
 
-struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
+guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *scrollbar, u16 x, u16 y, u16 height,
     u8 num_items, struct guiObject *parent,
     u8 (*press_cb)(struct guiObject *parent, u8 pos, s8 direction, void *data), void *data)
 {
-    struct guiObject    *obj = GUI_GetFreeObj();
-    struct guiScrollbar *scrollbar;
+    struct guiObject    *obj = (guiObject_t *)scrollbar;
     struct guiBox     *box;
-
-    if (obj == NULL)
-        return NULL;
 
     box = &obj->box;
     box->x = x;
@@ -48,7 +44,6 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
     OBJ_SET_TRANSPARENT(obj, 0);
     connect_object(obj);
 
-    scrollbar = &obj->o.scrollbar;
     scrollbar->callback = press_cb;
     scrollbar->cb_data = data;
     scrollbar->parent = parent;
@@ -63,7 +58,7 @@ struct guiObject *GUI_CreateScrollbar(u16 x, u16 y, u16 height,
 
 void GUI_DrawScrollbar(struct guiObject *obj)
 {
-    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    struct guiScrollbar *scrollbar = (struct guiScrollbar *)obj;
     u16 bar_height = 10;  // Bug fix: After the logic view is introduce , a coordinate can be larger than 10000
     if (scrollbar->num_items <= 1)
         return;
@@ -88,9 +83,9 @@ void GUI_DrawScrollbar(struct guiObject *obj)
     }
 }
 
-void GUI_SetScrollbar(struct guiObject *obj, u8 pos)
+void GUI_SetScrollbar(struct guiScrollbar *scrollbar, u8 pos)
 {
-    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    guiObject_t *obj = &scrollbar->header;
     if (scrollbar->cur_pos != pos) {
         scrollbar->cur_pos = pos;
         OBJ_SET_DIRTY(obj, 1);
@@ -99,7 +94,7 @@ void GUI_SetScrollbar(struct guiObject *obj, u8 pos)
 
 u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type)
 {
-    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    struct guiScrollbar *scrollbar = (struct guiScrollbar *)obj;
     struct guiBox box;
     s8 dir = 0;
 
@@ -162,16 +157,15 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
     return 0;
 }
 
-u8 GUI_GetScrollbarNumItems(struct guiObject *obj)
+u8 GUI_GetScrollbarNumItems(struct guiScrollbar *scrollbar)
 {
-    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
     return scrollbar->num_items;
 }
 
 static u8 button_cb(u32 button, u8 flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
-    struct guiScrollbar *scrollbar = &obj->o.scrollbar;
+    struct guiScrollbar *scrollbar = (struct guiScrollbar *)obj;
 
     if (!(flags & BUTTON_LONGPRESS))
         return 0;

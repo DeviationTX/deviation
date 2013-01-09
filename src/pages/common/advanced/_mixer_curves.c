@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define gui (&gui_objs.u.advcurve)
 static struct curve_edit * const edit = &pagemem.u.mixer_page.edit;
 static void okcancel_cb(guiObject_t *obj, const void *data);
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
@@ -47,8 +48,8 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     if (curve->type >= CURVE_3POINT) {
         curve->type = GUI_TextSelectHelper(curve->type, CURVE_3POINT, CURVE_MAX, dir, 1, 1, &changed);
         if (changed) {
-            GUI_Redraw(edit->graph);
-            GUI_Redraw(edit->pointsel);
+            GUI_Redraw(&gui->graph);
+            GUI_Redraw(&gui->point);
         }
     }
     return CURVE_GetName(curve);
@@ -81,7 +82,7 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
         ret = PAGEMIXER_SetNumberCB(obj, dir, &curve->points[pointnum]);
     }
     if (old_pointval != curve->points[pointnum]) {
-        GUI_Redraw(edit->graph);
+        GUI_Redraw(&gui->graph);
         if (edit->pointnum < 0)
             edit->curve.points[1] = edit->curve.points[0];
     }
@@ -98,7 +99,7 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
         u8 max = (curve->type - CURVE_3POINT) * 2 + 2;
         edit->pointnum = GUI_TextSelectHelper(edit->pointnum, 0, max, dir, 1, 1, &changed);
         if (changed)
-            GUI_Redraw(edit->value);
+            GUI_Redraw(&gui->value);
     }
     switch(edit->pointnum) {
         case 0: return "1";
@@ -126,8 +127,8 @@ const char *set_expopoint_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     edit->pointnum = GUI_TextSelectHelper(edit->pointnum, -1, 1, dir, 1, 1, &changed);
     if (changed) {
-        GUI_Redraw(edit->value);
-        GUI_Redraw(edit->graph);
+        GUI_Redraw(&gui->value);
+        GUI_Redraw(&gui->graph);
     }
     switch(edit->pointnum) {
         case -1: return _tr("Symmetric");
@@ -142,6 +143,6 @@ static u8 touch_cb(s16 x, s16 y, void *data)
     (void)x;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
     edit->curve.points[pointnum] = RANGE_TO_PCT(y);
-    GUI_Redraw(edit->value);
+    GUI_Redraw(&gui->value);
     return 1;
 }

@@ -20,11 +20,11 @@
 #include "simple.h"
 #include "../../common/simple/_traveladj_page.c"
 
+#define gui (&gui_objs.u.stdtravel)
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 static s16 view_origin_relativeY;
 static s8 current_selected = 0;
-guiObject_t *scroll_bar;
 
 void PAGE_TravelAdjInit(int page)
 {
@@ -39,8 +39,8 @@ void PAGE_TravelAdjInit(int page)
     PAGE_ShowHeader(("")); // draw a underline only
     u8 w = 35;
     u8 x = 50;
-    GUI_CreateLabelBox(x+2, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
+    GUI_CreateLabelBox(&gui->dnlbl, x+2, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
+    GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
     // Create a logical view
     u8 view_origin_absoluteX = 0;
@@ -51,34 +51,34 @@ void PAGE_TravelAdjInit(int page)
     u8 row = 0;
     for (u8 i = 0; i < Model.num_channels; i++) {
         MIXER_GetLimit(i, &mp->limit);
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->chan[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row ),
+        GUI_CreateTextSelectPlate(&gui->dn[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row ),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x + w +3), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateTextSelectPlate(&gui->up[i], GUI_MapToLogicalView(VIEW_ID, x + w +3), GUI_MapToLogicalView(VIEW_ID, row),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)i);
         row += ITEM_SPACE;
     }
     GUI_Select1stSelectableObj();
 
     // The following items are not draw in the logical view;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY,
+    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY,
             Model.num_channels + Model.num_channels, NULL, NULL, NULL);
     if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, scroll_bar);
+        PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, &gui->scroll);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
-    u8 total_items = GUI_GetScrollbarNumItems(scroll_bar);
+    u8 total_items = GUI_GetScrollbarNumItems(&gui->scroll);
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
+            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

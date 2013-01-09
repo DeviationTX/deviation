@@ -55,18 +55,12 @@ AUX4
 AUX5
 :About Deviation
 Deviation névjegye
-:Advanced
-Haladó
 :Airplane
 Repülőgép
 :Alarm
 Riasztás 
 :Altitude
 Magasság
-:Auto
-Auto
-:Aux2
-Aux2
 :Backlight:
 Fényerő:
 :Bar %d:
@@ -129,8 +123,6 @@ Cs
 Csat. mód
 :Change
 Váltás
-:Channel
-Csatorna
 :Channel monitor
 Csatornák
 :Channel output
@@ -155,8 +147,6 @@ Ciklikus1
 Ciklikus2
 :Cyclic3
 Ciklikus3
-:D/R & Exp
-D/R & Expó
 :DR
 DR
 :Deadband
@@ -205,8 +195,6 @@ FMODE1
 FMODE2
 :Fahren
 °F
-:Fail safe
-Vészértékek
 :Failsafe:
 Hibaérték:
 :File:
@@ -215,8 +203,6 @@ Fájl:
 Fix
 :Fixed ID:
 Fix ID:
-:Fly mode
-Rep. mód
 :Foot
 Láb
 :Frame Size
@@ -227,32 +213,18 @@ Keret
 GEAR
 :GPS
 GPS
-:Gear
-Gear
 :Generic settings
 Általános beállítások
-:Gyro sense
-Giró
-:H
-H
 :Heli
 Heli
-:Heli/Standard GUI
-Heli/Szokásos felület
 :Helicopter
 Helikopter
 :High-Rate
 Magas
-:Hold position
-TH érték
 :Icon
 Ikon
 :Icon:
 Ikon:
-:Idle 1
-Alapjárat 1
-:Idle 2
-Alapjárat 2
 :Input monitor
 Bemenetek
 :Input:
@@ -261,16 +233,12 @@ Bemenet:
 Beszúrás
 :Inverted
 Inverz
-:L
-L
 :LCD settings
 LCD beállítások
 :LEFT_H
 BAL_V
 :LEFT_V
 BAL_F
-:LIN
-LIN
 :Language:
 Nyelv:
 :Latitude
@@ -285,16 +253,12 @@ Csatolt
 Betöltés
 :Load...
 Betöltés...
-:Locked
-Zárolt
 :Longitude
 Hosszúság
 :Low Battery
 Telep üres
 :Low-Rate
 Alacsony
-:M
-M
 :MIX0
 MIX0
 :MIX1
@@ -321,22 +285,14 @@ Min korlát:
 Min/Max
 :Mixer
 Mixer
-:Mixer GUI:
-Felület:
 :Mixers:
 Mixerek:
-:Mode
-Mód
 :Mode %d
 Mód %d
 :Model menu
 Modell menü
 :Model name:
 Modell név:
-:Model needs reset\nfor simple mixer
-A modellt törölni kell\na szokásos felülethez
-:Model needs to be reset\nin order to switch to the standard mixer
-A modellt törölni kell\na szokásos felületre váltáshoz
 :Model setup
 Modell konfig.
 :Model type:
@@ -375,14 +331,8 @@ Eltolás:
 Ok
 :On
 Be
-:PIT
-PIT
 :Page:
 Oldal:
-:Pit Mix:
-Koll. mix:
-:Pitch curves
-Állásszög görbék
 :Plane
 Repülő
 :Point:
@@ -427,8 +377,6 @@ Csatol
 Törlés
 :Reset
 Törlés
-:Reverse
-Invertálás
 :Reverse:
 Invertálás:
 :Reversed
@@ -449,8 +397,6 @@ Mentés
 Skála%s:
 :Scanner
 Szkenner
-:Servo
-Szervó
 :Simple
 Egyszerű
 :Simple 4 Channel
@@ -463,10 +409,6 @@ Sebesség:
 Forrás
 :Src:
 Forrás:
-:Standard
-Szokásos
-:Standard Mixer
-Szokásos mixer
 :Start:
 Start:
 :Step:
@@ -477,20 +419,14 @@ Bemenetek
 Mód:
 :Sticks:
 Botkormány:
-:Subtrim
-Subtrim
 :Subtrim:
 Subtrim:
-:Swash
-Imbolygó
 :SwashType:
 Imbolygó típusa:
 |devo10:SwashType:
 Imbolygó:
 :Switch %d:
 Kapcs.%d:
-:Switch assignment
-Kapcsoló összerendelés
 :Switch1
 Kapcs.1
 :Switch2
@@ -549,12 +485,6 @@ Hőmérséklet:
 Sablon...
 :Test
 Teszt
-:Thr hold
-Gáz kapcsoló
-:Throttle curves
-Gáz görbék
-:Throttle hold
-Gáz kapcsoló
 :Time
 Idő
 :Timer
@@ -585,8 +515,6 @@ Képernyő:
 Távirányító konfig.
 :Transmitter menu
 Távirányító menü
-:Travel adjust
-Szervóút állítás
 :Trim
 Trim
 :Trim +:
@@ -609,12 +537,8 @@ Kimenő telj.:
 USB
 :Unknown
 Ismeretlen
-:Unlocked
-Szabad
 :Up
 Fel
-:Value
-Érték
 :Value:
 Érték:
 :Vibration:

@@ -24,7 +24,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 #define VIEW_ID 0
 static s8 current_page = 0;
 static u8 view_height;
-static guiObject_t *scroll_bar;
 
 static void _show_page()
 {
@@ -43,31 +42,31 @@ static void _show_page()
     for (u8 i = 0; i < NUM_TIMERS; i++) {
         y = i * (space * 3);
         //Row 1
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateLabelBox(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                 0, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
-        guiObject_t *obj =GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+        guiObject_t *obj =GUI_CreateTextSelectPlate(&gui->type[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         if (i == 0)
             GUI_SetSelected(obj);
 
         //Row 2
         y += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateLabelBox(&gui->switchlbl[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                 0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateTextSelectPlate(&gui->src[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
                 w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
         y += space;
-        tp->startLabelObj[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateLabelBox(&gui->startlbl[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
                 50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
                 ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
-        tp->startObj[i] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
+        GUI_CreateTextSelectPlate(&gui->start[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
                 w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)i);
 
         update_countdown(i);
     }
     space = ITEM_HEIGHT + 1;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, NUM_TIMERS, NULL, NULL, NULL);
+    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, NUM_TIMERS, NULL, NULL, NULL);
 }
 
 static void _navigate_items(s8 direction)
@@ -88,7 +87,7 @@ static void _navigate_items(s8 direction)
         else
             GUI_ScrollLogicalView(VIEW_ID, view_height);
     }
-    GUI_SetScrollbar(scroll_bar, current_page);
+    GUI_SetScrollbar(&gui->scroll, current_page);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define gui (&gui_objs.u.stdswash)
 static struct model_page * const mp = &pagemem.u.model_page;
-guiObject_t *itemObj[3];
 static s8 swashmix[3];
 
 static void update_swashmixes()
@@ -23,7 +23,7 @@ static void update_swashmixes()
     if (Model.swash_type ==  SWASH_TYPE_NONE)
         state = 0;
     for (u8 i = 0; i < 3; i++) {
-        GUI_TextSelectEnable(itemObj[i], state);
+        GUI_TextSelectEnable(&gui->mix[i], state);
     }
 }
 

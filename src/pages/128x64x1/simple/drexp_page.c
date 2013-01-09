@@ -42,7 +42,7 @@ void PAGE_DrExpInit(int page)
     memset(mp, 0, sizeof(*mp));
     get_mixers();
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
-        GUI_CreateLabelBox(0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
 
@@ -57,37 +57,37 @@ void PAGE_DrExpInit(int page)
     u8 w1 = 30;
     u8 w2 = 36;
     u8 y = 0;
-    mp->itemObj[0] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->type, GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     mp->max_scroll ++;
 
     y += ITEM_SPACE;
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateLabelBox(&gui->modelbl[0], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_NORMAL));
     y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->dr[0], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_NORMAL);
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->exp[0], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_NORMAL);
     mp->max_scroll += 2;
 
     y += ITEM_SPACE;
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateLabelBox(&gui->modelbl[1], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE1));
     y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->dr[1], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_IDLE1);
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->exp[1], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_IDLE1);
     mp->max_scroll += 2;
 
     y += ITEM_SPACE;
-    GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateLabelBox(&gui->modelbl[2], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE2));
     y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->dr[2], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_IDLE2);
-    GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
+    GUI_CreateTextSelectPlate(&gui->exp[2], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
             w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_IDLE2);
     mp->max_scroll += 2;
 
@@ -96,7 +96,7 @@ void PAGE_DrExpInit(int page)
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
     for (u8 i = 0; i < 3; i++) {
-        mp->graphs[i] = GUI_CreateXYGraph(GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
+        GUI_CreateXYGraph(&gui->graphs[i], GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
             GUI_MapToLogicalView(RIGHT_VIEW_ID, y), 50, RIGHT_VIEW_HEIGHT,
             CHAN_MIN_VALUE, ymin, CHAN_MAX_VALUE, ymax,
             0, 0, show_curve_cb, curpos_cb, NULL, (void *)(long)(PITTHROMODE_NORMAL + i));
@@ -105,7 +105,7 @@ void PAGE_DrExpInit(int page)
 
     current_xygraph = 0;
     GUI_Select1stSelectableObj();
-    mp->scroll_bar = GUI_CreateScrollbar(graph_pos - ARROW_WIDTH -2, 0, LCD_HEIGHT, mp->max_scroll, NULL, NULL, NULL);
+    GUI_CreateScrollbar(&gui->scroll, graph_pos - ARROW_WIDTH -2, 0, LCD_HEIGHT, mp->max_scroll, NULL, NULL, NULL);
     // set the focus item back to previous selection in this page
     if (current_selected > 0) {
         u8 temp = current_selected;
@@ -138,7 +138,7 @@ static void navigate_items(s8 direction)
         current_selected = mp->max_scroll - 1;
     if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
         // selected item is out of the view, scroll the view
-        if (obj == mp->itemObj[0])
+        if (obj == (guiObject_t *)&gui->type)
             GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
         else
             GUI_ScrollLogicalViewToObject(VIEW_ID, obj, direction);
@@ -157,7 +157,7 @@ static void navigate_items(s8 direction)
         GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
         current_xygraph = 1;
     }
-    GUI_SetScrollbar(mp->scroll_bar, current_selected);
+    GUI_SetScrollbar(&gui->scroll, current_selected);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
