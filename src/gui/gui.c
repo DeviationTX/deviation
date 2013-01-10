@@ -41,6 +41,8 @@ void connect_object(struct guiObject *obj)
             ptr = ptr->next;
         ptr->next = obj;
     }
+    OBJ_SET_USED(obj, 1);
+    OBJ_SET_DIRTY(obj, 1);
     obj->next = NULL;
 }
 

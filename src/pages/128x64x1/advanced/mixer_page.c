@@ -87,7 +87,11 @@ static void _show_page()
         }
         row += space;
     }
-    GUI_Select1stSelectableObj();
+    if (!(selectedIdx & 0x01) && ! OBJ_IS_USED(&gui->limit[selectedIdx/2]))
+        selectedIdx++;
+    GUI_SetSelected((guiObject_t *)((selectedIdx & 0x01)
+          ? &gui->tmpl[selectedIdx/2]
+          : &gui->limit[selectedIdx/2]));
 
     GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT - ITEM_HEIGHT,
             Model.num_channels + NUM_VIRT_CHANNELS, NULL, NULL, NULL);
@@ -105,10 +109,16 @@ void navigate_item(s8 direction, u8 step)
             if (obj == (guiObject_t *)&gui->tmpl[mp->entries_per_page-1]) {
                 if (mp->top_channel < mp->max_scroll ) {
                     mp->top_channel ++;
+                    selectedIdx = 2*(mp->entries_per_page -1);
                     _show_page();
                 }
-            } else
-                GUI_SetSelected(GUI_GetNextSelectable(NULL));
+            } else {
+                selectedIdx ++;
+                if (!(selectedIdx & 0x01) && ! OBJ_IS_USED(&gui->limit[selectedIdx/2])) {
+                    selectedIdx++;
+                }
+                GUI_SetSelected(GUI_GetNextSelectable(obj));
+            }
         } else {
             struct guiObject *prevObj = GUI_GetPrevSelectable(obj);
             if (prevObj == (guiObject_t *)&gui->tmpl[mp->entries_per_page-1]) {  // the 1st item may not be selectable
@@ -117,8 +127,12 @@ void navigate_item(s8 direction, u8 step)
                     selectedIdx = 1;
                     _show_page();
                 }
-            } else
+            } else {
+                selectedIdx --;
+                if (!(selectedIdx & 0x01) && ! OBJ_IS_USED(&gui->limit[selectedIdx/2]))
+                    selectedIdx--;
                 GUI_SetSelected(prevObj);
+            }
         }
     } else { // page up and page down
         current_row = selectedIdx/2;

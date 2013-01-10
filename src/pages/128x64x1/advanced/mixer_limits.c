@@ -145,6 +145,7 @@ static void _show_limits()
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->speed, GUI_MapToLogicalView(LEFT_VIEW_ID, x1), GUI_MapToLogicalView(LEFT_VIEW_ID, y),
             w, ITEM_HEIGHT, &labelDesc, NULL, set_limits_cb, &mp->limit.speed);
+    mp->max_scroll++;
 
     // The following items are not draw in the logical view;
     y = ITEM_HEIGHT;
@@ -164,6 +165,40 @@ void revert_cb(guiObject_t *obj, const void *data)
     GUI_DrawScreen();
 }
 
+/*We can't use PAGE_NavigatePages because of the 'Revert' button */
+static void navigate_items(s8 direction)
+{
+    guiObject_t *obj = GUI_GetSelected();
+    if (direction > 0) {
+        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+    } else {
+        if (obj == (guiObject_t *)&gui->revert)
+            current_selected_item = mp->max_scroll;
+        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+    }
+    obj = GUI_GetSelected();
+    if (obj == (guiObject_t *)&gui->revert) {
+        current_selected_item = -1;
+        GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+    } else {
+        current_selected_item += direction;
+        if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
+            // selected item is out of the view, scroll the view
+            if (obj == (guiObject_t *)&gui->reverse)
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
+            else if (obj == (guiObject_t *)&gui->speed) {
+                u8 pages = mp->max_scroll/mp->entries_per_page;
+                if (mp->max_scroll%mp->entries_per_page != 0)
+                    pages++;
+                GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, (pages -1) * (ITEM_HEIGHT +1) * 4);
+            }
+            else
+                GUI_ScrollLogicalView(LEFT_VIEW_ID, (ITEM_HEIGHT +1) *direction);
+        }
+    }
+    GUI_SetScrollbar(&gui->scroll, current_selected_item >=0?current_selected_item :0);
+}
+
 static u8 action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
@@ -172,9 +207,11 @@ static u8 action_cb(u32 button, u8 flags, void *data)
             GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
             PAGE_MixerInit(mp->top_channel);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, LEFT_VIEW_ID, mp->max_scroll, &current_selected_item, &view_origin_relativeY, &gui->scroll);
+            //PAGE_NavigateItems(-1, LEFT_VIEW_ID, mp->max_scroll, &current_selected_item, &view_origin_relativeY, &gui->scroll);
+            navigate_items(-1);
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, LEFT_VIEW_ID, mp->max_scroll, &current_selected_item, &view_origin_relativeY, &gui->scroll);
+            //PAGE_NavigateItems(1, LEFT_VIEW_ID, mp->max_scroll, &current_selected_item, &view_origin_relativeY, &gui->scroll);
+            navigate_items(1);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

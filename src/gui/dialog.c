@@ -65,7 +65,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
         }
         break;
     case dtOkCancel: {
-        GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2, y + height - button_height - 1,
+        but = GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2, y + height - button_height - 1,
                 DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
         OBJ_SET_MODAL(but, 1);
         but = GUI_CreateButton(&dialog->but2, x + width/2, y + height - button_height - 1,
@@ -86,7 +86,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
 void GUI_DrawDialog(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
-    struct guiDialog *dialog = (struct guiDialog *)dialog;
+    struct guiDialog *dialog = (struct guiDialog *)obj;
     if (dialog->txtbox.height == 0) {
         _draw_dialog_box(box, dialog->txtbox.x, dialog->title);
     } else if(dialog->txtbox.width) {

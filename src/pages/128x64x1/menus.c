@@ -76,6 +76,7 @@ void PAGE_MenuInit(int page)
     PAGE_SetModal(0);
     PAGE_SetActionCB(action_cb);
     GUI_RemoveAllObjects();
+    memset(gui, 0, sizeof(*gui));
 
     if (page != -1)
         menu_type_flag = (u8)page;
@@ -97,7 +98,7 @@ void PAGE_MenuInit(int page)
             view_origin_absoluteX, view_origin_absoluteY);
 
     u8 row = 0;
-    u8 idx = 1;
+    u8 idx = 0;
     guiObject_t *obj;
     labelDesc.style = LABEL_LEFTCENTER;
     for(u8 i=0; i < sizeof(menus) / sizeof(struct menu_pages); i++) {
@@ -107,19 +108,19 @@ void PAGE_MenuInit(int page)
             continue;
         if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
                 continue;
-        GUI_CreateLabelBox(&gui->idx[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(long)idx);
-        obj =GUI_CreateLabelBox(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, 17), GUI_MapToLogicalView(VIEW_ID, row),
+        GUI_CreateLabelBox(&gui->idx[idx], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+            16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(idx+ 1L));
+        obj =GUI_CreateLabelBox(&gui->name[idx], GUI_MapToLogicalView(VIEW_ID, 17), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
         GUI_SetSelectable(obj, 1);
-        if (idx == 1)
+        if (idx == 0)
             GUI_SetSelected(obj);
 
         row += ITEM_SPACE;
         idx++;
     }
 
-    mp->total_items = idx-1;
+    mp->total_items = idx;
     if (mp->total_items > PAGE_ITEM_MAX) {
         GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT,
                 LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);

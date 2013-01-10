@@ -140,7 +140,7 @@ static void _show_complex()
     u8 y = 0;
     labelDesc.style = LABEL_LEFTCENTER;
     //Row 1
-    if (OBJ_IS_USED(&gui->swlbl)) {
+    if (! OBJ_IS_USED(&gui->swlbl)) {
         mp->firstObj = GUI_CreateLabelBox(&gui->nummixlbl, GUI_MapToLogicalView(LEFT_VIEW_ID, x), GUI_MapToLogicalView(LEFT_VIEW_ID, y) , w, ITEM_HEIGHT,
                 &labelDesc, NULL, NULL, _tr("Mixers:"));
         y += space;
@@ -440,9 +440,8 @@ static void navigate_items(s8 direction)
     current_selected_item %= mp->max_scroll;
     if (current_selected_item < 0)
         current_selected_item = mp->max_scroll - 1;
-#if 0
-    if (obj == mp->itemObj[0] || obj == mp->itemObj[1]) {
-        if (obj == mp->itemObj[0]) {
+    if (obj == (guiObject_t *)&gui->tmpl || obj == (guiObject_t *)&gui->save) {
+        if (obj == (guiObject_t *)&gui->tmpl) {
             current_selected_item = 0;
             if (direction > 0)  // Perf improvement on UI drawing for mixer setup: remove unnecessary view refreshing
                 GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
@@ -450,13 +449,12 @@ static void navigate_items(s8 direction)
     } else {
         if (!GUI_IsObjectInsideCurrentView(LEFT_VIEW_ID, obj)) {
             // selected item is out of the view, scroll the view
-            if (obj == mp->itemObj[2])  // bug fix
+            if (obj == (guiObject_t *)&gui->src)  // bug fix
                 GUI_SetRelativeOrigin(LEFT_VIEW_ID, 0, 0);
             else
                 GUI_ScrollLogicalViewToObject(LEFT_VIEW_ID, obj, direction);
         }
     }
-#endif
     if (OBJ_IS_USED(&gui->graphs[1]) && OBJ_IS_USED(&gui->graphs[2])) { // indicate that it is the expo&dr page
         // Bug description: (only happen in real devo10) When config Expo&DR template, it is most likely that hitting the Save button will fail
         // it is because in previous design, whenever switching from one widget to another, the xygraph will be redrew and cause

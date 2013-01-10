@@ -49,8 +49,8 @@ struct mainpage_obj {
 };
 
 struct menu_obj {
-    guiLabel_t idx[10];  /* FIXME */
-    guiLabel_t name[10]; /* FIXME */
+    guiLabel_t idx[20];  /* FIXME */
+    guiLabel_t name[20]; /* FIXME */
     guiScrollbar_t scroll;
 };
 

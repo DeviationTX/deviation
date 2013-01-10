@@ -99,7 +99,7 @@ void PAGE_MainEvent()
         }
     }
     for(i = 0; i < 8; i++) {
-        if (! OBJ_IS_USED(&gui->box))
+        if (! OBJ_IS_USED(&gui->box[i]))
             continue;
         s32 val = get_boxval(Model.pagecfg.box[i]);
         if (Model.pagecfg.box[i] <= NUM_TIMERS) {

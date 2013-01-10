@@ -108,10 +108,10 @@ struct guiBox {
 
 #define guiObject guiHeader
 struct guiHeader {
-    enum GUIType Type;
     struct guiBox box;
-    u8 flags;
     struct guiObject *next;
+    enum GUIType Type;
+    u8 flags;
 };
 typedef struct guiHeader guiObject_t;
 
@@ -405,15 +405,19 @@ void GUI_ChangeImage(guiImage_t *obj, const char *file, u16 x_off, u16 y_off);
 
 // logical view, only available in text-based LCD, such as devo10
 struct viewObject {
-    u8 flags;
-    s16 orgin_relativeX;  // can be negative to indicate the whole view is hidden
-    s16 orgin_relativeY; // can be negative to indicate the whole view is hidden
-    u16 width;
-    u16 height;
+    /*This is a hack to allow use of OBJ_* macros */
+    /*This provides the same layout as guiHeader */
     u16 origin_absoluteX;
     u16 origin_absoluteY;
-    u16 boundary;
+    u16 width;
+    u16 height;
     struct viewObject *next;
+    enum GUIType Type;
+    u8 flags;
+    /*end*/
+    s16 orgin_relativeX;  // can be negative to indicate the whole view is hidden
+    s16 orgin_relativeY; // can be negative to indicate the whole view is hidden
+    u16 boundary;
 };
 typedef struct viewObject viewObject_t;
 

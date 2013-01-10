@@ -57,6 +57,7 @@ void PAGE_ModelInit(int page)
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
+    memset(gui, 0, sizeof(gui));
     mp->file_state = 0;
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
     view_origin_relativeY = 0;
