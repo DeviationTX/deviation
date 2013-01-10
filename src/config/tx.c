@@ -197,27 +197,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     return 0;
 }
 
-void CONFIG_LoadTx()
-{
-    memset(&Transmitter, 0, sizeof(Transmitter));
-    Transmitter.current_model = 1;
-    Transmitter.mode = MODE_2;
-    Transmitter.brightness = 5;
-    Transmitter.contrast = 5;
-    Transmitter.volume = 10;
-    Transmitter.vibration_state = 0; // default to off since only devo10 support it
-    Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
-    Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
-    Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
-    Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
-    Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
-    Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
-    Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
-    CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
-    crc32 = Crc(&Transmitter, sizeof(Transmitter));
-    return;
-}
-
 void CONFIG_WriteTx()
 {
     int i;
@@ -263,6 +242,27 @@ void CONFIG_WriteTx()
 
     CONFIG_EnableLanguage(1);
     fclose(fh);
+}
+
+void CONFIG_LoadTx()
+{
+    memset(&Transmitter, 0, sizeof(Transmitter));
+    Transmitter.current_model = 1;
+    Transmitter.mode = MODE_2;
+    Transmitter.brightness = 5;
+    Transmitter.contrast = 5;
+    Transmitter.volume = 10;
+    Transmitter.vibration_state = 0; // default to off since only devo10 support it
+    Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
+    Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
+    Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
+    Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
+    Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
+    Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
+    Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
+    CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
+    crc32 = Crc(&Transmitter, sizeof(Transmitter));
+    return;
 }
 
 void CONFIG_SaveTxIfNeeded()

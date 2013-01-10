@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 
+#if HAS_A7105
 void A7105_Initialize()
 {
 }
@@ -83,6 +84,7 @@ void A7105_Strobe(enum A7105_State state)
     (void)state;
     //send(state)//
 }
+#endif
 
 /* CYRF */
 void CYRF_Initialize() {}

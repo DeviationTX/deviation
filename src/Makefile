@@ -24,9 +24,14 @@ DUMP ?= objdump
 
 SRC_C    := $(SRC_C) $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSIZE)/*.c) \
                 $(wildcard gui/*.c) $(wildcard pages/$(SCREENSIZE)/*.c) $(wildcard protocol/*.c) \
-                $(wildcard pages/$(SCREENSIZE)/advanced/*.c) \
-                $(wildcard pages/$(SCREENSIZE)/simple/*.c) \
                 $(wildcard config/*.c)
+ifndef NO_STANDARD_GUI
+SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/simple/*.c)
+endif
+ifndef NO_ADVANCED_GUI
+SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
+endif
+
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)
 SRCS     := $(SRC_C) $(SRC_CXX) $(SRC_S)
@@ -51,8 +56,6 @@ endif
 
 ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
-else
-  CFLAGS   := $(CFLAGS) -O2
 endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) -DHGVERSION="\"${HGVERSION}\""
@@ -65,10 +68,14 @@ LAST_MODEL := filesystem/models/model$(NUM_MODELS).ini
 
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LAST_MODEL) $(LIBOPENCM3)
 	@echo " + Building '$@'"
+ifdef LINKFILE #Create an empty 'obj/optimize.ld' just in case the linker script needs it
+	/bin/rm -f objs/optimize.ld
+	echo "" > objs/optimize.ld
+endif
 ifeq ("$(SRC_CXX)", " ")
-	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS)
+	$(CC) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 else
-	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(CFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2) $(CFLAGS)
 endif
 
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)

@@ -274,17 +274,16 @@ void LCD_Init()
   image = new image_box(0, (height - lcdScreenHeight) / 2, lcdScreenWidth, lcdScreenHeight);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
-  int mid = (INP_LAST - 1) / 2;
-  for(i = 0; i < mid; i++) {
+  for(i = 0; i < INP_LAST; i++) {
       char *label;
       label = (char *)malloc(10);
       INPUT_SourceName(label, i + 1);
-      gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
+      if(i < INP_LAST / 2) {
+          gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
+      } else {
+          gui.raw[i] = new Fl_Output(lcdScreenWidth + 230, 20 * (i - INP_LAST / 2) + 5, 60, 15, label);
+      }
       gui.raw[i]->textsize(10);
-      label = (char *)malloc(10);
-      INPUT_SourceName(label, i + mid + 1);
-      gui.raw[i+mid] = new Fl_Output(lcdScreenWidth + 230, 20 * i + 5, 60, 15, label);
-      gui.raw[i+mid]->textsize(10);
   }
   for(i = 0; i < 4; i++) {
       //This will leak memory for the labels, but it won't be much

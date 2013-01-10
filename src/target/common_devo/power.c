@@ -19,7 +19,7 @@
 
 void PWR_Init(void)
 {
-    SCB_VTOR = 0x4000;
+    SCB_VTOR = VECTOR_TABLE_LOCATION;
     SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT; //sleep immediate on WFI
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 

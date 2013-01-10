@@ -96,12 +96,12 @@ void Init() {
     CLOCK_Init();
     UART_Initialize();
     Initialize_ButtonMatrix();
+    CYRF_Initialize();
+    SPIFlash_Init(); //This must come before LCD_Init() for 7e
 
     LCD_Init();
     CHAN_Init();
 
-    SPIFlash_Init();
-    CYRF_Initialize();
 #ifdef PROTO_HAS_A7105
     A7105_Initialize();
 #endif

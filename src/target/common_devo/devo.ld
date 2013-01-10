@@ -32,6 +32,7 @@ SECTIONS
 {
 	.text : {
 		*(.vectors)	/* Vector table */
+		INCLUDE objs/optimize.ld
 		. = _crc_offset;
                 KEEP(*(.crc))
 		*(.text*)	/* Program code */

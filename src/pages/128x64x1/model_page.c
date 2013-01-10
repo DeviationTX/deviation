@@ -135,12 +135,14 @@ void PAGE_ModelInit(int page)
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, numchanselect_cb, NULL);
     mp->total_items++;
 
+#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
     row += space;
     GUI_CreateLabelBox(&gui->mixer, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Mixer GUI:"));
     GUI_CreateTextSelectPlate(&gui->mixersel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, mixermode_cb, NULL);
     mp->total_items++;
+#endif
 
     // The following items are not draw in the logical view;
     GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);

@@ -18,18 +18,15 @@
 #include <stm32f10x.h>
 #include "mass_mal.h"
 #include "usb_bot.h"
+#include "target.h"
 
-void SPIFlash_EraseSector(u32 sectorAddress);
-void SPIFlash_WriteBytes(u32 writeAddress, u32 length, u8 * buffer);
-void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-#define SECTOR_OFFSET 54
-uint32_t Mass_Memory_Size[2] = {0x1000 * (1024 - SECTOR_OFFSET), 0};
+uint32_t Mass_Memory_Size[2] = {0x1000 * (SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET), 0};
 uint32_t Mass_Block_Size[2] = {4096, 0};
-uint32_t Mass_Block_Count[2] = {1024 - SECTOR_OFFSET, 0};
+uint32_t Mass_Block_Count[2] = {SPIFLASH_SECTORS - SPIFLASH_SECTOR_OFFSET, 0};
 volatile uint32_t Status = 0;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +65,7 @@ uint16_t MAL_Write(uint8_t lun, uint32_t Memory_Offset, uint32_t *Writebuff, uin
   {
     case 0:
       //DBG("Writing: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
-      SPIFlash_WriteBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8 *)Writebuff);
+      SPIFlash_WriteBytes(Memory_Offset  + (SPIFLASH_SECTOR_OFFSET * 0x1000), Transfer_Length, (u8 *)Writebuff);
       //NAND_Write(Memory_Offset, Writebuff, Transfer_Length);
       break;
     default:
@@ -91,7 +88,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
     case 0:
       //NAND_Read(Memory_Offset, Readbuff, Transfer_Length);
       //DBG("Reading: 0x%08x %d\n", (unsigned int)Memory_Offset, (int)Transfer_Length);
-      SPIFlash_ReadBytes(Memory_Offset  + (SECTOR_OFFSET * 0x1000), Transfer_Length, (u8*)Readbuff);
+      SPIFlash_ReadBytes(Memory_Offset  + (SPIFLASH_SECTOR_OFFSET * 0x1000), Transfer_Length, (u8*)Readbuff);
       break;
     default:
       return MAL_FAIL;
@@ -109,7 +106,7 @@ uint16_t MAL_Read(uint8_t lun, uint32_t Memory_Offset, uint32_t *Readbuff, uint1
 uint16_t MAL_Clear(uint8_t lun, uint32_t Memory_Offset)
 {
   (void)lun;
-  SPIFlash_EraseSector(Memory_Offset + (SECTOR_OFFSET * 0x1000));
+  SPIFlash_EraseSector(Memory_Offset + (SPIFLASH_SECTOR_OFFSET * 0x1000));
   return MAL_OK;
 }
 /*******************************************************************************

@@ -16,11 +16,6 @@
 #include "petit_io.h"
 #include "common.h"
 
-//SECTOR_OFFSET is also defined in target/devo8/msc2/mass_mal.c
-//Make sure they both match!
-#define SECTOR_OFFSET 54
-
-
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
@@ -45,7 +40,7 @@ DRESULT disk_readp (
 	WORD count			/* Byte count (bit15:destination) */
 )
 {
-	SPIFlash_ReadBytes((sector + SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+	SPIFlash_ReadBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
 
 	return RES_OK;
 }
@@ -63,7 +58,7 @@ DRESULT disk_writep_rand (
 	WORD count			/* Byte count (bit15:destination) */
 )
 {
-	SPIFlash_WriteBytes((sector + SECTOR_OFFSET) * 0x1000 + sofs, count, src);
+	SPIFlash_WriteBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, src);
 	return RES_OK;
 }
 
@@ -77,7 +72,7 @@ DRESULT disk_writep (
 	if (!buff) {
 		if (sc) {
 			// Initiate write process
-			pos = (sc + SECTOR_OFFSET) * 0x1000;
+			pos = (sc + SPIFLASH_SECTOR_OFFSET) * 0x1000;
 			SPIFlash_EraseSector(pos);
 		} else {
 			// Finalize write process

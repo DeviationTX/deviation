@@ -18,6 +18,7 @@
 #include "common.h"
 #include "protocol/interface.h"
 
+#ifdef PROTO_HAS_A7105
 #define CS_HI() gpio_set(GPIOA, GPIO13)   
 #define CS_LO() gpio_clear(GPIOA, GPIO13)
 
@@ -154,3 +155,4 @@ void A7105_Initialize()
 
     A7105_Reset();
 }
+#endif

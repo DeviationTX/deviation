@@ -22,8 +22,19 @@
 
 struct Model Model;
 /*set this to write all model data even if it is the same as the default */
-#define WRITE_FULL_MODEL 0
 static u32 crc32;
+
+const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
+const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
+
+#define MATCH_SECTION(s) strcasecmp(section, s) == 0
+#define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
+#define MATCH_KEY(s)     strcasecmp(name,    s) == 0
+#define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
+#define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
+
+#define WRITE_FULL_MODEL 0
 static u8 auto_map;
 
 const char *MODEL_NAME = "name";
@@ -31,7 +42,6 @@ const char *MODEL_ICON = "icon";
 const char *MODEL_TYPE = "type";
 const char *MODEL_TEMPLATE = "template";
 const char *MODEL_AUTOMAP = "automap";
-const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
 const char *MODEL_MIXERMODE = "mixermode";
 
 /* Section: Radio */
@@ -44,8 +54,6 @@ static const char RADIO_NUM_CHANNELS[] = "num_channels";
 static const char RADIO_FIXED_ID[] = "fixed_id";
 
 static const char RADIO_TX_POWER[] = "tx_power";
-const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
-     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
 static const char SECTION_PROTO_OPTS[] = "protocol_opts";
 /* Section: Mixer */
@@ -237,11 +245,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     CLOCK_ResetWatchdog();
     struct Model *m = (struct Model *)user;
     u16 i;
-    #define MATCH_SECTION(s) strcasecmp(section, s) == 0
-    #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
-    #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
-    #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
-    #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
     if (MATCH_SECTION("")) {
         if(MATCH_KEY(MODEL_NAME)) {
             strncpy(m->name, value, sizeof(m->name)-1);
@@ -1062,12 +1065,13 @@ void clear_model(u8 full)
 }
 
 u8 CONFIG_ReadModel(u8 model_num) {
-    char file[20];
     crc32 = 0;
     Transmitter.current_model = model_num;
-    get_model_file(file, model_num);
     clear_model(1);
+
+    char file[20];
     auto_map = 0;
+    get_model_file(file, model_num);
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
