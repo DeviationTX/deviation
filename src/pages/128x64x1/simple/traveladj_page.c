@@ -26,6 +26,29 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 static s16 view_origin_relativeY;
 static s8 current_selected = 0;
 
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    if(col == 0)
+        return (guiObject_t *)&gui->dn[relrow];
+    else
+        return (guiObject_t *)&gui->up[relrow];
+}
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    u8 w = 35;
+    u8 x = 50;
+    MIXER_GetLimit(absrow, &mp->limit);
+    GUI_CreateLabelBox(&gui->chan[relrow], 0, y,
+            0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->dn[relrow], x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->up[relrow], x + w +3, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
+    return 2;
+}
+
 void PAGE_TravelAdjInit(int page)
 {
     if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
@@ -42,43 +65,21 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateLabelBox(&gui->dnlbl, x+2, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
     GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_SPACE;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH, LCD_HEIGHT - view_origin_absoluteY ,
-        view_origin_absoluteX, view_origin_absoluteY);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL);
 
-    u8 row = 0;
-    for (u8 i = 0; i < Model.num_channels; i++) {
-        MIXER_GetLimit(i, &mp->limit);
-        GUI_CreateLabelBox(&gui->chan[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-                0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(&gui->dn[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row ),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)i);
-        GUI_CreateTextSelectPlate(&gui->up[i], GUI_MapToLogicalView(VIEW_ID, x + w +3), GUI_MapToLogicalView(VIEW_ID, row),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)i);
-        row += ITEM_SPACE;
-    }
-    GUI_Select1stSelectableObj();
+    GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, 0, 0));
 
-    // The following items are not draw in the logical view;
-    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY, LCD_HEIGHT - view_origin_absoluteY,
-            Model.num_channels + Model.num_channels, NULL, NULL, NULL);
-    if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, &gui->scroll);
+    //if (page > 0)
+    //    PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, &gui->scroll);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
-    u8 total_items = GUI_GetScrollbarNumItems(&gui->scroll);
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

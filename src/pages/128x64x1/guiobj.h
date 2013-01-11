@@ -7,12 +7,11 @@ struct about_obj {
 struct chantest_obj {
     guiLabel_t title;
     guiRect_t  rect;
-    guiLabel_t chan[NUM_TEST_BARS];
-    guiLabel_t value[NUM_VALUES];
-    guiBarGraph_t bar[NUM_TEST_BARS];
+    guiLabel_t chan[8];
+    guiLabel_t value[8];
+    guiBarGraph_t bar[8];
     guiLabel_t page;
-    guiScrollbar_t scroll;
-    guiLabel_t lock;
+    guiScrollable_t scrollable;
 };
 
 struct dialog_obj {
@@ -364,10 +363,10 @@ struct stdthold_obj {
 struct stdtravel_obj {
     guiLabel_t dnlbl;
     guiLabel_t uplbl;
-    guiLabel_t chan[NUM_CHANNELS];
-    guiTextSelect_t dn[NUM_CHANNELS];
-    guiTextSelect_t up[NUM_CHANNELS];
-    guiScrollbar_t scroll;
+    guiLabel_t chan[4];
+    guiTextSelect_t dn[4];
+    guiTextSelect_t up[4];
+    guiScrollable_t scrollable;
 };
 
 struct gui_objs {

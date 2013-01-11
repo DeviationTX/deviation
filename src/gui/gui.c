@@ -71,7 +71,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Scrollable: GUI_DrawScrollable(obj);        break;
     case Rect:       GUI_DrawRect(obj);              break;
     }
-    if (obj == objSELECTED)
+    if (obj == objSELECTED && obj->Type != Scrollable)
         _gui_hilite_selected(obj);
     OBJ_SET_DIRTY(obj, 0);
 }
@@ -496,8 +496,11 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
             obj = obj->next;
         }
     }
-    if (! objLast)
+    if (! objLast) {
+        if (origObj && origObj->Type == Scrollable)
+            return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)origObj, NULL);
         return origObj;
+    }
     if (objLast->Type == Scrollable)
         return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)objLast, NULL);
     return objLast;

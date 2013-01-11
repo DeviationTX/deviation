@@ -19,7 +19,7 @@
 #include "config/display.h"
 
 //static u8 press_cb(u32 button, u8 flags, void *data);
-void create_scrollable_objs(guiScrollable_t *scrollable);
+void create_scrollable_objs(guiScrollable_t *scrollable, int row);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
@@ -36,7 +36,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
     scrollable->item_count = item_count;
     scrollable->cb_data = data;
     scrollable->head = NULL;
-    scrollable->cur_row = 0;
+    scrollable->cur_row = -1;
 
     box->x = x;
     box->y = y;
@@ -57,7 +57,10 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
               obj,
               NULL, NULL);
 
-    create_scrollable_objs(scrollable);
+    create_scrollable_objs(scrollable, 0);
+    //force selection to be current objectif there are no selectable contents
+    if (scrollable->num_selectable == 0)
+        objSELECTED = obj;
 
     //BUTTON_RegisterCallback(&scrollable->action,
     //     CHAN_ButtonMask(BUT_UP)
@@ -89,7 +92,7 @@ int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)
 {
     guiObject_t *head = scrollable->head;
     if (! obj)
-        obj = objSELECTED;
+        return -1;
     int id = 0;
     while(head) {
         if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
@@ -132,17 +135,18 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
     return NULL;
 }
 
-void create_scrollable_objs(guiScrollable_t *scrollable)
+void create_scrollable_objs(guiScrollable_t *scrollable, int row)
 {
-    int i = scrollable->cur_row;
+    if (scrollable->cur_row == row)
+        return;
+    scrollable->cur_row = row;
     int rel_row = 0;
     int selectable = 0;
     GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
-    for(i = scrollable->cur_row; rel_row < scrollable->visible_rows; i++, rel_row++) {
-printf("%d: %d -> %d\n", i, scrollable->header.box.y + rel_row * scrollable->row_height, scrollable->row_height);
-        selectable += scrollable->row_cb(i, rel_row, scrollable->header.box.y + rel_row * scrollable->row_height, scrollable->cb_data);
+    for(row = scrollable->cur_row; rel_row < scrollable->visible_rows; row++, rel_row++) {
+        selectable += scrollable->row_cb(row, rel_row, scrollable->header.box.y + rel_row * scrollable->row_height, scrollable->cb_data);
     }
     scrollable->num_selectable = selectable;
     scrollable->head = objHEAD;
@@ -158,7 +162,7 @@ printf("%d: %d -> %d\n", i, scrollable->header.box.y + rel_row * scrollable->row
 
 guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
 {
-    return scrollable->getobj_cb(row, col, NULL);
+    return scrollable->getobj_cb ? scrollable->getobj_cb(row, col, NULL) : NULL;
 }
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {
@@ -175,17 +179,24 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
                 //Go to the next item after the Scrollable
                 return (guiObject_t *)scrollable;
             }
-            scrollable->cur_row++;
-            create_scrollable_objs(scrollable);
+            create_scrollable_objs(scrollable, scrollable->cur_row+1);
             return select_scrollable(scrollable, scrollable->visible_rows-1, 0);
         }
         obj = obj->next;
     } else {
+        if (! scrollable->num_selectable) {
+            //No selectable objects, just move the scrollbar
+            if (scrollable->cur_row + scrollable->visible_rows < scrollable->item_count) {
+                create_scrollable_objs(scrollable, scrollable->cur_row+1);
+            }
+            return (guiObject_t *)scrollable;
+        }
         obj = scrollable->head;
-         scrollable->cur_row = 0;
-        create_scrollable_objs(scrollable);
+        if (scrollable->cur_row) {
+            create_scrollable_objs(scrollable, 0);
+        }
     }
-    while(! OBJ_IS_SELECTABLE(obj)) {
+    while(obj && ! OBJ_IS_SELECTABLE(obj)) {
         obj = obj->next;
     }
     return obj;
@@ -206,19 +217,26 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
                 //Go to the prev item before the Scrollable
                 return (guiObject_t *)scrollable;
             }
-            scrollable->cur_row--;
-            create_scrollable_objs(scrollable);
+            create_scrollable_objs(scrollable, scrollable->cur_row -1);
             return select_scrollable(scrollable, 0, -1);
         }
         return set_selected_idx(scrollable, idx-1);
     } else {
-        scrollable->cur_row = scrollable->item_count - scrollable->visible_rows;
-        create_scrollable_objs(scrollable);
+        if (! scrollable->num_selectable) {
+            //No selectable objects, just move the scrollbar
+            if (scrollable->cur_row)
+                create_scrollable_objs(scrollable, scrollable->cur_row -1);
+            return (guiObject_t *)scrollable;
+        }
+        create_scrollable_objs(scrollable, scrollable->item_count - scrollable->visible_rows);
         return select_scrollable(scrollable, scrollable->visible_rows - 1, -1);
     }
     return NULL;
 }
 guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
 {
-    return scrollable->getobj_cb(row - scrollable->cur_row, col, scrollable->cb_data);
+    int relrow = row - scrollable->cur_row;
+    if (relrow < 0 || relrow >= scrollable->visible_rows || ! scrollable->getobj_cb)
+        return NULL;
+    return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
 }
