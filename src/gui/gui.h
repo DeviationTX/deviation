@@ -96,6 +96,7 @@ enum GUIType {
     Listbox,
     Keyboard,
     Scrollbar,
+    Scrollable,
     Rect,
 };
 
@@ -189,6 +190,21 @@ typedef struct guiListbox {
     buttonAction_t action; // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN
 } guiListbox_t;
 
+typedef struct guiScrollable {
+    struct guiHeader header;
+    u8 item_count;
+    u8 row_height;
+    u8 num_selectable;
+    u8 cur_row;
+    u8 visible_rows;
+    guiObject_t *head;
+    struct guiScrollbar scrollbar;
+    int (*row_cb)(int absrow, int relrow, int x, void *data);
+    guiObject_t *(*getobj_cb)(int relrow, int col, void *data);
+    void *cb_data;
+    //buttonAction_t action;
+}  guiScrollable_t;
+ 
 typedef struct guiXYGraph {
     struct guiHeader header;
     s16 min_x;
@@ -247,6 +263,7 @@ typedef struct guiRect {
 #define OBJ_IS_DIRTY(x)       ((x)->flags & 0x08) /* bool: UI element needs redraw */
 #define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
 #define OBJ_IS_SELECTABLE(x)  ((x)->flags & 0x20) /* bool: UI element can be selected */
+#define OBJ_IS_SCROLLABLE(x)  ((x)->flags & 0x40) /* bool: UI element is part of a scrollable container */
 #define OBJ_SET_FLAG(obj,flag,set)  ((guiObject_t *)(obj))->flags = (set) \
                                     ? ((guiObject_t *)(obj))->flags | (flag) \
                                     : ((guiObject_t *)(obj))->flags & ~(flag)
@@ -256,6 +273,7 @@ typedef struct guiRect {
 #define OBJ_SET_DIRTY(x,y)       OBJ_SET_FLAG(x, 0x08, y)
 #define OBJ_SET_TRANSPARENT(x,y) OBJ_SET_FLAG(x, 0x10, y)
 #define OBJ_SET_SELECTABLE(x,y)  OBJ_SET_FLAG(x, 0x20, y)
+#define OBJ_SET_SCROLLABLE(x,y)  OBJ_SET_FLAG(x, 0x40, y)
 
 #define DRAW_NORMAL  0
 #define DRAW_PRESSED 1
@@ -265,6 +283,13 @@ extern struct guiObject *objHEAD;
 extern struct guiObject *objTOUCHED;
 extern struct guiObject *objSELECTED;
 extern struct guiObject *objModalButton;
+
+guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj);
+void GUI_RemoveScrollableObjs(guiObject_t *obj);
+void GUI_DrawScrollable(guiObject_t *obj);
+guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
+guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
+
 
 void GUI_DrawKeyboard(struct guiObject *obj);
 u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type);
@@ -345,6 +370,12 @@ guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *, u16 x, u16 y, u16 width,
         void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
         void *cb_data);
 void GUI_ListBoxSelect(guiListbox_t *obj, u16 selected);
+
+guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
+     int (*row_cb)(int absrow, int relrow, int x, void *data),
+     guiObject_t * (*getobj_cb)(int relrow, int col, void *data),
+     void *data);
+guiObject_t *GUI_GetScrollableObj(guiScrollable_t *, int row, int col);
 
 guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,

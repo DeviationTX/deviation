@@ -51,12 +51,14 @@ void sourceselect_cb(guiObject_t *obj, void *data)
 
 static void update_safe_val_state()
 {
+    guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_SAFEVAL, 0);
     if (!mp->limit.safetysw) {
-        GUI_TextSelectEnable(&gui->safeval, 0);
+        if (obj)
+            GUI_TextSelectEnable((guiTextSelect_t *)obj, 0);
         mp->limit.safetyval = 0;
     }
-    else
-        GUI_TextSelectEnable(&gui->safeval, 1);
+    else if (obj)
+        GUI_TextSelectEnable((guiTextSelect_t *)obj, 1);
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -124,8 +126,11 @@ const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data)
     if (isCurrentItemChanged) {
         *ptr = value;
         if (ptr == &mp->limit.servoscale) {
-            if (mp->limit.servoscale_neg == 0)
-                GUI_Redraw(&gui->scaleneg);
+            if (mp->limit.servoscale_neg == 0) {
+                guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_SCALENEG, 0);
+                if(obj)
+                    GUI_Redraw(obj);
+            }
         } else {
             if (value == mp->limit.servoscale)
                 *ptr = 0;

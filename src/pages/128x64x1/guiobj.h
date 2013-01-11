@@ -238,27 +238,9 @@ struct advcurve_obj {
 struct advlimit_obj {
     guiLabel_t title;
     guiButton_t revert;
-    guiLabel_t reverselbl;
-    guiTextSelect_t reverse;
-    guiLabel_t failsafelbl;
-    guiTextSelect_t failsafe;
-    guiLabel_t safelbl;
-    guiTextSelect_t safe;
-    guiLabel_t safevallbl;
-    guiTextSelect_t safeval;
-    guiLabel_t minlbl;
-    guiTextSelect_t min;
-    guiLabel_t maxlbl;
-    guiTextSelect_t max;
-    guiLabel_t scaleposlbl;
-    guiTextSelect_t scalepos;
-    guiLabel_t scaleneglbl;
-    guiTextSelect_t scaleneg;
-    guiLabel_t subtrimlbl;
-    guiTextSelect_t subtrim;
-    guiLabel_t speedlbl;
-    guiTextSelect_t speed;
-    guiScrollbar_t scroll;
+    guiScrollable_t scrollable;
+    guiLabel_t label[4];
+    guiTextSelect_t value[4];
 };
 
 struct advmixer_obj {

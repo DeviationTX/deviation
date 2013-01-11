@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 
-#if HAS_A7105
+#ifdef PROTO_HAS_A7105
 void A7105_Initialize()
 {
 }

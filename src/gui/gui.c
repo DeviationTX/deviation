@@ -68,6 +68,7 @@ void GUI_DrawObject(struct guiObject *obj)
     case Listbox:    GUI_DrawListbox(obj, 1);        break;
     case Keyboard:   GUI_DrawKeyboard(obj);          break;
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
+    case Scrollable: GUI_DrawScrollable(obj);        break;
     case Rect:       GUI_DrawRect(obj);              break;
     }
     if (obj == objSELECTED)
@@ -130,6 +131,10 @@ void GUI_RemoveObj(struct guiObject *obj)
     }
     case Scrollbar:
         BUTTON_UnregisterCallback(&((guiScrollbar_t *)obj)->action);
+        break;
+    case Scrollable:
+        GUI_RemoveScrollableObjs(obj);
+        GUI_RemoveObj((guiObject_t *)&((guiScrollable_t *)obj)->scrollbar);
         break;
     case Keyboard:
         BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
@@ -268,15 +273,22 @@ void GUI_RefreshScreen(void)
                 } else
                     OBJ_SET_DIRTY(obj, 0);
             }
-        } else if(! OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
-            if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
-                if (modalObj && modalObj->Type == Dialog) {
-                    GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-                } else {
-                    GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+        } else if(! OBJ_IS_HIDDEN(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+            if (obj->Type == Scrollable) {
+                guiObject_t *head = objHEAD;
+                objHEAD = ((guiScrollable_t *)obj)->head;
+                GUI_RefreshScreen();
+                objHEAD = head;
+            } else if(OBJ_IS_DIRTY(obj)) {
+                if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
+                    if (modalObj && modalObj->Type == Dialog) {
+                        GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                    } else {
+                        GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
+                    }
                 }
+                GUI_DrawObject(obj);
             }
-            GUI_DrawObject(obj);
         }
         obj = obj->next;
     }
@@ -339,6 +351,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case CheckBox:
             case Dropdown:
             case BarGraph:
+            case Scrollable:
             case Rect:
                 break;
             case Button:
@@ -423,11 +436,22 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
     if (! objHEAD)
         return NULL;
     u8 modalActive = GUI_IsModal() ? 1 : 0;
+    if (obj && OBJ_IS_SCROLLABLE(obj)) {
+        //The current selected object is scrollable
+        guiScrollable_t *scroll = GUI_FindScrollableParent(obj);
+        obj = GUI_ScrollableGetNextSelectable(scroll, obj);
+        if (obj->Type != Scrollable)
+            return obj;
+    }
     obj = obj ? obj->next : objHEAD;
     while(obj) {
         if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
         {
-            foundObj = obj;
+            if(obj->Type == Scrollable) {
+                foundObj = GUI_ScrollableGetNextSelectable((guiScrollable_t *)obj, NULL);
+            } else {
+                foundObj = obj;
+            }
             break;
         }
         obj = obj->next;
@@ -435,11 +459,19 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
     if (! foundObj && origObj) {
         return GUI_GetNextSelectable(NULL);
     }
-    return obj;
+    return foundObj;
 }
+
 struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
 {
     struct guiObject *obj = objHEAD, *objLast = NULL;
+    if (origObj && OBJ_IS_SCROLLABLE(origObj)) {
+        //The current selected object is scrollable
+        guiScrollable_t *scroll = GUI_FindScrollableParent(origObj);
+        origObj = GUI_ScrollableGetPrevSelectable(scroll, origObj);
+        if (origObj->Type != Scrollable)
+            return origObj;
+    }
     if (obj == NULL)
         return GUI_GetNextSelectable(objHEAD);
     u8 modalActive = GUI_IsModal() ? 1 : 0;
@@ -466,6 +498,8 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     }
     if (! objLast)
         return origObj;
+    if (objLast->Type == Scrollable)
+        return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)objLast, NULL);
     return objLast;
 }
 
