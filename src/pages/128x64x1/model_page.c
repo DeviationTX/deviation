@@ -29,9 +29,8 @@
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
-#define VIEW_ID 0
-static s16 view_origin_relativeY;
-static s8 current_selected = 0;
+static u16 current_selected = 0;
+
 
 static const char * show_icontext_cb(guiObject_t *obj, const void *data)
 {
@@ -50,6 +49,85 @@ static const char * show_icontext_cb(guiObject_t *obj, const void *data)
     return mp->tmpstr;
 }
 
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void) data;
+    if(col == 0 && gui->col1[relrow].ts.header.Type == TextSelect) {
+        return (guiObject_t *)&gui->col1[relrow];
+    }
+    return (guiObject_t *)&gui->col2[relrow];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void) data;
+    u8 w = 59;
+    u8 x = 63;
+    u8 ts_x = 63;
+    int count = 0;
+    const void *label = NULL;
+    void *ts_tgl = NULL;
+    void *ts_value = NULL;
+    void *but_txt = NULL;
+    void *but_tgl = NULL;
+    void *but_data = NULL;
+
+    switch(absrow) {
+        case ITEM_FILE:
+            label = _tr("File:");
+            ts_tgl = file_press_cb; ts_value = file_val_cb;
+            break;
+        case ITEM_NAME:
+            label = _tr("Model name:");
+            but_txt = show_text_cb; but_tgl = _changename_cb; but_data = Model.name;
+            break;
+        case ITEM_ICON:
+            label = _tr("Icon:");
+            but_txt = show_icontext_cb; but_tgl = changeicon_cb;
+            break;
+        case ITEM_TYPE:
+            label = _tr("Model type:");
+            ts_tgl = type_press_cb; ts_value = type_val_cb;
+            break;
+        case ITEM_TXPOWER:
+            label = _tr("Tx power:");
+            ts_value = powerselect_cb;
+            break;
+        case ITEM_PROTO:
+            ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = 0;
+            but_txt = show_bindtext_cb; but_tgl = bind_cb;
+            break;
+        case ITEM_FIXEDID:
+            label = _tr("Fixed ID:");
+            but_txt = show_text_cb; but_tgl = fixedid_cb; but_data = mp->fixed_id;
+            break;
+        case ITEM_NUMCHAN:
+            label = _tr("# Channels:");
+            ts_value = numchanselect_cb;
+            break;
+#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
+        case ITEM_GUI:
+            label = _tr("Mixer GUI:");
+            ts_value = mixermode_cb;
+            break;
+#endif
+    }
+    if (label)
+        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,
+           0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
+    if (ts_value) {
+        GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+        count++;
+    }
+    if (but_txt) {
+        GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
+        count++;
+    }
+    return count;
+}
+        
 void PAGE_ModelInit(int page)
 {
     if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
@@ -60,94 +138,16 @@ void PAGE_ModelInit(int page)
     memset(gui, 0, sizeof(gui));
     mp->file_state = 0;
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
-    view_origin_relativeY = 0;
-    current_selected = 0;
-    mp->total_items = 0;
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    u8 space = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
-        view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 row = 0;
-    u8 w = 59;
-    u8 x = 63;
-    GUI_CreateLabelBox(&gui->file, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("File:"));
-    GUI_CreateTextSelectPlate(&gui->filesel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, file_press_cb, file_val_cb, NULL);
-    GUI_Select1stSelectableObj();
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateLabelBox(&gui->name, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model name:"));
-    GUI_CreateButtonPlateText(&gui->namesel, GUI_MapToLogicalView(VIEW_ID, x ), GUI_MapToLogicalView(VIEW_ID, row),
-        w, ITEM_HEIGHT, &DEFAULT_FONT, show_text_cb, 0x0000, _changename_cb, Model.name);
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateLabelBox(&gui->icon, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Icon:"));
-    GUI_CreateButtonPlateText(&gui->iconsel, GUI_MapToLogicalView(VIEW_ID, x ), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, show_icontext_cb, 0x0000, changeicon_cb, NULL);
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateLabelBox(&gui->type, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model type:"));
-    GUI_CreateTextSelectPlate(&gui->typesel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, type_press_cb, type_val_cb, NULL);
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateLabelBox(&gui->power, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Tx power:"));
-    GUI_CreateTextSelectPlate(&gui->powersel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, powerselect_cb, NULL);
-    mp->total_items++;
-
-    row += space;
-    GUI_CreateTextSelectPlate(&gui->protosel, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, proto_press_cb, protoselect_cb, NULL);
-    mp->total_items++;
-    GUI_CreateButtonPlateText(&gui->bind, GUI_MapToLogicalView(VIEW_ID, x +5 ), GUI_MapToLogicalView(VIEW_ID, row),
-            w-10, ITEM_HEIGHT, &DEFAULT_FONT, show_bindtext_cb, 0x0000, bind_cb, NULL);
-    mp->total_items++;
-
-    row += space;
     if(Model.fixed_id == 0)
         strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabelBox(&gui->id, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-        0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Fixed ID:"));
-    GUI_CreateButtonPlateText(&gui->idsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
-    mp->total_items++;
 
-    row += space;
-    GUI_CreateLabelBox(&gui->chan, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("# Channels:"));
-    GUI_CreateTextSelectPlate(&gui->chansel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, numchanselect_cb, NULL);
-    mp->total_items++;
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL);
 
-#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
-    row += space;
-    GUI_CreateLabelBox(&gui->mixer, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Mixer GUI:"));
-    GUI_CreateTextSelectPlate(&gui->mixersel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, mixermode_cb, NULL);
-    mp->total_items++;
-#endif
-
-    // The following items are not draw in the logical view;
-    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
-    if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
 static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
@@ -180,10 +180,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
@@ -191,4 +187,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+void PAGE_ModelExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }

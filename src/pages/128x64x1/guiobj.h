@@ -83,25 +83,16 @@ struct modelload_obj {
 };
 
 struct modelpage_obj {
+    union {
+        guiLabel_t label;
+        guiTextSelect_t ts;
+    } col1[4];
+    union {
+        guiTextSelect_t ts;
+        guiButton_t but;
+    } col2[4];
     guiLabel_t file;
-    guiTextSelect_t filesel;
-    guiLabel_t name;
-    guiButton_t namesel;
-    guiLabel_t icon;
-    guiButton_t iconsel;
-    guiLabel_t type;
-    guiTextSelect_t typesel;
-    guiLabel_t power;
-    guiTextSelect_t powersel;
-    guiTextSelect_t protosel;
-    guiButton_t bind;
-    guiLabel_t id;
-    guiButton_t idsel;
-    guiLabel_t chan;
-    guiTextSelect_t chansel;
-    guiLabel_t mixer;
-    guiTextSelect_t mixersel;
-    guiScrollbar_t scroll;
+    guiScrollable_t scrollable;
     guiKeyboard_t  keyboard;
 };
 

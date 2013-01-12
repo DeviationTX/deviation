@@ -32,6 +32,21 @@ static void changeicon_cb(guiObject_t *obj, const void *data);
 
 static void _changename_done_cb(guiObject_t *obj, void *data);
 
+enum {
+    ITEM_FILE,
+    ITEM_NAME,
+    ITEM_ICON,
+    ITEM_TYPE,
+    ITEM_TXPOWER,
+    ITEM_PROTO,
+    ITEM_FIXEDID,
+    ITEM_NUMCHAN,
+#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
+    ITEM_GUI,
+#endif
+    ITEM_LAST,
+};
+
 const char *show_text_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -105,7 +120,9 @@ static void bind_cb(guiObject_t *obj, const void *data)
 
 static void configure_bind_button()
 {
-    GUI_Redraw(&gui->bind);
+    guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_PROTO, 1);
+    if(obj)
+        GUI_Redraw(obj);
     //GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
 }
 
@@ -156,7 +173,9 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts)); //This may cause an immediate change in behavior!
-        GUI_Redraw(&gui->chansel);
+        guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_NUMCHAN, 0);
+        if (obj)
+            GUI_Redraw(obj);
         if (Model.mixer_mode == MIXER_SIMPLE)
             SIMPLEMIXER_SetChannelOrderByProtocol();
         configure_bind_button();
@@ -214,13 +233,12 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
 static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    (void)obj;
     u8 changed = 0;
     Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
     if (changed && Model.mixer_mode == MIXER_SIMPLE) {
         if (!SIMPLEMIXER_ValidateTraditionModel()) {
             Model.mixer_mode = MIXER_ADVANCED;
-            PAGE_ShowInvalidSimpleMixerDialog((guiObject_t *)&gui->mixersel);
+            PAGE_ShowInvalidSimpleMixerDialog(obj);
         } else {
             SIMPLEMIXER_SetChannelOrderByProtocol();
         }
