@@ -48,12 +48,14 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
     OBJ_SET_SELECTABLE(obj, 1); //Scrollables aren't really selectable
     connect_object(obj);
     scrollable->visible_rows = height / row_height + 1;
-
+    if (scrollable->visible_rows > item_count)
+        scrollable->visible_rows = item_count;
+    int scroll_count = item_count - scrollable->visible_rows + 1;
     GUI_CreateScrollbar(&scrollable->scrollbar,
               x + width - ARROW_WIDTH,
               y,
               height,
-              item_count - scrollable->visible_rows + 1,
+              scroll_count,
               obj,
               NULL, NULL);
 

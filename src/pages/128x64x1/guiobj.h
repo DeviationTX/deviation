@@ -54,28 +54,11 @@ struct menu_obj {
 };
 
 struct modelcfg_obj {
-    guiLabel_t swash;
-    guiTextSelect_t swashsel;
-    guiLabel_t ele;
-    guiTextSelect_t elesel;
-    guiLabel_t ail;
-    guiTextSelect_t ailsel;
-    guiLabel_t col;
-    guiTextSelect_t colsel;
-    guiLabel_t emix;
-    guiTextSelect_t emixsel;
-    guiLabel_t amix;
-    guiTextSelect_t amixsel;
-    guiLabel_t cmix;
-    guiTextSelect_t cmixsel;
-    guiScrollbar_t scroll;
+    guiLabel_t label[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
 
-struct modelproto_obj {
-    guiLabel_t str[NUM_PROTO_OPTS];
-    guiTextSelect_t sel[NUM_PROTO_OPTS];
-};
- 
 struct modelload_obj {
     guiTextSelect_t ico;
     guiImage_t image;
@@ -370,7 +353,6 @@ struct gui_objs {
         struct mainpage_obj mainpage;
         struct menu_obj menu;
         struct modelcfg_obj modelcfg;
-        struct modelproto_obj modelproto;
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
