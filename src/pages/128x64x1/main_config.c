@@ -20,6 +20,23 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+enum {
+    ITEM_TRIMS,
+    ITEM_BOX0,
+    ITEM_BOX1,
+    ITEM_BOX2,
+    ITEM_BOX3,
+    ITEM_BOX4,
+    ITEM_BOX5,
+    ITEM_BOX6,
+    ITEM_BOX7,
+    ITEM_SWITCH0,
+    ITEM_SWITCH1,
+    ITEM_SWITCH2,
+    ITEM_SWITCH3,
+    ITEM_MENU,
+};
+
 #define COL1_VALUE 4
 #define COL2_VALUE 56
 #define COL3_VALUE 156
@@ -111,68 +128,79 @@ guiObject_t *firstObj;
 #define VIEW_ID 0
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static const char *_swicthlabel_cb(guiObject_t *obj, const void *data);
+static const char *_switchlabel_cb(guiObject_t *obj, const void *data);
 
-static s8 current_selected = 0;
-static u8 total_items = 0;
-static s16 view_origin_relativeY;
+static u16 current_selected = 0;
 
+static void press_nop_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj; (void)press_type; (void)data;
+}
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)col;
+    (void)data;
+    return OBJ_IS_USED(&gui->value[relrow])
+           ? (guiObject_t *)&gui->value[relrow]
+           : (guiObject_t *)&gui->label[relrow];
+}
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    const void *label = (void *)-1L;
+    void *label_cb = NULL;
+    void *label_press = NULL;
+    void *tgl = NULL;
+    void *value = NULL;
+    int x = 0;
+    switch(absrow) {
+        case ITEM_TRIMS:
+            label = _tr("Trims:");
+            value = trimsel_cb;
+            break;
+        case ITEM_BOX0:
+        case ITEM_BOX1:
+        case ITEM_BOX2:
+        case ITEM_BOX3:
+        case ITEM_BOX4:
+        case ITEM_BOX5:
+        case ITEM_BOX6:
+        case ITEM_BOX7:
+            label_cb = boxlabel_cb; label = (void *)(long)(absrow - ITEM_BOX0);
+            value = boxtxtsel_cb; data = (void *)(long)(absrow - ITEM_BOX0);
+            break;
+        case ITEM_SWITCH0:
+        case ITEM_SWITCH1:
+        case ITEM_SWITCH2:
+        case ITEM_SWITCH3:
+            label_cb = _switchlabel_cb; label = (void *)(long)(absrow - ITEM_SWITCH0);
+            tgl = toggle_inv_cb; value = toggle_val_cb; data = (void *)(long)(absrow - ITEM_SWITCH0);
+            break;
+        case ITEM_MENU:
+        default:
+            if (! ((absrow - ITEM_MENU) % 2)) {
+                label_cb = menulabel_cb; label = (void *)(long)((absrow - ITEM_MENU)/2); label_press = press_nop_cb;
+            } else {
+                value = menusel_cb; data = (void *)(long)((absrow - ITEM_MENU)/2);
+            }
+            break;
+    }
+    if((long)label != -1L) {
+        GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+             0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, label_press, label);
+        x = 56;
+    }
+    if (value) {
+        GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
+             LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
+    }
+    return 1;
+}
 static void _show_page()
 {
-    if (page_num < 0 && current_selected > 0)
-        page_num = current_selected;
-    total_items = 0;
-    current_selected = 0;
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    u8 space = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
-            view_origin_absoluteX, view_origin_absoluteY);
-
-    int y = 0;
-    u8 w = 63;
-    u8 x = 56;
-    GUI_CreateLabelBox(&gui->label_trim, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trims:"));
-    guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->trimsel, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, trimsel_cb, NULL);
-    GUI_SetSelected(obj);
-    total_items++;
-
-    y += space;
-    long i;
-    for(i = 0; i < 8; i++) {
-        GUI_CreateLabelBox(&gui->boxlabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                    0, ITEM_HEIGHT, &DEFAULT_FONT, boxlabel_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(&gui->boxsel[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                    w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, boxtxtsel_cb, (void *)(long)i);
-        y+= space;
-        total_items++;
-    }
-
-    for(i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui->switchlabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                0, ITEM_HEIGHT, &DEFAULT_FONT, _swicthlabel_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(&gui->switchsel[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                    w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_inv_cb, toggle_val_cb,  (void *)(long)i);
-        y+= space;
-        total_items++;
-     }
-     y += space;
-     for (i = 0; i < NUM_QUICKPAGES; i++) {
-         GUI_CreateLabelBox(&gui->menulabel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-             0, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)i);
-         y += space;
-         GUI_CreateTextSelectPlate(&gui->menusel[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                120, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)i);
-         y += space;
-         total_items++;
-    }
-
-    GUI_CreateScrollbar(&gui->scroll_bar, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
-    if (page_num > 0)
-        PAGE_NavigateItems(page_num, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                     ITEM_SPACE, ITEM_MENU + NUM_QUICKPAGES, row_cb, getobj_cb, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
 static void _show_title()
@@ -182,7 +210,7 @@ static void _show_title()
     PAGE_ShowHeader(_tr("Preview: Long-Press ENT"));
 }
 
-static const char *_swicthlabel_cb(guiObject_t *obj, const void *data)
+static const char *_switchlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
@@ -198,10 +226,6 @@ u8 _action_cb(u32 button, u8 flags, void *data)
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_ChangeByID(PAGEID_MAIN, 1);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll_bar);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
@@ -210,3 +234,8 @@ u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+void PAGE_MainCfgExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+}
+void build_image() {}

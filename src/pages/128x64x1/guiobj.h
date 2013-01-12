@@ -24,16 +24,9 @@ struct lang_obj {
 };
 
 struct mainconfig_obj {
-    guiRect_t rect;
-    guiLabel_t label_trim;
-    guiTextSelect_t trimsel;
-    guiLabel_t boxlabel[8];
-    guiTextSelect_t boxsel[8];
-    guiLabel_t switchlabel[4];
-    guiTextSelect_t switchsel[4];
-    guiLabel_t menulabel[NUM_QUICKPAGES];
-    guiTextSelect_t menusel[NUM_QUICKPAGES];
-    guiScrollbar_t scroll_bar;
+    guiLabel_t label[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
 
 struct mainpage_obj {
