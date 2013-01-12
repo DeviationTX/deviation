@@ -100,6 +100,7 @@ u8 PAGE_TelemStateCheck(char *str, int strlen);
 void PAGE_ModelMenuInit(int page);
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
+void PAGE_TravelAdjExit();
 void PAGE_PitCurvesInit(int page);
 void PAGE_ThroCurvesInit(int page);
 void PAGE_SubtrimInit(int page);

@@ -240,3 +240,26 @@ guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
         return NULL;
     return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
 }
+guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, int col)
+{
+    if (absrow < scrollable->cur_row
+        || absrow >= scrollable->cur_row + scrollable->visible_rows)
+    {
+        int row = absrow;
+        if (row + scrollable->visible_rows >= scrollable->item_count)
+            row = scrollable->item_count - scrollable->visible_rows;
+        create_scrollable_objs(scrollable, row);
+    }
+    int relrow = absrow - scrollable->cur_row;
+    return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
+}
+
+guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
+{
+    create_scrollable_objs(scrollable, row_idx >> 8);
+    return set_selected_idx(scrollable, row_idx & 0xff);
+}
+int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
+{
+    return (scrollable->cur_row << 8) | get_selected_idx(scrollable, obj);
+}

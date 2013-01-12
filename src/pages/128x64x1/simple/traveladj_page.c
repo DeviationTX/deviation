@@ -23,8 +23,7 @@
 #define gui (&gui_objs.u.stdtravel)
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
-static s16 view_origin_relativeY;
-static s8 current_selected = 0;
+static u16 current_selected = 0;
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -56,8 +55,6 @@ void PAGE_TravelAdjInit(int page)
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    view_origin_relativeY = 0;
-    current_selected = 0;
 
     PAGE_ShowHeader(("")); // draw a underline only
     u8 w = 35;
@@ -68,10 +65,7 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL);
 
-    GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, 0, 0));
-
-    //if (page > 0)
-    //    PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, &gui->scroll);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -87,4 +81,8 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+void PAGE_TravelAdjExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }

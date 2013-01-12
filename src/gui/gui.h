@@ -289,6 +289,7 @@ void GUI_RemoveScrollableObjs(guiObject_t *obj);
 void GUI_DrawScrollable(guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
+int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj);
 
 
 void GUI_DrawKeyboard(struct guiObject *obj);
@@ -376,6 +377,8 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
      guiObject_t * (*getobj_cb)(int relrow, int col, void *data),
      void *data);
 guiObject_t *GUI_GetScrollableObj(guiScrollable_t *, int row, int col);
+guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, int col);
+guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx);
 
 guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
