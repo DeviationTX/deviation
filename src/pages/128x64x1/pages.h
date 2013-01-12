@@ -45,6 +45,7 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
 
 // Menu
 void PAGE_MenuInit(int page);
+void PAGE_MenuExit();
 
 void PAGE_AboutInit(int page);
 

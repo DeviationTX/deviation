@@ -64,14 +64,45 @@ struct menu_pages menus[] = {
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
 #define VIEW_ID 0
-static s8 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
-static s16 view_origin_relativeY;
+static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static const char *idx_string_cb(guiObject_t *obj, const void *data);
 static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static const char *menu_name_cb(guiObject_t *obj, const void *data);
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)col;
+    (void)data;
+    return  (guiObject_t *)&gui->name[relrow];
+}
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    labelDesc.style = LABEL_LEFTCENTER;
+    MenuItemType menu_item_type = menu_type_flag & 0x0f;
+    u8 group = (menu_type_flag >> 4) &0x0f;
+    u8 idx = 0;
+    for(u8 i=0; i < sizeof(menus) / sizeof(struct menu_pages); i++) {
+        if (menus[i].menu_depth != menu_item_type)
+            continue;
+        if (menus[i].mixer_mode != MIXER_ALL && menus[i].mixer_mode != Model.mixer_mode)
+            continue;
+        if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
+            continue;
+        if (idx == absrow) {
+            GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
+                16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
+            GUI_CreateLabelBox(&gui->name[relrow], 17, y,
+                0, ITEM_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+            break;
+        }
+        idx++;
+    }
+    return 1;
+}
 
 void PAGE_MenuInit(int page)
 {
@@ -93,50 +124,28 @@ void PAGE_MenuInit(int page)
         mp->current_selected = &current_selected[group + 1]; // current_selected[0] is used for main menu;1& 2 are used for sub menu
     }
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_SPACE;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -ARROW_WIDTH, LCD_HEIGHT - view_origin_absoluteY ,
-            view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 row = 0;
     u8 idx = 0;
-    guiObject_t *obj;
-    labelDesc.style = LABEL_LEFTCENTER;
     for(u8 i=0; i < sizeof(menus) / sizeof(struct menu_pages); i++) {
         if (menus[i].menu_depth != menu_item_type)
             continue;
         if (menus[i].mixer_mode != MIXER_ALL && menus[i].mixer_mode != Model.mixer_mode)
             continue;
         if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
-                continue;
-        GUI_CreateLabelBox(&gui->idx[idx], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-            16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(idx+ 1L));
-        obj =GUI_CreateLabelBox(&gui->name[idx], GUI_MapToLogicalView(VIEW_ID, 17), GUI_MapToLogicalView(VIEW_ID, row),
-            0, ITEM_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
-        GUI_SetSelectable(obj, 1);
-        if (idx == 0)
-            GUI_SetSelected(obj);
-
-        row += ITEM_SPACE;
+            continue;
         idx++;
     }
 
-    mp->total_items = idx;
-    if (mp->total_items > PAGE_ITEM_MAX) {
-        GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT,
-                LCD_HEIGHT- ITEM_HEIGHT, mp->total_items, NULL, NULL, NULL);
-    } else {
-        //Bug fix: this is a must to let PAGE_NavigateItems() won't set scroll bars' position. Otherwise, the main menu might crash when there is no scroll bar in a menu
-        OBJ_SET_USED(&gui->scroll, 0); 
-    }
-    if (*mp->current_selected >= mp->total_items)  // when users customize sub menu item to main menu item, this scenario happans
-        *mp->current_selected = mp->total_items - 1;
-    if (*mp->current_selected > 0) {
-        s8 temp = *mp->current_selected;
-        *mp->current_selected = 0;
-        PAGE_NavigateItems(temp, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
-    }
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                     ITEM_SPACE, idx, row_cb, getobj_cb, NULL);
+
+    if (*mp->current_selected >= idx)  // when users customize sub menu item to main menu item, this scenario happans
+        *mp->current_selected = idx-1;
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, *mp->current_selected));
+}
+
+void PAGE_MenuExit()
+{
+    *mp->current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 const char *menu_name_cb(guiObject_t *obj, const void *data)
@@ -168,10 +177,6 @@ static u8 action_cb(u32 button, u8 flags, void *data)
                 PAGE_ChangeByID(PAGEID_MENU, page);
             } else  // from main menu back to main page
                 PAGE_ChangeByID(PAGEID_MAIN, 0);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
-        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, mp->total_items, mp->current_selected, &view_origin_relativeY, &gui->scroll);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

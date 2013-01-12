@@ -41,9 +41,9 @@ struct mainpage_obj {
 };
 
 struct menu_obj {
-    guiLabel_t idx[20];  /* FIXME */
-    guiLabel_t name[20]; /* FIXME */
-    guiScrollbar_t scroll;
+    guiLabel_t idx[4];
+    guiLabel_t name[4];
+    guiScrollable_t scrollable;
 };
 
 struct modelcfg_obj {

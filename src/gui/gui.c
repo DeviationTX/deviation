@@ -351,7 +351,6 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
             case CheckBox:
             case Dropdown:
             case BarGraph:
-            case Scrollable:
             case Rect:
                 break;
             case Button:
@@ -422,6 +421,14 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                     return GUI_TouchScrollbar(obj, coords, long_press);
                 }
                 break;
+            case Scrollable:
+               if(coords_in_box(&obj->box, coords)) {
+                   guiObject_t *head = objHEAD;
+                   objHEAD = ((guiScrollable_t *)obj)->head;
+                   int ret = GUI_CheckTouch(coords, long_press);
+                   objHEAD = head;
+                   return ret;
+               }
             }
         }
         obj = obj->next;

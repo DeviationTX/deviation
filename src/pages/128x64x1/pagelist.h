@@ -1,6 +1,6 @@
 #ifdef PAGEDEF
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,    _tr_noop("Main page"))
-PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,             "")
+PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,    "")
 
 #ifndef NO_STANDARD_GUI
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,             _tr_noop("Reverse"))

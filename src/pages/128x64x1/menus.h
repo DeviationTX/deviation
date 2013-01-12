@@ -8,9 +8,7 @@ typedef enum
 } MenuItemType;
 
 struct menu_page {
-    u8 total_items;
-    s8 *current_selected;
-    guiObject_t *scroll_bar;
+    u16 *current_selected;
     char tmpstr[20];
 };
 
