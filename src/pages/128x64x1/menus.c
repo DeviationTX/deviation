@@ -136,7 +136,7 @@ void PAGE_MenuInit(int page)
     }
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, idx, row_cb, getobj_cb, NULL);
+                     ITEM_SPACE, idx, row_cb, getobj_cb, NULL, NULL);
 
     if (*mp->current_selected >= idx)  // when users customize sub menu item to main menu item, this scenario happans
         *mp->current_selected = idx-1;

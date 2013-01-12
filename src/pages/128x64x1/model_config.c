@@ -100,7 +100,7 @@ void MODELPAGE_Config()
 
     if (Model.type == 0) {
         GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL);
+                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
         GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
     }
 }
@@ -159,6 +159,6 @@ void MODELPROTO_Config()
     }
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, idx, row2_cb, getobj_cb, NULL);
+                         ITEM_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

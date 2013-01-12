@@ -197,10 +197,12 @@ typedef struct guiScrollable {
     u8 num_selectable;
     u8 cur_row;
     u8 visible_rows;
+    u8 max_visible_rows;
     guiObject_t *head;
     struct guiScrollbar scrollbar;
     int (*row_cb)(int absrow, int relrow, int x, void *data);
     guiObject_t *(*getobj_cb)(int relrow, int col, void *data);
+    int (*size_cb)(int absrow, void *data);
     void *cb_data;
     //buttonAction_t action;
 }  guiScrollable_t;
@@ -375,7 +377,9 @@ void GUI_ListBoxSelect(guiListbox_t *obj, u16 selected);
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
      guiObject_t * (*getobj_cb)(int relrow, int col, void *data),
+     int (*size_cb)(int absrow, void *data),
      void *data);
+
 guiObject_t *GUI_GetScrollableObj(guiScrollable_t *, int row, int col);
 guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, int col);
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx);

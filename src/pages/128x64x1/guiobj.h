@@ -19,8 +19,8 @@ struct dialog_obj {
 };
 
 struct lang_obj {
-    guiLabel_t label[20]; /*FIXME */
-    guiScrollbar_t scroll;
+    guiLabel_t label[4];
+    guiScrollable_t scrollable;
 };
 
 struct mainconfig_obj {

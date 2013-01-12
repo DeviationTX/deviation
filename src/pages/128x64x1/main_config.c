@@ -132,9 +132,10 @@ static const char *_switchlabel_cb(guiObject_t *obj, const void *data);
 
 static u16 current_selected = 0;
 
-static void press_nop_cb(guiObject_t *obj, s8 press_type, const void *data)
+static int size_cb(int absrow, void *data)
 {
-    (void)obj; (void)press_type; (void)data;
+    (void)data;
+    return (absrow >= ITEM_MENU) ? 2 : 1;
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -147,12 +148,13 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    const void *label = (void *)-1L;
+    const void *label;
     void *label_cb = NULL;
     void *label_press = NULL;
     void *tgl = NULL;
     void *value = NULL;
-    int x = 0;
+    int x = 56;
+    int y_ts = y;
     switch(absrow) {
         case ITEM_TRIMS:
             label = _tr("Trims:");
@@ -178,20 +180,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_MENU:
         default:
-            if (! ((absrow - ITEM_MENU) % 2)) {
-                label_cb = menulabel_cb; label = (void *)(long)((absrow - ITEM_MENU)/2); label_press = press_nop_cb;
-            } else {
-                value = menusel_cb; data = (void *)(long)((absrow - ITEM_MENU)/2);
-            }
+            label_cb = menulabel_cb; label = (void *)(long)(absrow - ITEM_MENU);
+            x = 56; 
+            value = menusel_cb; data = (void *)(long)(absrow - ITEM_MENU); x = 0; y_ts += ITEM_HEIGHT;
             break;
     }
-    if((long)label != -1L) {
-        GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
              0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, label_press, label);
-        x = 56;
-    }
     if (value) {
-        GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
+        GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
              LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
     }
     return 1;
@@ -199,7 +196,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page()
 {
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, ITEM_MENU + NUM_QUICKPAGES, row_cb, getobj_cb, NULL);
+                     ITEM_SPACE, ITEM_MENU + NUM_QUICKPAGES, row_cb, getobj_cb, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 

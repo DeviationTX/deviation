@@ -145,7 +145,7 @@ void PAGE_ModelInit(int page)
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL);
+                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }

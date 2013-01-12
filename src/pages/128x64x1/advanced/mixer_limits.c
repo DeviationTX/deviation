@@ -121,7 +121,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_limits()
 {
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, 128, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_HEIGHT+1, ITEM_LAST, row_cb, getobj_cb, NULL);
+                         ITEM_HEIGHT+1, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, ITEM_REVERSE, 0));
 };
 
