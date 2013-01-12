@@ -138,45 +138,13 @@ struct trim2_obj {
 };
 
 struct tx_obj {
-    guiLabel_t lbl1;
-    guiLabel_t langlbl;
-    guiButton_t lang;
-    guiLabel_t modelbl;
-    guiTextSelect_t mode;
-    guiLabel_t batlbl;
-    guiTextSelect_t bat;
-    guiLabel_t sticklbl;
-    guiButton_t stick;
-    guiLabel_t buzzlbl;
-    guiTextSelect_t buzz;
-    guiLabel_t hapticlbl;
-    guiTextSelect_t haptic;
-
-    guiLabel_t lbl2;
-    guiLabel_t lightlbl;
-    guiTextSelect_t light;
-    guiLabel_t contrastlbl;
-    guiTextSelect_t contrast;
-    guiLabel_t dimlbl;
-    guiTextSelect_t dim;
-    guiLabel_t dimtgtlbl;
-    guiTextSelect_t dimtgt;
-  
-    guiLabel_t lbl3;
-    guiLabel_t prealertlbl;
-    guiTextSelect_t prealert;
-    guiLabel_t prevallbl;
-    guiTextSelect_t preval;
-    guiLabel_t timeuplbl;
-    guiTextSelect_t timeup;
-
-    guiLabel_t lbl4;
-    guiLabel_t templbl;
-    guiTextSelect_t temp;
-    guiLabel_t lenlbl;
-    guiTextSelect_t len;
-
-    guiScrollbar_t scroll;
+    guiLabel_t title;
+    guiLabel_t label[4];
+    union {
+        guiButton_t but;
+        guiTextSelect_t ts;
+    } value[4];
+    guiScrollable_t scrollable;
 };
 
 struct calibrate_obj {

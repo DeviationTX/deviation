@@ -157,21 +157,33 @@ int adjust_row(guiScrollable_t *scrollable, int offset)
             count++;
         }
         scrollable->visible_rows = count;
+        //printf("Adjusted Next %d -> %d\n", scrollable->cur_row + offset, last_row);
         return last_row;
     } else {
-        int last_row = scrollable->cur_row + scrollable->visible_rows + offset;
         int height = scrollable->max_visible_rows;
+        int first_row = scrollable->cur_row + offset; //We must move at least offset up
         int count = 0;
-        while(last_row) {
-            int row_height = scrollable->size_cb(last_row-1, scrollable->cb_data);
+        int last_row = scrollable->cur_row + scrollable->visible_rows - 1;
+        int row = first_row;
+        while(row < last_row) {
+            int row_height = scrollable->size_cb(row, scrollable->cb_data);
             if (height - row_height < 0)
                 break;
             height -= row_height;
-            last_row--;
+            row++;
+            count++;
+        }
+        while(first_row) {
+            int row_height = scrollable->size_cb(first_row-1, scrollable->cb_data);
+            if (height - row_height < 0)
+                break;
+            height -= row_height;
+            first_row--;
             count++;
         }
         scrollable->visible_rows = count;
-        return last_row;
+        //printf("Adjusted Prev %d -> %d\n", scrollable->cur_row + offset, first_row);
+        return first_row;
     }
 }
 
@@ -187,8 +199,11 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
     objHEAD = NULL;
     int y = scrollable->header.box.y;
     for(row = scrollable->cur_row; y < scrollable->header.box.y + scrollable->header.box.height; row++, rel_row++) {
+        int num_rows = scrollable->size_cb ? scrollable->size_cb(row, scrollable->cb_data) : 1;
+        if (rel_row + num_rows > scrollable->max_visible_rows)
+            break;
         selectable += scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
-        y += scrollable->row_height * (scrollable->size_cb ? scrollable->size_cb(row, scrollable->cb_data) : 1);
+        y += scrollable->row_height * num_rows;
     }
     scrollable->visible_rows = rel_row;
     scrollable->num_selectable = selectable;

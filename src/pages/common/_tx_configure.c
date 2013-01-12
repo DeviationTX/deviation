@@ -17,6 +17,25 @@ static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // M
 #define gui (&gui_objs.u.tx)
 #define guic (&gui_objs.u.calibrate)
 
+enum {
+    ITEM_LANG,
+    ITEM_MODE,
+    ITEM_BATT,
+    ITEM_STICKS,
+    ITEM_BUZZ,
+    ITEM_HAPTIC,
+    ITEM_BACKLIGHT,
+    ITEM_CONTRAST,
+    ITEM_DIMTIME,
+    ITEM_DIMVAL,
+    ITEM_PREALERT,
+    ITEM_PREALERT_IVAL,
+    ITEM_TIMEUP,
+    ITEM_TELEMTEMP,
+    ITEM_TELEMLEN,
+    ITEM_LAST,
+};
+
 enum calibType {
     CALIB_NONE,
     CALIB_TOUCH,
@@ -239,11 +258,14 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
             MIN_BACKLIGHT_DIMTIME, MAX_BACKLIGHT_DIMTIME, dir, 5, 10, &changed);
     if (changed)
         Transmitter.auto_dimmer.timer = dimmer_timmer * 1000;
+    guiObject_t *dimobj = GUI_GetScrollableObj(&gui->scrollable, ITEM_DIMVAL, 0);
     if (dimmer_timmer == 0) {
-        GUI_TextSelectEnable(&gui->dimtgt, 0);
+        if(dimobj)
+            GUI_TextSelectEnable((guiTextSelect_t *)dimobj, 0);
         return _tr("Off");
     }
-    GUI_TextSelectEnable(&gui->dimtgt, 1);
+    if (dimobj)
+        GUI_TextSelectEnable((guiTextSelect_t *)dimobj, 1);
     TIMER_SetString(cp->tmpstr, Transmitter.auto_dimmer.timer);
     return cp->tmpstr;
 }
