@@ -68,7 +68,7 @@ static const char *set_dr_cb(guiObject_t *obj, int dir, void *data)
     mp->mixer_ptr[pit_mode]->scalar = GUI_TextSelectHelper(mp->mixer_ptr[pit_mode]->scalar,
             0, MAX_SCALAR, dir, 1, LONG_PRESS_STEP, &changed);
     if (changed) {
-        GUI_Redraw(&gui->graphs[pit_mode]);
+        GUI_Redraw(&gui->graph);
     }
     sprintf(mp->tmpstr, "%d", mp->mixer_ptr[pit_mode]->scalar);
     strcat(mp->tmpstr, "%");
@@ -78,12 +78,13 @@ static const char *set_dr_cb(guiObject_t *obj, int dir, void *data)
 static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    u8 pit_mode = (long)data;
+    (void)data;
+    u8 pit_mode = drexp_type;
     u8 changed = 1;
     struct Curve *curve = &(mp->mixer_ptr[pit_mode]->curve);
     curve->points[0] = GUI_TextSelectHelper(curve->points[0], -100, 100, dir, 1, LONG_PRESS_STEP, &changed);
     if (changed) {
-        GUI_Redraw(&gui->graphs[pit_mode]);
+        GUI_Redraw(&gui->graph);
         curve->points[1] = curve->points[0];
     }
     if (curve->points[0] == 0)

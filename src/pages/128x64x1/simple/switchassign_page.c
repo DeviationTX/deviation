@@ -23,48 +23,35 @@
 #define gui (&gui_objs.u.stdswitch)
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
-static s16 view_origin_relativeY;
-static s8 current_selected = 0;
-
 void PAGE_SwitchAssignInit(int page)
 {
-    if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-        page = current_selected;
+    (void)page;
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    view_origin_relativeY = 0;
-    current_selected = 0;
     refresh_switches();
 
     PAGE_ShowHeader(_tr("Press ENT to change:"));
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_SPACE;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH, LCD_HEIGHT - view_origin_absoluteY ,
-        view_origin_absoluteX, view_origin_absoluteY);
-
     u8 row = 0;
     u8 w = 66;
     u8 x = 58;
-    GUI_CreateLabelBox(&gui->modelbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->modelbl, 0, row,
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
-    GUI_CreateTextSelectPlate(&gui->mode, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->mode, x, row,
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_FLYMODE);
     row += ITEM_SPACE;
 
-    GUI_CreateLabelBox(&gui->tholdlbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->tholdlbl, 0, row,
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelectPlate(&gui->thold, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->thold, x, row,
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_HOLD);
     row += ITEM_SPACE;
 
-    GUI_CreateLabelBox(&gui->gyrolbl, GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateLabelBox(&gui->gyrolbl, 0, row,
             0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
-    GUI_CreateTextSelectPlate(&gui->gyro, GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
+    GUI_CreateTextSelectPlate(&gui->gyro, x, row,
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)SWITCHFUNC_GYROSENSE);
-    row += ITEM_SPACE;
 
     GUI_Select1stSelectableObj();
 

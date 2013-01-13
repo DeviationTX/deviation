@@ -23,141 +23,73 @@
 #include "../../common/simple/_drexp_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static void navigate_items(s8 direction);
 
-static s8 current_selected = 0;
+//static u16 current_selected = 0;
 guiObject_t *scroll_bar;
-static u8 current_xygraph;
 #define RIGHT_VIEW_HEIGHT 60
 #define RIGHT_VIEW_ID 1
 
+enum {
+    ITEM_NORMAL,
+    ITEM_IDLE1,
+    ITEM_IDLE2,
+    ITEM_LAST,
+};
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    col = (2 + col) % 2;
+    return col ? (guiObject_t *)&gui->value2[relrow] : (guiObject_t *)&gui->value1[relrow];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    u8 w1 = 30;
+    u8 w2 = 36;
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+        0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(absrow - PITTHROMODE_NORMAL));
+    y += ITEM_SPACE;
+    GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
+        w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+    GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
+        w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+    return 2;
+}
+
 void PAGE_DrExpInit(int page)
 {
-    if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-        page = current_selected;
+    (void)page;
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    current_selected = 0;
     memset(mp, 0, sizeof(*mp));
     get_mixers();
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
-        GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
+    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0,
+        60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE, 76, LCD_HEIGHT - ITEM_SPACE,
+                     2 *ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+    //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = 0;
-    u8 graph_pos = 77;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, graph_pos - ARROW_WIDTH -3, LCD_HEIGHT - view_origin_absoluteY ,
-        view_origin_absoluteX, view_origin_absoluteY);
-
-    mp->max_scroll = 0;
-    u8 w1 = 30;
-    u8 w2 = 36;
     u8 y = 0;
-    GUI_CreateTextSelectPlate(&gui->type, GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
-    mp->max_scroll ++;
-
-    y += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->modelbl[0], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_NORMAL));
-    y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(&gui->dr[0], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_NORMAL);
-    GUI_CreateTextSelectPlate(&gui->exp[0], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_NORMAL);
-    mp->max_scroll += 2;
-
-    y += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->modelbl[1], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE1));
-    y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(&gui->dr[1], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_IDLE1);
-    GUI_CreateTextSelectPlate(&gui->exp[1], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_IDLE1);
-    mp->max_scroll += 2;
-
-    y += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->modelbl[2], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE2));
-    y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(&gui->dr[2], GUI_MapToLogicalView(VIEW_ID, 0) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)PITTHROMODE_IDLE2);
-    GUI_CreateTextSelectPlate(&gui->exp[2], GUI_MapToLogicalView(VIEW_ID, w1+1) ,  GUI_MapToLogicalView(VIEW_ID, y),
-            w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)PITTHROMODE_IDLE2);
-    mp->max_scroll += 2;
-
-    GUI_SetupLogicalView(RIGHT_VIEW_ID, 0, 0, 50, RIGHT_VIEW_HEIGHT, graph_pos, 2);
     y = 0;
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
-    for (u8 i = 0; i < 3; i++) {
-        GUI_CreateXYGraph(&gui->graphs[i], GUI_MapToLogicalView(RIGHT_VIEW_ID, 0) ,
-            GUI_MapToLogicalView(RIGHT_VIEW_ID, y), 50, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, 77, 2, 50, RIGHT_VIEW_HEIGHT,
             CHAN_MIN_VALUE, ymin, CHAN_MAX_VALUE, ymax,
-            0, 0, show_curve_cb, curpos_cb, NULL, (void *)(long)(PITTHROMODE_NORMAL + i));
-        y += RIGHT_VIEW_HEIGHT;
-    }
+            0, 0, show_curve_cb, curpos_cb, NULL, NULL);
 
-    current_xygraph = 0;
     GUI_Select1stSelectableObj();
-    GUI_CreateScrollbar(&gui->scroll, graph_pos - ARROW_WIDTH -2, 0, LCD_HEIGHT, mp->max_scroll, NULL, NULL, NULL);
-    // set the focus item back to previous selection in this page
-    if (current_selected > 0) {
-        u8 temp = current_selected;
-        current_selected = 0;
-        navigate_items(temp);
-    }
 }
 
 static void _refresh_page()
 {
-    GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
-}
-
-static void navigate_items(s8 direction)
-{
-    guiObject_t *obj;
-    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
-        obj = GUI_GetSelected();
-    if (direction > 0) {
-        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
-    } else {
-        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
-    }
-    }
-    obj = GUI_GetSelected();
-    current_selected += direction;
-    current_selected %= mp->max_scroll;
-    if (current_selected < 0)
-        current_selected = mp->max_scroll - 1;
-    if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
-        // selected item is out of the view, scroll the view
-        if (obj == (guiObject_t *)&gui->type)
-            GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-        else
-            GUI_ScrollLogicalViewToObject(VIEW_ID, obj, direction);
-    }
-    if (current_selected >= 0 && current_selected < 3) {
-        if (current_xygraph != 0) {
-            current_xygraph = 0;
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, 0);
-        }
-    } else if (current_selected >= 5) {
-        if (current_xygraph != 2) {
-            current_xygraph = 2;
-            GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT + RIGHT_VIEW_HEIGHT);
-        }
-    }  else if (current_xygraph != 1) {
-        GUI_SetRelativeOrigin(RIGHT_VIEW_ID, 0, RIGHT_VIEW_HEIGHT);
-        current_xygraph = 1;
-    }
-    GUI_SetScrollbar(&gui->scroll, current_selected);
+    GUI_Redraw(&gui->graph);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -167,10 +99,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            navigate_items(-1);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            navigate_items(1);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

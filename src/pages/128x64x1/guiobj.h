@@ -212,39 +212,30 @@ struct stdcurve_obj {
 };
 
 struct stddrexp_obj {
-    guiLabel_t msg;
-    guiTextSelect_t type;
-    guiLabel_t modelbl[3];
-    guiTextSelect_t dr[3];
-    guiTextSelect_t exp[3];
-    guiXYGraph_t graphs[3];
-    guiScrollbar_t scroll;
+    union {
+        guiLabel_t msg;
+        guiTextSelect_t type;
+    } u;
+    guiLabel_t label[2];
+    guiTextSelect_t value1[2];
+    guiTextSelect_t value2[2];
+    guiXYGraph_t graph;
+    guiScrollable_t scrollable;
+    
 };
 
-struct stdfailsafe_obj {
-    guiLabel_t name[NUM_CHANNELS];
-    guiTextSelect_t failsafe[NUM_CHANNELS];
-    guiScrollbar_t scroll;
+struct stdchan_obj {
+    guiLabel_t title;
+    guiLabel_t name[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
-
 struct stdgyro_obj {
     guiLabel_t msg;
     guiLabel_t chanlbl;
     guiTextSelect_t chan;
     guiLabel_t gyrolbl[3];
     guiTextSelect_t gyro[3];
-};
-
-struct stdreverse_obj {
-    guiLabel_t name[NUM_CHANNELS];
-    guiTextSelect_t reverse[NUM_CHANNELS];
-    guiScrollbar_t scroll;
-};
-
-struct stdsubtrim_obj {
-    guiLabel_t name[NUM_CHANNELS];
-    guiTextSelect_t subtrim[NUM_CHANNELS];
-    guiScrollbar_t scroll;
 };
 
 struct stdswash_obj {
@@ -308,14 +299,12 @@ struct gui_objs {
 
         struct stdcurve_obj stdcurve;
         struct stddrexp_obj stddrexp;
-        struct stdfailsafe_obj stdfailsafe;
         struct stdgyro_obj stdgyro;
-        struct stdreverse_obj stdreverse;
-        struct stdsubtrim_obj stdsubtrim;
         struct stdswash_obj stdswash;
         struct stdswitch_obj stdswitch;
         struct stdthold_obj stdthold;
         struct stdtravel_obj stdtravel;
+        struct stdchan_obj stdchan;
     } u;
 } gui_objs;
 
