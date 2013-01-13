@@ -186,8 +186,9 @@ static u8 action_cb(u32 button, u8 flags, void *data)
 void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
-    (void)press_type;
-    long i = (long)data;
-    menu_type_flag = (menus[i].menu_num << 4)| menus[i].menu_depth;
-    PAGE_ChangeByID(menus[i].id, menus[i].pagepos);
+    if (press_type == -1) {
+        long i = (long)data;
+        menu_type_flag = (menus[i].menu_num << 4)| menus[i].menu_depth;
+        PAGE_ChangeByID(menus[i].id, menus[i].pagepos);
+    }
 }
