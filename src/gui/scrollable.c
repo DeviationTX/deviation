@@ -245,8 +245,11 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
                 //Go to the next item after the Scrollable
                 return (guiObject_t *)scrollable;
             }
+            //The number of visible rows may change, so we must calculate the
+            //selection based on absolute position
+            int next_row = scrollable->cur_row + scrollable->visible_rows;
             create_scrollable_objs(scrollable, adjust_row(scrollable, 1));
-            return select_scrollable(scrollable, scrollable->visible_rows-1, 0);
+            return select_scrollable(scrollable, next_row - scrollable->cur_row, 0);
         }
         obj = obj->next;
     } else {

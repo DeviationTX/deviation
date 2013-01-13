@@ -123,21 +123,16 @@ struct timer_obj {
 struct trim_obj {
     guiLabel_t steplbl;
     guiLabel_t trimposlbl;
-    guiButton_t src[NUM_TRIMS];
-    guiTextSelect_t item[NUM_TRIMS];
-    guiLabel_t name[NUM_TRIMS];
-    guiScrollbar_t scroll;
+    guiButton_t src[4];
+    guiTextSelect_t item[4];
+    guiLabel_t name[4];
+    guiScrollable_t scrollable;
 };
 struct trim2_obj {
     guiButton_t save;
-    guiLabel_t srclbl;
-    guiTextSelect_t src;
-    guiLabel_t trimneglbl;
-    guiTextSelect_t trimneg;
-    guiLabel_t trimposlbl;
-    guiTextSelect_t trimpos;
-    guiLabel_t steplbl;
-    guiTextSelect_t step;
+    guiLabel_t label[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
 
 struct tx_obj {
@@ -194,39 +189,15 @@ struct advmixcfg_obj {
     guiLabel_t chan;
     guiTextSelect_t tmpl;
     guiButton_t save;
-    guiLabel_t srclbl;
-    guiTextSelect_t src;
-    guiLabel_t curvelbl;
-    guiTextSelect_t curve;
-    guiLabel_t scalelbl;
-    guiTextSelect_t scale;
-    guiLabel_t offsetlbl;
-    guiTextSelect_t offset;
-    guiLabel_t swlbl;
-    guiTextSelect_t sw;
-    guiLabel_t nummixlbl;
-    guiTextSelect_t nummix;
-    guiLabel_t pagelbl;
-    guiTextSelect_t page;
-    guiLabel_t muxlbl;
-    guiTextSelect_t mux;
-    guiButton_t trim;
-    guiLabel_t highlbl;
-    guiTextSelect_t high;
-    guiLabel_t sw1lbl;
-    guiTextSelect_t sw1;
-    guiLabel_t sw2lbl;
-    guiTextSelect_t sw2;
-    guiLabel_t scale1lbl;
-    guiLabel_t scale2lbl;
     guiRect_t rect1;
-    guiRect_t rect2;
-    guiButton_t link[2];
-    guiTextSelect_t curve_[2];
-    guiTextSelect_t scale_[2];
-    guiXYGraph_t graphs[3];
     guiBarGraph_t bar;
-    guiScrollbar_t scroll;
+    guiXYGraph_t graph;
+    guiLabel_t label[4];
+    union {
+        guiButton_t but;
+        guiTextSelect_t ts;
+    } value[4];
+    guiScrollable_t scrollable;
 };
 
 /******* Standard ********/

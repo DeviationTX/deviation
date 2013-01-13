@@ -146,7 +146,7 @@ static const char *show_rate_cb(guiObject_t *obj, const void *data)
 
 s16 eval_mixer_cb(s16 xval, void * data)
 {
-    struct Mixer *mix = (struct Mixer *)data;
+    struct Mixer *mix = data ? (struct Mixer *)data : mp->cur_mixer;
     if (MIXER_SRC_IS_INV(mix->src))
         xval = -xval;
     s16 yval = CURVE_Evaluate(xval, &mix->curve);
@@ -237,11 +237,11 @@ void sync_mixers()
             mp->mixer[1].mux    = MUX_REPLACE;
             mp->mixer[1].offset = 0;
             mp->mixer[1].apply_trim = mp->mixer[0].apply_trim;
-            if (mp->link_curves & 0x01)
-                mp->mixer[1].curve = mp->mixer[0].curve;
         } else {
             mp->mixer[1].src = 0;
         }
+        if (mp->link_curves & 0x01)
+            mp->mixer[1].curve = mp->mixer[0].curve;
         if (MIXER_SRC(mp->mixer[2].sw)) {
             mp->num_mixers++;
             mp->mixer[2].src    = mp->mixer[0].src;
@@ -249,11 +249,11 @@ void sync_mixers()
             mp->mixer[2].mux    = MUX_REPLACE;
             mp->mixer[2].offset = 0;
             mp->mixer[2].apply_trim = mp->mixer[0].apply_trim;
-            if (mp->link_curves & 0x02)
-                mp->mixer[2].curve = mp->mixer[0].curve;
         } else {
             mp->mixer[2].src = 0;
         }
+        if (mp->link_curves & 0x02)
+            mp->mixer[2].curve = mp->mixer[0].curve;
         mp->mixer[0].mux = MUX_REPLACE;
         mp->mixer[0].offset = 0;
         mp->mixer[0].sw = 0;
@@ -345,11 +345,12 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        if(OBJ_IS_USED(&gui->trim)) {
+        guiObject_t *trim = GUI_GetScrollableObj(&gui->scrollable, COMPLEX_TRIM, 0);
+        if(trim) {
             if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-                GUI_SetHidden((guiObject_t *)&gui->trim, 0);
+                GUI_SetHidden(trim, 0);
             else
-                GUI_SetHidden((guiObject_t *)&gui->trim, 1);
+                GUI_SetHidden(trim, 1);
         }
         sync_mixers();
         redraw_graphs();
@@ -426,9 +427,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     if (mix->curve.type >= CURVE_EXPO
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
         //Do not allow entering a linked graph
-        OBJ_SET_USED(&gui->graphs[0], 0);
-        OBJ_SET_USED(&gui->graphs[1], 0);
-        OBJ_SET_USED(&gui->graphs[2], 0);
+        OBJ_SET_USED(&gui->graph, 0);
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }
 }
@@ -486,9 +485,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
-    OBJ_SET_USED(&gui->graphs[0], 0);
-    OBJ_SET_USED(&gui->graphs[1], 0);
-    OBJ_SET_USED(&gui->graphs[2], 0);
+    OBJ_SET_USED(&gui->graph, 0);
     PAGE_MixerInit(mp->top_channel);
 }
 
@@ -503,14 +500,14 @@ void redraw_graphs()
 {
     switch(mp->cur_template) {
     case MIXERTEMPLATE_EXPO_DR:
-        if (OBJ_IS_USED(&gui->graphs[1]))
-            GUI_Redraw(&gui->graphs[1]);
-        if (OBJ_IS_USED(&gui->graphs[2]))
-            GUI_Redraw(&gui->graphs[2]);
+        if (OBJ_IS_USED(&gui->graph))
+            GUI_Redraw(&gui->graph);
+        if (OBJ_IS_USED(&gui->graph))
+            GUI_Redraw(&gui->graph);
     case MIXERTEMPLATE_COMPLEX:
     case MIXERTEMPLATE_SIMPLE:
-        if (OBJ_IS_USED(&gui->graphs[0]))
-            GUI_Redraw(&gui->graphs[0]);
+        if (OBJ_IS_USED(&gui->graph))
+            GUI_Redraw(&gui->graph);
         break;
     case MIXERTEMPLATE_NONE: break;
     case MIXERTEMPLATE_CYC1: break;

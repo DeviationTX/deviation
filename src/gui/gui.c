@@ -22,6 +22,7 @@ struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
 struct guiObject *objSELECTED = NULL;
 struct guiObject *objModalButton = NULL;
+static void (*select_notify)(guiObject_t *obj) = NULL;
 
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
@@ -556,6 +557,8 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
                     OBJ_SET_DIRTY(objSELECTED, 1);
                 objSELECTED = obj;
                 OBJ_SET_DIRTY(obj, 1);
+                if (select_notify)
+                    select_notify(obj);
                 return 1;
             }
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
@@ -565,11 +568,15 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
                     OBJ_SET_DIRTY(objSELECTED, 1);
                 objSELECTED = obj;
                 OBJ_SET_DIRTY(obj, 1);
+                if (select_notify)
+                    select_notify(obj);
                 return 1;
             }
         } else if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             OBJ_SET_DIRTY(objSELECTED, 1);
             objSELECTED = NULL;
+            if (select_notify)
+                select_notify(objSELECTED);
             return 1;
         }
         return modalActive;
@@ -640,6 +647,8 @@ void GUI_SetSelected(guiObject_t *obj)
         OBJ_SET_DIRTY(objSELECTED, 1);
     }
     objSELECTED = obj;
+    if(select_notify)
+        select_notify(obj);
     OBJ_SET_DIRTY(obj, 1);
 }
 
@@ -685,4 +694,8 @@ void GUI_Select1stSelectableObj()
         }
         obj = obj->next;
     }
+}
+void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
+{
+    select_notify = notify_cb;
 }

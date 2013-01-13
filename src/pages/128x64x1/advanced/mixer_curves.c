@@ -24,6 +24,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     if (curve->type < CURVE_EXPO)
         return;
+    GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;

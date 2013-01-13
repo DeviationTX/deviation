@@ -21,55 +21,98 @@
 
 #define gui (&gui_objs.u.trim)
 #define guit (&gui_objs.u.trim2)
-#define VIEW_ID 0
-#define SUB_VIEW_ID 1
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static u8 _sub_action_cb(u32 button, u8 flags, void *data);
-static s8 selectedIdx = 0;
-static s16 view_origin_relativeY = 0;
-static u8 max_items = NUM_TRIMS * 2;
+static u16 current_selected = 0;
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    col = (2 + col) % 2;
+    return  (col == 0) ? (guiObject_t *)&gui->src[relrow] : (guiObject_t *)&gui->item[relrow];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    u8 w = 30;
+    struct Trim *trim = MIXER_GetAllTrims();
+    GUI_CreateButtonPlateText(&gui->src[relrow], 0, y, w, ITEM_HEIGHT,
+            &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+    GUI_CreateTextSelectPlate(&gui->item[relrow], 32, y,
+            40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, &trim[absrow].step);
+    GUI_CreateLabelBox(&gui->name[relrow], 75, y, 50, ITEM_HEIGHT,
+            &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
+    return 1;
+}
 
 static void _show_page()
 {
     PAGE_SetActionCB(_action_cb);
-    guiObject_t *obj;
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
-    u8 w = 30;
     PAGE_ShowHeader(_tr("Input:"));
     GUI_CreateLabelBox(&gui->steplbl, 40, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step:"));
     // no enought space in Devo10, so just display trim + in the 1st page
     //GUI_CreateLabelBox(w + 40, 0, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim -:"));
     GUI_CreateLabelBox(&gui->trimposlbl, 80, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +:"));
-    struct Trim *trim = MIXER_GetAllTrims();
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
-    u8 space = ITEM_HEIGHT +1;
-    // create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - space, view_origin_absoluteX, view_origin_absoluteY);
-    u8 y = 0;
-    for (u8 i = 0; i < NUM_TRIMS; i++) {
-        GUI_CreateButtonPlateText(&gui->src[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w, ITEM_HEIGHT,
-                &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)i));
-        //GUI_CreateLabel(72, 24*i + 66, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
-        GUI_CreateTextSelectPlate(&gui->item[i], GUI_MapToLogicalView(VIEW_ID, 31), GUI_MapToLogicalView(VIEW_ID, y),
-                40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, &trim[i].step);
-        GUI_CreateLabelBox(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, 75), GUI_MapToLogicalView(VIEW_ID, y), 50, ITEM_HEIGHT,
-                &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[i].pos));
-
-        y += space;
-    }
-    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, max_items, NULL, NULL, NULL);
-
-    GUI_SetSelected((guiObject_t *)&gui->item[selectedIdx]);
-    // when entering this page from its children page, we need to scroll the view to its previous position
-    obj = GUI_GetSelected();
-    if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj))
-        GUI_SetRelativeOrigin(VIEW_ID, 0, view_origin_relativeY);
-    GUI_SetScrollbar(&gui->scroll, selectedIdx);
 }
 
+void PAGE_TrimExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+}
+
+static guiObject_t *getobj2_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    (void)col;
+    return (guiObject_t *)&gui->item[relrow];
+}
+enum {
+    ITEM_INPUT,
+    ITEM_TRIMNEG,
+    ITEM_TRIMPOS,
+    ITEM_TRIMSTEP,
+    ITEM_LAST,
+};
+
+static int row2_cb(int absrow, int relrow, int y, void *data)
+{
+    data = NULL;
+    const void *label = NULL;
+    void *value = NULL;
+
+    switch(absrow) {
+        case ITEM_INPUT:
+            label = _tr_noop("Input:");
+            value = set_source_cb; data = &tp->trim.src;
+            break;
+        case ITEM_TRIMNEG:
+            label = _tr_noop("Trim -:");
+            value = set_trim_cb; data = &tp->trim.neg;
+            break;
+        case ITEM_TRIMPOS:
+            label = _tr_noop("Trim +:");
+            value = set_trim_cb; data = &tp->trim.pos;
+            break;
+        case ITEM_TRIMSTEP:
+            label = _tr_noop("Trim Step:");
+            value = set_trimstep_cb; data = &tp->trim.step;
+            break;
+    }
+    int w = 63;
+    u8 x = 60;
+    GUI_CreateLabelBox(&guit->label[relrow], 0, y, 0, ITEM_HEIGHT,
+            &DEFAULT_FONT, NULL, NULL,  _tr(label));
+    GUI_CreateTextSelectPlate(&guit->value[relrow], x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT,  NULL, value, data);
+    return 1;
+} 
 static void _edit_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -84,39 +127,9 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     u8 w = 50;
     GUI_CreateButtonPlateText(&guit->save, LCD_WIDTH - w -1, 0, w, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
-
-    u8 space = ITEM_HEIGHT + 1;
-    // Even though we can draw all the 4 rows in a page, still create in view for future expansion
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = space;
-    GUI_SetupLogicalView(SUB_VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - space, view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 y = 0;
-    u8 x = 60;
-    w = 63;
-    GUI_CreateLabelBox(&guit->srclbl, GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
-            &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Input:"));
-    guiObject_t *obj1 = GUI_CreateTextSelectPlate(&guit->src, GUI_MapToLogicalView(SUB_VIEW_ID, x), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w, ITEM_HEIGHT, &DEFAULT_FONT,  NULL, set_source_cb, &tp->trim.src);
-    GUI_SetSelected(obj1);
-
-    y += space;
-    GUI_CreateLabelBox(&guit->trimneglbl, GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
-            &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Trim -:"));
-    GUI_CreateTextSelectPlate(&guit->trimneg, GUI_MapToLogicalView(SUB_VIEW_ID, x-10), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w +10, ITEM_HEIGHT, &DEFAULT_FONT,  NULL, set_trim_cb, &tp->trim.neg);
-
-    y += space;
-    GUI_CreateLabelBox(&guit->trimposlbl, GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
-            &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Trim +:"));
-    GUI_CreateTextSelectPlate(&guit->trimpos, GUI_MapToLogicalView(SUB_VIEW_ID, x-10), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w +10, ITEM_HEIGHT, &DEFAULT_FONT,  NULL,  set_trim_cb, &tp->trim.pos);
-
-    y += space;
-    GUI_CreateLabelBox(&guit->steplbl, GUI_MapToLogicalView(SUB_VIEW_ID, 0), GUI_MapToLogicalView(SUB_VIEW_ID, y), 0, ITEM_HEIGHT,
-            &DEFAULT_FONT, NULL, NULL,  (void *)_tr("Trim Step:"));
-    GUI_CreateTextSelectPlate(&guit->step, GUI_MapToLogicalView(SUB_VIEW_ID, x), GUI_MapToLogicalView(SUB_VIEW_ID, y),
-            w, ITEM_HEIGHT, &DEFAULT_FONT,  NULL,  set_trimstep_cb, &tp->trim.step);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, ITEM_LAST, row2_cb, getobj2_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
 
@@ -126,10 +139,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, max_items, &selectedIdx, &view_origin_relativeY, &gui->scroll);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, max_items, &selectedIdx, &view_origin_relativeY, &gui->scroll);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

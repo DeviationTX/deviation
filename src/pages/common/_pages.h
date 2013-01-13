@@ -40,6 +40,7 @@ void PAGE_MixerEvent();
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
+void PAGE_TrimExit();
 
 /* Timer */
 void PAGE_TimerInit(int page);
