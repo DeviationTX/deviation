@@ -39,7 +39,9 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
         0, TELEM_RPM2, dir, 1, 1, &changed);
     if (changed) {
-        GUI_Redraw(&gui->value[val]);
+        guiObject_t *valObj = GUI_GetScrollableObj(&gui->scrollable, val, 2);
+        if (valObj)
+            GUI_Redraw(valObj);
     }
     return TELEMETRY_ShortName(tp.str, Model.telem_alarm[val]);
 }

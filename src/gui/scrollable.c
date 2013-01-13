@@ -95,19 +95,20 @@ void GUI_RemoveScrollableObjs(struct guiObject *obj)
 int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)
 {
     guiObject_t *head = scrollable->head;
-    if (! obj)
-        return -1;
+    int found = -1;
     int id = 0;
     while(head) {
         if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
             if(head == obj)
-                return id;
+                found = id;
             id++;
         }
         head = head->next;
     }
-    return -1;
+    scrollable->num_selectable = id;
+    return found;
 }
+
 guiObject_t * set_selected_idx(guiScrollable_t *scrollable, int idx)
 {
     guiObject_t *head = scrollable->head;
@@ -227,6 +228,7 @@ guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
 {
     return scrollable->getobj_cb ? scrollable->getobj_cb(row, col, NULL) : NULL;
 }
+
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {
     if(obj) {

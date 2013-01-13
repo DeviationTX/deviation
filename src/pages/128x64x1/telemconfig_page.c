@@ -24,11 +24,40 @@
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *idx_cb(guiObject_t *obj, const void *data);
 
-#define VIEW_ID 0
 
-static u8 total_items;
-static s8 current_selected = 0;
-static s16 view_origin_relativeY = 0;
+static u16 current_selected = 0;
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    col = (3 + col) % 3;
+    if(col == 0)
+        return (guiObject_t *)&gui->name[relrow];
+    else if(col == 1)
+        return (guiObject_t *)&gui->gtlt[relrow];
+    else
+        return (guiObject_t *)&gui->value[relrow];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    int x = 9;
+    u8 w1 = 44;
+    u8 w2 = 21;
+    u8 w3 = 40;
+    GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
+            9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->name[relrow], x, y,
+            w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
+    x += w1 + 5;
+    GUI_CreateTextSelectPlate(&gui->gtlt[relrow], x, y,
+            w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)absrow);
+    x += w2 + 3;
+    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
+            w3, ITEM_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);
+    return 3;
+}
 
 void PAGE_TelemconfigInit(int page)
 {
@@ -45,41 +74,14 @@ void PAGE_TelemconfigInit(int page)
     }
 
     PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
-    current_selected = 0;
-    total_items = 0;
 
-    // Create 1 logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    u8 space = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
-            view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 row = 0;
-    u8 w1 = 44;
-    u8 w2 = 21;
-    u8 w3 = 40;
-    u8 i;
-    for (i = 0; i < TELEM_NUM_ALARMS; i++) {
-        u8 x = 9;
-        GUI_CreateLabelBox(&gui->idx[i], GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-                9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(&gui->name[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-                w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)i);
-        x += w1 + 5;
-        GUI_CreateTextSelectPlate(&gui->gtlt[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-                w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)i);
-        x += w2 + 3;
-        GUI_CreateTextSelectPlate(&gui->value[i], GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-                w3, ITEM_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)i);
-        total_items++;
-        row += space;
-    }
-    GUI_Select1stSelectableObj();
-    total_items *= 3;
-    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, total_items, NULL, NULL, NULL);
-    if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, TELEM_NUM_ALARMS, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+}
+void PAGE_TelemconfigExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
@@ -96,11 +98,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else if (CHAN_ButtonIsPressed(button, BUT_UP) && OBJ_IS_USED(&gui->value[0])) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && OBJ_IS_USED(&gui->value[0])) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, &gui->scroll);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

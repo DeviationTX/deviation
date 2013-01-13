@@ -44,6 +44,7 @@ void PAGE_TrimEvent();
 /* Timer */
 void PAGE_TimerInit(int page);
 void PAGE_TimerEvent();
+void PAGE_TimerExit();
 
 /* Model */
 void PAGE_ModelInit(int page);
@@ -93,6 +94,7 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 /* Telemetry Config */
 void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
+void PAGE_TelemconfigExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);

@@ -85,11 +85,11 @@ struct reorder_obj {
 
 struct telemcfg_obj {
     guiLabel_t msg;
-    guiLabel_t idx[TELEM_NUM_ALARMS];
-    guiTextSelect_t name[TELEM_NUM_ALARMS];
-    guiTextSelect_t gtlt[TELEM_NUM_ALARMS];
-    guiTextSelect_t value[TELEM_NUM_ALARMS];
-    guiScrollbar_t scroll;
+    guiLabel_t idx[4];
+    guiTextSelect_t name[4];
+    guiTextSelect_t gtlt[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
 
 struct telemtest_obj {
@@ -108,13 +108,13 @@ struct telemtest_obj {
 };
 
 struct timer_obj {
-    guiLabel_t name[8];
-    guiTextSelect_t type[8];
-    guiLabel_t switchlbl[8];
-    guiTextSelect_t src[8];
-    guiLabel_t startlbl[8];
-    guiTextSelect_t start[8];
-    guiScrollbar_t scroll;
+    guiLabel_t name;
+    guiTextSelect_t type;
+    guiLabel_t switchlbl;
+    guiTextSelect_t src;
+    guiLabel_t startlbl;
+    guiTextSelect_t start;
+    guiScrollable_t scrollable;
 };
 
 struct trim_obj {
