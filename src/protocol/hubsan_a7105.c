@@ -254,10 +254,15 @@ static void initialize() {
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
+#ifdef MODULAR
+//Allows the linker to properly relocate
+#define HUBSAN_Cmds PROTO_Cmds
+#endif
 const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)4L;

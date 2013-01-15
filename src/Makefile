@@ -127,6 +127,9 @@ MODELDIR = filesystem/$(FILESYSTEM)/models
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
 
 ALL += $(LAST_MODEL)
+ifdef MODULAR
+include protocol/Makefile.inc
+endif
 ############################################
 #END SECTION                               #
 ############################################
@@ -163,11 +166,15 @@ language:
 	../utils/extract_strings.pl -update
 
 
-zip: $(TARGET).dfu
+zip: $(TARGET).dfu $(PROTO_MODULES)
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	# make zipping more compatible with other distributions
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+ifdef MODULAR
+	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
+	rm -rf $(ODIR)/protocol
+endif
 	rm -f deviation-$(HGVERSION).dfu
 
 fs:
@@ -280,3 +287,6 @@ $(ODIR)/hgstamp:
 
 BUILD_TARGET := 1
 include target/$(TARGET)/Makefile.inc
+ifdef MODULAR
+include protocol/Makefile.inc
+endif

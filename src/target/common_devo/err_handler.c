@@ -15,6 +15,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/scb.h>
 
+#ifdef BUILDTYPE_DEV
 void hard_fault_handler()
 {
     asm(
@@ -88,4 +89,4 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
  
   while (1);
 }
-
+#endif

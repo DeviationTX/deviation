@@ -5,7 +5,11 @@
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 512
 
-//#define NO_STANDARD_GUI     1
+#ifdef BUILDTYPE_DEV
+//No room for debug and standard gui
+#define NO_STANDARD_GUI     1
+#endif
+
 #define NO_LANGUAGE_SUPPORT 1
 
 #define MIN_BRIGHTNESS 0

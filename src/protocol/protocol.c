@@ -81,7 +81,18 @@ void PROTOCOL_Init(u8 force)
 void PROTOCOL_DeInit()
 {
     CLOCK_StopTimer();
-    PWM_Stop();
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        PROTO_Cmds(PROTOCMD_DEINIT);
+#else
+    #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_DEINIT); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        case PROTOCOL_NONE:
+        default: break;
+    }
+    #undef PROTODEF
+#endif
     proto_state = PROTO_READY;
 }
 
@@ -115,6 +126,8 @@ void PROTOCOL_Load()
             break;
     }
     fclose(fh);
+    //We use the same file for multiple protocols, so we need to manually set this here
+    *loaded_protocol = Model.protocol;
 #endif
 }
  

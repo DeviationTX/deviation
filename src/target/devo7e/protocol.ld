@@ -6,7 +6,7 @@ SECTIONS
 {
         .text : {
             KEEP(*(.rodata.protocol_type))
-            KEEP(*(.text.DSM2_Cmds))
+            KEEP(*(.text.PROTO_Cmds))
             *(.text*)
             . = ALIGN(4);
             *(.rodata*)     /* Read-only data */

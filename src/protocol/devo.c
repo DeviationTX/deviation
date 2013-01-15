@@ -35,7 +35,7 @@
 
 #define TELEMETRY_ENABLE 0x30
 
-static const char *devo_opts[] = {
+static const char * const devo_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
@@ -529,10 +529,15 @@ static void initialize()
     }
 }
 
+#ifdef MODULAR
+//Allows the linker to properly relocate
+#define DEVO_Cmds PROTO_Cmds
+#endif
 const void *DEVO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
         case PROTOCMD_BIND:  bind(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;

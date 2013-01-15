@@ -112,6 +112,7 @@ void Init() {
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;
     PROTOCOL_Init(1);
+    PROTO_Stubs(0);
 #endif
 }
 

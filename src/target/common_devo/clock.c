@@ -115,7 +115,6 @@ void CLOCK_Init()
     /* wait for system to start up and stabilize */
     while(msecs < 100)
         ;
-    CLOCK_StartTimer(0, NULL); //Force inclusion even if function is unused
 }
 
 void CLOCK_StartTimer(u16 us, u16 (*cb)(void))

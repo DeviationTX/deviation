@@ -23,7 +23,7 @@ LFLAGS2OPT  = -Wl,-Ttarget/$(TARGET)/$(TARGET)_opt.ld
 
 #-lnosys
 
-ALL = $(TARGET).dfu $(PROTO_LIBS)
+ALL = $(TARGET).dfu
 
 else #BUILD_TARGET
 

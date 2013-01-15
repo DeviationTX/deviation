@@ -30,7 +30,7 @@ u8 num_channels;
 #ifndef EMULATOR
 #define BITBANG_PPM
 #endif
-static const char *ppm_opts[] = {
+static const char * const ppm_opts[] = {
   _tr_noop("Center PW"),  "1000", "1800", NULL,
   _tr_noop("Delta PW"),   "100", "700", NULL,
   _tr_noop("Notch PW"),   "100", "500", NULL,
@@ -111,10 +111,15 @@ static void initialize()
     CLOCK_StartTimer(1000, ppmout_cb);
 }
 
+#ifdef MODULAR
+//Allows the linker to properly relocate
+#define PPMOUT_Cmds PROTO_Cmds
+#endif
 const void * PPMOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: PWM_Stop(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)PPMOUT_MAX_CHANNELS);
