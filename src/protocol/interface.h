@@ -14,9 +14,11 @@ enum ProtoCmds {
     PROTOCMD_TELEMETRYSTATE,
 };
 
+#ifndef MODULAR
 #define PROTODEF(proto, map, cmd, name) extern const void * cmd(enum ProtoCmds);
 #include "protocol.h"
 #undef PROTODEF
+#endif
 
 #ifdef PROTO_HAS_A7105
 #include "iface_a7105.h"

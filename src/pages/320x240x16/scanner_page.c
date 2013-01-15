@@ -40,6 +40,7 @@ static const char *enablestr_cb(guiObject_t *obj, const void *data)
 static void press_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
+#ifndef MODULAR
     sp.enable ^= 1;
     if (sp.enable) {
         PROTOCOL_DeInit();
@@ -53,6 +54,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     } else {
         PROTOCOL_Init(0);
     }
+#endif
     GUI_Redraw(obj);
 }
 
@@ -75,6 +77,7 @@ void PAGE_ScannerInit(int page)
 
 void PAGE_ScannerEvent()
 {
+#ifndef MODULAR
     u8 dpbuffer[16];
     if(! sp.enable)
         return;
@@ -95,10 +98,13 @@ void PAGE_ScannerEvent()
         if(sp.channel == MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)
             sp.channel = 0;
     }
+#endif
 }
 
 void PAGE_ScannerExit()
 {
+#ifndef MODULAR
     if(sp.enable)
         PROTOCOL_Init(0);
+#endif
 }

@@ -23,8 +23,16 @@
 #define RS_HI() gpio_set(GPIOB, GPIO11)
 #define RS_LO() gpio_clear(GPIOB, GPIO11)
 
-void Delay(uint32_t);
-
+void usleep(unsigned int x)
+{
+    (void)x;
+    asm ("mov r1, #36;"
+         "mul r0, r0, r1;"
+         "loop:"
+         "sub r0, #1;"
+         " bne loop;");
+}
+#define Delay usleep
 void CYRF_WriteRegister(u8 address, u8 data)
 {
     CS_LO();

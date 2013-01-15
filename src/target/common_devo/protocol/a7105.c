@@ -143,9 +143,34 @@ void A7105_Strobe(enum A7105_State state)
 void A7105_Initialize()
 {
     /* Enable SPI2 */
-    //rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
-    //rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    /* Enable GPIOB */
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
+
+    /* RESET */
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
+    /* SCK, MOSI */
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13 | GPIO15);
+    /* MISO */
+    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_FLOAT, GPIO14);
+    CS_HI();
+    RS_LO();
+
+    /* Includes enable? */
+    spi_init_master(SPI2, 
+                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
+                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
+                    SPI_CR1_DFF_8BIT,
+                    SPI_CR1_MSBFIRST);
+    spi_enable_software_slave_management(SPI2);
+    spi_set_nss_high(SPI2);
+    spi_enable(SPI2);
 
     /* CS */
     AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;

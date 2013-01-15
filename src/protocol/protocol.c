@@ -37,6 +37,10 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
     #include "protocol.h"
 };
 #undef PROTODEF
+#ifdef MODULAR
+long * const loaded_protocol = (long *)MODULAR;
+const void * (*PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long));
+#endif
 
 #define PROTODEF(proto, map, cmd, name) name,
 const char * const ProtocolNames[PROTOCOL_COUNT] = {
@@ -45,15 +49,23 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
 };
 #undef PROTODEF
 
+static void PROTOCOL_Load();
 void PROTOCOL_Init(u8 force)
 {
     PROTOCOL_DeInit();
+    PROTOCOL_Load(Model.protocol);
     proto_state = 0;
     if (! force && PROTOCOL_CheckSafe()) {
         return;
     }
     proto_state |= PROTO_READY;
-    
+
+#ifdef MODULAR
+    if(Model.protocol == PROTOCOL_NONE)
+        CLOCK_StopTimer();
+    else
+        PROTO_Cmds(PROTOCMD_INIT);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_INIT); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -63,6 +75,7 @@ void PROTOCOL_Init(u8 force)
             break;
     }
     #undef PROTODEF
+#endif
 }
 
 void PROTOCOL_DeInit()
@@ -72,6 +85,39 @@ void PROTOCOL_DeInit()
     proto_state = PROTO_READY;
 }
 
+void PROTOCOL_Load()
+{
+#ifdef MODULAR
+    if(*loaded_protocol == Model.protocol)
+        return;
+    char file[25];
+    #define PROTODEF(proto, map, cmd, name) case proto: sprintf(file,"protocol/%s.bin", name); break;
+    switch(Model.protocol) {
+        #include "protocol.h"
+        default: *loaded_protocol = 0; return;
+    }
+    #undef PROTODEF
+    FILE *fh;
+    fh = fopen(file, "r");
+    if(! fh) {
+        return;
+    }
+    setbuf(fh, 0);
+    int size = 0;
+    unsigned char buf[256];
+    while(size < 4096) {
+        int len = fread(buf, 1, 256, fh);
+        if(len) {
+            memcpy(loaded_protocol, buf, len);
+        }
+        size += len;
+        if (len != 256)
+            break;
+    }
+    fclose(fh);
+#endif
+}
+ 
 u8 PROTOCOL_WaitingForSafe()
 {
     return (proto_state & PROTO_READY) ? 0 : 1;
@@ -147,6 +193,12 @@ u64 PROTOCOL_CheckSafe()
 u8 PROTOCOL_AutoBindEnabled()
 {
     u8 binding = 0;
+#ifdef MODULAR
+    if(Model.protocol == PROTOCOL_NONE || *loaded_protocol != Model.protocol)
+        binding = 1;
+    else
+        binding = (unsigned long)PROTO_Cmds(PROTOCMD_CHECK_AUTOBIND);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: binding = (unsigned long)cmd(PROTOCMD_CHECK_AUTOBIND); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -155,11 +207,16 @@ u8 PROTOCOL_AutoBindEnabled()
             binding = 1;
     }
     #undef PROTODEF
+#endif
     return binding;
 }
 
 void PROTOCOL_Bind()
 {
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        PROTO_Cmds(PROTOCMD_BIND);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_BIND); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -167,11 +224,16 @@ void PROTOCOL_Bind()
         default: break;
     }
     #undef PROTODEF
+#endif
 }
 
 int PROTOCOL_NumChannels()
 {
     int num_channels = NUM_OUT_CHANNELS;
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        num_channels = (unsigned long)PROTO_Cmds(PROTOCMD_NUMCHAN);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: num_channels = (unsigned long)cmd(PROTOCMD_NUMCHAN); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -179,6 +241,7 @@ int PROTOCOL_NumChannels()
         default: break;
     }
     #undef PROTODEF
+#endif
     if (num_channels > NUM_OUT_CHANNELS)
         num_channels = NUM_OUT_CHANNELS;
     return num_channels;
@@ -187,6 +250,10 @@ int PROTOCOL_NumChannels()
 int PROTOCOL_DefaultNumChannels()
 {
     int num_channels = NUM_OUT_CHANNELS;
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        num_channels = (unsigned long)PROTO_Cmds(PROTOCMD_DEFAULT_NUMCHAN);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: num_channels = (unsigned long)cmd(PROTOCMD_DEFAULT_NUMCHAN); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -194,6 +261,7 @@ int PROTOCOL_DefaultNumChannels()
         default: break;
     }
     #undef PROTODEF
+#endif
     if (num_channels > NUM_OUT_CHANNELS)
         num_channels = NUM_OUT_CHANNELS;
     return num_channels;
@@ -201,6 +269,10 @@ int PROTOCOL_DefaultNumChannels()
 u32 PROTOCOL_CurrentID()
 {
     u32 id = 0;
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        id = (unsigned long)PROTO_Cmds(PROTOCMD_CURRENT_ID);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: id = (unsigned long)cmd(PROTOCMD_CURRENT_ID); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -209,12 +281,17 @@ u32 PROTOCOL_CurrentID()
             id = 0;
     }
     #undef PROTODEF
+#endif
     return id;
 }
 
 const char **PROTOCOL_GetOptions()
 {
     const char **data = NULL;
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        data = (const char **)PROTO_Cmds(PROTOCMD_GETOPTIONS);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: data = (const char **)cmd(PROTOCMD_GETOPTIONS); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -223,11 +300,16 @@ const char **PROTOCOL_GetOptions()
             data = NULL;
     }
     #undef PROTODEF
+#endif
     return data;
 }
 
 void PROTOCOL_SetOptions()
 {
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        PROTO_Cmds(PROTOCMD_SETOPTIONS);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: cmd(PROTOCMD_SETOPTIONS); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -235,11 +317,16 @@ void PROTOCOL_SetOptions()
         default: break;
     }
     #undef PROTODEF
+#endif
 }
 
 s8 PROTOCOL_GetTelemetryState()
 {
     s8 telem_state=  -1;  // -1 means not support
+#ifdef MODULAR
+    if(Model.protocol != PROTOCOL_NONE && *loaded_protocol == Model.protocol)
+        telem_state = (long)PROTO_Cmds(PROTOCMD_TELEMETRYSTATE);
+#else
     #define PROTODEF(proto, map, cmd, name) case proto: telem_state = (long)cmd(PROTOCMD_TELEMETRYSTATE); break;
     switch(Model.protocol) {
         #include "protocol.h"
@@ -248,6 +335,7 @@ s8 PROTOCOL_GetTelemetryState()
             telem_state = -1;
     }
     #undef PROTODEF
+#endif
     return telem_state;
 }
 

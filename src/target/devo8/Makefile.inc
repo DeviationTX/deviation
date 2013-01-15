@@ -1,8 +1,6 @@
-include target/common_devo/Makefile.inc
-
-SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_devo/*.c) $(wildcard target/common_devo/msc2/*.c) $(wildcard target/common_devo/msc2/lib/*.c)
-
 SCREENSIZE = 320x240x16
+FILESYSTEM = devo8
+include target/common_devo/Makefile.inc
 
 $(TARGET).dfu: $(TARGET).bin
 	../utils/dfu.py -c 8 -b 0x08004000:$< $@

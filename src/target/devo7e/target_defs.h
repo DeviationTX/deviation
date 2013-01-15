@@ -7,7 +7,6 @@
 
 #define NO_STANDARD_GUI     1
 #define NO_LANGUAGE_SUPPORT 1
-#define NO_INI_SUPPORT      1
 
 #define MIN_BRIGHTNESS 0
 #define HAS_TOUCH 0
@@ -19,7 +18,7 @@
 
 //Protocols
 #define PROTO_HAS_CYRF6936
-//#define PROTO_HAS_A7105
+#define PROTO_HAS_A7105
 
 #define NUM_OUT_CHANNELS 12
 #define NUM_VIRT_CHANNELS 10

@@ -25,7 +25,7 @@
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
-static const char *dsm_opts[] = {
+static const char * const dsm_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
 };
@@ -126,6 +126,8 @@ static const u8 ch_map7[] = {1, 5, 2, 4, 3,    6,    0}; //DX6i
 static const u8 ch_map8[] = {1, 5, 2, 3, 6,    0xff, 0xff, 4, 0, 7,    0xff, 0xff, 0xff, 0xff}; //DX8
 static const u8 ch_map9[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9};
+
+const long protocol_type = PROTOCOL_DSM2;
 
 u8 packet[16];
 u8 channels[23];
@@ -470,6 +472,7 @@ static u16 dsm2_cb()
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
+    CYRF_Initialize();
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
