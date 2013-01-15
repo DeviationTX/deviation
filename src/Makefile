@@ -198,6 +198,9 @@ $(foreach directory,$(sort $(dir $(SRCS) $(PROTO_EXTRA_C))),$(eval $(call define
 # Rebuild on hg version change.
 $(ODIR)/version.o: $(ODIR)/hgstamp
 
+$(ODIR)/hgstamp:
+	echo $(HGVERSION) > $(ODIR)/hgstamp
+
 # phony targets
 .PHONY: clean
 # recompile if the Makefile changes

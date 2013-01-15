@@ -3,7 +3,7 @@ FILESYSTEM=devo10
 
 CRC_OFFSET := 8192
 OPTIMIZE_DFU := 1
-NO_STANDARD_GUI := 1
+#NO_STANDARD_GUI := 1
 MODULAR=0x20004000
 
 include target/common_devo/Makefile.inc

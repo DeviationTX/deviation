@@ -68,7 +68,7 @@ int main() {
     PAGE_Init();
     
     CLOCK_StartWatchdog();
-    
+
     priority_ready = 0;
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
     CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
