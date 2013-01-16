@@ -12,6 +12,12 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
@@ -159,7 +165,6 @@ void A7105_Initialize()
     gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
                   GPIO_CNF_INPUT_FLOAT, GPIO14);
     CS_HI();
-    RS_LO();
 
     /* Includes enable? */
     spi_init_master(SPI2, 
@@ -180,4 +185,5 @@ void A7105_Initialize()
 
     A7105_Reset();
 }
+#pragma long_calls_off
 #endif

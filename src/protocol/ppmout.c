@@ -13,11 +13,20 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define PPMOUT_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#pragma long_calls_off
 
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_PPM;
+#endif
 #define PPMOUT_MAX_CHANNELS 10
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];
 u8 num_channels;
@@ -111,10 +120,6 @@ static void initialize()
     CLOCK_StartTimer(1000, ppmout_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define PPMOUT_Cmds PROTO_Cmds
-#endif
 const void * PPMOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

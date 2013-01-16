@@ -13,11 +13,19 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define WK2x01_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-
+#pragma long_calls_off
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_WK2801;
+#endif
 #include <stdlib.h>
 
 #ifdef PROTO_HAS_CYRF6936
@@ -494,7 +502,7 @@ static void bind()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CYRF_Reset();
+    CYRF_Initialize();
     cyrf_init();
     CYRF_ConfigRxTx(1);
     set_radio_channels();
@@ -529,10 +537,6 @@ static void initialize()
     CLOCK_StartTimer(2800, wk_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define WK2x01_Cmds PROTO_Cmds
-#endif
 const void *WK2x01_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

@@ -13,11 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define FLYSKY_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
+#pragma long_calls_off
+
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_FLYSKY;
+#endif
 
 #ifdef PROTO_HAS_A7105
 
@@ -166,7 +176,7 @@ static u16 flysky_cb()
 
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
-    A7105_Reset();
+    A7105_Initialize();
     flysky_init();
     if (Model.fixed_id) {
         id = Model.fixed_id;
@@ -185,10 +195,6 @@ static void initialize(u8 bind) {
     CLOCK_StartTimer(2400, flysky_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define FLYSKY_Cmds PROTO_Cmds
-#endif
 const void *FLYSKY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

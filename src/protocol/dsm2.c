@@ -13,12 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DSM2_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include <stdlib.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
+#pragma long_calls_off
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_DSM2;
+#endif
 
 #ifdef PROTO_HAS_CYRF6936
 #define RANDOM_CHANNELS 1
@@ -126,8 +135,6 @@ static const u8 ch_map7[] = {1, 5, 2, 4, 3,    6,    0}; //DX6i
 static const u8 ch_map8[] = {1, 5, 2, 3, 6,    0xff, 0xff, 4, 0, 7,    0xff, 0xff, 0xff, 0xff}; //DX8
 static const u8 ch_map9[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9};
-
-const long protocol_type = PROTOCOL_DSM2;
 
 u8 packet[16];
 u8 channels[23];
@@ -473,7 +480,6 @@ static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     CYRF_Initialize();
-    CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
    if (Model.fixed_id) {
@@ -539,10 +545,6 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(10000, dsm2_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define DSM2_Cmds PROTO_Cmds
-#endif
 const void *DSM2_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

@@ -13,11 +13,20 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define HUBSAN_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#pragma long_calls_off
 
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_HUBSAN;
+#endif
 #ifdef PROTO_HAS_A7105
 
 #include <string.h>
@@ -245,7 +254,7 @@ static u16 hubsan_cb()
 
 static void initialize() {
     CLOCK_StopTimer();
-    A7105_Reset();
+    A7105_Initialize();
     hubsan_init();
     sessionid = rand();
     channel = allowed_ch[rand() % sizeof(allowed_ch)];
@@ -254,10 +263,6 @@ static void initialize() {
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define HUBSAN_Cmds PROTO_Cmds
-#endif
 const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

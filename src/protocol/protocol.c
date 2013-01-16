@@ -39,7 +39,7 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
 #undef PROTODEF
 #ifdef MODULAR
 long * const loaded_protocol = (long *)MODULAR;
-const void * (*PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long));
+void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
 #endif
 
 #define PROTODEF(proto, map, cmd, name) name,
@@ -61,7 +61,7 @@ void PROTOCOL_Init(u8 force)
     proto_state |= PROTO_READY;
 
 #ifdef MODULAR
-    if(Model.protocol == PROTOCOL_NONE)
+    if(Model.protocol == PROTOCOL_NONE || *loaded_protocol != Model.protocol)
         CLOCK_StopTimer();
     else
         PROTO_Cmds(PROTOCMD_INIT);
@@ -102,7 +102,7 @@ void PROTOCOL_Load()
     if(*loaded_protocol == Model.protocol)
         return;
     char file[25];
-    #define PROTODEF(proto, map, cmd, name) case proto: sprintf(file,"protocol/%s.bin", name); break;
+    #define PROTODEF(proto, map, cmd, name) case proto: sprintf(file,"protocol/%s.mod", name); break;
     switch(Model.protocol) {
         #include "protocol.h"
         default: *loaded_protocol = 0; return;
@@ -110,22 +110,27 @@ void PROTOCOL_Load()
     #undef PROTODEF
     FILE *fh;
     fh = fopen(file, "r");
+    printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
         return;
     }
     setbuf(fh, 0);
     int size = 0;
     unsigned char buf[256];
+    int len;
+    char *ptr = (char *)loaded_protocol;
     while(size < 4096) {
-        int len = fread(buf, 1, 256, fh);
+        len = fread(buf, 1, 256, fh);
         if(len) {
-            memcpy(loaded_protocol, buf, len);
+            memcpy(ptr, buf, len);
+            ptr += len;
         }
         size += len;
         if (len != 256)
             break;
     }
     fclose(fh);
+    printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
     //We use the same file for multiple protocols, so we need to manually set this here
     *loaded_protocol = Model.protocol;
 #endif

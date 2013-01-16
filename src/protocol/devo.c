@@ -13,12 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
+#pragma long_calls_off
 
+#ifdef MODULAR
+  const long protocol_type = PROTOCOL_DEVO;
+#endif
 #ifdef PROTO_HAS_CYRF6936
 
 //For Debug
@@ -482,7 +491,7 @@ static void bind()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CYRF_Reset();
+    CYRF_Initialize();
     cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);
@@ -529,10 +538,6 @@ static void initialize()
     }
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define DEVO_Cmds PROTO_Cmds
-#endif
 const void *DEVO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {

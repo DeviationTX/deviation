@@ -12,6 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifdef MODULAR
+  #pragma long_calls
+#endif
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
@@ -26,11 +29,14 @@
 void usleep(unsigned int x)
 {
     (void)x;
-    asm ("mov r1, #36;"
+    asm ("mov r1, #24;"
          "mul r0, r0, r1;"
-         "loop:"
-         "sub r0, #1;"
-         " bne loop;");
+         "b _delaycmp;"
+         "_delayloop:"
+         "subs r0, r0, #1;"
+         "_delaycmp:;"
+         "cmp r0, #0;"
+         " bne _delayloop;");
 }
 #define Delay usleep
 void CYRF_WriteRegister(u8 address, u8 data)
@@ -82,9 +88,9 @@ void CYRF_Reset()
 {
     /* Reset the CYRF chip */
     RS_HI();
-    Delay(50);
+    Delay(100);
     RS_LO();
-    Delay(50);
+    Delay(100);
 }
 
 void CYRF_Initialize()
@@ -286,3 +292,4 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     }
     CYRF_ConfigRxTx(1);
 }
+#pragma long_calls_off

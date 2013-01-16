@@ -13,11 +13,20 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define J6PRO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#pragma long_calls_off
 
+#ifdef MODULAR
+const long protocol_type = PROTOCOL_J6PRO;
+#endif
 #ifdef PROTO_HAS_CYRF6936
 
 //For Debug
@@ -282,7 +291,7 @@ static u16 j6pro_cb()
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
-    CYRF_Reset();
+    CYRF_Initialize();
     cyrf_init();
     num_channels = 8;
     if (bind) {
@@ -294,10 +303,6 @@ static void initialize(u8 bind)
     CLOCK_StartTimer(2400, j6pro_cb);
 }
 
-#ifdef MODULAR
-//Allows the linker to properly relocate
-#define J6PRO_Cmds PROTO_Cmds
-#endif
 const void *J6PRO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
