@@ -53,9 +53,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     u8 w = 60;
     u8 x = 63;
-    const void *label;
-    void *value;
-    void *tgl;
+    const void *label = NULL;
+    void *value = NULL;
+    void *tgl = NULL;
     switch(absrow) {
         case ITEM_SWASHTYPE:
             label = _tr("SwashType:");
@@ -89,7 +89,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
                 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-                w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, value, data);
+                w, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
     return 1;
 }
 void MODELPAGE_Config()

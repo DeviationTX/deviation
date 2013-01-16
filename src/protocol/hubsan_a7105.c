@@ -179,6 +179,8 @@ static void hubsan_build_packet()
     packet[14] = (txid >>  0) & 0xff;
     update_crc();
 }
+
+MODULE_CALLTYPE
 static u16 hubsan_cb()
 {
     int i;

@@ -396,7 +396,7 @@ void DEVO_BuildPacket()
     if(pkt_num == PKTS_PER_CHANNEL)
         pkt_num = 0;
 }
-
+MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
     if (txState == 0) {
@@ -455,6 +455,7 @@ static u16 devo_telemetry_cb()
     return delay;
 }
 
+MODULE_CALLTYPE
 static u16 devo_cb()
 {
     if (txState == 0) {

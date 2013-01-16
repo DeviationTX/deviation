@@ -19,6 +19,7 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#pragma long_calls_off
 #include "protocol/interface.h"
 
 #define CS_HI() gpio_set(GPIOB, GPIO12)   

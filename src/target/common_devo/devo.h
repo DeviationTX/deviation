@@ -16,6 +16,4 @@ u32 SOUND_Callback();
 extern const u8 adc_chan_sel[NUM_ADC_CHANNELS];
 extern u16 adc_array_raw[NUM_ADC_CHANNELS];
 
-//Ensure functions are loaded for protocol modules
-void PROTO_Stubs(int idx);
 #endif

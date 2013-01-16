@@ -44,7 +44,6 @@ static void _show_page()
     memset(gui, 0, sizeof(*gui));
 
     struct Mixer *mix = MIXER_GetAllMixers();
-    guiObject_t *obj;
     u8 space = ITEM_HEIGHT + 1;
     u8 row = space;
     u8 w1 = 50;
@@ -56,11 +55,11 @@ static void _show_page()
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
         if (ch < NUM_OUT_CHANNELS) {
-            obj = GUI_CreateButtonPlateText(&gui->limit[i], 0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+            GUI_CreateButtonPlateText(&gui->limit[i], 0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
         }
         else {
-            obj = GUI_CreateLabelBox(&gui->name[i], 0, row, w1, h, &labelDesc,
+            GUI_CreateLabelBox(&gui->name[i], 0, row, w1, h, &labelDesc,
                                    MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)ch));
         }
 

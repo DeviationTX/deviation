@@ -66,6 +66,7 @@ static void build_data_pkt()
 }
 
 #ifdef BITBANG_PPM
+MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     static volatile u16 accum;
@@ -92,6 +93,7 @@ static u16 ppmout_cb()
     return val;
 }
 #else
+MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     build_data_pkt();

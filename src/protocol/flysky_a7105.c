@@ -156,6 +156,8 @@ static void flysky_build_packet(u8 init)
         packet[6 + i*2] = (value >> 8) & 0xff;
     }
 }
+
+MODULE_CALLTYPE
 static u16 flysky_cb()
 {
     if (counter) {

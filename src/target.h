@@ -149,4 +149,14 @@ enum {
     BL_ID = 0,
 };
 u8 *BOOTLOADER_Read(int idx);
+
+//Ensure functions are loaded for protocol modules
+void PROTO_Stubs(int idx);
+
+#ifdef MODULAR
+  #define MODULE_CALLTYPE __attribute__((__long_call__))
+#else
+  #define MODULE_CALLTYPE
+#endif
+
 #endif

@@ -462,6 +462,7 @@ void WK_BuildPacket_2401()
     pkt_num = (pkt_num + 1) % 12;
 }
 
+MODULE_CALLTYPE
 static u16 wk_cb()
 {
     if (txState == 0) {

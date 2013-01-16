@@ -110,7 +110,7 @@ void PROTOCOL_Load()
     #undef PROTODEF
     FILE *fh;
     fh = fopen(file, "r");
-    printf("Loading %s: %08lx\n", file, fh);
+    //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
         return;
     }
@@ -130,7 +130,7 @@ void PROTOCOL_Load()
             break;
     }
     fclose(fh);
-    printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
+    //printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
     //We use the same file for multiple protocols, so we need to manually set this here
     *loaded_protocol = Model.protocol;
 #endif

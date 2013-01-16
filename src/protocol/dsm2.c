@@ -383,6 +383,7 @@ static void parse_telemetry_packet()
     }
 }
 
+MODULE_CALLTYPE
 static u16 dsm2_cb()
 {
 #define CH1_CH2_DELAY 4010  // Time between write of channel 1 and channel 2
