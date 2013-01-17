@@ -42,7 +42,7 @@ extern "C" {
 }
 
 
-static const u16 keymap[] = { 'A', 'Q', 'D', 'E', 'S', 'W', 'F', 'R', 'G', 'T', 'H', 'Y', FL_Left, FL_Right, FL_Down, FL_Up, 13/*FL_Enter*/, FL_Escape, 0 };
+static const u16 keymap[BUT_LAST] = BUTTON_MAP;
 
 static struct {
     s32 xscale;
