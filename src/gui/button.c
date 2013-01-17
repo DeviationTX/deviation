@@ -26,6 +26,7 @@ guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType
 {
     struct guiHeader *obj = (guiObject_t *)button;
     struct guiBox    *box;
+    CLEAR_OBJ(button);
 
     box = &obj->box;
 
@@ -59,6 +60,7 @@ guiObject_t *GUI_CreateIcon(guiButton_t *button, u16 x, u16 y, const struct Imag
 {
     struct guiHeader *obj = (guiObject_t *)button;
     struct guiBox    *box;
+    CLEAR_OBJ(button);
 
     box = &obj->box;
     button->image = image;

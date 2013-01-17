@@ -18,16 +18,18 @@
   #define DEVO_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
-#pragma long_calls_off
 
 #ifdef MODULAR
+  #pragma long_calls_off
   const long protocol_type = PROTOCOL_DEVO;
 #endif
+
 #ifdef PROTO_HAS_CYRF6936
 
 //For Debug

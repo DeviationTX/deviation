@@ -32,6 +32,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
 {
     struct guiHeader *obj = (guiObject_t *)dialog;
     struct guiBox *box ;
+    CLEAR_OBJ(dialog);
 
     box = &obj->box;
 

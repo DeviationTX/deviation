@@ -22,9 +22,9 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-#pragma long_calls_off
 
 #ifdef MODULAR
+  #pragma long_calls_off
   const long protocol_type = PROTOCOL_HUBSAN;
 #endif
 #ifdef PROTO_HAS_A7105

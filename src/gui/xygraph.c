@@ -28,6 +28,7 @@ guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *graph, u16 x, u16 y, u16 width, u16
 {
     struct guiObject  *obj   = (guiObject_t *)graph;
     struct guiBox    *box;
+    CLEAR_OBJ(graph);
 
     box = &obj->box;
 

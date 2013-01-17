@@ -18,14 +18,16 @@
   #define DSM2_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
+
 #include <stdlib.h>
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
-#pragma long_calls_off
+
 #ifdef MODULAR
+  #pragma long_calls_off
   const long protocol_type = PROTOCOL_DSM2;
 #endif
 

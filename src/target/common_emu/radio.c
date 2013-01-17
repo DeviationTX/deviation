@@ -19,11 +19,9 @@
 
 #include <stdlib.h>
 
-#ifdef PROTO_HAS_A7105
-void A7105_Initialize()
-{
-}
+void SPI_ProtoInit() {}
 
+#ifdef PROTO_HAS_A7105
 void A7105_WriteReg(u8 addr, u8 value)
 {
     (void)addr;
@@ -143,13 +141,13 @@ void CYRF_ConfigRFChannel(u8 ch) {
 void CYRF_SetPower(u8 power) {
     printf("Set Tx Power to %s\n", RADIO_TX_POWER_VAL[power]);
 }
-void CYRF_WriteDataPacketLen(u8 data[], u8 len) {
+void CYRF_WriteDataPacketLen(const u8 data[], u8 len) {
     int i;
     for(i = 0; i < len; i++)
         printf("%02x ", data[i]);
     printf("\n");
 }
-void CYRF_WriteDataPacket(u8 data[]) {
+void CYRF_WriteDataPacket(const u8 data[]) {
     CYRF_WriteDataPacketLen(data, 16);
 }
 u8 CYRF_MaxPower() { return CYRF_PWR_100MW; }

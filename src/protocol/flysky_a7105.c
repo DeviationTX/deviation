@@ -18,14 +18,15 @@
   #define FLYSKY_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
-#pragma long_calls_off
 
 #ifdef MODULAR
+  #pragma long_calls_off
   const long protocol_type = PROTOCOL_FLYSKY;
 #endif
 

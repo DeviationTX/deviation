@@ -56,6 +56,7 @@ guiObject_t *GUI_CreateKeyboard(guiKeyboard_t *keyboard, enum KeyboardType type,
         void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
     struct guiObject   *obj = (guiObject_t *)keyboard;
+    CLEAR_OBJ(keyboard);
 
     obj->Type = Keyboard;
     OBJ_SET_MODAL(obj, 1);

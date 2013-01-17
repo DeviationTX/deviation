@@ -58,7 +58,9 @@ struct page_group groups[] = {
     {2, PAGEID_CHANMON},
     {2, PAGEID_INPUTMON},
     {2, PAGEID_BTNMON},
+#ifdef ENABLE_SCANNER
     {2, PAGEID_SCANNER},
+#endif
     {2, PAGEID_USB},
     {0x81, PAGEID_MODELMENU},
     {255, 0}

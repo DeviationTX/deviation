@@ -276,10 +276,10 @@ typedef struct guiRect {
 #define OBJ_SET_TRANSPARENT(x,y) OBJ_SET_FLAG(x, 0x10, y)
 #define OBJ_SET_SELECTABLE(x,y)  OBJ_SET_FLAG(x, 0x20, y)
 #define OBJ_SET_SCROLLABLE(x,y)  OBJ_SET_FLAG(x, 0x40, y)
+#define CLEAR_OBJ(x) memset((x), 0, sizeof(*(x)))
 
 #define DRAW_NORMAL  0
 #define DRAW_PRESSED 1
-
 /* internal use only */
 extern struct guiObject *objHEAD;
 extern struct guiObject *objTOUCHED;

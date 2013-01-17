@@ -23,6 +23,7 @@ guiObject_t *GUI_CreateImageOffset(guiImage_t *image, u16 x, u16 y, u16 width, u
 {
     struct guiObject *obj = (guiObject_t *)image;
     struct guiBox    *box;
+    CLEAR_OBJ(image);
 
     box = &obj->box;
 

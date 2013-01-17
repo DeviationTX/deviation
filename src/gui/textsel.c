@@ -25,6 +25,7 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
 {
     struct guiObject *obj = (guiObject_t *)select;
     struct guiBox *box;
+    CLEAR_OBJ(select);
 
     box = &obj->box;
 

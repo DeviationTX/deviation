@@ -44,6 +44,7 @@ guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *listbox, u16 x, u16 y, u16
     u16 text_w, text_h;
     s16 pos = 0;
     u8 sb_entries;
+    CLEAR_OBJ(listbox);
 
     box = &obj->box;
 

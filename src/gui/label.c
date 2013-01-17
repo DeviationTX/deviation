@@ -26,6 +26,7 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 
 {
     struct guiObject *obj = (guiObject_t *)label;
     struct guiBox    *box;
+    CLEAR_OBJ(label);
 
     box = &obj->box;
     box->x = x;

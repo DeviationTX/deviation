@@ -22,6 +22,7 @@ guiObject_t *GUI_CreateRect(guiRect_t *rect, u16 x, u16 y, u16 width, u16 height
 {
     struct guiObject *obj = (guiObject_t *)rect;
     struct guiBox    *box;
+    CLEAR_OBJ(rect);
 
     box = &obj->box;
     box->x = x;

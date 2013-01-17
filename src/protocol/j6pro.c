@@ -22,10 +22,10 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
-#pragma long_calls_off
 
 #ifdef MODULAR
-const long protocol_type = PROTOCOL_J6PRO;
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_J6PRO;
 #endif
 #ifdef PROTO_HAS_CYRF6936
 

@@ -33,6 +33,7 @@ guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *scrollbar, u16 x, u16 y, u16 he
 {
     struct guiObject    *obj = (guiObject_t *)scrollbar;
     struct guiBox     *box;
+    CLEAR_OBJ(scrollbar);
 
     box = &obj->box;
     box->x = x;

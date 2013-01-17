@@ -30,6 +30,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
 {
     struct guiObject *obj = (guiObject_t *)scrollable;
     struct guiBox    *box;
+    CLEAR_OBJ(scrollable);
 
     box = &obj->box;
     scrollable->row_cb = row_cb;
