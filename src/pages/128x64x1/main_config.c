@@ -20,6 +20,8 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+#define gui (&gui_objs.u.mainconfig)
+
 enum {
     ITEM_TRIMS,
     ITEM_BOX0,

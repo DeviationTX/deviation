@@ -193,3 +193,8 @@ void PAGE_ModelExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
+
+static inline guiObject_t *_get_obj(int type, int objid)
+{
+    return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, type, objid);
+}

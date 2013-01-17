@@ -21,6 +21,7 @@
 #define TELEM_TXT_FONT DEFAULT_FONT
 #define TELEM_ERR_FONT NORMALBOXNEG_FONT
 
+static guiObject_t *_get_obj(int idx, int objid);
 static u8 time_count = 0;
 static u8 telem_state_check()
 {
@@ -89,7 +90,7 @@ void PAGE_TelemtestEvent() {
     if(memcmp(&tp.telem.gps, &Telemetry.gps, sizeof(struct gps)) != 0) {
         tp.telem.gps = Telemetry.gps;
         for(i = 0; i < 5; i++) {
-            guiObject_t *obj = GUI_GetScrollableObj(&gui2->scrollable, i/2, i%2);
+            guiObject_t *obj = _get_obj(i/2, i%2);
             if (obj)
                 GUI_Redraw(obj);
         }
@@ -133,7 +134,7 @@ void PAGE_TelemtestEvent() {
         }
         tp.telem.time[2] = Telemetry.time[2];
         for(i = 0; i < 5; i++) {
-            guiObject_t *obj = GUI_GetScrollableObj(&gui2->scrollable, i/2, i%2);
+            guiObject_t *obj = _get_obj(i/2, i%2);
             if(obj)
                 GUI_SetLabelDesc((guiLabel_t *)obj, font);
         }

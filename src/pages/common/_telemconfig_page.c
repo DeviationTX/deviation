@@ -16,6 +16,8 @@
 #define tp pagemem.u.telemconfig_page
 #define gui (&gui_objs.u.telemcfg)
 
+static guiObject_t *_get_obj(int idx, int objid);
+
 static u8 telem_state_check()
 {
     if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
@@ -39,7 +41,7 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
         0, TELEM_RPM2, dir, 1, 1, &changed);
     if (changed) {
-        guiObject_t *valObj = GUI_GetScrollableObj(&gui->scrollable, val, 2);
+        guiObject_t *valObj = _get_obj(val, 2);
         if (valObj)
             GUI_Redraw(valObj);
     }

@@ -16,20 +16,6 @@
 #include "../pages.h"
 #include <stdlib.h>
 
-enum {
-    ITEM_REVERSE,
-    ITEM_FAILSAFE,
-    ITEM_SAFETY,
-    ITEM_SAFEVAL,
-    ITEM_MINLIMIT,
-    ITEM_MAXLIMIT,
-    ITEM_SCALEPOS,
-    ITEM_SCALENEG,
-    ITEM_SUBTRIM,
-    ITEM_SPEED,
-    ITEM_LAST,
-};
-
 #include "../../common/advanced/_mixer_limits.c"
 
 static u8 action_cb(u32 button, u8 flags, void *data);
@@ -147,4 +133,8 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+static inline guiObject_t *_get_obj(int idx, int objid) {
+    return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }

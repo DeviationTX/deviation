@@ -4,6 +4,7 @@
 #include "../common/_pages.h"
 #include "scanner_page.h"
 #include "icons.h"
+#include "guiobj.h"
 
 #define PAGEDEF(id, init, event, exit, name) id,
 enum PageID {
@@ -22,7 +23,9 @@ struct pagemem {
         struct model_page model_page;
         struct timer_page timer_page;
         struct chantest_page chantest_page;
+#ifdef ENABLE_SCANNER
         struct scanner_page scanner_page;
+#endif
         struct usb_page usb_page;
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;

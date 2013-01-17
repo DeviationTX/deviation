@@ -14,6 +14,8 @@
  */
 #include "pages.h"
 
+#define gui (&gui_objs.page)
+
 static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
@@ -154,11 +156,11 @@ void changepage_cb(guiObject_t *obj, const void *data)
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
-    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
-    obj = GUI_CreateIcon(256, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
+    obj = GUI_CreateIcon(&gui->previco, 256, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     GUI_SetSelectable(obj, 0);
-    obj = GUI_CreateIcon(288, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    obj = GUI_CreateIcon(&gui->nextico, 288, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
     GUI_SetSelectable(obj, 0);
     exit_cmd = changepage_cb;
     exit_data = NULL;
@@ -170,8 +172,8 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
     enter_data = (void *)1;
     exit_cmd = CallBack;
     exit_data = (void *)0;
-    GUI_CreateIcon(0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-    GUI_CreateLabel(40, 10, NULL, TITLE_FONT, (void *)title);
+    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
+    GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
 }
 
 static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
@@ -226,13 +228,13 @@ guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t 
 {
     exit_cmd = CallBack;
     exit_data = (void *)0;
-    return GUI_CreateButton(x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
+    return GUI_CreateButton(&gui->previco, x, y, BUTTON_96, okcancelstr_cb, 0x0000, CallBack, (void *)0);
 }
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))
 {
     enter_cmd = CallBack;
     enter_data = (void *)1;
-    return GUI_CreateButton(x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
+    return GUI_CreateButton(&gui->nextico, x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }
 
 const char *PAGE_GetName(int i)

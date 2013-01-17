@@ -46,10 +46,10 @@ static void press_cb(guiObject_t *obj, const void *data)
     u8 point_num = (long)data;
     u8 *selectable_bitmap = &selectable_bitmaps[curve_mode * 4 + pit_mode];
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
-        GUI_TextSelectEnable(mp->itemObj[point_num], 0);
+        GUI_TextSelectEnable(&gui->val[point_num], 0);
         *selectable_bitmap &= ~(1 << (point_num-1));
     } else {
-        GUI_TextSelectEnable(mp->itemObj[point_num], 1);
+        GUI_TextSelectEnable(&gui->val[point_num], 1);
         *selectable_bitmap |= 1 << (point_num-1);
     }
 }
@@ -59,9 +59,9 @@ static void update_textsel_state()
     for (u8 i = 1; i < 8; i++) {
         u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
         if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(mp->itemObj[i], 1);
+            GUI_TextSelectEnable(&gui->val[i], 1);
         } else {
-            GUI_TextSelectEnable(mp->itemObj[i], 0);
+            GUI_TextSelectEnable(&gui->val[i], 0);
         }
     }
 }
@@ -79,7 +79,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
     }
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
-        GUI_CreateLabelBox(0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
     u8 mode_count = 3;
@@ -94,12 +94,12 @@ static void show_page(CurvesMode _curve_mode, int page)
             mp->mixer_ptr[i]->curve.type = CURVE_9POINT;
     }
     /* Row 1 */
-    GUI_CreateButton(20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
-    GUI_CreateLabelBox(92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
-    GUI_CreateTextSelect(140, 40, TEXTSELECT_96, 0x0000, NULL, set_mode_cb, (void *)(long)curve_mode);
-    mp->itemObj[9] = GUI_CreateTextSelect(246, 40, TEXTSELECT_64, 0x0000, NULL, set_holdstate_cb, NULL);
+    GUI_CreateButton(&gui->auto_, 20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
+    GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, 0x0000, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, 0x0000, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
-        GUI_SetHidden(mp->itemObj[9], 1);
+        GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
     #define COL1 4
     #define COL2 20
@@ -109,13 +109,13 @@ static void show_page(CurvesMode _curve_mode, int page)
         const char *label = curvepos[i];
         if(label[0] > '9')
             label = _tr(label);
-        GUI_CreateLabelBox(COL1, 60+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, label);
-        mp->itemObj[i] = GUI_CreateTextSelect(COL2, 60+20*i, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)i);
+        GUI_CreateLabelBox(&gui->vallbl[i], COL1, 60+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, label);
+        GUI_CreateTextSelect(&gui->val[i], COL2, 60+20*i, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
-            GUI_CreateButton(COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
+            GUI_CreateButton(&gui->lock[i-1], COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }
     update_textsel_state();
-    mp->graphs[0] = GUI_CreateXYGraph(160, 80, 150, 150,
+    GUI_CreateXYGraph(&gui->graph, 160, 80, 150, 150,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                   0, 0,

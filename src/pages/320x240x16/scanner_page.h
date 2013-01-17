@@ -6,7 +6,6 @@
 
 struct scanner_page {
     u8 channelnoise[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
-    guiObject_t *bar[MAX_RADIOCHANNEL - MIN_RADIOCHANNEL];
     u8 channel;
     u8 time_to_scan;
     u8 enable;

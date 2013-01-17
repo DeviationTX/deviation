@@ -30,6 +30,7 @@ void PAGE_MainInit(int page)
     int i;
     u16 x, y, w, h;
     memset(mp, 0, sizeof(struct main_page));
+    memset(gui, 0, sizeof(*gui));
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&mp->action,
           CHAN_ButtonMask(BUT_ENTER)
@@ -41,36 +42,33 @@ void PAGE_MainInit(int page)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
-    mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+    GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateIcon(32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
+        GUI_CreateIcon(&gui->model.ico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
-    mp->nameObj = GUI_CreateLabelBox(96, 8, 128, 24, &MODELNAME_FONT,
+    GUI_CreateLabelBox(&gui->name, 96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
     //Icon
     if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
+        GUI_CreateImageOffset(&gui->model.img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
 
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
         if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
-        else
-            mp->trimObj[i] = NULL;
+            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
     }
     for(i = 0; i < 8; i++) {
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
             int font = ((Model.pagecfg.box[i] <= NUM_TIMERS && mp->boxval[i] < 0) ||
                         ((u8)(Model.pagecfg.box[i] - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
-            mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
+            GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
                                 get_box_font(i, font),
                                 show_box_cb, press_box_cb,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else {
             mp->boxval[i] = 0;
-            mp->boxObj[i] = NULL;
         }
     }
     for(i = 0; i < 8; i++) {
@@ -78,30 +76,29 @@ void PAGE_MainInit(int page)
             break;
         if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
             mp->barval[i] = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
-            mp->barObj[i] = GUI_CreateBarGraph(x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+            GUI_CreateBarGraph(&gui->bar[i], x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                                                bar_cb, (void *)((long)Model.pagecfg.bar[i]));
         } else {
             mp->barval[i] = 0;
-            mp->barObj[i] = NULL;
         }
     }
     for(i = 0; i < 4; i++) {
         if(! Model.pagecfg.toggle[i])
             continue;
         if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h))
-            mp->toggleObj[i] = GUI_CreateImageOffset(x, y, 32, 31, Model.pagecfg.tglico[i]*32, 0, TOGGLE_FILE, NULL, NULL);
+            GUI_CreateImageOffset(&gui->toggle[i], x, y, 32, 31, Model.pagecfg.tglico[i]*32, 0, TOGGLE_FILE, NULL, NULL);
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        mp->battObj = GUI_CreateImage(270,1,48,22,"media/bat.bmp");
+        GUI_CreateImage(&gui->batt.ico, 270,1,48,22,"media/bat.bmp");
     } else {
-        mp->battObj = GUI_CreateLabelBox(275,10, 0, 0,
+        GUI_CreateLabelBox(&gui->batt.lbl, 275,10, 0, 0,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
+    GUI_CreateImageOffset(&gui->pwr, 225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
 }
 
 void PAGE_MainExit()
@@ -118,9 +115,9 @@ static void _check_voltage()
         if(Display.flags & SHOW_BAT_ICON) {
             //FIXME
         } else {
-            GUI_SetLabelDesc(mp->battObj, batt < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT);
+            GUI_SetLabelDesc(&gui->batt.lbl, batt < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT);
         }
-        GUI_Redraw(mp->battObj);
+        GUI_Redraw(&gui->batt);
     }
 }
 
@@ -172,7 +169,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if(! GUI_GetSelected()) {
         if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             mp->ignore_release = 1;
-            GUI_SetSelected(mp->optsObj);
+            GUI_SetSelected((guiObject_t *)&gui->optico);
         }else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             mp->ignore_release = 1;
             TIMER_Reset(0);

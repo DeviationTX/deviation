@@ -25,6 +25,8 @@
 #define MIN_BATTERY_ALARM_STEP 10
 #include "../common/_tx_configure.c"
 
+#define gui (&gui_objs.u.tx)
+
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
@@ -204,4 +206,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+static inline guiObject_t *_get_obj(int idx, int objid)
+{
+    return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, idx, oibjid);
 }

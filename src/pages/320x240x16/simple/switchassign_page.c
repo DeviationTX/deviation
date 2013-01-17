@@ -20,6 +20,7 @@
 #include "simple.h"
 #include "../../common/simple/_switchassign_page.c"
 
+#define gui (&gui_objs.u.stdswitch)
 static const char *switch_cb2(guiObject_t *obj, int dir, void *data)
 {
     const char *str = switch_cb(obj, dir, data);
@@ -39,17 +40,17 @@ void PAGE_SwitchAssignInit(int page)
     #define ROW_SPACE 20
     /* Row 1 */
     int row = 40;
-    GUI_CreateLabelBox(COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
-    GUI_CreateTextSelect(COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
+    GUI_CreateLabelBox(&gui->modelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
+    GUI_CreateTextSelect(&gui->mode, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
 
     /* Row 2 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelect(COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_HOLD);
+    GUI_CreateLabelBox(&gui->tholdlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateTextSelect(&gui->thold, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_HOLD);
 
     /* Row 3 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
-    GUI_CreateTextSelect(COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
+    GUI_CreateLabelBox(&gui->gyrolbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
+    GUI_CreateTextSelect(&gui->gyro, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
 }
 

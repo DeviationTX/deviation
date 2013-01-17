@@ -18,7 +18,9 @@
 #include "pages.h"
 #include "config/model.h"
 
+#ifdef ENABLE_SCANNER
 #define sp (pagemem.u.scanner_page)
+#define gui (&gui_objs.u.scanner)
 u16 scan_trigger_cb()
 {
     sp.time_to_scan = 1;
@@ -65,12 +67,12 @@ void PAGE_ScannerInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     sp.enable = 0;
-    GUI_CreateButton(112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
+    GUI_CreateButton(&gui->enable, 112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
 
     sp.time_to_scan = 0;
     sp.channel = MIN_RADIOCHANNEL;
     for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
-        sp.bar[i] = GUI_CreateBarGraph(i * 4, 70, 4, 162, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        GUI_CreateBarGraph(&gui->bar[i], i * 4, 70, 4, 162, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
         sp.channelnoise[i] = 0x10;
     }
 }
@@ -90,7 +92,7 @@ void PAGE_ScannerEvent()
 
     CYRF_ReadDataPacket(dpbuffer);
         sp.channelnoise[sp.channel] = CYRF_ReadRSSI(1) & 0x1F;
-        GUI_Redraw(sp.bar[sp.channel]);
+        GUI_Redraw(&gui->bar[sp.channel]);
 
     //printf("%02X : %d\n",sp.channel,sp.channelnoise[sp.channel]);
 
@@ -108,3 +110,5 @@ void PAGE_ScannerExit()
         PROTOCOL_Init(0);
 #endif
 }
+
+#endif

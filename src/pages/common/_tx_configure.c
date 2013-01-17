@@ -14,7 +14,6 @@
  */
 
 static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // MACRO is not good when debugging
-#define gui (&gui_objs.u.tx)
 #define guic (&gui_objs.u.calibrate)
 
 enum {
@@ -44,6 +43,7 @@ enum calibType {
     CALIB_STICK_TEST,
 };
 
+static guiObject_t *_get_obj(int idx, int objid);
 #define XCOORD 20
 #define YCOORD 20
 static void draw_target(u16 x, u16 y)
@@ -258,7 +258,7 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
             MIN_BACKLIGHT_DIMTIME, MAX_BACKLIGHT_DIMTIME, dir, 5, 10, &changed);
     if (changed)
         Transmitter.auto_dimmer.timer = dimmer_timmer * 1000;
-    guiObject_t *dimobj = GUI_GetScrollableObj(&gui->scrollable, ITEM_DIMVAL, 0);
+    guiObject_t *dimobj = _get_obj(ITEM_DIMVAL, 0);
     if (dimmer_timmer == 0) {
         if(dimobj)
             GUI_TextSelectEnable((guiTextSelect_t *)dimobj, 0);

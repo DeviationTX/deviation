@@ -181,3 +181,8 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
     return cp->tmpstr;
 }
 void _handle_button_test() {}
+
+static inline guiObject_t *_get_obj(int chan, int objid)
+{
+    return GUI_GetScrollableObj(&gui->scrollable, chan, objid);
+}

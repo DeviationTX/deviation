@@ -21,6 +21,7 @@
 
 #include "../common/_dialogs.c"
 
+#define gui (&gui_objs.dialog)
 
 void PAGE_ShowSafetyDialog()
 {
@@ -61,7 +62,7 @@ void PAGE_ShowSafetyDialog()
         }
     } else {
         dlgstr[0] = 0;
-        dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -98,7 +99,7 @@ void PAGE_ShowBindingDialog(u8 update)
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -108,7 +109,7 @@ void PAGE_ShowLowBattDialog()
         return;
     strncpy(dlgstr, _tr("Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Low Battery"), NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Low Battery"), NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
 
 void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
@@ -118,6 +119,6 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
         return;
     strncpy(dlgstr, _tr("Model needs to be reset\nin order to switch to the standard mixer"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(10, 42, 300, 188, _tr("Standard Mixer"), NULL,
+    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Standard Mixer"), NULL,
             invalid_simplemixer_cb, dtOkCancel, dlgstr);
 }

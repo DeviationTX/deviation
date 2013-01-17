@@ -15,6 +15,7 @@
 static struct Limit origin_limit;
 
 #define gui (&gui_objs.u.advlimit)
+static guiObject_t *_get_obj(int idx, int objid);
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
@@ -29,6 +30,20 @@ static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 static void update_safe_val_state();
 static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data);
+
+enum {
+    ITEM_REVERSE,
+    ITEM_FAILSAFE,
+    ITEM_SAFETY,
+    ITEM_SAFEVAL,
+    ITEM_MINLIMIT,
+    ITEM_MAXLIMIT,
+    ITEM_SCALEPOS,
+    ITEM_SCALENEG,
+    ITEM_SUBTRIM,
+    ITEM_SPEED,
+    ITEM_LAST,
+};
 
 void MIXPAGE_EditLimits()
 {
@@ -51,7 +66,7 @@ void sourceselect_cb(guiObject_t *obj, void *data)
 
 static void update_safe_val_state()
 {
-    guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_SAFEVAL, 0);
+    guiObject_t *obj = _get_obj(ITEM_SAFEVAL, 0);
     if (!mp->limit.safetysw) {
         if (obj)
             GUI_TextSelectEnable((guiTextSelect_t *)obj, 0);
@@ -127,7 +142,7 @@ const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data)
         *ptr = value;
         if (ptr == &mp->limit.servoscale) {
             if (mp->limit.servoscale_neg == 0) {
-                guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, ITEM_SCALENEG, 0);
+                guiObject_t *obj = _get_obj(ITEM_SCALENEG, 0);
                 if(obj)
                     GUI_Redraw(obj);
             }

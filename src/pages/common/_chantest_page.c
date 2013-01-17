@@ -19,6 +19,7 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _show_bar_page(u8 num_bars);
 static void _handle_button_test();
+static guiObject_t *_get_obj(int chan, int objid);
 
 enum {
     ITEM_GRAPH,
@@ -72,10 +73,10 @@ void PAGE_ChantestEvent()
     for(i = 0; i < cp->num_bars; i++) {
         int v = RANGE_TO_PCT(cp->type ? raw[i+1] : Channels[i]);
         if (v != cp->pctvalue[i]) {
-            guiObject_t *obj = GUI_GetScrollableObj(&gui->scrollable, i, ITEM_GRAPH);
+            guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {
                 GUI_Redraw(obj);
-                GUI_Redraw(GUI_GetScrollableObj(&gui->scrollable, i, ITEM_VALUE));
+                GUI_Redraw(_get_obj(i, ITEM_VALUE));
             }
             cp->pctvalue[i] = v;
         }

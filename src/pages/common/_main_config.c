@@ -12,8 +12,6 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-#define gui (&gui_objs.u.mainconfig)
-
 char str[30];
 s8 page_num;
 

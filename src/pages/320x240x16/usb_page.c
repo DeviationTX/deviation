@@ -19,6 +19,8 @@
 
 #include "../common/_usb_page.c"
 
+#define gui (&gui_objs.u.usb)
+
 static void _draw_page(u8 enable)
 {
     PAGE_RemoveAllObjects();
@@ -29,6 +31,6 @@ static void _draw_page(u8 enable)
             _tr("Deviation FW version:"), DeviationVersion,
             _tr("Press 'Ent' to turn USB Filesystem:"),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
 }
 
