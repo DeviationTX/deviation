@@ -16,19 +16,6 @@
 #include "../pages.h"
 #include "config/model.h"
 
-enum {
-    COMPLEX_MIXER,
-    COMPLEX_PAGE,
-    COMPLEX_SWITCH,
-    COMPLEX_MUX,
-    COMPLEX_SRC,
-    COMPLEX_CURVE,
-    COMPLEX_SCALE,
-    COMPLEX_OFFSET,
-    COMPLEX_TRIM,
-    COMPLEX_LAST,
-};
-
 #include "../../common/advanced/_mixer_setup.c"
 
 #define FIRST_PAGE_ITEM_IDX  2  // 0 is the template obj and 1 is the button obj
@@ -414,4 +401,21 @@ static u8 action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+
+void MIXPAGE_RedrawGraphs()
+{
+    switch(mp->cur_template) {
+    case MIXERTEMPLATE_COMPLEX:
+        GUI_Redraw(&gui->bar);
+    case MIXERTEMPLATE_EXPO_DR:
+    case MIXERTEMPLATE_SIMPLE:
+        GUI_Redraw(&gui->graph);
+        break;
+    default: break;
+    }
+}
+
+static inline guiObject_t * _get_obj(int idx, int objid) {
+    return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }

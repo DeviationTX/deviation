@@ -171,11 +171,14 @@ void PAGE_MixerEvent()
     // bug fix: when entering chantest modal page from the mixer page, the mp structure might be set to wrong value
     // and will clear all limit data in devo8, simply because all structures inside the pagemem are unions and share the same memory
     _determine_save_in_live();
-    if (mp->cur_mixer && OBJ_IS_USED(&guim->graph)) {
-        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
-            GUI_Redraw(&guim->graph);
-            if (OBJ_IS_USED(&guim->bar))
-                GUI_Redraw(&guim->bar);
+    if (mp->cur_mixer && ! mp->edit.parent) {
+        if (mp->cur_template == MIXERTEMPLATE_SIMPLE
+            || mp->cur_template == MIXERTEMPLATE_EXPO_DR
+            || mp->cur_template == MIXERTEMPLATE_COMPLEX)
+        {
+            if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+                MIXPAGE_RedrawGraphs();
+            }
         }
     }
 }

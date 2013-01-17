@@ -178,7 +178,7 @@ static u16 flysky_cb()
 
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
-    A7105_Initialize();
+    A7105_Reset();
     flysky_init();
     if (Model.fixed_id) {
         id = Model.fixed_id;

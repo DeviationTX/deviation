@@ -86,7 +86,7 @@ static void _show_expo_dr()
     //Row 3
     GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
     GUI_CreateButton(&gui2->rate[0], 112, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
-    GUI_CreateButton(&gui2->rate[1], , 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
+    GUI_CreateButton(&gui2->rate[1], 216, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(&gui2->curvehi, COL1_TEXT, 96, TEXTSELECT_96, 0x0000, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
@@ -98,8 +98,8 @@ static void _show_expo_dr()
     //Row 5
     GUI_CreateLabel(&gui2->scalelbl, COL1_TEXT, 122, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(&gui2->scalehi, 40, 120, TEXTSELECT_64, 0x0000, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    mp->expoObj[3] = GUI_CreateTextSelect(&gui2->scale[0], 112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
-    mp->expoObj[7] = GUI_CreateTextSelect(&gui2->scale[1], 216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
+    GUI_CreateTextSelect(&gui2->scale[0], 112, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[1].scalar);
+    GUI_CreateTextSelect(&gui2->scale[1], 216, 120, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->mixer[2].scalar);
 
     GUI_CreateXYGraph(&gui2->graphhi, COL1_TEXT, 140, 96, 96,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
@@ -122,15 +122,15 @@ static void _show_expo_dr()
 static void _show_complex()
 {
     //Row 1
-    if (! mp->expoObj[0]) {
+    if (! OBJ_IS_USED(&gui3->swlbl)) {
         mp->firstObj = GUI_CreateLabel(&gui3->nummixlbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
         GUI_CreateTextSelect(&gui3->nummix, COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
         GUI_CreateLabel(&gui3->pagelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
-        guiObject_t *obj = GUI_CreateTextSelect(&gui->page, COL2_VALUE, 40, TEXTSELECT_96, 0x0000, reorder_cb, set_mixernum_cb, NULL);
+        guiObject_t *obj = GUI_CreateTextSelect(&gui3->page, COL2_VALUE, 40, TEXTSELECT_96, 0x0000, reorder_cb, set_mixernum_cb, NULL);
         if (! GUI_GetSelected()) //Set the page button to be selected if nothinge else is yet
             GUI_SetSelected(obj);
     } else {
-        GUI_RemoveHierObjects(mp->expoObj[0]);
+        GUI_RemoveHierObjects((guiObject_t *)&gui3->swlbl);
     }
     //Row 2
     GUI_CreateLabel(&gui3->swlbl, COL1_TEXT, 64, NULL, DEFAULT_FONT, _tr("Switch:"));
@@ -159,7 +159,7 @@ static void _show_complex()
     //Row 7
     GUI_CreateButton(&gui3->trim, COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-        GUI_SetHidden(&gui3->trim, 1);
+        GUI_SetHidden((guiObject_t *)&gui3->trim, 1);
     /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, 0x0000, NULL, set_number100_cb, &mp->limit.min);
@@ -172,22 +172,51 @@ static void _update_rate_widgets(u8 idx)
 {
     u8 mix = idx + 1;
     if (MIXER_SRC(mp->mixer[mix].sw)) {
-        GUI_SetHidden(&gui3->rate[idx], 0);
+        GUI_SetHidden((guiObject_t *)&gui2->rate[idx], 0);
         if(mp->link_curves & mix) {
-            GUI_SetHidden(&gui3->linked[idx], 0);
-            GUI_SetHidden(&gui3->curve[idx], 1);
+            GUI_SetHidden((guiObject_t *)&gui2->linked[idx], 0);
+            GUI_SetHidden((guiObject_t *)&gui2->curve[idx], 1);
         } else {
-            GUI_SetHidden(&gui3->linked[idx], 1);
-            GUI_SetHidden(&gui3->curve[idx], 0);
+            GUI_SetHidden((guiObject_t *)&gui2->linked[idx], 1);
+            GUI_SetHidden((guiObject_t *)&gui2->curve[idx], 0);
         }
-        GUI_SetHidden(&gui3->scale[idx], 0);
-        GUI_SetHidden(&gui3->graph[idx], 0);
+        GUI_SetHidden((guiObject_t *)&gui2->scale[idx], 0);
+        GUI_SetHidden((guiObject_t *)&gui2->graph[idx], 0);
     } else {
-        GUI_SetHidden(&gui3->rate[idx], 1);
-        GUI_SetHidden(&gui3->linked[idx], 1);
-        GUI_SetHidden(&gui3->curve[idx], 1);
-        GUI_SetHidden(&gui3->scale[idx], 1);
-        GUI_SetHidden(&gui3->graph[idx], 1);
+        GUI_SetHidden((guiObject_t *)&gui2->rate[idx], 1);
+        GUI_SetHidden((guiObject_t *)&gui2->linked[idx], 1);
+        GUI_SetHidden((guiObject_t *)&gui2->curve[idx], 1);
+        GUI_SetHidden((guiObject_t *)&gui2->scale[idx], 1);
+        GUI_SetHidden((guiObject_t *)&gui2->graph[idx], 1);
     }
 }
 
+void MIXPAGE_RedrawGraphs()
+{
+    switch(mp->cur_template) {
+        case MIXERTEMPLATE_SIMPLE:
+            GUI_Redraw(&gui1->graph);
+            break;
+        case MIXERTEMPLATE_EXPO_DR:
+            GUI_Redraw(&gui2->graphhi);
+            if(OBJ_IS_USED(&gui2->graph[0]))
+                GUI_Redraw(&gui2->graph[0]);
+            if(OBJ_IS_USED(&gui2->graph[1]))
+                GUI_Redraw(&gui2->graph[1]);
+            break;
+        case MIXERTEMPLATE_COMPLEX:
+            GUI_Redraw(&gui3->graph);
+            GUI_Redraw(&gui3->bar);
+            break;
+        default: break;
+    }
+}
+
+static inline guiObject_t * _get_obj(int idx, int objid)
+{
+    (void)objid;
+    switch(idx) {
+        case COMPLEX_TRIM: return (guiObject_t *)&gui3->trim;
+        default: return NULL;
+    }
+}

@@ -480,7 +480,7 @@ static u16 dsm2_cb()
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
-    CYRF_Initialize();
+    CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
    if (Model.fixed_id) {

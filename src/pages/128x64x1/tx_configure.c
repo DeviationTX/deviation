@@ -210,5 +210,5 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 
 static inline guiObject_t *_get_obj(int idx, int objid)
 {
-    return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, idx, oibjid);
+    return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }

@@ -61,6 +61,7 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data);
 const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data);
 void MIXPAGE_ChangeTemplate(int show_header);
 void MIXPAGE_EditLimits();
+void MIXPAGE_RedrawGraphs();
 
 #endif
 

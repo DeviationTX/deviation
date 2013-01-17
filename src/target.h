@@ -151,7 +151,7 @@ enum {
 u8 *BOOTLOADER_Read(int idx);
 
 //Ensure functions are loaded for protocol modules
-void PROTO_Stubs(int idx);
+void SPI_ProtoInit();
 
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))

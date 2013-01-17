@@ -108,17 +108,17 @@ void Init() {
     BACKLIGHT_Brightness(1);
     AUTODIMMER_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+    SPI_ProtoInit();
 #ifdef MODULAR
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;
     PROTOCOL_Init(1);
-    PROTO_Stubs(0);
 #endif
 }
 
 void Banner()
 {
-    CYRF_Initialize();
+    CYRF_Reset();
     u8 Power = CYRF_MaxPower();
     u8 mfgdata[6];
     u8 tmp[12];

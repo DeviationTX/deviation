@@ -492,7 +492,7 @@ static void bind()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CYRF_Initialize();
+    CYRF_Reset();
     cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);
     CYRF_ConfigRxTx(1);

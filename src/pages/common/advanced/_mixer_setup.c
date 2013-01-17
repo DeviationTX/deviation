@@ -16,6 +16,7 @@
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 #define gui (&gui_objs.u.advmixcfg)
 
+static guiObject_t * _get_obj(int idx, int objid);
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
@@ -34,8 +35,20 @@ static void show_none();
 static void _show_simple();
 static void _show_expo_dr();
 static void _show_complex();
-static void redraw_graphs();
 static void _update_rate_widgets(u8 idx);
+
+enum {
+    COMPLEX_MIXER,
+    COMPLEX_PAGE,
+    COMPLEX_SWITCH,
+    COMPLEX_MUX,
+    COMPLEX_SRC,
+    COMPLEX_CURVE,
+    COMPLEX_SCALE,
+    COMPLEX_OFFSET,
+    COMPLEX_TRIM,
+    COMPLEX_LAST,
+};
 
 void MIXPAGE_ChangeTemplate(int show_header)
 {
@@ -126,13 +139,13 @@ void toggle_link_cb(guiObject_t *obj, const void *data)
         mp->link_curves ^= 0x02;
         if (mp->link_curves & 0x02) { //Redraw graphs when re-linking
             sync_mixers();
-            redraw_graphs();
+            MIXPAGE_RedrawGraphs();
         }
     } else {
         mp->link_curves ^= 0x01;
         if (mp->link_curves & 0x01) { //Redraw graphs when re-linking
             sync_mixers();
-            redraw_graphs();
+            MIXPAGE_RedrawGraphs();
         }
     }
     _update_rate_widgets(data ? 1 : 0);
@@ -276,7 +289,7 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
     sprintf(mp->tmpstr, "%d", *value);
     if (changed) {
         sync_mixers();
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
     }
     return mp->tmpstr;
 }
@@ -288,7 +301,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     mp->cur_mixer->mux = GUI_TextSelectHelper(mp->cur_mixer->mux, MUX_REPLACE, MUX_LAST-1, dir, 1, 1, &changed);
     if (changed) {
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
         sync_mixers();
     }
     switch(mp->cur_mixer->mux) {
@@ -314,7 +327,7 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
                      dir, 1, 1, &changed);
     if (changed) {
         mp->num_complex_mixers = mp->num_mixers;
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
         sync_mixers();
     }
     sprintf(mp->tmpstr, "%d", mp->num_mixers);
@@ -345,7 +358,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        guiObject_t *trim = GUI_GetScrollableObj(&gui->scrollable, COMPLEX_TRIM, 0);
+        guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
         if(trim) {
             if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
                 GUI_SetHidden(trim, 0);
@@ -353,7 +366,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
                 GUI_SetHidden(trim, 1);
         }
         sync_mixers();
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(mp->tmpstr, *source);
@@ -376,7 +389,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
             else if(data == &mp->mixer[2].sw)
                 _update_rate_widgets(1);
         } else {    
-            redraw_graphs();
+            MIXPAGE_RedrawGraphs();
         }
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
@@ -395,7 +408,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     mix->curve.type = GUI_TextSelectHelper(mix->curve.type, 0, CURVE_MAX, dir, 1, 1, &changed);
     if (changed) {
         sync_mixers();
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, mix->curve.type >= CURVE_EXPO);
     return CURVE_GetName(&mix->curve);
@@ -407,12 +420,13 @@ void sourceselect_cb(guiObject_t *obj, void *data)
     if (MIXER_SRC(*source)) {
         MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
         GUI_Redraw(obj);
-        redraw_graphs();
+        MIXPAGE_RedrawGraphs();
     }
 }
 
 void graph_cb()
 {
+    mp->edit.parent = NULL;
     MIXPAGE_ChangeTemplate(1);
 }
 
@@ -426,8 +440,6 @@ void curveselect_cb(guiObject_t *obj, void *data)
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
     if (mix->curve.type >= CURVE_EXPO
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
-        //Do not allow entering a linked graph
-        OBJ_SET_USED(&gui->graph, 0);
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }
 }
@@ -485,7 +497,6 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
     GUI_RemoveAllObjects();
-    OBJ_SET_USED(&gui->graph, 0);
     PAGE_MixerInit(mp->top_channel);
 }
 
@@ -495,25 +506,6 @@ static u8 touch_cb(s16 x, s16 y, void *data)
     (void)y;
     curveselect_cb(NULL, data);
     return 1;
-}
-void redraw_graphs()
-{
-    switch(mp->cur_template) {
-    case MIXERTEMPLATE_EXPO_DR:
-        if (OBJ_IS_USED(&gui->graph))
-            GUI_Redraw(&gui->graph);
-        if (OBJ_IS_USED(&gui->graph))
-            GUI_Redraw(&gui->graph);
-    case MIXERTEMPLATE_COMPLEX:
-    case MIXERTEMPLATE_SIMPLE:
-        if (OBJ_IS_USED(&gui->graph))
-            GUI_Redraw(&gui->graph);
-        break;
-    case MIXERTEMPLATE_NONE: break;
-    case MIXERTEMPLATE_CYC1: break;
-    case MIXERTEMPLATE_CYC2: break;
-    case MIXERTEMPLATE_CYC3: break;
-    }
 }
 
 static const char *scalestring_cb(guiObject_t *obj, const void *data)

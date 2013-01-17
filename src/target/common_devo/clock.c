@@ -143,6 +143,7 @@ void CLOCK_ResetWatchdog()
 }
 void CLOCK_StopTimer() {
     timer_disable_irq(TIM4, TIM_DIER_CC1IE);
+    timer_callback = NULL;
 }
 
 void tim4_isr()

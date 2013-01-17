@@ -503,7 +503,7 @@ static void bind()
 static void initialize()
 {
     CLOCK_StopTimer();
-    CYRF_Initialize();
+    CYRF_Reset();
     cyrf_init();
     CYRF_ConfigRxTx(1);
     set_radio_channels();

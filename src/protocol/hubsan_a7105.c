@@ -256,7 +256,7 @@ static u16 hubsan_cb()
 
 static void initialize() {
     CLOCK_StopTimer();
-    A7105_Initialize();
+    A7105_Reset();
     hubsan_init();
     sessionid = rand();
     channel = allowed_ch[rand() % sizeof(allowed_ch)];
