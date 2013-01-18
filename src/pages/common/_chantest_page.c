@@ -24,6 +24,8 @@ static guiObject_t *_get_obj(int chan, int objid);
 enum {
     ITEM_GRAPH,
     ITEM_VALUE,
+    ITEM_GRAPH2,
+    ITEM_VALUE2,
 };
 
 const char *lockstr_cb(guiObject_t *obj, const void *data)

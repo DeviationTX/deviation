@@ -53,10 +53,11 @@ static void draw_chan(long ch, int row, int y)
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
-    if(col == ITEM_GRAPH) {
-        return (guiObject_t *)&gui->bar[relrow];
-    } else {
-        return (guiObject_t *)&gui->value[relrow];
+    switch(col) {
+        case ITEM_GRAPH:  return (guiObject_t *)&gui->bar[2*relrow];
+        case ITEM_GRAPH2: return (guiObject_t *)&gui->bar[2*relrow+1];
+        case ITEM_VALUE2: return (guiObject_t *)&gui->value[2*relrow+1];
+        default:          return (guiObject_t *)&gui->value[2*relrow];
     }
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -184,5 +185,5 @@ void _handle_button_test() {}
 
 static inline guiObject_t *_get_obj(int chan, int objid)
 {
-    return GUI_GetScrollableObj(&gui->scrollable, chan, objid);
+    return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
