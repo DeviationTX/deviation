@@ -32,15 +32,11 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
-#if 0
+
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                   GPIO6 | GPIO7 | GPIO8 | GPIO9
-                   | GPIO10 | GPIO11 | GPIO12 | GPIO13);
-    gpio_set(GPIOC,
-                   GPIO6 | GPIO7 | GPIO8 | GPIO9
-                   | GPIO10 | GPIO11 | GPIO12 | GPIO13);
-#endif
+                   GPIO10 | GPIO11);
+    gpio_set(GPIOC, GPIO10 | GPIO11);
 }
 
 s32 CHAN_ReadRawInput(int channel)
