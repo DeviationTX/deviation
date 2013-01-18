@@ -36,8 +36,9 @@ u8 BATTERY_Check();
 int main() {
     
     Init();
+#ifndef MODULAR
     Banner();
-
+#endif
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 
     LCD_Clear(0x0000);
@@ -67,7 +68,7 @@ int main() {
     PAGE_Init();
     
     CLOCK_StartWatchdog();
-    
+
     priority_ready = 0;
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
     CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
@@ -96,25 +97,28 @@ void Init() {
     CLOCK_Init();
     UART_Initialize();
     Initialize_ButtonMatrix();
+    SPIFlash_Init(); //This must come before LCD_Init() for 7e
 
     LCD_Init();
     CHAN_Init();
 
-    SPIFlash_Init();
-    CYRF_Initialize();
-#ifdef PROTO_HAS_A7105
-    A7105_Initialize();
-#endif
     SPITouch_Init();
     SOUND_Init();
     BACKLIGHT_Init();
     BACKLIGHT_Brightness(1);
     AUTODIMMER_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+    SPI_ProtoInit();
+#ifdef MODULAR
+    //Force protocol to none to initialize RAM
+    Model.protocol = PROTOCOL_NONE;
+    PROTOCOL_Init(1);
+#endif
 }
 
 void Banner()
 {
+    CYRF_Reset();
     u8 Power = CYRF_MaxPower();
     u8 mfgdata[6];
     u8 tmp[12];

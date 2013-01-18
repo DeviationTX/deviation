@@ -12,6 +12,11 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/timer.h>
@@ -124,3 +129,4 @@ void tim1_up_isr()
         timer_disable_counter(TIM1);
 }
 #endif
+#pragma long_calls_off

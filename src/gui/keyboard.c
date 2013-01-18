@@ -52,20 +52,16 @@ static const char * const numpad[] = {
 };
 static const char * const * const array[] = { alpha, numpad, mixed };
 
-guiObject_t *GUI_CreateKeyboard(enum KeyboardType type, char *text, s32 max_size,
+guiObject_t *GUI_CreateKeyboard(guiKeyboard_t *keyboard, enum KeyboardType type, char *text, s32 max_size,
         void (*CallBack)(struct guiObject *obj, void *data), void *cb_data)
 {
-    struct guiObject   *obj = GUI_GetFreeObj();
-    struct guiKeyboard *keyboard;
-
-    if (obj == NULL)
-        return NULL;
+    struct guiObject   *obj = (guiObject_t *)keyboard;
+    CLEAR_OBJ(keyboard);
 
     obj->Type = Keyboard;
     OBJ_SET_MODAL(obj, 1);
     connect_object(obj);
 
-    keyboard = &obj->o.keyboard;
     keyboard->type = type;
     keyboard->text = text;
     keyboard->flags = FLAG_BUTTON;
@@ -277,7 +273,7 @@ static char keyboard_cmd(enum DrawCmds cmd, struct guiKeyboard *keyboard, struct
 void GUI_DrawKeyboard(struct guiObject *obj)
 {
 #define FILL  Display.keyboard.fill_color  //RGB888_to_RGB565(0x6b, 0x73, 0x80)
-    struct guiKeyboard *keyboard = &obj->o.keyboard;
+    struct guiKeyboard *keyboard = (struct guiKeyboard *)obj;
 
     LCD_Clear(FILL);
     keyboard_cmd(KB_DRAW, keyboard, NULL);
@@ -287,7 +283,7 @@ void GUI_DrawKeyboard(struct guiObject *obj)
 
 u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
 {
-    struct guiKeyboard *keyboard = &obj->o.keyboard;
+    struct guiKeyboard *keyboard = (struct guiKeyboard *)obj;
     if (coords && ! press_type && (! keyboard->lastchar || (keyboard->flags & FLAG_BUTTON))) {
         char c = keyboard_cmd(KB_COMPARE_AND_PRESS, keyboard, coords);
         keyboard->flags &= ~FLAG_BUTTON;
@@ -366,7 +362,7 @@ static void navigate_item(struct guiKeyboard *keyboard, short leftRight, short u
 static u8 press_cb(u32 button, u8 flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
-    struct guiKeyboard *keyboard = &obj->o.keyboard;
+    struct guiKeyboard *keyboard = (struct guiKeyboard *)obj;
     (void)data;
     if (flags & BUTTON_PRESS || flags & BUTTON_LONGPRESS) {
         if ( flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_ENTER) && keyboard->lastchar == '\x08') {

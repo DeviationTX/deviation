@@ -19,9 +19,15 @@ typedef uint64_t u64;
 
 extern volatile s16 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[32];
+
 /* Temproary definition until we have real translation */
 #define _tr_noop(x) x
+#ifdef NO_LANGUAGE_SUPPORT
+#define _tr(x) x
+#else
 const char *_tr(const char *str);
+#endif
+
 void CONFIG_ReadLang(u8 idx);
 void CONFIG_EnableLanguage(int state);
 int CONFIG_IniParse(const char* filename,

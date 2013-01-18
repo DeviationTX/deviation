@@ -14,6 +14,7 @@
  */
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
+#define gui (&gui_objs.u.stdcurve)
 
 static PitThroMode pit_mode = PITTHROMODE_NORMAL;
 static CurvesMode curve_mode;
@@ -32,13 +33,13 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
     u8 i;
     if (changed) {
         if (pit_mode == PITTHROMODE_HOLD)
-            GUI_SetHidden(mp->itemObj[9], 0);
+            GUI_SetHidden((guiObject_t *)&gui->hold, 0);
         else
-            GUI_SetHidden(mp->itemObj[9],  1);
+            GUI_SetHidden((guiObject_t *)&gui->hold,  1);
         update_textsel_state();
-        GUI_Redraw(mp->graphs[0]);
+        GUI_Redraw(&gui->graph);
         for ( i = 0; i < 9; i++)
-            GUI_Redraw(mp->itemObj[i]);
+            GUI_Redraw(&gui->val[i]);
     }
     strcpy(mp->tmpstr, (const char *)SIMPLEMIX_ModeName(pit_mode));
     return mp->tmpstr;
@@ -64,9 +65,9 @@ static void set_hold_state(u8 state) {
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
         mp->mixer_ptr[PITTHROMODE_HOLD] = &mp->mixer[3];
     }
-    GUI_Redraw(mp->graphs[0]);
+    GUI_Redraw(&gui->graph);
     for (u8 i = 0; i < 9; i++)
-        GUI_Redraw(mp->itemObj[i]);
+        GUI_Redraw(&gui->val[i]);
 }
 
 static const char *set_holdstate_cb(guiObject_t *obj, int dir, void *data)
@@ -109,13 +110,13 @@ static void auto_generate_cb(guiObject_t *obj, const void *data)
                 u16 x_diff =  x_end - x_start;
                 for (j = x_start + 1; j < x_end; j++) {
                     curve->points[j] = y_diff * (j - x_start)/x_diff + curve->points[x_start];
-                    GUI_Redraw(mp->itemObj[j]);
+                    GUI_Redraw(&gui->val[j]);
                 }
             }
             x_start = x_end; // no need to calculate
         }
     }
-    GUI_Redraw(mp->graphs[0]);
+    GUI_Redraw(&gui->graph);
 }
 
 static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
@@ -128,7 +129,7 @@ static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
         u8 changed = 1;
         curve->points[point_num] = GUI_TextSelectHelper(curve->points[point_num], -100, 100, dir, 1, LONG_PRESS_STEP, &changed);
         if (changed)
-            GUI_Redraw(mp->graphs[0]);
+            GUI_Redraw(&gui->graph);
     }
     sprintf(mp->tmpstr, "%d", curve->points[point_num]);
     return mp->tmpstr;
@@ -165,13 +166,15 @@ void PAGE_CurvesEvent()
     //if (event_interval++ <EVENT_REFRESH_INTERVAL) // reduce the refresh frequency
     //    return;
     event_interval = 0;
-    if (mp->graphs[0]) {
+    if (OBJ_IS_USED(&gui->graph)) {
         if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
-            GUI_Redraw(mp->graphs[0]);
+            GUI_Redraw(&gui->graph);
+/*
             if (mp->graphs[1])
                 GUI_Redraw(mp->graphs[1]);
             if (mp->graphs[2])
                 GUI_Redraw(mp->graphs[2]);
+*/
         }
     }
 }

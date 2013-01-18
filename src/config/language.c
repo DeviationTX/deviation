@@ -18,6 +18,16 @@
 #include "tx.h"
 #include "ini.h"
 
+#ifdef NO_LANGUAGE_SUPPORT
+int CONFIG_IniParse(const char* filename,
+         int (*handler)(void*, const char*, const char*, const char*),
+         void* user)
+{
+    return ini_parse(filename, handler, user);
+}
+void CONFIG_ReadLang(u8 idx) {(void)idx;}
+void CONFIG_EnableLanguage(int state) {(void)state;}
+#else
 u16 fnv_16_str(const char *str);
 static char strings[8192];
 #define MAX_STRINGS 300
@@ -229,3 +239,4 @@ u16 fnv_16_str(const char *str)
     /* return our new hash value */
     return hval;
 }
+#endif

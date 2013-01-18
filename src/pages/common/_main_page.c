@@ -14,6 +14,7 @@
  */
 
 static struct main_page * const mp = &pagemem.u.main_page;
+#define gui (&gui_objs.u.mainpage)
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
@@ -90,60 +91,60 @@ void PAGE_MainEvent()
         return;
     }
     for(i = 0; i < 6; i++) {
-        if (! mp->trimObj[i])
+        if (! OBJ_IS_USED(&gui->trim[i]))
             continue;
         if (mp->trims[i] != Model.trims[i].value) {
             mp->trims[i] = Model.trims[i].value;
-            GUI_Redraw(mp->trimObj[i]);
+            GUI_Redraw(&gui->trim[i]);
         }
     }
     for(i = 0; i < 8; i++) {
-        if (! mp->boxObj[i])
+        if (! OBJ_IS_USED(&gui->box[i]))
             continue;
         s32 val = get_boxval(Model.pagecfg.box[i]);
         if (Model.pagecfg.box[i] <= NUM_TIMERS) {
             if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
                 //Timer
-                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, val < 0));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, val < 0));
                 mp->boxval[i] = val;
-                GUI_Redraw(mp->boxObj[i]);
+                GUI_Redraw(&gui->box[i]);
             } else if (mp->boxval[i] / 1000 != val /1000) {
                 mp->boxval[i] = val;
-                GUI_Redraw(mp->boxObj[i]);
+                GUI_Redraw(&gui->box[i]);
             }
         } else if (Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM) {
             u32 time = CLOCK_getms();
             if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
                 clear_time = 1;
-                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 1));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, 1));
             } else if(Telemetry.time[0] && mp->boxval[i] != val) {
-                GUI_SetLabelDesc(mp->boxObj[i], get_box_font(i, 0));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, 0));
                 mp->boxval[i] = val;
-                GUI_Redraw(mp->boxObj[i]);
+                GUI_Redraw(&gui->box[i]);
             }
         } else if (mp->boxval[i] != val) {
             mp->boxval[i] = val;
-            GUI_Redraw(mp->boxObj[i]);
+            GUI_Redraw(&gui->box[i]);
         }
     }
     if (clear_time)
         Telemetry.time[0] = 0;
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < 8; i++) {
-        if (! mp->barObj[i])
+        if (! OBJ_IS_USED(&gui->bar[i]))
             continue;
         s16 chan = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
         if (mp->barval[i] != chan) {
             mp->barval[i] = chan;
-            GUI_Redraw(mp->barObj[i]);
+            GUI_Redraw(&gui->bar[i]);
         }
     }
     for(i = 0; i < 4; i++) {
-        if (! mp->toggleObj[i])
+        if (! OBJ_IS_USED(&gui->toggle[i]))
             continue;
         u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);
         s16 val = raw[src];
-        GUI_SetHidden(mp->toggleObj[i], MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
+        GUI_SetHidden((guiObject_t *)&gui->toggle[i], MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
     }
     _check_voltage();
 }

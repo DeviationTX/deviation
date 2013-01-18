@@ -40,14 +40,17 @@ void PAGE_MixerEvent();
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
+void PAGE_TrimExit();
 
 /* Timer */
 void PAGE_TimerInit(int page);
 void PAGE_TimerEvent();
+void PAGE_TimerExit();
 
 /* Model */
 void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
+void PAGE_ModelExit();
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 void MODELPAGE_Config();
 void MODELPROTO_Config();
@@ -82,6 +85,7 @@ void LANGPage_Select(void(*return_page)(int page));
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
+void PAGE_MainCfgExit();
 
 /* Telemetry Test */
 void PAGE_TelemtestInit(int page);
@@ -91,6 +95,7 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page);
 /* Telemetry Config */
 void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
+void PAGE_TelemconfigExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
@@ -100,6 +105,7 @@ u8 PAGE_TelemStateCheck(char *str, int strlen);
 void PAGE_ModelMenuInit(int page);
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
+void PAGE_TravelAdjExit();
 void PAGE_PitCurvesInit(int page);
 void PAGE_ThroCurvesInit(int page);
 void PAGE_SubtrimInit(int page);

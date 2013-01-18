@@ -91,6 +91,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     pages[cur_page].init(menuPage);
 }
 
+static guiLabel_t headerLabel;
 void PAGE_ShowHeader(const char *title)
 {
     struct LabelDesc labelDesc;
@@ -98,7 +99,7 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
@@ -108,7 +109,7 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(0, 0, width, height, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
@@ -120,6 +121,7 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
 void PAGE_RemoveAllObjects()
 {
     GUI_RemoveAllObjects();
+    memset(&gui_objs, 0, sizeof(gui_objs));
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)
@@ -132,36 +134,6 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     if (!result && ActionCB != NULL)
         result = ActionCB(button, flags, data);
     return result;
-}
-
-void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedIdx, s16 *view_origin_relativeY,
-        guiObject_t *scroll_bar)
-{
-    if (total_items == 0)
-        return;  // bug fix: avoid devided by 0
-    guiObject_t *obj;
-    for (u8 i = 0; i < (direction >0 ?direction:-direction); i++) {
-        obj = GUI_GetSelected();
-        if (direction > 0) {
-            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
-        } else {
-            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
-        }
-    }
-    *selectedIdx += direction;
-    *selectedIdx %= total_items;
-    if (*selectedIdx == 0) {
-        GUI_SetRelativeOrigin(view_id, 0, 0);
-    } else {
-        if (*selectedIdx < 0)
-            *selectedIdx = total_items + *selectedIdx;
-        obj = GUI_GetSelected();
-        if (!GUI_IsObjectInsideCurrentView(view_id, obj))
-            GUI_ScrollLogicalViewToObject(view_id, obj, direction);
-    }
-    *view_origin_relativeY = GUI_GetLogicalViewOriginRelativeY(view_id);
-    if (scroll_bar != NULL)
-        GUI_SetScrollbar(scroll_bar, *selectedIdx);
 }
 
 void PAGE_ChangeQuick(int dir)

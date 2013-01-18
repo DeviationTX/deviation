@@ -137,7 +137,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
         Model.pagecfg.toggle[i] = MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
         build_image();
     }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(Model.pagecfg.toggle[i]));
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(Model.pagecfg.toggle[i]));
     return INPUT_SourceName(str, Model.pagecfg.toggle[i]);
 }
 
@@ -283,34 +283,6 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
     }
     return 0;
 }
-static void draw_rect(enum MainWidget widget, const struct LabelDesc *desc)
-{
-    u16 x, y, w, h;
-    if (MAINPAGE_GetWidgetLoc(widget, &x, &y, &w, &h)) {
-        GUI_CreateRect(CALC_X(x), CALC_Y(y), CALC_W(w), CALC_H(h), desc);
-    }
-}
-static void build_image()
-{
-    if (LCD_DEPTH == 1)
-        return;
-    int i;
-    if(imageObj)
-       GUI_RemoveHierObjects(imageObj);
-    imageObj = GUI_CreateRect(IMAGE_X, IMAGE_Y, CALC_W(320), CALC_H(240-32), &outline);
-    for(i = TRIM1; i <= TRIM6; i++)
-        draw_rect(i, &fill_black);
-    for(i = TOGGLE1; i <= TOGGLE4; i++)
-        draw_rect(i, &fill_black);
-    for(i = BOX1; i <= BOX8; i++)
-        draw_rect(i, &fill_white);
-    draw_rect(MODEL_ICO, &fill_black);
-    for(i = BAR1; i <= BAR8; i++)
-        draw_rect(i, &fill_black);
-}
-
-
-
 void toggle_inv_cb(guiObject_t *obj, void *data)
 {
     if(MIXER_SRC(Model.pagecfg.toggle[(long)data])) {
@@ -318,7 +290,6 @@ void toggle_inv_cb(guiObject_t *obj, void *data)
         GUI_Redraw(obj);
     }
 }
-
 
 void PAGE_MainCfgInit(int page)
 {

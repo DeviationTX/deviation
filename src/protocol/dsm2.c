@@ -13,6 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DSM2_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include <stdlib.h>
 #include "common.h"
 #include "interface.h"
@@ -20,12 +26,17 @@
 #include "telemetry.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_DSM2;
+#endif
+
 #ifdef PROTO_HAS_CYRF6936
 #define RANDOM_CHANNELS 1
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
-static const char *dsm_opts[] = {
+static const char * const dsm_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
 };
@@ -374,6 +385,7 @@ static void parse_telemetry_packet()
     }
 }
 
+MODULE_CALLTYPE
 static u16 dsm2_cb()
 {
 #define CH1_CH2_DELAY 4010  // Time between write of channel 1 and channel 2
@@ -540,6 +552,7 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)9L;

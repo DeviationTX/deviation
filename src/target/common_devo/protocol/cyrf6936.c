@@ -12,10 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifdef MODULAR
+  #pragma long_calls
+#endif
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#pragma long_calls_off
 #include "protocol/interface.h"
 
 #define CS_HI() gpio_set(GPIOB, GPIO12)   
@@ -23,8 +27,19 @@
 #define RS_HI() gpio_set(GPIOB, GPIO11)
 #define RS_LO() gpio_clear(GPIOB, GPIO11)
 
-void Delay(uint32_t);
-
+void usleep(unsigned int x)
+{
+    (void)x;
+    asm ("mov r1, #24;"
+         "mul r0, r0, r1;"
+         "b _delaycmp;"
+         "_delayloop:"
+         "subs r0, r0, #1;"
+         "_delaycmp:;"
+         "cmp r0, #0;"
+         " bne _delayloop;");
+}
+#define Delay usleep
 void CYRF_WriteRegister(u8 address, u8 data)
 {
     CS_LO();
@@ -74,42 +89,9 @@ void CYRF_Reset()
 {
     /* Reset the CYRF chip */
     RS_HI();
-    Delay(50);
+    Delay(100);
     RS_LO();
-    Delay(50);
-}
-
-void CYRF_Initialize()
-{
-    /* Enable SPI2 */
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
-    /* Enable GPIOB */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
-
-    /* RESET, CS */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11 | GPIO12);
-    /* SCK, MOSI */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13 | GPIO15);
-    /* MISO */
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO14);
-    CS_HI();
-    RS_LO();
-
-    /* Includes enable? */
-    spi_init_master(SPI2, 
-                    SPI_CR1_BAUDRATE_FPCLK_DIV_16,
-                    SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, 
-                    SPI_CR1_DFF_8BIT,
-                    SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPI2);
-    spi_set_nss_high(SPI2);
-    spi_enable(SPI2);
-
-    CYRF_Reset();
+    Delay(100);
 }
 
 u8 CYRF_MaxPower()
@@ -207,14 +189,14 @@ void CYRF_ReadDataPacket(u8 dpbuffer[])
     ReadRegisterMulti(0x21, dpbuffer, 0x10);
 }
 
-void CYRF_WriteDataPacketLen(u8 dpbuffer[], u8 len)
+void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)
 {
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, len);
     CYRF_WriteRegister(0x02, 0x40);
     WriteRegisterMulti(0x20, dpbuffer, len);
     CYRF_WriteRegister(0x02, 0xBF);
 }
-void CYRF_WriteDataPacket(u8 dpbuffer[])
+void CYRF_WriteDataPacket(const u8 dpbuffer[])
 {
     CYRF_WriteDataPacketLen(dpbuffer, 16);
 }
@@ -278,3 +260,4 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     }
     CYRF_ConfigRxTx(1);
 }
+#pragma long_calls_off

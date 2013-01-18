@@ -14,6 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
+#define gui (&gui_objs.u.modelpage)
 static long callback_result; // Bug fix: u8 is a wrong data type, causing memory violation and unpredictable behavior in real devo10's modelname editing
 
 static void _changename_cb(guiObject_t *obj, const void *data);
@@ -30,6 +31,22 @@ static void file_press_cb(guiObject_t *obj, void *data);
 static void changeicon_cb(guiObject_t *obj, const void *data);
 
 static void _changename_done_cb(guiObject_t *obj, void *data);
+static guiObject_t *_get_obj(int type, int objid);
+
+enum {
+    ITEM_FILE,
+    ITEM_NAME,
+    ITEM_ICON,
+    ITEM_TYPE,
+    ITEM_TXPOWER,
+    ITEM_PROTO,
+    ITEM_FIXEDID,
+    ITEM_NUMCHAN,
+#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
+    ITEM_GUI,
+#endif
+    ITEM_LAST,
+};
 
 const char *show_text_cb(guiObject_t *obj, const void *data)
 {
@@ -89,7 +106,7 @@ static void fixedid_cb(guiObject_t *obj, const void *data)
     }
     PAGE_RemoveAllObjects();
     callback_result = 1;
-    GUI_CreateKeyboard(KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, &callback_result);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_NUM, mp->fixed_id, 999999, fixedid_done_cb, &callback_result);
 }
 
 static void bind_cb(guiObject_t *obj, const void *data)
@@ -104,7 +121,9 @@ static void bind_cb(guiObject_t *obj, const void *data)
 
 static void configure_bind_button()
 {
-    GUI_Redraw(mp->obj);
+    guiObject_t *obj = _get_obj(ITEM_PROTO, 1);
+    if(obj)
+        GUI_Redraw(obj);
     //GUI_SetHidden(mp->obj, PROTOCOL_AutoBindEnabled());
 }
 
@@ -114,7 +133,7 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, NULL);
-    GUI_TextSelectEnablePress(obj, Model.type == 0);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, Model.type == 0);
 
     switch (Model.type) {
         case 0: return _tr(HELI_LABEL);
@@ -155,12 +174,14 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         memset(Model.proto_opts, 0, sizeof(Model.proto_opts)); //This may cause an immediate change in behavior!
-        GUI_Redraw(mp->chanObj);
+        guiObject_t *obj = _get_obj(ITEM_NUMCHAN, 0);
+        if (obj)
+            GUI_Redraw(obj);
         if (Model.mixer_mode == MIXER_SIMPLE)
             SIMPLEMIXER_SetChannelOrderByProtocol();
         configure_bind_button();
     }
-    GUI_TextSelectEnablePress(obj, PROTOCOL_GetOptions() ? 1 : 0);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
     return ProtocolNames[Model.protocol];
 }
 void proto_press_cb(guiObject_t *obj, void *data)
@@ -213,13 +234,12 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
 static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
-    (void)obj;
     u8 changed = 0;
     Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
     if (changed && Model.mixer_mode == MIXER_SIMPLE) {
         if (!SIMPLEMIXER_ValidateTraditionModel()) {
             Model.mixer_mode = MIXER_ADVANCED;
-            PAGE_ShowInvalidSimpleMixerDialog(mp->telemStateObj);
+            PAGE_ShowInvalidSimpleMixerDialog(obj);
         } else {
             SIMPLEMIXER_SetChannelOrderByProtocol();
         }

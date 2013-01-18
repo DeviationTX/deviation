@@ -13,11 +13,7 @@ struct model_page {
     char iconstr[24];
     char fixed_id[7];
     u8 file_state;
-    guiObject_t *chanObj;
-    guiObject_t *telemStateObj;
 /*Load save */
-    guiObject_t *obj;
-    guiObject_t *scroll_bar;
     s8 selected;
     u8 total_items;
     void(*return_page)(int page);

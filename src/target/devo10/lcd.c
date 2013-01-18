@@ -68,8 +68,6 @@ void LCD_Contrast(u8 contrast)
 
 void LCD_Init()
 {
-    GUI_ViewInit();
-
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPEEN);
     rcc_peripheral_enable_clock(&RCC_AHBENR, RCC_AHBENR_FSMCEN);
@@ -195,22 +193,13 @@ void LCD_DrawStop(void)
 
 void LCD_DrawPixel(unsigned int color)
 {
-	u16 absolute_x0 = xpos;
-	u16 absolute_y0 = ypos;
-	// if x and y are relative coordinate and inside a logical view, convert them to absolute coordinates
-	// it they are absolute coordinate, just draw it as usual
-	if (GUI_IsLogicViewCoordinate(absolute_y0) || GUI_IsLogicViewCoordinate(absolute_x0)) {
-	    if (!GUI_IsCoordinateInsideLogicalView(&absolute_x0, &absolute_y0))
-	        return; // don't draw relative coordinate if it is outside the view;
-	}
+    int y = ypos;
+    int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
 
-    int y = absolute_y0;
-    int x = PHY_LCD_WIDTH - 1 - absolute_x0; //We want to map 0 -> 128 and 128 -> 0
-
-    if (absolute_y0 > 31)
-        y = absolute_y0 - 32;
+    if (ypos > 31)
+        y = ypos - 32;
     else
-        y = absolute_y0 + 32;
+        y = ypos + 32;
 
     
     int ycol = y / 8;

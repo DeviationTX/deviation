@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
+guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *graph, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
                       s16 (*Callback)(s16 xval, void *data),
@@ -26,15 +26,11 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data)
 {
-    struct guiObject  *obj   = GUI_GetFreeObj();
-    struct guiXYGraph *graph;
+    struct guiObject  *obj   = (guiObject_t *)graph;
     struct guiBox    *box;
-
-    if (obj == NULL)
-        return NULL;
+    CLEAR_OBJ(graph);
 
     box = &obj->box;
-    graph = &obj->o.xy;
 
     box->x = x;
     box->y = y;
@@ -62,7 +58,7 @@ guiObject_t *GUI_CreateXYGraph(u16 x, u16 y, u16 width, u16 height,
 void GUI_DrawXYGraph(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
-    struct guiXYGraph *graph = &obj->o.xy;
+    struct guiXYGraph *graph = (struct guiXYGraph *)obj;
     u32 x, y;
 
     #define VAL_TO_X(xval) \
@@ -137,7 +133,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
 
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press)
 {
-    struct guiXYGraph *graph = &obj->o.xy;
+    struct guiXYGraph *graph = (struct guiXYGraph *)obj;
     (void)long_press;
 
     if (graph->touch_cb) {

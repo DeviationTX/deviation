@@ -20,62 +20,13 @@
 #include "simple.h"
 #include "../../common/simple/_failsafe_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
-
-static s16 view_origin_relativeY;
-static s8 current_selected = 0;
-guiObject_t *scroll_bar;
-
+static const struct page_defs failsafe_defs = {
+    _tr_noop("Failsafe"),
+    set_failsafe_cb,
+    toggle_failsafe_cb,
+};
 void PAGE_FailSafeInit(int page)
 {
-    if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-        page = current_selected;
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    view_origin_relativeY = 0;
-    current_selected = 0;
-
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = 0;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH, LCD_HEIGHT - view_origin_absoluteY ,
-        view_origin_absoluteX, view_origin_absoluteY);
-
-    u8 row = 0;
-    u8 w = 59;
-    u8 x = 58;
-    for (u8 i = 0; i < Model.num_channels; i++) {
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, row),
-                0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, row),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_failsafe_cb, set_failsafe_cb, (void *)(long)i);
-        row += ITEM_SPACE;
-    }
-    GUI_Select1stSelectableObj();
-
-    // The following items are not draw in the logical view;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, 0, LCD_HEIGHT, Model.num_channels, NULL, NULL, NULL);
-    if (page > 0)
-        PAGE_NavigateItems(page, VIEW_ID,Model.num_channels, &current_selected, &view_origin_relativeY, scroll_bar);
-}
-
-static u8 _action_cb(u32 button, u8 flags, void *data)
-{
-    (void)data;
-    u8 total_items = GUI_GetScrollbarNumItems(scroll_bar);
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            PAGE_NavigateItems(-1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, total_items, &current_selected, &view_origin_relativeY, scroll_bar);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
+    (void)page;
+    SIMPLE_Init(&failsafe_defs);
 }

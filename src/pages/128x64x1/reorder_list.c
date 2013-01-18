@@ -18,8 +18,6 @@
 #include "gui/gui.h"
 
 #include "../common/_reorder_list.c"
-
-#define VIEW_ID 0
 static s8 current_selected = 0;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -66,37 +64,32 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     u8 y = 0;
     u8 w = 55;
 
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY =  0;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, w, LCD_HEIGHT , view_origin_absoluteX, view_origin_absoluteY);
-
-    guiObject_t *obj = GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2, ITEM_HEIGHT,
+    guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, 0, y, w/2 -2, ITEM_HEIGHT,
             &DEFAULT_FONT,  _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
     GUI_SetSelected(obj);
-    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, w/2), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2 , ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->down, w/2, y, w/2 -2 , ITEM_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
     y += space;
-    rl.textsel = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w, ITEM_HEIGHT,
+    GUI_CreateTextSelectPlate(&gui->value, 0, y, w, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, copy_val_cb, NULL);
     y += space;
-    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w, ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->apply, 0, y, w, ITEM_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
     if (max_allowed) {
         y += space;
-        GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y), w/2 -2, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, ITEM_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, w/2), GUI_MapToLogicalView(VIEW_ID, y), w/2 - 2, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->remove, w/2, y, w/2 - 2, ITEM_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
     y += space;
-    GUI_CreateButtonPlateText(GUI_MapToLogicalView(VIEW_ID, (w -30)/2), GUI_MapToLogicalView(VIEW_ID, y), 30, ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->save, (w -30)/2, y, 30, ITEM_HEIGHT,
         &DEFAULT_FONT, NULL, 0x0000, _okcancel_cb, (void *)_tr("Save"));
 
     u8 x = w + 4;
-    rl.listbox = GUI_CreateListBoxPlateText(x, 0, LCD_WIDTH - x , LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
+    GUI_CreateListBoxPlateText(&gui->list, x, 0, LCD_WIDTH - x , LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
         LISTBOX_KEY_RIGHTLEFT, string_cb, select_cb, NULL, NULL);
-    GUI_SetSelectable(rl.listbox, 0);
+    GUI_SetSelectable((guiObject_t *)&gui->list, 0);
 
     PAGE_SetActionCB(NULL);
     // we need to grab the key handler from the listbox to let rl.textsel catch left/right keys when it is selected
@@ -126,14 +119,14 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             BUTTON_UnregisterCallback(&action);
             GUI_RemoveAllObjects();
             rl.return_page(NULL);
-        } else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && (rl.textsel == GUI_GetSelected())) {
+        } else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && ((guiObject_t *)&gui->value == GUI_GetSelected())) {
             // catch the left/right keys when r1.textsel is selected
             copy_val_cb(NULL, 1, NULL);
-            GUI_Redraw(rl.textsel);
+            GUI_Redraw(&gui->value);
 
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)&& (rl.textsel == GUI_GetSelected())) {
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)&& ((guiObject_t *)&gui->value == GUI_GetSelected())) {
             copy_val_cb(NULL, -1, NULL);
-            GUI_Redraw(rl.textsel);
+            GUI_Redraw(&gui->value);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

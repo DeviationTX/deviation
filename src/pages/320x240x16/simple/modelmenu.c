@@ -17,6 +17,8 @@
 #include "../pages.h"
 #include "gui/gui.h"
 
+#define gui (&gui_objs.u.stdmenu)
+
 struct menu_s {
     u8 id;
     struct ImageMap icon;
@@ -67,7 +69,7 @@ void PAGE_ModelMenuInit(int page)
             if (pos >= count)
                 break;
             int x = 12 + i*60;
-            GUI_CreateIcon(x, y, &menus[pos].icon, ico_select_cb, (void *)pos);
+            GUI_CreateIcon(&gui->icon[pos], x, y, &menus[pos].icon, ico_select_cb, (void *)pos);
         }
     }
 }

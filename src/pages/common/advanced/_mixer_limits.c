@@ -12,9 +12,10 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-static guiObject_t *titleObj = NULL;
 static struct Limit origin_limit;
 
+#define gui (&gui_objs.u.advlimit)
+static guiObject_t *_get_obj(int idx, int objid);
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
@@ -29,6 +30,20 @@ static const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_failsafe_cb(guiObject_t *obj, void *data);
 static void update_safe_val_state();
 static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data);
+
+enum {
+    ITEM_REVERSE,
+    ITEM_FAILSAFE,
+    ITEM_SAFETY,
+    ITEM_SAFEVAL,
+    ITEM_MINLIMIT,
+    ITEM_MAXLIMIT,
+    ITEM_SCALEPOS,
+    ITEM_SCALENEG,
+    ITEM_SUBTRIM,
+    ITEM_SPEED,
+    ITEM_LAST,
+};
 
 void MIXPAGE_EditLimits()
 {
@@ -51,12 +66,14 @@ void sourceselect_cb(guiObject_t *obj, void *data)
 
 static void update_safe_val_state()
 {
+    guiObject_t *obj = _get_obj(ITEM_SAFEVAL, 0);
     if (!mp->limit.safetysw) {
-        GUI_TextSelectEnable(mp->safeValObj, 0);
+        if (obj)
+            GUI_TextSelectEnable((guiTextSelect_t *)obj, 0);
         mp->limit.safetyval = 0;
     }
-    else
-        GUI_TextSelectEnable(mp->safeValObj, 1);
+    else if (obj)
+        GUI_TextSelectEnable((guiTextSelect_t *)obj, 1);
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -69,7 +86,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     mp->are_limits_changed |= isCurrentItemChanged;
     update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
     MIXER_SET_SRC_INV(*source, is_neg);
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(*source));
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(mp->tmpstr, *source);
 }
 
@@ -124,8 +141,11 @@ const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data)
     if (isCurrentItemChanged) {
         *ptr = value;
         if (ptr == &mp->limit.servoscale) {
-            if (mp->limit.servoscale_neg == 0)
-                GUI_Redraw(mp->negscaleObj);
+            if (mp->limit.servoscale_neg == 0) {
+                guiObject_t *obj = _get_obj(ITEM_SCALENEG, 0);
+                if(obj)
+                    GUI_Redraw(obj);
+            }
         } else {
             if (value == mp->limit.servoscale)
                 *ptr = 0;
@@ -192,11 +212,11 @@ const char *reverse_cb(guiObject_t *obj, int dir, void *data)
     if (dir > 0 && ! (mp->limit.flags & CH_REVERSE)) {
         mp->limit.flags |= CH_REVERSE;
         mp->are_limits_changed |= 1;
-        GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+        GUI_Redraw(&gui->title);  // since changes are saved in live ,we need to redraw the title
     } else if (dir < 0 && (mp->limit.flags & CH_REVERSE)) {
         mp->limit.flags &= ~CH_REVERSE;
         mp->are_limits_changed |= 1;
-        GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+        GUI_Redraw(&gui->title);  // since changes are saved in live ,we need to redraw the title
     }
     return (mp->limit.flags & CH_REVERSE) ? _tr("Reversed") : _tr("Normal");
 }
@@ -209,6 +229,6 @@ void toggle_reverse_cb(guiObject_t *obj, void *data)
     mp->limit.flags = (mp->limit.flags & CH_REVERSE)
           ? (mp->limit.flags & ~CH_REVERSE)
           : (mp->limit.flags | CH_REVERSE);
-    GUI_Redraw(titleObj);  // since changes are saved in live ,we need to redraw the title
+    GUI_Redraw(&gui->title);  // since changes are saved in live ,we need to redraw the title
 }
 

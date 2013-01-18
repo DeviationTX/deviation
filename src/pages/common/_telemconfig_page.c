@@ -14,6 +14,9 @@
  */
 
 #define tp pagemem.u.telemconfig_page
+#define gui (&gui_objs.u.telemcfg)
+
+static guiObject_t *_get_obj(int idx, int objid);
 
 static u8 telem_state_check()
 {
@@ -38,7 +41,9 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
         0, TELEM_RPM2, dir, 1, 1, &changed);
     if (changed) {
-        GUI_Redraw(tp.valueObj[val]);
+        guiObject_t *valObj = _get_obj(val, 2);
+        if (valObj)
+            GUI_Redraw(valObj);
     }
     return TELEMETRY_ShortName(tp.str, Model.telem_alarm[val]);
 }

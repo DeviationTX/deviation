@@ -1,5 +1,9 @@
-#ifndef _DEVO8_TARGET_H_
-#define _DEVO8_TARGET_H_
+#ifndef _DEVO10_TARGET_H_
+#define _DEVO10_TARGET_H_
+
+#define VECTOR_TABLE_LOCATION 0x4000
+#define SPIFLASH_SECTOR_OFFSET 54
+#define SPIFLASH_SECTORS 1024
 
 #define MIN_BRIGHTNESS 0
 #define HAS_TOUCH 0
@@ -22,4 +26,4 @@
 #define INP_HAS_CALIBRATION 6
 
 #define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
-#endif //_DEVO8_TARGET_H_
+#endif //_DEVO10_TARGET_H_

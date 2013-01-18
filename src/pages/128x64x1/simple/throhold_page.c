@@ -19,7 +19,6 @@
 #include "config/model.h"
 #include "simple.h"
 #include "../../common/simple/_throhold_page.c"
-
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 static s8 current_selected = 0;
@@ -33,15 +32,15 @@ void PAGE_ThroHoldInit(int page)
     current_selected = 0;
 
     u8 y = 0;
-    GUI_CreateLabelBox(0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
     y += ITEM_SPACE;
     u8 w = 40;
-    GUI_CreateTextSelectPlate(40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->en, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
 
     y += ITEM_SPACE;
-    GUI_CreateLabelBox(0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
     y += ITEM_SPACE;
-    mp->itemObj[0] = GUI_CreateTextSelectPlate(40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->value, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
 
     GUI_Select1stSelectableObj();
 

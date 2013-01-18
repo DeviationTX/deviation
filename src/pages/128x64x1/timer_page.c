@@ -21,74 +21,65 @@
 #include "../common/_timer_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-#define VIEW_ID 0
-static s8 current_page = 0;
-static u8 view_height;
-static guiObject_t *scroll_bar;
+static u16 current_selected = 0;
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)relrow;
+    (void)data;
+    col = (3 + col) % 3;
+    if (col == 0)
+        return (guiObject_t *)&gui->type;
+    else if (col == 1)
+        return (guiObject_t *)&gui->src;
+    else
+        return (guiObject_t *)&gui->start;
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    (void)relrow;
+    u8 space = ITEM_HEIGHT + 5;
+    u8 w = 65;
+    u8 x = 55;
+    //Row 1
+    GUI_CreateLabelBox(&gui->name, 0, y,
+            0, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->type, x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
+
+    //Row 2
+    y += space;
+    GUI_CreateLabelBox(&gui->switchlbl, 0, y,
+            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch:"));
+    GUI_CreateTextSelectPlate(&gui->src, x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
+    //Row 3
+    y += space;
+    GUI_CreateLabelBox(&gui->startlbl, 0, y,
+            50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
+            ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+    GUI_CreateTextSelectPlate(&gui->start, x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
+
+    update_countdown(absrow);
+    return 3;
+}
 
 static void _show_page()
 {
     PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
     PAGE_SetActionCB(_action_cb);
-    u8 space = ITEM_HEIGHT + 5;
-    // create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    view_height = space * 3;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, view_height, view_origin_absoluteX, view_origin_absoluteY);
 
-    u8 y = 0;
-    u8 w = 65;
-    u8 x = 55;
-    for (u8 i = 0; i < NUM_TIMERS; i++) {
-        y = i * (space * 3);
-        //Row 1
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                0, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
-        guiObject_t *obj =GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
-        if (i == 0)
-            GUI_SetSelected(obj);
-
-        //Row 2
-        y += space;
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch:"));
-        GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)i);
-        //Row 3
-        y += space;
-        tp->startLabelObj[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-                50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
-                ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
-        tp->startObj[i] = GUI_CreateTextSelectPlate(GUI_MapToLogicalView(VIEW_ID, x), GUI_MapToLogicalView(VIEW_ID, y),
-                w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)i);
-
-        update_countdown(i);
-    }
-    space = ITEM_HEIGHT + 1;
-    scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, NUM_TIMERS, NULL, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                     LCD_HEIGHT - ITEM_HEIGHT -1, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
-static void _navigate_items(s8 direction)
+void PAGE_TimerExit()
 {
-    guiObject_t *obj = GUI_GetSelected();
-    if (direction > 0) {
-        GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
-    } else {
-        GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
-    }
-    obj = GUI_GetSelected();
-    if (!GUI_IsObjectInsideCurrentView(VIEW_ID, obj)) {
-        current_page = (current_page + direction)%NUM_TIMERS;
-        if (current_page < 0)
-            current_page = NUM_TIMERS -1; //rewind to last page
-        if (current_page == 0)
-            GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-        else
-            GUI_ScrollLogicalView(VIEW_ID, view_height);
-    }
-    GUI_SetScrollbar(scroll_bar, current_page);
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -97,10 +88,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            _navigate_items(-1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
-            _navigate_items(1);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

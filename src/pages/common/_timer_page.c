@@ -14,6 +14,7 @@
  */
 #include "mixer_simple.h"
 static struct timer_page * const tp = &pagemem.u.timer_page;
+#define gui (&gui_objs.u.timer)
 
 static void update_countdown(u8 idx);
 const char *timer_str_cb(guiObject_t *obj, const void *data);
@@ -38,8 +39,8 @@ void PAGE_TimerEvent()
 void update_countdown(u8 idx)
 {
     u8 hide = Model.timer[idx].type == TIMER_STOPWATCH;
-    GUI_SetHidden(tp->startObj[idx], hide);
-    GUI_SetHidden(tp->startLabelObj[idx], hide);
+    GUI_SetHidden((guiObject_t *)&gui->start, hide);
+    GUI_SetHidden((guiObject_t *)&gui->startlbl, hide);
 }
 
 const char *timer_str_cb(guiObject_t *obj, const void *data)
@@ -69,7 +70,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         timer->src = src;
         TIMER_Reset(idx);
     }
-    GUI_TextSelectEnablePress(obj, MIXER_SRC(src));
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(src));
     return INPUT_SourceName(tp->tmpstr, src);
 }
 

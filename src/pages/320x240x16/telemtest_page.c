@@ -24,27 +24,27 @@ static void show_page()
 {
     const u8 row_height = 20;
     for(long i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(10, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(&gui1->templbl[i], 10, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_TEMP1+i));
-        tp.temp[i] = GUI_CreateLabelBox(60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+        GUI_CreateLabelBox(&gui1->temp[i], 60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_TEMP1+i));
     }
     for(long i = 0; i < 3; i++) {
-        GUI_CreateLabelBox(110, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(&gui1->voltlbl[i], 110, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_VOLT1+i));
-        tp.volt[i] = GUI_CreateLabelBox(155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+        GUI_CreateLabelBox(&gui1->volt[i], 155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_VOLT1+i));
     }
     for(long i = 0; i < 2; i++) {
-        GUI_CreateLabelBox(210, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(&gui1->rpmlbl[i], 210, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_RPM1+i));
-        tp.rpm[i]  = GUI_CreateLabelBox(255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
+        GUI_CreateLabelBox(&gui1->rpm[i], 255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_RPM1+i));
     }
     for(long i = 0; i < 5; i++) {
-        GUI_CreateLabelBox(20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,
+        GUI_CreateLabelBox(&gui1->gpslbl[i], 20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
-        tp.gps[i]  = GUI_CreateLabelBox(100,  140 + i*row_height, 200, 16, &TELEM_ERR_FONT,
+        GUI_CreateLabelBox(&gui1->gps[i], 100,  140 + i*row_height, 200, 16, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
     }
     tp.telem = Telemetry;
@@ -59,7 +59,7 @@ void PAGE_TelemtestInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMMON));
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui1->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
         return;
     }
     show_page();
@@ -74,9 +74,12 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui1->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
         return;
     }
 
     show_page();
+}
+static inline guiObject_t *_get_obj(int idx, int objid) {
+    return (guiObject_t *)&gui1->gps[idx*2 + objid];
 }

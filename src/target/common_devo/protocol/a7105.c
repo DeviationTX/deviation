@@ -12,12 +12,19 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "protocol/interface.h"
 
+#ifdef PROTO_HAS_A7105
 #define CS_HI() gpio_set(GPIOA, GPIO13)   
 #define CS_LO() gpio_clear(GPIOA, GPIO13)
 
@@ -139,18 +146,5 @@ void A7105_Strobe(enum A7105_State state)
     CS_HI();
 }
 
-void A7105_Initialize()
-{
-    /* Enable SPI2 */
-    //rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
-    /* Enable GPIOA */
-    //rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
-
-    /* CS */
-    AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    CS_HI();
-
-    A7105_Reset();
-}
+#pragma long_calls_off
+#endif

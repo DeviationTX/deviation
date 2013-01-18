@@ -14,12 +14,14 @@
  */
 
 #include "common.h"
-#include "pages.h"
 #include "gui/gui.h"
+#include "pages.h"
 #include "config/model.h"
 #include "config/ini.h"
 
 #include "../common/_dialogs.c"
+
+#define gui (&gui_objs.dialog)
 
 void PAGE_ShowSafetyDialog()
 {
@@ -29,7 +31,7 @@ void PAGE_ShowSafetyDialog()
     if (dialog == NULL) {
         dlgstr[0] = 0;
         current_selected_obj = GUI_GetSelected();
-        dialog = GUI_CreateDialog(2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, dlgstr);
         return;
     }
     u64 unsafe = PROTOCOL_CheckSafe();
@@ -98,7 +100,7 @@ void PAGE_ShowBindingDialog(u8 update)
         GUI_Redraw(dialog);
     } else if(! dialog) {
         current_selected_obj = GUI_GetSelected();
-        dialog = GUI_CreateDialog(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -109,7 +111,7 @@ void PAGE_ShowLowBattDialog()
     strncpy(dlgstr, _tr("Battery too low,\ncan't save!"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
 
 const char *string_cb(guiObject_t *obj, void *data)
@@ -127,7 +129,7 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
 
     dlgstr[sizeof(dlgstr) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, string_cb,
+    dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, string_cb,
             invalid_simplemixer_cb, dtOkCancel, guiObj);
 }
 

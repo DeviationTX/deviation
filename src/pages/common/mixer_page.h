@@ -14,9 +14,6 @@ struct curve_edit {
     struct Curve *curveptr;
     void(*parent)(void);
     s8 pointnum;
-    guiObject_t *graph;
-    guiObject_t *value;
-    guiObject_t *pointsel;
 };
 
 struct mixer_page {
@@ -25,18 +22,22 @@ struct mixer_page {
     u8 top_channel;
     u8 max_scroll;
     guiObject_t *firstObj;
+/*
     guiObject_t *scroll_bar;
     guiObject_t *itemObj[NUM_OUT_CHANNELS *2 + NUM_VIRT_CHANNELS];
     guiObject_t *trimObj;
     guiObject_t *safeValObj;
     guiObject_t *expoObj[10];
     guiObject_t *negscaleObj;
+*/
     struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *mixer_ptr[4];
     struct Mixer *cur_mixer;
     struct Limit limit;
+/*
     guiObject_t *graphs[3];
     guiObject_t *bar;
+*/
     u8 channel;
     u8 num_mixers;
     u8 num_complex_mixers;
@@ -60,6 +61,7 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data);
 const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data);
 void MIXPAGE_ChangeTemplate(int show_header);
 void MIXPAGE_EditLimits();
+void MIXPAGE_RedrawGraphs();
 
 #endif
 

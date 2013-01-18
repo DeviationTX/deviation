@@ -43,6 +43,7 @@ void PAGE_MainInit(int page)
     int i;
     u16 x, y, w, h;
     memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
+    memset(gui, 0, sizeof(struct mainpage_obj));
     PAGE_SetModal(0);
     if (page == 1)
         PAGE_SetActionCB(_action_preview_cb);
@@ -55,7 +56,7 @@ void PAGE_MainInit(int page)
     //if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
     //    GUI_CreateIcon(32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
-    mp->nameObj = GUI_CreateLabelBox(0, 1, //64, 12,
+    GUI_CreateLabelBox(&gui->name, 0, 1, //64, 12,
             0, 0, &SMALL_FONT, NULL, NULL, Model.name);
 
     // Logo label
@@ -63,27 +64,25 @@ void PAGE_MainInit(int page)
 
     //heli/plane Icon
     if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateImageOffset(x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
+        GUI_CreateImageOffset(&gui->icon, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
 
     for(i = 0; i < 6; i++) {
         mp->trims[i] = Model.trims[i].value;
-        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            mp->trimObj[i] = GUI_CreateBarGraph(x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
-        else
-            mp->trimObj[i] = NULL;
+        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h)) {
+            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
+        }
     }
 
     // show thro , timer1 ,timer 2
     for(i = 0; i < 8; i++) {
         if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) { // i = 0, 1, 2
             mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
-            mp->boxObj[i] = GUI_CreateLabelBox(x, y, w, h,
+            GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
                                 get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
                                 show_box_cb, NULL,
                                 (void *)((long)Model.pagecfg.box[i]));
         } else { // i = 3 - 7
             mp->boxval[i] = 0;
-            mp->boxObj[i] = NULL;
         }
     }
 
@@ -94,16 +93,17 @@ void PAGE_MainInit(int page)
             u8 x1 = x + (w +2)* i;
             if(! Model.pagecfg.toggle[i])
                 LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
-            else
-                mp->toggleObj[i] = GUI_CreateLabelBox(x1 + 1 , y, w, h, &TINY_FONT, show_toggle_cb, NULL, (void *)(long)i);
+            else {
+                GUI_CreateLabelBox(&gui->toggle[i], x1 + 1 , y, w, h, &TINY_FONT, show_toggle_cb, NULL, (void *)(long)i);
+            }
             TINY_FONT.outline_color = old_color;
         }
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
-    mp->battObj = GUI_CreateLabelBox(88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->battery, 88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
     //TxPower
-    GUI_CreateLabelBox(88, 12,  //54,1,
+    GUI_CreateLabelBox(&gui->power, 88, 12,  //54,1,
             40, 8,&TINY_FONT, _power_to_string, NULL, NULL);
 }
 
@@ -115,13 +115,13 @@ static void _check_voltage()
         if (batt < Transmitter.batt_alarm) {
             enum LabelType oldStyle = TINY_FONT.style;  // bug fix
             TINY_FONT.style = LABEL_BLINK;
-            GUI_SetLabelDesc(mp->battObj, &TINY_FONT);
-            GUI_Redraw(mp->battObj);
+            GUI_SetLabelDesc(&gui->battery, &TINY_FONT);
+            GUI_Redraw(&gui->battery);
             TINY_FONT.style = oldStyle;
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;
-            GUI_Redraw(mp->battObj);
+            GUI_Redraw(&gui->battery);
         }
     }
 }

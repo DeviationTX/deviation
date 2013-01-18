@@ -21,11 +21,31 @@
 
 #include "../common/_lang_select.c"
 
-#define VIEW_ID 0
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_string_cb(guiObject_t *obj, const void *data);
-static s8 current_selected;
-static s16 view_origin_relativeY = 0;
+
+#define gui (&gui_objs.u.lang)
+void press_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    (void)press_type;
+    long idx = (long)data;
+    CONFIG_ReadLang(idx);
+    cp->return_page(0);
+}
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)col;
+    (void)data;
+    return  (guiObject_t *)&gui->label[relrow];
+}
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+            0, ITEM_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
+    return 1;
+}
 
 void LANGPage_Select(void(*return_page)(int page))
 {
@@ -33,7 +53,6 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(1);
     cp->return_page = return_page;
-    current_selected = 0; // don't use cp->selected
 
     PAGE_ShowHeader(_tr("Press ENT to change:"));
 
@@ -48,30 +67,9 @@ void LANGPage_Select(void(*return_page)(int page))
         }
         FS_CloseDir();
     }
-
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    u8 space = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH -5, LCD_HEIGHT - view_origin_absoluteY ,
-            view_origin_absoluteX, view_origin_absoluteY);
-    u8 y = 0;
-    guiObject_t *obj;
-    for (u8 i = 0; i < cp->total_items; i++) {
-        obj = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, 0), GUI_MapToLogicalView(VIEW_ID, y),
-            0, ITEM_HEIGHT, &DEFAULT_FONT, _string_cb, NULL, (void *)(long)i);
-        GUI_SetSelectable(obj, 1);
-        if (i == 0)
-            GUI_SetSelected(obj);
-        y += space;
-    }
-    //GUI_CreateListBox(112, 40, 200, 192, num_lang, cp->selected, string_cb, select_cb, NULL, NULL); */
-
-    // The following items are not draw in the logical view;
-    if (cp->total_items > PAGE_ITEM_MAX)
-        cp->scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, ITEM_HEIGHT, LCD_HEIGHT- ITEM_HEIGHT, cp->total_items, NULL, NULL, NULL);
-    if ( Transmitter.language > 0)
-        PAGE_NavigateItems(Transmitter.language, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                     ITEM_SPACE, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
 }
 
 const char *_string_cb(guiObject_t *obj, const void *data)
@@ -87,14 +85,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_TxConfigureInit(-1);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            CONFIG_ReadLang(current_selected);
-            cp->return_page(0);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            //_navigate_items(-1);
-            PAGE_NavigateItems(-1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            PAGE_NavigateItems(1, VIEW_ID, cp->total_items, &current_selected, &view_origin_relativeY, cp->scroll_bar);
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

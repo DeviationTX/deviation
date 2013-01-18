@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define gui (&gui_objs.u.advmixer)
+#define guim (&gui_objs.u.advmixcfg)
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, const void *data);
@@ -141,7 +143,6 @@ void PAGE_MixerInit(int page)
     memset(mp, 0, sizeof(*mp));
     mp->top_channel = page;
     show_chantest = 0;
-    mp->firstObj = NULL;
     _show_title(page);
     _show_page();
 }
@@ -170,15 +171,14 @@ void PAGE_MixerEvent()
     // bug fix: when entering chantest modal page from the mixer page, the mp structure might be set to wrong value
     // and will clear all limit data in devo8, simply because all structures inside the pagemem are unions and share the same memory
     _determine_save_in_live();
-    if (mp->cur_mixer && mp->graphs[0]) {
-        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
-            GUI_Redraw(mp->graphs[0]);
-            if (mp->graphs[1])
-                GUI_Redraw(mp->graphs[1]);
-            if (mp->graphs[2])
-                GUI_Redraw(mp->graphs[2]);
-            if (mp->bar)
-                GUI_Redraw(mp->bar);
+    if (mp->cur_mixer && ! mp->edit.parent) {
+        if (mp->cur_template == MIXERTEMPLATE_SIMPLE
+            || mp->cur_template == MIXERTEMPLATE_EXPO_DR
+            || mp->cur_template == MIXERTEMPLATE_COMPLEX)
+        {
+            if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+                MIXPAGE_RedrawGraphs();
+            }
         }
     }
 }

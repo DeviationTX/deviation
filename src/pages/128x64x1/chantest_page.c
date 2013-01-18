@@ -24,83 +24,73 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
-static void _navigate_items(s8 direction);
-#define VIEW_ID 0
 static s8 current_page = 0; // bug fix
-static u8 view_height;
-static guiObject_t *scroll_bar;
 
-static void _show_bar_page(u8 num_bars)
+static void draw_chan(long ch, int row, int y)
 {
-    current_page = 0;
-    int i;
-    if (num_bars > 18)
-        num_bars = 18;
-    cp->num_bars = num_bars;
-    memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-
-    GUI_CreateLabelBox(0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
-    labelDesc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
-    GUI_CreateRect(0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
-
-    u8 x = 0;
-    u8 height = 7;
-    u8 width = 59; // better to be even
-    u8 page_item_count = 8;
+    int x = ch%2 ? 63 : 0;
+    int idx = ch%2 ? 2*row + 1 : 2*row;
+    int height;
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = 12;
-        page_item_count = 6;
-        view_height = 51; // can only show 3 rows: (12 + 5) x 3
     } else {
         labelDesc.font = TINY_FONT.font;  // only digits, can use smaller font to show more channels
         height = 7;
-        page_item_count = 8;
-        view_height = 48; // can only show 4 rows: (7 + 5) x 4
     }
-    u8 space = height + 5;
-    s8 y = -space;
-    // Create a logical view
-    u8 view_origin_absoluteX = 0;
-    u8 view_origin_absoluteY = ITEM_HEIGHT + 1;
-    GUI_SetupLogicalView(VIEW_ID, 0, 0, LCD_WIDTH - ARROW_WIDTH,  // bug fix: should give space for scroll bar
-            view_height, view_origin_absoluteX, view_origin_absoluteY);
-
-    for(i = 0; i < num_bars; i++) {
-        if (i%2 ==0) {
-            x = 0;
-            y += space;
-        } else {
-            x = 63;
-        }
-        GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID,x) , GUI_MapToLogicalView(VIEW_ID, y),
-                0, height, &labelDesc, _channum_cb, NULL, (void *)(long)i);
-        cp->value[i] = GUI_CreateLabelBox(GUI_MapToLogicalView(VIEW_ID, x + 37), GUI_MapToLogicalView(VIEW_ID, y),
-                        23, height, &TINY_FONT, value_cb, NULL, (void *)((long)i));
-        cp->bar[i] = GUI_CreateBarGraph(GUI_MapToLogicalView(VIEW_ID, x) , GUI_MapToLogicalView(VIEW_ID, y + height),
-                width, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)((long)i));
-    }
-
-    u8 w = 10;
-    GUI_CreateLabelBox(LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
-    u8 total_items = num_bars/page_item_count;
-    if (num_bars%page_item_count!= 0)
-        total_items++;
-    if (total_items > 1)
-        scroll_bar = GUI_CreateScrollbar(LCD_WIDTH - ARROW_WIDTH, view_origin_absoluteY,
-                LCD_HEIGHT - view_origin_absoluteY, total_items, NULL, NULL, NULL);
-    else
-        scroll_bar = NULL;
+    GUI_CreateLabelBox(&gui->chan[idx], x, y,
+        0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
+    GUI_CreateLabelBox(&gui->value[idx], x+37, y,
+        23, height, &TINY_FONT, value_cb, NULL, (void *)ch);
+    GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
+        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
 
     // Bug fix: the labelDesc is shared in many pages, must reset it to DEFAULT_FONT after the page is drawn
     // Otherwise, page in other language will not display as only the DEFAULT_FONT supports multi-lang
     labelDesc.font = DEFAULT_FONT.font;
 }
 
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    if(col == ITEM_GRAPH) {
+        return (guiObject_t *)&gui->bar[relrow];
+    } else {
+        return (guiObject_t *)&gui->value[relrow];
+    }
+}
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    draw_chan(absrow*2, relrow, y);
+    if(absrow*2+1 < cp->num_bars)
+        draw_chan(absrow*2+1, relrow, y);
+    return 0;
+}
+
+static void _show_bar_page(u8 num_bars)
+{
+    current_page = 0;
+    if (num_bars > 18)
+        num_bars = 18;
+    cp->num_bars = num_bars;
+    memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
+    int view_height = (cp->type == MONITOR_RAWINPUT)
+                      ? 17   // can only show 3 rows: (12 + 5) x 3
+                      : 12;  // can only show 4 rows: (7 + 5) x 4
+    GUI_CreateLabelBox(&gui->title, 0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
+    labelDesc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
+    GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
+
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
+                         view_height, num_bars/2, row_cb, getobj_cb, NULL, NULL);
+    u8 w = 10;
+    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+}
+
 void PAGE_ChantestInit(int page)
 {
     (void)channum_cb; // remove compile warning as this method is not used here
-    (void)show_button_page; // to remove compile warning as this method is not used in devo10
     (void)okcancel_cb;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
@@ -114,7 +104,6 @@ void PAGE_ChantestInit(int page)
         cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
     }
-
 }
 
 void PAGE_ChantestModal(void(*return_page)(int page), int page)
@@ -123,23 +112,6 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     PAGE_ChantestInit(page);
     cp->return_page = return_page;
     cp->return_val = page;
-}
-
-static void _navigate_items(s8 direction)
-{
-    if (scroll_bar == NULL) // no page scroll
-        return;
-    current_page += direction;
-    u8 total_items = GUI_GetScrollbarNumItems(scroll_bar);
-    if (current_page <=0) {
-        current_page = 0;
-        GUI_SetRelativeOrigin(VIEW_ID, 0, 0);
-    } else if (current_page >= total_items)
-        current_page = total_items -1;
-    else {
-        GUI_ScrollLogicalView(VIEW_ID, direction* view_height);
-    }
-    GUI_SetScrollbar(scroll_bar, current_page);
 }
 
 static void _navigate_pages(s8 direction)
@@ -161,10 +133,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
                 PAGE_ChangeByID(PAGEID_TXCFG, -1);
             else
                 PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }  else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            _navigate_items(-1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_DOWN)) {
-            _navigate_items(1);
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
             _navigate_pages(1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
@@ -211,4 +179,10 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
         strcpy(cp->tmpstr, (const char *)"<-");
     }
     return cp->tmpstr;
+}
+void _handle_button_test() {}
+
+static inline guiObject_t *_get_obj(int chan, int objid)
+{
+    return GUI_GetScrollableObj(&gui->scrollable, chan, objid);
 }

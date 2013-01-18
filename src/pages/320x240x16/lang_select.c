@@ -21,6 +21,8 @@
 
 #include "../common/_lang_select.c"
 
+#define gui (&gui_objs.u.lang)
+
 static void select_cb(guiObject_t *obj, u16 sel, void *data)
 {
     (void)obj;
@@ -51,7 +53,7 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_SetModal(1);
     cp->return_page = return_page;
     PAGE_CreateCancelButton(112, 4, okcancel_cb);
-    GUI_CreateButton(216, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
+    GUI_CreateButton(&gui->ok, 216, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
     num_lang = 1;
     if (FS_OpenDir("language")) {
         char filename[13];
@@ -64,5 +66,5 @@ void LANGPage_Select(void(*return_page)(int page))
         FS_CloseDir();
     }
     cp->selected = Transmitter.language;
-    GUI_CreateListBox(112, 40, 200, 192, num_lang, cp->selected, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(&gui->listbox, 112, 40, 200, 192, num_lang, cp->selected, string_cb, select_cb, NULL, NULL);
 }

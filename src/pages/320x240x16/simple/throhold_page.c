@@ -20,6 +20,7 @@
 #include "simple.h"
 #include "../../common/simple/_throhold_page.c"
 
+#define gui (&gui_objs.u.stdthold)
 static void toggle_thold_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -36,9 +37,9 @@ void PAGE_ThroHoldInit(int page)
 {
     (void)page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROHOLD), MODELMENU_Show);
-    GUI_CreateLabelBox(30, 80, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelect(150, 80, TEXTSELECT_128, 0x0000, toggle_thold_cb, throhold_cb,  NULL);
+    GUI_CreateLabelBox(&gui->enlbl, 30, 80, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateTextSelect(&gui->en, 150, 80, TEXTSELECT_128, 0x0000, toggle_thold_cb, throhold_cb,  NULL);
 
-    GUI_CreateLabelBox(30, 120, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    mp->itemObj[0] = GUI_CreateTextSelect(150, 120, TEXTSELECT_128, 0x0000, NULL, holdpostion_cb,  NULL);
+    GUI_CreateLabelBox(&gui->valuelbl, 30, 120, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateTextSelect(&gui->value, 150, 120, TEXTSELECT_128, 0x0000, NULL, holdpostion_cb,  NULL);
 }

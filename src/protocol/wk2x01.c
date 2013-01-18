@@ -13,11 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define WK2x01_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_WK2801;
+#endif
 #include <stdlib.h>
 
 #ifdef PROTO_HAS_CYRF6936
@@ -59,7 +69,7 @@ static u8 *radio_ch_ptr;
 static u8 pkt_num;
 static u8 last_beacon;
 
-static const char *wk2601_opts[] = {
+static const char * const wk2601_opts[] = {
   _tr_noop("Chan mode"), _tr_noop("5+1"), _tr_noop("Heli"), _tr_noop("6+1"), NULL,
   _tr_noop("COL Inv"), _tr_noop("Normal"), _tr_noop("Inverted"), NULL,
   _tr_noop("COL Limit"), "-100", "100", NULL,
@@ -454,6 +464,7 @@ void WK_BuildPacket_2401()
     pkt_num = (pkt_num + 1) % 12;
 }
 
+MODULE_CALLTYPE
 static u16 wk_cb()
 {
     if (txState == 0) {
@@ -533,6 +544,7 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
         case PROTOCMD_BIND:  bind(); return 0;

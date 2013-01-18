@@ -12,11 +12,10 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+#define gui (&gui_objs.u.reorder)
 struct {
     void(*return_page)(u8 *);
     const char *(*text_cb)(u8 idx);
-    guiObject_t *listbox;
-    guiObject_t *textsel;
     u8 *list;
     u8 count;
     u8 selected;
@@ -44,9 +43,9 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     if(sel < rl.count)  {
         rl.copyto = sel;
         rl.selected = sel;
-        GUI_Redraw(rl.textsel);
+        GUI_Redraw(&gui->value);
     } else {
-        GUI_ListBoxSelect(rl.listbox, rl.selected);
+        GUI_ListBoxSelect(&gui->list, rl.selected);
     }
 }
 
@@ -70,7 +69,7 @@ void press_button_cb(guiObject_t *obj, const void *data)
             tmp = rl.list[rl.selected-1];
             rl.list[rl.selected-1] = rl.list[rl.selected];
             rl.list[rl.selected] = tmp;
-            GUI_ListBoxSelect(rl.listbox, rl.selected - 1);
+            GUI_ListBoxSelect(&gui->list, rl.selected - 1);
         }
         break;
     case MOVE_DOWN:
@@ -78,13 +77,13 @@ void press_button_cb(guiObject_t *obj, const void *data)
             tmp = rl.list[rl.selected+1];
             rl.list[rl.selected+1] = rl.list[rl.selected];
             rl.list[rl.selected] = tmp;
-            GUI_ListBoxSelect(rl.listbox, rl.selected + 1);
+            GUI_ListBoxSelect(&gui->list, rl.selected + 1);
         }
         break;
     case APPLY:
         if(rl.selected != rl.copyto)
             rl.list[rl.copyto] = rl.list[rl.selected];
-        GUI_Redraw(rl.listbox);
+        GUI_Redraw(&gui->list);
         break;
     case INSERT:
         if(rl.count < rl.max) {
@@ -92,7 +91,7 @@ void press_button_cb(guiObject_t *obj, const void *data)
                 rl.list[tmp] = rl.list[tmp-1];
             rl.count++;
             rl.list[rl.selected] = 255;
-            GUI_ListBoxSelect(rl.listbox, rl.selected + 1);
+            GUI_ListBoxSelect(&gui->list, rl.selected + 1);
         }
         break;
     case REMOVE:
@@ -103,7 +102,7 @@ void press_button_cb(guiObject_t *obj, const void *data)
             rl.count--;
             if(rl.selected == rl.count)
                 rl.selected--;
-            GUI_ListBoxSelect(rl.listbox, rl.selected);
+            GUI_ListBoxSelect(&gui->list, rl.selected);
         }
         break;
     }

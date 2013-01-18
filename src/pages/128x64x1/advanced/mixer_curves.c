@@ -19,12 +19,12 @@
 #include "../../common/advanced/_mixer_curves.c"
 
 static u8 action_cb(u32 button, u8 flags, void *data);
-static guiObject_t *saveButton;
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     if (curve->type < CURVE_EXPO)
         return;
+    GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
@@ -39,12 +39,12 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 
     labelDesc.style = LABEL_CENTER;
     u8 w = 60;
-    GUI_CreateTextSelectPlate(0, 0, w, ITEM_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->name, 0, 0, w, ITEM_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
     u8 x =40;
     w = 40;
-    saveButton = GUI_CreateButtonPlateText(LCD_WIDTH - w, 0, w, ITEM_HEIGHT,&labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, ITEM_HEIGHT,&labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
-    GUI_CreateRect(0, ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+    GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc);
 
     x = 0;
     u8 space = ITEM_HEIGHT + 1;
@@ -53,30 +53,30 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     labelDesc.style = LABEL_LEFTCENTER;
 
     if (curve->type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point:"));
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point:"));
         y += space;
         labelDesc.style = LABEL_CENTER;
-        edit->pointsel = GUI_CreateTextSelectPlate(x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_pointnum_cb, NULL);
+        GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_pointnum_cb, NULL);
     } else {
-        GUI_CreateLabelBox(x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg:"));
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg:"));
         y += space;
         labelDesc.style = LABEL_CENTER;
-        edit->pointsel = GUI_CreateTextSelectPlate(x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
+        GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
     }
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value:"));
+    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value:"));
     y += space;
     labelDesc.style = LABEL_CENTER;
-    edit->value = GUI_CreateTextSelectPlate(x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->value, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
 
-    edit->graph = GUI_CreateXYGraph(77, ITEM_HEIGHT +1, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, 77, ITEM_HEIGHT +1, 50, 50,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                               show_curve_cb, NULL, touch_cb, &edit->curve);
-    GUI_SetSelected(edit->pointsel);
+    GUI_SetSelected((guiObject_t *)&gui->point);
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)

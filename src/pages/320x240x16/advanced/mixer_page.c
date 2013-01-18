@@ -29,10 +29,10 @@ static void _show_title(int page)
                           Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE
                         : Model.num_channels + NUM_VIRT_CHANNELS;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MIXER));
-    GUI_CreateIcon(192, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
-    GUI_CreateIcon(224, 0, &icons[ICON_ORDER], reorder_cb, NULL);
-    guiObject_t *obj = GUI_CreateScrollbar(304, 32, 208, mp->max_scroll+1, NULL, scroll_cb, NULL);
-    GUI_SetScrollbar(obj, page);
+    GUI_CreateIcon(&gui->testico, 192, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    GUI_CreateIcon(&gui->reorderico, 224, 0, &icons[ICON_ORDER], reorder_cb, NULL);
+    GUI_CreateScrollbar(&gui->scroll, 304, 32, 208, mp->max_scroll+1, NULL, scroll_cb, NULL);
+    GUI_SetScrollbar(&gui->scroll, page);
 }
 
 static void _show_page()
@@ -54,27 +54,27 @@ static void _show_page()
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
         if (ch < NUM_OUT_CHANNELS)
-            obj = GUI_CreateButton(4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
+            obj = GUI_CreateButton(&gui->name[i].but, 4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
                                    0x0000, limitselect_cb, (void *)((long)ch));
         else
-            obj = GUI_CreateLabelBox(4, row, 64, 16, &DEFAULT_FONT,
+            obj = GUI_CreateLabelBox(&gui->name[i].lbl, 4, row, 64, 16, &DEFAULT_FONT,
                                    MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateButton(132, row, BUTTON_64x16, template_name_cb, 0x0000,
+        GUI_CreateButton(&gui->tmpl[i], 132, row, BUTTON_64x16, template_name_cb, 0x0000,
                          templateselect_cb, (void *)((long)ch));
         for (idx = 0; idx < NUM_MIXERS; idx++)
             if (mix[idx].src && mix[idx].dest == ch)
                 break;
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
-            GUI_CreateLabelBox(68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
+            GUI_CreateLabelBox(&gui->src[i], 68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
-                    GUI_CreateLabelBox(200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
+                    GUI_CreateLabelBox(&gui->sw1[i], 200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
                 }
                 if (mix[idx].src == mix[idx+2].src && mix[idx].dest == mix[idx+2].dest && mix[idx+2].sw) {
-                    GUI_CreateLabelBox(252, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
+                    GUI_CreateLabelBox(&gui->sw2[i], 252, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
                 }
             }
         }

@@ -14,6 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
+#define gui (&gui_objs.u.modelload)
 
 static void _show_buttons(int loadsave);
 static void _show_list(int loadsave, u8 num_models);
@@ -45,7 +46,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     (void)data;
     const char *ico;
     mp->selected = sel + 1;
-    if(! mp->obj)
+    if(! OBJ_IS_USED(&gui->image))
         return;
     if ((long)data == LOAD_ICON) {
         ico = CONFIG_GetIcon(mp->modeltype);
@@ -75,7 +76,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         else
             ico = CONFIG_GetIcon(mp->modeltype);
     }
-    GUI_ChangeImage(mp->obj, ico, 0, 0);
+    GUI_ChangeImage(&gui->image, ico, 0, 0);
 }
 static const char *string_cb(u8 idx, void *data)
 {
@@ -178,7 +179,6 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     mp->return_page = return_page;
-    mp->obj = NULL;
     _show_buttons(loadsave);
     if (loadsave == LOAD_TEMPLATE) { //Template
         if (FS_OpenDir("template")) {

@@ -13,11 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define PPMOUT_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_PPM;
+#endif
 #define PPMOUT_MAX_CHANNELS 10
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];
 u8 num_channels;
@@ -30,7 +40,7 @@ u8 num_channels;
 #ifndef EMULATOR
 #define BITBANG_PPM
 #endif
-static const char *ppm_opts[] = {
+static const char * const ppm_opts[] = {
   _tr_noop("Center PW"),  "1000", "1800", NULL,
   _tr_noop("Delta PW"),   "100", "700", NULL,
   _tr_noop("Notch PW"),   "100", "500", NULL,
@@ -57,6 +67,7 @@ static void build_data_pkt()
 }
 
 #ifdef BITBANG_PPM
+MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     static volatile u16 accum;
@@ -83,6 +94,7 @@ static u16 ppmout_cb()
     return val;
 }
 #else
+MODULE_CALLTYPE
 static u16 ppmout_cb()
 {
     build_data_pkt();
@@ -115,6 +127,7 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: PWM_Stop(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)PPMOUT_MAX_CHANNELS);

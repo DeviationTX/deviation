@@ -13,11 +13,20 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define J6PRO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_J6PRO;
+#endif
 #ifdef PROTO_HAS_CYRF6936
 
 //For Debug
@@ -63,6 +72,8 @@ static const u8 sopcodes[][8] = {
     {0x9E, 0x82, 0xDC, 0x3C, 0xA1, 0x78, 0xDC, 0x3C},
     {0x6F, 0x65, 0x18, 0x74, 0xB9, 0x8E, 0x19, 0x74},
 };
+const u8 bind_sop_code[] = {0x62, 0xdf, 0xc1, 0x49, 0xdf, 0xb1, 0xc0, 0x49};
+const u8 data_code[] = {0x02, 0xf9, 0x93, 0x97, 0x02, 0xfa, 0x5c, 0xe3, 0x01, 0x2b, 0xf1, 0xdb, 0x01, 0x32, 0xbe, 0x6f};
 
 static enum PktState state;
 static u8 packet[16];
@@ -130,7 +141,6 @@ static void cyrf_init()
        CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xee);
        CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
        CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);
-       const u8 data_code[] = {0x02, 0xf9, 0x93, 0x97, 0x02, 0xfa, 0x5c, 0xe3, 0x01, 0x2b, 0xf1, 0xdb, 0x01, 0x32, 0xbe, 0x6f};
        CYRF_ConfigDataCode(data_code, 16);
        CYRF_WritePreamble(0x023333);
 #ifndef USE_FIXED_MFGID
@@ -147,11 +157,10 @@ static void cyrf_bindinit()
 {
 /* Use when binding */
        //0.060470# 03 2f
-       u8 sop_code[] = {0x62, 0xdf, 0xc1, 0x49, 0xdf, 0xb1, 0xc0, 0x49};
        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x29);
 
        CYRF_ConfigRFChannel(0x52);
-       CYRF_ConfigSOPCode(sop_code);
+       CYRF_ConfigSOPCode(bind_sop_code);
        CYRF_ConfigCRCSeed(0x0000);
        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);
        CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
@@ -185,6 +194,7 @@ static void set_radio_channels()
     radio_ch[3] = radio_ch[0];
 }
 
+MODULE_CALLTYPE
 static u16 j6pro_cb()
 {
     switch(state) {
@@ -298,6 +308,7 @@ const void *J6PRO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;

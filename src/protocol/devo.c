@@ -13,11 +13,22 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
+
+#ifdef MODULAR
+  #pragma long_calls_off
+  const long protocol_type = PROTOCOL_DEVO;
+#endif
 
 #ifdef PROTO_HAS_CYRF6936
 
@@ -35,7 +46,7 @@
 
 #define TELEMETRY_ENABLE 0x30
 
-static const char *devo_opts[] = {
+static const char * const devo_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
@@ -387,7 +398,7 @@ void DEVO_BuildPacket()
     if(pkt_num == PKTS_PER_CHANNEL)
         pkt_num = 0;
 }
-
+MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
     if (txState == 0) {
@@ -446,6 +457,7 @@ static u16 devo_telemetry_cb()
     return delay;
 }
 
+MODULE_CALLTYPE
 static u16 devo_cb()
 {
     if (txState == 0) {
@@ -533,6 +545,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
         case PROTOCMD_BIND:  bind(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;

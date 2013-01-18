@@ -20,6 +20,8 @@
 #include "simple.h"
 #include "../../common/simple/_failsafe_page.c"
 
+#define gui (&gui_objs.u.stdchan)
+
 static void show_page(int page)
 {
     struct mixer_page * mp = &pagemem.u.mixer_page;
@@ -33,10 +35,10 @@ static void show_page(int page)
         if (ch >= Model.num_channels)
             break;
         MIXER_GetLimit(ch, &mp->limit);
-        guiObject_t *obj = GUI_CreateLabelBox(30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
+        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateTextSelect(150, row, TEXTSELECT_128, 0x0000, toggle_failsafe_cb, set_failsafe_cb, (void *)ch);
+        GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, 0x0000, toggle_failsafe_cb, set_failsafe_cb, (void *)ch);
     }
 }
 void PAGE_FailSafeInit(int page)
@@ -48,6 +50,6 @@ void PAGE_FailSafeInit(int page)
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;
     mp->firstObj = NULL;
-    GUI_CreateScrollbar(304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
     show_page(page);
 }

@@ -18,17 +18,13 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc)
+guiObject_t *GUI_CreateRect(guiRect_t *rect, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc)
 {
-    struct guiObject *obj = GUI_GetFreeObj();
-    struct guiRect   *rect;
+    struct guiObject *obj = (guiObject_t *)rect;
     struct guiBox    *box;
-
-    if (obj == NULL)
-        return NULL;
+    CLEAR_OBJ(rect);
 
     box = &obj->box;
-    rect = &obj->o.rect;
     box->x = x;
     box->y = y;
     box->width = width;
@@ -46,7 +42,7 @@ guiObject_t *GUI_CreateRect(u16 x, u16 y, u16 width, u16 height, const struct La
 
 void GUI_DrawRect(struct guiObject *obj)
 {
-    struct guiRect *rect = &obj->o.rect;
+    struct guiRect *rect = (struct guiRect *)obj;
     if (rect->desc.style == LABEL_TRANSPARENT) {
         GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
     } else {

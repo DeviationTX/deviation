@@ -20,6 +20,8 @@
 
 #include "../common/_chantest_page.c"
 
+static void show_button_page();
+
 static void _show_bar_page(u8 num_bars)
 {
     #define SEPERATION 32
@@ -39,22 +41,22 @@ static void _show_bar_page(u8 num_bars)
     u16 offset = (320 + (SEPERATION - 10) - SEPERATION * count) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
-        GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
+        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
                                       SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
-        cp->bar[i] = GUI_CreateBarGraph(offset + SEPERATION * i, 50, 10, height,
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)((long)i));
-        cp->value[i] = GUI_CreateLabelBox(offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
+        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)((long)i));
     }
     offset = (320 + (SEPERATION - 10) - SEPERATION * (num_bars - count)) / 2;
     for(i = count; i < num_bars; i++) {
-        GUI_CreateLabelBox(offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 - height,
+        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 - height,
                                       SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)((long)i));
-        cp->bar[i] = GUI_CreateBarGraph(offset + SEPERATION * (i - count), 229 - height, 10, height,
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * (i - count), 229 - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)((long)i));
-        cp->value[i] = GUI_CreateLabelBox(offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230,
+        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230,
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)((long)i));
     }
 }
@@ -100,4 +102,53 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
 
     _show_bar_page(Model.num_channels);
+}
+
+static void show_button_page()
+{
+    #define X_STEP 95
+    int i;
+    cp->is_locked = 3;
+    int y = 64;
+    GUI_CreateLabelBox(&gui->lock, 10, 40, 300, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
+    for (i = 0; i < NUM_TX_BUTTONS; i++) {
+        GUI_CreateLabelBox(&gui->chan[i], 10 + X_STEP * (i % 3), y, 0, 0,
+                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->value[i], 70 + X_STEP * (i % 3), y, 16, 16,
+                         &SMALLBOX_FONT, NULL, NULL, (void *)"");
+        if ((i % 3) == 2)
+            y += 24;
+    }
+}
+
+void _handle_button_test()
+{
+    if (cp->is_locked == 0 && SPITouch_IRQ()) {
+        BUTTON_RegisterCallback(&cp->action, 0xFFFFFFFF,
+               BUTTON_PRESS | BUTTON_RELEASE | BUTTON_LONGPRESS | BUTTON_PRIORITY,
+               button_capture_cb, NULL);
+        GUI_Redraw(&gui->lock); //Textbox
+        cp->is_locked++;
+    } else if (cp->is_locked == 1 && ! SPITouch_IRQ()) {
+        cp->is_locked++;
+    } else if (cp->is_locked == 2 && SPITouch_IRQ()) {
+        BUTTON_UnregisterCallback(&cp->action);
+        GUI_Redraw(&gui->lock); //Textbox
+        cp->is_locked++;
+    } else if (cp->is_locked == 3 && ! SPITouch_IRQ()) {
+        cp->is_locked = 0;
+    }
+    u32 buttons = ScanButtons();
+    for (int i = 0; i < NUM_TX_BUTTONS; i++) {
+        GUI_SetLabelDesc(&gui->value[i],
+               CHAN_ButtonIsPressed(buttons, i+1)
+               ? &SMALLBOXNEG_FONT
+               : &SMALLBOX_FONT);
+    }
+    return;
+}
+
+static inline guiObject_t *_get_obj(int chan, int objid)
+{
+    return objid == ITEM_GRAPH ? (guiObject_t *)&gui->bar[chan] : (guiObject_t *)&gui->value[chan];
 }

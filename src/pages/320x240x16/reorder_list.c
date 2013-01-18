@@ -55,14 +55,14 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     }
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     PAGE_CreateOkButton(264, 4, okcancel_cb);
-    GUI_CreateButton(8, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
-    GUI_CreateButton(8, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
+    GUI_CreateButton(&gui->up, 8, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
+    GUI_CreateButton(&gui->down, 8, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
 
-    rl.textsel = GUI_CreateTextSelect(8, 90, TEXTSELECT_96, 0x0000, NULL, copy_val_cb, NULL);
-    GUI_CreateButton(8, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
+    GUI_CreateTextSelect(&gui->value, 8, 90, TEXTSELECT_96, 0x0000, NULL, copy_val_cb, NULL);
+    GUI_CreateButton(&gui->apply, 8, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
     if (max_allowed) {
-        GUI_CreateButton(8, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButton(8, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
+        GUI_CreateButton(&gui->insert, 8, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
+        GUI_CreateButton(&gui->remove, 8, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
-    rl.listbox = GUI_CreateListBox(112, 40, 200, 192, rl.max, selected, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(&gui->list, 112, 40, 200, 192, rl.max, selected, string_cb, select_cb, NULL, NULL);
 }

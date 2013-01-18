@@ -22,36 +22,31 @@
 static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
 static u8 press_cb(u32 button, u8 flags, void *data);
 
-guiObject_t *GUI_CreateListBox(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+guiObject_t *GUI_CreateListBox(guiListbox_t *listbox, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(struct guiObject *obj, u16 selected, void *data),
         void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
         void *cb_data)
 {
-    guiObject_t *obj = GUI_CreateListBoxPlateText(x, y, width, height, item_count, selected, NULL, LISTBOX_KEY_RIGHTLEFT,
+    return GUI_CreateListBoxPlateText(listbox, x, y, width, height, item_count, selected, NULL, LISTBOX_KEY_RIGHTLEFT,
             string_cb, select_cb, longpress_cb, cb_data);
-    return obj;
 }
 
-guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
+guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *listbox, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const struct LabelDesc *desc, enum ListBoxNavigateKeyType keyType,
         const char *(*string_cb)(u8 idx, void *data),
         void (*select_cb)(struct guiObject *obj, u16 selected, void *data),
         void (*longpress_cb)(struct guiObject *obj, u16 selected, void *data),
         void *cb_data)
 {
-    struct guiObject  *obj = GUI_GetFreeObj();
-    struct guiListbox *listbox;
+    struct guiObject  *obj = (guiObject_t *)listbox;
     struct guiBox     *box;
     u16 text_w, text_h;
     s16 pos = 0;
     u8 sb_entries;
-
-    if (obj == NULL)
-        return NULL;
+    CLEAR_OBJ(listbox);
 
     box = &obj->box;
-    listbox = &obj->o.listbox;
 
     box->x = x;
     box->y = y;
@@ -104,16 +99,16 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
     // bug fix: the total items of scroll-bar is 0-based while devo10 is 1-based
     // 0-based for sum is not a good idea.
     sb_entries++;
-    listbox->scrollbar = GUI_CreateScrollbar(
+    GUI_CreateScrollbar(&listbox->scrollbar,
               x + width - ARROW_WIDTH,
               y,
               height,
               sb_entries,
               obj,
               scroll_cb, NULL);
-    GUI_SetScrollbar(listbox->scrollbar, pos);
+    GUI_SetScrollbar(&listbox->scrollbar, pos);
     if (listbox->item_count <= listbox->entries_per_page)
-        GUI_SetHidden(listbox->scrollbar, 1);
+        GUI_SetHidden((guiObject_t *)&listbox->scrollbar, 1);
     if (listbox->key_style == LISTBOX_KEY_RIGHTLEFT)
         BUTTON_RegisterCallback(&listbox->action,
                  CHAN_ButtonMask(BUT_LEFT)
@@ -131,9 +126,9 @@ guiObject_t *GUI_CreateListBoxPlateText(u16 x, u16 y, u16 width, u16 height, u8 
     return obj;
 }
 
-void GUI_ListBoxSelect(struct guiObject *obj, u16 selected)
+void GUI_ListBoxSelect(struct guiListbox *listbox, u16 selected)
 {
-    struct guiListbox *listbox = &obj->o.listbox;
+    guiObject_t *obj = (guiObject_t *)listbox;
     listbox->selected = selected;
     if (listbox->select_cb)
         listbox->select_cb(obj, (u16)selected, listbox->cb_data);
@@ -144,7 +139,7 @@ static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)data;
-    struct guiListbox *listbox = &parent->o.listbox;
+    struct guiListbox *listbox = (struct guiListbox *)parent;
     if (direction > 0) {
         s16 new_pos = (s16)listbox->cur_pos + (direction > 1 ? listbox->entries_per_page : 1);
         if (new_pos > listbox->item_count - listbox->entries_per_page)
@@ -172,12 +167,12 @@ static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 {
     u8 i;
-    struct guiListbox *listbox = &obj->o.listbox;
+    struct guiListbox *listbox = (struct guiListbox *)obj;
     unsigned int font;
     if (listbox->item_count <= listbox->entries_per_page)
-        GUI_SetHidden(listbox->scrollbar, 1);
+        GUI_SetHidden((guiObject_t *)&listbox->scrollbar, 1);
     else
-        GUI_SetHidden(listbox->scrollbar, 0);
+        GUI_SetHidden((guiObject_t *)&listbox->scrollbar, 0);
     if (listbox->style == LISTBOX_DEVO10) {
         font = listbox->desc.font;
    } else {
@@ -218,7 +213,7 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
 
 u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
 {
-    struct guiListbox *listbox = &obj->o.listbox;
+    struct guiListbox *listbox = (struct guiListbox *)obj;
     struct guiBox box;
     u8 i;
     box.x = obj->box.x;
@@ -247,7 +242,7 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
 static u8 press_cb(u32 button, u8 flags, void *data)
 {   // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN, so the listbox can change navigate key-sets now
     struct guiObject *obj = (struct guiObject *)data;
-    struct guiListbox *listbox = &obj->o.listbox;
+    struct guiListbox *listbox = (struct guiListbox *)obj;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         // devo10's right/left buttons are upside down compared with devo8's
         u8 move_down_button = BUT_RIGHT;
@@ -262,7 +257,7 @@ static u8 press_cb(u32 button, u8 flags, void *data)
             if (listbox->selected < listbox->item_count - 1) {
                 listbox->selected++;
                 if (listbox->selected >= listbox->cur_pos + listbox->entries_per_page)
-                    GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, 1, NULL));
+                    GUI_SetScrollbar(&listbox->scrollbar, scroll_cb(obj, 0, 1, NULL));
                 if (listbox->select_cb)
                     listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
                 OBJ_SET_DIRTY(obj, 1);
@@ -271,7 +266,7 @@ static u8 press_cb(u32 button, u8 flags, void *data)
             if (listbox->selected > 0) {
                 listbox->selected--;
                 if (listbox->selected < listbox->cur_pos)
-                    GUI_SetScrollbar(listbox->scrollbar, scroll_cb(obj, 0, -1, NULL));
+                    GUI_SetScrollbar(&listbox->scrollbar, scroll_cb(obj, 0, -1, NULL));
                 if (listbox->select_cb)
                     listbox->select_cb(obj, (u16)listbox->selected, listbox->cb_data);
                 OBJ_SET_DIRTY(obj, 1);
