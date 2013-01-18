@@ -95,3 +95,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+void update_countdown(u8 idx)
+{
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH;
+    GUI_SetHidden((guiObject_t *)&gui->start, hide);
+    GUI_SetHidden((guiObject_t *)&gui->startlbl, hide);
+}
