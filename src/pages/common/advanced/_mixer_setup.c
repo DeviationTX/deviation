@@ -384,10 +384,13 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         sync_mixers();
         if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
-            if(data == &mp->mixer[1].sw)
-                _update_rate_widgets(0);
-            else if(data == &mp->mixer[2].sw)
-                _update_rate_widgets(1);
+            // bug fix (issues #191) : only invoke _update_rate_widgets() for expo template
+            if (mp->cur_template == MIXERTEMPLATE_EXPO_DR) {
+                if(data == &mp->mixer[1].sw)
+                    _update_rate_widgets(0);
+                else if(data == &mp->mixer[2].sw)
+                    _update_rate_widgets(1);
+            }
         } else {    
             MIXPAGE_RedrawGraphs();
         }
