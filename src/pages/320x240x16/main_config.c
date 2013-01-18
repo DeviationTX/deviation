@@ -115,6 +115,7 @@ guiObject_t *firstObj;
 
 static void select_toggle_icon(u8 idx);
 static void iconpress_cb(guiObject_t *obj, const void *data);
+static void build_image(guiObject_t *obj, const void *data);
 
 #define MAX_PAGE 2 // bug fix: divided by 0 error; scroll bar is 1-based now
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
@@ -197,7 +198,7 @@ static void _show_page()
         }
         return;
     }
-    build_image();
+    GUI_CreateRectCB(&gui->rect, IMAGE_X, IMAGE_Y, CALC_W(320), CALC_H(240-32), &outline, build_image, NULL);
 }
 
 static void _show_title()
@@ -263,12 +264,11 @@ static void draw_rect(enum MainWidget widget, const struct LabelDesc *desc)
     }
 }
 
-static void build_image()
+static void build_image(guiObject_t *obj, const void *data)
 {
+    (void)obj;
+    (void)data;
     int i;
-    if(imageObj)
-       GUI_RemoveHierObjects(imageObj);
-    imageObj = GUI_CreateRect(&gui->rect, IMAGE_X, IMAGE_Y, CALC_W(320), CALC_H(240-32), &outline);
     for(i = TRIM1; i <= TRIM6; i++)
         draw_rect(i, &fill_black);
     for(i = TOGGLE1; i <= TOGGLE4; i++)
@@ -278,4 +278,8 @@ static void build_image()
     draw_rect(MODEL_ICO, &fill_black);
     for(i = BAR1; i <= BAR8; i++)
         draw_rect(i, &fill_black);
+}
+static void _update_preview()
+{
+    GUI_Redraw(&gui->rect);
 }

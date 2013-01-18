@@ -31,7 +31,7 @@ const struct {
     { BOX4567_X, BOX37_Y, BOX_W, BOX2367_H },
 };
 
-static void build_image();
+static void _update_preview();
 static void _show_page();
 static void _show_title();
 
@@ -42,7 +42,7 @@ const char *trimsel_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     Model.pagecfg.trims = GUI_TextSelectHelper(Model.pagecfg.trims, 0, 3, dir, 1, 1, &changed);   
     if (changed)
-        build_image();
+        _update_preview();
     switch(Model.pagecfg.trims) {
     case TRIMS_NONE :    return _tr("No Trims");
     case TRIMS_4OUTSIDE: return _tr("4 Outside");
@@ -66,7 +66,7 @@ const char *graphsel_cb(guiObject_t *obj, int dir, void *data)
         maxbar = 2;
     Model.pagecfg.barsize = GUI_TextSelectHelper(Model.pagecfg.barsize, 0, maxbar, dir, 1, 1, &changed);   
     if (changed)
-        build_image();
+        _update_preview();
     switch(Model.pagecfg.barsize) {
     case BARS_NONE: return _tr("No Bars");
     case BARS_4:    return _tr("4 Bars");
@@ -91,7 +91,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     int old_val = Model.pagecfg.box[i];
     Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
     if (changed && (old_val == 0 || Model.pagecfg.box[i] == 0))
-        build_image();
+        _update_preview();
     if (Model.pagecfg.box[i]) {
         if (Model.pagecfg.box[i] <= NUM_TIMERS)
             return TIMER_Name(str, Model.pagecfg.box[i] - 1);
@@ -115,7 +115,7 @@ const char *bartxtsel_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     Model.pagecfg.bar[i] = GUI_TextSelectHelper(Model.pagecfg.bar[i], 0, NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed)
-        build_image();
+        _update_preview();
     return INPUT_SourceName(str, Model.pagecfg.bar[i] ? Model.pagecfg.bar[i] + NUM_INPUTS : 0);
 }
 const char *toggle_sel_cb(guiObject_t *obj, const void *data)
@@ -135,7 +135,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
     val = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);   
     if (changed) {
         Model.pagecfg.toggle[i] = MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
-        build_image();
+        _update_preview();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(Model.pagecfg.toggle[i]));
     return INPUT_SourceName(str, Model.pagecfg.toggle[i]);

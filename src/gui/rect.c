@@ -40,6 +40,14 @@ guiObject_t *GUI_CreateRect(guiRect_t *rect, u16 x, u16 y, u16 width, u16 height
     return obj;
 }
 
+guiObject_t *GUI_CreateRectCB(guiRect_t *rect, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc, void (*Callback)(guiObject_t *, const void *), const void *data)
+{
+    guiObject_t *obj = GUI_CreateRect(rect, x, y, width, height, desc);
+    rect->CallBack = Callback;
+    rect->cbData = data;
+    return obj;
+}
+    
 void GUI_DrawRect(struct guiObject *obj)
 {
     struct guiRect *rect = (struct guiRect *)obj;
@@ -50,5 +58,8 @@ void GUI_DrawRect(struct guiObject *obj)
     }
     if (rect->desc.style == LABEL_TRANSPARENT || rect->desc.fill_color != rect->desc.outline_color) {
         LCD_DrawRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, rect->desc.outline_color);
+    }
+    if (rect->CallBack) {
+        rect->CallBack(obj, rect->cbData);
     }
 }

@@ -237,4 +237,4 @@ void PAGE_MainCfgExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
-void build_image() {}
+void _update_preview() {}

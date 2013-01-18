@@ -257,6 +257,8 @@ typedef struct guiTextSelect {
 typedef struct guiRect {
     struct guiHeader header;
     struct LabelDesc desc;
+    void (*CallBack)(guiObject_t *, const void *data);
+    const void *cbData;
 } guiRect_t;
 
 #define OBJ_IS_USED(x)        (((guiObject_t *)(x))->flags & 0x01) /* bool: UI element is in use */
@@ -411,6 +413,7 @@ void GUI_SetScrollbar(guiScrollbar_t *obj, u8 pos);
 u8 GUI_GetScrollbarNumItems(guiScrollbar_t *obj);
 
 guiObject_t *GUI_CreateRect(guiRect_t *, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc);
+guiObject_t *GUI_CreateRectCB(guiRect_t *, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc, void (*)(guiObject_t *, const void *), const void *);
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
 void GUI_TouchRelease();
