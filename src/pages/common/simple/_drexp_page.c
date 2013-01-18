@@ -21,7 +21,7 @@ typedef enum {
     DREXP_RUD,
 } DREXPType;
 static DREXPType drexp_type = DREXP_AIL;
-#define MAX_SCALAR 120
+#define MAX_SCALAR 125
 
 static void _refresh_page();
 

@@ -97,7 +97,7 @@ static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data)
         return "0";
     u8 isCurrentItemChanged = 0;
     // bug fix: safe value should be allow to over +/-100
-    mp->limit.safetyval = GUI_TextSelectHelper(mp->limit.safetyval, -120, 120, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
+    mp->limit.safetyval = GUI_TextSelectHelper(mp->limit.safetyval, -150, 150, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
     sprintf(mp->tmpstr, "%d", mp->limit.safetyval);
     return mp->tmpstr;
