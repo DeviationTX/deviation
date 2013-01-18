@@ -68,6 +68,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
     } else {
         GUI_RemoveHierObjects(mp->firstObj); 
     }
+    mp->firstObj = NULL;
     switch(mp->cur_template)  {
     case MIXERTEMPLATE_NONE:
     case MIXERTEMPLATE_CYC1:

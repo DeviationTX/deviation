@@ -122,7 +122,7 @@ static void _show_expo_dr()
 static void _show_complex()
 {
     //Row 1
-    if (! OBJ_IS_USED(&gui3->swlbl)) {
+    if (! mp->firstObj) {
         mp->firstObj = GUI_CreateLabel(&gui3->nummixlbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
         GUI_CreateTextSelect(&gui3->nummix, COL1_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, set_nummixers_cb, NULL);
         GUI_CreateLabel(&gui3->pagelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
