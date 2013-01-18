@@ -22,8 +22,14 @@ static const char *travelup_cb(guiObject_t *obj, int dir, void *data)
     u8 old_scale = Model.limits[ch].servoscale;
     u8 changed = 1;
     Model.limits[ch].servoscale = GUI_TextSelectHelper(Model.limits[ch].servoscale, 1, MAX_TRAVEL_LIMIT, dir, 1, LONG_PRESS_STEP, &changed);
-    if (changed && Model.limits[ch].servoscale_neg == 0)
-        Model.limits[ch].servoscale_neg = old_scale;  // bug fix: must make sure  scale- won't changed if scale+ is changed
+    if (changed) {
+        if (Model.limits[ch].servoscale > 150)
+            Model.limits[ch].max = Model.limits[ch].servoscale;
+        else
+            Model.limits[ch].max = 150;
+        if (Model.limits[ch].servoscale_neg == 0)
+            Model.limits[ch].servoscale_neg = old_scale;  // bug fix: must make sure  scale- won't changed if scale+ is changed
+    }
     sprintf(mp->tmpstr, "+%d", Model.limits[ch].servoscale);
     return mp->tmpstr;
 }
@@ -40,6 +46,10 @@ static const char *traveldown_cb(guiObject_t *obj, int dir, void *data)
     value = GUI_TextSelectHelper(value, min, -1, dir, 1, 5, &changed);
     if (changed) {
         Model.limits[ch].servoscale_neg = -value;
+        if (Model.limits[ch].servoscale_neg > 150)
+            Model.limits[ch].min = Model.limits[ch].servoscale_neg;
+        else
+            Model.limits[ch].min = 150;
         if (value == Model.limits[ch].servoscale)
             Model.limits[ch].servoscale_neg = 0;
     }

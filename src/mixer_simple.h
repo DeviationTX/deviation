@@ -23,7 +23,7 @@ typedef struct {
     u8 switches[3];
 } MappedSimpleChannels;
 
-#define MAX_TRAVEL_LIMIT 150
+#define MAX_TRAVEL_LIMIT 175
 #define PITCHMIXER_COUNT 4
 #define THROTTLEMIXER_COUNT 3
 #define DREXPMIXER_COUNT 3

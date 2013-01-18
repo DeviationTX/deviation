@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static struct mixer_page * const mp = &pagemem.u.mixer_page;
+
 void toggle_failsafe_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -34,6 +36,9 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     }
     if (!(Model.limits[ch].flags & CH_FAILSAFE_EN))
         return _tr("Off");
-    const char *str = PAGEMIXER_SetNumberCB(obj, dir, &(Model.limits[ch].failsafe));
-    return str;
+
+    Model.limits[ch].failsafe =
+            GUI_TextSelectHelper(Model.limits[ch].failsafe, -125, 125, dir, 1, LONG_PRESS_STEP, NULL);
+    sprintf(mp->tmpstr, "%d", Model.limits[ch].failsafe);
+    return mp->tmpstr;
 }

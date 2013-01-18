@@ -184,11 +184,12 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     if (!(mp->limit.flags & CH_FAILSAFE_EN))
         return _tr("Off");
-    s8 failsafe_oldValue = mp->limit.failsafe;
-    const char *str = PAGEMIXER_SetNumberCB(obj, dir, &mp->limit.failsafe);
-    if (failsafe_oldValue!= mp->limit.failsafe)
-        mp->are_limits_changed |= 1;
-    return str;
+    u8 isCurrentItemChanged = 0;
+    // bug fix: failsafe value should be allow to over +/-100
+    mp->limit.failsafe = GUI_TextSelectHelper(mp->limit.failsafe, -125, 125, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
+    mp->are_limits_changed |= isCurrentItemChanged;
+    sprintf(mp->tmpstr, "%d", mp->limit.failsafe);
+    return mp->tmpstr;
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)
