@@ -4,8 +4,8 @@ DFU_ARGS   := -c 8 -b 0x08004000
 
 include target/common_devo/Makefile.inc
 
-SRC_C   += $(wildcard target/$(TARGET)/*.c) \
-           target/devo8/backlight.c \
+ifndef BUILD_TARGET
+SRC_C   += target/devo8/backlight.c \
            target/devo8/lcd.c \
            target/devo8/tx_voltage.c
-
+endif

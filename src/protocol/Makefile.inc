@@ -1,15 +1,16 @@
 ifndef BUILD_TARGET
 
-ALL += $(ODIR)/protocol/devo.mod
-ALL += $(ODIR)/protocol/dsm2.mod
-ALL += $(ODIR)/protocol/dsmx.mod
-ALL += $(ODIR)/protocol/flysky.mod
-ALL += $(ODIR)/protocol/hubsan4.mod
-ALL += $(ODIR)/protocol/j6pro.mod
-ALL += $(ODIR)/protocol/ppm.mod
-ALL += $(ODIR)/protocol/wk2801.mod
-ALL += $(ODIR)/protocol/wk2601.mod
-ALL += $(ODIR)/protocol/wk2401.mod
+PROTO_MODULES += $(ODIR)/protocol/devo.mod
+PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
+PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
+PROTO_MODULES += $(ODIR)/protocol/flysky.mod
+PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
+PROTO_MODULES += $(ODIR)/protocol/j6pro.mod
+PROTO_MODULES += $(ODIR)/protocol/ppm.mod
+PROTO_MODULES += $(ODIR)/protocol/wk2801.mod
+PROTO_MODULES += $(ODIR)/protocol/wk2601.mod
+PROTO_MODULES += $(ODIR)/protocol/wk2401.mod
+ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
 	@echo Building 'devo' module
