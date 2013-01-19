@@ -38,6 +38,7 @@ sub read_map {
     my $start = 0;
     my $lastfile = "";
     while(<$fh>) {
+        s/\r//;
         if(! $start) {
            $start = 1 if(/Linker script and memory map/);
            next;
@@ -49,6 +50,7 @@ sub read_map {
             if(! /0x/) {
                 chomp;
                 $_ .= <$fh>;
+                s/\r//;
             }
             chomp;
             my($address, $obj) = (/^\s+\S+\s+(\S+)\s.*\s(\S+)$/);
