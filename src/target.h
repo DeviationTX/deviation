@@ -112,6 +112,7 @@ void SPIFlash_BulkErase();
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer);
 void SPIFlash_WriteByte(u32 writeAddress, const u8 byte);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
+int  SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
 void SPI_FlashBlockWriteEnable(u8 enable);
 
 /* Sound */

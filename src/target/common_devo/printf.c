@@ -17,16 +17,21 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+Code originally from: http://www.sparetimelabs.com/tinyprintf/index.html
 */
-#include <stdio.h>
-#include "printf.h"
-#include <libopencm3/stm32/usart.h>
+
+#define USE_OWN_PRINTF 0
+#include "common.h"
+#include <stdarg.h>
 
 typedef void (*putcf) (void*,char);
 
 #define stdout_putp NULL
 void stdout_putf (void *p, char c) {
     (void)p;
+    //if (c == '\n')
+    //    usart_send_blocking(USART1, '\r');
+    //usart_send_blocking(USART1, c);
     fputc(c, stdout);
 };
 void fputf (void *p, char c) {
@@ -71,9 +76,9 @@ static int a2d(char ch)
     else return -1;
     }
 
-static char a2i(char ch, char** src,int base,int* nump)
+static char a2i(char ch, const char** src,int base,int* nump)
     {
-    char* p= *src;
+    const char* p= *src;
     int num=0;
     int digit;
     while ((digit=a2d(ch))>=0) {
@@ -99,7 +104,7 @@ static void putchw(void* putp,putcf putf,int n, char z, char* bf)
         putf(putp,ch);
     }
 
-void tfp_format(void* putp,putcf putf,char *fmt, va_list va)
+void tfp_format(void* putp,putcf putf,const char *fmt, va_list va)
     {
     char bf[12];
     
@@ -175,7 +180,7 @@ void tfp_format(void* putp,putcf putf,char *fmt, va_list va)
     }
 
 
-void tfp_printf(char *fmt, ...)
+void tfp_printf(const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
@@ -190,7 +195,7 @@ static void putcp(void* p,char c)
 
 
 
-void tfp_sprintf(char* s,char *fmt, ...)
+void tfp_sprintf(char* s, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
@@ -199,7 +204,7 @@ void tfp_sprintf(char* s,char *fmt, ...)
     va_end(va);
     }
 
-void tfp_fprintf(FILE* fh,char *fmt, ...)
+void tfp_fprintf(FILE* fh, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);

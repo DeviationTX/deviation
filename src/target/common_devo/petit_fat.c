@@ -867,6 +867,7 @@ FRESULT pf_read (
 	CLUST clst;
 	DWORD sect, remain;
 	WORD rcnt;
+        WORD acnt;
 	BYTE cs, *rbuff = buff;
 	FATFS *fs = FatFs;
 
@@ -894,8 +895,12 @@ FRESULT pf_read (
 		}
 		rcnt = (WORD)(SECTOR_SIZE - (fs->fptr % SECTOR_SIZE));		/* Get partial sector data from sector buffer */
 		if (rcnt > btr) rcnt = btr;
-		dr = disk_readp(!buff ? 0 : rbuff, fs->dsect, (WORD)(fs->fptr % SECTOR_SIZE), rcnt);
+		dr = disk_readp_cnt(!buff ? 0 : rbuff, fs->dsect, (WORD)(fs->fptr % SECTOR_SIZE), rcnt, &acnt);
 		if (dr) goto fr_abort;
+                if (acnt != rcnt) {
+                    fs->fptr += acnt; *br += acnt;
+                    break;
+                }
 		fs->fptr += rcnt; rbuff += rcnt;			/* Update pointers and counters */
 		btr -= rcnt; *br += rcnt;
 	}

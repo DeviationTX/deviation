@@ -44,6 +44,23 @@ DRESULT disk_readp (
 
 	return RES_OK;
 }
+u8 _stop_on_cr = 0;
+DRESULT disk_readp_cnt (
+	BYTE* dest,			/* Pointer to the destination object */
+	DWORD sector,		/* Sector number (LBA) */
+	WORD sofs,			/* Offset in the sector */
+	WORD count,			/* Byte count (bit15:destination) */
+	WORD *actual			/* Actual Byte count read (bit15:destination) */
+)
+{
+	if (_stop_on_cr) {
+		*actual = SPIFlash_ReadBytesStopCR((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+	} else {
+		*actual = count;
+		SPIFlash_ReadBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+	}
+	return RES_OK;
+}
 
 
 

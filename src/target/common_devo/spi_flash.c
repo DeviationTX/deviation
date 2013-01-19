@@ -55,6 +55,15 @@ void SPIFlash_Init()
 
     spi_enable(SPI1);
 }
+static void SPIFlash_SetAddr(u8 cmd, u32 address)
+{
+    CS_LO();
+    spi_xfer(SPI1, cmd);
+    spi_xfer(SPI1, (u8)(address >> 16));
+    spi_xfer(SPI1, (u8)(address >>  8));
+    spi_xfer(SPI1, (u8)(address));
+}
+
 /*
  *
  */
@@ -63,10 +72,7 @@ u32 SPIFlash_ReadID()
     u32 result;
     CS_LO();
 
-    spi_xfer(SPI1, 0x90);
-    spi_xfer(SPI1, 0x00);
-    spi_xfer(SPI1, 0x00);
-    spi_xfer(SPI1, 0x00); /* Mfr, Dev */
+    SPIFlash_SetAddr(0x90, 0);
     result  = (u8)spi_xfer(SPI1, 0);
     result <<= 8;
     result |= (u8)spi_xfer(SPI1, 0);
@@ -138,11 +144,7 @@ void SPIFlash_EraseSector(u32 sectorAddress)
 {
     WriteFlashWriteEnable();
 
-    CS_LO();
-    spi_xfer(SPI1, 0x20);
-    spi_xfer(SPI1, (u8)(sectorAddress >> 16));
-    spi_xfer(SPI1, (u8)(sectorAddress >>  8));
-    spi_xfer(SPI1, (u8)(sectorAddress));
+    SPIFlash_SetAddr(0x20, sectorAddress);
     CS_HI();
 
     WaitForWriteComplete();
@@ -190,11 +192,7 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
         //printf("SPI write fast mode, length %d\r\n", fast_write_length);
         WriteFlashWriteEnable();
 
-        CS_LO();
-        spi_xfer(SPI1, 0xAD);
-        spi_xfer(SPI1, (u8)(writeAddress >> 16));
-        spi_xfer(SPI1, (u8)(writeAddress >>  8));
-        spi_xfer(SPI1, (u8)(writeAddress));
+        SPIFlash_SetAddr(0xAD, writeAddress);
         spi_xfer(SPI1, ~buffer[0]);
         spi_xfer(SPI1, ~buffer[1]);
         CS_HI();
@@ -230,11 +228,7 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 void SPIFlash_WriteByte(u32 writeAddress, const u8 byte) {
    DisableHWRYBY();
    WriteFlashWriteEnable();
-   CS_LO();
-   spi_xfer(SPI1, 0x02);
-   spi_xfer(SPI1, (u8)(writeAddress >> 16));
-   spi_xfer(SPI1, (u8)(writeAddress >>  8));
-   spi_xfer(SPI1, (u8)(writeAddress));
+   SPIFlash_SetAddr(0x02, writeAddress);
    spi_xfer(SPI1, ~byte);
    CS_HI();
    WaitForWriteComplete();
@@ -250,11 +244,7 @@ void SPIFlash_WriteByte(u32 writeAddress, const u8 byte) {
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
 {
     u32 i;
-    CS_LO();
-    spi_xfer(SPI1, 0x03);
-    spi_xfer(SPI1, (u8)(readAddress >> 16));
-    spi_xfer(SPI1, (u8)(readAddress >>  8));
-    spi_xfer(SPI1, (u8)(readAddress));
+    SPIFlash_SetAddr(0x03, readAddress);
 
     for(i=0;i<length;i++)
     {
@@ -262,4 +252,22 @@ void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer)
     }
 
     CS_HI();
+}
+
+int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
+{
+    u32 i;
+    SPIFlash_SetAddr(0x03, readAddress);
+
+    for(i=0;i<length;i++)
+    {
+        buffer[i] = ~spi_xfer(SPI1, 0);
+        if (buffer[i] == '\n') {
+            i++;
+            break;
+        }
+    }
+
+    CS_HI();
+    return i;
 }

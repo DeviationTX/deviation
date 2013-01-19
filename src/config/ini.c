@@ -8,7 +8,7 @@ http://code.google.com/p/inih/
 */
 
 #include <stdio.h>
-#include <ctype.h>
+//#include <ctype.h> //Ctype pulls in unneccessary dependencies, so don't use it for isspace
 #include <string.h>
 
 #include "ini.h"
@@ -16,6 +16,8 @@ http://code.google.com/p/inih/
 #define MAX_LINE 200
 #define MAX_SECTION 50
 #define MAX_NAME 50
+
+extern int isspace(int c);
 
 /* Strip whitespace chars off end of given string, in place. Return s. */
 static char* rstrip(char* s)
