@@ -218,6 +218,7 @@ endif
 #################
 #The filesystem #
 #################
+.PHONY: $(LAST_MODEL)
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	@echo " + Copying template files for $(FILESYSTEM)"
 	export tx=$(FILESYSTEM); \
@@ -226,6 +227,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	mkdir filesystem/$$tx/language 2> /dev/null || true; \
                ../utils/extract_strings.pl -target $$tx; \
 	cp tx_template.ini filesystem/$$tx/tx.ini; \
+        echo 'empty' > filesystem/$$tx/errors.txt; \
 	mkdir filesystem/$$tx/models 2> /dev/null || true; \
 	echo 'name=Model1' > filesystem/$$tx/models/model1.ini; \
 	cat model_template.ini >> filesystem/$$tx/models/model1.ini; \
