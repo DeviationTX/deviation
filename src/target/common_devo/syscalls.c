@@ -32,6 +32,8 @@ static FATFS fat[2];
 static DIR   dir;
 static bool file_open[2]= {false, false};
 
+extern void init_err_handler();
+
 int FS_Mount();
 void FS_Unmount();
 
@@ -53,6 +55,10 @@ int FS_Mount()
     int res = pf_mount(&fat[0]);
     fat[1] = fat[0];
     dbgprintf("Mount: %d\n", res);
+    if (res == FR_OK) {
+        init_err_handler();
+        pf_switchfile(&fat[0]);
+    }
     return (res == FR_OK);
 }
 

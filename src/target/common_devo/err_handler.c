@@ -14,8 +14,10 @@
  */
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/scb.h>
+#include "common.h"
+#include "petit_fat.h"
+#include "petit_io.h"
 
-#ifdef BUILDTYPE_DEV
 void hard_fault_handler()
 {
     asm(
@@ -25,21 +27,27 @@ void hard_fault_handler()
 "    MRSNE R0, PSP\n"
 "    B hard_fault_handler_c\n");
 }
+static u32 debug_addr = 0;
+void write_byte(u8 x) {
+    if(debug_addr)
+        disk_writep(&x, 1);
+    usart_send_blocking(USART1,(x));
+}
 void fault_printf(char *str, unsigned int val)
 {
     while(*str) {
-        usart_send_blocking(USART1, *str);
+        write_byte(*str);
         str++;
     }
     for(int i = 7; i >= 0; i--) {
         u8 v = 0x0f & (val >> (4 * i));
         if (v < 10)
-            usart_send_blocking(USART1, '0' + v);
+            write_byte('0' + v);
         else
-            usart_send_blocking(USART1, 'a' + v - 10);
+            write_byte('a' + v - 10);
     }
-    usart_send_blocking(USART1, '\r');
-    usart_send_blocking(USART1, '\n');
+    write_byte('\r');
+    write_byte('\n');
 }
 // From Joseph Yiu, minor edits by FVH
 // hard fault handler in C,
@@ -65,7 +73,9 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
   stacked_lr = ((unsigned long) hardfault_args[5]);
   stacked_pc = ((unsigned long) hardfault_args[6]);
   stacked_psr = ((unsigned long) hardfault_args[7]);
- 
+
+  if(debug_addr)
+      disk_writep(0, debug_addr); 
   fault_printf ("\n\n[Hard fault handler", 0);
   fault_printf ("R0 = ", stacked_r0);
   fault_printf ("R1 = ", stacked_r1);
@@ -89,4 +99,22 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
  
   while (1);
 }
-#endif
+
+void init_err_handler() {
+    //This is a hack to get the memory address of a file
+    //we can't use 'fopen' because it masks the structure we need
+    FATFS fat;
+    if(pf_mount(&fat) != FR_OK)
+        return;
+    if(pf_open("errors.txt") != FR_OK) {
+        pf_mount(0);
+        return;
+    }
+    pf_maximize_file_size();
+    if(pf_lseek(1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
+        pf_mount(0);
+        return;
+    }
+    debug_addr = fat.dsect;
+    pf_mount(0);
+}
