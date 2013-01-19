@@ -17,7 +17,9 @@ static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // M
 #define guic (&gui_objs.u.calibrate)
 
 enum {
+#ifndef NO_LANGUAGE_SUPPORT
     ITEM_LANG,
+#endif
     ITEM_MODE,
     ITEM_BATT,
     ITEM_STICKS,
@@ -342,6 +344,7 @@ static void press_cb(guiObject_t *obj, const void *data)
         calibrate_state = CALI_CENTER; // bug fix: must reset state before calibrating
 }
 
+#ifndef NO_LANGUAGE_SUPPORT
 static const char *langstr_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
@@ -356,6 +359,7 @@ static void lang_select_cb(guiObject_t *obj, const void *data)
     PAGE_SetModal(1);
     LANGPage_Select(PAGE_TxConfigureInit);
 }
+#endif
 
 static const char *units_cb(guiObject_t *obj, int dir, void *data)
 {

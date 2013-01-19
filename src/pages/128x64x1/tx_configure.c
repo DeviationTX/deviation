@@ -36,7 +36,9 @@ static int size_cb(int absrow, void *data)
 {
     (void)data;
     switch(absrow) {
+#ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
+#endif
         case ITEM_BACKLIGHT:
         case ITEM_PREALERT:
         case ITEM_TELEMTEMP:
@@ -64,11 +66,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = X;
 
     switch(absrow) {
+#ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
             title = _tr_noop("Generic settings");
             label = _tr_noop("Language:");
             but_str = langstr_cb; tgl = lang_select_cb;
             break;
+#endif
         case ITEM_MODE:
             label = _tr_noop("Stick mode:");
             value = modeselect_cb;
