@@ -119,7 +119,7 @@ static void _show_page2()
     tp.telem.time[1] = 0;
     tp.telem.time[2] = 0;
 
-    GUI_CreateScrollable(&gui2->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
+    GUI_CreateScrollable(&gui2->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          4 * ITEM_HEIGHT + 4, 3, row_cb, getobj_cb, NULL, NULL);
 }
 

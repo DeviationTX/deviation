@@ -84,7 +84,7 @@ static void _show_bar_page(u8 num_bars)
     GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
-                         view_height, num_bars/2, row_cb, getobj_cb, NULL, NULL);
+                         view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
     GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
 }
