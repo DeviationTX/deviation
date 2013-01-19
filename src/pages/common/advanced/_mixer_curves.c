@@ -62,7 +62,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
             edit->curve.points[1] = edit->curve.points[0];
         *edit->curveptr = edit->curve;
     }
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     edit->parent();
 }
 static const char *set_value_cb(guiObject_t *obj, int dir, void *data)

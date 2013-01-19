@@ -52,7 +52,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     if (data) {
         rl.return_page(rl.list);
     }

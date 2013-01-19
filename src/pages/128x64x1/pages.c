@@ -120,8 +120,10 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
 
 void PAGE_RemoveAllObjects()
 {
-    GUI_RemoveAllObjects();
-    memset(&gui_objs, 0, sizeof(gui_objs));
+    if(! GUI_IsEmpty()) {
+        GUI_RemoveAllObjects();
+        memset(&gui_objs, 0, sizeof(gui_objs));
+    }
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)

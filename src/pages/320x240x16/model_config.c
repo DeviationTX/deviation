@@ -26,7 +26,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_ModelInit(-1);  // devo8 doesn't care the page value, while it must be -1 for devo10
 }
 

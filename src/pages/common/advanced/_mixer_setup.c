@@ -500,7 +500,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetTemplate(mp->channel, mp->cur_template);
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_MixerInit(mp->top_channel);
 }
 

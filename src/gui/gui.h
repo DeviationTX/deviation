@@ -477,5 +477,6 @@ s16 GUI_GetLogicalViewOriginRelativeY(u8 view_id);
 void GUI_Select1stSelectableObj();
 s8 GUI_GetViewId(s16 x, s16 y);
 void GUI_ViewInit();
+int GUI_IsEmpty();
 void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
 #endif /* GUI_H_ */

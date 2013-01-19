@@ -205,7 +205,7 @@ static void _show_page()
 static void _show_title()
 {
     PAGE_SetActionCB(_action_cb);
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Preview: Long-Press ENT"));
 }
 

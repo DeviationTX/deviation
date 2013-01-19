@@ -60,7 +60,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         trim[tp->index] = tp->trim;
         MIXER_RegisterTrimButtons();
     }
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_TrimInit(0);
 }
 

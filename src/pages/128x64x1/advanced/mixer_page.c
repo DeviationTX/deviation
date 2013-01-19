@@ -39,7 +39,7 @@ static void _show_page()
 {
     u8 h = 12;
     int i;
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Mixer"));
     memset(gui, 0, sizeof(*gui));
 

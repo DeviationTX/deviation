@@ -108,8 +108,7 @@ void PAGE_MenuInit(int page)
 {
     PAGE_SetModal(0);
     PAGE_SetActionCB(action_cb);
-    GUI_RemoveAllObjects();
-    memset(gui, 0, sizeof(*gui));
+    PAGE_RemoveAllObjects();
 
     if (page != -1)
         menu_type_flag = (u8)page;

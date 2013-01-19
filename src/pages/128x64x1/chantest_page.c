@@ -95,7 +95,7 @@ void PAGE_ChantestInit(int page)
     (void)okcancel_cb;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;

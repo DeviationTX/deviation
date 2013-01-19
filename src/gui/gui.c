@@ -660,6 +660,11 @@ void GUI_GetSize(struct guiObject *obj, int *width, int *height)
     *height = obj->box.height;
 }
 
+int GUI_IsEmpty()
+{
+    return objHEAD ? 0 : 1;
+}
+
 void GUI_Select1stSelectableObj()
 {
     struct guiObject *obj = objHEAD;

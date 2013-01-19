@@ -202,7 +202,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         memcpy(&mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
         MIXER_SetLimit(mp->channel, &mp->limit);  // save
     }
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     PAGE_MixerInit(mp->top_channel);
 }
 

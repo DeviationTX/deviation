@@ -35,7 +35,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (data)
         CONFIG_ReadLang(cp->selected);
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     cp->return_page(0);
 }
 

@@ -389,7 +389,7 @@ static u8 action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             GUI_SelectionNotify(NULL);
-            GUI_RemoveAllObjects();  // Discard unsaved items and exit to upper page
+            PAGE_RemoveAllObjects();  // Discard unsaved items and exit to upper page
             PAGE_MixerInit(mp->top_channel);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting

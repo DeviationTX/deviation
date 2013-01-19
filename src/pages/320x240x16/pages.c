@@ -223,7 +223,10 @@ void PAGE_RemoveAllObjects()
 {
     enter_cmd = NULL;
     exit_cmd = NULL;
-    GUI_RemoveAllObjects();
+    if(! GUI_IsEmpty()) {
+        GUI_RemoveAllObjects();
+        memset(&gui_objs, 0, sizeof(gui_objs));
+    }
 }
 
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data))

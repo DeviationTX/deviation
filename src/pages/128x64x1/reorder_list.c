@@ -117,7 +117,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             BUTTON_UnregisterCallback(&action);
-            GUI_RemoveAllObjects();
+            PAGE_RemoveAllObjects();
             rl.return_page(NULL);
         } else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && ((guiObject_t *)&gui->value == GUI_GetSelected())) {
             // catch the left/right keys when r1.textsel is selected

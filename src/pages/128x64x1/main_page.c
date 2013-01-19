@@ -49,7 +49,7 @@ void PAGE_MainInit(int page)
         PAGE_SetActionCB(_action_preview_cb);
     else
         PAGE_SetActionCB(_action_cb);
-    GUI_RemoveAllObjects();
+    PAGE_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
     //mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
