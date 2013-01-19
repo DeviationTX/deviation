@@ -93,11 +93,11 @@ struct telemcfg_obj {
 };
 
 struct telemtest1_obj {
+    guiLabel_t page;
     guiLabel_t msg;
     guiLabel_t tempstr;
     guiLabel_t voltstr;
     guiLabel_t rpmstr;
-    guiLabel_t page;
     guiLabel_t idx[4];
     guiLabel_t temp[4];
     guiLabel_t volt[3];
@@ -105,6 +105,7 @@ struct telemtest1_obj {
 };
 
 struct telemtest2_obj {
+    guiLabel_t page;
     guiLabel_t gpsstr[2];
     guiLabel_t gps[2];
     guiScrollable_t scrollable;

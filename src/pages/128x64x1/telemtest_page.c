@@ -21,6 +21,7 @@
 #include "../common/_telemtest_page.c"
 
 typedef enum {
+    telemetry_off,
     telemetry_basic,
     telemetry_gps,
 } TeleMetryMonitorType;
@@ -36,7 +37,6 @@ static TeleMetryMonitorType current_page = telemetry_basic;
 static void _show_page1()
 {
     PAGE_RemoveAllObjects();
-    memset(gui1, 0, sizeof(*gui1));
     u8 w = 35;
     PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
     GUI_CreateLabelBox(&gui1->tempstr, 8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp:"));
@@ -110,10 +110,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page2()
 {
     PAGE_RemoveAllObjects();
-    memset(gui2, 0, sizeof(*gui2));
     PAGE_ShowHeader(_tr_noop("GPS")); // to draw a underline only
     u8 w = 10;
-    GUI_CreateLabelBox(&gui1->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui2->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
 
     tp.telem = Telemetry;
     tp.telem.time[0] = 0;
@@ -139,6 +138,7 @@ void PAGE_TelemtestInit(int page)
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
+        current_page = telemetry_off;
         GUI_CreateLabelBox(&gui1->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
         return;
     }
@@ -192,7 +192,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (OBJ_IS_USED(&gui1->volt[0]) || GUI_GetScrollableObj(&gui2->scrollable, 0, 0)) {
+        } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
                 _navigate_pages(1);
