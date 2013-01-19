@@ -493,7 +493,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         } else {
             for (i = 0; i < w; i++ ) {
                 if (LCD_DEPTH == 1)
-                    *color = *color < 0x2fff? 0xffff:0;
+                    *color = (*color & 0x8410) == 0x8410 ?  0 : 0xffff;
                 LCD_DrawPixel(*color++);
             }
         }
