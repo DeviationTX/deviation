@@ -24,12 +24,12 @@ const char *SIMPLEMIX_channelname_cb(guiObject_t *obj, const void *data)
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         char tmp1[30];
         INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][ch]);
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d-%s", ch+1, tmp1);
+        sprintf(mp->tmpstr, "%d-%s", ch+1, tmp1);
     }
     else if (ch == 5)
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d-%s",  ch+1, _tr("PIT"));  // aux1
+        sprintf(mp->tmpstr, "%d-%s",  ch+1, _tr("PIT"));  // aux1
     else
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d-%s%d",ch+1, "AUX", ch -4); //AUX no need to translate
+        sprintf(mp->tmpstr, "%d-%s%d",ch+1, "AUX", ch -4); //AUX no need to translate
     return mp->tmpstr;
 }
 

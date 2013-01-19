@@ -48,21 +48,21 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
                 || Model.templates[i] == MIXERTEMPLATE_CYC3)
             {
                 switch(ch - NUM_OUT_CHANNELS) {
-                    case 0: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
-                    case 1: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
-                    case 2: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
+                    case 0: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
+                    case 1: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
+                    case 2: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
                 }
             }
         }
     }
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][ch]);
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s%d-%s",
+        sprintf(mp->tmpstr, "%s%d-%s",
             (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
             (int)(ch + 1), tmp1);
     } else {
         INPUT_SourceName(tmp1, ch + NUM_INPUTS + 1);
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s%s",
+        sprintf(mp->tmpstr, "%s%s",
                 (ch < Model.num_channels && Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
                 tmp1);
     }
