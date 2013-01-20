@@ -35,7 +35,7 @@ ifdef OPTIMIZE_DFU
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
-	$(DUMP) -t $< | perl -ne 'if(/^(\S+) g.....([FO])..* (\S+)/) {printf "$$3 = 0x%08x;\n", hex($$1) + ($$2 eq "O" ? 0 : 1);}' > $(SYMBOL_FILE)
+	$(DUMP) -t $< | ../utils/build_symbolfile.pl > $(SYMBOL_FILE)
 endif
 	$(CP) -O binary $< $@
 	$(DUMP) -S $< > $(TARGET).list

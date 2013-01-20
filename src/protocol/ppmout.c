@@ -26,7 +26,8 @@
 
 #ifdef MODULAR
   #pragma long_calls_off
-  const long protocol_type = PROTOCOL_PPM;
+  extern unsigned _data_loadaddr;
+  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 #define PPMOUT_MAX_CHANNELS 10
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];

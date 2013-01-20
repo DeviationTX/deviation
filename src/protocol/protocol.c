@@ -38,7 +38,7 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
 };
 #undef PROTODEF
 #ifdef MODULAR
-long * const loaded_protocol = (long *)MODULAR;
+unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
 void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
 #endif
 
@@ -96,6 +96,8 @@ void PROTOCOL_DeInit()
     proto_state = PROTO_READY;
 }
 
+/*This symbol is exported bythe linker*/
+extern unsigned _data_loadaddr;
 void PROTOCOL_Load()
 {
 #ifdef MODULAR
@@ -112,6 +114,7 @@ void PROTOCOL_Load()
     fh = fopen(file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
+	PAGE_ShowInvalidModule();
         return;
     }
     setbuf(fh, 0);
@@ -130,6 +133,11 @@ void PROTOCOL_Load()
             break;
     }
     fclose(fh);
+    if ((unsigned long)&_data_loadaddr != *loaded_protocol) {
+	PAGE_ShowInvalidModule();
+        *loaded_protocol = 0;
+        return;
+    }
     //printf("Updated %d (%d) bytes: Data: %08lx %08lx %08lx\n", size, len, *loaded_protocol, *(loaded_protocol+1), *(loaded_protocol+2));
     //We use the same file for multiple protocols, so we need to manually set this here
     *loaded_protocol = Model.protocol;
