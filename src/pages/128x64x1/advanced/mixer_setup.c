@@ -97,7 +97,7 @@ static void _show_simple()
 {
     GUI_SelectionNotify(NULL);
     GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          2 * ITEM_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
     // The following items are not draw in the logical view;
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
@@ -177,7 +177,7 @@ static void _show_complex()
     mp->max_scroll = 2;
     GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          2 * ITEM_SPACE, COMPLEX_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
     // The following items are not draw in the logical view;
     GUI_CreateBarGraph(&gui->bar, LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
@@ -316,7 +316,7 @@ static void _show_expo_dr()
 
     sync_mixers();
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
 
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
