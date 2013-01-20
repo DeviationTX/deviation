@@ -227,7 +227,15 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
 
 guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
 {
-    return scrollable->getobj_cb ? scrollable->getobj_cb(row, col, NULL) : NULL;
+    if (scrollable->getobj_cb) {
+        while(1) {
+            guiObject_t *obj = scrollable->getobj_cb(row, col, NULL);
+            if (! OBJ_IS_HIDDEN(obj))
+                return obj;
+            col = col + (col >= 0 ? 1 : -1);
+        }
+    }
+    return NULL;
 }
 
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)

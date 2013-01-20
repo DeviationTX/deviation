@@ -4,12 +4,13 @@ MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
 # Use VERBOSE=1 to enable verbose make
-TYPE     ?= prd
 TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
 NUM_MODELS ?= 30
 
 include target/$(TARGET)/Makefile.inc
+
+TYPE     ?= prd
 
 ###############################################
 #This section defines binaries needed to build#
