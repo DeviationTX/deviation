@@ -230,6 +230,8 @@ guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
     if (scrollable->getobj_cb) {
         while(1) {
             guiObject_t *obj = scrollable->getobj_cb(row, col, NULL);
+            if (! obj)
+                return NULL;
             if (! OBJ_IS_HIDDEN(obj))
                 return obj;
             col = col + (col >= 0 ? 1 : -1);
