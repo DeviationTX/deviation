@@ -918,7 +918,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
         if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
             fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
-        if(WRITE_FULL_MODEL || m->limits[idx].servoscale_neg != 100)
+        if(WRITE_FULL_MODEL || m->limits[idx].servoscale_neg != 0)
             fprintf(fh, "%s=%d\n", CHAN_SCALAR_NEG, m->limits[idx].servoscale_neg);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
