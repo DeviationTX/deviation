@@ -25,8 +25,6 @@
 #define gui2 (&gui_objs.u.tx.u.g2)
 #define gui3 (&gui_objs.u.tx.u.g3)
 
-#define MAX_BATTERY_ALARM 12000
-#define MIN_BATTERY_ALARM 3300
 #define MIN_BATTERY_ALARM_STEP 50
 
 u8 page_num;

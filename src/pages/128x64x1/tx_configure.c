@@ -20,8 +20,6 @@
 #include "config/model.h"
 #include "autodimmer.h"
 
-#define MAX_BATTERY_ALARM 12000
-#define MIN_BATTERY_ALARM 5500
 #define MIN_BATTERY_ALARM_STEP 10
 #include "../common/_tx_configure.c"
 
