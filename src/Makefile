@@ -170,12 +170,17 @@ language:
 zip: $(TARGET).dfu $(PROTO_MODULES)
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	zip debug-$(HGVERSION).zip $(TARGET).elf
 	# make zipping more compatible with other distributions
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
+	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
 	rm -rf $(ODIR)/protocol
 endif
+	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
 	rm -f deviation-$(HGVERSION).dfu
 
 fs:
