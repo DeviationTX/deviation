@@ -19,7 +19,9 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
-#pragma long_calls_off
+//Some versions of gcc applythis to definitions, others to calls
+//So just use long_calls everywhere
+//#pragma long_calls_off
 #include "protocol/interface.h"
 
 #define CS_HI() gpio_set(GPIOB, GPIO12)   
@@ -260,4 +262,3 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     }
     CYRF_ConfigRxTx(1);
 }
-#pragma long_calls_off
