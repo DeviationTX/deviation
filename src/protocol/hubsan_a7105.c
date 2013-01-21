@@ -22,6 +22,9 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include <string.h>
+#include <stdlib.h>
+
 
 #ifdef MODULAR
   #pragma long_calls_off
@@ -29,9 +32,6 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 #ifdef PROTO_HAS_A7105
-
-#include <string.h>
-#include <stdlib.h>
 
 static u8 packet[16];
 static u8 channel;
