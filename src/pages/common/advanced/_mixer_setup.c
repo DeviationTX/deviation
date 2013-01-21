@@ -34,7 +34,7 @@ static void _show_titlerow();
 static void show_none();
 static void _show_simple();
 static void _show_expo_dr();
-static void _show_complex();
+static void _show_complex(int page_change);
 static void _update_rate_widgets(u8 idx);
 
 enum {
@@ -83,7 +83,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
         _show_expo_dr();
         break;
     case MIXERTEMPLATE_COMPLEX:
-        _show_complex();
+        _show_complex(0);
         break;
     }
 }
@@ -344,7 +344,7 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     cur = GUI_TextSelectHelper(cur, 1, mp->num_mixers, dir, 1, 1, &changed);
     if (changed) {
         mp->cur_mixer = mp->mixer + (cur - 1);
-        _show_complex();
+        _show_complex(1);
     }
     sprintf(mp->tmpstr, "%d", cur);
     return mp->tmpstr;

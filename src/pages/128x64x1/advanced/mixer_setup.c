@@ -171,12 +171,14 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     return 1;
 }
 
-static void _show_complex()
+static void _show_complex(int page_change)
 {
     GUI_SelectionNotify(NULL);
     mp->max_scroll = 2;
-    GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
-
+    int selection = 0;
+    if (page_change) {
+        selection = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    }
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          2 * ITEM_SPACE, COMPLEX_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
     // The following items are not draw in the logical view;
@@ -186,6 +188,11 @@ static void _show_complex()
                                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                                   0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
+    if (page_change) {
+        GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, selection));
+    } else {
+        GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
+    }
 }
 
 enum {

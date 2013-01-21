@@ -119,8 +119,9 @@ static void _show_expo_dr()
     _update_rate_widgets(1);
 }
 
-static void _show_complex()
+static void _show_complex(int page_change)
 {
+    (void)page_change;
     //Row 1
     if (! mp->firstObj) {
         mp->firstObj = GUI_CreateLabel(&gui3->nummixlbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
