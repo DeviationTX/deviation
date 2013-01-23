@@ -51,7 +51,8 @@ void SPI_ProtoInit()
 
     /* A7105 */
 #ifdef PROTO_HAS_A7105
-    AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
+    //Disable JTAG and SWD
+    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
     gpio_set(GPIOA, GPIO13);
