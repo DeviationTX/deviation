@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <libopencm3/stm32/usart.h>
-#include <libopencm3/stm32/f1/scb.h>
+#include <libopencm3/cm3/scb.h>
 #include "common.h"
 #include "petit_fat.h"
 #include "petit_io.h"

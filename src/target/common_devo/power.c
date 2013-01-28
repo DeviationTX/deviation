@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/scb.h>
+#include <libopencm3/cm3/scb.h>
 #include "common.h"
 
 void PWR_Init(void)

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/nvic.h>
+#include <libopencm3/cm3/nvic.h>
 #include "common.h"
 
 #define LE_WORD(x)		((x)&0xFF),((x)>>8)
