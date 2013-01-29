@@ -53,6 +53,7 @@ static struct {
 
 static Fl_Window *main_window;
 static Fl_Box    *image;
+int image_ypos;
 static u16 (*timer_callback)(void);
 void update_channels(void *);
 
@@ -181,10 +182,22 @@ public:
             return 1;
         case FL_PUSH:
         case FL_DRAG:
+          {
+            int x = Fl::event_x();
+            int y = Fl::event_y() - image_ypos;
+            if (x < 0)
+                x = 0;
+            if (x >= LCD_WIDTH)
+                x = LCD_WIDTH -1;
+            if (y < 0)
+                y = 0;
+            if (y >= LCD_HEIGHT)
+                y = LCD_HEIGHT -1;
             gui.mouse = 1;
-            gui.mousex = calibration.xscale * Fl::event_x() / 0x10000 + calibration.xoffset;
-            gui.mousey = calibration.yscale * Fl::event_y() / 0x10000 + calibration.yoffset;
+            gui.mousex = calibration.xscale * x / 0x10000 + calibration.xoffset;
+            gui.mousey = calibration.yscale * y / 0x10000 + calibration.yoffset;
             return 1;
+          }
         case FL_RELEASE:
             gui.mouse = 0;
             return 1;
@@ -270,14 +283,15 @@ void LCD_Init()
   int height = (lcdScreenHeight > INP_LAST + (INP_LAST - 1) * 10 + 85) ?
                 lcdScreenHeight : INP_LAST + (INP_LAST - 1) * 10 + 85;
   main_window = new mywin(lcdScreenWidth + 320,height);
-  image = new image_box(0, (height - lcdScreenHeight) / 2, lcdScreenWidth, lcdScreenHeight);
+  image_ypos = (height - lcdScreenHeight) / 2;
+  image = new image_box(0, image_ypos, lcdScreenWidth, lcdScreenHeight);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
-  for(i = 0; i < INP_LAST; i++) {
+  for(i = 0; i < INP_LAST-1; i++) {
       char *label;
       label = (char *)malloc(10);
       INPUT_SourceName(label, i + 1);
-      if(i < INP_LAST / 2) {
+      if(i < (INP_LAST-1) / 2) {
           gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
       } else {
           gui.raw[i] = new Fl_Output(lcdScreenWidth + 230, 20 * (i - INP_LAST / 2) + 5, 60, 15, label);
