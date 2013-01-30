@@ -17,6 +17,7 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
+#include "devo.h"
 
 #define START  (1 << 7)
 
@@ -44,9 +45,9 @@ PA6 : SPI1_MISO
 PA7 : SPI1_MOSI
 */
 
-#define CS_HI() gpio_set(GPIOB, GPIO0)
-#define CS_LO() gpio_clear(GPIOB, GPIO0)
-#define pen_is_down() (! gpio_get(GPIOB, GPIO5))
+#define CS_HI() gpio_set(_TOUCH_PORT, _TOUCH_PIN)
+#define CS_LO() gpio_clear(_TOUCH_PORT, _TOUCH_PIN)
+#define pen_is_down() (! gpio_get(_TOUCH_PORT, _TOUCH_IRQ_PIN))
 
 u8 read_channel(u8 address)
 {
@@ -69,13 +70,13 @@ void SPITouch_Init()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
 #endif
     /* CS */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
+    gpio_set_mode(_TOUCH_PORT, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, _TOUCH_PIN);
 
     /* PenIRQ is pull-up input*/
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_PULL_UPDOWN, GPIO5);
-    gpio_set(GPIOB, GPIO5);
+    gpio_set_mode(_TOUCH_PORT, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_PULL_UPDOWN, _TOUCH_IRQ_PIN);
+    gpio_set(_TOUCH_PORT, _TOUCH_IRQ_PIN);
 
     CS_LO();
     spi_xfer(SPI1, RESET);
@@ -106,10 +107,15 @@ struct touch SPITouch_GetCoords()
 {
     struct touch res;
     CS_LO();
+#if _TOUCH_COORDS_REVERSE
     /* X and Y are swapped on Devo8 */
     /* and X is reversed */
     res.x = 255 - read_channel(READ_Y);
     res.y = read_channel(READ_X);
+#else
+    res.x = 255 - read_channel(READ_X);
+    res.y = read_channel(READ_Y);
+#endif
     res.z1 = read_channel(READ_Z1);
     res.z2 = read_channel(READ_Z2);
     CS_HI();

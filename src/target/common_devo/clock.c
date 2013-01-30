@@ -102,15 +102,15 @@ void CLOCK_Init()
 
     timer_enable_counter(TIM4);
 
-    /* Enable TIM3 interrupt. */
-    /* We are enabling the interrupt but not the timer.
-       We'll manually trigger this via set_pending_interrupt
+    /* Enable EXTI1 interrupt. */
+    /* We are enabling only the interrupt
+     * We'll manually trigger this via set_pending_interrupt
      */
-    nvic_enable_irq(NVIC_TIM3_IRQ);
-    nvic_set_priority(NVIC_TIM3_IRQ, 64); //Medium priority
-    /* Enable DMA Channel1 with same priority as TIM3 */
-    nvic_enable_irq(NVIC_DMA1_CHANNEL1_IRQ);
-    nvic_set_priority(NVIC_DMA1_CHANNEL1_IRQ, 65); //Medium priority
+    nvic_enable_irq(NVIC_EXTI1_IRQ);
+    nvic_set_priority(NVIC_EXTI1_IRQ, 64); //Medium priority
+    /* Enable DMA Channel1 with same priority as EXTI1 */
+    nvic_enable_irq(_NVIC_DMA_CHANNEL_IRQ);
+    nvic_set_priority(_NVIC_DMA_CHANNEL_IRQ, 65); //Medium priority
 
     /* wait for system to start up and stabilize */
     while(msecs < 100)
@@ -182,7 +182,7 @@ void CLOCK_ClearMsecCallback(int cb)
 }
 
 
-void tim3_isr()
+void exti1_isr()
 {
     ADC_StartCapture();
     //ADC completion will trigger update
@@ -195,7 +195,7 @@ void sys_tick_handler(void)
         if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
             if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
                 //medium priority tasks execute in interrupt and main loop context
-                nvic_set_pending_irq(NVIC_TIM3_IRQ);
+                nvic_set_pending_irq(NVIC_EXTI1_IRQ);
                 priority_ready |= 1 << MEDIUM_PRIORITY;
                 msec_cbtime[MEDIUM_PRIORITY] = msecs + MEDIUM_PRIORITY_MSEC;
             }

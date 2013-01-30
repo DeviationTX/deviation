@@ -44,7 +44,7 @@ $(LIBOPENCM3):
 	make -C libopencm3 TARGETS=stm32/f1 lib
 
 $(TARGET).dfu: $(TARGET).bin
-	../utils/dfu.py $(DFU_ARGS):$< $@
+	../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	../utils/get_mem_usage.pl $(TARGET).map
 
 ###################################

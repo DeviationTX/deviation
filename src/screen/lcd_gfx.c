@@ -470,6 +470,20 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
             break;
         u16 *color = (u16 *)buf;
         if(transparent) {
+#ifdef TRANSPARENT_COLOR
+            //Display supports a transparent color
+            for (i = 0; i < w; i++ ) {
+                u32 c;
+                if((*color & 0x8000)) {
+                    //convert 1555 -> 565
+                    c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
+                } else {
+                    c = TRANSPARENT_COLOR;
+                }
+                LCD_DrawPixel(c);
+                color++;
+            }
+#else
             u8 last_pixel_transparent = row_has_transparency;
             row_has_transparency = 0;
             for (i = 0; i < w; i++ ) {
@@ -490,6 +504,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                 }
                 color++;
             }
+#endif
         } else {
             for (i = 0; i < w; i++ ) {
                 if (LCD_DEPTH == 1)

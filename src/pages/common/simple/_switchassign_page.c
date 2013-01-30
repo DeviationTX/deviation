@@ -21,10 +21,10 @@ typedef struct {
     char name[15];
 } SwitchTable;
 static SwitchTable switch_table[] = {
-    {{INP_RUD_DR, INP_RUD_DR|0x80, IMPOSSIBL_SWITCH}, "RUD DR 0/1"},  // no translation for switch labels
-    {{INP_ELE_DR, INP_ELE_DR|0x80, IMPOSSIBL_SWITCH}, "ELE DR 0/1"},
-    {{INP_AIL_DR, INP_AIL_DR|0x80, IMPOSSIBL_SWITCH}, "AIL DR 0/1"},
-    {{INP_GEAR,   INP_GEAR|0x80,   IMPOSSIBL_SWITCH}, "GEAR 0/1"},
+    {{INP_RUD_DR1, INP_RUD_DR1|0x80, IMPOSSIBL_SWITCH}, "RUD DR 0/1"},  // no translation for switch labels
+    {{INP_ELE_DR1, INP_ELE_DR1|0x80, IMPOSSIBL_SWITCH}, "ELE DR 0/1"},
+    {{INP_AIL_DR1, INP_AIL_DR1|0x80, IMPOSSIBL_SWITCH}, "AIL DR 0/1"},
+    {{INP_GEAR1,   INP_GEAR1|0x80,   IMPOSSIBL_SWITCH}, "GEAR 0/1"},
     {{INP_MIX0,   INP_MIX1,        INP_MIX2},         "MIX 0/1/2"},
     {{INP_FMOD0,  INP_FMOD1,       INP_FMOD2},        "FMOD 0/1/2"},
 };

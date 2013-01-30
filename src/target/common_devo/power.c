@@ -16,6 +16,7 @@
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
+#include "devo.h"
 
 void PWR_Init(void)
 {
@@ -24,22 +25,19 @@ void PWR_Init(void)
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
     /* Enable GPIOA so we can manage the power switch */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, _PWREN_RCC_APB2ENR_IOPEN);
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, _PWRSW_RCC_APB2ENR_IOPEN);
 
     /* Pin 2 controls power-down */
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
+    gpio_set_mode(_PWREN_PORT, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, _PWREN_PIN);
 
     /* Enable GPIOA.2 to keep from shutting down */
-    gpio_set(GPIOA, GPIO2);
+    gpio_set(_PWREN_PORT, _PWREN_PIN);
 
     /* When Pin 3 goes high, the user turned off the Tx */
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO3);
-
-    /* Enable Voltage measurement */
-    /* ADC is configured by the 'channel' code */
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
+    gpio_set_mode(_PWRSW_PORT, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_FLOAT, _PWRSW_PIN);
 }
 
 void PWR_Shutdown()
@@ -48,14 +46,14 @@ void PWR_Shutdown()
     BACKLIGHT_Brightness(0);
     rcc_set_sysclk_source(RCC_CFGR_SW_SYSCLKSEL_HSICLK);
     rcc_wait_for_osc_ready(HSI);
-    gpio_clear(GPIOA, GPIO2);
+    gpio_clear(_PWREN_PORT, _PWREN_PIN);
     while(1) ;
 }
 
 int PWR_CheckPowerSwitch()
 {
     //static u16 debounce = 0;
-    if(gpio_get(GPIOA, GPIO3)) {
+    if(gpio_get(_PWRSW_PORT, _PWRSW_PIN)) {
 /*
         debounce++;
     } else {

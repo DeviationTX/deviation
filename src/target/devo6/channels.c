@@ -31,6 +31,8 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO1);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO2);
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO3);
+    /* Enable Voltage measurement */
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
@@ -49,14 +51,16 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_RUDDER:   value = adc_array_raw[1]; break;
     case INP_ELEVATOR: value = adc_array_raw[2]; break;
     case INP_AILERON:  value = adc_array_raw[3]; break;
-    case INP_DR:       value = ! gpio_get(GPIOC, GPIO11); break;
-    case INP_FMOD0:     value = ! gpio_get(GPIOC, GPIO13); break;
-    case INP_FMOD1:     value = (gpio_get(GPIOC, GPIO12) && gpio_get(GPIOC, GPIO13)); break;
-    case INP_FMOD2:     value = ! gpio_get(GPIOC, GPIO12); break;
+    case INP_DR0:      value = gpio_get(GPIOC, GPIO11); break;
+    case INP_DR1:      value = ! gpio_get(GPIOC, GPIO11); break;
+    case INP_FMOD0:    value = ! gpio_get(GPIOC, GPIO13); break;
+    case INP_FMOD1:    value = (gpio_get(GPIOC, GPIO12) && gpio_get(GPIOC, GPIO13)); break;
+    case INP_FMOD2:    value = ! gpio_get(GPIOC, GPIO12); break;
     case INP_MIX0:     value = ! gpio_get(GPIOC, GPIO8); break;
     case INP_MIX1:     value = (gpio_get(GPIOC, GPIO6) && gpio_get(GPIOC, GPIO8)); break;
     case INP_MIX2:     value = ! gpio_get(GPIOC, GPIO6); break;
-    case INP_GEAR:     value = ! gpio_get(GPIOC, GPIO7); break;
+    case INP_GEAR0:    value = gpio_get(GPIOC, GPIO7); break;
+    case INP_GEAR1:    value = ! gpio_get(GPIOC, GPIO7); break;
     }
     return value;
 }

@@ -57,7 +57,7 @@ static void set_hold_state(u8 state) {
         mp->num_mixers = 4;
         mp->mixer[3].src    = mp->mixer_ptr[0]->src;
         mp->mixer[3].dest   = mp->mixer_ptr[0]->dest;
-        mp->mixer[3].sw = INP_RUD_DR;
+        mp->mixer[3].sw = INP_RUD_DR1;
         mp->mixer[3].mux    = MUX_REPLACE;
         mp->mixer[3].offset = 0;
         mp->mixer[3].scalar = mp->mixer_ptr[0]->scalar;

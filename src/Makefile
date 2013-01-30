@@ -183,7 +183,9 @@ endif
 	rm -f debug-$(HGVERSION).zip
 	rm -f deviation-$(HGVERSION).dfu
 
-fs:
+fs: $(TARGET).fs
+
+%.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
 release:
@@ -191,8 +193,10 @@ release:
 	make TARGET=devo6 zip
 	make TARGET=devo10 zip
 	make TARGET=devo7e zip
+	make TARGET=devo12 zip
 	make TARGET=devo8 fs
 	make TARGET=devo10 fs
+	make TARGET=devo12 fs
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
 
 ##########################################

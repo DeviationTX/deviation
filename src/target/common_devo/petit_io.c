@@ -19,6 +19,21 @@
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
+static const struct {
+	void (*ReadBytes)(u32 readAddress, u32 length, u8 * buffer);
+	int (*ReadBytesStopCR)(u32 readAddress, u32 length, u8 * buffer);
+	void (*WriteBytes)(u32 writeAddress, u32 length, const u8 * buffer);
+	void (*EraseSector)(u32 sectorAddress);
+	long SECTOR_OFFSET;
+} drive[] = {
+	{SPIFlash_ReadBytes, SPIFlash_ReadBytesStopCR, SPIFlash_WriteBytes, SPIFlash_EraseSector, SPIFLASH_SECTOR_OFFSET},
+#ifdef MEDIA_DRIVE
+	{ MEDIA_DRIVE },
+#endif
+};
+
+u8 _drive_num = 0;
+u8 _stop_on_cr = 0;
 
 DSTATUS disk_initialize (void)
 {
@@ -40,11 +55,17 @@ DRESULT disk_readp (
 	WORD count			/* Byte count (bit15:destination) */
 )
 {
-	SPIFlash_ReadBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+	//printf("Reading sector: %d, offset: %d size: %d\n", (int)sector, (int)sofs, (int)count);
+	drive[_drive_num].ReadBytes((sector + drive[_drive_num].SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+	//int max = count > 64 ? 64 : count;
+	//for(int i = 0; i < max; i++) {
+	//    printf("%02x ", dest[i]);
+	//}
+	//printf("\n");
 
 	return RES_OK;
 }
-u8 _stop_on_cr = 0;
+
 DRESULT disk_readp_cnt (
 	BYTE* dest,			/* Pointer to the destination object */
 	DWORD sector,		/* Sector number (LBA) */
@@ -54,10 +75,10 @@ DRESULT disk_readp_cnt (
 )
 {
 	if (_stop_on_cr) {
-		*actual = SPIFlash_ReadBytesStopCR((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+                *actual = drive[_drive_num].ReadBytesStopCR((sector + drive[_drive_num].SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
 	} else {
 		*actual = count;
-		SPIFlash_ReadBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
+                drive[_drive_num].ReadBytes((sector + drive[_drive_num].SECTOR_OFFSET) * 0x1000 + sofs, count, dest);
 	}
 	return RES_OK;
 }
@@ -75,7 +96,7 @@ DRESULT disk_writep_rand (
 	WORD count			/* Byte count (bit15:destination) */
 )
 {
-	SPIFlash_WriteBytes((sector + SPIFLASH_SECTOR_OFFSET) * 0x1000 + sofs, count, src);
+	drive[_drive_num].WriteBytes((sector + drive[_drive_num].SECTOR_OFFSET) * 0x1000 + sofs, count, src);
 	return RES_OK;
 }
 
@@ -89,15 +110,15 @@ DRESULT disk_writep (
 	if (!buff) {
 		if (sc) {
 			// Initiate write process
-			pos = (sc + SPIFLASH_SECTOR_OFFSET) * 0x1000;
-			SPIFlash_EraseSector(pos);
+			pos = (sc + drive[_drive_num].SECTOR_OFFSET) * 0x1000;
+                        drive[_drive_num].EraseSector(pos);
 		} else {
 			// Finalize write process
 			pos = 0;
 		}
 	} else {
 		// Send data to the disk
-		SPIFlash_WriteBytes(pos, sc, buff);
+                drive[_drive_num].WriteBytes(pos, sc, buff);
 		pos += sc;
 	}
 	return RES_OK;

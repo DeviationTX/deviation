@@ -75,18 +75,18 @@ def parse(file,dump_images=False,crypt=0):
   if data:
     print "PARSE ERROR"
 
-def build(file,targets,device=DEFAULT_DEVICE,crypt=0):
+def build(file,targets,options):
   data = ''
   for t,target in enumerate(targets):
     tdata = ''
     for image in target:
       tdata += struct.pack('<2I',image['address'],len(image['data']))
-      tdata += encrypt(image['data'],crypt)
-    tdata = struct.pack('<6sBI255s2I','Target',0,1,'ST...',len(tdata),len(target)) + tdata
+      tdata += encrypt(image['data'],options.crypt)
+    tdata = struct.pack('<6sBI255s2I','Target',options.alt,1,options.name,len(tdata),len(target)) + tdata
     data += tdata
   data  = struct.pack('<5sBIB','DfuSe',1,len(data)+11,len(targets)) + data
-  v,d=map(lambda x: int(x,0) & 0xFFFF, device.split(':',1))
-  data += struct.pack('<4H3sB',0,d,v,0x011a,'UFD',16)
+  v,d=map(lambda x: int(x,0) & 0xFFFF, options.device.split(':',1))
+  data += struct.pack('<4H3sB',options.version,d,v,0x011a,'UFD',16)
   crc   = compute_crc(data)
   data += struct.pack('<I',crc)
   open(file,'wb').write(data)
@@ -103,7 +103,13 @@ if __name__=="__main__":
   parser.add_option("-d", "--dump", action="store_true", dest="dump_images",
     default=False, help="dump contained images to current directory")
   parser.add_option("-c", "--crypt", action="store", type="int", dest="crypt",
-    default=False, help="use scramble offset of 'xx' (6, 7, 8, 10, 12)")
+    default=0, help="use scramble offset of 'xx' (6, 7, 8, 10, 12)")
+  parser.add_option("-a", "--alt", action="store", type="int", dest="alt",
+    default=0, help="specifies alternate-seting")
+  parser.add_option("-v", "--version", action="store", type="int", dest="version",
+    default=0, help="specifies firmware version")
+  parser.add_option("-n", "--name", action="store", dest="name",
+    default='ST...', help="specifies firmware version")
   (options, args) = parser.parse_args()
 
   if options.binfiles and len(args)==1:
@@ -124,15 +130,15 @@ if __name__=="__main__":
         sys.exit(1)
       target.append({ 'address': address, 'data': open(binfile,'rb').read() })
     outfile = args[0]
-    device = DEFAULT_DEVICE
-    if options.device:
-      device=options.device
+
+    if not options.device:
+      options.device = DEFAULT_DEVICE
     try:
-      v,d=map(lambda x: int(x,0) & 0xFFFF, device.split(':',1))
+      v,d=map(lambda x: int(x,0) & 0xFFFF, options.device.split(':',1))
     except:
-      print "Invalid device '%s'." % device
+      print "Invalid device '%s'." % options.device
       sys.exit(1)
-    build(outfile,[target],device,crypt=options.crypt)
+    build(outfile,[target],options)
   elif len(args)==1:
     infile = args[0]
     if not os.path.isfile(infile):

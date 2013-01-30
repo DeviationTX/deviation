@@ -24,13 +24,20 @@
 #include <libopencm3/stm32/usart.h>
 
 #include "petit_fat.h"
+#include "common.h"
 
 //#define dbgprintf(args...) printf(args)
 #define dbgprintf(args...) 
-
-static FATFS fat[2];
 static DIR   dir;
+#ifdef MEDIA_DRIVE
+static FATFS fat[3];
+static bool file_open[3]= {false, false, false};
+#else
+static FATFS fat[2];
 static bool file_open[2]= {false, false};
+#endif
+
+extern u8 _drive_num;
 
 extern void init_err_handler();
 
@@ -53,8 +60,17 @@ int _isatty_r(struct _reent *r, int fd);
 int FS_Mount()
 {
     int res = pf_mount(&fat[0]);
-    fat[1] = fat[0];
     dbgprintf("Mount: %d\n", res);
+#ifdef MEDIA_DRIVE
+    _drive_num = 1;
+    int res2 = pf_mount(&fat[2]);
+    (void)res2;
+    dbgprintf("Mount2: %d\n", res2);
+    fat[1] = fat[2];
+    _drive_num = 0;
+#else
+    fat[1] = fat[0];
+#endif
     if (res == FR_OK) {
         init_err_handler();
         pf_switchfile(&fat[0]);
@@ -69,7 +85,13 @@ void FS_Unmount()
 
 int FS_OpenDir(const char *path)
 {
-    
+    if (strncmp(path, "media", 5) == 0) {
+        pf_switchfile(&fat[2]);
+        _drive_num = 1;
+    } else {
+        pf_switchfile(&fat[0]);
+        _drive_num = 0;
+    }
     FRESULT res = pf_opendir(&dir, path);
     dbgprintf("Opendir: %d\n", res);
     return (res == FR_OK);
@@ -99,7 +121,22 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
-    int fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) ? 4 : 3;
+    int fd;
+#ifdef MEDIA_DRIVE
+    if (strncmp(file, "media/", 6) == 0) {
+        _drive_num = 1;
+        if (strcmp(file + strlen(file) - 4, ".fon") == 0) {
+            fd = 4;
+        } else {
+            fd = 5;
+        }
+    } else {
+        _drive_num = 0;
+        fd = 3;
+    }
+#else
+    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) ? 4 : 3;
+#endif
     if(file_open[fd-3]) {
         dbgprintf("_open_r: file already open.\n");
         return -1;
@@ -113,7 +150,7 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
             file_open[fd-3]=true;
             return fd;  
         } else {
-            dbgprintf("_open_r: pf_open failed\r\n");
+            dbgprintf("_open_r: pf_open failed: %d\r\n", res);
             return -1;
         }
     }
@@ -132,6 +169,9 @@ int _read_r (struct _reent *r, int fd, char * ptr, int len)
 {
     (void)r;
     if(fd>2 && file_open[fd-3]) {
+#ifdef MEDIA_DRIVE
+        _drive_num = fd == 3 ? 0 : 1;
+#endif
         if(len <= 0xffff) {
             WORD bytes_read;
             pf_switchfile(&fat[fd-3]);
@@ -163,6 +203,9 @@ int _write_r (struct _reent *r, int fd, char * ptr, int len)
         return len;
     } else if(fd>2) {
         if(file_open[fd-3]) {
+#ifdef MEDIA_DRIVE
+            _drive_num = fd == 3 ? 0 : 1;
+#endif
             WORD bytes_written;
             pf_switchfile(&fat[fd-3]);
             int res=pf_write(ptr, len, &bytes_written);
@@ -180,6 +223,9 @@ int _lseek_r (struct _reent *r, int fd, int ptr, int dir)
     (void)r;
     
     if(fd>2 && file_open[fd-3]) {
+#ifdef MEDIA_DRIVE
+        _drive_num = fd == 3 ? 0 : 1;
+#endif
         if(dir==SEEK_CUR) {
             ptr += fat[fd-3].fptr;
         } else if (dir==SEEK_END) {

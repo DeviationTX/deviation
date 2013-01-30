@@ -1,6 +1,8 @@
 #ifndef _DEVO_H_
 #define _DEVO_H_
 
+#include "ports.h"
+
 void ADC_Init(void);
 void ADC_StartCapture();
 
