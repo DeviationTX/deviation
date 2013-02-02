@@ -2,8 +2,10 @@
 #define _DEVO12_PORTS_H_
 
 //ADC overrides
+#define ADC_OVERSAMPLE_WINDOW_COUNT 10
 #define _ADC                   ADC3
 #define _RCC_APB2ENR_ADCEN     RCC_APB2ENR_ADC3EN
+#define _RCC_APB2RSTR_ADCRST   RCC_APB2RSTR_ADC3RST
 #define _DMA                   DMA2
 #define _DMA_CHANNEL           DMA_CHANNEL5
 #define _RCC_AHBENR_DMAEN      RCC_AHBENR_DMA2EN
@@ -37,4 +39,8 @@
 #define _TOUCH_RCC_APB2ENR_IOPEN   RCC_APB2ENR_IOPCEN
 #define _TOUCH_COORDS_REVERSE      0
 //End Touch pins
+
+//PWM Port
+#define _PWM_PIN GPIO8
+//End PWM Port
 #endif //_DEVO12_PORTS_H_

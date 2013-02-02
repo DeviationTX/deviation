@@ -22,8 +22,8 @@
 u16 PWR_ReadVoltage(void)
 {
     u32 v = adc_array_raw[INP_HAS_CALIBRATION];
-    /* Compute voltage from y = 0.0021x + 0.3026 */
+    /* Compute voltage from y = 0.001662x - 0.03988 */
     /* Multily the above by 1000 to get milivolts */
-    v = v * 21 / 10 + 303;
+    v = v * 166 / 100 - 20;
     return v;
 }

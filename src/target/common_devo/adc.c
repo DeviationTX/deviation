@@ -20,16 +20,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static u16 ADC_Read(u8 channel);
-u16 adc_array_raw[NUM_ADC_CHANNELS];
-
+u16 ADC_Read(u8 channel);
+volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
+#define WINDOW_SIZE 10
+#define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
+static volatile u16 adc_array_oversample[SAMPLE_COUNT];
 void ADC_Init(void)
 {
-    int i;
     rcc_peripheral_enable_clock(&RCC_APB2ENR, _RCC_APB2ENR_ADCEN);
     /* Make sure the ADC doesn't run during config. */
     adc_off(_ADC);
-
+    rcc_peripheral_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
+    rcc_peripheral_clear_reset(&RCC_APB2RSTR, _RCC_APB2RSTR_ADCRST);
+    rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);
     /* We configure to scan the entire group each time conversion is requested. */
     adc_enable_scan_mode(_ADC);
     adc_set_single_conversion_mode(_ADC);
@@ -39,14 +42,9 @@ void ADC_Init(void)
 
     /* We want to read the temperature sensor, so we have to enable it. */
     adc_enable_temperature_sensor(_ADC); 
-    adc_set_sample_time_on_all_channels(_ADC, ADC_SMPR_SMP_28DOT5CYC);
+    adc_set_sample_time_on_all_channels(_ADC, ADC_SMPR_SMP_13DOT5CYC);
 
     adc_power_on(_ADC);
-
-    /* Wait for ADC starting up. */
-    for (i = 0; i < 800000; i++)    /* Wait a bit. */
-        __asm__("nop");
-
     adc_reset_calibration(_ADC);
     adc_calibration(_ADC);
 
@@ -76,17 +74,19 @@ void ADC_Init(void)
     /* get the data from the ADC data register */
     dma_set_peripheral_address(_DMA, _DMA_CHANNEL,(u32) &ADC_DR(_ADC));
     /* put everything in this array */
-    dma_set_memory_address(_DMA, _DMA_CHANNEL, (u32) &adc_array_raw);
+    dma_set_memory_address(_DMA, _DMA_CHANNEL, (u32) &adc_array_oversample);
     /* we convert only 3 values in one adc-group */
-    dma_set_number_of_data(_DMA, _DMA_CHANNEL, NUM_ADC_CHANNELS);
+    dma_set_number_of_data(_DMA, _DMA_CHANNEL, SAMPLE_COUNT);
     /* we want an interrupt after the adc is finished */
-    dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
+    //dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
 
     /* dma ready to go. waiting til the peripheral gives the first data */
     dma_enable_channel(_DMA, _DMA_CHANNEL);
 
     adc_enable_dma(_ADC);
     adc_set_regular_sequence(_ADC, NUM_ADC_CHANNELS, (u8 *)adc_chan_sel);
+    adc_set_continuous_conversion_mode(_ADC);
+    adc_start_conversion_direct(_ADC);
 }
 
 u16 ADC_Read(u8 channel)
@@ -103,20 +103,36 @@ u16 ADC_Read(u8 channel)
     adc_start_conversion_direct(_ADC);
 
     /* Wait for end of conversion. */
-    while (!(ADC_SR(_ADC) & ADC_SR_EOC));
-    return(ADC_DR(_ADC));
+    while (! adc_eoc(_ADC))
+        ;
+    return adc_read_regular(_ADC);
 }
 
 void ADC_StartCapture()
 {
     //while (!(ADC_SR(_ADC) & ADC_SR_EOC));
-    adc_start_conversion_direct(_ADC);
+    //adc_start_conversion_direct(_ADC);
 }
 
+#if 0
 void _DMA_ISR()
 {
-    medium_priority_cb();
+    //medium_priority_cb();
     /* clear the interrupt flag */
     DMA_IFCR(_DMA) |= _DMA_IFCR_CGIF;
 }
+#endif
 
+void ADC_Filter()
+{
+    for (int i = 0; i < NUM_ADC_CHANNELS; i++) {
+        u32 result = 0;
+        int idx = i;
+        for(int j = 0; j < WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT; j++) {
+            result += adc_array_oversample[idx];
+            idx += NUM_ADC_CHANNELS;
+        }
+        result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
+        adc_array_raw[i] = result;
+    }
+}

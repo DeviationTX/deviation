@@ -23,6 +23,7 @@
 #include <libopencm3/cm3/nvic.h>
 
 #include "common.h"
+#include "../ports.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -36,11 +37,13 @@
 static volatile u16 *pwm;
 void PWM_Initialize()
 {
+#if _PWM_PIN == GPIO_USART1_TX
     UART_Stop();
+#endif
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO9);
-    gpio_clear(GPIOA, GPIO9);
+                  GPIO_CNF_OUTPUT_PUSHPULL, _PWM_PIN);
+    gpio_clear(GPIOA, _PWM_PIN);
     return;
 #if 0
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB2ENR_TIM1EN);
@@ -91,16 +94,18 @@ void PWM_Stop()
 {
     if (RCC_APB1ENR & RCC_APB2ENR_TIM1EN) {
         rcc_peripheral_disable_clock(&RCC_APB1ENR, RCC_APB2ENR_TIM1EN);
+#if _PWM_PIN == GPIO_USART1_TX
         UART_Initialize();
+#endif
     }
 }
 
 void PWM_Set(int val)
 {
     if(val)
-        gpio_set(GPIOA, GPIO9);
+        gpio_set(GPIOA, _PWM_PIN);
     else
-        gpio_clear(GPIOA, GPIO9);
+        gpio_clear(GPIOA, _PWM_PIN);
 }
 
 void PPM_Enable(u16 low_time, volatile u16 *pulses)

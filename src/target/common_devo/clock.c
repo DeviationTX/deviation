@@ -184,9 +184,10 @@ void CLOCK_ClearMsecCallback(int cb)
 
 void exti1_isr()
 {
-    ADC_StartCapture();
+    //ADC_StartCapture();
+    ADC_Filter();
     //ADC completion will trigger update
-    //medium_priority_cb();
+    medium_priority_cb();
 }
 
 void sys_tick_handler(void)

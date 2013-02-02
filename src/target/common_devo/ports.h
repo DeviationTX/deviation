@@ -2,8 +2,10 @@
 #define _PORTS_H_
 
 #ifndef _ADC
+#define ADC_OVERSAMPLE_WINDOW_COUNT 1
     #define _ADC                   ADC1
     #define _RCC_APB2ENR_ADCEN     RCC_APB2ENR_ADC1EN
+    #define _RCC_APB2RSTR_ADCRST   RCC_APB2RSTR_ADC1RST
     #define _DMA                   DMA1
     #define _DMA_CHANNEL           DMA_CHANNEL1
     #define _RCC_AHBENR_DMAEN      RCC_AHBENR_DMA1EN
@@ -39,6 +41,10 @@
     #define _TOUCH_RCC_APB2ENR_IOPEN   RCC_APB2ENR_IOPBEN
     #define _TOUCH_COORDS_REVERSE      1
 #endif //_TOUCH_PORT
+
+#ifndef _PWM_PIN
+    #define _PWM_PIN GPIO_USART1_TX
+#endif //_PWM_PIN
 
 #endif //_PORTS_H_
 
