@@ -671,23 +671,37 @@ void MIXER_SetDefaultLimit(struct Limit *limit)
     limit->servoscale_neg = 0;  //match servoscale
 }
 
+extern const u8 const EATRG[PROTO_MAP_LEN];
 void MIXER_AdjustForProtocol()
 {
+    int i, j;
     const u8 *map = ProtocolChannelMap[Model.protocol];
-    if(! map)
+    u8 chmap[PROTO_MAP_LEN];
+    //Automap assumes input is EATRG
+    if(! map || map == EATRG)
         return;
-    int i, ch;
+    for(i = 0; i < PROTO_MAP_LEN; i++) {
+        for (j= 0; j < PROTO_MAP_LEN; j++) {
+            if (EATRG[i] == map[j]) {
+                chmap[i] = j;
+                break;
+            }
+        }
+    }
     u8 template[NUM_CHANNELS];
     memcpy(template, Model.templates, sizeof(template));
     for(i = 0; i < NUM_MIXERS; i++) {
         if (! Model.mixers[i].src)
             break;
-        for(ch = 0; ch < PROTO_MAP_LEN; ch++)
-            if (map[ch] == Model.mixers[i].src) {
-                template[ch] = Model.templates[Model.mixers[i].dest];
-                Model.mixers[i].dest = ch;
+        for(j = 0; j < PROTO_MAP_LEN; j++) {
+            if(Model.mixers[i].dest == j) {
+                Model.mixers[i].dest = chmap[j];
                 break;
             }
+        }
+    }
+    for(j = 0; j < PROTO_MAP_LEN; j++) {
+        template[map[j]] = Model.templates[EATRG[j]];
     }
     memcpy(Model.templates, template, sizeof(template));
     MIXER_SetMixers(NULL, 0);

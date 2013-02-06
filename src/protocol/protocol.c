@@ -18,7 +18,8 @@
 #include "interface.h"
 #include "config/model.h"
 
-static const u8 const EATRG[PROTO_MAP_LEN] =
+//Not static because we need it in mixer.c
+const u8 const EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
 static const u8 const TAERG[PROTO_MAP_LEN] = 
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
