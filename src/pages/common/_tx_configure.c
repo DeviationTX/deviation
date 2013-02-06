@@ -127,8 +127,15 @@ static void calibrate_sticks(void)
         CLOCK_ResetWatchdog();
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
-        BUTTON_Handler();
-        GUI_RefreshScreen();
+        if(priority_ready & (1 << MEDIUM_PRIORITY)) {
+            BUTTON_Handler();
+            priority_ready &= ~(1 << MEDIUM_PRIORITY);
+        }
+        if(priority_ready & (1 << LOW_PRIORITY)) {
+            //Only sample every 100msec
+            GUI_RefreshScreen();
+            priority_ready = 0;
+        }
         for (u8 i = 0; i < INP_HAS_CALIBRATION; i++) {
             s32 value = CHAN_ReadRawInput(i + 1);
             if (value > Transmitter.calibration[i].max)
