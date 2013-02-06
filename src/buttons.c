@@ -18,6 +18,7 @@
 
 static buttonAction_t *buttonHEAD = NULL;
 static buttonAction_t *buttonPressed = NULL;
+#define DEBOUNCE_WAIT_MS 20
 
 void exec_callbacks(u32, enum ButtonFlags);
 
@@ -86,17 +87,25 @@ void BUTTON_Handler()
 
     static u32 long_press_at = 0;
     static u8  longpress_release = 0;
+    static u32 last_button_time = 0;
 
+    u32 ms = CLOCK_getms();
+    //debounce
+    if (ms < last_button_time)
+        return;
     u32 buttons = ScanButtons();
 
     u32 buttons_pressed=   buttons  & (~last_buttons);
     u32 buttons_released=(~buttons) &   last_buttons;
 
+    if (buttons != last_buttons)
+        last_button_time = ms;
+
     if(buttons_pressed && !longpress_release) {
         AUTODIMMER_Check();
         exec_callbacks(buttons_pressed, BUTTON_PRESS);
         last_buttons_pressed = buttons_pressed;
-        long_press_at = CLOCK_getms()+500;
+        long_press_at = ms+500;
         longpress_release = 0;
     }
     
@@ -111,7 +120,7 @@ void BUTTON_Handler()
     }
 
     if(buttons && (buttons == last_buttons) && !interrupt_longpress) {
-        if(CLOCK_getms()>long_press_at) {
+        if(ms > long_press_at) {
             exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
             longpress_release=1;
             long_press_at += 100;
