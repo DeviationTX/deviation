@@ -53,10 +53,7 @@ static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
     return (guiObject_t *)&gui->value[relrow];
 }
 enum {
-    SIMPLE_SRC,
-    SIMPLE_CURVE,
-    SIMPLE_SCALE,
-    SIMPLE_OFFSET,
+    SIMPLE_OFFSET = COMMON_LAST,
     SIMPLE_LAST,
 };
 static int simple_row_cb(int absrow, int relrow, int y, void *data)
@@ -66,15 +63,15 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     void *value = NULL;
     data = NULL;
     switch(absrow) {
-        case SIMPLE_SRC:
+        case COMMON_SRC:
             label = _tr_noop("Src:");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src;
             break;
-        case SIMPLE_CURVE:
+        case COMMON_CURVE:
             label = _tr_noop("Curve:");
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[0];
             break;
-        case SIMPLE_SCALE:
+        case COMMON_SCALE:
             label = _tr_noop("Scale:");
             value = set_number100_cb; data = &mp->mixer[0].scalar;
             break;
@@ -145,15 +142,15 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Mux:");
             value = set_mux_cb;
             break;
-        case COMPLEX_SRC:
+        case COMMON_SRC:
             label = _tr_noop("Src:");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
             break;
-        case COMPLEX_CURVE:
+        case COMMON_CURVE:
             label = _tr_noop("Curve:");
             tgl = curveselect_cb; value = set_curvename_cb; data = mp->cur_mixer;
             break;
-        case COMPLEX_SCALE:
+        case COMMON_SCALE:
             label = _tr_noop("Scale:");
             value = set_number100_cb; data = &mp->cur_mixer->scalar;
             break;
@@ -196,10 +193,7 @@ static void _show_complex(int page_change)
 }
 
 enum {
-    EXPO_SRC,
-    EXPO_HIGHCURVE,
-    EXPO_SCALE,
-    EXPO_SWITCH1,
+    EXPO_SWITCH1 = COMMON_LAST,
     EXPO_LINK1,
     EXPO_CURVE1,
     EXPO_SCALE1,
@@ -238,15 +232,15 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     int x = 0;
     int w = LEFT_VIEW_WIDTH;
     switch(absrow) {
-        case EXPO_SRC:
+        case COMMON_SRC:
             label = _tr("Src:");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
             break;
-        case EXPO_HIGHCURVE:
+        case COMMON_CURVE:
             label = _tr("High-Rate");
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[0];
             break;
-        case EXPO_SCALE:
+        case COMMON_SCALE:
             label = (void *)0; label_cb = scalestring_cb;
             value = set_number100_cb; data = &mp->mixer[0].scalar;
             break;

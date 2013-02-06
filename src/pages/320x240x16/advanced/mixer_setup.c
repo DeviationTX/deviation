@@ -218,6 +218,10 @@ static inline guiObject_t * _get_obj(int idx, int objid)
     (void)objid;
     switch(idx) {
         case COMPLEX_TRIM: return (guiObject_t *)&gui3->trim;
+        case COMMON_SRC:
+            return (guiObject_t *)(mp->cur_template == MIXERTEMPLATE_SIMPLE ? &gui1->src
+                                   : mp->cur_template == MIXERTEMPLATE_EXPO_DR ? &gui2->src
+                                     : &gui3->src);
         default: return NULL;
     }
 }
