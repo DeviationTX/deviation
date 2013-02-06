@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/timeb.h>
+#include <sys/time.h>
 #include <time.h>
 #include <errno.h>
 #ifndef WIN32
@@ -466,6 +467,14 @@ void CLOCK_Init()
     int Ret;
     timer_callback = NULL;
     signal(SIGALRM, _ALARMhandler);
+#if 1  //Mac OSX doesn't support posix timers, but does support itimers
+    struct itimerval in;
+    in.it_value.tv_usec = 100 * 1000; //100msec
+    in.it_value.tv_sec = 0;
+    in.it_interval.tv_usec = 1000; //1msec
+    in.it_interval.tv_sec = 0;
+    setitimer(ITIMER_REAL, &in, NULL);
+#else
      //create a new timer.
     timer_t timerid;
     struct sigevent sig;
@@ -488,6 +497,7 @@ void CLOCK_Init()
         printf("timer_settime() failed with %d\n", errno);
         exit(1);
     }
+#endif
 }
 #else
 HANDLE mainThread;
