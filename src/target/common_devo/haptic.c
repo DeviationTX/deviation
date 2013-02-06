@@ -22,7 +22,7 @@ void VIBRATINGMOTOR_Init()
 {
     if (!HAS_VIBRATINGMOTOR)
         return;
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
 
     gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_2_MHZ,
             GPIO_CNF_OUTPUT_PUSHPULL, GPIO2);
