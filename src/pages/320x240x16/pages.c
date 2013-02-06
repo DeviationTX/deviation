@@ -226,6 +226,7 @@ void PAGE_RemoveAllObjects()
     if(! GUI_IsEmpty()) {
         GUI_RemoveAllObjects();
         memset(&gui_objs, 0, sizeof(gui_objs));
+        BUTTON_InterruptLongPress(); //Make sure button press is not passed to next page
     }
 }
 

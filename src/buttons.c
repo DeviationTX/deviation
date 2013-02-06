@@ -102,14 +102,17 @@ void BUTTON_Handler()
         last_button_time = ms;
 
     if(buttons_pressed && !longpress_release) {
+        //printf("pressed: %08d\n", buttons_pressed);
         AUTODIMMER_Check();
         exec_callbacks(buttons_pressed, BUTTON_PRESS);
         last_buttons_pressed = buttons_pressed;
         long_press_at = ms+500;
         longpress_release = 0;
+        interrupt_longpress = 0;
     }
     
     if(buttons_released) {
+        //printf("release: %08d\n", buttons_released);
         interrupt_longpress = 0;
         longpress_release = 0;
         if(!longpress_release) {
@@ -121,6 +124,7 @@ void BUTTON_Handler()
 
     if(buttons && (buttons == last_buttons) && !interrupt_longpress) {
         if(ms > long_press_at) {
+            //printf("long_press: %08d\n", buttons_released);
             exec_callbacks(last_buttons_pressed, BUTTON_LONGPRESS);
             longpress_release=1;
             long_press_at += 100;
@@ -132,7 +136,7 @@ void BUTTON_Handler()
 
 void BUTTON_InterruptLongPress()
 {
-    printf("interrupt \n");
+    //printf("interrupt \n");
     interrupt_longpress = 1;
 }
 

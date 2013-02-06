@@ -83,6 +83,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     if (pages[cur_page].exit)
         pages[cur_page].exit();
     cur_page = id;
+    BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
     if (pages[cur_page].init == PAGE_MainInit)
         quick_page_enabled = 1;
     else if (pages[cur_page].init == PAGE_MenuInit)
@@ -123,6 +124,7 @@ void PAGE_RemoveAllObjects()
     if(! GUI_IsEmpty()) {
         GUI_RemoveAllObjects();
         memset(&gui_objs, 0, sizeof(gui_objs));
+        BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
     }
 }
 
@@ -166,12 +168,10 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 
     if((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(buttons, BUT_UP))
     {
-        BUTTON_InterruptLongPress(); // avoid the quickpage switching continously
         PAGE_ChangeQuick(1);
         return 1;
     } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(buttons, BUT_DOWN))
     {
-        BUTTON_InterruptLongPress();
         PAGE_ChangeQuick(-1);
         return 1;
     }
