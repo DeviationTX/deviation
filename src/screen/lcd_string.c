@@ -165,16 +165,23 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     LCD_DrawStop();
 }
 
-u8 open_font(unsigned int idx)
+void close_font()
 {
-    char font[20];
-    if (! idx)
-        return 0;
-    sprintf(font, "media/%s.fon", FontNames[idx-1]);
     if(cur_str.font.fh) {
         fclose(cur_str.font.fh);
         cur_str.font.fh = NULL;
     }
+}
+
+u8 open_font(unsigned int idx)
+{
+    char font[20];
+    close_font();
+    if (! idx) {
+        cur_str.font.idx = 0;
+        return 0;
+    }
+    sprintf(font, "media/%s.fon", FontNames[idx-1]);
     cur_str.font.fh = fopen(font, "rb");
     if (! cur_str.font.fh) {
         printf("Couldn't open font file: %s\n", font);

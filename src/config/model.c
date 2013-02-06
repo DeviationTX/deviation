@@ -289,6 +289,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             for (i = 0; i < NUM_STR_ELEMS(RADIO_PROTOCOL_VAL); i++) {
                 if (MATCH_VALUE(RADIO_PROTOCOL_VAL[i])) {
                     m->protocol = i;
+                    PROTOCOL_Load(1);
                     return 1;
                 }
             }

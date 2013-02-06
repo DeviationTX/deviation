@@ -50,11 +50,10 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
 };
 #undef PROTODEF
 
-static void PROTOCOL_Load();
 void PROTOCOL_Init(u8 force)
 {
     PROTOCOL_DeInit();
-    PROTOCOL_Load(Model.protocol);
+    PROTOCOL_Load(0);
     proto_state = 0;
     if (! force && PROTOCOL_CheckSafe()) {
         return;
@@ -99,8 +98,9 @@ void PROTOCOL_DeInit()
 
 /*This symbol is exported bythe linker*/
 extern unsigned _data_loadaddr;
-void PROTOCOL_Load()
+void PROTOCOL_Load(int no_dlg)
 {
+    (void)no_dlg;
 #ifdef MODULAR
     if(*loaded_protocol == Model.protocol)
         return;
@@ -112,10 +112,18 @@ void PROTOCOL_Load()
     }
     #undef PROTODEF
     FILE *fh;
+    //We close the current font because on the dveo8 we reuse
+    //the font filehandle to read the protocol.
+    //Thatis necessary because we need to be able to load the
+    //protocol while an ini file is open, and we don't want to
+    //waste the RAM for an extra filehandle
+    u8 old_font = LCD_SetFont(0);
     fh = fopen(file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
-	PAGE_ShowInvalidModule();
+        if(! no_dlg)
+            PAGE_ShowInvalidModule();
+        LCD_SetFont(old_font);
         return;
     }
     setbuf(fh, 0);
@@ -134,8 +142,10 @@ void PROTOCOL_Load()
             break;
     }
     fclose(fh);
+    LCD_SetFont(old_font);
     if ((unsigned long)&_data_loadaddr != *loaded_protocol) {
-	PAGE_ShowInvalidModule();
+        if(! no_dlg)
+            PAGE_ShowInvalidModule();
         *loaded_protocol = 0;
         return;
     }

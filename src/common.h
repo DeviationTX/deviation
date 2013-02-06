@@ -119,6 +119,7 @@ enum TxPower {
 };
 
 void PROTOCOL_Init(u8 force);
+void PROTOCOL_Load(int no_dlg);
 void PROTOCOL_DeInit();
 u8 PROTOCOL_WaitingForSafe();
 u64 PROTOCOL_CheckSafe();

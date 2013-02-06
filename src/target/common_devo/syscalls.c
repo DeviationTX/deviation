@@ -125,7 +125,7 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
 #ifdef MEDIA_DRIVE
     if (strncmp(file, "media/", 6) == 0) {
         _drive_num = 1;
-        if (strcmp(file + strlen(file) - 4, ".fon") == 0) {
+        if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strncmp(file, "protocol/", 9)== 0) {
             fd = 4;
         } else {
             fd = 5;
@@ -135,7 +135,7 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
         fd = 3;
     }
 #else
-    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) ? 4 : 3;
+    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strncmp(file, "protocol/", 9)== 0 ? 4 : 3;
 #endif
     if(file_open[fd-3]) {
         dbgprintf("_open_r: file already open.\n");
