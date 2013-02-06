@@ -61,12 +61,18 @@ AUX4
 AUX5
 :About Deviation
 О программе
+:Advanced
+Микшеры
 :Airplane
 Самолет
 :Alarm
 Сигнал
 :Altitude
 Высота
+:Auto
+Авто
+:Aux2
+Aux2
 :Backlight:
 Подсветка:
 :Bar %d:
@@ -133,6 +139,8 @@ AUX5
 Режим канала:
 :Change
 Изменить
+:Channel
+Канал
 :Channel monitor
 Монитор каналов
 :Channel output
@@ -157,6 +165,8 @@ AUX5
 Цикл2
 :Cyclic3
 Цикл3
+:D/R & Exp
+Д/Р и Экспонента
 :DR
 ДР
 :Deadband
@@ -211,6 +221,10 @@ AUX5
 F°
 |devo8:Fahren
 Фаренгейт
+:Fail safe
+Отказоуст.
+|devo8:Fail safe
+Отказоустойчивость
 :Failsafe:
 Отказоуст.:
 |devo8:Failsafe:
@@ -223,6 +237,10 @@ F°
 Фиксир.ID:
 |devo8:Fixed ID:
 Фиксированный ID:
+:Fly mode
+Пол.режим
+|devo8:Fly mode
+Полетный режим
 :Foot
 Фут
 :Frame Size
@@ -231,20 +249,38 @@ F°
 Шасси
 :GPS
 GPS
+:Gear
+Шасси
 :Generic settings
 Основные настройки
+:Gyro sense
+Чувств.гиро
+|devo8:Gyro sense
+Чувств. гироскопа
+:H
+H
 :Heli
 Вертолет
+:Heli/Standard GUI
+Вертолет/Стандартный
+|devo8:Heli/Simple GUI
+Вертолет/Стандартный интерфейс
 :Helicopter
 Вертолет
 :High-Rate
 Выс.расход
 |devo8:High-Rate
 Высокий расход
+:Hold position
+Положение
 :Icon
 Значок
 :Icon:
 Значок:
+:Idle 1
+Пилотаж 1
+:Idle 2
+Пилотаж 2
 :Input monitor
 Монитор ввода
 :Input:
@@ -253,12 +289,16 @@ GPS
 Вставить
 :Inverted
 Реверс
+:L
+L
 :LCD settings
 Настройки экрана
 :LEFT_H
 ЛЕВЫЙ_Г
 :LEFT_V
 ЛЕВЫЙ_В
+:LIN
+Линейно
 :Language:
 Язык:
 :Latitude
@@ -273,6 +313,8 @@ GPS
 Загрузить
 :Load...
 Загрузка...
+:Locked
+Заперто
 :Longitude
 Долгота
 :Low Battery
@@ -281,6 +323,8 @@ GPS
 Низк.расход
 |devo8:Low-Rate
 Низкий расход
+:M
+M
 :MIX0
 МИКШ0
 :MIX1
@@ -313,14 +357,24 @@ GPS
 Мин/Макс
 :Mixer
 Микшер
+:Mixer GUI:
+Интерфейс:
+|devo8:Mixer GUI:
+Интерфейс микшеров:
 :Mixers:
 Микшер:
+:Mode
+Режим
 :Mode %d
 Режим %d
 :Model menu
 Меню модели
 :Model name:
 Имя модели:
+:Model needs reset\nfor simple mixer
+Модель требует сброса\nдля стандартных микшеров
+:Model needs to be reset\nin order to switch to the standard mixer
+Модель требует сброса\nдля переключения к стандартным микшерам
 :Model setup
 Модель
 :Model type:
@@ -357,8 +411,14 @@ GPS
 ОK
 :On
 Вкл.
+:PIT
+Шаг
 :Page:
 Стр.:
+:Pit Mix:
+Шаг Микш:
+:Pitch curves
+Кривые шага
 :Plane
 Самолет
 :Point:
@@ -417,6 +477,8 @@ RPM
 Удалить
 :Reset
 Сброс
+:Reverse
+Реверс
 :Reverse:
 Реверс:
 :Reversed
@@ -443,6 +505,8 @@ RPM
 Масшт.%s:
 :Scanner
 Сканер
+:Servo
+серво
 :Simple
 Простой
 :Simple 4 Channel
@@ -455,6 +519,10 @@ RPM
 Источник
 :Src:
 Источник:
+:Standard
+Стандарт
+:Standard Mixer
+Стандартный микшер
 :Start:
 Старт:
 :Step:
@@ -465,14 +533,20 @@ RPM
 Режим стиков:
 :Sticks:
 Стики:
+:Subtrim
+Субтриммер
 :Subtrim:
 Субтриммер:
+:Swash
+Автомат перекоса
 :SwashType:
 Тип авт.пер.:
 |devo8:SwashType:
 Тип авт.перекоса:
 :Switch %d:
 Перекл. %d:
+:Switch assignment
+Переключатели
 :Switch1
 Перекл.1
 :Switch2
@@ -531,6 +605,14 @@ RPM
 Шаблон...
 :Test
 Тест
+:Thr hold
+Удерж.газа
+|devo8:Thr hold
+Удержание газа
+:Throttle curves
+Кривые газа
+:Throttle hold
+Удержание газа
 :Time
 Время
 :Timer
@@ -563,6 +645,8 @@ RPM
 Передатчик
 :Transmitter menu
 Меню передатчика
+:Travel adjust
+Расходы
 :Trim
 Триммер
 :Trim +:
@@ -587,8 +671,12 @@ RPM
 USB
 :Unknown
 Неизвестный
+:Unlocked
+Открыто
 :Up
 Вверх
+:Value
+Значение
 :Value:
 Значение:
 :Vibration:
