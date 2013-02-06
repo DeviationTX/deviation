@@ -113,7 +113,7 @@ void LCD_Init()
             LCD_Data(0x00);
     }
     lcd_display(1);
-    LCD_Contrast(0x78);
+    LCD_Contrast(5);
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
 }
