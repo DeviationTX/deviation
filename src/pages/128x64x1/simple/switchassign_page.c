@@ -33,7 +33,7 @@ void PAGE_SwitchAssignInit(int page)
 
     PAGE_ShowHeader(_tr("Press ENT to change:"));
 
-    u8 row = 0;
+    u8 row = ITEM_SPACE;
     u8 w = 66;
     u8 x = 58;
     GUI_CreateLabelBox(&gui->modelbl, 0, row,
