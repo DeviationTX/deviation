@@ -464,7 +464,6 @@ void _ALARMhandler(int sig) {
 
 void CLOCK_Init()
 {
-    int Ret;
     timer_callback = NULL;
     signal(SIGALRM, _ALARMhandler);
 #if 1  //Mac OSX doesn't support posix timers, but does support itimers
@@ -476,6 +475,7 @@ void CLOCK_Init()
     setitimer(ITIMER_REAL, &in, NULL);
 #else
      //create a new timer.
+    int Ret;
     timer_t timerid;
     struct sigevent sig;
     sig.sigev_notify = SIGEV_SIGNAL;
