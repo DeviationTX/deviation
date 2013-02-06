@@ -272,7 +272,7 @@ static void build_data_pkt_2601()
     if (frame == 0) {
         //Gyro & Rudder mix
         v1 = get_channel(6, 0x200, 0x200, 0x200);
-        v2 = 512;
+        v2 = 0;
     }
     if (Model.proto_opts[WK2601_OPT_CHANMODE] == 1) {
         channels_heli_2601(frame, &v1, &v2);
