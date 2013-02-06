@@ -71,7 +71,8 @@ void LCD_Contrast(u8 contrast)
 {
     //int data = 0x20 + contrast * 0xC / 10;
     LCD_Cmd(0x81);
-    LCD_Cmd(0x78); //contrast); //data & 0x7F);
+    int c = contrast * 12 + 76; //contrast should range from ~72 to ~200
+    LCD_Cmd(c);
 }
 
 void LCD_Init()
