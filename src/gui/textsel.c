@@ -49,7 +49,7 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
-    select->enable = 1;
+    select->enable |= 0x01;
 
     return obj;
 }
@@ -82,7 +82,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
-    select->enable = 1;
+    select->enable |= 0x01;
 
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
@@ -103,7 +103,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     if (select->type != TEXTSELECT_DEVO10) {
         GUI_DrawImageHelper(box->x + ARROW_WIDTH,
                             box->y, select->button, DRAW_NORMAL);
-        if (select->enable) {
+        if (select->enable & 0x01) {
             GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
                                 select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
             GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
@@ -118,7 +118,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     } else {   // plate text select for devo 10, copy most behavior from label.c
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
         u8 arrow_width = ARROW_WIDTH - 1;
-        if (select->enable == 1) {
+        if (select->enable  & 0x01) {
             u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
             u16 x1 = box->x + arrow_width -1;
             LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
@@ -198,34 +198,36 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
         return 0;
     }
     box.width = ARROW_WIDTH;
-    if (coords_in_box(&box, coords)) {
-        if (! press_type) {
-            if (! select->state) {
-                select->state = 0x01;
+    if (select->enable & 0x01) {
+        if (coords_in_box(&box, coords)) {
+            if (! press_type) {
+                if (! select->state) {
+                    select->state = 0x01;
+                    OBJ_SET_DIRTY(obj, 1);
+                }
+            } else if (select->ValueCB) {
                 OBJ_SET_DIRTY(obj, 1);
+                select->ValueCB(obj, -2, select->cb_data);
+                select->state |= 0x80;
             }
-        } else if (select->ValueCB) {
-            OBJ_SET_DIRTY(obj, 1);
-            select->ValueCB(obj, -2, select->cb_data);
-            select->state |= 0x80;
+            return 1;
         }
-        return 1;
-    }
-    box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
-    if (coords_in_box(&box, coords)) {
-        if (! press_type) {
-            if (! select->state) {
-                select->state = 0x02;
+        box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+        if (coords_in_box(&box, coords)) {
+            if (! press_type) {
+                if (! select->state) {
+                    select->state = 0x02;
+                    OBJ_SET_DIRTY(obj, 1);
+                }
+            } else if (select->ValueCB) {
                 OBJ_SET_DIRTY(obj, 1);
+                select->ValueCB(obj, 2, select->cb_data);
+                select->state |= 0x80;
             }
-        } else if (select->ValueCB) {
-            OBJ_SET_DIRTY(obj, 1);
-            select->ValueCB(obj, 2, select->cb_data);
-            select->state |= 0x80;
+            return 1;
         }
-        return 1;
     }
-    if (! press_type && ! select->state && select->SelectCB) {
+    if (! press_type && ! select->state && select->SelectCB && (select->enable & 0x02)) {
         OBJ_SET_DIRTY(obj, 1);
         select->state = 0x04;
         return 1;
@@ -252,6 +254,7 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
 {
     guiObject_t *obj = (guiObject_t *)select;
+    select->enable = enable ? select->enable | 0x02 : select->enable & ~0x02;
     if (select->type == TEXTSELECT_DEVO10) { // plate text for Devo10
         if (enable)
             select->desc.style = LABEL_BOX;
@@ -276,8 +279,9 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
 void GUI_TextSelectEnable(guiTextSelect_t *select, u8 enable)
 {
     guiObject_t *obj = (guiObject_t *)select;
-    if (select->enable != enable) {
-        select->enable = enable;
+    enable = enable ? 1 : 0;
+    if ((0x01 & select->enable) ^ enable) { // bit 0 is different
+        select->enable ^= 0x01; //toggle bit 0
         OBJ_SET_DIRTY(obj, 1);
     }
 }
@@ -285,5 +289,5 @@ void GUI_TextSelectEnable(guiTextSelect_t *select, u8 enable)
 u8 GUI_IsTextSelectEnabled(struct guiObject *obj)
 {
     struct guiTextSelect *select = (struct guiTextSelect *)obj;
-    return select->enable;
+    return select->enable & 0x01;
 }

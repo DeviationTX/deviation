@@ -43,7 +43,7 @@ static void update_textsel_state()
         if (selectable_bitmap >> (i-1) & 0x01) {
             GUI_TextSelectEnable(&gui->val[i], 1);
         } else {
-            GUI_TextSelectEnable(&gui->val[i], 2);
+            GUI_TextSelectEnable(&gui->val[i], 0);
         }
     }
 }
@@ -53,7 +53,7 @@ static void press_cb(guiObject_t *obj, void *data)
     u8 point_num = (long)data;
     u8 *selectable_bitmap = &selectable_bitmaps[curve_mode * 4 + pit_mode];
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
-        GUI_TextSelectEnable((guiTextSelect_t *)obj, 2);
+        GUI_TextSelectEnable((guiTextSelect_t *)obj, 0);
         *selectable_bitmap &= ~(1 << (point_num-1));
     } else {
         GUI_TextSelectEnable((guiTextSelect_t *)obj, 1);
