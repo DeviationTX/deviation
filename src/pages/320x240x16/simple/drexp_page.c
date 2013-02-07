@@ -36,19 +36,19 @@ void PAGE_DrExpInit(int page)
     }
     /* Row 1 */
     GUI_CreateLabelBox(&gui->srclbl, 10, 40, 96, 16, &DEFAULT_FONT, NULL, NULL, _tr("Src"));
-    GUI_CreateTextSelect(&gui->src, 100, 40, TEXTSELECT_96, 0x0000, NULL, set_type_cb, NULL);
+    GUI_CreateTextSelect(&gui->src, 100, 40, TEXTSELECT_96, NULL, set_type_cb, NULL);
     /* Row 2 */
     GUI_CreateLabelBox(&gui->mode[0], 4, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_NORMAL));
     GUI_CreateLabelBox(&gui->mode[1], 112, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE1));
     GUI_CreateLabelBox(&gui->mode[2], 216, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE2));
     /* Row 3 */
-    GUI_CreateTextSelect(&gui->dr[0], 4, 80, TEXTSELECT_96, 0x0000, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_NORMAL));
-    GUI_CreateTextSelect(&gui->dr[1], 112, 80, TEXTSELECT_96, 0x0000, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE1));
-    GUI_CreateTextSelect(&gui->dr[2], 216, 80, TEXTSELECT_96, 0x0000, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE2));
+    GUI_CreateTextSelect(&gui->dr[0], 4, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_NORMAL));
+    GUI_CreateTextSelect(&gui->dr[1], 112, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE1));
+    GUI_CreateTextSelect(&gui->dr[2], 216, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE2));
     /* Row 4 */
-    GUI_CreateTextSelect(&gui->exp[0], 4, 100, TEXTSELECT_96, 0x0000, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_NORMAL));
-    GUI_CreateTextSelect(&gui->exp[1], 112, 100, TEXTSELECT_96, 0x0000, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE1));
-    GUI_CreateTextSelect(&gui->exp[2], 216, 100, TEXTSELECT_96, 0x0000, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE2));
+    GUI_CreateTextSelect(&gui->exp[0], 4, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_NORMAL));
+    GUI_CreateTextSelect(&gui->exp[1], 112, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE1));
+    GUI_CreateTextSelect(&gui->exp[2], 216, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE2));
     /* Row 5 */
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;

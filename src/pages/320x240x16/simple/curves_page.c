@@ -96,8 +96,8 @@ static void show_page(CurvesMode _curve_mode, int page)
     /* Row 1 */
     GUI_CreateButton(&gui->auto_, 20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
-    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, 0x0000, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, 0x0000, NULL, set_holdstate_cb, NULL);
+    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
@@ -110,7 +110,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         if(label[0] > '9')
             label = _tr(label);
         GUI_CreateLabelBox(&gui->vallbl[i], COL1, 60+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, label);
-        GUI_CreateTextSelect(&gui->val[i], COL2, 60+20*i, TEXTSELECT_64, 0x0000, NULL, set_pointval_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->val[i], COL2, 60+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
             GUI_CreateButton(&gui->lock[i-1], COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }

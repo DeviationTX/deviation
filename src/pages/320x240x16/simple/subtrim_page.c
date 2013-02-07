@@ -38,7 +38,7 @@ static void show_page(int page)
         guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, 0x0000, NULL, subtrim_cb, (void *)(ch));
+        GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, NULL, subtrim_cb, (void *)(ch));
     }
 }
 void PAGE_SubtrimInit(int page)

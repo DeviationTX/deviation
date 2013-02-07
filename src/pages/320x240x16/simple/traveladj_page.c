@@ -38,8 +38,8 @@ static void show_page(int page)
         guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 10, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)ch);
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateTextSelect(&gui->down[i], 90, row, TEXTSELECT_96, 0x0000, NULL, traveldown_cb, (void *)ch);
-        GUI_CreateTextSelect(&gui->up[i], 196, row, TEXTSELECT_96, 0x0000, NULL, travelup_cb, (void *)ch);
+        GUI_CreateTextSelect(&gui->down[i], 90, row, TEXTSELECT_96, NULL, traveldown_cb, (void *)ch);
+        GUI_CreateTextSelect(&gui->up[i], 196, row, TEXTSELECT_96, NULL, travelup_cb, (void *)ch);
     }
 }
 

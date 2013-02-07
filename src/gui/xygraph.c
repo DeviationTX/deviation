@@ -65,7 +65,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         (u32)(box->x + (((s32)(xval)) - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x))
     #define VAL_TO_Y(yval) \
         (u32)(box->y + box->height - (((s32)(yval)) - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y))
-    LCD_FillRect(box->x, box->y, box->width, box->height, 0x0000);
+    LCD_FillRect(box->x, box->y, box->width, box->height, Display.xygraph.bg_color);
     if (graph->grid_x) {
         int xval;
         for (xval = graph->min_x + graph->grid_x; xval < graph->max_x; xval += graph->grid_x) {
@@ -73,7 +73,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
                 continue;
             x = VAL_TO_X(xval);
             //LCD_DrawDashedVLine(x, box->y, box->height, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
-            LCD_DrawFastVLine(x, box->y, box->height, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            LCD_DrawFastVLine(x, box->y, box->height, Display.xygraph.grid_color);
         }
     }
     if (graph->grid_y) {
@@ -83,16 +83,16 @@ void GUI_DrawXYGraph(struct guiObject *obj)
                 continue;
             y = VAL_TO_Y(yval);
             //LCD_DrawDashedHLine(box->x, y, box->width, 5, RGB888_to_RGB565(0x30, 0x30, 0x30));
-            LCD_DrawFastHLine(box->x, y, box->width, RGB888_to_RGB565(0x30, 0x30, 0x30));
+            LCD_DrawFastHLine(box->x, y, box->width, Display.xygraph.grid_color);
         }
     }
     if (graph->min_x < 0 && graph->max_x > 0) {
         int x = box->x + box->width * (0 - graph->min_x) / (graph->max_x - graph->min_x);
-        LCD_DrawFastVLine(x, box->y, box->height, 0xFFFF);
+        LCD_DrawFastVLine(x, box->y, box->height, Display.xygraph.axis_color);
     }
     if (graph->min_y < 0 && graph->max_y > 0) {
         y = box->y + box->height - box->height * (0 - graph->min_y) / (graph->max_y - graph->min_y);
-        LCD_DrawFastHLine(box->x, y, box->width, 0xFFFF);
+        LCD_DrawFastHLine(box->x, y, box->width, Display.xygraph.axis_color);
     }
     u16 lastx = box->x;
     u16 lasty = box->y + box->height -1;
@@ -105,7 +105,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         //printf("(%d, %d - %d, %d) -> (%d, %d)\n",
         //       (int)lastx, (int)lasty, (int)x, (int)y, (int)xval, (int)yval);
         if (x != 0) {
-            LCD_DrawLine(lastx, lasty, x + box->x, box->y + box->height - y - 1, 0xFFE0); //Yellow
+            LCD_DrawLine(lastx, lasty, x + box->x, box->y + box->height - y - 1, Display.xygraph.fg_color); //Yellow
         }
         lastx = x + box->x;
         lasty = box->y + box->height - y - 1;
@@ -126,9 +126,11 @@ void GUI_DrawXYGraph(struct guiObject *obj)
                 x2 = box->x + box->width - 1;
             if ( y2 >= box->y + box->height)
                 y2 = box->y + box->height - 1;
-            LCD_FillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, RGB888_to_RGB565(0x00, 0xFF, 0xFF));
+            LCD_FillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, Display.xygraph.point_color);
         }
     }
+    if(Display.xygraph.outline_color != Display.xygraph.bg_color)
+        LCD_DrawRect(box->x, box->y, box->width, box->height, Display.xygraph.outline_color);
 }
 
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press)

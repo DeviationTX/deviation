@@ -20,7 +20,7 @@
 #include <string.h>
 
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "batt_alarm", "tiny", "bold", "narrow", "small", "bigboxneg", "smallboxneg", "dialogtitle", "dialogbody", "normalbox", "normalboxneg", "section"};
+static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "batt_alarm", "tiny", "bold", "narrow", "small", "bigboxneg", "smallboxneg", "dialogtitle", "dialogbody", "normalbox", "normalboxneg", "section", "textsel", "button"};
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
 static const char FG_COLOR[] = "fg_color";
@@ -31,6 +31,9 @@ static const char OUTLINE_COLOR[] = "outline_color";
 static const char FONT_COLOR[] = "font_color";
 static const char IS_TRANSPARENT[] = "transparent";
 static const char * const BARGRAPH_VAL[] = { "bargraph", "trim" };
+static const char XY_AXIS_COLOR[] = "axis_color";
+static const char XY_GRID_COLOR[] = "grid_color";
+static const char XY_POINT_COLOR[] = "point_color";
 static const char BOX[] = "box_type";
 static const char * const BOX_VAL[] = { "none", "center", "fill", "outline", "underline", "squarebox" , "inverted"};
 
@@ -218,6 +221,31 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if(MATCH_KEY(FG_COLOR)) {
             d->scrollbar.fg_color = get_color(value);
             return 1;
+        }
+    }
+    if(MATCH_SECTION("xygraph")) {
+        if(MATCH_KEY(BG_COLOR)) {
+            d->xygraph.bg_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY(FG_COLOR)) {
+            d->xygraph.fg_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY(XY_AXIS_COLOR)) {
+            d->xygraph.axis_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY(XY_GRID_COLOR)) {
+            d->xygraph.grid_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY(XY_POINT_COLOR)) {
+            d->xygraph.point_color = get_color(value);
+            return 1;
+        }
+        if(MATCH_KEY(OUTLINE_COLOR)) {
+            d->xygraph.outline_color = get_color(value);
         }
     }
     for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {

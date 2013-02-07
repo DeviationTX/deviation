@@ -38,8 +38,8 @@ void PAGE_ThroHoldInit(int page)
     (void)page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROHOLD), MODELMENU_Show);
     GUI_CreateLabelBox(&gui->enlbl, 30, 80, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelect(&gui->en, 150, 80, TEXTSELECT_128, 0x0000, toggle_thold_cb, throhold_cb,  NULL);
+    GUI_CreateTextSelect(&gui->en, 150, 80, TEXTSELECT_128, toggle_thold_cb, throhold_cb,  NULL);
 
     GUI_CreateLabelBox(&gui->valuelbl, 30, 120, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelect(&gui->value, 150, 120, TEXTSELECT_128, 0x0000, NULL, holdpostion_cb,  NULL);
+    GUI_CreateTextSelect(&gui->value, 150, 120, TEXTSELECT_128, NULL, holdpostion_cb,  NULL);
 }

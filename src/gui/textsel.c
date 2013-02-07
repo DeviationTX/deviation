@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type, u16 fontColor,
+guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data)
@@ -45,7 +45,7 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
     connect_object(obj);
 
     select->state     = 0;
-    select->fontColor = fontColor;
+    select->fontColor = 0;
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
@@ -110,7 +110,8 @@ void GUI_DrawTextSelect(struct guiObject *obj)
                                 box->y, ARROW_RIGHT,
                                 select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
         }
-        LCD_SetFontColor(select->fontColor);
+        LCD_SetFont(TEXTSEL_FONT.font);
+        LCD_SetFontColor(TEXTSEL_FONT.font_color);
         LCD_GetStringDimensions((const u8 *)str, &w, &h);
         x = box->x + (box->width - w) / 2;
         y = box->y + 2 + (box->height - h) / 2;

@@ -395,7 +395,7 @@ guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *, u16 x, u16 y, u16 width, u16 heig
                       void *cb_data);
 guiObject_t *GUI_CreateBarGraph(guiBarGraph_t *, u16 x, u16 y, u16 width, u16 height, s16 min,
         s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
-guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *, u16 x, u16 y, enum TextSelectType type, u16 fontColor,
+guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *, u16 x, u16 y, enum TextSelectType type,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);

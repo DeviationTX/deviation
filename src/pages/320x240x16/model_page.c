@@ -39,11 +39,11 @@ void PAGE_ModelInit(int page)
 
     row = 40;
     GUI_CreateLabel(&gui->filelbl, 8, row, NULL, DEFAULT_FONT, _tr("File:"));
-    GUI_CreateTextSelect(&gui->file, 136, row, TEXTSELECT_96, 0x0000, file_press_cb, file_val_cb, NULL);
+    GUI_CreateTextSelect(&gui->file, 136, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
 
     row+= 20;
     GUI_CreateLabel(&gui->guilbl, 8, row, NULL, DEFAULT_FONT, _tr("Mixer GUI:"));
-    GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, 0x0000, NULL, mixermode_cb, NULL);
+    GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, NULL, mixermode_cb, NULL);
 
     row += 20;
     GUI_CreateLabel(&gui->namelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model name:"));  // use the same naming convention for devo8 and devo10
@@ -52,20 +52,20 @@ void PAGE_ModelInit(int page)
 
     row += 20;
     GUI_CreateLabel(&gui->typelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model type:"));
-    GUI_CreateTextSelect(&gui->type, 136, row, TEXTSELECT_96, 0x0000, type_press_cb, type_val_cb, NULL);
+    GUI_CreateTextSelect(&gui->type, 136, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
 
     row += 24;
     GUI_CreateLabel(&gui->protolbl, 8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
-    GUI_CreateTextSelect(&gui->proto, 136, row, TEXTSELECT_96, 0x0000, proto_press_cb, protoselect_cb, NULL);
+    GUI_CreateTextSelect(&gui->proto, 136, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
 
     row += 20;
     GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("# Channels:"));
-    GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, 0x0000, NULL, numchanselect_cb, NULL);
+    GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
 
 
     row += 32;
     GUI_CreateLabel(&gui->pwrlbl, 8, row, NULL, DEFAULT_FONT, _tr("Tx power:"));
-    GUI_CreateTextSelect(&gui->pwr, 136, row, TEXTSELECT_96, 0x0000, NULL, powerselect_cb, NULL);
+    GUI_CreateTextSelect(&gui->pwr, 136, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
 
     row += 20;
     if(Model.fixed_id == 0)

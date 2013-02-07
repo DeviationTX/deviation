@@ -41,16 +41,16 @@ void PAGE_SwitchAssignInit(int page)
     /* Row 1 */
     int row = 40;
     GUI_CreateLabelBox(&gui->modelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
-    GUI_CreateTextSelect(&gui->mode, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
+    GUI_CreateTextSelect(&gui->mode, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
 
     /* Row 2 */
     row += ROW_SPACE;
     GUI_CreateLabelBox(&gui->tholdlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelect(&gui->thold, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_HOLD);
+    GUI_CreateTextSelect(&gui->thold, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_HOLD);
 
     /* Row 3 */
     row += ROW_SPACE;
     GUI_CreateLabelBox(&gui->gyrolbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
-    GUI_CreateTextSelect(&gui->gyro, COL2, row, TEXTSELECT_128, 0x0000, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
+    GUI_CreateTextSelect(&gui->gyro, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
 }
 

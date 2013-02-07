@@ -22,7 +22,9 @@
 #define NORMALBOX_FONT     (Display.font[15])
 #define NORMALBOXNEG_FONT  (Display.font[16])
 #define SECTION_FONT       (Display.font[17])
-#define NUM_LABELS 18
+#define TEXTSEL_FONT       (Display.font[18])
+#define BUTTON_FONT        (Display.font[19])
+#define NUM_LABELS 20
 
 struct disp_keyboard {
     u8 font;
@@ -52,6 +54,16 @@ struct disp_bargraph {
     u16 fg_color_zero;
     u16 outline_color;
 };
+
+struct disp_xygraph {
+    u16 bg_color;
+    u16 fg_color;
+    u16 grid_color;
+    u16 axis_color;
+    u16 point_color;
+    u16 outline_color;
+};
+
 struct disp_scrollbar {
     u16 bg_color;
     u16 fg_color;
@@ -69,6 +81,7 @@ struct display_settings {
     struct disp_listbox listbox;
     struct disp_scrollbar scrollbar;
     struct disp_bargraph bargraph;
+    struct disp_xygraph xygraph;
     struct disp_bargraph trim;
     u16 select_color;
     u8 select_width;

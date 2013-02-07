@@ -37,7 +37,7 @@ static void _show_page()
             trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)i));
         GUI_CreateLabel(&gui->neg[i], 72, 24*i + 66, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
         GUI_CreateLabel(&gui->pos[i], 136, 24*i + 66, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
-        GUI_CreateTextSelect(&gui->step[i], 200, 24*i + 64, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &trim[i].step);
+        GUI_CreateTextSelect(&gui->step[i], 200, 24*i + 64, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
     }
 }
 
@@ -55,13 +55,13 @@ static void _edit_cb(guiObject_t *obj, const void *data)
 
     //Row 1
     GUI_CreateLabel(&gui_ed->srclbl, 8, 48, NULL, DEFAULT_FONT, _tr("Input:"));
-    GUI_CreateTextSelect(&gui_ed->src, 72, 48, TEXTSELECT_96, 0x0000, NULL, set_source_cb, &tp->trim.src);
+    GUI_CreateTextSelect(&gui_ed->src, 72, 48, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
     //Row 2
     GUI_CreateLabel(&gui_ed->neglbl, 8, 72, NULL, DEFAULT_FONT, _tr("Trim -:"));
-    GUI_CreateTextSelect(&gui_ed->neg, 72, 72, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.neg);
+    GUI_CreateTextSelect(&gui_ed->neg, 72, 72, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
     GUI_CreateLabel(&gui_ed->poslbl, 176, 72, NULL, DEFAULT_FONT, _tr("Trim +:"));
-    GUI_CreateTextSelect(&gui_ed->pos, 216, 72, TEXTSELECT_96, 0x0000, NULL, set_trim_cb, &tp->trim.pos);
+    GUI_CreateTextSelect(&gui_ed->pos, 216, 72, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 3
     GUI_CreateLabel(&gui_ed->steplbl, 8, 96, NULL, DEFAULT_FONT, _tr("Trim Step:"));
-    GUI_CreateTextSelect(&gui_ed->step, 72, 96, TEXTSELECT_96, 0x0000, NULL, set_trimstep_cb, &tp->trim.step);
+    GUI_CreateTextSelect(&gui_ed->step, 72, 96, TEXTSELECT_96, NULL, set_trimstep_cb, &tp->trim.step);
 }

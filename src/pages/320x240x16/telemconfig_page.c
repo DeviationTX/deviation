@@ -39,9 +39,9 @@ void PAGE_TelemconfigInit(int page)
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(&gui->name[i], 10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);
-        GUI_CreateTextSelect(&gui->type[i], 65, 70 + row_height * i, TEXTSELECT_96, 0x0000, NULL, telem_name_cb, (void *)i);
-        GUI_CreateTextSelect(&gui->gtlt[i], 166, 70 + row_height * i, TEXTSELECT_64, 0x0000, NULL, gtlt_cb, (void *)i);
-        GUI_CreateTextSelect(&gui->value[i], 235, 70 + row_height * i, TEXTSELECT_64, 0x0000, NULL, limit_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->type[i], 65, 70 + row_height * i, TEXTSELECT_96, NULL, telem_name_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->gtlt[i], 166, 70 + row_height * i, TEXTSELECT_64, NULL, gtlt_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->value[i], 235, 70 + row_height * i, TEXTSELECT_64, NULL, limit_cb, (void *)i);
     }
 }
 

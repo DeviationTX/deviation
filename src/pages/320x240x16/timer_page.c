@@ -31,13 +31,13 @@ static void _show_page()
         u8 x = 48 + i * 96;
         //Row 1
         GUI_CreateLabel(&gui->timer[i], 8, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
-        GUI_CreateTextSelect(&gui->type[i], 72, x, TEXTSELECT_96, 0x0000, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
+        GUI_CreateTextSelect(&gui->type[i], 72, x, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         GUI_CreateLabel(&gui->switchlbl[i], 8, x+24, NULL, DEFAULT_FONT, _tr("Switch:"));
-        GUI_CreateTextSelect(&gui->src[i], 72, x+24, TEXTSELECT_96, 0x0000, toggle_source_cb, set_source_cb, (void *)(long)i);
+        GUI_CreateTextSelect(&gui->src[i], 72, x+24, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
         GUI_CreateLabelBox(&gui->startlbl[i], 8, x+48, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
-        GUI_CreateTextSelect(&gui->start[i], 72, x+48, TEXTSELECT_96, 0x0000, NULL, set_start_cb, (void *)(long)i);
+        GUI_CreateTextSelect(&gui->start[i], 72, x+48, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
 
         update_countdown(i);
     }

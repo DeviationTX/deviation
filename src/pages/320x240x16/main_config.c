@@ -153,38 +153,38 @@ static void _show_page()
     u16 y = 144;
     if (page_num == 0) {
         firstObj = GUI_CreateLabel(&gui1->trimlbl, COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
-        GUI_CreateTextSelect(&gui1->trim, COL2_VALUE, 40, TEXTSELECT_96, 0x0000, NULL, trimsel_cb, NULL);
+        GUI_CreateTextSelect(&gui1->trim, COL2_VALUE, 40, TEXTSELECT_96, NULL, trimsel_cb, NULL);
         GUI_CreateLabel(&gui1->barlbl, COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars:"));
-        GUI_CreateTextSelect(&gui1->bar, COL2_VALUE, 64, TEXTSELECT_96, 0x0000, NULL, graphsel_cb, NULL);
+        GUI_CreateTextSelect(&gui1->bar, COL2_VALUE, 64, TEXTSELECT_96, NULL, graphsel_cb, NULL);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(&gui1->boxlbl[i], COL1_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(&gui1->box[i], COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, boxtxtsel_cb, (void *)i);
+            GUI_CreateTextSelect(&gui1->box[i], COL2_VALUE, y, TEXTSELECT_96, NULL, boxtxtsel_cb, (void *)i);
             y+= 24;
         }
         y = 144;
         for(i = 4; i < 8; i++) {
             GUI_CreateLabel(&gui1->boxlbl[i], COL3_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(&gui1->box[i], COL4_VALUE, y, TEXTSELECT_96, 0x0000, NULL, boxtxtsel_cb, (void *)i);
+            GUI_CreateTextSelect(&gui1->box[i], COL4_VALUE, y, TEXTSELECT_96, NULL, boxtxtsel_cb, (void *)i);
             y+= 24;
         }
     } else if (page_num == 1) {
         firstObj = GUI_CreateButton(&gui2->icon[0], COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
-        GUI_CreateTextSelect(&gui2->toggle[0], COL2_VALUE, 40, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)0);
+        GUI_CreateTextSelect(&gui2->toggle[0], COL2_VALUE, 40, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)0);
         GUI_CreateButton(&gui2->icon[1], COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
-        GUI_CreateTextSelect(&gui2->toggle[1], COL2_VALUE, 64, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)1);
+        GUI_CreateTextSelect(&gui2->toggle[1], COL2_VALUE, 64, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)1);
         GUI_CreateButton(&gui2->icon[2], COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
-        GUI_CreateTextSelect(&gui2->toggle[2], COL2_VALUE, 88, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)2);
+        GUI_CreateTextSelect(&gui2->toggle[2], COL2_VALUE, 88, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)2);
         GUI_CreateButton(&gui2->icon[3], COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
-        GUI_CreateTextSelect(&gui2->toggle[3], COL2_VALUE, 112, TEXTSELECT_96, 0x0000, toggle_inv_cb, toggle_val_cb, (void *)3);
+        GUI_CreateTextSelect(&gui2->toggle[3], COL2_VALUE, 112, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(&gui2->barlbl[i], COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(&gui2->bar[i], COL2_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
+            GUI_CreateTextSelect(&gui2->bar[i], COL2_VALUE, y, TEXTSELECT_96, NULL, bartxtsel_cb, (void *)i);
             y+= 24;
         }
         y = 144;
         for(i = 4; i < 8; i++) {
             GUI_CreateLabel(&gui2->barlbl[i], COL3_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
-            GUI_CreateTextSelect(&gui2->bar[i], COL4_VALUE, y, TEXTSELECT_96, 0x0000, NULL, bartxtsel_cb, (void *)i);
+            GUI_CreateTextSelect(&gui2->bar[i], COL4_VALUE, y, TEXTSELECT_96, NULL, bartxtsel_cb, (void *)i);
             y+= 24;
         }
     } else if (page_num == 2) {
@@ -193,7 +193,7 @@ static void _show_page()
             guiObject_t *obj = GUI_CreateLabel(&gui3->menulbl[i], COL1_VALUE, y, menulabel_cb, DEFAULT_FONT, (void *)i);
             if (i == 0)
                 firstObj = obj;
-            GUI_CreateTextSelect(&gui3->menu[i], COL2_VALUE, y, TEXTSELECT_224, 0x0000, NULL, menusel_cb, (void *)i);
+            GUI_CreateTextSelect(&gui3->menu[i], COL2_VALUE, y, TEXTSELECT_224, NULL, menusel_cb, (void *)i);
             y += 24;
         }
         return;

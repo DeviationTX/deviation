@@ -108,13 +108,13 @@ void GUI_DrawButton(struct guiObject *obj)
         GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
         if (button->strCallback) {
             u16 text_w, text_h;
-            LCD_SetFont(DEFAULT_FONT.font); //Set Font here so callback can calculate size
+            LCD_SetFont(BUTTON_FONT.font); //Set Font here so callback can calculate size
             txt = button->strCallback(obj, button->cb_data);
             if (txt) {
                 LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
                 x_off = (box->width - text_w) / 2 + box->x;
                 y_off = (box->height - text_h) / 2 + box->y + 1;
-                LCD_SetFontColor(button->fontColor);
+                LCD_SetFontColor(BUTTON_FONT.font_color);
                 LCD_PrintStringXY(x_off, y_off, txt);
             }
         }
