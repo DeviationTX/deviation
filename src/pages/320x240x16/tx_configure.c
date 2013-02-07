@@ -90,7 +90,7 @@ static void _show_page()
         GUI_CreateButton(&gui1->stickcalib, 112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
         row += space + 8;
         GUI_CreateLabelBox(&gui1->buzzlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume:"));
-        GUI_CreateTextSelect(&gui1->buzz, 112, row, TEXTSELECT_96, NULL, common_select_cb, (void *)&Transmitter.volume);
+        GUI_CreateTextSelect(&gui1->buzz, 112, row, TEXTSELECT_96, NULL, _buzz_vol_cb, (void *)&Transmitter.volume);
 
     } else if (page_num == 1) {
         firstObj = GUI_CreateLabelBox(&gui2->head1, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
@@ -106,7 +106,7 @@ static void _show_page()
                 (void *)&Transmitter.auto_dimmer.backlight_dim_value);
         row += space + 8;
 	GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Shutdown music"));
-        GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, 0x0000, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
+        GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
         row += space + 8;
         GUI_CreateLabelBox(&gui2->head2, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;

@@ -30,6 +30,7 @@
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
+static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
 static u16 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
 static int size_cb(int absrow, void *data)
@@ -95,7 +96,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_BUZZ:
             label = _tr_noop("Buzz volume:");
-            value = common_select_cb; data = &Transmitter.volume;
+	    value = _buzz_vol_cb; data = &Transmitter.volume;
             break;
         case ITEM_HAPTIC:
             label = _tr_noop("Vibration:");

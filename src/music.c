@@ -48,6 +48,7 @@ static const struct NoteMap note_map[] = {
 static const char const *sections[] = {
     "startup",
     "shutdown",
+    "volume",
     "alarm1",
     "alarm2",
     "batt_alarm",
@@ -105,7 +106,7 @@ void MUSIC_Play(enum Music music)
     next_note = 1;
     Volume = Transmitter.volume * 10;
     if(CONFIG_IniParse("media/sound.ini", ini_handler, (void *)sections[music])) {
-        printf("ERROR: Could not read images/sound.ini\n");
+        printf("ERROR: Could not read media/sound.ini\n");
         return;
     }
     if(! num_notes)
