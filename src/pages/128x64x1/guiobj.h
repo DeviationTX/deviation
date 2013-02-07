@@ -25,8 +25,13 @@ struct lang_obj {
 
 struct mainconfig_obj {
     guiLabel_t label[4];
+    union {
+        guiLabel_t label;
+        guiButton_t button;
+    } col1[4];
     guiTextSelect_t value[4];
     guiScrollable_t scrollable;
+    guiImage_t image[24];
 };
 
 struct mainpage_obj {

@@ -50,11 +50,22 @@ guiObject_t *GUI_CreateImageOffset(guiImage_t *image, u16 x, u16 y, u16 width, u
 
 void GUI_DrawImage(struct guiObject *obj)
 {
+#define SELECT_BORDER_OFFSET 1
     struct guiImage *image = (struct guiImage *)obj;
     struct guiBox *box = &obj->box;
+
+    //  clear the whole widget, including its selected border for devo10/7e
+    if (LCD_DEPTH == 1)
+        GUI_DrawBackground(box->x -SELECT_BORDER_OFFSET, box->y -SELECT_BORDER_OFFSET,
+            box->width + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET, box->height + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET);
+
     LCD_DrawWindowedImageFromFile(box->x, box->y,
             image->file, box->width, box->height,
             image->x_off, image->y_off);
+
+    if (LCD_DEPTH == 1 && GUI_GetSelected() == obj)
+        LCD_DrawRect(box->x -SELECT_BORDER_OFFSET, box->y -SELECT_BORDER_OFFSET,
+            box->width + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET, box->height + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET, 1);
 }
 
 

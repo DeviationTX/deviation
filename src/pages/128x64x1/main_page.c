@@ -89,14 +89,14 @@ void PAGE_MainInit(int page)
     for(i = 0; i < 4; i++) {
         if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
             u8 old_color = TINY_FONT.outline_color;
-            TINY_FONT.outline_color = 0xffff;
+            //TINY_FONT.outline_color = 0xffff;
             u8 x1 = x + (w +2)* i;
             if(! Model.pagecfg.toggle[i])
                 LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
             else {
-                GUI_CreateLabelBox(&gui->toggle[i], x1 + 1 , y, w, h, &TINY_FONT, show_toggle_cb, NULL, (void *)(long)i);
+		GUI_CreateImageOffset(&gui->toggle[i], x1 + 1 , y, w , h, Model.pagecfg.tglico[i]*8, 0, SWITCH_ICON_FILE, NULL, NULL);
             }
-            TINY_FONT.outline_color = old_color;
+            //TINY_FONT.outline_color = old_color;
         }
     }
     //Battery

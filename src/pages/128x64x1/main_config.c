@@ -125,12 +125,17 @@ guiObject_t *firstObj;
 #define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLE_W)
 /*************************************/
 
+enum {
+    MAIN_PAGE,
+    SWITCHICON_SELECTION_PAGE
+} page_type;
+
 #include "../common/_main_config.c"
 
 #define VIEW_ID 0
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static const char *_switchlabel_cb(guiObject_t *obj, const void *data);
+static void show_switchicon_page(u8 idx);
 
 static u16 current_selected = 0;
 
@@ -140,20 +145,31 @@ static int size_cb(int absrow, void *data)
     return (absrow >= ITEM_MENU) ? 2 : 1;
 }
 
+static void switchicon_press_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    if(Model.pagecfg.toggle[(long)data])
+        show_switchicon_page((long)data);
+}
+
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
-    (void)col;
     (void)data;
-    return OBJ_IS_USED(&gui->value[relrow])
-           ? (guiObject_t *)&gui->value[relrow]
-           : (guiObject_t *)&gui->label[relrow];
+    if(col == 0 && gui->col1[relrow].label.header.Type == Button) {  // both gui->col1[relrow].button and gui->col1[relrow].lable are the same pointer
+        return (guiObject_t *)&gui->col1[relrow];
+    }
+    return (guiObject_t *)&gui->value[relrow];
 }
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     const void *label;
     void *label_cb = NULL;
+
     void *label_press = NULL;
     void *tgl = NULL;
+    void *buttonlabel_cb = NULL;
+    void *buttonpress_cb = NULL;
     void *value = NULL;
     int x = 56;
     int y_ts = y;
@@ -161,6 +177,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_TRIMS:
             label = _tr("Trims:");
             value = trimsel_cb;
+            buttonlabel_cb = NULL;
             break;
         case ITEM_BOX0:
         case ITEM_BOX1:
@@ -170,6 +187,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_BOX5:
         case ITEM_BOX6:
         case ITEM_BOX7:
+	    buttonlabel_cb = NULL;
             label_cb = boxlabel_cb; label = (void *)(long)(absrow - ITEM_BOX0);
             value = boxtxtsel_cb; data = (void *)(long)(absrow - ITEM_BOX0);
             break;
@@ -177,18 +195,24 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_SWITCH1:
         case ITEM_SWITCH2:
         case ITEM_SWITCH3:
-            label_cb = _switchlabel_cb; label = (void *)(long)(absrow - ITEM_SWITCH0);
+	    label_cb = NULL;
             tgl = toggle_inv_cb; value = toggle_val_cb; data = (void *)(long)(absrow - ITEM_SWITCH0);
+	    buttonlabel_cb = toggle_sel_cb; buttonpress_cb = switchicon_press_cb;
             break;
         case ITEM_MENU:
         default:
+	    buttonlabel_cb = NULL;
             label_cb = menulabel_cb; label = (void *)(long)(absrow - ITEM_MENU);
             x = 56; 
             value = menusel_cb; data = (void *)(long)(absrow - ITEM_MENU); x = 0; y_ts += ITEM_HEIGHT;
             break;
     }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-             0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, label_press, label);
+
+     if (buttonlabel_cb)
+        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  50,
+                ITEM_HEIGHT, &DEFAULT_FONT, buttonlabel_cb, 0x0000, buttonpress_cb, data);
+    else
+        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, label_press, label);
     if (value) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
              LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
@@ -197,6 +221,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 }
 static void _show_page()
 {
+    page_type = MAIN_PAGE;
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                      ITEM_SPACE, ITEM_MENU + NUM_QUICKPAGES, row_cb, getobj_cb, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
@@ -209,22 +234,81 @@ static void _show_title()
     PAGE_ShowHeader(_tr("Preview: Long-Press ENT"));
 }
 
-static const char *_switchlabel_cb(guiObject_t *obj, const void *data)
+static void switch_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
-    u8 i = (long)data;
-    sprintf(str, _tr("Switch %d:"), i+1);
-    return str;
+    (void)press_type;
+
+    u16 pos = (long)data;
+    u8 idx = pos >> 8;
+    pos &= 0xff;
+    Model.pagecfg.tglico[idx] = pos;
+    PAGE_MainCfgInit(-1);
 }
+
+static void show_switchicon_page(u8 idx)
+{
+#define MAX_COUNT 24
+#define ITEM_PER_ROW 8
+    page_type = SWITCHICON_SELECTION_PAGE;
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_RemoveAllObjects();
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(_tr("Select switch icon"));
+
+    u16 w, h;
+    LCD_ImageDimensions(SWITCH_ICON_FILE, &w, &h);
+    u8 count = w / 8;
+    if (count > MAX_COUNT)
+        count = MAX_COUNT; // no more than 12 per row
+    u8 x = 0;
+    u8 y = 17 - 15;
+    u8 pos = 0;
+    while (pos < count) {
+        if (pos% ITEM_PER_ROW ==0) {
+            y += 15;
+            x = 4;
+        }
+        GUI_CreateImageOffset(&gui->image[pos], x, y, 8, 11, pos * 8, 0, SWITCH_ICON_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
+        if (pos == Model.pagecfg.tglico[idx])
+           GUI_SetSelected((guiObject_t *)&gui->image[pos]);
+        x += 15;
+        pos++;
+
+    }
+}
+
+
 
 u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
+    guiObject_t *obj = NULL;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+	    if (page_type == MAIN_PAGE)
+                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            else
+                PAGE_MainCfgInit(-1);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
-            PAGE_ChangeByID(PAGEID_MAIN, 1);
+	    if (page_type == MAIN_PAGE)
+                PAGE_ChangeByID(PAGEID_MAIN, 1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_UP) && page_type == SWITCHICON_SELECTION_PAGE) {
+            for (u8 i = 0; i < ITEM_PER_ROW; i++) {
+                obj = GUI_GetSelected();
+                GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+            }
+        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && page_type == SWITCHICON_SELECTION_PAGE) {
+            for (u8 i = 0; i < ITEM_PER_ROW; i++) {
+                obj = GUI_GetSelected();
+                GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+            }
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT) && page_type == SWITCHICON_SELECTION_PAGE) {
+            guiObject_t *obj = GUI_GetSelected();
+            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+        }  else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && page_type == SWITCHICON_SELECTION_PAGE) {
+            guiObject_t *obj = GUI_GetSelected();
+            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

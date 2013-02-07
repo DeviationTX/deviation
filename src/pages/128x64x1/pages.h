@@ -34,6 +34,7 @@ struct pagemem {
 #define ITEM_SPACE 13
 #define PREVIOUS_ITEM -1
 #define PAGE_ITEM_MAX 4
+#define SWITCH_ICON_FILE "media/switches.bmp"
 
 extern struct LabelDesc labelDesc;
 void PAGE_SaveMixerSetup(struct mixer_page * const mp);
