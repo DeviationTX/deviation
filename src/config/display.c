@@ -246,6 +246,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if(MATCH_KEY(OUTLINE_COLOR)) {
             d->xygraph.outline_color = get_color(value);
+            return 1;
         }
     }
     for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
