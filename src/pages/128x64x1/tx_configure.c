@@ -21,6 +21,8 @@
 #include "autodimmer.h"
 
 #define MIN_BATTERY_ALARM_STEP 10
+#define MIN_BATTERY_WARNING 5000
+#define MAX_BATTERY_WARNING 3600000
 #include "../common/_tx_configure.c"
 
 #define gui (&gui_objs.u.tx)
@@ -78,6 +80,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_BATT:
             label = _tr_noop("Batt alarm:");
             value = batalarm_select_cb;
+            break;
+	case ITEM_ALARM_INTV:
+            label = _tr_noop("Alarm intvl:");
+            value = batalarmwarn_select_cb;
             break;
         case ITEM_STICKS:
             label = _tr_noop("Sticks:");

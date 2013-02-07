@@ -22,6 +22,7 @@ enum {
 #endif
     ITEM_MODE,
     ITEM_BATT,
+    ITEM_ALARM_INTV,
     ITEM_STICKS,
     ITEM_BUZZ,
     ITEM_HAPTIC,
@@ -320,6 +321,21 @@ static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(cp->tmpstr, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
     return cp->tmpstr;
 }
+
+static const char *batalarmwarn_select_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    u8 changed;
+    u16 batt_warning = Transmitter.batt_warning_interval/1000;
+    batt_warning = GUI_TextSelectHelper(batt_warning,
+            MIN_BATTERY_WARNING/1000, MAX_BATTERY_WARNING/1000, dir, 5, 30, &changed);
+    if (changed)
+        Transmitter.batt_warning_interval = batt_warning*1000;
+    TIMER_SetString(cp->tmpstr, Transmitter.batt_warning_interval);
+    return cp->tmpstr;
+}
+
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

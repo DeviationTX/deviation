@@ -38,6 +38,7 @@ const char VIBRATION[] = "vibration";
 
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
+const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
 
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
@@ -112,6 +113,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(BATT_CRITICAL)) {
             t->batt_critical = atoi(value);
+            return 1;
+        }
+	if (MATCH_KEY(BATT_WARNING_INTERVAL)) {
+            t->batt_warning_interval = atoi(value);
             return 1;
         }
     }
@@ -217,6 +222,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
+    fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);
@@ -255,6 +261,7 @@ void CONFIG_LoadTx()
     Transmitter.vibration_state = 0; // default to off since only devo10 support it
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
+    Transmitter.batt_warning_interval = DEFAULT_BATTERY_WARNING_INTERVAL;
     Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
     Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
     Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;

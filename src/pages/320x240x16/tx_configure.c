@@ -26,6 +26,8 @@
 #define gui3 (&gui_objs.u.tx.u.g3)
 
 #define MIN_BATTERY_ALARM_STEP 50
+#define MIN_BATTERY_WARNING 5000
+#define MAX_BATTERY_WARNING 3600000
 
 u8 page_num;
 guiObject_t *firstObj;
@@ -62,7 +64,7 @@ static void _show_page()
         GUI_RemoveHierObjects(firstObj);
         firstObj = NULL;
     }
-    u8 space = 22;
+    u8 space = 19;
     u8 row = 40;
     if (page_num == 0) {
         firstObj = GUI_CreateLabelBox(&gui1->head1, 16, row, 0, 0,
@@ -81,14 +83,15 @@ static void _show_page()
         GUI_CreateLabelBox(&gui1->battalrmlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm:"));
         GUI_CreateTextSelect(&gui1->battalrm, 112, row, TEXTSELECT_96, NULL, batalarm_select_cb, NULL);
         row += space;
+        GUI_CreateLabelBox(&gui1->battalrmintvllbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm interval:"));
+        GUI_CreateTextSelect(&gui1->battalrmintvl, 112, row, TEXTSELECT_96, NULL, batalarmwarn_select_cb, NULL);
+        row += space + 8;
         GUI_CreateLabelBox(&gui1->sticklbl, 16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
         GUI_CreateButton(&gui1->stickcalib, 112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
-        // GUI_CreateButton(216, 140, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK_TEST);
         row += space + 8;
         GUI_CreateLabelBox(&gui1->buzzlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume:"));
         GUI_CreateTextSelect(&gui1->buzz, 112, row, TEXTSELECT_96, NULL, common_select_cb, (void *)&Transmitter.volume);
 
-        row += space;
     } else if (page_num == 1) {
         firstObj = GUI_CreateLabelBox(&gui2->head1, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
         row += space;

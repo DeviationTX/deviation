@@ -27,6 +27,7 @@ struct Transmitter {
     enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;
+    u16 batt_warning_interval;
     u8 volume;
     u8 vibration_state; // for future vibration on/off support
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

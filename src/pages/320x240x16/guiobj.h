@@ -195,6 +195,8 @@ struct tx_obj {
              guiButton_t touchtest;
              guiLabel_t battalrmlbl;
              guiTextSelect_t battalrm;
+	     guiLabel_t battalrmintvllbl;
+             guiTextSelect_t battalrmintvl;
              guiLabel_t sticklbl;
              guiButton_t stickcalib;
              guiLabel_t buzzlbl;

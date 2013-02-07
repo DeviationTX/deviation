@@ -232,12 +232,31 @@ void TOUCH_Handler() {
 u8 BATTERY_Check()
 {
     static u8 warned = 0;
+    static u8 counter = 0;
     u16 battery = PWR_ReadVoltage();
-    if (battery < Transmitter.batt_alarm && ! (warned & 0x02)) {
-        MUSIC_Play(MUSIC_BATT_ALARM);
-        warned |= 0x02;
+    static u16 batt_warning_interval = 0;
+
+    // We read batt_warning_interval only once
+    if(!batt_warning_interval)
+        batt_warning_interval = Transmitter.batt_warning_interval / 100 ;
+
+    // If battery is low or , was low and till under low + 200mV
+    if (battery < Transmitter.batt_alarm || 
+	( battery <= Transmitter.batt_alarm + 200 && (warned & 0x02)) ) {
+
+	if(battery < Transmitter.batt_alarm)
+	    warned |= 0x02; // Bat was low...
+	
+	// We play alarm every counter*100ms secunds
+	counter++;
+	if (1 == counter) {
+            MUSIC_Play(MUSIC_BATT_ALARM);
+	} else if( batt_warning_interval  == counter  )
+	    counter = 0 ;	
+
     } else if (battery > Transmitter.batt_alarm + 200) {
-        warned &= ~0x02;
+        warned &= ~0x02; // Bat OK... reset  'was low' and counter..
+	counter = 0;
     }
     if (battery < Transmitter.batt_critical && ! (warned & 0x01)) {
         CONFIG_SaveModelIfNeeded();
