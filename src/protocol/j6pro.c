@@ -135,9 +135,9 @@ static void cyrf_init()
        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);  //From Devo
        CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //From Devo - Enable XOUT as GPIO
        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x05);
+       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x05 | Model.tx_power);
        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x8a);
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x2f);
+       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
        CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0e);
        CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xee);
        CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
@@ -158,7 +158,7 @@ static void cyrf_bindinit()
 {
 /* Use when binding */
        //0.060470# 03 2f
-       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x29);
+       CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | 0x07); //Use max power for binding in case there is no telem module
 
        CYRF_ConfigRFChannel(0x52);
        CYRF_ConfigSOPCode(bind_sop_code);

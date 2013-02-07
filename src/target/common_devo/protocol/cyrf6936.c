@@ -139,7 +139,7 @@ void CYRF_ConfigRFChannel(u8 ch)
 
 void CYRF_SetPower(u8 power)
 {
-    u8 val = CYRF_ReadRegister(0x03);
+    u8 val = CYRF_ReadRegister(0x03) & 0xF8;
     CYRF_WriteRegister(0x03, val | (power & 0x07));
 }
 

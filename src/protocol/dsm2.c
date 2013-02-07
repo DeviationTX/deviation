@@ -237,7 +237,7 @@ static void cyrf_config()
     CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
     CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38);
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38 | Model.tx_power);
     CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a);
     //CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0x80);
     CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //From Devo - Enable XOUT as GPIO
@@ -272,7 +272,7 @@ static void cyrf_config()
     CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a); //set pn correlation threshold
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
     CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x0f); //Clear RX abort?
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38); //Set 64chip, SDE mode
+    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38 | Model.tx_power); //Set 64chip, SDE mode
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
     CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x04); //disable tx CRC
     CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x14); //disable rx crc
