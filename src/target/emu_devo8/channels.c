@@ -28,7 +28,7 @@ s16 CHAN_ReadInput(int channel)
         case INP_RUD_DR0:  return gui.rud_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
         case INP_RUD_DR1:  return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
 
-        case INP_ELE_DR0:  return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_ELE_DR0:  return gui.ele_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
         case INP_ELE_DR1:  return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
 
         case INP_AIL_DR0:  return gui.ail_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
