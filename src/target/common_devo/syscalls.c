@@ -125,7 +125,7 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
 #ifdef MEDIA_DRIVE
     if (strncmp(file, "media/", 6) == 0) {
         _drive_num = 1;
-        if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strncmp(file, "protocol/", 9)== 0) {
+        if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strcmp(file + strlen(file) - 4, ".mod") == 0) {
             fd = 4;
         } else {
             fd = 5;
@@ -135,22 +135,22 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
         fd = 3;
     }
 #else
-    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strncmp(file, "protocol/", 9)== 0 ? 4 : 3;
+    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strcmp(file + strlen(file) - 4, ".mod") == 0 ? 4 : 3;
 #endif
     if(file_open[fd-3]) {
-        dbgprintf("_open_r: file already open.\n");
+        dbgprintf("_open_r(%d): file already open.\n", fd-3);
         return -1;
     } else {
         pf_switchfile(&fat[fd-3]);
         int res=pf_open(file);
         if(res==FR_OK) {
-            dbgprintf("_open_r: pf_open (%s) flags: %d, mode: %d ok\r\n", file, flags, mode);
+            dbgprintf("_open_r(%d): pf_open (%s) flags: %d, mode: %d ok\r\n", fd-3, file, flags, mode);
             if (flags & O_CREAT)
                 pf_maximize_file_size();
             file_open[fd-3]=true;
             return fd;  
         } else {
-            dbgprintf("_open_r: pf_open failed: %d\r\n", res);
+            dbgprintf("_open_r(%d): pf_open failed: %d\r\n", fd-3, res);
             return -1;
         }
     }
@@ -160,7 +160,7 @@ int _close_r (struct _reent *r, int fd) {
     (void)r;
     if(fd>2) {
        file_open[fd-3]=false;
-       dbgprintf("_close_r: file closed.\r\n");
+       dbgprintf("_close_r(%d): file closed.\r\n", fd-3);
     }
     return 0;
 }

@@ -179,7 +179,7 @@ u8 open_font(unsigned int idx)
     close_font();
     if (! idx) {
         cur_str.font.idx = 0;
-        return 0;
+        return 1;
     }
     sprintf(font, "media/%s.fon", FontNames[idx-1]);
     cur_str.font.fh = fopen(font, "rb");
@@ -217,6 +217,8 @@ u8 open_font(unsigned int idx)
 u8 LCD_SetFont(unsigned int idx)
 {
     u8 old = LCD_GetFont();
+    if (old == idx)
+        return old;
     if (! open_font(idx))
         open_font(old);
     return old;
