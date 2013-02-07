@@ -248,8 +248,8 @@ static void switch_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 
 static void show_switchicon_page(u8 idx)
 {
-#define MAX_COUNT 30
-#define ITEM_PER_ROW 10
+#define MAX_COUNT 24 
+#define ITEM_PER_ROW 8 
     page_type = SWITCHICON_SELECTION_PAGE;
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     PAGE_RemoveAllObjects();
@@ -272,7 +272,7 @@ static void show_switchicon_page(u8 idx)
         GUI_CreateImageOffset(&gui->image[pos], x, y, 8, 11, pos * 8, 0, SWITCH_ICON_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
         if (pos == Model.pagecfg.tglico[idx])
            GUI_SetSelected((guiObject_t *)&gui->image[pos]);
-        x += 12;
+        x += 15;
         pos++;
 
     }
