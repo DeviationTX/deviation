@@ -40,7 +40,7 @@ static const char * const alpha[] = {
 };
 static const char * const mixed[] = {
           "1234567890",
-          "-/:;()$&@\"",
+          "-/:#()$&@\"",
             ".,?!'"    "\x08",
        "\x02" " "      "\x06",
 };
