@@ -76,8 +76,6 @@ void PAGE_DrExpInit(int page)
                      2 *ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
-    u8 y = 0;
-    y = 0;
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
     GUI_CreateXYGraph(&gui->graph, 77, 2, 50, RIGHT_VIEW_HEIGHT,
