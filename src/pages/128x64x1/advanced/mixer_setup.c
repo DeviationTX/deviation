@@ -23,7 +23,6 @@
 #define LEFT_VIEW_ID 0
 #define RIGHT_VIEW_ID 1
 #define RIGHT_VIEW_HEIGHT 49
-static s8 current_selected_item = 0;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static void notify_cb(guiObject_t * obj);
