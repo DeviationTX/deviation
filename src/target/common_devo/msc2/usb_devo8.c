@@ -41,7 +41,7 @@ void usb_lp_can_rx0_isr()
 void USB_Enable(u8 use_interrupt)
 {
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-        GPIO_CNF_OUTPUT_OPENDRAIN, GPIO10);
+        GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
         gpio_set(GPIOB, GPIO10);
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
     USB_Init();  
