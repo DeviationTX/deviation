@@ -24,6 +24,7 @@ struct Transmitter {
     u8 brightness;
     u8 contrast;
     u8 telem;
+    u8 music_shutdown;
     enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;

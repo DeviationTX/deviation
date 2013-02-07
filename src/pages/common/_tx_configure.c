@@ -20,6 +20,7 @@ enum {
 #ifndef NO_LANGUAGE_SUPPORT
     ITEM_LANG,
 #endif
+    ITEM_MUSIC,
     ITEM_MODE,
     ITEM_BATT,
     ITEM_ALARM_INTV,
@@ -430,3 +431,13 @@ void PAGE_TxConfigureEvent()
     }
 }
 
+static const char *_music_shutdown_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    Transmitter.music_shutdown = GUI_TextSelectHelper(Transmitter.music_shutdown, 0, 1, dir, 1, 1, NULL);
+    if (Transmitter.music_shutdown == 0)
+        return _tr("Off");
+    else
+        return _tr("On");
+}

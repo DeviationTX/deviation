@@ -47,6 +47,7 @@ static const struct NoteMap note_map[] = {
 
 static const char const *sections[] = {
     "startup",
+    "shutdown",
     "alarm1",
     "alarm2",
     "batt_alarm",

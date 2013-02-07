@@ -201,6 +201,8 @@ GEAR
 GPS
 :Generic settings
 Réglages
+:Shutdown music
+Alarme arrêt
 :Heli
 Heli
 :Helicopter

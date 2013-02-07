@@ -105,6 +105,9 @@ static void _show_page()
         GUI_CreateTextSelect(&gui2->dimtgt, 112, row, TEXTSELECT_96, NULL, common_select_cb,
                 (void *)&Transmitter.auto_dimmer.backlight_dim_value);
         row += space + 8;
+	GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Shutdown music"));
+        GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, 0x0000, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
+        row += space + 8;
         GUI_CreateLabelBox(&gui2->head2, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;
         GUI_CreateLabelBox(&gui2->templbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Temperature:"));

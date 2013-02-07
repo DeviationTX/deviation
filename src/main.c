@@ -154,6 +154,7 @@ void medium_priority_cb()
 void EventLoop()
 {
     CLOCK_ResetWatchdog();
+    unsigned int time;
 
 #ifdef HEAP_DEBUG
     static int heap = 0;
@@ -172,6 +173,13 @@ void EventLoop()
             CONFIG_SaveModelIfNeeded();
             CONFIG_SaveTxIfNeeded();
         }
+    	if(Transmitter.music_shutdown) {
+	    MUSIC_Play(MUSIC_SHUTDOWN);
+            // We wait ~1sec for shutdown music finished
+            time = CLOCK_getms()+700;
+            while(CLOCK_getms()<time);
+	}
+
         PWR_Shutdown();
     }
     BUTTON_Handler();

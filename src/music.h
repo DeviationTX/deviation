@@ -3,6 +3,7 @@
 
 enum Music {
     MUSIC_STARTUP = 0,
+    MUSIC_SHUTDOWN,
     MUSIC_ALARM1,
     MUSIC_ALARM2,
     MUSIC_BATT_ALARM,

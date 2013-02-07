@@ -210,6 +210,8 @@ struct tx_obj {
              guiTextSelect_t dimtime;
              guiLabel_t dimtgtlbl;
              guiTextSelect_t dimtgt;
+	     guiLabel_t musicshutdbl;
+             guiTextSelect_t music_shutdown;
              guiLabel_t head2;
              guiLabel_t templbl;
              guiTextSelect_t temp;

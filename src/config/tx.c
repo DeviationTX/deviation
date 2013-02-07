@@ -28,7 +28,7 @@ static u32 crc32;
 const char CURRENT_MODEL[] = "current_model";
 
 const char LANGUAGE[] = "language";
-
+const char MUSIC_SHUTD[]="music_shutdown";
 const char MODE[]="mode";
 
 const char BRIGHTNESS[] = "brightness";
@@ -85,6 +85,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(LANGUAGE)) {
             t->language = value_int;
+            return 1;
+        }
+	if (MATCH_KEY(MUSIC_SHUTD)) {
+            t->music_shutdown = atoi(value);
             return 1;
         }
         if (MATCH_KEY(MODE)) {
@@ -215,6 +219,7 @@ void CONFIG_WriteTx()
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%d\n", CURRENT_MODEL, Transmitter.current_model);
     fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
+    fprintf(fh, "%s=%d\n", MUSIC_SHUTD, Transmitter.music_shutdown);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
     fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
@@ -254,6 +259,7 @@ void CONFIG_LoadTx()
 {
     memset(&Transmitter, 0, sizeof(Transmitter));
     Transmitter.current_model = 1;
+    Transmitter.music_shutdown = 0; // default to off
     Transmitter.mode = MODE_2;
     Transmitter.brightness = 5;
     Transmitter.contrast = 5;

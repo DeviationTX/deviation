@@ -73,6 +73,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             but_str = langstr_cb; tgl = lang_select_cb;
             break;
 #endif
+	case ITEM_MUSIC:
+            label = _tr_noop("Shutdown music");
+            value = _music_shutdown_cb;
+            break;
         case ITEM_MODE:
             label = _tr_noop("Stick mode:");
             value = modeselect_cb;
@@ -199,7 +203,6 @@ static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
     else
         return _tr("On");
 }
-
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
