@@ -89,7 +89,7 @@ const char *INPUT_SourceName(char *str, u8 src)
     src = MIXER_SRC(src);
 
     if(! src) {
-        return _tr("None");
+        strcpy(str, _tr("None"));
     } else if(src <= NUM_TX_INPUTS) {
         const char *ptr = "";
         #define CHANDEF(x) case INP_##x : ptr = INPNAME_##x; break;
