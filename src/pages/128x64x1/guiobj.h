@@ -40,7 +40,7 @@ struct mainpage_obj {
     guiBarGraph_t trim[6];
     guiBarGraph_t bar[8];
     guiLabel_t box[8];
-    guiLabel_t toggle[4];
+    guiImage_t toggle[4];
     guiLabel_t battery;
     guiLabel_t power;
 };

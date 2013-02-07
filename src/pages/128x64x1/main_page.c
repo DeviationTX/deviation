@@ -26,7 +26,6 @@
 
 static const char *_power_to_string();
 static u8 _action_preview_cb(u32 button, u8 flags, void *data);
-static const char *show_toggle_cb(guiObject_t *obj, const void *data);
 
 #define BATTERY_SCAN_MSEC 2000 // refresh battery for every 2sec to avoid its label blinking
 static u32 next_scan=0;
@@ -88,7 +87,7 @@ void PAGE_MainInit(int page)
 
     for(i = 0; i < 4; i++) {
         if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
-            u8 old_color = TINY_FONT.outline_color;
+            // u8 old_color = TINY_FONT.outline_color;
             //TINY_FONT.outline_color = 0xffff;
             u8 x1 = x + (w +2)* i;
             if(! Model.pagecfg.toggle[i])
@@ -172,12 +171,4 @@ static u8 _action_preview_cb(u32 button, u8 flags, void *data)
 static const char *_power_to_string()
 {
     return RADIO_TX_POWER_VAL[Model.tx_power];
-}
-
-static const char *show_toggle_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 i = (long)data;
-    sprintf(mp->tmpstr, "%d", i + 1);
-    return mp->tmpstr;
 }
