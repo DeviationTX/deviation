@@ -248,8 +248,7 @@ static void switch_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 
 static void show_switchicon_page(u8 idx)
 {
-#define MAX_COUNT 24 
-#define ITEM_PER_ROW 8 
+#define ICONS_PER_ROW 10 
     page_type = SWITCHICON_SELECTION_PAGE;
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     PAGE_RemoveAllObjects();
@@ -258,21 +257,21 @@ static void show_switchicon_page(u8 idx)
 
     u16 w, h;
     LCD_ImageDimensions(SWITCH_ICON_FILE, &w, &h);
-    u8 count = w / 8;
-    if (count > MAX_COUNT)
-        count = MAX_COUNT; 
+    u8 count = w / TOGGLE_W;
+    if (count > ICONS_MAX_COUNT)
+        count = ICONS_MAX_COUNT; 
     u8 x = 0;
     u8 y = 2 ;
     u8 pos = 0;
     while (pos < count) {
-        if (pos% ITEM_PER_ROW ==0) {
+        if (pos% ICONS_PER_ROW ==0) {
             y += 15;
             x = 4;
         }
-        GUI_CreateImageOffset(&gui->image[pos], x, y, 8, 11, pos * 8, 0, SWITCH_ICON_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
+        GUI_CreateImageOffset(&gui->image[pos], x, y, TOGGLE_W, TOGGLE_H, pos * TOGGLE_W, 0, SWITCH_ICON_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
         if (pos == Model.pagecfg.tglico[idx])
            GUI_SetSelected((guiObject_t *)&gui->image[pos]);
-        x += 15;
+        x += 12;
         pos++;
 
     }
@@ -294,12 +293,12 @@ u8 _action_cb(u32 button, u8 flags, void *data)
 	    if (page_type == MAIN_PAGE)
                 PAGE_ChangeByID(PAGEID_MAIN, 1);
         } else if (CHAN_ButtonIsPressed(button, BUT_UP) && page_type == SWITCHICON_SELECTION_PAGE) {
-            for (u8 i = 0; i < ITEM_PER_ROW; i++) {
+            for (u8 i = 0; i < ICONS_PER_ROW; i++) {
                 obj = GUI_GetSelected();
                 GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
             }
         }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && page_type == SWITCHICON_SELECTION_PAGE) {
-            for (u8 i = 0; i < ITEM_PER_ROW; i++) {
+            for (u8 i = 0; i < ICONS_PER_ROW; i++) {
                 obj = GUI_GetSelected();
                 GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
             }

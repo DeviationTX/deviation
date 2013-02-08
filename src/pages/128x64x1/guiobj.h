@@ -23,6 +23,7 @@ struct lang_obj {
     guiScrollable_t scrollable;
 };
 
+#define ICONS_MAX_COUNT 30 
 struct mainconfig_obj {
     guiLabel_t label[4];
     union {
@@ -31,7 +32,7 @@ struct mainconfig_obj {
     } col1[4];
     guiTextSelect_t value[4];
     guiScrollable_t scrollable;
-    guiImage_t image[24];
+    guiImage_t image[ICONS_MAX_COUNT];
 };
 
 struct mainpage_obj {
