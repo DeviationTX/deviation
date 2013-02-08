@@ -84,6 +84,7 @@ void PAGE_ShowBindingDialog(u8 update);
 void PAGE_ShowLowBattDialog();
 void PAGE_DisableSafetyDialog(u8 disable);
 void PAGE_ShowInvalidModule();
+void PAGE_ShowWarning(const char *title, const char *str);
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
 int PAGE_GetStartPage();

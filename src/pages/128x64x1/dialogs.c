@@ -104,14 +104,21 @@ void PAGE_ShowBindingDialog(u8 update)
     }
 }
 
-void PAGE_ShowLowBattDialog()
+void PAGE_ShowWarning(const char *title, const char *str)
 {
+    (void)title;
     if (dialog)
         return;
-    strncpy(dlgstr, _tr("Battery too low,\ncan't save!"), sizeof(dlgstr));
+    strncpy(dlgstr, str, sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+}
+
+
+void PAGE_ShowLowBattDialog()
+{
+    PAGE_ShowWarning(NULL, _tr("Battery too low,\ncan't save!"));
 }
 
 const char *string_cb(guiObject_t *obj, void *data)
@@ -135,10 +142,5 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
 
 void PAGE_ShowInvalidModule()
 {
-    if (dialog)
-        return;
-    strncpy(dlgstr, _tr("Bad/missing\nprotocol modules!"), sizeof(dlgstr));
-    dlgstr[sizeof(dlgstr) - 1] = 0;
-    current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    PAGE_ShowWarning(NULL, _tr("Bad/missing\nprotocol modules!"));
 }
