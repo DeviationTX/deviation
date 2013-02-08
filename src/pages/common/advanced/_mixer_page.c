@@ -56,7 +56,7 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
         }
     }
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
-        INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][ch]);
+        INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
         sprintf(mp->tmpstr, "%s%d-%s",
             (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
             (int)(ch + 1), tmp1);

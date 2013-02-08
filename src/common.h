@@ -140,6 +140,7 @@ int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);
+const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src);
 const char *INPUT_MapSourceName(u8 idx, u8 *val);
 const char *INPUT_ButtonName(u8 src);
 

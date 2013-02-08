@@ -23,40 +23,43 @@
 #include "mixer.h"
 #include "config/model.h"
 
-#define INPNAME_AILERON  _tr("AIL")
-#define INPNAME_ELEVATOR _tr("ELE")
-#define INPNAME_THROTTLE _tr("THR")
-#define INPNAME_RUDDER   _tr("RUD")
-#define INPNAME_AUX2     _tr("AUX2")
-#define INPNAME_AUX3     _tr("AUX3")
-#define INPNAME_AUX4     _tr("AUX4")
-#define INPNAME_AUX5     _tr("AUX5")
-#define INPNAME_AUX6     _tr("AUX6")
-#define INPNAME_AUX7     _tr("AUX7")
-#define INPNAME_DR0      _tr("DR0")
-#define INPNAME_DR1      _tr("DR1")
-#define INPNAME_RUD_DR0  _tr("RUD DR0")
-#define INPNAME_RUD_DR1  _tr("RUD DR1")
-#define INPNAME_RUD_DR2  _tr("RUD DR2")
-#define INPNAME_ELE_DR0  _tr("ELE DR0")
-#define INPNAME_ELE_DR1  _tr("ELE DR1")
-#define INPNAME_ELE_DR2  _tr("ELE DR2")
-#define INPNAME_AIL_DR0  _tr("AIL DR0")
-#define INPNAME_AIL_DR1  _tr("AIL DR1")
-#define INPNAME_AIL_DR2  _tr("AIL DR2")
-#define INPNAME_GEAR0    _tr("GEAR0")
-#define INPNAME_GEAR1    _tr("GEAR1")
-#define INPNAME_MIX0     _tr("MIX0")
-#define INPNAME_MIX1     _tr("MIX1")
-#define INPNAME_MIX2     _tr("MIX2")
-#define INPNAME_FMOD0    _tr("FMODE0")
-#define INPNAME_FMOD1    _tr("FMODE1")
-#define INPNAME_FMOD2    _tr("FMODE2")
-#define INPNAME_HOLD0    _tr("HOLD0")
-#define INPNAME_HOLD1    _tr("HOLD1")
-#define INPNAME_TRN0     _tr("TRN0")
-#define INPNAME_TRN1     _tr("TRN1")
+#define INPNAME_AILERON(x)  ((!x) ? _tr("AIL")     : _tr("AIL"))
+#define INPNAME_ELEVATOR(x) ((!x) ? _tr("ELE")     : _tr("ELE"))
+#define INPNAME_THROTTLE(x) ((!x) ? _tr("THR")     : _tr("THR"))
+#define INPNAME_RUDDER(x)   ((!x) ? _tr("RUD")     : _tr("RUD"))
+#define INPNAME_AUX2(x)     ((!x) ? _tr("AUX2")    : _tr("AUX2"))
+#define INPNAME_AUX3(x)     ((!x) ? _tr("AUX3")    : _tr("AUX3"))
+#define INPNAME_AUX4(x)     ((!x) ? _tr("AUX4")    : _tr("AUX4"))
+#define INPNAME_AUX5(x)     ((!x) ? _tr("AUX5")    : _tr("AUX5"))
+#define INPNAME_AUX6(x)     ((!x) ? _tr("AUX6")    : _tr("AUX6"))
+#define INPNAME_AUX7(x)     ((!x) ? _tr("AUX7")    : _tr("AUX7"))
+#define INPNAME_DR0(x)      ((!x) ? _tr("DR0")     : _tr("DR"))
+#define INPNAME_DR1(x)      ((!x) ? _tr("DR1")     : _tr("DR"))
+#define INPNAME_RUD_DR0(x)  ((!x) ? _tr("RUD DR0") : _tr("RUD DR"))
+#define INPNAME_RUD_DR1(x)  ((!x) ? _tr("RUD DR1") : _tr("RUD DR"))
+#define INPNAME_RUD_DR2(x)  ((!x) ? _tr("RUD DR2") : _tr("RUD DR"))
+#define INPNAME_ELE_DR0(x)  ((!x) ? _tr("ELE DR0") : _tr("ELE DR"))
+#define INPNAME_ELE_DR1(x)  ((!x) ? _tr("ELE DR1") : _tr("ELE DR"))
+#define INPNAME_ELE_DR2(x)  ((!x) ? _tr("ELE DR2") : _tr("ELE DR"))
+#define INPNAME_AIL_DR0(x)  ((!x) ? _tr("AIL DR0") : _tr("AIL DR"))
+#define INPNAME_AIL_DR1(x)  ((!x) ? _tr("AIL DR1") : _tr("AIL DR"))
+#define INPNAME_AIL_DR2(x)  ((!x) ? _tr("AIL DR2") : _tr("AIL DR"))
+#define INPNAME_GEAR0(x)    ((!x) ? _tr("GEAR0")   : _tr("GEAR"))
+#define INPNAME_GEAR1(x)    ((!x) ? _tr("GEAR1")   : _tr("GEAR"))
+#define INPNAME_MIX0(x)     ((!x) ? _tr("MIX0")    : _tr("MIX"))
+#define INPNAME_MIX1(x)     ((!x) ? _tr("MIX1")    : _tr("MIX"))
+#define INPNAME_MIX2(x)     ((!x) ? _tr("MIX2")    : _tr("MIX"))
+#define INPNAME_FMOD0(x)    ((!x) ? _tr("FMODE0")  : _tr("FMODE"))
+#define INPNAME_FMOD1(x)    ((!x) ? _tr("FMODE1")  : _tr("FMODE"))
+#define INPNAME_FMOD2(x)    ((!x) ? _tr("FMODE2")  : _tr("FMODE"))
+#define INPNAME_HOLD0(x)    ((!x) ? _tr("HOLD0")   : _tr("HOLD"))
+#define INPNAME_HOLD1(x)    ((!x) ? _tr("HOLD1")   : _tr("HOLD"))
+#define INPNAME_TRN0(x)     ((!x) ? _tr("TRN0")    : _tr("TRN"))
+#define INPNAME_TRN1(x)     ((!x) ? _tr("TRN1")    : _tr("TRN"))
 
+#define SWITCH_NAME_GEAR0 _tr("GEAR")
+#define SWITCH_NAME_GEAR1 _tr("GEAR")
+#define SWITCH_NAME_GEAR0 _tr("GEAR")
 #define BUTNAME_TRIM_LV_NEG _tr("TRIMLV-")
 #define BUTNAME_TRIM_LV_POS _tr("TRIMLV+")
 #define BUTNAME_TRIM_RV_NEG _tr("TRIMRV-")
@@ -83,7 +86,7 @@ const char *tx_stick_names[4] = {
     _tr_noop("LEFT_H"),
 };
 
-const char *INPUT_SourceName(char *str, u8 src)
+static const char *_get_source_name(char *str, u8 src, int switchname)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
     src = MIXER_SRC(src);
@@ -92,7 +95,7 @@ const char *INPUT_SourceName(char *str, u8 src)
         strcpy(str, _tr("None"));
     } else if(src <= NUM_TX_INPUTS) {
         const char *ptr = "";
-        #define CHANDEF(x) case INP_##x : ptr = INPNAME_##x; break;
+        #define CHANDEF(x) case INP_##x : ptr = INPNAME_##x(switchname); break;
         switch(src) {
             #include "capabilities.h"
         };
@@ -103,6 +106,16 @@ const char *INPUT_SourceName(char *str, u8 src)
     } else {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
     }
+    return str;
+}
+const char *INPUT_SourceName(char *str, u8 src)
+{
+    return _get_source_name(str, src, 0);
+}
+const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
+{
+    _get_source_name(str, src, 1);
+    printf("%d: %s\n", src, str);
     return str;
 }
 
