@@ -53,7 +53,7 @@ static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Off");
     Model.limits[mapped_simple_channels.throttle].safetyval =
             GUI_TextSelectHelper(Model.limits[mapped_simple_channels.throttle].safetyval,
-                    -150, 150, dir, 1, LONG_PRESS_STEP, NULL);
+                    -SAFETYVALUE_RANGE, SAFETYVALUE_RANGE, dir, 1, LONG_PRESS_STEP, NULL);
     sprintf(mp->tmpstr, "%d", Model.limits[mapped_simple_channels.throttle].safetyval);
     return mp->tmpstr;
 }

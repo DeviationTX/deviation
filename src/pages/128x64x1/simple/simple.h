@@ -8,4 +8,9 @@ struct page_defs {
     void (*tgl)(guiObject_t *obj, void *data);
 };
 void SIMPLE_Init(const struct page_defs *page_defs);
+void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
+        guiButton_t *auto_button_ptr, u8 selectable_bitmap,
+        void (*auto_generate_cb)(struct guiObject *obj, const void *data),
+        void (*press_cb)(guiObject_t *obj, void *data),
+        const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data));
 #endif

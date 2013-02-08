@@ -396,6 +396,12 @@ struct stdswitch_obj {
     guiLabel_t tholdlbl;
     guiTextSelect_t thold;
     guiLabel_t gyrolbl;
+    guiLabel_t draillbl;
+    guiTextSelect_t drail;
+    guiLabel_t drelelbl;
+    guiTextSelect_t drele;
+    guiLabel_t drrudlbl;
+    guiTextSelect_t drrud;
     guiTextSelect_t gyro;
 };
 

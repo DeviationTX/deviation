@@ -45,27 +45,19 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
     return mp->tmpstr;
 }
 
+static void get_hold_state()
+{
+    if (mp->mixer_ptr[3]->sw ==  mapped_simple_channels.switches[SWITCHFUNC_HOLD])
+        pit_hold_state = 1;
+    else
+        pit_hold_state = 0;
+}
+
 static void set_hold_state(u8 state) {
-    if (state == 0) {
-        mp->mixer_ptr[PITTHROMODE_HOLD]->src = 0;
-        mp->mixer_ptr[PITTHROMODE_HOLD] = NULL;
-        mp->num_mixers = 3;
-    } else {
-        memcpy(&mp->mixer[0], mp->mixer_ptr[0], sizeof(mp->mixer[0]));
-        memcpy(&mp->mixer[1], mp->mixer_ptr[1], sizeof(mp->mixer[1]));
-        memcpy(&mp->mixer[2], mp->mixer_ptr[2], sizeof(mp->mixer[2]));
-        mp->num_mixers = 4;
-        mp->mixer[3].src    = mp->mixer_ptr[0]->src;
-        mp->mixer[3].dest   = mp->mixer_ptr[0]->dest;
-        mp->mixer[3].sw = INP_RUD_DR1;
-        mp->mixer[3].mux    = MUX_REPLACE;
-        mp->mixer[3].offset = 0;
-        mp->mixer[3].scalar = mp->mixer_ptr[0]->scalar;
-        mp->mixer[3].apply_trim = mp->mixer_ptr[0]->apply_trim;
-        mp->mixer[3].curve = mp->mixer_ptr[0]->curve;
-    }
-    MIXER_SetMixers(mp->mixer, mp->num_mixers);
-    SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.pitch, PITCHMIXER_COUNT);
+    if (state == 0)
+        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = ALWAYSOFF_SWITCH;  //virt10 as switch, to disable this mixer
+    else
+        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = mapped_simple_channels.switches[SWITCHFUNC_HOLD]; //bug fix
     GUI_Redraw(&gui->graph);
     for (u8 i = 0; i < 9; i++)
         GUI_Redraw(&gui->val[i]);

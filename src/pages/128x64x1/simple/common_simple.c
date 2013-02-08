@@ -69,3 +69,71 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+
+void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
+        guiButton_t *auto_button_ptr, u8 selectable_bitmap,
+        void (*auto_generate_cb)(struct guiObject *obj, const void *data),
+        void (*press_cb)(guiObject_t *obj, void *data),
+        const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
+{
+    u8 y = ITEM_SPACE;
+    u8 w1 = 5;
+    u8 w2 = 32;
+    u8 x = 0;
+    u8 height = 9;
+    GUI_CreateLabelBox(&vallbl[0], x, y,  w1, height, &TINY_FONT, NULL, NULL, "L");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[0], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)0);
+    x += w2 + 2;
+    GUI_CreateLabelBox(&vallbl[8], x, y,  w1, height, &TINY_FONT, NULL, NULL, "H");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
+
+    y += height;
+    x = 0;
+    GUI_CreateButtonPlateText(auto_button_ptr, x, y, 38, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0, auto_generate_cb, _tr("Auto"));
+    x += 39;
+    GUI_CreateLabelBox(&vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
+
+    y += ITEM_SPACE;
+    x = 0;
+    GUI_CreateLabelBox(&vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[1], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
+    x += w2 + 2;
+    GUI_CreateLabelBox(&vallbl[2], x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[2], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
+
+    y += height +1;
+    x = 0;
+    GUI_CreateLabelBox(&vallbl[3], x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[3], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
+    x += w2 + 2;
+    GUI_CreateLabelBox(&vallbl[5], x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[5], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
+
+    y += height +1;
+    x = 0;
+    GUI_CreateLabelBox(&vallbl[6], x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[6], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
+    x += w2 + 2;
+    GUI_CreateLabelBox(&vallbl[7], x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
+    x += w1;
+    GUI_CreateTextSelectPlate(&val[7], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
+
+    //update_textsel_state();
+    for (u8 i = 1; i < 8; i++) {
+        GUI_TextSelectEnablePress(&val[i], 1);
+        if (selectable_bitmap >> (i-1) & 0x01) {
+            GUI_TextSelectEnable(&val[i], 1);
+        } else {
+            GUI_TextSelectEnable(&val[i], 0);
+        }
+    }
+}

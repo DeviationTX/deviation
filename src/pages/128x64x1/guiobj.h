@@ -246,12 +246,9 @@ struct stdswash_obj {
 };
 
 struct stdswitch_obj {
-    guiLabel_t modelbl;
-    guiTextSelect_t mode;
-    guiLabel_t tholdlbl;
-    guiTextSelect_t thold;
-    guiLabel_t gyrolbl;
-    guiTextSelect_t gyro;
+    guiLabel_t name[4];
+    guiTextSelect_t value[4];
+    guiScrollable_t scrollable;
 };
 
 struct stdthold_obj {

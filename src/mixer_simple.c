@@ -38,6 +38,9 @@ void SIMPLEMIXER_Preset()
     mapped_simple_channels.switches[SWITCHFUNC_HOLD] = INP_RUD_DR0;
     mapped_simple_channels.switches[SWITCHFUNC_GYROSENSE] = INP_MIX0;
     mapped_simple_channels.switches[SWITCHFUNC_FLYMODE] = INP_FMOD0;
+    mapped_simple_channels.switches[SWITCHFUNC_DREXP_AIL] = INP_FMOD0;
+    mapped_simple_channels.switches[SWITCHFUNC_DREXP_ELE] = INP_FMOD0;
+    mapped_simple_channels.switches[SWITCHFUNC_DREXP_RUD] = INP_FMOD0;
 
     if (Model.protocol == 0) {  // for none protocol, assign any channel to thr is fine
         mapped_simple_channels.throttle = 0;
@@ -68,9 +71,9 @@ void SIMPLEMIXER_SetChannelOrderByProtocol()
         if (ProtocolChannelMap[Model.protocol][ch] == INP_THROTTLE)
             mapped_simple_channels.throttle = ch;
         else if (ProtocolChannelMap[Model.protocol][ch] == INP_AILERON)
-            mapped_simple_channels.aile = ch;
+            mapped_simple_channels.actual_aile = mapped_simple_channels.aile = ch;
         else if (ProtocolChannelMap[Model.protocol][ch] == INP_ELEVATOR)
-            mapped_simple_channels.elev = ch;
+            mapped_simple_channels.actual_elev = mapped_simple_channels.elev = ch;
     }
     Model.limits[mapped_simple_channels.throttle].safetysw = safetysw;
     Model.limits[mapped_simple_channels.throttle].safetyval = safetyval;
@@ -84,21 +87,22 @@ void SIMPLEMIXER_SetChannelOrderByProtocol()
     MIXER_SetTemplate(mapped_simple_channels.aile, MIXERTEMPLATE_CYC1);
     MIXER_SetTemplate(mapped_simple_channels.elev, MIXERTEMPLATE_CYC2);
 
-    u8 i = 0;
     struct Mixer *mix = MIXER_GetAllMixers();
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
-        if (i >= THROTTLEMIXER_COUNT)
-            break;
-        if (mix[idx].src== INP_THROTTLE && mix[idx].dest < NUM_OUT_CHANNELS) { // src=THR && dest = virt should be pitch's mixer
+        if (mix[idx].src ==0)
+            continue;
+        if (mix[idx].dest == NUM_OUT_CHANNELS + 9)
+           mix[idx].src = 0; // remove all mixers pointing to Virt10, because the Virt10 is reserved in Standard mode
+        else if (mix[idx].mux == MUX_REPLACE && mix[idx].src== INP_THROTTLE && mix[idx].dest < NUM_OUT_CHANNELS) { // src=THR && dest = virt should be pitch's mixer
             mix[idx].dest = mapped_simple_channels.throttle;
-            i++;
         }
     }
+    MIXER_SetTemplate(NUM_OUT_CHANNELS + 9, MIXERTEMPLATE_NONE);// remove all mixers pointing to Virt10 as the Virt10 is reserved in Standard mode
     mapped_simple_channels.aile = NUM_OUT_CHANNELS; // virt 1
     mapped_simple_channels.elev = NUM_OUT_CHANNELS +1; // virt 2
 
     // Simplfied timer sw, only throttle channel output is possible to be selected
-    for (i = 0; i < NUM_TIMERS; i++) {
+    for (u8 i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src)
             Model.timer[i].src = mapped_simple_channels.throttle + NUM_INPUTS +1;
         TIMER_Reset(i);
@@ -115,8 +119,10 @@ u8 SIMPLEMIXER_ValidateTraditionModel()
     u8 drexp_mixer_count = 0;
     u8 gryo_mixer_count = 0;
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
-        if (mix[idx].src == 0)
+        if (mix[idx].src == 0  || mix[idx].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
+        if (mix[idx].dest == NUM_OUT_CHANNELS + 9) //mixers pointing to Virt10 as the Virt10 is reserved in Standard mode
+            return 0;
         if (mix[idx].dest == mapped_simple_channels.pitch)
             pit_mixer_count++;
         else if (mix[idx].dest == mapped_simple_channels.throttle)
@@ -131,7 +137,7 @@ u8 SIMPLEMIXER_ValidateTraditionModel()
     }
     if (thro_mixer_count != THROTTLEMIXER_COUNT ||
             (pit_mixer_count != PITCHMIXER_COUNT && pit_mixer_count != PITCHMIXER_COUNT -1) ||
-            gryo_mixer_count != GYROMIXER_COUNT || drexp_mixer_count != DREXPMIXER_COUNT *3)
+            gryo_mixer_count < GYROMIXER_COUNT || drexp_mixer_count != DREXPMIXER_COUNT *3)
         return 0;
 
     u8 cyc_template_count = 0;

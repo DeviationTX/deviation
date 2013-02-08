@@ -120,7 +120,7 @@ enum LimitMask {
 struct Limit {
     u8 flags;
     u8 safetysw;
-    s8 safetyval;
+    s16 safetyval;  // allow safetyval to be over +/-125
     u8 max;
     u8 min;
     u8 servoscale;

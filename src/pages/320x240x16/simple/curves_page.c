@@ -74,6 +74,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     if (curve_mode == CURVESMODE_PITCH) {
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_PITCURVES), MODELMENU_Show);
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.pitch, PITCHMIXER_COUNT);
+        get_hold_state();
     } else {
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROCURVES), MODELMENU_Show);
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
@@ -82,17 +83,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    u8 mode_count = 3;
-    if (mp->mixer_ptr[3] == NULL)
-        pit_hold_state = 0;
-    else {
-        mode_count = 4;
-        pit_hold_state = 1;
-    }
-    for (u8 i = 0; i < mode_count; i++) {
-        if (mp->mixer_ptr[i]->curve.type != CURVE_9POINT) // the 1st version uses 7point curve, need to convert to 13point
-            mp->mixer_ptr[i]->curve.type = CURVE_9POINT;
-    }
+
     /* Row 1 */
     GUI_CreateButton(&gui->auto_, 20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));

@@ -20,7 +20,6 @@
 #include "simple.h"
 #include "../../common/simple/_switchassign_page.c"
 
-#define gui (&gui_objs.u.stdswitch)
 static const char *switch_cb2(guiObject_t *obj, int dir, void *data)
 {
     const char *str = switch_cb(obj, dir, data);
@@ -52,5 +51,16 @@ void PAGE_SwitchAssignInit(int page)
     row += ROW_SPACE;
     GUI_CreateLabelBox(&gui->gyrolbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Gyro sense"));
     GUI_CreateTextSelect(&gui->gyro, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_GYROSENSE);
+    row += ROW_SPACE;
+    GUI_CreateLabelBox(&gui->draillbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("D/R&Exp -AIL"));
+    GUI_CreateTextSelect(&gui->drail, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_AIL);
+
+    row += ROW_SPACE;
+    GUI_CreateLabelBox(&gui->drelelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("D/R&Exp -ELE"));
+    GUI_CreateTextSelect(&gui->drele, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_ELE);
+
+    row += ROW_SPACE;
+    GUI_CreateLabelBox(&gui->drrudlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL,  _tr("D/R&Exp -RUD"));
+    GUI_CreateTextSelect(&gui->drrud, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_RUD);
 }
 
