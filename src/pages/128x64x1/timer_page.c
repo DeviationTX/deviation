@@ -40,7 +40,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     (void)relrow;
-    u8 space = ITEM_HEIGHT + 5;
+    u8 space = ITEM_HEIGHT + 1;
     u8 w = 65;
     u8 x = 55;
     //Row 1
@@ -57,6 +57,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
+     GUI_CreateLabelBox(&gui->resetlbl, 0, y,
+            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
+    GUI_CreateTextSelectPlate(&gui->resetsrc, x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
+    //Row 4
+    y += space;
     GUI_CreateLabelBox(&gui->startlbl, 0, y,
             50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
             ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
@@ -64,7 +70,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
 
     update_countdown(absrow);
-    return 3;
+    return 4;
 }
 
 static void _show_page()

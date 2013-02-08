@@ -78,6 +78,40 @@ void toggle_source_cb(guiObject_t *obj, void *data)
     }
 }
 
+const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void) obj;
+    u8 idx = (long)data;
+    struct Timer *timer = &Model.timer[idx];
+    u8 is_neg = MIXER_SRC_IS_INV(timer->resetsrc);
+    u8 changed;
+    u8 max = NUM_SOURCES;
+    u8 step = 1;
+    if (Model.mixer_mode == MIXER_SIMPLE && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
+        max = mapped_simple_channels.throttle + NUM_INPUTS +1;
+        step = max;
+    }
+    u8 resetsrc = GUI_TextSelectHelper(MIXER_SRC(timer->resetsrc), 0, max, dir, step, step, &changed);
+    MIXER_SET_SRC_INV(resetsrc, is_neg);
+    if (changed) {
+        timer->resetsrc = resetsrc;
+        TIMER_Reset(idx);
+    }
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(resetsrc));
+    return INPUT_SourceName(tp->tmpstr, resetsrc);
+}
+
+void toggle_resetsrc_cb(guiObject_t *obj, void *data)
+{
+    u8 idx = (long)data;
+    struct Timer *timer = &Model.timer[idx];
+    if(MIXER_SRC(timer->resetsrc)) {
+        MIXER_SET_SRC_INV(timer->resetsrc, ! MIXER_SRC_IS_INV(timer->resetsrc));
+        TIMER_Reset(idx);
+        GUI_Redraw(obj);
+    }
+}
+
 const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;

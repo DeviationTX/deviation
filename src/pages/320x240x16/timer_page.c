@@ -33,12 +33,14 @@ static void _show_page()
         GUI_CreateLabel(&gui->timer[i], 8, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
         GUI_CreateTextSelect(&gui->type[i], 72, x, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
-        GUI_CreateLabel(&gui->switchlbl[i], 8, x+24, NULL, DEFAULT_FONT, _tr("Switch:"));
-        GUI_CreateTextSelect(&gui->src[i], 72, x+24, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
+        GUI_CreateLabel(&gui->switchlbl[i], 8, x+22, NULL, DEFAULT_FONT, _tr("Switch:"));
+        GUI_CreateTextSelect(&gui->src[i], 72, x+22, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
-        GUI_CreateLabelBox(&gui->startlbl[i], 8, x+48, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
-        GUI_CreateTextSelect(&gui->start[i], 72, x+48, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
-
+	GUI_CreateLabel(&gui->resetlbl[i], 8, x+44, NULL, DEFAULT_FONT, _tr("Reset sw:"));
+        GUI_CreateTextSelect(&gui->resetsrc[i], 72, x+44, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
+        //Row 4
+        GUI_CreateLabelBox(&gui->startlbl[i], 8, x+66, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+        GUI_CreateTextSelect(&gui->start[i], 72, x+66, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
         update_countdown(i);
     }
 }

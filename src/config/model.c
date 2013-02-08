@@ -123,6 +123,7 @@ static const char SECTION_TIMER[] = "timer";
 #define TIMER_TYPE MODEL_TYPE
 static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" };
 static const char TIMER_TIME[] = "time";
+static const char TIMER_RESETSRC[] = "resetsrc";
 
 /* Section: Safety */
 static const char SECTION_SAFETY[] = "safety";
@@ -617,6 +618,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->timer[idx].src = get_source(section, value);
             return 1;
         }
+	if (MATCH_KEY(TIMER_RESETSRC)) {
+            m->timer[idx].resetsrc = get_source(section, value);
+            return 1;
+        }
         if (MATCH_KEY(TIMER_TIME)) {
             m->timer[idx].timer = atoi(value);
             return 1;
@@ -974,6 +979,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
         if (WRITE_FULL_MODEL || m->timer[idx].src != 0)
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
+        if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
+            fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceName(file, m->timer[idx].resetsrc));
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
     }

@@ -99,7 +99,7 @@ void TIMER_Update()
                     last_time[i] = t;
                 timer_state[i] = new_state;
             }
-         }
+        }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
             if (Model.timer[i].type == TIMER_STOPWATCH) {
@@ -131,6 +131,19 @@ void TIMER_Update()
                 timer_val[i] -= delta;
             }
             last_time[i] = t;
+	} else if (Model.timer[i].resetsrc) {
+            s16 val;
+            if (MIXER_SRC(Model.timer[i].resetsrc) <= NUM_INPUTS) {
+                volatile s16 *raw = MIXER_GetInputs();
+                val = raw[MIXER_SRC(Model.timer[i].resetsrc)];
+            } else {
+                val = MIXER_GetChannel(Model.timer[i].resetsrc - NUM_INPUTS - 1, APPLY_SAFETY);
+            }
+            if (MIXER_SRC_IS_INV(Model.timer[i].resetsrc))
+                val = -val;
+            if (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) {
+		TIMER_Reset(i);
+	    }
         }
     }
 }

@@ -155,6 +155,8 @@ struct timer_obj {
     guiTextSelect_t type[NUM_TIMERS];
     guiLabel_t switchlbl[NUM_TIMERS];
     guiTextSelect_t src[NUM_TIMERS];
+    guiLabel_t resetlbl[NUM_TIMERS];
+    guiTextSelect_t resetsrc[NUM_TIMERS];
     guiLabel_t startlbl[NUM_TIMERS];
     guiTextSelect_t start[NUM_TIMERS];
 };

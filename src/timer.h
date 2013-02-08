@@ -17,6 +17,7 @@ enum TimerType {
 };
 struct Timer {
     u8 src;
+    u8 resetsrc;
     u16 timer;
     enum TimerType type;
 };
