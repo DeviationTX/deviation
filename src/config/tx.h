@@ -6,6 +6,8 @@
 #include "telemetry.h"
 
 #define DEFAULT_BATTERY_WARNING_INTERVAL 30
+#define MIN_BATTERY_WARNING 0
+#define MAX_BATTERY_WARNING 60
 
 struct StickCalibration {
     u16 max;

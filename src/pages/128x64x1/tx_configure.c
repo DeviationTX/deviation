@@ -21,8 +21,6 @@
 #include "autodimmer.h"
 
 #define MIN_BATTERY_ALARM_STEP 10
-#define MIN_BATTERY_WARNING 0
-#define MAX_BATTERY_WARNING 60
 #include "../common/_tx_configure.c"
 
 #define gui (&gui_objs.u.tx)

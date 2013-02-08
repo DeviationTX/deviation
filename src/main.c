@@ -254,7 +254,7 @@ u8 BATTERY_Check()
 	counter++;
 	if (1 == counter && Transmitter.batt_warning_interval ) {
             MUSIC_Play(MUSIC_BATT_ALARM);
-	} else if( Transmitter.batt_warning_interval * 10  == counter  )
+	} else if( Transmitter.batt_warning_interval * 10  < counter   )
 	    counter = 0 ;	
 
     } else if (battery > Transmitter.batt_alarm + 200) {
