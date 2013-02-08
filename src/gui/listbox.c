@@ -181,7 +181,7 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
     if (redraw_all) {
         LCD_FillRect(obj->box.x, obj->box.y, obj->box.width, obj->box.height, FILL);
     }
-    LCD_SetXY(obj->box.x + listbox->style == LISTBOX_DEVO10 ? 1 : 5, obj->box.y + LINE_SPACING -1);
+    LCD_SetXY(obj->box.x + (listbox->style == LISTBOX_DEVO10 ? 1 : 5), obj->box.y + LINE_SPACING -1);
     if(listbox->selected >= listbox->cur_pos && listbox->selected < listbox->cur_pos + listbox->entries_per_page) {
         // Bug fix: each line of row contains both text and line-spacing, so the height should take line-spacing into account
         if (listbox->style == LISTBOX_DEVO10) {
