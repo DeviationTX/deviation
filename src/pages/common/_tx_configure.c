@@ -328,12 +328,14 @@ static const char *batalarmwarn_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
-    u16 batt_warning = Transmitter.batt_warning_interval/1000;
+    u16 batt_warning = Transmitter.batt_warning_interval;
     batt_warning = GUI_TextSelectHelper(batt_warning,
-            MIN_BATTERY_WARNING/1000, MAX_BATTERY_WARNING/1000, dir, 5, 30, &changed);
+            MIN_BATTERY_WARNING, MAX_BATTERY_WARNING, dir, 5, 30, &changed);
     if (changed)
-        Transmitter.batt_warning_interval = batt_warning*1000;
-    TIMER_SetString(cp->tmpstr, Transmitter.batt_warning_interval);
+        Transmitter.batt_warning_interval = batt_warning;
+    if( 0 == batt_warning)
+	return _tr("Off");
+    TIMER_SetString(cp->tmpstr, Transmitter.batt_warning_interval * 1000);
     return cp->tmpstr;
 }
 

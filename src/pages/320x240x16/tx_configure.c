@@ -26,8 +26,8 @@
 #define gui3 (&gui_objs.u.tx.u.g3)
 
 #define MIN_BATTERY_ALARM_STEP 50
-#define MIN_BATTERY_WARNING 5000
-#define MAX_BATTERY_WARNING 3600000
+#define MIN_BATTERY_WARNING 0
+#define MAX_BATTERY_WARNING 60
 
 u8 page_num;
 guiObject_t *firstObj;

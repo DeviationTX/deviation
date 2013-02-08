@@ -5,6 +5,8 @@
 #include "autodimmer.h"
 #include "telemetry.h"
 
+#define DEFAULT_BATTERY_WARNING_INTERVAL 30
+
 struct StickCalibration {
     u16 max;
     u16 min;
