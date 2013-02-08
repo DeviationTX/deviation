@@ -58,7 +58,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 3
     y += space;
      GUI_CreateLabelBox(&gui->resetlbl, 0, y,
-            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
+            55, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
     GUI_CreateTextSelectPlate(&gui->resetsrc, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
     //Row 4
@@ -103,7 +103,11 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 }
 void update_countdown(u8 idx)
 {
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH;
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERM;
     GUI_SetHidden((guiObject_t *)&gui->start, hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl, hide);
+    // Permanent timer do not have reset command
+    hide = Model.timer[idx].type == TIMER_PERM;
+    GUI_SetHidden((guiObject_t *)&gui->resetsrc, hide);
+    GUI_SetHidden((guiObject_t *)&gui->resetlbl, hide);
 }

@@ -37,9 +37,13 @@ void TIMER_SetString(char *str, s32 time)
         neg = 0;
     }
     time = time / 1000; //Convert to seconds
-    u8 m = time / 60;
-    u8 s = time - m*60;
-    sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
+    u8 h = time / 3600;
+    u8 m = (time - h*3600) / 60;
+    u8 s = time -h*3600 - m*60;
+    if( h < 1)
+    	sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
+    else
+	sprintf(str, "%s%02d:%02d:%02d", neg ? "-" : "", h, m, s);
 }
 
 const char *TIMER_Name(char *str, u8 timer)
@@ -61,7 +65,7 @@ void TIMER_Reset(u8 timer)
     timer_state[timer] = 0;
     if (Model.timer[timer].type == TIMER_STOPWATCH) {
         timer_val[timer] = 0;
-    } else {
+    } else if(Model.timer[timer].type == TIMER_COUNTDOWN) {
         timer_val[timer] = Model.timer[timer].timer * 1000;
     }
 }
@@ -74,8 +78,14 @@ s32 TIMER_GetValue(u8 timer)
 void TIMER_Init()
 {
     u8 i;
-    for (i = 0; i < NUM_TIMERS; i++)
-        TIMER_Reset(i);
+    if( model_fulltime == 0 )
+	 model_fulltime = Model.fulltime!=0 ? Model.fulltime * 1000 : 1 ;
+    for (i = 0; i < NUM_TIMERS; i++){
+	if(Model.timer[i].type != TIMER_PERM ) 
+        	TIMER_Reset(i);
+	else
+	  timer_val[i] = model_fulltime;
+    }
 }
 
 void TIMER_Update()
@@ -102,7 +112,10 @@ void TIMER_Update()
         }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
-            if (Model.timer[i].type == TIMER_STOPWATCH) {
+	   if (Model.timer[i].type == TIMER_PERM) {
+		model_fulltime += delta;
+                timer_val[i] = model_fulltime;
+            } else if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {
                 s32 warn_time;

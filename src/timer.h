@@ -2,7 +2,7 @@
 #define _TIMER_H_
 
 #define TIMER_MAX_VAL 5940
-#define NUM_TIMERS 2
+#define NUM_TIMERS 3
 
 #define DEFAULT_TIMEUP_INTERVAL 10000
 #define DEFAULT_PERALERT_TIME 30000
@@ -10,9 +10,11 @@
 #define MIN_PERALERT_TIME 0
 #define MAX_PERALERT_TIME 60
 
+u32 model_fulltime;
 enum TimerType {
     TIMER_STOPWATCH,
     TIMER_COUNTDOWN,
+    TIMER_PERM,
     TIMER_LAST,
 };
 struct Timer {

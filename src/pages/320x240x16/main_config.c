@@ -72,7 +72,7 @@ guiObject_t *firstObj;
 
 #define BOX0123_X 16
 #define BOX4567_X 204
-#define BOX_W     100
+#define BOX_W     113
 #define BOX0145_H 40
 #define BOX2367_H 24
 

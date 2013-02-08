@@ -18,6 +18,7 @@ const char *MODEL_TEMPLATE;
 struct Model {
     char name[24];
     char icon[24];
+    u32  fulltime;
     enum ModelType type;
     enum Protocols protocol;
     s16 proto_opts[NUM_PROTO_OPTS];

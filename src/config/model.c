@@ -121,9 +121,10 @@ static const char SECTION_TIMER[] = "timer";
 
 #define TIMER_SOURCE  MIXER_SOURCE
 #define TIMER_TYPE MODEL_TYPE
-static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" };
+static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" ,"fulltime"};
 static const char TIMER_TIME[] = "time";
 static const char TIMER_RESETSRC[] = "resetsrc";
+static const char FULLTIME[] = "fulltime";
 
 /* Section: Safety */
 static const char SECTION_SAFETY[] = "safety";
@@ -258,6 +259,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(MODEL_ICON)) {
             CONFIG_ParseIconName(m->icon, value);
+            return 1;
+        }
+	if (MATCH_KEY(FULLTIME)) {
+            m->fulltime = atoi(value);
             return 1;
         }
         if (MATCH_KEY(MODEL_TYPE)) {
@@ -872,6 +877,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
+    if(WRITE_FULL_MODEL || model_fulltime != 0 )
+    	fprintf(fh, "%s=%d\n", FULLTIME, model_fulltime/1000);
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, SIMPLEMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1099,6 +1106,8 @@ u8 CONFIG_ReadModel(u8 model_num) {
 
 u8 CONFIG_SaveModelIfNeeded() {
     u32 newCrc = Crc(&Model, sizeof(Model));
+    struct Model *m = &Model;
+    m->fulltime = (int) model_fulltime/1000;
     if (crc32 == newCrc)
         return 0;
     CONFIG_WriteModel(Transmitter.current_model);

@@ -84,9 +84,9 @@ guiObject_t *firstObj;
 /*************************************/
 
 
-#define BOX0123_X 8 //16
+#define BOX0123_X 2 //16
 #define BOX4567_X 80 //204
-#define BOX_W     40 //100
+#define BOX_W     48 //100
 #define BOX0145_H 9 //40
 #define BOX2367_H 9 //24
 
