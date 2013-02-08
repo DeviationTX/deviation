@@ -64,7 +64,8 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
               item_count,
               obj,
               NULL, NULL);
-
+    if (scrollable->max_visible_rows == item_count)
+        GUI_SetHidden((guiObject_t *)&scrollable->scrollbar, 1);
     scrollable->cur_row = -1;
     create_scrollable_objs(scrollable, 0);
     //force selection to be current objectif there are no selectable contents
@@ -221,7 +222,8 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
         scroll_pos = 0;
     else if(scrollable->cur_row + rel_row == scrollable->item_count)
         scroll_pos = scrollable->item_count - 1;
-    GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
+    if (! OBJ_IS_HIDDEN((guiObject_t *)&scrollable->scrollbar))
+        GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
     
 }
 

@@ -70,24 +70,14 @@ static void show_page(CurvesMode _curve_mode, int page)
     PAGE_RemoveAllObjects();
     memset(mp, 0, sizeof(*mp));
     curve_mode = _curve_mode;
-    if (curve_mode == CURVESMODE_PITCH)
+    if (curve_mode == CURVESMODE_PITCH) {
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.pitch, PITCHMIXER_COUNT);
-    else
+        get_hold_state();
+    } else
         SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
         GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
-    }
-    u8 mode_count = 3;
-    if (mp->mixer_ptr[3] == NULL)
-        pit_hold_state = 0;
-    else {
-        mode_count = 4;
-        pit_hold_state = 1;
-    }
-    for (u8 i = 0; i < mode_count; i++) {
-        if (mp->mixer_ptr[i]->curve.type != CURVE_9POINT) // the 1st version uses 7point curve, need to convert to 13point
-            mp->mixer_ptr[i]->curve.type = CURVE_9POINT;
     }
 
     PAGE_ShowHeader(_tr("Mode"));
@@ -96,64 +86,14 @@ static void show_page(CurvesMode _curve_mode, int page)
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
-    u8 y = ITEM_SPACE;
-    u8 w1 = 5;
-    u8 w2 = 32;
-    u8 x = 0;
-    u8 height = 9;
-    GUI_CreateLabelBox(&gui->vallbl[0], x, y,  w1, height, &TINY_FONT, NULL, NULL, "L");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[0], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)0);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&gui->vallbl[8], x, y,  w1, height, &TINY_FONT, NULL, NULL, "H");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
+    STANDARD_DrawCurvePoints(gui->vallbl, gui->val, &gui->auto_,
+        selectable_bitmaps[curve_mode * 4 + pit_mode], auto_generate_cb, press_cb, set_pointval_cb);
 
-    y += height;
-    x = 0;
-    GUI_CreateButtonPlateText(&gui->auto_, x, y, 38, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0, auto_generate_cb, _tr("Auto"));
-    x += 39;
-    GUI_CreateLabelBox(&gui->vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
-
-    y += ITEM_SPACE;
-    x = 0;
-    GUI_CreateLabelBox(&gui->vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[1], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)1);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&gui->vallbl[2], x, y,  w1, height, &TINY_FONT, NULL, NULL, "3");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[2], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)2);
-
-    y += height +1;
-    x = 0;
-    GUI_CreateLabelBox(&gui->vallbl[3], x, y,  w1, height, &TINY_FONT, NULL, NULL, "4");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[3], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)3);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&gui->vallbl[5], x, y,  w1, height, &TINY_FONT, NULL, NULL, "6");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[5], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)5);
-
-    y += height +1;
-    x = 0;
-    GUI_CreateLabelBox(&gui->vallbl[6], x, y,  w1, height, &TINY_FONT, NULL, NULL, "7");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[6], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)6);
-    x += w2 + 2;
-    GUI_CreateLabelBox(&gui->vallbl[7], x, y,  w1, height, &TINY_FONT, NULL, NULL, "8");
-    x += w1;
-    GUI_CreateTextSelectPlate(&gui->val[7], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)7);
-
-    update_textsel_state();
-
-    GUI_CreateXYGraph(&gui->graph, 77, ITEM_HEIGHT +1, 50, 50,
-                  CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                  CHAN_MAX_VALUE, CHAN_MAX_VALUE,
-                  0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
-                  show_curve_cb, curpos_cb, NULL, NULL);
+    GUI_CreateXYGraph(&gui->graph, 77, ITEM_SPACE, 50, 50,
+                      CHAN_MIN_VALUE, CHAN_MIN_VALUE,
+                      CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                      0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
+                      show_curve_cb, curpos_cb, NULL, NULL);
 
     GUI_Select1stSelectableObj();
 }

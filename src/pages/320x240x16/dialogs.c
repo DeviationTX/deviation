@@ -103,13 +103,23 @@ void PAGE_ShowBindingDialog(u8 update)
     }
 }
 
-void PAGE_ShowLowBattDialog()
-{
+void PAGE_ShowWarning(const char *title, const char *str)
+{   
     if (dialog)
         return;
-    strncpy(dlgstr, _tr("Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!"), sizeof(dlgstr));
-    dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Low Battery"), NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    sprintf(dlgstr, "%s", str);
+    current_selected_obj = GUI_GetSelected();
+    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+}
+
+void PAGE_ShowLowBattDialog()
+{
+    PAGE_ShowWarning(_tr("Low Battery"),
+         _tr("Critical battery level detected.\n"
+             "Settings have been saved.\n"
+             "Any future configuration settings\n"
+             "will NOT be saved.\n\n"
+             "Change batteries now!"));
 }
 
 void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)

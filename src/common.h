@@ -84,6 +84,7 @@ void PAGE_ShowBindingDialog(u8 update);
 void PAGE_ShowLowBattDialog();
 void PAGE_DisableSafetyDialog(u8 disable);
 void PAGE_ShowInvalidModule();
+void PAGE_ShowWarning(const char *title, const char *str);
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
 int PAGE_GetStartPage();
@@ -139,6 +140,7 @@ int PROTOCOL_MapChannel(int input, int default_ch);
 
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);
+const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src);
 const char *INPUT_MapSourceName(u8 idx, u8 *val);
 const char *INPUT_ButtonName(u8 src);
 

@@ -7,6 +7,7 @@
 #define NUM_COMPLEX_MIXERS 10
 #define LONG_PRESS_STEP 5
 #define SUBTRIM_RANGE 500  // subtrim <100 is insufficient
+#define SAFETYVALUE_RANGE 200 //some motors,e.g. 005 in v120d02, are detected to need thr hold  as low as -170
 
 struct curve_edit {
     struct buttonAction action;

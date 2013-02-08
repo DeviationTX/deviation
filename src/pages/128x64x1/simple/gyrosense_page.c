@@ -50,15 +50,15 @@ void PAGE_GyroSenseInit(int page)
 
     row += ITEM_SPACE;
     w = 40;
-    GUI_CreateLabelBox(&gui->gyrolbl[0], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)1);
+    GUI_CreateLabelBox(&gui->gyrolbl[0], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)0);
     GUI_CreateTextSelectPlate(&gui->gyro[0], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)0);
 
     row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->gyrolbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
+    GUI_CreateLabelBox(&gui->gyrolbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)1);
     GUI_CreateTextSelectPlate(&gui->gyro[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)1);
 
     row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->gyrolbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)3);
+    GUI_CreateLabelBox(&gui->gyrolbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
     GUI_CreateTextSelectPlate(&gui->gyro[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
 
     GUI_Select1stSelectableObj();

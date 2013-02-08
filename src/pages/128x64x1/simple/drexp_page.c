@@ -54,7 +54,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
         w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
-        w2, ITEM_HEIGHT, &TINY_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+        w2, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     return 2;
 }
 
@@ -87,6 +87,10 @@ void PAGE_DrExpInit(int page)
 
 static void _refresh_page()
 {
+    for (u8 i = 0; i < ITEM_LAST; i++) {
+        GUI_Redraw(&gui->value1[i]);
+        GUI_Redraw(&gui->value2[i]);
+    }
     GUI_Redraw(&gui->graph);
 }
 

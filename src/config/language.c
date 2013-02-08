@@ -30,7 +30,7 @@ void CONFIG_EnableLanguage(int state) {(void)state;}
 #else
 u16 fnv_16_str(const char *str);
 static char strings[8192];
-#define MAX_STRINGS 300
+#define MAX_STRINGS 320
 #define MAX_LINE 300
 
 #define dbg_printf if(0) printf
