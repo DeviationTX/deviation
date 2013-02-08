@@ -73,7 +73,7 @@ static void _show_page()
     PAGE_SetActionCB(_action_cb);
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     LCD_HEIGHT - ITEM_HEIGHT -1, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
+                     LCD_HEIGHT - ITEM_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
