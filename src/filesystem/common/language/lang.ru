@@ -47,18 +47,38 @@
 Абсолют.
 :AIL
 Элер
-:AIL DR
-ЭЛ.ДР
-|devo8:AIL DR
-Элер ДР
+<:AIL DR
+<ЭЛ.ДР
+<|devo8:AIL DR
+<Элер ДР
+:AIL DR0
+ЭЛ.ДР0
+|devo8:AIL DR0
+Элер ДР0
+:AIL DR1
+ЭЛ.ДР1
+|devo8:AIL DR1
+Элер ДР1
+:AIL DR2
+ЭЛ.ДР2
+|devo8:AIL DR2
+Элер ДР2
 :AIL Inv:
 Элер Инв:
 :AIL Mix:
 Элер Микш:
+:AUX2
+AUX2
+:AUX3
+AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
+:AUX6
+AUX6
+:AUX7
+AUX7
 :About Deviation
 О программе
 :Advanced
@@ -75,6 +95,8 @@ AUX5
 Aux2
 :Backlight:
 Подсветка:
+:Bad/missing\nprotocol modules!
+Ошибочные/отсутствующие\nмодули протоколов!
 :Bar %d:
 Полоса%d
 :Bars:
@@ -167,8 +189,12 @@ Aux2
 Цикл3
 :D/R & Exp
 Д/Р и Экспонента
-:DR
-ДР
+<:DR
+<ДР
+:DR0
+ДР0
+:DR1
+ДР1
 :Deadband
 Мертв.зона
 :Default
@@ -187,10 +213,22 @@ Aux2
 Вниз
 :ELE
 РВыс
-:ELE DR
-РВ.ДР
-|devo8:ELE DR
-РВыс ДР
+<:ELE DR
+<РВ.ДР
+<|devo8:ELE DR
+<РВыс ДР
+:ELE DR0
+РВ.ДР0
+|devo8:ELE DR0
+РВыс ДР0
+:ELE DR1
+РВ.ДР1
+|devo8:ELE DR1
+РВыс ДР1
+:ELE DR2
+РВ.ДР2
+|devo8:ELE DR2
+РВыс ДР2
 :ELE Inv:
 РВыс Инв:
 :ELE Mix:
@@ -225,6 +263,8 @@ F°
 Отказоуст.
 |devo8:Fail safe
 Отказоустойчивость
+:Failsafe
+Отказоуст.
 :Failsafe:
 Отказоуст.:
 |devo8:Failsafe:
@@ -245,8 +285,12 @@ F°
 Фут
 :Frame Size
 Период
-:GEAR
-Шасси
+<:GEAR
+<Шасси
+:GEAR0
+Шасси0
+:GEAR1
+Шасси1
 :GPS
 GPS
 :Gear
@@ -259,12 +303,18 @@ GPS
 Чувств. гироскопа
 :H
 H
+:HOLD0
+HOLD0
+:HOLD1
+HOLD1
 :Heli
 Вертолет
+<:Heli/Simple GUI
+<Вертолет/Стандартный интерфейс
+<|devo8:Heli/Simple GUI
+<Вертолет/Стандартный интерфейс
 :Heli/Standard GUI
 Вертолет/Стандартный
-|devo8:Heli/Simple GUI
-Вертолет/Стандартный интерфейс
 :Helicopter
 Вертолет
 :High-Rate
@@ -467,10 +517,22 @@ RPM
 РНап
 |devo8:RUD
 РНапр
-:RUD DR
-РН.ДР
-|devo8:RUD DR
-РНапр ДР
+<:RUD DR
+<РН.ДР
+<|devo8:RUD DR
+<РНапр ДР
+:RUD DR0
+РН.ДР0
+|devo8:RUD DR0
+РНапр ДР0
+:RUD DR1
+РН.ДР1
+|devo8:RUD DR1
+РНапр ДР1
+:RUD DR2
+РН.ДР2
+|devo8:RUD DR2
+РНапр ДР2
 :Re-Init
 Привязка
 :Remove
@@ -503,6 +565,8 @@ RPM
 Сохранить
 :Scale%s:
 Масшт.%s:
+:Scale:
+Масшт.:
 :Scanner
 Сканер
 :Servo
@@ -533,6 +597,8 @@ RPM
 Режим стиков:
 :Sticks:
 Стики:
+:Sub-trim
+Субтриммер
 :Subtrim
 Субтриммер
 :Subtrim:
@@ -581,6 +647,10 @@ RPM
 Трим_П+
 :TRIM_R-
 Трим_П-
+:TRN0
+Тренер0
+:TRN1
+Тренер1
 :TelemRPM
 ТелеRPM
 :TelemT
