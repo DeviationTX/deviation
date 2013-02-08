@@ -125,7 +125,7 @@ const char *string_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    strncpy(dlgstr, _tr("Model needs reset\nfor simple mixer"), sizeof(dlgstr));
+    strncpy(dlgstr, _tr("Model needs reset\nfor standard mixer"), sizeof(dlgstr));
     return dlgstr;
 }
 
