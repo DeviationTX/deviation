@@ -78,14 +78,13 @@ s32 TIMER_GetValue(u8 timer)
 void TIMER_Init()
 {
     u8 i;
-    if( model_fulltime == 0 )
-	 model_fulltime = Model.fulltime!=0 ? Model.fulltime * 1000 : 1 ;
     for (i = 0; i < NUM_TIMERS; i++){
 	if(Model.timer[i].type != TIMER_PERM ) 
         	TIMER_Reset(i);
-	else
-	  timer_val[i] = model_fulltime;
+	else if ( 1 == init_fulltime)
+	  timer_val[i] = Model.fulltime;
     }
+    init_fulltime = 0;
 }
 
 void TIMER_Update()
@@ -113,8 +112,8 @@ void TIMER_Update()
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
 	   if (Model.timer[i].type == TIMER_PERM) {
-		model_fulltime += delta;
-                timer_val[i] = model_fulltime;
+		timer_val[i] += delta;
+		Model.fulltime = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {

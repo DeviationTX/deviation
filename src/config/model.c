@@ -877,8 +877,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-    if(WRITE_FULL_MODEL || model_fulltime != 0 )
-    	fprintf(fh, "%s=%d\n", FULLTIME, model_fulltime/1000);
+    if(WRITE_FULL_MODEL || m->fulltime != 0 )
+    	fprintf(fh, "%s=%d\n", FULLTIME, m->fulltime);
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, SIMPLEMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1064,7 +1064,6 @@ void clear_model(u8 full)
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
     }
-    model_fulltime = 0;
     Model.swashmix[0] = 60;
     Model.swashmix[1] = 60;
     Model.swashmix[2] = 60;
@@ -1095,6 +1094,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
         MIXER_AdjustForProtocol();
+    init_fulltime  = 1;
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
@@ -1106,8 +1106,6 @@ u8 CONFIG_ReadModel(u8 model_num) {
 }
 
 u8 CONFIG_SaveModelIfNeeded() {
-    struct Model *m = &Model;
-    m->fulltime = (int) model_fulltime/1000;
     u32 newCrc = Crc(&Model, sizeof(Model));
     if (crc32 == newCrc)
         return 0;

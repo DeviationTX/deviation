@@ -10,7 +10,7 @@
 #define MIN_PERALERT_TIME 0
 #define MAX_PERALERT_TIME 60
 
-u32 model_fulltime;
+u8 init_fulltime;
 enum TimerType {
     TIMER_STOPWATCH,
     TIMER_COUNTDOWN,
