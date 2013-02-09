@@ -49,11 +49,11 @@ static void _show_page()
 
 void update_countdown(u8 idx)
 {
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERM;
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start[idx], hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl[idx], hide);
     // Permanent timer do not have reset command
-    hide = Model.timer[idx].type == TIMER_PERM;
+    hide = Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->resetsrc[idx], hide);
     GUI_SetHidden((guiObject_t *)&gui->resetlbl[idx], hide);
 }
