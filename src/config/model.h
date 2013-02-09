@@ -18,7 +18,6 @@ const char *MODEL_TEMPLATE;
 struct Model {
     char name[24];
     char icon[24];
-    u32  fulltime;
     enum ModelType type;
     enum Protocols protocol;
     s16 proto_opts[NUM_PROTO_OPTS];
@@ -39,6 +38,7 @@ struct Model {
     u16 telem_alarm_val[TELEM_NUM_ALARMS];
     u8 telem_flags;
     MixerMode mixer_mode;
+    u32 permanent_timer;
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

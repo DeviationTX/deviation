@@ -10,11 +10,10 @@
 #define MIN_PERALERT_TIME 0
 #define MAX_PERALERT_TIME 60
 
-u8 init_fulltime;
 enum TimerType {
     TIMER_STOPWATCH,
     TIMER_COUNTDOWN,
-    TIMER_PERM,
+    TIMER_PERMANENT,
     TIMER_LAST,
 };
 struct Timer {

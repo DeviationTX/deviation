@@ -79,12 +79,11 @@ void TIMER_Init()
 {
     u8 i;
     for (i = 0; i < NUM_TIMERS; i++){
-	if(Model.timer[i].type != TIMER_PERM ) 
+	if(Model.timer[i].type != TIMER_PERMANENT ) 
         	TIMER_Reset(i);
-	else if ( 1 == init_fulltime)
-	  timer_val[i] = Model.fulltime;
+	else
+	  timer_val[i] = Model.permanent_timer;
     }
-    init_fulltime = 0;
 }
 
 void TIMER_Update()
@@ -111,9 +110,9 @@ void TIMER_Update()
         }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
-	   if (Model.timer[i].type == TIMER_PERM) {
+	   if (Model.timer[i].type == TIMER_PERMANENT) {
 		timer_val[i] += delta;
-		Model.fulltime = timer_val[i];
+		Model.permanent_timer = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {

@@ -103,11 +103,11 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 }
 void update_countdown(u8 idx)
 {
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERM;
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start, hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl, hide);
     // Permanent timer do not have reset command
-    hide = Model.timer[idx].type == TIMER_PERM;
+    hide = Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->resetsrc, hide);
     GUI_SetHidden((guiObject_t *)&gui->resetlbl, hide);
 }

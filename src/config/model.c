@@ -121,10 +121,10 @@ static const char SECTION_TIMER[] = "timer";
 
 #define TIMER_SOURCE  MIXER_SOURCE
 #define TIMER_TYPE MODEL_TYPE
-static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" ,"fulltime"};
+static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" ,"permanent"};
 static const char TIMER_TIME[] = "time";
 static const char TIMER_RESETSRC[] = "resetsrc";
-static const char FULLTIME[] = "fulltime";
+static const char PERMANENT_TIMER[] = "permanent_timer";
 
 /* Section: Safety */
 static const char SECTION_SAFETY[] = "safety";
@@ -261,8 +261,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
-	if (MATCH_KEY(FULLTIME)) {
-            m->fulltime = atoi(value);
+	if (MATCH_KEY(PERMANENT_TIMER)) {
+            m->permanent_timer = atoi(value);
             return 1;
         }
         if (MATCH_KEY(MODEL_TYPE)) {
@@ -877,8 +877,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-    if(WRITE_FULL_MODEL || m->fulltime != 0 )
-    	fprintf(fh, "%s=%d\n", FULLTIME, m->fulltime);
+    if(WRITE_FULL_MODEL || m->permanent_timer != 0 )
+    	fprintf(fh, "%s=%d\n", PERMANENT_TIMER, m->permanent_timer);
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, SIMPLEMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1094,7 +1094,6 @@ u8 CONFIG_ReadModel(u8 model_num) {
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
         MIXER_AdjustForProtocol();
-    init_fulltime  = 1;
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
