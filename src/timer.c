@@ -67,6 +67,8 @@ void TIMER_Reset(u8 timer)
         timer_val[timer] = 0;
     } else if(Model.timer[timer].type == TIMER_COUNTDOWN) {
         timer_val[timer] = Model.timer[timer].timer * 1000;
+    } else if(Model.timer[timer].type == TIMER_PERMANENT ) {
+	timer_val[timer] = Model.permanent_timer;
     }
 }
 
@@ -78,12 +80,8 @@ s32 TIMER_GetValue(u8 timer)
 void TIMER_Init()
 {
     u8 i;
-    for (i = 0; i < NUM_TIMERS; i++){
-	if(Model.timer[i].type != TIMER_PERMANENT ) 
-        	TIMER_Reset(i);
-	else
-	  timer_val[i] = Model.permanent_timer;
-    }
+    for (i = 0; i < NUM_TIMERS; i++)
+	TIMER_Reset(i);
 }
 
 void TIMER_Update()
