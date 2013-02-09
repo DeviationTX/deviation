@@ -90,8 +90,8 @@ guiObject_t *firstObj;
 #define MODEL_ICO_W 96
 #define MODEL_ICO_H 96
 /*************************************/
-// 100 = previous BOX_W
-#define GRAPH1_X BOX0123_X
+// 100 = previous BOX_W, 16 = previous BOX0123_X
+#define GRAPH1_X 16
 #define GRAPH2_X (320 - 100 - GRAPH1_X)
 #define GRAPH_Y BOX26_Y
 #define GRAPH_H 59
