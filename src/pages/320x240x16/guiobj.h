@@ -158,6 +158,8 @@ struct timer_obj {
     guiLabel_t resetlbl[NUM_TIMERS];
     guiTextSelect_t resetsrc[NUM_TIMERS];
     guiLabel_t startlbl[NUM_TIMERS];
+    guiLabel_t resetpermlbl[NUM_TIMERS];
+    guiButton_t resetperm[NUM_TIMERS];
     guiTextSelect_t start[NUM_TIMERS];
 };
 

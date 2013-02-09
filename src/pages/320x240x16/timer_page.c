@@ -40,6 +40,9 @@ static void _show_page()
         //Row 3
         GUI_CreateLabelBox(&gui->resetlbl[i], y, x+44, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
         GUI_CreateTextSelect(&gui->resetsrc[i],  y+63, x+44, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
+         /* or Reset Perm timer*/
+	GUI_CreateLabelBox(&gui->resetpermlbl[i], y, x+44, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+	GUI_CreateButton(&gui->resetperm[i], y+63, x+44, TEXTSELECT_96, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
         //Row 4
         GUI_CreateLabelBox(&gui->startlbl[i], y, x+66, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
         GUI_CreateTextSelect(&gui->start[i], y+63, x+66, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
@@ -52,9 +55,17 @@ void update_countdown(u8 idx)
     u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start[idx], hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl[idx], hide);
+    GUI_SetSelectable((guiObject_t *)&gui->start[idx], !hide);
+
     // Permanent timer do not have reset command
     hide = Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->resetsrc[idx], hide);
+    GUI_SetSelectable((guiObject_t *)&gui->resetsrc[idx], !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetlbl[idx], hide);
+
+    hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_COUNTDOWN;
+    GUI_SetHidden((guiObject_t *)&gui->resetperm[idx], hide);
+    GUI_SetSelectable((guiObject_t *)&gui->resetperm[idx], !hide);
+    GUI_SetHidden((guiObject_t *)&gui->resetpermlbl[idx], hide);
 }
 
