@@ -152,6 +152,11 @@ extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
 
+/* Battery */
+#define BATTERY_CRITICAL 0x01
+#define BATTERY_LOW      0x02
+u8 BATTERY_Check();
+
 /* Mixer mode */
 typedef enum {
     MIXER_ADVANCED = 0,

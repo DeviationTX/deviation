@@ -31,7 +31,6 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
-u8 BATTERY_Check();
 
 int main() {
     
@@ -169,7 +168,7 @@ void EventLoop()
 #endif
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
     if(PWR_CheckPowerSwitch()) {
-        if(! (BATTERY_Check() & 0x01)) {
+        if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
             CONFIG_SaveModelIfNeeded();
             CONFIG_SaveTxIfNeeded();
         }
@@ -235,43 +234,6 @@ void TOUCH_Handler() {
         }
     }
     pen_down_last=pen_down;
-}
-
-u8 BATTERY_Check()
-{
-    static u8 warned = 0;
-    static u16 counter = 0;
-    u16 battery = PWR_ReadVoltage();
-
-    // If battery is low or , was low and till under low + 200mV
-    if (battery < Transmitter.batt_alarm || 
-	( battery <= Transmitter.batt_alarm + 200 && (warned & 0x02)) ) {
-
-	if(battery < Transmitter.batt_alarm)
-	    warned |= 0x02; // Bat was low...
-	
-	// We play alarm every counter*100ms secunds
-	counter++;
-	if (1 == counter && Transmitter.batt_warning_interval ) {
-            MUSIC_Play(MUSIC_BATT_ALARM);
-	} else if( Transmitter.batt_warning_interval * 10  <= counter   )
-	    counter = 0 ;	
-
-    } else if (battery > Transmitter.batt_alarm + 200) {
-        warned &= ~0x02; // Bat OK... reset  'was low' and counter..
-	counter = 0;
-    }
-    if (battery < Transmitter.batt_critical && ! (warned & 0x01)) {
-        CONFIG_SaveModelIfNeeded();
-        CONFIG_SaveTxIfNeeded();
-        SPI_FlashBlockWriteEnable(0); //Disable writing to all banks of SPIFlash
-        warned |= 0x01;
-        PAGE_ShowLowBattDialog();
-    } else if (battery > Transmitter.batt_critical + 200) {
-        warned &= ~0x01;
-        SPI_FlashBlockWriteEnable(1); //Disable writing to all banks of SPIFlash
-    }
-    return warned;
 }
 
 #ifdef TIMING_DEBUG
