@@ -1064,6 +1064,7 @@ void clear_model(u8 full)
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
     }
+    model_fulltime = 0;
     Model.swashmix[0] = 60;
     Model.swashmix[1] = 60;
     Model.swashmix[2] = 60;
@@ -1105,9 +1106,9 @@ u8 CONFIG_ReadModel(u8 model_num) {
 }
 
 u8 CONFIG_SaveModelIfNeeded() {
-    u32 newCrc = Crc(&Model, sizeof(Model));
     struct Model *m = &Model;
     m->fulltime = (int) model_fulltime/1000;
+    u32 newCrc = Crc(&Model, sizeof(Model));
     if (crc32 == newCrc)
         return 0;
     CONFIG_WriteModel(Transmitter.current_model);
