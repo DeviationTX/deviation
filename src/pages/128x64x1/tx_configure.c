@@ -37,7 +37,10 @@ static int size_cb(int absrow, void *data)
     switch(absrow) {
 #ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
+#else
+        case ITEM_MODE:
 #endif
+        case ITEM_BUZZ:
         case ITEM_BACKLIGHT:
         case ITEM_PREALERT:
         case ITEM_TELEMTEMP:
@@ -72,33 +75,37 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             but_str = langstr_cb; tgl = lang_select_cb;
             break;
 #endif
-	case ITEM_MUSIC:
-            label = _tr_noop("PowerOff alert");
-            value = _music_shutdown_cb;
-            break;
         case ITEM_MODE:
+#ifdef NO_LANGUAGE_SUPPORT
+            title = _tr_noop("Generic settings");
+#endif
             label = _tr_noop("Stick mode:");
             value = modeselect_cb;
-            break;
-        case ITEM_BATT:
-            label = _tr_noop("Batt alarm:");
-            value = batalarm_select_cb;
-            break;
-	case ITEM_ALARM_INTV:
-            label = _tr_noop("Alarm intvl:");
-            value = batalarmwarn_select_cb;
             break;
         case ITEM_STICKS:
             label = _tr_noop("Sticks:");
             but_str = calibratestr_cb; tgl = press_cb; data = (void *)CALIB_STICK;
             break;
         case ITEM_BUZZ:
+            title = _tr_noop("Buzz settings");
             label = _tr_noop("Buzz volume:");
-	    value = _buzz_vol_cb; data = &Transmitter.volume;
+            value = _buzz_vol_cb; data = &Transmitter.volume;
             break;
         case ITEM_HAPTIC:
             label = _tr_noop("Vibration:");
             value = _vibration_state_cb; data = &Transmitter.vibration_state;
+            break;
+        case ITEM_BATT:
+            label = _tr_noop("Batt alarm:");
+            value = batalarm_select_cb;
+            break;
+        case ITEM_ALARM_INTV:
+            label = _tr_noop("Alarm intvl:");
+            value = batalarmwarn_select_cb;
+            break;
+        case ITEM_PWRDN_ALARM:
+            label = _tr_noop("PwrDn alert:");
+            value = _music_shutdown_cb;
             break;
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
