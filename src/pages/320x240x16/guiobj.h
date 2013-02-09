@@ -195,30 +195,26 @@ struct tx_obj {
              guiLabel_t touchlbl;
              guiButton_t touchcalib;
              guiButton_t touchtest;
+             guiLabel_t sticklbl;
+             guiButton_t stickcalib;
+        } g1;
+        struct {
+             guiLabel_t head1;
+             guiLabel_t buzzlbl;
+             guiTextSelect_t buzz;
              guiLabel_t battalrmlbl;
              guiTextSelect_t battalrm;
 	     guiLabel_t battalrmintvllbl;
              guiTextSelect_t battalrmintvl;
-             guiLabel_t sticklbl;
-             guiButton_t stickcalib;
-             guiLabel_t buzzlbl;
-             guiTextSelect_t buzz;
-        } g1;
-        struct {
-             guiLabel_t head1;
+	     guiLabel_t musicshutdbl;
+             guiTextSelect_t music_shutdown;
+             guiLabel_t head2;
              guiLabel_t backlightlbl;
              guiTextSelect_t backlight;
              guiLabel_t dimtimelbl;
              guiTextSelect_t dimtime;
              guiLabel_t dimtgtlbl;
              guiTextSelect_t dimtgt;
-	     guiLabel_t musicshutdbl;
-             guiTextSelect_t music_shutdown;
-             guiLabel_t head2;
-             guiLabel_t templbl;
-             guiTextSelect_t temp;
-             guiLabel_t lengthlbl;
-             guiTextSelect_t length;
         } g2;
         struct {
              guiLabel_t head1;
@@ -228,6 +224,11 @@ struct tx_obj {
              guiTextSelect_t preintvl;
              guiLabel_t timeuplbl;
              guiTextSelect_t timeup;
+             guiLabel_t head2;
+             guiLabel_t templbl;
+             guiTextSelect_t temp;
+             guiLabel_t lengthlbl;
+             guiTextSelect_t length;
         } g3;
     } u;
 };
