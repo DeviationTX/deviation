@@ -207,7 +207,7 @@ Acrobatie
 Pied
 :Frame Size
 Larg. Signal
-:fulltime
+:permanent
 Total
 :GEAR
 GEAR
