@@ -167,6 +167,8 @@ Veille après
 Bas
 :Down
 Bas
+:Do you really want\nto reset\nthe permanent timer?
+Vous allez remettre\n le Totalisateur\nà zéro?
 :ELE
 ELE
 :ELE DR
