@@ -55,10 +55,14 @@ AUX4
 AUX5
 :About Deviation
 A propos...
+:Advanced
+Expert
 :Airplane
 Avion
 :Alarm
 Alarme
+:Alarm intvl:
+Tempo alarme
 :Altitude
 Altitude
 :Backlight:
@@ -72,7 +76,7 @@ Alarme batt.
 :Battery alarm:
 Alarme batterie:
 :Battery too low,\ncan't save!
-Batterie vide,\nEnregistrement impossible!
+Batterie vide!\n Sauvegarde \n impossible.
 :Bind
 Appairer
 :Binding
@@ -117,6 +121,8 @@ Ch
 Mode canaux
 :Change
 Changer
+:Channel
+Canaux
 :Channel monitor
 Ctrl. des Canaux
 :Channel output
@@ -141,6 +147,8 @@ Cyclique1
 Cyclique2
 :Cyclic3
 Cyclique3
+:D/R & Exp
+D/R & Exp
 :DR
 DR
 :Deadband
@@ -185,12 +193,16 @@ FMODE2
 °F
 :Failsafe:
 Failsafe:
+:Fail safe
+Sécurités
 :File:
 Fichier
 :Fixed
 Fixe
 :Fixed ID:
 ID fixe
+:Fly mode
+Acrobatie
 :Foot
 Pied
 :Frame Size
@@ -203,18 +215,26 @@ GEAR
 GPS
 :Generic settings
 Réglages
-:Shutdown music
-Alarme arrêt
+:Gyro sense
+Gain gyro
 :Heli
 Heli
+:Heli/Standard GUI
+Heli/Interface Std.
 :Helicopter
 Helicoptère
 :High-Rate
 Petit Déb.
+:Hold Position
+Valeur Thr hold
 :Icon
 Icône
 :Icon:
 Icône
+:Idle 1
+Idle 1
+:Idle 2
+Idle 2
 :Input monitor
 Ctrl. des entrées
 :Input:
@@ -243,6 +263,8 @@ Lié
 Charger
 :Load...
 Charger...
+:Locked
+Bloqué
 :Longitude
 Longitude
 :Low Battery
@@ -275,6 +297,8 @@ Limite Min
 Min/Max
 :Mixer
 Mixer
+:Mixer GUI:
+Réglages
 :Mixers:
 Nbr mixers
 :Mode %d
@@ -283,6 +307,10 @@ Mode %d
 Menu Modèle
 :Model name:
 Nom Modèle
+:Model needs reset\nfor standard mixer
+L'interface standard\nréinitialise le modèle
+:Model needs to be reset\nin order to switch to the standard mixer
+Pour le mode de réglage standard,\n le modèle doit être réinitialisé.
 :Model setup
 Config. Modèle
 :Model type:
@@ -319,8 +347,14 @@ Offset
 Ok
 :On
 Marche
+:PIT
+PAS
 :Page:
 Page
+:Pit Mix:
+Mixage plateau
+:Pitch curves
+Courbes de pas
 :Plane
 Avion
 :Point:
@@ -329,6 +363,8 @@ Point:
 Pos.
 :Pos/Neg:
 Pos./Neg.:
+:PowerOff alert
+Alerte d'arrêt 
 :Prealert intvl:
 Tempo préAlarm
 :Prealert time:
@@ -347,8 +383,6 @@ Appuyer sur ENT\n pour passer \n le mode USB sur:
 Aperçu: Appuie-Long ENT
 :Protocol:
 Protocole
-:Reset sw:
-Inter RaZ
 :RIGHT_H
 DROITE_H
 :RIGHT_V
@@ -367,8 +401,12 @@ Réinit.
 Supprimer
 :Reset
 Reset
+:Reset sw:
+Inter RaZ
 :Reverse:
 Sens:
+:Reverse
+Sens servos
 :Reversed
 Inversé
 :Revert
@@ -387,6 +425,8 @@ Sauve
 Echelle%s:
 :Scanner
 Scanner
+:Select switch icon
+Choix de l'icone
 :Simple
 Simple
 :Simple 4 Channel
@@ -399,6 +439,8 @@ Vitesse:
 Source
 :Src:
 Source
+:Standard
+Standard
 :Start:
 Durée:
 :Step:
@@ -411,10 +453,14 @@ Mode
 Sticks
 :Subtrim:
 Subtrim
+:Swash
+Plateau cycl.
 :SwashType:
 Plateau cycl.:
 :Switch %d:
 Inter %d
+:Switch assignment
+Affect. Inters
 :Switch1
 Inter1
 :Switch2
@@ -473,12 +519,18 @@ Unité T°
 Gabarit...
 :Test
 Test
+:Thr hold
+Thr hold
+:Throttle curves
+Courbes de Gaz
+:Throttle hold
+Coupure gaz
 :Time
 Heure
 :Timer
 Chrono
 :Timer settings
-Réglage Alarme
+Alarmes Chronos
 :Timer%d:
 Chrono %d
 :Timers
@@ -486,7 +538,7 @@ Chronos
 :Timeup intvl:
 Tempo Alarme
 :Toggle%d
-Voyant%d
+Inter%d
 :Touch Calibrate
 Calibration du tactile
 :Touch Test
@@ -503,6 +555,8 @@ Toucher pour déverrouiller
 Config. Emetteur
 :Transmitter menu
 Menu Emetteur
+:Travel adjust
+Course servos
 :Trim
 Trim
 :Trim +:
@@ -525,6 +579,8 @@ Puiss. TX
 USB
 :Unknown
 Inconnu
+:Unlocked
+Débloqué
 :Up
 Haut
 :Value:

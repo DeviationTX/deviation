@@ -81,7 +81,7 @@ static void _show_page()
         GUI_CreateLabelBox(&gui1->battalrmlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm:"));
         GUI_CreateTextSelect(&gui1->battalrm, 112, row, TEXTSELECT_96, NULL, batalarm_select_cb, NULL);
         row += space;
-        GUI_CreateLabelBox(&gui1->battalrmintvllbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm interval:"));
+        GUI_CreateLabelBox(&gui1->battalrmintvllbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm intvl:"));
         GUI_CreateTextSelect(&gui1->battalrmintvl, 112, row, TEXTSELECT_96, NULL, batalarmwarn_select_cb, NULL);
         row += space + 8;
         GUI_CreateLabelBox(&gui1->sticklbl, 16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
@@ -91,7 +91,10 @@ static void _show_page()
         GUI_CreateTextSelect(&gui1->buzz, 112, row, TEXTSELECT_96, NULL, _buzz_vol_cb, (void *)&Transmitter.volume);
 
     } else if (page_num == 1) {
-        firstObj = GUI_CreateLabelBox(&gui2->head1, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
+	firstObj = GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("PowerOff alert"));
+        GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
+        row += space + 8;
+        GUI_CreateLabelBox(&gui2->head1, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
         row += space;
         GUI_CreateLabelBox(&gui2->backlightlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight:"));
         GUI_CreateTextSelect(&gui2->backlight, 112, row, TEXTSELECT_96, NULL, brightness_select_cb, NULL);
@@ -102,9 +105,6 @@ static void _show_page()
         GUI_CreateLabelBox(&gui2->dimtgtlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer target:"));
         GUI_CreateTextSelect(&gui2->dimtgt, 112, row, TEXTSELECT_96, NULL, common_select_cb,
                 (void *)&Transmitter.auto_dimmer.backlight_dim_value);
-        row += space + 8;
-	GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Shutdown music"));
-        GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
         row += space + 8;
         GUI_CreateLabelBox(&gui2->head2, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Telemetry settings"));
         row += space;

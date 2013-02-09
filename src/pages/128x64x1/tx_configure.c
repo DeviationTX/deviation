@@ -73,7 +73,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
 #endif
 	case ITEM_MUSIC:
-            label = _tr_noop("Shutdown music");
+            label = _tr_noop("PowerOff alert");
             value = _music_shutdown_cb;
             break;
         case ITEM_MODE:
