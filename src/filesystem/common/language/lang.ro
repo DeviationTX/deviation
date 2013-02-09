@@ -55,12 +55,18 @@ AUX4
 AUX5
 :About Deviation
 Despre Deviation
+:Advanced
+Avansat
 :Airplane
 Avion
 :Alarm
 Alarmă 
 :Altitude
 Altitudine
+:Auto
+Auto
+:Aux2
+Aux2
 :Backlight:
 Iluminare:
 :Bar %d:
@@ -117,6 +123,8 @@ Ch
 Mod canale
 :Change
 Modifică
+:Channel
+Canal
 :Channel monitor
 Monitor canale
 :Channel output
@@ -141,6 +149,8 @@ Ciclic1
 Ciclic2
 :Cyclic3
 Ciclic3
+:D/R & Exp
+DR și Expo
 :DR
 DR
 :Deadband
@@ -183,6 +193,8 @@ FMODE1
 FMODE2
 :Fahren
 F°
+:Fail safe
+Fail safe:
 :Failsafe:
 Failsafe:
 :File:
@@ -191,6 +203,8 @@ Fișier:
 Fix
 :Fixed ID:
 ID Fix:
+:Fly mode
+Mod zbor
 :Foot
 Picior
 :Frame Size
@@ -199,18 +213,32 @@ Dim. pachet
 GEAR
 :GPS
 GPS
+:Gear
+Gear
 :Generic settings
 Setări generale
+:Gyro sense
+Sens giro
+:H
+H
 :Heli
 Elic.
+:Heli/Standard GUI
+Elicopter/Std GUI
 :Helicopter
 Elicopter
 :High-Rate
 Pos0
+:Hold position
+Poziție fixă
 :Icon
 Icon
 :Icon:
 Icon:
+:Idle 1
+Idle 1
+:Idle 2
+Idle 2
 :Input monitor
 Monitor intrări
 :Input:
@@ -219,12 +247,16 @@ Intrare:
 Inserare
 :Inverted
 Inversat
+:L
+J
 :LCD settings
 Setări ecran
 :LEFT_H
 STÂNGA_H
 :LEFT_V
 STÂNGA_V
+:LIN
+LIN
 :Language:
 Limbă:
 :Latitude
@@ -239,12 +271,16 @@ Legat
 Încarcă
 :Load...
 Încarcă...
+:Locked
+Încuiat
 :Longitude
 Longitudine
 :Low Battery
 Nivel bat. scăzut
 :Low-Rate
 Pos2
+:M
+M
 :MIX0
 MIX0
 :MIX1
@@ -271,14 +307,22 @@ Limită min:
 Min/Max
 :Mixer
 Configurare mixer
+:Mixer GUI:
+GUI mixer:
 :Mixers:
 Mixere:
+:Mode
+Mod
 :Mode %d
 Mod %d
 :Model menu
 Meniu model
 :Model name:
 Nume model:
+:Model needs reset\nfor simple mixer
+Modelul se va reseta\pentru modul simplu
+:Model needs to be reset\nin order to switch to the standard mixer
+Modelul va fi resetat pentru\întoarcerea la modul simplu
 :Model setup
 Profil model
 :Model type:
@@ -315,8 +359,14 @@ Offset:
 Ok
 :On
 Pornit
+:PIT
+PIT
 :Page:
 Pagină:
+:Pit Mix:
+Mix PIT:
+:Pitch curves
+Curbe pitch
 :Plane
 Avion
 :Point:
@@ -361,6 +411,8 @@ Re-init
 Șterge
 :Reset
 Reset
+:Reverse
+Invers
 :Reverse:
 Invers:
 :Reversed
@@ -381,6 +433,8 @@ Salv.
 Scară%s:
 :Scanner
 Scaner
+:Servo
+Servo
 :Simple
 Simplu
 :Simple 4 Channel
@@ -393,6 +447,10 @@ Viteză:
 Sursa
 :Src:
 Sursă:
+:Standard
+Standard
+:Standard Mixer
+Mixer standard
 :Start:
 Start:
 :Step:
@@ -403,12 +461,18 @@ Intrări
 Mod:
 :Sticks:
 Stick-uri:
+:Subtrim
+Subtrim
 :Subtrim:
 Subtrim
+:Swash
+Platou
 :SwashType:
 Tip platou:
 :Switch %d:
 Ind. %d
+:Switch assignment
+Asignare act.
 :Switch1
 Act1
 :Switch2
@@ -467,6 +531,12 @@ Temperatură:
 Șablon...
 :Test
 Test
+:Thr hold
+Thr hold
+:Throttle curves
+Curba putere
+:Throttle hold
+Throttle hold
 :Time
 Timp
 :Timer
@@ -497,6 +567,8 @@ Apasă pentru a descuia
 Configurare radio
 :Transmitter menu
 Meniu radio
+:Travel adjust
+Ajustare curse
 :Trim
 Trim
 :Trim +:
@@ -519,8 +591,12 @@ Putere tx:
 USB
 :Unknown
 Necunoscut
+:Unlocked
+Descuiat
 :Up
 Sus
+:Value
+Valoare
 :Value:
 Valoare:
 :Vibration:
