@@ -164,6 +164,8 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + ITEM_HEIGHT + 1,
             w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
+    if (absrow == COMMON_SRC)
+        set_src_enable(mp->cur_mixer->curve.type);
     return 1;
 }
 

@@ -352,6 +352,7 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         mp->cur_mixer = mp->mixer + (cur - 1);
         _show_complex(1);
+        set_src_enable(mp->cur_mixer->curve.type);
     }
     sprintf(mp->tmpstr, "%d", cur);
     return mp->tmpstr;
