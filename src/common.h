@@ -7,6 +7,8 @@
 
 #include "std.h"
 
+#ifndef LIBOPENCM3_CM3_COMMON_H
+//Older gcc does not allow typedef redefinition even to thesame type
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
@@ -14,6 +16,7 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
+#endif
 
 #include "target.h"
 
