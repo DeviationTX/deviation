@@ -115,7 +115,6 @@ const char *INPUT_SourceName(char *str, u8 src)
 const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
 {
     _get_source_name(str, src, 1);
-    printf("%d: %s\n", src, str);
     return str;
 }
 
