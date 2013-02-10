@@ -22,6 +22,7 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+#define GRAY_FILE "media/gray.bmp"
 #include "../common/_main_page.c"
 
 static const char *_power_to_string();
@@ -93,7 +94,10 @@ void PAGE_MainInit(int page)
             if(! Model.pagecfg.toggle[i])
                 LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
             else {
-		GUI_CreateImageOffset(&gui->toggle[i], x1 + 1 , y, w , h, Model.pagecfg.tglico[i]*8, 0, SWITCH_ICON_FILE, NULL, NULL);
+                if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
+                    struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
+                    GUI_CreateImageOffset(&gui->toggle[i], x1 + 1, y, w, h, img.x_off, img.y_off, img.file, NULL, NULL);
+                }
             }
             //TINY_FONT.outline_color = old_color;
         }

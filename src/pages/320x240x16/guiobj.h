@@ -46,6 +46,16 @@ struct maincfg_obj {
             guiRect_t rect;
             guiImage_t image[40];
         } g4;
+        struct {
+            guiButton_t  okbutton;
+            guiButton_t  cancelbutton;
+            guiLabel_t   switchbox;
+            guiLabel_t   togglelabel[3];
+            guiRect_t    toggleframe;
+            guiImage_t   toggleicon[3];
+            guiImage_t   symbolicon[32];
+            guiRect_t    symbolframe;
+        } g5;
     } u;
 };
 

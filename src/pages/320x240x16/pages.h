@@ -30,12 +30,17 @@ struct pagemem {
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;
         struct telemconfig_page telemconfig_page;
+        struct toggle_select_page toggle_select_page;
     } u;
     u8 modal_page;
 };
 
 #define TOGGLE_FILE "media/toggle.bmp"
 #define MODELMENU_FILE "media/modelmnu.bmp"
+#define GRAY_FILE      "media/gray.bmp"
+
+#define TOGGLEICON_WIDTH 32
+#define TOGGLEICON_HEIGHT 31
 
 void PAGE_SetSection(u8 section);
 void PAGE_ChangeByID(enum PageID id);
