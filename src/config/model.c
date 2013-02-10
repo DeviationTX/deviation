@@ -324,18 +324,17 @@ static void tglico_set_num_pos(struct Model *m, int idx)
         return;
     }
     int src = m->pagecfg.toggle[idx];
-    int count = 1;
     char str1[10], str2[10];
     INPUT_SourceNameAbbrevSwitch(str1, src);
-    while(src+count < INP_LAST) {
-        INPUT_SourceNameAbbrevSwitch(str2, src + count);
-        if(strcmp(str1, str2))
-            break;
-        count++;
+    if (src +2 < INP_LAST) {
+        INPUT_SourceNameAbbrevSwitch(str2, src+2);
+        if(strcmp(str1, str2) == 0) {
+            //3 way switch
+            return;
+        }
     }
-    while(count < 3) {
-        m->pagecfg.tglico[idx][count++] = 0;
-    }
+    //2-way switch or non-switch
+    m->pagecfg.tglico[idx][2] = 0;
 }
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
