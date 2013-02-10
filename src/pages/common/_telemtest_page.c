@@ -21,7 +21,7 @@
 #define TELEM_TXT_FONT DEFAULT_FONT
 #define TELEM_ERR_FONT NORMALBOXNEG_FONT
 
-static guiObject_t *_get_obj(int idx, int objid);
+static inline guiObject_t *_get_obj(int idx, int objid);
 static u8 time_count = 0;
 static u8 telem_state_check()
 {
