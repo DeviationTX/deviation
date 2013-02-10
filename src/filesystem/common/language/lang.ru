@@ -47,10 +47,10 @@
 Абсолют.
 :AIL
 Элер
-<:AIL DR
-<ЭЛ.ДР
-<|devo8:AIL DR
-<Элер ДР
+:AIL DR
+ЭЛ.ДР
+|devo8:AIL DR
+Элер ДР
 :AIL DR0
 ЭЛ.ДР0
 |devo8:AIL DR0
@@ -87,6 +87,8 @@ AUX7
 Самолет
 :Alarm
 Сигнал
+:Alarm intvl:
+Интервал:
 :Altitude
 Высота
 :Auto
@@ -121,8 +123,12 @@ Aux2
 Бокс %d:
 :Button monitor
 Монитор кнопок
+:Buzz settings
+Настройки сигнала
 :Buzz volume:
 Громкость:
+:Buzzer settings
+Настройки сигнала
 :COL
 Колл
 :COL Inv
@@ -189,8 +195,14 @@ Aux2
 Цикл3
 :D/R & Exp
 Д/Р и Экспонента
-<:DR
-<ДР
+:D/R&Exp -AIL
+ДР&Экспо Элер
+:D/R&Exp -ELE
+ДР&Экспо РВыс
+:D/R&Exp -RUD
+ДР&Экспо РНапр
+:DR
+ДР
 :DR0
 ДР0
 :DR1
@@ -213,10 +225,10 @@ Aux2
 Вниз
 :ELE
 РВыс
-<:ELE DR
-<РВ.ДР
-<|devo8:ELE DR
-<РВыс ДР
+:ELE DR
+РВ.ДР
+|devo8:ELE DR
+РВыс ДР
 :ELE DR0
 РВ.ДР0
 |devo8:ELE DR0
@@ -243,6 +255,8 @@ Aux2
 Эксп&ДР
 |devo8:Expo&DR
 Экспо&ДР
+:FMODE
+ПРежим
 :FMODE0
 ПРеж0
 |devo8:FMODE0
@@ -285,8 +299,8 @@ F°
 Фут
 :Frame Size
 Период
-<:GEAR
-<Шасси
+:GEAR
+Шасси
 :GEAR0
 Шасси0
 :GEAR1
@@ -303,16 +317,14 @@ GPS
 Чувств. гироскопа
 :H
 H
+:HOLD
+HOLD
 :HOLD0
 HOLD0
 :HOLD1
 HOLD1
 :Heli
 Вертолет
-<:Heli/Simple GUI
-<Вертолет/Стандартный интерфейс
-<|devo8:Heli/Simple GUI
-<Вертолет/Стандартный интерфейс
 :Heli/Standard GUI
 Вертолет/Стандартный
 :Helicopter
@@ -375,6 +387,8 @@ L
 Низкий расход
 :M
 M
+:MIX
+МИКШ
 :MIX0
 МИКШ0
 :MIX1
@@ -421,7 +435,7 @@ M
 Меню модели
 :Model name:
 Имя модели:
-:Model needs reset\nfor simple mixer
+:Model needs reset\nfor standard mixer
 Модель требует сброса\nдля стандартных микшеров
 :Model needs to be reset\nin order to switch to the standard mixer
 Модель требует сброса\nдля переключения к стандартным микшерам
@@ -454,13 +468,13 @@ M
 :Notch PW
 Пауза ШИ
 :Off
-Выкл.
+Выкл
 :Offset:
 Смещ.:
 :Ok
 ОK
 :On
-Вкл.
+Вкл
 :PIT
 Шаг
 :Page:
@@ -475,8 +489,18 @@ M
 Точка:
 :Pos
 +
+:Pos 0:
+Поз.0:
+:Pos 1:
+Поз.1:
+:Pos 2:
+Поз.2:
 :Pos/Neg:
 +/-:
+:Position %d
+Положение %d
+:PowerOff alert
+Сигнал выкл.:
 :Prealert intvl:
 Интерв. перед:
 |devo8:Prealert intvl:
@@ -505,6 +529,8 @@ ENT для загрузки:
 Просмотр: дл.нажатие ENT
 :Protocol:
 Протокол:
+:PwrDn alert:
+Сигнал выкл.:
 :RIGHT_H
 ПРАВЫЙ_Г
 :RIGHT_V
@@ -517,10 +543,10 @@ RPM
 РНап
 |devo8:RUD
 РНапр
-<:RUD DR
-<РН.ДР
-<|devo8:RUD DR
-<РНапр ДР
+:RUD DR
+РН.ДР
+|devo8:RUD DR
+РНапр ДР
 :RUD DR0
 РН.ДР0
 |devo8:RUD DR0
@@ -539,6 +565,8 @@ RPM
 Удалить
 :Reset
 Сброс
+:Reset sw:
+Сброс:
 :Reverse
 Реверс
 :Reverse:
@@ -569,6 +597,7 @@ RPM
 Масшт.:
 :Scanner
 Сканер
+>:Select switch icon
 :Servo
 серво
 :Simple
@@ -609,8 +638,6 @@ RPM
 Тип авт.пер.:
 |devo8:SwashType:
 Тип авт.перекоса:
-:Switch %d:
-Перекл. %d:
 :Switch assignment
 Переключатели
 :Switch1
@@ -647,6 +674,8 @@ RPM
 Трим_П+
 :TRIM_R-
 Трим_П-
+:TRN
+Тренер
 :TRN0
 Тренер0
 :TRN1
@@ -677,8 +706,6 @@ RPM
 Тест
 :Thr hold
 Удерж.газа
-|devo8:Thr hold
-Удержание газа
 :Throttle curves
 Кривые газа
 :Throttle hold
@@ -739,6 +766,7 @@ RPM
 Мощность:
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Неизвестный
 :Unlocked
@@ -775,6 +803,7 @@ USB
 минимум
 :mult
 умножить
+>:permanent
 :replace
 заменить
 :stopwatch
