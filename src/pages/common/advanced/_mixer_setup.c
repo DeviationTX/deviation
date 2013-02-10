@@ -16,7 +16,7 @@
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 #define gui (&gui_objs.u.advmixcfg)
 
-static guiObject_t * _get_obj(int idx, int objid);
+static inline guiObject_t * _get_obj(int idx, int objid);
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);

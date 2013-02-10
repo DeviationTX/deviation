@@ -19,7 +19,7 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _show_bar_page(u8 num_bars);
 static void _handle_button_test();
-static guiObject_t *_get_obj(int chan, int objid);
+static inline guiObject_t *_get_obj(int chan, int objid);
 
 enum {
     ITEM_GRAPH,

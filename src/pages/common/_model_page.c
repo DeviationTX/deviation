@@ -31,7 +31,7 @@ static void file_press_cb(guiObject_t *obj, void *data);
 static void changeicon_cb(guiObject_t *obj, const void *data);
 
 static void _changename_done_cb(guiObject_t *obj, void *data);
-static guiObject_t *_get_obj(int type, int objid);
+static inline guiObject_t *_get_obj(int type, int objid);
 
 enum {
     ITEM_FILE,

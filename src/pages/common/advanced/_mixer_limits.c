@@ -15,7 +15,7 @@
 static struct Limit origin_limit;
 
 #define gui (&gui_objs.u.advlimit)
-static guiObject_t *_get_obj(int idx, int objid);
+static inline guiObject_t *_get_obj(int idx, int objid);
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);

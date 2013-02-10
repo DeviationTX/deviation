@@ -47,7 +47,7 @@ enum calibType {
     CALIB_STICK_TEST,
 };
 
-static guiObject_t *_get_obj(int idx, int objid);
+static inline guiObject_t *_get_obj(int idx, int objid);
 #define XCOORD 20
 #define YCOORD 20
 static void draw_target(u16 x, u16 y)
