@@ -167,7 +167,9 @@ language:
 	../utils/extract_strings.pl -update
 
 
-zip: $(TARGET).dfu $(PROTO_MODULES) $(ALL)
+zip: $(TARGET).zip
+
+%.zip: $(TARGET).dfu $(PROTO_MODULES) $(ALL)
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip

@@ -31,4 +31,15 @@ else
         LFLAGS := $(LFLAGS) -lportaudio
     endif
 endif
+else #BUILD_TARGET
+
+$(TARGET).zip: $(TARGET).$(EXEEXT)
+	mv -f $(TARGET).$(EXEEXT) deviation-$(HGVERSION).$(EXEEXT)
+	rm -f deviation-$(HGVERSION).zip
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)
+ifdef WINDOWS
+	zip -u deviation-$(HGVERSION).zip libportaudio-2.dll
+endif
+	rm -f deviation-$(HGVERSION).$(EXEEXT)
+
 endif #BUILD_TARGET
