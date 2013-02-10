@@ -100,9 +100,6 @@ guiObject_t *firstObj;
 
 /*************************************/
 /* Toggle Icons */
-#define TOGGLE_W 32
-#define TOGGLE_H 32
-
 #define TOGGLE_CNTR_X 145
 #define TOGGLE_CNTR_Y 40
 #define TOGGLE_CNTR_SPACE 48
@@ -110,14 +107,15 @@ guiObject_t *firstObj;
 #define TOGGLE_LR_Y 182
 #define TOGGLE_LR_SPACE 40
 #define TOGGLE_L_X 10
-#define TOGGLE_R_X (320 - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLE_W)
+#define TOGGLE_R_X (320 - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLEICON_WIDTH)
 /*************************************/
 
 #include "../common/_main_config.c"
 
-static void select_toggle_icon(u8 idx);
-static void iconpress_cb(guiObject_t *obj, const void *data);
 static void build_image(guiObject_t *obj, const void *data);
+
+const char *toggle_val_cb(guiObject_t *obj, int dir, void *data);
+extern void TGLICO_Select(guiObject_t *obj, const void *data);
 
 #define MAX_PAGE 2 // bug fix: divided by 0 error; scroll bar is 1-based now
 static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
@@ -135,12 +133,6 @@ static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         _show_page();
     }
     return page_num;
-}
-static void iconpress_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if(Model.pagecfg.toggle[(long)data])
-        select_toggle_icon((long)data);
 }
 
 static void _show_page()
@@ -170,14 +162,14 @@ static void _show_page()
             y+= 24;
         }
     } else if (page_num == 1) {
-        firstObj = GUI_CreateButton(&gui2->icon[0], COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)0);
-        GUI_CreateTextSelect(&gui2->toggle[0], COL2_VALUE, 40, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)0);
-        GUI_CreateButton(&gui2->icon[1], COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)1);
-        GUI_CreateTextSelect(&gui2->toggle[1], COL2_VALUE, 64, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)1);
-        GUI_CreateButton(&gui2->icon[2], COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)2);
-        GUI_CreateTextSelect(&gui2->toggle[2], COL2_VALUE, 88, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)2);
-        GUI_CreateButton(&gui2->icon[3], COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, iconpress_cb, (void *)3);
-        GUI_CreateTextSelect(&gui2->toggle[3], COL2_VALUE, 112, TEXTSELECT_96, toggle_inv_cb, toggle_val_cb, (void *)3);
+        firstObj = GUI_CreateButton(&gui2->icon[0], COL1_VALUE, 40, BUTTON_48x16, toggle_sel_cb, 0x0000, TGLICO_Select, (void *)0);
+        GUI_CreateTextSelect(&gui2->toggle[0], COL2_VALUE, 40, TEXTSELECT_96, NULL, toggle_val_cb, (void *)0);
+        GUI_CreateButton(&gui2->icon[1], COL1_VALUE, 64, BUTTON_48x16, toggle_sel_cb, 0x0000, TGLICO_Select, (void *)1);
+        GUI_CreateTextSelect(&gui2->toggle[1], COL2_VALUE, 64, TEXTSELECT_96, NULL, toggle_val_cb, (void *)1);
+        GUI_CreateButton(&gui2->icon[2], COL1_VALUE, 88, BUTTON_48x16, toggle_sel_cb, 0x0000, TGLICO_Select, (void *)2);
+        GUI_CreateTextSelect(&gui2->toggle[2], COL2_VALUE, 88, TEXTSELECT_96, NULL, toggle_val_cb, (void *)2);
+        GUI_CreateButton(&gui2->icon[3], COL1_VALUE, 112, BUTTON_48x16, toggle_sel_cb, 0x0000, TGLICO_Select, (void *)3);
+        GUI_CreateTextSelect(&gui2->toggle[3], COL2_VALUE, 112, TEXTSELECT_96, NULL, toggle_val_cb, (void *)3);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(&gui2->barlbl[i], COL1_VALUE, y, barlabel_cb, DEFAULT_FONT, (void *)i);
             GUI_CreateTextSelect(&gui2->bar[i], COL2_VALUE, y, TEXTSELECT_96, NULL, bartxtsel_cb, (void *)i);
@@ -211,50 +203,6 @@ static void _show_title()
          PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));
      GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, MAX_PAGE+1, NULL, scroll_cb, NULL);
      GUI_SetScrollbar(&gui->scrollbar, page_num);
-}
-
-void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        u16 pos = (long)data;
-        u8 idx = pos >> 8;
-        pos &= 0xff;
-        Model.pagecfg.tglico[idx] = pos;
-        PAGE_RemoveAllObjects();
-        PAGE_MainCfgInit(1);
-    }
-}
-
-static void tglico_cancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    PAGE_RemoveAllObjects();
-    PAGE_MainCfgInit(1);
-}
-static void select_toggle_icon(u8 idx)
-{
-    long pos = 0;
-    u16 w, h, x, y;
-    u8 i, j;
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
-    u8 count = w / 32;
-    u8 cursel = Model.pagecfg.tglico[idx];
-    PAGE_CreateCancelButton(216, 4, tglico_cancel_cb);
-    for(j = 0; j < 5; j++) {
-        y = 40 + j * 40;
-        for(i = 0; i < 8; i++,pos++) {
-            if (pos >= count)
-                break;
-            x = 4 + i*40;
-            if (pos == cursel)
-                GUI_CreateRect(&gui4->rect, x-1, y-1, 34, 33, &outline);
-            GUI_CreateImageOffset(&gui4->image[pos], x, y, 32, 31, pos * 32, 0, TOGGLE_FILE, tglico_select_cb, (void *)((idx << 8) | pos));
-        }
-    }
 }
 
 static void draw_rect(enum MainWidget widget, const struct LabelDesc *desc)

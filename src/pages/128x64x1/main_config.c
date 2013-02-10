@@ -20,6 +20,8 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+#include "../common/_toggle_select.c"
+
 #define gui (&gui_objs.u.mainconfig)
 
 enum {
@@ -112,8 +114,6 @@ guiObject_t *firstObj;
 
 /*************************************/
 /* Toggle Icons */
-#define TOGGLE_W 8
-#define TOGGLE_H 11
 
 #define TOGGLE_CNTR_X 145
 #define TOGGLE_CNTR_Y 40
@@ -122,7 +122,7 @@ guiObject_t *firstObj;
 #define TOGGLE_LR_Y 11
 #define TOGGLE_LR_SPACE 40
 #define TOGGLE_L_X 8
-#define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLE_W)
+#define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLEICON_WIDTH)
 /*************************************/
 
 enum {
@@ -196,7 +196,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_SWITCH2:
         case ITEM_SWITCH3:
 	    label_cb = NULL;
-            tgl = toggle_inv_cb; value = toggle_val_cb; data = (void *)(long)(absrow - ITEM_SWITCH0);
+            value = toggle_val_cb; data = (void *)(long)(absrow - ITEM_SWITCH0);
 	    buttonlabel_cb = toggle_sel_cb; buttonpress_cb = switchicon_press_cb;
             break;
         case ITEM_MENU:
@@ -242,7 +242,7 @@ static void switch_select_cb(guiObject_t *obj, s8 press_type, const void *data)
     u16 pos = (long)data;
     u8 idx = pos >> 8;
     pos &= 0xff;
-    Model.pagecfg.tglico[idx] = pos;
+    Model.pagecfg.tglico[idx][0] = pos;
     PAGE_MainCfgInit(-1);
 }
 
@@ -256,8 +256,8 @@ static void show_switchicon_page(u8 idx)
     PAGE_ShowHeader(_tr("Select switch icon"));
 
     u16 w, h;
-    LCD_ImageDimensions(SWITCH_ICON_FILE, &w, &h);
-    u8 count = w / TOGGLE_W;
+    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
+    u8 count = w / TOGGLEICON_WIDTH;
     if (count > ICONS_MAX_COUNT)
         count = ICONS_MAX_COUNT; 
     u8 x = 0;
@@ -268,8 +268,9 @@ static void show_switchicon_page(u8 idx)
             y += 15;
             x = 4;
         }
-        GUI_CreateImageOffset(&gui->image[pos], x, y, TOGGLE_W, TOGGLE_H, pos * TOGGLE_W, 0, SWITCH_ICON_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
-        if (pos == Model.pagecfg.tglico[idx])
+        GUI_CreateImageOffset(&gui->image[pos], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
+             pos * TOGGLEICON_WIDTH, 0, TOGGLE_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
+        if (pos == Model.pagecfg.tglico[idx][0])
            GUI_SetSelected((guiObject_t *)&gui->image[pos]);
         x += 12;
         pos++;

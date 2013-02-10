@@ -242,6 +242,102 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
     return 0;
 }
 
+static int parse_s8_list(const char *ptr, s8 *vals, int max_count)
+{
+    const char *origptr = ptr;
+    int value_int = 0;
+    int idx = 0;
+    int sign = 0;
+
+    while(1) {
+        if(*ptr == ',' || *ptr == '\0') {
+            value_int = value_int * (sign ? -1 : 1);
+            if (idx >= max_count)
+                return max_count + 1;
+            if (value_int > 127)
+                value_int = 127;
+            else if (value_int < -127)
+                value_int = -127;
+            vals[idx] = value_int;
+            sign = 0;
+            value_int = 0;
+            idx++;
+            if(*ptr == '\0')
+                return idx;
+        } else if(*ptr == '-') {
+            sign = 1;
+        } else if (*ptr >= '0' && *ptr <= '9') {
+            value_int = value_int * 10 + (*ptr - '0');
+        } else {
+            printf("Bad value '%c' in '%s'\n", *ptr, origptr);
+            return idx;
+        }
+        ptr++;
+    }
+}
+
+static void upgrade_tglico(struct Model *m, int idx)
+{
+    //Map legacy toggle icons to new format
+    char str1[10], str2[10];
+    if(! m->pagecfg.toggle[idx])
+        return;
+    int src = MIXER_SRC(m->pagecfg.toggle[idx]);
+    if(! m->pagecfg.tglico[idx][2]) {
+        //got 2.1 or earlier style name (same as abbrev. name) for 2-position switch
+        //so need to convert to position 1
+        if (src+1 < INP_LAST &&
+            strcmp(INPUT_SourceNameAbbrevSwitch(str1, src), INPUT_SourceNameAbbrevSwitch(str2, src+1)) == 0)
+        {
+            src++;
+        }
+    }
+    //Determine switch-position (0, 1, or 2)
+    int sw = src;
+    INPUT_SourceNameAbbrevSwitch(str1, src);
+    while(sw) {
+        INPUT_SourceNameAbbrevSwitch(str2, sw-1);
+        if(strcmp(str1, str2))
+            break;
+        sw--;
+    }
+    sw = src - sw; //cur switch position
+    int val = m->pagecfg.tglico[idx][0];
+    memset(m->pagecfg.tglico[idx], 0, sizeof(m->pagecfg.tglico[idx]));
+    if(MIXER_SRC_IS_INV(m->pagecfg.toggle[idx])) {
+        for(int i = 0; i < 3; i++) {
+            if(i != sw) {
+                m->pagecfg.tglico[idx][i] = val;
+            }
+        }
+    } else {
+        m->pagecfg.tglico[idx][sw] = val;
+    }
+    m->pagecfg.toggle[idx] = src - sw;
+}
+
+static void tglico_set_num_pos(struct Model *m, int idx)
+{
+    //zero unsupported switch positions
+    if(! m->pagecfg.toggle[idx]) {
+        memset(m->pagecfg.tglico[idx], 0, sizeof(m->pagecfg.tglico[idx]));
+        return;
+    }
+    int src = m->pagecfg.toggle[idx];
+    int count = 1;
+    char str1[10], str2[10];
+    INPUT_SourceNameAbbrevSwitch(str1, src);
+    while(src+count < INP_LAST) {
+        INPUT_SourceNameAbbrevSwitch(str2, src + count);
+        if(strcmp(str1, str2))
+            break;
+        count++;
+    }
+    while(count < 3) {
+        m->pagecfg.tglico[idx][count++] = 0;
+    }
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     CLOCK_ResetWatchdog();
@@ -386,37 +482,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MIXER_CURVE_POINTS)) {
-            u8 point = 0;
-            u8 sign = 0;
-            value_int = 0;
-            const char *ptr = value;
-            // This is a crude version of strtok/atoi
-            while(1) {
-                if(*ptr == ',' || *ptr == '\0') {
-                    value_int = value_int * (sign ? -1 : 1);
-                    if (point >= MAX_POINTS) {
-                        printf("%s: Curve point %s is not valid (maxpoints = %d\n", section, name, MAX_POINTS);
-                        return 0;
-                    }
-                    if (value_int > 100)
-                        value_int = 100;
-                    if (value_int < -100)
-                        value_int = -100;
-                    m->mixers[idx].curve.points[point] = value_int;
-                    sign = 0;
-                    value_int = 0;
-                    if (*ptr == '\0')
-                        return 1;
-                    point++;
-                } else if(*ptr == '-') {
-                    sign = 1;
-                } else if(*ptr >= '0' && *ptr <= '9') {
-                    value_int = value_int * 10 + (*ptr - '0');
-                } else {
-                    printf("%s: Bad value in %s at:%s\n", section, name, ptr);
-                    return 0;
-                }
-                ptr++;
+            int count = parse_s8_list(value, m->mixers[idx].curve.points, MAX_POINTS);
+            if (count > MAX_POINTS) {
+                printf("%s: Too many points (max points = %d\n", section, MAX_POINTS);
+                return 0;
             }
             return 1;
         }
@@ -757,16 +826,30 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
+            for (int i = 0; i <= NUM_SOURCES; i++) {
+                char cmp[10];
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, i), value) == 0) {
+                    m->pagecfg.toggle[idx] = i;
+                    return 1;
+                }
+            }
+            //Legacy
             m->pagecfg.toggle[idx] = get_source(section, value);
+            m->pagecfg.tglico[idx][2] = 255; //Mark that we had a legacy source for upgrade
             return 1;
         }
         if (MATCH_START(name, GUI_TGLICO)) {
-            u8 idx = name[6] - '1';
+            int idx = name[6] - '1';
             if (idx >= 4) {
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
-            m->pagecfg.tglico[idx] = atoi(value);
+            int count = parse_s8_list(value, (s8 *)m->pagecfg.tglico[idx], 3);
+            if (count == 1) {
+                //convert from old syntax
+                upgrade_tglico(m, idx);
+            }
+            tglico_set_num_pos(m, idx);
             return 1;
         }
         if (MATCH_START(name, GUI_QUICKPAGE)) {
@@ -1036,9 +1119,10 @@ u8 CONFIG_WriteModel(u8 model_num) {
     for(idx = 0; idx < 4; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.toggle[idx]) {
             u8 val = m->pagecfg.toggle[idx];
-            fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceName(file, val));
+            fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceNameAbbrevSwitch(file, val));
             if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
-                fprintf(fh, "%s%d=%d\n", GUI_TGLICO, idx+1, m->pagecfg.tglico[idx]);
+                fprintf(fh, "%s%d=%d,%d,%d\n", GUI_TGLICO, idx+1,
+                        m->pagecfg.tglico[idx][0], m->pagecfg.tglico[idx][1], m->pagecfg.tglico[idx][2]);
         }
     }
     for(idx = 0; idx < NUM_QUICKPAGES; idx++) {

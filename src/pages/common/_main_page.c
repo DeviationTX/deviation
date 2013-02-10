@@ -26,6 +26,8 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 static s32 get_boxval(u8 idx);
 static void _check_voltage();
 
+struct ImageMap TGLICO_GetImage(int idx);
+
 struct LabelDesc *get_box_font(u8 idx, u8 neg)
 {
     if(neg) {
@@ -143,8 +145,26 @@ void PAGE_MainEvent()
         if (! OBJ_IS_USED(&gui->toggle[i]))
             continue;
         u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);
-        s16 val = raw[src];
-        GUI_SetHidden((guiObject_t *)&gui->toggle[i], MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) ? val > 0 : val < 0);
+        struct ImageMap img;
+        img.file = NULL;
+        if (Model.pagecfg.toggle[i] > INP_HAS_CALIBRATION && Model.pagecfg.toggle[i] < INP_LAST) {
+            //switch
+            for (int j = 0; j < 3; j++) {
+                // Assume switch 0/1/2 are in order
+                if(Model.pagecfg.tglico[i][j] && raw[src+j] > 0) {
+                    img = TGLICO_GetImage(Model.pagecfg.tglico[i][j]);
+                }
+            }
+        } else {
+            //Non switch
+            img = TGLICO_GetImage(Model.pagecfg.tglico[i][raw[src] > 0 ? 1 : 0]);
+        }
+        if (img.file && strcmp(img.file, GRAY_FILE)) {
+            GUI_ChangeImage(&gui->toggle[i], img.file, img.x_off, img.y_off);
+            GUI_SetHidden((guiObject_t *)&gui->toggle[i], 0);
+        } else {
+            GUI_SetHidden((guiObject_t *)&gui->toggle[i], 1);
+        }
     }
     _check_voltage();
 }

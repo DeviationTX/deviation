@@ -126,19 +126,51 @@ const char *toggle_sel_cb(guiObject_t *obj, const void *data)
     return str;
 }
 
+int fix_abbrev_src(int origval, int newval, int dir)
+{
+    if (origval == newval || ! newval)
+        return newval;
+    char str1[10];
+    char str2[10];
+    if (dir > 0) {
+        INPUT_SourceNameAbbrevSwitch(str1, origval);
+        INPUT_SourceNameAbbrevSwitch(str2, newval);
+        while(newval <= NUM_SOURCES) {
+            if (strcmp(str1, str2) != 0) {
+                return newval;
+            }
+            newval++;
+            INPUT_SourceNameAbbrevSwitch(str2, newval);
+        }
+        //selected last value
+        return origval;
+    }
+    INPUT_SourceNameAbbrevSwitch(str1, newval);
+    while(newval) {
+        INPUT_SourceNameAbbrevSwitch(str2, newval-1);
+        if(strcmp(str1, str2) != 0) {
+            return newval;
+        }
+        newval--;
+    }
+    return newval;
+}
+
 const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    u8 i = (long)data;
+    u8 idx = (long)data;
     u8 changed;
-    u8 val = MIXER_SRC(Model.pagecfg.toggle[i]);
-    val = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);   
-    if (changed) {
-        Model.pagecfg.toggle[i] = MIXER_SRC_IS_INV(Model.pagecfg.toggle[i]) | val;
+    u8 val = MIXER_SRC(Model.pagecfg.toggle[idx]);
+
+    int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
+    newval = fix_abbrev_src(val, newval, dir);
+    if (val != newval) {
+        val = newval;
+        Model.pagecfg.toggle[idx] = val;
         _update_preview();
     }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(Model.pagecfg.toggle[i]));
-    return INPUT_SourceName(str, Model.pagecfg.toggle[i]);
+    return INPUT_SourceNameAbbrevSwitch(str, Model.pagecfg.toggle[idx]);
 }
 
 u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
@@ -186,12 +218,12 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         if (LCD_DEPTH == 1) {
             *x = TOGGLE_L_X;
             *y = TOGGLE_LR_Y;
-            *w = TOGGLE_W;
-            *h = TOGGLE_H;
+            *w = TOGGLEICON_WIDTH;
+            *h = TOGGLEICON_HEIGHT;
             return 1;
         } else {
-            *w = TOGGLE_W;
-            *h = TOGGLE_H;
+            *w = TOGGLEICON_WIDTH;
+            *h = TOGGLEICON_HEIGHT;
             if (Model.pagecfg.trims != TRIMS_6) {
                 *x = TOGGLE_CNTR_X;
                 *y = TOGGLE_CNTR_Y + (widget - TOGGLE1) * TOGGLE_CNTR_SPACE;

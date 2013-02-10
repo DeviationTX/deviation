@@ -14,6 +14,7 @@
 #include "tx_configure.h"
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
+#include "toggle_select.h"
 #include "config/display.h"
 
 #define PAGE_NAME_MAX 10
@@ -32,6 +33,7 @@ void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data));
 void PAGE_MainInit(int page);
 void PAGE_MainEvent();
 void PAGE_MainExit();
+struct ImageMap TGLICO_GetImage(int idx);
 
 /* Mixer */
 void PAGE_MixerInit(int page);

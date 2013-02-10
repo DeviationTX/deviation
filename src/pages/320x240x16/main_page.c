@@ -83,10 +83,13 @@ void PAGE_MainInit(int page)
         }
     }
     for(i = 0; i < 4; i++) {
-        if(! Model.pagecfg.toggle[i])
+        if (! Model.pagecfg.toggle[i])
             continue;
-        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h))
-            GUI_CreateImageOffset(&gui->toggle[i], x, y, 32, 31, Model.pagecfg.tglico[i]*32, 0, TOGGLE_FILE, NULL, NULL);
+        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
+            struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
+            GUI_CreateImageOffset(&gui->toggle[i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
+                                  img.x_off, img.y_off, img.file, NULL, NULL);
+        }
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
