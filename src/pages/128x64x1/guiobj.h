@@ -35,6 +35,16 @@ struct mainconfig_obj {
     guiImage_t image[ICONS_MAX_COUNT];
 };
 
+struct toggleselect_obj {
+    guiButton_t  revert;
+    guiLabel_t   switchbox;
+    guiLabel_t   togglelabel[3];
+    guiRect_t    toggleframe;
+    guiImage_t   toggleicon[3];
+    guiImage_t   symbolicon[32];
+    guiRect_t    symbolframe;
+};
+
 struct mainpage_obj {
     guiLabel_t name;
     guiImage_t icon;
@@ -311,6 +321,7 @@ struct gui_objs {
         struct stdthold_obj stdthold;
         struct stdtravel_obj stdtravel;
         struct stdchan_obj stdchan;
+        struct toggleselect_obj toggleselect;
     } u;
 } gui_objs;
 

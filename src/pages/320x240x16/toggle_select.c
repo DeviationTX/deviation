@@ -19,30 +19,13 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-#include "../common/_toggle_select.c"
-
 #define tp pagemem.u.toggle_select_page
 #define gui5 (&gui_objs.u.maincfg.u.g5)
 
+#include "../common/_toggle_select.c"
+
 static void show_iconsel_page(int idx);
 extern const struct LabelDesc outline;
-
-static int num_switch_positions(int idx) {
-   char str1[10], str2[10];
-   return strcmp(INPUT_SourceNameAbbrevSwitch(str1, idx+1), INPUT_SourceNameAbbrevSwitch(str2, idx+2)) == 0 ?
-          3 : 2;
-}
-
-void TGLICO_Select(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if(Model.pagecfg.toggle[(long)data])
-    {
-        tp.tglidx = (long)data;
-        memcpy(tp.tglicons, Model.pagecfg.tglico[tp.tglidx], sizeof(tp.tglicons));
-        show_iconsel_page(0);
-    }
-}
 
 void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
@@ -53,25 +36,6 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
         u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
         Model.pagecfg.tglico[tp.tglidx][IconNumber] = IconPosition + 1;
         show_iconsel_page(IconNumber);
-    }
-}
-
-void tglico_setpos_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        u32 pos = (long)data;
-        show_iconsel_page(pos);
-    }
-}
-
-void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        u32 pos = (long)data;
-        Model.pagecfg.tglico[tp.tglidx][pos] = 0;
-        show_iconsel_page(pos);
     }
 }
 
