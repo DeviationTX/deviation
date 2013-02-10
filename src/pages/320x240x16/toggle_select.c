@@ -65,6 +65,16 @@ void tglico_setpos_cb(guiObject_t *obj, s8 press_type, const void *data)
     }
 }
 
+void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type == -1) {
+        u32 pos = (long)data;
+        Model.pagecfg.tglico[tp.tglidx][pos] = 0;
+        show_iconsel_page(pos);
+    }
+}
+
 static void tglico_cancel_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
@@ -111,17 +121,17 @@ static void show_iconsel_page(int SelectedIcon)
     GUI_CreateLabel(&gui5->togglelabel[0], 94, 50, NULL, DEFAULT_FONT, _tr("Pos 0:"));
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][0]);
     GUI_CreateImageOffset(&gui5->toggleicon[0], 124, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 0 ? NULL : tglico_setpos_cb, (void *)0L);
+             SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb, (void *)0L);
 
     GUI_CreateLabel(&gui5->togglelabel[1], 174, 50, NULL, DEFAULT_FONT, _tr("Pos 1:"));
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][1]);
     GUI_CreateImageOffset(&gui5->toggleicon[1], 204, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 1 ? NULL : tglico_setpos_cb, (void *)1L);
+             SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb, (void *)1L);
     if (num_positions == 3) {
         GUI_CreateLabel(&gui5->togglelabel[2], 254, 50, NULL, DEFAULT_FONT, _tr("Pos 2:"));
         img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][2]);
         GUI_CreateImageOffset(&gui5->toggleicon[2], 284, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 2 ? NULL : tglico_setpos_cb, (void *)2L);
+             SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);
     }
     u8 cursel = Model.pagecfg.tglico[tp.tglidx][SelectedIcon] - 1;
     long pos = 0;
