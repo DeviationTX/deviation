@@ -53,6 +53,10 @@ Mix. AIL
 AUX4
 :AUX5
 AUX5
+:AUX6
+AUX6
+:AUX7
+AUX7
 :About Deviation
 A propos...
 :Advanced
@@ -65,6 +69,10 @@ Alarme
 Tempo alarme
 :Altitude
 Altitude
+:Auto
+Auto
+:Aux2
+Aux2
 :Backlight:
 Luminosité
 :Bar %d:
@@ -89,6 +97,8 @@ Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
 Box%d:
 :Button monitor
 Ctrl des boutons
+:Buzz settings
+Réglages Son
 :Buzz volume:
 Vol. buzzer
 :COL
@@ -149,8 +159,18 @@ Cyclique2
 Cyclique3
 :D/R & Exp
 D/R & Exp
-:DR
-DR
+:D/R&Exp -AIL
+D/R & Exp AIL
+:D/R&Exp -ELE
+D/R & Exp ELE
+:D/R&Exp -RUD
+D/R & Exp RUD
+:DR0
+DR0
+:DR1
+DR1
+:Deadband
+Deadband
 :Deadband
 Deadband
 :Default
@@ -173,6 +193,18 @@ Vous allez remettre\n le Totalisateur\nà zéro?
 ELE
 :ELE DR
 ELE DR
+:ELE DR0
+ELE DR0
+:ELE DR1
+ELE DR1
+:ELE DR2
+ELE DR2
+:ELE Inv:
+Sens ELE 
+:ELE Inv:
+Sens ELE 
+:ELE Mix:
+Mix. ELE 
 :ELE Inv:
 Sens ELE 
 :ELE Mix:
@@ -213,6 +245,14 @@ Larg. Signal
 Total
 :GEAR
 GEAR
+:GEAR0
+GEAR0
+:GEAR1
+GEAR1
+:GPS
+GPS
+:GPS
+GPS
 :GPS
 GPS
 :Generic settings
@@ -524,7 +564,7 @@ Gabarit...
 :Test
 Test
 :Thr hold
-Thr hold
+Coup. Gaz
 :Throttle curves
 Courbes de Gaz
 :Throttle hold
@@ -581,6 +621,8 @@ Activer
 Puiss. TX
 :USB
 USB
+:USB Filesystem is currently
+L'USB partition est actuellement
 :Unknown
 Inconnu
 :Unlocked
