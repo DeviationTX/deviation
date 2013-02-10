@@ -164,7 +164,9 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
     u8 val = MIXER_SRC(Model.pagecfg.toggle[idx]);
 
     int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
+    CONFIG_EnableLanguage(0);
     newval = fix_abbrev_src(val, newval, dir);
+    CONFIG_EnableLanguage(1);
     if (val != newval) {
         val = newval;
         Model.pagecfg.toggle[idx] = val;
