@@ -46,7 +46,7 @@ guiObject_t *firstObj;
 
 /*************************************/
 /* Trims */
-#define OUTTRIM_OFFSET 24
+#define OUTTRIM_OFFSET 18
 
 #define VTRIM_W 10
 #define VTRIM_H 140
@@ -55,7 +55,7 @@ guiObject_t *firstObj;
 
 #define INTRIM_1_X 130
 #define INTRIM_2_X (320 - INTRIM_1_X - VTRIM_W)
-#define OUTTRIM_1_X 16
+#define OUTTRIM_1_X 6
 #define OUTTRIM_2_X (320 - OUTTRIM_1_X - VTRIM_W)
 #define TRIM_12_Y 75
 
