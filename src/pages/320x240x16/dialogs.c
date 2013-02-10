@@ -136,7 +136,6 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
 /********************************/
 /* Reset Permanent Timer Dialog */
 /********************************/
-
 void PAGE_ShowResetPermTimerDialog(void *guiObj)
 {
     (void)guiObj;
@@ -144,7 +143,7 @@ void PAGE_ShowResetPermTimerDialog(void *guiObj)
         return;
     strncpy(dlgstr, _tr("Do you really want\nto reset\nthe permanent timer?"),sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Standard Mixer"), NULL,
+    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Reset Permanent Timer?"), NULL,
             reset_permtimer_cb, dtOkCancel, dlgstr);
 }
 

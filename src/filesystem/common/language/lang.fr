@@ -365,8 +365,8 @@ Point:
 Pos.
 :Pos/Neg:
 Pos./Neg.:
-:PowerOff alert
-Alerte d'arrêt 
+:PwrDn alert:
+Alrm. d'arrêt 
 :Prealert intvl:
 Tempo préAlarm
 :Prealert time:
@@ -403,6 +403,8 @@ Réinit.
 Supprimer
 :Reset
 Reset
+:Reset Permanent Timer?
+Reinitialisation totalisateur?
 :Reset sw:
 Inter RaZ
 :Reverse:

@@ -171,6 +171,4 @@ void reset_timerperm_cb(guiObject_t *obj, const void *data)
   (void)obj;
   (void)data;
   PAGE_ShowResetPermTimerDialog(obj);
-  /* Model.permanent_timer = 0;
-  GUI_Redraw(obj);*/
 }
