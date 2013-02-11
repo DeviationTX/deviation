@@ -102,15 +102,15 @@ Réglages Son
 :Buzz volume:
 Vol. buzzer
 :COL
-COL
+PAS
 :COL Inv
-Sens COL
+Sens PAS
 :COL Inv:
-Sens COL 
+Sens PAS
 :COL Limit
-Limite COL 
+Limite PAS
 :COL Mix:
-Mix. COL 
+Mix. PAS 
 :CYC
 CYC
 :Calibrate
@@ -225,6 +225,8 @@ FMODE1
 FMODE2
 :Fahren
 °F
+:Failsafe
+Sécurités
 :Failsafe:
 Failsafe:
 :Fail safe
@@ -236,7 +238,7 @@ Fixe
 :Fixed ID:
 ID fixe
 :Fly mode
-Acrobatie
+Mode de Vol
 :Foot
 Pied
 :Frame Size
@@ -267,16 +269,16 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Petit Déb.
-:Hold Position
-Valeur Thr hold
+:Hold position
+Valeur coupure
 :Icon
 Icône
 :Icon:
 Icône
 :Idle 1
-Idle 1
+Sport 1
 :Idle 2
-Idle 2
+Sport 2
 :Input monitor
 Ctrl. des entrées
 :Input:
@@ -394,7 +396,7 @@ PAS
 :Page:
 Page
 :Pit Mix:
-Mixage plateau
+Mix. PAS
 :Pitch curves
 Courbes de pas
 :Plane
@@ -465,6 +467,8 @@ Sécurité
 Sécurité:
 :Save
 Sauve
+:Scale:
+Echelle
 :Scale%s:
 Echelle%s:
 :Scanner
@@ -498,9 +502,9 @@ Sticks
 :Subtrim:
 Subtrim
 :Swash
-Plateau cycl.
+Plateau cyclique
 :SwashType:
-Plateau cycl.:
+Type Plat.
 :Switch %d:
 Inter %d
 :Switch assignment
@@ -514,7 +518,7 @@ Commande
 :Symmetric
 Symétrique
 :THR
-THR
+GAZ
 :TRIMLH+
 TRIMGH+
 :TRIMLH-
@@ -566,7 +570,7 @@ Test
 :Thr hold
 Coup. Gaz
 :Throttle curves
-Courbes de Gaz
+Courbes de gaz
 :Throttle hold
 Coupure gaz
 :Time
@@ -660,4 +664,4 @@ multiplier
 :replace
 remplacer
 :stopwatch
-Chronomètre
+Chrono.

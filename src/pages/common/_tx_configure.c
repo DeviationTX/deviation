@@ -330,7 +330,7 @@ static const char *batalarmwarn_select_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     u16 batt_warning = Transmitter.batt_warning_interval;
     batt_warning = GUI_TextSelectHelper(batt_warning,
-            MIN_BATTERY_WARNING, MAX_BATTERY_WARNING, dir, 5, 30, &changed);
+            MIN_BATTERY_WARNING_INTERVAL, MAX_BATTERY_WARNING_INTERVAL, dir, 5, 30, &changed);
     if (changed)
         Transmitter.batt_warning_interval = batt_warning;
     if( 0 == batt_warning)
