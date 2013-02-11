@@ -70,14 +70,14 @@ static void _show_page()
         row += space;
         GUI_CreateLabelBox(&gui1->langlbl, 16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language:"));
         GUI_CreateButton(&gui1->lang, 112, row, BUTTON_96, langstr_cb, 0x0000, lang_select_cb, NULL);
-        row += space + 8;
+        row += space + 15 ;
         GUI_CreateLabelBox(&gui1->modelbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode:"));
         GUI_CreateTextSelect(&gui1->mode, 112, row, TEXTSELECT_96, NULL, modeselect_cb, NULL);
-        row += space + 24;
+        row += space + 15;
         GUI_CreateLabelBox(&gui1->touchlbl, 16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen:"));
         GUI_CreateButton(&gui1->touchcalib, 112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
         GUI_CreateButton(&gui1->touchtest, 216, row, BUTTON_48, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
-        row += space + 24;
+        row += space + 15;
         GUI_CreateLabelBox(&gui1->sticklbl, 16, row+6, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks:"));
         GUI_CreateButton(&gui1->stickcalib, 112, row, BUTTON_96, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
     } else if (page_num == 1) {
