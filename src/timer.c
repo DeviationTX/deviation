@@ -110,6 +110,8 @@ void TIMER_Update()
             s32 delta = t - last_time[i];
 	   if (Model.timer[i].type == TIMER_PERMANENT) {
 		timer_val[i] += delta;
+		if( timer_val[i] >= 359999900) // Reset when 99h59mn59sec
+		    timer_val[i] = 0 ;
 		Model.permanent_timer = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
