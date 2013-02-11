@@ -140,7 +140,8 @@ void TIMER_Update()
                 timer_val[i] -= delta;
             }
             last_time[i] = t;
-	} else if (Model.timer[i].resetsrc) {
+	} 
+	if (Model.timer[i].resetsrc) {
             s16 val;
             if (MIXER_SRC(Model.timer[i].resetsrc) <= NUM_INPUTS) {
                 volatile s16 *raw = MIXER_GetInputs();
