@@ -24,6 +24,7 @@ struct pagemem {
         struct tx_configure_page tx_configure_page;
         struct telemtest_page telemtest_page;
         struct telemconfig_page telemconfig_page;
+        struct toggle_select_page toggle_select_page;
 
         struct menu_page menu_page;
     } u;

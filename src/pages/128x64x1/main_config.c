@@ -20,8 +20,6 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
-#include "../common/_toggle_select.c"
-
 #define gui (&gui_objs.u.mainconfig)
 
 enum {
@@ -135,7 +133,6 @@ enum {
 #define VIEW_ID 0
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static void show_switchicon_page(u8 idx);
 
 static u16 current_selected = 0;
 
@@ -147,9 +144,9 @@ static int size_cb(int absrow, void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    (void)obj;
-    if(Model.pagecfg.toggle[(long)data])
-        show_switchicon_page((long)data);
+    page_type = SWITCHICON_SELECTION_PAGE;
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    TGLICO_Select(obj, data);
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -234,56 +231,9 @@ static void _show_title()
     PAGE_ShowHeader(_tr("Preview: Long-Press ENT"));
 }
 
-static void switch_select_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    (void)press_type;
-
-    u16 pos = (long)data;
-    u8 idx = pos >> 8;
-    pos &= 0xff;
-    Model.pagecfg.tglico[idx][0] = pos;
-    PAGE_MainCfgInit(-1);
-}
-
-static void show_switchicon_page(u8 idx)
-{
-#define ICONS_PER_ROW 10 
-    page_type = SWITCHICON_SELECTION_PAGE;
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(_tr("Select switch icon"));
-
-    u16 w, h;
-    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
-    u8 count = w / TOGGLEICON_WIDTH;
-    if (count > ICONS_MAX_COUNT)
-        count = ICONS_MAX_COUNT; 
-    u8 x = 0;
-    u8 y = 2 ;
-    u8 pos = 0;
-    while (pos < count) {
-        if (pos% ICONS_PER_ROW ==0) {
-            y += 15;
-            x = 4;
-        }
-        GUI_CreateImageOffset(&gui->image[pos], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
-             pos * TOGGLEICON_WIDTH, 0, TOGGLE_FILE, switch_select_cb, (void *)(long)((idx << 8 ) | pos));
-        if (pos == Model.pagecfg.tglico[idx][0])
-           GUI_SetSelected((guiObject_t *)&gui->image[pos]);
-        x += 12;
-        pos++;
-
-    }
-}
-
-
-
 u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
-    guiObject_t *obj = NULL;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
 	    if (page_type == MAIN_PAGE)
@@ -293,16 +243,6 @@ u8 _action_cb(u32 button, u8 flags, void *data)
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
 	    if (page_type == MAIN_PAGE)
                 PAGE_ChangeByID(PAGEID_MAIN, 1);
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP) && page_type == SWITCHICON_SELECTION_PAGE) {
-            for (u8 i = 0; i < ICONS_PER_ROW; i++) {
-                obj = GUI_GetSelected();
-                GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
-            }
-        }  else if (CHAN_ButtonIsPressed(button, BUT_DOWN) && page_type == SWITCHICON_SELECTION_PAGE) {
-            for (u8 i = 0; i < ICONS_PER_ROW; i++) {
-                obj = GUI_GetSelected();
-                GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
-            }
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT) && page_type == SWITCHICON_SELECTION_PAGE) {
             guiObject_t *obj = GUI_GetSelected();
             GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));

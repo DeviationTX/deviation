@@ -106,7 +106,7 @@ static void _show_simple()
 
 static int complex_size_cb(int absrow, void *data) {
     (void)data;
-    return (absrow == COMPLEX_TRIM) ? 2 : 1;
+    return (absrow + COMMON_LAST == COMPLEX_TRIM) ? 2 : 1;
 }
 
 static int complex_row_cb(int absrow, int relrow, int y, void *data)
@@ -117,14 +117,14 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     data = NULL;
     int x = 0;
     int w = LEFT_VIEW_WIDTH;
-    if (absrow == COMPLEX_TRIM) {
+    if (absrow + COMMON_LAST == COMPLEX_TRIM) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
             w, ITEM_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
         if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
             GUI_SetHidden((guiObject_t *)&gui->label[relrow], 1);
         return 1;
     }
-    switch(absrow) {
+    switch(absrow + COMMON_LAST) {
         case COMPLEX_MIXER:
             label = _tr_noop("Mixers:");
             value = set_nummixers_cb;
@@ -141,15 +141,15 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Mux:");
             value = set_mux_cb;
             break;
-        case COMMON_SRC:
+        case COMPLEX_SRC:
             label = _tr_noop("Src:");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
             break;
-        case COMMON_CURVE:
+        case COMPLEX_CURVE:
             label = _tr_noop("Curve:");
             tgl = curveselect_cb; value = set_curvename_cb; data = mp->cur_mixer;
             break;
-        case COMMON_SCALE:
+        case COMPLEX_SCALE:
             label = _tr_noop("Scale:");
             value = set_number100_cb; data = &mp->cur_mixer->scalar;
             break;
@@ -164,7 +164,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + ITEM_HEIGHT + 1,
             w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
-    if (absrow == COMMON_SRC)
+    if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(mp->cur_mixer->curve.type);
     return 1;
 }
@@ -178,7 +178,7 @@ static void _show_complex(int page_change)
         selection = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     }
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         2 * ITEM_SPACE, COMPLEX_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
+                         2 * ITEM_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
     // The following items are not draw in the logical view;
     GUI_CreateBarGraph(&gui->bar, LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
@@ -419,5 +419,13 @@ void MIXPAGE_RedrawGraphs()
 }
 
 static inline guiObject_t * _get_obj(int idx, int objid) {
+    if (mp->cur_template == MIXERTEMPLATE_COMPLEX) {
+        switch(idx) {
+            case COMMON_SRC: idx = COMPLEX_SRC; break;
+            case COMMON_CURVE: idx = COMPLEX_CURVE; break;
+            case COMMON_SCALE: idx = COMPLEX_SCALE; break;
+        }
+        idx -= COMMON_LAST;
+    }
     return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }

@@ -34,6 +34,7 @@ void PAGE_MainInit(int page);
 void PAGE_MainEvent();
 void PAGE_MainExit();
 struct ImageMap TGLICO_GetImage(int idx);
+void TGLICO_Select(guiObject_t *obj, const void *data);
 
 /* Mixer */
 void PAGE_MixerInit(int page);
