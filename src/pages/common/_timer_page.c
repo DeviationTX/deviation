@@ -123,9 +123,10 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     struct Timer *timer = &Model.timer[idx];
     timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST - 1, dir, 1, 1, &changed);
-    if (changed)
+    if (changed){
         TIMER_Reset(idx);
-    update_countdown(idx);
+    	update_countdown(idx);
+    }
     switch (timer->type) {
     case TIMER_STOPWATCH: return _tr("stopwatch");
     case TIMER_COUNTDOWN: return _tr("countdown");

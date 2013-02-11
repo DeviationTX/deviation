@@ -161,6 +161,7 @@ struct telemtest_obj {
 };
 
 struct timer_obj {
+    guiScrollbar_t scrollbar;
     guiLabel_t timer[NUM_TIMERS];
     guiTextSelect_t type[NUM_TIMERS];
     guiLabel_t switchlbl[NUM_TIMERS];

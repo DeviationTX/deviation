@@ -19,20 +19,60 @@
 #include "config/model.h"
 
 #include "../common/_timer_page.c"
+#define MAX_TIMER_PAGE 1 // 2 - 1 
+static void _draw_body();
+guiObject_t *firstObj;
+s8 timer_page_num ;
+
+static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+{
+    (void)pos;
+    (void)parent;
+    (void)data;
+    s8 newpos = (s8)timer_page_num+ (direction > 0 ? 1 : -1);
+    if (newpos < 0)
+        newpos = 0;
+    else if (newpos > MAX_TIMER_PAGE)
+        newpos = MAX_TIMER_PAGE;
+    if (newpos != timer_page_num) {
+        timer_page_num = newpos;
+        _draw_body();
+    }
+    return timer_page_num;
+}
+
 
 static void _show_page()
 {
+    PAGE_SetModal(0);
+    firstObj = NULL;
+    timer_page_num = 0 ;
+
     if (Model.mixer_mode == MIXER_SIMPLE)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TIMER), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER));
+    
+    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, MAX_TIMER_PAGE + 1, NULL, scroll_cb, NULL);
+    GUI_SetScrollbar(&gui->scrollbar,timer_page_num);
+    _draw_body();
+}
 
-    for (u8 i = 0; i < NUM_TIMERS; i++) {
-	u8 y = i < 2 ? 1 : 161;
+static void _draw_body() {
+    if (firstObj) {
+        GUI_RemoveHierObjects(firstObj);
+        firstObj = NULL;
+    }
+    
+    for (u8 i = timer_page_num * 2; i < NUM_TIMERS && i < timer_page_num * 2 + 2; i++) {
+	u8 y = 20 ;
         u8 x = 48 + i%2 * 96;
-
         //Row 1
-        GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
+	if(!i) 
+            firstObj = GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
+	else
+	    GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
+		
         GUI_CreateTextSelect(&gui->type[i], y+63 , x, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
 	GUI_CreateLabel(&gui->switchlbl[i], y, x+22, NULL, DEFAULT_FONT, _tr("Switch:"));
@@ -68,4 +108,3 @@ void update_countdown(u8 idx)
     GUI_SetSelectable((guiObject_t *)&gui->resetperm[idx], !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl[idx], hide);
 }
-
