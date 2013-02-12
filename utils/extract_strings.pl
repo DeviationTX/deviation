@@ -76,7 +76,7 @@ if($count) {
     exit 0;
 }
 
-if(! $update && ! $target) {
+if(! $update) {
     foreach (sort keys %uniq) {
         print ":$_\n";
     }

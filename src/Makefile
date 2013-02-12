@@ -237,7 +237,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	cp -prf filesystem/common/media filesystem/$$tx/; \
 	cp -prf filesystem/common/template filesystem/$$tx/; \
 	mkdir filesystem/$$tx/language 2> /dev/null || true; \
-               ../utils/extract_strings.pl -target $$tx; \
+               ../utils/extract_strings.pl -target $$tx -update; \
 	cp tx_template.ini filesystem/$$tx/tx.ini; \
         echo 'empty' > filesystem/$$tx/errors.txt; \
 	mkdir filesystem/$$tx/models 2> /dev/null || true; \
