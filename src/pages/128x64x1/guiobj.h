@@ -39,7 +39,7 @@ struct toggleselect_obj {
     guiButton_t  revert;
     guiLabel_t   switchbox;
     guiLabel_t   togglelabel[3];
-    guiRect_t    toggleframe;
+    guiRect_t    separator;
     guiImage_t   toggleicon[3];
     guiImage_t   symbolicon[32];
     guiRect_t    symbolframe;

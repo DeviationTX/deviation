@@ -64,6 +64,8 @@ static void show_iconsel_page(int SelectedIcon)
 
     labelDesc.style = LABEL_UNDERLINE;
 
+    GUI_CreateRect(&gui->separator, 12 + TOGGLEICON_WIDTH, ITEM_HEIGHT, 1, LCD_HEIGHT-ITEM_HEIGHT, &labelDesc);
+
     int row = ITEM_HEIGHT + 5;
     GUI_CreateLabelBox(&gui->togglelabel[0], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 0 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][0]);
