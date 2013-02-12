@@ -68,7 +68,7 @@ static void _draw_body() {
 	u8 y = 20 ;
         u8 x = 48 + i%2 * 96;
         //Row 1
-	if(!i) 
+	if(!i%2) 
             firstObj = GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
 	else
 	    GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
