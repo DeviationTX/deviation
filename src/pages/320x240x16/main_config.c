@@ -46,7 +46,7 @@ guiObject_t *firstObj;
 
 /*************************************/
 /* Trims */
-#define OUTTRIM_OFFSET 24
+#define OUTTRIM_OFFSET 18
 
 #define VTRIM_W 10
 #define VTRIM_H 140
@@ -55,7 +55,7 @@ guiObject_t *firstObj;
 
 #define INTRIM_1_X 130
 #define INTRIM_2_X (320 - INTRIM_1_X - VTRIM_W)
-#define OUTTRIM_1_X 16
+#define OUTTRIM_1_X 6
 #define OUTTRIM_2_X (320 - OUTTRIM_1_X - VTRIM_W)
 #define TRIM_12_Y 75
 
@@ -70,9 +70,11 @@ guiObject_t *firstObj;
 /*************************************/
 
 
-#define BOX0123_X 16
-#define BOX4567_X 204
+#define BOX0123_X 8  // 16 
+#define BOX4567_X 200 // 204
 #define BOX_W     113
+//#define BOX1256_W 113
+//#define BOX3478_W 100
 #define BOX0145_H 40
 #define BOX2367_H 24
 
@@ -88,13 +90,13 @@ guiObject_t *firstObj;
 #define MODEL_ICO_W 96
 #define MODEL_ICO_H 96
 /*************************************/
-
-#define GRAPH1_X BOX0123_X
-#define GRAPH2_X (320 - BOX_W - GRAPH1_X)
+// 100 = previous BOX_W, 16 = previous BOX0123_X
+#define GRAPH1_X 16
+#define GRAPH2_X (320 - 100 - GRAPH1_X)
 #define GRAPH_Y BOX26_Y
 #define GRAPH_H 59
 #define GRAPH_W 10
-#define GRAPH_SPACE ((BOX_W - GRAPH_W) / 3)
+#define GRAPH_SPACE ((100 - GRAPH_W) / 3)
 
 /*************************************/
 /* Toggle Icons */

@@ -144,3 +144,16 @@ void PAGE_ShowInvalidModule()
 {
     PAGE_ShowWarning(NULL, _tr("Bad/missing\nprotocol modules!"));
 }
+
+/********************************/
+/* Reset Permanent Timer Dialog */
+/********************************/
+void PAGE_ShowResetPermTimerDialog(void *guiObj)
+{
+    (void)guiObj;
+    if (dialog)
+        return;
+    strncpy(dlgstr, _tr("Do you really want\nto reset\nthe permanent timer?"),sizeof(dlgstr));
+    dlgstr[sizeof(dlgstr) - 1] = 0;
+    dialog = GUI_CreateDialog(&gui->dialog, 2 , 2,  LCD_WIDTH - 4, LCD_HEIGHT - 4 , NULL , NULL, reset_permtimer_cb, dtOkCancel, dlgstr);
+}

@@ -161,6 +161,7 @@ struct telemtest_obj {
 };
 
 struct timer_obj {
+    guiScrollbar_t scrollbar;
     guiLabel_t timer[NUM_TIMERS];
     guiTextSelect_t type[NUM_TIMERS];
     guiLabel_t switchlbl[NUM_TIMERS];
@@ -168,6 +169,8 @@ struct timer_obj {
     guiLabel_t resetlbl[NUM_TIMERS];
     guiTextSelect_t resetsrc[NUM_TIMERS];
     guiLabel_t startlbl[NUM_TIMERS];
+    guiLabel_t resetpermlbl[NUM_TIMERS];
+    guiButton_t resetperm[NUM_TIMERS];
     guiTextSelect_t start[NUM_TIMERS];
 };
 

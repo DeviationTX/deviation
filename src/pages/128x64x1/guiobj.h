@@ -136,6 +136,8 @@ struct timer_obj {
     guiTextSelect_t start;
     guiLabel_t resetlbl;
     guiTextSelect_t resetsrc;
+    guiLabel_t resetpermlbl;
+    guiButton_t resetperm;
     guiScrollable_t scrollable;
 };
 

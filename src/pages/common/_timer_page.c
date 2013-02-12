@@ -23,6 +23,10 @@ static void toggle_source_cb(guiObject_t *obj, void *data);
 static void toggle_timertype_cb(guiObject_t *obj, void *data);
 static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
+
+static const char *show_timerperm_cb(guiObject_t *obj, const void *data);
+static void reset_timerperm_cb(guiObject_t *obj, const void *data);
+
 static void _show_page();
 
 void PAGE_TimerInit(int page)
@@ -119,9 +123,10 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     struct Timer *timer = &Model.timer[idx];
     timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST - 1, dir, 1, 1, &changed);
-    if (changed)
+    if (changed){
         TIMER_Reset(idx);
-    update_countdown(idx);
+    	update_countdown(idx);
+    }
     switch (timer->type) {
     case TIMER_STOPWATCH: return _tr("stopwatch");
     case TIMER_COUNTDOWN: return _tr("countdown");
@@ -152,4 +157,19 @@ const char *set_start_cb(guiObject_t *obj, int dir, void *data)
         TIMER_Reset(idx);
     TIMER_SetString(tp->timer, timer->timer*1000);
     return tp->timer;
+}
+
+const char *show_timerperm_cb(guiObject_t *obj, const void *data)
+{
+  (void)obj;
+  (void)data;
+  TIMER_SetString(tp->tmpstr,(long)Model.permanent_timer);
+  return tp->tmpstr;
+}
+
+void reset_timerperm_cb(guiObject_t *obj, const void *data)
+{
+  (void)obj;
+  (void)data;
+  PAGE_ShowResetPermTimerDialog(obj);
 }
