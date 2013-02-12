@@ -90,7 +90,7 @@ static void _draw_body() {
     }
 }
 
-void update_countdown(u8 idx)
+static void update_countdown(u8 idx)
 {
     u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start[idx], hide);
