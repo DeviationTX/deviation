@@ -65,10 +65,3 @@ void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
         show_iconsel_page(pos);
     }
 }
-
-static int num_switch_positions(int idx) {
-   char str1[10], str2[10];
-   return strcmp(INPUT_SourceNameAbbrevSwitch(str1, idx+1), INPUT_SourceNameAbbrevSwitch(str2, idx+2)) == 0 ?
-          3 : 2;
-}
-

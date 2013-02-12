@@ -130,28 +130,13 @@ int fix_abbrev_src(int origval, int newval, int dir)
 {
     if (origval == newval || ! newval)
         return newval;
-    char str1[10];
-    char str2[10];
-    if (dir > 0) {
-        INPUT_SourceNameAbbrevSwitch(str1, origval);
-        INPUT_SourceNameAbbrevSwitch(str2, newval);
-        while(newval <= NUM_SOURCES) {
-            if (strcmp(str1, str2) != 0) {
-                return newval;
-            }
-            newval++;
-            INPUT_SourceNameAbbrevSwitch(str2, newval);
-        }
-        //selected last value
-        return origval;
-    }
-    INPUT_SourceNameAbbrevSwitch(str1, newval);
-    while(newval) {
-        INPUT_SourceNameAbbrevSwitch(str2, newval-1);
-        if(strcmp(str1, str2) != 0) {
-            return newval;
-        }
-        newval--;
+    int pos = INPUT_SwitchPos(newval);
+    int num_pos = INPUT_NumSwitchPos(newval);
+    if (num_pos != 0) {
+        if (dir > 0)
+            newval += (num_pos - pos);
+        else
+            newval -= pos;
     }
     return newval;
 }

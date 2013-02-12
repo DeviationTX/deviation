@@ -23,39 +23,39 @@
 #include "mixer.h"
 #include "config/model.h"
 
-#define INPNAME_AILERON(x)  ((!x) ? _tr("AIL")     : _tr("AIL"))
-#define INPNAME_ELEVATOR(x) ((!x) ? _tr("ELE")     : _tr("ELE"))
-#define INPNAME_THROTTLE(x) ((!x) ? _tr("THR")     : _tr("THR"))
-#define INPNAME_RUDDER(x)   ((!x) ? _tr("RUD")     : _tr("RUD"))
-#define INPNAME_AUX2(x)     ((!x) ? _tr("AUX2")    : _tr("AUX2"))
-#define INPNAME_AUX3(x)     ((!x) ? _tr("AUX3")    : _tr("AUX3"))
-#define INPNAME_AUX4(x)     ((!x) ? _tr("AUX4")    : _tr("AUX4"))
-#define INPNAME_AUX5(x)     ((!x) ? _tr("AUX5")    : _tr("AUX5"))
-#define INPNAME_AUX6(x)     ((!x) ? _tr("AUX6")    : _tr("AUX6"))
-#define INPNAME_AUX7(x)     ((!x) ? _tr("AUX7")    : _tr("AUX7"))
-#define INPNAME_DR0(x)      ((!x) ? _tr("DR0")     : _tr("DR"))
-#define INPNAME_DR1(x)      ((!x) ? _tr("DR1")     : _tr("DR"))
-#define INPNAME_RUD_DR0(x)  ((!x) ? _tr("RUD DR0") : _tr("RUD DR"))
-#define INPNAME_RUD_DR1(x)  ((!x) ? _tr("RUD DR1") : _tr("RUD DR"))
-#define INPNAME_RUD_DR2(x)  ((!x) ? _tr("RUD DR2") : _tr("RUD DR"))
-#define INPNAME_ELE_DR0(x)  ((!x) ? _tr("ELE DR0") : _tr("ELE DR"))
-#define INPNAME_ELE_DR1(x)  ((!x) ? _tr("ELE DR1") : _tr("ELE DR"))
-#define INPNAME_ELE_DR2(x)  ((!x) ? _tr("ELE DR2") : _tr("ELE DR"))
-#define INPNAME_AIL_DR0(x)  ((!x) ? _tr("AIL DR0") : _tr("AIL DR"))
-#define INPNAME_AIL_DR1(x)  ((!x) ? _tr("AIL DR1") : _tr("AIL DR"))
-#define INPNAME_AIL_DR2(x)  ((!x) ? _tr("AIL DR2") : _tr("AIL DR"))
-#define INPNAME_GEAR0(x)    ((!x) ? _tr("GEAR0")   : _tr("GEAR"))
-#define INPNAME_GEAR1(x)    ((!x) ? _tr("GEAR1")   : _tr("GEAR"))
-#define INPNAME_MIX0(x)     ((!x) ? _tr("MIX0")    : _tr("MIX"))
-#define INPNAME_MIX1(x)     ((!x) ? _tr("MIX1")    : _tr("MIX"))
-#define INPNAME_MIX2(x)     ((!x) ? _tr("MIX2")    : _tr("MIX"))
-#define INPNAME_FMOD0(x)    ((!x) ? _tr("FMODE0")  : _tr("FMODE"))
-#define INPNAME_FMOD1(x)    ((!x) ? _tr("FMODE1")  : _tr("FMODE"))
-#define INPNAME_FMOD2(x)    ((!x) ? _tr("FMODE2")  : _tr("FMODE"))
-#define INPNAME_HOLD0(x)    ((!x) ? _tr("HOLD0")   : _tr("HOLD"))
-#define INPNAME_HOLD1(x)    ((!x) ? _tr("HOLD1")   : _tr("HOLD"))
-#define INPNAME_TRN0(x)     ((!x) ? _tr("TRN0")    : _tr("TRN"))
-#define INPNAME_TRN1(x)     ((!x) ? _tr("TRN1")    : _tr("TRN"))
+#define INPNAME_AILERON(x,y)  x = _tr_noop("AIL"); y = -1
+#define INPNAME_ELEVATOR(x,y) x = _tr_noop("ELE"); y = -1
+#define INPNAME_THROTTLE(x,y) x = _tr_noop("THR"); y = -1
+#define INPNAME_RUDDER(x,y)   x = _tr_noop("RUD"); y = -1
+#define INPNAME_AUX2(x,y)     x = _tr_noop("AUX2"); y = -1
+#define INPNAME_AUX3(x,y)     x = _tr_noop("AUX3"); y = -1
+#define INPNAME_AUX4(x,y)     x = _tr_noop("AUX4"); y = -1
+#define INPNAME_AUX5(x,y)     x = _tr_noop("AUX5"); y = -1
+#define INPNAME_AUX6(x,y)     x = _tr_noop("AUX6"); y = -1
+#define INPNAME_AUX7(x,y)     x = _tr_noop("AUX7"); y = -1
+#define INPNAME_DR0(x,y)      x = _tr_noop("DR"); y = 0
+#define INPNAME_DR1(x,y)      x = _tr_noop("DR"); y = 1
+#define INPNAME_RUD_DR0(x,y)  x = _tr_noop("RUD DR"); y = 0
+#define INPNAME_RUD_DR1(x,y)  x = _tr_noop("RUD DR"); y = 1
+#define INPNAME_RUD_DR2(x,y)  x = _tr_noop("RUD DR"); y = 2
+#define INPNAME_ELE_DR0(x,y)  x = _tr_noop("ELE DR"); y = 0
+#define INPNAME_ELE_DR1(x,y)  x = _tr_noop("ELE DR"); y = 1
+#define INPNAME_ELE_DR2(x,y)  x = _tr_noop("ELE DR"); y = 2
+#define INPNAME_AIL_DR0(x,y)  x = _tr_noop("AIL DR"); y = 0
+#define INPNAME_AIL_DR1(x,y)  x = _tr_noop("AIL DR"); y = 1
+#define INPNAME_AIL_DR2(x,y)  x = _tr_noop("AIL DR"); y = 2
+#define INPNAME_GEAR0(x,y)    x = _tr_noop("GEAR"); y = 0
+#define INPNAME_GEAR1(x,y)    x = _tr_noop("GEAR"); y = 1
+#define INPNAME_MIX0(x,y)     x = _tr_noop("MIX"); y = 0
+#define INPNAME_MIX1(x,y)     x = _tr_noop("MIX"); y = 1
+#define INPNAME_MIX2(x,y)     x = _tr_noop("MIX"); y = 2
+#define INPNAME_FMOD0(x,y)    x = _tr_noop("FMODE"); y = 0
+#define INPNAME_FMOD1(x,y)    x = _tr_noop("FMODE"); y = 1
+#define INPNAME_FMOD2(x,y)    x = _tr_noop("FMODE"); y = 2
+#define INPNAME_HOLD0(x,y)    x = _tr_noop("HOLD"); y = 0
+#define INPNAME_HOLD1(x,y)    x = _tr_noop("HOLD"); y = 1
+#define INPNAME_TRN0(x,y)     x = _tr_noop("TRN"); y = 0
+#define INPNAME_TRN1(x,y)     x = _tr_noop("TRN"); y = 1
 
 #define SWITCH_NAME_GEAR0 _tr("GEAR")
 #define SWITCH_NAME_GEAR1 _tr("GEAR")
@@ -86,6 +86,17 @@ const char *tx_stick_names[4] = {
     _tr_noop("LEFT_H"),
 };
 
+static void get_input_str(int src, const char **ptr, int *idx)
+{
+    *ptr = "";
+    *idx = -1;
+    #define CHANDEF(x) case INP_##x : INPNAME_##x(*ptr, *idx); break;
+    switch(src) {
+        #include "capabilities.h"
+    };
+    #undef CHANDEF
+}
+
 static const char *_get_source_name(char *str, u8 src, int switchname)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
@@ -94,13 +105,13 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
     if(! src) {
         strcpy(str, _tr("None"));
     } else if(src <= NUM_TX_INPUTS) {
-        const char *ptr = "";
-        #define CHANDEF(x) case INP_##x : ptr = INPNAME_##x(switchname); break;
-        switch(src) {
-            #include "capabilities.h"
-        };
-        #undef CHANDEF
-        sprintf(str, "%s%s", is_neg ? "!" : "", ptr);
+        const char *ptr;
+        int idx;
+        get_input_str(src, &ptr, &idx);
+        if(idx >= 0 && switchname)
+            sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr(ptr), idx);
+        else
+            sprintf(str, "%s%s", is_neg ? "!" : "", _tr(ptr));
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     } else {
@@ -110,12 +121,38 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
 }
 const char *INPUT_SourceName(char *str, u8 src)
 {
-    return _get_source_name(str, src, 0);
+    return _get_source_name(str, src, 1);
 }
 const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
 {
-    _get_source_name(str, src, 1);
+    _get_source_name(str, src, 0);
     return str;
+}
+
+int INPUT_SwitchPos(u8 src)
+{
+    const char *ptr;
+    int idx;
+    get_input_str(src, &ptr, &idx);
+    return idx;
+}
+
+int INPUT_NumSwitchPos(u8 src)
+{
+    const char *ptr, *ptr2;
+    int idx, idx2;
+    get_input_str(src, &ptr, &idx);
+    if (idx == -1)
+        return 0;
+    while(src+1 < INP_LAST) {
+        get_input_str(src+1, &ptr2, &idx2);
+        if(ptr2 != ptr) {
+            return idx+1;
+        }
+        idx = idx2;
+        src++;
+    }
+    return idx+1;
 }
 
 const char *INPUT_MapSourceName(u8 idx, u8 *val)

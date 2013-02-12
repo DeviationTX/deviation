@@ -80,7 +80,9 @@ static void show_iconsel_page(int SelectedIcon)
     GUI_CreateLabelBox(&gui5->switchbox,  4, 47, 70, 22, &NORMALBOX_FONT, NULL, NULL,
                        INPUT_SourceNameAbbrevSwitch(tp.str, Model.pagecfg.toggle[tp.tglidx]));
 
-    int num_positions = num_switch_positions(toggleinput);
+    int num_positions = INPUT_NumSwitchPos(toggleinput);
+    if(num_positions < 2)
+        num_positions = 2;
 
     GUI_CreateLabel(&gui5->togglelabel[0], 94, 50, NULL, DEFAULT_FONT, _tr("Pos 0:"));
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][0]);

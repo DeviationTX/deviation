@@ -52,7 +52,9 @@ static void show_iconsel_page(int SelectedIcon)
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     u8 toggleinput = MIXER_SRC(Model.pagecfg.toggle[tp.tglidx]);
-    int num_positions = num_switch_positions(toggleinput);
+    int num_positions = INPUT_NumSwitchPos(toggleinput);
+    if(num_positions < 2)
+        num_positions = 2;
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tp.str, toggleinput));
