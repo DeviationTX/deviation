@@ -38,7 +38,7 @@ static int size_cb(int absrow, void *data)
 #ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
 #else
-        case ITEM_MODE:
+//        case ITEM_MODE:
 #endif
         case ITEM_BUZZ:
         case ITEM_BACKLIGHT:
@@ -77,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
         case ITEM_MODE:
 #ifdef NO_LANGUAGE_SUPPORT
-            title = _tr_noop("Generic settings");
+            //title = _tr_noop("Generic settings");
 #endif
             label = _tr_noop("Stick mode:");
             value = modeselect_cb;
