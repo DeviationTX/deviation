@@ -49,10 +49,14 @@ AIL DR
 Csűrés inv.:
 :AIL Mix:
 Csűrés mix:
+>:AUX2
+>:AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
+>:AUX6
+>:AUX7
 :About Deviation
 Deviation névjegye
 :Advanced
@@ -61,6 +65,7 @@ Haladó
 Repülőgép
 :Alarm
 Riasztás 
+>:Alarm intvl:
 :Altitude
 Magasság
 :Auto
@@ -69,6 +74,7 @@ Auto
 Aux2
 :Backlight:
 Fényerő:
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 Oszlop%d:
 :Bars:
@@ -91,8 +97,10 @@ Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
 Doboz%d:
 :Button monitor
 Nyomógomb ellenőrzés
+>:Buzz settings
 :Buzz volume:
 Hangerő:
+>:Buzzer settings
 :COL
 Kollektív
 :COL Inv
@@ -157,6 +165,9 @@ Ciklikus2
 Ciklikus3
 :D/R & Exp
 D/R & Expó
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -197,16 +208,18 @@ Enter
 Exit
 :Expo&DR
 Expó+DR
-:FMODE0
-FMODE0
-:FMODE1
-FMODE1
-:FMODE2
-FMODE2
+>:FMODE
+<:FMODE0
+<FMODE0
+<:FMODE1
+<FMODE1
+<:FMODE2
+<FMODE2
 :Fahren
 °F
 :Fail safe
 Vészértékek
+>:Failsafe
 :Failsafe:
 Hibaérték:
 :File:
@@ -235,6 +248,7 @@ Gear
 Giró
 :H
 H
+>:HOLD
 :Heli
 Heli
 :Heli/Standard GUI
@@ -295,12 +309,13 @@ Telep üres
 Alacsony
 :M
 M
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+>:MIX
+<:MIX0
+<MIX0
+<:MIX1
+<MIX1
+<:MIX2
+<MIX2
 :Main menu
 Főmenü
 :Main page
@@ -333,8 +348,9 @@ Mód %d
 Modell menü
 :Model name:
 Modell név:
-:Model needs reset\nfor simple mixer
-A modellt törölni kell\na szokásos felülethez
+<:Model needs reset\nfor simple mixer
+<A modellt törölni kell\na szokásos felülethez
+>:Model needs reset\nfor standard mixer
 :Model needs to be reset\nin order to switch to the standard mixer
 A modellt törölni kell\na szokásos felületre váltáshoz
 :Model setup
@@ -389,8 +405,13 @@ Repülő
 Pont:
 :Pos
 Poz.
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 Poz/Neg:
+>:Position %d
+>:PowerOff alert
 :Prealert intvl:
 Előjelz. interv.:
 :Prealert time:
@@ -409,6 +430,7 @@ Nyomjon ENT-t \naz USB:
 Előnézet: hosszú ENT
 :Protocol:
 Protokoll:
+>:PwrDn alert:
 :RIGHT_H
 JOBB_V
 :RIGHT_V
@@ -427,6 +449,7 @@ Csatol
 Törlés
 :Reset
 Törlés
+>:Reset sw:
 :Reverse
 Invertálás
 :Reverse:
@@ -447,6 +470,7 @@ Biztonság:
 Mentés
 :Scale%s:
 Skála%s:
+>:Scale:
 :Scanner
 Szkenner
 :Servo
@@ -477,6 +501,7 @@ Bemenetek
 Mód:
 :Sticks:
 Botkormány:
+>:Sub-trim
 :Subtrim
 Subtrim
 :Subtrim:
@@ -487,8 +512,8 @@ Imbolygó
 Imbolygó típusa:
 |devo10:SwashType:
 Imbolygó:
-:Switch %d:
-Kapcs.%d:
+<:Switch %d:
+<Kapcs.%d:
 :Switch assignment
 Kapcsoló összerendelés
 :Switch1
@@ -525,6 +550,7 @@ TRIM_B-
 TRIM_J+
 :TRIM_R-
 TRIM_J-
+>:TRN
 :TelemRPM
 TelemFord
 :TelemT
@@ -607,6 +633,7 @@ Bekapcsol
 Kimenő telj.:
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Ismeretlen
 :Unlocked
@@ -643,6 +670,7 @@ max
 min
 :mult
 szoroz
+>:permanent
 :replace
 cserél
 :stopwatch

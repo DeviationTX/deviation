@@ -49,10 +49,14 @@ AIL DR
 Sens AIL
 :AIL Mix:
 Mix. AIL
+>:AUX2
+>:AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
+>:AUX6
+>:AUX7
 :About Deviation
 A propos...
 :Advanced
@@ -65,8 +69,11 @@ Alarme
 Tempo alarme
 :Altitude
 Altitude
+>:Auto
+>:Aux2
 :Backlight:
 Luminosité
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 Barre %d:
 :Bars:
@@ -89,8 +96,10 @@ Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
 Box%d:
 :Button monitor
 Ctrl des boutons
+>:Buzz settings
 :Buzz volume:
 Vol. buzzer
+>:Buzzer settings
 :COL
 COL
 :COL Inv
@@ -149,6 +158,9 @@ Cyclique2
 Cyclique3
 :D/R & Exp
 D/R & Exp
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -183,18 +195,20 @@ Entrée
 Sortie
 :Expo&DR
 Expo&DR 
-:FMODE0
-FMODE0
-:FMODE1
-FMODE1
-:FMODE2
-FMODE2
+>:FMODE
+<:FMODE0
+<FMODE0
+<:FMODE1
+<FMODE1
+<:FMODE2
+<FMODE2
 :Fahren
 °F
-:Failsafe:
-Failsafe:
 :Fail safe
 Sécurités
+>:Failsafe
+:Failsafe:
+Failsafe:
 :File:
 Fichier
 :Fixed
@@ -207,16 +221,17 @@ Acrobatie
 Pied
 :Frame Size
 Larg. Signal
-:fulltime
-Total
 :GEAR
 GEAR
 :GPS
 GPS
+>:Gear
 :Generic settings
 Réglages
 :Gyro sense
 Gain gyro
+>:H
+>:HOLD
 :Heli
 Heli
 :Heli/Standard GUI
@@ -225,8 +240,9 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Petit Déb.
-:Hold Position
-Valeur Thr hold
+<:Hold Position
+<Valeur Thr hold
+>:Hold position
 :Icon
 Icône
 :Icon:
@@ -243,12 +259,14 @@ Entrée
 Ajouter
 :Inverted
 Inversé
+>:L
 :LCD settings
 Réglage Ecran
 :LEFT_H
 GAUCHE_H
 :LEFT_V
 GAUCHE_V
+>:LIN
 :Language:
 Langue:
 :Latitude
@@ -271,12 +289,14 @@ Longitude
 Batterie vide
 :Low-Rate
 Grand Déb.
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+>:M
+>:MIX
+<:MIX0
+<MIX0
+<:MIX1
+<MIX1
+<:MIX2
+<MIX2
 :Main menu
 Menu principal
 :Main page
@@ -301,6 +321,7 @@ Mixer
 Réglages
 :Mixers:
 Nbr mixers
+>:Mode
 :Mode %d
 Mode %d
 :Model menu
@@ -361,8 +382,12 @@ Avion
 Point:
 :Pos
 Pos.
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 Pos./Neg.:
+>:Position %d
 :PowerOff alert
 Alerte d'arrêt 
 :Prealert intvl:
@@ -383,6 +408,7 @@ Appuyer sur ENT\n pour passer \n le mode USB sur:
 Aperçu: Appuie-Long ENT
 :Protocol:
 Protocole
+>:PwrDn alert:
 :RIGHT_H
 DROITE_H
 :RIGHT_V
@@ -403,10 +429,10 @@ Supprimer
 Reset
 :Reset sw:
 Inter RaZ
-:Reverse:
-Sens:
 :Reverse
 Sens servos
+:Reverse:
+Sens:
 :Reversed
 Inversé
 :Revert
@@ -423,10 +449,12 @@ Sécurité:
 Sauve
 :Scale%s:
 Echelle%s:
+>:Scale:
 :Scanner
 Scanner
-:Select switch icon
-Choix de l'icone
+<:Select switch icon
+<Choix de l'icone
+>:Servo
 :Simple
 Simple
 :Simple 4 Channel
@@ -441,6 +469,7 @@ Source
 Source
 :Standard
 Standard
+>:Standard Mixer
 :Start:
 Durée:
 :Step:
@@ -451,14 +480,16 @@ Entrées  sticks/aux.
 Mode
 :Sticks:
 Sticks
+>:Sub-trim
+>:Subtrim
 :Subtrim:
 Subtrim
 :Swash
 Plateau cycl.
 :SwashType:
 Plateau cycl.:
-:Switch %d:
-Inter %d
+<:Switch %d:
+<Inter %d
 :Switch assignment
 Affect. Inters
 :Switch1
@@ -495,6 +526,7 @@ TRIM_G-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
+>:TRN
 :TelemRPM
 Télém.T/mn
 :TelemT
@@ -577,12 +609,14 @@ Activer
 Puiss. TX
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Inconnu
 :Unlocked
 Débloqué
 :Up
 Haut
+>:Value
 :Value:
 Valeur:
 :Vibration:
@@ -601,6 +635,8 @@ Volt:
 ajouter
 :countdown
 A rebours
+<:fulltime
+<Total
 :is not supported
 Non supporté
 :is turned off
@@ -611,6 +647,7 @@ max
 min
 :mult
 multiplier
+>:permanent
 :replace
 remplacer
 :stopwatch

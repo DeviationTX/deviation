@@ -46,20 +46,29 @@ DR ALET
 :AIL Inv:
 :Direzione degli Alettoni
 >:AIL Mix:
+>:AUX2
+>:AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
+>:AUX6
+>:AUX7
 :About Deviation
 A proposito di Deviation
+>:Advanced
 :Airplane
 Aereo
 :Alarm
 Allarme
+>:Alarm intvl:
 :Altitude
 Altitudine
+>:Auto
+>:Aux2
 :Backlight:
 Luminosità
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 Barra %d:
 :Bars:
@@ -81,7 +90,9 @@ Binding...\n%d secondi\nPremi ENT per fermare
 :Box %d:
 Box%d:
 >:Button monitor
+>:Buzz settings
 >:Buzz volume:
+>:Buzzer settings
 :COL
 Collet.
 >:COL Inv
@@ -107,6 +118,7 @@ Ch
 >:Chan mode
 :Change
 Cambia
+>:Channel
 >:Channel monitor
 :Channel output
 Canale di uscita
@@ -129,6 +141,10 @@ Ciclico1
 Ciclico2
 :Cyclic3
 Ciclico3
+>:D/R & Exp
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -161,14 +177,17 @@ Entra
 Esci
 :Expo&DR
 Esp.&DR
-:FMODE0
-FMOD0
-:FMODE1
-FMOD1
-:FMODE2
-FMOD2
+>:FMODE
+<:FMODE0
+<FMOD0
+<:FMODE1
+<FMOD1
+<:FMODE2
+<FMOD2
 :Fahren
 Fahren
+>:Fail safe
+>:Failsafe
 :Failsafe:
 Failsafe:
 :File:
@@ -177,6 +196,7 @@ File:
 Fisso
 :Fixed ID:
 ID Fisso:
+>:Fly mode
 :Foot
 Piede
 >:Frame Size
@@ -184,17 +204,25 @@ Piede
 CARRELLO
 :GPS
 GPS
+>:Gear
 :Generic settings
 Settaggi generici
+>:Gyro sense
+>:H
+>:HOLD
 :Heli
 Eli
+>:Heli/Standard GUI
 :Helicopter
 Elicottero
 :High-Rate
 Rate Alto
+>:Hold position
 :Icon
 Icona
 >:Icon:
+>:Idle 1
+>:Idle 2
 >:Input monitor
 :Input:
 Ingresso:
@@ -202,12 +230,14 @@ Ingresso:
 Inserisci
 :Inverted
 Inverso
+>:L
 :LCD settings
 Parametri LCD
 :LEFT_H
 SINISTRA_H
 :LEFT_V
 SINISTRA_V
+>:LIN
 :Language:
 Lingua:
 :Latitude
@@ -222,18 +252,21 @@ Linkato
 Carica
 :Load...
 Carica...
+>:Locked
 :Longitude
 Longitudine
 :Low Battery
 Batteria scarica
 :Low-Rate
 Rate basso
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+>:M
+>:MIX
+<:MIX0
+<MIX0
+<:MIX1
+<MIX1
+<:MIX2
+<MIX2
 :Main menu
 Menù principale
 >:Main page
@@ -250,13 +283,17 @@ Rate Medio
 Min/Max
 :Mixer
 Mixer
+>:Mixer GUI:
 :Mixers:
 Mixers:
+>:Mode
 :Mode %d
 Modo %d
 >:Model menu
 :Model name:
 Nome del modello:
+>:Model needs reset\nfor standard mixer
+>:Model needs to be reset\nin order to switch to the standard mixer
 :Model setup
 Setup del modello
 :Model type:
@@ -292,16 +329,24 @@ Offset:
 Ok
 :On
 On
+>:PIT
 :Page:
 Pagina:
+>:Pit Mix:
+>:Pitch curves
 :Plane
 Aero
 :Point:
 Punto:
 :Pos
 Pos.
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 Pos./Neg.:
+>:Position %d
+>:PowerOff alert
 :Prealert intvl:
 Intervallo di preallarme:
 :Prealert time:
@@ -320,6 +365,7 @@ Premi ENT per attivare il drive USB:
 Anteprima: premi ENT a lungo
 :Protocol:
 Protocollo:
+>:PwrDn alert:
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
@@ -338,6 +384,8 @@ Reinizializza
 Rimuovi
 :Reset
 Reset
+>:Reset sw:
+>:Reverse
 :Reverse:
 Inverso:
 :Reversed
@@ -356,8 +404,10 @@ Sicurezza:
 Salva
 :Scale%s:
 Scala%s:
+>:Scale:
 :Scanner
 Scanner
+>:Servo
 :Simple
 Sempl.
 :Simple 4 Channel
@@ -369,6 +419,8 @@ Velocità
 >:Src
 :Src:
 Sorgente:
+>:Standard
+>:Standard Mixer
 :Start:
 Avvia:
 :Step:
@@ -379,12 +431,16 @@ posizione dello stick
 Modo di volo:
 :Sticks:
 Sticks:
+>:Sub-trim
+>:Subtrim
 :Subtrim:
 Subtrim
+>:Swash
 :SwashType:
 Piatto:
-:Switch %d:
-Interr. %d:
+<:Switch %d:
+<Interr. %d:
+>:Switch assignment
 :Switch1
 Interr1
 :Switch2
@@ -419,6 +475,7 @@ TRIM_S-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
+>:TRN
 :TelemRPM
 TelemRPM
 :TelemT
@@ -442,6 +499,9 @@ Temperatura:
 Modello..
 :Test
 Test
+>:Thr hold
+>:Throttle curves
+>:Throttle hold
 :Time
 :Timer
 >:Timer
@@ -469,6 +529,7 @@ Tocca per sbloccare
 :Transmitter config
 Config. trasmittente
 >:Transmitter menu
+>:Travel adjust
 :Trim
 Trim
 :Trim +:
@@ -489,10 +550,13 @@ Attiva
 Potenza di TX:
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Sconosciuto
+>:Unlocked
 :Up
 Sù
+>:Value
 :Value:
 valore:
 >:Vibration:
@@ -517,6 +581,7 @@ max
 min
 :mult
 Mult.
+>:permanent
 :replace
 Sostituisci
 :stopwatch

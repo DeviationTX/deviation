@@ -51,18 +51,18 @@
 ЭЛ.ДР
 |devo8:AIL DR
 Элер ДР
-:AIL DR0
-ЭЛ.ДР0
-|devo8:AIL DR0
-Элер ДР0
-:AIL DR1
-ЭЛ.ДР1
-|devo8:AIL DR1
-Элер ДР1
-:AIL DR2
-ЭЛ.ДР2
-|devo8:AIL DR2
-Элер ДР2
+<:AIL DR0
+<ЭЛ.ДР0
+<|devo8:AIL DR0
+<Элер ДР0
+<:AIL DR1
+<ЭЛ.ДР1
+<|devo8:AIL DR1
+<Элер ДР1
+<:AIL DR2
+<ЭЛ.ДР2
+<|devo8:AIL DR2
+<Элер ДР2
 :AIL Inv:
 Элер Инв:
 :AIL Mix:
@@ -203,10 +203,10 @@ Aux2
 ДР&Экспо РНапр
 :DR
 ДР
-:DR0
-ДР0
-:DR1
-ДР1
+<:DR0
+<ДР0
+<:DR1
+<ДР1
 :Deadband
 Мертв.зона
 :Default
@@ -229,18 +229,18 @@ Aux2
 РВ.ДР
 |devo8:ELE DR
 РВыс ДР
-:ELE DR0
-РВ.ДР0
-|devo8:ELE DR0
-РВыс ДР0
-:ELE DR1
-РВ.ДР1
-|devo8:ELE DR1
-РВыс ДР1
-:ELE DR2
-РВ.ДР2
-|devo8:ELE DR2
-РВыс ДР2
+<:ELE DR0
+<РВ.ДР0
+<|devo8:ELE DR0
+<РВыс ДР0
+<:ELE DR1
+<РВ.ДР1
+<|devo8:ELE DR1
+<РВыс ДР1
+<:ELE DR2
+<РВ.ДР2
+<|devo8:ELE DR2
+<РВыс ДР2
 :ELE Inv:
 РВыс Инв:
 :ELE Mix:
@@ -257,18 +257,18 @@ Aux2
 Экспо&ДР
 :FMODE
 ПРежим
-:FMODE0
-ПРеж0
-|devo8:FMODE0
-ПРежим0
-:FMODE1
-ПРеж1
-|devo8:FMODE1
-ПРежим1
-:FMODE2
-ПРеж2
-|devo8:FMODE2
-ПРежим2
+<:FMODE0
+<ПРеж0
+<|devo8:FMODE0
+<ПРежим0
+<:FMODE1
+<ПРеж1
+<|devo8:FMODE1
+<ПРежим1
+<:FMODE2
+<ПРеж2
+<|devo8:FMODE2
+<ПРежим2
 :Fahren
 F°
 |devo8:Fahren
@@ -301,10 +301,10 @@ F°
 Период
 :GEAR
 Шасси
-:GEAR0
-Шасси0
-:GEAR1
-Шасси1
+<:GEAR0
+<Шасси0
+<:GEAR1
+<Шасси1
 :GPS
 GPS
 :Gear
@@ -319,10 +319,10 @@ GPS
 H
 :HOLD
 HOLD
-:HOLD0
-HOLD0
-:HOLD1
-HOLD1
+<:HOLD0
+<HOLD0
+<:HOLD1
+<HOLD1
 :Heli
 Вертолет
 :Heli/Standard GUI
@@ -389,12 +389,12 @@ L
 M
 :MIX
 МИКШ
-:MIX0
-МИКШ0
-:MIX1
-МИКШ1
-:MIX2
-МИКШ2
+<:MIX0
+<МИКШ0
+<:MIX1
+<МИКШ1
+<:MIX2
+<МИКШ2
 :Main menu
 Главное меню
 :Main page
@@ -547,18 +547,18 @@ RPM
 РН.ДР
 |devo8:RUD DR
 РНапр ДР
-:RUD DR0
-РН.ДР0
-|devo8:RUD DR0
-РНапр ДР0
-:RUD DR1
-РН.ДР1
-|devo8:RUD DR1
-РНапр ДР1
-:RUD DR2
-РН.ДР2
-|devo8:RUD DR2
-РНапр ДР2
+<:RUD DR0
+<РН.ДР0
+<|devo8:RUD DR0
+<РНапр ДР0
+<:RUD DR1
+<РН.ДР1
+<|devo8:RUD DR1
+<РНапр ДР1
+<:RUD DR2
+<РН.ДР2
+<|devo8:RUD DR2
+<РНапр ДР2
 :Re-Init
 Привязка
 :Remove
@@ -597,7 +597,6 @@ RPM
 Масшт.:
 :Scanner
 Сканер
->:Select switch icon
 :Servo
 серво
 :Simple
@@ -676,10 +675,10 @@ RPM
 Трим_П-
 :TRN
 Тренер
-:TRN0
-Тренер0
-:TRN1
-Тренер1
+<:TRN0
+<Тренер0
+<:TRN1
+<Тренер1
 :TelemRPM
 ТелеRPM
 :TelemT

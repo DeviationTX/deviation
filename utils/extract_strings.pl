@@ -6,13 +6,14 @@ use Getopt::Long;
 my $update;
 my $lang;
 my $target;
+my $count;
 my @targets = ("320x240x16", "128x64x1");
 my %targetmap = (
     devo8 => "320x240x16",
     devo10 => "128x64x1",
 );
 
-GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target);
+GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count);
 if($target && (! $targetmap{$target} || ! (grep {$targetmap{$target} eq $_} @targets))) {
     my @t = keys(%targetmap);
     print "Target must be one of: @t\n";
@@ -70,6 +71,10 @@ foreach (`head -n 1 filesystem/common/template/*.ini`) {
     }
 }
 my %uniq = map {$_ => undef} @out;
+if($count) {
+    printf "%d", scalar(keys(%uniq));
+    exit 0;
+}
 
 if(! $update && ! $target) {
     foreach (sort keys %uniq) {

@@ -46,17 +46,26 @@ AIL DR
 :AIL Inv:
 AIL omg:
 >:AIL Mix:
+>:AUX2
+>:AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
+>:AUX6
+>:AUX7
 >:About Deviation
+>:Advanced
 :Airplane
 Vliegtuig
 >:Alarm
+>:Alarm intvl:
 >:Altitude
+>:Auto
+>:Aux2
 :Backlight:
 Helderheid:
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 Balk %d:
 :Bars:
@@ -75,7 +84,9 @@ Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige 
 :Box %d:
 Kader %d:
 >:Button monitor
+>:Buzz settings
 >:Buzz volume:
+>:Buzzer settings
 :COL
 COL
 >:COL Inv
@@ -98,6 +109,7 @@ Kan
 >:Chan mode
 :Change
 Aanpassen
+>:Channel
 >:Channel monitor
 >:Channel output
 :Complex
@@ -117,6 +129,10 @@ Cyclic1
 Cyclic2
 :Cyclic3
 Cyclic3
+>:D/R & Exp
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 DR
 >:Deadband
@@ -145,13 +161,16 @@ Toepassen
 Stoppen
 :Expo&DR
 Expo&DR
-:FMODE0
-FMODE0
-:FMODE1
-FMODE1
-:FMODE2
-FMODE2
+>:FMODE
+<:FMODE0
+<FMODE0
+<:FMODE1
+<FMODE1
+<:FMODE2
+<FMODE2
 >:Fahren
+>:Fail safe
+>:Failsafe
 :Failsafe:
 Veilige modus:
 :File:
@@ -160,31 +179,42 @@ Bestand:
 Vast
 :Fixed ID:
 Vast ID:
+>:Fly mode
 >:Foot
 >:Frame Size
 :GEAR
 GEA
 >:GPS
+>:Gear
 >:Generic settings
+>:Gyro sense
+>:H
+>:HOLD
 >:Heli
+>:Heli/Standard GUI
 :Helicopter
 Helikopter
 :High-Rate
 Hoog
+>:Hold position
 :Icon
 Icoon
 >:Icon:
+>:Idle 1
+>:Idle 2
 >:Input monitor
 :Input:
 Invoer:
 >:Insert
 :Inverted
 Omgekeerd
+>:L
 >:LCD settings
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
+>:LIN
 :Language:
 Taal:
 >:Latitude
@@ -197,16 +227,19 @@ Verbonden
 Laad
 :Load...
 Laad...
+>:Locked
 >:Longitude
 >:Low Battery
 :Low-Rate
 Laag
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+>:M
+>:MIX
+<:MIX0
+<MIX0
+<:MIX1
+<MIX1
+<:MIX2
+<MIX2
 >:Main menu
 >:Main page
 :Main page config
@@ -221,13 +254,17 @@ Middel
 Min/Max
 :Mixer
 Mixer
+>:Mixer GUI:
 :Mixers:
 Mixers:
+>:Mode
 :Mode %d
 Mode %d
 >:Model menu
 :Model name:
 Modelnaam:
+>:Model needs reset\nfor standard mixer
+>:Model needs to be reset\nin order to switch to the standard mixer
 >:Model setup
 :Model type:
 Modeltype:
@@ -258,15 +295,23 @@ Offset:
 Ok
 :On
 Aan
+>:PIT
 :Page:
 Pagina:
+>:Pit Mix:
+>:Pitch curves
 >:Plane
 :Point:
 Punt:
 :Pos
 +
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 +/-:
+>:Position %d
+>:PowerOff alert
 >:Prealert intvl:
 >:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
@@ -278,6 +323,7 @@ Druk op 'ENT' om USB-bestandssysteem te activeren
 >:Preview: Long-Press ENT
 :Protocol:
 Protocol:
+>:PwrDn alert:
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
@@ -293,6 +339,8 @@ Herinitialiseren
 >:Remove
 :Reset
 Reset
+>:Reset sw:
+>:Reverse
 :Reverse:
 Keer om:
 :Reversed
@@ -310,8 +358,10 @@ Veiligheid:
 OPslaan
 :Scale%s:
 Schaal%s:
+>:Scale:
 :Scanner
 Scanner
+>:Servo
 :Simple
 Eenvoudig
 :Simple 4 Channel
@@ -322,6 +372,8 @@ Eenvoudig 4 kanalen
 Bron
 :Src:
 Bron:
+>:Standard
+>:Standard Mixer
 :Start:
 Start:
 >:Step:
@@ -330,11 +382,14 @@ Start:
 Stickmodus:
 :Sticks:
 Sticks:
+>:Sub-trim
+>:Subtrim
 :Subtrim:
 Fijnafstelling:
+>:Swash
 :SwashType:
 Type tuimelschijf:
->:Switch %d:
+>:Switch assignment
 :Switch1
 Schakelaar1
 :Switch2
@@ -369,6 +424,7 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
+>:TRN
 >:TelemRPM
 >:TelemT
 >:TelemV
@@ -383,6 +439,9 @@ TRIM_R-
 Sjabloon...
 :Test
 Testen
+>:Thr hold
+>:Throttle curves
+>:Throttle hold
 >:Time
 :Timer
 Timer
@@ -406,6 +465,7 @@ Raak aan om vast te zetten
 Raak aan om los te maken
 >:Transmitter config
 >:Transmitter menu
+>:Travel adjust
 :Trim
 Trim
 :Trim +:
@@ -425,10 +485,13 @@ Inschakelen
 Zendvermogen:
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Onbekend
+>:Unlocked
 :Up
 Omhoog
+>:Value
 :Value:
 Waarde:
 >:Vibration:
@@ -450,6 +513,7 @@ Aftellen
 >:min
 :mult
 *
+>:permanent
 :replace
 Vervangen
 :stopwatch

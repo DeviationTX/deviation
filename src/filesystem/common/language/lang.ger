@@ -47,22 +47,31 @@ QUE
 QUE DR
 :AIL Inv:
 QUE Inv:
-:AUX4
-AUX4
 :AIL Mix:
 QUE Mix:
+>:AUX2
+>:AUX3
+:AUX4
+AUX4
 :AUX5
 AUX5
+>:AUX6
+>:AUX7
 :About Deviation
 :Über Deviation
+>:Advanced
 :Airplane
 Flugzeug
 :Alarm
 Alarm
+>:Alarm intvl:
 :Altitude
 Höhe
+>:Auto
+>:Aux2
 :Backlight:
 Helligkeit:
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 Balken %d:
 :Bars:
@@ -85,8 +94,10 @@ Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevor
 Kasten %d:
 :Button monitor
 Knöpfe Anzeige
+>:Buzz settings
 :Buzz volume:
 Buzzer Lautst:
+>:Buzzer settings
 :COL
 COL
 :COL Inv
@@ -117,6 +128,7 @@ K
 K Modus
 :Change
 Ändern
+>:Channel
 :Channel monitor
 Kanal Anzeige
 :Channel output
@@ -141,6 +153,10 @@ Zyklisch1
 Zyklisch2
 :Cyclic3
 Zyklisch3
+>:D/R & Exp
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -175,14 +191,17 @@ Eingabe
 EXT
 :Expo&DR
 Expo&DR
-:FMODE0
-FMODE0
-:FMODE1
-FMODE1
-:FMODE2
-FMODE2
+>:FMODE
+<:FMODE0
+<FMODE0
+<:FMODE1
+<FMODE1
+<:FMODE2
+<FMODE2
 :Fahren
 Fahrenheit
+>:Fail safe
+>:Failsafe
 :Failsafe:
 Ausfallschutz:
 :File:
@@ -191,6 +210,7 @@ Modell:
 Fest
 :Fixed ID:
 Feste ID:
+>:Fly mode
 :Foot
 Fuß
 :Frame Size
@@ -199,18 +219,26 @@ Rahmen Größe
 FAHRW
 :GPS
 GPS
+>:Gear
 :Generic settings
 Allgemeine Einstellungen
+>:Gyro sense
+>:H
+>:HOLD
 :Heli
 Heli
+>:Heli/Standard GUI
 :Helicopter
 Helikopter
 :High-Rate
 Hoch
+>:Hold position
 :Icon
 Bild
 :Icon:
 Bild:
+>:Idle 1
+>:Idle 2
 :Input monitor
 Eingaben Anzeige
 :Input:
@@ -219,12 +247,14 @@ Eingabe:
 Einfügen
 :Inverted
 Umgekehrt
+>:L
 :LCD settings
 LCD Einstellungen
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
+>:LIN
 :Language:
 Sprache:
 :Latitude
@@ -239,18 +269,21 @@ Verknüpft
 Laden
 :Load...
 Laden...
+>:Locked
 :Longitude
 Länge
 :Low Battery
 Akku schwach
 :Low-Rate
 Niedrig
-:MIX0
-MIX0
-:MIX1
-MIX1
-:MIX2
-MIX2
+>:M
+>:MIX
+<:MIX0
+<MIX0
+<:MIX1
+<MIX1
+<:MIX2
+<MIX2
 :Main menu
 Hauptmenü
 :Main page
@@ -271,14 +304,18 @@ Min Limit:
 Min/Max
 :Mixer
 Mixer
+>:Mixer GUI:
 :Mixers:
 Mixers:
+>:Mode
 :Mode %d
 Mode %d
 :Model menu
 Modell Menü
 :Model name:
 Modellname:
+>:Model needs reset\nfor standard mixer
+>:Model needs to be reset\nin order to switch to the standard mixer
 :Model setup
 Modell Einstellungen
 :Model type:
@@ -315,16 +352,24 @@ Ausgleich:
 Ok
 :On
 Ein
+>:PIT
 :Page:
 Seite:
+>:Pit Mix:
+>:Pitch curves
 :Plane
 Flugzeug
 :Point:
 Punkt:
 :Pos
 +
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 +/-:
+>:Position %d
+>:PowerOff alert
 :Prealert intvl:
 Prealert intvl:
 :Prealert time:
@@ -343,6 +388,7 @@ ENT schaltet \ndas USB Laufwerk:
 Vorschau: Lange ENT drücken
 :Protocol:
 Protokoll:
+>:PwrDn alert:
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
@@ -361,6 +407,8 @@ Neu binden
 Löschen
 :Reset
 Reset
+>:Reset sw:
+>:Reverse
 :Reverse:
 Umkehr:
 :Reversed
@@ -379,8 +427,10 @@ Sicherheit:
 Kopieren
 :Scale%s:
 Skalierung%s:
+>:Scale:
 :Scanner
 Scanner
+>:Servo
 :Simple
 Nichts
 :Simple 4 Channel
@@ -393,6 +443,8 @@ Geschwindigkeit:
 Quelle
 :Src:
 Quelle:
+>:Standard
+>:Standard Mixer
 :Start:
 Start:
 :Step:
@@ -403,12 +455,16 @@ Knüppel Eingabe
 Knüppel Mode:
 :Sticks:
 Knüppel:
+>:Sub-trim
+>:Subtrim
 :Subtrim:
 Untertrimmung:
+>:Swash
 :SwashType:
 Taumelscheibe:
-:Switch %d:
-Hebel %d:
+<:Switch %d:
+<Hebel %d:
+>:Switch assignment
 :Switch1
 Hebel1
 :Switch2
@@ -443,6 +499,7 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
+>:TRN
 :TelemRPM
 TelemUPM
 :TelemT
@@ -467,6 +524,9 @@ Temp:
 Vorlage...
 :Test
 Testen
+>:Thr hold
+>:Throttle curves
+>:Throttle hold
 :Time
 Zeit
 :Timer
@@ -497,6 +557,7 @@ Antippen zum Entsperren
 Sender Einstellungen
 :Transmitter menu
 Sender Menü
+>:Travel adjust
 :Trim
 Trimmung
 :Trim +:
@@ -517,10 +578,13 @@ Einschalten
 Sendeleistung:
 :USB
 USB
+>:USB Filesystem is currently 
 :Unknown
 Unbekannt
+>:Unlocked
 :Up
 Hoch
+>:Value
 :Value:
 Wert:
 :Vibration:
@@ -549,6 +613,7 @@ max
 min
 :mult
 *
+>:permanent
 :replace
 ersetzen
 :stopwatch

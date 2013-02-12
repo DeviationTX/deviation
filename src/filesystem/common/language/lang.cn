@@ -46,8 +46,12 @@
 副翼方向
 :AIL Mix:
 副翼螺距
+>:AUX2
+>:AUX3
 >:AUX4
 >:AUX5
+>:AUX6
+>:AUX7
 :About Deviation
 关于Deviation固件
 :Advanced
@@ -56,6 +60,7 @@
 固定翼
 :Alarm
 报警
+>:Alarm intvl:
 :Altitude
 高度
 :Auto
@@ -63,6 +68,7 @@
 >:Aux2
 :Backlight:
 背光
+>:Bad/missing\nprotocol modules!
 :Bar %d:
 柱图%d
 :Bars:
@@ -85,8 +91,10 @@
 第%d栏
 :Button monitor
 按键监控
+>:Buzz settings
 :Buzz volume:
 音量
+>:Buzzer settings
 :COL
 螺距
 :COL Inv
@@ -145,6 +153,9 @@ CCPM2
 CCPM3
 :D/R & Exp
 舵量及舵机指数
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
 :DR
 舵量
 :Deadband
@@ -178,16 +189,18 @@ Deviation固件版本:
 退出
 :Expo&DR
 三段式
-:FMODE0
-FMOD0
-:FMODE1
-FMOD1
-:FMODE2
-FMOD2
+>:FMODE
+<:FMODE0
+<FMOD0
+<:FMODE1
+<FMOD1
+<:FMODE2
+<FMOD2
 :Fahren
 华氏
 :Fail safe
 失控保护
+>:Failsafe
 :Failsafe:
 失控保护
 :File:
@@ -210,8 +223,11 @@ FMOD2
 基本设置
 :Gyro sense
 锁尾感度
+>:H
+>:HOLD
 :Heli
 直升机
+>:Heli/Standard GUI
 :Helicopter
 直升机
 :High-Rate
@@ -234,12 +250,14 @@ FMOD2
 插入
 :Inverted
 反向
+>:L
 :LCD settings
 LCD设置
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
+>:LIN
 :Language:
 语言
 :Latitude
@@ -254,15 +272,15 @@ LCD设置
 读取
 :Load...
 读取...
+>:Locked
 :Longitude
 经度
 :Low Battery
 低电量
 :Low-Rate
 3D飞行2
->:MIX0
->:MIX1
->:MIX2
+>:M
+>:MIX
 :Main menu
 主菜单
 :Main page
@@ -295,6 +313,8 @@ LCD设置
 模型设置
 :Model name:
 模型命名
+>:Model needs reset\nfor standard mixer
+>:Model needs to be reset\nin order to switch to the standard mixer
 :Model setup
 模型设置
 :Model type:
@@ -321,8 +341,8 @@ LCD设置
 无
 :Normal
 正常
-:Not a traditional\n model, reset it?
-本模型与通用模式\n不兼容, 是否重置？
+<:Not a traditional\n model, reset it?
+<本模型与通用模式\n不兼容, 是否重置？
 :Notch PW
 通道间隔
 :Off
@@ -347,8 +367,13 @@ LCD设置
 点
 :Pos
 正
+>:Pos 0:
+>:Pos 1:
+>:Pos 2:
 :Pos/Neg:
 正/负
+>:Position %d
+>:PowerOff alert
 :Prealert intvl:
 预警间隔
 :Prealert time:
@@ -367,6 +392,7 @@ LCD设置
 长按ENT预览,EXT返回
 :Protocol:
 通信协议
+>:PwrDn alert:
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -384,6 +410,7 @@ LCD设置
 删除
 :Reset
 重置
+>:Reset sw:
 :Reverse
 舵机正逆转
 :Reverse:
@@ -404,6 +431,7 @@ LCD设置
 保存
 :Scale%s:
 比例%s
+>:Scale:
 :Scanner
 信号扫描器
 :Servo
@@ -412,8 +440,8 @@ LCD设置
 一段式
 :Simple 4 Channel
 4通道
-:Simplfied
-通用模式
+<:Simplfied
+<通用模式
 :Speed
 速度
 :Speed:
@@ -422,6 +450,8 @@ LCD设置
 输入
 :Src:
 输入
+>:Standard
+>:Standard Mixer
 :Start:
 开始时间
 :Step:
@@ -432,6 +462,7 @@ LCD设置
 摇杆模式
 :Sticks:
 摇杆/旋钮
+>:Sub-trim
 :Subtrim
 微调
 :Subtrim:
@@ -440,8 +471,8 @@ LCD设置
 斜盘设置
 :SwashType:
 斜盘模式
-:Switch %d:
-开关 %d
+<:Switch %d:
+<开关 %d
 :Switch assignment
 开关分配
 :Switch1
@@ -478,6 +509,7 @@ LCD设置
 右上+
 :TRIM_R-
 右上-
+>:TRN
 :TelemRPM
 转数
 :TelemT
@@ -532,7 +564,6 @@ LCD设置
 触摸目标%d
 >:Touch to Lock
 >:Touch to Unlock
->:Tradition Heli
 :Transmitter config
 遥控设置
 :Transmitter menu
@@ -558,7 +589,9 @@ LCD设置
 :Tx power:
 发射功率
 >:USB
+>:USB Filesystem is currently 
 >:Unknown
+>:Unlocked
 :Up
 上
 :Value
@@ -591,6 +624,7 @@ LCD设置
 最小
 :mult
 叠加
+>:permanent
 :replace
 替换
 :stopwatch
