@@ -28,16 +28,16 @@ static void _show_page()
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
     GUI_CreateLabel(&gui->inplbl, 18, 40, NULL, DEFAULT_FONT, _tr("Input:"));
-    GUI_CreateLabel(&gui->neglbl, 76, 40, NULL, DEFAULT_FONT, _tr("Trim -:"));
-    GUI_CreateLabel(&gui->poslbl, 140, 40, NULL, DEFAULT_FONT, _tr("Trim +:"));
-    GUI_CreateLabel(&gui->steplbl, 218, 40, NULL, DEFAULT_FONT, _tr("Trim Step:"));
+    GUI_CreateLabel(&gui->neglbl, 64, 40, NULL, DEFAULT_FONT, _tr("Trim -:"));
+    GUI_CreateLabel(&gui->poslbl, 148, 40, NULL, DEFAULT_FONT, _tr("Trim +:"));
+    GUI_CreateLabel(&gui->steplbl, 226, 40, NULL, DEFAULT_FONT, _tr("Trim Step:"));
     struct Trim *trim = MIXER_GetAllTrims();
     for (u8 i = 0; i < NUM_TRIMS; i++) {
-        GUI_CreateButton(&gui->src[i], 8, 24*i + 66, BUTTON_48x16,
+        GUI_CreateButton(&gui->src[i], 4, 24*i + 66, BUTTON_64x16,
             trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)i));
-        GUI_CreateLabel(&gui->neg[i], 72, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
-        GUI_CreateLabel(&gui->pos[i], 136, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
-        GUI_CreateTextSelect(&gui->step[i], 200, 24*i + 66, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
+        GUI_CreateLabel(&gui->neg[i], 80, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
+        GUI_CreateLabel(&gui->pos[i], 144, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
+        GUI_CreateTextSelect(&gui->step[i], 208, 24*i + 66, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
     }
 }
 
