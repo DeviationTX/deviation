@@ -26,7 +26,6 @@ static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
 
 static const char *show_timerperm_cb(guiObject_t *obj, const void *data);
 static void reset_timerperm_cb(guiObject_t *obj, const void *data);
-static u8 has_permanent_timer();
 
 static void _show_page();
 
@@ -123,8 +122,7 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     u8 idx = (long)data;
     u8 changed;
     struct Timer *timer = &Model.timer[idx];
-    u8 last = timer->type != TIMER_PERMANENT && has_permanent_timer() ? TIMER_PERMANENT : TIMER_LAST;
-    timer->type = GUI_TextSelectHelper(timer->type, 0, last - 1, dir, 1, 1, &changed);
+    timer->type = GUI_TextSelectHelper(timer->type, 0, idx != 2 ? TIMER_PERMANENT - 1 : TIMER_LAST - 1, dir, 1, 1, &changed);
     if (changed){
         TIMER_Reset(idx);
     	update_countdown(idx);
@@ -142,7 +140,7 @@ void toggle_timertype_cb(guiObject_t *obj, void *data)
 {
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    u8 last = timer->type != TIMER_PERMANENT && has_permanent_timer() ? TIMER_PERMANENT : TIMER_LAST;
+    u8 last =  idx != 2  ? TIMER_PERMANENT : TIMER_LAST;
     timer->type = last == timer->type + 1 ? 0 : timer->type + 1;     
     TIMER_Reset(idx);
     update_countdown(idx);
@@ -175,16 +173,4 @@ void reset_timerperm_cb(guiObject_t *obj, const void *data)
   (void)obj;
   (void)data;
   PAGE_ShowResetPermTimerDialog(obj);
-}
-
-static u8 has_permanent_timer() {
-    u8 i;
-    struct Timer *timer ;
-    // Does TIMER_PERMANENT already exist ?
-    for ( i=0; i < NUM_TIMERS; i++) {
-	timer = &Model.timer[i];
-        if( TIMER_PERMANENT == timer->type )
-	    return 1;
-    }
-    return 0;
 }
