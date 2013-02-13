@@ -582,7 +582,7 @@ RPM
 :Switch2
 Перекл.2
 :Switch:
-Старт:
+Перекл.:
 :Symmetric
 Симметр.
 :THR
