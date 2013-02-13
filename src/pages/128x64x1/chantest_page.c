@@ -72,8 +72,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_bar_page(u8 num_bars)
 {
     current_page = 0;
-    if (num_bars > 18)
-        num_bars = 18;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     int view_height = (cp->type == MONITOR_RAWINPUT)
