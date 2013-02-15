@@ -1075,7 +1075,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
             fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceName(file, m->timer[idx].resetsrc));
-        if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
+        if (WRITE_FULL_MODEL || (m->timer[idx].type == TIMER_COUNTDOWN && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
 	if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
 	    fprintf(fh, "%s=%d\n", TIMER_VAL, m->timer[idx].val);
