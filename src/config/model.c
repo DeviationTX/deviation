@@ -125,6 +125,7 @@ static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown
 static const char TIMER_TIME[] = "time";
 static const char TIMER_RESETSRC[] = "resetsrc";
 static const char PERMANENT_TIMER[] = "permanent_timer";
+static const char TIMER_VAL[] = "val";
 
 /* Section: Safety */
 static const char SECTION_SAFETY[] = "safety";
@@ -699,6 +700,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->timer[idx].timer = atoi(value);
             return 1;
         }
+	if (MATCH_KEY(TIMER_VAL)) {
+            m->timer[idx].val = atoi(value);
+            return 1;
+        }
     }
     if (MATCH_START(section, SECTION_TELEMALARM)) {
         u8 idx = atoi(section + sizeof(SECTION_TELEMALARM)-1);
@@ -1072,6 +1077,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceName(file, m->timer[idx].resetsrc));
         if (WRITE_FULL_MODEL || (m->timer[idx].type != TIMER_STOPWATCH && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
+	if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
+	    fprintf(fh, "%s=%d\n", TIMER_VAL, m->timer[idx].val);
     }
     for(idx = 0; idx < TELEM_NUM_ALARMS; idx++) {
         if (! WRITE_FULL_MODEL && ! m->telem_alarm[idx])

@@ -68,7 +68,7 @@ void TIMER_Reset(u8 timer)
     } else if(Model.timer[timer].type == TIMER_COUNTDOWN) {
         timer_val[timer] = Model.timer[timer].timer * 1000;
     } else if(Model.timer[timer].type == TIMER_PERMANENT ) {
-	timer_val[timer] = Model.permanent_timer;
+	timer_val[timer] = Model.timer[timer].val;
     }
 }
 
@@ -112,7 +112,7 @@ void TIMER_Update()
 		timer_val[i] += delta;
 		if( timer_val[i] >= 359999900) // Reset when 99h59mn59sec
 		    timer_val[i] = 0 ;
-		Model.permanent_timer = timer_val[i];
+		Model.timer[i].val = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH) {
                 timer_val[i] += delta;
             } else {

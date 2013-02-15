@@ -67,14 +67,15 @@ static void invalid_simplemixer_cb(u8 state, void *guiObj)
     }
 }
 
-static void reset_permtimer_cb(u8 state, void *guiObj)
+static void reset_permtimer_cb(u8 state, void *data)
 {
+    u8 idx = (long) data;
     if (current_selected_obj != NULL)
 	GUI_SetSelected(current_selected_obj);
+  
     dialog = NULL;
-    if (state == 1 && guiObj != NULL) {
-	Model.permanent_timer = 0;
+    if (state == 1 ) {
+	Model.timer[idx].val = 0;
 	TIMER_Init();
-	GUI_Redraw(guiObj);
     }
 }
