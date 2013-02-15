@@ -148,7 +148,6 @@ void PAGE_ShowInvalidModule()
 /********************************/
 /* Reset Permanent Timer Dialog */
 /********************************/
-
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
 {
     (void)guiObject;
