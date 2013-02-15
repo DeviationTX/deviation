@@ -230,6 +230,8 @@ Aux2
 |devo8:Expo&DR
 Экспо&ДР
 :FMODE
+ПРеж
+|devo8:FMODE
 ПРежим
 :Fahren
 F°
