@@ -78,7 +78,7 @@ void ADC_Init(void)
     /* we convert only 3 values in one adc-group */
     dma_set_number_of_data(_DMA, _DMA_CHANNEL, SAMPLE_COUNT);
     /* we want an interrupt after the adc is finished */
-    //dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
+    dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
 
     /* dma ready to go. waiting til the peripheral gives the first data */
     dma_enable_channel(_DMA, _DMA_CHANNEL);
@@ -111,13 +111,17 @@ u16 ADC_Read(u8 channel)
 void ADC_StartCapture()
 {
     //while (!(ADC_SR(_ADC) & ADC_SR_EOC));
-    //adc_start_conversion_direct(_ADC);
+    adc_start_conversion_direct(_ADC);
 }
 
-#if 0
+#if 1
 void _DMA_ISR()
 {
-    //medium_priority_cb();
+    //stop continuous mode
+    adc_off(_ADC);
+    adc_power_on(_ADC);
+    ADC_Filter();
+    medium_priority_cb();
     /* clear the interrupt flag */
     DMA_IFCR(_DMA) |= _DMA_IFCR_CGIF;
 }
@@ -133,6 +137,13 @@ void ADC_Filter()
             idx += NUM_ADC_CHANNELS;
         }
         result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
+        if (i == NUM_ADC_CHANNELS-1) {
+            // Special case for Tx voltage
+            if(result + (result >> 4) < adc_array_raw[i]) {
+               //Big voltage drop, may be a glitch
+               result = adc_array_raw[i] - (adc_array_raw[i] >> 5);
+            }
+        }
         adc_array_raw[i] = result;
     }
 }
