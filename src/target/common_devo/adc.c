@@ -137,6 +137,13 @@ void ADC_Filter()
             idx += NUM_ADC_CHANNELS;
         }
         result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
+        if (i == NUM_ADC_CHANNELS-1) {
+            // Special case for Tx voltage
+            if(result + (result >> 4) < adc_array_raw[i]) {
+               //Big voltage drop, may be a glitch
+               result = adc_array_raw[i] - (adc_array_raw[i] >> 5);
+            }
+        }
         adc_array_raw[i] = result;
     }
 }
