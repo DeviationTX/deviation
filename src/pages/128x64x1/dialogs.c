@@ -148,13 +148,6 @@ void PAGE_ShowInvalidModule()
 /********************************/
 /* Reset Permanent Timer Dialog */
 /********************************/
-const char *reset_timer_string_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    strncpy(dlgstr, _tr("Do you really want\nto reset\nthis permanent timer?"),sizeof(dlgstr));
-    return dlgstr;
-}
 
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
 {
