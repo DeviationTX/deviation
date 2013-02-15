@@ -79,3 +79,11 @@ static void reset_permtimer_cb(u8 state, void *data)
 	TIMER_Init();
     }
 }
+
+const char *reset_timer_string_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    strncpy(dlgstr, _tr("Do you really want\nto reset this\npermanent timer?"),sizeof(dlgstr));
+    return dlgstr;
+}
