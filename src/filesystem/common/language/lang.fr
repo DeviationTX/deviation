@@ -73,7 +73,8 @@ Altitude
 >:Aux2
 :Backlight:
 Luminosité
->:Bad/missing\nprotocol modules!
+:Bad/missing\nprotocol modules!
+Module de protocole\nabsent ou défaillant!
 :Bar %d:
 Barre %d:
 :Bars:
@@ -96,20 +97,22 @@ Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
 Box%d:
 :Button monitor
 Ctrl des boutons
->:Buzz settings
+:Buzz settings
+Réglages Son
 :Buzz volume:
-Vol. buzzer
->:Buzzer settings
+Volume
+:Buzzer settings
+Réglages Son
 :COL
-COL
+PAS
 :COL Inv
-Sens COL
+Sens PAS 
 :COL Inv:
-Sens COL 
+Sens PAS 
 :COL Limit
-Limite COL 
+Limite PAS
 :COL Mix:
-Mix. COL 
+Mix. PAS 
 :CYC
 CYC
 :Calibrate
@@ -177,6 +180,8 @@ Lum. veille
 Veille après
 :Dn
 Bas
+:Do you really want\nto reset\nthis permanent timer?
+Vous allez remettre\n ce Totalisateur\nà zéro?
 :Down
 Bas
 :ELE
@@ -388,8 +393,8 @@ Pos.
 :Pos/Neg:
 Pos./Neg.:
 >:Position %d
-:PowerOff alert
-Alerte d'arrêt 
+:PwrDn alert:
+Alrm. d'arrêt 
 :Prealert intvl:
 Tempo préAlarm
 :Prealert time:
@@ -426,9 +431,9 @@ Réinit.
 :Remove
 Supprimer
 :Reset
-Reset
+RàZ
 :Reset sw:
-Inter RaZ
+Cmd. RàZ
 :Reverse
 Sens servos
 :Reverse:
@@ -647,8 +652,9 @@ max
 min
 :mult
 multiplier
->:permanent
+:permanent
+permanent
 :replace
 remplacer
 :stopwatch
-Chronomètre
+Chrono
