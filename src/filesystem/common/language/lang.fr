@@ -180,8 +180,8 @@ Lum. veille
 Veille après
 :Dn
 Bas
-:Do you really want\nto reset this\npermanent timer?
-Remise à zéro\n de ce totalisateur?
+:Do you really want\nto reset \nthe permanent timer%d?
+Remise à zéro\n du totalisateur %d?
 :Down
 Bas
 :ELE
@@ -432,6 +432,8 @@ Réinit.
 Supprimer
 :Reset
 RàZ
+:Reset Permanent Timer?
+RaZ Totalisateur?
 :Reset sw:
 Cmd. RàZ
 :Reverse
