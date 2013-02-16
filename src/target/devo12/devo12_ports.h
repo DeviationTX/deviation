@@ -3,15 +3,16 @@
 
 //ADC overrides
 #define ADC_OVERSAMPLE_WINDOW_COUNT 10
-#define _ADC                   ADC3
-#define _RCC_APB2ENR_ADCEN     RCC_APB2ENR_ADC3EN
-#define _RCC_APB2RSTR_ADCRST   RCC_APB2RSTR_ADC3RST
-#define _DMA                   DMA2
-#define _DMA_CHANNEL           DMA_CHANNEL5
-#define _RCC_AHBENR_DMAEN      RCC_AHBENR_DMA2EN
-#define _DMA_ISR               dma2_channel4_5_isr
-#define _DMA_IFCR_CGIF         DMA_IFCR_CGIF5
-#define _NVIC_DMA_CHANNEL_IRQ  NVIC_DMA2_CHANNEL4_5_IRQ
+#define _ADC                    ADC3
+#define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC3EN
+#define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC3RST
+#define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_13DOT5CYC
+#define _DMA                    DMA2
+#define _DMA_CHANNEL            DMA_CHANNEL5
+#define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA2EN
+#define _DMA_ISR                dma2_channel4_5_isr
+#define _DMA_IFCR_CGIF          DMA_IFCR_CGIF5
+#define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA2_CHANNEL4_5_IRQ
 //End ADC
 
 //Power Switch configuration

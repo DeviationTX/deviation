@@ -41,7 +41,9 @@ int main() {
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 
     LCD_Clear(0x0000);
-
+#ifdef TEST_ADC
+    ADC_ScanChannels(); while(1);
+#endif
     u32 buttons = ScanButtons();
     if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount()) {
         LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);

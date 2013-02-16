@@ -70,3 +70,12 @@ void PWR_Sleep()
 {
     asm("wfi");
 }
+
+/* Return milivolts */
+u16 PWR_ReadVoltage(void)
+{
+    u32 v = adc_array_raw[NUM_ADC_CHANNELS-1];
+    /* Multily the above by 1000 to get milivolts */
+    v = v * VOLTAGE_NUMERATOR / 100 + VOLTAGE_OFFSET;
+    return v;
+}

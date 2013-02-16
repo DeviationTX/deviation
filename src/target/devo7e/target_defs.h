@@ -1,5 +1,5 @@
-#ifndef _DEVO8_TARGET_H_
-#define _DEVO8_TARGET_H_
+#ifndef _DEVO7E_TARGET_H_
+#define _DEVO7E_TARGET_H_
 
 #define VECTOR_TABLE_LOCATION 0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
@@ -35,5 +35,8 @@
 
 #define INP_HAS_CALIBRATION 4
 
-#define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
-#endif //_DEVO8_TARGET_H_
+/* Compute voltage from y = 2.1592x + 0.2493 */
+#define VOLTAGE_NUMERATOR 216
+#define VOLTAGE_OFFSET    249
+
+#endif //_DEVO7E_TARGET_H_

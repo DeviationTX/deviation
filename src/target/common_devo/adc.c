@@ -42,7 +42,7 @@ void ADC_Init(void)
 
     /* We want to read the temperature sensor, so we have to enable it. */
     adc_enable_temperature_sensor(_ADC); 
-    adc_set_sample_time_on_all_channels(_ADC, ADC_SMPR_SMP_13DOT5CYC);
+    adc_set_sample_time_on_all_channels(_ADC, _ADC_SMPR_SMP_XXDOT5CYC);
 
     adc_power_on(_ADC);
     adc_reset_calibration(_ADC);
@@ -52,9 +52,12 @@ void ADC_Init(void)
     u32 seed = 0;
     for(int i = 0; i < 8; i++) {
         seed = seed << 4 | ((ADC_Read(16) & 0x03) << 2) | (ADC_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
-        seed ^= ADC_Read(14) << i; //Get a couple more random bits from Voltage sensor
+        seed ^= ADC_Read(adc_chan_sel[NUM_ADC_CHANNELS-1]) << i; //Get a couple more random bits from Voltage sensor
     }
-    adc_disable_temperature_sensor(_ADC); 
+    //This is important.  We're using the temp value as a buffer because otherwise the channel data
+    //Can bleed into the voltage-sense data.
+    //By disabling the temperature, we always read a consistent value
+    adc_disable_temperature_sensor(_ADC);
     printf("RNG Seed: %08x\n", (int)seed);
     srand(seed);
 
@@ -78,7 +81,7 @@ void ADC_Init(void)
     /* we convert only 3 values in one adc-group */
     dma_set_number_of_data(_DMA, _DMA_CHANNEL, SAMPLE_COUNT);
     /* we want an interrupt after the adc is finished */
-    dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
+    //dma_enable_transfer_complete_interrupt(_DMA, _DMA_CHANNEL);
 
     /* dma ready to go. waiting til the peripheral gives the first data */
     dma_enable_channel(_DMA, _DMA_CHANNEL);
@@ -114,12 +117,9 @@ void ADC_StartCapture()
     adc_start_conversion_direct(_ADC);
 }
 
-#if 1
+#if 0
 void _DMA_ISR()
 {
-    //stop continuous mode
-    adc_off(_ADC);
-    adc_power_on(_ADC);
     ADC_Filter();
     medium_priority_cb();
     /* clear the interrupt flag */
@@ -137,13 +137,39 @@ void ADC_Filter()
             idx += NUM_ADC_CHANNELS;
         }
         result /= ADC_OVERSAMPLE_WINDOW_COUNT * WINDOW_SIZE;
-        if (i == NUM_ADC_CHANNELS-1) {
-            // Special case for Tx voltage
-            if(result + (result >> 4) < adc_array_raw[i]) {
-               //Big voltage drop, may be a glitch
-               result = adc_array_raw[i] - (adc_array_raw[i] >> 5);
-            }
-        }
         adc_array_raw[i] = result;
+    }
+}
+
+void ADC_ScanChannels()
+{
+    u32 lastms = 0;
+    u16 max[NUM_ADC_CHANNELS];
+    u16 min[NUM_ADC_CHANNELS];
+    while(1) {
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+        ADC_Filter();
+        for(int i = 0; i < NUM_ADC_CHANNELS; i++) {
+            u32 x = adc_array_raw[i];
+            if (x > max[i])
+                max[i] = x;
+            if (x < min[i])
+                min[i] = x;
+        }
+        u32 ms = CLOCK_getms();
+        if((ms % 100) == 0 && ms != lastms) {
+            lastms = ms;
+            printf("max:");
+            for(int i = 0; i < NUM_ADC_CHANNELS; i++) printf(" %04x", max[i]);
+            printf(" %d\n", max[NUM_ADC_CHANNELS-1]);
+            printf("min:");
+            for(int i = 0; i < NUM_ADC_CHANNELS; i++) printf(" %04x", min[i]);
+            printf(" %d\n", min[NUM_ADC_CHANNELS-1]);
+            printf("    ");
+            for(int i = 0; i < NUM_ADC_CHANNELS; i++) printf(" %04x", adc_array_raw[i]);
+            printf(" %d\n\n", adc_array_raw[NUM_ADC_CHANNELS-1]);
+            memset(max, 0, sizeof(max));
+            memset(min, 0xFF, sizeof(min));
+        }
     }
 }

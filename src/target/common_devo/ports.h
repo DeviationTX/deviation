@@ -3,15 +3,16 @@
 
 #ifndef _ADC
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
-    #define _ADC                   ADC1
-    #define _RCC_APB2ENR_ADCEN     RCC_APB2ENR_ADC1EN
-    #define _RCC_APB2RSTR_ADCRST   RCC_APB2RSTR_ADC1RST
-    #define _DMA                   DMA1
-    #define _DMA_CHANNEL           DMA_CHANNEL1
-    #define _RCC_AHBENR_DMAEN      RCC_AHBENR_DMA1EN
-    #define _DMA_ISR               dma1_channel1_isr
-    #define _DMA_IFCR_CGIF         DMA_IFCR_CGIF1
-    #define _NVIC_DMA_CHANNEL_IRQ  NVIC_DMA1_CHANNEL1_IRQ
+    #define _ADC                    ADC1
+    #define _RCC_APB2ENR_ADCEN      RCC_APB2ENR_ADC1EN
+    #define _RCC_APB2RSTR_ADCRST    RCC_APB2RSTR_ADC1RST
+    #define _ADC_SMPR_SMP_XXDOT5CYC ADC_SMPR_SMP_239DOT5CYC
+    #define _DMA                    DMA1
+    #define _DMA_CHANNEL            DMA_CHANNEL1
+    #define _RCC_AHBENR_DMAEN       RCC_AHBENR_DMA1EN
+    #define _DMA_ISR                dma1_channel1_isr
+    #define _DMA_IFCR_CGIF          DMA_IFCR_CGIF1
+    #define _NVIC_DMA_CHANNEL_IRQ   NVIC_DMA1_CHANNEL1_IRQ
 #endif //_ADC
 
 //Power switch configuration

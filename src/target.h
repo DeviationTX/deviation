@@ -25,6 +25,8 @@ enum {
 };
 #undef BUTTONDEF
 
+#define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
+
 #define NUM_TX_INPUTS (INP_LAST - 1)
 #define NUM_INPUTS (NUM_TX_INPUTS)
 #define NUM_TX_BUTTONS (BUT_LAST - 1)

@@ -6,6 +6,5 @@ include target/common_devo/Makefile.inc
 
 ifndef BUILD_TARGET
 SRC_C   += target/devo8/backlight.c \
-           target/devo8/lcd.c \
-           target/devo8/tx_voltage.c
+           target/devo8/lcd.c
 endif
