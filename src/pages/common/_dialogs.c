@@ -69,11 +69,11 @@ static void invalid_simplemixer_cb(u8 state, void *guiObj)
 
 static void reset_permtimer_cb(u8 state, void *data)
 {
-    u8 idx = (long)data;
+    u8 idx = (long) data;
     if (current_selected_obj != NULL)
 	GUI_SetSelected(current_selected_obj);
     dialog = NULL;
-    if (state == 1) {
+    if (state == 1 ) {
 	Model.timer[idx].val = 0;
 	TIMER_Init();
     }
@@ -83,7 +83,7 @@ const char *reset_timer_string_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    u8 idx = (long)data;
-    sprintf(dlgstr, _tr("Do you really want\nto reset the\n permanent timer %d?"),idx+1);
+    u8 idx = (long) data;
+    sprintf(dlgstr, _tr("Do you really want\nto reset \nthe permanent timer%d?"),idx+1);
     return dlgstr;
 }

@@ -180,7 +180,7 @@ Lum. veille
 Veille après
 :Dn
 Bas
-:Do you really want\nto reset the\n permanent timer %d?
+:Do you really want\nto reset \nthe permanent timer%d?
 Remise à zéro\n du totalisateur %d?
 :Down
 Bas
