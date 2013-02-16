@@ -34,6 +34,7 @@ void iwdg_reset(void);
 #endif
 
 volatile u32 msecs;
+volatile u32 wdg_time;
 u16 (*timer_callback)(void);
 volatile u8 msec_callbacks;
 volatile u32 msec_cbtime[NUM_MSEC_CALLBACKS];
@@ -46,6 +47,9 @@ void CLOCK_Init()
     /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
     systick_set_reload(9000);
     nvic_set_priority(NVIC_SYSTICK_IRQ, 0x0); //Highest priority
+
+    /* We trigger exti2 right before the watchdog fires to do a stack dump */
+    nvic_set_priority(NVIC_EXTI2_IRQ, 0x01); //Highest priority
 
     systick_interrupt_enable();
 
@@ -133,13 +137,18 @@ void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
 
 void CLOCK_StartWatchdog()
 {
-    iwdg_set_period_ms(2000);
+    iwdg_set_period_ms(3000);
     iwdg_start();
+
+    wdg_time = msecs;
+    nvic_clear_pending_irq(NVIC_EXTI2_IRQ);
+    nvic_enable_irq(NVIC_EXTI2_IRQ);
 }
 
 void CLOCK_ResetWatchdog()
 {
     iwdg_reset();
+    wdg_time = msecs;
 }
 void CLOCK_StopTimer() {
     timer_disable_irq(TIM4, TIM_DIER_CC1IE);
@@ -193,6 +202,10 @@ void exti1_isr()
 void sys_tick_handler(void)
 {
 	msecs++;
+        if(msecs - wdg_time > 2000) {
+            nvic_set_pending_irq(NVIC_EXTI2_IRQ);
+            return;
+        }
         if(msec_callbacks & (1 << MEDIUM_PRIORITY)) {
             if (msecs == msec_cbtime[MEDIUM_PRIORITY]) {
                 //medium priority tasks execute in interrupt and main loop context

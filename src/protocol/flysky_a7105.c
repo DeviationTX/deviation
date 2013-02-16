@@ -72,7 +72,7 @@ static u8 chanoffset;
 static u8 packet[21];
 static u16 counter;
 
-static void flysky_init()
+static int flysky_init()
 {
     int i;
     u8 if_calibration1;
@@ -89,11 +89,18 @@ static void flysky_init()
     //IF Filter Bank Calibration
     A7105_WriteReg(0x02, 1);
     A7105_ReadReg(0x02);
-    while(A7105_ReadReg(0x02))
-        ;
+    u32 ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(0x02))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     if_calibration1 = A7105_ReadReg(0x22);
     if(if_calibration1 & A7105_MASK_FBCF) {
         //Calibration failed...what do we do?
+        return 0;
     }
 
     //VCO Current Calibration
@@ -107,11 +114,18 @@ static void flysky_init()
     A7105_WriteReg(0x0f, 0); //Should we choose a different channel?
     //VCO Calibration
     A7105_WriteReg(0x02, 2);
-    while(A7105_ReadReg(0x02))
-        ;
+    ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(0x02))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     vco_calibration0 = A7105_ReadReg(0x25);
     if (vco_calibration0 & A7105_MASK_VBCF) {
         //Calibration failed...what do we do?
+        return 0;
     }
 
     //Calibrate channel 0xa0?
@@ -119,11 +133,18 @@ static void flysky_init()
     A7105_WriteReg(0x0f, 0xa0); //Should we choose a different channel?
     //VCO Calibration
     A7105_WriteReg(0x02, 2);
-    while(A7105_ReadReg(0x02))
-        ;
+    ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(A7105_02_CALC))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     vco_calibration1 = A7105_ReadReg(0x25);
     if (vco_calibration1 & A7105_MASK_VBCF) {
         //Calibration failed...what do we do?
+        return 0;
     }
 
     //Reset VCO Band calibration
@@ -132,6 +153,7 @@ static void flysky_init()
     A7105_SetPower(Model.tx_power);
 
     A7105_Strobe(A7105_STANDBY);
+    return 1;
 }
 
 static void flysky_build_packet(u8 init)
@@ -182,8 +204,13 @@ static u16 flysky_cb()
 
 static void initialize(u8 bind) {
     CLOCK_StopTimer();
-    A7105_Reset();
-    flysky_init();
+    while(1) {
+        A7105_Reset();
+        usleep(10000);
+        CLOCK_ResetWatchdog();
+        if (flysky_init())
+            break;
+    }
     if (Model.fixed_id) {
         id = Model.fixed_id;
     } else {

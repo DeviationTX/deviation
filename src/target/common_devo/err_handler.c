@@ -27,6 +27,15 @@ void hard_fault_handler()
 "    MRSNE R0, PSP\n"
 "    B hard_fault_handler_c\n");
 }
+void exti2_isr()
+{
+    asm(
+"    TST LR, #4\n"
+"    ITE EQ\n"
+"    MRSEQ R0, MSP\n"
+"    MRSNE R0, PSP\n"
+"    B hard_fault_handler_c\n");
+}
 static u32 debug_addr = 0;
 void write_byte(u8 x) {
     if(debug_addr)

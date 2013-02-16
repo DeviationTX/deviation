@@ -34,18 +34,6 @@ static u16 xpos, ypos, xstart, xend;
 
 extern void PARFlash_Init();
 
-static void usleep(unsigned int x)
-{
-    (void)x;
-    asm ("mov r1, #24;"
-         "mul r0, r0, r1;"
-         "b _delaycmp;"
-         "_delayloop:"
-         "subs r0, r0, #1;"
-         "_delaycmp:;"
-         "cmp r0, #0;"
-         " bne _delayloop;");
-}
 void WRITE_PX(unsigned int c) {
     LCD_DATA = (c >> 16) & 0xff;
     LCD_DATA = c & 0xFFFF;
