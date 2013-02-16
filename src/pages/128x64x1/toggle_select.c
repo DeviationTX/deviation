@@ -80,7 +80,7 @@ static void show_iconsel_page(int SelectedIcon)
 
     if (num_positions == 3) {
         row += ITEM_HEIGHT + 2;
-        GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
+        GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "2:");
         img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);
