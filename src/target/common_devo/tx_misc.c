@@ -17,7 +17,7 @@ void TxName(u8 *var, u8 len)
     var[len - 1] = 0;
 }
 
-void usleep(u32 x)
+void _usleep(u32 x)
 {
     (void)x;
     asm ("mov r1, #24;"

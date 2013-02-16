@@ -146,7 +146,8 @@ int FS_OpenDir(const char *path);
 int FS_ReadDir(char *path);
 void FS_CloseDir();
 
-void usleep(u32 usec);
+void _usleep(u32 usec);
+#define usleep _usleep
 
 /* Abstract bootloader access */
 enum {
