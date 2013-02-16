@@ -16,30 +16,10 @@
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 #define gui (&gui_objs.u.stdswitch)
 
-
-typedef struct {
-    u8 switches[3]; // maximum is 3(such as INP_MIX, INP_FMOD), minimun is 2(such as INP_RUD_DR, INP_ELE_DR, INP_AIL_DR, INP_GEAR)
-    char name[15];
-} SwitchTable;
-static SwitchTable switch_table[] = {
-    {{0, INP_RUD_DR1, ALWAYSOFF_SWITCH}, "RUD DR"},  // no translation for switch labels
-    {{0, INP_ELE_DR1, ALWAYSOFF_SWITCH}, "ELE DR"},
-    {{0, INP_AIL_DR1, ALWAYSOFF_SWITCH}, "AIL DR"},
-    {{0,   INP_GEAR1,   ALWAYSOFF_SWITCH}, "GEAR"},
-    {{0,   INP_MIX1,        INP_MIX2},         "MIX"},
-    {{0,  INP_FMOD1,       INP_FMOD2},        "FMOD"},
-};
 static u8 switch_idx[SWITCHFUNC_LAST];
 
 static u8 get_switch_idx(FunctionSwitch switch_type) {
-    for (u8 i = 0; i < 6; i++) {
-        for (u8 j = 0; j < 3; j++) {
-            if (mapped_simple_channels.switches[switch_type] == switch_table[i].switches[j])
-                return i;
-        }
-    }
-    //printf("something is wrong in get_switch_idx()\n\n");
-    return 0; // this is impossible
+    return mapped_simple_channels.switches[switch_type] - INPUT_SwitchPos(mapped_simple_channels.switches[switch_type]);
 }
 
 static void refresh_switches()
@@ -47,7 +27,7 @@ static void refresh_switches()
     struct Mixer *mix = MIXER_GetAllMixers();
 
     if (Model.limits[mapped_simple_channels.throttle].safetysw)
-        mapped_simple_channels.switches[SWITCHFUNC_HOLD] =  Model.limits[mapped_simple_channels.throttle].safetysw;
+        mapped_simple_channels.switches[SWITCHFUNC_HOLD] =  MIXER_SRC(Model.limits[mapped_simple_channels.throttle].safetysw);
     u8 found_gyro_switch = 0;
     u8 found_flymode_switch = 0;
     u8 found_drexp_rud_switch = 0;
@@ -86,13 +66,13 @@ void save_changes()
 {
     MUSIC_Play(MUSIC_SAVING);
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
-        if (switch_type == SWITCHFUNC_HOLD) // bug fix: hold should use pos 1 instead of pos 0
-            mapped_simple_channels.switches[switch_type] = switch_table[switch_idx[switch_type]].switches[1];
-        else
-            mapped_simple_channels.switches[switch_type] = switch_table[switch_idx[switch_type]].switches[0];
+        mapped_simple_channels.switches[switch_type] = switch_idx[switch_type];
 
     if (Model.limits[mapped_simple_channels.throttle].safetysw)
-       Model.limits[mapped_simple_channels.throttle].safetysw = mapped_simple_channels.switches[SWITCHFUNC_HOLD];
+       Model.limits[mapped_simple_channels.throttle].safetysw =
+             mapped_simple_channels.switches[SWITCHFUNC_HOLD]
+             ? 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
+             : 0;
 
     u8 gyro_gear_count = 0;
     u8 gyro_aux2_count = 0;
@@ -103,44 +83,56 @@ void save_changes()
     u8 pit_count = 0;
     struct Mixer *mix = MIXER_GetAllMixers();
     for (u8 i = 0; i < NUM_MIXERS; i++) {
-        if (!MIXER_SRC(mix[i].src) || mix[i].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
+        u8 *count = NULL;
+        int sw;
+        if (!MIXER_SRC(mix[i].src) || mix[i].mux != MUX_REPLACE)  // all non-replace mux will be considered as program mix in the Standard mode
             continue;
-
         if (mix[i].dest == mapped_simple_channels.gear) {
-            if (gyro_gear_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_GYROSENSE]].switches[gyro_gear_count++];
+            count = &gyro_gear_count;
+            sw = SWITCHFUNC_GYROSENSE;
         } else if (mix[i].dest == mapped_simple_channels.aux2) {
-            if (gyro_aux2_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_GYROSENSE]].switches[gyro_aux2_count++];
+            count = &gyro_aux2_count;
+            sw = SWITCHFUNC_GYROSENSE;
         } else if (mix[i].dest == mapped_simple_channels.aile) {
-            if (drexp_aile_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_DREXP_AIL]].switches[drexp_aile_count++];
+            count = &drexp_aile_count;
+            sw = SWITCHFUNC_DREXP_AIL;
         } else if (mix[i].dest == mapped_simple_channels.elev) {
-            if (drexp_elev_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_DREXP_ELE]].switches[drexp_elev_count++];
+            count = &drexp_elev_count;
+            sw = SWITCHFUNC_DREXP_ELE;
         } else if (mix[i].dest == mapped_simple_channels.rudd) {
-            if (drexp_rudd_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_DREXP_RUD]].switches[drexp_rudd_count++];
+            count = &drexp_rudd_count;
+            sw = SWITCHFUNC_DREXP_RUD;
         } else if (mix[i].dest == mapped_simple_channels.pitch) {
-            if (pit_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[pit_count++];
-            else if (pit_count == 3 && mix[i].sw != ALWAYSOFF_SWITCH)
-                mix[i].sw = mapped_simple_channels.switches[SWITCHFUNC_HOLD];  // hold curve
+            if (pit_count < 3) {
+                count = &pit_count;
+                sw = SWITCHFUNC_FLYMODE;
+            } else if (pit_count == 3 && mix[i].sw != ALWAYSOFF_SWITCH) {
+                mix[i].sw = 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD];  // hold curve
+                continue;
+            }
         } else if (mix[i].dest == mapped_simple_channels.throttle) {
-            if (thro_count < 3)
-                mix[i].sw = switch_table[switch_idx[SWITCHFUNC_FLYMODE]].switches[thro_count++];
+            count = &thro_count;
+            sw = SWITCHFUNC_FLYMODE;
+        }
+        if (count && *count < INPUT_NumSwitchPos(switch_idx[sw])) {
+            mix[i].sw = switch_idx[sw] + *count;
+            *count = (*count) + 1;
         }
     }
 }
 
 
+//From common/_main_config.c
+extern int fix_abbrev_src(int origval, int newval, int dir);
 static const char *switch_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     FunctionSwitch switch_type = (long)data;
-    switch_idx[switch_type] = GUI_TextSelectHelper(switch_idx[switch_type], 0, 5, dir, 1, 1, NULL);
-    strcpy(mp->tmpstr, switch_table[switch_idx[switch_type]].name);
-    return mp->tmpstr;
+    int first = INP_HAS_CALIBRATION+1;
+    int last = INP_LAST-1;
+    int newval = GUI_TextSelectHelper(switch_idx[switch_type], first, last, dir, 1, 1, NULL);
+    switch_idx[switch_type] = fix_abbrev_src(switch_idx[switch_type], newval, dir);
+    return INPUT_SourceNameAbbrevSwitch(mp->tmpstr, switch_idx[switch_type]);
 }
 
 
