@@ -30,7 +30,9 @@
 
 #define INP_HAS_CALIBRATION 10
 
-#define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
+/* Compute voltage from y = 0.001662x - 0.03988 */
+#define VOLTAGE_NUMERATOR 166
+#define VOLTAGE_OFFSET     20
 
 #include "devo12_ports.h"
 

@@ -27,5 +27,8 @@
 
 #define INP_HAS_CALIBRATION 6
 
-#define CHAN_ButtonMask(btn) (btn ? (1 << (btn - 1)) : 0)
+/* Compute voltage from y = 0.003246x + 0.4208 */
+#define VOLTAGE_NUMERATOR 324
+#define VOLTAGE_OFFSET    421
+
 #endif //_DEVO10_TARGET_H_
