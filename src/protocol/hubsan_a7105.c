@@ -58,7 +58,7 @@ enum {
 };
 #define WAIT_WRITE 0x80
 
-static void hubsan_init()
+static int hubsan_init()
 {
     u8 if_calibration1;
     u8 vco_calibration0;
@@ -84,12 +84,19 @@ static void hubsan_init()
     A7105_WriteReg(0x02, 1);
     //vco_current =
     A7105_ReadReg(0x02);
-    while(A7105_ReadReg(0x02))
-        ;
+    u32 ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(0x02))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     if_calibration1 = A7105_ReadReg(A7105_22_IF_CALIB_I);
     A7105_ReadReg(A7105_24_VCO_CURCAL);
     if(if_calibration1 & A7105_MASK_FBCF) {
         //Calibration failed...what do we do?
+        return 0;
     }
 
     //VCO Current Calibration
@@ -103,11 +110,18 @@ static void hubsan_init()
     A7105_WriteReg(A7105_0F_CHANNEL, 0);
     //VCO Calibration
     A7105_WriteReg(0x02, 2);
-    while(A7105_ReadReg(0x02))
-        ;
+    ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(0x02))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     vco_calibration0 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
     if (vco_calibration0 & A7105_MASK_VBCF) {
         //Calibration failed...what do we do?
+        return 0;
     }
 
     //Calibrate channel 0xa0?
@@ -115,8 +129,14 @@ static void hubsan_init()
     A7105_WriteReg(A7105_0F_CHANNEL, 0xa0);
     //VCO Calibration
     A7105_WriteReg(A7105_02_CALC, 2);
-    while(A7105_ReadReg(A7105_02_CALC))
-        ;
+    ms = CLOCK_getms();
+    CLOCK_ResetWatchdog();
+    while(CLOCK_getms()  - ms < 500) {
+        if(! A7105_ReadReg(A7105_02_CALC))
+            break;
+    }
+    if (CLOCK_getms() - ms >= 500)
+        return 0;
     vco_calibration1 = A7105_ReadReg(A7105_25_VCO_SBCAL_I);
     if (vco_calibration1 & A7105_MASK_VBCF) {
         //Calibration failed...what do we do?
@@ -128,6 +148,7 @@ static void hubsan_init()
     A7105_SetPower(Model.tx_power);
 
     A7105_Strobe(A7105_STANDBY);
+    return 1;
 }
 
 static void update_crc()
@@ -261,8 +282,13 @@ static u16 hubsan_cb()
 
 static void initialize() {
     CLOCK_StopTimer();
-    A7105_Reset();
-    hubsan_init();
+    while(1) {
+        A7105_Reset();
+        usleep(10000);
+        CLOCK_ResetWatchdog();
+        if (hubsan_init())
+            break;
+    }
     sessionid = rand();
     channel = allowed_ch[rand() % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);

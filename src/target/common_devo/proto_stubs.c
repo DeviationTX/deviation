@@ -26,6 +26,7 @@ extern void spi_read();
 extern void spi_set_unidirectional_mode();
 extern void UART_Stop();
 extern void rcc_peripheral_disable_clock();
+extern void usleep();
 
 void PROTO_Stubs(int idx)
 {
@@ -40,4 +41,5 @@ void PROTO_Stubs(int idx)
 
     UART_Stop();
     rcc_peripheral_disable_clock();
+    usleep();
 }
