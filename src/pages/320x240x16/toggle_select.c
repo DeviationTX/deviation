@@ -34,7 +34,7 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
         // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
         u8 IconPosition = ((long)data      ) & 0xff;
         u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
-        Model.pagecfg.tglico[tp.tglidx][IconNumber] = IconPosition + 1;
+        Model.pagecfg.tglico[tp.tglidx][IconNumber] = IconPosition;
         show_iconsel_page(IconNumber);
     }
 }
@@ -75,7 +75,6 @@ static void show_iconsel_page(int SelectedIcon)
     // style the switch textbox
     struct LabelDesc outline = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_TRANSPARENT };
     GUI_CreateRect(&gui5->toggleframe, 80+80*SelectedIcon, 39, 77, 33, &outline);
-    long posX, posY;
 
     GUI_CreateLabelBox(&gui5->switchbox,  4, 47, 70, 22, &NORMALBOX_FONT, NULL, NULL,
                        INPUT_SourceNameAbbrevSwitch(tp.str, Model.pagecfg.toggle[tp.tglidx]));
@@ -101,19 +100,14 @@ static void show_iconsel_page(int SelectedIcon)
     }
     u8 cursel = Model.pagecfg.tglico[tp.tglidx][SelectedIcon] - 1;
     long pos = 0;
-    posX = 0;
-    posY = 0;
     for(j = 0; j < 4; j++) {
         y = 80 + j * 40;
-        for(i = 0; i < 8; i++,pos++,posX+=TOGGLEICON_WIDTH) {
+        for(i = 0; i < 8; i++,pos++) {
             if (pos >= count) break;
+            img = TGLICO_GetImage(pos);
             x = 4 + i*(TOGGLEICON_WIDTH+8);
             if (pos == cursel) GUI_CreateRect(&gui5->symbolframe, x-1, y-1, TOGGLEICON_WIDTH+2, TOGGLEICON_HEIGHT+2, &outline);
-            while (posX >= w) {
-                posX -= w;
-                posY += TOGGLEICON_HEIGHT;
-            }
-            GUI_CreateImageOffset(&gui5->symbolicon[pos], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, posX, posY, TOGGLE_FILE,
+            GUI_CreateImageOffset(&gui5->symbolicon[pos], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
                                     tglico_select_cb, (void *)((long)(SelectedIcon << 8) | pos));
         }
     }
