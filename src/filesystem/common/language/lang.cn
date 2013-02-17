@@ -53,16 +53,23 @@
 >:AUX6
 >:AUX7
 :About Deviation
-关于Deviation固件
+关于本系统
+:Add
+增加
 :Advanced
-高级模式
+高级模式1
+:Advanced2
+高级模式2
 :Airplane
 固定翼
 :Alarm
 报警
->:Alarm intvl:
+:Alarm intvl:
+报警间隔
 :Altitude
 高度
+:Are you sure to\ndelete this mix?
+是否确定删除\n当前混控?
 :Auto
 自动
 >:Aux2
@@ -91,10 +98,13 @@
 第%d栏
 :Button monitor
 按键监控
->:Buzz settings
+:Buzz settings
+报警设置
 :Buzz volume:
 音量
->:Buzzer settings
+:Buzzer settings
+报警设置
+>:CCPM
 :COL
 螺距
 :COL Inv
@@ -126,11 +136,17 @@ CYC
 :Change
 改变
 :Channel
-指定通道
+通道
+:Channel config
+通道基本配置
+:Channel mix
+通道混控配置
 :Channel monitor
 通道监控
 :Channel output
 通道输出
+:Channel reorder
+调整通道顺序
 :Complex
 多段式
 :Configure
@@ -141,8 +157,12 @@ CYC
 复制到
 :Copy To...
 复制...
+:CopyTo
+复制
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
+:Curve
+曲线
 :Curve:
 曲线
 :Cyclic1
@@ -152,16 +172,23 @@ CCPM2
 :Cyclic3
 CCPM3
 :D/R & Exp
-舵量及舵机指数
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+舵量/曲线
+:D/R&Exp -AIL
+副翼舵量/曲线
+:D/R&Exp -ELE
+升降舵量/曲线
+:D/R&Exp -RUD
+方向舵量/曲线
 :DR
 舵量
 :Deadband
 死区
 :Default
 缺省
+:Default input
+默认输入
+:Dele
+删除
 :Delta PW
 脉宽变化
 :Deviation FW version:
@@ -172,8 +199,14 @@ Deviation固件版本:
 背光减弱时间
 :Dn
 下
+:Do you really want\nto reset the\n permanent timer %d?
+是否确定\n重置持续\n计时器%d?
 :Down
 下
+:Dual Rate
+两段
+:Duplicate mix\n exists!
+相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -183,6 +216,8 @@ Deviation固件版本:
 升降螺距
 :EXPO
 指数曲线
+:Edit
+编辑
 :Enter
 进入
 :Exit
@@ -190,17 +225,12 @@ Deviation固件版本:
 :Expo&DR
 三段式
 >:FMODE
-<:FMODE0
-<FMOD0
-<:FMODE1
-<FMOD1
-<:FMODE2
-<FMOD2
 :Fahren
 华氏
 :Fail safe
 失控保护
->:Failsafe
+:Failsafe
+失控保护
 :Failsafe:
 失控保护
 :File:
@@ -223,7 +253,8 @@ Deviation固件版本:
 基本设置
 :Gyro sense
 锁尾感度
->:H
+:H
+高
 >:HOLD
 :Heli
 直升机
@@ -250,14 +281,16 @@ Deviation固件版本:
 插入
 :Inverted
 反向
->:L
+:L
+低
 :LCD settings
 LCD设置
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
->:LIN
+:LIN
+线性
 :Language:
 语言
 :Latitude
@@ -279,7 +312,8 @@ LCD设置
 低电量
 :Low-Rate
 3D飞行2
->:M
+:M
+中
 >:MIX
 :Main menu
 主菜单
@@ -287,6 +321,8 @@ LCD设置
 主页面
 :Main page config
 定制主页面
+:Master
+输入
 :Max Limit:
 最大舵量
 :Menu
@@ -313,8 +349,10 @@ LCD设置
 模型设置
 :Model name:
 模型命名
->:Model needs reset\nfor standard mixer
->:Model needs to be reset\nin order to switch to the standard mixer
+:Model needs reset\nfor standard mixer
+切换到通用模式\n需要重置,确定吗?
+:Model needs to be reset\nin order to switch to the standard mixer
+本设置与通用模式不兼容,需要进行重置,\n是否确定?
 :Model setup
 模型设置
 :Model type:
@@ -325,6 +363,12 @@ LCD设置
 上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
+:MoveDn
+下移
+:MoveUp
+上移
+:Mux
+作用
 :Mux:
 作用
 :Neg
@@ -341,8 +385,6 @@ LCD设置
 无
 :Normal
 正常
-<:Not a traditional\n model, reset it?
-<本模型与通用模式\n不兼容, 是否重置？
 :Notch PW
 通道间隔
 :Off
@@ -363,17 +405,24 @@ LCD设置
 螺距曲线
 :Plane
 固定翼
+:Point
+点
 :Point:
 点
 :Pos
 正
->:Pos 0:
->:Pos 1:
->:Pos 2:
+:Pos 0:
+位置0
+:Pos 1:
+位置1
+:Pos 2:
+位置2
 :Pos/Neg:
 正/负
->:Position %d
->:PowerOff alert
+:Position %d
+档位%1
+:PowerOff alert
+关机提示
 :Prealert intvl:
 预警间隔
 :Prealert time:
@@ -390,9 +439,12 @@ LCD设置
 按ENT使U盘:
 :Preview: Long-Press ENT
 长按ENT预览,EXT返回
+:Program mix
+程式混控
 :Protocol:
 通信协议
->:PwrDn alert:
+:PwrDn alert:
+无电提示
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -404,13 +456,20 @@ LCD设置
 :RUD
 方向
 >:RUD DR
+:Rate
+分段
 :Re-Init
 初始化
+:Reach max mix\nlimit for a channel!
+此通道程式混控\n数量达到上限！
 :Remove
 删除
 :Reset
 重置
->:Reset sw:
+:Reset Permanent Timer?
+是否确定重置\n持续计时器?
+:Reset sw:
+重置开关
 :Reverse
 舵机正逆转
 :Reverse:
@@ -431,7 +490,8 @@ LCD设置
 保存
 :Scale%s:
 比例%s
->:Scale:
+:Scale:
+比例:
 :Scanner
 信号扫描器
 :Servo
@@ -440,8 +500,8 @@ LCD设置
 一段式
 :Simple 4 Channel
 4通道
-<:Simplfied
-<通用模式
+:Slave
+被控通道
 :Speed
 速度
 :Speed:
@@ -450,10 +510,12 @@ LCD设置
 输入
 :Src:
 输入
->:Standard
->:Standard Mixer
+:Standard Mixer
+通用模式
 :Start:
 开始时间
+:Std Heli
+标准直机
 :Step:
 幅度
 :Stick input
@@ -462,7 +524,8 @@ LCD设置
 摇杆模式
 :Sticks:
 摇杆/旋钮
->:Sub-trim
+:Sub-trim
+微调
 :Subtrim
 微调
 :Subtrim:
@@ -471,8 +534,8 @@ LCD设置
 斜盘设置
 :SwashType:
 斜盘模式
-<:Switch %d:
-<开关 %d
+:Switch
+开关
 :Switch assignment
 开关分配
 :Switch1
@@ -589,11 +652,14 @@ LCD设置
 :Tx power:
 发射功率
 >:USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+USB文件系统当前状态
 >:Unknown
 >:Unlocked
 :Up
 上
+:UseTrim
+微调
 :Value
 感度值
 :Value:
@@ -601,7 +667,7 @@ LCD设置
 :Vibration:
 振动
 :Virt
-虚通道
+虚拟
 :Volt
 电压
 :Volt:
@@ -624,7 +690,8 @@ LCD设置
 最小
 :mult
 叠加
->:permanent
+:permanent
+持续计时
 :replace
 替换
 :stopwatch

@@ -114,8 +114,14 @@ void save_changes()
             count = &thro_count;
             sw = SWITCHFUNC_FLYMODE;
         }
-        if (count && *count < INPUT_NumSwitchPos(switch_idx[sw])) {
-            mix[i].sw = switch_idx[sw] + *count;
+        if (count) {
+            // bug fix: a) must not assign switch for the 1st mix; b) must assign a none-used switch(virt10 here) for 2-way switch. Otherwise, it won't work properly
+            if (*count == 0)
+                mix[i].sw = 0;
+            else if (*count < INPUT_NumSwitchPos(switch_idx[sw]))
+                mix[i].sw = switch_idx[sw] + *count;
+            else
+                mix[i].sw = ALWAYSOFF_SWITCH;
             *count = (*count) + 1;
         }
     }

@@ -205,8 +205,8 @@ Aux2
 Время гашения:
 :Dn
 Вниз
-:Do you really want\nto reset\nthe permanent timer?
-Вы действительно\nхотите сбросить\nинтегральный таймер?
+:Do you really want\nto reset the\n permanent timer %d?
+Вы действительно\nхотите сбросить\nинтегральный таймер %d?
 :Down
 Вниз
 :ELE

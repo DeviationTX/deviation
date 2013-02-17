@@ -157,9 +157,12 @@ void PAGE_MainEvent()
             }
         } else {
             //Non switch
-            img = TGLICO_GetImage(Model.pagecfg.tglico[i][raw[src] > 0 ? 1 : 0]);
+            int sw = raw[src] > 0 ? 1 : 0;
+            if (Model.pagecfg.tglico[i][sw]) {
+                img = TGLICO_GetImage(Model.pagecfg.tglico[i][sw]);
+            }
         }
-        if (img.file && strcmp(img.file, GRAY_FILE)) {
+        if (img.file) {
             GUI_ChangeImage(&gui->toggle[i], img.file, img.x_off, img.y_off);
             GUI_SetHidden((guiObject_t *)&gui->toggle[i], 0);
         } else {
