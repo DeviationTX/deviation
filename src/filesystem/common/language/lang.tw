@@ -54,15 +54,22 @@
 >:AUX7
 :About Deviation
 關於 Deviation
+:Add
+增加
 :Advanced
-進階式
+增強模式1
+:Advanced2
+增強模式2
 :Airplane
 飛機
 :Alarm
 警示
->:Alarm intvl:
+:Alarm intvl:
+警示間隔
 :Altitude
 海拔
+:Are you sure to\ndelete this mix?
+是否確定刪除\n當前混控?
 :Auto
 自動
 >:Aux2
@@ -91,10 +98,13 @@
 訊息框 %d:
 :Button monitor
 按鍵內容檢視
->:Buzz settings
+:Buzz settings
+======警示參數======
 :Buzz volume:
 警示音量:
->:Buzzer settings
+:Buzzer settings
+警示參數
+>:CCPM
 :COL
 集體螺距
 :COL Inv
@@ -125,11 +135,17 @@
 :Change
 更改
 :Channel
-指定通道
+通道
+:Channel config
+通道基本規畫
+:Channel mix
+通道混控規畫
 :Channel monitor
 通道內容檢視
 :Channel output
 輸出通道
+:Channel reorder
+調整通道順序
 :Complex
 多段式
 :Configure
@@ -140,8 +156,12 @@
 複製到
 :Copy To...
 複製到...
+:CopyTo
+複製
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 電池電壓不足！\n\n使用中的設定已儲存.\n未來更動將不再儲存.\n\n請即更換電池！
+:Curve
+曲線
 :Curve:
 曲線:
 :Cyclic1
@@ -152,15 +172,22 @@
 循環3
 :D/R & Exp
 大小動與曲線
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+:D/R&Exp -AIL
+大小動-副翼
+:D/R&Exp -ELE
+大小動-升降
+:D/R&Exp -RUD
+大小動-方向
 :DR
 大小動
 :Deadband
 死區
 :Default
 預設
+:Default input
+默認輸入
+:Dele
+移除
 :Delta PW
 增減幅度
 :Deviation FW version:
@@ -171,8 +198,14 @@ Deviation 韌體版本：
 省電啟動時間:
 :Dn
 下
+:Do you really want\nto reset the\n permanent timer %d?
+是否確定重置\n持久計時器%d?
 :Down
 下
+:Dual Rate
+兩段
+:Duplicate mix\n exists!
+相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -182,6 +215,8 @@ Deviation 韌體版本：
 升降螺距:
 :EXPO
 曲線
+:Edit
+編輯
 :Enter
 輸入
 :Exit
@@ -189,17 +224,12 @@ Deviation 韌體版本：
 :Expo&DR
 三段式
 >:FMODE
-<:FMODE0
-<FMOD0
-<:FMODE1
-<FMOD1
-<:FMODE2
-<FMOD2
 :Fahren
 華氏
 :Fail safe
 失效保護
->:Failsafe
+:Failsafe
+失效保護
 :Failsafe:
 失效保護
 :File:
@@ -221,7 +251,8 @@ PPM週期
 ======基本參數======
 :Gyro sense
 鎖尾感度
->:H
+:H
+高
 >:HOLD
 :Heli
 直升機
@@ -244,17 +275,20 @@ PPM週期
 輸入內容檢視
 :Input:
 輸入:
->:Insert
+:Insert
+插入
 :Inverted
 反向的
->:L
+:L
+低
 :LCD settings
 ======液晶參數======
 :LEFT_H
 左水平
 :LEFT_V
 左垂直
->:LIN
+:LIN
+線性
 :Language:
 使用語系:
 :Latitude
@@ -275,7 +309,8 @@ PPM週期
 >:Low Battery
 :Low-Rate
 低位
->:M
+:M
+中
 >:MIX
 :Main menu
 主選單
@@ -283,6 +318,8 @@ PPM週期
 主螢幕
 :Main page config
 螢幕排列規畫
+:Master
+輸入
 :Max Limit:
 輸出上限:
 :Menu
@@ -309,8 +346,10 @@ PPM週期
 模型選單
 :Model name:
 模型名稱:
->:Model needs reset\nfor standard mixer
->:Model needs to be reset\nin order to switch to the standard mixer
+:Model needs reset\nfor standard mixer
+切換到通用模式\n需要重置,確定嗎?
+:Model needs to be reset\nin order to switch to the standard mixer
+本設置與通用模式不兼容,需要進行重置,\n是否確定?
 :Model setup
 模型設定
 :Model type:
@@ -321,6 +360,12 @@ PPM週期
 上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 移動所有搖桿\n通過上下極限區域\n按 ENT 校準 
+:MoveDn
+上移
+:MoveUp
+下移
+:Mux
+混合
 :Mux:
 混合:
 :Neg
@@ -336,9 +381,7 @@ PPM週期
 :None
 無
 :Normal
-一般
-<:Not a traditional\n model, reset it?
-<不相容於通用模式規\n畫的模型檔,重置它?
+正常的
 :Notch PW
 通道間隔
 :Off
@@ -359,17 +402,24 @@ PPM週期
 螺距曲線
 :Plane
 飛機
+:Point
+點
 :Point:
 點:
 :Pos
 正
->:Pos 0:
->:Pos 1:
->:Pos 2:
+:Pos 0:
+位置0
+:Pos 1:
+位置1
+:Pos 2:
+位置2
 :Pos/Neg:
 正/負:
->:Position %d
->:PowerOff alert
+:Position %d
+档位%d
+:PowerOff alert
+無電警示
 :Prealert intvl:
 倒數預警間隔:
 :Prealert time:
@@ -386,9 +436,12 @@ PPM週期
 按 ENT 讓 USB：
 :Preview: Long-Press ENT
 長按 ENT 預覽 EXT 離開
+:Program mix
+程式混控
 :Protocol:
 通訊協定:
->:PwrDn alert:
+:PwrDn alert:
+關機警示
 :RIGHT_H
 右水平
 :RIGHT_V
@@ -400,12 +453,20 @@ PPM週期
 :RUD
 方向
 >:RUD DR
+:Rate
+分段
 :Re-Init
 重對頻
->:Remove
+:Reach max mix\nlimit for a channel!
+此通道程式混控\n數量達到上限！
+:Remove
+刪除
 :Reset
 重置
->:Reset sw:
+:Reset Permanent Timer?
+是否確定重置\n持久計時器?
+:Reset sw:
+重置開關
 :Reverse
 輸出方向
 :Reverse:
@@ -426,7 +487,8 @@ PPM週期
 儲存
 :Scale%s:
 比例%s:
->:Scale:
+:Scale:
+比例:
 :Scanner
 2.4G頻道掃描
 :Servo
@@ -435,8 +497,8 @@ PPM週期
 單段式
 :Simple 4 Channel
 簡單4通道
-<:Simplfied
-<通用模式
+:Slave
+被控通道
 :Speed
 速率
 :Speed:
@@ -445,10 +507,12 @@ PPM週期
 訊號來源
 :Src:
 來源:
->:Standard
->:Standard Mixer
+:Standard Mixer
+通用模式
 :Start:
 開始時間:
+:Std Heli
+通用直機
 :Step:
 步幅
 :Stick input
@@ -457,7 +521,8 @@ PPM週期
 搖桿模式:
 :Sticks:
 搖桿校正:
->:Sub-trim
+:Sub-trim
+微調
 :Subtrim
 微調
 :Subtrim:
@@ -466,8 +531,8 @@ PPM週期
 十字盤設定
 :SwashType:
 十字盤類型:
-<:Switch %d:
-<開關框%d:
+:Switch
+開關
 :Switch assignment
 指定切換開關
 :Switch1
@@ -586,12 +651,15 @@ PPM週期
 :Tx power:
 發射功率:
 >:USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+USB文件系統當前狀態
 :Unknown
 未知
 >:Unlocked
 :Up
 上
+:UseTrim
+微調
 :Value
 數值
 :Value:
@@ -622,7 +690,8 @@ PPM週期
 最小值
 :mult
 相乘
->:permanent
+:permanent
+持久計時
 :replace
 取代
 :stopwatch
