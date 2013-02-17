@@ -22,6 +22,10 @@
 #include "protocol/interface.h"
 #include "fltk.h"
 
+#undef usleep
+void _usleep(u32 usec) {
+    usleep(usec);
+}
 void TxName(u8 *var, u8 len) {
     const u8 model[] = EMU_STRING;
     if(len > 12)
