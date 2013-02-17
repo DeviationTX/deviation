@@ -22,6 +22,8 @@
 #include "mixer_simple.h"
 #include "../../common/simple/_gyrosense_page.c"
 
+#define gui (&gui_objs.u.stdgyro)
+
 
 void PAGE_GyroSenseInit(int page)
 {

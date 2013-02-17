@@ -27,10 +27,8 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
     throhold_state = GUI_TextSelectHelper(throhold_state, 0, 1, dir, 1, 1, &changed);
     if (changed) {
         if (throhold_state == 1) {
-	    Model.limits[mapped_simple_channels.throttle].safetysw = // bug fix: must use inverse position for hold switch
-                mapped_simple_channels.switches[SWITCHFUNC_HOLD]
-                     ? 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
-                     : 0;
+            Model.limits[mapped_simple_channels.throttle].safetysw =
+                    mapped_simple_channels.switches[SWITCHFUNC_HOLD];
             if (Model.limits[mapped_simple_channels.throttle].safetyval == 0)
                 Model.limits[mapped_simple_channels.throttle].safetyval = -110;
         } else

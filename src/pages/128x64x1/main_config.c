@@ -123,6 +123,11 @@ guiObject_t *firstObj;
 #define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLEICON_WIDTH)
 /*************************************/
 
+enum {
+    MAIN_PAGE,
+    SWITCHICON_SELECTION_PAGE
+} page_type;
+
 #include "../common/_main_config.c"
 
 #define VIEW_ID 0
@@ -139,6 +144,7 @@ static int size_cb(int absrow, void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
+    page_type = SWITCHICON_SELECTION_PAGE;
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     TGLICO_Select(obj, data);
 }
@@ -212,6 +218,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 }
 static void _show_page()
 {
+    page_type = MAIN_PAGE;
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                      ITEM_SPACE, ITEM_MENU + NUM_QUICKPAGES, row_cb, getobj_cb, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
@@ -228,10 +235,21 @@ u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-	if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS))
-            PAGE_ChangeByID(PAGEID_MAIN, 1);
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+	    if (page_type == MAIN_PAGE)
+                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            else
+                PAGE_MainCfgInit(-1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+	    if (page_type == MAIN_PAGE)
+                PAGE_ChangeByID(PAGEID_MAIN, 1);
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT) && page_type == SWITCHICON_SELECTION_PAGE) {
+            guiObject_t *obj = GUI_GetSelected();
+            GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
+        }  else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && page_type == SWITCHICON_SELECTION_PAGE) {
+            guiObject_t *obj = GUI_GetSelected();
+            GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+        }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;
