@@ -41,13 +41,13 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         for ( i = 0; i < 9; i++)
             GUI_Redraw(&gui->val[i]);
     }
-    strcpy(mp->tmpstr, (const char *)SIMPLEMIX_ModeName(pit_mode));
+    strcpy(mp->tmpstr, (const char *)STDMIX_ModeName(pit_mode));
     return mp->tmpstr;
 }
 
 static void get_hold_state()
 {
-    if (mp->mixer_ptr[3]->sw ==  mapped_simple_channels.switches[SWITCHFUNC_HOLD])
+    if (mp->mixer_ptr[3]->sw ==  mapped_std_channels.switches[SWITCHFUNC_HOLD])
         pit_hold_state = 1;
     else
         pit_hold_state = 0;
@@ -57,7 +57,7 @@ static void set_hold_state(u8 state) {
     if (state == 0)
         mp->mixer_ptr[PITTHROMODE_HOLD]->sw = ALWAYSOFF_SWITCH;  //virt10 as switch, to disable this mixer
     else
-        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = mapped_simple_channels.switches[SWITCHFUNC_HOLD]; //bug fix
+        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = mapped_std_channels.switches[SWITCHFUNC_HOLD]; //bug fix
     GUI_Redraw(&gui->graph);
     for (u8 i = 0; i < 9; i++)
         GUI_Redraw(&gui->val[i]);
@@ -140,7 +140,7 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
         *x = CHAN_MAX_VALUE;
     else if (*x  < CHAN_MIN_VALUE)
         *x = CHAN_MIN_VALUE;
-    *y = SIMPLEMIX_EvalMixerCb(*x, mp->mixer_ptr[pit_mode], CHAN_MAX_VALUE, CHAN_MIN_VALUE);
+    *y = STDMIX_EvalMixerCb(*x, mp->mixer_ptr[pit_mode], CHAN_MAX_VALUE, CHAN_MIN_VALUE);
     return 1;
 }
 

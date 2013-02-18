@@ -196,7 +196,7 @@ static void _show_page()
 
 static void _show_title()
 {
-     if (Model.mixer_mode == MIXER_SIMPLE)
+     if (Model.mixer_mode == MIXER_STANDARD)
          PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MAINCFG), MODELMENU_Show);
      else
          PAGE_ShowHeader(PAGE_GetName(PAGEID_MAINCFG));

@@ -22,19 +22,19 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     u8 changed = 1;
     u8 throhold_state = 0;
-    if (Model.limits[mapped_simple_channels.throttle].safetysw)
+    if (Model.limits[mapped_std_channels.throttle].safetysw)
         throhold_state = 1; // here we set it either 1 or 0
     throhold_state = GUI_TextSelectHelper(throhold_state, 0, 1, dir, 1, 1, &changed);
     if (changed) {
         if (throhold_state == 1) {
-            Model.limits[mapped_simple_channels.throttle].safetysw = // bug fix: must use inverse position for hold switch
-                    mapped_simple_channels.switches[SWITCHFUNC_HOLD]
-                         ? 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
+            Model.limits[mapped_std_channels.throttle].safetysw = // bug fix: must use inverse position for hold switch
+                    mapped_std_channels.switches[SWITCHFUNC_HOLD]
+                         ? 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
                          : 0;
-            if (Model.limits[mapped_simple_channels.throttle].safetyval == 0)
-                Model.limits[mapped_simple_channels.throttle].safetyval = -110;
+            if (Model.limits[mapped_std_channels.throttle].safetyval == 0)
+                Model.limits[mapped_std_channels.throttle].safetyval = -110;
         } else
-            Model.limits[mapped_simple_channels.throttle].safetysw = 0;
+            Model.limits[mapped_std_channels.throttle].safetysw = 0;
     }
     if (throhold_state == 1) {
         strcpy(mp->tmpstr, (const char *)_tr("On"));
@@ -51,11 +51,11 @@ static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (!GUI_IsTextSelectEnabled((guiObject_t *)&gui->value) || !Model.limits[mapped_simple_channels.throttle].safetysw)
+    if (!GUI_IsTextSelectEnabled((guiObject_t *)&gui->value) || !Model.limits[mapped_std_channels.throttle].safetysw)
         return _tr("Off");
-    Model.limits[mapped_simple_channels.throttle].safetyval =
-            GUI_TextSelectHelper(Model.limits[mapped_simple_channels.throttle].safetyval,
+    Model.limits[mapped_std_channels.throttle].safetyval =
+            GUI_TextSelectHelper(Model.limits[mapped_std_channels.throttle].safetyval,
                     -SAFETYVALUE_RANGE, SAFETYVALUE_RANGE, dir, 1, LONG_PRESS_STEP, NULL);
-    sprintf(mp->tmpstr, "%d", Model.limits[mapped_simple_channels.throttle].safetyval);
+    sprintf(mp->tmpstr, "%d", Model.limits[mapped_std_channels.throttle].safetyval);
     return mp->tmpstr;
 }

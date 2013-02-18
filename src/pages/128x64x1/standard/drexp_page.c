@@ -49,7 +49,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 w1 = 30;
     u8 w2 = 36;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-        0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(absrow - PITTHROMODE_NORMAL));
+        0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
     y += ITEM_SPACE;
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
         w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));

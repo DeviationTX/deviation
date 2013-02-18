@@ -28,9 +28,9 @@ void PAGE_GyroSenseInit(int page)
     (void)page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_GYROSENSE), MODELMENU_Show);
     memset(mp, 0, sizeof(*mp));
-    SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.aux2, GYROMIXER_COUNT);
+    STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2])  // should be switched to gear
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.gear, GYROMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.gear, GYROMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;

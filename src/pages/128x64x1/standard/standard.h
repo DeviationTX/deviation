@@ -1,5 +1,5 @@
-#ifndef _SIMPLE_H_
-#define _SIMPLE_H_
+#ifndef _STANDARD_H_
+#define _STANDARD_H_
 #define VIEW_ID 0
 #include "../../common/standard/common_standard.h"
 struct page_defs {
@@ -7,7 +7,7 @@ struct page_defs {
     const char *(*value)(guiObject_t *obj, int dir, void *data);
     void (*tgl)(guiObject_t *obj, void *data);
 };
-void SIMPLE_Init(const struct page_defs *page_defs);
+void STANDARD_Init(const struct page_defs *page_defs);
 void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         guiButton_t *auto_button_ptr, u8 selectable_bitmap,
         void (*auto_generate_cb)(struct guiObject *obj, const void *data),

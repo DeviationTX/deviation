@@ -17,7 +17,7 @@
 
 static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
-const char *SIMPLEMIX_channelname_cb(guiObject_t *obj, const void *data)
+const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 ch = (long)data;
@@ -33,7 +33,7 @@ const char *SIMPLEMIX_channelname_cb(guiObject_t *obj, const void *data)
     return mp->tmpstr;
 }
 
-void SIMPLEMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
+void STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
 {
     if (count > PITCHMIXER_COUNT) {
         count = PITCHMIXER_COUNT;
@@ -50,7 +50,7 @@ void SIMPLEMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
     }
 }
 
-const char *SIMPLEMIX_ModeName(PitThroMode pit_mode)
+const char *STDMIX_ModeName(PitThroMode pit_mode)
 {
     switch (pit_mode) {
     case PITTHROMODE_NORMAL:
@@ -65,7 +65,7 @@ const char *SIMPLEMIX_ModeName(PitThroMode pit_mode)
     }
 }
 
-s16 SIMPLEMIX_EvalMixerCb(s16 xval, struct Mixer *mix, s16 max_value, s16 min_value)
+s16 STDMIX_EvalMixerCb(s16 xval, struct Mixer *mix, s16 max_value, s16 min_value)
 {
     if (MIXER_SRC_IS_INV(mix->src))
         xval = -xval;

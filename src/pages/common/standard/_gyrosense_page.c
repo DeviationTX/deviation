@@ -52,7 +52,7 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
             mp->mixer[0].dest = GYROOUTPUT_GEAR;
         }
         MIXER_SetMixers(mp->mixer, 1);
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, gryo_output, GYROMIXER_COUNT); // must refresh mixer_ptr for next time use
+        STDMIX_GetMixers(mp->mixer_ptr, gryo_output, GYROMIXER_COUNT); // must refresh mixer_ptr for next time use
         convert_output_to_percentile();
         for (u8 i = 0; i < GYROMIXER_COUNT; i ++) {
             GUI_Redraw(&gui->gyro[i]);

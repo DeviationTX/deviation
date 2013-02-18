@@ -122,7 +122,7 @@ void PAGE_ShowLowBattDialog()
              "Change batteries now!"));
 }
 
-void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
+void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
 {
     (void)guiObj;
     if (dialog)
@@ -130,7 +130,7 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
     strncpy(dlgstr, _tr("Model needs to be reset\nin order to switch to the standard mixer"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
     dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Standard Mixer"), NULL,
-            invalid_simplemixer_cb, dtOkCancel, dlgstr);
+            invalid_stdmixer_cb, dtOkCancel, dlgstr);
 }
 
 /********************************/

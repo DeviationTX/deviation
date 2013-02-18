@@ -1,5 +1,5 @@
-#ifndef _MIXER_SIMPLE_H_
-#define _MIXER_SIMPLE_H_
+#ifndef _MIXER_STANDARD_H_
+#define _MIXER_STANDARD_H_
 
 typedef enum {
     GYROOUTPUT_GEAR = 4, // CH5
@@ -36,6 +36,6 @@ typedef struct {
 #define GYROMIXER_COUNT 3
 
 #define ALWAYSOFF_SWITCH (NUM_INPUTS + NUM_CHANNELS)  //virt10 as switch so that it won't be on
-extern MappedSimpleChannels mapped_simple_channels;
+extern MappedSimpleChannels mapped_std_channels;
 
 #endif

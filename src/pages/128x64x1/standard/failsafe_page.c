@@ -28,5 +28,5 @@ static const struct page_defs failsafe_defs = {
 void PAGE_FailSafeInit(int page)
 {
     (void)page;
-    SIMPLE_Init(&failsafe_defs);
+    STANDARD_Init(&failsafe_defs);
 }

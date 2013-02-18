@@ -28,5 +28,5 @@ static const struct page_defs subtrim_defs = {
 void PAGE_SubtrimInit(int page)
 {
     (void)page;
-    SIMPLE_Init(&subtrim_defs);
+    STANDARD_Init(&subtrim_defs);
 }

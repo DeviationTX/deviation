@@ -73,11 +73,11 @@ static void show_page(CurvesMode _curve_mode, int page)
     memset(mp, 0, sizeof(*mp));
     if (curve_mode == CURVESMODE_PITCH) {
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_PITCURVES), MODELMENU_Show);
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.pitch, PITCHMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
         get_hold_state();
     } else {
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROCURVES), MODELMENU_Show);
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
     }
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini

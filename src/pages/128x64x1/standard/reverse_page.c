@@ -29,6 +29,6 @@ static const struct page_defs reverse_defs = {
 void PAGE_ReverseInit(int page)
 {
     (void)page;
-    SIMPLE_Init(&reverse_defs);
+    STANDARD_Init(&reverse_defs);
 }
 

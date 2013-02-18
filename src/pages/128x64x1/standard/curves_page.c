@@ -71,10 +71,10 @@ static void show_page(CurvesMode _curve_mode, int page)
     memset(mp, 0, sizeof(*mp));
     curve_mode = _curve_mode;
     if (curve_mode == CURVESMODE_PITCH) {
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.pitch, PITCHMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
         get_hold_state();
     } else
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.throttle, THROTTLEMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
         GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;

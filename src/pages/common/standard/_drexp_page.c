@@ -29,11 +29,11 @@ static void _refresh_page();
 static void get_mixers()
 {
     if (drexp_type == DREXP_AIL) {
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.aile, DREXPMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aile, DREXPMIXER_COUNT);
     } else if (drexp_type == DREXP_ELE) {
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.elev, DREXPMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.elev, DREXPMIXER_COUNT);
     } else {
-        SIMPLEMIX_GetMixers(mp->mixer_ptr, mapped_simple_channels.rudd, DREXPMIXER_COUNT);
+        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.rudd, DREXPMIXER_COUNT);
     }
 }
 
@@ -118,7 +118,7 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
         *x = CHAN_MIN_VALUE;
     s16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
-    *y = SIMPLEMIX_EvalMixerCb(*x, mp->mixer_ptr[current_pit_mode], ymax, ymin);
+    *y = STDMIX_EvalMixerCb(*x, mp->mixer_ptr[current_pit_mode], ymax, ymin);
     return 1;
 }
 

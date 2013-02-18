@@ -380,7 +380,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 return 1;
             }
             for(i = 0; i < 2; i++) {
-                if(MATCH_VALUE(SIMPLEMIXER_ModeName(i)))
+                if(MATCH_VALUE(STDMIXER_ModeName(i)))
                     m->mixer_mode = i;
             }
             return 1;
@@ -966,7 +966,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     if(WRITE_FULL_MODEL || m->permanent_timer != 0 )
     	fprintf(fh, "%s=%d\n", PERMANENT_TIMER, m->permanent_timer);
-    fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, SIMPLEMIXER_ModeName(m->mixer_mode));
+    fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
     if(WRITE_FULL_MODEL || m->type != 0)
@@ -1190,7 +1190,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     if(! Model.name[0])
         sprintf(Model.name, "Model%d", model_num);
 
-    SIMPLEMIXER_Preset(); // bug fix: this must be invoked in all modes
+    STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     return 1;
 }
 

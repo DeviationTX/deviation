@@ -42,7 +42,7 @@ static void show_page(int page)
         long ch = page  + i;
         if (ch >= Model.num_channels)
             break;
-        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
+        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30, row, 0, 16, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
         GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, toggle_reverse_cb, reverse_cb, (void *)(ch));
@@ -57,6 +57,6 @@ void PAGE_ReverseInit(int page)
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;
     mp->firstObj = NULL;
-    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, mp->max_scroll+1, NULL, STDMIX_ScrollCB, show_page);
     show_page(page);
 }

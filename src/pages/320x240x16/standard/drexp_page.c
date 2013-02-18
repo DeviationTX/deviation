@@ -38,9 +38,9 @@ void PAGE_DrExpInit(int page)
     GUI_CreateLabelBox(&gui->srclbl, 10, 40, 96, 16, &DEFAULT_FONT, NULL, NULL, _tr("Src"));
     GUI_CreateTextSelect(&gui->src, 100, 40, TEXTSELECT_96, NULL, set_type_cb, NULL);
     /* Row 2 */
-    GUI_CreateLabelBox(&gui->mode[0], 4, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_NORMAL));
-    GUI_CreateLabelBox(&gui->mode[1], 112, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE1));
-    GUI_CreateLabelBox(&gui->mode[2], 216, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, SIMPLEMIX_ModeName(PITTHROMODE_IDLE2));
+    GUI_CreateLabelBox(&gui->mode[0], 4, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_NORMAL));
+    GUI_CreateLabelBox(&gui->mode[1], 112, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE1));
+    GUI_CreateLabelBox(&gui->mode[2], 216, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE2));
     /* Row 3 */
     GUI_CreateTextSelect(&gui->dr[0], 4, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_NORMAL));
     GUI_CreateTextSelect(&gui->dr[1], 112, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE1));

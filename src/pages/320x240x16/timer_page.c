@@ -48,7 +48,7 @@ static void _show_page()
     firstObj = NULL;
     timer_page_num = 0 ;
 
-    if (Model.mixer_mode == MIXER_SIMPLE)
+    if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TIMER), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER));

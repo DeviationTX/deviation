@@ -40,7 +40,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = 50;
     MIXER_GetLimit(absrow, &mp->limit);
     GUI_CreateLabelBox(&gui->chan[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)absrow);
+            0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->dn[relrow], x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->up[relrow], x + w +3, y,

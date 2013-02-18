@@ -35,7 +35,7 @@ static void show_page(int page)
         if (ch >= Model.num_channels)
             break;
         MIXER_GetLimit(ch, &mp->limit);
-        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 10, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)ch);
+        guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 10, row, 0, 16, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)ch);
         if (! mp->firstObj)
             mp->firstObj = obj;
         GUI_CreateTextSelect(&gui->down[i], 90, row, TEXTSELECT_96, NULL, traveldown_cb, (void *)ch);
@@ -52,7 +52,7 @@ void PAGE_TravelAdjInit(int page)
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;
     mp->firstObj = NULL;
-    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, mp->max_scroll+1, NULL, SIMPLEMIX_ScrollCB, show_page);
+    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, mp->max_scroll+1, NULL, STDMIX_ScrollCB, show_page);
     GUI_CreateLabelBox(&gui->dnlbl, 90, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Down"));
     GUI_CreateLabelBox(&gui->uplbl, 196, 36,  96, 16, &NARROW_FONT, NULL, NULL, _tr("Up"));
     show_page(page);

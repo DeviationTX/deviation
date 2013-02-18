@@ -19,15 +19,15 @@ static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static u8 switch_idx[SWITCHFUNC_LAST];
 
 static u8 get_switch_idx(FunctionSwitch switch_type) {
-    return mapped_simple_channels.switches[switch_type] - INPUT_SwitchPos(mapped_simple_channels.switches[switch_type]);
+    return mapped_std_channels.switches[switch_type] - INPUT_SwitchPos(mapped_std_channels.switches[switch_type]);
 }
 
 static void refresh_switches()
 {
     struct Mixer *mix = MIXER_GetAllMixers();
 
-    if (Model.limits[mapped_simple_channels.throttle].safetysw)
-        mapped_simple_channels.switches[SWITCHFUNC_HOLD] =  MIXER_SRC(Model.limits[mapped_simple_channels.throttle].safetysw);
+    if (Model.limits[mapped_std_channels.throttle].safetysw)
+        mapped_std_channels.switches[SWITCHFUNC_HOLD] =  MIXER_SRC(Model.limits[mapped_std_channels.throttle].safetysw);
     u8 found_gyro_switch = 0;
     u8 found_flymode_switch = 0;
     u8 found_drexp_rud_switch = 0;
@@ -36,21 +36,21 @@ static void refresh_switches()
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
         if (!MIXER_SRC(mix[idx].src) || mix[idx].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
-        if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_simple_channels.gear || mix[idx].dest == mapped_simple_channels.aux2)) {
+        if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_std_channels.gear || mix[idx].dest == mapped_std_channels.aux2)) {
             found_gyro_switch = 1;
-            mapped_simple_channels.switches[SWITCHFUNC_GYROSENSE] = mix[idx].sw;
-        } else if (!found_drexp_rud_switch && mix[idx].dest == mapped_simple_channels.rudd && mix[idx].sw != 0) {
+            mapped_std_channels.switches[SWITCHFUNC_GYROSENSE] = mix[idx].sw;
+        } else if (!found_drexp_rud_switch && mix[idx].dest == mapped_std_channels.rudd && mix[idx].sw != 0) {
             found_drexp_rud_switch = 1;
-            mapped_simple_channels.switches[SWITCHFUNC_DREXP_RUD] = mix[idx].sw;
-        } else if (!found_drexp_ail_switch && mix[idx].dest == mapped_simple_channels.aile && mix[idx].sw != 0) {
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_RUD] = mix[idx].sw;
+        } else if (!found_drexp_ail_switch && mix[idx].dest == mapped_std_channels.aile && mix[idx].sw != 0) {
             found_drexp_ail_switch = 1;
-            mapped_simple_channels.switches[SWITCHFUNC_DREXP_AIL] = mix[idx].sw;
-        } else if (!found_drexp_ele_switch && mix[idx].dest == mapped_simple_channels.elev && mix[idx].sw != 0) {
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL] = mix[idx].sw;
+        } else if (!found_drexp_ele_switch && mix[idx].dest == mapped_std_channels.elev && mix[idx].sw != 0) {
             found_drexp_ele_switch = 1;
-            mapped_simple_channels.switches[SWITCHFUNC_DREXP_ELE] = mix[idx].sw;
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_ELE] = mix[idx].sw;
         } else if (!found_flymode_switch && (mix[idx].dest == NUM_OUT_CHANNELS + 2) && mix[idx].sw != 0) { //virt3
             found_flymode_switch = 1;
-            mapped_simple_channels.switches[SWITCHFUNC_FLYMODE] = mix[idx].sw;
+            mapped_std_channels.switches[SWITCHFUNC_FLYMODE] = mix[idx].sw;
         }
         if (found_flymode_switch && found_gyro_switch && found_drexp_rud_switch && found_drexp_ail_switch && found_drexp_ele_switch)
             break;  // don't need to check the rest
@@ -66,12 +66,12 @@ void save_changes()
 {
     MUSIC_Play(MUSIC_SAVING);
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
-        mapped_simple_channels.switches[switch_type] = switch_idx[switch_type];
+        mapped_std_channels.switches[switch_type] = switch_idx[switch_type];
 
-    if (Model.limits[mapped_simple_channels.throttle].safetysw)
-       Model.limits[mapped_simple_channels.throttle].safetysw =
-             mapped_simple_channels.switches[SWITCHFUNC_HOLD]
-             ? 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
+    if (Model.limits[mapped_std_channels.throttle].safetysw)
+       Model.limits[mapped_std_channels.throttle].safetysw =
+             mapped_std_channels.switches[SWITCHFUNC_HOLD]
+             ? 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
              : 0;
 
     u8 gyro_gear_count = 0;
@@ -87,30 +87,30 @@ void save_changes()
         int sw;
         if (!MIXER_SRC(mix[i].src) || mix[i].mux != MUX_REPLACE)  // all non-replace mux will be considered as program mix in the Standard mode
             continue;
-        if (mix[i].dest == mapped_simple_channels.gear) {
+        if (mix[i].dest == mapped_std_channels.gear) {
             count = &gyro_gear_count;
             sw = SWITCHFUNC_GYROSENSE;
-        } else if (mix[i].dest == mapped_simple_channels.aux2) {
+        } else if (mix[i].dest == mapped_std_channels.aux2) {
             count = &gyro_aux2_count;
             sw = SWITCHFUNC_GYROSENSE;
-        } else if (mix[i].dest == mapped_simple_channels.aile) {
+        } else if (mix[i].dest == mapped_std_channels.aile) {
             count = &drexp_aile_count;
             sw = SWITCHFUNC_DREXP_AIL;
-        } else if (mix[i].dest == mapped_simple_channels.elev) {
+        } else if (mix[i].dest == mapped_std_channels.elev) {
             count = &drexp_elev_count;
             sw = SWITCHFUNC_DREXP_ELE;
-        } else if (mix[i].dest == mapped_simple_channels.rudd) {
+        } else if (mix[i].dest == mapped_std_channels.rudd) {
             count = &drexp_rudd_count;
             sw = SWITCHFUNC_DREXP_RUD;
-        } else if (mix[i].dest == mapped_simple_channels.pitch) {
+        } else if (mix[i].dest == mapped_std_channels.pitch) {
             if (pit_count < 3) {
                 count = &pit_count;
                 sw = SWITCHFUNC_FLYMODE;
             } else if (pit_count == 3 && mix[i].sw != ALWAYSOFF_SWITCH) {
-                mix[i].sw = 0x80 | mapped_simple_channels.switches[SWITCHFUNC_HOLD];  // hold curve
+                mix[i].sw = 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD];  // hold curve
                 continue;
             }
-        } else if (mix[i].dest == mapped_simple_channels.throttle) {
+        } else if (mix[i].dest == mapped_std_channels.throttle) {
             count = &thro_count;
             sw = SWITCHFUNC_FLYMODE;
         }

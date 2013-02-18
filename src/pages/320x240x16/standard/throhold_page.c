@@ -26,7 +26,7 @@ static void toggle_thold_cb(guiObject_t *obj, void *data)
     (void)obj;
     (void)data;
     int dir;
-    if (Model.limits[mapped_simple_channels.throttle].safetysw)
+    if (Model.limits[mapped_std_channels.throttle].safetysw)
         dir = -1;
     else
         dir = 1;

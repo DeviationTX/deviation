@@ -87,7 +87,7 @@ void PAGE_SetSection(u8 section)
     u8 p;
     u8 newpage = cur_page;
 
-    if (section == SECTION_MODEL && Model.mixer_mode == MIXER_SIMPLE)
+    if (section == SECTION_MODEL && Model.mixer_mode == MIXER_STANDARD)
         section = 0x80 | SECTION_MODEL;
 
     for(p = 0; groups[p].group != 255; p++) {

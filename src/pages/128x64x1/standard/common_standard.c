@@ -38,13 +38,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = 58;
 
     GUI_CreateLabelBox(&gui->name[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(long)absrow);
+            0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
     return 1;
 }
 
-void SIMPLE_Init(const struct page_defs *page_defs)
+void STANDARD_Init(const struct page_defs *page_defs)
 {
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);

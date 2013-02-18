@@ -57,8 +57,8 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     u8 max = NUM_SOURCES;
     u8 step = 1;
-    if (Model.mixer_mode == MIXER_SIMPLE)  {
-        max = mapped_simple_channels.throttle + NUM_INPUTS +1;
+    if (Model.mixer_mode == MIXER_STANDARD)  {
+        max = mapped_std_channels.throttle + NUM_INPUTS +1;
         step = max;
     }
     u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, max, dir, step, step, &changed);
@@ -91,8 +91,8 @@ const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     u8 max = NUM_SOURCES;
     u8 step = 1;
-    if (Model.mixer_mode == MIXER_SIMPLE && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
-        max = mapped_simple_channels.throttle + NUM_INPUTS +1;
+    if (Model.mixer_mode == MIXER_STANDARD && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
+        max = mapped_std_channels.throttle + NUM_INPUTS +1;
         step = max;
     }
     u8 resetsrc = GUI_TextSelectHelper(MIXER_SRC(timer->resetsrc), 0, max, dir, step, step, &changed);
