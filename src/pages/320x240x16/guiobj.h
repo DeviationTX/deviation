@@ -394,6 +394,7 @@ struct stdchan_obj {
 struct stdgyro_obj {
     guiLabel_t msg;
     guiLabel_t chanlbl;
+    guiLabel_t rangelbl;
     guiTextSelect_t chan;
     guiLabel_t gyrolbl[3];
     guiTextSelect_t gyro[3];
