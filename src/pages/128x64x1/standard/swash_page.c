@@ -47,7 +47,7 @@ void PAGE_SwashInit(int page)
     GUI_CreateTextSelectPlate(&gui->mix[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
 
     row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Pit Mix:"));
+    GUI_CreateLabelBox(&gui->lbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix:"));
     GUI_CreateTextSelectPlate(&gui->mix[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();
