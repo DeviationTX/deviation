@@ -65,27 +65,27 @@ static void _draw_body() {
     }
     
     for (u8 i = timer_page_num * 2; i < NUM_TIMERS && i < timer_page_num * 2 + 2; i++) {
-	u8 y = 20 ;
-        u8 x = 48 + i%2 * 96;
+	u8 y = 30 ;
+        u8 x = 48 + i%2 * 100;
         //Row 1
 	if(!i%2) 
-            firstObj = GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
+            firstObj = GUI_CreateLabelBox(&gui->timer[i], y, x, 60, 12, &DEFAULT_FONT,timer_str_cb, NULL, (void *)(long)i);
 	else
-	    GUI_CreateLabel(&gui->timer[i], y, x, timer_str_cb, DEFAULT_FONT, (void *)(long)i);
+	    GUI_CreateLabelBox(&gui->timer[i], y, x, 60, 12, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
 		
-        GUI_CreateTextSelect(&gui->type[i], y+63 , x, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
+        GUI_CreateTextSelect(&gui->type[i], y+73 , x, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
-	GUI_CreateLabel(&gui->switchlbl[i], y, x+22, NULL, DEFAULT_FONT, _tr("Switch:"));
-        GUI_CreateTextSelect(&gui->src[i],  y+63, x+22, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
+	GUI_CreateLabelBox(&gui->switchlbl[i], y, x+20, 60, 12, &DEFAULT_FONT, NULL,NULL,_tr("Switch:"));
+        GUI_CreateTextSelect(&gui->src[i],  y+73, x+20, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
-        GUI_CreateLabelBox(&gui->resetlbl[i], y, x+44, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
-        GUI_CreateTextSelect(&gui->resetsrc[i],  y+63, x+44, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->resetlbl[i], y, x+40, 60, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
+        GUI_CreateTextSelect(&gui->resetsrc[i],  y+73, x+40, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
          /* or Reset Perm timer*/
-	GUI_CreateLabelBox(&gui->resetpermlbl[i], y, x+44, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-	GUI_CreateButton(&gui->resetperm[i], y+63, x+44, TEXTSELECT_96, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
+	GUI_CreateLabelBox(&gui->resetpermlbl[i], y, x+40, 60, 12, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+	GUI_CreateButton(&gui->resetperm[i], y+73, x+40, TEXTSELECT_96, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
         //Row 4
-        GUI_CreateLabelBox(&gui->startlbl[i], y, x+66, 50, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
-        GUI_CreateTextSelect(&gui->start[i], y+63, x+66, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->startlbl[i], y, x+60, 60, 12, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+        GUI_CreateTextSelect(&gui->start[i], y+73, x+60, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
         update_countdown(i);
     }
 }
