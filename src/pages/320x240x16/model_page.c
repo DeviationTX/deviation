@@ -108,6 +108,7 @@ static inline guiObject_t *_get_obj(int type, int objid)
     switch(type) {
         case ITEM_NUMCHAN: return (guiObject_t *)&gui->numch;
         case ITEM_PROTO: return (guiObject_t *)&gui->bind;
+        case ITEM_GUI: return (guiObject_t *)&gui->guits;
         default: return NULL;
     }
 }
