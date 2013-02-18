@@ -71,8 +71,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 }
 
 void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
-        guiButton_t *auto_button_ptr, u8 selectable_bitmap,
-        void (*auto_generate_cb)(struct guiObject *obj, const void *data),
+        u8 selectable_bitmap,
         void (*press_cb)(guiObject_t *obj, void *data),
         const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
 {
@@ -90,9 +89,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
     GUI_CreateTextSelectPlate(&val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
 
     y += height;
-    x = 0;
-    GUI_CreateButtonPlateText(auto_button_ptr, x, y, 38, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0, auto_generate_cb, _tr("Auto"));
-    x += 39;
+    x = 20;
     GUI_CreateLabelBox(&vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
     x += w1;
     GUI_CreateTextSelectPlate(&val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);

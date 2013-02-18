@@ -175,7 +175,14 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
     exit_cmd = CallBack;
     exit_data = (void *)0;
     GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-    GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
+    if(title)
+        GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
+}
+void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
+{
+    if(OBJ_IS_USED(&gui->title))
+        GUI_RemoveObj((guiObject_t *)&gui->title);
+    GUI_CreateLabelBox(&gui->title, 40, 10, 0, 0, &TITLE_FONT, label_cb, NULL, data);
 }
 
 static const char *okcancelstr_cb(guiObject_t *obj, const void *data)

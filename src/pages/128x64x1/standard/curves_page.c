@@ -55,6 +55,7 @@ static void press_cb(guiObject_t *obj, void *data)
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
         GUI_TextSelectEnable((guiTextSelect_t *)obj, 0);
         *selectable_bitmap &= ~(1 << (point_num-1));
+        auto_generate_cb(NULL, NULL);
     } else {
         GUI_TextSelectEnable((guiTextSelect_t *)obj, 1);
         *selectable_bitmap |= 1 << (point_num-1);
@@ -86,8 +87,8 @@ static void show_page(CurvesMode _curve_mode, int page)
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
-    STANDARD_DrawCurvePoints(gui->vallbl, gui->val, &gui->auto_,
-        selectable_bitmaps[curve_mode * 4 + pit_mode], auto_generate_cb, press_cb, set_pointval_cb);
+    STANDARD_DrawCurvePoints(gui->vallbl, gui->val,
+        selectable_bitmaps[curve_mode * 4 + pit_mode], press_cb, set_pointval_cb);
 
     GUI_CreateXYGraph(&gui->graph, 77, ITEM_SPACE, 50, 50,
                       CHAN_MIN_VALUE, CHAN_MIN_VALUE,

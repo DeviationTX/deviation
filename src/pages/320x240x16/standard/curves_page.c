@@ -48,6 +48,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
         GUI_TextSelectEnable(&gui->val[point_num], 0);
         *selectable_bitmap &= ~(1 << (point_num-1));
+        auto_generate_cb(NULL, NULL);
     } else {
         GUI_TextSelectEnable(&gui->val[point_num], 1);
         *selectable_bitmap |= 1 << (point_num-1);
@@ -71,12 +72,13 @@ static void show_page(CurvesMode _curve_mode, int page)
     (void)page;
     curve_mode = _curve_mode;
     memset(mp, 0, sizeof(*mp));
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     if (curve_mode == CURVESMODE_PITCH) {
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_PITCURVES), MODELMENU_Show);
+        PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_PITCURVES, SWITCHFUNC_FLYMODE));
         STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
         get_hold_state();
     } else {
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROCURVES), MODELMENU_Show);
+        PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROCURVES, SWITCHFUNC_FLYMODE));
         STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
     }
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
@@ -85,7 +87,6 @@ static void show_page(CurvesMode _curve_mode, int page)
     }
 
     /* Row 1 */
-    GUI_CreateButton(&gui->auto_, 20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);

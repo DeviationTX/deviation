@@ -45,6 +45,7 @@ static const char *set_type_cb(guiObject_t *obj, int dir, void *data)
     drexp_type = GUI_TextSelectHelper(drexp_type, DREXP_AIL, DREXP_RUD, dir, 1, 1, &changed);
     if (changed) {
         get_mixers();
+        PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_DREXP, SWITCHFUNC_DREXP_AIL+drexp_type));
         _refresh_page();
     }
     switch (drexp_type) {

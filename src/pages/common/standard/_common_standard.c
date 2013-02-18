@@ -56,10 +56,10 @@ const char *STDMIX_ModeName(PitThroMode pit_mode)
     case PITTHROMODE_NORMAL:
         return _tr("Normal");
     case PITTHROMODE_IDLE1:
-        return _tr("Idle 1");
+        return _tr("Idle Up 1");
         break;
     case PITTHROMODE_IDLE2:
-        return _tr("Idle 2");
+        return _tr("Idle Up 2");
     default: // PITTHROMODE_HOLD
         return _tr("Thr hold");
     }
@@ -77,4 +77,14 @@ s16 STDMIX_EvalMixerCb(s16 xval, struct Mixer *mix, s16 max_value, s16 min_value
     else if (yval <min_value)
         yval = min_value;
     return yval;
+}
+
+const char *STDMIX_TitleString(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int pageid = ((unsigned long)data) & 0xFFFF;
+    int sw     = (((unsigned long)data) >> 16) & 0xFFFF;
+    sprintf(mp->tmpstr, "%s - ", PAGE_GetName(pageid));
+    INPUT_SourceNameAbbrevSwitch(mp->tmpstr+strlen(mp->tmpstr), mapped_std_channels.switches[sw]);
+    return mp->tmpstr;
 }

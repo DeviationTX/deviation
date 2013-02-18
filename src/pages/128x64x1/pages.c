@@ -119,6 +119,12 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
     (void)CallBack;
 }
 
+void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
+{
+    (void)label_cb;
+    (void)data;
+}
+
 void PAGE_RemoveAllObjects()
 {
     if(! GUI_IsEmpty()) {

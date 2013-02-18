@@ -42,7 +42,7 @@ enum {
     ITEM_PROTO,
     ITEM_FIXEDID,
     ITEM_NUMCHAN,
-#if !defined(NO_STANDARD_GUI) && !defined(NO_ADVANCED_GUI)
+#if !defined(NO_STANDARD_GUI)
     ITEM_GUI,
 #endif
     ITEM_LAST,
@@ -132,8 +132,16 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
-    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, NULL);
+    u8 changed = 0;
+    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, &changed);
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, Model.type == 0);
+    if (changed && Model.type != 0) {
+        //Standard GUI is not supported
+        Model.mixer_mode = MIXER_ADVANCED;
+        guiObject_t *obj = _get_obj(ITEM_GUI, 0);
+        if(obj)
+            GUI_Redraw(obj);
+    }
 
     switch (Model.type) {
         case 0: return _tr(HELI_LABEL);
@@ -235,7 +243,8 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     u8 changed = 0;
-    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
+    int max_mode = Model.type ? 0 : 1; //Only allow Standard GUI for Helis
+    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, max_mode, dir, 1, 1, &changed);
     if (changed && Model.mixer_mode == MIXER_STANDARD) {
         if (!STDMIXER_ValidateTraditionModel()) {
             Model.mixer_mode = MIXER_ADVANCED;

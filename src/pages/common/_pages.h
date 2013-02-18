@@ -22,6 +22,8 @@ extern struct pagemem pagemem;
 
 void PAGE_ShowHeader(const char *title);
 void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));
+void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data);
+
 u8 PAGE_SetModal(u8 _modal);
 u8 PAGE_GetModal();
 void PAGE_RemoveAllObjects();
