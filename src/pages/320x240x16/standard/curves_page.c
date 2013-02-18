@@ -48,6 +48,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     if (*selectable_bitmap >> (point_num-1) & 0x01) {
         GUI_TextSelectEnable(&gui->val[point_num], 0);
         *selectable_bitmap &= ~(1 << (point_num-1));
+        auto_generate_cb(NULL, NULL);
     } else {
         GUI_TextSelectEnable(&gui->val[point_num], 1);
         *selectable_bitmap |= 1 << (point_num-1);
@@ -86,7 +87,6 @@ static void show_page(CurvesMode _curve_mode, int page)
     }
 
     /* Row 1 */
-    GUI_CreateButton(&gui->auto_, 20, 40, BUTTON_64x16, buttonstr_cb, 0x0000, auto_generate_cb, NULL);
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);

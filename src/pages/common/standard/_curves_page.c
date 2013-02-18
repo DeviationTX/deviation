@@ -128,7 +128,7 @@ static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
         u8 changed = 1;
         curve->points[point_num] = GUI_TextSelectHelper(curve->points[point_num], -100, 100, dir, 1, LONG_PRESS_STEP, &changed);
         if (changed)
-            GUI_Redraw(&gui->graph);
+            auto_generate_cb(NULL, NULL);
     }
     sprintf(mp->tmpstr, "%d", curve->points[point_num]);
     return mp->tmpstr;
@@ -177,5 +177,4 @@ void PAGE_CurvesEvent()
         }
     }
 }
-
 
