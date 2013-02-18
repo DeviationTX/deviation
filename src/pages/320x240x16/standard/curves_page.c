@@ -26,13 +26,6 @@ static const char *curvepos[] = {
   _tr_noop("L"), "2", "3", "4", _tr_noop("M"), "6", "7", "8", _tr_noop("H")
 };
 
-static const char *buttonstr_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return _tr("Auto");
-}
-
 static const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
