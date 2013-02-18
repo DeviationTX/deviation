@@ -22,11 +22,20 @@
 #include "mixer_standard.h"
 #include "../../common/standard/_gyrosense_page.c"
 
+const char *title_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(mp->tmpstr, "%s - ", PAGE_GetName(PAGEID_GYROSENSE));
+    INPUT_SourceNameAbbrevSwitch(mp->tmpstr+strlen(mp->tmpstr), mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
+    return mp->tmpstr;
+}
 
 void PAGE_GyroSenseInit(int page)
 {
     (void)page;
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_GYROSENSE), MODELMENU_Show);
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
+    PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_GYROSENSE, SWITCHFUNC_GYROSENSE));
     memset(mp, 0, sizeof(*mp));
     STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2])  // should be switched to gear
@@ -50,7 +59,9 @@ void PAGE_GyroSenseInit(int page)
     GUI_CreateLabelBox(&gui->gyrolbl[1], 10, 80, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
     GUI_CreateTextSelect(&gui->gyro[1], 120, 80, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
 
-    /* Row 4 */
-    GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 100, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
-    GUI_CreateTextSelect(&gui->gyro[2], 120, 100, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
+    if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
+        /* Row 4 */
+        GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 100, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
+        GUI_CreateTextSelect(&gui->gyro[2], 120, 100, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
+    }
 }

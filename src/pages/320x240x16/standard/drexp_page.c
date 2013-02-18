@@ -28,6 +28,8 @@ void PAGE_DrExpInit(int page)
 {
     (void)page;
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DREXP), MODELMENU_Show);
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
+    PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_DREXP, SWITCHFUNC_DREXP_AIL+drexp_type));
     memset(mp, 0, sizeof(*mp));
     get_mixers();
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {

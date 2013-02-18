@@ -27,11 +27,17 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     curve_mode = (long)data;
-    u8 max = curve_mode == CURVESMODE_PITCH?PITTHROMODE_HOLD: PITTHROMODE_IDLE2;
+    int max_sw = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_FLYMODE])-1;
+    u8 max = curve_mode == CURVESMODE_PITCH? PITTHROMODE_HOLD : PITTHROMODE_NORMAL + max_sw;
     u8 changed;
     pit_mode = GUI_TextSelectHelper(pit_mode, PITTHROMODE_NORMAL, max, dir, 1, 1, &changed);
     u8 i;
+    if (pit_mode > (u32)(PITTHROMODE_NORMAL + max_sw) && pit_mode != PITTHROMODE_HOLD) {
+        pit_mode = (dir > 0) ? PITTHROMODE_HOLD : PITTHROMODE_NORMAL + max_sw;
+        changed = 1;
+    }
     if (changed) {
+          
         if (pit_mode == PITTHROMODE_HOLD)
             GUI_SetHidden((guiObject_t *)&gui->hold, 0);
         else

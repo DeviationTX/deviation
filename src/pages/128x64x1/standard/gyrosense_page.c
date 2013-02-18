@@ -56,9 +56,11 @@ void PAGE_GyroSenseInit(int page)
     GUI_CreateLabelBox(&gui->gyrolbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)1);
     GUI_CreateTextSelectPlate(&gui->gyro[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)1);
 
-    row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->gyrolbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
-    GUI_CreateTextSelectPlate(&gui->gyro[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
+    if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
+        row += ITEM_SPACE;
+        GUI_CreateLabelBox(&gui->gyrolbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
+        GUI_CreateTextSelectPlate(&gui->gyro[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
+    }
 
     GUI_Select1stSelectableObj();
 }

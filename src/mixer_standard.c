@@ -31,6 +31,8 @@ MappedSimpleChannels mapped_std_channels;
 
 void STDMIXER_Preset()
 {
+    if(Model.mixer_mode == MIXER_ADVANCED)
+        return;
     mapped_std_channels.pitch = NUM_OUT_CHANNELS + 2; // Virt 3 /pit
     mapped_std_channels.rudd = 3;
     mapped_std_channels.gear = GYROOUTPUT_GEAR;
@@ -54,6 +56,7 @@ void STDMIXER_Preset()
     }
     mapped_std_channels.aile = NUM_OUT_CHANNELS; // virt 1
     mapped_std_channels.elev = NUM_OUT_CHANNELS +1; // virt 2
+    STDMIXER_InitSwitches();
 }
 
 void STDMIXER_SetChannelOrderByProtocol()
@@ -158,4 +161,39 @@ u8 STDMIXER_ValidateTraditionModel()
 const char *STDMIXER_ModeName(int mode)
 {
     return mode == MIXER_ADVANCED ? _tr("Advanced") : _tr("Standard");
+}
+
+void STDMIXER_InitSwitches()
+{
+    struct Mixer *mix = MIXER_GetAllMixers();
+
+    if (Model.limits[mapped_std_channels.throttle].safetysw)
+        mapped_std_channels.switches[SWITCHFUNC_HOLD] =  MIXER_SRC(Model.limits[mapped_std_channels.throttle].safetysw);
+    u8 found_gyro_switch = 0;
+    u8 found_flymode_switch = 0;
+    u8 found_drexp_rud_switch = 0;
+    u8 found_drexp_ail_switch = 0;
+    u8 found_drexp_ele_switch = 0;
+    for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
+        if (!MIXER_SRC(mix[idx].src) || mix[idx].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
+            continue;
+        if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_std_channels.gear || mix[idx].dest == mapped_std_channels.aux2)) {
+            found_gyro_switch = 1;
+            mapped_std_channels.switches[SWITCHFUNC_GYROSENSE] = mix[idx].sw;
+        } else if (!found_drexp_rud_switch && mix[idx].dest == mapped_std_channels.rudd && mix[idx].sw != 0) {
+            found_drexp_rud_switch = 1;
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_RUD] = mix[idx].sw;
+        } else if (!found_drexp_ail_switch && mix[idx].dest == mapped_std_channels.aile && mix[idx].sw != 0) {
+            found_drexp_ail_switch = 1;
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL] = mix[idx].sw;
+        } else if (!found_drexp_ele_switch && mix[idx].dest == mapped_std_channels.elev && mix[idx].sw != 0) {
+            found_drexp_ele_switch = 1;
+            mapped_std_channels.switches[SWITCHFUNC_DREXP_ELE] = mix[idx].sw;
+        } else if (!found_flymode_switch && (mix[idx].dest == NUM_OUT_CHANNELS + 2) && mix[idx].sw != 0) { //virt3
+            found_flymode_switch = 1;
+            mapped_std_channels.switches[SWITCHFUNC_FLYMODE] = mix[idx].sw;
+        }
+        if (found_flymode_switch && found_gyro_switch && found_drexp_rud_switch && found_drexp_ail_switch && found_drexp_ele_switch)
+            break;  // don't need to check the rest
+    }
 }

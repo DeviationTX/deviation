@@ -71,12 +71,13 @@ static void show_page(CurvesMode _curve_mode, int page)
     (void)page;
     curve_mode = _curve_mode;
     memset(mp, 0, sizeof(*mp));
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     if (curve_mode == CURVESMODE_PITCH) {
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_PITCURVES), MODELMENU_Show);
+        PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_PITCURVES, SWITCHFUNC_FLYMODE));
         STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
         get_hold_state();
     } else {
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_THROCURVES), MODELMENU_Show);
+        PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROCURVES, SWITCHFUNC_FLYMODE));
         STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
     }
     if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
