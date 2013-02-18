@@ -51,18 +51,18 @@ void PAGE_DisableSafetyDialog(u8 disable)
     disable_safety = disable;
 }
 
-static void invalid_simplemixer_cb(u8 state, void *guiObj)
+static void invalid_stdmixer_cb(u8 state, void *guiObj)
 {
-#define SIMPLE_TEMPLATE "heli_std.ini"
+#define STANDARD_TEMPLATE "heli_std.ini"
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1 && guiObj != NULL) {
         memset(Model.mixers, 0, sizeof(struct Mixer) * (NUM_MIXERS)); // // reset all mixers first
-        CONFIG_ReadTemplate(SIMPLE_TEMPLATE); // load template
-        SIMPLEMIXER_Preset();
-        SIMPLEMIXER_SetChannelOrderByProtocol();
-        Model.mixer_mode = MIXER_SIMPLE;
+        CONFIG_ReadTemplate(STANDARD_TEMPLATE); // load template
+        STDMIXER_Preset();
+        STDMIXER_SetChannelOrderByProtocol();
+        Model.mixer_mode = MIXER_STANDARD;
         GUI_Redraw(guiObj);
     }
 }

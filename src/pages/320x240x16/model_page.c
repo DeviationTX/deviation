@@ -32,7 +32,7 @@ void PAGE_ModelInit(int page)
 
     mp->file_state = 0;
     PAGE_SetModal(0);
-    if (Model.mixer_mode == MIXER_SIMPLE)
+    if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));

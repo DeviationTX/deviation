@@ -166,13 +166,13 @@ u8 BATTERY_Check();
 /* Mixer mode */
 typedef enum {
     MIXER_ADVANCED = 0,
-    MIXER_SIMPLE,
+    MIXER_STANDARD,
     MIXER_ALL,
 } MixerMode;
-void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj);
-void SIMPLEMIXER_Preset();
-void SIMPLEMIXER_SetChannelOrderByProtocol();
-u8 SIMPLEMIXER_ValidateTraditionModel();
-const char *SIMPLEMIXER_ModeName(int mode);
+void PAGE_ShowInvalidStandardMixerDialog(void *guiObj);
+void STDMIXER_Preset();
+void STDMIXER_SetChannelOrderByProtocol();
+u8 STDMIXER_ValidateTraditionModel();
+const char *STDMIXER_ModeName(int mode);
 
 #endif

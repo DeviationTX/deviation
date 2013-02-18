@@ -177,8 +177,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         guiObject_t *obj = _get_obj(ITEM_NUMCHAN, 0);
         if (obj)
             GUI_Redraw(obj);
-        if (Model.mixer_mode == MIXER_SIMPLE)
-            SIMPLEMIXER_SetChannelOrderByProtocol();
+        if (Model.mixer_mode == MIXER_STANDARD)
+            STDMIXER_SetChannelOrderByProtocol();
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
@@ -236,14 +236,14 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     u8 changed = 0;
     Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, 1, dir, 1, 1, &changed);
-    if (changed && Model.mixer_mode == MIXER_SIMPLE) {
-        if (!SIMPLEMIXER_ValidateTraditionModel()) {
+    if (changed && Model.mixer_mode == MIXER_STANDARD) {
+        if (!STDMIXER_ValidateTraditionModel()) {
             Model.mixer_mode = MIXER_ADVANCED;
-            PAGE_ShowInvalidSimpleMixerDialog(obj);
+            PAGE_ShowInvalidStandardMixerDialog(obj);
         } else {
-            SIMPLEMIXER_SetChannelOrderByProtocol();
+            STDMIXER_SetChannelOrderByProtocol();
         }
     }
-    return SIMPLEMIXER_ModeName(Model.mixer_mode);
+    return STDMIXER_ModeName(Model.mixer_mode);
 }
 

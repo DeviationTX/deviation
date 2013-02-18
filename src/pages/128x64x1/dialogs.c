@@ -129,7 +129,7 @@ const char *string_cb(guiObject_t *obj, void *data)
     return dlgstr;
 }
 
-void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
+void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
 {
     if (dialog)
         return;
@@ -137,7 +137,7 @@ void PAGE_ShowInvalidSimpleMixerDialog(void *guiObj)
     dlgstr[sizeof(dlgstr) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, string_cb,
-            invalid_simplemixer_cb, dtOkCancel, guiObj);
+            invalid_stdmixer_cb, dtOkCancel, guiObj);
 }
 
 void PAGE_ShowInvalidModule()

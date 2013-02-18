@@ -23,7 +23,7 @@
 #define gui_ed (&gui_objs.u.trimedit)
 static void _show_page()
 {
-    if (Model.mixer_mode == MIXER_SIMPLE)
+    if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
