@@ -1,7 +1,7 @@
 #ifndef _GUIOBJ_H_
 #define _GUIOBJ_H_
 
-#include "simple/simple.h"
+#include "standard/standard.h"
 
 struct dialog_obj {
     guiDialog_t dialog;

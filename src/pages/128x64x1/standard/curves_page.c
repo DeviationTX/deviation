@@ -18,9 +18,9 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "mixer.h"
-#include "mixer_simple.h"
-#include "simple.h"
-#include "../../common/simple/_curves_page.c"
+#include "mixer_standard.h"
+#include "standard.h"
+#include "../../common/standard/_curves_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static void show_page(CurvesMode curves_mode, int page);

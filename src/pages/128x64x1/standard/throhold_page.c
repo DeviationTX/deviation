@@ -17,47 +17,38 @@
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "mixer.h"
-#include "simple.h"
-#include "mixer_simple.h"
-
-#include "../../common/simple/_swash_page.c"
-
+#include "standard.h"
+#include "../../common/standard/_throhold_page.c"
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
-void PAGE_SwashInit(int page)
+static s8 current_selected = 0;
+void PAGE_ThroHoldInit(int page)
 {
-    (void)page;
+    if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
+        page = current_selected;
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    get_swash();
+    current_selected = 0;
 
-    u8 w = 60;
-    u8 x = 63;
-    PAGE_ShowHeader(_tr("SwashType:"));
-    GUI_CreateTextSelectPlate(&gui->type, x-3, 0, w + 8, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL);
+    u8 y = 0;
+    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    y += ITEM_SPACE;
+    u8 w = 40;
+    GUI_CreateTextSelectPlate(&gui->en, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
 
-    u8 row = ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[0], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix:"));
-    GUI_CreateTextSelectPlate(&gui->mix[0], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
+    y += ITEM_SPACE;
+    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
+    y += ITEM_SPACE;
+    GUI_CreateTextSelectPlate(&gui->value, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
 
-    row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[1], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix:"));
-    GUI_CreateTextSelectPlate(&gui->mix[1], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)0);
-
-    row += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[2], 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Pit Mix:"));
-    GUI_CreateTextSelectPlate(&gui->mix[2], x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)2);
-
-    update_swashmixes();
     GUI_Select1stSelectableObj();
+
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
-    //u8 total_items = 2;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);

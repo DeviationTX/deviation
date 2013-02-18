@@ -1,7 +1,7 @@
 #ifndef _SIMPLE_H_
 #define _SIMPLE_H_
 #define VIEW_ID 0
-#include "../../common/simple/common_simple.h"
+#include "../../common/standard/common_standard.h"
 struct page_defs {
     const char *title;
     const char *(*value)(guiObject_t *obj, int dir, void *data);

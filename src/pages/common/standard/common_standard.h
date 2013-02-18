@@ -1,7 +1,7 @@
 #ifndef _COMMON_SIMPLE_H_
 #define _COMMON_SIMPLE_H_
 
-#include "mixer_simple.h"
+#include "mixer_standard.h"
 
 typedef enum {
     PITTHROMODE_NORMAL = 0,

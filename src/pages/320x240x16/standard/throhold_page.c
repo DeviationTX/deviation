@@ -17,8 +17,8 @@
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "simple.h"
-#include "../../common/simple/_throhold_page.c"
+#include "standard.h"
+#include "../../common/standard/_throhold_page.c"
 
 #define gui (&gui_objs.u.stdthold)
 static void toggle_thold_cb(guiObject_t *obj, void *data)

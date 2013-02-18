@@ -18,9 +18,9 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "mixer.h"
-#include "mixer_simple.h"
-#include "simple.h"
-#include "../../common/simple/_curves_page.c"
+#include "mixer_standard.h"
+#include "standard.h"
+#include "../../common/standard/_curves_page.c"
 
 static const char *curvepos[] = {
   _tr_noop("L"), "2", "3", "4", _tr_noop("M"), "6", "7", "8", _tr_noop("H")

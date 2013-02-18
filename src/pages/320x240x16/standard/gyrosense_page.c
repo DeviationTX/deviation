@@ -18,9 +18,9 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "mixer.h"
-#include "simple.h"
-#include "mixer_simple.h"
-#include "../../common/simple/_gyrosense_page.c"
+#include "standard.h"
+#include "mixer_standard.h"
+#include "../../common/standard/_gyrosense_page.c"
 
 
 void PAGE_GyroSenseInit(int page)

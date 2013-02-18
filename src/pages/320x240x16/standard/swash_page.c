@@ -18,10 +18,10 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "mixer.h"
-#include "simple.h"
-#include "mixer_simple.h"
+#include "standard.h"
+#include "mixer_standard.h"
 
-#include "../../common/simple/_swash_page.c"
+#include "../../common/standard/_swash_page.c"
 
 #define gui (&gui_objs.u.stdswash)
 

@@ -18,8 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
-#include "mixer_simple.h"
-#include "simple/simple.h"
+#include "mixer_standard.h"
+#include "standard/standard.h"
 
 #include <stdlib.h>
 

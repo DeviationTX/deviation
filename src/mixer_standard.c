@@ -25,7 +25,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include <stdlib.h>
-#include "mixer_simple.h"
+#include "mixer_standard.h"
 
 MappedSimpleChannels mapped_simple_channels;
 

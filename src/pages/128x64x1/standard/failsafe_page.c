@@ -17,8 +17,8 @@
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "simple.h"
-#include "../../common/simple/_failsafe_page.c"
+#include "standard.h"
+#include "../../common/standard/_failsafe_page.c"
 
 static const struct page_defs failsafe_defs = {
     _tr_noop("Failsafe"),

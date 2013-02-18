@@ -18,9 +18,9 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "mixer.h"
-#include "mixer_simple.h"
-#include "simple.h"
-#include "../../common/simple/_drexp_page.c"
+#include "mixer_standard.h"
+#include "standard.h"
+#include "../../common/standard/_drexp_page.c"
 
 guiObject_t *scroll_bar;
 

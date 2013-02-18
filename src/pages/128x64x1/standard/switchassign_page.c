@@ -17,8 +17,8 @@
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "simple.h"
-#include "../../common/simple/_switchassign_page.c"
+#include "standard.h"
+#include "../../common/standard/_switchassign_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 

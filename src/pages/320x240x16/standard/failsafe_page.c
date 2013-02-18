@@ -17,19 +17,11 @@
 #include "../pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
-#include "simple.h"
-#include "../../common/simple/_reverse_page.c"
+#include "standard.h"
+#include "../../common/standard/_failsafe_page.c"
 
 #define gui (&gui_objs.u.stdchan)
 
-static void toggle_reverse_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    u8 ch = (long)data;
-    if (ch >= NUM_OUT_CHANNELS)
-        return;
-    Model.limits[ch].flags ^= CH_REVERSE;
-}
 static void show_page(int page)
 {
     struct mixer_page * mp = &pagemem.u.mixer_page;
@@ -42,17 +34,18 @@ static void show_page(int page)
         long ch = page  + i;
         if (ch >= Model.num_channels)
             break;
+        MIXER_GetLimit(ch, &mp->limit);
         guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30, row, 0, 16, &DEFAULT_FONT, SIMPLEMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
-        GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, toggle_reverse_cb, reverse_cb, (void *)(ch));
+        GUI_CreateTextSelect(&gui->value[i], 150, row, TEXTSELECT_128, toggle_failsafe_cb, set_failsafe_cb, (void *)ch);
     }
 }
-
-void PAGE_ReverseInit(int page)
+void PAGE_FailSafeInit(int page)
 {
+    (void)page;
     struct mixer_page * mp = &pagemem.u.mixer_page;
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_REVERSE), MODELMENU_Show);
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_FAILSAFE), MODELMENU_Show);
     mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;

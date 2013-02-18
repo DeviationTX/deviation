@@ -50,7 +50,7 @@ else
 endif
 
 ifndef NO_STANDARD_GUI
-   SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/simple/*.c)
+   SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
 endif
 ifndef NO_ADVANCED_GUI
    SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)

@@ -18,8 +18,8 @@
 #include "config/model.h"
 #include "../pages.h"
 
-#include "simple.h"
-#include "../../common/simple/_common_simple.c"
+#include "standard.h"
+#include "../../common/standard/_common_standard.c"
 
 #define gui (&gui_objs.u.stdchan)
 static u8 _action_cb(u32 button, u8 flags, void *data);

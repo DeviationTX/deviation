@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mixer_simple.h"
+#include "mixer_standard.h"
 static struct timer_page * const tp = &pagemem.u.timer_page;
 #define gui (&gui_objs.u.timer)
 
