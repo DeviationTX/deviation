@@ -56,10 +56,10 @@ const char *STDMIX_ModeName(PitThroMode pit_mode)
     case PITTHROMODE_NORMAL:
         return _tr("Normal");
     case PITTHROMODE_IDLE1:
-        return _tr("Idle 1");
+        return _tr("Idle Up 1");
         break;
     case PITTHROMODE_IDLE2:
-        return _tr("Idle 2");
+        return _tr("Idle Up 2");
     default: // PITTHROMODE_HOLD
         return _tr("Thr hold");
     }
