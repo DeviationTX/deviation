@@ -50,7 +50,7 @@ void PAGE_SwashInit(int page)
 
     /* Row 4 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[2], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Pit Mix:"));
+    GUI_CreateLabelBox(&gui->lbl[2], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix:"));
     GUI_CreateTextSelect(&gui->mix[2], COL2, row, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();
