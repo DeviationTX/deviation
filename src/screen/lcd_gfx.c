@@ -398,6 +398,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     FILE *fh;
     u8 transparent = 0;
     u8 row_has_transparency = 0;
+    (void)row_has_transparency;
+
     u8 buf[320 * 2];
 
     if (w == 0 || h == 0)
