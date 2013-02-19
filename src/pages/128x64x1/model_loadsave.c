@@ -68,7 +68,7 @@ static void _show_list(int loadsave,u8 num_models)
     } else {
         OBJ_SET_USED(&gui->image, 0);
         guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1, num_models,
-        mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
+        mp->selected-1, &NARROW_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
         string_cb, select_cb, _press_cb, (void *)(long)loadsave);
     GUI_SetSelected(obj);
     }

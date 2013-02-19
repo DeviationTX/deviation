@@ -1,0 +1,681 @@
+﻿FRANÇAIS
+:# Channels:
+NBR CANAUX
+:%s is %d%%, safe value = %d%%\n
+%S = %d%%,VALEUR SECU. = %d%%\n
+:%s is %d%%,\nsafe value = %d%%
+%S = %d%%,\nVALEUR SECU. = %d%%\n
+:1-to-1
+1 À 1 
+:11 Point
+11 PTS
+:13 Point
+13 PTS
+:3 Point
+3 PTS
+:4 Bars
+4 BARRES
+:4 Inside
+4 CENTRAUX 
+:4 Outside
+4 EXTERNES
+:4Ch w/ Dual-Rates
+4CH ET DR
+:5 Point
+5 PTS
+:5+1
+5+1
+:6 Trims
+6 TRIMS
+:6+1
+6+1
+:6Ch Airplane
+6CH AVION
+:6Ch Helicopter
+6CH HELICOPTERE
+:7 Point
+7 PTS
+:8 Bars
+8 BARRES
+:9 Point
+9 PTS
+:ABSVAL
+VAL. ABS
+:AIL
+AIL
+:AIL DR
+AIL DR
+:AIL Inv:
+SENS AIL
+:AIL Mix:
+MIX. AIL
+>:AUX2
+>:AUX3
+:AUX4
+AUX4
+:AUX5
+AUX5
+>:AUX6
+>:AUX7
+:About Deviation
+A PROPOS...
+:Advanced
+EXPERT
+:Airplane
+AVION
+:Alarm
+ALARME
+:Alarm intvl:
+TEMPO ALARME
+:Altitude
+ALTITUDE
+:Auto
+AUTO
+:Aux2
+AUX2
+:Backlight:
+LUMINOSITE
+:Bad/missing\nprotocol modules!
+MODULE DE PROTOCOLE\nABSENT OU DEFAILLANT!
+:Bar %d:
+BARRE %d:
+:Bars:
+BARRES:
+:Batt alarm:
+ALARME BATT.
+:Battery alarm:
+ALARME BATTERIE:
+:Battery too low,\ncan't save!
+BATTERIE VIDE!\n SAUVEGARDE \n IMPOSSIBLE.
+:Bind
+APPAIRER
+:Binding
+APPAIRAGE
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+APPAIRAGE EN COURS...\nS'ASSURER QUE LE RECEPTEUR FONCTIONNE\nAPPUYER SUR OK N'ANNULE PAS LA PROCEDURE \nMAIS PERMET LE CONTROLE DU TX.
+:Binding...\n%d seconds\nPress ENT to stop
+APPAIRAGE...   %d SEC.\n APPUYER SUR ENT\nPOUR ARRETER
+:Box %d:
+BOX%d:
+:Button monitor
+CTRL DES BOUTONS
+:Buzz settings
+REGLAGES SON
+:Buzz volume:
+VOLUME
+:Buzzer settings
+REGLAGES SON
+:COL
+PAS
+:COL Inv
+SENS PAS 
+:COL Inv:
+SENS PAS 
+:COL Limit
+LIMITE PAS
+:COL Mix:
+MIX. PAS 
+:CYC
+CYC
+:Calibrate
+CALIBRER
+:Calibration done.
+CALIBRATION TERMINEE.\nAPPUYER SUR ENT\n POUR CONTINUER.
+:Cancel
+ANNULER
+:Celsius
+°C
+:Center PW
+IMP. NEUTRE
+:Center all \nsticks and knobs\nthen press ENT
+CENTRER TOUS LES STICKS\nET POTENTIOMETRES AUX,\n PUIS PRESSER ENT
+:Ch
+CH
+:Chan mode
+MODE CANAUX
+:Change
+CHANGER
+:Channel
+CANAUX
+:Channel monitor
+CTRL. DES CANAUX
+:Channel output
+SORTIES CANAUX
+:Complex
+COMPLEXE
+:Configure
+CONFIGURER
+:Contrast:
+CONTRASTE
+:Copy To
+COPIER
+:Copy To...
+COPIER...
+:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
+NIVEAU BATTERIE CRITIQUE.\nCONFIGURATION ENREGISTREE.\nCHARGER LA BATTERIE SVP.\n LES CHGTS DE CONFIGURATION\nNE SERONT PLUS SAUVER.
+:Curve:
+COURBE
+:Cyclic1
+CYCLIQUE1
+:Cyclic2
+CYCLIQUE2
+:Cyclic3
+CYCLIQUE3
+:D/R & Exp
+D/R & EXP
+>:D/R&Exp -AIL
+>:D/R&Exp -ELE
+>:D/R&Exp -RUD
+:DR
+DR
+:Deadband
+DEADBAND
+:Default
+DEFAUT
+:Delta PW
+DELTA IMP. 
+:Deviation FW version:
+DeViation FW VERSION
+:Dimmer target:
+LUM. VEILLE
+:Dimmer time:
+VEILLE APRES
+:Dn
+BAS
+:Do you really want\nto reset the\n permanent timer %d?
+REMISE À ZERO\n DU TOTALISATEUR %d?
+:Down
+BAS
+:ELE
+ELE
+:ELE DR
+ELE DR
+:ELE Inv:
+SENS ELE 
+:ELE Mix:
+MIX. ELE 
+:EXPO
+EXP.
+:Enter
+ENTREE
+:Exit
+SORTIE
+:Expo&DR
+EXPO&DR 
+:FMODE
+FMODE
+:FMODE0
+FMODE0
+:FMODE1
+FMODE1
+:FMODE2
+FMODE2
+:Fahren
+°F
+:Fail safe
+SECURITES
+:Failsafe
+FAILSAFE
+:Failsafe:
+FAILSAFE:
+:File:
+FICHIER
+:Fixed
+FIXE
+:Fixed ID:
+ID FIXE
+:Fly mode
+ACROBATIE
+:Foot
+PIED
+:Frame Size
+LARG. SIGNAL
+:GEAR
+GEAR
+:GPS
+GPS
+:Gear
+GEAR
+:Generic settings
+REGLAGES
+:Gyro sense
+GAIN GYRO
+>:H
+>:HOLD
+:Heli
+HELI
+:Heli/Standard GUI
+HELI/INTERFACE STD.
+:Helicopter
+HELICOPTERE
+:High-Rate
+PETIT DEB.
+:Hold Position
+VALEUR THR HOLD
+:Hold position
+VALEUR THR HOLD
+:Icon
+ICONE
+:Icon:
+ICONE
+:Idle 1
+IDLE 1
+:Idle 2
+IDLE 2
+:Input monitor
+CTRL. DES ENTREES
+:Input:
+ENTREE
+:Insert
+AJOUTER
+:Inverted
+INVERSE
+>:L
+:LCD settings
+REGLAGE ECRAN
+:LEFT_H
+GAUCHE_H
+:LEFT_V
+GAUCHE_V
+>:LIN
+:Language:
+LANGUE:
+:Latitude
+LATITUDE
+:Left
+GAUCHE
+:Length:
+UNITE LONG.
+:Linked
+LIE
+:Load
+CHARGER
+:Load...
+CHARGER...
+:Locked
+BLOQUE
+:Longitude
+LONGITUDE
+:Low Battery
+BATTERIE VIDE
+:Low-Rate
+GRAND DEB.
+:M
+M
+:MIX
+MIX
+:MIX0
+MIX0
+:MIX1
+MIX1
+:MIX2
+MIX2
+:Main menu
+MENU PRINCIPAL
+:Main page
+ECRAN D'ACCUEIL
+:Main page config
+CONF. ECRAN ACCUEIL
+:Max Limit:
+LIMITE MAX
+:Menu
+MENU
+:Meter
+METRE
+:Mid-Rate
+DEB. MED
+:Min Limit:
+LIMITE MIN
+:Min/Max
+MIN/MAX
+:Mixer
+MIXER
+:Mixer GUI:
+REGLAGES
+:Mixers:
+NBR MIXERS
+:Mode
+MODE
+:Mode %d
+MODE %d
+:Model menu
+MENU MODELE
+:Model name:
+NOM MODELE
+:Model needs reset\nfor standard mixer
+L'INTERFACE STANDARD\nREINITIALISE LE MODELE
+:Model needs to be reset\nin order to switch to the standard mixer
+POUR LE MODE DE REGLAGE STANDARD,\n LE MODELE DOIT ETRE REINITIALISE.
+:Model setup
+CONFIG. MODELE
+:Model type:
+TYPE MODELE
+:Move Down
+BAISSER
+:Move Up
+MONTER
+:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+BOUGER STICKS ET POT.\nAUX MIN/MAX DE COURSE\n PUIS APPUYER SUR ENT
+:Mux:
+OPERATION
+:Neg
+NEG.
+:New
+NOUVEAU
+:No Bars
+DESACTIVE
+:No Trim
+PAS DE TRIM
+:No Trims
+PAS DE TRIM
+:None
+NEANT
+:Normal
+NORMAL
+:Notch PW
+IMP. FIN
+:Off
+ARRET
+:Offset:
+OFFSET
+:Ok
+OK
+:On
+MARCHE
+:PIT
+PAS
+:Page:
+PAGE
+:Pit Mix:
+MIXAGE PLATEAU
+:Pitch curves
+COURBES DE PAS
+:Plane
+AVION
+:Point:
+POINT:
+:Pos
+POS.
+:Pos 0:
+POS 0 
+:Pos 1:
+POS 1
+:Pos 2:
+POS 2
+:Pos/Neg:
+POS./NEG.:
+:Position %d
+POSITION %d
+:PwrDn alert:
+ALRM. D'ARRET 
+:Prealert intvl:
+TEMPO PREALARM
+:Prealert time:
+PREALARME
+:Press 'Ent' to turn USB Filesystem:
+APPUYER SUR ENT\n POUR PASSER \n LE MODE USB SUR:
+:Press ENT to change:
+'ENT' POUR SELECTIONNER
+:Press ENT to copy to:
+'ENT' POUR COPIER
+:Press ENT to load:
+'ENT' POUR CHARGER
+:Press ENT to turn \nUSB drive:
+APPUYER SUR ENT\n POUR PASSER \n LE MODE USB SUR:
+:Preview: Long-Press ENT
+APERÇU: APPUI-LONG SUR ENT
+:Protocol:
+PROTOCOLE
+:RIGHT_H
+DROITE_H
+:RIGHT_V
+DROITE_V
+:RPM
+T/MN
+:RPM:
+T/MN:
+:RUD
+RUD
+:RUD DR
+RUD DR
+:Re-Init
+REINIT.
+:Remove
+SUPPRIMER
+:Reset
+RAZ
+:Reset Permanent Timer?
+RAZ TOTALISATEUR?
+:Reset sw:
+CMD. RAZ
+:Reverse
+SENS SERVOS
+:Reverse:
+SENS:
+:Reversed
+INVERSE
+:Revert
+ANNULER
+:Right
+DROITE
+:Safe Val:
+VAL. SECU
+:Safety
+SECURITE
+:Safety:
+SECURITE:
+:Save
+SAUVE
+:Scale%s:
+ECHELLE%S:
+:Scale:
+ECHELLE
+:Scanner
+SCANNER
+:Select switch icon
+CHOIX DE L'ICONE
+:Servo
+SERVO
+:Simple
+SIMPLE
+:Simple 4 Channel
+4CH. SIMPLE
+:Speed
+VITESSE
+:Speed:
+VITESSE:
+:Src
+SOURCE
+:Src:
+SOURCE
+:Standard
+STANDARD
+:Standard Mixer
+MIXER STANDARD
+:Start:
+DUREE:
+:Step:
+<PAS>
+:Stick input
+ENTREES  STICKS/AUX.
+:Stick mode:
+MODE
+:Sticks:
+STICKS
+:Sub-trim
+SUBTRIMS
+:Subtrim
+SUBTRIM
+:Subtrim:
+SUBTRIM
+:Swash
+PLATEAU CYCL.
+:SwashType:
+PLATEAU CYCL.:
+<:Switch %d:
+<INTER %d
+:Switch assignment
+AFFECT. INTERS
+:Switch1
+INTER1
+:Switch2
+INTER2
+:Switch:
+COMMANDE
+:Symmetric
+SYMETRIQUE
+:THR
+THR
+:TRIMLH+
+TRIMGH+
+:TRIMLH-
+TRIMGH-
+:TRIMLV+
+TRIMGV+
+:TRIMLV-
+TRIMGV-
+:TRIMRH+
+TRIMDH+
+:TRIMRH-
+TRIMDH-
+:TRIMRV+
+TRIMDV+
+:TRIMRV-
+TRIMDV-
+:TRIM_L+
+TRIM_G+
+:TRIM_L-
+TRIM_G-
+:TRIM_R+
+TRIM_D+
+:TRIM_R-
+TRIM_D-
+>:TRN
+:TelemRPM
+TELEM.T/MN
+:TelemT
+TELEM.T°
+:TelemV
+TELEM.V
+:Telemetry
+TELEMETRIE
+:Telemetry config
+CONFIG. TELEMETRIE
+:Telemetry monitor
+CTRL. TELEMETRIE
+:Telemetry settings
+REGLAGES TELEMETRIE
+:Temp
+T°
+:Temp:
+T°:
+:Temperature:
+UNITE T°
+:Template..
+GABARIT...
+:Test
+TEST
+:Thr hold
+THR HOLD
+:Throttle curves
+COURBES DE GAZ
+:Throttle hold
+COUPURE GAZ
+:Time
+HEURE
+:Timer
+CHRONO
+:Timer settings
+ALARMES CHRONOS
+:Timer%d:
+CHRONO %d
+:Timers
+CHRONOS
+:Timeup intvl:
+TEMPO ALARME
+:Toggle%d
+INTER%d
+:Touch Calibrate
+CALIBRATION DU TACTILE
+:Touch Test
+TEST DU TACTILE
+:Touch screen:
+ECRAN TACTILE:
+:Touch target %d
+TOUCHER LA CIBLE %d 
+:Touch to Lock
+TOUCHER POUR VERROUILLER
+:Touch to Unlock
+TOUCHER POUR DEVERROUILLER
+:Transmitter config
+CONFIG. EMETTEUR
+:Transmitter menu
+MENU EMETTEUR
+:Travel adjust
+COURSE SERVOS
+:Trim
+TRIM
+:Trim +:
+TRIM +:
+:Trim -:
+TRIM -:
+:Trim Step:
+FINESSE:
+:Trims
+TRIMS
+:Trims:
+TRIMS:
+:Turn Off
+DESACTIVER
+:Turn On
+ACTIVER
+:Tx power:
+PUISS. TX
+:USB
+USB
+:USB Filesystem is currently 
+LA PARTITION USB EST 
+:Unknown
+INCONNU
+:Unlocked
+DEBLOQUE
+:Up
+HAUT
+:Value
+VALEUR
+:Value:
+VALEUR:
+:Vibration:
+VIBREUR
+:Virt
+VIRT
+:Volt
+VOLT
+:Volt:
+VOLT:
+:Zero/Max
+0/MAX
+:\n\nBinding will end in %d seconds...
+\n\nAPPAIRAGE TERMINE DANS %d SECONDES...
+:add
+AJOUTER
+:countdown
+A REBOURS
+<:fulltime
+<TOTAL
+:is not supported
+NON SUPPORTE
+:is turned off
+ETEINT
+:max
+MAX
+:min
+MIN
+:mult
+MULTIPLIER
+:permanent
+PERMANENT
+:replace
+REMPLACER
+:stopwatch
+CHRONO
