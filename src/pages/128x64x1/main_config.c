@@ -154,7 +154,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    const void *label;
+    const void *label = NULL;
     void *label_cb = NULL;
 
     void *label_press = NULL;
