@@ -48,8 +48,18 @@ static void press_cb(guiObject_t *obj, const void *data)
     }
 }
 
+static const char *holdsw_str_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(mp->tmpstr, "%s ", _tr("Switch:"));
+    INPUT_SourceNameAbbrevSwitch(mp->tmpstr + strlen(mp->tmpstr), mapped_std_channels.switches[SWITCHFUNC_HOLD]);
+    return mp->tmpstr;
+}
+
 static void update_textsel_state()
 {
+    GUI_SetHidden((guiObject_t *)&gui->holdsw, pit_mode == PITTHROMODE_HOLD ? 0 : 1);
     for (u8 i = 1; i < 8; i++) {
         u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
         if (selectable_bitmap >> (i-1) & 0x01) {
@@ -83,6 +93,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
+    GUI_CreateLabelBox(&gui->holdsw, 140, 60, 170, 16, &NARROW_FONT, holdsw_str_cb, NULL, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 

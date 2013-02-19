@@ -37,7 +37,6 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         changed = 1;
     }
     if (changed) {
-          
         if (pit_mode == PITTHROMODE_HOLD)
             GUI_SetHidden((guiObject_t *)&gui->hold, 0);
         else
