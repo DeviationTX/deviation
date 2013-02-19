@@ -40,12 +40,13 @@ void PAGE_GyroSenseInit(int page)
     }
     gryo_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
+    PAGE_ShowHeader(_tr("Gyro sense"));
 
     u8 w = 65;
     u8 x = 63;
-    u8 row = 0;
+    u8 row = ITEM_SPACE;
     GUI_CreateLabelBox(&gui->chanlbl, 0, row, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
-    GUI_CreateTextSelectPlate(&gui->chan, x, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->chan, x, row, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
 
     row += ITEM_SPACE;
     w = 40;

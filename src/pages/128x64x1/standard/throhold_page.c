@@ -31,16 +31,16 @@ void PAGE_ThroHoldInit(int page)
     PAGE_RemoveAllObjects();
     current_selected = 0;
 
-    u8 y = 0;
+    PAGE_ShowHeader(_tr("Throttle hold"));
+
+    u8 y = ITEM_SPACE;
     GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    y += ITEM_SPACE;
     u8 w = 40;
-    GUI_CreateTextSelectPlate(&gui->en, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->en, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
 
     y += ITEM_SPACE;
     GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    y += ITEM_SPACE;
-    GUI_CreateTextSelectPlate(&gui->value, 40, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->value, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
 
     GUI_Select1stSelectableObj();
 
