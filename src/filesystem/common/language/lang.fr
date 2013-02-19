@@ -266,7 +266,7 @@ Ajouter
 Inversé
 >:L
 :LCD settings
-Réglage Ecran
+Réglages Ecran
 :LEFT_H
 GAUCHE_H
 :LEFT_V
