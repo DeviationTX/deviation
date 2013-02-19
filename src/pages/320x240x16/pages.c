@@ -155,6 +155,19 @@ void changepage_cb(guiObject_t *obj, const void *data)
             PAGE_Change(-1);
     }
 }
+
+void PAGE_RemoveHeader()
+{
+    if(OBJ_IS_USED(&gui->exitico))
+        GUI_RemoveObj((guiObject_t *)&gui->exitico);
+    if(OBJ_IS_USED(&gui->title))
+        GUI_RemoveObj((guiObject_t *)&gui->title);
+    if(OBJ_IS_USED(&gui->previco))
+        GUI_RemoveObj((guiObject_t *)&gui->previco);
+    if(OBJ_IS_USED(&gui->nextico))
+        GUI_RemoveObj((guiObject_t *)&gui->nextico);
+}
+
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
@@ -178,6 +191,7 @@ void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *o
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
 }
+
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
 {
     if(OBJ_IS_USED(&gui->title))

@@ -20,6 +20,7 @@
 #define PAGE_NAME_MAX 10
 extern struct pagemem pagemem;
 
+void PAGE_RemoveHeader();
 void PAGE_ShowHeader(const char *title);
 void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data);

@@ -25,11 +25,26 @@
 #define PLANE_LABEL _tr_noop("Airplane")
 #include "../common/_model_page.c"
 
+static const char *_mixermode_cb(guiObject_t *obj, int dir, void *data)
+{
+    const char *ret = mixermode_cb(obj, dir, data);
+    if(Model.mixer_mode != mp->last_mixermode) {
+        mp->last_mixermode = Model.mixer_mode;
+        PAGE_RemoveHeader();
+        if (Model.mixer_mode == MIXER_STANDARD)
+            PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
+        else
+            PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
+    }
+    return ret;
+}
+
 void PAGE_ModelInit(int page)
 {
     (void)page;
     u8 row;
 
+    mp->last_mixermode = Model.mixer_mode;
     mp->file_state = 0;
     PAGE_SetModal(0);
     if (Model.mixer_mode == MIXER_STANDARD)
@@ -43,7 +58,7 @@ void PAGE_ModelInit(int page)
 
     row+= 20;
     GUI_CreateLabel(&gui->guilbl, 8, row, NULL, DEFAULT_FONT, _tr("Mixer GUI:"));
-    GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, NULL, mixermode_cb, NULL);
+    GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
 
     row += 20;
     GUI_CreateLabel(&gui->namelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model name:"));  // use the same naming convention for devo8 and devo10
