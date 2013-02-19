@@ -13,6 +13,7 @@ struct model_page {
     char iconstr[24];
     char fixed_id[7];
     u8 file_state;
+    u8 last_mixermode;
 /*Load save */
     s8 selected;
     u8 total_items;

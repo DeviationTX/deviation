@@ -124,6 +124,8 @@ void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const vo
     (void)label_cb;
     (void)data;
 }
+void PAGE_RemoveHeader()
+{}
 
 void PAGE_RemoveAllObjects()
 {

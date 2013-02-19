@@ -52,16 +52,19 @@ void PAGE_GyroSenseInit(int page)
     GUI_CreateTextSelect(&gui->chan, 120, 40, TEXTSELECT_128, NULL, gyro_output_cb, NULL);
 
     /* Row 2 */
-    GUI_CreateLabelBox(&gui->gyrolbl[0], 10, 60, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
-    GUI_CreateTextSelect(&gui->gyro[0], 120, 60, TEXTSELECT_128, NULL, gyro_val_cb, (void *)0L);
+    GUI_CreateLabelBox(&gui->rangelbl, 120, 70, 128, 16, &NARROW_FONT, NULL, NULL, "0% - 100%");
 
     /* Row 3 */
-    GUI_CreateLabelBox(&gui->gyrolbl[1], 10, 80, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
-    GUI_CreateTextSelect(&gui->gyro[1], 120, 80, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
+    GUI_CreateLabelBox(&gui->gyrolbl[0], 10, 90, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
+    GUI_CreateTextSelect(&gui->gyro[0], 120, 90, TEXTSELECT_128, NULL, gyro_val_cb, (void *)0L);
+
+    /* Row 4 */
+    GUI_CreateLabelBox(&gui->gyrolbl[1], 10, 110, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
+    GUI_CreateTextSelect(&gui->gyro[1], 120, 110, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
 
     if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
-        /* Row 4 */
-        GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 100, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
-        GUI_CreateTextSelect(&gui->gyro[2], 120, 100, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
+        /* Row 5 */
+        GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 130, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
+        GUI_CreateTextSelect(&gui->gyro[2], 120, 130, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
     }
 }
