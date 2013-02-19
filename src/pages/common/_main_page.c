@@ -146,6 +146,8 @@ void PAGE_MainEvent()
             continue;
         u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);
         struct ImageMap img;
+        (void)img.x_off;
+        (void)img.y_off;
         img.file = NULL;
         if (Model.pagecfg.toggle[i] > INP_HAS_CALIBRATION && Model.pagecfg.toggle[i] < INP_LAST) {
             //switch

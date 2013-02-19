@@ -58,6 +58,14 @@ void SPI_ProtoInit()
     gpio_set(GPIOA, GPIO13);
 #endif
 
+    /* CC2500 */
+#ifdef PROTO_HAS_CC2500
+    //Disable JTAG and SWD
+    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
+    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO14);
+    gpio_set(GPIOA, GPIO14);
+#endif
     /* Includes enable? */
     spi_init_master(SPI2, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
