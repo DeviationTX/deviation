@@ -68,6 +68,9 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         TIMER_Reset(idx);
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(src));
+    if (0 && Model.mixer_mode == MIXER_STANDARD)  {
+        return MIXER_SRC(src) ? _tr("On") : _tr("Off");
+    }
     return INPUT_SourceName(tp->tmpstr, src);
 }
 
