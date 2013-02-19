@@ -106,6 +106,10 @@ void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
+    if (Model.mixer_mode != 0 && groups[cur_page].group == 1) {
+        //Don't use left/right on model pages in standard mode
+        return;
+    }
     u8 nextpage = cur_page;
     if(dir > 0) {
         if (groups[nextpage+1].group == groups[cur_page].group) {
