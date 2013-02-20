@@ -92,7 +92,7 @@ static void _show_page()
         GUI_CreateLabelBox(&gui2->buzzlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Buzz volume:"));
         GUI_CreateTextSelect(&gui2->buzz, 112, row, TEXTSELECT_96, NULL, _buzz_vol_cb, (void *)&Transmitter.volume);
         row += space;
-        GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power-down alert"));
+        GUI_CreateLabelBox(&gui2->musicshutdbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("PwrDn alert:"));
         GUI_CreateTextSelect(&gui2->music_shutdown, 112, row, TEXTSELECT_96, NULL, _music_shutdown_cb, (void *)&Transmitter.music_shutdown);
         row += space + 8;
         GUI_CreateLabelBox(&gui2->head2, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("LCD settings"));
