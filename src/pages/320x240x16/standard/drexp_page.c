@@ -24,6 +24,11 @@
 
 guiObject_t *scroll_bar;
 
+void update_graph(int graph)
+{
+    GUI_Redraw(&gui->graph[graph]);
+}
+
 void PAGE_DrExpInit(int page)
 {
     (void)page;

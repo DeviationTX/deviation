@@ -77,6 +77,7 @@ static const char *set_holdstate_cb(guiObject_t *obj, int dir, void *data)
     pit_hold_state = GUI_TextSelectHelper(pit_hold_state, 0, 1, dir, 1, 1, &changed);
     if (changed) {
         set_hold_state(pit_hold_state);
+        update_textsel_state();
     }
     if (pit_mode != PITTHROMODE_HOLD)
         strcpy(mp->tmpstr, "");

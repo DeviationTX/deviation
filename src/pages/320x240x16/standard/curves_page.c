@@ -30,7 +30,7 @@ static const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int pos = (long)data;
-    return (selectable_bitmaps[curve_mode * 4 + pit_mode] & (1 << (pos - 1))) ? _tr("Unlocked") : _tr("Locked");
+    return (selectable_bitmaps[curve_mode * 4 + pit_mode] & (1 << (pos - 1))) ? _tr("Manual") : _tr("Auto");
 }
 
 static void press_cb(guiObject_t *obj, const void *data)
@@ -60,14 +60,22 @@ static const char *holdsw_str_cb(guiObject_t *obj, const void *data)
 static void update_textsel_state()
 {
     GUI_SetHidden((guiObject_t *)&gui->holdsw, pit_mode == PITTHROMODE_HOLD ? 0 : 1);
-    for (u8 i = 1; i < 8; i++) {
-        u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
-        if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(&gui->val[i], 1);
-        } else {
-            GUI_TextSelectEnable(&gui->val[i], 0);
+    GUI_SetHidden((guiObject_t *)&gui->holdlbl, pit_mode == PITTHROMODE_HOLD ? 0 : 1);
+    int state = pit_mode == PITTHROMODE_HOLD && pit_hold_state == 0;
+    for (u8 i = 0; i < 9; i++) {
+        GUI_SetHidden((guiObject_t *)&gui->vallbl[i], state);
+        GUI_SetHidden((guiObject_t *)&gui->val[i], state);
+        GUI_SetHidden((guiObject_t *)&gui->lock[i-1], state);
+        if(! state && i > 0 && i < 8) {
+            u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
+            if (selectable_bitmap >> (i-1) & 0x01) {
+                GUI_TextSelectEnable(&gui->val[i], 1);
+            } else {
+                GUI_TextSelectEnable(&gui->val[i], 0);
+            }
         }
     }
+    GUI_SetHidden((guiObject_t *)&gui->graph, state);
 }
 
 static void show_page(CurvesMode _curve_mode, int page)
@@ -92,8 +100,9 @@ static void show_page(CurvesMode _curve_mode, int page)
     /* Row 1 */
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateTextSelect(&gui->hold, 246, 40, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
-    GUI_CreateLabelBox(&gui->holdsw, 140, 60, 170, 16, &NARROW_FONT, holdsw_str_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->holdlbl, 92, 60, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
+    GUI_CreateTextSelect(&gui->hold, 140, 60, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
+    GUI_CreateLabelBox(&gui->holdsw, 216, 60, 0, 0, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
@@ -105,7 +114,7 @@ static void show_page(CurvesMode _curve_mode, int page)
         const char *label = curvepos[i];
         if(label[0] > '9')
             label = _tr(label);
-        GUI_CreateLabelBox(&gui->vallbl[i], COL1, 60+20*i, 0, 16, &DEFAULT_FONT, NULL, NULL, label);
+        GUI_CreateLabelBox(&gui->vallbl[i], COL1, 60+20*i, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, label);
         GUI_CreateTextSelect(&gui->val[i], COL2, 60+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
             GUI_CreateButton(&gui->lock[i-1], COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);

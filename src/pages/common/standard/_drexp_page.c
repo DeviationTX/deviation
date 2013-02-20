@@ -25,6 +25,7 @@ static u8 current_pit_mode = 0;
 #define MAX_SCALAR 125
 
 static void _refresh_page();
+void update_graph(int graph);
 
 static void get_mixers()
 {
@@ -71,7 +72,7 @@ static const char *set_dr_cb(guiObject_t *obj, int dir, void *data)
             0, MAX_SCALAR, dir, 1, LONG_PRESS_STEP, &changed);
     if (changed || (GUI_GetSelected() == obj && current_pit_mode != pit_mode)) {
         current_pit_mode = pit_mode;
-        GUI_Redraw(&gui->graph);;
+        update_graph(pit_mode);
     }
     sprintf(mp->tmpstr, "%d", mp->mixer_ptr[pit_mode]->scalar);
     strcat(mp->tmpstr, "%");
@@ -96,7 +97,7 @@ static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
     if (changed || (GUI_GetSelected() == obj && current_pit_mode != pit_mode))  {
         curve->points[1] = curve->points[0];
         current_pit_mode = pit_mode;
-        GUI_Redraw(&gui->graph);
+        update_graph(pit_mode);
     }
     if (curve->points[0] == 0)
         strcpy(mp->tmpstr, _tr("LIN"));

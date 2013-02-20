@@ -23,7 +23,7 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
     u8 ch = (long)data;
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         char tmp1[30];
-        INPUT_SourceName(tmp1, ProtocolChannelMap[Model.protocol][ch]);
+        INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
         sprintf(mp->tmpstr, "%d-%s", ch+1, tmp1);
     }
     else if (ch == 5)

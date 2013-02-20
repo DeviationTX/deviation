@@ -106,7 +106,7 @@ void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (Model.mixer_mode != 0 && groups[cur_page].group == 1) {
+    if (Model.mixer_mode != 0 && (cur_page >= sizeof(groups) / sizeof(struct page_group) || groups[cur_page].group == 1)) {
         //Don't use left/right on model pages in standard mode
         return;
     }

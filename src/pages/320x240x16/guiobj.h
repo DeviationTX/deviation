@@ -367,6 +367,7 @@ struct advmixcfg_obj {
 struct stdcurve_obj {
     guiLabel_t msg;
     guiLabel_t modelbl;
+    guiLabel_t holdlbl;
     guiLabel_t holdsw;
     guiTextSelect_t mode;
     guiTextSelect_t hold;
