@@ -127,8 +127,9 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
 static s16 show_curve_cb(s16 xval, void *data)
 {
     (void)data;
-    s16 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[current_pit_mode]->curve));
-    yval = yval * mp->mixer_ptr[current_pit_mode]->scalar / 100 ;
+    int idx = data ? ((long)data - 1) : current_pit_mode;
+    s16 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[idx]->curve));
+    yval = yval * mp->mixer_ptr[idx]->scalar / 100 ;
     return yval;
 }
 
