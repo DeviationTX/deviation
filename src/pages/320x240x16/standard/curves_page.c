@@ -30,7 +30,7 @@ static const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int pos = (long)data;
-    return (selectable_bitmaps[curve_mode * 4 + pit_mode] & (1 << (pos - 1))) ? _tr("Unlocked") : _tr("Locked");
+    return (selectable_bitmaps[curve_mode * 4 + pit_mode] & (1 << (pos - 1))) ? _tr("Manual") : _tr("Auto");
 }
 
 static void press_cb(guiObject_t *obj, const void *data)
