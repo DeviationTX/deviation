@@ -99,7 +99,7 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     /* Row 1 */
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
-    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_96, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateLabelBox(&gui->holdlbl, 92, 60, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
     GUI_CreateTextSelect(&gui->hold, 140, 60, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
     GUI_CreateLabelBox(&gui->holdsw, 216, 60, 0, 0, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);

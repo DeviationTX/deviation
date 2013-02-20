@@ -62,15 +62,15 @@ void PAGE_DrExpInit(int page)
     GUI_CreateXYGraph(&gui->graph[0], 4, 140, 96, 96,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
-                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(long)(PITTHROMODE_NORMAL));
+                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_NORMAL+1L));
     GUI_CreateXYGraph(&gui->graph[1], 112, 140, 96, 96,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
-                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(long)(PITTHROMODE_IDLE1));
+                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_IDLE1+1L));
     GUI_CreateXYGraph(&gui->graph[2], 216, 140, 96, 96,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
-                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(long)(PITTHROMODE_IDLE2));
+                              0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_IDLE2+1L));
 }
 
 static void _refresh_page() {
