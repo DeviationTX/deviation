@@ -37,15 +37,21 @@ void PAGE_PitCurvesInit(int page)
 
 static void update_textsel_state()
 {
-    for (u8 i = 1; i < 8; i++) {
-        u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
-        GUI_TextSelectEnablePress(&gui->val[i], 1);
-        if (selectable_bitmap >> (i-1) & 0x01) {
-            GUI_TextSelectEnable(&gui->val[i], 1);
-        } else {
-            GUI_TextSelectEnable(&gui->val[i], 0);
+    int state = pit_mode == PITTHROMODE_HOLD && pit_hold_state == 0;
+    for (u8 i = 0; i < 9; i++) {
+        GUI_SetHidden((guiObject_t *)&gui->vallbl[i], state);
+        GUI_SetHidden((guiObject_t *)&gui->val[i], state);
+        if(! state && i > 0 && i < 8) {
+            u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
+            GUI_TextSelectEnablePress(&gui->val[i], 1);
+            if (selectable_bitmap >> (i-1) & 0x01) {
+                GUI_TextSelectEnable(&gui->val[i], 1);
+            } else {
+                GUI_TextSelectEnable(&gui->val[i], 0);
+            }
         }
     }
+    GUI_SetHidden((guiObject_t *)&gui->graph, state);
 }
 
 static void press_cb(guiObject_t *obj, void *data)
