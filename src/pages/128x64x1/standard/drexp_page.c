@@ -36,6 +36,11 @@ enum {
     ITEM_LAST,
 };
 
+void update_graph(int graph)
+{
+    (void)graph;
+    GUI_Redraw(&gui->graph);
+}
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
