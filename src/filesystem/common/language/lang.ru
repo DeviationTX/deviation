@@ -221,6 +221,8 @@ Aux2
 РВыс Микш:
 :EXPO
 Экспо.
+:Enabled
+Вкл.:
 :Enter
 Ввод
 :Exit
@@ -295,9 +297,9 @@ HOLD
 Значок
 :Icon:
 Значок:
-:Idle 1
+:Idle Up 1
 Пилотаж 1
-:Idle 2
+:Idle Up 2
 Пилотаж 2
 :Input monitor
 Монитор ввода
@@ -331,8 +333,6 @@ L
 Загрузить
 :Load...
 Загрузка...
-:Locked
-Заперто
 :Longitude
 Долгота
 :Low Battery
@@ -351,6 +351,8 @@ M
 Главная страница
 :Main page config
 Главная страница
+:Manual
+Вручную
 :Max Limit:
 Макс.предел:
 |devo8:Max Limit:
@@ -378,7 +380,7 @@ M
 :Mixers:
 Микшер:
 :Mode
-Режим
+Режим:
 :Mode %d
 Режим %d
 :Model menu
@@ -427,10 +429,10 @@ M
 Вкл
 :PIT
 Шаг
+:PIT Mix:
+Шаг Микш:
 :Page:
 Стр.:
-:Pit Mix:
-Шаг Микш:
 :Pitch curves
 Кривые шага
 :Plane
@@ -449,7 +451,7 @@ M
 +/-:
 :Position %d
 Положение %d
-:PowerOff alert
+:Power-down alert
 Сигнал выкл.:
 :Prealert intvl:
 Интерв. перед:
@@ -705,8 +707,6 @@ USB
 Файловая система сейчас: 
 :Unknown
 Неизвестный
-:Unlocked
-Открыто
 :Up
 Вверх
 :Value
