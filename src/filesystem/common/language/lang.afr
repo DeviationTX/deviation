@@ -49,29 +49,38 @@ AIL DR
 :AIL Inv:
 :AIL Mix:
 AIL Meng:
->:AUX2
->:AUX3
+:AUX2
+AUX2
+:AUX3
+AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
->:AUX6
->:AUX7
+:AUX6
+AUX6
+:AUX7
+AUX7
 :About Deviation
 Deviation Info
->:Advanced
+:Advanced
+Gevorderd
 :Airplane
 Vliegtuig
 :Alarm
 Alarm
->:Alarm intvl:
+:Alarm intvl:
+Alarm interval:
 :Altitude
 Hoogte
->:Auto
->:Aux2
+:Auto
+Outo
+:Aux2
+Aux2
 :Backlight:
 Skermlig:
->:Bad/missing\nprotocol modules!
+:Bad/missing\nprotocol modules!
+Protokol modules\nis sleg of weg!
 :Bar %d:
 Balk %d:
 :Bars:
@@ -94,10 +103,12 @@ Bind...\n%d seconds\n Druk ENT om te stop
 Kassie %d:
 :Button monitor
 Knoppie Monitor
->:Buzz settings
+:Buzz settings
+Beep verstellings 
 :Buzz volume:
 Beep Volume:
->:Buzzer settings
+:Buzzer settings
+Beep verstellings 
 :COL
 KOL
 :COL Inv
@@ -128,7 +139,8 @@ K
 Kanaal Mode
 :Change
 Verander
->:Channel
+:Channel
+Kannaal
 :Channel monitor
 Kanaal Monitor
 :Channel output
@@ -153,10 +165,14 @@ Siklies1
 Siklies2
 :Cyclic3
 Siklies3
->:D/R & Exp
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+:D/R & Exp
+D/R & Exp
+:D/R&Exp -AIL
+D/R&Exp -AIL
+:D/R&Exp -ELE
+D/R&Exp -ELE
+:D/R&Exp -RUD
+D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -191,17 +207,14 @@ Enter
 Exit
 :Expo&DR
 Expo&DR
->:FMODE
-<:FMODE0
-<FMOD0
-<:FMODE1
-<FMOD1
-<:FMODE2
-<FMOD2
+:FMODE
+FMODE
 :Fahren
 Beweeg
->:Fail safe
->:Failsafe
+:Fail safe
+Falingveilig
+:Failsafe
+Falingveilig
 :Failsafe:
 Falingveilig:
 :File:
@@ -210,7 +223,8 @@ Lêer:
 Vaste
 :Fixed ID:
 Vaste ID:
->:Fly mode
+:Fly mode
+Vliegmode
 :Foot
 Voet
 :Frame Size
@@ -219,26 +233,34 @@ Raam Grootte
 Wiele
 :GPS
 GPS
->:Gear
+:Gear
+Wiele
 :Generic settings
 Generiese Opstelling
->:Gyro sense
->:H
->:HOLD
+:Gyro sense
+Gyro monitor
+:H
+H
+:HOLD
+HOU
 :Heli
 Heli
->:Heli/Standard GUI
+:Heli/Standard GUI
+Heli/Standaard GUI
 :Helicopter
 Helikopter
 :High-Rate
 Hoë tempo
->:Hold position
+:Hold position
+Hou posisie
 :Icon
 Ikoon
 :Icon:
 Ikoon
->:Idle 1
->:Idle 2
+:Idle 1
+Idle 1
+:Idle 2
+Idle 2
 :Input monitor
 Inset Monitor
 :Input:
@@ -247,14 +269,16 @@ Inset:
 Enter
 :Inverted
 Omgekeerd
->:L
+:L
+L
 :LCD settings
 LCD Opstelling
 :LEFT_H
 LINKS_H
 :LEFT_V
 LINKS_V
->:LIN
+:LIN
+LIN
 :Language:
 Taal: 
 :Latitude
@@ -269,21 +293,18 @@ Verbind
 Laai
 :Load...
 Laai...
->:Locked
+:Locked
+Gesluit
 :Longitude
 Lengtegraad
 :Low Battery
 Battery pap
 :Low-Rate
 Lae Tempo
->:M
->:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
+:M
+M
+:MIX
+MENG
 :Main menu
 Hoof Menu
 :Main page
@@ -304,18 +325,22 @@ Min Limiet:
 Min/Max
 :Mixer
 Menger:
->:Mixer GUI:
+:Mixer GUI:
+Menger GUI
 :Mixers:
 Mengers:
->:Mode
+:Mode
+Modus
 :Mode %d
 Modus %d
 :Model menu
 Model Menu
 :Model name:
 Model name:
->:Model needs reset\nfor standard mixer
->:Model needs to be reset\nin order to switch to the standard mixer
+:Model needs reset\nfor standard mixer
+Model moet Reset \nvir die Standaard Menger
+:Model needs to be reset\nin order to switch to the standard mixer
+Model moet eers Reset\nom oor teskakel na die Standaard Menger
 :Model setup
 Modelopstelling
 :Model type:
@@ -352,26 +377,34 @@ Afset:
 Ok
 :On
 Aan
->:PIT
+:PIT
+PIT
 :Page:
 Bladsy:
->:Pit Mix:
->:Pitch curves
+:Pit Mix:
+PIT Meng:
+:Pitch curves
+PIT kurwes
 :Plane
 Vlak
 :Point:
 Punk:
 :Pos
 +
->:Pos 0:
->:Pos 1:
->:Pos 2:
+:Pos 0:
+Pos 0:
+:Pos 1:
+Pos 1:
+:Pos 2:
+Pos 2:
 :Pos/Neg:
 +/-:
->:Position %d
->:PowerOff alert
+:Position %d
+Posisie %d
+:PowerOff alert
+Krag-af waarskuwing
 :Prealert intvl:
-Voorwaarsku per:
+Voorwaarsku intvl:
 :Prealert time:
 Voorwaarsku tyd:
 :Press 'Ent' to turn USB Filesystem:
@@ -388,7 +421,8 @@ Druk ENT vir USB aan:
 Voorskou: Lang-druk ENT
 :Protocol:
 Protokol:
->:PwrDn alert:
+:PwrDn alert:
+Krag-af waarskuwing
 :RIGHT_H
 REGS_H
 :RIGHT_V
@@ -407,8 +441,10 @@ Her-ini
 Verwyder
 :Reset
 Reset
->:Reset sw:
->:Reverse
+:Reset sw:
+Reset sw:
+:Reverse
+Omkeer
 :Reverse:
 Omkeer:
 :Reversed
@@ -427,10 +463,12 @@ Veligheid:
 Stoor
 :Scale%s:
 Skale%s:
->:Scale:
+:Scale:
+Skaal:
 :Scanner
 Skandeer
->:Servo
+:Servo
+Servo
 :Simple
 Eenvoudig
 :Simple 4 Channel
@@ -443,8 +481,10 @@ Spoed:
 Bron
 :Src:
 Bron:
->:Standard
->:Standard Mixer
+:Standard
+Standaard
+:Standard Mixer
+Standaard Menger
 :Start:
 Begin:
 :Step:
@@ -455,16 +495,19 @@ Stokinset
 Stok mode:
 :Sticks:
 Stokke:
->:Sub-trim
->:Subtrim
+:Sub-trim
+SubTrim 
+:Subtrim
+SubTrim
 :Subtrim:
-Sub trim:
->:Swash
+SubTrim:
+SubTrim: 
+:Swash
+Swash
 :SwashType:
 Swash tipe:
-<:Switch %d:
-<Skakelaar $d
->:Switch assignment
+:Switch assignment
+Skakelaar toekening
 :Switch1
 Skakelaar1
 :Switch2
@@ -499,7 +542,8 @@ TRIM_L-
 TRIM_R+
 :TRIM_R-
 TRIM_R-
->:TRN
+:TRN
+TRN
 :TelemRPM
 TelemRPM
 :TelemT
@@ -524,9 +568,12 @@ Temperatuur:
 Voorbeeld..
 :Test
 Toets
->:Thr hold
->:Throttle curves
->:Throttle hold
+:Thr hold
+THR Hou
+:Throttle curves
+Throttle Kurwes
+:Throttle hold
+Throttle hou
 :Time
 Tyd
 :Timer
@@ -557,7 +604,8 @@ Raak om te ontsluit
 Sender Opstelling
 :Transmitter menu
 Sender Menu
->:Travel adjust
+:Travel adjust
+Beweging verstelling
 :Trim
 Trim
 :Trim +:
@@ -578,13 +626,16 @@ Sit Aan
 Sendkrag:
 :USB
 USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+USB Lêerstelsel is tans
 :Unknown
 Onbekend
->:Unlocked
+:Unlocked
+Ontsluit
 :Up
 Op
->:Value
+:Value
+Waarde
 :Value:
 Waarde:
 :Vibration:
@@ -613,7 +664,8 @@ max
 min
 :mult
 *
->:permanent
+:permanent
+Permanent
 :replace
 vervang
 :stopwatch
