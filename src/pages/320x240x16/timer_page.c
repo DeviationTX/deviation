@@ -68,7 +68,7 @@ static void _draw_body() {
     for (u8 i = timer_page_num * 2; i < NUM_TIMERS && i < timer_page_num * 2 + 2; i++) {
         int row = 48 + i%2 * 100;
         //Row 1
-	if(!i%2) 
+	if( 0 == i%2 ) 
             firstObj = GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT,timer_str_cb, NULL, (void *)(long)i);
 	else
 	    GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
