@@ -643,6 +643,8 @@ RPM
 Тест
 :Thr hold
 Удерж.газа
+|devo8:Thr hold
+Удержание газа
 :Throttle curves
 Кривые газа
 :Throttle hold
