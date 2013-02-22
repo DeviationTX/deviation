@@ -65,7 +65,7 @@ static void update_textsel_state()
     for (u8 i = 0; i < 9; i++) {
         GUI_SetHidden((guiObject_t *)&gui->vallbl[i], state);
         GUI_SetHidden((guiObject_t *)&gui->val[i], state);
-        GUI_SetHidden((guiObject_t *)&gui->lock[i-1], state);
+        GUI_SetHidden((guiObject_t *)&gui->lock[i], state);
         if(! state && i > 0 && i < 8) {
             u8 selectable_bitmap = selectable_bitmaps[curve_mode * 4 + pit_mode];
             if (selectable_bitmap >> (i-1) & 0x01) {
