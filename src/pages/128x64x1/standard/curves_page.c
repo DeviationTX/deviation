@@ -77,16 +77,22 @@ static void show_page(CurvesMode _curve_mode, int page)
     PAGE_RemoveAllObjects();
     memset(mp, 0, sizeof(*mp));
     curve_mode = _curve_mode;
+    int count;
+    int expected;
     if (curve_mode == CURVESMODE_PITCH) {
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, 4);
         get_hold_state();
-    } else
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    } else {
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, 4);
+        pit_hold_state = 0;
+    }
+    expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_FLYMODE]) + pit_hold_state;
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
 
+    set_cur_mixer();
     PAGE_ShowHeader(_tr("Mode"));
     GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
@@ -102,6 +108,7 @@ static void show_page(CurvesMode _curve_mode, int page)
                       0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
                       show_curve_cb, curpos_cb, NULL, NULL);
 
+    update_textsel_state();
     GUI_Select1stSelectableObj();
 }
 

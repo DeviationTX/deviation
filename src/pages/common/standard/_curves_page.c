@@ -23,6 +23,15 @@ static u8 selectable_bitmaps[7] = {0, 0, 0 ,0 ,0, 0, 0};
 
 static void update_textsel_state();
 
+void set_cur_mixer()
+{
+    if(pit_mode == PITTHROMODE_HOLD) {
+        mp->cur_mixer = mp->mixer_ptr[INPUT_NumSwitchPos(mp->mixer_ptr[1]->sw)];
+    } else {
+        mp->cur_mixer = mp->mixer_ptr[pit_mode];
+    }
+}
+
 static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -37,6 +46,7 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         changed = 1;
     }
     if (changed) {
+        set_cur_mixer();
         if (pit_mode == PITTHROMODE_HOLD)
             GUI_SetHidden((guiObject_t *)&gui->hold, 0);
         else
@@ -52,17 +62,31 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
 
 static void get_hold_state()
 {
-    if (mp->mixer_ptr[3]->sw ==  mapped_std_channels.switches[SWITCHFUNC_HOLD])
+    pit_hold_state = 0;
+    if(mp->mixer_ptr[3]) {
+        if (MIXER_SRC(mp->mixer_ptr[3]->sw) == mapped_std_channels.switches[SWITCHFUNC_HOLD])
+            pit_hold_state = 1;
+    } else if(mp->mixer_ptr[2] && MIXER_SRC(mp->mixer_ptr[2]->sw) == mapped_std_channels.switches[SWITCHFUNC_HOLD]) {
         pit_hold_state = 1;
-    else
-        pit_hold_state = 0;
+    }
 }
 
 static void set_hold_state(u8 state) {
-    if (state == 0)
-        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = ALWAYSOFF_SWITCH;  //virt10 as switch, to disable this mixer
-    else
-        mp->mixer_ptr[PITTHROMODE_HOLD]->sw = mapped_std_channels.switches[SWITCHFUNC_HOLD]; //bug fix
+    struct Mixer mix[4];
+    int i;
+    for(i = 0; i < 4 && mp->mixer_ptr[i]; i++)
+        mix[i] = *mp->mixer_ptr[i];
+    int num_pos = INPUT_NumSwitchPos(mix[1].sw);
+    if (state != 0) {
+        if (i == num_pos) {
+            mix[num_pos] = mix[0];
+        }
+        mix[num_pos].sw = 0x80 | INPUT_GetFirstSwitch(mapped_std_channels.switches[SWITCHFUNC_HOLD]);
+        num_pos++;
+    }
+    MIXER_SetMixers(mix, num_pos);
+    STDMIX_GetMixers(mp->mixer_ptr, mix[1].dest, 4);
+    set_cur_mixer();
     GUI_Redraw(&gui->graph);
     for (u8 i = 0; i < 9; i++)
         GUI_Redraw(&gui->val[i]);
@@ -93,9 +117,9 @@ static void auto_generate_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    if (mp->mixer_ptr[pit_mode] == NULL) // Bug fix: do not do auto gen when pit curve is off
+    if (! mp->cur_mixer)
         return;
-    struct Curve *curve = &(mp->mixer_ptr[pit_mode]->curve);
+    struct Curve *curve = &(mp->cur_mixer->curve);
     s16 y_diff = 0;
     s16 x_start = 0;
     s16 x_end = 8;
@@ -120,10 +144,10 @@ static void auto_generate_cb(guiObject_t *obj, const void *data)
 
 static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
 {
-    if (mp->mixer_ptr[pit_mode] == NULL)
+    if (! mp->cur_mixer)
         return "";
     u8 point_num = (long)data;
-    struct Curve *curve = &(mp->mixer_ptr[pit_mode]->curve);
+    struct Curve *curve = &(mp->cur_mixer->curve);
     if (GUI_IsTextSelectEnabled(obj) == 1) {
         u8 changed = 1;
         curve->points[point_num] = GUI_TextSelectHelper(curve->points[point_num], -100, 100, dir, 1, LONG_PRESS_STEP, &changed);
@@ -137,25 +161,25 @@ static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
 {
     (void)data;
-    if (mp->mixer_ptr[pit_mode] == NULL)
+    if (! mp->cur_mixer)
         return 0;
     if (pos != 0)
         return 0;
-    *x = mp->raw[MIXER_SRC(mp->mixer_ptr[pit_mode]->src)];
+    *x = mp->raw[MIXER_SRC(mp->cur_mixer->src)];
     if (*x > CHAN_MAX_VALUE)
         *x = CHAN_MAX_VALUE;
     else if (*x  < CHAN_MIN_VALUE)
         *x = CHAN_MIN_VALUE;
-    *y = STDMIX_EvalMixerCb(*x, mp->mixer_ptr[pit_mode], CHAN_MAX_VALUE, CHAN_MIN_VALUE);
+    *y = STDMIX_EvalMixerCb(*x, mp->cur_mixer, CHAN_MAX_VALUE, CHAN_MIN_VALUE);
     return 1;
 }
 
 static s16 show_curve_cb(s16 xval, void *data)
 {
     (void)data;
-    if (mp->mixer_ptr[pit_mode] == NULL)
+    if (! mp->cur_mixer)
         return 0;
-    s16 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[pit_mode]->curve));
+    s16 yval = CURVE_Evaluate(xval, &(mp->cur_mixer->curve));
     return yval;
 }
 

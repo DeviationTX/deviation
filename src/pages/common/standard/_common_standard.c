@@ -33,11 +33,8 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
     return mp->tmpstr;
 }
 
-void STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
+int STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
 {
-    if (count > PITCHMIXER_COUNT) {
-        count = PITCHMIXER_COUNT;
-    }
     u8 idx;
     u8 i = 0;
     struct Mixer *mix = MIXER_GetAllMixers();
@@ -48,6 +45,9 @@ void STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
             mixers[i++] = &mix[idx];
         }
     }
+    while(i < count)
+        mixers[--count] = 0;
+    return i;
 }
 
 const char *STDMIX_ModeName(PitThroMode pit_mode)

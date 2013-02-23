@@ -84,19 +84,24 @@ static void show_page(CurvesMode _curve_mode, int page)
     curve_mode = _curve_mode;
     memset(mp, 0, sizeof(*mp));
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
+    int count;
+    int expected;
     if (curve_mode == CURVESMODE_PITCH) {
         PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_PITCURVES, SWITCHFUNC_FLYMODE));
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, PITCHMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.pitch, 4);
         get_hold_state();
     } else {
         PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROCURVES, SWITCHFUNC_FLYMODE));
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, THROTTLEMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.throttle, 4);
+        pit_hold_state = 0;
     }
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_FLYMODE]) + pit_hold_state;
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
 
+    set_cur_mixer();
     /* Row 1 */
     GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
@@ -119,12 +124,12 @@ static void show_page(CurvesMode _curve_mode, int page)
         if (i > 0 && i < 8)
             GUI_CreateButton(&gui->lock[i-1], COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }
-    update_textsel_state();
     GUI_CreateXYGraph(&gui->graph, 160, 80, 150, 150,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                   0, 0,
                   show_curve_cb, curpos_cb, NULL, NULL);
+    update_textsel_state();
 }
 
 void PAGE_ThroCurvesInit(int page)

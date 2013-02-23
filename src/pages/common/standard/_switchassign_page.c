@@ -18,8 +18,9 @@ static struct mixer_page * const mp = &pagemem.u.mixer_page;
 
 static u8 switch_idx[SWITCHFUNC_LAST];
 
-static u8 get_switch_idx(FunctionSwitch switch_type) {
-    return mapped_std_channels.switches[switch_type] - INPUT_SwitchPos(mapped_std_channels.switches[switch_type]);
+static int get_switch_idx(FunctionSwitch switch_type)
+{
+    return INPUT_GetFirstSwitch(mapped_std_channels.switches[switch_type]);
 }
 
 static void refresh_switches()
@@ -28,6 +29,33 @@ static void refresh_switches()
     // initialize
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
         switch_idx[switch_type] = get_switch_idx(switch_type);
+}
+
+void save_switch(int dest, FunctionSwitch switch_type, int thold_sw)
+{
+    struct Mixer mix[4];
+    struct Mixer thold;
+    int use_thold = 0;
+    int i;
+    int sw = get_switch_idx(switch_type);
+    int count = MIXER_GetMixers(dest, mix, 4);
+    if(thold_sw && count > 2 && mix[1].sw != mix[count-1].sw) {
+        //Pitch uses thold
+        thold = mix[count-1];
+        use_thold = 1;
+    }
+    mix[0].sw = 0;
+    for(i = 1; i < INPUT_NumSwitchPos(sw); i++) {
+        if(i >= count)
+            mix[i] = mix[i-1];
+        mix[i].sw = sw + i;
+    }
+    if (use_thold) {
+        mix[i] = thold;
+        mix[i].sw = 0x80 | thold_sw;
+        i++;
+    }
+    MIXER_SetMixers(mix, i);
 }
 
 // the only reason not to save changes in live is I don't want to change mixers' switch in the middle of changing options
@@ -43,59 +71,14 @@ void save_changes()
              ? 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
              : 0;
 
-    u8 gyro_gear_count = 0;
-    u8 gyro_aux2_count = 0;
-    u8 drexp_aile_count = 0;
-    u8 drexp_elev_count = 0;
-    u8 drexp_rudd_count = 0;
-    u8 thro_count = 0;
-    u8 pit_count = 0;
-    struct Mixer *mix = MIXER_GetAllMixers();
-    for (u8 i = 0; i < NUM_MIXERS; i++) {
-        u8 *count = NULL;
-        int sw;
-        if (!MIXER_SRC(mix[i].src) || mix[i].mux != MUX_REPLACE)  // all non-replace mux will be considered as program mix in the Standard mode
-            continue;
-        if (mix[i].dest == mapped_std_channels.gear) {
-            count = &gyro_gear_count;
-            sw = SWITCHFUNC_GYROSENSE;
-        } else if (mix[i].dest == mapped_std_channels.aux2) {
-            count = &gyro_aux2_count;
-            sw = SWITCHFUNC_GYROSENSE;
-        } else if (mix[i].dest == mapped_std_channels.aile) {
-            count = &drexp_aile_count;
-            sw = SWITCHFUNC_DREXP_AIL;
-        } else if (mix[i].dest == mapped_std_channels.elev) {
-            count = &drexp_elev_count;
-            sw = SWITCHFUNC_DREXP_ELE;
-        } else if (mix[i].dest == mapped_std_channels.rudd) {
-            count = &drexp_rudd_count;
-            sw = SWITCHFUNC_DREXP_RUD;
-        } else if (mix[i].dest == mapped_std_channels.pitch) {
-            if (pit_count < 3) {
-                count = &pit_count;
-                sw = SWITCHFUNC_FLYMODE;
-            } else if (pit_count == 3 && mix[i].sw != ALWAYSOFF_SWITCH) {
-                mix[i].sw = 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD];  // hold curve
-                continue;
-            }
-        } else if (mix[i].dest == mapped_std_channels.throttle) {
-            count = &thro_count;
-            sw = SWITCHFUNC_FLYMODE;
-        }
-        if (count) {
-            // bug fix: a) must not assign switch for the 1st mix; b) must assign a none-used switch(virt10 here) for 2-way switch. Otherwise, it won't work properly
-            if (*count == 0)
-                mix[i].sw = 0;
-            else if (*count < INPUT_NumSwitchPos(switch_idx[sw]))
-                mix[i].sw = switch_idx[sw] + *count;
-            else
-                mix[i].sw = ALWAYSOFF_SWITCH;
-            *count = (*count) + 1;
-        }
-    }
+    save_switch(mapped_std_channels.gear, SWITCHFUNC_GYROSENSE, 0);
+    save_switch(mapped_std_channels.aux2, SWITCHFUNC_GYROSENSE, 0);
+    save_switch(mapped_std_channels.aile, SWITCHFUNC_DREXP_AIL, 0);
+    save_switch(mapped_std_channels.elev, SWITCHFUNC_DREXP_ELE, 0);
+    save_switch(mapped_std_channels.rudd, SWITCHFUNC_DREXP_RUD, 0);
+    save_switch(mapped_std_channels.throttle, SWITCHFUNC_FLYMODE, 0);
+    save_switch(mapped_std_channels.pitch, SWITCHFUNC_FLYMODE, get_switch_idx(SWITCHFUNC_HOLD));
 }
-
 
 //From common/_main_config.c
 extern int fix_abbrev_src(int origval, int newval, int dir);

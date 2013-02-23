@@ -155,6 +155,10 @@ int INPUT_NumSwitchPos(u8 src)
     return idx+1;
 }
 
+int INPUT_GetFirstSwitch(int sw) {
+    return sw - INPUT_SwitchPos(sw);
+}
+
 const char *INPUT_MapSourceName(u8 idx, u8 *val)
 {
     int i = 0;
