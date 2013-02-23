@@ -37,14 +37,16 @@ void PAGE_GyroSenseInit(int page)
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_GYROSENSE, SWITCHFUNC_GYROSENSE));
     memset(mp, 0, sizeof(*mp));
-    STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2])  // should be switched to gear
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.gear, GYROMIXER_COUNT);
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
+    int count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
+    if (! count) {
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.gear, GYROMIXER_COUNT);
+    }
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    gryo_output = mp->mixer_ptr[0]->dest;
+    gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
 
     /* Row 1 */
@@ -62,7 +64,7 @@ void PAGE_GyroSenseInit(int page)
     GUI_CreateLabelBox(&gui->gyrolbl[1], 10, 110, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
     GUI_CreateTextSelect(&gui->gyro[1], 120, 110, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
 
-    if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
+    if(expected == 3) {
         /* Row 5 */
         GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 130, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
         GUI_CreateTextSelect(&gui->gyro[2], 120, 130, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);

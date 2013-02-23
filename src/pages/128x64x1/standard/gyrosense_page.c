@@ -31,14 +31,16 @@ void PAGE_GyroSenseInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     memset(mp, 0, sizeof(*mp));
-    STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2])  // should be switched to gear
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.gear, GYROMIXER_COUNT);
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
+    int count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aux2, GYROMIXER_COUNT);
+    if (! count) {
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.gear, GYROMIXER_COUNT);
+    }
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    gryo_output = mp->mixer_ptr[0]->dest;
+    gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
     PAGE_ShowHeader(_tr("Gyro sense"));
 
