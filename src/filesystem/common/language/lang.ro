@@ -1,4 +1,4 @@
-﻿Română 
+Română 
 :# Channels:
 Canale:
 :%s is %d%%, safe value = %d%%\n
@@ -49,14 +49,18 @@ AIL DR
 AIL Inv.:
 :AIL Mix:
 AIL Mix:
->:AUX2
->:AUX3
+:AUX2
+AUX2
+:AUX3
+AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
->:AUX6
->:AUX7
+:AUX6
+AUX6
+:AUX7
+AUX7
 :About Deviation
 Despre Deviation
 :Advanced
@@ -65,7 +69,8 @@ Avansat
 Avion
 :Alarm
 Alarmă 
->:Alarm intvl:
+:Alarm intvl:
+Int. alarmă
 :Altitude
 Altitudine
 :Auto
@@ -74,7 +79,8 @@ Auto
 Aux2
 :Backlight:
 Iluminare:
->:Bad/missing\nprotocol modules!
+:Bad/missing\nprotocol modules!
+Module protocol\nlipsă sau corupte!
 :Bar %d:
 Bara %d:
 :Bars:
@@ -97,10 +103,12 @@ Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
 Loc%d:
 :Button monitor
 Monitor butoane
->:Buzz settings
+:Buzz settings
+Setări sunet
 :Buzz volume:
 Volum:
->:Buzzer settings
+:Buzzer settings
+Setări sunet
 :COL
 Colectiv
 :COL Inv
@@ -159,9 +167,12 @@ Ciclic2
 Ciclic3
 :D/R & Exp
 DR și Expo
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+:D/R&Exp -AIL
+D/R&Exp -AIL
+:D/R&Exp -ELE
+D/R&Exp - ELE
+:D/R&Exp -RUD
+D/R&Exp -RUD
 :DR
 DR
 :Deadband
@@ -196,18 +207,14 @@ Enter
 Exit
 :Expo&DR
 Expo+DR
->:FMODE
-<:FMODE0
-<FMODE0
-<:FMODE1
-<FMODE1
-<:FMODE2
-<FMODE2
+:FMODE
+FMODE
 :Fahren
 F°
 :Fail safe
 Fail safe:
->:Failsafe
+:Failsafe
+Failsafe
 :Failsafe:
 Failsafe:
 :File:
@@ -234,7 +241,8 @@ Setări generale
 Sens giro
 :H
 H
->:HOLD
+:HOLD
+HOLD
 :Heli
 Elic.
 :Heli/Standard GUI
@@ -295,13 +303,8 @@ Nivel bat. scăzut
 Pos2
 :M
 M
->:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
+:MIX
+MIX
 :Main menu
 Meniu principal
 :Main page
@@ -334,9 +337,8 @@ Mod %d
 Meniu model
 :Model name:
 Nume model:
-<:Model needs reset\nfor simple mixer
-<Modelul se va reseta\pentru modul simplu
->:Model needs reset\nfor standard mixer
+:Model needs reset\nfor standard mixer
+Modelul trebuie să fie\n resetat pentru mixerul standard
 :Model needs to be reset\nin order to switch to the standard mixer
 Modelul va fi resetat pentru\întoarcerea la modul simplu
 :Model setup
@@ -389,13 +391,18 @@ Avion
 Punct:
 :Pos
 Poz.
->:Pos 0:
->:Pos 1:
->:Pos 2:
+:Pos 0:
+Pos 0:
+:Pos 1:
+Pos 1:
+:Pos 2:
+Pos 2
 :Pos/Neg:
 Poz/Neg:
->:Position %d
->:PowerOff alert
+:Position %d
+Poziția %d
+:PowerOff alert
+Alertă oprire
 :Prealert intvl:
 Interval:
 :Prealert time:
@@ -414,7 +421,8 @@ Apasă ENT pentru a seta\nmodul USB:
 Test: ține ENT apăsat
 :Protocol:
 Protocol:
->:PwrDn alert:
+:PwrDn alert:
+Alertă opr.
 :RIGHT_H
 DREAPTA_V
 :RIGHT_V
@@ -433,7 +441,8 @@ Re-init
 Șterge
 :Reset
 Reset
->:Reset sw:
+:Reset sw:
+Sw reset:
 :Reverse
 Invers
 :Reverse:
@@ -454,7 +463,8 @@ Siguranță:
 Salv.
 :Scale%s:
 Scară%s:
->:Scale:
+:Scale:
+Scara:
 :Scanner
 Scaner
 :Servo
@@ -485,7 +495,8 @@ Intrări
 Mod:
 :Sticks:
 Stick-uri:
->:Sub-trim
+:Sub-trim
+Sub-trim
 :Subtrim
 Subtrim
 :Subtrim:
@@ -532,7 +543,8 @@ TRIM_S-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
->:TRN
+:TRN
+TRN
 :TelemRPM
 TelemRPM
 :TelemT
@@ -615,7 +627,8 @@ Pornește
 Putere tx:
 :USB
 USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+Sistemul de fițiere USB este 
 :Unknown
 Necunoscut
 :Unlocked
@@ -652,7 +665,8 @@ max
 min
 :mult
 mult.
->:permanent
+:permanent
+permanent
 :replace
 înloc.
 :stopwatch
