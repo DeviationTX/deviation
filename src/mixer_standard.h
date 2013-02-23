@@ -35,7 +35,6 @@ typedef struct {
 #define DREXPMIXER_COUNT 3
 #define GYROMIXER_COUNT 3
 
-#define ALWAYSOFF_SWITCH (NUM_INPUTS + NUM_CHANNELS)  //virt10 as switch so that it won't be on
 extern MappedSimpleChannels mapped_std_channels;
 
 #endif
