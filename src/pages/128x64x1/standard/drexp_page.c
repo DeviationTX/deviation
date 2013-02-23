@@ -70,15 +70,16 @@ void PAGE_DrExpInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     memset(mp, 0, sizeof(*mp));
-    get_mixers();
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    int count = get_mixers();
+    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]);
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
     GUI_CreateTextSelectPlate(&gui->u.type, 0, 0,
         60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE, 76, LCD_HEIGHT - ITEM_SPACE,
-                     2 *ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+                     2 *ITEM_SPACE, count, row_cb, getobj_cb, NULL, NULL);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
@@ -92,11 +93,8 @@ void PAGE_DrExpInit(int page)
 
 static void _refresh_page()
 {
-    for (u8 i = 0; i < ITEM_LAST; i++) {
-        GUI_Redraw(&gui->value1[i]);
-        GUI_Redraw(&gui->value2[i]);
-    }
-    GUI_Redraw(&gui->graph);
+    PAGE_RemoveAllObjects();
+    PAGE_DrExpInit(0);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

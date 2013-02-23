@@ -36,8 +36,9 @@ void PAGE_DrExpInit(int page)
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_DREXP, SWITCHFUNC_DREXP_AIL+drexp_type));
     memset(mp, 0, sizeof(*mp));
-    get_mixers();
-    if (!mp->mixer_ptr[0] || !mp->mixer_ptr[1] || !mp->mixer_ptr[2]) {
+    int count = get_mixers();
+    int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]);
+    if (count != expected) {
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
@@ -71,9 +72,16 @@ void PAGE_DrExpInit(int page)
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
                               0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_IDLE2+1L));
+    _refresh_page();
 }
 
 static void _refresh_page() {
+    int hide3 = (INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]) < 3) ? 1 : 0;
+    GUI_SetHidden((guiObject_t *)&gui->mode[2], hide3);
+    GUI_SetHidden((guiObject_t *)&gui->dr[2], hide3);
+    GUI_SetHidden((guiObject_t *)&gui->exp[2], hide3);
+    GUI_SetHidden((guiObject_t *)&gui->graph[2], hide3);
+
     GUI_RedrawAllObjects();
 }
 

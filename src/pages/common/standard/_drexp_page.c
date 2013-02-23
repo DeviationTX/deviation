@@ -27,15 +27,17 @@ static u8 current_pit_mode = 0;
 static void _refresh_page();
 void update_graph(int graph);
 
-static void get_mixers()
+static int get_mixers()
 {
+    int count;
     if (drexp_type == DREXP_AIL) {
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aile, DREXPMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.aile, 4);
     } else if (drexp_type == DREXP_ELE) {
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.elev, DREXPMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.elev, 4);
     } else {
-        STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.rudd, DREXPMIXER_COUNT);
+        count = STDMIX_GetMixers(mp->mixer_ptr, mapped_std_channels.rudd, 4);
     }
+    return count;
 }
 
 static const char *set_type_cb(guiObject_t *obj, int dir, void *data)
