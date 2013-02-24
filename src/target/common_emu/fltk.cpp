@@ -295,7 +295,7 @@ void LCD_Init()
       if(i < (INP_LAST-1) / 2) {
           gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
       } else {
-          gui.raw[i] = new Fl_Output(lcdScreenWidth + 230, 20 * (i - INP_LAST / 2) + 5, 60, 15, label);
+          gui.raw[i] = new Fl_Output(lcdScreenWidth + 230, 20 * (i - (INP_LAST - 1)/ 2) + 5, 60, 15, label);
       }
       gui.raw[i]->textsize(10);
   }
