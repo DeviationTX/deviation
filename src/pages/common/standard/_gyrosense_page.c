@@ -43,7 +43,7 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
             mp->mixer[i] = *mp->mixer_ptr[i];
             mp->mixer[i].dest = gyro_output;
         }
-        MIXER_SetTemplate(gyro_output, MIXERTEMPLATE_COMPLEX);
+        MIXER_SetTemplate(gyro_output, MIXERTEMPLATE_EXPO_DR);
         // secondly: clear mix for original gyro channel
         MIXER_SetTemplate(gyro_output == GYROOUTPUT_GEAR ? GYROOUTPUT_AUX2 : GYROOUTPUT_GEAR, MIXERTEMPLATE_NONE);
         // save mixers
