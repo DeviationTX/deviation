@@ -39,6 +39,8 @@ void save_switch(int dest, FunctionSwitch switch_type, int thold_sw)
     int i;
     int sw = get_switch_idx(switch_type);
     int count = MIXER_GetMixers(dest, mix, 4);
+    if(! count)
+        return;
     if(thold_sw && count > 2 && mix[1].sw != mix[count-1].sw) {
         //Pitch uses thold
         thold = mix[count-1];
