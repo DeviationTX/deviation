@@ -38,8 +38,16 @@
 #ifdef NO_SOUND
 void SOUND_SetFrequency(u16 freq, u8 volume) {(void)freq; (void)volume;}
 void SOUND_Init() {}
-void SOUND_Start(u16 msec, u16(*next_note_cb)()) {(void)msec; (void)next_note_cb;}
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)()) {(void)msec; (void)next_note_cb;}
+void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
+    (void)msec;
+    (void)next_note_cb;
+    printf("beep\n");
+}
+void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)()) {
+    (void)msec;
+    (void)next_note_cb;
+    printf("beep\n");
+}
 void SOUND_Stop() {}
 #else
 

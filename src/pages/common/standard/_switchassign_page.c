@@ -63,7 +63,6 @@ void save_switch(int dest, FunctionSwitch switch_type, int thold_sw)
 // the only reason not to save changes in live is I don't want to change mixers' switch in the middle of changing options
 void save_changes()
 {
-    MUSIC_Play(MUSIC_SAVING);
     for (FunctionSwitch switch_type = SWITCHFUNC_FLYMODE; switch_type < SWITCHFUNC_LAST; switch_type++)
         mapped_std_channels.switches[switch_type] = switch_idx[switch_type];
 
