@@ -308,6 +308,7 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
             value = (s32)value * limit->servoscale_neg / 100;
     }
     if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, _raw)) {
+        applied_safety = 1;
         value = PCT_TO_RANGE(Model.limits[channel].safetyval);
     }
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE)) {
@@ -322,7 +323,8 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
             else if(value - _Channels[channel] < -rate)
                 value = _Channels[channel] - rate;
         }
-    } else if (flags & APPLY_LIMITS) {
+    }
+    if (flags & APPLY_LIMITS) {
         if (value > PCT_TO_RANGE(limit->max))
             value = PCT_TO_RANGE(limit->max);
         else if( value < PCT_TO_RANGE(-(int)limit->min))
