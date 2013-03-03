@@ -294,6 +294,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
 s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
                       volatile s16 *_Channels, enum LimitMask flags)
 {
+    int applied_safety = 0;
     s32 value = _raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
     if (channel >= NUM_OUT_CHANNELS)
         return value;
@@ -306,18 +307,21 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
         else
             value = (s32)value * limit->servoscale_neg / 100;
     }
-    if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE))
-        value = -value;
-    //degrees / 100msec
-    if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
-        s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * MEDIUM_PRIORITY_MSEC / 100;
-        if (value - _Channels[channel] > rate)
-            value = _Channels[channel] + rate;
-        else if(value - _Channels[channel] < -rate)
-            value = _Channels[channel] - rate;
-    }
     if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, _raw)) {
         value = PCT_TO_RANGE(Model.limits[channel].safetyval);
+    }
+    if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE)) {
+        value = -value;
+    }
+    if (! applied_safety) {
+        //degrees / 100msec
+        if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
+            s32 rate = CHAN_MAX_VALUE * limit->speed / 60 * MEDIUM_PRIORITY_MSEC / 100;
+            if (value - _Channels[channel] > rate)
+                value = _Channels[channel] + rate;
+            else if(value - _Channels[channel] < -rate)
+                value = _Channels[channel] - rate;
+        }
     } else if (flags & APPLY_LIMITS) {
         if (value > PCT_TO_RANGE(limit->max))
             value = PCT_TO_RANGE(limit->max);
