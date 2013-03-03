@@ -93,11 +93,14 @@ foreach my $file (@files) {
     my %unused;
     open my $fh, "<", $file;
     my $name = <$fh>;
-    while(<$fh>) {
+    my(@lines) = <$fh>;
+    for (my $line = 0; $line < $#lines-1; $line++) {
+        $_ = $lines[$line];
         chomp;
         if(/^:(.*)/) {               #/^([<>]?):(.*)/)
             my($eng) = ($1);
-            my $next = <$fh>;
+            next if ($line < $#lines-2 && $lines[$line+1] =~ /^:./);
+            my $next = $lines[++$line];
             chomp $next;
             #($next) = ($next =~ /^.(.*)/) if ($missing);
             if (! exists $uniq{$eng}) {
@@ -106,7 +109,7 @@ foreach my $file (@files) {
             $strings{$eng} = $next;
         } elsif(/^\|(\S+?):(.*)/) {
             my($t, $eng) = ($1, $2);
-            my $next = <$fh>;
+            my $next = $lines[++$line];
             chomp $next;
             if (! exists $uniq{$eng}) {
                 $unused{$eng} = 1;
