@@ -299,21 +299,21 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
     if (channel >= NUM_OUT_CHANNELS)
         return value;
 
-    if (flags & APPLY_SUBTRIM)
-        value += PCT_TO_RANGE(limit->subtrim) / 10;
+    if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, _raw)) {
+        applied_safety = 1;
+        value = PCT_TO_RANGE(Model.limits[channel].safetyval);
+    }
     if (flags & APPLY_SCALAR) {
         if (value >= 0 || limit->servoscale_neg == 0)
             value = (s32)value * limit->servoscale / 100;
         else
             value = (s32)value * limit->servoscale_neg / 100;
     }
-    if ((flags & APPLY_SAFETY) && MIXER_SRC(limit->safetysw) && switch_is_on(limit->safetysw, _raw)) {
-        applied_safety = 1;
-        value = PCT_TO_RANGE(Model.limits[channel].safetyval);
-    }
     if ((flags & APPLY_REVERSE) && (limit->flags & CH_REVERSE)) {
         value = -value;
     }
+    if (flags & APPLY_SUBTRIM)
+        value += PCT_TO_RANGE(limit->subtrim) / 10;
     if (! applied_safety) {
         //degrees / 100msec
         if (_Channels && (flags & APPLY_SPEED) && limit->speed) {
