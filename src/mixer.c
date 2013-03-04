@@ -707,7 +707,7 @@ void MIXER_AdjustForProtocol()
         }
     }
     for(j = 0; j < PROTO_MAP_LEN; j++) {
-        template[map[j]] = Model.templates[EATRG[j]];
+        template[j] = Model.templates[chmap[j]];
     }
     memcpy(Model.templates, template, sizeof(template));
     MIXER_SetMixers(NULL, 0);
