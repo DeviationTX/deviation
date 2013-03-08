@@ -532,7 +532,7 @@ static void initialize()
         PROTOCOL_SetBindState(0x1388 * 2400 / 1000); //msecs
     } else {
         fixed_id = Model.fixed_id;
-        use_fixed_id = 0;
+        use_fixed_id = 1;
         state = DEVO_BOUND_1;
         bind_counter = 0;
         cyrf_set_bound_sop_code();
