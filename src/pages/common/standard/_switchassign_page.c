@@ -31,35 +31,6 @@ static void refresh_switches()
         switch_idx[switch_type] = get_switch_idx(switch_type);
 }
 
-void save_switch(int dest, FunctionSwitch switch_type, int thold_sw)
-{
-    struct Mixer mix[4];
-    struct Mixer thold;
-    int use_thold = 0;
-    int i;
-    int sw = get_switch_idx(switch_type);
-    int count = MIXER_GetMixers(dest, mix, 4);
-    if(! count)
-        return;
-    if(thold_sw && count > 2 && mix[1].sw != mix[count-1].sw) {
-        //Pitch uses thold
-        thold = mix[count-1];
-        use_thold = 1;
-    }
-    mix[0].sw = 0;
-    for(i = 1; i < INPUT_NumSwitchPos(sw); i++) {
-        if(i >= count)
-            mix[i] = mix[i-1];
-        mix[i].sw = sw + i;
-    }
-    if (use_thold) {
-        mix[i] = thold;
-        mix[i].sw = 0x80 | thold_sw;
-        i++;
-    }
-    MIXER_SetMixers(mix, i);
-}
-
 // the only reason not to save changes in live is I don't want to change mixers' switch in the middle of changing options
 void save_changes()
 {
@@ -72,13 +43,7 @@ void save_changes()
              ? 0x80 | mapped_std_channels.switches[SWITCHFUNC_HOLD] // inverse of '0'
              : 0;
 
-    save_switch(mapped_std_channels.gear, SWITCHFUNC_GYROSENSE, 0);
-    save_switch(mapped_std_channels.aux2, SWITCHFUNC_GYROSENSE, 0);
-    save_switch(mapped_std_channels.aile, SWITCHFUNC_DREXP_AIL, 0);
-    save_switch(mapped_std_channels.elev, SWITCHFUNC_DREXP_ELE, 0);
-    save_switch(mapped_std_channels.rudd, SWITCHFUNC_DREXP_RUD, 0);
-    save_switch(mapped_std_channels.throttle, SWITCHFUNC_FLYMODE, 0);
-    save_switch(mapped_std_channels.pitch, SWITCHFUNC_FLYMODE, get_switch_idx(SWITCHFUNC_HOLD));
+    STDMIXER_SaveSwitches();
 }
 
 //From common/_main_config.c

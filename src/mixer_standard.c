@@ -57,6 +57,7 @@ void STDMIXER_Preset()
     mapped_std_channels.aile = NUM_OUT_CHANNELS; // virt 1
     mapped_std_channels.elev = NUM_OUT_CHANNELS +1; // virt 2
     STDMIXER_InitSwitches();
+    STDMIXER_SaveSwitches();
 }
 
 void STDMIXER_SetChannelOrderByProtocol()
@@ -196,4 +197,45 @@ void STDMIXER_InitSwitches()
         if (found_flymode_switch && found_gyro_switch && found_drexp_rud_switch && found_drexp_ail_switch && found_drexp_ele_switch)
             break;  // don't need to check the rest
     }
+}
+
+void save_switch(int dest, FunctionSwitch switch_type, int thold_sw)
+{
+    struct Mixer mix[4];
+    struct Mixer thold;
+    int use_thold = 0;
+    int i;
+    int sw = INPUT_GetFirstSwitch(mapped_std_channels.switches[switch_type]);
+    int count = MIXER_GetMixers(dest, mix, 4);
+    if(! count)
+        return;
+    if(thold_sw && count > 2 && mix[1].sw != mix[count-1].sw) {
+        //Pitch uses thold
+        thold = mix[count-1];
+        use_thold = 1;
+    }
+    mix[0].sw = 0;
+    for(i = 1; i < INPUT_NumSwitchPos(sw); i++) {
+        if(i >= count)
+            mix[i] = mix[i-1];
+        mix[i].sw = sw + i;
+    }
+    if (use_thold) {
+        mix[i] = thold;
+        mix[i].sw = 0x80 | thold_sw;
+        i++;
+    }
+    MIXER_SetMixers(mix, i);
+}
+
+void STDMIXER_SaveSwitches()
+{
+    save_switch(mapped_std_channels.gear, SWITCHFUNC_GYROSENSE, 0);
+    save_switch(mapped_std_channels.aux2, SWITCHFUNC_GYROSENSE, 0);
+    save_switch(mapped_std_channels.aile, SWITCHFUNC_DREXP_AIL, 0);
+    save_switch(mapped_std_channels.elev, SWITCHFUNC_DREXP_ELE, 0);
+    save_switch(mapped_std_channels.rudd, SWITCHFUNC_DREXP_RUD, 0);
+    save_switch(mapped_std_channels.throttle, SWITCHFUNC_FLYMODE, 0);
+    int hold_sw = INPUT_GetFirstSwitch(mapped_std_channels.switches[SWITCHFUNC_HOLD]);
+    save_switch(mapped_std_channels.pitch, SWITCHFUNC_FLYMODE, hold_sw);
 }

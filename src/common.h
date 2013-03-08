@@ -177,5 +177,6 @@ void STDMIXER_SetChannelOrderByProtocol();
 u8 STDMIXER_ValidateTraditionModel();
 const char *STDMIXER_ModeName(int mode);
 void STDMIXER_InitSwitches();
+void STDMIXER_SaveSwitches();
 
 #endif
