@@ -524,8 +524,14 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
     }
     u8 pos = compact_mixers();
     for (i = 0; i < count; i++) {
-        if (MIXER_SRC(mixers[i].src))
-            Model.mixers[pos++] = mixers[i];
+        if (MIXER_SRC(mixers[i].src)) {
+            Model.mixers[pos] = mixers[i];
+            if(Model.templates[mixers[i].dest] != MIXERTEMPLATE_COMPLEX) {
+                //Always apply the trim if the template is not 'complex'
+                Model.mixers[pos].apply_trim = 1;
+            }
+            pos++;
+        }
     }
     fix_mixer_dependencies(pos);
     return 1;
