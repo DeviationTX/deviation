@@ -1,0 +1,78 @@
+/*
+    This project is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Deviation is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
+*/
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
+
+#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/spi.h>
+#include "common.h"
+#include "protocol/interface.h"
+
+#ifdef PROTO_HAS_CC2500
+#define CS_HI() gpio_set(GPIOA, GPIO14)   
+#define CS_LO() gpio_clear(GPIOA, GPIO14)
+
+void CC2500_WriteReg(u8 address, u8 data)
+{
+    CS_LO();
+    spi_xfer(SPI2, address);
+    spi_xfer(SPI2, data);
+    CS_HI();
+}
+
+u8 CC2500_ReadReg(u8 address)
+{
+    CS_LO();
+    spi_xfer(SPI2, CC2500_READ_SINGLE | address);
+    u8 data = spi_xfer(SPI2, 0);
+    CS_HI();
+    return data;
+}
+
+void CC2500_Strobe(u8 state)
+{
+    CS_LO();
+    spi_xfer(SPI2, state);
+    CS_HI();
+}
+
+
+void CC2500_WriteRegisterMulti(u8 address, const u8 data[], u8 length)
+{
+    CS_LO();
+    spi_xfer(SPI2, CC2500_WRITE_BURST | address);
+    for(int i = 0; i < length; i++)
+    {
+        spi_xfer(SPI2, data[i]);
+    }
+    CS_HI();
+}
+
+void CC2500_WriteData(u8 *dpbuffer, u8 len)
+{
+    CC2500_Strobe(CC2500_SFTX);
+    CC2500_WriteRegisterMulti(CC2500_3F_TXFIFO, dpbuffer, len);
+    CC2500_Strobe(CC2500_STX);
+}
+
+void CC2500_Reset()
+{
+    CC2500_Strobe(CC2500_SRES);
+}
+#endif

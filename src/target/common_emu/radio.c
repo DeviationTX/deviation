@@ -84,6 +84,24 @@ void A7105_Strobe(enum A7105_State state)
 }
 #endif
 
+#ifdef PROTO_HAS_CC2500
+void CC2500_WriteReg(u8 address, u8 data) {
+    (void)address;
+    (void)data;
+}
+void CC2500_Strobe(u8 state) {
+    (void)state;
+}
+void CC2500_Reset() {}
+void CC2500_WriteData(u8 *dpbuffer, u8 len)
+{
+    int i;
+    for(i = 0; i < len; i++)
+        printf(" %02x", dpbuffer[i]);
+    printf("\n");
+}
+
+#endif //PROTO_HAS_CC2500
 /* CYRF */
 void CYRF_Initialize() {}
 void CYRF_Reset() {}

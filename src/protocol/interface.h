@@ -29,4 +29,8 @@ enum ProtoCmds {
 #include "iface_cyrf6936.h"
 #endif
 
+#ifdef PROTO_HAS_CC2500
+#include "iface_cc2500.h"
+#endif
+
 #endif //_INTERFACE_H_

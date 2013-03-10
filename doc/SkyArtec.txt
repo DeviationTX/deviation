@@ -1,0 +1,36 @@
+s/n: b2 c5 4a 2f
+d/s: 02 06
+date: 20 13 1 12
+
+Data Packet:
+The data packet is transmitted every 6 milliseconds.  It is 20 bytes long
+A single pakcet contains the encoding for all 7 channels
+Each channel has a minimum of '0' and a maximum of '0x500'
+
+13 c5 01 0259 0168 0000 0259 030c 021a 0489 f3 7e 0a
+aa bb cc dddd eeee ffff gggg hhhh iiii jjjj kk ll mm
+aa
+bb
+dd
+dddd : aileron
+eeee : elevator
+ffff : throttle
+gggg : rudder (?)
+hhhh : gain (?)
+iiii : pitch
+jjjj : gear (?)
+kk   : xor of bytes 3 through 16
+ll   : xor of bytes 3 through 14
+mm   : sum of bytes[3, 5, 7, 9, 11, 13]
+
+Bind packet
+The bind packet is 12 bytes in length.
+The bind packet is transmitted in place of a data packet as every 6th packet.
+
+0b 7d 01 01 b2 c5 4a 2f 00 00 c5 d6
+aa bb cc dd ee ff gg hh ii jj kk ll
+eeffgghh : the Transmitter serial number
+ee       : the channel to transmit on
+ff       : the address to use during transmission
+
+
