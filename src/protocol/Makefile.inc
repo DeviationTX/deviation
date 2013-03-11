@@ -10,6 +10,8 @@ PROTO_MODULES += $(ODIR)/protocol/ppm.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2801.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2601.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2401.mod
+#PROTO_MODULES += $(ODIR)/protocol/frsky.mod
+#PROTO_MODULES += $(ODIR)/protocol/skyartec.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
@@ -28,6 +30,10 @@ $(ODIR)/protocol/flysky.mod : $(ODIR)/flysky_a7105.bin
 	@echo Building 'flysky' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
+$(ODIR)/protocol/frsky.mod : $(ODIR)/frsky_cc2500.bin
+	@echo Building 'frsky' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
 $(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
 	@echo Building 'hubsan4' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
@@ -38,6 +44,10 @@ $(ODIR)/protocol/j6pro.mod : $(ODIR)/j6pro.bin
 
 $(ODIR)/protocol/ppm.mod : $(ODIR)/ppmout.bin
 	@echo Building 'ppm' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/skyartec.mod : $(ODIR)/skyartec_cc2500.bin
+	@echo Building 'skyartec' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/wk2801.mod : $(ODIR)/wk2x01.bin
