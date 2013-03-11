@@ -1,0 +1,51 @@
+Bind packets:
+The binding packets define a list of 50 channels that will
+be used during data transmission. At least for some
+transmitters, these channels are sequential with a uniform spacing of 5,
+but this is likely not strictly required. Channel values of 0 and 1 are
+apparently invalid. From observed data, the 1st channel in the sequence
+was 6.
+Binding packets seem to be sent until the transmitter is powered down.
+Packets are sent every 53.468msec. There are 10 packets needed to define
+the entire sequence, packets repeat once transmission is complete.
+
+Binding packets are sent as follows:
+aa bbbb cccc dd ee ff gg hh ii jj kk ll mm
+aa: length of transfer (not including length byte) == 0x0e
+bbbb: packet type (?) == 0x0301
+cccc: transmitter ID
+dd: starting channel
+ee: channel value for index dd+1
+ff: channel value for index dd+2
+gg: channel value for index dd+3
+hh: channel value for index dd+4
+ii: channel value for index dd+5
+jj: 00
+kk: 00
+ll: 00
+mm: CRC8 of previous 14 bytes (polynomial = 0x07, initial value = 0x93)
+
+Data packets:
+Data packets are sent every 9msec. They are composed as follows
+
+aa bbbb cccc dd eeee ffff gggg hhhh ii
+aa: length of transfer (not including length byte) == 0x0e
+bbbb: transmitter ID
+cccc: current seed of PRNG
+dd: f0, 0f, or 00 (which set of channels are being transmitted?). these seem to be sent in the repeating pattern 0f, f0, 0f, f0, 00
+eeee: channel data (pw = 1.5 * value?)
+ffff: channel data (pw = 1.5 * value?)
+gggg: channel data (pw = 1.5 * value?)
+hhhh: channel data (pw = 1.5 * value?)
+ii: CRC8 of previous 14 bytes (polynomial = 0x07, initial value = 0xa6)
+
+Channel hopping:
+Unlike the 2-way version of the protocol, channels do not hop in order of the channel map.
+The index into the channel-hopping table (defined by the bind packets) is determined via a PRNG.
+The next seed is defined as:
+(current seed * 0xaa) MOD 0x7673)
+The index for the next channel is defined as:
+(next seed & 0xFF) MOD 0x32
+
+The channel is then selected as the index in the channel hopping array.
+The 16bit seed used for the current channel is included in the data packet (little-endian). This is sufficient to synchronize the Rx as soon as it sees any channel data arrive.
