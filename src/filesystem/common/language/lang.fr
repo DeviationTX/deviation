@@ -192,6 +192,8 @@ ELE DR
 Sens ELE 
 :ELE Mix:
 Mix. ELE 
+:Enabled
+Etat
 :EXPO
 EXP.
 :Enter
@@ -200,20 +202,16 @@ Entrée
 Sortie
 :Expo&DR
 Expo&DR 
->:FMODE
-<:FMODE0
-<FMODE0
-<:FMODE1
-<FMODE1
-<:FMODE2
-<FMODE2
+:FMODE
+FMODE
 :Fahren
 °F
 :Fail safe
 Sécurités
->:Failsafe
+:Failsafe
+Sécurités
 :Failsafe:
-Failsafe:
+Sécurités:
 :File:
 Fichier
 :Fixed
@@ -245,17 +243,22 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Petit Déb.
-<:Hold Position
-<Valeur Thr hold
->:Hold position
+:Hold Position
+Valeur gaz 
+:Hold position
+Valeur gaz 
 :Icon
 Icône
 :Icon:
 Icône
 :Idle 1
-Idle 1
+Sport 1
 :Idle 2
-Idle 2
+Sport 2
+:Idle Up 1
+Sport 1
+:Idle Up 2
+Sport 2
 :Input monitor
 Ctrl. des entrées
 :Input:
@@ -377,8 +380,8 @@ Marche
 PAS
 :Page:
 Page
-:Pit Mix:
-Mixage plateau
+:PIT Mix:
+Mix. PAS 
 :Pitch curves
 Courbes de pas
 :Plane
@@ -394,7 +397,9 @@ Pos.
 Pos./Neg.:
 >:Position %d
 :PwrDn alert:
-Alrm. d'arrêt 
+Mélodie arrêt 
+:Power-down alert:
+Mélodie d'arrêt 
 :Prealert intvl:
 Tempo préAlarm
 :Prealert time:
@@ -559,9 +564,9 @@ Gabarit...
 :Test
 Test
 :Thr hold
-Thr hold
+Stop gaz
 :Throttle curves
-Courbes de Gaz
+Courbes de gaz
 :Throttle hold
 Coupure gaz
 :Time
@@ -616,14 +621,16 @@ Activer
 Puiss. TX
 :USB
 USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+Etat de la partition USB 
 :Unknown
 Inconnu
 :Unlocked
 Débloqué
 :Up
 Haut
->:Value
+:Value
+Valeur
 :Value:
 Valeur:
 :Vibration:
@@ -642,8 +649,6 @@ Volt:
 ajouter
 :countdown
 A rebours
-<:fulltime
-<Total
 :is not supported
 Non supporté
 :is turned off
