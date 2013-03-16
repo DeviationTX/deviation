@@ -20,7 +20,7 @@ Aantal Kanale:
 :4 Outside
 4 buite
 :4Ch w/ Dual-Rates
-4k met DR
+4K met DR
 :5 Point
 5 Punt
 :5+1
@@ -46,7 +46,7 @@ AIL
 :AIL DR
 AIL DR
 :AIL Inv:
-:AIL Inv:
+AIL Omgekeerd:
 :AIL Mix:
 AIL Meng:
 :AUX2
@@ -96,7 +96,7 @@ Bind
 :Binding
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Bind in proses...\nMaak seker die model is aan!\n\nOK sal nie die proses stop nie,\maar sal volle beheer toelaat van die Tx.
+Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
 :Binding...\n%d seconds\nPress ENT to stop
 Bind...\n%d seconds\n Druk ENT om te stop
 :Box %d:
@@ -134,7 +134,7 @@ Center PW
 :Center all \nsticks and knobs\nthen press ENT
 Stokke in middel en\nknoppies af\nDruk dan ENT
 :Ch
-K
+Knl
 :Chan mode
 Kanaal Mode
 :Change
@@ -146,7 +146,7 @@ Kanaal Monitor
 :Channel output
 Kanaal Uitset
 :Complex
-Komplex
+Kompleks 
 :Configure
 Konfigureer
 :Contrast:
@@ -230,15 +230,15 @@ Voet
 :Frame Size
 Raam Grootte
 :GEAR
-Wiele
+GEAR
 :GPS
 GPS
 :Gear
-Wiele
+GEAR
 :Generic settings
 Generiese Opstelling
 :Gyro sense
-Gyro monitor
+Gyro Monitor
 :H
 H
 :HOLD
@@ -252,7 +252,7 @@ Helikopter
 :High-Rate
 Hoë tempo
 :Hold position
-Hou posisie
+Hou Posisie
 :Icon
 Ikoon
 :Icon:
@@ -304,13 +304,13 @@ Lae Tempo
 :M
 M
 :MIX
-MENG
+MIX
 :Main menu
 Hoof Menu
 :Main page
 Hoofbladsy
 :Main page config
-Hoofbladsy opstel. 
+Hoofbladsy Opstelling 
 :Max Limit:
 Max limiet:
 :Menu
@@ -336,7 +336,7 @@ Modus %d
 :Model menu
 Model Menu
 :Model name:
-Model name:
+Model naam:
 :Model needs reset\nfor standard mixer
 Model moet Reset \nvir die Standaard Menger
 :Model needs to be reset\nin order to switch to the standard mixer
@@ -402,15 +402,15 @@ Pos 2:
 :Position %d
 Posisie %d
 :PowerOff alert
-Krag-af waarskuwing
+Krag-af Waarskuwing
 :Prealert intvl:
 Voorwaarsku intvl:
 :Prealert time:
-Voorwaarsku tyd:
+Voorwaarsku-tyd:
 :Press 'Ent' to turn USB Filesystem:
-Druk 'ENT' vir USB aan:
+Druk 'ENT' om USB aan te skakel:
 :Press ENT to change:
-Druk ENT om te Verander:
+Druk ENT om te verander:
 :Press ENT to copy to:
 Druk ENT om te kopieër na:
 :Press ENT to load:
@@ -422,7 +422,7 @@ Voorskou: Lang-druk ENT
 :Protocol:
 Protokol:
 :PwrDn alert:
-Krag-af waarskuwing
+Krag-af waarskuwing:
 :RIGHT_H
 REGS_H
 :RIGHT_V
@@ -444,7 +444,7 @@ Reset
 :Reset sw:
 Reset sw:
 :Reverse
-Omkeer
+Kanaal Omkeer
 :Reverse:
 Omkeer:
 :Reversed
@@ -458,7 +458,7 @@ Veiligew:
 :Safety
 Veiligheid
 :Safety:
-Veligheid:
+Veiligheid:
 :Save
 Stoor
 :Scale%s:
@@ -503,11 +503,11 @@ SubTrim
 SubTrim:
 SubTrim: 
 :Swash
-Swash
+Swash Tipe
 :SwashType:
-Swash tipe:
+Swash Tipe:
 :Switch assignment
-Skakelaar toekening
+Skakelaar Toekening
 :Switch1
 Skakelaar1
 :Switch2
@@ -573,7 +573,7 @@ THR Hou
 :Throttle curves
 Throttle Kurwes
 :Throttle hold
-Throttle hou
+Throttle Hou
 :Time
 Tyd
 :Timer
@@ -605,7 +605,7 @@ Sender Opstelling
 :Transmitter menu
 Sender Menu
 :Travel adjust
-Beweging verstelling
+Maks Beweeging 
 :Trim
 Trim
 :Trim +:
@@ -653,9 +653,9 @@ Zero/Max
 :add
 +
 :countdown
-Countdown
+Afteller
 :is not supported
-word nie ondersteun
+word nie ondersteun nie
 :is turned off
 is afgeskakel
 :max
