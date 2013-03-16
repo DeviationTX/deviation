@@ -505,8 +505,6 @@ Subtrim
 Platou
 :SwashType:
 Tip platou:
-<:Switch %d:
-<Ind. %d
 :Switch assignment
 Asignare act.
 :Switch1
