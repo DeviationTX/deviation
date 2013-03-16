@@ -31,7 +31,7 @@ enum {
 };
 #define TELEM_ON 0
 #define TELEM_OFF 1
-static u8 packet[18];
+static u8 packet[40];
 static u32 state;
 static u8 counter;
 static u32 fixed_id;
@@ -43,6 +43,7 @@ enum {
     FRSKY_DATA2,
     FRSKY_DATA3,
     FRSKY_DATA4,
+    FRSKY_DATA5,
 };
 
 static void frsky2way_init(int bind)
@@ -89,8 +90,8 @@ static void frsky2way_init(int bind)
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
 
         CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
-        CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : 0xd7);
-        CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
+        CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
+        CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04); //Should be 0x05 but the filter isn't working
 
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
 
@@ -112,8 +113,8 @@ static int get_chan_num(int idx)
 
 static void frsky2way_build_bind_packet()
 {
-    //0e 03 01 57 12 00 06 0b 10 15 1a 00 00 00 61
     //11 03 01 d7 2d 00 00 1e 3c 5b 78 00 00 00 00 00 00 01
+    //11 03 01 19 3e 00 02 8e 2f bb 5c 00 00 00 00 00 00 01
     packet[0] = 0x11;                //Length
     packet[1] = 0x03;                //Packet type
     packet[2] = 0x01;                //Packet type
@@ -187,16 +188,32 @@ static u16 frsky2way_cb()
         PROTOCOL_SetBindState(0);
         frsky2way_init(0);
         counter = 0;
+    } else if (state == FRSKY_DATA5) {
+        CC2500_Strobe(CC2500_SRX);
+        state = FRSKY_DATA1;
+        return 7500;
     }
     counter = (counter + 1) % 188;
     if (state == FRSKY_DATA4) {
         //telemetry receive
-        state = FRSKY_DATA1;
+        CC2500_Strobe(CC2500_SIDLE);
+        CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
+        CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
+        state++;
+        return 1500;
     } else {
+        if (state == FRSKY_DATA1) {
+            int len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
+            if (len && len < 40) {
+                CC2500_ReadData(packet, len);
+                //parse telemetry packet here
+            }
+        }
         CC2500_Strobe(CC2500_SIDLE);
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
+        CC2500_Strobe(CC2500_SFRX);
         frsky2way_build_data_packet();
         CC2500_WriteData(packet, packet[0]+1);
         state++;
@@ -208,7 +225,7 @@ static void initialize(int bind)
 {
     CLOCK_StopTimer();
     frsky2way_init(bind);
-    fixed_id = 0x1257;
+    fixed_id = 0x3e19;
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;

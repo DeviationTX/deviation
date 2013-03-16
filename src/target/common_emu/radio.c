@@ -180,6 +180,15 @@ void CC2500_WriteData(u8 *dpbuffer, u8 len)
         printf(" %02x", dpbuffer[i]);
     printf("\n");
 }
+u8 CC2500_ReadReg(u8 address)
+{
+    (void)address;
+    return 0;
+}
+void CC2500_ReadData(u8 *dpbuffer, int len)
+{
+    memset(dpbuffer, 0, len);
+}
 
 #endif //PROTO_HAS_CC2500
 /* CYRF */
