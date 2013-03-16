@@ -40,6 +40,15 @@
 #define BIND_COUNT 2500
 #endif
 
+static const char * const flysky_opts[] = {
+  "WLToys V9x9",  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
+#define WLTOYS_ON 1
+#define WLTOYS_OFF 0
+enum {
+    PROTOOPTS_WLTOYS = 0,
+};
 static const u8 A7105_regs[] = {
      -1,  0x42, 0x00, 0x14, 0x00,  -1 ,  -1 , 0x00, 0x00, 0x00, 0x00, 0x01, 0x21, 0x05, 0x00, 0x50,
     0x9e, 0x4b, 0x00, 0x02, 0x16, 0x2b, 0x12, 0x00, 0x62, 0x80, 0x80, 0x00, 0x0a, 0x32, 0xc3, 0x0f,
@@ -181,6 +190,14 @@ static void flysky_build_packet(u8 init)
         packet[5 + i*2] = value & 0xff;
         packet[6 + i*2] = (value >> 8) & 0xff;
     }
+    if (Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_ON) {
+        if(Channels[4] > 0)
+            packet[12] |= 0x20;
+        if(Channels[5] > 0)
+            packet[10] |= 0x40;
+        if(Channels[6] > 0)
+            packet[10] |= 0x80;
+    }
 }
 
 MODULE_CALLTYPE
@@ -238,6 +255,8 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
+        case PROTOCMD_GETOPTIONS:
+            return flysky_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }

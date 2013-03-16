@@ -56,6 +56,11 @@ Word 1 is 0xaa05 until 3 seconds have elapsed and the throttle has been broughtt
 
 Word 2 and 3 are the Transmitter's Unique ID (thanks zeza from RCGroups)
 
+WLToys implemented some enhancements to the protocol for the v9x9 quads:
+Setting bit 14 of the throttle channel will toggle the accessory (video camera)
+Setting bit 15 of the throttle channel will toggle the accessory (still camera)
+Setting bit 13 of the rudder channel will toggle the lights 
+
 zeza has confirmed channels 5-8 on a Turnigy 9x (Thanks!)
 
 The Tx channel will be 01 until initialization is done and the throttle is brought to 0.  At ~ 3 seconds, data is transmitted on multiple channels.  Channel ordering is dependent on Transmitter ID as follows:
