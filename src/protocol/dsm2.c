@@ -223,61 +223,41 @@ static u8 get_pn_row(u8 channel)
            : channel % 5;
 }
 
+static const u8 init_vals[][2] = {
+    {CYRF_1D_MODE_OVERRIDE, 0x01},
+    {CYRF_28_CLK_EN, 0x02},
+    {CYRF_32_AUTO_CAL_TIME, 0x3c},
+    {CYRF_35_AUTOCAL_OFFSET, 0x14},
+    {CYRF_0D_IO_CFG, 0x04}, //From Devo - Enable PACTL as GPIO
+    {CYRF_0E_GPIO_CTRL, 0x20}, //From Devo
+    {CYRF_06_RX_CFG, 0x48},
+    {CYRF_1B_TX_OFFSET_LSB, 0x55},
+    {CYRF_1C_TX_OFFSET_MSB, 0x05},
+    {CYRF_0F_XACT_CFG, 0x24},
+    {CYRF_03_TX_CFG, 0x38 | 7},
+    {CYRF_12_DATA64_THOLD, 0x0a},
+    {CYRF_0C_XTAL_CTRL, 0xC0}, //From Devo - Enable XOUT as GPIO
+    {CYRF_0F_XACT_CFG, 0x04},
+    {CYRF_39_ANALOG_CTRL, 0x01},
+    {CYRF_0F_XACT_CFG, 0x24}, //Force IDLE
+    {CYRF_29_RX_ABORT, 0x00}, //Clear RX abort
+    {CYRF_12_DATA64_THOLD, 0x0a}, //set pn correlation threshold
+    {CYRF_10_FRAMING_CFG, 0x4a}, //set sop len and threshold
+    {CYRF_29_RX_ABORT, 0x0f}, //Clear RX abort?
+    {CYRF_03_TX_CFG, 0x38 | 7}, //Set 64chip, SDE mode, max-power
+    {CYRF_10_FRAMING_CFG, 0x4a}, //set sop len and threshold
+    {CYRF_1F_TX_OVERRIDE, 0x04}, //disable tx CRC
+    {CYRF_1E_RX_OVERRIDE, 0x14}, //disable rx crc
+    {CYRF_14_EOP_CTRL, 0x02}, //set EOP sync == 2
+    {CYRF_01_TX_LENGTH, 0x10}, //16byte packet
+};
+
 static void cyrf_config()
 {
-    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
-    CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
-    CYRF_WriteRegister(CYRF_32_AUTO_CAL_TIME, 0x3c);
-    CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
-    //0d
-    //CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x40);
-    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //From Devo - Enable PACTL as GPIO
-    CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20); //From Devo
-    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x48);
-    CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
-    CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a);
-    //CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0x80);
-    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //From Devo - Enable XOUT as GPIO
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x04);
-    CYRF_WriteRegister(CYRF_39_ANALOG_CTRL, 0x01);
+    for(u32 i = 0; i < sizeof(init_vals) / 2; i++)
+        CYRF_WriteRegister(init_vals[i][0], init_vals[i][1]);
     CYRF_WritePreamble(0x333304);
     CYRF_ConfigRFChannel(0x61);
-/*
-    CYRF_ConfigRxTx(0);
-    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83); //setup read
-    u8 rssi = CYRF_ReadRegister(CYRF_13_RSSI); //poll RSSI valyue = 0x20
-    printf("Rssi: %02x\n", rssi);
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x3f); //set pn correlation threshold
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x7f); //disable sop
-    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83); //setupo read
-    rssi = CYRF_ReadRegister(CYRF_13_RSSI);  //poll RSSI value = 0x20
-    printf("Rssi: %02x\n", rssi);
-    Delay(30000);
-    u8 bytes = CYRF_ReadRegister(CYRF_09_RX_COUNT); //0x09, 0x0f //15 bytes in queue?
-    u8 data[32];
-    printf("count: %d", bytes);
-    CYRF_ReadDataPacket(data);
-    for(bytes = 0; bytes < 16; bytes++)
-        printf(" %02x", data[bytes]);
-    printf("\n");
-    //0x21, 0xf7 ee af f9 f6 a5 57 28 74 6b 84 64 c4 bb 84 //read 15 bytes
-    CYRF_ConfigRxTx(0);
-*/
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24); //Force IDLE
-    //0x0f, 0x04 //Read state (Idle)
-    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00); //Clear RX abort
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a); //set pn correlation threshold
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
-    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x0f); //Clear RX abort?
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x38 | Model.tx_power); //Set 64chip, SDE mode
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0x4a); //set sop len and threshold
-    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x04); //disable tx CRC
-    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x14); //disable rx crc
-    CYRF_WriteRegister(CYRF_14_EOP_CTRL, 0x02); //set EOP sync == 2
-    CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10); //16byte packet
 }
 
 void initialize_bind_state()
@@ -295,29 +275,28 @@ void initialize_bind_state()
     build_bind_packet();
 }
 
+static const u8 data_vals[][2] = {
+    {CYRF_05_RX_CTRL, 0x83}, //Initialize for reading RSSI
+    {CYRF_29_RX_ABORT, 0x20},
+    {CYRF_0F_XACT_CFG, 0x24},
+    {CYRF_29_RX_ABORT, 0x00},
+    {CYRF_03_TX_CFG, 0x08 | 7},
+    {CYRF_10_FRAMING_CFG, 0xea},
+    {CYRF_1F_TX_OVERRIDE, 0x00},
+    {CYRF_1E_RX_OVERRIDE, 0x00},
+    {CYRF_03_TX_CFG, 0x28 | 7},
+    {CYRF_12_DATA64_THOLD, 0x3f},
+    {CYRF_10_FRAMING_CFG, 0xff},
+    {CYRF_0F_XACT_CFG, 0x24}, //Switch from reading RSSI to Writing
+    {CYRF_29_RX_ABORT, 0x00},
+    {CYRF_12_DATA64_THOLD, 0x0a},
+    {CYRF_10_FRAMING_CFG, 0xea},
+};
+
 static void cyrf_configdata()
 {
-//Initialize for reading RSSI
-    CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
-//0x13, 0xa6
-    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x20);
-//0x13, 0x20
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
-//0x0f, 0x04
-    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xea);
-    CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
-    CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x00);
-    CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x3f);
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xff);
-//Switch from reading RSSI to Writing
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);
-//0x0f, 0x04
-    CYRF_WriteRegister(CYRF_29_RX_ABORT, 0x00);
-    CYRF_WriteRegister(CYRF_12_DATA64_THOLD, 0x0a);
-    CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xea);
+    for(u32 i = 0; i < sizeof(data_vals) / 2; i++)
+        CYRF_WriteRegister(data_vals[i][0], data_vals[i][1]);
 }
 
 static void set_sop_data_crc()
@@ -371,18 +350,109 @@ static void calc_dsmx_channel()
 
 static void parse_telemetry_packet()
 {
-    if((packet[0] & 0x0f) == 0x0f) {
-        Telemetry.volt[2] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
-        Telemetry.time[0] = CLOCK_getms();
-        Telemetry.time[1] = Telemetry.time[0];
-    } else if ((packet[0] & 0x0f) == 0x0e) {
-        Telemetry.rpm[0] = ((packet[2] << 8) | packet[3]); //In RPM
-        if (Telemetry.rpm[0] == 0xffff)
-            Telemetry.rpm[0] = 0;
-        Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
-        Telemetry.temp[0] = (packet[7] - 32) * 5 / 9;  //In degrees-C
-        Telemetry.time[0] = CLOCK_getms();
-        Telemetry.time[1] = Telemetry.time[0];
+    u32 time = CLOCK_getms();
+    switch(packet[0]) {
+        case 0x7f: //TM1000 Flight log
+        case 0xff: //TM1100 Flight log
+            //Telemetry.fadesA = ((s32)packet[2] << 8) | packet[3];
+            //Telemetry.fadesB = ((s32)packet[4] << 8) | packet[5];
+            //Telemetry.fadesL = ((s32)packet[6] << 8) | packet[7];
+            //Telemetry.fadesR = ((s32)packet[8] << 8) | packet[9];
+            //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
+            //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
+            Telemetry.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
+            Telemetry.time[0] = time;
+            Telemetry.time[1] = Telemetry.time[0];
+            break;
+        case 0x7e: //TM1000
+        case 0xfe: //TM1100
+            Telemetry.rpm[0] = ((packet[2] << 8) | packet[3]); //In RPM
+            if (Telemetry.rpm[0] == 0xffff)
+                Telemetry.rpm[0] = 0;
+            Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
+            Telemetry.temp[0] = packet[7] == 0xff ? 0 : (packet[7] - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
+            //Telemetry.temp[0] = ((((s16)packet[8] << 8) | packet[7]) - 32) * 5 / 9; //(16Bit signed integer)
+            //if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
+            //    Telemetry.temp[0] = 0;
+            Telemetry.time[0] = time;
+            Telemetry.time[1] = Telemetry.time[0];
+            break;
+        case 0x03: //High Current sensor
+            //Telemetry.current = (((s32)packet[2] << 8) | packet[3]) * 1967 / 1000; //In 1/10 of Amps (16bit value, 1 unit is 0.1967A)
+            //Telemetry.time[x1] = time;
+            break;
+        case 0x10: //Powerbox sensor
+            //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
+            //Telemetry.pwb.volt1 = (((s32)packet[4] << 8) | packet[5] + 5) /10; //In 1/10 of Volts
+            //Telemetry.pwb.capacity1 = (((s32)packet[6] << 8) | packet[7] + 5); //In mAh
+            //Telemetry.pwb.capacity2 = (((s32)packet[8] << 8) | packet[9] + 5); //In mAh
+            //Telemetry.pwb.alarm_v1 = packet[15] & 0x01; //0 = disable, 1 = enable
+            //Telemetry.pwb.alarm_v2 = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
+            //Telemetry.pwb.alarm_c1 = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
+            //Telemetry.pwb.alarm_c2 = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
+            //Telemetry.time[x2] = time;
+            break;
+        case 0x11: //AirSpeed sensor
+            //Telemetry.airspeed = ((s32)packet[2] << 8) | packet[3]; //In km/h (16Bit value, 1 unit is 1 km/h)
+            //Telemetry.time[x3] = time;
+            break;
+        case 0x12: //Altimeter sensor
+            //Telemetry.altitude = (((s16)packet[2] << 8) | packet[3]) /10; //In meters (16Bit signed integer, 1 unit is 0.1m)
+            //Telemetry.time[x4] = time;
+            break;
+        case 0x14: //G-Force sensor
+            //Telemetry.gforce.x = ((s16)packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
+            //Telemetry.gforce.y = ((s16)packet[4] << 8) | packet[5];
+            //Telemetry.gforce.z = ((s16)packet[6] << 8) | packet[7];
+            //Telemetry.gforce.xmax = ((s16)packet[8] << 8) | packet[9];
+            //Telemetry.gforce.ymax = ((s16)packet[10] << 8) | packet[11];
+            //Telemetry.gforce.zmax = ((s16)packet[12] << 8) | packet[13];
+            //Telemetry.gforce.zmin = ((s16)packet[14] << 8) | packet[15];
+            //Telemetry.time[x5] = time;
+            break;
+        case 0x15: //JetCat sensor
+            //No data yet
+            break;
+        case 0x16: //GPS sensor
+            Telemetry.gps.altitude = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100   //(16Bit decimal, 1 unit is 0.1m)
+                                    + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000
+            Telemetry.gps.latitude = ((packet[7] >> 4) * 10 + (packet[7] & 0x0f)) * 3600000 
+                                   + ((packet[6] >> 4) * 10 + (packet[6] & 0x0f)) * 60000 
+                                   + ((packet[5] >> 4) * 10 + (packet[5] & 0x0f)) * 600 
+                                   + ((packet[4] >> 4) * 10 + (packet[4] & 0x0f)) * 6;
+            if ((packet[15] & 0x01)  == 0)
+                Telemetry.gps.latitude *= -1;
+            Telemetry.gps.longitude = ((packet[11] >> 4) * 10 + (packet[11] & 0x0f)) * 3600000 
+                                    + ((packet[10] >> 4) * 10 + (packet[10] & 0x0f)) * 60000 
+                                    + ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 600 
+                                    + ((packet[8] >> 4) * 10 + (packet[8] & 0x0f)) * 6;
+            if ((packet[15] & 0x04) == 4)
+                Telemetry.gps.longitude += 360000000;
+            if ((packet[15] & 0x02) == 0)
+                Telemetry.gps.longitude *= -1;
+            // Telemetry.gps.heading = ((packet[13] >> 4) * 10 + (packet[13] & 0x0f)) * 10     //(16Bit decimal, 1 unit is 0.1 degree)
+            //                          + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees
+            Telemetry.time[2] = time;
+            break;
+        case 0x17: //GPS sensor
+            Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
+                                    + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 5556 / 108; //In m/s * 1000
+            u8 hour  = (packet[7] >> 4) * 10 + (packet[7] & 0x0f);
+            u8 min   = (packet[6] >> 4) * 10 + (packet[6] & 0x0f);
+            u8 sec   = (packet[5] >> 4) * 10 + (packet[5] & 0x0f);
+            //u8 ssec   = (packet[4] >> 4) * 10 + (packet[4] & 0x0f);
+            u8 day   = 0;
+            u8 month = 0;
+            u8 year  = 0; // + 2000
+            Telemetry.gps.time = ((year & 0x3F) << 26)
+                               | ((month & 0x0F) << 22)
+                               | ((day & 0x1F) << 17)
+                               | ((hour & 0x1F) << 12)
+                               | ((min & 0x3F) << 6)
+                               | ((sec & 0x3F) << 0);
+            // Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
+            Telemetry.time[2] = time;
+            break;
     }
 }
 
