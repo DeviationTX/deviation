@@ -135,14 +135,15 @@ static void send_data_packet()
         s32 value = (s32)Channels[i] * 0x280 / CHAN_MAX_VALUE + 0x280;
         if(value < 0)
             value = 0;
-        if(value > 0x280)
-            value = 0x280;
+        if(value > 0x500)
+            value = 0x500;
         packet[3+2*i] = value >> 8;
         packet[4+2*i] = value & 0xff;
     }
     add_pkt_suffix();
-    CC2500_WriteReg(CC2500_04_SYNC1, 0x2f);
-    CC2500_WriteReg(CC2500_05_SYNC0, 0x4a);
+    //for(int i = 0; i < 20; i++) printf("%02x ", packet[i]); printf("\n");
+    CC2500_WriteReg(CC2500_04_SYNC1, ((fixed_id >> 0) & 0xff));
+    CC2500_WriteReg(CC2500_05_SYNC0, ((fixed_id >> 8) & 0xff));
     CC2500_WriteReg(CC2500_09_ADDR, TX_ADDR);
     CC2500_WriteReg(CC2500_0A_CHANNR, TX_CHANNEL);
     CC2500_WriteData(packet, 20);
@@ -161,8 +162,11 @@ static void send_bind_packet()
     packet[7] = (fixed_id >> 0)  & 0xff;
     packet[8] = 0x00;
     packet[9] = 0x00;
-    packet[10] = 0xc5;
-    packet[11] = 0xd6;
+    packet[10] = TX_ADDR;
+    u8 xor = 0;
+    for(int i = 3; i < 11; i++)
+        xor ^= packet[i];
+    packet[11] = xor;
     CC2500_WriteReg(CC2500_04_SYNC1, 0x7d);
     CC2500_WriteReg(CC2500_05_SYNC0, 0x7d);
     CC2500_WriteReg(CC2500_09_ADDR, 0x7d);
@@ -179,9 +183,13 @@ static u16 skyartec_cb()
     }
     if (state == SKYARTEC_PKT1 && bind_count) {
         send_bind_packet();
+        bind_count--;
+        if(bind_count == 0)
+            printf("Done binding\n");
     } else {
         send_data_packet();
     }
+    state++;
     return 3000;
 }
 
@@ -190,6 +198,24 @@ static void initialize()
     CLOCK_StopTimer();
     skyartec_init();
     fixed_id = 0xb2c54a2f;
+    if (Model.fixed_id) {
+        fixed_id ^= Model.fixed_id + (Model.fixed_id << 16);
+    } else {
+        int partnum = CC2500_ReadReg(0xF0);
+        int vernum = CC2500_ReadReg(0xF1);
+        fixed_id ^= partnum << 24;
+        fixed_id ^= vernum << 16;
+        fixed_id ^= (vernum << 4 | partnum >> 4) << 8;
+        fixed_id ^= (partnum << 4 | vernum >> 4) << 8;
+    }
+    if (0 == (fixed_id & 0xff000000))
+        fixed_id |= 0xb2;
+    if (0 == (fixed_id & 0x00ff0000))
+        fixed_id |= 0xc5;
+    if (0 == (fixed_id & 0x0000ff00))
+        fixed_id |= 0x4a;
+    if (0 == (fixed_id & 0x000000ff))
+        fixed_id |= 0x2f;
     bind_count = 10000;
     state = SKYARTEC_PKT1;
 
@@ -201,11 +227,11 @@ const void *SKYARTEC_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)7L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
-        case PROTOCMD_CURRENT_ID: return 0;
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
