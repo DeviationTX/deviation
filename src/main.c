@@ -36,7 +36,7 @@ int main() {
     
     Init();
 #ifndef MODULAR
-    Banner();
+    //Banner();
 #endif
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
 
@@ -53,6 +53,7 @@ int main() {
     }
     
     CONFIG_LoadTx();
+    SPI_ProtoInit();
     CONFIG_ReadDisplay();
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     CONFIG_ReadLang(Transmitter.language);
@@ -109,7 +110,6 @@ void Init() {
     BACKLIGHT_Brightness(1);
     AUTODIMMER_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
-    SPI_ProtoInit();
 #ifdef MODULAR
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;

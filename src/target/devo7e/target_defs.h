@@ -22,10 +22,6 @@
 #define MIN_BATTERY_ALARM 3300
 
 
-//Protocols
-#define PROTO_HAS_CYRF6936
-#define PROTO_HAS_A7105
-
 #define NUM_OUT_CHANNELS 12
 #define NUM_VIRT_CHANNELS 10
 

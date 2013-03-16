@@ -16,7 +16,7 @@ enum ProtoCmds {
 };
 
 #ifndef MODULAR
-#define PROTODEF(proto, map, cmd, name) extern const void * cmd(enum ProtoCmds);
+#define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);
 #include "protocol.h"
 #undef PROTODEF
 #endif

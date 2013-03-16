@@ -45,6 +45,7 @@ void PAGE_ModelInit(int page)
     u8 row;
 
     mp->last_mixermode = Model.mixer_mode;
+    mp->last_txpower = Model.tx_power;
     mp->file_state = 0;
     PAGE_SetModal(0);
     if (Model.mixer_mode == MIXER_STANDARD)
@@ -122,6 +123,7 @@ static inline guiObject_t *_get_obj(int type, int objid)
     (void)objid;
     switch(type) {
         case ITEM_NUMCHAN: return (guiObject_t *)&gui->numch;
+        case ITEM_TXPOWER: return (guiObject_t *)&gui->pwr;
         case ITEM_PROTO: return (guiObject_t *)&gui->bind;
         case ITEM_GUI: return (guiObject_t *)&gui->guits;
         default: return NULL;

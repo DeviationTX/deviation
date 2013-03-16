@@ -22,11 +22,13 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#include "config/tx.h"
 #include "protocol/interface.h"
 
 #ifdef PROTO_HAS_A7105
-#define CS_HI() gpio_set(GPIOA, GPIO13)   
-#define CS_LO() gpio_clear(GPIOA, GPIO13)
+//GPIOA.13
+#define CS_HI() gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin)
+#define CS_LO() gpio_clear(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin)
 
 void A7105_WriteReg(u8 address, u8 data)
 {

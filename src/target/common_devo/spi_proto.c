@@ -24,6 +24,8 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "devo.h"
+#include "config/tx.h"
+#include <stdlib.h>
 
 void SPI_ProtoInit()
 {
@@ -44,27 +46,42 @@ void SPI_ProtoInit()
     /*CYRF cfg */
     /* Reset and CS */
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11 | GPIO12);
-    gpio_set(GPIOB, GPIO12);
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
     gpio_clear(GPIOB, GPIO11);
+    if(Transmitter.module_enable[CYRF6936].port) {
+        struct mcu_pin *port = &Transmitter.module_enable[CYRF6936];
+        printf("CYRF port: %08x pin: %04x\n", port->port, port->pin);
+        //GPIOB.12
+        gpio_set_mode(Transmitter.module_enable[CYRF6936].port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[CYRF6936].pin);
+        gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
+    }
 
+    //Disable JTAG and SWD
+    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
 
     /* A7105 */
 #ifdef PROTO_HAS_A7105
-    //Disable JTAG and SWD
-    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    gpio_set(GPIOA, GPIO13);
+    if(Transmitter.module_enable[A7105].port) {
+        //GPIOA.13
+        struct mcu_pin *port = &Transmitter.module_enable[A7105];
+        printf("A7105 port: %08x pin: %04x\n", port->port, port->pin);
+        gpio_set_mode(Transmitter.module_enable[A7105].port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[A7105].pin);
+        gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
+    }
 #endif
 
     /* CC2500 */
 #ifdef PROTO_HAS_CC2500
-    //Disable JTAG and SWD
-    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO14);
-    gpio_set(GPIOA, GPIO14);
+    if(Transmitter.module_enable[CC2500].port) {
+        //GPIOA.14
+        struct mcu_pin *port = &Transmitter.module_enable[CC2500];
+        printf("CC2500 port: %08x pin: %04x\n", port->port, port->pin);
+        gpio_set_mode(Transmitter.module_enable[CC2500].port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[CC2500].pin);
+        gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
+    }
 #endif
     /* Includes enable? */
     spi_init_master(SPI2, 
@@ -78,4 +95,73 @@ void SPI_ProtoInit()
     spi_enable(SPI2);
 
     PROTO_Stubs(0);
+}
+
+void MCU_InitModules()
+{
+    Transmitter.module_enable[CYRF6936].port = GPIOB;
+    Transmitter.module_enable[CYRF6936].pin = GPIO12;
+    Transmitter.module_poweramp = (1 << CYRF6936);
+}
+
+int MCU_SetPin(struct mcu_pin *port, const char *name) {
+    switch(name[0]) {
+        case 'A':
+        case 'a':
+            port->port = GPIOA; break;
+        case 'B':
+        case 'b':
+            port->port = GPIOB; break;
+        case 'C':
+        case 'c':
+            port->port = GPIOC; break;
+        case 'D':
+        case 'd':
+            port->port = GPIOD; break;
+        case 'E':
+        case 'e':
+            port->port = GPIOE; break;
+        case 'F':
+        case 'f':
+            port->port = GPIOF; break;
+        case 'G':
+        case 'g':
+            port->port = GPIOG; break;
+        default:
+            if(strcasecmp(name, "None") == 0) {
+                port->port = 0;
+                port->pin = 0;
+                return 1;
+            }
+            return 0;
+    }
+    int x = atoi(name+1);
+    if (x > 15)
+        return 0;
+    port->pin = 1 << x;
+    printf("port: %08x pin: %04x\n", port->port, port->pin);
+    return 1;
+}
+
+const char *MCU_GetPinName(char *str, struct mcu_pin *port)
+{
+    switch(port->port) {
+        case GPIOA: str[0] = 'A'; break;
+        case GPIOB: str[0] = 'B'; break;
+        case GPIOC: str[0] = 'C'; break;
+        case GPIOD: str[0] = 'D'; break;
+        case GPIOE: str[0] = 'E'; break;
+        case GPIOF: str[0] = 'F'; break;
+        case GPIOG: str[0] = 'G'; break;
+        default: str[0] = '-'; break;
+    }
+    for(int i = 0; i < 16; i++) {
+        if(port->pin == (1 << i)) {
+            sprintf(str+1, "%d", i);
+            return str;
+        }
+    }
+    str[1] = '0';
+    str[2] = 0;
+    return str;
 }

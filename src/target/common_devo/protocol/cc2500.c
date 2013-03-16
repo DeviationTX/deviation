@@ -22,11 +22,13 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#include "config/tx.h"
 #include "protocol/interface.h"
 
 #ifdef PROTO_HAS_CC2500
-#define CS_HI() gpio_set(GPIOA, GPIO14)   
-#define CS_LO() gpio_clear(GPIOA, GPIO14)
+//GPIOA.14
+#define CS_HI() gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin)
+#define CS_LO() gpio_clear(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin)
 
 void CC2500_WriteReg(u8 address, u8 data)
 {

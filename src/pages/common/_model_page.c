@@ -170,7 +170,10 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
+    if(! PROTOCOL_HasPowerAmp(Model.protocol))
+        return _tr("Default");
     Model.tx_power = GUI_TextSelectHelper(Model.tx_power, TXPOWER_100uW, TXPOWER_LAST-1, dir, 1, 1, NULL);
+    mp->last_txpower = Model.tx_power;
     return RADIO_TX_POWER_VAL[Model.tx_power];
 }
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
@@ -180,9 +183,18 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
+        PROTOCOL_DeInit();
+        PROTOCOL_Load(1);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
-        memset(Model.proto_opts, 0, sizeof(Model.proto_opts)); //This may cause an immediate change in behavior!
+        if (! PROTOCOL_HasPowerAmp(Model.protocol))
+            Model.tx_power = TXPOWER_150mW;
+        else
+            Model.tx_power = mp->last_txpower;
+        memset(Model.proto_opts, 0, sizeof(Model.proto_opts));
         guiObject_t *obj = _get_obj(ITEM_NUMCHAN, 0);
+        if (obj)
+            GUI_Redraw(obj);
+        obj = _get_obj(ITEM_TXPOWER, 0);
         if (obj)
             GUI_Redraw(obj);
         if (Model.mixer_mode == MIXER_STANDARD)
@@ -190,7 +202,10 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
-    return ProtocolNames[Model.protocol];
+    if(PROTOCOL_HasModule(Model.protocol))
+        return ProtocolNames[Model.protocol];
+    sprintf(mp->tmpstr, "*%s", ProtocolNames[Model.protocol]);
+    return mp->tmpstr;
 }
 void proto_press_cb(guiObject_t *obj, void *data)
 {

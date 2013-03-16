@@ -94,7 +94,7 @@ int PAGE_GetNumPages();
 int PAGE_GetStartPage();
 
 /* Protocol */
-#define PROTODEF(proto, map, init, name) proto,
+#define PROTODEF(proto, module, map, init, name) proto,
 enum Protocols {
     PROTOCOL_NONE,
     #include "protocol/protocol.h"
@@ -141,6 +141,8 @@ const char **PROTOCOL_GetOptions();
 void PROTOCOL_SetOptions();
 s8 PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
+int PROTOCOL_HasModule(int idx);
+int PROTOCOL_HasPowerAmp(int idx);
 
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);

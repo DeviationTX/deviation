@@ -19,13 +19,15 @@
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+#include "config/tx.h"
 //Some versions of gcc applythis to definitions, others to calls
 //So just use long_calls everywhere
 //#pragma long_calls_off
 #include "protocol/interface.h"
 
-#define CS_HI() gpio_set(GPIOB, GPIO12)   
-#define CS_LO() gpio_clear(GPIOB, GPIO12)
+//GPIOB.12
+#define CS_HI() gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin)
+#define CS_LO() gpio_clear(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin)
 #define RS_HI() gpio_set(GPIOB, GPIO11)
 #define RS_LO() gpio_clear(GPIOB, GPIO11)
 

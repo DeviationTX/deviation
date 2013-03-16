@@ -22,6 +22,11 @@ struct TouchCalibration {
     s32 yoffset;
 };
 
+struct mcu_pin {
+    u32 port;
+    u16 pin;
+};
+
 struct Transmitter {
     u8 current_model;
     u8 language;
@@ -35,6 +40,8 @@ struct Transmitter {
     u16 batt_warning_interval;
     u8 volume;
     u8 vibration_state; // for future vibration on/off support
+    struct mcu_pin module_enable[TX_MODULE_LAST];
+    u8 module_poweramp;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;
     struct AutoDimmer auto_dimmer;

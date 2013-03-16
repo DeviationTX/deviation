@@ -31,6 +31,13 @@ enum {
 #define NUM_INPUTS (NUM_TX_INPUTS)
 #define NUM_TX_BUTTONS (BUT_LAST - 1)
 
+enum {
+    CYRF6936,
+    A7105,
+    CC2500,
+    TX_MODULE_LAST,
+};
+
 /* The following functions must be provided by every target */
 
 /* General Functions */
@@ -155,9 +162,15 @@ enum {
 };
 u8 *BOOTLOADER_Read(int idx);
 
+#define PROTO_HAS_CYRF6936
+#define PROTO_HAS_A7105
+#define PROTO_HAS_CC2500
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
-
+struct mcu_pin;
+void MCU_InitModules();
+int MCU_SetPin(struct mcu_pin *, const char *name);
+const char *MCU_GetPinName(char *str, struct mcu_pin *);
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))
 #else

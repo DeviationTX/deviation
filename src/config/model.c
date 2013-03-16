@@ -1181,6 +1181,8 @@ u8 CONFIG_ReadModel(u8 model_num) {
         printf("Failed to parse Model file: %s\n", file);
         return 0;
     }
+    if(! PROTOCOL_HasPowerAmp(Model.protocol))
+        Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
         MIXER_AdjustForProtocol();
