@@ -350,7 +350,7 @@ static void calc_dsmx_channel()
 
 static void parse_telemetry_packet()
 {
-    u32 time = CLOCK_getms();
+    u32 time_ms = CLOCK_getms();
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
@@ -361,25 +361,29 @@ static void parse_telemetry_packet()
             //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
             //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
             Telemetry.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.time[0] = time;
+            Telemetry.time[0] = time_ms;
             Telemetry.time[1] = Telemetry.time[0];
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
-            Telemetry.rpm[0] = ((packet[2] << 8) | packet[3]); //In RPM
-            if (Telemetry.rpm[0] == 0xffff)
-                Telemetry.rpm[0] = 0;
+            Telemetry.rpm[0] = (packet[2] << 8) | packet[3];
+            if ((Telemetry.rpm[0] == 0xffff) || (Telemetry.rpm[0] < 200))
+            	  Telemetry.rpm[0] = 0; 
+            else
+            	  Telemetry.rpm[0] = 120000000 / 2 / Telemetry.rpm[0]; //In RPM (2 = number of poles)
+                //Telemetry.rpm[0] = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
+                //by default number_of_poles = 2, gear_ratio = 1.00
             Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
             Telemetry.temp[0] = packet[7] == 0xff ? 0 : (packet[7] - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
             //Telemetry.temp[0] = ((((s16)packet[8] << 8) | packet[7]) - 32) * 5 / 9; //(16Bit signed integer)
             //if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
             //    Telemetry.temp[0] = 0;
-            Telemetry.time[0] = time;
+            Telemetry.time[0] = time_ms;
             Telemetry.time[1] = Telemetry.time[0];
             break;
         case 0x03: //High Current sensor
             //Telemetry.current = (((s32)packet[2] << 8) | packet[3]) * 1967 / 1000; //In 1/10 of Amps (16bit value, 1 unit is 0.1967A)
-            //Telemetry.time[x1] = time;
+            //Telemetry.time[x1] = time_ms;
             break;
         case 0x10: //Powerbox sensor
             //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
@@ -390,15 +394,15 @@ static void parse_telemetry_packet()
             //Telemetry.pwb.alarm_v2 = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_c1 = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_c2 = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
-            //Telemetry.time[x2] = time;
+            //Telemetry.time[x2] = time_ms;
             break;
         case 0x11: //AirSpeed sensor
             //Telemetry.airspeed = ((s32)packet[2] << 8) | packet[3]; //In km/h (16Bit value, 1 unit is 1 km/h)
-            //Telemetry.time[x3] = time;
+            //Telemetry.time[x3] = time_ms;
             break;
         case 0x12: //Altimeter sensor
             //Telemetry.altitude = (((s16)packet[2] << 8) | packet[3]) /10; //In meters (16Bit signed integer, 1 unit is 0.1m)
-            //Telemetry.time[x4] = time;
+            //Telemetry.time[x4] = time_ms;
             break;
         case 0x14: //G-Force sensor
             //Telemetry.gforce.x = ((s16)packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
@@ -408,7 +412,7 @@ static void parse_telemetry_packet()
             //Telemetry.gforce.ymax = ((s16)packet[10] << 8) | packet[11];
             //Telemetry.gforce.zmax = ((s16)packet[12] << 8) | packet[13];
             //Telemetry.gforce.zmin = ((s16)packet[14] << 8) | packet[15];
-            //Telemetry.time[x5] = time;
+            //Telemetry.time[x5] = time_ms;
             break;
         case 0x15: //JetCat sensor
             //No data yet
@@ -432,7 +436,7 @@ static void parse_telemetry_packet()
                 Telemetry.gps.longitude *= -1;
             // Telemetry.gps.heading = ((packet[13] >> 4) * 10 + (packet[13] & 0x0f)) * 10     //(16Bit decimal, 1 unit is 0.1 degree)
             //                          + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees
-            Telemetry.time[2] = time;
+            Telemetry.time[2] = time_ms;
             break;
         case 0x17: //GPS sensor
             Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
@@ -451,7 +455,7 @@ static void parse_telemetry_packet()
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
             // Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
-            Telemetry.time[2] = time;
+            Telemetry.time[2] = time_ms;
             break;
     }
 }
