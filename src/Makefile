@@ -218,7 +218,6 @@ $(MODELDIR):
 $(TARGET).$(EXEEXT): $(LINKFILE) $(OBJS) $(LIBOPENCM3)
 	@echo " + Building '$@'"
 ifdef LINKFILE #Create an empty 'obj/optimize.ld' just in case the linker script needs it
-	/bin/rm -f objs/optimize.ld
 	echo "" > objs/optimize.ld
 endif
 ifeq ("$(SRC_CXX)", " ")
