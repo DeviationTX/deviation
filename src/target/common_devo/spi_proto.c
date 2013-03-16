@@ -153,7 +153,7 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
         case GPIOE: str[0] = 'E'; break;
         case GPIOF: str[0] = 'F'; break;
         case GPIOG: str[0] = 'G'; break;
-        default: str[0] = '-'; break;
+        default: return "None"; break;
     }
     for(int i = 0; i < 16; i++) {
         if(port->pin == (1 << i)) {
@@ -161,7 +161,5 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
             return str;
         }
     }
-    str[1] = '0';
-    str[2] = 0;
-    return str;
+    return "None";
 }
