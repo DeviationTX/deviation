@@ -244,7 +244,7 @@ static void parse_telemetry_packet(u8 *packet)
         Telemetry.temp[0] = packet[1] == 0xff ? 0 : packet[1] - 20; //In degrees-C
         Telemetry.temp[1] = packet[2] == 0xff ? 0 : packet[2] - 20; //In degrees-C
         Telemetry.temp[2] = packet[3] == 0xff ? 0 : packet[3] - 20; //In degrees-C
-        Telemetry.temp[3] = packet[3] == 0xff ? 0 : packet[4] - 20; //In degrees-C
+        Telemetry.temp[3] = packet[4] == 0xff ? 0 : packet[4] - 20; //In degrees-C
         Telemetry.time[1] = CLOCK_getms();
     }
     /* GPS Data

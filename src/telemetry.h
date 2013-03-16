@@ -44,7 +44,7 @@ struct gps {
 
 struct Telemetry {
     u16 volt[3];
-    u8 temp[4];
+    s16 temp[4];
     u16 rpm[2];
     struct gps gps;
     u32 time[3];

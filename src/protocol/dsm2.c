@@ -374,10 +374,10 @@ static void parse_telemetry_packet()
                 //Telemetry.rpm[0] = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
                 //by default number_of_poles = 2, gear_ratio = 1.00
             Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.temp[0] = packet[7] == 0xff ? 0 : (packet[7] - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
+            Telemetry.temp[0] = (((packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
             //Telemetry.temp[0] = ((((s16)packet[8] << 8) | packet[7]) - 32) * 5 / 9; //(16Bit signed integer)
-            //if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
-            //    Telemetry.temp[0] = 0;
+            if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
+                Telemetry.temp[0] = 0;
             Telemetry.time[0] = time_ms;
             Telemetry.time[1] = Telemetry.time[0];
             break;
