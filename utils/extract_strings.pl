@@ -94,7 +94,7 @@ foreach my $file (@files) {
     open my $fh, "<", $file;
     my $name = <$fh>;
     my(@lines) = <$fh>;
-    for (my $line = 0; $line < $#lines-1; $line++) {
+    for (my $line = 0; $line < $#lines; $line++) {
         $_ = $lines[$line];
         chomp;
         if(/^:(.*)/) {               #/^([<>]?):(.*)/)
