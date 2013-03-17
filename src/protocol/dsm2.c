@@ -137,7 +137,10 @@ static const u8 ch_map6[] = {1, 5, 2, 3, 0,    4,    0xff}; //HP6DSM
 static const u8 ch_map7[] = {1, 5, 2, 4, 3,    6,    0}; //DX6i
 static const u8 ch_map8[] = {1, 5, 2, 3, 6,    0xff, 0xff, 4, 0, 7,    0xff, 0xff, 0xff, 0xff}; //DX8
 static const u8 ch_map9[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 0xff, 0xff, 0xff, 0xff, 0xff}; //DM9
-static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9};
+static const u8 ch_map10[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 0xff, 0xff, 0xff, 0xff};
+static const u8 ch_map11[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 0xff, 0xff, 0xff};
+static const u8 ch_map12[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 11, 0xff, 0xff};
+static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9, ch_map10, ch_map11, ch_map12};
 
 u8 packet[16];
 u8 channels[23];
@@ -609,8 +612,8 @@ static void initialize(u8 bind)
     num_channels = Model.num_channels;
     if (num_channels < 6)
         num_channels = 6;
-    else if (num_channels > 9)
-        num_channels = 9;
+    else if (num_channels > 12)
+        num_channels = 12;
 
     CYRF_ConfigRxTx(1);
     if (bind) {
