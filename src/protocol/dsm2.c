@@ -385,7 +385,7 @@ static void parse_telemetry_packet()
             //Telemetry.current = (((s32)packet[2] << 8) | packet[3]) * 1967 / 1000; //In 1/10 of Amps (16bit value, 1 unit is 0.1967A)
             //Telemetry.time[x1] = time_ms;
             break;
-        case 0x10: //Powerbox sensor
+        case 0x0a: //Powerbox sensor
             //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
             //Telemetry.pwb.volt1 = (((s32)packet[4] << 8) | packet[5] + 5) /10; //In 1/10 of Volts
             //Telemetry.pwb.capacity1 = (((s32)packet[6] << 8) | packet[7] + 5); //In mAh
