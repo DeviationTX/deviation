@@ -377,8 +377,7 @@ static void parse_telemetry_packet()
                 //Telemetry.rpm[0] = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
                 //by default number_of_poles = 2, gear_ratio = 1.00
             Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.temp[0] = (((packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
-            //Telemetry.temp[0] = ((((s16)packet[8] << 8) | packet[7]) - 32) * 5 / 9; //(16Bit signed integer)
+            Telemetry.temp[0] = (((s32)(packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer !!!)
             if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
                 Telemetry.temp[0] = 0;
             Telemetry.time[0] = time_ms;
@@ -391,8 +390,8 @@ static void parse_telemetry_packet()
         case 0x0a: //Powerbox sensor
             //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
             //Telemetry.pwb.volt1 = (((s32)packet[4] << 8) | packet[5] + 5) /10; //In 1/10 of Volts
-            //Telemetry.pwb.capacity1 = (((s32)packet[6] << 8) | packet[7] + 5); //In mAh
-            //Telemetry.pwb.capacity2 = (((s32)packet[8] << 8) | packet[9] + 5); //In mAh
+            //Telemetry.pwb.capacity1 = ((s32)packet[6] << 8) | packet[7]; //In mAh
+            //Telemetry.pwb.capacity2 = ((s32)packet[8] << 8) | packet[9]; //In mAh
             //Telemetry.pwb.alarm_v1 = packet[15] & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_v2 = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_c1 = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
@@ -404,21 +403,79 @@ static void parse_telemetry_packet()
             //Telemetry.time[x3] = time_ms;
             break;
         case 0x12: //Altimeter sensor
-            //Telemetry.altitude = (((s16)packet[2] << 8) | packet[3]) /10; //In meters (16Bit signed integer, 1 unit is 0.1m)
+            //Telemetry.altitude = ((s32)(packet[2] << 8) | packet[3]) /10; //In meters (16Bit signed integer, 1 unit is 0.1m)
             //Telemetry.time[x4] = time_ms;
             break;
         case 0x14: //G-Force sensor
-            //Telemetry.gforce.x = ((s16)packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
-            //Telemetry.gforce.y = ((s16)packet[4] << 8) | packet[5];
-            //Telemetry.gforce.z = ((s16)packet[6] << 8) | packet[7];
-            //Telemetry.gforce.xmax = ((s16)packet[8] << 8) | packet[9];
-            //Telemetry.gforce.ymax = ((s16)packet[10] << 8) | packet[11];
-            //Telemetry.gforce.zmax = ((s16)packet[12] << 8) | packet[13];
-            //Telemetry.gforce.zmin = ((s16)packet[14] << 8) | packet[15];
+            //Telemetry.gforce.x = (s32)(packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
+            //Telemetry.gforce.y = (s32)(packet[4] << 8) | packet[5];
+            //Telemetry.gforce.z = (s32)(packet[6] << 8) | packet[7];
+            //Telemetry.gforce.xmax = (s32)(packet[8] << 8) | packet[9];
+            //Telemetry.gforce.ymax = (s32)(packet[10] << 8) | packet[11];
+            //Telemetry.gforce.zmax = (s32)(packet[12] << 8) | packet[13];
+            //Telemetry.gforce.zmin = (s32)(packet[14] << 8) | packet[15];
             //Telemetry.time[x5] = time_ms;
             break;
         case 0x15: //JetCat sensor
-            //No data yet
+            //Telemetry.jc.status = packet[2];
+                //Possible messages for status:
+                //0x00:OFF
+                //0x01:WAIT FOR RPM
+                //0x02:IGNITE
+                //0x03;ACCELERATE
+                //0x04:STABILIZE
+                //0x05:LEARN HIGH
+                //0x06:LEARN LOW
+                //0x07:undef
+                //0x08:SLOW DOWN
+                //0x09:MANUAL
+                //0x0a,0x10:AUTO OFF
+                //0x0b,0x11:RUN
+                //0x0c,0x12:ACCELERATION DELAY
+                //0x0d,0x13:SPEED REG
+                //0x0e,0x14:TWO SHAFT REGULATE
+                //0x0f,0x15:PRE HEAT
+                //0x16:PRE HEAT 2
+                //0x17:MAIN F START
+                //0x18:not used
+                //0x19:KERO FULL ON
+                //0x1a:MAX STATE
+            //Telemetry.jc.throttle = (packet[3] >> 4) * 10 + (packet[3] & 0x0f); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
+            //Telemetry.jc.pack_volt = (((packet[4] >> 4) * 10 + (packet[4] & 0x0f)) * 100 
+            //                         + (packet[5] >> 4) * 10 + (packet[5] & 0x0f) + 5) / 10; //In 1/10 of Volts
+            //Telemetry.jc.pump_volt = (((packet[6] >> 6) * 10 + (packet[6] & 0x0f)) * 100 
+            //                         + (packet[7] >> 4) * 10 + (packet[7] & 0x0f) + 5) / 10; //In 1/10 of Volts
+            //Telemetry.jc.rpm = ((packet[10] >> 4) * 10 + (packet[10] & 0x0f)) * 10000 
+            //                 + ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 100 
+            //                 + ((packet[8] >> 4) * 10 + (packet[8] & 0x0f)); //RPM up to 999999
+            //Telemetry.jc.tempEGT = (packet[13] & 0x0f) * 100 + (packet[12] >> 4) * 10 + (packet[12] & 0x0f); //EGT temp up to 999°
+            //Telemetry.jc.off_condition = packet[14];
+                //Messages for Off_Condition:
+                //0x00:NA
+                //0x01:OFF BY RC
+                //0x02:OVER TEMPERATURE
+                //0x03:IGNITION TIMEOUT
+                //0x04:ACCELERATION TIMEOUT
+                //0x05:ACCELERATION TOO SLOW
+                //0x06:OVER RPM
+                //0x07:LOW RPM OFF
+                //0x08:LOW BATTERY
+                //0x09:AUTO OFF
+                //0x0a,0x10:LOW TEMP OFF
+                //0x0b,0x11:HIGH TEMP OFF
+                //0x0c,0x12:GLOW PLUG DEFECTIVE
+                //0x0d,0x13:WATCH DOG TIMER
+                //0x0e,0x14:FAIL SAFE OFF
+                //0x0f,0x15:MANUAL OFF
+                //0x16:POWER BATT FAIL
+                //0x17:TEMP SENSOR FAIL
+                //0x18:FUEL FAIL
+                //0x19:PROP FAIL
+                //0x1a:2nd ENGINE FAIL
+                //0x1b:2nd ENGINE DIFFERENTIAL TOO HIGH
+                //0x1c:2nd ENGINE NO COMMUNICATION
+                //0x1d:MAX OFF CONDITION
+            //Telemetry.time[x6] = time_ms;
             break;
         case 0x16: //GPS sensor
             Telemetry.gps.altitude = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100   //(16Bit decimal, 1 unit is 0.1m)
