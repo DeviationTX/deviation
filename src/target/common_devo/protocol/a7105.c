@@ -41,16 +41,25 @@ void A7105_WriteReg(u8 address, u8 data)
 u8 A7105_ReadReg(u8 address)
 {
     u8 data;
-
+    int i;
     CS_LO();
     spi_xfer(SPI2, 0x40 | address);
+    /* Wait for tx completion before spi shutdown */
+    while(!(SPI_SR(SPI2) & SPI_SR_TXE))
+        ;
+    while((SPI_SR(SPI2) & SPI_SR_BSY))
+        ;
+
     spi_disable(SPI2);
     spi_set_bidirectional_receive_only_mode(SPI2);
-    spi_enable(SPI2);
-    int i;
-    for(i = 0; i < 10; i++)
-       ;
-    spi_disable(SPI2);
+    /* Force read from SPI_DR to ensure RXNE is clear (probably not needed) */
+    volatile u8 x = SPI_DR(SPI2);
+    (void)x;
+    spi_enable(SPI2);  //This starts the data read
+    for(i = 0; i < 20; i++)  //Wait > 1 SPI clock (but less than 8).  clock is 4.5MHz
+        asm volatile ("nop");
+    ;
+    spi_disable(SPI2); //This ends the read window
     data = spi_read(SPI2);
     CS_HI();
     spi_set_unidirectional_mode(SPI2);
@@ -101,6 +110,7 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
 void A7105_Reset()
 {
     A7105_WriteReg(0x00, 0x00);
+    usleep(1000);
 }
 void A7105_WriteID(u32 id)
 {

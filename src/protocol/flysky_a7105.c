@@ -223,7 +223,6 @@ static void initialize(u8 bind) {
     CLOCK_StopTimer();
     while(1) {
         A7105_Reset();
-        usleep(100000);
         CLOCK_ResetWatchdog();
         if (flysky_init())
             break;
