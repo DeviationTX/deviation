@@ -42,7 +42,7 @@ const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
 #ifdef MODULAR
 unsigned long * const loaded_protocol = (unsigned long *)MODULAR;
 void * (* const PROTO_Cmds)(enum ProtoCmds) = (void *)(MODULAR +sizeof(long)+1);
-#define PROTOCOL_LOADED (*loaded_protocol != Model.protocol)
+#define PROTOCOL_LOADED (*loaded_protocol == Model.protocol)
 #else
 const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
 #define PROTOCOL_LOADED PROTO_Cmds
