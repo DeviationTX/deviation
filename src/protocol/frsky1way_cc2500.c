@@ -13,24 +13,28 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define FRSKY1WAY_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  //Some versions of gcc applythis to definitions, others to calls
+  //So just use long_calls everywhere
+  //#pragma long_calls_off
+  extern unsigned _data_loadaddr;
+  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+#endif
+
 #ifdef PROTO_HAS_CC2500
 
 #include "iface_cc2500.h"
 
-static const char *frsky_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
-  NULL
-};
-enum {
-    PROTO_OPTS_TELEM = 0,
-};
-#define TELEM_ON 0
-#define TELEM_OFF 1
 static u8 packet[16];
 static u32 state;
 static u16 seed;
@@ -212,10 +216,7 @@ static void build_data_packet_1way()
 static u16 frsky_cb()
 {
     if (state < FRSKY_BIND_DONE) {
-        if (Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON) {
-        } else {
-            build_bind_packet_1way();
-        }
+        build_bind_packet_1way();
         CC2500_Strobe(CC2500_SIDLE);
         CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
         CC2500_WriteData(packet, packet[0]+1);
@@ -230,10 +231,7 @@ static u16 frsky_cb()
         u8 chan = calc_channel();
         CC2500_Strobe(CC2500_SIDLE);
         CC2500_WriteReg(CC2500_0A_CHANNR, chan * 5 + 6);
-        if (Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON) {
-        } else {
-            build_data_packet_1way();
-        }
+        build_data_packet_1way();
         CC2500_WriteData(packet, packet[0]+1);
         state++;
         if (state > FRSKY_DATA5)
@@ -259,7 +257,7 @@ static void initialize(int bind)
     CLOCK_StartTimer(10000, frsky_cb);
 }
 
-const void *FRSKY_Cmds(enum ProtoCmds cmd)
+const void *FRSKY1WAY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
@@ -268,10 +266,7 @@ const void *FRSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)4L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS:
-            return frsky_opts;
-        case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? 1L : 0L);
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
     return 0;

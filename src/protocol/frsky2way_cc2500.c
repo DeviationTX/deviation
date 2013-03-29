@@ -13,16 +13,29 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define FRSKY2WAY_Cmds PROTO_Cmds
+  #pragma long_calls
+#endif
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
 
+#ifdef MODULAR
+  //Some versions of gcc applythis to definitions, others to calls
+  //So just use long_calls everywhere
+  //#pragma long_calls_off
+  extern unsigned _data_loadaddr;
+  const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+#endif
+
 #ifdef PROTO_HAS_CC2500
 
 #include "iface_cc2500.h"
 
-static const char *frsky_opts[] = {
+static const char * const frsky_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
