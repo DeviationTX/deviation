@@ -105,8 +105,8 @@ Aux2
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
-:Binding...\n%d seconds\nPress ENT to stop
-Привязка...\n%d секунд\nENT для остановки
+:Binding...\nPress ENT to stop
+Привязка...\nENT для остановки
 :Box %d:
 Бокс %d:
 :Button monitor
@@ -725,6 +725,8 @@ USB
 Вольт:
 :Zero/Max
 Ноль/Макс
+:\n%d seconds left
+\n%d секунд до конца
 :\n\nBinding will end in %d seconds...
 \n\nПривязка завершится через %d секунд...
 :add

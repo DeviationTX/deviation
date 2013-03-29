@@ -93,8 +93,9 @@ void PAGE_ShowBindingDialog(u8 update)
         return;
     u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
+    strcpy(dlgstr, _tr("Binding...\nPress ENT to stop"));
     if (bind_time != 0xFFFFFFFF )
-        sprintf(dlgstr, _tr("Binding...\n%d seconds\nPress ENT to stop"), (int)bind_time / 1000);
+        sprintf(dlgstr + strlen(dlgstr), _tr("\n%d seconds left"), (int)bind_time / 1000);
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);

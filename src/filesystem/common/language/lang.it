@@ -43,8 +43,7 @@ V_ASSOL
 ALET
 :AIL DR
 DR ALET
-:AIL Inv:
-:Direzione degli Alettoni
+>:AIL Inv:
 >:AIL Mix:
 >:AUX2
 >:AUX3
@@ -85,8 +84,8 @@ Bind
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
-:Binding...\n%d seconds\nPress ENT to stop
-Binding...\n%d secondi\nPremi ENT per fermare
+:Binding...\nPress ENT to stop
+Binding...\nPremi ENT per fermare
 :Box %d:
 Box%d:
 >:Button monitor
@@ -96,8 +95,7 @@ Box%d:
 :COL
 Collet.
 >:COL Inv
-:COL Inv:
-:Collet.Inv.
+>:COL Inv:
 >:COL Limit
 >:COL Mix:
 :CYC
@@ -122,13 +120,15 @@ Cambia
 >:Channel monitor
 :Channel output
 Canale di uscita
+<:Collet.Inv.
+<>:COL Limit
 :Complex
 Complesso
 :Configure
 Configura
 :Contrast:
 Contrasto:
-:Copy To
+>:Copy To
 :Copy To...
 >:Copy To...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
@@ -158,8 +158,11 @@ Versione del FW Deviation:
 Dest. del Dimmer:
 :Dimmer time:
 Durata del Dimmer:
+<:Direzione degli Alettoni
+<>:AIL Mix:
 :Dn
 Dn
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Giù
 :ELE
@@ -171,6 +174,7 @@ ELE Inv
 >:ELE Mix:
 :EXPO
 Esponenziale
+>:Enabled
 :Enter
 Entra
 :Exit
@@ -178,12 +182,6 @@ Esci
 :Expo&DR
 Esp.&DR
 >:FMODE
-<:FMODE0
-<FMOD0
-<:FMODE1
-<FMOD1
-<:FMODE2
-<FMOD2
 :Fahren
 Fahren
 >:Fail safe
@@ -221,8 +219,8 @@ Rate Alto
 :Icon
 Icona
 >:Icon:
->:Idle 1
->:Idle 2
+>:Idle Up 1
+>:Idle Up 2
 >:Input monitor
 :Input:
 Ingresso:
@@ -252,7 +250,6 @@ Linkato
 Carica
 :Load...
 Carica...
->:Locked
 :Longitude
 Longitudine
 :Low Battery
@@ -261,17 +258,12 @@ Batteria scarica
 Rate basso
 >:M
 >:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
 :Main menu
 Menù principale
 >:Main page
 :Main page config
 Pagina di Configurazione
+>:Manual
 >:Max Limit:
 >:Menu
 :Meter
@@ -330,9 +322,9 @@ Ok
 :On
 On
 >:PIT
+>:PIT Mix:
 :Page:
 Pagina:
->:Pit Mix:
 >:Pitch curves
 :Plane
 Aero
@@ -346,7 +338,7 @@ Pos.
 :Pos/Neg:
 Pos./Neg.:
 >:Position %d
->:PowerOff alert
+>:Power-down alert
 :Prealert intvl:
 Intervallo di preallarme:
 :Prealert time:
@@ -384,6 +376,7 @@ Reinizializza
 Rimuovi
 :Reset
 Reset
+>:Reset Permanent Timer?
 >:Reset sw:
 >:Reverse
 :Reverse:
@@ -414,7 +407,7 @@ Sempl.
 4Ch. Semplici
 :Speed
 Velocità
-:Speed:
+>:Speed:
 :Src
 >:Src
 :Src:
@@ -438,8 +431,6 @@ Subtrim
 >:Swash
 :SwashType:
 Piatto:
-<:Switch %d:
-<Interr. %d:
 >:Switch assignment
 :Switch1
 Interr1
@@ -502,7 +493,7 @@ Test
 >:Thr hold
 >:Throttle curves
 >:Throttle hold
-:Time
+>:Time
 :Timer
 >:Timer
 :Timer settings
@@ -553,7 +544,6 @@ USB
 >:USB Filesystem is currently 
 :Unknown
 Sconosciuto
->:Unlocked
 :Up
 Sù
 >:Value
@@ -564,9 +554,11 @@ valore:
 Virt
 :Volt
 Volt
-:Volt:
+>:Volt:
 :Zero/Max
 >:Zero/Max
+:\n%d seconds left
+\n%d secondi a sinistra
 :\n\nBinding will end in %d seconds...
 \n\nIl Binding finirà tra %d secondi...
 :add

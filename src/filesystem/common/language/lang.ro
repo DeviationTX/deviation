@@ -97,8 +97,8 @@ Bind
 Conectare
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
-:Binding...\n%d seconds\nPress ENT to stop
-Conectare...\n%d secunde\nApăsați ENT pentru a întrerupe.
+:Binding...\nPress ENT to stop
+Conectare...\nApăsați ENT pentru a opri
 :Box %d:
 Loc%d:
 :Button monitor
@@ -189,6 +189,7 @@ Nivel auto
 Timp auto:
 :Dn
 Jos
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Jos
 :ELE
@@ -201,6 +202,7 @@ ELE inv.:
 ELE Mix:
 :EXPO
 EXP.
+>:Enabled
 :Enter
 Enter
 :Exit
@@ -257,10 +259,12 @@ Poziție fixă
 Icon
 :Icon:
 Icon:
-:Idle 1
-Idle 1
-:Idle 2
-Idle 2
+<:Idle 1
+<Idle 1
+<:Idle 2
+<Idle 2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 Monitor intrări
 :Input:
@@ -293,8 +297,8 @@ Legat
 Încarcă
 :Load...
 Încarcă...
-:Locked
-Încuiat
+<:Locked
+<Încuiat
 :Longitude
 Longitudine
 :Low Battery
@@ -311,6 +315,7 @@ Meniu principal
 Pagina principală
 :Main page config
 Ecran principal
+>:Manual
 :Max Limit:
 Limită max:
 :Menu
@@ -379,10 +384,11 @@ Ok
 Pornit
 :PIT
 PIT
+>:PIT Mix:
 :Page:
 Pagină:
-:Pit Mix:
-Mix PIT:
+<:Pit Mix:
+<Mix PIT:
 :Pitch curves
 Curbe pitch
 :Plane
@@ -401,8 +407,9 @@ Pos 2
 Poz/Neg:
 :Position %d
 Poziția %d
-:PowerOff alert
-Alertă oprire
+>:Power-down alert
+<:PowerOff alert
+<Alertă oprire
 :Prealert intvl:
 Interval:
 :Prealert time:
@@ -441,6 +448,7 @@ Re-init
 Șterge
 :Reset
 Reset
+>:Reset Permanent Timer?
 :Reset sw:
 Sw reset:
 :Reverse
@@ -629,8 +637,8 @@ USB
 Sistemul de fițiere USB este 
 :Unknown
 Necunoscut
-:Unlocked
-Descuiat
+<:Unlocked
+<Descuiat
 :Up
 Sus
 :Value
@@ -647,6 +655,8 @@ Volt
 Volt:
 :Zero/Max
 Zero/Max
+:\n%d seconds left
+\n%d secunde stânga
 :\n\nBinding will end in %d seconds...
 \n\nConectarea se va încheia în %d secunde...
 :add

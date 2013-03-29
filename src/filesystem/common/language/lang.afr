@@ -97,8 +97,10 @@ Bind
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
-:Binding...\n%d seconds\nPress ENT to stop
-Bind...\n%d seconds\n Druk ENT om te stop
+<:Binding...\n%d seconds\nPress ENT to stop
+<Bind...\n%d seconds\n Druk ENT om te stop
+:Binding...\nPress ENT to stop
+<Bind...\nDruk ENT om te stop
 :Box %d:
 Kassie %d:
 :Button monitor
@@ -189,6 +191,7 @@ Verdof Teiken:
 Verdof tyd:
 :Dn
 Af:
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Af
 :ELE
@@ -201,6 +204,7 @@ ELE Inv:
 ELE Meng:
 :EXPO
 Expo
+>:Enabled
 :Enter
 Enter
 :Exit
@@ -257,10 +261,12 @@ Hou Posisie
 Ikoon
 :Icon:
 Ikoon
-:Idle 1
-Idle 1
-:Idle 2
-Idle 2
+<:Idle 1
+<Idle 1
+<:Idle 2
+<Idle 2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 Inset Monitor
 :Input:
@@ -293,8 +299,8 @@ Verbind
 Laai
 :Load...
 Laai...
-:Locked
-Gesluit
+<:Locked
+<Gesluit
 :Longitude
 Lengtegraad
 :Low Battery
@@ -311,6 +317,7 @@ Hoof Menu
 Hoofbladsy
 :Main page config
 Hoofbladsy Opstelling 
+>:Manual
 :Max Limit:
 Max limiet:
 :Menu
@@ -379,10 +386,11 @@ Ok
 Aan
 :PIT
 PIT
+>:PIT Mix:
 :Page:
 Bladsy:
-:Pit Mix:
-PIT Meng:
+<:Pit Mix:
+<PIT Meng:
 :Pitch curves
 PIT kurwes
 :Plane
@@ -401,8 +409,9 @@ Pos 2:
 +/-:
 :Position %d
 Posisie %d
-:PowerOff alert
-Krag-af Waarskuwing
+>:Power-down alert
+<:PowerOff alert
+<Krag-af Waarskuwing
 :Prealert intvl:
 Voorwaarsku intvl:
 :Prealert time:
@@ -441,6 +450,7 @@ Her-ini
 Verwyder
 :Reset
 Reset
+>:Reset Permanent Timer?
 :Reset sw:
 Reset sw:
 :Reverse
@@ -501,7 +511,6 @@ SubTrim
 SubTrim
 :Subtrim:
 SubTrim:
-SubTrim: 
 :Swash
 Swash Tipe
 :SwashType:
@@ -630,8 +639,8 @@ USB
 USB Lêerstelsel is tans
 :Unknown
 Onbekend
-:Unlocked
-Ontsluit
+<:Unlocked
+<Ontsluit
 :Up
 Op
 :Value
@@ -648,6 +657,8 @@ Volt
 Volt:
 :Zero/Max
 Zero/Max
+:\n%d seconds left
+\n%d sekondes links
 :\n\nBinding will end in %d seconds...
 \n\nBindproses eindig in %d sekonds...
 :add

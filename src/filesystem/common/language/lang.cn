@@ -54,12 +54,12 @@
 >:AUX7
 :About Deviation
 关于本系统
-:Add
-增加
+<:Add
+<增加
 :Advanced
 高级模式1
-:Advanced2
-高级模式2
+<:Advanced2
+<高级模式2
 :Airplane
 固定翼
 :Alarm
@@ -68,8 +68,8 @@
 报警间隔
 :Altitude
 高度
-:Are you sure to\ndelete this mix?
-是否确定删除\n当前混控?
+<:Are you sure to\ndelete this mix?
+<是否确定删除\n当前混控?
 :Auto
 自动
 >:Aux2
@@ -92,8 +92,8 @@
 对频
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
-:Binding...\n%d seconds\nPress ENT to stop
-对频中...\n%d秒后结束\n按ENT中止
+:Binding...\nPress ENT to stop
+对频中...\n按ENT中止
 :Box %d:
 第%d栏
 :Button monitor
@@ -104,7 +104,6 @@
 音量
 :Buzzer settings
 报警设置
->:CCPM
 :COL
 螺距
 :COL Inv
@@ -137,16 +136,16 @@ CYC
 改变
 :Channel
 通道
-:Channel config
-通道基本配置
-:Channel mix
-通道混控配置
+<:Channel config
+<通道基本配置
+<:Channel mix
+<通道混控配置
 :Channel monitor
 通道监控
 :Channel output
 通道输出
-:Channel reorder
-调整通道顺序
+<:Channel reorder
+<调整通道顺序
 :Complex
 多段式
 :Configure
@@ -157,12 +156,12 @@ CYC
 复制到
 :Copy To...
 复制...
-:CopyTo
-复制
+<:CopyTo
+<复制
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
-:Curve
-曲线
+<:Curve
+<曲线
 :Curve:
 曲线
 :Cyclic1
@@ -185,10 +184,10 @@ CCPM3
 死区
 :Default
 缺省
-:Default input
-默认输入
-:Dele
-删除
+<:Default input
+<默认输入
+<:Dele
+<删除
 :Delta PW
 脉宽变化
 :Deviation FW version:
@@ -203,10 +202,10 @@ Deviation固件版本:
 是否确定\n重置持续\n计时器%d?
 :Down
 下
-:Dual Rate
-两段
-:Duplicate mix\n exists!
-相同的混控\n已存在!
+<:Dual Rate
+<两段
+<:Duplicate mix\n exists!
+<相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -216,8 +215,9 @@ Deviation固件版本:
 升降螺距
 :EXPO
 指数曲线
-:Edit
-编辑
+<:Edit
+<编辑
+>:Enabled
 :Enter
 进入
 :Exit
@@ -269,10 +269,12 @@ Deviation固件版本:
 图标
 :Icon:
 图标
-:Idle 1
-3D飞行1
-:Idle 2
-3D飞行2
+<:Idle 1
+<3D飞行1
+<:Idle 2
+<3D飞行2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 摇杆输入监控
 :Input:
@@ -305,7 +307,6 @@ LCD设置
 读取
 :Load...
 读取...
->:Locked
 :Longitude
 经度
 :Low Battery
@@ -321,8 +322,9 @@ LCD设置
 主页面
 :Main page config
 定制主页面
-:Master
-输入
+>:Manual
+<:Master
+<输入
 :Max Limit:
 最大舵量
 :Menu
@@ -363,12 +365,12 @@ LCD设置
 上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
-:MoveDn
-下移
-:MoveUp
-上移
-:Mux
-作用
+<:MoveDn
+<下移
+<:MoveUp
+<上移
+<:Mux
+<作用
 :Mux:
 作用
 :Neg
@@ -397,16 +399,17 @@ LCD设置
 开启
 :PIT
 螺距
+>:PIT Mix:
 :Page:
 模式1-N
-:Pit Mix:
-集体螺距
+<:Pit Mix:
+<集体螺距
 :Pitch curves
 螺距曲线
 :Plane
 固定翼
-:Point
-点
+<:Point
+<点
 :Point:
 点
 :Pos
@@ -421,8 +424,9 @@ LCD设置
 正/负
 :Position %d
 档位%1
-:PowerOff alert
-关机提示
+>:Power-down alert
+<:PowerOff alert
+<关机提示
 :Prealert intvl:
 预警间隔
 :Prealert time:
@@ -439,8 +443,8 @@ LCD设置
 按ENT使U盘:
 :Preview: Long-Press ENT
 长按ENT预览,EXT返回
-:Program mix
-程式混控
+<:Program mix
+<程式混控
 :Protocol:
 通信协议
 :PwrDn alert:
@@ -456,12 +460,12 @@ LCD设置
 :RUD
 方向
 >:RUD DR
-:Rate
-分段
+<:Rate
+<分段
 :Re-Init
 初始化
-:Reach max mix\nlimit for a channel!
-此通道程式混控\n数量达到上限！
+<:Reach max mix\nlimit for a channel!
+<此通道程式混控\n数量达到上限！
 :Remove
 删除
 :Reset
@@ -500,8 +504,8 @@ LCD设置
 一段式
 :Simple 4 Channel
 4通道
-:Slave
-被控通道
+<:Slave
+<被控通道
 :Speed
 速度
 :Speed:
@@ -510,12 +514,13 @@ LCD设置
 输入
 :Src:
 输入
+>:Standard
 :Standard Mixer
 通用模式
 :Start:
 开始时间
-:Std Heli
-标准直机
+<:Std Heli
+<标准直机
 :Step:
 幅度
 :Stick input
@@ -534,8 +539,8 @@ LCD设置
 斜盘设置
 :SwashType:
 斜盘模式
-:Switch
-开关
+<:Switch
+<开关
 :Switch assignment
 开关分配
 :Switch1
@@ -655,11 +660,10 @@ LCD设置
 :USB Filesystem is currently 
 USB文件系统当前状态
 >:Unknown
->:Unlocked
 :Up
 上
-:UseTrim
-微调
+<:UseTrim
+<微调
 :Value
 感度值
 :Value:
@@ -674,6 +678,8 @@ USB文件系统当前状态
 电压
 :Zero/Max
 零/最大
+:\n%d seconds left
+\n还剩%d秒
 :\n\nBinding will end in %d seconds...
 \n\n对频在%d秒后结束 
 :add

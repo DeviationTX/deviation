@@ -97,8 +97,8 @@ Csatol
 Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
-:Binding...\n%d seconds\nPress ENT to stop
-Kapcsolódás...\n%d másodperc\nNyomjon ENT-t a leállításához
+:Binding...\nPress ENT to stop
+Kapcsolódás...\nENT megállítani
 :Box %d:
 Doboz%d:
 :Button monitor
@@ -197,6 +197,7 @@ Alvó fényerő:
 Alvó mód ideje:
 :Dn
 Le
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Le
 :ELE
@@ -213,6 +214,7 @@ Magassági mix:
 Magas. mix:
 :EXPO
 EXP.
+>:Enabled
 :Enter
 Enter
 :Exit
@@ -271,12 +273,12 @@ TH érték
 Ikon
 :Icon:
 Ikon:
-:Idle 1
-Alapjárat 1
+<:Idle 1
+<Alapjárat 1
+<:Idle 2
+<Alapjárat 2
 :Idle Up 1
 Alapjárat 1
-:Idle 2
-Alapjárat 2
 :Idle Up 2
 Alapjárat 2
 :Input monitor
@@ -311,8 +313,8 @@ Csatolt
 Betöltés
 :Load...
 Betöltés...
-:Locked
-Zárolt
+<:Locked
+<Zárolt
 :Longitude
 Hosszúság
 :Low Battery
@@ -329,6 +331,7 @@ Főmenü
 Főablak
 :Main page config
 Főablak konfig.
+>:Manual
 :Max Limit:
 Max korlát:
 :Menu
@@ -399,10 +402,11 @@ Ok
 Be
 :PIT
 PIT
+>:PIT Mix:
 :Page:
 Oldal:
-:Pit Mix:
-Koll. mix:
+<:Pit Mix:
+<Koll. mix:
 :Pitch curves
 Állásszög görbék
 :Plane
@@ -421,10 +425,11 @@ Poz. 2:
 Poz/Neg:
 :Position %d
 Pozíció %d
-:PowerOff alert
-Kikapcs. riaszt.
-:PowerOff alert:
-Kikapcs. riaszt.:
+>:Power-down alert
+<:PowerOff alert
+<Kikapcs. riaszt.
+<:PowerOff alert:
+<Kikapcs. riaszt.:
 :Prealert intvl:
 Előjelz. interv.:
 :Prealert time:
@@ -463,6 +468,7 @@ Csatol
 Törlés
 :Reset
 Törlés
+>:Reset Permanent Timer?
 :Reset sw:
 Törlés kapcs.:
 :Reverse
@@ -653,8 +659,8 @@ USB
 USB fájlrendszer jelenleg 
 :Unknown
 Ismeretlen
-:Unlocked
-Szabad
+<:Unlocked
+<Szabad
 :Up
 Fel
 :Value
@@ -671,6 +677,8 @@ Fesz.
 Fesz.:
 :Zero/Max
 Nulla/Max
+:\n%d seconds left
+\n%d másodperc van hátra
 :\n\nBinding will end in %d seconds...
 \n\nKapcsolódás vége %d másodperc múlva...
 :add

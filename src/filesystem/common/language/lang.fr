@@ -91,8 +91,10 @@ Appairer
 Appairage
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
-:Binding...\n%d seconds\nPress ENT to stop
-Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
+<:Binding...\n%d seconds\nPress ENT to stop
+<Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
+:Binding...\nPress ENT to stop
+Appairage...\nENT pour arrêter
 :Box %d:
 Box%d:
 :Button monitor
@@ -192,10 +194,10 @@ ELE DR
 Sens ELE 
 :ELE Mix:
 Mix. ELE 
-:Enabled
-Etat
 :EXPO
 EXP.
+:Enabled
+Etat
 :Enter
 Entrée
 :Exit
@@ -243,18 +245,18 @@ Heli/Interface Std.
 Helicoptère
 :High-Rate
 Petit Déb.
-:Hold Position
-Valeur gaz 
+<:Hold Position
+<Valeur gaz 
 :Hold position
 Valeur gaz 
 :Icon
 Icône
 :Icon:
 Icône
-:Idle 1
-Sport 1
-:Idle 2
-Sport 2
+<:Idle 1
+<Sport 1
+<:Idle 2
+<Sport 2
 :Idle Up 1
 Sport 1
 :Idle Up 2
@@ -289,8 +291,8 @@ Lié
 Charger
 :Load...
 Charger...
-:Locked
-Bloqué
+<:Locked
+<Bloqué
 :Longitude
 Longitude
 :Low Battery
@@ -299,18 +301,13 @@ Batterie vide
 Grand Déb.
 >:M
 >:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
 :Main menu
 Menu principal
 :Main page
 Ecran d'accueil
 :Main page config
 Conf. écran accueil
+>:Manual
 :Max Limit:
 Limite Max
 :Menu
@@ -378,10 +375,10 @@ Ok
 Marche
 :PIT
 PAS
-:Page:
-Page
 :PIT Mix:
 Mix. PAS 
+:Page:
+Page
 :Pitch curves
 Courbes de pas
 :Plane
@@ -396,10 +393,9 @@ Pos.
 :Pos/Neg:
 Pos./Neg.:
 >:Position %d
-:PwrDn alert:
-Mélodie arrêt 
-:Power-down alert:
-Mélodie d'arrêt 
+>:Power-down alert
+<:Power-down alert:
+<Mélodie d'arrêt 
 :Prealert intvl:
 Tempo préAlarm
 :Prealert time:
@@ -418,7 +414,8 @@ Appuyer sur ENT\n pour passer \n le mode USB sur:
 Aperçu: Appuie-Long ENT
 :Protocol:
 Protocole
->:PwrDn alert:
+:PwrDn alert:
+Mélodie arrêt 
 :RIGHT_H
 DROITE_H
 :RIGHT_V
@@ -464,8 +461,6 @@ Echelle%s:
 >:Scale:
 :Scanner
 Scanner
-<:Select switch icon
-<Choix de l'icone
 >:Servo
 :Simple
 Simple
@@ -500,8 +495,6 @@ Subtrim
 Plateau cycl.
 :SwashType:
 Plateau cycl.:
-<:Switch %d:
-<Inter %d
 :Switch assignment
 Affect. Inters
 :Switch1
@@ -625,8 +618,8 @@ USB
 Etat de la partition USB 
 :Unknown
 Inconnu
-:Unlocked
-Débloqué
+<:Unlocked
+<Débloqué
 :Up
 Haut
 :Value
@@ -643,6 +636,8 @@ Volt
 Volt:
 :Zero/Max
 0/Max
+:\n%d seconds left
+\n%d secondes à gauche
 :\n\nBinding will end in %d seconds...
 \n\nAppairage terminé dans %d secondes...
 :add

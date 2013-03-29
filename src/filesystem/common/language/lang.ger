@@ -57,8 +57,7 @@ AUX4
 AUX5
 >:AUX6
 >:AUX7
-:About Deviation
-:Über Deviation
+>:About Deviation
 >:Advanced
 :Airplane
 Flugzeug
@@ -88,8 +87,8 @@ Binden
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
-:Binding...\n%d seconds\nPress ENT to stop
-:Bindevorgang...\n%d Sekunden\nDrücke ENT zum stoppen
+:Binding...\nPress ENT to stop
+Binden...\nENT zu stoppen
 :Box %d:
 Kasten %d:
 :Button monitor
@@ -173,6 +172,7 @@ Dimmer target:
 Dimmer time:
 :Dn
 Dn
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Runter
 :ELE
@@ -185,6 +185,7 @@ HOE Inv:
 HOE Mix:
 :EXPO
 EXPO
+>:Enabled
 :Enter
 Eingabe
 :Exit
@@ -192,12 +193,6 @@ EXT
 :Expo&DR
 Expo&DR
 >:FMODE
-<:FMODE0
-<FMODE0
-<:FMODE1
-<FMODE1
-<:FMODE2
-<FMODE2
 :Fahren
 Fahrenheit
 >:Fail safe
@@ -237,8 +232,8 @@ Hoch
 Bild
 :Icon:
 Bild:
->:Idle 1
->:Idle 2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 Eingaben Anzeige
 :Input:
@@ -269,7 +264,6 @@ Verknüpft
 Laden
 :Load...
 Laden...
->:Locked
 :Longitude
 Länge
 :Low Battery
@@ -278,18 +272,13 @@ Akku schwach
 Niedrig
 >:M
 >:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
 :Main menu
 Hauptmenü
 :Main page
 Startseite
 :Main page config
 Startseitenkonfiguration
+>:Manual
 :Max Limit:
 Max Limit:
 :Menu
@@ -353,9 +342,9 @@ Ok
 :On
 Ein
 >:PIT
+>:PIT Mix:
 :Page:
 Seite:
->:Pit Mix:
 >:Pitch curves
 :Plane
 Flugzeug
@@ -369,7 +358,7 @@ Punkt:
 :Pos/Neg:
 +/-:
 >:Position %d
->:PowerOff alert
+>:Power-down alert
 :Prealert intvl:
 Prealert intvl:
 :Prealert time:
@@ -407,6 +396,7 @@ Neu binden
 Löschen
 :Reset
 Reset
+>:Reset Permanent Timer?
 >:Reset sw:
 >:Reverse
 :Reverse:
@@ -462,8 +452,6 @@ Untertrimmung:
 >:Swash
 :SwashType:
 Taumelscheibe:
-<:Switch %d:
-<Hebel %d:
 >:Switch assignment
 :Switch1
 Hebel1
@@ -581,7 +569,6 @@ USB
 >:USB Filesystem is currently 
 :Unknown
 Unbekannt
->:Unlocked
 :Up
 Hoch
 >:Value
@@ -597,6 +584,8 @@ Volt
 Volt:
 :Zero/Max
 Null/Max
+:\n%d seconds left
+\n%d sekunden nach links
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :add
@@ -618,3 +607,5 @@ min
 ersetzen
 :stopwatch
 Stoppuhr
+<:Über Deviation
+<>:Advanced

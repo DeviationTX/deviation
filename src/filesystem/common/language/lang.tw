@@ -54,12 +54,12 @@
 >:AUX7
 :About Deviation
 關於 Deviation
-:Add
-增加
+<:Add
+<增加
 :Advanced
 增強模式1
-:Advanced2
-增強模式2
+<:Advanced2
+<增強模式2
 :Airplane
 飛機
 :Alarm
@@ -68,8 +68,8 @@
 警示間隔
 :Altitude
 海拔
-:Are you sure to\ndelete this mix?
-是否確定刪除\n當前混控?
+<:Are you sure to\ndelete this mix?
+<是否確定刪除\n當前混控?
 :Auto
 自動
 >:Aux2
@@ -92,8 +92,8 @@
 連結中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
-:Binding...\n%d seconds\nPress ENT to stop
-對頻中...\n%d秒\n按ENT鍵中止對頻
+:Binding...\nPress ENT to stop
+對頻中...\n按ENT鍵中止對頻
 :Box %d:
 訊息框 %d:
 :Button monitor
@@ -104,7 +104,6 @@
 警示音量:
 :Buzzer settings
 警示參數
->:CCPM
 :COL
 集體螺距
 :COL Inv
@@ -136,16 +135,16 @@
 更改
 :Channel
 通道
-:Channel config
-通道基本規畫
-:Channel mix
-通道混控規畫
+<:Channel config
+<通道基本規畫
+<:Channel mix
+<通道混控規畫
 :Channel monitor
 通道內容檢視
 :Channel output
 輸出通道
-:Channel reorder
-調整通道順序
+<:Channel reorder
+<調整通道順序
 :Complex
 多段式
 :Configure
@@ -156,12 +155,12 @@
 複製到
 :Copy To...
 複製到...
-:CopyTo
-複製
+<:CopyTo
+<複製
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 電池電壓不足！\n\n使用中的設定已儲存.\n未來更動將不再儲存.\n\n請即更換電池！
-:Curve
-曲線
+<:Curve
+<曲線
 :Curve:
 曲線:
 :Cyclic1
@@ -184,10 +183,10 @@
 死區
 :Default
 預設
-:Default input
-默認輸入
-:Dele
-移除
+<:Default input
+<默認輸入
+<:Dele
+<移除
 :Delta PW
 增減幅度
 :Deviation FW version:
@@ -202,10 +201,10 @@ Deviation 韌體版本：
 是否確定重置\n持久計時器%d?
 :Down
 下
-:Dual Rate
-兩段
-:Duplicate mix\n exists!
-相同的混控\n已存在!
+<:Dual Rate
+<兩段
+<:Duplicate mix\n exists!
+<相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -215,8 +214,9 @@ Deviation 韌體版本：
 升降螺距:
 :EXPO
 曲線
-:Edit
-編輯
+<:Edit
+<編輯
+>:Enabled
 :Enter
 輸入
 :Exit
@@ -267,10 +267,12 @@ PPM週期
 圖示
 :Icon:
 圖式:
-:Idle 1
-特技1
-:Idle 2
-特技2
+<:Idle 1
+<特技1
+<:Idle 2
+<特技2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 輸入內容檢視
 :Input:
@@ -303,7 +305,6 @@ PPM週期
 載入
 :Load...
 載入..
->:Locked
 :Longitude
 經度
 >:Low Battery
@@ -318,8 +319,9 @@ PPM週期
 主螢幕
 :Main page config
 螢幕排列規畫
-:Master
-輸入
+>:Manual
+<:Master
+<輸入
 :Max Limit:
 輸出上限:
 :Menu
@@ -360,12 +362,12 @@ PPM週期
 上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 移動所有搖桿\n通過上下極限區域\n按 ENT 校準 
-:MoveDn
-上移
-:MoveUp
-下移
-:Mux
-混合
+<:MoveDn
+<上移
+<:MoveUp
+<下移
+<:Mux
+<混合
 :Mux:
 混合:
 :Neg
@@ -394,16 +396,17 @@ PPM週期
 開啟
 :PIT
 螺距
+>:PIT Mix:
 :Page:
 頁碼：
-:Pit Mix:
-集體螺距:
+<:Pit Mix:
+<集體螺距:
 :Pitch curves
 螺距曲線
 :Plane
 飛機
-:Point
-點
+<:Point
+<點
 :Point:
 點:
 :Pos
@@ -418,8 +421,9 @@ PPM週期
 正/負:
 :Position %d
 档位%d
-:PowerOff alert
-無電警示
+>:Power-down alert
+<:PowerOff alert
+<無電警示
 :Prealert intvl:
 倒數預警間隔:
 :Prealert time:
@@ -436,8 +440,8 @@ PPM週期
 按 ENT 讓 USB：
 :Preview: Long-Press ENT
 長按 ENT 預覽 EXT 離開
-:Program mix
-程式混控
+<:Program mix
+<程式混控
 :Protocol:
 通訊協定:
 :PwrDn alert:
@@ -453,12 +457,12 @@ PPM週期
 :RUD
 方向
 >:RUD DR
-:Rate
-分段
+<:Rate
+<分段
 :Re-Init
 重對頻
-:Reach max mix\nlimit for a channel!
-此通道程式混控\n數量達到上限！
+<:Reach max mix\nlimit for a channel!
+<此通道程式混控\n數量達到上限！
 :Remove
 刪除
 :Reset
@@ -497,8 +501,8 @@ PPM週期
 單段式
 :Simple 4 Channel
 簡單4通道
-:Slave
-被控通道
+<:Slave
+<被控通道
 :Speed
 速率
 :Speed:
@@ -507,12 +511,13 @@ PPM週期
 訊號來源
 :Src:
 來源:
+>:Standard
 :Standard Mixer
 通用模式
 :Start:
 開始時間:
-:Std Heli
-通用直機
+<:Std Heli
+<通用直機
 :Step:
 步幅
 :Stick input
@@ -531,8 +536,8 @@ PPM週期
 十字盤設定
 :SwashType:
 十字盤類型:
-:Switch
-開關
+<:Switch
+<開關
 :Switch assignment
 指定切換開關
 :Switch1
@@ -655,11 +660,10 @@ PPM週期
 USB文件系統當前狀態
 :Unknown
 未知
->:Unlocked
 :Up
 上
-:UseTrim
-微調
+<:UseTrim
+<微調
 :Value
 數值
 :Value:
@@ -674,6 +678,8 @@ USB文件系統當前狀態
 電壓:
 :Zero/Max
 零/最大
+:\n%d seconds left
+\n還剩%d秒
 :\n\nBinding will end in %d seconds...
 \n\n連結將在 %d 秒內結束
 :add

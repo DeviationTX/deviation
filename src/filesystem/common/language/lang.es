@@ -88,8 +88,8 @@ Bind
 Emparejando
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Emparejamiento en curso...\nAsegurese de que el modelo está encendido\n\nPresionar OK NO cancelará el emparejado\npero le permitirá control completo de la emisora.
-:Binding...\n%d seconds\nPress ENT to stop
-Emparejando...\n%d segundos\nPulsar ENT para parar
+:Binding...\nPress ENT to stop
+Emparejando...\nPulsar ENT para parar
 :Box %d:
 Caja%d:
 :Button monitor
@@ -172,6 +172,7 @@ Atenuación final:
 Atenuación en:
 :Dn
 Aba
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Abajo
 :ELE
@@ -184,6 +185,7 @@ PROF Inv:
 PROF Mez
 :EXPO
 Exponencial
+>:Enabled
 :Enter
 Entrar
 :Exit
@@ -191,12 +193,6 @@ Salir
 :Expo&DR
 Expo&DR
 >:FMODE
-<:FMODE0
-<FMOD0
-<:FMODE1
-<FMOD1
-<:FMODE2
-<FMOD2
 :Fahren
 Fahren
 >:Fail safe
@@ -236,8 +232,8 @@ Valor Alto
 Icono
 :Icon:
 Icono
->:Idle 1
->:Idle 2
+>:Idle Up 1
+>:Idle Up 2
 :Input monitor
 Monitor entradas
 :Input:
@@ -268,7 +264,6 @@ Enlazado
 Cargar
 :Load...
 Cargar...
->:Locked
 :Longitude
 Longitud
 :Low Battery
@@ -277,18 +272,13 @@ Bateria baja
 Valor bajo
 >:M
 >:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
 :Main menu
 Menú principal
 :Main page
 Página principal
 :Main page config
 Página configuración
+>:Manual
 :Max Limit:
 Límite max
 :Menu
@@ -352,9 +342,9 @@ Ok
 :On
 On
 >:PIT
+>:PIT Mix:
 :Page:
 Página:
->:Pit Mix:
 >:Pitch curves
 :Plane
 Avión
@@ -368,7 +358,7 @@ Pos.
 :Pos/Neg:
 Pos/Neg:
 >:Position %d
->:PowerOff alert
+>:Power-down alert
 :Prealert intvl:
 Intervalo prealerta:
 :Prealert time:
@@ -406,6 +396,7 @@ Reiniciar
 Quitar
 :Reset
 Reiniciar
+>:Reset Permanent Timer?
 >:Reset sw:
 >:Reverse
 :Reverse:
@@ -461,8 +452,6 @@ Subtrim:
 >:Swash
 :SwashType:
 Plato:
-<:Switch %d:
-<Interr. %d:
 >:Switch assignment
 :Switch1
 Interr1
@@ -580,7 +569,6 @@ USB
 >:USB Filesystem is currently 
 :Unknown
 Desconocido
->:Unlocked
 :Up
 Arriba
 >:Value
@@ -596,6 +584,8 @@ Volt
 Volt:
 :Zero/Max
 Zero/Max
+:\n%d seconds left
+\n%d segundos restantes
 :\n\nBinding will end in %d seconds...
 \n\nEmparejamiento termina en %d segundos...
 :add

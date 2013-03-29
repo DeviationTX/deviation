@@ -80,7 +80,8 @@ Koppelen
 Bezig met koppelen
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
->:Binding...\n%d seconds\nPress ENT to stop
+:Binding...\nPress ENT to stop
+Bezig met koppelen\nDruk op ENT om te stoppen
 :Box %d:
 Kader %d:
 >:Button monitor
@@ -144,6 +145,7 @@ Deviation FW Versie:
 >:Dimmer target:
 >:Dimmer time:
 >:Dn
+>:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Omlaag
 :ELE
@@ -155,6 +157,7 @@ ELE inv:
 >:ELE Mix:
 :EXPO
 Expo
+>:Enabled
 :Enter
 Toepassen
 :Exit
@@ -162,12 +165,6 @@ Stoppen
 :Expo&DR
 Expo&DR
 >:FMODE
-<:FMODE0
-<FMODE0
-<:FMODE1
-<FMODE1
-<:FMODE2
-<FMODE2
 >:Fahren
 >:Fail safe
 >:Failsafe
@@ -200,8 +197,8 @@ Hoog
 :Icon
 Icoon
 >:Icon:
->:Idle 1
->:Idle 2
+>:Idle Up 1
+>:Idle Up 2
 >:Input monitor
 :Input:
 Invoer:
@@ -227,23 +224,17 @@ Verbonden
 Laad
 :Load...
 Laad...
->:Locked
 >:Longitude
 >:Low Battery
 :Low-Rate
 Laag
 >:M
 >:MIX
-<:MIX0
-<MIX0
-<:MIX1
-<MIX1
-<:MIX2
-<MIX2
 >:Main menu
 >:Main page
 :Main page config
 Configuratie hoofdscherm
+>:Manual
 >:Max Limit:
 >:Menu
 >:Meter
@@ -296,9 +287,9 @@ Ok
 :On
 Aan
 >:PIT
+>:PIT Mix:
 :Page:
 Pagina:
->:Pit Mix:
 >:Pitch curves
 >:Plane
 :Point:
@@ -311,7 +302,7 @@ Punt:
 :Pos/Neg:
 +/-:
 >:Position %d
->:PowerOff alert
+>:Power-down alert
 >:Prealert intvl:
 >:Prealert time:
 :Press 'Ent' to turn USB Filesystem:
@@ -339,6 +330,7 @@ Herinitialiseren
 >:Remove
 :Reset
 Reset
+>:Reset Permanent Timer?
 >:Reset sw:
 >:Reverse
 :Reverse:
@@ -488,7 +480,6 @@ USB
 >:USB Filesystem is currently 
 :Unknown
 Onbekend
->:Unlocked
 :Up
 Omhoog
 >:Value
@@ -501,6 +492,8 @@ Virt
 >:Volt:
 :Zero/Max
 Nul/Max
+:\n%d seconds left
+\n%d seconden links
 :\n\nBinding will end in %d seconds...
 \n\nKoppeling eindigt over %d seconden...
 :add
