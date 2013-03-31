@@ -88,6 +88,8 @@ void TIMER_Update()
 {
     u8 i;
     u32 t = CLOCK_getms();
+    if (PROTOCOL_WaitingForSafe())
+        return;
     for (i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src) {
             s16 val;
