@@ -127,7 +127,7 @@ MODELDIR = filesystem/$(FILESYSTEM)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
 
-ALL += $(LAST_MODEL)
+ALL += $(TARGET).fs_wrapper
 ifdef MODULAR
 include protocol/Makefile.inc
 endif
@@ -198,6 +198,7 @@ release:
 	make TARGET=devo12 zip
 	make TARGET=devo8 fs
 	make TARGET=devo10 fs
+	make TARGET=devo7e fs
 	make TARGET=devo12 fs
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
 
@@ -229,20 +230,24 @@ endif
 #################
 #The filesystem #
 #################
+%.fs_wrapper: $(LAST_MODEL)
+	true
+
 .PHONY: $(LAST_MODEL)
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	@echo " + Copying template files for $(FILESYSTEM)"
+	mkdir -p filesystem/$(FILESYSTEM) || true
+	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
+	cp -prf filesystem/common/template filesystem/$(FILESYSTEM)/
+	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
+	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
+	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
+	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
+		&& cat model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
+	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
+	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
+               ../utils/extract_strings.pl -target $(FILESYSTEM) -update
 	export tx=$(FILESYSTEM); \
-	cp -prf filesystem/common/media filesystem/$$tx/; \
-	cp -prf filesystem/common/template filesystem/$$tx/; \
-	mkdir filesystem/$$tx/language 2> /dev/null || true; \
-               ../utils/extract_strings.pl -target $$tx -update; \
-	cp tx_template.ini filesystem/$$tx/tx.ini; \
-        echo 'empty' > filesystem/$$tx/errors.txt; \
-	mkdir filesystem/$$tx/models 2> /dev/null || true; \
-	echo 'name=Model1' > filesystem/$$tx/models/model1.ini; \
-	cat model_template.ini >> filesystem/$$tx/models/model1.ini; \
-	cp model_template.ini filesystem/$$tx/models/default.ini; \
 	number=2 ; while [ $$number -le 30 ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
 		number=`expr $$number + 1`; \

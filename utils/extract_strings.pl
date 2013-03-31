@@ -11,14 +11,17 @@ my @targets = ("320x240x16", "128x64x1");
 my %targetmap = (
     devo8 => "320x240x16",
     devo10 => "128x64x1",
+    devo7e => undef,
 );
 
 GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count);
-if($target && (! $targetmap{$target} || ! (grep {$targetmap{$target} eq $_} @targets))) {
+if($target && ! exists $targetmap{$target}) {
     my @t = keys(%targetmap);
     print "Target must be one of: @t\n";
     exit 1;
 }
+exit 0 if(! $targetmap{$target});
+
 my @lines = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @files;
 my $str = "";

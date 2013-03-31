@@ -31,6 +31,7 @@ src/filesystem/devo10/errors.txt
 src/filesystem/devo10/language/
 src/filesystem/devo10/template/
 src/filesystem/devo10/media/sound.ini
+src/filesystem/devo7e/
 glob:src/filesystem/devo10/media/*.fon
 glob:*.dll
 glob:*~
