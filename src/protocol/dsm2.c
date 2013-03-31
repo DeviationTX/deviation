@@ -178,7 +178,7 @@ static void build_bind_packet()
     packet[10] = 0x01; //???
     packet[11] = num_channels;
     if(Model.protocol == PROTOCOL_DSMX)
-        packet[12] = num_channels < 8 ? 0xb2 : 0xb2;
+        packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? 0xa2 : 0xb2;
     else 
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
     packet[13] = 0x00; //???
