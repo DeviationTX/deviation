@@ -1179,7 +1179,6 @@ u8 CONFIG_ReadModel(u8 model_num) {
     get_model_file(file, model_num);
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
         printf("Failed to parse Model file: %s\n", file);
-        return 0;
     }
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
