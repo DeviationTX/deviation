@@ -10,8 +10,8 @@ PROTO_MODULES += $(ODIR)/protocol/ppm.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2801.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2601.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2401.mod
-PROTO_MODULES += $(ODIR)/protocol/frsky-1.mod
-PROTO_MODULES += $(ODIR)/protocol/frsky-2.mod
+#PROTO_MODULES += $(ODIR)/protocol/frsky-1.mod
+#PROTO_MODULES += $(ODIR)/protocol/frsky-2.mod
 PROTO_MODULES += $(ODIR)/protocol/skyartec.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
