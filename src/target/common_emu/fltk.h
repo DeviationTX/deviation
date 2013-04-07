@@ -8,6 +8,8 @@
 #define Fl_Output void
 #endif
 
+//#define KEYBOARD_LAYOUT_QWERTZ 1
+
 struct Gui {
     u16 xstart, xend, ystart, yend;
     u16 x, y;
@@ -17,14 +19,20 @@ struct Gui {
     int  rudder;
     int  elevator;
     int  aileron;
+	int  aux2;
+	int  aux3;
+	int  aux4;
+	int  aux5;
+	int  aux6;
+	int  aux7;
     int  rud_dr;
     int  ail_dr;
     int  ele_dr;
     int  gear;
     int  mix;
     int  fmod;
-    int aux4;
-    int aux5;
+	int  hold;
+	int  trn;
 
     u8  powerdown;
     u8  mouse;
