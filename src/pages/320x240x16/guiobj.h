@@ -55,6 +55,7 @@ struct maincfg_obj {
             guiImage_t   toggleicon[3];
             guiImage_t   symbolicon[32];
             guiRect_t    symbolframe;
+            guiScrollbar_t scrollbar;
         } g5;
     } u;
 };
