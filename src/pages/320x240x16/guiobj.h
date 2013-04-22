@@ -89,6 +89,17 @@ struct modelcfg_objs {
 
     guiLabel_t protolbl[NUM_PROTO_OPTS];
     guiTextSelect_t proto[NUM_PROTO_OPTS];
+
+    guiLabel_t numchlbl;
+    guiTextSelect_t numch;
+    guiLabel_t trainswlbl;
+    guiTextSelect_t trainsw;
+    guiLabel_t centerpwlbl;
+    guiTextSelect_t centerpw;
+    guiLabel_t deltapwlbl;
+    guiTextSelect_t deltapw;
+    guiLabel_t ppmmaplbl[MAX_PPM_CHANNELS];
+    guiTextSelect_t ppmmap[MAX_PPM_CHANNELS];
 };
 
 struct modelload_objs {
@@ -107,6 +118,8 @@ struct modelpage_objs {
     guiButton_t icon;
     guiLabel_t typelbl;
     guiTextSelect_t type;
+    guiLabel_t ppmlbl;
+    guiTextSelect_t ppm;
     guiLabel_t protolbl;
     guiTextSelect_t proto;
     guiLabel_t numchlbl;

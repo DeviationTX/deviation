@@ -93,6 +93,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Tx power:");
             ts_value = powerselect_cb;
             break;
+        case ITEM_PPMIN:
+            label = _tr_noop("PPM In:");
+            ts_tgl = ppmin_press_cb; ts_value = ppmin_select_cb;
+            break;
         case ITEM_PROTO:
             ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = 0;
             but_txt = show_bindtext_cb; but_tgl = bind_cb;
