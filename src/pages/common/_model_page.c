@@ -39,6 +39,7 @@ enum {
     ITEM_ICON,
     ITEM_TYPE,
     ITEM_TXPOWER,
+    ITEM_PPMIN,
     ITEM_PROTO,
     ITEM_FIXEDID,
     ITEM_NUMCHAN,
@@ -176,6 +177,37 @@ static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
     mp->last_txpower = Model.tx_power;
     return RADIO_TX_POWER_VAL[Model.tx_power];
 }
+
+static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed;
+    u8 new_ppm = Model.num_ppmin >> 6;
+    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 2, dir, 1, 1, &changed);
+
+    if (obj) {
+        GUI_TextSelectEnablePress((guiTextSelect_t *)obj, new_ppm);
+        Model.num_ppmin = (Model.num_ppmin & 0x3f) | (new_ppm << 6);
+    }
+    if (new_ppm == 0) {
+        return _tr("None");
+    } else if (new_ppm == 1) {
+        return _tr("Train");
+    } else {
+        return _tr("Input");
+    }
+}
+
+void ppmin_press_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    (void)obj;
+    PAGE_RemoveAllObjects();
+    MODELTRAIN_Config();
+    return;
+}
+
 static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

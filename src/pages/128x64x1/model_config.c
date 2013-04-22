@@ -140,6 +140,46 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
     return 1;
 }
 
+static int row3_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    u8 w = 60;
+    u8 x = 63;
+    void *ts;
+    void *ts_press = NULL;
+    void *ts_data = NULL;
+    char *label = NULL;
+    void *label_cmd = NULL;
+
+    switch (absrow) {
+    case 0:
+        label = _tr_noop("Num Channels");
+        ts = set_train_cb; ts_data = (void *)0L;
+        break;
+    case 1:
+        label = _tr_noop("Trainer Sw");
+        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
+        break;
+    case 2:
+        label = _tr_noop("Center PW");
+        ts = set_train_cb; ts_data = (void *)1L;
+        break;
+    case 3:
+        label = _tr_noop("Delta PW");
+        ts = set_train_cb; ts_data = (void *)2L;
+        break;
+    default:
+        label_cmd = input_chname_cb; label = (void *)((long)absrow - 4);
+        ts = set_chmap_cb; ts_data = label;
+        break;
+    }
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+            0, ITEM_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
+    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
+            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, ts, ts_data);
+    return 1;
+}
+
 void MODELPROTO_Config()
 {
     PAGE_SetModal(1);
@@ -160,5 +200,17 @@ void MODELPROTO_Config()
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+}
+
+void MODELTRAIN_Config()
+{
+    PAGE_SetModal(1);
+    PAGE_SetActionCB(_action_cb);
+    show_titlerow((Model.num_ppmin & 0xC0) == 0x40
+                  ? _tr("Trainer Config")
+                  : _tr("PPMIn Config"));
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         ITEM_SPACE, (Model.num_ppmin & 0xC0) == 0x40 ? 4 + MAX_PPM_CHANNELS : 4, row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

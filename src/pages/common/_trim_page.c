@@ -25,7 +25,7 @@ const char *trimsource_name_cb(guiObject_t *obj, const void *data)
     return INPUT_SourceName(tp->tmpstr, MIXER_MapChannel(trim[i].src));
 }
 
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
+static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;

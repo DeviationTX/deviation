@@ -21,13 +21,14 @@
 #define tp pagemem.u.toggle_select_page
 #define gui (&gui_objs.u.toggleselect)
 
+#define NUM_COLS 8
+
 #include "../common/_toggle_select.c"
 
-extern const struct LabelDesc outline;
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static s8 current_toggleicon = 0;
 
-void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
+static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     if (press_type == -1) {
@@ -47,10 +48,52 @@ static void revert_cb(guiObject_t *obj, const void *data)
     show_iconsel_page(0);
 }
 
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    int idx;
+    if (col == -1) {
+        idx = relrow * NUM_COLS + NUM_COLS -1;
+        if (relrow == 3) {
+            while(! OBJ_IS_USED(&gui->symbolicon[idx]))
+                idx--;
+        }
+    } else {
+        idx = relrow * NUM_COLS + col;
+    }
+    return (guiObject_t *)&gui->symbolicon[idx];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    int SelectedIcon = (long)data;
+    struct ImageMap img;
+    int idx = 0;
+    int i;
+    for(i = 0; i < NUM_COLS * absrow; i++) {
+        idx = get_next_icon(idx);
+        if (idx < 0) {
+            idx = 0;
+            return 0;
+        }
+    }
+    for(i = 0; i < NUM_COLS; i++) {
+        img = TGLICO_GetImage(idx);
+        int x = 22 + i * (TOGGLEICON_WIDTH+4);
+        GUI_CreateImageOffset(&gui->symbolicon[relrow * NUM_COLS + i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
+                              img.x_off, img.y_off, img.file, tglico_select_cb,
+                              (void *)((long)(SelectedIcon << 8) | idx));
+        idx = get_next_icon(idx);
+        if(idx < 0)
+            break;
+    }
+    return i;
+}
+
 static void show_iconsel_page(int SelectedIcon)
 {
     struct ImageMap img;
-    u16 w, h;
+    u16 w;
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
@@ -75,43 +118,31 @@ static void show_iconsel_page(int SelectedIcon)
     GUI_CreateLabelBox(&gui->togglelabel[0], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 0 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][0]);
     GUI_CreateImageOffset(&gui->toggleicon[0], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb, (void *)0L);
+             NULL, //SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb,
+             (void *)0L);
 
     row += ITEM_HEIGHT + 2;
     GUI_CreateLabelBox(&gui->togglelabel[1], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 1 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "1:");
     img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][1]);
     GUI_CreateImageOffset(&gui->toggleicon[1], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb, (void *)1L);
+             NULL, //SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb,
+             (void *)1L);
 
     if (num_positions == 3) {
         row += ITEM_HEIGHT + 2;
         GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "2:");
         img = TGLICO_GetImage(Model.pagecfg.tglico[tp.tglidx][2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);
+             NULL, //SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb,
+             (void *)2L);
     }
 
-    LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
-    u8 rows = h / TOGGLEICON_HEIGHT;        // icons in rows
-    u8 count = w / TOGGLEICON_WIDTH * rows;        // number of icons
-    u8 start_x = 10 + TOGGLEICON_WIDTH + 4;
-    u8 pos = 0;
-    for(int row = 0; row < 4; row++) {
-        int y = ITEM_HEIGHT + 2 + (TOGGLEICON_HEIGHT + 1) * row;
-        int x = start_x;
-        while(x + TOGGLEICON_WIDTH < LCD_WIDTH && pos < count) {
-            img = TGLICO_GetImage(pos);
-            GUI_CreateImageOffset(&gui->symbolicon[pos], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
-                                  img.x_off, img.y_off, img.file, tglico_select_cb, (void *)((long)(SelectedIcon << 8) | pos));
-            if (pos == Model.pagecfg.tglico[tp.tglidx][SelectedIcon])
-               GUI_SetSelected((guiObject_t *)&gui->symbolicon[pos]);
-            x += TOGGLEICON_WIDTH + 4;
-            pos++;
-        }
-    }
-    if (! GUI_GetSelected()) {
-        GUI_SetSelected((guiObject_t *)&gui->symbolicon[0]);
-    }
+    int count = get_toggle_icon_count();
+    int rows = (count + NUM_COLS - 1) / NUM_COLS;
+
+    GUI_CreateScrollable(&gui->scrollable, 22, ITEM_HEIGHT + 2, LCD_WIDTH - 22, 4 *(TOGGLEICON_HEIGHT + 1),
+                     TOGGLEICON_HEIGHT + 1, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
+    //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Model.pagecfg.tglico[tp.tglidx][SelectedIcon]));
 }
 
 void navigate_toggleicons(s8 direction) {
@@ -131,6 +162,7 @@ void navigate_symbolicons(s8 direction) {
         GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
     else
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
+    return;
     obj = GUI_GetSelected();
     if (obj == (guiObject_t *)&gui->toggleicon[0] || obj == (guiObject_t *)&gui->toggleicon[1] ||
         obj == (guiObject_t *)&gui->toggleicon[2]) { // skip toggle icon for right/left pressing
@@ -152,9 +184,9 @@ u8 _action_cb(u32 button, u8 flags, void *data)
             navigate_toggleicons(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_DOWN))
             navigate_toggleicons(1);
-        else if (CHAN_ButtonIsPressed(button, BUT_RIGHT))
-            navigate_symbolicons(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_LEFT))
+            navigate_symbolicons(-1);
+        else if (CHAN_ButtonIsPressed(button, BUT_RIGHT))
             navigate_symbolicons(1);
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

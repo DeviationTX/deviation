@@ -22,6 +22,11 @@ struct Model {
     enum Protocols protocol;
     s16 proto_opts[NUM_PROTO_OPTS];
     u8 num_channels;
+    u8 num_ppmin;
+    u16 ppmin_centerpw;
+    u16 ppmin_deltapw;
+    u8 train_sw;
+    u8 ppm_map[MAX_PPM_CHANNELS];
     u32 fixed_id;
     enum TxPower tx_power;
     enum SwashType swash_type;
