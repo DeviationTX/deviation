@@ -132,7 +132,7 @@ int fix_abbrev_src(int origval, int newval, int dir)
         return newval;
     int pos = INPUT_SwitchPos(newval);
     int num_pos = INPUT_NumSwitchPos(newval);
-    if (num_pos != 0) {
+    if (num_pos != 0 && pos) {
         if (dir > 0)
             newval += (num_pos - pos);
         else
