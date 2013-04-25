@@ -184,7 +184,7 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     u8 new_ppm = PPMin_Mode();
-    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 1, dir, 1, 1, &changed);
+    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 2, dir, 1, 1, &changed);
 
     if (obj) {
         if (changed) {

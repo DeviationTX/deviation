@@ -32,6 +32,10 @@
 #define MIXER_CYC2 (NUM_TX_INPUTS + 2)
 #define MIXER_CYC3 (NUM_TX_INPUTS + 3)
 
+extern volatile u8 ppmSync;
+extern volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
+extern volatile u8 ppmin_num_channels;
+
 // Channels should be volatile:
 // This array is written from the main event loop
 // and read from an interrupt service routine.
@@ -122,6 +126,11 @@ static void MIXER_UpdateRawInputs()
         u8 mapped_channel = MIXER_MapChannel(i);
         raw[i] = CHAN_ReadInput(mapped_channel);
     }
+    if (PPMin_Mode() == 2 && ppmSync) {
+        for (i = 0; i < (Model.num_ppmin & 0x3f); i++) {
+            raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i] = ppmChannels[i];
+        }
+    }
 }
 
 int MIXER_GetCachedInputs(s16 *cache, u8 threshold)
@@ -137,9 +146,6 @@ int MIXER_GetCachedInputs(s16 *cache, u8 threshold)
     return changed;
 }
 
-extern volatile u8 ppmSync;
-extern volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
-extern volatile u8 ppmin_num_channels;
 void MIXER_CalcChannels()
 {
     //We retain this array so that we can refer to the prevous values in the next iteration
@@ -162,7 +168,7 @@ void MIXER_CalcChannels()
     }
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        if ((Model.num_ppmin & 0xC0) && Model.train_sw && raw[Model.train_sw] > 0) {
+        if (PPMin_Mode() == 1 && Model.train_sw && raw[Model.train_sw] > 0) {
             if (Model.ppm_map[i] >= 0 && Model.ppm_map[i] < ppmin_num_channels) {
                 if (ppmSync) {
                     Channels[i] = ppmChannels[Model.ppm_map[i]];

@@ -114,8 +114,10 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
             sprintf(str, "%s%s", is_neg ? "!" : "", _tr(ptr));
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
-    } else {
+    } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
+    } else {
+        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("PPM"), src - NUM_INPUTS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS);
     }
     return str;
 }
