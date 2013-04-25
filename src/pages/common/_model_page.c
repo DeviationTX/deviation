@@ -183,10 +183,19 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    u8 new_ppm = Model.num_ppmin >> 6;
-    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 2, dir, 1, 1, &changed);
+    u8 new_ppm = PPMin_Mode();
+    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 1, dir, 1, 1, &changed);
 
     if (obj) {
+        if (changed) {
+            if (! PPMin_Mode() && new_ppm) {
+                //Start PPM-In
+                PPMin_Start();
+            } else if(! new_ppm) {
+                //Stop PPM-In
+                PPMin_Stop();
+            }
+        }
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, new_ppm);
         Model.num_ppmin = (Model.num_ppmin & 0x3f) | (new_ppm << 6);
     }

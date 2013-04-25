@@ -211,6 +211,6 @@ void MODELTRAIN_Config()
                   ? _tr("Trainer Config")
                   : _tr("PPMIn Config"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, (Model.num_ppmin & 0xC0) == 0x40 ? 4 + MAX_PPM_CHANNELS : 4, row3_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, (Model.num_ppmin & 0xC0) == 0x40 ? 4 + MAX_PPM_IN_CHANNELS : 4, row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

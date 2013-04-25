@@ -23,6 +23,7 @@
 #include <libopencm3/cm3/nvic.h>
 
 #include "common.h"
+#include "config/model.h"
 #include "../ports.h"
 
 #include <stdio.h>
@@ -92,12 +93,16 @@ void PWM_Initialize()
 }
 void PWM_Stop()
 {
+    if (PPMin_Mode())
+        return;
+#if 0
     if (RCC_APB1ENR & RCC_APB2ENR_TIM1EN) {
         rcc_peripheral_disable_clock(&RCC_APB1ENR, RCC_APB2ENR_TIM1EN);
-#if _PWM_PIN == GPIO_USART1_TX
-        UART_Initialize();
-#endif
     }
+#endif
+#if _PWM_PIN == GPIO_USART1_TX
+    UART_Initialize();
+#endif
 }
 
 void PWM_Set(int val)

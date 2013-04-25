@@ -97,6 +97,16 @@ static const char SECTION_VIRTCHAN[] = "virtchan";
 #define VCHAN_TEMPLATE CHAN_TEMPLATE
 #define VCHAN_TEMPLATE_VAL CHAN_TEMPLATE_VAL
 
+/* Section: PPM-In */
+static const char SECTION_PPMIN[] = "ppm-in";
+static const char PPMIN_MAP[] = "map";
+static const char PPMIN_MODE[] = "mode";
+static const char * const PPMIN_MODE_VALUE[3] =  {"none", "train", "input"};
+static const char PPMIN_CENTERPW[] = "centerpw";
+static const char PPMIN_DELTAPW[] = "deltapw";
+#define PPMIN_NUM_CHANNELS  RADIO_NUM_CHANNELS
+#define PPMIN_SWITCH MIXER_SWITCH
+
 /* Section: Trim */
 static const char SECTION_TRIM[] = "trim";
 
@@ -881,6 +891,40 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+    if (MATCH_SECTION(SECTION_PPMIN)) {
+        if (MATCH_KEY(PPMIN_NUM_CHANNELS)) {
+            m->num_ppmin = (m->num_ppmin & 0xC0) | atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(PPMIN_MODE)) {
+            for(i = 0; i < 3; i++) {
+                if(mapstrcasecmp(PPMIN_MODE_VALUE[i], value) == 0) {
+                    m->num_ppmin = (m->num_ppmin & 0x3F) | (i << 6);
+                    return 1;
+                }
+            }
+            return 1;
+        }
+        if (MATCH_KEY(PPMIN_CENTERPW)) {
+            m->ppmin_centerpw = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(PPMIN_DELTAPW)) {
+            m->ppmin_deltapw = atoi(value);
+            return 1;
+        }
+        if (MATCH_START(name, PPMIN_MAP)) {
+            u8 idx = atoi(name + sizeof(PPMIN_MAP)-1);
+            if (idx < MAX_PPM_IN_CHANNELS) {
+                m->ppm_map[idx] = atoi(value) -1;
+            }
+            return 1;
+        }
+        if (MATCH_KEY(PPMIN_SWITCH)) {
+            m->train_sw = get_source(section, value);
+            return 1;
+        }
+    }
     printf("Unknown Section: '%s'\n", section);
     return 0;
 }
@@ -1042,6 +1086,22 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (write_mixer(fh, m, idx+NUM_OUT_CHANNELS))
             fprintf(fh, "\n");
     }
+    if (PPMin_Mode()) {
+        fprintf(fh, "[%s]\n", SECTION_PPMIN);
+        fprintf(fh, "%s=%s\n", PPMIN_MODE, PPMIN_MODE_VALUE[PPMin_Mode()]);
+        fprintf(fh, "%s=%d\n", PPMIN_NUM_CHANNELS, (m->num_ppmin & 0x3F));
+        if (PPMin_Mode() == 1) {
+            fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceName(file, m->train_sw));
+        }
+        fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
+        fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
+        for(idx = 0; idx < MAX_PPM_IN_CHANNELS; idx++) {
+            if (idx != m->ppm_map[idx] || WRITE_FULL_MODEL) {
+                fprintf(fh, "%s%d=%d\n", PPMIN_MAP, idx + 1, m->ppm_map[idx] + 1);
+            }
+        }
+        fprintf(fh, "\n");
+    }
     for(idx = 0; idx < NUM_TRIMS; idx++) {
         if (! WRITE_FULL_MODEL && m->trims[idx].src == 0)
             continue;
@@ -1175,6 +1235,11 @@ void clear_model(u8 full)
     for (i = 0; i < NUM_TRIMS; i++) {
         Model.trims[i].step = 1;
     }
+    for (i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        Model.ppm_map[i] = i;
+    }
+    Model.ppmin_centerpw = 1500;
+    Model.ppmin_deltapw = 400;
 }
 
 u8 CONFIG_ReadModel(u8 model_num) {

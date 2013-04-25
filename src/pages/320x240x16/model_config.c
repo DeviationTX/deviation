@@ -93,8 +93,6 @@ void MODELTRAIN_Config()
                   ? _tr("Trainer Config")
                   : _tr("PPMIn Config"));
     int row = 40;
-    int pos = 0;
-    long idx = 0;
     GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
     GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
     row += 20;
@@ -111,7 +109,7 @@ void MODELTRAIN_Config()
         return;
 
     long i = 0;
-    int num_ppm = MAX_PPM_CHANNELS;
+    int num_ppm = MAX_PPM_IN_CHANNELS;
     while (i < num_ppm) {
         row += 20;
         if (row > 300)
