@@ -1,6 +1,6 @@
 繁體中文
-:# Channels:
-通道數:
+:# Channels
+通道數
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%,熄火保護 = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -42,10 +42,10 @@
 :AIL
 副翼
 >:AIL DR
-:AIL Inv:
-副翼方向:
-:AIL Mix:
-副翼螺距:
+:AIL Inv
+副翼方向
+:AIL Mix
+副翼螺距
 >:AUX2
 >:AUX3
 >:AUX4
@@ -64,7 +64,7 @@
 飛機
 :Alarm
 警示
-:Alarm intvl:
+:Alarm intvl
 警示間隔
 :Altitude
 海拔
@@ -73,17 +73,17 @@
 :Auto
 自動
 >:Aux2
-:Backlight:
-背光亮度:
+:Backlight
+背光亮度
 >:Bad/missing\nprotocol modules!
-:Bar %d:
+:Bar %d
 條框%d
-:Bars:
-狀態條:
-:Batt alarm:
-低電警示:
-:Battery alarm:
-低電警示:
+:Bars
+狀態條
+:Batt alarm
+低電警示
+:Battery alarm
+低電警示
 :Battery too low,\ncan't save!
 電壓過低,\n無法儲存修改!
 :Bind
@@ -94,26 +94,26 @@
 連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
 :Binding...\nPress ENT to stop
 對頻中...\n按ENT鍵中止對頻
-:Box %d:
-訊息框 %d:
+:Box %d
+訊息框 %d
 :Button monitor
 按鍵內容檢視
 :Buzz settings
 ======警示參數======
-:Buzz volume:
-警示音量:
+:Buzz volume
+警示音量
 :Buzzer settings
 警示參數
 :COL
 集體螺距
 :COL Inv
 螺距方向
-:COL Inv:
-螺距方向:
+:COL Inv
+螺距方向
 :COL Limit
 集體螺距
-:COL Mix:
-集體螺距:
+:COL Mix
+集體螺距
 >:CYC
 :Calibrate
 校正
@@ -149,8 +149,8 @@
 多段式
 :Configure
 發射機基本規畫
-:Contrast:
-對比度:
+:Contrast
+對比度
 :Copy To
 複製到
 :Copy To...
@@ -161,8 +161,8 @@
 電池電壓不足！\n\n使用中的設定已儲存.\n未來更動將不再儲存.\n\n請即更換電池！
 <:Curve
 <曲線
-:Curve:
-曲線:
+:Curve
+曲線
 :Cyclic1
 循環1
 :Cyclic2
@@ -190,11 +190,11 @@
 :Delta PW
 增減幅度
 :Deviation FW version:
-Deviation 韌體版本：
-:Dimmer target:
-背光省電亮度:
-:Dimmer time:
-省電啟動時間:
+Deviation 韌體版本:
+:Dimmer target
+背光省電亮度
+:Dimmer time
+省電啟動時間
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
@@ -208,10 +208,10 @@ Deviation 韌體版本：
 :ELE
 升降
 >:ELE DR
-:ELE Inv:
-升降方向:
-:ELE Mix:
-升降螺距:
+:ELE Inv
+升降方向
+:ELE Mix
+升降螺距
 :EXPO
 曲線
 <:Edit
@@ -230,14 +230,14 @@ Deviation 韌體版本：
 失效保護
 :Failsafe
 失效保護
-:Failsafe:
+:Failsafe
 失效保護
-:File:
-檔案:
+:File
+檔案
 :Fixed
 固定
-:Fixed ID:
-固定ID:
+:Fixed ID
+固定ID
 :Fly mode
 飛行模式
 :Foot
@@ -265,8 +265,8 @@ PPM週期
 鎖定準位
 :Icon
 圖示
-:Icon:
-圖式:
+:Icon
+圖式
 <:Idle 1
 <特技1
 <:Idle 2
@@ -275,8 +275,8 @@ PPM週期
 >:Idle Up 2
 :Input monitor
 輸入內容檢視
-:Input:
-輸入:
+:Input
+輸入
 :Insert
 插入
 :Inverted
@@ -291,14 +291,14 @@ PPM週期
 左垂直
 :LIN
 線性
-:Language:
-使用語系:
+:Language
+使用語系
 :Latitude
 緯度
 :Left
 左
-:Length:
-長度單位:
+:Length
+長度單位
 :Linked
 連動
 :Load
@@ -322,54 +322,54 @@ PPM週期
 >:Manual
 <:Master
 <輸入
-:Max Limit:
-輸出上限:
+:Max Limit
+輸出上限
 :Menu
 快顯
 :Meter
 公尺
 :Mid-Rate
 中位
-:Min Limit:
-輸出下限:
+:Min Limit
+輸出下限
 :Min/Max
 上/下限
 :Mixer
 混控器
-:Mixer GUI:
-混控界面:
-:Mixers:
-段數:
+:Mixer GUI
+混控界面
+:Mixers
+段數
 :Mode
 模式
 :Mode %d
 模式 %d
 :Model menu
 模型選單
-:Model name:
-模型名稱:
+:Model name
+模型名稱
 :Model needs reset\nfor standard mixer
 切換到通用模式\n需要重置,確定嗎?
 :Model needs to be reset\nin order to switch to the standard mixer
 本設置與通用模式不兼容,需要進行重置,\n是否確定?
 :Model setup
 模型設定
-:Model type:
-機種選擇:
+:Model type
+機種選擇
 :Move Down
 下移
 :Move Up
 上移
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
-移動所有搖桿\n通過上下極限區域\n按 ENT 校準 
+移動所有搖桿\n通過上下極限區域\n按 ENT 校準
 <:MoveDn
 <上移
 <:MoveUp
 <下移
 <:Mux
 <混合
-:Mux:
-混合:
+:Mux
+混合
 :Neg
 負
 :New
@@ -388,63 +388,63 @@ PPM週期
 通道間隔
 :Off
 關閉
-:Offset:
-偏移:
+:Offset
+偏移
 :Ok
 確定
 :On
 開啟
 :PIT
 螺距
->:PIT Mix:
-:Page:
+>:PIT Mix
+:Page
 頁碼：
-<:Pit Mix:
-<集體螺距:
+<:Pit Mix
+<集體螺距
 :Pitch curves
 螺距曲線
 :Plane
 飛機
 <:Point
 <點
-:Point:
-點:
+:Point
+點
 :Pos
 正
-:Pos 0:
+:Pos 0
 位置0
-:Pos 1:
+:Pos 1
 位置1
-:Pos 2:
+:Pos 2
 位置2
-:Pos/Neg:
-正/負:
+:Pos/Neg
+正/負
 :Position %d
 档位%d
 >:Power-down alert
 <:PowerOff alert
 <無電警示
-:Prealert intvl:
-倒數預警間隔:
-:Prealert time:
-倒數預警時間:
-:Press 'Ent' to turn USB Filesystem:
+:Prealert intvl
+倒數預警間隔
+:Prealert time
+倒數預警時間
+:Press 'Ent' to turn USB Filesystem
 按 ENT 讓 USB 傳輸：
-:Press ENT to change:
-按 ENT 變更:
-:Press ENT to copy to:
+:Press ENT to change
+按 ENT 變更
+:Press ENT to copy to
 按 ENT 複製到：
-:Press ENT to load:
-按 ENT 載入:
-:Press ENT to turn \nUSB drive:
+:Press ENT to load
+按 ENT 載入
+:Press ENT to turn \nUSB drive
 按 ENT 讓 USB：
 :Preview: Long-Press ENT
 長按 ENT 預覽 EXT 離開
 <:Program mix
 <程式混控
-:Protocol:
-通訊協定:
-:PwrDn alert:
+:Protocol
+通訊協定
+:PwrDn alert
 關機警示
 :RIGHT_H
 右水平
@@ -452,7 +452,7 @@ PPM週期
 右垂直
 :RPM
 轉速
-:RPM:
+:RPM
 轉速
 :RUD
 方向
@@ -469,30 +469,30 @@ PPM週期
 重置
 :Reset Permanent Timer?
 是否確定重置\n持久計時器?
-:Reset sw:
+:Reset sw
 重置開關
 :Reverse
 輸出方向
-:Reverse:
-輸出方向:
+:Reverse
+輸出方向
 :Reversed
 反向的
 :Revert
 復原
 :Right
 右
-:Safe Val:
-安全值:
+:Safe Val
+安全值
 :Safety
 安全開關
-:Safety:
-安全開關:
+:Safety
+安全開關
 :Save
 儲存
-:Scale%s:
-比例%s:
-:Scale:
-比例:
+:Scale%s
+比例%s
+:Scale
+比例
 :Scanner
 2.4G頻道掃描
 :Servo
@@ -505,37 +505,37 @@ PPM週期
 <被控通道
 :Speed
 速率
-:Speed:
-舵機速度:
+:Speed
+舵機速度
 :Src
 訊號來源
-:Src:
-來源:
+:Src
+來源
 >:Standard
 :Standard Mixer
 通用模式
-:Start:
-開始時間:
+:Start
+開始時間
 <:Std Heli
 <通用直機
-:Step:
+:Step
 步幅
 :Stick input
-搖桿輸入:
-:Stick mode:
-搖桿模式:
-:Sticks:
-搖桿校正:
+搖桿輸入
+:Stick mode
+搖桿模式
+:Sticks
+搖桿校正
 :Sub-trim
 微調
 :Subtrim
 微調
-:Subtrim:
-微調:
+:Subtrim
+微調
 :Swash
 十字盤設定
-:SwashType:
-十字盤類型:
+:SwashType
+十字盤類型
 <:Switch
 <開關
 :Switch assignment
@@ -544,8 +544,8 @@ PPM週期
 開關1
 :Switch2
 開關2
-:Switch:
-開關:
+:Switch
+開關
 :Symmetric
 對稱
 :THR
@@ -591,9 +591,9 @@ PPM週期
 ======遙測參數======
 :Temp
 溫度
-:Temp:
-溫度:
-:Temperature:
+:Temp
+溫度
+:Temperature
 溫度單位
 :Template..
 模板..
@@ -611,20 +611,20 @@ PPM週期
 計時器
 :Timer settings
 ======計時參數======
-:Timer%d:
-計時器%d:
+:Timer%d
+計時器%d
 :Timers
 計時器
-:Timeup intvl:
-超時警示間隔:
+:Timeup intvl
+超時警示間隔
 :Toggle%d
 開關%d
 :Touch Calibrate
 觸控板校正
 :Touch Test
 觸控測試
-:Touch screen:
-觸控螢幕:
+:Touch screen
+觸控螢幕
 :Touch target %d
 點擊目標 %d
 :Touch to Lock
@@ -639,24 +639,24 @@ PPM週期
 行程量調整
 :Trim
 微調
-:Trim +:
-微調+:
-:Trim -:
-微調-:
-:Trim Step:
-微調幅度:
+:Trim +
+微調+
+:Trim -
+微調-
+:Trim Step
+微調幅度
 :Trims
 微調
-:Trims:
-微調數:
+:Trims
+微調數
 :Turn Off
 關閉
 :Turn On
 開啟
-:Tx power:
-發射功率:
+:Tx power
+發射功率
 >:USB
-:USB Filesystem is currently 
+:USB Filesystem is currently
 USB文件系統當前狀態
 :Unknown
 未知
@@ -666,16 +666,16 @@ USB文件系統當前狀態
 <微調
 :Value
 數值
-:Value:
-數值:
-:Vibration:
-震動警示:
+:Value
+數值
+:Vibration
+震動警示
 :Virt
 虛擬
 :Volt
 電壓
-:Volt:
-電壓:
+:Volt
+電壓
 :Zero/Max
 零/最大
 :\n%d seconds left

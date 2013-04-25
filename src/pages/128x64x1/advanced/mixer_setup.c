@@ -63,19 +63,19 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     data = NULL;
     switch(absrow) {
         case COMMON_SRC:
-            label = _tr_noop("Src:");
+            label = _tr_noop("Src");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src;
             break;
         case COMMON_CURVE:
-            label = _tr_noop("Curve:");
+            label = _tr_noop("Curve");
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[0];
             break;
         case COMMON_SCALE:
-            label = _tr_noop("Scale:");
+            label = _tr_noop("Scale");
             value = set_number100_cb; data = &mp->mixer[0].scalar;
             break;
         case SIMPLE_OFFSET:
-            label = _tr_noop("Offset:");
+            label = _tr_noop("Offset");
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
@@ -126,35 +126,35 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     }
     switch(absrow + COMMON_LAST) {
         case COMPLEX_MIXER:
-            label = _tr_noop("Mixers:");
+            label = _tr_noop("Mixers");
             value = set_nummixers_cb;
             break;
         case COMPLEX_PAGE:
-            label = _tr_noop("Page:");
+            label = _tr_noop("Page");
             tgl = reorder_cb; value = set_mixernum_cb;
             break;
         case COMPLEX_SWITCH:
-            label = _tr_noop("Switch:");
+            label = _tr_noop("Switch");
             tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->cur_mixer->sw;
             break;
         case COMPLEX_MUX:
-            label = _tr_noop("Mux:");
+            label = _tr_noop("Mux");
             value = set_mux_cb;
             break;
         case COMPLEX_SRC:
-            label = _tr_noop("Src:");
+            label = _tr_noop("Src");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
             break;
         case COMPLEX_CURVE:
-            label = _tr_noop("Curve:");
+            label = _tr_noop("Curve");
             tgl = curveselect_cb; value = set_curvename_cb; data = mp->cur_mixer;
             break;
         case COMPLEX_SCALE:
-            label = _tr_noop("Scale:");
+            label = _tr_noop("Scale");
             value = set_number100_cb; data = &mp->cur_mixer->scalar;
             break;
         case COMPLEX_OFFSET:
-            label = _tr_noop("Offset:");
+            label = _tr_noop("Offset");
             value = set_number100_cb; data = &mp->cur_mixer->offset;
             break;
     }
@@ -234,7 +234,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     int w = LEFT_VIEW_WIDTH;
     switch(absrow) {
         case COMMON_SRC:
-            label = _tr("Src:");
+            label = _tr("Src");
             tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
             break;
         case COMMON_CURVE:

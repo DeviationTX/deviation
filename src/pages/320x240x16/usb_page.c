@@ -30,7 +30,7 @@ static void _draw_page(u8 enable)
             "www.deviationtx.com",
             _tr("Deviation FW version:"), DeviationVersion,
 			_tr("USB Filesystem is currently "), enable == 0 ? _tr("Off") : _tr("On"),
-            _tr("Press 'Ent' to turn USB Filesystem:"),
+            _tr("Press 'Ent' to turn USB Filesystem"),
             enable == 0 ? _tr("On") : _tr("Off"));
     GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
 }

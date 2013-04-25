@@ -1,6 +1,6 @@
 ﻿Nederlands
-:# Channels:
-# Kanelen:
+:# Channels
+# Kanelen
 :%s is %d%%, safe value = %d%%\n
 %s is %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -43,9 +43,9 @@ absolute waarde
 AIL
 :AIL DR
 AIL DR
-:AIL Inv:
-AIL omg:
->:AIL Mix:
+:AIL Inv
+AIL omg
+>:AIL Mix
 >:AUX2
 >:AUX3
 :AUX4
@@ -59,20 +59,20 @@ AUX5
 :Airplane
 Vliegtuig
 >:Alarm
->:Alarm intvl:
+>:Alarm intvl
 >:Altitude
 >:Auto
 >:Aux2
-:Backlight:
-Helderheid:
+:Backlight
+Helderheid
 >:Bad/missing\nprotocol modules!
-:Bar %d:
-Balk %d:
-:Bars:
-Balken:
->:Batt alarm:
-:Battery alarm:
-Batterijalarm:
+:Bar %d
+Balk %d
+:Bars
+Balken
+>:Batt alarm
+:Battery alarm
+Batterijalarm
 >:Battery too low,\ncan't save!
 :Bind
 Koppelen
@@ -82,19 +82,19 @@ Bezig met koppelen
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
 :Binding...\nPress ENT to stop
 Bezig met koppelen\nDruk op ENT om te stoppen
-:Box %d:
-Kader %d:
+:Box %d
+Kader %d
 >:Button monitor
 >:Buzz settings
->:Buzz volume:
+>:Buzz volume
 >:Buzzer settings
 :COL
 COL
 >:COL Inv
-:COL Inv:
-COL omg:
+:COL Inv
+COL omg
 >:COL Limit
->:COL Mix:
+>:COL Mix
 :CYC
 CYC
 :Calibrate
@@ -117,13 +117,13 @@ Aanpassen
 Complex
 :Configure
 Configureren
->:Contrast:
+>:Contrast
 >:Copy To
 :Copy To...
 Kopieer...
 >:Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
-:Curve:
-Curve:
+:Curve
+Curve
 :Cyclic1
 Cyclic1
 :Cyclic2
@@ -142,8 +142,8 @@ Standaard
 >:Delta PW
 :Deviation FW version:
 Deviation FW Versie:
->:Dimmer target:
->:Dimmer time:
+>:Dimmer target
+>:Dimmer time
 >:Dn
 >:Do you really want\nto reset the\n permanent timer %d?
 :Down
@@ -152,9 +152,9 @@ Omlaag
 ELE
 :ELE DR
 ELE DR
-:ELE Inv:
-ELE inv:
->:ELE Mix:
+:ELE Inv
+ELE inv
+>:ELE Mix
 :EXPO
 Expo
 >:Enabled
@@ -168,14 +168,14 @@ Expo&DR
 >:Fahren
 >:Fail safe
 >:Failsafe
-:Failsafe:
-Veilige modus:
-:File:
-Bestand:
+:Failsafe
+Veilige modus
+:File
+Bestand
 :Fixed
 Vast
-:Fixed ID:
-Vast ID:
+:Fixed ID
+Vast ID
 >:Fly mode
 >:Foot
 >:Frame Size
@@ -196,12 +196,12 @@ Hoog
 >:Hold position
 :Icon
 Icoon
->:Icon:
+>:Icon
 >:Idle Up 1
 >:Idle Up 2
 >:Input monitor
-:Input:
-Invoer:
+:Input
+Invoer
 >:Insert
 :Inverted
 Omgekeerd
@@ -212,12 +212,12 @@ LINKS_H
 :LEFT_V
 LINKS_V
 >:LIN
-:Language:
-Taal:
+:Language
+Taal
 >:Latitude
 :Left
 Links
->:Length:
+>:Length
 :Linked
 Verbonden
 :Load
@@ -235,35 +235,35 @@ Laag
 :Main page config
 Configuratie hoofdscherm
 >:Manual
->:Max Limit:
+>:Max Limit
 >:Menu
 >:Meter
 :Mid-Rate
 Middel
->:Min Limit:
+>:Min Limit
 :Min/Max
 Min/Max
 :Mixer
 Mixer
->:Mixer GUI:
-:Mixers:
-Mixers:
+>:Mixer GUI
+:Mixers
+Mixers
 >:Mode
 :Mode %d
 Mode %d
 >:Model menu
-:Model name:
-Modelnaam:
+:Model name
+Modelnaam
 >:Model needs reset\nfor standard mixer
 >:Model needs to be reset\nin order to switch to the standard mixer
 >:Model setup
-:Model type:
-Modeltype:
+:Model type
+Modeltype
 >:Move Down
 >:Move Up
 >:Move sticks and knobs\nto Max & Min positions\nthen press ENT
-:Mux:
-Mux:
+:Mux
+Mux
 :Neg
 -
 >:New
@@ -280,47 +280,47 @@ Normaal
 >:Notch PW
 :Off
 Uit
-:Offset:
-Offset:
+:Offset
+Offset
 :Ok
 Ok
 :On
 Aan
 >:PIT
->:PIT Mix:
-:Page:
-Pagina:
+>:PIT Mix
+:Page
+Pagina
 >:Pitch curves
 >:Plane
-:Point:
-Punt:
+:Point
+Punt
 :Pos
 +
->:Pos 0:
->:Pos 1:
->:Pos 2:
-:Pos/Neg:
-+/-:
+>:Pos 0
+>:Pos 1
+>:Pos 2
+:Pos/Neg
++/-
 >:Position %d
 >:Power-down alert
->:Prealert intvl:
->:Prealert time:
-:Press 'Ent' to turn USB Filesystem:
+>:Prealert intvl
+>:Prealert time
+:Press 'Ent' to turn USB Filesystem
 Druk op 'ENT' om USB-bestandssysteem te activeren
->:Press ENT to change:
->:Press ENT to copy to:
->:Press ENT to load:
->:Press ENT to turn \nUSB drive:
+>:Press ENT to change
+>:Press ENT to copy to
+>:Press ENT to load
+>:Press ENT to turn \nUSB drive
 >:Preview: Long-Press ENT
-:Protocol:
-Protocol:
->:PwrDn alert:
+:Protocol
+Protocol
+>:PwrDn alert
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
 >:RPM
->:RPM:
+>:RPM
 :RUD
 RUD
 :RUD DR
@@ -331,26 +331,26 @@ Herinitialiseren
 :Reset
 Reset
 >:Reset Permanent Timer?
->:Reset sw:
+>:Reset sw
 >:Reverse
-:Reverse:
-Keer om:
+:Reverse
+Keer om
 :Reversed
 Omgekeerd
 >:Revert
 :Right
 Rechts
-:Safe Val:
-Veilige waarde:
+:Safe Val
+Veilige waarde
 :Safety
 Veiligheid
-:Safety:
-Veiligheid:
+:Safety
+Veiligheid
 :Save
 OPslaan
-:Scale%s:
-Schaal%s:
->:Scale:
+:Scale%s
+Schaal%s
+>:Scale
 :Scanner
 Scanner
 >:Servo
@@ -359,35 +359,35 @@ Eenvoudig
 :Simple 4 Channel
 Eenvoudig 4 kanalen
 >:Speed
->:Speed:
+>:Speed
 :Src
 Bron
-:Src:
-Bron:
+:Src
+Bron
 >:Standard
 >:Standard Mixer
-:Start:
-Start:
->:Step:
+:Start
+Start
+>:Step
 >:Stick input
-:Stick mode:
-Stickmodus:
-:Sticks:
-Sticks:
+:Stick mode
+Stickmodus
+:Sticks
+Sticks
 >:Sub-trim
 >:Subtrim
-:Subtrim:
-Fijnafstelling:
+:Subtrim
+Fijnafstelling
 >:Swash
-:SwashType:
-Type tuimelschijf:
+:SwashType
+Type tuimelschijf
 >:Switch assignment
 :Switch1
 Schakelaar1
 :Switch2
 Schakelaar2
-:Switch:
-Schakelaar:
+:Switch
+Schakelaar
 :Symmetric
 Symmetrisch
 :THR
@@ -425,8 +425,8 @@ TRIM_R-
 >:Telemetry monitor
 >:Telemetry settings
 >:Temp
->:Temp:
->:Temperature:
+>:Temp
+>:Temperature
 :Template..
 Sjabloon...
 :Test
@@ -438,17 +438,17 @@ Testen
 :Timer
 Timer
 >:Timer settings
->:Timer%d:
+>:Timer%d
 >:Timers
->:Timeup intvl:
+>:Timeup intvl
 :Toggle%d
 Schakel%d
 :Touch Calibrate
 Aanraakscherm kalibreren
 :Touch Test
 Aanraakscherm testen
-:Touch screen:
-Aanraakscherm:
+:Touch screen
+Aanraakscherm
 :Touch target %d
 Raak indicator %d aan
 :Touch to Lock
@@ -460,36 +460,36 @@ Raak aan om los te maken
 >:Travel adjust
 :Trim
 Trim
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Trimstap:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Trimstap
 >:Trims
-:Trims:
-Trims:
+:Trims
+Trims
 :Turn Off
 Uitschakelen
 :Turn On
 Inschakelen
-:Tx power:
-Zendvermogen:
+:Tx power
+Zendvermogen
 :USB
 USB
->:USB Filesystem is currently 
+>:USB Filesystem is currently
 :Unknown
 Onbekend
 :Up
 Omhoog
 >:Value
-:Value:
-Waarde:
->:Vibration:
+:Value
+Waarde
+>:Vibration
 :Virt
 Virt
 >:Volt
->:Volt:
+>:Volt
 :Zero/Max
 Nul/Max
 :\n%d seconds left

@@ -58,31 +58,31 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     switch(absrow) {
         case ITEM_SWASHTYPE:
-            label = _tr("SwashType:");
+            label = _tr("SwashType");
             value = swash_val_cb;
             break;
         case ITEM_ELEINV:
-            label = _tr("ELE Inv:");
+            label = _tr("ELE Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)1L;
             break;
         case ITEM_AILINV:
-            label = _tr("AIL Inv:");
+            label = _tr("AIL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)2L;
             break;
         case ITEM_COLINV:
-            label = _tr("COL Inv:");
+            label = _tr("COL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)4L;
             break;
         case ITEM_ELEMIX:
-            label = _tr("ELE Mix:");
+            label = _tr("ELE Mix");
             value = swashmix_val_cb; data = (void *)1L;
             break;
         case ITEM_AILMIX:
-            label = _tr("AIL Mix:");
+            label = _tr("AIL Mix");
             value = swashmix_val_cb; data = (void *)0L;
             break;
         case ITEM_COLMIX:
-            label = _tr("COL Mix:");
+            label = _tr("COL Mix");
             value = swashmix_val_cb; data = (void *)2L;
             break;
     }

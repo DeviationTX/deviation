@@ -1,6 +1,6 @@
 ﻿Deutsch
-:# Channels:
-Kanäle:
+:# Channels
+Kanäle
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, Ausfallwert = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -45,10 +45,10 @@ Absolut
 QUE
 :AIL DR
 QUE DR
-:AIL Inv:
-QUE Inv:
-:AIL Mix:
-QUE Mix:
+:AIL Inv
+QUE Inv
+:AIL Mix
+QUE Mix
 >:AUX2
 >:AUX3
 :AUX4
@@ -63,22 +63,22 @@ AUX5
 Flugzeug
 :Alarm
 Alarm
->:Alarm intvl:
+>:Alarm intvl
 :Altitude
 Höhe
 >:Auto
 >:Aux2
-:Backlight:
-Helligkeit:
+:Backlight
+Helligkeit
 >:Bad/missing\nprotocol modules!
-:Bar %d:
-Balken %d:
-:Bars:
-Balken:
-:Batt alarm:
-Akkuwarner:
-:Battery alarm:
-Akkuwarner:
+:Bar %d
+Balken %d
+:Bars
+Balken
+:Batt alarm
+Akkuwarner
+:Battery alarm
+Akkuwarner
 :Battery too low,\ncan't save!
 Akku zu schwach,\nkann nicht speichern!
 :Bind
@@ -89,24 +89,24 @@ Binden
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
 :Binding...\nPress ENT to stop
 Binden...\nENT zu stoppen
-:Box %d:
-Kasten %d:
+:Box %d
+Kasten %d
 :Button monitor
 Knöpfe Anzeige
 >:Buzz settings
-:Buzz volume:
-Buzzer Lautst:
+:Buzz volume
+Buzzer Lautst
 >:Buzzer settings
 :COL
 COL
 :COL Inv
 COL Inv
-:COL Inv:
-COL Inv:
+:COL Inv
+COL Inv
 :COL Limit
 COL Limit
-:COL Mix:
-COL Mix:
+:COL Mix
+COL Mix
 :CYC
 TAUM
 :Calibrate
@@ -136,16 +136,16 @@ Kanal Ausgabe
 Komplex
 :Configure
 Konfigurieren
-:Contrast:
-Kontrast:
+:Contrast
+Kontrast
 :Copy To
 Kopiere zu
 :Copy To...
 Kopieren...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Kritischer Akkustand erkannt.\nEinstellungen wurden gespeichert.\nAlle nachträglichen Einstellungen\nwerden NICHT gespeichert.\n\nAkku umgehend wechseln!
-:Curve:
-Kurve:
+:Curve
+Kurve
 :Cyclic1
 Zyklisch1
 :Cyclic2
@@ -166,10 +166,10 @@ Standard
 Delta PW
 :Deviation FW version:
 Deviation FW Version:
-:Dimmer target:
-Dimmer target:
-:Dimmer time:
-Dimmer time:
+:Dimmer target
+Dimmer target
+:Dimmer time
+Dimmer time
 :Dn
 Dn
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -179,10 +179,10 @@ Runter
 HOE
 :ELE DR
 HOE DR
-:ELE Inv:
-HOE Inv:
-:ELE Mix:
-HOE Mix:
+:ELE Inv
+HOE Inv
+:ELE Mix
+HOE Mix
 :EXPO
 EXPO
 >:Enabled
@@ -197,14 +197,14 @@ Expo&DR
 Fahrenheit
 >:Fail safe
 >:Failsafe
-:Failsafe:
-Ausfallschutz:
-:File:
-Modell:
+:Failsafe
+Ausfallschutz
+:File
+Modell
 :Fixed
 Fest
-:Fixed ID:
-Feste ID:
+:Fixed ID
+Feste ID
 >:Fly mode
 :Foot
 Fuß
@@ -230,14 +230,14 @@ Hoch
 >:Hold position
 :Icon
 Bild
-:Icon:
-Bild:
+:Icon
+Bild
 >:Idle Up 1
 >:Idle Up 2
 :Input monitor
 Eingaben Anzeige
-:Input:
-Eingabe:
+:Input
+Eingabe
 :Insert
 Einfügen
 :Inverted
@@ -250,14 +250,14 @@ LINKS_H
 :LEFT_V
 LINKS_V
 >:LIN
-:Language:
-Sprache:
+:Language
+Sprache
 :Latitude
 Breite
 :Left
 Links
-:Length:
-Länge:
+:Length
+Länge
 :Linked
 Verknüpft
 :Load
@@ -279,44 +279,44 @@ Startseite
 :Main page config
 Startseitenkonfiguration
 >:Manual
-:Max Limit:
-Max Limit:
+:Max Limit
+Max Limit
 :Menu
 Menü
 :Meter
 Meter
 :Mid-Rate
 Mittel
-:Min Limit:
-Min Limit:
+:Min Limit
+Min Limit
 :Min/Max
 Min/Max
 :Mixer
 Mixer
->:Mixer GUI:
-:Mixers:
-Mixers:
+>:Mixer GUI
+:Mixers
+Mixers
 >:Mode
 :Mode %d
 Mode %d
 :Model menu
 Modell Menü
-:Model name:
-Modellname:
+:Model name
+Modellname
 >:Model needs reset\nfor standard mixer
 >:Model needs to be reset\nin order to switch to the standard mixer
 :Model setup
 Modell Einstellungen
-:Model type:
-Modelltyp:
+:Model type
+Modelltyp
 :Move Down
 Nach unten
 :Move Up
 Nach oben
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 Bewege die Knüppel und Hebel\nin die Max & Min Positionen\nDann drücke ENT
-:Mux:
-Mux:
+:Mux
+Mux
 :Neg
 -
 :New
@@ -335,57 +335,57 @@ Normal
 Notch PW
 :Off
 Aus
-:Offset:
-Ausgleich:
+:Offset
+Ausgleich
 :Ok
 Ok
 :On
 Ein
 >:PIT
->:PIT Mix:
-:Page:
-Seite:
+>:PIT Mix
+:Page
+Seite
 >:Pitch curves
 :Plane
 Flugzeug
-:Point:
-Punkt:
+:Point
+Punkt
 :Pos
 +
->:Pos 0:
->:Pos 1:
->:Pos 2:
-:Pos/Neg:
-+/-:
+>:Pos 0
+>:Pos 1
+>:Pos 2
+:Pos/Neg
++/-
 >:Position %d
 >:Power-down alert
-:Prealert intvl:
-Prealert intvl:
-:Prealert time:
-Prealert time:
-:Press 'Ent' to turn USB Filesystem:
-'ENT' schaltet das USB Filesystem:
-:Press ENT to change:
-Drücke ENT zum Ändern:
-:Press ENT to copy to:
-Drücke ENT zum Kopieren:
-:Press ENT to load:
-Drücke ENT zum Laden:
-:Press ENT to turn \nUSB drive:
-ENT schaltet \ndas USB Laufwerk:
+:Prealert intvl
+Prealert intvl
+:Prealert time
+Prealert time
+:Press 'Ent' to turn USB Filesystem
+'ENT' schaltet das USB Filesystem
+:Press ENT to change
+Drücke ENT zum Ändern
+:Press ENT to copy to
+Drücke ENT zum Kopieren
+:Press ENT to load
+Drücke ENT zum Laden
+:Press ENT to turn \nUSB drive
+ENT schaltet \ndas USB Laufwerk
 :Preview: Long-Press ENT
 Vorschau: Lange ENT drücken
-:Protocol:
-Protokoll:
->:PwrDn alert:
+:Protocol
+Protokoll
+>:PwrDn alert
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
 :RPM
 UPM
-:RPM:
-UPM:
+:RPM
+UPM
 :RUD
 RUD
 :RUD DR
@@ -397,27 +397,27 @@ Löschen
 :Reset
 Reset
 >:Reset Permanent Timer?
->:Reset sw:
+>:Reset sw
 >:Reverse
-:Reverse:
-Umkehr:
+:Reverse
+Umkehr
 :Reversed
 Umgekehrt
 :Revert
 Zurücknehmen
 :Right
 Rechts
-:Safe Val:
-Sicherer Wert:
+:Safe Val
+Sicherer Wert
 :Safety
 Sicherheit
-:Safety:
-Sicherheit:
+:Safety
+Sicherheit
 :Save
 Kopieren
-:Scale%s:
-Skalierung%s:
->:Scale:
+:Scale%s
+Skalierung%s
+>:Scale
 :Scanner
 Scanner
 >:Servo
@@ -426,39 +426,39 @@ Nichts
 :Simple 4 Channel
 Einfach 4 Kanäle
 :Speed
-Geschw:
-:Speed:
-Geschwindigkeit:
+Geschw
+:Speed
+Geschwindigkeit
 :Src
 Quelle
-:Src:
-Quelle:
+:Src
+Quelle
 >:Standard
 >:Standard Mixer
-:Start:
-Start:
-:Step:
-Schritt:
+:Start
+Start
+:Step
+Schritt
 :Stick input
 Knüppel Eingabe
-:Stick mode:
-Knüppel Mode:
-:Sticks:
-Knüppel:
+:Stick mode
+Knüppel Mode
+:Sticks
+Knüppel
 >:Sub-trim
 >:Subtrim
-:Subtrim:
-Untertrimmung:
+:Subtrim
+Untertrimmung
 >:Swash
-:SwashType:
-Taumelscheibe:
+:SwashType
+Taumelscheibe
 >:Switch assignment
 :Switch1
 Hebel1
 :Switch2
 Hebel2
-:Switch:
-Hebel:
+:Switch
+Hebel
 :Symmetric
 Symmetrie
 :THR
@@ -504,10 +504,10 @@ Telemetrie Anzeige
 Telemetrie Einstellungen
 :Temp
 Temp
-:Temp:
-Temp:
-:Temperature:
-Temp:
+:Temp
+Temp
+:Temperature
+Temp
 :Template..
 Vorlage...
 :Test
@@ -521,20 +521,20 @@ Zeit
 Timer
 :Timer settings
 Timer Einstellungen
-:Timer%d:
-Timer%d:
+:Timer%d
+Timer%d
 :Timers
 Timer
-:Timeup intvl:
-Timeup intvl:
+:Timeup intvl
+Timeup intvl
 :Toggle%d
 Hebel%d
 :Touch Calibrate
 Touchscreen kalibrieren
 :Touch Test
 Touchscreen testen
-:Touch screen:
-Bildschirm:
+:Touch screen
+Bildschirm
 :Touch target %d
 Tippe auf Ziel %d
 :Touch to Lock
@@ -548,40 +548,40 @@ Sender Menü
 >:Travel adjust
 :Trim
 Trimmung
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Schritt:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Schritt
 :Trims
 Trimmung
-:Trims:
-Trimm:
+:Trims
+Trimm
 :Turn Off
 Ausschalten
 :Turn On
 Einschalten
-:Tx power:
-Sendeleistung:
+:Tx power
+Sendeleistung
 :USB
 USB
->:USB Filesystem is currently 
+>:USB Filesystem is currently
 :Unknown
 Unbekannt
 :Up
 Hoch
 >:Value
-:Value:
-Wert:
-:Vibration:
-Vibration:
+:Value
+Wert
+:Vibration
+Vibration
 :Virt
 Virt
 :Volt
 Volt
-:Volt:
-Volt:
+:Volt
+Volt
 :Zero/Max
 Null/Max
 :\n%d seconds left
@@ -608,4 +608,4 @@ ersetzen
 :stopwatch
 Stoppuhr
 <:Über Deviation
-<>:Advanced
+>:Advanced

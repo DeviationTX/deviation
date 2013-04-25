@@ -1,5 +1,5 @@
 ﻿简体中文
-:# Channels:
+:# Channels
 通道数
 :%s is %d%%, safe value = %d%%\n
 %s当前值为%d%%, 安全开机设定为%d%%\n
@@ -42,9 +42,9 @@
 :AIL
 副翼
 >:AIL DR
-:AIL Inv:
+:AIL Inv
 副翼方向
-:AIL Mix:
+:AIL Mix
 副翼螺距
 >:AUX2
 >:AUX3
@@ -64,7 +64,7 @@
 固定翼
 :Alarm
 报警
-:Alarm intvl:
+:Alarm intvl
 报警间隔
 :Altitude
 高度
@@ -73,16 +73,16 @@
 :Auto
 自动
 >:Aux2
-:Backlight:
+:Backlight
 背光
 >:Bad/missing\nprotocol modules!
-:Bar %d:
+:Bar %d
 柱图%d
-:Bars:
+:Bars
 柱状图
-:Batt alarm:
+:Batt alarm
 电量报警
-:Battery alarm:
+:Battery alarm
 电量报警
 :Battery too low,\ncan't save!
 电压过低,\n无法存盘!
@@ -94,13 +94,13 @@
 对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
 :Binding...\nPress ENT to stop
 对频中...\n按ENT中止
-:Box %d:
+:Box %d
 第%d栏
 :Button monitor
 按键监控
 :Buzz settings
 报警设置
-:Buzz volume:
+:Buzz volume
 音量
 :Buzzer settings
 报警设置
@@ -108,11 +108,11 @@
 螺距
 :COL Inv
 螺距方向
-:COL Inv:
+:COL Inv
 螺距方向
 :COL Limit
 螺距
-:COL Mix:
+:COL Mix
 螺距
 :CYC
 CYC
@@ -150,7 +150,7 @@ CYC
 多段式
 :Configure
 设置
-:Contrast:
+:Contrast
 对比度
 :Copy To
 复制到
@@ -162,7 +162,7 @@ CYC
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
 <:Curve
 <曲线
-:Curve:
+:Curve
 曲线
 :Cyclic1
 CCPM1
@@ -192,9 +192,9 @@ CCPM3
 脉宽变化
 :Deviation FW version:
 Deviation固件版本:
-:Dimmer target:
+:Dimmer target
 背光减弱至
-:Dimmer time:
+:Dimmer time
 背光减弱时间
 :Dn
 下
@@ -209,9 +209,9 @@ Deviation固件版本:
 :ELE
 升降
 >:ELE DR
-:ELE Inv:
+:ELE Inv
 升降方向
-:ELE Mix:
+:ELE Mix
 升降螺距
 :EXPO
 指数曲线
@@ -231,13 +231,13 @@ Deviation固件版本:
 失控保护
 :Failsafe
 失控保护
-:Failsafe:
+:Failsafe
 失控保护
-:File:
+:File
 模型文件
 :Fixed
 固定
-:Fixed ID:
+:Fixed ID
 固定ID码
 :Fly mode
 飞行模式
@@ -267,7 +267,7 @@ Deviation固件版本:
 熄火油门值
 :Icon
 图标
-:Icon:
+:Icon
 图标
 <:Idle 1
 <3D飞行1
@@ -277,7 +277,7 @@ Deviation固件版本:
 >:Idle Up 2
 :Input monitor
 摇杆输入监控
-:Input:
+:Input
 输入
 :Insert
 插入
@@ -293,14 +293,14 @@ LCD设置
 左垂直
 :LIN
 线性
-:Language:
+:Language
 语言
 :Latitude
 纬度
 :Left
 左
-:Length:
-距离:
+:Length
+距离
 :Linked
 关联
 :Load
@@ -325,7 +325,7 @@ LCD设置
 >:Manual
 <:Master
 <输入
-:Max Limit:
+:Max Limit
 最大舵量
 :Menu
 快捷菜单
@@ -333,23 +333,23 @@ LCD设置
 米
 :Mid-Rate
 3D飞行1
-:Min Limit:
+:Min Limit
 最小舵量
 :Min/Max
 最低/最高
 :Mixer
 混控
-:Mixer GUI:
+:Mixer GUI
 设置界面
-:Mixers:
-混控:
+:Mixers
+混控
 :Mode
 模式
 :Mode %d
 模式%d
 :Model menu
 模型设置
-:Model name:
+:Model name
 模型命名
 :Model needs reset\nfor standard mixer
 切换到通用模式\n需要重置,确定吗?
@@ -357,7 +357,7 @@ LCD设置
 本设置与通用模式不兼容,需要进行重置,\n是否确定?
 :Model setup
 模型设置
-:Model type:
+:Model type
 模型类型
 :Move Down
 下移
@@ -371,7 +371,7 @@ LCD设置
 <上移
 <:Mux
 <作用
-:Mux:
+:Mux
 作用
 :Neg
 负
@@ -391,7 +391,7 @@ LCD设置
 通道间隔
 :Off
 关闭
-:Offset:
+:Offset
 偏移
 :Ok
 确定
@@ -399,10 +399,10 @@ LCD设置
 开启
 :PIT
 螺距
->:PIT Mix:
-:Page:
+>:PIT Mix
+:Page
 模式1-N
-<:Pit Mix:
+<:Pit Mix
 <集体螺距
 :Pitch curves
 螺距曲线
@@ -410,44 +410,44 @@ LCD设置
 固定翼
 <:Point
 <点
-:Point:
+:Point
 点
 :Pos
 正
-:Pos 0:
+:Pos 0
 位置0
-:Pos 1:
+:Pos 1
 位置1
-:Pos 2:
+:Pos 2
 位置2
-:Pos/Neg:
+:Pos/Neg
 正/负
 :Position %d
 档位%1
 >:Power-down alert
 <:PowerOff alert
 <关机提示
-:Prealert intvl:
+:Prealert intvl
 预警间隔
-:Prealert time:
+:Prealert time
 预警时间
-:Press 'Ent' to turn USB Filesystem:
-按ENT改变USB盘状态:
-:Press ENT to change:
+:Press 'Ent' to turn USB Filesystem
+按ENT改变USB盘状态
+:Press ENT to change
 按ENT更改
-:Press ENT to copy to:
+:Press ENT to copy to
 按ENT复制
-:Press ENT to load:
+:Press ENT to load
 按ENT读取
-:Press ENT to turn \nUSB drive:
-按ENT使U盘:
+:Press ENT to turn \nUSB drive
+按ENT使U盘
 :Preview: Long-Press ENT
 长按ENT预览,EXT返回
 <:Program mix
 <程式混控
-:Protocol:
+:Protocol
 通信协议
-:PwrDn alert:
+:PwrDn alert
 无电提示
 :RIGHT_H
 右水平
@@ -455,7 +455,7 @@ LCD设置
 右垂直
 :RPM
 转数
-:RPM:
+:RPM
 转数
 :RUD
 方向
@@ -472,11 +472,11 @@ LCD设置
 重置
 :Reset Permanent Timer?
 是否确定重置\n持续计时器?
-:Reset sw:
+:Reset sw
 重置开关
 :Reverse
 舵机正逆转
-:Reverse:
+:Reverse
 反向
 :Reversed
 反向
@@ -484,18 +484,18 @@ LCD设置
 回滚修改
 :Right
 右
-:Safe Val:
+:Safe Val
 熄火值
 :Safety
 熄火开关
-:Safety:
+:Safety
 熄火开关
 :Save
 保存
-:Scale%s:
+:Scale%s
 比例%s
-:Scale:
-比例:
+:Scale
+比例
 :Scanner
 信号扫描器
 :Servo
@@ -508,36 +508,36 @@ LCD设置
 <被控通道
 :Speed
 速度
-:Speed:
+:Speed
 舵机速率
 :Src
 输入
-:Src:
+:Src
 输入
 >:Standard
 :Standard Mixer
 通用模式
-:Start:
+:Start
 开始时间
 <:Std Heli
 <标准直机
-:Step:
+:Step
 幅度
 :Stick input
 摇杆输入
-:Stick mode:
+:Stick mode
 摇杆模式
-:Sticks:
+:Sticks
 摇杆/旋钮
 :Sub-trim
 微调
 :Subtrim
 微调
-:Subtrim:
+:Subtrim
 微调
 :Swash
 斜盘设置
-:SwashType:
+:SwashType
 斜盘模式
 <:Switch
 <开关
@@ -547,7 +547,7 @@ LCD设置
 开关1
 :Switch2
 开关2
-:Switch:
+:Switch
 开关
 :Symmetric
 对称
@@ -594,9 +594,9 @@ LCD设置
 双向回传设置
 :Temp
 温度
-:Temp:
+:Temp
 温度
-:Temperature:
+:Temperature
 温度
 :Template..
 模板..
@@ -614,11 +614,11 @@ LCD设置
 定时器
 :Timer settings
 定时器设置
-:Timer%d:
+:Timer%d
 定时器%d
 :Timers
 定时器
-:Timeup intvl:
+:Timeup intvl
 超时报警间隔
 :Toggle%d
 开关%d
@@ -626,7 +626,7 @@ LCD设置
 触摸屏校准
 :Touch Test
 触摸屏测试
-:Touch screen:
+:Touch screen
 触摸屏
 :Touch target %d
 触摸目标%d
@@ -640,24 +640,24 @@ LCD设置
 舵机行程
 :Trim
 微调
-:Trim +:
+:Trim +
 微调+
-:Trim -:
+:Trim -
 微调-
-:Trim Step:
+:Trim Step
 微调幅度
 :Trims
 微调
-:Trims:
+:Trims
 微调数
 :Turn Off
 关闭
 :Turn On
 开启
-:Tx power:
+:Tx power
 发射功率
 >:USB
-:USB Filesystem is currently 
+:USB Filesystem is currently
 USB文件系统当前状态
 >:Unknown
 :Up
@@ -666,22 +666,22 @@ USB文件系统当前状态
 <微调
 :Value
 感度值
-:Value:
+:Value
 值
-:Vibration:
+:Vibration
 振动
 :Virt
 虚拟
 :Volt
 电压
-:Volt:
+:Volt
 电压
 :Zero/Max
 零/最大
 :\n%d seconds left
 \n还剩%d秒
 :\n\nBinding will end in %d seconds...
-\n\n对频在%d秒后结束 
+\n\n对频在%d秒后结束
 :add
 附加
 :countdown

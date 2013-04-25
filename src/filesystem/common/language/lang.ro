@@ -1,6 +1,6 @@
-Română 
-:# Channels:
-Canale:
+Română
+:# Channels
+Canale
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valoare de siguranță = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -45,10 +45,10 @@ VAL ABS
 AIL
 :AIL DR
 AIL DR
-:AIL Inv:
-AIL Inv.:
-:AIL Mix:
-AIL Mix:
+:AIL Inv
+AIL Inv.
+:AIL Mix
+AIL Mix
 :AUX2
 AUX2
 :AUX3
@@ -68,8 +68,8 @@ Avansat
 :Airplane
 Avion
 :Alarm
-Alarmă 
-:Alarm intvl:
+Alarmă
+:Alarm intvl
 Int. alarmă
 :Altitude
 Altitudine
@@ -77,18 +77,18 @@ Altitudine
 Auto
 :Aux2
 Aux2
-:Backlight:
-Iluminare:
+:Backlight
+Iluminare
 :Bad/missing\nprotocol modules!
 Module protocol\nlipsă sau corupte!
-:Bar %d:
-Bara %d:
-:Bars:
-Bare:
-:Batt alarm:
-Alarmă bat.:
-:Battery alarm:
-Alarmă baterie:
+:Bar %d
+Bara %d
+:Bars
+Bare
+:Batt alarm
+Alarmă bat.
+:Battery alarm
+Alarmă baterie
 :Battery too low,\ncan't save!
 Nivel baterie scăzut,\nnu pot salva!
 :Bind
@@ -99,26 +99,26 @@ Conectare
 Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
 :Binding...\nPress ENT to stop
 Conectare...\nApăsați ENT pentru a opri
-:Box %d:
-Loc%d:
+:Box %d
+Loc%d
 :Button monitor
 Monitor butoane
 :Buzz settings
 Setări sunet
-:Buzz volume:
-Volum:
+:Buzz volume
+Volum
 :Buzzer settings
 Setări sunet
 :COL
 Colectiv
 :COL Inv
 COL Inv
-:COL Inv:
-Colectiv inv.:
+:COL Inv
+Colectiv inv.
 :COL Limit
 COL Limită
-:COL Mix:
-COL Mix:
+:COL Mix
+COL Mix
 :CYC
 CYC
 :Calibrate
@@ -149,16 +149,16 @@ Canale
 Complex
 :Configure
 Configurează
-:Contrast:
-Contrast:
+:Contrast
+Contrast
 :Copy To
 Copiază
 :Copy To...
 Copiază...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Nivelul de încărcare al bateriei critic!\nSetările au fost salvate,\norice modificare ulterioară\nNU va mai fi salvată.\n\nÎncărcați sau schimbați bateriile!
-:Curve:
-Curbă:
+:Curve
+Curbă
 :Cyclic1
 Ciclic1
 :Cyclic2
@@ -183,10 +183,10 @@ Default
 Delta PW
 :Deviation FW version:
 Deviation fw. versiune:
-:Dimmer target:
+:Dimmer target
 Nivel auto
-:Dimmer time:
-Timp auto:
+:Dimmer time
+Timp auto
 :Dn
 Jos
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -196,10 +196,10 @@ Jos
 ELE
 :ELE DR
 ELE DR
-:ELE Inv:
-ELE inv.:
-:ELE Mix:
-ELE Mix:
+:ELE Inv
+ELE inv.
+:ELE Mix
+ELE Mix
 :EXPO
 EXP.
 >:Enabled
@@ -214,17 +214,17 @@ FMODE
 :Fahren
 F°
 :Fail safe
-Fail safe:
+Fail safe
 :Failsafe
 Failsafe
-:Failsafe:
-Failsafe:
-:File:
-Fișier:
+:Failsafe
+Failsafe
+:File
+Fișier
 :Fixed
 Fix
-:Fixed ID:
-ID Fix:
+:Fixed ID
+ID Fix
 :Fly mode
 Mod zbor
 :Foot
@@ -257,8 +257,8 @@ Pos0
 Poziție fixă
 :Icon
 Icon
-:Icon:
-Icon:
+:Icon
+Icon
 <:Idle 1
 <Idle 1
 <:Idle 2
@@ -267,8 +267,8 @@ Icon:
 >:Idle Up 2
 :Input monitor
 Monitor intrări
-:Input:
-Intrare:
+:Input
+Intrare
 :Insert
 Inserare
 :Inverted
@@ -283,13 +283,13 @@ STÂNGA_H
 STÂNGA_V
 :LIN
 LIN
-:Language:
-Limbă:
+:Language
+Limbă
 :Latitude
 Latitudine
 :Left
 Stânga
-:Length:
+:Length
 Distanță
 :Linked
 Legat
@@ -316,48 +316,48 @@ Pagina principală
 :Main page config
 Ecran principal
 >:Manual
-:Max Limit:
-Limită max:
+:Max Limit
+Limită max
 :Menu
 Meniu
 :Meter
 Metru
 :Mid-Rate
 Pos1
-:Min Limit:
-Limită min:
+:Min Limit
+Limită min
 :Min/Max
 Min/Max
 :Mixer
 Configurare mixer
-:Mixer GUI:
-GUI mixer:
-:Mixers:
-Mixere:
+:Mixer GUI
+GUI mixer
+:Mixers
+Mixere
 :Mode
 Mod
 :Mode %d
 Mod %d
 :Model menu
 Meniu model
-:Model name:
-Nume model:
+:Model name
+Nume model
 :Model needs reset\nfor standard mixer
 Modelul trebuie să fie\n resetat pentru mixerul standard
 :Model needs to be reset\nin order to switch to the standard mixer
 Modelul va fi resetat pentru\întoarcerea la modul simplu
 :Model setup
 Profil model
-:Model type:
-Tip model:
+:Model type
+Tip model
 :Move Down
 Mișcă în jos
 :Move Up
 Mișcă în sus
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 Mută stick-urile și potențiometrele\nla MAX și MIN\ndupă care apasă ENT
-:Mux:
-Mux:
+:Mux
+Mux
 :Neg
 Neg.
 :New
@@ -376,59 +376,59 @@ Normal
 Depres. PW
 :Off
 Oprit
-:Offset:
-Offset:
+:Offset
+Offset
 :Ok
 Ok
 :On
 Pornit
 :PIT
 PIT
->:PIT Mix:
-:Page:
-Pagină:
-<:Pit Mix:
-<Mix PIT:
+>:PIT Mix
+:Page
+Pagină
+<:Pit Mix
+<Mix PIT
 :Pitch curves
 Curbe pitch
 :Plane
 Avion
-:Point:
-Punct:
+:Point
+Punct
 :Pos
 Poz.
-:Pos 0:
-Pos 0:
-:Pos 1:
-Pos 1:
-:Pos 2:
+:Pos 0
+Pos 0
+:Pos 1
+Pos 1
+:Pos 2
 Pos 2
-:Pos/Neg:
-Poz/Neg:
+:Pos/Neg
+Poz/Neg
 :Position %d
 Poziția %d
 >:Power-down alert
 <:PowerOff alert
 <Alertă oprire
-:Prealert intvl:
-Interval:
-:Prealert time:
-Prealertă:
-:Press 'Ent' to turn USB Filesystem:
-\nApasă ENT pentru a seta modul USB: 
-:Press ENT to change:
-Apasaă ENT pentru schimbare:
-:Press ENT to copy to:
-Apasa ENT pentru copiere:
-:Press ENT to load:
-Apasă ENT pentru incarcare:
-:Press ENT to turn \nUSB drive:
-Apasă ENT pentru a seta\nmodul USB:
+:Prealert intvl
+Interval
+:Prealert time
+Prealertă
+:Press 'Ent' to turn USB Filesystem
+\nApasă ENT pentru a seta modul USB
+:Press ENT to change
+Apasaă ENT pentru schimbare
+:Press ENT to copy to
+Apasa ENT pentru copiere
+:Press ENT to load
+Apasă ENT pentru incarcare
+:Press ENT to turn \nUSB drive
+Apasă ENT pentru a seta\nmodul USB
 :Preview: Long-Press ENT
 Test: ține ENT apăsat
-:Protocol:
-Protocol:
-:PwrDn alert:
+:Protocol
+Protocol
+:PwrDn alert
 Alertă opr.
 :RIGHT_H
 DREAPTA_V
@@ -436,8 +436,8 @@ DREAPTA_V
 DREAPTA_F
 :RPM
 RPM
-:RPM:
-RPM:
+:RPM
+RPM
 :RUD
 RUD
 :RUD DR
@@ -449,30 +449,30 @@ Re-init
 :Reset
 Reset
 >:Reset Permanent Timer?
-:Reset sw:
-Sw reset:
+:Reset sw
+Sw reset
 :Reverse
 Invers
-:Reverse:
-Invers:
+:Reverse
+Invers
 :Reversed
 Inversat
 :Revert
 Inversează
 :Right
 Dreapta
-:Safe Val:
-Valoare sig.:
+:Safe Val
+Valoare sig.
 :Safety
 Siguranță
-:Safety:
-Siguranță:
+:Safety
+Siguranță
 :Save
 Salv.
-:Scale%s:
-Scară%s:
-:Scale:
-Scara:
+:Scale%s
+Scară%s
+:Scale
+Scara
 :Scanner
 Scaner
 :Servo
@@ -483,44 +483,44 @@ Simplu
 Simplu 4 canale
 :Speed
 Viteză
-:Speed:
-Viteză:
+:Speed
+Viteză
 :Src
 Sursa
-:Src:
-Sursă:
+:Src
+Sursă
 :Standard
 Standard
 :Standard Mixer
 Mixer standard
-:Start:
-Start:
-:Step:
-Pas:
+:Start
+Start
+:Step
+Pas
 :Stick input
 Intrări
-:Stick mode:
-Mod:
-:Sticks:
-Stick-uri:
+:Stick mode
+Mod
+:Sticks
+Stick-uri
 :Sub-trim
 Sub-trim
 :Subtrim
 Subtrim
-:Subtrim:
+:Subtrim
 Subtrim
 :Swash
 Platou
-:SwashType:
-Tip platou:
+:SwashType
+Tip platou
 :Switch assignment
 Asignare act.
 :Switch1
 Act1
 :Switch2
 Act2
-:Switch:
-Activator:
+:Switch
+Activator
 :Symmetric
 Simetric.
 :THR
@@ -567,10 +567,10 @@ Monitor telemetrie
 Setări telemetrie
 :Temp
 Temp.
-:Temp:
-Temp:
-:Temperature:
-Temperatură:
+:Temp
+Temp
+:Temperature
+Temperatură
 :Template..
 Șablon...
 :Test
@@ -587,24 +587,24 @@ Timp
 Timer
 :Timer settings
 Setări crono
-:Timer%d:
-Timer%d:
+:Timer%d
+Timer%d
 :Timers
 Timere
-:Timeup intvl:
-Expirare:
+:Timeup intvl
+Expirare
 :Toggle%d
 Într.%d
 :Touch Calibrate
 Calibrare ecran
 :Touch Test
 Test tactil
-:Touch screen:
-Ecran tactil:
+:Touch screen
+Ecran tactil
 :Touch target %d
 Atinge punctul %d
 :Touch to Lock
-Apasă pentru a încuia  
+Apasă pentru a încuia
 :Touch to Unlock
 Apasă pentru a descuia
 :Transmitter config
@@ -615,26 +615,26 @@ Meniu radio
 Ajustare curse
 :Trim
 Trim
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Pas trim:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Pas trim
 :Trims
 Trim-uri
-:Trims:
-Trim-uri:
+:Trims
+Trim-uri
 :Turn Off
 Oprește
 :Turn On
 Pornește
-:Tx power:
-Putere tx:
+:Tx power
+Putere tx
 :USB
 USB
-:USB Filesystem is currently 
-Sistemul de fițiere USB este 
+:USB Filesystem is currently
+Sistemul de fițiere USB este
 :Unknown
 Necunoscut
 <:Unlocked
@@ -643,16 +643,16 @@ Necunoscut
 Sus
 :Value
 Valoare
-:Value:
-Valoare:
-:Vibration:
+:Value
+Valoare
+:Vibration
 Vibrație
 :Virt
 Virt.
 :Volt
 Volt
-:Volt:
-Volt:
+:Volt
+Volt
 :Zero/Max
 Zero/Max
 :\n%d seconds left

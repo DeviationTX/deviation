@@ -42,25 +42,25 @@ void MODELPAGE_Config()
     show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
     if (Model.type == 0) {
         u8 i = 40;
-        GUI_CreateLabel(&gui->swashlbl, 8, i, NULL, DEFAULT_FONT, _tr("SwashType:"));
+        GUI_CreateLabel(&gui->swashlbl, 8, i, NULL, DEFAULT_FONT, _tr("SwashType"));
         GUI_CreateTextSelect(&gui->swash, 136, i, TEXTSELECT_96, NULL, swash_val_cb, NULL);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Inv:"));
+        GUI_CreateLabel(&gui->invlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Inv"));
         GUI_CreateTextSelect(&gui->inv[0], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)1);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Inv:"));
+        GUI_CreateLabel(&gui->invlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Inv"));
         GUI_CreateTextSelect(&gui->inv[1], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)2);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Inv:"));
+        GUI_CreateLabel(&gui->invlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Inv"));
         GUI_CreateTextSelect(&gui->inv[2], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)4);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Mix:"));
+        GUI_CreateLabel(&gui->mixlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Mix"));
         GUI_CreateTextSelect(&gui->mix[0], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)1);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Mix:"));
+        GUI_CreateLabel(&gui->mixlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Mix"));
         GUI_CreateTextSelect(&gui->mix[1], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)0);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Mix:"));
+        GUI_CreateLabel(&gui->mixlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Mix"));
         GUI_CreateTextSelect(&gui->mix[2], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)2);
     }
 }

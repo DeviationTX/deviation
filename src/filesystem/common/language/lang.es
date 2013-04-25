@@ -1,6 +1,6 @@
 ﻿Español
-:# Channels:
-# Canales:
+:# Channels
+# Canales
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valor seguro  = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -45,9 +45,9 @@ ValAbs
 ALAB
 :AIL DR
 DR ALAB
-:AIL Inv:
+:AIL Inv
 ALAB Inv
-:AIL Mix:
+:AIL Mix
 ALAB Mez
 >:AUX2
 >:AUX3
@@ -64,22 +64,22 @@ Acerca de Deviation
 Avión
 :Alarm
 Alarma
->:Alarm intvl:
+>:Alarm intvl
 :Altitude
 Altitud
 >:Auto
 >:Aux2
-:Backlight:
-Iluminación:
+:Backlight
+Iluminación
 >:Bad/missing\nprotocol modules!
-:Bar %d:
-Barra %d:
-:Bars:
-Barras:
-:Batt alarm:
-Alarma bat:
-:Battery alarm:
-Alarma Batería:
+:Bar %d
+Barra %d
+:Bars
+Barras
+:Batt alarm
+Alarma bat
+:Battery alarm
+Alarma Batería
 :Battery too low,\ncan't save!
 Batería demadiado baja,\nno se puede grabar!
 :Bind
@@ -90,22 +90,22 @@ Emparejando
 Emparejamiento en curso...\nAsegurese de que el modelo está encendido\n\nPresionar OK NO cancelará el emparejado\npero le permitirá control completo de la emisora.
 :Binding...\nPress ENT to stop
 Emparejando...\nPulsar ENT para parar
-:Box %d:
-Caja%d:
+:Box %d
+Caja%d
 :Button monitor
 Monitor pulsadores
 >:Buzz settings
-:Buzz volume:
-Volumen Altavoz:
+:Buzz volume
+Volumen Altavoz
 >:Buzzer settings
 :COL
 PASO
 :COL Inv
 PASO Inv
->:COL Inv:
+>:COL Inv
 :COL Limit
 Paso Limite
-:COL Mix:
+:COL Mix
 Paso Mez
 :CYC
 Cíclico
@@ -120,7 +120,7 @@ Celsius
 :Center PW
 Centro PW
 :Center all \nsticks and knobs\nthen press ENT
-Centrar todos los\nsticks y ruedas \nentonces pulsar ENT 
+Centrar todos los\nsticks y ruedas \nentonces pulsar ENT
 :Ch
 Ch
 :Chan mode
@@ -136,16 +136,16 @@ Salida de canales
 Complejo
 :Configure
 Configurar
-:Contrast:
-Contraste:
+:Contrast
+Contraste
 :Copy To
 Copiar a
 :Copy To...
 Copiar a...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Nivel crítico de baterías detectado.\nLos ajustes no se grabarán.\nCualquier cambio futuro en los ajustes\nNO será grabado.\n\nCambie las baterías ahora!
-:Curve:
-Curva:
+:Curve
+Curva
 :Cyclic1
 Ciclico1
 :Cyclic2
@@ -166,10 +166,10 @@ Defecto
 Delta PW
 :Deviation FW version:
 Versión del FW Deviation:
-:Dimmer target:
-Atenuación final:
-:Dimmer time:
-Atenuación en:
+:Dimmer target
+Atenuación final
+:Dimmer time
+Atenuación en
 :Dn
 Aba
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -179,9 +179,9 @@ Abajo
 PROF
 :ELE DR
 DR PROF
-:ELE Inv:
-PROF Inv:
-:ELE Mix:
+:ELE Inv
+PROF Inv
+:ELE Mix
 PROF Mez
 :EXPO
 Exponencial
@@ -197,14 +197,14 @@ Expo&DR
 Fahren
 >:Fail safe
 >:Failsafe
-:Failsafe:
-Failsafe:
-:File:
-Archivo:
+:Failsafe
+Failsafe
+:File
+Archivo
 :Fixed
 Fijo
-:Fixed ID:
-ID Fijo:
+:Fixed ID
+ID Fijo
 >:Fly mode
 :Foot
 Pié
@@ -230,14 +230,14 @@ Valor Alto
 >:Hold position
 :Icon
 Icono
-:Icon:
+:Icon
 Icono
 >:Idle Up 1
 >:Idle Up 2
 :Input monitor
 Monitor entradas
-:Input:
-Entrada:
+:Input
+Entrada
 :Insert
 Insertar
 :Inverted
@@ -250,14 +250,14 @@ IZQUIERDA_H
 :LEFT_V
 IZQUIERDA_V
 >:LIN
-:Language:
-Lenguaje:
+:Language
+Lenguaje
 :Latitude
 Latitud
 :Left
 Izquierda
-:Length:
-Longitud:
+:Length
+Longitud
 :Linked
 Enlazado
 :Load
@@ -279,7 +279,7 @@ Página principal
 :Main page config
 Página configuración
 >:Manual
-:Max Limit:
+:Max Limit
 Límite max
 :Menu
 Menú
@@ -287,36 +287,36 @@ Menú
 Metro
 :Mid-Rate
 Valor Medio
-:Min Limit:
+:Min Limit
 Límite Min
 :Min/Max
 Min/Max
 :Mixer
 Mezclas
->:Mixer GUI:
-:Mixers:
-Mezcladores:
+>:Mixer GUI
+:Mixers
+Mezcladores
 >:Mode
 :Mode %d
 Modo %d
 :Model menu
 Menú modelo
-:Model name:
-Nombre del modelo:
+:Model name
+Nombre del modelo
 >:Model needs reset\nfor standard mixer
 >:Model needs to be reset\nin order to switch to the standard mixer
 :Model setup
 Ajustes del modelo
-:Model type:
-Tipo del modelo:
+:Model type
+Tipo del modelo
 :Move Down
 Mover Abajo
 :Move Up
 Mover Arriba
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 Mover sticks y ruedas\na posiciones Max y Min\ny pulsar ENT
-:Mux:
-Mezcla:
+:Mux
+Mezcla
 :Neg
 Neg.
 :New
@@ -335,57 +335,57 @@ Normal
 Notch PW
 :Off
 Apagado
-:Offset:
-Desvío:
+:Offset
+Desvío
 :Ok
 Ok
 :On
 On
 >:PIT
->:PIT Mix:
-:Page:
-Página:
+>:PIT Mix
+:Page
+Página
 >:Pitch curves
 :Plane
 Avión
-:Point:
-Punto:
+:Point
+Punto
 :Pos
 Pos.
->:Pos 0:
->:Pos 1:
->:Pos 2:
-:Pos/Neg:
-Pos/Neg:
+>:Pos 0
+>:Pos 1
+>:Pos 2
+:Pos/Neg
+Pos/Neg
 >:Position %d
 >:Power-down alert
-:Prealert intvl:
-Intervalo prealerta:
-:Prealert time:
-Tiempo prealerta:
-:Press 'Ent' to turn USB Filesystem:
-Pulsar 'Ent' para activar sistema archivos USB:
-:Press ENT to change:
-Pulsar ENT para cambiar:
-:Press ENT to copy to:
-Pulsar ENT para copiar a:
-:Press ENT to load:
-Pulsar ENT para cargar:
-:Press ENT to turn \nUSB drive:
-Pulsar ENT para activar la unidad USB:
+:Prealert intvl
+Intervalo prealerta
+:Prealert time
+Tiempo prealerta
+:Press 'Ent' to turn USB Filesystem
+Pulsar 'Ent' para activar sistema archivos USB
+:Press ENT to change
+Pulsar ENT para cambiar
+:Press ENT to copy to
+Pulsar ENT para copiar a
+:Press ENT to load
+Pulsar ENT para cargar
+:Press ENT to turn \nUSB drive
+Pulsar ENT para activar la unidad USB
 :Preview: Long-Press ENT
-Previsualizar: pulsación larga ENT 
-:Protocol:
-Protocolo:
->:PwrDn alert:
+Previsualizar: pulsación larga ENT
+:Protocol
+Protocolo
+>:PwrDn alert
 :RIGHT_H
 DERECHA_H
 :RIGHT_V
 DERECHA_V
 :RPM
 RPM
-:RPM:
-RPM:
+:RPM
+RPM
 :RUD
 COLA
 :RUD DR
@@ -397,27 +397,27 @@ Quitar
 :Reset
 Reiniciar
 >:Reset Permanent Timer?
->:Reset sw:
+>:Reset sw
 >:Reverse
-:Reverse:
-Inverso:
+:Reverse
+Inverso
 :Reversed
 Invertido
 :Revert
 Volver atrás
 :Right
 Derecha
-:Safe Val:
-Val. Seguro:
+:Safe Val
+Val. Seguro
 :Safety
 Seguridad
-:Safety:
-Seguridad:
+:Safety
+Seguridad
 :Save
 Guardar
-:Scale%s:
-Escala%s:
->:Scale:
+:Scale%s
+Escala%s
+>:Scale
 :Scanner
 Scanner
 >:Servo
@@ -427,38 +427,38 @@ Simple
 4Ch. Simple
 :Speed
 Velocidad
-:Speed:
-Velocidad:
+:Speed
+Velocidad
 :Src
 Origen
-:Src:
-Origen:
+:Src
+Origen
 >:Standard
 >:Standard Mixer
-:Start:
-Inicio:
-:Step:
-Paso:
+:Start
+Inicio
+:Step
+Paso
 :Stick input
 Posiciones sticks
-:Stick mode:
-Modo de vuelo:
-:Sticks:
-Sticks:
+:Stick mode
+Modo de vuelo
+:Sticks
+Sticks
 >:Sub-trim
 >:Subtrim
-:Subtrim:
-Subtrim:
+:Subtrim
+Subtrim
 >:Swash
-:SwashType:
-Plato:
+:SwashType
+Plato
 >:Switch assignment
 :Switch1
 Interr1
 :Switch2
 Interr2
-:Switch:
-Interruptor:
+:Switch
+Interruptor
 :Symmetric
 Simétrico
 :THR
@@ -504,10 +504,10 @@ Monitor telemetría
 Ajustes telemetría
 :Temp
 Temp
-:Temp:
-Temp:
-:Temperature:
-Temperatura:
+:Temp
+Temp
+:Temperature
+Temperatura
 :Template..
 Plantilla..
 :Test
@@ -521,20 +521,20 @@ Hora
 Temporiz
 :Timer settings
 Config. Timer
-:Timer%d:
+:Timer%d
 Temporiz%d
 :Timers
 Temporizadores
-:Timeup intvl:
-Duración:
+:Timeup intvl
+Duración
 :Toggle%d
 Indic%d
 :Touch Calibrate
 Calibración táctil
 :Touch Test
 Prueba táctil
-:Touch screen:
-Pantalla táctil:
+:Touch screen
+Pantalla táctil
 :Touch target %d
 Pulsar %d
 :Touch to Lock
@@ -548,40 +548,40 @@ Menú Emisora
 >:Travel adjust
 :Trim
 Trim
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Trim paso:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Trim paso
 :Trims
 Trims
-:Trims:
-Trims:
+:Trims
+Trims
 :Turn Off
 Apagar
 :Turn On
 Encender
-:Tx power:
-Potencia del TX:
+:Tx power
+Potencia del TX
 :USB
 USB
->:USB Filesystem is currently 
+>:USB Filesystem is currently
 :Unknown
 Desconocido
 :Up
 Arriba
 >:Value
-:Value:
-Valor:
-:Vibration:
+:Value
+Valor
+:Vibration
 Vibración
 :Virt
 Virt
 :Volt
 Volt
-:Volt:
-Volt:
+:Volt
+Volt
 :Zero/Max
 Zero/Max
 :\n%d seconds left

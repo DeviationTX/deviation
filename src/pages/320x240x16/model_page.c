@@ -54,37 +54,37 @@ void PAGE_ModelInit(int page)
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     row = 40;
-    GUI_CreateLabel(&gui->filelbl, 8, row, NULL, DEFAULT_FONT, _tr("File:"));
+    GUI_CreateLabel(&gui->filelbl, 8, row, NULL, DEFAULT_FONT, _tr("File"));
     GUI_CreateTextSelect(&gui->file, 136, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
 
     row+= 20;
-    GUI_CreateLabel(&gui->guilbl, 8, row, NULL, DEFAULT_FONT, _tr("Mixer GUI:"));
+    GUI_CreateLabel(&gui->guilbl, 8, row, NULL, DEFAULT_FONT, _tr("Mixer GUI"));
     GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->namelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model name:"));  // use the same naming convention for devo8 and devo10
+    GUI_CreateLabel(&gui->namelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model name"));  // use the same naming convention for devo8 and devo10
     GUI_CreateButton(&gui->name, 136, row, BUTTON_96x16, show_text_cb, 0x0000, _changename_cb, Model.name);
     GUI_CreateButton(&gui->icon, 236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
 
     row += 20;
-    GUI_CreateLabel(&gui->typelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model type:"));
+    GUI_CreateLabel(&gui->typelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model type"));
     GUI_CreateTextSelect(&gui->type, 136, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
 
     row += 24;
-    GUI_CreateLabel(&gui->ppmlbl, 8, row, NULL, DEFAULT_FONT, _tr("PPM In:"));
+    GUI_CreateLabel(&gui->ppmlbl, 8, row, NULL, DEFAULT_FONT, _tr("PPM In"));
     GUI_CreateTextSelect(&gui->ppm, 136, row, TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->protolbl, 8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
+    GUI_CreateLabel(&gui->protolbl, 8, row, NULL, DEFAULT_FONT, _tr("Protocol"));
     GUI_CreateTextSelect(&gui->proto, 136, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("# Channels:"));
+    GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("# Channels"));
     GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
 
 
     row += 24;
-    GUI_CreateLabel(&gui->pwrlbl, 8, row, NULL, DEFAULT_FONT, _tr("Tx power:"));
+    GUI_CreateLabel(&gui->pwrlbl, 8, row, NULL, DEFAULT_FONT, _tr("Tx power"));
     GUI_CreateTextSelect(&gui->pwr, 136, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
 
     row += 20;
@@ -92,7 +92,7 @@ void PAGE_ModelInit(int page)
         strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabel(&gui->fixedidlbl, 8, row, NULL, DEFAULT_FONT, _tr("Fixed ID:"));
+    GUI_CreateLabel(&gui->fixedidlbl, 8, row, NULL, DEFAULT_FONT, _tr("Fixed ID"));
     GUI_CreateButton(&gui->fixedid, 136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
     GUI_CreateButton(&gui->bind, 236, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
     configure_bind_button();

@@ -79,7 +79,7 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, _tr("Box %d:"), i+1);
+    sprintf(str, _tr("Box %d"), i+1);
     return str;
 }
 
@@ -104,7 +104,7 @@ const char *barlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, _tr("Bar %d:"), i+1);
+    sprintf(str, _tr("Bar %d"), i+1);
     return str;
 }
 
@@ -335,7 +335,7 @@ const char *menulabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    sprintf(str, "%s %d:", _tr("Menu"), (int)i+1);
+    sprintf(str, "%s %d", _tr("Menu"), (int)i+1);
     return str;
 }
 

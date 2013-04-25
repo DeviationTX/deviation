@@ -1,8 +1,8 @@
 ﻿Russian
-:# Channels:
-Каналы:
-|devo8:# Channels:
-Количество каналов:
+:# Channels
+Каналы
+|devo8:# Channels
+Количество каналов
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, безопасное значение = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -51,10 +51,10 @@
 ЭЛ.ДР
 |devo8:AIL DR
 Элер ДР
-:AIL Inv:
-Элер Инв:
-:AIL Mix:
-Элер Микш:
+:AIL Inv
+Элер Инв
+:AIL Mix
+Элер Микш
 :AUX2
 AUX2
 :AUX3
@@ -75,28 +75,28 @@ AUX7
 Самолет
 :Alarm
 Сигнал
-:Alarm intvl:
-Интервал:
+:Alarm intvl
+Интервал
 :Altitude
 Высота
 :Auto
 Авто
 :Aux2
 Aux2
-:Backlight:
-Подсветка:
+:Backlight
+Подсветка
 :Bad/missing\nprotocol modules!
 Ошибочные/отсутствующие\nмодули протоколов!
-:Bar %d:
+:Bar %d
 Полоса%d
-:Bars:
-Полоса:
-:Batt alarm:
-Сигнал бат.:
-|devo8:Batt alarm:
-Сигнал батареи:
-:Battery alarm:
-Сигнал батареи:
+:Bars
+Полоса
+:Batt alarm
+Сигнал бат.
+|devo8:Batt alarm
+Сигнал батареи
+:Battery alarm
+Сигнал батареи
 :Battery too low,\ncan't save!
 Батарея разряжена,\nсохранение невозможно!
 :Bind
@@ -107,28 +107,28 @@ Aux2
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Binding...\nPress ENT to stop
 Привязка...\nENT для остановки
-:Box %d:
-Бокс %d:
+:Box %d
+Бокс %d
 :Button monitor
 Монитор кнопок
 :Buzz settings
 Настройки сигнала
-:Buzz volume:
-Громкость:
+:Buzz volume
+Громкость
 :Buzzer settings
 Настройки сигнала
 :COL
 Колл
 :COL Inv
-Колл Инв:
-:COL Inv:
-Колл Инв:
+Колл Инв
+:COL Inv
+Колл Инв
 :COL Limit
 Колл Предел
 |devo8:COL Limit
-Колл Предел:
-:COL Mix:
-Колл Микш:
+Колл Предел
+:COL Mix
+Колл Микш
 :CYC
 Цикл
 :Calibrate
@@ -148,11 +148,11 @@ Aux2
 |devo8:Center all \nsticks and knobs\nthen press ENT
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
-Канал 
+Канал
 :Chan mode
-Реж. канала:
+Реж. канала
 |devo8:Chan mode
-Режим канала:
+Режим канала
 :Change
 Изменить
 :Channel
@@ -165,16 +165,16 @@ Aux2
 Комплекс
 :Configure
 Настройки передатчика
-:Contrast:
-Контраст:
+:Contrast
+Контраст
 :Copy To
 Копир. в
 :Copy To...
 Копир. в...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Обнаружен критический разряд батареи.\nНастройки сохранены.\nДальнейшие изменения настроек\nне будут сохраняться.\n\nНемедленно замените батарею!
-:Curve:
-Кривая:
+:Curve
+Кривая
 :Cyclic1
 Цикл1
 :Cyclic2
@@ -199,10 +199,10 @@ Aux2
 Дельта ШИ
 :Deviation FW version:
 Версия Deviation:
-:Dimmer target:
-Гашение до:
-:Dimmer time:
-Время гашения:
+:Dimmer target
+Гашение до
+:Dimmer time
+Время гашения
 :Dn
 Вниз
 :Do you really want\nto reset the\n permanent timer %d?
@@ -215,14 +215,14 @@ Aux2
 РВ.ДР
 |devo8:ELE DR
 РВыс ДР
-:ELE Inv:
-РВыс Инв:
-:ELE Mix:
-РВыс Микш:
+:ELE Inv
+РВыс Инв
+:ELE Mix
+РВыс Микш
 :EXPO
 Экспо.
 :Enabled
-Вкл.:
+Вкл.
 :Enter
 Ввод
 :Exit
@@ -245,18 +245,18 @@ F°
 Отказоустойчивость
 :Failsafe
 Отказоуст.
-:Failsafe:
-Отказоуст.:
-|devo8:Failsafe:
-Отказоустойчивость:
-:File:
-Файл:
+:Failsafe
+Отказоуст.
+|devo8:Failsafe
+Отказоустойчивость
+:File
+Файл
 :Fixed
 Фиксир.
-:Fixed ID:
-Фиксир.ID:
-|devo8:Fixed ID:
-Фиксированный ID:
+:Fixed ID
+Фиксир.ID
+|devo8:Fixed ID
+Фиксированный ID
 :Fly mode
 Пол.режим
 |devo8:Fly mode
@@ -295,16 +295,16 @@ HOLD
 Положение
 :Icon
 Значок
-:Icon:
-Значок:
+:Icon
+Значок
 :Idle Up 1
 Пилотаж 1
 :Idle Up 2
 Пилотаж 2
 :Input monitor
 Монитор ввода
-:Input:
-Ввод:
+:Input
+Ввод
 :Insert
 Вставить
 :Inverted
@@ -319,14 +319,14 @@ L
 ЛЕВЫЙ_В
 :LIN
 Линейно
-:Language:
-Язык:
+:Language
+Язык
 :Latitude
 Широта
 :Left
 Влево
-:Length:
-Длина:
+:Length
+Длина
 :Linked
 Связанный
 :Load
@@ -353,10 +353,10 @@ M
 Главная страница
 :Manual
 Вручную
-:Max Limit:
-Макс.предел:
-|devo8:Max Limit:
-Макс. предел:
+:Max Limit
+Макс.предел
+|devo8:Max Limit
+Макс. предел
 :Menu
 Меню
 :Meter
@@ -365,44 +365,44 @@ M
 Ср.расход
 |devo8:Mid-Rate
 Средний расход
-:Min Limit:
-Мин.предел:
-|devo8:Min Limit:
-Мин. предел:
+:Min Limit
+Мин.предел
+|devo8:Min Limit
+Мин. предел
 :Min/Max
 Мин/Макс
 :Mixer
 Микшер
-:Mixer GUI:
-Интерфейс:
-|devo8:Mixer GUI:
-Интерфейс микшеров:
-:Mixers:
-Микшер:
+:Mixer GUI
+Интерфейс
+|devo8:Mixer GUI
+Интерфейс микшеров
+:Mixers
+Микшер
 :Mode
-Режим:
+Режим
 :Mode %d
 Режим %d
 :Model menu
 Меню модели
-:Model name:
-Имя модели:
+:Model name
+Имя модели
 :Model needs reset\nfor standard mixer
 Модель требует сброса\nдля стандартных микшеров
 :Model needs to be reset\nin order to switch to the standard mixer
 Модель требует сброса\nдля переключения к стандартным микшерам
 :Model setup
 Модель
-:Model type:
-Тип модели:
+:Model type
+Тип модели
 :Move Down
 Вниз
 :Move Up
 Вверх
 :Move sticks and knobs\nto Max & Min positions\nthen press ENT
 Переместите стики и ручки\nв максимум и минимум,\nзатем нажмите ENT
-:Mux:
-Мульт:
+:Mux
+Мульт
 :Neg
 -
 :New
@@ -421,75 +421,75 @@ M
 Пауза ШИ
 :Off
 Выкл
-:Offset:
-Смещ.:
+:Offset
+Смещ.
 :Ok
 ОK
 :On
 Вкл
 :PIT
 Шаг
-:PIT Mix:
-Шаг Микш:
-:Page:
-Стр.:
+:PIT Mix
+Шаг Микш
+:Page
+Стр.
 :Pitch curves
 Кривые шага
 :Plane
 Самолет
-:Point:
-Точка:
+:Point
+Точка
 :Pos
 +
-:Pos 0:
-Поз.0:
-:Pos 1:
-Поз.1:
-:Pos 2:
-Поз.2:
-:Pos/Neg:
-+/-:
+:Pos 0
+Поз.0
+:Pos 1
+Поз.1
+:Pos 2
+Поз.2
+:Pos/Neg
++/-
 :Position %d
 Положение %d
 :Power-down alert
-Сигнал выкл.:
-:Prealert intvl:
-Интерв. перед:
-|devo8:Prealert intvl:
-Интервалы перед:
-:Prealert time:
-Вр. до сигнала:
-|devo8:Prealert time:
-Время до сигнала:
-:Press 'Ent' to turn USB Filesystem:
-Нажмите 'Ent' для перевода файловой\nсистемы USB в состояние: 
-:Press ENT to change:
-ENT для изменения:
-|devo8:Press ENT to change:
-Нажмите ENT для изменения:
-:Press ENT to copy to:
-ENT для копирования в:
-|devo8:Press ENT to copy to:
-Нажмите ENT для копирования в:
-:Press ENT to load:
-ENT для загрузки:
-|devo8:Press ENT to load:
-Нажмите ENT для загрузки:
-:Press ENT to turn \nUSB drive:
-Нажмите ENT для\nперевода USB диска\nв состояние: 
+Сигнал выкл.
+:Prealert intvl
+Интерв. перед
+|devo8:Prealert intvl
+Интервалы перед
+:Prealert time
+Вр. до сигнала
+|devo8:Prealert time
+Время до сигнала
+:Press 'Ent' to turn USB Filesystem
+Нажмите 'Ent' для перевода файловой\nсистемы USB в состояние
+:Press ENT to change
+ENT для изменения
+|devo8:Press ENT to change
+Нажмите ENT для изменения
+:Press ENT to copy to
+ENT для копирования в
+|devo8:Press ENT to copy to
+Нажмите ENT для копирования в
+:Press ENT to load
+ENT для загрузки
+|devo8:Press ENT to load
+Нажмите ENT для загрузки
+:Press ENT to turn \nUSB drive
+Нажмите ENT для\nперевода USB диска\nв состояние
 :Preview: Long-Press ENT
 Просмотр: дл.нажатие ENT
-:Protocol:
-Протокол:
-:PwrDn alert:
-Сигнал выкл.:
+:Protocol
+Протокол
+:PwrDn alert
+Сигнал выкл.
 :RIGHT_H
 ПРАВЫЙ_Г
 :RIGHT_V
 ПРАВЫЙ_В
 :RPM
 RPM
-:RPM:
+:RPM
 RPM
 :RUD
 РНап
@@ -504,39 +504,39 @@ RPM
 :Remove
 Удалить
 :Reset
-Сброс:
+Сброс
 :Reset Permanent Timer?
 Сбросить интегральный таймер?
-:Reset sw:
-Сброс:
+:Reset sw
+Сброс
 :Reverse
 Реверс
-:Reverse:
-Реверс:
+:Reverse
+Реверс
 :Reversed
 Реверс
 :Revert
 Отменить
 :Right
 Вправо
-:Safe Val:
-Безоп.знач.:
-|devo8:Safe Val:
-Безопасное значение:
+:Safe Val
+Безоп.знач.
+|devo8:Safe Val
+Безопасное значение
 :Safety
 Безопасность
-:Safety:
-Безопасн.:
-|devo8:Safety:
-Безопасность:
+:Safety
+Безопасн.
+|devo8:Safety
+Безопасность
 :Save
 Сохр.
 |devo8:Save
 Сохранить
-:Scale%s:
-Масшт.%s:
-:Scale:
-Масшт.:
+:Scale%s
+Масшт.%s
+:Scale
+Масшт.
 :Scanner
 Сканер
 :Servo
@@ -547,46 +547,46 @@ RPM
 Простой 4-канала
 :Speed
 Скорость
-:Speed:
-Скорость:
+:Speed
+Скорость
 :Src
 Источник
-:Src:
-Источник:
+:Src
+Источник
 :Standard
 Стандарт
 :Standard Mixer
 Стандартный микшер
-:Start:
-Время:
-:Step:
-Шаг:
+:Start
+Время
+:Step
+Шаг
 :Stick input
 Вводы
-:Stick mode:
-Режим стиков:
-:Sticks:
-Стики:
+:Stick mode
+Режим стиков
+:Sticks
+Стики
 :Sub-trim
 Субтриммер
 :Subtrim
 Субтриммер
-:Subtrim:
-Субтриммер:
+:Subtrim
+Субтриммер
 :Swash
 Автомат перекоса
-:SwashType:
-Тип авт.пер.:
-|devo8:SwashType:
-Тип авт.перекоса:
+:SwashType
+Тип авт.пер.
+|devo8:SwashType
+Тип авт.перекоса
 :Switch assignment
 Переключатели
 :Switch1
 Перекл.1
 :Switch2
 Перекл.2
-:Switch:
-Перекл.:
+:Switch
+Перекл.
 :Symmetric
 Симметр.
 :THR
@@ -633,10 +633,10 @@ RPM
 Настройки телеметрии
 :Temp
 Темп.
-:Temp:
-Темп.:
-:Temperature:
-Температура:
+:Temp
+Темп.
+:Temperature
+Температура
 :Template..
 Шаблон...
 :Test
@@ -655,22 +655,22 @@ RPM
 Таймер
 :Timer settings
 Настройки таймера
-:Timer%d:
-Таймер%d:
+:Timer%d
+Таймер%d
 :Timers
 Таймеры
-:Timeup intvl:
-Интерв. после:
-|devo8:Timeup intvl:
-Интервалы после:
+:Timeup intvl
+Интерв. после
+|devo8:Timeup intvl
+Интервалы после
 :Toggle%d
 Перекл%d
 :Touch Calibrate
 Калибровка экрана
 :Touch Test
 Нажать тест
-:Touch screen:
-Сенсорн. экран:
+:Touch screen
+Сенсорн. экран
 :Touch target %d
 Нажать цель %d
 :Touch to Lock
@@ -685,44 +685,44 @@ RPM
 Расходы
 :Trim
 Триммер
-:Trim +:
-Трим+:
-:Trim -:
-Трим-:
-:Trim Step:
-Шаг тримм.:
-|devo8:Trim Step:
-Шаг триммера:
+:Trim +
+Трим+
+:Trim -
+Трим-
+:Trim Step
+Шаг тримм.
+|devo8:Trim Step
+Шаг триммера
 :Trims
 Триммер
-:Trims:
-Триммер:
+:Trims
+Триммер
 :Turn Off
 Выключить
 :Turn On
 Включить
-:Tx power:
-Мощность:
+:Tx power
+Мощность
 :USB
 USB
-:USB Filesystem is currently 
-Файловая система сейчас: 
+:USB Filesystem is currently
+Файловая система сейчас
 :Unknown
 Неизвестный
 :Up
 Вверх
 :Value
 Значение
-:Value:
-Значение:
-:Vibration:
-Вибрация:
+:Value
+Значение
+:Vibration
+Вибрация
 :Virt
-Вирт. 
+Вирт.
 :Volt
 Вольт
-:Volt:
-Вольт:
+:Volt
+Вольт
 :Zero/Max
 Ноль/Макс
 :\n%d seconds left
