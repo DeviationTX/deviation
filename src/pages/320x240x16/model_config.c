@@ -93,17 +93,20 @@ void MODELTRAIN_Config()
                   ? _tr("Trainer Config")
                   : _tr("PPMIn Config"));
     int row = 40;
-    GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
-    GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
-    row += 20;
-    GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
-    GUI_CreateTextSelect(&gui->trainsw, 136, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
+    if (PPMin_Mode() == 1) {
+        GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
+        GUI_CreateTextSelect(&gui->trainsw, 136, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
+    } else {
+        GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
+        GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
+    }
     row += 20;
     GUI_CreateLabel(&gui->centerpwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Center PW"));
     GUI_CreateTextSelect(&gui->centerpw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)1L);
     row += 20;
     GUI_CreateLabel(&gui->deltapwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Delta PW"));
     GUI_CreateTextSelect(&gui->deltapw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)2L);
+    row += 20;
  
     if ((Model.num_ppmin & 0xC0) != 0x40)
         return;

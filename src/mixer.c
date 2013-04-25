@@ -163,18 +163,12 @@ void MIXER_CalcChannels()
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
         if ((Model.num_ppmin & 0xC0) && Model.train_sw && raw[Model.train_sw] > 0) {
-            int match;
-            for (int j = 0; j < ppmin_num_channels; j++) {
-                if (Model.ppm_map[j] ==  i) {
-                    match = 1;
-                    if (ppmSync) {
-                        Channels[i] = ppmChannels[j];
-                    }
-                    break;
+            if (Model.ppm_map[i] >= 0 && Model.ppm_map[i] < ppmin_num_channels) {
+                if (ppmSync) {
+                    Channels[i] = ppmChannels[Model.ppm_map[i]];
                 }
-            }
-            if (match)
                 continue;
+            }
         }
         Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, Channels, APPLY_ALL);
     }

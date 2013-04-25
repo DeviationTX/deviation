@@ -153,23 +153,24 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
 
     switch (absrow) {
     case 0:
-        label = _tr_noop("Num Channels");
-        ts = set_train_cb; ts_data = (void *)0L;
-        break;
-    case 1:
-        label = _tr_noop("Trainer Sw");
-        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
-        break;
-    case 2:
         label = _tr_noop("Center PW");
         ts = set_train_cb; ts_data = (void *)1L;
         break;
-    case 3:
+    case 1:
         label = _tr_noop("Delta PW");
         ts = set_train_cb; ts_data = (void *)2L;
         break;
+    case 2:
+        if (PPMin_Mode() == 1) {
+            label = _tr_noop("Trainer Sw");
+            ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
+        } else {
+            label = _tr_noop("Num Channels");
+            ts = set_train_cb; ts_data = (void *)0L;
+        }
+        break;
     default:
-        label_cmd = input_chname_cb; label = (void *)((long)absrow - 4);
+        label_cmd = input_chname_cb; label = (void *)((long)absrow - 3);
         ts = set_chmap_cb; ts_data = label;
         break;
     }
@@ -211,6 +212,6 @@ void MODELTRAIN_Config()
                   ? _tr("Trainer Config")
                   : _tr("PPMIn Config"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, (Model.num_ppmin & 0xC0) == 0x40 ? 4 + MAX_PPM_IN_CHANNELS : 4, row3_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, PPMin_Mode() == 1 ? 3 + MAX_PPM_IN_CHANNELS : 3, row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
