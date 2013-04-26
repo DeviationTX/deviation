@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use integer;
+
 use Getopt::Long;
 
 my $target;
@@ -78,6 +80,7 @@ exit($error);
 
 sub fnv {
     my($str) = @_;
+    my $orig_str = $str;
     $str =~ s/\\n/\n/g;
     my $hval = 0x811c9dc5;
     # FNV-1 hash each octet in the buffer
@@ -92,7 +95,8 @@ sub fnv {
     }
 
     #/* fold to 16bits (don't do this if you want 32bits */
-    $hval = ($hval>>16) ^ ($hval & (1<<16)-1);
+    $hval = 0xFFFF & (($hval>>16) ^ ($hval & (1<<16)-1));
     #/* return our new hash value */
+    #printf "%5d: %s\n", $hval, $orig_str;
     return $hval;
 }
