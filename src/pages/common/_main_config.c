@@ -89,7 +89,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     u8 i = (long)data;
     u8 changed;
     int old_val = Model.pagecfg.box[i];
-    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
+    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed && (old_val == 0 || Model.pagecfg.box[i] == 0))
         _update_preview();
     if (Model.pagecfg.box[i]) {
