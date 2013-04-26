@@ -26,12 +26,12 @@ s16 CHAN_ReadInput(int channel)
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
         case INP_AUX4:     return CHAN_MIN_VALUE + step * gui.aux4;
         case INP_AUX5:     return CHAN_MIN_VALUE + step * gui.aux5;
-        case INP_RUD_DR0:  return gui.rud_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_RUD_DR1:  return gui.rud_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_ELE_DR0:  return gui.ele_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_ELE_DR1:  return gui.ele_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_AIL_DR0:  return gui.ail_dr ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_AIL_DR1:  return gui.ail_dr ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_RUD_DR0:  return (gui.rud_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_RUD_DR1:  return (gui.rud_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_ELE_DR0:  return (gui.ele_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_ELE_DR1:  return (gui.ele_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_AIL_DR0:  return (gui.ail_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_AIL_DR1:  return (gui.ail_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_GEAR0:    return gui.gear   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
         case INP_GEAR1:    return gui.gear   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_MIX0:     return gui.mix == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
