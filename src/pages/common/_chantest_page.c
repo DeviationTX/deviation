@@ -17,7 +17,6 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
-static void _show_bar_page(u8 num_bars);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 

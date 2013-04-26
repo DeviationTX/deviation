@@ -13,6 +13,7 @@ struct chantest_obj {
     guiLabel_t chan[NUM_CHANNELS];
     guiLabel_t value[MAX_IDX];
     guiBarGraph_t bar[MAX_IDX];
+    guiScrollbar_t scrollbar;
 };
 
 struct lang_obj {
