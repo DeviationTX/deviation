@@ -121,8 +121,6 @@ Aux2
 Колл
 :COL Inv
 Колл Инв
-:COL Inv
-Колл Инв
 :COL Limit
 Колл Предел
 |devo8:COL Limit
@@ -149,6 +147,10 @@ Aux2
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал
+:Ch %d
+Канал %d
+:Ch%d
+Канал %d
 :Chan mode
 Реж. канала
 |devo8:Chan mode
@@ -245,8 +247,6 @@ F°
 Отказоустойчивость
 :Failsafe
 Отказоуст.
-:Failsafe
-Отказоуст.
 |devo8:Failsafe
 Отказоустойчивость
 :File
@@ -295,16 +295,14 @@ HOLD
 Положение
 :Icon
 Значок
-:Icon
-Значок
 :Idle Up 1
 Пилотаж 1
 :Idle Up 2
 Пилотаж 2
-:Input monitor
-Монитор ввода
 :Input
 Ввод
+:Input monitor
+Монитор ввода
 :Insert
 Вставить
 :Inverted
@@ -419,6 +417,10 @@ M
 Норма
 :Notch PW
 Пауза ШИ
+:Num Channels
+Каналы
+|devo8:Num Channels
+Количество каналов
 :Off
 Выкл
 :Offset
@@ -431,6 +433,12 @@ M
 Шаг
 :PIT Mix
 Шаг Микш
+:PPM
+PPM
+:PPM In
+PPM-Вход
+:PPMIn Config
+Настройка PPM-Вход
 :Page
 Стр.
 :Pitch curves
@@ -489,8 +497,6 @@ ENT для загрузки
 ПРАВЫЙ_В
 :RPM
 RPM
-:RPM
-RPM
 :RUD
 РНап
 |devo8:RUD
@@ -511,8 +517,6 @@ RPM
 Сброс
 :Reverse
 Реверс
-:Reverse
-Реверс
 :Reversed
 Реверс
 :Revert
@@ -524,8 +528,6 @@ RPM
 |devo8:Safe Val
 Безопасное значение
 :Safety
-Безопасность
-:Safety
 Безопасн.
 |devo8:Safety
 Безопасность
@@ -533,10 +535,10 @@ RPM
 Сохр.
 |devo8:Save
 Сохранить
-:Scale%s
-Масшт.%s
 :Scale
 Масшт.
+:Scale%s
+Масшт.%s
 :Scanner
 Сканер
 :Servo
@@ -547,10 +549,6 @@ RPM
 Простой 4-канала
 :Speed
 Скорость
-:Speed
-Скорость
-:Src
-Источник
 :Src
 Источник
 :Standard
@@ -571,22 +569,20 @@ RPM
 Субтриммер
 :Subtrim
 Субтриммер
-:Subtrim
-Субтриммер
 :Swash
 Автомат перекоса
 :SwashType
 Тип авт.пер.
 |devo8:SwashType
 Тип авт.перекоса
+:Switch
+Перекл.
 :Switch assignment
 Переключатели
 :Switch1
 Перекл.1
 :Switch2
 Перекл.2
-:Switch
-Перекл.
 :Symmetric
 Симметр.
 :THR
@@ -633,8 +629,6 @@ RPM
 Настройки телеметрии
 :Temp
 Темп.
-:Temp
-Темп.
 :Temperature
 Температура
 :Template..
@@ -677,6 +671,14 @@ RPM
 Нажать для блокировки
 :Touch to Unlock
 Нажать для разблокировки
+:Train
+Тренер
+:Trainer Config
+Тренер
+:Trainer Sw
+Пер.тренера
+|devo8:Trainer Sw
+Перекл. тренера
 :Transmitter config
 Передатчик
 :Transmitter menu
@@ -695,8 +697,6 @@ RPM
 Шаг триммера
 :Trims
 Триммер
-:Trims
-Триммер
 :Turn Off
 Выключить
 :Turn On
@@ -705,22 +705,18 @@ RPM
 Мощность
 :USB
 USB
-:USB Filesystem is currently
-Файловая система сейчас
+:USB Filesystem is currently 
+Файловая система сейчас 
 :Unknown
 Неизвестный
 :Up
 Вверх
 :Value
 Значение
-:Value
-Значение
 :Vibration
 Вибрация
 :Virt
 Вирт.
-:Volt
-Вольт
 :Volt
 Вольт
 :Zero/Max
