@@ -313,8 +313,8 @@ Tipo del modelo
 Mover Abajo
 :Move Up
 Mover Arriba
-:Move sticks and knobs\nto Max & Min positions\nthen press ENT
-Mover sticks y ruedas\na posiciones Max y Min\ny pulsar ENT
+:Move sticks and knobs\nto max & min positions\nthen press ENT
+Mover sticks y ruedas\na posiciones max y min\ny pulsar ENT
 :Mux
 Mezcla
 :Neg

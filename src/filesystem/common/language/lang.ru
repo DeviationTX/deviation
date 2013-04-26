@@ -399,7 +399,7 @@ M
 Вниз
 :Move Up
 Вверх
-:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+:Move sticks and knobs\nto max & min positions\nthen press ENT
 Переместите стики и ручки\nв максимум и минимум,\nзатем нажмите ENT
 :Mux
 Мульт

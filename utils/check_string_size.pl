@@ -11,6 +11,7 @@ my @dirs = grep {$_ !~ /common/ && (! $target || $_ =~ /$target/)} glob("filesys
 my $max_line_length = 0;
 my $max_bytes = 0;
 my $max_count = 0;
+my $error = 0;
 foreach my $target_dir (@dirs) {
     my($target) = ($target_dir =~ /\/(.*)/);
     my @langfiles = glob("$target_dir/language/*");
@@ -18,8 +19,10 @@ foreach my $target_dir (@dirs) {
     my $target_count = 0;
     my $target_line_length = 0;
     foreach my $file (@langfiles) {
+        my %hash;
         open my $fh, "<", $file || die("Couldn't read $file\n");
         my @lines = <$fh>;
+        foreach (@lines) { chomp; }
         close $fh;
         shift @lines;
         my $bytes = 0;
@@ -27,6 +30,13 @@ foreach my $target_dir (@dirs) {
         my $line_length = 0;
         for (my $idx = 0; $idx < $#lines; $idx++) {
             if($lines[$idx] =~ /^:/) {
+                my $hashval = fnv(substr($lines[$idx], 1));
+                if($hash{$hashval}) {
+                    print "Found hash collision between:\n    $hash{$hashval}\n    " . substr($lines[$idx], 1) . "\n";
+                    $error = 1;
+                }
+                #printf "%6d: %s\n", $hashval, substr($lines[$idx], 1);
+                $hash{$hashval} ||= substr($lines[$idx], 1);
                 my $len = length($lines[$idx+1]) + 1; #Count the NULL too
                 $bytes += $len;
                 $line_length = $len if($len > $line_length);
@@ -63,5 +73,26 @@ while(<$fh>) {
     }
 }
 printf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", "Allocated", $allowed_count, $allowed_bytes, $allowed_line_length) if(! $quiet);
-my $ok = ($allowed_line_length >= $max_line_length && $allowed_count >= $max_count && $allowed_bytes >= $max_bytes);
-exit(! $ok);
+$error |= ($allowed_line_length < $max_line_length || $allowed_count < $max_count || $allowed_bytes < $max_bytes);
+exit($error);
+
+sub fnv {
+    my($str) = @_;
+    $str =~ s/\\n/\n/g;
+    my $hval = 0x811c9dc5;
+    # FNV-1 hash each octet in the buffer
+    my @s = split(//, $str);
+    foreach (@s) {
+	#/* multiply by the 32 bit FNV magic prime mod 2^32 */
+	$hval += ($hval<<1) + ($hval<<4) + ($hval<<7) + ($hval<<8) + ($hval<<24);
+        $hval &= 0xFFFFFFFF;
+
+	#/* xor the bottom with the current octet */
+	$hval ^= ord($_);
+    }
+
+    #/* fold to 16bits (don't do this if you want 32bits */
+    $hval = ($hval>>16) ^ ($hval & (1<<16)-1);
+    #/* return our new hash value */
+    return $hval;
+}
