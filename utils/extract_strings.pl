@@ -20,7 +20,7 @@ if($target && ! exists $targetmap{$target}) {
     print "Target must be one of: @t\n";
     exit 1;
 }
-exit 0 if(! $targetmap{$target});
+exit 0 if($target && ! $targetmap{$target});
 
 my @lines = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @files;

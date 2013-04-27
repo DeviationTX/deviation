@@ -110,6 +110,8 @@ void Init() {
     BACKLIGHT_Brightness(1);
     AUTODIMMER_Init();
     SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+
+    PPMin_TIM_Init();
 #ifdef MODULAR
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;

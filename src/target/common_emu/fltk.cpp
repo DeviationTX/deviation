@@ -141,13 +141,13 @@ public:
                 gui.gear = ! gui.gear;
                 return 1;
             case 'x':
-                gui.rud_dr = ! gui.rud_dr;
+                gui.rud_dr = (gui.rud_dr + 1) % 6;
                 return 1;
             case 'c':
-                gui.ele_dr = ! gui.ele_dr;
+                gui.ele_dr = (gui.ele_dr + 1) % 6;
                 return 1;
             case 'v':
-                gui.ail_dr = ! gui.ail_dr;
+                gui.ail_dr = (gui.ail_dr + 1) % 6;
                 return 1;
             case 'b':
                 gui.mix = (gui.mix + 1) % 3;

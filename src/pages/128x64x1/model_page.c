@@ -74,27 +74,27 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
     switch(absrow) {
         case ITEM_FILE:
-            label = _tr_noop("File:");
+            label = _tr_noop("File");
             ts_tgl = file_press_cb; ts_value = file_val_cb;
             break;
         case ITEM_NAME:
-            label = _tr_noop("Model name:");
+            label = _tr_noop("Model name");
             but_txt = show_text_cb; but_tgl = _changename_cb; but_data = Model.name;
             break;
         case ITEM_ICON:
-            label = _tr_noop("Icon:");
+            label = _tr_noop("Icon");
             but_txt = show_icontext_cb; but_tgl = changeicon_cb;
             break;
         case ITEM_TYPE:
-            label = _tr_noop("Model type:");
+            label = _tr_noop("Model type");
             ts_tgl = type_press_cb; ts_value = type_val_cb;
             break;
         case ITEM_TXPOWER:
-            label = _tr_noop("Tx power:");
+            label = _tr_noop("Tx power");
             ts_value = powerselect_cb;
             break;
         case ITEM_PPMIN:
-            label = _tr_noop("PPM In:");
+            label = _tr_noop("PPM In");
             ts_tgl = ppmin_press_cb; ts_value = ppmin_select_cb;
             break;
         case ITEM_PROTO:
@@ -102,16 +102,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             but_txt = show_bindtext_cb; but_tgl = bind_cb;
             break;
         case ITEM_FIXEDID:
-            label = _tr_noop("Fixed ID:");
+            label = _tr_noop("Fixed ID");
             but_txt = show_text_cb; but_tgl = fixedid_cb; but_data = mp->fixed_id;
             break;
         case ITEM_NUMCHAN:
-            label = _tr_noop("# Channels:");
+            label = _tr_noop("# Channels");
             ts_value = numchanselect_cb;
             break;
 #if !defined(NO_STANDARD_GUI)
         case ITEM_GUI:
-            label = _tr_noop("Mixer GUI:");
+            label = _tr_noop("Mixer GUI");
             ts_value = mixermode_cb;
             break;
 #endif

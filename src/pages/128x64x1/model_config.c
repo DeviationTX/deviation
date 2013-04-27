@@ -58,31 +58,31 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     switch(absrow) {
         case ITEM_SWASHTYPE:
-            label = _tr("SwashType:");
+            label = _tr("SwashType");
             value = swash_val_cb;
             break;
         case ITEM_ELEINV:
-            label = _tr("ELE Inv:");
+            label = _tr("ELE Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)1L;
             break;
         case ITEM_AILINV:
-            label = _tr("AIL Inv:");
+            label = _tr("AIL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)2L;
             break;
         case ITEM_COLINV:
-            label = _tr("COL Inv:");
+            label = _tr("COL Inv");
             tgl = swashinv_press_cb; value = swashinv_val_cb; data = (void *)4L;
             break;
         case ITEM_ELEMIX:
-            label = _tr("ELE Mix:");
+            label = _tr("ELE Mix");
             value = swashmix_val_cb; data = (void *)1L;
             break;
         case ITEM_AILMIX:
-            label = _tr("AIL Mix:");
+            label = _tr("AIL Mix");
             value = swashmix_val_cb; data = (void *)0L;
             break;
         case ITEM_COLMIX:
-            label = _tr("COL Mix:");
+            label = _tr("COL Mix");
             value = swashmix_val_cb; data = (void *)2L;
             break;
     }
@@ -153,23 +153,24 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
 
     switch (absrow) {
     case 0:
-        label = _tr_noop("Num Channels");
-        ts = set_train_cb; ts_data = (void *)0L;
-        break;
-    case 1:
-        label = _tr_noop("Trainer Sw");
-        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
-        break;
-    case 2:
         label = _tr_noop("Center PW");
         ts = set_train_cb; ts_data = (void *)1L;
         break;
-    case 3:
+    case 1:
         label = _tr_noop("Delta PW");
         ts = set_train_cb; ts_data = (void *)2L;
         break;
+    case 2:
+        if (PPMin_Mode() == 1) {
+            label = _tr_noop("Trainer Sw");
+            ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
+        } else {
+            label = _tr_noop("Num Channels");
+            ts = set_train_cb; ts_data = (void *)0L;
+        }
+        break;
     default:
-        label_cmd = input_chname_cb; label = (void *)((long)absrow - 4);
+        label_cmd = input_chname_cb; label = (void *)((long)absrow - 3);
         ts = set_chmap_cb; ts_data = label;
         break;
     }
@@ -211,6 +212,6 @@ void MODELTRAIN_Config()
                   ? _tr("Trainer Config")
                   : _tr("PPMIn Config"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, (Model.num_ppmin & 0xC0) == 0x40 ? 4 + MAX_PPM_CHANNELS : 4, row3_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, PPMin_Mode() == 1 ? 3 + MAX_PPM_IN_CHANNELS : 3, row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

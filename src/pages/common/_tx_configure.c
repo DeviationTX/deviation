@@ -87,7 +87,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     Transmitter.calibration[i].min = 0xFFFF;
                     Transmitter.calibration[i].zero = value;
                 }
-                sprintf(cp->tmpstr, "%s", _tr("Move sticks and knobs\nto Max & Min positions\nthen press ENT"));
+                sprintf(cp->tmpstr, "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_MAXMIN;
                 break;

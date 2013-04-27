@@ -124,7 +124,7 @@ const char *scalestring_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf(mp->tmpstr, _tr("Scale%s:"), idx ? "+" : "-");
+    sprintf(mp->tmpstr, _tr("Scale%s"), idx ? "+" : "-");
     return mp->tmpstr;
 }
 

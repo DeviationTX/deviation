@@ -116,8 +116,10 @@ const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], 1, Model.num_channels, dir, 1, 1, NULL);
-    sprintf(mp->tmpstr, "Ch %d", Model.ppm_map[idx]+1);
+    Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], -1, Model.num_channels, dir, 1, 1, NULL);
+    if (Model.ppm_map[idx] < 0)
+        return _tr("None");
+    sprintf(mp->tmpstr, _tr("PPM%d"), Model.ppm_map[idx]+1);
     return mp->tmpstr;
 }
 
@@ -130,7 +132,7 @@ const char *set_train_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     if (idx == 0) {
         min = 1;
-        max = MAX_PPM_CHANNELS;
+        max = MAX_PPM_IN_CHANNELS;
         ptr = NULL;
         value = Model.num_ppmin & 0x3f;
         s1 = 1;
@@ -166,6 +168,6 @@ const char *input_chname_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(mp->tmpstr, "Ch%d", idx+1);
+    sprintf(mp->tmpstr, _tr("Ch%d"), idx+1);
     return mp->tmpstr;
 }

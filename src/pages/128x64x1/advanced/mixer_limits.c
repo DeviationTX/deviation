@@ -53,27 +53,27 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void * value = NULL;
     switch(absrow) {
         case ITEM_REVERSE:
-            label = _tr("Reverse:");
+            label = _tr("Reverse");
             tgl = toggle_reverse_cb; disp = reverse_cb; value = (void *)((long)mp->channel);
             break;
         case ITEM_FAILSAFE:
-            label = _tr("Failsafe:");
+            label = _tr("Failsafe");
             tgl = toggle_failsafe_cb; disp = set_failsafe_cb;
             break;
         case ITEM_SAFETY:
-            label = _tr("Safety:");
+            label = _tr("Safety");
             tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit.safetysw;
             break;
         case ITEM_SAFEVAL:
-            label = _tr("Safe Val:");
+            label = _tr("Safe Val");
             disp = set_safeval_cb;
             break;
         case ITEM_MINLIMIT:
-            label = _tr("Min Limit:");
+            label = _tr("Min Limit");
             disp = set_limits_cb; value = &mp->limit.min;
             break;
         case ITEM_MAXLIMIT:
-            label = _tr("Max Limit:");        
+            label = _tr("Max Limit");        
             disp = set_limits_cb; value = &mp->limit.max;
             break;
         case ITEM_SCALEPOS:
@@ -85,11 +85,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limitsscale_cb; value = &mp->limit.servoscale_neg;
             break;
         case ITEM_SUBTRIM:
-            label = _tr("Subtrim:");
+            label = _tr("Subtrim");
             disp = set_trimstep_cb; value = &mp->limit.subtrim;
             break;
         case ITEM_SPEED:
-            label = _tr("Speed:");
+            label = _tr("Speed");
             disp = set_limits_cb; value = &mp->limit.speed;
             break;
     }

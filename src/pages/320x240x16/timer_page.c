@@ -76,13 +76,13 @@ static void _draw_body() {
         GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         row+=20;
-	GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL,NULL,_tr("Switch:"));
+	GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL,NULL,_tr("Switch"));
         GUI_CreateTextSelect(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
         row+=20;
         int next_row = row;
         if(Model.mixer_mode != MIXER_STANDARD) {
-            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
+            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
             GUI_CreateTextSelect(&gui->resetsrc[i],  COL2, row, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
             next_row+=20;
         }
@@ -90,7 +90,7 @@ static void _draw_body() {
 	GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
 	GUI_CreateButton(&gui->resetperm[i], COL2, row, TEXTSELECT_96, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
         //Row 4
-        GUI_CreateLabelBox(&gui->startlbl[i], COL1, next_row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+        GUI_CreateLabelBox(&gui->startlbl[i], COL1, next_row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
         GUI_CreateTextSelect(&gui->start[i], COL2, next_row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
         update_countdown(i);
     }

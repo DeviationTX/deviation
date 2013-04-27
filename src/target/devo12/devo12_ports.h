@@ -43,5 +43,6 @@
 
 //PWM Port
 #define _PWM_PIN GPIO8
+#define _PWM_EXTI EXTI8
 //End PWM Port
 #endif //_DEVO12_PORTS_H_

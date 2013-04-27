@@ -13,6 +13,7 @@ struct chantest_obj {
     guiLabel_t chan[NUM_CHANNELS];
     guiLabel_t value[MAX_IDX];
     guiBarGraph_t bar[MAX_IDX];
+    guiScrollbar_t scrollbar;
 };
 
 struct lang_obj {
@@ -98,8 +99,8 @@ struct modelcfg_objs {
     guiTextSelect_t centerpw;
     guiLabel_t deltapwlbl;
     guiTextSelect_t deltapw;
-    guiLabel_t ppmmaplbl[MAX_PPM_CHANNELS];
-    guiTextSelect_t ppmmap[MAX_PPM_CHANNELS];
+    guiLabel_t ppmmaplbl[MAX_PPM_IN_CHANNELS];
+    guiTextSelect_t ppmmap[MAX_PPM_IN_CHANNELS];
 };
 
 struct modelload_objs {

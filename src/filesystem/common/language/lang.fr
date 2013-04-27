@@ -1,12 +1,12 @@
 ﻿Français
-:# Channels:
+:# Channels
 Nbr canaux
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%,valeur sécu. = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\nvaleur sécu. = %d%%\n
 :1-to-1
-1 à 1 
+1 à 1
 :11 Point
 11 Pts
 :13 Point
@@ -16,7 +16,7 @@ Nbr canaux
 :4 Bars
 4 Barres
 :4 Inside
-4 Centraux 
+4 Centraux
 :4 Outside
 4 Externes
 :4Ch w/ Dual-Rates
@@ -45,9 +45,9 @@ ValAbs
 AIL
 :AIL DR
 AIL DR
-:AIL Inv:
+:AIL Inv
 Sens AIL
-:AIL Mix:
+:AIL Mix
 Mix. AIL
 >:AUX2
 >:AUX3
@@ -65,24 +65,24 @@ Expert
 Avion
 :Alarm
 Alarme
-:Alarm intvl:
+:Alarm intvl
 Tempo alarme
 :Altitude
 Altitude
 >:Auto
 >:Aux2
-:Backlight:
+:Backlight
 Luminosité
 :Bad/missing\nprotocol modules!
 Module de protocole\nabsent ou défaillant!
-:Bar %d:
-Barre %d:
-:Bars:
-Barres:
-:Batt alarm:
+:Bar %d
+Barre %d
+:Bars
+Barres
+:Batt alarm
 Alarme batt.
-:Battery alarm:
-Alarme batterie:
+:Battery alarm
+Alarme batterie
 :Battery too low,\ncan't save!
 Batterie vide!\n Sauvegarde \n impossible.
 :Bind
@@ -95,26 +95,26 @@ Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK 
 <Appairage...   %d sec.\n Appuyer sur ENT\npour arrêter
 :Binding...\nPress ENT to stop
 Appairage...\nENT pour arrêter
-:Box %d:
-Box%d:
+:Box %d
+Box%d
 :Button monitor
 Ctrl des boutons
 :Buzz settings
 Réglages Son
-:Buzz volume:
+:Buzz volume
 Volume
 :Buzzer settings
 Réglages Son
 :COL
 PAS
 :COL Inv
-Sens PAS 
-:COL Inv:
-Sens PAS 
+Sens PAS
+:COL Inv
+Sens PAS
 :COL Limit
 Limite PAS
-:COL Mix:
-Mix. PAS 
+:COL Mix
+Mix. PAS
 :CYC
 CYC
 :Calibrate
@@ -145,7 +145,7 @@ Sorties canaux
 Complexe
 :Configure
 Configurer
-:Contrast:
+:Contrast
 Contraste
 :Copy To
 Copier
@@ -153,7 +153,7 @@ Copier
 Copier...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Niveau batterie critique.\nConfiguration enregistrée.\nCharger la batterie SVP.\n Les chgts de configuration\nne seront plus sauver.
-:Curve:
+:Curve
 Courbe
 :Cyclic1
 Cyclique1
@@ -173,12 +173,12 @@ Deadband
 :Default
 Défaut
 :Delta PW
-Delta Imp. 
+Delta Imp.
 :Deviation FW version:
-Deviation FW version
-:Dimmer target:
+Deviation FW version:
+:Dimmer target
 Lum. veille
-:Dimmer time:
+:Dimmer time
 Veille après
 :Dn
 Bas
@@ -190,10 +190,10 @@ Bas
 ELE
 :ELE DR
 ELE DR
-:ELE Inv:
-Sens ELE 
-:ELE Mix:
-Mix. ELE 
+:ELE Inv
+Sens ELE
+:ELE Mix
+Mix. ELE
 :EXPO
 EXP.
 :Enabled
@@ -203,7 +203,7 @@ Entrée
 :Exit
 Sortie
 :Expo&DR
-Expo&DR 
+Expo&DR
 :FMODE
 FMODE
 :Fahren
@@ -212,13 +212,13 @@ FMODE
 Sécurités
 :Failsafe
 Sécurités
-:Failsafe:
-Sécurités:
-:File:
+:Failsafe
+Sécurités
+:File
 Fichier
 :Fixed
 Fixe
-:Fixed ID:
+:Fixed ID
 ID fixe
 :Fly mode
 Acrobatie
@@ -246,12 +246,12 @@ Helicoptère
 :High-Rate
 Petit Déb.
 <:Hold Position
-<Valeur gaz 
+<Valeur gaz
 :Hold position
-Valeur gaz 
+Valeur gaz
 :Icon
 Icône
-:Icon:
+:Icon
 Icône
 <:Idle 1
 <Sport 1
@@ -263,7 +263,7 @@ Sport 1
 Sport 2
 :Input monitor
 Ctrl. des entrées
-:Input:
+:Input
 Entrée
 :Insert
 Ajouter
@@ -277,13 +277,13 @@ GAUCHE_H
 :LEFT_V
 GAUCHE_V
 >:LIN
-:Language:
-Langue:
+:Language
+Langue
 :Latitude
 Latitude
 :Left
 Gauche
-:Length:
+:Length
 Unité Long.
 :Linked
 Lié
@@ -308,7 +308,7 @@ Ecran d'accueil
 :Main page config
 Conf. écran accueil
 >:Manual
-:Max Limit:
+:Max Limit
 Limite Max
 :Menu
 Menu
@@ -316,22 +316,22 @@ Menu
 Mètre
 :Mid-Rate
 Déb. Med
-:Min Limit:
+:Min Limit
 Limite Min
 :Min/Max
 Min/Max
 :Mixer
 Mixer
-:Mixer GUI:
+:Mixer GUI
 Réglages
-:Mixers:
+:Mixers
 Nbr mixers
 >:Mode
 :Mode %d
 Mode %d
 :Model menu
 Menu Modèle
-:Model name:
+:Model name
 Nom Modèle
 :Model needs reset\nfor standard mixer
 L'interface standard\nréinitialise le modèle
@@ -339,15 +339,15 @@ L'interface standard\nréinitialise le modèle
 Pour le mode de réglage standard,\n le modèle doit être réinitialisé.
 :Model setup
 Config. Modèle
-:Model type:
+:Model type
 Type Modèle
 :Move Down
 Baisser
 :Move Up
 Monter
-:Move sticks and knobs\nto Max & Min positions\nthen press ENT
+:Move sticks and knobs\nto max & min positions\nthen press ENT
 Bouger sticks et pot.\naux min/max de course\n puis appuyer sur ENT
-:Mux:
+:Mux
 Opération
 :Neg
 Neg.
@@ -367,7 +367,7 @@ Normal
 Imp. Fin
 :Off
 Arrêt
-:Offset:
+:Offset
 Offset
 :Ok
 Ok
@@ -375,55 +375,55 @@ Ok
 Marche
 :PIT
 PAS
-:PIT Mix:
-Mix. PAS 
-:Page:
+:PIT Mix
+Mix. PAS
+:Page
 Page
 :Pitch curves
 Courbes de pas
 :Plane
 Avion
-:Point:
-Point:
+:Point
+Point
 :Pos
 Pos.
->:Pos 0:
->:Pos 1:
->:Pos 2:
-:Pos/Neg:
-Pos./Neg.:
+>:Pos 0
+>:Pos 1
+>:Pos 2
+:Pos/Neg
+Pos./Neg.
 >:Position %d
 >:Power-down alert
-<:Power-down alert:
-<Mélodie d'arrêt 
-:Prealert intvl:
+<:Power-down alert
+<Mélodie d'arrêt
+:Prealert intvl
 Tempo préAlarm
-:Prealert time:
+:Prealert time
 préAlarme
-:Press 'Ent' to turn USB Filesystem:
-Appuyer sur ENT\n pour passer \n le mode USB sur:
-:Press ENT to change:
+:Press 'Ent' to turn USB Filesystem
+Appuyer sur ENT\n pour passer \n le mode USB sur
+:Press ENT to change
 'ENT' pour selectionner
-:Press ENT to copy to:
+:Press ENT to copy to
 'ENT' pour copier
-:Press ENT to load:
+:Press ENT to load
 'ENT' pour charger
-:Press ENT to turn \nUSB drive:
-Appuyer sur ENT\n pour passer \n le mode USB sur:
+:Press ENT to turn \nUSB drive
+Appuyer sur ENT\n pour passer \n le mode USB sur
 :Preview: Long-Press ENT
 Aperçu: Appuie-Long ENT
-:Protocol:
+:Protocol
 Protocole
-:PwrDn alert:
-Mélodie arrêt 
+:PwrDn alert
+Mélodie arrêt
 :RIGHT_H
 DROITE_H
 :RIGHT_V
 DROITE_V
 :RPM
 T/mn
-:RPM:
-T/mn:
+:RPM
+T/mn
 :RUD
 RUD
 :RUD DR
@@ -436,29 +436,29 @@ Supprimer
 RàZ
 :Reset Permanent Timer?
 RaZ Totalisateur?
-:Reset sw:
+:Reset sw
 Cmd. RàZ
 :Reverse
 Sens servos
-:Reverse:
-Sens:
+:Reverse
+Sens
 :Reversed
 Inversé
 :Revert
 Annuler
 :Right
 Droite
-:Safe Val:
+:Safe Val
 Val. Sécu
 :Safety
 Sécurité
-:Safety:
-Sécurité:
+:Safety
+Sécurité
 :Save
 Sauve
-:Scale%s:
-Echelle%s:
->:Scale:
+:Scale%s
+Echelle%s
+>:Scale
 :Scanner
 Scanner
 >:Servo
@@ -468,40 +468,40 @@ Simple
 4Ch. Simple
 :Speed
 Vitesse
-:Speed:
-Vitesse:
+:Speed
+Vitesse
 :Src
 Source
-:Src:
+:Src
 Source
 :Standard
 Standard
 >:Standard Mixer
-:Start:
-Durée:
-:Step:
+:Start
+Durée
+:Step
 <Pas>
 :Stick input
 Entrées  sticks/aux.
-:Stick mode:
+:Stick mode
 Mode
-:Sticks:
+:Sticks
 Sticks
 >:Sub-trim
 >:Subtrim
-:Subtrim:
+:Subtrim
 Subtrim
 :Swash
 Plateau cycl.
-:SwashType:
-Plateau cycl.:
+:SwashType
+Plateau cycl.
 :Switch assignment
 Affect. Inters
 :Switch1
 Inter1
 :Switch2
 Inter2
-:Switch:
+:Switch
 Commande
 :Symmetric
 Symétrique
@@ -548,9 +548,9 @@ Ctrl. Télémétrie
 Réglages télémétrie
 :Temp
 T°
-:Temp:
-T°:
-:Temperature:
+:Temp
+T°
+:Temperature
 Unité T°
 :Template..
 Gabarit...
@@ -568,11 +568,11 @@ Heure
 Chrono
 :Timer settings
 Alarmes Chronos
-:Timer%d:
+:Timer%d
 Chrono %d
 :Timers
 Chronos
-:Timeup intvl:
+:Timeup intvl
 Tempo Alarme
 :Toggle%d
 Inter%d
@@ -580,10 +580,10 @@ Inter%d
 Calibration du tactile
 :Touch Test
 Test du tactile
-:Touch screen:
-Ecran tactile:
+:Touch screen
+Ecran tactile
 :Touch target %d
-Toucher la cible %d 
+Toucher la cible %d
 :Touch to Lock
 Toucher pour verrouiller
 :Touch to Unlock
@@ -596,26 +596,26 @@ Menu Emetteur
 Course servos
 :Trim
 Trim
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Finesse:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Finesse
 :Trims
 Trims
-:Trims:
-Trims:
+:Trims
+Trims
 :Turn Off
 Désactiver
 :Turn On
 Activer
-:Tx power:
+:Tx power
 Puiss. TX
 :USB
 USB
-:USB Filesystem is currently 
-Etat de la partition USB 
+:USB Filesystem is currently
+Etat de la partition USB
 :Unknown
 Inconnu
 <:Unlocked
@@ -624,16 +624,16 @@ Inconnu
 Haut
 :Value
 Valeur
-:Value:
-Valeur:
-:Vibration:
+:Value
+Valeur
+:Vibration
 Vibreur
 :Virt
 Virt
 :Volt
 Volt
-:Volt:
-Volt:
+:Volt
+Volt
 :Zero/Max
 0/Max
 :\n%d seconds left

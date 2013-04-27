@@ -145,9 +145,9 @@ static void _show_page()
 
     u16 y = 144;
     if (page_num == 0) {
-        firstObj = GUI_CreateLabel(&gui1->trimlbl, COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims:"));
+        firstObj = GUI_CreateLabel(&gui1->trimlbl, COL1_VALUE, 40, NULL, DEFAULT_FONT, _tr("Trims"));
         GUI_CreateTextSelect(&gui1->trim, COL2_VALUE, 40, TEXTSELECT_96, NULL, trimsel_cb, NULL);
-        GUI_CreateLabel(&gui1->barlbl, COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars:"));
+        GUI_CreateLabel(&gui1->barlbl, COL1_VALUE, 64, NULL, DEFAULT_FONT, _tr("Bars"));
         GUI_CreateTextSelect(&gui1->bar, COL2_VALUE, 64, TEXTSELECT_96, NULL, graphsel_cb, NULL);
         for(i = 0; i < 4; i++) {
             GUI_CreateLabel(&gui1->boxlbl[i], COL1_VALUE, y, boxlabel_cb, DEFAULT_FONT, (void *)i);

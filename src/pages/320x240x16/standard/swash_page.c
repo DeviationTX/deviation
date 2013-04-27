@@ -35,22 +35,22 @@ void PAGE_SwashInit(int page)
     #define ROW_SPACE 20
     /* Row 1 */
     int row = 40;
-    GUI_CreateLabelBox(&gui->typelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("SwashType:"));
+    GUI_CreateLabelBox(&gui->typelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("SwashType"));
     GUI_CreateTextSelect(&gui->type, COL2, row, TEXTSELECT_96, NULL, swash_val_cb, NULL);
 
     /* Row 2 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[0], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix:"));
+    GUI_CreateLabelBox(&gui->lbl[0], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix"));
     GUI_CreateTextSelect(&gui->mix[0], COL2, row, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)1L);
 
     /* Row 3 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[1], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix:"));
+    GUI_CreateLabelBox(&gui->lbl[1], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("AIL Mix"));
     GUI_CreateTextSelect(&gui->mix[1], COL2, row, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)0);
 
     /* Row 4 */
     row += ROW_SPACE;
-    GUI_CreateLabelBox(&gui->lbl[2], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix:"));
+    GUI_CreateLabelBox(&gui->lbl[2], COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("PIT Mix"));
     GUI_CreateTextSelect(&gui->mix[2], COL2, row, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)2);
 
     update_swashmixes();

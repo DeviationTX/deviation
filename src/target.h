@@ -30,7 +30,6 @@ enum {
 #define NUM_TX_INPUTS (INP_LAST - 1)
 #define NUM_INPUTS (NUM_TX_INPUTS)
 #define NUM_TX_BUTTONS (BUT_LAST - 1)
-#define MAX_PPM_CHANNELS 8
 
 enum {
     CYRF6936,
@@ -107,6 +106,13 @@ void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
 void PPM_Enable(u16 low_time, volatile u16 *pulses);
+
+/* PPM-In functions */
+#define MAX_PPM_IN_CHANNELS 8
+void PPMin_TIM_Init();
+void PPMin_Start();
+void PPMin_Stop();
+
 
 /* Sticks */
 void CHAN_Init();
