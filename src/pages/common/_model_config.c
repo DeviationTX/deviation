@@ -119,7 +119,7 @@ const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
     Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], -1, Model.num_channels, dir, 1, 1, NULL);
     if (Model.ppm_map[idx] < 0)
         return _tr("None");
-    sprintf(mp->tmpstr, _tr("Ch %d"), Model.ppm_map[idx]+1);
+    sprintf(mp->tmpstr, _tr("PPM%d"), Model.ppm_map[idx]+1);
     return mp->tmpstr;
 }
 
