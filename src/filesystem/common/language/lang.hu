@@ -112,8 +112,6 @@ Hang beállítások
 :COL
 Kollektív
 :COL Inv
-Koll. inv.
-:COL Inv
 Kollektív inv.
 |devo10:COL Inv
 Koll. inv.
@@ -141,6 +139,8 @@ Közép imp.
 Állítsa középre a \nbotkormányokat és potikat\nés nyomjon ENT-t
 :Ch
 Cs
+:Ch%d
+Cs%d
 :Chan mode
 Csat. mód
 :Change
@@ -197,7 +197,8 @@ Alvó fényerő
 Alvó mód ideje
 :Dn
 Le
->:Do you really want\nto reset the\n permanent timer %d?
+:Do you really want\nto reset the\n permanent timer %d?
+Valóban nullázni\nakarja az üzemidő\nidőzítő %d-t?
 :Down
 Le
 :ELE
@@ -214,7 +215,8 @@ Magassági mix
 Magas. mix
 :EXPO
 EXP.
->:Enabled
+:Enabled
+Engedélyezett
 :Enter
 Enter
 :Exit
@@ -227,8 +229,6 @@ FMODE
 °F
 :Fail safe
 Vészértékek
-:Failsafe
-Hibaérték
 :Failsafe
 Hibaérték
 :File
@@ -271,20 +271,14 @@ Magas
 TH érték
 :Icon
 Ikon
-:Icon
-Ikon
-<:Idle 1
-<Alapjárat 1
-<:Idle 2
-<Alapjárat 2
 :Idle Up 1
 Alapjárat 1
 :Idle Up 2
 Alapjárat 2
-:Input monitor
-Bemenetek
 :Input
 Bemenet
+:Input monitor
+Bemenetek
 :Insert
 Beszúrás
 :Inverted
@@ -313,8 +307,6 @@ Csatolt
 Betöltés
 :Load...
 Betöltés...
-<:Locked
-<Zárolt
 :Longitude
 Hosszúság
 :Low Battery
@@ -331,7 +323,8 @@ Főmenü
 Főablak
 :Main page config
 Főablak konfig.
->:Manual
+:Manual
+Kézi
 :Max Limit
 Max korlát
 :Menu
@@ -392,6 +385,8 @@ Normál
 Szünet hossz
 |devo10:Notch PW
 Szünet
+:Num Channels
+Csat. száma
 :Off
 Ki
 :Offset
@@ -402,11 +397,18 @@ Ok
 Be
 :PIT
 PIT
->:PIT Mix
+:PIT Mix
+Koll. mix
+:PPM
+PPM
+:PPM In
+PPM be
+:PPM%d
+PPM%d
+:PPMIn Config
+PPM be konfig.
 :Page
 Oldal
-<:Pit Mix
-<Koll. mix
 :Pitch curves
 Állásszög görbék
 :Plane
@@ -425,11 +427,8 @@ Poz. 2
 Poz/Neg
 :Position %d
 Pozíció %d
->:Power-down alert
-<:PowerOff alert
-<Kikapcs. riaszt.
-<:PowerOff alert
-<Kikapcs. riaszt.
+:Power-down alert
+Kikapcs. riaszt.
 :Prealert intvl
 Előjelz. interv.
 :Prealert time
@@ -456,8 +455,6 @@ JOBB_V
 JOBB_F
 :RPM
 Ford.
-:RPM
-Ford.
 :RUD
 RUD
 :RUD DR
@@ -468,11 +465,10 @@ Csatol
 Törlés
 :Reset
 Törlés
->:Reset Permanent Timer?
+:Reset Permanent Timer?
+Nullázza az üzemidőt?
 :Reset sw
 Törlés kapcs.
-:Reverse
-Invertálás
 :Reverse
 Invertálás
 :Reversed
@@ -484,15 +480,13 @@ Jobb
 :Safe Val
 Bizt. érték
 :Safety
-Biztonsági ellenőrzés
-:Safety
 Biztonság
 :Save
 Mentés
-:Scale%s
-Skála%s
 :Scale
 Skála
+:Scale%s
+Skála%s
 :Scanner
 Szkenner
 :Servo
@@ -503,10 +497,6 @@ Egyszerű
 Egyszerű 4 csat.
 :Speed
 Sebesség
-:Speed
-Sebesség
-:Src
-Forrás
 :Src
 Forrás
 :Standard
@@ -527,22 +517,20 @@ Botkormány
 Sub-trim
 :Subtrim
 Subtrim
-:Subtrim
-Subtrim
 :Swash
 Imbolygó
 :SwashType
 Imbolygó típusa
 |devo10:SwashType
 Imbolygó
+:Switch
+Kapcsoló
 :Switch assignment
 Kapcsoló összerendelés
 :Switch1
 Kapcs.1
 :Switch2
 Kapcs.2
-:Switch
-Kapcsoló
 :Symmetric
 Szimmetr.
 :THR
@@ -589,8 +577,6 @@ Telemetria adatok
 Telemetria beállítások
 :Temp
 Hőm.
-:Temp
-Hőm.
 :Temperature
 Hőmérséklet
 :Template..
@@ -629,6 +615,12 @@ Képernyő
 Érintse meg a zároláshoz
 :Touch to Unlock
 Érintse meg a feloldáshoz
+:Train
+Oktatás
+:Trainer Config
+Oktató konfig.
+:Trainer Sw
+Oktató kapcs.
 :Transmitter config
 Távirányító konfig.
 :Transmitter menu
@@ -645,8 +637,6 @@ Trim -
 Trim lépés
 :Trims
 Trim-ek
-:Trims
-Trim-ek
 :Turn Off
 Kikapcsol
 :Turn On
@@ -655,24 +645,18 @@ Bekapcsol
 Kimenő telj.
 :USB
 USB
-:USB Filesystem is currently
-USB fájlrendszer jelenleg
+:USB Filesystem is currently 
+USB fájlrendszer jelenleg 
 :Unknown
 Ismeretlen
-<:Unlocked
-<Szabad
 :Up
 Fel
-:Value
-Érték
 :Value
 Érték
 :Vibration
 Rezgés
 :Virt
 Virt.
-:Volt
-Fesz.
 :Volt
 Fesz.
 :Zero/Max
