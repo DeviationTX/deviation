@@ -71,6 +71,10 @@ void PAGE_ModelInit(int page)
     GUI_CreateTextSelect(&gui->type, 136, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
 
     row += 24;
+    GUI_CreateLabel(&gui->ppmlbl, 8, row, NULL, DEFAULT_FONT, _tr("PPM In:"));
+    GUI_CreateTextSelect(&gui->ppm, 136, row, TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
+
+    row += 20;
     GUI_CreateLabel(&gui->protolbl, 8, row, NULL, DEFAULT_FONT, _tr("Protocol:"));
     GUI_CreateTextSelect(&gui->proto, 136, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
 
@@ -79,7 +83,7 @@ void PAGE_ModelInit(int page)
     GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
 
 
-    row += 32;
+    row += 24;
     GUI_CreateLabel(&gui->pwrlbl, 8, row, NULL, DEFAULT_FONT, _tr("Tx power:"));
     GUI_CreateTextSelect(&gui->pwr, 136, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
 
@@ -126,6 +130,7 @@ static inline guiObject_t *_get_obj(int type, int objid)
         case ITEM_TXPOWER: return (guiObject_t *)&gui->pwr;
         case ITEM_PROTO: return (guiObject_t *)&gui->bind;
         case ITEM_GUI: return (guiObject_t *)&gui->guits;
+        case ITEM_PPMIN: return (guiObject_t *)&gui->ppm;
         default: return NULL;
     }
 }

@@ -90,3 +90,82 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     return mp->tmpstr;
 }
 
+/* Functions for the ppm-in capability */
+const char *set_source_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 source = *(u8 *)data;
+    u8 is_neg = MIXER_SRC_IS_INV(source);
+    u8 changed;
+    source = GUI_TextSelectHelper(MIXER_SRC(source), 1, NUM_SOURCES, dir, 1, 1, &changed);
+    MIXER_SET_SRC_INV(source, is_neg);
+    if (changed) {
+        *(u8 *)data = source;
+    }
+    return INPUT_SourceName(mp->tmpstr, source);
+}
+
+void sourceselect_cb(guiObject_t *obj, void *data)
+{
+    u8 *source = (u8 *)data;
+    MIXER_SET_SRC_INV(*source, ! MIXER_SRC_IS_INV(*source));
+    GUI_Redraw(obj);
+}
+
+const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], 1, Model.num_channels, dir, 1, 1, NULL);
+    sprintf(mp->tmpstr, "Ch %d", Model.ppm_map[idx]+1);
+    return mp->tmpstr;
+}
+
+const char *set_train_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    int s1, s2, min, max, value;
+    u16 *ptr;
+    u8 changed;
+    if (idx == 0) {
+        min = 1;
+        max = MAX_PPM_CHANNELS;
+        ptr = NULL;
+        value = Model.num_ppmin & 0x3f;
+        s1 = 1;
+        s2 = 1;
+    } else {
+        s1 = 10;
+        s2 = 50;
+        if (idx == 1) {
+            min = 1000;
+            max = 1800;
+            ptr = &Model.ppmin_centerpw;
+            value = Model.ppmin_centerpw;
+        } else {
+            min = 100;
+            max = 700;
+            ptr = &Model.ppmin_deltapw;
+            value = Model.ppmin_deltapw;
+        }
+    }
+    value = GUI_TextSelectHelper(value, min, max, dir, s1, s2, &changed);
+    if (changed) {
+        if(! ptr) {
+           Model.num_ppmin = (Model.num_ppmin & 0xc0) | value;
+        } else {
+           *ptr = value;
+        }
+    }
+    sprintf(mp->tmpstr, "%d", value);
+    return mp->tmpstr;
+}
+
+const char *input_chname_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    sprintf(mp->tmpstr, "Ch%d", idx+1);
+    return mp->tmpstr;
+}

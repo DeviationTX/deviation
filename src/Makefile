@@ -252,6 +252,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
 		number=`expr $$number + 1`; \
 		done
+	@echo " + Checking string list length for $(FILESYSTEM)"
 	../utils/check_string_size.pl -target $(FILESYSTEM) -quiet
 
 ######################

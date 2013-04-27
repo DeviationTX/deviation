@@ -43,6 +43,7 @@ struct toggleselect_obj {
     guiImage_t   toggleicon[3];
     guiImage_t   symbolicon[32];
     guiRect_t    symbolframe;
+    guiScrollable_t scrollable;
 };
 
 struct mainpage_obj {

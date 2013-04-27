@@ -13,19 +13,46 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+extern const struct LabelDesc outline;
 static void show_iconsel_page(int idx);
+static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data);
+
+static const char * const toggle_files[4] = {
+    "media/toggle0.bmp",
+    "media/toggle1.bmp",
+    "media/toggle2.bmp",
+    "media/toggle3.bmp",
+};
+
+static u32 _get_icon_info()
+{
+    static u32 count = 0;
+    if(count == 0) {
+        for(int i = 0; i < 4; i++) {
+            u16 w, h;
+            int ok = LCD_ImageDimensions(toggle_files[i], &w, &h);
+            if(ok) {
+                printf("file%d = %d\n", i, w / TOGGLEICON_WIDTH);
+                count |= (w / TOGGLEICON_WIDTH) << (i*8);
+            }
+        }
+    }
+    return count;
+}
 
 struct ImageMap TGLICO_GetImage(int idx)
 {
-    static u16 w = 0;
-    if(w == 0) {
-        u16 h;
-	LCD_ImageDimensions(TOGGLE_FILE, &w, &h);
+    unsigned int fnum = idx >> 6;
+    unsigned int offset = idx & 0x3f;
+    u32 count = _get_icon_info();
+    if(offset >= ((count >> (8 * fnum)) & 0xff)) {
+       offset = 0;
+       fnum = 0;
     }
     struct ImageMap img;
-    img.file = TOGGLE_FILE;
-    img.x_off = (idx * TOGGLEICON_WIDTH) % w;
-    img.y_off = ((idx * TOGGLEICON_WIDTH) / w) * TOGGLEICON_HEIGHT;
+    img.file = toggle_files[fnum];
+    img.x_off = offset * TOGGLEICON_WIDTH;
+    img.y_off = 0;
     return img;
 }
 
@@ -58,3 +85,30 @@ void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
         show_iconsel_page(pos);
     }
 }
+
+static int get_toggle_icon_count()
+{
+    u32 count = _get_icon_info();
+    count = ((count >> 24) & 0xff)
+            + ((count >> 16) & 0xff)
+            + ((count >>  8) & 0xff)
+            + ((count >>  0) & 0xff);
+    return count;
+}
+
+static int get_next_icon(int idx)
+{
+    u32 count = _get_icon_info();
+    unsigned int fnum = idx >> 6;
+    unsigned int offset = (idx & 0x3f) + 1;
+    while (offset >= ((count >> (fnum * 8)) & 0xff)) {
+        fnum++;
+        offset = 0;
+        if (fnum >= 4)
+            return -1;
+    }
+    return (fnum << 6) | offset;
+}
+
+
+

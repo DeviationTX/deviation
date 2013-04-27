@@ -85,3 +85,45 @@ void MODELPROTO_Config()
         row += 24;
     }
 }
+
+void MODELTRAIN_Config()
+{
+    PAGE_SetModal(1);
+    show_titlerow((Model.num_ppmin & 0xC0) == 0x40
+                  ? _tr("Trainer Config")
+                  : _tr("PPMIn Config"));
+    int row = 40;
+    int pos = 0;
+    long idx = 0;
+    GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
+    GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
+    row += 20;
+    GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
+    GUI_CreateTextSelect(&gui->trainsw, 136, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
+    row += 20;
+    GUI_CreateLabel(&gui->centerpwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Center PW"));
+    GUI_CreateTextSelect(&gui->centerpw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)1L);
+    row += 20;
+    GUI_CreateLabel(&gui->deltapwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Delta PW"));
+    GUI_CreateTextSelect(&gui->deltapw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)2L);
+ 
+    if ((Model.num_ppmin & 0xC0) != 0x40)
+        return;
+
+    long i = 0;
+    int num_ppm = MAX_PPM_CHANNELS;
+    while (i < num_ppm) {
+        row += 20;
+        if (row > 300)
+            break;
+        GUI_CreateLabelBox(&gui->ppmmaplbl[i], 8, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)i);
+        GUI_CreateTextSelect(&gui->ppmmap[i], 60, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)i);
+        i++;
+        if (i >= num_ppm)
+            break;
+        GUI_CreateLabelBox(&gui->ppmmaplbl[i], 164, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)i);
+        GUI_CreateTextSelect(&gui->ppmmap[i], 216, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)i);
+        i++;
+    }
+}
+

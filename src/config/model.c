@@ -243,7 +243,7 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
     return 0;
 }
 
-static int parse_s8_list(const char *ptr, s8 *vals, int max_count)
+static int parse_byte_list(const char *ptr, s8 *vals, int max_count, int is_signed)
 {
     const char *origptr = ptr;
     int value_int = 0;
@@ -255,11 +255,19 @@ static int parse_s8_list(const char *ptr, s8 *vals, int max_count)
             value_int = value_int * (sign ? -1 : 1);
             if (idx >= max_count)
                 return max_count + 1;
-            if (value_int > 127)
-                value_int = 127;
-            else if (value_int < -127)
-                value_int = -127;
-            vals[idx] = value_int;
+            if (is_signed) {
+                if (value_int > 127)
+                    value_int = 127;
+                else if (value_int < -127)
+                    value_int = -127;
+                vals[idx] = value_int;
+            } else {
+                if (value_int > 255)
+                    value_int = 255;
+                else if (value_int < 0)
+                    value_int = 0;
+                ((u8 *)vals)[idx] = value_int;
+            }
             sign = 0;
             value_int = 0;
             idx++;
@@ -482,7 +490,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MIXER_CURVE_POINTS)) {
-            int count = parse_s8_list(value, m->mixers[idx].curve.points, MAX_POINTS);
+            int count = parse_byte_list(value, m->mixers[idx].curve.points, MAX_POINTS, 1);
             if (count > MAX_POINTS) {
                 printf("%s: Too many points (max points = %d\n", section, MAX_POINTS);
                 return 0;
@@ -848,7 +856,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
-            int count = parse_s8_list(value, (s8 *)m->pagecfg.tglico[idx], 3);
+            int count = parse_byte_list(value, (s8 *)m->pagecfg.tglico[idx], 3, 0);
             if (count == 1) {
                 //convert from old syntax
                 upgrade_tglico(m, idx);
