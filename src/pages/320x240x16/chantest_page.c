@@ -56,6 +56,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     int row_len;
     page = _page;
     num_pages = 0;
+
     if (num_bars > 18) {
         num_pages = (num_bars + 7) / 8 - 1;
     
@@ -66,6 +67,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     } else {
         row_len = 9;
     }
+
     cp->num_bars = num_bars;
 
     if (num_bars > row_len) {
@@ -79,22 +81,22 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+page*8));
+                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+8*page));
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)(i+page*9));
+                                    showchan_cb, (void *)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
-                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)(i+page*8));
+                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
     offset = (320 + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 - height,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+page*8));
+                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+8*page));
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * (i - count), 229 - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)(i+page*9));
+                                    showchan_cb, (void *)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230,
-                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)(i+page*8));
+                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
     if(num_pages > 1) {
         GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, num_pages, NULL, scroll_cb, NULL);
@@ -193,4 +195,8 @@ void _handle_button_test()
 static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return objid == ITEM_GRAPH ? (guiObject_t *)&gui->bar[chan] : (guiObject_t *)&gui->value[chan];
+}
+static inline int _get_input_idx(int chan)
+{
+    return page * 8 + chan;
 }

@@ -185,3 +185,8 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
+
+static inline int _get_input_idx(int chan)
+{
+    return chan;
+}
