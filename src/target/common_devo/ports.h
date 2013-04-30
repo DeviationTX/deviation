@@ -44,7 +44,8 @@
 #endif //_TOUCH_PORT
 
 #ifndef _PWM_PIN
-    #define _PWM_PIN GPIO_USART1_TX
+    #define _PWM_PIN GPIO_USART1_TX    //GPIO9
+    #define _PWM_EXTI EXTI9
 #endif //_PWM_PIN
 
 #endif //_PORTS_H_

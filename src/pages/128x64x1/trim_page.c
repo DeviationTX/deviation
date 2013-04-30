@@ -51,11 +51,11 @@ static void _show_page()
 {
     PAGE_SetActionCB(_action_cb);
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
-    PAGE_ShowHeader(_tr("Input:"));
-    GUI_CreateLabelBox(&gui->steplbl, 40, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step:"));
+    PAGE_ShowHeader(_tr("Input"));
+    GUI_CreateLabelBox(&gui->steplbl, 40, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step"));
     // no enought space in Devo10, so just display trim + in the 1st page
-    //GUI_CreateLabelBox(w + 40, 0, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim -:"));
-    GUI_CreateLabelBox(&gui->trimposlbl, 80, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +:"));
+    //GUI_CreateLabelBox(w + 40, 0, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
+    GUI_CreateLabelBox(&gui->trimposlbl, 80, 0, 30, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
@@ -89,19 +89,19 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
 
     switch(absrow) {
         case ITEM_INPUT:
-            label = _tr_noop("Input:");
+            label = _tr_noop("Input");
             value = set_source_cb; data = &tp->trim.src;
             break;
         case ITEM_TRIMNEG:
-            label = _tr_noop("Trim -:");
+            label = _tr_noop("Trim -");
             value = set_trim_cb; data = &tp->trim.neg;
             break;
         case ITEM_TRIMPOS:
-            label = _tr_noop("Trim +:");
+            label = _tr_noop("Trim +");
             value = set_trim_cb; data = &tp->trim.pos;
             break;
         case ITEM_TRIMSTEP:
-            label = _tr_noop("Trim Step:");
+            label = _tr_noop("Trim Step");
             value = set_trimstep_cb; data = &tp->trim.step;
             break;
     }

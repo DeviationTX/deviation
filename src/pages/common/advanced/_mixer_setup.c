@@ -553,6 +553,6 @@ static const char *scalestring_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long v = (long)data;
-    sprintf(mp->tmpstr, _tr("Scale%s:"), v == 0 ? "" : v == 1 ? "1" : "2");
+    sprintf(mp->tmpstr, _tr("Scale%s"), v == 0 ? "" : v == 1 ? "1" : "2");
     return mp->tmpstr;
 }

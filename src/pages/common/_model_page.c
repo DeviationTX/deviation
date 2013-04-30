@@ -183,10 +183,19 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    u8 new_ppm = Model.num_ppmin >> 6;
+    u8 new_ppm = PPMin_Mode();
     new_ppm = GUI_TextSelectHelper(new_ppm, 0, 2, dir, 1, 1, &changed);
 
     if (obj) {
+        if (changed) {
+            if (! PPMin_Mode() && new_ppm) {
+                //Start PPM-In
+                PPMin_Start();
+            } else if(! new_ppm) {
+                //Stop PPM-In
+                PPMin_Stop();
+            }
+        }
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, new_ppm);
         Model.num_ppmin = (Model.num_ppmin & 0x3f) | (new_ppm << 6);
     }
@@ -234,6 +243,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
+    if (Model.protocol == 0)
+        return _tr("None");
     if(PROTOCOL_HasModule(Model.protocol))
         return ProtocolNames[Model.protocol];
     sprintf(mp->tmpstr, "*%s", ProtocolNames[Model.protocol]);

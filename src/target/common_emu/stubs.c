@@ -98,3 +98,11 @@ void LCD_Contrast(u8 contrast) { printf("Contrast: %d\n", contrast); }
 void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}
 void VIBRATINGMOTOR() {}
+
+void PPMin_Start() {}
+void PPMin_Stop() {}
+void PPMin_TIM_Init() {}
+volatile u8 ppmSync;
+volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
+volatile u8 ppmin_num_channels;
+

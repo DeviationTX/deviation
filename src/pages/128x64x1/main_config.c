@@ -166,7 +166,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int y_ts = y;
     switch(absrow) {
         case ITEM_TRIMS:
-            label = _tr("Trims:");
+            label = _tr("Trims");
             value = trimsel_cb;
             buttonlabel_cb = NULL;
             break;

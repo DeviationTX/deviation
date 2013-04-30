@@ -53,12 +53,12 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     labelDesc.style = LABEL_LEFTCENTER;
 
     if (curve->type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point:"));
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
         y += space;
         labelDesc.style = LABEL_CENTER;
         GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_pointnum_cb, NULL);
     } else {
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg:"));
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;
         labelDesc.style = LABEL_CENTER;
         GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
@@ -66,7 +66,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value:"));
+    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
     y += space;
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);

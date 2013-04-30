@@ -32,7 +32,7 @@ static u32 _get_icon_info()
             u16 w, h;
             int ok = LCD_ImageDimensions(toggle_files[i], &w, &h);
             if(ok) {
-                printf("file%d = %d\n", i, w / TOGGLEICON_WIDTH);
+                //printf("file%d = %d\n", i, w / TOGGLEICON_WIDTH);
                 count |= (w / TOGGLEICON_WIDTH) << (i*8);
             }
         }

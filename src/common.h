@@ -181,4 +181,5 @@ const char *STDMIXER_ModeName(int mode);
 void STDMIXER_InitSwitches();
 void STDMIXER_SaveSwitches();
 
+#define PPMin_Mode() (Model.num_ppmin >> 6)
 #endif

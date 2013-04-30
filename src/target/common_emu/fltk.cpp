@@ -141,19 +141,39 @@ public:
                 gui.gear = ! gui.gear;
                 return 1;
             case 'x':
-                gui.rud_dr = ! gui.rud_dr;
+                gui.rud_dr = (gui.rud_dr + 1) % 6;
                 return 1;
             case 'c':
-                gui.ele_dr = ! gui.ele_dr;
+                gui.ele_dr = (gui.ele_dr + 1) % 6;
                 return 1;
             case 'v':
-                gui.ail_dr = ! gui.ail_dr;
+                gui.ail_dr = (gui.ail_dr + 1) % 6;
                 return 1;
             case 'b':
                 gui.mix = (gui.mix + 1) % 3;
                 return 1;
             case 'n':
                 gui.fmod = (gui.fmod + 1) % 3;
+                return 1;
+            case 'o':
+                if(++gui.aux2 > 10)
+                    gui.aux2 = 10;
+                return 1;
+            case 'l':
+                if(--gui.aux2 < 0)
+                    gui.aux2 = 0;
+                return 1;
+            case 'p':
+                if(++gui.aux3 > 10)
+                    gui.aux3 = 10;
+                return 1;
+#ifdef KEYBOARD_LAYOUT_QWERTZ
+            case 96: //'ö'
+#else
+            case ';':
+#endif
+                if(--gui.aux3 < 0)
+                    gui.aux3 = 0;
                 return 1;
             case 't':
                 if(++gui.aux4 > 10)
@@ -163,7 +183,11 @@ public:
                 if(--gui.aux4 < 0)
                     gui.aux4 = 0;
                 return 1;
+#ifdef KEYBOARD_LAYOUT_QWERTZ
+            case 'z':
+#else
             case 'y':
+#endif
                 if(++gui.aux5 > 10)
                     gui.aux5 = 10;
                 return 1;
@@ -171,6 +195,39 @@ public:
                 if(--gui.aux5 < 0)
                     gui.aux5 = 0;
                 return 1;
+            case 'u':
+                if(++gui.aux6 > 10)
+                    gui.aux6 = 10;
+                return 1;
+            case 'j':
+                if(--gui.aux6 < 0)
+                    gui.aux6 = 0;
+                return 1;
+            case 'i':
+                if(++gui.aux7 > 10)
+                    gui.aux7 = 10;
+                return 1;
+            case 'k':
+                if(--gui.aux7 < 0)
+                    gui.aux7 = 0;
+                return 1;
+            case 'm':
+                gui.hold = ! gui.hold;
+                return 1;
+            case ',':
+                gui.trn = ! gui.trn;
+                return 1;
+#ifdef KEYBOARD_LAYOUT_QWERTZ
+			//only to be prepared ü+ö#.-
+			//                    [];\./
+			//case 39:	// QWERTZ: 'ä', QWERTY: '''
+			//case 59:	// QWERTZ: 'ü', QWERTY: '['
+			//case 61:	// QWERTZ: '+', QWERTY: ']'
+			//case 47:	// QWERTZ: '#', QWERTY: '\'
+			//case 46:	// QWERTZ: '.', QWERTY: '.'
+			//case 45:	// QWERTZ: '-', QWERTY: '/'
+			//	return 1;
+#endif
             }
         case FL_KEYUP:
             k = Fl::event_text();
@@ -258,6 +315,12 @@ void set_stick_positions()
        gui.elevator = 0;
        break;
     }
+	gui.aux2     = 5;
+	gui.aux3     = 5;
+	gui.aux4     = 5;
+	gui.aux5     = 5;
+	gui.aux6     = 5;
+	gui.aux7     = 5;
 }
 
 void close_window(Fl_Widget *widget, void *param)

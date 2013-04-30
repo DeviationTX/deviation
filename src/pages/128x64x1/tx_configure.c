@@ -71,7 +71,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
             title = _tr_noop("Generic settings");
-            label = _tr_noop("Language:");
+            label = _tr_noop("Language");
             but_str = langstr_cb; tgl = lang_select_cb;
             break;
 #endif
@@ -79,71 +79,71 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #ifdef NO_LANGUAGE_SUPPORT
             //title = _tr_noop("Generic settings");
 #endif
-            label = _tr_noop("Stick mode:");
+            label = _tr_noop("Stick mode");
             value = modeselect_cb;
             break;
         case ITEM_STICKS:
-            label = _tr_noop("Sticks:");
+            label = _tr_noop("Sticks");
             but_str = calibratestr_cb; tgl = press_cb; data = (void *)CALIB_STICK;
             break;
         case ITEM_BUZZ:
             title = _tr_noop("Buzz settings");
-            label = _tr_noop("Buzz volume:");
+            label = _tr_noop("Buzz volume");
             value = _buzz_vol_cb; data = &Transmitter.volume;
             break;
         case ITEM_HAPTIC:
-            label = _tr_noop("Vibration:");
+            label = _tr_noop("Vibration");
             value = _vibration_state_cb; data = &Transmitter.vibration_state;
             break;
         case ITEM_BATT:
-            label = _tr_noop("Batt alarm:");
+            label = _tr_noop("Batt alarm");
             value = batalarm_select_cb;
             break;
         case ITEM_ALARM_INTV:
-            label = _tr_noop("Alarm intvl:");
+            label = _tr_noop("Alarm intvl");
             value = batalarmwarn_select_cb;
             break;
         case ITEM_PWRDN_ALARM:
-            label = _tr_noop("PwrDn alert:");
+            label = _tr_noop("PwrDn alert");
             value = _music_shutdown_cb;
             break;
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
-            label = _tr_noop("Backlight:");
+            label = _tr_noop("Backlight");
             value = brightness_select_cb;
             break;
         case ITEM_CONTRAST:
-            label = _tr_noop("Contrast:");
+            label = _tr_noop("Contrast");
             value = _contrast_select_cb;
             break;
         case ITEM_DIMTIME:
-            label = _tr_noop("Dimmer time:");
+            label = _tr_noop("Dimmer time");
             value = auto_dimmer_time_cb; x = X+10;
             break;
         case ITEM_DIMVAL:
-            label = _tr_noop("Dimmer target:");
+            label = _tr_noop("Dimmer target");
             value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x= X+10;
             break;
         case ITEM_PREALERT:
             title = _tr_noop("Timer settings");
-            label = _tr_noop("Prealert time:");
+            label = _tr_noop("Prealert time");
             value = prealert_time_cb; data = (void *)0L; x= X+10;
             break;
         case ITEM_PREALERT_IVAL:
-            label = _tr_noop("Prealert intvl:");
+            label = _tr_noop("Prealert intvl");
             value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; x= X+15;
             break;
         case ITEM_TIMEUP:
-            label = _tr_noop("Timeup intvl:");
+            label = _tr_noop("Timeup intvl");
             value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; x= X+15;
             break;
         case ITEM_TELEMTEMP:
             title = _tr_noop("Telemetry settings");
-            label = _tr_noop("Temperature:");
+            label = _tr_noop("Temperature");
             value = units_cb; data = (void *)1L;
             break;
         case ITEM_TELEMLEN:
-            label = _tr_noop("Length:");
+            label = _tr_noop("Length");
             value = units_cb; data = (void *)0L;
             break;
     }

@@ -37,9 +37,9 @@ static void _show_titlerow()
 static void _show_simple()
 {
     //Row 1
-    mp->firstObj = GUI_CreateLabel(&gui1->srclbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Src:"));
+    mp->firstObj = GUI_CreateLabel(&gui1->srclbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Src"));
     GUI_CreateTextSelect(&gui1->src, COL1_VALUE, 40, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateLabel(&gui1->curvelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve:"));
+    GUI_CreateLabel(&gui1->curvelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Curve"));
     GUI_CreateTextSelect(&gui1->curve, COL2_VALUE, 40, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //Row 2
     GUI_CreateXYGraph(&gui1->graph, 112, 64, 120, 120,
@@ -49,7 +49,7 @@ static void _show_simple()
     //Row 4
     GUI_CreateLabel(&gui1->scalelbl, COL1_TEXT, 192, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(&gui1->scale, COL1_VALUE, 192, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    GUI_CreateLabel(&gui1->offsetlbl, COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset:"));
+    GUI_CreateLabel(&gui1->offsetlbl, COL2_TEXT, 192, NULL, DEFAULT_FONT, _tr("Offset"));
     GUI_CreateTextSelect(&gui1->offset, COL2_VALUE, 192, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].offset);
     //Row 5
     /*
@@ -57,9 +57,9 @@ static void _show_simple()
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden(mp->trimObj, 1);
 
-    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
+    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.min);
-    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
+    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max"));
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.max);
     */
 }
@@ -124,9 +124,9 @@ static void _show_complex(int page_change)
     (void)page_change;
     //Row 1
     if (! mp->firstObj) {
-        mp->firstObj = GUI_CreateLabel(&gui3->nummixlbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers:"));
+        mp->firstObj = GUI_CreateLabel(&gui3->nummixlbl, COL1_TEXT, 40, NULL, DEFAULT_FONT, _tr("Mixers"));
         GUI_CreateTextSelect(&gui3->nummix, COL1_VALUE, 40, TEXTSELECT_96, NULL, set_nummixers_cb, NULL);
-        GUI_CreateLabel(&gui3->pagelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page:"));
+        GUI_CreateLabel(&gui3->pagelbl, COL2_TEXT, 40, NULL, DEFAULT_FONT, _tr("Page"));
         guiObject_t *obj = GUI_CreateTextSelect(&gui3->page, COL2_VALUE, 40, TEXTSELECT_96, reorder_cb, set_mixernum_cb, NULL);
         if (! GUI_GetSelected()) //Set the page button to be selected if nothinge else is yet
             GUI_SetSelected(obj);
@@ -134,21 +134,21 @@ static void _show_complex(int page_change)
         GUI_RemoveHierObjects((guiObject_t *)&gui3->swlbl);
     }
     //Row 2
-    GUI_CreateLabel(&gui3->swlbl, COL1_TEXT, 64, NULL, DEFAULT_FONT, _tr("Switch:"));
+    GUI_CreateLabel(&gui3->swlbl, COL1_TEXT, 64, NULL, DEFAULT_FONT, _tr("Switch"));
     GUI_CreateTextSelect(&gui3->sw, COL1_VALUE, 64, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->cur_mixer->sw);
-    GUI_CreateLabel(&gui3->muxlbl, COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux:"));
+    GUI_CreateLabel(&gui3->muxlbl, COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux"));
     GUI_CreateTextSelect(&gui3->mux, COL2_VALUE, 64, TEXTSELECT_96, NULL, set_mux_cb, NULL);
     //Row 3
-    GUI_CreateLabel(&gui3->srclbl, COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src:"));
+    GUI_CreateLabel(&gui3->srclbl, COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src"));
     GUI_CreateTextSelect(&gui3->src, COL1_VALUE, 98, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
     //Row 4
-    GUI_CreateLabel(&gui3->curvelbl, COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Curve:"));
+    GUI_CreateLabel(&gui3->curvelbl, COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Curve"));
     GUI_CreateTextSelect(&gui3->curve, COL1_VALUE, 122, TEXTSELECT_96, curveselect_cb, set_curvename_cb, mp->cur_mixer);
     //Row 5
     GUI_CreateLabel(&gui3->scalelbl, COL1_TEXT, 156, scalestring_cb, DEFAULT_FONT, (void *)0);
     GUI_CreateTextSelect(&gui3->scale, COL1_VALUE, 156, TEXTSELECT_96, NULL, set_number100_cb, &mp->cur_mixer->scalar);
     //Row 6
-    GUI_CreateLabel(&gui3->offsetlbl, COL1_TEXT, 180, NULL, DEFAULT_FONT, _tr("Offset:"));
+    GUI_CreateLabel(&gui3->offsetlbl, COL1_TEXT, 180, NULL, DEFAULT_FONT, _tr("Offset"));
     GUI_CreateTextSelect(&gui3->offset, COL1_VALUE, 180, TEXTSELECT_96, NULL, set_number100_cb, &mp->cur_mixer->offset);
     GUI_CreateBarGraph(&gui3->bar, COL2_TEXT, 88, 10, 120,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
@@ -162,9 +162,9 @@ static void _show_complex(int page_change)
     if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
         GUI_SetHidden((guiObject_t *)&gui3->trim, 1);
     /*
-    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min:"));
+    GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min"));
     GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.min);
-    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max:"));
+    GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max"));
     GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.max);
     */
 }

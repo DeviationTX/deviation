@@ -17,9 +17,9 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
-static void _show_bar_page(u8 num_bars);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
+static inline int _get_input_idx(int chan);
 
 enum {
     ITEM_GRAPH,
@@ -73,7 +73,8 @@ void PAGE_ChantestEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
-        int v = RANGE_TO_PCT(cp->type ? raw[i+1] : Channels[i]);
+        int j = _get_input_idx(i);
+        int v = RANGE_TO_PCT(cp->type ? raw[j+1] : Channels[j]);
         if (v != cp->pctvalue[i]) {
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {

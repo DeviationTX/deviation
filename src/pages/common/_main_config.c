@@ -79,7 +79,7 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, _tr("Box %d:"), i+1);
+    sprintf(str, _tr("Box %d"), i+1);
     return str;
 }
 
@@ -89,7 +89,7 @@ const char *boxtxtsel_cb(guiObject_t *obj, int dir, void *data)
     u8 i = (long)data;
     u8 changed;
     int old_val = Model.pagecfg.box[i];
-    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_CHANNELS + 2, dir, 1, 1, &changed);   
+    Model.pagecfg.box[i] = GUI_TextSelectHelper(Model.pagecfg.box[i], 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);   
     if (changed && (old_val == 0 || Model.pagecfg.box[i] == 0))
         _update_preview();
     if (Model.pagecfg.box[i]) {
@@ -104,7 +104,7 @@ const char *barlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(str, _tr("Bar %d:"), i+1);
+    sprintf(str, _tr("Bar %d"), i+1);
     return str;
 }
 
@@ -132,7 +132,7 @@ int fix_abbrev_src(int origval, int newval, int dir)
         return newval;
     int pos = INPUT_SwitchPos(newval);
     int num_pos = INPUT_NumSwitchPos(newval);
-    if (num_pos != 0) {
+    if (num_pos != 0 && pos) {
         if (dir > 0)
             newval += (num_pos - pos);
         else
@@ -335,7 +335,7 @@ const char *menulabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    sprintf(str, "%s %d:", _tr("Menu"), (int)i+1);
+    sprintf(str, "%s %d", _tr("Menu"), (int)i+1);
     return str;
 }
 

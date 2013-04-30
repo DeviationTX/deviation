@@ -54,7 +54,7 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_SetModal(1);
     cp->return_page = return_page;
 
-    PAGE_ShowHeader(_tr("Press ENT to change:"));
+    PAGE_ShowHeader(_tr("Press ENT to change"));
 
     cp->total_items = 1;
     if (FS_OpenDir("language")) {

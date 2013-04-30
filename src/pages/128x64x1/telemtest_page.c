@@ -39,9 +39,9 @@ static void _show_page1()
     PAGE_RemoveAllObjects();
     u8 w = 35;
     PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
-    GUI_CreateLabelBox(&gui1->tempstr, 8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp:"));
-    GUI_CreateLabelBox(&gui1->voltstr, w + 13, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Volt:"));
-    GUI_CreateLabelBox(&gui1->rpmstr, w + w + 18, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("RPM:"));
+    GUI_CreateLabelBox(&gui1->tempstr, 8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp"));
+    GUI_CreateLabelBox(&gui1->voltstr, w + 13, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Volt"));
+    GUI_CreateLabelBox(&gui1->rpmstr, w + w + 18, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("RPM"));
     w = 10;
     GUI_CreateLabelBox(&gui1->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
 

@@ -52,14 +52,14 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 2
     y += space;
     GUI_CreateLabelBox(&gui->switchlbl, 0, y,
-            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch:"));
+            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch"));
     GUI_CreateTextSelectPlate(&gui->src, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
     if(Model.mixer_mode != MIXER_STANDARD) {
     	GUI_CreateLabelBox(&gui->resetlbl, 0, y ,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw:"));
+            55, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
     	GUI_CreateTextSelectPlate(&gui->resetsrc, x, y ,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
     	/* or Reset Perm timer*/
@@ -77,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 4
     GUI_CreateLabelBox(&gui->startlbl, 0, y ,
             50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
-            ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start:"));
+            ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
     GUI_CreateTextSelectPlate(&gui->start, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
 

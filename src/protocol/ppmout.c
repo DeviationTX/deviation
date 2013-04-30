@@ -111,6 +111,8 @@ static u16 ppmout_cb()
 static void initialize()
 {
     CLOCK_StopTimer();
+    if (PPMin_Mode())
+        return;
     PWM_Initialize();
     num_channels = Model.num_channels;
     if (Model.proto_opts[CENTER_PW] == 0) {

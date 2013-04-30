@@ -1,6 +1,6 @@
 ﻿Afrikaans
-:# Channels:
-Aantal Kanale:
+:# Channels
+Aantal Kanale
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
@@ -45,10 +45,10 @@ AbsWrde
 AIL
 :AIL DR
 AIL DR
-:AIL Inv:
-AIL Omgekeerd:
-:AIL Mix:
-AIL Meng:
+:AIL Inv
+AIL Omgekeerd
+:AIL Mix
+AIL Meng
 :AUX2
 AUX2
 :AUX3
@@ -69,26 +69,26 @@ Gevorderd
 Vliegtuig
 :Alarm
 Alarm
-:Alarm intvl:
-Alarm interval:
+:Alarm intvl
+Alarm interval
 :Altitude
 Hoogte
 :Auto
 Outo
 :Aux2
 Aux2
-:Backlight:
-Skermlig:
+:Backlight
+Skermlig
 :Bad/missing\nprotocol modules!
 Protokol modules\nis sleg of weg!
-:Bar %d:
-Balk %d:
-:Bars:
-Balke:
-:Batt alarm:
-Bat Alarm:
-:Battery alarm:
-Battery Alarm:
+:Bar %d
+Balk %d
+:Bars
+Balke
+:Batt alarm
+Bat Alarm
+:Battery alarm
+Battery Alarm
 :Battery too low,\ncan't save!
 Battery pap,kan\nnie stoor nie!
 :Bind
@@ -101,25 +101,25 @@ Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop
 <Bind...\n%d seconds\n Druk ENT om te stop
 :Binding...\nPress ENT to stop
 <Bind...\nDruk ENT om te stop
-:Box %d:
-Kassie %d:
+:Box %d
+Kassie %d
 :Button monitor
 Knoppie Monitor
 :Buzz settings
-Beep verstellings 
-:Buzz volume:
-Beep Volume:
+Beep verstellings
+:Buzz volume
+Beep Volume
 :Buzzer settings
-Beep verstellings 
+Beep verstellings
 :COL
 KOL
 :COL Inv
 KOL Inv
-:COL Inv:
-KOL Inv:
+:COL Inv
+KOL Inv
 :COL Limit
 KOL Limiet
-:COL Mix:
+:COL Mix
 KOL Meng
 :CYC
 CYC
@@ -148,19 +148,19 @@ Kanaal Monitor
 :Channel output
 Kanaal Uitset
 :Complex
-Kompleks 
+Kompleks
 :Configure
 Konfigureer
-:Contrast:
-Kontras:
+:Contrast
+Kontras
 :Copy To
 Kopieër na
 :Copy To...
 Kopieër na..
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Battery amper pap.\nOpstelling is gestoor.\nAlle vêrdere opstellings\nword nie gestoor nie.\n\nLaai battery nou!
-:Curve:
-Kurwe:
+:Curve
+Kurwe
 :Cyclic1
 Siklies1
 :Cyclic2
@@ -184,13 +184,13 @@ Default
 :Delta PW
 Delta PW
 :Deviation FW version:
-Deviation Sagteware: 
-:Dimmer target:
-Verdof Teiken: 
-:Dimmer time:
-Verdof tyd:
+Deviation Sagteware:
+:Dimmer target
+Verdof Teiken
+:Dimmer time
+Verdof tyd
 :Dn
-Af:
+Af
 >:Do you really want\nto reset the\n permanent timer %d?
 :Down
 Af
@@ -198,10 +198,10 @@ Af
 ELE
 :ELE DR
 ELE DR
-:ELE Inv:
-ELE Inv:
-:ELE Mix:
-ELE Meng:
+:ELE Inv
+ELE Inv
+:ELE Mix
+ELE Meng
 :EXPO
 Expo
 >:Enabled
@@ -219,14 +219,14 @@ Beweeg
 Falingveilig
 :Failsafe
 Falingveilig
-:Failsafe:
-Falingveilig:
-:File:
-Lêer:
+:Failsafe
+Falingveilig
+:File
+Lêer
 :Fixed
 Vaste
-:Fixed ID:
-Vaste ID:
+:Fixed ID
+Vaste ID
 :Fly mode
 Vliegmode
 :Foot
@@ -259,7 +259,7 @@ Hoë tempo
 Hou Posisie
 :Icon
 Ikoon
-:Icon:
+:Icon
 Ikoon
 <:Idle 1
 <Idle 1
@@ -269,8 +269,8 @@ Ikoon
 >:Idle Up 2
 :Input monitor
 Inset Monitor
-:Input:
-Inset:
+:Input
+Inset
 :Insert
 Enter
 :Inverted
@@ -285,16 +285,16 @@ LINKS_H
 LINKS_V
 :LIN
 LIN
-:Language:
-Taal: 
+:Language
+Taal
 :Latitude
 Breedtegraad
 :Left
 Links
-:Length:
-Lengte:
+:Length
+Lengte
 :Linked
-Verbind 
+Verbind
 :Load
 Laai
 :Load...
@@ -316,56 +316,56 @@ Hoof Menu
 :Main page
 Hoofbladsy
 :Main page config
-Hoofbladsy Opstelling 
+Hoofbladsy Opstelling
 >:Manual
-:Max Limit:
-Max limiet:
+:Max Limit
+Max limiet
 :Menu
 Menu
 :Meter
 Meter
 :Mid-Rate
 Mid tempo
-:Min Limit:
-Min Limiet:
+:Min Limit
+Min Limiet
 :Min/Max
 Min/Max
 :Mixer
-Menger:
-:Mixer GUI:
+Menger
+:Mixer GUI
 Menger GUI
-:Mixers:
-Mengers:
+:Mixers
+Mengers
 :Mode
 Modus
 :Mode %d
 Modus %d
 :Model menu
 Model Menu
-:Model name:
-Model naam:
+:Model name
+Model naam
 :Model needs reset\nfor standard mixer
 Model moet Reset \nvir die Standaard Menger
 :Model needs to be reset\nin order to switch to the standard mixer
 Model moet eers Reset\nom oor teskakel na die Standaard Menger
 :Model setup
 Modelopstelling
-:Model type:
-Model tipe:
+:Model type
+Model tipe
 :Move Down
 Beweeg Af
 :Move Up
 Beweeg Op
-:Move sticks and knobs\nto Max & Min positions\nthen press ENT
-Beweeg stokke en skakelaars na Max & Min/nDruk dan ENT
-:Mux:
-Mux:
+:Move sticks and knobs\nto max & min positions\nthen press ENT
+Beweeg stokke en skakelaars na max & min/nDruk dan ENT
+:Mux
+Mux
 :Neg
 Neg
 :New
 Nuwe
 :No Bars
-Geen balke 
+Geen balke
 :No Trim
 Geen Trim
 :No Trims
@@ -378,68 +378,68 @@ Normal
 Notch PW
 :Off
 Af
-:Offset:
-Afset:
+:Offset
+Afset
 :Ok
 Ok
 :On
 Aan
 :PIT
 PIT
->:PIT Mix:
-:Page:
-Bladsy:
-<:Pit Mix:
-<PIT Meng:
+>:PIT Mix
+:Page
+Bladsy
+<:Pit Mix
+<PIT Meng
 :Pitch curves
 PIT kurwes
 :Plane
 Vlak
-:Point:
-Punk:
+:Point
+Punk
 :Pos
 +
-:Pos 0:
-Pos 0:
-:Pos 1:
-Pos 1:
-:Pos 2:
-Pos 2:
-:Pos/Neg:
-+/-:
+:Pos 0
+Pos 0
+:Pos 1
+Pos 1
+:Pos 2
+Pos 2
+:Pos/Neg
++/-
 :Position %d
 Posisie %d
 >:Power-down alert
 <:PowerOff alert
 <Krag-af Waarskuwing
-:Prealert intvl:
-Voorwaarsku intvl:
-:Prealert time:
-Voorwaarsku-tyd:
-:Press 'Ent' to turn USB Filesystem:
-Druk 'ENT' om USB aan te skakel:
-:Press ENT to change:
-Druk ENT om te verander:
-:Press ENT to copy to:
-Druk ENT om te kopieër na:
-:Press ENT to load:
-Druk ENT om te laai:
-:Press ENT to turn \nUSB drive:
-Druk ENT vir USB aan:
+:Prealert intvl
+Voorwaarsku intvl
+:Prealert time
+Voorwaarsku-tyd
+:Press 'Ent' to turn USB Filesystem
+Druk 'ENT' om USB aan te skakel
+:Press ENT to change
+Druk ENT om te verander
+:Press ENT to copy to
+Druk ENT om te kopieër na
+:Press ENT to load
+Druk ENT om te laai
+:Press ENT to turn \nUSB drive
+Druk ENT vir USB aan
 :Preview: Long-Press ENT
 Voorskou: Lang-druk ENT
-:Protocol:
-Protokol:
-:PwrDn alert:
-Krag-af waarskuwing:
+:Protocol
+Protokol
+:PwrDn alert
+Krag-af waarskuwing
 :RIGHT_H
 REGS_H
 :RIGHT_V
 REGS_V
 :RPM
 RPM
-:RPM:
-RPM:
+:RPM
+RPM
 :RUD
 RUD
 :RUD DR
@@ -451,30 +451,30 @@ Verwyder
 :Reset
 Reset
 >:Reset Permanent Timer?
-:Reset sw:
-Reset sw:
+:Reset sw
+Reset sw
 :Reverse
 Kanaal Omkeer
-:Reverse:
-Omkeer:
+:Reverse
+Omkeer
 :Reversed
 Omgekeerd
 :Revert
 Verander terug
 :Right
 Regs
-:Safe Val:
-Veiligew:
+:Safe Val
+Veiligew
 :Safety
 Veiligheid
-:Safety:
-Veiligheid:
+:Safety
+Veiligheid
 :Save
 Stoor
-:Scale%s:
-Skale%s:
-:Scale:
-Skaal:
+:Scale%s
+Skale%s
+:Scale
+Skaal
 :Scanner
 Skandeer
 :Servo
@@ -485,44 +485,44 @@ Eenvoudig
 Eenvdge 4 kanaal
 :Speed
 Spoed
-:Speed:
-Spoed:
+:Speed
+Spoed
 :Src
 Bron
-:Src:
-Bron:
+:Src
+Bron
 :Standard
 Standaard
 :Standard Mixer
 Standaard Menger
-:Start:
-Begin:
-:Step:
+:Start
+Begin
+:Step
 Stap
 :Stick input
 Stokinset
-:Stick mode:
-Stok mode:
-:Sticks:
-Stokke:
+:Stick mode
+Stok mode
+:Sticks
+Stokke
 :Sub-trim
-SubTrim 
+SubTrim
 :Subtrim
 SubTrim
-:Subtrim:
-SubTrim:
+:Subtrim
+SubTrim
 :Swash
 Swash Tipe
-:SwashType:
-Swash Tipe:
+:SwashType
+Swash Tipe
 :Switch assignment
 Skakelaar Toekening
 :Switch1
 Skakelaar1
 :Switch2
 Skakelaar2
-:Switch:
-Skakelaar:
+:Switch
+Skakelaar
 :Symmetric
 Symmetries
 :THR
@@ -569,10 +569,10 @@ Telemetrie Monitor
 Telemetrie Opstelling
 :Temp
 Temp
-:Temp:
-Temp:
-:Temperature:
-Temperatuur:
+:Temp
+Temp
+:Temperature
+Temperatuur
 :Template..
 Voorbeeld..
 :Test
@@ -589,20 +589,20 @@ Tyd
 Tydhouer
 :Timer settings
 Tydhoueropstelling
-:Timer%d:
-Tydhouer%d:
+:Timer%d
+Tydhouer%d
 :Timers
 Tydhouers
-:Timeup intvl:
-Tydaan periode:
+:Timeup intvl
+Tydaan periode
 :Toggle%d
 Skakel%d
 :Touch Calibrate
-Skerm kalibrasie 
+Skerm kalibrasie
 :Touch Test
 Raakskerm toets
-:Touch screen:
-Raakskerm:
+:Touch screen
+Raakskerm
 :Touch target %d
 Raak teiken %d
 :Touch to Lock
@@ -614,28 +614,28 @@ Sender Opstelling
 :Transmitter menu
 Sender Menu
 :Travel adjust
-Maks Beweeging 
+Maks Beweeging
 :Trim
 Trim
-:Trim +:
-Trim +:
-:Trim -:
-Trim -:
-:Trim Step:
-Trim stap:
+:Trim +
+Trim +
+:Trim -
+Trim -
+:Trim Step
+Trim stap
 :Trims
 Trims
-:Trims:
-Trims:
+:Trims
+Trims
 :Turn Off
 Sit Af
 :Turn On
 Sit Aan
-:Tx power:
-Sendkrag:
+:Tx power
+Sendkrag
 :USB
 USB
-:USB Filesystem is currently 
+:USB Filesystem is currently
 USB Lêerstelsel is tans
 :Unknown
 Onbekend
@@ -645,16 +645,16 @@ Onbekend
 Op
 :Value
 Waarde
-:Value:
-Waarde:
-:Vibration:
+:Value
+Waarde
+:Vibration
 Vibrasie
 :Virt
 Virt
 :Volt
 Volt
-:Volt:
-Volt:
+:Volt
+Volt
 :Zero/Max
 Zero/Max
 :\n%d seconds left
