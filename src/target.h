@@ -36,6 +36,7 @@ enum {
     CYRF6936,
     A7105,
     CC2500,
+    NRF24L01,
     TX_MODULE_LAST,
 };
 
@@ -166,6 +167,7 @@ u8 *BOOTLOADER_Read(int idx);
 #define PROTO_HAS_CYRF6936
 #define PROTO_HAS_A7105
 #define PROTO_HAS_CC2500
+#define PROTO_HAS_NRF24L01
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
 struct mcu_pin;

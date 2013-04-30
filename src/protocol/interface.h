@@ -33,4 +33,8 @@ enum ProtoCmds {
 #include "iface_cc2500.h"
 #endif
 
+#ifdef PROTO_HAS_NRF24L01
+#include "iface_nrf24l01.h"
+#endif
+
 #endif //_INTERFACE_H_

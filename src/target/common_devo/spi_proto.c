@@ -83,6 +83,17 @@ void SPI_ProtoInit()
         gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
     }
 #endif
+    /* NRF24L01 */
+#ifdef PROTO_HAS_NRF24L01
+    if(Transmitter.module_enable[NRF24L01].port) {
+        //GPIOA.14
+        struct mcu_pin *port = &Transmitter.module_enable[NRF24L01];
+        printf("nRF24L01 port: %08x pin: %04x\n", port->port, port->pin);
+        gpio_set_mode(Transmitter.module_enable[NRF24L01].port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[NRF24L01].pin);
+        gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
+    }
+#endif
     /* Includes enable? */
     spi_init_master(SPI2, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
