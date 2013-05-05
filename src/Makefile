@@ -80,11 +80,7 @@ endif
 ifeq "$(wildcard ../.hg )" ""
   HGVERSION := ${TARGET}-Unknown
 else
-  ifeq "$(shell hg parents --template {latesttagdistance})" "1"
-    HGVERSION := $(shell hg parents --template '${TARGET}-{latesttag}')
-  else
-    HGVERSION := $(shell hg parents --template '${TARGET}-{node|short}')
-  endif
+  HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
 endif
 
 # Rebuild on hg version change.
