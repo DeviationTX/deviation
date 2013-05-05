@@ -275,6 +275,76 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     }
 }
 
+void NRF24L01_Initialize() {}
+u8 NRF24L01_WriteReg(u8 reg, u8 data)
+{
+    (void)reg;
+    (void)data;
+    return 0;
+}
+
+u8 NRF24L01_WriteRegisterMulti(u8 reg, u8 data[], u8 length)
+{
+    (void)reg;
+    (void)data;
+    (void)length;
+    return 0;
+}
+
+u8 NRF24L01_WritePayload(u8 *data, u8 length)
+{
+    (void)data;
+    (void)length;
+    return 0;
+}
+
+u8 NRF24L01_ReadReg(u8 reg)
+{
+    (void)reg;
+    return 0;
+}
+
+u8 NRF24L01_ReadRegisterMulti(u8 reg, u8 data[], u8 length)
+{
+    (void)reg;
+    (void)data;
+    (void)length;
+    return 0;
+}
+
+u8 NRF24L01_ReadPayload(u8 *data, u8 length)
+{
+    (void)data;
+    (void)length;
+    return 0;
+}
+
+u8 NRF24L01_FlushTx() {
+    return 0;
+}
+
+u8 NRF24L01_FlushRx() {
+    return 0;
+}
+
+u8 NRF24L01_Activate(u8 code)
+{
+    (void)code;
+    return 0;
+}
+
+u8 NRF24L01_SetBitrate(u8 bitrate)
+{
+    (void)bitrate;
+    return 0;
+}
+
+u8 NRF24L01_SetPower(u8 power)
+{
+    (void)power;
+    return 0;
+}
+
 void PWM_Initialize() {}
 void PWM_Stop() {}
 void PPM_Enable(u16 low_time, volatile u16 *pulses) {
