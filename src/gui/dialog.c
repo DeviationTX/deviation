@@ -115,7 +115,7 @@ void GUI_DialogDrawBackground(u16 x, u16 y, u16 w, u16 h)
 void DialogClose(struct guiObject *obj, u8 state)
 {
     struct guiDialog *dialog = (struct guiDialog *)obj;
-    void *data = dialog->cbData;
+    void *data = dialog->string_cb ? dialog->cbData : NULL;
     void (*func)(u8, void*) = dialog->CallBack;
     GUI_RemoveObj(obj);
     func(state, data);

@@ -57,11 +57,13 @@ static void invalid_stdmixer_cb(u8 state, void *guiObj)
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
     dialog = NULL;
-    if (state == 1 && guiObj != NULL) {
+    if (state == 1) {
         PAGE_RemoveHeader();
-        memset(Model.mixers, 0, sizeof(struct Mixer) * (NUM_MIXERS)); // // reset all mixers first
+        memset(Model.mixers, 0, sizeof(Model.mixers)); // // reset all mixers first
         CONFIG_ReadTemplate(STANDARD_TEMPLATE); // load template
-        GUI_Redraw(guiObj);
+        if (guiObj != NULL) {
+            GUI_Redraw(guiObj);
+        }
     }
 }
 

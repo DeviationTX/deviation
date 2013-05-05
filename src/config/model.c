@@ -1345,7 +1345,7 @@ u8 CONFIG_ReadTemplateByIndex(u8 template_num) {
 }
 
 u8 CONFIG_ReadTemplate(const char *filename) {
-    char file[20];
+    char file[25];
 
     sprintf(file, "template/%s", filename);
     clear_model(0);
