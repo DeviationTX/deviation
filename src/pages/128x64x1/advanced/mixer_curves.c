@@ -50,14 +50,15 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     x = 0;
     u8 space = ITEM_HEIGHT + 1;
     u8 y = space;
-    w = 65;
+    w = 74;
     labelDesc.style = LABEL_LEFTCENTER;
 
     if (type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
+        GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
+        GUI_CreateTextSelectPlate(&gui->smooth, x + w - 35, y, 35, ITEM_HEIGHT, &labelDesc, NULL, set_smooth_cb, NULL);
         y += space;
-        labelDesc.style = LABEL_CENTER;
-        GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_pointnum_cb, NULL);
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w-24, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
+        GUI_CreateTextSelectPlate(&gui->point, x + w - 24, y, 24, ITEM_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
     } else {
         GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;

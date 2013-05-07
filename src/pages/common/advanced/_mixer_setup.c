@@ -139,7 +139,7 @@ static void toggle_trim_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     
-    u8 trim = MIXER_APPLY_TRIM(mp->cur_mixer);
+    u8 trim = MIXER_APPLY_TRIM(mp->cur_mixer) ? 1 : 0;
     MIXER_SET_APPLY_TRIM(mp->cur_mixer, trim ^ 0x01);
 }
 

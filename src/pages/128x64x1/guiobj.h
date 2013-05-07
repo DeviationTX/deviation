@@ -186,6 +186,8 @@ struct advcurve_obj {
     guiTextSelect_t point;
     guiLabel_t valuelbl;
     guiTextSelect_t value;
+    guiLabel_t smoothlbl;
+    guiTextSelect_t smooth;
     guiXYGraph_t graph;
 };
 

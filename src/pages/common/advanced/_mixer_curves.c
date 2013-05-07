@@ -139,6 +139,23 @@ const char *set_expopoint_cb(guiObject_t *obj, int dir, void *data)
         default: return "-";
     }
 }
+
+const char *set_smooth_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+
+    u8 changed;
+    u8 smooth = CURVE_SMOOTHING(&edit->curve) ? 1 : 0;
+    smooth = GUI_TextSelectHelper(smooth, 0, 1, dir, 1, 1, &changed);
+    if (changed) {
+        CURVE_SET_SMOOTHING(&edit->curve, smooth);
+        GUI_Redraw(&gui->value);
+        GUI_Redraw(&gui->graph);
+    }
+    return smooth ? _tr("Yes") : _tr("No");
+}
+
 static u8 touch_cb(s16 x, s16 y, void *data)
 {
     (void)data;

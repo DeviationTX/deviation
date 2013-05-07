@@ -74,6 +74,7 @@ static const char * const MIXER_CURVETYPE_VAL[CURVE_MAX+1] = {
    "none", "fixed", "min/max", "zero/max", "greater-than-0", "less-than-0", "absval",
    "expo", "deadband", "3point", "5point", "7point", "9point", "11point", "13point" };
 static const char MIXER_CURVE_POINTS[] = "points";
+static const char MIXER_CURVE_SMOOTH[] = "smooth";
 
 /* Section: Channel */
 static const char SECTION_CHANNEL[] = "channel";
@@ -505,6 +506,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 printf("%s: Too many points (max points = %d\n", section, MAX_POINTS);
                 return 0;
             }
+            return 1;
+        }
+        if (MATCH_KEY(MIXER_CURVE_SMOOTH)) {
+            CURVE_SET_SMOOTHING(&m->mixers[idx].curve, value_int);
             return 1;
         }
         printf("%s: Couldn't parse key: %s\n", section, name);
@@ -972,6 +977,8 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
                 }
                 fprintf(fh, "\n");
             }
+            if (CURVE_SMOOTHING(&m->mixers[idx].curve))
+                fprintf(fh, "%s=%d\n", MIXER_CURVE_SMOOTH, CURVE_SMOOTHING(&m->mixers[idx].curve) ? 1 : 0);
         }
     }
     return changed;
