@@ -97,7 +97,7 @@ void STDMIXER_SetChannelOrderByProtocol()
             continue;
         if (mix[idx].dest == NUM_OUT_CHANNELS + 9)
            mix[idx].src = 0; // remove all mixers pointing to Virt10, because the Virt10 is reserved in Standard mode
-        else if (mix[idx].mux == MUX_REPLACE && mix[idx].src== INP_THROTTLE && mix[idx].dest < NUM_OUT_CHANNELS) { // src=THR && dest = virt should be pitch's mixer
+        else if (MIXER_MUX(&mix[idx]) == MUX_REPLACE && mix[idx].src== INP_THROTTLE && mix[idx].dest < NUM_OUT_CHANNELS) { // src=THR && dest = virt should be pitch's mixer
             mix[idx].dest = mapped_std_channels.throttle;
         }
     }
@@ -123,7 +123,7 @@ u8 STDMIXER_ValidateTraditionModel()
     u8 drexp_mixer_count = 0;
     u8 gryo_mixer_count = 0;
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
-        if (mix[idx].src == 0  || mix[idx].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
+        if (mix[idx].src == 0  || MIXER_MUX(&mix[idx]) != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
         if (mix[idx].dest == NUM_OUT_CHANNELS + 9) //mixers pointing to Virt10 as the Virt10 is reserved in Standard mode
             return 0;
@@ -176,7 +176,7 @@ void STDMIXER_InitSwitches()
     u8 found_drexp_ail_switch = 0;
     u8 found_drexp_ele_switch = 0;
     for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
-        if (!MIXER_SRC(mix[idx].src) || mix[idx].mux != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
+        if (!MIXER_SRC(mix[idx].src) || MIXER_MUX(&mix[idx]) != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
         if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_std_channels.gear || mix[idx].dest == mapped_std_channels.aux2)) {
             found_gyro_switch = 1;

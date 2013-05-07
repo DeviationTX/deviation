@@ -93,7 +93,7 @@ void MIXPAGE_ChangeTemplate(int show_header)
         _show_complex(0);
         break;
     }
-    set_src_enable(mp->mixer[0].curve.type);
+    set_src_enable(CURVE_TYPE(&mp->mixer[0].curve));
 }
 
 
@@ -131,14 +131,16 @@ static const char *show_trim_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    return (long)mp->cur_mixer->apply_trim ? _tr("Trim") : _tr("No Trim");
+    return MIXER_APPLY_TRIM(mp->cur_mixer) ? _tr("Trim") : _tr("No Trim");
 }
 
 static void toggle_trim_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    mp->cur_mixer->apply_trim ^= 0x01;
+    
+    u8 trim = MIXER_APPLY_TRIM(mp->cur_mixer);
+    MIXER_SET_APPLY_TRIM(mp->cur_mixer, trim ^ 0x01);
 }
 
 void toggle_link_cb(guiObject_t *obj, const void *data)
@@ -148,14 +150,14 @@ void toggle_link_cb(guiObject_t *obj, const void *data)
         mp->link_curves ^= 0x02;
         if (mp->link_curves & 0x02) { //Redraw graphs when re-linking
             sync_mixers();
-            set_src_enable(mp->mixer[0].curve.type);
+            set_src_enable(CURVE_TYPE(&mp->mixer[0].curve));
             MIXPAGE_RedrawGraphs();
         }
     } else {
         mp->link_curves ^= 0x01;
         if (mp->link_curves & 0x01) { //Redraw graphs when re-linking
             sync_mixers();
-            set_src_enable(mp->mixer[0].curve.type);
+            set_src_enable(CURVE_TYPE(&mp->mixer[0].curve));
             MIXPAGE_RedrawGraphs();
         }
     }
@@ -246,7 +248,7 @@ void sync_mixers()
         break;
     case MIXERTEMPLATE_SIMPLE:
         mp->mixer[0].sw = 0;
-        mp->mixer[0].mux = MUX_REPLACE;
+        MIXER_SET_MUX(&mp->mixer[0], MUX_REPLACE);
         mp->num_mixers = 1;
         break;
     case MIXERTEMPLATE_COMPLEX:
@@ -258,9 +260,9 @@ void sync_mixers()
             mp->num_mixers++;
             mp->mixer[1].src    = mp->mixer[0].src;
             mp->mixer[1].dest   = mp->mixer[0].dest;
-            mp->mixer[1].mux    = MUX_REPLACE;
+            MIXER_SET_MUX(&mp->mixer[1], MUX_REPLACE);
             mp->mixer[1].offset = 0;
-            mp->mixer[1].apply_trim = mp->mixer[0].apply_trim;
+            MIXER_SET_APPLY_TRIM(&mp->mixer[1], MIXER_APPLY_TRIM(&mp->mixer[0]));
         } else {
             mp->mixer[1].src = 0;
         }
@@ -270,15 +272,15 @@ void sync_mixers()
             mp->num_mixers++;
             mp->mixer[2].src    = mp->mixer[0].src;
             mp->mixer[2].dest   = mp->mixer[0].dest;
-            mp->mixer[2].mux    = MUX_REPLACE;
+            MIXER_SET_MUX(&mp->mixer[2], MUX_REPLACE);
             mp->mixer[2].offset = 0;
-            mp->mixer[2].apply_trim = mp->mixer[0].apply_trim;
+            MIXER_SET_APPLY_TRIM(&mp->mixer[2], MIXER_APPLY_TRIM(&mp->mixer[0]));
         } else {
             mp->mixer[2].src = 0;
         }
         if (mp->link_curves & 0x02)
             mp->mixer[2].curve = mp->mixer[0].curve;
-        mp->mixer[0].mux = MUX_REPLACE;
+        MIXER_SET_MUX(&mp->mixer[0], MUX_REPLACE);
         mp->mixer[0].offset = 0;
         mp->mixer[0].sw = 0;
         break;
@@ -310,12 +312,14 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
-    mp->cur_mixer->mux = GUI_TextSelectHelper(mp->cur_mixer->mux, MUX_REPLACE, MUX_LAST-1, dir, 1, 1, &changed);
+    u8 mux = MIXER_MUX(mp->cur_mixer);
+    mux = GUI_TextSelectHelper(mux, MUX_REPLACE, MUX_LAST-1, dir, 1, 1, &changed);
     if (changed) {
+        MIXER_SET_MUX(mp->cur_mixer, mux);
         MIXPAGE_RedrawGraphs();
         sync_mixers();
     }
-    switch(mp->cur_mixer->mux) {
+    switch(mux) {
         case MUX_REPLACE:  return _tr("replace");
         case MUX_MULTIPLY: return _tr("mult");
         case MUX_ADD:      return _tr("add");
@@ -355,7 +359,7 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         mp->cur_mixer = mp->mixer + (cur - 1);
         _show_complex(1);
-        set_src_enable(mp->cur_mixer->curve.type);
+        set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     }
     sprintf(mp->tmpstr, "%d", cur);
     return mp->tmpstr;
@@ -422,9 +426,9 @@ static void set_src_enable(int curve_type)
         state = 1;
     } else if(mp->cur_template != MIXERTEMPLATE_EXPO_DR) {
         state = 0;
-    } else if(mp->mixer[0].curve.type == CURVE_FIXED &&
-       (! mp->mixer[1].src || mp->mixer[1].curve.type == CURVE_FIXED) &&
-       (! mp->mixer[2].src || mp->mixer[2].curve.type == CURVE_FIXED))
+    } else if(CURVE_TYPE(&mp->mixer[0].curve) == CURVE_FIXED &&
+       (! mp->mixer[1].src || CURVE_TYPE(&mp->mixer[1].curve) == CURVE_FIXED) &&
+       (! mp->mixer[2].src || CURVE_TYPE(&mp->mixer[2].curve) == CURVE_FIXED))
     {
         state = 0;
     } else {
@@ -445,13 +449,15 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     }
     u8 changed;
     struct Mixer *mix = (struct Mixer *)data;
-    mix->curve.type = GUI_TextSelectHelper(mix->curve.type, 0, CURVE_MAX, dir, 1, 1, &changed);
+    u8 type = CURVE_TYPE(&mix->curve);
+    type = GUI_TextSelectHelper(type, 0, CURVE_MAX, dir, 1, 1, &changed);
     if (changed) {
+        CURVE_SET_TYPE(&mix->curve, type);
         sync_mixers();
-        set_src_enable(mix->curve.type);
+        set_src_enable(type);
         MIXPAGE_RedrawGraphs();
     }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, mix->curve.type >= CURVE_EXPO);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type >= CURVE_EXPO);
     return CURVE_GetName(&mix->curve);
 }
 
@@ -479,7 +485,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     }
     struct Mixer *mix = (struct Mixer *)data;
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
-    if (mix->curve.type >= CURVE_EXPO
+    if (CURVE_TYPE(&mix->curve) >= CURVE_EXPO
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }

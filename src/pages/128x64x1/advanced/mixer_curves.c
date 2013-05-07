@@ -22,14 +22,15 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
-    if (curve->type < CURVE_EXPO)
+    u8 type = CURVE_TYPE(curve);
+    if (type < CURVE_EXPO)
         return;
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
-    if ((curve->type == CURVE_EXPO || curve->type == CURVE_DEADBAND)
+    if ((type == CURVE_EXPO || type == CURVE_DEADBAND)
         && curve->points[0] == curve->points[1])
     {
         edit->pointnum = -1;
@@ -52,7 +53,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     w = 65;
     labelDesc.style = LABEL_LEFTCENTER;
 
-    if (curve->type >= CURVE_3POINT) {
+    if (type >= CURVE_3POINT) {
         GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
         y += space;
         labelDesc.style = LABEL_CENTER;

@@ -15,6 +15,17 @@
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
 #define NUM_CHANNELS (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS)
 #define NUM_SOURCES (NUM_INPUTS + NUM_CHANNELS + MAX_PPM_IN_CHANNELS)
+
+#define CURVE_TYPE(x)       (((x)->type) & 0x7F)
+#define CURVE_SMOOTHING(x)  (((x)->type) & 0x80)
+#define CURVE_SET_TYPE(x, y) ((x)->type = ((x)->type & ~0x7F) | (y))
+#define CURVE_SET_SMOOTHING(x, y) ((x)->type = ((x)->type & ~0x80) | ((y) ? 0x80 : 0))
+
+#define MIXER_MUX(x)        (((x)->flags) & 0x0F)
+#define MIXER_APPLY_TRIM(x) (((x)->flags) & 0x10)
+#define MIXER_SET_APPLY_TRIM(x,y) ((x)->flags = ((x)->flags & ~0x10) | ((y) ? 0x10 : 0))
+#define MIXER_SET_MUX(x,y)        ((x)->flags = ((x)->flags & ~0x0F) | (y))
+
 enum Safety {
     SAFE_NONE,
     SAFE_MIN,
@@ -53,6 +64,9 @@ enum CurveType {
 struct Curve {
     enum CurveType type;
     s8 points[MAX_POINTS];
+    //u8 index;
+    //s8 p1;
+    //s8 p2;
 };
 
 //The followingis defined bythe target
@@ -92,14 +106,15 @@ enum SwashType {
 #define MIXER_SRC_IS_INV(x) ((x) & 0x80)
 #define MIXER_SET_SRC_INV(x, y) x = (y) ? ((x) | 0x80) : ((x) & ~0x80)
 struct Mixer {
+    struct Curve curve;
     u8 src;
     u8 dest;
     u8 sw;
-    struct Curve curve;
     s8 scalar;
     s8 offset;
-    u8 apply_trim;
-    enum MuxType mux;
+    u8 flags;
+    //apply_trim;
+    //enum MuxType mux;
 };
 
 enum LimitFlags {

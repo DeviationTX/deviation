@@ -273,7 +273,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
     value = value * mixer->scalar / 100 + PCT_TO_RANGE(mixer->offset);
 
     //4th: multiplex result
-    switch(mixer->mux) {
+    switch(MIXER_MUX(mixer)) {
     case MUX_REPLACE:
         break;
     case MUX_MULTIPLY:
@@ -296,7 +296,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
     }
 
     //5th: apply trim
-    if (mixer->apply_trim)
+    if (MIXER_APPLY_TRIM(mixer))
         value = value + (MIXER_SRC_IS_INV(mixer->src) ? -1 : 1) * get_trim(MIXER_SRC(mixer->src));
 
     //Ensure we don't overflow
@@ -545,7 +545,7 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
             Model.mixers[pos] = mixers[i];
             if(Model.templates[mixers[i].dest] != MIXERTEMPLATE_COMPLEX) {
                 //Always apply the trim if the template is not 'complex'
-                Model.mixers[pos].apply_trim = 1;
+                MIXER_SET_APPLY_TRIM(&Model.mixers[pos], 1);
             }
             pos++;
         }
@@ -576,7 +576,7 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
     mixer->scalar = 100;
     mixer->offset = 0;
     mixer->sw = 0;
-    mixer->curve.type = CURVE_EXPO;
+    CURVE_SET_TYPE(&mixer->curve, CURVE_EXPO);
     for (i = 0; i < MAX_POINTS; i++)
         mixer->curve.points[i] = 0;
 }

@@ -45,9 +45,11 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     struct Curve *curve = &edit->curve;
     u8 changed;
-    if (curve->type >= CURVE_3POINT) {
-        curve->type = GUI_TextSelectHelper(curve->type, CURVE_3POINT, CURVE_MAX, dir, 1, 1, &changed);
+    u8 type = CURVE_TYPE(curve);
+    if (type >= CURVE_3POINT) {
+        type = GUI_TextSelectHelper(type, CURVE_3POINT, CURVE_MAX, dir, 1, 1, &changed);
         if (changed) {
+            CURVE_SET_TYPE(curve, type);
             GUI_Redraw(&gui->graph);
             GUI_Redraw(&gui->point);
         }
@@ -73,7 +75,7 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
     struct Curve *curve = &edit->curve;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
     s8 old_pointval = curve->points[pointnum];
-    if(curve->type == CURVE_DEADBAND) {
+    if(CURVE_TYPE(curve) == CURVE_DEADBAND) {
         curve->points[pointnum] = (s8)GUI_TextSelectHelper((u8)curve->points[pointnum], 0, 255, dir, 1, 5, NULL);
         ret = pagemem.u.mixer_page.tmpstr;
         sprintf(pagemem.u.mixer_page.tmpstr, "%d.%d", (u8)curve->points[pointnum] / 10, (u8)curve->points[pointnum] % 10);
@@ -94,9 +96,9 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     struct Curve *curve = &edit->curve;
-    if (curve->type >= CURVE_3POINT) {
+    if (CURVE_TYPE(curve) >= CURVE_3POINT) {
         u8 changed;
-        u8 max = (curve->type - CURVE_3POINT) * 2 + 2;
+        u8 max = (CURVE_TYPE(curve) - CURVE_3POINT) * 2 + 2;
         edit->pointnum = GUI_TextSelectHelper(edit->pointnum, 0, max, dir, 1, 1, &changed);
         if (changed)
             GUI_Redraw(&gui->value);

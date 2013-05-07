@@ -20,12 +20,13 @@
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
-    if (curve->type < CURVE_EXPO)
+    u8 type = CURVE_TYPE(curve);
+    if (type < CURVE_EXPO)
         return;
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
-    if ((curve->type == CURVE_EXPO || curve->type == CURVE_DEADBAND)
+    if ((type == CURVE_EXPO || type == CURVE_DEADBAND)
         && curve->points[0] == curve->points[1])
     {
         edit->pointnum = -1;
@@ -36,7 +37,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     PAGE_CreateCancelButton(160, 4, okcancel_cb);
     PAGE_CreateOkButton(264, 4, okcancel_cb);
 
-    if (curve->type >= CURVE_3POINT) {
+    if (type >= CURVE_3POINT) {
         GUI_CreateLabel(&gui->pointlbl, 8, 40, NULL, DEFAULT_FONT, _tr("Point"));
         GUI_CreateTextSelect(&gui->point, 8, 56, TEXTSELECT_96, NULL, set_pointnum_cb, NULL);
     } else {
