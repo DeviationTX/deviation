@@ -74,7 +74,7 @@ s16 hermite_spline(struct Curve *curve, s32 value)
             s32 h10 = t3 - 2*t2 + t;
             s32 h01 = -2*t3 + 3*t2;
             s32 h11 = t3 - t2;
-            y = p0y * h00 + h * m0 * h10 / MMULT + p3y * h01 + h * m3 * h11 / MMULT;
+            y = p0y * h00 + h * (m0 * h10 / MMULT) + p3y * h01 + h * (m3 * h11 / MMULT);
             y /= MMULT;
             return y;
         }
