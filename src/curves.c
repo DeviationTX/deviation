@@ -55,7 +55,7 @@ s32 compute_tangent(struct Curve *curve, int num_points, int i)
 s16 hermite_spline(struct Curve *curve, s32 value)
 {
     int num_points = (CURVE_TYPE(curve) - CURVE_3POINT) * 2 + 3;
-    s32 step = PCT_TO_RANGE(2 * 100 / (num_points - 1)) ;
+    s32 step = PCT_TO_RANGE(2 * 100) / (num_points - 1) ;
     for (int i = 0; i < num_points -1; i++) {
         s32 x = PCT_TO_RANGE(-100) + i * step;
         s32 p0x = x;
