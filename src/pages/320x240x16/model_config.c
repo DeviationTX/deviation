@@ -111,20 +111,19 @@ void MODELTRAIN_Config()
     if ((Model.num_ppmin & 0xC0) != 0x40)
         return;
 
-    long i = 0;
-    int num_ppm = MAX_PPM_IN_CHANNELS;
-    while (i < num_ppm) {
+    int num_rows= (MAX_PPM_IN_CHANNELS + 1) / 2;
+    for (int i = 0; i < num_rows; i++) {
+        long idx = i;
         row += 20;
         if (row > 300)
             break;
-        GUI_CreateLabelBox(&gui->ppmmaplbl[i], 8, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)i);
-        GUI_CreateTextSelect(&gui->ppmmap[i], 60, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)i);
-        i++;
-        if (i >= num_ppm)
+        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], 8, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
+        GUI_CreateTextSelect(&gui->ppmmap[idx], 60, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
+        idx += num_rows;
+        if (idx >= MAX_PPM_IN_CHANNELS)
             break;
-        GUI_CreateLabelBox(&gui->ppmmaplbl[i], 164, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)i);
-        GUI_CreateTextSelect(&gui->ppmmap[i], 216, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)i);
-        i++;
+        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], 164, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
+        GUI_CreateTextSelect(&gui->ppmmap[idx], 216, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
     }
 }
 
