@@ -147,8 +147,6 @@ Aux2
 Отцентруйте все стики и ручки,\nзатем нажмите ENT
 :Ch
 Канал
-:Ch %d
-Канал %d
 :Ch%d
 Канал %d
 :Chan mode
@@ -405,6 +403,8 @@ M
 -
 :New
 Новый
+:No
+Нет
 :No Bars
 Без полос
 :No Trim
@@ -437,6 +437,8 @@ M
 PPM
 :PPM In
 PPM-Вход
+:PPM%d
+PPM%d
 :PPMIn Config
 Настройка PPM-Вход
 :Page
@@ -547,6 +549,8 @@ RPM
 Простой
 :Simple 4 Channel
 Простой 4-канала
+:Smooth
+Сгладить
 :Speed
 Скорость
 :Src
@@ -719,6 +723,8 @@ USB
 Вирт.
 :Volt
 Вольт
+:Yes
+Да
 :Zero/Max
 Ноль/Макс
 :\n%d seconds left
