@@ -358,14 +358,16 @@ static void calc_dsmx_channel()
 
 static void parse_telemetry_packet()
 {
+    static s32 altitude;
     u32 time_ms = CLOCK_getms();
+    
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
-            //Telemetry.fadesA = ((s32)packet[2] << 8) | packet[3];
-            //Telemetry.fadesB = ((s32)packet[4] << 8) | packet[5];
-            //Telemetry.fadesL = ((s32)packet[6] << 8) | packet[7];
-            //Telemetry.fadesR = ((s32)packet[8] << 8) | packet[9];
+            //Telemetry.fadesA = ((s32)packet[2] << 8) | packet[3]; //0xFFFF = NC (not connected)
+            //Telemetry.fadesB = ((s32)packet[4] << 8) | packet[5]; //0xFFFF = NC (not connected)
+            //Telemetry.fadesL = ((s32)packet[6] << 8) | packet[7]; //0xFFFF = NC (not connected)
+            //Telemetry.fadesR = ((s32)packet[8] << 8) | packet[9]; //0xFFFF = NC (not connected)
             //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
             //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
             Telemetry.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
@@ -482,9 +484,10 @@ static void parse_telemetry_packet()
                 //0x1d:MAX OFF CONDITION
             //Telemetry.time[x6] = time_ms;
             break;
-        case 0x16: //GPS sensor
-            Telemetry.gps.altitude = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
-                                    + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
+        case 0x16: //GPS sensor (always second GPS packet)
+            altitude += (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
+                       + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
+            Telemetry.gps.altitude = altitude;
             Telemetry.gps.latitude = ((packet[7] >> 4) * 10 + (packet[7] & 0x0f)) * 3600000 
                                    + ((packet[6] >> 4) * 10 + (packet[6] & 0x0f)) * 60000 
                                    + ((packet[5] >> 4) * 10 + (packet[5] & 0x0f)) * 600 
@@ -503,7 +506,7 @@ static void parse_telemetry_packet()
             //                      + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees (16Bit decimal, 1 unit is 0.1 degree)
             Telemetry.time[2] = time_ms;
             break;
-        case 0x17: //GPS sensor
+        case 0x17: //GPS sensor (always first GPS packet)
             Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
                                     + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 5556 / 108; //In m/s * 1000
             u8 hour  = (packet[7] >> 4) * 10 + (packet[7] & 0x0f);
@@ -520,6 +523,7 @@ static void parse_telemetry_packet()
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
             //Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
+            altitude = ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             Telemetry.time[2] = time_ms;
             break;
     }
