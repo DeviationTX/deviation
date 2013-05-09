@@ -29,9 +29,11 @@ static const u8 const AETRG[PROTO_MAP_LEN] =
 
 static u8 proto_state;
 static u32 bind_time;
-#define PROTO_READY   0x01
-#define PROTO_BINDING 0x02
-#define PROTO_BINDDLG 0x04
+#define PROTO_DEINIT  0x00
+#define PROTO_INIT    0x01
+#define PROTO_READY   0x02
+#define PROTO_BINDING 0x04
+#define PROTO_BINDDLG 0x08
 
 #define PROTODEF(proto, module, map, cmd, name) map,
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
@@ -59,7 +61,7 @@ void PROTOCOL_Init(u8 force)
 {
     PROTOCOL_DeInit();
     PROTOCOL_Load(0);
-    proto_state = 0;
+    proto_state = PROTO_INIT;
     if (! force && PROTOCOL_CheckSafe()) {
         return;
     }
@@ -76,7 +78,7 @@ void PROTOCOL_DeInit()
     CLOCK_StopTimer();
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_DEINIT);
-    proto_state = PROTO_READY;
+    proto_state = PROTO_DEINIT;
 }
 
 /*This symbol is exported bythe linker*/
@@ -156,7 +158,7 @@ void PROTOCOL_Load(int no_dlg)
  
 u8 PROTOCOL_WaitingForSafe()
 {
-    return (proto_state & PROTO_READY) ? 0 : 1;
+    return ((proto_state & (PROTO_INIT | PROTO_READY)) == PROTO_INIT) ? 1 : 0;
 }
 
 u32 PROTOCOL_Binding()
@@ -238,6 +240,12 @@ u8 PROTOCOL_AutoBindEnabled()
 
 void PROTOCOL_Bind()
 {
+    if(! (proto_state & PROTO_INIT)) {
+        PROTOCOL_Init(0);
+    }
+    if (! (proto_state & PROTO_READY)) {
+        return;
+    }
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         PROTO_Cmds(PROTOCMD_BIND);
 }
