@@ -1270,6 +1270,10 @@ u8 CONFIG_ReadModel(u8 model_num) {
     crc32 = Crc(&Model, sizeof(Model));
     if(! Model.name[0])
         sprintf(Model.name, "Model%d", model_num);
+    if (PPMin_Mode())
+        PPMin_Start();
+    else
+        PPMin_Stop();
 
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     return 1;
