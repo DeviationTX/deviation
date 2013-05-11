@@ -40,14 +40,18 @@ void lcd_set_pos(unsigned int x0, unsigned int y0)
 #define LCDTYPE_UNKNOWN 0
 int lcd_detect()
 {
+    //Read ID register for HX8347 (will be 0x47 if found)
     LCD_REG = 0x00;
     u8 data = LCD_DATA;
     if (data == 0x47) {
         return LCDTYPE_HX8347;
     } else {
+        //Read ID register for ILI9341 (will be 0x9341 if found)
         LCD_REG = 0xd3;
+        //As per the spec, the 1st 2 reads are dummy reads and irrelevant
         data = LCD_DATA;
         data = LCD_DATA;
+        //Actual ID is in 3rd and 4th bytes
         data = LCD_DATA;
         u16 data2 = LCD_DATA;
         data2 = (((int)data) << 8) | data2;
