@@ -53,4 +53,5 @@ void PAGE_SplashEvent()
 
 void PAGE_SplashExit()
 {
+    PAGE_SetActionCB(NULL);
 }
