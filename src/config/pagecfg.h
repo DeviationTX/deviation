@@ -22,8 +22,8 @@ struct PageCfg {
     u8 barsize;
     u8 box[8];
     u8 bar[8];
-    u8 toggle[4];
-    u8 tglico[4][3];
+    u8 toggle[NUM_TOGGLES];
+    u8 tglico[NUM_TOGGLES][3];
     u8 quickpage[NUM_QUICKPAGES];
 };
 #endif

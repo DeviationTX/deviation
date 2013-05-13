@@ -45,6 +45,7 @@ static const struct page pages[] = {
     {PAGE_TelemtestGPSInit, PAGE_TelemtestEvent, NULL, "TeleGPS"},
     {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
     {PAGE_AboutInit, NULL, NULL, "About"},
+    {PAGE_SplashInit, PAGE_SplashEvent, PAGE_SplashExit, "Splash"},
 
     //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
 };
@@ -69,7 +70,8 @@ void PAGE_Init()
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, action_cb, NULL);
-    PAGE_ChangeByID(PAGEID_MAIN, 0);
+    //PAGE_ChangeByID(PAGEID_MAIN, 0);
+    PAGE_ChangeByID(PAGEID_SPLASH, 0);
 
     labelDesc.font = DEFAULT_FONT.font;
     labelDesc.style = LABEL_LEFT;

@@ -24,6 +24,7 @@ enum {
     ITEM_STICKS,
     ITEM_BUZZ,
     ITEM_HAPTIC,
+    ITEM_PWR_ALARM,
     ITEM_BATT,
     ITEM_ALARM_INTV,
     ITEM_PWRDN_ALARM,
@@ -309,6 +310,19 @@ static const char *timer_interval_cb(guiObject_t *obj, int dir, void *data)
     if (interval == 0)
         return _tr("Off");
     sprintf(cp->tmpstr, "%d", interval);
+    return cp->tmpstr;
+}
+
+static const char *poweralarm_select_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    u8 changed;
+    Transmitter.power_alarm = GUI_TextSelectHelper(Transmitter.power_alarm,
+            0 , MAX_POWER_ALARM, dir, 1 , 5 , &changed);
+    if( 0 == Transmitter.power_alarm)
+	return _tr("Off");
+    sprintf(cp->tmpstr, "%2dmn", Transmitter.power_alarm);
     return cp->tmpstr;
 }
 

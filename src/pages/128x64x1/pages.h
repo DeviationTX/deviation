@@ -36,7 +36,7 @@ struct pagemem {
 #define PREVIOUS_ITEM -1
 #define PAGE_ITEM_MAX 4
 #define TOGGLE_FILE    "media/switches.bmp"
-#define GRAY_FILE      "media/gray.bmp"
+#define SPLASH_FILE    "media/splash.bmp"
 
 #define TOGGLEICON_WIDTH 8
 #define TOGGLEICON_HEIGHT 11
@@ -54,5 +54,8 @@ void PAGE_MenuInit(int page);
 void PAGE_MenuExit();
 
 void PAGE_AboutInit(int page);
+void PAGE_SplashInit(int page);
+void PAGE_SplashEvent();
+void PAGE_SplashExit();
 
 #endif

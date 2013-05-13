@@ -22,7 +22,6 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
-#define GRAY_FILE "media/gray.bmp"
 #include "../common/_main_page.c"
 
 static const char *_power_to_string();
@@ -86,20 +85,15 @@ void PAGE_MainInit(int page)
         }
     }
 
-    for(i = 0; i < 4; i++) {
+    for(i = 0; i < NUM_TOGGLES; i++) {
         if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
-            // u8 old_color = TINY_FONT.outline_color;
-            //TINY_FONT.outline_color = 0xffff;
-            u8 x1 = x + (w +2)* i;
-            if(! Model.pagecfg.toggle[i])
+            u8 x1 = x + (w+1) * i;
+            if(! Model.pagecfg.toggle[i]) {
                 LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
-            else {
-                if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
-                    struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
-                    GUI_CreateImageOffset(&gui->toggle[i], x1 + 1, y, w, h, img.x_off, img.y_off, img.file, NULL, NULL);
-                }
+            } else {
+                struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
+                GUI_CreateImageOffset(&gui->toggle[i], x1 + 1, y, w, h, img.x_off, img.y_off, img.file, NULL, NULL);
             }
-            //TINY_FONT.outline_color = old_color;
         }
     }
     //Battery

@@ -36,6 +36,7 @@ struct Transmitter {
     u8 music_shutdown;
     enum Mode mode;
     u16 batt_alarm;
+    u8 power_alarm;
     u16 batt_critical;
     u16 batt_warning_interval;
     u8 volume;

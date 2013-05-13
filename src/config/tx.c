@@ -35,6 +35,7 @@ const char BRIGHTNESS[] = "brightness";
 const char CONTRAST[] = "contrast";
 const char VOLUME[] = "volume";
 const char VIBRATION[] = "vibration";
+const char POWER_ALARM[] = "power_alarm";
 
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
@@ -124,6 +125,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_KEY(VIBRATION)) {
             t->vibration_state = atoi(value);
+            return 1;
+        }
+        if (MATCH_KEY(POWER_ALARM)) {
+            t->power_alarm = atoi(value);
             return 1;
         }
         if (MATCH_KEY(BATT_ALARM)) {
@@ -257,6 +262,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
     fprintf(fh, "%s=%d\n", VOLUME, Transmitter.volume);
     fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
+    fprintf(fh, "%s=%d\n", POWER_ALARM, Transmitter.power_alarm);
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
@@ -303,6 +309,7 @@ void CONFIG_LoadTx()
     Transmitter.contrast = 5;
     Transmitter.volume = 10;
     Transmitter.vibration_state = 0; // default to off since only devo10 support it
+    Transmitter.power_alarm = 0;     // default to off 
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     Transmitter.batt_warning_interval = DEFAULT_BATTERY_WARNING_INTERVAL;

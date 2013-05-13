@@ -37,7 +37,7 @@ struct pagemem {
 
 #define TOGGLE_FILE "media/toggle.bmp"
 #define MODELMENU_FILE "media/modelmnu.bmp"
-#define GRAY_FILE      "media/gray.bmp"
+#define SPLASH_FILE    "media/splash.bmp"
 
 #define TOGGLEICON_WIDTH 32
 #define TOGGLEICON_HEIGHT 31
@@ -45,4 +45,9 @@ struct pagemem {
 void PAGE_SetSection(u8 section);
 void PAGE_ChangeByID(enum PageID id);
 void MODELMENU_Show(guiObject_t *obj, const void *data);
+
+void PAGE_SplashInit(int page);
+void PAGE_SplashEvent();
+void PAGE_SplashExit();
+
 #endif

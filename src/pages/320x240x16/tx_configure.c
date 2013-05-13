@@ -83,6 +83,9 @@ static void _show_page()
     } else if (page_num == 1) {
         firstObj = GUI_CreateLabelBox(&gui2->head1, 16, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Buzzer settings"));
         row += space;
+        GUI_CreateLabelBox(&gui2->power_alarmlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power On alarm"));
+        GUI_CreateTextSelect(&gui2->power_alarm, 112, row, TEXTSELECT_96, NULL, poweralarm_select_cb, NULL);
+        row += space;
         GUI_CreateLabelBox(&gui2->battalrmlbl, 16, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Battery alarm"));
         GUI_CreateTextSelect(&gui2->battalrm, 112, row, TEXTSELECT_96, NULL, batalarm_select_cb, NULL);
         row += space;

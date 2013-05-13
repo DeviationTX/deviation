@@ -62,6 +62,7 @@ struct page_group groups[] = {
     {2, PAGEID_SCANNER},
 #endif
     {2, PAGEID_USB},
+    {2, PAGEID_SPLASH},
     {0x81, PAGEID_MODELMENU},
     {255, 0}
 };
@@ -79,7 +80,8 @@ void PAGE_Init()
         CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
         | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
         BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
-    PAGE_ChangeByID(PAGEID_MAIN);
+    PAGE_ChangeByID(PAGEID_SPLASH);
+    //PAGE_ChangeByID(PAGEID_MAIN);
 }
 
 void PAGE_SetSection(u8 section)

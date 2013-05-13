@@ -849,7 +849,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_START(name, GUI_TOGGLE)) {
             u8 idx = name[6] - '1';
-            if (idx >= 4) {
+            if (idx >= NUM_TOGGLES) {
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
@@ -867,7 +867,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         if (MATCH_START(name, GUI_TGLICO)) {
             int idx = name[6] - '1';
-            if (idx >= 4) {
+            if (idx >= NUM_TOGGLES) {
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
@@ -1197,7 +1197,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_BAR, idx+1, INPUT_SourceName(file, val));
         }
     }
-    for(idx = 0; idx < 4; idx++) {
+    for(idx = 0; idx < NUM_TOGGLES; idx++) {
         if (WRITE_FULL_MODEL || m->pagecfg.toggle[idx]) {
             u8 val = m->pagecfg.toggle[idx];
             fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceNameAbbrevSwitch(file, val));

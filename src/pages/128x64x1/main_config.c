@@ -36,6 +36,7 @@ enum {
     ITEM_SWITCH1,
     ITEM_SWITCH2,
     ITEM_SWITCH3,
+    ITEM_SWITCH4,
     ITEM_MENU,
 };
 
@@ -119,7 +120,7 @@ guiObject_t *firstObj;
 
 #define TOGGLE_LR_Y 11
 #define TOGGLE_LR_SPACE 40
-#define TOGGLE_L_X 8
+#define TOGGLE_L_X 6
 #define TOGGLE_R_X (LCD_WIDTH - TOGGLE_L_X - 2 * TOGGLE_LR_SPACE - TOGGLEICON_WIDTH)
 /*************************************/
 
@@ -186,6 +187,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_SWITCH1:
         case ITEM_SWITCH2:
         case ITEM_SWITCH3:
+        case ITEM_SWITCH4:
 	    label_cb = NULL;
             value = toggle_val_cb; data = (void *)(long)(absrow - ITEM_SWITCH0);
 	    buttonlabel_cb = toggle_sel_cb; buttonpress_cb = switchicon_press_cb;

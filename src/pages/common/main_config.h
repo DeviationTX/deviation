@@ -12,6 +12,7 @@ enum MainWidget {
     TOGGLE2,
     TOGGLE3,
     TOGGLE4,
+    TOGGLE5,
     BOX1,
     BOX2,
     BOX3,

@@ -141,7 +141,7 @@ void PAGE_MainEvent()
             GUI_Redraw(&gui->bar[i]);
         }
     }
-    for(i = 0; i < 4; i++) {
+    for(i = 0; i < NUM_TOGGLES; i++) {
         if (! OBJ_IS_USED(&gui->toggle[i]))
             continue;
         u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);

@@ -103,6 +103,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Alarm intvl");
             value = batalarmwarn_select_cb;
             break;
+	case ITEM_PWR_ALARM:
+            label = _tr_noop("PwrOn alarm");
+            value = poweralarm_select_cb;
+            break;
         case ITEM_PWRDN_ALARM:
             label = _tr_noop("PwrDn alert");
             value = _music_shutdown_cb;

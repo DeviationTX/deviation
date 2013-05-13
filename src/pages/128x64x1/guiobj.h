@@ -4,6 +4,11 @@ struct about_obj {
     guiLabel_t label[3];
 };
 
+struct splash_obj {
+    guiLabel_t version;
+    guiImage_t splash_image;
+};
+
 struct chantest_obj {
     guiLabel_t title;
     guiRect_t  rect;
@@ -52,7 +57,7 @@ struct mainpage_obj {
     guiBarGraph_t trim[6];
     guiBarGraph_t bar[8];
     guiLabel_t box[8];
-    guiImage_t toggle[4];
+    guiImage_t toggle[NUM_TOGGLES];
     guiLabel_t battery;
     guiLabel_t power;
 };
@@ -294,6 +299,7 @@ struct gui_objs {
     struct dialog_obj dialog;
     union {
         struct about_obj about;
+        struct splash_obj splash;
         struct chantest_obj chantest;
         struct lang_obj lang;
         struct mainconfig_obj mainconfig;

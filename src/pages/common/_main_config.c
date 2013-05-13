@@ -194,6 +194,7 @@ u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h)
         *h = VTRIM_56_H; // VTRIM_H;
         return 1;
     case TOGGLE4:
+    case TOGGLE5:
         if (LCD_DEPTH != 1 && Model.pagecfg.trims == TRIMS_6)
             return 0;
         //Fall-through

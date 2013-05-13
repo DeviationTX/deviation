@@ -3,6 +3,11 @@
 
 #include "standard/standard.h"
 
+struct splash_obj {
+    guiLabel_t version;
+    guiImage_t splash_image;
+};
+
 struct dialog_obj {
     guiDialog_t dialog;
 };
@@ -230,6 +235,8 @@ struct tx_obj {
              guiLabel_t head1;
              guiLabel_t buzzlbl;
              guiTextSelect_t buzz;
+             guiTextSelect_t power_alarm;
+             guiLabel_t power_alarmlbl;
              guiLabel_t battalrmlbl;
              guiTextSelect_t battalrm;
 	     guiLabel_t battalrmintvllbl;
@@ -465,6 +472,7 @@ struct gui_objs {
     struct page_obj page;
     struct dialog_obj dialog;
     union {
+        struct splash_obj splash;
         struct chantest_obj chantest;
         struct lang_obj lang;
         struct maincfg_obj maincfg;

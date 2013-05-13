@@ -18,6 +18,7 @@
 #include "music.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include <stdlib.h>
 
 static u8 timer_state[NUM_TIMERS];
 static s32 timer_val[NUM_TIMERS];
@@ -84,12 +85,41 @@ void TIMER_Init()
 	TIMER_Reset(i);
 }
 
+void TIMER_Power(){
+    static u32 timer = 0;
+    u32 alert = Transmitter.power_alarm * 60 * 1000;
+    static u16 throttle;
+    u16 new_throttle;
+    u16 elevator;
+    u8 mode = MODE_2 == Transmitter.mode || MODE_4 == Transmitter.mode ? 2 : 1;
+
+    if( 0 == timer)
+	timer =  CLOCK_getms() + alert;
+
+    elevator = 2 == mode ? abs(CHAN_ReadInput(INP_THROTTLE)) : abs(CHAN_ReadInput(INP_ELEVATOR));
+    new_throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
+    new_throttle = abs(new_throttle - throttle);
+     
+    if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 && 
+		new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
+		!ScanButtons() && !SPITouch_IRQ() ) {
+	if ( CLOCK_getms() > timer ) {
+	    timer =  CLOCK_getms() + 2000;
+	    MUSIC_Play(MUSIC_SHUTDOWN);
+	}		
+    } else 
+	   timer =  CLOCK_getms() + alert;
+    throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
+}
+
 void TIMER_Update()
 {
     u8 i;
     u32 t = CLOCK_getms();
     if (PROTOCOL_WaitingForSafe())
         return;
+    if( Transmitter.power_alarm > 0 )
+        TIMER_Power();
     for (i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src) {
             s16 val;
