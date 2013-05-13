@@ -919,9 +919,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_START(name, PPMIN_MAP)) {
-            u8 idx = atoi(name + sizeof(PPMIN_MAP)-1);
+            u8 idx = atoi(name + sizeof(PPMIN_MAP)-1) -1;
             if (idx < MAX_PPM_IN_CHANNELS) {
-                m->ppm_map[idx] = atoi(value) -1;
+                m->ppm_map[idx]  = get_source(section, value);
+                if (PPMin_Mode() == PPM_IN_TRAIN1) {
+                    m->ppm_map[idx] =  (m->ppm_map[idx] <= NUM_INPUTS)
+                                       ? -1
+                                       : m->ppm_map[idx] - (NUM_INPUTS + 1);
+                }
             }
             return 1;
         }
@@ -1097,14 +1102,17 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s]\n", SECTION_PPMIN);
         fprintf(fh, "%s=%s\n", PPMIN_MODE, PPMIN_MODE_VALUE[PPMin_Mode()]);
         fprintf(fh, "%s=%d\n", PPMIN_NUM_CHANNELS, (m->num_ppmin & 0x3F));
-        if (PPMin_Mode() == 1) {
+        if (PPMin_Mode() != PPM_IN_SOURCE) {
             fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceName(file, m->train_sw));
         }
         fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
         fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
-        for(idx = 0; idx < MAX_PPM_IN_CHANNELS; idx++) {
-            if (idx != m->ppm_map[idx] || WRITE_FULL_MODEL) {
-                fprintf(fh, "%s%d=%d\n", PPMIN_MAP, idx + 1, m->ppm_map[idx] + 1);
+        if (PPMin_Mode() != PPM_IN_SOURCE) {
+            int offset = (PPMin_Mode() == PPM_IN_TRAIN1) ? NUM_INPUTS + 1: 0;
+            for(idx = 0; idx < MAX_PPM_IN_CHANNELS; idx++) {
+                if (m->ppm_map[idx] == -1)
+                    continue;
+                fprintf(fh, "%s%d=%s\n", PPMIN_MAP, idx + 1, INPUT_SourceName(file, m->ppm_map[idx] + offset));
             }
         }
         fprintf(fh, "\n");
@@ -1243,7 +1251,7 @@ void clear_model(u8 full)
         Model.trims[i].step = 1;
     }
     for (i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
-        Model.ppm_map[i] = i;
+        Model.ppm_map[i] = -1;
     }
     Model.ppmin_centerpw = 1500;
     Model.ppmin_deltapw = 400;

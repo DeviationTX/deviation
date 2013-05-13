@@ -208,10 +208,11 @@ void MODELTRAIN_Config()
 {
     PAGE_SetModal(1);
     PAGE_SetActionCB(_action_cb);
-    show_titlerow((Model.num_ppmin & 0xC0) == 0x40
-                  ? _tr("Trainer Config")
-                  : _tr("PPMIn Config"));
+    show_titlerow((Model.num_ppmin & 0xC0) == 0xC0
+                  ? _tr("PPMIn Config")
+                  : _tr("Trainer Config"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, PPMin_Mode() == 1 ? 3 + MAX_PPM_IN_CHANNELS : 3, row3_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
+                         row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

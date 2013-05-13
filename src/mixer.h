@@ -41,6 +41,13 @@ enum Mode {
     MODE_4=4
 };
 
+enum PPMInMode {
+    PPM_IN_OFF,
+    PPM_IN_TRAIN1,
+    PPM_IN_TRAIN2,
+    PPM_IN_SOURCE,
+};
+
 enum CurveType {
     CURVE_NONE,
     CURVE_FIXED,

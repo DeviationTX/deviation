@@ -89,11 +89,11 @@ void MODELPROTO_Config()
 void MODELTRAIN_Config()
 {
     PAGE_SetModal(1);
-    show_titlerow((Model.num_ppmin & 0xC0) == 0x40
-                  ? _tr("Trainer Config")
-                  : _tr("PPMIn Config"));
+    show_titlerow((Model.num_ppmin & 0xC0) == 0xC0
+                  ? _tr("PPMIn Config")
+                  : _tr("Trainer Config"));
     int row = 40;
-    if (PPMin_Mode() == 1) {
+    if (PPMin_Mode() != PPM_IN_SOURCE) {
         GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
         GUI_CreateTextSelect(&gui->trainsw, 136, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
     } else {
@@ -108,7 +108,7 @@ void MODELTRAIN_Config()
     GUI_CreateTextSelect(&gui->deltapw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)2L);
     row += 20;
  
-    if ((Model.num_ppmin & 0xC0) != 0x40)
+    if (PPMin_Mode() == PPM_IN_SOURCE)
         return;
 
     int num_rows= (MAX_PPM_IN_CHANNELS + 1) / 2;

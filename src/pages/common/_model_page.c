@@ -184,7 +184,7 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     u8 new_ppm = PPMin_Mode();
-    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 2, dir, 1, 1, &changed);
+    new_ppm = GUI_TextSelectHelper(new_ppm, 0, 3, dir, 1, 1, &changed);
 
     if (obj) {
         if (changed) {
@@ -195,6 +195,18 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
                 //Stop PPM-In
                 PPMin_Stop();
             }
+            switch (new_ppm) {
+                case PPM_IN_TRAIN1:
+                    memset(Model.ppm_map, -1, sizeof(Model.ppm_map));
+                    for(int i = 0; i < Model.num_channels; i++)
+                        Model.ppm_map[i] = i;
+                    break;
+                case PPM_IN_TRAIN2:
+                    memset(Model.ppm_map, -1, sizeof(Model.ppm_map));
+                    for(int i = 0; i < 4; i++)
+                        Model.ppm_map[i] = i+1;
+                    break;
+            }
         }
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, new_ppm);
         Model.num_ppmin = (Model.num_ppmin & 0x3f) | (new_ppm << 6);
@@ -202,7 +214,9 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     if (new_ppm == 0) {
         return _tr("None");
     } else if (new_ppm == 1) {
-        return _tr("Train");
+        return _tr("Train1");
+    } else if (new_ppm == 2) {
+        return _tr("Train2");
     } else {
         return _tr("Input");
     }

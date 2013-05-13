@@ -131,6 +131,21 @@ const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
     return str;
 }
 
+int INPUT_GetAbbrevSource(int origval, int newval, int dir)
+{
+    if (origval == newval || ! newval)
+        return newval;
+    int pos = INPUT_SwitchPos(newval);
+    int num_pos = INPUT_NumSwitchPos(newval);
+    if (num_pos != 0 && pos) {
+        if (dir > 0)
+            newval += (num_pos - pos);
+        else
+            newval -= pos;
+    }
+    return newval;
+}
+
 int INPUT_SwitchPos(u8 src)
 {
     const char *ptr;

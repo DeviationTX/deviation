@@ -97,7 +97,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 source = *(u8 *)data;
     u8 is_neg = MIXER_SRC_IS_INV(source);
     u8 changed;
-    source = GUI_TextSelectHelper(MIXER_SRC(source), 1, NUM_SOURCES, dir, 1, 1, &changed);
+    source = GUI_TextSelectHelper(MIXER_SRC(source), 0, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(source, is_neg);
     if (changed) {
         *(u8 *)data = source;
@@ -116,10 +116,16 @@ const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], -1, Model.num_channels, dir, 1, 1, NULL);
-    if (Model.ppm_map[idx] < 0)
-        return _tr("None");
-    sprintf(mp->tmpstr, _tr("PPM%d"), Model.ppm_map[idx]+1);
+    if (PPMin_Mode() == PPM_IN_TRAIN1) {
+        Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], 0, NUM_SOURCES, dir, 1, 1, NULL);
+        if (Model.ppm_map[idx] < 0)
+            return _tr("None");
+        sprintf(mp->tmpstr, _tr("Ch%d"), Model.ppm_map[idx]+1);
+    } else {
+        int newval = GUI_TextSelectHelper(Model.ppm_map[idx], 0, NUM_INPUTS, dir, 1, 1, NULL);
+        Model.ppm_map[idx] = INPUT_GetAbbrevSource(Model.ppm_map[idx], newval, dir);
+        INPUT_SourceNameAbbrevSwitch(mp->tmpstr, Model.ppm_map[idx]);
+    }
     return mp->tmpstr;
 }
 
@@ -168,6 +174,6 @@ const char *input_chname_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(mp->tmpstr, _tr("Ch%d"), idx+1);
+    sprintf(mp->tmpstr, _tr("PPM%d"), idx+1);
     return mp->tmpstr;
 }

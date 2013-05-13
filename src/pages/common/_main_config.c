@@ -126,21 +126,6 @@ const char *toggle_sel_cb(guiObject_t *obj, const void *data)
     return str;
 }
 
-int fix_abbrev_src(int origval, int newval, int dir)
-{
-    if (origval == newval || ! newval)
-        return newval;
-    int pos = INPUT_SwitchPos(newval);
-    int num_pos = INPUT_NumSwitchPos(newval);
-    if (num_pos != 0 && pos) {
-        if (dir > 0)
-            newval += (num_pos - pos);
-        else
-            newval -= pos;
-    }
-    return newval;
-}
-
 const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -149,7 +134,7 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
     u8 val = MIXER_SRC(Model.pagecfg.toggle[idx]);
 
     int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
-    newval = fix_abbrev_src(val, newval, dir);
+    newval = INPUT_GetAbbrevSource(val, newval, dir);
     if (val != newval) {
         val = newval;
         Model.pagecfg.toggle[idx] = val;

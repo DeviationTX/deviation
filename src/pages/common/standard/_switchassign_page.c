@@ -55,7 +55,7 @@ static const char *switch_cb(guiObject_t *obj, int dir, void *data)
     int first = INP_HAS_CALIBRATION+1;
     int last = INP_LAST-1;
     int newval = GUI_TextSelectHelper(switch_idx[switch_type], first, last, dir, 1, 1, NULL);
-    switch_idx[switch_type] = fix_abbrev_src(switch_idx[switch_type], newval, dir);
+    switch_idx[switch_type] = INPUT_GetAbbrevSource(switch_idx[switch_type], newval, dir);
     return INPUT_SourceNameAbbrevSwitch(mp->tmpstr, switch_idx[switch_type]);
 }
 

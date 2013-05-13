@@ -147,6 +147,7 @@ int PROTOCOL_HasPowerAmp(int idx);
 /* Input */
 const char *INPUT_SourceName(char *str, u8 src);
 const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src);
+int INPUT_GetAbbrevSource(int origval, int newval, int dir);
 int INPUT_SwitchPos(u8 src);
 int INPUT_NumSwitchPos(u8 src);
 int INPUT_GetFirstSwitch(int src);

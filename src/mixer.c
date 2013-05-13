@@ -118,15 +118,33 @@ u8 MIXER_MapChannel(u8 channel)
     return channel;
 }
 
+static int map_ppm_channels(int idx)
+{
+    for(int i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        if(Model.ppm_map[i] == idx) {
+            return i;
+        }
+    }
+    return -1;
+}
 static void MIXER_UpdateRawInputs()
 {
     int i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
         u8 mapped_channel = MIXER_MapChannel(i);
+        if (PPMin_Mode() == PPM_IN_TRAIN2 && Model.train_sw && raw[Model.train_sw] > 0) {
+            int ppm_channel_map = map_ppm_channels(i);
+            if (ppm_channel_map >= 0) {
+                if (ppmSync) {
+                    raw[i] = ppmChannels[ppm_channel_map];
+                }
+                continue;
+            }
+        }
         raw[i] = CHAN_ReadInput(mapped_channel);
     }
-    if (PPMin_Mode() == 2 && ppmSync) {
+    if (PPMin_Mode() == PPM_IN_SOURCE && ppmSync) {
         for (i = 0; i < (Model.num_ppmin & 0x3f); i++) {
             raw[1 + NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i] = ppmChannels[i];
         }
@@ -168,10 +186,11 @@ void MIXER_CalcChannels()
     }
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        if (PPMin_Mode() == 1 && Model.train_sw && raw[Model.train_sw] > 0) {
-            if (Model.ppm_map[i] >= 0 && Model.ppm_map[i] < ppmin_num_channels) {
+        if (PPMin_Mode() == PPM_IN_TRAIN1 && Model.train_sw && raw[Model.train_sw] > 0) {
+            int ppm_channel_map = map_ppm_channels(i);
+            if (ppm_channel_map >= 0) {
                 if (ppmSync) {
-                    Channels[i] = ppmChannels[Model.ppm_map[i]];
+                    Channels[i] = ppmChannels[ppm_channel_map];
                 }
                 continue;
             }
