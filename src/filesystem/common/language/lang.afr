@@ -191,7 +191,8 @@ Verdof Teiken
 Verdof tyd
 :Dn
 Af
->:Do you really want\nto reset the\n permanent timer %d?
+:Do you really want\nto reset the\n permanent timer %d?
+Wil jy regtig die\npermanente Tydteller %d\nnul maak?
 :Down
 Af
 :ELE
@@ -204,7 +205,8 @@ ELE Inv
 ELE Meng
 :EXPO
 Expo
->:Enabled
+:Enabled
+Geaktiveer
 :Enter
 Enter
 :Exit
@@ -265,8 +267,10 @@ Ikoon
 <Idle 1
 <:Idle 2
 <Idle 2
->:Idle Up 1
->:Idle Up 2
+:Idle Up 1
+Idle Up 1
+:Idle Up 2
+Idle Up 2
 :Input monitor
 Inset Monitor
 :Input
@@ -317,7 +321,8 @@ Hoof Menu
 Hoofbladsy
 :Main page config
 Hoofbladsy Opstelling
->:Manual
+:Manual
+Per hand
 :Max Limit
 Max limiet
 :Menu
@@ -386,11 +391,12 @@ Ok
 Aan
 :PIT
 PIT
->:PIT Mix
+:PIT Mix
+PIT Meng
 :Page
 Bladsy
-<:Pit Mix
-<PIT Meng
+:Pit Mix
+PIT Meng
 :Pitch curves
 PIT kurwes
 :Plane
@@ -409,11 +415,10 @@ Pos 2
 +/-
 :Position %d
 Posisie %d
->:Power-down alert
-<:PowerOff alert
-<Krag-af Waarskuwing
+:Power-down alert
+Krag-af Waarskuwing
 :Prealert intvl
-Voorwaarsku intvl
+Voorwaarsku periode
 :Prealert time
 Voorwaarsku-tyd
 :Press 'Ent' to turn USB Filesystem
@@ -450,7 +455,8 @@ Her-ini
 Verwyder
 :Reset
 Reset
->:Reset Permanent Timer?
+:Reset Permanent Timer?
+Zero Permanente Teller?
 :Reset sw
 Reset sw
 :Reverse
