@@ -62,8 +62,8 @@ struct page_group groups[] = {
     {2, PAGEID_SCANNER},
 #endif
     {2, PAGEID_USB},
-    {2, PAGEID_SPLASH},
     {0x81, PAGEID_MODELMENU},
+    {255, PAGEID_SPLASH},
     {255, 0}
 };
 
