@@ -31,7 +31,7 @@ void PAGE_SplashInit(int page)
     //GUI_CreateImageOffset(&gui->splash_image, 15, 10, w-offset, h-5, offset, 0, SPLASH_FILE, NULL, NULL);
     if( w < LCD_WIDTH - 1 && h < LCD_HEIGHT - ITEM_HEIGHT - 3) 
     	GUI_CreateImageOffset(&gui->splash_image, (LCD_WIDTH-w)/2, (LCD_HEIGHT-h-ITEM_HEIGHT)/2, w, h, 0, 0, SPLASH_FILE, NULL, NULL);
-    GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT - ITEM_HEIGHT - 1 , LCD_WIDTH, ITEM_HEIGHT, &TINY_FONT, NULL, NULL, _tr_noop(DeviationVersion));
+    GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT - ITEM_HEIGHT - 1 , LCD_WIDTH, ITEM_HEIGHT, &TINY_FONT, NULL, NULL, DeviationVersion);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

@@ -30,7 +30,7 @@ void PAGE_SplashInit(int page)
     LCD_ImageDimensions(SPLASH_FILE, &w, &h);
     if( w < LCD_WIDTH - 10 && h < LCD_HEIGHT - 20)
     	GUI_CreateImageOffset(&gui->splash_image, (LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, w, h, 0, 0, SPLASH_FILE, NULL, NULL);
-    GUI_CreateLabelBox(&gui->version,  (LCD_WIDTH-w)/2, (LCD_HEIGHT+h)/2 + 5, 0, 0, &TINY_FONT, NULL, NULL, _tr_noop(DeviationVersion));
+    GUI_CreateLabelBox(&gui->version,  (LCD_WIDTH-w)/2, (LCD_HEIGHT+h)/2 + 5, 0, 0, &TINY_FONT, NULL, NULL, DeviationVersion);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)
@@ -47,7 +47,9 @@ void PAGE_SplashEvent()
     static unsigned int time=0;
     if ( 0 == time )
     	time = CLOCK_getms()+ 3500; // 3 sec.
-    if ( CLOCK_getms() > time ) 
+    // We use SPITouch_IRQ() here instead of attaching an event to the image because
+    // We want to abort regardless of where on the page the touch occurred
+    if ( CLOCK_getms() > time || SPITouch_IRQ()) 
 	PAGE_ChangeByID(PAGEID_MAIN);
 }
 
