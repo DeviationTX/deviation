@@ -214,11 +214,11 @@ static const char *ppmin_select_cb(guiObject_t *obj, int dir, void *data)
     if (new_ppm == 0) {
         return _tr("None");
     } else if (new_ppm == 1) {
-        return _tr("Train1");
+        return _tr("Channel");
     } else if (new_ppm == 2) {
-        return _tr("Train2");
+        return _tr("Stick");
     } else {
-        return _tr("Input");
+        return _tr("Extend");
     }
 }
 

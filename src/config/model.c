@@ -102,7 +102,7 @@ static const char SECTION_VIRTCHAN[] = "virtchan";
 static const char SECTION_PPMIN[] = "ppm-in";
 static const char PPMIN_MAP[] = "map";
 static const char PPMIN_MODE[] = "mode";
-static const char * const PPMIN_MODE_VALUE[3] =  {"none", "train", "input"};
+static const char * const PPMIN_MODE_VALUE[4] =  {"none", "channel", "stick", "extend"};
 static const char PPMIN_CENTERPW[] = "centerpw";
 static const char PPMIN_DELTAPW[] = "deltapw";
 #define PPMIN_NUM_CHANNELS  RADIO_NUM_CHANNELS
