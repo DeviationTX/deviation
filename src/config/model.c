@@ -902,7 +902,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(PPMIN_MODE)) {
-            for(i = 0; i < 3; i++) {
+            for(i = 0; i < 4; i++) {
                 if(mapstrcasecmp(PPMIN_MODE_VALUE[i], value) == 0) {
                     m->num_ppmin = (m->num_ppmin & 0x3F) | (i << 6);
                     return 1;
