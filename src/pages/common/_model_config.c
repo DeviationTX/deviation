@@ -117,7 +117,9 @@ const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     int idx = (long)data;
     if (PPMin_Mode() == PPM_IN_TRAIN1) {
-        Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], 0, NUM_SOURCES, dir, 1, 1, NULL);
+        if (Model.ppm_map[idx] >= Model.num_channels)
+            Model.ppm_map[idx] = -1;
+        Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], -1, Model.num_channels-1, dir, 1, 1, NULL);
         if (Model.ppm_map[idx] < 0)
             return _tr("None");
         sprintf(mp->tmpstr, _tr("Ch%d"), Model.ppm_map[idx]+1);

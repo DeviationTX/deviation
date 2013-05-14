@@ -89,9 +89,12 @@ void MODELPROTO_Config()
 void MODELTRAIN_Config()
 {
     PAGE_SetModal(1);
-    show_titlerow((Model.num_ppmin & 0xC0) == 0xC0
-                  ? _tr("PPMIn Config")
-                  : _tr("Trainer Config"));
+    int mode = PPMin_Mode();
+    show_titlerow(mode == PPM_IN_TRAIN1
+                  ? _tr("Trainer Cfg (Channel)")
+                  : mode == PPM_IN_TRAIN2
+                    ? _tr("Trainer Cfg (Stick)")
+                    : _tr("PPMIn Cfg (Extend)"));
     int row = 40;
     if (PPMin_Mode() != PPM_IN_SOURCE) {
         GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
