@@ -13,6 +13,7 @@ PROTO_MODULES += $(ODIR)/protocol/wk2401.mod
 #PROTO_MODULES += $(ODIR)/protocol/frsky-1.mod
 #PROTO_MODULES += $(ODIR)/protocol/frsky-2.mod
 PROTO_MODULES += $(ODIR)/protocol/skyartec.mod
+PROTO_MODULES += $(ODIR)/protocol/v202.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
@@ -65,6 +66,10 @@ $(ODIR)/protocol/wk2601.mod : $(ODIR)/wk2x01.bin
 
 $(ODIR)/protocol/wk2401.mod : $(ODIR)/wk2x01.bin
 	@echo Building 'wk2401' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/v202.mod : $(ODIR)/v202_nrf24l01.bin
+	@echo Building 'v202' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET

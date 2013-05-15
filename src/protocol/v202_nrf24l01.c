@@ -88,7 +88,7 @@ enum {
 // number in this case.
 // The pattern is defined by 5 least significant bits of
 // sum of 3 bytes comprising TX id
-static u8 freq_hopping[][16] = {
+static const u8 freq_hopping[][16] = {
  { 0x27, 0x1B, 0x39, 0x28, 0x24, 0x22, 0x2E, 0x36,
    0x19, 0x21, 0x29, 0x14, 0x1E, 0x12, 0x2D, 0x18 }, //  00
  { 0x2E, 0x33, 0x25, 0x38, 0x19, 0x12, 0x18, 0x16,
@@ -197,7 +197,7 @@ static void set_tx_id(u32 id)
     tx_id[0] = (id >> 0) & 0xFF;
     sum = tx_id[0] + tx_id[1] + tx_id[2];
     // Base row is defined by lowest 2 bits
-    u8 *fh_row = freq_hopping[sum & 0x03];
+    const u8 *fh_row = freq_hopping[sum & 0x03];
     // Higher 3 bits define increment to corresponding row
     u8 increment = (sum & 0x1e) >> 2;
     for (u8 i = 0; i < 16; ++i) {
@@ -445,8 +445,13 @@ const void *V202_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)6L; // T, R, E, A, LED (on/off/blink), Auto flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_SET_TXPOWER:
+            tx_power = Model.tx_power;
+            NRF24L01_SetPower(tx_power);
+            break;
         default: break;
     }
     return 0;
