@@ -45,7 +45,7 @@
 #define CS_HI() gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin)
 #define CS_LO() gpio_clear(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin)
 
-static u8 rf_setup = 0x0F;
+static u8 rf_setup;
 
 void NRF24L01_Initialize()
 {
