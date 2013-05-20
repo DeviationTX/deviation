@@ -36,7 +36,10 @@ import os
 import random
 import xstruct
 import array
+import re
 from imgutil import *
+
+from optparse import OptionParser
 
 def subtree_size(root, cluster_size, dirent_size):
 	"Recursive directory walk and calculate size"
@@ -429,22 +432,31 @@ FAT_ENTRY = """little:
 	uint16_t next              /* FAT16 entry */
 """
 
-def usage(prname):
-	"Print usage syntax"
-	print(prname + " <EXTRA_BYTES> <PATH> <IMAGE>")
-
 def main():
-	if (len(sys.argv) < 4):
-		usage(sys.argv[0])
+	usage = """
+%prog [--extra <extra_bytes>] [--size <size>] <source-path> <output-image>"""
+	parser = OptionParser(usage=usage)
+	parser.add_option("-e", "--extra", action="store", dest="extra_bytes",
+		default=0, type="int",
+		help="Extra bytes to pad filesystem")
+	parser.add_option("-s", "--size", action="store", dest="size",
+		default="0",
+		help="Device size (in bytes)")
+
+	(options, args) = parser.parse_args()
+	if (len(args) != 2):
+		print "Must specify both source-path and output-image"
 		return
+
+	extra_bytes = options.extra_bytes
+	m = re.search("^(\d+)([kM])?$", options.size)
+	fs_size = int(m.group(1));
+	if (m.group(2) == "k"):
+		fs_size = fs_size * 1024
+	elif (m.group(2) == "M"):
+		fs_size = fs_size * 1024 * 1024
 	
-	if (not sys.argv[1].isdigit()):
-		print("<EXTRA_BYTES> must be a number")
-		return
-	
-	extra_bytes = int(sys.argv[1])
-	
-	path = os.path.abspath(sys.argv[2])
+	path = os.path.abspath(args[0])
 	if (not os.path.isdir(path)):
 		print("<PATH> must be a directory")
 		return
@@ -460,6 +472,12 @@ def main():
 	
 	# Make sure the filesystem is large enough for FAT16
 	size = subtree_size(path, cluster_size, dirent_size) + reserved_clusters * cluster_size + extra_bytes
+        if (fs_size > 0 and size > fs_size):
+            # can't fit on the device
+            print "Directory has size (%dkB) which is larger than device size (%dkB)" % (size // 1024, fs_size // 1024);
+            return;
+	if (fs_size > size):
+		size = fs_size - reserved_clusters * cluster_size
 	#while (size // cluster_size < fat16_clusters):
 	#	if (cluster_size > sector_size):
 	#		cluster_size = cluster_size // 2
@@ -475,7 +493,7 @@ def main():
 	root_start = cluster_size + fat_count * fat_size
 	data_start = root_start + root_size
 	
-	outf = open(sys.argv[3], "wb")
+	outf = open(args[1], "wb")
 	
 	boot_sector = xstruct.create(BOOT_SECTOR)
 	boot_sector.jmp = [0xEB, 0x3C, 0x90]
