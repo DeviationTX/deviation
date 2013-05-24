@@ -56,10 +56,21 @@ s16 hermite_spline(struct Curve *curve, s32 value)
 {
     int num_points = (CURVE_TYPE(curve) - CURVE_3POINT) * 2 + 3;
     s32 step = PCT_TO_RANGE(2 * 100) / (num_points - 1) ;
+    if (value < PCT_TO_RANGE(-100)) {
+        value = PCT_TO_RANGE(-100);
+    } else if(value > PCT_TO_RANGE(100)) {
+        value = PCT_TO_RANGE(100);
+    }
     for (int i = 0; i < num_points -1; i++) {
         s32 x = PCT_TO_RANGE(-100) + i * step;
         s32 p0x = x;
-        s32 p3x = x + step;
+        s32 p3x;
+        //If there are rounding errors, we need to deal with them here
+        if (i == num_points - 2) {
+            p3x = PCT_TO_RANGE(100);
+        } else {
+            p3x = x + step;
+        }
         if(value >= p0x && value <= p3x) {
             s32 p0y = PCT_TO_RANGE(curve->points[i]);
             s32 p3y = PCT_TO_RANGE(curve->points[i+1]);
