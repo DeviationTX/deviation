@@ -102,7 +102,7 @@ void TIMER_Power(){
      
     if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 && 
 		new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
-		!ScanButtons() && !SPITouch_IRQ() ) {
+		!ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
 	if ( CLOCK_getms() > timer ) {
 	    timer =  CLOCK_getms() + 2000;
 	    MUSIC_Play(MUSIC_SHUTDOWN);

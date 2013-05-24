@@ -12,7 +12,7 @@ $(TARGET)-lib.dfu: $(wildcard filesystem/devo8/media/*.*) $(TARGET).dfu
 	/bin/rm -rf $(ODIR)/filesystem 2> /dev/null; true
 	/bin/mkdir $(ODIR)/filesystem
 	/bin/cp -prf filesystem/devo8/media $(ODIR)/filesystem/
-	../utils/mkfat/mkfat.py 0 $(ODIR)/filesystem/ $(ODIR)/$(TARGET)-lib.bin
+	../utils/mkfat/mkfat.py --size 16M $(ODIR)/filesystem/ $(ODIR)/$(TARGET)-lib.bin
 	../utils/dfu.py --alt 2 --name "$(HGVERSION) Library" -b 0x64080000:$(ODIR)/$(TARGET)-lib.bin $@
 
 $(TARGET).fs:
