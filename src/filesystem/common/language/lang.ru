@@ -231,6 +231,8 @@ Aux2
 Эксп&ДР
 |devo8:Expo&DR
 Экспо&ДР
+:Extend
+Расширен.
 :FMODE
 ПРеж
 |devo8:FMODE
@@ -433,8 +435,8 @@ PPM
 PPM-Вход
 :PPM%d
 PPM%d
-:PPMIn Config
-Настройка PPM-Вход
+:PPMIn Cfg (Extend)
+PPM-Вход (расширенный)
 :Page
 Стр.
 :Pitch curves
@@ -455,6 +457,8 @@ PPM%d
 +/-
 :Position %d
 Положение %d
+:Power On alarm
+Сигнал вкл.
 :Power-down alert
 Сигнал выкл.
 :Prealert intvl
@@ -487,6 +491,8 @@ ENT для загрузки
 Протокол
 :PwrDn alert
 Сигнал выкл.
+:PwrOn alarm
+Сигнал вкл.
 :RIGHT_H
 ПРАВЫЙ_Г
 :RIGHT_V
@@ -557,6 +563,8 @@ RPM
 Время
 :Step
 Шаг
+:Stick
+Стики
 :Stick input
 Вводы
 :Stick mode
@@ -669,10 +677,14 @@ RPM
 Нажать для блокировки
 :Touch to Unlock
 Нажать для разблокировки
-:Train
-Тренер
-:Trainer Config
-Тренер
+:Trainer Cfg (Channel)
+Тренер (канал)
+|devo8:Trainer Cfg (Channel)
+Настройка тренера (канал)
+:Trainer Cfg (Stick)
+Тренер (стики)
+|devo8:Trainer Cfg (Stick)
+Настройка тренера (стики)
 :Trainer Sw
 Пер.тренера
 |devo8:Trainer Sw
@@ -717,6 +729,8 @@ USB
 Вирт.
 :Volt
 Вольт
+:Welcome
+Привет
 :Yes
 Да
 :Zero/Max
