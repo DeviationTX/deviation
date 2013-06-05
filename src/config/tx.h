@@ -8,6 +8,7 @@
 #define DEFAULT_BATTERY_WARNING_INTERVAL 30
 #define MIN_BATTERY_WARNING_INTERVAL 0
 #define MAX_BATTERY_WARNING_INTERVAL 60
+#define DEFAULT_SPLASH_DELAY 35 //3.5sec
 
 struct StickCalibration {
     u16 max;
@@ -39,6 +40,7 @@ struct Transmitter {
     u8 power_alarm;
     u16 batt_critical;
     u16 batt_warning_interval;
+    u8 splash_delay;
     u8 volume;
     u8 vibration_state; // for future vibration on/off support
     struct mcu_pin module_enable[TX_MODULE_LAST];

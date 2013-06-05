@@ -24,6 +24,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 void PAGE_SplashInit(int page)
 {
     (void)page;
+    if (Transmitter.splash_delay == 0) {
+        PAGE_ChangeByID(PAGEID_MAIN);
+        return;
+    }
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     u16 w, h;
@@ -45,8 +49,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 void PAGE_SplashEvent()
 {
     static unsigned int time=0;
+    if (GUI_IsModal())
+        return;
     if ( 0 == time )
-    	time = CLOCK_getms()+ 3500; // 3 sec.
+    	time = CLOCK_getms()+ Transmitter.splash_delay * 100; // 3 sec.
     // We use SPITouch_IRQ() here instead of attaching an event to the image because
     // We want to abort regardless of where on the page the touch occurred
     if ( CLOCK_getms() > time || SPITouch_IRQ()) 

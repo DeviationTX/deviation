@@ -41,6 +41,8 @@ const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
 const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
 
+const char SPLASH_DELAY[] = "splash_delay";
+
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
 const char CALIBRATE_MIN[] = "min";
@@ -141,6 +143,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
 	if (MATCH_KEY(BATT_WARNING_INTERVAL)) {
             t->batt_warning_interval = atoi(value);
+            return 1;
+        }
+	if (MATCH_KEY(SPLASH_DELAY)) {
+            t->splash_delay = atoi(value);
             return 1;
         }
     }
@@ -266,6 +272,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_ALARM, Transmitter.batt_alarm);
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
+    fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
     fprintf(fh, "[%s]\n", SECTION_MODULES);
     for(i = 0; i < TX_MODULE_LAST; i++) {
         char str[10];
@@ -313,6 +320,7 @@ void CONFIG_LoadTx()
     Transmitter.batt_alarm = DEFAULT_BATTERY_ALARM;
     Transmitter.batt_critical = DEFAULT_BATTERY_CRITICAL;
     Transmitter.batt_warning_interval = DEFAULT_BATTERY_WARNING_INTERVAL;
+    Transmitter.splash_delay = DEFAULT_SPLASH_DELAY;
     Transmitter.auto_dimmer.timer = DEFAULT_BACKLIGHT_DIMTIME;
     Transmitter.auto_dimmer.backlight_dim_value = DEFAULT_BACKLIGHT_DIMVALUE;
     Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
