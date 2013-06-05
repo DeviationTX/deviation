@@ -49,6 +49,7 @@
 
 #define TELEMETRY_ENABLE 0x30
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 static const char * const devo_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
@@ -412,8 +413,14 @@ static u16 devo_telemetry_cb()
     }
     int delay = 100;
     if (txState == 1) {
-        while(! (CYRF_ReadRegister(0x04) & 0x02))
-            ;
+        int i = 0;
+        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+            if(++i > NUM_WAIT_LOOPS) {
+                delay = 1500;
+                txState = 15;
+            }
+        }
+     
         if (state == DEVO_BOUND) {
             /* exit binding state */
             state = DEVO_BOUND_3;
@@ -470,8 +477,11 @@ static u16 devo_cb()
         return 1200;
     }
     txState = 0;
-    while(! (CYRF_ReadRegister(0x04) & 0x02))
-        ;
+    int i = 0;
+    while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        if(++i > NUM_WAIT_LOOPS)
+            return 1200;
+    }
     if (state == DEVO_BOUND) {
         /* exit binding state */
         state = DEVO_BOUND_3;

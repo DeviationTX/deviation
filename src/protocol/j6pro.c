@@ -30,6 +30,8 @@
 #endif
 #ifdef PROTO_HAS_CYRF6936
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
+
 //For Debug
 //#define NO_SCRAMBLE
 
@@ -213,8 +215,12 @@ static u16 j6pro_cb()
             state = J6PRO_BIND_03_START;
             return 3000; //3msec
         case J6PRO_BIND_03_START:
-            while(! (CYRF_ReadRegister(0x04) & 0x06))
-                ;
+            {
+                int i = 0;
+                while (! (CYRF_ReadRegister(0x04) & 0x06))
+                    if(++i > NUM_WAIT_LOOPS)
+                        break;
+            }
             CYRF_ConfigRFChannel(0x53);
             CYRF_ConfigRxTx(0);
             CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);

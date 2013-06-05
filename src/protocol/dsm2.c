@@ -42,6 +42,8 @@
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
+
 static const char * const dsm_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
@@ -569,14 +571,20 @@ static u16 dsm2_cb()
         state++;
         return WRITE_DELAY;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
-        while(! (CYRF_ReadRegister(0x04) & 0x02))
-            ;
+        int i = 0;
+        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+            if(++i > NUM_WAIT_LOOPS)
+                break;
+        }
         set_sop_data_crc();
         state++;
         return CH1_CH2_DELAY - WRITE_DELAY;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
-        while(! (CYRF_ReadRegister(0x04) & 0x02))
-            ;
+        int i = 0;
+        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+            if(++i > NUM_WAIT_LOOPS)
+                break;
+        }
         if (state == DSM2_CH2_CHECK_A) {
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);

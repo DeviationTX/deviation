@@ -42,6 +42,8 @@
 #define BIND_COUNT 2980
 #endif
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
+
 enum PktState {
     WK_BIND,
     WK_BOUND_1,
@@ -481,8 +483,11 @@ static u16 wk_cb()
         return 1600;
     }
     txState = 0;
-    while(! (CYRF_ReadRegister(0x04) & 0x02))
-        ;
+    int i = 0;
+    while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        if(++i > NUM_WAIT_LOOPS)
+            break;
+    }
     if((pkt_num & 0x03) == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
