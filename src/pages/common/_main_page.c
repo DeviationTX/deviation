@@ -155,6 +155,7 @@ void PAGE_MainEvent()
                 // Assume switch 0/1/2 are in order
                 if(Model.pagecfg.tglico[i][j] && raw[src+j] > 0) {
                     img = TGLICO_GetImage(Model.pagecfg.tglico[i][j]);
+                    break;
                 }
             }
         } else {
