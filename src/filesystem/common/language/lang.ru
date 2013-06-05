@@ -239,14 +239,8 @@ Aux2
 F°
 |devo8:Fahren
 Фаренгейт
-:Fail safe
+:Fail-safe
 Отказоуст.
-|devo8:Fail safe
-Отказоустойчивость
-:Failsafe
-Отказоуст.
-|devo8:Failsafe
-Отказоустойчивость
 :File
 Файл
 :Fixed

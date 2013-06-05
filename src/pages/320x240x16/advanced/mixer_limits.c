@@ -28,7 +28,7 @@ static void _show_limits()
     GUI_CreateTextSelect(&gui->reverse, 128, y, TEXTSELECT_96, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
     y += height;
     //Row 2
-    GUI_CreateLabel(&gui->failsafelbl, 8, y, NULL, DEFAULT_FONT, _tr("Failsafe"));
+    GUI_CreateLabel(&gui->failsafelbl, 8, y, NULL, DEFAULT_FONT, _tr("Fail-safe"));
     GUI_CreateTextSelect(&gui->failsafe, 128, y, TEXTSELECT_96, toggle_failsafe_cb, set_failsafe_cb, NULL);
     y += height;
     //Row 3

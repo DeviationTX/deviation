@@ -195,10 +195,8 @@ Expo&DR
 >:FMODE
 :Fahren
 Fahren
->:Fail safe
->:Failsafe
-:Failsafe
-Failsafe
+:Fail-safe
+Fail-safe
 :File
 Archivo
 :Fixed

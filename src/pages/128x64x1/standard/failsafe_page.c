@@ -21,7 +21,7 @@
 #include "../../common/standard/_failsafe_page.c"
 
 static const struct page_defs failsafe_defs = {
-    _tr_noop("Failsafe"),
+    _tr_noop("Fail-safe"),
     set_failsafe_cb,
     toggle_failsafe_cb,
 };

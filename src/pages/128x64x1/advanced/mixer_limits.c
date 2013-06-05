@@ -57,7 +57,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             tgl = toggle_reverse_cb; disp = reverse_cb; value = (void *)((long)mp->channel);
             break;
         case ITEM_FAILSAFE:
-            label = _tr("Failsafe");
+            label = _tr("Fail-safe");
             tgl = toggle_failsafe_cb; disp = set_failsafe_cb;
             break;
         case ITEM_SAFETY:

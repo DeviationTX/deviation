@@ -27,7 +27,7 @@ PAGEDEF(PAGEID_PITCURVES,PAGE_PitCurvesInit,   PAGE_CurvesEvent,      NULL,     
 PAGEDEF(PAGEID_THROHOLD, PAGE_ThroHoldInit,    NULL,                  NULL,             _tr_noop("Throttle hold"))
 PAGEDEF(PAGEID_GYROSENSE,PAGE_GyroSenseInit,   NULL,                  NULL,             _tr_noop("Gyro sense"))
 PAGEDEF(PAGEID_SWASH,    PAGE_SwashInit,       NULL,                  NULL,             _tr_noop("Swash"))
-PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,             _tr_noop("Fail safe"))
+PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,             _tr_noop("Fail-safe"))
 PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,             _tr_noop("Switch assignment"))
 
 #endif

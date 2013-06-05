@@ -208,11 +208,7 @@ Expo&DR
 FMODE
 :Fahren
 °F
-:Fail safe
-Sécurités
-:Failsafe
-Sécurités
-:Failsafe
+:Fail-safe
 Sécurités
 :File
 Fichier
