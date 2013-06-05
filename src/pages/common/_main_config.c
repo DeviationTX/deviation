@@ -137,6 +137,8 @@ const char *toggle_val_cb(guiObject_t *obj, int dir, void *data)
     newval = INPUT_GetAbbrevSource(val, newval, dir);
     if (val != newval) {
         val = newval;
+        if (INPUT_NumSwitchPos(val) == 2)
+            Model.pagecfg.tglico[idx][2] = 0;
         Model.pagecfg.toggle[idx] = val;
         _update_preview();
     }
