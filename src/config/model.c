@@ -1211,7 +1211,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceNameAbbrevSwitch(file, val));
             if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
                 fprintf(fh, "%s%d=%d,%d,%d\n", GUI_TGLICO, idx+1,
-                        m->pagecfg.tglico[idx][0], m->pagecfg.tglico[idx][1], m->pagecfg.tglico[idx][2]);
+                        m->pagecfg.tglico[idx][0],
+                        m->pagecfg.tglico[idx][1],
+                        INPUT_NumSwitchPos(idx) == 2 ? 0 : m->pagecfg.tglico[idx][2]);
         }
     }
     for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
