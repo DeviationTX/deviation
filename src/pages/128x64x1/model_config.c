@@ -177,7 +177,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
             0, ITEM_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, ts, ts_data);
+            w, ITEM_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
     return 1;
 }
 
