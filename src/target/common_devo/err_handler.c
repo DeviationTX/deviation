@@ -14,27 +14,45 @@
  */
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/scb.h>
+#include <libopencm3/stm32/iwdg.h>
 #include "common.h"
 #include "petit_fat.h"
 #include "petit_io.h"
 
-void hard_fault_handler()
-{
+//Memory start is constant for all Tx
+#define MEMORY_START  ((unsigned int *)0x20000000)
+#define MEMORY_END    (&_stack)
+#define NO_VALUE 0xFABACEAE //Unique ID
+
+#define NONE      0
+#define BACKTRACE 1
+#define DUMP      2
+
+#define MEMORY_DUMP BACKTRACE
+extern unsigned _stack; //Defined in devo.ld
+
+/*
     asm(
 "    TST LR, #4\n"
 "    ITE EQ\n"
 "    MRSEQ R0, MSP\n"
 "    MRSNE R0, PSP\n"
-"    B hard_fault_handler_c\n");
+"    B fault_handler_c\n");
+*/
+
+void hard_fault_handler()
+{
+    asm(
+"    MRS   R0, MSP\n"
+"    MOVS  R1, #0\n"
+"    B fault_handler_c\n");
 }
 void exti2_isr()
 {
     asm(
-"    TST LR, #4\n"
-"    ITE EQ\n"
-"    MRSEQ R0, MSP\n"
-"    MRSNE R0, PSP\n"
-"    B hard_fault_handler_c\n");
+"    MRS   R0, MSP\n"
+"    MOVS  R1, #1\n"
+"    B fault_handler_c\n");
 }
 static u32 debug_addr = 0;
 void write_byte(u8 x) {
@@ -42,18 +60,25 @@ void write_byte(u8 x) {
         disk_writep(&x, 1);
     usart_send_blocking(USART1,(x));
 }
-void fault_printf(char *str, unsigned int val)
+void write_long(unsigned int val)
 {
-    while(*str) {
-        write_byte(*str);
-        str++;
-    }
     for(int i = 7; i >= 0; i--) {
         u8 v = 0x0f & (val >> (4 * i));
         if (v < 10)
             write_byte('0' + v);
         else
             write_byte('a' + v - 10);
+    }
+}
+
+void fault_printf(const char *str, unsigned int val)
+{
+    while(*str) {
+        write_byte(*str);
+        str++;
+    }
+    if (val != NO_VALUE) { //Unique ID
+        write_long(val);
     }
     write_byte('\r');
     write_byte('\n');
@@ -62,7 +87,7 @@ void fault_printf(char *str, unsigned int val)
 // hard fault handler in C,
 // with stack frame location as input parameter
 // called from HardFault_Handler in file xxx.s
-void hard_fault_handler_c (unsigned int * hardfault_args)
+void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
 {
   unsigned int stacked_r0;
   unsigned int stacked_r1;
@@ -84,8 +109,13 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
   stacked_psr = ((unsigned long) hardfault_args[7]);
 
   if(debug_addr)
-      disk_writep(0, debug_addr); 
-  fault_printf ("\n\n[Hard fault handler", 0);
+      disk_writep(0, debug_addr);
+  if (fault_type) {
+      fault_printf ("\n\n[Soft fault]", NO_VALUE);
+  } else {
+      fault_printf ("\n\n[Hard fault]", NO_VALUE);
+  }
+  fault_printf (DeviationVersion, NO_VALUE);
   fault_printf ("R0 = ", stacked_r0);
   fault_printf ("R1 = ", stacked_r1);
   fault_printf ("R2 = ", stacked_r2);
@@ -100,12 +130,33 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
   fault_printf ("DFSR = ", (*((volatile unsigned long *)(0xE000ED30))));
   fault_printf ("AFSR = ", (*((volatile unsigned long *)(0xE000ED3C))));
   fault_printf ("SCB_SHCSR = ", SCB_SHCSR);
-  fault_printf ("impure_ptr = ", (*((volatile unsigned long *)(0x20000148))));
-  fault_printf ("             ", (*((volatile unsigned long *)(0x2000014c))));
-  fault_printf ("             ", (*((volatile unsigned long *)(0x20000150))));
-  fault_printf ("             ", (*((volatile unsigned long *)(0x20000154))));
-  
- 
+  fault_printf ("Top of Stack:", (unsigned int)(&_stack));
+  fault_printf ("Stack Detect:", (unsigned int)hardfault_args);
+
+#if MEMORY_DUMP == BACKTRACE
+  int count = 0;
+  unsigned int *ptr = hardfault_args;
+  fault_printf ("Backtrace:", NO_VALUE);
+  while (ptr < (&_stack) && count < 20) {
+    //iwdg_reset();
+    if ((*ptr & 0xFFF00001) == 0x08000001) {
+        //This looks like it may be a return address
+        write_long((unsigned int)ptr);
+        fault_printf(" : ", *ptr);
+        count++;
+    }
+    ptr = (unsigned int *)((unsigned int)ptr + 1);
+  }  
+  fault_printf("Done", NO_VALUE);
+#elif MEMORY_DUMP == DUMP
+  if(debug_addr) {
+      fault_printf ("Memory Dump:", NO_VALUE);
+      for (unsigned int *i = MEMORY_START; i < MEMORY_END; i++) {
+          disk_writep((const u8 *)i, 4);
+          iwdg_reset();
+      }
+  }
+#endif
   while (1);
 }
 
