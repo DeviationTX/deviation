@@ -72,7 +72,11 @@ struct Trim *MIXER_GetAllTrims()
 void MIXER_EvalMixers(volatile s16 *raw)
 {
     int i;
+    s16 orig_value[NUM_CHANNELS];
     //3rd step: apply mixers
+    for (i = 0; i < NUM_CHANNELS; i++) {
+        orig_value[i] = raw[i + NUM_INPUTS + 1];
+    }
     for (i = 0; i < NUM_MIXERS; i++) {
         struct Mixer *mixer = &Model.mixers[i];
         // Linkers are pre-ordred such that we can process them in order
@@ -81,7 +85,7 @@ void MIXER_EvalMixers(volatile s16 *raw)
             break;
         }
         //apply_mixer updates mixed[mirer->dest]
-        MIXER_ApplyMixer(mixer, raw);
+        MIXER_ApplyMixer(mixer, raw, &orig_value[mixer->dest]);
     }
 
 }
@@ -270,7 +274,7 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum)
     return cyc[cycnum-1];
 }
 
-void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
 {
     s32 value;
     if (! MIXER_SRC(mixer->src))
@@ -311,6 +315,24 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw)
                   ? raw[mixer->dest + NUM_INPUTS + 1]
                   : value;
         break;
+    case MUX_DELAY:
+        {
+            //value initially represents 20ths of seconds to cover 60-degrees
+            //convert value to represent #msecs to cover 60-degrees (zero->full)
+            if (value == 0 || orig_value == NULL) {
+                value = raw[mixer->dest + NUM_INPUTS + 1];
+                break;
+            }
+            value = abs(RANGE_TO_PCT(value)) * 50;
+            //rate represents the maximum travel per iteration (once per MEDIUM_PRIORITY_MSEC)
+            s32 rate = CHAN_MAX_VALUE * MEDIUM_PRIORITY_MSEC / value;
+
+            value = raw[mixer->dest + NUM_INPUTS + 1];
+            if (value - *orig_value > rate)
+                value = *orig_value + rate;
+            else if(value - *orig_value < -rate)
+                value = *orig_value - rate;
+        }
     case MUX_LAST: break;
     }
 

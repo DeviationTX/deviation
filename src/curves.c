@@ -167,6 +167,7 @@ s16 deadband(struct Curve *curve, s32 value)
 
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 {
+    s32 divisor;
     //interpolation doesn't work if theinput is out of bounds, so bound it here
     if (xval > CHAN_MAX_VALUE)
         xval = CHAN_MAX_VALUE;
@@ -175,11 +176,34 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
     switch (CURVE_TYPE(curve)) {
         case CURVE_NONE:     return xval;
         case CURVE_FIXED:    return CHAN_MAX_VALUE;
-        case CURVE_MIN_MAX:  return (xval < 0) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case CURVE_ZERO_MAX: return (xval < 0) ? 0 : CHAN_MAX_VALUE;
-        case CURVE_GT_ZERO:  return (xval < 0) ? 0 : xval;
-        case CURVE_LT_ZERO:  return (xval > 0) ? 0 : xval;
-        case CURVE_ABSVAL:   return (xval < 0) ? -xval : xval;
+        case CURVE_MIN_MAX:  return (xval < PCT_TO_RANGE(curve->points[0])) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case CURVE_ZERO_MAX: return (xval < PCT_TO_RANGE(curve->points[0])) ? 0 : CHAN_MAX_VALUE;
+        case CURVE_GT_ZERO:
+            divisor = (PCT_TO_RANGE(100) - PCT_TO_RANGE(curve->points[0]));
+            if (divisor <= 0)
+                return 0;
+            return (xval < PCT_TO_RANGE(curve->points[0]))
+                   ? 0
+                   : PCT_TO_RANGE(100) * (xval - PCT_TO_RANGE(curve->points[0])) / divisor;
+        case CURVE_LT_ZERO:
+            divisor = (PCT_TO_RANGE(-100) - PCT_TO_RANGE(curve->points[0]));
+            if (divisor >= 0)
+                return 0;
+            return (xval > PCT_TO_RANGE(curve->points[0]))
+                   ? 0
+                   : PCT_TO_RANGE(-100) * (xval - PCT_TO_RANGE(curve->points[0])) / divisor;
+        case CURVE_ABSVAL:
+               if (xval < PCT_TO_RANGE(curve->points[0])) {
+                   divisor = (PCT_TO_RANGE(-100) - PCT_TO_RANGE(curve->points[0]));
+                   if (divisor >= 0)
+                       return 0;
+                   return PCT_TO_RANGE(100) * (xval - PCT_TO_RANGE(curve->points[0])) / divisor;
+               } else {
+                   divisor = (PCT_TO_RANGE(100) - PCT_TO_RANGE(curve->points[0]));
+                   if (divisor <= 0)
+                       return 0;
+                   return PCT_TO_RANGE(100) * (xval - PCT_TO_RANGE(curve->points[0])) / divisor;
+               }
         case CURVE_EXPO:     return expo(curve, xval);
         case CURVE_DEADBAND: return deadband(curve, xval);
         default:             return CURVE_SMOOTHING(curve)

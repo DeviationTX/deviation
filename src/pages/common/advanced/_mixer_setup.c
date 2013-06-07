@@ -203,10 +203,10 @@ s16 eval_chan_cb(void * data)
     struct Mixer *mix = MIXER_GetAllMixers();
     for (i = 0; i < NUM_MIXERS; i++) {
         if(MIXER_SRC(mix->src) != 0 && mix->dest != mp->cur_mixer->dest)
-            MIXER_ApplyMixer(mix, mp->raw);
+            MIXER_ApplyMixer(mix, mp->raw, NULL);
     }
     for (i = 0; i < mp->num_mixers; i++)
-        MIXER_ApplyMixer(&mp->mixer[i], mp->raw);
+        MIXER_ApplyMixer(&mp->mixer[i], mp->raw, NULL);
     s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, NULL, APPLY_ALL);
     if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
@@ -325,6 +325,7 @@ const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
         case MUX_ADD:      return _tr("add");
         case MUX_MAX:      return _tr("max");
         case MUX_MIN:      return _tr("min");
+        case MUX_DELAY:    return _tr("delay");
         case MUX_LAST: break;
     }
     return "";
@@ -457,7 +458,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         set_src_enable(type);
         MIXPAGE_RedrawGraphs();
     }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type >= CURVE_EXPO);
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type > CURVE_FIXED);
     return CURVE_GetName(&mix->curve);
 }
 
@@ -485,7 +486,7 @@ void curveselect_cb(guiObject_t *obj, void *data)
     }
     struct Mixer *mix = (struct Mixer *)data;
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
-    if (CURVE_TYPE(&mix->curve) >= CURVE_EXPO
+    if (CURVE_TYPE(&mix->curve) > CURVE_FIXED
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
         MIXPAGE_EditCurves(&mix->curve, graph_cb);
     }

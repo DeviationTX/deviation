@@ -23,7 +23,7 @@ static u8 action_cb(u32 button, u8 flags, void *data);
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     u8 type = CURVE_TYPE(curve);
-    if (type < CURVE_EXPO)
+    if (type < CURVE_FIXED)
         return;
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
@@ -59,7 +59,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         y += space;
         GUI_CreateLabelBox(&gui->pointlbl, x, y , w-24, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
         GUI_CreateTextSelectPlate(&gui->point, x + w - 24, y, 24, ITEM_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
-    } else {
+    } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
         GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;
         labelDesc.style = LABEL_CENTER;

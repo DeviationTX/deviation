@@ -161,7 +161,7 @@ static u8 touch_cb(s16 x, s16 y, void *data)
     (void)data;
     (void)x;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
-    edit->curve.points[pointnum] = RANGE_TO_PCT(y);
+    edit->curve.points[pointnum] = (CURVE_TYPE(&edit->curve) < CURVE_EXPO) ? RANGE_TO_PCT(x) : RANGE_TO_PCT(y);
     GUI_Redraw(&gui->value);
     return 1;
 }

@@ -98,6 +98,7 @@ enum MuxType {
     MUX_ADD,
     MUX_MAX,
     MUX_MIN,
+    MUX_DELAY,
     MUX_LAST,
 };
 
@@ -180,7 +181,7 @@ enum TemplateType MIXER_GetTemplate(int ch);
 
 void MIXER_InitMixer(struct Mixer *mixer, u8 ch);
 
-void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw);
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value);
 void MIXER_EvalMixers(volatile s16 *raw);
 int MIXER_GetCachedInputs(s16 *raw, u8 threshold);
 

@@ -21,7 +21,7 @@
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     u8 type = CURVE_TYPE(curve);
-    if (type < CURVE_EXPO)
+    if (type <= CURVE_FIXED)
         return;
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
@@ -43,7 +43,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         y += 40;
         GUI_CreateLabel(&gui->pointlbl, 8, y, NULL, DEFAULT_FONT, _tr("Point"));
         GUI_CreateTextSelect(&gui->point, 8, y+16, TEXTSELECT_96, NULL, set_pointnum_cb, NULL);
-    } else {
+    } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
         GUI_CreateLabel(&gui->pointlbl, 8, y, NULL, DEFAULT_FONT, _tr("Pos/Neg"));
         GUI_CreateTextSelect(&gui->point, 8, y+16, TEXTSELECT_96, NULL, set_expopoint_cb, NULL);
     }
