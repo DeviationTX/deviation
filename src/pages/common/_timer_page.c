@@ -47,6 +47,16 @@ const char *timer_str_cb(guiObject_t *obj, const void *data)
     sprintf(tp->tmpstr, _tr("Timer%d"), i + 1);
     return tp->tmpstr;
 }
+static const char *switch_str_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int i = (long)data;
+    if(Model.timer[i].type == TIMER_STOPWATCH_PROP || Model.timer[i].type == TIMER_COUNTDOWN_PROP) {
+        return _tr("Control");
+    } else {
+        return _tr("Switch");
+    }
+}
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -132,7 +142,9 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     }
     switch (timer->type) {
         case TIMER_STOPWATCH: return _tr("stopwatch");
+        case TIMER_STOPWATCH_PROP: return _tr("stop-prop");
         case TIMER_COUNTDOWN: return _tr("countdown");
+        case TIMER_COUNTDOWN_PROP: return _tr("cntdn-prop");
         case TIMER_PERMANENT: return _tr("permanent");
         case TIMER_LAST: break;
     }

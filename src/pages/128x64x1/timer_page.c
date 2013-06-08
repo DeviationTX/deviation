@@ -52,7 +52,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     //Row 2
     y += space;
     GUI_CreateLabelBox(&gui->switchlbl, 0, y,
-            0, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Switch"));
+            0, ITEM_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->src, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
@@ -116,19 +116,27 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 
 static void update_countdown(u8 idx)
 {
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH
+              || Model.timer[idx].type == TIMER_STOPWATCH_PROP
+              || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start, hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl, hide);
     GUI_SetSelectable((guiObject_t *)&gui->start, !hide);
 
     // Permanent timer do not have reset command
-    hide = Model.timer[idx].type == TIMER_PERMANENT || Model.mixer_mode == MIXER_STANDARD ;
+    hide = Model.timer[idx].type == TIMER_PERMANENT
+           || Model.mixer_mode == MIXER_STANDARD ;
     GUI_SetHidden((guiObject_t *)&gui->resetsrc, hide);
     GUI_SetSelectable((guiObject_t *)&gui->resetsrc, !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetlbl, hide);
 
-    hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_COUNTDOWN;
+    hide = Model.timer[idx].type == TIMER_STOPWATCH
+           || Model.timer[idx].type == TIMER_STOPWATCH_PROP
+           || Model.timer[idx].type == TIMER_COUNTDOWN
+           || Model.timer[idx].type == TIMER_COUNTDOWN_PROP;
     GUI_SetHidden((guiObject_t *)&gui->resetperm, hide);
     GUI_SetSelectable((guiObject_t *)&gui->resetperm, !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl, hide);
+
+    GUI_Redraw(&gui->switchlbl);
 }

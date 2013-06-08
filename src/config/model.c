@@ -132,7 +132,7 @@ static const char SECTION_TIMER[] = "timer";
 
 #define TIMER_SOURCE  MIXER_SOURCE
 #define TIMER_TYPE MODEL_TYPE
-static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "countdown" ,"permanent"};
+static const char * const TIMER_TYPE_VAL[TIMER_LAST] = { "stopwatch", "stop-prop", "countdown" , "cntdn-prop", "permanent"};
 static const char TIMER_TIME[] = "time";
 static const char TIMER_RESETSRC[] = "resetsrc";
 static const char PERMANENT_TIMER[] = "permanent_timer";
@@ -1158,7 +1158,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
             fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceName(file, m->timer[idx].resetsrc));
-        if (WRITE_FULL_MODEL || (m->timer[idx].type == TIMER_COUNTDOWN && m->timer[idx].timer))
+        if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
 	if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
 	    fprintf(fh, "%s=%d\n", TIMER_VAL, m->timer[idx].val);

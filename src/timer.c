@@ -42,9 +42,9 @@ void TIMER_SetString(char *str, s32 time)
     u8 m = (time - h*3600) / 60;
     u8 s = time -h*3600 - m*60;
     if( h < 1)
-    	sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
+            sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
     else
-	sprintf(str, "%s%02d:%02d:%02d", neg ? "-" : "", h, m, s);
+        sprintf(str, "%s%02d:%02d:%02d", neg ? "-" : "", h, m, s);
 }
 
 const char *TIMER_Name(char *str, u8 timer)
@@ -55,6 +55,11 @@ const char *TIMER_Name(char *str, u8 timer)
 
 void TIMER_StartStop(u8 timer)
 {
+    if (Model.timer[timer].type == TIMER_STOPWATCH_PROP ||
+        Model.timer[timer].type == TIMER_COUNTDOWN_PROP)
+    {
+        return;
+    }
     timer_state[timer] ^= 1;
     if(timer_state[timer]) {
         last_time[timer] = CLOCK_getms();
@@ -63,13 +68,20 @@ void TIMER_StartStop(u8 timer)
 
 void TIMER_Reset(u8 timer)
 {
-    timer_state[timer] = 0;
-    if (Model.timer[timer].type == TIMER_STOPWATCH) {
+    if (Model.timer[timer].type == TIMER_STOPWATCH_PROP
+        || Model.timer[timer].type == TIMER_COUNTDOWN_PROP)
+    {
+        timer_state[timer] = 1;
+        last_time[timer] = CLOCK_getms();
+    } else {
+        timer_state[timer] = 0;
+    }
+    if (Model.timer[timer].type == TIMER_STOPWATCH || Model.timer[timer].type == TIMER_STOPWATCH_PROP) {
         timer_val[timer] = 0;
-    } else if(Model.timer[timer].type == TIMER_COUNTDOWN) {
+    } else if(Model.timer[timer].type == TIMER_COUNTDOWN || Model.timer[timer].type == TIMER_COUNTDOWN_PROP) {
         timer_val[timer] = Model.timer[timer].timer * 1000;
     } else if(Model.timer[timer].type == TIMER_PERMANENT ) {
-	timer_val[timer] = Model.timer[timer].val;
+        timer_val[timer] = Model.timer[timer].val;
     }
 }
 
@@ -82,7 +94,7 @@ void TIMER_Init()
 {
     u8 i;
     for (i = 0; i < NUM_TIMERS; i++)
-	TIMER_Reset(i);
+        TIMER_Reset(i);
 }
 
 void TIMER_Power(){
@@ -94,27 +106,28 @@ void TIMER_Power(){
     u8 mode = MODE_2 == Transmitter.mode || MODE_4 == Transmitter.mode ? 2 : 1;
 
     if( 0 == timer)
-	timer =  CLOCK_getms() + alert;
+        timer =  CLOCK_getms() + alert;
 
     elevator = 2 == mode ? abs(CHAN_ReadInput(INP_THROTTLE)) : abs(CHAN_ReadInput(INP_ELEVATOR));
     new_throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
     new_throttle = abs(new_throttle - throttle);
      
     if( elevator < 1000 && abs(CHAN_ReadInput(INP_AILERON)) < 1000 && 
-		new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
-		!ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
-	if ( CLOCK_getms() > timer ) {
-	    timer =  CLOCK_getms() + 2000;
-	    MUSIC_Play(MUSIC_SHUTDOWN);
-	}		
+                new_throttle < 1000 && abs(CHAN_ReadInput(INP_RUDDER)) < 1000 &&
+                !ScanButtons() && (!HAS_TOUCH || !SPITouch_IRQ()) ) {
+        if ( CLOCK_getms() > timer ) {
+            timer =  CLOCK_getms() + 2000;
+            MUSIC_Play(MUSIC_SHUTDOWN);
+        }                
     } else 
-	   timer =  CLOCK_getms() + alert;
+           timer =  CLOCK_getms() + alert;
     throttle = 2 == mode ?  abs(CHAN_ReadInput(INP_ELEVATOR)) : abs(CHAN_ReadInput(INP_THROTTLE));
 }
 
 void TIMER_Update()
 {
     u8 i;
+    u8 chan_val;
     u32 t = CLOCK_getms();
     if (PROTOCOL_WaitingForSafe())
         return;
@@ -131,21 +144,32 @@ void TIMER_Update()
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].src))
                 val = -val;
-            u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
-            if (new_state != timer_state[i]) {
-                if (new_state)
-                    last_time[i] = t;
-                timer_state[i] = new_state;
+            if (Model.timer[i].type == TIMER_STOPWATCH_PROP
+                || Model.timer[i].type == TIMER_COUNTDOWN_PROP)
+            {
+               chan_val = RANGE_TO_PCT(abs(val));
+               if (chan_val > 100)
+                   chan_val = 100;
+            } else {
+                u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
+                if (new_state != timer_state[i]) {
+                    if (new_state)
+                        last_time[i] = t;
+                    timer_state[i] = new_state;
+                }
             }
         }
         if (timer_state[i]) {
             s32 delta = t - last_time[i];
-	   if (Model.timer[i].type == TIMER_PERMANENT) {
-		timer_val[i] += delta;
-		if( timer_val[i] >= 359999900) // Reset when 99h59mn59sec
-		    timer_val[i] = 0 ;
-		Model.timer[i].val = timer_val[i];
-            } else if (Model.timer[i].type == TIMER_STOPWATCH) {
+            if (Model.timer[i].type == TIMER_STOPWATCH_PROP || Model.timer[i].type == TIMER_COUNTDOWN_PROP) {
+                delta = delta * chan_val / 100;
+            }
+            if (Model.timer[i].type == TIMER_PERMANENT) {
+                timer_val[i] += delta;
+                if( timer_val[i] >= 359999900) // Reset when 99h59mn59sec
+                    timer_val[i] = 0 ;
+                Model.timer[i].val = timer_val[i];
+            } else if (Model.timer[i].type == TIMER_STOPWATCH || Model.timer[i].type == TIMER_STOPWATCH_PROP) {
                 timer_val[i] += delta;
             } else {
                 s32 warn_time;
@@ -174,8 +198,8 @@ void TIMER_Update()
                 timer_val[i] -= delta;
             }
             last_time[i] = t;
-	} 
-	if (Model.timer[i].resetsrc) {
+        } 
+        if (Model.timer[i].resetsrc) {
             s16 val;
             if (MIXER_SRC(Model.timer[i].resetsrc) <= NUM_INPUTS) {
                 volatile s16 *raw = MIXER_GetInputs();
@@ -186,8 +210,8 @@ void TIMER_Update()
             if (MIXER_SRC_IS_INV(Model.timer[i].resetsrc))
                 val = -val;
             if (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) {
-		TIMER_Reset(i);
-	    }
+                TIMER_Reset(i);
+            }
         }
     }
 }

@@ -76,7 +76,7 @@ static void _draw_body() {
         GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         row+=20;
-	GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL,NULL,_tr("Switch"));
+	GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)i);
         GUI_CreateTextSelect(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
         row+=20;
@@ -98,7 +98,9 @@ static void _draw_body() {
 
 static void update_countdown(u8 idx)
 {
-    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_PERMANENT;
+    u8 hide = Model.timer[idx].type == TIMER_STOPWATCH
+              || Model.timer[idx].type == TIMER_STOPWATCH_PROP
+              || Model.timer[idx].type == TIMER_PERMANENT;
     GUI_SetHidden((guiObject_t *)&gui->start[idx], hide);
     GUI_SetHidden((guiObject_t *)&gui->startlbl[idx], hide);
     GUI_SetSelectable((guiObject_t *)&gui->start[idx], !hide);
@@ -109,8 +111,13 @@ static void update_countdown(u8 idx)
     GUI_SetSelectable((guiObject_t *)&gui->resetsrc[idx], !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetlbl[idx], hide);
 
-    hide = Model.timer[idx].type == TIMER_STOPWATCH || Model.timer[idx].type == TIMER_COUNTDOWN;
+    hide = Model.timer[idx].type == TIMER_STOPWATCH
+           || Model.timer[idx].type == TIMER_COUNTDOWN
+           || Model.timer[idx].type == TIMER_STOPWATCH_PROP
+           || Model.timer[idx].type == TIMER_COUNTDOWN_PROP;
     GUI_SetHidden((guiObject_t *)&gui->resetperm[idx], hide);
     GUI_SetSelectable((guiObject_t *)&gui->resetperm[idx], !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl[idx], hide);
+
+    GUI_Redraw(&gui->switchlbl[idx]);
 }
