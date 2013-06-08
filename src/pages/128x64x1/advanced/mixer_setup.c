@@ -97,8 +97,8 @@ static void _show_simple()
                          2 * ITEM_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
     // The following items are not draw in the logical view;
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
-                              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
+                              CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb,
                               &mp->mixer[0]);
     OBJ_SET_USED(&gui->bar, 0);
@@ -183,8 +183,8 @@ static void _show_complex(int page_change)
     GUI_CreateBarGraph(&gui->bar, LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
-                                  CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                                  CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                                  CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
+                                  CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                                   0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
     if (page_change) {
         GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, selection));
@@ -322,8 +322,8 @@ static void _show_expo_dr()
                          ITEM_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
 
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
-                              CHAN_MIN_VALUE, CHAN_MIN_VALUE,
-                              CHAN_MAX_VALUE, CHAN_MAX_VALUE,
+                              CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
+                              CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, NULL);
 
     mp->cur_mixer = &mp->mixer[0];

@@ -187,10 +187,10 @@ s16 eval_mixer_cb(s16 xval, void * data)
     }
     */
 
-    if (yval > CHAN_MAX_VALUE)
-        yval = CHAN_MAX_VALUE;
-    else if (yval <CHAN_MIN_VALUE)
-        yval = CHAN_MIN_VALUE;
+    if (yval > CHAN_MAX_VALUE * 5 / 4)
+        yval = CHAN_MAX_VALUE * 5 / 4;
+    else if (yval <CHAN_MIN_VALUE * 5 / 4)
+        yval = CHAN_MIN_VALUE * 5 / 4;
     //Don't showchannel-reverse on the graph (but do show input reverse)
     //if (mp->limit.flags & CH_REVERSE)
     //    yval = -yval;
@@ -296,8 +296,8 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
         sprintf(mp->tmpstr, "%d", *value);
         return mp->tmpstr;
     }
-    s8 min = -100; //(value == &mp->limit.max) ? mp->limit.min : -100;
-    s8 max = 100; //(value == &mp->limit.min) ? mp->limit.max : 100;
+    s8 min = -125; //(value == &mp->limit.max) ? mp->limit.min : -100;
+    s8 max = 125; //(value == &mp->limit.min) ? mp->limit.max : 100;
     *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
     sprintf(mp->tmpstr, "%d", *value);
     if (changed) {
