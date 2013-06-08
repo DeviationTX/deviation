@@ -127,7 +127,7 @@ void TIMER_Power(){
 void TIMER_Update()
 {
     u8 i;
-    u8 chan_val;
+    u8 chan_val = 0;
     u32 t = CLOCK_getms();
     if (PROTOCOL_WaitingForSafe())
         return;
