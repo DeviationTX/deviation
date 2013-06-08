@@ -239,12 +239,13 @@ u8 CURVE_NumPoints(struct Curve *curve)
     switch (CURVE_TYPE(curve)) {
         case CURVE_NONE:
         case CURVE_FIXED:
+            return 0;
         case CURVE_MIN_MAX:
         case CURVE_ZERO_MAX:
         case CURVE_GT_ZERO:
         case CURVE_LT_ZERO:
         case CURVE_ABSVAL:
-            return 0;
+            return 1;
         case CURVE_EXPO:
         case CURVE_DEADBAND:
              return 2;

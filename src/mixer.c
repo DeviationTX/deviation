@@ -504,7 +504,7 @@ u8 find_dependencies(u8 ch, u8 *deps)
             if (MIXER_SRC(mixer->src) > NUM_INPUTS && MIXER_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
                 deps[MIXER_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
             } 
-            if (MIXER_SRC(mixer->sw) > NUM_INPUTS) {
+            if (MIXER_SRC(mixer->sw) > NUM_INPUTS && MIXER_SRC(mixer->sw) != NUM_INPUTS + 1 + ch) {
                 deps[MIXER_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
             }
         }
