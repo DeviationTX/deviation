@@ -52,7 +52,7 @@ u8 usb_cb(u32 button, u8 flags, void *data)
     if(flags == BUTTON_RELEASE) {
         _draw_page(1);
         GUI_RefreshScreen();
-        USB_Enable(1);
+        USB_Enable(0, 1);
         wait_release();
         wait_press();
         wait_release();
@@ -81,7 +81,7 @@ void PAGE_USBEvent()
 
 void USB_Connect()
 {
-    USB_Enable(1);
+    USB_Enable(0, 1);
     wait_release();
     wait_press();
     wait_release();

@@ -35,7 +35,7 @@ __IO uint8_t bIntPackSOF = 0;  /* SOFs received between 2 consecutive packets */
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* function pointers to non-control endpoints service routines */
-void (*pEpInt_IN[7])(void) =
+void (*MSC_pEpInt_IN[7])(void) =
   {
     EP1_IN_Callback,
     EP2_IN_Callback,
@@ -46,7 +46,7 @@ void (*pEpInt_IN[7])(void) =
     EP7_IN_Callback,
   };
 
-void (*pEpInt_OUT[7])(void) =
+void (*MSC_pEpInt_OUT[7])(void) =
   {
     EP1_OUT_Callback,
     EP2_OUT_Callback,
@@ -87,7 +87,7 @@ void USB_Istr(void)
   if (wIstr & ISTR_RESET & wInterrupt_Mask)
   {
     _SetISTR((uint16_t)CLR_RESET);
-    Device_Property.Reset();
+    Device_Property->Reset();
 #ifdef RESET_CALLBACK
     RESET_Callback();
 #endif

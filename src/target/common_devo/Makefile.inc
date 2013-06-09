@@ -13,7 +13,8 @@ SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_devo/*.c) $
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard target/common_devo/protocol/*.c)
 else
-SRC_C   += $(wildcard target/common_devo/protocol/*.c)
+SRC_C   += $(wildcard target/common_devo/protocol/*.c) \
+           $(wildcard target/common_devo/hid/*.c)
 endif
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Itarget/common_devo/msc2/lib -Itarget/common_devo/msc2 -Ilibopencm3/include -fno-builtin-printf -Os

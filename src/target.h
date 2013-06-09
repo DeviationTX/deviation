@@ -149,7 +149,7 @@ void UART_Initialize();
 void UART_Stop();
 
 /* USB*/
-void USB_Enable(u8 use_interrupt);
+void USB_Enable(u8 type, u8 use_interrupt);
 void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();

@@ -33,8 +33,15 @@ void TxName(u8 *var, u8 len) {
     memcpy(var, model, len - 1);
     var[len-1] = 0;
 }
-void USB_Enable(u8 use_interrupt) {(void)use_interrupt;}
+void USB_Enable(u8 type, u8 use_interrupt) {
+    (void) type;
+    (void)use_interrupt;
+}
 void USB_Disable() {}
+void HID_Write(s8 *pkt, u8 size) {
+    (void)pkt;
+    (void)size;
+}
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 void PWR_Sleep() {}

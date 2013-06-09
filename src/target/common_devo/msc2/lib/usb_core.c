@@ -308,7 +308,7 @@ RESULT Standard_ClearFeature(void)
         if (Related_Endpoint == ENDP0)
         {
           /* After clear the STALL, enable the default endpoint receiver */
-          SetEPRxCount(Related_Endpoint, Device_Property.MaxPacketSize);
+          SetEPRxCount(Related_Endpoint, Device_Property->MaxPacketSize);
           _SetEPRxStatus(Related_Endpoint, EP_RX_VALID);
         }
         else
@@ -1016,7 +1016,7 @@ uint8_t Post0_Process(void)
   USB_OTG_EP *ep;
 #endif /* STM32F10X_CL */
       
-  SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+  SetEPRxCount(ENDP0, Device_Property->MaxPacketSize);
 
   if (pInformation->ControlState == STALLED)
   {

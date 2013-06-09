@@ -1,9 +1,9 @@
 /******************** (C) COPYRIGHT 2011 STMicroelectronics ********************
-* File Name          : usb_init.c
+* File Name          : usb_endp.c
 * Author             : MCD Application Team
 * Version            : V3.3.0
 * Date               : 21-March-2011
-* Description        : Initialization routines & global variables
+* Description        : Endpoint routines
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -14,50 +14,37 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
+#ifdef STM32L1XX_MD
+#include "stm32l1xx.h"
+#else
+#include "stm32f10x.h"
+#endif /* STM32L1XX_MD */
+
 #include "usb_lib.h"
+#include "hid_usb_istr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-/*  The number of current endpoint, it will be used to specify an endpoint */
- uint8_t	EPindex;
-/*  The number of current device, it is an index to the Device_Table */
-/* uint8_t	Device_no; */
-/*  Points to the DEVICE_INFO structure of current device */
-/*  The purpose of this register is to speed up the execution */
-DEVICE_INFO *pInformation;
-/*  Points to the DEVICE_PROP structure of current device */
-/*  The purpose of this register is to speed up the execution */
-DEVICE_PROP *pProperty;
-/*  Temporary save the state of Rx & Tx status. */
-/*  Whenever the Rx or Tx state is changed, its value is saved */
-/*  in this variable first and will be set to the EPRB or EPRA */
-/*  at the end of interrupt process */
-uint16_t	SaveState ;
-uint16_t  wInterrupt_Mask;
-DEVICE_INFO	Device_Info;
-USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
+extern __IO uint8_t PrevXferComplete;
 
-/* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-
 /*******************************************************************************
-* Function Name  : USB_Init
-* Description    : USB system initialization
+* Function Name  : EP1_OUT_Callback.
+* Description    : EP1 OUT Callback Routine.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void USB_Init(void)
+void HID_EP1_IN_Callback(void)
 {
-  pInformation = &Device_Info;
-  pInformation->ControlState = 2;
-  pProperty = Device_Property;
-  pUser_Standard_Requests = User_Standard_Requests;
-  /* Initialize devices one by one */
-  pProperty->Init();
+  /* Set the transfer complete token to inform upper layer that the current 
+  transfer has been complete */
+  //printf("Completed\n");
+  PrevXferComplete = 1; 
 }
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+

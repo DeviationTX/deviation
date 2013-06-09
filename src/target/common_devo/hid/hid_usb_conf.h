@@ -3,7 +3,7 @@
 * Author             : MCD Application Team
 * Version            : V3.3.0
 * Date               : 21-March-2011
-* Description        : Mass Storage Demo configuration header
+* Description        : Joystick Mouse demo configuration file
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -12,22 +12,26 @@
 * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USB_CONF_H
-#define __USB_CONF_H
 
-/*-------------------------------------------------------------*/
-/* EP_NUM */
-/* defines how many endpoints are used by the device */
-/*-------------------------------------------------------------*/
-#define EP_NUM                          (3)
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __HID_USB_CONF_H
+#define __HID_USB_CONF_H
+
+#include "usb_conf.h"
+
+/* Includes ------------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+/* External variables --------------------------------------------------------*/
 
 #ifndef STM32F10X_CL
 /*-------------------------------------------------------------*/
 /* --------------   Buffer Description Table  -----------------*/
 /*-------------------------------------------------------------*/
 /* buffer table base address */
-
+/* buffer table base address */
 #define BTABLE_ADDRESS      (0x00)
 
 /* EP0  */
@@ -35,43 +39,14 @@
 #define ENDP0_RXADDR        (0x18)
 #define ENDP0_TXADDR        (0x58)
 
-/* EP1  */
-/* tx buffer base address */
-#define ENDP1_TXADDR        (0x98)
-
-/* EP2  */
-/* Rx buffer base address */
-#define ENDP2_RXADDR        (0xD8)
-
-
-/* ISTR events */
-/* IMR_MSK */
-/* mask defining which events has to be handled */
-/* by the device application software */
-#define IMR_MSK (CNTR_CTRM  | CNTR_RESETM)
-//#define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM )
+/*-------------------------------------------------------------*/
+/* -------------------   ISTR events  -------------------------*/
+/*-------------------------------------------------------------*/
 #endif /* STM32F10X_CL */
 
-/* CTR service routines */
-/* associated to defined endpoints */
-//#define  EP1_IN_Callback   NOP_Process
-#define  EP2_IN_Callback   NOP_Process
-#define  EP3_IN_Callback   NOP_Process
-#define  EP4_IN_Callback   NOP_Process
-#define  EP5_IN_Callback   NOP_Process
-#define  EP6_IN_Callback   NOP_Process
-#define  EP7_IN_Callback   NOP_Process
-
-
-#define  EP1_OUT_Callback   NOP_Process
-//#define  EP2_OUT_Callback   NOP_Process
-#define  EP3_OUT_Callback  NOP_Process
-#define  EP4_OUT_Callback   NOP_Process
-#define  EP5_OUT_Callback   NOP_Process
-#define  EP6_OUT_Callback   NOP_Process
-#define  EP7_OUT_Callback   NOP_Process
 
 #ifdef STM32F10X_CL
+
 /*******************************************************************************
 *                              FIFO Size Configuration
 *  
@@ -122,17 +97,17 @@
 /* OTGD-FS-DEVICE IP interrupts Enable definitions */
 /* Uncomment the define to enable the selected interrupt */
 //#define INTR_MODEMISMATCH
-#define INTR_SOFINTR
+//#define INTR_SOFINTR
 #define INTR_RXSTSQLVL           /* Mandatory */
 //#define INTR_NPTXFEMPTY
 //#define INTR_GINNAKEFF
 //#define INTR_GOUTNAKEFF
-//#define INTR_ERLYSUSPEND
+#define INTR_ERLYSUSPEND
 #define INTR_USBSUSPEND          /* Mandatory */
 #define INTR_USBRESET            /* Mandatory */
 #define INTR_ENUMDONE            /* Mandatory */
 //#define INTR_ISOOUTDROP
-#define INTR_EOPFRAME
+//#define INTR_EOPFRAME
 //#define INTR_EPMISMATCH
 #define INTR_INEPINTR            /* Mandatory */
 #define INTR_OUTEPINTR           /* Mandatory */
@@ -174,6 +149,25 @@
 
 #endif /* STM32F10X_CL */
 
-#endif /* __USB_CONF_H */
+/* CTR service routines */
+/* associated to defined endpoints */
+/* #define  EP1_IN_Callback   NOP_Process*/
+#define  HID_EP2_IN_Callback   NOP_Process
+#define  HID_EP3_IN_Callback   NOP_Process
+#define  HID_EP4_IN_Callback   NOP_Process
+#define  HID_EP5_IN_Callback   NOP_Process
+#define  HID_EP6_IN_Callback   NOP_Process
+#define  HID_EP7_IN_Callback   NOP_Process
+
+#define  HID_EP1_OUT_Callback   NOP_Process
+#define  HID_EP2_OUT_Callback   NOP_Process
+#define  HID_EP3_OUT_Callback   NOP_Process
+#define  HID_EP4_OUT_Callback   NOP_Process
+#define  HID_EP5_OUT_Callback   NOP_Process
+#define  HID_EP6_OUT_Callback   NOP_Process
+#define  HID_EP7_OUT_Callback   NOP_Process
+
+#endif /*__HID_USB_CONF_H*/
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+

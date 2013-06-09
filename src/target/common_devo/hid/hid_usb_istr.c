@@ -1,9 +1,9 @@
 /******************** (C) COPYRIGHT 2011 STMicroelectronics ********************
-* File Name          : usb_init.c
+* File Name          : usb_istr.c
 * Author             : MCD Application Team
 * Version            : V3.3.0
 * Date               : 21-March-2011
-* Description        : Initialization routines & global variables
+* Description        : ISTR events interrupt service routines
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -15,49 +15,41 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
+#include "hid_usb_prop.h"
+#include "hid_usb_istr.h"
+#include "usb_pwr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-/*  The number of current endpoint, it will be used to specify an endpoint */
- uint8_t	EPindex;
-/*  The number of current device, it is an index to the Device_Table */
-/* uint8_t	Device_no; */
-/*  Points to the DEVICE_INFO structure of current device */
-/*  The purpose of this register is to speed up the execution */
-DEVICE_INFO *pInformation;
-/*  Points to the DEVICE_PROP structure of current device */
-/*  The purpose of this register is to speed up the execution */
-DEVICE_PROP *pProperty;
-/*  Temporary save the state of Rx & Tx status. */
-/*  Whenever the Rx or Tx state is changed, its value is saved */
-/*  in this variable first and will be set to the EPRB or EPRA */
-/*  at the end of interrupt process */
-uint16_t	SaveState ;
-uint16_t  wInterrupt_Mask;
-DEVICE_INFO	Device_Info;
-USER_STANDARD_REQUESTS  *pUser_Standard_Requests;
+__IO uint16_t wIstr;  /* ISTR register last read value */
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+/* function pointers to non-control endpoints service routines */
+void (*HID_pEpInt_IN[7])(void) =
+  {
+    HID_EP1_IN_Callback,
+    HID_EP2_IN_Callback,
+    HID_EP3_IN_Callback,
+    HID_EP4_IN_Callback,
+    HID_EP5_IN_Callback,
+    HID_EP6_IN_Callback,
+    HID_EP7_IN_Callback,
+  };
 
-/*******************************************************************************
-* Function Name  : USB_Init
-* Description    : USB system initialization
-* Input          : None.
-* Output         : None.
-* Return         : None.
-*******************************************************************************/
-void USB_Init(void)
-{
-  pInformation = &Device_Info;
-  pInformation->ControlState = 2;
-  pProperty = Device_Property;
-  pUser_Standard_Requests = User_Standard_Requests;
-  /* Initialize devices one by one */
-  pProperty->Init();
-}
+void (*HID_pEpInt_OUT[7])(void) =
+  {
+    HID_EP1_OUT_Callback,
+    HID_EP2_OUT_Callback,
+    HID_EP3_OUT_Callback,
+    HID_EP4_OUT_Callback,
+    HID_EP5_OUT_Callback,
+    HID_EP6_OUT_Callback,
+    HID_EP7_OUT_Callback,
+  };
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+

@@ -35,7 +35,7 @@ DEVICE Device_Table =
     1
   };
 
-DEVICE_PROP Device_Property =
+DEVICE_PROP MSC_Device_Property =
   {
     MASS_init,
     MASS_Reset,
@@ -51,7 +51,7 @@ DEVICE_PROP Device_Property =
     0x40 /*MAX PACKET SIZE*/
   };
 
-USER_STANDARD_REQUESTS User_Standard_Requests =
+USER_STANDARD_REQUESTS MSC_User_Standard_Requests =
   {
     Mass_Storage_GetConfiguration,
     Mass_Storage_SetConfiguration,
@@ -64,19 +64,19 @@ USER_STANDARD_REQUESTS User_Standard_Requests =
     Mass_Storage_SetDeviceAddress
   };
 
-ONE_DESCRIPTOR Device_Descriptor =
+ONE_DESCRIPTOR MSC_Device_Descriptor =
   {
     (uint8_t*)MASS_DeviceDescriptor,
     MASS_SIZ_DEVICE_DESC
   };
 
-ONE_DESCRIPTOR Config_Descriptor =
+ONE_DESCRIPTOR MSC_Config_Descriptor =
   {
     (uint8_t*)MASS_ConfigDescriptor,
     MASS_SIZ_CONFIG_DESC
   };
 
-ONE_DESCRIPTOR String_Descriptor[5] =
+ONE_DESCRIPTOR MSC_String_Descriptor[5] =
   {
     {(uint8_t*)MASS_StringLangID, MASS_SIZ_STRING_LANGID},
     {(uint8_t*)MASS_StringVendor, MASS_SIZ_STRING_VENDOR},
@@ -149,7 +149,7 @@ void MASS_Reset()
   SetEPType(ENDP0, EP_CONTROL);
   SetEPTxStatus(ENDP0, EP_TX_NAK);
   SetEPRxAddr(ENDP0, ENDP0_RXADDR);
-  SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+  SetEPRxCount(ENDP0, Device_Property->MaxPacketSize);
   SetEPTxAddr(ENDP0, ENDP0_TXADDR);
   Clear_Status_Out(ENDP0);
   SetEPRxValid(ENDP0);
@@ -163,12 +163,12 @@ void MASS_Reset()
   /* Initialize Endpoint 2 */
   SetEPType(ENDP2, EP_BULK);
   SetEPRxAddr(ENDP2, ENDP2_RXADDR);
-  SetEPRxCount(ENDP2, Device_Property.MaxPacketSize);
+  SetEPRxCount(ENDP2, Device_Property->MaxPacketSize);
   SetEPRxStatus(ENDP2, EP_RX_VALID);
   SetEPTxStatus(ENDP2, EP_TX_DIS);
 
 
-  SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+  SetEPRxCount(ENDP0, Device_Property->MaxPacketSize);
   SetEPRxValid(ENDP0);
 
   /* Set the device to response on default address */
@@ -364,7 +364,7 @@ RESULT MASS_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting)
 *******************************************************************************/
 uint8_t *MASS_GetDeviceDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &Device_Descriptor );
+  return Standard_GetDescriptorData(Length, &MSC_Device_Descriptor );
 }
 
 /*******************************************************************************
@@ -376,7 +376,7 @@ uint8_t *MASS_GetDeviceDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *MASS_GetConfigDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &Config_Descriptor );
+  return Standard_GetDescriptorData(Length, &MSC_Config_Descriptor );
 }
 
 /*******************************************************************************
@@ -396,7 +396,7 @@ uint8_t *MASS_GetStringDescriptor(uint16_t Length)
   }
   else
   {
-    return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);
+    return Standard_GetDescriptorData(Length, &MSC_String_Descriptor[wValue0]);
   }
 }
 
