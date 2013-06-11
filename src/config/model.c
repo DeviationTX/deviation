@@ -116,6 +116,7 @@ static const char TRIM_POS[]  = "pos";
 static const char TRIM_NEG[]  = "neg";
 static const char TRIM_STEP[] = "step";
 static const char TRIM_VALUE[] = "value";
+#define TRIM_SWITCH MIXER_SWITCH
 
 /* Section: Heli */
 static const char SECTION_SWASH[] = "swash";
@@ -628,6 +629,16 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->trims[idx].src = get_source(section, value);
             return 1;
         }
+        if (MATCH_KEY(TRIM_SWITCH)) {
+            for (int i = 0; i <= NUM_SOURCES; i++) {
+                char cmp[10];
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, i), value) == 0) {
+                    m->trims[idx].sw = i;
+                    return 1;
+                }
+            }
+            return 1;
+        }
         if (MATCH_KEY(TRIM_POS)) {
             m->trims[idx].pos = get_button(section, value);
             return 1;
@@ -641,7 +652,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(TRIM_VALUE)) {
-            m->trims[idx].value = value_int;
+            parse_byte_list(value, m->trims[idx].value, 3, 1);
             return 1;
         }
         printf("%s: Unknown trim setting: %s\n", section, name);
@@ -1127,10 +1138,13 @@ u8 CONFIG_WriteModel(u8 model_num) {
              : INPUT_SourceName(file, m->trims[idx].src));
         fprintf(fh, "%s=%s\n", TRIM_POS, INPUT_ButtonName(m->trims[idx].pos));
         fprintf(fh, "%s=%s\n", TRIM_NEG, INPUT_ButtonName(m->trims[idx].neg));
+        if(WRITE_FULL_MODEL || m->trims[idx].sw)
+            fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitch(file, m->trims[idx].sw));
         if(WRITE_FULL_MODEL || m->trims[idx].step != 1)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
-        if(WRITE_FULL_MODEL || m->trims[idx].value)
-            fprintf(fh, "%s=%d\n", TRIM_VALUE, m->trims[idx].value);
+        if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2])
+            fprintf(fh, "%s=%d,%d,%d\n", TRIM_VALUE,
+                    m->trims[idx].value[0], m->trims[idx].value[1], m->trims[idx].value[2]);
     }
     if (WRITE_FULL_MODEL || m->swash_type) {
         fprintf(fh, "[%s]\n", SECTION_SWASH);

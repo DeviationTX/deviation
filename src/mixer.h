@@ -158,7 +158,8 @@ struct Trim {
     u8 pos;
     u8 neg;
     u8 step;
-    s16 value;
+    u8 sw;
+    s8 value[3];
 };
 
 /* Curve functions */
@@ -200,6 +201,7 @@ u8 MIXER_SourceHasTrim(u8 src);
 u8 MIXER_MapChannel(u8 channel);
 void MIXER_AdjustForProtocol();
 u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data);
+s8 *MIXER_GetTrim(u8 i);
 
 void MIXER_Init();
 

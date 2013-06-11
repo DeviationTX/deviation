@@ -62,7 +62,10 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     //Row 3
     GUI_CreateLabel(&gui_ed->poslbl, 8, 96, NULL, DEFAULT_FONT, _tr("Trim -"));
     GUI_CreateTextSelect(&gui_ed->pos, 104, 96, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
-    //Row 3
+    //Row 4
     GUI_CreateLabel(&gui_ed->steplbl, 8, 120, NULL, DEFAULT_FONT, _tr("Trim Step"));
     GUI_CreateTextSelect(&gui_ed->step, 104, 120, TEXTSELECT_96, NULL, set_trimstep_cb, &tp->trim.step);
+    //Row 5
+    GUI_CreateLabel(&gui_ed->swlbl, 8, 144, NULL, DEFAULT_FONT, _tr("Switch"));
+    GUI_CreateTextSelect(&gui_ed->sw, 104, 144, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
 }

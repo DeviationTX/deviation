@@ -71,13 +71,14 @@ static guiObject_t *getobj2_cb(int relrow, int col, void *data)
 {
     (void)data;
     (void)col;
-    return (guiObject_t *)&gui->item[relrow];
+    return (guiObject_t *)&guit->value[relrow];
 }
 enum {
     ITEM_INPUT,
     ITEM_TRIMNEG,
     ITEM_TRIMPOS,
     ITEM_TRIMSTEP,
+    ITEM_TRIMSWITCH,
     ITEM_LAST,
 };
 
@@ -103,6 +104,10 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
         case ITEM_TRIMSTEP:
             label = _tr_noop("Trim Step");
             value = set_trimstep_cb; data = &tp->trim.step;
+            break;
+        case ITEM_TRIMSWITCH:
+            label = _tr_noop("Switch");
+            value = set_switch_cb; data = &tp->trim.sw;
             break;
     }
     int w = 63;

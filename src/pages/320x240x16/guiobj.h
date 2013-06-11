@@ -210,10 +210,12 @@ struct trimedit_obj {
     guiLabel_t neglbl;
     guiLabel_t poslbl;
     guiLabel_t steplbl;
+    guiLabel_t swlbl;
     guiTextSelect_t src;
     guiTextSelect_t neg;
     guiTextSelect_t pos;
     guiTextSelect_t step;
+    guiTextSelect_t sw;
 };
 
 struct tx_obj {

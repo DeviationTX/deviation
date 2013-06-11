@@ -66,9 +66,9 @@ void PAGE_MainInit(int page)
         GUI_CreateImageOffset(&gui->icon, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
 
     for(i = 0; i < 6; i++) {
-        mp->trims[i] = Model.trims[i].value;
+        mp->trims[i] = *MIXER_GetTrim(i);
         if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h)) {
-            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, &Model.trims[i].value);
+            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, (void *)(long)i);
         }
     }
 

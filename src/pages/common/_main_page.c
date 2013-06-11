@@ -72,8 +72,8 @@ const char *voltage_cb(guiObject_t *obj, const void *data) {
 
 s16 trim_cb(void * data)
 {
-    s8 *trim = (s8 *)data;
-    return *trim;
+    long i = (long)data;
+    return *(MIXER_GetTrim(i));
 }
 
 s16 bar_cb(void * data)
@@ -95,8 +95,9 @@ void PAGE_MainEvent()
     for(i = 0; i < 6; i++) {
         if (! OBJ_IS_USED(&gui->trim[i]))
             continue;
-        if (mp->trims[i] != Model.trims[i].value) {
-            mp->trims[i] = Model.trims[i].value;
+        int value = *(MIXER_GetTrim(i));
+        if (mp->trims[i] != value) {
+            mp->trims[i] = value;
             GUI_Redraw(&gui->trim[i]);
         }
     }

@@ -33,6 +33,22 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return INPUT_SourceName(tp->tmpstr, MIXER_MapChannel(*source));
 }
 
+static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    u8 *source = (u8 *)data;
+    u8 changed;
+    u8 val = MIXER_SRC(*source);
+
+    int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
+    newval = INPUT_GetAbbrevSource(val, newval, dir);
+    if (val != newval) {
+        val = newval;
+        *source = val;
+    }
+    return INPUT_SourceNameAbbrevSwitch(tp->tmpstr, *source);
+}
+
 const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;

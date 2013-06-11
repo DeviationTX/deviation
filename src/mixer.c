@@ -396,12 +396,26 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
     return value;
 }
 
+s8 *MIXER_GetTrim(u8 i)
+{
+    if (Model.trims[i].sw) {
+        for (int j = 0; j < 3; j++) {
+            // Assume switch 0/1/2 are in order
+            if(raw[Model.trims[i].sw+j] > 0) {
+                return &Model.trims[i].value[j];
+            }
+        }
+    }
+    return &Model.trims[i].value[0];
+}
+
 s32 get_trim(u8 src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            return PCT_TO_RANGE((s32)Model.trims[i].value * Model.trims[i].step) / 10;
+            s32 value = *(MIXER_GetTrim(i));
+            return PCT_TO_RANGE(value * Model.trims[i].step) / 10;
         }
     }
     return 0;
@@ -648,22 +662,23 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg) || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
             if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg))
                 step_size = -step_size;
-            tmp = (int)(Model.trims[i].value) + step_size;
+            s8 *value = MIXER_GetTrim(i);
+            tmp = (int)(*value) + step_size;
             //print_buttons(buttons);
-            if ((int)(Model.trims[i].value) > 0 && tmp <= 0) {
-                Model.trims[i].value = 0;
+            if ((int)*value > 0 && tmp <= 0) {
+                *value = 0;
                 reach_end = 1;
-            } else if ((int)(Model.trims[i].value) < 0 && tmp >= 0) {
-                Model.trims[i].value = 0;
+            } else if ((int)*value < 0 && tmp >= 0) {
+                *value = 0;
                 reach_end = 1;
             } else if (tmp > 100) {
-                Model.trims[i].value = 100;
+                *value = 100;
                 reach_end = 1;
             } else if (tmp < -100) {
-                Model.trims[i].value = -100;
+                *value = -100;
                 reach_end = 1;
             } else {
-                Model.trims[i].value = tmp;
+                *value = tmp;
             }
 
             if (reach_end && (flags & BUTTON_LONGPRESS))
@@ -675,11 +690,11 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
             }
             else if (CLOCK_getms()- last_trim_music_time > TRIM_MUSIC_DURATION + 50) {  // Do not beep too frequently
                 last_trim_music_time = CLOCK_getms();
-                tmp = (Model.trims[i].value >= 0) ? Model.trims[i].value : -Model.trims[i].value;
+                tmp = (*value >= 0) ? *value : -*value;
                 if (step_size >=9 || step_size <= -9)
                     SOUND_SetFrequency(START_TONE + tmp * 10, volume); // start from "c2" tone, frequence = 1000
                 else  {  //  for small step change: generate 2 different tone for closing to/away from mid-point
-                    if (Model.trims[i].value < 0)
+                    if (*value < 0)
                         step_size = -step_size;
                     u16 tone = START_TONE + 300;
                     if (step_size < 0)
@@ -691,8 +706,6 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
                 SOUND_StartWithoutVibrating(TRIM_MUSIC_DURATION, NULL);
             }
         }
-
-
     }
     return 1;
 }
