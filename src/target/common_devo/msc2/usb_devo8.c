@@ -81,6 +81,7 @@ void USB_Enable(u8 type, u8 use_interrupt)
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
         GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
         gpio_set(GPIOB, GPIO10);
+    //rcc_set_usbpre(RCC_CFGR_USBPRE_PLL_CLK_DIV1_5);
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
     USB_Init();  
     if(use_interrupt) {
