@@ -328,6 +328,7 @@ struct advmixer_obj {
     guiLabel_t sw1[ENTRIES_PER_PAGE];
     guiLabel_t sw2[ENTRIES_PER_PAGE];
     guiScrollbar_t scroll;
+    guiKeyboard_t keyboard;
 };
 
 struct advmixcfg_obj {

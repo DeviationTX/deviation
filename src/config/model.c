@@ -97,6 +97,7 @@ static const char * const CHAN_TEMPLATE_VAL[MIXERTEMPLATE_MAX+1] =
 static const char SECTION_VIRTCHAN[] = "virtchan";
 #define VCHAN_TEMPLATE CHAN_TEMPLATE
 #define VCHAN_TEMPLATE_VAL CHAN_TEMPLATE_VAL
+#define VCHAN_NAME MODEL_NAME
 
 /* Section: PPM-In */
 static const char SECTION_PPMIN[] = "ppm-in";
@@ -610,6 +611,10 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown template: %s\n", section, value);
             return 1;
         }
+        if (MATCH_KEY(VCHAN_NAME)) {
+            strncpy(m->virtname[idx - NUM_OUT_CHANNELS], value, sizeof(m->virtname[0]));
+            return 1;
+        }
         printf("%s: Unknown key: %s\n", section, name);
         return 0;
     }
@@ -1101,8 +1106,10 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "\n");
     }
     for(idx = 0; idx < NUM_VIRT_CHANNELS; idx++) {
-        if(WRITE_FULL_MODEL || m->templates[idx+NUM_OUT_CHANNELS] != 0) {
+        if(WRITE_FULL_MODEL || m->templates[idx+NUM_OUT_CHANNELS] != 0 || m->virtname[idx][0]) {
             fprintf(fh, "[%s%d]\n", SECTION_VIRTCHAN, idx+1);
+            if(m->virtname[idx][0])
+                fprintf(fh, "%s=%s\n", VCHAN_NAME, m->virtname[idx]);
             if(WRITE_FULL_MODEL || m->templates[idx+NUM_OUT_CHANNELS] != 0)
                 fprintf(fh, "%s=%s\n", VCHAN_TEMPLATE, VCHAN_TEMPLATE_VAL[m->templates[idx+NUM_OUT_CHANNELS]]);
         }

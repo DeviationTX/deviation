@@ -212,6 +212,7 @@ struct advmixer_obj {
     guiLabel_t sw1[2];
     guiLabel_t sw2[2];
     guiScrollbar_t scroll;
+    guiKeyboard_t keyboard;
 };
 
 struct advmixcfg_obj {

@@ -115,7 +115,12 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS) {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) {
-        sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
+        int virt = src - NUM_INPUTS - NUM_OUT_CHANNELS;
+        if (Model.virtname[virt-1][0]) {
+            sprintf(str, "%s%s", is_neg ? "!" : "", Model.virtname[virt-1]);
+        } else {
+            sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
+        }
     } else {
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("PPM"), src - NUM_INPUTS - NUM_OUT_CHANNELS - NUM_VIRT_CHANNELS);
     }

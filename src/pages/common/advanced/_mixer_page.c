@@ -19,6 +19,7 @@ static struct mixer_page * const mp = &pagemem.u.mixer_page;
 static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, const void *data);
 static void limitselect_cb(guiObject_t *obj, const void *data);
+static void virtname_cb(guiObject_t *obj, const void *data);
 static const char *show_source(guiObject_t *obj, const void *data);
 
 static void _show_title(int page);
@@ -31,13 +32,8 @@ const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data)
     return INPUT_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
 }
 
-const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
+int _is_virt_cyclic(int ch)
 {
-    (void)obj;
-    u8 ch = (long)data;
-    char tmp1[30];
-
-    /* See if we need to name the cyclic virtual channels */
     if (Model.type == MODELTYPE_HELI
         && (ch >= NUM_OUT_CHANNELS && ch < NUM_OUT_CHANNELS + 3))
     {
@@ -47,12 +43,25 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
                 || Model.templates[i] == MIXERTEMPLATE_CYC2
                 || Model.templates[i] == MIXERTEMPLATE_CYC3)
             {
-                switch(ch - NUM_OUT_CHANNELS) {
-                    case 0: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
-                    case 1: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
-                    case 2: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
-                }
+                return 1;
             }
+        }
+    }
+    return 0;
+}
+
+const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    u8 ch = (long)data;
+    char tmp1[30];
+
+    /* See if we need to name the cyclic virtual channels */
+    if (_is_virt_cyclic(ch)) {
+        switch(ch - NUM_OUT_CHANNELS) {
+            case 0: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
+            case 1: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
+            case 2: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
         }
     }
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
@@ -224,5 +233,31 @@ void limitselect_cb(guiObject_t *obj, const void *data)
     MIXER_GetLimit(ch, &mp->limit);
     mp->channel = ch;
     MIXPAGE_EditLimits();
+}
+
+static int callback_result;
+static void _changename_done_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    GUI_RemoveObj(obj);
+    PAGE_SetModal(0);
+    if (callback_result) {
+        int ch = callback_result - 1;
+        strcpy(Model.virtname[ch], mp->tmpstr);
+    }
+}
+
+void virtname_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int ch = (long)data - NUM_OUT_CHANNELS;
+    PAGE_SetModal(1);
+    if (Model.virtname[ch][0]) {
+        strcpy(mp->tmpstr, Model.virtname[ch]);
+    } else {
+        sprintf(mp->tmpstr, "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
+    }
+    callback_result = ch+1;
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, mp->tmpstr, sizeof(Model.virtname[ch])-1, _changename_done_cb, &callback_result);
 }
 

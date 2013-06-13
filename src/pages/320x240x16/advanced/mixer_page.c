@@ -53,12 +53,16 @@ static void _show_page()
         u8 ch = mp->top_channel + i;
         if (ch >= Model.num_channels)
             ch += (NUM_OUT_CHANNELS - Model.num_channels);
-        if (ch < NUM_OUT_CHANNELS)
+        if (ch < NUM_OUT_CHANNELS) {
             obj = GUI_CreateButton(&gui->name[i].but, 4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
                                    0x0000, limitselect_cb, (void *)((long)ch));
-        else
+        } else if(! _is_virt_cyclic(ch)) {
+            obj = GUI_CreateButton(&gui->name[i].but, 4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
+                                   0x0000, virtname_cb, (void *)(long)ch);
+        } else {
             obj = GUI_CreateLabelBox(&gui->name[i].lbl, 4, row, 64, 16, &DEFAULT_FONT,
                                    MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
+        }
         if (! mp->firstObj)
             mp->firstObj = obj;
         GUI_CreateButton(&gui->tmpl[i], 132, row, BUTTON_64x16, template_name_cb, 0x0000,

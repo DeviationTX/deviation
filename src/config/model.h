@@ -14,6 +14,7 @@ const char *MODEL_TEMPLATE;
 
 //This cannot be computed, and must be manually updated
 #define NUM_PROTO_OPTS 4
+#define VIRT_NAME_LEN 10 
 
 struct Model {
     char name[24];
@@ -35,6 +36,7 @@ struct Model {
     struct Trim trims[NUM_TRIMS];
     struct Mixer mixers[NUM_MIXERS];
     struct Limit limits[NUM_OUT_CHANNELS];
+    char virtname[NUM_VIRT_CHANNELS][VIRT_NAME_LEN];
     struct Timer timer[NUM_TIMERS];
     u8 templates[NUM_CHANNELS];
     struct PageCfg pagecfg;

@@ -57,8 +57,10 @@ static void _show_page()
         if (ch < NUM_OUT_CHANNELS) {
             GUI_CreateButtonPlateText(&gui->limit[i], 0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                     limitselect_cb, (void *)((long)ch));
-        }
-        else {
+        } else if(! _is_virt_cyclic(ch)) {
+            GUI_CreateButtonPlateText(&gui->limit[i], 0, row, w1, h,&labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+                    virtname_cb, (void *)((long)ch));
+        } else {
             GUI_CreateLabelBox(&gui->name[i], 0, row, w1, h, &labelDesc,
                                    MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)ch));
         }
