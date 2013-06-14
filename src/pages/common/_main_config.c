@@ -312,8 +312,15 @@ const char *menusel_cb(guiObject_t *obj, int dir, void *data)
     int i = (long)data;
     int max_pages = PAGE_GetNumPages();
     int start_page = PAGE_GetStartPage();
-    Model.pagecfg.quickpage[i] = GUI_TextSelectHelper(Model.pagecfg.quickpage[i],
-            start_page, max_pages -1, dir, 1, 1, NULL); // bug fix: don't need to put main menu in quick page, and should use max_pages-1
+    int page = GUI_TextSelectHelper(Model.pagecfg.quickpage[i], start_page, max_pages -1, dir, 1, 1, NULL);
+    if (page != Model.pagecfg.quickpage[i]) {
+        int increment = (page > Model.pagecfg.quickpage[i]) ? 1 : -1;
+        while (page >= start_page && page != max_pages && ! PAGE_IsValid(page)) {
+            page = (page + increment);
+        }
+        if (page >= start_page && page != max_pages)
+            Model.pagecfg.quickpage[i] = page;
+    }
     return PAGE_GetName(Model.pagecfg.quickpage[i]);
 }
 

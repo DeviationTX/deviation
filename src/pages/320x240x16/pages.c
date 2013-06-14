@@ -299,8 +299,11 @@ void PAGE_ChangeQuick(int dir)
     int increment = dir > 0 ? 1 : NUM_QUICKPAGES;
     while(1) {
        quick = (quick + increment) % 5;
-       if (quick == 0 || Model.pagecfg.quickpage[quick-1])
+       if (quick == 0
+           || (Model.pagecfg.quickpage[quick-1] && PAGE_IsValid(Model.pagecfg.quickpage[quick-1])))
+       {
            break;
+       }
     }
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN);

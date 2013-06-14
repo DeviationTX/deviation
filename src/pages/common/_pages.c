@@ -72,3 +72,35 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
     }
     return 1;
 }
+
+int PAGE_IsValid(int page) {
+    if (Model.mixer_mode == MIXER_ADVANCED) {
+        switch(page) {
+#ifdef PAGEID_MODELMENU
+            case PAGEID_MODELMENU:
+#endif
+            case PAGEID_REVERSE:
+            case PAGEID_DREXP:
+            case PAGEID_SUBTRIM:
+            case PAGEID_TRAVELADJ:
+            case PAGEID_THROCURVES:
+            case PAGEID_PITCURVES:
+            case PAGEID_THROHOLD:
+            case PAGEID_GYROSENSE:
+            case PAGEID_SWASH:
+            case PAGEID_FAILSAFE:
+            case PAGEID_SWITCHASSIGN:
+                return 0;
+        }
+    } else {
+        switch(page) {
+            case PAGEID_MIXER:
+                return 0;
+        }
+    }
+    switch(page) {
+        case PAGEID_SPLASH:
+            return 0;
+    }
+    return 1;
+}

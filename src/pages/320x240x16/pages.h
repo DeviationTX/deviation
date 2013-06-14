@@ -11,6 +11,8 @@ enum PageID {
 #include "pagelist.h"
 };
 #undef PAGEDEF
+//The following are only present in this GUI
+#define PAGEID_MODELMENU PAGEID_MODELMENU
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1

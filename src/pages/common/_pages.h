@@ -106,6 +106,7 @@ void PAGE_TelemconfigExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
+int PAGE_IsValid(int page);
 
 
 /* Simple Mixer pages */
@@ -123,4 +124,3 @@ void PAGE_GyroSenseInit(int page);
 void PAGE_CurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
-
