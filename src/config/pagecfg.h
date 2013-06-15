@@ -1,5 +1,7 @@
 #ifndef _PAGECFG_H_
 #define _PAGECFG_H_
+#define GUI_ADVANCED 1
+#include "gui/gui.h"
 
 #define NUM_QUICKPAGES 4
 enum DisplayTrims {
@@ -26,4 +28,46 @@ struct PageCfg {
     u8 tglico[NUM_TOGGLES][3];
     u8 quickpage[NUM_QUICKPAGES];
 };
+
+struct elem_trim {
+    u8 src;
+    u16 x;
+    u16 y;
+    u8 is_vert;
+};
+struct elem_toggle {
+    u8 src;
+    u16 x;
+    u16 y;
+    u8 ico[3];
+};
+struct elem_box {
+    u8 src;
+    u16 x;
+    u16 y;
+    u8 type;
+};
+struct elem_modelico {
+    u16 x;
+    u16 y;
+};
+struct elem_bar {
+    u8 src;
+    u16 x;
+    u16 y;
+};
+
+#define NUM_TRIM_ELEMS 6
+#define NUM_BOX_ELEMS 8
+#define NUM_BAR_ELEMS 8
+#define NUM_TOGGLE_ELEMS 4
+
+struct PageCfg2 {
+    struct elem_modelico modelico;
+    struct elem_trim     trim[NUM_TRIM_ELEMS];
+    struct elem_toggle   tgl[NUM_TOGGLE_ELEMS];
+    struct elem_box      box[NUM_BOX_ELEMS];
+    struct elem_bar      bar[NUM_BOX_ELEMS];
+};
+
 #endif

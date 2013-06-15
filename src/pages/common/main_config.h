@@ -32,6 +32,6 @@ enum MainWidget {
     BAR8,
 };
 
-u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h);
+//u8 MAINPAGE_GetWidgetLoc(enum MainWidget widget, u16 *x, u16 *y, u16 *w, u16 *h);
 
 #endif

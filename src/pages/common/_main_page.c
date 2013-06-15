@@ -15,6 +15,7 @@
 
 static struct main_page * const mp = &pagemem.u.main_page;
 #define gui (&gui_objs.u.mainpage)
+#define pc Model.pagecfg2
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
@@ -92,40 +93,44 @@ void PAGE_MainEvent()
         }
         return;
     }
-    for(i = 0; i < 6; i++) {
+    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
         if (! OBJ_IS_USED(&gui->trim[i]))
-            continue;
-        int value = *(MIXER_GetTrim(i));
+            break;
+        int src = pc.trim[i].src;
+        int value = *(MIXER_GetTrim(src));
         if (mp->trims[i] != value) {
             mp->trims[i] = value;
             GUI_Redraw(&gui->trim[i]);
         }
     }
-    for(i = 0; i < 8; i++) {
+    for(i = 0; i < NUM_BOX_ELEMS; i++) {
         if (! OBJ_IS_USED(&gui->box[i]))
-            continue;
-        s32 val = get_boxval(Model.pagecfg.box[i]);
-        if (Model.pagecfg.box[i] <= NUM_TIMERS) {
+            break;
+        int src = pc.box[i].src;
+        s32 val = get_boxval(src);
+        if (src <= NUM_TIMERS) {
+            //Timer
             if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
-                //Timer
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, val < 0));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, val < 0));
                 mp->boxval[i] = val;
                 GUI_Redraw(&gui->box[i]);
             } else if (mp->boxval[i] / 1000 != val /1000) {
                 mp->boxval[i] = val;
                 GUI_Redraw(&gui->box[i]);
             }
-        } else if (Model.pagecfg.box[i] - NUM_TIMERS <= NUM_TELEM) {
+        } else if (src - NUM_TIMERS <= NUM_TELEM) {
+            //Telem
             u32 time = CLOCK_getms();
             if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
                 clear_time = 1;
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, 1));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, 1));
             } else if(Telemetry.time[0] && mp->boxval[i] != val) {
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(i, 0));
+                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, 0));
                 mp->boxval[i] = val;
                 GUI_Redraw(&gui->box[i]);
             }
         } else if (mp->boxval[i] != val) {
+            //Source
             mp->boxval[i] = val;
             GUI_Redraw(&gui->box[i]);
         }
@@ -133,37 +138,37 @@ void PAGE_MainEvent()
     if (clear_time)
         Telemetry.time[0] = 0;
     volatile s16 *raw = MIXER_GetInputs();
-    for(i = 0; i < 8; i++) {
+    for(i = 0; i < NUM_BAR_ELEMS; i++) {
         if (! OBJ_IS_USED(&gui->bar[i]))
-            continue;
-        s16 chan = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
+            break;
+        s16 chan = MIXER_GetChannel(pc.bar[i].src-1, APPLY_SAFETY);
         if (mp->barval[i] != chan) {
             mp->barval[i] = chan;
             GUI_Redraw(&gui->bar[i]);
         }
     }
-    for(i = 0; i < NUM_TOGGLES; i++) {
+    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
         if (! OBJ_IS_USED(&gui->toggle[i]))
-            continue;
-        u8 src = MIXER_SRC(Model.pagecfg.toggle[i]);
+            break;
+        u8 src = MIXER_SRC(pc.tgl[i].src);
         struct ImageMap img;
         (void)img.x_off;
         (void)img.y_off;
         img.file = NULL;
-        if (Model.pagecfg.toggle[i] > INP_HAS_CALIBRATION && Model.pagecfg.toggle[i] < INP_LAST) {
+        if (pc.tgl[i].src > INP_HAS_CALIBRATION && pc.tgl[i].src < INP_LAST) {
             //switch
             for (int j = 0; j < 3; j++) {
                 // Assume switch 0/1/2 are in order
-                if(Model.pagecfg.tglico[i][j] && raw[src+j] > 0) {
-                    img = TGLICO_GetImage(Model.pagecfg.tglico[i][j]);
+                if(pc.tgl[i].ico[j] && raw[src+j] > 0) {
+                    img = TGLICO_GetImage(pc.tgl[i].ico[j]);
                     break;
                 }
             }
         } else {
             //Non switch
             int sw = raw[src] > 0 ? 1 : 0;
-            if (Model.pagecfg.tglico[i][sw]) {
-                img = TGLICO_GetImage(Model.pagecfg.tglico[i][sw]);
+            if (pc.tgl[i].ico[sw]) {
+                img = TGLICO_GetImage(pc.tgl[i].ico[sw]);
             }
         }
         if (img.file) {

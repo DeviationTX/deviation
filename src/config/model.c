@@ -151,6 +151,7 @@ static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
 
 /* Section: Gui-QVGA */
+static const char SECTION_GUI[] = "gui";
 static const char SECTION_GUI_QVGA[] = "gui-qvga";
 #define GUI_TRIM SECTION_TRIM
 static const char * const GUI_TRIM_VAL[TRIMS_LAST] = { "none", "4out", "4in", "6"};
@@ -256,7 +257,12 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
     return 0;
 }
 
-static int parse_byte_list(const char *ptr, s8 *vals, int max_count, int is_signed)
+enum {
+    S8,
+    U8,
+    S16
+};
+static const char * parse_partial_int_list(const char *ptr, void *vals, int *max_count, int type)
 {
     const char *origptr = ptr;
     int value_int = 0;
@@ -266,36 +272,44 @@ static int parse_byte_list(const char *ptr, s8 *vals, int max_count, int is_sign
     while(1) {
         if(*ptr == ',' || *ptr == '\0') {
             value_int = value_int * (sign ? -1 : 1);
-            if (idx >= max_count)
-                return max_count + 1;
-            if (is_signed) {
+            if (type == S8) {
                 if (value_int > 127)
                     value_int = 127;
                 else if (value_int < -127)
                     value_int = -127;
-                vals[idx] = value_int;
-            } else {
+                ((s8 *)vals)[idx] = value_int;
+            } else if (type == U8) {
                 if (value_int > 255)
                     value_int = 255;
                 else if (value_int < 0)
                     value_int = 0;
                 ((u8 *)vals)[idx] = value_int;
+            } else {
+                ((s16 *)vals)[idx] = value_int;
             }
             sign = 0;
             value_int = 0;
             idx++;
-            if(*ptr == '\0')
-                return idx;
+            --*max_count;
+            if (*max_count == 0 || *ptr == '\0')
+                return ptr;
         } else if(*ptr == '-') {
             sign = 1;
         } else if (*ptr >= '0' && *ptr <= '9') {
             value_int = value_int * 10 + (*ptr - '0');
         } else {
             printf("Bad value '%c' in '%s'\n", *ptr, origptr);
-            return idx;
+            return ptr;
         }
         ptr++;
     }
+}
+
+static int parse_int_list(const char *ptr, void *vals, int max_count, int type)
+{
+    int count = max_count;
+    parse_partial_int_list(ptr, vals, &count, type);
+    return max_count - count;
 }
 
 static void upgrade_tglico(struct Model *m, int idx)
@@ -503,7 +517,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MIXER_CURVE_POINTS)) {
-            int count = parse_byte_list(value, m->mixers[idx].curve.points, MAX_POINTS, 1);
+            int count = parse_int_list(value, m->mixers[idx].curve.points, MAX_POINTS, S8);
             if (count > MAX_POINTS) {
                 printf("%s: Too many points (max points = %d\n", section, MAX_POINTS);
                 return 0;
@@ -657,7 +671,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(TRIM_VALUE)) {
-            parse_byte_list(value, m->trims[idx].value, 3, 1);
+            parse_int_list(value, m->trims[idx].value, 3, S8);
             return 1;
         }
         printf("%s: Unknown trim setting: %s\n", section, name);
@@ -887,7 +901,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 printf("%s: Unkown key: %s\n", section, name);
                 return 1;
             }
-            int count = parse_byte_list(value, (s8 *)m->pagecfg.tglico[idx], 3, 0);
+            int count = parse_int_list(value, m->pagecfg.tglico[idx], 3, U8);
             if (count == 1) {
                 //convert from old syntax
                 upgrade_tglico(m, idx);
@@ -909,6 +923,105 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 }
             }
             printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
+            return 1;
+        }
+    }
+    if (MATCH_SECTION(SECTION_GUI)) {
+        if (MATCH_KEY(MODEL_ICON)) {
+            s16 data[2];
+            int count = parse_int_list(value, data, 2, S16);
+            if (count == 2)
+                m->pagecfg2.modelico = (struct elem_modelico){data[0], data[1]};
+            return 1;
+        }
+        if (MATCH_KEY(GUI_TRIM)) {
+            for (i = 0; i < NUM_TRIM_ELEMS; i++) {
+                if (m->pagecfg2.trim[i].y != 0)
+                    continue;
+                s16 data[4];
+                //x, y, is_vert, src
+                int count = parse_int_list(value, data, 4, S16);
+                if (count == 4)
+                    m->pagecfg2.trim[i] = (struct elem_trim){data[3], data[0], data[1], data[2]};
+                break;
+            }
+            return 1;
+        }
+        if (MATCH_KEY(GUI_BOX)) {
+            for (int j = 0; j < NUM_BOX_ELEMS; j++) {
+                if (m->pagecfg2.box[j].y != 0)
+                    continue;
+                s16 data[3];
+                s16 src = -1;
+                char str[20];
+                //x, y, type (1=big, 0=small), src
+                int count = 3;
+                const char *ptr = parse_partial_int_list(value, data, &count, S16);
+                if (count)
+                    break;
+                ptr++;
+                for(i = 0; i < NUM_TIMERS; i++) {
+                    if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+                        src = i + 1;
+                        break;
+                    }
+                }
+                if (src == -1) {
+                    for(i = 0; i < NUM_TELEM; i++) {
+                        if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
+                            src = i + 1 + NUM_TIMERS;
+                            break;
+                        }
+                    }
+                }
+                if (src == -1) {
+                    u8 newsrc = get_source(section, ptr);
+                    if(newsrc >= NUM_INPUTS) {
+                        src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+                    }
+                }
+                if (src != -1)
+                    m->pagecfg2.box[j] = (struct elem_box){src, data[0], data[1], data[2]};
+                break;
+            }
+            return 1;
+        }
+        if (MATCH_KEY(GUI_BAR)) {
+            for (i = 0; i < NUM_BAR_ELEMS; i++) {
+                if (m->pagecfg2.bar[i].y != 0)
+                    continue;
+                s16 data[2];
+                int count = 2;
+                //x, y, src
+                const char *ptr = parse_partial_int_list(value, data, &count, S16);
+                if(count)
+                    break;
+                u8 src = get_source(section, ptr+1);
+                if (src > NUM_INPUTS)
+                    m->pagecfg2.bar[i] = (struct elem_bar){src, data[0], data[1]};
+                break;
+            }
+            return 1;
+        }
+        if (MATCH_KEY(GUI_TOGGLE)) {
+            for (i = 0; i < NUM_TOGGLE_ELEMS; i++) {
+                if (m->pagecfg2.tgl[i].y != 0)
+                    continue;
+                s16 data[5];
+                int count = 5;
+                //x, y, tgl0, tgl1, tgl2, src
+                const char *ptr = parse_partial_int_list(value, data, &count, S16);
+                if(count)
+                    break;
+                for (int j = 0; j <= NUM_SOURCES; j++) {
+                    char cmp[10];
+                    if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
+                        m->pagecfg2.tgl[i] = (struct elem_toggle) {j, data[0], data[1], {data[2], data[3], data[4]}};
+                        break;
+                    }
+                }
+                break;
+            }
             return 1;
         }
     }

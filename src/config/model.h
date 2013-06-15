@@ -1,3 +1,8 @@
+#define NUM_TRIM_ELEMS 6
+#define NUM_BOX_ELEMS 8
+#define NUM_BAR_ELEMS 8
+#define NUM_TOGGLE_ELEMS 4
+
 #ifndef _MODEL_H_
 #define _MODEL_H_
 
@@ -40,6 +45,7 @@ struct Model {
     struct Timer timer[NUM_TIMERS];
     u8 templates[NUM_CHANNELS];
     struct PageCfg pagecfg;
+    struct PageCfg2 pagecfg2;
     u8 safety[NUM_SOURCES+1];
     u8 telem_alarm[TELEM_NUM_ALARMS];
     u16 telem_alarm_val[TELEM_NUM_ALARMS];

@@ -22,7 +22,78 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+#define VTRIM_W      10
+#define VTRIM_H     140
+#define HTRIM_W     125
+#define HTRIM_H      10
+#define MODEL_ICO_W  96
+#define MODEL_ICO_H  96
+#define GRAPH_H      59
+#define GRAPH_W      10
+#define BOX_W       113
+#define SMALLBOX_H   24
+#define BIGBOX_H     40
+
 #include "../common/_main_page.c"
+
+static int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
+{
+    if ((struct elem_trim *)ptr >= pc.trim && (struct elem_trim *)ptr < pc.trim + NUM_TRIM_ELEMS) {
+        //Trim
+        struct elem_trim *p = ptr;
+        if (p->y == 0)
+            return 0;
+        *x = p->x;
+        *y = p->y;
+        int vert = p->is_vert;
+        if (vert) {
+            *w = VTRIM_W;
+            *h = VTRIM_H;
+        } else {
+            *w = HTRIM_W;
+            *h = HTRIM_H;
+        }
+    } else if ((struct elem_toggle *)ptr >= pc.tgl && (struct elem_toggle *)ptr < pc.tgl + NUM_TOGGLE_ELEMS) {
+        //Toggle
+        struct elem_toggle *p = ptr;
+        if (p->y == 0)
+            return 0;
+        *x = p->x;
+        *y = p->y;
+        *w = TOGGLEICON_WIDTH;
+        *h = TOGGLEICON_HEIGHT;
+    } else if ((struct elem_box *)ptr >= pc.box && (struct elem_box *)ptr < pc.box + NUM_BOX_ELEMS) {
+        //Toggle
+        struct elem_box *p = ptr;
+        if (p->y == 0)
+            return 0;
+        *x = p->x;
+        *y = p->y;
+        *w = BOX_W;
+        *h = p->type ? BIGBOX_H : SMALLBOX_H;
+    } else if (ptr == &pc.modelico) {
+        //Model Icon
+        struct elem_modelico *p = ptr;
+        if (p->y == 0)
+            return 0;
+        *x = p->x;
+        *y = p->y;
+        *w = MODEL_ICO_W;
+        *h = MODEL_ICO_H;
+    } else if ((struct elem_bar *)ptr >= pc.bar && (struct elem_bar *)ptr <= pc.bar + NUM_BAR_ELEMS) {
+        //Bar
+        struct elem_bar *p = ptr;
+        if (p->y == 0)
+            return 0;
+        *x = p->x;
+        *y = p->y;
+        *w = GRAPH_W;
+        *h = GRAPH_H;
+    } else {
+        return 0;
+    }
+    return 1;
+}
 
 void PAGE_MainInit(int page)
 {
@@ -43,53 +114,51 @@ void PAGE_MainInit(int page)
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
     GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
-    if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
+    if(! GetWidgetLoc(&pc.modelico, &x, &y, &w, &h))
         GUI_CreateIcon(&gui->model.ico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
     GUI_CreateLabelBox(&gui->name, 96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
     //Icon
-    if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
+    if (GetWidgetLoc(&pc.modelico, &x, &y, &w, &h))
         GUI_CreateImageOffset(&gui->model.img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
 
-    for(i = 0; i < 6; i++) {
-        mp->trims[i] = *(MIXER_GetTrim(i));
-        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h))
-            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, (void *)(long)i);
-    }
-    for(i = 0; i < 8; i++) {
-        if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) {
-            mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
-            int font = ((Model.pagecfg.box[i] <= NUM_TIMERS && mp->boxval[i] < 0) ||
-                        ((u8)(Model.pagecfg.box[i] - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
-            GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
-                                get_box_font(i, font),
-                                show_box_cb, press_box_cb,
-                                (void *)((long)Model.pagecfg.box[i]));
-        } else {
-            mp->boxval[i] = 0;
-        }
-    }
-    for(i = 0; i < 8; i++) {
-        if (i >= NUM_OUT_CHANNELS || i >= Model.num_channels)
+    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.trim[i], &x, &y, &w, &h))
             break;
-        if (MAINPAGE_GetWidgetLoc(BAR1+i, &x, &y, &w, &h)) {
-            mp->barval[i] = MIXER_GetChannel(Model.pagecfg.bar[i]-1, APPLY_SAFETY);
-            GUI_CreateBarGraph(&gui->bar[i], x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
-                                               bar_cb, (void *)((long)Model.pagecfg.bar[i]));
-        } else {
-            mp->barval[i] = 0;
-        }
+        int src = pc.trim[i].src;
+        int vert = pc.trim[i].is_vert;
+        mp->trims[i] = *(MIXER_GetTrim(src));
+        GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100,
+             vert ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)src);
     }
-    for(i = 0; i < 4; i++) {
-        if (! Model.pagecfg.toggle[i])
-            continue;
-        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
-            struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
-            GUI_CreateImageOffset(&gui->toggle[i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
+    for(i = 0; i < NUM_BOX_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.box[i], &x, &y, &w, &h))
+            break;
+        int src = pc.box[i].src;
+        mp->boxval[i] = get_boxval(src);
+        int font = ((src <= NUM_TIMERS && mp->boxval[i] < 0) ||
+                    ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
+        GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
+                            get_box_font(pc.box[i].type ? 0 : 2, font),
+                            show_box_cb, press_box_cb,
+                            (void *)((long)src));
+    }
+    for(i = 0; i < NUM_BAR_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.bar[i], &x, &y, &w, &h))
+            break;
+        int src = pc.bar[i].src;
+        mp->barval[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
+        GUI_CreateBarGraph(&gui->bar[i], x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+                           bar_cb, (void *)((long)src));
+    }
+    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.tgl[i], &x, &y, &w, &h))
+            break;
+        struct ImageMap img = TGLICO_GetImage(pc.tgl[i].ico[0]); //We'll set this properly down below
+        GUI_CreateImageOffset(&gui->toggle[i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
-        }
     }
     //Battery
     mp->battery = PWR_ReadVoltage();
