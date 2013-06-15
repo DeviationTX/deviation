@@ -41,8 +41,21 @@ enum {
     BAR_ELEM,
     VTRIM_ELEM,
     HTRIM_ELEM,
+    MODELICO_ELEM,
     LAST_ELEMTYPE,
 };
+
+#define VTRIM_W      10
+#define VTRIM_H     140
+#define HTRIM_W     125
+#define HTRIM_H      10
+#define MODEL_ICO_W  96
+#define MODEL_ICO_H  96
+#define GRAPH_H      59
+#define GRAPH_W      10
+#define BOX_W       113
+#define SMALLBOX_H   24
+#define BIGBOX_H     40
 
 u8 newelem;
 u16 selected_x, selected_y;
@@ -51,10 +64,10 @@ char tmp[20];
 void PAGE_MainLayoutInit(int page)
 {
      (void)page;
-     if (Model.mixer_mode == MIXER_STANDARD)
+     //if (Model.mixer_mode == MIXER_STANDARD)
          PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
-     else
-         PAGE_ShowHeader(NULL);
+     //else
+     //    PAGE_ShowHeader(NULL);
     newelem = 0;
     selected_x = 0;
     GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
@@ -116,18 +129,91 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     newelem = GUI_TextSelectHelper(newelem, 0, LAST_ELEMTYPE-1, dir, 1, 1, NULL);
     switch(newelem) {
-        case SMALLBOX_ELEM: return _tr("small-box");
-        case BIGBOX_ELEM:   return _tr("big-box");
-        case TOGGLE_ELEM:   return _tr("toggle");
-        case BAR_ELEM:      return _tr("bargraph");
+        case SMALLBOX_ELEM: return _tr("Small-box");
+        case BIGBOX_ELEM:   return _tr("Big-box");
+        case TOGGLE_ELEM:   return _tr("Toggle");
+        case BAR_ELEM:      return _tr("Bargraph");
         case VTRIM_ELEM:    return _tr("V-trim");
         case HTRIM_ELEM:    return _tr("H-trim");
+        case MODELICO_ELEM: return _tr("Model");
     }
     return "";
 }
 
 void newelem_press_cb(guiObject_t *obj, void *data)
 {
+    int i;
+    u16 x,y,w,h;
+    switch(newelem) {
+        case MODELICO_ELEM:
+            if (! GetWidgetLoc(&pc.modelico, &x, &y, &w, &h)) {
+                    pc.modelico = (struct elem_modelico){
+                                 (LCD_WIDTH - MODEL_ICO_W) /2,
+                                 40 + (LCD_HEIGHT - 40 - MODEL_ICO_H) / 2};
+                    draw_elements();
+                    GUI_SetSelected((guiObject_t *)&gui->modelico);
+                 
+            }
+            break;
+        case SMALLBOX_ELEM:
+        case BIGBOX_ELEM:
+            for(i = 0; i < NUM_BOX_ELEMS; i++) {
+                if (! GetWidgetLoc(&pc.box[i], &x, &y, &w, &h)) {
+                    h =  newelem == BIGBOX_ELEM ? BIGBOX_H : SMALLBOX_H;
+                    pc.box[i] = (struct elem_box){0,
+                                 (LCD_WIDTH - BOX_W) /2,
+                                 40 + (LCD_HEIGHT - 40 - h) / 2,
+                                 newelem == SMALLBOX_ELEM ? 0 : 1};
+                    draw_elements();
+                    GUI_SetSelected((guiObject_t *)&gui->box[i]);
+                    return;
+                }
+            }
+            break;
+        case BAR_ELEM:
+            for(i = 0; i < NUM_BAR_ELEMS; i++) {
+                if (! GetWidgetLoc(&pc.bar[i], &x, &y, &w, &h)) {
+                    h = GRAPH_H;
+                    pc.bar[i] = (struct elem_bar){0,
+                                 (LCD_WIDTH - GRAPH_W) /2,
+                                 40 + (LCD_HEIGHT - 40 - h) / 2};
+                    draw_elements();
+                    GUI_SetSelected((guiObject_t *)&gui->bar[i]);
+                    return;
+                }
+            }
+            break;
+        case TOGGLE_ELEM:
+            for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
+                if (! GetWidgetLoc(&pc.tgl[i], &x, &y, &w, &h)) {
+                    h = TOGGLEICON_HEIGHT;
+                    pc.tgl[i] = (struct elem_toggle){0,
+                                 (LCD_WIDTH - TOGGLEICON_WIDTH) /2,
+                                 40 + (LCD_HEIGHT - 40 - h) / 2, {0, 0, 0}};
+                    draw_elements();
+                    GUI_SetSelected((guiObject_t *)&gui->tgl[i]);
+                    return;
+                }
+            }
+            break;
+        case VTRIM_ELEM:
+        case HTRIM_ELEM:
+            for(i = 0; i < NUM_TRIM_ELEMS; i++) {
+                if (! GetWidgetLoc(&pc.trim[i], &x, &y, &w, &h)) {
+                    h = newelem == VTRIM_ELEM ? VTRIM_H : HTRIM_H;
+                    w = newelem == VTRIM_ELEM ? VTRIM_W : HTRIM_W;
+        
+                    pc.trim[i] = (struct elem_trim){0,
+                                 (LCD_WIDTH - w) /2,
+                                 40 + (LCD_HEIGHT - 40 - h) / 2, newelem == VTRIM_ELEM};
+                    draw_elements();
+                    GUI_SetSelected((guiObject_t *)&gui->trim[i]);
+                    return;
+                }
+            }
+            break;
+    }
+            
 }
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -141,7 +227,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 }
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
-    int y = GUI_TextSelectHelper(selected_y, 0, LCD_WIDTH, dir, 1, 10, NULL);
+    int y = GUI_TextSelectHelper(selected_y, 40, LCD_WIDTH, dir, 1, 10, NULL);
     if (y != selected_y) {
         selected_y = y;
         move_elem();
