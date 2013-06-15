@@ -418,6 +418,7 @@ static u16 devo_telemetry_cb()
             if(++i > NUM_WAIT_LOOPS) {
                 delay = 1500;
                 txState = 15;
+                break;
             }
         }
      
