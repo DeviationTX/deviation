@@ -178,7 +178,8 @@ void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
     GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
-    GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
+    if(title)
+        GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
     obj = GUI_CreateIcon(&gui->previco, 256, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     GUI_SetSelectable(obj, 0);
     obj = GUI_CreateIcon(&gui->nextico, 288, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);

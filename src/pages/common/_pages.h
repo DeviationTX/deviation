@@ -93,6 +93,9 @@ void LANGPage_Select(void(*return_page)(int page));
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
 void PAGE_MainCfgExit();
+void PAGE_MainLayoutInit(int page);
+void PAGE_MainLayoutEvent();
+void PAGE_MainLayoutExit();
 
 /* Telemetry Test */
 void PAGE_TelemtestInit(int page);

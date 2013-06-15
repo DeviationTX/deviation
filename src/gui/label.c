@@ -118,7 +118,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
     else if (desc->style == LABEL_INVERTED || is_selected) {
         if (w < txt_w)
             w = txt_w;
-        if (h < txt_h)
+        if (txt_w && h < txt_h)
             h = txt_h;
         LCD_FillRect(obj_x, obj_y, w, h, 0xffff);
         if (obj_height > txt_h)

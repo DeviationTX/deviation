@@ -66,6 +66,19 @@ struct maincfg_obj {
     } u;
 };
 
+struct mainlayout_obj {
+    guiTextSelect_t newelem;
+    guiTextSelect_t x;
+    guiTextSelect_t y;
+    guiLabel_t xlbl;
+    guiLabel_t ylbl;
+    guiLabel_t trim[6];
+    guiLabel_t box[8];
+    guiLabel_t bar[8];
+    guiLabel_t tgl[4];
+    guiLabel_t modelico;
+};
+
 struct mainpage_objs {
     guiButton_t optico;
     union {
@@ -479,6 +492,7 @@ struct gui_objs {
         struct chantest_obj chantest;
         struct lang_obj lang;
         struct maincfg_obj maincfg;
+        struct mainlayout_obj mainlayout;
         struct mainpage_objs mainpage;
         struct modelcfg_objs modelcfg;
         struct modelload_objs modelload;

@@ -36,7 +36,7 @@
 
 #include "../common/_main_page.c"
 
-static int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
+int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
 {
     if ((struct elem_trim *)ptr >= pc.trim && (struct elem_trim *)ptr < pc.trim + NUM_TRIM_ELEMS) {
         //Trim
