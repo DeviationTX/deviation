@@ -998,7 +998,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     break;
                 u8 src = get_source(section, ptr+1);
                 if (src > NUM_INPUTS)
-                    m->pagecfg2.bar[i] = (struct elem_bar){src, data[0], data[1]};
+                    m->pagecfg2.bar[i] = (struct elem_bar){src-NUM_INPUTS, data[0], data[1]};
                 break;
             }
             return 1;
