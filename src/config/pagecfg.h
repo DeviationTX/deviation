@@ -29,32 +29,31 @@ struct PageCfg {
     u8 quickpage[NUM_QUICKPAGES];
 };
 
-struct elem_trim {
-    u8 src;
+struct elem_xy {
     u16 x;
     u16 y;
+};
+struct elem_trim {
+    struct elem_xy pos;
+    u8 src;
     u8 is_vert;
 };
 struct elem_toggle {
+    struct elem_xy pos;
     u8 src;
-    u16 x;
-    u16 y;
     u8 ico[3];
 };
 struct elem_box {
+    struct elem_xy pos;
     u8 src;
-    u16 x;
-    u16 y;
     u8 type;
 };
 struct elem_modelico {
-    u16 x;
-    u16 y;
+    struct elem_xy pos;
 };
 struct elem_bar {
+    struct elem_xy pos;
     u8 src;
-    u16 x;
-    u16 y;
 };
 
 #define NUM_TRIM_ELEMS 6

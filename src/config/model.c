@@ -931,25 +931,25 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             s16 data[2];
             int count = parse_int_list(value, data, 2, S16);
             if (count == 2)
-                m->pagecfg2.modelico = (struct elem_modelico){data[0], data[1]};
+                m->pagecfg2.modelico = (struct elem_modelico){.pos = {data[0], data[1]}};
             return 1;
         }
         if (MATCH_KEY(GUI_TRIM)) {
             for (i = 0; i < NUM_TRIM_ELEMS; i++) {
-                if (m->pagecfg2.trim[i].y != 0)
+                if (m->pagecfg2.trim[i].pos.y != 0)
                     continue;
                 s16 data[4];
                 //x, y, is_vert, src
                 int count = parse_int_list(value, data, 4, S16);
                 if (count == 4)
-                    m->pagecfg2.trim[i] = (struct elem_trim){data[3], data[0], data[1], data[2]};
+                    m->pagecfg2.trim[i] = (struct elem_trim){.pos = {data[0], data[1]}, .src = data[3], .is_vert = data[2]};
                 break;
             }
             return 1;
         }
         if (MATCH_KEY(GUI_BOX)) {
             for (int j = 0; j < NUM_BOX_ELEMS; j++) {
-                if (m->pagecfg2.box[j].y != 0)
+                if (m->pagecfg2.box[j].pos.y != 0)
                     continue;
                 s16 data[3];
                 s16 src = -1;
@@ -981,14 +981,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     }
                 }
                 if (src != -1)
-                    m->pagecfg2.box[j] = (struct elem_box){src, data[0], data[1], data[2]};
+                    m->pagecfg2.box[j] = (struct elem_box){.pos = {data[0], data[1]}, .src = src, .type = data[2]};
                 break;
             }
             return 1;
         }
         if (MATCH_KEY(GUI_BAR)) {
             for (i = 0; i < NUM_BAR_ELEMS; i++) {
-                if (m->pagecfg2.bar[i].y != 0)
+                if (m->pagecfg2.bar[i].pos.y != 0)
                     continue;
                 s16 data[2];
                 int count = 2;
@@ -998,14 +998,14 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     break;
                 u8 src = get_source(section, ptr+1);
                 if (src > NUM_INPUTS)
-                    m->pagecfg2.bar[i] = (struct elem_bar){src-NUM_INPUTS, data[0], data[1]};
+                    m->pagecfg2.bar[i] = (struct elem_bar){.pos = {data[0], data[1]}, .src = src-NUM_INPUTS};
                 break;
             }
             return 1;
         }
         if (MATCH_KEY(GUI_TOGGLE)) {
             for (i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-                if (m->pagecfg2.tgl[i].y != 0)
+                if (m->pagecfg2.tgl[i].pos.y != 0)
                     continue;
                 s16 data[5];
                 int count = 5;
@@ -1016,7 +1016,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 for (int j = 0; j <= NUM_SOURCES; j++) {
                     char cmp[10];
                     if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
-                        m->pagecfg2.tgl[i] = (struct elem_toggle) {j, data[0], data[1], {data[2], data[3], data[4]}};
+                        m->pagecfg2.tgl[i] = (struct elem_toggle) {.pos = {data[0], data[1]}, .src = j, .ico = {data[2], data[3], data[4]}};
                         break;
                     }
                 }

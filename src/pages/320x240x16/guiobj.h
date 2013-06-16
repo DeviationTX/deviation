@@ -73,6 +73,13 @@ struct mainlayout_obj {
     guiTextSelect_t y;
     guiLabel_t xlbl;
     guiLabel_t ylbl;
+    //dialog
+    guiDialog_t dialog;
+    guiScrollable_t scrollable;
+    guiLabel_t dlglbl[8];
+    guiTextSelect_t dlgts[8];
+    guiButton_t dlgbut[8];
+    //Everything below here must be part an element
     guiLabel_t trim[6];
     guiLabel_t box[8];
     guiLabel_t bar[8];

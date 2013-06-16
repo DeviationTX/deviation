@@ -41,10 +41,10 @@ int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
     if ((struct elem_trim *)ptr >= pc.trim && (struct elem_trim *)ptr < pc.trim + NUM_TRIM_ELEMS) {
         //Trim
         struct elem_trim *p = ptr;
-        if (p->y == 0)
+        if (p->pos.y == 0)
             return 0;
-        *x = p->x;
-        *y = p->y;
+        *x = p->pos.x;
+        *y = p->pos.y;
         int vert = p->is_vert;
         if (vert) {
             *w = VTRIM_W;
@@ -56,37 +56,37 @@ int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
     } else if ((struct elem_toggle *)ptr >= pc.tgl && (struct elem_toggle *)ptr < pc.tgl + NUM_TOGGLE_ELEMS) {
         //Toggle
         struct elem_toggle *p = ptr;
-        if (p->y == 0)
+        if (p->pos.y == 0)
             return 0;
-        *x = p->x;
-        *y = p->y;
+        *x = p->pos.x;
+        *y = p->pos.y;
         *w = TOGGLEICON_WIDTH;
         *h = TOGGLEICON_HEIGHT;
     } else if ((struct elem_box *)ptr >= pc.box && (struct elem_box *)ptr < pc.box + NUM_BOX_ELEMS) {
         //Toggle
         struct elem_box *p = ptr;
-        if (p->y == 0)
+        if (p->pos.y == 0)
             return 0;
-        *x = p->x;
-        *y = p->y;
+        *x = p->pos.x;
+        *y = p->pos.y;
         *w = BOX_W;
         *h = p->type ? BIGBOX_H : SMALLBOX_H;
     } else if (ptr == &pc.modelico) {
         //Model Icon
         struct elem_modelico *p = ptr;
-        if (p->y == 0)
+        if (p->pos.y == 0)
             return 0;
-        *x = p->x;
-        *y = p->y;
+        *x = p->pos.x;
+        *y = p->pos.y;
         *w = MODEL_ICO_W;
         *h = MODEL_ICO_H;
     } else if ((struct elem_bar *)ptr >= pc.bar && (struct elem_bar *)ptr <= pc.bar + NUM_BAR_ELEMS) {
         //Bar
         struct elem_bar *p = ptr;
-        if (p->y == 0)
+        if (p->pos.y == 0)
             return 0;
-        *x = p->x;
-        *y = p->y;
+        *x = p->pos.x;
+        *y = p->pos.y;
         *w = GRAPH_W;
         *h = GRAPH_H;
     } else {
