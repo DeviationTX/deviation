@@ -34,6 +34,7 @@ static void touch_cb(guiObject_t *obj, s8 press, const void *data);
 static void notify_cb(guiObject_t *obj);
 static void move_elem();
 static void select_for_move(guiLabel_t *obj);
+static void show_config();
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 extern int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h);
@@ -404,7 +405,10 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
 
 static void dialog_ok_cb(u8 state, void * data)
 {
-    GUI_SetSelected((guiObject_t *)selected_for_move);
+    guiObject_t *obj = (guiObject_t *)selected_for_move;
+    draw_elements();
+    if(OBJ_IS_USED(obj))
+        GUI_SetSelected(obj);
 }
 
 #define DIALOG_X 20
@@ -439,6 +443,55 @@ static int get_elem_type(guiLabel_t *obj)
 
 static void dlgbut_cb(struct guiObject *obj, const void *data)
 {
+    int idx = (long)data;
+    int i;
+    //Remove object
+    switch (get_elem_type(selected_for_move)) {
+        case SMALLBOX_ELEM:
+        case BIGBOX_ELEM:
+            pc.box[idx].pos.y = 0;
+            for(i = idx+1; i < NUM_BOX_ELEMS; i++) {
+                pc.box[i-1] = pc.box[i];
+                if (! pc.box[i].pos.y)
+                    break;
+            }
+            selected_for_move = &gui->box[0];
+            break;
+        case BAR_ELEM:
+            pc.bar[idx].pos.y = 0;
+            for(i = idx+1; i < NUM_BAR_ELEMS; i++) {
+                pc.bar[i-1] = pc.bar[i];
+                if (! pc.bar[i].pos.y)
+                    break;
+            }
+            selected_for_move = &gui->bar[0];
+            break;
+        case TOGGLE_ELEM:
+            pc.tgl[idx].pos.y = 0;
+            for(i = idx+1; i < NUM_TOGGLE_ELEMS; i++) {
+                pc.tgl[i-1] = pc.tgl[i];
+                if (! pc.tgl[i].pos.y)
+                    break;
+            }
+            selected_for_move = &gui->tgl[0];
+            break;
+        case HTRIM_ELEM:
+        case VTRIM_ELEM:
+            pc.trim[idx].pos.y = 0;
+            for(i = idx+1; i < NUM_TRIM_ELEMS; i++) {
+                pc.trim[i-1] = pc.trim[i];
+                if (! pc.trim[i].pos.y)
+                    break;
+            }
+            selected_for_move = &gui->trim[0];
+            break;
+        case MODELICO_ELEM:
+            pc.modelico.pos.y = 0;
+            break;
+    }
+    //close the dialog and reopen with new elements
+    GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
+    show_config();
 }
 
 const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
@@ -488,11 +541,15 @@ const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    (void)data;
+    int type = (long)data;
     #define X DIALOG_X + SCROLLABLE_X
-    GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow+1));
-    GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)(long)(absrow));
-    GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, NULL);
+    if (type == MODELICO_ELEM) {
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
+    } else {
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow+1));
+        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)(long)(absrow));
+    }
+    GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)(long)(absrow));
     return 1;
 }
 
@@ -501,7 +558,12 @@ static void show_config()
     int i;
     int count = 0;
     int row_idx = 0;
-    switch (get_elem_type(selected_for_move)) {
+    long type = get_elem_type(selected_for_move);
+    switch (type) {
+        case MODELICO_ELEM:
+            row_idx = 0;
+            count = pc.modelico.pos.y ? 1 : 0;
+            break;
         case SMALLBOX_ELEM:
         case BIGBOX_ELEM:
             for(i = 0; i < NUM_BOX_ELEMS; i++) {
@@ -545,8 +607,10 @@ static void show_config()
             }
             break;
     }
-    if (! count)
+    if (! count) {
+        dialog_ok_cb(1, NULL);
         return;
+    }
     GUI_CreateDialog(&gui->dialog,
          DIALOG_X, 40 + DIALOG_Y,
          LCD_WIDTH - 2*DIALOG_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y,
@@ -554,7 +618,7 @@ static void show_config()
     GUI_CreateScrollable(&gui->scrollable,
          DIALOG_X + SCROLLABLE_X, 40 + DIALOG_Y + SCROLLABLE_Y,
          LCD_WIDTH - 2*DIALOG_X - 2*SCROLLABLE_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y - 2 * SCROLLABLE_Y,
-         TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
+         TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, (void *)type);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, (row_idx << 8) | 2 * row_idx));
 }
     
