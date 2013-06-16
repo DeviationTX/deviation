@@ -22,12 +22,12 @@ struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
 struct guiObject *objSELECTED = NULL;
 struct guiObject *objModalButton = NULL;
+struct guiObject *objDIALOG   = NULL;
 static void (*select_notify)(guiObject_t *obj) = NULL;
 
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
-static viewObject_t views[LOGICALVIEW_COUNT]; // The logical view is only available in devo10 currently
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
 #include "_gui.c"
@@ -119,6 +119,7 @@ void GUI_RemoveObj(struct guiObject *obj)
     case Dialog: {
         GUI_HandleModalButtons(0);
         GUI_RemoveHierObjects(obj->next);
+        objDIALOG = NULL;
         break;
     }
     case Scrollbar:
@@ -173,7 +174,10 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
     if(FullRedraw && w != LCD_WIDTH//SCREEN_WIDTH
             && h != LCD_HEIGHT) //SCREEN_HEIGHT)
         return;  //Optimization to prevent partial redraw when it isn't needed
-    _gui_draw_background(x, y, w, h);
+    if (objDIALOG)
+        GUI_DialogDrawBackground(x, y, w, h);
+    else 
+        _gui_draw_background(x, y, w, h);
 }
 
 void GUI_DrawScreen(void)
@@ -181,7 +185,7 @@ void GUI_DrawScreen(void)
     /*
      * First we need to draw the main background
      *  */
-    GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);//320, 240);
+    GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
     /*
      * Then we need to draw any supporting GUI
      */
@@ -193,6 +197,8 @@ void GUI_DrawScreen(void)
 struct guiObject *GUI_IsModal(void)
 {
     struct guiObject *obj = objHEAD;
+    if (objDIALOG)
+        return objDIALOG;
     while(obj) {
         if(OBJ_IS_MODAL(obj) && OBJ_IS_USED(obj) && ! OBJ_IS_HIDDEN(obj))
             return obj;
@@ -211,75 +217,57 @@ void GUI_RedrawAllObjects()
     FullRedraw = 1;
 }
 
-void GUI_HideObjects(struct guiObject *modalObj)
+void GUI_HideObjects(struct guiObject *headObj, struct guiObject *modalObj)
 {
     struct guiObject *obj;
-    obj = objHEAD;
+    //Only start drawing from headObj(scrollable) or 1st modal if either is set
+    obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
     while(obj) {
-        if(OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
-            if (modalObj && modalObj->Type == Dialog) {
-                GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-            } else {
-                GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-            }
+        if(OBJ_IS_HIDDEN(obj) && OBJ_IS_DIRTY(obj)) {
+            GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
             OBJ_SET_DIRTY(obj, 0);
         }
         obj = obj->next;
     }
 }
 
-void GUI_RefreshScreen(void)
+void _GUI_RefreshScreen(struct guiObject *headObj)
 {
     struct guiObject *modalObj = GUI_IsModal();
-    viewObject_t *viewObj = NULL;
-    if (HAS_LOGICALVIEW && modalObj == NULL) // bug fix: when a modal obj, e.g. dialog, exists, do not clear any viewpoints
-    {
-        for (u8 i = 0; i < LOGICALVIEW_COUNT; i++) {
-            viewObj = &views[i];
-            if (OBJ_IS_DIRTY(viewObj)) {
-                //printf("Clear view: %d\n\n", i);
-                GUI_DrawBackground(viewObj->origin_absoluteX, viewObj->origin_absoluteY, viewObj->width, viewObj->height);
-            }
-        }
-    }
 
     struct guiObject *obj;
     if (FullRedraw) {
-        GUI_DrawScreen();
-        return;
+        if (modalObj && modalObj->Type == Dialog) {
+            //Handle Dialog redraw as an incremental
+            FullRedraw = 0;
+        } else {
+            GUI_DrawScreen();
+            return;
+        }
     }
-    GUI_HideObjects(modalObj);
-    obj = objHEAD;
+    GUI_HideObjects(headObj, modalObj);
+    //Only start drawing from headObj(scrollable) or 1st modal if either is set
+    obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
     while(obj) {
-        if(! OBJ_IS_HIDDEN(obj) && (! modalObj || OBJ_IS_MODAL(obj))) {
+        if(! OBJ_IS_HIDDEN(obj)) {
             if (obj->Type == Scrollable) {
-                guiObject_t *head = objHEAD;
-                objHEAD = ((guiScrollable_t *)obj)->head;
-                GUI_RefreshScreen();
-                objHEAD = head;
+                //Redraw scrollable contents
+                _GUI_RefreshScreen(((guiScrollable_t *)obj)->head);
             } else if(OBJ_IS_DIRTY(obj)) {
                 if(OBJ_IS_TRANSPARENT(obj) || OBJ_IS_HIDDEN(obj)) {
-                    if (modalObj && modalObj->Type == Dialog) {
-                        GUI_DialogDrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-                    } else {
-                        GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
-                    }
+                    GUI_DrawBackground(obj->box.x, obj->box.y, obj->box.width, obj->box.height);
                 }
                 GUI_DrawObject(obj);
             }
         }
         obj = obj->next;
     }
-
-    if (HAS_LOGICALVIEW)
-    {
-        for (u8 i = 0; i < LOGICALVIEW_COUNT; i++) {
-            if (OBJ_IS_DIRTY(&views[i]))
-                OBJ_SET_DIRTY(&views[i], 0);  // must rest views' dirty flag at last
-        }
-    }
 }
 
+void GUI_RefreshScreen() {
+    _GUI_RefreshScreen(NULL);
+}
+    
 void GUI_TouchRelease()
 {
     if (objTOUCHED) {
@@ -315,14 +303,11 @@ void GUI_TouchRelease()
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
-    u8 modalActive;
-    modalActive = GUI_IsModal() ? 1 : 0;
-    struct guiObject *obj = objHEAD;
-    
+    struct guiObject *modalObj = GUI_IsModal();
+    struct guiObject *obj = modalObj ? modalObj : objHEAD;
+
     while(obj) {
-        if (! OBJ_IS_HIDDEN(obj)
-            && ((modalActive == 0) || OBJ_IS_MODAL(obj)))
-        {
+        if (! OBJ_IS_HIDDEN(obj)) {
             switch (obj->Type) {
             case UnknownGUI:
             case Dialog:
@@ -420,7 +405,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
 
     if (! objHEAD)
         return NULL;
-    u8 modalActive = GUI_IsModal() ? 1 : 0;
+    struct guiObject *modalObj = GUI_IsModal();
     if (obj && OBJ_IS_SCROLLABLE(obj)) {
         //The current selected object is scrollable
         guiScrollable_t *scroll = GUI_FindScrollableParent(obj);
@@ -428,9 +413,9 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         if (obj->Type != Scrollable)
             return obj;
     }
-    obj = obj ? obj->next : objHEAD;
+    obj = obj ? obj->next : modalObj ? modalObj : objHEAD;
     while(obj) {
-        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
         {
             if(obj->Type == Scrollable) {
                 foundObj = GUI_ScrollableGetNextSelectable((guiScrollable_t *)obj, NULL);
@@ -449,7 +434,8 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
 
 struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
 {
-    struct guiObject *obj = objHEAD, *objLast = NULL;
+    struct guiObject *obj, *objLast = NULL;
+    struct guiObject *modalObj;
     if (origObj && OBJ_IS_SCROLLABLE(origObj)) {
         //The current selected object is scrollable
         guiScrollable_t *scroll = GUI_FindScrollableParent(origObj);
@@ -457,14 +443,12 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         if (origObj->Type != Scrollable)
             return origObj;
     }
-    if (obj == NULL)
-        return GUI_GetNextSelectable(objHEAD);
-    u8 modalActive = GUI_IsModal() ? 1 : 0;
+    modalObj = GUI_IsModal();
+    obj = modalObj ? modalObj : objHEAD;
     while(obj) {
         if (obj == origObj)
             break;
-        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
-        {
+        if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj)) {
             objLast = obj;
         }
         obj = obj->next;
@@ -474,8 +458,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         while(obj) {
             if (obj == origObj)
                 break;
-            if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj) && (! modalActive || OBJ_IS_MODAL(obj)))
-            {
+            if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj)) {
                 objLast = obj;
             }
             obj = obj->next;

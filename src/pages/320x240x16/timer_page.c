@@ -24,7 +24,7 @@ static void _draw_body();
 guiObject_t *firstObj;
 s8 timer_page_num ;
 
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;

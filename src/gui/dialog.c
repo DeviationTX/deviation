@@ -77,6 +77,8 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     case dtNone:
         break;
     }
+    objDIALOG = obj;
+
     GUI_HandleModalButtons(1);
     objSELECTED = but;
     //bug fix: using objSELECTED for dialog is not safe in devo10

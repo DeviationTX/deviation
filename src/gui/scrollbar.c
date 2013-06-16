@@ -29,7 +29,7 @@ static u8 button_cb(u32 button, u8 flags, void *data);
 
 guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *scrollbar, u16 x, u16 y, u16 height,
     u8 num_items, struct guiObject *parent,
-    u8 (*press_cb)(struct guiObject *parent, u8 pos, s8 direction, void *data), void *data)
+    int (*press_cb)(struct guiObject *parent, u8 pos, s8 direction, void *data), void *data)
 {
     struct guiObject    *obj = (guiObject_t *)scrollbar;
     struct guiBox     *box;
@@ -108,14 +108,18 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
             return 1;
         }
         if (scrollbar->state == PRESS_UP) {
-            scrollbar->cur_pos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, -1, scrollbar->cb_data);
-            OBJ_SET_DIRTY(obj, 1);
+            int pos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, -1, scrollbar->cb_data);
+            if (pos >= 0)
+                scrollbar->cur_pos = pos;
+            OBJ_SET_DIRTY(obj, 1); //Set dirty to clear button press even if pos dint' move
             scrollbar->state = RELEASE_UP;
             return 1;
         }
         if (scrollbar->state == PRESS_DOWN) {
-            scrollbar->cur_pos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, 1, scrollbar->cb_data);
-            OBJ_SET_DIRTY(obj, 1);
+            int pos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, 1, scrollbar->cb_data);
+            if (pos >= 0)
+                scrollbar->cur_pos = pos;
+            OBJ_SET_DIRTY(obj, 1); //Set dirty to clear button press even if pos dint' move
             scrollbar->state = RELEASE_DOWN;
             return 1;
         }

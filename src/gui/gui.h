@@ -157,7 +157,7 @@ typedef struct guiScrollbar {
     u8 cur_pos;
     buttonAction_t action;
     struct guiObject *parent;
-    u8 (*callback)(struct guiObject *obj, u8 pos, s8 dir, void *data);
+    int (*callback)(struct guiObject *obj, u8 pos, s8 dir, void *data);
     void *cb_data;
 } guiScrollbar_t;
 
@@ -286,6 +286,7 @@ typedef struct guiRect {
 extern struct guiObject *objHEAD;
 extern struct guiObject *objTOUCHED;
 extern struct guiObject *objSELECTED;
+extern struct guiObject *objDIALOG;
 extern struct guiObject *objModalButton;
 
 guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj);
@@ -408,7 +409,7 @@ guiObject_t *GUI_CreateKeyboard(guiKeyboard_t *, enum KeyboardType type, char *t
 
 guiObject_t *GUI_CreateScrollbar(guiScrollbar_t *, u16 x, u16 y, u16 height,
         u8 num_items, guiObject_t *parent,
-        u8 (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
+        int (*press_cb)(guiObject_t *parent, u8 pos, s8 direction, void *data), void *data);
 void GUI_SetScrollbar(guiScrollbar_t *obj, u8 pos);
 u8 GUI_GetScrollbarNumItems(guiScrollbar_t *obj);
 
@@ -418,7 +419,7 @@ guiObject_t *GUI_CreateRectCB(guiRect_t *, u16 x, u16 y, u16 width, u16 height, 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press);
 void GUI_TouchRelease();
 void GUI_DrawScreen(void);
-void GUI_RefreshScreen(void);
+void GUI_RefreshScreen();
 void _GUI_Redraw(guiObject_t *obj);
 #define GUI_Redraw(x) _GUI_Redraw((guiObject_t *)(x))
 void GUI_RedrawAllObjects();

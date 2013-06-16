@@ -21,7 +21,7 @@
 
 #include "../../common/standard/_common_standard.c"
 
-u8 STDMIX_ScrollCB(guiObject_t *parent, u8 pos, s8 direction, void *data)
+int STDMIX_ScrollCB(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)parent;
     struct mixer_page * _mp = &pagemem.u.mixer_page;

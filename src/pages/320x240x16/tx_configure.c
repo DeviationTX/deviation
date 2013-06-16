@@ -39,7 +39,7 @@ void PAGE_ChangeByName(const char *pageName, u8 menuPage)
 #define MAX_PAGE 2
 static void _show_page();
 
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;

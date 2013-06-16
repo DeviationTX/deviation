@@ -19,7 +19,7 @@
 #include "config/display.h"
 
 #include "_listbox.c"
-static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
+static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
 static u8 press_cb(u32 button, u8 flags, void *data);
 
 guiObject_t *GUI_CreateListBox(guiListbox_t *listbox, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
@@ -135,7 +135,7 @@ void GUI_ListBoxSelect(struct guiListbox *listbox, u16 selected)
     OBJ_SET_DIRTY(obj, 1);
 }
     
-static u8 scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)data;

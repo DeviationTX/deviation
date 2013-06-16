@@ -26,7 +26,7 @@ static void _show_bar_page(u8 num_bars, u8 _page);
 static s8 page;
 static u8 num_pages;
 
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;

@@ -81,7 +81,7 @@ static void show_icons(int SelectedIcon, int idx)
     }
 }
 
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)data;
     (void)parent;

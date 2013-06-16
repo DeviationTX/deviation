@@ -21,7 +21,7 @@
 #include "../../common/advanced/_mixer_page.c"
 
 #define ENTRIES_PER_PAGE (8 > NUM_CHANNELS ? NUM_CHANNELS : 8)
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 
 static void _show_title(int page)
 {
@@ -85,7 +85,7 @@ static void _show_page()
     }
 }
 
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)data;
     s16 newpos;

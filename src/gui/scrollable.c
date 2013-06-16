@@ -19,6 +19,12 @@
 #include "config/display.h"
 
 //static u8 press_cb(u32 button, u8 flags, void *data);
+#if HAS_TOUCH
+    static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
+#else
+    #define scroll_cb NULL
+#endif
+
 void create_scrollable_objs(guiScrollable_t *scrollable, int row);
 int adjust_row(guiScrollable_t *scrollable, int offset);
 
@@ -44,7 +50,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
 
     box->x = x;
     box->y = y;
-    box->width = width;
+    box->width = width - ARROW_WIDTH;
     box->height = height;
 
     obj->Type = Scrollable;
@@ -63,7 +69,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
               height,
               item_count,
               obj,
-              NULL, NULL);
+              scroll_cb, scrollable);
     if (scrollable->max_visible_rows == item_count)
         GUI_SetHidden((guiObject_t *)&scrollable->scrollbar, 1);
     scrollable->cur_row = -1;
@@ -224,7 +230,6 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
         scroll_pos = scrollable->item_count - 1;
     if (! OBJ_IS_HIDDEN((guiObject_t *)&scrollable->scrollbar))
         GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
-    
 }
 
 guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
@@ -241,6 +246,21 @@ guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
     }
     return NULL;
 }
+
+#if HAS_TOUCH
+int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
+    (void)parent;
+    (void)pos;
+    guiScrollable_t *scrollable = (guiScrollable_t *)data;
+    if ((direction > 0 && scrollable->cur_row + scrollable->visible_rows == scrollable->item_count)
+        || (direction < 0 && scrollable->cur_row == 0))
+    {
+        return -1;
+    }
+    create_scrollable_objs(scrollable, adjust_row(scrollable, direction));
+    return -1;
+}
+#endif
 
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {

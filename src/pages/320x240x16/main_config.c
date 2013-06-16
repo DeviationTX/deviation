@@ -117,7 +117,7 @@ static void build_image(guiObject_t *obj, const void *data);
 const char *toggle_val_cb(guiObject_t *obj, int dir, void *data);
 
 #define MAX_PAGE 2 // bug fix: divided by 0 error; scroll bar is 1-based now
-static u8 scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;
