@@ -364,7 +364,12 @@ guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, i
 
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
 {
-    create_scrollable_objs(scrollable, row_idx >> 8);
+    int delta = (row_idx >> 8) - scrollable->cur_row;
+    delta = adjust_row(scrollable, delta);
+    if(delta) {
+        if (delta >= scrollable->cur_row + scrollable->visible_rows)
+            create_scrollable_objs(scrollable, delta);
+    }
     return set_selected_idx(scrollable, row_idx & 0xff);
 }
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
