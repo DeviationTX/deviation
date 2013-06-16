@@ -62,16 +62,13 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     case dtOk: {
         but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 1,
                     DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-        OBJ_SET_MODAL(but, 1);
         }
         break;
     case dtOkCancel: {
         but = GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2, y + height - button_height - 1,
                 DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-        OBJ_SET_MODAL(but, 1);
         but = GUI_CreateButton(&dialog->but2, x + width/2, y + height - button_height - 1,
                  DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
-        OBJ_SET_MODAL(but, 1);
         }
         break;
     case dtNone:

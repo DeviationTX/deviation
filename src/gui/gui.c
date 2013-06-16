@@ -301,10 +301,10 @@ void GUI_TouchRelease()
     }
 }
 
-u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
+u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headObj)
 {
     struct guiObject *modalObj = GUI_IsModal();
-    struct guiObject *obj = modalObj ? modalObj : objHEAD;
+    struct guiObject *obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
 
     while(obj) {
         if (! OBJ_IS_HIDDEN(obj)) {
@@ -386,10 +386,7 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
                 break;
             case Scrollable:
                if(coords_in_box(&obj->box, coords)) {
-                   guiObject_t *head = objHEAD;
-                   objHEAD = ((guiScrollable_t *)obj)->head;
-                   int ret = GUI_CheckTouch(coords, long_press);
-                   objHEAD = head;
+                   int ret = _GUI_CheckTouch(coords, long_press, ((guiScrollable_t *)obj)->head);
                    return ret;
                }
             }
@@ -397,6 +394,11 @@ u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
         obj = obj->next;
     }
     return 0;
+}
+
+u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
+{
+    return _GUI_CheckTouch(coords, long_press, NULL);
 }
 
 struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
@@ -572,7 +574,7 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
                     struct touch coords;
                     coords.x = objSELECTED->box.x + (objSELECTED->box.width >> 1);
                     coords.y = objSELECTED->box.y + (objSELECTED->box.height >> 1);
-                    GUI_CheckTouch(&coords, flags & BUTTON_LONGPRESS);
+                    _GUI_CheckTouch(&coords, flags & BUTTON_LONGPRESS, NULL);
                     return 1;
                 }
             }
