@@ -500,6 +500,7 @@ static void show_config()
 {
     int i;
     int count = 0;
+    int row_idx = 0;
     switch (get_elem_type(selected_for_move)) {
         case SMALLBOX_ELEM:
         case BIGBOX_ELEM:
@@ -508,6 +509,8 @@ static void show_config()
                     count = i;
                     break;
                 }
+                if (selected_for_move == &gui->box[i])
+                   row_idx = i;
             }
             break;
         case BAR_ELEM:
@@ -516,6 +519,8 @@ static void show_config()
                     count = i;
                     break;
                 }
+                if (selected_for_move == &gui->bar[i])
+                   row_idx = i;
             }
             break;
         case TOGGLE_ELEM:
@@ -524,15 +529,19 @@ static void show_config()
                     count = i;
                     break;
                 }
+                if (selected_for_move == &gui->tgl[i])
+                   row_idx = i;
             }
             break;
         case HTRIM_ELEM:
         case VTRIM_ELEM:
             for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-                if (! pc.tgl[i].pos.y) {
+                if (! pc.trim[i].pos.y) {
                     count = i;
                     break;
                 }
+                if (selected_for_move == &gui->trim[i])
+                   row_idx = i;
             }
             break;
     }
@@ -546,6 +555,7 @@ static void show_config()
          DIALOG_X + SCROLLABLE_X, 40 + DIALOG_Y + SCROLLABLE_Y,
          LCD_WIDTH - 2*DIALOG_X - 2*SCROLLABLE_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y - 2 * SCROLLABLE_Y,
          TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, (row_idx << 8) | 2 * row_idx));
 }
     
 static u8 _action_cb(u32 button, u8 flags, void *data)
