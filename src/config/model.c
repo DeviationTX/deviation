@@ -1356,6 +1356,66 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
+    fprintf(fh, "[%s]\n", SECTION_GUI);
+    for(idx = 0; idx < NUM_BOX_ELEMS; idx++) {
+        if (Model.pagecfg2.box[idx].pos.y == 0)
+            break;
+        int src = Model.pagecfg2.box[idx].src;
+        if(src && src <= NUM_TIMERS) {
+            TIMER_Name(file, src-1);
+        } else if(src && src - NUM_TIMERS <= NUM_TELEM) {
+            TELEMETRY_Name(file, src-NUM_TIMERS);
+        } else {
+            if (src)
+                src += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
+            INPUT_SourceName(file, src);
+        }
+        fprintf(fh, "%s=%d,%d,%d,%s\n",
+                GUI_BOX,
+                Model.pagecfg2.box[idx].pos.x,
+                Model.pagecfg2.box[idx].pos.y,
+                Model.pagecfg2.box[idx].type,
+                file);
+    }
+    for(idx = 0; idx < NUM_BAR_ELEMS; idx++) {
+        if (Model.pagecfg2.bar[idx].pos.y == 0)
+            break;
+        int src = Model.pagecfg2.bar[idx].src + NUM_INPUTS;
+        fprintf(fh, "%s=%d,%d,%s\n",
+                GUI_BAR,
+                Model.pagecfg2.bar[idx].pos.x,
+                Model.pagecfg2.bar[idx].pos.y,
+                INPUT_SourceName(file, src));
+    }
+    for(idx = 0; idx < NUM_TOGGLE_ELEMS; idx++) {
+        if (Model.pagecfg2.tgl[idx].pos.y == 0)
+            break;
+        int src = Model.pagecfg2.tgl[idx].src;
+        fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n",
+                GUI_TOGGLE,
+                Model.pagecfg2.tgl[idx].pos.x,
+                Model.pagecfg2.tgl[idx].pos.y,
+                Model.pagecfg2.tgl[idx].ico[0],
+                Model.pagecfg2.tgl[idx].ico[1],
+                INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.tgl[idx].ico[2],
+                INPUT_SourceNameAbbrevSwitch(file, src));
+    }
+    for(idx = 0; idx < NUM_TRIM_ELEMS; idx++) {
+        if (Model.pagecfg2.trim[idx].pos.y == 0)
+            break;
+        fprintf(fh, "%s=%d,%d,%d,%d\n",
+                GUI_TRIM,
+                Model.pagecfg2.trim[idx].pos.x,
+                Model.pagecfg2.trim[idx].pos.y,
+                Model.pagecfg2.trim[idx].is_vert,
+                Model.pagecfg2.trim[idx].src);
+    }
+    if (Model.pagecfg2.modelico.pos.y != 0) {
+        fprintf(fh, "%s=%d,%d\n",
+                MODEL_ICON,
+                Model.pagecfg2.modelico.pos.x,
+                Model.pagecfg2.modelico.pos.y);
+    }
     CONFIG_EnableLanguage(1);
     fclose(fh);
     return 1;
