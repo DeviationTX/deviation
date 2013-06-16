@@ -117,6 +117,7 @@ void PAGE_MainLayoutEvent()
 void PAGE_MainLayoutExit()
 {
     GUI_SelectionNotify(NULL);
+    BUTTON_UnregisterCallback(&action);
 }
 void draw_elements()
 {
