@@ -382,8 +382,6 @@ static void create_element(struct elem *elem, int type, int x, int y, int src, i
     elem->extra[0] = e0;
     elem->extra[1] = e1;
     elem->extra[2] = e2;
-    printf("%-5d : %5d %5d %5d %5d %5d %5d\n", type, x, y, src, e0, e1, e2);
-    printf("%-5d : %5d %5d (%08x) %d\n\n", ELEM_TYPE(*elem), ELEM_X(*elem), ELEM_Y(*elem), elem, Model.pagecfg2.elem[0].src);
 }
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)

@@ -72,10 +72,21 @@ int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
     return 1;
 }
 
+unsigned map_type(int type)
+{
+    switch(type) {
+        case ELEM_BIGBOX: return ELEM_SMALLBOX;
+        case ELEM_HTRIM: return ELEM_VTRIM;
+        default: return type;
+    }
+}
 int MAINPAGE_FindNextElem(unsigned type, int idx)
 {
+    type = map_type(type);
     for(int i = idx; i < NUM_ELEMS; i++) {
-        if (ELEM_TYPE(pc.elem[i]) == type)
+        if(! ELEM_USED(pc.elem[i]))
+            break;
+        if (map_type(ELEM_TYPE(pc.elem[i])) == type)
             return i;
     }
     return -1;
@@ -139,7 +150,6 @@ void PAGE_MainInit(int page)
             {
                 int src = pc.elem[i].src;
                 mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
-printf("Create Bar: %d %d %d %d %d\n", x, y, w, h, src);
                 GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                            bar_cb, (void *)((long)src));
                 break;

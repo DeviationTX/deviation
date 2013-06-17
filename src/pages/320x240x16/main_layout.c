@@ -46,7 +46,7 @@ struct buttonAction action;
 u8 cfg_elem_type;
 
 u8 newelem;
-u16 selected_x, selected_y;
+u16 selected_x, selected_y, selected_w, selected_h;
 char tmp[20];
 
 void PAGE_MainLayoutInit(int page)
@@ -144,11 +144,10 @@ void draw_elements()
         int type = ELEM_TYPE(pc.elem[i]);
         const char *(*strCallback)(guiObject_t *, const void *) = label_cb;
         void *data = (void *)(long)elem_abs_to_rel(i);
-        int desc;
-                GUI_CreateLabelBox(&gui->elem[i], x, y, w, h, &gui->desc[0], NULL, touch_cb, _tr("Model"));
+        int desc = 0;
         switch(type) {
             case ELEM_MODELICO:
-                desc = 0; data = (void *)_tr("Model");
+                desc = 0; strCallback = NULL; data = (void *)_tr("Model");
                 break;
             case ELEM_HTRIM:
             case ELEM_VTRIM:
@@ -156,7 +155,7 @@ void draw_elements()
                 break;
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
-                desc = 2; strCallback = boxlabel_cb;
+                desc = 2; strCallback = boxlabel_cb; data = (void *)(long)i;
                 break;
             case ELEM_BAR:
                 desc = 3;
@@ -231,7 +230,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH, dir, 1, 10, NULL);
+    int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH-selected_w, dir, 1, 10, NULL);
     if (x != selected_x) {
         selected_x = x;
         move_elem();
@@ -243,7 +242,7 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    int y = GUI_TextSelectHelper(selected_y, 40, LCD_WIDTH, dir, 1, 10, NULL);
+    int y = GUI_TextSelectHelper(selected_y, 40, LCD_HEIGHT-selected_h, dir, 1, 10, NULL);
     if (y != selected_y) {
         selected_y = y;
         move_elem();
@@ -265,6 +264,7 @@ void notify_cb(guiObject_t *obj)
     int idx = guielem_idx(obj);
     selected_x = ELEM_X(pc.elem[idx]);
     selected_y = ELEM_Y(pc.elem[idx]);
+    GetElementSize(ELEM_TYPE(pc.elem[idx]), &selected_w, &selected_h);
     GUI_Redraw((guiObject_t *)&gui->x);
     GUI_Redraw((guiObject_t *)&gui->y);
 }
@@ -311,7 +311,7 @@ static void dialog_ok_cb(u8 state, void * data)
     (void)data;
     guiObject_t *obj = (guiObject_t *)selected_for_move;
     draw_elements();
-    if(OBJ_IS_USED(obj))
+    if(obj && OBJ_IS_USED(obj))
         GUI_SetSelected(obj);
 }
 
@@ -334,12 +334,18 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
+    int i;
     //Remove object
     int type = ELEM_TYPE(pc.elem[idx]);
-    ELEM_SET_Y(pc.elem[idx], 0);
+    for(i = idx+1; i < NUM_ELEMS; i++) {
+        if (! ELEM_USED(pc.elem[i]))
+            break;
+        pc.elem[i-1] = pc.elem[i];
+    }
+         ELEM_SET_Y(pc.elem[i-1], 0);
     idx = MAINPAGE_FindNextElem(type, 0);
     if (idx >= 0) {
-        selected_for_move = &gui->elem[0];
+        selected_for_move = &gui->elem[idx];
     } else {
         selected_for_move = NULL;
     }
