@@ -59,10 +59,10 @@ struct ImageMap TGLICO_GetImage(int idx)
 void TGLICO_Select(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if(Model.pagecfg.toggle[(long)data])
+    if(Model.pagecfg2.elem[(long)data].src)
     {
         tp.tglidx = (long)data;
-        memcpy(tp.tglicons, Model.pagecfg.tglico[tp.tglidx], sizeof(tp.tglicons));
+        memcpy(tp.tglicons, Model.pagecfg2.elem[tp.tglidx].extra, sizeof(tp.tglicons));
         show_iconsel_page(0);
     }
 }
@@ -81,7 +81,7 @@ void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if (press_type == -1) {
         u32 pos = (long)data;
-        Model.pagecfg.tglico[tp.tglidx][pos] = 0;
+        Model.pagecfg2.elem[tp.tglidx].extra[pos] = 0;
         show_iconsel_page(pos);
     }
 }

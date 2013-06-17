@@ -99,6 +99,14 @@ void PAGE_MainLayoutExit()
     GUI_SelectionNotify(NULL);
     BUTTON_UnregisterCallback(&action);
 }
+void PAGE_MainLayoutRestoreDialog(int idx)
+{
+    GUI_RemoveAllObjects();
+    PAGE_MainLayoutInit(0);
+    selected_for_move = &gui->elem[idx];
+    show_config();
+}
+
 //Return the 
 int elem_abs_to_rel(int idx)
 {
@@ -401,16 +409,26 @@ const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
     return _tr("Delete");
 }
 
+static void toggle_press_cb(guiObject_t *obj, void *data)
+{
+    PAGE_MainLayoutExit();
+    TGLICO_Select(obj, data);
+}
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int type = (long)data;
     long elemidx = elem_rel_to_abs(type, absrow);
+    void (*press_cb)(guiObject_t *obj, void *data) = NULL;
     #define X DIALOG_X + SCROLLABLE_X
     if (type == ELEM_MODELICO) {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
     } else {
+        if (type == ELEM_TOGGLE) {
+            press_cb = toggle_press_cb;
+        }
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow+1));
-        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
+        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, press_cb, dlgts_cb, (void *)elemidx);
     }
     GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
     return 1;
