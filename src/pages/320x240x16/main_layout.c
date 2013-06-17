@@ -320,7 +320,7 @@ static void dialog_ok_cb(u8 state, void * data)
     guiObject_t *obj = (guiObject_t *)selected_for_move;
     draw_elements();
     if(obj && OBJ_IS_USED(obj))
-        GUI_SetSelected(obj);
+        select_for_move((guiLabel_t *)obj);
 }
 
 #define DIALOG_X 20
