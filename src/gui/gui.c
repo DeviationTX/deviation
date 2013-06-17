@@ -103,14 +103,14 @@ void GUI_RemoveHierObjects(struct guiObject *obj)
         return;
     while(parent->next)
         GUI_RemoveObj(parent->next);
-    FullRedraw = 1;
+    FullRedraw = objHEAD ? 1: 2;
 }
 
 void GUI_RemoveAllObjects()
 {
     while(objHEAD)
         GUI_RemoveObj(objHEAD);
-    FullRedraw = 1;
+    FullRedraw = 2;
 }
 
 void GUI_RemoveObj(struct guiObject *obj)
@@ -156,7 +156,7 @@ void GUI_RemoveObj(struct guiObject *obj)
             prev = prev->next;
         }
     }
-    FullRedraw = 1;
+    FullRedraw = objHEAD ? 1 : 2;
 }
 
 void GUI_SetHidden(struct guiObject *obj, u8 state)
@@ -171,9 +171,11 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
-    if(FullRedraw && w != LCD_WIDTH//SCREEN_WIDTH
-            && h != LCD_HEIGHT) //SCREEN_HEIGHT)
+    if(FullRedraw) {
+        if(w == LCD_WIDTH && h == LCD_HEIGHT)
+            _gui_draw_background(x, y, w, h); //Optimization to prevent partial redraw when it isn't needed
         return;  //Optimization to prevent partial redraw when it isn't needed
+    }
     if (objDIALOG)
         GUI_DialogDrawBackground(x, y, w, h);
     else 
@@ -214,7 +216,7 @@ void _GUI_Redraw(struct guiObject *obj)
 
 void GUI_RedrawAllObjects()
 {
-    FullRedraw = 1;
+    FullRedraw = 2;
 }
 
 void GUI_HideObjects(struct guiObject *headObj, struct guiObject *modalObj)
@@ -237,7 +239,7 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 
     struct guiObject *obj;
     if (FullRedraw) {
-        if (modalObj && modalObj->Type == Dialog) {
+        if (modalObj && modalObj->Type == Dialog && FullRedraw != 2) {
             //Handle Dialog redraw as an incremental
             FullRedraw = 0;
         } else {
