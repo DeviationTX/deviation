@@ -47,6 +47,7 @@ u8 cfg_elem_type;
 
 u8 newelem;
 u16 selected_x, selected_y, selected_w, selected_h;
+static u8 long_press;
 char tmp[20];
 
 void PAGE_MainLayoutInit(int page)
@@ -65,6 +66,7 @@ void PAGE_MainLayoutInit(int page)
          PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
      //else
      //    PAGE_ShowHeader(NULL);
+    long_press = 0;
     newelem = 0;
     selected_x = 0;
     const u16 color[5] = {
@@ -307,9 +309,21 @@ void select_for_move(guiLabel_t *obj)
 
 void touch_cb(guiObject_t *obj, s8 press, const void *data)
 {
+    //press = -1 : release
+    //press = 0  : short press
+    //press = 1  : long press
     (void)data;
+    if (long_press) {
+        if(press == -1)
+            long_press = 0;
+        return;
+    }
     if(press < 0) {
         select_for_move((guiLabel_t *)obj);
+    }
+    if(selected_for_move && press == 1) {
+        show_config();
+        long_press = 1;
     }
 }
 
