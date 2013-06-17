@@ -36,69 +36,54 @@
 
 #include "../common/_main_page.c"
 
-int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h)
+void GetElementSize(unsigned type, u16 *w, u16 *h)
 {
-    if ((struct elem_trim *)ptr >= pc.trim && (struct elem_trim *)ptr < pc.trim + NUM_TRIM_ELEMS) {
-        //Trim
-        struct elem_trim *p = ptr;
-        if (p->pos.y == 0)
-            return 0;
-        *x = p->pos.x;
-        *y = p->pos.y;
-        int vert = p->is_vert;
-        if (vert) {
-            *w = VTRIM_W;
-            *h = VTRIM_H;
-        } else {
-            *w = HTRIM_W;
-            *h = HTRIM_H;
-        }
-    } else if ((struct elem_toggle *)ptr >= pc.tgl && (struct elem_toggle *)ptr < pc.tgl + NUM_TOGGLE_ELEMS) {
-        //Toggle
-        struct elem_toggle *p = ptr;
-        if (p->pos.y == 0)
-            return 0;
-        *x = p->pos.x;
-        *y = p->pos.y;
-        *w = TOGGLEICON_WIDTH;
-        *h = TOGGLEICON_HEIGHT;
-    } else if ((struct elem_box *)ptr >= pc.box && (struct elem_box *)ptr < pc.box + NUM_BOX_ELEMS) {
-        //Toggle
-        struct elem_box *p = ptr;
-        if (p->pos.y == 0)
-            return 0;
-        *x = p->pos.x;
-        *y = p->pos.y;
-        *w = BOX_W;
-        *h = p->type ? BIGBOX_H : SMALLBOX_H;
-    } else if (ptr == &pc.modelico) {
-        //Model Icon
-        struct elem_modelico *p = ptr;
-        if (p->pos.y == 0)
-            return 0;
-        *x = p->pos.x;
-        *y = p->pos.y;
-        *w = MODEL_ICO_W;
-        *h = MODEL_ICO_H;
-    } else if ((struct elem_bar *)ptr >= pc.bar && (struct elem_bar *)ptr <= pc.bar + NUM_BAR_ELEMS) {
-        //Bar
-        struct elem_bar *p = ptr;
-        if (p->pos.y == 0)
-            return 0;
-        *x = p->pos.x;
-        *y = p->pos.y;
-        *w = GRAPH_W;
-        *h = GRAPH_H;
-    } else {
+    const u8 width[ELEM_LAST] = {
+        [ELEM_SMALLBOX] = BOX_W,
+        [ELEM_BIGBOX]   = BOX_W,
+        [ELEM_TOGGLE]   = TOGGLEICON_WIDTH,
+        [ELEM_BAR]      = GRAPH_W,
+        [ELEM_VTRIM]    = VTRIM_W,
+        [ELEM_HTRIM]    = HTRIM_W,
+        [ELEM_MODELICO] = MODEL_ICO_W,
+    };
+    const u8 height[ELEM_LAST] = {
+        [ELEM_SMALLBOX] = SMALLBOX_H,
+        [ELEM_BIGBOX]   = BIGBOX_H,
+        [ELEM_TOGGLE]   = TOGGLEICON_HEIGHT,
+        [ELEM_BAR]      = GRAPH_H,
+        [ELEM_VTRIM]    = VTRIM_H,
+        [ELEM_HTRIM]    = HTRIM_H,
+        [ELEM_MODELICO] = MODEL_ICO_H,
+    };
+    *w = width[type];
+    *h = height[type];
+}
+int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
+{
+    *y = ELEM_Y(*elem);
+    if (*y == 0)
         return 0;
-    }
+    int type = ELEM_TYPE(*elem);
+    if (type >= ELEM_LAST)
+        return 0;
+    *x = ELEM_X(*elem);
+    GetElementSize(type, w, h);
     return 1;
+}
+
+int MAINPAGE_FindNextElem(unsigned type, int idx)
+{
+    for(int i = idx; i < NUM_ELEMS; i++) {
+        if (ELEM_TYPE(pc.elem[i]) == type)
+            return i;
+    }
+    return -1;
 }
 
 void PAGE_MainInit(int page)
 {
     (void)page;
-    int i;
     u16 x, y, w, h;
     memset(mp, 0, sizeof(struct main_page));
     memset(gui, 0, sizeof(*gui));
@@ -114,51 +99,59 @@ void PAGE_MainInit(int page)
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
     GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
-    if(! GetWidgetLoc(&pc.modelico, &x, &y, &w, &h))
-        GUI_CreateIcon(&gui->model.ico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
+    if (! MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
+        GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
     GUI_CreateLabelBox(&gui->name, 96, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
-    //Icon
-    if (GetWidgetLoc(&pc.modelico, &x, &y, &w, &h))
-        GUI_CreateImageOffset(&gui->model.img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
-
-    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.trim[i], &x, &y, &w, &h))
+    for (int i = 0; i < NUM_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.elem[i], &x, &y, &w, &h))
             break;
-        int src = pc.trim[i].src;
-        int vert = pc.trim[i].is_vert;
-        mp->trims[i] = *(MIXER_GetTrim(src));
-        GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100,
-             vert ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)src);
-    }
-    for(i = 0; i < NUM_BOX_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.box[i], &x, &y, &w, &h))
-            break;
-        int src = pc.box[i].src;
-        mp->boxval[i] = get_boxval(src);
-        int font = ((src <= NUM_TIMERS && mp->boxval[i] < 0) ||
-                    ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
-        GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
-                            get_box_font(pc.box[i].type ? 0 : 2, font),
+        int type = ELEM_TYPE(pc.elem[i]);
+        switch(type) {
+            case ELEM_MODELICO:
+                GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
+                break;
+            case ELEM_VTRIM:
+            case ELEM_HTRIM:
+            {
+                int src = pc.elem[i].src;
+                mp->elem[i] = *(MIXER_GetTrim(src));
+                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, -100, 100,
+                    type == ELEM_VTRIM ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)src);
+                break;
+            }
+            case ELEM_SMALLBOX:
+            case ELEM_BIGBOX:
+            {
+                int src = pc.elem[i].src;
+                mp->elem[i] = get_boxval(src);
+                int font = ((src <= NUM_TIMERS && mp->elem[i] < 0)
+                           || ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h,
+                            get_box_font(type == ELEM_BIGBOX ? 0 : 2, font),
                             show_box_cb, press_box_cb,
                             (void *)((long)src));
-    }
-    for(i = 0; i < NUM_BAR_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.bar[i], &x, &y, &w, &h))
-            break;
-        int src = pc.bar[i].src;
-        mp->barval[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
-        GUI_CreateBarGraph(&gui->bar[i], x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+                break;
+            }
+            case ELEM_BAR:
+            {
+                int src = pc.elem[i].src;
+                mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
+printf("Create Bar: %d %d %d %d %d\n", x, y, w, h, src);
+                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                            bar_cb, (void *)((long)src));
-    }
-    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.tgl[i], &x, &y, &w, &h))
-            break;
-        struct ImageMap img = TGLICO_GetImage(pc.tgl[i].ico[0]); //We'll set this properly down below
-        GUI_CreateImageOffset(&gui->toggle[i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
+                break;
+            }
+            case ELEM_TOGGLE:
+            {
+                struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], 0)); //We'll set this properly down below
+                GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
+                break;
+            }
+        }
     }
     //Battery
     mp->battery = PWR_ReadVoltage();

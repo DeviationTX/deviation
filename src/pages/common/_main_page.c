@@ -93,90 +93,98 @@ void PAGE_MainEvent()
         }
         return;
     }
-    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-        if (! OBJ_IS_USED(&gui->trim[i]))
+    volatile s16 *raw = MIXER_GetInputs();
+    for(i = 0; i < NUM_ELEMS; i++) {
+        if (! OBJ_IS_USED(&gui->elem[i]))
             break;
-        int src = pc.trim[i].src;
-        int value = *(MIXER_GetTrim(src));
-        if (mp->trims[i] != value) {
-            mp->trims[i] = value;
-            GUI_Redraw(&gui->trim[i]);
-        }
-    }
-    for(i = 0; i < NUM_BOX_ELEMS; i++) {
-        if (! OBJ_IS_USED(&gui->box[i]))
+        int src = pc.elem[i].src;
+        int type = ELEM_TYPE(pc.elem[i]);
+        switch(type) {
+            case ELEM_VTRIM:
+            case ELEM_HTRIM:
+            {
+                int value = *(MIXER_GetTrim(src));
+                if (mp->elem[i] != value) {
+                    mp->elem[i] = value;
+                    GUI_Redraw(&gui->elem[i].bar);
+                }
+                break;
+            }
+            case ELEM_SMALLBOX:
+            case ELEM_BIGBOX:
+            {
+                s32 val = get_boxval(src);
+                if (src <= NUM_TIMERS) {
+                    //Timer
+                    if ((val >= 0 && mp->elem[i] < 0) || (val < 0 && mp->elem[i] >= 0)) {
+                        GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, val < 0));
+                        mp->elem[i] = val;
+                        GUI_Redraw(&gui->elem[i].box);
+                    } else if (mp->elem[i] / 1000 != val /1000) {
+                        mp->elem[i] = val;
+                        GUI_Redraw(&gui->elem[i].box);
+                    }
+                } else if (src - NUM_TIMERS <= NUM_TELEM) {
+                    //Telem
+                    u32 time = CLOCK_getms();
+                    if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
+                        clear_time = 1;
+                        GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 1));
+                    } else if(Telemetry.time[0] && mp->elem[i] != val) {
+                        GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 0));
+                        mp->elem[i] = val;
+                        GUI_Redraw(&gui->elem[i].box);
+                    }
+                } else if (mp->elem[i] != val) {
+                    //Source
+                    mp->elem[i] = val;
+                    GUI_Redraw(&gui->elem[i].box);
+                }
+                break;
+            }
+            case ELEM_BAR:
+            {
+                s16 chan = MIXER_GetChannel(src-1, APPLY_SAFETY);
+                if (mp->elem[i] != chan) {
+                    mp->elem[i] = chan;
+                    GUI_Redraw(&gui->elem[i].bar);
+                }
+                break;
+            }
+            case ELEM_TOGGLE:
+            {
+                src = MIXER_SRC(src);
+                struct ImageMap img;
+                (void)img.x_off;
+                (void)img.y_off;
+                img.file = NULL;
+                if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
+                    //switch
+                    for (int j = 0; j < 3; j++) {
+                        // Assume switch 0/1/2 are in order
+                        if(ELEM_ICO(pc.elem[i], j) && raw[src+j] > 0) {
+                            img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], j));
+                            break;
+                        }
+                    }
+                } else {
+                    //Non switch
+                    int sw = raw[src] > 0 ? 1 : 0;
+                    if (ELEM_ICO(pc.elem[i], sw)) {
+                        img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], sw));
+                    }
+                }
+                if (img.file) {
+                    GUI_ChangeImage(&gui->elem[i].img, img.file, img.x_off, img.y_off);
+                    GUI_SetHidden((guiObject_t *)&gui->elem[i].img, 0);
+                } else {
+                    GUI_SetHidden((guiObject_t *)&gui->elem[i].img, 1);
+                }
+            }
             break;
-        int src = pc.box[i].src;
-        s32 val = get_boxval(src);
-        if (src <= NUM_TIMERS) {
-            //Timer
-            if ((val >= 0 && mp->boxval[i] < 0) || (val < 0 && mp->boxval[i] >= 0)) {
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, val < 0));
-                mp->boxval[i] = val;
-                GUI_Redraw(&gui->box[i]);
-            } else if (mp->boxval[i] / 1000 != val /1000) {
-                mp->boxval[i] = val;
-                GUI_Redraw(&gui->box[i]);
-            }
-        } else if (src - NUM_TIMERS <= NUM_TELEM) {
-            //Telem
-            u32 time = CLOCK_getms();
-            if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-                clear_time = 1;
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, 1));
-            } else if(Telemetry.time[0] && mp->boxval[i] != val) {
-                GUI_SetLabelDesc(&gui->box[i], get_box_font(pc.box[i].type ? 0 : 2, 0));
-                mp->boxval[i] = val;
-                GUI_Redraw(&gui->box[i]);
-            }
-        } else if (mp->boxval[i] != val) {
-            //Source
-            mp->boxval[i] = val;
-            GUI_Redraw(&gui->box[i]);
         }
     }
     if (clear_time)
         Telemetry.time[0] = 0;
-    volatile s16 *raw = MIXER_GetInputs();
-    for(i = 0; i < NUM_BAR_ELEMS; i++) {
-        if (! OBJ_IS_USED(&gui->bar[i]))
-            break;
-        s16 chan = MIXER_GetChannel(pc.bar[i].src-1, APPLY_SAFETY);
-        if (mp->barval[i] != chan) {
-            mp->barval[i] = chan;
-            GUI_Redraw(&gui->bar[i]);
-        }
-    }
-    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-        if (! OBJ_IS_USED(&gui->toggle[i]))
-            break;
-        u8 src = MIXER_SRC(pc.tgl[i].src);
-        struct ImageMap img;
-        (void)img.x_off;
-        (void)img.y_off;
-        img.file = NULL;
-        if (pc.tgl[i].src > INP_HAS_CALIBRATION && pc.tgl[i].src < INP_LAST) {
-            //switch
-            for (int j = 0; j < 3; j++) {
-                // Assume switch 0/1/2 are in order
-                if(pc.tgl[i].ico[j] && raw[src+j] > 0) {
-                    img = TGLICO_GetImage(pc.tgl[i].ico[j]);
-                    break;
-                }
-            }
-        } else {
-            //Non switch
-            int sw = raw[src] > 0 ? 1 : 0;
-            if (pc.tgl[i].ico[sw]) {
-                img = TGLICO_GetImage(pc.tgl[i].ico[sw]);
-            }
-        }
-        if (img.file) {
-            GUI_ChangeImage(&gui->toggle[i], img.file, img.x_off, img.y_off);
-            GUI_SetHidden((guiObject_t *)&gui->toggle[i], 0);
-        } else {
-            GUI_SetHidden((guiObject_t *)&gui->toggle[i], 1);
-        }
-    }
     _check_voltage();
 }

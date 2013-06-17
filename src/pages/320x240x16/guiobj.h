@@ -80,24 +80,18 @@ struct mainlayout_obj {
     guiTextSelect_t dlgts[8];
     guiButton_t dlgbut[8];
     //Everything below here must be part an element
-    guiLabel_t trim[6];
-    guiLabel_t box[8];
-    guiLabel_t bar[8];
-    guiLabel_t tgl[4];
-    guiLabel_t modelico;
+    guiLabel_t elem[NUM_ELEMS];
 };
 
 struct mainpage_objs {
     guiButton_t optico;
-    union {
-        guiButton_t ico;
-        guiImage_t img;
-    } model;
+    guiButton_t modelico;
     guiLabel_t name;
-    guiBarGraph_t trim[6];
-    guiLabel_t box[8];
-    guiBarGraph_t bar[8];
-    guiImage_t toggle[4];
+    union {
+        guiBarGraph_t bar;
+        guiLabel_t    box;
+        guiImage_t    img;
+    } elem[NUM_ELEMS];
     union {
         guiImage_t ico;
         guiLabel_t lbl;

@@ -56,17 +56,45 @@ struct elem_bar {
     u8 src;
 };
 
-#define NUM_TRIM_ELEMS 6
-#define NUM_BOX_ELEMS 8
-#define NUM_BAR_ELEMS 8
-#define NUM_TOGGLE_ELEMS 4
+struct elem {
+    u8 blob[3];
+    u8 src;
+    u8 extra[3];
+};
+
+#define ELEM_X(elem)    (*((u32 *)((elem).blob)) & 0x1FF)
+#define ELEM_Y(elem)    ((*((u32 *)((elem).blob)) >> 9) & 0x1FF)
+#define ELEM_USED(elem) (*((u32 *)((elem).blob)) & 0x3FE00)
+#define ELEM_TYPE(elem) ((*((u32 *)((elem).blob)) >> 18) & 0x0F)
+#define ELEM_SET_X(elem, x)       *((u32 *)((elem).blob)) = ((*((u32 *)((elem).blob)) & ~0x1FF) | (x))
+#define ELEM_SET_Y(elem, y)       *((u32 *)((elem).blob)) = ((*((u32 *)((elem).blob)) & ~(0x1FF << 9)) | ((y) << 9))
+#define ELEM_SET_TYPE(elem, type) *((u32 *)((elem).blob)) = ((*((u32 *)((elem).blob)) & ~(0x0F << 18)) | ((type) << 18))
+
+#define ELEM_ICO(elem, j) ((elem).extra[j])
+//#define ELEM_TRIM_IS_VERT(elem)       (*((u32 *)((elem).blob)) & (1 << 22))
+//#define ELEM_BOX_IS_BIG(elem)         (*((u32 *)((elem).blob)) & (1 << 22))
+//#define ELEM_TRIM_SET_VERT(elem, val) ((*((u32 *)((elem).blob)) & ~(1 << 22)) | (val) << 22)
+//#define ELEM_BOX_SET_BIG(elem, val)   ((*((u32 *)((elem).blob)) & ~(1 << 22)) | (val) << 22)
+//NUM_TRIM_ELEMS + NUM_BOX_ELEMS + NUM_BAR_ELEMS + NUM_TOGGLE_ELEMS
+#define NUM_ELEMS (6 + 8 + 8 + 4 + 1)
+//#define NUM_TRIM_ELEMS 6
+//#define NUM_BOX_ELEMS 8
+//#define NUM_BAR_ELEMS 8
+//#define NUM_TOGGLE_ELEMS 4
 
 struct PageCfg2 {
-    struct elem_modelico modelico;
-    struct elem_trim     trim[NUM_TRIM_ELEMS];
-    struct elem_toggle   tgl[NUM_TOGGLE_ELEMS];
-    struct elem_box      box[NUM_BOX_ELEMS];
-    struct elem_bar      bar[NUM_BOX_ELEMS];
+    struct elem elem[NUM_ELEMS];
+};
+
+enum {
+    ELEM_SMALLBOX,
+    ELEM_BIGBOX,
+    ELEM_TOGGLE,
+    ELEM_BAR,
+    ELEM_VTRIM,
+    ELEM_HTRIM,
+    ELEM_MODELICO,
+    ELEM_LAST,
 };
 
 #endif

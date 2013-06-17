@@ -38,32 +38,12 @@ static void show_config();
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 extern int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h);
+extern void GetElementSize(unsigned type, u16 *w, u16 *h);
+extern int MAINPAGE_FindNextElem(unsigned type, int idx);
+
 guiLabel_t *selected_for_move;
 struct buttonAction action;
 u8 cfg_elem_type;
-
-enum {
-    SMALLBOX_ELEM,
-    BIGBOX_ELEM,
-    TOGGLE_ELEM,
-    BAR_ELEM,
-    VTRIM_ELEM,
-    HTRIM_ELEM,
-    MODELICO_ELEM,
-    LAST_ELEMTYPE,
-};
-
-#define VTRIM_W      10
-#define VTRIM_H     140
-#define HTRIM_W     125
-#define HTRIM_H      10
-#define MODEL_ICO_W  96
-#define MODEL_ICO_H  96
-#define GRAPH_H      59
-#define GRAPH_W      10
-#define BOX_W       113
-#define SMALLBOX_H   24
-#define BIGBOX_H     40
 
 u8 newelem;
 u16 selected_x, selected_y;
@@ -119,6 +99,37 @@ void PAGE_MainLayoutExit()
     GUI_SelectionNotify(NULL);
     BUTTON_UnregisterCallback(&action);
 }
+//Return the 
+int elem_abs_to_rel(int idx)
+{
+    unsigned type = ELEM_TYPE(pc.elem[idx]);
+    int nxt = -1;
+    for (int i = 0; i < NUM_ELEMS-1; i++) {
+        nxt = MAINPAGE_FindNextElem(type, nxt+1);
+        if (nxt == idx)
+            return i;
+    }
+    return 0;
+}
+int elem_rel_to_abs(int type, int idx)
+{
+    int nxt = -1;
+    for(int i = 0; i < idx+1; i++)
+        nxt = MAINPAGE_FindNextElem(type, nxt+1);
+    return nxt;
+}
+
+int elem_get_count(int type)
+{
+    int nxt = -1;
+    for (int i = 0; i < NUM_ELEMS; i++) {
+        nxt = MAINPAGE_FindNextElem(type, nxt+1);
+        if (nxt == -1)
+            return i;
+    }
+    return 0;
+}
+
 void draw_elements()
 {
     u16 x, y, w, h;
@@ -127,43 +138,50 @@ void draw_elements()
     guiObject_t *obj = gui->y.header.next;
     if (obj)
         GUI_RemoveHierObjects(obj);
-    if (GetWidgetLoc(&pc.modelico, &x, &y, &w, &h)) {
-        GUI_CreateLabelBox(&gui->modelico, x, y, w, h, &gui->desc[0], NULL, touch_cb, _tr("Model"));
-    }
-    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.trim[i], &x, &y, &w, &h))
+    for (i = 0; i < NUM_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.elem[i], &x, &y, &w, &h))
             break;
-        GUI_CreateLabelBox(&gui->trim[i], x, y, w, h, &gui->desc[1], label_cb, touch_cb, (void *)(long)i);
-    }
-    for(i = 0; i < NUM_BOX_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.box[i], &x, &y, &w, &h))
-            break;
-        GUI_CreateLabelBox(&gui->box[i], x, y, w, h, &gui->desc[2], boxlabel_cb, touch_cb, (void *)(long)i);
-    }
-    for(i = 0; i < NUM_BAR_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.bar[i], &x, &y, &w, &h))
-            break;
-        GUI_CreateLabelBox(&gui->bar[i], x, y, w, h, &gui->desc[3], label_cb, touch_cb, (void *)(long)i);
-    }
-    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.tgl[i], &x, &y, &w, &h))
-            break;
-        GUI_CreateLabelBox(&gui->tgl[i], x, y, w, h, &gui->desc[4], label_cb, touch_cb, (void *)(long)i);
+        int type = ELEM_TYPE(pc.elem[i]);
+        const char *(*strCallback)(guiObject_t *, const void *) = label_cb;
+        void *data = (void *)(long)elem_abs_to_rel(i);
+        int desc;
+                GUI_CreateLabelBox(&gui->elem[i], x, y, w, h, &gui->desc[0], NULL, touch_cb, _tr("Model"));
+        switch(type) {
+            case ELEM_MODELICO:
+                desc = 0; data = (void *)_tr("Model");
+                break;
+            case ELEM_HTRIM:
+            case ELEM_VTRIM:
+                desc = 1;
+                break;
+            case ELEM_SMALLBOX:
+            case ELEM_BIGBOX:
+                desc = 2; strCallback = boxlabel_cb;
+                break;
+            case ELEM_BAR:
+                desc = 3;
+                break;
+            case ELEM_TOGGLE:
+                desc = 4;
+        }
+        GUI_CreateLabelBox(&gui->elem[i], x, y, w, h, &gui->desc[desc], strCallback, touch_cb, data);
     }
 }
 
 const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
+    (void)obj;
     int i = (long)data;
-    if (pc.box[i].src <= NUM_TIMERS)
-        return TIMER_Name(tmp, pc.box[i].src - 1);
-    else if( pc.box[i].src - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_Name(tmp, pc.box[i].src - NUM_TIMERS);
-    return INPUT_SourceName(tmp, pc.box[i].src ? pc.box[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
+    if (pc.elem[i].src <= NUM_TIMERS)
+        return TIMER_Name(tmp, pc.elem[i].src - 1);
+    else if( pc.elem[i].src - NUM_TIMERS <= NUM_TELEM)
+        return TELEMETRY_Name(tmp, pc.elem[i].src - NUM_TIMERS);
+    return INPUT_SourceName(tmp, pc.elem[i].src ? pc.elem[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
     return tmp;
 }
 const char *label_cb(guiObject_t *obj, const void *data)
 {
+    (void)obj;
     int idx = (long)data;
     sprintf(tmp, "%d", idx);
     return tmp;
@@ -173,97 +191,46 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
 {   
     (void)data;
     (void)obj;
-    newelem = GUI_TextSelectHelper(newelem, 0, LAST_ELEMTYPE-1, dir, 1, 1, NULL);
+    newelem = GUI_TextSelectHelper(newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
     switch(newelem) {
-        case SMALLBOX_ELEM: return _tr("Small-box");
-        case BIGBOX_ELEM:   return _tr("Big-box");
-        case TOGGLE_ELEM:   return _tr("Toggle");
-        case BAR_ELEM:      return _tr("Bargraph");
-        case VTRIM_ELEM:    return _tr("V-trim");
-        case HTRIM_ELEM:    return _tr("H-trim");
-        case MODELICO_ELEM: return _tr("Model");
+        case ELEM_SMALLBOX: return _tr("Small-box");
+        case ELEM_BIGBOX:   return _tr("Big-box");
+        case ELEM_TOGGLE:   return _tr("Toggle");
+        case ELEM_BAR:      return _tr("Bargraph");
+        case ELEM_VTRIM:    return _tr("V-trim");
+        case ELEM_HTRIM:    return _tr("H-trim");
+        case ELEM_MODELICO: return _tr("Model");
     }
     return "";
 }
 
 void newelem_press_cb(guiObject_t *obj, void *data)
 {
+    (void)obj;
+    (void)data;
     int i;
     u16 x,y,w,h;
-    switch(newelem) {
-        case MODELICO_ELEM:
-            if (! GetWidgetLoc(&pc.modelico, &x, &y, &w, &h)) {
-                    pc.modelico = (struct elem_modelico){
-                                 .pos = {(LCD_WIDTH - MODEL_ICO_W) /2, 40 + (LCD_HEIGHT - 40 - MODEL_ICO_H) / 2}};
-                    draw_elements();
-                    select_for_move(&gui->modelico);
-                 
-            }
+    for (i = 0; i < NUM_ELEMS; i++)
+        if (! OBJ_IS_USED(&gui->elem[i]))
             break;
-        case SMALLBOX_ELEM:
-        case BIGBOX_ELEM:
-            for(i = 0; i < NUM_BOX_ELEMS; i++) {
-                if (! GetWidgetLoc(&pc.box[i], &x, &y, &w, &h)) {
-                    h =  newelem == BIGBOX_ELEM ? BIGBOX_H : SMALLBOX_H;
-                    pc.box[i] = (struct elem_box){
-                                 .pos = {(LCD_WIDTH - BOX_W) /2, 40 + (LCD_HEIGHT - 40 - h) / 2},
-                                 .src = 0, 
-                                 .type = newelem == SMALLBOX_ELEM ? 0 : 1};
-                    draw_elements();
-                    select_for_move(&gui->box[i]);
-                    return;
-                }
-            }
-            break;
-        case BAR_ELEM:
-            for(i = 0; i < NUM_BAR_ELEMS; i++) {
-                if (! GetWidgetLoc(&pc.bar[i], &x, &y, &w, &h)) {
-                    h = GRAPH_H;
-                    pc.bar[i] = (struct elem_bar){
-                                 .pos = {(LCD_WIDTH - GRAPH_W) /2, 40 + (LCD_HEIGHT - 40 - h) / 2},
-                                 .src = 0};
-                    draw_elements();
-                    select_for_move(&gui->bar[i]);
-                    return;
-                }
-            }
-            break;
-        case TOGGLE_ELEM:
-            for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-                if (! GetWidgetLoc(&pc.tgl[i], &x, &y, &w, &h)) {
-                    h = TOGGLEICON_HEIGHT;
-                    pc.tgl[i] = (struct elem_toggle){
-                                 .pos = {(LCD_WIDTH - TOGGLEICON_WIDTH) /2, 40 + (LCD_HEIGHT - 40 - h) / 2},
-                                 .src = 0,
-                                 .ico = {0, 0, 0}};
-                    draw_elements();
-                    select_for_move(&gui->tgl[i]);
-                    return;
-                }
-            }
-            break;
-        case VTRIM_ELEM:
-        case HTRIM_ELEM:
-            for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-                if (! GetWidgetLoc(&pc.trim[i], &x, &y, &w, &h)) {
-                    h = newelem == VTRIM_ELEM ? VTRIM_H : HTRIM_H;
-                    w = newelem == VTRIM_ELEM ? VTRIM_W : HTRIM_W;
-        
-                    pc.trim[i] = (struct elem_trim){
-                                 .pos = {(LCD_WIDTH - w) /2, 40 + (LCD_HEIGHT - 40 - h) / 2},
-                                 .src = 0,
-                                 .is_vert = newelem == VTRIM_ELEM};
-                    draw_elements();
-                    select_for_move(&gui->trim[i]);
-                    return;
-                }
-            }
-            break;
-    }
-            
+    if (i == NUM_ELEMS)
+        return;
+    y = 1;
+    GetElementSize(newelem, &w, &h);
+    x = (LCD_WIDTH - w) / 2;
+    y = (((LCD_WIDTH - 40) - h) / 2) + 40;
+    memset(&pc.elem[i], 0, sizeof(struct elem));
+    ELEM_SET_X(pc.elem[i], x);
+    ELEM_SET_Y(pc.elem[i], y);
+    ELEM_SET_TYPE(pc.elem[i], newelem);
+    draw_elements();
+    select_for_move(&gui->elem[i]);
 }
+
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
+    (void)data;
     int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH, dir, 1, 10, NULL);
     if (x != selected_x) {
         selected_x = x;
@@ -274,6 +241,8 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 }
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
+    (void)data;
     int y = GUI_TextSelectHelper(selected_y, 40, LCD_WIDTH, dir, 1, 10, NULL);
     if (y != selected_y) {
         selected_y = y;
@@ -284,101 +253,32 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
     return "0";
 }
 
+int guielem_idx(guiObject_t *obj)
+{
+    return ((unsigned long)obj - (unsigned long)gui->elem) / sizeof(guiLabel_t);
+}
+
 void notify_cb(guiObject_t *obj)
 {
-    int i;
-    if (obj == (guiObject_t *)&gui->modelico) {
-        selected_x = pc.modelico.pos.x;
-        selected_y = pc.modelico.pos.y;
-        GUI_Redraw((guiObject_t *)&gui->x);
-        GUI_Redraw((guiObject_t *)&gui->y);
+    if ((guiLabel_t *)obj < gui->elem)
         return;
-    }
-    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->trim[i]) {
-            selected_x = pc.trim[i].pos.x;
-            selected_y = pc.trim[i].pos.y;
-            GUI_Redraw((guiObject_t *)&gui->x);
-            GUI_Redraw((guiObject_t *)&gui->y);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_BOX_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->box[i]) {
-            selected_x = pc.box[i].pos.x;
-            selected_y = pc.box[i].pos.y;
-            GUI_Redraw((guiObject_t *)&gui->x);
-            GUI_Redraw((guiObject_t *)&gui->y);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_BAR_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->bar[i]) {
-            selected_x = pc.bar[i].pos.x;
-            selected_y = pc.bar[i].pos.y;
-            GUI_Redraw((guiObject_t *)&gui->x);
-            GUI_Redraw((guiObject_t *)&gui->y);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->tgl[i]) {
-            selected_x = pc.tgl[i].pos.x;
-            selected_y = pc.tgl[i].pos.y;
-            GUI_Redraw((guiObject_t *)&gui->x);
-            GUI_Redraw((guiObject_t *)&gui->y);
-            return;
-        }
-    }
+    int idx = guielem_idx(obj);
+    selected_x = ELEM_X(pc.elem[idx]);
+    selected_y = ELEM_Y(pc.elem[idx]);
+    GUI_Redraw((guiObject_t *)&gui->x);
+    GUI_Redraw((guiObject_t *)&gui->y);
 }
 
 void move_elem()
 {
-    int i;
     guiObject_t *obj = GUI_GetSelected();
-    if (obj == (guiObject_t *)&gui->modelico) {
-        pc.modelico.pos.x = selected_x;
-        pc.modelico.pos.y = selected_y;
-        draw_elements();
-        select_for_move((guiLabel_t *)obj);
+    if ((guiLabel_t *)obj < gui->elem)
         return;
-    }
-    for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->trim[i]) {
-            pc.trim[i].pos.x = selected_x;
-            pc.trim[i].pos.y = selected_y;
-            draw_elements();
-            select_for_move((guiLabel_t *)obj);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_BOX_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->box[i]) {
-            pc.box[i].pos.x = selected_x;
-            pc.box[i].pos.y = selected_y;
-            draw_elements();
-            select_for_move((guiLabel_t *)obj);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_BAR_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->bar[i]) {
-            pc.bar[i].pos.x = selected_x;
-            pc.bar[i].pos.y = selected_y;
-            draw_elements();
-            select_for_move((guiLabel_t *)obj);
-            return;
-        }
-    }
-    for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-        if (obj == (guiObject_t *)&gui->tgl[i]) {
-            pc.tgl[i].pos.x = selected_x;
-            pc.tgl[i].pos.y = selected_y;
-            draw_elements();
-            select_for_move((guiLabel_t *)obj);
-            return;
-        }
-    }
+    int idx = guielem_idx(obj);
+    ELEM_SET_X(pc.elem[idx], selected_x);
+    ELEM_SET_Y(pc.elem[idx], selected_y);
+    draw_elements();
+    select_for_move((guiLabel_t *)obj);
 }
 
 void select_for_move(guiLabel_t *obj)
@@ -399,6 +299,7 @@ void select_for_move(guiLabel_t *obj)
 
 void touch_cb(guiObject_t *obj, s8 press, const void *data)
 {
+    (void)data;
     if(press < 0) {
         select_for_move((guiLabel_t *)obj);
     }
@@ -406,6 +307,8 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
 
 static void dialog_ok_cb(u8 state, void * data)
 {
+    (void)state;
+    (void)data;
     guiObject_t *obj = (guiObject_t *)selected_for_move;
     draw_elements();
     if(OBJ_IS_USED(obj))
@@ -427,68 +330,18 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
     return (guiObject_t *)&gui->dlgbut[relrow];
 }
 
-static int get_elem_type(guiLabel_t *obj)
-{
-    if (obj == &gui->modelico)
-        return MODELICO_ELEM;
-    if (obj >= gui->trim && obj < gui->trim + NUM_TRIM_ELEMS)
-        return HTRIM_ELEM;
-    if (obj >= gui->box && obj < gui->box + NUM_BOX_ELEMS)
-        return SMALLBOX_ELEM;
-    if (obj >= gui->bar && obj < gui->bar + NUM_BAR_ELEMS)
-        return BAR_ELEM;
-    if (obj >= gui->tgl && obj < gui->tgl + NUM_TOGGLE_ELEMS)
-        return TOGGLE_ELEM;
-    return LAST_ELEMTYPE;
-}
-
 static void dlgbut_cb(struct guiObject *obj, const void *data)
 {
+    (void)obj;
     int idx = (long)data;
-    int i;
     //Remove object
-    switch (get_elem_type(selected_for_move)) {
-        case SMALLBOX_ELEM:
-        case BIGBOX_ELEM:
-            pc.box[idx].pos.y = 0;
-            for(i = idx+1; i < NUM_BOX_ELEMS; i++) {
-                pc.box[i-1] = pc.box[i];
-                if (! pc.box[i].pos.y)
-                    break;
-            }
-            selected_for_move = &gui->box[0];
-            break;
-        case BAR_ELEM:
-            pc.bar[idx].pos.y = 0;
-            for(i = idx+1; i < NUM_BAR_ELEMS; i++) {
-                pc.bar[i-1] = pc.bar[i];
-                if (! pc.bar[i].pos.y)
-                    break;
-            }
-            selected_for_move = &gui->bar[0];
-            break;
-        case TOGGLE_ELEM:
-            pc.tgl[idx].pos.y = 0;
-            for(i = idx+1; i < NUM_TOGGLE_ELEMS; i++) {
-                pc.tgl[i-1] = pc.tgl[i];
-                if (! pc.tgl[i].pos.y)
-                    break;
-            }
-            selected_for_move = &gui->tgl[0];
-            break;
-        case HTRIM_ELEM:
-        case VTRIM_ELEM:
-            pc.trim[idx].pos.y = 0;
-            for(i = idx+1; i < NUM_TRIM_ELEMS; i++) {
-                pc.trim[i-1] = pc.trim[i];
-                if (! pc.trim[i].pos.y)
-                    break;
-            }
-            selected_for_move = &gui->trim[0];
-            break;
-        case MODELICO_ELEM:
-            pc.modelico.pos.y = 0;
-            break;
+    int type = ELEM_TYPE(pc.elem[idx]);
+    ELEM_SET_Y(pc.elem[idx], 0);
+    idx = MAINPAGE_FindNextElem(type, 0);
+    if (idx >= 0) {
+        selected_for_move = &gui->elem[0];
+    } else {
+        selected_for_move = NULL;
     }
     //close the dialog and reopen with new elements
     GUI_RemoveHierObjects((guiObject_t *)&gui->dialog);
@@ -497,38 +350,38 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
 
 const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
 {
+    (void)obj;
     int idx = (long)data;
-    int type = get_elem_type(selected_for_move);
+    int type = ELEM_TYPE(pc.elem[idx]);
     switch (type) {
-        case SMALLBOX_ELEM:
-        case BIGBOX_ELEM:
+        case ELEM_SMALLBOX:
+        case ELEM_BIGBOX:
         {
-            int old_val = pc.box[idx].src;
-            pc.box[idx].src = GUI_TextSelectHelper(pc.box[idx].src, 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
-            if (pc.box[idx].src) {
-                if (pc.box[idx].src <= NUM_TIMERS)
-                    return TIMER_Name(tmp, pc.box[idx].src - 1);
-                else if( pc.box[idx].src - NUM_TIMERS <= NUM_TELEM)
-                    return TELEMETRY_Name(tmp, pc.box[idx].src - NUM_TIMERS);
+            pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
+            if (pc.elem[idx].src) {
+                if (pc.elem[idx].src <= NUM_TIMERS)
+                    return TIMER_Name(tmp, pc.elem[idx].src - 1);
+                else if( pc.elem[idx].src - NUM_TIMERS <= NUM_TELEM)
+                    return TELEMETRY_Name(tmp, pc.elem[idx].src - NUM_TIMERS);
             }
-            return INPUT_SourceName(tmp, pc.box[idx].src ? pc.box[idx].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
+            return INPUT_SourceName(tmp, pc.elem[idx].src ? pc.elem[idx].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
         }
-        case BAR_ELEM:
-            pc.bar[idx].src = GUI_TextSelectHelper(pc.bar[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
-            return INPUT_SourceName(tmp, pc.bar[idx].src ? pc.bar[idx].src + NUM_INPUTS : 0);
-        case TOGGLE_ELEM:
+        case ELEM_BAR:
+            pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
+            return INPUT_SourceName(tmp, pc.elem[idx].src ? pc.elem[idx].src + NUM_INPUTS : 0);
+        case ELEM_TOGGLE:
         {
-            int val = MIXER_SRC(pc.tgl[idx].src);
+            int val = MIXER_SRC(pc.elem[idx].src);
             int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, NULL);
             newval = INPUT_GetAbbrevSource(val, newval, dir);
             if (val != newval) {
                 val = newval;
-                pc.tgl[idx].src = val;
+                pc.elem[idx].src = val;
             }
-            return INPUT_SourceNameAbbrevSwitch(tmp, pc.tgl[idx].src);
+            return INPUT_SourceNameAbbrevSwitch(tmp, pc.elem[idx].src);
         }
-        case HTRIM_ELEM:
-        case VTRIM_ELEM:
+        case ELEM_HTRIM:
+        case ELEM_VTRIM:
             sprintf(tmp, "%d", idx);
             return tmp;
     }
@@ -537,76 +390,36 @@ const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
 
 const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
 {
+    (void)obj;
+    (void)data;
     return _tr("Delete");
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int type = (long)data;
+    long elemidx = elem_rel_to_abs(type, absrow);
     #define X DIALOG_X + SCROLLABLE_X
-    if (type == MODELICO_ELEM) {
+    if (type == ELEM_MODELICO) {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
     } else {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow+1));
-        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)(long)(absrow));
+        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
     }
-    GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)(long)(absrow));
+    GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
     return 1;
 }
 
 static void show_config()
 {
-    int i;
     int count = 0;
     int row_idx = 0;
-    long type = get_elem_type(selected_for_move);
-    switch (type) {
-        case MODELICO_ELEM:
-            row_idx = 0;
-            count = pc.modelico.pos.y ? 1 : 0;
-            break;
-        case SMALLBOX_ELEM:
-        case BIGBOX_ELEM:
-            for(i = 0; i < NUM_BOX_ELEMS; i++) {
-                if (! pc.box[i].pos.y) {
-                    count = i;
-                    break;
-                }
-                if (selected_for_move == &gui->box[i])
-                   row_idx = i;
-            }
-            break;
-        case BAR_ELEM:
-            for(i = 0; i < NUM_BAR_ELEMS; i++) {
-                if (! pc.bar[i].pos.y) {
-                    count = i;
-                    break;
-                }
-                if (selected_for_move == &gui->bar[i])
-                   row_idx = i;
-            }
-            break;
-        case TOGGLE_ELEM:
-            for(i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-                if (! pc.tgl[i].pos.y) {
-                    count = i;
-                    break;
-                }
-                if (selected_for_move == &gui->tgl[i])
-                   row_idx = i;
-            }
-            break;
-        case HTRIM_ELEM:
-        case VTRIM_ELEM:
-            for(i = 0; i < NUM_TRIM_ELEMS; i++) {
-                if (! pc.trim[i].pos.y) {
-                    count = i;
-                    break;
-                }
-                if (selected_for_move == &gui->trim[i])
-                   row_idx = i;
-            }
-            break;
+    long type;
+    if(selected_for_move) {
+        int selected_idx = guielem_idx((guiObject_t *)selected_for_move);
+        type = ELEM_TYPE(pc.elem[selected_idx]);
+        row_idx = elem_abs_to_rel(selected_idx);
+        count = elem_get_count(type);
     }
     if (! count) {
         dialog_ok_cb(1, NULL);
@@ -625,6 +438,7 @@ static void show_config()
     
 static u8 _action_cb(u32 button, u8 flags, void *data)
 {
+    (void)data;
     if(! GUI_GetSelected() || ! selected_for_move || GUI_IsModal())
         return 0;
     if(CHAN_ButtonIsPressed(button, BUT_EXIT)) {

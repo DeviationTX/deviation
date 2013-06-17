@@ -6,9 +6,7 @@ struct main_page {
     struct buttonAction action;
     u8 ignore_release;
     s16 battery;
-    s8 trims[6];
-    s32 boxval[8];
-    s16 barval[8];
+    s32 elem[NUM_ELEMS];
     char tmpstr[8];
 };
 

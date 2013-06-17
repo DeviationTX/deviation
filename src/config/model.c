@@ -373,6 +373,19 @@ static void tglico_set_num_pos(struct Model *m, int idx)
     m->pagecfg.tglico[idx][2] = 0;
 }
 
+static void create_element(struct elem *elem, int type, int x, int y, int src, int e0, int e1, int e2)
+{
+    ELEM_SET_X(*elem, x);
+    ELEM_SET_Y(*elem, y);
+    ELEM_SET_TYPE(*elem, type);
+    elem->src = src;
+    elem->extra[0] = e0;
+    elem->extra[1] = e1;
+    elem->extra[2] = e2;
+    printf("%-5d : %5d %5d %5d %5d %5d %5d\n", type, x, y, src, e0, e1, e2);
+    printf("%-5d : %5d %5d (%08x) %d\n\n", ELEM_TYPE(*elem), ELEM_X(*elem), ELEM_Y(*elem), elem, Model.pagecfg2.elem[0].src);
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     CLOCK_ResetWatchdog();
@@ -927,100 +940,89 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
     }
     if (MATCH_SECTION(SECTION_GUI)) {
+        int idx;
+        for (idx = 0; idx < NUM_ELEMS; idx++) {
+            if (! ELEM_USED(Model.pagecfg2.elem[idx]))
+                break;
+        }
+        if (idx == NUM_ELEMS) {
+            printf("No free element available (max = %d)\n", NUM_ELEMS);
+            return 1;
+        }
         if (MATCH_KEY(MODEL_ICON)) {
             s16 data[2];
             int count = parse_int_list(value, data, 2, S16);
             if (count == 2)
-                m->pagecfg2.modelico = (struct elem_modelico){.pos = {data[0], data[1]}};
+                create_element(&m->pagecfg2.elem[idx], ELEM_MODELICO, data[0], data[1], 0, 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_TRIM)) {
-            for (i = 0; i < NUM_TRIM_ELEMS; i++) {
-                if (m->pagecfg2.trim[i].pos.y != 0)
-                    continue;
-                s16 data[4];
-                //x, y, is_vert, src
-                int count = parse_int_list(value, data, 4, S16);
-                if (count == 4)
-                    m->pagecfg2.trim[i] = (struct elem_trim){.pos = {data[0], data[1]}, .src = data[3], .is_vert = data[2]};
-                break;
-            }
+            s16 data[4];
+            //x, y, is_vert, src
+            int count = parse_int_list(value, data, 4, S16);
+            if (count == 4)
+                create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_VTRIM : ELEM_HTRIM, data[0], data[1], data[3], 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_BOX)) {
-            for (int j = 0; j < NUM_BOX_ELEMS; j++) {
-                if (m->pagecfg2.box[j].pos.y != 0)
-                    continue;
-                s16 data[3];
-                s16 src = -1;
-                char str[20];
-                //x, y, type (1=big, 0=small), src
-                int count = 3;
-                const char *ptr = parse_partial_int_list(value, data, &count, S16);
-                if (count)
+            s16 data[3];
+            s16 src = -1;
+            char str[20];
+            //x, y, type (1=big, 0=small), src
+            int count = 3;
+            const char *ptr = parse_partial_int_list(value, data, &count, S16);
+            if (count)
+                return 1;
+            ptr++;
+            for(i = 0; i < NUM_TIMERS; i++) {
+                if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+                    src = i + 1;
                     break;
-                ptr++;
-                for(i = 0; i < NUM_TIMERS; i++) {
-                    if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
-                        src = i + 1;
+                }
+            }
+            if (src == -1) {
+                for(i = 0; i < NUM_TELEM; i++) {
+                    if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
+                        src = i + 1 + NUM_TIMERS;
                         break;
                     }
                 }
-                if (src == -1) {
-                    for(i = 0; i < NUM_TELEM; i++) {
-                        if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
-                            src = i + 1 + NUM_TIMERS;
-                            break;
-                        }
-                    }
-                }
-                if (src == -1) {
-                    u8 newsrc = get_source(section, ptr);
-                    if(newsrc >= NUM_INPUTS) {
-                        src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
-                    }
-                }
-                if (src != -1)
-                    m->pagecfg2.box[j] = (struct elem_box){.pos = {data[0], data[1]}, .src = src, .type = data[2]};
-                break;
             }
+            if (src == -1) {
+                u8 newsrc = get_source(section, ptr);
+                if(newsrc >= NUM_INPUTS) {
+                    src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+                }
+            }
+            if (src != -1)
+                create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_BAR)) {
-            for (i = 0; i < NUM_BAR_ELEMS; i++) {
-                if (m->pagecfg2.bar[i].pos.y != 0)
-                    continue;
-                s16 data[2];
-                int count = 2;
-                //x, y, src
-                const char *ptr = parse_partial_int_list(value, data, &count, S16);
-                if(count)
-                    break;
-                u8 src = get_source(section, ptr+1);
-                if (src > NUM_INPUTS)
-                    m->pagecfg2.bar[i] = (struct elem_bar){.pos = {data[0], data[1]}, .src = src-NUM_INPUTS};
-                break;
-            }
+            s16 data[2];
+            int count = 2;
+            //x, y, src
+            const char *ptr = parse_partial_int_list(value, data, &count, S16);
+            if(count)
+                return 1;
+            u8 src = get_source(section, ptr+1);
+            if (src > NUM_INPUTS)
+                create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_TOGGLE)) {
-            for (i = 0; i < NUM_TOGGLE_ELEMS; i++) {
-                if (m->pagecfg2.tgl[i].pos.y != 0)
-                    continue;
-                s16 data[5];
-                int count = 5;
-                //x, y, tgl0, tgl1, tgl2, src
-                const char *ptr = parse_partial_int_list(value, data, &count, S16);
-                if(count)
-                    break;
-                for (int j = 0; j <= NUM_SOURCES; j++) {
-                    char cmp[10];
-                    if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
-                        m->pagecfg2.tgl[i] = (struct elem_toggle) {.pos = {data[0], data[1]}, .src = j, .ico = {data[2], data[3], data[4]}};
-                        break;
-                    }
+            s16 data[5];
+            int count = 5;
+            //x, y, tgl0, tgl1, tgl2, src
+            const char *ptr = parse_partial_int_list(value, data, &count, S16);
+            if(count)
+                return 1;
+            for (int j = 0; j <= NUM_SOURCES; j++) {
+                char cmp[10];
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
+                    create_element(&m->pagecfg2.elem[idx], ELEM_TOGGLE, data[0], data[1], j, data[2], data[3], data[4]);
+                    return 1;
                 }
-                break;
             }
             return 1;
         }
@@ -1357,64 +1359,46 @@ u8 CONFIG_WriteModel(u8 model_num) {
         }
     }
     fprintf(fh, "[%s]\n", SECTION_GUI);
-    for(idx = 0; idx < NUM_BOX_ELEMS; idx++) {
-        if (Model.pagecfg2.box[idx].pos.y == 0)
+    for(idx = 0; idx < NUM_ELEMS; idx++) {
+        if (! ELEM_USED(Model.pagecfg2.elem[idx]))
             break;
-        int src = Model.pagecfg2.box[idx].src;
-        if(src && src <= NUM_TIMERS) {
-            TIMER_Name(file, src-1);
-        } else if(src && src - NUM_TIMERS <= NUM_TELEM) {
-            TELEMETRY_Name(file, src-NUM_TIMERS);
-        } else {
-            if (src)
-                src += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
-            INPUT_SourceName(file, src);
+        int src = Model.pagecfg2.elem[idx].src;
+        int x = ELEM_X(Model.pagecfg2.elem[idx]);
+        int y = ELEM_Y(Model.pagecfg2.elem[idx]);
+        int type = ELEM_TYPE(Model.pagecfg2.elem[idx]);
+        switch(type) {
+            case ELEM_SMALLBOX:
+            case ELEM_BIGBOX:
+                if(src && src <= NUM_TIMERS) {
+                    TIMER_Name(file, src-1);
+                } else if(src && src - NUM_TIMERS <= NUM_TELEM) {
+                    TELEMETRY_Name(file, src-NUM_TIMERS);
+                } else {
+                    if (src)
+                        src += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
+                    INPUT_SourceName(file, src);
+                }
+                fprintf(fh, "%s=%d,%d,%d,%s\n", GUI_BOX, x, y, type == ELEM_BIGBOX ? 1 : 0, file);
+                break;
+            case ELEM_BAR:
+                src += NUM_INPUTS;
+                fprintf(fh, "%s=%d,%d,%s\n", GUI_BAR, x, y, INPUT_SourceName(file, src));
+                break;
+            case ELEM_TOGGLE:
+                fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n", GUI_TOGGLE, x, y,
+                        Model.pagecfg2.elem[idx].extra[0],
+                        Model.pagecfg2.elem[idx].extra[1],
+                        INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.elem[idx].extra[2],
+                        INPUT_SourceNameAbbrevSwitch(file, src));
+                break;
+            case ELEM_HTRIM:
+            case ELEM_VTRIM:
+                fprintf(fh, "%s=%d,%d,%d,%d\n", GUI_TRIM, x, y, type == ELEM_VTRIM ? 1 : 0, src);
+                break;
+            case ELEM_MODELICO:
+                fprintf(fh, "%s=%d,%d\n", MODEL_ICON, x, y);
+                break;
         }
-        fprintf(fh, "%s=%d,%d,%d,%s\n",
-                GUI_BOX,
-                Model.pagecfg2.box[idx].pos.x,
-                Model.pagecfg2.box[idx].pos.y,
-                Model.pagecfg2.box[idx].type,
-                file);
-    }
-    for(idx = 0; idx < NUM_BAR_ELEMS; idx++) {
-        if (Model.pagecfg2.bar[idx].pos.y == 0)
-            break;
-        int src = Model.pagecfg2.bar[idx].src + NUM_INPUTS;
-        fprintf(fh, "%s=%d,%d,%s\n",
-                GUI_BAR,
-                Model.pagecfg2.bar[idx].pos.x,
-                Model.pagecfg2.bar[idx].pos.y,
-                INPUT_SourceName(file, src));
-    }
-    for(idx = 0; idx < NUM_TOGGLE_ELEMS; idx++) {
-        if (Model.pagecfg2.tgl[idx].pos.y == 0)
-            break;
-        int src = Model.pagecfg2.tgl[idx].src;
-        fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n",
-                GUI_TOGGLE,
-                Model.pagecfg2.tgl[idx].pos.x,
-                Model.pagecfg2.tgl[idx].pos.y,
-                Model.pagecfg2.tgl[idx].ico[0],
-                Model.pagecfg2.tgl[idx].ico[1],
-                INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.tgl[idx].ico[2],
-                INPUT_SourceNameAbbrevSwitch(file, src));
-    }
-    for(idx = 0; idx < NUM_TRIM_ELEMS; idx++) {
-        if (Model.pagecfg2.trim[idx].pos.y == 0)
-            break;
-        fprintf(fh, "%s=%d,%d,%d,%d\n",
-                GUI_TRIM,
-                Model.pagecfg2.trim[idx].pos.x,
-                Model.pagecfg2.trim[idx].pos.y,
-                Model.pagecfg2.trim[idx].is_vert,
-                Model.pagecfg2.trim[idx].src);
-    }
-    if (Model.pagecfg2.modelico.pos.y != 0) {
-        fprintf(fh, "%s=%d,%d\n",
-                MODEL_ICON,
-                Model.pagecfg2.modelico.pos.x,
-                Model.pagecfg2.modelico.pos.y);
     }
     CONFIG_EnableLanguage(1);
     fclose(fh);
