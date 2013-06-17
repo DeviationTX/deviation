@@ -537,6 +537,10 @@ u8 handle_buttons(u32 button, u8 flags, void *data)
                 return 1;
             }
         } else if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            if (objDIALOG) {
+                DialogClose(objDIALOG, 0);
+                return 1;
+            }
             OBJ_SET_DIRTY(objSELECTED, 1);
             objSELECTED = NULL;
             if (select_notify)

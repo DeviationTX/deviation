@@ -25,8 +25,19 @@ void exec_callbacks(u32, enum ButtonFlags);
 u8 BUTTON_RegisterCallback(buttonAction_t *action, u32 button, u8 flags,
                  u8 (*callback)(u32 button, u8 flags, void *data), void *data)
 {
-    buttonAction_t *ptr = buttonHEAD;
-
+    buttonAction_t *ptr;
+    //Ensure 'action' is not already in the linked list
+    if (buttonHEAD == action) {
+        buttonHEAD = action->next;
+    } else if(buttonHEAD) {
+        for(ptr = buttonHEAD; ptr->next; ptr = ptr->next) {
+            if(ptr->next == action) {
+                ptr->next = ptr->next->next;
+                break;
+            }
+        }
+    }
+    ptr = buttonHEAD;
     if (! (flags & BUTTON_PRIORITY)) {
         while(ptr) {
             if((ptr->button & button) && (ptr->flags & flags) & ! (ptr->flags & BUTTON_PRIORITY)) {

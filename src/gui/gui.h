@@ -316,6 +316,7 @@ u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type);
 
 void GUI_DrawDialog(struct guiObject *obj);
 void GUI_DialogDrawBackground(u16 x, u16 y, u16 w, u16 h);
+void DialogClose(struct guiObject *obj, u8 state);
 
 void GUI_DrawImage(struct guiObject *obj);
 u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type);
