@@ -83,9 +83,9 @@ void PAGE_MainLayoutInit(int page)
             .style = LABEL_FILL};
     gui->desc[1].font = TINY_FONT.font; //Special case for trims
     GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
-    GUI_CreateLabel(&gui->xlbl, 136, 12, NULL, DEFAULT_FONT, _tr("X"));
+    GUI_CreateLabel(&gui->xlbl, 136, 12, NULL, TITLE_FONT, _tr("X"));
     GUI_CreateTextSelect(&gui->x, 144, 12, TEXTSELECT_64, NULL, xpos_cb, NULL);
-    GUI_CreateLabel(&gui->ylbl, 212, 12, NULL, DEFAULT_FONT, _tr("Y"));
+    GUI_CreateLabel(&gui->ylbl, 212, 12, NULL, TITLE_FONT, _tr("Y"));
     GUI_CreateTextSelect(&gui->y, 220, 12, TEXTSELECT_64, NULL, ypos_cb, NULL);
 
     GUI_SelectionNotify(notify_cb);
@@ -243,7 +243,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
         selected_x = x;
         move_elem();
     }
-    sprintf(tmp, "x:%d", selected_x);
+    sprintf(tmp, "%d", selected_x);
     return tmp;
 }
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
@@ -255,7 +255,7 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
         selected_y = y;
         move_elem();
     }
-    sprintf(tmp, "y:%d", selected_y);
+    sprintf(tmp, "%d", selected_y);
     return tmp;
     return "0";
 }
