@@ -9,6 +9,7 @@ enum Icons {
     ICON_CHANTEST,
     ICON_MODELICO,
     ICON_ORDER,
+    ICON_PLUS,
     ICON_LAST,
 };
 

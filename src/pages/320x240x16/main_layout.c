@@ -27,6 +27,7 @@ static void draw_elements();
 static const char *label_cb(guiObject_t *obj, const void *data);
 static const char *boxlabel_cb(guiObject_t *obj, const void *data);
 static const char *newelem_cb(guiObject_t *obj, int dir, void *data);
+static void add_dlg_cb(guiObject_t *obj, const void *data);
 static void newelem_press_cb(guiObject_t *obj, void *data);
 static const char *xpos_cb(guiObject_t *obj, int dir, void *data);
 static const char *ypos_cb(guiObject_t *obj, int dir, void *data);
@@ -62,10 +63,10 @@ void PAGE_MainLayoutInit(int page)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY, _action_cb, NULL);
-     //if (Model.mixer_mode == MIXER_STANDARD)
+     if (Model.mixer_mode == MIXER_STANDARD)
          PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
-     //else
-     //    PAGE_ShowHeader(NULL);
+     else
+         PAGE_ShowHeader(NULL);
     long_press = 0;
     newelem = 0;
     selected_x = 0;
@@ -84,11 +85,12 @@ void PAGE_MainLayoutInit(int page)
             .outline_color = 0,
             .style = LABEL_FILL};
     gui->desc[1].font = TINY_FONT.font; //Special case for trims
-    GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
-    GUI_CreateLabel(&gui->xlbl, 136, 12, NULL, TITLE_FONT, _tr("X"));
-    GUI_CreateTextSelect(&gui->x, 144, 12, TEXTSELECT_64, NULL, xpos_cb, NULL);
-    GUI_CreateLabel(&gui->ylbl, 212, 12, NULL, TITLE_FONT, _tr("Y"));
-    GUI_CreateTextSelect(&gui->y, 220, 12, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_CreateIcon(&gui->newelem, 36, 0, &icons[ICON_PLUS], add_dlg_cb, NULL);
+    //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
+    GUI_CreateLabel(&gui->xlbl, 80, 12, NULL, TITLE_FONT, _tr("X"));
+    GUI_CreateTextSelect(&gui->x, 88, 12, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_CreateLabel(&gui->ylbl, 164, 12, NULL, TITLE_FONT, _tr("Y"));
+    GUI_CreateTextSelect(&gui->y, 172, 12, TEXTSELECT_64, NULL, ypos_cb, NULL);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
@@ -337,6 +339,36 @@ static void dialog_ok_cb(u8 state, void * data)
         select_for_move((guiLabel_t *)obj);
 }
 
+static void add_dlg_ok_cb(u8 state, void * data)
+{
+    if (state == 1) {
+        newelem_press_cb(NULL, NULL);
+    } else {
+        dialog_ok_cb(state, data);
+    }
+}
+
+#define ADD_DIALOG_W 200
+#define ADD_DIALOG_H 120
+static void add_dlg_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    GUI_CreateDialog(&gui->dialog,
+        (LCD_WIDTH - ADD_DIALOG_W) / 2,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 40,
+        ADD_DIALOG_W,
+        ADD_DIALOG_H,
+        _tr("Add Element"), NULL, add_dlg_ok_cb, dtOkCancel, "");
+    GUI_CreateLabel(&gui->dlglbl[0],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
+        NULL, DEFAULT_FONT, _tr("Type"));
+    GUI_CreateTextSelect(&gui->dlgts[0],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 128,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
+        TEXTSELECT_128, NULL, newelem_cb, NULL);
+}
 #define DIALOG_X 20
 #define DIALOG_Y 10
 #define SCROLLABLE_X 10
