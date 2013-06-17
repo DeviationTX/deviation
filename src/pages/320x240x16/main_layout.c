@@ -190,7 +190,7 @@ const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(tmp, "%d", idx);
+    sprintf(tmp, "%d", idx+1);
     return tmp;
 }
 
