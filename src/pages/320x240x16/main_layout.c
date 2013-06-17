@@ -243,7 +243,7 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
         selected_x = x;
         move_elem();
     }
-    sprintf(tmp, "%d", selected_x);
+    sprintf(tmp, "x:%d", selected_x);
     return tmp;
 }
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
@@ -255,7 +255,7 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
         selected_y = y;
         move_elem();
     }
-    sprintf(tmp, "%d", selected_y);
+    sprintf(tmp, "y:%d", selected_y);
     return tmp;
     return "0";
 }
@@ -396,7 +396,8 @@ const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         }
         case ELEM_HTRIM:
         case ELEM_VTRIM:
-            sprintf(tmp, "%d", idx);
+            pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
+            sprintf(tmp, "%s%d", _tr("Trim"),pc.elem[idx].src + 1);
             return tmp;
     }
     return "";
