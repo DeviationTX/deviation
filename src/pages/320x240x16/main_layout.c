@@ -474,7 +474,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (type == ELEM_TOGGLE) {
             press_cb = toggle_press_cb;
         }
-        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow+1));
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, TEXT_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, press_cb, dlgts_cb, (void *)elemidx);
     }
     GUI_CreateButton(&gui->dlgbut[relrow], X + 15 + 100, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
@@ -504,7 +504,7 @@ static void show_config()
          DIALOG_X + SCROLLABLE_X, 40 + DIALOG_Y + SCROLLABLE_Y,
          LCD_WIDTH - 2*DIALOG_X - 2*SCROLLABLE_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y - 2 * SCROLLABLE_Y,
          TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, (void *)type);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, (row_idx << 8) | 2 * row_idx));
+    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }
     
 static u8 _action_cb(u32 button, u8 flags, void *data)
