@@ -113,7 +113,7 @@ void PAGE_MainInit(int page)
     if (! MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
         GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
-    GUI_CreateLabelBox(&gui->name, 96, 8, 128, 24, &MODELNAME_FONT,
+    GUI_CreateLabelBox(&gui->name, (LCD_WIDTH-128)/2, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
     for (int i = 0; i < NUM_ELEMS; i++) {
@@ -170,14 +170,14 @@ void PAGE_MainInit(int page)
     //Battery
     mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        GUI_CreateImage(&gui->batt.ico, 270,1,48,22,"media/bat.bmp");
+        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - 50,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(&gui->batt.lbl, 275,10, 0, 0,
+        GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - 45,10, 0, 0,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(&gui->pwr, 225,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
+    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - 95,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
 }
 
 void PAGE_MainExit()

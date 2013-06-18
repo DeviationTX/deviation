@@ -180,9 +180,9 @@ void PAGE_ShowHeader(const char *title)
     GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
-    obj = GUI_CreateIcon(&gui->previco, 256, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
     GUI_SetSelectable(obj, 0);
-    obj = GUI_CreateIcon(&gui->nextico, 288, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
     GUI_SetSelectable(obj, 0);
     exit_cmd = changepage_cb;
     exit_data = NULL;

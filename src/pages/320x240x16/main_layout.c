@@ -87,10 +87,10 @@ void PAGE_MainLayoutInit(int page)
     gui->desc[1].font = TINY_FONT.font; //Special case for trims
     GUI_CreateIcon(&gui->newelem, 36, 0, &icons[ICON_PLUS], add_dlg_cb, NULL);
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
-    GUI_CreateLabel(&gui->xlbl, 80, 12, NULL, TITLE_FONT, _tr("X"));
-    GUI_CreateTextSelect(&gui->x, 88, 12, TEXTSELECT_64, NULL, xpos_cb, NULL);
-    GUI_CreateLabel(&gui->ylbl, 164, 12, NULL, TITLE_FONT, _tr("Y"));
-    GUI_CreateTextSelect(&gui->y, 172, 12, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_CreateLabel(&gui->xlbl, 80, 10, NULL, TITLE_FONT, _tr("X"));
+    GUI_CreateTextSelect(&gui->x, 88, 10, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_CreateLabel(&gui->ylbl, 164, 10, NULL, TITLE_FONT, _tr("Y"));
+    GUI_CreateTextSelect(&gui->y, 172, 10, TEXTSELECT_64, NULL, ypos_cb, NULL);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
