@@ -95,8 +95,10 @@ void PAGE_MainEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < NUM_ELEMS; i++) {
-        if (! OBJ_IS_USED(&gui->elem[i]))
+        if (! ELEM_USED(pc.elem[i]))
             break;
+        if (! OBJ_IS_USED(&gui->elem[i]))
+            continue;
         int src = pc.elem[i].src;
         int type = ELEM_TYPE(pc.elem[i]);
         switch(type) {

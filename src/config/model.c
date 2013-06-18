@@ -992,8 +992,9 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
                 }
             }
-            if (src != -1)
-                create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
+            if (src == -1)
+                src = 0;
+            create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_BAR)) {
@@ -1004,8 +1005,9 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             if(count)
                 return 1;
             u8 src = get_source(section, ptr+1);
-            if (src > NUM_INPUTS)
-                create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
+            if (src < NUM_INPUTS)
+                src = 0;
+            create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
             return 1;
         }
         if (MATCH_KEY(GUI_TOGGLE)) {

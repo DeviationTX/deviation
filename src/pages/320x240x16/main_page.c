@@ -137,6 +137,8 @@ void PAGE_MainInit(int page)
             case ELEM_BIGBOX:
             {
                 int src = pc.elem[i].src;
+                if (src == 0)
+                    continue;
                 mp->elem[i] = get_boxval(src);
                 int font = ((src <= NUM_TIMERS && mp->elem[i] < 0)
                            || ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
@@ -149,6 +151,8 @@ void PAGE_MainInit(int page)
             case ELEM_BAR:
             {
                 int src = pc.elem[i].src;
+                if (src == 0)
+                    continue;
                 mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
                 GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                            bar_cb, (void *)((long)src));

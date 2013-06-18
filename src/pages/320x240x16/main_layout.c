@@ -183,12 +183,15 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    if (pc.elem[i].src <= NUM_TIMERS)
-        return TIMER_Name(tmp, pc.elem[i].src - 1);
-    else if( pc.elem[i].src - NUM_TIMERS <= NUM_TELEM)
+    if (pc.elem[i].src) {
+        if (pc.elem[i].src <= NUM_TIMERS)
+            return TIMER_Name(tmp, pc.elem[i].src - 1);
+        else if( pc.elem[i].src - NUM_TIMERS <= NUM_TELEM)
         return TELEMETRY_Name(tmp, pc.elem[i].src - NUM_TIMERS);
-    return INPUT_SourceName(tmp, pc.elem[i].src ? pc.elem[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
-    return tmp;
+    }
+    return INPUT_SourceName(tmp, pc.elem[i].src
+               ? pc.elem[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS
+               : 0);
 }
 const char *label_cb(guiObject_t *obj, const void *data)
 {
@@ -229,7 +232,7 @@ void newelem_press_cb(guiObject_t *obj, void *data)
     y = 1;
     GetElementSize(newelem, &w, &h);
     x = (LCD_WIDTH - w) / 2;
-    y = (((LCD_WIDTH - 40) - h) / 2) + 40;
+    y = (((LCD_HEIGHT - 40) - h) / 2) + 40;
     memset(&pc.elem[i], 0, sizeof(struct elem));
     ELEM_SET_X(pc.elem[i], x);
     ELEM_SET_Y(pc.elem[i], y);
@@ -418,13 +421,7 @@ const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_BIGBOX:
         {
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
-            if (pc.elem[idx].src) {
-                if (pc.elem[idx].src <= NUM_TIMERS)
-                    return TIMER_Name(tmp, pc.elem[idx].src - 1);
-                else if( pc.elem[idx].src - NUM_TIMERS <= NUM_TELEM)
-                    return TELEMETRY_Name(tmp, pc.elem[idx].src - NUM_TIMERS);
-            }
-            return INPUT_SourceName(tmp, pc.elem[idx].src ? pc.elem[idx].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS : 0);
+            return boxlabel_cb(NULL, data);
         }
         case ELEM_BAR:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
