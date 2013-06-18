@@ -76,7 +76,9 @@ struct elem {
 //#define ELEM_TRIM_SET_VERT(elem, val) ((*((u32 *)((elem).blob)) & ~(1 << 22)) | (val) << 22)
 //#define ELEM_BOX_SET_BIG(elem, val)   ((*((u32 *)((elem).blob)) & ~(1 << 22)) | (val) << 22)
 //NUM_TRIM_ELEMS + NUM_BOX_ELEMS + NUM_BAR_ELEMS + NUM_TOGGLE_ELEMS
-#define NUM_ELEMS (6 + 8 + 8 + 4 + 1)
+#ifndef NUM_ELEMS
+    #define NUM_ELEMS (6 + 8 + 8 + 4 + 1)
+#endif
 //#define NUM_TRIM_ELEMS 6
 //#define NUM_BOX_ELEMS 8
 //#define NUM_BAR_ELEMS 8

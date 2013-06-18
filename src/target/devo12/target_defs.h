@@ -28,6 +28,7 @@
 
 #define INP_HAS_CALIBRATION 10
 
+#define NUM_ELEMS 50
 /* Compute voltage from y = 0.001662x - 0.03988 */
 #define VOLTAGE_NUMERATOR 160
 #define VOLTAGE_OFFSET    268
