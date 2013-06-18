@@ -94,10 +94,7 @@ void GUI_DrawScrollable(struct guiObject *obj)
 void GUI_RemoveScrollableObjs(struct guiObject *obj)
 {
     struct guiScrollable *scrollable = (struct guiScrollable *)obj;
-    guiObject_t *head = objHEAD;
-    objHEAD = scrollable->head;
-    GUI_RemoveAllObjects();
-    objHEAD = head;
+    GUI_RemoveHierObjects(scrollable->head);
 }
 
 int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)
