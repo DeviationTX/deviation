@@ -77,6 +77,7 @@ struct mainlayout_obj {
     struct LabelDesc desc[5];
     //guiTextSelect_t newelem;
     guiButton_t newelem;
+    guiButton_t editelem;
     guiTextSelect_t x;
     guiTextSelect_t y;
     guiLabel_t xlbl;

@@ -59,9 +59,15 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     int button_width  = GUI_ButtonWidth(DIALOG_BUTTON);
     int button_height = GUI_ButtonHeight(DIALOG_BUTTON);
     switch (dgType) {
-    case dtOk: {
+    case dtOk:
+    case dtCancel:
+        {
         but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 1,
-                    DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
+                    DIALOG_BUTTON,
+                    dgType == dtOk ? dlgbut_strok_cb : dlgbut_strcancel_cb,
+                    0x0000,
+                    dgType == dtOk ? dlgbut_pressok_cb : dlgbut_presscancel_cb,
+                    obj);
         }
         break;
     case dtOkCancel: {

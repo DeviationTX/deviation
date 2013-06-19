@@ -13,7 +13,7 @@
 
 #define RGB888_to_RGB565(r, g, b) (((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3))
 enum DialogType {
-    dtOk, dtOkCancel, dtNone,
+    dtOk, dtCancel, dtOkCancel, dtNone,
 };
 
 enum BarGraphDirection {

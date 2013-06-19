@@ -28,7 +28,8 @@ static const char *label_cb(guiObject_t *obj, const void *data);
 static const char *boxlabel_cb(guiObject_t *obj, const void *data);
 static const char *newelem_cb(guiObject_t *obj, int dir, void *data);
 static void add_dlg_cb(guiObject_t *obj, const void *data);
-static void newelem_press_cb(guiObject_t *obj, void *data);
+static void cfg_cb(guiObject_t *obj, const void *data);
+static void newelem_press_cb(guiObject_t *obj, const void *data);
 static const char *xpos_cb(guiObject_t *obj, int dir, void *data);
 static const char *ypos_cb(guiObject_t *obj, int dir, void *data);
 static void touch_cb(guiObject_t *obj, s8 press, const void *data);
@@ -52,7 +53,6 @@ u8 newelem;
 u16 selected_x, selected_y, selected_w, selected_h;
 static u8 long_press;
 char tmp[20];
-u8 erase;
 
 void PAGE_MainLayoutInit(int page)
 {
@@ -88,12 +88,14 @@ void PAGE_MainLayoutInit(int page)
             .outline_color = 0,
             .style = LABEL_FILL};
     gui->desc[1].font = TINY_FONT.font; //Special case for trims
-    GUI_CreateIcon(&gui->newelem, 36, 0, &icons[ICON_PLUS], add_dlg_cb, NULL);
+    GUI_CreateIcon(&gui->newelem, 32, 0, &icons[ICON_PLUS], add_dlg_cb, NULL);
+    GUI_CreateIcon(&gui->editelem, 64, 0, &icons[ICON_OPTIONS], cfg_cb, NULL);
+    GUI_SetHidden((guiObject_t *)&gui->editelem, 1);
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
-    GUI_CreateLabel(&gui->xlbl, 80, 10, NULL, TITLE_FONT, _tr("X"));
-    GUI_CreateTextSelect(&gui->x, 88, 10, TEXTSELECT_64, NULL, xpos_cb, NULL);
-    GUI_CreateLabel(&gui->ylbl, 164, 10, NULL, TITLE_FONT, _tr("Y"));
-    GUI_CreateTextSelect(&gui->y, 172, 10, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_CreateLabel(&gui->xlbl, 80+18, 10, NULL, TITLE_FONT, _tr("X"));
+    GUI_CreateTextSelect(&gui->x, 88+18, 10, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_CreateLabel(&gui->ylbl, 164+16, 10, NULL, TITLE_FONT, _tr("Y"));
+    GUI_CreateTextSelect(&gui->y, 172+16, 10, TEXTSELECT_64, NULL, ypos_cb, NULL);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
@@ -150,6 +152,7 @@ void draw_elements()
     u16 x, y, w, h;
     int i;
     selected_for_move = NULL;
+    GUI_SetHidden((guiObject_t *)&gui->editelem, 1);
     guiObject_t *obj = gui->y.header.next;
     if (obj)
         GUI_RemoveHierObjects(obj);
@@ -221,7 +224,7 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
     return "";
 }
 
-void newelem_press_cb(guiObject_t *obj, void *data)
+void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
@@ -311,6 +314,7 @@ void select_for_move(guiLabel_t *obj)
         GUI_Redraw((guiObject_t *)selected_for_move);
     }
     selected_for_move = obj;
+    GUI_SetHidden((guiObject_t *)&gui->editelem, 0);
     selected_for_move->desc.font_color ^= 0xffff;
     selected_for_move->desc.fill_color ^= 0xffff;
 }
@@ -345,80 +349,55 @@ static void dialog_ok_cb(u8 state, void * data)
         select_for_move((guiLabel_t *)obj);
 }
 
-static void add_dlg_ok_cb(u8 state, void * data)
-{
-    if (state == 1) {
-        if(erase) {
-            for (int i = 0; i < NUM_ELEMS; i++) {
-                ELEM_SET_Y(pc.elem[i], 0);
-            }
-            dialog_ok_cb(state, data);
-        } else {
-            newelem_press_cb(NULL, NULL);
-        }
-    } else {
-        dialog_ok_cb(state, data);
-    }
-}
-
 static const char *add_dlgbut_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return data ? _tr("Erase All") : _tr("Load");
+    return data ? _tr("Add") : _tr("Load");
 }
 static void add_dlgbut_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     if(data) {
-        erase = 1;
-        GUI_SetHidden((guiObject_t *)&gui->dlgbut[2], 1);
-        GUI_SetHidden((guiObject_t *)&gui->dlglbl[2], 0);
     } else {
         PAGE_MainLayoutExit();
         MODELPage_ShowLoadSave(LOAD_LAYOUT, PAGE_MainLayoutInit);
     }
 }
 
-#define ADD_DIALOG_W 200
+#define ADD_DIALOG_W 268
 #define ADD_DIALOG_H 130
 static void add_dlg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    erase = 0;
     GUI_CreateDialog(&gui->dialog,
         (LCD_WIDTH - ADD_DIALOG_W) / 2,
         (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 40,
         ADD_DIALOG_W,
         ADD_DIALOG_H,
-        _tr("Add Element"), NULL, add_dlg_ok_cb, dtOkCancel, "");
+        _tr("Page Config"), NULL, dialog_ok_cb, dtCancel, "");
     GUI_CreateLabel(&gui->dlglbl[0],
         (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
         (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
         NULL, DEFAULT_FONT, _tr("Type"));
     GUI_CreateTextSelect(&gui->dlgts[0],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 128,
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 128 - 68,
         (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
         TEXTSELECT_128, NULL, newelem_cb, NULL);
+    GUI_CreateButton(&gui->dlgbut[0],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 64,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
+        BUTTON_64x16, add_dlgbut_str_cb, 0, newelem_press_cb, (void *)1L);
 
     GUI_CreateLabel(&gui->dlglbl[1],
         (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
-        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 40,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 50,
         NULL, DEFAULT_FONT, _tr("Template"));
     GUI_CreateButton(&gui->dlgbut[1],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
-        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 40,
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112 - 68,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 50,
         BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)0L);
-
-    GUI_CreateButton(&gui->dlgbut[2],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
-        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 60,
-        BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)1L);
-    GUI_CreateLabelBox(&gui->dlglbl[2],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
-        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 60,
-        96, 16, &NARROW_FONT, NULL, NULL, _tr("Erased"));
-    GUI_SetHidden((guiObject_t *)&gui->dlglbl[2], 1);
+    GUI_SetSelected((guiObject_t *)&gui->dlgbut[0]);
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -495,7 +474,7 @@ const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
     return ((guiButton_t *)obj >= gui->dlgbut2 && (guiButton_t *)obj < gui->dlgbut2 + LAYDLG_NUM_ITEMS) ? _tr("Edit") : _tr("Delete");
 }
 
-static void toggle_press_cb(guiObject_t *obj, void *data)
+static void toggle_press_cb(guiObject_t *obj, const void *data)
 {
     PAGE_MainLayoutExit();
     TGLICO_Select(obj, data);
@@ -510,15 +489,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int type = (long)data;
     long elemidx = elem_rel_to_abs(type, absrow);
-    void (*press_cb)(guiObject_t *obj, void *data) = NULL;
     int X = LAYDLG_X + LAYDLG_SCROLLABLE_X - (type == ELEM_TOGGLE ? 68/2 : 0);
     int del_x = X + 15 + 100;
     if (type == ELEM_MODELICO) {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
     } else {
         if (type == ELEM_TOGGLE) {
-            press_cb = toggle_press_cb;
-            GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, press_cb, (void *)elemidx);
+            GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, toggle_press_cb, (void *)elemidx);
             del_x = X + 15 + 168;
         }
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
@@ -526,6 +503,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     GUI_CreateButton(&gui->dlgbut[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
     return 1;
+}
+
+static void cfg_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    show_config();
 }
 
 static void show_config()
@@ -566,6 +550,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         selected_for_move->desc.fill_color ^= 0xffff;
         GUI_Redraw((guiObject_t *)selected_for_move);
         selected_for_move = NULL;
+        GUI_SetHidden((guiObject_t *)&gui->editelem, 1);
         return 1;
     }
     if(CHAN_ButtonIsPressed(button, BUT_ENTER)) {
