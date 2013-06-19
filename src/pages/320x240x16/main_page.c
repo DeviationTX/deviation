@@ -110,7 +110,7 @@ void PAGE_MainInit(int page)
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
     GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
-    if (! MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
+    if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
         GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
     GUI_CreateLabelBox(&gui->name, (LCD_WIDTH-128)/2, 8, 128, 24, &MODELNAME_FONT,
