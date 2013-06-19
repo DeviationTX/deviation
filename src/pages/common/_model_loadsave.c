@@ -113,8 +113,11 @@ static const char *string_cb(u8 idx, void *data)
             return _tr("Unknown");
         return mp->tmpstr;
     } else if ((long)data == LOAD_LAYOUT) {
-        if (! get_idx_filename("layout", ".ini", idx, "layout/"))
-            return _tr("Unknown");
+        if (idx >= mp->file_state)
+            sprintf(mp->tmpstr, "models/model%d.ini", idx + 1 - mp->file_state);
+        else
+            if (! get_idx_filename("layout", ".ini", idx, "layout/"))
+                return _tr("Unknown");
     } else {
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }
@@ -127,6 +130,8 @@ static const char *string_cb(u8 idx, void *data)
         ini_parse_file(fh, ini_handle_name, (void *)user);
         fclose(fh);
     }
+    if ((long)data == LOAD_LAYOUT && idx >= mp->file_state)
+        strcat(mp->tmpstr + strlen(mp->tmpstr), "(M)");
     return mp->tmpstr;
 }
 static void okcancel_cb(guiObject_t *obj, const void *data)
@@ -158,7 +163,11 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
             strcpy(Model.icon, mp->iconstr);
     } else if (msg == LOAD_LAYOUT + 1) {
         /* Load Layout */
-        get_idx_filename("layout", ".ini", mp->selected-1, "");
+        if (mp->selected > mp->file_state) {
+            sprintf(mp->tmpstr, "models/model%d.ini", mp->selected - mp->file_state);
+        } else {
+            get_idx_filename("layout", ".ini", mp->selected-1, "layout/");
+        }
         CONFIG_ReadLayout(mp->tmpstr);
     }
     PAGE_RemoveAllObjects();
@@ -228,6 +237,8 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     } else if (loadsave == LOAD_LAYOUT) { //Layout
         mp->selected = 1;
         num_models = count_files("layout", ".ini", "default.ini");
+        mp->file_state = num_models;
+        num_models += model_count();
     } else {
         num_models = model_count();
         strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));

@@ -151,7 +151,9 @@ static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
 
 /* Section: Gui-QVGA */
-static const char SECTION_GUI[] = "gui";
+#define STRINGIFY(x) _STRINGIFY(x)
+#define _STRINGIFY(x) #x
+static const char SECTION_GUI[] = "gui-" STRINGIFY(LCD_WIDTH) "x" STRINGIFY(LCD_HEIGHT);
 static const char SECTION_GUI_QVGA[] = "gui-qvga";
 #define GUI_TRIM SECTION_TRIM
 static const char * const GUI_TRIM_VAL[TRIMS_LAST] = { "none", "4out", "4in", "6"};
@@ -390,6 +392,8 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     u16 i;
     CLOCK_ResetWatchdog();
     int idx;
+    if (! MATCH_SECTION(SECTION_GUI))
+        return 1;
     for (idx = 0; idx < NUM_ELEMS; idx++) {
         if (! ELEM_USED(Model.pagecfg2.elem[idx]))
             break;
@@ -1033,7 +1037,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-    if (MATCH_SECTION(SECTION_GUI)) {
+    if (MATCH_START(section, "gui-")) {
         return layout_ini_handler(user, section, name, value);
     }
     if (MATCH_SECTION(SECTION_PPMIN)) {
@@ -1572,12 +1576,9 @@ u8 CONFIG_ReadTemplate(const char *filename) {
 }
 
 u8 CONFIG_ReadLayout(const char *filename) {
-    char file[25];
-
-    sprintf(file, "layout/%s", filename);
     memset(&Model.pagecfg2, 0, sizeof(Model.pagecfg2));
-    if (CONFIG_IniParse(file, layout_ini_handler, &Model)) {
-        printf("Failed to parse Layout file: %s\n", file);
+    if (CONFIG_IniParse(filename, layout_ini_handler, &Model)) {
+        printf("Failed to parse Layout file: %s\n", filename);
         return 0;
     }
     return 1;
