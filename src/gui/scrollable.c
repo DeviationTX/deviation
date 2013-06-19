@@ -254,7 +254,7 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     {
         return -1;
     }
-    create_scrollable_objs(scrollable, adjust_row(scrollable, direction));
+    create_scrollable_objs(scrollable, adjust_row(scrollable, direction > 0 ? 1 : -1));
     return -1;
 }
 #endif

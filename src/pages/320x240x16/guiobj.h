@@ -66,6 +66,13 @@ struct maincfg_obj {
     } u;
 };
 
+#define LAYDLG_Y_SPACE 10
+#define LAYDLG_HEIGHT (LCD_HEIGHT - 32 - 2*LAYDLG_Y_SPACE)
+#define LAYDLG_SCROLLABLE_Y 35
+#define LAYDLG_SCROLLABLE_HEIGHT (LAYDLG_HEIGHT - 2 * LAYDLG_SCROLLABLE_Y)
+#define LAYDLG_TEXT_HEIGHT 20
+#define LAYDLG_NUM_ITEMS (LAYDLG_SCROLLABLE_HEIGHT / LAYDLG_TEXT_HEIGHT + 1)
+
 struct mainlayout_obj {
     struct LabelDesc desc[5];
     //guiTextSelect_t newelem;
@@ -77,9 +84,10 @@ struct mainlayout_obj {
     //dialog
     guiDialog_t dialog;
     guiScrollable_t scrollable;
-    guiLabel_t dlglbl[8];
-    guiTextSelect_t dlgts[8];
-    guiButton_t dlgbut[8];
+    guiLabel_t dlglbl[LAYDLG_NUM_ITEMS];
+    guiTextSelect_t dlgts[LAYDLG_NUM_ITEMS];
+    guiButton_t dlgbut[LAYDLG_NUM_ITEMS];
+    guiButton_t dlgbut2[LAYDLG_NUM_ITEMS];
     //Everything below here must be part an element
     guiLabel_t elem[NUM_ELEMS];
 };
