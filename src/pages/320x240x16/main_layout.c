@@ -251,10 +251,12 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH-selected_w, dir, 1, 10, NULL);
-    if (x != selected_x) {
-        selected_x = x;
-        move_elem();
+    if (selected_for_move) {
+        int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH-selected_w, dir, 1, 10, NULL);
+        if (x != selected_x) {
+            selected_x = x;
+            move_elem();
+        }
     }
     sprintf(tmp, "%d", selected_x);
     return tmp;
@@ -263,14 +265,15 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    int y = GUI_TextSelectHelper(selected_y, 40, LCD_HEIGHT-selected_h, dir, 1, 10, NULL);
-    if (y != selected_y) {
-        selected_y = y;
-        move_elem();
+    if (selected_for_move) {
+        int y = GUI_TextSelectHelper(selected_y, 40, LCD_HEIGHT-selected_h, dir, 1, 10, NULL);
+        if (y != selected_y) {
+            selected_y = y;
+            move_elem();
+        }
     }
     sprintf(tmp, "%d", selected_y);
     return tmp;
-    return "0";
 }
 
 int guielem_idx(guiObject_t *obj)
