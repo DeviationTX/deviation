@@ -78,45 +78,43 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
     }
     GUI_ChangeImage(&gui->image, ico, 0, 0);
 }
+
+int get_idx_filename(const char *dir, const char *ext, int idx, const char *prefix)
+{
+    if (! FS_OpenDir(dir))
+        return 0;
+    char filename[13];
+    int type;
+    int count = 0;
+    while((type = FS_ReadDir(filename)) != 0) {
+        if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ext, 4) == 0) {
+            count++;
+            if (idx + 1 == count) {
+                sprintf(mp->tmpstr, "%s%s", prefix, filename);
+                FS_CloseDir();
+                return 1;
+            }
+        }
+    }
+    FS_CloseDir();
+    return 0;
+}
 static const char *string_cb(u8 idx, void *data)
 {
     (void)data;
     FILE *fh;
     if ((long)data == LOAD_TEMPLATE) { //Template
-        char filename[13];
-        int type;
-        int count = 0;
-        if (! FS_OpenDir("template"))
+        if (! get_idx_filename("template", ".ini", idx, "template/"))
             return _tr("Unknown");
-        while((type = FS_ReadDir(filename)) != 0) {
-            if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
-                count++;
-                if (idx + 1 == count) {
-                    sprintf(mp->tmpstr, "template/%s", filename);
-                    break;
-                }
-            }
-        }
-        FS_CloseDir();
     } else if ((long)data == LOAD_ICON) { //Icon
-        char filename[13];
-        int type;
-        int count = 1;
         if (idx == 0)
             return _tr("Default");
-        if (! FS_OpenDir("modelico"))
+        if (! get_idx_filename("modelico", ".bmp", idx-1, ""))
             return _tr("Unknown");
-        while((type = FS_ReadDir(filename)) != 0) {
-            if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
-                count++;
-                if (idx + 1 == count) {
-                    strncpy(mp->tmpstr, filename, sizeof(filename));
-                    return mp->tmpstr;
-                }
-            }
-        }
-        FS_CloseDir();
-        return _tr("Unknown");
+        return mp->tmpstr;
+    } else if ((long)data == LOAD_LAYOUT) {
+        if (! get_idx_filename("layout", ".ini", idx, "layout/"))
+            return _tr("Unknown");
     } else {
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }
@@ -151,12 +149,17 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         CONFIG_ReadModel(mp->selected);  //Reload the model after saving to switch (for future saves)
     } else if (msg == LOAD_TEMPLATE + 1) {
         /* Load Template */
-        CONFIG_ReadTemplateByIndex(mp->selected);
+        get_idx_filename("template", ".ini", mp->selected-1, "");
+        CONFIG_ReadTemplate(mp->tmpstr);
     } else if (msg == LOAD_ICON + 1) {
         if (mp->selected == 1)
             Model.icon[0] = 0;
         else
             strcpy(Model.icon, mp->iconstr);
+    } else if (msg == LOAD_LAYOUT + 1) {
+        /* Load Layout */
+        get_idx_filename("layout", ".ini", mp->selected-1, "");
+        CONFIG_ReadLayout(mp->tmpstr);
     }
     PAGE_RemoveAllObjects();
     mp->return_page(-1);  // -1 for devo10 means return to the focus of previous page, which is important so that users don't need to scroll down from the 1st item
@@ -168,11 +171,44 @@ static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
     return ((long)data) == SAVE_MODEL + 1 ? _tr("Save") : _tr("Load");
 }
 
+int model_count()
+{
+    int num_models;
+    for (num_models = 1; num_models <= 100; num_models++) {
+        sprintf(mp->tmpstr, "models/model%d.ini", num_models);
+        FILE *fh = fopen(mp->tmpstr, "r");
+        if (! fh)
+            break;
+        fclose(fh);
+    }
+    num_models--;
+    return num_models;
+}
+
+int count_files(const char *dir, const char *ext, const char *match)
+{
+    int num_files = 0;
+    if (FS_OpenDir(dir)) {
+        char filename[13];
+        int type;
+        while((type = FS_ReadDir(filename)) != 0) {
+            if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ext, 4) == 0) {
+                num_files++;
+                if(match && strncasecmp(match, filename, 13) == 0) {
+                    mp->selected = num_files;
+                }
+            }
+        }
+        FS_CloseDir();
+    }
+    return num_files;
+}
 /* loadsave values:
  * 0 : Load Model
  * 1 : Save Model
  * 2 : Load Template
  * 3 : Load Icon
+ * 4 : Load Layout
  */
 void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
 {
@@ -182,50 +218,23 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
     mp->return_page = return_page;
     _show_buttons(loadsave);
     if (loadsave == LOAD_TEMPLATE) { //Template
-        if (FS_OpenDir("template")) {
-            char filename[13];
-            int type;
-            while((type = FS_ReadDir(filename)) != 0) {
-                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".ini", 4) == 0) {
-                    num_models++;
-                }
-            }
-            FS_CloseDir();
-        }
+        num_models = count_files("template", ".ini", NULL);
         mp->selected = 1;
     } else if (loadsave == LOAD_ICON) { //Icon
-        num_models = 1;
-        mp->selected = 1;
-        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
-        if (FS_OpenDir("modelico")) {
-            char filename[13];
-            int type;
-            while((type = FS_ReadDir(filename)) != 0) {
-                if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ".bmp", 4) == 0) {
-                    num_models++;
-                    if(Model.icon[0] && strncasecmp(Model.icon+9, filename, 13) == 0) {
-                        mp->selected = num_models;
-                    }
-                }
-            }
-        }
-    } else {
-        for (num_models = 1; num_models <= 100; num_models++) {
-            sprintf(mp->tmpstr, "models/model%d.ini", num_models);
-            FILE *fh = fopen(mp->tmpstr, "r");
-            if (! fh)
-                break;
-            fclose(fh);
-        }
-        num_models--;
-        mp->selected = CONFIG_GetCurrentModel();
-        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
-    }
-    if (loadsave == SAVE_MODEL) {
         mp->selected = 0;
-    } else if (loadsave == LOAD_ICON) {
+        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
+        num_models = 1 + count_files("modelico", ".bmp", Model.icon[0] ? Model.icon+9 : NULL);
+        mp->selected++;
+    } else if (loadsave == LOAD_LAYOUT) { //Layout
+        mp->selected = 1;
+        num_models = count_files("layout", ".ini", "default.ini");
     } else {
-        mp->selected = CONFIG_GetCurrentModel();
+        num_models = model_count();
+        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
+        if (loadsave == SAVE_MODEL)
+            mp->selected = 0;
+        else
+            mp->selected = CONFIG_GetCurrentModel();
     }
     _show_list(loadsave, num_models);
 }

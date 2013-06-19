@@ -37,6 +37,8 @@ static void move_elem();
 static void select_for_move(guiLabel_t *obj);
 static void show_config();
 static u8 _action_cb(u32 button, u8 flags, void *data);
+static const char *dlgbut_str_cb(guiObject_t *obj, const void *data);
+static void dlgbut_cb(struct guiObject *obj, const void *data);
 
 extern int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h);
 extern void GetElementSize(unsigned type, u16 *w, u16 *h);
@@ -50,6 +52,7 @@ u8 newelem;
 u16 selected_x, selected_y, selected_w, selected_h;
 static u8 long_press;
 char tmp[20];
+u8 erase;
 
 void PAGE_MainLayoutInit(int page)
 {
@@ -345,18 +348,44 @@ static void dialog_ok_cb(u8 state, void * data)
 static void add_dlg_ok_cb(u8 state, void * data)
 {
     if (state == 1) {
-        newelem_press_cb(NULL, NULL);
+        if(erase) {
+            for (int i = 0; i < NUM_ELEMS; i++) {
+                ELEM_SET_Y(pc.elem[i], 0);
+            }
+            dialog_ok_cb(state, data);
+        } else {
+            newelem_press_cb(NULL, NULL);
+        }
     } else {
         dialog_ok_cb(state, data);
     }
 }
 
+static const char *add_dlgbut_str_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    return data ? _tr("Erase All") : _tr("Load");
+}
+static void add_dlgbut_cb(struct guiObject *obj, const void *data)
+{
+    (void)obj;
+    if(data) {
+        erase = 1;
+        GUI_SetHidden((guiObject_t *)&gui->dlgbut[2], 1);
+        GUI_SetHidden((guiObject_t *)&gui->dlglbl[2], 0);
+    } else {
+        PAGE_MainLayoutExit();
+        MODELPage_ShowLoadSave(LOAD_LAYOUT, PAGE_MainLayoutInit);
+    }
+}
+
 #define ADD_DIALOG_W 200
-#define ADD_DIALOG_H 120
+#define ADD_DIALOG_H 130
 static void add_dlg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
+    erase = 0;
     GUI_CreateDialog(&gui->dialog,
         (LCD_WIDTH - ADD_DIALOG_W) / 2,
         (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 40,
@@ -371,11 +400,34 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 128,
         (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 10,
         TEXTSELECT_128, NULL, newelem_cb, NULL);
+
+    GUI_CreateLabel(&gui->dlglbl[1],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 40,
+        NULL, DEFAULT_FONT, _tr("Template"));
+    GUI_CreateButton(&gui->dlgbut[1],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 40,
+        BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)0L);
+
+    GUI_CreateButton(&gui->dlgbut[2],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 60,
+        BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)1L);
+    GUI_CreateLabelBox(&gui->dlglbl[2],
+        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112,
+        (LCD_HEIGHT - 40 - ADD_DIALOG_H) / 2 + 60 + 60,
+        96, 16, &NARROW_FONT, NULL, NULL, _tr("Erased"));
+    GUI_SetHidden((guiObject_t *)&gui->dlglbl[2], 1);
 }
-#define DIALOG_X 20
-#define DIALOG_Y 10
-#define SCROLLABLE_X 10
-#define SCROLLABLE_Y 30
+#define X_SPACE 10
+#define Y_SPACE 10
+#define DIALOG_WIDTH (2*X_SPACE + 15 + 100 + 64 +20) //space + # + spinbox + button + scrollbar
+#define DIALOG_HEIGHT (LCD_HEIGHT - 32 - 2*Y_SPACE)
+#define DIALOG_X (LCD_WIDTH - DIALOG_WIDTH) / 2
+#define DIALOG_Y (32 + Y_SPACE)
+#define SCROLLABLE_X X_SPACE
+#define SCROLLABLE_Y 35
 #define TEXT_HEIGHT 20
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -494,12 +546,12 @@ static void show_config()
         return;
     }
     GUI_CreateDialog(&gui->dialog,
-         DIALOG_X, 40 + DIALOG_Y,
-         LCD_WIDTH - 2*DIALOG_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y,
+         DIALOG_X, DIALOG_Y,
+         DIALOG_WIDTH, DIALOG_HEIGHT,
          _tr("Page Config"), NULL, dialog_ok_cb, dtOk, "");
     GUI_CreateScrollable(&gui->scrollable,
-         DIALOG_X + SCROLLABLE_X, 40 + DIALOG_Y + SCROLLABLE_Y,
-         LCD_WIDTH - 2*DIALOG_X - 2*SCROLLABLE_X, LCD_HEIGHT - 40 - 2 * DIALOG_Y - 2 * SCROLLABLE_Y,
+         DIALOG_X + SCROLLABLE_X, DIALOG_Y + SCROLLABLE_Y,
+         DIALOG_WIDTH - 2 * SCROLLABLE_X, DIALOG_HEIGHT - 2 * SCROLLABLE_Y,
          TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, (void *)type);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }

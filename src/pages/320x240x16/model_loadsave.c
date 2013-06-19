@@ -31,6 +31,6 @@ static void _show_buttons(int loadsave)
 static void _show_list(int loadsave, u8 num_models)
 {
     GUI_CreateListBox(&gui->list, 112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
-    if (loadsave != LOAD_TEMPLATE)
+    if (loadsave != LOAD_TEMPLATE && loadsave != LOAD_LAYOUT)
         GUI_CreateImage(&gui->image, 8, 88, 96, 96, mp->iconstr);
 }

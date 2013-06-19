@@ -6,6 +6,7 @@ enum {
    SAVE_MODEL,
    LOAD_TEMPLATE,
    LOAD_ICON,
+   LOAD_LAYOUT,
 };
 
 struct model_page {

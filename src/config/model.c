@@ -384,6 +384,102 @@ static void create_element(struct elem *elem, int type, int x, int y, int src, i
     elem->extra[2] = e2;
 }
 
+static int layout_ini_handler(void* user, const char* section, const char* name, const char* value)
+{
+    struct Model *m = (struct Model *)user;
+    u16 i;
+    CLOCK_ResetWatchdog();
+    int idx;
+    for (idx = 0; idx < NUM_ELEMS; idx++) {
+        if (! ELEM_USED(Model.pagecfg2.elem[idx]))
+            break;
+    }
+    if (idx == NUM_ELEMS) {
+        printf("No free element available (max = %d)\n", NUM_ELEMS);
+        return 1;
+    }
+    if (MATCH_KEY(MODEL_ICON)) {
+        s16 data[2];
+        int count = parse_int_list(value, data, 2, S16);
+        if (count == 2)
+            create_element(&m->pagecfg2.elem[idx], ELEM_MODELICO, data[0], data[1], 0, 0, 0, 0);
+        return 1;
+    }
+    if (MATCH_KEY(GUI_TRIM)) {
+        s16 data[4];
+        //x, y, is_vert, src
+        int count = parse_int_list(value, data, 4, S16);
+        if (count == 4)
+            create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_VTRIM : ELEM_HTRIM, data[0], data[1], data[3], 0, 0, 0);
+        return 1;
+    }
+    if (MATCH_KEY(GUI_BOX)) {
+        s16 data[3];
+        s16 src = -1;
+        char str[20];
+        //x, y, type (1=big, 0=small), src
+        int count = 3;
+        const char *ptr = parse_partial_int_list(value, data, &count, S16);
+        if (count)
+            return 1;
+        ptr++;
+        for(i = 0; i < NUM_TIMERS; i++) {
+            if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+                src = i + 1;
+                break;
+            }
+        }
+        if (src == -1) {
+            for(i = 0; i < NUM_TELEM; i++) {
+                if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
+                    src = i + 1 + NUM_TIMERS;
+                    break;
+                }
+            }
+        }
+        if (src == -1) {
+            u8 newsrc = get_source(section, ptr);
+            if(newsrc >= NUM_INPUTS) {
+                src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+            }
+        }
+        if (src == -1)
+            src = 0;
+        create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
+        return 1;
+    }
+    if (MATCH_KEY(GUI_BAR)) {
+        s16 data[2];
+        int count = 2;
+        //x, y, src
+        const char *ptr = parse_partial_int_list(value, data, &count, S16);
+        if(count)
+            return 1;
+        u8 src = get_source(section, ptr+1);
+        if (src < NUM_INPUTS)
+            src = 0;
+        create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
+        return 1;
+    }
+    if (MATCH_KEY(GUI_TOGGLE)) {
+        s16 data[5];
+        int count = 5;
+        //x, y, tgl0, tgl1, tgl2, src
+        const char *ptr = parse_partial_int_list(value, data, &count, S16);
+        if(count)
+            return 1;
+        for (int j = 0; j <= NUM_SOURCES; j++) {
+            char cmp[10];
+            if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
+                create_element(&m->pagecfg2.elem[idx], ELEM_TOGGLE, data[0], data[1], j, data[2], data[3], data[4]);
+                return 1;
+            }
+        }
+        return 1;
+    }
+    return 1;
+}
+
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     CLOCK_ResetWatchdog();
@@ -938,94 +1034,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
     }
     if (MATCH_SECTION(SECTION_GUI)) {
-        int idx;
-        for (idx = 0; idx < NUM_ELEMS; idx++) {
-            if (! ELEM_USED(Model.pagecfg2.elem[idx]))
-                break;
-        }
-        if (idx == NUM_ELEMS) {
-            printf("No free element available (max = %d)\n", NUM_ELEMS);
-            return 1;
-        }
-        if (MATCH_KEY(MODEL_ICON)) {
-            s16 data[2];
-            int count = parse_int_list(value, data, 2, S16);
-            if (count == 2)
-                create_element(&m->pagecfg2.elem[idx], ELEM_MODELICO, data[0], data[1], 0, 0, 0, 0);
-            return 1;
-        }
-        if (MATCH_KEY(GUI_TRIM)) {
-            s16 data[4];
-            //x, y, is_vert, src
-            int count = parse_int_list(value, data, 4, S16);
-            if (count == 4)
-                create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_VTRIM : ELEM_HTRIM, data[0], data[1], data[3], 0, 0, 0);
-            return 1;
-        }
-        if (MATCH_KEY(GUI_BOX)) {
-            s16 data[3];
-            s16 src = -1;
-            char str[20];
-            //x, y, type (1=big, 0=small), src
-            int count = 3;
-            const char *ptr = parse_partial_int_list(value, data, &count, S16);
-            if (count)
-                return 1;
-            ptr++;
-            for(i = 0; i < NUM_TIMERS; i++) {
-                if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
-                    src = i + 1;
-                    break;
-                }
-            }
-            if (src == -1) {
-                for(i = 0; i < NUM_TELEM; i++) {
-                    if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
-                        src = i + 1 + NUM_TIMERS;
-                        break;
-                    }
-                }
-            }
-            if (src == -1) {
-                u8 newsrc = get_source(section, ptr);
-                if(newsrc >= NUM_INPUTS) {
-                    src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
-                }
-            }
-            if (src == -1)
-                src = 0;
-            create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
-            return 1;
-        }
-        if (MATCH_KEY(GUI_BAR)) {
-            s16 data[2];
-            int count = 2;
-            //x, y, src
-            const char *ptr = parse_partial_int_list(value, data, &count, S16);
-            if(count)
-                return 1;
-            u8 src = get_source(section, ptr+1);
-            if (src < NUM_INPUTS)
-                src = 0;
-            create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
-            return 1;
-        }
-        if (MATCH_KEY(GUI_TOGGLE)) {
-            s16 data[5];
-            int count = 5;
-            //x, y, tgl0, tgl1, tgl2, src
-            const char *ptr = parse_partial_int_list(value, data, &count, S16);
-            if(count)
-                return 1;
-            for (int j = 0; j <= NUM_SOURCES; j++) {
-                char cmp[10];
-                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
-                    create_element(&m->pagecfg2.elem[idx], ELEM_TOGGLE, data[0], data[1], j, data[2], data[3], data[4]);
-                    return 1;
-                }
-            }
-            return 1;
-        }
+        return layout_ini_handler(user, section, name, value);
     }
     if (MATCH_SECTION(SECTION_PPMIN)) {
         if (MATCH_KEY(PPMIN_NUM_CHANNELS)) {
@@ -1559,5 +1568,17 @@ u8 CONFIG_ReadTemplate(const char *filename) {
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     if (Model.mixer_mode == MIXER_STANDARD)
         STDMIXER_SetChannelOrderByProtocol();
+    return 1;
+}
+
+u8 CONFIG_ReadLayout(const char *filename) {
+    char file[25];
+
+    sprintf(file, "layout/%s", filename);
+    memset(&Model.pagecfg2, 0, sizeof(Model.pagecfg2));
+    if (CONFIG_IniParse(file, layout_ini_handler, &Model)) {
+        printf("Failed to parse Layout file: %s\n", file);
+        return 0;
+    }
     return 1;
 }

@@ -308,7 +308,7 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    MODELPage_ShowLoadSave(3, PAGE_ModelInit);
+    MODELPage_ShowLoadSave(LOAD_ICON, PAGE_ModelInit);
 }
 
 static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
