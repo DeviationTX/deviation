@@ -12,10 +12,15 @@ struct dialog_obj {
     guiDialog_t dialog;
 };
 
-#define MAX_IDX (NUM_TX_BUTTONS > NUM_CHANNELS ? NUM_TX_BUTTONS : NUM_CHANNELS)
+#define SEPERATION        32
+#define NUM_BARS_PER_ROW  (LCD_WIDTH == 320 ? 8 : 14)
+#define MAX_CHAN_ELEMENTS ((NUM_BARS_PER_ROW + 1) * 2) // 320: 2 rows with 9 elements each, 480: 2*15 resp. 2*8 / 2*14 with scrollbar
+#define MAX_BUTT          (NUM_TX_BUTTONS > NUM_CHANNELS ? NUM_TX_BUTTONS : NUM_CHANNELS)
+#define MAX_CHAN          (MAX_CHAN_ELEMENTS > MAX_BUTT ? MAX_CHAN_ELEMENTS : MAX_BUTT)
+#define MAX_IDX           (MAX_CHAN > MAX_BUTT ? MAX_CHAN : MAX_BUTT)
 struct chantest_obj {
     guiLabel_t lock;
-    guiLabel_t chan[NUM_CHANNELS];
+    guiLabel_t chan[MAX_CHAN];
     guiLabel_t value[MAX_IDX];
     guiBarGraph_t bar[MAX_IDX];
     guiScrollbar_t scrollbar;
@@ -247,7 +252,7 @@ struct tx_obj {
     guiScrollbar_t scrollbar;
     union {
         struct {
-             guiLabel_t head1;
+             guiLabel_t head1_1;
              guiLabel_t langlbl;
              guiButton_t lang;
              guiLabel_t modelbl;
@@ -257,36 +262,40 @@ struct tx_obj {
              guiButton_t touchtest;
              guiLabel_t sticklbl;
              guiButton_t stickcalib;
+#if LCD_WIDTH != 480
         } g1;
         struct {
-             guiLabel_t head1;
+#endif
+             guiLabel_t head2_1;
              guiLabel_t buzzlbl;
              guiTextSelect_t buzz;
              guiTextSelect_t power_alarm;
              guiLabel_t power_alarmlbl;
              guiLabel_t battalrmlbl;
              guiTextSelect_t battalrm;
-	     guiLabel_t battalrmintvllbl;
+             guiLabel_t battalrmintvllbl;
              guiTextSelect_t battalrmintvl;
-	     guiLabel_t musicshutdbl;
+             guiLabel_t musicshutdbl;
              guiTextSelect_t music_shutdown;
-             guiLabel_t head2;
+             guiLabel_t head2_2;
              guiLabel_t backlightlbl;
              guiTextSelect_t backlight;
              guiLabel_t dimtimelbl;
              guiTextSelect_t dimtime;
              guiLabel_t dimtgtlbl;
              guiTextSelect_t dimtgt;
+#if LCD_WIDTH != 480
         } g2;
         struct {
-             guiLabel_t head1;
+#endif
+             guiLabel_t head3_1;
              guiLabel_t prealertlbl;
              guiTextSelect_t prealert;
              guiLabel_t preintvllbl;
              guiTextSelect_t preintvl;
              guiLabel_t timeuplbl;
              guiTextSelect_t timeup;
-             guiLabel_t head2;
+             guiLabel_t head3_2;
              guiLabel_t templbl;
              guiTextSelect_t temp;
              guiLabel_t lengthlbl;
@@ -302,6 +311,7 @@ struct calibrate_obj {
 };
 
 struct usb_obj {
+    guiLabel_t headline;
     guiLabel_t msg;
 };    
 
