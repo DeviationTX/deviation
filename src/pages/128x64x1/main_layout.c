@@ -155,7 +155,13 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
         }
         return 1;
     }
-    if(! GUI_GetSelected() || ! selected_for_move || flags & BUTTON_RELEASE)
+    if (! GUI_GetSelected() || flags & BUTTON_RELEASE)
+        return 0;
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && ! selected_for_move) {
+        select_for_move((guiLabel_t *)GUI_GetSelected());
+        return 1;
+    }
+    if (! selected_for_move)
         return 0;
     if(CHAN_ButtonIsPressed(button, BUT_LEFT)) {
         xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, (void *)selected_for_move->cb_data);

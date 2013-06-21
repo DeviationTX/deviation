@@ -97,12 +97,12 @@ void GUI_RemoveAllObjects()
     FullRedraw = 2;
 }
 
-struct guiObject *_GUI_RemoveObj(struct guiObject *obj)
+void _GUI_RemoveObj(struct guiObject *obj, struct guiObject **head)
 {
     switch(obj->Type) {
     case Dialog: {
         GUI_HandleModalButtons(0);
-        GUI_RemoveHierObjects(obj->next);
+        _GUI_RemoveHierObjects(obj->next, head);
         objDIALOG = NULL;
         break;
     }
@@ -127,20 +127,14 @@ struct guiObject *_GUI_RemoveObj(struct guiObject *obj)
     if (objSELECTED == obj)
         objSELECTED = NULL;
     OBJ_SET_USED(obj, 0);
-    return obj->next;
-}
-
-void GUI_RemoveObj(struct guiObject *obj)
-{
-    guiObject_t *next = _GUI_RemoveObj(obj);
     // Reattach linked list
-    struct guiObject *prev = objHEAD;
+    struct guiObject *prev = *head;
     if (prev == obj) {
-        objHEAD = next;
+        *head = obj->next;
     } else {
         while(prev) {
             if(prev->next == obj) {
-                prev->next = next;
+                prev->next = obj->next;
                 break;
             }
             prev = prev->next;
@@ -149,18 +143,30 @@ void GUI_RemoveObj(struct guiObject *obj)
     FullRedraw = objHEAD ? 1 : 2;
 }
 
-void GUI_RemoveHierObjects(struct guiObject *obj)
+void GUI_RemoveObj(struct guiObject *obj)
+{
+    _GUI_RemoveObj(obj, &objHEAD);
+}
+
+void _GUI_RemoveHierObjects(struct guiObject *obj, struct guiObject **head)
 {
     if(obj == objHEAD) {
         GUI_RemoveAllObjects();
         return;
     }
-    struct guiObject *next = obj->next;
-    while(next)
-        next = _GUI_RemoveObj(next);
-    obj->next = NULL;
-    GUI_RemoveObj(obj);
+    struct guiObject *parent = *head;
+    while(parent && parent->next != obj)
+        parent = parent->next;
+    if(! parent)
+        return;
+    while(parent->next)
+        _GUI_RemoveObj(parent->next, head);
     FullRedraw = 1;
+}
+
+void GUI_RemoveHierObjects(struct guiObject *obj)
+{
+    _GUI_RemoveHierObjects(obj, &objHEAD);
 }
 
 void GUI_SetHidden(struct guiObject *obj, u8 state)
