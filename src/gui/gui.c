@@ -27,7 +27,7 @@ static void (*select_notify)(guiObject_t *obj) = NULL;
 
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
-static u8 FullRedraw;
+u8 FullRedraw;
 
 static u8 handle_buttons(u32 button, u8 flags, void*data);
 #include "_gui.c"
@@ -97,12 +97,12 @@ void GUI_RemoveAllObjects()
     FullRedraw = 2;
 }
 
-void _GUI_RemoveObj(struct guiObject *obj, struct guiObject **head)
+void GUI_RemoveObj(struct guiObject *obj)
 {
     switch(obj->Type) {
     case Dialog: {
         GUI_HandleModalButtons(0);
-        _GUI_RemoveHierObjects(obj->next, head);
+        GUI_RemoveHierObjects(obj->next);
         objDIALOG = NULL;
         break;
     }
@@ -128,9 +128,9 @@ void _GUI_RemoveObj(struct guiObject *obj, struct guiObject **head)
         objSELECTED = NULL;
     OBJ_SET_USED(obj, 0);
     // Reattach linked list
-    struct guiObject *prev = *head;
+    struct guiObject *prev = objHEAD;
     if (prev == obj) {
-        *head = obj->next;
+        objHEAD = obj->next;
     } else {
         while(prev) {
             if(prev->next == obj) {
@@ -143,30 +143,20 @@ void _GUI_RemoveObj(struct guiObject *obj, struct guiObject **head)
     FullRedraw = objHEAD ? 1 : 2;
 }
 
-void GUI_RemoveObj(struct guiObject *obj)
-{
-    _GUI_RemoveObj(obj, &objHEAD);
-}
-
-void _GUI_RemoveHierObjects(struct guiObject *obj, struct guiObject **head)
+void GUI_RemoveHierObjects(struct guiObject *obj)
 {
     if(obj == objHEAD) {
         GUI_RemoveAllObjects();
         return;
     }
-    struct guiObject *parent = *head;
+    struct guiObject *parent = objHEAD;
     while(parent && parent->next != obj)
         parent = parent->next;
     if(! parent)
         return;
     while(parent->next)
-        _GUI_RemoveObj(parent->next, head);
+        GUI_RemoveObj(parent->next);
     FullRedraw = 1;
-}
-
-void GUI_RemoveHierObjects(struct guiObject *obj)
-{
-    _GUI_RemoveHierObjects(obj, &objHEAD);
 }
 
 void GUI_SetHidden(struct guiObject *obj, u8 state)
