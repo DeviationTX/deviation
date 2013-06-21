@@ -71,10 +71,10 @@ static void _show_page()
         firstObj = NULL;
     }
     #define COL1 16
-    #define COL2 (COL1+96)
+    #define COL2 (COL1+106)
     #if LCD_WIDTH == 480
-        #define COL3         (LCD_WIDTH/2+COL1)
-        #define COL4         (LCD_WIDTH/2+COL2)
+        #define COL3         (LCD_WIDTH-16-106-96) // border + label + button
+        #define COL4         (LCD_WIDTH-16-96)    // border + button
         #define BUTTON_WIDE  BUTTON_96x16
         #define BUTTON_TEST  BUTTON_48x16
         #define BUTTON_TOUCH BUTTON_TEST
@@ -116,7 +116,7 @@ static void _show_page()
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
         GUI_CreateButton(&gui1->stickcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_STICK);
-        row += space + 8;
+        row += space + (LCD_WIDTH == 320 ? 8 : 16); // for nicer look
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
     }
     if (page_num == 1 || LCD_WIDTH == 480) {
