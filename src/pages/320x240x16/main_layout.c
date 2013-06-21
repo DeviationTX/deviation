@@ -50,6 +50,7 @@ u8 cfg_elem_type;
 void PAGE_MainLayoutInit(int page)
 {
      (void)page;
+    PAGE_SetModal(0);
     BUTTON_RegisterCallback(&action,
           CHAN_ButtonMask(BUT_ENTER)
           | CHAN_ButtonMask(BUT_EXIT)
