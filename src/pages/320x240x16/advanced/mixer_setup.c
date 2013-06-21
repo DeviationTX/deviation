@@ -34,8 +34,8 @@ static void _show_titlerow()
 {
     GUI_CreateLabel(&gui->chan, 4, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
     GUI_CreateTextSelect(&gui->tmpl, COL1_VALUE, 8, TEXTSELECT_96, NULL, templatetype_cb, (void *)((long)mp->channel));
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 }
 
 static void _show_simple()

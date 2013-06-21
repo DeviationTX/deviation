@@ -34,8 +34,8 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     edit->curve = *curve;
     edit->curveptr = curve;
     GUI_CreateTextSelect(&gui->name, 8, 8, TEXTSELECT_96, NULL, set_curvename_cb, NULL);
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
     int y = 40;
     if (type >= CURVE_3POINT) {
         GUI_CreateLabel(&gui->smoothlbl, 8, y, NULL, DEFAULT_FONT, _tr("Smooth"));
@@ -50,7 +50,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     y += 40;
     GUI_CreateLabel(&gui->valuelbl, 8, y, NULL, DEFAULT_FONT, _tr("Value"));
     GUI_CreateTextSelect(&gui->value, 8, y+16, TEXTSELECT_96, NULL, set_value_cb, NULL);
-    GUI_CreateXYGraph(&gui->graph, 112, 36, 200, 200,
+    GUI_CreateXYGraph(&gui->graph, LCD_WIDTH-208, 36, 200, 200,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

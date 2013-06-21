@@ -29,9 +29,9 @@ static void _show_title(int page)
                           Model.num_channels + NUM_VIRT_CHANNELS - ENTRIES_PER_PAGE
                         : Model.num_channels + NUM_VIRT_CHANNELS;
     PAGE_ShowHeader(PAGE_GetName(PAGEID_MIXER));
-    GUI_CreateIcon(&gui->testico, 192, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
-    GUI_CreateIcon(&gui->reorderico, 224, 0, &icons[ICON_ORDER], reorder_cb, NULL);
-    GUI_CreateScrollbar(&gui->scroll, 304, 32, 208, mp->max_scroll+1, NULL, scroll_cb, NULL);
+    GUI_CreateIcon(&gui->testico, LCD_WIDTH-128, 0, &icons[ICON_CHANTEST], show_chantest_cb, NULL);
+    GUI_CreateIcon(&gui->reorderico, LCD_WIDTH-96, 0, &icons[ICON_ORDER], reorder_cb, NULL);
+    GUI_CreateScrollbar(&gui->scroll, LCD_WIDTH-16, 32, LCD_HEIGHT-32, mp->max_scroll+1, NULL, scroll_cb, NULL);
     GUI_SetScrollbar(&gui->scroll, page);
 }
 
