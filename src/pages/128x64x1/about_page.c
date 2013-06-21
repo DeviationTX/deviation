@@ -31,7 +31,7 @@ void PAGE_AboutInit(int page)
     strcpy(up->tmpstr, (const char *) _tr("Deviation FW version:"));
     GUI_CreateLabelBox(&gui->label[0], 0, 15, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
     GUI_CreateLabelBox(&gui->label[1], 0, 30, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, up->tmpstr);
-    GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, ITEM_HEIGHT, &TINY_FONT, NULL, NULL, _tr_noop(DeviationVersion));
+    GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, ITEM_HEIGHT, &MICRO_FONT, NULL, NULL, _tr_noop(DeviationVersion));
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

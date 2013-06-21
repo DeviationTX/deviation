@@ -83,7 +83,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             h = txt_h;
         GUI_DrawBackground(obj_x, obj_y, w, h);
         if (is_selected) {
-            if (desc->style == LABEL_SQUAREBOX)
+            if (desc->style == LABEL_SQUAREBOX || w < 5)
                 LCD_FillRect(obj_x, obj_y, w, h , 1);
             else
                 LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
@@ -94,15 +94,27 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
                 else
                     LCD_FillRect(obj_x, obj_y, w, h, desc->fill_color);
             else if (desc->style == LABEL_BRACKET) {
-                u16 y1 = obj_y + 2;
-                u16 y2 = obj_y + obj_height -3;
-                u16 x1 = obj_x + obj_width - 1;
-                LCD_DrawLine(obj_x, y1, obj_x + 2, obj_y, 1);
-                LCD_DrawLine(obj_x, y2, obj_x + 2, obj_y + obj_height -1, 1);
-                LCD_DrawLine(obj_x, y1, obj_x, y2, 1);
-                LCD_DrawLine(x1, y1, x1 - 2, obj_y, 1);
-                LCD_DrawLine(x1, y2, x1 - 2, obj_y + obj_height -1, 1);
-                LCD_DrawLine(x1, y1, x1, y2, 1);
+                if (h > 2 * w) {
+                    int x1 = obj_x + 2;
+                    int x2 = obj_x + obj_width -3;
+                    int y1 = obj_y + obj_height - 1;
+                    LCD_DrawLine(x1, obj_y, obj_x, obj_y + 2, 1);
+                    LCD_DrawLine(x2, obj_y, obj_x + obj_width -1, obj_y +2, 1);
+                    LCD_DrawLine(x1, obj_y, x2, obj_y, 1);
+                    LCD_DrawLine(x1, y1, obj_x, y1 - 2, 1);
+                    LCD_DrawLine(x2, y1, obj_x + obj_width -1, y1 -2, 1);
+                    LCD_DrawLine(x1, y1, x2, y1, 1);
+                } else {
+                    u16 y1 = obj_y + 2;
+                    u16 y2 = obj_y + obj_height -3;
+                    u16 x1 = obj_x + obj_width - 1;
+                    LCD_DrawLine(obj_x, y1, obj_x + 2, obj_y, 1);
+                    LCD_DrawLine(obj_x, y2, obj_x + 2, obj_y + obj_height -1, 1);
+                    LCD_DrawLine(obj_x, y1, obj_x, y2, 1);
+                    LCD_DrawLine(x1, y1, x1 - 2, obj_y, 1);
+                    LCD_DrawLine(x1, y2, x1 - 2, obj_y + obj_height -1, 1);
+                    LCD_DrawLine(x1, y1, x1, y2, 1);
+                }
             } else
                 LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
         }

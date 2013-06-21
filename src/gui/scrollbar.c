@@ -152,8 +152,8 @@ u8 GUI_TouchScrollbar(struct guiObject *obj, struct touch *coords, s8 press_type
         }
     }
     if(dir) {
-        u8 newpos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, dir, scrollbar->cb_data);
-        if (newpos != scrollbar->cur_pos) {
+        int newpos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos, dir, scrollbar->cb_data);
+        if (newpos >= 0 && newpos != scrollbar->cur_pos) {
             scrollbar->cur_pos = newpos;
             OBJ_SET_DIRTY(obj, 1);
             return 1;
@@ -175,8 +175,8 @@ static u8 button_cb(u32 button, u8 flags, void *data)
     if (!(flags & BUTTON_LONGPRESS))
         return 0;
     s8 dir = (button & CHAN_ButtonMask(BUT_DOWN)) ? 2 : -2;
-    u8 newpos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos,dir, scrollbar->cb_data);
-    if (newpos != scrollbar->cur_pos) {
+    int newpos = scrollbar->callback(scrollbar->parent,  scrollbar->cur_pos,dir, scrollbar->cb_data);
+    if (newpos >= 0 && newpos != scrollbar->cur_pos) {
         scrollbar->cur_pos = newpos;
         OBJ_SET_DIRTY(obj, 1);
     }

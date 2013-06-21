@@ -35,13 +35,13 @@ static void draw_chan(long ch, int row, int y)
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = 12;
     } else {
-        labelDesc.font = TINY_FONT.font;  // only digits, can use smaller font to show more channels
+        labelDesc.font = MICRO_FONT.font;  // only digits, can use smaller font to show more channels
         height = 7;
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
         0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
     GUI_CreateLabelBox(&gui->value[idx], x+37, y,
-        23, height, &TINY_FONT, value_cb, NULL, (void *)ch);
+        23, height, &MICRO_FONT, value_cb, NULL, (void *)ch);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
         59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
 
@@ -84,7 +84,7 @@ static void _show_bar_page(u8 num_bars)
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
                          view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
-    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &MICRO_FONT, _page_cb, NULL, NULL);
 }
 
 void PAGE_ChantestInit(int page)

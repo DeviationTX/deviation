@@ -292,7 +292,7 @@ void PAGE_ChangeQuick(int dir)
 {
     int quick = 0;
     for (int i = 0; i < NUM_QUICKPAGES; i++) {
-        if(Model.pagecfg.quickpage[i] && Model.pagecfg.quickpage[i] == cur_page) {
+        if(Model.pagecfg2.quickpage[i] && Model.pagecfg2.quickpage[i] == cur_page) {
             quick = i+1;
             break;
         }
@@ -301,7 +301,7 @@ void PAGE_ChangeQuick(int dir)
     while(1) {
        quick = (quick + increment) % 5;
        if (quick == 0
-           || (Model.pagecfg.quickpage[quick-1] && PAGE_IsValid(Model.pagecfg.quickpage[quick-1])))
+           || (Model.pagecfg2.quickpage[quick-1] && PAGE_IsValid(Model.pagecfg2.quickpage[quick-1])))
        {
            break;
        }
@@ -309,7 +309,7 @@ void PAGE_ChangeQuick(int dir)
     if (quick == 0) {
         PAGE_ChangeByID(PAGEID_MAIN);
     } else {
-        PAGE_ChangeByID(Model.pagecfg.quickpage[quick-1]);
+        PAGE_ChangeByID(Model.pagecfg2.quickpage[quick-1]);
     }
 }
 
@@ -331,7 +331,7 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
 */
     int i;
     for(i = 0; i < NUM_QUICKPAGES; i++)
-        if(Model.pagecfg.quickpage[i])
+        if(Model.pagecfg2.quickpage[i])
             break;
     if(i == NUM_QUICKPAGES)
         return 0;

@@ -118,7 +118,9 @@ EXEEXT   ?= elf
 
 FONTS    = filesystem/devo10/media/12normal.fon \
            filesystem/devo8/media/15normal.fon \
-           filesystem/devo8/media/23bold.fon
+           filesystem/devo8/media/23bold.fon \
+           filesystem/devo10/media/04b03.fon
+
 MODELDIR = filesystem/$(FILESYSTEM)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
@@ -262,6 +264,9 @@ filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
 
 filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
 	../utils/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
+
+filesystem/devo10/media/04b03.fon: fonts/04b03.bdf
+	../utils/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################
 #Build rules for all .o files#

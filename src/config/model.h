@@ -44,7 +44,6 @@ struct Model {
     char virtname[NUM_VIRT_CHANNELS][VIRT_NAME_LEN];
     struct Timer timer[NUM_TIMERS];
     u8 templates[NUM_CHANNELS];
-    struct PageCfg pagecfg;
     struct PageCfg2 pagecfg2;
     u8 safety[NUM_SOURCES+1];
     u8 telem_alarm[TELEM_NUM_ALARMS];

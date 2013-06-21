@@ -19,16 +19,6 @@ enum BarSize {
     BARS_LAST,
 };
 
-struct PageCfg {
-    u8 trims;
-    u8 barsize;
-    u8 box[8];
-    u8 bar[8];
-    u8 toggle[NUM_TOGGLES];
-    u8 tglico[NUM_TOGGLES][3];
-    u8 quickpage[NUM_QUICKPAGES];
-};
-
 struct elem_xy {
     u16 x;
     u16 y;
@@ -86,6 +76,7 @@ struct elem {
 
 struct PageCfg2 {
     struct elem elem[NUM_ELEMS];
+    u8 quickpage[NUM_QUICKPAGES];
 };
 
 enum {

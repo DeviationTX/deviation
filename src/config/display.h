@@ -12,19 +12,20 @@
 #define BATTALARM_FONT (Display.font[6])
 #define ERROR_FONT     (Display.font[6])  //Same as BATTALARM_FONT
 #define TINY_FONT      (Display.font[7])
-#define BOLD_FONT      (Display.font[8])
-#define NARROW_FONT    (Display.font[9])
-#define SMALL_FONT     (Display.font[10])
-#define BIGBOXNEG_FONT   (Display.font[11])
-#define SMALLBOXNEG_FONT (Display.font[12])
-#define DIALOGTITLE_FONT (Display.font[13])
-#define DIALOGBODY_FONT  (Display.font[14])
-#define NORMALBOX_FONT     (Display.font[15])
-#define NORMALBOXNEG_FONT  (Display.font[16])
-#define SECTION_FONT       (Display.font[17])
-#define TEXTSEL_FONT       (Display.font[18])
-#define BUTTON_FONT        (Display.font[19])
-#define NUM_LABELS 20
+#define MICRO_FONT     (Display.font[8])
+#define BOLD_FONT      (Display.font[9])
+#define NARROW_FONT    (Display.font[10])
+#define SMALL_FONT     (Display.font[11])
+#define BIGBOXNEG_FONT   (Display.font[12])
+#define SMALLBOXNEG_FONT (Display.font[13])
+#define DIALOGTITLE_FONT (Display.font[14])
+#define DIALOGBODY_FONT  (Display.font[15])
+#define NORMALBOX_FONT     (Display.font[16])
+#define NORMALBOXNEG_FONT  (Display.font[17])
+#define SECTION_FONT       (Display.font[18])
+#define TEXTSEL_FONT       (Display.font[19])
+#define BUTTON_FONT        (Display.font[20])
+#define NUM_LABELS 21
 
 struct disp_keyboard {
     u8 font;

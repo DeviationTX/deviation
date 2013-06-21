@@ -22,10 +22,25 @@
 #include "../common/main_config.h"
 #include "telemetry.h"
 
+#define VTRIM_W       4
+#define VTRIM_H      49
+#define HTRIM_W      49
+#define HTRIM_H       4
+#define MODEL_ICO_W  52
+#define MODEL_ICO_H  36
+#define BOX_W        48
+#define SMALLBOX_H    9
+#define BIGBOX_H      9
+
+#define ELEM_BIGBOX ELEM_SMALLBOX
+#define ELEM_BAR
+
+#define press_icon_cb NULL
+#define press_box_cb NULL
+
 #include "../common/_main_page.c"
 
 static const char *_power_to_string();
-static u8 _action_preview_cb(u32 button, u8 flags, void *data);
 
 #define BATTERY_SCAN_MSEC 2000 // refresh battery for every 2sec to avoid its label blinking
 static u32 next_scan=0;
@@ -38,64 +53,20 @@ static u32 next_scan=0;
  */
 void PAGE_MainInit(int page)
 {
+    (void)page;
     (void)bar_cb;
-    int i;
-    u16 x, y, w, h;
     memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
     memset(gui, 0, sizeof(struct mainpage_obj));
     PAGE_SetModal(0);
-    if (page == 1)
-        PAGE_SetActionCB(_action_preview_cb);
-    else
-        PAGE_SetActionCB(_action_cb);
+    PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
-
-    //mp->optsObj = GUI_CreateIcon(0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
-    //if(! MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-    //    GUI_CreateIcon(32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 
     GUI_CreateLabelBox(&gui->name, 0, 1, //64, 12,
             0, 0, &SMALL_FONT, NULL, NULL, Model.name);
 
-    // Logo label
-    //GUI_CreateLabelBox(10, 12, 0, 0, &SMALL_FONT, NULL, NULL, "Devil 10");
 
-    //heli/plane Icon
-    if (MAINPAGE_GetWidgetLoc(MODEL_ICO, &x, &y, &w, &h))
-        GUI_CreateImageOffset(&gui->icon, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), NULL, (void *)1);
-
-    for(i = 0; i < 6; i++) {
-        mp->trims[i] = *MIXER_GetTrim(i);
-        if (MAINPAGE_GetWidgetLoc(TRIM1+i, &x, &y, &w, &h)) {
-            GUI_CreateBarGraph(&gui->trim[i], x, y, w, h, -100, 100, i & 0x02 ? TRIM_INVHORIZONTAL : TRIM_VERTICAL, trim_cb, (void *)(long)i);
-        }
-    }
-
-    // show thro , timer1 ,timer 2
-    for(i = 0; i < 8; i++) {
-        if (MAINPAGE_GetWidgetLoc(BOX1+i, &x, &y, &w, &h)) { // i = 0, 1, 2
-            mp->boxval[i] = get_boxval(Model.pagecfg.box[i]);
-            GUI_CreateLabelBox(&gui->box[i], x, y, w, h,
-                                get_box_font(i, Model.pagecfg.box[i] <= 2 && mp->boxval[i] < 0),
-                                show_box_cb, NULL,
-                                (void *)((long)Model.pagecfg.box[i]));
-        } else { // i = 3 - 7
-            mp->boxval[i] = 0;
-        }
-    }
-
-    for(i = 0; i < NUM_TOGGLES; i++) {
-        if (MAINPAGE_GetWidgetLoc(TOGGLE1+i, &x, &y, &w, &h)) {
-            u8 x1 = x + (w+1) * i;
-            if(! Model.pagecfg.toggle[i]) {
-                LCD_FillRect(x1+1, y, w, h, 0x0);  // clear the area
-            } else {
-                struct ImageMap img = TGLICO_GetImage(Model.pagecfg.tglico[i][0]); //We'll set this properly down below
-                GUI_CreateImageOffset(&gui->toggle[i], x1 + 1, y, w, h, img.x_off, img.y_off, img.file, NULL, NULL);
-            }
-        }
-    }
+    show_elements();
     //Battery
     mp->battery = PWR_ReadVoltage();
     GUI_CreateLabelBox(&gui->battery, 88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
@@ -141,17 +112,6 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 	    TIMER_Reset(i);
     } else if (! PAGE_QuickPage(button, flags, data)) {
         MIXER_UpdateTrim(button, flags, data);
-    }
-    return 1;
-}
-
-static u8 _action_preview_cb(u32 button, u8 flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MAINCFG, -1);  // go back to the main config page
-        }
     }
     return 1;
 }
