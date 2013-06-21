@@ -90,22 +90,6 @@ void GUI_DrawObjects(void)
     }
 }
 
-void GUI_RemoveHierObjects(struct guiObject *obj)
-{
-    struct guiObject *parent = objHEAD;
-    if(obj == objHEAD) {
-        GUI_RemoveAllObjects();
-        return;
-    }
-    while(parent && parent->next != obj)
-        parent = parent->next;
-    if(! parent)
-        return;
-    while(parent->next)
-        GUI_RemoveObj(parent->next);
-    FullRedraw = objHEAD ? 1: 2;
-}
-
 void GUI_RemoveAllObjects()
 {
     while(objHEAD)
@@ -113,7 +97,7 @@ void GUI_RemoveAllObjects()
     FullRedraw = 2;
 }
 
-void GUI_RemoveObj(struct guiObject *obj)
+struct guiObject *_GUI_RemoveObj(struct guiObject *obj)
 {
     switch(obj->Type) {
     case Dialog: {
@@ -143,20 +127,40 @@ void GUI_RemoveObj(struct guiObject *obj)
     if (objSELECTED == obj)
         objSELECTED = NULL;
     OBJ_SET_USED(obj, 0);
+    return obj->next;
+}
+
+void GUI_RemoveObj(struct guiObject *obj)
+{
+    guiObject_t *next = _GUI_RemoveObj(obj);
     // Reattach linked list
     struct guiObject *prev = objHEAD;
     if (prev == obj) {
-        objHEAD = obj->next;
+        objHEAD = next;
     } else {
         while(prev) {
             if(prev->next == obj) {
-                prev->next = obj->next;
+                prev->next = next;
                 break;
             }
             prev = prev->next;
         }
     }
     FullRedraw = objHEAD ? 1 : 2;
+}
+
+void GUI_RemoveHierObjects(struct guiObject *obj)
+{
+    if(obj == objHEAD) {
+        GUI_RemoveAllObjects();
+        return;
+    }
+    struct guiObject *next = obj->next;
+    while(next)
+        next = _GUI_RemoveObj(next);
+    obj->next = NULL;
+    GUI_RemoveObj(obj);
+    FullRedraw = 1;
 }
 
 void GUI_SetHidden(struct guiObject *obj, u8 state)

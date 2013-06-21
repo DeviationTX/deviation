@@ -86,6 +86,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (load_save == LOAD_LAYOUT) {
+            mp->return_page(-1);
+            return 0;
+        }
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ModelInit(-1);
         }

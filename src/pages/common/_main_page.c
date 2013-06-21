@@ -20,9 +20,7 @@ const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
 static s16 bar_cb(void * data);
-void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
 void press_icon2_cb(guiObject_t *obj, const void *data);
-void press_box_cb(guiObject_t *obj, s8 press_type, const void *data);
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static s32 get_boxval(u8 idx);
 static void _check_voltage();
@@ -113,7 +111,9 @@ void PAGE_MainEvent()
                 break;
             }
             case ELEM_SMALLBOX:
+#ifndef ELEM_BIGBOX
             case ELEM_BIGBOX:
+#endif
             {
                 s32 val = get_boxval(src);
                 if (src <= NUM_TIMERS) {
@@ -144,6 +144,7 @@ void PAGE_MainEvent()
                 }
                 break;
             }
+#ifndef ELEM_BAR
             case ELEM_BAR:
             {
                 s16 chan = MIXER_GetChannel(src-1, APPLY_SAFETY);
@@ -153,6 +154,7 @@ void PAGE_MainEvent()
                 }
                 break;
             }
+#endif
             case ELEM_TOGGLE:
             {
                 src = MIXER_SRC(src);
@@ -189,4 +191,129 @@ void PAGE_MainEvent()
     if (clear_time)
         Telemetry.time[0] = 0;
     _check_voltage();
+}
+void GetElementSize(unsigned type, u16 *w, u16 *h)
+{
+    const u8 width[ELEM_LAST] = {
+        [ELEM_SMALLBOX] = BOX_W,
+#ifndef ELEM_BIGBOX
+        [ELEM_BIGBOX]   = BOX_W,
+#endif
+        [ELEM_TOGGLE]   = TOGGLEICON_WIDTH,
+#ifndef ELEM_BAR
+        [ELEM_BAR]      = GRAPH_W,
+#endif
+        [ELEM_VTRIM]    = VTRIM_W,
+        [ELEM_HTRIM]    = HTRIM_W,
+        [ELEM_MODELICO] = MODEL_ICO_W,
+    };
+    const u8 height[ELEM_LAST] = {
+        [ELEM_SMALLBOX] = SMALLBOX_H,
+#ifndef ELEM_BIGBOX
+        [ELEM_BIGBOX]   = BIGBOX_H,
+#endif
+        [ELEM_TOGGLE]   = TOGGLEICON_HEIGHT,
+#ifndef ELEM_BAR
+        [ELEM_BAR]      = GRAPH_H,
+#endif
+        [ELEM_VTRIM]    = VTRIM_H,
+        [ELEM_HTRIM]    = HTRIM_H,
+        [ELEM_MODELICO] = MODEL_ICO_H,
+    };
+    *w = width[type];
+    *h = height[type];
+}
+int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
+{
+    *y = ELEM_Y(*elem);
+    if (*y == 0)
+        return 0;
+    int type = ELEM_TYPE(*elem);
+    if (type >= ELEM_LAST)
+        return 0;
+    *x = ELEM_X(*elem);
+    GetElementSize(type, w, h);
+    return 1;
+}
+
+unsigned map_type(int type)
+{
+    switch(type) {
+#ifndef ELEM_BIGBOX
+        case ELEM_BIGBOX: return ELEM_SMALLBOX;
+#endif
+        case ELEM_HTRIM: return ELEM_VTRIM;
+        default: return type;
+    }
+}
+int MAINPAGE_FindNextElem(unsigned type, int idx)
+{
+    type = map_type(type);
+    for(int i = idx; i < NUM_ELEMS; i++) {
+        if(! ELEM_USED(pc.elem[i]))
+            break;
+        if (map_type(ELEM_TYPE(pc.elem[i])) == type)
+            return i;
+    }
+    return -1;
+}
+
+void show_elements()
+{
+    u16 x, y, w, h;
+    for (int i = 0; i < NUM_ELEMS; i++) {
+        if (! GetWidgetLoc(&pc.elem[i], &x, &y, &w, &h))
+            break;
+        int type = ELEM_TYPE(pc.elem[i]);
+        switch(type) {
+            case ELEM_MODELICO:
+                GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
+                break;
+            case ELEM_VTRIM:
+            case ELEM_HTRIM:
+            {
+                int src = pc.elem[i].src;
+                mp->elem[i] = *(MIXER_GetTrim(src));
+                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, -100, 100,
+                    type == ELEM_VTRIM ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)src);
+                break;
+            }
+            case ELEM_SMALLBOX:
+#ifndef ELEM_BIGBOX
+            case ELEM_BIGBOX:
+#endif
+            {
+                int src = pc.elem[i].src;
+                if (src == 0)
+                    continue;
+                mp->elem[i] = get_boxval(src);
+                int font = ((src <= NUM_TIMERS && mp->elem[i] < 0)
+                           || ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h,
+                            get_box_font(type == ELEM_BIGBOX ? 0 : 2, font),
+                            show_box_cb, press_box_cb,
+                            (void *)((long)src));
+                break;
+            }
+#ifndef ELEM_BAR
+            case ELEM_BAR:
+            {
+                int src = pc.elem[i].src;
+                if (src == 0)
+                    continue;
+                mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
+                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
+                           bar_cb, (void *)((long)src));
+                break;
+            }
+#endif
+            case ELEM_TOGGLE:
+            {
+                struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], 0)); //We'll set this properly down below
+                GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
+                                  img.x_off, img.y_off, img.file, NULL, NULL);
+                break;
+            }
+        }
+    }
 }

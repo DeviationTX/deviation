@@ -314,67 +314,6 @@ static int parse_int_list(const char *ptr, void *vals, int max_count, int type)
     return max_count - count;
 }
 
-static void upgrade_tglico(struct Model *m, int idx)
-{
-    //Map legacy toggle icons to new format
-    char str1[10], str2[10];
-    if(! m->pagecfg.toggle[idx])
-        return;
-    int src = MIXER_SRC(m->pagecfg.toggle[idx]);
-    if(! m->pagecfg.tglico[idx][2]) {
-        //got 2.1 or earlier style name (same as abbrev. name) for 2-position switch
-        //so need to convert to position 1
-        if (src+1 < INP_LAST &&
-            strcmp(INPUT_SourceNameAbbrevSwitch(str1, src), INPUT_SourceNameAbbrevSwitch(str2, src+1)) == 0)
-        {
-            src++;
-        }
-    }
-    //Determine switch-position (0, 1, or 2)
-    int sw = src;
-    INPUT_SourceNameAbbrevSwitch(str1, src);
-    while(sw) {
-        INPUT_SourceNameAbbrevSwitch(str2, sw-1);
-        if(strcmp(str1, str2))
-            break;
-        sw--;
-    }
-    sw = src - sw; //cur switch position
-    int val = m->pagecfg.tglico[idx][0];
-    memset(m->pagecfg.tglico[idx], 0, sizeof(m->pagecfg.tglico[idx]));
-    if(MIXER_SRC_IS_INV(m->pagecfg.toggle[idx])) {
-        for(int i = 0; i < 3; i++) {
-            if(i != sw) {
-                m->pagecfg.tglico[idx][i] = val;
-            }
-        }
-    } else {
-        m->pagecfg.tglico[idx][sw] = val;
-    }
-    m->pagecfg.toggle[idx] = src - sw;
-}
-
-static void tglico_set_num_pos(struct Model *m, int idx)
-{
-    //zero unsupported switch positions
-    if(! m->pagecfg.toggle[idx]) {
-        memset(m->pagecfg.tglico[idx], 0, sizeof(m->pagecfg.tglico[idx]));
-        return;
-    }
-    int src = m->pagecfg.toggle[idx];
-    char str1[10], str2[10];
-    INPUT_SourceNameAbbrevSwitch(str1, src);
-    if (src +2 < INP_LAST) {
-        INPUT_SourceNameAbbrevSwitch(str2, src+2);
-        if(strcmp(str1, str2) == 0) {
-            //3 way switch
-            return;
-        }
-    }
-    //2-way switch or non-switch
-    m->pagecfg.tglico[idx][2] = 0;
-}
-
 static void create_element(struct elem *elem, int type, int x, int y, int src, int e0, int e1, int e2)
 {
     ELEM_SET_X(*elem, x);
@@ -922,104 +861,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
         }
     }
-    if (MATCH_START(section, SECTION_GUI_QVGA)) {
-        if (MATCH_KEY(GUI_TRIM)) {
-            for (i = 0; i < NUM_STR_ELEMS(GUI_TRIM_VAL); i++) {
-                if (MATCH_VALUE(GUI_TRIM_VAL[i])) {
-                    m->pagecfg.trims = i;
-                    break;
-                }
-            }
-            return 1;
-        }
-        if (MATCH_KEY(GUI_BARSIZE)) {
-            for (i = 0; i < NUM_STR_ELEMS(GUI_BARSIZE_VAL); i++) {
-                if (MATCH_VALUE(GUI_BARSIZE_VAL[i])) {
-                    m->pagecfg.barsize = i;
-                    break;
-                }
-            }
-            return 1;
-        }
-        if (MATCH_START(name, GUI_BOX)) {
-            char str[20];
-            u8 idx = name[3] - '1';
-            if (idx >= 8) {
-                printf("%s: Unkown key: %s\n", section, name);
-                return 1;
-            }
-            for(i = 0; i < NUM_TIMERS; i++) {
-                if(mapstrcasecmp(value, TIMER_Name(str, i)) == 0) {
-                    m->pagecfg.box[idx] = i + 1;
-                    return 1;
-                }
-            }
-            for(i = 0; i < NUM_TELEM; i++) {
-                if(mapstrcasecmp(value, TELEMETRY_Name(str, i+1)) == 0) {
-                    m->pagecfg.box[idx] = i + 1 + NUM_TIMERS;
-                    return 1;
-                }
-            }
-            u8 src = get_source(section, value);
-            if(src > 0) {
-                if(src <= NUM_INPUTS) {
-                    printf("%s: Illegal input for box: %s\n", section, value);
-                    return 1;
-                }
-                src -= NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1);
-            }
-            m->pagecfg.box[idx] = src;
-            return 1;
-        }
-        if (MATCH_START(name, GUI_BAR)) {
-            u8 idx = name[3] - '1';
-            if (idx >= 8) {
-                printf("%s: Unkown key: %s\n", section, name);
-                return 1;
-            }
-            u8 src = get_source(section, value);
-            if(src > 0) {
-                if(src <= NUM_INPUTS) {
-                    printf("%s: Illegal input for bargraph: %s\n", section, value);
-                    return 1;
-                }
-                src -= NUM_INPUTS;
-            }
-            m->pagecfg.bar[idx] = src;
-            return 1;
-        }
-        if (MATCH_START(name, GUI_TOGGLE)) {
-            u8 idx = name[6] - '1';
-            if (idx >= NUM_TOGGLES) {
-                printf("%s: Unkown key: %s\n", section, name);
-                return 1;
-            }
-            for (int i = 0; i <= NUM_SOURCES; i++) {
-                char cmp[10];
-                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, i), value) == 0) {
-                    m->pagecfg.toggle[idx] = i;
-                    return 1;
-                }
-            }
-            //Legacy
-            m->pagecfg.toggle[idx] = get_source(section, value);
-            m->pagecfg.tglico[idx][2] = 255; //Mark that we had a legacy source for upgrade
-            return 1;
-        }
-        if (MATCH_START(name, GUI_TGLICO)) {
-            int idx = name[6] - '1';
-            if (idx >= NUM_TOGGLES) {
-                printf("%s: Unkown key: %s\n", section, name);
-                return 1;
-            }
-            int count = parse_int_list(value, m->pagecfg.tglico[idx], 3, U8);
-            if (count == 1) {
-                //convert from old syntax
-                upgrade_tglico(m, idx);
-            }
-            tglico_set_num_pos(m, idx);
-            return 1;
-        }
+    if (MATCH_START(section, "gui-")) {
         if (MATCH_START(name, GUI_QUICKPAGE)) {
             u8 idx = name[9] - '1';
             if (idx >= NUM_QUICKPAGES) {
@@ -1029,15 +871,13 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             int max = PAGE_GetNumPages();
             for(i = 0; i < max; i++) {
                 if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
-                    m->pagecfg.quickpage[idx] = i;
+                    m->pagecfg2.quickpage[idx] = i;
                     return 1;
                 }
             }
             printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
             return 1;
         }
-    }
-    if (MATCH_START(section, "gui-")) {
         return layout_ini_handler(user, section, name, value);
     }
     if (MATCH_SECTION(SECTION_PPMIN)) {
@@ -1327,50 +1167,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceName(file, i), SAFETY_VAL[m->safety[i]]);
         }
     }
-    fprintf(fh, "[%s]\n", SECTION_GUI_QVGA);
-    if (WRITE_FULL_MODEL || m->pagecfg.trims)
-        fprintf(fh, "%s=%s\n", GUI_TRIM, GUI_TRIM_VAL[m->pagecfg.trims]);
-    if (WRITE_FULL_MODEL || m->pagecfg.barsize)
-        fprintf(fh, "%s=%s\n", GUI_BARSIZE, GUI_BARSIZE_VAL[m->pagecfg.barsize]);
-    for(idx = 0; idx < 8; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg.box[idx]) {
-            if(m->pagecfg.box[idx] && m->pagecfg.box[idx] <= NUM_TIMERS) {
-                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TIMER_Name(file, m->pagecfg.box[idx]-1));
-            } else if(m->pagecfg.box[idx] && m->pagecfg.box[idx] - NUM_TIMERS <= NUM_TELEM) {
-                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, TELEMETRY_Name(file, m->pagecfg.box[idx]-NUM_TIMERS));
-            } else {
-                u8 val = m->pagecfg.box[idx];
-                if (val)
-                    val += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
-                fprintf(fh, "%s%d=%s\n", GUI_BOX, idx+1, INPUT_SourceName(file, val));
-            }
-        }
-    }
-    for(idx = 0; idx < 8; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg.bar[idx]) {
-            u8 val = m->pagecfg.bar[idx];
-            if (val)
-                val += NUM_INPUTS;
-            fprintf(fh, "%s%d=%s\n", GUI_BAR, idx+1, INPUT_SourceName(file, val));
-        }
-    }
-    for(idx = 0; idx < NUM_TOGGLES; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg.toggle[idx]) {
-            u8 val = m->pagecfg.toggle[idx];
-            fprintf(fh, "%s%d=%s\n", GUI_TOGGLE, idx+1, INPUT_SourceNameAbbrevSwitch(file, val));
-            if (WRITE_FULL_MODEL || m->pagecfg.tglico[idx])
-                fprintf(fh, "%s%d=%d,%d,%d\n", GUI_TGLICO, idx+1,
-                        m->pagecfg.tglico[idx][0],
-                        m->pagecfg.tglico[idx][1],
-                        INPUT_NumSwitchPos(idx) == 2 ? 0 : m->pagecfg.tglico[idx][2]);
-        }
-    }
-    for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
-        if (WRITE_FULL_MODEL || m->pagecfg.quickpage[idx]) {
-            u8 val = m->pagecfg.quickpage[idx];
-            fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
-        }
-    }
     fprintf(fh, "[%s]\n", SECTION_GUI);
     for(idx = 0; idx < NUM_ELEMS; idx++) {
         if (! ELEM_USED(Model.pagecfg2.elem[idx]))
@@ -1411,6 +1207,12 @@ u8 CONFIG_WriteModel(u8 model_num) {
             case ELEM_MODELICO:
                 fprintf(fh, "%s=%d,%d\n", MODEL_ICON, x, y);
                 break;
+        }
+    }
+    for(idx = 0; idx < NUM_QUICKPAGES; idx++) {
+        if (WRITE_FULL_MODEL || m->pagecfg2.quickpage[idx]) {
+            u8 val = m->pagecfg2.quickpage[idx];
+            fprintf(fh, "%s%d=%s\n", GUI_QUICKPAGE, idx+1, PAGE_GetName(val));
         }
     }
     CONFIG_EnableLanguage(1);

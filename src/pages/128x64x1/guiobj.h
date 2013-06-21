@@ -28,16 +28,25 @@ struct lang_obj {
     guiScrollable_t scrollable;
 };
 
-#define ICONS_MAX_COUNT 30 
 struct mainconfig_obj {
-    guiLabel_t label[4];
     union {
         guiLabel_t label;
         guiButton_t button;
-    } col1[4];
+    } col1[4]; 
     guiTextSelect_t value[4];
     guiScrollable_t scrollable;
-    guiImage_t image[ICONS_MAX_COUNT];
+};
+
+struct mainlayout_obj {
+    struct LabelDesc desc[5];
+    guiLabel_t editelem;
+    guiLabel_t move;
+    //guiTextSelect_t newelem;
+    guiLabel_t xlbl;
+    guiLabel_t ylbl;
+    guiLabel_t x;
+    guiLabel_t y;
+    guiLabel_t elem[NUM_ELEMS];
 };
 
 struct toggleselect_obj {
@@ -53,11 +62,11 @@ struct toggleselect_obj {
 
 struct mainpage_obj {
     guiLabel_t name;
-    guiImage_t icon;
-    guiBarGraph_t trim[6];
-    guiBarGraph_t bar[8];
-    guiLabel_t box[8];
-    guiImage_t toggle[NUM_TOGGLES];
+    union {
+        guiBarGraph_t bar;
+        guiLabel_t    box;
+        guiImage_t    img;
+    } elem[NUM_ELEMS];
     guiLabel_t battery;
     guiLabel_t power;
 };
@@ -304,6 +313,7 @@ struct gui_objs {
         struct chantest_obj chantest;
         struct lang_obj lang;
         struct mainconfig_obj mainconfig;
+        struct mainlayout_obj mainlayout;
         struct mainpage_obj mainpage;
         struct menu_obj menu;
         struct modelcfg_obj modelcfg;

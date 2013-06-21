@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern const struct LabelDesc outline;
+static const struct LabelDesc outline;
 static void show_iconsel_page(int idx);
 static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data);
 

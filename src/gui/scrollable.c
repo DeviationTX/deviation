@@ -94,7 +94,9 @@ void GUI_DrawScrollable(struct guiObject *obj)
 void GUI_RemoveScrollableObjs(struct guiObject *obj)
 {
     struct guiScrollable *scrollable = (struct guiScrollable *)obj;
-    GUI_RemoveHierObjects(scrollable->head);
+    if (scrollable->head)
+        GUI_RemoveHierObjects(scrollable->head);
+    scrollable->head = NULL;
 }
 
 int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)
@@ -249,7 +251,7 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)pos;
     guiScrollable_t *scrollable = (guiScrollable_t *)data;
-    if ((direction > 0 && scrollable->cur_row + scrollable->visible_rows == scrollable->item_count)
+    if ((direction > 0 && scrollable->cur_row + scrollable->visible_rows >= scrollable->item_count)
         || (direction < 0 && scrollable->cur_row == 0))
     {
         return -1;

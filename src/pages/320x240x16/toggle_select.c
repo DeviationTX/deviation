@@ -20,16 +20,17 @@
 #include "config/model.h"
 
 #define tp pagemem.u.toggle_select_page
-#define gui (&gui_objs.u.maincfg.u.g5)
+#define gui (&gui_objs.u.toggle)
 
 #define NUM_COLS      7
 
 #include "../common/_toggle_select.c"
 
 static void show_iconsel_page(int idx);
-extern const struct LabelDesc outline;
 static void show_icons(int SelectedIcon, int idx);
 extern void PAGE_MainLayoutRestoreDialog(int);
+
+static const struct LabelDesc outline = {0, 0, 0, 0, LABEL_TRANSPARENT};
 
 void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
 {

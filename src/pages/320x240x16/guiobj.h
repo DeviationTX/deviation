@@ -31,44 +31,16 @@ struct lang_obj {
     guiListbox_t listbox;
 };
 
-struct maincfg_obj {
+struct toggle_obj {
+    guiButton_t  okbutton;
+    guiButton_t  cancelbutton;
+    guiLabel_t   switchbox;
+    guiLabel_t   togglelabel[3];
+    guiRect_t    toggleframe;
+    guiImage_t   toggleicon[3];
+    guiImage_t   symbolicon[32];
+    guiRect_t    symbolframe;
     guiScrollbar_t scrollbar;
-    guiRect_t rect;
-    union {
-        struct {
-            guiLabel_t trimlbl;
-            guiTextSelect_t trim;
-            guiLabel_t barlbl;
-            guiTextSelect_t bar;
-            guiLabel_t boxlbl[8];
-            guiTextSelect_t box[8];
-        } g1;
-        struct {
-            guiButton_t icon[4];
-            guiTextSelect_t toggle[4];
-            guiLabel_t barlbl[8];
-            guiTextSelect_t bar[8];
-        } g2;
-        struct {
-            guiLabel_t menulbl[4];
-            guiTextSelect_t menu[4];
-        } g3;
-        struct {
-            guiRect_t rect;
-            guiImage_t image[40];
-        } g4;
-        struct {
-            guiButton_t  okbutton;
-            guiButton_t  cancelbutton;
-            guiLabel_t   switchbox;
-            guiLabel_t   togglelabel[3];
-            guiRect_t    toggleframe;
-            guiImage_t   toggleicon[3];
-            guiImage_t   symbolicon[32];
-            guiRect_t    symbolframe;
-            guiScrollbar_t scrollbar;
-        } g5;
-    } u;
 };
 
 #define LAYDLG_Y_SPACE 10
@@ -513,7 +485,7 @@ struct gui_objs {
         struct splash_obj splash;
         struct chantest_obj chantest;
         struct lang_obj lang;
-        struct maincfg_obj maincfg;
+        struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
         struct mainpage_objs mainpage;
         struct modelcfg_objs modelcfg;
