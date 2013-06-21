@@ -95,8 +95,7 @@ void GUI_RemoveScrollableObjs(struct guiObject *obj)
 {
     struct guiScrollable *scrollable = (struct guiScrollable *)obj;
     if (scrollable->head)
-        GUI_RemoveHierObjects(scrollable->head);
-    scrollable->head = NULL;
+        _GUI_RemoveHierObjects(scrollable->head, &scrollable->head);
 }
 
 int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)
