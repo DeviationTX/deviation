@@ -27,17 +27,24 @@ static void _show_page()
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
-    GUI_CreateLabelBox(&gui->inplbl, 4, 40, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Input"));
-    GUI_CreateLabelBox(&gui->neglbl, 74, 40, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim -"));
-    GUI_CreateLabelBox(&gui->poslbl, 138, 40, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim +"));
-    GUI_CreateLabelBox(&gui->steplbl, 202, 40, 108, 15, &NARROW_FONT, NULL, NULL, _tr("Trim Step"));
+    #define PCOL1 (4 + ((LCD_WIDTH - 320) / 2))
+    #define PCOL2 (74 + ((LCD_WIDTH - 320) / 2))
+    #define PCOL3 (138 + ((LCD_WIDTH - 320) / 2))
+    #define PCOL4 (202 + ((LCD_WIDTH - 320) / 2))
+    #define PROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    #define PROW2 (66 + ((LCD_HEIGHT - 240) / 2))
+    #define PROW3 (PROW2 + 2)
+    GUI_CreateLabelBox(&gui->inplbl, PCOL1, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Input"));
+    GUI_CreateLabelBox(&gui->neglbl, PCOL2, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim -"));
+    GUI_CreateLabelBox(&gui->poslbl, PCOL3, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim +"));
+    GUI_CreateLabelBox(&gui->steplbl, PCOL4, PROW1, 108, 15, &NARROW_FONT, NULL, NULL, _tr("Trim Step"));
     struct Trim *trim = MIXER_GetAllTrims();
     for (u8 i = 0; i < NUM_TRIMS; i++) {
-        GUI_CreateButton(&gui->src[i], 4, 24*i + 66, BUTTON_64x16,
+        GUI_CreateButton(&gui->src[i], PCOL1, 24*i + PROW2, BUTTON_64x16,
             trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)i));
-        GUI_CreateLabel(&gui->neg[i], 80, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
-        GUI_CreateLabel(&gui->pos[i], 144, 24*i + 68, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
-        GUI_CreateTextSelect(&gui->step[i], 208, 24*i + 66, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
+        GUI_CreateLabel(&gui->neg[i], PCOL2 + 6, 24*i + PROW3, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
+        GUI_CreateLabel(&gui->pos[i], PCOL3 + 6, 24*i + PROW3, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
+        GUI_CreateTextSelect(&gui->step[i], PCOL4 + 6, 24*i + PROW2, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
     }
 }
 
@@ -50,22 +57,29 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     tp->trim = trim[tp->index];
 
     PAGE_RemoveAllObjects();
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-96, 4, okcancel_cb);
 
+    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (104 + ((LCD_WIDTH - 320) / 2))
+    #define ROW1 (48 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW2 (ROW1 + 24)
+    #define ROW3 (ROW1 + 48)
+    #define ROW4 (ROW1 + 72)
+    #define ROW5 (ROW1 + 96)
     //Row 1
-    GUI_CreateLabel(&gui_ed->srclbl, 8, 48, NULL, DEFAULT_FONT, _tr("Input"));
-    GUI_CreateTextSelect(&gui_ed->src, 104, 48, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
+    GUI_CreateLabel(&gui_ed->srclbl, COL1, ROW1, NULL, DEFAULT_FONT, _tr("Input"));
+    GUI_CreateTextSelect(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
     //Row 2
-    GUI_CreateLabel(&gui_ed->neglbl, 8, 72, NULL, DEFAULT_FONT, _tr("Trim +"));
-    GUI_CreateTextSelect(&gui_ed->neg, 104, 72, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
+    GUI_CreateLabel(&gui_ed->neglbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim +"));
+    GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW2, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 3
-    GUI_CreateLabel(&gui_ed->poslbl, 8, 96, NULL, DEFAULT_FONT, _tr("Trim -"));
-    GUI_CreateTextSelect(&gui_ed->pos, 104, 96, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
+    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW3, NULL, DEFAULT_FONT, _tr("Trim -"));
+    GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
     //Row 4
-    GUI_CreateLabel(&gui_ed->steplbl, 8, 120, NULL, DEFAULT_FONT, _tr("Trim Step"));
-    GUI_CreateTextSelect(&gui_ed->step, 104, 120, TEXTSELECT_96, NULL, set_trimstep_cb, &tp->trim.step);
+    GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW4, NULL, DEFAULT_FONT, _tr("Trim Step"));
+    GUI_CreateTextSelect(&gui_ed->step, COL2, ROW4, TEXTSELECT_96, NULL, set_trimstep_cb, &tp->trim.step);
     //Row 5
-    GUI_CreateLabel(&gui_ed->swlbl, 8, 144, NULL, DEFAULT_FONT, _tr("Switch"));
-    GUI_CreateTextSelect(&gui_ed->sw, 104, 144, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
+    GUI_CreateLabel(&gui_ed->swlbl, COL1, ROW5, NULL, DEFAULT_FONT, _tr("Switch"));
+    GUI_CreateTextSelect(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
 }
