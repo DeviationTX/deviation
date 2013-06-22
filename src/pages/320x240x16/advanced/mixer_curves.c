@@ -18,6 +18,8 @@
 
 #include "../../common/advanced/_mixer_curves.c"
 
+#define ADDITIONAL_H (LCD_HEIGHT - 240) // additional space for the bigger Devo12-screen
+
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
     u8 type = CURVE_TYPE(curve);
@@ -50,7 +52,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     y += 40;
     GUI_CreateLabel(&gui->valuelbl, 8, y, NULL, DEFAULT_FONT, _tr("Value"));
     GUI_CreateTextSelect(&gui->value, 8, y+16, TEXTSELECT_96, NULL, set_value_cb, NULL);
-    GUI_CreateXYGraph(&gui->graph, LCD_WIDTH-208, 36, 200, 200,
+    GUI_CreateXYGraph(&gui->graph, LCD_WIDTH-208-ADDITIONAL_H, 36, 200+ADDITIONAL_H, 200+ADDITIONAL_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
