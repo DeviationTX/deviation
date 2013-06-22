@@ -53,48 +53,52 @@ void PAGE_ModelInit(int page)
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
-    row = 40;
-    GUI_CreateLabel(&gui->filelbl, 8, row, NULL, DEFAULT_FONT, _tr("File"));
-    GUI_CreateTextSelect(&gui->file, 136, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
+    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (COL1 + 128)
+    #define COL3 (COL1 + 228)
+    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    row = ROW1;
+    GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));
+    GUI_CreateTextSelect(&gui->file, COL2, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
 
     row+= 20;
-    GUI_CreateLabel(&gui->guilbl, 8, row, NULL, DEFAULT_FONT, _tr("Mixer GUI"));
-    GUI_CreateTextSelect(&gui->guits, 136, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
+    GUI_CreateLabel(&gui->guilbl, COL1, row, NULL, DEFAULT_FONT, _tr("Mixer GUI"));
+    GUI_CreateTextSelect(&gui->guits, COL2, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->namelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model name"));  // use the same naming convention for devo8 and devo10
-    GUI_CreateButton(&gui->name, 136, row, BUTTON_96x16, show_text_cb, 0x0000, _changename_cb, Model.name);
-    GUI_CreateButton(&gui->icon, 236, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
+    GUI_CreateLabel(&gui->namelbl, COL1, row, NULL, DEFAULT_FONT, _tr("Model name"));  // use the same naming convention for devo8 and devo10
+    GUI_CreateButton(&gui->name, COL2, row, BUTTON_96x16, show_text_cb, 0x0000, _changename_cb, Model.name);
+    GUI_CreateButton(&gui->icon, COL3, row, BUTTON_64x16, show_text_cb, 0x0000, changeicon_cb, _tr("Icon"));
 
     row += 20;
-    GUI_CreateLabel(&gui->typelbl, 8, row, NULL, DEFAULT_FONT, _tr("Model type"));
-    GUI_CreateTextSelect(&gui->type, 136, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
+    GUI_CreateLabel(&gui->typelbl, COL1, row, NULL, DEFAULT_FONT, _tr("Model type"));
+    GUI_CreateTextSelect(&gui->type, COL2, row, TEXTSELECT_96, type_press_cb, type_val_cb, NULL);
 
     row += 24;
-    GUI_CreateLabel(&gui->ppmlbl, 8, row, NULL, DEFAULT_FONT, _tr("PPM In"));
-    GUI_CreateTextSelect(&gui->ppm, 136, row, TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
+    GUI_CreateLabel(&gui->ppmlbl, COL1, row, NULL, DEFAULT_FONT, _tr("PPM In"));
+    GUI_CreateTextSelect(&gui->ppm, COL2, row, TEXTSELECT_96, ppmin_press_cb, ppmin_select_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->protolbl, 8, row, NULL, DEFAULT_FONT, _tr("Protocol"));
-    GUI_CreateTextSelect(&gui->proto, 136, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
+    GUI_CreateLabel(&gui->protolbl, COL1, row, NULL, DEFAULT_FONT, _tr("Protocol"));
+    GUI_CreateTextSelect(&gui->proto, COL2, row, TEXTSELECT_96, proto_press_cb, protoselect_cb, NULL);
 
     row += 20;
-    GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("# Channels"));
-    GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
+    GUI_CreateLabel(&gui->numchlbl, COL1, row, NULL, DEFAULT_FONT, _tr("# Channels"));
+    GUI_CreateTextSelect(&gui->numch, COL2, row, TEXTSELECT_96, NULL, numchanselect_cb, NULL);
 
 
     row += 24;
-    GUI_CreateLabel(&gui->pwrlbl, 8, row, NULL, DEFAULT_FONT, _tr("Tx power"));
-    GUI_CreateTextSelect(&gui->pwr, 136, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
+    GUI_CreateLabel(&gui->pwrlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Tx power"));
+    GUI_CreateTextSelect(&gui->pwr, COL2, row, TEXTSELECT_96, NULL, powerselect_cb, NULL);
 
     row += 20;
     if(Model.fixed_id == 0)
         strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
-    GUI_CreateLabel(&gui->fixedidlbl, 8, row, NULL, DEFAULT_FONT, _tr("Fixed ID"));
-    GUI_CreateButton(&gui->fixedid, 136, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
-    GUI_CreateButton(&gui->bind, 236, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
+    GUI_CreateLabel(&gui->fixedidlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Fixed ID"));
+    GUI_CreateButton(&gui->fixedid, COL2, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
+    GUI_CreateButton(&gui->bind, COL3, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
     configure_bind_button();
 }
 

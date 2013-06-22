@@ -24,13 +24,13 @@
 
 static void _show_buttons(int loadsave)
 {
-    PAGE_CreateCancelButton(112, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, 216, 4, BUTTON_96, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    PAGE_CreateCancelButton(LCD_WIDTH - 208, 4, okcancel_cb);
+    GUI_CreateButton(&gui->ok, LCD_WIDTH - 104, 4, BUTTON_96, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
 }
 
 static void _show_list(int loadsave, u8 num_models)
 {
-    GUI_CreateListBox(&gui->list, 112, 40, 200, 192, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
+    GUI_CreateListBox(&gui->list, 112 + ((LCD_WIDTH - 320) / 2), 40, 200, 192 + LCD_HEIGHT - 240, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
     if (loadsave != LOAD_TEMPLATE && loadsave != LOAD_LAYOUT)
-        GUI_CreateImage(&gui->image, 8, 88, 96, 96, mp->iconstr);
+        GUI_CreateImage(&gui->image, 8 + ((LCD_WIDTH - 320) / 2), 88, 96, 96, mp->iconstr);
 }
