@@ -64,11 +64,11 @@ void PAGE_ModelMenuInit(int page)
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODELMENU), goto_mainpage);
     u8 count = sizeof(menus) / sizeof(struct menu_s);
     for(int j = 0; j < 4; j++) {
-        int y = 40 + j * 50;
+        int y = 40 + j * (LCD_HEIGHT == 240 ? 50 : 59);
         for(int i = 0; i < 5; i++,pos++) {
             if (pos >= count)
                 break;
-            int x = 12 + i*60;
+            int x = (LCD_WIDTH == 320 ? 12 : 92) + i*60;
             GUI_CreateIcon(&gui->icon[pos], x, y, &menus[pos].icon, ico_select_cb, (void *)pos);
         }
     }

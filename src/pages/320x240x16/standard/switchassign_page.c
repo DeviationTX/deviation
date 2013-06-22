@@ -34,11 +34,11 @@ void PAGE_SwitchAssignInit(int page)
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SWITCHASSIGN), MODELMENU_Show);
     refresh_switches();
 
-    #define COL1 10
-    #define COL2 150
-    #define ROW_SPACE 20
+    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (150 + ((LCD_WIDTH - 320) / 2))
+    #define ROW_SPACE 30
     /* Row 1 */
-    int row = 40;
+    int row = 40 + ((LCD_HEIGHT - 240) / 2);
     GUI_CreateLabelBox(&gui->modelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
     GUI_CreateTextSelect(&gui->mode, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_FLYMODE);
 
