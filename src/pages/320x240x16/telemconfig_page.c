@@ -36,12 +36,17 @@ void PAGE_TelemconfigInit(int page)
         return;
     }
 
+    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (COL1 + 55)
+    #define COL3 (COL1 + 156)
+    #define COL4 (COL1 + 225)
+    #define ROW1 (70 + ((LCD_HEIGHT - 240) / 2))
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
-        GUI_CreateLabelBox(&gui->name[i], 10, 70 + row_height * i, 55, 16, &DEFAULT_FONT,
+        GUI_CreateLabelBox(&gui->name[i], COL1, ROW1 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);
-        GUI_CreateTextSelect(&gui->type[i], 65, 70 + row_height * i, TEXTSELECT_96, NULL, telem_name_cb, (void *)i);
-        GUI_CreateTextSelect(&gui->gtlt[i], 166, 70 + row_height * i, TEXTSELECT_64, NULL, gtlt_cb, (void *)i);
-        GUI_CreateTextSelect(&gui->value[i], 235, 70 + row_height * i, TEXTSELECT_64, NULL, limit_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->type[i], COL2, ROW1 + row_height * i, TEXTSELECT_96, NULL, telem_name_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->gtlt[i], COL3, ROW1 + row_height * i, TEXTSELECT_64, NULL, gtlt_cb, (void *)i);
+        GUI_CreateTextSelect(&gui->value[i], COL4, ROW1 + row_height * i, TEXTSELECT_64, NULL, limit_cb, (void *)i);
     }
 }
 
