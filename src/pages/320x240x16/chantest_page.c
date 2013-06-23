@@ -76,26 +76,26 @@ static void _show_bar_page(u8 num_bars, u8 _page)
         height = 155 + (LCD_HEIGHT - 240);
         count = num_bars;
     }
-    u16 offset = (LCD_WIDTH + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
+    u16 offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
-        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * i, 50, 10, height,
+        GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
+                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
-        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
-                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+        GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 53 + height,
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
-    offset = (LCD_WIDTH + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
+    offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
-        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
+        GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
+                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
-        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230 + (LCD_HEIGHT - 240),
-                                      SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+        GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
     if(num_pages > 1) {
         GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_pages, NULL, scroll_cb, NULL);

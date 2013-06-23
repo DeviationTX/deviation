@@ -12,7 +12,7 @@ struct dialog_obj {
     guiDialog_t dialog;
 };
 
-#define SEPERATION        32
+#define SEPARATION        32
 #define NUM_BARS_PER_ROW  (LCD_WIDTH == 320 ? 8 : 14)
 #define MAX_CHAN_ELEMENTS ((NUM_BARS_PER_ROW + 1) * 2) // 320: 2 rows with 9 elements each, 480: 2*15 resp. 2*8 / 2*14 with scrollbar
 #define MAX_BUTT          (NUM_TX_BUTTONS > NUM_CHANNELS ? NUM_TX_BUTTONS : NUM_CHANNELS)
