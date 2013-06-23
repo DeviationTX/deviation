@@ -139,7 +139,7 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (lp.selected_for_move) {
+    if (lp.selected_for_move >= 0) {
         int y = GUI_TextSelectHelper(lp.selected_y, HEADER_Y, LCD_HEIGHT-lp.selected_h, dir, 1, 10, NULL);
         if (y != lp.selected_y) {
             lp.selected_y = y;
