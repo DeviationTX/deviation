@@ -93,7 +93,8 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
     if(press < 0) {
         select_for_move((guiLabel_t *)obj);
     }
-    if(lp.selected_for_move >= 0 && press == 1) {
+    if(press == 1) {
+        select_for_move((guiLabel_t *)obj);
         show_config();
         lp.long_press = 1;
     }
@@ -126,5 +127,4 @@ void notify_cb(guiObject_t *obj)
     GetElementSize(ELEM_TYPE(pc.elem[idx]), &lp.selected_w, &lp.selected_h);
     GUI_Redraw((guiObject_t *)&gui->x);
     GUI_Redraw((guiObject_t *)&gui->y);
-
 }
