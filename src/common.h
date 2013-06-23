@@ -181,6 +181,8 @@ u8 STDMIXER_ValidateTraditionModel();
 const char *STDMIXER_ModeName(int mode);
 void STDMIXER_InitSwitches();
 void STDMIXER_SaveSwitches();
+const char *GetElemName(int type);
+const char *GetBoxSource(char *str, int src);
 
 #define PPMin_Mode() (Model.num_ppmin >> 6)
 #endif

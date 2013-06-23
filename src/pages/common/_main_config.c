@@ -46,28 +46,21 @@ int elem_get_count(int type)
     return 0;
 }
 
-const char *boxlabel_cb(guiObject_t *obj, const void *data)
+const char *GetBoxSource(char *str, int src)
 {
-    (void)obj;
-    int i = (long)data;
-    if (pc.elem[i].src) {
-        if (pc.elem[i].src <= NUM_TIMERS)
-            return TIMER_Name(lp.tmp, pc.elem[i].src - 1);
-        else if( pc.elem[i].src - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_Name(lp.tmp, pc.elem[i].src - NUM_TIMERS);
+    if (src) {
+        if (src <= NUM_TIMERS)
+            return TIMER_Name(str, src - 1);
+        else if( src - NUM_TIMERS <= NUM_TELEM)
+        return TELEMETRY_Name(str, src - NUM_TIMERS);
     }
-    return INPUT_SourceName(lp.tmp, pc.elem[i].src
-               ? pc.elem[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS
+    return INPUT_SourceName(str, src
+               ? src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS
                : 0);
 }
-
-
-const char *newelem_cb(guiObject_t *obj, int dir, void *data)
-{   
-    (void)data;
-    (void)obj;
-    lp.newelem = GUI_TextSelectHelper(lp.newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
-    switch(lp.newelem) {
+const char *GetElemName(int type)
+{
+    switch(type) {
         case ELEM_SMALLBOX: return _tr("Small-box");
         case ELEM_BIGBOX:   return _tr("Big-box");
         case ELEM_TOGGLE:   return _tr("Toggle");
@@ -77,6 +70,14 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_MODELICO: return _tr("Model");
     }
     return "";
+}
+
+const char *newelem_cb(guiObject_t *obj, int dir, void *data)
+{   
+    (void)data;
+    (void)obj;
+    lp.newelem = GUI_TextSelectHelper(lp.newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
+    return GetElemName(lp.newelem);
 }
 
 int create_element()
@@ -115,7 +116,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_BIGBOX:
         {
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
-            return boxlabel_cb(NULL, data);
+            return GetBoxSource(lp.tmp, pc.elem[idx].src);
         }
         case ELEM_BAR:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   

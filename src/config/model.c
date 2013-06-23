@@ -266,7 +266,7 @@ enum {
 };
 static const char * parse_partial_int_list(const char *ptr, void *vals, int *max_count, int type)
 {
-    const char *origptr = ptr;
+    //const char *origptr = ptr;
     int value_int = 0;
     int idx = 0;
     int sign = 0;
@@ -300,7 +300,7 @@ static const char * parse_partial_int_list(const char *ptr, void *vals, int *max
         } else if (*ptr >= '0' && *ptr <= '9') {
             value_int = value_int * 10 + (*ptr - '0');
         } else {
-            printf("Bad value '%c' in '%s'\n", *ptr, origptr);
+            //printf("Bad value '%c' in '%s'\n", *ptr, origptr);
             return ptr;
         }
         ptr++;
@@ -314,15 +314,16 @@ static int parse_int_list(const char *ptr, void *vals, int max_count, int type)
     return max_count - count;
 }
 
-static void create_element(struct elem *elem, int type, int x, int y, int src, int e0, int e1, int e2)
+static void create_element(struct elem *elem, int type, s16 *data)
 {
-    ELEM_SET_X(*elem, x);
-    ELEM_SET_Y(*elem, y);
+    //int x, int y, int src, int e0, int e1, int e2)
+    ELEM_SET_X(*elem, data[0]);
+    ELEM_SET_Y(*elem, data[1]);
     ELEM_SET_TYPE(*elem, type);
-    elem->src = src;
-    elem->extra[0] = e0;
-    elem->extra[1] = e1;
-    elem->extra[2] = e2;
+    elem->src = data[5];
+    elem->extra[0] = data[2];
+    elem->extra[1] = data[3];
+    elem->extra[2] = data[4];
 }
 
 static int layout_ini_handler(void* user, const char* section, const char* name, const char* value)
@@ -341,85 +342,83 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
     }
-    if (MATCH_KEY(MODEL_ICON)) {
-        s16 data[2];
-        int count = parse_int_list(value, data, 2, S16);
-        if (count == 2)
-            create_element(&m->pagecfg2.elem[idx], ELEM_MODELICO, data[0], data[1], 0, 0, 0, 0);
+    int type;
+    for (type = 0; type < ELEM_LAST; type++)
+        if(mapstrcasecmp(name, GetElemName(type)) == 0)
+            break;
+    if (type == ELEM_LAST)
+        return 1;
+    int count = 5;
+    s16 data[6] = {0};
+    const char *ptr = parse_partial_int_list(value, data, &count, S16);
+    if (count > 3) {
+        printf("Could not parse coordinates from %s=%s\n", name,value);
         return 1;
     }
-    if (MATCH_KEY(GUI_TRIM)) {
-        s16 data[4];
-        //x, y, is_vert, src
-        int count = parse_int_list(value, data, 4, S16);
-        if (count == 4)
-            create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_VTRIM : ELEM_HTRIM, data[0], data[1], data[3], 0, 0, 0);
-        return 1;
-    }
-    if (MATCH_KEY(GUI_BOX)) {
-        s16 data[3];
-        s16 src = -1;
-        char str[20];
-        //x, y, type (1=big, 0=small), src
-        int count = 3;
-        const char *ptr = parse_partial_int_list(value, data, &count, S16);
-        if (count)
-            return 1;
-        ptr++;
-        for(i = 0; i < NUM_TIMERS; i++) {
-            if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
-                src = i + 1;
-                break;
-            }
-        }
-        if (src == -1) {
-            for(i = 0; i < NUM_TELEM; i++) {
-                if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
-                    src = i + 1 + NUM_TIMERS;
+    switch(type) {
+        //case ELEM_MODEL:  //x, y
+        case ELEM_VTRIM:  //x, y, src
+        case ELEM_HTRIM:  //x, y, src
+            data[5] = data[2];
+            data[2] = 0;
+            break;
+        case ELEM_SMALLBOX: //x, y, src
+        case ELEM_BIGBOX:   //x. y. src
+        {
+            s16 src = -1;
+            char str[20];
+            if (count != 3)
+                return 1;
+            for(i = 0; i < NUM_TIMERS; i++) {
+                if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+                    src = i + 1;
                     break;
                 }
             }
-        }
-        if (src == -1) {
-            u8 newsrc = get_source(section, ptr);
-            if(newsrc >= NUM_INPUTS) {
-                src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+            if (src == -1) {
+                for(i = 0; i < NUM_TELEM; i++) {
+                    if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
+                        src = i + 1 + NUM_TIMERS;
+                        break;
+                    }
+                }
             }
+            if (src == -1) {
+                u8 newsrc = get_source(section, ptr);
+                if(newsrc >= NUM_INPUTS) {
+                    src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+                }
+            }
+            if (src == -1)
+                src = 0;
+            data[5] = src;
+            break;
         }
-        if (src == -1)
-            src = 0;
-        create_element(&m->pagecfg2.elem[idx], data[2] ? ELEM_BIGBOX : ELEM_SMALLBOX, data[0], data[1], src, 0, 0, 0);
-        return 1;
-    }
-    if (MATCH_KEY(GUI_BAR)) {
-        s16 data[2];
-        int count = 2;
-        //x, y, src
-        const char *ptr = parse_partial_int_list(value, data, &count, S16);
-        if(count)
-            return 1;
-        u8 src = get_source(section, ptr+1);
-        if (src < NUM_INPUTS)
-            src = 0;
-        create_element(&m->pagecfg2.elem[idx], ELEM_BAR, data[0], data[1], src-NUM_INPUTS, 0, 0, 0);
-        return 1;
-    }
-    if (MATCH_KEY(GUI_TOGGLE)) {
-        s16 data[5];
-        int count = 5;
-        //x, y, tgl0, tgl1, tgl2, src
-        const char *ptr = parse_partial_int_list(value, data, &count, S16);
-        if(count)
-            return 1;
-        for (int j = 0; j <= NUM_SOURCES; j++) {
-            char cmp[10];
-            if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
-                create_element(&m->pagecfg2.elem[idx], ELEM_TOGGLE, data[0], data[1], j, data[2], data[3], data[4]);
+        case ELEM_BAR: //x, y, src
+        {
+            if (count != 3)
                 return 1;
-            }
+            u8 src = get_source(section, ptr);
+            if (src < NUM_INPUTS)
+                src = 0;
+            data[5] = src;
+            break;
         }
-        return 1;
+        case ELEM_TOGGLE: //x, y, tgl0, tgl1, tgl2, src
+        {
+            if(count)
+                return 1;
+            for (int j = 0; j <= NUM_SOURCES; j++) {
+                char cmp[10];
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr) == 0) {
+                    data[5] = j;
+                    break;
+                }
+            }
+            return 1;
+        }
     }
+    create_element(&m->pagecfg2.elem[idx], type, data);
     return 1;
 }
 
@@ -1175,26 +1174,18 @@ u8 CONFIG_WriteModel(u8 model_num) {
         int x = ELEM_X(Model.pagecfg2.elem[idx]);
         int y = ELEM_Y(Model.pagecfg2.elem[idx]);
         int type = ELEM_TYPE(Model.pagecfg2.elem[idx]);
+        const char *elename = GetElemName(type);
         switch(type) {
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
-                if(src && src <= NUM_TIMERS) {
-                    TIMER_Name(file, src-1);
-                } else if(src && src - NUM_TIMERS <= NUM_TELEM) {
-                    TELEMETRY_Name(file, src-NUM_TIMERS);
-                } else {
-                    if (src)
-                        src += NUM_INPUTS-(NUM_TIMERS + NUM_TELEM);
-                    INPUT_SourceName(file, src);
-                }
-                fprintf(fh, "%s=%d,%d,%d,%s\n", GUI_BOX, x, y, type == ELEM_BIGBOX ? 1 : 0, file);
+                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, GetBoxSource(file, src));
                 break;
             case ELEM_BAR:
                 src += NUM_INPUTS;
-                fprintf(fh, "%s=%d,%d,%s\n", GUI_BAR, x, y, INPUT_SourceName(file, src));
+                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, INPUT_SourceName(file, src));
                 break;
             case ELEM_TOGGLE:
-                fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n", GUI_TOGGLE, x, y,
+                fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n", elename, x, y,
                         Model.pagecfg2.elem[idx].extra[0],
                         Model.pagecfg2.elem[idx].extra[1],
                         INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.elem[idx].extra[2],
@@ -1202,10 +1193,10 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 break;
             case ELEM_HTRIM:
             case ELEM_VTRIM:
-                fprintf(fh, "%s=%d,%d,%d,%d\n", GUI_TRIM, x, y, type == ELEM_VTRIM ? 1 : 0, src);
+                fprintf(fh, "%s=%d,%d,%d\n", elename, x, y, src);
                 break;
             case ELEM_MODELICO:
-                fprintf(fh, "%s=%d,%d\n", MODEL_ICON, x, y);
+                fprintf(fh, "%s=%d,%d\n", elename, x, y);
                 break;
         }
     }

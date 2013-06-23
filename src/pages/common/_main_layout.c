@@ -64,6 +64,13 @@ void draw_elements()
     }
 }
 
+const char *boxlabel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int i = (long)data;
+    return GetBoxSource(lp.tmp, pc.elem[i].src);
+}
+
 const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
