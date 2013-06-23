@@ -193,7 +193,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
     if (desc->style == LABEL_BLINK ) {
         blink_fontcolor = ~blink_fontcolor;
         LCD_SetFontColor(blink_fontcolor);
-    } else if (desc->style == LABEL_INVERTED || is_selected) {
+    } else if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
         LCD_SetFontColor(~desc->font_color);
     } else {
         LCD_SetFontColor(desc->font_color);
