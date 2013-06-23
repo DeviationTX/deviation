@@ -154,18 +154,6 @@ static const char TELEM_VALUE[] = "value";
 #define STRINGIFY(x) _STRINGIFY(x)
 #define _STRINGIFY(x) #x
 static const char SECTION_GUI[] = "gui-" STRINGIFY(LCD_WIDTH) "x" STRINGIFY(LCD_HEIGHT);
-static const char SECTION_GUI_QVGA[] = "gui-qvga";
-#define GUI_TRIM SECTION_TRIM
-static const char * const GUI_TRIM_VAL[TRIMS_LAST] = { "none", "4out", "4in", "6"};
-static const char GUI_BARSIZE[] = "barsize";
-static const char * const GUI_BARSIZE_VAL[BARS_LAST] = { "none", "half", "full"};
-#define GUI_SOURCE MIXER_SOURCE
-#define GUI_TIMER SECTION_TIMER
-static const char GUI_TOGGLE[] = "toggle";
-static const char GUI_TGLICO[] = "tglico";
-static const char GUI_BAR[] = "bar";
-static const char GUI_BOX[] = "box";
-static const char GUI_TELEMETRY[] = "telemetry";
 static const char GUI_QUICKPAGE[] = "quickpage";
 
 s8 mapstrcasecmp(const char *s1, const char *s2)
