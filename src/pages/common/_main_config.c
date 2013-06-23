@@ -170,3 +170,29 @@ static void add_dlgbut_cb(struct guiObject *obj, const void *data)
     }
 }
 
+const char *menulabel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    long i = (long)data;
+    sprintf(lp.tmp, "%s %d", _tr("Menu"), (int)i+1);
+    return lp.tmp;
+}
+
+const char *menusel_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void) obj;
+    (void) dir;
+    int i = (long)data;
+    int max_pages = PAGE_GetNumPages();
+    int start_page = PAGE_GetStartPage();
+    int page = GUI_TextSelectHelper(pc.quickpage[i], start_page, max_pages -1, dir, 1, 1, NULL);
+    if (page != pc.quickpage[i]) {
+        int increment = (page > pc.quickpage[i]) ? 1 : -1;
+        while (page >= start_page && page != max_pages && ! PAGE_IsValid(page)) {
+            page = (page + increment);
+        }
+        if (page >= start_page && page != max_pages)
+            pc.quickpage[i] = page;
+    }
+    return PAGE_GetName(pc.quickpage[i]);
+}
