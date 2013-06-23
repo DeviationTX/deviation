@@ -21,53 +21,56 @@
 
 static void _show_limits()
 {
-    int y = 40;
+    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (COL1 + 120)
+    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    int y = ROW1;
     int height = 20;
     //Row 1
-    GUI_CreateLabel(&gui->reverselbl, 8, y, NULL, DEFAULT_FONT, _tr("Reverse"));
-    GUI_CreateTextSelect(&gui->reverse, 128, y, TEXTSELECT_96, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
+    GUI_CreateLabel(&gui->reverselbl, COL1, y, NULL, DEFAULT_FONT, _tr("Reverse"));
+    GUI_CreateTextSelect(&gui->reverse, COL2, y, TEXTSELECT_96, toggle_reverse_cb, reverse_cb, (void *)((long)mp->channel));
     y += height;
     //Row 2
-    GUI_CreateLabel(&gui->failsafelbl, 8, y, NULL, DEFAULT_FONT, _tr("Fail-safe"));
-    GUI_CreateTextSelect(&gui->failsafe, 128, y, TEXTSELECT_96, toggle_failsafe_cb, set_failsafe_cb, NULL);
+    GUI_CreateLabel(&gui->failsafelbl, COL1, y, NULL, DEFAULT_FONT, _tr("Fail-safe"));
+    GUI_CreateTextSelect(&gui->failsafe, COL2, y, TEXTSELECT_96, toggle_failsafe_cb, set_failsafe_cb, NULL);
     y += height;
     //Row 3
-    GUI_CreateLabel(&gui->safetylbl, 8, y, NULL, DEFAULT_FONT, _tr("Safety"));
-    GUI_CreateTextSelect(&gui->safety, 128, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+    GUI_CreateLabel(&gui->safetylbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safety"));
+    GUI_CreateTextSelect(&gui->safety, COL2, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
     y += height;
     //Row 4
-    GUI_CreateLabel(&gui->safevallbl, 8, y, NULL, DEFAULT_FONT, _tr("Safe Val"));
-    GUI_CreateTextSelect(&gui->safeval, 128, y, TEXTSELECT_96, NULL, set_safeval_cb, NULL);
+    GUI_CreateLabel(&gui->safevallbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safe Val"));
+    GUI_CreateTextSelect(&gui->safeval, COL2, y, TEXTSELECT_96, NULL, set_safeval_cb, NULL);
     y += height;
     //Row 5
-    GUI_CreateLabel(&gui->minlbl, 8, y, NULL, DEFAULT_FONT, _tr("Min Limit"));
-    GUI_CreateTextSelect(&gui->min, 128, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.min);
+    GUI_CreateLabel(&gui->minlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Min Limit"));
+    GUI_CreateTextSelect(&gui->min, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.min);
     y += height;
     //Row 6
-    GUI_CreateLabel(&gui->maxlbl, 8, y, NULL, DEFAULT_FONT, _tr("Max Limit"));
-    GUI_CreateTextSelect(&gui->max, 128, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.max);
+    GUI_CreateLabel(&gui->maxlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Max Limit"));
+    GUI_CreateTextSelect(&gui->max, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.max);
     y += height;
     //Row 5
-    GUI_CreateLabel(&gui->scalelbl, 8, y, scalestring_cb, DEFAULT_FONT, (void *)1L);
-    GUI_CreateTextSelect(&gui->scale, 128, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit.servoscale);
+    GUI_CreateLabel(&gui->scalelbl, COL1, y, scalestring_cb, DEFAULT_FONT, (void *)1L);
+    GUI_CreateTextSelect(&gui->scale, COL2, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit.servoscale);
     y += height;
-    GUI_CreateLabel(&gui->scaleneglbl, 8, y, scalestring_cb, DEFAULT_FONT, (void *)0L);
-    GUI_CreateTextSelect(&gui->scaleneg, 128, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit.servoscale_neg);
+    GUI_CreateLabel(&gui->scaleneglbl, COL1, y, scalestring_cb, DEFAULT_FONT, (void *)0L);
+    GUI_CreateTextSelect(&gui->scaleneg, COL2, y, TEXTSELECT_96, NULL, set_limitsscale_cb, &mp->limit.servoscale_neg);
     y += height;
     //Row 6
-    GUI_CreateLabel(&gui->subtrimlbl, 8, y, NULL, DEFAULT_FONT, _tr("Subtrim"));
-    GUI_CreateTextSelect(&gui->subtrim, 128, y, TEXTSELECT_96, NULL, set_trimstep_cb, &mp->limit.subtrim);
+    GUI_CreateLabel(&gui->subtrimlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Subtrim"));
+    GUI_CreateTextSelect(&gui->subtrim, COL2, y, TEXTSELECT_96, NULL, set_trimstep_cb, &mp->limit.subtrim);
     y += height;
     //Row 7
-    GUI_CreateLabel(&gui->speedlbl, 8, y, NULL, DEFAULT_FONT, _tr("Speed"));
-    GUI_CreateTextSelect(&gui->speed, 128, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.speed);
+    GUI_CreateLabel(&gui->speedlbl, COL1, y, NULL, DEFAULT_FONT, _tr("Speed"));
+    GUI_CreateTextSelect(&gui->speed, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit.speed);
 }
 
 static void _show_titlerow()
 {
     GUI_CreateLabel(&gui->title, 8, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)(long)mp->channel);
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid) {
