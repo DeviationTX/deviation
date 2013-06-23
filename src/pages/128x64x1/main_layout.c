@@ -127,6 +127,7 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
         if (lp.selected_for_move >= 0) {
             set_selected_for_move(-1);
         } else {
+            layout_exit();
             show_config();
         }
         return 1;
