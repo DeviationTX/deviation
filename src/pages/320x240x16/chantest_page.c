@@ -49,7 +49,6 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 
 static void _show_bar_page(u8 num_bars, u8 _page)
 {
-    #define SEPERATION 32
     long i;
     u8 height;
     u8 count;
@@ -57,49 +56,49 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     page = _page;
     num_pages = 0;
 
-    if (num_bars > 18) {
-        num_pages = (num_bars + 7) / 8 - 1;
+    if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
+        num_pages = (num_bars + NUM_BARS_PER_ROW - 1) / NUM_BARS_PER_ROW - 1;
     
-        num_bars = num_bars - page * 8;
-        if (num_bars > 16)
-            num_bars = 16;
-        row_len = 8;
+        num_bars = num_bars - page * NUM_BARS_PER_ROW;
+        if (num_bars > 2 * NUM_BARS_PER_ROW)
+            num_bars = 2 * NUM_BARS_PER_ROW;
+        row_len = NUM_BARS_PER_ROW;
     } else {
-        row_len = 9;
+        row_len = NUM_BARS_PER_ROW + 1;
     }
 
     cp->num_bars = num_bars;
 
     if (num_bars > row_len) {
-        height = 70;
+        height = 70 + (LCD_HEIGHT - 240) / 2;
         count = (num_bars + 1) / 2;
     } else {
-        height = 155;
+        height = 155 + (LCD_HEIGHT - 240);
         count = num_bars;
     }
-    u16 offset = (320 + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
+    u16 offset = (LCD_WIDTH + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 32,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+8*page));
+                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * i - (SEPERATION - 10)/2, 53 + height,
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
-    offset = (320 + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
+    offset = (LCD_WIDTH + (SEPERATION - 10) - SEPERATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
-        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 - height,
-                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+8*page));
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * (i - count), 229 - height, 10, height,
+        GUI_CreateLabelBox(&gui->chan[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
+                                      SEPERATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPERATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
-        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230,
+        GUI_CreateLabelBox(&gui->value[i], offset + SEPERATION * (i - count) - (SEPERATION - 10)/2, 230 + (LCD_HEIGHT - 240),
                                       SEPERATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
     if(num_pages > 1) {
-        GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, num_pages, NULL, scroll_cb, NULL);
+        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_pages, NULL, scroll_cb, NULL);
         GUI_SetScrollbar(&gui->scrollbar, page);
     }
         
@@ -150,18 +149,26 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void show_button_page()
 {
-    #define X_STEP 95
+    #define X_STEP ((LCD_WIDTH - 20) / 3)
+    int reorder[NUM_TX_BUTTONS] = {
+            0, 2, 17,    // L-trims in left column, R -trims middle, control keys right
+            1, 3, 15,
+            4, 6, 14,
+            5, 7, 16,
+            8, 10, 13,
+            9, 11, 12,
+    };
     int i;
     cp->is_locked = 3;
     int y = 64;
-    GUI_CreateLabelBox(&gui->lock, 10, 40, 300, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->lock, LCD_WIDTH/2-40, 40, 80, 20, &TITLE_FONT, lockstr_cb, NULL, NULL);
     for (i = 0; i < NUM_TX_BUTTONS; i++) {
-        GUI_CreateLabelBox(&gui->chan[i], 10 + X_STEP * (i % 3), y, 0, 0,
-                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
-        GUI_CreateLabelBox(&gui->value[i], 70 + X_STEP * (i % 3), y, 16, 16,
+        GUI_CreateLabelBox(&gui->value[i], 10 + X_STEP * (i % 3), y, 16, 16,
                          &SMALLBOX_FONT, NULL, NULL, (void *)"");
+        GUI_CreateLabelBox(&gui->chan[i], 30 + X_STEP * (i % 3), y+2, 0, 0,
+                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)reorder[i]);
         if ((i % 3) == 2)
-            y += 24;
+            y += (LCD_HEIGHT - 64) / 6;
     }
 }
 
@@ -198,5 +205,5 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 }
 static inline int _get_input_idx(int chan)
 {
-    return page * 8 + chan;
+    return page * NUM_BARS_PER_ROW + chan;
 }

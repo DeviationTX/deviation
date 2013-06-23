@@ -42,33 +42,43 @@ void PAGE_DrExpInit(int page)
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
+    #define COL3 (4 + ((LCD_WIDTH - 320) / 2))
+    #define COL4 (112 + ((LCD_WIDTH - 320) / 2))
+    #define COL5 (216 + ((LCD_WIDTH - 320) / 2))
+    #define COL1 COL4
+    #define COL2 (COL1 + 32)
+    #define ROW1 (36 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW2 (ROW1 + 20)
+    #define ROW3 (ROW1 + 40)
+    #define ROW4 (ROW1 + 60)
+    #define ROW5 (ROW1 + 80)
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->srclbl, 10, 40, 96, 16, &DEFAULT_FONT, NULL, NULL, _tr("Src"));
-    GUI_CreateTextSelect(&gui->src, 100, 40, TEXTSELECT_96, NULL, set_type_cb, NULL);
+    GUI_CreateLabelBox(&gui->srclbl, COL1, ROW1, 96, 16, &DEFAULT_FONT, NULL, NULL, _tr("Src"));
+    GUI_CreateTextSelect(&gui->src, COL2, ROW1, TEXTSELECT_64, NULL, set_type_cb, NULL);
     /* Row 2 */
-    GUI_CreateLabelBox(&gui->mode[0], 4, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_NORMAL));
-    GUI_CreateLabelBox(&gui->mode[1], 112, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE1));
-    GUI_CreateLabelBox(&gui->mode[2], 216, 60, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE2));
+    GUI_CreateLabelBox(&gui->mode[0], COL3, ROW2, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_NORMAL));
+    GUI_CreateLabelBox(&gui->mode[1], COL4, ROW2, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE1));
+    GUI_CreateLabelBox(&gui->mode[2], COL5, ROW2, 96, 16, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(PITTHROMODE_IDLE2));
     /* Row 3 */
-    GUI_CreateTextSelect(&gui->dr[0], 4, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_NORMAL));
-    GUI_CreateTextSelect(&gui->dr[1], 112, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE1));
-    GUI_CreateTextSelect(&gui->dr[2], 216, 80, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE2));
+    GUI_CreateTextSelect(&gui->dr[0], COL3, ROW3, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_NORMAL));
+    GUI_CreateTextSelect(&gui->dr[1], COL4, ROW3, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE1));
+    GUI_CreateTextSelect(&gui->dr[2], COL5, ROW3, TEXTSELECT_96, NULL, set_dr_cb, ((void *)(long)PITTHROMODE_IDLE2));
     /* Row 4 */
-    GUI_CreateTextSelect(&gui->exp[0], 4, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_NORMAL));
-    GUI_CreateTextSelect(&gui->exp[1], 112, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE1));
-    GUI_CreateTextSelect(&gui->exp[2], 216, 100, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE2));
+    GUI_CreateTextSelect(&gui->exp[0], COL3, ROW4, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_NORMAL));
+    GUI_CreateTextSelect(&gui->exp[1], COL4, ROW4, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE1));
+    GUI_CreateTextSelect(&gui->exp[2], COL5, ROW4, TEXTSELECT_96, NULL, set_exp_cb, ((void *)(long)PITTHROMODE_IDLE2));
     /* Row 5 */
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
-    GUI_CreateXYGraph(&gui->graph[0], 4, 140, 96, 96,
+    GUI_CreateXYGraph(&gui->graph[0], COL3, ROW5, 96, 120,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
                               0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_NORMAL+1L));
-    GUI_CreateXYGraph(&gui->graph[1], 112, 140, 96, 96,
+    GUI_CreateXYGraph(&gui->graph[1], COL4, ROW5, 96, 120,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
                               0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_IDLE1+1L));
-    GUI_CreateXYGraph(&gui->graph[2], 216, 140, 96, 96,
+    GUI_CreateXYGraph(&gui->graph[2], COL5, ROW5, 96, 120,
                               CHAN_MIN_VALUE, ymin,
                               CHAN_MAX_VALUE, ymax,
                               0, 0, show_curve_cb, curpos_cb, NULL, (void *)(PITTHROMODE_IDLE2+1L));

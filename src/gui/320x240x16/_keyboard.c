@@ -14,14 +14,14 @@
  */
 
 #define TEXTBOX_X_OFFSET 5
-#define TEXTBOX_Y_OFFSET 2
-#define TEXTBOX_HEIGHT  24
+#define TEXTBOX_Y_OFFSET (2 + (LCD_HEIGHT - 240) / 2)
+#define TEXTBOX_HEIGHT   24
 #define TEXTBOX_ROUND    3
 #define TEXTBOX_BG_COLOR 0xFFFF
 #define TEXTBOX_COLOR    0x0000
 #define TEXTBOX_OUTLINE  0x0000
 
-#define Y_OFFSET 30
+#define Y_OFFSET (TEXTBOX_X_OFFSET + TEXTBOX_HEIGHT + 1 + (LCD_HEIGHT - 240) / 2)
 #define KEY_H 52
 #define KEY_W1 32
 #define KEY_W2 (32 + 12)

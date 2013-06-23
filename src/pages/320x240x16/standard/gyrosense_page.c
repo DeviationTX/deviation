@@ -48,25 +48,31 @@ void PAGE_GyroSenseInit(int page)
     }
     gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
-
+    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (120 + ((LCD_WIDTH - 320) / 2))
+    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW2 (70 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW3 (90 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW4 (110 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW5 (130 + ((LCD_HEIGHT - 240) / 2))
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->chanlbl, 10, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
-    GUI_CreateTextSelect(&gui->chan, 120, 40, TEXTSELECT_128, NULL, gyro_output_cb, NULL);
+    GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
+    GUI_CreateTextSelect(&gui->chan, COL2, ROW1, TEXTSELECT_128, NULL, gyro_output_cb, NULL);
 
     /* Row 2 */
-    GUI_CreateLabelBox(&gui->rangelbl, 120, 70, 128, 16, &NARROW_FONT, NULL, NULL, "0% - 100%");
+    GUI_CreateLabelBox(&gui->rangelbl, COL2, ROW2, 128, 16, &NARROW_FONT, NULL, NULL, "0% - 100%");
 
     /* Row 3 */
-    GUI_CreateLabelBox(&gui->gyrolbl[0], 10, 90, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
-    GUI_CreateTextSelect(&gui->gyro[0], 120, 90, TEXTSELECT_128, NULL, gyro_val_cb, (void *)0L);
+    GUI_CreateLabelBox(&gui->gyrolbl[0], COL1, ROW3, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)1L);
+    GUI_CreateTextSelect(&gui->gyro[0], COL2, ROW3, TEXTSELECT_128, NULL, gyro_val_cb, (void *)0L);
 
     /* Row 4 */
-    GUI_CreateLabelBox(&gui->gyrolbl[1], 10, 110, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
-    GUI_CreateTextSelect(&gui->gyro[1], 120, 110, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
+    GUI_CreateLabelBox(&gui->gyrolbl[1], COL1, ROW4, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)2L);
+    GUI_CreateTextSelect(&gui->gyro[1], COL2, ROW4, TEXTSELECT_128, NULL, gyro_val_cb, (void *)1);
 
     if(expected == 3) {
         /* Row 5 */
-        GUI_CreateLabelBox(&gui->gyrolbl[2], 10, 130, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
-        GUI_CreateTextSelect(&gui->gyro[2], 120, 130, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
+        GUI_CreateLabelBox(&gui->gyrolbl[2], COL1, ROW5, 0, 16, &DEFAULT_FONT, label_cb, NULL, (void *)3L);
+        GUI_CreateTextSelect(&gui->gyro[2], COL2, ROW5, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
     }
 }

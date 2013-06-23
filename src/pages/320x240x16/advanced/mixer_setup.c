@@ -21,21 +21,31 @@
 #define gui1 (&gui_objs.u.advmixcfg.u.g1)
 #define gui2 (&gui_objs.u.advmixcfg.u.g2)
 #define gui3 (&gui_objs.u.advmixcfg.u.g3)
-#define COL1  10 
-#define COL2   56
-#define COL3   ((310 - 120 - (COL2 + 106)) / 2 + COL2 + 106)
-#define GRAPH_X ((220 - 40 - 150) / 2 + 40)
-#define COL1_TEXT   4
-#define COL1_VALUE  56
-#define COL2_TEXT  164
-#define COL2_VALUE 216
+#ifndef COL1
+    //320x240
+    #define COL1        10
+    #define COL2        56
+    #define COL3        ((310 - 120 - (COL2 + 106)) / 2 + COL2 + 106)
+    #define COL_SCALEHI 36
+    #define COL_EXP2    112
+    #define COL_EXP3    216
+    #define COL_GRAPH   192
+    #define COL1_TEXT   4
+    #define COL1_VALUE  56
+    #define COL2_TEXT   164
+    #define COL2_VALUE  216
+    #define EXP_WIDTH   77
+    #define EXP_HEIGHT  96
+#endif
+#define COL_TEMPLATE 56
+#define GRAPH_Y ((220 - 40 - 150) / 2 + 40)
 
 static void _show_titlerow()
 {
     GUI_CreateLabel(&gui->chan, 4, 10, MIXPAGE_ChanNameProtoCB, TITLE_FONT, (void *)((long)mp->cur_mixer->dest));
-    GUI_CreateTextSelect(&gui->tmpl, COL1_VALUE, 8, TEXTSELECT_96, NULL, templatetype_cb, (void *)((long)mp->channel));
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    GUI_CreateTextSelect(&gui->tmpl, COL_TEMPLATE, 8, TEXTSELECT_96, NULL, templatetype_cb, (void *)((long)mp->channel));
+    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 }
 
 static void _show_simple()
@@ -51,7 +61,7 @@ static void _show_simple()
     GUI_CreateTextSelect(&gui1->curve, COL2, x, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     x += space;
 
-    GUI_CreateXYGraph(&gui1->graph, COL3, GRAPH_X, 120, 150,
+    GUI_CreateXYGraph(&gui1->graph, COL3, GRAPH_Y, 120, 150,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 125 / 100,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 125 / 100,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
@@ -89,39 +99,39 @@ static void _show_expo_dr()
         GUI_SetHidden(mp->trimObj, 1);
     */
 
-    GUI_CreateLabelBox(&gui2->sw1lbl, 112, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
-    GUI_CreateLabelBox(&gui2->sw2lbl, 216, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
+    GUI_CreateLabelBox(&gui2->sw1lbl, COL_EXP2, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
+    GUI_CreateLabelBox(&gui2->sw2lbl, COL_EXP3, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
     //Row 2
     GUI_CreateTextSelect(&gui2->src, COL1_TEXT, 48, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateTextSelect(&gui2->sw1, 112, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
-    GUI_CreateTextSelect(&gui2->sw2, 216, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
+    GUI_CreateTextSelect(&gui2->sw1, COL_EXP2, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
+    GUI_CreateTextSelect(&gui2->sw2, COL_EXP3, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
-    GUI_CreateButton(&gui2->rate[0], 112, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
-    GUI_CreateButton(&gui2->rate[1], 216, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
+    GUI_CreateButton(&gui2->rate[0], COL_EXP2, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
+    GUI_CreateButton(&gui2->rate[1], COL_EXP3, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)1);
     //Row 4
     GUI_CreateTextSelect(&gui2->curvehi, COL1_TEXT, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     //The following 2 items are mutex.  One is always hidden
-    GUI_CreateLabelBox(&gui2->linked[0], 112, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
-    GUI_CreateTextSelect(&gui2->curve[0], 112, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
+    GUI_CreateLabelBox(&gui2->linked[0], COL_EXP2, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
+    GUI_CreateTextSelect(&gui2->curve[0], COL_EXP2, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[1]);
     //The following 2 items are mutex.  One is always hidden
-    GUI_CreateLabelBox(&gui2->linked[1], 216, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
-    GUI_CreateTextSelect(&gui2->curve[1], 216, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
+    GUI_CreateLabelBox(&gui2->linked[1], COL_EXP3, 96, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Linked"));
+    GUI_CreateTextSelect(&gui2->curve[1], COL_EXP3, 96, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[2]);
     //Row 5
     GUI_CreateLabel(&gui2->scalelbl, COL1_TEXT, 122, scalestring_cb, DEFAULT_FONT, (void *)0);
-    GUI_CreateTextSelect(&gui2->scalehi, 40, 120, TEXTSELECT_64, NULL, set_number100_cb, &mp->mixer[0].scalar);
-    GUI_CreateTextSelect(&gui2->scale[0], 112, 120, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[1].scalar);
-    GUI_CreateTextSelect(&gui2->scale[1], 216, 120, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[2].scalar);
+    GUI_CreateTextSelect(&gui2->scalehi, COL_SCALEHI, 120, TEXTSELECT_64, NULL, set_number100_cb, &mp->mixer[0].scalar);
+    GUI_CreateTextSelect(&gui2->scale[0], COL_EXP2, 120, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[1].scalar);
+    GUI_CreateTextSelect(&gui2->scale[1], COL_EXP3, 120, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[2].scalar);
 
-    GUI_CreateXYGraph(&gui2->graphhi, COL1_TEXT + 10, 140, 77, 96,
+    GUI_CreateXYGraph(&gui2->graphhi, COL1_TEXT + (LCD_WIDTH == 320 ? 10 : 0), 140, EXP_WIDTH, EXP_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
-    GUI_CreateXYGraph(&gui2->graph[0], 112 + 10, 140, 77, 96,
+    GUI_CreateXYGraph(&gui2->graph[0], COL_EXP2 + (LCD_WIDTH == 320 ? 10 : 0), 140, EXP_WIDTH, EXP_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[1]);
-    GUI_CreateXYGraph(&gui2->graph[1], 216 + 10, 140, 77, 96,
+    GUI_CreateXYGraph(&gui2->graph[1], COL_EXP3 + (LCD_WIDTH == 320 ? 10 : 0), 140, EXP_WIDTH, EXP_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5/ 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 /4,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[2]);
@@ -165,7 +175,7 @@ static void _show_complex(int page_change)
     GUI_CreateBarGraph(&gui3->bar, COL2_TEXT, 86, 10, 150,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL,
                               eval_chan_cb, NULL);
-    GUI_CreateXYGraph(&gui3->graph, 192, 86, 120, 150,
+    GUI_CreateXYGraph(&gui3->graph, COL_GRAPH, 86, 120, 150,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);

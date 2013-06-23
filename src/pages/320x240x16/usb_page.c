@@ -26,12 +26,11 @@ static void _draw_page(u8 enable)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_USB));
 
-    sprintf(up->tmpstr, "%s\n%s\n%s\n\n%s%s\n%s %s",
-            "www.deviationtx.com",
+    GUI_CreateLabelBox(&gui->headline, LCD_WIDTH/2-100, 60, 200, 40, &MODELNAME_FONT, NULL, NULL, "www.deviationtx.com");
+    sprintf(up->tmpstr, "%s\n%s\n\n%s... %s\n%s %s",
             _tr("Deviation FW version:"), DeviationVersion,
-			_tr("USB Filesystem is currently "), enable == 0 ? _tr("Off") : _tr("On"),
+            _tr("USB Filesystem is currently "), enable == 0 ? _tr("Off") : _tr("On"),
             _tr("Press 'Ent' to turn USB Filesystem"),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(&gui->msg, LCD_WIDTH/2-126, 120, 252, LCD_HEIGHT-120, &BOLD_FONT, NULL, NULL, up->tmpstr);
 }
-

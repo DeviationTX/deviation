@@ -52,8 +52,8 @@ void LANGPage_Select(void(*return_page)(int page))
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
     cp->return_page = return_page;
-    PAGE_CreateCancelButton(112, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, 216, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
+    PAGE_CreateCancelButton(LCD_WIDTH-208, 4, okcancel_cb);
+    GUI_CreateButton(&gui->ok, LCD_WIDTH-104, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
     num_lang = 1;
     if (FS_OpenDir("language")) {
         char filename[13];
@@ -66,5 +66,5 @@ void LANGPage_Select(void(*return_page)(int page))
         FS_CloseDir();
     }
     cp->selected = Transmitter.language;
-    GUI_CreateListBox(&gui->listbox, 112, 40, 200, 192, num_lang, cp->selected, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(&gui->listbox, LCD_WIDTH/2-100, 40, 200, LCD_HEIGHT-48, num_lang, cp->selected, string_cb, select_cb, NULL, NULL);
 }

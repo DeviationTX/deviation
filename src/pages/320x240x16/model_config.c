@@ -33,35 +33,42 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 static void show_titlerow(const char *header)
 {
     GUI_CreateLabel(&gui->title, 8, 10, NULL, TITLE_FONT, (void *)header);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 }
+
+#define COL1 (8 + ((LCD_WIDTH - 320) / 2))
+#define COL2 (COL1 + 128)
+#define COL3 (COL1 + 52)
+#define COL4 (COL1 + 156)
+#define COL5 (COL1 + 208)
+#define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
 
 void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
     show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
     if (Model.type == 0) {
-        u8 i = 40;
-        GUI_CreateLabel(&gui->swashlbl, 8, i, NULL, DEFAULT_FONT, _tr("SwashType"));
-        GUI_CreateTextSelect(&gui->swash, 136, i, TEXTSELECT_96, NULL, swash_val_cb, NULL);
+        u8 i = ROW1;
+        GUI_CreateLabel(&gui->swashlbl, COL1, i, NULL, DEFAULT_FONT, _tr("SwashType"));
+        GUI_CreateTextSelect(&gui->swash, COL2, i, TEXTSELECT_96, NULL, swash_val_cb, NULL);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Inv"));
-        GUI_CreateTextSelect(&gui->inv[0], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)1);
+        GUI_CreateLabel(&gui->invlbl[0], COL1, i, NULL, DEFAULT_FONT, _tr("ELE Inv"));
+        GUI_CreateTextSelect(&gui->inv[0], COL2, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)1);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Inv"));
-        GUI_CreateTextSelect(&gui->inv[1], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)2);
+        GUI_CreateLabel(&gui->invlbl[1], COL1, i, NULL, DEFAULT_FONT, _tr("AIL Inv"));
+        GUI_CreateTextSelect(&gui->inv[1], COL2, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)2);
         i+=24;
-        GUI_CreateLabel(&gui->invlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Inv"));
-        GUI_CreateTextSelect(&gui->inv[2], 136, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)4);
+        GUI_CreateLabel(&gui->invlbl[2], COL1, i, NULL, DEFAULT_FONT, _tr("COL Inv"));
+        GUI_CreateTextSelect(&gui->inv[2], COL2, i, TEXTSELECT_96, swashinv_press_cb, swashinv_val_cb, (void *)4);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[0], 8, i, NULL, DEFAULT_FONT, _tr("ELE Mix"));
-        GUI_CreateTextSelect(&gui->mix[0], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)1);
+        GUI_CreateLabel(&gui->mixlbl[0], COL1, i, NULL, DEFAULT_FONT, _tr("ELE Mix"));
+        GUI_CreateTextSelect(&gui->mix[0], COL2, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)1);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[1], 8, i, NULL, DEFAULT_FONT, _tr("AIL Mix"));
-        GUI_CreateTextSelect(&gui->mix[1], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)0);
+        GUI_CreateLabel(&gui->mixlbl[1], COL1, i, NULL, DEFAULT_FONT, _tr("AIL Mix"));
+        GUI_CreateTextSelect(&gui->mix[1], COL2, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)0);
         i+=24;
-        GUI_CreateLabel(&gui->mixlbl[2], 8, i, NULL, DEFAULT_FONT, _tr("COL Mix"));
-        GUI_CreateTextSelect(&gui->mix[2], 136, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)2);
+        GUI_CreateLabel(&gui->mixlbl[2], COL1, i, NULL, DEFAULT_FONT, _tr("COL Mix"));
+        GUI_CreateTextSelect(&gui->mix[2], COL2, i, TEXTSELECT_96, NULL, swashmix_val_cb, (void *)2);
     }
 }
 
@@ -70,14 +77,14 @@ void MODELPROTO_Config()
     PAGE_SetModal(1);
     show_titlerow(ProtocolNames[Model.protocol]);
     proto_strs = PROTOCOL_GetOptions();
-    int row = 40;
+    int row = ROW1;
     int pos = 0;
     long idx = 0;
     while(idx < NUM_PROTO_OPTS) {
         if(proto_strs[pos] == NULL)
             break;
-        GUI_CreateLabel(&gui->protolbl[idx], 8, row, NULL, DEFAULT_FONT, _tr(proto_strs[pos]));
-        GUI_CreateTextSelect(&gui->proto[idx], 136, row, TEXTSELECT_96, NULL, proto_opt_cb, (void *)idx);
+        GUI_CreateLabel(&gui->protolbl[idx], COL1, row, NULL, DEFAULT_FONT, _tr(proto_strs[pos]));
+        GUI_CreateTextSelect(&gui->proto[idx], COL2, row, TEXTSELECT_96, NULL, proto_opt_cb, (void *)idx);
         while(proto_strs[++pos])
             ;
         pos++;
@@ -95,20 +102,20 @@ void MODELTRAIN_Config()
                   : mode == PPM_IN_TRAIN2
                     ? _tr("Trainer Cfg (Stick)")
                     : _tr("PPMIn Cfg (Extend)"));
-    int row = 40;
+    int row = ROW1;
     if (PPMin_Mode() != PPM_IN_SOURCE) {
-        GUI_CreateLabel(&gui->trainswlbl, 8, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
-        GUI_CreateTextSelect(&gui->trainsw, 136, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
+        GUI_CreateLabel(&gui->trainswlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
+        GUI_CreateTextSelect(&gui->trainsw, COL2, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
     } else {
-        GUI_CreateLabel(&gui->numchlbl, 8, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
-        GUI_CreateTextSelect(&gui->numch, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
+        GUI_CreateLabel(&gui->numchlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
+        GUI_CreateTextSelect(&gui->numch, COL2, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);
     }
     row += 20;
-    GUI_CreateLabel(&gui->centerpwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Center PW"));
-    GUI_CreateTextSelect(&gui->centerpw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)1L);
+    GUI_CreateLabel(&gui->centerpwlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Center PW"));
+    GUI_CreateTextSelect(&gui->centerpw, COL2, row, TEXTSELECT_96, NULL, set_train_cb, (void *)1L);
     row += 20;
-    GUI_CreateLabel(&gui->deltapwlbl, 8, row, NULL, DEFAULT_FONT, _tr("Delta PW"));
-    GUI_CreateTextSelect(&gui->deltapw, 136, row, TEXTSELECT_96, NULL, set_train_cb, (void *)2L);
+    GUI_CreateLabel(&gui->deltapwlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Delta PW"));
+    GUI_CreateTextSelect(&gui->deltapw, COL2, row, TEXTSELECT_96, NULL, set_train_cb, (void *)2L);
     row += 20;
  
     if (PPMin_Mode() == PPM_IN_SOURCE)
@@ -118,15 +125,15 @@ void MODELTRAIN_Config()
     for (int i = 0; i < num_rows; i++) {
         long idx = i;
         row += 20;
-        if (row > 300)
+        if (row > 300) // RBE: should be LCD_HEIGHT - 16(height box) ==> always < 300
             break;
-        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], 8, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
-        GUI_CreateTextSelect(&gui->ppmmap[idx], 60, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
+        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], COL1, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
+        GUI_CreateTextSelect(&gui->ppmmap[idx], COL3, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
         idx += num_rows;
         if (idx >= MAX_PPM_IN_CHANNELS)
             break;
-        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], 164, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
-        GUI_CreateTextSelect(&gui->ppmmap[idx], 216, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
+        GUI_CreateLabelBox(&gui->ppmmaplbl[idx], COL4, row, 0, 16, &DEFAULT_FONT, input_chname_cb, NULL, (void *)idx);
+        GUI_CreateTextSelect(&gui->ppmmap[idx], COL5, row, TEXTSELECT_96, NULL, set_chmap_cb, (void *)idx);
     }
 }
 

@@ -67,12 +67,15 @@ void PAGE_ScannerInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     sp.enable = 0;
-    GUI_CreateButton(&gui->enable, 112, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
+    GUI_CreateButton(&gui->enable, LCD_WIDTH/2-48, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
 
     sp.time_to_scan = 0;
     sp.channel = MIN_RADIOCHANNEL;
+    #define SCANBARWIDTH   (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))
+    #define SCANBARXOFFSET ((LCD_WIDTH - SCANBARWIDTH * (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))/2)
+    #define SCANBARHEIGHT  (LCD_HEIGHT - 78)
     for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
-        GUI_CreateBarGraph(&gui->bar[i], i * 4, 70, 4, 162, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
+        GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
         sp.channelnoise[i] = 0x10;
     }
 }

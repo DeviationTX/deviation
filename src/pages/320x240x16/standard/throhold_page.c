@@ -36,11 +36,15 @@ static void toggle_thold_cb(guiObject_t *obj, void *data)
 void PAGE_ThroHoldInit(int page)
 {
     (void)page;
+    #define COL1 (30 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (150 + ((LCD_WIDTH - 320) / 2))
+    #define ROW1 (80 + ((LCD_HEIGHT - 240) / 2))
+    #define ROW2 (120 + ((LCD_HEIGHT - 240) / 2))
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROHOLD, SWITCHFUNC_HOLD));
-    GUI_CreateLabelBox(&gui->enlbl, 30, 80, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
-    GUI_CreateTextSelect(&gui->en, 150, 80, TEXTSELECT_128, toggle_thold_cb, throhold_cb,  NULL);
+    GUI_CreateLabelBox(&gui->enlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    GUI_CreateTextSelect(&gui->en, COL2, ROW1, TEXTSELECT_128, toggle_thold_cb, throhold_cb,  NULL);
 
-    GUI_CreateLabelBox(&gui->valuelbl, 30, 120, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelect(&gui->value, 150, 120, TEXTSELECT_128, NULL, holdpostion_cb,  NULL);
+    GUI_CreateLabelBox(&gui->valuelbl, COL1, ROW2, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateTextSelect(&gui->value, COL2, ROW2, TEXTSELECT_128, NULL, holdpostion_cb,  NULL);
 }

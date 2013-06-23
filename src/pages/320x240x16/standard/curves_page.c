@@ -103,28 +103,38 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     set_cur_mixer();
     /* Row 1 */
-    GUI_CreateLabelBox(&gui->modelbl, 92, 40, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
-    GUI_CreateTextSelect(&gui->mode, 140, 40, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateLabelBox(&gui->holdlbl, 92, 60, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
-    GUI_CreateTextSelect(&gui->hold, 140, 60, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
-    GUI_CreateLabelBox(&gui->holdsw, 216, 60, 0, 0, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
+//    #define LINE1      (40 + ((LCD_HEIGHT - 240) / 2))
+    #define LINE1      36
+    #define LINE2      (LINE1 + 20)
+//    #define COL_LBL    (92 + ((LCD_WIDTH - 320) / 2))
+    #define COL_LBL    (LCD_WIDTH - 208)
+    #define COL_TEXT   (COL_LBL + 48)
+    #define COL_SWITCH (COL_LBL + 120)
+    GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
+    GUI_CreateTextSelect(&gui->mode, COL_TEXT, LINE1-1, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
+    GUI_CreateTextSelect(&gui->hold, COL_TEXT, LINE2-1, TEXTSELECT_64, NULL, set_holdstate_cb, NULL);
+    GUI_CreateLabelBox(&gui->holdsw, COL_SWITCH, LINE2, 0, 0, &DEFAULT_FONT, holdsw_str_cb, NULL, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
-    #define COL1 4
-    #define COL2 20
-    #define COL3 92
+    #define COL1 (4 + ((LCD_WIDTH - 320) / 2))
+    #define COL2 (20 + ((LCD_WIDTH - 320) / 2))
+    #define COL3 (92 + ((LCD_WIDTH - 320) / 2))
+    #define ROWBASE ((LCD_HEIGHT == 240 ? 60 : 67) + ((LCD_HEIGHT - 240) / 2))
     /* Row 2 */
     for(long i = 0; i < 9; i++) {
         const char *label = curvepos[i];
         if(label[0] > '9')
             label = _tr(label);
-        GUI_CreateLabelBox(&gui->vallbl[i], COL1, 60+20*i, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, label);
-        GUI_CreateTextSelect(&gui->val[i], COL2, 60+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
+        GUI_CreateLabelBox(&gui->vallbl[i], COL1, ROWBASE+20*i+1, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, label);
+        GUI_CreateTextSelect(&gui->val[i], COL2, ROWBASE+20*i, TEXTSELECT_64, NULL, set_pointval_cb, (void *)i);
         if (i > 0 && i < 8)
-            GUI_CreateButton(&gui->lock[i-1], COL3, 60+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
+            GUI_CreateButton(&gui->lock[i-1], COL3, ROWBASE+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }
-    GUI_CreateXYGraph(&gui->graph, 160, 80, 150, 150,
+    #define GRAPHSIZE_320 150
+    #define GRAPHSIZE (LCD_WIDTH == 320 ? GRAPHSIZE_320 : GRAPHSIZE_320 + 32)
+    GUI_CreateXYGraph(&gui->graph, 160 + ((LCD_WIDTH - 320) / 2), 80 + ((LCD_HEIGHT - 240) / 2) - (GRAPHSIZE - GRAPHSIZE_320) / 2, GRAPHSIZE, GRAPHSIZE,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                   0, 0,
