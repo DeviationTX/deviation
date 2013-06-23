@@ -19,7 +19,6 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
-#include "../common/main_config.h"
 #include "telemetry.h"
 
 #define VTRIM_W       4

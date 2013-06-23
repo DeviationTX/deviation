@@ -46,6 +46,7 @@ u8 cfg_elem_type;
 #define HEADER_Y 32
 
 #include "../common/_main_layout.c"
+#include "../common/_main_config.c"
 
 void PAGE_MainLayoutInit(int page)
 {
@@ -110,10 +111,10 @@ void PAGE_MainLayoutRestoreDialog(int idx)
     show_config();
 }
 
-void set_selected_for_move(guiLabel_t * obj)
+void set_selected_for_move(int idx)
 {
-    selected_for_move = obj;
-    int state = obj ? 1 : 0;
+    selected_for_move = idx >= 0 ? &gui->elem[idx] : NULL;
+    int state = idx >= 0 ? 1 : 0;
     GUI_SetHidden((guiObject_t *)&gui->editelem, !state);
     GUI_TextSelectEnable(&gui->x, state);
     GUI_TextSelectEnable(&gui->y, state);
@@ -158,7 +159,7 @@ void select_for_move(guiLabel_t *obj)
         selected_for_move->desc.fill_color ^= 0xffff;
         GUI_Redraw((guiObject_t *)selected_for_move);
     }
-    set_selected_for_move(obj);
+    set_selected_for_move(obj_to_idx(obj));
     selected_for_move->desc.font_color ^= 0xffff;
     selected_for_move->desc.fill_color ^= 0xffff;
 }
@@ -280,7 +281,7 @@ static void cfg_cb(guiObject_t *obj, const void *data)
     show_config();
 }
 
-static void show_config()
+void show_config()
 {
     int count = 0;
     int row_idx = 0;
@@ -320,7 +321,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         selected_for_move->desc.font_color ^= 0xffff;
         selected_for_move->desc.fill_color ^= 0xffff;
         GUI_Redraw((guiObject_t *)selected_for_move);
-        set_selected_for_move(NULL);
+        set_selected_for_move(-1);
         return 1;
     }
     if(CHAN_ButtonIsPressed(button, BUT_ENTER)) {
