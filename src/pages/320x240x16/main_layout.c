@@ -117,7 +117,9 @@ void set_selected_for_move(int idx)
     int state = idx >= 0 ? 1 : 0;
     GUI_SetHidden((guiObject_t *)&gui->editelem, !state);
     GUI_TextSelectEnable(&gui->x, state);
+    GUI_SetSelectable((guiObject_t *)&gui->x, state);
     GUI_TextSelectEnable(&gui->y, state);
+    GUI_SetSelectable((guiObject_t *)&gui->y, state);
 }
 const char *xpos_cb(guiObject_t *obj, int dir, void *data)
 {
