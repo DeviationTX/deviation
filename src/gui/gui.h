@@ -295,8 +295,6 @@ void GUI_DrawScrollable(guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj);
-void _GUI_RemoveHierObjects(struct guiObject *obj, struct guiObject **head);
-void _GUI_RemoveObj(struct guiObject *obj, struct guiObject **head);
 
 
 void GUI_DrawKeyboard(struct guiObject *obj);

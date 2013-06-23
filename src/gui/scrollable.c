@@ -91,11 +91,16 @@ void GUI_DrawScrollable(struct guiObject *obj)
     objHEAD = head;
 }
 
+extern u8 FullRedraw;
 void GUI_RemoveScrollableObjs(struct guiObject *obj)
 {
     struct guiScrollable *scrollable = (struct guiScrollable *)obj;
-    if (scrollable->head)
-        _GUI_RemoveHierObjects(scrollable->head, &scrollable->head);
+    guiObject_t *head = objHEAD;
+    objHEAD = scrollable->head;
+    GUI_RemoveAllObjects();
+    objHEAD = head;
+    scrollable->head = NULL;
+    FullRedraw = 1;
 }
 
 int get_selected_idx(guiScrollable_t *scrollable, guiObject_t *obj)

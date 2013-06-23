@@ -94,26 +94,25 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
                 else
                     LCD_FillRect(obj_x, obj_y, w, h, desc->fill_color);
             else if (desc->style == LABEL_BRACKET) {
+                struct pos { int i1; int i2; int i3; int i4;};
+                struct { union { int p[4]; struct pos pos;} u;} x[2], y[2];
+                //int x[2][4];
+                //int y[2][4];
                 if (h > 2 * w) {
-                    int x1 = obj_x + 2;
-                    int x2 = obj_x + obj_width -3;
-                    int y1 = obj_y + obj_height - 1;
-                    LCD_DrawLine(x1, obj_y, obj_x, obj_y + 2, 1);
-                    LCD_DrawLine(x2, obj_y, obj_x + obj_width -1, obj_y +2, 1);
-                    LCD_DrawLine(x1, obj_y, x2, obj_y, 1);
-                    LCD_DrawLine(x1, y1, obj_x, y1 - 2, 1);
-                    LCD_DrawLine(x2, y1, obj_x + obj_width -1, y1 -2, 1);
-                    LCD_DrawLine(x1, y1, x2, y1, 1);
+                    x[0].u.pos = (struct pos){ 0,             2,             obj_width -3,  obj_width -1};
+                    y[0].u.pos = (struct pos){ 2,             0,             0,             2};
+                    x[1].u.pos = x[0].u.pos;
+                    y[1].u.pos = (struct pos){ obj_height -3, obj_height -1, obj_height -1, obj_height -3};
                 } else {
-                    u16 y1 = obj_y + 2;
-                    u16 y2 = obj_y + obj_height -3;
-                    u16 x1 = obj_x + obj_width - 1;
-                    LCD_DrawLine(obj_x, y1, obj_x + 2, obj_y, 1);
-                    LCD_DrawLine(obj_x, y2, obj_x + 2, obj_y + obj_height -1, 1);
-                    LCD_DrawLine(obj_x, y1, obj_x, y2, 1);
-                    LCD_DrawLine(x1, y1, x1 - 2, obj_y, 1);
-                    LCD_DrawLine(x1, y2, x1 - 2, obj_y + obj_height -1, 1);
-                    LCD_DrawLine(x1, y1, x1, y2, 1);
+                    x[0].u.pos = (struct pos){ 2,            0,            0,             2};
+                    y[0].u.pos = (struct pos){ 0,            2,            obj_height -3, obj_height -1};
+                    x[1].u.pos = (struct pos){ obj_width -3, obj_width -1, obj_width -1,  obj_width -3};
+                    y[1].u.pos = y[0].u.pos;
+                }
+                for(int oc = 0; oc < 2; oc++) {
+                    for(int i = 0; i < 3; i++) {
+                        LCD_DrawLine(obj_x + x[oc].u.p[i], obj_y+y[oc].u.p[i], obj_x+x[oc].u.p[i+1], obj_y + y[oc].u.p[i+1], 1);
+                    }
                 }
             } else
                 LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
