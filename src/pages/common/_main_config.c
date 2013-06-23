@@ -15,9 +15,6 @@
 
 #include "main_layout.h"
 
-static u8 newelem;
-char tmp[20];
-
 int elem_abs_to_rel(int idx)
 {
     unsigned type = ELEM_TYPE(pc.elem[idx]);
@@ -55,11 +52,11 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
     int i = (long)data;
     if (pc.elem[i].src) {
         if (pc.elem[i].src <= NUM_TIMERS)
-            return TIMER_Name(tmp, pc.elem[i].src - 1);
+            return TIMER_Name(lp.tmp, pc.elem[i].src - 1);
         else if( pc.elem[i].src - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_Name(tmp, pc.elem[i].src - NUM_TIMERS);
+        return TELEMETRY_Name(lp.tmp, pc.elem[i].src - NUM_TIMERS);
     }
-    return INPUT_SourceName(tmp, pc.elem[i].src
+    return INPUT_SourceName(lp.tmp, pc.elem[i].src
                ? pc.elem[i].src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS
                : 0);
 }
@@ -69,8 +66,8 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
 {   
     (void)data;
     (void)obj;
-    newelem = GUI_TextSelectHelper(newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
-    switch(newelem) {
+    lp.newelem = GUI_TextSelectHelper(lp.newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
+    switch(lp.newelem) {
         case ELEM_SMALLBOX: return _tr("Small-box");
         case ELEM_BIGBOX:   return _tr("Big-box");
         case ELEM_TOGGLE:   return _tr("Toggle");
@@ -92,13 +89,13 @@ int create_element()
     if (i == NUM_ELEMS)
         return -1;
     y = 1;
-    GetElementSize(newelem, &w, &h);
+    GetElementSize(lp.newelem, &w, &h);
     x = (LCD_WIDTH - w) / 2;
     y = (((LCD_HEIGHT - HEADER_Y) - h) / 2) + HEADER_Y;
     memset(&pc.elem[i], 0, sizeof(struct elem));
     ELEM_SET_X(pc.elem[i], x);
     ELEM_SET_Y(pc.elem[i], y);
-    ELEM_SET_TYPE(pc.elem[i], newelem);
+    ELEM_SET_TYPE(pc.elem[i], lp.newelem);
     return i;
 }
 
@@ -122,7 +119,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         }
         case ELEM_BAR:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
-            return INPUT_SourceName(tmp, pc.elem[idx].src ? pc.elem[idx].src + NUM_INPUTS : 0);
+            return INPUT_SourceName(lp.tmp, pc.elem[idx].src ? pc.elem[idx].src + NUM_INPUTS : 0);
         case ELEM_TOGGLE:
         {
             int val = MIXER_SRC(pc.elem[idx].src);
@@ -132,13 +129,13 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
                 val = newval;
                 pc.elem[idx].src = val;
             }
-            return INPUT_SourceNameAbbrevSwitch(tmp, pc.elem[idx].src);
+            return INPUT_SourceNameAbbrevSwitch(lp.tmp, pc.elem[idx].src);
         }
         case ELEM_HTRIM:
         case ELEM_VTRIM:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
-            sprintf(tmp, "%s%d", _tr("Trim"),pc.elem[idx].src + 1);
-            return tmp;
+            sprintf(lp.tmp, "%s%d", _tr("Trim"),pc.elem[idx].src + 1);
+            return lp.tmp;
     }
     return "";
 }

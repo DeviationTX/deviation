@@ -14,6 +14,7 @@ enum PageID {
 struct pagemem {
     union {
         struct main_page main_page;
+        struct layout_page layout_page;
         struct mixer_page mixer_page;
         struct trim_page trim_page;
         struct model_page model_page;

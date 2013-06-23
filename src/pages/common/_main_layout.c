@@ -23,11 +23,6 @@ static void touch_cb(guiObject_t *obj, s8 press, const void *data);
 static void select_for_move(guiLabel_t *obj);
 static void notify_cb(guiObject_t *obj);
 
-guiLabel_t *selected_for_move;
-u16 selected_x, selected_y, selected_w, selected_h;
-char tmp[20];
-static u8 long_press;
-
 void draw_elements()
 {
     u16 x, y, w, h;
@@ -73,8 +68,8 @@ const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(tmp, "%d", idx+1);
-    return tmp;
+    sprintf(lp.tmp, "%d", idx+1);
+    return lp.tmp;
 }
 
 void touch_cb(guiObject_t *obj, s8 press, const void *data)
@@ -83,17 +78,17 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
     //press = 0  : short press
     //press = 1  : long press
     (void)data;
-    if (long_press) {
+    if (lp.long_press) {
         if(press == -1)
-            long_press = 0;
+            lp.long_press = 0;
         return;
     }
     if(press < 0) {
         select_for_move((guiLabel_t *)obj);
     }
-    if(selected_for_move && press == 1) {
+    if(lp.selected_for_move >= 0 && press == 1) {
         show_config();
-        long_press = 1;
+        lp.long_press = 1;
     }
 }
 
@@ -108,8 +103,8 @@ void move_elem()
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
-    ELEM_SET_X(pc.elem[idx], selected_x);
-    ELEM_SET_Y(pc.elem[idx], selected_y);
+    ELEM_SET_X(pc.elem[idx], lp.selected_x);
+    ELEM_SET_Y(pc.elem[idx], lp.selected_y);
     draw_elements();
     select_for_move((guiLabel_t *)obj);
 }
@@ -119,18 +114,10 @@ void notify_cb(guiObject_t *obj)
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
-    selected_x = ELEM_X(pc.elem[idx]);
-    selected_y = ELEM_Y(pc.elem[idx]);
-    GetElementSize(ELEM_TYPE(pc.elem[idx]), &selected_w, &selected_h);
+    lp.selected_x = ELEM_X(pc.elem[idx]);
+    lp.selected_y = ELEM_Y(pc.elem[idx]);
+    GetElementSize(ELEM_TYPE(pc.elem[idx]), &lp.selected_w, &lp.selected_h);
     GUI_Redraw((guiObject_t *)&gui->x);
     GUI_Redraw((guiObject_t *)&gui->y);
 
 }
-
-static int obj_to_idx(guiLabel_t *obj)
-{
-    if (obj >= &gui->elem[0] && obj < gui->elem + NUM_ELEMS)
-        return (obj - gui->elem) / sizeof(guiLabel_t);
-    return -1;
-}
-

@@ -19,6 +19,7 @@
 #include "config/model.h"
 #include "telemetry.h"
 
+#define lp pagemem.u.layout_page
 #define pc Model.pagecfg2
 #define gui (&gui_objs.u.mainconfig)
 #define HEADER_Y 10
@@ -32,6 +33,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 void PAGE_MainLayoutInit(int page)
 {
     (void)page;
+    memset(&lp, 0, sizeof(lp));
     show_config();
 }
 void PAGE_MainLayoutEvent()
@@ -92,8 +94,8 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
     default:
         str = "";
     }
-    sprintf(tmp,"%s%d", str, idx+1);
-    return tmp;
+    sprintf(lp.tmp,"%s%d", str, idx+1);
+    return lp.tmp;
 }
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)

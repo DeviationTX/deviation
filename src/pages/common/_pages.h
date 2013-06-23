@@ -6,6 +6,7 @@
 
 #include "mixer_page.h"
 #include "main_page.h"
+#include "main_layout.h"
 #include "trim_page.h"
 #include "timer_page.h"
 #include "model_page.h"

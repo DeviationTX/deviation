@@ -21,6 +21,7 @@
 
 #if ENABLE_LAYOUT_EDIT
 
+#define lp pagemem.u.layout_page
 #define gui (&gui_objs.u.mainlayout)
 #define pc Model.pagecfg2
 
@@ -36,8 +37,8 @@ void show_layout()
 {
     GUI_RemoveAllObjects();
     PAGE_SetActionCB(_layaction_cb);
-    selected_x = 0;
-    selected_y = 0;
+    lp.selected_x = 0;
+    lp.selected_y = 0;
     for (int i = 0 ; i < 5; i++)
         gui->desc[i] = (struct LabelDesc){
             .font = MICRO_FONT.font,
@@ -70,10 +71,10 @@ void xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (selected_for_move) {
-        int x = GUI_TextSelectHelper(selected_x, 0, LCD_WIDTH-selected_w, dir, 1, 10, NULL);
-        if (x != selected_x) {
-            selected_x = x;
+    if (lp.selected_for_move >= 0) {
+        int x = GUI_TextSelectHelper(lp.selected_x, 0, LCD_WIDTH-lp.selected_w, dir, 1, 10, NULL);
+        if (x != lp.selected_x) {
+            lp.selected_x = x;
             move_elem();
         }
     }
@@ -83,10 +84,10 @@ void ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (selected_for_move) {
-        int y = GUI_TextSelectHelper(selected_y, 10, LCD_HEIGHT-selected_h, dir, 1, 10, NULL);
-        if (y != selected_y) {
-            selected_y = y;
+    if (lp.selected_for_move >= 0) {
+        int y = GUI_TextSelectHelper(lp.selected_y, 10, LCD_HEIGHT-lp.selected_h, dir, 1, 10, NULL);
+        if (y != lp.selected_y) {
+            lp.selected_y = y;
             move_elem();
         }
     }
@@ -94,27 +95,28 @@ void ypos_cb(guiObject_t *obj, int dir, void *data)
 
 void set_selected_for_move(int idx)
 {
-    selected_for_move = idx >= 0 ? &gui->elem[idx] : NULL;
+    lp.selected_for_move = idx;
     GUI_SetHidden((guiObject_t *)&gui->editelem, idx >= 0 ? 0 : 1);
 }
 
 const char *pos_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    sprintf(tmp, "%d", data ? selected_y : selected_x);
-    return tmp;
+    sprintf(lp.tmp, "%d", data ? lp.selected_y : lp.selected_x);
+    return lp.tmp;
 }
 
 void select_for_move(guiLabel_t *obj)
 {
     GUI_SetSelected((guiObject_t *)obj);
     notify_cb((guiObject_t *)obj);
-    if (selected_for_move == obj)
+    int idx = guielem_idx((guiObject_t *)obj);
+    if (lp.selected_for_move == idx)
         return;
-    if (selected_for_move) {
-        GUI_Redraw((guiObject_t *)selected_for_move);
+    if (lp.selected_for_move >= 0) {
+        GUI_Redraw((guiObject_t *)&gui->elem[lp.selected_for_move]);
     }
-    set_selected_for_move(obj_to_idx(obj));
+    set_selected_for_move(idx);
 }
 
     
@@ -122,7 +124,7 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if(CHAN_ButtonIsPressed(button, BUT_EXIT) && !(flags & BUTTON_RELEASE)) {
-        if (selected_for_move) {
+        if (lp.selected_for_move >= 0) {
             set_selected_for_move(-1);
         } else {
             show_config();
@@ -131,26 +133,26 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
     }
     if (! GUI_GetSelected() || flags & BUTTON_RELEASE)
         return 0;
-    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && ! selected_for_move) {
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && lp.selected_for_move < 0) {
         select_for_move((guiLabel_t *)GUI_GetSelected());
         return 1;
     }
-    if (! selected_for_move)
+    if (lp.selected_for_move < 0)
         return 0;
     if(CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-        xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, (void *)selected_for_move->cb_data);
+        xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, NULL);
         return 1;
     }
     if(CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-        xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? 2 : 1, (void *)selected_for_move->cb_data);
+        xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? 2 : 1, NULL);
         return 1;
     }
     if(CHAN_ButtonIsPressed(button, BUT_UP)) {
-        ypos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, (void *)selected_for_move->cb_data);
+        ypos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, NULL);
         return 1;
     }
     if(CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-        ypos_cb(NULL, (flags & BUTTON_LONGPRESS) ? 2 : 1, (void *)selected_for_move->cb_data);
+        ypos_cb(NULL, (flags & BUTTON_LONGPRESS) ? 2 : 1, NULL);
         return 1;
     }
     return 0;
