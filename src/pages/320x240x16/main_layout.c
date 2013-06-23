@@ -188,8 +188,16 @@ static void dialog_ok_cb(u8 state, void * data)
         select_for_move((guiLabel_t *)obj);
 }
 
-#define ADD_DIALOG_W 268
+#define ADD_DIALOG_W 288
 #define ADD_DIALOG_H 130
+#define ADD_DIALOG_X (LCD_WIDTH - ADD_DIALOG_W) / 2
+#define ADD_LBL_X    (ADD_DIALOG_X + 10)
+#define ADD_TS_X     (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 128 / 2)
+#define ADD_BUT_X    (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 96 / 2)
+#define ADD_ADDBUT_X (ADD_DIALOG_X + ADD_DIALOG_W - 64 -5)
+#if (ADD_ADDBUT_X < ADD_TS_X + 128)
+    #error "Overlapped buttons"
+#endif
 static void add_dlg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -201,24 +209,24 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_DIALOG_H,
         _tr("Page Config"), NULL, dialog_ok_cb, dtCancel, "");
     GUI_CreateLabel(&gui->dlglbl[0],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
+        ADD_LBL_X,
         (LCD_HEIGHT - HEADER_Y - ADD_DIALOG_H) / 2 + HEADER_Y + 30,
         NULL, DEFAULT_FONT, _tr("Type"));
     GUI_CreateTextSelect(&gui->dlgts[0],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 128 - 68,
+        ADD_TS_X,
         (LCD_HEIGHT - HEADER_Y - ADD_DIALOG_H) / 2 + HEADER_Y + 30,
         TEXTSELECT_128, NULL, newelem_cb, NULL);
     GUI_CreateButton(&gui->dlgbut[0],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 64,
+        ADD_ADDBUT_X,
         (LCD_HEIGHT - HEADER_Y - ADD_DIALOG_H) / 2 + HEADER_Y + 30,
         BUTTON_64x16, add_dlgbut_str_cb, 0, newelem_press_cb, (void *)1L);
 
     GUI_CreateLabel(&gui->dlglbl[1],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + 10,
+        ADD_LBL_X,
         (LCD_HEIGHT - HEADER_Y - ADD_DIALOG_H) / 2 + HEADER_Y + 70,
         NULL, DEFAULT_FONT, _tr("Template"));
     GUI_CreateButton(&gui->dlgbut[1],
-        (LCD_WIDTH - ADD_DIALOG_W) / 2 + ADD_DIALOG_W - 10 - 112 - 68,
+        ADD_BUT_X,
         (LCD_HEIGHT - HEADER_Y - ADD_DIALOG_H) / 2 + HEADER_Y + 70,
         BUTTON_96x16, add_dlgbut_str_cb, 0, add_dlgbut_cb, (void *)0L);
     GUI_SetSelected((guiObject_t *)&gui->dlgbut[0]);
