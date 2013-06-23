@@ -149,15 +149,15 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void show_button_page()
 {
-	#define X_STEP ((LCD_WIDTH - 20) / 3)
-	int reorder[NUM_TX_BUTTONS] = {
-			0, 2, 17,    // L-trims in left column, R -trims middle, control keys right
-			1, 3, 15,
-			4, 6, 14,
-			5, 7, 16,
-			8, 10, 13,
-			9, 11, 12,
-	};
+    #define X_STEP ((LCD_WIDTH - 20) / 3)
+    int reorder[NUM_TX_BUTTONS] = {
+            0, 2, 17,    // L-trims in left column, R -trims middle, control keys right
+            1, 3, 15,
+            4, 6, 14,
+            5, 7, 16,
+            8, 10, 13,
+            9, 11, 12,
+    };
     int i;
     cp->is_locked = 3;
     int y = 64;
