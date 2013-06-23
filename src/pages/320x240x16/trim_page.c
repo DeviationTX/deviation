@@ -58,7 +58,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
 
     PAGE_RemoveAllObjects();
     PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
-    PAGE_CreateOkButton(LCD_WIDTH-96, 4, okcancel_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 
     #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
     #define COL2 (104 + ((LCD_WIDTH - 320) / 2))
