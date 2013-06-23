@@ -389,7 +389,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             u8 src = get_source(section, ptr);
             if (src < NUM_INPUTS)
                 src = 0;
-            data[5] = src;
+            data[5] = src - NUM_INPUTS;
             break;
         }
         case ELEM_TOGGLE: //x, y, tgl0, tgl1, tgl2, src
