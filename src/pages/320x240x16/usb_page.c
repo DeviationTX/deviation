@@ -32,5 +32,5 @@ static void _draw_page(u8 enable)
             _tr("USB Filesystem is currently "), enable == 0 ? _tr("Off") : _tr("On"),
             _tr("Press 'Ent' to turn USB Filesystem"),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(&gui->msg, LCD_WIDTH/2-126, 120, 252, LCD_HEIGHT-120, &BOLD_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(&gui->msg, LCD_WIDTH/2-126, 120, 252, LCD_HEIGHT-120, &DEFAULT_FONT, NULL, NULL, up->tmpstr);
 }
