@@ -90,11 +90,10 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
             lp.long_press = 0;
         return;
     }
-    if(press < 0) {
+    if(press == 0) {
         select_for_move((guiLabel_t *)obj);
     }
     if(press == 1) {
-        select_for_move((guiLabel_t *)obj);
         show_config();
         lp.long_press = 1;
     }
