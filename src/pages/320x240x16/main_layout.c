@@ -209,7 +209,7 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
         ADD_DIALOG_Y,
         ADD_DIALOG_W,
         ADD_DIALOG_H,
-        _tr("Page Config"), NULL, dialog_ok_cb, dtCancel, "");
+        _tr("Page Config"), NULL, dialog_ok_cb, dtOk, "");
     GUI_CreateLabel(&gui->dlglbl[0],
         ADD_LBL_X,
         ADD_DIALOG_Y + 30,
