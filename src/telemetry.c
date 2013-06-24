@@ -282,3 +282,11 @@ void TELEMETRY_Alarm()
         }
     }
 }
+
+int TELEMETRY_HasAlarm(int src)
+{
+    for(int i = 0; i < TELEM_NUM_ALARMS; i++)
+        if(Model.telem_alarm[i] == src && (alarm & (1 << i)))
+            return 1;
+    return 0;
+}

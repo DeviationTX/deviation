@@ -128,9 +128,11 @@ void PAGE_MainEvent()
                     }
                 } else if (src - NUM_TIMERS <= NUM_TELEM) {
                     //Telem
+                    int alarm = TELEMETRY_HasAlarm(src - NUM_TIMERS);
                     u32 time = CLOCK_getms();
-                    if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME) {
-                        clear_time = 1;
+                    if (alarm || (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)) {
+                        if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)
+                            clear_time = 1;
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 1));
                     } else if(Telemetry.time[0] && mp->elem[i] != val) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 0));
