@@ -22,8 +22,6 @@
 #define tp pagemem.u.toggle_select_page
 #define gui (&gui_objs.u.toggle)
 
-#define NUM_COLS      7
-
 #include "../common/_toggle_select.c"
 
 static void show_iconsel_page(int idx);
@@ -65,9 +63,9 @@ static void show_icons(int SelectedIcon, int idx)
     struct ImageMap img;
     u8 cursel = Model.pagecfg2.elem[tp.tglidx].extra[SelectedIcon];
 
-    for(int i = 0; i < 4 * NUM_COLS; i++) {
-        y = 80 + (i / NUM_COLS) * 40;
-        x = 8 + (i - (i / NUM_COLS) * NUM_COLS) * (TOGGLEICON_WIDTH+8);
+    for(int i = 0; i < NUM_SYMBOL_ELEMS; i++) {
+        y = 80 + (i / NUM_SYMBOL_COLS) * 40;
+        x = 8 + (i - (i / NUM_SYMBOL_COLS) * NUM_SYMBOL_COLS) * (TOGGLEICON_WIDTH+8);
         img = TGLICO_GetImage(idx);
         //printf("%d(%d): (%d, %d) %s / %d\n", i, idx, x, y, img.file, img.x_off);
         GUI_CreateImageOffset(&gui->symbolicon[i], x, y, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT,
@@ -93,7 +91,7 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     }
     int idx = 0;
     if (page) {
-        for(int i = 0; i < NUM_COLS * page; i++) {
+        for(int i = 0; i < NUM_SYMBOL_COLS * page; i++) {
             idx = get_next_icon(idx);
             if (idx < 0) {
                 idx = 0;
@@ -111,9 +109,9 @@ static void show_iconsel_page(int SelectedIcon)
     struct ImageMap img;
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
-    PAGE_CreateCancelButton(216, 4, tglico_cancel_cb);
+    PAGE_CreateCancelButton(LCD_WIDTH-104, 4, tglico_cancel_cb);
     // Ok-Button for saving
-    PAGE_CreateOkButton(165, 4, tglico_ok_cb);
+    PAGE_CreateOkButton(LCD_WIDTH-155, 4, tglico_ok_cb);
     // Show name of source for toggle icon
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp.tglidx].src);
 
@@ -145,7 +143,7 @@ static void show_iconsel_page(int SelectedIcon)
     }
 
     int count = get_toggle_icon_count();
-    int max_scroll = (count + NUM_COLS - 1) / NUM_COLS - 3;
-    GUI_CreateScrollbar(&gui->scrollbar, 304, 32, 208, max_scroll, NULL, scroll_cb, (void *)(long)SelectedIcon);
+    int max_scroll = (count + NUM_SYMBOL_COLS - 1) / NUM_SYMBOL_COLS - 3;
+    GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 80, LCD_HEIGHT-80, max_scroll, NULL, scroll_cb, (void *)(long)SelectedIcon);
     show_icons(SelectedIcon, 0);
 }

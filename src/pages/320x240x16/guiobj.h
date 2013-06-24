@@ -31,6 +31,9 @@ struct lang_obj {
     guiListbox_t listbox;
 };
 
+#define NUM_SYMBOL_COLS ((LCD_WIDTH-24) / 40)
+#define NUM_SYMBOL_ROWS ((LCD_HEIGHT-80) / 40)
+#define NUM_SYMBOL_ELEMS (NUM_SYMBOL_COLS * NUM_SYMBOL_ROWS)
 struct toggle_obj {
     guiButton_t  okbutton;
     guiButton_t  cancelbutton;
@@ -38,7 +41,7 @@ struct toggle_obj {
     guiLabel_t   togglelabel[3];
     guiRect_t    toggleframe;
     guiImage_t   toggleicon[3];
-    guiImage_t   symbolicon[32];
+    guiImage_t   symbolicon[NUM_SYMBOL_ELEMS];
     guiRect_t    symbolframe;
     guiScrollbar_t scrollbar;
 };
