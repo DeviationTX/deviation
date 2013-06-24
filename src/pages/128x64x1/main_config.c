@@ -45,9 +45,8 @@ void PAGE_MainLayoutExit()
 
 static int size_cb(int absrow, void *data)
 {
-    (void)data;
-    return 1;
-    //return (absrow >= ITEM_MENU) ? 2 : 1;
+    int num_elems = (long)data;
+    return (absrow >= num_elems  && absrow < num_elems + NUM_QUICKPAGES) ? 2 : 1;
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -136,16 +135,22 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int y_ts = y;
     //show elements in order
     int row = -1;
-    if (absrow == num_elems) {
+    if (absrow == num_elems + NUM_QUICKPAGES) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y_ts,
                  LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, LCD_WIDTH-x-4, y,  50,
                  ITEM_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
         return 2;
     }
-    if (absrow == num_elems + 1) {
+    if (absrow == num_elems + NUM_QUICKPAGES + 1) {
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, ITEM_HEIGHT,
                  &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
+        return 1;
+    }
+    if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
+        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
+        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + ITEM_HEIGHT,
+             LCD_WIDTH-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
         return 1;
     }
     for(int type = 0; type < ELEM_LAST; type++) {
@@ -190,7 +195,7 @@ void show_config()
             break;
     }
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, count+2, row_cb, getobj_cb, size_cb, (void *)count);
+                     ITEM_SPACE, count+NUM_QUICKPAGES + 2, row_cb, getobj_cb, size_cb, (void *)count);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
