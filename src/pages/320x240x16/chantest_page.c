@@ -163,10 +163,12 @@ static void show_button_page()
     int y = 64;
     GUI_CreateLabelBox(&gui->lock, 10, 40, LCD_WIDTH-20, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (i = 0; i < NUM_TX_BUTTONS; i++) {
-        GUI_CreateLabelBox(&gui->value[i], 10 + X_STEP * (i % 3), y, 16, 16,
-                         &SMALLBOX_FONT, NULL, NULL, (void *)"");
-        GUI_CreateLabelBox(&gui->chan[i], 30 + X_STEP * (i % 3), y+2, 0, 0,
-                         &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)reorder[i]);
+        GUI_CreateLabelBox(&gui->value[reorder[i]],
+                10 + X_STEP * (i % 3), y, 16, 16,
+                &SMALLBOX_FONT, NULL, NULL, (void *)"");
+        GUI_CreateLabelBox(&gui->chan[reorder[i]],
+                30 + X_STEP * (i % 3), y+2, 0, 0,
+                &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)reorder[i]);
         if ((i % 3) == 2)
             y += (LCD_HEIGHT - 64) / 6;
     }
