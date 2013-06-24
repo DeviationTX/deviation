@@ -34,6 +34,9 @@
 u8 page_num;
 guiObject_t *firstObj;
 
+static void calibrate_touch(void);
+static void init_touch_calib();
+
 void PAGE_ChangeByName(const char *pageName, u8 menuPage)
 {   // dummy method for devo8, only used in devo10
     (void)pageName;
@@ -110,8 +113,7 @@ static void _show_page()
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
-        GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_TOUCH, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
-        GUI_CreateButton(&gui1->touchtest, COL2TEST, row, BUTTON_TEST, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH_TEST);
+        GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
@@ -214,3 +216,104 @@ static inline guiObject_t *_get_obj(int idx, int objid)
         default: return NULL;
     }
 }
+
+static void draw_target(u16 x, u16 y)
+{
+    LCD_DrawFastHLine(x - 5, y, 11, SMALLBOX_FONT.font_color);
+    LCD_DrawFastVLine(x, y - 5, 11, SMALLBOX_FONT.font_color);
+}
+
+const char *show_msg_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(cp->tmpstr, _tr("Touch target %d"), cp->state < 3 ? 1 : 2);
+    return cp->tmpstr;
+}
+
+const char *coords_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(cp->tmpstr, "%d*%d-%d-%d", cp->coords.x, cp->coords.y, cp->coords.z1, cp->coords.z2);
+    return cp->tmpstr;
+}
+
+static void init_touch_calib()
+{
+    PAGE_RemoveAllObjects();
+    PAGE_SetModal(1);
+    //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
+    GUI_CreateLabel(&guic->title, 40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
+    GUI_CreateLabelBox(&guic->msg, XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
+    GUI_CreateLabelBox(&guic->msg1, 130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
+    memset(&cp->coords, 0, sizeof(cp->coords));
+    SPITouch_Calibrate(0x10000, 0x10000, 0, 0);
+    cp->state = 0;
+}
+
+static void okcancel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    PAGE_TxConfigureInit(0);
+}
+
+static void calibrate_touch(void)
+{
+    if (cp->state == 0 || cp->state == 3) {
+        if (GUI_ObjectNeedsRedraw((guiObject_t *)&guic->msg))
+            return;
+        draw_target(cp->state ? 320 - XCOORD : XCOORD , cp->state ? 240 - YCOORD : YCOORD + 32);
+        cp->state++;
+    } else if (cp->state == 1 || cp->state == 4) {
+        if (SPITouch_IRQ()) {
+            cp->coords = SPITouch_GetCoords();
+            cp->state++;
+        }
+    } else if (cp->state == 2) {
+        if (! SPITouch_IRQ()) {
+            cp->coords1 = cp->coords;
+            GUI_RemoveObj((guiObject_t *)&guic->msg);
+            GUI_CreateLabelBox(&guic->msg, 320 - XCOORD - 5, 240 - YCOORD - 5,
+                                            11, 11, &SMALLBOX_FONT, NULL, NULL, "");
+            GUI_Redraw(&guic->msg1);
+            cp->state = 3;
+        } else {
+            cp->coords = SPITouch_GetCoords();
+        }
+    } else if (cp->state == 5) {
+        if (! SPITouch_IRQ()) {
+            s32 xscale, yscale;
+            s32 xoff, yoff;
+            printf("T1:(%d, %d)\n", cp->coords1.x, cp->coords1.y);
+            printf("T2:(%d, %d)\n", cp->coords.x, cp->coords.y);
+            xscale = cp->coords.x - cp->coords1.x;
+            xscale = (320 - 2 * XCOORD) * 0x10000 / xscale;
+            yscale = cp->coords.y - cp->coords1.y;
+            yscale = (240 - 32 - 2 * YCOORD) * 0x10000 / yscale;
+            xoff = XCOORD - cp->coords1.x * xscale / 0x10000;
+            yoff = YCOORD + 32 - cp->coords1.y * yscale / 0x10000;
+            printf("Debug: scale(%d, %d) offset(%d, %d)\n", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
+            SPITouch_Calibrate(xscale, yscale, xoff, yoff);
+            PAGE_RemoveAllObjects();
+            PAGE_SetModal(1);
+            PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
+            GUI_CreateLabelBox(&guic->msg, 60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
+            memset(&cp->coords, 0, sizeof(cp->coords));
+            cp->state = 6;
+        } else {
+            cp->coords = SPITouch_GetCoords();
+        }
+    } else if(cp->state == 6) {
+        struct touch t;
+        if (SPITouch_IRQ()) {
+            t = SPITouch_GetCoords();
+            if (memcmp(&t, &cp->coords, sizeof(t)) != 0) {
+                cp->coords = t;
+                GUI_Redraw(&guic->msg);
+            }
+        }
+    }
+}
+
