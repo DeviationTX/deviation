@@ -269,14 +269,15 @@ static void toggle_press_cb(guiObject_t *obj, const void *data)
 #define LAYDLG_X_SPACE 10
 #define LAYDLG_X (LCD_WIDTH - LAYDLG_MIN_WIDTH) / 2
 #define LAYDLG_Y (32 + LAYDLG_Y_SPACE)
-#define LAYDLG_MIN_WIDTH (2*LAYDLG_X_SPACE + 15 + 100 + 64 +20) //space + # + spinbox + button + scrollbar
+#define LAYDLG_MIN_WIDTH (2*LAYDLG_X_SPACE + 15 + 100 + 64 +20+10) //space + # + spinbox + button + scrollbar
 #define LAYDLG_SCROLLABLE_X LAYDLG_X_SPACE
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int type = (long)data;
     long elemidx = elem_rel_to_abs(type, absrow);
     int X = LAYDLG_X + LAYDLG_SCROLLABLE_X - (type == ELEM_TOGGLE ? 68/2 : 0);
-    int del_x = X + 15 + 100;
+    int width = LAYDLG_MIN_WIDTH + (type == ELEM_TOGGLE ? 64 : 0) - 2 * LAYDLG_SCROLLABLE_X - 16;
+    int del_x = X + 15 + 110;
     int num_objs = 2;
     if (type == ELEM_MODELICO) {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
@@ -289,7 +290,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
     }
-    GUI_CreateButton(&gui->dlgbut[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
+    GUI_CreateButton(&gui->dlgbut[relrow], X+width-64, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
     return num_objs;
 }
 
@@ -317,7 +318,7 @@ void show_config()
         return;
     }
     int x = LAYDLG_X - (type == ELEM_TOGGLE ? 68/2 : 0);
-    int width = LAYDLG_MIN_WIDTH + (type == ELEM_TOGGLE ? 64 : 0);;
+    int width = LAYDLG_MIN_WIDTH + (type == ELEM_TOGGLE ? 64 : 0);
     GUI_CreateDialog(&gui->dialog,
          x, LAYDLG_Y,
          width, LAYDLG_HEIGHT,
