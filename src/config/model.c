@@ -398,12 +398,12 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
                 return 1;
             for (int j = 0; j <= NUM_SOURCES; j++) {
                 char cmp[10];
-                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr) == 0) {
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
                     data[5] = j;
                     break;
                 }
             }
-            return 1;
+            break;
         }
     }
     create_element(&m->pagecfg2.elem[idx], type, data);
