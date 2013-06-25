@@ -55,9 +55,9 @@ void _RTC_SetDayStart(u32 value)
     u32 days = value / DAYSEC;
     if (today.DayStart != days) {
         today.DayStart = days;
-        today.Year  = days / 365.25;
+        today.Year  = (4*days) / 1461; // = days/365.25
         u8 leap = today.Year % 4 == 0;
-        days -= (u32)(today.Year * 365.25);
+        days -= (u32)(today.Year * 365 + today.Year / 4);
         days -= ((today.Year != 0 && days > daysInYear[leap][2]) ? 1 : 0);    //leap year correction for RTC_STARTYEAR
         today.Month = 0;
         for (today.Month=0; today.Month<12; today.Month++) {
@@ -97,7 +97,7 @@ int _RTC_GetMonth(u32 value)
 int _RTC_GetYear(u32 value)
 {
     _RTC_SetDayStart(value);
-    return today.Year + 2012;
+    return today.Year + RTC_STARTYEAR;
 }
 
 u32 _RTC_GetSerialTime(int hour, int minute, int second)
@@ -110,7 +110,7 @@ u32 _RTC_GetSerialDate(int day, int month, int year)
     if (year>RTC_STARTYEAR) year -= RTC_STARTYEAR;
     if (year>67) year = 67;
     if (year<0) year = 0;
-    return (u32)(day-1 + daysInYear[year%4 == 0 ? 1 : 0][month-1] + year*365.25 + ((year != 0 && month > 2) ? 1 : 0)) * DAYSEC;
+    return (u32)(day-1 + daysInYear[year%4 == 0 ? 1 : 0][month-1] + year*365 + year/4 + ((year != 0 && month > 2) ? 1 : 0)) * DAYSEC;
 }
 
 // get serial time (seconds since 01.01.RTC_STARTYEAR (now 2012), 0:00:00 - "deviation epoch")    //year = RTC_STARTYEAR-based

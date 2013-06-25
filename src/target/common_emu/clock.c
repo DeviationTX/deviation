@@ -14,13 +14,31 @@
  */
 
 #include "common.h"
+#include "rtc.h"
 #include <time.h>
 
+//Time since 01.01.2012, 0:00:00
 long delta;
+#if 0
+long get_gmtoff(time_t tt) {
+    long tz;
+    struct tm *loc_t;
+    struct tm *gmt_t;
+
+    loc_t = localtime(&tt);
+    gmt_t = gmtime(&tt);
+
+    tz = mktime(loc_t) - mktime(gmt_t);
+
+    return tz;
+}
+#endif
 // initialize RTC
 void RTC_Init()
 {
-   delta = 0;
+   //UTC at 2012-01-01 00:00:00
+   #define DEVO_EPOCH 1325376000L
+   delta = DEVO_EPOCH;
 }
 
 // set date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
