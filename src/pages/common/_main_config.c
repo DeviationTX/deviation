@@ -53,13 +53,13 @@ const char *GetBoxSource(char *str, int src)
         if (src <= NUM_RTC)
             return RTC_Name(str, src - 1);
 #endif
-        if (src <= NUM_TIMERS)
+        if (src - NUM_RTC <= NUM_TIMERS)
             return TIMER_Name(str, src - NUM_RTC - 1);
-        else if( src - NUM_TIMERS <= NUM_TELEM)
+        else if( src - NUM_RTC - NUM_TIMERS <= NUM_TELEM)
         return TELEMETRY_Name(str, src - NUM_TIMERS);
     }
     return INPUT_SourceName(str, src
-               ? src - (NUM_TELEM + NUM_TIMERS) + NUM_INPUTS
+               ? src - (NUM_TELEM + NUM_TIMERS + NUM_RTC) + NUM_INPUTS
                : 0);
 }
 const char *GetElemName(int type)
@@ -119,7 +119,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_SMALLBOX:
         case ELEM_BIGBOX:
         {
-            pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
+            pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
             return GetBoxSource(lp.tmp, pc.elem[idx].src);
         }
         case ELEM_BAR:
