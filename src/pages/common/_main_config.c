@@ -56,7 +56,7 @@ const char *GetBoxSource(char *str, int src)
         if (src - NUM_RTC <= NUM_TIMERS)
             return TIMER_Name(str, src - NUM_RTC - 1);
         else if( src - NUM_RTC - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_Name(str, src - NUM_TIMERS);
+            return TELEMETRY_Name(str, src - NUM_RTC - NUM_TIMERS);
     }
     return INPUT_SourceName(str, src
                ? src - (NUM_TELEM + NUM_TIMERS + NUM_RTC) + NUM_INPUTS
