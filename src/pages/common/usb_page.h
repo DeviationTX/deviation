@@ -4,7 +4,7 @@
 
 struct usb_page {
     struct buttonAction action;
-    char tmpstr[200];
+    char tmpstr[240];
 #if HAS_RTC
     u32  timeval;
     char datetime[12];
