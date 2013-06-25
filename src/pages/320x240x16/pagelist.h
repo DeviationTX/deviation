@@ -16,7 +16,7 @@ PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_Scann
 #endif
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
 #if HAS_RTC
-PAGEDEF(PAGEID_RTC,      PAGE_RTCInit,         PAGE_RTCEvent,         PAGE_RTCExit,     _tr_noop("Real Time Clock"))
+PAGEDEF(PAGEID_RTC,      PAGE_RTCInit,         PAGE_RTCEvent,         NULL,             _tr_noop("Real Time Clock"))
 #endif
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,  _tr_noop("Welcome"))
 /* Simple */

@@ -24,13 +24,14 @@
 #if HAS_RTC
 #define gui (&gui_objs.u.rtc)
 
+static struct rtc_page * const rp = &pagemem.u.rtc_page;
+
 void _show_page();
 static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data);
 
 const int min[6] = { 0, 0, 0, 1, 1, RTC_STARTYEAR };
 int max[6] = { 59, 59, 23, 31, 12, RTC_STARTYEAR+67 };    // not const because max[3] will change (day)
 static const u8 daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-static int savetimerpage;
 
 struct Rtc {
     u16 value[6];
@@ -39,28 +40,33 @@ struct Rtc {
     int clocksourceready;
 } Rtc;
 
-char tmpstr[12];
-
+static void okcancel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    RTC_SetValue(RTC_GetSerial(Rtc.value[3], Rtc.value[4], Rtc.value[5]-RTC_STARTYEAR, Rtc.value[2], Rtc.value[1], Rtc.value[0]));
+    PAGE_SetModal(0);
+    PAGE_RemoveAllObjects();
+    PAGE_ChangeByID(PAGEID_TXCFG);
+}
 
 void PAGE_RTCInit(int page)
 {
-    savetimerpage=page;
-    PAGE_SetModal(0);
-     char title[40];
-    sprintf(title, "%s", _tr(PAGE_GetName(PAGEID_RTC)));
-    GUI_CreateLabel(&gui->title, 8, 10, NULL, TITLE_FONT, (void *)title);
-    PAGE_CreateOkButton(264, 4, PAGE_RTCExit);
+    (void)page;
+    PAGE_SetModal(1);
+    PAGE_RemoveAllObjects();
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_RTC), okcancel_cb);
     u32 timevalue = RTC_GetTimeValue();
     Rtc.value[2] = (u16)(timevalue / 3600);
     Rtc.value[1] = (u16)(timevalue % 3600) / 60;
     Rtc.value[0] = (u16)(timevalue % 60);
-    RTC_GetDateStringLong(tmpstr,RTC_GetValue());
-    int idx = (tmpstr[1] == '.' ? 1 : 2);
-    tmpstr[idx] = 0;
-    tmpstr[idx+3] = 0;
-    Rtc.value[3] = atoi(tmpstr);
-    Rtc.value[4] = atoi(tmpstr + idx + 1);
-    Rtc.value[5] = atoi(tmpstr + idx + 4);
+    RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+    int idx = (rp->tmpstr[1] == '.' ? 1 : 2);
+    rp->tmpstr[idx] = 0;
+    rp->tmpstr[idx+3] = 0;
+    Rtc.value[3] = atoi(rp->tmpstr);
+    Rtc.value[4] = atoi(rp->tmpstr + idx + 1);
+    Rtc.value[5] = atoi(rp->tmpstr + idx + 4);
     _show_page();
 }
 
@@ -69,28 +75,28 @@ const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
     (void)obj;
     switch ((long)data) {
         case 0:    // second
-            sprintf(tmpstr, "%02d", RTC_GetTimeValue() % 60);
+            sprintf(rp->tmpstr, "%02d", RTC_GetTimeValue() % 60);
             break;
         case 1:    // minute
-            sprintf(tmpstr, "%02d", (RTC_GetTimeValue() / 60) % 60);
+            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue() / 60) % 60);
             break;
         case 2:    // hour
-            sprintf(tmpstr, "%02d", (RTC_GetTimeValue() / 3600) % 24);
+            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue() / 3600) % 24);
             break;
         case 3: // day
-            RTC_GetDateStringLong(tmpstr,RTC_GetValue());
-            tmpstr[tmpstr[1] == '.' ? 1 : 2] = 0;
+            RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+            rp->tmpstr[rp->tmpstr[1] == '.' ? 1 : 2] = 0;
             break;
         case 4: // month
-            RTC_GetDateStringLong(tmpstr,RTC_GetValue());
-            int idx = (tmpstr[1] == '.' ? 1 : 2);
-            tmpstr[idx+3] = 0;
-            return tmpstr + idx + 1;
+            RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+            int idx = (rp->tmpstr[1] == '.' ? 1 : 2);
+            rp->tmpstr[idx+3] = 0;
+            return rp->tmpstr + idx + 1;
         case 5: // year
-            RTC_GetDateStringLong(tmpstr,RTC_GetValue());
-            return tmpstr + (tmpstr[1] == '.' ? 1 : 2) + 4;
+            RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+            return rp->tmpstr + (rp->tmpstr[1] == '.' ? 1 : 2) + 4;
     }
-    return tmpstr;
+    return rp->tmpstr;
 }
 
 void _show_page()
@@ -133,12 +139,6 @@ void PAGE_RTCEvent()
     }
 }
 
-void PAGE_RTCExit()
-{
-    RTC_SetValue(RTC_GetSerial(Rtc.value[3], Rtc.value[4], Rtc.value[5]-RTC_STARTYEAR, Rtc.value[2], Rtc.value[1], Rtc.value[0]));
-    PAGE_TimerInit(savetimerpage);
-}
-
 static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -146,9 +146,9 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
     if (idx < 6) {
         if (idx == 3) max[3] = daysInMonth[Rtc.value[4] - 1] + (Rtc.value[5] % 4 == 0 ? 1 : 0);
         Rtc.value[idx] = GUI_TextSelectHelper(Rtc.value[idx], min[idx], max[idx], dir, 1, 4, NULL);
-        if (idx == 5) sprintf(tmpstr, "%4d", Rtc.value[idx]);
-        else sprintf(tmpstr, "%2d", Rtc.value[idx]);
+        if (idx == 5) sprintf(rp->tmpstr, "%4d", Rtc.value[idx]);
+        else sprintf(rp->tmpstr, "%2d", Rtc.value[idx]);
     }
-    return tmpstr;
+    return rp->tmpstr;
 }
 #endif

@@ -243,6 +243,10 @@ struct tx_obj {
              guiButton_t touchtest;
              guiLabel_t sticklbl;
              guiButton_t stickcalib;
+#if HAS_RTC
+             guiLabel_t clocklbl;
+             guiButton_t clock;
+#endif
 #if LCD_WIDTH != 480
         } g1;
         struct {

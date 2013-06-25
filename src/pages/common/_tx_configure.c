@@ -45,6 +45,7 @@ enum calibType {
     CALIB_TOUCH,
     CALIB_STICK,
     CALIB_STICK_TEST,
+    SET_CLOCK,
 };
 
 static inline guiObject_t *_get_obj(int idx, int objid);
@@ -155,6 +156,13 @@ static const char *calibratestr_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     return _tr("Calibrate");
+}
+
+static const char *clockstr_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return _tr("Set");
 }
 
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
@@ -291,6 +299,12 @@ static void press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     cp->enable = (long)data;
+#if HAS_RTC
+    if (cp->enable == SET_CLOCK) {
+        PAGE_ChangeByID(PAGEID_RTC);
+        return;
+    }
+#endif
 #if HAS_TOUCH
     if (cp->enable == CALIB_TOUCH)
         init_touch_calib();

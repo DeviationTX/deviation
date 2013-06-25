@@ -7,6 +7,9 @@ typedef enum {
 
 struct rtc_page {
     u16 value[6];
+    char tmpstr[12];
+    void (*return_page)(int page);
+    int return_val;
 };
 
 #endif
