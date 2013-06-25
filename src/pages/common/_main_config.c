@@ -135,7 +135,9 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_HTRIM:
         case ELEM_VTRIM:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
-            sprintf(lp.tmp, "%s%d", _tr("Trim"),pc.elem[idx].src + 1);
+            if (pc.elem[idx].src == 0)
+                return _tr("None");
+            sprintf(lp.tmp, "%s%d", _tr("Trim"),pc.elem[idx].src);
             return lp.tmp;
     }
     return "";

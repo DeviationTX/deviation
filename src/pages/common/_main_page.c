@@ -109,7 +109,7 @@ void PAGE_MainEvent()
             case ELEM_VTRIM:
             case ELEM_HTRIM:
             {
-                int value = *(MIXER_GetTrim(src));
+                int value = *(MIXER_GetTrim(src-1));
                 if (mp->elem[i] != value) {
                     mp->elem[i] = value;
                     GUI_Redraw(&gui->elem[i].bar);
@@ -281,9 +281,11 @@ void show_elements()
             case ELEM_HTRIM:
             {
                 int src = pc.elem[i].src;
-                mp->elem[i] = *(MIXER_GetTrim(src));
+                if (src == 0)
+                    continue;
+                mp->elem[i] = *(MIXER_GetTrim(src-1));
                 GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, -100, 100,
-                    type == ELEM_VTRIM ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)src);
+                    type == ELEM_VTRIM ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)(src-1));
                 break;
             }
             case ELEM_SMALLBOX:
