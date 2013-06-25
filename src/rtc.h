@@ -1,6 +1,13 @@
 #ifndef _RTC_H_
 #define _RTC_H_
 
+#ifndef HAS_RTC
+    #define HAS_RTC 0
+    #define NUM_RTC 0
+#else
+    #define NUM_RTC 2
+#endif
+
 #define RTC_STARTYEAR 2012
 
 // initialize RTC clock
@@ -25,9 +32,11 @@ void RTC_GetDateString(char *str, u32 date);
 void RTC_GetDateStringLong(char *str, u32 date);
 
 // return only time-value
-u32 RTC_GetTimeValue();
+u32 RTC_GetTimeValue(u32 time);
 
 // return only date-value
-u32 RTC_GetDateValue();
+u32 RTC_GetDateValue(u32 time);
 
+//return RTC name
+const char *RTC_Name(char *str, int i);
 #endif

@@ -363,16 +363,26 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             char str[20];
             if (count != 3)
                 return 1;
-            for(i = 0; i < NUM_TIMERS; i++) {
-                if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+#if HAS_RTC
+            for(i = 0; i < NUM_RTC; i++) {
+                if(mapstrcasecmp(ptr, RTC_Name(str, i)) == 0) {
                     src = i + 1;
                     break;
+                }
+            }
+#endif
+            if (src == -1) {
+                for(i = 0; i < NUM_TIMERS; i++) {
+                    if(mapstrcasecmp(ptr, TIMER_Name(str, i)) == 0) {
+                        src = i + 1 + NUM_RTC;
+                        break;
+                    }
                 }
             }
             if (src == -1) {
                 for(i = 0; i < NUM_TELEM; i++) {
                     if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
-                        src = i + 1 + NUM_TIMERS;
+                        src = i + 1 + NUM_RTC + NUM_TIMERS;
                         break;
                     }
                 }
@@ -380,7 +390,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             if (src == -1) {
                 u8 newsrc = get_source(section, ptr);
                 if(newsrc >= NUM_INPUTS) {
-                    src = newsrc - (NUM_INPUTS + 1 - (NUM_TIMERS + NUM_TELEM + 1));
+                    src = newsrc - (NUM_INPUTS + 1 - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1));
                 }
             }
             if (src == -1)

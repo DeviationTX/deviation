@@ -49,8 +49,12 @@ int elem_get_count(int type)
 const char *GetBoxSource(char *str, int src)
 {
     if (src) {
+#if HAS_RTC
+        if (src <= NUM_RTC)
+            return RTC_Name(str, src - 1);
+#endif
         if (src <= NUM_TIMERS)
-            return TIMER_Name(str, src - 1);
+            return TIMER_Name(str, src - NUM_RTC - 1);
         else if( src - NUM_TIMERS <= NUM_TELEM)
         return TELEMETRY_Name(str, src - NUM_TIMERS);
     }

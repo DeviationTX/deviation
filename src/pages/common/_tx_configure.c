@@ -158,12 +158,14 @@ static const char *calibratestr_cb(guiObject_t *obj, const void *data)
     return _tr("Calibrate");
 }
 
+#if HAS_RTC
 static const char *clockstr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
     return _tr("Set");
 }
+#endif
 
 static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
 {

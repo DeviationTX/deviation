@@ -146,14 +146,20 @@ void RTC_GetDateStringLong(char *str, u32 date)
 }
 
 // return only time-value
-u32 RTC_GetTimeValue()
+u32 RTC_GetTimeValue(u32 time)
 {
-    return RTC_GetValue() % DAYSEC;
+    return time % DAYSEC;
 }
 
 // return only date-value
-u32 RTC_GetDateValue()
+u32 RTC_GetDateValue(u32 time)
 {
-    return RTC_GetValue() / DAYSEC;
+    return time / DAYSEC;
+}
+
+const char *RTC_Name(char *str, int i)
+{
+    sprintf(str, "%s", i == 0 ? _tr("Clock") : _tr("Date"));
+    return str;
 }
 #endif //HAS_RTC

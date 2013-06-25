@@ -56,11 +56,12 @@ void PAGE_RTCInit(int page)
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_RTC), okcancel_cb);
-    u32 timevalue = RTC_GetTimeValue();
+    u32 time = RTC_GetValue();
+    u32 timevalue = RTC_GetTimeValue(time);
     Rtc.value[2] = (u16)(timevalue / 3600);
     Rtc.value[1] = (u16)(timevalue % 3600) / 60;
     Rtc.value[0] = (u16)(timevalue % 60);
-    RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+    RTC_GetDateStringLong(rp->tmpstr,time);
     int idx = (rp->tmpstr[1] == '.' ? 1 : 2);
     rp->tmpstr[idx] = 0;
     rp->tmpstr[idx+3] = 0;
@@ -73,18 +74,19 @@ void PAGE_RTCInit(int page)
 const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
+    u32 time = RTC_GetValue();
     switch ((long)data) {
         case 0:    // second
-            sprintf(rp->tmpstr, "%02d", RTC_GetTimeValue() % 60);
+            sprintf(rp->tmpstr, "%02d", RTC_GetTimeValue(time) % 60);
             break;
         case 1:    // minute
-            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue() / 60) % 60);
+            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue(time) / 60) % 60);
             break;
         case 2:    // hour
-            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue() / 3600) % 24);
+            sprintf(rp->tmpstr, "%02d", (RTC_GetTimeValue(time) / 3600) % 24);
             break;
         case 3: // day
-            RTC_GetDateStringLong(rp->tmpstr,RTC_GetValue());
+            RTC_GetDateStringLong(rp->tmpstr,time);
             rp->tmpstr[rp->tmpstr[1] == '.' ? 1 : 2] = 0;
             break;
         case 4: // month

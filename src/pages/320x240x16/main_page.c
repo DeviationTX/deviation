@@ -123,10 +123,10 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     u8 idx = (long)data;
 #if HAS_RTC
-    if(idx == NUM_TIMERS)
+    if(idx <= NUM_RTC)
         return;
 #endif
-    if (idx <= NUM_TIMERS) {
+    if (idx - NUM_RTC <= NUM_TIMERS) {
         if(press_type == -1 && ! mp->ignore_release) 
             TIMER_StartStop(idx-1);
         mp->ignore_release = 0;
@@ -134,7 +134,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
             TIMER_Reset(idx-1);
             mp->ignore_release = 1;
         }
-    } else if (idx - NUM_TIMERS <= NUM_TELEM) {
+    } else if (idx - NUM_RTC - NUM_TIMERS<= NUM_TELEM) {
         if(press_type == -1) {
             pagemem.modal_page = 2;
             PAGE_MainExit();

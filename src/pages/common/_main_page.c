@@ -38,11 +38,17 @@ struct LabelDesc *get_box_font(u8 idx, u8 neg)
 
 s32 get_boxval(u8 idx)
 {
-    if (idx <= NUM_TIMERS)
+#if HAS_RTC
+    if (idx <= NUM_RTC) {
+        u32 time = RTC_GetValue();
+        return idx == 1 ? RTC_GetTimeValue(time) : RTC_GetDateValue(time);
+    }
+#endif
+    if (idx - NUM_RTC <= NUM_TIMERS)
         return TIMER_GetValue(idx - 1);
     if(idx - NUM_TIMERS <= NUM_TELEM)
-        return TELEMETRY_GetValue(idx - NUM_TIMERS);
-    return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR));
+        return TELEMETRY_GetValue(idx - NUM_RTC - NUM_TIMERS);
+    return RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR));
 }
 
 const char *show_box_cb(guiObject_t *obj, const void *data)
@@ -50,17 +56,18 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
     (void)obj;
     u8 idx = (long)data;
 #if HAS_RTC
-    if (idx == NUM_TIMERS) {
-        RTC_GetTimeString(mp->tmpstr, RTC_GetValue());
+    if (idx <= NUM_RTC) {
+        u32 time = RTC_GetValue();
+        idx == 1 ? RTC_GetTimeString(mp->tmpstr, time) : RTC_GetDateString(mp->tmpstr, time);
         return mp->tmpstr;
     }
 #endif
-    if (idx <= NUM_TIMERS) {
+    if (idx - NUM_RTC <= NUM_TIMERS) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
-    } else if(idx - NUM_TIMERS <= NUM_TELEM) {
+    } else if(idx - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
         TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_TIMERS);
     } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
+        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
     }
     return mp->tmpstr;
 }
@@ -122,7 +129,15 @@ void PAGE_MainEvent()
 #endif
             {
                 s32 val = get_boxval(src);
-                if (src <= NUM_TIMERS) {
+#if HAS_RTC
+                if (src <= NUM_RTC) {
+                    if (mp->elem[i] != val) {
+                        mp->elem[i] = val;
+                        GUI_Redraw(&gui->elem[i].box);
+                    }
+                } else
+#endif
+                if (src - NUM_RTC <= NUM_TIMERS) {
                     //Timer
                     if ((val >= 0 && mp->elem[i] < 0) || (val < 0 && mp->elem[i] >= 0)) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, val < 0));
@@ -132,9 +147,9 @@ void PAGE_MainEvent()
                         mp->elem[i] = val;
                         GUI_Redraw(&gui->elem[i].box);
                     }
-                } else if (src - NUM_TIMERS <= NUM_TELEM) {
+                } else if (src - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
                     //Telem
-                    int alarm = TELEMETRY_HasAlarm(src - NUM_TIMERS);
+                    int alarm = TELEMETRY_HasAlarm(src - NUM_RTC - NUM_TIMERS);
                     u32 time = CLOCK_getms();
                     if (alarm || (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)) {
                         if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)
@@ -297,8 +312,12 @@ void show_elements()
                 if (src == 0)
                     continue;
                 mp->elem[i] = get_boxval(src);
-                int font = ((src <= NUM_TIMERS && mp->elem[i] < 0)
-                           || ((u8)(src - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0));
+                int font = (
+#if HAS_RTC
+                           src > NUM_RTC &&
+#endif
+                           ((src <= NUM_RTC + NUM_TIMERS && mp->elem[i] < 0)
+                           || ((u8)(src - NUM_RTC - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0)));
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h,
                             get_box_font(type == ELEM_BIGBOX ? 0 : 2, font),
                             show_box_cb, press_box_cb,

@@ -1,6 +1,7 @@
 #ifndef _RTC_CONFIG_H_
 #define _RTC_CONFIG_H_
 
+#include "rtc.h"
 typedef enum {
     PLL, HSE, HSI, LSE, LSI
 } clocksource_t;

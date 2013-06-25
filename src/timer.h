@@ -1,12 +1,7 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#ifndef HAS_RTC
-    #define HAS_RTC 0
-    #define NUM_TIMERS 4
-#else
-    #define NUM_TIMERS 5
-#endif
+#define NUM_TIMERS 4
 
 #define TIMER_MAX_VAL 5940
 #define IS_RTC(x) ((x) == NUM_TIMERS - 1)

@@ -18,7 +18,6 @@
 #include "music.h"
 #include "config/model.h"
 #include "config/tx.h"
-#include "rtc.h"
 #include <stdlib.h>
 
 static u8 timer_state[NUM_TIMERS];
@@ -50,10 +49,6 @@ void TIMER_SetString(char *str, s32 time)
 
 const char *TIMER_Name(char *str, u8 timer)
 {
-#if HAS_RTC
-    if(timer == NUM_TIMERS-1)
-        return _tr("Clock");
-#endif
     sprintf(str, "%s%d", _tr("Timer"), timer+1);
     return str;
 }
@@ -73,13 +68,6 @@ void TIMER_StartStop(u8 timer)
 
 void TIMER_Reset(u8 timer)
 {
-#if HAS_RTC
-    if (IS_RTC(timer)) {
-        timer_val[timer] = RTC_GetTimeValue()*1000;
-        timer_state[timer] = 1;    //run immediately after resetting
-        return;
-    }
-#endif
     if (Model.timer[timer].type == TIMER_STOPWATCH_PROP
         || Model.timer[timer].type == TIMER_COUNTDOWN_PROP)
     {
@@ -185,10 +173,6 @@ void TIMER_Update()
                 Model.timer[i].val = timer_val[i];
             } else if (Model.timer[i].type == TIMER_STOPWATCH || Model.timer[i].type == TIMER_STOPWATCH_PROP) {
                 timer_val[i] += delta;
-#if HAS_RTC
-            } else if (IS_RTC(i)) {
-                timer_val[i] = RTC_GetTimeValue()*1000;
-#endif
             } else {
                 s32 warn_time;
                 // start to beep  for each prealert_interval at the last prealert_time(seconds)
