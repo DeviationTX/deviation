@@ -17,6 +17,7 @@
 #include "telemconfig_page.h"
 #include "toggle_select.h"
 #include "config/display.h"
+#include "rtc_config.h"
 
 #define PAGE_NAME_MAX 10
 extern struct pagemem pagemem;
@@ -64,6 +65,11 @@ void MODELPROTO_Config();
 void MODELTRAIN_Config();
 void MODELPage_Template();
 
+/* RTC */
+void PAGE_RTCInit(int page);
+void PAGE_RTCEvent();
+void PAGE_RTCExit();
+
 /* Test */
 void PAGE_TestInit(int page);
 void PAGE_TestEvent();
@@ -86,7 +92,7 @@ void PAGE_USBInit(int page);
 void PAGE_USBEvent();
 void PAGE_USBExit();
 
-/* USB */
+/* TX configure */
 void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));

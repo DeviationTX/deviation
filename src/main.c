@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "config/display.h"
+#include "rtc.h"
 
 void Init();
 void Banner();
@@ -117,6 +118,9 @@ void Init() {
     //Force protocol to none to initialize RAM
     Model.protocol = PROTOCOL_NONE;
     PROTOCOL_Init(1);
+#endif
+#if HAS_RTC
+    RTC_Init();        // Watchdog must be running in case something goes wrong (e.g no crystal)
 #endif
 }
 

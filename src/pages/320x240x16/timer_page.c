@@ -17,6 +17,7 @@
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+#include "rtc.h"
 
 #include "../common/_timer_page.c"
 
@@ -26,6 +27,11 @@
 static void _draw_body();
 guiObject_t *firstObj;
 s8 timer_page_num ;
+
+void press_set_cb(guiObject_t *obj, const void *data);
+const char *show_set_cb(guiObject_t *obj, const void *data);
+const char *show_time_cb(guiObject_t *obj, const void *data);
+const char *show_date_cb(guiObject_t *obj, const void *data);
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
@@ -68,7 +74,7 @@ static void _draw_body() {
     }
     int COL1 = 30;
     int COL2 = 103;
-    for (u8 i = timer_page_num * 2 * TIMERCOLUMNS; i < NUM_TIMERS && i < (timer_page_num + 1) * 2 * TIMERCOLUMNS; i++) {
+    for (u8 i = timer_page_num * 2 * TIMERCOLUMNS; (i < NUM_TIMERS - (HAS_RTC ? 1 : 0)) && i < (timer_page_num + 1) * 2 * TIMERCOLUMNS; i++) {
         if (TIMERCOLUMNS == 1 || (TIMERCOLUMNS == 2 && i < timer_page_num * 2 * TIMERCOLUMNS + TIMERCOLUMNS)) {
             COL1 = 30;
             COL2 = 103;
@@ -86,6 +92,10 @@ static void _draw_body() {
         GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         row+=20;
+#if 0 //HAS_RTC
+        //GUI_CreateLabelBox(&gui->timelbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL,NULL,_tr("Time:"));
+        GUI_CreateLabelBox(&gui->timevallbl[i], COL2+30, row, 96, 16, &DEFAULT_FONT, show_time_cb, NULL, (void *)(long)i);
+#endif
         GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)i);
         GUI_CreateTextSelect(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
@@ -102,6 +112,13 @@ static void _draw_body() {
         //Row 4
         GUI_CreateLabelBox(&gui->startlbl[i], COL1, next_row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
         GUI_CreateTextSelect(&gui->start[i], COL2, next_row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
+#if 0 //HAS_RTC
+        // date label and set date/time button
+        GUI_CreateLabelBox(&gui->datelbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Date:"));
+        GUI_CreateLabelBox(&gui->datevallbl[i], COL2+20, row, 96, 16, &DEFAULT_FONT, show_date_cb, NULL, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->setlbl[i], COL1, row+20, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Set:"));
+        GUI_CreateButton(&gui->set[i], COL2, row+20, TEXTSELECT_96, show_set_cb, 0x0000, press_set_cb, (void *)(long)i);
+#endif
         update_countdown(i);
     }
 }
@@ -131,3 +148,36 @@ static void update_countdown(u8 idx)
 
     GUI_Redraw(&gui->switchlbl[idx]);
 }
+#if HAS_RTC
+void press_set_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    PAGE_RemoveAllObjects();
+    PAGE_RTCInit(0);
+}
+
+const char *show_set_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    sprintf(tp->tmpstr, "%s", _tr("Date / Time"));
+    return tp->tmpstr;
+}
+
+const char *show_time_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    RTC_GetTimeString(tp->tmpstr, RTC_GetValue());
+    return tp->tmpstr;
+}
+
+const char *show_date_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    RTC_GetDateStringLong(tp->tmpstr, RTC_GetValue());
+    return tp->tmpstr;
+}
+#endif

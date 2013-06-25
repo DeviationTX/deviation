@@ -20,6 +20,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "telemetry.h"
+#include "rtc.h"
 
 #define VTRIM_W      10
 #define VTRIM_H     140
@@ -121,6 +122,10 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
+#if HAS_RTC
+    if(idx == NUM_TIMERS)
+        return;
+#endif
     if (idx <= NUM_TIMERS) {
         if(press_type == -1 && ! mp->ignore_release) 
             TIMER_StartStop(idx-1);

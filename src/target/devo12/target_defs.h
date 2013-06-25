@@ -9,6 +9,7 @@
 
 //#define ENABLE_SCANNER 1
 #define HAS_TOUCH 1
+#define HAS_RTC 1
 #define HAS_VIBRATINGMOTOR 0
 #define HAS_LOGICALVIEW 0
 #define MIN_BRIGHTNESS 1 

@@ -47,3 +47,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+
+void PAGE_USBEvent()
+{
+}

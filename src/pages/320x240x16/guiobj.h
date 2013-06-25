@@ -196,6 +196,12 @@ struct timer_obj {
     guiLabel_t startlbl[NUM_TIMERS];
     guiLabel_t resetpermlbl[NUM_TIMERS];
     guiButton_t resetperm[NUM_TIMERS];
+    guiLabel_t timelbl[NUM_TIMERS];
+    guiLabel_t timevallbl[NUM_TIMERS];
+    guiLabel_t datelbl[NUM_TIMERS];
+    guiLabel_t datevallbl[NUM_TIMERS];
+    guiLabel_t setlbl[NUM_TIMERS];
+    guiButton_t set[NUM_TIMERS];
     guiTextSelect_t start[NUM_TIMERS];
 };
 
@@ -288,7 +294,31 @@ struct calibrate_obj {
 struct usb_obj {
     guiLabel_t headline;
     guiLabel_t msg;
+    guiLabel_t time;
+    guiLabel_t date;
 };    
+
+struct rtc_obj {
+    guiLabel_t title;
+    guiLabel_t secondlbl;
+    guiLabel_t minutelbl;
+    guiLabel_t hourlbl;
+    guiLabel_t daylbl;
+    guiLabel_t monthlbl;
+    guiLabel_t yearlbl;
+    guiTextSelect_t second;
+    guiTextSelect_t minute;
+    guiTextSelect_t hour;
+    guiTextSelect_t day;
+    guiTextSelect_t month;
+    guiTextSelect_t year;
+    guiLabel_t secondvalue;
+    guiLabel_t minutevalue;
+    guiLabel_t hourvalue;
+    guiLabel_t dayvalue;
+    guiLabel_t monthvalue;
+    guiLabel_t yearvalue;
+};
 
 /****Advanced ****/
 struct advcurve_obj {
@@ -507,6 +537,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
+        struct rtc_obj rtc;
 
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

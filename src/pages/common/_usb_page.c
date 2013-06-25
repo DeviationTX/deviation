@@ -75,10 +75,6 @@ void PAGE_USBExit()
     BUTTON_UnregisterCallback(&up->action);
 }
 
-void PAGE_USBEvent()
-{
-}
-
 void USB_Connect()
 {
     USB_Enable(0, 1);

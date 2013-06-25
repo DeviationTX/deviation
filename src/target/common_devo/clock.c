@@ -17,6 +17,7 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/f1/rtc.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/iwdg.h>
 
@@ -231,3 +232,26 @@ void sys_tick_handler(void)
             }
         }
 }
+
+// initialize RTC
+void RTC_Init()
+{
+    rtc_auto_awake(LSE, 32767); // LowSpeed External source, divided by (clock-1)=32767
+}
+
+// set date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
+void RTC_SetValue(u32 value)
+{
+    rtc_set_counter_val(value);
+    //_RTC_SetDayStart(value);
+}
+
+// get date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
+u32 RTC_GetValue()
+{
+    u32 value;
+    value = rtc_get_counter_val();
+    //_RTC_SetDayStart(value);
+    return value;
+}
+

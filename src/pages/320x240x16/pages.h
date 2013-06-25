@@ -34,6 +34,7 @@ struct pagemem {
         struct telemtest_page telemtest_page;
         struct telemconfig_page telemconfig_page;
         struct toggle_select_page toggle_select_page;
+        struct rtc_page rtc_page;
     } u;
     u8 modal_page;
 };

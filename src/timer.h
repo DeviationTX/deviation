@@ -1,8 +1,15 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
+#ifndef HAS_RTC
+    #define HAS_RTC 0
+    #define NUM_TIMERS 5
+#else
+    #define NUM_TIMERS 4
+#endif
+
 #define TIMER_MAX_VAL 5940
-#define NUM_TIMERS 4
+#define IS_RTC(x) ((x) == NUM_TIMERS - 1)
 
 #define DEFAULT_TIMEUP_INTERVAL 10000
 #define DEFAULT_PERALERT_TIME 30000

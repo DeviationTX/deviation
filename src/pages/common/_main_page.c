@@ -49,6 +49,12 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
+#if HAS_RTC
+    if (idx == NUM_TIMERS) {
+        RTC_GetTimeString(mp->tmpstr, RTC_GetValue());
+        return mp->tmpstr;
+    }
+#endif
     if (idx <= NUM_TIMERS) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - 1));
     } else if(idx - NUM_TIMERS <= NUM_TELEM) {
