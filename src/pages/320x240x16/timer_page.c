@@ -74,7 +74,7 @@ static void _draw_body() {
     }
     int COL1 = 30;
     int COL2 = 103;
-    for (u8 i = timer_page_num * 2 * TIMERCOLUMNS; (i < NUM_TIMERS - (HAS_RTC ? 1 : 0)) && i < (timer_page_num + 1) * 2 * TIMERCOLUMNS; i++) {
+    for (u8 i = timer_page_num * 2 * TIMERCOLUMNS; i < NUM_TIMERS  && i < (timer_page_num + 1) * 2 * TIMERCOLUMNS; i++) {
         if (TIMERCOLUMNS == 1 || (TIMERCOLUMNS == 2 && i < timer_page_num * 2 * TIMERCOLUMNS + TIMERCOLUMNS)) {
             COL1 = 30;
             COL2 = 103;
