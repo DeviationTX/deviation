@@ -326,6 +326,22 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     u16 i;
     CLOCK_ResetWatchdog();
     int idx;
+    if (MATCH_START(name, GUI_QUICKPAGE)) {
+        u8 idx = name[9] - '1';
+        if (idx >= NUM_QUICKPAGES) {
+            printf("%s: Only %d quickpages are supported\n", section, NUM_QUICKPAGES);
+            return 1;
+        }
+        int max = PAGE_GetNumPages();
+        for(i = 0; i < max; i++) {
+            if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
+                m->pagecfg2.quickpage[idx] = i;
+                return 1;
+            }
+        }
+        printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
+        return 1;
+    }
     if (! MATCH_SECTION(SECTION_GUI))
         return 1;
     for (idx = 0; idx < NUM_ELEMS; idx++) {
@@ -865,22 +881,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
     }
     if (MATCH_START(section, "gui-")) {
-        if (MATCH_START(name, GUI_QUICKPAGE)) {
-            u8 idx = name[9] - '1';
-            if (idx >= NUM_QUICKPAGES) {
-                printf("%s: Only %d quickpages are supported\n", section, NUM_QUICKPAGES);
-                return 1;
-            }
-            int max = PAGE_GetNumPages();
-            for(i = 0; i < max; i++) {
-                if(mapstrcasecmp(PAGE_GetName(i), value) == 0) {
-                    m->pagecfg2.quickpage[idx] = i;
-                    return 1;
-                }
-            }
-            printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
-            return 1;
-        }
         return layout_ini_handler(user, section, name, value);
     }
     if (MATCH_SECTION(SECTION_PPMIN)) {

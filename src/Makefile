@@ -237,6 +237,8 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	mkdir -p filesystem/$(FILESYSTEM) || true
 	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
 	cp -prf filesystem/common/template filesystem/$(FILESYSTEM)/
+	mkdir filesystem/$(FILESYSTEM)/layout 2> /dev/null; \
+        cp -prf filesystem/common/layout/*.* filesystem/$(FILESYSTEM)/layout/
 	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
 	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
 	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
