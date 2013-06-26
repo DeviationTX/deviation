@@ -24,6 +24,8 @@ src/filesystem/devo8/errors.txt
 src/filesystem/devo8/language/
 src/filesystem/devo8/template/
 src/filesystem/devo8/media/sound.ini
+src/filesystem/devo8/layout/default.ini
+src/filesystem/devo8/layout/empty.ini
 glob:src/filesystem/devo8/media/*.fon
 src/filesystem/devo10/models/
 src/filesystem/devo10/tx.ini
@@ -31,6 +33,8 @@ src/filesystem/devo10/errors.txt
 src/filesystem/devo10/language/
 src/filesystem/devo10/template/
 src/filesystem/devo10/media/sound.ini
+src/filesystem/devo10/layout/default.ini
+src/filesystem/devo10/layout/empty.ini
 src/filesystem/devo7e/
 glob:src/filesystem/devo10/media/*.fon
 glob:*.dll
