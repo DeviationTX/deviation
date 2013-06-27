@@ -254,7 +254,7 @@ static void init_touch_calib()
     //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
     GUI_CreateLabel(&guic->title, 40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
     GUI_CreateLabelBox(&guic->msg, XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
-    GUI_CreateLabelBox(&guic->msg1, 130, 110, 0, 0, &DEFAULT_FONT, show_msg_cb, NULL, NULL);
+    GUI_CreateLabelBox(&guic->msg1, (LCD_WIDTH - 100) /2, (LCD_HEIGHT - 20)/2, 100, 20, &NARROW_FONT, show_msg_cb, NULL, NULL);
     memset(&cp->coords, 0, sizeof(cp->coords));
     SPITouch_Calibrate(0x10000, 0x10000, 0, 0);
     cp->state = 0;
@@ -272,7 +272,7 @@ static void calibrate_touch(void)
     if (cp->state == 0 || cp->state == 3) {
         if (GUI_ObjectNeedsRedraw((guiObject_t *)&guic->msg))
             return;
-        draw_target(cp->state ? 320 - XCOORD : XCOORD , cp->state ? 240 - YCOORD : YCOORD + 32);
+        draw_target(cp->state ? LCD_WIDTH - XCOORD : XCOORD , cp->state ? LCD_HEIGHT - YCOORD : YCOORD + 32);
         cp->state++;
     } else if (cp->state == 1 || cp->state == 4) {
         if (SPITouch_IRQ()) {
@@ -283,7 +283,7 @@ static void calibrate_touch(void)
         if (! SPITouch_IRQ()) {
             cp->coords1 = cp->coords;
             GUI_RemoveObj((guiObject_t *)&guic->msg);
-            GUI_CreateLabelBox(&guic->msg, 320 - XCOORD - 5, 240 - YCOORD - 5,
+            GUI_CreateLabelBox(&guic->msg, LCD_WIDTH - XCOORD - 5, LCD_HEIGHT - YCOORD - 5,
                                             11, 11, &SMALLBOX_FONT, NULL, NULL, "");
             GUI_Redraw(&guic->msg1);
             cp->state = 3;
@@ -297,9 +297,9 @@ static void calibrate_touch(void)
             printf("T1:(%d, %d)\n", cp->coords1.x, cp->coords1.y);
             printf("T2:(%d, %d)\n", cp->coords.x, cp->coords.y);
             xscale = cp->coords.x - cp->coords1.x;
-            xscale = (320 - 2 * XCOORD) * 0x10000 / xscale;
+            xscale = (LCD_WIDTH - 2 * XCOORD) * 0x10000 / xscale;
             yscale = cp->coords.y - cp->coords1.y;
-            yscale = (240 - 32 - 2 * YCOORD) * 0x10000 / yscale;
+            yscale = (LCD_HEIGHT - 32 - 2 * YCOORD) * 0x10000 / yscale;
             xoff = XCOORD - cp->coords1.x * xscale / 0x10000;
             yoff = YCOORD + 32 - cp->coords1.y * yscale / 0x10000;
             printf("Debug: scale(%d, %d) offset(%d, %d)\n", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
@@ -307,7 +307,7 @@ static void calibrate_touch(void)
             PAGE_RemoveAllObjects();
             PAGE_SetModal(1);
             PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
-            GUI_CreateLabelBox(&guic->msg, 60, 110, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
+            GUI_CreateLabelBox(&guic->msg, (LCD_WIDTH - 150) / 2, (LCD_HEIGHT - 25) / 2, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
             memset(&cp->coords, 0, sizeof(cp->coords));
             cp->state = 6;
         } else {
