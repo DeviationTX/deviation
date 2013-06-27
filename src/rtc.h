@@ -24,6 +24,7 @@ u32 RTC_GetSerial(int day, int month, int year, int hour, int minute, int second
 
 // format time string
 void RTC_GetTimeString(char *str, u32 value);
+void RTC_GetTimeStringShort(char *str, u32 value);
 
 // format date string (return year without century)
 void RTC_GetDateString(char *str, u32 date);

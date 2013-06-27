@@ -63,17 +63,24 @@ void PAGE_MainInit(int page)
                                       NULL, press_icon_cb, Model.name);
 
     show_elements();
+    int left_offset = 45;
+#if HAS_RTC
+    if(Display.flags & SHOW_TIME) {
+        GUI_CreateLabelBox(&gui->time, LCD_WIDTH-35, 10, 0, 0, &BATTERY_FONT, time_cb, NULL, NULL);
+        left_offset += 35;
+    }
+#endif
     //Battery
     mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - 50,1,48,22,"media/bat.bmp");
+        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - 45,10, 0, 0,
+        GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - left_offset,10, 0, 0,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - 95,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
+    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - left_offset - 50,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
 }
 
 void PAGE_MainExit()

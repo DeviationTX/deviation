@@ -82,6 +82,15 @@ const char *voltage_cb(guiObject_t *obj, const void *data) {
     return mp->tmpstr;
 }
 
+#if HAS_RTC
+static const char *time_cb(guiObject_t *obj, const void *data) {
+    (void)obj;
+    (void)data;
+    RTC_GetTimeStringShort(mp->tmpstr, RTC_GetValue());
+    return mp->tmpstr;
+}
+#endif
+
 s16 trim_cb(void * data)
 {
     long i = (long)data;
@@ -214,6 +223,15 @@ void PAGE_MainEvent()
     if (clear_time)
         Telemetry.time[0] = 0;
     _check_voltage();
+#if HAS_RTC
+    if(Display.flags & SHOW_TIME) {
+        u32 time = RTC_GetValue() / 60;
+        if(mp->time != time) {
+            mp->time = time;
+            GUI_Redraw(&gui->time);
+        }
+    }
+#endif
 }
 void GetElementSize(unsigned type, u16 *w, u16 *h)
 {

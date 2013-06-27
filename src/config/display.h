@@ -73,6 +73,7 @@ struct disp_scrollbar {
 enum DispFlags {
     BAR_TRANSPARENT   = 0x01,
     TRIM_TRANSPARENT  = 0x02,
+    SHOW_TIME         = 0x40,
     SHOW_BAT_ICON     = 0x80,
 };
 

@@ -86,6 +86,9 @@ struct mainpage_objs {
         guiImage_t ico;
         guiLabel_t lbl;
     } batt;
+#if HAS_RTC
+    guiLabel_t time;
+#endif
     guiImage_t pwr;
 };
 

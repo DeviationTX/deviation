@@ -8,6 +8,9 @@ struct main_page {
     s16 battery;
     s32 elem[NUM_ELEMS];
     char tmpstr[8];
+#if HAS_RTC
+    u32 time;
+#endif
 };
 
 #endif

@@ -125,6 +125,12 @@ void RTC_GetTimeString(char *str, u32 value)
     sprintf(str, "%2d:%02d:%02d", _RTC_GetHour(value), _RTC_GetMinute(value), _RTC_GetSecond(value));
 }
 
+// format time string
+void RTC_GetTimeStringShort(char *str, u32 value)
+{
+    sprintf(str, "%2d:%02d", _RTC_GetHour(value), _RTC_GetMinute(value));
+}
+
 // format date string
 void _RTC_GetDateStringHelper(char *str, u32 date, u8 year4)
 {
