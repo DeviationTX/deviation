@@ -119,6 +119,7 @@ void CONFIG_ReadLang(u8 idx)
     while (fgets(line, sizeof(line), fh) != NULL) {
         u16 hash;
         if(line[0] == ':') {
+            CLOCK_ResetWatchdog();
             fix_crlf(line+1);
             if (lookup - lookupmap == MAX_STRINGS - 1) {
                 printf("Only %d strings are supported aborting @ %s\n", MAX_STRINGS, line);
