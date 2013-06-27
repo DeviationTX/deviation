@@ -128,10 +128,10 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 #endif
     if (idx - NUM_RTC <= NUM_TIMERS) {
         if(press_type == -1 && ! mp->ignore_release) 
-            TIMER_StartStop(idx-1);
+            TIMER_StartStop(idx - NUM_RTC - 1);
         mp->ignore_release = 0;
         if(press_type > 0) {
-            TIMER_Reset(idx-1);
+            TIMER_Reset(idx - NUM_RTC - 1);
             mp->ignore_release = 1;
         }
     } else if (idx - NUM_RTC - NUM_TIMERS<= NUM_TELEM) {
