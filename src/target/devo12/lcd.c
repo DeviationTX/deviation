@@ -81,8 +81,6 @@ void LCD_DrawPixel(unsigned int color)
 
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 {
-    x += (480 - 320) /2;
-    y += (272 - 240) /2;
     LCD_REG = LCD_5A_WRWIN_XSTART;
     LCD_DATA = (x / 4) & 0xFE;
     LCD_DATA = y >> 2;
@@ -98,10 +96,6 @@ void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color)
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir)
 {
-  x0 += (480 - 320) /2;
-  x1 += (480 - 320) /2;
-  y0 += (272 - 240) /2;
-  y1 += (272 - 240) /2;
   if (dir == DRAW_SWNE) {
     invert = 1;
     lcd_cmd(LCD_52_INP_MODE, 0x0B);
