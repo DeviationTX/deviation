@@ -114,7 +114,9 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
             *p = '\n';
             p++;
         }
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limitied in character set
         INPUT_SourceName(p, ch+1);
+        CONFIG_EnableLanguage(1);
         if (! (ch & 0x01)) {
             sprintf(p + strlen(p), "\n");
         }
