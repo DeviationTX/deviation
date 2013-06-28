@@ -11,16 +11,14 @@
 1-к-1
 :11 Point
 11 точек
+:12 hour
+12 часов
 :13 Point
 13 точек
+:24 hour
+24 часа
 :3 Point
 3 точки
-:4 Bars
-4 полосы
-:4 Inside
-4 внутри
-:4 Outside
-4 снаружи
 :4Ch w/ Dual-Rates
 4-канала с дв.расх.
 |devo8:4Ch w/ Dual-Rates
@@ -29,8 +27,6 @@
 5 точек
 :5+1
 5+1
-:6 Trims
-6 тримм.
 :6+1
 6+1
 :6Ch Airplane
@@ -39,8 +35,6 @@
 6-канальный вертолет
 :7 Point
 7 точек
-:8 Bars
-8 полос
 :9 Point
 9 точек
 :ABSVAL
@@ -69,6 +63,8 @@ AUX6
 AUX7
 :About Deviation
 О программе
+:Add
+Добавить
 :Advanced
 Микшеры
 :Airplane
@@ -87,9 +83,7 @@ Aux2
 Подсветка
 :Bad/missing\nprotocol modules!
 Ошибочные/отсутствующие\nмодули протоколов!
-:Bar %d
-Полоса%d
-:Bars
+:Bargraph
 Полоса
 :Batt alarm
 Сигнал бат.
@@ -99,6 +93,10 @@ Aux2
 Сигнал батареи
 :Battery too low,\ncan't save!
 Батарея разряжена,\nсохранение невозможно!
+:Big-box
+Больш.-бокс
+|devo8:Big-box
+Большой-бокс
 :Bind
 Привязка
 :Binding
@@ -107,8 +105,8 @@ Aux2
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Binding...\nPress ENT to stop
 Привязка...\nENT для остановки
-:Box %d
-Бокс %d
+:Box
+Бокс
 :Button monitor
 Монитор кнопок
 :Buzz settings
@@ -161,12 +159,16 @@ Aux2
 Монитор каналов
 :Channel output
 Выход канала
+:Clock
+Часы
 :Complex
 Комплекс
 :Configure
 Настройки передатчика
 :Contrast
 Контраст
+:Control
+Управление
 :Copy To
 Копир. в
 :Copy To...
@@ -191,10 +193,20 @@ Aux2
 ДР&Экспо РНапр
 :DR
 ДР
+:Date
+Дата
+:Date / Time
+Дата / Время
+:Date:
+Дата:
+:Day
+День
 :Deadband
 Мертв.зона
 :Default
 Умолчание
+:Delete
+Удалить
 :Delta PW
 Дельта ШИ
 :Deviation FW version:
@@ -203,6 +215,8 @@ Aux2
 Гашение до
 :Dimmer time
 Время гашения
+:Display
+Формат
 :Dn
 Вниз
 :Do you really want\nto reset the\n permanent timer %d?
@@ -221,6 +235,8 @@ Aux2
 РВыс Микш
 :EXPO
 Экспо.
+:Edit
+Редактир.
 :Enabled
 Вкл.
 :Enter
@@ -273,6 +289,8 @@ GPS
 Чувств. гироскопа
 :H
 H
+:H-trim
+Г-триммер
 :HOLD
 HOLD
 :Heli
@@ -287,6 +305,8 @@ HOLD
 Высокий расход
 :Hold position
 Положение
+:Hour
+Часы
 :Icon
 Значок
 :Idle Up 1
@@ -315,6 +335,10 @@ L
 Язык
 :Latitude
 Широта
+:Layout: Long-Press ENT
+Схема: Д-нажатие ENT
+|devo8:Layout: Long-Press ENT
+Схема: Долгое нажатие ENT
 :Left
 Влево
 :Length
@@ -363,6 +387,8 @@ M
 Мин. предел
 :Min/Max
 Мин/Макс
+:Minute
+Минуты
 :Mixer
 Микшер
 :Mixer GUI
@@ -375,6 +401,8 @@ M
 Режим
 :Mode %d
 Режим %d
+:Model
+Модель
 :Model menu
 Меню модели
 :Model name
@@ -387,6 +415,8 @@ M
 Модель
 :Model type
 Тип модели
+:Month
+Месяц
 :Move Down
 Вниз
 :Move Up
@@ -401,12 +431,8 @@ M
 Новый
 :No
 Нет
-:No Bars
-Без полос
 :No Trim
 Без триммера
-:No Trims
-Без тримм.
 :None
 Нет
 :Normal
@@ -439,6 +465,8 @@ PPM%d
 PPM-Вход (расширенный)
 :Page
 Стр.
+:Page Config
+Настройка страницы
 :Pitch curves
 Кривые шага
 :Plane
@@ -470,7 +498,7 @@ PPM-Вход (расширенный)
 |devo8:Prealert time
 Время до сигнала
 :Press 'Ent' to turn USB Filesystem
-Нажмите 'Ent' для перевода файловой\nсистемы USB в состояние
+Нажмите 'Ent' для перевода файловой\nсистемы USB в состояние ...
 :Press ENT to change
 ENT для изменения
 |devo8:Press ENT to change
@@ -485,8 +513,6 @@ ENT для загрузки
 Нажмите ENT для загрузки
 :Press ENT to turn \nUSB drive
 Нажмите ENT для\nперевода USB диска\nв состояние
-:Preview: Long-Press ENT
-Просмотр: дл.нажатие ENT
 :Protocol
 Протокол
 :PwrDn alert
@@ -509,6 +535,8 @@ RPM
 РНапр ДР
 :Re-Init
 Привязка
+:Real Time Clock
+Часы
 :Remove
 Удалить
 :Reset
@@ -543,12 +571,20 @@ RPM
 Масшт.%s
 :Scanner
 Сканер
+:Second
+Секунды
 :Servo
 серво
+:Set
+Установить
+:Set:
+Установить:
 :Simple
 Простой
 :Simple 4 Channel
 Простой 4-канала
+:Small-box
+Малый-бокс
 :Smooth
 Сгладить
 :Speed
@@ -637,10 +673,10 @@ RPM
 Темп.
 :Temperature
 Температура
+:Template
+Шаблон
 :Template..
 Шаблон...
-:Test
-Тест
 :Thr hold
 Удерж.газа
 |devo8:Thr hold
@@ -663,8 +699,10 @@ RPM
 Интерв. после
 |devo8:Timeup intvl
 Интервалы после
-:Toggle%d
-Перекл%d
+:Toggle
+Переключ.
+|devo8:Toggle
+Переключатель
 :Touch Calibrate
 Калибровка экрана
 :Touch Test
@@ -705,6 +743,8 @@ RPM
 Шаг тримм.
 |devo8:Trim Step
 Шаг триммера
+:Trimbar
+Триммер
 :Trims
 Триммер
 :Turn Off
@@ -713,6 +753,8 @@ RPM
 Включить
 :Tx power
 Мощность
+:Type
+Тип
 :USB
 USB
 :USB Filesystem is currently 
@@ -721,6 +763,8 @@ USB
 Неизвестный
 :Up
 Вверх
+:V-trim
+В-триммер
 :Value
 Значение
 :Vibration
@@ -731,6 +775,8 @@ USB
 Вольт
 :Welcome
 Привет
+:Year
+Год
 :Yes
 Да
 :Zero/Max
@@ -741,8 +787,12 @@ USB
 \n\nПривязка завершится через %d секунд...
 :add
 добавить
+:cntdn-prop
+обр.отсч.пр
 :countdown
 обр.отсчет
+:delay
+задержка
 :is not supported
 не поддерживается
 :is turned off
@@ -757,5 +807,7 @@ USB
 интеграл
 :replace
 заменить
+:stop-prop
+сек. проп
 :stopwatch
 секундомер
