@@ -44,6 +44,7 @@ const char BATT_CRITICAL[] = "batt_critical";
 const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
 
 const char SPLASH_DELAY[] = "splash_delay";
+const char CLOCK_12HR[] = "12hr_clock";
 
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
@@ -151,6 +152,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             t->splash_delay = atoi(value);
             return 1;
         }
+#if HAS_RTC
+        if (MATCH_KEY(CLOCK_12HR)) {
+            t->clock12hr = atoi(value);
+            return 1;
+        }
+#endif
     }
     if(MATCH_START(section, SECTION_CALIBRATE) && strlen(section) >= sizeof(SECTION_CALIBRATE)) {
         u8 idx = atoi(section + sizeof(SECTION_CALIBRATE)-1);
@@ -275,6 +282,9 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
+#if HAS_RTC
+    fprintf(fh, "%s=%d\n", CLOCK_12HR, Transmitter.clock12hr);
+#endif
     fprintf(fh, "[%s]\n", SECTION_MODULES);
     for(i = 0; i < TX_MODULE_LAST; i++) {
         char str[10];

@@ -66,7 +66,7 @@ void PAGE_MainInit(int page)
     int left_offset = 45;
 #if HAS_RTC
     if(Display.flags & SHOW_TIME) {
-        GUI_CreateLabelBox(&gui->time, LCD_WIDTH-35, 10, 0, 0, &BATTERY_FONT, time_cb, NULL, NULL);
+        GUI_CreateLabelBox(&gui->time, LCD_WIDTH-35, 10, 34, 20, &BATTERY_FONT, time_cb, NULL, NULL);
         left_offset += 35;
     }
 #endif

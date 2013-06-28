@@ -43,6 +43,9 @@ struct Transmitter {
     u8 splash_delay;
     u8 volume;
     u8 vibration_state; // for future vibration on/off support
+#if HAS_RTC
+    u8 clock12hr;
+#endif
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u8 module_poweramp;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

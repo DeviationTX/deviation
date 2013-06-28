@@ -307,12 +307,14 @@ struct usb_obj {
 
 struct rtc_obj {
     guiLabel_t title;
+    guiLabel_t displaylbl;
     guiLabel_t secondlbl;
     guiLabel_t minutelbl;
     guiLabel_t hourlbl;
     guiLabel_t daylbl;
     guiLabel_t monthlbl;
     guiLabel_t yearlbl;
+    guiTextSelect_t display;
     guiTextSelect_t second;
     guiTextSelect_t minute;
     guiTextSelect_t hour;

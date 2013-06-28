@@ -28,6 +28,7 @@ static struct rtc_page * const rp = &pagemem.u.rtc_page;
 
 void _show_page();
 static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data);
+static const char *rtc_display_cb(guiObject_t *obj, int dir, void *data);
 
 const int min[6] = { 0, 0, 0, 1, 1, RTC_STARTYEAR };
 int max[6] = { 59, 59, 23, 31, 12, RTC_STARTYEAR+67 };    // not const because max[3] will change (day)
@@ -100,31 +101,33 @@ const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
     }
     return rp->tmpstr;
 }
-
 void _show_page()
 {
     int row = 40;
-    GUI_CreateLabel(&gui->secondlbl, 72, row, NULL, DEFAULT_FONT, _tr("Second:"));
+    GUI_CreateLabel(&gui->displaylbl, 72, row, NULL, DEFAULT_FONT, _tr("Display"));
+    GUI_CreateTextSelect(&gui->display, 136, row, TEXTSELECT_96, NULL, rtc_display_cb, (void *)0);
+    row += 20;
+    GUI_CreateLabel(&gui->secondlbl, 72, row, NULL, DEFAULT_FONT, _tr("Second"));
     GUI_CreateTextSelect(&gui->second, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)0);
     GUI_CreateLabelBox(&gui->secondvalue, 226, row-1, 24, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)0);
     row += 20;
-    GUI_CreateLabel(&gui->minutelbl, 72, row, NULL, DEFAULT_FONT, _tr("Minute:"));
+    GUI_CreateLabel(&gui->minutelbl, 72, row, NULL, DEFAULT_FONT, _tr("Minute"));
     GUI_CreateTextSelect(&gui->minute, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)1);
     GUI_CreateLabelBox(&gui->minutevalue, 226, row-1, 24, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)1);
     row += 20;
-    GUI_CreateLabel(&gui->hourlbl, 72, row, NULL, DEFAULT_FONT, _tr("Hour:"));
+    GUI_CreateLabel(&gui->hourlbl, 72, row, NULL, DEFAULT_FONT, _tr("Hour"));
     GUI_CreateTextSelect(&gui->hour, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)2);
     GUI_CreateLabelBox(&gui->hourvalue, 226, row-1, 24, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)2);
     row += 20;
-    GUI_CreateLabel(&gui->daylbl, 72, row, NULL, DEFAULT_FONT, _tr("Day:"));
+    GUI_CreateLabel(&gui->daylbl, 72, row, NULL, DEFAULT_FONT, _tr("Day"));
     GUI_CreateTextSelect(&gui->day, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)3);
     GUI_CreateLabelBox(&gui->dayvalue, 226, row-1, 24, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)3);
     row += 20;
-    GUI_CreateLabel(&gui->monthlbl, 72, row, NULL, DEFAULT_FONT, _tr("Month:"));
+    GUI_CreateLabel(&gui->monthlbl, 72, row, NULL, DEFAULT_FONT, _tr("Month"));
     GUI_CreateTextSelect(&gui->month, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)4);
     GUI_CreateLabelBox(&gui->monthvalue, 226, row-1, 24, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)4);
     row += 20;
-    GUI_CreateLabel(&gui->yearlbl, 72, row, NULL, DEFAULT_FONT, _tr("Year:"));
+    GUI_CreateLabel(&gui->yearlbl, 72, row, NULL, DEFAULT_FONT, _tr("Year"));
     GUI_CreateTextSelect(&gui->year, 136, row, TEXTSELECT_64, NULL, rtc_val_cb, (void *)5);
     GUI_CreateLabelBox(&gui->yearvalue, 218, row-1, 40, 18, &SMALLBOX_FONT, rtc_show_val_cb, NULL, (void *)5);
 }
@@ -153,4 +156,13 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
     }
     return rp->tmpstr;
 }
+
+static const char *rtc_display_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)obj;
+    (void)data;
+    Transmitter.clock12hr = GUI_TextSelectHelper(Transmitter.clock12hr, 0, 1, dir, 1, 4, NULL);
+    return Transmitter.clock12hr ? _tr("12 hour") : _tr("24 hour");
+}
+
 #endif
