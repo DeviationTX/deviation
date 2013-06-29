@@ -14,45 +14,42 @@
  */
 #include <fcntl.h>
 #define FILE void
-int _open_r (void *r, const char *file, int flags, int mode);
-int _close_r (void *r, int fd);
-int _read_r (void *r, int fd, char * ptr, int len);
-int _write_r (void *r, int fd, char * ptr, int len);
-int _lseek_r (void *r, int fd, int ptr, int dir);
+long _open_r (void *r, const char *file, int flags, int mode);
+int _close_r (void *r);
+int _read_r (void *r, char * ptr, int len);
+int _write_r (void *r, char * ptr, int len);
+int _lseek_r (void *r, int ptr, int dir);
 
-FILE *devo_fopen(const char *path, const char *mode)
+FILE *devo_fopen2(void *r, const char *path, const char *mode)
 {
     int flags = (mode && *mode == 'w') ? O_CREAT : 0;
     int _mode = flags ? O_WRONLY : O_RDONLY;
         
-    long fd = _open_r (NULL, path, flags, _mode);
-    fd++;
-    return (void *)fd;
+    long fd = _open_r (r, path, flags, _mode);
+    if (fd <= 0)
+        return NULL;
+    return (FILE *)fd;
 }
 
 int devo_fclose(FILE *fp)
 {
-    long fd = (long)fp - 1;
-    return _close_r(NULL, fd);
+    return _close_r(fp);
 }
 
 int devo_fseek(FILE *stream, long offset, int whence)
 {
-    long fd = (long)stream - 1;
-    return _lseek_r(NULL, fd, offset, whence);
+    return _lseek_r(stream, offset, whence);
 }
 
 int devo_fputc(int c, FILE *stream) {
-    long fd = (long)stream - 1;
     char ch = c;
-    return (_write_r(NULL, fd, &ch, 1) == -1) ? -1 : c;
+    return (_write_r(stream, &ch, 1) == -1) ? -1 : c;
 }
 extern unsigned char _stop_on_cr;
 char *devo_fgets(char *s, int size, FILE *stream)
 {
-    long fd = (long)stream - 1;
     _stop_on_cr = 1;
-    int r = _read_r(NULL, fd, s, size-1);
+    int r = _read_r(stream, s, size-1);
     _stop_on_cr = 0;
     if(r <= 0)
         return NULL;
@@ -61,8 +58,14 @@ char *devo_fgets(char *s, int size, FILE *stream)
 }
 size_t devo_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-    long fd = (long)stream - 1;
-    int r = _read_r(NULL, fd, ptr, size * nmemb);
+    int r = _read_r(stream, ptr, size * nmemb);
+    if (r <= 0)
+        return 0;
+    return nmemb;
+}
+size_t devo_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    int r = _write_r(stream, ptr, size * nmemb);
     if (r <= 0)
         return 0;
     return nmemb;

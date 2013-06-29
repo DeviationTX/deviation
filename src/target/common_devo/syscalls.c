@@ -31,10 +31,8 @@
 static DIR   dir;
 #ifdef MEDIA_DRIVE
 static FATFS fat[3];
-static bool file_open[3]= {false, false, false};
 #else
 static FATFS fat[2];
-static bool file_open[2]= {false, false};
 #endif
 
 extern u8 _drive_num;
@@ -44,26 +42,24 @@ extern void init_err_handler();
 int FS_Mount();
 void FS_Unmount();
 
-int _open_r (struct _reent *r, const char *file, int flags, int mode);
-int _close_r (struct _reent *r, int fd);
+long _open_r (FATFS *r, const char *file, int flags, int mode);
+int _close_r (FATFS *r);
 
 
-int _read_r (struct _reent *r, int fd, char * ptr, int len);
-int _write_r (struct _reent *r, int fd, char * ptr, int len);
-int _lseek_r (struct _reent *r, int fd, int ptr, int dir);
+int _read_r (FATFS *r, char * ptr, int len);
+int _write_r (FATFS *r, char * ptr, int len);
+int _lseek_r (FATFS *r, int ptr, int dir);
 
-
-caddr_t _sbrk_r (struct _reent *r, int incr);
-int _fstat_r (struct _reent *r, int fd, struct stat * st);
-int _isatty_r(struct _reent *r, int fd);
 
 int FS_Mount()
 {
     int res = pf_mount(&fat[0]);
+    fat[0].pad1 = 0;
     dbgprintf("Mount: %d\n", res);
 #ifdef MEDIA_DRIVE
     _drive_num = 1;
     int res2 = pf_mount(&fat[2]);
+    fat[2].pad1 = 1;
     (void)res2;
     dbgprintf("Mount2: %d\n", res2);
     fat[1] = fat[2];
@@ -85,13 +81,14 @@ void FS_Unmount()
 
 int FS_OpenDir(const char *path)
 {
+    FATFS *ptr = &fat[0];
+#if MEDIA_DRIVE
     if (strncmp(path, "media", 5) == 0) {
-        pf_switchfile(&fat[2]);
-        _drive_num = 1;
-    } else {
-        pf_switchfile(&fat[0]);
-        _drive_num = 0;
+        ptr = &fat[2];
     }
+#endif
+    pf_switchfile(ptr);
+    _drive_num = ptr->pad1;
     FRESULT res = pf_opendir(&dir, path);
     dbgprintf("Opendir: %d\n", res);
     return (res == FR_OK);
@@ -116,39 +113,37 @@ void FS_CloseDir()
 {
 }
 
-int _open_r (struct _reent *r, const char *file, int flags, int mode) {
-    (void)r;
+long _open_r (FATFS *r, const char *file, int flags, int mode) {
     (void)flags;
     (void)mode;
 
-    int fd;
+    if(!r) {
 #ifdef MEDIA_DRIVE
-    if (strncmp(file, "media/", 6) == 0) {
-        _drive_num = 1;
-        if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strcmp(file + strlen(file) - 4, ".mod") == 0) {
-            fd = 4;
+        if (strncmp(file, "media/", 6) == 0) {
+            if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strcmp(file + strlen(file) - 4, ".mod") == 0) {
+                r = &fat[1]
+            } else {
+                r = &fat[2]
+            }
         } else {
-            fd = 5;
+            r = &fat[0]
         }
-    } else {
-        _drive_num = 0;
-        fd = 3;
-    }
 #else
-    fd = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strcmp(file + strlen(file) - 4, ".mod") == 0 ? 4 : 3;
+        r = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strcmp(file + strlen(file) - 4, ".mod") == 0 ? &fat[1] : &fat[0];
 #endif
-    if(file_open[fd-3]) {
-        dbgprintf("_open_r(%d): file already open.\n", fd-3);
+    }
+    if(r->flag & FA_OPENED) {
+        dbgprintf("_open_r(%p): file already open.\n", r);
         return -1;
     } else {
-        pf_switchfile(&fat[fd-3]);
+        pf_switchfile(r);
+        _drive_num = r->pad1;
         int res=pf_open(file);
         if(res==FR_OK) {
             dbgprintf("_open_r(%d): pf_open (%s) flags: %d, mode: %d ok\r\n", fd-3, file, flags, mode);
             if (flags & O_CREAT)
                 pf_maximize_file_size();
-            file_open[fd-3]=true;
-            return fd;  
+            return (long)r;
         } else {
             dbgprintf("_open_r(%d): pf_open failed: %d\r\n", fd-3, res);
             return -1;
@@ -156,25 +151,21 @@ int _open_r (struct _reent *r, const char *file, int flags, int mode) {
     }
 }
 
-int _close_r (struct _reent *r, int fd) {
-    (void)r;
-    if(fd>2) {
-       file_open[fd-3]=false;
-       dbgprintf("_close_r(%d): file closed.\r\n", fd-3);
+int _close_r (FATFS *r) {
+    if(r) {
+       r->flag = 0;
+       dbgprintf("_close_r(%p): file closed.\r\n", r);
     }
     return 0;
 }
 
-int _read_r (struct _reent *r, int fd, char * ptr, int len)
+int _read_r (FATFS *r, char * ptr, int len)
 {
-    (void)r;
-    if(fd>2 && file_open[fd-3]) {
-#ifdef MEDIA_DRIVE
-        _drive_num = fd == 3 ? 0 : 1;
-#endif
+    if((unsigned long)r>2 && r->flag & FA_OPENED) {
         if(len <= 0xffff) {
             WORD bytes_read;
-            pf_switchfile(&fat[fd-3]);
+            pf_switchfile(r);
+            _drive_num = r->pad1;
             int res=pf_read(ptr, len, &bytes_read);
             dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
             if(res==FR_OK) return bytes_read;
@@ -185,10 +176,9 @@ int _read_r (struct _reent *r, int fd, char * ptr, int len)
     return -1;
 }
 
-int _write_r (struct _reent *r, int fd, char * ptr, int len)
+int _write_r (FATFS *r, char * ptr, int len)
 {  
-    (void)r;
-    if(fd==1 || fd==2) {
+    if((unsigned long)r==1 || (unsigned long)r==2) {
         int index;
 
         if (0 == (USART_CR1(USART1) & USART_CR1_UE))
@@ -201,13 +191,11 @@ int _write_r (struct _reent *r, int fd, char * ptr, int len)
             usart_send_blocking(USART1, ptr[index]);
         }    
         return len;
-    } else if(fd>2) {
-        if(file_open[fd-3]) {
-#ifdef MEDIA_DRIVE
-            _drive_num = fd == 3 ? 0 : 1;
-#endif
+    } else if(r) {
+        if(r->flag & FA_OPENED) {
             WORD bytes_written;
-            pf_switchfile(&fat[fd-3]);
+            pf_switchfile(r);
+            _drive_num = r->pad1;
             int res=pf_write(ptr, len, &bytes_written);
             dbgprintf("_write_r: len %d, bytes_written %d, result %d\r\n",len, bytes_written, res);
             if(res==FR_OK) return bytes_written;
@@ -218,71 +206,23 @@ int _write_r (struct _reent *r, int fd, char * ptr, int len)
 }
 
 
-int _lseek_r (struct _reent *r, int fd, int ptr, int dir)
+int _lseek_r (FATFS *r, int ptr, int dir)
 {
     (void)r;
     
-    if(fd>2 && file_open[fd-3]) {
-#ifdef MEDIA_DRIVE
-        _drive_num = fd == 3 ? 0 : 1;
-#endif
+    if((unsigned long)r>2 && (r->flag & FA_OPENED)) {
         if(dir==SEEK_CUR) {
-            ptr += fat[fd-3].fptr;
+            ptr += r->fptr;
         } else if (dir==SEEK_END) {
-            ptr += fat[fd-3].fsize;
+            ptr += r->fsize;
         }
-        pf_switchfile(&fat[fd-3]);
+        pf_switchfile(r);
+        _drive_num = r->pad1;
         int res=pf_lseek(ptr);
         if(res==FR_OK) {
-           return fat[fd-3].fptr;
+           return r->fptr;
         }
     }
     errno=EINVAL;
     return -1;
-}
-
-
-
-int _fstat_r (struct _reent *r, int fd, struct stat * st)
-{
-    (void)r;
-    (void)fd;
-    (void)st;
-    errno=EINVAL;
-    return -1;
-}
-
-int _isatty_r(struct _reent *r, int fd)
-{
-    (void)r;
-    if(fd<3) return 1;
-    return 0;  
-}
-
-
-
-register char * stack_ptr asm ("sp");
-
-caddr_t _sbrk_r (struct _reent *r, int incr)
-{
-  extern char   end asm ("end"); /* Defined by the linker.  */
-  static char * heap_end;
-  char *        prev_heap_end;
-
-   r=r;
-
-  if (heap_end == NULL)
-    heap_end = & end;
-  
-  prev_heap_end = heap_end;
-  
-  if (heap_end + incr > stack_ptr)
-  {
-    errno = ENOMEM;
-    return (caddr_t) -1;
-  }
-  
-  heap_end += incr;
-
-  return (caddr_t) prev_heap_end;
 }

@@ -4,14 +4,12 @@
 /* the following defines allow control over how stdio/stdlib functions are handles */
 #ifndef EMULATOR
 
-#ifndef USE_OWN_STDIO
-    #define USE_OWN_STDIO 1
-#endif
+#define USE_OWN_STDIO 1
 #ifndef USE_OWN_PRINTF
     #define USE_OWN_PRINTF 1
 #endif
 #if USE_OWN_STDIO
-    FILE *devo_fopen(const char *path, const char *mode);
+    FILE *devo_fopen2(void *, const char *path, const char *mode);
     int devo_fclose(FILE *fp);
     int devo_fseek(FILE *stream, long offset, int whence);
     int devo_fputc(int c, FILE *stream);
@@ -20,10 +18,11 @@
     void devo_setbuf(FILE *stream, char *buf);
 
     #undef stdout
-    #define stdout (void *)(2L)
+    #define stdout (void *)(1L)
     #undef stderr
-    #define stderr (void *)(3L)
-    #define fopen devo_fopen
+    #define stderr (void *)(2L)
+    #define fopen(p, m)  devo_fopen2(NULL, p, m)
+    #define fopen2(fat, p, m)  devo_fopen2(fat, p, m)
     #define fclose devo_fclose
     #define fseek devo_fseek
     #define fputc devo_fputc
@@ -50,5 +49,7 @@
         #define printf tfp_printf
     #endif  //BUILDTYPE_DEV
 #endif //USE_OWN_PRINTF
+#else //EMULATOR
+    #define fopen2(fat, p, m) fopen(p, m)
 #endif //EMULATOR
 #endif //_STD_H_
