@@ -117,3 +117,12 @@ volatile u8 ppmSync;
 volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
 volatile u8 ppmin_num_channels;
 
+void fempty(FILE *fh)
+{
+    fseek(fh, 0, SEEK_END);
+    long pos = ftell(fh);
+    int fd = fileno(fh);
+    ftruncate(fd, 0);
+    ftruncate(fd, pos);
+    fseek(fh, 0, SEEK_SET);
+}

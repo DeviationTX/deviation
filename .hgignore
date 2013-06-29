@@ -6,6 +6,7 @@ list$
 gz$
 ^src/libopencm3/.*\.d$
 ^src/libopencm3/.*\.a$
+^src/libopencm3/lib/.*\.ld$
 #src/gz*
 #src/elf*
 map$
@@ -21,6 +22,7 @@ utils/midicsv/midicsv
 src/filesystem/devo8/models/
 src/filesystem/devo8/tx.ini
 src/filesystem/devo8/errors.txt
+src/filesystem/devo8/datalog.bin
 src/filesystem/devo8/language/
 src/filesystem/devo8/template/
 src/filesystem/devo8/media/sound.ini
@@ -30,6 +32,7 @@ glob:src/filesystem/devo8/media/*.fon
 src/filesystem/devo10/models/
 src/filesystem/devo10/tx.ini
 src/filesystem/devo10/errors.txt
+src/filesystem/devo10/datalog.bin
 src/filesystem/devo10/language/
 src/filesystem/devo10/template/
 src/filesystem/devo10/media/sound.ini

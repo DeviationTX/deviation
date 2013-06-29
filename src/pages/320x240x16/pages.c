@@ -52,6 +52,9 @@ struct page_group groups[] = {
     {1, PAGEID_TIMER},
     {1, PAGEID_TELEMCFG},
     {1, PAGEID_TRIM},
+#if DATALOG_ENABLED
+    {1, PAGEID_DATALOG},
+#endif
     {1, PAGEID_MAINCFG},
     {2, PAGEID_TXCFG},
     {2, PAGEID_TELEMMON},

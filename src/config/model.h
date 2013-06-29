@@ -10,6 +10,7 @@
 #include "timer.h"
 #include "rtc.h"
 #include "telemetry.h"
+#include "datalog.h"
 #include "pagecfg.h"
 
 /* INI file consts */
@@ -52,6 +53,9 @@ struct Model {
     u8 telem_flags;
     MixerMode mixer_mode;
     u32 permanent_timer;
+#if DATALOG_ENABLED
+    struct datalog datalog;
+#endif
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

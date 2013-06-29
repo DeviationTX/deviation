@@ -92,6 +92,24 @@ struct mainpage_objs {
     guiImage_t pwr;
 };
 
+#define DATALOG_NUM_SCROLLABLE (LCD_HEIGHT == 240 ? 7 : 8)
+struct datalog_objs {
+    guiLabel_t enlbl;
+    guiTextSelect_t en;
+    guiLabel_t freqlbl;
+    guiTextSelect_t freq;
+    guiButton_t reset;
+    guiLabel_t remaining;
+    guiLabel_t selectlbl;
+    guiButton_t all;
+    guiButton_t none;
+    guiLabel_t checked[DATALOG_NUM_SCROLLABLE];
+    guiLabel_t source[DATALOG_NUM_SCROLLABLE];
+    guiLabel_t checked2[DATALOG_NUM_SCROLLABLE];
+    guiLabel_t source2[DATALOG_NUM_SCROLLABLE];
+    guiScrollable_t scrollable;
+};
+
 struct modelcfg_objs {
     guiLabel_t title;
     guiLabel_t swashlbl;
@@ -530,6 +548,7 @@ struct gui_objs {
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
         struct mainpage_objs mainpage;
+        struct datalog_objs  datalog;
         struct modelcfg_objs modelcfg;
         struct modelload_objs modelload;
         struct modelpage_objs modelpage;

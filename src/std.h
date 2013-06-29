@@ -15,7 +15,9 @@
     int devo_fputc(int c, FILE *stream);
     char *devo_fgets(char *s, int size, FILE *stream);
     size_t devo_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+    size_t devo_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
     void devo_setbuf(FILE *stream, char *buf);
+    long devo_ftell(FILE *stream);
     void devo_finit(void *FAT, const char *str);
 
     #include "target/common_devo/petit_fat.h"
@@ -37,6 +39,8 @@
     #define fgets devo_fgets
     #define gets  devo_fgets
     #define fread devo_fread
+    #define fwrite devo_fwrite
+    #define ftell devo_ftell
     #define finit devo_finit
     #define setbuf devo_setbuf
 #endif //USE_OWN_STDIO

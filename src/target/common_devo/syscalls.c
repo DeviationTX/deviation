@@ -205,6 +205,13 @@ int _write_r (FATFS *r, char * ptr, int len)
     return -1;
 }
 
+long _ltell_r (FATFS *r)
+{
+    if((unsigned long)r>2 && (r->flag & FA_OPENED)) {
+        return r->fptr;
+    }
+    return -1;
+}
 
 int _lseek_r (FATFS *r, int ptr, int dir)
 {

@@ -72,6 +72,10 @@ int main() {
     
     CLOCK_StartWatchdog();
 
+#if DATALOG_ENABLED
+    DATALOG_Init();
+#endif
+
     priority_ready = 0;
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
     CLOCK_SetMsecCallback(MEDIUM_PRIORITY, MEDIUM_PRIORITY_MSEC);
@@ -201,6 +205,9 @@ void EventLoop()
         TELEMETRY_Alarm();
         BATTERY_Check();
         AUTODIMMER_Update();
+#if DATALOG_ENABLED
+        DATALOG_Update();
+#endif
         GUI_RefreshScreen();
     }
 #ifdef TIMING_DEBUG

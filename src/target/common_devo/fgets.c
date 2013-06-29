@@ -19,6 +19,7 @@ int _close_r (void *r);
 int _read_r (void *r, char * ptr, int len);
 int _write_r (void *r, char * ptr, int len);
 int _lseek_r (void *r, int ptr, int dir);
+int _ltell_r (void *r);
 int FS_Mount(void *FAT, const char *drive);
 
 FILE *devo_fopen2(void *r, const char *path, const char *mode)
@@ -40,6 +41,11 @@ int devo_fclose(FILE *fp)
 int devo_fseek(FILE *stream, long offset, int whence)
 {
     return _lseek_r(stream, offset, whence);
+}
+
+int devo_ftell(FILE *stream)
+{
+    return _ltell_r(stream);
 }
 
 int devo_fputc(int c, FILE *stream) {
@@ -77,6 +83,20 @@ void devo_finit(void *FAT, const char *drive)
     if(! ((char *)FAT)[0])
         FS_Mount(FAT, drive);
 }
+
+void fempty(FILE *stream)
+{
+    long pos = 0;
+    long len = devo_fseek(stream, 0, 2 /* SEEK_END */);
+    devo_fseek(stream, 0, 0 /*SEEK_SET*/);
+    while(pos < len) {
+        devo_fputc(0x00, stream);
+        pos += 4096;
+        devo_fseek(stream, pos, 0 /*SEEK_SET*/);
+    }
+    devo_fseek(stream, 0, 0 /*SEEK_SET*/);
+}
+
 void devo_setbuf(FILE *stream, char *buf)
 {
     (void)stream;

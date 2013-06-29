@@ -240,6 +240,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 	mkdir filesystem/$(FILESYSTEM)/layout 2> /dev/null; \
         cp -prf filesystem/common/layout/*.* filesystem/$(FILESYSTEM)/layout/
 	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
+	cp filesystem/common/datalog.bin filesystem/$(FILESYSTEM)/datalog.bin
 	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
 	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
 	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
