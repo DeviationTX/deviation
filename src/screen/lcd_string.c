@@ -15,6 +15,7 @@
 #include "common.h"
 #include "gui/gui.h"
 
+struct FAT FontFAT;
 /*
  * The font 'font_table' begins with a list of u24 values which represent
  * the offeset (from the beginning of the font file) of each character.
@@ -182,7 +183,8 @@ u8 open_font(unsigned int idx)
         return 1;
     }
     sprintf(font, "media/%s.fon", FontNames[idx-1]);
-    cur_str.font.fh = fopen(font, "rb");
+    finit(&FontFAT, "media");
+    cur_str.font.fh = fopen2(&FontFAT, font, "rb");
     if (! cur_str.font.fh) {
         printf("Couldn't open font file: %s\n", font);
         return 0;

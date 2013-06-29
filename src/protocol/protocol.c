@@ -19,6 +19,8 @@
 #include "config/model.h"
 #include "config/tx.h"
 
+extern struct FAT FontFAT; //defined in screen/lcd_string.c
+
 //Not static because we need it in mixer.c
 const u8 const EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
@@ -107,7 +109,7 @@ void PROTOCOL_Load(int no_dlg)
     //protocol while an ini file is open, and we don't want to
     //waste the RAM for an extra filehandle
     u8 old_font = LCD_SetFont(0);
-    fh = fopen(file, "r");
+    fh = fopen2(&FontFAT, file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
         if(! no_dlg)

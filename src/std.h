@@ -16,6 +16,12 @@
     char *devo_fgets(char *s, int size, FILE *stream);
     size_t devo_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
     void devo_setbuf(FILE *stream, char *buf);
+    void devo_finit(void *FAT, const char *str);
+
+    #include "target/common_devo/petit_fat.h"
+    struct FAT {
+        char a[sizeof(FATFS)];
+    };
 
     #undef stdout
     #define stdout (void *)(1L)
@@ -31,6 +37,7 @@
     #define fgets devo_fgets
     #define gets  devo_fgets
     #define fread devo_fread
+    #define finit devo_finit
     #define setbuf devo_setbuf
 #endif //USE_OWN_STDIO
 
@@ -51,5 +58,7 @@
 #endif //USE_OWN_PRINTF
 #else //EMULATOR
     #define fopen2(fat, p, m) fopen(p, m)
+    #define finit if(0) FS_Mount
+    struct FAT {};
 #endif //EMULATOR
 #endif //_STD_H_

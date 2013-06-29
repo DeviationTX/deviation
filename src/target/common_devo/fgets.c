@@ -19,6 +19,7 @@ int _close_r (void *r);
 int _read_r (void *r, char * ptr, int len);
 int _write_r (void *r, char * ptr, int len);
 int _lseek_r (void *r, int ptr, int dir);
+int FS_Mount(void *FAT, const char *drive);
 
 FILE *devo_fopen2(void *r, const char *path, const char *mode)
 {
@@ -69,6 +70,12 @@ size_t devo_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
     if (r <= 0)
         return 0;
     return nmemb;
+}
+
+void devo_finit(void *FAT, const char *drive)
+{
+    if(! ((char *)FAT)[0])
+        FS_Mount(FAT, drive);
 }
 void devo_setbuf(FILE *stream, char *buf)
 {

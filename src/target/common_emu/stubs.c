@@ -77,7 +77,11 @@ u8 *BOOTLOADER_Read(int idx) {
 }
     
 void UART_Initialize() {}
-int FS_Mount() {return ! chdir(FILESYSTEM_DIR);}
+int FS_Mount(void *FAT, const char *drive) {
+    (void)FAT;
+    (void)drive;
+    return ! chdir(FILESYSTEM_DIR);
+}
 
 static DIR *dh;
 int FS_OpenDir(const char *path)

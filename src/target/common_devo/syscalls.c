@@ -30,9 +30,9 @@
 #define dbgprintf(args...) 
 static DIR   dir;
 #ifdef MEDIA_DRIVE
-static FATFS fat[3];
-#else
 static FATFS fat[2];
+#else
+static FATFS fat[1];
 #endif
 
 extern u8 _drive_num;
@@ -51,26 +51,33 @@ int _write_r (FATFS *r, char * ptr, int len);
 int _lseek_r (FATFS *r, int ptr, int dir);
 
 
-int FS_Mount()
+int FS_Mount(void *_f, const char *drive)
 {
-    int res = pf_mount(&fat[0]);
-    fat[0].pad1 = 0;
-    dbgprintf("Mount: %d\n", res);
+    (void)drive;
+    if(! _f) {
 #ifdef MEDIA_DRIVE
-    _drive_num = 1;
-    int res2 = pf_mount(&fat[2]);
-    fat[2].pad1 = 1;
-    (void)res2;
-    dbgprintf("Mount2: %d\n", res2);
-    fat[1] = fat[2];
-    _drive_num = 0;
-#else
-    fat[1] = fat[0];
+        int res = (FS_Mount(&fat[0], "")  && FS_Mount(&fat[1], "media"));
+#else 
+        int res = FS_Mount(&fat[0], "");
 #endif
-    if (res == FR_OK) {
-        init_err_handler();
-        pf_switchfile(&fat[0]);
+        if (res) {
+            init_err_handler();
+            pf_switchfile(&fat[0]);
+            return 1;
+        }
+        return 0;
     }
+    FATFS *f = (FATFS *)_f;
+    _drive_num = 0;
+#ifdef MEDIA_DRIVE
+    if (strncmp(drive, "media", 5) == 0) {
+        _drive_num = 1;
+    }
+#endif
+    int res = pf_mount(f);
+    f->pad1 = _drive_num;
+    dbgprintf("Mount: %d\n", res);
+    _drive_num = 0;
     return (res == FR_OK);
 }
 
@@ -82,9 +89,9 @@ void FS_Unmount()
 int FS_OpenDir(const char *path)
 {
     FATFS *ptr = &fat[0];
-#if MEDIA_DRIVE
+#ifdef MEDIA_DRIVE
     if (strncmp(path, "media", 5) == 0) {
-        ptr = &fat[2];
+        ptr = &fat[1];
     }
 #endif
     pf_switchfile(ptr);
@@ -119,18 +126,11 @@ long _open_r (FATFS *r, const char *file, int flags, int mode) {
 
     if(!r) {
 #ifdef MEDIA_DRIVE
-        if (strncmp(file, "media/", 6) == 0) {
-            if (strcmp(file + strlen(file) - 4, ".fon") == 0 || strcmp(file + strlen(file) - 4, ".mod") == 0) {
-                r = &fat[1]
-            } else {
-                r = &fat[2]
-            }
-        } else {
-            r = &fat[0]
-        }
-#else
-        r = (strcmp(file + strlen(file) - 4, ".fon") == 0) || strcmp(file + strlen(file) - 4, ".mod") == 0 ? &fat[1] : &fat[0];
+        if (strncmp(file, "media/", 6) == 0)
+            r = &fat[1];
+        else
 #endif
+            r = &fat[0];
     }
     if(r->flag & FA_OPENED) {
         dbgprintf("_open_r(%p): file already open.\n", r);

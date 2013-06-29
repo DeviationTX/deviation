@@ -155,7 +155,7 @@ void USB_HandleISR();
 void USB_Connect();
 
 /* Filesystem */
-int FS_Mount();
+int FS_Mount(void *FAT, const char *drive);
 void FS_Unmount();
 int FS_OpenDir(const char *path);
 int FS_ReadDir(char *path);
