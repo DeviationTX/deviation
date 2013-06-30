@@ -18,7 +18,6 @@
 #include "gui.h"
 #include "config/display.h"
 
-//static u8 press_cb(u32 button, u8 flags, void *data);
 #if HAS_TOUCH
     static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 #else
@@ -255,12 +254,30 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)pos;
     guiScrollable_t *scrollable = (guiScrollable_t *)data;
-    if ((direction > 0 && scrollable->cur_row + scrollable->visible_rows >= scrollable->item_count)
-        || (direction < 0 && scrollable->cur_row == 0))
-    {
-        return -1;
+    int adjust;
+    if (direction == 2) {
+        if (scrollable->cur_row + 2 * scrollable->visible_rows > scrollable->item_count)
+            adjust = scrollable->item_count - (scrollable->cur_row + scrollable->visible_rows);
+        else
+            adjust = scrollable->visible_rows;
+    } else if (direction == -2) {
+        if (scrollable->cur_row - scrollable->visible_rows < 0)
+            adjust = -scrollable->cur_row;
+        else
+            adjust = -scrollable->visible_rows;
+    } else if (direction == 1) {
+        if (scrollable->cur_row + scrollable->visible_rows == scrollable->item_count)
+            adjust = 0;
+        else
+            adjust = 1;
+    } else {
+        if (scrollable->cur_row == 0)
+            adjust = 0;
+        else
+            adjust = -1;
     }
-    create_scrollable_objs(scrollable, adjust_row(scrollable, direction > 0 ? 1 : -1));
+    if (adjust)
+        create_scrollable_objs(scrollable, adjust_row(scrollable, adjust));
     return -1;
 }
 #endif

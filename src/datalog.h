@@ -8,6 +8,8 @@ enum {
     DLOG_CHANNELS  = NUM_TIMERS + NUM_TELEM + NUM_INPUTS,
     DLOG_PPM       = NUM_TIMERS + NUM_TELEM + NUM_INPUTS + NUM_CHANNELS,
     DLOG_GPSLOC    = NUM_TIMERS + NUM_TELEM + NUM_SOURCES,
+    DLOG_GPSALT,
+    DLOG_GPSSPEED,
     DLOG_GPSTIME,
 #if HAS_RTC
     DLOG_TIME,
@@ -15,7 +17,16 @@ enum {
     DLOG_LAST,
 };
 
-#define GPSLOC_SIZE 16
+enum {
+    DLOG_RATE_1SEC,
+    DLOG_RATE_5SEC,
+    DLOG_RATE_10SEC,
+    DLOG_RATE_30SEC,
+    DLOG_RATE_1MIN,
+    DLOG_RATE_LAST,
+};
+
+#define GPSLOC_SIZE 8
 #define GPSTIME_SIZE 4
 #define CLOCK_SIZE   4
 #define TIMER_SIZE   2
@@ -26,7 +37,7 @@ enum {
 
 struct datalog {
     u8 enable;
-    u8 freq;
+    u8 rate;
     u8 source[(7 + NUM_DATALOG) / 8];
 };
 
@@ -37,4 +48,5 @@ extern int DATALOG_Remaining();
 extern void DATALOG_Reset();
 extern void DATALOG_UpdateState();
 extern int DATALOG_IsEnabled();
+extern const char *DATALOG_RateString(int idx);
 #endif

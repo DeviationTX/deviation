@@ -156,6 +156,12 @@ static const char TELEM_SRC[] = "source";
 static const char TELEM_ABOVE[] =  "above";
 static const char TELEM_VALUE[] = "value";
 
+/* Section: Datalog */
+static const char SECTION_DATALOG[] = "datalog";
+static const char DATALOG_RATE[] = "rate";
+#define DATALOG_SWITCH MIXER_SWITCH
+#define DATALOG_SOURCE TELEM_SRC
+
 /* Section: Gui-QVGA */
 #define STRINGIFY(x) _STRINGIFY(x)
 #define _STRINGIFY(x) #x
@@ -861,6 +867,29 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
+#if DATALOG_ENABLED
+    if (MATCH_SECTION(SECTION_DATALOG)) {
+        if (MATCH_KEY(DATALOG_SWITCH)) {
+            m->datalog.enable = get_source(section, value);
+        } else if (MATCH_KEY(DATALOG_RATE)) {
+            for (i = 0; i < DLOG_RATE_LAST; i++) {
+                if(mapstrcasecmp(DATALOG_RateString(i), value) == 0) {
+                    m->datalog.rate = i;
+                    break;
+                }
+            }
+        } else if (MATCH_KEY(DATALOG_SOURCE)) {
+            char cmp[10];
+            for (i = 0; i < DLOG_LAST; i++) {
+                if(mapstrcasecmp(DATALOG_Source(cmp, i), value) == 0) {
+                    m->datalog.source[DATALOG_BYTE(i)] |= 1 << DATALOG_POS(i);
+                    break;
+                }
+            }
+        }
+        return 1;
+    }
+#endif //DATALOG_ENABLED
     if (MATCH_START(section, SECTION_SAFETY)) {
         int found = 0;
         u8 src;
@@ -1164,6 +1193,15 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", TELEM_ABOVE, (m->telem_flags & (1 << idx)) ? 1 : 0);
         fprintf(fh, "%s=%d\n", TELEM_VALUE, m->telem_alarm_val[idx]);
     }
+#if DATALOG_ENABLED
+    fprintf(fh, "[%s]\n", SECTION_DATALOG);
+    fprintf(fh, "%s=%s\n", DATALOG_SWITCH, INPUT_SourceName(file, m->datalog.enable));
+    fprintf(fh, "%s=%s\n", DATALOG_RATE, DATALOG_RateString(m->datalog.rate));
+    for(idx = 0; idx < DLOG_LAST; idx++) {
+        if(m->datalog.source[DATALOG_BYTE(idx)] & (1 << DATALOG_POS(idx)))
+            fprintf(fh, "%s=%s\n", DATALOG_SOURCE, DATALOG_Source(file, idx));
+    }
+#endif //DATALOG_ENABLED
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {

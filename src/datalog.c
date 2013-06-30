@@ -22,12 +22,12 @@
 #if DATALOG_ENABLED
 #define DATALOG_VERSION 0x01
 #define DATALOG_HEADER_SIZE (3 + ((7 + NUM_DATALOG) / 8))
-const u32 sample_rate[] = {
-    1000, /* 1 sec */
-    5000, /* 5 sec */
-   10000, /*10 sec */
-   30000, /*30 sec */
-   60000, /* 1 min */
+const u32 sample_rate[DLOG_RATE_LAST] = {
+    [DLOG_RATE_1SEC]  =  1000,
+    [DLOG_RATE_5SEC]  =  5000,
+    [DLOG_RATE_10SEC] = 10000,
+    [DLOG_RATE_30SEC] = 30000,
+    [DLOG_RATE_1MIN]  = 60000,
 };
 
 static struct FAT DatalogFAT;
@@ -38,21 +38,37 @@ static u32 dlog_size;
 u8 need_header_update;
 u16 data_size;
 
+const char *DATALOG_RateString(int idx)
+{
+    switch(idx) {
+        case 0: return _tr("1 sec");
+        case 1: return _tr("5 sec");
+        case 2: return _tr("10 sec");
+        case 3: return _tr("30 sec");
+        case 4: return _tr("60 sec");
+    }
+    return "";
+}
+
 const char *DATALOG_Source(char *str, int idx)
 {
 #if HAS_RTC
     if (idx == DLOG_TIME) {
-        strcpy(str, _tr("Time"));
+        strcpy(str, _tr("RTC Time"));
     } else
 #endif
     if (idx == DLOG_GPSTIME) {
         strcpy(str, _tr("GPS Time"));
     } else if (idx == DLOG_GPSLOC) {
         strcpy(str, _tr("GPS Coords"));
+    } else if (idx == DLOG_GPSALT) {
+        strcpy(str, _tr("GPS Alt."));
+    } else if (idx == DLOG_GPSSPEED) {
+        strcpy(str, _tr("GPS Speed"));
     } else if (idx >= DLOG_INPUTS) {
         return INPUT_SourceName(str, idx - DLOG_INPUTS + 1);
     } else if (idx >= DLOG_TELEMETRY) {
-        return TELEMETRY_Name(str, idx - DLOG_TELEMETRY);
+        return TELEMETRY_Name(str, idx - DLOG_TELEMETRY + 1);
     } else { // idx >= DLOG_TIMERS 
         return TIMER_Name(str, idx);
     }
@@ -77,7 +93,7 @@ int DATALOG_GetSize(u8 *src)
                 size += CLOCK_SIZE;
             } else
 #endif
-            if (i == DLOG_GPSTIME) {
+            if (i >= DLOG_GPSALT) {
                 size += GPSTIME_SIZE;
             } else if (i == DLOG_GPSLOC) {
                 size += GPSLOC_SIZE;
@@ -150,7 +166,7 @@ void _write_header() {
     need_header_update = 0;
     _write_8(0x01);
     _write_8(TXID);
-    _write_8(Model.datalog.freq);
+    _write_8(Model.datalog.rate);
     fwrite(Model.datalog.source, sizeof(Model.datalog.source), 1, fh);
     dlog_pos += 3 + sizeof(Model.datalog.source);
 }
@@ -179,11 +195,13 @@ void DATALOG_Write()
 #endif
         if(i == DLOG_GPSTIME) {
             _write_32(Telemetry.gps.time);
+        } else if(i == DLOG_GPSSPEED) {
+            _write_32(Telemetry.gps.velocity);
+        } else if(i == DLOG_GPSALT) {
+            _write_32(Telemetry.gps.altitude);
         } else if(i == DLOG_GPSLOC) {
             _write_32(Telemetry.gps.latitude);
             _write_32(Telemetry.gps.longitude);
-            _write_32(Telemetry.gps.altitude);
-            _write_32(Telemetry.gps.velocity);
         } else if(i >= DLOG_INPUTS) {
             int val = _get_src_value(i - DLOG_INPUTS + 1, APPLY_SAFETY | APPLY_SCALAR);
             val = RANGE_TO_PCT(val);
@@ -193,7 +211,7 @@ void DATALOG_Write()
                 val = -128;
             _write_8(val);
         } else if(i >= DLOG_TELEMETRY) {
-            _write_16(TELEMETRY_GetValue(i - DLOG_TELEMETRY));
+            _write_16(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
         } else {
             _write_16(TIMER_GetValue(i) / 1000);
         }
@@ -209,7 +227,7 @@ void DATALOG_Update()
             _write_header();
         u32 time = CLOCK_getms();
         if(time >= next_update) {
-            next_update = time + sample_rate[Model.datalog.freq];
+            next_update = time + sample_rate[Model.datalog.rate];
             DATALOG_Write();
         }
     }

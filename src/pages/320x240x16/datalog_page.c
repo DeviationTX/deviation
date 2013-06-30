@@ -41,19 +41,12 @@ const char *source_cb(guiObject_t *obj, const void *data)
     return DATALOG_Source(str, (long)data);
 }
 
-static const char *freqsel_cb(guiObject_t *obj, int dir, void *data)
+static const char *ratesel_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    dlog.freq = GUI_TextSelectHelper(dlog.freq, 0, 4, dir, 1, 1, NULL);   
-    switch(dlog.freq) {
-        case 0: return _tr("1 sec");
-        case 1: return _tr("5 sec");
-        case 2: return _tr("10 sec");
-        case 3: return _tr("30 sec");
-        case 4: return _tr("60 sec");
-    }
-    return "";
+    dlog.rate = GUI_TextSelectHelper(dlog.rate, 0, DLOG_RATE_LAST, dir, 1, 1, NULL);
+    return DATALOG_RateString(dlog.rate);
 }
 
 void press_cb(guiObject_t *obj, s8 press, const void *data)
@@ -204,7 +197,7 @@ void PAGE_DatalogInit(int page)
 
     //col1
     GUI_CreateLabelBox(&gui->freqlbl, SCROLLABLE_X, row, 80, 20, &DEFAULT_FONT, NULL, NULL, _tr("Frequency"));
-    GUI_CreateTextSelect(&gui->freq, SCROLLABLE_X + 90, row, TEXTSELECT_96, NULL, freqsel_cb, NULL);
+    GUI_CreateTextSelect(&gui->freq, SCROLLABLE_X + 90, row, TEXTSELECT_96, NULL, ratesel_cb, NULL);
     //col2
     GUI_CreateLabelBox(&gui->remaining, SCROLLABLE_X + 200, row, SCROLLABLE_WIDTH-200, 20, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
     row += ROW_HEIGHT;
