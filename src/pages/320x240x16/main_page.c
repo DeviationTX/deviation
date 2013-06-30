@@ -75,7 +75,7 @@ void PAGE_MainInit(int page)
     if (Display.flags & SHOW_BAT_ICON) {
         GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat.bmp");
     } else {
-        GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - left_offset,10, 0, 0,
+        GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - left_offset,10, 45, 20,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
