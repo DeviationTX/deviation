@@ -54,6 +54,4 @@ void PAGE_SplashInit(int page);
 void PAGE_SplashEvent();
 void PAGE_SplashExit();
 
-void PAGE_DatalogInit();
-void PAGE_DatalogEvent();
 #endif

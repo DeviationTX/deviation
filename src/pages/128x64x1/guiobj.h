@@ -171,6 +171,16 @@ struct trim2_obj {
     guiScrollable_t scrollable;
 };
 
+struct datalog_obj {
+    guiLabel_t remaining;
+    guiLabel_t label[4];
+    union {
+        guiTextSelect_t ts;
+        guiButton_t     but;
+    } col2[4];
+    guiScrollable_t scrollable;
+};
+
 struct tx_obj {
     guiLabel_t title;
     guiLabel_t label[4];
@@ -326,6 +336,7 @@ struct gui_objs {
         struct timer_obj timer;
         struct trim_obj trim;
         struct trim2_obj trim2;
+        struct datalog_obj datalog;
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;

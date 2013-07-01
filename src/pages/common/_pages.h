@@ -114,6 +114,10 @@ void PAGE_TelemconfigInit(int page);
 void PAGE_TelemconfigEvent();
 void PAGE_TelemconfigExit();
 
+/* Datalog */
+void PAGE_DatalogInit();
+void PAGE_DatalogEvent();
+
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
 int PAGE_IsValid(int page);
