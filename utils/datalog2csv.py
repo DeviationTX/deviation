@@ -21,8 +21,7 @@ class Capture(object):
         self.INPUT   = 0
         self.CHAN    = 0
         self.PPM     = 0
-        self.GPSLOC  = 0
-        self.GPSTIME = 0
+        self.GPS     = 0
         self.RTC     = 0
     def __init__(self, data):
         self.init()
@@ -63,23 +62,22 @@ class Capture(object):
         virtch = ["Virt1", "Virt2", "Virt3", "Virt4", "Virt5",
                   "Virt6", "Virt7", "Virt8", "Virt9", "Virt10"]
         ppm    = ["PPM1", "PPM2", "PPM3", "PPM4", "PPM5", "PPM6", "PPM7", "PPM8"]
-        gpsloc = ["Latitude,Longitude,Altitude,Velocity"]
-        gpstime = ["GPSTime"]
+        gps    = ["Latitude", ",Longitude", "Altitude", "Velocity", "GPSTime"]
         rtc    = []
         if value == 0x06:
             self.model = "Devo6"
             inp = ["AIL", "ELE", "THR", "RUD", "DR0", "DR1", "GEAR0", "GEAR1",
-                   "MIX0", "MIX1", "MIX2", "FMODE1", "FMODE2", "FMODE3"]
+                   "MIX0", "MIX1", "MIX2", "FMODE0", "FMODE1", "FMODE2"]
         elif value == 0x08:
             self.model = "Devo8"
             inp = ["AIL", "ELE", "THR", "RUD", "RUD_DR0", "RUD_DR1", "ELE_DR0", "ELE_DR1",
                    "AIL_DR0", "AIL_DR1", "GEAR0", "GEAR1",
-                   "MIX0", "MIX1", "MIX2", "FMODE1", "FMODE2", "FMODE3"]
+                   "MIX0", "MIX1", "MIX2", "FMODE0", "FMODE1", "FMODE2"]
         elif value == 0x0a:
             self.model = "Devo10"
             inp = ["AIL", "ELE", "THR", "RUD", "AUX4", "AUX5", "RUD_DR0", "RUD_DR1",
                    "ELE_DR0", "ELE_DR1", "AIL_DR0", "AIL_DR1", "GEAR0", "GEAR1",
-                   "MIX0", "MIX1", "MIX2", "FMODE1", "FMODE2", "FMODE3"]
+                   "MIX0", "MIX1", "MIX2", "FMODE0", "FMODE1", "FMODE2"]
         elif value == 0x0c:
             self.model = "Devo12"
             inp = ["AIL", "ELE", "THR", "RUD", "AUX2", "AUX3","AUX4", "AUX5", "AUX6", "AUX7",
@@ -87,7 +85,7 @@ class Capture(object):
                    "ELE_DR0", "ELE_DR1", "ELE_DR2",
                    "AIL_DR0", "AIL_DR1", "AIL_DR2",
                    "GEAR0", "GEAR1",
-                   "MIX0", "MIX1", "MIX2", "FMODE1", "FMODE2", "FMODE3",
+                   "MIX0", "MIX1", "MIX2", "FMODE0", "FMODE1", "FMODE2",
                    "HOLD0", "HOLD1", "TRAIN0", "TRAIN1"]
             rtc = ["Clock"]
         elif value == 0x7e:
@@ -100,11 +98,10 @@ class Capture(object):
         self.INPUT   = self.TELEM + len(telem)
         self.CHAN    = self.INPUT + len(inp)
         self.PPM     = self.CHAN  + len(outch) + len(virtch)
-        self.GPSLOC  = self.PPM   + len(ppm)
-        self.GPSTIME = self.GPSLOC + len(gpsloc)
-        self.RTC     = self.GPSTIME + len(gpstime)
+        self.GPS     = self.PPM   + len(ppm)
+        self.RTC     = self.GPS   + len(gps)
         self.max_elem = self.RTC + len(rtc)
-        self.elem_names = timers + telem + inp + outch + virtch + ppm + gpsloc + gpstime + rtc
+        self.elem_names = timers + telem + inp + outch + virtch + ppm + gps + rtc
         return (7 + self.max_elem) / 8
     def to_rate(self, value):
         if value == 0:
@@ -120,10 +117,8 @@ class Capture(object):
     def get_size(self, idx):
         if idx < self.INPUT:
             return 2
-        if idx < self.GPSLOC:
+        if idx < self.GPS:
             return 1
-        if idx == self.GPSLOC:
-            return 16
         return 4
     def parse_size(self, data):
         self.num_elem = 0
