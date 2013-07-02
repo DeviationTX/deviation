@@ -21,6 +21,8 @@
 
 #if DATALOG_ENABLED
 #define DATALOG_VERSION 0x01
+
+#define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
 #define DATALOG_HEADER_SIZE (3 + ((7 + NUM_DATALOG) / 8))
 const u32 sample_rate[DLOG_RATE_LAST] = {
     [DLOG_RATE_1SEC]  =  1000,
@@ -223,10 +225,10 @@ void DATALOG_Update()
     if (! fh)
         return;
     if(DATALOG_IsEnabled() && ((int)dlog_size - ftell(fh) >= data_size)) {
-        if (need_header_update)
-            _write_header();
         u32 time = CLOCK_getms();
         if(time >= next_update) {
+            if (need_header_update)
+                _write_header();
             next_update = time + sample_rate[Model.datalog.rate];
             DATALOG_Write();
         }
@@ -235,7 +237,7 @@ void DATALOG_Update()
 
 void DATALOG_UpdateState()
 {
-    next_update = CLOCK_getms();
+    next_update = CLOCK_getms() + UPDATE_DELAY;
     data_size = DATALOG_GetSize(Model.datalog.source);
     need_header_update = 1;
 }
