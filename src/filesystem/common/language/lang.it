@@ -1,4 +1,4 @@
-Italiano
+ï»¿Italiano
 :# Channels
 # Canali
 :%s is %d%%, safe value = %d%%\n
@@ -23,10 +23,12 @@ Italiano
 4Ch con DualRate
 :5 Point
 5 Punti
->:5+1
+:5+1
+5+1
 :6 Trims
 6 Trim
->:6+1
+:6+1
+6+1
 :6Ch Airplane
 Aereo 6Ch
 :6Ch Helicopter
@@ -43,31 +45,42 @@ V_ASSOL
 ALET
 :AIL DR
 DR ALET
->:AIL Inv
->:AIL Mix
->:AUX2
->:AUX3
+:AIL Inv
+ALET Inv
+:AIL Mix
+ALET Mix
+:AUX2
+AUX2
+:AUX3
+AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
->:AUX6
->:AUX7
+:AUX6
+AUX6
+:AUX7
+AUX7
 :About Deviation
 A proposito di Deviation
->:Advanced
+:Advanced
+Avanzato
 :Airplane
 Aereo
 :Alarm
 Allarme
->:Alarm intvl
+:Alarm intvl
+Allarme intvl
 :Altitude
 Altitudine
->:Auto
->:Aux2
+:Auto
+Auto
+:Aux2
+Aux2
 :Backlight
-Luminosità
->:Bad/missing\nprotocol modules!
+LuminositÃ 
+:Bad/missing\nprotocol modules!
+Moduli protocollo errati o assenti!
 :Bar %d
 Barra %d
 :Bars
@@ -83,21 +96,29 @@ Bind
 :Binding
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
+Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperÃ  la procedura di binding\nma permetterÃ  il controllo della TX.
 :Binding...\nPress ENT to stop
 Binding...\nPremi ENT per fermare
 :Box %d
 Box%d
->:Button monitor
->:Buzz settings
->:Buzz volume
->:Buzzer settings
+:Button monitor
+Monitor pulsante
+:Buzz settings
+Configurazione del Buzz
+:Buzz volume
+Volume del Buzzer
+:Buzzer settings
+Configurazione del Buzzer
 :COL
 Collet.
->:COL Inv
->:COL Inv
->:COL Limit
->:COL Mix
+:COL Inv
+Inv.Collet.
+:COL Inv
+Inv.Collet.
+:COL Limit
+Limite Collet.
+COL Mix
+Mix Collet.
 :CYC
 Ciclico
 :Calibrate
@@ -108,31 +129,39 @@ Calibrazione completata.
 Cancella
 :Celsius
 Celsius
->:Center PW
+:Center PW
+Centro PW
 :Center all \nsticks and knobs\nthen press ENT
 Centra tutti gli\nsticks e le manopole\nquindi premi ENT
 :Ch
 Ch
->:Chan mode
+:Chan mode
+Modo di Canale
 :Change
 Cambia
->:Channel
->:Channel monitor
+:Channel
+Canale
+:Channel monitor
+Monitor di Canale
 :Channel output
 Canale di uscita
-<:Collet.Inv.
-<>:COL Limit
+:Collet.Inv.
+Inv. Collet.
+:COL Limit
+Limite Collet.
 :Complex
 Complesso
 :Configure
 Configura
 :Contrast
 Contrasto
->:Copy To
+:Copy To
+Copia su
 :Copy To...
->:Copy To...
+Copia su...
+:Copy To...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
-Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarà salvata.\n\nCarica la batteria ora!
+Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarÃ  salvata.\n\nCarica la batteria ora!
 :Curve
 Curva
 :Cyclic1
@@ -141,47 +170,56 @@ Ciclico1
 Ciclico2
 :Cyclic3
 Ciclico3
->:D/R & Exp
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+:D/R & Exp
+D/R & Esp.
+:D/R&Exp -AIL
+D/R & Esp.-ALET
+:D/R&Exp -ELE
+D/R & Esp.-ELEV
+:D/R&Exp -RUD
+D/R & Esp.-TIMONE
 :DR
 DR
 :Deadband
 Zona morta
 :Default
 Default
->:Delta PW
+:Delta PW
+Delta PW
 :Deviation FW version:
 Versione del FW Deviation:
 :Dimmer target
 Dest. del Dimmer
 :Dimmer time
 Durata del Dimmer
-<:Direzione degli Alettoni
->:AIL Mix
+:AIL Mix
+ALETT Mix
 :Dn
 Dn
->:Do you really want\nto reset the\n permanent timer %d?
+:Do you really want\nto reset the\n permanent timer %d?
+Vuoi veramente resettare il timer permanente %d?
 :Down
-Giù
+Giu*
 :ELE
 ELEV
 :ELE DR
 DR ELEV
 :ELE Inv
-ELE Inv
->:ELE Mix
+Inv ELEV
+:ELE Mix
+Mix ELEV
 :EXPO %d
-Espo. %d
->:Enabled
+Esp. %d
+:Enabled
+Abilitato
 :Enter
 Entra
 :Exit
 Esci
 :Expo&DR
 Esp.&DR
->:FMODE
+:FMODE
+Modo di volo
 :Fahren
 Fahren
 :Fail-safe
@@ -192,48 +230,62 @@ File
 Fisso
 :Fixed ID
 ID Fisso
->:Fly mode
+:Fly mode
+Modo di volo
 :Foot
 Piede
->:Frame Size
+:Frame Size
+Dimensione del Frame
 :GEAR
 CARRELLO
 :GPS
 GPS
->:Gear
+:Gear
+Carrello
 :Generic settings
 Settaggi generici
->:Gyro sense
->:H
->:HOLD
+:Gyro sense
+Sens. giroscopio
+:H
+H
+:HOLD
+HOLD
 :Heli
 Eli
->:Heli/Standard GUI
+:Heli/Standard GUI
+GUI Eli/Standard
 :Helicopter
 Elicottero
 :High-Rate
 Rate Alto
->:Hold position
+:Hold position
+Posizione di Hold
 :Icon
 Icona
->:Icon
->:Idle Up 1
->:Idle Up 2
->:Input monitor
+:Icon
+Icona
+:Idle Up 1
+Idle Up 1
+:Idle Up 2
+Idle Up 2
+:Input monitor
+Monitor degli Input
 :Input
 Ingresso
 :Insert
 Inserisci
 :Inverted
 Inverso
->:L
+:L
+L
 :LCD settings
 Parametri LCD
 :LEFT_H
 SINISTRA_H
 :LEFT_V
 SINISTRA_V
->:LIN
+:LIN
+LIN
 :Language
 Lingua
 :Latitude
@@ -254,44 +306,56 @@ Longitudine
 Batteria scarica
 :Low-Rate
 Rate basso
->:M
->:MIX
+:M
+M
+:MIX
+MIX
 :Main menu
-Menù principale
->:Main page
+Menu* principale
+:Main page
+Pagina principale
 :Main page config
 Pagina di Configurazione
->:Manual
->:Max Limit
->:Menu
+:Manual
+Manuale
+:Max Limit
+Limite Max
+:Menu
+Menu
 :Meter
 Metro
 :Mid-Rate
 Rate Medio
->:Min Limit
+:Min Limit
+Limite Min
 :Min/Max
 Min/Max
 :Mixer
 Mixer
->:Mixer GUI
+:Mixer GUI
+Mixer GUI
 :Mixers
 Mixers
->:Mode
+:Mode
+Modo
 :Mode %d
 Modo %d
->:Model menu
+:Model menu
+Menu del modello
 :Model name
 Nome del modello
->:Model needs reset\nfor standard mixer
->:Model needs to be reset\nin order to switch to the standard mixer
+:Model needs reset\nfor standard mixer
+Il modello deve essere\nresettato se vuoi i mixer std.
+:Model needs to be reset\nin order to switch to the standard mixer
+Il modello deve essere\nresettato per tornare ai mixer std.
 :Model setup
 Setup del modello
 :Model type
 Tipo del modello
 :Move Down
-Muovi Giù
+Muovi Giu*
 :Move Up
-Muovi Sù
+Muovi Su*
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 Muovi gli stick e le manopole\nfino al max e al min\nquindi premi ENT
 :Mux
@@ -310,7 +374,8 @@ No Trims
 Nessuno
 :Normal
 Normale
->:Notch PW
+:Notch PW
+Notch PW
 :Off
 Off
 :Offset
@@ -319,24 +384,32 @@ Offset
 Ok
 :On
 On
->:PIT
->:PIT Mix
+:PIT
+PASSO
+:PIT Mix
+Mix PASSO
 :Page
 Pagina
->:Pitch curves
+:Pitch curves
+Curva del passo
 :Plane
 Aero
 :Point
 Punto
 :Pos
 Pos.
->:Pos 0
->:Pos 1
->:Pos 2
+:Pos 0
+Pos 0
+:Pos 1
+Pos 1
+:Pos 2
+Pos 2
 :Pos/Neg
 Pos./Neg.
->:Position %d
->:Power-down alert
+:Position %d
+Posizione %d
+:Power-down alert
+Allarme di spegnimento
 :Prealert intvl
 Intervallo di preallarme
 :Prealert time
@@ -355,7 +428,8 @@ Premi ENT per attivare il drive USB
 Anteprima: premi ENT a lungo
 :Protocol
 Protocollo
->:PwrDn alert
+:PwrDn alert
+Allarme spegnimento
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
@@ -374,9 +448,12 @@ Reinizializza
 Rimuovi
 :Reset
 Reset
->:Reset Permanent Timer?
->:Reset sw
->:Reverse
+:Reset Permanent Timer?
+Resetta il timer permanente?
+:Reset sw
+Reset del SW
+:Reverse
+Inverso
 :Reverse
 Inverso
 :Reversed
@@ -395,23 +472,28 @@ Sicurezza
 Salva
 :Scale%s
 Scala%s
->:Scale
+:Scale
+Scala
 :Scanner
 Scanner
->:Servo
+:Servo
+Servo
 :Simple
 Sempl.
 :Simple 4 Channel
 4Ch. Semplici
 :Speed
-Velocità
->:Speed
-:Src
->:Src
+VelocitÃ 
+:Speed
+VelocitÃ 
 :Src
 Sorgente
->:Standard
->:Standard Mixer
+:Src
+Sorgente
+:Standard
+Standard
+:Standard Mixer
+Mixer Standard
 :Start
 Avvia
 :Step
@@ -426,10 +508,12 @@ Sticks
 >:Subtrim
 :Subtrim
 Subtrim
->:Swash
+:Swash
+Piatto
 :SwashType
 Piatto
->:Switch assignment
+:Switch assignment
+Assegnazione interruttore
 :Switch1
 Interr1
 :Switch2
@@ -439,7 +523,7 @@ Interrutore
 :Symmetric
 Simmetrico
 :THR
-ACCEL
+GAS
 :TRIMLH+
 TRIMSO+
 :TRIMLH-
@@ -464,14 +548,16 @@ TRIM_S-
 TRIM_D+
 :TRIM_R-
 TRIM_D-
->:TRN
+:TRN
+TRN
 :TelemRPM
 TelemRPM
 :TelemT
 TelemT
 :TelemV
 TelemV
->:Telemetry
+:Telemetry
+Telemetria
 :Telemetry config
 Config. etlemetria
 :Telemetry monitor
@@ -488,15 +574,22 @@ Temperatura
 Modello..
 :Test
 Test
->:Thr hold
->:Throttle curves
->:Throttle hold
->:Time
+:Thr hold
+Hold del gas
+:Throttle curves
+Curve del gas
+:Throttle hold
+Hold del gas
+:Time
+Tempo
 :Timer
->:Timer
+Timer
+:Timer
+Timer
 :Timer settings
 Config. Timer
->:Timer%d
+:Timer%d
+Timer%d
 :Timers
 Timers
 :Timeup intvl
@@ -517,8 +610,10 @@ Tocca per bloccare
 Tocca per sbloccare
 :Transmitter config
 Config. trasmittente
->:Transmitter menu
->:Travel adjust
+:Transmitter menu
+Menu della Trasmittente
+:Travel adjust
+Regolazione dell'escursione
 :Trim
 Trim
 :Trim +
@@ -539,39 +634,48 @@ Attiva
 Potenza di TX
 :USB
 USB
->:USB Filesystem is currently
+:USB Filesystem is currently
+il Filesystem USC attuale Ã¨
 :Unknown
 Sconosciuto
 :Up
-Sù
->:Value
+Su*
 :Value
-valore
->:Vibration
+Valore
+:Value
+Valore
+:Vibration
+Vibrazione
 :Virt
 Virt
 :Volt
 Volt
->:Volt
+:Volt
+Volt
 :Zero/Max
->:Zero/Max
+Zero/Max
+:Zero/Max
+Zero/Max
 :\n%d seconds left
 \n%d secondi a sinistra
 :\n\nBinding will end in %d seconds...
-\n\nIl Binding finirà tra %d secondi...
+\n\nIl Binding finirr' tra %d secondi...
 :add
 aggiungi
 :countdown
 countdown
->:is not supported
->:is turned off
+:is not supported
+non Ã¨ supportato
+:is turned off
+Ã¨ spento
 :max
 max
 :min
 min
 :mult
 Mult.
->:permanent
+:permanent
+permanente
 :replace
 Sostituisci
 :stopwatch
