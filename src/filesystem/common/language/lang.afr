@@ -97,10 +97,10 @@ Bind
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
-<:Binding...\n%d seconds\nPress ENT to stop
-<Bind...\n%d seconds\n Druk ENT om te stop
+:Binding...\n%d seconds\nPress ENT to stop
+Bind...\n%d sekondes\n Druk ENT om te stop
 :Binding...\nPress ENT to stop
-<Bind...\nDruk ENT om te stop
+Bind...\nDruk ENT om te stop
 :Box %d
 Kassie %d
 :Button monitor
@@ -259,10 +259,10 @@ Hou Posisie
 Ikoon
 :Icon
 Ikoon
-<:Idle 1
-<Idle 1
-<:Idle 2
-<Idle 2
+:Idle 1
+Idle 1
+:Idle 2
+Idle 2
 :Idle Up 1
 Idle Up 1
 :Idle Up 2
@@ -299,8 +299,8 @@ Verbind
 Laai
 :Load...
 Laai...
-<:Locked
-<Gesluit
+:Locked
+Gesluit
 :Longitude
 Lengtegraad
 :Low Battery
@@ -641,8 +641,8 @@ USB
 USB Lêerstelsel is tans
 :Unknown
 Onbekend
-<:Unlocked
-<Ontsluit
+:Unlocked
+Ontsluit
 :Up
 Op
 :Value
