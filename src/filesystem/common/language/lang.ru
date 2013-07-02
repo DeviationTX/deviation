@@ -3,12 +3,18 @@
 Каналы
 |devo8:# Channels
 Количество каналов
+:%d bytes left
+осталось %d байт
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, безопасное значение = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\nбезопасное значение = %d%%
+:1 sec
+1 сек
 :1-to-1
 1-к-1
+:10 sec
+10 сек
 :11 Point
 11 точек
 :12 hour
@@ -19,16 +25,22 @@
 24 часа
 :3 Point
 3 точки
+:30 sec
+30 сек
 :4Ch w/ Dual-Rates
 4-канала с дв.расх.
 |devo8:4Ch w/ Dual-Rates
 4-канала с дв.расходами
 :5 Point
 5 точек
+:5 sec
+5 сек
 :5+1
 5+1
 :6+1
 6+1
+:60 sec
+60 сек
 :6Ch Airplane
 6-канальный самолет
 :6Ch Helicopter
@@ -73,6 +85,8 @@ AUX7
 Сигнал
 :Alarm intvl
 Интервал
+:All
+Все
 :Altitude
 Высота
 :Auto
@@ -193,6 +207,10 @@ Aux2
 ДР&Экспо РНапр
 :DR
 ДР
+:Data log
+Журнал
+:Datalog
+Журнал
 :Date
 Дата
 :Date / Time
@@ -237,6 +255,8 @@ Aux2
 Экспо. %d
 :Edit
 Редактир.
+:Enable
+Включение
 :Enabled
 Вкл.
 :Enter
@@ -279,6 +299,14 @@ F°
 Шасси
 :GPS
 GPS
+:GPS Alt.
+GPS высота
+:GPS Coords
+GPS коорд.
+:GPS Speed
+GPS скорость
+:GPS Time
+GPS время
 :Gear
 Шасси
 :Generic settings
@@ -525,6 +553,8 @@ ENT для загрузки
 ПРАВЫЙ_В
 :RPM
 RPM
+:RTC Time
+Часы RTC
 :RUD
 РНап
 |devo8:RUD
@@ -533,6 +563,8 @@ RPM
 РН.ДР
 |devo8:RUD DR
 РНапр ДР
+:Rate
+Частота
 :Re-Init
 Привязка
 :Real Time Clock
@@ -561,6 +593,8 @@ RPM
 Безопасн.
 |devo8:Safety
 Безопасность
+:Sample Rate
+Частота
 :Save
 Сохр.
 |devo8:Save
@@ -573,6 +607,8 @@ RPM
 Сканер
 :Second
 Секунды
+:Select
+Выбор
 :Servo
 серво
 :Set
