@@ -16,13 +16,6 @@ class Capture(object):
         self.capture_size = 0
         self.data = []
 
-        self.TIMER   = 0
-        self.TELEM   = 0
-        self.INPUT   = 0
-        self.CHAN    = 0
-        self.PPM     = 0
-        self.GPS     = 0
-        self.RTC     = 0
     def __init__(self, data):
         self.init()
         header_mask_size = self.to_model(data[1])
@@ -37,24 +30,17 @@ class Capture(object):
             if not (self.header_mask[(i / 8)] & (1 << (i % 8))):
                 continue
             size = self.get_size(i)
-            if size == 1:
-                item.append(data[idx])
-            elif size == 2:
-                item.append(data[idx] + (data[idx+1] << 8))
-            elif size == 4:
-                item.append(data[idx] + (data[idx+1] << 8) + (data[idx+2] << 16) + (data[idx+3] << 24))
-            elif size == 16:
-                item.append(data[idx+0] + (data[idx+1] << 8) + (data[idx+2] << 16) + (data[idx+3] << 24))
-                item.append(data[idx+4] + (data[idx+5] << 8) + (data[idx+6] << 16) + (data[idx+7] << 24))
-                item.append(data[idx+8] + (data[idx+9] << 8) + (data[idx+10] << 16) + (data[idx+11] << 24))
-                item.append(data[idx+12] + (data[idx+13] << 8) + (data[idx+14] << 16) + (data[idx+15] << 24))
+            item.append(self.format_data(i, data[idx:]))
             idx += size
+        if idx != self.capture_size:
+            print "Size mismatch"
+            sys.exit(1)
         self.data.append(item)
     def to_model(self, value):
         timers = ["Timer1", "Timer2", "Timer3", "Timer4"]
-        telem  = ["Volt1", "Volt2", "Volt3",
-                  "Temp1", "Temp2", "Temp3", "Temp4",
-                  "RPM1", "RPM2"]
+        telem_volt = ["Volt1", "Volt2", "Volt3"]
+        telem_temp = ["Temp1(C)", "Temp2(C)", "Temp3(C)", "Temp4(C)"]
+        telem_rpm  = ["RPM1", "RPM2"]
         inp    = []
         outch  = ["Channel1", "Channel2", "Channel3", "Channel4",
                   "Channel5", "Channel6", "Channel7", "Channel8",
@@ -62,7 +48,10 @@ class Capture(object):
         virtch = ["Virt1", "Virt2", "Virt3", "Virt4", "Virt5",
                   "Virt6", "Virt7", "Virt8", "Virt9", "Virt10"]
         ppm    = ["PPM1", "PPM2", "PPM3", "PPM4", "PPM5", "PPM6", "PPM7", "PPM8"]
-        gps    = ["Latitude", ",Longitude", "Altitude", "Velocity", "GPSTime"]
+        gps_loc = ["Latitude,Longitude"]
+        gps_alt = ["Altitude(m)"]
+        gps_speed = ["Velocity(m/s)"]
+        gps_time  = ["GPSTime"]
         rtc    = []
         if value == 0x06:
             self.model = "Devo6"
@@ -93,15 +82,21 @@ class Capture(object):
             inp = ["AIL", "ELE", "THR", "RUD", "HOLD0", "HOLD1", "FMODE0", "FMODE1"]
         else:
             return 0
-        self.TIMER   = 0
-        self.TELEM   = self.TIMER + len(timers)
-        self.INPUT   = self.TELEM + len(telem)
-        self.CHAN    = self.INPUT + len(inp)
-        self.PPM     = self.CHAN  + len(outch) + len(virtch)
-        self.GPS     = self.PPM   + len(ppm)
-        self.RTC     = self.GPS   + len(gps)
-        self.max_elem = self.RTC + len(rtc)
-        self.elem_names = timers + telem + inp + outch + virtch + ppm + gps + rtc
+        self.TIMER        = 0
+        self.TELEM_VOLT = self.TIMER      + len(timers)
+        self.TELEM_TEMP = self.TELEM_VOLT + len(telem_volt)
+        self.TELEM_RPM  = self.TELEM_TEMP + len(telem_temp)
+        self.INPUT      = self.TELEM_RPM  + len(telem_rpm)
+        self.CHAN       = self.INPUT      + len(inp)
+        self.PPM        = self.CHAN       + len(outch) + len(virtch)
+        self.GPS_LOC    = self.PPM        + len(ppm)
+        self.GPS_ALT    = self.GPS_LOC    + len(gps_loc)
+        self.GPS_SPEED  = self.GPS_ALT    + len(gps_alt)
+        self.GPS_TIME   = self.GPS_SPEED  + len(gps_speed)
+        self.RTC        = self.GPS_TIME   + len(gps_time)
+        self.max_elem   = self.RTC        + len(rtc)
+        self.elem_names = timers + telem_volt + telem_temp + telem_rpm \
+                          + inp + outch + virtch + ppm + gps_loc + gps_alt + gps_speed + gps_time + rtc
         return (7 + self.max_elem) / 8
     def to_rate(self, value):
         if value == 0:
@@ -117,9 +112,74 @@ class Capture(object):
     def get_size(self, idx):
         if idx < self.INPUT:
             return 2
-        if idx < self.GPS:
+        if idx < self.GPS_LOC:
             return 1
+        if idx == self.GPS_LOC:
+            return 8
         return 4
+    def format_data(self, type, data):
+        if type < self.TELEM_VOLT: #Timer
+            value = (data[1] << 8) | data[0]
+            return "%02d:%02d" % (value / 60, value % 60)
+        if type < self.TELEM_TEMP: #Telem Volt
+            value = (data[1] << 8) | data[0]
+            return "%d.%d" % (value / 10, value % 10)
+        if type < self.INPUT:      #Telem Temp
+            #                      #Telem RPM
+            value = (data[1] << 8) | data[0]
+            return "%d" % (value)
+        if type < self.GPS_LOC:    #Inputs
+            #                      #Channels
+            #                      #PPM
+            return "%d" % (data[0] - 0x100 if (data[0] & 0x80) else data[0])
+        if type == self.GPS_LOC:
+            value = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+            h = value / 1000 / 60 / 60;
+            m = (value - h * 1000 * 60 * 60) / 1000 / 60;
+            s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
+            ss = value % 1000;
+            str = "%03d %02d %02d.%03d" % (h, m, s, ss)
+            value = data[4] + (data[5] << 8) + (data[6] << 16) + (data[7] << 24)
+            h = value / 1000 / 60 / 60;
+            m = (value - h * 1000 * 60 * 60) / 1000 / 60;
+            s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
+            ss = value % 1000;
+            return "%s,%03d %02d %02d.%03d" % (str, h, m, s, ss)
+        if type == self.GPS_ALT or type == self.GPS_SPEED:
+            value = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+            return "%d.%03d" % (value / 1000, value % 1000)
+        if type == self.GPS_TIME:
+            value = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+            year  = 2000 + ((value >> 26) & 0x3F)
+            month = (value >> 22) & 0x0F;
+            day   = (value >> 17) & 0x1F
+            hour  = (value >> 12) & 0x1F
+            min   = (value >>  6) & 0x3F
+            sec   = (value >>  0) & 0x3F
+            return "%02d:%02d:%02d %04d-%02d-%02d" % (hour, min, sec, year, month, day)
+        if type == self.RTC:
+            value = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+            DAYSEC = (60*60*24)
+            daysInYear = [ [ 0,31,59,90,120,151,181,212,243,273,304,334,365],
+                           [ 0,31,60,91,121,152,182,213,244,274,305,335,366] ]
+
+            days = value / DAYSEC;
+            year = (4*days) / 1461; # = days/365.25
+            leap = 1 if year % 4 == 0 else 0
+            days = year * 365 + year / 4
+            days -= 1 if (year != 0 and days > daysInYear[leap][2]) else 0  #leap year correction for RTC_STARTYEAR
+            month = 0;
+            for month in range(0, 12):
+                if days < daysInYear[leap][month + 1]:
+                    break;
+            day = days - daysInYear[leap][month]
+            month += 1
+            sec = value % 60
+            min = (value / 60) % 60
+            hour = (value / 3600) % 24
+            return "%02d:%02d:%02d %04d-%02d-%02d" % (hour, min, sec, 2012 + year, month, day)
+        return "Unknown(%d)" %(data[0])
+
     def parse_size(self, data):
         self.num_elem = 0
         for i in range(self.max_elem):

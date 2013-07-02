@@ -142,7 +142,8 @@ long _find_fpos() {
 
 void _write_8(s32 data)
 {
-    fwrite(&data, 1, 1, fh);
+    u8 x[1] = {(data & 0xff)}
+    fwrite(x, 1, 1, fh);
     dlog_pos++;
 }
 void _write_16(s32 data)
