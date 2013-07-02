@@ -30,7 +30,7 @@ if(! $version) {
 } elsif ($count == 1) {
     print "${target}-$tag";
 } else {
-    print "${target}-$tag-" . substr($version, 0, 6);
+    print "${target}-$tag-" . substr($version, 0, 7);
 }
 exit 0;
 
