@@ -272,8 +272,8 @@ def parse_file(bin):
         if data[idx] == 0x00: #finished parsing
             return info
         if data[idx] == 0xff:
-            idx += info[-1].capture_size+1
             info[-1].add_elem(data[idx+1:])
+            idx += info[-1].capture_size+1
             continue
         if data[idx] != 0x01:
             printf("Cannot handle API version 0x%02x\n", data[idx])
