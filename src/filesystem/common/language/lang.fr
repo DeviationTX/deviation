@@ -194,8 +194,8 @@ ELE DR
 Sens ELE
 :ELE Mix
 Mix. ELE
-:EXPO
-EXP.
+:EXPO %d
+EXP. %d
 :Enabled
 Etat
 :Enter

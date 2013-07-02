@@ -183,8 +183,8 @@ HOE DR
 HOE Inv
 :ELE Mix
 HOE Mix
-:EXPO
-EXPO
+:EXPO %d
+EXPO %d
 >:Enabled
 :Enter
 Eingabe

@@ -212,7 +212,7 @@ s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
     }
 }
 
-const char *CURVE_GetName(struct Curve *curve)
+const char *CURVE_GetName(char *str, struct Curve *curve)
 {
     switch (CURVE_TYPE(curve)) {
         case CURVE_NONE: return _tr("1-to-1");
@@ -222,7 +222,7 @@ const char *CURVE_GetName(struct Curve *curve)
         case CURVE_GT_ZERO:  return "> 0"; //Don't translate these
         case CURVE_LT_ZERO:  return "< 0"; //Don't translate these
         case CURVE_ABSVAL:   return _tr("ABSVAL");
-        case CURVE_EXPO:     return _tr("EXPO");
+        case CURVE_EXPO:     sprintf(str, _tr("EXPO %d"), curve->points[0]); return str;
         case CURVE_DEADBAND: return _tr("Deadband");
         case CURVE_3POINT:   return _tr("3 Point");
         case CURVE_5POINT:   return _tr("5 Point");

@@ -200,8 +200,8 @@ ELE DR
 ELE inv.
 :ELE Mix
 ELE Mix
-:EXPO
-EXP.
+:EXPO %d
+EXP. %d
 >:Enabled
 :Enter
 Enter

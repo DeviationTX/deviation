@@ -213,8 +213,8 @@ Deviation固件版本:
 升降方向
 :ELE Mix
 升降螺距
-:EXPO
-指数曲线
+:EXPO %d
+指数曲线%d
 <:Edit
 <编辑
 >:Enabled

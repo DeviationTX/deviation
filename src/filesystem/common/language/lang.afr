@@ -203,8 +203,8 @@ ELE DR
 ELE Inv
 :ELE Mix
 ELE Meng
-:EXPO
-Expo
+:EXPO %d
+Expo %d
 :Enabled
 Geaktiveer
 :Enter

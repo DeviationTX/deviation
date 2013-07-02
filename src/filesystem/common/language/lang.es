@@ -183,8 +183,8 @@ DR PROF
 PROF Inv
 :ELE Mix
 PROF Mez
-:EXPO
-Exponencial
+:EXPO %d
+Expo. %d
 >:Enabled
 :Enter
 Entrar

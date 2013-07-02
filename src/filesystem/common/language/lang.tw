@@ -212,8 +212,8 @@ Deviation 韌體版本:
 升降方向
 :ELE Mix
 升降螺距
-:EXPO
-曲線
+:EXPO %d
+曲線%d
 <:Edit
 <編輯
 >:Enabled

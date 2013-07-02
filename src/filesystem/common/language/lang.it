@@ -172,8 +172,8 @@ DR ELEV
 :ELE Inv
 ELE Inv
 >:ELE Mix
-:EXPO
-Esponenziale
+:EXPO %d
+Espo. %d
 >:Enabled
 :Enter
 Entra

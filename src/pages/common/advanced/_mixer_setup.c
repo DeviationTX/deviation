@@ -459,7 +459,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type > CURVE_FIXED);
-    return CURVE_GetName(&mix->curve);
+    return CURVE_GetName(mp->tmpstr, &mix->curve);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)

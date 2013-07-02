@@ -213,8 +213,8 @@ Magas. inv.
 Magassági mix
 |devo10:ELE Mix
 Magas. mix
-:EXPO
-EXP.
+:EXPO %d
+EXP. %d
 :Enabled
 Engedélyezett
 :Enter

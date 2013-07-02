@@ -233,8 +233,8 @@ Aux2
 РВыс Инв
 :ELE Mix
 РВыс Микш
-:EXPO
-Экспо.
+:EXPO %d
+Экспо. %d
 :Edit
 Редактир.
 :Enabled

@@ -54,7 +54,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(&gui->point);
         }
     }
-    return CURVE_GetName(curve);
+    return CURVE_GetName(pagemem.u.mixer_page.tmpstr, curve);
 }
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
