@@ -361,35 +361,34 @@ static void calc_dsmx_channel()
 static void parse_telemetry_packet()
 {
     static s32 altitude;
+    const u8 *update = NULL;
     
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
+            update = (const u8[]){TELEM_DEVO_VOLT2, 0};
             //Telemetry.fadesA = ((s32)packet[2] << 8) | packet[3]; //0xFFFF = NC (not connected)
             //Telemetry.fadesB = ((s32)packet[4] << 8) | packet[5]; //0xFFFF = NC (not connected)
             //Telemetry.fadesL = ((s32)packet[6] << 8) | packet[7]; //0xFFFF = NC (not connected)
             //Telemetry.fadesR = ((s32)packet[8] << 8) | packet[9]; //0xFFFF = NC (not connected)
             //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
             //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
-            Telemetry.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.updated |= (1 << TELEM_VOLT2);
+            Telemetry.p.devo.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
-            Telemetry.rpm[0] = (packet[2] << 8) | packet[3];
-            if ((Telemetry.rpm[0] == 0xffff) || (Telemetry.rpm[0] < 200))
-            	  Telemetry.rpm[0] = 0; 
+            update = (const u8[]){TELEM_DEVO_RPM1, TELEM_DEVO_VOLT1, TELEM_DEVO_TEMP1, 0};
+            Telemetry.p.devo.rpm[0] = (packet[2] << 8) | packet[3];
+            if ((Telemetry.p.devo.rpm[0] == 0xffff) || (Telemetry.p.devo.rpm[0] < 200))
+            	  Telemetry.p.devo.rpm[0] = 0; 
             else
-            	  Telemetry.rpm[0] = 120000000 / 2 / Telemetry.rpm[0]; //In RPM (2 = number of poles)
+            	  Telemetry.p.devo.rpm[0] = 120000000 / 2 / Telemetry.p.devo.rpm[0]; //In RPM (2 = number of poles)
                 //Telemetry.rpm[0] = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
                 //by default number_of_poles = 2, gear_ratio = 1.00
-            Telemetry.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.temp[0] = ((s32)((s16)(packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
-            if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
-                Telemetry.temp[0] = 0;
-            Telemetry.updated |= (1 << TELEM_RPM1) |
-                                 (1 << TELEM_VOLT1) |
-                                 (1 << TELEM_TEMP1);
+            Telemetry.p.devo.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
+            Telemetry.p.devo.temp[0] = ((s32)((s16)(packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
+            if (Telemetry.p.devo.temp[0] > 500 || Telemetry.p.devo.temp[0] < -100)
+                Telemetry.p.devo.temp[0] = 0;
             break;
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
@@ -480,6 +479,7 @@ static void parse_telemetry_packet()
                 //0x1d:MAX OFF CONDITION
             break;
         case 0x16: //GPS sensor (always second GPS packet)
+            update = (const u8[]){ TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
             altitude += (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
                        + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
             Telemetry.gps.altitude = altitude;
@@ -499,11 +499,9 @@ static void parse_telemetry_packet()
                 Telemetry.gps.longitude *= -1; //1=E(+), 0=W(-)
             //Telemetry.gps.heading = ((packet[13] >> 4) * 10 + (packet[13] & 0x0f)) * 10 
             //                      + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees (16Bit decimal, 1 unit is 0.1 degree)
-            Telemetry.updated |= (1 << TELEM_GPS_ALT) |
-                                 (1 << TELEM_GPS_LAT) |
-                                 (1 << TELEM_GPS_LONG);
             break;
         case 0x17: //GPS sensor (always first GPS packet)
+            update = (const u8[]){ TELEM_GPS_SPEED, TELEM_GPS_TIME, 0};
             Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
                                     + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 5556 / 108; //In m/s * 1000
             u8 hour  = (packet[7] >> 4) * 10 + (packet[7] & 0x0f);
@@ -521,8 +519,12 @@ static void parse_telemetry_packet()
                                | ((sec & 0x3F) << 0);
             //Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
             altitude = ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
-            Telemetry.updated |= (1 << TELEM_GPS_SPEED) | (1 << TELEM_GPS_TIME);
             break;
+    }
+    if (update) {
+        while(*update) {
+            TELEMETRY_SetUpdated(*update++);
+        }
     }
 }
 

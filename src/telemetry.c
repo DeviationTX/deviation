@@ -18,19 +18,31 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
+#include "telemetry/telem_devo.c"
+#include "telemetry/telem_dsm.c"
+
+#define CAP_DSM 0
+
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 telem_idx = 0;
 static u8 alarm = 0;
 static u32 alarm_time = 0;
-static u32 last_updated;
+static u8 last_updated[TELEM_UPDATE_SIZE];
 static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
-u32 TELEMETRY_IsUpdated()
+u32 TELEMETRY_IsUpdated(int val)
 {
-    return last_updated | Telemetry.updated;
+    if (val == 0xff) {
+        for(int i = 0; i < TELEM_UPDATE_SIZE; i++) {
+            if (last_updated[i] | Telemetry.updated[i])
+                return 1;
+        }
+        return 0;
+    }
+    return (last_updated[val / 8] | Telemetry.updated[val / 8]) & (1 << val % 8);
 }
 
 s32 TELEMETRY_GetValue(int idx)
@@ -41,18 +53,6 @@ s32 TELEMETRY_GetValue(int idx)
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
 {
     switch (idx) {
-    case TELEM_VOLT1:
-    case TELEM_VOLT2:
-    case TELEM_VOLT3:
-        return t->volt[idx - TELEM_VOLT1];
-    case TELEM_TEMP1:
-    case TELEM_TEMP2:
-    case TELEM_TEMP3:
-    case TELEM_TEMP4:
-        return t->temp[idx - TELEM_TEMP1];
-    case TELEM_RPM1:
-    case TELEM_RPM2:
-        return t->rpm[idx - TELEM_RPM1];
     case TELEM_GPS_LONG:
         return t->gps.longitude;
     case TELEM_GPS_LAT:
@@ -64,36 +64,13 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     case TELEM_GPS_TIME:
         return t->gps.time;
     }
-    return 0;
+    return TELEMETRY_Type() == TELEM_DEVO ? _devo_value(t, idx) : _dsm_value(t, idx);
 }
 
 const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
 {
     int h, m, s, ss;
     switch(telem) {
-        case TELEM_VOLT1:
-        case TELEM_VOLT2:
-        case TELEM_VOLT3:
-            sprintf(str, "%d.%dV", (int)value /10, (int)value % 10);
-            break;
-        case TELEM_TEMP1:
-        case TELEM_TEMP2:
-        case TELEM_TEMP3:
-        case TELEM_TEMP4:
-            if (value == 0) {
-                strcpy(str, "----");
-            } else {
-                if (Transmitter.telem & TELEMUNIT_FAREN) {
-                    sprintf(str, "%dF", ((int)value * 9 + 160)/ 5);
-                } else {
-                    sprintf(str, "%dC", (int)value);
-                }
-            }
-            break;
-        case TELEM_RPM1:
-        case TELEM_RPM2:
-            sprintf(str, "%d", (int)value);
-            break;
         case TELEM_GPS_LONG:
             h = value / 1000 / 60 / 60;
             m = (value - h * 1000 * 60 * 60) / 1000 / 60;
@@ -136,6 +113,10 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
                     hour, min, sec, year, month, day);
             break;
         }
+        default:
+           return TELEMETRY_Type() == TELEM_DEVO
+                  ? _devo_str_by_value(str, telem, value)
+                  : _dsm_str_by_value(str, telem, value);
     }
     return str;
 }
@@ -148,68 +129,42 @@ const char * TELEMETRY_GetValueStr(char *str, u8 telem)
 
 const char * TELEMETRY_Name(char *str, u8 telem)
 {
-    switch (telem) {
-      case TELEM_VOLT1:
-      case TELEM_VOLT2:
-      case TELEM_VOLT3:
-        sprintf(str, "%s%d", _tr("TelemV"), telem - TELEM_VOLT1 + 1);
-        break;
-      case TELEM_TEMP1:
-      case TELEM_TEMP2:
-      case TELEM_TEMP3:
-      case TELEM_TEMP4:
-        sprintf(str, "%s%d", _tr("TelemT"), telem - TELEM_TEMP1 + 1);
-        break;
-      case TELEM_RPM1:
-      case TELEM_RPM2:
-        sprintf(str, "%s%d", _tr("TelemRPM"), telem - TELEM_RPM1 + 1);
-        break;
-      default:
-        return "";
-    }
-    return str;
+   return (TELEMETRY_Type() == TELEM_DEVO)
+          ? _devo_name(str, telem)
+          : _dsm_name(str, telem);
 }
 
 const char * TELEMETRY_ShortName(char *str, u8 telem)
 {
     switch(telem) {
-        case 0: strcpy(str, _tr("None")); break;
-        case TELEM_VOLT1: sprintf(str, "%s%d", _tr("Volt"), 1); break;
-        case TELEM_VOLT2: sprintf(str, "%s%d", _tr("Volt"), 2); break;
-        case TELEM_VOLT3: sprintf(str, "%s%d", _tr("Volt"), 3); break;
-        case TELEM_RPM1:  sprintf(str, "%s%d",  _tr("RPM"), 1);  break;
-        case TELEM_RPM2:  sprintf(str, "%s%d",  _tr("RPM"), 2);  break;
-        case TELEM_TEMP1: sprintf(str, "%s%d", _tr("Temp"), 1); break;
-        case TELEM_TEMP2: sprintf(str, "%s%d", _tr("Temp"), 2); break;
-        case TELEM_TEMP3: sprintf(str, "%s%d", _tr("Temp"), 3); break;
-        case TELEM_TEMP4: sprintf(str, "%s%d", _tr("Temp"), 4); break;
         case TELEM_GPS_LONG:   strcpy(str, _tr("Longitude")); break;
         case TELEM_GPS_LAT:    strcpy(str, _tr("Latitude")); break;
         case TELEM_GPS_ALT:    strcpy(str, _tr("Altitude")); break;
         case TELEM_GPS_SPEED:  strcpy(str, _tr("Speed")); break;
         case TELEM_GPS_TIME:   strcpy(str, _tr("Time")); break;
-        default: str[0] = '\0'; break;
+        default:
+            return TELEMETRY_Type() == TELEM_DEVO
+                   ? _devo_short_name(str, telem)
+                   : _dsm_short_name(str, telem);
     }
     return str;
 }
 s32 TELEMETRY_GetMaxValue(u8 telem)
 {
-    switch(telem) {
-        case TELEM_VOLT1:
-        case TELEM_VOLT2:
-        case TELEM_VOLT3:
-            return 255;
-        case TELEM_RPM1:
-        case TELEM_RPM2:
-            return 20000;
-        case TELEM_TEMP1:
-        case TELEM_TEMP2:
-        case TELEM_TEMP3:
-        case TELEM_TEMP4:
-            return 255;
-        default:
-            return 0;
-    }
+   return TELEMETRY_Type() == TELEM_DEVO
+          ? _devo_get_max_value(telem)
+          : _dsm_get_max_value(telem);
+}
+
+void TELEMETRY_SetUpdated(int telem)
+{
+    Telemetry.updated[telem/8] |= telem % 8;
+}
+
+int TELEMETRY_Type()
+{
+    //return (Telemetry.capabilities & CAP_DSM) ? TELEM_DSM : TELEM_DEVO;
+    return TELEM_DEVO;
 }
 
 //#define DEBUG_TELEMALARM
@@ -219,8 +174,10 @@ void TELEMETRY_Alarm()
     u32 current_time = CLOCK_getms();
     if (current_time - last_time > TELEM_ERROR_TIME) {
         last_time = current_time;
-        last_updated = Telemetry.updated;
-        Telemetry.updated = 0;
+        for(int i = 0; i < TELEM_UPDATE_SIZE; i++) {
+            last_updated[i] = Telemetry.updated[i];
+            Telemetry.updated[i] = 0;
+        }
     }
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
@@ -236,7 +193,7 @@ void TELEMETRY_Alarm()
         return;
     }
 
-    if (! TELEMETRY_IsUpdated()) {
+    if (! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
         alarm &= ~(1 << telem_idx); // clear this set
         return;

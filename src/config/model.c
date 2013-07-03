@@ -846,7 +846,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
-            for(i = TELEM_VOLT1; i <= TELEM_RPM2; i++) {
+            int last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : TELEM_DSM_LAST;
+            for(i = 1; i <= last; i++) {
                 if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
                     m->telem_alarm[idx] = i;
                     return 1;

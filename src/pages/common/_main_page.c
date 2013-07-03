@@ -158,7 +158,7 @@ void PAGE_MainEvent()
                 } else if (src - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
                     //Telem
                     int alarm = TELEMETRY_HasAlarm(src - NUM_RTC - NUM_TIMERS);
-                    if (alarm || ! TELEMETRY_IsUpdated()) {
+                    if (alarm || ! TELEMETRY_IsUpdated(0xff)) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 1));
                     } else if(mp->elem[i] != val) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 0));

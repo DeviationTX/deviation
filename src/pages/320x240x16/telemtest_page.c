@@ -35,15 +35,15 @@ struct telem_layout {
 };
 
 const struct telem_layout devo8_layout[] = {
-          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_TEMP1},
-          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_TEMP2},
-          {{10, 80, 40, 16}, {60, 80, 40, 16}, TELEM_TEMP3},
-          {{10,100, 40, 16}, {60,100, 40, 16}, TELEM_TEMP4},
-          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_VOLT1},
-          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_VOLT2},
-          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_VOLT3},
-          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_RPM1},
-          {{210, 60, 40, 16}, {255, 60, 40, 16}, TELEM_RPM2},
+          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DEVO_TEMP1},
+          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_DEVO_TEMP2},
+          {{10, 80, 40, 16}, {60, 80, 40, 16}, TELEM_DEVO_TEMP3},
+          {{10,100, 40, 16}, {60,100, 40, 16}, TELEM_DEVO_TEMP4},
+          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_DEVO_VOLT1},
+          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_DEVO_VOLT2},
+          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_DEVO_VOLT3},
+          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_DEVO_RPM1},
+          {{210, 60, 40, 16}, {255, 60, 40, 16}, TELEM_DEVO_RPM2},
           {{20, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
           {{20, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
           {{20, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
@@ -97,7 +97,6 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 void PAGE_TelemtestEvent() {
     long i = 0;
     struct Telemetry cur_telem = Telemetry;
-    u32 updated = TELEMETRY_IsUpdated();
     for (const struct telem_layout *ptr = devo8_layout; ptr->source; ptr++) {
         long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
         long last_val = _TELEMETRY_GetValue(&tp.telem, ptr->source);
@@ -105,7 +104,7 @@ void PAGE_TelemtestEvent() {
         font = &TELEM_FONT;
         if (cur_val != last_val) {
             GUI_Redraw(&gui->value[i]);
-        } else if(! (updated & (1 << ptr->source))) {
+        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
         }
         GUI_SetLabelDesc(&gui->value[i], font);

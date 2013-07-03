@@ -229,31 +229,30 @@ static void parse_telemetry_packet(u8 *packet)
 {
     if((packet[0] & 0xF0) != 0x30)
         return;
+    const u8 *update = NULL;
     scramble_pkt(); //This will unscramble the packet
     //if (packet[0] < 0x37) {
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
     if (packet[0] == TELEMETRY_ENABLE) {
-        Telemetry.volt[0] = packet[1]; //In 1/10 of Volts
-        Telemetry.volt[1] = packet[3]; //In 1/10 of Volts
-        Telemetry.volt[2] = packet[5]; //In 1/10 of Volts
-        Telemetry.rpm[0]  = packet[7] * 120; //In RPM
-        Telemetry.rpm[1]  = packet[9] * 120; //In RPM
-        Telemetry.updated |= (1 << TELEM_VOLT1) |
-                             (1 << TELEM_VOLT2) |
-                             (1 << TELEM_VOLT3) |
-                             (1 << TELEM_RPM1) |
-                             (1 << TELEM_RPM2);
+         update = (const u8[]){
+            TELEM_DEVO_VOLT1, TELEM_DEVO_VOLT2, TELEM_DEVO_VOLT3,
+            TELEM_DEVO_RPM1, TELEM_DEVO_RPM2, 0
+        };
+        Telemetry.p.devo.volt[0] = packet[1]; //In 1/10 of Volts
+        Telemetry.p.devo.volt[1] = packet[3]; //In 1/10 of Volts
+        Telemetry.p.devo.volt[2] = packet[5]; //In 1/10 of Volts
+        Telemetry.p.devo.rpm[0]  = packet[7] * 120; //In RPM
+        Telemetry.p.devo.rpm[1]  = packet[9] * 120; //In RPM
     }
     if (packet[0] == 0x31) {
-        Telemetry.temp[0] = packet[1] == 0xff ? 0 : packet[1] - 20; //In degrees-C
-        Telemetry.temp[1] = packet[2] == 0xff ? 0 : packet[2] - 20; //In degrees-C
-        Telemetry.temp[2] = packet[3] == 0xff ? 0 : packet[3] - 20; //In degrees-C
-        Telemetry.temp[3] = packet[4] == 0xff ? 0 : packet[4] - 20; //In degrees-C
-        Telemetry.updated |= (1 << TELEM_TEMP1) |
-                             (1 << TELEM_TEMP2) |
-                             (1 << TELEM_TEMP3) |
-                             (1 << TELEM_TEMP4);
+        update = (const u8[]){
+            TELEM_DEVO_TEMP1, TELEM_DEVO_TEMP2, TELEM_DEVO_TEMP3, TELEM_DEVO_TEMP4, 0
+        };
+        Telemetry.p.devo.temp[0] = packet[1] == 0xff ? 0 : packet[1] - 20; //In degrees-C
+        Telemetry.p.devo.temp[1] = packet[2] == 0xff ? 0 : packet[2] - 20; //In degrees-C
+        Telemetry.p.devo.temp[2] = packet[3] == 0xff ? 0 : packet[3] - 20; //In degrees-C
+        Telemetry.p.devo.temp[3] = packet[4] == 0xff ? 0 : packet[4] - 20; //In degrees-C
     }
     /* GPS Data
        32: 30333032302e3832373045fb  = 030°20.8270E
@@ -263,32 +262,33 @@ static void parse_telemetry_packet(u8 *packet)
        36: 313832353532313531303132  = 2012-10-15 18:25:52 (UTC)
     */
     if (packet[0] == 0x32) {
+        update = (const u8[]){ TELEM_GPS_LONG, 0};
         Telemetry.gps.longitude = ((packet[1]-'0') * 100 + (packet[2]-'0') * 10 + (packet[3]-'0')) * 3600000
                                   + ((packet[4]-'0') * 10 + (packet[5]-'0')) * 60000
                                   + ((packet[7]-'0') * 1000 + (packet[8]-'0') * 100
                                      + (packet[9]-'0') * 10 + (packet[10]-'0')) * 6;
         if (packet[11] == 'W')
             Telemetry.gps.longitude *= -1;
-        Telemetry.updated |= (1 << TELEM_GPS_LONG);
     }
     if (packet[0] == 0x33) {
+        update = (const u8[]){ TELEM_GPS_LAT, 0};
         Telemetry.gps.latitude = ((packet[1]-'0') * 10 + (packet[2]-'0')) * 3600000
                                   + ((packet[3]-'0') * 10 + (packet[4]-'0')) * 60000
                                   + ((packet[6]-'0') * 1000 + (packet[7]-'0') * 100
                                      + (packet[8]-'0') * 10 + (packet[9]-'0')) * 6;
         if (packet[10] == 'S')
             Telemetry.gps.latitude *= -1;
-        Telemetry.updated |= (1 << TELEM_GPS_LAT);
     }
     if (packet[0] == 0x34) {
+        update = (const u8[]){ TELEM_GPS_ALT, 0};
         Telemetry.gps.altitude = float_to_int(packet+1);
-        Telemetry.updated |= (1 << TELEM_GPS_ALT);
     }
     if (packet[0] == 0x35) {
+        update = (const u8[]){ TELEM_GPS_SPEED, 0};
         Telemetry.gps.velocity = float_to_int(packet+7);
-        Telemetry.updated |= (1 << TELEM_GPS_SPEED);
     }
     if (packet[0] == 0x36) {
+        update = (const u8[]){ TELEM_GPS_TIME, 0};
         u8 hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
         u8 min   = (packet[3]-'0') * 10 + (packet[4]-'0');
         u8 sec   = (packet[5]-'0') * 10 + (packet[6]-'0');
@@ -301,7 +301,11 @@ static void parse_telemetry_packet(u8 *packet)
                            | ((hour & 0x1F) << 12)
                            | ((min & 0x3F) << 6)
                            | ((sec & 0x3F) << 0);
-        Telemetry.updated |= (1 << TELEM_GPS_TIME);
+    }
+    if (update) {
+        while(*update) {
+            TELEMETRY_SetUpdated(*update++);
+        }
     }
 }
 
@@ -455,7 +459,8 @@ static u16 devo_telemetry_cb()
         for(int i = 1; i < 13; i++)
             packet[i] = rand() % 256;
         parse_telemetry_packet(packet);
-        Telemetry.updated = 0xFFFFFFFF;
+        for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
+            Telemetry.updated[i] = 0xff;
         delay = 100 * (16 - txState);
         txState = 15;
 #endif
