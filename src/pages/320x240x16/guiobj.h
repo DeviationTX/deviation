@@ -196,14 +196,8 @@ struct telemcfg_obj {
 
 struct telemtest_obj {
    guiLabel_t msg;
-   guiLabel_t templbl[4];
-   guiLabel_t temp[4];
-   guiLabel_t voltlbl[3];
-   guiLabel_t volt[3];
-   guiLabel_t rpmlbl[2];
-   guiLabel_t rpm[2];
-   guiLabel_t gpslbl[5];
-   guiLabel_t gps[5];
+   guiLabel_t label[14];
+   guiLabel_t value[14];
 };
 
 struct timer_obj {
@@ -558,7 +552,6 @@ struct gui_objs {
 #endif
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
-        struct telemtest_obj telemtest2;
         struct timer_obj timer;
         struct trim_obj trim;
         struct trimedit_obj trimedit;

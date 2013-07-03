@@ -391,3 +391,11 @@ int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
 {
     return (scrollable->cur_row << 8) | get_selected_idx(scrollable, obj);
 }
+int GUI_ScrollableCurrentRow(guiScrollable_t *scrollable)
+{
+    return scrollable->cur_row;
+}
+int GUI_ScrollableVisibleRows(guiScrollable_t *scrollable)
+{
+    return scrollable->visible_rows;
+}

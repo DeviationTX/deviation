@@ -123,22 +123,11 @@ struct telemcfg_obj {
     guiScrollable_t scrollable;
 };
 
-struct telemtest1_obj {
+struct telemtest_obj {
     guiLabel_t page;
     guiLabel_t msg;
-    guiLabel_t tempstr;
-    guiLabel_t voltstr;
-    guiLabel_t rpmstr;
-    guiLabel_t idx[4];
-    guiLabel_t temp[4];
-    guiLabel_t volt[3];
-    guiLabel_t rpm[2];
-};
-
-struct telemtest2_obj {
-    guiLabel_t page;
-    guiLabel_t gpsstr[2];
-    guiLabel_t gps[2];
+    guiLabel_t header[4];
+    guiLabel_t box[13];
     guiScrollable_t scrollable;
 };
 
@@ -331,8 +320,7 @@ struct gui_objs {
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
         struct telemcfg_obj telemcfg;
-        struct telemtest1_obj telemtest1;
-        struct telemtest2_obj telemtest2;
+        struct telemtest_obj telemtest1;
         struct timer_obj timer;
         struct trim_obj trim;
         struct trim2_obj trim2;

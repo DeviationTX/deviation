@@ -20,37 +20,51 @@
 
 #include "../common/_telemtest_page.c"
 
-static void show_page()
+static const u8 row_height = 20;
+struct telempos {
+    u16 x;
+    u16 y;
+    u8 width;
+    u8 height;
+};
+
+struct telem_layout {
+    struct telempos label;
+    struct telempos value;
+    u8 source;
+};
+
+const struct telem_layout devo8_layout[] = {
+          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_TEMP1},
+          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_TEMP2},
+          {{10, 80, 40, 16}, {60, 80, 40, 16}, TELEM_TEMP3},
+          {{10,100, 40, 16}, {60,100, 40, 16}, TELEM_TEMP4},
+          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_VOLT1},
+          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_VOLT2},
+          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_VOLT3},
+          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_RPM1},
+          {{210, 60, 40, 16}, {255, 60, 40, 16}, TELEM_RPM2},
+          {{20, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
+          {{20, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
+          {{20, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
+          {{20, 200, 60, 16}, {100, 200, 200, 16}, TELEM_GPS_SPEED},
+          {{20, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
+          {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
+};
+static void show_page(const struct telem_layout *layout)
 {
-    const u8 row_height = 20;
-    for(long i = 0; i < 4; i++) {
-        GUI_CreateLabelBox(&gui1->templbl[i], 10, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_TEMP1+i));
-        GUI_CreateLabelBox(&gui1->temp[i], 60,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_TEMP1+i));
-    }
-    for(long i = 0; i < 3; i++) {
-        GUI_CreateLabelBox(&gui1->voltlbl[i], 110, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_VOLT1+i));
-        GUI_CreateLabelBox(&gui1->volt[i], 155,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_VOLT1+i));
-    }
-    for(long i = 0; i < 2; i++) {
-        GUI_CreateLabelBox(&gui1->rpmlbl[i], 210, 40 + i*row_height, 40, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_RPM1+i));
-        GUI_CreateLabelBox(&gui1->rpm[i], 255,  40 + i*row_height, 40, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_RPM1+i));
-    }
-    for(long i = 0; i < 5; i++) {
-        GUI_CreateLabelBox(&gui1->gpslbl[i], 20, 140 + i*row_height, 60, 16, &TELEM_TXT_FONT,
-                           label_cb, NULL, (void *)(TELEM_GPS_LAT+i));
-        GUI_CreateLabelBox(&gui1->gps[i], 100,  140 + i*row_height, 200, 16, &TELEM_ERR_FONT,
-                           telem_cb, NULL, (void *)(TELEM_GPS_LAT+i));
+    int i = 0;
+    for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
+        GUI_CreateLabelBox(&gui->label[i], ptr->label.x, ptr->label.y,
+                           ptr->label.width, ptr->label.height, &TELEM_TXT_FONT,
+                           label_cb, NULL, (void *)(long)ptr->source);
+        GUI_CreateLabelBox(&gui->value[i], ptr->value.x, ptr->value.y,
+                           ptr->value.width, ptr->value.height, &TELEM_ERR_FONT,
+                           telem_cb, NULL, (void *)(long)ptr->source);
+        i++;
     }
     tp.telem = Telemetry;
-    tp.telem.time[0] = 0;
-    tp.telem.time[1] = 0;
-    tp.telem.time[2] = 0;
+    //memset(tp.telem.time, 0, sizeof(tp.telem.time));
 }
 
 void PAGE_TelemtestInit(int page)
@@ -59,10 +73,10 @@ void PAGE_TelemtestInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMMON));
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui1->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
         return;
     }
-    show_page();
+    show_page(devo8_layout);
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
@@ -74,12 +88,28 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui1->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tp.str);
         return;
     }
 
-    show_page();
+    show_page(devo8_layout);
 }
-static inline guiObject_t *_get_obj(int idx, int objid) {
-    return (guiObject_t *)&gui1->gps[idx*2 + objid];
+void PAGE_TelemtestEvent() {
+    long i = 0;
+    struct Telemetry cur_telem = Telemetry;
+    u32 updated = TELEMETRY_IsUpdated();
+    for (const struct telem_layout *ptr = devo8_layout; ptr->source; ptr++) {
+        long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
+        long last_val = _TELEMETRY_GetValue(&tp.telem, ptr->source);
+        struct LabelDesc *font;
+        font = &TELEM_FONT;
+        if (cur_val != last_val) {
+            GUI_Redraw(&gui->value[i]);
+        } else if(! (updated & (1 << ptr->source))) {
+            font = &TELEM_ERR_FONT;
+        }
+        GUI_SetLabelDesc(&gui->value[i], font);
+        i++;
+    }
+    tp.telem = cur_telem;
 }

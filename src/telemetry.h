@@ -47,10 +47,11 @@ struct Telemetry {
     s16 temp[4];
     u16 rpm[2];
     struct gps gps;
-    u32 time[3];
+    volatile u32 updated;
 };
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
+s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
 const char * TELEMETRY_GetValueStr(char *str, u8 telem);
 const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value);
 const char * TELEMETRY_Name(char *str, u8 telem);
@@ -58,4 +59,5 @@ const char * TELEMETRY_ShortName(char *str, u8 telem);
 s32 TELEMETRY_GetMaxValue(u8 telem);
 void TELEMETRY_Alarm();
 int TELEMETRY_HasAlarm(int src);
+u32 TELEMETRY_IsUpdated();
 #endif

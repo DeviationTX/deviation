@@ -23,34 +23,46 @@ static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 telem_idx = 0;
 static u8 alarm = 0;
 static u32 alarm_time = 0;
+static u32 last_updated;
+static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
+u32 TELEMETRY_IsUpdated()
+{
+    return last_updated | Telemetry.updated;
+}
+
 s32 TELEMETRY_GetValue(int idx)
+{
+    return _TELEMETRY_GetValue(&Telemetry, idx);
+}
+
+s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
 {
     switch (idx) {
     case TELEM_VOLT1:
     case TELEM_VOLT2:
     case TELEM_VOLT3:
-        return Telemetry.volt[idx - TELEM_VOLT1];
+        return t->volt[idx - TELEM_VOLT1];
     case TELEM_TEMP1:
     case TELEM_TEMP2:
     case TELEM_TEMP3:
     case TELEM_TEMP4:
-        return Telemetry.temp[idx - TELEM_TEMP1];
+        return t->temp[idx - TELEM_TEMP1];
     case TELEM_RPM1:
     case TELEM_RPM2:
-        return Telemetry.rpm[idx - TELEM_RPM1];
+        return t->rpm[idx - TELEM_RPM1];
     case TELEM_GPS_LONG:
-        return Telemetry.gps.longitude;
+        return t->gps.longitude;
     case TELEM_GPS_LAT:
-        return Telemetry.gps.latitude;
+        return t->gps.latitude;
     case TELEM_GPS_ALT:
-        return Telemetry.gps.altitude;
+        return t->gps.altitude;
     case TELEM_GPS_SPEED:
-        return Telemetry.gps.velocity;
+        return t->gps.velocity;
     case TELEM_GPS_TIME:
-        return Telemetry.gps.time;
+        return t->gps.time;
     }
     return 0;
 }
@@ -203,6 +215,13 @@ s32 TELEMETRY_GetMaxValue(u8 telem)
 //#define DEBUG_TELEMALARM
 void TELEMETRY_Alarm()
 {
+    //Update 'updated' state every time we get here
+    u32 current_time = CLOCK_getms();
+    if (current_time - last_time > TELEM_ERROR_TIME) {
+        last_time = current_time;
+        last_updated = Telemetry.updated;
+        Telemetry.updated = 0;
+    }
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
     telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
@@ -217,8 +236,7 @@ void TELEMETRY_Alarm()
         return;
     }
 
-    u32 current_time = CLOCK_getms();
-    if (current_time - Telemetry.time[0] > TELEM_ERROR_TIME) {
+    if (! TELEMETRY_IsUpdated()) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
         alarm &= ~(1 << telem_idx); // clear this set
         return;

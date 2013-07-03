@@ -361,7 +361,6 @@ static void calc_dsmx_channel()
 static void parse_telemetry_packet()
 {
     static s32 altitude;
-    u32 time_ms = CLOCK_getms();
     
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
@@ -373,8 +372,7 @@ static void parse_telemetry_packet()
             //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
             //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
             Telemetry.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.time[0] = time_ms;
-            Telemetry.time[1] = Telemetry.time[0];
+            Telemetry.updated |= (1 << TELEM_VOLT2);
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
@@ -389,12 +387,12 @@ static void parse_telemetry_packet()
             Telemetry.temp[0] = ((s32)((s16)(packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
             if (Telemetry.temp[0] > 500 || Telemetry.temp[0] < -100)
                 Telemetry.temp[0] = 0;
-            Telemetry.time[0] = time_ms;
-            Telemetry.time[1] = Telemetry.time[0];
+            Telemetry.updated |= (1 << TELEM_RPM1) |
+                                 (1 << TELEM_VOLT1) |
+                                 (1 << TELEM_TEMP1);
             break;
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
-            //Telemetry.time[x1] = time_ms;
             break;
         case 0x0a: //Powerbox sensor
             //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
@@ -405,15 +403,12 @@ static void parse_telemetry_packet()
             //Telemetry.pwb.alarm_v2 = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_c1 = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
             //Telemetry.pwb.alarm_c2 = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
-            //Telemetry.time[x2] = time_ms;
             break;
         case 0x11: //AirSpeed sensor
             //Telemetry.airspeed = ((s32)packet[2] << 8) | packet[3]; //In km/h (16Bit value, 1 unit is 1 km/h)
-            //Telemetry.time[x3] = time_ms;
             break;
         case 0x12: //Altimeter sensor
             //Telemetry.altitude = (s16)(packet[2] << 8) | packet[3]; //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
-            //Telemetry.time[x4] = time_ms;
             break;
         case 0x14: //G-Force sensor
             //Telemetry.gforce.x = (s16)(packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
@@ -423,7 +418,6 @@ static void parse_telemetry_packet()
             //Telemetry.gforce.ymax = (s16)(packet[10] << 8) | packet[11];
             //Telemetry.gforce.zmax = (s16)(packet[12] << 8) | packet[13];
             //Telemetry.gforce.zmin = (s16)(packet[14] << 8) | packet[15];
-            //Telemetry.time[x5] = time_ms;
             break;
         case 0x15: //JetCat sensor
             //Telemetry.jc.status = packet[2];
@@ -450,14 +444,14 @@ static void parse_telemetry_packet()
                 //0x19:KERO FULL ON
                 //0x1a:MAX STATE
             //Telemetry.jc.throttle = (packet[3] >> 4) * 10 + (packet[3] & 0x0f); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
-            //Telemetry.jc.pack_volt = (((packet[4] >> 4) * 10 + (packet[4] & 0x0f)) * 100 
-            //                         + (packet[5] >> 4) * 10 + (packet[5] & 0x0f) + 5) / 10; //In 1/10 of Volts
-            //Telemetry.jc.pump_volt = (((packet[6] >> 6) * 10 + (packet[6] & 0x0f)) * 100 
-            //                         + (packet[7] >> 4) * 10 + (packet[7] & 0x0f) + 5) / 10; //In 1/10 of Volts
+            //Telemetry.jc.pack_volt = (((packet[5] >> 4) * 10 + (packet[5] & 0x0f)) * 100 
+            //                         + (packet[4] >> 4) * 10 + (packet[4] & 0x0f) + 5) / 10; //In 1/10 of Volts
+            //Telemetry.jc.pump_volt = (((packet[7] >> 6) * 10 + (packet[7] & 0x0f)) * 100 
+            //                         + (packet[6] >> 4) * 10 + (packet[6] & 0x0f) + 5) / 10; //In 1/10 of Volts (low voltage)
             //Telemetry.jc.rpm = ((packet[10] >> 4) * 10 + (packet[10] & 0x0f)) * 10000 
             //                 + ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 100 
             //                 + ((packet[8] >> 4) * 10 + (packet[8] & 0x0f)); //RPM up to 999999
-            //Telemetry.jc.tempEGT = (packet[13] & 0x0f) * 100 + (packet[12] >> 4) * 10 + (packet[12] & 0x0f); //EGT temp up to 999°
+            //Telemetry.jc.tempEGT = (packet[13] & 0x0f) * 100 + (packet[12] >> 4) * 10 + (packet[12] & 0x0f); //EGT temp up to 999°C
             //Telemetry.jc.off_condition = packet[14];
                 //Messages for Off_Condition:
                 //0x00:NA
@@ -484,7 +478,6 @@ static void parse_telemetry_packet()
                 //0x1b:2nd ENGINE DIFFERENTIAL TOO HIGH
                 //0x1c:2nd ENGINE NO COMMUNICATION
                 //0x1d:MAX OFF CONDITION
-            //Telemetry.time[x6] = time_ms;
             break;
         case 0x16: //GPS sensor (always second GPS packet)
             altitude += (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
@@ -506,7 +499,9 @@ static void parse_telemetry_packet()
                 Telemetry.gps.longitude *= -1; //1=E(+), 0=W(-)
             //Telemetry.gps.heading = ((packet[13] >> 4) * 10 + (packet[13] & 0x0f)) * 10 
             //                      + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees (16Bit decimal, 1 unit is 0.1 degree)
-            Telemetry.time[2] = time_ms;
+            Telemetry.updated |= (1 << TELEM_GPS_ALT) |
+                                 (1 << TELEM_GPS_LAT) |
+                                 (1 << TELEM_GPS_LONG);
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
@@ -526,7 +521,7 @@ static void parse_telemetry_packet()
                                | ((sec & 0x3F) << 0);
             //Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
             altitude = ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
-            Telemetry.time[2] = time_ms;
+            Telemetry.updated |= (1 << TELEM_GPS_SPEED) | (1 << TELEM_GPS_TIME);
             break;
     }
 }

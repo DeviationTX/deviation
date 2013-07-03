@@ -106,7 +106,6 @@ s16 bar_cb(void * data)
 void PAGE_MainEvent()
 {
     int i;
-    int clear_time = 0;
     if (PAGE_GetModal()) {
         if(pagemem.modal_page == 2) {
             PAGE_TelemtestEvent();
@@ -159,12 +158,9 @@ void PAGE_MainEvent()
                 } else if (src - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
                     //Telem
                     int alarm = TELEMETRY_HasAlarm(src - NUM_RTC - NUM_TIMERS);
-                    u32 time = CLOCK_getms();
-                    if (alarm || (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)) {
-                        if (Telemetry.time[0] && time - Telemetry.time[0] > TELEM_ERROR_TIME)
-                            clear_time = 1;
+                    if (alarm || ! TELEMETRY_IsUpdated()) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 1));
-                    } else if(Telemetry.time[0] && mp->elem[i] != val) {
+                    } else if(mp->elem[i] != val) {
                         GUI_SetLabelDesc(&gui->elem[i].box, get_box_font(type == ELEM_BIGBOX ? 0 : 2, 0));
                         mp->elem[i] = val;
                         GUI_Redraw(&gui->elem[i].box);
@@ -220,8 +216,6 @@ void PAGE_MainEvent()
             break;
         }
     }
-    if (clear_time)
-        Telemetry.time[0] = 0;
     _check_voltage();
 #if HAS_RTC
     if(Display.flags & SHOW_TIME) {
@@ -335,7 +329,8 @@ void show_elements()
                            src > NUM_RTC &&
 #endif
                            ((src <= NUM_RTC + NUM_TIMERS && mp->elem[i] < 0)
-                           || ((u8)(src - NUM_RTC - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0)));
+//                           || ((u8)(src - NUM_RTC - NUM_TIMERS - 1) < NUM_TELEM && Telemetry.time[0] == 0)
+                           ));
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h,
                             get_box_font(type == ELEM_BIGBOX ? 0 : 2, font),
                             show_box_cb, press_box_cb,

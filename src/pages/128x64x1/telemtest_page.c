@@ -21,113 +21,167 @@
 #include "../common/_telemtest_page.c"
 
 typedef enum {
-    telemetry_off,
     telemetry_basic,
     telemetry_gps,
+    telemetry_off,
 } TeleMetryMonitorType;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
-static const char *_page_cb(guiObject_t *obj, const void *data);
 static void _press_cb(guiObject_t *obj, const void *data);
-static void _show_page2();
 static const char *idx_cb(guiObject_t *obj, const void *data);
 
 static TeleMetryMonitorType current_page = telemetry_basic;
 
-static void _show_page1()
+struct telem_layout {
+    u8 row_type;
+    u8 x;
+    u8 width;
+    u8 source;
+};
+#define TYPE_INDEX  0x10
+#define TYPE_LABEL  0x20
+#define TYPE_LABEL3 0x30
+#define TYPE_VALUE  0x80
+#define TYPE_VALUE2 0x90
+#define TYPE_VALUE4 0xa0
+
+#define TEMP_LABEL 1
+#define VOLT_LABEL 2
+#define RPM_LABEL 3
+#define GPS_LABEL 4
+#define ARROW_LABEL 0xff
+struct telem_layout2 {
+    const struct telem_layout *header;
+    const struct telem_layout *layout;
+    u8 num_items;
+    u8 row_height;
+};
+
+const struct telem_layout devo_header_basic[] = {
+        {TYPE_LABEL,  8, 35, TEMP_LABEL},
+        {TYPE_LABEL, 45, 35, VOLT_LABEL},
+        {TYPE_LABEL, 88, 35, RPM_LABEL},
+        {TYPE_LABEL, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {0, 0, 0, 0},
+};
+
+const struct telem_layout devo_layout_basic[] = {
+    {TYPE_INDEX | 0,  0, 8,  1},
+    {TYPE_VALUE | 0,  8, 35, TELEM_TEMP1},
+    {TYPE_VALUE | 0, 48, 35, TELEM_VOLT1},
+    {TYPE_VALUE | 0, 87, 35, TELEM_RPM1},
+    {TYPE_INDEX | 1,  0, 8,  2},
+    {TYPE_VALUE | 1,  8, 35, TELEM_TEMP2},
+    {TYPE_VALUE | 1, 48, 35, TELEM_VOLT2},
+    {TYPE_VALUE | 1, 87, 35, TELEM_RPM2},
+    {TYPE_INDEX | 2,  0, 8,  3},
+    {TYPE_VALUE | 2,  8, 35, TELEM_TEMP3},
+    {TYPE_VALUE | 2, 48, 35, TELEM_VOLT3},
+    {TYPE_INDEX | 3,  0, 8,  4},
+    {TYPE_VALUE | 3,  8, 35, TELEM_TEMP4},
+    {0, 0, 0, 0},
+};
+
+const struct telem_layout devo_header_gps[] = {
+        {TYPE_LABEL,  8, 35, GPS_LABEL},
+        {TYPE_LABEL, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {0, 0, 0, 0},
+};
+const struct telem_layout devo_layout_gps[] = {
+    {TYPE_LABEL  | 0,  0, 0,  TELEM_GPS_LAT},
+    {TYPE_VALUE2 | 0, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_LAT},
+    {TYPE_LABEL3 | 0, 0, 0,  TELEM_GPS_LONG},
+    {TYPE_VALUE4 | 0, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_LONG},
+
+    {TYPE_LABEL  | 1,  0, 0,  TELEM_GPS_ALT},
+    {TYPE_VALUE2 | 1, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_ALT},
+    {TYPE_LABEL3 | 1, 0, 0,  TELEM_GPS_SPEED},
+    {TYPE_VALUE4 | 1, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_SPEED},
+
+    {TYPE_LABEL  | 2,  0, 0,  TELEM_GPS_TIME},
+    {TYPE_VALUE2 | 2, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_TIME},
+    {0, 0, 0, 0},
+};
+
+const struct telem_layout2 devo_page[] = {
+    {devo_header_basic, devo_layout_basic, 4, ITEM_SPACE},
+    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+};
+static const char *header_cb(guiObject_t *obj, const void *data)
 {
-    PAGE_RemoveAllObjects();
-    u8 w = 35;
-    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
-    GUI_CreateLabelBox(&gui1->tempstr, 8, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Temp"));
-    GUI_CreateLabelBox(&gui1->voltstr, w + 13, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("Volt"));
-    GUI_CreateLabelBox(&gui1->rpmstr, w + w + 18, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, (void *)_tr("RPM"));
-    w = 10;
-    GUI_CreateLabelBox(&gui1->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
-
-    u8 space = ITEM_HEIGHT +1;
-    u8 row = space;
-    w = 35;
-    labelDesc.font = TINY_FONT.font;
-    labelDesc.font_color = 0xffff;
-    labelDesc.fill_color = 0;
-    for(long i = 0; i < 4; i++) {
-        u8 x = 8;
-        labelDesc.style = LABEL_LEFTCENTER;
-        GUI_CreateLabelBox(&gui1->idx[i], 0,  row, 8, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)i);
-        labelDesc.style = LABEL_SQUAREBOX;
-        GUI_CreateLabelBox(&gui1->temp[i], x,  row, w, ITEM_HEIGHT, &labelDesc,
-                          telem_cb, NULL, (void *)(TELEM_TEMP1+i));
-        if (i < 3) {
-            x = x + w + 5;
-            GUI_CreateLabelBox(&gui1->volt[i], x,  row, w, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_VOLT1+i));
-        }
-        if (i < 2) {
-            x = x + w + 5;
-            GUI_CreateLabelBox(&gui1->rpm[i], x,  row, w, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(TELEM_RPM1+i));
-        }
-        row += space;
+    (void)obj;
+    int source = (long)data;
+    switch(source) {
+        case TEMP_LABEL: return _tr("Temp");
+        case VOLT_LABEL: return _tr("Volt");
+        case RPM_LABEL: return _tr("RPM");
+        case GPS_LABEL: return _tr("GPS");
+        case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
     }
-    tp.telem = Telemetry;
-    tp.telem.time[0] = 0;
-    tp.telem.time[1] = 0;
-    tp.telem.time[2] = 0;
-
-    labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
-    labelDesc.font_color = 0xffff;
-    labelDesc.outline_color = labelDesc.fill_color = 0; // bug fix: reset to default no-box style
+    return "";
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
     (void)relrow;
-    return (guiObject_t *)&gui2->gps[col];
+    (void)col;
+    return (guiObject_t *)&gui->box[0];
 }
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    (void)data;
     (void)relrow;
-    labelDesc.font = TINY_FONT.font;
-    labelDesc.style = LABEL_SQUAREBOX;
-    labelDesc.font_color = 0xffff;
-    labelDesc.fill_color = 0;
-    absrow = absrow*2;
-    for(int i = 0; i < 2 && absrow < 5; i++) {
-        GUI_CreateLabelBox(&gui2->gpsstr[i], 0, y,
-                0, ITEM_HEIGHT, &DEFAULT_FONT,  label_cb, NULL, (void *)(long)(TELEM_GPS_LAT+absrow));
-        GUI_CreateLabelBox(&gui2->gps[i], 0, y + ITEM_HEIGHT + 1,
-                LCD_WIDTH - ARROW_WIDTH - 3, ITEM_HEIGHT, &labelDesc, telem_cb, NULL, (void *)(long)(TELEM_GPS_LAT+absrow));
-        y +=  2 *(ITEM_HEIGHT + 1);
-        absrow +=1;
+    const struct telem_layout *layout = (const struct telem_layout *)data;
+    int i = 0;
+    struct LabelDesc *font;
+    void *cmd = NULL;
+    int orig_y = y;
+    for(const struct telem_layout *ptr = layout; ptr->source; ptr++, i++) {
+        if((ptr->row_type & 0x0f) < absrow)
+            continue;
+        if((ptr->row_type & 0x0f) > absrow)
+            break;
+        y = orig_y;
+        font = &DEFAULT_FONT;
+        switch (ptr->row_type & 0xf0) {
+            case TYPE_INDEX:  font = &TINY_FONT; cmd = idx_cb; break;
+            case TYPE_LABEL:  cmd = label_cb; break;
+            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*ITEM_HEIGHT; break;
+            case TYPE_VALUE:  font = &tp.font;  cmd = telem_cb; break;
+            case TYPE_VALUE2: font = &tp.font;  cmd = telem_cb; y = orig_y + ITEM_HEIGHT;break;
+            case TYPE_VALUE4: font = &tp.font;  cmd = telem_cb; y =orig_y + 3*ITEM_HEIGHT; break;
+        }
+        GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, ITEM_HEIGHT,
+                font, cmd, NULL, (void *)(long)ptr->source);
     }
-
-    labelDesc.font = DEFAULT_FONT.font; // bug fix: quickpage(telem)->main page->main menu,all pages' font will be set to TINY_FONT
-    labelDesc.font_color = 0xffff;
-    labelDesc.outline_color = labelDesc.fill_color = 0; // bug fix: reset to default no-box style
     return 0;
 }
-static void _show_page2()
+
+static void _show_page(const struct telem_layout2 *page)
 {
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr_noop("GPS")); // to draw a underline only
-    u8 w = 10;
-    GUI_CreateLabelBox(&gui2->page, LCD_WIDTH -w, 0, w, 7, &TINY_FONT, _page_cb, NULL, NULL);
-
+    tp.font.font = TINY_FONT.font;
+    tp.font.font_color = 0xffff;
+    tp.font.fill_color = 0;
+    tp.font.style = LABEL_SQUAREBOX;
+    long i = 0;
+    for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
+        GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, ITEM_HEIGHT,
+                           ptr->source == ARROW_LABEL ? &TINY_FONT : &DEFAULT_FONT,
+                           header_cb, NULL, (void *)(long)ptr->source);
+    }
+    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+                         page->row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
     tp.telem = Telemetry;
-    tp.telem.time[0] = 0;
-    tp.telem.time[1] = 0;
-    tp.telem.time[2] = 0;
-
-    GUI_CreateScrollable(&gui2->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         4 * ITEM_HEIGHT + 4, 3, row_cb, getobj_cb, NULL, NULL);
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf(tp.str, "%d", idx+1);
+    sprintf(tp.str, "%d", idx);
     return tp.str;
 }
 
@@ -139,14 +193,40 @@ void PAGE_TelemtestInit(int page)
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
         current_page = telemetry_off;
-        GUI_CreateLabelBox(&gui1->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
         return;
     }
 
-    if (current_page== telemetry_gps)
-        _show_page2();
-    else
-        _show_page1();
+    _show_page(&devo_page[current_page]);
+}
+
+void PAGE_TelemtestEvent() {
+    long i = 0;
+    if (current_page == telemetry_off)
+        return;
+    struct Telemetry cur_telem = Telemetry;
+    u32 updated = TELEMETRY_IsUpdated();
+    int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
+    int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);
+    for (const struct telem_layout *ptr = devo_page[current_page].layout; ptr->source; ptr++, i++) {
+        if ((ptr->row_type & 0x0f) < current_row)
+            continue;
+        if ((ptr->row_type & 0x0f) >= current_row + visible_rows)
+            break;
+        if (!( ptr->row_type & 0x80))
+            continue;
+        long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
+        long last_val = _TELEMETRY_GetValue(&tp.telem, ptr->source);
+        struct LabelDesc *font;
+        font = &TELEM_FONT;
+        if (cur_val != last_val) {
+            GUI_Redraw(&gui->box[i]);
+        } else if(! (updated & (1 << ptr->source))) {
+            font = &TELEM_ERR_FONT;
+        }
+        GUI_SetLabelDesc(&gui->box[i], font);
+    }
+    tp.telem = cur_telem;
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
@@ -155,26 +235,12 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
     (void)page;
 }
 
-static const char *_page_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if (current_page== telemetry_gps)
-        strcpy(tp.str, (const char *)"<-");
-    else
-        strcpy(tp.str, (const char *)"->");
-    return tp.str;
-}
-
 static void _press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
     current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
-    if (current_page== telemetry_gps)
-        _show_page2();
-    else
-        _show_page1();
+    _show_page(&devo_page[current_page]);
 }
 
 static void _navigate_pages(s8 direction)
@@ -210,5 +276,5 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     return 1;
 }
 static inline guiObject_t *_get_obj(int idx, int objid) {
-    return GUI_GetScrollableObj(&gui2->scrollable, idx, objid);
+    return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }

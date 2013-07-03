@@ -295,6 +295,8 @@ void GUI_DrawScrollable(guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj);
+int GUI_ScrollableCurrentRow(guiScrollable_t *scrollable);
+int GUI_ScrollableVisibleRows(guiScrollable_t *scrollable);
 
 
 void GUI_DrawKeyboard(struct guiObject *obj);
