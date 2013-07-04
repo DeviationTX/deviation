@@ -220,15 +220,17 @@ struct timer_obj {
     guiTextSelect_t start[NUM_TIMERS];
 };
 
+#define NUM_TRIM_ROWS (LCD_HEIGHT == 240 ? 7 : 8)
 struct trim_obj {
     guiLabel_t inplbl;
     guiLabel_t neglbl;
     guiLabel_t poslbl;
     guiLabel_t steplbl;
-    guiButton_t src[NUM_TRIMS];
-    guiLabel_t neg[NUM_TRIMS];
-    guiLabel_t pos[NUM_TRIMS];
-    guiTextSelect_t step[NUM_TRIMS];
+    guiButton_t src[NUM_TRIM_ROWS];
+    guiLabel_t neg[NUM_TRIM_ROWS];
+    guiLabel_t pos[NUM_TRIM_ROWS];
+    guiTextSelect_t step[NUM_TRIM_ROWS];
+    guiScrollable_t scrollable;
 };
 
 struct trimedit_obj {

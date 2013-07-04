@@ -21,31 +21,48 @@
 
 #define gui (&gui_objs.u.trim)
 #define gui_ed (&gui_objs.u.trimedit)
+
+#define PCOL1 (4 + ((LCD_WIDTH - 320) / 2))
+#define PCOL2 (72 + ((LCD_WIDTH - 320) / 2))
+#define PCOL3 (134 + ((LCD_WIDTH - 320) / 2))
+#define PCOL4 (196 + ((LCD_WIDTH - 320) / 2))
+#define PROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+#define PROW2 (66 + ((LCD_HEIGHT - 240) / 2))
+#define PROW3 (PROW2 + 2)
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    col = (col + 2) % 2;
+    return col ? (guiObject_t *)&gui->step[relrow] : (guiObject_t *)&gui->src[relrow];
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    struct Trim *trim = MIXER_GetAllTrims();
+    GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
+        trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+    GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].neg));
+    GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
+    GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[absrow].step);
+    return 2;
+}
+
 static void _show_page()
 {
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
     else
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
-    #define PCOL1 (4 + ((LCD_WIDTH - 320) / 2))
-    #define PCOL2 (74 + ((LCD_WIDTH - 320) / 2))
-    #define PCOL3 (138 + ((LCD_WIDTH - 320) / 2))
-    #define PCOL4 (202 + ((LCD_WIDTH - 320) / 2))
-    #define PROW1 (40 + ((LCD_HEIGHT - 240) / 2))
-    #define PROW2 (66 + ((LCD_HEIGHT - 240) / 2))
-    #define PROW3 (PROW2 + 2)
     GUI_CreateLabelBox(&gui->inplbl, PCOL1, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Input"));
     GUI_CreateLabelBox(&gui->neglbl, PCOL2, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim -"));
     GUI_CreateLabelBox(&gui->poslbl, PCOL3, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateLabelBox(&gui->steplbl, PCOL4, PROW1, 108, 15, &NARROW_FONT, NULL, NULL, _tr("Trim Step"));
-    struct Trim *trim = MIXER_GetAllTrims();
-    for (u8 i = 0; i < NUM_TRIMS; i++) {
-        GUI_CreateButton(&gui->src[i], PCOL1, 24*i + PROW2, BUTTON_64x16,
-            trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)i));
-        GUI_CreateLabel(&gui->neg[i], PCOL2 + 6, 24*i + PROW3, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].neg));
-        GUI_CreateLabel(&gui->pos[i], PCOL3 + 6, 24*i + PROW3, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[i].pos));
-        GUI_CreateTextSelect(&gui->step[i], PCOL4 + 6, 24*i + PROW2, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[i].step);
-    }
+
+    GUI_CreateScrollable(&gui->scrollable,
+         PCOL1, PROW2,  LCD_WIDTH - 2 * PCOL1, NUM_TRIM_ROWS * 24 - 8,
+         24, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
 }
 
 static void _edit_cb(guiObject_t *obj, const void *data)
