@@ -282,13 +282,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (type == ELEM_MODELICO) {
         GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 115, LAYDLG_TEXT_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Model"));
     } else {
+        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
+        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
         if (type == ELEM_TOGGLE) {
             GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, toggle_press_cb, (void *)elemidx);
             del_x = X + 15 + 168;
             num_objs++;
         }
-        GUI_CreateLabelBox(&gui->dlglbl[relrow], X, y, 10, 16, &DEFAULT_FONT, label_cb, NULL, (void *)(long)(absrow));
-        GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
     }
     GUI_CreateButton(&gui->dlgbut[relrow], X+width-64, y, BUTTON_64x16, dlgbut_str_cb, 0, dlgbut_cb, (void *)elemidx);
     return num_objs;
