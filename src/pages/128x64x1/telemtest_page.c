@@ -39,17 +39,30 @@ struct telem_layout {
     u8 source;
 };
 #define TYPE_INDEX  0x10
-#define TYPE_LABEL  0x20
-#define TYPE_LABEL3 0x30
+#define TYPE_HEADER 0x20
+#define TYPE_LABEL  0x30
+#define TYPE_LABEL3 0x40
 #define TYPE_VALUE  0x80
 #define TYPE_VALUE2 0x90
 #define TYPE_VALUE4 0xa0
 
-#define TEMP_LABEL 1
-#define VOLT_LABEL 2
-#define RPM_LABEL 3
-#define GPS_LABEL 4
-#define ARROW_LABEL 0xff
+enum {
+    TEMP_LABEL = 1,
+    VOLT_LABEL,
+    RPM_LABEL,
+    GPS_LABEL,
+    A_LABEL,
+    B_LABEL,
+    L_LABEL,
+    R_LABEL,
+    F_LABEL,
+    H_LABEL,
+    RXV_LABEL,
+    BATT_LABEL,
+    DSM_LABEL,
+    ARROW_LABEL = 0xff,
+};
+
 struct telem_layout2 {
     const struct telem_layout *header;
     const struct telem_layout *layout;
@@ -58,33 +71,33 @@ struct telem_layout2 {
 };
 
 const struct telem_layout devo_header_basic[] = {
-        {TYPE_LABEL,  8, 35, TEMP_LABEL},
-        {TYPE_LABEL, 45, 35, VOLT_LABEL},
-        {TYPE_LABEL, 88, 35, RPM_LABEL},
-        {TYPE_LABEL, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER,  8, 35, TEMP_LABEL},
+        {TYPE_HEADER, 45, 35, VOLT_LABEL},
+        {TYPE_HEADER, 88, 35, RPM_LABEL},
+        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_layout_basic[] = {
     {TYPE_INDEX | 0,  0, 8,  1},
-    {TYPE_VALUE | 0,  8, 35, TELEM_TEMP1},
-    {TYPE_VALUE | 0, 48, 35, TELEM_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_RPM1},
+    {TYPE_VALUE | 0,  8, 35, TELEM_DEVO_TEMP1},
+    {TYPE_VALUE | 0, 48, 35, TELEM_DEVO_VOLT1},
+    {TYPE_VALUE | 0, 87, 35, TELEM_DEVO_RPM1},
     {TYPE_INDEX | 1,  0, 8,  2},
-    {TYPE_VALUE | 1,  8, 35, TELEM_TEMP2},
-    {TYPE_VALUE | 1, 48, 35, TELEM_VOLT2},
-    {TYPE_VALUE | 1, 87, 35, TELEM_RPM2},
+    {TYPE_VALUE | 1,  8, 35, TELEM_DEVO_TEMP2},
+    {TYPE_VALUE | 1, 48, 35, TELEM_DEVO_VOLT2},
+    {TYPE_VALUE | 1, 87, 35, TELEM_DEVO_RPM2},
     {TYPE_INDEX | 2,  0, 8,  3},
-    {TYPE_VALUE | 2,  8, 35, TELEM_TEMP3},
-    {TYPE_VALUE | 2, 48, 35, TELEM_VOLT3},
+    {TYPE_VALUE | 2,  8, 35, TELEM_DEVO_TEMP3},
+    {TYPE_VALUE | 2, 48, 35, TELEM_DEVO_VOLT3},
     {TYPE_INDEX | 3,  0, 8,  4},
-    {TYPE_VALUE | 3,  8, 35, TELEM_TEMP4},
+    {TYPE_VALUE | 3,  8, 35, TELEM_DEVO_TEMP4},
     {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_LABEL,  8, 35, GPS_LABEL},
-        {TYPE_LABEL, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER,  8, 35, GPS_LABEL},
+        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
 const struct telem_layout devo_layout_gps[] = {
@@ -103,8 +116,46 @@ const struct telem_layout devo_layout_gps[] = {
     {0, 0, 0, 0},
 };
 
+const struct telem_layout dsm_header_basic[] = {
+        {TYPE_HEADER,  8, 35, DSM_LABEL},
+        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {0, 0, 0, 0},
+};
+
+const struct telem_layout dsm_layout_basic[] = {
+    {TYPE_HEADER | 0,  0, 8,  A_LABEL},
+    {TYPE_VALUE  | 0,  7, 35, TELEM_DSM_FLOG_FADESA},
+    {TYPE_HEADER | 0, 43, 8,  B_LABEL},
+    {TYPE_VALUE  | 0, 50, 35, TELEM_DSM_FLOG_FADESB},
+    {TYPE_HEADER | 0, 86, 8,  F_LABEL},
+    {TYPE_VALUE  | 0, 93, 35, TELEM_DSM_FLOG_FRAMELOSS},
+
+    {TYPE_HEADER | 1,  0, 8,  L_LABEL},
+    {TYPE_VALUE  | 1,  7, 35, TELEM_DSM_FLOG_FADESL},
+    {TYPE_HEADER | 1, 43, 8,  R_LABEL},
+    {TYPE_VALUE  | 1, 50, 35, TELEM_DSM_FLOG_FADESR},
+    {TYPE_HEADER | 1, 86, 8,  H_LABEL},
+    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_FRAMELOSS},
+
+    {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
+    {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
+    {TYPE_HEADER | 2, 61, 25, RXV_LABEL},
+    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT2},
+
+    {TYPE_HEADER | 3,  0, 25, BATT_LABEL},
+    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT1},
+    {TYPE_HEADER | 3, 61, 25, RPM_LABEL},
+    {TYPE_VALUE  | 3, 86, 35, TELEM_DSM_FLOG_RPM1},
+
+    {0, 0, 0, 0},
+};
+
 const struct telem_layout2 devo_page[] = {
     {devo_header_basic, devo_layout_basic, 4, ITEM_SPACE},
+    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+};
+const struct telem_layout2 dsm_page[] = {
+    {dsm_header_basic, dsm_layout_basic, 4, ITEM_SPACE},
     {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)
@@ -116,6 +167,15 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case VOLT_LABEL: return _tr("Volt");
         case RPM_LABEL: return _tr("RPM");
         case GPS_LABEL: return _tr("GPS");
+        case A_LABEL: return "A";
+        case B_LABEL: return "B";
+        case L_LABEL: return "L";
+        case R_LABEL: return "R";
+        case F_LABEL: return "F";
+        case H_LABEL: return "H";
+        case RXV_LABEL: return "RxV";
+        case BATT_LABEL: return "Bat";
+        case DSM_LABEL: return "DSM";
         case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
     }
     return "";
@@ -146,6 +206,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         font = &DEFAULT_FONT;
         switch (ptr->row_type & 0xf0) {
             case TYPE_INDEX:  font = &TINY_FONT; cmd = idx_cb; break;
+            case TYPE_HEADER: cmd = header_cb; break;
             case TYPE_LABEL:  cmd = label_cb; break;
             case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*ITEM_HEIGHT; break;
             case TYPE_VALUE:  font = &tp.font;  cmd = telem_cb; break;
@@ -197,18 +258,19 @@ void PAGE_TelemtestInit(int page)
         return;
     }
 
-    _show_page(&devo_page[current_page]);
+    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
 }
 
 void PAGE_TelemtestEvent() {
-    long i = 0;
     if (current_page == telemetry_off)
         return;
     struct Telemetry cur_telem = Telemetry;
-    u32 updated = TELEMETRY_IsUpdated();
     int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
     int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);
-    for (const struct telem_layout *ptr = devo_page[current_page].layout; ptr->source; ptr++, i++) {
+    const struct telem_layout *ptr = TELEMETRY_Type() == TELEM_DEVO
+                                     ? devo_page[current_page].layout
+                                     : dsm_page[current_page].layout;
+    for (long i = 0; ptr->source; ptr++, i++) {
         if ((ptr->row_type & 0x0f) < current_row)
             continue;
         if ((ptr->row_type & 0x0f) >= current_row + visible_rows)
@@ -221,7 +283,7 @@ void PAGE_TelemtestEvent() {
         font = &TELEM_FONT;
         if (cur_val != last_val) {
             GUI_Redraw(&gui->box[i]);
-        } else if(! (updated & (1 << ptr->source))) {
+        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
         }
         GUI_SetLabelDesc(&gui->box[i], font);
@@ -240,7 +302,7 @@ static void _press_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
-    _show_page(&devo_page[current_page]);
+    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
 }
 
 static void _navigate_pages(s8 direction)

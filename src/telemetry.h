@@ -99,7 +99,7 @@ struct telem_devo {
     u16 rpm[2];
 };
 struct telem_dsm_flog {
-    u8 fades[3];
+    u8 fades[4];
     u8 frameloss;
     u8 holds;
     u16 volt[2];
@@ -169,4 +169,5 @@ int TELEMETRY_HasAlarm(int src);
 u32 TELEMETRY_IsUpdated(int val);
 void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
+void TELEMETRY_SetType(int type);
 #endif

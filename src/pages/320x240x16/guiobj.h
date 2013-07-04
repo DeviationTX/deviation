@@ -196,8 +196,8 @@ struct telemcfg_obj {
 
 struct telemtest_obj {
    guiLabel_t msg;
-   guiLabel_t label[14];
-   guiLabel_t value[14];
+   guiLabel_t label[15];
+   guiLabel_t value[15];
 };
 
 struct timer_obj {

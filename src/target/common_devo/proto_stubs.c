@@ -28,6 +28,8 @@ extern void UART_Stop();
 extern void rcc_peripheral_disable_clock();
 extern void _usleep();
 extern void rand();
+extern void TELEMETRY_SetUpdated();
+extern void TELEMETRY_SetType();
 
 void PROTO_Stubs(int idx)
 {
@@ -40,6 +42,8 @@ void PROTO_Stubs(int idx)
     spi_read();
     spi_set_unidirectional_mode();
 
+    TELEMETRY_SetUpdated();
+    TELEMETRY_SetType();
     UART_Stop();
     rcc_peripheral_disable_clock();
     _usleep();

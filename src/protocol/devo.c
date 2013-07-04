@@ -530,6 +530,7 @@ static void initialize()
     failsafe_pkt = 0;
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
+    TELEMETRY_SetType(TELEM_DEVO);
     /*
     parse_telemetry_packet("203020.8270E\0");
     parse_telemetry_packet("35954.776N\0\0");

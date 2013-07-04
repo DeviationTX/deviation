@@ -358,38 +358,68 @@ static void calc_dsmx_channel()
     }
 }
 
+static int pkt16_to_u8(u8 *ptr)
+{
+    u32 value = ((u32)ptr[0] <<8) | ptr[1];
+    return value > 255 ? 255 : value;
+}
+static u32 pkt16_to_volt(u8 *ptr)
+{
+    return ((((u32)ptr[0] << 8) | ptr[1]) + 5) / 10;  //In 1/10 of Volts
+}
+
+static u32 pkt16_to_rpm(u8 *ptr)
+{
+    u32 value = ((u32)ptr[0] << 8) | ptr[1];
+    //In RPM (2 = number of poles)
+    //RPM = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
+    //by default number_of_poles = 2, gear_ratio = 1.00
+    if (value == 0xffff || value < 200)
+        value = 0;
+    else
+        value = 120000000 / 2 / value;
+    return value;
+}
+
+static s32 pkt16_to_temp(u8 *ptr)
+{
+    s32 value = ((s32)((s16)(ptr[0] << 8) | ptr[1]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
+    if (value > 500 || value < -100)
+        value = 0;
+    return value;
+}
+
 static void parse_telemetry_packet()
 {
     static s32 altitude;
+    static const u8 update7f[] = {
+                 TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
+                 TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
+                 TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
+                 TELEM_DSM_FLOG_VOLT2, 0};
+    static const u8 update7e[] = {
+                TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT1, TELEM_DSM_FLOG_TEMP1, 0};
+    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
+    static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, 0};
     const u8 *update = NULL;
-    
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
-            update = (const u8[]){TELEM_DEVO_VOLT2, 0};
-            //Telemetry.fadesA = ((s32)packet[2] << 8) | packet[3]; //0xFFFF = NC (not connected)
-            //Telemetry.fadesB = ((s32)packet[4] << 8) | packet[5]; //0xFFFF = NC (not connected)
-            //Telemetry.fadesL = ((s32)packet[6] << 8) | packet[7]; //0xFFFF = NC (not connected)
-            //Telemetry.fadesR = ((s32)packet[8] << 8) | packet[9]; //0xFFFF = NC (not connected)
-            //Telemetry.frameloss = ((s32)packet[10] << 8) | packet[11];
-            //Telemetry.holds = ((s32)packet[12] << 8) | packet[13];
-            Telemetry.p.devo.volt[1] = ((((s32)packet[14] << 8) | packet[15]) + 5) / 10;  //In 1/10 of Volts
+            update = update7f;
+            Telemetry.p.dsm.flog.fades[0] = pkt16_to_u8(packet+2); //FadesA 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[1] = pkt16_to_u8(packet+4); //FadesB 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[2] = pkt16_to_u8(packet+6); //FadesL 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[3] = pkt16_to_u8(packet+8); //FadesR 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.frameloss = pkt16_to_u8(packet+10);
+            Telemetry.p.dsm.flog.holds = pkt16_to_u8(packet+12);
+            Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
-            update = (const u8[]){TELEM_DEVO_RPM1, TELEM_DEVO_VOLT1, TELEM_DEVO_TEMP1, 0};
-            Telemetry.p.devo.rpm[0] = (packet[2] << 8) | packet[3];
-            if ((Telemetry.p.devo.rpm[0] == 0xffff) || (Telemetry.p.devo.rpm[0] < 200))
-            	  Telemetry.p.devo.rpm[0] = 0; 
-            else
-            	  Telemetry.p.devo.rpm[0] = 120000000 / 2 / Telemetry.p.devo.rpm[0]; //In RPM (2 = number of poles)
-                //Telemetry.rpm[0] = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
-                //by default number_of_poles = 2, gear_ratio = 1.00
-            Telemetry.p.devo.volt[0] = ((((s32)packet[4] << 8) | packet[5]) + 5) / 10;  //In 1/10 of Volts
-            Telemetry.p.devo.temp[0] = ((s32)((s16)(packet[6] << 8) | packet[7]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
-            if (Telemetry.p.devo.temp[0] > 500 || Telemetry.p.devo.temp[0] < -100)
-                Telemetry.p.devo.temp[0] = 0;
-            break;
+            update = update7e;
+            Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
+            Telemetry.p.dsm.flog.volt[0] = pkt16_to_volt(packet+4);  //In 1/10 of Volts
+            Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
             break;
@@ -479,7 +509,7 @@ static void parse_telemetry_packet()
                 //0x1d:MAX OFF CONDITION
             break;
         case 0x16: //GPS sensor (always second GPS packet)
-            update = (const u8[]){ TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
+            update = update16;
             altitude += (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
                        + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
             Telemetry.gps.altitude = altitude;
@@ -501,7 +531,7 @@ static void parse_telemetry_packet()
             //                      + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees (16Bit decimal, 1 unit is 0.1 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
-            update = (const u8[]){ TELEM_GPS_SPEED, TELEM_GPS_TIME, 0};
+            update = update17;
             Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
                                     + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 5556 / 108; //In m/s * 1000
             u8 hour  = (packet[7] >> 4) * 10 + (packet[7] & 0x0f);
@@ -686,6 +716,8 @@ static void initialize(u8 bind)
     else if (num_channels > 12)
         num_channels = 12;
 
+    memset(&Telemetry, 0, sizeof(Telemetry));
+    TELEMETRY_SetType(TELEM_DSM);
     CYRF_ConfigRxTx(1);
     if (bind) {
         state = DSM2_BIND;

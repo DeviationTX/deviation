@@ -38,26 +38,13 @@ const char * _devo_str_by_value(char *str, u8 telem, s32 value)
     switch(telem) {
         case TELEM_DEVO_VOLT1:
         case TELEM_DEVO_VOLT2:
-        case TELEM_DEVO_VOLT3:
-            sprintf(str, "%d.%dV", (int)value /10, (int)value % 10);
-            break;
+        case TELEM_DEVO_VOLT3: _get_volt_str(str, value); break;
         case TELEM_DEVO_TEMP1:
         case TELEM_DEVO_TEMP2:
         case TELEM_DEVO_TEMP3:
-        case TELEM_DEVO_TEMP4:
-            if (value == 0) {
-                strcpy(str, "----");
-            } else {
-                if (Transmitter.telem & TELEMUNIT_FAREN) {
-                    sprintf(str, "%dF", ((int)value * 9 + 160)/ 5);
-                } else {
-                    sprintf(str, "%dC", (int)value);
-                }
-            }
-            break;
+        case TELEM_DEVO_TEMP4: _get_temp_str(str, value); break;
         case TELEM_DEVO_RPM1:
-        case TELEM_DEVO_RPM2:
-            sprintf(str, "%d", (int)value);
+        case TELEM_DEVO_RPM2:  sprintf(str, "%d", (int)value);
             break;
     }
     return str;

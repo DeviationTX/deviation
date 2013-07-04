@@ -18,10 +18,12 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
+static void _get_volt_str(char *str, u32 value);
+static void _get_temp_str(char *str, int value);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
 
-#define CAP_DSM 0
+#define CAP_DSM 1
 
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
@@ -33,6 +35,23 @@ static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
+void _get_volt_str(char *str, u32 value)
+{
+    sprintf(str, "%d.%dV", (int)value /10, (int)value % 10);
+}
+
+void _get_temp_str(char *str, int value)
+{
+    if (value == 0) {
+        strcpy(str, "----");
+    } else {
+        if (Transmitter.telem & TELEMUNIT_FAREN) {
+            sprintf(str, "%dF", ((int)value * 9 + 160)/ 5);
+        } else {
+            sprintf(str, "%dC", (int)value);
+        }
+    }
+}
 u32 TELEMETRY_IsUpdated(int val)
 {
     if (val == 0xff) {
@@ -163,8 +182,14 @@ void TELEMETRY_SetUpdated(int telem)
 
 int TELEMETRY_Type()
 {
-    //return (Telemetry.capabilities & CAP_DSM) ? TELEM_DSM : TELEM_DEVO;
-    return TELEM_DEVO;
+    return (Telemetry.capabilities & CAP_DSM) ? TELEM_DSM : TELEM_DEVO;
+}
+void TELEMETRY_SetType(int type)
+{
+    if (type == TELEM_DSM)
+        Telemetry.capabilities |= CAP_DSM;
+    else
+        Telemetry.capabilities &= ~CAP_DSM;
 }
 
 //#define DEBUG_TELEMALARM
