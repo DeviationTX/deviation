@@ -94,7 +94,8 @@ static const char *time_cb(guiObject_t *obj, const void *data) {
 s16 trim_cb(void * data)
 {
     long i = (long)data;
-    return *(MIXER_GetTrim(i));
+    int value = *MIXER_GetTrim(i);
+    return PCT_TO_RANGE(value);
 }
 
 s16 bar_cb(void * data)
@@ -311,7 +312,7 @@ void show_elements()
                 if (src == 0)
                     continue;
                 mp->elem[i] = *(MIXER_GetTrim(src-1));
-                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, -100, 100,
+                GUI_CreateBarGraph(&gui->elem[i].bar, x, y, w, h, -10000, 10000,
                     type == ELEM_VTRIM ? TRIM_VERTICAL : TRIM_INVHORIZONTAL, trim_cb, (void *)(long)(src-1));
                 break;
             }

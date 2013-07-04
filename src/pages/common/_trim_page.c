@@ -60,15 +60,22 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -101, 101, dir, 1, 5, NULL);
-    if (*value == -101) {
+    u8 *value = (u8 *)data;
+    //place switches before 0.1 on the spinbox
+    u8 v = ((int)*value + TRIM_SWITCH_TYPES - 1) % (190 + TRIM_SWITCH_TYPES);
+    v = GUI_TextSelectHelper(v, 0, 190 + TRIM_SWITCH_TYPES - 1, dir, 1, 5, NULL);
+    *value = ((int)v + 190) % (190 + TRIM_SWITCH_TYPES) + 1;
+
+    if (*value == TRIM_MOMENTARY) {
         strcpy(tp->tmpstr, _tr("Momentary"));
-    } else if (*value == 101) {
+    } else if (*value == TRIM_TOGGLE) {
         strcpy(tp->tmpstr, _tr("Toggle"));
+    } else if (*value == TRIM_ONOFF) {
+        strcpy(tp->tmpstr, _tr("On/Off"));
+    } else if (*value < 100) {
+        sprintf(tp->tmpstr, "%d.%d", *value / 10, *value % 10);
     } else {
-        s8 val = *value < 0 ? -*value : *value;
-        sprintf(tp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "",val / 10, val % 10);
+        sprintf(tp->tmpstr, "%d", *value - 90);
     }
     return tp->tmpstr;
 }

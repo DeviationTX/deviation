@@ -26,6 +26,13 @@
 #define MIXER_SET_APPLY_TRIM(x,y) ((x)->flags = ((x)->flags & ~0x10) | ((y) ? 0x10 : 0))
 #define MIXER_SET_MUX(x,y)        ((x)->flags = ((x)->flags & ~0x0F) | (y))
 
+enum {
+    TRIM_ONOFF     = 191,
+    TRIM_TOGGLE    = 192,
+    TRIM_MOMENTARY = 193,
+    TRIM_SWITCH_TYPES = 3,
+};
+
 enum Safety {
     SAFE_NONE,
     SAFE_MIN,
@@ -157,7 +164,7 @@ struct Trim {
     u8 src;
     u8 pos;
     u8 neg;
-    s8 step;
+    u8 step;
     u8 sw;
     s8 value[3];
 };
@@ -202,6 +209,7 @@ u8 MIXER_MapChannel(u8 channel);
 void MIXER_AdjustForProtocol();
 u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data);
 s8 *MIXER_GetTrim(u8 i);
+s32 MIXER_GetTrimValue(int i);
 
 void MIXER_Init();
 

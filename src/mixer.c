@@ -409,15 +409,22 @@ s8 *MIXER_GetTrim(u8 i)
     return &Model.trims[i].value[0];
 }
 
+s32 MIXER_GetTrimValue(int i)
+{
+    s32 value = *(MIXER_GetTrim(i));
+    //0 to 100 step is 0.1
+    if (Model.trims[i].step < 10)
+        return PCT_TO_RANGE(value * Model.trims[i].step) / 10;
+    else
+        return PCT_TO_RANGE(value);
+}
+
 s32 get_trim(u8 src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
-            s32 value = *(MIXER_GetTrim(i));
-            if (Model.trims[i].step == -101 || Model.trims[i].step == 101)
-                return PCT_TO_RANGE(value);
-            return PCT_TO_RANGE(value * Model.trims[i].step) / 10;
+            return MIXER_GetTrimValue(i);
         }
     }
     return 0;
@@ -638,20 +645,22 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
-static void _trim_as_switch(u8 flags, int i)
+static void _trim_as_switch(u8 flags, int i, int is_neg)
 {
-    if(Model.trims[i].step == -101) {
+    s8 *value = MIXER_GetTrim(i);
+    if(Model.trims[i].step == TRIM_MOMENTARY) {
         //Momentarty
-        s8 *value = MIXER_GetTrim(i);
         if (flags & BUTTON_PRESS) {
             *value = 100;
         } else if (flags & BUTTON_RELEASE) {
             *value = -100;
         }
-    } else {
-        //Toggle
-        s8 *value = MIXER_GetTrim(i);
-        if (flags & BUTTON_PRESS) {
+    } else if (flags & BUTTON_PRESS) {
+        if (Model.trims[i].step == TRIM_ONOFF) {
+            //On/Off
+            *value = is_neg ? -100 : 100;
+        } else {
+            //Toggle
             *value = *value == -100 ? 100 : -100;
         }
     }
@@ -664,30 +673,36 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
 #define START_TONE 1000
     (void)data;
     int i;
-    s8 step_size = 1;
+    int orig_step_size = 1;
     int tmp;
     u8 reach_end = 0; // reach either 100 , 0, or -100
-    if (flags & BUTTON_PRESS)
-        step_size = 1;
     if (flags & BUTTON_LONGPRESS) {
-        if (step_size == 1)
-            step_size = 9;
-        else if (step_size == 9)
-            step_size = 10;
+        if (orig_step_size == 1)
+            orig_step_size = 9;
+        else if (orig_step_size == 9)
+            orig_step_size = 10;
     }
-    if (! step_size)
+    if (! orig_step_size)
         return 1;
     u8 volume = 10 * Transmitter.volume;
     for (i = 0; i < NUM_TRIMS; i++) {
+        int step_size = orig_step_size;
         reach_end = 0;
-        if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg) || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
-            if (Model.trims[i].step == -101 || Model.trims[i].step == 101) {
-                _trim_as_switch(flags, i);
+        int neg_button = CHAN_ButtonIsPressed(buttons, Model.trims[i].neg);
+        if (neg_button || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
+            if (Model.trims[i].step > 190) {
+                _trim_as_switch(flags, i, neg_button);
                 continue;
             }
             if (flags & BUTTON_RELEASE)
                 continue;
-            if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg))
+            int max = 100;
+            if (Model.trims[i].step >= 100) {
+                step_size = Model.trims[i].step - 90;
+            } else if (Model.trims[i].step > 10) {
+                step_size = step_size * Model.trims[i].step / 10;
+            }
+            if (neg_button)
                 step_size = -step_size;
             s8 *value = MIXER_GetTrim(i);
             tmp = (int)(*value) + step_size;
@@ -698,10 +713,10 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
             } else if ((int)*value < 0 && tmp >= 0) {
                 *value = 0;
                 reach_end = 1;
-            } else if (tmp > 100) {
+            } else if (tmp > max) {
                 *value = 100;
                 reach_end = 1;
-            } else if (tmp < -100) {
+            } else if (tmp < -max) {
                 *value = -100;
                 reach_end = 1;
             } else {
