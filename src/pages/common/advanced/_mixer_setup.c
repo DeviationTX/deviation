@@ -379,12 +379,14 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
     MIXER_SET_SRC_INV(*source, is_neg);
     if (changed) {
-        guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
-        if(trim) {
-            if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
-                GUI_SetHidden(trim, 0);
-            else
-                GUI_SetHidden(trim, 1);
+        if(mp->cur_template == MIXERTEMPLATE_COMPLEX) {
+            guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
+            if(trim) {
+                if (MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
+                    GUI_SetHidden(trim, 0);
+                else
+                    GUI_SetHidden(trim, 1);
+            }
         }
         sync_mixers();
         MIXPAGE_RedrawGraphs();
