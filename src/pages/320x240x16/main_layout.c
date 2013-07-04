@@ -323,9 +323,11 @@ void show_config()
          x, LAYDLG_Y,
          width, LAYDLG_HEIGHT,
          _tr("Page Config"), NULL, dialog_ok_cb, dtOk, "");
+
     GUI_CreateScrollable(&gui->scrollable,
          x + LAYDLG_SCROLLABLE_X, LAYDLG_Y + LAYDLG_SCROLLABLE_Y,
-         width - 2 * LAYDLG_SCROLLABLE_X, LAYDLG_HEIGHT - 2 * LAYDLG_SCROLLABLE_Y,
+         width - 2 * LAYDLG_SCROLLABLE_X + 1, 
+         LAYDLG_SCROLLABLE_HEIGHT,
          LAYDLG_TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, (void *)type);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }
