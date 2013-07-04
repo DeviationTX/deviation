@@ -61,9 +61,15 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     s8 *value = (s8 *)data;
-    *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, 5, NULL);
-    s8 val = *value < 0 ? -*value : *value;
-    sprintf(tp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "",val / 10, val % 10);
+    *value = GUI_TextSelectHelper(*value, -101, 101, dir, 1, 5, NULL);
+    if (*value == -101) {
+        strcpy(tp->tmpstr, _tr("Momentary"));
+    } else if (*value == 101) {
+        strcpy(tp->tmpstr, _tr("Toggle"));
+    } else {
+        s8 val = *value < 0 ? -*value : *value;
+        sprintf(tp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "",val / 10, val % 10);
+    }
     return tp->tmpstr;
 }
 

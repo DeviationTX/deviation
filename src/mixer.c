@@ -415,6 +415,8 @@ s32 get_trim(u8 src)
     for (i = 0; i < NUM_TRIMS; i++) {
         if (MIXER_MapChannel(Model.trims[i].src) == src) {
             s32 value = *(MIXER_GetTrim(i));
+            if (Model.trims[i].step == -101 || Model.trims[i].step == 101)
+                return PCT_TO_RANGE(value);
             return PCT_TO_RANGE(value * Model.trims[i].step) / 10;
         }
     }
@@ -452,7 +454,7 @@ void MIXER_RegisterTrimButtons()
         mask |= CHAN_ButtonMask(Model.trims[i].neg);
         mask |= CHAN_ButtonMask(Model.trims[i].pos);
     }
-    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS, MIXER_UpdateTrim, NULL);
+    BUTTON_RegisterCallback(&button_action, mask, BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE, MIXER_UpdateTrim, NULL);
 }
 enum TemplateType MIXER_GetTemplate(int ch)
 {
@@ -636,6 +638,25 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
+static void _trim_as_switch(u8 flags, int i)
+{
+    if(Model.trims[i].step == -101) {
+        //Momentarty
+        s8 *value = MIXER_GetTrim(i);
+        if (flags & BUTTON_PRESS) {
+            *value = 100;
+        } else if (flags & BUTTON_RELEASE) {
+            *value = -100;
+        }
+    } else {
+        //Toggle
+        s8 *value = MIXER_GetTrim(i);
+        if (flags & BUTTON_PRESS) {
+            *value = *value == -100 ? 100 : -100;
+        }
+    }
+}
+
 static u32 last_trim_music_time = 0;
 u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
 {
@@ -660,6 +681,12 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
     for (i = 0; i < NUM_TRIMS; i++) {
         reach_end = 0;
         if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg) || CHAN_ButtonIsPressed(buttons, Model.trims[i].pos)) {
+            if (Model.trims[i].step == -101 || Model.trims[i].step == 101) {
+                _trim_as_switch(flags, i);
+                continue;
+            }
+            if (flags & BUTTON_RELEASE)
+                continue;
             if (CHAN_ButtonIsPressed(buttons, Model.trims[i].neg))
                 step_size = -step_size;
             s8 *value = MIXER_GetTrim(i);

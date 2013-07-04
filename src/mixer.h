@@ -157,7 +157,7 @@ struct Trim {
     u8 src;
     u8 pos;
     u8 neg;
-    u8 step;
+    s8 step;
     u8 sw;
     s8 value[3];
 };
