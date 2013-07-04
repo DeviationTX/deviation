@@ -79,7 +79,15 @@ int _RTC_GetMinute(u32 value)
 
 int _RTC_GetHour(u32 value)
 {
-    return (int)(value / 3600) % ((Transmitter.clock12hr) ? 12 : 24);
+    value /= 3600;
+    if (Transmitter.clock12hr) {
+       value %= 12;
+       if (value == 0)
+           value = 12;
+    } else {
+        value %= 24;
+    }
+    return value;
 }
 
 int _RTC_GetDay(u32 value)
