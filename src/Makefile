@@ -153,7 +153,7 @@ $(VERBOSE).SILENT:
 
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list \
-		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.P  $(ODIR)/*.bin
+		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin
 
 distclean:
 	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
@@ -293,6 +293,15 @@ $(ODIR)/%.o: $(1)%.c
 $(ODIR)/%.o: $(1)%.cpp
 	@echo " + Compiling '$$<'"
 	$(CXX) $$(CXXFLAGS) -MD -c -o $$@ $$<
+	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
+            sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
+                -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
+            rm -f $(ODIR)/$$*.d
+
+#For module building
+$(ODIR)/%.o_: $(1)%.c
+	@echo " + Compiling '$$<' as module"
+	$(CC) $$(CFLAGS) $$(MODULE_FLAGS) -MD -c -o $$@ $$<
 	@cp $(ODIR)/$$*.d $(ODIR)/$$*.P; \
             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$(dollar)//' \
                 -e '/^$$(dollar)/ d' -e 's/$$(dollar)/ :/' < $(ODIR)/$$*.d >> $(ODIR)/$$*.P; \
