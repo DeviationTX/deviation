@@ -1,0 +1,51 @@
+The module system ysed by deviation for the Devo7e is basically a program running
+in RAM that can executue any available functions from ROM.
+
+Since a RAM->ROM call requires bx/blx, we must ensure long calls are made.
+
+This is done by adding: '#pragma long_calls' before any includes are done.
+Since we don't want code within the program itself touse long-calls (they take
+more space), we add '#pragma no_long_calls' after all files are included
+
+There are some cases where the only usage of a 'ROM' function is in the program,
+in which case the lnker will optimize those functions out of the code.
+The solution to this is to add the functions to target/common_devo/proto_stubs.c
+which ensures they are not discarded from the ROM image.
+
+The memory addresses for all ROM functions are included in a symbolfile that is
+generated during compilation.  Note that the linker assumes all functions in the
+symbolfilke are ARM32, and so generates a thumb->ARM32 trampoline function if
+allowed to.  The above #pragma will generally prevent this from occurring,
+however.  The Makefiule includes a check to see if any trampolines with
+'from_thumb' names were created and aborts when this does occur for safety sake.
+
+There is one case in which the above #pragma is ignored.  If a gcc builtin function
+(see list here: http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html) is called,
+and is not inlined, gcc will generate a short-call to this function, which results
+in a thumb->ARM trampoline being generated.
+
+There are 2 known work-arounds to this issue:
+1) use -fno-builtin to prevent use of builtin functions (which could be sub-optimal)
+2) use assembly to define function addresses rather than a symbolfile (which will
+still reuslt in a trampoline function, but at leats it is a correct one)
+
+Deviation uses option (1), which generally produces smaller code of the options.
+Since this disables all builtins, we can re-enable builtins that actually compile
+properly inline via '#define abs __builtin_abs' for instance
+
+Here is documentation for using assmebly instead of a symbolfile:
+
+symbolfile:
+memset = 0x0801c8b9;
+
+becomes:
+symbolfile.s:
+	.global	memset
+	.type memset %function
+	.equ	memset, 0x0801c8b9
+
+then compile as:
+arm-none-eabi-as -o symbolfile.o symbolfile.s
+and add to the linker obj files.
+
+
