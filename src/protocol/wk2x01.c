@@ -28,6 +28,8 @@
   #pragma long_calls_off
   extern unsigned _data_loadaddr;
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
+  //Force the following functions to be builtin 
+  #define abs __builtin_abs
 #endif
 #include <stdlib.h>
 

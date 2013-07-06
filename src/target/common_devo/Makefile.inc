@@ -18,6 +18,8 @@ SRC_C   += $(wildcard target/common_devo/protocol/*.c) \
 endif
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Itarget/common_devo/msc2/lib -Itarget/common_devo/msc2 -Ilibopencm3/include -fno-builtin-printf -Os
+MODULE_FLAGS = -fno-builtin
+
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc
 LFLAGS2  = -Wl,-T$(LINKFILE)
@@ -51,7 +53,7 @@ $(TARGET).dfu: $(TARGET).bin
 ###################################
 #The protocol modules (if needed) #
 ###################################
-$(ODIR)/%.bin: $(ODIR)/%.o $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
+$(ODIR)/%.bin: $(ODIR)/%.o_ $(PROTO_LINKFILE) $(PROTO_EXTRA_OBJS) $(TARGET).bin
 	@echo " + Building '$@'"
 	$(LD) -o $(@:.bin=.elf) $< $(PROTO_EXTRA_OBJS) -gc-sections -Map=$(@:.bin=.map) \
 		--cref -T$(PROTO_LINKFILE) --just-symbols=$(SYMBOL_FILE)
