@@ -41,6 +41,7 @@ static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 
 static u32 sessionid;
 static const u32 txid = 0xdb042679;
 static u8 state;
+static u8 pcount;
 enum {
     BIND_1,
     BIND_2,
@@ -190,7 +191,6 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 static void hubsan_build_packet()
 {
-    static u32 pcount=0;
     memset(packet, 0, 16);
     //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
     packet[0] = 0x20;
@@ -306,6 +306,7 @@ static void initialize() {
     channel = allowed_ch[rand() % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
+    pcount=0;
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
