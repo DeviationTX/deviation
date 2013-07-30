@@ -108,7 +108,7 @@ cc : throttle  observed range: 0x00 - 0xff (smaller is down)
 ee : rudder    observed range: 0x34 - 0xcc (smaller is right)
 gg : elevator  observed range: 0x3e - 0xbc (smaller is up)
 ii : aileron   observed range: 0x45 - 0xc3 (smaller is right)
-jj : bit 0x02 is set all the time, on the H107-L setting bit 0x04 switch lights on, setting bit 0x08 to enable flips
+jj : bit 0x02 is always set, on the H107-L setting bit 0x04 switch lights on, setting bit 0x08 enable flips
 llmmnnoo: Transmiter ID(?)
 pp : checksum
 Checksums:
