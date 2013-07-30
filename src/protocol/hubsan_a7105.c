@@ -205,7 +205,7 @@ static void hubsan_build_packet()
     packet[8] = get_channel(0, 0x80, 0x80, 0x80);
     if(packet_count < 100)
     {
-        packet[9] = 0x0e;
+        packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
         packet_count++;
     }
     else
