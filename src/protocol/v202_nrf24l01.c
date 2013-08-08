@@ -49,9 +49,27 @@
 
 
 enum {
-    FLAG_FLIP = 0x04,
-    FLAG_LED  = 0x10,
-    FLAG_BIND = 0xC0
+    FLAG_CAMERA = 0x01, // also automatic Missile Launcher and Hoist in one direction
+    FLAG_VIDEO  = 0x02, // also Sprayer, Bubbler, Missile Launcher(1), and Hoist in the other dir.
+    FLAG_FLIP   = 0x04,
+    FLAG_UNK9   = 0x08,
+    FLAG_LED    = 0x10,
+    FLAG_UNK10  = 0x20,
+    FLAG_BIND   = 0xC0
+};
+
+// For code readability
+enum {
+    CHANNEL1 = 0,
+    CHANNEL2,
+    CHANNEL3,
+    CHANNEL4,
+    CHANNEL5,
+    CHANNEL6,
+    CHANNEL7,
+    CHANNEL8,
+    CHANNEL9,
+    CHANNEL10
 };
 
 #define PAYLOADSIZE 16
@@ -63,7 +81,7 @@ static u8 rf_ch_num;
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
-//static u8 auto_flip; // Channel 6 < 0 - disabled >= 0 - enabled
+//static u8 auto_flip; // Channel 6 <= 0 - disabled > 0 - enabled
 static u16 led_blink_count;
 static u8 throttle, rudder, elevator, aileron, flags;
 
@@ -237,27 +255,33 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     // CHAN_MAX_VALUE. As we have no space here, we hard-limit
     // channels values by min..max range
     u8 a;
-    *throttle = convert_channel(2);
 
-    a = convert_channel(3);
+    // Channel 3
+    *throttle = convert_channel(CHANNEL3);
+
+    // Channel 4
+    a = convert_channel(CHANNEL4);
     *rudder = a < 0x80 ? 0x7f - a : a;
 
-    a = convert_channel(1);
+    // Channel 2
+    a = convert_channel(CHANNEL2);
     *elevator = a < 0x80 ? 0x7f - a : a;
 
-    a = convert_channel(0);
+    // Channel 1
+    a = convert_channel(CHANNEL1);
     *aileron = a < 0x80 ? 0x7f - a : a;
 
+    // Channel 5
     // 512 - slow blinking (period 4ms*2*512 ~ 4sec), 64 - fast blinking (4ms*2*64 ~ 0.5sec)
     u16 new_led_blink_count;
-    s32 ch = Channels[4];
+    s32 ch = Channels[CHANNEL5];
     if (ch == CHAN_MIN_VALUE) {
         new_led_blink_count = BLINK_COUNT_MAX + 1;
     } else if (ch == CHAN_MAX_VALUE) {
         new_led_blink_count = BLINK_COUNT_MIN - 1;
     } else {
         new_led_blink_count = (BLINK_COUNT_MAX+BLINK_COUNT_MIN)/2 -
-            ((s32) Channels[4] * (BLINK_COUNT_MAX-BLINK_COUNT_MIN) / (2*CHAN_MAX_VALUE));
+            ((s32) Channels[CHANNEL5] * (BLINK_COUNT_MAX-BLINK_COUNT_MIN) / (2*CHAN_MAX_VALUE));
     }
     if (*led_blink_count != new_led_blink_count) {
         if (counter > new_led_blink_count) counter = new_led_blink_count;
@@ -265,8 +289,25 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     }
 
 
-    if (Channels[5] < 0) *flags &= ~FLAG_FLIP;
+    // Channel 6
+    if (Channels[CHANNEL6] <= 0) *flags &= ~FLAG_FLIP;
     else *flags |= FLAG_FLIP;
+
+    // Channel 7
+    if (Channels[CHANNEL7] <= 0) *flags &= ~FLAG_CAMERA;
+    else *flags |= FLAG_CAMERA;
+
+    // Channel 8
+    if (Channels[CHANNEL8] <= 0) *flags &= ~FLAG_VIDEO;
+    else *flags |= FLAG_VIDEO;
+
+    // Channel 9
+    if (Channels[CHANNEL9] <= 0) *flags &= ~FLAG_UNK9;
+    else *flags |= FLAG_UNK9;
+
+    // Channel 10
+    if (Channels[CHANNEL10] <= 0) *flags &= ~FLAG_UNK10;
+    else *flags |= FLAG_UNK10;
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -443,7 +484,7 @@ const void *V202_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)6L; // T, R, E, A, LED (on/off/blink), Auto flip
+        case PROTOCMD_NUMCHAN: return (void *) 10L; // T, R, E, A, LED (on/off/blink), Auto flip, 4 unknown flags
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
