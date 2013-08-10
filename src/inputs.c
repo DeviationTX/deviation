@@ -97,7 +97,7 @@ static void get_input_str(int src, const char **ptr, int *idx)
     #undef CHANDEF
 }
 
-static const char *_get_source_name(char *str, u8 src, int switchname)
+static const char *_get_source_name(char *str, u8 src, int switchname, int ignore_rename)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
     src = MIXER_SRC(src);
@@ -116,7 +116,7 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
         sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Ch"), src - NUM_INPUTS);
     } else if(src <= NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) {
         int virt = src - NUM_INPUTS - NUM_OUT_CHANNELS;
-        if (Model.virtname[virt-1][0]) {
+        if (! ignore_rename && Model.virtname[virt-1][0]) {
             sprintf(str, "%s%s", is_neg ? "!" : "", Model.virtname[virt-1]);
         } else {
             sprintf(str, "%s%s%d", is_neg ? "!" : "", _tr("Virt"), src - NUM_INPUTS - NUM_OUT_CHANNELS);
@@ -128,11 +128,22 @@ static const char *_get_source_name(char *str, u8 src, int switchname)
 }
 const char *INPUT_SourceName(char *str, u8 src)
 {
-    return _get_source_name(str, src, 1);
+    return _get_source_name(str, src, 1, 0);
+}
+const char *INPUT_SourceNameReal(char *str, u8 src)
+{
+    // Use 'Virt' instead of renamed value
+    return _get_source_name(str, src, 1, 1);
 }
 const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
 {
-    _get_source_name(str, src, 0);
+    _get_source_name(str, src, 0, 0);
+    return str;
+}
+const char *INPUT_SourceNameAbbrevSwitchReal(char *str, u8 src)
+{
+    // Use 'Virt' instead of renamed value
+    _get_source_name(str, src, 0, 1);
     return str;
 }
 

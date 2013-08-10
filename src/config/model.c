@@ -194,7 +194,7 @@ static u8 get_source(const char *section, const char *value)
     const char *tmp;
     char cmp[10];
     for (i = 0; i <= NUM_SOURCES; i++) {
-        if(mapstrcasecmp(INPUT_SourceName(cmp, i), ptr) == 0) {
+        if(mapstrcasecmp(INPUT_SourceNameReal(cmp, i), ptr) == 0) {
             return ((ptr == value) ? 0 : 0x80) | i;
         }
     }
@@ -436,7 +436,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
                 return 1;
             for (int j = 0; j <= NUM_SOURCES; j++) {
                 char cmp[10];
-                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, j), ptr+1) == 0) {
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitchReal(cmp, j), ptr+1) == 0) {
                     data[5] = j;
                     break;
                 }
@@ -726,7 +726,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if (MATCH_KEY(TRIM_SWITCH)) {
             for (int i = 0; i <= NUM_SOURCES; i++) {
                 char cmp[10];
-                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitch(cmp, i), value) == 0) {
+                if(mapstrcasecmp(INPUT_SourceNameAbbrevSwitchReal(cmp, i), value) == 0) {
                     m->trims[idx].sw = i;
                     return 1;
                 }
@@ -975,10 +975,10 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
             continue;
         changed = 1;
         fprintf(fh, "[%s]\n", SECTION_MIXER);
-        fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceName(tmpstr, m->mixers[idx].src));
-        fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceName(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
+        fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
+        fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
         if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
-            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceName(tmpstr, m->mixers[idx].sw));
+            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceNameReal(tmpstr, m->mixers[idx].sw));
         if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
             fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
         if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
@@ -1079,7 +1079,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
         if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
-            fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceName(file, m->limits[idx].safetysw));
+            fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceNameReal(file, m->limits[idx].safetysw));
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1122,7 +1122,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", PPMIN_MODE, PPMIN_MODE_VALUE[PPMin_Mode()]);
         fprintf(fh, "%s=%d\n", PPMIN_NUM_CHANNELS, (m->num_ppmin & 0x3F));
         if (PPMin_Mode() != PPM_IN_SOURCE) {
-            fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceName(file, m->train_sw));
+            fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceNameReal(file, m->train_sw));
         }
         fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
         fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
@@ -1131,7 +1131,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             for(idx = 0; idx < MAX_PPM_IN_CHANNELS; idx++) {
                 if (m->ppm_map[idx] == -1)
                     continue;
-                fprintf(fh, "%s%d=%s\n", PPMIN_MAP, idx + 1, INPUT_SourceName(file, m->ppm_map[idx] + offset));
+                fprintf(fh, "%s%d=%s\n", PPMIN_MAP, idx + 1, INPUT_SourceNameReal(file, m->ppm_map[idx] + offset));
             }
         }
         fprintf(fh, "\n");
@@ -1143,11 +1143,11 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", TRIM_SOURCE,
              m->trims[idx].src >= 1 && m->trims[idx].src <= 4 
              ? tx_stick_names[m->trims[idx].src-1]
-             : INPUT_SourceName(file, m->trims[idx].src));
+             : INPUT_SourceNameReal(file, m->trims[idx].src));
         fprintf(fh, "%s=%s\n", TRIM_POS, INPUT_ButtonName(m->trims[idx].pos));
         fprintf(fh, "%s=%s\n", TRIM_NEG, INPUT_ButtonName(m->trims[idx].neg));
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
-            fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitch(file, m->trims[idx].sw));
+            fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
         if(WRITE_FULL_MODEL || m->trims[idx].step != 1)
             fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2])
@@ -1177,9 +1177,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
             fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
         if (WRITE_FULL_MODEL || m->timer[idx].src != 0)
-            fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceName(file, m->timer[idx].src));
+            fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceNameReal(file, m->timer[idx].src));
         if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
-            fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceName(file, m->timer[idx].resetsrc));
+            fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceNameReal(file, m->timer[idx].resetsrc));
         if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
         if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
@@ -1196,7 +1196,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #if DATALOG_ENABLED
     fprintf(fh, "[%s]\n", SECTION_DATALOG);
-    fprintf(fh, "%s=%s\n", DATALOG_SWITCH, INPUT_SourceName(file, m->datalog.enable));
+    fprintf(fh, "%s=%s\n", DATALOG_SWITCH, INPUT_SourceNameReal(file, m->datalog.enable));
     fprintf(fh, "%s=%s\n", DATALOG_RATE, DATALOG_RateString(m->datalog.rate));
     for(idx = 0; idx < DLOG_LAST; idx++) {
         if(m->datalog.source[DATALOG_BYTE(idx)] & (1 << DATALOG_POS(idx)))
@@ -1206,7 +1206,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
-            fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceName(file, i), SAFETY_VAL[m->safety[i]]);
+            fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceNameReal(file, i), SAFETY_VAL[m->safety[i]]);
         }
     }
     fprintf(fh, "[%s]\n", SECTION_GUI);
@@ -1225,14 +1225,14 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 break;
             case ELEM_BAR:
                 src += NUM_INPUTS;
-                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, INPUT_SourceName(file, src));
+                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, INPUT_SourceNameReal(file, src));
                 break;
             case ELEM_TOGGLE:
                 fprintf(fh, "%s=%d,%d,%d,%d,%d,%s\n", elename, x, y,
                         Model.pagecfg2.elem[idx].extra[0],
                         Model.pagecfg2.elem[idx].extra[1],
                         INPUT_NumSwitchPos(src) == 2 ? 0 : Model.pagecfg2.elem[idx].extra[2],
-                        INPUT_SourceNameAbbrevSwitch(file, src));
+                        INPUT_SourceNameAbbrevSwitchReal(file, src));
                 break;
             case ELEM_HTRIM:
             case ELEM_VTRIM:
