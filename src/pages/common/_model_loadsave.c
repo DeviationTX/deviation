@@ -170,6 +170,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         }
         CONFIG_ReadLayout(mp->tmpstr);
     }
+    PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     mp->return_page(-1);  // -1 for devo10 means return to the focus of previous page, which is important so that users don't need to scroll down from the 1st item
 }
