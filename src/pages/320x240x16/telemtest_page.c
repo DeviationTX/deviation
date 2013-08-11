@@ -126,7 +126,6 @@ void PAGE_TelemtestEvent() {
             font = &TELEM_ERR_FONT;
         }
         GUI_SetLabelDesc(&gui->value[i], font);
-        i++;
     }
     tp.telem = cur_telem;
 }
