@@ -209,7 +209,10 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     int y = scrollable->header.box.y;
-    for(row = scrollable->cur_row; y < scrollable->header.box.y + scrollable->header.box.height; row++, rel_row++) {
+    for(row = scrollable->cur_row;
+        y < scrollable->header.box.y + scrollable->header.box.height && row < scrollable->item_count;
+        row++, rel_row++)
+    {
         int num_rows = scrollable->size_cb ? scrollable->size_cb(row, scrollable->cb_data) : 1;
         if (rel_row + num_rows > scrollable->max_visible_rows)
             break;
