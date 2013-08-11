@@ -26,7 +26,7 @@
 #define pc Model.pagecfg2
 
 #define NUMERIC_LABELS
-#define HEADER_Y 10
+#define HEADER_Y 1
 #include "../common/_main_layout.c"
 
 static const char *pos_cb(guiObject_t *obj, const void *data);
@@ -85,7 +85,7 @@ void ypos_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     if (lp.selected_for_move >= 0) {
-        int y = GUI_TextSelectHelper(lp.selected_y, 10, LCD_HEIGHT-lp.selected_h, dir, 1, 10, NULL);
+        int y = GUI_TextSelectHelper(lp.selected_y, HEADER_Y, LCD_HEIGHT-lp.selected_h, dir, 1, 10, NULL);
         if (y != lp.selected_y) {
             lp.selected_y = y;
             move_elem();
