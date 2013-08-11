@@ -24,6 +24,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 void PAGE_SplashInit(int page)
 {
     (void)page;
+    if(Transmitter.splash_delay == 0) {
+        PAGE_ChangeByID(PAGEID_MAIN, 0);
+        return;
+    }
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     u16 w, h;
@@ -46,9 +50,11 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 void PAGE_SplashEvent()
 {
     static unsigned int time=0;
+    if(GUI_IsModal())
+       return;
 //    u8 step = 5;
     if ( 0 == time )
-    	time = CLOCK_getms()+ 3500; // 3 sec.
+    	time = CLOCK_getms() + Transmitter.splash_delay * 100;
     if ( CLOCK_getms() > time ) 
 	PAGE_ChangeByID(PAGEID_MAIN,0);
 /*     if ( offset > 0 ) {
