@@ -14,6 +14,7 @@
 #define HAS_VIBRATINGMOTOR 0
 #define HAS_LOGICALVIEW 0
 #define DATALOG_ENABLED 1
+#define ENABLE_320x240_GUI 1 //Enable support for 320x240 gui items as well as 480x360 ones
 
 #define MIN_BRIGHTNESS 1 
 #define DEFAULT_BATTERY_ALARM 4000

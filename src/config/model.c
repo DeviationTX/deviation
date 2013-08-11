@@ -168,6 +168,7 @@ static const char DATALOG_RATE[] = "rate";
 static const char SECTION_GUI[] = "gui-" STRINGIFY(LCD_WIDTH) "x" STRINGIFY(LCD_HEIGHT);
 static const char GUI_QUICKPAGE[] = "quickpage";
 
+ 
 s8 mapstrcasecmp(const char *s1, const char *s2)
 {
     int i = 0;
@@ -330,6 +331,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
 {
     struct Model *m = (struct Model *)user;
     u16 i;
+    int offset_x = 0, offset_y = 0;
     CLOCK_ResetWatchdog();
     int idx;
     if (MATCH_START(name, GUI_QUICKPAGE)) {
@@ -348,12 +350,36 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
         return 1;
     }
+#if ENABLE_320x240_GUI
+    static u8 seen_res = 0;
+    enum {
+        LOWRES = 1,
+        HIRES,
+    };
+    if (! MATCH_SECTION(SECTION_GUI)) {
+        if(MATCH_SECTION("gui-320x240")
+           && (! ELEM_USED(Model.pagecfg2.elem[0]) || seen_res != HIRES))
+        {
+            seen_res = LOWRES;
+            offset_x = (LCD_WIDTH - 320) / 2;
+            offset_y = (LCD_HEIGHT - 240) / 2;
+        } else
+            return 1;
+    } else {
+        if (seen_res == LOWRES) {
+            memset(&Model.pagecfg2.elem, 0, sizeof(Model.pagecfg2.elem));
+        }
+        seen_res = HIRES;
+    }
+#else 
     if (! MATCH_SECTION(SECTION_GUI))
         return 1;
+#endif
     for (idx = 0; idx < NUM_ELEMS; idx++) {
         if (! ELEM_USED(Model.pagecfg2.elem[idx]))
             break;
     }
+    
     if (idx == NUM_ELEMS) {
         printf("No free element available (max = %d)\n", NUM_ELEMS);
         return 1;
@@ -367,6 +393,8 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     int count = 5;
     s16 data[6] = {0};
     const char *ptr = parse_partial_int_list(value, data, &count, S16);
+    data[0] += offset_x;
+    data[1] += offset_y;
     if (count > 3) {
         printf("Could not parse coordinates from %s=%s\n", name,value);
         return 1;
