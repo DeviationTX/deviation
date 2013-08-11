@@ -13,6 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+enum {
+    TRIM_MINUS,
+    TRIM_SWITCH,
+};
+
+static inline guiObject_t * _get_obj(int idx, int objid);
 static struct trim_page * const tp = &pagemem.u.trim_page;
 static void _show_page();
 static void _edit_cb(guiObject_t *obj, const void *data);
@@ -35,7 +41,9 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 
 static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
 {
-    (void)obj;
+    if(! GUI_IsTextSelectEnabled(obj)){
+        return _tr("None");
+    }
     u8 *source = (u8 *)data;
     u8 changed;
     u8 val = MIXER_SRC(*source);
@@ -51,7 +59,9 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
 
 const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 {
-    (void) obj;
+    if(! GUI_IsTextSelectEnabled(obj)){
+        return _tr("None");
+    }
     u8 *button = (u8 *)data;
     *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
     return INPUT_ButtonName(*button);
@@ -60,23 +70,40 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    u8 *value = (u8 *)data;
+    int i = (long)data;
+    u8 *value = &Model.trims[i].step;
     //place switches before 0.1 on the spinbox
     u8 v = ((int)*value + TRIM_SWITCH_TYPES - 1) % (190 + TRIM_SWITCH_TYPES);
     v = GUI_TextSelectHelper(v, 0, 190 + TRIM_SWITCH_TYPES - 1, dir, 1, 5, NULL);
     *value = ((int)v + 190) % (190 + TRIM_SWITCH_TYPES) + 1;
 
+    guiObject_t *negtrimObj = _get_obj(i, TRIM_MINUS);
+    guiObject_t *switchObj  = _get_obj(i, TRIM_SWITCH);
+
+    int hide_trim = 0;
+    int hide_switch = 0;
     if (*value == TRIM_MOMENTARY) {
         strcpy(tp->tmpstr, _tr("Momentary"));
+        hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_TOGGLE) {
         strcpy(tp->tmpstr, _tr("Toggle"));
+        hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_ONOFF) {
         strcpy(tp->tmpstr, _tr("On/Off"));
+        hide_switch = 1;
     } else if (*value < 100) {
         sprintf(tp->tmpstr, "%d.%d", *value / 10, *value % 10);
     } else {
         sprintf(tp->tmpstr, "%d", *value - 90);
     }
+    if (negtrimObj) {
+        if (negtrimObj->Type == TextSelect)
+            GUI_TextSelectEnable((guiTextSelect_t *)negtrimObj, ! hide_trim);
+        else
+            GUI_Redraw(negtrimObj);
+    }
+    if (switchObj)
+        GUI_TextSelectEnable((guiTextSelect_t *)switchObj, ! hide_switch);
     return tp->tmpstr;
 }
 

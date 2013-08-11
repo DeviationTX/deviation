@@ -36,6 +36,15 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
     col = (col + 2) % 2;
     return col ? (guiObject_t *)&gui->step[relrow] : (guiObject_t *)&gui->src[relrow];
 }
+static const char *negtrim_str(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int i = (long)data;
+    if(Model.trims[i].step == TRIM_MOMENTARY || Model.trims[i].step == TRIM_TOGGLE)
+        return _tr("None");
+    struct Trim *trim = MIXER_GetAllTrims();
+    return INPUT_ButtonName(trim[i].neg);
+}
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -43,9 +52,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
         trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
-    GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].neg));
+    GUI_CreateLabelBox(&gui->neg[relrow], PCOL2 + 6, y, PCOL3 - PCOL2, 24, &DEFAULT_FONT, negtrim_str, NULL, (void *)(long)absrow);
     GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
-    GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL, set_trimstep_cb, &trim[absrow].step);
+    GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL, set_trimstep_cb, (void *)(long)absrow);
     return 2;
 }
 
@@ -88,15 +97,31 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_CreateLabel(&gui_ed->srclbl, COL1, ROW1, NULL, DEFAULT_FONT, _tr("Input"));
     GUI_CreateTextSelect(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
     //Row 2
-    GUI_CreateLabel(&gui_ed->neglbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim +"));
-    GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW2, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
+    GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim Step"));
+    GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL, set_trimstep_cb, (void *)(long)tp->index);
     //Row 3
-    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW3, NULL, DEFAULT_FONT, _tr("Trim -"));
-    GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
+    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW3, NULL, DEFAULT_FONT, _tr("Trim +"));
+    GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 4
-    GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW4, NULL, DEFAULT_FONT, _tr("Trim Step"));
-    GUI_CreateTextSelect(&gui_ed->step, COL2, ROW4, TEXTSELECT_96, NULL, set_trimstep_cb, &tp->trim.step);
+    GUI_CreateLabelBox(&gui_ed->neglbl, COL1, ROW4, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
+    GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW4, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
     //Row 5
-    GUI_CreateLabel(&gui_ed->swlbl, COL1, ROW5, NULL, DEFAULT_FONT, _tr("Switch"));
+    GUI_CreateLabelBox(&gui_ed->swlbl, COL1, ROW5, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Switch"));
     GUI_CreateTextSelect(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
+}
+
+static inline guiObject_t * _get_obj(int idx, int objid) {
+    if (PAGE_GetModal()) {
+        if(objid == TRIM_MINUS) {
+            return (guiObject_t *)&gui_ed->neg;
+        } else if(objid == TRIM_SWITCH) {
+            return (guiObject_t *)&gui_ed->sw;
+        }
+    } else {
+        if(objid == TRIM_MINUS) {
+            return (guiObject_t *)&gui->neg[idx - GUI_ScrollableCurrentRow(&gui->scrollable)];
+        }
+    }
+    return NULL;
+
 }

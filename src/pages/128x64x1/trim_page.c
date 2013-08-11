@@ -41,7 +41,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButtonPlateText(&gui->src[relrow], 0, y, w, ITEM_HEIGHT,
             &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], 32, y,
-            40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, &trim[absrow].step);
+            40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)absrow);
     GUI_CreateLabelBox(&gui->name[relrow], 75, y, 50, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
     return 1;
@@ -75,9 +75,9 @@ static guiObject_t *getobj2_cb(int relrow, int col, void *data)
 }
 enum {
     ITEM_INPUT,
+    ITEM_TRIMSTEP,
     ITEM_TRIMNEG,
     ITEM_TRIMPOS,
-    ITEM_TRIMSTEP,
     ITEM_TRIMSWITCH,
     ITEM_LAST,
 };
@@ -103,7 +103,7 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_TRIMSTEP:
             label = _tr_noop("Trim Step");
-            value = set_trimstep_cb; data = &tp->trim.step;
+            value = set_trimstep_cb; data = (void *)(long)tp->index;
             break;
         case ITEM_TRIMSWITCH:
             label = _tr_noop("Switch");
@@ -165,4 +165,15 @@ static u8 _sub_action_cb(u32 button, u8 flags, void *data)
         }
     }
     return 1;
+}
+static inline guiObject_t * _get_obj(int idx, int objid) {
+    if (PAGE_GetModal()) {
+        if(objid == TRIM_MINUS) {
+            idx = ITEM_TRIMNEG; objid = -1;
+        } else if(objid == TRIM_SWITCH) {
+            idx = ITEM_TRIMSWITCH; objid = -1;
+        }
+        return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, idx, objid);
+    }
+    return NULL;
 }
