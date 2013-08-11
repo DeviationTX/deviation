@@ -142,11 +142,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                  ITEM_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
         return 2;
     }
+#if ENABLE_LAYOUT_EDIT
     if (absrow == num_elems + NUM_QUICKPAGES + 1) {
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, ITEM_HEIGHT,
                  &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
         return 1;
     }
+#endif
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
         GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
         GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + ITEM_HEIGHT,
@@ -194,8 +196,13 @@ void show_config()
         if (! ELEM_USED(pc.elem[count]))
             break;
     }
+#if ENABLE_LAYOUT_EDIT
+    #define ADD_LOAD 2
+# else
+    #define ADD_LOAD 1
+#endif
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, count+NUM_QUICKPAGES + 2, row_cb, getobj_cb, size_cb, (void *)count);
+                     ITEM_SPACE, count+NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
