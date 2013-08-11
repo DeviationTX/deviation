@@ -204,7 +204,7 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     mp->num_complex_mixers = 1;
     for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
         MIXER_InitMixer(mp->mixer + i, idx);
-        mp->mixer[i].src = 1;
+        mp->mixer[i].src = 0;
     }
 
     if (mp->cur_template != MIXERTEMPLATE_NONE) {

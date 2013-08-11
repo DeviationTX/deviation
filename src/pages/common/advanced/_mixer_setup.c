@@ -336,12 +336,17 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
+    int old = mp->num_mixers;
     mp->num_mixers = GUI_TextSelectHelper(
                      mp->num_mixers,
                      1 + (mp->cur_mixer - mp->mixer),
                      NUM_COMPLEX_MIXERS,
                      dir, 1, 1, &changed);
     if (changed) {
+        if (mp->num_mixers > old) {
+            //initialize mixer
+            mp->mixer[mp->num_mixers-1].src = 1;
+        }
         mp->num_complex_mixers = mp->num_mixers;
         MIXPAGE_RedrawGraphs();
         sync_mixers();
@@ -514,6 +519,8 @@ static void reorder_return_cb(u8 *list)
                 break;
             if(list[i] == 255) {
                 memset(&tmpmix[i], 0, sizeof(struct Mixer));
+                tmpmix[i].dest = mp->cur_mixer->dest;
+                tmpmix[i].src = 1;
             } else {
                 tmpmix[i] = mp->mixer[list[i]-1];
                 if(mp->cur_mixer - mp->mixer == list[i]-1)
