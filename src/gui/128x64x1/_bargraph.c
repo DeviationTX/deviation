@@ -31,7 +31,7 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     LCD_DrawFastVLine(box->x + (box->width -1) / 2, box->y -1, 2, 1); //Center
     LCD_DrawFastVLine(box->x + (box->width -1) / 2, box->y + box->height -1, 2, 1); //Center
     s16 xpos = 0;
-    if (graph->max > 100 && abs(graph->min) == graph->max) {
+    if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
         u8 pos100 = (box->width -1) * (100 - graph->min)/(graph->max - graph->min);
         xpos = graph->direction == TRIM_HORIZONTAL ? box->x + pos100: box->x + box->width -1 - pos100;
         LCD_DrawFastVLine(xpos, box->y -1, 2, 1); // -100% position
@@ -63,7 +63,7 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
     LCD_DrawFastHLine(box->x -1, box->y + (box->height -1) / 2, 2, 1); //Center
     LCD_DrawFastHLine(box->x + box->width -1, box->y + (box->height -1) / 2, 2, 1); //Center
     s16 ypos = 0;
-    if (graph->max > 100 && abs(graph->min) == graph->max) {
+    if ((graph->max > 100 && graph->max <= 200) && abs(graph->min) == graph->max) {
         u8 pos100 = (box->height -1) * (100 - graph->min)/(graph->max - graph->min);
         ypos = box->y + box->height -1 - pos100;
         LCD_DrawFastHLine(box->x -1, ypos, 2, 1); // -100% position
