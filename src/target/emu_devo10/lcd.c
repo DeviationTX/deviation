@@ -37,9 +37,11 @@ void LCD_DrawPixel(unsigned int color)
     col = 2 * gui.x;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
-            gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
-            gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
-            gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
+            if ((unsigned int)(3*(logical_lcd_width* (row + i) + col + j) + 2) < sizeof(gui.image)) {
+                gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
+                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
+                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
+            }
         }
     }
     gui.x++;

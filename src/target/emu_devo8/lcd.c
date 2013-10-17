@@ -22,9 +22,11 @@ void LCD_DrawPixel(unsigned int color)
     r = (color >> 8) & 0xf8;
     g = (color >> 3) & 0xfc;
     b = (color << 3) & 0xf8;
-    gui.image[3*(320*gui.y+gui.x)] = r;
-    gui.image[3*(320*gui.y+gui.x)+1] = g;
-    gui.image[3*(320*gui.y+gui.x)+2] = b;
+    if ((gui.x < LCD_WIDTH) && (gui.y < LCD_HEIGHT)) {
+        gui.image[3*(LCD_WIDTH*gui.y+gui.x)] = r;
+        gui.image[3*(LCD_WIDTH*gui.y+gui.x)+1] = g;
+        gui.image[3*(LCD_WIDTH*gui.y+gui.x)+2] = b;
+    }
     gui.x++;
     if(gui.x > gui.xend) {
         gui.x = gui.xstart;

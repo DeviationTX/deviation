@@ -204,10 +204,12 @@ void LCD_DrawPixel(unsigned int color)
     
     int ycol = y / 8;
     int ybit = y & 0x07;
-    if(color) {
-        img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
-    } else {
-        img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
+    if ((ycol < LCD_PAGES) && (x < PHY_LCD_WIDTH)) {
+        if(color) {
+            img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
+        } else {
+            img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
+        }
     }
     dirty[x] |= 1 << ycol;
     xpos++;
