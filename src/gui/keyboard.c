@@ -399,7 +399,8 @@ static u8 press_cb(u32 button, u8 flags, void *data)
                 if (keyboard->CallBack) {
                     if (keyboard->cb_data != NULL) {
                         int *result = (int *) keyboard->cb_data;
-                        *result = 1;
+                        if (*result <= 0) // to avoid loosing the channel number when renaming virtual channels on b/w-screens
+                        	*result = 1;
                     }
                     BUTTON_UnregisterCallback(&keyboard->action);
                     keyboard->CallBack(obj, keyboard->cb_data );
