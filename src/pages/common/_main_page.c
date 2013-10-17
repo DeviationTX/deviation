@@ -171,7 +171,6 @@ void PAGE_MainEvent()
                 }
                 break;
             }
-#ifndef ELEM_BAR
             case ELEM_BAR:
             {
                 s16 chan = MIXER_GetChannel(src-1, APPLY_SAFETY);
@@ -181,7 +180,6 @@ void PAGE_MainEvent()
                 }
                 break;
             }
-#endif
             case ELEM_TOGGLE:
             {
                 src = MIXER_SRC(src);
@@ -232,9 +230,7 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_SMALLBOX] = BOX_W,
         [ELEM_BIGBOX]   = BOX_W,
         [ELEM_TOGGLE]   = TOGGLEICON_WIDTH,
-#ifndef ELEM_BAR
         [ELEM_BAR]      = GRAPH_W,
-#endif
         [ELEM_VTRIM]    = VTRIM_W,
         [ELEM_HTRIM]    = HTRIM_W,
         [ELEM_MODELICO] = MODEL_ICO_W,
@@ -243,9 +239,7 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_SMALLBOX] = SMALLBOX_H,
         [ELEM_BIGBOX]   = BIGBOX_H,
         [ELEM_TOGGLE]   = TOGGLEICON_HEIGHT,
-#ifndef ELEM_BAR
         [ELEM_BAR]      = GRAPH_H,
-#endif
         [ELEM_VTRIM]    = VTRIM_H,
         [ELEM_HTRIM]    = HTRIM_H,
         [ELEM_MODELICO] = MODEL_ICO_H,
@@ -328,7 +322,6 @@ void show_elements()
                             (void *)((long)src));
                 break;
             }
-#ifndef ELEM_BAR
             case ELEM_BAR:
             {
                 int src = pc.elem[i].src;
@@ -339,7 +332,6 @@ void show_elements()
                            bar_cb, (void *)((long)src));
                 break;
             }
-#endif
             case ELEM_TOGGLE:
             {
                 struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], 0)); //We'll set this properly down below

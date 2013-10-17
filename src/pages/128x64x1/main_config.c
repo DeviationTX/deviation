@@ -85,6 +85,9 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
     case ELEM_SMALLBOX:
         str = _tr("Box");
         break;
+    case ELEM_BAR:
+        str = _tr("Bar");
+        break;
     case ELEM_TOGGLE:
         str = _tr("Toggle");
         break;

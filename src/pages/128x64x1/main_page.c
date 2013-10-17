@@ -30,8 +30,8 @@
 #define BOX_W        48
 #define SMALLBOX_H    9
 #define BIGBOX_H      14
-
-#define ELEM_BAR
+#define GRAPH_W      (VTRIM_W)
+#define GRAPH_H      (VTRIM_H / 2)
 
 #define press_icon_cb NULL
 #define press_box_cb NULL
