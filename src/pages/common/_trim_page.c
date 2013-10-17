@@ -110,8 +110,8 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if (data) {
-        //Save trim here
+    if (! data) {
+        //Reset trim here (automatically saved in the Model.trim[])
         struct Trim *trim = MIXER_GetAllTrims();
         trim[tp->index] = tp->trim;
         MIXER_RegisterTrimButtons();
