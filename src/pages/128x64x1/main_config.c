@@ -81,6 +81,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
     case ELEM_HTRIM:
         str = _tr("Trimbar");
         break; 
+    case ELEM_BIGBOX:
     case ELEM_SMALLBOX:
         str = _tr("Box");
         break;
@@ -161,8 +162,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         long nxt = -1;
         long item = -1;
         while((nxt = MAINPAGE_FindNextElem(type, nxt+1)) >= 0) {
-            if(ELEM_TYPE(pc.elem[nxt]) == ELEM_BIGBOX)  //because FindNextElem maps elements
-                continue;
             item = nxt;
             row++;
             if(row == absrow)

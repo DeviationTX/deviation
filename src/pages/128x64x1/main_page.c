@@ -29,9 +29,8 @@
 #define MODEL_ICO_H  36
 #define BOX_W        48
 #define SMALLBOX_H    9
-#define BIGBOX_H      9
+#define BIGBOX_H      14
 
-#define ELEM_BIGBOX ELEM_SMALLBOX
 #define ELEM_BAR
 
 #define press_icon_cb NULL

@@ -133,9 +133,7 @@ void PAGE_MainEvent()
                 break;
             }
             case ELEM_SMALLBOX:
-#ifndef ELEM_BIGBOX
             case ELEM_BIGBOX:
-#endif
             {
                 s32 val = get_boxval(src);
 #if HAS_RTC
@@ -232,9 +230,7 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
 {
     const u8 width[ELEM_LAST] = {
         [ELEM_SMALLBOX] = BOX_W,
-#ifndef ELEM_BIGBOX
         [ELEM_BIGBOX]   = BOX_W,
-#endif
         [ELEM_TOGGLE]   = TOGGLEICON_WIDTH,
 #ifndef ELEM_BAR
         [ELEM_BAR]      = GRAPH_W,
@@ -245,9 +241,7 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
     };
     const u8 height[ELEM_LAST] = {
         [ELEM_SMALLBOX] = SMALLBOX_H,
-#ifndef ELEM_BIGBOX
         [ELEM_BIGBOX]   = BIGBOX_H,
-#endif
         [ELEM_TOGGLE]   = TOGGLEICON_HEIGHT,
 #ifndef ELEM_BAR
         [ELEM_BAR]      = GRAPH_H,
@@ -275,9 +269,7 @@ int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
 unsigned map_type(int type)
 {
     switch(type) {
-#ifndef ELEM_BIGBOX
         case ELEM_BIGBOX: return ELEM_SMALLBOX;
-#endif
         case ELEM_HTRIM: return ELEM_VTRIM;
         default: return type;
     }
@@ -317,9 +309,7 @@ void show_elements()
                 break;
             }
             case ELEM_SMALLBOX:
-#ifndef ELEM_BIGBOX
             case ELEM_BIGBOX:
-#endif
             {
                 int src = pc.elem[i].src;
                 if (src == 0)
