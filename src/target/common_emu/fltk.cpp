@@ -148,6 +148,7 @@ public:
                 return 1;
             case 'v':
                 gui.ail_dr = (gui.ail_dr + 1) % 6;
+                gui.dr = gui.ail_dr; /* for Devo6 */
                 return 1;
             case 'b':
                 gui.mix = (gui.mix + 1) % 3;

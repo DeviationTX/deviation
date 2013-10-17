@@ -28,6 +28,7 @@ struct Gui {
     int  rud_dr;
     int  ail_dr;
     int  ele_dr;
+    int  dr;   /* for emu_devo6 */
     int  gear;
     int  mix;
     int  fmod;
