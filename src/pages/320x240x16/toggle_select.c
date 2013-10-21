@@ -143,7 +143,7 @@ static void show_iconsel_page(int SelectedIcon)
     }
 
     int count = get_toggle_icon_count();
-    int max_scroll = (count + NUM_SYMBOL_COLS - 1) / NUM_SYMBOL_COLS - 3;
+    int max_scroll = (count + NUM_SYMBOL_COLS - 1) / NUM_SYMBOL_COLS - (NUM_SYMBOL_ROWS - 1);
     GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 80, LCD_HEIGHT-80, max_scroll, NULL, scroll_cb, (void *)(long)SelectedIcon);
     show_icons(SelectedIcon, 0);
 }
