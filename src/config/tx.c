@@ -349,5 +349,6 @@ void CONFIG_SaveTxIfNeeded()
     u32 newCrc = Crc(&Transmitter, sizeof(Transmitter));
     if (crc32 == newCrc)
         return;
+    crc32 = newCrc;
     CONFIG_WriteTx();
 }
