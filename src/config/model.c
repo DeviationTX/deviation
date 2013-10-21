@@ -1249,7 +1249,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         switch(type) {
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
-                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, GetBoxSource(file, src));
+                fprintf(fh, "%s=%d,%d,%s\n", elename, x, y, GetBoxSourceReal(file, src));
                 break;
             case ELEM_BAR:
                 src += NUM_INPUTS;
