@@ -97,6 +97,8 @@ Aux2
 Подсветка
 :Bad/missing\nprotocol modules!
 Ошибочные/отсутствующие\nмодули протоколов!
+:Bar
+Полоса
 :Bargraph
 Полоса
 :Batt alarm
@@ -273,6 +275,8 @@ Aux2
 ПРеж
 |devo8:FMODE
 ПРежим
+:Fades
+Затух.
 :Fahren
 F°
 |devo8:Fahren
@@ -333,6 +337,8 @@ HOLD
 Высокий расход
 :Hold position
 Положение
+:Holds
+Удерж.
 :Hour
 Часы
 :Icon
@@ -379,6 +385,8 @@ L
 Загрузка...
 :Longitude
 Долгота
+:Loss
+Потери
 :Low Battery
 Батарея разряжена
 :Low-Rate
@@ -443,6 +451,8 @@ M
 Модель
 :Model type
 Тип модели
+:Momentary
+Кнопка
 :Month
 Месяц
 :Move Down
@@ -479,6 +489,8 @@ M
 ОK
 :On
 Вкл
+:On/Off
+Вкл/Выкл
 :PIT
 Шаг
 :PIT Mix
@@ -736,9 +748,7 @@ RPM
 |devo8:Timeup intvl
 Интервалы после
 :Toggle
-Переключ.
-|devo8:Toggle
-Переключатель
+Тумблер
 :Touch Calibrate
 Калибровка экрана
 :Touch Test
