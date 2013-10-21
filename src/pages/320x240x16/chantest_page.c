@@ -166,7 +166,6 @@ static void show_button_page()
             #endif
             220, 200, 220, 200, 180, 180 };
     cp->is_locked = 3;
-//    GUI_CreateLabelBox(&gui->lock, OFFSET_X + 110, 40, 100, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     GUI_CreateLabelBox(&gui->lock, OFFSET_X, 34, 320, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (int i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(&gui->value[i],
