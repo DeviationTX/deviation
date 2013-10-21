@@ -399,6 +399,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("Could not parse coordinates from %s=%s\n", name,value);
         return 1;
     }
+printf("#####  Section, Name, Value = %s, %s, %s\n", section, name, value);
     switch(type) {
         //case ELEM_MODEL:  //x, y
         case ELEM_VTRIM:  //x, y, src
@@ -432,6 +433,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
             if (src == -1) {
                 for(i = 0; i < NUM_TELEM; i++) {
                     if(mapstrcasecmp(ptr, TELEMETRY_Name(str, i+1)) == 0) {
+printf("#####  Telemetry found: %s\n", TELEMETRY_Name(str, i+1));
                         src = i + 1 + NUM_RTC + NUM_TIMERS;
                         break;
                     }
@@ -530,6 +532,9 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 if (MATCH_VALUE(RADIO_PROTOCOL_VAL[i])) {
                     m->protocol = i;
                     PROTOCOL_Load(1);
+                    if (MATCH_VALUE("DEVO")) TELEMETRY_SetType(TELEM_DEVO);
+                    if (MATCH_VALUE("DSM2")) TELEMETRY_SetType(TELEM_DSM);
+                    if (MATCH_VALUE("DSMX")) TELEMETRY_SetType(TELEM_DSM);
                     return 1;
                 }
             }
