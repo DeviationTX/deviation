@@ -53,8 +53,8 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
         else
             list[i] = 0;
     }
-    PAGE_CreateCancelButton(160, 4, okcancel_cb);
-    PAGE_CreateOkButton(264, 4, okcancel_cb);
+    PAGE_CreateCancelButton(160 + (LCD_WIDTH - 320), 4, okcancel_cb);
+    PAGE_CreateOkButton(264 + (LCD_WIDTH - 320), 4, okcancel_cb);
     GUI_CreateButton(&gui->up, 8, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
     GUI_CreateButton(&gui->down, 8, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
 
