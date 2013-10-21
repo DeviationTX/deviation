@@ -161,6 +161,7 @@ static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data)
             OBJ_SET_DIRTY(parent, 1);
         }
     }
+    GUI_ListBoxSelect(listbox, listbox->selected);
     return listbox->cur_pos;
 }
 
