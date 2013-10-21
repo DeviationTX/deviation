@@ -146,12 +146,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             d->flags = SET_FLAG(d->flags, atoi(value), SHOW_BAT_ICON);
             return 1;
         }
-#if HAS_RTC
         if(MATCH_KEY("header_time")) {
+#if HAS_RTC
             d->flags = SET_FLAG(d->flags, atoi(value), SHOW_TIME);
+#endif
             return 1;
         }
-#endif
     }
     if(MATCH_START(section, "select")) {
         if(MATCH_KEY(COLOR)) {

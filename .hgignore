@@ -1,3 +1,4 @@
+.hgignore
 bin$
 dfu$
 elf$
@@ -16,8 +17,9 @@ push
 glob:*.o
 utils/midicsv/csvmidi
 utils/midicsv/midicsv
-#.cproject
-#.project
+.cproject
+.project
+.settings/org.eclipse.cdt.core.prefs
 ^local/
 src/filesystem/devo8/models/
 src/filesystem/devo8/tx.ini
