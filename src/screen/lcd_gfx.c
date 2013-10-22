@@ -517,6 +517,8 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         if((u16)w < img_w) {
             fseek(fh, 2 * (img_w - w), SEEK_CUR);
         }
+        // for images with odd width: skip 2 bytes to reach a 4-byte-position (skip padding bytes, see http://en.wikipedia.org/wiki/File:BMPfileFormat.png
+        if ((img_w % 2) == 1) fseek(fh, 2, SEEK_CUR);
     }
     LCD_DrawStop();
     fclose(fh);
