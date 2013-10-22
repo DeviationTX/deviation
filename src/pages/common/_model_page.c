@@ -33,6 +33,8 @@ static void changeicon_cb(guiObject_t *obj, const void *data);
 static void _changename_done_cb(guiObject_t *obj, void *data);
 static inline guiObject_t *_get_obj(int type, int objid);
 
+static enum Protocols save_protocol; // used for channel remapping after protocol change
+
 enum {
     ITEM_FILE,
     ITEM_NAME,
@@ -82,6 +84,18 @@ const char *show_bindtext_cb(guiObject_t *obj, const void *data)
 
 void PAGE_ModelEvent()
 {
+}
+
+void _PAGE_ModelExit()
+{
+    if (save_protocol != Model.protocol) {
+        enum Protocols new_protocol = Model.protocol;
+        Model.protocol = save_protocol;
+        MIXER_AdjustForProtocol();      // (1) revert old adjustments to AETRG
+        Model.protocol = new_protocol;
+        MIXER_AdjustForProtocol();      // (2) make new adjustments
+        save_protocol = new_protocol;
+    }
 }
 
 static void fixedid_done_cb(guiObject_t *obj, void *data)

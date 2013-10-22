@@ -134,6 +134,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         
 void PAGE_ModelInit(int page)
 {
+    save_protocol = Model.protocol;
+
     if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
         page = current_selected;
     PAGE_SetActionCB(_action_cb);
@@ -197,6 +199,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 void PAGE_ModelExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    _PAGE_ModelExit();      // call function from common/_model_page.c, remaps channel according to protocol
 }
 
 static inline guiObject_t *_get_obj(int type, int objid)

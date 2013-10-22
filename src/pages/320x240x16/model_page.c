@@ -44,6 +44,8 @@ void PAGE_ModelInit(int page)
     (void)page;
     u8 row;
 
+    save_protocol = Model.protocol;
+
     mp->last_mixermode = Model.mixer_mode;
     mp->last_txpower = Model.tx_power;
     mp->file_state = 0;
@@ -100,6 +102,11 @@ void PAGE_ModelInit(int page)
     GUI_CreateButton(&gui->fixedid, COL2, row, BUTTON_96x16, show_text_cb, 0x0000, fixedid_cb, mp->fixed_id);
     GUI_CreateButton(&gui->bind, COL3, row, BUTTON_64x16, show_bindtext_cb, 0x0000, bind_cb, NULL);
     configure_bind_button();
+}
+
+void PAGE_ModelExit()
+{
+    _PAGE_ModelExit();      // call function from common/_model_page.c, remaps channel according to protocol
 }
 
 /* Button callbacks */
