@@ -1,40 +1,38 @@
 ﻿简体中文
 :# Channels
 通道数
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s当前值为%d%%, 安全开机设定为%d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s当前值为%d%%,\n安全开机设定为%d%%
+>:1 sec
 :1-to-1
 45度曲线
+>:10 sec
 :11 Point
 11点曲线
+>:12 hour
 :13 Point
 13点曲线
+>:24 hour
 :3 Point
 3点曲线
-:4 Bars
-4柱图
-:4 Inside
-4内
-:4 Outside
-4外
+>:30 sec
 :4Ch w/ Dual-Rates
 4通直升机
 :5 Point
 5点曲线
+>:5 sec
 >:5+1
-:6 Trims
-6微调显示
 >:6+1
+>:60 sec
 :6Ch Airplane
 6通直升机
 :6Ch Helicopter
 6通固定翼
 :7 Point
 7点曲线
-:8 Bars
-8柱图
 :9 Point
 9点曲线
 :ABSVAL
@@ -54,38 +52,33 @@
 >:AUX7
 :About Deviation
 关于本系统
-<:Add
-<增加
+>:Add
 :Advanced
 高级模式1
-<:Advanced2
-<高级模式2
 :Airplane
 固定翼
 :Alarm
 报警
 :Alarm intvl
 报警间隔
+>:All
 :Altitude
 高度
-<:Are you sure to\ndelete this mix?
-<是否确定删除\n当前混控?
 :Auto
 自动
 >:Aux2
 :Backlight
 背光
 >:Bad/missing\nprotocol modules!
-:Bar %d
-柱图%d
-:Bars
-柱状图
+>:Bar
+>:Bargraph
 :Batt alarm
 电量报警
 :Battery alarm
 电量报警
 :Battery too low,\ncan't save!
 电压过低,\n无法存盘!
+>:Big-box
 :Bind
 对频
 :Binding
@@ -94,8 +87,7 @@
 对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
 :Binding...\nPress ENT to stop
 对频中...\n按ENT中止
-:Box %d
-第%d栏
+>:Box
 :Button monitor
 按键监控
 :Buzz settings
@@ -106,8 +98,6 @@
 报警设置
 :COL
 螺距
-:COL Inv
-螺距方向
 :COL Inv
 螺距方向
 :COL Limit
@@ -130,38 +120,31 @@ CYC
 将所有\n摇杆和旋钮置中\n然后按ENT
 :Ch
 通道
+>:Ch%d
 :Chan mode
 通道模式
 :Change
 改变
 :Channel
 通道
-<:Channel config
-<通道基本配置
-<:Channel mix
-<通道混控配置
 :Channel monitor
 通道监控
 :Channel output
 通道输出
-<:Channel reorder
-<调整通道顺序
+>:Clock
 :Complex
 多段式
 :Configure
 设置
 :Contrast
 对比度
+>:Control
 :Copy To
 复制到
 :Copy To...
 复制...
-<:CopyTo
-<复制
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 检测到电压过低.\n当前设置已经存盘.\n以后的设置将无法存盘.\n\n请立即更换电池！
-<:Curve
-<曲线
 :Curve
 曲线
 :Cyclic1
@@ -180,14 +163,17 @@ CCPM3
 方向舵量/曲线
 :DR
 舵量
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 :Deadband
 死区
 :Default
 缺省
-<:Default input
-<默认输入
-<:Dele
-<删除
+>:Delete
 :Delta PW
 脉宽变化
 :Deviation FW version:
@@ -196,16 +182,13 @@ Deviation固件版本:
 背光减弱至
 :Dimmer time
 背光减弱时间
+>:Display
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
 是否确定\n重置持续\n计时器%d?
 :Down
 下
-<:Dual Rate
-<两段
-<:Duplicate mix\n exists!
-<相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -215,8 +198,8 @@ Deviation固件版本:
 升降螺距
 :EXPO %d
 指数曲线%d
-<:Edit
-<编辑
+>:Edit
+>:Enable
 >:Enabled
 :Enter
 进入
@@ -224,7 +207,9 @@ Deviation固件版本:
 退出
 :Expo&DR
 三段式
+>:Extend
 >:FMODE
+>:Fades
 :Fahren
 华氏
 :Fail-safe
@@ -244,6 +229,10 @@ Deviation固件版本:
 :GEAR
 尾舵
 >:GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 >:Gear
 :Generic settings
 基本设置
@@ -251,6 +240,7 @@ Deviation固件版本:
 锁尾感度
 :H
 高
+>:H-trim
 >:HOLD
 :Heli
 直升机
@@ -261,20 +251,16 @@ Deviation固件版本:
 普通飞行
 :Hold position
 熄火油门值
+>:Holds
+>:Hour
 :Icon
 图标
-:Icon
-图标
-<:Idle 1
-<3D飞行1
-<:Idle 2
-<3D飞行2
 >:Idle Up 1
 >:Idle Up 2
-:Input monitor
-摇杆输入监控
 :Input
 输入
+:Input monitor
+摇杆输入监控
 :Insert
 插入
 :Inverted
@@ -293,6 +279,7 @@ LCD设置
 语言
 :Latitude
 纬度
+>:Layout: Long-Press ENT
 :Left
 左
 :Length
@@ -305,6 +292,7 @@ LCD设置
 读取...
 :Longitude
 经度
+>:Loss
 :Low Battery
 低电量
 :Low-Rate
@@ -319,8 +307,6 @@ LCD设置
 :Main page config
 定制主页面
 >:Manual
-<:Master
-<输入
 :Max Limit
 最大舵量
 :Menu
@@ -333,6 +319,7 @@ LCD设置
 最小舵量
 :Min/Max
 最低/最高
+>:Minute
 :Mixer
 混控
 :Mixer GUI
@@ -343,6 +330,7 @@ LCD设置
 模式
 :Mode %d
 模式%d
+>:Model
 :Model menu
 模型设置
 :Model name
@@ -355,29 +343,22 @@ LCD设置
 模型设置
 :Model type
 模型类型
+>:Momentary
+>:Month
 :Move Down
 下移
 :Move Up
 上移
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 拨动摇杆和旋钮,\n先至最小再至最大位置,\n然后按ENT
-<:MoveDn
-<下移
-<:MoveUp
-<上移
-<:Mux
-<作用
 :Mux
 作用
 :Neg
 负
 :New
 新增
-:No Bars
-无
+>:No
 :No Trim
-无
-:No Trims
 无
 :None
 无
@@ -385,6 +366,7 @@ LCD设置
 正常
 :Notch PW
 通道间隔
+>:Num Channels
 :Off
 关闭
 :Offset
@@ -393,19 +375,21 @@ LCD设置
 确定
 :On
 开启
+>:On/Off
 :PIT
 螺距
 >:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 模式1-N
-<:Pit Mix
-<集体螺距
+>:Page Config
 :Pitch curves
 螺距曲线
 :Plane
 固定翼
-<:Point
-<点
 :Point
 点
 :Pos
@@ -420,9 +404,8 @@ LCD设置
 正/负
 :Position %d
 档位%1
+>:Power On alarm
 >:Power-down alert
-<:PowerOff alert
-<关机提示
 :Prealert intvl
 预警间隔
 :Prealert time
@@ -437,31 +420,25 @@ LCD设置
 按ENT读取
 :Press ENT to turn \nUSB drive
 按ENT使U盘
-:Preview: Long-Press ENT
-长按ENT预览,EXT返回
-<:Program mix
-<程式混控
 :Protocol
 通信协议
 :PwrDn alert
 无电提示
+>:PwrOn alarm
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
 :RPM
 转数
-:RPM
-转数
+>:RTC Time
 :RUD
 方向
 >:RUD DR
-<:Rate
-<分段
+>:Rate
 :Re-Init
 初始化
-<:Reach max mix\nlimit for a channel!
-<此通道程式混控\n数量达到上限！
+>:Real Time Clock
 :Remove
 删除
 :Reset
@@ -470,8 +447,6 @@ LCD设置
 是否确定重置\n持续计时器?
 :Reset sw
 重置开关
-:Reverse
-舵机正逆转
 :Reverse
 反向
 :Reversed
@@ -484,30 +459,29 @@ LCD设置
 熄火值
 :Safety
 熄火开关
-:Safety
-熄火开关
+>:Sample Rate
 :Save
 保存
-:Scale%s
-比例%s
 :Scale
 比例
+:Scale%s
+比例%s
 :Scanner
 信号扫描器
+>:Second
+>:Select
 :Servo
 舵机
+>:Set
+>:Set:
 :Simple
 一段式
 :Simple 4 Channel
 4通道
-<:Slave
-<被控通道
-:Speed
-速度
+>:Small-box
+>:Smooth
 :Speed
 舵机速率
-:Src
-输入
 :Src
 输入
 >:Standard
@@ -515,10 +489,9 @@ LCD设置
 通用模式
 :Start
 开始时间
-<:Std Heli
-<标准直机
 :Step
 幅度
+>:Stick
 :Stick input
 摇杆输入
 :Stick mode
@@ -529,22 +502,18 @@ LCD设置
 微调
 :Subtrim
 微调
-:Subtrim
-微调
 :Swash
 斜盘设置
 :SwashType
 斜盘模式
-<:Switch
-<开关
+:Switch
+开关
 :Switch assignment
 开关分配
 :Switch1
 开关1
 :Switch2
 开关2
-:Switch
-开关
 :Symmetric
 对称
 :THR
@@ -590,14 +559,11 @@ LCD设置
 双向回传设置
 :Temp
 温度
-:Temp
-温度
 :Temperature
 温度
+>:Template
 :Template..
 模板..
-:Test
-测试
 :Thr hold
 油门熄火
 :Throttle curves
@@ -616,8 +582,7 @@ LCD设置
 定时器
 :Timeup intvl
 超时报警间隔
-:Toggle%d
-开关%d
+>:Toggle
 :Touch Calibrate
 触摸屏校准
 :Touch Test
@@ -628,6 +593,9 @@ LCD设置
 触摸目标%d
 >:Touch to Lock
 >:Touch to Unlock
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
 :Transmitter config
 遥控设置
 :Transmitter menu
@@ -642,8 +610,7 @@ LCD设置
 微调-
 :Trim Step
 微调幅度
-:Trims
-微调
+>:Trimbar
 :Trims
 微调数
 :Turn Off
@@ -652,16 +619,13 @@ LCD设置
 开启
 :Tx power
 发射功率
+>:Type
 >:USB
-:USB Filesystem is currently
-USB文件系统当前状态
+>:USB Filesystem is currently 
 >:Unknown
 :Up
 上
-<:UseTrim
-<微调
-:Value
-感度值
+>:V-trim
 :Value
 值
 :Vibration
@@ -670,8 +634,9 @@ USB文件系统当前状态
 虚拟
 :Volt
 电压
-:Volt
-电压
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 零/最大
 :\n%d seconds left
@@ -680,8 +645,10 @@ USB文件系统当前状态
 \n\n对频在%d秒后结束
 :add
 附加
+>:cntdn-prop
 :countdown
 倒计时
+>:delay
 :is not supported
 不支持
 :is turned off
@@ -696,5 +663,6 @@ USB文件系统当前状态
 持续计时
 :replace
 替换
+>:stop-prop
 :stopwatch
 秒表

@@ -1,42 +1,40 @@
 ﻿Italiano
 :# Channels
 # Canali
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valore sicuro  = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%, \nvalore sicuro  = %d%%
+>:1 sec
 :1-to-1
 1 a 1
+>:10 sec
 :11 Point
 11 Punti
+>:12 hour
 :13 Point
 13 Punti
+>:24 hour
 :3 Point
 3 Punti
-:4 Bars
-4 Barre
-:4 Inside
-4 Interno
-:4 Outside
-4 Esterno
+>:30 sec
 :4Ch w/ Dual-Rates
 4Ch con DualRate
 :5 Point
 5 Punti
+>:5 sec
 :5+1
 5+1
-:6 Trims
-6 Trim
 :6+1
 6+1
+>:60 sec
 :6Ch Airplane
 Aereo 6Ch
 :6Ch Helicopter
 Elicottero 6Ch
 :7 Point
 7 Punti
-:8 Bars
-8 Barre
 :9 Point
 9 Punti
 :ABSVAL
@@ -48,7 +46,7 @@ DR ALET
 :AIL Inv
 ALET Inv
 :AIL Mix
-ALET Mix
+ALETT Mix
 :AUX2
 AUX2
 :AUX3
@@ -63,6 +61,7 @@ AUX6
 AUX7
 :About Deviation
 A proposito di Deviation
+>:Add
 :Advanced
 Avanzato
 :Airplane
@@ -71,6 +70,7 @@ Aereo
 Allarme
 :Alarm intvl
 Allarme intvl
+>:All
 :Altitude
 Altitudine
 :Auto
@@ -81,16 +81,15 @@ Aux2
 Luminosità
 :Bad/missing\nprotocol modules!
 Moduli protocollo errati o assenti!
-:Bar %d
-Barra %d
-:Bars
-Barre
+>:Bar
+>:Bargraph
 :Batt alarm
 Allarme batteria
 :Battery alarm
 Allarme batteria
 :Battery too low,\ncan't save!
 Batteria troppo scarica,\nnon posso salvare!
+>:Big-box
 :Bind
 Bind
 :Binding
@@ -99,8 +98,7 @@ Binding
 Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
 :Binding...\nPress ENT to stop
 Binding...\nPremi ENT per fermare
-:Box %d
-Box%d
+>:Box
 :Button monitor
 Monitor pulsante
 :Buzz settings
@@ -113,12 +111,9 @@ Configurazione del Buzzer
 Collet.
 :COL Inv
 Inv.Collet.
-:COL Inv
-Inv.Collet.
 :COL Limit
 Limite Collet.
-COL Mix
-Mix Collet.
+>:COL Mix
 :CYC
 Ciclico
 :Calibrate
@@ -135,6 +130,7 @@ Centro PW
 Centra tutti gli\nsticks e le manopole\nquindi premi ENT
 :Ch
 Ch
+>:Ch%d
 :Chan mode
 Modo di Canale
 :Change
@@ -145,21 +141,18 @@ Canale
 Monitor di Canale
 :Channel output
 Canale di uscita
-:Collet.Inv.
-Inv. Collet.
-:COL Limit
-Limite Collet.
+>:Clock
 :Complex
 Complesso
 :Configure
 Configura
 :Contrast
 Contrasto
+>:Control
 :Copy To
 Copia su
 :Copy To...
 Copia su...
-:Copy To...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Livello critico della batteria.\nI settaggi sono stati salvati.\nOgni ulteriore modifica dei parametri\nNON sarà salvata.\n\nCarica la batteria ora!
 :Curve
@@ -180,10 +173,17 @@ D/R & Esp.-ELEV
 D/R & Esp.-TIMONE
 :DR
 DR
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 :Deadband
 Zona morta
 :Default
 Default
+>:Delete
 :Delta PW
 Delta PW
 :Deviation FW version:
@@ -192,8 +192,7 @@ Versione del FW Deviation:
 Dest. del Dimmer
 :Dimmer time
 Durata del Dimmer
-:AIL Mix
-ALETT Mix
+>:Display
 :Dn
 Dn
 :Do you really want\nto reset the\n permanent timer %d?
@@ -210,6 +209,8 @@ Inv ELEV
 Mix ELEV
 :EXPO %d
 Esp. %d
+>:Edit
+>:Enable
 :Enabled
 Abilitato
 :Enter
@@ -218,8 +219,10 @@ Entra
 Esci
 :Expo&DR
 Esp.&DR
+>:Extend
 :FMODE
 Modo di volo
+>:Fades
 :Fahren
 Fahren
 :Fail-safe
@@ -240,6 +243,10 @@ Dimensione del Frame
 CARRELLO
 :GPS
 GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 :Gear
 Carrello
 :Generic settings
@@ -248,6 +255,7 @@ Settaggi generici
 Sens. giroscopio
 :H
 H
+>:H-trim
 :HOLD
 HOLD
 :Heli
@@ -260,18 +268,18 @@ Elicottero
 Rate Alto
 :Hold position
 Posizione di Hold
-:Icon
-Icona
+>:Holds
+>:Hour
 :Icon
 Icona
 :Idle Up 1
 Idle Up 1
 :Idle Up 2
 Idle Up 2
-:Input monitor
-Monitor degli Input
 :Input
 Ingresso
+:Input monitor
+Monitor degli Input
 :Insert
 Inserisci
 :Inverted
@@ -290,6 +298,7 @@ LIN
 Lingua
 :Latitude
 Latitudine
+>:Layout: Long-Press ENT
 :Left
 Sinistra
 :Length
@@ -302,6 +311,7 @@ Carica
 Carica...
 :Longitude
 Longitudine
+>:Loss
 :Low Battery
 Batteria scarica
 :Low-Rate
@@ -330,6 +340,7 @@ Rate Medio
 Limite Min
 :Min/Max
 Min/Max
+>:Minute
 :Mixer
 Mixer
 :Mixer GUI
@@ -340,6 +351,7 @@ Mixers
 Modo
 :Mode %d
 Modo %d
+>:Model
 :Model menu
 Menu del modello
 :Model name
@@ -352,6 +364,8 @@ Il modello deve essere\nresettato per tornare ai mixer std.
 Setup del modello
 :Model type
 Tipo del modello
+>:Momentary
+>:Month
 :Move Down
 Muovi Giu*
 :Move Up
@@ -364,18 +378,16 @@ Operazione
 Neg.
 :New
 Nuovo
-:No Bars
-No Bars
+>:No
 :No Trim
 No Trim
-:No Trims
-No Trims
 :None
 Nessuno
 :Normal
 Normale
 :Notch PW
 Notch PW
+>:Num Channels
 :Off
 Off
 :Offset
@@ -384,12 +396,18 @@ Offset
 Ok
 :On
 On
+>:On/Off
 :PIT
 PASSO
 :PIT Mix
 Mix PASSO
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 Pagina
+>:Page Config
 :Pitch curves
 Curva del passo
 :Plane
@@ -408,6 +426,7 @@ Pos 2
 Pos./Neg.
 :Position %d
 Posizione %d
+>:Power On alarm
 :Power-down alert
 Allarme di spegnimento
 :Prealert intvl
@@ -424,26 +443,26 @@ Premi ENT per copiare su
 Premi ENT per caricare
 :Press ENT to turn \nUSB drive
 Premi ENT per attivare il drive USB
-:Preview: Long-Press ENT
-Anteprima: premi ENT a lungo
 :Protocol
 Protocollo
 :PwrDn alert
 Allarme spegnimento
+>:PwrOn alarm
 :RIGHT_H
 DESTRA_H
 :RIGHT_V
 DESTRA_V
 :RPM
 RPM
-:RPM
-RPM
+>:RTC Time
 :RUD
 TIMONE
 :RUD DR
 DRTIMONE
+>:Rate
 :Re-Init
 Reinizializza
+>:Real Time Clock
 :Remove
 Rimuovi
 :Reset
@@ -452,8 +471,6 @@ Reset
 Resetta il timer permanente?
 :Reset sw
 Reset del SW
-:Reverse
-Inverso
 :Reverse
 Inverso
 :Reversed
@@ -466,28 +483,29 @@ Destra
 Val.Sicuro
 :Safety
 Sicurezza
-:Safety
-Sicurezza
+>:Sample Rate
 :Save
 Salva
-:Scale%s
-Scala%s
 :Scale
 Scala
+:Scale%s
+Scala%s
 :Scanner
 Scanner
+>:Second
+>:Select
 :Servo
 Servo
+>:Set
+>:Set:
 :Simple
 Sempl.
 :Simple 4 Channel
 4Ch. Semplici
+>:Small-box
+>:Smooth
 :Speed
 Velocità
-:Speed
-Velocità
-:Src
-Sorgente
 :Src
 Sorgente
 :Standard
@@ -498,6 +516,7 @@ Mixer Standard
 Avvia
 :Step
 Passo
+>:Stick
 :Stick input
 posizione dello stick
 :Stick mode
@@ -505,21 +524,20 @@ Modo di volo
 :Sticks
 Sticks
 >:Sub-trim
->:Subtrim
 :Subtrim
 Subtrim
 :Swash
 Piatto
 :SwashType
 Piatto
+:Switch
+Interrutore
 :Switch assignment
 Assegnazione interruttore
 :Switch1
 Interr1
 :Switch2
 Interr2
-:Switch
-Interrutore
 :Symmetric
 Simmetrico
 :THR
@@ -566,14 +584,11 @@ Monitor telemetria
 Settaggi telemetria
 :Temp
 Temp
-:Temp
-Temp
 :Temperature
 Temperatura
+>:Template
 :Template..
 Modello..
-:Test
-Test
 :Thr hold
 Hold del gas
 :Throttle curves
@@ -584,8 +599,6 @@ Hold del gas
 Tempo
 :Timer
 Timer
-:Timer
-Timer
 :Timer settings
 Config. Timer
 :Timer%d
@@ -594,8 +607,7 @@ Timer%d
 Timers
 :Timeup intvl
 Durata
-:Toggle%d
-Alterna%d
+>:Toggle
 :Touch Calibrate
 Calibrazione dello schermo
 :Touch Test
@@ -608,6 +620,9 @@ Tocca %d
 Tocca per bloccare
 :Touch to Unlock
 Tocca per sbloccare
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
 :Transmitter config
 Config. trasmittente
 :Transmitter menu
@@ -622,8 +637,7 @@ Trim +
 Trim -
 :Trim Step
 Trim fine
-:Trims
-Trim
+>:Trimbar
 :Trims
 Trim
 :Turn Off
@@ -632,16 +646,15 @@ Disattiva
 Attiva
 :Tx power
 Potenza di TX
+>:Type
 :USB
 USB
-:USB Filesystem is currently
-il Filesystem USC attuale è
+>:USB Filesystem is currently 
 :Unknown
 Sconosciuto
 :Up
 Su*
-:Value
-Valore
+>:V-trim
 :Value
 Valore
 :Vibration
@@ -650,10 +663,9 @@ Vibrazione
 Virt
 :Volt
 Volt
-:Volt
-Volt
-:Zero/Max
-Zero/Max
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 Zero/Max
 :\n%d seconds left
@@ -662,8 +674,10 @@ Zero/Max
 \n\nIl Binding finirr' tra %d secondi...
 :add
 aggiungi
+>:cntdn-prop
 :countdown
 countdown
+>:delay
 :is not supported
 non è supportato
 :is turned off
@@ -678,5 +692,6 @@ Mult.
 permanente
 :replace
 Sostituisci
+>:stop-prop
 :stopwatch
 Cronometro

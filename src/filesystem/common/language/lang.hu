@@ -1,42 +1,40 @@
 ﻿Magyar
 :# Channels
 Csatornák
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, a biztonságos érték = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\na biztonságos érték = %d%%\n
+>:1 sec
 :1-to-1
 1 az 1
+>:10 sec
 :11 Point
 11 pont
+>:12 hour
 :13 Point
 13 pont
+>:24 hour
 :3 Point
 3 pont
-:4 Bars
-4 oszlop
-:4 Inside
-4 belül
-:4 Outside
-4 kívül
+>:30 sec
 :4Ch w/ Dual-Rates
 4 csat. + DR
 :5 Point
 5 pont
+>:5 sec
 :5+1
 5+1
-:6 Trims
-6 trim
 :6+1
 6+1
+>:60 sec
 :6Ch Airplane
 6 csat. repülőgép
 :6Ch Helicopter
 6 csat. helikopter
 :7 Point
 7 pont
-:8 Bars
-8 oszlop
 :9 Point
 9 pont
 :ABSVAL
@@ -63,6 +61,7 @@ AUX6
 AUX7
 :About Deviation
 Deviation névjegye
+>:Add
 :Advanced
 Haladó
 :Airplane
@@ -71,6 +70,7 @@ Repülőgép
 Riasztás
 :Alarm intvl
 Riaszt. int.
+>:All
 :Altitude
 Magasság
 :Auto
@@ -81,16 +81,15 @@ Aux2
 Fényerő
 :Bad/missing\nprotocol modules!
 Hibás/hiányzó\nprotokoll modulok!
-:Bar %d
-Oszlop%d
-:Bars
-Oszlop
+>:Bar
+>:Bargraph
 :Batt alarm
 Fesz. riaszt.
 :Battery alarm
 Fesz. riasztás
 :Battery too low,\ncan't save!
 Tápfesz. túl alacsony,\nnem tudok menteni!
+>:Big-box
 :Bind
 Csatol
 :Binding
@@ -99,8 +98,7 @@ Kapcsolódás a modellhez
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
 :Binding...\nPress ENT to stop
 Kapcsolódás...\nENT megállítani
-:Box %d
-Doboz%d
+>:Box
 :Button monitor
 Nyomógomb ellenőrzés
 :Buzz settings
@@ -151,12 +149,14 @@ Csatorna
 Csatornák
 :Channel output
 Csatornák
+>:Clock
 :Complex
 Komplex
 :Configure
 Konfigurálás
 :Contrast
 Kontraszt
+>:Control
 :Copy To
 Másolás
 :Copy To...
@@ -181,10 +181,17 @@ D/R&Expó -ELE
 D/R&Expó -RUD
 :DR
 DR
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 :Deadband
 Holtsáv
 :Default
 Default
+>:Delete
 :Delta PW
 Impulzus kitérés
 |devo10:Delta PW
@@ -195,6 +202,7 @@ Deviation verzió:
 Alvó fényerő
 :Dimmer time
 Alvó mód ideje
+>:Display
 :Dn
 Le
 :Do you really want\nto reset the\n permanent timer %d?
@@ -215,6 +223,8 @@ Magassági mix
 Magas. mix
 :EXPO %d
 EXP. %d
+>:Edit
+>:Enable
 :Enabled
 Engedélyezett
 :Enter
@@ -223,8 +233,10 @@ Enter
 Exit
 :Expo&DR
 Expó+DR
+>:Extend
 :FMODE
 FMODE
+>:Fades
 :Fahren
 °F
 :Fail-safe
@@ -247,6 +259,10 @@ Keret
 GEAR
 :GPS
 GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 :Gear
 Gear
 :Generic settings
@@ -255,6 +271,7 @@ Gear
 Giró
 :H
 H
+>:H-trim
 :HOLD
 HOLD
 :Heli
@@ -267,6 +284,8 @@ Helikopter
 Magas
 :Hold position
 TH érték
+>:Holds
+>:Hour
 :Icon
 Ikon
 :Idle Up 1
@@ -295,6 +314,7 @@ LIN
 Nyelv
 :Latitude
 Szélesség
+>:Layout: Long-Press ENT
 :Left
 Bal
 :Length
@@ -307,6 +327,7 @@ Betöltés
 Betöltés...
 :Longitude
 Hosszúság
+>:Loss
 :Low Battery
 Telep üres
 :Low-Rate
@@ -335,6 +356,7 @@ Közepes
 Min korlát
 :Min/Max
 Min/Max
+>:Minute
 :Mixer
 Mixer
 :Mixer GUI
@@ -345,6 +367,7 @@ Mixerek
 Mód
 :Mode %d
 Mód %d
+>:Model
 :Model menu
 Modell menü
 :Model name
@@ -357,6 +380,8 @@ A modellt törölni kell\na szokásos felületre váltáshoz
 Modell konfig.
 :Model type
 Modell típus
+>:Momentary
+>:Month
 :Move Down
 Lejjebb
 :Move Up
@@ -369,12 +394,9 @@ Művelet
 Neg.
 :New
 Új
-:No Bars
-Nincs
+>:No
 :No Trim
 Nincs Trim
-:No Trims
-Nincs
 :None
 Nincs
 :Normal
@@ -393,6 +415,7 @@ Eltolás
 Ok
 :On
 Be
+>:On/Off
 :PIT
 PIT
 :PIT Mix
@@ -403,10 +426,10 @@ PPM
 PPM be
 :PPM%d
 PPM%d
-:PPMIn Config
-PPM be konfig.
+>:PPMIn Cfg (Extend)
 :Page
 Oldal
+>:Page Config
 :Pitch curves
 Állásszög görbék
 :Plane
@@ -425,6 +448,7 @@ Poz. 2
 Poz/Neg
 :Position %d
 Pozíció %d
+>:Power On alarm
 :Power-down alert
 Kikapcs. riaszt.
 :Prealert intvl
@@ -441,24 +465,26 @@ Másolás ENT
 Betöltés ENT
 :Press ENT to turn \nUSB drive
 Nyomjon ENT-t \naz USB
-:Preview: Long-Press ENT
-Előnézet: hosszú ENT
 :Protocol
 Protokoll
 :PwrDn alert
 Kikapcs. riaszt.
+>:PwrOn alarm
 :RIGHT_H
 JOBB_V
 :RIGHT_V
 JOBB_F
 :RPM
 Ford.
+>:RTC Time
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:Rate
 :Re-Init
 Csatol
+>:Real Time Clock
 :Remove
 Törlés
 :Reset
@@ -479,6 +505,7 @@ Jobb
 Bizt. érték
 :Safety
 Biztonság
+>:Sample Rate
 :Save
 Mentés
 :Scale
@@ -487,12 +514,18 @@ Skála
 Skála%s
 :Scanner
 Szkenner
+>:Second
+>:Select
 :Servo
 Szervó
+>:Set
+>:Set:
 :Simple
 Egyszerű
 :Simple 4 Channel
 Egyszerű 4 csat.
+>:Small-box
+>:Smooth
 :Speed
 Sebesség
 :Src
@@ -505,6 +538,7 @@ Szokásos mixer
 Start
 :Step
 Lépés
+>:Stick
 :Stick input
 Bemenetek
 :Stick mode
@@ -577,10 +611,9 @@ Telemetria beállítások
 Hőm.
 :Temperature
 Hőmérséklet
+>:Template
 :Template..
 Sablon...
-:Test
-Teszt
 :Thr hold
 Gáz kapcsoló
 :Throttle curves
@@ -599,8 +632,7 @@ Időzítő %d
 Időzítők
 :Timeup intvl
 Ismétlés interv.
-:Toggle%d
-Jelzés%d
+>:Toggle
 :Touch Calibrate
 Érintés kalibrálás
 :Touch Test
@@ -613,10 +645,8 @@ Képernyő
 Érintse meg a zároláshoz
 :Touch to Unlock
 Érintse meg a feloldáshoz
-:Train
-Oktatás
-:Trainer Config
-Oktató konfig.
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
 :Trainer Sw
 Oktató kapcs.
 :Transmitter config
@@ -633,6 +663,7 @@ Trim +
 Trim -
 :Trim Step
 Trim lépés
+>:Trimbar
 :Trims
 Trim-ek
 :Turn Off
@@ -641,6 +672,7 @@ Kikapcsol
 Bekapcsol
 :Tx power
 Kimenő telj.
+>:Type
 :USB
 USB
 :USB Filesystem is currently 
@@ -649,6 +681,7 @@ USB fájlrendszer jelenleg
 Ismeretlen
 :Up
 Fel
+>:V-trim
 :Value
 Érték
 :Vibration
@@ -657,6 +690,9 @@ Rezgés
 Virt.
 :Volt
 Fesz.
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 Nulla/Max
 :\n%d seconds left
@@ -665,8 +701,10 @@ Nulla/Max
 \n\nKapcsolódás vége %d másodperc múlva...
 :add
 hozzáad
+>:cntdn-prop
 :countdown
 Időzítő
+>:delay
 :is not supported
 nem támogatott
 :is turned off
@@ -681,5 +719,6 @@ szoroz
 Üzemidő
 :replace
 cserél
+>:stop-prop
 :stopwatch
 Stopper

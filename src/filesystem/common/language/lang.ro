@@ -1,42 +1,40 @@
 Română
 :# Channels
 Canale
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%, valoare de siguranță = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\nvaloare de siguranță = %d%%\n
+>:1 sec
 :1-to-1
 1 la 1
+>:10 sec
 :11 Point
 11 puncte
+>:12 hour
 :13 Point
 13 puncte
+>:24 hour
 :3 Point
 3 puncte
-:4 Bars
-4 bări
-:4 Inside
-4 int
-:4 Outside
-4 ext
+>:30 sec
 :4Ch w/ Dual-Rates
 4CH + D/R
 :5 Point
 5 puncte
+>:5 sec
 :5+1
 5+1
-:6 Trims
-6
 :6+1
 6+1
+>:60 sec
 :6Ch Airplane
 6CH avion
 :6Ch Helicopter
 6CH, elicopter
 :7 Point
 7 puncte
-:8 Bars
-8 bare
 :9 Point
 9 puncte
 :ABSVAL
@@ -63,6 +61,7 @@ AUX6
 AUX7
 :About Deviation
 Despre Deviation
+>:Add
 :Advanced
 Avansat
 :Airplane
@@ -71,6 +70,7 @@ Avion
 Alarmă
 :Alarm intvl
 Int. alarmă
+>:All
 :Altitude
 Altitudine
 :Auto
@@ -81,16 +81,15 @@ Aux2
 Iluminare
 :Bad/missing\nprotocol modules!
 Module protocol\nlipsă sau corupte!
-:Bar %d
-Bara %d
-:Bars
-Bare
+>:Bar
+>:Bargraph
 :Batt alarm
 Alarmă bat.
 :Battery alarm
 Alarmă baterie
 :Battery too low,\ncan't save!
 Nivel baterie scăzut,\nnu pot salva!
+>:Big-box
 :Bind
 Bind
 :Binding
@@ -99,8 +98,7 @@ Conectare
 Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
 :Binding...\nPress ENT to stop
 Conectare...\nApăsați ENT pentru a opri
-:Box %d
-Loc%d
+>:Box
 :Button monitor
 Monitor butoane
 :Buzz settings
@@ -111,8 +109,6 @@ Volum
 Setări sunet
 :COL
 Colectiv
-:COL Inv
-COL Inv
 :COL Inv
 Colectiv inv.
 :COL Limit
@@ -135,6 +131,7 @@ Centru PW
 Centrați toate stickuri-le\nși potențiometrele\nși apăsați ENT
 :Ch
 Ch
+>:Ch%d
 :Chan mode
 Mod canale
 :Change
@@ -145,12 +142,14 @@ Canal
 Monitor canale
 :Channel output
 Canale
+>:Clock
 :Complex
 Complex
 :Configure
 Configurează
 :Contrast
 Contrast
+>:Control
 :Copy To
 Copiază
 :Copy To...
@@ -175,10 +174,17 @@ D/R&Exp - ELE
 D/R&Exp -RUD
 :DR
 DR
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 :Deadband
 Bandă moartă
 :Default
 Default
+>:Delete
 :Delta PW
 Delta PW
 :Deviation FW version:
@@ -187,6 +193,7 @@ Deviation fw. versiune:
 Nivel auto
 :Dimmer time
 Timp auto
+>:Display
 :Dn
 Jos
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -202,6 +209,8 @@ ELE inv.
 ELE Mix
 :EXPO %d
 EXP. %d
+>:Edit
+>:Enable
 >:Enabled
 :Enter
 Enter
@@ -209,8 +218,10 @@ Enter
 Exit
 :Expo&DR
 Expo+DR
+>:Extend
 :FMODE
 FMODE
+>:Fades
 :Fahren
 F°
 :Fail-safe
@@ -231,6 +242,10 @@ Dim. pachet
 GEAR
 :GPS
 GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 :Gear
 Gear
 :Generic settings
@@ -239,6 +254,7 @@ Setări generale
 Sens giro
 :H
 H
+>:H-trim
 :HOLD
 HOLD
 :Heli
@@ -251,20 +267,16 @@ Elicopter
 Pos0
 :Hold position
 Poziție fixă
+>:Holds
+>:Hour
 :Icon
 Icon
-:Icon
-Icon
-<:Idle 1
-<Idle 1
-<:Idle 2
-<Idle 2
 >:Idle Up 1
 >:Idle Up 2
-:Input monitor
-Monitor intrări
 :Input
 Intrare
+:Input monitor
+Monitor intrări
 :Insert
 Inserare
 :Inverted
@@ -283,6 +295,7 @@ LIN
 Limbă
 :Latitude
 Latitudine
+>:Layout: Long-Press ENT
 :Left
 Stânga
 :Length
@@ -293,10 +306,9 @@ Legat
 Încarcă
 :Load...
 Încarcă...
-<:Locked
-<Încuiat
 :Longitude
 Longitudine
+>:Loss
 :Low Battery
 Nivel bat. scăzut
 :Low-Rate
@@ -324,6 +336,7 @@ Pos1
 Limită min
 :Min/Max
 Min/Max
+>:Minute
 :Mixer
 Configurare mixer
 :Mixer GUI
@@ -334,6 +347,7 @@ Mixere
 Mod
 :Mode %d
 Mod %d
+>:Model
 :Model menu
 Meniu model
 :Model name
@@ -346,6 +360,8 @@ Modelul va fi resetat pentru\întoarcerea la modul simplu
 Profil model
 :Model type
 Tip model
+>:Momentary
+>:Month
 :Move Down
 Mișcă în jos
 :Move Up
@@ -358,11 +374,8 @@ Mux
 Neg.
 :New
 Now
-:No Bars
-Nici o bară
+>:No
 :No Trim
-nimic
-:No Trims
 nimic
 :None
 nimic
@@ -370,6 +383,7 @@ nimic
 Normal
 :Notch PW
 Depres. PW
+>:Num Channels
 :Off
 Oprit
 :Offset
@@ -378,13 +392,17 @@ Offset
 Ok
 :On
 Pornit
+>:On/Off
 :PIT
 PIT
 >:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 Pagină
-<:Pit Mix
-<Mix PIT
+>:Page Config
 :Pitch curves
 Curbe pitch
 :Plane
@@ -403,9 +421,8 @@ Pos 2
 Poz/Neg
 :Position %d
 Poziția %d
+>:Power On alarm
 >:Power-down alert
-<:PowerOff alert
-<Alertă oprire
 :Prealert intvl
 Interval
 :Prealert time
@@ -420,26 +437,26 @@ Apasa ENT pentru copiere
 Apasă ENT pentru incarcare
 :Press ENT to turn \nUSB drive
 Apasă ENT pentru a seta\nmodul USB
-:Preview: Long-Press ENT
-Test: ține ENT apăsat
 :Protocol
 Protocol
 :PwrDn alert
 Alertă opr.
+>:PwrOn alarm
 :RIGHT_H
 DREAPTA_V
 :RIGHT_V
 DREAPTA_F
 :RPM
 RPM
-:RPM
-RPM
+>:RTC Time
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:Rate
 :Re-Init
 Re-init
+>:Real Time Clock
 :Remove
 Șterge
 :Reset
@@ -447,8 +464,6 @@ Reset
 >:Reset Permanent Timer?
 :Reset sw
 Sw reset
-:Reverse
-Invers
 :Reverse
 Invers
 :Reversed
@@ -461,28 +476,29 @@ Dreapta
 Valoare sig.
 :Safety
 Siguranță
-:Safety
-Siguranță
+>:Sample Rate
 :Save
 Salv.
-:Scale%s
-Scară%s
 :Scale
 Scara
+:Scale%s
+Scară%s
 :Scanner
 Scaner
+>:Second
+>:Select
 :Servo
 Servo
+>:Set
+>:Set:
 :Simple
 Simplu
 :Simple 4 Channel
 Simplu 4 canale
+>:Small-box
+>:Smooth
 :Speed
 Viteză
-:Speed
-Viteză
-:Src
-Sursa
 :Src
 Sursă
 :Standard
@@ -493,6 +509,7 @@ Mixer standard
 Start
 :Step
 Pas
+>:Stick
 :Stick input
 Intrări
 :Stick mode
@@ -503,20 +520,18 @@ Stick-uri
 Sub-trim
 :Subtrim
 Subtrim
-:Subtrim
-Subtrim
 :Swash
 Platou
 :SwashType
 Tip platou
+:Switch
+Activator
 :Switch assignment
 Asignare act.
 :Switch1
 Act1
 :Switch2
 Act2
-:Switch
-Activator
 :Symmetric
 Simetric.
 :THR
@@ -562,15 +577,12 @@ Monitor telemetrie
 :Telemetry settings
 Setări telemetrie
 :Temp
-Temp.
-:Temp
 Temp
 :Temperature
 Temperatură
+>:Template
 :Template..
 Șablon...
-:Test
-Test
 :Thr hold
 Thr hold
 :Throttle curves
@@ -589,8 +601,7 @@ Timer%d
 Timere
 :Timeup intvl
 Expirare
-:Toggle%d
-Într.%d
+>:Toggle
 :Touch Calibrate
 Calibrare ecran
 :Touch Test
@@ -603,6 +614,9 @@ Atinge punctul %d
 Apasă pentru a încuia
 :Touch to Unlock
 Apasă pentru a descuia
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
 :Transmitter config
 Configurare radio
 :Transmitter menu
@@ -617,8 +631,7 @@ Trim +
 Trim -
 :Trim Step
 Pas trim
-:Trims
-Trim-uri
+>:Trimbar
 :Trims
 Trim-uri
 :Turn Off
@@ -627,18 +640,15 @@ Oprește
 Pornește
 :Tx power
 Putere tx
+>:Type
 :USB
 USB
-:USB Filesystem is currently
-Sistemul de fițiere USB este
+>:USB Filesystem is currently 
 :Unknown
 Necunoscut
-<:Unlocked
-<Descuiat
 :Up
 Sus
-:Value
-Valoare
+>:V-trim
 :Value
 Valoare
 :Vibration
@@ -647,8 +657,9 @@ Vibrație
 Virt.
 :Volt
 Volt
-:Volt
-Volt
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 Zero/Max
 :\n%d seconds left
@@ -657,8 +668,10 @@ Zero/Max
 \n\nConectarea se va încheia în %d secunde...
 :add
 aditiv
+>:cntdn-prop
 :countdown
 countdown
+>:delay
 :is not supported
 nu este suportat(ă)
 :is turned off
@@ -673,5 +686,6 @@ mult.
 permanent
 :replace
 înloc.
+>:stop-prop
 :stopwatch
 crono

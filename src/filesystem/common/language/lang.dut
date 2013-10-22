@@ -1,40 +1,38 @@
 ﻿Nederlands
 :# Channels
 # Kanelen
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s is %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s is %d%%,\nveilige waarde = %d%%\n
+>:1 sec
 :1-to-1
 1-op-1
+>:10 sec
 :11 Point
 11 punten
+>:12 hour
 :13 Point
 13 punten
+>:24 hour
 :3 Point
 3 punten
-:4 Bars
-4 balken
-:4 Inside
-4 binnen
-:4 Outside
-4 buiten
+>:30 sec
 :4Ch w/ Dual-Rates
 4-kan. met Dual-Rates
 :5 Point
 5 punten
+>:5 sec
 >:5+1
-:6 Trims
-6 trims
 >:6+1
+>:60 sec
 :6Ch Airplane
 6-kan. vliegtuig
 :6Ch Helicopter
 6-kan. helikopter
 :7 Point
 7 punten
-:8 Bars
-8 balken
 :9 Point
 9 punten
 :ABSVAL
@@ -55,25 +53,26 @@ AUX5
 >:AUX6
 >:AUX7
 >:About Deviation
+>:Add
 >:Advanced
 :Airplane
 Vliegtuig
 >:Alarm
 >:Alarm intvl
+>:All
 >:Altitude
 >:Auto
 >:Aux2
 :Backlight
 Helderheid
 >:Bad/missing\nprotocol modules!
-:Bar %d
-Balk %d
-:Bars
-Balken
+>:Bar
+>:Bargraph
 >:Batt alarm
 :Battery alarm
 Batterijalarm
 >:Battery too low,\ncan't save!
+>:Big-box
 :Bind
 Koppelen
 :Binding
@@ -82,15 +81,13 @@ Bezig met koppelen
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
 :Binding...\nPress ENT to stop
 Bezig met koppelen\nDruk op ENT om te stoppen
-:Box %d
-Kader %d
+>:Box
 >:Button monitor
 >:Buzz settings
 >:Buzz volume
 >:Buzzer settings
 :COL
 COL
->:COL Inv
 :COL Inv
 COL omg
 >:COL Limit
@@ -107,17 +104,20 @@ Annuleren
 >:Center all \nsticks and knobs\nthen press ENT
 :Ch
 Kan
+>:Ch%d
 >:Chan mode
 :Change
 Aanpassen
 >:Channel
 >:Channel monitor
 >:Channel output
+>:Clock
 :Complex
 Complex
 :Configure
 Configureren
 >:Contrast
+>:Control
 >:Copy To
 :Copy To...
 Kopieer...
@@ -136,14 +136,22 @@ Cyclic3
 >:D/R&Exp -RUD
 :DR
 DR
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 >:Deadband
 :Default
 Standaard
+>:Delete
 >:Delta PW
 :Deviation FW version:
 Deviation FW Versie:
 >:Dimmer target
 >:Dimmer time
+>:Display
 >:Dn
 >:Do you really want\nto reset the\n permanent timer %d?
 :Down
@@ -157,6 +165,8 @@ ELE inv
 >:ELE Mix
 :EXPO %d
 Expo %d
+>:Edit
+>:Enable
 >:Enabled
 :Enter
 Toepassen
@@ -164,7 +174,9 @@ Toepassen
 Stoppen
 :Expo&DR
 Expo&DR
+>:Extend
 >:FMODE
+>:Fades
 >:Fahren
 :Fail-safe
 Veilige modus
@@ -180,10 +192,15 @@ Vast ID
 :GEAR
 GEA
 >:GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 >:Gear
 >:Generic settings
 >:Gyro sense
 >:H
+>:H-trim
 >:HOLD
 >:Heli
 >:Heli/Standard GUI
@@ -192,14 +209,15 @@ Helikopter
 :High-Rate
 Hoog
 >:Hold position
+>:Holds
+>:Hour
 :Icon
 Icoon
->:Icon
 >:Idle Up 1
 >:Idle Up 2
->:Input monitor
 :Input
 Invoer
+>:Input monitor
 >:Insert
 :Inverted
 Omgekeerd
@@ -213,6 +231,7 @@ LINKS_V
 :Language
 Taal
 >:Latitude
+>:Layout: Long-Press ENT
 :Left
 Links
 >:Length
@@ -223,6 +242,7 @@ Laad
 :Load...
 Laad...
 >:Longitude
+>:Loss
 >:Low Battery
 :Low-Rate
 Laag
@@ -241,6 +261,7 @@ Middel
 >:Min Limit
 :Min/Max
 Min/Max
+>:Minute
 :Mixer
 Mixer
 >:Mixer GUI
@@ -249,6 +270,7 @@ Mixers
 >:Mode
 :Mode %d
 Mode %d
+>:Model
 >:Model menu
 :Model name
 Modelnaam
@@ -257,6 +279,8 @@ Modelnaam
 >:Model setup
 :Model type
 Modeltype
+>:Momentary
+>:Month
 >:Move Down
 >:Move Up
 >:Move sticks and knobs\nto max & min positions\nthen press ENT
@@ -265,17 +289,15 @@ Mux
 :Neg
 -
 >:New
-:No Bars
-Geen balken
+>:No
 :No Trim
 Geen trim
-:No Trims
-Geen trims
 :None
 Geen
 :Normal
 Normaal
 >:Notch PW
+>:Num Channels
 :Off
 Uit
 :Offset
@@ -284,10 +306,16 @@ Offset
 Ok
 :On
 Aan
+>:On/Off
 >:PIT
 >:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 Pagina
+>:Page Config
 >:Pitch curves
 >:Plane
 :Point
@@ -300,6 +328,7 @@ Punt
 :Pos/Neg
 +/-
 >:Position %d
+>:Power On alarm
 >:Power-down alert
 >:Prealert intvl
 >:Prealert time
@@ -309,28 +338,29 @@ Druk op 'ENT' om USB-bestandssysteem te activeren
 >:Press ENT to copy to
 >:Press ENT to load
 >:Press ENT to turn \nUSB drive
->:Preview: Long-Press ENT
 :Protocol
 Protocol
 >:PwrDn alert
+>:PwrOn alarm
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
 >:RPM
->:RPM
+>:RTC Time
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:Rate
 :Re-Init
 Herinitialiseren
+>:Real Time Clock
 >:Remove
 :Reset
 Reset
 >:Reset Permanent Timer?
 >:Reset sw
->:Reverse
 :Reverse
 Keer om
 :Reversed
@@ -342,24 +372,26 @@ Rechts
 Veilige waarde
 :Safety
 Veiligheid
-:Safety
-Veiligheid
+>:Sample Rate
 :Save
 OPslaan
+>:Scale
 :Scale%s
 Schaal%s
->:Scale
 :Scanner
 Scanner
+>:Second
+>:Select
 >:Servo
+>:Set
+>:Set:
 :Simple
 Eenvoudig
 :Simple 4 Channel
 Eenvoudig 4 kanalen
+>:Small-box
+>:Smooth
 >:Speed
->:Speed
-:Src
-Bron
 :Src
 Bron
 >:Standard
@@ -367,25 +399,25 @@ Bron
 :Start
 Start
 >:Step
+>:Stick
 >:Stick input
 :Stick mode
 Stickmodus
 :Sticks
 Sticks
 >:Sub-trim
->:Subtrim
 :Subtrim
 Fijnafstelling
 >:Swash
 :SwashType
 Type tuimelschijf
+:Switch
+Schakelaar
 >:Switch assignment
 :Switch1
 Schakelaar1
 :Switch2
 Schakelaar2
-:Switch
-Schakelaar
 :Symmetric
 Symmetrisch
 :THR
@@ -423,12 +455,10 @@ TRIM_R-
 >:Telemetry monitor
 >:Telemetry settings
 >:Temp
->:Temp
 >:Temperature
+>:Template
 :Template..
 Sjabloon...
-:Test
-Testen
 >:Thr hold
 >:Throttle curves
 >:Throttle hold
@@ -439,8 +469,7 @@ Timer
 >:Timer%d
 >:Timers
 >:Timeup intvl
-:Toggle%d
-Schakel%d
+>:Toggle
 :Touch Calibrate
 Aanraakscherm kalibreren
 :Touch Test
@@ -453,6 +482,9 @@ Raak indicator %d aan
 Raak aan om vast te zetten
 :Touch to Unlock
 Raak aan om los te maken
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
 >:Transmitter config
 >:Transmitter menu
 >:Travel adjust
@@ -464,7 +496,7 @@ Trim +
 Trim -
 :Trim Step
 Trimstap
->:Trims
+>:Trimbar
 :Trims
 Trims
 :Turn Off
@@ -473,21 +505,24 @@ Uitschakelen
 Inschakelen
 :Tx power
 Zendvermogen
+>:Type
 :USB
 USB
->:USB Filesystem is currently
+>:USB Filesystem is currently 
 :Unknown
 Onbekend
 :Up
 Omhoog
->:Value
+>:V-trim
 :Value
 Waarde
 >:Vibration
 :Virt
 Virt
 >:Volt
->:Volt
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 Nul/Max
 :\n%d seconds left
@@ -496,8 +531,10 @@ Nul/Max
 \n\nKoppeling eindigt over %d seconden...
 :add
 +
+>:cntdn-prop
 :countdown
 Aftellen
+>:delay
 >:is not supported
 >:is turned off
 >:max
@@ -507,5 +544,6 @@ Aftellen
 >:permanent
 :replace
 Vervangen
+>:stop-prop
 :stopwatch
 Stopwatch

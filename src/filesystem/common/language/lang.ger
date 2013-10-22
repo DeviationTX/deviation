@@ -1,42 +1,46 @@
 ﻿Deutsch
 :# Channels
 Kanäle
+:%d bytes left
+%d Bytes übrig
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, Ausfallwert = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s %d%%,\nAusfallwert = %d%%\n
+>:1 sec
 :1-to-1
 1-zu-1
+>:10 sec
 :11 Point
 11 Punkt
+:12 hour
+12 Stunden
 :13 Point
 13 Punkt
+:24 hour
+24 Stunden
 :3 Point
 3 Punkt
-:4 Bars
-4 Balken
-:4 Inside
-4 innen
-:4 Outside
-4 außen
+:30 sec
+30 Sek.
 :4Ch w/ Dual-Rates
 4K mit DR
 :5 Point
 5 Punkt
+:5 sec
+5 Sek.
 :5+1
 5+1
-:6 Trims
-6 Trimms
 :6+1
 6+1
+:60 sec
+60 Sek.
 :6Ch Airplane
 6K Flugzeug
 :6Ch Helicopter
 6K Helikopter
 :7 Point
 7 Punkt
-:8 Bars
-8 Balken
 :9 Point
 9 Punkt
 :ABSVAL
@@ -49,31 +53,45 @@ QUE DR
 QUE Inv
 :AIL Mix
 QUE Mix
->:AUX2
->:AUX3
+:AUX2
+AUX2
+:AUX3
+AUX3
 :AUX4
 AUX4
 :AUX5
 AUX5
->:AUX6
->:AUX7
->:About Deviation
->:Advanced
+:AUX6
+AUX6
+:AUX7
+AUX7
+:About Deviation
+über Deviation
+:Add
+Hinzu
+:Advanced
+Fortgescchritten
 :Airplane
 Flugzeug
 :Alarm
 Alarm
->:Alarm intvl
+:Alarm intvl
+Alarm Intervall
+:All
+Alle
 :Altitude
 Höhe
->:Auto
->:Aux2
+:Auto
+Auto
+:Aux2
+AUX2
 :Backlight
 Helligkeit
->:Bad/missing\nprotocol modules!
-:Bar %d
-Balken %d
-:Bars
+:Bad/missing\nprotocol modules!
+falsches/fehlen-\ndes Protokolmodul!
+:Bar
+Balken
+:Bargraph
 Balken
 :Batt alarm
 Akkuwarner
@@ -81,6 +99,8 @@ Akkuwarner
 Akkuwarner
 :Battery too low,\ncan't save!
 Akku zu schwach,\nkann nicht speichern!
+:Big-box
+Box groß
 :Bind
 Binden
 :Binding
@@ -89,18 +109,18 @@ Binden
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
 :Binding...\nPress ENT to stop
 Binden...\nENT zu stoppen
-:Box %d
-Kasten %d
+:Box
+Box
 :Button monitor
 Knöpfe Anzeige
->:Buzz settings
+:Buzz settings
+Buzzer Einstellung
 :Buzz volume
 Buzzer Lautst
->:Buzzer settings
+:Buzzer settings
+Buzzer Einstellung
 :COL
 COL
-:COL Inv
-COL Inv
 :COL Inv
 COL Inv
 :COL Limit
@@ -123,21 +143,26 @@ Zentriere PW
 Zentriere alle \nKnüppel und Hebel\ndann drücke ENT
 :Ch
 K
+>:Ch%d
 :Chan mode
 K Modus
 :Change
 Ändern
->:Channel
+:Channel
+Kanal
 :Channel monitor
 Kanal Anzeige
 :Channel output
 Kanal Ausgabe
+:Clock
+Uhr
 :Complex
 Komplex
 :Configure
 Konfigurieren
 :Contrast
 Kontrast
+>:Control
 :Copy To
 Kopiere zu
 :Copy To...
@@ -158,10 +183,22 @@ Zyklisch3
 >:D/R&Exp -RUD
 :DR
 DR
+>:Data log
+>:Datalog
+:Date
+Datum
+:Date / Time
+Datum / Zeit
+:Date:
+Datum:
+:Day
+Tag
 :Deadband
 Totzone
 :Default
 Standard
+:Delete
+Lösche
 :Delta PW
 Delta PW
 :Deviation FW version:
@@ -170,9 +207,12 @@ Deviation FW Version:
 Dimmer target
 :Dimmer time
 Dimmer time
+:Display
+Anzeige
 :Dn
 Dn
->:Do you really want\nto reset the\n permanent timer %d?
+:Do you really want\nto reset the\n permanent timer %d?
+Soll der permanente\nTimer %d zurück-\ngesetzt werden?
 :Down
 Runter
 :ELE
@@ -185,6 +225,8 @@ HOE Inv
 HOE Mix
 :EXPO %d
 EXPO %d
+>:Edit
+>:Enable
 >:Enabled
 :Enter
 Eingabe
@@ -192,7 +234,10 @@ Eingabe
 EXT
 :Expo&DR
 Expo&DR
->:FMODE
+>:Extend
+:FMODE
+FMODE
+>:Fades
 :Fahren
 Fahrenheit
 :Fail-safe
@@ -203,7 +248,8 @@ Modell
 Fest
 :Fixed ID
 Feste ID
->:Fly mode
+:Fly mode
+Flugmodus
 :Foot
 Fuß
 :Frame Size
@@ -212,11 +258,20 @@ Rahmen Größe
 FAHRW
 :GPS
 GPS
+:GPS Alt.
+GPS Höhe
+:GPS Coords
+GPS Koordinaten
+:GPS Speed
+GPS Geschwindigkeit
+:GPS Time
+GPS Zeit
 >:Gear
 :Generic settings
 Allgemeine Einstellungen
 >:Gyro sense
 >:H
+>:H-trim
 >:HOLD
 :Heli
 Heli
@@ -226,16 +281,16 @@ Helikopter
 :High-Rate
 Hoch
 >:Hold position
-:Icon
-Bild
+>:Holds
+>:Hour
 :Icon
 Bild
 >:Idle Up 1
 >:Idle Up 2
-:Input monitor
-Eingaben Anzeige
 :Input
 Eingabe
+:Input monitor
+Eingaben Anzeige
 :Insert
 Einfügen
 :Inverted
@@ -252,6 +307,7 @@ LINKS_V
 Sprache
 :Latitude
 Breite
+>:Layout: Long-Press ENT
 :Left
 Links
 :Length
@@ -264,12 +320,14 @@ Laden
 Laden...
 :Longitude
 Länge
+>:Loss
 :Low Battery
 Akku schwach
 :Low-Rate
 Niedrig
 >:M
->:MIX
+:MIX
+MIX
 :Main menu
 Hauptmenü
 :Main page
@@ -289,24 +347,34 @@ Mittel
 Min Limit
 :Min/Max
 Min/Max
+>:Minute
 :Mixer
 Mixer
 >:Mixer GUI
 :Mixers
 Mixers
->:Mode
+:Mode
+Modus
 :Mode %d
-Mode %d
+Modus %d
+:Model
+Modell
 :Model menu
 Modell Menü
 :Model name
 Modellname
->:Model needs reset\nfor standard mixer
->:Model needs to be reset\nin order to switch to the standard mixer
+:Model needs reset\nfor standard mixer
+Modell wird zurück-\gesetzt für Std. Mixer
+:Model needs to be reset\nin order to switch to the standard mixer
+Modell muss zurückgesetzt\nwerden, um den Standard Mixer zu nutzen
 :Model setup
 Modell Einstellungen
 :Model type
 Modelltyp
+:Momentary
+Momenttaster
+:Month
+Monat
 :Move Down
 Nach unten
 :Move Up
@@ -319,11 +387,9 @@ Mux
 -
 :New
 Neu
-:No Bars
-Keine
+:No
+Nein
 :No Trim
-Keine
-:No Trims
 Keine
 :None
 Nichts
@@ -331,6 +397,8 @@ Nichts
 Normal
 :Notch PW
 Notch PW
+:Num Channels
+Anz. Kanäle
 :Off
 Aus
 :Offset
@@ -339,10 +407,17 @@ Ausgleich
 Ok
 :On
 Ein
+:On/Off
+Ein/Aus
 >:PIT
 >:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 Seite
+>:Page Config
 >:Pitch curves
 :Plane
 Flugzeug
@@ -356,7 +431,10 @@ Punkt
 :Pos/Neg
 +/-
 >:Position %d
->:Power-down alert
+:Power On alarm
+Einschaltalarm
+:Power-down alert
+Abschaltalarm
 :Prealert intvl
 Prealert intvl
 :Prealert time
@@ -371,32 +449,36 @@ Drücke ENT zum Kopieren
 Drücke ENT zum Laden
 :Press ENT to turn \nUSB drive
 ENT schaltet \ndas USB Laufwerk
-:Preview: Long-Press ENT
-Vorschau: Lange ENT drücken
 :Protocol
 Protokoll
->:PwrDn alert
+:PwrDn alert
+Absch.-Alarm
+:PwrOn alarm
+Einsch.-Alarm
 :RIGHT_H
 RECHTS_H
 :RIGHT_V
 RECHTS_V
 :RPM
 UPM
-:RPM
-UPM
+:RTC Time
+Uhrzeit
 :RUD
 RUD
 :RUD DR
 RUD DR
+>:Rate
 :Re-Init
 Neu binden
+:Real Time Clock
+Echtzeituhr
 :Remove
 Löschen
 :Reset
 Reset
->:Reset Permanent Timer?
+:Reset Permanent Timer?
+permanenten Timer zurücksetzen?
 >:Reset sw
->:Reverse
 :Reverse
 Umkehr
 :Reversed
@@ -409,26 +491,34 @@ Rechts
 Sicherer Wert
 :Safety
 Sicherheit
-:Safety
-Sicherheit
+>:Sample Rate
 :Save
 Kopieren
+:Scale
+Skalierung
 :Scale%s
 Skalierung%s
->:Scale
 :Scanner
 Scanner
+:Second
+Sekunde
+:Select
+W�hlen
 >:Servo
+:Set
+Setzen
+:Set:
+Setzen:
 :Simple
 Nichts
 :Simple 4 Channel
 Einfach 4 Kanäle
-:Speed
-Geschw
+:Small-box
+Box klein
+:Smooth
+Glätten
 :Speed
 Geschwindigkeit
-:Src
-Quelle
 :Src
 Quelle
 >:Standard
@@ -437,6 +527,8 @@ Quelle
 Start
 :Step
 Schritt
+:Stick
+Knüppel
 :Stick input
 Knüppel Eingabe
 :Stick mode
@@ -444,19 +536,18 @@ Knüppel Mode
 :Sticks
 Knüppel
 >:Sub-trim
->:Subtrim
 :Subtrim
 Untertrimmung
 >:Swash
 :SwashType
 Taumelscheibe
+:Switch
+Hebel
 >:Switch assignment
 :Switch1
 Hebel1
 :Switch2
 Hebel2
-:Switch
-Hebel
 :Symmetric
 Symmetrie
 :THR
@@ -502,14 +593,11 @@ Telemetrie Anzeige
 Telemetrie Einstellungen
 :Temp
 Temp
-:Temp
-Temp
 :Temperature
 Temp
+>:Template
 :Template..
 Vorlage...
-:Test
-Testen
 >:Thr hold
 >:Throttle curves
 >:Throttle hold
@@ -525,8 +613,7 @@ Timer%d
 Timer
 :Timeup intvl
 Timeup intvl
-:Toggle%d
-Hebel%d
+>:Toggle
 :Touch Calibrate
 Touchscreen kalibrieren
 :Touch Test
@@ -539,11 +626,18 @@ Tippe auf Ziel %d
 Antippen zum Sperren
 :Touch to Unlock
 Antippen zum Entsperren
+:Trainer Cfg (Channel)
+Lehrermodus (Kanäle)
+:Trainer Cfg (Stick)
+Lehrermodus (Knüppel)
+:Trainer Sw
+Lehrerschalter
 :Transmitter config
 Sender Einstellungen
 :Transmitter menu
 Sender Menü
->:Travel adjust
+:Travel adjust
+Wegbegrenzung
 :Trim
 Trimmung
 :Trim +
@@ -552,8 +646,7 @@ Trim +
 Trim -
 :Trim Step
 Schritt
-:Trims
-Trimmung
+>:Trimbar
 :Trims
 Trimm
 :Turn Off
@@ -562,14 +655,18 @@ Ausschalten
 Einschalten
 :Tx power
 Sendeleistung
+:Type
+Typ
 :USB
 USB
->:USB Filesystem is currently
+<:USB Filesystem is currently
+<USB-Modus ist gerade
+>:USB Filesystem is currently 
 :Unknown
 Unbekannt
 :Up
 Hoch
->:Value
+>:V-trim
 :Value
 Wert
 :Vibration
@@ -578,8 +675,12 @@ Vibration
 Virt
 :Volt
 Volt
-:Volt
-Volt
+:Welcome
+Willkommen
+:Year
+Jahr
+:Yes
+Ja
 :Zero/Max
 Null/Max
 :\n%d seconds left
@@ -588,8 +689,10 @@ Null/Max
 \n\nBindevorgang endet in %d Sekunden...
 :add
 +
+>:cntdn-prop
 :countdown
 Countdown
+>:delay
 :is not supported
 wird nicht unterstützt
 :is turned off
@@ -600,10 +703,10 @@ max
 min
 :mult
 *
->:permanent
+:permanent
+dauerhaft
 :replace
 ersetzen
+>:stop-prop
 :stopwatch
 Stoppuhr
-<:Über Deviation
->:Advanced

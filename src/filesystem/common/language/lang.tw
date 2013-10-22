@@ -1,40 +1,38 @@
 繁體中文
 :# Channels
 通道數
+>:%d bytes left
 :%s is %d%%, safe value = %d%%\n
 %s = %d%%,熄火保護 = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s = %d%%,\n熄火保護 = %d%%\n
+>:1 sec
 :1-to-1
 等比例
+>:10 sec
 :11 Point
 11 點
+>:12 hour
 :13 Point
 13 點
+>:24 hour
 :3 Point
 3 點
-:4 Bars
-4 條框
-:4 Inside
-4 內調
-:4 Outside
-4 外調
+>:30 sec
 :4Ch w/ Dual-Rates
 4通和舵量
 :5 Point
 5 點
+>:5 sec
 >:5+1
-:6 Trims
-6 微調
 >:6+1
+>:60 sec
 :6Ch Airplane
 6動固定翼
 :6Ch Helicopter
 6動直升機
 :7 Point
 7 點
-:8 Bars
-8 條框
 :9 Point
 9 點
 :ABSVAL
@@ -54,38 +52,33 @@
 >:AUX7
 :About Deviation
 關於 Deviation
-<:Add
-<增加
+>:Add
 :Advanced
 增強模式1
-<:Advanced2
-<增強模式2
 :Airplane
 飛機
 :Alarm
 警示
 :Alarm intvl
 警示間隔
+>:All
 :Altitude
 海拔
-<:Are you sure to\ndelete this mix?
-<是否確定刪除\n當前混控?
 :Auto
 自動
 >:Aux2
 :Backlight
 背光亮度
 >:Bad/missing\nprotocol modules!
-:Bar %d
-條框%d
-:Bars
-狀態條
+>:Bar
+>:Bargraph
 :Batt alarm
 低電警示
 :Battery alarm
 低電警示
 :Battery too low,\ncan't save!
 電壓過低,\n無法儲存修改!
+>:Big-box
 :Bind
 連結
 :Binding
@@ -94,8 +87,7 @@
 連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
 :Binding...\nPress ENT to stop
 對頻中...\n按ENT鍵中止對頻
-:Box %d
-訊息框 %d
+>:Box
 :Button monitor
 按鍵內容檢視
 :Buzz settings
@@ -106,8 +98,6 @@
 警示參數
 :COL
 集體螺距
-:COL Inv
-螺距方向
 :COL Inv
 螺距方向
 :COL Limit
@@ -129,38 +119,31 @@
 所有搖桿置中\n按 ENT 開始進行
 :Ch
 通道
+>:Ch%d
 :Chan mode
 模式
 :Change
 更改
 :Channel
 通道
-<:Channel config
-<通道基本規畫
-<:Channel mix
-<通道混控規畫
 :Channel monitor
 通道內容檢視
 :Channel output
 輸出通道
-<:Channel reorder
-<調整通道順序
+>:Clock
 :Complex
 多段式
 :Configure
 發射機基本規畫
 :Contrast
 對比度
+>:Control
 :Copy To
 複製到
 :Copy To...
 複製到...
-<:CopyTo
-<複製
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 電池電壓不足！\n\n使用中的設定已儲存.\n未來更動將不再儲存.\n\n請即更換電池！
-<:Curve
-<曲線
 :Curve
 曲線
 :Cyclic1
@@ -179,14 +162,17 @@
 大小動-方向
 :DR
 大小動
+>:Data log
+>:Datalog
+>:Date
+>:Date / Time
+>:Date:
+>:Day
 :Deadband
 死區
 :Default
 預設
-<:Default input
-<默認輸入
-<:Dele
-<移除
+>:Delete
 :Delta PW
 增減幅度
 :Deviation FW version:
@@ -195,16 +181,13 @@ Deviation 韌體版本:
 背光省電亮度
 :Dimmer time
 省電啟動時間
+>:Display
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
 是否確定重置\n持久計時器%d?
 :Down
 下
-<:Dual Rate
-<兩段
-<:Duplicate mix\n exists!
-<相同的混控\n已存在!
 :ELE
 升降
 >:ELE DR
@@ -214,8 +197,8 @@ Deviation 韌體版本:
 升降螺距
 :EXPO %d
 曲線%d
-<:Edit
-<編輯
+>:Edit
+>:Enable
 >:Enabled
 :Enter
 輸入
@@ -223,11 +206,12 @@ Deviation 韌體版本:
 退出
 :Expo&DR
 三段式
+>:Extend
 >:FMODE
+>:Fades
 :Fahren
 華氏
-:Failsafe
-失效保護
+>:Fail-safe
 :File
 檔案
 :Fixed
@@ -242,6 +226,10 @@ Deviation 韌體版本:
 PPM週期
 >:GEAR
 >:GPS
+>:GPS Alt.
+>:GPS Coords
+>:GPS Speed
+>:GPS Time
 >:Gear
 :Generic settings
 ======基本參數======
@@ -249,6 +237,7 @@ PPM週期
 鎖尾感度
 :H
 高
+>:H-trim
 >:HOLD
 :Heli
 直升機
@@ -259,20 +248,16 @@ PPM週期
 高位
 :Hold position
 鎖定準位
-:Icon
-圖示
+>:Holds
+>:Hour
 :Icon
 圖式
-<:Idle 1
-<特技1
-<:Idle 2
-<特技2
 >:Idle Up 1
 >:Idle Up 2
-:Input monitor
-輸入內容檢視
 :Input
 輸入
+:Input monitor
+輸入內容檢視
 :Insert
 插入
 :Inverted
@@ -291,6 +276,7 @@ PPM週期
 使用語系
 :Latitude
 緯度
+>:Layout: Long-Press ENT
 :Left
 左
 :Length
@@ -303,6 +289,7 @@ PPM週期
 載入..
 :Longitude
 經度
+>:Loss
 >:Low Battery
 :Low-Rate
 低位
@@ -316,8 +303,6 @@ PPM週期
 :Main page config
 螢幕排列規畫
 >:Manual
-<:Master
-<輸入
 :Max Limit
 輸出上限
 :Menu
@@ -330,6 +315,7 @@ PPM週期
 輸出下限
 :Min/Max
 上/下限
+>:Minute
 :Mixer
 混控器
 :Mixer GUI
@@ -340,6 +326,7 @@ PPM週期
 模式
 :Mode %d
 模式 %d
+>:Model
 :Model menu
 模型選單
 :Model name
@@ -352,29 +339,22 @@ PPM週期
 模型設定
 :Model type
 機種選擇
+>:Momentary
+>:Month
 :Move Down
 下移
 :Move Up
 上移
 :Move sticks and knobs\nto max & min positions\nthen press ENT
 移動所有搖桿\n通過上下極限區域\n按 ENT 校準
-<:MoveDn
-<上移
-<:MoveUp
-<下移
-<:Mux
-<混合
 :Mux
 混合
 :Neg
 負
 :New
 新
-:No Bars
-無條框
+>:No
 :No Trim
-無微調
-:No Trims
 無微調
 :None
 無
@@ -382,6 +362,7 @@ PPM週期
 正常的
 :Notch PW
 通道間隔
+>:Num Channels
 :Off
 關閉
 :Offset
@@ -390,19 +371,21 @@ PPM週期
 確定
 :On
 開啟
+>:On/Off
 :PIT
 螺距
 >:PIT Mix
+>:PPM
+>:PPM In
+>:PPM%d
+>:PPMIn Cfg (Extend)
 :Page
 頁碼：
-<:Pit Mix
-<集體螺距
+>:Page Config
 :Pitch curves
 螺距曲線
 :Plane
 飛機
-<:Point
-<點
 :Point
 點
 :Pos
@@ -417,9 +400,8 @@ PPM週期
 正/負
 :Position %d
 档位%d
+>:Power On alarm
 >:Power-down alert
-<:PowerOff alert
-<無電警示
 :Prealert intvl
 倒數預警間隔
 :Prealert time
@@ -434,31 +416,25 @@ PPM週期
 按 ENT 載入
 :Press ENT to turn \nUSB drive
 按 ENT 讓 USB：
-:Preview: Long-Press ENT
-長按 ENT 預覽 EXT 離開
-<:Program mix
-<程式混控
 :Protocol
 通訊協定
 :PwrDn alert
 關機警示
+>:PwrOn alarm
 :RIGHT_H
 右水平
 :RIGHT_V
 右垂直
 :RPM
 轉速
-:RPM
-轉速
+>:RTC Time
 :RUD
 方向
 >:RUD DR
-<:Rate
-<分段
+>:Rate
 :Re-Init
 重對頻
-<:Reach max mix\nlimit for a channel!
-<此通道程式混控\n數量達到上限！
+>:Real Time Clock
 :Remove
 刪除
 :Reset
@@ -467,8 +443,6 @@ PPM週期
 是否確定重置\n持久計時器?
 :Reset sw
 重置開關
-:Reverse
-輸出方向
 :Reverse
 輸出方向
 :Reversed
@@ -481,30 +455,29 @@ PPM週期
 安全值
 :Safety
 安全開關
-:Safety
-安全開關
+>:Sample Rate
 :Save
 儲存
-:Scale%s
-比例%s
 :Scale
 比例
+:Scale%s
+比例%s
 :Scanner
 2.4G頻道掃描
+>:Second
+>:Select
 :Servo
 舵機
+>:Set
+>:Set:
 :Simple
 單段式
 :Simple 4 Channel
 簡單4通道
-<:Slave
-<被控通道
-:Speed
-速率
+>:Small-box
+>:Smooth
 :Speed
 舵機速度
-:Src
-訊號來源
 :Src
 來源
 >:Standard
@@ -512,10 +485,9 @@ PPM週期
 通用模式
 :Start
 開始時間
-<:Std Heli
-<通用直機
 :Step
 步幅
+>:Stick
 :Stick input
 搖桿輸入
 :Stick mode
@@ -526,22 +498,18 @@ PPM週期
 微調
 :Subtrim
 微調
-:Subtrim
-微調
 :Swash
 十字盤設定
 :SwashType
 十字盤類型
-<:Switch
-<開關
+:Switch
+開關
 :Switch assignment
 指定切換開關
 :Switch1
 開關1
 :Switch2
 開關2
-:Switch
-開關
 :Symmetric
 對稱
 :THR
@@ -587,14 +555,11 @@ PPM週期
 ======遙測參數======
 :Temp
 溫度
-:Temp
-溫度
 :Temperature
 溫度單位
+>:Template
 :Template..
 模板..
-:Test
-測試
 :Thr hold
 熄火開關
 :Throttle curves
@@ -613,8 +578,7 @@ PPM週期
 計時器
 :Timeup intvl
 超時警示間隔
-:Toggle%d
-開關%d
+>:Toggle
 :Touch Calibrate
 觸控板校正
 :Touch Test
@@ -627,6 +591,9 @@ PPM週期
 按此鎖住按鍵不輸出
 :Touch to Unlock
 按此解除按鍵鎖定
+>:Trainer Cfg (Channel)
+>:Trainer Cfg (Stick)
+>:Trainer Sw
 :Transmitter config
 發射機規畫
 :Transmitter menu
@@ -641,8 +608,7 @@ PPM週期
 微調-
 :Trim Step
 微調幅度
-:Trims
-微調
+>:Trimbar
 :Trims
 微調數
 :Turn Off
@@ -651,17 +617,14 @@ PPM週期
 開啟
 :Tx power
 發射功率
+>:Type
 >:USB
-:USB Filesystem is currently
-USB文件系統當前狀態
+>:USB Filesystem is currently 
 :Unknown
 未知
 :Up
 上
-<:UseTrim
-<微調
-:Value
-數值
+>:V-trim
 :Value
 數值
 :Vibration
@@ -670,8 +633,9 @@ USB文件系統當前狀態
 虛擬
 :Volt
 電壓
-:Volt
-電壓
+>:Welcome
+>:Year
+>:Yes
 :Zero/Max
 零/最大
 :\n%d seconds left
@@ -680,8 +644,10 @@ USB文件系統當前狀態
 \n\n連結將在 %d 秒內結束
 :add
 相加
+>:cntdn-prop
 :countdown
 倒數
+>:delay
 :is not supported
 並未支援
 :is turned off
@@ -696,5 +662,6 @@ USB文件系統當前狀態
 持久計時
 :replace
 取代
+>:stop-prop
 :stopwatch
 碼錶
