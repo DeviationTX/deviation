@@ -170,4 +170,5 @@ u32 TELEMETRY_IsUpdated(int val);
 void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
+void TELEMETRY_SetTypeByProtocol(enum Protocols protocol);
 #endif

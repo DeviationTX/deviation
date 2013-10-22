@@ -530,9 +530,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 if (MATCH_VALUE(RADIO_PROTOCOL_VAL[i])) {
                     m->protocol = i;
                     PROTOCOL_Load(1);
-                    if (MATCH_VALUE("DEVO")) TELEMETRY_SetType(TELEM_DEVO);
-                    if (MATCH_VALUE("DSM2")) TELEMETRY_SetType(TELEM_DSM);
-                    if (MATCH_VALUE("DSMX")) TELEMETRY_SetType(TELEM_DSM);
+                    TELEMETRY_SetTypeByProtocol(m->protocol);
                     return 1;
                 }
             }

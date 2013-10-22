@@ -240,6 +240,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         PROTOCOL_DeInit();
         PROTOCOL_Load(1);
+        TELEMETRY_SetTypeByProtocol(Model.protocol);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
         if (! PROTOCOL_HasPowerAmp(Model.protocol))
             Model.tx_power = TXPOWER_150mW;
