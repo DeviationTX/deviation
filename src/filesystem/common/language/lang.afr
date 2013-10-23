@@ -1,34 +1,42 @@
 ﻿Afrikaans
 :# Channels
 Aantal Kanale
->:%d bytes left
+:%d bytes left
+%d Bytes oor
 :%s is %d%%, safe value = %d%%\n
 %s %d%%, veilige waarde = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
 %s %d%%,\nveilige waarde = %d%%
->:1 sec
+:1 sec
+1 sek
 :1-to-1
 1-tot-1
->:10 sec
+:10 sec
+10 sek
 :11 Point
 11 Punt
->:12 hour
+:12 hour
+12 huur
 :13 Point
 13 Punt
 >:24 hour
+24 huur
 :3 Point
 3 Punt
->:30 sec
+:30 sec
+30 sek
 :4Ch w/ Dual-Rates
 4K met DR
 :5 Point
 5 Punt
->:5 sec
+:5 sec
+5 seK
 :5+1
 5+1
 :6+1
 6+1
->:60 sec
+:60 sec
+60 sek
 :6Ch Airplane
 6K Vliegtuig
 :6Ch Helicopter
@@ -70,7 +78,8 @@ Vliegtuig
 Alarm
 :Alarm intvl
 Alarm interval
->:All
+:All
+Almal
 :Altitude
 Hoogte
 :Auto
@@ -81,15 +90,18 @@ Aux2
 Skermlig
 :Bad/missing\nprotocol modules!
 Protokol modules\nis sleg of weg!
->:Bar
->:Bargraph
+:Bar
+Balk
+:Bargraph
+Balkgrafiek
 :Batt alarm
 Bat Alarm
 :Battery alarm
 Battery Alarm
 :Battery too low,\ncan't save!
 Battery pap,kan\nnie stoor nie!
->:Big-box
+:Big-box
+Groot boks
 :Bind
 Bind
 :Binding
@@ -98,7 +110,8 @@ Bind...
 Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
 :Binding...\nPress ENT to stop
 Bind...\nDruk ENT om te stop
->:Box
+:Box
+Boks
 :Button monitor
 Knoppie Monitor
 :Buzz settings
@@ -131,7 +144,8 @@ Center PW
 Stokke in middel en\nknoppies af\nDruk dan ENT
 :Ch
 Knl
->:Ch%d
+:Ch%d
+Knl%d
 :Chan mode
 Kanaal Mode
 :Change
@@ -142,14 +156,16 @@ Kannaal
 Kanaal Monitor
 :Channel output
 Kanaal Uitset
->:Clock
+:Clock
+Horlosie
 :Complex
 Kompleks
 :Configure
 Konfigureer
 :Contrast
 Kontras
->:Control
+:Control
+Beheer
 :Copy To
 Kopieër na
 :Copy To...
@@ -174,17 +190,24 @@ D/R&Exp -ELE
 D/R&Exp -RUD
 :DR
 DR
->:Data log
->:Datalog
->:Date
->:Date / Time
->:Date:
->:Day
+:Data log
+Datalog
+:Datalog
+Datalog
+:Date
+Datum
+:Date / Time
+Datum / Tyd
+:Date:
+Datum:
+:Day
+Dag
 :Deadband
 Dooieband
 :Default
 Default
->:Delete
+:Delete
+Vee uit
 :Delta PW
 Delta PW
 :Deviation FW version:
@@ -193,7 +216,8 @@ Deviation Sagteware:
 Verdof Teiken
 :Dimmer time
 Verdof tyd
->:Display
+:Display
+Vertoon
 :Dn
 Af
 :Do you really want\nto reset the\n permanent timer %d?
@@ -210,8 +234,10 @@ ELE Inv
 ELE Meng
 :EXPO %d
 Expo %d
->:Edit
->:Enable
+:Edit
+Edit
+:Enable
+Aktiveer
 :Enabled
 Geaktiveer
 :Enter
@@ -220,10 +246,12 @@ Enter
 Exit
 :Expo&DR
 Expo&DR
->:Extend
+:Extend
+Bereik
 :FMODE
 FMODE
->:Fades
+:Fades
+Verdof
 :Fahren
 Beweeg
 :Fail-safe
@@ -244,10 +272,14 @@ Raam Grootte
 GEAR
 :GPS
 GPS
->:GPS Alt.
->:GPS Coords
->:GPS Speed
->:GPS Time
+:GPS Alt.
+GPS Hooghte
+:GPS Coords
+GPS Koord.
+:GPS Speed
+GPS Spoed
+:GPS Time
+GPS Tyd
 :Gear
 GEAR
 :Generic settings
@@ -256,7 +288,8 @@ Generiese Opstelling
 Gyro Monitor
 :H
 H
->:H-trim
+:H-trim
+H-trim
 :HOLD
 HOU
 :Heli
@@ -269,8 +302,10 @@ Helikopter
 Hoë tempo
 :Hold position
 Hou Posisie
->:Holds
->:Hour
+:Holds
+Hou
+:Hour
+Uur
 :Icon
 Ikoon
 :Idle Up 1
@@ -299,7 +334,8 @@ LIN
 Taal
 :Latitude
 Breedtegraad
->:Layout: Long-Press ENT
+:Layout: Long-Press ENT
+Uitleg: Langdruk ENT
 :Left
 Links
 :Length
@@ -312,7 +348,8 @@ Laai
 Laai...
 :Longitude
 Lengtegraad
->:Loss
+:Loss
+Verlies
 :Low Battery
 Battery pap
 :Low-Rate
@@ -352,7 +389,8 @@ Mengers
 Modus
 :Mode %d
 Modus %d
->:Model
+:Model
+Model
 :Model menu
 Model Menu
 :Model name
@@ -365,8 +403,10 @@ Model moet eers Reset\nom oor teskakel na die Standaard Menger
 Modelopstelling
 :Model type
 Model tipe
->:Momentary
->:Month
+:Momentary
+Moment
+:Month
+Maand
 :Move Down
 Beweeg Af
 :Move Up
@@ -379,7 +419,8 @@ Mux
 Neg
 :New
 Nuwe
->:No
+:No
+Nee
 :No Trim
 Geen Trim
 :None
@@ -388,7 +429,8 @@ Geen
 Normal
 :Notch PW
 Notch PW
->:Num Channels
+:Num Channels
+Aantal Kanale
 :Off
 Af
 :Offset
@@ -397,18 +439,24 @@ Afset
 Ok
 :On
 Aan
->:On/Off
+:On/Off
+Aan/Af
 :PIT
 PIT
 :PIT Mix
 PIT Meng
->:PPM
->:PPM In
->:PPM%d
->:PPMIn Cfg (Extend)
+:PPM
+PPM
+:PPM In
+PPM_In
+:PPM%d
+PPM%d
+:PPMIn Cfg (Extend)
+PPM_In Konf.
 :Page
 Bladsy
->:Page Config
+:Page Config
+Bladsy Konfig.
 :Pitch curves
 PIT kurwes
 :Plane
@@ -427,7 +475,8 @@ Pos 2
 +/-
 :Position %d
 Posisie %d
->:Power On alarm
+:Power On alarm
+Krag aan alarm
 :Power-down alert
 Krag-af Waarskuwing
 :Prealert intvl
@@ -448,22 +497,26 @@ Druk ENT vir USB aan
 Protokol
 :PwrDn alert
 Krag-af waarskuwing
->:PwrOn alarm
+:PwrOn alarm
+Krag-Aan Alarm
 :RIGHT_H
 REGS_H
 :RIGHT_V
 REGS_V
 :RPM
 RPM
->:RTC Time
+:RTC Time
+RTC Tyd
 :RUD
 RUD
 :RUD DR
 RUD DR
->:Rate
+:Rate
+Tempo
 :Re-Init
 Her-ini
->:Real Time Clock
+:Real Time Clock
+Waretyd Horlosie
 :Remove
 Verwyder
 :Reset
@@ -484,7 +537,8 @@ Regs
 Veiligew
 :Safety
 Veiligheid
->:Sample Rate
+:Sample Rate
+Monstertyd 
 :Save
 Stoor
 :Scale
@@ -493,18 +547,24 @@ Skaal
 Skale%s
 :Scanner
 Skandeer
->:Second
->:Select
+:Second
+Sekonde
+:Select
+Selekteer
 :Servo
 Servo
->:Set
->:Set:
+:Set
+Set
+:Set:
+Set:
 :Simple
 Eenvoudig
 :Simple 4 Channel
 Eenvdge 4 kanaal
->:Small-box
->:Smooth
+:Small-box
+Kleinboks
+:Smooth
+Glad
 :Speed
 Spoed
 :Src
@@ -517,7 +577,8 @@ Standaard Menger
 Begin
 :Step
 Stap
->:Stick
+:Stick
+Stok
 :Stick input
 Stokinset
 :Stick mode
@@ -609,7 +670,8 @@ Tydhouer%d
 Tydhouers
 :Timeup intvl
 Tydaan periode
->:Toggle
+:Toggle
+Skakel
 :Touch Calibrate
 Skerm kalibrasie
 :Touch Test
@@ -623,8 +685,11 @@ Raak om te sluit
 :Touch to Unlock
 Raak om te ontsluit
 >:Trainer Cfg (Channel)
+Leerder Konf(Kanaal)
 >:Trainer Cfg (Stick)
->:Trainer Sw
+Leerder Konf(Stok )
+:Trainer Sw
+Leerder Sk. 
 :Transmitter config
 Sender Opstelling
 :Transmitter menu
@@ -639,7 +704,8 @@ Trim +
 Trim -
 :Trim Step
 Trim stap
->:Trimbar
+:Trimbar
+Trimbalk
 :Trims
 Trims
 :Turn Off
@@ -649,14 +715,17 @@ Sit Aan
 :Tx power
 Sendkrag
 >:Type
+Tipe
 :USB
 USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+USB Leerstelsel is tans
 :Unknown
 Onbekend
 :Up
 Op
->:V-trim
+:V-trim
+V-trim
 :Value
 Waarde
 :Vibration
@@ -665,9 +734,12 @@ Vibrasie
 Virt
 :Volt
 Volt
->:Welcome
->:Year
->:Yes
+:Welcome
+Welkom
+:Year
+Jaar
+:Yes
+Ja
 :Zero/Max
 Zero/Max
 :\n%d seconds left
@@ -676,10 +748,12 @@ Zero/Max
 \n\nBindproses eindig in %d sekonds...
 :add
 +
->:cntdn-prop
+:cntdn-prop
+aftel-prop
 :countdown
 Afteller
->:delay
+:delay
+Vertraging
 :is not supported
 word nie ondersteun nie
 :is turned off
@@ -694,6 +768,7 @@ min
 Permanent
 :replace
 vervang
->:stop-prop
+:stop-prop
+Stop-prop
 :stopwatch
 Stophorlosie
