@@ -4,13 +4,15 @@ Kanäle
 :%d bytes left
 %d Bytes übrig
 :%s is %d%%, safe value = %d%%\n
-%s %d%%, Ausfallwert = %d%%\n
+%s ist %d%%, Sicherer Wert = %d%%\n
 :%s is %d%%,\nsafe value = %d%%
-%s %d%%,\nAusfallwert = %d%%\n
->:1 sec
+%s=%d%%, SOLL=%d%%\n
+:1 sec
+1 Sek.
 :1-to-1
 1-zu-1
->:10 sec
+:10 sec
+10 Sek.
 :11 Point
 11 Punkt
 :12 hour
@@ -46,13 +48,13 @@ Kanäle
 :ABSVAL
 Absolut
 :AIL
-QUE
+QR
 :AIL DR
-QUE DR
+QR DR
 :AIL Inv
-QUE Inv
+QR Inv
 :AIL Mix
-QUE Mix
+QR Mix
 :AUX2
 AUX2
 :AUX3
@@ -70,13 +72,13 @@ AUX7
 :Add
 Hinzu
 :Advanced
-Fortgescchritten
+Erweitert
 :Airplane
 Flugzeug
 :Alarm
 Alarm
 :Alarm intvl
-Alarm Intervall
+Alarm intvl
 :All
 Alle
 :Altitude
@@ -114,11 +116,11 @@ Box
 :Button monitor
 Knöpfe Anzeige
 :Buzz settings
-Buzzer Einstellung
+Summer Einstellungen
 :Buzz volume
-Buzzer Lautst
+Lautstärke
 :Buzzer settings
-Buzzer Einstellung
+Summer Einstellungen
 :COL
 COL
 :COL Inv
@@ -130,20 +132,21 @@ COL Mix
 :CYC
 TAUM
 :Calibrate
-Kalibrieren
+Kalibrier.
 :Calibration done.
-Kalibrierung abgeschlossen.
+Kalibrierung\nabgeschlossen.
 :Cancel
-Abbruch
+Abbr.
 :Celsius
 Celsius
 :Center PW
-Zentriere PW
+Zentr. PW
 :Center all \nsticks and knobs\nthen press ENT
 Zentriere alle \nKnüppel und Hebel\ndann drücke ENT
 :Ch
 K
->:Ch%d
+:Ch%d
+K%d
 :Chan mode
 K Modus
 :Change
@@ -162,25 +165,30 @@ Komplex
 Konfigurieren
 :Contrast
 Kontrast
->:Control
+:Control
+Regelung
 :Copy To
-Kopiere zu
+Kopie nach
 :Copy To...
-Kopieren...
+Kopie...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
 Kritischer Akkustand erkannt.\nEinstellungen wurden gespeichert.\nAlle nachträglichen Einstellungen\nwerden NICHT gespeichert.\n\nAkku umgehend wechseln!
 :Curve
 Kurve
 :Cyclic1
-Zyklisch1
+Zykl1
 :Cyclic2
-Zyklisch2
+Zykl2
 :Cyclic3
-Zyklisch3
->:D/R & Exp
->:D/R&Exp -AIL
->:D/R&Exp -ELE
->:D/R&Exp -RUD
+Zykl3
+:D/R & Exp
+D/R & Exp
+:D/R&Exp -AIL
+D/R&Exp -QR
+:D/R&Exp -ELE
+D/R&Exp -HR
+:D/R&Exp -RUD
+D/R&Exp -SR
 :DR
 DR
 >:Data log
@@ -204,9 +212,9 @@ Delta PW
 :Deviation FW version:
 Deviation FW Version:
 :Dimmer target
-Dimmer target
+Dimmer Ziel
 :Dimmer time
-Dimmer time
+Dimmzeit
 :Display
 Anzeige
 :Dn
@@ -216,18 +224,20 @@ Soll der permanente\nTimer %d zurück-\ngesetzt werden?
 :Down
 Runter
 :ELE
-HOE
+HR
 :ELE DR
-HOE DR
+HR DR
 :ELE Inv
-HOE Inv
+HR Inv
 :ELE Mix
-HOE Mix
+HR Mix
 :EXPO %d
 EXPO %d
 >:Edit
->:Enable
->:Enabled
+:Enable
+Aktiv
+:Enabled
+Aktiv
 :Enter
 Eingabe
 :Exit
@@ -241,7 +251,7 @@ FMODE
 :Fahren
 Fahrenheit
 :Fail-safe
-Ausfallschutz
+Fail-safe
 :File
 Modell
 :Fixed
@@ -261,15 +271,16 @@ GPS
 :GPS Alt.
 GPS Höhe
 :GPS Coords
-GPS Koordinaten
+GPS Koord.
 :GPS Speed
-GPS Geschwindigkeit
+GPS Geschw.
 :GPS Time
 GPS Zeit
 >:Gear
 :Generic settings
-Allgemeine Einstellungen
->:Gyro sense
+Allgemeine Einstell.
+:Gyro sense
+Kreiselempf.
 >:H
 >:H-trim
 >:HOLD
@@ -280,15 +291,18 @@ Heli
 Helikopter
 :High-Rate
 Hoch
->:Hold position
+:Hold position
+Halteposition
 >:Holds
 >:Hour
 :Icon
 Bild
->:Idle Up 1
->:Idle Up 2
+:Idle Up 1
+Leerl. 1
+:Idle Up 2
+Leerl. 2
 :Input
-Eingabe
+Einga.
 :Input monitor
 Eingaben Anzeige
 :Insert
@@ -307,13 +321,14 @@ LINKS_V
 Sprache
 :Latitude
 Breite
->:Layout: Long-Press ENT
+:Layout: Long-Press ENT
+Entw.: Langer Druck ENT
 :Left
 Links
 :Length
 Länge
 :Linked
-Verknüpft
+Verkn.
 :Load
 Laden
 :Load...
@@ -333,7 +348,7 @@ Hauptmenü
 :Main page
 Startseite
 :Main page config
-Startseitenkonfiguration
+Startseitenkonfig.
 >:Manual
 :Max Limit
 Max Limit
@@ -354,9 +369,9 @@ Mixer
 :Mixers
 Mixers
 :Mode
-Modus
+Mode
 :Mode %d
-Modus %d
+Mode %d
 :Model
 Modell
 :Model menu
@@ -364,11 +379,11 @@ Modell Menü
 :Model name
 Modellname
 :Model needs reset\nfor standard mixer
-Modell wird zurück-\gesetzt für Std. Mixer
+Modell wird rückge-\nsetzt für Std. Mixer
 :Model needs to be reset\nin order to switch to the standard mixer
 Modell muss zurückgesetzt\nwerden, um den Standard Mixer zu nutzen
 :Model setup
-Modell Einstellungen
+Modelleinstellungen
 :Model type
 Modelltyp
 :Momentary
@@ -380,7 +395,7 @@ Nach unten
 :Move Up
 Nach oben
 :Move sticks and knobs\nto max & min positions\nthen press ENT
-Bewege die Knüppel und Hebel\nin die max & min Positionen\nDann drücke ENT
+Bewege Knüppel und\nHebel in die Max & Min\nPositionen\nDann drücke ENT
 :Mux
 Mux
 :Neg
@@ -392,7 +407,7 @@ Nein
 :No Trim
 Keine
 :None
-Nichts
+keine
 :Normal
 Normal
 :Notch PW
@@ -402,7 +417,7 @@ Anz. Kanäle
 :Off
 Aus
 :Offset
-Ausgleich
+Versatz
 :Ok
 Ok
 :On
@@ -414,11 +429,13 @@ Ein/Aus
 >:PPM
 >:PPM In
 >:PPM%d
->:PPMIn Cfg (Extend)
+:PPMIn Cfg (Extend)
+PPMIn Konf. (Erweitert)
 :Page
 Seite
 >:Page Config
->:Pitch curves
+:Pitch curves
+Nick-Kurven
 :Plane
 Flugzeug
 :Point
@@ -436,15 +453,15 @@ Einschaltalarm
 :Power-down alert
 Abschaltalarm
 :Prealert intvl
-Prealert intvl
+Voralarm intvl
 :Prealert time
-Prealert time
+Voralarmzeit
 :Press 'Ent' to turn USB Filesystem
 'ENT' schaltet das USB Filesystem
 :Press ENT to change
 Drücke ENT zum Ändern
 :Press ENT to copy to
-Drücke ENT zum Kopieren
+Drücke ENT zum Kopier.
 :Press ENT to load
 Drücke ENT zum Laden
 :Press ENT to turn \nUSB drive
@@ -464,9 +481,9 @@ UPM
 :RTC Time
 Uhrzeit
 :RUD
-RUD
+SR
 :RUD DR
-RUD DR
+SR DR
 >:Rate
 :Re-Init
 Neu binden
@@ -475,35 +492,36 @@ Echtzeituhr
 :Remove
 Löschen
 :Reset
-Reset
+Rücksetz
 :Reset Permanent Timer?
-permanenten Timer zurücksetzen?
->:Reset sw
+Permanenten Timer zurücksetzen?
+:Reset sw
+Rücksetz
 :Reverse
-Umkehr
+Servoumkehr
 :Reversed
 Umgekehrt
 :Revert
-Zurücknehmen
+Ursprung
 :Right
 Rechts
 :Safe Val
-Sicherer Wert
+Sich. Wert
 :Safety
 Sicherheit
 >:Sample Rate
 :Save
-Kopieren
+Sichrn
 :Scale
 Skalierung
 :Scale%s
-Skalierung%s
+Skalier.%s
 :Scanner
 Scanner
 :Second
 Sekunde
 :Select
-W�hlen
+Auswahl
 >:Servo
 :Set
 Setzen
@@ -518,7 +536,7 @@ Box klein
 :Smooth
 Glätten
 :Speed
-Geschwindigkeit
+Geschwind.
 :Src
 Quelle
 >:Standard
@@ -526,24 +544,27 @@ Quelle
 :Start
 Start
 :Step
-Schritt
+Stufe
 :Stick
 Knüppel
 :Stick input
 Knüppel Eingabe
 :Stick mode
-Knüppel Mode
+Knüppelmode
 :Sticks
 Knüppel
->:Sub-trim
+:Sub-trim
+Servomitte
 :Subtrim
-Untertrimmung
->:Swash
-:SwashType
+Servomitte
+:Swash
 Taumelscheibe
+:SwashType
+T.-Typ
 :Switch
-Hebel
->:Switch assignment
+Schalter
+:Switch assignment
+Schalterzuordnung
 :Switch1
 Hebel1
 :Switch2
@@ -586,21 +607,24 @@ TelemV
 :Telemetry
 Telemetrie
 :Telemetry config
-Telemetrie Einstellung
+Telemetriekonfig.
 :Telemetry monitor
 Telemetrie Anzeige
 :Telemetry settings
-Telemetrie Einstellungen
+Telemetrieeinstellung.
 :Temp
 Temp
 :Temperature
-Temp
+Temperatur
 >:Template
 :Template..
 Vorlage...
->:Thr hold
->:Throttle curves
->:Throttle hold
+:Thr hold
+Gas halt.
+:Throttle curves
+Gaskurven
+:Throttle hold
+Gas halten
 :Time
 Zeit
 :Timer
@@ -613,7 +637,8 @@ Timer%d
 Timer
 :Timeup intvl
 Timeup intvl
->:Toggle
+:Toggle
+Hebel
 :Touch Calibrate
 Touchscreen kalibrieren
 :Touch Test
@@ -627,11 +652,11 @@ Antippen zum Sperren
 :Touch to Unlock
 Antippen zum Entsperren
 :Trainer Cfg (Channel)
-Lehrermodus (Kanäle)
+Lehrer/Schüler (Kanal)
 :Trainer Cfg (Stick)
-Lehrermodus (Knüppel)
+Lehrer/Sch. (Knüppel)
 :Trainer Sw
-Lehrerschalter
+Lehr. Schalt
 :Transmitter config
 Sender Einstellungen
 :Transmitter menu
@@ -654,13 +679,11 @@ Ausschalten
 :Turn On
 Einschalten
 :Tx power
-Sendeleistung
+Tx Leistung
 :Type
 Typ
 :USB
 USB
-<:USB Filesystem is currently
-<USB-Modus ist gerade
 >:USB Filesystem is currently 
 :Unknown
 Unbekannt
@@ -684,7 +707,7 @@ Ja
 :Zero/Max
 Null/Max
 :\n%d seconds left
-\n%d sekunden nach links
+\n%d Sekunden verbleibend
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :add
@@ -692,7 +715,8 @@ Null/Max
 >:cntdn-prop
 :countdown
 Countdown
->:delay
+:delay
+verzög.
 :is not supported
 wird nicht unterstützt
 :is turned off
@@ -702,7 +726,7 @@ max
 :min
 min
 :mult
-*
+mult
 :permanent
 dauerhaft
 :replace
