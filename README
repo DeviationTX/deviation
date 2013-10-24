@@ -1,3 +1,14 @@
+This repository is used to develop a new version 3.1 of the deviation software.
+
+It is based on the great work which has been done for deviation 3.0, mainly 
+by its initiator PhracturedBlue.
+
+The original repository can be found here:
+https://bitbucket.org/PhracturedBlue/deviation
+
+=======================================================
+This is the original README:
+
 There are multiple targets available for building the Deviation firmware:
 
 devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
