@@ -29,8 +29,8 @@
 #define LCD_PAGES 8
 static u8 img[PHY_LCD_WIDTH * LCD_PAGES];
 static u8 dirty[PHY_LCD_WIDTH];
-static u16 xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
-static u16 xpos, ypos;
+static unsigned int xstart, xend;  // After introducing logical view for devo10, the coordinate can be >= 5000
+static unsigned int xpos, ypos;
 static s8 dir;
 
 void lcd_display(uint8_t on)
@@ -191,6 +191,30 @@ void LCD_DrawStop(void)
     memset(dirty, 0, sizeof(dirty));
 }
 
+/*
+ * 2.
+Display Start Line Set
+Specifies line address (refer to Figure 6) to determine the initial display line, or COM0. The RAM
+display data becomes the top line of LCD screen. The higher number of
+lines in ascending order,
+corresponding to the duty cycle follows it. When this command changes the line address, smooth
+scrolling or a page change takes place.
+A0 (E /RD) (R/W /WR) D7 D6 D5 D4 D3 D2 D1 D0 Hex
+0     1        0      0  1 A5 A4 A3 A2 A1 A0 40h to 7Fh
+
+8.
+ADC Select
+Changes the relationship between RAM column address and segment driver. The order of
+segment driver output pads could be reversed by software. This allows flexi
+ble IC layout during
+LCD module assembly. For details, refer to the column address section of Figure 4. When display
+data is written or read, the column address is incremented by 1 as shown in Figure 4.
+A0 (E /RD) (R/W /WR) D7 D6 D5 D4 D3 D2 D1 D0 Hex Setting
+ 0    1        0      1  0  1  0  0  0  0  0 A0h Normal
+                                           1 A1h Reverse
+ */
+
+
 void LCD_DrawPixel(unsigned int color)
 {
     int y = ypos;
@@ -210,8 +234,8 @@ void LCD_DrawPixel(unsigned int color)
         } else {
             img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
         }
+        dirty[x] |= 1 << ycol;
     }
-    dirty[x] |= 1 << ycol;
     xpos++;
     if (xpos > xend) {
         xpos = xstart;

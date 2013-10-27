@@ -185,8 +185,8 @@ void LCD_DrawPixel(unsigned int color)
         } else {
             img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
         }
+        dirty[x] |= 1 << ycol;
     }
-    dirty[x] |= 1 << ycol;
     xpos++;
     if (xpos > xend) {
         xpos = xstart;
