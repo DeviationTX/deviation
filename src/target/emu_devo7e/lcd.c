@@ -33,11 +33,11 @@ void LCD_DrawPixel(unsigned int color)
     c = color ? 0x00 : 0xaa; // 0xaa is grey color(not dot)
 
     //Fill in 4 dots
-    row = 2 * gui.y;
-    col = 2 * gui.x;
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 2; j++) {
-            if ((unsigned int)(3*(logical_lcd_width* (row + i) + col + j) + 2) < sizeof(gui.image)) {
+    row = LCD_HEIGHT_MULT * gui.y;
+    col = LCD_WIDTH_MULT * gui.x;
+    for (i = 0; i < LCD_HEIGHT_MULT; i++) {
+        for (j = 0; j < LCD_WIDTH_MULT; j++) {
+            if (gui.x < LCD_WIDTH && gui.y < LCD_HEIGHT) {
                 gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
                 gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
                 gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
