@@ -106,10 +106,10 @@ void LCD_Init()
     lcd_set_start_line(0);
     // Display data write (6)
     //Clear the screen
-    for(int page = 0; page < 9; page++) {
+    for(int page = 0; page < LCD_PAGES; page++) {
         lcd_set_page_address(page);
         lcd_set_column_address(0);
-        for(int col = 0; col < 129; col++)
+        for(int col = 0; col < PHY_LCD_WIDTH; col++)
             LCD_Data(0x00);
     }
     lcd_display(1);
