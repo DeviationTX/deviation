@@ -151,3 +151,31 @@ foreach idx in (0 .. 22):
            OR 53 <= tmp and the number of channels in ch that are greater than 53 is < 8:
                ok = 1
   ch[idx] = next_ch
+
+
+The X-Plus channels structure was decoded by Cesco and vlad_vy.
+
+Channel numbers 0 to 11 are normal, with data resolution 11bit (2048).
+Channel 12 carries the X-Plus channels, with data resolution 9bit (512).
+
+Channel transfer structure:
+packet 1 -> 1 5 2 4 6 10 12
+packet 2 -> 0 7 3 8 9 11 12
+
+X-Plus data format
+each 16bit X-Plus data value is defined as:
+
+a bbbb cc ddddddddd
+
+a:    always 0
+bbbb: the channel number, always 12
+cc:   X-Plus channel number, low 2 bits, third bit defined by packet number, 1st packet = 0, second packet = 1
+dd..: X-Plus channel data, 9 bits, 256 is midpoint
+
+The channel data will be 0xffff if the specific X-Plus channel slot is unused.
+
+1 to 2 X-Plus channels, every 22ms
+3 to 4 X-Plus channels, every 44ms
+5 to 6 X-Plus channels, every 66ms
+7 to 8 X-Plus channels, every 88ms
+
