@@ -19,7 +19,7 @@ Aantal Kanale
 12 huur
 :13 Point
 13 Punt
->:24 hour
+:24 hour
 24 huur
 :3 Point
 3 Punt
@@ -69,7 +69,8 @@ AUX6
 AUX7
 :About Deviation
 Deviation Info
->:Add
+:Add
+voeg
 :Advanced
 Gevorderd
 :Airplane
@@ -378,7 +379,8 @@ Mid tempo
 Min Limiet
 :Min/Max
 Min/Max
->:Minute
+:Minute
+Minuut
 :Mixer
 Menger
 :Mixer GUI
@@ -649,7 +651,8 @@ Telemetrie Opstelling
 Temp
 :Temperature
 Temperatuur
->:Template
+:Template
+Voorbeeld
 :Template..
 Voorbeeld..
 :Thr hold
@@ -684,9 +687,9 @@ Raak teiken %d
 Raak om te sluit
 :Touch to Unlock
 Raak om te ontsluit
->:Trainer Cfg (Channel)
+:Trainer Cfg (Channel)
 Leerder Konf(Kanaal)
->:Trainer Cfg (Stick)
+:Trainer Cfg (Stick)
 Leerder Konf(Stok )
 :Trainer Sw
 Leerder Sk. 
@@ -714,7 +717,7 @@ Sit Af
 Sit Aan
 :Tx power
 Sendkrag
->:Type
+:Type
 Tipe
 :USB
 USB
