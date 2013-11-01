@@ -19,7 +19,8 @@ utils/midicsv/csvmidi
 utils/midicsv/midicsv
 .cproject
 .project
-.settings/org.eclipse.cdt.core.prefs
+.settings/org.eclipse.cdt.*
+src/beta-*
 ^local/
 src/filesystem/devo8/models/
 src/filesystem/devo8/tx.ini
