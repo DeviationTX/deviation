@@ -146,16 +146,16 @@ void PAGE_DatalogInit(int page)
 
     //Col1
     GUI_CreateLabelBox(&gui->enlbl, SCROLLABLE_X, row, 80, 20, &DEFAULT_FONT, NULL, NULL, _tr("Enable"));
-    GUI_CreateTextSelect(&gui->en, SCROLLABLE_X + 90, row, TEXTSELECT_96, NULL, sourcesel_cb, NULL);
+    GUI_CreateTextSelect(&gui->en, SCROLLABLE_X + 78, row, TEXTSELECT_96, NULL, sourcesel_cb, NULL);
     //Col2
     GUI_CreateButton(&gui->reset, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, reset_str_cb, 0, reset_press_cb, NULL);
     row += ROW_HEIGHT;
 
     //col1
     GUI_CreateLabelBox(&gui->freqlbl, SCROLLABLE_X, row, 80, 20, &DEFAULT_FONT, NULL, NULL, _tr("Sample Rate"));
-    GUI_CreateTextSelect(&gui->freq, SCROLLABLE_X + 90, row, TEXTSELECT_96, NULL, ratesel_cb, NULL);
+    GUI_CreateTextSelect(&gui->freq, SCROLLABLE_X + 78, row, TEXTSELECT_96, NULL, ratesel_cb, NULL);
     //col2
-    GUI_CreateLabelBox(&gui->remaining, SCROLLABLE_X + 200, row, SCROLLABLE_WIDTH-200, 20, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->remaining, SCROLLABLE_X + 184, row, SCROLLABLE_WIDTH-200, 20, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
     row += ROW_HEIGHT;
 
     GUI_CreateLabelBox(&gui->selectlbl, SCROLLABLE_X, row, 80, 20, &DEFAULT_FONT, NULL, NULL, _tr("Select"));
