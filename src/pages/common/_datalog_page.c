@@ -15,7 +15,7 @@
 
 #define gui (&gui_objs.u.datalog)
 #define dlog Model.datalog
-char str[33];
+char str[34];
 u16 next_update;
 u32 remaining;
 
