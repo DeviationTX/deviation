@@ -34,6 +34,9 @@ struct telem_layout {
     u8 source;
 };
 
+#define TELEM_OFFSET_X ((LCD_WIDTH-320)/2)
+#define TELEM_OFFSET_Y ((LCD_HEIGHT-240)/2)
+
 const struct telem_layout devo8_layout[] = {
           {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DEVO_TEMP1},
           {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_DEVO_TEMP2},
@@ -73,10 +76,10 @@ static void show_page(const struct telem_layout *layout)
 {
     int i = 0;
     for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
-        GUI_CreateLabelBox(&gui->label[i], ptr->label.x, ptr->label.y,
+        GUI_CreateLabelBox(&gui->label[i], ptr->label.x + TELEM_OFFSET_X, ptr->label.y + TELEM_OFFSET_Y,
                            ptr->label.width, ptr->label.height, &TELEM_TXT_FONT,
                            label_cb, NULL, (void *)(long)ptr->source);
-        GUI_CreateLabelBox(&gui->value[i], ptr->value.x, ptr->value.y,
+        GUI_CreateLabelBox(&gui->value[i], ptr->value.x + TELEM_OFFSET_X, ptr->value.y + TELEM_OFFSET_Y,
                            ptr->value.width, ptr->value.height, &TELEM_ERR_FONT,
                            telem_cb, NULL, (void *)(long)ptr->source);
         i++;
