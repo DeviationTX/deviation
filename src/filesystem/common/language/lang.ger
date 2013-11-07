@@ -53,8 +53,12 @@ QR
 QR DR
 :AIL Inv
 QR Inv
+|devo8:AIL Inv
+Richtung Querruder
 :AIL Mix
 QR Mix
+|devo8:AIL Mix
+Mischanteil Querruder
 :AUX2
 AUX2
 :AUX3
@@ -78,13 +82,17 @@ Flugzeug
 :Alarm
 Alarm
 :Alarm intvl
-Alarm intvl
+Alarm-intrvl
+|devo8:Alarm intvl
+Alarm-Intervall
 :All
 Alle
 :Altitude
 Höhe
 :Auto
 Auto
+<:Aux2
+<AUX2
 :Backlight
 Helligkeit
 :Bad/missing\nprotocol modules!
@@ -123,18 +131,26 @@ Summer Einstellungen
 COL
 :COL Inv
 COL Inv
+|devo8:COL Inv
+Richtung Pitch
 :COL Limit
 COL Limit
 :COL Mix
 COL Mix
+|devo8:COL Mix
+Mischanteil Pitch
 :CYC
 TAUM
 :Calibrate
 Kalibrier.
+|devo8:Calibrate
+Kalibrieren
 :Calibration done.
 Kalibrierung\nabgeschlossen.
 :Cancel
 Abbr.
+|devo8:Cancel
+Abbrechen
 :Celsius
 Celsius
 :Center PW
@@ -189,7 +205,10 @@ D/R&Exp -HR
 D/R&Exp -SR
 :DR
 DR
->:Datalog
+<:Data log
+<Datenprotokoll
+:Datalog
+Datenprotokoll
 :Date
 Datum
 :Date / Time
@@ -226,11 +245,16 @@ HR
 HR DR
 :ELE Inv
 HR Inv
+|devo8:ELE Inv
+Richtung Höhenruder
 :ELE Mix
 HR Mix
+|devo8:ELE Mix
+Mischanteil Höhenruder
 :EXPO %d
 EXPO %d
->:Edit
+:Edit
+Bearbeiten
 :Enable
 Aktiv
 :Enabled
@@ -241,7 +265,8 @@ Eingabe
 EXT
 :Expo&DR
 Expo&DR
->:Extend
+:Extend
+Erweitern
 :FMODE
 FMODE
 >:Fades
@@ -277,6 +302,8 @@ GPS Geschw.
 GPS Zeit
 :Generic settings
 Allgemeine Einstell.
+|devo8:Generic settings
+Allgemeine Einstellungen
 :Gyro sense
 Kreiselempf.
 >:H
@@ -301,6 +328,8 @@ Leerl. 1
 Leerl. 2
 :Input
 Einga.
+|devo8:Input
+Eingabe
 :Input monitor
 Eingaben Anzeige
 :Insert
@@ -326,7 +355,9 @@ Links
 :Length
 Länge
 :Linked
-Verkn.
+verkn.
+|devo8:Linked
+verknüpft
 :Load
 Laden
 :Load...
@@ -362,8 +393,11 @@ Min Limit
 Min/Max
 >:Minute
 :Mixer
-Mixer
->:Mixer GUI
+Mischer
+:Mixer GUI
+Mischer GUI
+|devo8:Mixer GUI
+Mischeroberfläche
 :Mixers
 Mixers
 :Mode
@@ -379,7 +413,7 @@ Modellname
 :Model needs reset\nfor standard mixer
 Modell wird rückge-\nsetzt für Std. Mixer
 :Model needs to be reset\nin order to switch to the standard mixer
-Modell muss zurückgesetzt\nwerden, um den Standard Mixer zu nutzen
+Modell muss zurückgesetzt werden,\num den Standard Mixer zu nutzen
 :Model setup
 Modelleinstellungen
 :Model type
@@ -425,13 +459,17 @@ Ein/Aus
 >:PIT
 >:PIT Mix
 >:PPM
->:PPM In
+:PPM In
+PPM Kanäle
+|devo8:PPM In
+PPM Eingangskanäle
 >:PPM%d
 :PPMIn Cfg (Extend)
 PPMIn Konf. (Erweitert)
 :Page
 Seite
->:Page Config
+:Page Config
+Seitenkonfiguration
 :Pitch curves
 Nick-Kurven
 :Plane
@@ -452,6 +490,8 @@ Einschaltalarm
 Abschaltalarm
 :Prealert intvl
 Voralarm intvl
+|devo8:Prealert intvl
+Voralarm-Intervall
 :Prealert time
 Voralarmzeit
 :Press 'Ent' to turn USB Filesystem
@@ -491,10 +531,14 @@ Echtzeituhr
 Löschen
 :Reset
 Rücksetz
+|devo8:Reset
+Rücksetzen
 :Reset Permanent Timer?
 Permanenten Timer zurücksetzen?
 :Reset sw
 Rücksetz
+|devo8:Reset sw
+auf Null mit
 :Reverse
 Servoumkehr
 :Reversed
@@ -510,10 +554,14 @@ Sicherheit
 >:Sample Rate
 :Save
 Sichrn
+|devo8:Save
+Sichern
 :Scale
 Skalierung
 :Scale%s
 Skalier.%s
+|devo8:Scale%s
+%sSkalierung
 :Scanner
 Scanner
 :Second
@@ -535,6 +583,8 @@ Box klein
 Glätten
 :Speed
 Geschwind.
+|devo8:Speed
+Geschwindigkeit
 :Src
 Quelle
 >:Standard
@@ -551,12 +601,16 @@ Knüppel Eingabe
 Knüppelmode
 :Sticks
 Knüppel
+<:Sub-trim
+<Servomitte
 :Subtrim
 Servomitte
 :Swash
 Taumelscheibe
 :SwashType
 T.-Typ
+|devo8:SwashType
+Taumelscheibentyp
 :Switch
 Schalter
 :Switch assignment
@@ -604,15 +658,20 @@ TelemV
 Telemetrie
 :Telemetry config
 Telemetriekonfig.
+|devo8:Telemetry config
+Telemetriekonfiguration
 :Telemetry monitor
 Telemetrie Anzeige
 :Telemetry settings
 Telemetrieeinstellung.
+|devo8:Telemetry settings
+Telemetrieeinstellungen
 :Temp
 Temp
 :Temperature
 Temperatur
->:Template
+:Template
+Vorlage
 :Template..
 Vorlage...
 :Thr hold
@@ -632,7 +691,9 @@ Timer%d
 :Timers
 Timer
 :Timeup intvl
-Timeup intvl
+Timeup-Intrvl
+|devo8:Timeup intvl
+Timeup-Intervall
 :Toggle
 Hebel
 :Touch Calibrate
@@ -675,12 +736,15 @@ Ausschalten
 :Turn On
 Einschalten
 :Tx power
-Tx Leistung
+Sendeleist.
+|devo8:Tx power
+Sendeleistung
 :Type
 Typ
 :USB
 USB
->:USB Filesystem is currently 
+:USB Filesystem is currently 
+Das USB-Dateisystem ist aktuell 
 :Unknown
 Unbekannt
 :Up
