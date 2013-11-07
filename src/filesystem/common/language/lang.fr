@@ -70,7 +70,6 @@ Tempo alarme
 :Altitude
 Altitude
 >:Auto
->:Aux2
 :Backlight
 Luminosité
 :Bad/missing\nprotocol modules!
@@ -165,7 +164,6 @@ D/R & Exp
 >:D/R&Exp -RUD
 :DR
 DR
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -239,7 +237,6 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
->:Gear
 :Generic settings
 Réglages
 :Gyro sense
@@ -498,7 +495,6 @@ Entrées  sticks/aux.
 Mode
 :Sticks
 Sticks
->:Sub-trim
 :Subtrim
 Subtrim
 :Swash

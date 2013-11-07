@@ -68,7 +68,6 @@ Alarma
 :Altitude
 Altitud
 >:Auto
->:Aux2
 :Backlight
 Iluminación
 >:Bad/missing\nprotocol modules!
@@ -158,7 +157,6 @@ Ciclico3
 >:D/R&Exp -RUD
 :DR
 DR
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -228,7 +226,6 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
->:Gear
 :Generic settings
 Ajustes generales
 >:Gyro sense
@@ -472,7 +469,6 @@ Posiciones sticks
 Modo de vuelo
 :Sticks
 Sticks
->:Sub-trim
 :Subtrim
 Subtrim
 >:Swash

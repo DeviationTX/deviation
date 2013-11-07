@@ -85,8 +85,8 @@ Alle
 Höhe
 :Auto
 Auto
-:Aux2
-AUX2
+<:Aux2
+<AUX2
 :Backlight
 Helligkeit
 :Bad/missing\nprotocol modules!
@@ -191,7 +191,6 @@ D/R&Exp -HR
 D/R&Exp -SR
 :DR
 DR
->:Data log
 >:Datalog
 :Date
 Datum
@@ -278,7 +277,6 @@ GPS Koord.
 GPS Geschw.
 :GPS Time
 GPS Zeit
->:Gear
 :Generic settings
 Allgemeine Einstell.
 :Gyro sense
@@ -555,8 +553,8 @@ Knüppel Eingabe
 Knüppelmode
 :Sticks
 Knüppel
-:Sub-trim
-Servomitte
+<:Sub-trim
+<Servomitte
 :Subtrim
 Servomitte
 :Swash

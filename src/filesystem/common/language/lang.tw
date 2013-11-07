@@ -66,7 +66,6 @@
 海拔
 :Auto
 自動
->:Aux2
 :Backlight
 背光亮度
 >:Bad/missing\nprotocol modules!
@@ -162,7 +161,6 @@
 大小動-方向
 :DR
 大小動
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -230,7 +228,6 @@ PPM週期
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
->:Gear
 :Generic settings
 ======基本參數======
 :Gyro sense
@@ -494,8 +491,8 @@ PPM週期
 搖桿模式
 :Sticks
 搖桿校正
-:Sub-trim
-微調
+<:Sub-trim
+<微調
 :Subtrim
 微調
 :Swash

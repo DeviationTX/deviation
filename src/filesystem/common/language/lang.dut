@@ -62,7 +62,6 @@ Vliegtuig
 >:All
 >:Altitude
 >:Auto
->:Aux2
 :Backlight
 Helderheid
 >:Bad/missing\nprotocol modules!
@@ -136,7 +135,6 @@ Cyclic3
 >:D/R&Exp -RUD
 :DR
 DR
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -196,7 +194,6 @@ GEA
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
->:Gear
 >:Generic settings
 >:Gyro sense
 >:H
@@ -405,7 +402,6 @@ Start
 Stickmodus
 :Sticks
 Sticks
->:Sub-trim
 :Subtrim
 Fijnafstelling
 >:Swash

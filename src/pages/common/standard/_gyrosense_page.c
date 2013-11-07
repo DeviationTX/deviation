@@ -56,9 +56,9 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     if (gyro_output == GYROOUTPUT_GEAR)
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s5", _tr("Gear"), _tr("Ch"));
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s5", _tr("GEAR"), _tr("Ch"));
     else
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s7", _tr("Aux2"), _tr("Ch"));
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s7", _tr("AUX2"), _tr("Ch"));
     return mp->tmpstr;
 }
 

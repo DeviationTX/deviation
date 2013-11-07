@@ -85,8 +85,8 @@ Mind
 Magasság
 :Auto
 Auto
-:Aux2
-Aux2
+<:Aux2
+<Aux2
 :Backlight
 Fényerő
 :Bad/missing\nprotocol modules!
@@ -197,8 +197,8 @@ D/R&Expó -ELE
 D/R&Expó -RUD
 :DR
 DR
-:Data log
-Adat napló
+<:Data log
+<Adat napló
 :Datalog
 Adat napló
 :Date
@@ -295,8 +295,8 @@ GPS koord.
 GPS sebes.
 :GPS Time
 GPS idő
-:Gear
-Gear
+<:Gear
+<Gear
 :Generic settings
 Általános beállítások
 :Gyro sense
@@ -603,8 +603,8 @@ Bemenetek
 Mód
 :Sticks
 Botkormány
-:Sub-trim
-Sub-trim
+<:Sub-trim
+<Sub-trim
 :Subtrim
 Subtrim
 :Swash

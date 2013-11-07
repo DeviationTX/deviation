@@ -75,8 +75,8 @@ Int. alarmă
 Altitudine
 :Auto
 Auto
-:Aux2
-Aux2
+<:Aux2
+<Aux2
 :Backlight
 Iluminare
 :Bad/missing\nprotocol modules!
@@ -174,7 +174,6 @@ D/R&Exp - ELE
 D/R&Exp -RUD
 :DR
 DR
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -246,8 +245,8 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
-:Gear
-Gear
+<:Gear
+<Gear
 :Generic settings
 Setări generale
 :Gyro sense
@@ -516,8 +515,8 @@ Intrări
 Mod
 :Sticks
 Stick-uri
-:Sub-trim
-Sub-trim
+<:Sub-trim
+<Sub-trim
 :Subtrim
 Subtrim
 :Swash

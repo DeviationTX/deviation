@@ -91,8 +91,8 @@ AUX7
 Высота
 :Auto
 Авто
-:Aux2
-Aux2
+<:Aux2
+<Aux2
 :Backlight
 Подсветка
 :Bad/missing\nprotocol modules!
@@ -209,8 +209,8 @@ Aux2
 ДР&Экспо РНапр
 :DR
 ДР
-:Data log
-Журнал
+<:Data log
+<Журнал
 :Datalog
 Журнал
 :Date
@@ -311,8 +311,8 @@ GPS коорд.
 GPS скорость
 :GPS Time
 GPS время
-:Gear
-Шасси
+<:Gear
+<Шасси
 :Generic settings
 Основные настройки
 :Gyro sense
@@ -655,8 +655,8 @@ RPM
 Режим стиков
 :Sticks
 Стики
-:Sub-trim
-Субтриммер
+<:Sub-trim
+<Субтриммер
 :Subtrim
 Субтриммер
 :Swash

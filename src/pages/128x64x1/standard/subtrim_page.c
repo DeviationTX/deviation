@@ -21,7 +21,7 @@
 #include "../../common/standard/_subtrim_page.c"
 
 static const struct page_defs subtrim_defs = {
-    _tr_noop("Sub-trim"),
+    _tr_noop("Subtrim"),
     subtrim_cb,
     NULL,
 };

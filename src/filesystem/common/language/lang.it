@@ -75,8 +75,8 @@ Allarme intvl
 Altitudine
 :Auto
 Auto
-:Aux2
-Aux2
+<:Aux2
+<Aux2
 :Backlight
 Luminosità
 :Bad/missing\nprotocol modules!
@@ -173,7 +173,6 @@ D/R & Esp.-ELEV
 D/R & Esp.-TIMONE
 :DR
 DR
->:Data log
 >:Datalog
 >:Date
 >:Date / Time
@@ -247,8 +246,8 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
-:Gear
-Carrello
+<:Gear
+<Carrello
 :Generic settings
 Settaggi generici
 :Gyro sense
@@ -523,7 +522,6 @@ posizione dello stick
 Modo di volo
 :Sticks
 Sticks
->:Sub-trim
 :Subtrim
 Subtrim
 :Swash

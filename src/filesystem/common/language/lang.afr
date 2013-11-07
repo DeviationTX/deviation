@@ -85,8 +85,8 @@ Almal
 Hoogte
 :Auto
 Outo
-:Aux2
-Aux2
+<:Aux2
+<Aux2
 :Backlight
 Skermlig
 :Bad/missing\nprotocol modules!
@@ -191,8 +191,8 @@ D/R&Exp -ELE
 D/R&Exp -RUD
 :DR
 DR
-:Data log
-Datalog
+<:Data log
+<Datalog
 :Datalog
 Datalog
 :Date
@@ -281,8 +281,8 @@ GPS Koord.
 GPS Spoed
 :GPS Time
 GPS Tyd
-:Gear
-GEAR
+<:Gear
+<GEAR
 :Generic settings
 Generiese Opstelling
 :Gyro sense
@@ -587,8 +587,8 @@ Stokinset
 Stok mode
 :Sticks
 Stokke
-:Sub-trim
-SubTrim
+<:Sub-trim
+<SubTrim
 :Subtrim
 SubTrim
 :Swash
