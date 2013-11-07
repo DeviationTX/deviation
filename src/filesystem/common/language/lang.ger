@@ -85,8 +85,6 @@ Alle
 Höhe
 :Auto
 Auto
-<:Aux2
-<AUX2
 :Backlight
 Helligkeit
 :Bad/missing\nprotocol modules!
@@ -553,8 +551,6 @@ Knüppel Eingabe
 Knüppelmode
 :Sticks
 Knüppel
-<:Sub-trim
-<Servomitte
 :Subtrim
 Servomitte
 :Swash

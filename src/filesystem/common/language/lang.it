@@ -75,8 +75,6 @@ Allarme intvl
 Altitudine
 :Auto
 Auto
-<:Aux2
-<Aux2
 :Backlight
 Luminosità
 :Bad/missing\nprotocol modules!
@@ -246,8 +244,6 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
-<:Gear
-<Carrello
 :Generic settings
 Settaggi generici
 :Gyro sense

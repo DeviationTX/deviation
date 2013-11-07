@@ -75,8 +75,6 @@ Int. alarmă
 Altitudine
 :Auto
 Auto
-<:Aux2
-<Aux2
 :Backlight
 Iluminare
 :Bad/missing\nprotocol modules!
@@ -245,8 +243,6 @@ GPS
 >:GPS Coords
 >:GPS Speed
 >:GPS Time
-<:Gear
-<Gear
 :Generic settings
 Setări generale
 :Gyro sense
@@ -515,8 +511,6 @@ Intrări
 Mod
 :Sticks
 Stick-uri
-<:Sub-trim
-<Sub-trim
 :Subtrim
 Subtrim
 :Swash
