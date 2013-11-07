@@ -114,7 +114,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         LCD_SetFontColor(TEXTSEL_FONT.font_color);
         LCD_GetStringDimensions((const u8 *)str, &w, &h);
         x = box->x + (box->width - w) / 2;
-        y = box->y + 2 + (box->height - h) / 2;
+        y = box->y + 1 + (box->height - h) / 2; // one pixel higher (+1) to avoid artifacts
         LCD_PrintStringXY(x, y, str);
     } else {   // plate text select for devo 10, copy most behavior from label.c
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
