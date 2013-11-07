@@ -87,10 +87,10 @@ void PAGE_MainLayoutInit(int page)
     GUI_CreateIcon(&gui->editelem, 64, 0, &icons[ICON_OPTIONS], cfg_cb, NULL);
     GUI_SetHidden((guiObject_t *)&gui->editelem, 1);
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
-    GUI_CreateLabel(&gui->xlbl, 80+18, 10, NULL, TITLE_FONT, "X");
-    GUI_CreateTextSelect(&gui->x, 88+18, 10, TEXTSELECT_64, NULL, xpos_cb, NULL);
-    GUI_CreateLabel(&gui->ylbl, 164+16, 10, NULL, TITLE_FONT, "Y");
-    GUI_CreateTextSelect(&gui->y, 172+16, 10, TEXTSELECT_64, NULL, ypos_cb, NULL);
+    GUI_CreateLabel(&gui->xlbl, 80+18, 9, NULL, TITLE_FONT, "X");
+    GUI_CreateTextSelect(&gui->x, 88+18, 8, TEXTSELECT_64, NULL, xpos_cb, NULL);
+    GUI_CreateLabel(&gui->ylbl, 164+16, 9, NULL, TITLE_FONT, "Y");
+    GUI_CreateTextSelect(&gui->y, 172+16, 8, TEXTSELECT_64, NULL, ypos_cb, NULL);
 
     GUI_SelectionNotify(notify_cb);
     draw_elements();
