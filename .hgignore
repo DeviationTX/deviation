@@ -29,6 +29,7 @@ src/filesystem/devo8/datalog.bin
 src/filesystem/devo8/language/
 src/filesystem/devo8/template/
 src/filesystem/devo8/media/sound.ini
+src/filesystem/devo8/mymedia/
 src/filesystem/devo8/layout/default.ini
 src/filesystem/devo8/layout/empty.ini
 glob:src/filesystem/devo8/media/*.fon

@@ -17,15 +17,31 @@ static const struct LabelDesc outline;
 static void show_iconsel_page(int idx);
 static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data);
 
-static const char * const toggle_files[4] = {
-    "media/toggle0.bmp",
-    "media/toggle1.bmp",
-    "media/toggle2.bmp",
-    "media/toggle3.bmp",
-};
+#ifdef _DEVO12_TARGET_H_
+    static char * toggle_files[4] = {
+#else
+    static const char * const toggle_files[4] = {
+#endif
+        "media/toggle0.bmp",
+        "media/toggle1.bmp",
+        "media/toggle2.bmp",
+        "media/toggle3.bmp",
+    };
 
 static u32 _get_icon_info()
 {
+    #ifdef _DEVO12_TARGET_H_
+        static u8 checked;
+        if(!checked) {
+            FILE *fh;
+            fh = fopen(toggle_files[3], "r");
+            if(!fh)
+                toggle_files[3] = "mymedia/toggle3.bmp";
+            else
+                fclose(fh);
+            checked = 1;
+        }
+    #endif
     static u32 count = 0;
     if(count == 0) {
         for(int i = 0; i < 4; i++) {

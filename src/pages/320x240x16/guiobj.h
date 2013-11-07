@@ -32,7 +32,7 @@ struct lang_obj {
 };
 
 #define NUM_SYMBOL_COLS ((LCD_WIDTH-24) / 40)
-#define NUM_SYMBOL_ROWS ((LCD_HEIGHT-80) / 40)
+#define NUM_SYMBOL_ROWS ((LCD_HEIGHT-(80-(40-31))) / 40)    //allows one row more to show (no gap for last row needed)
 #define NUM_SYMBOL_ELEMS (NUM_SYMBOL_COLS * NUM_SYMBOL_ROWS)
 struct toggle_obj {
     guiButton_t  okbutton;
