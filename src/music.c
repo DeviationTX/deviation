@@ -122,7 +122,6 @@ void MUSIC_Play(enum Music music)
         printf("ERROR: Could not read %s\n", filename);
         return;
     }
-    else printf("##### Sound config taken from %s #####\n", filename);
     if(! num_notes)
         return;
     SOUND_SetFrequency(note_map[Notes[0].note].note, Volume);
