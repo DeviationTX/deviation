@@ -243,7 +243,8 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
     PAGE_SetModal(0);
     if (callback_result) {
         int ch = callback_result - 1;
-        strcpy(Model.virtname[ch], mp->tmpstr);
+        strncpy(Model.virtname[ch], mp->tmpstr, sizeof(Model.virtname[ch]));
+        Model.virtname[ch][sizeof(Model.virtname[0])-1] = '\0'; // strncpy doesn't put that '\0' at the end
     }
 }
 
