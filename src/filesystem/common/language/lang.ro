@@ -68,6 +68,8 @@ Avansat
 Avion
 :Alarm
 Alarmă
+:Alarm interval
+Int. alarmă
 :Alarm intvl
 Int. alarmă
 >:All
@@ -418,6 +420,8 @@ Poz/Neg
 Poziția %d
 >:Power On alarm
 >:Power-down alert
+:Prealert interval
+Interval
 :Prealert intvl
 Interval
 :Prealert time
@@ -592,8 +596,9 @@ Setări crono
 Timer%d
 :Timers
 Timere
-:Timeup intvl
+:Timeup interval
 Expirare
+:Timeup intvl
 >:Toggle
 :Touch Calibrate
 Calibrare ecran

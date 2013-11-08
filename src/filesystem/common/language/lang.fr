@@ -64,6 +64,8 @@ Expert
 Avion
 :Alarm
 Alarme
+:Alarm interval
+Tempo alarme
 :Alarm intvl
 Tempo alarme
 >:All
@@ -404,6 +406,8 @@ Pos./Neg.
 >:Position %d
 >:Power On alarm
 >:Power-down alert
+:Prealert interval
+Tempo préAlarm
 :Prealert intvl
 Tempo préAlarm
 :Prealert time
@@ -575,6 +579,8 @@ Alarmes Chronos
 Chrono %d
 :Timers
 Chronos
+:Timeup interval
+Tempo Alarme
 :Timeup intvl
 Tempo Alarme
 >:Toggle

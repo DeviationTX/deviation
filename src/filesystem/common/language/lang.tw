@@ -59,6 +59,8 @@
 飛機
 :Alarm
 警示
+:Alarm interval
+警示間隔
 :Alarm intvl
 警示間隔
 >:All
@@ -399,6 +401,8 @@ PPM週期
 档位%d
 >:Power On alarm
 >:Power-down alert
+:Prealert interval
+倒數預警間隔
 :Prealert intvl
 倒數預警間隔
 :Prealert time
@@ -571,6 +575,8 @@ PPM週期
 計時器%d
 :Timers
 計時器
+:Timeup interval
+超時警示間隔
 :Timeup intvl
 超時警示間隔
 >:Toggle

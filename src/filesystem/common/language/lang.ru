@@ -83,6 +83,8 @@ AUX7
 Самолет
 :Alarm
 Сигнал
+:Alarm interval
+Интервал
 :Alarm intvl
 Интервал
 :All
@@ -523,6 +525,8 @@ PPM-Вход (расширенный)
 Сигнал вкл.
 :Power-down alert
 Сигнал выкл.
+:Prealert interval
+Интерв. перед
 :Prealert intvl
 Интерв. перед
 |devo8:Prealert intvl
@@ -735,6 +739,8 @@ RPM
 Таймер%d
 :Timers
 Таймеры
+:Timeup interval
+Интерв. после
 :Timeup intvl
 Интерв. после
 |devo8:Timeup intvl

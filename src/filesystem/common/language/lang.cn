@@ -59,6 +59,8 @@
 固定翼
 :Alarm
 报警
+:Alarm interval
+报警间隔
 :Alarm intvl
 报警间隔
 >:All
@@ -403,6 +405,8 @@ LCD设置
 档位%1
 >:Power On alarm
 >:Power-down alert
+:Prealert interval
+预警间隔
 :Prealert intvl
 预警间隔
 :Prealert time
@@ -575,6 +579,8 @@ LCD设置
 定时器%d
 :Timers
 定时器
+:Timeup interval
+超时报警间隔
 :Timeup intvl
 超时报警间隔
 >:Toggle

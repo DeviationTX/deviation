@@ -77,6 +77,8 @@ Haladó
 Repülőgép
 :Alarm
 Riasztás
+:Alarm interval
+Riaszt. int.
 :Alarm intvl
 Riaszt. int.
 :All
@@ -491,6 +493,8 @@ Pozíció %d
 Bekapcs. riaszt.
 :Power-down alert
 Kikapcs. riaszt.
+:Prealert interval
+Előjelz. interv.
 :Prealert intvl
 Előjelz. interv.
 :Prealert time
@@ -681,6 +685,8 @@ Időzítő beállítások
 Időzítő %d
 :Timers
 Időzítők
+:Timeup interval
+Ismétlés interv.
 :Timeup intvl
 Ismétlés interv.
 :Toggle

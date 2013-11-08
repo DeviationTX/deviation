@@ -68,6 +68,8 @@ Avanzato
 Aereo
 :Alarm
 Allarme
+:Alarm interval
+Intervallo di allarme
 :Alarm intvl
 Allarme intvl
 >:All
@@ -424,6 +426,8 @@ Posizione %d
 >:Power On alarm
 :Power-down alert
 Allarme di spegnimento
+:Prealert interval
+Intervallo di preallarme
 :Prealert intvl
 Intervallo di preallarme
 :Prealert time
@@ -599,6 +603,8 @@ Config. Timer
 Timer%d
 :Timers
 Timers
+:Timeup interval
+Durata
 :Timeup intvl
 Durata
 >:Toggle

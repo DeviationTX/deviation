@@ -142,7 +142,7 @@ static void _show_page()
         GUI_CreateTextSelect(&gui2->battalrm, col2, row, TEXTSELECT_96, NULL, batalarm_select_cb, NULL);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui2->battalrmintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm intvl"));
+        GUI_CreateLabelBox(&gui2->battalrmintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Alarm interval"));
         GUI_CreateTextSelect(&gui2->battalrmintvl, col2, row, TEXTSELECT_96, NULL, batalarmwarn_select_cb, NULL);
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
@@ -180,12 +180,12 @@ static void _show_page()
         GUI_CreateTextSelect(&gui3->prealert, col2, row, TEXTSELECT_96,NULL, prealert_time_cb, (void *)0L);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->preintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Prealert intvl"));
+        GUI_CreateLabelBox(&gui3->preintvllbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Prealert interval"));
         GUI_CreateTextSelect(&gui3->preintvl, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.prealert_interval);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL,_tr("Timeup intvl"));
+        GUI_CreateLabelBox(&gui3->timeuplbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL,_tr("Timeup interval"));
         GUI_CreateTextSelect(&gui3->timeup, col2, row, TEXTSELECT_96, NULL, timer_interval_cb,
                 &Transmitter.countdown_timer_settings.timeup_interval);
         row += space + 8;

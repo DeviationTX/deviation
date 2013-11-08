@@ -81,22 +81,20 @@ Erweitert
 Flugzeug
 :Alarm
 Alarm
-:Alarm intvl
-Alarm-intrvl
-|devo8:Alarm intvl
+:Alarm interval
 Alarm-Intervall
+:Alarm intvl
+Alarm-Intrvl
 :All
 Alle
 :Altitude
 Höhe
 :Auto
 Auto
-<:Aux2
-<AUX2
 :Backlight
 Helligkeit
 :Bad/missing\nprotocol modules!
-falsches/fehlen-\ndes Protokolmodul!
+Falsches/fehlen-\ndes Protokollmodul!
 :Bar
 Balken
 :Bargraph
@@ -154,7 +152,7 @@ Abbrechen
 :Celsius
 Celsius
 :Center PW
-Zentr. PW
+Mitte PW
 :Center all \nsticks and knobs\nthen press ENT
 Zentriere alle \nKnüppel und Hebel\ndann drücke ENT
 :Ch
@@ -205,8 +203,6 @@ D/R&Exp -HR
 D/R&Exp -SR
 :DR
 DR
-<:Data log
-<Datenprotokoll
 :Datalog
 Datenprotokoll
 :Date
@@ -266,7 +262,7 @@ EXT
 :Expo&DR
 Expo&DR
 :Extend
-Erweitern
+Erweitert
 :FMODE
 FMODE
 >:Fades
@@ -298,6 +294,8 @@ GPS Höhe
 GPS Koord.
 :GPS Speed
 GPS Geschw.
+|devo8:GPS Speed
+GPS Geschwindigkeit
 :GPS Time
 GPS Zeit
 :Generic settings
@@ -306,6 +304,8 @@ Allgemeine Einstell.
 Allgemeine Einstellungen
 :Gyro sense
 Kreiselempf.
+|devo8:Gyro sense
+Kreiselempfindlichkeit
 >:H
 >:H-trim
 >:HOLD
@@ -319,7 +319,8 @@ Hoch
 :Hold position
 Halteposition
 >:Holds
->:Hour
+:Hour
+Stunde
 :Icon
 Bild
 :Idle Up 1
@@ -350,6 +351,8 @@ Sprache
 Breite
 :Layout: Long-Press ENT
 Entw.: Langer Druck ENT
+|devo8:Layout: Long-Press ENT
+Entwurf: Langer Druck ENT
 :Left
 Links
 :Length
@@ -378,7 +381,10 @@ Hauptmenü
 Startseite
 :Main page config
 Startseitenkonfig.
->:Manual
+|devo8:Main page config
+Startseitenkonfiguration
+:Manual
+manuell
 :Max Limit
 Max Limit
 :Menu
@@ -437,7 +443,7 @@ Neu
 :No
 Nein
 :No Trim
-Keine
+Kein Trim
 :None
 keine
 :Normal
@@ -488,14 +494,14 @@ Punkt
 Einschaltalarm
 :Power-down alert
 Abschaltalarm
+:Prealert interval
+Voralarm-Intervall
 :Prealert intvl
 Voralarm intvl
-|devo8:Prealert intvl
-Voralarm-Intervall
 :Prealert time
 Voralarmzeit
 :Press 'Ent' to turn USB Filesystem
-'ENT' schaltet das USB Filesystem
+ENT schaltet das USB Filesystem
 :Press ENT to change
 Drücke ENT zum Ändern
 :Press ENT to copy to
@@ -536,10 +542,12 @@ Rücksetzen
 :Reset Permanent Timer?
 Permanenten Timer zurücksetzen?
 :Reset sw
-Rücksetz
+auf Null
 |devo8:Reset sw
 auf Null mit
 :Reverse
+Servoumk.
+|devo8:Reverse
 Servoumkehr
 :Reversed
 Umgekehrt
@@ -574,7 +582,7 @@ Setzen
 :Set:
 Setzen:
 :Simple
-Nichts
+Einfach
 :Simple 4 Channel
 Einfach 4 Kanäle
 :Small-box
@@ -588,7 +596,8 @@ Geschwindigkeit
 :Src
 Quelle
 >:Standard
->:Standard Mixer
+:Standard Mixer
+Standard Mischer
 :Start
 Start
 :Step
@@ -601,8 +610,6 @@ Knüppel Eingabe
 Knüppelmode
 :Sticks
 Knüppel
-<:Sub-trim
-<Servomitte
 :Subtrim
 Servomitte
 :Swash
@@ -690,10 +697,10 @@ Timer Einstellungen
 Timer%d
 :Timers
 Timer
+:Timeup interval
+Nachalarm-Intervall
 :Timeup intvl
-Timeup-Intrvl
-|devo8:Timeup intvl
-Timeup-Intervall
+Nachalarm-Intrvl
 :Toggle
 Hebel
 :Touch Calibrate

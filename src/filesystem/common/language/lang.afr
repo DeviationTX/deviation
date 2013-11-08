@@ -77,6 +77,8 @@ Gevorderd
 Vliegtuig
 :Alarm
 Alarm
+:Alarm interval
+Alarm interval
 :Alarm intvl
 Alarm interval
 :All
@@ -475,6 +477,8 @@ Posisie %d
 Krag aan alarm
 :Power-down alert
 Krag-af Waarskuwing
+:Prealert interval
+Voorwaarsku periode
 :Prealert intvl
 Voorwaarsku periode
 :Prealert time
@@ -663,6 +667,8 @@ Tydhoueropstelling
 Tydhouer%d
 :Timers
 Tydhouers
+:Timeup interval
+Tydaan periode
 :Timeup intvl
 Tydaan periode
 :Toggle

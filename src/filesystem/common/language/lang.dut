@@ -58,6 +58,7 @@ AUX5
 :Airplane
 Vliegtuig
 >:Alarm
+>:Alarm interval
 >:Alarm intvl
 >:All
 >:Altitude
@@ -327,6 +328,7 @@ Punt
 >:Position %d
 >:Power On alarm
 >:Power-down alert
+>:Prealert interval
 >:Prealert intvl
 >:Prealert time
 :Press 'Ent' to turn USB Filesystem
@@ -464,6 +466,7 @@ Timer
 >:Timer settings
 >:Timer%d
 >:Timers
+>:Timeup interval
 >:Timeup intvl
 >:Toggle
 :Touch Calibrate

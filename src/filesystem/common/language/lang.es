@@ -63,6 +63,7 @@ Acerca de Deviation
 Avión
 :Alarm
 Alarma
+>:Alarm interval
 >:Alarm intvl
 >:All
 :Altitude
@@ -382,6 +383,8 @@ Pos/Neg
 >:Position %d
 >:Power On alarm
 >:Power-down alert
+:Prealert interval
+Intervalo prealerta
 :Prealert intvl
 Intervalo prealerta
 :Prealert time
@@ -544,6 +547,8 @@ Config. Timer
 Temporiz%d
 :Timers
 Temporizadores
+:Timeup interval
+Duración
 :Timeup intvl
 Duración
 >:Toggle
