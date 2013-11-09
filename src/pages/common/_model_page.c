@@ -236,9 +236,13 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed;
-    Model.protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
+    enum Protocols new_protocol;
+    new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
+    	// DeInit() the old protocol (Model.protocol unchanged)
         PROTOCOL_DeInit();
+        // Load() the new protocol
+        Model.protocol = new_protocol;
         PROTOCOL_Load(1);
         TELEMETRY_SetTypeByProtocol(Model.protocol);
         Model.num_channels = PROTOCOL_DefaultNumChannels();
