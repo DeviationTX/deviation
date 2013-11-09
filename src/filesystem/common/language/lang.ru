@@ -85,6 +85,8 @@ AUX7
 Сигнал
 :Alarm interval
 Интервал
+|devo8:Alarm interval
+Интервал
 :Alarm intvl
 Интервал
 :All
@@ -526,11 +528,11 @@ PPM-Вход (расширенный)
 :Power-down alert
 Сигнал выкл.
 :Prealert interval
-Интерв. перед
+Интервалы перед
+|devo8:Prealert interval
+Интервалы перед
 :Prealert intvl
 Интерв. перед
-|devo8:Prealert intvl
-Интервалы перед
 :Prealert time
 Вр. до сигнала
 |devo8:Prealert time
@@ -740,11 +742,11 @@ RPM
 :Timers
 Таймеры
 :Timeup interval
-Интерв. после
+Интервалы после
+|devo8:Timeup interval
+Интервалы после
 :Timeup intvl
 Интерв. после
-|devo8:Timeup intvl
-Интервалы после
 :Toggle
 Тумблер
 :Touch Calibrate
