@@ -175,18 +175,19 @@ void LCD_DrawStop(void)
 
 void LCD_DrawPixel(unsigned int color)
 {
-    int y = ypos;
-    int x = xpos;
-    int ycol = y / 8;
-    int ybit = y & 0x07;
-    if ((ycol < LCD_PAGES) && (x < PHY_LCD_WIDTH)) {
-        if(color) {
+	if (xpos < LCD_WIDTH && ypos < LCD_HEIGHT) {	// both are unsigned, can not be < 0
+		int y = ypos;
+		int x = xpos;
+		int ycol = y / 8;
+		int ybit = y & 0x07;
+        if (color) {
             img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
         } else {
             img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
         }
         dirty[x] |= 1 << ycol;
     }
+	// this must be executed to continue drawing in the next row
     xpos++;
     if (xpos > xend) {
         xpos = xstart;

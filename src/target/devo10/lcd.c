@@ -217,26 +217,27 @@ A0 (E /RD) (R/W /WR) D7 D6 D5 D4 D3 D2 D1 D0 Hex Setting
 
 void LCD_DrawPixel(unsigned int color)
 {
-    int y = ypos;
-    int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
+	if (xpos < LCD_WIDTH && ypos < LCD_HEIGHT) {	// both are unsigned, can not be < 0
+		int y = ypos;
+		int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
 
-    if (ypos > 31)
-        y = ypos - 32;
-    else
-        y = ypos + 32;
+		if (ypos > 31)
+			y = ypos - 32;
+		else
+			y = ypos + 32;
 
-    
-    int ycol = y / 8;
-    int ybit = y & 0x07;
-    if ((ycol < LCD_PAGES) && (x < PHY_LCD_WIDTH)) {
-        if(color) {
-            img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
-        } else {
-            img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
-        }
-        dirty[x] |= 1 << ycol;
-    }
-    xpos++;
+
+		int ycol = y / 8;
+		int ybit = y & 0x07;
+		if(color) {
+			img[ycol * PHY_LCD_WIDTH + x] |= 1 << ybit;
+		} else {
+			img[ycol * PHY_LCD_WIDTH + x] &= ~(1 << ybit);
+		}
+		dirty[x] |= 1 << ycol;
+	}
+	// this must be executed to continue drawing in the next row
+	xpos++;
     if (xpos > xend) {
         xpos = xstart;
         ypos += dir;

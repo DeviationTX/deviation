@@ -18,15 +18,16 @@
 
 void LCD_DrawPixel(unsigned int color)
 {
-    u8 r, g, b;
-    r = (color >> 8) & 0xf8;
-    g = (color >> 3) & 0xfc;
-    b = (color << 3) & 0xf8;
-    if ((gui.x < LCD_WIDTH) && (gui.y < LCD_HEIGHT)) {
+	if (gui.x < LCD_WIDTH || gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
+		u8 r, g, b;
+		r = (color >> 8) & 0xf8;
+		g = (color >> 3) & 0xfc;
+		b = (color << 3) & 0xf8;
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)] = r;
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)+1] = g;
         gui.image[3*(LCD_WIDTH*gui.y+gui.x)+2] = b;
-    }
+	}
+	// this must be executed to continue drawing in the next row
     gui.x++;
     if(gui.x > gui.xend) {
         gui.x = gui.xstart;
