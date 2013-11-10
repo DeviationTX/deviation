@@ -84,7 +84,10 @@ void GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y_
     u32 crc = Crc(file, strlen(file));
     if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
         struct guiBox *box = &obj->box;
-        GUI_DrawBackground(box->x, box->y, box->width, box->height);
+        u16 w, h;
+        LCD_ImageDimensions(file, &w, &h);
+        if (h < box->height) GUI_DrawBackground(box->x, box->y + h, box->width, box->height - h);	// remove lower left part of old image
+        if (w < box->width) GUI_DrawBackground(box->x + w, box->y, box->width - w, h < box->height ? h : box->height);	// remove upper right part of old image
         image->crc = crc;
         image->file = file;
         image->x_off = x_off;
