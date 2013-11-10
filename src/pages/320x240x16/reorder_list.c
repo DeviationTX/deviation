@@ -19,6 +19,8 @@
 
 #include "../common/_reorder_list.c"
 
+#define REORD_XOFFSET ((LCD_WIDTH - 320) / 2)
+
 static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -55,14 +57,14 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     }
     PAGE_CreateCancelButton(160 + (LCD_WIDTH - 320), 4, okcancel_cb);
     PAGE_CreateOkButton(264 + (LCD_WIDTH - 320), 4, okcancel_cb);
-    GUI_CreateButton(&gui->up, 8, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
-    GUI_CreateButton(&gui->down, 8, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
+    GUI_CreateButton(&gui->up, 8 + REORD_XOFFSET, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
+    GUI_CreateButton(&gui->down, 8 + REORD_XOFFSET, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
 
-    GUI_CreateTextSelect(&gui->value, 8, 90, TEXTSELECT_96, NULL, copy_val_cb, NULL);
-    GUI_CreateButton(&gui->apply, 8, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
+    GUI_CreateTextSelect(&gui->value, 8 + REORD_XOFFSET, 90, TEXTSELECT_96, NULL, copy_val_cb, NULL);
+    GUI_CreateButton(&gui->apply, 8 + REORD_XOFFSET, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
     if (max_allowed) {
-        GUI_CreateButton(&gui->insert, 8, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButton(&gui->remove, 8, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
+        GUI_CreateButton(&gui->insert, 8 + REORD_XOFFSET, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
+        GUI_CreateButton(&gui->remove, 8 + REORD_XOFFSET, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
-    GUI_CreateListBox(&gui->list, 112, 40, 200, LCD_HEIGHT - 48, rl.max, selected, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(&gui->list, 112 + REORD_XOFFSET, 40, 200, LCD_HEIGHT - 48, rl.max, selected, string_cb, select_cb, NULL, NULL);
 }
