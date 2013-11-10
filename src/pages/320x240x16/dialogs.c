@@ -23,6 +23,9 @@
 
 #define gui (&gui_objs.dialog)
 
+#define DLG_XOFFSET ((LCD_WIDTH - 320) / 2)
+#define DLG_YOFFSET ((LCD_HEIGHT - 320) / 2)
+
 void PAGE_ShowSafetyDialog()
 {
     if (disable_safety) {
@@ -63,7 +66,7 @@ void PAGE_ShowSafetyDialog()
         }
     } else {
         dlgstr[0] = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -100,7 +103,7 @@ void PAGE_ShowBindingDialog(u8 update)
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
     }
 }
 
@@ -110,7 +113,7 @@ void PAGE_ShowWarning(const char *title, const char *str)
         return;
     sprintf(dlgstr, "%s", str);
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, dlgstr);
 }
 
 void PAGE_ShowLowBattDialog()
@@ -130,7 +133,7 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
         return;
     strncpy(dlgstr, _tr("Model needs to be reset\nin order to switch to the standard mixer"), sizeof(dlgstr));
     dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 10, 42, 300, 188, _tr("Standard Mixer"), NULL,
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Standard Mixer"), NULL,
             invalid_stdmixer_cb, dtOkCancel, dlgstr);
 }
 
@@ -144,7 +147,7 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     if (dialog)
         return;
     dlgstr[sizeof(dlgstr) - 1] = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 10 , 42, 300, 188, _tr("Reset Permanent Timer?"), reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Reset Permanent Timer?"), reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }
 
 
