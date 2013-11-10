@@ -64,5 +64,5 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
         GUI_CreateButton(&gui->insert, 8, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
         GUI_CreateButton(&gui->remove, 8, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
-    GUI_CreateListBox(&gui->list, 112, 40, 200, 192, rl.max, selected, string_cb, select_cb, NULL, NULL);
+    GUI_CreateListBox(&gui->list, 112, 40, 200, LCD_HEIGHT - 48, rl.max, selected, string_cb, select_cb, NULL, NULL);
 }
