@@ -24,7 +24,7 @@
 #define gui (&gui_objs.dialog)
 
 #define DLG_XOFFSET ((LCD_WIDTH - 320) / 2)
-#define DLG_YOFFSET ((LCD_HEIGHT - 320) / 2)
+#define DLG_YOFFSET ((LCD_HEIGHT - 240) / 2)
 
 void PAGE_ShowSafetyDialog()
 {
