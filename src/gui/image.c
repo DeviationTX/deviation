@@ -83,10 +83,13 @@ void GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y_
     //Use a CRC for comparison because the filename may change without the pointer changing
     u32 crc = Crc(file, strlen(file));
     if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
+        struct guiBox *box = &obj->box;
+        GUI_DrawBackground(box->x, box->y, box->width, box->height);
         image->crc = crc;
         image->file = file;
         image->x_off = x_off;
         image->y_off = y_off;
+        LCD_ImageDimensions(image->file, &image->header.box.width, &image->header.box.height);
         OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(file));
         OBJ_SET_DIRTY(obj, 1);
     }
