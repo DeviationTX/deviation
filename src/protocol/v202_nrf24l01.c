@@ -211,8 +211,8 @@ static void set_tx_id(u32 id)
 {
     u8 sum;
     tx_id[0] = (id >> 16) & 0xFF;
-    tx_id[0] = (id >> 8) & 0xFF;
-    tx_id[0] = (id >> 0) & 0xFF;
+    tx_id[1] = (id >> 8) & 0xFF;
+    tx_id[2] = (id >> 0) & 0xFF;
     sum = tx_id[0] + tx_id[1] + tx_id[2];
     // Base row is defined by lowest 2 bits
     const u8 *fh_row = freq_hopping[sum & 0x03];
