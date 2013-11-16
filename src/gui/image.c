@@ -77,23 +77,37 @@ u8 GUI_TouchImage(struct guiObject *obj, struct touch *coords, s8 press_type)
     return 1;
 }
 
-void GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y_off)
+void _GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y_off, u8 replace)
 {
     guiObject_t *obj = (guiObject_t *)image;
     //Use a CRC for comparison because the filename may change without the pointer changing
     u32 crc = Crc(file, strlen(file));
     if (image->file != file || image->crc != crc || image->x_off != x_off || image->y_off != y_off) {
-        struct guiBox *box = &obj->box;
-        u16 w, h;
-        LCD_ImageDimensions(file, &w, &h);
-        if (h < box->height) GUI_DrawBackground(box->x, box->y + h, box->width, box->height - h);	// remove lower left part of old image
-        if (w < box->width) GUI_DrawBackground(box->x + w, box->y, box->width - w, h < box->height ? h : box->height);	// remove upper right part of old image
+        if (replace) {
+            // draw background where the old picture was bigger
+            struct guiBox *box = &obj->box;
+            u16 w, h;
+            LCD_ImageDimensions(file, &w, &h);
+            if (h < box->height) GUI_DrawBackground(box->x, box->y + h, box->width, box->height - h);    // remove lower left part of old image
+            if (w < box->width) GUI_DrawBackground(box->x + w, box->y, box->width - w, h < box->height ? h : box->height);    // remove upper right part of old image
+            box->width = w;
+            box->height = h;
+        }
         image->crc = crc;
         image->file = file;
         image->x_off = x_off;
         image->y_off = y_off;
-        LCD_ImageDimensions(image->file, &image->header.box.width, &image->header.box.height);
         OBJ_SET_TRANSPARENT(obj, LCD_ImageIsTransparent(file));
         OBJ_SET_DIRTY(obj, 1);
     }
+}
+
+void GUI_ChangeImage(struct guiImage *image, const char *file, u16 x_off, u16 y_off)
+{
+    _GUI_ChangeImage(image, file, x_off, y_off, 0);
+}
+
+void GUI_ReplaceImage(struct guiImage *image, const char *file, u16 x_off, u16 y_off)
+{
+    _GUI_ChangeImage(image, file, x_off, y_off, 1);
 }

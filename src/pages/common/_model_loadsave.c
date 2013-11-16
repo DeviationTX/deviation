@@ -76,7 +76,7 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         else
             ico = CONFIG_GetIcon(mp->modeltype);
     }
-    GUI_ChangeImage(&gui->image, ico, 0, 0);
+    GUI_ReplaceImage(&gui->image, ico, 0, 0);
 }
 
 int get_idx_filename(const char *dir, const char *ext, int idx, const char *prefix)

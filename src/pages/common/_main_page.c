@@ -244,9 +244,14 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_HTRIM]    = HTRIM_H,
         [ELEM_MODELICO] = MODEL_ICO_H,
     };
-    *w = width[type];
-    *h = height[type];
+    if (type == ELEM_MODELICO && Model.icon[0])
+    	LCD_ImageDimensions(Model.icon, w, h);
+    else {
+		*w = width[type];
+		*h = height[type];
+    }
 }
+
 int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
 {
     *y = ELEM_Y(*elem);
@@ -257,6 +262,12 @@ int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
         return 0;
     *x = ELEM_X(*elem);
     GetElementSize(type, w, h);
+    if (type == ELEM_MODELICO) {
+    	if (*h > LCD_HEIGHT - 32) *h = LCD_HEIGHT - 32;
+    	if (*w > LCD_WIDTH)       *w = LCD_WIDTH;
+    	if (*x + *w > LCD_WIDTH)  *x = LCD_WIDTH - *w;
+    	if (*y + *h > LCD_HEIGHT) *y = LCD_HEIGHT - *h;
+    }
     return 1;
 }
 
