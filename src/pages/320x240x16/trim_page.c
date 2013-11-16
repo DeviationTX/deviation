@@ -27,7 +27,7 @@
 #define PCOL3 (134 + ((LCD_WIDTH - 320) / 2))
 #define PCOL4 (196 + ((LCD_WIDTH - 320) / 2))
 #define PROW1 (40 + ((LCD_HEIGHT - 240) / 2))
-#define PROW2 (66 + ((LCD_HEIGHT - 240) / 2))
+#define PROW2 ((LCD_HEIGHT == 240 ? 66 : 64) + ((LCD_HEIGHT - 240) / 2))    //slightly higher on Devo12 screen for additional line
 #define PROW3 (PROW2 + 2)
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
