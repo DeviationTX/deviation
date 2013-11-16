@@ -140,14 +140,16 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (msg == LOAD_MODEL + 1) {
         /* Load Model */
-        CONFIG_SaveModelIfNeeded();
-        PROTOCOL_DeInit();
-        CONFIG_ReadModel(mp->selected);
-        CONFIG_SaveTxIfNeeded();  //Save here to ensure in case of crash we restart on the right model
-        /* Need to recaclulate channels to see if we're in a safe state */
-        MIXER_Init();
-        MIXER_CalcChannels();
-        PROTOCOL_Init(0);
+        if (mp->selected != Transmitter.current_model) { // don't do that if model didn't change
+            CONFIG_SaveModelIfNeeded();
+            PROTOCOL_DeInit();
+            CONFIG_ReadModel(mp->selected);
+            CONFIG_SaveTxIfNeeded();  //Save here to ensure in case of crash we restart on the right model
+            /* Need to recalculate channels to see if we're in a safe state */
+            MIXER_Init();
+            MIXER_CalcChannels();
+            PROTOCOL_Init(0);
+        }
     } else if (msg == SAVE_MODEL + 1) {
         /* Save Model */
         CONFIG_WriteModel(mp->selected);
