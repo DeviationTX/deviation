@@ -56,7 +56,7 @@ u8 usb_cb(u32 button, u8 flags, void *data)
         wait_release();
         wait_press();
         wait_release();
-        USB_Disable(1);
+        USB_Disable();
         _draw_page(0);
     }
     return 1;
@@ -81,5 +81,5 @@ void USB_Connect()
     wait_release();
     wait_press();
     wait_release();
-    USB_Disable(1);
+    USB_Disable();
 }
