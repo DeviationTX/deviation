@@ -106,8 +106,8 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 	for ( i=0; i< NUM_TIMERS; i++) 
             TIMER_StartStop(i);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-	for ( i=0; i< NUM_TIMERS; i++)
-	    TIMER_Reset(i);
+        for ( i=0; i< NUM_TIMERS; i++)
+            TIMER_Reset(i);
     } else if (! PAGE_QuickPage(button, flags, data)) {
         MIXER_UpdateTrim(button, flags, data);
     }
