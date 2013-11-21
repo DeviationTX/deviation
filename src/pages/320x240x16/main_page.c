@@ -158,8 +158,9 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
             GUI_SetSelected((guiObject_t *)&gui->optico);
         }else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             mp->ignore_release = 1;
-            TIMER_Reset(0);
-            TIMER_Reset(1);
+            for (u8 timer=0; timer<NUM_TIMERS; timer++) {
+                if (Model.timer[timer].type != TIMER_PERMANENT) TIMER_Reset(timer);
+            }
         } else if (! PAGE_QuickPage(button, flags, data)) {
             MIXER_UpdateTrim(button, flags, data);
         }
