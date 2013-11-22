@@ -18,7 +18,7 @@
 
 void LCD_DrawPixel(unsigned int color)
 {
-	if (gui.x < LCD_WIDTH || gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
+	if (gui.x < LCD_WIDTH && gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
 		u8 r, g, b;
 		r = (color >> 8) & 0xf8;
 		g = (color >> 3) & 0xfc;

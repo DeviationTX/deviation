@@ -26,7 +26,7 @@ static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
  */
 void LCD_DrawPixel(unsigned int color)
 {
-	if (gui.x < LCD_WIDTH || gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
+	if (gui.x < LCD_WIDTH && gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
 		u8 c;
 		int row, col;
 		int i, j;
