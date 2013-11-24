@@ -141,10 +141,15 @@ struct timer_obj {
     guiTextSelect_t resetsrc;
     guiLabel_t resetpermlbl;
     guiButton_t resetperm;
+// don't include this in Devo7e due to memory restrictions
+#if TXID != 0x7e
     guiButton_t setperm;
+#endif
     guiScrollable_t scrollable;
 };
 
+// don't include this in Devo7e due to memory restrictions
+#if TXID != 0x7e
 struct set_timer_obj {
     guiLabel_t      oldtime;
     guiTextSelect_t hms;
@@ -153,6 +158,7 @@ struct set_timer_obj {
     guiTextSelect_t addset;
     guiLabel_t      newvalue;
 };
+#endif
 
 struct trim_obj {
     guiLabel_t steplbl;
@@ -331,7 +337,10 @@ struct gui_objs {
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
+// don't include this in Devo7e due to memory restrictions
+#if TXID != 0x7e
         struct set_timer_obj settimer;
+#endif
         struct trim_obj trim;
         struct trim2_obj trim2;
         struct datalog_obj datalog;
