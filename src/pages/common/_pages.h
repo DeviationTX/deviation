@@ -136,5 +136,6 @@ void PAGE_DrExpInit(int page);
 void PAGE_SwashInit(int page);
 void PAGE_GyroSenseInit(int page);
 void PAGE_CurvesEvent();
+void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);

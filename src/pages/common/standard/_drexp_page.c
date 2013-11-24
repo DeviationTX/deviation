@@ -135,3 +135,11 @@ static s16 show_curve_cb(s16 xval, void *data)
     return yval;
 }
 
+void PAGE_DrExpCurvesEvent()
+{
+    if (OBJ_IS_USED(&gui->graph)) {
+        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+            GUI_Redraw(&gui->graph);
+        }
+    }
+}

@@ -4,7 +4,7 @@ PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuE
 
 #ifndef NO_STANDARD_GUI
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,             _tr_noop("Reverse"))
-PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_CurvesEvent,      NULL,             _tr_noop("D/R & Exp"))
+PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_DrExpCurvesEvent, NULL,             _tr_noop("D/R & Exp"))
 PAGEDEF(PAGEID_SUBTRIM,  PAGE_SubtrimInit,     NULL,                  NULL,             _tr_noop("Subtrim"))
 PAGEDEF(PAGEID_TRAVELADJ,PAGE_TravelAdjInit,   NULL,                  PAGE_TravelAdjExit, _tr_noop("Travel adjust"))
 PAGEDEF(PAGEID_THROCURVES,PAGE_ThroCurvesInit, PAGE_CurvesEvent,      NULL,             _tr_noop("Throttle curves"))

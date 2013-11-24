@@ -25,7 +25,7 @@ PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_Splas
 /* Simple */
 PAGEDEF(PAGEID_MODELMENU, PAGE_ModelMenuInit,  NULL,                  NULL,             _tr_noop("Model menu"))
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,             _tr_noop("Reverse"))
-PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_CurvesEvent,      NULL,             _tr_noop("D/R & Exp"))
+PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_DrExpCurvesEvent, NULL,             _tr_noop("D/R & Exp"))
 PAGEDEF(PAGEID_SUBTRIM,  PAGE_SubtrimInit,     NULL,                  NULL,             _tr_noop("Subtrim"))
 PAGEDEF(PAGEID_TRAVELADJ,PAGE_TravelAdjInit,   NULL,                  NULL,             _tr_noop("Travel adjust"))
 PAGEDEF(PAGEID_THROCURVES,PAGE_ThroCurvesInit, PAGE_CurvesEvent,      NULL,             _tr_noop("Throttle curves"))
