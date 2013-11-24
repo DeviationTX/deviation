@@ -55,13 +55,13 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-#if HAS_RTC
-    if (idx <= NUM_RTC) {
-        u32 time = RTC_GetValue();
-        idx == 1 ? RTC_GetTimeFormatted(mp->tmpstr, time) : RTC_GetDateFormatted(mp->tmpstr, time);
-        return mp->tmpstr;
-    }
-#endif
+    #if HAS_RTC
+        if (idx <= NUM_RTC) {
+            u32 time = RTC_GetValue();
+            idx == 1 ? RTC_GetTimeFormatted(mp->tmpstr, time) : RTC_GetDateFormatted(mp->tmpstr, time);
+            return mp->tmpstr;
+        }
+    #endif
     if (idx - NUM_RTC <= NUM_TIMERS) {
         TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - NUM_RTC - 1));
     } else if(idx - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
@@ -74,14 +74,14 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 
 const char *show_bigbox_cb(guiObject_t *obj, const void *data)
 {
-    u8 idx = (long)data;
-#if HAS_RTC
-    if (idx <= NUM_RTC) {
-        u32 time = RTC_GetValue();
-        idx == 1 ? RTC_GetTimeFormattedBigbox(mp->tmpstr, time) : RTC_GetDateFormattedBigbox(mp->tmpstr, time);
-        return mp->tmpstr;
-    }
-#endif
+    #if HAS_RTC
+        u8 idx = (long)data;
+        if (idx <= NUM_RTC) {
+            u32 time = RTC_GetValue();
+            idx == 1 ? RTC_GetTimeFormattedBigbox(mp->tmpstr, time) : RTC_GetDateFormattedBigbox(mp->tmpstr, time);
+            return mp->tmpstr;
+        }
+    #endif
     return show_box_cb(obj, data);
 }
 
