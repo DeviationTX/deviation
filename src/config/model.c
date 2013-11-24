@@ -1347,11 +1347,14 @@ u8 CONFIG_ReadModel(u8 model_num) {
     return 1;
 }
 
-u8 CONFIG_SaveModelIfNeeded() {
+u8 CONFIG_IsModelChanged() {
     u32 newCrc = Crc(&Model, sizeof(Model));
-    if (crc32 == newCrc)
-        return 0;
-    CONFIG_WriteModel(Transmitter.current_model);
+    return (crc32 != newCrc);
+}
+
+u8 CONFIG_SaveModelIfNeeded() {
+    if (CONFIG_IsModelChanged())
+        CONFIG_WriteModel(Transmitter.current_model);
     return 1;
 }
 

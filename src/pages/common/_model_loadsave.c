@@ -18,6 +18,7 @@ static struct model_page * const mp = &pagemem.u.model_page;
 
 static void _show_buttons(int loadsave);
 static void _show_list(int loadsave, u8 num_models);
+
 static int ini_handle_icon(void* user, const char* section, const char* name, const char* value)
 {
     (void)user;
@@ -71,10 +72,14 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
         mp->modeltype = 0;
         mp->iconstr[0] = 0;
         ini_parse(mp->tmpstr, ini_handle_icon, NULL);
-        if (mp->iconstr[0])
-            ico = mp->iconstr;
-        else
-            ico = CONFIG_GetIcon(mp->modeltype);
+        if (mp->selected == CONFIG_GetCurrentModel() && Model.icon[0])
+            ico = Model.icon;
+        else {
+            if (mp->iconstr[0])
+                ico = mp->iconstr;
+            else
+                ico = CONFIG_GetIcon(mp->modeltype);
+        }
     }
     GUI_ReplaceImage(&gui->image, ico, 0, 0);
 }
@@ -119,6 +124,10 @@ static const char *string_cb(u8 idx, void *data)
             if (! get_idx_filename("layout", ".ini", idx, "layout/"))
                 return _tr("Unknown");
     } else {
+        if (idx + 1 == CONFIG_GetCurrentModel()) {
+            sprintf(tempstring, "%d: %s%s", idx + 1, Model.name, CONFIG_IsModelChanged() ? " (unsaved)" : "");
+            return tempstring;
+        }
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }
     fh = fopen(mp->tmpstr, "r");
@@ -140,7 +149,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     (void)obj;
     if (msg == LOAD_MODEL + 1) {
         /* Load Model */
-        if (mp->selected != Transmitter.current_model) { // don't do that if model didn't change
+        if (mp->selected != CONFIG_GetCurrentModel()) { // don't do that if model didn't change
             CONFIG_SaveModelIfNeeded();
             PROTOCOL_DeInit();
             CONFIG_ReadModel(mp->selected);
