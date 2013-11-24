@@ -115,14 +115,15 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     (void)data;
     if (pos != 0)
         return 0;
-    *x = mp->raw[MIXER_SRC(mp->mixer_ptr[current_pit_mode]->src)];
+    int idx = data ? ((long)data - 1) : current_pit_mode;
+    *x = mp->raw[MIXER_SRC(mp->mixer_ptr[idx]->src)];
     if (*x > CHAN_MAX_VALUE)
         *x = CHAN_MAX_VALUE;
     else if (*x  < CHAN_MIN_VALUE)
         *x = CHAN_MIN_VALUE;
     s16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;
-    *y = STDMIX_EvalMixerCb(*x, mp->mixer_ptr[current_pit_mode], ymax, ymin);
+    *y = STDMIX_EvalMixerCb(*x, mp->mixer_ptr[idx], ymax, ymin);
     return 1;
 }
 
@@ -133,13 +134,4 @@ static s16 show_curve_cb(s16 xval, void *data)
     s16 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[idx]->curve));
     yval = yval * mp->mixer_ptr[idx]->scalar / 100 ;
     return yval;
-}
-
-void PAGE_DrExpCurvesEvent()
-{
-    if (OBJ_IS_USED(&gui->graph)) {
-        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
-            GUI_Redraw(&gui->graph);
-        }
-    }
 }

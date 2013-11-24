@@ -95,3 +95,13 @@ static void _refresh_page() {
     GUI_RedrawAllObjects();
 }
 
+void PAGE_DrExpCurvesEvent()
+{
+    if (OBJ_IS_USED(&gui->graph)) {
+        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+            GUI_Redraw(&gui->graph[0]);
+            GUI_Redraw(&gui->graph[1]);
+            GUI_Redraw(&gui->graph[2]);
+        }
+    }
+}
