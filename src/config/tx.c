@@ -45,6 +45,8 @@ const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
 
 const char SPLASH_DELAY[] = "splash_delay";
 const char CLOCK_12HR[] = "12hr_clock";
+const char TIME_FORMAT[] = "time_format";
+const char DATE_FORMAT[] = "date_format";
 
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
@@ -152,12 +154,20 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             t->splash_delay = atoi(value);
             return 1;
         }
-#if HAS_RTC
+    #if HAS_RTC
         if (MATCH_KEY(CLOCK_12HR)) {
-            t->clock12hr = atoi(value);
+            t->rtcflags = (t->rtcflags & !CLOCK12HR) | (atoi(value) & CLOCK12HR);
             return 1;
         }
-#endif
+        if (MATCH_KEY(TIME_FORMAT)) {
+            t->rtcflags = (t->rtcflags & !TIMEFMT) | (atoi(value) & TIMEFMT);
+            return 1;
+        }
+        if (MATCH_KEY(DATE_FORMAT)) {
+            t->rtcflags = (t->rtcflags & !DATEFMT) | ((atoi(value) << 4) & DATEFMT);
+            return 1;
+        }
+    #endif
     }
     if(MATCH_START(section, SECTION_CALIBRATE) && strlen(section) >= sizeof(SECTION_CALIBRATE)) {
         u8 idx = atoi(section + sizeof(SECTION_CALIBRATE)-1);
@@ -283,7 +293,9 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
 #if HAS_RTC
-    fprintf(fh, "%s=%d\n", CLOCK_12HR, Transmitter.clock12hr);
+    fprintf(fh, "%s=%d\n", CLOCK_12HR, Transmitter.rtcflags & CLOCK12HR);
+    fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtcflags & TIMEFMT);
+    fprintf(fh, "%s=%d\n", DATE_FORMAT, (Transmitter.rtcflags & DATEFMT) >> 4);
 #endif
     fprintf(fh, "[%s]\n", SECTION_MODULES);
     for(i = 0; i < TX_MODULE_LAST; i++) {

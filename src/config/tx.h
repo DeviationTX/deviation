@@ -28,6 +28,10 @@ struct mcu_pin {
     u16 pin;
 };
 
+// bitmap for rtcflags:
+#define CLOCK12HR 0b00000001
+#define TIMEFMT   0b00001111
+#define DATEFMT   0b11110000
 struct Transmitter {
     u8 current_model;
     u8 language;
@@ -44,7 +48,7 @@ struct Transmitter {
     u8 volume;
     u8 vibration_state; // for future vibration on/off support
 #if HAS_RTC
-    u8 clock12hr;
+    u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
 #endif
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u8 module_poweramp;

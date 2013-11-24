@@ -31,8 +31,13 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
 
     select->type = type;
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
-    box->height = select->button->height;
-    box->width = select->button->width + 2 * ARROW_WIDTH;
+    if (type != TEXTSELECT_VERT_64) {
+        box->height = select->button->height;
+        box->width = select->button->width + 2 * ARROW_WIDTH;
+    } else {
+        box->height = select->button->height + 2 * ARROW_HEIGHT;
+        box->width = select->button->width;
+    }
 
     box->x = x;
     box->y = y;
@@ -101,14 +106,23 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
     if (select->type != TEXTSELECT_DEVO10) {
-        GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                            box->y, select->button, DRAW_NORMAL);
         if (select->enable & 0x01) {
-            GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
-                                select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-            GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                                box->y, ARROW_RIGHT,
-                                select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+            if (select->type != TEXTSELECT_VERT_64) {
+                GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                                    box->y, select->button, DRAW_NORMAL);
+                GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
+                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+                GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
+                        box->y, ARROW_RIGHT,
+                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+            } else {
+                GUI_DrawImageHelper(box->x,
+                                    box->y + ARROW_HEIGHT, select->button, DRAW_NORMAL);
+                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y, ARROW_UP,
+                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y + box->height - ARROW_HEIGHT, ARROW_DOWN,
+                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+            }
         }
         LCD_SetFont(TEXTSEL_FONT.font);
         LCD_SetFontColor(TEXTSEL_FONT.font_color);
@@ -119,6 +133,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     } else {   // plate text select for devo 10, copy most behavior from label.c
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
         u8 arrow_width = ARROW_WIDTH - 1;
+        u8 arrow_height = ARROW_HEIGHT - 1;
         if (select->enable  & 0x01) {
             u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
             u16 x1 = box->x + arrow_width -1;
@@ -138,8 +153,13 @@ void GUI_DrawTextSelect(struct guiObject *obj)
             if (!select->enable)  // avoid drawing button box when it is disable
                 select->desc.style = LABEL_CENTER;
         }
-        GUI_DrawLabelHelper(box->x + arrow_width , box->y,box->width - arrow_width -arrow_width , obj->box.height,
-                str, &select->desc, obj == objSELECTED);
+        if (select->type != TEXTSELECT_VERT_64) {
+            GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , box->height,
+                    str, &select->desc, obj == objSELECTED);
+        } else {
+            GUI_DrawLabelHelper(box->x , box->y + arrow_height, box->width, box->height - 2 * arrow_height,
+                    str, &select->desc, obj == objSELECTED);
+        }
     }
 }
 
@@ -199,6 +219,11 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
         return 0;
     }
     box.width = ARROW_WIDTH;
+    if (select->type == TEXTSELECT_VERT_64) {
+        box.height = ARROW_HEIGHT;
+        box.x = obj->box.x + (obj->box.width - ARROW_WIDTH) / 2;
+        box.y = obj->box.y + obj->box.height - ARROW_HEIGHT;
+    }
     if (select->enable & 0x01) {
         if (coords_in_box(&box, coords)) {
             if (! press_type) {
@@ -213,7 +238,11 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
             }
             return 1;
         }
-        box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+        if (select->type != TEXTSELECT_VERT_64) {
+            box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+        } else {
+            box.y = obj->box.y;
+        }
         if (coords_in_box(&box, coords)) {
             if (! press_type) {
                 if (! select->state) {

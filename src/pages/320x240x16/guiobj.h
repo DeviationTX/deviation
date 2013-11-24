@@ -330,27 +330,25 @@ struct usb_obj {
 };    
 
 struct rtc_obj {
-    guiLabel_t title;
-    guiLabel_t displaylbl;
-    guiLabel_t secondlbl;
-    guiLabel_t minutelbl;
-    guiLabel_t hourlbl;
-    guiLabel_t daylbl;
-    guiLabel_t monthlbl;
-    guiLabel_t yearlbl;
-    guiTextSelect_t display;
-    guiTextSelect_t second;
-    guiTextSelect_t minute;
-    guiTextSelect_t hour;
-    guiTextSelect_t day;
-    guiTextSelect_t month;
-    guiTextSelect_t year;
-    guiLabel_t secondvalue;
-    guiLabel_t minutevalue;
-    guiLabel_t hourvalue;
-    guiLabel_t dayvalue;
-    guiLabel_t monthvalue;
-    guiLabel_t yearvalue;
+    guiLabel_t      title;
+    // time / date format
+    guiLabel_t      timelbl;
+    guiLabel_t      datelbl;
+    guiTextSelect_t timeformat;
+    guiTextSelect_t dateformat;
+    // array for second ... year
+    guiLabel_t      label[6];
+    guiTextSelect_t select[6];
+    // label for displaying time / date
+    guiLabel_t      actlbl;
+    guiLabel_t      acttime;
+    guiLabel_t      actdate;
+    guiLabel_t      newlbl;
+    guiLabel_t      newtime;
+    guiLabel_t      newdate;
+    // buttons for setting time and date
+    guiButton_t     settime;
+    guiButton_t     setdate;
 };
 
 /****Advanced ****/

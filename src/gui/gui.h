@@ -29,6 +29,7 @@ enum TextSelectType {
     TEXTSELECT_64,
     TEXTSELECT_96,
     TEXTSELECT_DEVO10, // indication for textsel specically in devo10
+    TEXTSELECT_VERT_64, // TEXTSELECT_64 with arrows above and beyond instead of sideways
 };
 
 enum KeyboardType {

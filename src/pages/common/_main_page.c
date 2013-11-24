@@ -58,7 +58,7 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
 #if HAS_RTC
     if (idx <= NUM_RTC) {
         u32 time = RTC_GetValue();
-        idx == 1 ? RTC_GetTimeString(mp->tmpstr, time) : RTC_GetDateString(mp->tmpstr, time);
+        idx == 1 ? RTC_GetTimeFormatted(mp->tmpstr, time) : RTC_GetDateFormatted(mp->tmpstr, time);
         return mp->tmpstr;
     }
 #endif
@@ -70,6 +70,19 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
         sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
     }
     return mp->tmpstr;
+}
+
+const char *show_bigbox_cb(guiObject_t *obj, const void *data)
+{
+    u8 idx = (long)data;
+#if HAS_RTC
+    if (idx <= NUM_RTC) {
+        u32 time = RTC_GetValue();
+        idx == 1 ? RTC_GetTimeFormattedBigbox(mp->tmpstr, time) : RTC_GetDateFormattedBigbox(mp->tmpstr, time);
+        return mp->tmpstr;
+    }
+#endif
+    return show_box_cb(obj, data);
 }
 
 const char *voltage_cb(guiObject_t *obj, const void *data) {
@@ -329,7 +342,7 @@ void show_elements()
                            ));
                 GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h,
                             get_box_font(type == ELEM_BIGBOX ? 0 : 2, font),
-                            show_box_cb, press_box_cb,
+                            type == ELEM_BIGBOX ? show_bigbox_cb : show_box_cb, press_box_cb,
                             (void *)((long)src));
                 break;
             }

@@ -30,8 +30,8 @@ static void _draw_page(u8 enable)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_USB));
 #if HAS_RTC
-    GUI_CreateLabelBox(&gui->time, (LCD_WIDTH - (120 + 160 +20)) / 2, 40, 120, 28, &BIGBOX_FONT, show_usb_time_cb, NULL, NULL);
-    GUI_CreateLabelBox(&gui->date, (LCD_WIDTH - (120 + 160 +20)) / 2 + 120 + 20, 40, 160, 28, &BIGBOX_FONT, show_usb_date_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->time, (LCD_WIDTH - (113 + 113 +20)) / 2, 40, 113, 28, &SMALLBOX_FONT, show_usb_time_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->date, (LCD_WIDTH - (113 + 113 +20)) / 2 + 96 + 20, 40, 113, 28, &SMALLBOX_FONT, show_usb_date_cb, NULL, NULL);
 #endif
 
     GUI_CreateLabelBox(&gui->headline, LCD_WIDTH/2-100, 60, 200, 40, &MODELNAME_FONT, NULL, NULL, "www.deviationtx.com");
@@ -48,7 +48,7 @@ const char *show_usb_time_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    RTC_GetTimeString(up->datetime, RTC_GetValue());
+    RTC_GetTimeFormatted(up->datetime, RTC_GetValue());
     return up->datetime;
 }
 
@@ -56,7 +56,7 @@ const char *show_usb_date_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    RTC_GetDateString(up->datetime, RTC_GetValue());
+    RTC_GetDateFormatted(up->datetime, RTC_GetValue());
     return up->datetime;
 }
 
