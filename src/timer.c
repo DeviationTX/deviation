@@ -92,6 +92,13 @@ s32 TIMER_GetValue(u8 timer)
     return timer_val[timer];
 }
 
+void TIMER_SetValue(u8 timer, s32 value)
+{
+    if (Model.timer[timer].type == TIMER_PERMANENT) {
+        timer_val[timer] = value;
+    }
+}
+
 void TIMER_Init()
 {
     u8 i;

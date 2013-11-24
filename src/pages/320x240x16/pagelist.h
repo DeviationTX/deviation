@@ -22,6 +22,7 @@ PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBEx
 PAGEDEF(PAGEID_RTC,      PAGE_RTCInit,         PAGE_RTCEvent,         NULL,             _tr_noop("Real Time Clock"))
 #endif
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,  _tr_noop("Welcome"))
+PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,             _tr_noop("Set permanent timer"))
 /* Simple */
 PAGEDEF(PAGEID_MODELMENU, PAGE_ModelMenuInit,  NULL,                  NULL,             _tr_noop("Model menu"))
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,             _tr_noop("Reverse"))

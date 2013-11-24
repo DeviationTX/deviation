@@ -51,11 +51,11 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 }
 
 
-static void _show_page()
+static void _show_page(int page)
 {
     PAGE_SetModal(0);
     firstObj = NULL;
-    timer_page_num = 0 ;
+    timer_page_num = (LCD_WIDTH == 480 ? 0 : page);  // ignore for big screen because everything is on one page
 
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TIMER), MODELMENU_Show);
@@ -112,6 +112,7 @@ static void _draw_body() {
         //Row 4
         GUI_CreateLabelBox(&gui->startlbl[i], COL1, next_row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
         GUI_CreateTextSelect(&gui->start[i], COL2, next_row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
+        GUI_CreateButton(&gui->setperm[i], COL2, next_row, TEXTSELECT_96, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)(i | 0x80));
 #if 0 //HAS_RTC
         // date label and set date/time button
         GUI_CreateLabelBox(&gui->datelbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Date:"));
@@ -144,10 +145,24 @@ static void update_countdown(u8 idx)
            || Model.timer[idx].type == TIMER_COUNTDOWN_PROP;
     GUI_SetHidden((guiObject_t *)&gui->resetperm[idx], hide);
     GUI_SetSelectable((guiObject_t *)&gui->resetperm[idx], !hide);
+    GUI_SetHidden((guiObject_t *)&gui->setperm[idx], hide);
+    GUI_SetSelectable((guiObject_t *)&gui->setperm[idx], !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl[idx], hide);
 
     GUI_Redraw(&gui->switchlbl[idx]);
 }
+
+void reset_timerperm_cb(guiObject_t *obj, const void *data)
+{
+    long index = (long)data & 0xff;
+    if (index & 0x80) {   // set
+        PAGE_RemoveAllObjects();
+        PAGE_SetTimerInit(index & 0x7f);
+    } else  {  // reset
+        PAGE_ShowResetPermTimerDialog(obj,(void *)(index & 0x7f));
+    }
+}
+
 #if HAS_RTC
 void press_set_cb(guiObject_t *obj, const void *data)
 {

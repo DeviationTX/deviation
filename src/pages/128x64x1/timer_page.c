@@ -20,8 +20,9 @@
 
 #include "../common/_timer_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
 static u16 current_selected = 0;
+
+static u8 _action_cb(u32 button, u8 flags, void *data);
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -80,13 +81,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
     GUI_CreateTextSelectPlate(&gui->start, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
+    GUI_CreateButtonPlateText(&gui->setperm, x, y,
+        55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 
     update_countdown(absrow);
     return 4;
 }
 
-static void _show_page()
+static void _show_page(int page)
 {
+    (void)page;
     PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
     PAGE_SetActionCB(_action_cb);
 
@@ -137,6 +141,20 @@ static void update_countdown(u8 idx)
     GUI_SetHidden((guiObject_t *)&gui->resetperm, hide);
     GUI_SetSelectable((guiObject_t *)&gui->resetperm, !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl, hide);
+    GUI_SetHidden((guiObject_t *)&gui->setperm, hide);
+    GUI_SetSelectable((guiObject_t *)&gui->setperm, !hide);
 
     GUI_Redraw(&gui->switchlbl);
+}
+
+void reset_timerperm_cb(guiObject_t *obj, const void *data)
+{
+    long index = (long)data & 0xff;
+    if (index & 0x80) {   // set
+        current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+        PAGE_RemoveAllObjects();
+        PAGE_SetTimerInit(index & 0x7f);
+    } else  {  // reset
+        PAGE_ShowResetPermTimerDialog(obj,(void *)(index & 0x7f));
+    }
 }

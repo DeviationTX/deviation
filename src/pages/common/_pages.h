@@ -54,6 +54,10 @@ void PAGE_TrimExit();
 void PAGE_TimerInit(int page);
 void PAGE_TimerEvent();
 void PAGE_TimerExit();
+void TIMERPAGE_Show(guiObject_t *obj, const void *data);
+/* Set permanent timer */
+void PAGE_SetTimerInit(int index);
+void PAGE_SetTimerExit();
 
 /* Model */
 void PAGE_ModelInit(int page);

@@ -125,8 +125,8 @@ static const char *string_cb(u8 idx, void *data)
                 return _tr("Unknown");
     } else {
         if (idx + 1 == CONFIG_GetCurrentModel()) {
-            sprintf(tempstring, "%d: %s%s", idx + 1, Model.name, CONFIG_IsModelChanged() ? " (unsaved)" : "");
-            return tempstring;
+            sprintf(mp->tmpstr, "%d: %s%s", idx + 1, Model.name, CONFIG_IsModelChanged() ? " (unsaved)" : "");
+            return mp->tmpstr;
         }
         sprintf(mp->tmpstr, "models/model%d.ini", idx + 1);
     }

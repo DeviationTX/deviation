@@ -141,7 +141,17 @@ struct timer_obj {
     guiTextSelect_t resetsrc;
     guiLabel_t resetpermlbl;
     guiButton_t resetperm;
+    guiButton_t setperm;
     guiScrollable_t scrollable;
+};
+
+struct set_timer_obj {
+    guiLabel_t      oldtime;
+    guiTextSelect_t hms;
+    guiTextSelect_t value;
+    guiLabel_t      addtime;
+    guiTextSelect_t addset;
+    guiLabel_t      newvalue;
 };
 
 struct trim_obj {
@@ -321,6 +331,7 @@ struct gui_objs {
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
+        struct set_timer_obj settimer;
         struct trim_obj trim;
         struct trim2_obj trim2;
         struct datalog_obj datalog;

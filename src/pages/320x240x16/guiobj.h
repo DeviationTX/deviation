@@ -211,6 +211,7 @@ struct timer_obj {
     guiLabel_t startlbl[NUM_TIMERS];
     guiLabel_t resetpermlbl[NUM_TIMERS];
     guiButton_t resetperm[NUM_TIMERS];
+    guiButton_t setperm[NUM_TIMERS];
     guiLabel_t timelbl[NUM_TIMERS];
     guiLabel_t timevallbl[NUM_TIMERS];
     guiLabel_t datelbl[NUM_TIMERS];
@@ -218,6 +219,15 @@ struct timer_obj {
     guiLabel_t setlbl[NUM_TIMERS];
     guiButton_t set[NUM_TIMERS];
     guiTextSelect_t start[NUM_TIMERS];
+};
+
+struct set_timer_obj {
+    guiLabel_t      headerlbl;
+    guiLabel_t      secondlbl, minutelbl, hourlbl;
+    guiTextSelect_t secondsel, minutesel, hoursel;
+    guiLabel_t      oldlbl, addlbl, newlbl;
+    guiLabel_t      oldvalue, addvalue, newvalue;
+    guiButton_t     addbtn, setbtn;
 };
 
 #define NUM_TRIM_ROWS (LCD_HEIGHT == 240 ? 7 : 8)
@@ -555,6 +565,7 @@ struct gui_objs {
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
+        struct set_timer_obj settimer;
         struct trim_obj trim;
         struct trimedit_obj trimedit;
         struct tx_obj tx;

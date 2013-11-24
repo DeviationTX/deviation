@@ -16,37 +16,35 @@
 static struct timer_page * const tp = &pagemem.u.timer_page;
 #define gui (&gui_objs.u.timer)
 
-static void update_countdown(u8 idx);
 const char *timer_str_cb(guiObject_t *obj, const void *data);
+
+static const char *show_timerperm_cb(guiObject_t *obj, const void *data);
+static void update_countdown(u8 idx);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_source_cb(guiObject_t *obj, void *data);
 static void toggle_timertype_cb(guiObject_t *obj, void *data);
 static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
-
-static const char *show_timerperm_cb(guiObject_t *obj, const void *data);
 static void reset_timerperm_cb(guiObject_t *obj, const void *data);
-
 static void _show_page();
 
 void PAGE_TimerInit(int page)
 {
-    (void)page;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    _show_page();
+    _show_page(page);
 }
 
 void PAGE_TimerEvent()
 {
 }
-const char *timer_str_cb(guiObject_t *obj, const void *data)
+
+void TIMERPAGE_Show(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    int i = (long)data;
-    snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Timer%d"), i + 1);
-    return tp->tmpstr;
+    PAGE_TimerInit((long)data);
 }
+
 static const char *switch_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -58,41 +56,26 @@ static const char *switch_str_cb(guiObject_t *obj, const void *data)
     }
 }
 
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
+const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    u8 is_neg = MIXER_SRC_IS_INV(timer->src);
     u8 changed;
-    u8 max = NUM_SOURCES;
-    u8 step = 1;
-    if (Model.mixer_mode == MIXER_STANDARD)  {
-        max = mapped_std_channels.throttle + NUM_INPUTS +1;
-        step = max;
-    }
-    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, max, dir, step, step, &changed);
-    MIXER_SET_SRC_INV(src, is_neg);
-    if (changed) {
-        timer->src = src;
+    timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST - 1, dir, 1, 1, &changed);
+    if (changed){
         TIMER_Reset(idx);
+        update_countdown(idx);
     }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(src));
-    if (0 && Model.mixer_mode == MIXER_STANDARD)  {
-        return MIXER_SRC(src) ? _tr("On") : _tr("Off");
+    switch (timer->type) {
+        case TIMER_STOPWATCH: return _tr("stopwatch");
+        case TIMER_STOPWATCH_PROP: return _tr("stop-prop");
+        case TIMER_COUNTDOWN: return _tr("countdown");
+        case TIMER_COUNTDOWN_PROP: return _tr("cntdn-prop");
+        case TIMER_PERMANENT: return _tr("permanent");
+        case TIMER_LAST: break;
     }
-    return INPUT_SourceName(tp->tmpstr, src);
-}
-
-void toggle_source_cb(guiObject_t *obj, void *data)
-{
-    u8 idx = (long)data;
-    struct Timer *timer = &Model.timer[idx];
-    if(MIXER_SRC(timer->src)) {
-        MIXER_SET_SRC_INV(timer->src, ! MIXER_SRC_IS_INV(timer->src));
-        TIMER_Reset(idx);
-        GUI_Redraw(obj);
-    }
+    return "";
 }
 
 const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
@@ -129,36 +112,59 @@ void toggle_resetsrc_cb(guiObject_t *obj, void *data)
     }
 }
 
-const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
+const char *timer_str_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int i = (long)data;
+    snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Timer%d"), i + 1);
+    return tp->tmpstr;
+}
+
+const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
+    u8 is_neg = MIXER_SRC_IS_INV(timer->src);
     u8 changed;
-    timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST - 1, dir, 1, 1, &changed);
-    if (changed){
+    u8 max = NUM_SOURCES;
+    u8 step = 1;
+    if (Model.mixer_mode == MIXER_STANDARD)  {
+        max = mapped_std_channels.throttle + NUM_INPUTS +1;
+        step = max;
+    }
+    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, max, dir, step, step, &changed);
+    MIXER_SET_SRC_INV(src, is_neg);
+    if (changed) {
+        timer->src = src;
         TIMER_Reset(idx);
-    	update_countdown(idx);
     }
-    switch (timer->type) {
-        case TIMER_STOPWATCH: return _tr("stopwatch");
-        case TIMER_STOPWATCH_PROP: return _tr("stop-prop");
-        case TIMER_COUNTDOWN: return _tr("countdown");
-        case TIMER_COUNTDOWN_PROP: return _tr("cntdn-prop");
-        case TIMER_PERMANENT: return _tr("permanent");
-        case TIMER_LAST: break;
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(src));
+    if (0 && Model.mixer_mode == MIXER_STANDARD)  {
+        return MIXER_SRC(src) ? _tr("On") : _tr("Off");
     }
-    return "";
+    return INPUT_SourceName(tp->tmpstr, src);
 }
 
 void toggle_timertype_cb(guiObject_t *obj, void *data)
 {
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    timer->type = TIMER_LAST == timer->type + 1 ? 0 : timer->type + 1;     
+    timer->type = TIMER_LAST == timer->type + 1 ? 0 : timer->type + 1;
     TIMER_Reset(idx);
     update_countdown(idx);
     GUI_Redraw(obj);
+}
+
+void toggle_source_cb(guiObject_t *obj, void *data)
+{
+    u8 idx = (long)data;
+    struct Timer *timer = &Model.timer[idx];
+    if(MIXER_SRC(timer->src)) {
+        MIXER_SET_SRC_INV(timer->src, ! MIXER_SRC_IS_INV(timer->src));
+        TIMER_Reset(idx);
+        GUI_Redraw(obj);
+    }
 }
 
 const char *set_start_cb(guiObject_t *obj, int dir, void *data)
@@ -178,11 +184,10 @@ const char *show_timerperm_cb(guiObject_t *obj, const void *data)
 {
   (void)obj;
   u8 idx = (long)data;
-  TIMER_SetString(tp->tmpstr,(long)Model.timer[idx].val);
+  if (idx & 0x80)
+      snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Set to"));
+  else
+      TIMER_SetString(tp->tmpstr,(long)Model.timer[idx & 0x7f].val);
   return tp->tmpstr;
 }
 
-void reset_timerperm_cb(guiObject_t *obj, const void *data)
-{
-  PAGE_ShowResetPermTimerDialog(obj,(void *)data);
-}
