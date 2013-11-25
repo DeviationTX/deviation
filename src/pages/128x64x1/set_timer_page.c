@@ -97,7 +97,7 @@ static void _show_settimer_page(u8 index)
     u8 xtime = 75;
     u8 y = ITEM_HEIGHT + 1; // under headline
     //Row 1
-    GUI_CreateLabelBox(&guiset->oldtime, xtime, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
+    GUI_CreateLabelBox(&guiset->oldtime, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
 
     //Row 2
     y += space;
@@ -106,12 +106,12 @@ static void _show_settimer_page(u8 index)
 
     //Row 3
     y += space;
-    GUI_CreateLabelBox(&guiset->addtime, xtime, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
+    GUI_CreateLabelBox(&guiset->addtime, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
     GUI_CreateTextSelectPlate(&guiset->addset, 0, y , x, ITEM_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
     y += space;
 
     //Row 4
-    GUI_CreateLabelBox(&guiset->newvalue, xtime, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
+    GUI_CreateLabelBox(&guiset->newvalue, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
 
 }
 
