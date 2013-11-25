@@ -74,25 +74,41 @@ static void _show_settimer_page(u8 index)
         firstObj = NULL;
     }
 
-    int row = 40, col = 30;
+    #define XOFF  ((LCD_WIDTH - 320) / 2)
+    #define YBOX  16
+    #define YOLD  40
+    #define YRES  (LCD_HEIGHT - 46 - 8)
+    #define YNEW  ((YRES + 86) / 2 - 36)
+    #define YUNIT (YNEW + YBOX)
+    #define YDIFF 20
+    #define YBTN  (YUNIT + YDIFF + YDIFF)
+    #define XLEFT (XOFF + 30)
+    #define XADD  (XLEFT)
+    #define XSET  (XADD + 64)
+    #define XUNIT (XOFF + 170)
+    #define XVAL  (XUNIT + 50)
 
-    firstObj = GUI_CreateLabel(&guiset->oldlbl, col, row, NULL, DEFAULT_FONT, (void *)_tr("actual value"));
-    GUI_CreateLabelBox(&guiset->oldvalue, col, row + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)OLD_TIMER);
-    row += 50;
-    GUI_CreateLabel(&guiset->addlbl, col, row, NULL, DEFAULT_FONT, (void *)_tr("value to add or set"));
-    GUI_CreateLabelBox(&guiset->addvalue, col, row + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)ADD_TIMER);
+    // actual value
+    firstObj = GUI_CreateLabel(&guiset->oldlbl, XLEFT, YOLD, NULL, DEFAULT_FONT, (void *)_tr("actual value"));
+    GUI_CreateLabelBox(&guiset->oldvalue, XLEFT, YOLD + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)OLD_TIMER);
+
+    // value to add or set
+    GUI_CreateLabel(&guiset->addlbl, XLEFT, YNEW, NULL, DEFAULT_FONT, (void *)_tr("value to add or set"));
+    GUI_CreateLabelBox(&guiset->addvalue, XLEFT, YNEW + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)ADD_TIMER);
+
     // select boxes
-    GUI_CreateLabel(&guiset->hourlbl, col + 140, row + 1, NULL, DEFAULT_FONT, (void *)_tr("Hour"));
-    GUI_CreateTextSelect(&guiset->hoursel, col + 180, row, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_HOURS);
-    GUI_CreateLabel(&guiset->minutelbl, col + 140, row + 21, NULL, DEFAULT_FONT, (void *)_tr("Minute"));
-    GUI_CreateTextSelect(&guiset->minutesel, col + 180, row + 20, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_MINUTES);
-    GUI_CreateLabel(&guiset->secondlbl, col + 140, row + 41, NULL, DEFAULT_FONT, (void *)_tr("Second"));
-    GUI_CreateTextSelect(&guiset->secondsel, col + 180, row + 40, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_SECONDS);
-    row += 50;
-    GUI_CreateButton(&guiset->addbtn, col, row, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)ADD_BUTTON);
-    GUI_CreateButton(&guiset->setbtn, col + 64, row, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)SET_BUTTON);
-    row += 20;
-    GUI_CreateLabel(&guiset->newlbl, col, row, NULL, DEFAULT_FONT, (void *)_tr("resulting value"));
-    GUI_CreateLabelBox(&guiset->newvalue, col, row + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)NEW_TIMER);
-    row += 50;
+    GUI_CreateLabel(&guiset->hourlbl, XUNIT, YUNIT + 1, NULL, DEFAULT_FONT, (void *)_tr("Hour"));
+    GUI_CreateTextSelect(&guiset->hoursel, XVAL, YUNIT, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_HOURS);
+    GUI_CreateLabel(&guiset->minutelbl, XUNIT, YUNIT + YDIFF + 1, NULL, DEFAULT_FONT, (void *)_tr("Minute"));
+    GUI_CreateTextSelect(&guiset->minutesel, XVAL, YUNIT + YDIFF, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_MINUTES);
+    GUI_CreateLabel(&guiset->secondlbl, XUNIT, YUNIT + YDIFF + YDIFF + 1, NULL, DEFAULT_FONT, (void *)_tr("Second"));
+    GUI_CreateTextSelect(&guiset->secondsel, XVAL, YUNIT + YDIFF + YDIFF, TEXTSELECT_64, NULL, _timer_new_str_cb, (void *)TIMER_SECONDS);
+
+    // add / set buttons
+    GUI_CreateButton(&guiset->addbtn, XADD, YBTN, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)ADD_BUTTON);
+    GUI_CreateButton(&guiset->setbtn, XSET, YBTN, BUTTON_64x16, timer_value_str_cb, 0, add_set_button_cb, (void *)SET_BUTTON);
+
+    // resulting value
+    GUI_CreateLabel(&guiset->newlbl, XLEFT, YRES, NULL, DEFAULT_FONT, (void *)_tr("resulting value"));
+    GUI_CreateLabelBox(&guiset->newvalue, XLEFT, YRES + 16, 128, 30, &BIGBOX_FONT, timer_value_str_cb, NULL, (void *)NEW_TIMER);
 }
