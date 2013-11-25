@@ -81,8 +81,6 @@ AUX7
 Сигнал
 :Alarm interval
 Интервал
-|devo8:Alarm interval
-Интервал
 :Alarm intvl
 Интервал
 :All
@@ -101,8 +99,6 @@ AUX7
 Полоса
 :Batt alarm
 Сигнал бат.
-|devo8:Batt alarm
-Сигнал батареи
 :Battery alarm
 Сигнал батареи
 :Battery too low,\ncan't save!
@@ -213,7 +209,8 @@ AUX7
 Дата
 :Date / Time
 Дата / Время
->:Date format
+:Date format
+Формат даты
 :Date:
 Дата:
 :Day
@@ -524,8 +521,6 @@ PPM-Вход (расширенный)
 Сигнал выкл.
 :Prealert interval
 Интервалы перед
-|devo8:Prealert interval
-Интервалы перед
 :Prealert intvl
 Интерв. перед
 :Prealert time
@@ -620,10 +615,14 @@ RPM
 серво
 :Set
 Установить
->:Set date
->:Set permanent timer
->:Set time
->:Set to
+:Set date
+Установить
+:Set permanent timer
+Установка интегрального таймера
+:Set time
+Установить
+:Set to
+Установить
 :Set:
 Установить:
 :Simple
@@ -732,7 +731,8 @@ RPM
 Удержание газа
 :Time
 Время
->:Time format
+:Time format
+Формат времени
 :Timer
 Таймер
 :Timer settings
@@ -742,8 +742,6 @@ RPM
 :Timers
 Таймеры
 :Timeup interval
-Интервалы после
-|devo8:Timeup interval
 Интервалы после
 :Timeup intvl
 Интерв. после
@@ -831,7 +829,8 @@ USB
 \n%d секунд до конца
 :\n\nBinding will end in %d seconds...
 \n\nПривязка завершится через %d секунд...
->:actual value
+:actual value
+Актуальное значение
 :add
 добавить
 :cntdn-prop
@@ -854,10 +853,13 @@ USB
 интеграл
 :replace
 заменить
->:resulting value
+:resulting value
+Результат
 :stop-prop
 сек. проп
 :stopwatch
 секундомер
->:value to add or set
->:value to set
+:value to add or set
+Значение установки
+:value to set
+Установка
