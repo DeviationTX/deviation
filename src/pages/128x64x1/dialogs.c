@@ -37,6 +37,7 @@ void PAGE_ShowSafetyDialog()
     u64 unsafe = PROTOCOL_CheckSafe();
     if (! unsafe) {
         GUI_RemoveObj(dialog);
+        GUI_SetSelected(current_selected_obj);
         dialog = NULL;
         PROTOCOL_Init(0);
         return;
