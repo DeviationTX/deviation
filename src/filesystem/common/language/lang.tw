@@ -12,10 +12,8 @@
 >:10 sec
 :11 Point
 11 點
->:12 hour
 :13 Point
 13 點
->:24 hour
 :3 Point
 3 點
 >:30 sec
@@ -166,6 +164,7 @@
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -181,7 +180,6 @@ Deviation 韌體版本:
 背光省電亮度
 :Dimmer time
 省電啟動時間
->:Display
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
@@ -470,6 +468,10 @@ PPM週期
 :Servo
 舵機
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 單段式
@@ -567,6 +569,7 @@ PPM週期
 熄火開關
 :Time
 時間
+>:Time format
 :Timer
 計時器
 :Timer settings
@@ -643,6 +646,7 @@ PPM週期
 \n還剩%d秒
 :\n\nBinding will end in %d seconds...
 \n\n連結將在 %d 秒內結束
+>:actual value
 :add
 相加
 >:cntdn-prop
@@ -663,6 +667,8 @@ PPM週期
 持久計時
 :replace
 取代
+>:resulting value
 >:stop-prop
 :stopwatch
 碼錶
+>:value to add or set

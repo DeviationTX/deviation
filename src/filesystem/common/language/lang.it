@@ -12,10 +12,8 @@
 >:10 sec
 :11 Point
 11 Punti
->:12 hour
 :13 Point
 13 Punti
->:24 hour
 :3 Point
 3 Punti
 >:30 sec
@@ -176,6 +174,7 @@ DR
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -191,7 +190,6 @@ Versione del FW Deviation:
 Dest. del Dimmer
 :Dimmer time
 Durata del Dimmer
->:Display
 :Dn
 Dn
 :Do you really want\nto reset the\n permanent timer %d?
@@ -496,6 +494,10 @@ Scanner
 :Servo
 Servo
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 Sempl.
@@ -595,6 +597,7 @@ Curve del gas
 Hold del gas
 :Time
 Tempo
+>:Time format
 :Timer
 Timer
 :Timer settings
@@ -672,6 +675,7 @@ Zero/Max
 \n%d secondi a sinistra
 :\n\nBinding will end in %d seconds...
 \n\nIl Binding finirr' tra %d secondi...
+>:actual value
 :add
 aggiungi
 >:cntdn-prop
@@ -692,6 +696,8 @@ Mult.
 permanente
 :replace
 Sostituisci
+>:resulting value
 >:stop-prop
 :stopwatch
 Cronometro
+>:value to add or set

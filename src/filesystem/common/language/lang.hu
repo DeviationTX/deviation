@@ -15,12 +15,12 @@ Csatornák
 10 mp
 :11 Point
 11 pont
-:12 hour
-12 óra
+<:12 hour
+<12 óra
 :13 Point
 13 pont
-:24 hour
-24 óra
+<:24 hour
+<24 óra
 :3 Point
 3 pont
 :30 sec
@@ -203,6 +203,7 @@ Adat napló
 Dátum
 :Date / Time
 Dátum / Idő
+>:Date format
 :Date:
 Dátum:
 :Day
@@ -223,8 +224,8 @@ Deviation verzió:
 Alvó fényerő
 :Dimmer time
 Alvó mód ideje
-:Display
-Kijelzés
+<:Display
+<Kijelzés
 :Dn
 Le
 :Do you really want\nto reset the\n permanent timer %d?
@@ -571,6 +572,10 @@ Kiválaszt
 Szervó
 :Set
 Beállítás
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 :Set:
 Beállítás:
 :Simple
@@ -677,6 +682,7 @@ Gáz görbék
 Gáz kapcsoló
 :Time
 Idő
+>:Time format
 :Timer
 Időzítő
 :Timer settings
@@ -765,6 +771,7 @@ Nulla/Max
 \n%d másodperc van hátra
 :\n\nBinding will end in %d seconds...
 \n\nKapcsolódás vége %d másodperc múlva...
+>:actual value
 :add
 hozzáad
 :cntdn-prop
@@ -787,7 +794,9 @@ szoroz
 Üzemidő
 :replace
 cserél
+>:resulting value
 :stop-prop
 Gázfüggő stop.
 :stopwatch
 Stopper
+>:value to add or set

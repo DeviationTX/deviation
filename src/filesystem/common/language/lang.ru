@@ -17,12 +17,12 @@
 10 сек
 :11 Point
 11 точек
-:12 hour
-12 часов
+<:12 hour
+<12 часов
 :13 Point
 13 точек
-:24 hour
-24 часа
+<:24 hour
+<24 часа
 :3 Point
 3 точки
 :30 sec
@@ -217,6 +217,7 @@ AUX7
 Дата
 :Date / Time
 Дата / Время
+>:Date format
 :Date:
 Дата:
 :Day
@@ -235,8 +236,8 @@ AUX7
 Гашение до
 :Dimmer time
 Время гашения
-:Display
-Формат
+<:Display
+<Формат
 :Dn
 Вниз
 :Do you really want\nto reset the\n permanent timer %d?
@@ -625,6 +626,10 @@ RPM
 серво
 :Set
 Установить
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 :Set:
 Установить:
 :Simple
@@ -733,6 +738,7 @@ RPM
 Удержание газа
 :Time
 Время
+>:Time format
 :Timer
 Таймер
 :Timer settings
@@ -831,6 +837,7 @@ USB
 \n%d секунд до конца
 :\n\nBinding will end in %d seconds...
 \n\nПривязка завершится через %d секунд...
+>:actual value
 :add
 добавить
 :cntdn-prop
@@ -853,7 +860,9 @@ USB
 интеграл
 :replace
 заменить
+>:resulting value
 :stop-prop
 сек. проп
 :stopwatch
 секундомер
+>:value to add or set

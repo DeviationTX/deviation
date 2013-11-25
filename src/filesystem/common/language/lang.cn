@@ -12,10 +12,8 @@
 >:10 sec
 :11 Point
 11点曲线
->:12 hour
 :13 Point
 13点曲线
->:24 hour
 :3 Point
 3点曲线
 >:30 sec
@@ -167,6 +165,7 @@ CCPM3
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -182,7 +181,6 @@ Deviation固件版本:
 背光减弱至
 :Dimmer time
 背光减弱时间
->:Display
 :Dn
 下
 :Do you really want\nto reset the\n permanent timer %d?
@@ -474,6 +472,10 @@ LCD设置
 :Servo
 舵机
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 一段式
@@ -571,6 +573,7 @@ LCD设置
 油门熄火
 :Time
 时间
+>:Time format
 :Timer
 定时器
 :Timer settings
@@ -644,6 +647,7 @@ LCD设置
 \n还剩%d秒
 :\n\nBinding will end in %d seconds...
 \n\n对频在%d秒后结束
+>:actual value
 :add
 附加
 >:cntdn-prop
@@ -664,6 +668,8 @@ LCD设置
 持续计时
 :replace
 替换
+>:resulting value
 >:stop-prop
 :stopwatch
 秒表
+>:value to add or set

@@ -12,10 +12,8 @@
 >:10 sec
 :11 Point
 11 Puntos
->:12 hour
 :13 Point
 13 Puntos
->:24 hour
 :3 Point
 3 Puntos
 >:30 sec
@@ -161,6 +159,7 @@ DR
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -176,7 +175,6 @@ Versión del FW Deviation:
 Atenuación final
 :Dimmer time
 Atenuación en
->:Display
 :Dn
 Aba
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -448,6 +446,10 @@ Scanner
 >:Select
 >:Servo
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 Simple
@@ -539,6 +541,7 @@ Plantilla..
 >:Throttle hold
 :Time
 Hora
+>:Time format
 :Timer
 Temporiz
 :Timer settings
@@ -615,6 +618,7 @@ Zero/Max
 \n%d segundos restantes
 :\n\nBinding will end in %d seconds...
 \n\nEmparejamiento termina en %d segundos...
+>:actual value
 :add
 añadir
 >:cntdn-prop
@@ -634,6 +638,8 @@ mult
 >:permanent
 :replace
 sustituir
+>:resulting value
 >:stop-prop
 :stopwatch
 cronómetro
+>:value to add or set

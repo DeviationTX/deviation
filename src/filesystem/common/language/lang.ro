@@ -12,10 +12,8 @@ Canale
 >:10 sec
 :11 Point
 11 puncte
->:12 hour
 :13 Point
 13 puncte
->:24 hour
 :3 Point
 3 puncte
 >:30 sec
@@ -177,6 +175,7 @@ DR
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -192,7 +191,6 @@ Deviation fw. versiune:
 Nivel auto
 :Dimmer time
 Timp auto
->:Display
 :Dn
 Jos
 >:Do you really want\nto reset the\n permanent timer %d?
@@ -489,6 +487,10 @@ Scaner
 :Servo
 Servo
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 Simplu
@@ -588,6 +590,7 @@ Curba putere
 Throttle hold
 :Time
 Timp
+>:Time format
 :Timer
 Timer
 :Timer settings
@@ -665,6 +668,7 @@ Zero/Max
 \n%d secunde stânga
 :\n\nBinding will end in %d seconds...
 \n\nConectarea se va încheia în %d secunde...
+>:actual value
 :add
 aditiv
 >:cntdn-prop
@@ -685,6 +689,8 @@ mult.
 permanent
 :replace
 înloc.
+>:resulting value
 >:stop-prop
 :stopwatch
 crono
+>:value to add or set

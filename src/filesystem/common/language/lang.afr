@@ -15,12 +15,12 @@ Aantal Kanale
 10 sek
 :11 Point
 11 Punt
-:12 hour
-12 huur
+<:12 hour
+<12 huur
 :13 Point
 13 Punt
-:24 hour
-24 huur
+<:24 hour
+<24 huur
 :3 Point
 3 Punt
 :30 sec
@@ -197,6 +197,7 @@ Datalog
 Datum
 :Date / Time
 Datum / Tyd
+>:Date format
 :Date:
 Datum:
 :Day
@@ -215,8 +216,8 @@ Deviation Sagteware:
 Verdof Teiken
 :Dimmer time
 Verdof tyd
-:Display
-Vertoon
+<:Display
+<Vertoon
 :Dn
 Af
 :Do you really want\nto reset the\n permanent timer %d?
@@ -555,6 +556,10 @@ Selekteer
 Servo
 :Set
 Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 :Set:
 Set:
 :Simple
@@ -659,6 +664,7 @@ Throttle Kurwes
 Throttle Hou
 :Time
 Tyd
+>:Time format
 :Timer
 Tydhouer
 :Timer settings
@@ -747,6 +753,7 @@ Zero/Max
 \n%d sekondes links
 :\n\nBinding will end in %d seconds...
 \n\nBindproses eindig in %d sekonds...
+>:actual value
 :add
 +
 :cntdn-prop
@@ -769,7 +776,9 @@ min
 Permanent
 :replace
 vervang
+>:resulting value
 :stop-prop
 Stop-prop
 :stopwatch
 Stophorlosie
+>:value to add or set

@@ -12,10 +12,8 @@
 >:10 sec
 :11 Point
 11 punten
->:12 hour
 :13 Point
 13 punten
->:24 hour
 :3 Point
 3 punten
 >:30 sec
@@ -139,6 +137,7 @@ DR
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 >:Deadband
@@ -150,7 +149,6 @@ Standaard
 Deviation FW Versie:
 >:Dimmer target
 >:Dimmer time
->:Display
 >:Dn
 >:Do you really want\nto reset the\n permanent timer %d?
 :Down
@@ -383,6 +381,10 @@ Scanner
 >:Select
 >:Servo
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 Eenvoudig
@@ -461,6 +463,7 @@ Sjabloon...
 >:Throttle curves
 >:Throttle hold
 >:Time
+>:Time format
 :Timer
 Timer
 >:Timer settings
@@ -528,6 +531,7 @@ Nul/Max
 \n%d seconden links
 :\n\nBinding will end in %d seconds...
 \n\nKoppeling eindigt over %d seconden...
+>:actual value
 :add
 +
 >:cntdn-prop
@@ -543,6 +547,8 @@ Aftellen
 >:permanent
 :replace
 Vervangen
+>:resulting value
 >:stop-prop
 :stopwatch
 Stopwatch
+>:value to add or set

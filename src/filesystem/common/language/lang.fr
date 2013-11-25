@@ -12,10 +12,8 @@ Nbr canaux
 >:10 sec
 :11 Point
 11 Pts
->:12 hour
 :13 Point
 13 Pts
->:24 hour
 :3 Point
 3 Pts
 >:30 sec
@@ -169,6 +167,7 @@ DR
 >:Datalog
 >:Date
 >:Date / Time
+>:Date format
 >:Date:
 >:Day
 :Deadband
@@ -184,7 +183,6 @@ Deviation FW version:
 Lum. veille
 :Dimmer time
 Veille après
->:Display
 :Dn
 Bas
 :Do you really want\nto reset the\n permanent timer %d?
@@ -474,6 +472,10 @@ Scanner
 >:Select
 >:Servo
 >:Set
+>:Set date
+>:Set permanent timer
+>:Set time
+>:Set to
 >:Set:
 :Simple
 Simple
@@ -571,6 +573,7 @@ Courbes de gaz
 Coupure gaz
 :Time
 Heure
+>:Time format
 :Timer
 Chrono
 :Timer settings
@@ -648,6 +651,7 @@ Volt
 \n%d secondes à gauche
 :\n\nBinding will end in %d seconds...
 \n\nAppairage terminé dans %d secondes...
+>:actual value
 :add
 ajouter
 >:cntdn-prop
@@ -668,6 +672,8 @@ multiplier
 permanent
 :replace
 remplacer
+>:resulting value
 >:stop-prop
 :stopwatch
 Chrono
+>:value to add or set

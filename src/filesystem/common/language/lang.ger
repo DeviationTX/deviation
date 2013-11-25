@@ -15,12 +15,8 @@ Kanäle
 10 Sek.
 :11 Point
 11 Punkt
-:12 hour
-12 Stunden
 :13 Point
 13 Punkt
-:24 hour
-24 Stunden
 :3 Point
 3 Punkt
 :30 sec
@@ -209,6 +205,8 @@ Datenprotokoll
 Datum
 :Date / Time
 Datum / Zeit
+:Date format
+Datumsformat
 :Date:
 Datum:
 :Day
@@ -227,8 +225,6 @@ Deviation FW Version:
 Dimmer Ziel
 :Dimmer time
 Dimmzeit
-:Display
-Anzeige
 :Dn
 Dn
 :Do you really want\nto reset the\n permanent timer %d?
@@ -579,6 +575,14 @@ Auswahl
 >:Servo
 :Set
 Setzen
+:Set date
+Setze Datum
+:Set permanent timer
+Setze Dauertimer
+:Set time
+Setze Zeit
+:Set to
+Setze auf
 :Set:
 Setzen:
 :Simple
@@ -689,6 +693,8 @@ Gaskurven
 Gas halten
 :Time
 Zeit
+:Time format
+Zeitformat
 :Timer
 Timer
 :Timer settings
@@ -777,6 +783,8 @@ Null/Max
 \n%d Sekunden verbleibend
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
+:actual value
+jetziger Wert
 :add
 +
 >:cntdn-prop
@@ -798,6 +806,10 @@ mult
 dauerhaft
 :replace
 ersetzen
+:resulting value
+Ergebnis
 >:stop-prop
 :stopwatch
 Stoppuhr
+:value to add or set
+zu addierend / setzen
