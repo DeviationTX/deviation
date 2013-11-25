@@ -30,9 +30,10 @@
 #define XR(w)  ((3 * LCD_WIDTH / 4 - (w) / 2) + ADD_OFFSET)
 #define X(r,w) ((r == 0) ? XL(w) : ((r == 1) ? XR(w) : XM(w)))
 
-enum { TIMEBUTTON=DAY+100, DATEBUTTON,      // for buttons setting time and date
+enum { TIMEBUTTON=DAY+100, DATEBUTTON,  // for buttons setting time and date
        TIMELABEL, DATELABEL,            // for description labels
-       ACTTIME, ACTDATE,           // ACT-/NEWTIME and *DATE are used for the formatted values
+       ACTTIME, ACTDATE,                // ACT-/NEWTIME and *DATE are used for the formatted values
+       SETLABEL, RESULTLABEL,           // for labels at new time/date and result time/date
        NEWTIME, NEWDATE };
 u8 order[6] = { DAY, MONTH, YEAR, HOUR, MINUTE, SECOND };
 
@@ -47,6 +48,8 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data);
 int min[6], max[6];     // for reordering the values are set dynamically
 static const u8 daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
+char newstring[31], resultstring[31];
+
 struct Rtc {
     u16 value[6];
     int clocksource;
@@ -58,7 +61,6 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-//    RTC_SetValue(RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ChangeByID(PAGEID_TXCFG);
@@ -162,10 +164,12 @@ static const char *rtc_text_cb(guiObject_t *obj, const void *data)
             RTC_GetDateFormatted(rp->tmpstr, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
             return rp->tmpstr;
         }
-        case TIMEBUTTON: return _tr("Set time");
-        case DATEBUTTON: return _tr("Set date");
-        case TIMELABEL:  return _tr("Time format");
-        case DATELABEL:  return _tr("Date format");
+        case TIMEBUTTON:   return _tr("Set time");
+        case DATEBUTTON:   return _tr("Set date");
+        case TIMELABEL:    return _tr("Time format");
+        case DATELABEL:    return _tr("Date format");
+        case SETLABEL:     return _tr("value to set");
+        case RESULTLABEL:  return _tr("resulting value");
     }
     return _tr("Unknown");
 }
@@ -223,8 +227,8 @@ const char *rtc_select_format_cb(guiObject_t *obj, int dir, void *data)
 
 void _show_page()
 {
-    GUI_CreateLabel(&gui->datelbl, XL(128), 40, rtc_text_cb, BOLD_FONT, (void *)DATELABEL);
-    GUI_CreateLabel(&gui->timelbl, XR(128), 40, rtc_text_cb, BOLD_FONT, (void *)TIMELABEL);
+    GUI_CreateLabel(&gui->datelbl, XL(128), 40, rtc_text_cb, DEFAULT_FONT, (void *)DATELABEL);
+    GUI_CreateLabel(&gui->timelbl, XR(128), 40, rtc_text_cb, DEFAULT_FONT, (void *)TIMELABEL);
     GUI_CreateTextSelect(&gui->dateformat, XL(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTDATE);
     GUI_CreateTextSelect(&gui->timeformat, XR(128), 56, TEXTSELECT_128, NULL, rtc_select_format_cb, (void *)ACTTIME);
 
@@ -237,18 +241,17 @@ void _show_page()
 
     #define DATEBOXWIDTH 180
     u16 w, h;
-    #define NEWSTRING "value to set"
-    LCD_GetStringDimensions((u8 *)_tr(NEWSTRING), &w, &h);
-    GUI_CreateLabel(&gui->newlbl, XM(w + ADD_OFFSET), 168 - h / 2 , NULL, BOLD_FONT, _tr(NEWSTRING));
+    LCD_SetFont(DEFAULT_FONT.font);
+    LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)SETLABEL), &w, &h);
+    GUI_CreateLabel(&gui->newlbl, XM(w), 168 - h / 2 , rtc_text_cb, DEFAULT_FONT, (void *)SETLABEL);
     GUI_CreateLabelBox(&gui->newdate, XL(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWDATE);
     GUI_CreateLabelBox(&gui->newtime, XR(DATEBOXWIDTH), 150, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)NEWTIME);
 
     GUI_CreateButton(&gui->setdate, XL(96), 184, BUTTON_96, rtc_text_cb, 0x0000, rtc_set_cb, (void *)DATEBUTTON);
     GUI_CreateButton(&gui->settime, XR(96), 184, BUTTON_96, rtc_text_cb, 0x0000, rtc_set_cb, (void *)TIMEBUTTON);
 
-    #define ACTSTRING "actual time"
-    LCD_GetStringDimensions((u8 *)_tr(ACTSTRING), &w, &h);
-    GUI_CreateLabel(&gui->actlbl, XM(w + ADD_OFFSET), 243 - h / 2 , NULL, BOLD_FONT, _tr(ACTSTRING));
+    LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)RESULTLABEL), &w, &h);
+    GUI_CreateLabel(&gui->actlbl, XM(w), 243 - h / 2 , rtc_text_cb, DEFAULT_FONT, (void *)RESULTLABEL);
     GUI_CreateLabelBox(&gui->actdate, XL(DATEBOXWIDTH), 225, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)ACTDATE);
     GUI_CreateLabelBox(&gui->acttime, XR(DATEBOXWIDTH), 225, DATEBOXWIDTH, 32, &BIGBOX_FONT, rtc_text_cb, NULL, (void *)ACTTIME);
 }
