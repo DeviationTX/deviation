@@ -46,14 +46,14 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = 55;
     //Row 1
     GUI_CreateLabelBox(&gui->name, 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
+            55, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->type, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
 
     //Row 2
     y += space;
     GUI_CreateLabelBox(&gui->switchlbl, 0, y,
-            0, ITEM_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
+            55, ITEM_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->src, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
