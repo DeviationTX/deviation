@@ -33,15 +33,15 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
     // only used for RTC config in Devo12
 #if HAS_RTC
-    if (type != TEXTSELECT_VERT_64) {
-        box->height = select->button->height;
-        box->width = select->button->width + 2 * ARROW_WIDTH;
+    if (type == TEXTSELECT_VERT_64) {
+        box->height = select->button->height + 2 * ARROW_HEIGHT;
+        box->width = select->button->width;
     }
     else
 #endif
     {
-        box->height = select->button->height + 2 * ARROW_HEIGHT;
-        box->width = select->button->width;
+        box->height = select->button->height;
+        box->width = select->button->width + 2 * ARROW_WIDTH;
     }
 
     box->x = x;
@@ -111,27 +111,29 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     const char *str =select->ValueCB(obj, 0, select->cb_data);
 
     if (select->type != TEXTSELECT_DEVO10) {
-        if (select->enable & 0x01) {
 // only used for RTC config in Devo12
 #if HAS_RTC
-            if (select->type != TEXTSELECT_VERT_64) {
-                GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                                    box->y, select->button, DRAW_NORMAL);
+        if (select->type == TEXTSELECT_VERT_64) {
+            GUI_DrawImageHelper(box->x,
+                    box->y + ARROW_HEIGHT, select->button, DRAW_NORMAL);
+            if (select->enable & 0x01) {
+                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y, ARROW_UP,
+                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y + box->height - ARROW_HEIGHT, ARROW_DOWN,
+                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+            }
+        }
+        else
+#endif
+        {
+            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+                    box->y, select->button, DRAW_NORMAL);
+            if (select->enable & 0x01) {
                 GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
                         select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
                 GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
                         box->y, ARROW_RIGHT,
                         select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-            }
-            else
-#endif
-            {
-                GUI_DrawImageHelper(box->x,
-                                    box->y + ARROW_HEIGHT, select->button, DRAW_NORMAL);
-                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y, ARROW_UP,
-                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y + box->height - ARROW_HEIGHT, ARROW_DOWN,
-                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
             }
         }
         LCD_SetFont(TEXTSEL_FONT.font);
@@ -143,7 +145,10 @@ void GUI_DrawTextSelect(struct guiObject *obj)
     } else {   // plate text select for devo 10, copy most behavior from label.c
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
         u8 arrow_width = ARROW_WIDTH - 1;
+// only used for RTC config in Devo12
+#if HAS_RTC
         u8 arrow_height = ARROW_HEIGHT - 1;
+#endif
         if (select->enable  & 0x01) {
             u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
             u16 x1 = box->x + arrow_width -1;
@@ -165,14 +170,14 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         }
 // only used for RTC config in Devo12
 #if HAS_RTC
-        if (select->type != TEXTSELECT_VERT_64) {
-            GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , box->height,
+        if (select->type == TEXTSELECT_VERT_64) {
+            GUI_DrawLabelHelper(box->x , box->y + arrow_height, box->width, box->height - 2 * arrow_height,
                     str, &select->desc, obj == objSELECTED);
         }
         else
 #endif
         {
-            GUI_DrawLabelHelper(box->x , box->y + arrow_height, box->width, box->height - 2 * arrow_height,
+            GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
                     str, &select->desc, obj == objSELECTED);
         }
     }
@@ -258,11 +263,11 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
         }
 // only used for RTC config in Devo12
 #if HAS_RTC
-        if (select->type != TEXTSELECT_VERT_64) {
-            box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
+        if (select->type == TEXTSELECT_VERT_64) {
+            box.y = obj->box.y;
         } else
 #endif
-            box.y = obj->box.y;
+            box.x = obj->box.x + obj->box.width - ARROW_WIDTH;
         if (coords_in_box(&box, coords)) {
             if (! press_type) {
                 if (! select->state) {
