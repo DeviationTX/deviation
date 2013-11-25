@@ -26,7 +26,7 @@ static void toggle_timertype_cb(guiObject_t *obj, void *data);
 static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
 static void reset_timerperm_cb(guiObject_t *obj, const void *data);
-static void _show_page();
+static void _show_page(int page);
 
 void PAGE_TimerInit(int page)
 {
