@@ -17,12 +17,8 @@
 10 сек
 :11 Point
 11 точек
-<:12 hour
-<12 часов
 :13 Point
 13 точек
-<:24 hour
-<24 часа
 :3 Point
 3 точки
 :30 sec
@@ -236,8 +232,6 @@ AUX7
 Гашение до
 :Dimmer time
 Время гашения
-<:Display
-<Формат
 :Dn
 Вниз
 :Do you really want\nto reset the\n permanent timer %d?
@@ -866,3 +860,4 @@ USB
 :stopwatch
 секундомер
 >:value to add or set
+>:value to set

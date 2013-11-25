@@ -677,3 +677,4 @@ remplacer
 :stopwatch
 Chrono
 >:value to add or set
+>:value to set

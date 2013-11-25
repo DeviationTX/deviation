@@ -15,12 +15,8 @@ Aantal Kanale
 10 sek
 :11 Point
 11 Punt
-<:12 hour
-<12 huur
 :13 Point
 13 Punt
-<:24 hour
-<24 huur
 :3 Point
 3 Punt
 :30 sec
@@ -216,8 +212,6 @@ Deviation Sagteware:
 Verdof Teiken
 :Dimmer time
 Verdof tyd
-<:Display
-<Vertoon
 :Dn
 Af
 :Do you really want\nto reset the\n permanent timer %d?
@@ -782,3 +776,4 @@ Stop-prop
 :stopwatch
 Stophorlosie
 >:value to add or set
+>:value to set

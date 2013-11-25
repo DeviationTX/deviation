@@ -307,7 +307,8 @@ Kreiselempfindlichkeit
 >:HOLD
 :Heli
 Heli
->:Heli/Standard GUI
+:Heli/Standard GUI
+Heli, Standard GUI
 :Helicopter
 Helikopter
 :High-Rate
@@ -393,7 +394,8 @@ Mittel
 Min Limit
 :Min/Max
 Min/Max
->:Minute
+:Minute
+Minute
 :Mixer
 Mischer
 :Mixer GUI
@@ -741,7 +743,8 @@ Trim +
 Trim -
 :Trim Step
 Schritt
->:Trimbar
+:Trimbar
+Trimmbalken
 :Trims
 Trimm
 :Turn Off
@@ -812,4 +815,6 @@ Ergebnis
 :stopwatch
 Stoppuhr
 :value to add or set
-zu addierend / setzen
+zu addieren / setzen
+:value to set
+zu setzender Wert

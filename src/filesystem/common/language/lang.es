@@ -643,3 +643,4 @@ sustituir
 :stopwatch
 cronómetro
 >:value to add or set
+>:value to set

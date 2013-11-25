@@ -15,12 +15,8 @@ Csatornák
 10 mp
 :11 Point
 11 pont
-<:12 hour
-<12 óra
 :13 Point
 13 pont
-<:24 hour
-<24 óra
 :3 Point
 3 pont
 :30 sec
@@ -224,8 +220,6 @@ Deviation verzió:
 Alvó fényerő
 :Dimmer time
 Alvó mód ideje
-<:Display
-<Kijelzés
 :Dn
 Le
 :Do you really want\nto reset the\n permanent timer %d?
@@ -800,3 +794,4 @@ Gázfüggő stop.
 :stopwatch
 Stopper
 >:value to add or set
+>:value to set
