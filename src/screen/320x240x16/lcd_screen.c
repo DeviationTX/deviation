@@ -20,7 +20,7 @@
 
 void LCD_Clear(unsigned int color){
         uint16_t zeile, spalte;
-        LCD_DrawStart(0, 0, (LCD_WIDTH), (LCD_HEIGHT-1), DRAW_NWSE);
+        LCD_DrawStart(0, 0, (LCD_WIDTH-1), (LCD_HEIGHT-1), DRAW_NWSE);
         for(zeile = 0; zeile < LCD_HEIGHT; zeile++){
                 for(spalte = 0; spalte < LCD_WIDTH; spalte++){
                         LCD_DrawPixel(color);
