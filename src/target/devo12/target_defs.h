@@ -38,6 +38,16 @@
 #define VOLTAGE_NUMERATOR 160
 #define VOLTAGE_OFFSET    268
 
+/* Define button placement for chantest page*/
+/* these are supposed to more closely match real Tx button layout */
+/* negative value: box at the right side of the label */
+#define CHANTEST_BUTTON_PLACEMENT { \
+    {51, 120}, {51, 105}, {-229, 120}, {-229, 105}, \
+    {-106, 135}, {21, 135}, {-259, 135}, {174, 135}, \
+    {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
+    {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
+    }
+
 #include "devo12_ports.h"
 
 //Use 2nd ROM for media

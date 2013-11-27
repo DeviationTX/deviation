@@ -152,30 +152,19 @@ static void show_button_page()
     // show elements where they are located on the real tx
     #define OFFSET_X    ((LCD_WIDTH - 320) / 2) // center on Devo12-screen
     #define OFFSET_Y    ((LCD_HEIGHT - 240) / 2)
-    int label_x[NUM_TX_BUTTONS] = { // fixed positions for the buttons, similar to position on real tx
-            // negative value: box at the right side of the label
-            51, 51, -229, -229, -106, 21, -259, 174,
-            #ifndef _DEVO6_TARGET_H_
-                30, 30, -250, -250, // non-existing upper trims on Devo6
-            #endif
-            185, 185, -95, -95, 200, -80 };
-    int label_y[NUM_TX_BUTTONS] = {
-            120, 105, 120, 105, 135, 135, 135, 135,
-            #ifndef _DEVO6_TARGET_H_
-                70, 55, 70, 55,
-            #endif
-            220, 200, 220, 200, 180, 180 };
+    enum {X = 0, Y = 1};
+    const int label_pos[NUM_TX_BUTTONS][2] = CHANTEST_BUTTON_PLACEMENT;
     cp->is_locked = 3;
     GUI_CreateLabelBox(&gui->lock, OFFSET_X, 34, 320, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (int i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(&gui->value[i],
-                OFFSET_X + (label_x[i] > 0 ? label_x[i] + 50 : -label_x[i] -20),    // >0? box at left side of label, otherwise right
-                OFFSET_Y + label_y[i] - 2,                                          // -2 to center box and label
+                OFFSET_X + (label_pos[i][X] > 0 ? label_pos[i][X] + 50 : -label_pos[i][X] -20),    // >0? box at left side of label, otherwise right
+                OFFSET_Y + label_pos[i][Y] - 2,                                          // -2 to center box and label
                 16, 16,
                 &SMALLBOX_FONT, NULL, NULL, (void *)"");
         GUI_CreateLabelBox(&gui->chan[i],
-                OFFSET_X + abs(label_x[i]),                                         // no differencing for the label
-                OFFSET_Y + label_y[i],
+                OFFSET_X + abs(label_pos[i][X]),                                         // no differencing for the label
+                OFFSET_Y + label_pos[i][Y],
                 0, 0,
                 &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
     }
