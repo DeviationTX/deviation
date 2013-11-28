@@ -2,12 +2,18 @@
 #define _STD_H_
 
 /* the following defines allow control over how stdio/stdlib functions are handles */
-#ifndef EMULATOR
-
-#define USE_OWN_STDIO 1
 #ifndef USE_OWN_PRINTF
     #define USE_OWN_PRINTF 1
 #endif
+#ifndef EMULATOR
+    #define USE_OWN_STDIO 1
+#else
+    #define USE_OWN_STDIO 0
+    #define fopen2(fat, p, m) fopen(p, m)
+    #define finit if(0) FS_Mount
+    struct FAT {};
+#endif //EMULATOR
+
 #if USE_OWN_STDIO
     FILE *devo_fopen2(void *, const char *path, const char *mode);
     int devo_fclose(FILE *fp);
@@ -49,8 +55,10 @@
     #include <stdarg.h>
     void tfp_printf(const char *fmt, ...);
     void tfp_sprintf(char* s,const char *fmt, ...);
+    void tfp_snprintf(char* s, unsigned int len, const char *fmt, ...);
     void tfp_fprintf(FILE *fh,const char *fmt, ...);
     #define sprintf tfp_sprintf
+    #define snprintf tfp_snprintf
     #define fprintf tfp_fprintf
     #if (! defined BUILDTYPE_DEV)
         //Use this instead of printf(args...) because this will avoid
@@ -60,9 +68,4 @@
         #define printf tfp_printf
     #endif  //BUILDTYPE_DEV
 #endif //USE_OWN_PRINTF
-#else //EMULATOR
-    #define fopen2(fat, p, m) fopen(p, m)
-    #define finit if(0) FS_Mount
-    struct FAT {};
-#endif //EMULATOR
 #endif //_STD_H_

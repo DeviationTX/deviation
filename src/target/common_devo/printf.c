@@ -27,16 +27,22 @@ Code originally from: http://www.sparetimelabs.com/tinyprintf/index.html
 typedef void (*putcf) (void*,char);
 
 #define stdout_putp NULL
-void stdout_putf (void *p, char c) {
+static void stdout_putf (void *p, char c) {
     (void)p;
     //if (c == '\n')
     //    usart_send_blocking(USART1, '\r');
     //usart_send_blocking(USART1, c);
     fputc(c, stdout);
 };
-void fputf (void *p, char c) {
+static void fputf (void *p, char c) {
     fputc(c, (FILE *)p);
 };
+static void putcp(void* p,char c)
+{
+    *(*((char**)p))++ = c;
+    if(c != '\0')
+        *(*((char**)p)) = '\0';
+}
 
 static void ui2a(unsigned int num, unsigned int base, int uc,char * bf)
     {
@@ -91,29 +97,47 @@ static char a2i(char ch, const char** src,int base,int* nump)
     return ch;
     }
 
-static void putchw(void* putp,putcf putf,int n, char z, char* bf)
+static void tfp_format(void* putp,putcf putf,unsigned int buffer_len, const char *fmt, va_list va)
     {
-    char fc=z? '0' : ' ';
-    char ch;
-    char* p=bf;
-    while (*p++ && n > 0)
-        n--;
-    while (n-- > 0) 
-        putf(putp,fc);
-    while ((ch= *bf++))
-        putf(putp,ch);
-    }
-
-void tfp_format(void* putp,putcf putf,const char *fmt, va_list va)
-    {
+    unsigned int bufsize = 0;
     char bf[12];
     
     char ch;
 
+    void _putc(char ch)
+    {
+        if (buffer_len && bufsize + 1 >= buffer_len)
+            return;
+        putf(putp, ch);
+        bufsize++;
+    }
+    void _putchw(int n, char z, char* bf)
+    {
+        char fc=z? '0' : ' ';
+        char* p=bf;
+        unsigned int i;
+        while (*p++) {
+            if (n > 0)
+                n--;
+        }
+        unsigned int len = (p - bf) + n - 1;
+        if (buffer_len && buffer_len - bufsize - 1 < len)
+            len = buffer_len - bufsize - 1;
+        for (i = 0; i < len; i++) {
+            if(n) {
+                putf(putp,fc);
+                n--;
+            } else {
+                putf(putp, *bf++);
+            }
+        }
+        bufsize += len;
+    }
+
 
     while ((ch=*(fmt++))) {
         if (ch!='%') 
-            putf(putp,ch);
+            _putc(ch);
         else {
             char lz=0;
 #ifdef  PRINTF_LONG_SUPPORT
@@ -141,7 +165,7 @@ void tfp_format(void* putp,putcf putf,const char *fmt, va_list va)
                     else
 #endif
                     ui2a(va_arg(va, unsigned int),10,0,bf);
-                    putchw(putp,putf,w,lz,bf);
+                    _putchw(w,lz,bf);
                     break;
                     }
                 case 'd' :  {
@@ -151,7 +175,7 @@ void tfp_format(void* putp,putcf putf,const char *fmt, va_list va)
                     else
 #endif
                     i2a(va_arg(va, int),bf);
-                    putchw(putp,putf,w,lz,bf);
+                    _putchw(w,lz,bf);
                     break;
                     }
                 case 'x': case 'X' : 
@@ -161,16 +185,16 @@ void tfp_format(void* putp,putcf putf,const char *fmt, va_list va)
                     else
 #endif
                     ui2a(va_arg(va, unsigned int),16,(ch=='X'),bf);
-                    putchw(putp,putf,w,lz,bf);
+                    _putchw(w,lz,bf);
                     break;
                 case 'c' : 
-                    putf(putp,(char)(va_arg(va, int)));
+                    _putc((char)(va_arg(va, int)));
                     break;
                 case 's' : 
-                    putchw(putp,putf,w,0,va_arg(va, char*));
+                    _putchw(w,0,va_arg(va, char*));
                     break;
                 case '%' :
-                    putf(putp,ch);
+                    _putc(ch);
                 default:
                     break;
                 }
@@ -184,13 +208,8 @@ void tfp_printf(const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(stdout_putp,stdout_putf,fmt,va);
+    tfp_format(stdout_putp, stdout_putf, 0, fmt, va);
     va_end(va);
-    }
-
-static void putcp(void* p,char c)
-    {
-    *(*((char**)p))++ = c;
     }
 
 
@@ -199,8 +218,15 @@ void tfp_sprintf(char* s, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(&s,putcp,fmt,va);
-    putcp(&s,0);
+    tfp_format(&s, putcp, 0, fmt, va);
+    va_end(va);
+    }
+
+void tfp_snprintf(char* s, unsigned int len, const char *fmt, ...)
+    {
+    va_list va;
+    va_start(va,fmt);
+    tfp_format(&s, putcp, len, fmt, va);
     va_end(va);
     }
 
@@ -208,6 +234,6 @@ void tfp_fprintf(FILE* fh, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(fh,fputf,fmt,va);
+    tfp_format(fh, fputf, 0, fmt, va);
     va_end(va);
     }
