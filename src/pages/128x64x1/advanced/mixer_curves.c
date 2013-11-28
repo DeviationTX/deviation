@@ -30,6 +30,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     PAGE_RemoveAllObjects();
     edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
+    edit->reverse = MIXER_SRC_IS_INV(pagemem.u.mixer_page.cur_mixer->src);
     if ((type == CURVE_EXPO || type == CURVE_DEADBAND)
         && curve->points[0] == curve->points[1])
     {

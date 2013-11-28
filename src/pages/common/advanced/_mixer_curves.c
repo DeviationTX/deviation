@@ -28,6 +28,8 @@ s16 show_curve_cb(s16 xval, void *data)
     (void)data;
     s16 oldpoint;
     s16 yval;
+    if (edit->reverse)
+        xval = -xval; 
     if (edit->pointnum < 0) {
         oldpoint = edit->curve.points[1];
         edit->curve.points[1] = edit->curve.points[0];
@@ -160,7 +162,25 @@ static u8 touch_cb(s16 x, s16 y, void *data)
     (void)data;
     (void)x;
     u8 pointnum = edit->pointnum < 0 ? 0 : edit->pointnum;
-    edit->curve.points[pointnum] = (CURVE_TYPE(&edit->curve) < CURVE_EXPO) ? RANGE_TO_PCT(x) : RANGE_TO_PCT(y);
+    if (CURVE_TYPE(&edit->curve) < CURVE_EXPO) {
+        edit->curve.points[pointnum] = RANGE_TO_PCT(x);
+    } else {
+        if (CURVE_TYPE(&edit->curve) >= CURVE_3POINT) {
+            u8 maxpt = (CURVE_TYPE(&edit->curve) - CURVE_3POINT) * 2 + 2;
+            if (edit->reverse)
+                x = -x;
+            x -= CHAN_MIN_VALUE;
+            int delta = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / maxpt;
+            int point = (x + delta / 2) / delta;
+            if (point != pointnum) {
+                edit->pointnum = point;
+printf("Setting point from %d -> %d\n", edit->pointnum, point);
+                GUI_Redraw(&gui->point);
+            }
+            pointnum = point;
+        }
+        edit->curve.points[pointnum] = RANGE_TO_PCT(y);
+    }
     GUI_Redraw(&gui->value);
     return 1;
 }

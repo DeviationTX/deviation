@@ -15,6 +15,7 @@ struct curve_edit {
     struct Curve *curveptr;
     void(*parent)(void);
     s8 pointnum;
+    u8 reverse;
 };
 
 struct mixer_page {
