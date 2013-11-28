@@ -50,7 +50,8 @@ void PAGE_ShowSafetyDialog()
                 s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                               ? raw[ch+1]
                               : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-                sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%, safe value = %d%%\n"),
+                int len = strlen(dlgstr);
+                snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("%s is %d%%, safe value = %d%%\n"),
                         INPUT_SourceName(tmpstr, ch + 1),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
@@ -92,9 +93,9 @@ void PAGE_ShowBindingDialog(u8 update)
     u32 bind_time = PROTOCOL_Binding();
     strncpy(dlgstr, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(dlgstr));
     u32 len = strlen(dlgstr);
-    if (bind_time != 0xFFFFFFFF && len < sizeof(dlgstr))
-        sprintf(dlgstr + len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
-    dlgstr[sizeof(dlgstr) - 1] = 0;
+    if (bind_time != 0xFFFFFFFF && len < sizeof(dlgstr)) {
+        snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
+    }
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);

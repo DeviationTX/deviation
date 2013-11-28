@@ -34,7 +34,7 @@ static int ini_handle_name(void* user, const char* section, const char* name, co
 {
     long idx = (long)user;
     if(section[0] == '\0' && (strcasecmp(name, MODEL_NAME) == 0 || strcasecmp(name, MODEL_TEMPLATE) == 0)) {
-        sprintf(mp->tmpstr, "%d: %s", abs(idx), idx < 0 ? _tr(value) : value);
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d: %s", abs(idx), idx < 0 ? _tr(value) : value);
         return -1;
     }
     return 1;

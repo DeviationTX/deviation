@@ -97,16 +97,16 @@ static char a2i(char ch, const char** src,int base,int* nump)
     return ch;
     }
 
-static void tfp_format(void* putp,putcf putf,unsigned int buffer_len, const char *fmt, va_list va)
+static void tfp_format(void* putp,putcf putf, int buffer_len, const char *fmt, va_list va)
     {
-    unsigned int bufsize = 0;
+    int bufsize = 0;
     char bf[12];
     
     char ch;
 
     void _putc(char ch)
     {
-        if (buffer_len && bufsize + 1 >= buffer_len)
+        if (buffer_len != INT32_MIN && bufsize + 1 >= buffer_len)
             return;
         putf(putp, ch);
         bufsize++;
@@ -115,13 +115,13 @@ static void tfp_format(void* putp,putcf putf,unsigned int buffer_len, const char
     {
         char fc=z? '0' : ' ';
         char* p=bf;
-        unsigned int i;
+        int i;
         while (*p++) {
             if (n > 0)
                 n--;
         }
-        unsigned int len = (p - bf) + n - 1;
-        if (buffer_len && buffer_len - bufsize - 1 < len)
+        int len = (p - bf) + n - 1;
+        if (buffer_len != INT32_MIN && buffer_len - bufsize - 1 < len)
             len = buffer_len - bufsize - 1;
         for (i = 0; i < len; i++) {
             if(n) {
@@ -208,7 +208,7 @@ void tfp_printf(const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(stdout_putp, stdout_putf, 0, fmt, va);
+    tfp_format(stdout_putp, stdout_putf, INT32_MIN, fmt, va);
     va_end(va);
     }
 
@@ -218,11 +218,11 @@ void tfp_sprintf(char* s, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(&s, putcp, 0, fmt, va);
+    tfp_format(&s, putcp, INT32_MIN, fmt, va);
     va_end(va);
     }
 
-void tfp_snprintf(char* s, unsigned int len, const char *fmt, ...)
+void tfp_snprintf(char* s, int len, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
@@ -234,6 +234,6 @@ void tfp_fprintf(FILE* fh, const char *fmt, ...)
     {
     va_list va;
     va_start(va,fmt);
-    tfp_format(fh, fputf, 0, fmt, va);
+    tfp_format(fh, fputf, INT32_MIN, fmt, va);
     va_end(va);
     }

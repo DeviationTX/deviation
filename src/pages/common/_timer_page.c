@@ -44,7 +44,7 @@ const char *timer_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    sprintf(tp->tmpstr, _tr("Timer%d"), i + 1);
+    snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Timer%d"), i + 1);
     return tp->tmpstr;
 }
 static const char *switch_str_cb(guiObject_t *obj, const void *data)

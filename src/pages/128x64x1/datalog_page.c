@@ -126,7 +126,7 @@ static const char *remaining_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(str, _tr("%d bytes left"), DATALOG_Remaining());
+    snprintf(str, sizeof(str), _tr("%d bytes left"), DATALOG_Remaining());
     return str;
 }
 

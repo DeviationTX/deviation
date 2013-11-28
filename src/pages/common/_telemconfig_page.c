@@ -29,7 +29,7 @@ static u8 telem_state_check()
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    sprintf(tp.str, "%s%d", _tr("Alarm"), (int)((long)data)+1);
+    snprintf(tp.str, sizeof(tp.str), "%s%d", _tr("Alarm"), (int)((long)data)+1);
     return tp.str;
 }
 

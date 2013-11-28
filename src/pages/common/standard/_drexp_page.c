@@ -85,7 +85,7 @@ const char *drexplabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    sprintf(mp->tmpstr, _tr("Position %d"), i);
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Position %d"), i);
     return mp->tmpstr;
 }
 

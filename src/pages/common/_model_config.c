@@ -51,7 +51,7 @@ static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     int i = (long)data;
     Model.swashmix[i] = GUI_TextSelectHelper(Model.swashmix[i], 0, 100, dir, 1, 5, NULL);
-    sprintf(mp->tmpstr, "%d", (int)Model.swashmix[i]);
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d", (int)Model.swashmix[i]);
     return mp->tmpstr;
 }
 
@@ -83,7 +83,7 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 
     } else {
         Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
-        sprintf(mp->tmpstr, "%s", _tr(proto_strs[pos+Model.proto_opts[idx]+1]));
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s", _tr(proto_strs[pos+Model.proto_opts[idx]+1]));
     }
     if (changed)
         PROTOCOL_SetOptions();  // for devo, it needs to do protocol init as the telemerty state is changed
@@ -122,7 +122,7 @@ const char *set_chmap_cb(guiObject_t *obj, int dir, void *data)
         Model.ppm_map[idx] = GUI_TextSelectHelper(Model.ppm_map[idx], -1, Model.num_channels-1, dir, 1, 1, NULL);
         if (Model.ppm_map[idx] < 0)
             return _tr("None");
-        sprintf(mp->tmpstr, _tr("Ch%d"), Model.ppm_map[idx]+1);
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Ch%d"), Model.ppm_map[idx]+1);
     } else {
         int newval = GUI_TextSelectHelper(Model.ppm_map[idx], 0, NUM_INPUTS, dir, 1, 1, NULL);
         Model.ppm_map[idx] = INPUT_GetAbbrevSource(Model.ppm_map[idx], newval, dir);
@@ -176,6 +176,6 @@ const char *input_chname_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(mp->tmpstr, _tr("PPM%d"), idx+1);
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("PPM%d"), idx+1);
     return mp->tmpstr;
 }

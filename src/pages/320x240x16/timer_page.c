@@ -161,7 +161,7 @@ const char *show_set_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(tp->tmpstr, "%s", _tr("Date / Time"));
+    snprintf(tp->tmpstr, sizeof(tp->tmpstr), "%s", _tr("Date / Time"));
     return tp->tmpstr;
 }
 

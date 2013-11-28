@@ -56,7 +56,8 @@ void PAGE_ShowSafetyDialog()
         s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-        sprintf(dlgstr + strlen(dlgstr), _tr("%s is %d%%,\nsafe value = %d%%"),
+        int len = strlen(dlgstr);
+        snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("%s is %d%%,\nsafe value = %d%%"),
                 INPUT_SourceName(tmpstr, ch + 1),
                 val, safeval[Model.safety[i]]);
         if (++count >= 5)
@@ -94,8 +95,10 @@ void PAGE_ShowBindingDialog(u8 update)
     u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
     strcpy(dlgstr, _tr("Binding...\nPress ENT to stop"));
-    if (bind_time != 0xFFFFFFFF )
-        sprintf(dlgstr + strlen(dlgstr), _tr("\n%d seconds left"), (int)bind_time / 1000);
+    if (bind_time != 0xFFFFFFFF ) {
+        int len = strlen(dlgstr);
+        snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("\n%d seconds left"), (int)bind_time / 1000);
+    }
     u32 crc_new = Crc(dlgstr, strlen(dlgstr));
     if (dialog && crc != crc_new) {
         GUI_Redraw(dialog);

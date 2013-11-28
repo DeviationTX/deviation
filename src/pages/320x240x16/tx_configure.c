@@ -235,7 +235,7 @@ const char *show_msg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(cp->tmpstr, _tr("Touch target %d"), cp->state < 3 ? 1 : 2);
+    snprintf(cp->tmpstr, sizeof(cp->tmpstr), _tr("Touch target %d"), cp->state < 3 ? 1 : 2);
     return cp->tmpstr;
 }
 
@@ -243,7 +243,7 @@ const char *coords_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(cp->tmpstr, "%d*%d-%d-%d", cp->coords.x, cp->coords.y, cp->coords.z1, cp->coords.z2);
+    snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%d*%d-%d-%d", cp->coords.x, cp->coords.y, cp->coords.z1, cp->coords.z2);
     return cp->tmpstr;
 }
 

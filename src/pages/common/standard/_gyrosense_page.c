@@ -24,7 +24,7 @@ const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf (mp->tmpstr, "%s %d", _tr("Value"), idx);
+    snprintf (mp->tmpstr, sizeof(mp->tmpstr), "%s %d", _tr("Value"), idx);
     return mp->tmpstr;
 }
 
@@ -56,9 +56,9 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     if (gyro_output == GYROOUTPUT_GEAR)
-        sprintf(mp->tmpstr, "%s/%s5", _tr("Gear"), _tr("Ch"));
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s5", _tr("Gear"), _tr("Ch"));
     else
-        sprintf(mp->tmpstr, "%s/%s7", _tr("Aux2"), _tr("Ch"));
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s7", _tr("Aux2"), _tr("Ch"));
     return mp->tmpstr;
 }
 

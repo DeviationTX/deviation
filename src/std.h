@@ -55,7 +55,7 @@
     #include <stdarg.h>
     void tfp_printf(const char *fmt, ...);
     void tfp_sprintf(char* s,const char *fmt, ...);
-    void tfp_snprintf(char* s, unsigned int len, const char *fmt, ...);
+    void tfp_snprintf(char* s, int len, const char *fmt, ...);
     void tfp_fprintf(FILE *fh,const char *fmt, ...);
     #define sprintf tfp_sprintf
     #define snprintf tfp_snprintf

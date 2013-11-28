@@ -81,7 +81,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     Transmitter.calibration[i].min = 0xFFFF;
                     Transmitter.calibration[i].zero = value;
                 }
-                sprintf(cp->tmpstr, "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
+                snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_MAXMIN;
                 break;
@@ -89,7 +89,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                 for (i = 0; i < INP_HAS_CALIBRATION; i++) {
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
-                sprintf(cp->tmpstr, "%s", _tr("Calibration done."));
+                snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s", _tr("Calibration done."));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_SUCCESS;
                 break;
@@ -114,7 +114,7 @@ static void calibrate_sticks(void)
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
-    sprintf(cp->tmpstr, "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
+    snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
     GUI_CreateLabelBox(&guic->msg, 1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, cp->tmpstr);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
@@ -172,7 +172,7 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
-    sprintf(cp->tmpstr, _tr("Mode %d"), Transmitter.mode);
+    snprintf(cp->tmpstr, sizeof(cp->tmpstr), _tr("Mode %d"), Transmitter.mode);
     return cp->tmpstr;
 }
 

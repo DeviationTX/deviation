@@ -84,6 +84,6 @@ const char *reset_timer_string_cb(guiObject_t *obj, void *data)
     (void)obj;
     (void)data;
     u8 idx = (long)data;
-    sprintf(dlgstr, _tr("Do you really want\nto reset the\n permanent timer %d?"),idx+1);
+    snprintf(dlgstr, sizeof(dlgstr), _tr("Do you really want\nto reset the\n permanent timer %d?"),idx+1);
     return dlgstr;
 }

@@ -52,7 +52,7 @@ static const char *holdsw_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(mp->tmpstr, "%s ", _tr("Switch"));
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s ", _tr("Switch"));
     INPUT_SourceNameAbbrevSwitch(mp->tmpstr + strlen(mp->tmpstr), mapped_std_channels.switches[SWITCHFUNC_HOLD]);
     return mp->tmpstr;
 }

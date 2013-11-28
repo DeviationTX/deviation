@@ -59,9 +59,9 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
     /* See if we need to name the cyclic virtual channels */
     if (_is_virt_cyclic(ch)) {
         switch(ch - NUM_OUT_CHANNELS) {
-            case 0: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
-            case 1: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
-            case 2: sprintf(mp->tmpstr, "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
+            case 0: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
+            case 1: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
+            case 2: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
         }
     }
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
@@ -253,9 +253,9 @@ void virtname_cb(guiObject_t *obj, const void *data)
     int ch = (long)data - NUM_OUT_CHANNELS;
     PAGE_SetModal(1);
     if (Model.virtname[ch][0]) {
-        strcpy(mp->tmpstr, Model.virtname[ch]);
+        strncpy(mp->tmpstr, Model.virtname[ch], sizeof(mp->tmpstr));
     } else {
-        sprintf(mp->tmpstr, "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
+        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
     }
     callback_result = ch+1;
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, mp->tmpstr, sizeof(Model.virtname[ch])-1, _changename_done_cb, &callback_result);

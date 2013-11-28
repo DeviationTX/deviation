@@ -37,19 +37,19 @@ static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
         update_swashmixes();
     switch(Model.swash_type) {
         case SWASH_TYPE_NONE:
-            sprintf(mp->tmpstr,"1%s", _tr("Servo"));
+            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "1%s", _tr("Servo"));
             break;
         case SWASH_TYPE_120:
-            sprintf(mp->tmpstr,"3%s 120", _tr("Servo"));
+            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 120", _tr("Servo"));
             break;
         case SWASH_TYPE_120X:
-            sprintf(mp->tmpstr,"3%s 120x", _tr("Servo"));
+            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 120x", _tr("Servo"));
             break;
         case SWASH_TYPE_140:
-            sprintf(mp->tmpstr,"3%s 140", _tr("Servo"));
+            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 140", _tr("Servo"));
             break;
         case SWASH_TYPE_90:
-            sprintf(mp->tmpstr,"3%s 90", _tr("Servo"));
+            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 90", _tr("Servo"));
             break;
         default:
             break;

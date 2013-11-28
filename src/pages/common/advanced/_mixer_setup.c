@@ -505,7 +505,7 @@ static const char *reorder_text_cb(u8 idx)
         return "";
     if(idx == 255)
         return _tr("New");
-    sprintf(mp->tmpstr, "%s %d", _tr("Mixer"), idx);
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s %d", _tr("Mixer"), idx);
     return mp->tmpstr;
 }
 static void reorder_return_cb(u8 *list)
@@ -569,6 +569,6 @@ static const char *scalestring_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long v = (long)data;
-    sprintf(mp->tmpstr, _tr("Scale%s"), v == 0 ? "" : v == 1 ? "1" : "2");
+    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Scale%s"), v == 0 ? "" : v == 1 ? "1" : "2");
     return mp->tmpstr;
 }
