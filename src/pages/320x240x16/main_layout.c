@@ -132,8 +132,8 @@ const char *xpos_cb(guiObject_t *obj, int dir, void *data)
             move_elem();
         }
     }
-    sprintf(lp.tmp, "%d", lp.selected_x);
-    return lp.tmp;
+    sprintf(tempstring, "%d", lp.selected_x);
+    return tempstring;
 }
 const char *ypos_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -146,8 +146,8 @@ const char *ypos_cb(guiObject_t *obj, int dir, void *data)
             move_elem();
         }
     }
-    sprintf(lp.tmp, "%d", lp.selected_y);
-    return lp.tmp;
+    sprintf(tempstring, "%d", lp.selected_y);
+    return tempstring;
 }
 
 void select_for_move(guiLabel_t *obj)

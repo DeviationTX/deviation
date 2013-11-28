@@ -105,7 +105,7 @@ static void show_iconsel_page(int SelectedIcon)
         num_positions = 2;
 
     //Header
-    PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tp.str, toggleinput));
+    PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
     labelDesc.style = LABEL_CENTER;
     w = 50;
     GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));

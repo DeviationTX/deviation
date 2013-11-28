@@ -4,7 +4,6 @@
 struct layout_page {
     u8 newelem;
     u8 long_press;
-    char tmp[20];
     u16 selected_x, selected_y, selected_w, selected_h;
     int selected_for_move;
 };

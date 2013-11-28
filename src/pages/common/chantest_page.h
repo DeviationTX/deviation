@@ -17,7 +17,6 @@ struct chantest_page {
     void(*return_page)(int page);
     int return_val;
     s16 pctvalue[NUM_TEST_BARS];
-    char tmpstr[31];
     struct buttonAction action;
 };
 

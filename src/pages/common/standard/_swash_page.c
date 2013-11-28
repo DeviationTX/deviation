@@ -37,24 +37,24 @@ static const char *swash_val_cb(guiObject_t *obj, int dir, void *data)
         update_swashmixes();
     switch(Model.swash_type) {
         case SWASH_TYPE_NONE:
-            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "1%s", _tr("Servo"));
+            snprintf(tempstring, sizeof(tempstring), "1%s", _tr("Servo"));
             break;
         case SWASH_TYPE_120:
-            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 120", _tr("Servo"));
+            snprintf(tempstring, sizeof(tempstring), "3%s 120", _tr("Servo"));
             break;
         case SWASH_TYPE_120X:
-            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 120x", _tr("Servo"));
+            snprintf(tempstring, sizeof(tempstring), "3%s 120x", _tr("Servo"));
             break;
         case SWASH_TYPE_140:
-            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 140", _tr("Servo"));
+            snprintf(tempstring, sizeof(tempstring), "3%s 140", _tr("Servo"));
             break;
         case SWASH_TYPE_90:
-            snprintf(mp->tmpstr, sizeof(mp->tmpstr), "3%s 90", _tr("Servo"));
+            snprintf(tempstring, sizeof(tempstring), "3%s 90", _tr("Servo"));
             break;
         default:
             break;
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
@@ -86,8 +86,8 @@ static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
             Model.swash_invert = Model.swash_invert | mask;
         }
     }
-    sprintf(mp->tmpstr, "%d", swashmix[i]);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", swashmix[i]);
+    return tempstring;
 }
 
 static void get_swash()

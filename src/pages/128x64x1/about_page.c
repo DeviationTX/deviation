@@ -28,9 +28,9 @@ void PAGE_AboutInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_ABOUT));
     PAGE_SetActionCB(_action_cb);
 
-    strcpy(up->tmpstr, (const char *) _tr("Deviation FW version:"));
+    strcpy(tempstring, (const char *) _tr("Deviation FW version:"));
     GUI_CreateLabelBox(&gui->label[0], 0, 15, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
-    GUI_CreateLabelBox(&gui->label[1], 0, 30, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(&gui->label[1], 0, 30, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, tempstring);
     GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, ITEM_HEIGHT, &MICRO_FONT, NULL, NULL, _tr_noop(DeviationVersion));
 }
 

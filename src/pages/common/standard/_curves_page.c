@@ -56,8 +56,8 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         for ( i = 0; i < 9; i++)
             GUI_Redraw(&gui->val[i]);
     }
-    strcpy(mp->tmpstr, (const char *)STDMIX_ModeName(pit_mode));
-    return mp->tmpstr;
+    strcpy(tempstring, (const char *)STDMIX_ModeName(pit_mode));
+    return tempstring;
 }
 
 static void get_hold_state()
@@ -104,12 +104,12 @@ static const char *set_holdstate_cb(guiObject_t *obj, int dir, void *data)
         update_textsel_state();
     }
     if (pit_mode != PITTHROMODE_HOLD)
-        strcpy(mp->tmpstr, "");
+        strcpy(tempstring, "");
     else if (pit_hold_state)
-        strcpy(mp->tmpstr, _tr("On"));
+        strcpy(tempstring, _tr("On"));
     else
-        strcpy(mp->tmpstr, _tr("Off"));
-    return mp->tmpstr;
+        strcpy(tempstring, _tr("Off"));
+    return tempstring;
 }
 
 
@@ -154,8 +154,8 @@ static const char *set_pointval_cb(guiObject_t *obj, int dir, void *data)
         if (changed)
             auto_generate_cb(NULL, NULL);
     }
-    sprintf(mp->tmpstr, "%d", curve->points[point_num]);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", curve->points[point_num]);
+    return tempstring;
 }
 
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)

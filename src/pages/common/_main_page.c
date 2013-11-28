@@ -58,18 +58,18 @@ const char *show_box_cb(guiObject_t *obj, const void *data)
     #if HAS_RTC
         if (idx <= NUM_RTC) {
             u32 time = RTC_GetValue();
-            idx == 1 ? RTC_GetTimeFormatted(mp->tmpstr, time) : RTC_GetDateFormatted(mp->tmpstr, time);
-            return mp->tmpstr;
+            idx == 1 ? RTC_GetTimeFormatted(tempstring, time) : RTC_GetDateFormatted(tempstring, time);
+            return tempstring;
         }
     #endif
     if (idx - NUM_RTC <= NUM_TIMERS) {
-        TIMER_SetString(mp->tmpstr, TIMER_GetValue(idx - NUM_RTC - 1));
+        TIMER_SetString(tempstring, TIMER_GetValue(idx - NUM_RTC - 1));
     } else if(idx - NUM_RTC - NUM_TIMERS <= NUM_TELEM) {
-        TELEMETRY_GetValueStr(mp->tmpstr, idx - NUM_RTC - NUM_TIMERS);
+        TELEMETRY_GetValueStr(tempstring, idx - NUM_RTC - NUM_TIMERS);
     } else {
-        sprintf(mp->tmpstr, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
+        sprintf(tempstring, "%3d%%", RANGE_TO_PCT(MIXER_GetChannel(idx - (NUM_RTC + NUM_TIMERS + NUM_TELEM + 1), APPLY_SAFETY | APPLY_SCALAR)));
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 #if HAS_RTC
@@ -78,8 +78,8 @@ const char *show_bigbox_cb(guiObject_t *obj, const void *data)
     u8 idx = (long)data;
     if (idx <= NUM_RTC) {
         u32 time = RTC_GetValue();
-        idx == 1 ? RTC_GetTimeFormattedBigbox(mp->tmpstr, time) : RTC_GetDateFormattedBigbox(mp->tmpstr, time);
-        return mp->tmpstr;
+        idx == 1 ? RTC_GetTimeFormattedBigbox(tempstring, time) : RTC_GetDateFormattedBigbox(tempstring, time);
+        return tempstring;
     }
     return show_box_cb(obj, data);
 }
@@ -89,18 +89,18 @@ const char *voltage_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
     if (mp->battery > 1000)  // bug fix: any value lower than 1v means the DMA reading is not ready
-        sprintf(mp->tmpstr, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
+        sprintf(tempstring, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
     else
-        mp->tmpstr[0] = 0;
-    return mp->tmpstr;
+        tempstring[0] = 0;
+    return tempstring;
 }
 
 #if HAS_RTC
 static const char *time_cb(guiObject_t *obj, const void *data) {
     (void)obj;
     (void)data;
-    RTC_GetTimeStringShort(mp->tmpstr, RTC_GetValue());
-    return mp->tmpstr;
+    RTC_GetTimeStringShort(tempstring, RTC_GetValue());
+    return tempstring;
 }
 #endif
 

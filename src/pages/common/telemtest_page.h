@@ -4,7 +4,6 @@
 struct telemtest_page {
     void(*return_page)(int page);
     int return_val;
-    char str[60];
     struct Telemetry telem;
     struct LabelDesc font;
 };

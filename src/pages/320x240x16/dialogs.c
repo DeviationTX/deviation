@@ -26,6 +26,7 @@
 #define DLG_XOFFSET ((LCD_WIDTH - 320) / 2)
 #define DLG_YOFFSET ((LCD_HEIGHT - 240) / 2)
 
+u32 dialogcrc;
 void PAGE_ShowSafetyDialog()
 {
     if (disable_safety) {
@@ -40,11 +41,9 @@ void PAGE_ShowSafetyDialog()
         } else {
             int i;
             int count = 0;
-            char tmpstr[30];
             const s8 safeval[4] = {0, -100, 0, 100};
             volatile s16 *raw = MIXER_GetInputs();
-            u32 crc = Crc(dlgstr, strlen(dlgstr));
-            dlgstr[0] = 0;
+            tempstring[0] = 0;
             for(i = 0; i < NUM_SOURCES + 1; i++) {
                 if (! (unsafe & (1LL << i)))
                     continue;
@@ -53,20 +52,23 @@ void PAGE_ShowSafetyDialog()
                 s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                               ? raw[ch+1]
                               : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-                int len = strlen(dlgstr);
-                snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("%s is %d%%, safe value = %d%%\n"),
-                        INPUT_SourceName(tmpstr, ch + 1),
+                INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
+                int len = strlen(tempstring);
+                snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%, safe value = %d%%\n"),
                         val, safeval[Model.safety[i]]);
                 if (++count >= 5)
                     break;
             }
-            if (crc != Crc(dlgstr, strlen(dlgstr))) {
+            u32 crc = Crc(tempstring, strlen(tempstring));
+            if (crc != dialogcrc) {
                 GUI_Redraw(dialog);
+                dialogcrc = crc;
             }
         }
     } else {
-        dlgstr[0] = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, dlgstr);
+        tempstring[0] = 0;
+        dialogcrc = 0;
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"), NULL, safety_ok_cb, dtOk, tempstring);
     }
 }
 
@@ -92,28 +94,29 @@ void PAGE_ShowBindingDialog(u8 update)
 {
     if (update && ! dialog)
         return;
-    u32 crc = Crc(dlgstr, strlen(dlgstr));
     u32 bind_time = PROTOCOL_Binding();
-    strncpy(dlgstr, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(dlgstr));
-    u32 len = strlen(dlgstr);
-    if (bind_time != 0xFFFFFFFF && len < sizeof(dlgstr)) {
-        snprintf(dlgstr + len, sizeof(dlgstr) - len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
+    strncpy(tempstring, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(tempstring));
+    u32 len = strlen(tempstring);
+    if (bind_time != 0xFFFFFFFF && len < sizeof(tempstring)) {
+        snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
     }
-    u32 crc_new = Crc(dlgstr, strlen(dlgstr));
-    if (dialog && crc != crc_new) {
+    u32 crc = Crc(tempstring, strlen(tempstring));
+    if (dialog && crc != dialogcrc) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, dlgstr);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Binding"), NULL, binding_ok_cb, dtOk, tempstring);
     }
+    dialogcrc = crc;
 }
 
 void PAGE_ShowWarning(const char *title, const char *str)
 {   
     if (dialog)
         return;
-    sprintf(dlgstr, "%s", str);
+    sprintf(tempstring, "%s", str);
+    dialogcrc = 0;
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, dlgstr);
+    dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
 void PAGE_ShowLowBattDialog()
@@ -131,10 +134,10 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
     (void)guiObj;
     if (dialog)
         return;
-    strncpy(dlgstr, _tr("Model needs to be reset\nin order to switch to the standard mixer"), sizeof(dlgstr));
-    dlgstr[sizeof(dlgstr) - 1] = 0;
+    strncpy(tempstring, _tr("Model needs to be reset\nin order to switch to the standard mixer"), sizeof(tempstring));
+    tempstring[sizeof(tempstring) - 1] = 0;
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Standard Mixer"), NULL,
-            invalid_stdmixer_cb, dtOkCancel, dlgstr);
+            invalid_stdmixer_cb, dtOkCancel, tempstring);
 }
 
 /********************************/
@@ -146,7 +149,7 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     (void)guiObject;
     if (dialog)
         return;
-    dlgstr[sizeof(dlgstr) - 1] = 0;
+    dialogcrc = 0;
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Reset Permanent Timer?"), reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }
 

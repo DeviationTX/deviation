@@ -28,19 +28,19 @@ const char * _timer_new_str_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     long index = (long)data;
     u8 changed;
-    tp->tmpstr[0] = '\0';
+    tempstring[0] = '\0';
     if (index == TIMER_SECONDS) {
         permanent.second = GUI_TextSelectHelper(permanent.second, 0, 59, dir, 1, 10, &changed);
-        sprintf(tp->tmpstr, "%2d", permanent.second);
+        sprintf(tempstring, "%2d", permanent.second);
     } else if (index == TIMER_MINUTES) {
         permanent.minute = GUI_TextSelectHelper(permanent.minute, 0, 59, dir, 1, 10, &changed);
-        sprintf(tp->tmpstr, "%2d", permanent.minute);
+        sprintf(tempstring, "%2d", permanent.minute);
     } else if (index == TIMER_HOURS) {
         permanent.hour   = GUI_TextSelectHelper(permanent.hour,   0, 99, dir, 1, 10, &changed);
-        sprintf(tp->tmpstr, "%2d", permanent.hour);
+        sprintf(tempstring, "%2d", permanent.hour);
     }
     if (changed) GUI_Redraw(&guiset->addvalue);
-    return tp->tmpstr;
+    return tempstring;
 }
 
 void add_set_button_cb(struct guiObject *obj, const void *data)

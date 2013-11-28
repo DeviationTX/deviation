@@ -30,31 +30,31 @@ static const char *string_cb(u8 idx, void *data)
         if (type == 1 && strncasecmp(filename, "lang", 4) == 0) {
             idx--;
             if (idx == 0) {
-                sprintf(cp->tmpstr, "language/%s", filename);
+                sprintf(tempstring, "language/%s", filename);
                 break;
             }
         }
     }
     FS_CloseDir();
     if(idx == 0) {
-        fh = fopen(cp->tmpstr, "r");
+        fh = fopen(tempstring, "r");
         if (fh) {
-            if(fgets(cp->tmpstr, sizeof(cp->tmpstr), fh) == NULL)
-                cp->tmpstr[0] = 0;
+            if(fgets(tempstring, sizeof(tempstring), fh) == NULL)
+                tempstring[0] = 0;
             fclose(fh);
-            unsigned len = strlen(cp->tmpstr);
-            if(len && cp->tmpstr[0] != ':') {
-                cp->tmpstr[len-1] = '\0';
-                if ((u8)cp->tmpstr[0] == 0xef
-                    && (u8)cp->tmpstr[1] == 0xbb
-                    && (u8)cp->tmpstr[2] == 0xbf)
+            unsigned len = strlen(tempstring);
+            if(len && tempstring[0] != ':') {
+                tempstring[len-1] = '\0';
+                if ((u8)tempstring[0] == 0xef
+                    && (u8)tempstring[1] == 0xbb
+                    && (u8)tempstring[2] == 0xbf)
                 {
                     //Remove BOM
                     for(u32 i = 3; i < len; i++)
-                        cp->tmpstr[i-3] = cp->tmpstr[i];
+                        tempstring[i-3] = tempstring[i];
                     len -= 3;
                 }
-                return cp->tmpstr;
+                return tempstring;
             }
         }
     }

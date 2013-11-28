@@ -3,10 +3,10 @@
 Csatornák
 :%d bytes left
 %d bájt maradt
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%, a biztonságos érték = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s = %d%%,\na biztonságos érték = %d%%\n
+: is %d%%, safe value = %d%%\n
+ = %d%%, a biztonságos érték = %d%%\n
+:n is %d%%,\nsafe value = %d%%
+ = %d%%,\na biztonságos érték = %d%%\n
 :1 sec
 1 mp
 :1-to-1

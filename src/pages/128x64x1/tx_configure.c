@@ -199,8 +199,8 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     }
     if (Transmitter.contrast == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", Transmitter.contrast);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", Transmitter.contrast);
+    return tempstring;
 }
 
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)

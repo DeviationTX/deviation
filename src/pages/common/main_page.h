@@ -7,7 +7,6 @@ struct main_page {
     u8 ignore_release;
     s16 battery;
     s32 elem[NUM_ELEMS];
-    char tmpstr[8];
 #if HAS_RTC
     u32 time;
 #endif

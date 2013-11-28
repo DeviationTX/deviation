@@ -102,8 +102,8 @@ void set_selected_for_move(int idx)
 const char *pos_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    sprintf(lp.tmp, "%d", data ? lp.selected_y : lp.selected_x);
-    return lp.tmp;
+    sprintf(tempstring, "%d", data ? lp.selected_y : lp.selected_x);
+    return tempstring;
 }
 
 void select_for_move(guiLabel_t *obj)

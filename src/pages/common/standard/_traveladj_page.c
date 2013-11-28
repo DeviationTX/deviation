@@ -30,8 +30,8 @@ static const char *travelup_cb(guiObject_t *obj, int dir, void *data)
         if (Model.limits[ch].servoscale_neg == 0)
             Model.limits[ch].servoscale_neg = old_scale;  // bug fix: must make sure  scale- won't changed if scale+ is changed
     }
-    sprintf(mp->tmpstr, "+%d", Model.limits[ch].servoscale);
-    return mp->tmpstr;
+    sprintf(tempstring, "+%d", Model.limits[ch].servoscale);
+    return tempstring;
 }
 
 static const char *traveldown_cb(guiObject_t *obj, int dir, void *data)
@@ -53,6 +53,6 @@ static const char *traveldown_cb(guiObject_t *obj, int dir, void *data)
         if (value == Model.limits[ch].servoscale)
             Model.limits[ch].servoscale_neg = 0;
     }
-    sprintf(mp->tmpstr, "%d", value);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", value);
+    return tempstring;
 }

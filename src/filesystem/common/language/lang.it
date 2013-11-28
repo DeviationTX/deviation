@@ -2,10 +2,10 @@
 :# Channels
 # Canali
 >:%d bytes left
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%, valore sicuro  = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s = %d%%, \nvalore sicuro  = %d%%
+: is %d%%, safe value = %d%%\n
+ = %d%%, valore sicuro  = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ = %d%%, \nvalore sicuro  = %d%%
 >:1 sec
 :1-to-1
 1 a 1

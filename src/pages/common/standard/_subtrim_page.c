@@ -23,6 +23,6 @@ static const char *subtrim_cb(guiObject_t *obj, int dir, void *data)
             -SUBTRIM_RANGE, SUBTRIM_RANGE, dir, 1, LONG_PRESS_STEP, NULL);
 
     u16 abs_value = abs(Model.limits[ch].subtrim);
-    sprintf(mp->tmpstr, "%s%d.%d", Model.limits[ch].subtrim < 0 ? "-" : "", abs_value / 10, abs_value % 10);
-    return mp->tmpstr;
+    sprintf(tempstring, "%s%d.%d", Model.limits[ch].subtrim < 0 ? "-" : "", abs_value / 10, abs_value % 10);
+    return tempstring;
 }

@@ -35,26 +35,26 @@ static const char *label_cb(guiObject_t *obj, const void *data)
     FunctionSwitch i = (long)data;
     switch (i) {
     case SWITCHFUNC_FLYMODE:
-        strcpy(mp->tmpstr, _tr("Fly mode"));
+        strcpy(tempstring, _tr("Fly mode"));
         break;
     case SWITCHFUNC_HOLD:
-        strcpy(mp->tmpstr, _tr("Thr hold"));
+        strcpy(tempstring, _tr("Thr hold"));
         break;
     case SWITCHFUNC_GYROSENSE:
-        strcpy(mp->tmpstr, _tr("Gyro sense"));
+        strcpy(tempstring, _tr("Gyro sense"));
         break;
     case SWITCHFUNC_DREXP_AIL:
-        strcpy(mp->tmpstr, _tr("D/R&Exp -AIL"));
+        strcpy(tempstring, _tr("D/R&Exp -AIL"));
         break;
     case SWITCHFUNC_DREXP_ELE:
-        strcpy(mp->tmpstr, _tr("D/R&Exp -ELE"));
+        strcpy(tempstring, _tr("D/R&Exp -ELE"));
         break;
     case SWITCHFUNC_DREXP_RUD:
     default:
-        strcpy(mp->tmpstr, _tr("D/R&Exp -RUD"));
+        strcpy(tempstring, _tr("D/R&Exp -RUD"));
         break;
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)

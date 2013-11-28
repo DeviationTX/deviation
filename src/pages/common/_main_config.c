@@ -137,11 +137,11 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_BIGBOX:
         {
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
-            return GetBoxSource(lp.tmp, pc.elem[idx].src);
+            return GetBoxSource(tempstring, pc.elem[idx].src);
         }
         case ELEM_BAR:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
-            return INPUT_SourceName(lp.tmp, pc.elem[idx].src ? pc.elem[idx].src + NUM_INPUTS : 0);
+            return INPUT_SourceName(tempstring, pc.elem[idx].src ? pc.elem[idx].src + NUM_INPUTS : 0);
         case ELEM_TOGGLE:
         {
             int val = MIXER_SRC(pc.elem[idx].src);
@@ -151,15 +151,15 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
                 val = newval;
                 pc.elem[idx].src = val;
             }
-            return INPUT_SourceNameAbbrevSwitch(lp.tmp, pc.elem[idx].src);
+            return INPUT_SourceNameAbbrevSwitch(tempstring, pc.elem[idx].src);
         }
         case ELEM_HTRIM:
         case ELEM_VTRIM:
             pc.elem[idx].src = GUI_TextSelectHelper(pc.elem[idx].src, 0, NUM_TRIMS, dir, 1, 1, NULL);
             if (pc.elem[idx].src == 0)
                 return _tr("None");
-            snprintf(lp.tmp, sizeof(lp.tmp), "%s%d", _tr("Trim"),pc.elem[idx].src);
-            return lp.tmp;
+            snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"),pc.elem[idx].src);
+            return tempstring;
     }
     return "";
 }
@@ -197,8 +197,8 @@ const char *menulabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    snprintf(lp.tmp, sizeof(lp.tmp), "%s %d", _tr("Menu"), (int)i+1);
-    return lp.tmp;
+    snprintf(tempstring, sizeof(tempstring), "%s %d", _tr("Menu"), (int)i+1);
+    return tempstring;
 }
 
 const char *menusel_cb(guiObject_t *obj, int dir, void *data)

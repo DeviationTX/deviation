@@ -7,6 +7,13 @@
 
 #include "std.h"
 
+#define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
+                             //We could reduce this to ~240 on the 128x64 screens
+                             //But only after all sprintf are replaced with snprintf
+                             //Maybe move this to target_defs.h
+extern char tempstring[TEMPSTRINGLENGTH];
+
+
 #ifndef LIBOPENCM3_CM3_COMMON_H
 //Older gcc does not allow typedef redefinition even to thesame type
 typedef int8_t s8;

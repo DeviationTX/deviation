@@ -2,10 +2,10 @@ Română
 :# Channels
 Canale
 >:%d bytes left
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%, valoare de siguranță = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s = %d%%,\nvaloare de siguranță = %d%%\n
+: is %d%%, safe value = %d%%\n
+ = %d%%, valoare de siguranță = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ = %d%%,\nvaloare de siguranță = %d%%\n
 >:1 sec
 :1-to-1
 1 la 1

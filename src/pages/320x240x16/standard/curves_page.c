@@ -52,9 +52,9 @@ static const char *holdsw_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s ", _tr("Switch"));
-    INPUT_SourceNameAbbrevSwitch(mp->tmpstr + strlen(mp->tmpstr), mapped_std_channels.switches[SWITCHFUNC_HOLD]);
-    return mp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), "%s ", _tr("Switch"));
+    INPUT_SourceNameAbbrevSwitch(tempstring + strlen(tempstring), mapped_std_channels.switches[SWITCHFUNC_HOLD]);
+    return tempstring;
 }
 
 static void update_textsel_state()

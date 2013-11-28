@@ -15,14 +15,13 @@
 
 #define gui (&gui_objs.u.datalog)
 #define dlog Model.datalog
-char str[34];
 u16 next_update;
 u32 remaining;
 
 const char *source_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return DATALOG_Source(str, (long)data);
+    return DATALOG_Source(tempstring, (long)data);
 }
 
 static const char *ratesel_cb(guiObject_t *obj, int dir, void *data)
@@ -41,7 +40,7 @@ static const char *sourcesel_cb(guiObject_t *obj, int dir, void *data)
     dlog.enable = GUI_TextSelectHelper(dlog.enable, 0, NUM_SOURCES, dir, 1, 1, &changed);
     if (changed)
         DATALOG_UpdateState();
-    return INPUT_SourceName(str, dlog.enable);
+    return INPUT_SourceName(tempstring, dlog.enable);
 }
 
 static const char *reset_str_cb(guiObject_t *obj, const void *data)

@@ -24,8 +24,8 @@ const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    snprintf (mp->tmpstr, sizeof(mp->tmpstr), "%s %d", _tr("Value"), idx);
-    return mp->tmpstr;
+    snprintf (tempstring, sizeof(tempstring), "%s %d", _tr("Value"), idx);
+    return tempstring;
 }
 
 static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
@@ -56,10 +56,10 @@ static const char *gyro_output_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     if (gyro_output == GYROOUTPUT_GEAR)
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s5", _tr("GEAR"), _tr("Ch"));
+        snprintf(tempstring, sizeof(tempstring), "%s/%s5", _tr("GEAR"), _tr("Ch"));
     else
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s/%s7", _tr("AUX2"), _tr("Ch"));
-    return mp->tmpstr;
+        snprintf(tempstring, sizeof(tempstring), "%s/%s7", _tr("AUX2"), _tr("Ch"));
+    return tempstring;
 }
 
 static void convert_output_to_percentile()
@@ -79,9 +79,8 @@ static const char *gyro_val_cb(guiObject_t *obj, int dir, void *data)
     if (changed) {
         mp->mixer_ptr[i]->scalar = output[i] * 2 - 100;
     }
-    sprintf(mp->tmpstr, "%d", output[i]);
-    strcat(mp->tmpstr, "%");
-    return mp->tmpstr;
+    sprintf(tempstring, "%d%%", output[i]);
+    return tempstring;
 }
 
 

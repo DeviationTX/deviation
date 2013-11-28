@@ -2,10 +2,10 @@
 :# Channels
 # Kanelen
 >:%d bytes left
-:%s is %d%%, safe value = %d%%\n
-%s is %d%%, veilige waarde = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s is %d%%,\nveilige waarde = %d%%\n
+: is %d%%, safe value = %d%%\n
+ is %d%%, veilige waarde = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ is %d%%,\nveilige waarde = %d%%\n
 >:1 sec
 :1-to-1
 1-op-1

@@ -87,7 +87,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
     MIXER_SET_SRC_INV(*source, is_neg);
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data)
@@ -99,8 +99,8 @@ static const char *set_safeval_cb(guiObject_t *obj, int dir, void *data)
     // bug fix: safe value should be allow to over +/-100
     mp->limit.safetyval = GUI_TextSelectHelper(mp->limit.safetyval, -150, 150, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
-    sprintf(mp->tmpstr, "%d", mp->limit.safetyval);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", mp->limit.safetyval);
+    return tempstring;
 }
 
 const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
@@ -117,15 +117,15 @@ const char *set_limits_cb(guiObject_t *obj, int dir, void *data)
         *ptr = value;
     }
     mp->are_limits_changed |= isCurrentItemChanged;
-    sprintf(mp->tmpstr, "%d", value);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", value);
+    return tempstring;
 }
 const char *scalestring_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Scale%s"), idx ? "+" : "-");
-    return mp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Scale%s"), idx ? "+" : "-");
+    return tempstring;
 }
 
 
@@ -152,8 +152,8 @@ const char *set_limitsscale_cb(guiObject_t *obj, int dir, void *data)
         }
         mp->are_limits_changed = 1;
     }
-    sprintf(mp->tmpstr, "%d", value);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", value);
+    return tempstring;
 }
 
 
@@ -164,8 +164,8 @@ const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     u8 isCurrentItemChanged = 0;
     *value = GUI_TextSelectHelper(*value, -SUBTRIM_RANGE, SUBTRIM_RANGE, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
-    sprintf(mp->tmpstr, "%s%d.%d", *value < 0 ? "-" : "", abs(*value) / 10, abs(*value) % 10);
-    return mp->tmpstr;
+    sprintf(tempstring, "%s%d.%d", *value < 0 ? "-" : "", abs(*value) / 10, abs(*value) % 10);
+    return tempstring;
 }
 
 void toggle_failsafe_cb(guiObject_t *obj, void *data)
@@ -188,8 +188,8 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
     // bug fix: failsafe value should be allow to over +/-100
     mp->limit.failsafe = GUI_TextSelectHelper(mp->limit.failsafe, -125, 125, dir, 1, LONG_PRESS_STEP, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
-    sprintf(mp->tmpstr, "%d", mp->limit.failsafe);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", mp->limit.failsafe);
+    return tempstring;
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)

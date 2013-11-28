@@ -44,23 +44,23 @@ const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
         return "";
     }
     if ((long)data == SELECT_VALUE) {
-        tp->tmpstr[0] = '\0';
+        tempstring[0] = '\0';
         switch (permanent.hms) {
             case TIMER_SECONDS:
                 permanent.second = GUI_TextSelectHelper(permanent.second, 0, 59, dir, 1, 10, &changed);
-                sprintf(tp->tmpstr, "%d", permanent.second);
+                sprintf(tempstring, "%d", permanent.second);
                 break;
             case TIMER_MINUTES:
                 permanent.minute = GUI_TextSelectHelper(permanent.minute, 0, 59, dir, 1, 10, &changed);
-                sprintf(tp->tmpstr, "%d", permanent.minute);
+                sprintf(tempstring, "%d", permanent.minute);
                 break;
             case TIMER_HOURS:
                 permanent.hour = GUI_TextSelectHelper(permanent.hour, 0, 99, dir, 1, 10, &changed);
-                sprintf(tp->tmpstr, "%d", permanent.hour);
+                sprintf(tempstring, "%d", permanent.hour);
                 break;
         }
         if (changed) GUI_Redraw(&guiset->addtime);
-        return tp->tmpstr;
+        return tempstring;
     }
     if ((long)data == ADDSET_SELECT) {
         permanent.addset = GUI_TextSelectHelper(permanent.addset, SET_BUTTON, ADD_BUTTON, dir, 1, 1, NULL);
@@ -88,8 +88,8 @@ static void _show_settimer_page(u8 index)
     permanent.addset = ADD_BUTTON;
     permanent.hms = TIMER_HOURS;
 
-    snprintf(tp->tmpstr, sizeof(tp->tmpstr), "%s %d", _tr(PAGE_GetName(PAGEID_SETTIMER)), index + 1);
-    PAGE_ShowHeader(tp->tmpstr);
+    snprintf(tempstring, sizeof(tempstring), "%s %d", _tr(PAGE_GetName(PAGEID_SETTIMER)), index + 1);
+    PAGE_ShowHeader(tempstring);
     PAGE_SetActionCB(_action_cb);
 
     u8 space = ITEM_HEIGHT + 1;

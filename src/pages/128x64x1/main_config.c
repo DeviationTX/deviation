@@ -97,8 +97,8 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
     default:
         str = "";
     }
-    sprintf(lp.tmp,"%s%d", str, idx+1);
-    return lp.tmp;
+    sprintf(tempstring,"%s%d", str, idx+1);
+    return tempstring;
 }
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)

@@ -29,7 +29,7 @@ static void _determine_save_in_live();
 const char *MIXPAGE_ChannelNameCB(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    return INPUT_SourceName(mp->tmpstr, (long)data + NUM_INPUTS + 1);
+    return INPUT_SourceName(tempstring, (long)data + NUM_INPUTS + 1);
 }
 
 int _is_virt_cyclic(int ch)
@@ -59,23 +59,23 @@ const char *MIXPAGE_ChanNameProtoCB(guiObject_t *obj, const void *data)
     /* See if we need to name the cyclic virtual channels */
     if (_is_virt_cyclic(ch)) {
         switch(ch - NUM_OUT_CHANNELS) {
-            case 0: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("AIL")); return mp->tmpstr;
-            case 1: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("ELE")); return mp->tmpstr;
-            case 2: snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s-%s", _tr("CYC"), _tr("COL")); return mp->tmpstr;
+            case 0: snprintf(tempstring, sizeof(tempstring), "%s-%s", _tr("CYC"), _tr("AIL")); return tempstring;
+            case 1: snprintf(tempstring, sizeof(tempstring), "%s-%s", _tr("CYC"), _tr("ELE")); return tempstring;
+            case 2: snprintf(tempstring, sizeof(tempstring), "%s-%s", _tr("CYC"), _tr("COL")); return tempstring;
         }
     }
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
-        sprintf(mp->tmpstr, "%s%d-%s",
+        sprintf(tempstring, "%s%d-%s",
             (Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
             (int)(ch + 1), tmp1);
     } else {
         INPUT_SourceName(tmp1, ch + NUM_INPUTS + 1);
-        sprintf(mp->tmpstr, "%s%s",
+        sprintf(tempstring, "%s%s",
                 (ch < Model.num_channels && Model.limits[ch].flags & CH_REVERSE) ? "!" : "",
                 tmp1);
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static const char *template_name_cb(guiObject_t *obj, const void *data)
@@ -160,7 +160,7 @@ static const char *show_source(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 *source = (u8 *)data;
-    return INPUT_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 static void _determine_save_in_live()
@@ -243,7 +243,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
     PAGE_SetModal(0);
     if (callback_result) {
         int ch = callback_result - 1;
-        strncpy(Model.virtname[ch], mp->tmpstr, sizeof(Model.virtname[ch]));
+        strncpy(Model.virtname[ch], tempstring, sizeof(Model.virtname[ch]));
         Model.virtname[ch][sizeof(Model.virtname[0])-1] = '\0'; // strncpy doesn't put that '\0' at the end
     }
 }
@@ -254,11 +254,11 @@ void virtname_cb(guiObject_t *obj, const void *data)
     int ch = (long)data - NUM_OUT_CHANNELS;
     PAGE_SetModal(1);
     if (Model.virtname[ch][0]) {
-        strncpy(mp->tmpstr, Model.virtname[ch], sizeof(mp->tmpstr));
+        strncpy(tempstring, Model.virtname[ch], sizeof(tempstring));
     } else {
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
+        snprintf(tempstring, sizeof(tempstring), "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
     }
     callback_result = ch+1;
-    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, mp->tmpstr, sizeof(Model.virtname[ch])-1, _changename_done_cb, &callback_result);
+    GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, sizeof(Model.virtname[ch])-1, _changename_done_cb, &callback_result);
 }
 

@@ -54,7 +54,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(&gui->point);
         }
     }
-    return CURVE_GetName(pagemem.u.mixer_page.tmpstr, curve);
+    return CURVE_GetName(tempstring, curve);
 }
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
@@ -77,9 +77,8 @@ static const char *set_value_cb(guiObject_t *obj, int dir, void *data)
     s8 old_pointval = curve->points[pointnum];
     if(CURVE_TYPE(curve) == CURVE_DEADBAND) {
         curve->points[pointnum] = (s8)GUI_TextSelectHelper((u8)curve->points[pointnum], 0, 255, dir, 1, 5, NULL);
-        ret = pagemem.u.mixer_page.tmpstr;
-        sprintf(pagemem.u.mixer_page.tmpstr, "%d.%d", (u8)curve->points[pointnum] / 10, (u8)curve->points[pointnum] % 10);
-        ret = pagemem.u.mixer_page.tmpstr;
+        sprintf(tempstring, "%d.%d", (u8)curve->points[pointnum] / 10, (u8)curve->points[pointnum] % 10);
+        ret = tempstring;
     } else {
         ret = PAGEMIXER_SetNumberCB(obj, dir, &curve->points[pointnum]);
     }

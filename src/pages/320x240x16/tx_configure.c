@@ -235,16 +235,16 @@ const char *show_msg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    snprintf(cp->tmpstr, sizeof(cp->tmpstr), _tr("Touch target %d"), cp->state < 3 ? 1 : 2);
-    return cp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Touch target %d"), cp->state < 3 ? 1 : 2);
+    return tempstring;
 }
 
 const char *coords_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%d*%d-%d-%d", cp->coords.x, cp->coords.y, cp->coords.z1, cp->coords.z2);
-    return cp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), "%d*%d-%d-%d", cp->coords.x, cp->coords.y, cp->coords.z1, cp->coords.z2);
+    return tempstring;
 }
 
 static void init_touch_calib()

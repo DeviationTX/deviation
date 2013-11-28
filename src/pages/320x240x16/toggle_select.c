@@ -120,7 +120,7 @@ static void show_iconsel_page(int SelectedIcon)
     GUI_CreateRect(&gui->toggleframe, 80+80*SelectedIcon, 39, 77, 33, &outline);
 
     GUI_CreateLabelBox(&gui->switchbox,  4, 47, 70, 22, &NORMALBOX_FONT, NULL, NULL,
-                       INPUT_SourceNameAbbrevSwitch(tp.str, Model.pagecfg2.elem[tp.tglidx].src));
+                       INPUT_SourceNameAbbrevSwitch(tempstring, Model.pagecfg2.elem[tp.tglidx].src));
 
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)

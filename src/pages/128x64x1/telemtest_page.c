@@ -242,8 +242,8 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf(tp.str, "%d", idx);
-    return tp.str;
+    sprintf(tempstring, "%d", idx);
+    return tempstring;
 }
 
 void PAGE_TelemtestInit(int page)
@@ -254,7 +254,7 @@ void PAGE_TelemtestInit(int page)
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
         current_page = telemetry_off;
-        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         return;
     }
 

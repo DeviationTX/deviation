@@ -27,10 +27,10 @@ static void _draw_page(u8 enable)
     PAGE_ShowHeader(_tr("USB"));
     PAGE_SetActionCB(_action_cb);
 
-    snprintf(up->tmpstr, sizeof(up->tmpstr), "%s %s",
+    snprintf(tempstring, sizeof(tempstring), "%s %s",
             _tr("Press ENT to turn \nUSB drive"),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(&gui->label, 0, 15, LCD_WIDTH, 40, &DEFAULT_FONT, NULL, NULL, up->tmpstr);
+    GUI_CreateLabelBox(&gui->label, 0, 15, LCD_WIDTH, 40, &DEFAULT_FONT, NULL, NULL, tempstring);
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

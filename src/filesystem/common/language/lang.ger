@@ -3,10 +3,10 @@
 Kanäle
 :%d bytes left
 %d Bytes übrig
-:%s is %d%%, safe value = %d%%\n
-%s ist %d%%, Sicherer Wert = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s=%d%%, SOLL=%d%%\n
+: is %d%%, safe value = %d%%\n
+ ist %d%%, Sicherer Wert = %d%%\n
+: is %d%%,\nsafe value = %d%%
+=%d%%, SOLL=%d%%\n
 :1 sec
 1 Sek.
 :1-to-1

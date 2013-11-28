@@ -77,13 +77,13 @@ void PAGE_RTCInit(int page)
     Rtc.value[HOUR] = (u16)(timevalue / 3600);
     Rtc.value[MINUTE] = (u16)(timevalue % 3600) / 60;
     Rtc.value[SECOND] = (u16)(timevalue % 60);
-    RTC_GetDateStringLong(rp->tmpstr,time);
-    int idx = (rp->tmpstr[1] == '.' ? 1 : 2);
-    rp->tmpstr[idx] = 0;
-    rp->tmpstr[idx+3] = 0;
-    Rtc.value[DAY] = atoi(rp->tmpstr);
-    Rtc.value[MONTH] = atoi(rp->tmpstr + idx + 1);
-    Rtc.value[YEAR] = atoi(rp->tmpstr + idx + 4);
+    RTC_GetDateStringLong(tempstring,time);
+    int idx = (tempstring[1] == '.' ? 1 : 2);
+    tempstring[idx] = 0;
+    tempstring[idx+3] = 0;
+    Rtc.value[DAY] = atoi(tempstring);
+    Rtc.value[MONTH] = atoi(tempstring + idx + 1);
+    Rtc.value[YEAR] = atoi(tempstring + idx + 4);
     min[SECOND] = 0;             max[SECOND] = 59;
     min[MINUTE] = 0;             max[MINUTE] = 59;
     min[HOUR]   = 0;             max[HOUR]   = 23;
@@ -99,10 +99,10 @@ const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
     u32 time = RTC_GetValue();
     switch ((long)data) {
         case SECOND:
-            sprintf(rp->tmpstr, "%2d", RTC_GetTimeValue(time) % 60);
+            sprintf(tempstring, "%2d", RTC_GetTimeValue(time) % 60);
             break;
         case MINUTE:
-            sprintf(rp->tmpstr, "%2d", (RTC_GetTimeValue(time) / 60) % 60);
+            sprintf(tempstring, "%2d", (RTC_GetTimeValue(time) / 60) % 60);
             break;
         case HOUR: {
             u32 value = RTC_GetTimeValue(time) / 3600;
@@ -110,27 +110,27 @@ const char *rtc_show_val_cb(guiObject_t *obj, const void *data)
                 u8 hour = value % 12;
                 if (hour == 0)
                     hour = 12;
-                sprintf(rp->tmpstr, "%2d %s", hour, value > 12? "PM" : "AM");
+                sprintf(tempstring, "%2d %s", hour, value > 12? "PM" : "AM");
             } else {
-                sprintf(rp->tmpstr, "%2d", value % 24);
+                sprintf(tempstring, "%2d", value % 24);
             }
             break;
         }
         case DAY:
-            RTC_GetDateStringLong(rp->tmpstr, time);
-            rp->tmpstr[rp->tmpstr[1] == '.' ? 1 : 2] = 0;
+            RTC_GetDateStringLong(tempstring, time);
+            tempstring[tempstring[1] == '.' ? 1 : 2] = 0;
             break;
         case MONTH:
-            RTC_GetDateStringLong(rp->tmpstr, time);
-            int idx = (rp->tmpstr[1] == '.' ? 1 : 2);
-            rp->tmpstr[idx+3] = 0;
-            if (rp->tmpstr[idx + 1] == '0') idx++;
-            return rp->tmpstr + idx + 1;
+            RTC_GetDateStringLong(tempstring, time);
+            int idx = (tempstring[1] == '.' ? 1 : 2);
+            tempstring[idx+3] = 0;
+            if (tempstring[idx + 1] == '0') idx++;
+            return tempstring + idx + 1;
         case YEAR:
-            RTC_GetDateStringLong(rp->tmpstr, time);
-            return rp->tmpstr + (rp->tmpstr[1] == '.' ? 1 : 2) + 4;
+            RTC_GetDateStringLong(tempstring, time);
+            return tempstring + (tempstring[1] == '.' ? 1 : 2) + 4;
     }
-    return rp->tmpstr;
+    return tempstring;
 }
 
 static const char *rtc_text_cb(guiObject_t *obj, const void *data)
@@ -149,20 +149,20 @@ static const char *rtc_text_cb(guiObject_t *obj, const void *data)
         case MONTH:      return _tr("Month");
         case YEAR:       return _tr("Year");
         case ACTTIME: {
-            RTC_GetTimeFormatted(rp->tmpstr, RTC_GetValue());
-            return rp->tmpstr;
+            RTC_GetTimeFormatted(tempstring, RTC_GetValue());
+            return tempstring;
         }
         case ACTDATE: {
-            RTC_GetDateFormatted(rp->tmpstr, RTC_GetValue());
-            return rp->tmpstr;
+            RTC_GetDateFormatted(tempstring, RTC_GetValue());
+            return tempstring;
         }
         case NEWTIME: {
-            RTC_GetTimeFormatted(rp->tmpstr, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
-            return rp->tmpstr;
+            RTC_GetTimeFormatted(tempstring, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
+            return tempstring;
         }
         case NEWDATE: {
-            RTC_GetDateFormatted(rp->tmpstr, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
-            return rp->tmpstr;
+            RTC_GetDateFormatted(tempstring, RTC_GetSerial(Rtc.value[YEAR], Rtc.value[MONTH], Rtc.value[DAY], Rtc.value[HOUR], Rtc.value[MINUTE], Rtc.value[SECOND]));
+            return tempstring;
         }
         case TIMEBUTTON:   return _tr("Set time");
         case DATEBUTTON:   return _tr("Set date");
@@ -282,24 +282,24 @@ static const char *rtc_val_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(&gui->newdate);
         }
         if (idx == YEAR)
-            sprintf(rp->tmpstr, "%4d", Rtc.value[idx]);
+            sprintf(tempstring, "%4d", Rtc.value[idx]);
         else if (idx == HOUR) {
             u8 tmp = Rtc.value[HOUR];
             if (Transmitter.rtcflags & CLOCK12HR) {
                 tmp %= 12;
                 if (tmp == 0)
                     tmp = 12;
-                sprintf(rp->tmpstr, "%2d %s", tmp, Rtc.value[HOUR] >= 12? "pm" : "am");
+                sprintf(tempstring, "%2d %s", tmp, Rtc.value[HOUR] >= 12? "pm" : "am");
             } else {
-                sprintf(rp->tmpstr, "%2d", tmp);
+                sprintf(tempstring, "%2d", tmp);
             }
         }
         else if (idx == MONTH)
-            RTC_GetMonthFormatted(rp->tmpstr, Rtc.value[MONTH]);
+            RTC_GetMonthFormatted(tempstring, Rtc.value[MONTH]);
         else
-            sprintf(rp->tmpstr, "%2d", Rtc.value[idx]);
+            sprintf(tempstring, "%2d", Rtc.value[idx]);
     }
-    return rp->tmpstr;
+    return tempstring;
 }
 
 #endif

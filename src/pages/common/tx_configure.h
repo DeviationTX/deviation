@@ -11,6 +11,5 @@ struct tx_configure_page {
     struct touch coords1;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     void(*return_page)(int page);
-    char tmpstr[30];
 };
 #endif

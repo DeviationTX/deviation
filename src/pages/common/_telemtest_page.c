@@ -22,7 +22,7 @@
 
 static u8 telem_state_check()
 {
-    if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
+    if (PAGE_TelemStateCheck(tempstring, sizeof(tempstring))==0) {
         memset(gui, 0, sizeof(*gui));
         return 0;
     }
@@ -33,16 +33,16 @@ static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u32 val = (long)data;
-    return TELEMETRY_GetValueStr(tp.str, val);
+    return TELEMETRY_GetValueStr(tempstring, val);
 }
 
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long val = (long)data;
-    char str[25];
-    sprintf(tp.str, "%s:", TELEMETRY_ShortName(str, val));
-    return tp.str;
+    TELEMETRY_ShortName(tempstring, val);
+    strcpy(tempstring + strlen(tempstring), ":");
+    return tempstring;
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)

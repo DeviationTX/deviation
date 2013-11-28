@@ -53,16 +53,16 @@ static const char *set_type_cb(guiObject_t *obj, int dir, void *data)
     }
     switch (drexp_type) {
     case DREXP_AIL:
-        strcpy(mp->tmpstr, (const char *)_tr("AIL"));
+        strcpy(tempstring, (const char *)_tr("AIL"));
         break;
     case DREXP_ELE:
-        strcpy(mp->tmpstr, (const char *)_tr("ELE"));
+        strcpy(tempstring, (const char *)_tr("ELE"));
         break;
     default:
-        strcpy(mp->tmpstr, (const char *)_tr("RUD"));
+        strcpy(tempstring, (const char *)_tr("RUD"));
         break;
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static const char *set_dr_cb(guiObject_t *obj, int dir, void *data)
@@ -76,17 +76,17 @@ static const char *set_dr_cb(guiObject_t *obj, int dir, void *data)
         current_pit_mode = pit_mode;
         update_graph(pit_mode);
     }
-    sprintf(mp->tmpstr, "%d", mp->mixer_ptr[pit_mode]->scalar);
-    strcat(mp->tmpstr, "%");
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", mp->mixer_ptr[pit_mode]->scalar);
+    strcat(tempstring, "%");
+    return tempstring;
 }
 
 const char *drexplabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 i = (long)data;
-    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Position %d"), i);
-    return mp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Position %d"), i);
+    return tempstring;
 }
 
 static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
@@ -102,12 +102,12 @@ static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
         update_graph(pit_mode);
     }
     if (curve->points[0] == 0)
-        strcpy(mp->tmpstr, _tr("LIN"));
+        strcpy(tempstring, _tr("LIN"));
     else {
-        sprintf(mp->tmpstr, "%d", curve->points[0]);
-        strcat(mp->tmpstr, "%");
+        sprintf(tempstring, "%d", curve->points[0]);
+        strcat(tempstring, "%");
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)

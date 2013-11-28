@@ -98,7 +98,7 @@ const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
         TIMER_Reset(idx);
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(resetsrc));
-    return INPUT_SourceName(tp->tmpstr, resetsrc);
+    return INPUT_SourceName(tempstring, resetsrc);
 }
 
 void toggle_resetsrc_cb(guiObject_t *obj, void *data)
@@ -116,8 +116,8 @@ const char *timer_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Timer%d"), i + 1);
-    return tp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Timer%d"), i + 1);
+    return tempstring;
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -143,7 +143,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     if (0 && Model.mixer_mode == MIXER_STANDARD)  {
         return MIXER_SRC(src) ? _tr("On") : _tr("Off");
     }
-    return INPUT_SourceName(tp->tmpstr, src);
+    return INPUT_SourceName(tempstring, src);
 }
 
 void toggle_timertype_cb(guiObject_t *obj, void *data)
@@ -185,9 +185,9 @@ const char *show_timerperm_cb(guiObject_t *obj, const void *data)
   (void)obj;
   u8 idx = (long)data;
   if (idx & 0x80)
-      snprintf(tp->tmpstr, sizeof(tp->tmpstr), _tr("Set to"));
+      snprintf(tempstring, sizeof(tempstring), _tr("Set to"));
   else
-      TIMER_SetString(tp->tmpstr,(long)Model.timer[idx & 0x7f].val);
-  return tp->tmpstr;
+      TIMER_SetString(tempstring,(long)Model.timer[idx & 0x7f].val);
+  return tempstring;
 }
 

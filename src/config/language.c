@@ -18,6 +18,10 @@
 #include "tx.h"
 #include "ini.h"
 
+/* String long enough to hold every used string in the code
+   defined as extern char tempstring[TEMPSTRINGLENGTH] in common.h */
+char tempstring[TEMPSTRINGLENGTH];
+
 #ifdef NO_LANGUAGE_SUPPORT
 int CONFIG_IniParse(const char* filename,
          int (*handler)(void*, const char*, const char*, const char*),
@@ -32,6 +36,11 @@ u16 fnv_16_str(const char *str);
 static char strings[8192];
 #define MAX_STRINGS 360
 #define MAX_LINE 300
+
+/* tempstring[] must be at least long as line[], otherwise they are too small/big to fit in each other */
+#if MAX_LINE > TEMPSTRINGLENGTH
+    #error "MAX_LINE > TEMPSTRINGLENGTH in language.c - CRITICAL - check length of tmpstring[] here and in common.h"
+#endif
 
 #define dbg_printf if(0) printf
 static struct str_map {

@@ -68,7 +68,7 @@ void PAGE_TelemconfigInit(int page)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tp.str);
+        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         OBJ_SET_USED(&gui->value, 0);  // A indication not allow to scroll up/down
         return;
     }
@@ -88,8 +88,8 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf(tp.str, "%d", idx+1);
-    return tp.str;
+    sprintf(tempstring, "%d", idx+1);
+    return tempstring;
 }
 
 static u8 _action_cb(u32 button, u8 flags, void *data)

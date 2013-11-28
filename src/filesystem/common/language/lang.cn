@@ -2,10 +2,10 @@
 :# Channels
 通道数
 >:%d bytes left
-:%s is %d%%, safe value = %d%%\n
-%s当前值为%d%%, 安全开机设定为%d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s当前值为%d%%,\n安全开机设定为%d%%
+: is %d%%, safe value = %d%%\n
+当前值为%d%%, 安全开机设定为%d%%\n
+: is %d%%,\nsafe value = %d%%
+当前值为%d%%,\n安全开机设定为%d%%
 >:1 sec
 :1-to-1
 45度曲线

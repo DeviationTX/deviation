@@ -2,10 +2,10 @@
 :# Channels
 通道數
 >:%d bytes left
-:%s is %d%%, safe value = %d%%\n
-%s = %d%%,熄火保護 = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s = %d%%,\n熄火保護 = %d%%\n
+: is %d%%, safe value = %d%%\n
+ = %d%%,熄火保護 = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ = %d%%,\n熄火保護 = %d%%\n
 >:1 sec
 :1-to-1
 等比例

@@ -54,23 +54,23 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int width; int height;
     u16 txt_w, txt_h;
-    strcpy(mp->tmpstr, (const char *)data);
+    strcpy(tempstring, (const char *)data);
     GUI_GetSize(obj, &width, &height);
     width -=2;
     while(1) {
-        LCD_GetStringDimensions((const u8 *)mp->tmpstr, &txt_w, &txt_h);
+        LCD_GetStringDimensions((const u8 *)tempstring, &txt_w, &txt_h);
         if (txt_w > width) {
-            int len = strlen(mp->tmpstr);
-            if (mp->tmpstr[len-1] == '.')
+            int len = strlen(tempstring);
+            if (tempstring[len-1] == '.')
                 len--;
-            mp->tmpstr[len-3] = '.';
-            mp->tmpstr[len-2] = '.';
-            mp->tmpstr[len-1] = '\0';
+            tempstring[len-3] = '.';
+            tempstring[len-2] = '.';
+            tempstring[len-1] = '\0';
         } else {
             break;
         }
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 const char *show_bindtext_cb(guiObject_t *obj, const void *data)
@@ -163,8 +163,8 @@ static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Model.num_channels = GUI_TextSelectHelper(Model.num_channels, 1, PROTOCOL_NumChannels(), dir, 1, 1, NULL);
-    sprintf(mp->tmpstr, "%d", Model.num_channels);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", Model.num_channels);
+    return tempstring;
 }
 
 static const char *powerselect_cb(guiObject_t *obj, int dir, void *data)
@@ -266,8 +266,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         return _tr("None");
     if(PROTOCOL_HasModule(Model.protocol))
         return ProtocolNames[Model.protocol];
-    sprintf(mp->tmpstr, "*%s", ProtocolNames[Model.protocol]);
-    return mp->tmpstr;
+    sprintf(tempstring, "*%s", ProtocolNames[Model.protocol]);
+    return tempstring;
 }
 void proto_press_cb(guiObject_t *obj, void *data)
 {

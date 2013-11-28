@@ -150,11 +150,11 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     if (cp->type == MONITOR_RAWINPUT) {
-       INPUT_SourceName(cp->tmpstr, ch+1);
+       INPUT_SourceName(tempstring, ch+1);
     } else {
-       sprintf(cp->tmpstr, "%d", (int)ch+1);
+       sprintf(tempstring, "%d", (int)ch+1);
     }
-    return cp->tmpstr;
+    return tempstring;
 }
 
 static const char *_title_cb(guiObject_t *obj, const void *data)
@@ -162,22 +162,22 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, (const char *)_tr("Stick input"));
+        strcpy(tempstring, (const char *)_tr("Stick input"));
     } else {
-        strcpy(cp->tmpstr, (const char *)_tr("Channel output"));
+        strcpy(tempstring, (const char *)_tr("Channel output"));
     }
-    return cp->tmpstr;
+    return tempstring;
 }
 
 static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    strcpy(cp->tmpstr, (const char *)"->");  //this is actually used as an icon don't translate t
+    strcpy(tempstring, (const char *)"->");  //this is actually used as an icon don't translate t
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(cp->tmpstr, (const char *)"<-");
+        strcpy(tempstring, (const char *)"<-");
     }
-    return cp->tmpstr;
+    return tempstring;
 }
 void _handle_button_test() {}
 

@@ -24,13 +24,13 @@ const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data)
     if (ch < PROTO_MAP_LEN && ProtocolChannelMap[Model.protocol]) {
         char tmp1[30];
         INPUT_SourceNameAbbrevSwitch(tmp1, ProtocolChannelMap[Model.protocol][ch]);
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d-%s", ch+1, tmp1);
+        snprintf(tempstring, sizeof(tempstring), "%d-%s", ch+1, tmp1);
     }
     else if (ch == 5)
-        snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%d-%s",  ch+1, _tr("PIT"));  // aux1
+        snprintf(tempstring, sizeof(tempstring), "%d-%s",  ch+1, _tr("PIT"));  // aux1
     else
-        sprintf(mp->tmpstr, "%d-%s%d",ch+1, "AUX", ch -4); //AUX no need to translate
-    return mp->tmpstr;
+        sprintf(tempstring, "%d-%s%d",ch+1, "AUX", ch -4); //AUX no need to translate
+    return tempstring;
 }
 
 int STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count)
@@ -84,7 +84,7 @@ const char *STDMIX_TitleString(guiObject_t *obj, const void *data)
     (void)obj;
     int pageid = ((unsigned long)data) & 0xFFFF;
     int sw     = (((unsigned long)data) >> 16) & 0xFFFF;
-    sprintf(mp->tmpstr, "%s - ", PAGE_GetName(pageid));
-    INPUT_SourceNameAbbrevSwitch(mp->tmpstr+strlen(mp->tmpstr), mapped_std_channels.switches[sw]);
-    return mp->tmpstr;
+    sprintf(tempstring, "%s - ", PAGE_GetName(pageid));
+    INPUT_SourceNameAbbrevSwitch(tempstring+strlen(tempstring), mapped_std_channels.switches[sw]);
+    return tempstring;
 }

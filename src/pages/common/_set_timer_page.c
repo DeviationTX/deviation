@@ -38,14 +38,14 @@ const char * timer_value_str_cb(guiObject_t *obj, const void *data)
     (void)obj;
     switch ((long)data) {
         case OLD_TIMER:
-            TIMER_SetString(tp->tmpstr, permanent.oldvalue);
-            return tp->tmpstr;
+            TIMER_SetString(tempstring, permanent.oldvalue);
+            return tempstring;
         case ADD_TIMER:
-            TIMER_SetString(tp->tmpstr, ((permanent.hour * 60 + permanent.minute) * 60 + permanent.second) * 1000);
-            return tp->tmpstr;
+            TIMER_SetString(tempstring, ((permanent.hour * 60 + permanent.minute) * 60 + permanent.second) * 1000);
+            return tempstring;
         case NEW_TIMER:
-            TIMER_SetString(tp->tmpstr, permanent.newvalue);
-            return tp->tmpstr;
+            TIMER_SetString(tempstring, permanent.newvalue);
+            return tempstring;
         case ADD_BUTTON:
             return _tr("Add");
         case SET_BUTTON:

@@ -20,7 +20,7 @@ static inline guiObject_t *_get_obj(int idx, int objid);
 
 static u8 telem_state_check()
 {
-    if (PAGE_TelemStateCheck(tp.str, sizeof(tp.str))==0) {
+    if (PAGE_TelemStateCheck(tempstring, sizeof(tempstring))==0) {
         return 0;
     }
     return 1;
@@ -29,8 +29,8 @@ static u8 telem_state_check()
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    snprintf(tp.str, sizeof(tp.str), "%s%d", _tr("Alarm"), (int)((long)data)+1);
-    return tp.str;
+    snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Alarm"), (int)((long)data)+1);
+    return tempstring;
 }
 
 static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
@@ -45,7 +45,7 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
         if (valObj)
             GUI_Redraw(valObj);
     }
-    return TELEMETRY_ShortName(tp.str, Model.telem_alarm[val]);
+    return TELEMETRY_ShortName(tempstring, Model.telem_alarm[val]);
 }
 
 static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
@@ -83,7 +83,7 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
 
     Model.telem_alarm_val[val] = GUI_TextSelectHelper(Model.telem_alarm_val[val],
         0, max, dir, small_step, big_step, NULL);
-    return TELEMETRY_GetValueStrByValue(tp.str, Model.telem_alarm[val], Model.telem_alarm_val[val]);
+    return TELEMETRY_GetValueStrByValue(tempstring, Model.telem_alarm[val], Model.telem_alarm_val[val]);
 }
 
 void PAGE_TelemconfigEvent() {

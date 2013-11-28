@@ -233,8 +233,8 @@ const char *PAGEMIXER_SetNumberCB(guiObject_t *obj, int dir, void *data)
     (void)obj;
     s8 *value = (s8 *)data;
     *value = GUI_TextSelectHelper(*value, -100, 100, dir, 1, LONG_PRESS_STEP, NULL);
-    sprintf(mp->tmpstr, "%d", *value);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", *value);
+    return tempstring;
 }
 
 void sync_mixers()
@@ -293,18 +293,18 @@ const char *set_number100_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     s8 *value = (s8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
-        sprintf(mp->tmpstr, "%d", *value);
-        return mp->tmpstr;
+        sprintf(tempstring, "%d", *value);
+        return tempstring;
     }
     s8 min = -125; //(value == &mp->limit.max) ? mp->limit.min : -100;
     s8 max = 125; //(value == &mp->limit.min) ? mp->limit.max : 100;
     *value = GUI_TextSelectHelper(*value, min, max, dir, 1, 5, &changed);
-    sprintf(mp->tmpstr, "%d", *value);
+    sprintf(tempstring, "%d", *value);
     if (changed) {
         sync_mixers();
         MIXPAGE_RedrawGraphs();
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 const char *set_mux_cb(guiObject_t *obj, int dir, void *data)
@@ -351,8 +351,8 @@ const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_RedrawGraphs();
         sync_mixers();
     }
-    sprintf(mp->tmpstr, "%d", mp->num_mixers);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", mp->num_mixers);
+    return tempstring;
 }
 
 const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
@@ -367,8 +367,8 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
         _show_complex(1);
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     }
-    sprintf(mp->tmpstr, "%d", cur);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", cur);
+    return tempstring;
 }
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
@@ -376,8 +376,8 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 *source = (u8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
-        strcpy(mp->tmpstr, _tr("None"));
-        return mp->tmpstr;
+        strcpy(tempstring, _tr("None"));
+        return tempstring;
     }
     u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
@@ -397,7 +397,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
@@ -424,7 +424,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
         }
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
-    return INPUT_SourceName(mp->tmpstr, *source);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 static void set_src_enable(int curve_type)
@@ -452,8 +452,8 @@ static void set_src_enable(int curve_type)
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
     if (!GUI_IsTextSelectEnabled(obj)) {
-        strcpy(mp->tmpstr, _tr("Linked"));
-        return mp->tmpstr;
+        strcpy(tempstring, _tr("Linked"));
+        return tempstring;
     }
     u8 changed;
     struct Mixer *mix = (struct Mixer *)data;
@@ -466,7 +466,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
         MIXPAGE_RedrawGraphs();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, type > CURVE_FIXED);
-    return CURVE_GetName(mp->tmpstr, &mix->curve);
+    return CURVE_GetName(tempstring, &mix->curve);
 }
 
 void sourceselect_cb(guiObject_t *obj, void *data)
@@ -505,8 +505,8 @@ static const char *reorder_text_cb(u8 idx)
         return "";
     if(idx == 255)
         return _tr("New");
-    snprintf(mp->tmpstr, sizeof(mp->tmpstr), "%s %d", _tr("Mixer"), idx);
-    return mp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), "%s %d", _tr("Mixer"), idx);
+    return tempstring;
 }
 static void reorder_return_cb(u8 *list)
 {
@@ -569,6 +569,6 @@ static const char *scalestring_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long v = (long)data;
-    snprintf(mp->tmpstr, sizeof(mp->tmpstr), _tr("Scale%s"), v == 0 ? "" : v == 1 ? "1" : "2");
-    return mp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Scale%s"), v == 0 ? "" : v == 1 ? "1" : "2");
+    return tempstring;
 }

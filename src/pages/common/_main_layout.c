@@ -68,15 +68,15 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    return GetBoxSource(lp.tmp, pc.elem[i].src);
+    return GetBoxSource(tempstring, pc.elem[i].src);
 }
 
 const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int idx = (long)data;
-    sprintf(lp.tmp, "%d", idx+1);
-    return lp.tmp;
+    sprintf(tempstring, "%d", idx+1);
+    return tempstring;
 }
 
 void touch_cb(guiObject_t *obj, s8 press, const void *data)

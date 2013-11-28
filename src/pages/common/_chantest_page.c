@@ -100,8 +100,8 @@ static const char *value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    sprintf(cp->tmpstr, "%d", cp->pctvalue[ch]);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", cp->pctvalue[ch]);
+    return tempstring;
 }
 
 static const char *channum_cb(guiObject_t *obj, const void *data)
@@ -109,7 +109,7 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     if (cp->type) {
-        char *p = cp->tmpstr;
+        char *p = tempstring;
         if (ch & 0x01) {
             *p = '\n';
             p++;
@@ -121,7 +121,7 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
             sprintf(p + strlen(p), "\n");
         }
     } else {
-       sprintf(cp->tmpstr, "\n%d", (int)ch+1);
+       sprintf(tempstring, "\n%d", (int)ch+1);
     }
-    return cp->tmpstr;
+    return tempstring;
 }

@@ -26,9 +26,9 @@ const char *title_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    sprintf(mp->tmpstr, "%s - ", PAGE_GetName(PAGEID_GYROSENSE));
-    INPUT_SourceNameAbbrevSwitch(mp->tmpstr+strlen(mp->tmpstr), mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
-    return mp->tmpstr;
+    sprintf(tempstring, "%s - ", PAGE_GetName(PAGEID_GYROSENSE));
+    INPUT_SourceNameAbbrevSwitch(tempstring+strlen(tempstring), mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);
+    return tempstring;
 }
 
 void PAGE_GyroSenseInit(int page)

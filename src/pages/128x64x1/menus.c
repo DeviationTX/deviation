@@ -161,8 +161,8 @@ const char *idx_string_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     u8 idx = (long)data;
-    sprintf(mp->tmpstr, "%d.", idx);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d.", idx);
+    return tempstring;
 }
 
 static u8 action_cb(u32 button, u8 flags, void *data)

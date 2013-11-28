@@ -37,14 +37,14 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
             Model.limits[mapped_std_channels.throttle].safetysw = 0;
     }
     if (throhold_state == 1) {
-        strcpy(mp->tmpstr, (const char *)_tr("On"));
+        strcpy(tempstring, (const char *)_tr("On"));
         GUI_TextSelectEnable(&gui->value, 1);
     }
     else {
-        strcpy(mp->tmpstr, (const char *)_tr("Off"));
+        strcpy(tempstring, (const char *)_tr("Off"));
         GUI_TextSelectEnable(&gui->value, 0);
     }
-    return mp->tmpstr;
+    return tempstring;
 }
 
 static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
@@ -56,6 +56,6 @@ static const char *holdpostion_cb(guiObject_t *obj, int dir, void *data)
     Model.limits[mapped_std_channels.throttle].safetyval =
             GUI_TextSelectHelper(Model.limits[mapped_std_channels.throttle].safetyval,
                     -SAFETYVALUE_RANGE, SAFETYVALUE_RANGE, dir, 1, LONG_PRESS_STEP, NULL);
-    sprintf(mp->tmpstr, "%d", Model.limits[mapped_std_channels.throttle].safetyval);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", Model.limits[mapped_std_channels.throttle].safetyval);
+    return tempstring;
 }

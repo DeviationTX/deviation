@@ -39,6 +39,6 @@ const char *set_failsafe_cb(guiObject_t *obj, int dir, void *data)
 
     Model.limits[ch].failsafe =
             GUI_TextSelectHelper(Model.limits[ch].failsafe, -125, 125, dir, 1, LONG_PRESS_STEP, NULL);
-    sprintf(mp->tmpstr, "%d", Model.limits[ch].failsafe);
-    return mp->tmpstr;
+    sprintf(tempstring, "%d", Model.limits[ch].failsafe);
+    return tempstring;
 }

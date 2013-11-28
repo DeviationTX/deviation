@@ -3,10 +3,10 @@
 Aantal Kanale
 :%d bytes left
 %d Bytes oor
-:%s is %d%%, safe value = %d%%\n
-%s %d%%, veilige waarde = %d%%\n
-:%s is %d%%,\nsafe value = %d%%
-%s %d%%,\nveilige waarde = %d%%
+: is %d%%, safe value = %d%%\n
+ %d%%, veilige waarde = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ %d%%,\nveilige waarde = %d%%
 :1 sec
 1 sek
 :1-to-1

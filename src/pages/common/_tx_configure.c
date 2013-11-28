@@ -81,7 +81,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                     Transmitter.calibration[i].min = 0xFFFF;
                     Transmitter.calibration[i].zero = value;
                 }
-                snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
+                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Move sticks and knobs\nto max & min positions\nthen press ENT"));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_MAXMIN;
                 break;
@@ -89,7 +89,7 @@ static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
                 for (i = 0; i < INP_HAS_CALIBRATION; i++) {
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
-                snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s", _tr("Calibration done."));
+                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Calibration done."));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_SUCCESS;
                 break;
@@ -114,9 +114,9 @@ static void calibrate_sticks(void)
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
-    snprintf(cp->tmpstr, sizeof(cp->tmpstr), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
+    snprintf(tempstring, sizeof(tempstring), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
     GUI_CreateLabelBox(&guic->msg, 1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
-            LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, cp->tmpstr);
+            LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, tempstring);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
     while(1) {
@@ -172,8 +172,8 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     Transmitter.mode = GUI_TextSelectHelper(Transmitter.mode, MODE_1, MODE_4, dir, 1, 1, NULL);
-    snprintf(cp->tmpstr, sizeof(cp->tmpstr), _tr("Mode %d"), Transmitter.mode);
-    return cp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), _tr("Mode %d"), Transmitter.mode);
+    return tempstring;
 }
 
 static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
@@ -187,8 +187,8 @@ static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
         BACKLIGHT_Brightness(Transmitter.brightness);
     if (Transmitter.brightness == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", Transmitter.brightness);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", Transmitter.brightness);
+    return tempstring;
 }
 
 static const char *common_select_cb(guiObject_t *obj, int dir, void *data)
@@ -200,8 +200,8 @@ static const char *common_select_cb(guiObject_t *obj, int dir, void *data)
     }
     if (*unsigned_data == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", *unsigned_data);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", *unsigned_data);
+    return tempstring;
 }
 
 static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
@@ -222,8 +222,8 @@ static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data)
     }
     if (dimobj)
         GUI_TextSelectEnable((guiTextSelect_t *)dimobj, 1);
-    TIMER_SetString(cp->tmpstr, Transmitter.auto_dimmer.timer);
-    return cp->tmpstr;
+    TIMER_SetString(tempstring, Transmitter.auto_dimmer.timer);
+    return tempstring;
 }
 
 static const char *prealert_time_cb(guiObject_t *obj, int dir, void *data)
@@ -238,8 +238,8 @@ static const char *prealert_time_cb(guiObject_t *obj, int dir, void *data)
         Transmitter.countdown_timer_settings.prealert_time = prealert_time * 1000;
     if (prealert_time == 0)
         return _tr("Off");
-    TIMER_SetString(cp->tmpstr, Transmitter.countdown_timer_settings.prealert_time);
-    return cp->tmpstr;
+    TIMER_SetString(tempstring, Transmitter.countdown_timer_settings.prealert_time);
+    return tempstring;
 }
 
 static const char *timer_interval_cb(guiObject_t *obj, int dir, void *data)
@@ -253,8 +253,8 @@ static const char *timer_interval_cb(guiObject_t *obj, int dir, void *data)
         *value = interval * 1000;
     if (interval == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", interval);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", interval);
+    return tempstring;
 }
 
 static const char *poweralarm_select_cb(guiObject_t *obj, int dir, void *data)
@@ -266,8 +266,8 @@ static const char *poweralarm_select_cb(guiObject_t *obj, int dir, void *data)
             0 , MAX_POWER_ALARM, dir, 1 , 5 , &changed);
     if( 0 == Transmitter.power_alarm)
 	return _tr("Off");
-    sprintf(cp->tmpstr, "%2dmn", Transmitter.power_alarm);
-    return cp->tmpstr;
+    sprintf(tempstring, "%2dmn", Transmitter.power_alarm);
+    return tempstring;
 }
 
 static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
@@ -277,8 +277,8 @@ static const char *batalarm_select_cb(guiObject_t *obj, int dir, void *data)
     u8 changed;
     Transmitter.batt_alarm = GUI_TextSelectHelper(Transmitter.batt_alarm, 
             MIN_BATTERY_ALARM, MAX_BATTERY_ALARM, dir, MIN_BATTERY_ALARM_STEP, 500, &changed);
-    sprintf(cp->tmpstr, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
-    return cp->tmpstr;
+    sprintf(tempstring, "%2d.%02dV", Transmitter.batt_alarm / 1000, (Transmitter.batt_alarm % 1000) / 10);
+    return tempstring;
 }
 
 static const char *batalarmwarn_select_cb(guiObject_t *obj, int dir, void *data)
@@ -293,8 +293,8 @@ static const char *batalarmwarn_select_cb(guiObject_t *obj, int dir, void *data)
         Transmitter.batt_warning_interval = batt_warning;
     if( 0 == batt_warning)
 	return _tr("Off");
-    TIMER_SetString(cp->tmpstr, Transmitter.batt_warning_interval * 1000);
-    return cp->tmpstr;
+    TIMER_SetString(tempstring, Transmitter.batt_warning_interval * 1000);
+    return tempstring;
 }
 
 static void press_cb(guiObject_t *obj, const void *data)
@@ -394,6 +394,6 @@ static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data)
     }
     if (*unsigned_data == 0)
         return _tr("Off");
-    sprintf(cp->tmpstr, "%d", *unsigned_data);
-    return cp->tmpstr;
+    sprintf(tempstring, "%d", *unsigned_data);
+    return tempstring;
 }

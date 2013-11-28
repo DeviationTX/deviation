@@ -176,23 +176,23 @@ const char *show_set_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    snprintf(tp->tmpstr, sizeof(tp->tmpstr), "%s", _tr("Date / Time"));
-    return tp->tmpstr;
+    snprintf(tempstring, sizeof(tempstring), "%s", _tr("Date / Time"));
+    return tempstring;
 }
 
 const char *show_time_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    RTC_GetTimeString(tp->tmpstr, RTC_GetValue());
-    return tp->tmpstr;
+    RTC_GetTimeString(tempstring, RTC_GetValue());
+    return tempstring;
 }
 
 const char *show_date_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    RTC_GetDateStringLong(tp->tmpstr, RTC_GetValue());
-    return tp->tmpstr;
+    RTC_GetDateStringLong(tempstring, RTC_GetValue());
+    return tempstring;
 }
 #endif

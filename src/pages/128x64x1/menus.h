@@ -9,7 +9,6 @@ typedef enum
 
 struct menu_page {
     u16 *current_selected;
-    char tmpstr[20];
 };
 
 #endif /* MENUS_H_ */
