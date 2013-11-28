@@ -116,7 +116,7 @@ static const char *string_cb(u8 idx, void *data)
             return _tr("Default");
         if (! get_idx_filename("modelico", ".bmp", idx-1, ""))
             return _tr("Unknown");
-        return tempstring;
+        return tempstring;  //tempstring[] set in get_idx_filename()
     } else if ((long)data == LOAD_LAYOUT) {
         if (idx >= mp->file_state)
             sprintf(tempstring, "models/model%d.ini", idx + 1 - mp->file_state);
@@ -130,19 +130,20 @@ static const char *string_cb(u8 idx, void *data)
         }
         sprintf(tempstring, "models/model%d.ini", idx + 1);
     }
-    fh = fopen(tempstring, "r");
+    fh = fopen(tempstring, "r");  //tempstring[] set in get_idx_filename() or above with sprintf()
     sprintf(tempstring, "%d: NONE", idx + 1);
     if (fh) {
         long user = idx + 1;
         if ((long)data == LOAD_TEMPLATE)
             user = -user;
-        ini_parse_file(fh, ini_handle_name, (void *)user);
+        ini_parse_file(fh, ini_handle_name, (void *)user);  //tempstring[] is newly set in ini_handle_name()
         fclose(fh);
     }
     if ((long)data == LOAD_LAYOUT && idx >= mp->file_state)
         strcat(tempstring + strlen(tempstring), "(M)");
     return tempstring;
 }
+
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     int msg = (long)data;
@@ -166,7 +167,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     } else if (msg == LOAD_TEMPLATE + 1) {
         /* Load Template */
         get_idx_filename("template", ".ini", mp->selected-1, "");
-        CONFIG_ReadTemplate(tempstring);
+        CONFIG_ReadTemplate(tempstring);  //tempstring[] set in get_idx_filename()
     } else if (msg == LOAD_ICON + 1) {
         if (mp->selected == 1)
             Model.icon[0] = 0;
@@ -179,7 +180,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         } else {
             get_idx_filename("layout", ".ini", mp->selected-1, "layout/");
         }
-        CONFIG_ReadLayout(tempstring);
+        CONFIG_ReadLayout(tempstring);  //tempstring[] set in get_idx_filename() or above with sprintf()
     }
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
