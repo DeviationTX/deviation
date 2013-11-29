@@ -20,6 +20,8 @@
 #include "mixer.h"
 #include "mixer_standard.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -121,3 +123,4 @@ void PAGE_DrExpCurvesEvent()
         }
     }
 }
+#endif //HAS_STANDARD_GUI

@@ -49,12 +49,8 @@ else
    SRC_C    := $(SRC_C) $(wildcard protocol/*.c)
 endif
 
-ifndef NO_STANDARD_GUI
-   SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
-endif
-ifndef NO_ADVANCED_GUI
-   SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
-endif
+SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
+SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
 
 SRC_S    := $(SRC_S) $(wildcard *.s)
 SRC_CXX  := $(SRC_CXX) $(wildcard *.cpp)

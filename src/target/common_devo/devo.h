@@ -3,6 +3,13 @@
 
 #include "ports.h"
 
+#ifndef HAS_STANDARD_GUI
+    #define HAS_STANDARD_GUI 1
+#endif
+#ifndef HAS_ADVANCED_GUI
+    #define HAS_ADVANCED_GUI 1
+#endif
+
 void ADC_Init(void);
 void ADC_StartCapture();
 

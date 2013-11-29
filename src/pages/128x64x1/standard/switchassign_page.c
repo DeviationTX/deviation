@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_switchassign_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -99,3 +101,4 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+#endif //HAS_STANDARD_GUI

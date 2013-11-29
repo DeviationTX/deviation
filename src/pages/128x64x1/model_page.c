@@ -109,7 +109,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("# Channels");
             ts_value = numchanselect_cb;
             break;
-#if !defined(NO_STANDARD_GUI)
+#if HAS_STANDARD_GUI
         case ITEM_GUI:
             label = _tr_noop("Mixer GUI");
             ts_value = mixermode_cb;

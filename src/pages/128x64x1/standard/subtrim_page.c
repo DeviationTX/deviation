@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_subtrim_page.c"
 
 static const struct page_defs subtrim_defs = {
@@ -30,3 +31,4 @@ void PAGE_SubtrimInit(int page)
     (void)page;
     STANDARD_Init(&subtrim_defs);
 }
+#endif //HAS_STANDARD_GUI

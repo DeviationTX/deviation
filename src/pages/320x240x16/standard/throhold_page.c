@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_throhold_page.c"
 
 #define gui (&gui_objs.u.stdthold)
@@ -48,3 +50,4 @@ void PAGE_ThroHoldInit(int page)
     GUI_CreateLabelBox(&gui->valuelbl, COL1, ROW2, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
     GUI_CreateTextSelect(&gui->value, COL2, ROW2, TEXTSELECT_128, NULL, holdpostion_cb,  NULL);
 }
+#endif //HAS_STANDARD_GUI

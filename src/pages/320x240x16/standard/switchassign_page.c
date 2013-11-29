@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_switchassign_page.c"
 
 static const char *switch_cb2(guiObject_t *obj, int dir, void *data)
@@ -63,4 +65,4 @@ void PAGE_SwitchAssignInit(int page)
     GUI_CreateLabelBox(&gui->drrudlbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL,  _tr("D/R&Exp -RUD"));
     GUI_CreateTextSelect(&gui->drrud, COL2, row, TEXTSELECT_128, NULL, switch_cb2, (void *)(long)SWITCHFUNC_DREXP_RUD);
 }
-
+#endif //HAS_STANDARD_GUI

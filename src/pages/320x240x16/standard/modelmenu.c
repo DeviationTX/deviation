@@ -17,6 +17,8 @@
 #include "../pages.h"
 #include "gui/gui.h"
 
+#if HAS_STANDARD_GUI
+
 #define gui (&gui_objs.u.stdmenu)
 
 struct menu_s {
@@ -80,4 +82,4 @@ void MODELMENU_Show(guiObject_t *obj, const void *data)
     (void)data;
     PAGE_ChangeByID(PAGEID_MODELMENU);
 }
-
+#endif //HAS_STANDARD_GUI

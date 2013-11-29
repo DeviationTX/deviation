@@ -20,6 +20,8 @@
 #include "mixer.h"
 #include "mixer_standard.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
 guiObject_t *scroll_bar;
@@ -105,3 +107,4 @@ void PAGE_DrExpCurvesEvent()
         }
     }
 }
+#endif //HAS_STANDARD_GUI
