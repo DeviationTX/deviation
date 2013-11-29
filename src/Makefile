@@ -104,6 +104,9 @@ endif
 ifdef MODULAR
 CFLAGS   +=  -DMODULAR=$(MODULAR)
 endif
+ifdef NO_STANDARD_GUI
+CFLAGS   +=  -DNO_STANDARD_GUI=1
+endif
 
 CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))

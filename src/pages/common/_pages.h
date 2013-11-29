@@ -128,6 +128,7 @@ int PAGE_IsValid(int page);
 
 
 /* Simple Mixer pages */
+#if !defined(NO_STANDARD_GUI)
 void PAGE_ModelMenuInit(int page);
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
@@ -143,3 +144,4 @@ void PAGE_CurvesEvent();
 void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
+#endif

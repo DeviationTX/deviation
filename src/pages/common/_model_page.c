@@ -139,9 +139,11 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     if (changed && Model.type != 0) {
         //Standard GUI is not supported
         Model.mixer_mode = MIXER_ADVANCED;
+#if !defined(NO_STANDARD_GUI)
         guiObject_t *obj = _get_obj(ITEM_GUI, 0);
         if(obj)
             GUI_Redraw(obj);
+#endif
     }
 
     switch (Model.type) {
@@ -315,6 +317,7 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
     MODELPage_ShowLoadSave(LOAD_ICON, PAGE_ModelInit);
 }
 
+#if !defined(NO_STANDARD_GUI)
 static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
@@ -331,4 +334,4 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
     }
     return STDMIXER_ModeName(Model.mixer_mode);
 }
-
+#endif
