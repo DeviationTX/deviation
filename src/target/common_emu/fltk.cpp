@@ -35,13 +35,13 @@
 #include <FL/fl_draw.H>
 #include <FL/fl_ask.H>
 
+#define USE_OWN_PRINTF 0 //Disable sprintf mappingdue to need for %f
 extern "C" {
 #include "common.h"
 #include "fltk.h"
 #include "mixer.h"
 #include "config/tx.h"
 }
-
 
 static const u16 keymap[BUT_LAST] = BUTTON_MAP;
 

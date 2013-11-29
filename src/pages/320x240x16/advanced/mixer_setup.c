@@ -53,12 +53,12 @@ static void _show_simple()
     const int space = 40;
     int x = 60;
     //Row 1
-    mp->firstObj = GUI_CreateLabel(&gui1->srclbl, COL1, x, NULL, DEFAULT_FONT, _tr("Src"));
-    GUI_CreateTextSelect(&gui1->src, COL2, x, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
+    mp->firstObj = GUI_CreateLabel(&gui1->srclbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Src"));
+    GUI_CreateTextSelect(&gui1->src, COL1_VALUE, x, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
     x += space;
     //Row 2
-    GUI_CreateLabel(&gui1->curvelbl, COL1, x, NULL, DEFAULT_FONT, _tr("Curve"));
-    GUI_CreateTextSelect(&gui1->curve, COL2, x, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
+    GUI_CreateLabel(&gui1->curvelbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Curve"));
+    GUI_CreateTextSelect(&gui1->curve, COL1_VALUE, x, TEXTSELECT_96, curveselect_cb, set_curvename_cb, &mp->mixer[0]);
     x += space;
 
     GUI_CreateXYGraph(&gui1->graph, COL3, GRAPH_Y, 120, 150,
@@ -66,12 +66,12 @@ static void _show_simple()
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 125 / 100,
                               0, PCT_TO_RANGE(25), eval_mixer_cb, curpos_cb, touch_cb, &mp->mixer[0]);
     //Row 4
-    GUI_CreateLabel(&gui1->scalelbl, COL1, x, scalestring_cb, DEFAULT_FONT, (void *)0);
-    GUI_CreateTextSelect(&gui1->scale, COL2, x, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].scalar);
+    GUI_CreateLabel(&gui1->scalelbl, COL1_TEXT, x, scalestring_cb, DEFAULT_FONT, (void *)0);
+    GUI_CreateTextSelect(&gui1->scale, COL1_VALUE, x, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].scalar);
     x += space;
     //Row 4
-    GUI_CreateLabel(&gui1->offsetlbl, COL1, x, NULL, DEFAULT_FONT, _tr("Offset"));
-    GUI_CreateTextSelect(&gui1->offset, COL2, x, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].offset);
+    GUI_CreateLabel(&gui1->offsetlbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Offset"));
+    GUI_CreateTextSelect(&gui1->offset, COL1_VALUE, x, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].offset);
     x += space;
     //Row 5
     /*
