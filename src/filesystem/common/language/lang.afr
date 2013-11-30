@@ -26,7 +26,7 @@ Aantal Kanale
 :5 Point
 5 Punt
 :5 sec
-5 seK
+5 sek
 :5+1
 5+1
 :6+1
@@ -193,7 +193,8 @@ Datalog
 Datum
 :Date / Time
 Datum / Tyd
->:Date format
+:Date format
+Datum formaat
 :Date:
 Datum:
 :Day
@@ -550,10 +551,14 @@ Selekteer
 Servo
 :Set
 Set
->:Set date
->:Set permanent timer
->:Set time
->:Set to
+:Set date
+Stel Datum
+:Set permanent timer
+Stel Permanente Tydhouer
+:Set time
+Stel Tyd
+:Set to
+Stel na
 :Set:
 Set:
 :Simple
@@ -658,7 +663,8 @@ Throttle Kurwes
 Throttle Hou
 :Time
 Tyd
->:Time format
+:Time format
+Tyd formaat
 :Timer
 Tydhouer
 :Timer settings
@@ -747,7 +753,8 @@ Zero/Max
 \n%d sekondes links
 :\n\nBinding will end in %d seconds...
 \n\nBindproses eindig in %d sekonds...
->:actual value
+:actual value
+Regte waarde
 :add
 +
 :cntdn-prop
@@ -770,10 +777,13 @@ min
 Permanent
 :replace
 vervang
->:resulting value
+:resulting value
+Gevolglike waarde
 :stop-prop
 Stop-prop
 :stopwatch
 Stophorlosie
->:value to add or set
->:value to set
+:value to add or set
+Waarde om te stel of by-tel
+:value to set
+Waarde om te stel
