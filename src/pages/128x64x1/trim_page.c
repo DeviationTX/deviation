@@ -41,7 +41,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButtonPlateText(&gui->src[relrow], 0, y, w, ITEM_HEIGHT,
             &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], 32, y,
-            40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)absrow);
+            40, ITEM_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], 75, y, 50, ITEM_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
     return 1;
@@ -103,7 +103,7 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_TRIMSTEP:
             label = _tr_noop("Trim Step");
-            value = set_trimstep_cb; data = (void *)(long)tp->index;
+            value = set_trimstep_cb; data = (void *)(long)(tp->index + 0x100); //0x100: Use tp->trim
             break;
         case ITEM_TRIMSWITCH:
             label = _tr_noop("Switch");
