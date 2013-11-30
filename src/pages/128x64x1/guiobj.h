@@ -142,14 +142,14 @@ struct timer_obj {
     guiLabel_t resetpermlbl;
     guiButton_t resetperm;
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
     guiButton_t setperm;
 #endif
     guiScrollable_t scrollable;
 };
 
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
 struct set_timer_obj {
     guiLabel_t      oldtime;
     guiTextSelect_t hms;
@@ -338,7 +338,7 @@ struct gui_objs {
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
         struct set_timer_obj settimer;
 #endif
         struct trim_obj trim;
@@ -365,4 +365,4 @@ struct gui_objs {
     } u;
 } gui_objs;
 
-#endif
+#endif //_GUIOBJ_H_

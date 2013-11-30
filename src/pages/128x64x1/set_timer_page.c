@@ -19,7 +19,7 @@
 #include "config/model.h"
 
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
 #include "../common/_set_timer_page.c"
 
 #define guiset (&gui_objs.u.settimer)
@@ -130,4 +130,4 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
-#endif // not in Devo7e
+#endif // HAS_PERMANENT_TIMER

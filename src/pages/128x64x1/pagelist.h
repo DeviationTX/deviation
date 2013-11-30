@@ -20,7 +20,7 @@ PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       NULL,     
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       PAGE_ModelExit,   _tr_noop("Model setup"))
 PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,   _tr_noop("Timers"))
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
 PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,             _tr_noop("Set permanent timer"))
 #endif
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, PAGE_TelemconfigExit, _tr_noop("Telemetry config"))
