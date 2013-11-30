@@ -648,7 +648,7 @@ Volt
 :Zero/Max
 0/Max
 :\n%d seconds left
-\n%d secondes à gauche
+\n%d secondes restant
 :\n\nBinding will end in %d seconds...
 \n\nAppairage terminé dans %d secondes...
 >:actual value
