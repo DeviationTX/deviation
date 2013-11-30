@@ -168,11 +168,14 @@ s16 deadband(struct Curve *curve, s32 value)
 s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
 {
     s32 divisor;
-    //interpolation doesn't work if theinput is out of bounds, so bound it here
-    if (xval > CHAN_MAX_VALUE)
-        xval = CHAN_MAX_VALUE;
-    else if (xval < CHAN_MIN_VALUE)
-        xval = CHAN_MIN_VALUE;
+    if (CURVE_TYPE(curve) != CURVE_NONE) {
+        //interpolation doesn't work if theinput is out of bounds, so bound it here
+        //We let CURVE_NONE get a pass to allow creating a pre-scaler to chain mixers together
+        if (xval > CHAN_MAX_VALUE)
+            xval = CHAN_MAX_VALUE;
+        else if (xval < CHAN_MIN_VALUE)
+            xval = CHAN_MIN_VALUE;
+    }
     switch (CURVE_TYPE(curve)) {
         case CURVE_NONE:     return xval;
         case CURVE_FIXED:    return CHAN_MAX_VALUE;
