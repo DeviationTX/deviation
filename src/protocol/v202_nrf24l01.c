@@ -132,7 +132,7 @@ static void v202_init()
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xFF); // 4ms retransmit t/o, 15 tries
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x08);      // Channel 8
-    NRF24L01_SetBitrate(0);                          // 1Mbps
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);                          // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
 //    NRF24L01_WriteReg(NRF24L01_08_OBSERVE_TX, 0x00); // no write bits in this field

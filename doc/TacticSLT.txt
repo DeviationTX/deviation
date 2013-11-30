@@ -1,0 +1,160 @@
+Tactic SLT protocol
+
+* Data packets *
+
+Channel order for SLT receiver is AETRGP.
+
+Data packet is transmitted every 22ms, 7 bytes length, first 5 bytes encode AETR as 10-bit unsigned numbers, last 2 - GP as 8-bit unsigned numbers.
+
+TX transmits every packet 3 times with interval 1ms between packets, after third packet is pauses for 20ms, thus 22ms.
+
+In 9ms after receiving the packet radio changes to a new frequency according to FHSS sequence.
+
+Bytes 0-4 encode AETR least significant bits, byte 5 encodes most significant bits, first 2 LSB for channel 1 etc.
+
+Pseudocode for decoding channel values:
+
+A = packet[0] + (uint16) ((packet[4] >> 0) & 0x3) << 8;
+E = packet[1] + (uint16) ((packet[4] >> 2) & 0x3) << 8;
+T = packet[2] + (uint16) ((packet[4] >> 4) & 0x3) << 8;
+R = packet[3] + (uint16) ((packet[4] >> 6) & 0x3) << 8;
+
+
+Limits as read from Anylink connected to Devo 10 with 100% scale are:
+
+   min  mid  max
+A   B7  1FE  340
+E   BA  1FE  336
+T   B9  1FE  343
+R   BE  1FE  341
+G   1B   80   E3
+P   1B   80   E3
+
+Limits as read from Anylink connected to Devo 10 with 125% scale are:
+
+   min  mid  max
+A   65  1FE  389
+E   68  1FE  395
+T   6C  1FE  395
+R   68  1FE  392
+G   02   80   FC
+P   02   80   FC
+
+
+* Binding *
+
+Binding packets are transmitted every 2 sec on channel 0x50, address 7E B8 63 A9, lowest power settings possible.
+Transmitter does it in the same batch where regular packets go, 1ms after last packet in the batch (of 3) and after it makes pause for 19ms, keeping 22ms overall cycle.
+The binding packet is just 4-byte transmitter id.
+
+After successful binding the reciever tries packet sizes 4 to 9 on the first channel in frequency hopping sequence, and after sussessful attempt keeps this packet size.
+I only witnessed packet size 7 described before.
+
+491 W_REGISTER(RX_PW_P0) 04
+492 W_REGISTER(RX_ADDR_P0) 7E B8 63 A9
+493 W_REGISTER(RF_CH) 50
+494 FLUSH_RX
+495 W_REGISTER(STATUS) F0
+497 R_RX_PAYLOAD 7C 95 C1 70
+498 W_REGISTER(RX_ADDR_P0) 7C 95 C1 70
+499 W_REGISTER(TX_ADDR) 7C 95 C1 70
+500 W_REGISTER(RX_PW_P0) 04
+501 W_REGISTER(RF_CH) 3F
+502 FLUSH_RX
+503 W_REGISTER(STATUS) F0
+504 W_REGISTER(RX_PW_P0) 05
+505 W_REGISTER(RF_CH) 3F
+506 FLUSH_RX
+507 W_REGISTER(STATUS) F0
+508 W_REGISTER(RX_PW_P0) 06
+509 W_REGISTER(RF_CH) 3F
+510 FLUSH_RX
+511 W_REGISTER(STATUS) F0
+512 W_REGISTER(RX_PW_P0) 07
+513 W_REGISTER(RF_CH) 3F
+514 FLUSH_RX
+
+* Initialization *
+
+0 W_REGISTER(CONFIG) 3F
+1 W_REGISTER(EN_AA) 00
+2 W_REGISTER(EN_RXADDR) 01
+3 W_REGISTER(SETUP_AW) 02
+4 W_REGISTER(SETUP_RETR) 00
+5 W_REGISTER(RF_SETUP) 26               # 250kbps (nRF24L01+ only!), 0dBm
+6 W_REGISTER(STATUS) F0
+7 W_REGISTER(RX_ADDR_P1) C2 C2 C2 C2
+8 W_REGISTER(RX_ADDR_P2) C3
+9 W_REGISTER(RX_ADDR_P3) C4
+10 W_REGISTER(RX_ADDR_P4) C5
+11 W_REGISTER(RX_ADDR_P5) C6
+12 W_REGISTER(RX_PW_P1) 00
+13 W_REGISTER(RX_PW_P2) 00
+14 W_REGISTER(RX_PW_P3) 00
+15 W_REGISTER(RX_PW_P4) 00
+16 W_REGISTER(RX_PW_P5) 00
+# Emit 20 bytes ?signature on channel 1 at address 9A BC DE F0
+# Does it at every start for unknown reason.
+17 W_REGISTER(CONFIG) 5E
+18 W_REGISTER(RX_PW_P0) 20
+19 W_REGISTER(TX_ADDR) 9A BC DE F0
+20 W_REGISTER(RX_ADDR_P0) 9A BC DE F0
+21 W_REGISTER(RF_CH) 01
+22 FLUSH_TX
+23 W_REGISTER(STATUS) F0
+24 W_TX_PAYLOAD 9B 94 A1 A1 9A A0 94 BD 9D 97 8A 94 95 C3 A0 94 93 8A 91 9A 9C 9B 8F C3 91 9E 90 9E 91 8D 9E 9F
+#
+25 W_REGISTER(CONFIG) 3F
+26 W_REGISTER(RX_PW_P0) 07
+27 W_REGISTER(RX_ADDR_P0) 7C 95 C1 70
+28 W_REGISTER(TX_ADDR) 7C 95 C1 70
+29 W_REGISTER(RF_CH) 3F
+
+* RF frequency hopping *
+
+15 radio channels in cycles
+
+For address 7C 95 C1 70
+3F 22 1A 18 1F 28 1C 09 11 40 23 13 47 2C 17
+
+For address 84 03 35 DE
+07 24 3B 11 06 03 13 17 45 1D 33 48 2E 47 2B
+
+Frequency hopping generation algoritm in Python:
+
+def gen_fq_hop(id):
+  fq_hop = 15 * [0]
+  fq_hop[0]  = (id[0] & 0x3f) + 0x03
+  fq_hop[1]  = (id[0] >> 2) + 0x03
+  fq_hop[2]  = (id[0] >> 4) + (id[1] & 0x03)*0x10 + 0x03
+  fq_hop[3]  = (id[0] >> 6) + (id[1] & 0x0f)*0x04 + 0x03
+  fq_hop[4]  = (id[1] & 0x3f) + 0x03
+  fq_hop[5]  = (id[1] >> 2) + 0x03
+  fq_hop[6]  = (id[1] >> 4) + (id[2] & 0x03)*0x10 + 0x03
+  fq_hop[7]  = (id[1] >> 6) + (id[2] & 0x0f)*0x04 + 0x03
+  fq_hop[8]  = (id[2] & 0x3f) + 0x10
+  fq_hop[9]  = (id[2] >> 2) + 0x10
+  fq_hop[10] = (id[2] >> 4) + (id[3] & 0x03)*0x10 + 0x10
+  fq_hop[11] = (id[2] >> 6) + (id[3] & 0x0f)*0x04 + 0x10
+  fq_hop[12] = (id[3] & 0x3f) + 0x10
+  fq_hop[13] = (id[3] >> 2) + 0x10
+  fq_hop[14] = (id[3] >> 4) + (id[0] & 0x03)*0x10 + 0x10
+  # unique
+  for i in range(1,15):
+    done = False
+    while not done:
+      done = True
+      for j in range(i):
+        if fq_hop[i] == fq_hop[j]:
+          done = False
+          fq_hop[i] += 7
+          if fq_hop[i] > 0x4f:
+            fq_hop[i] = fq_hop[i] % 0x50 + 0x03
+  return fq_hop
+
+
+
+* Fault recovery *
+
+After receiving a packet in 9ms radio changes to a new frequency and waits for another packet. Normally, it comes in 13ms (9ms+13ms = 22ms - packet cycle).
+If the packet did not come in 18ms, receiver switches to fault mode. Radio switches every 18ms to the next frequency 9 times, then switches to the first channel in sequence and stays on it indefinitely.

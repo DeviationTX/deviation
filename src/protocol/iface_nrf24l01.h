@@ -40,8 +40,19 @@ enum {
     NRF24L01_00_CRCO        = 2,
     NRF24L01_00_PWR_UP      = 1,
     NRF24L01_00_PRIM_RX     = 0,
-    NRF24L01_07_TX_DS       = 5
+    NRF24L01_07_RX_DR       = 6,
+    NRF24L01_07_TX_DS       = 5,
+    NRF24L01_07_MAX_RT      = 4,
 };
+
+// Bitrates
+enum {
+    NRF24L01_BR_1M = 0,
+    NRF24L01_BR_2M,
+    NRF24L01_BR_250K,
+    NRF24L01_BR_RSVD
+};
+    
 
 void NRF24L01_Initialize();
 u8 NRF24L01_WriteReg(u8 reg, u8 data);
@@ -56,9 +67,13 @@ u8 NRF24L01_FlushRx();
 u8 NRF24L01_Activate(u8 code);
 
 
-// Bitrate 0 - 1Mbps, 1 - 2Mbps
+// Bitrate 0 - 1Mbps, 1 - 2Mbps, 3 - 250K (for nRF24L01+)
 u8 NRF24L01_SetBitrate(u8 bitrate);
 
 u8 NRF24L01_SetPower(u8 power);
+
+// To enable radio transmit after WritePayload you need to turn the radio
+void NRF24L01_PulseCE();
+
 
 #endif

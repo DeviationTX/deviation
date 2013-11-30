@@ -147,7 +147,13 @@ u8 NRF24L01_Activate(u8 code)
 
 u8 NRF24L01_SetBitrate(u8 bitrate)
 {
-    rf_setup = (rf_setup & 0xF7) | ((bitrate & 0x01) << 3);
+    // Note that bitrate 250kbps (and bit RF_DR_LOW) is valid only
+    // for nRF24L01+. There is no way to programmatically tell it from
+    // older version, nRF24L01, but the older is practically phased out
+    // by Nordic, so we assume that we deal with with modern version.
+
+    // Bit 0 goes to RF_DR_HIGH, bit 1 - to RF_DR_LOW
+    rf_setup = (rf_setup & 0xD7) | ((bitrate & 0x02) << 4) | ((bitrate & 0x01) << 3);
     return NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, rf_setup);
 }
 
@@ -186,6 +192,12 @@ u8 NRF24L01_SetPower(u8 power)
     // Power is in range 0..3 for nRF24L01
     rf_setup = (rf_setup & 0xF9) | ((nrf_power & 0x03) << 1);
     return NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, rf_setup);
+}
+
+void NRF24L01_PulseCE()
+{
+    // Not implemented, CE is wired HIGH
+    // Should issue HIGH pulse ~15us wide
 }
 
 #endif // defined(PROTO_HAS_NRF24L01)
