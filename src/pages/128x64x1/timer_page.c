@@ -83,7 +83,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
 
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
     GUI_CreateButtonPlateText(&gui->setperm, x, y,
         55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
@@ -146,7 +146,7 @@ static void update_countdown(u8 idx)
     GUI_SetSelectable((guiObject_t *)&gui->resetperm, !hide);
     GUI_SetHidden((guiObject_t *)&gui->resetpermlbl, hide);
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
     GUI_SetHidden((guiObject_t *)&gui->setperm, hide);
     GUI_SetSelectable((guiObject_t *)&gui->setperm, !hide);
 #endif
@@ -158,7 +158,7 @@ void reset_timerperm_cb(guiObject_t *obj, const void *data)
 {
     long index = (long)data & 0xff;
 // don't include this in Devo7e due to memory restrictions
-#if TXID != 0x7e
+#if HAS_PERMANENT_TIMER
     if (index & 0x80) {   // set
         current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
         PAGE_RemoveAllObjects();

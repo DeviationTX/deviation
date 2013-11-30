@@ -13,6 +13,7 @@
 //#endif
 
 #define NO_LANGUAGE_SUPPORT 1
+#define HAS_PERMANENT_TIMER 0
 
 #define MIN_BRIGHTNESS 0
 #define HAS_TOUCH 0
@@ -39,3 +40,4 @@
 #define VOLTAGE_OFFSET    249
 
 #endif //_DEVO7E_TARGET_H_
+

@@ -618,6 +618,8 @@ RPM
 :Set date
 Установить
 :Set permanent timer
+Интегральный таймер
+|devo8:Set permanent timer
 Установка интегрального таймера
 :Set time
 Установить

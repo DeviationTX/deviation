@@ -70,8 +70,11 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
 static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    int i = (long)data;
-    u8 *value = &Model.trims[i].step;
+    //data == pointer | index;
+    //pointer: 0x000 = Model.trims[index].step
+    //pointer: 0x100 = tp->trim.step
+    int i = ((long)data)& 0xff;
+    u8 *value = ((long)data >> 8) ? &tp->trim.step : &Model.trims[i].step;
     //place switches before 0.1 on the spinbox
     u8 v = ((int)*value + TRIM_SWITCH_TYPES - 1) % (190 + TRIM_SWITCH_TYPES);
     v = GUI_TextSelectHelper(v, 0, 190 + TRIM_SWITCH_TYPES - 1, dir, 1, 5, NULL);

@@ -197,6 +197,9 @@ static void flysky_build_packet(u8 init)
             packet[10] |= 0x40;
         if(Channels[6] > 0)
             packet[10] |= 0x80;
+        if(Channels[7] > 0)
+            packet[12] |= 0x10;
+
     }
 }
 

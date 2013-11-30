@@ -54,7 +54,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
     GUI_CreateLabelBox(&gui->neg[relrow], PCOL2 + 6, y, PCOL3 - PCOL2, 24, &DEFAULT_FONT, negtrim_str, NULL, (void *)(long)absrow);
     GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
-    GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL, set_trimstep_cb, (void *)(long)absrow);
+    GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL,
+                         set_trimstep_cb, (void *)(long)(absrow + 0x000)); //0x000: Use Model.trims
     return 2;
 }
 
@@ -100,7 +101,8 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_CreateTextSelect(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
     //Row 2
     GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim Step"));
-    GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL, set_trimstep_cb, (void *)(long)tp->index);
+    GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL,
+                         set_trimstep_cb, (void *)(long)(tp->index + 0x100)); //0x100: Use tp->trim
     //Row 3
     GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW3, NULL, DEFAULT_FONT, _tr("Trim +"));
     GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
