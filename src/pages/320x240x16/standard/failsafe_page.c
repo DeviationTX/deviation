@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_failsafe_page.c"
 
 #define gui (&gui_objs.u.stdchan)
@@ -53,3 +55,4 @@ void PAGE_FailSafeInit(int page)
     GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, mp->max_scroll+1, NULL, STDMIX_ScrollCB, show_page);
     show_page(page);
 }
+#endif //HAS_STANDARD_GUI

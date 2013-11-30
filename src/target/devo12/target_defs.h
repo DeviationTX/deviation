@@ -8,6 +8,9 @@
 
 #define TRANSPARENT_COLOR 0x10000
 
+#define HAS_STANDARD_GUI 1
+#define HAS_ADVANCED_GUI 1
+
 //#define ENABLE_SCANNER 1
 #define HAS_TOUCH 1
 #define HAS_RTC 1

@@ -20,6 +20,8 @@
 #include "mixer.h"
 #include "standard.h"
 #include "mixer_standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_gyrosense_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -83,3 +85,4 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     }
     return 1;
 }
+#endif //HAS_STANDARD_GUI

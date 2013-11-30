@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_reverse_page.c"
 
 static const struct page_defs reverse_defs = {
@@ -31,4 +33,5 @@ void PAGE_ReverseInit(int page)
     (void)page;
     STANDARD_Init(&reverse_defs);
 }
+#endif //HAS_STANDARD_GUI
 

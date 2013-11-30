@@ -20,6 +20,8 @@
 #include "mixer.h"
 #include "standard.h"
 #include "mixer_standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_gyrosense_page.c"
 
 const char *title_cb(guiObject_t *obj, const void *data)
@@ -76,3 +78,4 @@ void PAGE_GyroSenseInit(int page)
         GUI_CreateTextSelect(&gui->gyro[2], COL2, ROW5, TEXTSELECT_128, NULL, gyro_val_cb, (void *)2);
     }
 }
+#endif //HAS_STANDARD_GUI

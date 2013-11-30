@@ -18,6 +18,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_failsafe_page.c"
 
 static const struct page_defs failsafe_defs = {
@@ -30,3 +32,4 @@ void PAGE_FailSafeInit(int page)
     (void)page;
     STANDARD_Init(&failsafe_defs);
 }
+#endif //HAS_STANDARD_GUI

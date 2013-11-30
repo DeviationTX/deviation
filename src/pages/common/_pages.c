@@ -74,6 +74,7 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
 }
 
 int PAGE_IsValid(int page) {
+#if HAS_STANDARD_GUI
     if (Model.mixer_mode == MIXER_ADVANCED) {
         switch(page) {
 #ifdef PAGEID_MODELMENU
@@ -92,7 +93,9 @@ int PAGE_IsValid(int page) {
             case PAGEID_SWITCHASSIGN:
                 return 0;
         }
-    } else {
+    } else
+#endif //HAS_STANDARD_GUI
+    {
         switch(page) {
             case PAGEID_MIXER:
                 return 0;

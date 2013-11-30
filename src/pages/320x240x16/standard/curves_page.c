@@ -20,6 +20,8 @@
 #include "mixer.h"
 #include "mixer_standard.h"
 #include "standard.h"
+
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_curves_page.c"
 
 static const char *curvepos[] = {
@@ -151,4 +153,4 @@ void PAGE_PitCurvesInit(int page)
 {
     show_page(CURVESMODE_PITCH, page);
 }
-
+#endif //HAS_STANDARD_GUI

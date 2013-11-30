@@ -18,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 #include "standard.h"
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_traveladj_page.c"
 
 #define gui (&gui_objs.u.stdtravel)
@@ -86,3 +87,4 @@ void PAGE_TravelAdjExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
+#endif //HAS_STANDARD_GUI

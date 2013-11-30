@@ -18,6 +18,7 @@
 #include "config/model.h"
 #include "../pages.h"
 
+#if HAS_STANDARD_GUI
 #include "standard.h"
 #include "../../common/standard/_common_standard.c"
 
@@ -134,3 +135,4 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         }
     }
 }
+#endif //HAS_STANDARD_GUI

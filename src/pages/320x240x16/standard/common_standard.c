@@ -19,6 +19,7 @@
 #include "../pages.h"
 #include "standard.h"
 
+#if HAS_STANDARD_GUI
 #include "../../common/standard/_common_standard.c"
 
 int STDMIX_ScrollCB(guiObject_t *parent, u8 pos, s8 direction, void *data)
@@ -40,4 +41,4 @@ int STDMIX_ScrollCB(guiObject_t *parent, u8 pos, s8 direction, void *data)
         show_page_cb(newpos);
     return newpos;
 }
-
+#endif //HAS_STANDARD_GUI
