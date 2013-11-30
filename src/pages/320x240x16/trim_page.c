@@ -60,11 +60,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_page()
 {
-#if !defined(NO_STANDARD_GUI)
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
     else
-#endif
         PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
     GUI_CreateLabelBox(&gui->inplbl, PCOL1, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Input"));
     GUI_CreateLabelBox(&gui->neglbl, PCOL2, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim -"));

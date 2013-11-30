@@ -61,11 +61,9 @@ void PAGE_MainLayoutInit(int page)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY, _action_cb, NULL);
-#if !defined(NO_STANDARD_GUI)
      if (Model.mixer_mode == MIXER_STANDARD)
          PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
      else
-#endif
          PAGE_ShowHeader(NULL);
     lp.long_press = 0;
     lp.newelem = 0;

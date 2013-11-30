@@ -139,11 +139,9 @@ void PAGE_DatalogInit(int page)
     (void)page;
     int row = 40;
     #define ROW_HEIGHT 20
-#if !defined(NO_STANDARD_GUI)
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DATALOG), MODELMENU_Show);
     else
-#endif
         PAGE_ShowHeader(PAGE_GetName(PAGEID_DATALOG));
 
     //Col1

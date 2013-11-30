@@ -25,7 +25,6 @@
 #define PLANE_LABEL _tr_noop("Airplane")
 #include "../common/_model_page.c"
 
-#if !defined(NO_STANDARD_GUI)
 static const char *_mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
     const char *ret = mixermode_cb(obj, dir, data);
@@ -39,7 +38,6 @@ static const char *_mixermode_cb(guiObject_t *obj, int dir, void *data)
     }
     return ret;
 }
-#endif
 
 void PAGE_ModelInit(int page)
 {
@@ -50,11 +48,9 @@ void PAGE_ModelInit(int page)
     mp->last_txpower = Model.tx_power;
     mp->file_state = 0;
     PAGE_SetModal(0);
-#if !defined(NO_STANDARD_GUI)
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
     else
-#endif
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
@@ -65,11 +61,9 @@ void PAGE_ModelInit(int page)
     GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));
     GUI_CreateTextSelect(&gui->file, COL2, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);
 
-#if !defined(NO_STANDARD_GUI)
     row+= 20;
     GUI_CreateLabel(&gui->guilbl, COL1, row, NULL, DEFAULT_FONT, _tr("Mixer GUI"));
     GUI_CreateTextSelect(&gui->guits, COL2, row, TEXTSELECT_96, NULL, _mixermode_cb, NULL);
-#endif
 
     row += 20;
     GUI_CreateLabel(&gui->namelbl, COL1, row, NULL, DEFAULT_FONT, _tr("Model name"));  // use the same naming convention for devo8 and devo10
@@ -139,9 +133,7 @@ static inline guiObject_t *_get_obj(int type, int objid)
         case ITEM_NUMCHAN: return (guiObject_t *)&gui->numch;
         case ITEM_TXPOWER: return (guiObject_t *)&gui->pwr;
         case ITEM_PROTO: return (guiObject_t *)&gui->bind;
-#if !defined(NO_STANDARD_GUI)
         case ITEM_GUI: return (guiObject_t *)&gui->guits;
-#endif
         case ITEM_PPMIN: return (guiObject_t *)&gui->ppm;
         default: return NULL;
     }

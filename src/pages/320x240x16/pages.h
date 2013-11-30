@@ -11,10 +11,8 @@ enum PageID {
 #include "pagelist.h"
 };
 #undef PAGEDEF
-#if !defined(NO_STANDARD_GUI)
 //The following are only present in this GUI
 #define PAGEID_MODELMENU PAGEID_MODELMENU
-#endif
 
 #define SECTION_MAIN    0
 #define SECTION_MODEL   1
@@ -50,9 +48,7 @@ struct pagemem {
 
 void PAGE_SetSection(u8 section);
 void PAGE_ChangeByID(enum PageID id);
-#if !defined(NO_STANDARD_GUI)
 void MODELMENU_Show(guiObject_t *obj, const void *data);
-#endif
 
 void PAGE_SplashInit(int page);
 void PAGE_SplashEvent();

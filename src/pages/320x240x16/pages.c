@@ -65,9 +65,7 @@ struct page_group groups[] = {
     {2, PAGEID_SCANNER},
 #endif
     {2, PAGEID_USB},
-#if !defined(NO_STANDARD_GUI)
     {0x81, PAGEID_MODELMENU},
-#endif
     {255, PAGEID_SPLASH},
     {255, 0}
 };
