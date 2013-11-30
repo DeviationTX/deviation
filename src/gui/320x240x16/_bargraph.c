@@ -14,8 +14,11 @@
  */
 
 #define TRANSPARENT_BARGRAPH
-#define TRIM_THICKNESS 10
-#define TRIM_MARGIN 1
+#define TRIM_THICKNESS          7
+#define TRIM_INNER_THICKNESS    0
+#define TRIM_MARGIN             1
+
+
 u32 _bargraph_get_color(s32 val, struct guiBarGraph *graph, struct disp_bargraph *disp)
 {
     s32 center = (graph->max + graph->min) / 2;
@@ -36,11 +39,24 @@ void _bargraph_trim_horizontal(int x, int y, int width, int height, s32 val, u32
     } else {
         LCD_FillRect(x, y, width, height, disp->bg_color);
     }
-    //LCD_DrawFastHLine(x, y + height / 2, width, 0x0000); //Main axis
-    LCD_DrawFastVLine(x + width / 2, y, height, disp->outline_color); //Center
-    LCD_FillRect(xpos - TRIM_THICKNESS / 2,
-                 y + TRIM_MARGIN,
-                 TRIM_THICKNESS, height - TRIM_MARGIN * 2, color);
+
+    //Bar trim points
+    int hmap[] = {height / 2, 3 * height / 4, height / 2, height, height / 2, 3 * height / 4, height / 2};
+    for (int i = 0; i < 7; i++) {
+        LCD_DrawFastVLine(x + (i + 1) * width / 8, y, hmap[i], disp->outline_color);
+    }
+    // Main rectangle
+    if (TRIM_THICKNESS) {
+        LCD_FillRect(xpos - (TRIM_THICKNESS / 2)-1,
+                     y + TRIM_MARGIN,
+                     TRIM_THICKNESS, height - TRIM_MARGIN * 2, color);
+    }
+    // Marking rectangle
+    if (TRIM_INNER_THICKNESS) {
+        LCD_FillRect(xpos - (TRIM_INNER_THICKNESS / 2)-1,
+                     y + TRIM_MARGIN * 2,
+                     TRIM_INNER_THICKNESS, height - TRIM_MARGIN * 4, disp->outline_color);
+    }
 }
 void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 color,
         struct guiBarGraph *graph, struct disp_bargraph *disp, struct guiBox *box)
@@ -52,9 +68,22 @@ void _bargraph_trim_vertical(int x, int y, int width, int height, s32 val, u32 c
     } else {
         LCD_FillRect(x, y, width, height, disp->bg_color);
     }
-    //LCD_DrawFastVLine(x + width / 2, y, height, 0xFFFF); //Main axis
-    LCD_DrawFastHLine(x, y + height / 2, width, disp->outline_color); //Center
-    LCD_FillRect(x + TRIM_MARGIN,
-                 y + (height - val) - TRIM_THICKNESS / 2,
-                 width - TRIM_MARGIN * 2, TRIM_THICKNESS, color);
+
+    //Bar trim points
+    int wmap[] = {width / 2, 3 * width / 4, width / 2, width, width / 2, 3 * width / 4, width / 2};
+    for (int i = 0; i < 7; i++) {
+        LCD_DrawFastHLine(x, y + (i + 1) * height / 8, wmap[i], disp->outline_color);
+    }
+    // Main rectangle
+    if (TRIM_THICKNESS) {
+        LCD_FillRect(x + TRIM_MARGIN,
+                     y + (height - val) - (TRIM_THICKNESS / 2) - 1,
+                     width - TRIM_MARGIN * 2, TRIM_THICKNESS, color);
+    }
+    // Marking rectangle
+    if (TRIM_INNER_THICKNESS) {
+    LCD_FillRect(x + TRIM_MARGIN * 2,
+                 y + (height - val) - (TRIM_INNER_THICKNESS / 2) - 1,
+                 width - TRIM_MARGIN * 4, TRIM_INNER_THICKNESS, disp->outline_color);
+    }
 }
