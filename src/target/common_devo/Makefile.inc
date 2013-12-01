@@ -11,7 +11,8 @@ LIBOPENCM3 = libopencm3/lib/libopencm3_stm32f1.a
 SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_devo/*.c) $(wildcard target/common_devo/msc2/*.c) $(wildcard target/common_devo/msc2/lib/*.c)
 
 ifdef MODULAR
-PROTO_EXTRA_C = $(wildcard target/common_devo/protocol/*.c)
+PROTO_EXTRA_C = $(wildcard target/common_devo/protocol/*.c) \
+                $(wildcard target/common_devo/hid/*.c)
 else
 SRC_C   += $(wildcard target/common_devo/protocol/*.c) \
            $(wildcard target/common_devo/hid/*.c)

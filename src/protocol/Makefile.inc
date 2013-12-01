@@ -15,6 +15,7 @@ PROTO_MODULES += $(ODIR)/protocol/wk2401.mod
 PROTO_MODULES += $(ODIR)/protocol/skyartec.mod
 PROTO_MODULES += $(ODIR)/protocol/v202.mod
 PROTO_MODULES += $(ODIR)/protocol/slt.mod
+PROTO_MODULES += $(ODIR)/protocol/usbhid.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
@@ -75,6 +76,10 @@ $(ODIR)/protocol/v202.mod : $(ODIR)/v202_nrf24l01.bin
 
 $(ODIR)/protocol/slt.mod : $(ODIR)/slt_nrf24l01.bin
 	@echo Building 'slt' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/usbhid.mod : $(ODIR)/usbhid.bin
+	@echo Building 'usbhid' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET

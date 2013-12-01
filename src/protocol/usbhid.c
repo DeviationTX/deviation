@@ -15,7 +15,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define PPMOUT_Cmds PROTO_Cmds
+  #define USBHID_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 
@@ -36,12 +36,6 @@ static s8 packet[USBHID_MAX_CHANNELS];
 u8 num_channels;
 volatile u8 PrevXferComplete;
 extern void HID_Write(s8 *packet, u8 num_channels);
-
-/* FIXME:  The original imlementation used a PWM to output the PPM signal.
-           However, I could not get TIM1 woring properly.
-           The current implementation just bit-bangs the output.
-           It works fine but is less efficient
-*/
 
 static void build_data_pkt()
 {

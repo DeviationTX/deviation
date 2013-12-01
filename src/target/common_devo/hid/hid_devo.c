@@ -13,6 +13,14 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef MODULAR
+  //Allows the linker to properly relocate
+  #define DEVO_Cmds PROTO_Cmds
+  #pragma long_calls
+  //This is otherwise included in the main binary
+  #include "usb_regs.c"
+#endif
+
 #include "usb_lib.h"
 #include "usb_pwr.h"
 
