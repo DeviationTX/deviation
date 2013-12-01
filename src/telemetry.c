@@ -177,7 +177,7 @@ s32 TELEMETRY_GetMaxValue(u8 telem)
 
 void TELEMETRY_SetUpdated(int telem)
 {
-    Telemetry.updated[telem/8] |= telem % 8;
+    Telemetry.updated[telem/8] |= (1 << telem % 8);
 }
 
 int TELEMETRY_Type()
