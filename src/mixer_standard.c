@@ -44,7 +44,8 @@ void STDMIXER_Preset()
     mapped_std_channels.switches[SWITCHFUNC_DREXP_ELE] = INP_ELE_DR0;
     mapped_std_channels.switches[SWITCHFUNC_DREXP_RUD] = INP_FMOD0;
 
-    if (Model.protocol == 0) {  // for none protocol, assign any channel to thr is fine
+    if (Model.protocol == 0 || ! ProtocolChannelMap[Model.protocol]) {
+        // for none protocol, assign any channel to thr is fine
         mapped_std_channels.throttle = 0;
     } else {
         for (u8 ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
@@ -62,8 +63,10 @@ void STDMIXER_Preset()
 
 void STDMIXER_SetChannelOrderByProtocol()
 {
-    if (Model.protocol == 0)
+    if (Model.protocol == 0 || ! ProtocolChannelMap[Model.protocol]) {
+        // for none protocol, assign any channel to thr is fine
         return;
+    }
     CLOCK_ResetWatchdog();// this function might be invoked after loading from template/model file, so feeding the dog in the middle
     u8 safetysw = 0;
     s8 safetyval = 0;
