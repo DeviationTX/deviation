@@ -345,6 +345,8 @@ u8 NRF24L01_SetPower(u8 power)
     return 0;
 }
 
+void NRF24L01_PulseCE() {}
+
 void PWM_Initialize() {}
 void PWM_Stop() {}
 void PPM_Enable(u16 low_time, volatile u16 *pulses) {

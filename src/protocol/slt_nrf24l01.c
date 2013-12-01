@@ -299,7 +299,7 @@ static void send_bind_packet()
 
     NRF24L01_SetPower(TXPOWER_100uW);
     static const u8 bind_addr[4] = {0x7E, 0xB8, 0x63, 0xA9};
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_addr, 4);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, (u8 *)bind_addr, 4);
 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x50);
     send_data(tx_id, sizeof(tx_id));
@@ -422,4 +422,4 @@ const void *SLT_Cmds(enum ProtoCmds cmd)
     }
     return 0;
 }
-#endif
+#endif //PROTO_HAS_NRF24L01
