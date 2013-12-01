@@ -49,7 +49,7 @@ extern const uint8_t Joystick_ReportDescriptor[JOYSTICK_SIZ_REPORT_DESC];
 extern const uint8_t Joystick_StringLangID[JOYSTICK_SIZ_STRING_LANGID];
 extern const uint8_t Joystick_StringVendor[JOYSTICK_SIZ_STRING_VENDOR];
 extern const uint8_t Joystick_StringProduct[JOYSTICK_SIZ_STRING_PRODUCT];
-extern uint8_t Joystick_StringSerial[JOYSTICK_SIZ_STRING_SERIAL];
+extern const uint8_t Joystick_StringSerial[JOYSTICK_SIZ_STRING_SERIAL];
 
 #endif /* __USB_DESC_H */
 

@@ -153,6 +153,8 @@ void USB_Enable(u8 type, u8 use_interrupt);
 void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
+void HID_Enable();
+void HID_Disable();
 
 /* Filesystem */
 int FS_Mount(void *FAT, const char *drive);

@@ -13,6 +13,10 @@
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
 
+#ifdef MODULAR
+  #pragma long_calls
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 #include "hid_usb_conf.h"
@@ -38,7 +42,7 @@ DEVICE Device_Table =
     1
   };
 */
-DEVICE_PROP HID_Device_Property =
+const DEVICE_PROP HID_Device_Property =
   {
     Joystick_init,
     Joystick_Reset,
@@ -53,7 +57,7 @@ DEVICE_PROP HID_Device_Property =
     0,
     0x40 /*MAX PACKET SIZE*/
   };
-USER_STANDARD_REQUESTS HID_User_Standard_Requests =
+const USER_STANDARD_REQUESTS HID_User_Standard_Requests =
   {
     Joystick_GetConfiguration,
     Joystick_SetConfiguration,
@@ -66,31 +70,31 @@ USER_STANDARD_REQUESTS HID_User_Standard_Requests =
     Joystick_SetDeviceAddress
   };
 
-ONE_DESCRIPTOR HID_Device_Descriptor =
+const ONE_DESCRIPTOR HID_Device_Descriptor =
   {
     (uint8_t*)Joystick_DeviceDescriptor,
     JOYSTICK_SIZ_DEVICE_DESC
   };
 
-ONE_DESCRIPTOR HID_Config_Descriptor =
+const ONE_DESCRIPTOR HID_Config_Descriptor =
   {
     (uint8_t*)Joystick_ConfigDescriptor,
     JOYSTICK_SIZ_CONFIG_DESC
   };
 
-ONE_DESCRIPTOR Joystick_Report_Descriptor =
+const ONE_DESCRIPTOR Joystick_Report_Descriptor =
   {
     (uint8_t *)Joystick_ReportDescriptor,
     JOYSTICK_SIZ_REPORT_DESC
   };
 
-ONE_DESCRIPTOR Mouse_Hid_Descriptor =
+const ONE_DESCRIPTOR Mouse_Hid_Descriptor =
   {
     (uint8_t*)Joystick_ConfigDescriptor + JOYSTICK_OFF_HID_DESC,
     JOYSTICK_SIZ_HID_DESC
   };
 
-ONE_DESCRIPTOR HID_String_Descriptor[4] =
+const ONE_DESCRIPTOR HID_String_Descriptor[4] =
   {
     {(uint8_t*)Joystick_StringLangID, JOYSTICK_SIZ_STRING_LANGID},
     {(uint8_t*)Joystick_StringVendor, JOYSTICK_SIZ_STRING_VENDOR},

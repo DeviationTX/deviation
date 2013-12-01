@@ -61,22 +61,31 @@ void MSC_Init() {
     User_Standard_Requests = &MSC_User_Standard_Requests;
 }
 
+#ifdef MODULAR
+void (*_HID_Init)() = NULL;
+#else
+extern void HID_Init();
+#endif
+#if 0
 void HID_Init() {
-#ifndef MODULAR
-    //HID is too big for the devo7e, and building as a module will be tricky
     memcpy(pEpInt_IN, HID_pEpInt_IN, sizeof(pEpInt_IN));
     memcpy(pEpInt_OUT, HID_pEpInt_OUT, sizeof(pEpInt_OUT));
     Device_Property = &HID_Device_Property;
     User_Standard_Requests = &HID_User_Standard_Requests;
-#endif
 }
+#endif
 void USB_Enable(u8 type, u8 use_interrupt)
 {
     if (type == 0) {
         //Mass Storage
         MSC_Init();
     } else if (type == 1) {
+#ifndef MODULAR
         HID_Init();
+#else
+        if(_HID_Init)
+            _HID_Init();
+#endif
     }
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
         GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);

@@ -13,6 +13,9 @@
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
 
+#ifdef MODULAR
+  #pragma long_calls
+#endif
 /* Includes ------------------------------------------------------------------*/
 #ifdef STM32L1XX_MD
 #include "stm32l1xx.h"

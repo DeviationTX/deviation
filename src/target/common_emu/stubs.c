@@ -38,6 +38,8 @@ void USB_Enable(u8 type, u8 use_interrupt) {
     (void)use_interrupt;
 }
 void USB_Disable() {}
+void HID_Enable() {}
+void HID_Disable() {}
 void HID_Write(s8 *pkt, u8 size) {
     (void)pkt;
     (void)size;

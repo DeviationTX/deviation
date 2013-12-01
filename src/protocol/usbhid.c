@@ -70,7 +70,7 @@ static void initialize()
     CLOCK_StopTimer();
     num_channels = Model.num_channels;
     PrevXferComplete = 1;
-    USB_Enable(1, 1);
+    HID_Enable();
     CLOCK_StartTimer(1000, usbhid_cb);
 }
 
@@ -78,7 +78,7 @@ const void * USBHID_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: USB_Disable(); return 0;
+        case PROTOCMD_DEINIT: HID_Disable(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)USBHID_MAX_CHANNELS);

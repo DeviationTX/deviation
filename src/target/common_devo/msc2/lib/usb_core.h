@@ -33,12 +33,13 @@ typedef enum _CONTROL_STATE
   PAUSE             /* 10 */
 } CONTROL_STATE;    /* The state machine states of a control pipe */
 
-typedef struct OneDescriptor
+struct OneDescriptor
 {
   uint8_t *Descriptor;
   uint16_t Descriptor_Size;
-}
-ONE_DESCRIPTOR, *PONE_DESCRIPTOR;
+};
+typedef const struct OneDescriptor ONE_DESCRIPTOR;
+typedef const struct OneDescriptor *PONE_DESCRIPTOR;
 /* All the request process routines return a value of this type
    If the return value is not SUCCESS or NOT_READY,
    the software will STALL the correspond endpoint */

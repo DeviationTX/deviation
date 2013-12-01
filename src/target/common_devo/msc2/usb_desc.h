@@ -40,7 +40,7 @@ extern const uint8_t MASS_ConfigDescriptor[MASS_SIZ_CONFIG_DESC];
 extern const uint8_t MASS_StringLangID[MASS_SIZ_STRING_LANGID];
 extern const uint8_t MASS_StringVendor[MASS_SIZ_STRING_VENDOR];
 extern const uint8_t MASS_StringProduct[MASS_SIZ_STRING_PRODUCT];
-extern uint8_t MASS_StringSerial[MASS_SIZ_STRING_SERIAL];
+extern uint8_t MASS_StringSerial[MASS_SIZ_STRING_SERIAL]; //Not const due to GetSerial()
 extern const uint8_t MASS_StringInterface[MASS_SIZ_STRING_INTERFACE];
 
 #endif /* __USB_DESC_H */

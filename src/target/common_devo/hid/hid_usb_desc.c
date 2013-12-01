@@ -13,6 +13,9 @@
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
 
+#ifdef MODULAR
+  #pragma long_calls
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 #include "hid_usb_desc.h"
@@ -160,7 +163,7 @@ const uint8_t Joystick_StringProduct[JOYSTICK_SIZ_STRING_PRODUCT] =
     'o', 0, 'n', 0, ' ', 0, 'G', 0, 'a', 0, 'm', 0, 'e', 0,
     'P', 0, 'a', 0, 'd', 0
   };
-uint8_t Joystick_StringSerial[JOYSTICK_SIZ_STRING_SERIAL] =
+const uint8_t Joystick_StringSerial[JOYSTICK_SIZ_STRING_SERIAL] =
   {
     JOYSTICK_SIZ_STRING_SERIAL,           /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */

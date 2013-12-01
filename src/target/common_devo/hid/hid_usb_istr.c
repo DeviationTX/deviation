@@ -13,6 +13,10 @@
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
 
+#ifdef MODULAR
+  #pragma long_calls
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 #include "hid_usb_prop.h"
@@ -29,7 +33,7 @@ __IO uint16_t wIstr;  /* ISTR register last read value */
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* function pointers to non-control endpoints service routines */
-void (*HID_pEpInt_IN[7])(void) =
+void (* const HID_pEpInt_IN[7])(void) =
   {
     HID_EP1_IN_Callback,
     HID_EP2_IN_Callback,
@@ -40,7 +44,7 @@ void (*HID_pEpInt_IN[7])(void) =
     HID_EP7_IN_Callback,
   };
 
-void (*HID_pEpInt_OUT[7])(void) =
+void (* const HID_pEpInt_OUT[7])(void) =
   {
     HID_EP1_OUT_Callback,
     HID_EP2_OUT_Callback,
