@@ -265,6 +265,12 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
     }
 }
 
+void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w)
+{
+    if (*y + *h > LCD_HEIGHT) *h = LCD_HEIGHT - *y;
+    if (*x + *w> LCD_WIDTH)   *w = LCD_WIDTH - *x;
+}
+
 int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
 {
     *y = ELEM_Y(*elem);
@@ -275,12 +281,8 @@ int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
         return 0;
     *x = ELEM_X(*elem);
     GetElementSize(type, w, h);
-    if (type == ELEM_MODELICO) {
-    	if (*h > LCD_HEIGHT - 32) *h = LCD_HEIGHT - 32;
-    	if (*w > LCD_WIDTH)       *w = LCD_WIDTH;
-    	if (*x + *w > LCD_WIDTH)  *x = LCD_WIDTH - *w;
-    	if (*y + *h > LCD_HEIGHT) *y = LCD_HEIGHT - *h;
-    }
+    if (type == ELEM_MODELICO)
+        AdjustIconSize(x, y, h, w);
     return 1;
 }
 

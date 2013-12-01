@@ -16,6 +16,7 @@
 #include "main_layout.h"
 
 extern int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h);
+extern void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w);
 
 static const char *label_cb(guiObject_t *obj, const void *data);
 static void touch_cb(guiObject_t *obj, s8 press, const void *data);
@@ -124,6 +125,8 @@ void notify_cb(guiObject_t *obj)
     lp.selected_x = ELEM_X(pc.elem[idx]);
     lp.selected_y = ELEM_Y(pc.elem[idx]);
     GetElementSize(ELEM_TYPE(pc.elem[idx]), &lp.selected_w, &lp.selected_h);
+    if (ELEM_TYPE(pc.elem[idx]) == ELEM_MODELICO)
+        AdjustIconSize(&lp.selected_x, &lp.selected_y, &lp.selected_h, &lp.selected_w);
     GUI_Redraw((guiObject_t *)&gui->x);
     GUI_Redraw((guiObject_t *)&gui->y);
 }
