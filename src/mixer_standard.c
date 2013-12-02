@@ -28,6 +28,7 @@
 #include "mixer_standard.h"
 
 MappedSimpleChannels mapped_std_channels;
+extern const u8 const EATRG[PROTO_MAP_LEN];
 
 void STDMIXER_Preset()
 {
@@ -44,15 +45,15 @@ void STDMIXER_Preset()
     mapped_std_channels.switches[SWITCHFUNC_DREXP_ELE] = INP_ELE_DR0;
     mapped_std_channels.switches[SWITCHFUNC_DREXP_RUD] = INP_FMOD0;
 
-    if (Model.protocol == 0 || ! ProtocolChannelMap[Model.protocol]) {
+    const u8 *ch_map = ProtocolChannelMap[Model.protocol];
+    if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
-        mapped_std_channels.throttle = 0;
-    } else {
-        for (u8 ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
-            if (ProtocolChannelMap[Model.protocol][ch] == INP_THROTTLE) {
-                mapped_std_channels.throttle = ch;
-                break;
-            }
+        ch_map = EATRG;
+    }
+    for (u8 ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
+        if (ch_map[ch] == INP_THROTTLE) {
+            mapped_std_channels.throttle = ch;
+            break;
         }
     }
     mapped_std_channels.aile = NUM_OUT_CHANNELS; // virt 1
@@ -63,9 +64,10 @@ void STDMIXER_Preset()
 
 void STDMIXER_SetChannelOrderByProtocol()
 {
-    if (Model.protocol == 0 || ! ProtocolChannelMap[Model.protocol]) {
+    const u8 *ch_map = ProtocolChannelMap[Model.protocol];
+    if (! ch_map) {
         // for none protocol, assign any channel to thr is fine
-        return;
+        ch_map = EATRG;
     }
     CLOCK_ResetWatchdog();// this function might be invoked after loading from template/model file, so feeding the dog in the middle
     u8 safetysw = 0;
@@ -75,11 +77,11 @@ void STDMIXER_SetChannelOrderByProtocol()
             safetysw = Model.limits[ch].safetysw;
             safetyval = Model.limits[ch].safetyval;
         }
-        if (ProtocolChannelMap[Model.protocol][ch] == INP_THROTTLE)
+        if (ch_map[ch] == INP_THROTTLE)
             mapped_std_channels.throttle = ch;
-        else if (ProtocolChannelMap[Model.protocol][ch] == INP_AILERON)
+        else if (ch_map[ch] == INP_AILERON)
             mapped_std_channels.actual_aile = mapped_std_channels.aile = ch;
-        else if (ProtocolChannelMap[Model.protocol][ch] == INP_ELEVATOR)
+        else if (ch_map[ch] == INP_ELEVATOR)
             mapped_std_channels.actual_elev = mapped_std_channels.elev = ch;
     }
     Model.limits[mapped_std_channels.throttle].safetysw = safetysw;
