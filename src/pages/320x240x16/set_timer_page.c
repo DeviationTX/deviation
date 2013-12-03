@@ -86,7 +86,7 @@ static void _show_settimer_page(u8 index)
     #define XADD  (XLEFT)
     #define XSET  (XADD + 64)
     #define XUNIT (XOFF + 170)
-    #define XVAL  (XUNIT + 50)
+    #define XVAL  (XUNIT + 70)
 
     // actual value
     firstObj = GUI_CreateLabel(&guiset->oldlbl, XLEFT, YOLD, NULL, DEFAULT_FONT, (void *)_tr("actual value"));
