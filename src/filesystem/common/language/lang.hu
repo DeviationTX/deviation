@@ -199,7 +199,8 @@ Adat napló
 Dátum
 :Date / Time
 Dátum / Idő
->:Date format
+:Date format
+Dátum formátum
 :Date:
 Dátum:
 :Day
@@ -495,7 +496,7 @@ Előjelz. interv.
 :Prealert time
 Előjelz. idő
 :Press 'Ent' to turn USB Filesystem
-\nNyomjon 'ENT'-t, hogy az USB
+\n'ENT'-el kapcsolhatja az USB-t
 :Press ENT to change
 Változtatáshoz ENT
 :Press ENT to copy to
@@ -503,13 +504,17 @@ Másolás ENT
 :Press ENT to load
 Betöltés ENT
 :Press ENT to turn \nUSB drive
-Nyomjon ENT-t \naz USB
+ENT-el kapcsolhatja \naz USB-t
 :Protocol
 Protokoll
 :PwrDn alert
 Kikapcs. riaszt.
+|devo10:PwrDn alert
+Kikapcs. r.
 :PwrOn alarm
 Bekapcs. riaszt.
+|devo10:PwrOn alarm
+Bekapcs. r.
 :RIGHT_H
 JOBB_V
 :RIGHT_V
@@ -536,6 +541,8 @@ Törlés
 Nullázza az üzemidőt?
 :Reset sw
 Törlés kapcs.
+|devo10:Reset sw
+Törlés k.
 :Reverse
 Invertálás
 :Reversed
@@ -560,20 +567,30 @@ Skála%s
 Szkenner
 :Second
 Másodperc
+|devo12:Second
+Másodp.
+|devo10:Second
+Másodp.
 :Select
 Kiválaszt
 :Servo
 Szervó
 :Set
 Beállítás
->:Set date
->:Set permanent timer
->:Set time
->:Set to
+:Set date
+Dátum beáll.
+:Set permanent timer
+Üzemidő beállítása
+:Set time
+Idő beáll.
+:Set to
+Beállít
 :Set:
 Beállítás:
 :Simple
 Egyszerű
+|devo10:Simple
+Egysz.
 :Simple 4 Channel
 Egyszerű 4 csat.
 :Small-box
@@ -676,7 +693,8 @@ Gáz görbék
 Gáz kapcsoló
 :Time
 Idő
->:Time format
+:Time format
+Idő formátum
 :Timer
 Időzítő
 :Timer settings
@@ -765,15 +783,18 @@ Nulla/Max
 \n%d másodperc van hátra
 :\n\nBinding will end in %d seconds...
 \n\nKapcsolódás vége %d másodperc múlva...
->:actual value
+:actual value
+Aktuális érték
 :add
 hozzáad
 :cntdn-prop
-Gázfüggő időz.
+Gázf. időz.
 :countdown
 Időzítő
 :delay
 késleltetés
+|devo10:delay
+késlelt.
 :is not supported
 nem támogatott
 :is turned off
@@ -788,10 +809,13 @@ szoroz
 Üzemidő
 :replace
 cserél
->:resulting value
+:resulting value
+Új érték
 :stop-prop
-Gázfüggő stop.
+Gázf. stop.
 :stopwatch
 Stopper
->:value to add or set
->:value to set
+:value to add or set
+Beállítandó/hozzáadandó
+:value to set
+Beállítandó érték
