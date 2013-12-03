@@ -92,7 +92,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
     char letter = ' ';
     switch(telem) {
         case TELEM_GPS_LONG:
-            // allowed values: +/-180Â° = +/- 180*60*60*1000; W if value<0, E if value>=0; -180Â° = 180Â°
+            // allowed values: +/-180° = +/- 180*60*60*1000; W if value<0, E if value>=0; -180° = 180°
             if (value < 0) {
                 letter = 'W';
                 value = -value;
@@ -102,10 +102,10 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             m = (value - h * 1000 * 60 * 60) / 1000 / 60;
             s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
             ss = value % 1000;
-            sprintf(str, "%c %3dÂ° %02d' %02d.%03d\"", letter, h, m, s, ss);
+            sprintf(str, "%c %3d° %02d' %02d.%03d\"", letter, h, m, s, ss);
             break;
         case TELEM_GPS_LAT:
-            // allowed values: +/-90Â° = +/- 90*60*60*1000; S if value<0, N if value>=0
+            // allowed values: +/-90° = +/- 90*60*60*1000; S if value<0, N if value>=0
             if (value < 0) {
                 letter = 'S';
                 value = -value;
@@ -115,7 +115,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
             m = (value - h * 1000 * 60 * 60) / 1000 / 60;
             s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
             ss = value % 1000;
-            sprintf(str, "%c %3dÂ° %02d' %02d.%03d\"", letter, h, m, s, ss);
+            sprintf(str, "%c %3d° %02d' %02d.%03d\"", letter, h, m, s, ss);
             break;
         case TELEM_GPS_ALT:
             if (Transmitter.telem & TELEMUNIT_FEET) {
