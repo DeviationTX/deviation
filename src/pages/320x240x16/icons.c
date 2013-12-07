@@ -17,12 +17,13 @@
 #include "icons.h"
 
 const struct ImageMap icons[] = {
-    [ICON_EXIT]     = {"media/exit.bmp",     32, 31, 0, 0},
-    [ICON_OPTIONS]  = {"media/options.bmp",  32, 31, 0, 0},
-    [ICON_PREVPAGE] = {"media/prevpage.bmp", 32, 31, 0, 0},
-    [ICON_NEXTPAGE] = {"media/nextpage.bmp", 32, 31, 0, 0},
-    [ICON_CHANTEST] = {"media/chansico.bmp", 32, 31, 0, 0},
-    [ICON_MODELICO] = {"media/modelico.bmp", 32, 31, 0, 0},
-    [ICON_ORDER]    = {"media/orderico.bmp", 32, 31, 0, 0},
-    [ICON_PLUS]     = {"media/plusico.bmp",   32, 31, 0, 0},
+    [ICON_EXIT]       = {"media/exit.bmp",     32, 31, 0, 0},
+    [ICON_OPTIONS]    = {"media/options.bmp",  32, 31, 0, 0},
+    [ICON_PREVPAGE]   = {"media/prevpage.bmp", 32, 31, 0, 0},
+    [ICON_NEXTPAGE]   = {"media/nextpage.bmp", 32, 31, 0, 0},
+    [ICON_CHANTEST]   = {"media/chansico.bmp", 32, 31, 0, 0},
+    [ICON_MODELICO]   = {"media/modelico.bmp", 32, 31, 0, 0},
+    [ICON_ORDER]      = {"media/orderico.bmp", 32, 31, 0, 0},
+    [ICON_LAYOUT_ADD] = {"media/lay_add.bmp",  32, 31, 0, 0},
+    [ICON_LAYOUT_CFG] = {"media/lay_cfg.bmp",  32, 31, 0, 0},
 };

@@ -85,8 +85,8 @@ void PAGE_MainLayoutInit(int page)
             .outline_color = 0,
             .style = LABEL_FILL};
     gui->desc[1].font = TINY_FONT.font; //Special case for trims
-    GUI_CreateIcon(&gui->newelem, 32, 0, &icons[ICON_PLUS], add_dlg_cb, NULL);
-    GUI_CreateIcon(&gui->editelem, 64, 0, &icons[ICON_OPTIONS], cfg_cb, NULL);
+    GUI_CreateIcon(&gui->newelem, 32, 0, &icons[ICON_LAYOUT_ADD], add_dlg_cb, NULL);
+    GUI_CreateIcon(&gui->editelem, 64, 0, &icons[ICON_LAYOUT_CFG], cfg_cb, NULL);
     GUI_SetHidden((guiObject_t *)&gui->editelem, 1);
     //GUI_CreateTextSelect(&gui->newelem, 36, 12, TEXTSELECT_96, newelem_press_cb, newelem_cb, NULL);
     GUI_CreateLabel(&gui->xlbl, 80+18, 9, NULL, TITLE_FONT, "X");
