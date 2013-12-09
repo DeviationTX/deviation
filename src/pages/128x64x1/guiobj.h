@@ -150,7 +150,7 @@ struct timer_obj {
 
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
-struct set_timer_obj {
+struct settimer_obj {
     guiLabel_t      oldtime;
     guiTextSelect_t hms;
     guiTextSelect_t value;
@@ -339,7 +339,7 @@ struct gui_objs {
         struct timer_obj timer;
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
-        struct set_timer_obj settimer;
+        struct settimer_obj settimer;
 #endif
         struct trim_obj trim;
         struct trim2_obj trim2;

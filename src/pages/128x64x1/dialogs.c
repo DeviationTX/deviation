@@ -21,7 +21,7 @@
 
 #include "../common/_dialogs.c"
 
-#define gui (&gui_objs.dialog)
+static struct dialog_obj * const gui = &gui_objs.dialog;
 
 static u32 dialogcrc;
 void PAGE_ShowSafetyDialog()

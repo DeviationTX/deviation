@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct set_timer_obj * const guiset = &gui_objs.u.settimer;
-static struct timer_page * const tp = &pagemem.u.timer_page;
+static struct settimer_obj * const guiset = &gui_objs.u.settimer;
+static struct timer_page   * const tp     = &pagemem.u.timer_page;
 
 enum { OLD_TIMER=0, ADD_TIMER, NEW_TIMER,               // only for readability
        SET_BUTTON=100, ADD_BUTTON, SELECT_HMS, SELECT_VALUE,

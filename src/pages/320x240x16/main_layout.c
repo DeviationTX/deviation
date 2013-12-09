@@ -20,8 +20,8 @@
 #include "config/model.h"
 #include "telemetry.h"
 
+static struct mainlayout_obj * const gui = &gui_objs.u.mainlayout;
 #define lp pagemem.u.layout_page
-#define gui (&gui_objs.u.mainlayout)
 #define pc Model.pagecfg2
 
 static void draw_elements();

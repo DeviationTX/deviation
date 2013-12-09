@@ -24,7 +24,8 @@
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_string_cb(guiObject_t *obj, const void *data);
 
-#define gui (&gui_objs.u.lang)
+static struct lang_obj * const gui = &gui_objs.u.lang;
+
 void press_cb(struct guiObject *obj, s8 press_type, const void *data)
 {
     (void)obj;

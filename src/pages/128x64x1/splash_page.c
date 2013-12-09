@@ -17,7 +17,8 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-#define gui (&gui_objs.u.splash)
+static struct splash_obj * const gui = &gui_objs.u.splash;
+
 static u8 _action_cb(u32 button, u8 flags, void *data);
 //static int offset =  110;
 

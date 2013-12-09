@@ -14,7 +14,7 @@
  */
 #include "pages.h"
 
-#define gui (&gui_objs.page)
+static struct page_obj * const gui = &gui_objs.page;
 
 static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;

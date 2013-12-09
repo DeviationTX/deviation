@@ -20,16 +20,17 @@
 #include "config/model.h"
 
 
-#define gui (&gui_objs.u.tx)
-#define gui3 (&gui_objs.u.tx.u.g3)
+static struct tx_obj    * const gui  = &gui_objs.u.tx;
+static struct tx_obj_g3 * const gui3 = &gui_objs.u.tx.u.g3;
 #if LCD_WIDTH != 480
-    #define gui1 (&gui_objs.u.tx.u.g1)
-    #define gui2 (&gui_objs.u.tx.u.g2)
+    static struct tx_obj_g1 * const gui1 = &gui_objs.u.tx.u.g1;
+    static struct tx_obj_g2 * const gui2 = &gui_objs.u.tx.u.g2;
 #else
-    #define gui1 gui3
-    #define gui2 gui3
+    static struct tx_obj_g3 * const gui1 = &gui_objs.u.tx.u.g3;
+    static struct tx_obj_g3 * const gui2 = &gui_objs.u.tx.u.g3;
 #endif
-#define MIN_BATTERY_ALARM_STEP 50
+
+static const int MIN_BATTERY_ALARM_STEP  = 50;
 
 u8 page_num;
 guiObject_t *firstObj;

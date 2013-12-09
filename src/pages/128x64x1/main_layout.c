@@ -22,11 +22,12 @@
 #if ENABLE_LAYOUT_EDIT
 
 #define lp pagemem.u.layout_page
-#define gui (&gui_objs.u.mainlayout)
 #define pc Model.pagecfg2
+static struct mainlayout_obj * const gui = &gui_objs.u.mainlayout;
 
 #define NUMERIC_LABELS
-#define HEADER_Y 1
+static const int HEADER_Y = 1;
+
 #include "../common/_main_layout.c"
 
 static const char *pos_cb(guiObject_t *obj, const void *data);

@@ -20,7 +20,7 @@
 
 #include "../common/_model_config.c"
 
-#define gui (&gui_objs.u.modelcfg)
+static struct modelcfg_obj * const gui = &gui_objs.u.modelcfg;
 
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {

@@ -19,8 +19,8 @@
 
 #include "../common/_trim_page.c"
 
-#define gui (&gui_objs.u.trim)
-#define gui_ed (&gui_objs.u.trimedit)
+static struct trim_obj     * const gui    = &gui_objs.u.trim;
+static struct trimedit_obj * const gui_ed = &gui_objs.u.trimedit;
 
 #define PCOL1 (4 + ((LCD_WIDTH - 320) / 2))
 #define PCOL2 (72 + ((LCD_WIDTH - 320) / 2))

@@ -22,7 +22,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_reverse_page.c"
 
-#define gui (&gui_objs.u.stdchan)
+static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
 
 static void toggle_reverse_cb(guiObject_t *obj, void *data)
 {

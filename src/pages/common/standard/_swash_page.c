@@ -13,8 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define gui (&gui_objs.u.stdswash)
-static struct model_page * const mp = &pagemem.u.model_page;
+static struct stdswash_obj * const gui = &gui_objs.u.stdswash;
+static struct model_page   * const mp  = &pagemem.u.model_page;
+
 static s8 swashmix[3];
 
 static void update_swashmixes()

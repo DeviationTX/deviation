@@ -13,9 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define gui (&gui_objs.u.advmixer)
-#define guim (&gui_objs.u.advmixcfg)
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
+static struct advmixer_obj  * const gui  = &gui_objs.u.advmixer;
+static struct advmixcfg_obj * const guim = &gui_objs.u.advmixcfg;
+static struct mixer_page    * const mp   = &pagemem.u.mixer_page;
 static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, const void *data);
 static void limitselect_cb(guiObject_t *obj, const void *data);

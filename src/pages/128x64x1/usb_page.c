@@ -19,7 +19,8 @@
 
 #include "../common/_usb_page.c"
 static u8 _action_cb(u32 button, u8 flags, void *data);
-#define gui (&gui_objs.u.usb)
+
+static struct usb_obj * const gui = &gui_objs.u.usb;
 
 static void _draw_page(u8 enable)
 {

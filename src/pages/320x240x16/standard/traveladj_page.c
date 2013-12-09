@@ -22,7 +22,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_traveladj_page.c"
 
-#define gui (&gui_objs.u.stdtravel)
+static struct stdtravel_obj * const gui = &gui_objs.u.stdtravel;
 
 static void show_page(int page)
 {

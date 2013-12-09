@@ -21,8 +21,8 @@
 
 #define lp pagemem.u.layout_page
 #define pc Model.pagecfg2
-#define gui (&gui_objs.u.mainconfig)
-#define HEADER_Y 10
+static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
+static const int HEADER_Y = 10;
 
 #include "../common/_main_config.c"
 

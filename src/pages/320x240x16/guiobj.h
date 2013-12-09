@@ -221,7 +221,7 @@ struct timer_obj {
     guiTextSelect_t start[NUM_TIMERS];
 };
 
-struct set_timer_obj {
+struct settimer_obj {
     guiLabel_t      headerlbl;
     guiLabel_t      secondlbl, minutelbl, hourlbl;
     guiTextSelect_t secondsel, minutesel, hoursel;
@@ -259,7 +259,12 @@ struct trimedit_obj {
 struct tx_obj {
     guiScrollbar_t scrollbar;
     union {
-        struct {
+#if LCD_WIDTH != 480
+        struct tx_obj_g1
+#else
+        struct tx_obj_g3
+#endif
+        {
              guiLabel_t head1_1;
              guiLabel_t langlbl;
              guiButton_t lang;
@@ -276,7 +281,7 @@ struct tx_obj {
 #endif
 #if LCD_WIDTH != 480
         } g1;
-        struct {
+        struct tx_obj_g2 {
 #endif
              guiLabel_t head2_1;
              guiLabel_t buzzlbl;
@@ -298,7 +303,7 @@ struct tx_obj {
              guiTextSelect_t dimtgt;
 #if LCD_WIDTH != 480
         } g2;
-        struct {
+        struct tx_obj_g3 {
 #endif
              guiLabel_t head3_1;
              guiLabel_t prealertlbl;
@@ -408,7 +413,7 @@ struct advmixcfg_obj {
     //guiBarGraph_t bar;
     //guiXYGraph_t graph;
     union {
-        struct {
+        struct advmixcfg_obj_g1 {
             guiLabel_t srclbl;
             guiTextSelect_t src;
             guiLabel_t curvelbl;
@@ -419,7 +424,7 @@ struct advmixcfg_obj {
             guiLabel_t offsetlbl;
             guiTextSelect_t offset;
         } g1;
-        struct {
+        struct advmixcfg_obj_g2 {
             guiLabel_t srclbl;
             guiLabel_t sw1lbl;
             guiLabel_t sw2lbl;
@@ -437,7 +442,7 @@ struct advmixcfg_obj {
             guiXYGraph_t graphhi;
             guiXYGraph_t graph[2];
         } g2;
-        struct {
+        struct advmixcfg_obj_g3 {
             guiLabel_t nummixlbl;
             guiTextSelect_t nummix;
             guiLabel_t pagelbl;
@@ -563,7 +568,7 @@ struct gui_objs {
         struct telemcfg_obj telemcfg;
         struct telemtest_obj telemtest1;
         struct timer_obj timer;
-        struct set_timer_obj settimer;
+        struct settimer_obj settimer;
         struct trim_obj trim;
         struct trimedit_obj trimedit;
         struct tx_obj tx;

@@ -19,9 +19,9 @@
 #include "config/model.h"
 
 #define tp pagemem.u.toggle_select_page
-#define gui (&gui_objs.u.toggleselect)
+static struct toggleselect_obj * const gui = &gui_objs.u.toggleselect;
 
-#define NUM_COLS 8
+static const int NUM_COLS = 8;
 
 #include "../common/_toggle_select.c"
 

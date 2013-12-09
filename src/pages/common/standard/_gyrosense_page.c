@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
-#define gui (&gui_objs.u.stdgyro)
+static struct mixer_page  * const mp  = &pagemem.u.mixer_page;
+static struct stdgyro_obj * const gui = &gui_objs.u.stdgyro;
 
 static GyroOutputChannel gyro_output;
 static u8 output[3] ; // use 0-100 instead of -100 to 100 for gyro

@@ -22,7 +22,7 @@
 #include "target_defs.h"
 
 #if HAS_RTC
-#define gui (&gui_objs.u.rtc)
+static struct rtc_obj * const gui = &gui_objs.u.rtc;
 
 #define ADD_OFFSET 20   // to add some space in the middle
 #define XL(w)  ((LCD_WIDTH / 4 - (w) / 2) - ADD_OFFSET)

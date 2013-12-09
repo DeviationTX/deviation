@@ -18,9 +18,10 @@
 
 #include "../../common/advanced/_mixer_setup.c"
 
-#define gui1 (&gui_objs.u.advmixcfg.u.g1)
-#define gui2 (&gui_objs.u.advmixcfg.u.g2)
-#define gui3 (&gui_objs.u.advmixcfg.u.g3)
+static struct advmixcfg_obj_g1 * const gui1 = &gui_objs.u.advmixcfg.u.g1;
+static struct advmixcfg_obj_g2 * const gui2 = &gui_objs.u.advmixcfg.u.g2;
+static struct advmixcfg_obj_g3 * const gui3 = &gui_objs.u.advmixcfg.u.g3;
+
 #ifndef COL1
     //320x240
     #define COL1        10

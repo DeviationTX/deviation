@@ -19,8 +19,9 @@
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
-static struct usb_page * const up = &pagemem.u.usb_page;
-#define gui (&gui_objs.u.about)
+static struct usb_page  * const up  = &pagemem.u.usb_page;
+static struct about_obj * const gui = &gui_objs.u.about;
+
 void PAGE_AboutInit(int page)
 {
     (void)page;

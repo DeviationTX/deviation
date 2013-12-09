@@ -22,7 +22,6 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_throhold_page.c"
 
-#define gui (&gui_objs.u.stdthold)
 static void toggle_thold_cb(guiObject_t *obj, void *data)
 {
     (void)obj;

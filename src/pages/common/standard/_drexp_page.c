@@ -13,8 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define gui (&gui_objs.u.stddrexp)
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
+static struct stddrexp_obj * const gui = &gui_objs.u.stddrexp;
+static struct mixer_page   * const mp  = &pagemem.u.mixer_page;
+
 typedef enum {
     DREXP_AIL = 0,
     DREXP_ELE,

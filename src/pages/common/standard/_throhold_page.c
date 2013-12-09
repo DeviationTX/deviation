@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
-#define gui (&gui_objs.u.stdthold)
+static struct mixer_page   * const mp  = &pagemem.u.mixer_page;
+static struct stdthold_obj * const gui = &gui_objs.u.stdthold;
 
 static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
 {

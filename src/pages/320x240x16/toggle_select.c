@@ -19,8 +19,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+static struct toggle_obj * const gui = &gui_objs.u.toggle;
 #define tp pagemem.u.toggle_select_page
-#define gui (&gui_objs.u.toggle)
 
 #include "../common/_toggle_select.c"
 

@@ -20,7 +20,7 @@
 
 #include "../common/_usb_page.c"
 
-#define gui (&gui_objs.u.usb)
+static struct usb_obj * const gui = &gui_objs.u.usb;
 
 const char *show_usb_time_cb(guiObject_t *obj, const void *data);
 const char *show_usb_date_cb(guiObject_t *obj, const void *data);

@@ -24,8 +24,6 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_swash_page.c"
 
-#define gui (&gui_objs.u.stdswash)
-
 void PAGE_SwashInit(int page)
 {
     (void)page;

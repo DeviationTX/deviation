@@ -20,10 +20,10 @@
 #include "config/model.h"
 #include "autodimmer.h"
 
-#define MIN_BATTERY_ALARM_STEP 10
+static const int MIN_BATTERY_ALARM_STEP = 10;
 #include "../common/_tx_configure.c"
 
-#define gui (&gui_objs.u.tx)
+static struct tx_obj * const gui = &gui_objs.u.tx;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);

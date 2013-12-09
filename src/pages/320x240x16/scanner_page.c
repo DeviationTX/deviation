@@ -20,7 +20,8 @@
 
 #ifdef ENABLE_SCANNER
 #define sp (pagemem.u.scanner_page)
-#define gui (&gui_objs.u.scanner)
+static struct scanner_obj * const gui = &gui_objs.u.scanner;
+
 u16 scan_trigger_cb()
 {
     sp.time_to_scan = 1;

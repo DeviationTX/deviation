@@ -18,7 +18,8 @@
 #include "config/model.h"
 #include "config/tx.h"
 
-#define gui (&gui_objs.u.menu)
+static struct menu_obj * const gui = &gui_objs.u.menu;
+
 struct menu_pages {
     enum PageID id;
     const char *name;

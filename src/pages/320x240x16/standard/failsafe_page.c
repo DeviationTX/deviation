@@ -22,7 +22,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_failsafe_page.c"
 
-#define gui (&gui_objs.u.stdchan)
+static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
 
 static void show_page(int page)
 {

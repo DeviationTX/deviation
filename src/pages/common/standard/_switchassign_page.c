@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct mixer_page * const mp = &pagemem.u.mixer_page;
-#define gui (&gui_objs.u.stdswitch)
+static struct mixer_page    * const mp  = &pagemem.u.mixer_page;
+static struct stdswitch_obj * const gui = &gui_objs.u.stdswitch;
 
 static u8 switch_idx[SWITCHFUNC_LAST];
 

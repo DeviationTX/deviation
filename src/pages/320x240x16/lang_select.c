@@ -21,7 +21,7 @@
 
 #include "../common/_lang_select.c"
 
-#define gui (&gui_objs.u.lang)
+static struct lang_obj * const gui = &gui_objs.u.lang;
 
 static void select_cb(guiObject_t *obj, u16 sel, void *data)
 {

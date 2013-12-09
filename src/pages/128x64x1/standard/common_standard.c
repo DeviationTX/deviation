@@ -22,7 +22,8 @@
 #include "standard.h"
 #include "../../common/standard/_common_standard.c"
 
-#define gui (&gui_objs.u.stdchan)
+static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
+
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

@@ -19,7 +19,7 @@
 
 #if HAS_STANDARD_GUI
 
-#define gui (&gui_objs.u.stdmenu)
+static struct stdmenu_obj * const gui = &gui_objs.u.stdmenu;
 
 struct menu_s {
     u8 id;

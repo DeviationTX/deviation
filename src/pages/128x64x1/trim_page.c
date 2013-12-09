@@ -19,8 +19,8 @@
 
 #include "../common/_trim_page.c"
 
-#define gui (&gui_objs.u.trim)
-#define guit (&gui_objs.u.trim2)
+static struct trim_obj  * const gui  = &gui_objs.u.trim;
+static struct trim2_obj * const guit = &gui_objs.u.trim2;
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static u8 _sub_action_cb(u32 button, u8 flags, void *data);

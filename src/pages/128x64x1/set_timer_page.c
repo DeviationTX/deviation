@@ -22,8 +22,6 @@
 #if HAS_PERMANENT_TIMER
 #include "../common/_set_timer_page.c"
 
-#define guiset (&gui_objs.u.settimer)
-
 static u8 _action_cb(u32 button, u8 flags, void *data);
 
 const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
