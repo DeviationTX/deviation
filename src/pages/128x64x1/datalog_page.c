@@ -133,7 +133,7 @@ static const char *remaining_str_cb(guiObject_t *obj, const void *data)
 void PAGE_DatalogInit(int page)
 {
     (void)page;
-    memset(gui, 0, sizeof(gui));
+    memset(gui, 0, sizeof(*gui));
     seltype = 0;
     PAGE_ShowHeader("");
     GUI_CreateLabelBox(&gui->remaining, 0, 0,

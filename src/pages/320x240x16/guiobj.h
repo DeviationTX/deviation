@@ -73,7 +73,7 @@ struct mainlayout_obj {
     guiLabel_t elem[NUM_ELEMS];
 };
 
-struct mainpage_objs {
+struct mainpage_obj {
     guiButton_t optico;
     guiButton_t modelico;
     guiLabel_t name;
@@ -93,7 +93,7 @@ struct mainpage_objs {
 };
 
 #define DATALOG_NUM_SCROLLABLE (LCD_HEIGHT == 240 ? 7 : 8)
-struct datalog_objs {
+struct datalog_obj {
     guiLabel_t enlbl;
     guiTextSelect_t en;
     guiLabel_t freqlbl;
@@ -110,7 +110,7 @@ struct datalog_objs {
     guiScrollable_t scrollable;
 };
 
-struct modelcfg_objs {
+struct modelcfg_obj {
     guiLabel_t title;
     guiLabel_t swashlbl;
     guiTextSelect_t swash;
@@ -134,13 +134,13 @@ struct modelcfg_objs {
     guiTextSelect_t ppmmap[MAX_PPM_IN_CHANNELS];
 };
 
-struct modelload_objs {
+struct modelload_obj {
     guiButton_t ok;
     guiListbox_t list;
     guiImage_t image;
 };
 
-struct modelpage_objs {
+struct modelpage_obj {
     guiLabel_t filelbl;
     guiTextSelect_t file;
     guiLabel_t guilbl;
@@ -551,11 +551,11 @@ struct gui_objs {
         struct lang_obj lang;
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
-        struct mainpage_objs mainpage;
-        struct datalog_objs  datalog;
-        struct modelcfg_objs modelcfg;
-        struct modelload_objs modelload;
-        struct modelpage_objs modelpage;
+        struct mainpage_obj mainpage;
+        struct datalog_obj  datalog;
+        struct modelcfg_obj modelcfg;
+        struct modelload_obj modelload;
+        struct modelpage_obj modelpage;
         struct reorder_obj reorder;
 #ifdef ENABLE_SCANNER
         struct scanner_obj scanner;

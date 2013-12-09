@@ -12,7 +12,7 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
-#define gui (&gui_objs.u.reorder)
+static struct reorder_obj * const gui = &gui_objs.u.reorder;
 struct {
     void(*return_page)(u8 *);
     const char *(*text_cb)(u8 idx);

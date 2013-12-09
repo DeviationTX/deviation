@@ -14,7 +14,7 @@
  */
 
 static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // MACRO is not good when debugging
-#define guic (&gui_objs.u.calibrate)
+static struct calibrate_obj * const guic = &gui_objs.u.calibrate;
 
 enum {
 #ifndef NO_LANGUAGE_SUPPORT

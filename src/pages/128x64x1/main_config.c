@@ -192,7 +192,7 @@ void show_config()
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
 #endif
     PAGE_SetActionCB(_action_cb);
-    memset(gui, 0, sizeof(struct mainconfig_obj));
+    memset(gui, 0, sizeof(*gui));
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
         if (! ELEM_USED(pc.elem[count]))

@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define gui (&gui_objs.u.datalog)
+static struct datalog_obj * const gui = &gui_objs.u.datalog;
 #define dlog Model.datalog
 u16 next_update;
 u32 remaining;

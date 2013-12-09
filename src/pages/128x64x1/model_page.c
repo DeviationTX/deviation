@@ -139,7 +139,7 @@ void PAGE_ModelInit(int page)
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    memset(gui, 0, sizeof(gui));
+    memset(gui, 0, sizeof(struct modelpage_obj));
     mp->file_state = 0;
     mp->last_txpower = Model.tx_power;
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings

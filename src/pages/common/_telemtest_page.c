@@ -14,7 +14,7 @@
  */
 
 #define tp (pagemem.u.telemtest_page)
-#define gui (&gui_objs.u.telemtest1)
+static struct telemtest_obj * const gui = &gui_objs.u.telemtest1;
 
 #define TELEM_FONT NORMALBOX_FONT
 #define TELEM_TXT_FONT DEFAULT_FONT

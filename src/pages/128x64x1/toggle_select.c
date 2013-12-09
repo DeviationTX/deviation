@@ -97,7 +97,7 @@ static void show_iconsel_page(int SelectedIcon)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
-    memset(gui, 0, sizeof(gui));
+    memset(gui, 0, sizeof(*gui));
     current_toggleicon = SelectedIcon;
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp.tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);

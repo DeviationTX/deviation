@@ -14,7 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
-#define gui (&gui_objs.u.modelload)
+static struct modelload_obj * const gui = &gui_objs.u.modelload;
 
 static void _show_buttons(int loadsave);
 static void _show_list(int loadsave, u8 num_models);

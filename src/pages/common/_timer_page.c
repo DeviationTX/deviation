@@ -14,7 +14,7 @@
  */
 #include "mixer_standard.h"
 static struct timer_page * const tp = &pagemem.u.timer_page;
-#define gui (&gui_objs.u.timer)
+static struct timer_obj * const gui = &gui_objs.u.timer;
 
 const char *timer_str_cb(guiObject_t *obj, const void *data);
 

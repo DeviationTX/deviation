@@ -14,7 +14,7 @@
  */
 
 static struct model_page * const mp = &pagemem.u.model_page;
-#define gui (&gui_objs.u.modelpage)
+static struct modelpage_obj * const gui = &gui_objs.u.modelpage;
 static long callback_result; // Bug fix: u8 is a wrong data type, causing memory violation and unpredictable behavior in real devo10's modelname editing
 
 static void _changename_cb(guiObject_t *obj, const void *data);

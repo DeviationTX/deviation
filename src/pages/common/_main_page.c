@@ -14,7 +14,7 @@
  */
 
 static struct main_page * const mp = &pagemem.u.main_page;
-#define gui (&gui_objs.u.mainpage)
+static struct mainpage_obj * const gui = &gui_objs.u.mainpage;
 #define pc Model.pagecfg2
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);

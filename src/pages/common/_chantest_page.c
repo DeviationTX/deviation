@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 static struct chantest_page * const cp = &pagemem.u.chantest_page;
-#define gui (&gui_objs.u.chantest)
+static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
