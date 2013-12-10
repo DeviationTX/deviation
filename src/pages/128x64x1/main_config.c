@@ -19,8 +19,8 @@
 #include "config/model.h"
 #include "telemetry.h"
 
-#define lp pagemem.u.layout_page
-#define pc Model.pagecfg2
+static struct layout_page    * const lp  = &pagemem.u.layout_page;
+static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
 static const int HEADER_Y = 10;
 
@@ -33,7 +33,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 void PAGE_MainLayoutInit(int page)
 {
     (void)page;
-    memset(&lp, 0, sizeof(lp));
+    memset(lp, 0, sizeof(lp));
     show_config();
 }
 void PAGE_MainLayoutEvent()
@@ -73,7 +73,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    int type = ELEM_TYPE(pc.elem[i]);
+    int type = ELEM_TYPE(pc->elem[i]);
     int idx = elem_abs_to_rel(i);
     const char *str;
     switch(type) {
@@ -118,13 +118,13 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
 {
     int idx = (long)data;
-    if (pc.elem[idx].src == 0 && dir < 0)
-        pc.elem[idx].src = -1;
-    if ((s8)pc.elem[idx].src == -1 && dir > 0) {
-        pc.elem[idx].src = 0;
+    if (pc->elem[idx].src == 0 && dir < 0)
+        pc->elem[idx].src = -1;
+    if ((s8)pc->elem[idx].src == -1 && dir > 0) {
+        pc->elem[idx].src = 0;
         dir = 0;
     }
-    if ((s8)pc.elem[idx].src < 0) {
+    if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
         return _tr("Delete");
     }
@@ -195,7 +195,7 @@ void show_config()
     memset(gui, 0, sizeof(*gui));
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
-        if (! ELEM_USED(pc.elem[count]))
+        if (! ELEM_USED(pc->elem[count]))
             break;
     }
 #if ENABLE_LAYOUT_EDIT

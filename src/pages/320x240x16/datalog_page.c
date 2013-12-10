@@ -45,9 +45,9 @@ void press_cb(guiObject_t *obj, s8 press, const void *data)
     if (DATALOG_IsEnabled())
         return;
     if (press == 0) {
-        dlog.source[DATALOG_BYTE(absrow)] ^= (1 << DATALOG_POS(absrow));
+        dlog->source[DATALOG_BYTE(absrow)] ^= (1 << DATALOG_POS(absrow));
         GUI_SetLabelDesc((guiLabel_t *)obj,
-               (dlog.source[DATALOG_BYTE(absrow)] & (1 << DATALOG_POS(absrow)))
+               (dlog->source[DATALOG_BYTE(absrow)] & (1 << DATALOG_POS(absrow)))
                ? &SMALLBOXNEG_FONT
                : &SMALLBOX_FONT);
         DATALOG_UpdateState();
@@ -68,7 +68,7 @@ static void select_press_cb(struct guiObject *obj, const void *data)
     (void)data;
     if (DATALOG_IsEnabled())
         return;
-    memset(&dlog.source, data ? 0 : 0xff, sizeof(dlog.source));
+    memset(&dlog->source, data ? 0 : 0xff, sizeof(dlog->source));
     DATALOG_UpdateState();
     for(unsigned i = 0; i < sizeof(gui->checked) / sizeof(guiLabel_t); i++) {
         if(OBJ_IS_USED(&gui->checked[i]))
@@ -115,7 +115,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int pos = DATALOG_POS(absrow);
         GUI_CreateLabelBox(&gui->checked[relrow],
                     SCROLLABLE_X + 5, y, 16, 16,
-                    (dlog.source[idx] & (1 << pos)) ? &SMALLBOXNEG_FONT : &SMALLBOX_FONT,
+                    (dlog->source[idx] & (1 << pos)) ? &SMALLBOXNEG_FONT : &SMALLBOX_FONT,
                     emptystr_cb, press_cb, (void *)(long)absrow);
         GUI_CreateLabelBox(&gui->source[relrow],
                     SCROLLABLE_X + 25, y, 16, 100,
@@ -127,7 +127,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         int pos = DATALOG_POS(absrow+ROW1);
         GUI_CreateLabelBox(&gui->checked2[relrow],
                     SCROLLABLE_X + 160, y, 16, 16,
-                    (dlog.source[idx] & (1 << pos)) ? &SMALLBOXNEG_FONT : &SMALLBOX_FONT,
+                    (dlog->source[idx] & (1 << pos)) ? &SMALLBOXNEG_FONT : &SMALLBOX_FONT,
                     emptystr_cb, press_cb, (void *)(long)(absrow+ROW1));
         GUI_CreateLabelBox(&gui->source2[relrow],
                     SCROLLABLE_X + 180, y, 16, 100,

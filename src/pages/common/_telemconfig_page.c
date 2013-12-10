@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define tp pagemem.u.telemconfig_page
-static struct telemcfg_obj * const gui = &gui_objs.u.telemcfg;
+static struct telemcfg_obj     * const gui = &gui_objs.u.telemcfg;
+static struct telemconfig_page * const tp  = &pagemem.u.telemconfig_page;
 
 static inline guiObject_t *_get_obj(int idx, int objid);
 

@@ -42,18 +42,17 @@ static u32 _get_icon_info()
             checked = 1;
         }
     #endif
-    static u32 count = 0;
-    if(count == 0) {
+    if(tp->count == 0) {
         for(int i = 0; i < 4; i++) {
             u16 w, h;
             int ok = LCD_ImageDimensions(toggle_files[i], &w, &h);
             if(ok) {
                 //printf("file%d = %d\n", i, w / TOGGLEICON_WIDTH);
-                count |= (w / TOGGLEICON_WIDTH) << (i*8);
+                tp->count |= (w / TOGGLEICON_WIDTH) << (i*8);
             }
         }
     }
-    return count;
+    return tp->count;
 }
 
 struct ImageMap TGLICO_GetImage(int idx)
@@ -77,8 +76,9 @@ void TGLICO_Select(guiObject_t *obj, const void *data)
     (void)obj;
     if(Model.pagecfg2.elem[(long)data].src)
     {
-        tp.tglidx = (long)data;
-        memcpy(tp.tglicons, Model.pagecfg2.elem[tp.tglidx].extra, sizeof(tp.tglicons));
+        tp->tglidx = (long)data;
+        tp->count = 0;
+        memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
         show_iconsel_page(0);
     }
 }
@@ -97,7 +97,7 @@ void tglico_reset_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if (press_type == -1) {
         u32 pos = (long)data;
-        Model.pagecfg2.elem[tp.tglidx].extra[pos] = 0;
+        Model.pagecfg2.elem[tp->tglidx].extra[pos] = 0;
         show_iconsel_page(pos);
     }
 }

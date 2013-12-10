@@ -19,8 +19,8 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-static struct toggle_obj * const gui = &gui_objs.u.toggle;
-#define tp pagemem.u.toggle_select_page
+static struct toggle_obj         * const gui = &gui_objs.u.toggle;
+static struct toggle_select_page * const tp  = &pagemem.u.toggle_select_page;
 
 #include "../common/_toggle_select.c"
 
@@ -37,7 +37,7 @@ void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
         // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
         u8 IconPosition = ((long)data      ) & 0xff;
         u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
-        Model.pagecfg2.elem[tp.tglidx].extra[IconNumber] = IconPosition;
+        Model.pagecfg2.elem[tp->tglidx].extra[IconNumber] = IconPosition;
         show_iconsel_page(IconNumber);
     }
 }
@@ -46,22 +46,22 @@ static void tglico_cancel_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    memcpy(Model.pagecfg2.elem[tp.tglidx].extra, tp.tglicons, sizeof(tp.tglicons));
-    PAGE_MainLayoutRestoreDialog(tp.tglidx);
+    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
+    PAGE_MainLayoutRestoreDialog(tp->tglidx);
 }
 
 static void tglico_ok_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    PAGE_MainLayoutRestoreDialog(tp.tglidx);
+    PAGE_MainLayoutRestoreDialog(tp->tglidx);
 }
 
 static void show_icons(int SelectedIcon, int idx)
 {
     int x, y;
     struct ImageMap img;
-    u8 cursel = Model.pagecfg2.elem[tp.tglidx].extra[SelectedIcon];
+    u8 cursel = Model.pagecfg2.elem[tp->tglidx].extra[SelectedIcon];
 
     for(int i = 0; i < NUM_SYMBOL_ELEMS; i++) {
         y = 80 + (i / NUM_SYMBOL_COLS) * 40;
@@ -113,31 +113,31 @@ static void show_iconsel_page(int SelectedIcon)
     // Ok-Button for saving
     PAGE_CreateOkButton(LCD_WIDTH-155, 4, tglico_ok_cb);
     // Show name of source for toggle icon
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp.tglidx].src);
+    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
 
     // style the switch textbox
     struct LabelDesc outline = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_TRANSPARENT };
     GUI_CreateRect(&gui->toggleframe, 80+80*SelectedIcon, 39, 77, 33, &outline);
 
     GUI_CreateLabelBox(&gui->switchbox,  4, 47, 70, 22, &NORMALBOX_FONT, NULL, NULL,
-                       INPUT_SourceNameAbbrevSwitch(tempstring, Model.pagecfg2.elem[tp.tglidx].src));
+                       INPUT_SourceNameAbbrevSwitch(tempstring, Model.pagecfg2.elem[tp->tglidx].src));
 
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)
         num_positions = 2;
 
     GUI_CreateLabel(&gui->togglelabel[0], 94, 50, NULL, DEFAULT_FONT, _tr("Pos 0"));
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp.tglidx].extra[0]);
+    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[0]);
     GUI_CreateImageOffset(&gui->toggleicon[0], 124, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb, (void *)0L);
 
     GUI_CreateLabel(&gui->togglelabel[1], 174, 50, NULL, DEFAULT_FONT, _tr("Pos 1"));
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp.tglidx].extra[1]);
+    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[1]);
     GUI_CreateImageOffset(&gui->toggleicon[1], 204, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb, (void *)1L);
     if (num_positions == 3) {
         GUI_CreateLabel(&gui->togglelabel[2], 254, 50, NULL, DEFAULT_FONT, _tr("Pos 2"));
-        img = TGLICO_GetImage(Model.pagecfg2.elem[tp.tglidx].extra[2]);
+        img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 284, 40, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb, (void *)2L);
     }

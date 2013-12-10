@@ -33,9 +33,9 @@ void draw_elements()
     if (obj)
         GUI_RemoveHierObjects(obj);
     for (i = 0; i < NUM_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.elem[i], &x, &y, &w, &h))
+        if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
             break;
-        int type = ELEM_TYPE(pc.elem[i]);
+        int type = ELEM_TYPE(pc->elem[i]);
         const char *(*strCallback)(guiObject_t *, const void *) = label_cb;
         void *data = (void *)(long)elem_abs_to_rel(i);
         int desc = 0;
@@ -69,7 +69,7 @@ const char *boxlabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     int i = (long)data;
-    return GetBoxSource(tempstring, pc.elem[i].src);
+    return GetBoxSource(tempstring, pc->elem[i].src);
 }
 
 const char *label_cb(guiObject_t *obj, const void *data)
@@ -86,9 +86,9 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
     //press = 0  : short press
     //press = 1  : long press
     (void)data;
-    if (lp.long_press) {
+    if (lp->long_press) {
         if(press == -1)
-            lp.long_press = 0;
+            lp->long_press = 0;
         return;
     }
     if(press == 0) {
@@ -96,7 +96,7 @@ void touch_cb(guiObject_t *obj, s8 press, const void *data)
     }
     if(press == 1) {
         show_config();
-        lp.long_press = 1;
+        lp->long_press = 1;
     }
 }
 
@@ -111,8 +111,8 @@ void move_elem()
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
-    ELEM_SET_X(pc.elem[idx], lp.selected_x);
-    ELEM_SET_Y(pc.elem[idx], lp.selected_y);
+    ELEM_SET_X(pc->elem[idx], lp->selected_x);
+    ELEM_SET_Y(pc->elem[idx], lp->selected_y);
     draw_elements();
     select_for_move((guiLabel_t *)obj);
 }
@@ -122,11 +122,11 @@ void notify_cb(guiObject_t *obj)
     if ((guiLabel_t *)obj < gui->elem)
         return;
     int idx = guielem_idx(obj);
-    lp.selected_x = ELEM_X(pc.elem[idx]);
-    lp.selected_y = ELEM_Y(pc.elem[idx]);
-    GetElementSize(ELEM_TYPE(pc.elem[idx]), &lp.selected_w, &lp.selected_h);
-    if (ELEM_TYPE(pc.elem[idx]) == ELEM_MODELICO)
-        AdjustIconSize(&lp.selected_x, &lp.selected_y, &lp.selected_h, &lp.selected_w);
+    lp->selected_x = ELEM_X(pc->elem[idx]);
+    lp->selected_y = ELEM_Y(pc->elem[idx]);
+    GetElementSize(ELEM_TYPE(pc->elem[idx]), &lp->selected_w, &lp->selected_h);
+    if (ELEM_TYPE(pc->elem[idx]) == ELEM_MODELICO)
+        AdjustIconSize(&lp->selected_x, &lp->selected_y, &lp->selected_h, &lp->selected_w);
     GUI_Redraw((guiObject_t *)&gui->x);
     GUI_Redraw((guiObject_t *)&gui->y);
 }

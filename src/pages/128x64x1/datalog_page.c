@@ -35,7 +35,7 @@ static void checkbut_press_cb(struct guiObject *obj, const void *data)
     long idx = (long)data;
     if (DATALOG_IsEnabled())
         return;
-    dlog.source[DATALOG_BYTE(idx)] ^= (1 << DATALOG_POS(idx));
+    dlog->source[DATALOG_BYTE(idx)] ^= (1 << DATALOG_POS(idx));
     GUI_Redraw(obj);
 }
 
@@ -43,7 +43,7 @@ static const char *checkbut_txt_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     long idx = (long)data;
-    if (dlog.source[DATALOG_BYTE(idx)] & (1 << DATALOG_POS(idx)))
+    if (dlog->source[DATALOG_BYTE(idx)] & (1 << DATALOG_POS(idx)))
        return _tr("On");
     return _tr("Off");
 }
@@ -54,7 +54,7 @@ static void select_press_cb(struct guiObject *obj, const void *data)
     (void)data;
     if (DATALOG_IsEnabled())
         return;
-    memset(&dlog.source, seltype ? 0xff : 0, sizeof(dlog.source));
+    memset(&dlog->source, seltype ? 0xff : 0, sizeof(dlog->source));
     DATALOG_UpdateState();
     for (int i = 0; i < 4; i++) {
         if(OBJ_IS_USED(&gui->col2[i].but))

@@ -211,9 +211,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             case TYPE_HEADER: cmd = header_cb; break;
             case TYPE_LABEL:  cmd = label_cb; break;
             case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*ITEM_HEIGHT; break;
-            case TYPE_VALUE:  font = &tp.font;  cmd = telem_cb; break;
-            case TYPE_VALUE2: font = &tp.font;  cmd = telem_cb; y = orig_y + ITEM_HEIGHT;break;
-            case TYPE_VALUE4: font = &tp.font;  cmd = telem_cb; y =orig_y + 3*ITEM_HEIGHT; break;
+            case TYPE_VALUE:  font = &tp->font;  cmd = telem_cb; break;
+            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + ITEM_HEIGHT;break;
+            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*ITEM_HEIGHT; break;
         }
         GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, ITEM_HEIGHT,
                 font, cmd, NULL, (void *)(long)ptr->source);
@@ -224,10 +224,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page(const struct telem_layout2 *page)
 {
     PAGE_RemoveAllObjects();
-    tp.font.font = TINY_FONT.font;
-    tp.font.font_color = 0xffff;
-    tp.font.fill_color = 0;
-    tp.font.style = LABEL_SQUAREBOX;
+    tp->font.font = TINY_FONT.font;
+    tp->font.font_color = 0xffff;
+    tp->font.fill_color = 0;
+    tp->font.style = LABEL_SQUAREBOX;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, ITEM_HEIGHT,
@@ -237,7 +237,7 @@ static void _show_page(const struct telem_layout2 *page)
     PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          page->row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
-    tp.telem = Telemetry;
+    tp->telem = Telemetry;
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
@@ -280,7 +280,7 @@ void PAGE_TelemtestEvent() {
         if (!( ptr->row_type & 0x80))
             continue;
         long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
-        long last_val = _TELEMETRY_GetValue(&tp.telem, ptr->source);
+        long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
         if (cur_val != last_val) {
@@ -290,7 +290,7 @@ void PAGE_TelemtestEvent() {
         }
         GUI_SetLabelDesc(&gui->box[i], font);
     }
-    tp.telem = cur_telem;
+    tp->telem = cur_telem;
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)

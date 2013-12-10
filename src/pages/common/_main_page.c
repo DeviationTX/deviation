@@ -13,9 +13,9 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static struct main_page * const mp = &pagemem.u.main_page;
+static struct main_page    * const mp  = &pagemem.u.main_page;
 static struct mainpage_obj * const gui = &gui_objs.u.mainpage;
-#define pc Model.pagecfg2
+static struct PageCfg2     * const pc  = &Model.pagecfg2;
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
@@ -128,12 +128,12 @@ void PAGE_MainEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < NUM_ELEMS; i++) {
-        if (! ELEM_USED(pc.elem[i]))
+        if (! ELEM_USED(pc->elem[i]))
             break;
         if (! OBJ_IS_USED(&gui->elem[i]))
             continue;
-        int src = pc.elem[i].src;
-        int type = ELEM_TYPE(pc.elem[i]);
+        int src = pc->elem[i].src;
+        int type = ELEM_TYPE(pc->elem[i]);
         switch(type) {
             case ELEM_VTRIM:
             case ELEM_HTRIM:
@@ -204,16 +204,16 @@ void PAGE_MainEvent()
                     //switch
                     for (int j = 0; j < 3; j++) {
                         // Assume switch 0/1/2 are in order
-                        if(ELEM_ICO(pc.elem[i], j) && raw[src+j] > 0) {
-                            img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], j));
+                        if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
+                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
                             break;
                         }
                     }
                 } else {
                     //Non switch
                     int sw = raw[src] > 0 ? 1 : 0;
-                    if (ELEM_ICO(pc.elem[i], sw)) {
-                        img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], sw));
+                    if (ELEM_ICO(pc->elem[i], sw)) {
+                        img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
                     }
                 }
                 if (img.file) {
@@ -298,9 +298,9 @@ int MAINPAGE_FindNextElem(unsigned type, int idx)
 {
     type = map_type(type);
     for(int i = idx; i < NUM_ELEMS; i++) {
-        if(! ELEM_USED(pc.elem[i]))
+        if(! ELEM_USED(pc->elem[i]))
             break;
-        if (map_type(ELEM_TYPE(pc.elem[i])) == type)
+        if (map_type(ELEM_TYPE(pc->elem[i])) == type)
             return i;
     }
     return -1;
@@ -310,9 +310,9 @@ void show_elements()
 {
     u16 x, y, w, h;
     for (int i = 0; i < NUM_ELEMS; i++) {
-        if (! GetWidgetLoc(&pc.elem[i], &x, &y, &w, &h))
+        if (! GetWidgetLoc(&pc->elem[i], &x, &y, &w, &h))
             break;
-        int type = ELEM_TYPE(pc.elem[i]);
+        int type = ELEM_TYPE(pc->elem[i]);
         switch(type) {
             case ELEM_MODELICO:
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
@@ -320,7 +320,7 @@ void show_elements()
             case ELEM_VTRIM:
             case ELEM_HTRIM:
             {
-                int src = pc.elem[i].src;
+                int src = pc->elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = *(MIXER_GetTrim(src-1));
@@ -331,7 +331,7 @@ void show_elements()
             case ELEM_SMALLBOX:
             case ELEM_BIGBOX:
             {
-                int src = pc.elem[i].src;
+                int src = pc->elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = get_boxval(src);
@@ -354,7 +354,7 @@ void show_elements()
             }
             case ELEM_BAR:
             {
-                int src = pc.elem[i].src;
+                int src = pc->elem[i].src;
                 if (src == 0)
                     continue;
                 mp->elem[i] = MIXER_GetChannel(src-1, APPLY_SAFETY);
@@ -364,7 +364,7 @@ void show_elements()
             }
             case ELEM_TOGGLE:
             {
-                struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc.elem[i], 0)); //We'll set this properly down below
+                struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], 0)); //We'll set this properly down below
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
                 break;

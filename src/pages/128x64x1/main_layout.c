@@ -21,8 +21,8 @@
 
 #if ENABLE_LAYOUT_EDIT
 
-#define lp pagemem.u.layout_page
-#define pc Model.pagecfg2
+static struct layout_page    * const lp  = &pagemem.u.layout_page;
+static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainlayout_obj * const gui = &gui_objs.u.mainlayout;
 
 #define NUMERIC_LABELS
@@ -38,8 +38,8 @@ void show_layout()
 {
     GUI_RemoveAllObjects();
     PAGE_SetActionCB(_layaction_cb);
-    lp.selected_x = 0;
-    lp.selected_y = 0;
+    lp->selected_x = 0;
+    lp->selected_y = 0;
     for (int i = 0 ; i < 5; i++)
         gui->desc[i] = (struct LabelDesc){
             .font = MICRO_FONT.font,
@@ -72,10 +72,10 @@ void xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (lp.selected_for_move >= 0) {
-        int x = GUI_TextSelectHelper(lp.selected_x, 0, LCD_WIDTH-lp.selected_w, dir, 1, 10, NULL);
-        if (x != lp.selected_x) {
-            lp.selected_x = x;
+    if (lp->selected_for_move >= 0) {
+        int x = GUI_TextSelectHelper(lp->selected_x, 0, LCD_WIDTH-lp->selected_w, dir, 1, 10, NULL);
+        if (x != lp->selected_x) {
+            lp->selected_x = x;
             move_elem();
         }
     }
@@ -85,10 +85,10 @@ void ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
-    if (lp.selected_for_move >= 0) {
-        int y = GUI_TextSelectHelper(lp.selected_y, HEADER_Y, LCD_HEIGHT-lp.selected_h, dir, 1, 10, NULL);
-        if (y != lp.selected_y) {
-            lp.selected_y = y;
+    if (lp->selected_for_move >= 0) {
+        int y = GUI_TextSelectHelper(lp->selected_y, HEADER_Y, LCD_HEIGHT-lp->selected_h, dir, 1, 10, NULL);
+        if (y != lp->selected_y) {
+            lp->selected_y = y;
             move_elem();
         }
     }
@@ -96,14 +96,14 @@ void ypos_cb(guiObject_t *obj, int dir, void *data)
 
 void set_selected_for_move(int idx)
 {
-    lp.selected_for_move = idx;
+    lp->selected_for_move = idx;
     GUI_SetHidden((guiObject_t *)&gui->editelem, idx >= 0 ? 0 : 1);
 }
 
 const char *pos_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    sprintf(tempstring, "%d", data ? lp.selected_y : lp.selected_x);
+    sprintf(tempstring, "%d", data ? lp->selected_y : lp->selected_x);
     return tempstring;
 }
 
@@ -112,10 +112,10 @@ void select_for_move(guiLabel_t *obj)
     GUI_SetSelected((guiObject_t *)obj);
     notify_cb((guiObject_t *)obj);
     int idx = guielem_idx((guiObject_t *)obj);
-    if (lp.selected_for_move == idx)
+    if (lp->selected_for_move == idx)
         return;
-    if (lp.selected_for_move >= 0) {
-        GUI_Redraw((guiObject_t *)&gui->elem[lp.selected_for_move]);
+    if (lp->selected_for_move >= 0) {
+        GUI_Redraw((guiObject_t *)&gui->elem[lp->selected_for_move]);
     }
     set_selected_for_move(idx);
 }
@@ -125,7 +125,7 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
 {
     (void)data;
     if(CHAN_ButtonIsPressed(button, BUT_EXIT) && !(flags & BUTTON_RELEASE)) {
-        if (lp.selected_for_move >= 0) {
+        if (lp->selected_for_move >= 0) {
             set_selected_for_move(-1);
         } else {
             layout_exit();
@@ -135,11 +135,11 @@ static u8 _layaction_cb(u32 button, u8 flags, void *data)
     }
     if (! GUI_GetSelected() || flags & BUTTON_RELEASE)
         return 0;
-    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && lp.selected_for_move < 0) {
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && lp->selected_for_move < 0) {
         select_for_move((guiLabel_t *)GUI_GetSelected());
         return 1;
     }
-    if (lp.selected_for_move < 0)
+    if (lp->selected_for_move < 0)
         return 0;
     if(CHAN_ButtonIsPressed(button, BUT_LEFT)) {
         xpos_cb(NULL, (flags & BUTTON_LONGPRESS) ? -2 : -1, NULL);

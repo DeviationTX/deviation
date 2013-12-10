@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define tp (pagemem.u.telemtest_page)
-static struct telemtest_obj * const gui = &gui_objs.u.telemtest1;
+static struct telemtest_page * const tp  = &pagemem.u.telemtest_page;
+static struct telemtest_obj  * const gui = &gui_objs.u.telemtest1;
 
 #define TELEM_FONT NORMALBOX_FONT
 #define TELEM_TXT_FONT DEFAULT_FONT
@@ -49,10 +49,10 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    if(tp.return_page) {
+    if(tp->return_page) {
         PAGE_SetModal(0);
         PAGE_RemoveAllObjects();
-        tp.return_page(tp.return_val);
+        tp->return_page(tp->return_val);
     }
 }
 

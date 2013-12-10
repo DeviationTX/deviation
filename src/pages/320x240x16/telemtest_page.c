@@ -84,8 +84,8 @@ static void show_page(const struct telem_layout *layout)
                            telem_cb, NULL, (void *)(long)ptr->source);
         i++;
     }
-    tp.telem = Telemetry;
-    //memset(tp.telem.time, 0, sizeof(tp.telem.time));
+    tp->telem = Telemetry;
+    //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }
 
 void PAGE_TelemtestInit(int page)
@@ -103,8 +103,8 @@ void PAGE_TelemtestInit(int page)
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 {
     PAGE_SetModal(1);
-    tp.return_page = return_page;
-    tp.return_val = page;
+    tp->return_page = return_page;
+    tp->return_val = page;
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
@@ -120,7 +120,7 @@ void PAGE_TelemtestEvent() {
     const struct telem_layout *ptr = TELEMETRY_Type() == TELEM_DEVO ? devo8_layout : dsm_layout;
     for (int i = 0; ptr->source; ptr++, i++) {
         long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
-        long last_val = _TELEMETRY_GetValue(&tp.telem, ptr->source);
+        long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
         if (cur_val != last_val) {
@@ -130,5 +130,5 @@ void PAGE_TelemtestEvent() {
         }
         GUI_SetLabelDesc(&gui->value[i], font);
     }
-    tp.telem = cur_telem;
+    tp->telem = cur_telem;
 }
