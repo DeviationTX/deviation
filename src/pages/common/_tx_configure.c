@@ -49,8 +49,8 @@ enum calibType {
 };
 
 static inline guiObject_t *_get_obj(int idx, int objid);
-#define XCOORD 20
-#define YCOORD 20
+static const int XCOORD = 20;
+static const int YCOORD = 20;
 enum calibrateState {
     CALI_CENTER,
     CALI_MAXMIN,

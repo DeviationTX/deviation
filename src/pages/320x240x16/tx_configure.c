@@ -44,11 +44,30 @@ void PAGE_ChangeByName(const char *pageName, u8 menuPage)
     (void)menuPage;
 }
 #include "../common/_tx_configure.c"
-#if LCD_WIDTH != 480
-    #define MAX_PAGE 2
-#else
-    #define MAX_PAGE 0
-#endif
+enum {
+    MAX_PAGE = (LCD_WIDTH == 480) ? 0 : 2,
+    COL1 = 16,
+    COL2 = (COL1+106),
+    #if LCD_WIDTH == 480
+        COL3         = (LCD_WIDTH-16-106-96), // border + label + button
+        COL4         = (LCD_WIDTH-16-96),    // border + button
+        BUTTON_WIDE  = BUTTON_96x16,
+        BUTTON_TEST  = BUTTON_48x16,
+        BUTTON_TOUCH = BUTTON_TEST,
+        COL2TEST     = (COL2+48),
+        ADDSPACE     = 0,
+        ADDROW       = 0,
+    #else
+        COL3         = COL1,
+        COL4         = COL2,
+        BUTTON_WIDE  = BUTTON_96,
+        BUTTON_TEST  = BUTTON_48,
+        BUTTON_TOUCH = BUTTON_WIDE,
+        COL2TEST     = (COL2+100),
+        ADDSPACE     = 15,
+        ADDROW       = 6,
+    #endif
+};
 static void _show_page();
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
@@ -74,27 +93,6 @@ static void _show_page()
         GUI_RemoveHierObjects(firstObj);
         firstObj = NULL;
     }
-    #define COL1 16
-    #define COL2 (COL1+106)
-    #if LCD_WIDTH == 480
-        #define COL3         (LCD_WIDTH-16-106-96) // border + label + button
-        #define COL4         (LCD_WIDTH-16-96)    // border + button
-        #define BUTTON_WIDE  BUTTON_96x16
-        #define BUTTON_TEST  BUTTON_48x16
-        #define BUTTON_TOUCH BUTTON_TEST
-        #define COL2TEST     (COL2+48)
-        #define ADDSPACE     0
-        #define ADDROW       0
-    #else
-        #define COL3         COL1
-        #define COL4         COL2
-        #define BUTTON_WIDE  BUTTON_96
-        #define BUTTON_TEST  BUTTON_48
-        #define BUTTON_TOUCH BUTTON_WIDE
-        #define COL2TEST     (COL2+100)
-        #define ADDSPACE     15
-        #define ADDROW       6
-    #endif
     guiObject_t *obj;
     u8 space = 19;
     int row = 40;

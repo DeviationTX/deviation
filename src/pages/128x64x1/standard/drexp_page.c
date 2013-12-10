@@ -28,8 +28,8 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 
 //static u16 current_selected = 0;
 guiObject_t *scroll_bar;
-#define RIGHT_VIEW_HEIGHT 60
-#define RIGHT_VIEW_ID 1
+static const int RIGHT_VIEW_HEIGHT = 60;
+static const int RIGHT_VIEW_ID  = 1;
 
 enum {
     ITEM_NORMAL,
