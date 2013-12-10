@@ -24,7 +24,7 @@
 #if HAS_RTC
 static struct rtc_obj * const gui = &gui_objs.u.rtc;
 
-#define ADD_OFFSET 20   // to add some space in the middle
+static const int ADD_OFFSET = 20;   // to add some space in the middle
 #define XL(w)  ((LCD_WIDTH / 4 - (w) / 2) - ADD_OFFSET)
 #define XM(w)  (LCD_WIDTH / 2 - (w) / 2)
 #define XR(w)  ((3 * LCD_WIDTH / 4 - (w) / 2) + ADD_OFFSET)
@@ -239,7 +239,7 @@ void _show_page()
         GUI_CreateTextSelect(&gui->select[i], X(i/3, 32) + ((i%3 == 2) ? 67 : 0) - ((i%3 == 0) ? 67 : 0), 100, TEXTSELECT_VERT_64, NULL, rtc_val_cb, (void *)i);
     }
 
-    #define DATEBOXWIDTH 180
+    const int DATEBOXWIDTH = 180;
     u16 w, h;
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_GetStringDimensions((u8 *)rtc_text_cb(NULL, (void *)SETLABEL), &w, &h);

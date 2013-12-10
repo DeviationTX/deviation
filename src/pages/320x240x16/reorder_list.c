@@ -19,7 +19,7 @@
 
 #include "../common/_reorder_list.c"
 
-#define REORD_XOFFSET ((LCD_WIDTH - 320) / 2)
+static const int REORD_XOFFSET = ((LCD_WIDTH - 320) / 2);
 
 static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {

@@ -199,9 +199,9 @@ void show_config()
             break;
     }
 #if ENABLE_LAYOUT_EDIT
-    #define ADD_LOAD 2
+    static const int ADD_LOAD = 2;
 # else
-    #define ADD_LOAD 1
+    static const int ADD_LOAD = 1;
 #endif
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                      ITEM_SPACE, count+NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);

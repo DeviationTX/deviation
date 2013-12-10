@@ -150,8 +150,10 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 static void show_button_page()
 {
     // show elements where they are located on the real tx
-    #define OFFSET_X    ((LCD_WIDTH - 320) / 2) // center on Devo12-screen
-    #define OFFSET_Y    ((LCD_HEIGHT - 240) / 2)
+    enum {
+        OFFSET_X    = ((LCD_WIDTH - 320) / 2), // center on Devo12-screen
+        OFFSET_Y    = ((LCD_HEIGHT - 240) / 2),
+    };
     enum {X = 0, Y = 1};
     const int label_pos[NUM_TX_BUTTONS][2] = CHANTEST_BUTTON_PLACEMENT;
     cp->is_locked = 3;

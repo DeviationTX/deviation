@@ -38,13 +38,15 @@ struct telem_layout {
     u8 width;
     u8 source;
 };
-#define TYPE_INDEX  0x10
-#define TYPE_HEADER 0x20
-#define TYPE_LABEL  0x30
-#define TYPE_LABEL3 0x40
-#define TYPE_VALUE  0x80
-#define TYPE_VALUE2 0x90
-#define TYPE_VALUE4 0xa0
+enum {
+    TYPE_INDEX  = 0x10,
+    TYPE_HEADER = 0x20,
+    TYPE_LABEL  = 0x30,
+    TYPE_LABEL3 = 0x40,
+    TYPE_VALUE  = 0x80,
+    TYPE_VALUE2 = 0x90,
+    TYPE_VALUE4 = 0xa0,
+};
 
 enum {
     TEMP_LABEL = 1,

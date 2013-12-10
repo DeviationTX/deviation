@@ -83,6 +83,23 @@ static void update_textsel_state()
 static void show_page(CurvesMode _curve_mode, int page)
 {
     (void)page;
+    enum {
+        // LINE1      = (40 + ((LCD_HEIGHT - 240) / 2)),
+        LINE1      = 36,
+        LINE2      = (LINE1 + 20),
+        // COL_LBL    = (92 + ((LCD_WIDTH - 320) / 2)),
+        COL_LBL    = (LCD_WIDTH - 208),
+        COL_TEXT   = (COL_LBL + 48),
+        COL_SWITCH = (COL_LBL + 120),
+        ////
+        COL1 = (4 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (20 + ((LCD_WIDTH - 320) / 2)),
+        COL3 = (92 + ((LCD_WIDTH - 320) / 2)),
+        ROWBASE = ((LCD_HEIGHT == 240 ? 60 : 67) + ((LCD_HEIGHT - 240) / 2)),
+        ////
+        GRAPHSIZE_320 = 150,
+        GRAPHSIZE = (LCD_WIDTH == 320 ? GRAPHSIZE_320 : GRAPHSIZE_320 + 32),
+    };
     curve_mode = _curve_mode;
     memset(mp, 0, sizeof(*mp));
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
@@ -105,13 +122,6 @@ static void show_page(CurvesMode _curve_mode, int page)
 
     set_cur_mixer();
     /* Row 1 */
-//    #define LINE1      (40 + ((LCD_HEIGHT - 240) / 2))
-    #define LINE1      36
-    #define LINE2      (LINE1 + 20)
-//    #define COL_LBL    (92 + ((LCD_WIDTH - 320) / 2))
-    #define COL_LBL    (LCD_WIDTH - 208)
-    #define COL_TEXT   (COL_LBL + 48)
-    #define COL_SWITCH (COL_LBL + 120)
     GUI_CreateLabelBox(&gui->modelbl, COL_LBL, LINE1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Mode"));
     GUI_CreateTextSelect(&gui->mode, COL_TEXT, LINE1-1, TEXTSELECT_128, NULL, set_mode_cb, (void *)(long)curve_mode);
     GUI_CreateLabelBox(&gui->holdlbl, COL_LBL, LINE2, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Enabled"));
@@ -120,10 +130,6 @@ static void show_page(CurvesMode _curve_mode, int page)
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
-    #define COL1 (4 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (20 + ((LCD_WIDTH - 320) / 2))
-    #define COL3 (92 + ((LCD_WIDTH - 320) / 2))
-    #define ROWBASE ((LCD_HEIGHT == 240 ? 60 : 67) + ((LCD_HEIGHT - 240) / 2))
     /* Row 2 */
     for(long i = 0; i < 9; i++) {
         const char *label = curvepos[i];
@@ -134,8 +140,6 @@ static void show_page(CurvesMode _curve_mode, int page)
         if (i > 0 && i < 8)
             GUI_CreateButton(&gui->lock[i-1], COL3, ROWBASE+20*i, BUTTON_64x16, lockstr_cb, 0x0000, press_cb, (void *)i);
     }
-    #define GRAPHSIZE_320 150
-    #define GRAPHSIZE (LCD_WIDTH == 320 ? GRAPHSIZE_320 : GRAPHSIZE_320 + 32)
     GUI_CreateXYGraph(&gui->graph, 160 + ((LCD_WIDTH - 320) / 2), 80 + ((LCD_HEIGHT - 240) / 2) - (GRAPHSIZE - GRAPHSIZE_320) / 2, GRAPHSIZE, GRAPHSIZE,
                   CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                   CHAN_MAX_VALUE, CHAN_MAX_VALUE,

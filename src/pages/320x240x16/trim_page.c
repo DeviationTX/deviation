@@ -22,13 +22,16 @@
 static struct trim_obj     * const gui    = &gui_objs.u.trim;
 static struct trimedit_obj * const gui_ed = &gui_objs.u.trimedit;
 
-#define PCOL1 (4 + ((LCD_WIDTH - 320) / 2))
-#define PCOL2 (72 + ((LCD_WIDTH - 320) / 2))
-#define PCOL3 (134 + ((LCD_WIDTH - 320) / 2))
-#define PCOL4 (196 + ((LCD_WIDTH - 320) / 2))
-#define PROW1 (40 + ((LCD_HEIGHT - 240) / 2))
-#define PROW2 ((LCD_HEIGHT == 240 ? 66 : 64) + ((LCD_HEIGHT - 240) / 2))    //slightly higher on Devo12 screen for additional line
-#define PROW3 (PROW2 + 2)
+enum {
+     PCOL1 = (4 + ((LCD_WIDTH - 320) / 2)),
+     PCOL2 = (72 + ((LCD_WIDTH - 320) / 2)),
+     PCOL3 = (134 + ((LCD_WIDTH - 320) / 2)),
+     PCOL4 = (196 + ((LCD_WIDTH - 320) / 2)),
+     PROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+     //slightly higher on Devo12 screen for additional line
+     PROW2 = ((LCD_HEIGHT == 240 ? 66 : 64) + ((LCD_HEIGHT - 240) / 2)),
+     PROW3 = (PROW2 + 2),
+};
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -89,13 +92,15 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 
-    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (104 + ((LCD_WIDTH - 320) / 2))
-    #define ROW1 (48 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW2 (ROW1 + 24)
-    #define ROW3 (ROW1 + 48)
-    #define ROW4 (ROW1 + 72)
-    #define ROW5 (ROW1 + 96)
+    enum {
+         COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
+         COL2 = (104 + ((LCD_WIDTH - 320) / 2)),
+         ROW1 = (48 + ((LCD_HEIGHT - 240) / 2)),
+         ROW2 = (ROW1 + 24),
+         ROW3 = (ROW1 + 48),
+         ROW4 = (ROW1 + 72),
+         ROW5 = (ROW1 + 96),
+    };
     //Row 1
     GUI_CreateLabel(&gui_ed->srclbl, COL1, ROW1, NULL, DEFAULT_FONT, _tr("Input"));
     GUI_CreateTextSelect(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);

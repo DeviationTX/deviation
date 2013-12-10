@@ -23,8 +23,8 @@
 
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
-#define DLG_XOFFSET ((LCD_WIDTH - 320) / 2)
-#define DLG_YOFFSET ((LCD_HEIGHT - 240) / 2)
+static const int DLG_XOFFSET = ((LCD_WIDTH - 320) / 2);
+static const int DLG_YOFFSET = ((LCD_HEIGHT - 240) / 2);
 
 u32 dialogcrc;
 void PAGE_ShowSafetyDialog()

@@ -22,8 +22,13 @@
 #include "../common/_datalog_page.c"
 
 
-#define ROW1 (DLOG_CHANNELS)
-#define ROW2 (DLOG_LAST - DLOG_CHANNELS)
+static const int ROW1 = (DLOG_CHANNELS);
+static const int ROW2 = (DLOG_LAST - DLOG_CHANNELS);
+enum {
+    SCROLLABLE_WIDTH = (275 + 16 + 5),
+    SCROLLABLE_X     = (LCD_WIDTH - SCROLLABLE_WIDTH) / 2,
+};
+
 const char *emptystr_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -101,8 +106,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
     }
 }
 
-#define SCROLLABLE_WIDTH (275 + 16 + 5)
-#define SCROLLABLE_X (LCD_WIDTH - SCROLLABLE_WIDTH) / 2
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -138,7 +141,7 @@ void PAGE_DatalogInit(int page)
 {
     (void)page;
     int row = 40;
-    #define ROW_HEIGHT 20
+    const int ROW_HEIGHT = 20;
 #if HAS_STANDARD_GUI
     if (Model.mixer_mode == MIXER_STANDARD)
         PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DATALOG), MODELMENU_Show);

@@ -34,8 +34,8 @@ struct telem_layout {
     u8 source;
 };
 
-#define TELEM_OFFSET_X ((LCD_WIDTH-320)/2)
-#define TELEM_OFFSET_Y ((LCD_HEIGHT-240)/2)
+static const int TELEM_OFFSET_X = ((LCD_WIDTH-320)/2);
+static const int TELEM_OFFSET_Y = ((LCD_HEIGHT-240)/2);
 
 const struct telem_layout devo8_layout[] = {
           {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DEVO_TEMP1},

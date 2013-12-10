@@ -23,7 +23,7 @@ typedef enum {
 } DREXPType;
 static DREXPType drexp_type = DREXP_AIL;
 static u8 current_pit_mode = 0;
-#define MAX_SCALAR 125
+static const int MAX_SCALAR = 125;
 
 static void _refresh_page();
 void update_graph(int graph);

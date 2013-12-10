@@ -34,6 +34,18 @@ void update_graph(int graph)
 void PAGE_DrExpInit(int page)
 {
     (void)page;
+    enum {
+        COL3 = (4 + ((LCD_WIDTH - 320) / 2)),
+        COL4 = (112 + ((LCD_WIDTH - 320) / 2)),
+        COL5 = (216 + ((LCD_WIDTH - 320) / 2)),
+        COL1 = COL4,
+        COL2 = (COL1 + 32),
+        ROW1 = (36 + ((LCD_HEIGHT - 240) / 2)),
+        ROW2 = (ROW1 + 20),
+        ROW3 = (ROW1 + 40),
+        ROW4 = (ROW1 + 60),
+        ROW5 = (ROW1 + 80),
+    };
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DREXP), MODELMENU_Show);
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_DREXP, SWITCHFUNC_DREXP_AIL+drexp_type));
@@ -44,16 +56,6 @@ void PAGE_DrExpInit(int page)
         GUI_CreateLabelBox(&gui->msg, 0, 120, 240, 16, &NARROW_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    #define COL3 (4 + ((LCD_WIDTH - 320) / 2))
-    #define COL4 (112 + ((LCD_WIDTH - 320) / 2))
-    #define COL5 (216 + ((LCD_WIDTH - 320) / 2))
-    #define COL1 COL4
-    #define COL2 (COL1 + 32)
-    #define ROW1 (36 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW2 (ROW1 + 20)
-    #define ROW3 (ROW1 + 40)
-    #define ROW4 (ROW1 + 60)
-    #define ROW5 (ROW1 + 80)
     /* Row 1 */
     GUI_CreateLabelBox(&gui->srclbl, COL1, ROW1, 96, 16, &DEFAULT_FONT, NULL, NULL, _tr("Src"));
     GUI_CreateTextSelect(&gui->src, COL2, ROW1, TEXTSELECT_64, NULL, set_type_cb, NULL);

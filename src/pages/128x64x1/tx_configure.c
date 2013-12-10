@@ -64,7 +64,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     void *value = NULL;
     void *but_str = NULL;
-    #define X 68
+    const int X = 68;
     u8 x = X;
 
     switch(absrow) {

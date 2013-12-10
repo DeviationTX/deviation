@@ -73,20 +73,21 @@ static void _show_settimer_page(u8 index)
         GUI_RemoveHierObjects(firstObj);
         firstObj = NULL;
     }
-
-    #define XOFF  ((LCD_WIDTH - 320) / 2)
-    #define YBOX  16
-    #define YOLD  40
-    #define YRES  (LCD_HEIGHT - 46 - 8)
-    #define YNEW  ((YRES + 86) / 2 - 36)
-    #define YUNIT (YNEW + YBOX)
-    #define YDIFF 20
-    #define YBTN  (YUNIT + YDIFF + YDIFF)
-    #define XLEFT (XOFF + 30)
-    #define XADD  (XLEFT)
-    #define XSET  (XADD + 64)
-    #define XUNIT (XOFF + 170)
-    #define XVAL  (XUNIT + 70)
+    enum {
+        XOFF  = ((LCD_WIDTH - 320) / 2),
+        YBOX  = 16,
+        YOLD  = 40,
+        YRES  = (LCD_HEIGHT - 46 - 8),
+        YNEW  = ((YRES + 86) / 2 - 36),
+        YUNIT = (YNEW + YBOX),
+        YDIFF = 20,
+        YBTN  = (YUNIT + YDIFF + YDIFF),
+        XLEFT = (XOFF + 30),
+        XADD  = (XLEFT),
+        XSET  = (XADD + 64),
+        XUNIT = (XOFF + 170),
+        XVAL  = (XUNIT + 70),
+    };
 
     // actual value
     firstObj = GUI_CreateLabel(&guiset->oldlbl, XLEFT, YOLD, NULL, DEFAULT_FONT, (void *)_tr("actual value"));

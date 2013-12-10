@@ -22,24 +22,26 @@ static struct advmixcfg_obj_g1 * const gui1 = &gui_objs.u.advmixcfg.u.g1;
 static struct advmixcfg_obj_g2 * const gui2 = &gui_objs.u.advmixcfg.u.g2;
 static struct advmixcfg_obj_g3 * const gui3 = &gui_objs.u.advmixcfg.u.g3;
 
-#ifndef COL1
+#if LCD_WIDTH == 320
     //320x240
-    #define COL1        10
-    #define COL2        56
-    #define COL3        ((310 - 120 - (COL2 + 106)) / 2 + COL2 + 106)
-    #define COL_SCALEHI 36
-    #define COL_EXP2    112
-    #define COL_EXP3    216
-    #define COL_GRAPH   192
-    #define COL1_TEXT   4
-    #define COL1_VALUE  56
-    #define COL2_TEXT   164
-    #define COL2_VALUE  216
-    #define EXP_WIDTH   77
-    #define EXP_HEIGHT  96
+enum {
+     COL1        =  10,
+     COL2        =  56,
+     COL3        = ((310 - 120 - (COL2 + 106)) / 2 + COL2 + 106),
+     COL_SCALEHI =  36,
+     COL_EXP2    = 112,
+     COL_EXP3    = 216,
+     COL_GRAPH   = 192,
+     COL1_TEXT   =   4,
+     COL1_VALUE  =  56,
+     COL2_TEXT   = 164,
+     COL2_VALUE  = 216,
+     EXP_WIDTH   =  77,
+     EXP_HEIGHT  =  96,
+};
 #endif
-#define COL_TEMPLATE 56
-#define GRAPH_Y ((220 - 40 - 150) / 2 + 40)
+static const int COL_TEMPLATE = 56;
+static const int GRAPH_Y = ((220 - 40 - 150) / 2 + 40);
 
 static void _show_titlerow()
 {

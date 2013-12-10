@@ -21,17 +21,19 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
-#define VTRIM_W       4
-#define VTRIM_H      49
-#define HTRIM_W      49
-#define HTRIM_H       4
-#define MODEL_ICO_W  52
-#define MODEL_ICO_H  36
-#define BOX_W        48
-#define SMALLBOX_H    9
-#define BIGBOX_H      14
-#define GRAPH_W      (VTRIM_W)
-#define GRAPH_H      (VTRIM_H / 2)
+enum {
+     VTRIM_W      =  4,
+     VTRIM_H      = 49,
+     HTRIM_W      = 49,
+     HTRIM_H      =  4,
+     MODEL_ICO_W  = 52,
+     MODEL_ICO_H  = 36,
+     BOX_W        = 48,
+     SMALLBOX_H   =  9,
+     BIGBOX_H     = 14,
+     GRAPH_W      = (VTRIM_W),
+     GRAPH_H      = (VTRIM_H / 2),
+};
 
 #define press_icon_cb NULL
 #define press_box_cb NULL
@@ -40,7 +42,7 @@
 
 static const char *_power_to_string();
 
-#define BATTERY_SCAN_MSEC 2000 // refresh battery for every 2sec to avoid its label blinking
+static const int BATTERY_SCAN_MSEC = 2000; // refresh battery for every 2sec to avoid its label blinking
 static u32 next_scan=0;
 
 /*

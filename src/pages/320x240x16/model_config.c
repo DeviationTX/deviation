@@ -36,12 +36,14 @@ static void show_titlerow(const char *header)
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 }
 
-#define COL1 (8 + ((LCD_WIDTH - 320) / 2))
-#define COL2 (COL1 + 128)
-#define COL3 (COL1 + 52)
-#define COL4 (COL1 + 156)
-#define COL5 (COL1 + 208)
-#define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+enum {
+    COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
+    COL2 = (COL1 + 128),
+    COL3 = (COL1 + 52),
+    COL4 = (COL1 + 156),
+    COL5 = (COL1 + 208),
+    ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+};
 
 void MODELPAGE_Config()
 {

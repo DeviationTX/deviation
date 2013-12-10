@@ -23,7 +23,6 @@ static const void *exit_data;
 static u8 page_change_cb(u32 buttons, u8 flags, void *data);
 void PAGE_Exit();
 
-#define PAGE_NAME_MAX 10
 struct page {
     void (*init)(int i);
     void (*event)();

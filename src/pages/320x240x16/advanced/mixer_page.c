@@ -20,10 +20,6 @@
 
 #include "../../common/advanced/_mixer_page.c"
 
-#undef  ENTRIES_BY_SCREENSIZE
-#undef  ENTRIES_PER_PAGE
-#define ENTRIES_BY_SCREENSIZE (LCD_WIDTH == 480? 10 : 8) // 320x240: 8, 480x272: 10
-#define ENTRIES_PER_PAGE      (ENTRIES_BY_SCREENSIZE > NUM_CHANNELS ? NUM_CHANNELS : ENTRIES_BY_SCREENSIZE)
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 
 static void _show_title(int page)
@@ -42,7 +38,7 @@ static void _show_page()
 {
     // Note for future maintenance: DO NOT use logical view to draw all the channel items at a time for this page:  I just
     // gave it a try, it spent very long time to construct all the 30 items and could trigger watch-dog to reboot !!!
-    #define XOFFSET ((LCD_WIDTH - 320) / 2)
+    static const int XOFFSET = ((LCD_WIDTH - 320) / 2);
     int init_y = LCD_HEIGHT == 240 ? 44 : 36;
     int i;
     if (mp->firstObj) {

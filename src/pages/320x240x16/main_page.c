@@ -22,17 +22,19 @@
 #include "telemetry.h"
 #include "rtc.h"
 
-#define VTRIM_W      10
-#define VTRIM_H     140
-#define HTRIM_W     125
-#define HTRIM_H      10
-#define MODEL_ICO_W  96
-#define MODEL_ICO_H  96
-#define GRAPH_H      59
-#define GRAPH_W      10
-#define BOX_W       113
-#define SMALLBOX_H   24
-#define BIGBOX_H     40
+enum {
+    VTRIM_W      = 10,
+    VTRIM_H     = 140,
+    HTRIM_W     = 125,
+    HTRIM_H      = 10,
+    MODEL_ICO_W  = 96,
+    MODEL_ICO_H  = 96,
+    GRAPH_H      = 59,
+    GRAPH_W      = 10,
+    BOX_W       = 113,
+    SMALLBOX_H   = 24,
+    BIGBOX_H     = 40,
+};
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
 void press_box_cb(guiObject_t *obj, s8 press_type, const void *data);

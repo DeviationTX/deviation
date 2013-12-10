@@ -21,8 +21,10 @@
 
 #include "../common/_timer_page.c"
 
-#define TIMERCOLUMNS (LCD_WIDTH == 480 ? 2 : 1)
-#define MAX_TIMER_PAGE ((NUM_TIMERS - 1) / (2 * TIMERCOLUMNS))
+enum {
+    TIMERCOLUMNS   = (LCD_WIDTH == 480 ? 2 : 1),
+    MAX_TIMER_PAGE = ((NUM_TIMERS - 1) / (2 * TIMERCOLUMNS)),
+};
 
 static void _draw_body();
 guiObject_t *firstObj;

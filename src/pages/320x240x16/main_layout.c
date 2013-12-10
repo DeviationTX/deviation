@@ -42,11 +42,32 @@ static void dlgbut_cb(struct guiObject *obj, const void *data);
 struct buttonAction action;
 u8 cfg_elem_type;
 
-#define HEADER_Y 32
+static const int HEADER_Y = 32;
 
 #include "../common/_main_layout.c"
 #include "../common/_main_config.c"
 
+enum {
+    ADD_DIALOG_W = 288,
+    ADD_DIALOG_H = 220,
+    ADD_DIALOG_X = (LCD_WIDTH - ADD_DIALOG_W) / 2,
+    ADD_DIALOG_Y = ((LCD_HEIGHT - ADD_DIALOG_H) / 2),
+    ADD_LBL_X    = (ADD_DIALOG_X + 10),
+    ADD_TS_X     = (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 128 / 2),
+    ADD_BUT_X    = (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 96 / 2),
+    ADD_ADDBUT_X = (ADD_DIALOG_X + ADD_DIALOG_W - 64 -5),
+    ADD_MENU_X   = (ADD_DIALOG_X + ADD_DIALOG_W - 224 -5),
+};
+//#if (ADD_ADDBUT_X < ADD_TS_X + 128)
+//    #error "Overlapped buttons"
+//#endif
+enum {
+    LAYDLG_X_SPACE = 10,
+    LAYDLG_MIN_WIDTH = (2*LAYDLG_X_SPACE + 15 + 100 + 64 +20+10), //space + # + spinbox + button + scrollbar
+    LAYDLG_SCROLLABLE_X = LAYDLG_X_SPACE,
+    LAYDLG_X = (LCD_WIDTH - LAYDLG_MIN_WIDTH) / 2,
+    LAYDLG_Y = (32 + LAYDLG_Y_SPACE),
+};
 void PAGE_MainLayoutInit(int page)
 {
      (void)page;
@@ -190,18 +211,6 @@ static void dialog_ok_cb(u8 state, void * data)
         select_for_move((guiLabel_t *)obj);
 }
 
-#define ADD_DIALOG_W 288
-#define ADD_DIALOG_H 220
-#define ADD_DIALOG_X (LCD_WIDTH - ADD_DIALOG_W) / 2
-#define ADD_DIALOG_Y ((LCD_HEIGHT - ADD_DIALOG_H) / 2)
-#define ADD_LBL_X    (ADD_DIALOG_X + 10)
-#define ADD_TS_X     (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 128 / 2)
-#define ADD_BUT_X    (ADD_DIALOG_X + ADD_DIALOG_W / 2  - 96 / 2)
-#define ADD_ADDBUT_X (ADD_DIALOG_X + ADD_DIALOG_W - 64 -5)
-#define ADD_MENU_X   (ADD_DIALOG_X + ADD_DIALOG_W - 224 -5)
-#if (ADD_ADDBUT_X < ADD_TS_X + 128)
-    #error "Overlapped buttons"
-#endif
 static void add_dlg_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -268,11 +277,6 @@ static void toggle_press_cb(guiObject_t *obj, const void *data)
     TGLICO_Select(obj, data);
 }
 
-#define LAYDLG_X_SPACE 10
-#define LAYDLG_X (LCD_WIDTH - LAYDLG_MIN_WIDTH) / 2
-#define LAYDLG_Y (32 + LAYDLG_Y_SPACE)
-#define LAYDLG_MIN_WIDTH (2*LAYDLG_X_SPACE + 15 + 100 + 64 +20+10) //space + # + spinbox + button + scrollbar
-#define LAYDLG_SCROLLABLE_X LAYDLG_X_SPACE
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int type = (long)data;

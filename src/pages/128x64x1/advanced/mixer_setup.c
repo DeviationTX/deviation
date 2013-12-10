@@ -18,11 +18,11 @@
 
 #include "../../common/advanced/_mixer_setup.c"
 
-#define FIRST_PAGE_ITEM_IDX  2  // 0 is the template obj and 1 is the button obj
-#define LEFT_VIEW_WIDTH  60
-#define LEFT_VIEW_ID 0
-#define RIGHT_VIEW_ID 1
-#define RIGHT_VIEW_HEIGHT 49
+static const int FIRST_PAGE_ITEM_IDX = 2;  // 0 is the template obj and 1 is the button obj
+static const int LEFT_VIEW_WIDTH     = 60;
+static const int LEFT_VIEW_ID        = 0;
+static const int RIGHT_VIEW_ID       = 1;
+static const int RIGHT_VIEW_HEIGHT   = 49;
 
 static u8 action_cb(u32 button, u8 flags, void *data);
 static void notify_cb(guiObject_t * obj);

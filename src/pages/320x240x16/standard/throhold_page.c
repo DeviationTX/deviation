@@ -37,10 +37,12 @@ static void toggle_thold_cb(guiObject_t *obj, void *data)
 void PAGE_ThroHoldInit(int page)
 {
     (void)page;
-    #define COL1 (30 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (150 + ((LCD_WIDTH - 320) / 2))
-    #define ROW1 (80 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW2 (120 + ((LCD_HEIGHT - 240) / 2))
+    enum {
+        COL1 = (30 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (150 + ((LCD_WIDTH - 320) / 2)),
+        ROW1 = (80 + ((LCD_HEIGHT - 240) / 2)),
+        ROW2 = (120 + ((LCD_HEIGHT - 240) / 2)),
+    };
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROHOLD, SWITCHFUNC_HOLD));
     GUI_CreateLabelBox(&gui->enlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));

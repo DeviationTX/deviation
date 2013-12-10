@@ -23,6 +23,7 @@
 
 #define HELI_LABEL _tr_noop("Helicopter")  // string too long for devo10, so define it separately for devo8 and devo10
 #define PLANE_LABEL _tr_noop("Airplane")
+
 #include "../common/_model_page.c"
 
 #if HAS_STANDARD_GUI
@@ -57,10 +58,12 @@ void PAGE_ModelInit(int page)
 #endif
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
-    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (COL1 + 128)
-    #define COL3 (COL1 + 228)
-    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    enum {
+        COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (COL1 + 128),
+        COL3 = (COL1 + 228),
+        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+    };
     row = ROW1;
     GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));
     GUI_CreateTextSelect(&gui->file, COL2, row, TEXTSELECT_96, file_press_cb, file_val_cb, NULL);

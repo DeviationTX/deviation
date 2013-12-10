@@ -21,9 +21,11 @@
 
 static void _show_limits()
 {
-    #define COL1 (8 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (COL1 + 120)
-    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
+    enum {
+        COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (COL1 + 120),
+        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+    };
     int y = ROW1;
     int height = 20;
     //Row 1

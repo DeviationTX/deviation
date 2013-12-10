@@ -23,7 +23,14 @@
 
 void PAGE_TelemconfigInit(int page)
 {
-   (void)page;
+    (void)page;
+    enum {
+        COL1 = (10 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (COL1 + 55),
+        COL3 = (COL1 + 156),
+        COL4 = (COL1 + 225),
+        ROW1 = (70 + ((LCD_HEIGHT - 240) / 2)),
+    };
     const u8 row_height = 25;
     PAGE_SetModal(0);
 #if HAS_STANDARD_GUI
@@ -38,11 +45,6 @@ void PAGE_TelemconfigInit(int page)
         return;
     }
 
-    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (COL1 + 55)
-    #define COL3 (COL1 + 156)
-    #define COL4 (COL1 + 225)
-    #define ROW1 (70 + ((LCD_HEIGHT - 240) / 2))
     for (long i = 0; i < TELEM_NUM_ALARMS; i++) {
         GUI_CreateLabelBox(&gui->name[i], COL1, ROW1 + row_height * i, 55, 16, &DEFAULT_FONT,
            label_cb, NULL, (void *)i);

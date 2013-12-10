@@ -36,6 +36,15 @@ const char *title_cb(guiObject_t *obj, const void *data)
 void PAGE_GyroSenseInit(int page)
 {
     (void)page;
+    enum {
+        COL1 = (10 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (120 + ((LCD_WIDTH - 320) / 2)),
+        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+        ROW2 = (70 + ((LCD_HEIGHT - 240) / 2)),
+        ROW3 = (90 + ((LCD_HEIGHT - 240) / 2)),
+        ROW4 = (110 + ((LCD_HEIGHT - 240) / 2)),
+        ROW5 = (130 + ((LCD_HEIGHT - 240) / 2)),
+    };
     PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_GYROSENSE, SWITCHFUNC_GYROSENSE));
     memset(mp, 0, sizeof(*mp));
@@ -50,13 +59,6 @@ void PAGE_GyroSenseInit(int page)
     }
     gyro_output = mp->mixer_ptr[0]->dest;
     convert_output_to_percentile();
-    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (120 + ((LCD_WIDTH - 320) / 2))
-    #define ROW1 (40 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW2 (70 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW3 (90 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW4 (110 + ((LCD_HEIGHT - 240) / 2))
-    #define ROW5 (130 + ((LCD_HEIGHT - 240) / 2))
     /* Row 1 */
     GUI_CreateLabelBox(&gui->chanlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
     GUI_CreateTextSelect(&gui->chan, COL2, ROW1, TEXTSELECT_128, NULL, gyro_output_cb, NULL);

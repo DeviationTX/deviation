@@ -18,7 +18,7 @@
 
 #include "../../common/advanced/_mixer_curves.c"
 
-#define ADDITIONAL_H (LCD_HEIGHT - 240) // additional space for the bigger Devo12-screen
+static const int ADDITIONAL_H = (LCD_HEIGHT - 240); // additional space for the bigger Devo12-screen
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {

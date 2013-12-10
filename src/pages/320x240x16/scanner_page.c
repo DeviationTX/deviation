@@ -63,6 +63,11 @@ static void press_cb(guiObject_t *obj, const void *data)
 
 void PAGE_ScannerInit(int page)
 {
+    enum {
+        SCANBARWIDTH   = (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)),
+        SCANBARXOFFSET = ((LCD_WIDTH - SCANBARWIDTH * (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))/2),
+        SCANBARHEIGHT  = (LCD_HEIGHT - 78),
+    };
     u8 i;
     (void)page;
     PAGE_SetModal(0);
@@ -72,9 +77,6 @@ void PAGE_ScannerInit(int page)
 
     sp.time_to_scan = 0;
     sp.channel = MIN_RADIOCHANNEL;
-    #define SCANBARWIDTH   (LCD_WIDTH / (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))
-    #define SCANBARXOFFSET ((LCD_WIDTH - SCANBARWIDTH * (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))/2)
-    #define SCANBARHEIGHT  (LCD_HEIGHT - 78)
     for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
         GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
         sp.channelnoise[i] = 0x10;

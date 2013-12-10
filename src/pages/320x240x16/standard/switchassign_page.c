@@ -33,12 +33,13 @@ static const char *switch_cb2(guiObject_t *obj, int dir, void *data)
 void PAGE_SwitchAssignInit(int page)
 {
     (void)page;
+    const int COL1 = (10 + ((LCD_WIDTH - 320) / 2));
+    const int COL2 = (150 + ((LCD_WIDTH - 320) / 2));
+    const int ROW_SPACE = 30;
+
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SWITCHASSIGN), MODELMENU_Show);
     refresh_switches();
 
-    #define COL1 (10 + ((LCD_WIDTH - 320) / 2))
-    #define COL2 (150 + ((LCD_WIDTH - 320) / 2))
-    #define ROW_SPACE 30
     /* Row 1 */
     int row = 40 + ((LCD_HEIGHT - 240) / 2);
     GUI_CreateLabelBox(&gui->modelbl, COL1, row, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Fly mode"));
