@@ -96,12 +96,15 @@ void PROTOCOL_Load(int no_dlg)
     if(*loaded_protocol == Model.protocol)
         return;
     char file[25];
-    #define PROTODEF(proto, module, map, cmd, name) case proto: sprintf(file,"protocol/%s.mod", name); break;
+    strcpy(file, "protocol/");
+    #define PROTODEF(proto, module, map, cmd, name) case proto: strcat(file,name); break;
     switch(Model.protocol) {
         #include "protocol.h"
         default: *loaded_protocol = 0; return;
     }
     #undef PROTODEF
+    file[17] = '\0'; //truncate filename to 8 characters
+    strcat(file, ".mod");
     FILE *fh;
     //We close the current font because on the dveo8 we reuse
     //the font filehandle to read the protocol.
