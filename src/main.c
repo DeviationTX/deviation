@@ -33,6 +33,7 @@ volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
 
+#ifndef DUMP_BOOTLOADER
 int main() {
     
     Init();
@@ -99,6 +100,15 @@ int main() {
     }
 #endif
 }
+#else //DUMP_BOOTLOADER
+int main() {
+    PWR_Init();
+    CLOCK_Init();
+    UART_Initialize();
+    if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    dump_bootloader();
+}
+#endif //DUMP_BOOTLOADER
 
 void Init() {
     PWR_Init();
