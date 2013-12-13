@@ -75,7 +75,7 @@ static void _show_simple()
     //Row 4
     GUI_CreateLabel(&gui1->offsetlbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Offset"));
     GUI_CreateTextSelect(&gui1->offset, COL1_VALUE, x, TEXTSELECT_96, NULL, set_number100_cb, &mp->mixer[0].offset);
-    x += space;
+    //x += space;
     //Row 5
     /*
     mp->trimObj = GUI_CreateButton(COL1_VALUE, 214, BUTTON_96x16, show_trim_cb, 0x0000, toggle_trim_cb, NULL);

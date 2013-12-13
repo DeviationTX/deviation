@@ -27,7 +27,7 @@ const char * _timer_new_str_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     long index = (long)data;
-    u8 changed;
+    u8 changed = 0;
     tempstring[0] = '\0';
     if (index == TIMER_SECONDS) {
         permanent.second = GUI_TextSelectHelper(permanent.second, 0, 59, dir, 1, 10, &changed);

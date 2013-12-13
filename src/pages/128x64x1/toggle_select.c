@@ -73,7 +73,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     for(i = 0; i < NUM_COLS * absrow; i++) {
         idx = get_next_icon(idx);
         if (idx < 0) {
-            idx = 0;
             return 0;
         }
     }

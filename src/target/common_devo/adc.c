@@ -146,6 +146,10 @@ void ADC_ScanChannels()
     u32 lastms = 0;
     u16 max[NUM_ADC_CHANNELS];
     u16 min[NUM_ADC_CHANNELS];
+    for (int i = 0; i < NUM_ADC_CHANNELS; i++) {
+        max[i] = 0;
+        min[i] = 0xffff;
+    }
     while(1) {
         if(PWR_CheckPowerSwitch()) PWR_Shutdown();
         ADC_Filter();

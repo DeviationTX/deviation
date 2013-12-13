@@ -218,7 +218,7 @@ A0 (E /RD) (R/W /WR) D7 D6 D5 D4 D3 D2 D1 D0 Hex Setting
 void LCD_DrawPixel(unsigned int color)
 {
 	if (xpos < LCD_WIDTH && ypos < LCD_HEIGHT) {	// both are unsigned, can not be < 0
-		int y = ypos;
+		int y;
 		int x = PHY_LCD_WIDTH - 1 - xpos; //We want to map 0 -> 128 and 128 -> 0
 
 		if (ypos > 31)

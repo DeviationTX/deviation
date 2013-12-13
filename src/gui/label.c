@@ -149,12 +149,11 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             old_w = txt_w;
         if (old_h < txt_h)
             old_h = txt_h;
-        obj_width = txt_w;
-        obj_height = txt_h;
+        //obj_width = txt_w;  //unused assignment
+        //obj_height = txt_h; //unused assignment
         GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
     } else if (desc->style == LABEL_UNDERLINE) {
         txt_x = obj_x;
-        txt_y = obj_y;
         u16 old_w = obj_width;
         u16 old_h = obj_height;
         if (old_w < txt_w)

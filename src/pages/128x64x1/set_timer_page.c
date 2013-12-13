@@ -28,7 +28,7 @@ const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)dir;
-    u8 changed;
+    u8 changed = 0;
     if ((long)data == SELECT_HMS) {
         permanent.hms = GUI_TextSelectHelper(permanent.hms, TIMER_SECONDS, TIMER_HOURS, dir, 1, 1, &changed);
         switch (permanent.hms) {

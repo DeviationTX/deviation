@@ -62,8 +62,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_TelemconfigInit(int page)
 {
     (void)label_cb;
-    if (page < 0)
-        page = current_selected;
+    (void)page;
+    //if (page < 0)
+    //    page = current_selected;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);

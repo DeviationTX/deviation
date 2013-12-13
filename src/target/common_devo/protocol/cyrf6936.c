@@ -198,7 +198,7 @@ u8 CYRF_ReadRSSI(u32 dodummyread)
     u8 result;
     if(dodummyread)
     {
-        result = CYRF_ReadRegister(0x13);
+        CYRF_ReadRegister(0x13);
     }
     result = CYRF_ReadRegister(0x13);
     if(result & 0x80)

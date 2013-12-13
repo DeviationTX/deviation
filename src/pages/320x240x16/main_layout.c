@@ -292,7 +292,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateTextSelect(&gui->dlgts[relrow], X + 15, y, TEXTSELECT_96, NULL, dlgts_cb, (void *)elemidx);
         if (type == ELEM_TOGGLE) {
             GUI_CreateButton(&gui->dlgbut2[relrow], del_x, y, BUTTON_64x16, dlgbut_str_cb, 0, toggle_press_cb, (void *)elemidx);
-            del_x = X + 15 + 168;
+            //del_x = X + 15 + 168;
             num_objs++;
         }
     }

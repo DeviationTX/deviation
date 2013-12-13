@@ -82,7 +82,7 @@ a system reset is issued.
 
 void iwdg_set_period_ms(u32 period)
 {
-u32 count, prescale, reload, exponent;
+	u32 count, prescale, reload, exponent;
 /* Set the count to represent ticks of the 32kHz LSI clock */
 	count = (period << 5);
 /* Strip off the first 12 bits to get the prescale value required */
@@ -96,7 +96,7 @@ u32 count, prescale, reload, exponent;
 	else if (prescale > 4)   {exponent = IWDG_PR_DIV8;    reload = (count >> 3);}
 	else                     {exponent = IWDG_PR_DIV4;    reload = (count >> 2);}
 /* Avoid the undefined situation of a zero count */
-	if (count == 0) count = 1;
+	//if (count == 0) count = 1;
 
 	while (iwdg_prescaler_busy());
 	IWDG_KR = IWDG_KR_UNLOCK;
