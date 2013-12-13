@@ -8,7 +8,7 @@
 
 //#ifdef BUILDTYPE_DEV
 //No room for debug and standard gui
-#define HAS_STANDARD_GUI 1
+//#define HAS_STANDARD_GUI 1
 #define HAS_ADVANCED_GUI 1
 //#endif
 
