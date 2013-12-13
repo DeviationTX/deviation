@@ -3,6 +3,5 @@
 struct toggle_select_page {
     u8 tglicons[3];
     u8 tglidx;
-    u32 count;
 };
 #endif

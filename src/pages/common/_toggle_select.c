@@ -30,6 +30,7 @@ static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data);
 
 static u32 _get_icon_info()
 {
+    static u32 count = 0; //This gets called from the main page where 'tp' isn't defined
     #ifdef _DEVO12_TARGET_H_
         static u8 checked;
         if(!checked) {
@@ -42,17 +43,17 @@ static u32 _get_icon_info()
             checked = 1;
         }
     #endif
-    if(tp->count == 0) {
+    if(count == 0) {
         for(int i = 0; i < 4; i++) {
             u16 w, h;
             int ok = LCD_ImageDimensions(toggle_files[i], &w, &h);
             if(ok) {
                 //printf("file%d = %d\n", i, w / TOGGLEICON_WIDTH);
-                tp->count |= (w / TOGGLEICON_WIDTH) << (i*8);
+                count |= (w / TOGGLEICON_WIDTH) << (i*8);
             }
         }
     }
-    return tp->count;
+    return count;
 }
 
 struct ImageMap TGLICO_GetImage(int idx)
@@ -77,7 +78,6 @@ void TGLICO_Select(guiObject_t *obj, const void *data)
     if(Model.pagecfg2.elem[(long)data].src)
     {
         tp->tglidx = (long)data;
-        tp->count = 0;
         memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
         show_iconsel_page(0);
     }
