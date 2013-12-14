@@ -33,7 +33,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data);
 void PAGE_MainLayoutInit(int page)
 {
     (void)page;
-    memset(lp, 0, sizeof(lp));
+    memset(lp, 0, sizeof(*lp));
     show_config();
 }
 void PAGE_MainLayoutEvent()

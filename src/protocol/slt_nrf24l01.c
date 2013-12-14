@@ -386,12 +386,6 @@ static void initialize()
     if (Model.fixed_id) {
         id ^= Model.fixed_id + (Model.fixed_id << 16);
     } else {
-        /*
-        u32* stm32id = (uint32_t*) 0x1FFFF7E8;
-        id ^= stm32id[0];
-        id ^= stm32id[1];
-        id ^= stm32id[2];
-        */
         id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
     }
     // Wikipedia Linear_feedback_shift_register, Xilinx polinomial x^32 + x^22 + x^2 + x + 1

@@ -182,6 +182,7 @@ struct mcu_pin;
 void MCU_InitModules();
 int MCU_SetPin(struct mcu_pin *, const char *name);
 const char *MCU_GetPinName(char *str, struct mcu_pin *);
+void MCU_SerialNumber(u8 *var, u8 len);
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))
 #else

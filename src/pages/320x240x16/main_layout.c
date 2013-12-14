@@ -71,7 +71,7 @@ enum {
 void PAGE_MainLayoutInit(int page)
 {
      (void)page;
-    memset(lp, 0, sizeof(lp));
+    memset(lp, 0, sizeof(*lp));
     PAGE_SetModal(0);
     BUTTON_RegisterCallback(&action,
           CHAN_ButtonMask(BUT_ENTER)

@@ -297,16 +297,15 @@ static u16 hisky_cb()
 #endif
 }
 
-// Use Linear feedback shift register with 40-bit Xilinx polinome x^40 + x^38 + x^21 + x^19 + 1
+// Use Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
 // to generate internal 5-byte HiSky id from TX id and manufacturer id (STM32 unique id)
-const uint64_t LFSR_FEEDBACK = (1ull << (40-1)) + (1ull << (38-1)) + (1ull << (21-1)) + (1ull << (19-1));
-const uint64_t LFSR_INTAP = 40-1;
-static uint64_t lfsr;
+const uint32_t LFSR_FEEDBACK = 0x80200003ul;
+const uint32_t LFSR_INTAP = 32-1;
 
-static void update_lfsr(uint8_t b)
+static void update_lfsr(uint32_t *lfsr, uint8_t b)
 {
     for (int i = 0; i < 8; ++i) {
-        lfsr = (lfsr >> 1) ^ ((-(lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint64_t)(b & 1) << LFSR_INTAP));
+        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
         b >>= 1;
     }
 }
@@ -314,36 +313,37 @@ static void update_lfsr(uint8_t b)
 static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
-    lfsr = 0x138846577649eca9ull;
-
+    u32 lfsr = 0x7649eca9ul;
 
 #ifndef USE_FIXED_MFGID
-    // Every STM32 should have 12 bytes long unique id at 0x1FFFF7E8
-    u8 *stm32id = (u8*) 0x1FFFF7E8;
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
     printf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
-        printf("%02X", *stm32id);
-        update_lfsr(*stm32id++);
+        printf("%02X", var[i]);
+        update_lfsr(&lfsr, var[i]);
     }
     printf("\r\n");
 #endif
 
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           update_lfsr((Model.fixed_id >> j) & 0xff);
+           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(0);
+    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(&lfsr, 0);
 
-    for (u8 i = 0, j = 0; i < TXID_SIZE; ++i, j += 8)
-        rf_adr_buf[i] = (lfsr >>  j) & 0xff;
+    for (u8 i = 0; i < TXID_SIZE; ++i) {
+        rf_adr_buf[i] = lfsr & 0xff;
+        update_lfsr(&lfsr, i);
+    }
 
     printf("Effective id: %02X%02X%02X%02X%02X\r\n",
         rf_adr_buf[0], rf_adr_buf[1], rf_adr_buf[2], rf_adr_buf[3], rf_adr_buf[4]);
 
     // Use low bytes of LFSR to seed frequency hopping sequence after another
     // divergence round
-    for (int i = 0; i < 4; ++i) update_lfsr(0);
+    for (int i = 0; i < 4; ++i) update_lfsr(&lfsr, 0);
     calc_fh_channels((u32) lfsr);
 
     printf("FH Seq: ");
