@@ -44,8 +44,6 @@
 #define BIND_COUNT 800
 #endif
 
-//#define USE_FIXED_MFGID
-
 static int counter;
 
 // Bit vector from bit position
@@ -297,10 +295,9 @@ static u16 hisky_cb()
 #endif
 }
 
-// Use Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-// to generate internal 5-byte HiSky id from TX id and manufacturer id (STM32 unique id)
-const uint32_t LFSR_FEEDBACK = 0x80200003ul;
-const uint32_t LFSR_INTAP = 32-1;
+// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
+static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
+static const uint32_t LFSR_INTAP = 32-1;
 
 static void update_lfsr(uint32_t *lfsr, uint8_t b)
 {
@@ -310,9 +307,9 @@ static void update_lfsr(uint32_t *lfsr, uint8_t b)
     }
 }
 
-static void initialize(u8 bind)
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static void initialize_tx_id()
 {
-    CLOCK_StopTimer();
     u32 lfsr = 0x7649eca9ul;
 
 #ifndef USE_FIXED_MFGID
@@ -341,16 +338,22 @@ static void initialize(u8 bind)
     printf("Effective id: %02X%02X%02X%02X%02X\r\n",
         rf_adr_buf[0], rf_adr_buf[1], rf_adr_buf[2], rf_adr_buf[3], rf_adr_buf[4]);
 
-    // Use low bytes of LFSR to seed frequency hopping sequence after another
+    // Use LFSR to seed frequency hopping sequence after another
     // divergence round
-    for (int i = 0; i < 4; ++i) update_lfsr(&lfsr, 0);
-    calc_fh_channels((u32) lfsr);
+    for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
+    calc_fh_channels(lfsr);
 
     printf("FH Seq: ");
     for (int i = 0; i < FREQUENCE_NUM; ++i) {
         printf("%d, ", hopping_frequency[i]);
     }
     printf("\r\n");
+}
+
+static void initialize(u8 bind)
+{
+    CLOCK_StopTimer();
+    initialize_tx_id();
 
     build_binding_packet();
     hisky_init();

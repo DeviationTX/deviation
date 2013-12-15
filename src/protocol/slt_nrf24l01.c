@@ -56,6 +56,10 @@ enum {
 #define NFREQCHANNELS 15
 #define TXID_SIZE 4
 
+#ifdef EMULATOR
+#define USE_FIXED_MFGID
+#endif
+
 static u8 packet[PAYLOADSIZE];
 static u8 packet_sent;
 static u8 tx_id[TXID_SIZE];
@@ -373,6 +377,44 @@ static u16 SLT_callback()
     return delay_us;
 }
 
+// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
+static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
+static const uint32_t LFSR_INTAP = 32-1;
+
+static void update_lfsr(uint32_t *lfsr, uint8_t b)
+{
+    for (int i = 0; i < 8; ++i) {
+        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
+        b >>= 1;
+    }
+}
+
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static void initialize_tx_id()
+{
+    u32 lfsr = 0xb2c54a2ful;
+
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    printf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        printf("%02X", var[i]);
+        update_lfsr(&lfsr, var[i]);
+    }
+    printf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(&lfsr, 0);
+
+    set_tx_id(lfsr);
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
@@ -382,17 +424,8 @@ static void initialize()
     SLT_init();
     phase = SLT_INIT2;
 
-    u32 id = 0xb2c54a2f;
-    if (Model.fixed_id) {
-        id ^= Model.fixed_id + (Model.fixed_id << 16);
-    } else {
-        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
-    }
-    // Wikipedia Linear_feedback_shift_register, Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-    for (int i = 0; i < 33; ++i) {
-        id = (id >> 1) ^ (-(id & 1u) & 0x80200003u);
-    }
-    set_tx_id(id);
+    initialize_tx_id();
+
     CLOCK_StartTimer(50000, SLT_callback);
 }
 
