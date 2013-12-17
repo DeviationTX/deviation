@@ -74,6 +74,8 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
         printf("Set A7105 Enable: %s ", name);
     } else if(port == &Transmitter.module_enable[2]) {
         printf("Set CC2500 Enable: %s ", name);
+    } else if(port == &Transmitter.module_enable[3]) {
+        printf("Set NRF24L01 Enable: %s ", name);
     } else {
         return 0;
     }

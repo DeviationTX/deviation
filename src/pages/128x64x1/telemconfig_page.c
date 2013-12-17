@@ -82,7 +82,8 @@ void PAGE_TelemconfigInit(int page)
 }
 void PAGE_TelemconfigExit()
 {
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    if(telem_state_check())
+        current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)
