@@ -24,26 +24,14 @@
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
 static u32 dialogcrc;
-void PAGE_ShowSafetyDialog()
+
+static const char *safety_string_cb(guiObject_t *obj, void *data)
 {
-    if (disable_safety) {
-        return; // don't show safety dialog when calibrating
-    }
-    if (dialog == NULL) {
-        tempstring[0] = 0;
-        dialogcrc = 0;
-        current_selected_obj = GUI_GetSelected();
-        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, NULL, safety_ok_cb, dtOk, tempstring);
-        return;
-    }
+    (void)data;
+    u32 crc = Crc(tempstring, strlen(tempstring));
+    if (obj && crc == dialogcrc)
+        return tempstring;
     u64 unsafe = PROTOCOL_CheckSafe();
-    if (! unsafe) {
-        GUI_RemoveObj(dialog);
-        GUI_SetSelected(current_selected_obj);
-        dialog = NULL;
-        PROTOCOL_Init(0);
-        return;
-    }
     int i;
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
@@ -64,6 +52,29 @@ void PAGE_ShowSafetyDialog()
         if (++count >= 5)
             break;
     }
+    return tempstring;
+}
+void PAGE_ShowSafetyDialog()
+{
+    if (disable_safety) {
+        return; // don't show safety dialog when calibrating
+    }
+    if (dialog == NULL) {
+        tempstring[0] = 0;
+        dialogcrc = 0;
+        current_selected_obj = GUI_GetSelected();
+        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
+        return;
+    }
+    u64 unsafe = PROTOCOL_CheckSafe();
+    if (! unsafe) {
+        GUI_RemoveObj(dialog);
+        GUI_SetSelected(current_selected_obj);
+        dialog = NULL;
+        PROTOCOL_Init(0);
+        return;
+    }
+    safety_string_cb(NULL, NULL);
     u32 crc = Crc(tempstring, strlen(tempstring));
     if (crc != dialogcrc) {
         dialogcrc = crc;
@@ -74,6 +85,20 @@ void PAGE_ShowSafetyDialog()
 /******************/
 /* Binding Dialog */
 /******************/
+static const char *binding_string_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    u32 crc = Crc(tempstring, strlen(tempstring));
+    if (obj && crc == dialogcrc)
+        return tempstring;
+    u32 bind_time = PROTOCOL_Binding();
+    strcpy(tempstring, _tr("Binding...\nPress ENT to stop"));
+    if (bind_time != 0xFFFFFFFF ) {
+        int len = strlen(tempstring);
+        snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n%d seconds left"), (int)bind_time / 1000);
+    }
+    return tempstring;
+}
 static void binding_ok_cb(u8 state, void * data)
 {
     (void)state;
@@ -95,12 +120,7 @@ void PAGE_ShowBindingDialog(u8 update)
 {
     if (update && ! dialog)
         return;
-    u32 bind_time = PROTOCOL_Binding();
-    strcpy(tempstring, _tr("Binding...\nPress ENT to stop"));
-    if (bind_time != 0xFFFFFFFF ) {
-        int len = strlen(tempstring);
-        snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n%d seconds left"), (int)bind_time / 1000);
-    }
+    binding_string_cb(NULL, NULL);
     u32 crc = Crc(tempstring, strlen(tempstring));
     if (dialog && crc != dialogcrc) {
         GUI_Redraw(dialog);
@@ -128,12 +148,11 @@ void PAGE_ShowLowBattDialog()
     PAGE_ShowWarning(NULL, _tr("Battery too low,\ncan't save!"));
 }
 
-const char *string_cb(guiObject_t *obj, void *data)
+const char *invalidstdmixer_string_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
     (void)data;
-    strncpy(tempstring, _tr("Model needs reset\nfor standard mixer"), sizeof(tempstring));
-    return tempstring;
+    return _tr("Model needs reset\nfor standard mixer");
 }
 
 void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
@@ -143,7 +162,8 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
 
     tempstring[sizeof(tempstring) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, string_cb,
+    dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL,
+            invalidstdmixer_string_cb,
             invalid_stdmixer_cb, dtOkCancel, guiObj);
 }
 
