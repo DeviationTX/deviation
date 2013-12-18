@@ -28,15 +28,44 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)relrow;
     (void)data;
-    col = (3 + col) % 3;
-    if (col == 0)
-        return (guiObject_t *)&gui->type;
-    else if (col == 1)
-        return (guiObject_t *)&gui->src;
-    else
-        return (guiObject_t *)&gui->start;
+    /* This is really evil*/
+    int idx = gui->scrollable.cur_row;
+    int rows = (Model.timer[idx].type < TIMER_COUNTDOWN) ? 2 : 3;
+    if (Model.mixer_mode == MIXER_ADVANCED)
+        rows++;
+#if HAS_PERMANENT_TIMER
+    if (Model.timer[idx].type == TIMER_PERMANENT)
+        rows = 4;
+#endif
+    col = (rows + col) % rows;
+    switch(col) {
+        case 0: return (guiObject_t *)&gui->type;
+        case 1: return (guiObject_t *)&gui->src;
+        case 2:
+#if HAS_PERMANENT_TIMER
+            if(Model.timer[idx].type == TIMER_PERMANENT)
+                return (guiObject_t *)&gui->resetperm;
+#endif
+            if(Model.mixer_mode == MIXER_ADVANCED)
+                return (guiObject_t *)&gui->resetsrc;
+            else
+                return (guiObject_t *)&gui->start;
+        case 3:
+#if HAS_PERMANENT_TIMER
+            if(Model.timer[idx].type == TIMER_PERMANENT)
+                return (guiObject_t *)&gui->setperm;
+#endif
+            return (guiObject_t *)&gui->start;
+    }
+    return 0;
 }
 
+/*            Advanced                     Standard
+   Row1       Timer                        Timer
+   Row2       Switch                       Switch
+   Row3       Reset(perm)/ResetSwitch      Reset(perm)/Start
+   Row4       Start/Set-to                 Set-to
+*/
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -58,22 +87,18 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
+    /*prem-timer reset */
+    GUI_CreateLabelBox(&gui->resetpermlbl, 0, y  ,
+            55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+    GUI_CreateButtonPlateText(&gui->resetperm, x, y ,
+            55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
+        /* or Reset switch */
     	GUI_CreateLabelBox(&gui->resetlbl, 0, y ,
             55, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
     	GUI_CreateTextSelectPlate(&gui->resetsrc, x, y ,
             w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
-    	/* or Reset Perm timer*/
-    	GUI_CreateLabelBox(&gui->resetpermlbl, 0, y  ,
-           55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-    	GUI_CreateButtonPlateText(&gui->resetperm, x, y ,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
 	y += space;
-    } else {
-	 GUI_CreateLabelBox(&gui->resetpermlbl, 0, y  ,
-           55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-        GUI_CreateButtonPlateText(&gui->resetperm, x, y ,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
     }
     //Row 4
     GUI_CreateLabelBox(&gui->startlbl, 0, y ,
@@ -81,9 +106,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
     GUI_CreateTextSelectPlate(&gui->start, x, y,
             w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
-
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
+    if(Model.mixer_mode == MIXER_STANDARD)
+        y+= space;
     GUI_CreateButtonPlateText(&gui->setperm, x, y,
         55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
