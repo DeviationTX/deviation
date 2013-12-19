@@ -161,7 +161,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
         ts = set_train_cb; ts_data = (void *)2L;
         break;
     case 2:
-        if (PPMin_Mode() == 1) {
+        if (PPMin_Mode() != PPM_IN_SOURCE) {
             label = _tr_noop("Trainer Sw");
             ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
         } else {
