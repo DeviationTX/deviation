@@ -76,14 +76,16 @@ if($objdir) {
         #Parse all strings from the object files and add to the allstr hash
         my @od = `objdump -s $file`;
         my $str = "";
+        my $state = 0;
         foreach(@od) {
-            if(/section \.ro?data/ .. (/^Contents/ && ! /\.ro?data/)) {
-                #Found the rodata (string) section
-                if(/^Contents/) {
-                    #Strings are always null terminated
-                    $str = "";
-                    next;
-                }
+            my $orig = $_;
+            if(/section \.ro?data/) {
+                $state = 1;
+                next;
+            } elsif(/^Contents/ && ! /\.ro?data/) {
+                $str = "";
+                $state = 0;
+            } elsif($state) {
                 #Strip off everything but hex data
                 s/^\s+\S+\s//;
                 s/\s\s.*//;
