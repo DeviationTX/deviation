@@ -17,12 +17,15 @@
   #define DEVO_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
+
+#include "common.h"
+#ifndef DISABLE_PWM
+
 #include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/f1/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/nvic.h>
 
-#include "common.h"
 #include "config/model.h"
 #include "../ports.h"
 
@@ -139,4 +142,5 @@ void tim1_up_isr()
         timer_disable_counter(TIM1);
 }
 #endif
+#endif //DISABLE_PWM
 #pragma long_calls_off

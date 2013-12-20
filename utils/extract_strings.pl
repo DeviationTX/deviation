@@ -12,6 +12,7 @@ my %targetmap = (
     devo8 => "320x240x16",
     devo10 => "128x64x1",
     devo7e => undef,
+    x9d => "128x64x1",
 );
 
 GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count);

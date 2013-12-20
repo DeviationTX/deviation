@@ -56,10 +56,33 @@
 #define INPNAME_HOLD1(x,y)    x = _tr_noop("HOLD"); y = 1
 #define INPNAME_TRN0(x,y)     x = _tr_noop("TRN"); y = 0
 #define INPNAME_TRN1(x,y)     x = _tr_noop("TRN"); y = 1
+#define INPNAME_SWA0(x,y)      x = _tr_noop("SW A"); y = 0
+#define INPNAME_SWA1(x,y)      x = _tr_noop("SW A"); y = 1
+#define INPNAME_SWA2(x,y)      x = _tr_noop("SW A"); y = 2
+#define INPNAME_SWB0(x,y)      x = _tr_noop("SW B"); y = 0
+#define INPNAME_SWB1(x,y)      x = _tr_noop("SW B"); y = 1
+#define INPNAME_SWB2(x,y)      x = _tr_noop("SW B"); y = 2
+#define INPNAME_SWC0(x,y)      x = _tr_noop("SW C"); y = 0
+#define INPNAME_SWC1(x,y)      x = _tr_noop("SW C"); y = 1
+#define INPNAME_SWC2(x,y)      x = _tr_noop("SW C"); y = 2
+#define INPNAME_SWD0(x,y)      x = _tr_noop("SW D"); y = 0
+#define INPNAME_SWD1(x,y)      x = _tr_noop("SW D"); y = 1
+#define INPNAME_SWD2(x,y)      x = _tr_noop("SW D"); y = 2
+#define INPNAME_SWE0(x,y)      x = _tr_noop("SW E"); y = 0
+#define INPNAME_SWE1(x,y)      x = _tr_noop("SW E"); y = 1
+#define INPNAME_SWE2(x,y)      x = _tr_noop("SW E"); y = 2
+#define INPNAME_SWF0(x,y)      x = _tr_noop("SW F"); y = 0
+#define INPNAME_SWF1(x,y)      x = _tr_noop("SW F"); y = 1
+#define INPNAME_SWG0(x,y)      x = _tr_noop("SW G"); y = 0
+#define INPNAME_SWG1(x,y)      x = _tr_noop("SW G"); y = 1
+#define INPNAME_SWG2(x,y)      x = _tr_noop("SW G"); y = 2
+#define INPNAME_SWH0(x,y)      x = _tr_noop("SW H"); y = 0
+#define INPNAME_SWH1(x,y)      x = _tr_noop("SW H"); y = 1
 
 #define SWITCH_NAME_GEAR0 _tr("GEAR")
 #define SWITCH_NAME_GEAR1 _tr("GEAR")
 #define SWITCH_NAME_GEAR0 _tr("GEAR")
+
 #define BUTNAME_TRIM_LV_NEG _tr("TRIMLV-")
 #define BUTNAME_TRIM_LV_POS _tr("TRIMLV+")
 #define BUTNAME_TRIM_RV_NEG _tr("TRIMRV-")
