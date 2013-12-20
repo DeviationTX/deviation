@@ -243,14 +243,14 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS)
 		&& cat model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir objs/$(TARGET)
+               ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir $(ODIR)
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le 30 ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
 		number=`expr $$number + 1`; \
 		done
 	@echo " + Checking string list length for $(FILESYSTEM)"
-	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir objs/$(TARGET) -quiet
+	../utils/check_string_size.pl -target $(FILESYSTEM) -objdir $(ODIR) -quiet
 
 ######################
 #Necessary Font files#

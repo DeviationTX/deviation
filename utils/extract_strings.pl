@@ -77,7 +77,7 @@ if($objdir) {
         my @od = `objdump -s $file`;
         my $str = "";
         foreach(@od) {
-            if(/section \.rodata/ .. (/^Contents/ && ! /\.rodata/)) {
+            if(/section \.ro?data/ .. (/^Contents/ && ! /\.ro?data/)) {
                 #Found the rodata (string) section
                 if(/^Contents/) {
                     #Strings are always null terminated
