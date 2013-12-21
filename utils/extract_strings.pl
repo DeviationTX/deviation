@@ -11,9 +11,13 @@ my $count;
 my @targets = ("320x240x16", "128x64x1");
 my %targetmap = (
     devo8 => "320x240x16",
+    devo12 => "480x272x16",
     devo10 => "128x64x1",
     devo7e => undef,
     x9d => "128x64x1",
+);
+my %alt_targets = (
+    devo12 => ["devo8"],
 );
 
 GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count, "objdir=s" => \$objdir);
@@ -59,13 +63,13 @@ if($str) {
     }
 }
 #Filter out any files that are not used by the specified target
-if($target) {
-    foreach my $f (keys %filemap) {
-        if(grep {$_ ne $targetmap{$target} && $f =~ /$_/} @targets) {
-            delete $filemap{$f};
-        }
-    }
-}
+#if($target) {
+#    foreach my $f (keys %filemap) {
+#        if(grep {$_ ne $targetmap{$target} && $f =~ /$_/} @targets) {
+#            delete $filemap{$f};
+#        }
+#    }
+#}
 #build string list
 my @out;
 #Filter out any strings that do not appear in any obj files
@@ -80,6 +84,7 @@ if($objdir) {
         foreach(@od) {
             my $orig = $_;
             if(/section \.ro?data/) {
+                $str = "";
                 $state = 1;
                 next;
             } elsif(/^Contents/ && ! /\.ro?data/) {
@@ -179,6 +184,13 @@ foreach my $file (@files) {
         open $fh, ">", $outf;
         print $fh $name;
         $targetstr{$target} ||= {};
+        if($alt_targets{$target}) {
+            #Hierarchically try to find best string
+            foreach(@{ $alt_targets{$target} }) {
+                $targetstr{$_} ||= {};
+                %strings = (%strings, %{$targetstr{$_}});
+            }
+        }
         %strings = (%strings, %{$targetstr{$target}});
         foreach (sort keys %strings) {
             if(! $unused{$_} && defined($strings{$_})) {
