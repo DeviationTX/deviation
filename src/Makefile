@@ -149,7 +149,8 @@ $(VERBOSE).SILENT:
 
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list \
-		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin
+		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
+		filesystem/devo7e filesystem/devo12
 
 distclean:
 	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
