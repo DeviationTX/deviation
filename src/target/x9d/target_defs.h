@@ -17,6 +17,7 @@
 #define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
+#define HAS_LAYOUT_EDITOR   1
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 6000
@@ -39,5 +40,4 @@
 #define VOLTAGE_NUMERATOR 324
 #define VOLTAGE_OFFSET    421
 
-#define ENABLE_LAYOUT_EDIT 1
 #endif //_DEVO10_TARGET_H_

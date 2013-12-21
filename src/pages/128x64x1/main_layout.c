@@ -19,7 +19,7 @@
 #include "config/model.h"
 #include "telemetry.h"
 
-#if ENABLE_LAYOUT_EDIT
+#if HAS_LAYOUT_EDITOR
 
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
 static struct PageCfg2       * const pc  = &Model.pagecfg2;

@@ -139,7 +139,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     int y_ts = y;
     //show elements in order
     int row = -1;
-#if ENABLE_LAYOUT_EDIT
+#if HAS_LAYOUT_EDITOR
     if (absrow == num_elems + NUM_QUICKPAGES) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y_ts,
                  LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
@@ -188,7 +188,7 @@ void show_config()
 {
     PAGE_MainLayoutExit();
     GUI_RemoveAllObjects();
-#if ENABLE_LAYOUT_EDIT
+#if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
 #endif
     PAGE_SetActionCB(_action_cb);
@@ -198,7 +198,7 @@ void show_config()
         if (! ELEM_USED(pc->elem[count]))
             break;
     }
-#if ENABLE_LAYOUT_EDIT
+#if HAS_LAYOUT_EDITOR
     static const int ADD_LOAD = 2;
 # else
     static const int ADD_LOAD = 1;
@@ -214,10 +214,10 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-#if ENABLE_LAYOUT_EDIT
+#if HAS_LAYOUT_EDITOR
         else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS))
             show_layout();
-#endif //ENABLE_LAYOUT_EDIT
+#endif //HAS_LAYOUT_EDITOR
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

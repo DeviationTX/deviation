@@ -21,9 +21,9 @@
 #define HAS_VIBRATINGMOTOR  1
 #define HAS_DATALOG         0
 #define HAS_SCANNER         0
+#define HAS_LAYOUT_EDITOR   0
 
 #define NO_LANGUAGE_SUPPORT 1
-#define ENABLE_LAYOUT_EDIT  0
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 4100
