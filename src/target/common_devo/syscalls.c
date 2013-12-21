@@ -140,12 +140,12 @@ long _open_r (FATFS *r, const char *file, int flags, int mode) {
         _drive_num = r->pad1;
         int res=pf_open(file);
         if(res==FR_OK) {
-            dbgprintf("_open_r(%d): pf_open (%s) flags: %d, mode: %d ok\r\n", fd-3, file, flags, mode);
+            dbgprintf("_open_r(%08lx): pf_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             if (flags & O_CREAT)
                 pf_maximize_file_size();
             return (long)r;
         } else {
-            dbgprintf("_open_r(%d): pf_open failed: %d\r\n", fd-3, res);
+            dbgprintf("_open_r(%08lx): pf_open (%s) failed: %d\r\n", r, file, res);
             return -1;
         }
     }
