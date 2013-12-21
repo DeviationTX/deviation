@@ -18,7 +18,7 @@
 #include "pages.h"
 #include "config/model.h"
 
-#ifdef ENABLE_SCANNER
+#if HAS_SCANNER
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
 
@@ -117,4 +117,4 @@ void PAGE_ScannerExit()
 #endif
 }
 
-#endif
+#endif //HAS_SCANNER

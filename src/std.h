@@ -60,7 +60,7 @@
     #define sprintf tfp_sprintf
     #define snprintf tfp_snprintf
     #define fprintf tfp_fprintf
-    #if (! defined BUILDTYPE_DEV)
+    #ifndef BUILDTYPE_DEV
         //Use this instead of printf(args...) because this will avoid
         //compile warnings
         #define printf if(0) tfp_printf

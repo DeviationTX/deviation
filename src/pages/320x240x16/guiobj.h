@@ -562,7 +562,7 @@ struct gui_objs {
         struct modelload_obj modelload;
         struct modelpage_obj modelpage;
         struct reorder_obj reorder;
-#ifdef ENABLE_SCANNER
+#if HAS_SCANNER
         struct scanner_obj scanner;
 #endif
         struct telemcfg_obj telemcfg;

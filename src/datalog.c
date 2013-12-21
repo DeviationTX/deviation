@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#if DATALOG_ENABLED
+#if HAS_DATALOG
 #define DATALOG_VERSION 0x01
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
@@ -276,4 +276,4 @@ void DATALOG_Init()
         next_update = CLOCK_getms();
     }
 } 
-#endif
+#endif //HAS_DATALOG

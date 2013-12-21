@@ -18,6 +18,7 @@
 #include "telemetry.h"
 #include "gui/gui.h"
 
+#if HAS_TELEMETRY
 #include "../common/_telemtest_page.c"
 
 typedef enum {
@@ -342,3 +343,5 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
 static inline guiObject_t *_get_obj(int idx, int objid) {
     return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }
+
+#endif //HAS_TELEMETRY

@@ -19,6 +19,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+#if HAS_TELEMETRY
 #include "../common/_telemconfig_page.c"
 
 static u8 _action_cb(u32 button, u8 flags, void *data);
@@ -113,3 +114,5 @@ static inline guiObject_t *_get_obj(int idx, int objid)
 {
     return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
 }
+
+#endif //HAS_TELEMETRY

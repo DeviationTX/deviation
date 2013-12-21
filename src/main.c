@@ -73,7 +73,7 @@ int main() {
     
     CLOCK_StartWatchdog();
 
-#if DATALOG_ENABLED
+#if HAS_DATALOG
     DATALOG_Init();
 #endif
 
@@ -215,7 +215,7 @@ void EventLoop()
         TELEMETRY_Alarm();
         BATTERY_Check();
         AUTODIMMER_Update();
-#if DATALOG_ENABLED
+#if HAS_DATALOG
         DATALOG_Update();
 #endif
         GUI_RefreshScreen();

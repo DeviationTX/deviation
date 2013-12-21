@@ -897,7 +897,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-#if DATALOG_ENABLED
+#if HAS_DATALOG
     if (MATCH_SECTION(SECTION_DATALOG)) {
         if (MATCH_KEY(DATALOG_SWITCH)) {
             m->datalog.enable = get_source(section, value);
@@ -919,7 +919,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         }
         return 1;
     }
-#endif //DATALOG_ENABLED
+#endif //HAS_DATALOG
     if (MATCH_START(section, SECTION_SAFETY)) {
         int found = 0;
         u8 src;
@@ -1223,7 +1223,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=%d\n", TELEM_ABOVE, (m->telem_flags & (1 << idx)) ? 1 : 0);
         fprintf(fh, "%s=%d\n", TELEM_VALUE, m->telem_alarm_val[idx]);
     }
-#if DATALOG_ENABLED
+#if HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_DATALOG);
     fprintf(fh, "%s=%s\n", DATALOG_SWITCH, INPUT_SourceNameReal(file, m->datalog.enable));
     fprintf(fh, "%s=%s\n", DATALOG_RATE, DATALOG_RateString(m->datalog.rate));
@@ -1231,7 +1231,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if(m->datalog.source[DATALOG_BYTE(idx)] & (1 << DATALOG_POS(idx)))
             fprintf(fh, "%s=%s\n", DATALOG_SOURCE, DATALOG_Source(file, idx));
     }
-#endif //DATALOG_ENABLED
+#endif //HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {

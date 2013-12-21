@@ -51,7 +51,7 @@ struct page_group groups[] = {
     {1, PAGEID_TIMER},
     {1, PAGEID_TELEMCFG},
     {1, PAGEID_TRIM},
-#if DATALOG_ENABLED
+#if HAS_DATALOG
     {1, PAGEID_DATALOG},
 #endif
     {1, PAGEID_MAINCFG},
@@ -60,7 +60,7 @@ struct page_group groups[] = {
     {2, PAGEID_CHANMON},
     {2, PAGEID_INPUTMON},
     {2, PAGEID_BTNMON},
-#ifdef ENABLE_SCANNER
+#if HAS_SCANNER
     {2, PAGEID_SCANNER},
 #endif
     {2, PAGEID_USB},

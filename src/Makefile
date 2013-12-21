@@ -101,7 +101,8 @@ ifdef MODULAR
 CFLAGS   +=  -DMODULAR=$(MODULAR)
 endif
 
-CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) -DHGVERSION="\"${HGVERSION}\""
+CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
+            -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf
 ##################################################

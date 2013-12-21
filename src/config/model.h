@@ -53,7 +53,7 @@ struct Model {
     u8 telem_flags;
     MixerMode mixer_mode;
     u32 permanent_timer;
-#if DATALOG_ENABLED
+#if HAS_DATALOG
     struct datalog datalog;
 #endif
 };

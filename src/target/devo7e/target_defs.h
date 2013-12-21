@@ -6,20 +6,26 @@
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 512
 
-//#ifdef BUILDTYPE_DEV
+#ifdef BUILDTYPE_DEV
 //No room for debug and standard gui
-#define HAS_STANDARD_GUI 1
-#define HAS_ADVANCED_GUI 1
-//#endif
+ #define HAS_STANDARD_GUI   0
+#else
+ #define HAS_STANDARD_GUI   1
+#endif
+
+#define HAS_ADVANCED_GUI    1
+#define HAS_PERMANENT_TIMER 0
+#define HAS_TELEMETRY       1
+#define HAS_TOUCH           0
+#define HAS_RTC             0
+#define HAS_VIBRATINGMOTOR  1
+#define HAS_DATALOG         0
+#define HAS_SCANNER         0
 
 #define NO_LANGUAGE_SUPPORT 1
-#define HAS_PERMANENT_TIMER 0
 #define ENABLE_LAYOUT_EDIT  0
 
 #define MIN_BRIGHTNESS 0
-#define HAS_TOUCH 0
-#define HAS_VIBRATINGMOTOR 1
-#define HAS_LOGICALVIEW 1
 #define DEFAULT_BATTERY_ALARM 4100
 #define DEFAULT_BATTERY_CRITICAL 3900
 #define MAX_BATTERY_ALARM 12000

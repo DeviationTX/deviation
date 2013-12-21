@@ -18,7 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-#if DATALOG_ENABLED
+#if HAS_DATALOG
 #include "../common/_datalog_page.c"
 static u8 seltype;
 enum {
@@ -141,4 +141,4 @@ void PAGE_DatalogInit(int page)
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
 }
-#endif //DATLOG_ENABLED
+#endif //HAS_DATLOG

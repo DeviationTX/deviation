@@ -121,9 +121,11 @@ void PAGE_MainEvent()
 {
     int i;
     if (PAGE_GetModal()) {
+#if HAS_TELEMETRY
         if(pagemem.modal_page == 2) {
             PAGE_TelemtestEvent();
         }
+#endif
         return;
     }
     volatile s16 *raw = MIXER_GetInputs();

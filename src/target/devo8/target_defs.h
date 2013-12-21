@@ -6,14 +6,15 @@
 #define SPIFLASH_SECTOR_OFFSET 54
 #define SPIFLASH_SECTORS 1024
 
-#define HAS_STANDARD_GUI 1
-#define HAS_ADVANCED_GUI 1
-
-//#define ENABLE_SCANNER 1
-#define HAS_TOUCH 1
-#define HAS_VIBRATINGMOTOR 0
-#define HAS_LOGICALVIEW 0
-#define DATALOG_ENABLED 1
+#define HAS_STANDARD_GUI    1
+#define HAS_ADVANCED_GUI    1
+#define HAS_PERMANENT_TIMER 1
+#define HAS_TELEMETRY       1
+#define HAS_TOUCH           1
+#define HAS_RTC             0
+#define HAS_VIBRATINGMOTOR  0
+#define HAS_DATALOG         1
+#define HAS_SCANNER         0
 
 #define MIN_BRIGHTNESS 1 
 #define DEFAULT_BATTERY_ALARM 4000

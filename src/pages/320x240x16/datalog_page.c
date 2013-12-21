@@ -18,7 +18,7 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
-#if DATALOG_ENABLED
+#if HAS_DATALOG
 #include "../common/_datalog_page.c"
 
 
@@ -173,4 +173,4 @@ void PAGE_DatalogInit(int page)
          SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
     next_update = CLOCK_getms() / 1000 + 5;
 }
-#endif //DATALOG_ENABLED
+#endif //HAS_DATALOG

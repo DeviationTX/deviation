@@ -5,7 +5,7 @@ PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       NULL,     
 PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       NULL,             _tr_noop("Timers"))
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL,             _tr_noop("Telemetry config"))
 PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        NULL,             _tr_noop("Trims"))
-#if DATALOG_ENABLED
+#if HAS_DATALOG
 PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,             _tr_noop("Datalog"))
 #endif
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  PAGE_MainLayoutEvent,  PAGE_MainLayoutExit, _tr_noop("Main page config"))
@@ -14,7 +14,7 @@ PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,     
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Channel monitor"))
 PAGEDEF(PAGEID_INPUTMON, PAGE_InputtestInit,   PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Input monitor"))
 PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Button monitor"))
-#ifdef ENABLE_SCANNER
+#if HAS_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit, _tr_noop("Scanner"))
 #endif
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,     _tr_noop("USB"))
