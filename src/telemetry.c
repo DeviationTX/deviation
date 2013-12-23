@@ -90,6 +90,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
 {
     int h, m, s, ss;
     char letter = ' ';
+    int unit = 0;    // rBE-OPT: Optimizing string usage, saves some bytes
     switch(telem) {
         case TELEM_GPS_LONG:
             // allowed values: +/-180° = +/- 180*60*60*1000; W if value<0, E if value>=0; -180° = 180°
@@ -124,18 +125,16 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
                     letter = '-';
                     value =-value;
                 }
-                sprintf(str, "%c%d.%03dft", letter, (int)value / 1000, (int)value % 1000);
-            } else {
-                sprintf(str, "%c%d.%03dm", letter, (int)value / 1000, (int)value % 1000);
+                unit = 1;
             }
+            sprintf(str, "%c%d.%03d%s", letter, (int)value / 1000, (int)value % 1000, unit ? "ft" : "m");
             break;
         case TELEM_GPS_SPEED:
             if (Transmitter.telem & TELEMUNIT_FEET) {
                 value = value * 2237 / 1000;
-                sprintf(str, "%d.%02dmph", (int)value / 1000, (int)(value / 10) % 100);
-            } else {
-                sprintf(str, "%d.%03dm/s", (int)value / 1000, (int)value % 1000);
+                unit = 1;
             }
+            sprintf(str, "%d.%03d%s", (int)value / 1000, (int)value % 1000, unit ? "mph" : "m/s");
             break;
         case TELEM_GPS_TIME:
         {
