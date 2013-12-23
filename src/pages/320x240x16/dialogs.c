@@ -125,7 +125,8 @@ void PAGE_ShowBindingDialog(u8 update)
     if (dialog && crc != dialogcrc) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Binding"), binding_string_cb, binding_ok_cb, dtOk, NULL);
+        const char *title = Model.name[0] ? Model.name : _tr("Binding");
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, binding_string_cb, binding_ok_cb, dtOk, NULL);
     }
     dialogcrc = crc;
 }
