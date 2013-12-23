@@ -55,38 +55,38 @@ u32 Crc(const void *buffer, u32 size)
  */
 const char *utf8_to_u32(const char *str, u32 *ch)
 {
+    char str1 = 0x3f & *(str + 1);
+    char str2 = 0x3f & *(str + 2);
+    char str3 = 0x3f & *(str + 2);
+    char str4 = 0x3f & *(str + 2);
+    char str5 = 0x3f & *(str + 2);
     if(! (*str & 0x80)) {
         *ch = *str;
         return str + 1;
     }
     if((*str & 0xE0) == 0xC0) {
         /* 2 bytes */
-        *ch = ((0x1F & *str) << 6) | (0x3F & *(str + 1));
+        *ch = ((0x1F & *str) << 6) | str1;
         return str + 2;
     }
     if((*str & 0xF0) == 0xE0) {
         /* 3 bytes */
-        *ch = ((0x0F & *str) << 12) | ((0x3F & *(str + 1)) << 6) | (0x3F & *(str + 2));
+        *ch = ((0x0F & *str) << 12) | (str1 << 6) | str2;
         return str + 3;
     }
     if((*str & 0xF8) == 0xF0) {
         /* 4 bytes */
-        *ch = ((0x07 & *str) << 18) | ((0x3F & *(str + 1)) << 12)
-              | ((0x3F & *(str + 2)) << 6) | (0x3F & *(str + 3));
+        *ch = ((0x07 & *str) << 18) | (str1 << 12) | (str2 << 6) | str3;
         return str + 4;
     }
     if((*str & 0xFC) == 0xF8) {
         /* 5 bytes */
-        *ch = ((0x03 & *str) << 24) | ((0x3F & *(str + 1)) << 18)
-              | ((0x3F & *(str + 2)) << 12) | ((0x3F & *(str + 3)) << 6)
-              | (0x3F & *(str + 4));
+        *ch = ((0x03 & *str) << 24) | (str1 << 18) | (str2 << 12) | (str3 << 6) | str4;
         return str + 5;
     }
     if((*str & 0xFE) == 0xFC) {
         /* 6 bytes */
-        *ch = ((0x01 & *str) << 30) | ((0x3F & *(str + 1)) << 24)
-              | ((0x3F & *(str + 2)) << 18) | ((0x3F & *(str + 3)) << 12)
-              | ((0x3F & *(str + 4)) << 6) | (0x3F & *(str + 5));;
+        *ch = ((0x01 & *str) << 30) | (str1 << 24) | (str2 << 18) | (str3 << 12) | (str4 << 6) | str5;
         return str + 6;
     }
     return NULL;
