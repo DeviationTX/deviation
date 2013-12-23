@@ -156,6 +156,7 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
 
 const char *MCU_GetPinName(char *str, struct mcu_pin *port)
 {
+/*
     switch(port->port) {
         case GPIOA: str[0] = 'A'; break;
         case GPIOB: str[0] = 'B'; break;
@@ -166,6 +167,10 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
         case GPIOG: str[0] = 'G'; break;
         default: return "None"; break;
     }
+*/
+    str[0] = 'A' + ((port->port - GPIOA) / (GPIOB - GPIOA));
+    if (str[0] < 'G')
+        return "None";
     for(int i = 0; i < 16; i++) {
         if(port->pin == (1 << i)) {
             sprintf(str+1, "%d", i);
