@@ -59,69 +59,64 @@ void LCD_DrawDashedVLine(int16_t x, int16_t y,
     LCD_DrawStop();
 }
 
-// used to do circles and roundrects!
-void fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
-                uint8_t cornername, int16_t delta, uint16_t color) {
+struct circle {
+    int f;
+    int ddF_x;
+    int ddF_y;
+    int x;
+    int y;
+};
 
-  int16_t f     = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x     = 0;
-  int16_t y     = r;
-
-  while (x<y) {
-    if (f >= 0) {
-      y--;
-      ddF_y += 2;
-      f     += ddF_y;
+void _calcCircleHelper(struct circle *c)
+{
+    if (c->f >= 0) {
+        c->y     -= 1;
+        c->ddF_y += 2;
+        c->f     += c->ddF_y;
     }
-    x++;
-    ddF_x += 2;
-    f     += ddF_x;
+    c->x     += 1;
+    c->ddF_x += 2;
+    c->f     += c->ddF_x;
+}
+// used to do circles and roundrects!
+void fillCircleHelper(int x0, int y0, int r,
+                unsigned cornername, int delta, unsigned color) {
+  struct circle c = {1 - r, 1, -2 * r, 0, r};
 
+  while (c.x<c.y) {
+    _calcCircleHelper(&c);
     if (cornername & 0x1) {
-      LCD_DrawFastVLine(x0+x, y0-y, 2*y+1+delta, color);
-      LCD_DrawFastVLine(x0+y, y0-x, 2*x+1+delta, color);
+      LCD_DrawFastVLine(x0+c.x, y0-c.y, 2*c.y+1+delta, color);
+      LCD_DrawFastVLine(x0+c.y, y0-c.x, 2*c.x+1+delta, color);
     }
     if (cornername & 0x2) {
-      LCD_DrawFastVLine(x0-x, y0-y, 2*y+1+delta, color);
-      LCD_DrawFastVLine(x0-y, y0-x, 2*x+1+delta, color);
+      LCD_DrawFastVLine(x0-c.x, y0-c.y, 2*c.y+1+delta, color);
+      LCD_DrawFastVLine(x0-c.y, y0-c.x, 2*c.x+1+delta, color);
     }
   }
 }
 
-void drawCircleHelper( int16_t x0, int16_t y0,
-               int16_t r, uint8_t cornername, uint16_t color) {
-  int16_t f     = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x     = 0;
-  int16_t y     = r;
+void drawCircleHelper( int x0, int y0,
+               int r, unsigned cornername, unsigned color) {
+  struct circle c = {1 - r, 1, -2 * r, 0, r};
 
-  while (x<y) {
-    if (f >= 0) {
-      y--;
-      ddF_y += 2;
-      f     += ddF_y;
-    }
-    x++;
-    ddF_x += 2;
-    f     += ddF_x;
+  while (c.x<c.y) {
+    _calcCircleHelper(&c);
     if (cornername & 0x4) {
-      LCD_DrawPixelXY(x0 + x, y0 + y, color);
-      LCD_DrawPixelXY(x0 + y, y0 + x, color);
+      LCD_DrawPixelXY(x0 + c.x, y0 + c.y, color);
+      LCD_DrawPixelXY(x0 + c.y, y0 + c.x, color);
     } 
     if (cornername & 0x2) {
-      LCD_DrawPixelXY(x0 + x, y0 - y, color);
-      LCD_DrawPixelXY(x0 + y, y0 - x, color);
+      LCD_DrawPixelXY(x0 + c.x, y0 - c.y, color);
+      LCD_DrawPixelXY(x0 + c.y, y0 - c.x, color);
     }
     if (cornername & 0x8) {
-      LCD_DrawPixelXY(x0 - y, y0 + x, color);
-      LCD_DrawPixelXY(x0 - x, y0 + y, color);
+      LCD_DrawPixelXY(x0 - c.y, y0 + c.x, color);
+      LCD_DrawPixelXY(x0 - c.x, y0 + c.y, color);
     }
     if (cornername & 0x1) {
-      LCD_DrawPixelXY(x0 - y, y0 - x, color);
-      LCD_DrawPixelXY(x0 - x, y0 - y, color);
+      LCD_DrawPixelXY(x0 - c.y, y0 - c.x, color);
+      LCD_DrawPixelXY(x0 - c.x, y0 - c.y, color);
     }
   }
 }
@@ -131,35 +126,23 @@ void drawCircleHelper( int16_t x0, int16_t y0,
 // draw a circle outline
 void LCD_DrawCircle(u16 x0, u16 y0, u16 r, u16 color)
 {
-  int16_t f = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x = 0;
-  int16_t y = r;
+  struct circle c = {1 - r, 1, -2 * r, 0, r};
 
   LCD_DrawPixelXY(x0, y0+r, color);
   LCD_DrawPixelXY(x0, y0-r, color);
   LCD_DrawPixelXY(x0+r, y0, color);
   LCD_DrawPixelXY(x0-r, y0, color);
 
-  while (x<y) {
-    if (f >= 0) {
-      y--;
-      ddF_y += 2;
-      f += ddF_y;
-    }
-    x++;
-    ddF_x += 2;
-    f += ddF_x;
-  
-    LCD_DrawPixelXY(x0 + x, y0 + y, color);
-    LCD_DrawPixelXY(x0 - x, y0 + y, color);
-    LCD_DrawPixelXY(x0 + x, y0 - y, color);
-    LCD_DrawPixelXY(x0 - x, y0 - y, color);
-    LCD_DrawPixelXY(x0 + y, y0 + x, color);
-    LCD_DrawPixelXY(x0 - y, y0 + x, color);
-    LCD_DrawPixelXY(x0 + y, y0 - x, color);
-    LCD_DrawPixelXY(x0 - y, y0 - x, color);
+  while (c.x<c.y) {
+    _calcCircleHelper(&c);
+    LCD_DrawPixelXY(x0 + c.x, y0 + c.y, color);
+    LCD_DrawPixelXY(x0 - c.x, y0 + c.y, color);
+    LCD_DrawPixelXY(x0 + c.x, y0 - c.y, color);
+    LCD_DrawPixelXY(x0 - c.x, y0 - c.y, color);
+    LCD_DrawPixelXY(x0 + c.y, y0 + c.x, color);
+    LCD_DrawPixelXY(x0 - c.y, y0 + c.x, color);
+    LCD_DrawPixelXY(x0 + c.y, y0 - c.x, color);
+    LCD_DrawPixelXY(x0 - c.y, y0 - c.x, color);
     
   }
 }
@@ -174,7 +157,7 @@ void LCD_FillCircle(u16 x0, u16 y0, u16 r, u16 color)
 // bresenham's algorithm - thx wikpedia
 void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color)
 {
-  int16_t steep = abs(y1 - y0) > abs(x1 - x0);
+  int steep = abs(y1 - y0) > abs(x1 - x0);
   if (steep) {
     swap(x0, y0);
     swap(x1, y1);
@@ -185,12 +168,12 @@ void LCD_DrawLine(u16 x0, u16 y0, u16 x1, u16 y1, u16 color)
     swap(y0, y1);
   }
 
-  int16_t dx, dy;
+  int dx, dy;
   dx = x1 - x0;
   dy = abs(y1 - y0);
 
-  int16_t err = dx / 2;
-  int16_t ystep;
+  int err = dx / 2;
+  int ystep;
 
   if (y0 < y1) {
     ystep = 1;
@@ -290,7 +273,7 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
     return;
   }
 
-  int16_t
+  int
     dx01 = x1 - x0,
     dy01 = y1 - y0,
     dx02 = x2 - x0,
@@ -394,10 +377,10 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
-    u16 i, j;
+    int i, j;
     FILE *fh;
-    u8 transparent = 0;
-    u8 row_has_transparency = 0;
+    unsigned transparent = 0;
+    unsigned row_has_transparency = 0;
     (void)row_has_transparency;
 
     u8 buf[480 * 2];
@@ -486,12 +469,12 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
                 color++;
             }
 #else
-            u8 last_pixel_transparent = row_has_transparency;
+            unsigned last_pixel_transparent = row_has_transparency;
             row_has_transparency = 0;
             for (i = 0; i < w; i++ ) {
                 if((*color & 0x8000)) {
                     //convert 1555 -> 565
-                    u16 c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
+                    unsigned c = ((*color & 0x7fe0) << 1) | (*color & 0x1f);
                     if(last_pixel_transparent) {
                         LCD_DrawPixelXY(x + i, y + h - j - 1, c);
                         last_pixel_transparent = 0;
