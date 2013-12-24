@@ -44,6 +44,8 @@ static s8 dir;
 #define MOSI_LO() gpio_clear(GPIOD, GPIO10)
 
 #define __no_operation()  asm volatile ("nop")
+void write_pixel(int bit);
+void lcd_set_row(int y);
 
 /* These are ported from th eopentx driver */
 void AspiCmd(u8 Command_Byte)
@@ -175,6 +177,22 @@ void LCD_Init()
 
     memset(img, 0, sizeof(img));
     memset(dirty, 0, sizeof(dirty));
+
+    //Clear screen
+    for (int y = 0; y < LCD_HEIGHT; y++) {
+        lcd_set_row(y);
+        AspiCmd(0xAF);
+        CLK_HI();
+        A0_HI();
+        NCS_LO();
+        for (int x = 0; x < 212; x++) {
+            //write_pixel(((x/53) % 2) ^ ((y / 16) %2));
+            write_pixel(0);
+        }
+        NCS_HI();
+        A0_HI();
+        AspiData(0);
+    }
 }
 
 void LCD_Clear(unsigned int val)
@@ -220,10 +238,10 @@ void write_pixel(int bit)
 void LCD_DrawStop(void)
 {
     for (int y = 0; y < LCD_HEIGHT; y++) {
-        if(dirty[y / 8] & (1 << (y % 8)))
+        if(! (dirty[y / 8] & (1 << (y % 8))))
             continue;
-        u8 *p = &img[y / 8 * LCD_WIDTH];
-        u8 mask = 1 << y % 8;
+        u8 *p = &img[(y / 8) * LCD_WIDTH];
+        u8 mask = 1 << (y % 8);
 
         lcd_set_row(y);
         AspiCmd(0xAF);

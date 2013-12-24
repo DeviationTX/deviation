@@ -48,5 +48,8 @@
     #define _PWM_EXTI EXTI9
 #endif //_PWM_PIN
 
+#ifndef _USART
+    #define _USART USART1
+#endif
 #endif //_PORTS_H_
 

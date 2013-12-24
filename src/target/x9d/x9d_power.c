@@ -14,18 +14,43 @@
 */
 #include <libopencm3/stm32/f2/gpio.h>
 #include <libopencm3/stm32/f2/rcc.h>
+#include <libopencm3/stm32/f2/flash.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
 #include "../common_devo/devo.h"
+
+static const clock_scale_t hse_12mhz_3v3 =
+{
+		/* sysclk frequency = XTAL * plln / pllm / pllp = 60 MHz */
+                /* USB clock        = XTAL * plln / pllm / pllq = 48 MHz */
+		.pllm = 12,
+		.plln = 240,
+		.pllp = 4,
+		.pllq = 5,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_2,
+		.ppre2 = RCC_CFGR_PPRE_DIV_NONE,
+		.flash_config = FLASH_PRFTEN | FLASH_ICE | FLASH_DCE | FLASH_LATENCY_2WS,
+		.apb1_frequency = 30000000,
+		.apb2_frequency = 60000000,
+};
 
 void PWR_Init(void)
 {
     //SCB_VTOR = VECTOR_TABLE_LOCATION;
     SCB_SCR  &= ~SCB_SCR_SLEEPONEXIT; //sleep immediate on WFI
     //rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    rcc_clock_setup_hse_3v3(&hse_12mhz_3v3);
 
+    rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPBEN);
     rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPCEN);
     rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPDEN);
+
+    /* PB.8 enabled the backlight */
+    //FIXME: We shouldn't do this here
+    gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT,
+                  GPIO_PUPD_NONE, GPIO8);
+    gpio_set(GPIOB, GPIO8);
 
     /* PD.0 controls power-down */
     gpio_mode_setup(GPIOD, GPIO_MODE_OUTPUT,
@@ -52,7 +77,7 @@ void PWR_Shutdown()
 int PWR_CheckPowerSwitch()
 {
     //static u16 debounce = 0;
-    if(! gpio_get(GPIOD, GPIO1)) {
+    if(gpio_get(GPIOD, GPIO1)) {
         return 1;
     }
     return 0;

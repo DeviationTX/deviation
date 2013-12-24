@@ -82,8 +82,6 @@ void PPMin_Init() {}
 void PPMin_Stop() {}
 void PPMin_Start() {}
 
-void UART_Initialize() {}
-void UART_Stop() {}
 void SPITouch_Init() {}
 void PPMin_TIM_Init() {}
 

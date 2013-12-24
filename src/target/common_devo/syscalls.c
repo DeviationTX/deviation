@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <libopencm3/stm32/usart.h>
+#include "ports.h"
 
 #include "petit_fat.h"
 #include "common.h"
@@ -181,14 +182,14 @@ int _write_r (FATFS *r, char * ptr, int len)
     if((unsigned long)r==1 || (unsigned long)r==2) {
         int index;
 
-        if (0 == (USART_CR1(USART1) & USART_CR1_UE))
+        if (0 == (USART_CR1(_USART) & USART_CR1_UE))
             return len; //Don't send if USART is disabled
 
         for(index=0; index<len; index++) {
             if (ptr[index] == '\n') {
-                usart_send_blocking(USART1,'\r');
+                usart_send_blocking(_USART,'\r');
             }  
-            usart_send_blocking(USART1, ptr[index]);
+            usart_send_blocking(_USART, ptr[index]);
         }    
         return len;
     } else if(r) {

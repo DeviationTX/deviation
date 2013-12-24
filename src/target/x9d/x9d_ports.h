@@ -2,7 +2,7 @@
 #define _FRSKY9XD_PORTS_H_
 
 //ADC overrides
-#define ADC_OVERSAMPLE_WINDOW_COUNT 10
+//#define ADC_OVERSAMPLE_WINDOW_COUNT 10
 //End ADC
 
 //Sound port
@@ -17,4 +17,6 @@
 #define _PWM_PIN GPIO8
 #define _PWM_EXTI EXTI8
 //End PWM Port
+
+#define _USART USART3
 #endif //_FRSKY9XD_PORTS_H_
