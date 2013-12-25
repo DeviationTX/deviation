@@ -2,7 +2,8 @@
 #define _FRSKY9XD_PORTS_H_
 
 //ADC overrides
-//#define ADC_OVERSAMPLE_WINDOW_COUNT 10
+#define _ADC
+#define ADC_OVERSAMPLE_WINDOW_COUNT  1
 //End ADC
 
 //Sound port
