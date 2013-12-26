@@ -17,7 +17,7 @@
 #include "common.h"
 #include "mixer.h"
 #include "config/tx.h"
-#include "../common_devo/devo.h"
+#include "../common/devo/devo.h"
 
 const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {0, 1, 2, 3, 6, 8, 14, 15, 16, 10};
 

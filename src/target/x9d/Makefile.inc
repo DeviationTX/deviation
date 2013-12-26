@@ -11,15 +11,16 @@ LINKFILE = target/$(TARGET)/$(TARGET).ld
 LIBOPENCM3 = libopencm3/lib/libopencm3_stm32f2.a
 
 SRC_C    = $(wildcard target/$(TARGET)/*.c) \
-	target/common_devo/printf.c \
-	target/common_devo/fgets.c \
-	target/common_devo/syscalls.c \
-	target/common_devo/petit_io.c \
-	target/common_devo/petit_fat.c \
-	target/common_devo/iwdg.c \
-	target/common_devo/err_handler.c
+	target/$(TARGET)/FatFs/ff.c \
+        target/$(TARGET)/FatFs/fattime.c \
+        target/$(TARGET)/FatFs/option/ccsbcs.c \
+	target/common/devo/printf.c \
+	target/common/devo/fgets.c \
+	target/common/devo/syscalls.c \
+	target/common/devo/iwdg.c \
+	target/common/devo/err_handler.c
 
-SRC_C   += $(wildcard target/common_devo/protocol/*.c)
+SRC_C   += $(wildcard target/common/devo/protocol/*.c)
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F20X_HD -DSTM32F2 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -Ilibopencm3/include -fno-builtin-printf -Os
 MODULE_FLAGS = -fno-builtin

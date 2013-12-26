@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "std.h"
-
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
                              //But only after all sprintf are replaced with snprintf
@@ -26,6 +24,13 @@ typedef uint64_t u64;
 #endif
 
 #include "target.h"
+#include "std.h"
+
+//FATFS is defined by target_defs.h
+struct FAT {
+    char a[sizeof(FATFS)];
+};
+
 
 extern volatile s16 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];

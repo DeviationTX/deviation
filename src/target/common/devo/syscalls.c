@@ -22,10 +22,9 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <libopencm3/stm32/usart.h>
-#include "ports.h"
 
-#include "petit_fat.h"
 #include "common.h"
+#include "ports.h"
 
 //#define dbgprintf(args...) printf(args)
 #define dbgprintf(args...) 

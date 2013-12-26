@@ -17,7 +17,7 @@
 
 #include "common.h"
 #include "gui/gui.h"
-#include "../common_emu/fltk.h"
+#include "../common/emu/fltk.h"
 
 static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
 /*

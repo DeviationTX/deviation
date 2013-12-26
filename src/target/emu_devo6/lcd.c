@@ -14,7 +14,7 @@
 */
 
 #include "common.h"
-#include "../common_emu/fltk.h"
+#include "../common/emu/fltk.h"
 
 void LCD_DrawPixel(unsigned int color)
 {

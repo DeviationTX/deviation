@@ -13,7 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "common.h"
-#include "../common_emu/fltk.h"
+#include "../common/emu/fltk.h"
 #include "mixer.h"
 
 s16 CHAN_ReadInput(int channel)

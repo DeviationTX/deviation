@@ -1,7 +1,7 @@
 ifndef BUILD_TARGET
 
-SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common_emu/*.cpp)
-SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common_emu/*.c)
+SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common/emu/*.cpp)
+SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c)
 
 LFLAGS = -lfltk
 CFLAGS = -DEMULATOR

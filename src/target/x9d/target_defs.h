@@ -1,6 +1,8 @@
 #ifndef _DEVO10_TARGET_H_
 #define _DEVO10_TARGET_H_
 
+#include "FatFs/ff.h"
+
 #define TXID 0x9d
 #define VECTOR_TABLE_LOCATION 0x0000
 #define SPIFLASH_SECTOR_OFFSET 54     //FIXME

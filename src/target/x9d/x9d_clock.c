@@ -22,7 +22,7 @@
 #include <libopencm3/stm32/iwdg.h>
 
 #include "common.h"
-#include "../common_devo/devo.h"
+#include "../common/devo/devo.h"
 
 //The following is from an unreleased libopencm3
 //We should remove it eventually

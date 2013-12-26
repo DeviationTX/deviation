@@ -9,7 +9,7 @@ more space), we add '#pragma no_long_calls' after all files are included
 
 There are some cases where the only usage of a 'ROM' function is in the program,
 in which case the lnker will optimize those functions out of the code.
-The solution to this is to add the functions to target/common_devo/proto_stubs.c
+The solution to this is to add the functions to target/common/devo/proto_stubs.c
 which ensures they are not discarded from the ROM image.
 
 The memory addresses for all ROM functions are included in a symbolfile that is

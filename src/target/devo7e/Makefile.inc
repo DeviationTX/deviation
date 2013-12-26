@@ -8,7 +8,7 @@ DFU_ARGS         := -c 7 -b 0x08003000
 
 PRE_FS = $(ODIR)/.pre_fs
 
-include target/common_devo/Makefile.inc
+include target/common/devo/Makefile.inc
 
 ifdef BUILD_TARGET
 $(TARGET).fs_wrapper: $(LAST_MODEL)

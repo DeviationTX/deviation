@@ -8,4 +8,4 @@ MEMORY
 	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 16K
 }
 _crc_offset = 0x2000; /* CRC is located at 0x08005000 */
-INCLUDE target/common_devo/devo.ld
+INCLUDE target/common/devo/devo.ld

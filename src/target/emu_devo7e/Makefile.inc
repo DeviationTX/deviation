@@ -3,7 +3,7 @@ FILESYSTEM := devo7e
 
 PRE_FS = $(ODIR)/.pre_fs
 
-include target/common_emu/Makefile.inc
+include target/common/emu/Makefile.inc
 
 ifdef BUILD_TARGET
 $(TARGET).fs_wrapper: $(LAST_MODEL)

@@ -1,6 +1,8 @@
 #ifndef _DEVO6_TARGET_H_
 #define _DEVO6_TARGET_H_
 
+#include "../common/devo/common_devo.h"
+
 #define TXID 0x06
 #define VECTOR_TABLE_LOCATION 0x4000
 #define SPIFLASH_SECTOR_OFFSET 54

@@ -17,7 +17,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
-#include "../common_devo/devo.h"
+#include "../common/devo/devo.h"
 
 static const clock_scale_t hse_12mhz_3v3 =
 {
