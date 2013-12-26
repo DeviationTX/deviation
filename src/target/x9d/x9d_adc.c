@@ -14,7 +14,7 @@
 */
 #include <libopencm3/stm32/f2/adc.h>
 #include <libopencm3/stm32/f2/rcc.h>
-#include <libopencm3/stm32/f2/dma.h>
+#include <libopencm3/stm32/dma.h>
 #include "common.h"
 #include "../common_devo/devo.h"
 #include <stdlib.h>

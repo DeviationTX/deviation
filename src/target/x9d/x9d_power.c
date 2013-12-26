@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f2/gpio.h>
 #include <libopencm3/stm32/f2/rcc.h>
 #include <libopencm3/stm32/f2/flash.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
 #include "../common_devo/devo.h"

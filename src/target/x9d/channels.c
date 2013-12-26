@@ -13,7 +13,7 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <libopencm3/stm32/f2/rcc.h>
-#include <libopencm3/stm32/f2/gpio.h>
+#include <libopencm3/stm32/gpio.h>
 #include "common.h"
 #include "mixer.h"
 #include "config/tx.h"
