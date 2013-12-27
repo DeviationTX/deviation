@@ -14,11 +14,7 @@ SRC_C    = $(wildcard target/$(TARGET)/*.c) \
 	target/$(TARGET)/FatFs/ff.c \
         target/$(TARGET)/FatFs/fattime.c \
         target/$(TARGET)/FatFs/option/ccsbcs.c \
-	target/common/devo/printf.c \
-	target/common/devo/fgets.c \
-	target/common/devo/syscalls.c \
-	target/common/devo/iwdg.c \
-	target/common/devo/err_handler.c
+        $(wildcard target/common/stm32/*.c)
 
 SRC_C   += $(wildcard target/common/devo/protocol/*.c)
 

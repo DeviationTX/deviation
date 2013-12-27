@@ -16,12 +16,14 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/pwr.h>
 #include <libopencm3/stm32/f2/rcc.h>
-//#include <libopencm3/stm32/f2/rtc.h>
+#include <libopencm3/stm32/f2/rtc.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/iwdg.h>
 
 #include "common.h"
+#include "rtc.h"
 #include "../common/devo/devo.h"
 
 //The following is from an unreleased libopencm3
@@ -237,25 +239,108 @@ void sys_tick_handler(void)
 // initialize RTC
 void RTC_Init()
 {
-//FIXME
-//    rtc_auto_awake(LSE, 32767); // LowSpeed External source, divided by (clock-1)=32767
+    
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_PWREN);
+    pwr_disable_backup_domain_write_protect();
+    rcc_osc_on(LSE);
+    rcc_wait_for_osc_ready(LSE);
+    RCC_BDCR |= RCC_BDCR_SRC_LSE; //Set source to LSE
+    RCC_BDCR |= RCC_BDCR_RTCEN;   //Enable RTC
+    rtc_wait_for_synchro();
+    rtc_set_prescaler(255, 127);
 }
 
+static const u16 daysInYear[2][13] = { { 0,31,59,90,120,151,181,212,243,273,304,334,365},
+                                       { 0,31,60,91,121,152,182,213,244,274,305,335,366} };
 // set date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
 void RTC_SetValue(u32 value)
 {
-//FIXME
-//    rtc_set_counter_val(value);
-    //_RTC_SetDayStart(value);
+    value += 4382 * 60 * 60 * 24; //convert date from 1.1.2012, 00:00:00 to 1.1.2000, 00:00:00
+    uint32_t date = 0, time = 0;
+    const uint32_t SEC  = value % 60;
+    const uint32_t MIN  = (value / 60) % 60;
+    const uint32_t HR   = (value / 60 / 60) % 24;
+    uint32_t       DAYS = (value / 60 / 60 / 24);
+    uint32_t       DAY  = 0;
+    uint32_t       YEAR = (4*DAYS) / 1461; // = days/365.25
+    uint32_t       LEAP = (YEAR % 4 == 0) ? 1 : 0;
+    uint32_t    WEEKDAY = DAYS / 7 + 7; //1/1/2000 was a Saturday
+    uint32_t      MONTH = 0;
+    //Convert time to bcd
+    time |= (SEC % 10) <<  0; //seconds ones
+    time |= (SEC / 10) <<  4; //seconds tens
+    time |= (MIN % 10) <<  8; //minutes ones
+    time |= (MIN / 10) << 12; //minutes tens
+    time |= (HR  % 10) << 16; //hours ones
+    time |= (HR  / 10) << 20; //hours tens
+    //Convert date to bcd
+    DAYS -= (uint32_t)(YEAR * 365 + YEAR / 4);
+    DAYS -= (DAYS > daysInYear[LEAP][2]) ? 1 : 0;    //leap year correction for RTC_STARTYEAR
+    for (MONTH=0; MONTH<12; MONTH++) {
+        if (DAYS < daysInYear[LEAP][MONTH + 1]) break;
+    }
+    DAY = DAYS - daysInYear[LEAP][MONTH];
+    date |= (DAY   % 10) <<  0; //date in ones
+    date |= (DAY   / 10) <<  4; //date in tens
+    date |= (MONTH % 10) <<  8; //month in ones
+    date |= (MONTH / 10) << 12; //month in tens
+    date |= (WEEKDAY)    << 13; //weekday
+    date |= (YEAR  % 10) << 16; //year in ones
+    date |= (YEAR  / 10) << 20; //year in tens
+    //Unlock
+    rtc_unlock();
+    //Enter Init mode
+    RTC_ISR = 0xFFFFFFFF;
+    for(int i = 0; i < 0x10000; i++)
+        if((RTC_ISR & RTC_ISR_INITF) == 0)
+            break;
+    //SetDate
+    RTC_DR = date;
+    RTC_TR = time;
+    // Exit Init mode
+    RTC_ISR &= (uint32_t)~RTC_ISR_INIT;
+    //Wait for synch
+    rtc_wait_for_synchro();
+    //Lock
+    rtc_lock();
 }
 
 // get date value (deviation epoch = seconds since 1.1.2012, 00:00:00)
 u32 RTC_GetValue()
 {
-    u32 value;
-//FIXME
-//    value = rtc_get_counter_val();
-    //_RTC_SetDayStart(value);
+    u32 value = 0;
+    uint32_t time = RTC_TR;
+    uint32_t date = RTC_DR;
+
+    const uint32_t YEAR  = (((date >> 20) & 0x0f) * 10) + ((date >> 16) & 0x0f) - 12;
+    const uint32_t MONTH = (((date >> 12) & 0x01) * 10) + ((date >>  8) & 0x0f);
+    const uint32_t DAY   = (((date >>  4) & 0x03) * 10) + ((date >>  0) & 0x0f);
+    const uint32_t HOUR  = (((time >> 20) & 0x03) * 10) + ((time >> 16) & 0x0f);
+    const uint32_t MIN   = (((time >> 12) & 0x07) * 10) + ((time >>  8) & 0x0f);
+    const uint32_t SEC   = (((time >>  4) & 0x07) * 10) + ((time >>  0) & 0x0f);
+
+    value += (DAY-1 + daysInYear[YEAR%4 == 0 ? 1 : 0][MONTH-1] + YEAR * 365 + YEAR/4 + ((YEAR != 0 && MONTH > 2) ? 1 : 0)) * (60*60*24);
+    value += HOUR*60*60 + MIN*60+SEC;
     return value;
+}
+
+void rtc_gettime(struct gtm * t)
+{
+    uint32_t time = RTC_TR;
+    uint32_t date = RTC_DR;
+
+    const uint32_t YEAR  = (((date >> 20) & 0x0f) * 10) + ((date >> 16) & 0x0f);
+    const uint32_t MONTH = (((date >> 12) & 0x01) * 10) + ((date >>  8) & 0x0f);
+    const uint32_t DAY   = (((date >>  4) & 0x03) * 10) + ((date >>  0) & 0x0f);
+    const uint32_t HOUR  = (((time >> 20) & 0x03) * 10) + ((time >> 16) & 0x0f);
+    const uint32_t MIN   = (((time >> 12) & 0x07) * 10) + ((time >>  8) & 0x0f);
+    const uint32_t SEC   = (((time >>  4) & 0x07) * 10) + ((time >>  0) & 0x0f);
+
+    t->tm_hour = HOUR;
+    t->tm_min  = MIN;
+    t->tm_sec  = SEC;
+    t->tm_year = YEAR + 100;
+    t->tm_mon  = MONTH;
+    t->tm_mday = DAY;
 }
 

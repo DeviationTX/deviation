@@ -7,11 +7,16 @@
 #endif
 
 #ifndef EMULATOR
-    #define USE_OWN_STDIO 1
+    #ifndef USE_OWN_STDIO
+        #define USE_OWN_STDIO 1
+    #endif
 #else
-    #define USE_OWN_STDIO 0
+    #ifndef USE_OWN_STDIO
+        #define USE_OWN_STDIO 0
+    #endif
     #define fopen2(fat, p, m) fopen(p, m)
     #define finit if(0) FS_Mount
+    void fempty(FILE *fh);
 #endif //EMULATOR
 
 #if USE_OWN_STDIO
@@ -25,6 +30,7 @@
     void devo_setbuf(FILE *stream, char *buf);
     long devo_ftell(FILE *stream);
     void devo_finit(void *FAT, const char *str);
+    void fempty(FILE *fh);
 
     #undef stdout
     #define stdout (void *)(1L)

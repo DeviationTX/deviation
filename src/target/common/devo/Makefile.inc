@@ -8,7 +8,11 @@ PROTO_LINKFILE = target/$(TARGET)/protocol.ld
 
 LIBOPENCM3 = libopencm3/lib/libopencm3_stm32f1.a
 
-SRC_C    = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/devo/*.c) $(wildcard target/common/devo/msc2/*.c) $(wildcard target/common/devo/msc2/lib/*.c)
+SRC_C    = $(wildcard target/$(TARGET)/*.c) \
+           $(wildcard target/common/stm32/*.c) \
+           $(wildcard target/common/devo/*.c) \
+           $(wildcard target/common/devo/msc2/*.c) \
+           $(wildcard target/common/devo/msc2/lib/*.c)
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard target/common/devo/protocol/*.c) \

@@ -13,6 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <fcntl.h>
+
+#define USE_OWN_STDIO 0  //Prevent std.h from defining prototypes for devo_*
+#include "common.h"
+
 #define FILE void
 long _open_r (void *r, const char *file, int flags, int mode);
 int _close_r (void *r);
@@ -52,6 +56,8 @@ int devo_fputc(int c, FILE *stream) {
     char ch = c;
     return (_write_r(stream, &ch, 1) == -1) ? -1 : c;
 }
+
+#ifndef devo_fgets
 extern unsigned char _stop_on_cr;
 char *devo_fgets(char *s, int size, FILE *stream)
 {
@@ -63,6 +69,8 @@ char *devo_fgets(char *s, int size, FILE *stream)
     s[r] = '\0';
     return s;
 }
+#endif
+
 size_t devo_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
     int r = _read_r(stream, ptr, size * nmemb);

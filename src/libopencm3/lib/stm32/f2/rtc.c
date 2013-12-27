@@ -1,4 +1,15 @@
-/* This provides unification of code over STM32F subfamilies */
+/** @defgroup rtc_file RTC
+ *
+ * @ingroup STM32F2xx
+ *
+ * @brief <b>libopencm3 STM32F2xx RTC</b>
+ *
+ * @version 1.0.0
+ *
+ * @date 4 March 2013
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
 
 /*
  * This file is part of the libopencm3 project.
@@ -16,19 +27,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if defined(STM32F0)
-#       include <libopencm3/stm32/f0/pwr.h>
-#elif defined(STM32F1)
-#       include <libopencm3/stm32/f1/pwr.h>
-#elif defined(STM32F2)
-#       include <libopencm3/stm32/f2/pwr.h>
-#elif defined(STM32F3)
-#       include <libopencm3/stm32/f3/pwr.h>
-#elif defined(STM32F4)
-#       include <libopencm3/stm32/f4/pwr.h>
-#elif defined(STM32L1)
-#       include <libopencm3/stm32/l1/pwr.h>
-#else
-#       error "stm32 family not defined."
-#endif
 
+#include <libopencm3/stm32/rtc.h>
+#include <libopencm3/stm32/common/rtc_common_l1f024.h>

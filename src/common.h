@@ -28,7 +28,7 @@ typedef uint64_t u64;
 
 //FATFS is defined by target_defs.h
 struct FAT {
-    char a[sizeof(FATFS)];
+    char a[FILE_SIZE];
 };
 
 
@@ -177,7 +177,6 @@ const char *utf8_to_u32(const char *str, u32 *ch);
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
-void fempty(FILE *fh);
 /* Battery */
 #define BATTERY_CRITICAL 0x01
 #define BATTERY_LOW      0x02

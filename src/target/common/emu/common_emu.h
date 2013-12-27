@@ -2,5 +2,5 @@
 #define _COMMON_EMU_H_
 
 //FAT is unused for the emulator
-#define FATFS unsigned char
+#define FILE_SIZE 1
 #endif

@@ -1,6 +1,7 @@
 #ifndef _DEVO12_TARGET_H_
 #define _DEVO12_TARGET_H_
 
+#include "devo12_ports.h"
 #include "../common/devo/common_devo.h"
 
 #define TXID 0x0c
@@ -52,8 +53,6 @@
     {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
     {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
     }
-
-#include "devo12_ports.h"
 
 //Use 2nd ROM for media
 #define MEDIA_DRIVE PARFlash_ReadBytes, PARFlash_ReadBytesStopCR, NULL, NULL, 0

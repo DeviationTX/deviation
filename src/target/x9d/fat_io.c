@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #include "FatFs/diskio.h"
 #include "FatFs/ff.h"
 #include "x9d_ports.h"
@@ -798,7 +799,7 @@ DRESULT disk_write (
 @param[in] ctrl: BYTE Control Code.
                     CTRL_POWER (0=on,1=off,2=get setting)
                     CTRL_SYNC wait for writes to complete
-                    GET_SECTOR_COUNT number of sectors on disk
+                    GET_SECTOR_COUNT iumber of sectors on disk
                     GET_SECTOR_SIZE
                     GET_BLOCK_SIZE
                     MMC_GET_TYPE
@@ -1001,3 +1002,6 @@ void sdDone()
   }
 }
 
+char *_fat_fgets(char *s, int size, FILE *stream) {
+    return f_gets(s, size, (FIL *)stream);
+}

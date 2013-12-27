@@ -16,9 +16,14 @@
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/stm32/iwdg.h>
 #include "common.h"
-#include "petit_fat.h"
-#include "petit_io.h"
 
+/* This code will write a stack-trace to disk should a fault happen
+ * Since when it runs, memory may be corrupted, we want to use as
+ * few functions or static memory addresses as possible.
+ * The code bypasses the entire file I/O system, and writes directly
+ * to the disk address.
+ */
+extern int disk_writep (const BYTE*, DWORD);
 //Memory start is constant for all Tx
 #define MEMORY_START  ((unsigned int *)0x20000000)
 #define MEMORY_END    (&_stack)

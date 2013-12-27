@@ -2,6 +2,7 @@
 #define _DEVO10_TARGET_H_
 
 #include "FatFs/ff.h"
+#include "fat_io.h"
 
 #define TXID 0x9d
 #define VECTOR_TABLE_LOCATION 0x0000

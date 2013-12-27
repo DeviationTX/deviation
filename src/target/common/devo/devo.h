@@ -1,8 +1,6 @@
 #ifndef _DEVO_H_
 #define _DEVO_H_
 
-#include "ports.h"
-
 #ifndef HAS_STANDARD_GUI
     #define HAS_STANDARD_GUI 1
 #endif

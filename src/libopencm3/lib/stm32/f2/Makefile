@@ -31,7 +31,9 @@ ARFLAGS		= rcs
 OBJS		= rcc.o gpio.o usart.o spi.o flash.o \
 		  i2c.o exti2.o timer.o \
 		  gpio_common_all.o gpio_common_f24.o \
-		  adc.o dma_common_f24.o
+		  adc.o dma_common_f24.o \
+		  rtc.o rtc_common_l1f024.o \
+		  pwr_common_all.o
 
 VPATH += ../../usb:../:../../cm3:../common
 
