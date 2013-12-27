@@ -1,1 +1,1 @@
-#include "../common/devo/printf.c"
+#include "../stm32/printf.c"
