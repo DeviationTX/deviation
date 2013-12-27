@@ -169,7 +169,7 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
     }
 */
     str[0] = 'A' + ((port->port - GPIOA) / (GPIOB - GPIOA));
-    if (str[0] < 'G')
+    if (str[0] > 'G')
         return "None";
     for(int i = 0; i < 16; i++) {
         if(port->pin == (1 << i)) {
