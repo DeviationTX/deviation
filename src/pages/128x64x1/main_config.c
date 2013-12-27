@@ -91,11 +91,9 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
     case ELEM_TOGGLE:
         str = _tr("Toggle");
         break;
-    case ELEM_MODELICO:
-        str = _tr("Model");
-        break;
     default:
-        str = "";
+        str = GetElemName(type);
+        break;
     }
     sprintf(tempstring,"%s%d", str, idx+1);
     return tempstring;

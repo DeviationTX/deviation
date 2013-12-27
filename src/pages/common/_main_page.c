@@ -23,9 +23,25 @@ static s16 bar_cb(void * data);
 void press_icon2_cb(guiObject_t *obj, const void *data);
 static u8 _action_cb(u32 button, u8 flags, void *data);
 static s32 get_boxval(u8 idx);
-static void _check_voltage();
+static void _check_voltage(guiLabel_t *obj);
 
 struct ImageMap TGLICO_GetImage(int idx);
+
+/**
+ * Below are defined in the common.h
+ *  TXPOWER_100uW,  // -10db
+ *  TXPOWER_300uW, // -5db
+ *  TXPOWER_1mW, //0db
+ *  TXPOWER_3mW, // 5db
+ *  TXPOWER_10mW, // 10db
+ *  TXPOWER_30mW, // 15db
+ *  TXPOWER_100mW, // 20db
+ *  TXPOWER_150mW, // 22db
+ */
+static const char *_power_to_string()
+{
+    return RADIO_TX_POWER_VAL[Model.tx_power];
+}
 
 struct LabelDesc *get_box_font(u8 idx, u8 neg)
 {
@@ -226,9 +242,13 @@ void PAGE_MainEvent()
                 }
             }
             break;
+            case ELEM_BATTERY:
+                _check_voltage(&gui->elem[i].box);
+                break;
         }
     }
-    _check_voltage();
+    if(HAS_TOUCH)  //FIXME: Hack to let 320x240 GUI continue to work
+        _check_voltage(NULL);
 #if HAS_RTC
     if(Display.flags & SHOW_TIME) {
         u32 time = RTC_GetValue() / 60;
@@ -249,6 +269,8 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_VTRIM]    = VTRIM_W,
         [ELEM_HTRIM]    = HTRIM_W,
         [ELEM_MODELICO] = MODEL_ICO_W,
+        [ELEM_BATTERY]  = BATTERY_W,
+        [ELEM_TXPOWER]  = TXPOWER_W,
     };
     const u8 height[ELEM_LAST] = {
         [ELEM_SMALLBOX] = SMALLBOX_H,
@@ -258,6 +280,8 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_VTRIM]    = VTRIM_H,
         [ELEM_HTRIM]    = HTRIM_H,
         [ELEM_MODELICO] = MODEL_ICO_H,
+        [ELEM_BATTERY]  = BATTERY_H,
+        [ELEM_TXPOWER]  = TXPOWER_H,
     };
     if (type == ELEM_MODELICO && Model.icon[0])
     	LCD_ImageDimensions(Model.icon, w, h);
@@ -371,6 +395,12 @@ void show_elements()
                                   img.x_off, img.y_off, img.file, NULL, NULL);
                 break;
             }
+            case ELEM_BATTERY:
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &TINY_FONT,  voltage_cb, NULL, NULL);
+                break; 
+            case ELEM_TXPOWER:
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, w, h, &TINY_FONT,  _power_to_string, NULL, NULL);
+                break; 
         }
     }
 }

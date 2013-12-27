@@ -67,8 +67,6 @@ struct mainpage_obj {
         guiLabel_t    box;
         guiImage_t    img;
     } elem[NUM_ELEMS];
-    guiLabel_t battery;
-    guiLabel_t power;
 };
 
 struct menu_obj {

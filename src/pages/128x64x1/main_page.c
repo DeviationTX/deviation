@@ -33,14 +33,16 @@ enum {
      BIGBOX_H     = 14,
      GRAPH_W      = (VTRIM_W),
      GRAPH_H      = (VTRIM_H / 2),
+     BATTERY_W    = 40,
+     BATTERY_H    = 7,
+     TXPOWER_W    = 40,
+     TXPOWER_H    = 8,
 };
 
 #define press_icon_cb NULL
 #define press_box_cb NULL
 
 #include "../common/_main_page.c"
-
-static const char *_power_to_string();
 
 static const int BATTERY_SCAN_MSEC = 2000; // refresh battery for every 2sec to avoid its label blinking
 static u32 next_scan=0;
@@ -69,13 +71,9 @@ void PAGE_MainInit(int page)
     show_elements();
     //Battery
     mp->battery = PWR_ReadVoltage();
-    GUI_CreateLabelBox(&gui->battery, 88 ,1, 40, 7, &TINY_FONT,  voltage_cb, NULL, NULL);
-    //TxPower
-    GUI_CreateLabelBox(&gui->power, 88, 12,  //54,1,
-            40, 8,&TINY_FONT, _power_to_string, NULL, NULL);
 }
 
-static void _check_voltage()
+static void _check_voltage(guiLabel_t *obj)
 {
     if (CLOCK_getms() > next_scan)  {  // don't need to check battery too frequently, to avoid blink of the battery label
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
@@ -83,13 +81,13 @@ static void _check_voltage()
         if (batt < Transmitter.batt_alarm) {
             enum LabelType oldStyle = TINY_FONT.style;  // bug fix
             TINY_FONT.style = LABEL_BLINK;
-            GUI_SetLabelDesc(&gui->battery, &TINY_FONT);
-            GUI_Redraw(&gui->battery);
+            GUI_SetLabelDesc(obj, &TINY_FONT);
+            GUI_Redraw(obj);
             TINY_FONT.style = oldStyle;
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;
-            GUI_Redraw(&gui->battery);
+            GUI_Redraw(obj);
         }
     }
 }
@@ -114,20 +112,4 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
         MIXER_UpdateTrim(button, flags, data);
     }
     return 1;
-}
-
-/**
- * Below are defined in the common.h
- *  TXPOWER_100uW,  // -10db
- *  TXPOWER_300uW, // -5db
- *  TXPOWER_1mW, //0db
- *  TXPOWER_3mW, // 5db
- *  TXPOWER_10mW, // 10db
- *  TXPOWER_30mW, // 15db
- *  TXPOWER_100mW, // 20db
- *  TXPOWER_150mW, // 22db
- */
-static const char *_power_to_string()
-{
-    return RADIO_TX_POWER_VAL[Model.tx_power];
 }

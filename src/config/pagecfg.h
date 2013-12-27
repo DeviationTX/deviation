@@ -87,6 +87,8 @@ enum {
     ELEM_VTRIM,
     ELEM_HTRIM,
     ELEM_MODELICO,
+    ELEM_BATTERY,
+    ELEM_TXPOWER,
     ELEM_LAST,
 };
 

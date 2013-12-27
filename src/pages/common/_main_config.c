@@ -89,6 +89,8 @@ const char *GetElemName(int type)
         case ELEM_VTRIM:    return _tr("V-trim");
         case ELEM_HTRIM:    return _tr("H-trim");
         case ELEM_MODELICO: return _tr("Model");
+        case ELEM_BATTERY:  return _tr("Battery");
+        case ELEM_TXPOWER:  return _tr("TxPower");
     }
     return "";
 }
@@ -97,7 +99,8 @@ const char *newelem_cb(guiObject_t *obj, int dir, void *data)
 {   
     (void)data;
     (void)obj;
-    lp->newelem = GUI_TextSelectHelper(lp->newelem, 0, ELEM_LAST-1, dir, 1, 1, NULL);
+    const int last_elem = (HAS_TOUCH) ? ELEM_BATTERY : ELEM_LAST; //FIXME
+    lp->newelem = GUI_TextSelectHelper(lp->newelem, 0, last_elem-1, dir, 1, 1, NULL);
     return GetElemName(lp->newelem);
 }
 

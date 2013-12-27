@@ -34,6 +34,10 @@ enum {
     BOX_W       = 113,
     SMALLBOX_H   = 24,
     BIGBOX_H     = 40,
+    BATTERY_W    = 0,
+    BATTERY_H    = 0,
+    TXPOWER_W    = 0,
+    TXPOWER_H    = 0,
 };
 
 void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data);
@@ -90,8 +94,9 @@ void PAGE_MainExit()
     BUTTON_UnregisterCallback(&mp->action);
 }
 
-static void _check_voltage()
+static void _check_voltage(guiLabel_t *obj)
 {
+    (void)obj;
     s16 batt = PWR_ReadVoltage();
     if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
         
