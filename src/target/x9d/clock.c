@@ -37,6 +37,8 @@ void iwdg_reset(void);
 #endif
 
 volatile u32 msecs;
+volatile u32 msecTimer1;
+volatile u32 msecTimer2;
 volatile u32 wdg_time;
 u16 (*timer_callback)(void);
 volatile u8 msec_callbacks;
@@ -206,6 +208,10 @@ void exti1_isr()
 void sys_tick_handler(void)
 {
 	msecs++;
+	if(msecTimer1)
+		msecTimer1--;
+	if(msecTimer2)
+		msecTimer2--;
         if(msecs - wdg_time > 2000) {
             nvic_set_pending_irq(NVIC_EXTI2_IRQ);
             return;

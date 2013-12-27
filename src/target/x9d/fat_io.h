@@ -17,6 +17,5 @@
 #define fat_sync       f_sync
 #define fat_unlink     f_unlink
 
-char *_fat_fgets(char *s, int size, FILE *stream);
-#define devo_fgets _fat_fgets
+#define _f_gets f_gets
 #endif

@@ -48,9 +48,9 @@ int _lseek_r (FIL *r, int ptr, int dir);
 int FS_Mount(void *_f, const char *drive)
 {
     (void)drive;
-    FATFS *f = (FATFS *)_f;
-    if (! f)
-        f = &fat[0];
+    if(_f)  //We only need to mount once
+        return 1;
+    FATFS *f = &fat[0];
     int res = f_mount(0, f);
     dbgprintf("Mount: %d\n", res);
     return (res == FR_OK);
@@ -63,7 +63,9 @@ void FS_Unmount()
 
 int FS_OpenDir(const char *path)
 {
-    FRESULT res = f_opendir(&dir, path);
+    char tmppath[256];
+    sprintf(tmppath, "deviat.ion/%s", path);
+    FRESULT res = f_opendir(&dir, tmppath);
     dbgprintf("Opendir: %d\n", res);
     return (res == FR_OK);
 }
@@ -103,7 +105,9 @@ long _open_r (FIL *r, const char *file, int flags, int mode) {
             if (flags & O_CREAT)
                 fa |= FA_CREATE_ALWAYS;
         }
-        int res=f_open(r, file, fa);
+        char tmppath[256];
+        sprintf(tmppath, "deviat.ion/%s", file);
+        int res=f_open(r, tmppath, fa);
         if(res==FR_OK) {
             dbgprintf("_open_r(%08lx): pf_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             return (long)r;

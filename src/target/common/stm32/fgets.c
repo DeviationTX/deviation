@@ -57,7 +57,11 @@ int devo_fputc(int c, FILE *stream) {
     return (_write_r(stream, &ch, 1) == -1) ? -1 : c;
 }
 
-#ifndef devo_fgets
+#ifdef _f_gets
+char *devo_fgets(char *s, int size, FILE *stream) {
+    return _f_gets(s, size, (FIL *)stream);
+}
+#else
 extern unsigned char _stop_on_cr;
 char *devo_fgets(char *s, int size, FILE *stream)
 {

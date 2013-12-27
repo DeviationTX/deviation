@@ -85,8 +85,7 @@ static const DWORD socket_state_mask_wp = (1 << 1);
 static volatile
 DSTATUS Stat = STA_NOINIT;      /* Disk status */
 
-static volatile
-DWORD Timer1, Timer2;   /* 100Hz decrement timers */
+extern volatile uint32_t msecTimer1, msecTimer2;   /* 1000Hz decrement timers */
 
 static
 BYTE CardType;                  /* Card type flags */
@@ -229,11 +228,11 @@ static BYTE wait_ready (void)
         BYTE res;
 
 
-        Timer2 = 50;    /* Wait for ready in timeout of 500ms */
+        msecTimer2 = 500;    /* Wait for ready in timeout of 500ms */
         rcvr_spi();
         do
                 res = rcvr_spi();
-        while ((res != 0xFF) && Timer2);
+        while ((res != 0xFF) && msecTimer2);
 
         return res;
 }
@@ -370,8 +369,7 @@ static void power_on (void)
 	socket_cp_init();//Empty return
 	socket_wp_init();//Empty return.
 
-	for (Timer1 = 25; Timer1; );	/* Wait for 250ms */
-	//for (uint32_t Timer = 25000; Timer>0;Timer--);	/* Wait for 250ms */
+	for (msecTimer1 = 250; msecTimer1; );	/* Wait for 250ms */
 
 	/* Configure I/O for Flash Chip select */
 	gpio_mode_setup(GPIO_PORT_CS, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIOCS);
@@ -453,10 +451,10 @@ static BOOL rcvr_datablock (
         BYTE token;
 
 
-        Timer1 = 10;
+        msecTimer1 = 100;
         do {                                                    /* Wait for data packet in timeout of 100ms */
                 token = rcvr_spi();
-        } while ((token == 0xFF) && Timer1);
+        } while ((token == 0xFF) && msecTimer1);
         if(token != 0xFE) return FALSE; /* If not valid data token, return with error */
 
 #ifdef STM32_SD_USE_DMA
@@ -597,12 +595,12 @@ DSTATUS disk_initialize (
 
         ty = 0;
         if (send_cmd(CMD0, 0) == 1) {                   /* Enter Idle state */
-                Timer1 = 100;                                           /* Initialization timeout of 1000 milliseconds */
+                msecTimer1 = 1000;                                           /* Initialization timeout of 1000 milliseconds */
                 if (send_cmd(CMD8, 0x1AA) == 1) {       /* SDHC */
                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();            /* Get trailing return value of R7 response */
                         if (ocr[2] == 0x01 && ocr[3] == 0xAA) {                         /* The card can work at VDD range of 2.7-3.6V */
-                                while (Timer1 && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
-                                if (Timer1 && send_cmd(CMD58, 0) == 0) {                /* Check CCS bit in the OCR */
+                                while (msecTimer1 && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
+                                if (msecTimer1 && send_cmd(CMD58, 0) == 0) {                /* Check CCS bit in the OCR */
                                         for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();
                                         ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;
                                 }
@@ -613,8 +611,8 @@ DSTATUS disk_initialize (
                         } else {
                                 ty = CT_MMC; cmd = CMD1;        /* MMC */
                         }
-                        while (Timer1 && send_cmd(cmd, 0));                     /* Wait for leaving idle state */
-                        if (!Timer1 || send_cmd(CMD16, 512) != 0)       /* Set R/W block length to 512 */
+                        while (msecTimer1 && send_cmd(cmd, 0));                     /* Wait for leaving idle state */
+                        if (!msecTimer1 || send_cmd(CMD16, 512) != 0)       /* Set R/W block length to 512 */
                                 ty = 0;
                 }
         }
@@ -950,13 +948,8 @@ void sdPoll10ms()
 {
         static DWORD pv;
         DWORD ns;
-        BYTE n, s;
+        BYTE s;
 
-
-        n = Timer1;                /* 100Hz decrement timers */
-        if (n) Timer1 = --n;
-        n = Timer2;
-        if (n) Timer2 = --n;
 
         ns = pv;
         pv = socket_is_empty() | socket_is_write_protected();   /* Sample socket switch */
@@ -976,32 +969,4 @@ void sdPoll10ms()
 
                 Stat = s;
         }
-}
-
-// TODO everything here should not be in the driver layer ...
-
-FATFS g_FATFS_Obj;
-#if defined(DEBUG)
-FIL g_telemetryFile = {0};
-#endif
-
-uint32_t sdMounted()
-{
-  return g_FATFS_Obj.fs_type != 0;
-}
-
-uint32_t sdInit()
-{
-  return (f_mount(0, &g_FATFS_Obj) == FR_OK);
-}
-
-void sdDone()
-{
-  if (sdMounted()) {
-    f_mount(0, 0); // unmount SD
-  }
-}
-
-char *_fat_fgets(char *s, int size, FILE *stream) {
-    return f_gets(s, size, (FIL *)stream);
 }
