@@ -55,12 +55,22 @@ static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
+static int exact_atoi(const char *str)
+{
+    char *endptr;
+    int value;
+    value = strtol(str, &endptr, 10);
+    if (*endptr != '\0')
+        value = 0;
+    return value;
+}
 static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     long idx = (long)data;
-    u8 count = 0;
-    u8 pos = 0;
+    unsigned count = 0;
+    unsigned pos = 0;
+    unsigned step = 0;
     u8 changed;
     int i, start, end;
     for(i = 0; i < idx; i++) {
@@ -70,13 +80,19 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     }
     while(proto_strs[pos+1+count])
         count++;
-    start = atoi(proto_strs[pos+1]);
-    end = atoi(proto_strs[pos+2]);
-    if (count == 2 && (start != 0 || end != 0)) {
+    start = exact_atoi(proto_strs[pos+1]);
+    end   = exact_atoi(proto_strs[pos+2]);
+    if(count == 3)
+        step = exact_atoi(proto_strs[pos+3]);
+    if ((start != 0 || end != 0) && (count == 2 || (count == 3 && step != 0))) {
         int s1 = 1, s2 = 1;
-        if (start < -200 || end > 200) {
-            s1 = 10;
-            s2 = 50;
+        if (step) {
+            s1 = step & 0xffff;
+            s2 = (step >> 16) & 0xffff;
+            if(s2 == 0)
+                s2 = s1;
+            if(s1 == 0)
+                s1 = 1;
         }
         Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], start, end, dir, s1, s2, &changed);
         sprintf(tempstring, "%d", Model.proto_opts[idx]);
