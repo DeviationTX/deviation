@@ -35,11 +35,11 @@ struct CountDownTimerSettings {
 };
 
 void TIMER_SetString(char *str, s32 time);
-const char *TIMER_Name(char *str, u8 timer);
-void TIMER_StartStop(u8 timer);
-void TIMER_Reset(u8 timer);
-s32 TIMER_GetValue(u8 timer);
-void TIMER_SetValue(u8 timer, s32 value);
+const char *TIMER_Name(char *str, unsigned timer);
+void TIMER_StartStop(unsigned timer);
+void TIMER_Reset(unsigned timer);
+s32 TIMER_GetValue(unsigned timer);
+void TIMER_SetValue(unsigned timer, s32 value);
 void TIMER_Update();
 void TIMER_Init();
 #endif

@@ -50,7 +50,7 @@ void STDMIXER_Preset()
         // for none protocol, assign any channel to thr is fine
         ch_map = EATRG;
     }
-    for (u8 ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
+    for (unsigned ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
         if (ch_map[ch] == INP_THROTTLE) {
             mapped_std_channels.throttle = ch;
             break;
@@ -70,9 +70,9 @@ void STDMIXER_SetChannelOrderByProtocol()
         ch_map = EATRG;
     }
     CLOCK_ResetWatchdog();// this function might be invoked after loading from template/model file, so feeding the dog in the middle
-    u8 safetysw = 0;
+    unsigned safetysw = 0;
     s8 safetyval = 0;
-    for (u8 ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
+    for (unsigned ch = 0; ch < 3; ch++) {  // only the first 3 channels need to check
         if (Model.limits[ch].safetysw) {
             safetysw = Model.limits[ch].safetysw;
             safetyval = Model.limits[ch].safetyval;
@@ -97,7 +97,7 @@ void STDMIXER_SetChannelOrderByProtocol()
     MIXER_SetTemplate(mapped_std_channels.elev, MIXERTEMPLATE_CYC2);
 
     struct Mixer *mix = MIXER_GetAllMixers();
-    for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
+    for (unsigned idx = 0; idx < NUM_MIXERS; idx++) {
         if (mix[idx].src ==0)
             continue;
         if (mix[idx].dest == NUM_OUT_CHANNELS + 9)
@@ -111,7 +111,7 @@ void STDMIXER_SetChannelOrderByProtocol()
     mapped_std_channels.elev = NUM_OUT_CHANNELS +1; // virt 2
 
     // Simplfied timer sw, only throttle channel output is possible to be selected
-    for (u8 i = 0; i < NUM_TIMERS; i++) {
+    for (unsigned i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src)
             Model.timer[i].src = mapped_std_channels.throttle + NUM_INPUTS +1;
         TIMER_Reset(i);
@@ -120,14 +120,14 @@ void STDMIXER_SetChannelOrderByProtocol()
 }
 
 // Roughly verify if current model is a valid simple model
-u8 STDMIXER_ValidateTraditionModel()
+unsigned STDMIXER_ValidateTraditionModel()
 {
     struct Mixer *mix = MIXER_GetAllMixers();
-    u8 thro_mixer_count = 0;
-    u8 pit_mixer_count = 0;
-    u8 drexp_mixer_count = 0;
-    u8 gryo_mixer_count = 0;
-    for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
+    unsigned thro_mixer_count = 0;
+    unsigned pit_mixer_count = 0;
+    unsigned drexp_mixer_count = 0;
+    unsigned gryo_mixer_count = 0;
+    for (unsigned idx = 0; idx < NUM_MIXERS; idx++) {
         if (mix[idx].src == 0  || MIXER_MUX(&mix[idx]) != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
         if (mix[idx].dest == NUM_OUT_CHANNELS + 9) //mixers pointing to Virt10 as the Virt10 is reserved in Standard mode
@@ -149,8 +149,8 @@ u8 STDMIXER_ValidateTraditionModel()
             gryo_mixer_count < GYROMIXER_COUNT || drexp_mixer_count != DREXPMIXER_COUNT *3)
         return 0;
 
-    u8 cyc_template_count = 0;
-    for (u8 ch = 0; ch < NUM_OUT_CHANNELS; ch++) {
+    unsigned cyc_template_count = 0;
+    for (unsigned ch = 0; ch < NUM_OUT_CHANNELS; ch++) {
         switch(Model.templates[ch]) {
         case MIXERTEMPLATE_CYC1:
         case MIXERTEMPLATE_CYC2:
@@ -175,12 +175,12 @@ void STDMIXER_InitSwitches()
 
     if (Model.limits[mapped_std_channels.throttle].safetysw)
         mapped_std_channels.switches[SWITCHFUNC_HOLD] =  MIXER_SRC(Model.limits[mapped_std_channels.throttle].safetysw);
-    u8 found_gyro_switch = 0;
-    u8 found_flymode_switch = 0;
-    u8 found_drexp_rud_switch = 0;
-    u8 found_drexp_ail_switch = 0;
-    u8 found_drexp_ele_switch = 0;
-    for (u8 idx = 0; idx < NUM_MIXERS; idx++) {
+    unsigned found_gyro_switch = 0;
+    unsigned found_flymode_switch = 0;
+    unsigned found_drexp_rud_switch = 0;
+    unsigned found_drexp_ail_switch = 0;
+    unsigned found_drexp_ele_switch = 0;
+    for (unsigned idx = 0; idx < NUM_MIXERS; idx++) {
         if (!MIXER_SRC(mix[idx].src) || MIXER_MUX(&mix[idx]) != MUX_REPLACE)  // all none replace mux will be considered as program mix in the Standard mode
             continue;
         if (!found_gyro_switch && mix[idx].sw != 0 && (mix[idx].dest == mapped_std_channels.gear || mix[idx].dest == mapped_std_channels.aux2)) {

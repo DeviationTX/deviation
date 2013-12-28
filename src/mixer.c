@@ -54,10 +54,10 @@ struct Transmitter Transmitter;
 
 static volatile s16 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
-static u8 switch_is_on(u8 sw, volatile s16 *raw);
-static s32 get_trim(u8 src);
+static unsigned switch_is_on(unsigned sw, volatile s16 *raw);
+static s32 get_trim(unsigned src);
 
-static s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum);
+static s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -90,7 +90,7 @@ void MIXER_EvalMixers(volatile s16 *raw)
 
 }
 
-u8 MIXER_MapChannel(u8 channel)
+unsigned MIXER_MapChannel(unsigned channel)
 {
     switch(Transmitter.mode) {
     case MODE_1:
@@ -136,7 +136,7 @@ static void MIXER_UpdateRawInputs()
     int i;
     //1st step: read input data (sticks, switches, etc) and calibrate
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        u8 mapped_channel = MIXER_MapChannel(i);
+        unsigned mapped_channel = MIXER_MapChannel(i);
         if (PPMin_Mode() == PPM_IN_TRAIN2 && Model.train_sw && raw[Model.train_sw] > 0) {
             int ppm_channel_map = map_ppm_channels(i);
             if (ppm_channel_map >= 0) {
@@ -155,12 +155,12 @@ static void MIXER_UpdateRawInputs()
     }
 }
 
-int MIXER_GetCachedInputs(s16 *cache, u8 threshold)
+int MIXER_GetCachedInputs(s16 *cache, unsigned threshold)
 {
     int changed = 0;
     int i;
     for (i = 1; i <= NUM_TX_INPUTS; i++) {
-        if (abs(raw[i] - cache[i]) > threshold) {
+        if ((unsigned)abs(raw[i] - cache[i]) > threshold) {
             changed = 1;
             cache[i] = raw[i];
         }
@@ -208,14 +208,14 @@ volatile s16 *MIXER_GetInputs()
     return raw;
 }
 
-s16 MIXER_GetChannel(u8 channel, enum LimitMask flags)
+s16 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
 {
     return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, Channels, flags);
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-s16 MIXER_CreateCyclicOutput(volatile s16 *raw, u8 cycnum)
+s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
 {
     s16 cyc[3];
     if (! Model.swash_type) {
@@ -349,7 +349,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
-s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
+s16 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s16 *_raw,
                       volatile s16 *_Channels, enum LimitMask flags)
 {
     int applied_safety = 0;
@@ -396,7 +396,7 @@ s16 MIXER_ApplyLimits(u8 channel, struct Limit *limit, volatile s16 *_raw,
     return value;
 }
 
-s8 *MIXER_GetTrim(u8 i)
+s8 *MIXER_GetTrim(unsigned i)
 {
     if (Model.trims[i].sw) {
         for (int j = 0; j < 3; j++) {
@@ -419,7 +419,7 @@ s32 MIXER_GetTrimValue(int i)
         return PCT_TO_RANGE(value);
 }
 
-s32 get_trim(u8 src)
+s32 get_trim(unsigned src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++) {
@@ -430,9 +430,9 @@ s32 get_trim(u8 src)
     return 0;
 }
 
-u8 switch_is_on(u8 sw, volatile s16 *raw)
+unsigned switch_is_on(unsigned sw, volatile s16 *raw)
 {
-    u8 is_neg = MIXER_SRC_IS_INV(sw);
+    unsigned is_neg = MIXER_SRC_IS_INV(sw);
     sw = MIXER_SRC(sw);
     if(sw == 0) {
         // No switch selected is the same as an on switch
@@ -488,11 +488,11 @@ int MIXER_GetMixers(int ch, struct Mixer *mixers, int count)
 }
 
 int compact_mixers() {
-    u8 max = NUM_MIXERS;
-    u8 i = 0;
-    u8 j;
+    unsigned max = NUM_MIXERS;
+    unsigned i = 0;
+    unsigned j;
     while(i < max) {
-        u8 src = MIXER_SRC(Model.mixers[i].src);
+        unsigned src = MIXER_SRC(Model.mixers[i].src);
         if(! src 
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_NONE
            || Model.templates[Model.mixers[i].dest] == MIXERTEMPLATE_CYC1
@@ -514,10 +514,10 @@ int compact_mixers() {
     return i;
 }
 
-u8 find_dependencies(u8 ch, u8 *deps)
+unsigned find_dependencies(unsigned ch, unsigned *deps)
 {
-    u8 found = 0;
-    u8 i;
+    unsigned found = 0;
+    unsigned i;
     struct Mixer *mixer;
     for (i = 0; i < NUM_CHANNELS; i++)
         deps[i] = 0;
@@ -535,13 +535,13 @@ u8 find_dependencies(u8 ch, u8 *deps)
     return found;
 }
 
-void fix_mixer_dependencies(u8 mixer_count)
+void fix_mixer_dependencies(unsigned mixer_count)
 {
-    u8 dependencies[NUM_CHANNELS];
-    u8 placed[NUM_CHANNELS];
-    u8 pos = 0;
-    u8 last_count = 0;
-    u8 i;
+    unsigned dependencies[NUM_CHANNELS];
+    unsigned placed[NUM_CHANNELS];
+    unsigned pos = 0;
+    unsigned last_count = 0;
+    unsigned i;
     struct Mixer mixers[NUM_MIXERS];
     memset(mixers, 0, sizeof(mixers));
     for (i = 0; i < NUM_MIXERS; i++) {
@@ -557,8 +557,8 @@ void fix_mixer_dependencies(u8 mixer_count)
                 placed[i] = 1;
                 continue;
             }
-            u8 ok = 1;
-            u8 j;
+            unsigned ok = 1;
+            unsigned j;
             // determine if all dependencies have been placed
             for (j = 0; j < NUM_CHANNELS; j++) {
                 if (dependencies[i] && ! placed[i]) {
@@ -567,7 +567,7 @@ void fix_mixer_dependencies(u8 mixer_count)
                 }
             }
             if (ok) {
-                u8 num = MIXER_GetMixers(i, &mixers[pos], NUM_MIXERS);
+                unsigned num = MIXER_GetMixers(i, &mixers[pos], NUM_MIXERS);
                 pos += num;
                 mixer_count -= num;
                 placed[i] = 1;
@@ -587,7 +587,7 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
     int i;
     if (count) {
         int mixer_count = 0;
-        u8 dest = mixers[0].dest;
+        unsigned dest = mixers[0].dest;
         //Determine if we have enough free mixers
         for (i = 0; i < NUM_MIXERS; i++) {
             if (MIXER_SRC(Model.mixers[i].src) && Model.mixers[i].dest != dest)
@@ -603,7 +603,7 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
                 Model.mixers[i].src = 0;
         }
     }
-    u8 pos = compact_mixers();
+    unsigned pos = compact_mixers();
     for (i = 0; i < count; i++) {
         if (MIXER_SRC(mixers[i].src)) {
             Model.mixers[pos] = mixers[i];
@@ -632,7 +632,7 @@ void MIXER_SetLimit(int ch, struct Limit *limit)
         Model.limits[ch] = *limit;
 }
 
-void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
+void MIXER_InitMixer(struct Mixer *mixer, unsigned ch)
 {
     int i;
     mixer->src = ch + 1;
@@ -645,7 +645,7 @@ void MIXER_InitMixer(struct Mixer *mixer, u8 ch)
         mixer->curve.points[i] = 0;
 }
 
-static void _trim_as_switch(u8 flags, int i, int is_neg)
+static void _trim_as_switch(unsigned flags, int i, int is_neg)
 {
     s8 *value = MIXER_GetTrim(i);
     if(Model.trims[i].step == TRIM_MOMENTARY) {
@@ -675,7 +675,7 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
     int i;
     int orig_step_size = 1;
     int tmp;
-    u8 reach_end = 0; // reach either 100 , 0, or -100
+    unsigned reach_end = 0; // reach either 100 , 0, or -100
     if (flags & BUTTON_LONGPRESS) {
         if (orig_step_size == 1)
             orig_step_size = 9;
@@ -684,7 +684,7 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
     }
     if (! orig_step_size)
         return 1;
-    u8 volume = 10 * Transmitter.volume;
+    unsigned volume = 10 * Transmitter.volume;
     for (i = 0; i < NUM_TRIMS; i++) {
         int step_size = orig_step_size;
         reach_end = 0;
@@ -752,7 +752,7 @@ u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
     return 1;
 }
 
-u8 MIXER_SourceHasTrim(u8 src)
+unsigned MIXER_SourceHasTrim(unsigned src)
 {
     int i;
     for (i = 0; i < NUM_TRIMS; i++)
@@ -801,7 +801,7 @@ void MIXER_AdjustForProtocol()
 {
     int i, j;
     const u8 *map = ProtocolChannelMap[Model.protocol];
-    u8 chmap[PROTO_MAP_LEN];
+    unsigned chmap[PROTO_MAP_LEN];
     //Automap assumes input is EATRG
     if(! map || map == EATRG)
         return;

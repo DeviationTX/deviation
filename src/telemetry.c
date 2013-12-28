@@ -86,7 +86,7 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     return TELEMETRY_Type() == TELEM_DEVO ? _devo_value(t, idx) : _dsm_value(t, idx);
 }
 
-const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
+const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
 {
     int h, m, s, ss;
     char letter = ' ';
@@ -156,20 +156,20 @@ const char * TELEMETRY_GetValueStrByValue(char *str, u8 telem, s32 value)
     return str;
 }
 
-const char * TELEMETRY_GetValueStr(char *str, u8 telem)
+const char * TELEMETRY_GetValueStr(char *str, unsigned telem)
 {
     s32 value = TELEMETRY_GetValue(telem);
     return TELEMETRY_GetValueStrByValue(str, telem, value);
 }
 
-const char * TELEMETRY_Name(char *str, u8 telem)
+const char * TELEMETRY_Name(char *str, unsigned telem)
 {
    return (TELEMETRY_Type() == TELEM_DEVO)
           ? _devo_name(str, telem)
           : _dsm_name(str, telem);
 }
 
-const char * TELEMETRY_ShortName(char *str, u8 telem)
+const char * TELEMETRY_ShortName(char *str, unsigned telem)
 {
     switch(telem) {
         case TELEM_GPS_LONG:   strcpy(str, _tr("Longitude")); break;
@@ -184,7 +184,7 @@ const char * TELEMETRY_ShortName(char *str, u8 telem)
     }
     return str;
 }
-s32 TELEMETRY_GetMaxValue(u8 telem)
+s32 TELEMETRY_GetMaxValue(unsigned telem)
 {
    return TELEMETRY_Type() == TELEM_DEVO
           ? _devo_get_max_value(telem)
@@ -236,7 +236,7 @@ void TELEMETRY_Alarm()
         alarm &= ~(1 << telem_idx); // clear this set
         return;
     }
-    u8 idx = Model.telem_alarm[telem_idx];
+    unsigned idx = Model.telem_alarm[telem_idx];
     s32 value = TELEMETRY_GetValue(idx);
     if (value == 0) {
         alarm &= ~(1 << telem_idx); // clear this set
