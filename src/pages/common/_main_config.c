@@ -164,7 +164,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
             snprintf(tempstring, sizeof(tempstring), "%s%d", _tr("Trim"),pc->elem[idx].src);
             return tempstring;
     }
-    return "";
+    return _tr("None");
 }
 
 static void dlgbut_cb(struct guiObject *obj, const void *data)

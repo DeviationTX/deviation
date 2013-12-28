@@ -33,10 +33,10 @@ enum {
      BIGBOX_H     = 14,
      GRAPH_W      = (VTRIM_W),
      GRAPH_H      = (VTRIM_H / 2),
-     BATTERY_W    = 40,
-     BATTERY_H    = 7,
-     TXPOWER_W    = 40,
-     TXPOWER_H    = 8,
+     BATTERY_W    = 26,
+     BATTERY_H    = 6,
+     TXPOWER_W    = 26,
+     TXPOWER_H    = 6,
 };
 
 #define press_icon_cb NULL
@@ -79,11 +79,11 @@ static void _check_voltage(guiLabel_t *obj)
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            enum LabelType oldStyle = TINY_FONT.style;  // bug fix
-            TINY_FONT.style = LABEL_BLINK;
+            enum LabelType oldStyle = MICRO_FONT.style;  // bug fix
+            MICRO_FONT.style = LABEL_BLINK;
             GUI_SetLabelDesc(obj, &TINY_FONT);
             GUI_Redraw(obj);
-            TINY_FONT.style = oldStyle;
+            MICRO_FONT.style = oldStyle;
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;
