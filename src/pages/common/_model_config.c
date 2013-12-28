@@ -55,15 +55,6 @@ static const char *swashmix_val_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-static int exact_atoi(const char *str)
-{
-    char *endptr;
-    int value;
-    value = strtol(str, &endptr, 10);
-    if (*endptr != '\0')
-        value = 0;
-    return value;
-}
 static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;

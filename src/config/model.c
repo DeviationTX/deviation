@@ -1043,9 +1043,10 @@ static void write_proto_opts(FILE *fh, struct Model *m)
     int idx = 0;
     fprintf(fh, "[%s]\n", SECTION_PROTO_OPTS);
     while(*opts) {
-        int start = atoi(opts[1]);
-        int end = atoi(opts[2]);
-        if (opts[3] == 0 && (start != 0 || end != 0)) {
+        int start = exact_atoi(opts[1]);
+        int end = exact_atoi(opts[2]);
+        int is_num = ((start != 0 || end != 0) && (opts[3] == 0 || (opts[4] == 0 && exact_atoi(opts[3]) != 0))) ? 1 : 0;
+        if (is_num) {
             fprintf(fh, "%s=%d\n",*opts, m->proto_opts[idx]);
         } else {
             fprintf(fh, "%s=%s\n",*opts, opts[m->proto_opts[idx]+1]);

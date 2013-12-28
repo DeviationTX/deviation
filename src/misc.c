@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "common.h"
 
 void Delay(u32 count)
@@ -90,4 +91,14 @@ const char *utf8_to_u32(const char *str, u32 *ch)
         return str + 6;
     }
     return NULL;
+}
+
+int exact_atoi(const char *str)
+{
+    char *endptr;
+    int value;
+    value = strtol(str, &endptr, 10);
+    if (*endptr != '\0')
+        value = 0;
+    return value;
 }
