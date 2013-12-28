@@ -32,7 +32,7 @@ static const int HEADER_Y = 1;
 
 static const char *pos_cb(guiObject_t *obj, const void *data);
 
-static u8 _layaction_cb(u32 button, u8 flags, void *data);
+static unsigned _layaction_cb(u32 button, unsigned flags, void *data);
 
 static void move_cb(guiObject_t *obj, const void *data)
 {
@@ -150,7 +150,7 @@ void select_for_move(guiLabel_t *obj)
 }
 
     
-static u8 _layaction_cb(u32 button, u8 flags, void *data)
+static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if(CHAN_ButtonIsPressed(button, BUT_EXIT) && !(flags & BUTTON_RELEASE)) {

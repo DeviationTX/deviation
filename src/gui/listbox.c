@@ -20,7 +20,7 @@
 
 #include "_listbox.c"
 static int scroll_cb(struct guiObject *parent, u8 pos, s8 direction, void *data);
-static u8 press_cb(u32 button, u8 flags, void *data);
+static unsigned press_cb(u32 button, unsigned flags, void *data);
 
 guiObject_t *GUI_CreateListBox(guiListbox_t *listbox, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
         const char *(*string_cb)(u8 idx, void *data),
@@ -240,7 +240,7 @@ u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press)
     return 0;
 }
 
-static u8 press_cb(u32 button, u8 flags, void *data)
+static unsigned press_cb(u32 button, unsigned flags, void *data)
 {   // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN, so the listbox can change navigate key-sets now
     struct guiObject *obj = (struct guiObject *)data;
     struct guiListbox *listbox = (struct guiListbox *)obj;

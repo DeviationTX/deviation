@@ -157,7 +157,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
     }
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     if(! GUI_GetSelected()) {
         if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {

@@ -34,7 +34,7 @@ static const char *ypos_cb(guiObject_t *obj, int dir, void *data);
 static void notify_cb(guiObject_t *obj);
 static void move_elem();
 static void select_for_move(guiLabel_t *obj);
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *dlgbut_str_cb(guiObject_t *obj, const void *data);
 static void dlgbut_cb(struct guiObject *obj, const void *data);
 
@@ -338,7 +338,7 @@ void show_config()
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }
     
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
 

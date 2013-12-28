@@ -23,7 +23,7 @@
 static u8 selectedIdx = 0;
 static u8 top_channel = 0;
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned action_cb(u32 button, unsigned flags, void *data);
 
 static void _show_title(int page)
 {
@@ -163,7 +163,7 @@ void navigate_item(s8 direction, u8 step)
     GUI_SetScrollbar(&gui->scroll, current_row);
 }
 
-u8 action_cb(u32 button, u8 flags, void *data)
+unsigned action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

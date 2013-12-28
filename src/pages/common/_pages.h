@@ -32,7 +32,7 @@ u8 PAGE_GetModal();
 void PAGE_RemoveAllObjects();
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
-void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data));
+void PAGE_SetActionCB(unsigned (*callback)(u32 button, unsigned flags, void *data));
 
 /* Main */
 void PAGE_MainInit(int page);

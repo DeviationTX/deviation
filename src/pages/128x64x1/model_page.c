@@ -27,7 +27,7 @@ static const char * const HELI_LABEL = _tr_noop("Heli");
 static const char * const PLANE_LABEL = _tr_noop("Plane");
 #include "../common/_model_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static u16 current_selected = 0;
 
@@ -180,7 +180,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
             _changename_done_cb, (void *)&callback_result);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

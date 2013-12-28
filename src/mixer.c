@@ -667,7 +667,7 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
 }
 
 static u32 last_trim_music_time = 0;
-u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data)
+unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data)
 {
 #define TRIM_MUSIC_DURATION 100
 #define START_TONE 1000

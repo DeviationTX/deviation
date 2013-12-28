@@ -207,7 +207,7 @@ const char *MIXER_SwashType(enum SwashType);
 unsigned MIXER_SourceHasTrim(unsigned src);
 unsigned MIXER_MapChannel(unsigned channel);
 void MIXER_AdjustForProtocol();
-u8 MIXER_UpdateTrim(u32 buttons, u8 flags, void *data);
+unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data);
 s8 *MIXER_GetTrim(unsigned i);
 s32 MIXER_GetTrimValue(int i);
 

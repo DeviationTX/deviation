@@ -21,7 +21,7 @@
 
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_throhold_page.c"
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static s8 current_selected = 0;
 void PAGE_ThroHoldInit(int page)
@@ -49,7 +49,7 @@ void PAGE_ThroHoldInit(int page)
 
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

@@ -21,7 +21,7 @@ const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
 static s16 bar_cb(void * data);
 void press_icon2_cb(guiObject_t *obj, const void *data);
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s32 get_boxval(u8 idx);
 static void _check_voltage(guiLabel_t *obj);
 

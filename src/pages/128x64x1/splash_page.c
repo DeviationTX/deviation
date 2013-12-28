@@ -19,7 +19,7 @@
 
 static struct splash_obj * const gui = &gui_objs.u.splash;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 //static int offset =  110;
 
 void PAGE_SplashInit(int page)
@@ -39,7 +39,7 @@ void PAGE_SplashInit(int page)
     GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT - ITEM_HEIGHT - 1 , LCD_WIDTH, ITEM_HEIGHT, &MICRO_FONT, NULL, NULL, DeviationVersion);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     (void)button;

@@ -31,7 +31,7 @@ enum DrawCmds {
 };
 
 
-static u8 press_cb(u32 button, u8 flags, void *data);
+static unsigned press_cb(u32 button, unsigned flags, void *data);
 static const char * const alpha[] = {
           "QWERTYUIOP",
           "ASDFGHJKL",
@@ -359,7 +359,7 @@ static void navigate_item(struct guiKeyboard *keyboard, short leftRight, short u
     keyboard_cmd(KB_PRESS, keyboard, NULL);
 }
 
-static u8 press_cb(u32 button, u8 flags, void *data)
+static unsigned press_cb(u32 button, unsigned flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
     struct guiKeyboard *keyboard = (struct guiKeyboard *)obj;

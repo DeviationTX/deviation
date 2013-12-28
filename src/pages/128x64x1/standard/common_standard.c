@@ -24,7 +24,7 @@
 
 static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -57,7 +57,7 @@ void STANDARD_Init(const struct page_defs *page_defs)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

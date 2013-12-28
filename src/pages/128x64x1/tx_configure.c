@@ -25,7 +25,7 @@ static const int MIN_BATTERY_ALARM_STEP = 10;
 
 static struct tx_obj * const gui = &gui_objs.u.tx;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
@@ -214,7 +214,7 @@ static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
         return _tr("On");
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
