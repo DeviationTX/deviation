@@ -218,20 +218,22 @@ void PAGE_MainEvent()
                 (void)img.x_off;
                 (void)img.y_off;
                 img.file = NULL;
-                if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
-                    //switch
-                    for (int j = 0; j < 3; j++) {
-                        // Assume switch 0/1/2 are in order
-                        if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
-                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
-                            break;
+                if(src) {
+                    if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
+                        //switch
+                        for (int j = 0; j < 3; j++) {
+                            // Assume switch 0/1/2 are in order
+                            if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
+                                img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
+                                break;
+                            }
                         }
-                    }
-                } else {
-                    //Non switch
-                    int sw = raw[src] > 0 ? 1 : 0;
-                    if (ELEM_ICO(pc->elem[i], sw)) {
-                        img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
+                    } else {
+                        //Non switch
+                        int sw = raw[src] > 0 ? 1 : 0;
+                        if (ELEM_ICO(pc->elem[i], sw)) {
+                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
+                        }
                     }
                 }
                 if (img.file) {
