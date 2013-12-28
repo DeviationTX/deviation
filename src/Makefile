@@ -166,6 +166,7 @@ language:
 zip: $(TARGET).zip
 
 %.zip: $(TARGET).dfu $(PROTO_MODULES) $(ALL)
+	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
@@ -177,6 +178,9 @@ ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
 	rm -rf $(ODIR)/protocol
 endif
+ifeq "$(INCLUDE_FS)" "1"
+	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -ur $$p/deviation-$(HGVERSION).zip  *
+endif
 	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	rm -f deviation-$(HGVERSION).dfu
@@ -187,15 +191,17 @@ fs: $(TARGET).fs
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
 release:
-	make TARGET=devo8 zip
-	make TARGET=devo6 zip
+	make TARGET=devo8  zip
+	make TARGET=devo6  zip
 	make TARGET=devo10 zip
 	make TARGET=devo7e zip
 	make TARGET=devo12 zip
+ifneq "$(INCLUDE_FS)" "1"
 	make TARGET=devo8 fs
 	make TARGET=devo10 fs
 	make TARGET=devo7e fs
 	make TARGET=devo12 fs
+endif
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
 
 ##########################################

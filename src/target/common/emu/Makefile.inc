@@ -40,6 +40,9 @@ $(TARGET).zip: $(TARGET).$(EXEEXT)
 ifdef WINDOWS
 	zip -u deviation-$(HGVERSION).zip libportaudio-2.dll
 endif
+ifeq "$(INCLUDE_FS)" "1"
+	zip -ur deviation-$(HGVERSION).zip filesystem/$(FILESYSTEM)
+endif
 	rm -f deviation-$(HGVERSION).$(EXEEXT)
 
 endif #BUILD_TARGET
