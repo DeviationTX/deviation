@@ -34,6 +34,29 @@ static const char *pos_cb(guiObject_t *obj, const void *data);
 
 static u8 _layaction_cb(u32 button, u8 flags, void *data);
 
+static void move_cb(guiObject_t *obj, const void *data)
+{
+    //This will draw a little arrow bmp
+    (void)data;
+    const u8 bmp[] = {
+        0b00000100,
+        0b00001110,
+        0b00000000,
+        0b00001010,
+        0b00011011,
+        0b00001010,
+        0b00000000,
+        0b00001110,
+        0b00000100,
+    };
+    for(unsigned i = 0; i < sizeof(bmp); i++) {
+        for(int j = 0; j < 5; j++) {
+            if(bmp[i] & (1 << j)) 
+                LCD_DrawPixelXY(obj->box.x+i, obj->box.y+j, 0xffff);
+        }
+    }
+}
+
 void show_layout()
 {
     GUI_RemoveAllObjects();
@@ -50,11 +73,17 @@ void show_layout()
         };
     gui->desc[1].style = LABEL_BRACKET; //Special case for trims
 
-    GUI_CreateLabelBox(&gui->editelem, LCD_WIDTH-30, 1, 29, 10, &SMALL_FONT, NULL, NULL, "Move");
-    GUI_CreateLabel(&gui->xlbl, 0, 1, NULL, SMALL_FONT, "X:");
-    GUI_CreateLabelBox(&gui->x, 10, 1, 20, 10, &SMALL_FONT, pos_cb, NULL, (void *) 0L);
-    GUI_CreateLabel(&gui->ylbl, 32, 1, NULL, SMALL_FONT, "Y:");
-    GUI_CreateLabelBox(&gui->y, 42, 1, 20, 10, &SMALL_FONT, pos_cb, NULL, (void *) 1L);
+    struct LabelDesc micro = MICRO_FONT;
+    struct LabelDesc rect = MICRO_FONT;
+    micro.style = LABEL_LEFT;
+    rect.fill_color = 0x0000;
+    rect.outline_color = 0x0000;
+    GUI_CreateRect(&gui->editelem, 41, 1, 9, 5, &rect);
+    gui->editelem.CallBack = move_cb;
+    GUI_CreateLabel(&gui->xlbl, 0,  1, NULL, micro, "X:");
+    GUI_CreateLabelBox(&gui->x, 8, 1, 13, 6, &micro, pos_cb, NULL, (void *) 0L);
+    GUI_CreateLabel(&gui->ylbl, 22, 1, NULL, micro, "Y:");
+    GUI_CreateLabelBox(&gui->y, 30, 1, 9, 6, &micro, pos_cb, NULL, (void *) 1L);
     //gui->y must be the last element!
     GUI_SelectionNotify(notify_cb);
 
