@@ -1267,7 +1267,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             case ELEM_VTRIM:
                 fprintf(fh, "%s=%d,%d,%d\n", elename, x, y, src);
                 break;
-            case ELEM_MODELICO:
+            default:
                 fprintf(fh, "%s=%d,%d\n", elename, x, y);
                 break;
         }
