@@ -233,9 +233,10 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
     while(*popts) {
         if(mapstrcasecmp(*popts, key) == 0) {
             popts++;
-            int start = atoi(popts[0]);
-            int end = atoi(popts[1]);
-            if(popts[2] == 0 && (start != 0 || end != 0)) {
+            int start = exact_atoi(popts[0]);
+            int end = exact_atoi(popts[1]);
+            int is_num = ((start != 0 || end != 0) && (popts[2] == 0 || (popts[3] == 0 && exact_atoi(popts[2]) != 0))) ? 1 : 0;
+            if(is_num) {
                 m->proto_opts[idx] = atoi(value);
                 return 1;
             }
