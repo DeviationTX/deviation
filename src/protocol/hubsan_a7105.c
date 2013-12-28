@@ -40,6 +40,17 @@ enum{
     FLAG_LED  = 0x04
 };
 
+#define VTX_STEP_SIZE "5"
+
+static const char * const hubsan4_opts[] = {
+    _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
+    NULL
+};
+
+enum {
+    VTX_FREQ
+};
+
 static u8 packet[16];
 static u8 channel;
 static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};
@@ -196,10 +207,22 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 static void hubsan_build_packet()
 {
+    static s16 vtx_freq = 0; 
     memset(packet, 0, 16);
-    //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
-    packet[0] = 0x20;
-    packet[2] = get_channel(2, 0x80, 0x80, 0x80);
+    if(vtx_freq != Model.proto_opts[VTX_FREQ] || packet_count==100) // set vTX frequency (H107D)
+    {
+        vtx_freq = Model.proto_opts[VTX_FREQ];
+        packet[0] = 0x40;
+        packet[1] = (vtx_freq >> 8) & 0xff;
+        packet[2] = vtx_freq & 0xff;
+        packet[3] = 0x82;
+        packet_count++;      
+    }
+    else //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
+    {
+        packet[0] = 0x20;
+        packet[2] = get_channel(2, 0x80, 0x80, 0x80); //Throttle
+    }
     packet[4] = 0xff - get_channel(3, 0x80, 0x80, 0x80); //Rudder is reversed
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80);
@@ -312,6 +335,8 @@ static void initialize() {
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
     packet_count=0;
+    if( Model.proto_opts[VTX_FREQ] == 0)
+        Model.proto_opts[VTX_FREQ] = 5885;
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
@@ -323,8 +348,12 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)6L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return 0;
+        case PROTOCMD_GETOPTIONS:
+            if( Model.proto_opts[VTX_FREQ] == 0)
+                Model.proto_opts[VTX_FREQ] = 5885;
+            return hubsan4_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         default: break;
     }
