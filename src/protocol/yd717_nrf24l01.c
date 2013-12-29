@@ -70,7 +70,6 @@ enum {
 static u8 packet[PAYLOADSIZE];
 static u8 packet_sent;
 static u8 tx_id[3];
-static u8 rf_ch_num;
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
@@ -95,6 +94,29 @@ enum {
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
+
+static void packet_ack()
+{
+    if (packet_sent) {
+        //bool report_done = false;
+        //    if  (!(radio.read_register(STATUS) & _BV(TX_DS))) { Serial.write("Waiting for radio\n"); report_done = true; }
+        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_TX_DS))) ;
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS));
+        //    if (report_done) Serial.write("Done\n");
+        packet_sent = 0;
+    }
+}
+
+static void packet_write()
+{
+    packet_ack();
+//  yd717 always transmits on same channel    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x3C);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x7F);     // Clear any pending interrupts
+    NRF24L01_FlushTx();
+    NRF24L01_WritePayload(packet, sizeof(packet));
+    ++packet_counter;
+    packet_sent = 1;
+}
 
 static void yd717_init()
 {
@@ -143,7 +165,6 @@ static void yd717_init()
     printf("Trying to switch banks\n");
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
         printf("BK2421 detected\n");
-        long nul = 0;
         // Beken registers don't have such nice names, so we just mention
         // them by their numbers
         // It's all magic, eavesdropped from real transfer and not even from the
@@ -187,8 +208,14 @@ static void YD717_init3()
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 
-    // send address to use as data
-    packet = {0x29, 0xC3, 0x21, 0x11, 0x56, 0xAA, 0x32, 0x00};
+    packet[0]= 0x29; // send address to use in first 4 bytes
+    packet[1]= 0xC3;
+    packet[2]= 0x21;
+    packet[3]= 0x11;
+    packet[4]= 0x56; // fixed value
+    packet[5]= 0xAA; // fixed value
+    packet[6]= 0x32; // fixed - same as trim values in bind packets...
+    packet[7]= 0x00; // fixed value
     packet_write();
 }
 
@@ -197,32 +224,9 @@ static void YD717_init4()
     packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
 
     // set address
-    rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
+    u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
-}
-
-static void packet_ack()
-{
-    if (packet_sent) {
-        //bool report_done = false;
-        //    if  (!(radio.read_register(STATUS) & _BV(TX_DS))) { Serial.write("Waiting for radio\n"); report_done = true; }
-        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_TX_DS))) ;
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS));
-        //    if (report_done) Serial.write("Done\n");
-        packet_sent = 0;
-    }
-}
-
-static void packet_write()
-{
-    packet_ack();
-//  yd717 always transmits on same channel    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x3C);
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x7F);     // Clear any pending interrupts
-    NRF24L01_FlushTx();
-    NRF24L01_WritePayload(packet, sizeof(packet));
-    ++packet_counter;
-    packet_sent = 1;
 }
 
 static void set_tx_id(u32 id)
@@ -288,7 +292,6 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
 static void send_packet(u8 bind)
 {
     if (bind) {
-        flags     = FLAG_BIND;
         packet[0] = 0;    // stock controller puts channel values in during bind
         packet[1] = 0x80;
         packet[3] = 0x80;
