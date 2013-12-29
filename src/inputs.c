@@ -120,9 +120,9 @@ static void get_input_str(int src, const char **ptr, int *idx)
     #undef CHANDEF
 }
 
-static const char *_get_source_name(char *str, u8 src, int switchname, int ignore_rename)
+static const char *_get_source_name(char *str, unsigned src, int switchname, int ignore_rename)
 {
-    u8 is_neg = MIXER_SRC_IS_INV(src);
+    unsigned is_neg = MIXER_SRC_IS_INV(src);
     src = MIXER_SRC(src);
 
     if(! src) {
@@ -149,21 +149,21 @@ static const char *_get_source_name(char *str, u8 src, int switchname, int ignor
     }
     return str;
 }
-const char *INPUT_SourceName(char *str, u8 src)
+const char *INPUT_SourceName(char *str, unsigned src)
 {
     return _get_source_name(str, src, 1, 0);
 }
-const char *INPUT_SourceNameReal(char *str, u8 src)
+const char *INPUT_SourceNameReal(char *str, unsigned src)
 {
     // Use 'Virt' instead of renamed value
     return _get_source_name(str, src, 1, 1);
 }
-const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src)
+const char *INPUT_SourceNameAbbrevSwitch(char *str, unsigned src)
 {
     _get_source_name(str, src, 0, 0);
     return str;
 }
-const char *INPUT_SourceNameAbbrevSwitchReal(char *str, u8 src)
+const char *INPUT_SourceNameAbbrevSwitchReal(char *str, unsigned src)
 {
     // Use 'Virt' instead of renamed value
     _get_source_name(str, src, 0, 1);
@@ -185,7 +185,7 @@ int INPUT_GetAbbrevSource(int origval, int newval, int dir)
     return newval;
 }
 
-int INPUT_SwitchPos(u8 src)
+int INPUT_SwitchPos(unsigned src)
 {
     const char *ptr;
     int idx;
@@ -193,7 +193,7 @@ int INPUT_SwitchPos(u8 src)
     return idx;
 }
 
-int INPUT_NumSwitchPos(u8 src)
+int INPUT_NumSwitchPos(unsigned src)
 {
     const char *ptr, *ptr2;
     int idx, idx2;
@@ -215,9 +215,9 @@ int INPUT_GetFirstSwitch(int sw) {
     return sw - INPUT_SwitchPos(sw);
 }
 
-const char *INPUT_MapSourceName(u8 idx, u8 *val)
+const char *INPUT_MapSourceName(unsigned idx, unsigned *val)
 {
-    int i = 0;
+    unsigned i = 0;
     #define CHANMAP(oldname, new) if(idx == i++) { *val = INP_##new; return oldname;}
     #include "capabilities.h"
     #undef CHANMAP
@@ -225,7 +225,7 @@ const char *INPUT_MapSourceName(u8 idx, u8 *val)
 }
 
 
-const char *INPUT_ButtonName(u8 button)
+const char *INPUT_ButtonName(unsigned button)
 {
     if (! button) {
         return _tr("None");

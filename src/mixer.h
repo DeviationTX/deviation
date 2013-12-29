@@ -172,7 +172,7 @@ struct Trim {
 /* Curve functions */
 s16 CURVE_Evaluate(s16 value, struct Curve *curve);
 const char *CURVE_GetName(char *str, struct Curve *curve);
-u8 CURVE_NumPoints(struct Curve *curve);
+unsigned CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
 volatile s16 *MIXER_GetInputs();

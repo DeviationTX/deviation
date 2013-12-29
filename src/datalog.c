@@ -178,8 +178,8 @@ int DATALOG_IsEnabled()
 {
     if(! Model.datalog.enable)
         return 0;
-    u8 src = Model.datalog.enable;
-    s16 val = _get_src_value(MIXER_SRC(src), APPLY_SAFETY);
+    unsigned src = Model.datalog.enable;
+    int val = _get_src_value(MIXER_SRC(src), APPLY_SAFETY);
     if (MIXER_SRC_IS_INV(src))
         val = -val;
     return (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;

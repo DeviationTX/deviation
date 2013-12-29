@@ -189,8 +189,8 @@ s8 mapstrcasecmp(const char *s1, const char *s2)
 }
 static u8 get_source(const char *section, const char *value)
 {
-    u8 i;
-    u8 val;
+    unsigned i;
+    unsigned val;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     const char *tmp;
     char cmp[10];
