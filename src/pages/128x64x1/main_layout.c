@@ -39,15 +39,15 @@ static void move_cb(guiObject_t *obj, const void *data)
     //This will draw a little arrow bmp
     (void)data;
     const u8 bmp[] = {
-        0b00000100,
-        0b00001110,
-        0b00000000,
-        0b00001010,
-        0b00011011,
-        0b00001010,
-        0b00000000,
-        0b00001110,
-        0b00000100,
+        0x04, //0b00000100,
+        0x0e, //0b00001110,
+        0x00, //0b00000000,
+        0x0a, //0b00001010,
+        0x1b, //0b00011011,
+        0x0a, //0b00001010,
+        0x00, //0b00000000,
+        0x0e, //0b00001110,
+        0x04, //0b00000100,
     };
     for(unsigned i = 0; i < sizeof(bmp); i++) {
         for(int j = 0; j < 5; j++) {
