@@ -107,7 +107,7 @@ const char *voltage_cb(guiObject_t *obj, const void *data) {
     if (mp->battery > 1000)  // bug fix: any value lower than 1v means the DMA reading is not ready
         sprintf(tempstring, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
     else
-        tempstring[0] = 0;
+        sprintf(tempstring, "-.--V");
     return tempstring;
 }
 
