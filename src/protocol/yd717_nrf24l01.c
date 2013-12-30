@@ -47,6 +47,9 @@
 // Timeout for callback in uSec, 8ms=8000us for YD717
 #define PACKET_PERIOD 8000
 
+// Stock tx fixed frequency  TODO: Will reciever find others?
+#define RF_CHANNEL 0x3C
+
 enum {
     FLAG_FLIP   = 0x0F
 };
@@ -110,7 +113,7 @@ static void packet_ack()
 static void packet_write()
 {
     packet_ack();
-//  yd717 always transmits on same channel    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x3C);
+//  yd717 always transmits on same channel    NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x7F);     // Clear any pending interrupts
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, sizeof(packet));
@@ -128,7 +131,7 @@ static void yd717_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3F);  // Enable all data pipes
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x1A); // 500uS retransmit t/o, 10 tries
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x3C);      // Channel 3C
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL);      // Channel 3C
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
