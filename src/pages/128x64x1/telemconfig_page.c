@@ -22,7 +22,7 @@
 #if HAS_TELEMETRY
 #include "../common/_telemconfig_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *idx_cb(guiObject_t *obj, const void *data);
 
 
@@ -95,7 +95,7 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

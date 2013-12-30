@@ -60,7 +60,7 @@ enum calibrateState {
 };
 static enum calibrateState calibrate_state;
 static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data);
-static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
+static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
 {
     (void)data;
     u8 i;

@@ -17,7 +17,7 @@
 #include "pages.h"
 #include "gui/gui.h"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static struct usb_page  * const up  = &pagemem.u.usb_page;
 static struct about_obj * const gui = &gui_objs.u.about;
@@ -35,7 +35,7 @@ void PAGE_AboutInit(int page)
     GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, ITEM_HEIGHT, &MICRO_FONT, NULL, NULL, _tr_noop(DeviationVersion));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

@@ -38,22 +38,22 @@ void TIMER_SetString(char *str, s32 time)
         neg = 0;
     }
     time = time / 1000; //Convert to seconds
-    u8 h = time / 3600;
-    u8 m = (time - h*3600) / 60;
-    u8 s = time -h*3600 - m*60;
+    unsigned h = time / 3600;
+    unsigned m = (time - h*3600) / 60;
+    unsigned s = time -h*3600 - m*60;
     if( h < 1)
             sprintf(str, "%s%02d:%02d", neg ? "-" : "", m, s);
     else
         sprintf(str, "%s%02d:%02d:%02d", neg ? "-" : "", h, m, s);
 }
 
-const char *TIMER_Name(char *str, u8 timer)
+const char *TIMER_Name(char *str, unsigned timer)
 {
     sprintf(str, "%s%d", _tr("Timer"), timer+1);
     return str;
 }
 
-void TIMER_StartStop(u8 timer)
+void TIMER_StartStop(unsigned timer)
 {
     if (Model.timer[timer].type == TIMER_STOPWATCH_PROP ||
         Model.timer[timer].type == TIMER_COUNTDOWN_PROP)
@@ -66,7 +66,7 @@ void TIMER_StartStop(u8 timer)
     }
 }
 
-void TIMER_Reset(u8 timer)
+void TIMER_Reset(unsigned timer)
 {
     if (Model.timer[timer].type == TIMER_STOPWATCH_PROP
         || Model.timer[timer].type == TIMER_COUNTDOWN_PROP)
@@ -87,12 +87,12 @@ void TIMER_Reset(u8 timer)
     }
 }
 
-s32 TIMER_GetValue(u8 timer)
+s32 TIMER_GetValue(unsigned timer)
 {
     return timer_val[timer];
 }
 
-void TIMER_SetValue(u8 timer, s32 value)
+void TIMER_SetValue(unsigned timer, s32 value)
 {
     if (Model.timer[timer].type == TIMER_PERMANENT) {
         timer_val[timer] = value;
@@ -101,7 +101,7 @@ void TIMER_SetValue(u8 timer, s32 value)
 
 void TIMER_Init()
 {
-    u8 i;
+    unsigned i;
     for (i = 0; i < NUM_TIMERS; i++)
         TIMER_Reset(i);
 }
@@ -112,7 +112,7 @@ void TIMER_Power(){
     static u16 throttle;
     u16 new_throttle;
     u16 elevator;
-    u8 mode = MODE_2 == Transmitter.mode || MODE_4 == Transmitter.mode ? 2 : 1;
+    unsigned mode = MODE_2 == Transmitter.mode || MODE_4 == Transmitter.mode ? 2 : 1;
 
     if( 0 == timer)
         timer =  CLOCK_getms() + alert;
@@ -135,8 +135,8 @@ void TIMER_Power(){
 
 void TIMER_Update()
 {
-    u8 i;
-    u8 chan_val = 0;
+    unsigned i;
+    unsigned chan_val = 0;
     u32 t = CLOCK_getms();
     if (PROTOCOL_WaitingForSafe())
         return;
@@ -160,7 +160,7 @@ void TIMER_Update()
                if (chan_val > 100)
                    chan_val = 100;
             } else {
-                u8 new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
+                unsigned new_state = (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
                 if (new_state != timer_state[i]) {
                     if (new_state)
                         last_time[i] = t;

@@ -45,7 +45,7 @@ static void wait_release()
     printf("Released\n");
 }
 
-u8 usb_cb(u32 button, u8 flags, void *data)
+unsigned usb_cb(u32 button, unsigned flags, void *data)
 {
     (void)button;
     (void)data;

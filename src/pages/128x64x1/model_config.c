@@ -33,7 +33,7 @@ enum {
     ITEM_LAST,
 };
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static void show_titlerow(const char *header)
 {
     PAGE_ShowHeader(header);
@@ -105,7 +105,7 @@ void MODELPAGE_Config()
     }
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

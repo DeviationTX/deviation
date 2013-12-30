@@ -20,7 +20,7 @@
 #include "../common/_reorder_list.c"
 static s8 current_selected = 0;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static void _okcancel_cb(guiObject_t *obj, const void *data);
 static struct buttonAction action;
 
@@ -111,7 +111,7 @@ static void _okcancel_cb(guiObject_t *obj, const void *data)
     okcancel_cb(obj, data);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

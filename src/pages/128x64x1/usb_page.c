@@ -18,7 +18,7 @@
 #include "gui/gui.h"
 
 #include "../common/_usb_page.c"
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static struct usb_obj * const gui = &gui_objs.u.usb;
 
@@ -34,7 +34,7 @@ static void _draw_page(u8 enable)
     GUI_CreateLabelBox(&gui->label, 0, 15, LCD_WIDTH, 40, &DEFAULT_FONT, NULL, NULL, tempstring);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

@@ -22,7 +22,7 @@
 
 #include "../common/_model_loadsave.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static void _press_cb(guiObject_t *obj, u16 selected, void *data);
 
 static u8 load_save;
@@ -82,7 +82,7 @@ static void _press_cb(guiObject_t *obj, u16 selected, void *data)
     okcancel_cb(NULL, (void *)(long)(load_save +1));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

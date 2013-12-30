@@ -25,7 +25,7 @@ static const int NUM_COLS = 8;
 
 #include "../common/_toggle_select.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s8 current_toggleicon = 0;
 
 static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
@@ -173,7 +173,7 @@ void navigate_symbolicons(s8 direction) {
     }
 }
 
-u8 _action_cb(u32 button, u8 flags, void *data)
+unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

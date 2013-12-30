@@ -22,7 +22,7 @@
 
 static u16 current_selected = 0;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -134,7 +134,7 @@ void PAGE_TimerExit()
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {

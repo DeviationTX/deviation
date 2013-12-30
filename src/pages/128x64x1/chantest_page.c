@@ -20,7 +20,7 @@
 
 #include "../common/_chantest_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
@@ -122,7 +122,7 @@ static void _navigate_pages(s8 direction)
     }
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS) {

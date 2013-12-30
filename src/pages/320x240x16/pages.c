@@ -20,7 +20,7 @@ static void (*enter_cmd)(guiObject_t *obj, const void *data);
 static const void *enter_data;
 static void (*exit_cmd)(guiObject_t *obj, const void *data);
 static const void *exit_data;
-static u8 page_change_cb(u32 buttons, u8 flags, void *data);
+static unsigned page_change_cb(u32 buttons, unsigned flags, void *data);
 void PAGE_Exit();
 
 struct page {
@@ -216,7 +216,7 @@ static const char *okcancelstr_cb(guiObject_t *obj, const void *data)
     return data ? _tr("Ok") : _tr("Cancel");
 }
 
-u8 page_change_cb(u32 buttons, u8 flags, void *data)
+unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
 {
     (void)data;
     (void)flags;
