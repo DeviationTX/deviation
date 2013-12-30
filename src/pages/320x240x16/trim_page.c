@@ -93,9 +93,9 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 
     enum {
-         COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
-         COL2 = (104 + ((LCD_WIDTH - 320) / 2)),
-         ROW1 = (48 + ((LCD_HEIGHT - 240) / 2)),
+         COL1 = (64 + ((LCD_WIDTH - 320) / 2)),
+         COL2 = (160 + ((LCD_WIDTH - 320) / 2)),
+         ROW1 = (80 + ((LCD_HEIGHT - 240) / 2)),
          ROW2 = (ROW1 + 24),
          ROW3 = (ROW1 + 48),
          ROW4 = (ROW1 + 72),
@@ -109,11 +109,11 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL,
                          set_trimstep_cb, (void *)(long)(tp->index + 0x100)); //0x100: Use tp->trim
     //Row 3
-    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW3, NULL, DEFAULT_FONT, _tr("Trim +"));
-    GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
+    GUI_CreateLabelBox(&gui_ed->neglbl, COL1, ROW3, COL2-COL1, ROW4-ROW3, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
+    GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW3, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
     //Row 4
-    GUI_CreateLabelBox(&gui_ed->neglbl, COL1, ROW4, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
-    GUI_CreateTextSelect(&gui_ed->neg, COL2, ROW4, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.neg);
+    GUI_CreateLabel(&gui_ed->poslbl, COL1, ROW4, NULL, DEFAULT_FONT, _tr("Trim +"));
+    GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW4, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 5
     GUI_CreateLabelBox(&gui_ed->swlbl, COL1, ROW5, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Switch"));
     GUI_CreateTextSelect(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
