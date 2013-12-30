@@ -19,6 +19,8 @@ extern int GetWidgetLoc(void *ptr, u16 *x, u16 *y, u16 *w, u16 *h);
 extern void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w);
 
 static const char *label_cb(guiObject_t *obj, const void *data);
+static const char *battlabel_cb(guiObject_t *obj, const void *data);
+static const char *powerlabel_cb(guiObject_t *obj, const void *data);
 static void touch_cb(guiObject_t *obj, s8 press, const void *data);
 
 static void select_for_move(guiLabel_t *obj);
@@ -52,14 +54,23 @@ void draw_elements()
                 desc = 2;
 #ifndef NUMERIC_LABELS
                 strCallback = boxlabel_cb;
-#endif
                 data = (void *)(long)i;
+#endif
                 break;
             case ELEM_BAR:
                 desc = 3;
                 break;
             case ELEM_TOGGLE:
                 desc = 4;
+                break;
+            case ELEM_BATTERY:
+                desc = 2;
+                strCallback = battlabel_cb;
+                break;
+            case ELEM_TXPOWER:
+                desc = 2;
+                strCallback = powerlabel_cb;
+                break;
         }
         GUI_CreateLabelBox(&gui->elem[i], x, y, w, h, &gui->desc[desc], strCallback, touch_cb, data);
     }
@@ -77,6 +88,22 @@ const char *label_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int idx = (long)data;
     sprintf(tempstring, "%d", idx+1);
+    return tempstring;
+}
+
+static const char *battlabel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    sprintf(tempstring, "B: %d", idx+1);
+    return tempstring;
+}
+
+static const char *powerlabel_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int idx = (long)data;
+    sprintf(tempstring, "P: %d", idx+1);
     return tempstring;
 }
 

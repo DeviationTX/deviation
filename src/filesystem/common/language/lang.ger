@@ -1,12 +1,12 @@
 ﻿Deutsch
-:# Channels
-Kanäle
-:%d bytes left
-%d Bytes übrig
 : is %d%%, safe value = %d%%\n
  ist %d%%, Sicherer Wert = %d%%\n
 : is %d%%,\nsafe value = %d%%
 =%d%%, SOLL=%d%%\n
+:# Channels
+Kanäle
+:%d bytes left
+%d Bytes übrig
 :1 sec
 1 Sek.
 :1-to-1
@@ -22,7 +22,9 @@ Kanäle
 :30 sec
 30 Sek.
 :4Ch w/ Dual-Rates
-4K mit DR
+4-Kanal Heli mit DR
+|devo8:4Ch w/ Dual-Rates
+4-Kanal Heli mit Dual-Rate
 :5 Point
 5 Punkt
 :5 sec
@@ -34,9 +36,9 @@ Kanäle
 :60 sec
 60 Sek.
 :6Ch Airplane
-6K Flugzeug
+6-Kanal Flugzeug
 :6Ch Helicopter
-6K Helikopter
+6-Kanal Helikopter
 :7 Point
 7 Punkt
 :9 Point
@@ -97,6 +99,8 @@ Balken
 Balken
 :Batt alarm
 Akkuwarner
+:Battery
+Batterie
 :Battery alarm
 Akkuwarner
 :Battery too low,\ncan't save!
@@ -110,17 +114,17 @@ Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
 :Binding...\nPress ENT to stop
-Binden...\nENT zu stoppen
+Binden...\nENT zum Stoppen
 :Box
 Box
 :Button monitor
-Knöpfe Anzeige
+Tasten-Anzeige
 :Buzz settings
-Summer Einstellungen
+Summer-Einstellungen
 :Buzz volume
 Lautstärke
 :Buzzer settings
-Summer Einstellungen
+Summer-Einstellungen
 :COL
 COL
 :COL Inv
@@ -150,7 +154,7 @@ Celsius
 :Center PW
 Mitte PW
 :Center all \nsticks and knobs\nthen press ENT
-Zentriere alle \nKnüppel und Hebel\ndann drücke ENT
+Zentriere alle \nKnüppel und Regler\ndann drücke ENT
 :Ch
 K
 :Ch%d
@@ -162,9 +166,9 @@ K Modus
 :Channel
 Kanal
 :Channel monitor
-Kanal Anzeige
+Kanal-Anzeige
 :Channel output
-Kanal Ausgabe
+Kanal-Ausgabe
 :Clock
 Uhr
 :Complex
@@ -228,7 +232,9 @@ Dimmzeit
 :Dn
 Dn
 :Do you really want\nto reset the\n permanent timer %d?
-Soll der permanente\nTimer %d zurück-\ngesetzt werden?
+Soll der permanente\nZeitgeber %d zurück-\ngesetzt werden?
+|devo8:Do you really want\nto reset the\n permanent timer %d?
+Soll der permanente Zeitgeber %d\nwirklich zurückgesetzt werden?
 :Down
 Runter
 :ELE
@@ -279,7 +285,7 @@ Flugmodus
 :Foot
 Fuß
 :Frame Size
-Rahmen Größe
+Paketgröße
 :GEAR
 FAHRW
 :GPS
@@ -308,7 +314,9 @@ Kreiselempfindlichkeit
 :Heli
 Heli
 :Heli/Standard GUI
-Heli, Standard GUI
+Heli, Std. Mischer
+|devo8:Heli/Standard GUI
+Heli, Standard Mischer
 :Helicopter
 Helikopter
 :High-Rate
@@ -325,11 +333,9 @@ Leerl. 1
 :Idle Up 2
 Leerl. 2
 :Input
-Einga.
-|devo8:Input
-Eingabe
+Eingang
 :Input monitor
-Eingaben Anzeige
+Eingaben-Anzeige
 :Insert
 Einfügen
 :Inverted
@@ -403,7 +409,7 @@ Mischer GUI
 |devo8:Mixer GUI
 Mischeroberfläche
 :Mixers
-Mixers
+Mischer
 :Mode
 Mode
 :Mode %d
@@ -415,9 +421,9 @@ Modell Menü
 :Model name
 Modellname
 :Model needs reset\nfor standard mixer
-Modell wird rückge-\nsetzt für Std. Mixer
+Modell muss zurück-\ngesetzt werden für\nStandard-Mischer!
 :Model needs to be reset\nin order to switch to the standard mixer
-Modell muss zurückgesetzt werden,\num den Standard Mixer zu nutzen
+Modell muss zurückgesetzt werden,\num den Standard-Mischer zu nutzen
 :Model setup
 Modelleinstellungen
 :Model type
@@ -431,9 +437,9 @@ Nach unten
 :Move Up
 Nach oben
 :Move sticks and knobs\nto max & min positions\nthen press ENT
-Bewege Knüppel und\nHebel in die Max & Min\nPositionen\nDann drücke ENT
+Bewege Knüppel und\nRegler in die Max & Min\nPositionen\nDann drücke ENT
 :Mux
-Mux
+Funktion
 :Neg
 -
 :New
@@ -442,6 +448,8 @@ Neu
 Nein
 :No Trim
 Kein Trim
+|devo8:No Trim
+Keine Trimmung
 :None
 keine
 :Normal
@@ -464,7 +472,7 @@ Ein/Aus
 >:PIT Mix
 >:PPM
 :PPM In
-PPM Kanäle
+PPM Eingang
 |devo8:PPM In
 PPM Eingangskanäle
 >:PPM%d
@@ -473,7 +481,7 @@ PPMIn Konf. (Erweitert)
 :Page
 Seite
 :Page Config
-Seitenkonfiguration
+Startseitenkonfiguration
 :Pitch curves
 Nick-Kurven
 :Plane
@@ -493,11 +501,13 @@ Einschaltalarm
 :Power-down alert
 Abschaltalarm
 :Prealert interval
-Voralarm-Intervall
+Warnungsintervall
 :Prealert intvl
-Voralarm intvl
+Warnung alle
 :Prealert time
-Voralarmzeit
+Warnungszeit
+|devo8:Prealert time
+Warnungszeitraum
 :Press 'Ent' to turn USB Filesystem
 ENT schaltet das USB Filesystem
 :Press ENT to change
@@ -538,7 +548,7 @@ Rücksetz
 |devo8:Reset
 Rücksetzen
 :Reset Permanent Timer?
-Permanenten Timer zurücksetzen?
+Permanenten Zeitgeber zurücksetzen?
 :Reset sw
 auf Null
 |devo8:Reset sw
@@ -553,11 +563,22 @@ Umgekehrt
 Ursprung
 :Right
 Rechts
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Sich. Wert
+|devo8:Safe Val
+Sicherheitswert
 :Safety
 Sicherheit
->:Sample Rate
+:Sample Rate
+Messrate
 :Save
 Sichrn
 |devo8:Save
@@ -614,6 +635,8 @@ Knüppel
 Knüppel Eingabe
 :Stick mode
 Knüppelmode
+|devo8:Stick mode
+Knüppelmodus
 :Sticks
 Knüppel
 :Subtrim
@@ -629,9 +652,9 @@ Schalter
 :Switch assignment
 Schalterzuordnung
 :Switch1
-Hebel1
+Schalter1
 :Switch2
-Hebel2
+Schalter2
 :Symmetric
 Symmetrie
 :THR
@@ -672,13 +695,13 @@ Telemetrie
 :Telemetry config
 Telemetriekonfig.
 |devo8:Telemetry config
-Telemetriekonfiguration
+Telemetrie-Konfiguration
 :Telemetry monitor
-Telemetrie Anzeige
+Telemetrie-Anzeige
 :Telemetry settings
 Telemetrieeinstellung.
 |devo8:Telemetry settings
-Telemetrieeinstellungen
+Telemetrie-Einstellungen
 :Temp
 Temp
 :Temperature
@@ -698,19 +721,23 @@ Zeit
 :Time format
 Zeitformat
 :Timer
-Timer
+Zeitgeber
 :Timer settings
-Timer Einstellungen
+Zeitgeber-Einstellung
+|devo8:Timer settings
+Zeitgeber-Einstellungen
 :Timer%d
-Timer%d
+Zeitg. %d
+|devo8:Timer%d
+Zeitgeber%d
 :Timers
-Timer
+Zeitgeber
 :Timeup interval
-Nachalarm-Intervall
+Alarmintervall
 :Timeup intvl
-Nachalarm-Intrvl
+Alarm alle
 :Toggle
-Hebel
+Wechsler
 :Touch Calibrate
 Touchscreen kalibrieren
 :Touch Test
@@ -730,7 +757,7 @@ Lehrer/Sch. (Knüppel)
 :Trainer Sw
 Lehr. Schalt
 :Transmitter config
-Sender Einstellungen
+Sender-Einstellungen
 :Transmitter menu
 Sender Menü
 :Travel adjust
@@ -746,7 +773,7 @@ Schritt
 :Trimbar
 Trimmbalken
 :Trims
-Trimm
+Trimm-Einstellungen
 :Turn Off
 Ausschalten
 :Turn On
@@ -755,12 +782,13 @@ Einschalten
 Sendeleist.
 |devo8:Tx power
 Sendeleistung
+>:TxPower
 :Type
 Typ
 :USB
 USB
 :USB Filesystem is currently 
-Das USB-Dateisystem ist aktuell 
+Das USB-Dateisystem ist jetzt 
 :Unknown
 Unbekannt
 :Up
@@ -783,28 +811,36 @@ Ja
 :Zero/Max
 Null/Max
 :\n%d seconds left
-\n%d Sekunden verbleibend
+\n%d Sekunden übrig
 :\n\nBinding will end in %d seconds...
 \n\nBindevorgang endet in %d Sekunden...
 :actual value
 jetziger Wert
 :add
-+
+addiere
 >:cntdn-prop
 :countdown
 Countdown
 :delay
 verzög.
+|devo8:delay
+verzögern
 :is not supported
 wird nicht unterstützt
 :is turned off
 ist ausgeschaltet
 :max
 max
+|devo8:max
+Maximum
 :min
 min
+|devo8:min
+Minimum
 :mult
-mult
+mult.
+|devo8:mult
+multipliziere
 :permanent
 dauerhaft
 :replace
@@ -814,6 +850,7 @@ Ergebnis
 >:stop-prop
 :stopwatch
 Stoppuhr
+>:vTX MHz
 :value to add or set
 zu addieren / setzen
 :value to set

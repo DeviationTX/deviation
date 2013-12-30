@@ -130,15 +130,32 @@ static const char *remaining_str_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void PAGE_DatalogInit(int page)
 {
     (void)page;
     memset(gui, 0, sizeof(*gui));
     seltype = 0;
+    PAGE_SetActionCB(_action_cb);
     PAGE_ShowHeader("");
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
         LCD_WIDTH-1, ITEM_HEIGHT, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
 }
+
 #endif //HAS_DATLOG

@@ -1,12 +1,12 @@
 ﻿Afrikaans
-:# Channels
-Aantal Kanale
-:%d bytes left
-%d Bytes oor
 : is %d%%, safe value = %d%%\n
  %d%%, veilige waarde = %d%%\n
 : is %d%%,\nsafe value = %d%%
  %d%%,\nveilige waarde = %d%%
+:# Channels
+Aantal Kanale
+:%d bytes left
+%d Bytes oor
 :1 sec
 1 sek
 :1-to-1
@@ -93,6 +93,8 @@ Balk
 Balkgrafiek
 :Batt alarm
 Bat Alarm
+:Battery
+Battery
 :Battery alarm
 Battery Alarm
 :Battery too low,\ncan't save!
@@ -529,6 +531,22 @@ Omgekeerd
 Verander terug
 :Right
 Regs
+:SW A
+SK A
+:SW B
+SK B
+:SW C
+SK C
+:SW D
+SK D
+:SW E
+SK E
+:SW F
+SK F
+:SW G
+SK G
+:SW H
+SK H
 :Safe Val
 Veiligew
 :Safety
@@ -721,6 +739,8 @@ Sit Af
 Sit Aan
 :Tx power
 Sendkrag
+:TxPower
+Tx-krag
 :Type
 Tipe
 :USB
@@ -783,6 +803,8 @@ Gevolglike waarde
 Stop-prop
 :stopwatch
 Stophorlosie
+:vTX MHz
+vTX MHz
 :value to add or set
 Waarde om te stel of by-tel
 :value to set
