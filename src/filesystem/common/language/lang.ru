@@ -113,8 +113,8 @@ AUX7
 Привязка
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
-:Binding...\nPress ENT to stop
-Привязка...\nENT для остановки
+:Binding %s...\nPress ENT to stop
+Привязка %s...\nENT для остановки
 :Box
 Бокс
 :Button monitor

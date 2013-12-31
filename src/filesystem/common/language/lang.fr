@@ -89,8 +89,8 @@ Appairer
 Appairage
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Appairage en cours...\nS'assurer que le récepteur fonctionne\n\nAppuyer sur OK n'annule pas la procédure \nmais permet le contrôle du TX.
-:Binding...\nPress ENT to stop
-Appairage...\nENT pour arrêter
+:Binding %s...\nPress ENT to stop
+Appairage %s...\nENT pour arrêter
 >:Box
 :Button monitor
 Ctrl des boutons

@@ -84,8 +84,8 @@
 連結中
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 連結中...\n確認模型已通電!\n\n按 OK 提前完成\n可以完整控制發射機
-:Binding...\nPress ENT to stop
-對頻中...\n按ENT鍵中止對頻
+:Binding %s...\nPress ENT to stop
+對頻中%s...\n按ENT鍵中止對頻
 >:Box
 :Button monitor
 按鍵內容檢視

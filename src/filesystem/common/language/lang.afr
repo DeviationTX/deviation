@@ -107,8 +107,8 @@ Bind
 Bind...
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bind in proses...\nMaak seker die model is aan!\n\n "OK" sal nie die proses stop nie,\nmaar sal volle beheer toelaat.
-:Binding...\nPress ENT to stop
-Bind...\nDruk ENT om te stop
+:Binding %s...\nPress ENT to stop
+Bind %s...\nDruk ENT om te stop
 :Box
 Boks
 :Button monitor
