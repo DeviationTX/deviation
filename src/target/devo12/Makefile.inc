@@ -30,4 +30,19 @@ $(TARGET).fs:
 	zip -r deviation-fs-$(HGVERSION).zip $(TARGET)-lib.dfu
 	export p=`pwd`; cd $(ODIR); zip -x filesystem/media/\* -ur $$p/deviation-fs-$(HGVERSION).zip filesystem
 
+$(TARGET).zip: $(TARGET).dfu $(ALL)
+	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	zip debug-$(HGVERSION).zip $(TARGET).elf
+	# make zipping more compatible with other distributions
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+ifeq "$(INCLUDE_FS)" "1"
+	zip -u deviation-$(HGVERSION).zip $(TARGET)-lib.dfu
+	export p=`pwd`; cd filesystem/$(FILESYSTEM) && zip -x media/\* -ur $$p/deviation-$(HGVERSION).zip  *
+endif
+	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	rm -f deviation-$(HGVERSION).dfu
+
 endif #BUILD_TARGET
