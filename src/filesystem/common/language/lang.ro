@@ -105,8 +105,8 @@ Bind
 Conectare
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Conectare în progres\nAsigurați-vă că modelul este pornit!\n\nApăsând ENT puteți controla telecomanda\nfară a întrerupe procesul de conectare.
-:Binding...\nPress ENT to stop
-Conectare...\nApăsați ENT pentru a opri
+:Binding %s...\nPress ENT to stop
+Conectare %s...\nApăsați ENT pentru a opri
 :Box
 Box
 :Button monitor

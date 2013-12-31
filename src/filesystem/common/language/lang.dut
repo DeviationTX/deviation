@@ -77,7 +77,7 @@ Koppelen
 Bezig met koppelen
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bezig met koppelen...\nZorg dat model aan staat!\n\nSelecteer OK voor volledige controle over zender.\nKoppelingsprocedure wordt niet afgebroken.
-:Binding...\nPress ENT to stop
+:Binding %s...\nPress ENT to stop
 Bezig met koppelen\nDruk op ENT om te stoppen
 >:Box
 >:Button monitor

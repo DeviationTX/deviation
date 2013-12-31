@@ -85,8 +85,8 @@ Bind
 Emparejando
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Emparejamiento en curso...\nAsegurese de que el modelo está encendido\n\nPresionar OK NO cancelará el emparejado\npero le permitirá control completo de la emisora.
-:Binding...\nPress ENT to stop
-Emparejando...\nPulsar ENT para parar
+:Binding %s...\nPress ENT to stop
+Emparejando %s\nPulsar ENT para parar
 >:Box
 :Button monitor
 Monitor pulsadores

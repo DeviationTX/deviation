@@ -113,8 +113,8 @@ Binden
 Binden
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Bindevorgang läuft...\nSchalte das Modell ein!\n\nOK beendet NICHT den Bindevorgang,\nes erlaubt die Bedienung des Senders.
-:Binding...\nPress ENT to stop
-Binden...\nENT zum Stoppen
+:Binding %s...\nPress ENT to stop
+Binden %s...\nENT zum Stoppen
 :Box
 Box
 :Button monitor

@@ -84,8 +84,8 @@
 对频
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 对频中...\n请确保飞机通电!\n\n点击OK不会中止对频\n但是可以退出本页面
-:Binding...\nPress ENT to stop
-对频中...\n按ENT中止
+:Binding %s...\nPress ENT to stop
+对频中 %s...\n按ENT中止
 >:Box
 :Button monitor
 按键监控
