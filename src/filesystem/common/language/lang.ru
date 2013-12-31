@@ -1,14 +1,14 @@
 ﻿Russian
+: is %d%%, safe value = %d%%\n
+ = %d%%, безопасное значение = %d%%\n
+: is %d%%,\nsafe value = %d%%
+ = %d%%,\nбезопасное значение = %d%%
 :# Channels
 Каналы
 |devo8:# Channels
 Количество каналов
 :%d bytes left
 осталось %d байт
-: is %d%%, safe value = %d%%\n
- = %d%%, безопасное значение = %d%%\n
-: is %d%%,\nsafe value = %d%%
- = %d%%,\nбезопасное значение = %d%%
 :1 sec
 1 сек
 :1-to-1
@@ -99,6 +99,8 @@ AUX7
 Полоса
 :Batt alarm
 Сигнал бат.
+:Battery
+Батарея
 :Battery alarm
 Сигнал батареи
 :Battery too low,\ncan't save!
@@ -111,10 +113,10 @@ AUX7
 Привязка
 :Binding
 Привязка
-:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
-Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Binding %s...\nPress ENT to stop
 Привязка %s...\nENT для остановки
+:Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
+Производится привязка...\nУбедитесь, что модель включена!\n\nНажатие OK не отменит процедуру привязки,\nно позволит управлять передатчиком.
 :Box
 Бокс
 :Button monitor
@@ -587,6 +589,14 @@ RPM
 Отменить
 :Right
 Вправо
+>:SW A
+>:SW B
+>:SW C
+>:SW D
+>:SW E
+>:SW F
+>:SW G
+>:SW H
 :Safe Val
 Безоп.знач.
 |devo8:Safe Val
@@ -799,6 +809,8 @@ RPM
 Включить
 :Tx power
 Мощность
+:TxPower
+Мощность
 :Type
 Тип
 :USB
@@ -861,6 +873,8 @@ USB
 сек. проп
 :stopwatch
 секундомер
+:vTX MHz
+vTX МГц
 :value to add or set
 Значение установки
 :value to set
