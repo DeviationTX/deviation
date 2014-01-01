@@ -29,9 +29,9 @@ struct mcu_pin {
 };
 
 // bitmap for rtcflags:
-#define CLOCK12HR 0b00000001
-#define TIMEFMT   0b00001111
-#define DATEFMT   0b11110000
+#define CLOCK12HR 0x01  //0b00000001
+#define TIMEFMT   0x0F  //0b00001111
+#define DATEFMT   0xF0  //0b11110000
 struct Transmitter {
     u8 current_model;
     u8 language;
