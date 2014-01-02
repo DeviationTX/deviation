@@ -285,12 +285,15 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_BATTERY]  = BATTERY_H,
         [ELEM_TXPOWER]  = TXPOWER_H,
     };
-    if (type == ELEM_MODELICO && Model.icon[0])
-    	LCD_ImageDimensions(Model.icon, w, h);
-    else {
-		*w = width[type];
-		*h = height[type];
+    if (type == ELEM_MODELICO && Model.icon[0]) {
+        if(LCD_ImageDimensions(Model.icon, w, h))
+            return;
+        //We can't fix this during model-load because only 1 file can be open at a time
+        printf("Warning: model icon: '%s' not found.  Resetting tpo default\n", Model.icon);
+        Model.icon[0] = '\0';
     }
+    *w = width[type];
+    *h = height[type];
 }
 
 void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w)
