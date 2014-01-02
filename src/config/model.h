@@ -18,6 +18,7 @@ const char *MODEL_NAME;
 const char *MODEL_ICON;
 const char *MODEL_TYPE;
 const char *MODEL_TEMPLATE;
+#define UNKNOWN_ICON "media/noicon.bmp"
 
 //This cannot be computed, and must be manually updated
 #define NUM_PROTO_OPTS 4

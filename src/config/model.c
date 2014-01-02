@@ -1382,7 +1382,7 @@ const char *CONFIG_GetIcon(enum ModelType type) {
 
 const char *CONFIG_GetCurrentIcon() {
     if(Model.icon[0]) {
-        return Model.icon;
+        return fexists(Model.icon) ? Model.icon : UNKNOWN_ICON;
     } else {
         return CONFIG_GetIcon(Model.type);
     }
