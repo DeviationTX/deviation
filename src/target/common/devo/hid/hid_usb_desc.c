@@ -58,6 +58,7 @@ const uint8_t Joystick_DeviceDescriptor[JOYSTICK_SIZ_DEVICE_DESC] =
 
 /* USB Configuration Descriptor */
 /*   All Descriptors (Configuration, Interface, Endpoint, Class, Vendor */
+/* 8-channel Descriptor lifted from: http://vusb.wikidot.com/project:ppm-rc-to-usb-interface */
 const uint8_t Joystick_ConfigDescriptor[JOYSTICK_SIZ_CONFIG_DESC] =
   {
     0x09, /* bLength: Configuration Descriptor size */
