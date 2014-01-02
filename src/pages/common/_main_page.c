@@ -289,7 +289,7 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         if(LCD_ImageDimensions(Model.icon, w, h))
             return;
         //We can't fix this during model-load because only 1 file can be open at a time
-        printf("Warning: model icon: '%s' not found.  Resetting tpo default\n", Model.icon);
+        printf("Warning: model icon: '%s' not found.  Resetting to default\n", Model.icon);
         Model.icon[0] = '\0';
     }
     *w = width[type];
