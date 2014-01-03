@@ -40,8 +40,9 @@
 #define TELEM_OFF 1
 
 enum{
-    FLAG_FLIP = 0x08,
-    FLAG_LED  = 0x04
+    FLAG_VIDEO= 0x01,   // record video
+    FLAG_FLIP = 0x08,   // enable flips
+    FLAG_LED  = 0x04    // enable LEDs
 };
 
 #define VTX_STEP_SIZE "5"
@@ -231,7 +232,7 @@ static void hubsan_build_packet()
     }
     packet[4] = 0xff - get_channel(3, 0x80, 0x80, 0x80); //Rudder is reversed
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
-    packet[8] = get_channel(0, 0x80, 0x80, 0x80);
+    packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     if(packet_count < 100)
     {
         packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
@@ -240,10 +241,15 @@ static void hubsan_build_packet()
     else
     {
         packet[9] = 0x02;
+        // Channel 5
         if(Channels[4] >= 0)
             packet[9] |= FLAG_LED;
+        // Channel 6
         if(Channels[5] >= 0)
             packet[9] |= FLAG_FLIP;
+        // Channel 7
+        if(Channels[6] >0) // off by default
+            packet[9] |= FLAG_VIDEO;
     }
     packet[10] = 0x64;
     packet[11] = (txid >> 24) & 0xff;
@@ -414,8 +420,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)6L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Leds, Flips, Video Recording
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
