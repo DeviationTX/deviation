@@ -443,9 +443,9 @@ static void initialize(u8 bind)
 const void *YD717_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_INIT:  initialize(1); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 5L; // T, R, E, A, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
