@@ -41,7 +41,6 @@ void A7105_WriteReg(u8 address, u8 data)
 u8 A7105_ReadReg(u8 address)
 {
     u8 data;
-    int i;
     CS_LO();
     spi_xfer(SPI2, 0x40 | address);
     /* Wait for tx completion before spi shutdown */
@@ -56,9 +55,11 @@ u8 A7105_ReadReg(u8 address)
     volatile u8 x = SPI_DR(SPI2);
     (void)x;
     spi_enable(SPI2);  //This starts the data read
-    for(i = 0; i < 20; i++)  //Wait > 1 SPI clock (but less than 8).  clock is 4.5MHz
-        asm volatile ("nop");
-    ;
+    //Wait > 1 SPI clock (but less than 8).  clock is 4.5MHz
+    asm volatile ("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
+                  "nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
+                  "nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
+                  "nop\n\tnop\n\tnop\n\tnop\n\tnop");
     spi_disable(SPI2); //This ends the read window
     data = spi_read(SPI2);
     CS_HI();

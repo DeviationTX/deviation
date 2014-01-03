@@ -155,16 +155,12 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     #if HAS_RTC
-        if (MATCH_KEY(CLOCK_12HR)) {
-            t->rtcflags = (t->rtcflags & !CLOCK12HR) | (atoi(value) & CLOCK12HR);
-            return 1;
-        }
         if (MATCH_KEY(TIME_FORMAT)) {
-            t->rtcflags = (t->rtcflags & !TIMEFMT) | (atoi(value) & TIMEFMT);
+            t->rtcflags = (t->rtcflags & ~TIMEFMT) | (atoi(value) & TIMEFMT);
             return 1;
         }
         if (MATCH_KEY(DATE_FORMAT)) {
-            t->rtcflags = (t->rtcflags & !DATEFMT) | ((atoi(value) << 4) & DATEFMT);
+            t->rtcflags = (t->rtcflags & ~DATEFMT) | ((atoi(value) << 4) & DATEFMT);
             return 1;
         }
     #endif
@@ -293,7 +289,6 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
 #if HAS_RTC
-    fprintf(fh, "%s=%d\n", CLOCK_12HR, Transmitter.rtcflags & CLOCK12HR);
     fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtcflags & TIMEFMT);
     fprintf(fh, "%s=%d\n", DATE_FORMAT, (Transmitter.rtcflags & DATEFMT) >> 4);
 #endif

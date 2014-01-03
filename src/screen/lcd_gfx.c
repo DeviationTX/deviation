@@ -360,6 +360,7 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
     u8 buf[0x1a];
     fh = fopen(file, "r");
     if(! fh) {
+        printf("DEBUG: LCD_ImageDimensions: File %s not found\n", file);
         return 0;
     }
 

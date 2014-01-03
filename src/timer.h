@@ -4,7 +4,6 @@
 #define NUM_TIMERS 4
 
 #define TIMER_MAX_VAL 5940
-#define IS_RTC(x) ((x) == NUM_TIMERS - 1)
 
 #define DEFAULT_TIMEUP_INTERVAL 10000
 #define DEFAULT_PERALERT_TIME 30000

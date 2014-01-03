@@ -139,7 +139,20 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
         case ELEM_SMALLBOX:
         case ELEM_BIGBOX:
         {
-            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, NULL);   
+            u8 changed = 0;
+            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);
+            if(changed && dir) {
+                if(PROTOCOL_GetTelemetryState() != 1) {
+                    if (pc->elem[idx].src > NUM_RTC + NUM_TIMERS
+                        && pc->elem[idx].src <= NUM_RTC + NUM_TIMERS + NUM_TELEM)
+                    {
+                        //We chose a telemetry item, but there is no telemetry
+                        pc->elem[idx].src = (dir > 0)
+                            ? NUM_RTC + NUM_TIMERS + NUM_TELEM + 1
+                            : NUM_RTC + NUM_TIMERS;
+                    }
+                }
+            }
             return GetBoxSource(tempstring, pc->elem[idx].src);
         }
         case ELEM_BAR:

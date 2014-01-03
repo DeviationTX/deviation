@@ -1201,7 +1201,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->swashmix[2] != 60)
             fprintf(fh, "%s=%d\n", SWASH_COLMIX, m->swashmix[2]);
     }
-    for(idx = 0; idx < NUM_TIMERS - (HAS_RTC ? 1 : 0); idx++) {
+    for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
@@ -1382,7 +1382,7 @@ const char *CONFIG_GetIcon(enum ModelType type) {
 
 const char *CONFIG_GetCurrentIcon() {
     if(Model.icon[0]) {
-        return Model.icon;
+        return fexists(Model.icon) ? Model.icon : UNKNOWN_ICON;
     } else {
         return CONFIG_GetIcon(Model.type);
     }

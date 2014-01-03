@@ -1,11 +1,10 @@
 #ifndef _RTC_H_
 #define _RTC_H_
 
-#ifndef HAS_RTC
-    #define HAS_RTC 0
-    #define NUM_RTC 0
-#else
+#if HAS_RTC
     #define NUM_RTC 2
+#else
+    #define NUM_RTC 0
 #endif
 
 #define RTC_STARTYEAR 2012

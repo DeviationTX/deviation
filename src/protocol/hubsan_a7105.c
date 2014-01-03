@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include <string.h>
 #include <stdlib.h>
+#include "telemetry.h"
 
 
 #ifdef MODULAR
@@ -35,6 +36,9 @@
 #endif
 #ifdef PROTO_HAS_A7105
 
+#define TELEM_ON 0
+#define TELEM_OFF 1
+
 enum{
     FLAG_FLIP = 0x08,
     FLAG_LED  = 0x04
@@ -44,12 +48,14 @@ enum{
 
 static const char * const hubsan4_opts[] = {
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
+    _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
     NULL
 };
 
 enum {
-    VTX_FREQ
-};
+    PROTOOPTS_VTX_FREQ = 0,
+    PROTOOPTS_TELEMETRY
+} PROTO_OPTS_DEFINITION;
 
 static u8 packet[16];
 static u8 channel;
@@ -209,9 +215,9 @@ static void hubsan_build_packet()
 {
     static s16 vtx_freq = 0; 
     memset(packet, 0, 16);
-    if(vtx_freq != Model.proto_opts[VTX_FREQ] || packet_count==100) // set vTX frequency (H107D)
+    if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) // set vTX frequency (H107D)
     {
-        vtx_freq = Model.proto_opts[VTX_FREQ];
+        vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
         packet[0] = 0x40;
         packet[1] = (vtx_freq >> 8) & 0xff;
         packet[2] = vtx_freq & 0xff;
@@ -247,9 +253,36 @@ static void hubsan_build_packet()
     update_crc();
 }
 
+static u8 hubsan_check_integrity() 
+{
+    int sum = 0;
+    for(int i = 0; i < 15; i++)
+        sum += packet[i];
+    return packet[15] == ((256 - (sum % 256)) & 0xff);
+}
+
+static void hubsan_update_telemetry()
+{
+    const u8 *update = NULL;
+    if( (packet[0]==0xe1) && hubsan_check_integrity()) {
+        Telemetry.p.devo.volt[0] = packet[13];
+        update = (const u8[]){
+            TELEM_DEVO_VOLT1, 0
+        };
+    }
+    if (update) {
+        while(*update) {
+            TELEMETRY_SetUpdated(*update++);
+        }
+    }
+}
+
 MODULE_CALLTYPE
 static u16 hubsan_cb()
 {
+    static u8 txState = 0;
+    static int delay = 0;
+    static u8 rfMode=0;
     int i;
     switch(state) {
     case BIND_1:
@@ -305,19 +338,51 @@ static u16 hubsan_cb()
             return 15000; //22.5 msec elapsed since last write
         }
     case DATA_1:
-        //Keep transmit power in sync
-        A7105_SetPower(Model.tx_power);
     case DATA_2:
     case DATA_3:
     case DATA_4:
     case DATA_5:
-        hubsan_build_packet();
-        A7105_WriteData(packet, 16, state == DATA_5 ? channel + 0x23 : channel);
-        if (state == DATA_5)
-            state = DATA_1;
-        else
-            state++;
-        return 10000;
+        if( txState == 0) { // send packet
+            rfMode = A7105_TX;
+            if( state == DATA_1)
+                A7105_SetPower( Model.tx_power); //Keep transmit power in sync
+            hubsan_build_packet();
+            A7105_Strobe(A7105_STANDBY);
+            A7105_WriteData( packet, 16, state == DATA_5 ? channel + 0x23 : channel);
+            if (state == DATA_5)
+                state = DATA_1;
+            else
+                state++;
+            delay=3000;
+        }
+        else {
+            if( Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+                if( rfMode == A7105_TX) {// switch to rx mode 3ms after packet sent
+                    for( i=0; i<10; i++)
+                    {
+                        if( !(A7105_ReadReg(A7105_00_MODE) & 0x01)) {// wait for tx completion
+                            A7105_Strobe(A7105_RX); 
+                            rfMode = A7105_RX;
+                            break;
+                        }
+                    }
+                }
+                if( rfMode == A7105_RX) { // check for telemetry frame
+                    for( i=0; i<10; i++) {
+                        if( !(A7105_ReadReg(A7105_00_MODE) & 0x01)) { // data received
+                            A7105_ReadData(packet, 16);
+                            hubsan_update_telemetry();
+                            A7105_Strobe(A7105_RX);
+                            break;
+                        }
+                    }
+                }
+            }
+            delay=1000;
+        }
+        if (++txState == 8) // 3ms + 7*1ms
+            txState = 0;
+        return delay;
     }
     return 0;
 }
@@ -335,8 +400,10 @@ static void initialize() {
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
     packet_count=0;
-    if( Model.proto_opts[VTX_FREQ] == 0)
-        Model.proto_opts[VTX_FREQ] = 5885;
+    memset(&Telemetry, 0, sizeof(Telemetry));
+    TELEMETRY_SetType(TELEM_DEVO);
+    if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
+        Model.proto_opts[PROTOOPTS_VTX_FREQ] = 5885;
     CLOCK_StartTimer(10000, hubsan_cb);
 }
 
@@ -351,10 +418,11 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
-            if( Model.proto_opts[VTX_FREQ] == 0)
-                Model.proto_opts[VTX_FREQ] = 5885;
+            if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
+                Model.proto_opts[PROTOOPTS_VTX_FREQ] = 5885;
             return hubsan4_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: 
+            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
         default: break;
     }
     return 0;

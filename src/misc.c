@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
 #include "common.h"
+#include <stdlib.h>
 
 void Delay(u32 count)
 {
@@ -101,4 +101,13 @@ int exact_atoi(const char *str)
     if (*endptr != '\0')
         value = 0;
     return value;
+}
+
+int fexists(const char *file)
+{
+   FILE *fh = fopen(file, "r");
+   if(! fh)
+       return 0;
+   fclose(fh);
+   return 1;
 }

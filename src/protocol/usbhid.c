@@ -31,7 +31,7 @@
 #endif
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
 //It also must be a multiple of 4
-#define USBHID_MAX_CHANNELS 12
+#define USBHID_MAX_CHANNELS 8
 static s8 packet[USBHID_MAX_CHANNELS];
 u8 num_channels;
 volatile u8 PrevXferComplete;

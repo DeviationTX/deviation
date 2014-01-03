@@ -80,6 +80,8 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
             else
                 ico = CONFIG_GetIcon(mp->modeltype);
         }
+        if (! fexists(ico))
+            ico = UNKNOWN_ICON;
     }
     GUI_ReplaceImage(&gui->image, ico, 0, 0);
 }
@@ -244,8 +246,9 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
         mp->selected = 1;
     } else if (loadsave == LOAD_ICON) { //Icon
         mp->selected = 0;
-        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
         num_models = 1 + count_files("modelico", ".bmp", Model.icon[0] ? Model.icon+9 : NULL);
+        const char *ico = mp->selected == 0 ? CONFIG_GetIcon(Model.type) : CONFIG_GetCurrentIcon();
+        strncpy(mp->iconstr, ico, sizeof(mp->iconstr));
         mp->selected++;
     } else if (loadsave == LOAD_LAYOUT) { //Layout
         mp->selected = 1;
