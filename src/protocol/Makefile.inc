@@ -17,6 +17,8 @@ PROTO_MODULES += $(ODIR)/protocol/v202.mod
 PROTO_MODULES += $(ODIR)/protocol/slt.mod
 PROTO_MODULES += $(ODIR)/protocol/usbhid.mod
 PROTO_MODULES += $(ODIR)/protocol/hisky.mod
+PROTO_MODULES += $(ODIR)/protocol/yd717.mod
+
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
@@ -85,6 +87,10 @@ $(ODIR)/protocol/usbhid.mod : $(ODIR)/usbhid.bin
 
 $(ODIR)/protocol/hisky.mod : $(ODIR)/hisky_nrf24l01.bin
 	@echo Building 'hisky' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/yd717.mod : $(ODIR)/yd717_nrf24l01.bin
+	@echo Building 'yd717' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
