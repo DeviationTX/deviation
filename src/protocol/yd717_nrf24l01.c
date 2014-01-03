@@ -103,7 +103,7 @@ static void packet_ack()
     if (packet_sent) {
         //bool report_done = false;
         //    if  (!(radio.read_register(STATUS) & _BV(TX_DS))) { Serial.write("Waiting for radio\n"); report_done = true; }
-        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_TX_DS))) ;
+        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)) )) ;
         NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS));
         //    if (report_done) Serial.write("Done\n");
         packet_sent = 0;
