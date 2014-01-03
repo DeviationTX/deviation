@@ -149,7 +149,6 @@ void navigate_toggleicons(s8 direction) {
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)
         num_positions = 2;
-printf("num_pos: %d\n", num_positions);
     current_toggleicon += direction;
     if (current_toggleicon < 0)
         current_toggleicon = num_positions -1;
