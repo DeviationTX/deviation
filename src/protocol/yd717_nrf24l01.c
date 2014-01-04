@@ -79,7 +79,6 @@ static u8 tx_power;
 //static u8 auto_flip; // Channel 6 <= 0 - disabled > 0 - enabled
 static u8 throttle, rudder, elevator, aileron, flags;
 
-
 //
 static u8 phase;
 enum {
