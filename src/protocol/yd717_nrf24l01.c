@@ -260,22 +260,18 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     // throttle can be less than CHAN_MIN_VALUE or larger than
     // CHAN_MAX_VALUE. As we have no space here, we hard-limit
     // channels values by min..max range
-    u8 a;
 
     // Channel 3
     *throttle = convert_channel(CHANNEL3);
 
     // Channel 4
-    a = convert_channel(CHANNEL4);
-    *rudder = a < 0x80 ? 0x7f - a : a;
+    *rudder = convert_channel(CHANNEL4);
 
     // Channel 2
-    a = convert_channel(CHANNEL2);
-    *elevator = a < 0x80 ? 0x7f - a : a;
+    *elevator = convert_channel(CHANNEL2);
 
     // Channel 1
-    a = convert_channel(CHANNEL1);
-    *aileron = a < 0x80 ? 0x7f - a : a;
+    *aileron = convert_channel(CHANNEL1);
 
     // Channel 5
     if (Channels[CHANNEL5] <= 0) *flags &= ~FLAG_FLIP;
