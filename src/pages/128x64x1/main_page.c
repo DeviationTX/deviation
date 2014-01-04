@@ -79,11 +79,8 @@ static void _check_voltage(guiLabel_t *obj)
         next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
         s16 batt = PWR_ReadVoltage();
         if (batt < Transmitter.batt_alarm) {
-            enum LabelType oldStyle = MICRO_FONT.style;  // bug fix
-            MICRO_FONT.style = LABEL_BLINK;
-            GUI_SetLabelDesc(obj, &TINY_FONT);
+            obj->desc.style = LABEL_INVERTED;
             GUI_Redraw(obj);
-            MICRO_FONT.style = oldStyle;
         }
         if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
             mp->battery = batt;

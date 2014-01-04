@@ -147,6 +147,8 @@ static void show_iconsel_page(int SelectedIcon)
 void navigate_toggleicons(s8 direction) {
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);
+    if(num_positions < 2)
+        num_positions = 2;
     current_toggleicon += direction;
     if (current_toggleicon < 0)
         current_toggleicon = num_positions -1;
@@ -163,8 +165,11 @@ void navigate_symbolicons(s8 direction) {
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     return;
     obj = GUI_GetSelected();
-    if (obj == (guiObject_t *)&gui->toggleicon[0] || obj == (guiObject_t *)&gui->toggleicon[1] ||
-        obj == (guiObject_t *)&gui->toggleicon[2]) { // skip toggle icon for right/left pressing
+    if (obj == (guiObject_t *)&gui->toggleicon[0]
+        || obj == (guiObject_t *)&gui->toggleicon[1]
+        || obj == (guiObject_t *)&gui->toggleicon[2])
+    {
+        // skip toggle icon for right/left pressing
         if (direction == -1)
             GUI_SetSelected((guiObject_t *)&gui->revert);
         else {
