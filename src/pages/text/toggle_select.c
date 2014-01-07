@@ -25,7 +25,7 @@ static const int NUM_COLS = 8;
 
 #include "../common/_toggle_select.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s8 current_toggleicon = 0;
 
 static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
@@ -147,6 +147,8 @@ static void show_iconsel_page(int SelectedIcon)
 void navigate_toggleicons(s8 direction) {
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);
+    if(num_positions < 2)
+        num_positions = 2;
     current_toggleicon += direction;
     if (current_toggleicon < 0)
         current_toggleicon = num_positions -1;
@@ -163,8 +165,11 @@ void navigate_symbolicons(s8 direction) {
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     return;
     obj = GUI_GetSelected();
-    if (obj == (guiObject_t *)&gui->toggleicon[0] || obj == (guiObject_t *)&gui->toggleicon[1] ||
-        obj == (guiObject_t *)&gui->toggleicon[2]) { // skip toggle icon for right/left pressing
+    if (obj == (guiObject_t *)&gui->toggleicon[0]
+        || obj == (guiObject_t *)&gui->toggleicon[1]
+        || obj == (guiObject_t *)&gui->toggleicon[2])
+    {
+        // skip toggle icon for right/left pressing
         if (direction == -1)
             GUI_SetSelected((guiObject_t *)&gui->revert);
         else {
@@ -173,7 +178,7 @@ void navigate_symbolicons(s8 direction) {
     }
 }
 
-u8 _action_cb(u32 button, u8 flags, void *data)
+unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

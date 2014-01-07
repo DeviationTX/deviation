@@ -16,7 +16,7 @@
 
 struct LabelDesc labelDesc; // create a style-customizable font so that it can be shared for all pages
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned int action_cb(u32 button, unsigned int flags, void *data);
 
 struct page {
     void (*init)(int i);
@@ -138,7 +138,7 @@ void PAGE_RemoveAllObjects()
     }
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static unsigned int action_cb(u32 button, unsigned int flags, void *data)
 {
     u8 result = 0;
     if(GUI_IsModal())  //Disable control when a dialog is shown

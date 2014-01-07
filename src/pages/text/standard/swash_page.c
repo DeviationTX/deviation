@@ -24,7 +24,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_swash_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 void PAGE_SwashInit(int page)
 {
@@ -55,7 +55,7 @@ void PAGE_SwashInit(int page)
     GUI_Select1stSelectableObj();
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     //u8 total_items = 2;

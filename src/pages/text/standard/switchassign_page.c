@@ -22,7 +22,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_switchassign_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
@@ -84,7 +84,7 @@ void PAGE_SwitchAssignInit(int page)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

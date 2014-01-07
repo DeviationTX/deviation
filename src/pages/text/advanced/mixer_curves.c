@@ -18,7 +18,7 @@
 
 #include "../../common/advanced/_mixer_curves.c"
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned action_cb(u32 button, unsigned flags, void *data);
 
 void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 {
@@ -82,7 +82,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     GUI_SetSelected((guiObject_t *)&gui->point);
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

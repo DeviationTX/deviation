@@ -92,7 +92,9 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
     if (obj && crc == dialogcrc)
         return tempstring;
     u32 bind_time = PROTOCOL_Binding();
-    strcpy(tempstring, _tr("Binding...\nPress ENT to stop"));
+    char tmp[10];
+    snprintf(tmp, 10, "%s", Model.name);
+    snprintf(tempstring, sizeof(tempstring), _tr("Binding %s...\nPress ENT to stop"), tmp);
     if (bind_time != 0xFFFFFFFF ) {
         int len = strlen(tempstring);
         snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n%d seconds left"), (int)bind_time / 1000);

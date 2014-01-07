@@ -28,7 +28,7 @@ static const int HEADER_Y = 10;
 
 static u16 current_selected = 0;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 void PAGE_MainLayoutInit(int page)
 {
@@ -206,7 +206,7 @@ void show_config()
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

@@ -75,7 +75,7 @@ static const int VIEW_ID = 0;
 static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned int action_cb(u32 button, unsigned int flags, void *data);
 static const char *idx_string_cb(guiObject_t *obj, const void *data);
 static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static const char *menu_name_cb(guiObject_t *obj, const void *data);
@@ -170,7 +170,7 @@ const char *idx_string_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static unsigned int action_cb(u32 button, unsigned int flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

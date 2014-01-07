@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data);
+static unsigned int _handle_modalbuttons_devo10(u32 button, unsigned int flags, void *data);
 
 const struct ImageMap image_map[] = {
     {NULL, 37, 15, 0, 0}, /*DRAW_BTN32_18 */
@@ -47,7 +47,7 @@ void GUI_HandleModalButtons(u8 enable)
                 NULL);
 }
 
-static u8 _handle_modalbuttons_devo10(u32 button, u8 flags, void *data)
+static unsigned int _handle_modalbuttons_devo10(u32 button, unsigned int flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

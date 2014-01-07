@@ -24,7 +24,7 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 //static u16 current_selected = 0;
 guiObject_t *scroll_bar;
@@ -99,7 +99,7 @@ static void _refresh_page()
     PAGE_DrExpInit(0);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     //u8 total_items = 2;
