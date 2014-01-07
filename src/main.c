@@ -119,7 +119,7 @@ void Init() {
 
     LCD_Init();
     CHAN_Init();
-
+    
     SPITouch_Init();
     SOUND_Init();
     BACKLIGHT_Init();

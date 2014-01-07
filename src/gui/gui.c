@@ -95,6 +95,7 @@ void GUI_RemoveAllObjects()
     while(objHEAD)
         GUI_RemoveObj(objHEAD);
     FullRedraw = 2;
+    LCD_Clear(0);
 }
 
 void GUI_RemoveObj(struct guiObject *obj)
