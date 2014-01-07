@@ -14,7 +14,7 @@
  */
 
 static buttonAction_t button_action;
-static u8 (*ActionCB)(u32 button, u8 flags, void *data);
+static unsigned (*ActionCB)(u32 button, unsigned flags, void *data);
 
 void PAGE_ChangeQuick(int dir);
 
@@ -47,7 +47,7 @@ u8 PAGE_GetModal()
 }
 
 
-void PAGE_SetActionCB(u8 (*callback)(u32 button, u8 flags, void *data))
+void PAGE_SetActionCB(unsigned (*callback)(u32 button, unsigned flags, void *data))
 {
     ActionCB = callback;
 }

@@ -22,7 +22,7 @@
 #if HAS_PERMANENT_TIMER
 #include "../common/_set_timer_page.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -113,7 +113,7 @@ static void _show_settimer_page(u8 index)
 
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {

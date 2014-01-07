@@ -18,7 +18,7 @@
 
 #include "../../common/advanced/_mixer_limits.c"
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned action_cb(u32 button, unsigned flags, void *data);
 static void revert_cb(guiObject_t *obj, const void *data);
 
 static void _show_titlerow()
@@ -120,7 +120,7 @@ void revert_cb(guiObject_t *obj, const void *data)
     GUI_DrawScreen();
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

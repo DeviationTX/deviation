@@ -134,7 +134,7 @@ s16 expo(struct Curve *curve, s32 value)
 
     s32  y;
     s32 k;
-    u8 neg = value < 0;
+    unsigned neg = value < 0;
 
     k = neg ? curve->points[1] : curve->points[0];
     if (k == 0)
@@ -153,7 +153,7 @@ s16 expo(struct Curve *curve, s32 value)
 
 s16 deadband(struct Curve *curve, s32 value)
 {
-    u8 neg = value < 0;
+    unsigned neg = value < 0;
     s32 k = neg ? (u8)curve->points[1] : (u8)curve->points[0];
 
     if (k == 0)
@@ -237,7 +237,7 @@ const char *CURVE_GetName(char *str, struct Curve *curve)
     return _tr("Unknown");
 }
 
-u8 CURVE_NumPoints(struct Curve *curve)
+unsigned CURVE_NumPoints(struct Curve *curve)
 {
     switch (CURVE_TYPE(curve)) {
         case CURVE_NONE:

@@ -189,8 +189,8 @@ s8 mapstrcasecmp(const char *s1, const char *s2)
 }
 static u8 get_source(const char *section, const char *value)
 {
-    u8 i;
-    u8 val;
+    unsigned i;
+    unsigned val;
     const char *ptr = (value[0] == '!') ? value + 1 : value;
     const char *tmp;
     char cmp[10];
@@ -233,9 +233,10 @@ static int handle_proto_opts(struct Model *m, const char* key, const char* value
     while(*popts) {
         if(mapstrcasecmp(*popts, key) == 0) {
             popts++;
-            int start = atoi(popts[0]);
-            int end = atoi(popts[1]);
-            if(popts[2] == 0 && (start != 0 || end != 0)) {
+            int start = exact_atoi(popts[0]);
+            int end = exact_atoi(popts[1]);
+            int is_num = ((start != 0 || end != 0) && (popts[2] == 0 || (popts[3] == 0 && exact_atoi(popts[2]) != 0))) ? 1 : 0;
+            if(is_num) {
                 m->proto_opts[idx] = atoi(value);
                 return 1;
             }
@@ -1043,9 +1044,10 @@ static void write_proto_opts(FILE *fh, struct Model *m)
     int idx = 0;
     fprintf(fh, "[%s]\n", SECTION_PROTO_OPTS);
     while(*opts) {
-        int start = atoi(opts[1]);
-        int end = atoi(opts[2]);
-        if (opts[3] == 0 && (start != 0 || end != 0)) {
+        int start = exact_atoi(opts[1]);
+        int end = exact_atoi(opts[2]);
+        int is_num = ((start != 0 || end != 0) && (opts[3] == 0 || (opts[4] == 0 && exact_atoi(opts[3]) != 0))) ? 1 : 0;
+        if (is_num) {
             fprintf(fh, "%s=%d\n",*opts, m->proto_opts[idx]);
         } else {
             fprintf(fh, "%s=%s\n",*opts, opts[m->proto_opts[idx]+1]);
@@ -1199,7 +1201,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->swashmix[2] != 60)
             fprintf(fh, "%s=%d\n", SWASH_COLMIX, m->swashmix[2]);
     }
-    for(idx = 0; idx < NUM_TIMERS - (HAS_RTC ? 1 : 0); idx++) {
+    for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
             continue;
         fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
@@ -1380,7 +1382,7 @@ const char *CONFIG_GetIcon(enum ModelType type) {
 
 const char *CONFIG_GetCurrentIcon() {
     if(Model.icon[0]) {
-        return Model.icon;
+        return fexists(Model.icon) ? Model.icon : UNKNOWN_ICON;
     } else {
         return CONFIG_GetIcon(Model.type);
     }

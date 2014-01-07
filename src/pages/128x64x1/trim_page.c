@@ -22,8 +22,8 @@
 static struct trim_obj  * const gui  = &gui_objs.u.trim;
 static struct trim2_obj * const guit = &gui_objs.u.trim2;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
-static u8 _sub_action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
+static unsigned _sub_action_cb(u32 button, unsigned flags, void *data);
 static u16 current_selected = 0;
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -138,7 +138,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
 }
 
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
@@ -152,7 +152,7 @@ static u8 _action_cb(u32 button, u8 flags, void *data)
     return 1;
 }
 
-static u8 _sub_action_cb(u32 button, u8 flags, void *data)
+static unsigned _sub_action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {

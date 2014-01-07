@@ -32,8 +32,11 @@ static void _show_list(int loadsave, u8 num_models)
 {
     GUI_CreateListBox(&gui->list, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
     if (loadsave != LOAD_TEMPLATE && loadsave != LOAD_LAYOUT) {
-    	u16 w, h;
-    	LCD_ImageDimensions(mp->iconstr, &w, &h);
+        u16 w = 0, h = 0;
+        char *img = mp->iconstr;
+        if(! fexists(img))
+            img = UNKNOWN_ICON;
+        LCD_ImageDimensions(img, &w, &h);
         GUI_CreateImage(&gui->image, 212 + ((LCD_WIDTH - 320) / 2), 88, w, h, mp->iconstr);
     }
 }

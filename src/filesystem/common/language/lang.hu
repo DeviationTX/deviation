@@ -105,8 +105,8 @@ Csatol
 Kapcsolódás a modellhez
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Kapcsolódás folyamatban...\nGyőződjön meg róla, hogy a modell be van kapcsolva!\n\nAz OK gomb NEM szakítja meg a kapcsolódást,\ncsak lehetővé teszi a rádió használatát.
-:Binding...\nPress ENT to stop
-Kapcsolódás...\nENT megállítani
+:Binding %s...\nPress ENT to stop
+Kapcsolódás %s...\nENT megállítani
 :Box
 Doboz
 :Button monitor

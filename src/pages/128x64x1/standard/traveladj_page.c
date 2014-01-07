@@ -23,7 +23,7 @@
 
 static struct stdtravel_obj * const gui = &gui_objs.u.stdtravel;
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static u16 current_selected = 0;
 
@@ -71,7 +71,7 @@ void PAGE_TravelAdjInit(int page)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

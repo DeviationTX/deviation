@@ -60,7 +60,7 @@ enum calibrateState {
 };
 static enum calibrateState calibrate_state;
 static const char *auto_dimmer_time_cb(guiObject_t *obj, int dir, void *data);
-static u8 _action_cb_calibrate(u32 button, u8 flags, void *data)
+static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
 {
     (void)data;
     u8 i;
@@ -384,13 +384,11 @@ static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     u8 *unsigned_data = (u8 *)data;
-    static u8 mem = 0;
+    u8 changed;
     if (GUI_IsTextSelectEnabled(obj)) {
-        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 10, dir, 1, 1, NULL);
-    }
-    if( mem != *unsigned_data ) {
-        mem = *unsigned_data;
-        MUSIC_Play(MUSIC_VOLUME);
+        *unsigned_data = GUI_TextSelectHelper(*unsigned_data, 0, 10, dir, 1, 1, &changed);
+        if (changed)
+            MUSIC_Play(MUSIC_VOLUME);
     }
     if (*unsigned_data == 0)
         return _tr("Off");

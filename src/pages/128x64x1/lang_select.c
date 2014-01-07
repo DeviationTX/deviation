@@ -21,7 +21,7 @@
 
 #include "../common/_lang_select.c"
 
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_string_cb(guiObject_t *obj, const void *data);
 
 static struct lang_obj * const gui = &gui_objs.u.lang;
@@ -80,7 +80,7 @@ const char *_string_cb(guiObject_t *obj, const void *data)
     return string_cb(idx, NULL);
 }
 
-static u8 _action_cb(u32 button, u8 flags, void *data)
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

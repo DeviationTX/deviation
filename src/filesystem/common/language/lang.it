@@ -94,8 +94,8 @@ Bind
 Binding
 :Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx.
 Binding in corso...\nAssicurati che il modello sia acceso\n\nIl tasto OK non interromperà la procedura di binding\nma permetterà il controllo della TX.
-:Binding...\nPress ENT to stop
-Binding...\nPremi ENT per fermare
+:Binding %s...\nPress ENT to stop
+Binding %s...\nPremi ENT per fermare
 >:Box
 :Button monitor
 Monitor pulsante

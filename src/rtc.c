@@ -36,7 +36,7 @@ int _RTC_GetMonth(u32 value);
 int _RTC_GetYear(u32 value);
 u32 _RTC_GetSerialTime(int hour, int minute, int second);
 u32 _RTC_GetSerialDate(int year, int month, int day);
-void _RTC_GetDateStringHelper(char *str, u32 date, u8 year4);
+void _RTC_GetDateStringHelper(char *str, u32 date, unsigned year4);
 
 static struct {
     u32 DayStart;
@@ -58,7 +58,7 @@ void _RTC_SetDayStart(u32 value)
     if (today.DayStart != days) {
         today.DayStart = days;
         today.Year  = (4*days) / 1461; // = days/365.25
-        u8 leap = today.Year % 4 == 0;
+        unsigned leap = today.Year % 4 == 0;
         days -= (u32)(today.Year * 365 + today.Year / 4);
         days -= ((today.Year != 0 && days > daysInYear[leap][2]) ? 1 : 0);    //leap year correction for RTC_STARTYEAR
         today.Month = 0;
@@ -142,7 +142,7 @@ void RTC_GetTimeStringShort(char *str, u32 value)
 }
 
 // format date string
-void _RTC_GetDateStringHelper(char *str, u32 date, u8 year4)
+void _RTC_GetDateStringHelper(char *str, u32 date, unsigned year4)
 {
     _RTC_SetDayStart(date);
     if (year4) sprintf(str, "%2d.%02d.%04d", today.Day+1, today.Month+1, today.Year+RTC_STARTYEAR);
@@ -166,7 +166,7 @@ const char *timeformats[] = { /*"default",*/ "hh:mm:ss", "hh:mm:ss am/pm" };
 void RTC_GetTimeFormatted(char *str, u32 time)
 {
     // which format to use?
-    u8 format = Transmitter.rtcflags & TIMEFMT;
+    unsigned format = Transmitter.rtcflags & TIMEFMT;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(timeformats) / sizeof(timeformats[0])) format = 0;
     switch (format) {
@@ -175,7 +175,7 @@ void RTC_GetTimeFormatted(char *str, u32 time)
             break;
         case 1: // a.m. / p.m. = hh:mm:ss am/pm
         {
-            u8 am = ((time % DAYSEC) / 3600) < 12;
+            unsigned am = ((time % DAYSEC) / 3600) < 12;
             sprintf(str, "%2d:%02d:%02d %s", _RTC_GetHour(time), _RTC_GetMinute(time), _RTC_GetSecond(time), (am) ? "AM" : "PM");
             break;
         }
@@ -187,7 +187,7 @@ const char *dateformats[] = { "YYYY-MM-DD", "MM/DD/YYYY", "DD.MM.YYYY", "Mon DD 
 void RTC_GetDateFormatted(char *str, u32 date)
 {
     // which format to use?
-    u8 format = (Transmitter.rtcflags & DATEFMT) >> 4;
+    unsigned format = (Transmitter.rtcflags & DATEFMT) >> 4;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(dateformats) / sizeof(dateformats[0])) format = 0;
     _RTC_SetDayStart(date);
@@ -217,10 +217,10 @@ void RTC_GetDateFormatted(char *str, u32 date)
     }
 }
 
-void RTC_GetMonthFormatted(char *str, u8 month)
+void RTC_GetMonthFormatted(char *str, unsigned month)
 {
     // which format to use?
-    u8 format = (Transmitter.rtcflags & DATEFMT) >> 4;
+    unsigned format = (Transmitter.rtcflags & DATEFMT) >> 4;
     // make sure that the number is correct; use default otherwise
     if (format >= sizeof(dateformats) / sizeof(dateformats[0])) format = 0;
     switch (format) {
@@ -243,7 +243,7 @@ void RTC_GetMonthFormatted(char *str, u8 month)
     }
 }
 
-void RTC_GetDateFormattedOrder(u8 index, u8 *left, u8 *middle, u8 *right)
+void RTC_GetDateFormattedOrder(unsigned index, u8 *left, u8 *middle, u8 *right)
 {
     *left = (index == 0) ? YEAR : ((index == 1 || index == 3) ? MONTH : DAY);
     *middle = (index == 1 || index == 3) ? DAY : MONTH;
@@ -253,8 +253,8 @@ void RTC_GetDateFormattedOrder(u8 index, u8 *left, u8 *middle, u8 *right)
 // for big boxes only these will fit
 void RTC_GetTimeFormattedBigbox(char *str, u32 time)
 {
-    u8 am = ((time % DAYSEC) / 3600) < 12;
-    u8 hour = _RTC_GetHour(time);
+    unsigned am = ((time % DAYSEC) / 3600) < 12;
+    unsigned hour = _RTC_GetHour(time);
     if (hour == 12) hour = 0;
     sprintf(str, "%2d:%02d:%02d", hour + (am ? 0 : 12), _RTC_GetMinute(time), _RTC_GetSecond(time));
 }

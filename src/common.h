@@ -158,22 +158,24 @@ int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);
 
 /* Input */
-const char *INPUT_SourceName(char *str, u8 src);
-const char *INPUT_SourceNameReal(char *str, u8 src);
-const char *INPUT_SourceNameAbbrevSwitch(char *str, u8 src);
-const char *INPUT_SourceNameAbbrevSwitchReal(char *str, u8 src);
+const char *INPUT_SourceName(char *str, unsigned src);
+const char *INPUT_SourceNameReal(char *str, unsigned src);
+const char *INPUT_SourceNameAbbrevSwitch(char *str, unsigned src);
+const char *INPUT_SourceNameAbbrevSwitchReal(char *str, unsigned src);
 int INPUT_GetAbbrevSource(int origval, int newval, int dir);
-int INPUT_SwitchPos(u8 src);
-int INPUT_NumSwitchPos(u8 src);
+int INPUT_SwitchPos(unsigned src);
+int INPUT_NumSwitchPos(unsigned src);
 int INPUT_GetFirstSwitch(int src);
 
-const char *INPUT_MapSourceName(u8 idx, u8 *val);
-const char *INPUT_ButtonName(u8 src);
+const char *INPUT_MapSourceName(unsigned idx, unsigned *val);
+const char *INPUT_ButtonName(unsigned src);
 
 /* Misc */
 void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
+int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
+int fexists(const char *file);
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
@@ -191,7 +193,7 @@ typedef enum {
 void PAGE_ShowInvalidStandardMixerDialog(void *guiObj);
 void STDMIXER_Preset();
 void STDMIXER_SetChannelOrderByProtocol();
-u8 STDMIXER_ValidateTraditionModel();
+unsigned STDMIXER_ValidateTraditionModel();
 const char *STDMIXER_ModeName(int mode);
 void STDMIXER_InitSwitches();
 void STDMIXER_SaveSwitches();

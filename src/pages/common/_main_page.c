@@ -21,7 +21,7 @@ const char *voltage_cb(guiObject_t *obj, const void *data);
 static s16 trim_cb(void * data);
 static s16 bar_cb(void * data);
 void press_icon2_cb(guiObject_t *obj, const void *data);
-static u8 _action_cb(u32 button, u8 flags, void *data);
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s32 get_boxval(u8 idx);
 static void _check_voltage(guiLabel_t *obj);
 
@@ -107,7 +107,7 @@ const char *voltage_cb(guiObject_t *obj, const void *data) {
     if (mp->battery > 1000)  // bug fix: any value lower than 1v means the DMA reading is not ready
         sprintf(tempstring, "%2d.%02dV", mp->battery / 1000, (mp->battery % 1000) / 10);
     else
-        tempstring[0] = 0;
+        sprintf(tempstring, "-.--V");
     return tempstring;
 }
 
@@ -218,20 +218,22 @@ void PAGE_MainEvent()
                 (void)img.x_off;
                 (void)img.y_off;
                 img.file = NULL;
-                if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
-                    //switch
-                    for (int j = 0; j < 3; j++) {
-                        // Assume switch 0/1/2 are in order
-                        if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
-                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
-                            break;
+                if(src) {
+                    if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
+                        //switch
+                        for (int j = 0; j < 3; j++) {
+                            // Assume switch 0/1/2 are in order
+                            if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
+                                img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
+                                break;
+                            }
                         }
-                    }
-                } else {
-                    //Non switch
-                    int sw = raw[src] > 0 ? 1 : 0;
-                    if (ELEM_ICO(pc->elem[i], sw)) {
-                        img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
+                    } else {
+                        //Non switch
+                        int sw = raw[src] > 0 ? 1 : 0;
+                        if (ELEM_ICO(pc->elem[i], sw)) {
+                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
+                        }
                     }
                 }
                 if (img.file) {
@@ -283,12 +285,13 @@ void GetElementSize(unsigned type, u16 *w, u16 *h)
         [ELEM_BATTERY]  = BATTERY_H,
         [ELEM_TXPOWER]  = TXPOWER_H,
     };
-    if (type == ELEM_MODELICO && Model.icon[0])
-    	LCD_ImageDimensions(Model.icon, w, h);
-    else {
-		*w = width[type];
-		*h = height[type];
+    if (type == ELEM_MODELICO && Model.icon[0]) {
+        if(LCD_ImageDimensions(CONFIG_GetCurrentIcon(), w, h))
+            return;
+        //We can't fix this during model-load because only 1 file can be open at a time
     }
+    *w = width[type];
+    *h = height[type];
 }
 
 void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w)

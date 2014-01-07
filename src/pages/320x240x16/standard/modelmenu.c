@@ -41,6 +41,7 @@ static const struct menu_s menus[] = {
     {PAGEID_FAILSAFE,     {"media/mnufail.bmp",  48, 47, 0, 0}},
     {PAGEID_TIMER,        {"media/mnutimer.bmp", 48, 47, 0, 0}},
     {PAGEID_TELEMCFG,     {"media/mnutelem.bmp", 48, 47, 0, 0}},
+    {PAGEID_DATALOG,      {"media/mnulog.bmp",   48, 47, 0, 0}},
     {PAGEID_MAINCFG,      {"media/mnucfg.bmp",   48, 47, 0, 0}},
 };
 

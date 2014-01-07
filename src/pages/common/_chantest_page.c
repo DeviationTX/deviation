@@ -56,7 +56,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
     }
 }
 
-u8 button_capture_cb(u32 button, u8 flags, void *data)
+unsigned button_capture_cb(u32 button, unsigned flags, void *data)
 {
     (void)button;
     (void)flags;

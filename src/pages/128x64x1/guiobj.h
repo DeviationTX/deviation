@@ -39,7 +39,7 @@ struct mainconfig_obj {
 
 struct mainlayout_obj {
     struct LabelDesc desc[5];
-    guiLabel_t editelem;
+    guiRect_t editelem;
     guiLabel_t move;
     //guiTextSelect_t newelem;
     guiLabel_t xlbl;

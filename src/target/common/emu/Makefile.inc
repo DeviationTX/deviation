@@ -18,8 +18,10 @@ ifdef WINDOWS
         PORTAUDIO_DIR = /opt/portaudio-w32
         LFLAGS += -mno-cygwin
         CFLAGS += -mno-cygwin
+    else
+        LFLAGS += -static-libgcc -static-libstdc++
     endif
-    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio
+    LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio 
     CFLAGS += -I$(FLTK_DIR)/include -I$(PORTAUDIO_DIR)/include -DWIN32
     EXEEXT = exe
     ODIREXT = -w32
@@ -39,6 +41,9 @@ $(TARGET).zip: $(TARGET).$(EXEEXT)
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)
 ifdef WINDOWS
 	zip -u deviation-$(HGVERSION).zip libportaudio-2.dll
+endif
+ifeq "$(INCLUDE_FS)" "1"
+	zip -ur deviation-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 endif
 	rm -f deviation-$(HGVERSION).$(EXEEXT)
 

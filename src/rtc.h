@@ -1,11 +1,10 @@
 #ifndef _RTC_H_
 #define _RTC_H_
 
-#ifndef HAS_RTC
-    #define HAS_RTC 0
-    #define NUM_RTC 0
-#else
+#if HAS_RTC
     #define NUM_RTC 2
+#else
+    #define NUM_RTC 0
 #endif
 
 #define RTC_STARTYEAR 2012
@@ -45,10 +44,10 @@ int RTC_GetNumberDateFormats();
 // return formatted time/date string as stated in tx config
 void RTC_GetTimeFormatted(char *str, u32 time);
 void RTC_GetDateFormatted(char *str, u32 date);
-void RTC_GetMonthFormatted(char *str, u8 month); // for written month names
+void RTC_GetMonthFormatted(char *str, unsigned month); // for written month names
 void RTC_GetTimeFormattedBigbox(char *str, u32 time); // only this fits in big box
 void RTC_GetDateFormattedBigbox(char *str, u32 date); // only this fits in big box
-void RTC_GetDateFormattedOrder(u8 index, u8 *left, u8 *middle, u8 *right); // for ordering the input fields
+void RTC_GetDateFormattedOrder(unsigned index, u8 *left, u8 *middle, u8 *right); // for ordering the input fields
 
 //return RTC name
 const char *RTC_Name(char *str, int i);

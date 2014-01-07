@@ -24,7 +24,7 @@ static const int LEFT_VIEW_ID        = 0;
 static const int RIGHT_VIEW_ID       = 1;
 static const int RIGHT_VIEW_HEIGHT   = 49;
 
-static u8 action_cb(u32 button, u8 flags, void *data);
+static unsigned action_cb(u32 button, unsigned flags, void *data);
 static void notify_cb(guiObject_t * obj);
 
 static void _show_titlerow()
@@ -385,7 +385,7 @@ static void notify_cb(guiObject_t * obj)
     }
 }
 
-static u8 action_cb(u32 button, u8 flags, void *data)
+static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {

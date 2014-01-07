@@ -41,11 +41,12 @@ u8 num_channels;
 #ifndef EMULATOR
 #define BITBANG_PPM
 #endif
+#define STEP_SIZE "3276810" // == 10small/50large == (50 << 16) | 10
 static const char * const ppm_opts[] = {
-  _tr_noop("Center PW"),  "1000", "1800", NULL,
-  _tr_noop("Delta PW"),   "100", "700", NULL,
-  _tr_noop("Notch PW"),   "100", "500", NULL,
-  _tr_noop("Frame Size"),   "20000", "22500", NULL,
+  _tr_noop("Center PW"),  "1000",  "1800",  STEP_SIZE, NULL,
+  _tr_noop("Delta PW"),   "100",   "700",   STEP_SIZE, NULL,
+  _tr_noop("Notch PW"),   "100",   "500",   STEP_SIZE, NULL,
+  _tr_noop("Frame Size"), "20000", "22500", STEP_SIZE, NULL,
   NULL
 };
 enum {

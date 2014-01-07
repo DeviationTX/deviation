@@ -19,7 +19,7 @@
 #include "buttons.h"
 #include "config/display.h"
 
-static u8 button_cb(u32 button, u8 flags, void *data);
+static unsigned button_cb(u32 button, unsigned flags, void *data);
 
 #define PRESS_UP     0x01
 #define RELEASE_UP   0x02
@@ -167,7 +167,7 @@ u8 GUI_GetScrollbarNumItems(struct guiScrollbar *scrollbar)
     return scrollbar->num_items;
 }
 
-static u8 button_cb(u32 button, u8 flags, void *data)
+static unsigned button_cb(u32 button, unsigned flags, void *data)
 {
     struct guiObject *obj = (struct guiObject *)data;
     struct guiScrollbar *scrollbar = (struct guiScrollbar *)obj;
