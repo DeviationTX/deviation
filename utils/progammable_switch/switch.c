@@ -13,96 +13,100 @@
 
 #define NUM_PINS 7
 uint8_t PIN_MASK[NUM_PINS] = {
-	0,
-	1,
-	2,
-	3,
-	7,
-	0x80 | 1,
-	0x80 | 2,
+    0,
+    1,
+    2,
+    3,
+    7,
+    0x80 | 1,
+    0x80 | 2,
 };
-register uint8_t global_toggleA asm ("16"); 
-register uint8_t global_toggleB asm ("17");
-register uint8_t global_toggleNOTA asm ("14"); 
-register uint8_t global_toggleNOTB asm ("15");
+register uint8_t global_A asm ("16");
+register uint8_t global_NOTA asm ("17");
+register uint8_t global_tmp asm ("14");
+//register uint8_t global_B asm ("14");
+//register uint8_t global_NOTB asm ("15");
 
 
 void setup_switch() {
-	uint8_t i = 0;
-	uint8_t data[2];
-	TCNT0 = 0;
-	TCCR0B = (1 << CS01) | (1 << CS00); // div-by-64 prescalar = ~2msec overflow
+    uint8_t i = 0;
+    uint8_t data[2];
+    TCNT0 = 0;
+    TCCR0B = (1 << CS01) | (1 << CS00); // div-by-64 prescalar = ~2msec overflow
 
-	USICR = (1 << USIWM0) | (1 << USICS1);  // 3-sire (SPI), slave, rising clock
-	USISR = 1 << USIOIF;                    // Reset USI interrupt flag
-	while(i < 2) {
-		if (TCNT0 >= 125) {  //Abort after 1 msec
-			USICR = 0x00;   // disable SPI
-			return;
-		}
-		if (USISR & (1 << USIOIF)) {
-			data[i] = USIDR;
-            USISR = 1 << USIOIF;
-			i++;
-		}
-	}
-	USICR = 0x00; // disable SPI
-	TCCR0B = 0; // Disable Timer0
-    uint8_t setA = 0, resetA = 0, setB = 0, resetB = 0, toggleA = 0, toggleB = 0;
-	for(i = 0; i < NUM_PINS; i++) {
-		//Set each pin to the proper value
-        uint8_t is_toggle = data[1] & (1 << i);
-		if (is_toggle || (data[0] & (1 << i))) {//CSN must be high at this point
-            if (PIN_MASK[i] & 0x80) {
-                setB |= 1 << (PIN_MASK[i] & 0x7f);
-                if (is_toggle)
-                    toggleB |= 1 << (PIN_MASK[i] & 0x7f);
-            } else {
-                setA |= 1 << (PIN_MASK[i] & 0x7f);
-                if (is_toggle)
-                    toggleA |= 1 << (PIN_MASK[i] & 0x7f);
-            }
-		} else {
-            if (PIN_MASK[i] & 0x80) {
-                resetB |= 1 << (PIN_MASK[i] & 0x7f);
-            } else {
-                resetA |= 1 << (PIN_MASK[i] & 0x7f);
-            }
+    USICR = (1 << USIWM0) | (1 << USICS1);  // 3-sire (SPI), slave, rising clock
+    USISR = 1 << USIOIF;                    // Reset USI interrupt flag
+    while(i < 2) {
+        if (TCNT0 >= 125) {  //Abort after 1 msec
+            USICR = 0x00;   // disable SPI
+            return;
         }
-	}
-    PORTA |= setA;
-    PORTA &= ~resetA;
-    PORTB |= setB;
-    PORTB &= ~resetB;
-    global_toggleA = toggleA;
-    global_toggleB = toggleB;
-    global_toggleNOTA = ~toggleA;
-    global_toggleNOTB = ~toggleB;
+        if (USISR & (1 << USIOIF)) {
+            data[i] = USIDR;
+            USISR = 1 << USIOIF;
+            i++;
+        }
+    }
+    USICR = 0x00; // disable SPI
+    TCCR0B = 0; // Disable Timer0
+    uint8_t setA = 0, toggleA = 0;
+    //uint8_t setB = 0, toggleB = 0;
+    for(i = 0; i < NUM_PINS; i++) {
+        //Set each pin to the proper value
+        uint8_t is_toggle = data[1] & (1 << i);
+        if (is_toggle) {
+            //if (PIN_MASK[i] & 0x80) {
+            //    toggleB |= 1 << (PIN_MASK[i] & 0x7f);
+            //} else {
+                toggleA |= 1 << (PIN_MASK[i] & 0x7f);
+            //}
+        } else if (data[0] & (1 << i)) {
+            //if (PIN_MASK[i] & 0x80) {
+            //    setB |= 1 << (PIN_MASK[i] & 0x7f);
+            //} else {
+                setA |= 1 << (PIN_MASK[i] & 0x7f);
+            //}
+        }
+    }
+    global_A = toggleA | setA;
+    global_NOTA = ~toggleA & setA;
+    //global_B = toggleB | setB;
+    //global_NOTB = ~toggleB & setB;
+    PORTA = global_A;   //CSN must be high
+    //PORTB = global_B;
 }
 
-ISR(PCINT1_vect) {
-	//CSN change
+ISR(PCINT1_vect, ISR_NAKED) {
+    //CSN change
+    #if 0
     if (CSN) {
-        PORTA |= global_toggleA;
-        PORTB |= global_toggleB;
+        PORTA = global_A;
+        //PORTB = global_B;
     } else {
-        PORTA &= global_toggleNOTA;
-        PORTB &= global_toggleNOTB;
+        PORTA = global_NOTA;
+        //PORTB = global_NOTB;
     }
+    #else
+    asm("mov r14, r16");
+    asm("sbis 0x16, 0");
+    asm("mov r14, r17");
+    asm("out 0x1b, r14");
+    #endif
+    reti();
 }
 
 enum {
-	CLEAR = 0,
-	CLOCK_RISE  ,
+    CLEAR = 0,
+    CLOCK_RISE  ,
 };
 
 int main (void)
 {
     uint8_t state= CLEAR;
-    global_toggleA = 0;
-    global_toggleB = 0;
-    global_toggleNOTA = ~0;
-    global_toggleNOTB = ~0;
+    global_A = 0xff;
+    global_NOTA = ~0;
+    //global_B = 0;
+    //global_NOTB = ~0;
     DDRA = (1 << PA0) | (1 << PA1) | (1 << PA2) | (1 << PA3) | (1 << PA7);
     DDRB = (1 << PB1) | (1 << PB2);
     PCMSK0 = SCK_PIN;      //Watch for clock toggle
@@ -118,7 +122,7 @@ int main (void)
             if (SCK && CSN) {
                 //clock rise with CSN=1 ==> start of trigger
                 state = CLOCK_RISE;
-            } else if (state == CLOCK_RISE && ! SCK && CSN) {
+                } else if (state == CLOCK_RISE && ! SCK && CSN) {
                 //clock fall with state == CLOCK_RISE and CSN=1 ==> completion of trigger
                 state = CLEAR;
                 GIMSK  = 0;            //Disable PCINT1 interrupt
@@ -126,9 +130,8 @@ int main (void)
                 GIMSK  = 1 << PCIE1;   //Enable PCINT1 interrupt
             }
             GIFR = 1 << PCIF0;  //clear clock toggle
-        } else if(! CSN) {
+            } else if(! CSN) {
             state = CLEAR;
         }
     }
 }
-
