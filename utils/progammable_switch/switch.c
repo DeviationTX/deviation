@@ -48,30 +48,10 @@ void setup_switch() {
         }
     }
     USICR = 0x00; // disable SPI
-    TCCR0B = 0; // Disable Timer0
-    uint8_t setA = 0, toggleA = 0;
-    //uint8_t setB = 0, toggleB = 0;
-    for(i = 0; i < NUM_PINS; i++) {
-        //Set each pin to the proper value
-        uint8_t is_toggle = data[1] & (1 << i);
-        if (is_toggle) {
-            //if (PIN_MASK[i] & 0x80) {
-            //    toggleB |= 1 << (PIN_MASK[i] & 0x7f);
-            //} else {
-                toggleA |= 1 << (PIN_MASK[i] & 0x7f);
-            //}
-        } else if (data[0] & (1 << i)) {
-            //if (PIN_MASK[i] & 0x80) {
-            //    setB |= 1 << (PIN_MASK[i] & 0x7f);
-            //} else {
-                setA |= 1 << (PIN_MASK[i] & 0x7f);
-            //}
-        }
-    }
-    global_A = toggleA | setA;
-    global_NOTA = ~toggleA & setA;
-    //global_B = toggleB | setB;
-    //global_NOTB = ~toggleB & setB;
+    PORTA = data[0];      //Set PA.0, PA.1, PA,2, PA.3, PA.7
+    PORTB = data[0] >> 3; //Set PB.1 = BIT5, PB.2 = BIT6
+    global_A = data[0];
+    global_NOTA = data[1];
     PORTA = global_A;   //CSN must be high
     //PORTB = global_B;
 }
@@ -103,12 +83,13 @@ enum {
 int main (void)
 {
     uint8_t state= CLEAR;
-    global_A = 0xff;
-    global_NOTA = ~0;
+    global_A = 0x0f;
+    global_NOTA = 0x0f;
     //global_B = 0;
     //global_NOTB = ~0;
     DDRA = (1 << PA0) | (1 << PA1) | (1 << PA2) | (1 << PA3) | (1 << PA7);
     DDRB = (1 << PB1) | (1 << PB2);
+    PORTA = global_A;
     PCMSK0 = SCK_PIN;      //Watch for clock toggle
     PCMSK1 = CSN_PIN;      //Watch for CSN toggle
     GIMSK  = 1 << PCIE1;   //Enable PCINT1 interrupt
