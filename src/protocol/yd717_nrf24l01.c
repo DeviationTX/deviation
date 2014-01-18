@@ -76,11 +76,9 @@ static u8 tx_id[3];
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
-//static u8 auto_flip; // Channel 6 <= 0 - disabled > 0 - enabled
 static u8 throttle, rudder, elevator, aileron, flags;
+static u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
 
-
-//
 static u8 phase;
 enum {
     YD717_INIT2 = 0,
@@ -91,21 +89,14 @@ enum {
     YD717_DATA
 };
 
-// static u32 bind_count;
-
-//static u8 rf_channels[16];
-
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
 static void packet_ack()
 {
     if (packet_sent) {
-        //bool report_done = false;
-        //    if  (!(radio.read_register(STATUS) & _BV(TX_DS))) { Serial.write("Waiting for radio\n"); report_done = true; }
         while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)) )) ;
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS));
-        //    if (report_done) Serial.write("Done\n");
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
         packet_sent = 0;
     }
 }
@@ -113,8 +104,7 @@ static void packet_ack()
 static void packet_write()
 {
     packet_ack();
-//  yd717 always transmits on same channel    NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL);
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x7F);     // Clear any pending interrupts
+
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, sizeof(packet));
     ++packet_counter;
@@ -135,8 +125,6 @@ static void yd717_init()
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
-//    NRF24L01_WriteReg(NRF24L01_08_OBSERVE_TX, 0x00); // no write bits in this field
-//    NRF24L01_WriteReg(NRF24L01_09_CD, 0x00);         // no write bits in this field
     NRF24L01_WriteReg(NRF24L01_0C_RX_ADDR_P2, 0xC3); // LSB byte of pipe 2 receive address
     NRF24L01_WriteReg(NRF24L01_0D_RX_ADDR_P3, 0xC4);
     NRF24L01_WriteReg(NRF24L01_0E_RX_ADDR_P4, 0xC5);
@@ -149,13 +137,16 @@ static void yd717_init()
     NRF24L01_WriteReg(NRF24L01_16_RX_PW_P5, PAYLOADSIZE);
     NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00); // Just in case, no real bits to write here
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3F);       // Enable dynamic payload length on all pipes
+
+    // this sequence necessary for module from stock tx
+    NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
+    NRF24L01_Activate(0x73);                          // Activate feature register
+    NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3F);       // Enable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);     // Set feature bits on
 
 
-    u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
-//    u8 rx_p1_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
-//    NRF24L01_WriteRegisterMulti(NRF24L01_0B_RX_ADDR_P1, rx_p1_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 
     // Check for Beken BK2421/BK2423 chip
@@ -195,10 +186,6 @@ static void YD717_init2()
 {
     packet_sent = 0;
 
-    // Turn radio power on
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_PWR_UP));
-    NRF24L01_FlushTx();
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x7F);     // Clear any pending interrupts
 
     // Implicit delay in callback
     // delayMicroseconds(150);
@@ -206,6 +193,8 @@ static void YD717_init2()
 
 static void YD717_init3()
 {
+    packet_ack();   // acknowledge last bind packet.  Must be complete before changing address
+
     // set address to prearranged value known to receiver (guessing...)
     u8 rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
@@ -227,7 +216,6 @@ static void YD717_init4()
     packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
 
     // set address
-    u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 }
@@ -265,17 +253,19 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     *throttle = convert_channel(CHANNEL3);
 
     // Channel 4
-    *rudder = convert_channel(CHANNEL4);
+    *rudder = 0xff - convert_channel(CHANNEL4);
 
     // Channel 2
     *elevator = convert_channel(CHANNEL2);
 
     // Channel 1
-    *aileron = convert_channel(CHANNEL1);
+    *aileron = 0xff - convert_channel(CHANNEL1);
 
     // Channel 5
-    if (Channels[CHANNEL5] <= 0) *flags &= ~FLAG_FLIP;
-    else *flags |= FLAG_FLIP;
+    if (Channels[CHANNEL5] <= 0)
+      *flags &= ~FLAG_FLIP;
+    else
+      *flags |= FLAG_FLIP;
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -371,7 +361,6 @@ static u16 yd717_callback()
         phase = YD717_DATA;
         PROTOCOL_SetBindState(0);
         MUSIC_Play(MUSIC_DONE_BINDING);
-        // TODO: YD717 controller puts 2 second delay here - required?
         break;
     case YD717_DATA:
         send_packet(0);
