@@ -96,14 +96,13 @@ static void skyartec_init()
         CC2500_WriteReg(CC2500_2C_TEST2, 0x88);
         CC2500_WriteReg(CC2500_2D_TEST1, 0x31);
         CC2500_WriteReg(CC2500_2E_TEST0, 0x0b);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x0b);
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
         CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
         CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);
         CC2500_WriteReg(CC2500_09_ADDR, 0x43);
         CC2500_WriteReg(CC2500_06_PKTLEN, 0xff);
         CC2500_WriteReg(CC2500_04_SYNC1, 0x13);
         CC2500_WriteReg(CC2500_05_SYNC0, 0x18);
+        CC2500_SetTxRxMode(TX_EN);
         CC2500_Strobe(CC2500_SFTX);
         CC2500_Strobe(CC2500_SFRX);
         CC2500_Strobe(CC2500_SXOFF);

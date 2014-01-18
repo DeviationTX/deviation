@@ -168,8 +168,10 @@ static int hubsan_init()
 
     //Reset VCO Band calibration
     //A7105_WriteReg(0x25, 0x08);
+    A7105_SetTxRxMode(TX_EN);
 
     A7105_SetPower(Model.tx_power);
+
 
     A7105_Strobe(A7105_STANDBY);
     return 1;
@@ -311,6 +313,7 @@ static u16 hubsan_cb()
         }
         //if (i == 20)
         //    printf("Failed to complete write\n");
+        A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
         state++;
@@ -318,6 +321,7 @@ static u16 hubsan_cb()
     case BIND_2:
     case BIND_4:
     case BIND_6:
+        A7105_SetTxRxMode(TX_EN);
         if(A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_1;
             return 4500; //No signal, restart binding procedure.  12msec elapsed since last write
@@ -329,6 +333,7 @@ static u16 hubsan_cb()
         
         return 500;  //8msec elapsed time since last write;
     case BIND_8:
+        A7105_SetTxRxMode(TX_EN);
         if(A7105_ReadReg(A7105_00_MODE) & 0x01) {
             state = BIND_7;
             return 15000; //22.5msec elapsed since last write
@@ -367,6 +372,7 @@ static u16 hubsan_cb()
                     for( i=0; i<10; i++)
                     {
                         if( !(A7105_ReadReg(A7105_00_MODE) & 0x01)) {// wait for tx completion
+                            A7105_SetTxRxMode(RX_EN);
                             A7105_Strobe(A7105_RX); 
                             rfMode = A7105_RX;
                             break;
@@ -386,8 +392,10 @@ static u16 hubsan_cb()
             }
             delay=1000;
         }
-        if (++txState == 8) // 3ms + 7*1ms
+        if (++txState == 8) { // 3ms + 7*1ms
+            A7105_SetTxRxMode(RX_EN);
             txState = 0;
+        }
         return delay;
     }
     return 0;
@@ -417,7 +425,11 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+             CLOCK_StopTimer();
+             A7105_SetTxRxMode(TXRX_OFF);
+             A7105_Strobe(A7105_STANDBY);
+             return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Leds, Flips, Video Recording

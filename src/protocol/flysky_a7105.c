@@ -159,6 +159,7 @@ static int flysky_init()
     //Reset VCO Band calibration
     A7105_WriteReg(0x25, 0x08);
 
+    A7105_SetTxRxMode(TX_EN);
     A7105_SetPower(Model.tx_power);
 
     A7105_Strobe(A7105_STANDBY);

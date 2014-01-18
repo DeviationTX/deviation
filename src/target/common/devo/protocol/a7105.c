@@ -26,9 +26,26 @@
 #include "protocol/interface.h"
 
 #ifdef PROTO_HAS_A7105
-//GPIOA.13
-#define CS_HI() gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin)
-#define CS_LO() gpio_clear(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin)
+
+static void  CS_HI() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
+    }
+}
+
+static void CS_LO() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_clear(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
+    }
+}
 
 void A7105_WriteReg(u8 address, u8 data)
 {
@@ -42,6 +59,14 @@ u8 A7105_ReadReg(u8 address)
 {
     u8 data;
     CS_LO();
+/*    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        //4wire SPI
+        spi_xfer(SPI2, 0x40 | address);
+        data = spi_xfer(SPI2, 0);
+        CS_HI();
+        return data;
+    }
+*/
     spi_xfer(SPI2, 0x40 | address);
     /* Wait for tx completion before spi shutdown */
     while(!(SPI_SR(SPI2) & SPI_SR_TXE))
@@ -108,10 +133,29 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
     return;
 }
 
+/*
+ * 1 - Tx else Rx
+ */
+void A7105_SetTxRxMode(enum TXRX_State mode)
+{
+    if(mode == TX_EN) {
+        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
+        A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x31);
+    } else if (mode == RX_EN) {
+        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x31);
+        A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
+    } else {
+        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x31);
+        A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x31);
+    }
+}
+
 void A7105_Reset()
 {
     A7105_WriteReg(0x00, 0x00);
     usleep(1000);
+    //Set both GPIO as output and low
+    A7105_SetTxRxMode(TXRX_OFF);
 }
 void A7105_WriteID(u32 id)
 {

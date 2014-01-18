@@ -38,6 +38,15 @@ void PWR_Init(void)
     /* When Pin 3 goes high, the user turned off the Tx */
     gpio_set_mode(_PWRSW_PORT, GPIO_MODE_INPUT,
                   GPIO_CNF_INPUT_FLOAT, _PWRSW_PIN);
+
+    /* Disable SWD and set SWD pins as I/O for programable switch */
+    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
+    gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
+    gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
+    gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
+    gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 }
 
 void PWR_Shutdown()

@@ -36,6 +36,7 @@ enum {
     A7105,
     CC2500,
     NRF24L01,
+    PROGSWITCH,
     TX_MODULE_LAST,
 };
 
@@ -178,6 +179,9 @@ u8 *BOOTLOADER_Read(int idx);
 #define PROTO_HAS_NRF24L01
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
+void SPI_ConfigSwitch(u8 csn_high, u8 csn_low);
+int SPI_ProtoGetPinConfig(int module, int state);
+
 struct mcu_pin;
 void MCU_InitModules();
 int MCU_SetPin(struct mcu_pin *, const char *name);

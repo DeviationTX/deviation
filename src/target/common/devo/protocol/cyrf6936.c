@@ -106,9 +106,9 @@ void CYRF_GetMfgData(u8 data[])
 /*
  * 1 - Tx else Rx
  */
-void CYRF_ConfigRxTx(u32 TxRx)
+void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
-    if(TxRx)
+    if(mode == TX_EN)
     {
         CYRF_WriteRegister(0x0E,0x80);
         CYRF_WriteRegister(0x0F,0x2C);
@@ -224,7 +224,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     int j;
     memset(channels, 0, sizeof(u8) * len);
     CYRF_ConfigCRCSeed(0x0000);
-    CYRF_ConfigRxTx(0);
+    CYRF_SetTxRxMode(RX_EN);
     //Wait for pre-amp to switch from sned to receive
     Delay(1000);
     for(i = 0; i < NUM_FREQ; i++) {
@@ -250,5 +250,5 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
             rssi[j] = 0xff;
         }
     }
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
 }

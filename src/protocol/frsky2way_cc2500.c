@@ -63,8 +63,6 @@ static void frsky2way_init(int bind)
 {
         CC2500_Reset();
 
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x06);
         CC2500_WriteReg(CC2500_17_MCSM1, 0x0c);
         CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
         CC2500_WriteReg(CC2500_06_PKTLEN, 0x19);
@@ -100,9 +98,10 @@ static void frsky2way_init(int bind)
         CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
         CC2500_WriteReg(CC2500_09_ADDR, 0x00);
 
+        CC2500_SetTxRxMode(TX_EN);
+        
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
 
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
         CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
         CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04); //Should be 0x05 but the filter isn't working
 
@@ -209,6 +208,7 @@ static u16 frsky2way_cb()
     counter = (counter + 1) % 188;
     if (state == FRSKY_DATA4) {
         //telemetry receive
+        CC2500_SetTxRxMode(RX_EN);
         CC2500_Strobe(CC2500_SIDLE);
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
@@ -221,6 +221,7 @@ static u16 frsky2way_cb()
                 CC2500_ReadData(packet, len);
                 //parse telemetry packet here
             }
+            CC2500_SetTxRxMode(TX_EN);
         }
         CC2500_Strobe(CC2500_SIDLE);
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));

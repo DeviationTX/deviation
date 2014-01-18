@@ -27,8 +27,25 @@
 
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
-#define CS_HI() gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin)
-#define CS_LO() gpio_clear(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin)
+static void  CS_HI() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
+    }
+}
+
+static void CS_LO() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_clear(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
+    }
+}
 
 void CC2500_WriteReg(u8 address, u8 data)
 {
@@ -91,6 +108,19 @@ void CC2500_WriteData(u8 *dpbuffer, u8 len)
     CC2500_Strobe(CC2500_STX);
 }
 
+void CC2500_SetTxRxMode(enum TXRX_State mode)
+{
+    if(mode == TX_EN) {
+        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F | 0x40);
+        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
+    } else if (mode == RX_EN) {
+        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F);
+        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F | 0x40);
+    } else {
+        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F);
+        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
+    }
+}
 void CC2500_Reset()
 {
     CC2500_Strobe(CC2500_SRES);

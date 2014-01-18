@@ -156,6 +156,7 @@ s8 PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
 int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);
+void PROTOCOL_SetSwitch(int module);
 
 /* Input */
 const char *INPUT_SourceName(char *str, unsigned src);

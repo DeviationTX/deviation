@@ -130,4 +130,5 @@ void CC2500_Reset();
 void CC2500_Strobe(u8 cmd);
 void CC2500_WriteData(u8 *packet, u8 length);
 void CC2500_ReadData(u8 *dpbuffer, int len);
+void CC2500_SetTxRxMode(enum TXRX_State);
 #endif

@@ -54,8 +54,6 @@ static void frsky_init()
 {
         CC2500_Reset();
 
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x06);
         CC2500_WriteReg(CC2500_17_MCSM1, 0x0c);
         CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
         CC2500_WriteReg(CC2500_06_PKTLEN, 0xff);
@@ -90,6 +88,8 @@ static void frsky_init()
         CC2500_WriteReg(CC2500_2E_TEST0, 0x0b);
         CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
         CC2500_WriteReg(CC2500_09_ADDR, 0x00);
+
+        CC2500_SetTxRxMode(TX_EN);
 
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
         CC2500_WriteReg(CC2500_02_IOCFG0,   0x06);
