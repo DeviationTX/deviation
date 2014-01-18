@@ -193,26 +193,26 @@ void RTC_GetDateFormatted(char *str, u32 date)
     _RTC_SetDayStart(date);
     switch (format) {
         case 0: // "default" = ISO8601 = YYYY-MM-DD
-            sprintf(str, "%4d-%2d-%2d", today.Year + RTC_STARTYEAR, today.Month + 1, today.Day + 1);
+            sprintf(str, "%4d-%02d-%02d", today.Year + RTC_STARTYEAR, today.Month + 1, today.Day + 1);
             break;
         case 1: // US = MM/DD/YYYY
-            sprintf(str, "%2d/%2d/%4d", today.Month + 1, today.Day + 1, today.Year + RTC_STARTYEAR);
+            sprintf(str, "%02d/%02d/%4d", today.Month + 1, today.Day + 1, today.Year + RTC_STARTYEAR);
             break;
         case 2: // German = DD.MM.JJJJ
-            sprintf(str, "%2d.%2d.%4d", today.Day + 1, today.Month + 1, today.Year + RTC_STARTYEAR);
+            sprintf(str, "%02d.%02d.%4d", today.Day + 1, today.Month + 1, today.Year + RTC_STARTYEAR);
             break;
         case 3: // long US = Mon DD YYYY
         {
-            sprintf(str, "%3s %2d %4d", usmonth[today.Month], today.Day + 1, today.Year + RTC_STARTYEAR);
+            sprintf(str, "%3s %d %4d", usmonth[today.Month], today.Day + 1, today.Year + RTC_STARTYEAR);
             break;
         }
         case 4: // long German = DD. Mon YYYY
         {
-            sprintf(str, "%2d. %3s %4d", today.Day + 1, germanmonth[today.Month], today.Year + RTC_STARTYEAR);
+            sprintf(str, "%02d. %3s %4d", today.Day + 1, germanmonth[today.Month], today.Year + RTC_STARTYEAR);
             break;
         }
         case 5: // German short = DD.MM.JJ
-            sprintf(str, "%2d.%2d.%2d", today.Day + 1, today.Month + 1, (today.Year + RTC_STARTYEAR) % 100);
+            sprintf(str, "%02d.%02d.%2d", today.Day + 1, today.Month + 1, (today.Year + RTC_STARTYEAR) % 100);
             break;
     }
 }
@@ -228,7 +228,7 @@ void RTC_GetMonthFormatted(char *str, unsigned month)
         case 1: // US = MM/DD/YYYY
         case 2: // German = DD.MM.JJJJ
         case 5: // German short = DD.MM.JJ
-            sprintf(str, "%2d", month);
+            sprintf(str, "%02d", month);
             break;
         case 3: // long US = Mon DD YYYY
         {
@@ -261,7 +261,7 @@ void RTC_GetTimeFormattedBigbox(char *str, u32 time)
 void RTC_GetDateFormattedBigbox(char *str, u32 date)
 {
     _RTC_SetDayStart(date);
-    sprintf(str, "%2d.%2d.%2d", today.Day + 1, today.Month + 1, (today.Year + RTC_STARTYEAR) % 100);
+    sprintf(str, "%02d.%02d.%02d", today.Day + 1, today.Month + 1, (today.Year + RTC_STARTYEAR) % 100);
 }
 
 // to avoid sizeof() in rtc_config

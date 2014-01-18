@@ -156,6 +156,7 @@ void PAGE_DatalogInit(int page)
         LCD_WIDTH-1, ITEM_HEIGHT, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                          ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
 #endif //HAS_DATLOG
