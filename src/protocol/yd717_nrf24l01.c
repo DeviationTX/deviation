@@ -433,7 +433,7 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 5L; // T, R, E, A, enable flip
+        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
