@@ -33,8 +33,10 @@ When low rates are chosen the roll and pitch values are limited to 41-BF.
 
 Trim values are sent in three separate bytes.  Trim ranges from 00-7F.
 
-The flag byte is 00 in low rates and 0F in high rates.
-[TODO: Is this an auto-flip control?]
+The flag byte is 00 to disable auto-flip, and 0x0f to enable auto-flip.
+When auto-flip is enabled, full cyclic in any direction causes a flip to be
+executed in that direction.
+
 
 ## Example data packet
 aa bb cc dd ee ff gg hh
