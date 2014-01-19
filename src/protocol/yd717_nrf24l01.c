@@ -76,6 +76,7 @@ static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
 static u8 throttle, rudder, elevator, aileron, flags;
+static u8 rudder_trim, elevator_trim, aileron_trim;
 static u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};  // address used by stock tx
 
 static u8 phase;
@@ -213,25 +214,25 @@ static void YD717_init4()
 
 static u8 convert_channel(u8 num)
 {
+    // Sometimes due to imperfect calibration or mixer settings
+    // throttle can be less than CHAN_MIN_VALUE or larger than
+    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
+    // channels values by min..max range
     s32 ch = Channels[num];
     if (ch < CHAN_MIN_VALUE) {
         ch = CHAN_MIN_VALUE;
     } else if (ch > CHAN_MAX_VALUE) {
         ch = CHAN_MAX_VALUE;
     }
+
     return (u8) (((ch * 0xFF / CHAN_MAX_VALUE) + 0x100) >> 1);
 }
 
-
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
-                          u8* flags)
+                          u8* flags, u8* rudder_trim, u8* elevator_trim, u8* aileron_trim)
 {
-    // Protocol is registered AETRG, that is
-    // Aileron is channel 0, Elevator - 1, Throttle - 2, Rudder - 3
-    // Sometimes due to imperfect calibration or mixer settings
-    // throttle can be less than CHAN_MIN_VALUE or larger than
-    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
-    // channels values by min..max range
+    // Protocol is registered AETRF, that is
+    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
 
     // Channel 3
     *throttle = convert_channel(CHANNEL3);
@@ -250,6 +251,18 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
       *flags &= ~FLAG_FLIP;
     else
       *flags |= FLAG_FLIP;
+
+    // Channel 6
+    // Use 7-bit trim values to implement "high-rate"
+    if (Channels[CHANNEL6] <= 0) {
+      *aileron_trim = 0x40;
+      *elevator_trim = 0x40;
+      *rudder_trim = 0x40;
+    } else {
+      *aileron_trim = *aileron >> 1;
+      *elevator_trim = *elevator >> 1;
+      *rudder_trim = *rudder >> 1;
+    }
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -275,16 +288,14 @@ static void send_packet(u8 bind)
         packet[7] = 0;
     } else {
         // regular packet
-        read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
+        read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &rudder_trim, &elevator_trim, &aileron_trim);
         packet[0] = throttle;
         packet[1] = rudder;
         packet[3] = elevator;
         packet[4] = aileron;
-
-        // Trims, middle is 0x40
-        packet[2] = 0x40; // pitch
-        packet[5] = 0x40; // roll
-        packet[6] = 0x40; // yaw
+        packet[2] = elevator_trim;
+        packet[5] = aileron_trim;
+        packet[6] = rudder_trim;
         packet[7] = flags;
     }
 
@@ -412,8 +423,8 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
+        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable active trims
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         case PROTOCMD_SET_TXPOWER:
