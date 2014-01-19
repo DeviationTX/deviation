@@ -72,7 +72,6 @@ enum {
 
 static u8 packet[PAYLOADSIZE];
 static u8 packet_sent;
-static u8 tx_id[3];
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
@@ -214,13 +213,6 @@ static void YD717_init4()
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 }
 
-static void set_tx_id(u32 id)
-{
-    tx_id[0] = (id >> 16) & 0xFF;
-    tx_id[1] = (id >> 8) & 0xFF;
-    tx_id[2] = (id >> 0) & 0xFF;
-}
-
 static u8 convert_channel(u8 num)
 {
     s32 ch = Channels[num];
@@ -352,6 +344,15 @@ static u16 yd717_callback()
     return PACKET_PERIOD;
 }
 
+
+static void set_rx_tx_addr(u32 id)
+{
+    rx_tx_addr[0] = (id >> 24) & 0xFF;
+    rx_tx_addr[1] = (id >> 16) & 0xFF;
+    rx_tx_addr[2] = (id >>  8) & 0xFF;
+    rx_tx_addr[3] = (id >>  0) & 0xFF;
+}
+
 // Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
 static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
 static const uint32_t LFSR_INTAP = 32-1;
@@ -364,8 +365,8 @@ static void update_lfsr(uint32_t *lfsr, uint8_t b)
     }
 }
 
-// Generate internal id from TX id and manufacturer id (STM32 unique id)
-static void initialize_tx_id()
+// Generate address to use from TX id and manufacturer id (STM32 unique id)
+static void initialize_rx_tx_addr()
 {
     u32 lfsr = 0xb2c54a2ful;
 
@@ -387,22 +388,22 @@ static void initialize_tx_id()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
 
-    set_tx_id(lfsr);
+    set_rx_tx_addr(lfsr);
 }
 
 static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
+    initialize_rx_tx_addr();
     packet_counter = 0;
     packet_sent = 0;
+
     yd717_init();
     phase = YD717_INIT2;
     counter = BIND_COUNT;
+
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
-
-    initialize_tx_id();
-
     CLOCK_StartTimer(50000, yd717_callback);
 }
 
