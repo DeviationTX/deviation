@@ -111,3 +111,42 @@ int fexists(const char *file)
    fclose(fh);
    return 1;
 }
+
+/* USB */
+void wait_press()
+{
+    printf("Wait Press\n");
+    while(1) {
+        CLOCK_ResetWatchdog();
+        u32 buttons = ScanButtons();
+        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
+            break;
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+    printf("Pressed\n");
+}
+
+void wait_release()
+{
+    printf("Wait Release\n");
+    while(1) {
+        CLOCK_ResetWatchdog();
+        u32 buttons = ScanButtons();
+        if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
+            break;
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+    printf("Released\n");
+}
+
+void USB_Connect()
+{
+    USB_Enable(0, 1);
+    wait_release();
+    wait_press();
+    wait_release();
+    USB_Disable();
+}
+

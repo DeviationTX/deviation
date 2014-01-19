@@ -17,33 +17,8 @@ static struct usb_page * const up = &pagemem.u.usb_page;
 
 static void _draw_page(u8 enable);
 
-static void wait_press()
-{
-    printf("Wait Press\n");
-    while(1) {
-        CLOCK_ResetWatchdog();
-        u32 buttons = ScanButtons();
-        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
-            break;
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-    printf("Pressed\n");
-}
-
-static void wait_release()
-{
-    printf("Wait Release\n");
-    while(1) {
-        CLOCK_ResetWatchdog();
-        u32 buttons = ScanButtons();
-        if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
-            break;
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-    printf("Released\n");
-}
+void wait_release();
+void wait_press();
 
 unsigned usb_cb(u32 button, unsigned flags, void *data)
 {
@@ -73,13 +48,4 @@ void PAGE_USBInit(int page)
 void PAGE_USBExit()
 {
     BUTTON_UnregisterCallback(&up->action);
-}
-
-void USB_Connect()
-{
-    USB_Enable(0, 1);
-    wait_release();
-    wait_press();
-    wait_release();
-    USB_Disable();
 }

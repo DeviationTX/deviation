@@ -17,6 +17,7 @@ push
 glob:*.o
 utils/midicsv/csvmidi
 utils/midicsv/midicsv
+utils/progammable_switch/programmer/objs
 .cproject
 .project
 .settings/org.eclipse.cdt.*

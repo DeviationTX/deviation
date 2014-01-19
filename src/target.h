@@ -181,6 +181,9 @@ u8 *BOOTLOADER_Read(int idx);
 void SPI_ProtoInit();
 void SPI_ConfigSwitch(u8 csn_high, u8 csn_low);
 int SPI_ProtoGetPinConfig(int module, int state);
+u32 AVR_StartProgram();
+int AVR_Erase();
+int AVR_Program(u32 address, u8 *data, int pagesize);
 
 struct mcu_pin;
 void MCU_InitModules();
