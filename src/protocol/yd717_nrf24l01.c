@@ -81,8 +81,6 @@ static u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
 static u8 phase;
 enum {
     YD717_INIT2 = 0,
-    YD717_INIT2_NO_BIND,
-    YD717_BIND1,
     YD717_BIND2,
     YD717_BIND3,
     YD717_DATA
