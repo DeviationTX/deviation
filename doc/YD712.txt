@@ -33,18 +33,20 @@ When low rates are chosen the roll and pitch values are limited to 41-BF.
 
 Trim values are sent in three separate bytes.  Trim ranges from 00-7F.
 
-The flag byte is 00 in low rates and 0F in high rates.
-[TODO: Is this an auto-flip control?]
+The flag byte is 00 to disable auto-flip, and 0x0f to enable auto-flip.
+When auto-flip is enabled, full cyclic in any direction causes a flip to be
+executed in that direction.
+
 
 ## Example data packet
 aa bb cc dd ee ff gg hh
 00 80 3C 80 80 47 6C 00
 
 0  aa: throttle (0 is full down)
-1  bb: rudder (0 is full left)
+1  bb: rudder (0 is full right)
 2  cc: elevator trim
 3  dd: elevator (0 is full down)
-4  ee: aileron (0 is full left)
+4  ee: aileron (0 is full right)
 5  ff: aileron trim
 6  gg: rudder trim
 7  hh: flag
