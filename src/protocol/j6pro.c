@@ -207,7 +207,7 @@ static u16 j6pro_cb()
             //no break because we want to send the 1st bind packet now
         case J6PRO_BIND_01:
             CYRF_ConfigRFChannel(0x52);
-            CYRF_ConfigRxTx(1);
+            CYRF_SetTxRxMode(TX_EN);
             //0.062684# 0f 05
             CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
             //0.062684# 0f 05
@@ -222,7 +222,7 @@ static u16 j6pro_cb()
                         break;
             }
             CYRF_ConfigRFChannel(0x53);
-            CYRF_ConfigRxTx(0);
+            CYRF_SetTxRxMode(RX_EN);
             CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x83);
             state = J6PRO_BIND_03_CHECK;
@@ -248,7 +248,7 @@ static u16 j6pro_cb()
                             //Send back Ack
                             packet[0] = 0x05;
                             CYRF_ConfigRFChannel(0x54);
-                            CYRF_ConfigRxTx(1);
+                            CYRF_SetTxRxMode(TX_EN);
                             state = J6PRO_BIND_05_1;
                             return 2000; //2msec
                          }
@@ -284,7 +284,7 @@ static u16 j6pro_cb()
             //return 3750
         case J6PRO_CHAN_4:
             CYRF_ConfigRFChannel(radio_ch[state - J6PRO_CHAN_1]);
-            CYRF_ConfigRxTx(1);
+            CYRF_SetTxRxMode(TX_EN);
             CYRF_WriteDataPacket(packet);
             if (state == J6PRO_CHAN_4) {
                 state = J6PRO_CHAN_1;

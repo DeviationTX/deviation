@@ -58,6 +58,7 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
     #include "protocol.h"
 };
 #undef PROTODEF
+static int get_module(int idx);
 
 void PROTOCOL_Init(u8 force)
 {
@@ -160,6 +161,7 @@ void PROTOCOL_Load(int no_dlg)
     }
     #undef PROTODEF
 #endif
+    PROTOCOL_SetSwitch(get_module(Model.protocol));
 }
  
 u8 PROTOCOL_WaitingForSafe()
@@ -345,4 +347,21 @@ int PROTOCOL_HasPowerAmp(int idx)
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
     return 0;
+}
+
+void PROTOCOL_SetSwitch(int module)
+{
+    if (! Transmitter.module_enable[PROGSWITCH].port)
+        return;
+    u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
+    u8 set    = SPI_ProtoGetPinConfig(module, ENABLED_PIN);
+    for (int i = 0; i < PROGSWITCH; i++) {
+        if (i == module)
+            continue;
+        set |= SPI_ProtoGetPinConfig(i, DISABLED_PIN);
+        set |= SPI_ProtoGetPinConfig(i, CSN_PIN);
+    }
+    u8 csn_high = toggle | set;
+    u8 csn_low  = ~toggle & set;
+    SPI_ConfigSwitch(csn_high, csn_low);
 }

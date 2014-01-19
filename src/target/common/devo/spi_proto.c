@@ -25,10 +25,71 @@
 #include "common.h"
 #include "devo.h"
 #include "config/tx.h"
+#include "protocol/interface.h"
 #include <stdlib.h>
+
+void SPI_ConfigSwitch(u8 csn_high, u8 csn_low)
+{
+    int i;
+    spi_disable(SPI2);
+    //SCK is now on output
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+    gpio_clear(GPIOB, GPIO13); // It should already be clear, but whatever
+    for(i = 0; i < 100; i++)
+        asm volatile ("nop");
+    gpio_set(GPIOB, GPIO13);
+    for(i = 0; i < 100; i++)
+        asm volatile ("nop");
+    gpio_clear(GPIOB, GPIO13);
+    //Switch back to SPI
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
+    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
+    spi_enable(SPI2);
+    //Finally ready to send a command
+    
+    spi_xfer(SPI2, csn_high); //Set all other pins high
+    spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
+    for(i = 0; i < 100; i++)
+        asm volatile ("nop");
+    //Reset transfer speed
+    spi_disable(SPI2);
+    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
+    spi_enable(SPI2);
+}
+
+int SPI_ProtoGetPinConfig(int module, int state) {
+    if (Transmitter.module_enable[module].port != SWITCH_ADDRESS)
+        return 0;
+    if(state == CSN_PIN)
+        return 1 << (Transmitter.module_enable[module].pin & 0x0F);
+    if(state == ENABLED_PIN) {
+        if(module == NRF24L01) {
+            return 1 << ((Transmitter.module_enable[module].pin >> 8) & 0x0F);
+        }
+        return 0;
+    }
+    if(state == DISABLED_PIN) {
+        return 0;
+    }
+    if(state == RESET_PIN) {
+        if (module == CYRF6936)
+            return 1 << ((Transmitter.module_enable[module].pin >> 8) & 0x0F);
+        return 0;
+    }
+    return 0;
+}
 
 void SPI_ProtoInit()
 {
+    const char * const modules[PROGSWITCH] = {
+        [CYRF6936] = "CYRF",
+        [A7105]    = "A7105",
+        [CC2500]   = "CC2500",
+        [NRF24L01] = "nRF24L01",
+    };
+
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
@@ -48,52 +109,36 @@ void SPI_ProtoInit()
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
     gpio_clear(GPIOB, GPIO11);
-    if(Transmitter.module_enable[CYRF6936].port) {
-        struct mcu_pin *port = &Transmitter.module_enable[CYRF6936];
-        printf("CYRF port: %08x pin: %04x\n", port->port, port->pin);
-        //GPIOB.12
-        gpio_set_mode(Transmitter.module_enable[CYRF6936].port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[CYRF6936].pin);
-        gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
-    }
 
-    //Disable JTAG and SWD
+#if 0 //In power.c
+    //Disable JTAG and SWD and set both pins high
     AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
-
-    /* A7105 */
-#ifdef PROTO_HAS_A7105
-    if(Transmitter.module_enable[A7105].port) {
-        //GPIOA.13
-        struct mcu_pin *port = &Transmitter.module_enable[A7105];
-        printf("A7105 port: %08x pin: %04x\n", port->port, port->pin);
-        gpio_set_mode(Transmitter.module_enable[A7105].port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[A7105].pin);
-        gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
-    }
+    gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
+    gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
+    gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
+    gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
 
-    /* CC2500 */
-#ifdef PROTO_HAS_CC2500
-    if(Transmitter.module_enable[CC2500].port) {
-        //GPIOA.14
-        struct mcu_pin *port = &Transmitter.module_enable[CC2500];
-        printf("CC2500 port: %08x pin: %04x\n", port->port, port->pin);
-        gpio_set_mode(Transmitter.module_enable[CC2500].port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[CC2500].pin);
-        gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
+    if(Transmitter.module_enable[PROGSWITCH].port) {
+        struct mcu_pin *port = &Transmitter.module_enable[PROGSWITCH];
+        printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
+        gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
+        gpio_set(port->port, port->pin);
     }
-#endif
-    /* NRF24L01 */
-#ifdef PROTO_HAS_NRF24L01
-    if(Transmitter.module_enable[NRF24L01].port) {
-        //GPIOA.14
-        struct mcu_pin *port = &Transmitter.module_enable[NRF24L01];
-        printf("nRF24L01 port: %08x pin: %04x\n", port->port, port->pin);
-        gpio_set_mode(Transmitter.module_enable[NRF24L01].port, GPIO_MODE_OUTPUT_50_MHZ,
-                      GPIO_CNF_OUTPUT_PUSHPULL, Transmitter.module_enable[NRF24L01].pin);
-        gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
+    for (int i = 0; i < PROGSWITCH; i++) {
+        if(Transmitter.module_enable[i].port
+           && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
+        {
+            struct mcu_pin *port = &Transmitter.module_enable[i];
+            printf("%s port: %08x pin: %04x\n", modules[i], port->port, port->pin);
+            gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
+            gpio_set(port->port, port->pin);
+        }
     }
-#endif
     /* Includes enable? */
     spi_init_master(SPI2, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
@@ -105,6 +150,18 @@ void SPI_ProtoInit()
     spi_set_nss_high(SPI2);
     spi_enable(SPI2);
 
+#ifndef MODULAR
+    //Need to figure out how to do this given the protocols are loaded as modules
+    //We want to set up modules for low-power mode
+    if (Transmitter.module_enable[A7105].port) {
+        PROTOCOL_SetSwitch(A7105);
+        A7105_SetTxRxMode(TXRX_OFF);
+    }
+    if (Transmitter.module_enable[CC2500].port) {
+        PROTOCOL_SetSwitch(CC2500);
+        CC2500_SetTxRxMode(TXRX_OFF);
+    }
+#endif
     PROTO_Stubs(0);
 }
 
@@ -138,6 +195,9 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
         case 'G':
         case 'g':
             port->port = GPIOG; break;
+        case 'S':
+        case 's':
+            port->port = SWITCH_ADDRESS; break;
         default:
             if(strcasecmp(name, "None") == 0) {
                 port->port = 0;
@@ -146,10 +206,14 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
             }
             return 0;
     }
-    int x = atoi(name+1);
-    if (x > 15)
-        return 0;
-    port->pin = 1 << x;
+    if (port->port != SWITCH_ADDRESS) {
+        int x = atoi(name+1);
+        if (x > 15)
+            return 0;
+         port->pin = 1 << x;
+    } else {
+        port->pin = strtol(name+1,NULL, 16);
+    }
     printf("port: %08x pin: %04x\n", port->port, port->pin);
     return 1;
 }
@@ -168,9 +232,14 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
         default: return "None"; break;
     }
 */
-    str[0] = 'A' + ((port->port - GPIOA) / (GPIOB - GPIOA));
-    if (str[0] > 'G')
-        return "None";
+    if (port->port == SWITCH_ADDRESS) {
+        sprintf(str, "S%4x", port->pin);
+        return str;
+    } else {
+        str[0] = 'A' + ((port->port - GPIOA) / (GPIOB - GPIOA));
+        if (str[0] > 'G')
+            return "None";
+    }
     for(int i = 0; i < 16; i++) {
         if(port->pin == (1 << i)) {
             sprintf(str+1, "%d", i);

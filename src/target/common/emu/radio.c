@@ -103,6 +103,16 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
     }
     return "None";
 }
+
+void SPI_ConfigSwitch(u8 csn_high, u8 csn_low) {
+    (void)csn_high;
+    (void)csn_low;
+}
+int SPI_ProtoGetPinConfig(int module, int state) {
+    (void)module;
+    (void)state;
+    return 0;
+}
 #ifdef PROTO_HAS_A7105
 void A7105_WriteReg(u8 addr, u8 value)
 {
@@ -164,6 +174,9 @@ void A7105_Strobe(enum A7105_State state)
     (void)state;
     //send(state)//
 }
+void A7105_SetTxRxMode(enum TXRX_State State) {
+    printf("Switching to %s mode\n", State ? "transmit" : "receive");
+}
 #endif
 
 #ifdef PROTO_HAS_CC2500
@@ -192,6 +205,9 @@ void CC2500_ReadData(u8 *dpbuffer, int len)
     memset(dpbuffer, 0, len);
 }
 
+void CC2500_SetTxRxMode(enum TXRX_State State) {
+    printf("Switching to %s mode\n", State ? "transmit" : "receive");
+}
 #endif //PROTO_HAS_CC2500
 /* CYRF */
 void CYRF_Initialize() {}
@@ -241,8 +257,8 @@ u8 CYRF_ReadRegister(u8 addr) {
     return 0;
 }
 void CYRF_WriteRegister(u8 addr, u8 data) {(void)addr; (void)data;}
-void CYRF_ConfigRxTx(u32 TxRx) {
-    printf("Switching to %s mode\n", TxRx ? "transmit" : "receive");
+void CYRF_SetTxRxMode(enum TXRX_State State) {
+    printf("Switching to %s mode\n", State ? "transmit" : "receive");
 }
 void CYRF_ConfigRFChannel(u8 ch) {
     printf("Changed channel to %02x\n", ch);

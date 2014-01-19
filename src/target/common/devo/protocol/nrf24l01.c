@@ -42,11 +42,28 @@
 #define NOP           0xFF
 
 //GPIOA.14
-#define CS_HI() gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin)
-#define CS_LO() gpio_clear(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin)
 
 static u8 rf_setup;
 
+static void  CS_HI() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
+    }
+}
+
+static void CS_LO() {
+    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    } else {
+        gpio_clear(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
+    }
+}
 void NRF24L01_Initialize()
 {
     rf_setup = 0x0F;

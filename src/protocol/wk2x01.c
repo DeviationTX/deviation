@@ -528,7 +528,7 @@ static void initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
     set_radio_channels();
     radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);

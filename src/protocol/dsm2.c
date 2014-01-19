@@ -582,7 +582,7 @@ static u16 dsm2_cb()
         //Select channels and configure for writing data
         //CYRF_FindBestChannels(ch, 2, 10, 1, 79);
         cyrf_configdata();
-        CYRF_ConfigRxTx(1);
+        CYRF_SetTxRxMode(TX_EN);
         chidx = 0;
         crcidx = 0;
         state = DSM2_CH1_WRITE_A;
@@ -618,7 +618,7 @@ static u16 dsm2_cb()
         }
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
             state++;
-            CYRF_ConfigRxTx(0); //Receive mode
+            CYRF_SetTxRxMode(RX_EN); //Receive mode
             CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
@@ -651,7 +651,7 @@ static u16 dsm2_cb()
             state = DSM2_CH1_WRITE_B;
         else
             state = DSM2_CH1_WRITE_A;
-        CYRF_ConfigRxTx(1); //Write mode
+        CYRF_SetTxRxMode(TX_EN); //Write mode
         set_sop_data_crc();
         return READ_DELAY;
     } 
@@ -718,7 +718,7 @@ static void initialize(u8 bind)
 
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DSM);
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
     if (bind) {
         state = DSM2_BIND;
         PROTOCOL_SetBindState((BIND_COUNT > 200 ? BIND_COUNT / 2 : 200) * 10); //msecs

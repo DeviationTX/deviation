@@ -79,7 +79,13 @@ static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
 static const char MODULE_HAS_PA[] = "has_pa";
-static const char * const MODULE_NAME[4] = {"cyrf6936", "a7105", "cc2500", "nrf24l01"};
+static const char * const MODULE_NAME[TX_MODULE_LAST] = {
+      [CYRF6936] = "cyrf6936",
+      [A7105]    = "a7105",
+      [CC2500]   = "cc2500",
+      [NRF24L01] = "nrf24l01",
+      [PROGSWITCH] = "switch",
+      };
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0

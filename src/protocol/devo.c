@@ -316,7 +316,7 @@ static void cyrf_set_bound_sop_code()
     if(! crc)
         crc = 1;
     u8 sopidx = (0xff &((cyrfmfg_id[0] << 2) + cyrfmfg_id[1] + cyrfmfg_id[2])) % 10;
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
     CYRF_ConfigCRCSeed((crc << 8) + crc);
     CYRF_ConfigSOPCode(sopcodes[sopidx]);
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
@@ -441,7 +441,7 @@ static u16 devo_telemetry_cb()
             delay = 1500;
             txState = 15;
         } else {
-            CYRF_ConfigRxTx(0); //Receive mode
+            CYRF_SetTxRxMode(RX_EN); //Receive mode
             CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
         }
@@ -467,7 +467,7 @@ static u16 devo_telemetry_cb()
     }
     txState++;
     if(txState == 16) { //2.3msec have passed
-        CYRF_ConfigRxTx(1); //Write mode
+        CYRF_SetTxRxMode(TX_EN); //Write mode
         if(pkt_num == 0) {
             //Keep tx power updated
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
@@ -522,7 +522,7 @@ static void initialize()
     CYRF_Reset();
     cyrf_init();
     CYRF_GetMfgData(cyrfmfg_id);
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
     CYRF_ConfigCRCSeed(0x0000);
     CYRF_ConfigSOPCode(sopcodes[0]);
     set_radio_channels();
