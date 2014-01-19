@@ -145,8 +145,12 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x31);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
     } else {
-        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x31);
-        A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x31);
+        //The A7105 seems to some with a cross-wired power-amp (A7700)
+        //On the XL7105-D03, TX_EN -> RXSW and RX_EN -> TXSW
+        //This means that sleep mode is wired as RX_EN = 1 and TX_EN = 1
+        //If there are other amps in use, we'll need to fix this
+        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
+        A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
     }
 }
 

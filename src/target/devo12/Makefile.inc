@@ -4,7 +4,7 @@ DFU_ARGS   := -c 12 -b 0x08004000
 
 PRE_FS = $(ODIR)/.pre_fs
 
-include target/common/devo/Makefile.inc
+include $(SDIR)/target/common/devo/Makefile.inc
 
 ifndef BUILD_TARGET
 ALL += $(TARGET)-lib.dfu

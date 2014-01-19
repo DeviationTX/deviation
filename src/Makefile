@@ -7,7 +7,7 @@ MAKEFLAGS += --no-builtin-rules
 TARGET   ?= devo8
 PROGMODE ?= STATUS_SCREEN
 NUM_MODELS ?= 30
-
+SDIR := .
 include target/$(TARGET)/Makefile.inc
 
 TYPE     ?= prd
