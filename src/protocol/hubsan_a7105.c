@@ -393,7 +393,7 @@ static u16 hubsan_cb()
             delay=1000;
         }
         if (++txState == 8) { // 3ms + 7*1ms
-            A7105_SetTxRxMode(RX_EN);
+            A7105_SetTxRxMode(TX_EN);
             txState = 0;
         }
         return delay;

@@ -105,3 +105,28 @@ int AVR_Program(u32 address, u8 *data, int pagesize)
     }
     return 1;
 }
+
+int AVR_SetFuses()
+{
+    int data;
+    spi_xfer(SPI2, 0x50);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0x00);
+    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    if (data == 0xe2)
+        return 1; //already programmed
+    if (data != 0x62)
+        return 0; //Fuse bits aren't properly set
+    spi_xfer(SPI2, 0xAC);
+    spi_xfer(SPI2, 0xA0);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0xe2); //disable divclkby8
+    usleep(4500);
+    spi_xfer(SPI2, 0x50);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0x00);
+    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    if (data != 0xe2)
+        return 0;
+    return 1;
+}

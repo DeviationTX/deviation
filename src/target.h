@@ -184,6 +184,7 @@ int SPI_ProtoGetPinConfig(int module, int state);
 u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);
+int AVR_SetFuses();
 
 struct mcu_pin;
 void MCU_InitModules();

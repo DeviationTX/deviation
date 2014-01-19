@@ -125,6 +125,16 @@ int main() {
         }
         i += avr->page_size;
     }
+#if 0
+    //Untested
+    sprintf(tempstring, "%s\n3. Setting Fuses", avr_str);
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(0,0, tempstring);
+    if(!AVR_SetFuses()) {
+        sprintf(tempstring, "%s\nERR: Couldn't set fuses", avr_str);
+        error(tempstring);
+    }
+#endif
     sprintf(tempstring, "%s\n3. Done", avr_str);
     LCD_Clear(0x0000);
     LCD_PrintStringXY(0,0, tempstring);
