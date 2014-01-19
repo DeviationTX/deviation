@@ -178,32 +178,26 @@ static void yd717_init()
     }
     NRF24L01_Activate(0x53); // switch bank back
 
+    packet_sent = 0;
+
     // Implicit delay in callback
     // delay(50);
 }
 
-static void YD717_init2()
-{
-    packet_sent = 0;
-
-
-    // Implicit delay in callback
-    // delayMicroseconds(150);
-}
 
 static void YD717_init3()
 {
     packet_ack();   // acknowledge last bind packet.  Must be complete before changing address
 
     // set address to prearranged value known to receiver (guessing...)
-    u8 rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
+    u8 bind_rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_rx_tx_addr, 5);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_rx_tx_addr, 5);
 
-    packet[0]= 0x29; // send address to use in first 4 bytes
-    packet[1]= 0xC3;
-    packet[2]= 0x21;
-    packet[3]= 0x11;
+    packet[0]= rx_tx_addr[0]; // send address to use in first 4 bytes
+    packet[1]= rx_tx_addr[1];
+    packet[2]= rx_tx_addr[2];
+    packet[3]= rx_tx_addr[3];
     packet[4]= 0x56; // fixed value
     packet[5]= 0xAA; // fixed value
     packet[6]= 0x32; // fixed - same as trim values in bind packets...
@@ -330,23 +324,11 @@ static u16 yd717_callback()
 {
     switch (phase) {
     case YD717_INIT2:
-        YD717_init2();
         MUSIC_Play(MUSIC_TELEMALARM1);
-//        phase = YD717_BIND1;
         phase = YD717_BIND2;
         return 150;
         break;
-    case YD717_INIT2_NO_BIND:
-        YD717_init2();
-        phase = YD717_DATA;
-        return 150;
-        break;
-    case YD717_BIND1:
-        send_packet(1);
-        if (throttle >= 240) phase = YD717_BIND2;
-        break;
     case YD717_BIND2:
-//        if (throttle == 0) {
         if (--counter == 0) {
             YD717_init3();    // send rx/tx address to use on fixed bind address
             phase = YD717_BIND3;
@@ -408,18 +390,16 @@ static void initialize_tx_id()
     set_tx_id(lfsr);
 }
 
-static void initialize(u8 bind)
+static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     packet_counter = 0;
     packet_sent = 0;
     yd717_init();
-    phase = bind ? YD717_INIT2 : YD717_INIT2_NO_BIND;
-    if (bind) {
-        counter = BIND_COUNT;
-        PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
-    }
+    phase = YD717_INIT2;
+    counter = BIND_COUNT;
+    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
 
     initialize_tx_id();
 
@@ -429,10 +409,10 @@ static void initialize(u8 bind)
 const void *YD717_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(1); return 0;
+        case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Never Autobind
-        case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+        case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         // TODO: return id correctly
