@@ -77,7 +77,7 @@ static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
 static u8 throttle, rudder, elevator, aileron, flags;
-static u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
+static const u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
 
 static u8 phase;
 enum {

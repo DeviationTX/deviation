@@ -78,7 +78,7 @@ u8 NRF24L01_WriteReg(u8 reg, u8 data)
     return res;
 }
 
-u8 NRF24L01_WriteRegisterMulti(u8 reg, u8 data[], u8 length)
+u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
 {
     CS_LO();
     u8 res = spi_xfer(SPI2, W_REGISTER | ( REGISTER_MASK & reg));
