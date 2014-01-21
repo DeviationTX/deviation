@@ -42,7 +42,6 @@ const char POWER_ALARM[] = "power_alarm";
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
 const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
-const char SWITCH_CFG[] = "switch_cfg";
 
 const char SPLASH_DELAY[] = "splash_delay";
 const char CLOCK_12HR[] = "12hr_clock";
@@ -77,32 +76,11 @@ static const char * const TELEM_TEMP_VAL[2] = { "celcius", "farenheit"};
 static const char TELEM_LENGTH[] = "length";
 static const char * const TELEM_LENGTH_VAL[2] = { "meters", "feet" };
 
-/* Section: TX Module */
-static const char SECTION_MODULES[] = "modules";
-static const char MODULE_ENABLE_PIN[] = "enable";
-static const char MODULE_HAS_PA[] = "has_pa";
-static const char * const MODULE_NAME[TX_MODULE_LAST] = {
-      [CYRF6936] = "cyrf6936",
-      [A7105]    = "a7105",
-      [CC2500]   = "cc2500",
-      [NRF24L01] = "nrf24l01",
-      [PROGSWITCH] = "switch",
-      };
-
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
 #define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
 #define MATCH_KEY(s)     strcasecmp(name,    s) == 0
 #define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
-
-static int get_module_index(const char *str)
-{
-    for(int i = 0; i < TX_MODULE_LAST; i++) {
-        if (strcasecmp(str, MODULE_NAME[i]) == 0)
-            return i;
-    }
-    return -1;
-}
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
@@ -161,9 +139,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 	if (MATCH_KEY(SPLASH_DELAY)) {
             t->splash_delay = atoi(value);
             return 1;
-        }
-        if (MATCH_KEY(SWITCH_CFG)) {
-            CHAN_SetSwitchCfg(value);
         }
     #if HAS_RTC
         if (MATCH_KEY(TIME_FORMAT)) {
@@ -254,23 +229,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
     }
-    if(MATCH_SECTION(SECTION_MODULES)) {
-        if(MATCH_START(name, MODULE_ENABLE_PIN)) {
-            int pin = get_module_index(name+sizeof(MODULE_ENABLE_PIN));
-            if(pin >= 0) {
-                if (MCU_SetPin(&t->module_enable[pin], value))
-                    return 1;
-            }
-        }
-        if(MATCH_START(name, MODULE_HAS_PA)) {
-            int pin = get_module_index(name+sizeof(MODULE_HAS_PA));
-            if(pin >= 0) {
-               int v = value_int ? 1 : 0;
-               t->module_poweramp = (t->module_poweramp & ~(1 << pin)) | (v << pin);
-               return 1;
-            }
-        }
-    }
     printf("Unknown values section: %s key: %s\n", section, name);
     return 0;
 }
@@ -299,17 +257,10 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
-    fprintf(fh, "%s=%s\n", SWITCH_CFG, CHAN_GetSwitchCfg);
 #if HAS_RTC
     fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtcflags & TIMEFMT);
     fprintf(fh, "%s=%d\n", DATE_FORMAT, (Transmitter.rtcflags & DATEFMT) >> 4);
 #endif
-    fprintf(fh, "[%s]\n", SECTION_MODULES);
-    for(i = 0; i < TX_MODULE_LAST; i++) {
-        char str[10];
-        fprintf(fh, "  %s-%s=%s\n", MODULE_ENABLE_PIN,MODULE_NAME[i], MCU_GetPinName(str, &Transmitter.module_enable[i]));
-        fprintf(fh, "  %s-%s=%d\n", MODULE_HAS_PA, MODULE_NAME[i], (Transmitter.module_poweramp & (1 << i)) ? 1 : 0);
-    }
     for(i = 0; i < INP_HAS_CALIBRATION; i++) {
         fprintf(fh, "[%s%d]\n", SECTION_CALIBRATE, i+1);
         fprintf(fh, "  %s=%d\n", CALIBRATE_MAX, t->calibration[i].max);
@@ -359,6 +310,7 @@ void CONFIG_LoadTx()
     Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
     CHAN_SetSwitchCfg("");
     MCU_InitModules();
+    CONFIG_LoadHardware();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));
     return;
@@ -371,12 +323,4 @@ void CONFIG_SaveTxIfNeeded()
         return;
     crc32 = newCrc;
     CONFIG_WriteTx();
-}
-__attribute__((weak)) void CHAN_SetSwitchCfg(const char *str)
-{
-    (void)str;
-}
-__attribute__((weak)) const char *CHAN_GetSwitchCfg()
-{
-    return "";
 }

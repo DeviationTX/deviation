@@ -112,13 +112,3 @@ void CHAN_SetSwitchCfg(const char *str)
         Transmitter.ignore_src = SWITCH_NONE;
     }
 }
-const char *CHAN_GetSwitchCfg()
-{
-    if (Transmitter.ignore_src == SWITCH_3x2)
-        return "3x2";
-    if (Transmitter.ignore_src == SWITCH_2x2)
-        return "2x2";
-    if (Transmitter.ignore_src == SWITCH_3x1)
-        return "3x1";
-    return "";
-}

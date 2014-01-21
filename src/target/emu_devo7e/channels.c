@@ -15,6 +15,7 @@
 #include "common.h"
 #include "../common/emu/fltk.h"
 #include "mixer.h"
+#include "config/tx.h"
 
 #define SWITCH_3x2  0
 #define SWITCH_2x2  ((1 << INP_SWA2) | (1 << INP_SWB2))

@@ -217,34 +217,3 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
     printf("port: %08x pin: %04x\n", port->port, port->pin);
     return 1;
 }
-
-const char *MCU_GetPinName(char *str, struct mcu_pin *port)
-{
-/*
-    switch(port->port) {
-        case GPIOA: str[0] = 'A'; break;
-        case GPIOB: str[0] = 'B'; break;
-        case GPIOC: str[0] = 'C'; break;
-        case GPIOD: str[0] = 'D'; break;
-        case GPIOE: str[0] = 'E'; break;
-        case GPIOF: str[0] = 'F'; break;
-        case GPIOG: str[0] = 'G'; break;
-        default: return "None"; break;
-    }
-*/
-    if (port->port == SWITCH_ADDRESS) {
-        sprintf(str, "S%4x", port->pin);
-        return str;
-    } else {
-        str[0] = 'A' + ((port->port - GPIOA) / (GPIOB - GPIOA));
-        if (str[0] > 'G')
-            return "None";
-    }
-    for(int i = 0; i < 16; i++) {
-        if(port->pin == (1 << i)) {
-            sprintf(str+1, "%d", i);
-            return str;
-        }
-    }
-    return "None";
-}
