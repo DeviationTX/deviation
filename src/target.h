@@ -2,6 +2,7 @@
 #define _TARGET_H_
 //#define printf if(0) printf
 
+#define OPTIONAL 2
 //Load target-specific include
 #include "target_defs.h"
 

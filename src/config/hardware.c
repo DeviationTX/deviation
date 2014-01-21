@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char SWITCH_CFG[] = "extra_switches";
+const char SWITCH_CFG[] = "extra-switches";
+const char HAPTIC_ENABLE[] = "enable-haptic";
 /* Section: TX Module */
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
@@ -49,10 +50,18 @@ static int get_module_index(const char *str)
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     (void)user;
+    s32 value_int = atoi(value);
     if (section[0] == '\0') {
         if (MATCH_KEY(SWITCH_CFG)) {
             CHAN_SetSwitchCfg(value);
         }
+#if HAS_VIBRATINGMOTOR == OPTIONAL
+        //Only configure this if the motor isn't stock
+        if (MATCH_KEY(HAPTIC_ENABLE)) {
+            if (value_int)
+                Transmitter.extra_hardware |= VIBRATING_MOTOR;
+        }
+#endif
         return 1;
     }
     if(MATCH_SECTION(SECTION_MODULES)) {
@@ -66,7 +75,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         if(MATCH_START(name, MODULE_HAS_PA)) {
             int pin = get_module_index(name+sizeof(MODULE_HAS_PA));
             if(pin >= 0) {
-               s32 value_int = atoi(value);
                int v = value_int ? 1 : 0;
                Transmitter.module_poweramp = (Transmitter.module_poweramp & ~(1 << pin)) | (v << pin);
                return 1;

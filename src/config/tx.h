@@ -28,6 +28,10 @@ struct mcu_pin {
     u16 pin;
 };
 
+enum ExtraHardware {
+    VIBRATING_MOTOR = 0x01,
+};
+
 // bitmap for rtcflags:
 #define CLOCK12HR 0x01  //0b00000001
 #define TIMEFMT   0x0F  //0b00001111
@@ -39,7 +43,10 @@ struct Transmitter {
     u8 contrast;
     u8 telem;
     u8 music_shutdown;
-    u8 addtl_switches;
+#if HAS_VIBRATINGMOTOR == OPTIONAL
+    //Only enable this when this is an add-on
+    u8 extra_hardware;
+#endif
     enum Mode mode;
     u16 batt_alarm;
     u8 power_alarm;

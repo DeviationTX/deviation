@@ -14,7 +14,7 @@
 #define HAS_TELEMETRY       1
 #define HAS_TOUCH           1
 #define HAS_RTC             0
-#define HAS_VIBRATINGMOTOR  0
+#define HAS_VIBRATINGMOTOR  OPTIONAL
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
 

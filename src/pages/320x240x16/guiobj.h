@@ -317,6 +317,11 @@ struct tx_obj {
              guiTextSelect_t temp;
              guiLabel_t lengthlbl;
              guiTextSelect_t length;
+             //These are for the virating motor which may or may-not be installed
+             guiLabel_t head3_3;
+             guiLabel_t viblbl;
+             guiTextSelect_t vib;
+
         } g3;
     } u;
 };
