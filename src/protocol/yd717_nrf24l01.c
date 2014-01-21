@@ -77,7 +77,7 @@ static u32 packet_counter;
 static u8 tx_power;
 static u8 throttle, rudder, elevator, aileron, flags;
 static u8 rudder_trim, elevator_trim, aileron_trim;
-static u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};  // address used by stock tx
+static u8 rx_tx_addr[5];
 
 static u8 phase;
 enum {
@@ -239,30 +239,21 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
 
     // Channel 4
     *rudder = 0xff - convert_channel(CHANNEL4);
+    *rudder_trim = *rudder >> 1;
 
     // Channel 2
     *elevator = convert_channel(CHANNEL2);
+    *elevator_trim = *elevator >> 1;
 
     // Channel 1
     *aileron = 0xff - convert_channel(CHANNEL1);
+    *aileron_trim = *aileron >> 1;
 
     // Channel 5
     if (Channels[CHANNEL5] <= 0)
       *flags &= ~FLAG_FLIP;
     else
       *flags |= FLAG_FLIP;
-
-    // Channel 6
-    // Use 7-bit trim values to implement "high-rate"
-    if (Channels[CHANNEL6] <= 0) {
-      *aileron_trim = 0x40;
-      *elevator_trim = 0x40;
-      *rudder_trim = 0x40;
-    } else {
-      *aileron_trim = *aileron >> 1;
-      *elevator_trim = *elevator >> 1;
-      *rudder_trim = *rudder >> 1;
-    }
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -360,6 +351,7 @@ static void set_rx_tx_addr(u32 id)
     rx_tx_addr[1] = (id >> 16) & 0xFF;
     rx_tx_addr[2] = (id >>  8) & 0xFF;
     rx_tx_addr[3] = (id >>  0) & 0xFF;
+    rx_tx_addr[4] = 0xC1; // always uses first data port
 }
 
 // Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
@@ -423,8 +415,8 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable active trims
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         case PROTOCMD_SET_TXPOWER:
