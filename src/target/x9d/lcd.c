@@ -103,7 +103,7 @@ void lcd_delay(volatile unsigned int ms)
     ms--;
   }
 }
-void LCD_Contrast(u8 contrast)
+void LCD_Contrast(unsigned contrast)
 {
     AspiCmd(0x81);	//Set Vop
     contrast *= 25 + 5;

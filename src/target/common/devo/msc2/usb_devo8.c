@@ -74,7 +74,7 @@ void HID_Init() {
     User_Standard_Requests = &HID_User_Standard_Requests;
 }
 #endif
-void USB_Enable(u8 type, u8 use_interrupt)
+void USB_Enable(unsigned type, unsigned use_interrupt)
 {
     if (type == 0) {
         //Mass Storage

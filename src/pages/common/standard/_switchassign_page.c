@@ -52,11 +52,10 @@ static const char *switch_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     FunctionSwitch switch_type = (long)data;
-    int first = INP_HAS_CALIBRATION+1;
-    int last = INP_LAST-1;
-    int newval = GUI_TextSelectHelper(switch_idx[switch_type], first, last, dir, 1, 1, NULL);
-    switch_idx[switch_type] = INPUT_GetAbbrevSource(switch_idx[switch_type], newval, dir);
+    int sw = INPUT_SelectAbbrevSource(switch_idx[switch_type], dir);
+    if (sw < INP_HAS_CALIBRATION+1)
+        sw = INP_HAS_CALIBRATION+1;
+    switch_idx[switch_type] = sw;
     return INPUT_SourceNameAbbrevSwitch(tempstring, switch_idx[switch_type]);
 }
-
 

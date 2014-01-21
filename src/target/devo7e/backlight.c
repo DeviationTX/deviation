@@ -42,7 +42,7 @@ void BACKLIGHT_Init()
     timer_enable_preload(TIM3);
 }
 
-void BACKLIGHT_Brightness(u8 brightness)
+void BACKLIGHT_Brightness(unsigned brightness)
 {
     timer_disable_counter(TIM3);
     if (brightness == 0) {

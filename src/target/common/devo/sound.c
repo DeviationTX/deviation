@@ -55,7 +55,7 @@ void SOUND_Init()
     VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
 }
 
-void SOUND_SetFrequency(u16 frequency, u8 volume)
+void SOUND_SetFrequency(unsigned frequency, unsigned volume)
 {
     if (volume == 0) {
         //We need to keep the timer running (for the vibration motor, but also in case there is a pause in the music)
@@ -76,13 +76,13 @@ void SOUND_SetFrequency(u16 frequency, u8 volume)
     timer_set_oc_value(_SOUND_TIM, _SOUND_TIM_OC, duty_cycle);
 }
 
-void SOUND_Start(u16 msec, u16(*next_note_cb)())
+void SOUND_Start(unsigned msec, u16(*next_note_cb)())
 {
     SOUND_StartWithoutVibrating(msec, next_note_cb);
     VIBRATINGMOTOR_Start();
 }
 
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)())
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)())
 {
     CLOCK_SetMsecCallback(TIMER_SOUND, msec);
     Callback = next_note_cb;
@@ -102,7 +102,7 @@ u32 SOUND_Callback()
         SOUND_Stop();
         return 0;
     }
-    u16 msec = Callback();
+    unsigned msec = Callback();
     if(! msec)
         SOUND_Stop();
     return msec;

@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-u16 ADC_Read(u8 channel);
+unsigned ADC_Read(unsigned channel);
 volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
 #define WINDOW_SIZE 10
 #define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
@@ -92,7 +92,7 @@ void ADC_Init(void)
     adc_start_conversion_direct(_ADC);
 }
 
-u16 ADC_Read(u8 channel)
+unsigned ADC_Read(unsigned channel)
 {
     u8 channel_array[1];
     /* Select the channel we want to convert. 16=temperature_sensor. */

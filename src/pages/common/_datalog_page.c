@@ -37,7 +37,7 @@ static const char *sourcesel_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     (void)data;
     u8 changed;
-    dlog->enable = GUI_TextSelectHelper(dlog->enable, 0, NUM_SOURCES, dir, 1, 1, &changed);
+    dlog->enable = INPUT_SelectSource(dlog->enable, dir, &changed);
     if (changed)
         DATALOG_UpdateState();
     return INPUT_SourceName(tempstring, dlog->enable);

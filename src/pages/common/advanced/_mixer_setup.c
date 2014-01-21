@@ -379,10 +379,8 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
         strcpy(tempstring, _tr("None"));
         return tempstring;
     }
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
+    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         if(mp->cur_template == MIXERTEMPLATE_COMPLEX) {
             guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
@@ -404,11 +402,9 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
     u8 oldsrc = *source;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
+    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         sync_mixers();
         if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {

@@ -60,7 +60,7 @@ PA7 : SPI1_MOSI
 #define CS_LO() gpio_clear(_TOUCH_PORT, _TOUCH_PIN)
 #define pen_is_down() (! gpio_get(_TOUCH_PORT, _TOUCH_IRQ_PIN))
 
-u8 read_channel(u8 address)
+unsigned read_channel(unsigned address)
 {
     spi_xfer(SPI1, address);
     while(pen_is_down())

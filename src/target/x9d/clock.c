@@ -127,7 +127,7 @@ void CLOCK_Init()
         ;
 }
 
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
     if(! cb)
         return;

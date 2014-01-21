@@ -225,10 +225,9 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     void *value = NULL;
     data = NULL;
-    void *but_tgl = NULL;
-    void *but_txt = NULL;
-    void *but_data = NULL;
+    int but = 0;
     int disable = 0;
+    long idx;
 
     int x = 0;
     int w = LEFT_VIEW_WIDTH;
@@ -246,45 +245,43 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].scalar;
             break;
         case EXPO_SWITCH1:
-            label = _tr("Switch1"); underline = 1;
-            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[1].sw;
+        case EXPO_SWITCH2:
+            idx = (absrow == EXPO_LINK1) ? 1 : 2;
+            label = idx == 1 ? _tr("Switch1") : _tr("Switch2");
+            underline = 1;
+            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw;
             break;
         case EXPO_LINK1:
-            but_tgl = toggle_link_cb; but_txt = show_rate_cb; but_data = (void *)0;
-            if(! MIXER_SRC(mp->mixer[1].sw))
+        case EXPO_LINK2:
+            idx = (absrow == EXPO_LINK1) ? 0 : 1;
+            tgl = toggle_link_cb; label_cb = show_rate_cb; data = (void *)idx; but = 1;
+            if(! MIXER_SRC(mp->mixer[idx+1].sw))
                 disable = 1;
             break;
         case EXPO_CURVE1:
-            tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[1];
-            if(! MIXER_SRC(mp->mixer[1].sw) || mp->link_curves & 0x01)
+        case EXPO_CURVE2:
+            idx = (absrow == EXPO_CURVE1) ? 1 : 2;
+            tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[idx];
+            if(! MIXER_SRC(mp->mixer[idx].sw) || mp->link_curves & idx)
                 disable = 1;
             break;
         case EXPO_SCALE1:
-            label = (void *)1; label_cb = scalestring_cb;
-            value = set_number100_cb; data = &mp->mixer[1].scalar;
-            if(! MIXER_SRC(mp->mixer[1].sw))
-                disable = 1;
-            break;
-        case EXPO_SWITCH2:
-            label = _tr("Switch2"); underline = 1;
-            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[2].sw;
-            break;
-        case EXPO_LINK2:
-            but_tgl = toggle_link_cb; but_txt = show_rate_cb; but_data = (void *)1;
-            if(! MIXER_SRC(mp->mixer[2].sw))
-                disable = 1;
-            break;
-        case EXPO_CURVE2:
-            tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[2];
-            if(! MIXER_SRC(mp->mixer[2].sw) || mp->link_curves & 0x02)
-                disable = 1;
-            break;
         case EXPO_SCALE2:
-            label = (void *)2; label_cb = scalestring_cb;
-            value = set_number100_cb; data = &mp->mixer[2].scalar;
-            if(! MIXER_SRC(mp->mixer[2].sw))
+            idx = (absrow == EXPO_SCALE1) ? 1 : 2;
+            label = (void *)idx; label_cb = scalestring_cb;
+            value = set_number100_cb; data = &mp->mixer[idx].scalar;
+            if(! MIXER_SRC(mp->mixer[idx].sw))
                 disable = 1;
             break;
+    }
+    if (but) {
+        labelDesc.style = LABEL_CENTER;
+        GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
+            w, ITEM_HEIGHT, &labelDesc, label_cb, 0xffff, tgl, data);
+        if(disable) {
+            GUI_ButtonEnable((guiObject_t *)&gui->value[relrow].but, 0);
+        }
+        return 1;
     }
     if(label || label_cb) {
         labelDesc.style = LABEL_LEFTCENTER;
@@ -295,18 +292,10 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         y += ITEM_HEIGHT + 1;
     }
     labelDesc.style = LABEL_CENTER;
-    if(but_tgl) {
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            w, ITEM_HEIGHT, &labelDesc, but_txt, 0xffff, but_tgl, but_data);
-        if(disable) {
-            GUI_ButtonEnable((guiObject_t *)&gui->value[relrow].but, 0);
-        }
-    } else {
-        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
-        if(disable) {
-            GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
-        }
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
+        w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
+    if(disable) {
+        GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
     return 1;
 }
