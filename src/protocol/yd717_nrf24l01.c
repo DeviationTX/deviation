@@ -268,18 +268,19 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
 
 static void send_packet(u8 bind)
 {
+    read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &rudder_trim, &elevator_trim, &aileron_trim);
+
     if (bind) {
-        packet[0] = 0;    // stock controller puts channel values in during bind
+        packet[0] = throttle;  // safety on receiver won't drive props until throttle zeroed after bind
         packet[1] = 0x80;
         packet[3] = 0x80;
         packet[4] = 0x80;
-        packet[2] = 0x32; // trims have fixed values for bind
+        packet[2] = 0x32;      // trims have fixed values for bind
         packet[5] = 0x32;
         packet[6] = 0x32;
         packet[7] = 0;
     } else {
         // regular packet
-        read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &rudder_trim, &elevator_trim, &aileron_trim);
         packet[0] = throttle;
         packet[1] = rudder;
         packet[3] = elevator;
