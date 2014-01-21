@@ -42,7 +42,7 @@ void BACKLIGHT_Init()
     timer_enable_preload(TIM3);
 }
 
-void BACKLIGHT_Brightness(u8 brightness)
+void BACKLIGHT_Brightness(unsigned brightness)
 {
     timer_disable_counter(TIM3);
     if (brightness == 0) {
@@ -63,7 +63,7 @@ void BACKLIGHT_Brightness(u8 brightness)
     }
 }
 
-void LCD_Contrast(u8 contrast)
+void LCD_Contrast(unsigned contrast)
 {
     (void)contrast; // dummy method for devo8. Only valid in devo10 now
 }

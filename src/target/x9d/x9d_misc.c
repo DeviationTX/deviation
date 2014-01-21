@@ -1,10 +1,10 @@
 #include "common.h"
-void TxName(u8 *var, u8 len)
+void TxName(u8 *var, int len)
 {
     strncpy((char *)var, "X9D", len);
 }
 
-void MCU_SerialNumber(u8 *var, u8 len)
+void MCU_SerialNumber(u8 *var, int len)
 {
     // Every STM32 should have 12 bytes long unique id at 0x1FFFF7E8
     const u8 *stm32id = (u8*) 0x1FFFF7E8;

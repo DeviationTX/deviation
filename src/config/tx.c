@@ -371,3 +371,7 @@ void CONFIG_SaveTxIfNeeded()
     crc32 = newCrc;
     CONFIG_WriteTx();
 }
+__attribute__((weak)) void CHAN_SetSwitchCfg(const char *str)
+{
+    (void)str;
+}

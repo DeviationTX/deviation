@@ -16,4 +16,5 @@
 #define fat_write      pf_write
 
 #include "ports.h"
+
 #endif //_COMMON_DEVO_H_

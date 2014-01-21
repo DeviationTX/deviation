@@ -89,7 +89,7 @@ void PWR_Sleep()
 }
 
 /* Return milivolts */
-u16 PWR_ReadVoltage(void)
+unsigned PWR_ReadVoltage(void)
 {
     u32 v = adc_array_raw[NUM_ADC_CHANNELS-1];
     /* Multily the above by 1000 to get milivolts */
