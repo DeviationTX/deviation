@@ -81,12 +81,10 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 isCurrentItemChanged = 0;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &isCurrentItemChanged);
+    *source = INPUT_SelectSource(*source, dir, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
     update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
-    MIXER_SET_SRC_INV(*source, is_neg);
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(tempstring, *source);
 }

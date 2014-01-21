@@ -78,27 +78,31 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     return "";
 }
 
+const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx)
+{
+    u8 changed;
+    if (Model.mixer_mode == MIXER_STANDARD && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
+        int is_neg = MIXER_SRC_IS_INV(*src);
+        int newsrc = GUI_TextSelectHelper(MIXER_SRC(*src), 0, 1, dir, 1, 1, &changed);
+        newsrc = newsrc ? mapped_std_channels.throttle + NUM_INPUTS +1 : 0;
+        MIXER_SET_SRC_INV(newsrc, is_neg);
+        *src = newsrc;
+    } else {
+        *src = INPUT_SelectSource(*src, dir, &changed);
+    }
+    if (changed) {
+        TIMER_Reset(idx);
+    }
+    GUI_TextSelectEnablePress(obj, MIXER_SRC(*src));
+    return INPUT_SourceName(tempstring, *src);
+}
+
 const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
-    u8 idx = (long)data;
+    int idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    u8 is_neg = MIXER_SRC_IS_INV(timer->resetsrc);
-    u8 changed;
-    u8 max = NUM_SOURCES;
-    u8 step = 1;
-    if (Model.mixer_mode == MIXER_STANDARD && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
-        max = mapped_std_channels.throttle + NUM_INPUTS +1;
-        step = max;
-    }
-    u8 resetsrc = GUI_TextSelectHelper(MIXER_SRC(timer->resetsrc), 0, max, dir, step, step, &changed);
-    MIXER_SET_SRC_INV(resetsrc, is_neg);
-    if (changed) {
-        timer->resetsrc = resetsrc;
-        TIMER_Reset(idx);
-    }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(resetsrc));
-    return INPUT_SourceName(tempstring, resetsrc);
+    return _set_src_cb((guiTextSelect_t *)obj, &timer->resetsrc, dir, idx);
 }
 
 void toggle_resetsrc_cb(guiObject_t *obj, void *data)
@@ -123,27 +127,13 @@ const char *timer_str_cb(guiObject_t *obj, const void *data)
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
-    u8 idx = (long)data;
+    int idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    u8 is_neg = MIXER_SRC_IS_INV(timer->src);
-    u8 changed;
-    u8 max = NUM_SOURCES;
-    u8 step = 1;
-    if (Model.mixer_mode == MIXER_STANDARD)  {
-        max = mapped_std_channels.throttle + NUM_INPUTS +1;
-        step = max;
-    }
-    u8 src = GUI_TextSelectHelper(MIXER_SRC(timer->src), 0, max, dir, step, step, &changed);
-    MIXER_SET_SRC_INV(src, is_neg);
-    if (changed) {
-        timer->src = src;
-        TIMER_Reset(idx);
-    }
-    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(src));
-    if (0 && Model.mixer_mode == MIXER_STANDARD)  {
-        return MIXER_SRC(src) ? _tr("On") : _tr("Off");
-    }
-    return INPUT_SourceName(tempstring, src);
+    const char *str = _set_src_cb((guiTextSelect_t *)obj, &timer->src, dir, idx);
+    //if (0 && Model.mixer_mode == MIXER_STANDARD)  {
+    //    return MIXER_SRC(timer->src) ? _tr("On") : _tr("Off");
+    //}
+    return str;
 }
 
 void toggle_timertype_cb(guiObject_t *obj, void *data)

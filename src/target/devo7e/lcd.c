@@ -32,14 +32,14 @@ static u16 xstart, xend;  // After introducing logical view for devo10, the coor
 static u16 xpos, ypos;
 static s8 dir;
 
-void LCD_Cmd(u8 cmd) {
+void LCD_Cmd(unsigned cmd) {
     CMD_MODE();
     CS_LO();
     spi_xfer(SPI1, cmd);
     CS_HI();
 }
 
-void LCD_Data(u8 cmd) {
+void LCD_Data(unsigned cmd) {
     DATA_MODE();
     CS_LO();
     spi_xfer(SPI1, cmd);
@@ -67,7 +67,7 @@ void lcd_set_start_line(int line)
   LCD_Cmd((line & 0x3F) | 0x40); 
 }
 
-void LCD_Contrast(u8 contrast)
+void LCD_Contrast(unsigned contrast)
 {
     //int data = 0x20 + contrast * 0xC / 10;
     LCD_Cmd(0x81);

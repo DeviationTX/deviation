@@ -42,11 +42,13 @@ const char POWER_ALARM[] = "power_alarm";
 const char BATT_ALARM[] = "batt_alarm";
 const char BATT_CRITICAL[] = "batt_critical";
 const char BATT_WARNING_INTERVAL[] = "batt_warning_interval";
+const char SWITCH_CFG[] = "switch_cfg";
 
 const char SPLASH_DELAY[] = "splash_delay";
 const char CLOCK_12HR[] = "12hr_clock";
 const char TIME_FORMAT[] = "time_format";
 const char DATE_FORMAT[] = "date_format";
+
 
 const char SECTION_CALIBRATE[] = "calibrate";
 const char CALIBRATE_MAX[] = "max";
@@ -159,6 +161,9 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 	if (MATCH_KEY(SPLASH_DELAY)) {
             t->splash_delay = atoi(value);
             return 1;
+        }
+        if (MATCH_KEY(SWITCH_CFG)) {
+            CHAN_SetSwitchCfg(value);
         }
     #if HAS_RTC
         if (MATCH_KEY(TIME_FORMAT)) {
@@ -351,6 +356,7 @@ void CONFIG_LoadTx()
     Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
     Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
     Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
+    CHAN_SetSwitchCfg("");
     MCU_InitModules();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);
     crc32 = Crc(&Transmitter, sizeof(Transmitter));

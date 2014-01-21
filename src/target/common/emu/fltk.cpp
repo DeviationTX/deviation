@@ -587,7 +587,7 @@ void CLOCK_Init()
     }
 }
 #endif
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
     timer_callback = cb;
     msec_cbtime[TIMER_ENABLE] = CLOCK_getms() + us;

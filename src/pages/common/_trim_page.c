@@ -35,7 +35,7 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, NULL);
+    *source = INPUT_SelectSource(*source, dir, NULL);
     return INPUT_SourceName(tempstring, MIXER_MapChannel(*source));
 }
 
@@ -45,15 +45,7 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
         return _tr("None");
     }
     u8 *source = (u8 *)data;
-    u8 changed;
-    u8 val = MIXER_SRC(*source);
-
-    int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
-    newval = INPUT_GetAbbrevSource(val, newval, dir);
-    if (val != newval) {
-        val = newval;
-        *source = val;
-    }
+    *source = INPUT_SelectAbbrevSource(*source, dir);
     return INPUT_SourceNameAbbrevSwitch(tempstring, *source);
 }
 

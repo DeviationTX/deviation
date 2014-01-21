@@ -39,6 +39,7 @@ struct Transmitter {
     u8 contrast;
     u8 telem;
     u8 music_shutdown;
+    u8 addtl_switches;
     enum Mode mode;
     u16 batt_alarm;
     u8 power_alarm;
@@ -50,6 +51,11 @@ struct Transmitter {
 #if HAS_RTC
     u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
 #endif
+    #if INP_LAST <= 32
+        u32 ignore_src;
+    #else
+        u64 ignore_src;
+    #endif
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u8 module_poweramp;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

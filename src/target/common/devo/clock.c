@@ -122,13 +122,13 @@ void CLOCK_Init()
         ;
 }
 
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
     if(! cb)
         return;
     timer_callback = cb;
     /* Counter enable. */
-    u16 t = timer_get_counter(TIM4);
+    unsigned t = timer_get_counter(TIM4);
     /* Set the capture compare value for OC1. */
     timer_set_oc_value(TIM4, TIM_OC1, us + t);
 
@@ -162,7 +162,7 @@ void tim4_isr()
 #ifdef TIMING_DEBUG
         debug_timing(4, 0);
 #endif
-        u16 us = timer_callback();
+        unsigned us = timer_callback();
 #ifdef TIMING_DEBUG
         debug_timing(4, 1);
 #endif
@@ -224,7 +224,7 @@ void sys_tick_handler(void)
         }
         if(msec_callbacks & (1 << TIMER_SOUND)) {
             if (msecs == msec_cbtime[TIMER_SOUND]) {
-                u16 ms = SOUND_Callback();
+                unsigned ms = SOUND_Callback();
                 if(! ms)
                     msec_callbacks &= ~(1 << TIMER_SOUND);
                 else

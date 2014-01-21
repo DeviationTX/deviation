@@ -28,7 +28,7 @@
 #include "protocol/interface.h"
 #include <stdlib.h>
 
-void SPI_ConfigSwitch(u8 csn_high, u8 csn_low)
+void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 {
     int i;
     spi_disable(SPI2);

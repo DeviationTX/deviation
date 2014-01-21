@@ -104,7 +104,7 @@ const char *MCU_GetPinName(char *str, struct mcu_pin *port)
     return "None";
 }
 
-void SPI_ConfigSwitch(u8 csn_high, u8 csn_low) {
+void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low) {
     (void)csn_high;
     (void)csn_low;
 }
@@ -301,7 +301,7 @@ u8 NRF24L01_WriteReg(u8 reg, u8 data)
     return 0;
 }
 
-u8 NRF24L01_WriteRegisterMulti(u8 reg, u8 data[], u8 length)
+u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
 {
     (void)reg;
     (void)data;
@@ -367,7 +367,7 @@ void NRF24L01_PulseCE() {}
 
 void PWM_Initialize() {}
 void PWM_Stop() {}
-void PPM_Enable(u16 low_time, volatile u16 *pulses) {
+void PPM_Enable(unsigned low_time, volatile u16 *pulses) {
     int i;
     printf("PPM: low=%d ", (int)low_time);
     for(i = 0; pulses[i]; i++)

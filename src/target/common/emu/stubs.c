@@ -20,20 +20,21 @@
 
 #include "common.h"
 #include "protocol/interface.h"
+#include "config/tx.h"
 #include "fltk.h"
 
 #undef usleep
 void _usleep(u32 usec) {
     usleep(usec);
 }
-void TxName(u8 *var, u8 len) {
+void TxName(u8 *var, int len) {
     const u8 model[] = EMU_STRING;
     if(len > 12)
          len = 12;
     memcpy(var, model, len - 1);
     var[len-1] = 0;
 }
-void USB_Enable(u8 type, u8 use_interrupt) {
+void USB_Enable(unsigned type, unsigned use_interrupt) {
     (void) type;
     (void)use_interrupt;
 }
@@ -47,8 +48,25 @@ void HID_Write(s8 *pkt, u8 size) {
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 void PWR_Sleep() {}
-u16  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
+unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
+#define SWITCH_3x2  0
+#define SWITCH_2x2  ((1 << INP_SWA2) | (1 << INP_SWB2))
+#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+void CHAN_SetSwitchCfg(const char *str)
+{
+    if(strcmp(str, "3x2") == 0) {
+        Transmitter.ignore_src = SWITCH_3x2;
+    } else if(strcmp(str, "2x2") == 0) {
+        Transmitter.ignore_src = SWITCH_2x2;
+    } else if(strcmp(str, "3x1") == 0) {
+        Transmitter.ignore_src = SWITCH_3x1;
+    } else {
+        Transmitter.ignore_src = SWITCH_NONE;
+    }
+}
 
 void CLOCK_StartWatchdog() {}
 void CLOCK_ResetWatchdog() {
@@ -63,7 +81,7 @@ void CLOCK_ResetWatchdog() {
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
-void SPI_FlashBlockWriteEnable(u8 enable) {(void)enable;}
+void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {
@@ -105,8 +123,8 @@ void FS_CloseDir() {
 }
 
 void BACKLIGHT_Init() {}
-void BACKLIGHT_Brightness(u8 brightness) { printf("Brightness: %d\n", brightness); }
-void LCD_Contrast(u8 contrast) { printf("Contrast: %d\n", contrast); }
+void BACKLIGHT_Brightness(unsigned brightness) { printf("Brightness: %d\n", brightness); }
+void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
 
 void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}

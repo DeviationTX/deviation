@@ -156,17 +156,11 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
             return GetBoxSource(tempstring, pc->elem[idx].src);
         }
         case ELEM_BAR:
-            pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);   
+            pc->elem[idx].src = INPUT_SelectSource(pc->elem[idx].src, dir, NULL);
             return INPUT_SourceName(tempstring, pc->elem[idx].src ? pc->elem[idx].src + NUM_INPUTS : 0);
         case ELEM_TOGGLE:
         {
-            int val = MIXER_SRC(pc->elem[idx].src);
-            int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, NULL);
-            newval = INPUT_GetAbbrevSource(val, newval, dir);
-            if (val != newval) {
-                val = newval;
-                pc->elem[idx].src = val;
-            }
+            pc->elem[idx].src = INPUT_SelectAbbrevSource(pc->elem[idx].src, dir);
             return INPUT_SourceNameAbbrevSwitch(tempstring, pc->elem[idx].src);
         }
         case ELEM_HTRIM:
