@@ -299,6 +299,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", BATT_CRITICAL, Transmitter.batt_critical);
     fprintf(fh, "%s=%d\n", BATT_WARNING_INTERVAL, Transmitter.batt_warning_interval);
     fprintf(fh, "%s=%d\n", SPLASH_DELAY, Transmitter.splash_delay);
+    fprintf(fh, "%s=%s\n", SWITCH_CFG, CHAN_GetSwitchCfg);
 #if HAS_RTC
     fprintf(fh, "%s=%d\n", TIME_FORMAT, Transmitter.rtcflags & TIMEFMT);
     fprintf(fh, "%s=%d\n", DATE_FORMAT, (Transmitter.rtcflags & DATEFMT) >> 4);
@@ -374,4 +375,8 @@ void CONFIG_SaveTxIfNeeded()
 __attribute__((weak)) void CHAN_SetSwitchCfg(const char *str)
 {
     (void)str;
+}
+__attribute__((weak)) const char *CHAN_GetSwitchCfg()
+{
+    return "";
 }

@@ -120,6 +120,7 @@ void CHAN_Init();
 s16  CHAN_ReadInput(int channel);
 s32  CHAN_ReadRawInput(int channel);
 void CHAN_SetSwitchCfg(const char *str);
+const char *CHAN_GetSwitchCfg();
 #define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
 
 /* SPI Flash */
