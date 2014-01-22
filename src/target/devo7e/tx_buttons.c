@@ -38,10 +38,15 @@ static const u8 buttonmap[] = {
 // Extra switch connections
 //         2x2              3x1              3x2
 //         -----            -----            -----
-//B.5                                        SW_B2
-//B.6      SW_B1            SW_A0            SW_B0
-//B.7                                        SW_A2
-//B.8      SW_A1            SW_A2            SW_A0
+//B.5                                        SW_B0
+//B.6      SW_B1            SW_A2            SW_B2
+//B.7                                        SW_A0
+//B.8      SW_A1            SW_A0            SW_A2
+//global_extra_switches:
+//  .0 == B0
+//  .1 == B2
+//  .2 == A0
+//  .3 == A2
 
 #define COL_PORT GPIOB
 #define COL_PORT_MASK (GPIO5 | GPIO6 | GPIO7 | GPIO8)
@@ -98,7 +103,7 @@ u32 ScanButtons()
             gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
             gpio_set(GPIOC, GPIO6);
             if (Transmitter.ignore_src == SWITCH_3x1) {
-                global_extra_switches = ((port >> 6) & 0x04) | ((port >> 3) & 0x08);
+                global_extra_switches = (((~port) >> 6) & 0x04) | (((~port) >> 3) & 0x08);
             } else {
                 global_extra_switches  = (~(port>>5))&0xf;
             }
