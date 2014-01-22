@@ -59,12 +59,12 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_HOLD1:    value = ! gpio_get(GPIOC, GPIO11); break;
     case INP_FMOD0:    value = gpio_get(GPIOC, GPIO10); break;
     case INP_FMOD1:    value = ! gpio_get(GPIOC, GPIO10); break;
-    case INP_SWA0:     value = global_extra_switches   & 0x01;
-    case INP_SWA1:     value = !(global_extra_switches & 0x03);
-    case INP_SWA2:     value = global_extra_switches   & 0x02;
-    case INP_SWB0:     value = global_extra_switches   & 0x04;
-    case INP_SWB1:     value = !(global_extra_switches & 0x0c);
-    case INP_SWB2:     value = global_extra_switches   & 0x08;
+    case INP_SWA0:     value = global_extra_switches   & 0x08;  break;
+    case INP_SWA1:     value = !(global_extra_switches & 0x0c); break;
+    case INP_SWA2:     value = global_extra_switches   & 0x04;  break;
+    case INP_SWB0:     value = global_extra_switches   & 0x02;  break;
+    case INP_SWB1:     value = !(global_extra_switches & 0x03); break;
+    case INP_SWB2:     value = global_extra_switches   & 0x01;  break;
     }
     return value;
 }
