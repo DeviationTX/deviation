@@ -20,6 +20,8 @@ my %alt_targets = (
     devo12 => ["devo8"],
 );
 
+
+$ENV{CROSS} ||= "";
 GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count, "objdir=s" => \$objdir);
 if($target && ! exists $targetmap{$target}) {
     my @t = keys(%targetmap);
@@ -78,7 +80,7 @@ if($objdir) {
     my @files = glob("$objdir/*.o");
     foreach my $file (@files) {
         #Parse all strings from the object files and add to the allstr hash
-        my @od = `objdump -s $file`;
+        my @od = `$ENV{CROSS}objdump -s $file`;
         my $str = "";
         my $state = 0;
         foreach(@od) {
