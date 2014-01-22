@@ -104,6 +104,8 @@ u32 ScanButtons()
             gpio_set(GPIOC, GPIO6);
             if (Transmitter.ignore_src == SWITCH_3x1) {
                 global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
+            } else if (Transmitter.ignore_src == SWITCH_2x2) {
+                global_extra_switches  = (port>>6)&0x05;
             } else {
                 global_extra_switches  = (~(port>>5))&0xf;
             }
