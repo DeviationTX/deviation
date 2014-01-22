@@ -156,7 +156,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
             return GetBoxSource(tempstring, pc->elem[idx].src);
         }
         case ELEM_BAR:
-            pc->elem[idx].src = INPUT_SelectSource(pc->elem[idx].src, dir, NULL);
+            pc->elem[idx].src = pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_CHANNELS, dir, 1, 1, NULL);
             return INPUT_SourceName(tempstring, pc->elem[idx].src ? pc->elem[idx].src + NUM_INPUTS : 0);
         case ELEM_TOGGLE:
         {

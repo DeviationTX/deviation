@@ -253,7 +253,7 @@ const char *INPUT_ButtonName(unsigned button)
 int INPUT_SelectSource(int src, int dir, u8 *changed)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
-    int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_CHANNELS, dir, 1, 1, changed);
+    int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
     if(! dir)
         dir = -1;
     while (Transmitter.ignore_src & (1 << newsrc))
