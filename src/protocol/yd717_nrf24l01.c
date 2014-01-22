@@ -47,7 +47,7 @@
 // Timeout for callback in uSec, 8ms=8000us for YD717
 #define PACKET_PERIOD 8000
 
-// Stock tx fixed frequency  TODO: Will reciever find others?
+// Stock tx fixed frequency is 0x3C. Receiver only binds on this freq.
 #define RF_CHANNEL 0x3C
 
 enum {
@@ -72,18 +72,16 @@ enum {
 
 static u8 packet[PAYLOADSIZE];
 static u8 packet_sent;
-static u8 tx_id[3];
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
 static u8 throttle, rudder, elevator, aileron, flags;
-static const u8 rx_tx_addr[] = {0x29, 0xC3, 0x21, 0x11, 0xC1};
+static u8 rudder_trim, elevator_trim, aileron_trim;
+static u8 rx_tx_addr[5];
 
 static u8 phase;
 enum {
     YD717_INIT2 = 0,
-    YD717_INIT2_NO_BIND,
-    YD717_BIND1,
     YD717_BIND2,
     YD717_BIND3,
     YD717_DATA
@@ -178,32 +176,26 @@ static void yd717_init()
     }
     NRF24L01_Activate(0x53); // switch bank back
 
+    packet_sent = 0;
+
     // Implicit delay in callback
     // delay(50);
 }
 
-static void YD717_init2()
-{
-    packet_sent = 0;
-
-
-    // Implicit delay in callback
-    // delayMicroseconds(150);
-}
 
 static void YD717_init3()
 {
     packet_ack();   // acknowledge last bind packet.  Must be complete before changing address
 
     // set address to prearranged value known to receiver (guessing...)
-    u8 rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
+    u8 bind_rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
+    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_rx_tx_addr, 5);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_rx_tx_addr, 5);
 
-    packet[0]= 0x29; // send address to use in first 4 bytes
-    packet[1]= 0xC3;
-    packet[2]= 0x21;
-    packet[3]= 0x11;
+    packet[0]= rx_tx_addr[0]; // send address to use in first 4 bytes
+    packet[1]= rx_tx_addr[1];
+    packet[2]= rx_tx_addr[2];
+    packet[3]= rx_tx_addr[3];
     packet[4]= 0x56; // fixed value
     packet[5]= 0xAA; // fixed value
     packet[6]= 0x32; // fixed - same as trim values in bind packets...
@@ -220,46 +212,42 @@ static void YD717_init4()
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 }
 
-static void set_tx_id(u32 id)
-{
-    tx_id[0] = (id >> 16) & 0xFF;
-    tx_id[1] = (id >> 8) & 0xFF;
-    tx_id[2] = (id >> 0) & 0xFF;
-}
-
 static u8 convert_channel(u8 num)
 {
+    // Sometimes due to imperfect calibration or mixer settings
+    // throttle can be less than CHAN_MIN_VALUE or larger than
+    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
+    // channels values by min..max range
     s32 ch = Channels[num];
     if (ch < CHAN_MIN_VALUE) {
         ch = CHAN_MIN_VALUE;
     } else if (ch > CHAN_MAX_VALUE) {
         ch = CHAN_MAX_VALUE;
     }
+
     return (u8) (((ch * 0xFF / CHAN_MAX_VALUE) + 0x100) >> 1);
 }
 
-
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
-                          u8* flags)
+                          u8* flags, u8* rudder_trim, u8* elevator_trim, u8* aileron_trim)
 {
-    // Protocol is registered AETRG, that is
-    // Aileron is channel 0, Elevator - 1, Throttle - 2, Rudder - 3
-    // Sometimes due to imperfect calibration or mixer settings
-    // throttle can be less than CHAN_MIN_VALUE or larger than
-    // CHAN_MAX_VALUE. As we have no space here, we hard-limit
-    // channels values by min..max range
+    // Protocol is registered AETRF, that is
+    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
 
     // Channel 3
     *throttle = convert_channel(CHANNEL3);
 
     // Channel 4
     *rudder = 0xff - convert_channel(CHANNEL4);
+    *rudder_trim = *rudder >> 1;
 
     // Channel 2
     *elevator = convert_channel(CHANNEL2);
+    *elevator_trim = *elevator >> 1;
 
     // Channel 1
     *aileron = 0xff - convert_channel(CHANNEL1);
+    *aileron_trim = *aileron >> 1;
 
     // Channel 5
     if (Channels[CHANNEL5] <= 0)
@@ -281,26 +269,24 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
 static void send_packet(u8 bind)
 {
     if (bind) {
-        packet[0] = 0;    // stock controller puts channel values in during bind
+        packet[0] = 0;         // stock tx sends actual channel values during bind
         packet[1] = 0x80;
         packet[3] = 0x80;
         packet[4] = 0x80;
-        packet[2] = 0x32; // trims have fixed values for bind
+        packet[2] = 0x32;      // trims have fixed values for bind
         packet[5] = 0x32;
         packet[6] = 0x32;
         packet[7] = 0;
     } else {
         // regular packet
-        read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
+        read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &rudder_trim, &elevator_trim, &aileron_trim);
         packet[0] = throttle;
         packet[1] = rudder;
         packet[3] = elevator;
         packet[4] = aileron;
-
-        // Trims, middle is 0x40
-        packet[2] = 0x40; // pitch
-        packet[5] = 0x40; // roll
-        packet[6] = 0x40; // yaw
+        packet[2] = elevator_trim;
+        packet[5] = aileron_trim;
+        packet[6] = rudder_trim;
         packet[7] = flags;
     }
 
@@ -330,23 +316,11 @@ static u16 yd717_callback()
 {
     switch (phase) {
     case YD717_INIT2:
-        YD717_init2();
         MUSIC_Play(MUSIC_TELEMALARM1);
-//        phase = YD717_BIND1;
         phase = YD717_BIND2;
         return 150;
         break;
-    case YD717_INIT2_NO_BIND:
-        YD717_init2();
-        phase = YD717_DATA;
-        return 150;
-        break;
-    case YD717_BIND1:
-        send_packet(1);
-        if (throttle >= 240) phase = YD717_BIND2;
-        break;
     case YD717_BIND2:
-//        if (throttle == 0) {
         if (--counter == 0) {
             YD717_init3();    // send rx/tx address to use on fixed bind address
             phase = YD717_BIND3;
@@ -370,6 +344,16 @@ static u16 yd717_callback()
     return PACKET_PERIOD;
 }
 
+
+static void set_rx_tx_addr(u32 id)
+{
+    rx_tx_addr[0] = (id >> 24) & 0xFF;
+    rx_tx_addr[1] = (id >> 16) & 0xFF;
+    rx_tx_addr[2] = (id >>  8) & 0xFF;
+    rx_tx_addr[3] = (id >>  0) & 0xFF;
+    rx_tx_addr[4] = 0xC1; // always uses first data port
+}
+
 // Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
 static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
 static const uint32_t LFSR_INTAP = 32-1;
@@ -382,8 +366,8 @@ static void update_lfsr(uint32_t *lfsr, uint8_t b)
     }
 }
 
-// Generate internal id from TX id and manufacturer id (STM32 unique id)
-static void initialize_tx_id()
+// Generate address to use from TX id and manufacturer id (STM32 unique id)
+static void initialize_rx_tx_addr()
 {
     u32 lfsr = 0xb2c54a2ful;
 
@@ -405,37 +389,34 @@ static void initialize_tx_id()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
 
-    set_tx_id(lfsr);
+    set_rx_tx_addr(lfsr);
 }
 
-static void initialize(u8 bind)
+static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
+    initialize_rx_tx_addr();
     packet_counter = 0;
     packet_sent = 0;
+
     yd717_init();
-    phase = bind ? YD717_INIT2 : YD717_INIT2_NO_BIND;
-    if (bind) {
-        counter = BIND_COUNT;
-        PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
-    }
+    phase = YD717_INIT2;
+    counter = BIND_COUNT;
 
-    initialize_tx_id();
-
+    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
     CLOCK_StartTimer(50000, yd717_callback);
 }
 
 const void *YD717_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(1); return 0;
+        case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT: return 0;
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Never Autobind
-        case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+        case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
-        // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
         case PROTOCMD_SET_TXPOWER:
