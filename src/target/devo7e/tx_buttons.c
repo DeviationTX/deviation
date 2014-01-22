@@ -35,6 +35,14 @@ static const u8 buttonmap[] = {
 /*B.8*/    BUT_LAST+1,      BUT_DOWN,        BUT_UP,          BUT_EXIT,
     };
 
+// Extra switch connections
+//         2x2              3x1              3x2
+//         -----            -----            -----
+//B.5                                        SW_B2
+//B.6      SW_B1            SW_A0            SW_B0
+//B.7                                        SW_A2
+//B.8      SW_A1            SW_A2            SW_A0
+
 #define COL_PORT GPIOB
 #define COL_PORT_MASK (GPIO5 | GPIO6 | GPIO7 | GPIO8)
 #define ROW_PORT GPIOC
@@ -81,24 +89,20 @@ u32 ScanButtons()
             idx++;
         }
     }
-    if (Transmitter.ignore_src == SWITCH_3x2) {
+    if (Transmitter.ignore_src != SWITCH_NONE) {
         //Write to C.6, read B
         if (result == 0) {
             gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
             gpio_clear(GPIOC, GPIO6);
-            global_extra_switches  = (~(gpio_port_read(GPIOB)>>5))&0xf;
+            u32 port = gpio_port_read(GPIOB);
             gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
             gpio_set(GPIOC, GPIO6);
+            if (Transmitter.ignore_src == SWITCH_3x1) {
+                global_extra_switches = ((port >> 6) & 0x04) | ((port >> 3) & 0x08);
+            } else {
+                global_extra_switches  = (~(port>>5))&0xf;
+            }
         }
-    } else if (Transmitter.ignore_src == SWITCH_2x2) {
-        int sw = result & (1 << BUT_LAST) ? 0 : 0x01;
-        sw |= result & (1 << (BUT_LAST+1)) ? 0 : 0x04;
-        global_extra_switches = sw;
-    } else if (Transmitter.ignore_src == SWITCH_3x1) {
-        int sw = result & (1 << BUT_LAST) ?  0x01 : 0x00;
-        if (result & (1 << (BUT_LAST+1)))
-            sw |= 0x02;
-        global_extra_switches = sw;
     }
     return result;
 }
