@@ -37,8 +37,6 @@ guiObject_t *firstObj;
 
 static void calibrate_touch(void);
 static void init_touch_calib();
-static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
-static void _vibration_test_cb(guiObject_t *obj, void *data);
 
 
 void PAGE_ChangeByName(const char *pageName, u8 menuPage)
@@ -89,6 +87,23 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     }
     return page_num;
 }
+
+#if HAS_VIBRATINGMOTOR
+static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
+{
+    (void)data;
+    (void)obj;
+    Transmitter.vibration_state = GUI_TextSelectHelper(Transmitter.vibration_state, 0, 1, dir, 1, 1, NULL);
+    return Transmitter.vibration_state ? "On" : "Off";
+}
+
+static void _vibration_test_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    (void)data;
+    MUSIC_Play(MUSIC_TIMER_WARNING);
+}
+#endif
 
 static void _show_page()
 {
@@ -201,6 +216,7 @@ static void _show_page()
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui3->lengthlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Length"));
         GUI_CreateTextSelect(&gui3->length, col2, row, TEXTSELECT_96, NULL, units_cb, (void *)0L);
+#if HAS_VIBRATINGMOTOR
         if(Transmitter.extra_hardware & VIBRATING_MOTOR) {
             row += space + 8;
             GUI_CreateLabelBox(&gui3->head3_3, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Vibration settings"));
@@ -209,6 +225,7 @@ static void _show_page()
             GUI_CreateTextSelect(&gui3->vib, col2, row, TEXTSELECT_96,
                                  _vibration_test_cb, _vibration_state_cb, (void *)&Transmitter.vibration_state);
         }
+#endif
 
     }
 }
@@ -336,17 +353,3 @@ static void calibrate_touch(void)
     }
 }
 
-static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Transmitter.vibration_state = GUI_TextSelectHelper(Transmitter.vibration_state, 0, 1, dir, 1, 1, NULL);
-    return Transmitter.vibration_state ? "On" : "Off";
-}
-
-static void _vibration_test_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
-    (void)data;
-    MUSIC_Play(MUSIC_TIMER_WARNING);
-}
