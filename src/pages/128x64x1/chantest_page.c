@@ -39,7 +39,7 @@ static void draw_chan(long ch, int row, int y)
         height = 7;
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
+        0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(ch));
     GUI_CreateLabelBox(&gui->value[idx], x+37, y,
         23, height, &MICRO_FONT, value_cb, NULL, (void *)ch);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
@@ -97,9 +97,18 @@ void PAGE_ChantestInit(int page)
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
-    if(cp->type == MONITOR_RAWINPUT )
-        _show_bar_page(NUM_INPUTS);
-    else {
+    if(cp->type == MONITOR_RAWINPUT ) {
+        int j = 0;
+        for (int i = 0; i < NUM_INPUTS; i++) {
+            if (Transmitter.ignore_src & (1 << (i+1))) {
+printf("Ignoring %d\n", i);
+                continue;
+            }
+            j++;
+        }
+printf("%d => %d\n", NUM_INPUTS, j);
+        _show_bar_page(j);
+    } else {
         cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
     }
@@ -186,7 +195,17 @@ static inline guiObject_t *_get_obj(int chan, int objid)
     return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
 
-static inline int _get_input_idx(int chan)
+static int _get_input_idx(int chan)
 {
-    return chan;
+    if (! cp->type)
+        return chan;
+    int i;
+    for (i = 0; i < NUM_INPUTS; i++) {
+        if (Transmitter.ignore_src & (1 << (i+1)))
+            continue;
+        chan--;
+        if(chan < 0)
+            break;
+    }
+    return i;
 }

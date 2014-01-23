@@ -19,7 +19,7 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
-static inline int _get_input_idx(int chan);
+static int _get_input_idx(int chan);
 
 enum {
     ITEM_GRAPH,
