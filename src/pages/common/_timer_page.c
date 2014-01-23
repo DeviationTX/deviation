@@ -83,8 +83,8 @@ const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx)
     u8 changed;
     if (Model.mixer_mode == MIXER_STANDARD && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
         int is_neg = MIXER_SRC_IS_INV(*src);
-        int newsrc = GUI_TextSelectHelper(MIXER_SRC(*src), 0, 1, dir, 1, 1, &changed);
-        newsrc = newsrc ? mapped_std_channels.throttle + NUM_INPUTS +1 : 0;
+        int step = mapped_std_channels.throttle + NUM_INPUTS +1;
+        int newsrc = GUI_TextSelectHelper(MIXER_SRC(*src), 0, step, dir, step, step, &changed);
         MIXER_SET_SRC_INV(newsrc, is_neg);
         *src = newsrc;
     } else {
