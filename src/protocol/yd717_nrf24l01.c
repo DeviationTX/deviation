@@ -90,13 +90,15 @@ enum {
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-static void packet_ack()
+static u8 packet_ack()
 {
+    u8 status = 0;
     if (packet_sent) {
-        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)) )) ;
+        while (!(status = (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))))) ;
         NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
         packet_sent = 0;
     }
+    return status;
 }
 
 static void packet_write()
@@ -203,13 +205,17 @@ static void YD717_init3()
     packet_write();
 }
 
-static void YD717_init4()
+static u8 YD717_init4()
 {
-    packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
+    u8 status;
+    
+    status = packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
 
     // set address
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
+
+    return status & BV(NRF24L01_07_TX_DS);
 }
 
 static u8 convert_channel(u8 num)
@@ -330,11 +336,15 @@ static u16 yd717_callback()
         }
         break;
     case YD717_BIND3:
-        YD717_init4();  // set rx/tx address back from bind address
-        flags = 0;
-        phase = YD717_DATA;
-        PROTOCOL_SetBindState(0);
-        MUSIC_Play(MUSIC_DONE_BINDING);
+        if (YD717_init4()) {
+          flags = 0;
+          phase = YD717_DATA;
+          PROTOCOL_SetBindState(0);
+          MUSIC_Play(MUSIC_DONE_BINDING);
+        } else {
+          counter = BIND_COUNT;
+          phase = YD717_BIND2;
+        }
         break;
     case YD717_DATA:
         send_packet(0);
@@ -404,7 +414,7 @@ static void initialize()
     phase = YD717_INIT2;
     counter = BIND_COUNT;
 
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000); //msec
+    PROTOCOL_SetBindState(0xFFFFFFFF);
     CLOCK_StartTimer(50000, yd717_callback);
 }
 
