@@ -57,7 +57,7 @@ struct menu_pages menus[] = {
 #if HAS_TELEMETRY
     {PAGEID_TELEMCFG, NULL, MENUTYPE_SUBMENU,  0, MIXER_ALL, PREVIOUS_ITEM},
 #endif
-    {PAGEID_TRIM,     NULL, MENUTYPE_SUBMENU,  0, MIXER_ADVANCED, PREVIOUS_ITEM},
+//    {PAGEID_TRIM,     NULL, MENUTYPE_SUBMENU,  0, MIXER_ADVANCED, PREVIOUS_ITEM},
 #if HAS_DATALOG
     {PAGEID_DATALOG,  NULL, MENUTYPE_SUBMENU,  0, MIXER_ALL, PREVIOUS_ITEM},
 #endif
@@ -109,6 +109,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         }
         idx++;
     }
+
     return 1;
 }
 
@@ -156,7 +157,7 @@ void PAGE_MenuExit()
 const char *menu_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    long i = (long)data;
+    int i = (int)((long)data);
     if (menus[i].name != NULL)
         return _tr(menus[i].name);
     return PAGE_GetName(menus[i].id);

@@ -64,7 +64,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     void *value = NULL;
     void *but_str = NULL;
-    const int X = 68;
+    const int X = 14;
     u8 x = X;
 
     switch(absrow) {
@@ -122,24 +122,24 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_DIMTIME:
             label = _tr_noop("Dimmer time");
-            value = auto_dimmer_time_cb; x = X+10;
+            value = auto_dimmer_time_cb; //x = X+10;
             break;
         case ITEM_DIMVAL:
             label = _tr_noop("Dimmer target");
-            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x= X+10;
+            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value;// x= X+10;
             break;
         case ITEM_PREALERT:
             title = _tr_noop("Timer settings");
             label = _tr_noop("Prealert time");
-            value = prealert_time_cb; data = (void *)0L; x= X+10;
+            value = prealert_time_cb; data = (void *)0L; //x= X+10;
             break;
         case ITEM_PREALERT_IVAL:
             label = _tr_noop("Prealert intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; x= X+15;
+            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; //x= X+15;
             break;
         case ITEM_TIMEUP:
             label = _tr_noop("Timeup intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; x= X+15;
+            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; //x= X+15;
             break;
         case ITEM_TELEMTEMP:
             title = _tr_noop("Telemetry settings");
@@ -157,16 +157,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->title, 0, y,
                 0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
         labelDesc.style = oldType;
-        y += ITEM_HEIGHT + 1;
+        y += ITEM_HEIGHT;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
             0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, ITEM_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            0, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, value, data);
+            0, 0, &DEFAULT_FONT, NULL, value, data);
     }
     return 1;
 }
@@ -182,7 +182,7 @@ void PAGE_TxConfigureInit(int page)
     cp->total_items = 0;
 
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
                      ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }

@@ -64,8 +64,8 @@ void PAGE_MainInit(int page)
     PAGE_RemoveAllObjects();
     next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
 
-    GUI_CreateLabelBox(&gui->name, 0, 1, //64, 12,
-            0, 0, &SMALL_FONT, NULL, NULL, Model.name);
+    GUI_CreateLabelBox(&gui->name, 0, 0, //64, 12,
+            0, 0, &DEFAULT_FONT, NULL, NULL, Model.name);
 
 
     show_elements();

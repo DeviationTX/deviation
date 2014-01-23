@@ -28,37 +28,20 @@ static s8 current_page = 0; // bug fix
 
 static void draw_chan(long ch, int row, int y)
 {
-    int x = ch%2 ? 63 : 0;
+    int x = ch%2 ? 13 : 0;
     int idx = ch%2 ? 2*row + 1 : 2*row;
-    int height;
-    if (cp->type == MONITOR_RAWINPUT) {
-        labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
-        height = 12;
-    } else {
-        labelDesc.font = MICRO_FONT.font;  // only digits, can use smaller font to show more channels
-        height = 7;
-    }
-    GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
-    GUI_CreateLabelBox(&gui->value[idx], x+37, y,
-        23, height, &MICRO_FONT, value_cb, NULL, (void *)ch);
-    GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
-        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
 
-    // Bug fix: the labelDesc is shared in many pages, must reset it to DEFAULT_FONT after the page is drawn
-    // Otherwise, page in other language will not display as only the DEFAULT_FONT supports multi-lang
-    labelDesc.font = DEFAULT_FONT.font;
+    GUI_CreateLabelBox(&gui->chan[idx], x, y,
+        0, 0, &DEFAULT_FONT, _channum_cb, NULL, (void *)ch);
+    GUI_CreateLabelBox(&gui->value[idx], x+7, y,
+        ITEM_HEIGHT, 4, &DEFAULT_FONT, value_cb, NULL, (void *)ch);
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
-    switch(col) {
-        case ITEM_GRAPH:  return (guiObject_t *)&gui->bar[2*relrow];
-        case ITEM_GRAPH2: return (guiObject_t *)&gui->bar[2*relrow+1];
-        case ITEM_VALUE2: return (guiObject_t *)&gui->value[2*relrow+1];
-        default:          return (guiObject_t *)&gui->value[2*relrow];
-    }
+    (void)col;
+    return (guiObject_t *)&gui->value[2*relrow];
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -74,17 +57,11 @@ static void _show_bar_page(u8 num_bars)
     current_page = 0;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    int view_height = (cp->type == MONITOR_RAWINPUT)
-                      ? 17   // can only show 3 rows: (12 + 5) x 3
-                      : 12;  // can only show 4 rows: (7 + 5) x 4
-    GUI_CreateLabelBox(&gui->title, 0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
-    labelDesc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
-    GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
+    GUI_CreateLabelBox(&gui->title, 0 , 0, 0, 0, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
-                         view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
-    u8 w = 10;
-    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &MICRO_FONT, _page_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT * 2, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
+                         ITEM_HEIGHT, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->page, LCD_WIDTH-(ITEM_SPACE*2), 0, 0, 0, &DEFAULT_FONT, _page_cb, NULL, NULL);
 }
 
 void PAGE_ChantestInit(int page)
