@@ -98,7 +98,7 @@ static u8 packet_ack()
         NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
         packet_sent = 0;
     }
-    return status;
+    return status & BV(NRF24L01_07_TX_DS);
 }
 
 static void packet_write()
@@ -207,15 +207,13 @@ static void YD717_init3()
 
 static u8 YD717_init4()
 {
-    u8 status;
-    
-    status = packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
+    u8 status = packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
 
     // set address
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 
-    return status & BV(NRF24L01_07_TX_DS);
+    return status;
 }
 
 static u8 convert_channel(u8 num)
