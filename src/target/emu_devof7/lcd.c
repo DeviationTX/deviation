@@ -132,6 +132,14 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     }
     // Check if the requested character is available
     LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+1) * CHAR_WIDTH,  (y+1) * CHAR_HEIGHT, DRAW_NWSE);
+
+    // First clean th area
+    for(col = 0; col < CHAR_WIDTH; col++) {
+        for(row = 0; row < CHAR_HEIGHT; row++) {
+            LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, 0);
+        }
+    }
+
     for (col = 0; col < width; col++)
     {
         const u8 *data = offset++;

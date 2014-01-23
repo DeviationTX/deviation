@@ -93,11 +93,16 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
 {
-  (void) x;
-  (void) y;
+  //u16 i, j;
   (void) w;
   (void) h;
   (void) color;
+
+  /*for(i = 0; i < h; i++) {
+    LCD_SetXY(x, y + i);
+    for(j = 0; j < w; j++)
+      LCD_PrintChar(" ");
+  }*/
 }
 
 // draw a rounded rectangle!
