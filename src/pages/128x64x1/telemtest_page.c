@@ -138,7 +138,7 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 1, 43, 8,  R_LABEL},
     {TYPE_VALUE  | 1, 50, 35, TELEM_DSM_FLOG_FADESR},
     {TYPE_HEADER | 1, 86, 8,  H_LABEL},
-    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_FRAMELOSS},
+    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_HOLDS},
 
     {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
     {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
