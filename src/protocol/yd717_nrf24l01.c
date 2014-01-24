@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -86,6 +87,16 @@ enum {
     YD717_BIND3,
     YD717_DATA
 };
+
+static const char * const yd717_opts[] = {
+  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
+enum {
+    PROTOOPTS_TELEMETRY = 0,
+};
+#define TELEM_ON 1
+#define TELEM_OFF 0
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -213,6 +224,7 @@ static u8 YD717_init4()
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
 
+    if (status) NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL);  // clear packet loss count so telem has clean start
     return status;
 }
 
@@ -314,6 +326,16 @@ static void send_packet(u8 bind)
     }
 }
 
+static void update_telemetry() {
+  static u8 frameloss = 0;
+
+  frameloss += NRF24L01_ReadReg(NRF24L01_08_OBSERVE_TX) >> 4;
+  NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL);   // reset packet loss counter
+
+  Telemetry.p.dsm.flog.frameloss = frameloss;
+  TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
+}
+
 
 MODULE_CALLTYPE
 static u16 yd717_callback()
@@ -345,6 +367,7 @@ static u16 yd717_callback()
         }
         break;
     case YD717_DATA:
+        update_telemetry();
         send_packet(0);
         break;
     }
@@ -412,6 +435,9 @@ static void initialize()
     phase = YD717_INIT2;
     counter = BIND_COUNT;
 
+    memset(&Telemetry, 0, sizeof(Telemetry));
+    TELEMETRY_SetType(TELEM_DSM);
+
     PROTOCOL_SetBindState(0xFFFFFFFF);
     CLOCK_StartTimer(50000, yd717_callback);
 }
@@ -426,11 +452,11 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_GETOPTIONS: return yd717_opts;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
         case PROTOCMD_SET_TXPOWER:
             tx_power = Model.tx_power;
             NRF24L01_SetPower(tx_power);
-            break;
         default: break;
     }
     return 0;
