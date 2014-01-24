@@ -82,7 +82,7 @@ static u8 rx_tx_addr[5];
 
 static u8 phase;
 enum {
-    YD717_INIT2 = 0,
+    YD717_INIT1 = 0,
     YD717_BIND2,
     YD717_BIND3,
     YD717_DATA
@@ -195,8 +195,21 @@ static void yd717_init()
     // delay(50);
 }
 
+static void YD717_init1()
+{
+    // receiver doesn't re-enter bind mode if connection lost...check if already bound
+    packet[0] = 0; 
+    packet[1] = 0x80;
+    packet[3] = 0x80;
+    packet[4] = 0x80;
+    packet[2] = 0x40;
+    packet[5] = 0x40;
+    packet[6] = 0x40;
+    packet[7] = 0;
+    packet_write();
+}
 
-static void YD717_init3()
+static void YD717_init2()
 {
     packet_ack();   // acknowledge last bind packet.  Must be complete before changing address
 
@@ -216,7 +229,7 @@ static void YD717_init3()
     packet_write();
 }
 
-static u8 YD717_init4()
+static u8 YD717_init3()
 {
     u8 status = packet_ack();   // acknowledge packet sent by init3.  Must be complete before changing address
 
@@ -341,14 +354,14 @@ MODULE_CALLTYPE
 static u16 yd717_callback()
 {
     switch (phase) {
-    case YD717_INIT2:
+    case YD717_INIT1:
+        YD717_init1();        // check if receiver already in data mode
+        phase = YD717_BIND3;
         MUSIC_Play(MUSIC_TELEMALARM1);
-        phase = YD717_BIND2;
-        return 150;
         break;
     case YD717_BIND2:
         if (--counter == 0) {
-            YD717_init3();    // send rx/tx address to use on fixed bind address
+            YD717_init2();    // send rx/tx address to use on fixed bind address
             phase = YD717_BIND3;
             return 150;
         } else {
@@ -356,7 +369,7 @@ static u16 yd717_callback()
         }
         break;
     case YD717_BIND3:
-        if (YD717_init4()) {
+        if (YD717_init3()) {
           flags = 0;
           phase = YD717_DATA;
           PROTOCOL_SetBindState(0);
@@ -432,8 +445,7 @@ static void initialize()
     packet_sent = 0;
 
     yd717_init();
-    phase = YD717_INIT2;
-    counter = BIND_COUNT;
+    phase = YD717_INIT1;
 
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DSM);
