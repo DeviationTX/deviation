@@ -246,7 +246,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
             break;
         case EXPO_SWITCH1:
         case EXPO_SWITCH2:
-            idx = (absrow == EXPO_LINK1) ? 1 : 2;
+            idx = (absrow == EXPO_SWITCH1) ? 1 : 2;
             label = idx == 1 ? _tr("Switch1") : _tr("Switch2");
             underline = 1;
             tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw;
