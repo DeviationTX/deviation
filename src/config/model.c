@@ -1334,7 +1334,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
-        MIXER_AdjustForProtocol();
+        MIXER_AdjustForProtocol(NULL);
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));

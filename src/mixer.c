@@ -797,17 +797,19 @@ void MIXER_SetDefaultLimit(struct Limit *limit)
 }
 
 extern const u8 const EATRG[PROTO_MAP_LEN];
-void MIXER_AdjustForProtocol()
+void MIXER_AdjustForProtocol(const u8 *oldmap)
 {
     int i, j;
     const u8 *map = ProtocolChannelMap[Model.protocol];
     unsigned chmap[PROTO_MAP_LEN];
     //Automap assumes input is EATRG
-    if(! map || map == EATRG)
+    if(! oldmap)
+        oldmap = EATRG;
+    if(! map || map == oldmap)
         return;
     for(i = 0; i < PROTO_MAP_LEN; i++) {
         for (j= 0; j < PROTO_MAP_LEN; j++) {
-            if (EATRG[i] == map[j]) {
+            if (oldmap[i] == map[j]) {
                 chmap[i] = j;
                 break;
             }

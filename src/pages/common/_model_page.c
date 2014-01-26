@@ -241,6 +241,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     enum Protocols new_protocol;
     new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
+        const u8 *oldmap = ProtocolChannelMap[Model.protocol];
     	// DeInit() the old protocol (Model.protocol unchanged)
         PROTOCOL_DeInit();
         // Load() the new protocol
@@ -261,6 +262,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(obj);
         if (Model.mixer_mode == MIXER_STANDARD)
             STDMIXER_SetChannelOrderByProtocol();
+        else
+            MIXER_AdjustForProtocol(oldmap);
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
