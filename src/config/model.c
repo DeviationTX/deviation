@@ -1363,6 +1363,7 @@ u8 CONFIG_SaveModelIfNeeded() {
 void CONFIG_ResetModel()
 {
     u8 model_num = Transmitter.current_model;
+    PROTOCOL_DeInit();
     CONFIG_ReadModel(0);
     Transmitter.current_model = model_num;
     sprintf(Model.name, "Model%d", model_num);
