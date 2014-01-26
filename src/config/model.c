@@ -1440,7 +1440,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
         return 0;
     }
     if(auto_map)
-        MIXER_AdjustForProtocol();
+        MIXER_AdjustForProtocol(NULL);
     MIXER_RegisterTrimButtons();
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     if (Model.mixer_mode == MIXER_STANDARD)
