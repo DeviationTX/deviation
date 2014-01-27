@@ -129,6 +129,7 @@ int PAGE_IsValid(int page);
 
 /* Simple Mixer pages */
 void PAGE_ModelMenuInit(int page);
+void PAGE_ModelMenuExit();
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
 void PAGE_TravelAdjExit();
