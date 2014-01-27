@@ -19,7 +19,10 @@
 
 #if HAS_STANDARD_GUI
 
+static struct main_page    * const mp  = &pagemem.u.main_page;
+
 static struct stdmenu_obj * const gui = &gui_objs.u.stdmenu;
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 struct menu_s {
     u8 id;
@@ -59,16 +62,24 @@ static void goto_mainpage(guiObject_t *obj, const void *data)
     PAGE_ChangeByID(PAGEID_MAIN);
 }
 
+#define NUM_ROWS 4
+#define NUM_COLS 5
 void PAGE_ModelMenuInit(int page)
 {
     (void) page;
     long pos = 0;
     PAGE_SetModal(0);
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODELMENU), goto_mainpage);
+    BUTTON_RegisterCallback(&mp->action,
+          CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_UP)
+          | CHAN_ButtonMask(BUT_DOWN),
+          BUTTON_PRESS | BUTTON_PRIORITY, _action_cb, NULL);
     u8 count = sizeof(menus) / sizeof(struct menu_s);
-    for(int j = 0; j < 4; j++) {
+    for(int j = 0; j < NUM_ROWS; j++) {
         int y = 40 + j * (LCD_HEIGHT == 240 ? 50 : 59);
-        for(int i = 0; i < 5; i++,pos++) {
+        for(int i = 0; i < NUM_COLS; i++,pos++) {
             if (pos >= count)
                 break;
             int x = (LCD_WIDTH == 320 ? 12 : 92) + i*60;
@@ -77,10 +88,56 @@ void PAGE_ModelMenuInit(int page)
     }
 }
 
+void PAGE_ModelMenuExit()
+{
+    BUTTON_UnregisterCallback(&mp->action);
+}
+
 void MODELMENU_Show(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
     PAGE_ChangeByID(PAGEID_MODELMENU);
+}
+
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_LONGPRESS)
+         || CHAN_ButtonIsPressed(button, BUT_ENTER)
+         || CHAN_ButtonIsPressed(button, BUT_EXIT))
+    {
+        return 0;
+    }
+    if (! GUI_GetSelected()) {
+        GUI_SetSelected((guiObject_t *)&gui->icon[0]);
+        return 1;
+    }
+    int incr = 0;
+    if (CHAN_ButtonIsPressed(button, BUT_LEFT))
+        incr = -1;
+    else if (CHAN_ButtonIsPressed(button, BUT_RIGHT))
+        incr = 1;
+    else if (CHAN_ButtonIsPressed(button, BUT_UP))
+        incr = -NUM_COLS;
+    else if (CHAN_ButtonIsPressed(button, BUT_DOWN))
+        incr = NUM_COLS;
+    int pos = (((long)GUI_GetSelected()) - (long)(&gui->icon[0])) / sizeof(gui->icon[0]);
+    int count = sizeof(menus) / sizeof(struct menu_s);
+    if (pos < 0)
+        return 0;
+    pos = (pos + (NUM_COLS * NUM_ROWS) + incr) % (NUM_COLS * NUM_ROWS);
+    if (pos  >= count) {
+        if (incr == -1)
+            pos = count -1;
+        else if (incr == -NUM_COLS)
+            pos -= NUM_COLS;
+        else if (incr == 1)
+            pos = 0;
+        else if (incr == NUM_COLS)
+             pos = (pos + incr) % (NUM_COLS * NUM_ROWS);
+    }
+    GUI_SetSelected((guiObject_t *)&gui->icon[pos]);
+    return 1;
 }
 #endif //HAS_STANDARD_GUI

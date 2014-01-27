@@ -140,7 +140,7 @@ void PAGE_Change(int dir)
 
 void PAGE_ChangeByID(enum PageID id)
 {
-    if (cur_page != id) {
+    if (cur_page != id && id < sizeof(pages) / sizeof(struct page)) {
         PAGE_Exit();
         cur_page = id;
         PAGE_RemoveAllObjects();
