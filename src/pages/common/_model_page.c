@@ -263,7 +263,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
         if (Model.mixer_mode == MIXER_STANDARD)
             STDMIXER_SetChannelOrderByProtocol();
         else
-            MIXER_AdjustForProtocol(oldmap);
+            RemapChannelsForProtocol(oldmap);
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);

@@ -206,7 +206,6 @@ const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_SwashType(enum SwashType);
 unsigned MIXER_SourceHasTrim(unsigned src);
 unsigned MIXER_MapChannel(unsigned channel);
-void MIXER_AdjustForProtocol(const u8 *oldmap);
 unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data);
 s8 *MIXER_GetTrim(unsigned i);
 s32 MIXER_GetTrimValue(int i);
