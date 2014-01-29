@@ -40,8 +40,11 @@ static void draw_chan(long ch, int row, int y)
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
-    (void)col;
-    return (guiObject_t *)&gui->value[2*relrow];
+    switch(col) {
+        case ITEM_GRAPH2:
+        case ITEM_VALUE2: return (guiObject_t *)&gui->value[2*relrow+1];
+        default:          return (guiObject_t *)&gui->value[2*relrow];
+    }
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {

@@ -128,7 +128,7 @@ void PAGE_ShowBindingDialog(u8 update)
         GUI_Redraw(dialog);
     } else if(! dialog) {
         current_selected_obj = GUI_GetSelected();
-        dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, tempstring);
+        dialog = GUI_CreateDialog(&gui->dialog, 0, 2, 0, 0, NULL, NULL, binding_ok_cb, dtOk, tempstring);
     }
     dialogcrc = crc;
 }
@@ -141,7 +141,7 @@ void PAGE_ShowWarning(const char *title, const char *str)
     strncpy(tempstring, str, sizeof(tempstring));
     tempstring[sizeof(tempstring) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
-    dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
+    dialog = GUI_CreateDialog(&gui->dialog, 0, 5, 0, 0, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
 
@@ -184,5 +184,5 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     current_selected_obj = GUI_GetSelected();
     if (dialog)
         return;
-    dialog = GUI_CreateDialog(&gui->dialog, 2 , 2,  LCD_WIDTH - 4, LCD_HEIGHT - 4 , NULL , reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
+    dialog = GUI_CreateDialog(&gui->dialog, 0 , 2,  0, 0 , NULL , reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }

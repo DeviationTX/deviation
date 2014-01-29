@@ -34,10 +34,19 @@ void CHAN_Init()
     /* Enable Voltage measurement */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
+    // PC12, PC15 -> HOLD TRN
+    // PC14 -> GEAR
+    // PC11, PC10 -> FMODE
+    // PC13 -> DR
+    // PB3, PB4 -> MIX
+
     /* configure switches for digital I/O */
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                   GPIO10 | GPIO11);
-    gpio_set(GPIOC, GPIO10 | GPIO11);
+                   GPIO10 | GPIO11 | GPIO12 | GPIO13 | GPIO14 | GPIO15);
+    gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+                   GPIO3 | GPIO4);
+    gpio_set(GPIOC, GPIO10 | GPIO11 | GPIO12 | GPIO13 | GPIO14 | GPIO15);
+    gpio_set(GPIOB, GPIO3 | GPIO4);
 }
 
 s32 CHAN_ReadRawInput(int channel)
@@ -48,10 +57,20 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
     case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
     case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
-    case INP_HOLD0:    value = gpio_get(GPIOC, GPIO11); break;
-    case INP_HOLD1:    value = ! gpio_get(GPIOC, GPIO11); break;
-    case INP_FMOD0:    value = gpio_get(GPIOC, GPIO10); break;
-    case INP_FMOD1:    value = ! gpio_get(GPIOC, GPIO10); break;
+
+    case INP_AIL_DR0:  value = gpio_get(GPIOC, GPIO13); break;
+    case INP_AIL_DR1:  value = ! gpio_get(GPIOC, GPIO13); break;
+
+    case INP_GEAR0:    value = gpio_get(GPIOC, GPIO14); break;
+    case INP_GEAR1:    value = ! gpio_get(GPIOC, GPIO14); break;
+
+    case INP_MIX0:     value = ! gpio_get(GPIOB, GPIO4); break;
+    case INP_MIX1:     value = (gpio_get(GPIOB, GPIO3) && gpio_get(GPIOB, GPIO4)); break;
+    case INP_MIX2:     value = ! gpio_get(GPIOB, GPIO3); break;
+
+    case INP_FMOD0:    value = ! gpio_get(GPIOC, GPIO11); break;
+    case INP_FMOD1:    value = (gpio_get(GPIOC, GPIO10) && gpio_get(GPIOC, GPIO11)); break;
+    case INP_FMOD2:    value = ! gpio_get(GPIOC, GPIO10); break;
     }
     return value;
 }

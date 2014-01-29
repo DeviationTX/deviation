@@ -11,8 +11,8 @@ struct splash_obj {
 
 struct chantest_obj {
     guiLabel_t title;
-    guiLabel_t chan[8];
-    guiLabel_t value[8];
+    guiLabel_t chan[16];
+    guiLabel_t value[16];
     guiLabel_t page;
     guiScrollable_t scrollable;
 };

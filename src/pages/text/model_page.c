@@ -120,14 +120,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            0, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            ITEM_HEIGHT*4, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
-    /*if (but_txt) {
+    if (but_txt) {
+        if(but_txt == show_text_cb)
+            but_txt = NULL;
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
             0, 0, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
         count++;
-    }*/
+    }
     return count;
 }
         
