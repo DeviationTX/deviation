@@ -50,4 +50,5 @@ glob:src/filesystem/devo10/media/*.fon
 glob:*.dll
 glob:*~
 glob:*.pyc
+glob:*.zip
 .DS_Store
