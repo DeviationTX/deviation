@@ -333,6 +333,7 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
             PAGE_ShowInvalidStandardMixerDialog(obj);
         } else {
             STDMIXER_SetChannelOrderByProtocol();
+            STDMIXER_SaveSwitches();
         }
     }
     return STDMIXER_ModeName(Model.mixer_mode);
