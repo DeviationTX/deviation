@@ -38,6 +38,7 @@ else #BUILD_TARGET
 
 $(TARGET).bin: $(TARGET).elf
 ifdef OPTIMIZE_DFU
+	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
 	../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/optimize.ld
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
