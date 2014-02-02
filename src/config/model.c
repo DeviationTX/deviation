@@ -1097,7 +1097,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
     memset(&default_limit, 0, sizeof(default_limit));
     MIXER_SetDefaultLimit(&default_limit);
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
-        if(!WRITE_FULL_MODEL && memcmp(&m->limits[idx], &default_limit, sizeof(default_limit)) == 0)
+        if(!WRITE_FULL_MODEL
+           && memcmp(&m->limits[idx], &default_limit, sizeof(default_limit)) == 0
+           && m->templates[idx] == 0)
         {
             if (write_mixer(fh, m, idx))
                 fprintf(fh, "\n");
