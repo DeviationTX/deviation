@@ -71,7 +71,7 @@ void SOUND_SetFrequency(unsigned frequency, unsigned volume)
     /* use quadratic to approximate exponential volume control */
     u32 period = 14400000 / frequency;
     /* Taylor series: x + x^2/2 + x^3/6 + x^4/24 */
-    u32 duty_cycle = volume == 100 ? (period >> 1) : (u32)volume * volume * volume * 12 / 10000;
+    u32 duty_cycle = (period >> 1) * (u32)volume / 100 * volume / 100 * volume / 100;
     timer_set_period(_SOUND_TIM, period);
     timer_set_oc_value(_SOUND_TIM, _SOUND_TIM_OC, duty_cycle);
 }
