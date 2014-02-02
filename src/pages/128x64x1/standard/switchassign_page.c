@@ -64,9 +64,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     u8 w = 46;
     u8 x = 77;
-    GUI_CreateLabelBox(&gui->name[relrow], 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->name[relrow], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)absrow);
+        w, LINE_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)absrow);
     return 1;
 }
 
@@ -79,8 +79,8 @@ void PAGE_SwitchAssignInit(int page)
     refresh_switches();
 
     PAGE_ShowHeader(_tr("Press ENT to change"));
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 

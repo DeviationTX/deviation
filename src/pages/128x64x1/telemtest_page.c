@@ -75,7 +75,7 @@ struct telem_layout2 {
 
 const struct telem_layout devo_header_basic[] = {
         {TYPE_HEADER,  8, 35, TEMP_LABEL},
-        {TYPE_HEADER, 45, 35, VOLT_LABEL},
+        {TYPE_HEADER, 48, 35, VOLT_LABEL},
         {TYPE_HEADER, 88, 35, RPM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
@@ -154,12 +154,12 @@ const struct telem_layout dsm_layout_basic[] = {
 };
 
 const struct telem_layout2 devo_page[] = {
-    {devo_header_basic, devo_layout_basic, 4, ITEM_SPACE},
-    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+    {devo_header_basic, devo_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 dsm_page[] = {
-    {dsm_header_basic, dsm_layout_basic, 4, ITEM_SPACE},
-    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+    {dsm_header_basic, dsm_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)
 {
@@ -211,12 +211,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             case TYPE_INDEX:  font = &TINY_FONT; cmd = idx_cb; break;
             case TYPE_HEADER: cmd = header_cb; break;
             case TYPE_LABEL:  cmd = label_cb; break;
-            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*ITEM_HEIGHT; break;
+            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*LINE_HEIGHT; break;
             case TYPE_VALUE:  font = &tp->font;  cmd = telem_cb; break;
-            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + ITEM_HEIGHT;break;
-            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*ITEM_HEIGHT; break;
+            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + LINE_HEIGHT;break;
+            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*LINE_HEIGHT; break;
         }
-        GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, ITEM_HEIGHT,
+        GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, LINE_HEIGHT,
                 font, cmd, NULL, (void *)(long)ptr->source);
     }
     return 0;
@@ -231,13 +231,14 @@ static void _show_page(const struct telem_layout2 *page)
     tp->font.style = LABEL_SQUAREBOX;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
-        GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, ITEM_HEIGHT,
+        GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
                            ptr->source == ARROW_LABEL ? &TINY_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
     PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         page->row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+    u8 row_height = page->row_height * LINE_SPACE;
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
     tp->telem = Telemetry;
 }
 

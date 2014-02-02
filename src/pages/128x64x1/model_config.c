@@ -87,9 +87,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
+                0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-                w, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
+                w, LINE_HEIGHT, &DEFAULT_FONT, tgl, value, data);
     return 1;
 }
 void MODELPAGE_Config()
@@ -99,8 +99,9 @@ void MODELPAGE_Config()
     show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
 
     if (Model.type == 0) {
-        GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+        GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, 
+                         LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
         GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
     }
 }
@@ -134,9 +135,9 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
         idx++;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
+            0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
     return 1;
 }
 
@@ -175,9 +176,9 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
         break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
+            0, LINE_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
+            w, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
     return 1;
 }
 
@@ -199,8 +200,8 @@ void MODELPROTO_Config()
         idx++;
     }
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
@@ -214,8 +215,8 @@ void MODELTRAIN_Config()
                   : mode == PPM_IN_TRAIN2
                     ? _tr("Trainer Cfg (Stick)")
                     : _tr("PPMIn Cfg (Extend)"));
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
                          row3_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

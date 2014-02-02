@@ -22,7 +22,7 @@ static const int FIRST_PAGE_ITEM_IDX = 2;  // 0 is the template obj and 1 is the
 static const int LEFT_VIEW_WIDTH     = 60;
 static const int LEFT_VIEW_ID        = 0;
 static const int RIGHT_VIEW_ID       = 1;
-static const int RIGHT_VIEW_HEIGHT   = 49;
+static const int RIGHT_VIEW_HEIGHT   = 48;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 static void notify_cb(guiObject_t * obj);
@@ -35,14 +35,14 @@ static void _show_titlerow()
 
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
-    GUI_CreateLabelBox(&gui->chan, 0, 0 , LCD_WIDTH, ITEM_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->chan, 0, 0 , LCD_WIDTH, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
-    u8 x =40;
+    u8 x = 40;
     u8 w = 50;
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->tmpl, x, 0,  w, ITEM_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_CreateTextSelectPlate(&gui->tmpl, x, 0,  w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
     w = 38;
-    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
 }
 
 static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
@@ -82,21 +82,28 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     int x = 0;
     u8 w = LEFT_VIEW_WIDTH;
     labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, ITEM_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + ITEM_HEIGHT + 1,
-            w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + LINE_SPACE,
+            w, LINE_HEIGHT, &labelDesc, tgl, value, data);
     return 1;
 }
 static void _show_simple()
 {
     GUI_SelectionNotify(NULL);
     GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    /*
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
                          2 * ITEM_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
+    */
+    int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
+    left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
+    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH,
+                        left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
     // The following items are not draw in the logical view;
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb,
@@ -119,7 +126,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     int w = LEFT_VIEW_WIDTH;
     if (absrow + COMMON_LAST == COMPLEX_TRIM) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            w, ITEM_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+            w, LINE_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
         if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
             GUI_SetHidden((guiObject_t *)&gui->label[relrow], 1);
         return 1;
@@ -159,11 +166,11 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, ITEM_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + ITEM_HEIGHT + 1,
-            w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + LINE_SPACE,
+            w, LINE_HEIGHT, &labelDesc, tgl, value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     return 1;
@@ -177,12 +184,20 @@ static void _show_complex(int page_change)
     if (page_change) {
         selection = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     }
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    /*
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
                          2 * ITEM_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
+    */
+    int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
+    left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
+    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH,
+                        left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
+
     // The following items are not draw in the logical view;
     GUI_CreateBarGraph(&gui->bar, LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                                   CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                                   CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                                   0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
@@ -277,7 +292,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     if (but) {
         labelDesc.style = LABEL_CENTER;
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            w, ITEM_HEIGHT, &labelDesc, label_cb, 0xffff, tgl, data);
+            w, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, tgl, data);
         if(disable) {
             GUI_ButtonEnable((guiObject_t *)&gui->value[relrow].but, 0);
         }
@@ -285,15 +300,15 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     }
     if(label || label_cb) {
         labelDesc.style = LABEL_LEFTCENTER;
-        GUI_CreateLabelBox(&gui->label[relrow], x, y, w, ITEM_HEIGHT,
+        GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, label_cb, NULL, label);
         if(underline)
-            GUI_CreateRect(&gui->rect1, x, y, LEFT_VIEW_WIDTH, 1, &labelDesc);
-        y += ITEM_HEIGHT + 1;
+            GUI_CreateRect(&gui->rect1, x, y , LEFT_VIEW_WIDTH, 1, &labelDesc);
+        y += LINE_SPACE;
     }
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-        w, ITEM_HEIGHT, &labelDesc, tgl, value, data);
+        w, LINE_HEIGHT, &labelDesc, tgl, value, data);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
@@ -307,10 +322,17 @@ static void _show_expo_dr()
 
     sync_mixers();
 
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    /*
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
                          ITEM_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
-
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT - 1, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    */
+    int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
+    left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
+    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH, 
+                        left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
+    
+    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, NULL);

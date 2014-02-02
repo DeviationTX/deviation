@@ -22,6 +22,10 @@
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data);
 
+void PAGE_MixerExit()
+{
+}
+
 static void _show_title(int page)
 {
     mp->max_scroll = Model.num_channels + NUM_VIRT_CHANNELS > ENTRIES_PER_PAGE ?

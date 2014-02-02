@@ -48,15 +48,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 w2 = 21;
     u8 w3 = 40;
     GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
-            9, ITEM_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
+            9, LINE_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->name[relrow], x, y,
-            w1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
+            w1, LINE_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
     x += w1 + 5;
     GUI_CreateTextSelectPlate(&gui->gtlt[relrow], x, y,
-            w2, ITEM_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)absrow);
+            w2, LINE_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)absrow);
     x += w2 + 3;
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w3, ITEM_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);
+            w3, LINE_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);
     return 3;
 }
 
@@ -77,8 +77,8 @@ void PAGE_TelemconfigInit(int page)
 
     PAGE_ShowHeader(_tr("Telemetry config")); // using the same name as related menu item to reduce language strings
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, TELEM_NUM_ALARMS, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, TELEM_NUM_ALARMS, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 void PAGE_TelemconfigExit()

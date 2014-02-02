@@ -33,7 +33,7 @@ static void draw_chan(long ch, int row, int y)
     int height;
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
-        height = 12;
+        height = LINE_HEIGHT;
     } else {
         labelDesc.font = MICRO_FONT.font;  // only digits, can use smaller font to show more channels
         height = 7;
@@ -75,16 +75,17 @@ static void _show_bar_page(u8 num_bars)
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     int view_height = (cp->type == MONITOR_RAWINPUT)
-                      ? 17   // can only show 3 rows: (12 + 5) x 3
+                      ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
                       : 12;  // can only show 4 rows: (7 + 5) x 4
-    GUI_CreateLabelBox(&gui->title, 0 , 0, 50, 12, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
+    labelDesc.style = LABEL_UNDERLINE;
+    GUI_CreateLabelBox(&gui->title, 0 , 0, LCD_WIDTH, LINE_HEIGHT, &labelDesc, _title_cb, NULL, (void *)NULL);
     labelDesc.style = LABEL_LEFTCENTER;  // bug fix: must initialize to avoid unpredictable drawing
-    GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT , LCD_WIDTH, 1, &labelDesc);
+    //GUI_CreateRect(&gui->rect, 0, HEADER_HEIGHT - 1, LCD_WIDTH, 1, &labelDesc);
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, 47,
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
-    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &MICRO_FONT, _page_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &DEFAULT_FONT, _page_cb, NULL, NULL);
 }
 
 void PAGE_ChantestInit(int page)
@@ -101,12 +102,10 @@ void PAGE_ChantestInit(int page)
         int j = 0;
         for (int i = 0; i < NUM_INPUTS; i++) {
             if (Transmitter.ignore_src & (1 << (i+1))) {
-printf("Ignoring %d\n", i);
                 continue;
             }
             j++;
         }
-printf("%d => %d\n", NUM_INPUTS, j);
         _show_bar_page(j);
     } else {
         cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here

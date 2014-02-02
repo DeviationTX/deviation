@@ -140,21 +140,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #if HAS_LAYOUT_EDITOR
     if (absrow == num_elems + NUM_QUICKPAGES) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y_ts,
-                 LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
+                 LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, LCD_WIDTH-x-4, y,  50,
-                 ITEM_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
+                 LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
         return 2;
     }
 #endif
     if (absrow >= num_elems + NUM_QUICKPAGES) {
-        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, LINE_HEIGHT,
                  &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
         return 1;
     }
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
-        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
-        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + ITEM_HEIGHT,
-             LCD_WIDTH-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
+        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
+        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + LINE_HEIGHT,
+             LCD_WIDTH-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
         return 1;
     }
     for(int type = 0; type < ELEM_LAST; type++) {
@@ -172,12 +172,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             continue;
         if (type == ELEM_TOGGLE)
             GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  50,
-                    ITEM_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
+                    LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
         else
-            GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
+            GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
 
         GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
-             LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
+             LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
         return 1;
     }
     return 1;
@@ -188,6 +188,8 @@ void show_config()
     GUI_RemoveAllObjects();
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
+#else
+    PAGE_ShowHeader(_tr("Main page config"));
 #endif
     PAGE_SetActionCB(_action_cb);
     memset(gui, 0, sizeof(*gui));
@@ -201,8 +203,8 @@ void show_config()
 # else
     static const int ADD_LOAD = 1;
 #endif
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, count+NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 

@@ -16,7 +16,7 @@ PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,     
 PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,             _tr_noop("Switch assignment"))
 #endif
 
-PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       NULL,             _tr_noop("Mixer"))
+PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       PAGE_MixerExit,   _tr_noop("Mixer"))
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       PAGE_ModelExit,   _tr_noop("Model setup"))
 PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,   _tr_noop("Timers"))
 // don't include this in Devo7e due to memory restrictions

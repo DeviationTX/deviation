@@ -31,10 +31,12 @@ struct pagemem {
     u8 modal_page;
 };
 
-#define ITEM_HEIGHT 12
-#define ITEM_SPACE 13
+#define HEADER_HEIGHT (Display.metrics.header_height)
+#define HEADER_WIDGET_HEIGHT (Display.metrics.header_widget_height)
+#define LINE_HEIGHT (Display.metrics.line_height)
+#define LINE_SPACE (Display.metrics.line_space)
+
 #define PREVIOUS_ITEM -1
-#define PAGE_ITEM_MAX 4
 #define TOGGLE_FILE    "media/switches.bmp"
 #define SPLASH_FILE    "media/splash.bmp"
 

@@ -56,12 +56,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 w1 = 30;
     u8 w2 = 36;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-        0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
-    y += ITEM_SPACE;
+        0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
+    y += LINE_HEIGHT;
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
-        w1, ITEM_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+        w1, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
-        w2, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
+        w2, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_exp_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     return 2;
 }
 
@@ -75,13 +75,13 @@ void PAGE_DrExpInit(int page)
     int count = get_mixers();
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]);
     if (count != expected) {
-        GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
     GUI_CreateTextSelectPlate(&gui->u.type, 0, 0,
-        60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE, 76, LCD_HEIGHT - ITEM_SPACE,
-                     2 *ITEM_SPACE, count, row_cb, getobj_cb, NULL, NULL);
+        60, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 76, LCD_HEIGHT - HEADER_HEIGHT,
+                     2 * LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;

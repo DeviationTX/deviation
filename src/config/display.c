@@ -91,6 +91,13 @@ struct struct_map {const char *str;  u16 offset;};
 #define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
 #define OFFSET_COL(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
 #define OFFSET_FON(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
+static const struct struct_map _secgeneral[] =
+{
+    {"header_height",        OFFSET(Display.metrics, header_height)},
+    {"header_widget_height", OFFSET(Display.metrics, header_widget_height)},
+    {"line_height",          OFFSET(Display.metrics, line_height)},
+    {"line_space",           OFFSET(Display.metrics, line_space)},
+};
 static const struct struct_map _secselect[] =
 {
     {"width",                OFFSET(Display, select_width)},
@@ -189,6 +196,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #endif
             return 1;
         }
+        if(assign_int(&d->metrics, _secgeneral, MAPSIZE(_secgeneral)))
+            return 1;
     }
     if(MATCH_START(section, "select")) {
         if(assign_int(d, _secselect, MAPSIZE(_secselect)))

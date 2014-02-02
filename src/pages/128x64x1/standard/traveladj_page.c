@@ -42,11 +42,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = 50;
     MIXER_GetLimit(absrow, &mp->limit);
     GUI_CreateLabelBox(&gui->chan[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
+            0, LINE_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->dn[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->up[relrow], x + w +3, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, traveldown_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->up[relrow], x + w + 3, y,
+            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, travelup_cb, (void *)(long)absrow);
     return 2;
 }
 
@@ -62,11 +62,11 @@ void PAGE_TravelAdjInit(int page)
     PAGE_ShowHeader(("")); // draw a underline only
     u8 w = 35;
     u8 x = 50;
-    GUI_CreateLabelBox(&gui->dnlbl, x+2, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
-    GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
+    GUI_CreateLabelBox(&gui->dnlbl, x+2, 0,  w, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Down"));
+    GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_HEIGHT, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }

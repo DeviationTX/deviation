@@ -56,7 +56,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
     OBJ_SET_TRANSPARENT(obj, 0);
     OBJ_SET_SELECTABLE(obj, 1); //Scrollables aren't really selectable
     connect_object(obj);
-    scrollable->max_visible_rows = height / row_height + 1;
+    scrollable->max_visible_rows = height / row_height; // prevent paint of not fully displayable items
     if (scrollable->max_visible_rows > item_count)
         scrollable->max_visible_rows = item_count;
     scrollable->visible_rows = scrollable->max_visible_rows;

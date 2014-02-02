@@ -118,11 +118,11 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
                 LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
         }
         if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2;
+            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
         else
             txt_y = obj_y;
         if (obj_width > txt_w && desc->style != LABEL_LEFT)
-            txt_x = obj_x + (obj_width - txt_w) / 2;
+            txt_x = obj_x + (obj_width - txt_w) / 2 + 1;
         else
             txt_x = obj_x;
     }
@@ -133,7 +133,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             h = txt_h;
         LCD_FillRect(obj_x, obj_y, w, h, 0xffff);
         if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2;
+            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
         else
             txt_y = obj_y;
         if (obj_width > txt_w && desc->style != LABEL_LEFT)
@@ -142,7 +142,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             txt_x = obj_x;
     } else if (desc->style == LABEL_NO_BOX) {
         txt_x = obj_x;
-        txt_y = obj_y;
+        txt_y = obj_y + 1;
         u16 old_w = obj_width;
         u16 old_h = obj_height;
         if (old_w < txt_w)
@@ -161,11 +161,11 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
         if (old_h < txt_h)
             old_h = txt_h;
         GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
-        LCD_DrawFastHLine(obj_x, obj_y + old_h, old_w, 1); // bug fix: get right y position and give 1 moreline space
         if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2;
+            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
         else
             txt_y = obj_y;
+        LCD_DrawFastHLine(obj_x, txt_y + txt_h - 1, old_w, 1);
     } else {
         u8 y_off = 0;
         if (desc->style == LABEL_TRANSPARENT || desc->style == LABEL_CENTER || desc->style == LABEL_LEFT ||
@@ -180,7 +180,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             y_off = 1;
         }
         if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2;
+            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
         else
             txt_y = obj_y + y_off;
         if (obj_width > txt_w && desc->style != LABEL_LEFT &&  desc->style != LABEL_LEFTCENTER)

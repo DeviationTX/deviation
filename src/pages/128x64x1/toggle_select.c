@@ -107,29 +107,29 @@ static void show_iconsel_page(int SelectedIcon)
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
     labelDesc.style = LABEL_CENTER;
     w = 50;
-    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
 
-    labelDesc.style = LABEL_UNDERLINE;
+    labelDesc.style = LABEL_INVERTED;
 
-    GUI_CreateRect(&gui->separator, 12 + TOGGLEICON_WIDTH, ITEM_HEIGHT, 1, LCD_HEIGHT-ITEM_HEIGHT, &labelDesc);
+    GUI_CreateRect(&gui->separator, 12 + TOGGLEICON_WIDTH, HEADER_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &labelDesc);
 
-    int row = ITEM_HEIGHT + 5;
-    GUI_CreateLabelBox(&gui->togglelabel[0], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 0 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
+    int row = HEADER_HEIGHT + 5;
+    GUI_CreateLabelBox(&gui->togglelabel[0], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 0 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
     img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[0]);
     GUI_CreateImageOffset(&gui->toggleicon[0], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              NULL, //SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb,
              (void *)0L);
 
-    row += ITEM_HEIGHT + 2;
-    GUI_CreateLabelBox(&gui->togglelabel[1], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 1 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "1:");
+    row += TOGGLEICON_HEIGHT + 2;
+    GUI_CreateLabelBox(&gui->togglelabel[1], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 1 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "1:");
     img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[1]);
     GUI_CreateImageOffset(&gui->toggleicon[1], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              NULL, //SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb,
              (void *)1L);
 
     if (num_positions == 3) {
-        row += ITEM_HEIGHT + 2;
-        GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 10, ITEM_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "2:");
+        row += TOGGLEICON_HEIGHT + 2;
+        GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "2:");
         img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[2]);
         GUI_CreateImageOffset(&gui->toggleicon[2], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
              NULL, //SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb,
@@ -138,8 +138,8 @@ static void show_iconsel_page(int SelectedIcon)
 
     int count = get_toggle_icon_count();
     int rows = (count + NUM_COLS - 1) / NUM_COLS;
-
-    GUI_CreateScrollable(&gui->scrollable, 22, ITEM_HEIGHT + 2, LCD_WIDTH - 22, 4 *(TOGGLEICON_HEIGHT + 1),
+    int visible_toggle_rows = (LCD_HEIGHT - HEADER_HEIGHT - 2) / (TOGGLEICON_HEIGHT + 1);
+    GUI_CreateScrollable(&gui->scrollable, 22, HEADER_HEIGHT + 2, LCD_WIDTH - 22, visible_toggle_rows * (TOGGLEICON_HEIGHT + 1),
                      TOGGLEICON_HEIGHT + 1, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Model.pagecfg.tglico[tp->tglidx][SelectedIcon]));
 }

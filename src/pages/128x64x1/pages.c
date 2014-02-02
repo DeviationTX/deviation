@@ -102,7 +102,7 @@ void PAGE_ShowHeader(const char *title)
     labelDesc.font_color = 0xffff;
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.outline_color = 1;
-    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, ITEM_HEIGHT, &labelDesc, NULL, NULL, title);
+    GUI_CreateLabelBox(&headerLabel, 0, 0, LCD_WIDTH, LINE_HEIGHT, &labelDesc, NULL, NULL, title);
 }
 
 void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)

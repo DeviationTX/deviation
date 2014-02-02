@@ -197,6 +197,7 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long idx = (long)data;
     u8 i;
+    PAGE_MixerExit();
     mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
     MIXER_GetLimit(idx, &mp->limit);
@@ -230,6 +231,7 @@ void limitselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
+    PAGE_MixerExit();
     MIXER_GetLimit(ch, &mp->limit);
     mp->channel = ch;
     MIXPAGE_EditLimits();

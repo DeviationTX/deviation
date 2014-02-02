@@ -36,14 +36,14 @@ void PAGE_ThroHoldInit(int page)
 
     PAGE_ShowHeader(_tr("Throttle hold"));
 
-    u8 y = ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
+    u8 y = HEADER_HEIGHT;
+    GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
     u8 w = 40;
-    GUI_CreateTextSelectPlate(&gui->en, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
+    GUI_CreateTextSelectPlate(&gui->en, 75, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);
 
-    y += ITEM_SPACE;
-    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
-    GUI_CreateTextSelectPlate(&gui->value, 75, y, w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
+    y += LINE_SPACE;
+    GUI_CreateLabelBox(&gui->valuelbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Hold position"));
+    GUI_CreateTextSelectPlate(&gui->value, 75, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, holdpostion_cb,  NULL);
 
     GUI_Select1stSelectableObj();
 

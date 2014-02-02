@@ -24,7 +24,7 @@ struct dialog_obj {
 };
 
 struct lang_obj {
-    guiLabel_t label[4];
+    guiLabel_t label[7];
     guiScrollable_t scrollable;
 };
 
@@ -32,8 +32,8 @@ struct mainconfig_obj {
     union {
         guiLabel_t label;
         guiButton_t button;
-    } col1[4]; 
-    guiTextSelect_t value[4];
+    } col1[7]; 
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 
@@ -70,14 +70,14 @@ struct mainpage_obj {
 };
 
 struct menu_obj {
-    guiLabel_t idx[4];
-    guiLabel_t name[4];
+    guiLabel_t idx[7];
+    guiLabel_t name[7];
     guiScrollable_t scrollable;
 };
 
 struct modelcfg_obj {
-    guiLabel_t label[4];
-    guiTextSelect_t value[4];
+    guiLabel_t label[7];
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 
@@ -91,11 +91,11 @@ struct modelpage_obj {
     union {
         guiLabel_t label;
         guiTextSelect_t ts;
-    } col1[4];
+    } col1[7];
     union {
         guiTextSelect_t ts;
         guiButton_t but;
-    } col2[4];
+    } col2[7];
     guiLabel_t file;
     guiScrollable_t scrollable;
     guiKeyboard_t  keyboard;
@@ -114,16 +114,16 @@ struct reorder_obj {
 
 struct telemcfg_obj {
     guiLabel_t msg;
-    guiLabel_t idx[4];
-    guiTextSelect_t name[4];
-    guiTextSelect_t gtlt[4];
-    guiTextSelect_t value[4];
+    guiLabel_t idx[7];
+    guiTextSelect_t name[7];
+    guiTextSelect_t gtlt[7];
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 
 struct telemtest_obj {
     guiLabel_t msg;
-    guiLabel_t header[4];
+    guiLabel_t header[7];
     guiLabel_t box[20];
     guiScrollable_t scrollable;
 };
@@ -161,35 +161,35 @@ struct settimer_obj {
 struct trim_obj {
     guiLabel_t steplbl;
     guiLabel_t trimposlbl;
-    guiButton_t src[4];
-    guiTextSelect_t item[4];
-    guiLabel_t name[4];
+    guiButton_t src[7];
+    guiTextSelect_t item[7];
+    guiLabel_t name[7];
     guiScrollable_t scrollable;
 };
 struct trim2_obj {
     guiButton_t save;
-    guiLabel_t label[4];
-    guiTextSelect_t value[4];
+    guiLabel_t label[7];
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 
 struct datalog_obj {
     guiLabel_t remaining;
-    guiLabel_t label[4];
+    guiLabel_t label[7];
     union {
         guiTextSelect_t ts;
         guiButton_t     but;
-    } col2[4];
+    } col2[7];
     guiScrollable_t scrollable;
 };
 
 struct tx_obj {
-    guiLabel_t title;
-    guiLabel_t label[4];
+    guiLabel_t title[7];
+    guiLabel_t label[7];
     union {
         guiButton_t but;
         guiTextSelect_t ts;
-    } value[4];
+    } value[7];
     guiScrollable_t scrollable;
 };
 
@@ -221,17 +221,18 @@ struct advlimit_obj {
     guiLabel_t title;
     guiButton_t revert;
     guiScrollable_t scrollable;
-    guiLabel_t label[4];
-    guiTextSelect_t value[4];
+    guiLabel_t label[7];
+    guiTextSelect_t value[7];
 };
 
 struct advmixer_obj {
-    guiButton_t limit[2];
-    guiLabel_t  name[2];
-    guiButton_t tmpl[2];
-    guiLabel_t src[2];
-    guiLabel_t sw1[2];
-    guiLabel_t sw2[2];
+    guiLabel_t header_template;
+    guiLabel_t header_source;
+    guiButton_t limit[7];
+    guiLabel_t  name[7];
+    guiButton_t tmpl[7];
+    guiLabel_t src[7];
+    guiScrollable_t scrollable;
     guiScrollbar_t scroll;
     guiKeyboard_t keyboard;
 };
@@ -243,11 +244,11 @@ struct advmixcfg_obj {
     guiRect_t rect1;
     guiBarGraph_t bar;
     guiXYGraph_t graph;
-    guiLabel_t label[4];
+    guiLabel_t label[7];
     union {
         guiButton_t but;
         guiTextSelect_t ts;
-    } value[4];
+    } value[7];
     guiScrollable_t scrollable;
 };
 
@@ -267,9 +268,9 @@ struct stddrexp_obj {
         guiLabel_t msg;
         guiTextSelect_t type;
     } u;
-    guiLabel_t label[2];
-    guiTextSelect_t value1[2];
-    guiTextSelect_t value2[2];
+    guiLabel_t label[3];
+    guiTextSelect_t value1[3];
+    guiTextSelect_t value2[3];
     guiXYGraph_t graph;
     guiScrollable_t scrollable;
     
@@ -277,8 +278,8 @@ struct stddrexp_obj {
 
 struct stdchan_obj {
     guiLabel_t title;
-    guiLabel_t name[4];
-    guiTextSelect_t value[4];
+    guiLabel_t name[7];
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 struct stdgyro_obj {
@@ -296,8 +297,8 @@ struct stdswash_obj {
 };
 
 struct stdswitch_obj {
-    guiLabel_t name[4];
-    guiTextSelect_t value[4];
+    guiLabel_t name[7];
+    guiTextSelect_t value[7];
     guiScrollable_t scrollable;
 };
 
@@ -311,9 +312,9 @@ struct stdthold_obj {
 struct stdtravel_obj {
     guiLabel_t dnlbl;
     guiLabel_t uplbl;
-    guiLabel_t chan[4];
-    guiTextSelect_t dn[4];
-    guiTextSelect_t up[4];
+    guiLabel_t chan[7];
+    guiTextSelect_t dn[7];
+    guiTextSelect_t up[7];
     guiScrollable_t scrollable;
 };
 

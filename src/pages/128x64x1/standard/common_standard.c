@@ -40,9 +40,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 x = 58;
 
     GUI_CreateLabelBox(&gui->name[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
+            0, LINE_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, page_defs->tgl, page_defs->value, (void *)(long)absrow);
     return 1;
 }
 
@@ -52,8 +52,8 @@ void STANDARD_Init(const struct page_defs *page_defs)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr(page_defs->title));
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, (void *)page_defs);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, (void *)page_defs);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
@@ -77,7 +77,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         void (*press_cb)(guiObject_t *obj, void *data),
         const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
 {
-    u8 y = ITEM_SPACE;
+    u8 y = LINE_HEIGHT + 1;
     u8 w1 = 5;
     u8 w2 = 32;
     u8 x = 0;
@@ -92,11 +92,11 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
 
     y += height;
     x = 20;
-    GUI_CreateLabelBox(&vallbl[4], x, y + 3,  w1, height, &TINY_FONT, NULL, NULL, "M");
+    GUI_CreateLabelBox(&vallbl[4], x, y,  w1, height, &TINY_FONT, NULL, NULL, "M");
     x += w1;
-    GUI_CreateTextSelectPlate(&val[4], x, y +3, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
+    GUI_CreateTextSelectPlate(&val[4], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
 
-    y += ITEM_SPACE;
+    y += height + 1;
     x = 0;
     GUI_CreateLabelBox(&vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
     x += w1;

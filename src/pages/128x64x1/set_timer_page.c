@@ -90,26 +90,26 @@ static void _show_settimer_page(u8 index)
     PAGE_ShowHeader(tempstring);
     PAGE_SetActionCB(_action_cb);
 
-    u8 space = ITEM_HEIGHT + 1;
+    u8 space = LINE_HEIGHT;
     u8 x = 55;
     u8 xtime = 75;
-    u8 y = ITEM_HEIGHT + 1; // under headline
+    u8 y = LINE_HEIGHT; // under headline
     //Row 1
-    GUI_CreateLabelBox(&guiset->oldtime, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
+    GUI_CreateLabelBox(&guiset->oldtime, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
 
     //Row 2
     y += space;
-    GUI_CreateTextSelectPlate(&guiset->hms, 0, y, x, ITEM_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
-    GUI_CreateTextSelectPlate(&guiset->value, xtime, y, 24, ITEM_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
+    GUI_CreateTextSelectPlate(&guiset->hms, 0, y, x, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
+    GUI_CreateTextSelectPlate(&guiset->value, xtime, y, 24, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
 
     //Row 3
     y += space;
-    GUI_CreateLabelBox(&guiset->addtime, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
-    GUI_CreateTextSelectPlate(&guiset->addset, 0, y , x, ITEM_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
+    GUI_CreateLabelBox(&guiset->addtime, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
+    GUI_CreateTextSelectPlate(&guiset->addset, 0, y , x, LINE_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
     y += space;
 
     //Row 4
-    GUI_CreateLabelBox(&guiset->newvalue, xtime, y, LCD_WIDTH - xtime, ITEM_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
+    GUI_CreateLabelBox(&guiset->newvalue, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
 
 }
 

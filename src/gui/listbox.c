@@ -62,15 +62,16 @@ guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *listbox, u16 x, u16 y, u16
         listbox->style = LISTBOX_DEVO10;
         listbox->desc = *desc;
         LCD_SetFont(listbox->desc.font);
-        LCD_GetCharDimensions('A', &text_w, &text_h);
-        listbox->text_height = text_h;  //no extra spacing text height in devo10
+        //LCD_GetCharDimensions('A', &text_w, &text_h);
+        listbox->text_height = Display.metrics.line_space;
+        listbox->entries_per_page = height / listbox->text_height;
     } else {
         listbox->style = LISTBOX_OTHERS;
         LCD_SetFont(Display.listbox.font ? Display.listbox.font : DEFAULT_FONT.font);
         LCD_GetCharDimensions('A', &text_w, &text_h);
         listbox->text_height = text_h + LINE_SPACING;  //LINE_SPACING is defined in _gui.h
-    }
-    listbox->entries_per_page = (height + 2) / listbox->text_height;
+        listbox->entries_per_page = (height + 2) / listbox->text_height;
+    };
     if (listbox->entries_per_page >= item_count) {
         listbox->entries_per_page = item_count;
         sb_entries = item_count;
@@ -188,11 +189,11 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         if (listbox->style == LISTBOX_DEVO10) {
             if (obj != objSELECTED)  // only draw a box when the listbox is not selected
                 LCD_DrawRect(obj->box.x,
-                    obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height + LINE_SPACING),
+                    obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                     obj->box.width, listbox->text_height, SELECT);
             else
                 LCD_FillRect(obj->box.x,
-                    obj->box.y + (listbox->selected - listbox->cur_pos) * (listbox->text_height + LINE_SPACING),
+                    obj->box.y + (listbox->selected - listbox->cur_pos) * listbox->text_height,
                     obj->box.width, listbox->text_height, SELECT);
         } else {
             LCD_FillRect(obj->box.x,
@@ -205,10 +206,12 @@ void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all)
         const char *str = listbox->string_cb(i + listbox->cur_pos, listbox->cb_data);
         if (listbox->style == LISTBOX_DEVO10) {
             LCD_SetFontColor((i + listbox->cur_pos == listbox->selected && obj == objSELECTED)? SELECT_TXT : TEXT);
-        } else
+            LCD_PrintStringXY(obj->box.x, obj->box.y + listbox->text_height * i + 1, str);
+        } else{
             LCD_SetFontColor(i + listbox->cur_pos == listbox->selected ? SELECT_TXT : TEXT);
-        LCD_PrintString(str);
-        LCD_PrintString("\n");
+            LCD_PrintString(str);
+            LCD_PrintString("\n");
+        }
     }
 }
 

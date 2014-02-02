@@ -44,6 +44,8 @@ void TGLICO_Select(guiObject_t *obj, const void *data);
 /* Mixer */
 void PAGE_MixerInit(int page);
 void PAGE_MixerEvent();
+void PAGE_MixerExit();
+
 
 /* Trim */
 void PAGE_TrimInit(int page);

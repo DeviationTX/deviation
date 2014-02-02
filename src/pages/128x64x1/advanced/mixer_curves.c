@@ -41,40 +41,40 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
 
     labelDesc.style = LABEL_CENTER;
     u8 w = 60;
-    GUI_CreateTextSelectPlate(&gui->name, 0, 0, w, ITEM_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->name, 0, 0, w, HEADER_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
     u8 x =40;
     w = 40;
-    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, ITEM_HEIGHT,&labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
-    GUI_CreateRect(&gui->rect, 0, ITEM_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+    GUI_CreateRect(&gui->rect, 0, HEADER_HEIGHT, LCD_WIDTH, 1, &labelDesc);
 
     x = 0;
-    u8 space = ITEM_HEIGHT + 1;
+    u8 space = LINE_SPACE;
     u8 y = space;
     w = 74;
     labelDesc.style = LABEL_LEFTCENTER;
 
     if (type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
-        GUI_CreateTextSelectPlate(&gui->smooth, x + w - 35, y, 35, ITEM_HEIGHT, &labelDesc, NULL, set_smooth_cb, NULL);
+        GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
+        GUI_CreateTextSelectPlate(&gui->smooth, x + w - 35, y, 35, LINE_HEIGHT, &labelDesc, NULL, set_smooth_cb, NULL);
         y += space;
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w-24, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
-        GUI_CreateTextSelectPlate(&gui->point, x + w - 24, y, 24, ITEM_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w-24, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
+        GUI_CreateTextSelectPlate(&gui->point, x + w - 24, y, 24, LINE_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
     } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
+        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;
         labelDesc.style = LABEL_CENTER;
-        GUI_CreateTextSelectPlate(&gui->point, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
+        GUI_CreateTextSelectPlate(&gui->point, x, y, w, LINE_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
     }
 
     y += space;
     labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
+    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
     y += space;
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value, x, y, w, ITEM_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->value, x, y, w, LINE_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
 
-    GUI_CreateXYGraph(&gui->graph, 77, ITEM_HEIGHT +1, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, 77, LINE_HEIGHT, 50, 50,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

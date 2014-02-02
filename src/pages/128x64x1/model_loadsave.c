@@ -32,7 +32,7 @@ static void _show_buttons(int loadsave)
     (void)show_loadsave_cb;
     load_save = loadsave;
     PAGE_SetActionCB(_action_cb);
-    if (loadsave == LOAD_TEMPLATE || loadsave == LOAD_MODEL || loadsave == LOAD_ICON)
+    if (loadsave == LOAD_TEMPLATE || loadsave == LOAD_MODEL || loadsave == LOAD_ICON || loadsave == LOAD_LAYOUT)
         PAGE_ShowHeader(_tr("Press ENT to load"));
     else if (loadsave == SAVE_MODEL)
         PAGE_ShowHeader(_tr("Press ENT to copy to"));
@@ -62,13 +62,15 @@ static void _show_list(int loadsave,u8 num_models)
 {
     if (loadsave == LOAD_ICON) {
         mp->modeltype = Model.type;
-        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->ico, 10, ITEM_HEIGHT + 1, LCD_WIDTH - 20, ITEM_HEIGHT, &DEFAULT_FONT, iconpress_cb, iconstr_cb, (void *)(long)num_models);
+        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->ico, 10, HEADER_HEIGHT, LCD_WIDTH - 20, 
+                                LINE_HEIGHT, &DEFAULT_FONT, iconpress_cb, iconstr_cb, (void *)(long)num_models);
         GUI_CreateImage(&gui->image, LCD_WIDTH / 2 - 18, LCD_HEIGHT-37, 52, 36, mp->iconstr);
         GUI_SetSelected(obj);
     } else {
         OBJ_SET_USED(&gui->image, 0);
-        guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1, num_models,
-        mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
+        guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, HEADER_HEIGHT, LCD_WIDTH,
+                                LCD_HEIGHT - HEADER_HEIGHT, num_models,
+                                mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
                 string_cb, select_cb, _press_cb, (void *)(long)loadsave);
         GUI_SetSelected(obj);
     }

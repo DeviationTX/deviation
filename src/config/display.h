@@ -70,6 +70,13 @@ struct disp_scrollbar {
     u16 fg_color;
 };
 
+struct disp_metrics {
+    u8 header_height;
+    u8 header_widget_height;
+    u8 line_height;
+    u8 line_space;
+};
+
 enum DispFlags {
     BAR_TRANSPARENT   = 0x01,
     TRIM_TRANSPARENT  = 0x02,
@@ -82,6 +89,7 @@ struct display_settings {
     struct disp_keyboard keyboard;
     struct disp_listbox listbox;
     struct disp_scrollbar scrollbar;
+    struct disp_metrics metrics;
     struct disp_bargraph bargraph;
     struct disp_xygraph xygraph;
     struct disp_bargraph trim;
