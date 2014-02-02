@@ -37,7 +37,7 @@ static void _show_title(int page)
 static void _show_page()
 {
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("Mixer"));
+    PAGE_ShowHeader(_tr("Mixer    Reorder:Hold R+"));
     memset(gui, 0, sizeof(*gui));
     
     u8 channel_count = Model.num_channels + NUM_VIRT_CHANNELS;
@@ -106,6 +106,8 @@ unsigned action_cb(u32 button, unsigned flags, void *data)
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+            reorder_cb(NULL, NULL);
         } else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;
