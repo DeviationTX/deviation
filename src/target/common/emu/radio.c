@@ -285,7 +285,7 @@ u8 NRF24L01_WriteReg(u8 reg, u8 data)
     return 0;
 }
 
-u8 NRF24L01_WriteRegisterMulti(u8 reg, u8 data[], u8 length)
+u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
 {
     (void)reg;
     (void)data;

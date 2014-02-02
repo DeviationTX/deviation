@@ -1,0 +1,51 @@
+YD717 protocol    2014 Jan 19
+
+Other names: Sky-botz UFO Mini
+
+These quads use the Beken BK2421 Transceiver chip.  It is compatible with
+the nRF24L01, with the addition of a special register set.
+
+Data is transmitted every 8 msec using 8-byte packets.
+
+Only a single channel is used - no frequency hopping.  The receiver only
+listens on channel 3C.
+
+The tx/rx address is 32 bits.
+
+# Binding #
+After initialization, the transmitter sends 60 8-byte bind packets.  These
+packets look like normal data packets with the trim values fixed at 0x32.  The
+packets are unacknowledged so are retried 10 times each.  The tx address
+is set to the same value that will be used later for data packets.
+
+After the bind packets, the tx/rx value is changed to a common bind address.
+A single packet is sent that includes the tx/rx address to use for further
+communications.  The receiver acks this packet.
+
+The tx/rx address is then set back to the chosen value and data packet
+transmission begins.
+
+# Data Packets #
+Each channel is 8-bits. When high rates are selected the range is 00-FF.
+When low rates are chosen the roll and pitch values are limited to 41-BF.
+
+Trim values are sent in three separate bytes.  Trim ranges from 00-7F.
+
+The flag byte is 00 to disable auto-flip, and 0F to enable auto-flip.
+When auto-flip is enabled, full cyclic in any direction causes a flip to be
+executed in that direction.
+
+
+## Example data packet
+aa bb cc dd ee ff gg hh
+00 80 3C 80 80 47 6C 00
+
+0  aa: throttle (0 is full down)
+1  bb: rudder (0 is full right)
+2  cc: elevator trim
+3  dd: elevator (0 is full down)
+4  ee: aileron (0 is full right)
+5  ff: aileron trim
+6  gg: rudder trim
+7  hh: flag
+
