@@ -483,20 +483,20 @@ struct struct_map {const char *str;  u16 offset; u16 defval;};
 #define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
 #define OFFSET_SRC(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
 #define OFFSET_BUT(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
-struct struct_map _secnone[] =
+static const struct struct_map _secnone[] =
 {
     {PERMANENT_TIMER, OFFSET(Model, permanent_timer), 0},
 };
-struct struct_map _secradio[] = {
+static const struct struct_map _secradio[] = {
     {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
     {RADIO_FIXED_ID, OFFSET(Model, fixed_id), 0},
 };
-struct struct_map _secmixer[] = {
+static const struct struct_map _secmixer[] = {
     {MIXER_SWITCH, OFFSET_SRC(Model.mixers[0], sw), 0},
     {MIXER_SCALAR, OFFSETS(Model.mixers[0], scalar), 100},
     {MIXER_OFFSET, OFFSETS(Model.mixers[0], offset), 0},
 };
-struct struct_map _seclimit[] = {
+static const struct struct_map _seclimit[] = {
     {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(Model.limits[0], safetysw), 0},
     {CHAN_LIMIT_SAFETYVAL, OFFSETS(Model.limits[0], safetyval), 0},
     {CHAN_LIMIT_MAX,       OFFSET(Model.limits[0], max), DEFAULT_SERVO_LIMIT},
@@ -505,24 +505,24 @@ struct struct_map _seclimit[] = {
     {CHAN_SCALAR_NEG,      OFFSET(Model.limits[0], servoscale_neg), 0},
     {CHAN_SUBTRIM,         OFFSETS(Model.limits[0], subtrim), 0},
 };
-struct struct_map _sectrim[] = {
+static const struct struct_map _sectrim[] = {
     {TRIM_SOURCE, OFFSET_SRC(Model.trims[0], src), 0xFFFF},
     {TRIM_POS,    OFFSET_BUT(Model.trims[0], pos), 0},
     {TRIM_NEG,    OFFSET_BUT(Model.trims[0], neg), 0},
     {TRIM_STEP,   OFFSET(Model.trims[0], step), 1},
 };
-struct struct_map _secswash[] = {
+static const struct struct_map _secswash[] = {
     {SWASH_AILMIX, OFFSET(Model, swashmix[0]), 60},
     {SWASH_ELEMIX, OFFSET(Model, swashmix[1]), 60},
     {SWASH_COLMIX, OFFSET(Model, swashmix[2]), 60},
 };
-struct struct_map _sectimer[] = {
+static const struct struct_map _sectimer[] = {
     {TIMER_TIME,     OFFSET(Model.timer[0], timer), 0xFFFF},
     {TIMER_VAL,      OFFSET(Model.timer[0], val), 0xFFFF},
     {TIMER_SOURCE,   OFFSET_SRC(Model.timer[0], src), 0},
     {TIMER_RESETSRC, OFFSET_SRC(Model.timer[0], resetsrc), 0},
 };
-struct struct_map _secppm[] = {
+static const struct struct_map _secppm[] = {
     {PPMIN_CENTERPW, OFFSET(Model, ppmin_centerpw), 0},
     {PPMIN_DELTAPW,  OFFSET(Model, ppmin_deltapw), 0},
     {PPMIN_SWITCH,   OFFSET_SRC(Model, train_sw), 0xFFFF},
@@ -531,7 +531,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 {
     int value_int = atoi(value);
     struct Model *m = (struct Model *)user;
-int assign_int(void* ptr, struct struct_map *map, int map_size)
+int assign_int(void* ptr, const struct struct_map *map, int map_size)
 {
     for(int i = 0; i < map_size; i++) {
         if(MATCH_KEY(map[i].str)) {
@@ -1083,7 +1083,7 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
-void write_int(FILE *fh, void* ptr, struct struct_map *map, int map_size)
+void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
 {
     char tmpstr[20];
     for(int i = 0; i < map_size; i++) {
@@ -1215,16 +1215,11 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
+    struct Limit default_limit;
+    memset(&default_limit, 0, sizeof(default_limit));
+    MIXER_SetDefaultLimit(&default_limit);
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
-        if(!WRITE_FULL_MODEL &&
-           m->limits[idx].flags == 0 &&
-           m->limits[idx].safetysw == 0 &&
-           m->limits[idx].safetyval == 0 &&
-           m->limits[idx].max == DEFAULT_SERVO_LIMIT &&
-           m->limits[idx].min == DEFAULT_SERVO_LIMIT &&
-           m->limits[idx].servoscale == 100 &&
-           m->limits[idx].servoscale_neg == 0 &&
-           m->templates[idx] == 0)
+        if(!WRITE_FULL_MODEL && memcmp(&m->limits[idx], &default_limit, sizeof(default_limit)) == 0)
         {
             if (write_mixer(fh, m, idx))
                 fprintf(fh, "\n");
