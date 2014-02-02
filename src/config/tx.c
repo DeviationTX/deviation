@@ -308,7 +308,9 @@ void CONFIG_LoadTx()
     Transmitter.countdown_timer_settings.prealert_time = DEFAULT_PERALERT_TIME;
     Transmitter.countdown_timer_settings.prealert_interval = DEFAULT_PREALERT_INTERVAL;
     Transmitter.countdown_timer_settings.timeup_interval = DEFAULT_TIMEUP_INTERVAL;
+#if HAS_EXTRA_SWITCHES
     CHAN_SetSwitchCfg("");
+#endif
     MCU_InitModules();
     CONFIG_LoadHardware();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);

@@ -24,6 +24,7 @@
 #define HAS_DATALOG         0
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   0
+#define HAS_EXTRA_SWITCHES  OPTIONAL
 
 #define NO_LANGUAGE_SUPPORT 1
 

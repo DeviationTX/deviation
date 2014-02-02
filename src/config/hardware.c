@@ -52,9 +52,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     (void)user;
     s32 value_int = atoi(value);
     if (section[0] == '\0') {
+#if HAS_EXTRA_SWITCHES
         if (MATCH_KEY(SWITCH_CFG)) {
             CHAN_SetSwitchCfg(value);
         }
+#endif
 #if HAS_VIBRATINGMOTOR == OPTIONAL
         //Only configure this if the motor isn't stock
         if (MATCH_KEY(HAPTIC_ENABLE)) {
@@ -86,8 +88,4 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 void CONFIG_LoadHardware()
 {
     CONFIG_IniParse("hardware.ini", ini_handler, NULL);
-}
-__attribute__((weak)) void CHAN_SetSwitchCfg(const char *str)
-{
-    (void)str;
 }

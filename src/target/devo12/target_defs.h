@@ -20,6 +20,7 @@
 #define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
+#define HAS_EXTRA_SWITCHES  0
 #define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x360 ones
 
 #define MIN_BRIGHTNESS 1 

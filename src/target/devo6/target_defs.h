@@ -17,6 +17,7 @@
 #define HAS_VIBRATINGMOTOR  OPTIONAL
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
+#define HAS_EXTRA_SWITCHES  0
 
 #define MIN_BRIGHTNESS 1 
 #define DEFAULT_BATTERY_ALARM 4000
