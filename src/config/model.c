@@ -578,10 +578,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if(assign_int(&Model, _secnone, MAPSIZE(_secnone)))
             return 1;
-//	if (MATCH_KEY(PERMANENT_TIMER)) {
-//            m->permanent_timer = atoi(value);
-//            return 1;
-//        }
         if (MATCH_KEY(MODEL_TYPE)) {
             for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
                 if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
@@ -618,14 +614,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
-//        if (MATCH_KEY(RADIO_NUM_CHANNELS)) {
-//            m->num_channels = atoi(value);
-//            return 1;
-//        }
-//        if (MATCH_KEY(RADIO_FIXED_ID)) {
-//            m->fixed_id = atoi(value);
-//            return 1;
-//        }
         if (MATCH_KEY(RADIO_TX_POWER)) {
             for (i = 0; i < NUM_STR_ELEMS(RADIO_TX_POWER_VAL); i++) {
                 if (MATCH_VALUE(RADIO_TX_POWER_VAL[i])) {
@@ -664,20 +652,8 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             m->mixers[idx].dest = get_source(section, value) - NUM_INPUTS - 1;
             return 1;
         }
-//        if (MATCH_KEY(MIXER_SWITCH)) {
-//            m->mixers[idx].sw = get_source(section, value);
-//            return 1;
-//        }
         if(assign_int(&m->mixers[idx], _secmixer, MAPSIZE(_secmixer)))
             return 1;
-//        if (MATCH_KEY(MIXER_SCALAR)) {
-//            m->mixers[idx].scalar = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(MIXER_OFFSET)) {
-//            m->mixers[idx].offset = value_int;
-//            return 1;
-//        }
         if (MATCH_KEY(MIXER_USETRIM)) {
             MIXER_SET_APPLY_TRIM(&m->mixers[idx], value_int);
             return 1;
@@ -744,41 +720,13 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
             return 1;
         }
-//        if (MATCH_KEY(CHAN_LIMIT_SAFETYSW)) {
-//            m->limits[idx].safetysw = get_source(section, value);
-//            return 1;
-//        }
        
         if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
-//        if (MATCH_KEY(CHAN_LIMIT_SAFETYVAL)) {
-//            m->limits[idx].safetyval = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(CHAN_LIMIT_MAX)) {
-//            m->limits[idx].max = value_int;
-//            return 1;
-//        }
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
             m->limits[idx].min = -value_int;
             return 1;
         }
-//        if (MATCH_KEY(CHAN_LIMIT_SPEED)) {
-//            m->limits[idx].speed = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(CHAN_SCALAR)) {
-//            m->limits[idx].servoscale = value_int;
-//           return 1;
-//        }
-//        if (MATCH_KEY(CHAN_SCALAR_NEG)) {
-//            m->limits[idx].servoscale_neg = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(CHAN_SUBTRIM)) {
-//            m->limits[idx].subtrim = value_int;
-//            return 1;
-//        }
         if (MATCH_KEY(CHAN_TEMPLATE)) {
             for (i = 0; i < NUM_STR_ELEMS(CHAN_TEMPLATE_VAL); i++) {
                 if (MATCH_VALUE(CHAN_TEMPLATE_VAL[i])) {
@@ -833,10 +781,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         idx--;
         if(assign_int(&m->trims[idx], _sectrim, MAPSIZE(_sectrim)))
             return 1;
-//        if (MATCH_KEY(TRIM_SOURCE)) {
-//            m->trims[idx].src = get_source(section, value);
-//            return 1;
-//        }
         if (MATCH_KEY(TRIM_SWITCH)) {
             for (int i = 0; i <= NUM_SOURCES; i++) {
                 char cmp[10];
@@ -847,18 +791,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
             return 1;
         }
-//        if (MATCH_KEY(TRIM_POS)) {
-//            m->trims[idx].pos = get_button(section, value);
-//            return 1;
-//        }
-//        if (MATCH_KEY(TRIM_NEG)) {
-//            m->trims[idx].neg = get_button(section, value);
-//            return 1;
-//        }
-//        if (MATCH_KEY(TRIM_STEP)) {
-//            m->trims[idx].step = value_int;
-//            return 1;
-//        }
         if (MATCH_KEY(TRIM_VALUE)) {
             parse_int_list(value, m->trims[idx].value, 3, S8);
             return 1;
@@ -894,21 +826,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if(assign_int(m, _secswash, MAPSIZE(_secswash)))
             return 1;
-//        if (MATCH_KEY(SWASH_AILMIX)) {
-//            if (value_int) 
-//                m->swashmix[0] = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(SWASH_ELEMIX)) {
-//            if (value_int) 
-//                m->swashmix[1] = value_int;
-//            return 1;
-//        }
-//        if (MATCH_KEY(SWASH_COLMIX)) {
-//            if (value_int) 
-//                m->swashmix[2] = value_int;
-//            return 1;
-//        }
     }
     if (MATCH_START(section, SECTION_TIMER)) {
         u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
@@ -931,24 +848,8 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             printf("%s: Unknown timer type: %s\n", section, value);
             return 1;
         }
-//        if (MATCH_KEY(TIMER_SOURCE)) {
-//            m->timer[idx].src = get_source(section, value);
-//            return 1;
-//        }
-//	if (MATCH_KEY(TIMER_RESETSRC)) {
-//            m->timer[idx].resetsrc = get_source(section, value);
-//            return 1;
-//        }
         if(assign_int(&m->timer[idx], _sectimer, MAPSIZE(_sectimer)))
             return 1;
-//        if (MATCH_KEY(TIMER_TIME)) {
-//            m->timer[idx].timer = atoi(value);
-//            return 1;
-//        }
-//	if (MATCH_KEY(TIMER_VAL)) {
-//            m->timer[idx].val = atoi(value);
-//            return 1;
-//        }
     }
     if (MATCH_START(section, SECTION_TELEMALARM)) {
         u8 idx = atoi(section + sizeof(SECTION_TELEMALARM)-1);
@@ -1046,14 +947,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         }
         if(assign_int(m, _secppm, MAPSIZE(_secppm)))
             return 1;
-//        if (MATCH_KEY(PPMIN_CENTERPW)) {
-//            m->ppmin_centerpw = atoi(value);
-//            return 1;
-//        }
-//        if (MATCH_KEY(PPMIN_DELTAPW)) {
-//            m->ppmin_deltapw = atoi(value);
-//            return 1;
-//        }
         if (MATCH_START(name, PPMIN_MAP)) {
             u8 idx = atoi(name + sizeof(PPMIN_MAP)-1) -1;
             if (idx < MAX_PPM_IN_CHANNELS) {
@@ -1066,10 +959,6 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             }
             return 1;
         }
-//        if (MATCH_KEY(PPMIN_SWITCH)) {
-//            m->train_sw = get_source(section, value);
-//            return 1;
-//        }
     }
     printf("Unknown Section: '%s'\n", section);
     return 0;
@@ -1127,12 +1016,6 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
         write_int(fh, &m->mixers[idx], _secmixer, MAPSIZE(_secmixer));
-//        if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
-//            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceNameReal(tmpstr, m->mixers[idx].sw));
-//        if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
-//            fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
-//        if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
-//            fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
         if(WRITE_FULL_MODEL || ! MIXER_APPLY_TRIM(&m->mixers[idx]))
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, MIXER_APPLY_TRIM(&m->mixers[idx]) ? 1 : 0);
         if(WRITE_FULL_MODEL || MIXER_MUX(&m->mixers[idx]))
@@ -1199,8 +1082,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
     write_int(fh, m, _secnone, MAPSIZE(_secnone));
-//    if(WRITE_FULL_MODEL || m->permanent_timer != 0 )
-//    	fprintf(fh, "%s=%d\n", PERMANENT_TIMER, m->permanent_timer);
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1209,9 +1090,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
     write_int(fh, m, _secradio, MAPSIZE(_secradio));
-//    fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
-//    if(WRITE_FULL_MODEL || m->fixed_id != 0)
-//        fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
@@ -1229,8 +1107,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
         write_int(fh, &m->limits[idx], _seclimit, MAPSIZE(_seclimit));
-//        if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
-//            fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceNameReal(file, m->limits[idx].safetysw));
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1238,20 +1114,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 fprintf(fh, "%s=Off\n", CHAN_LIMIT_FAILSAFE);
             }
         }
-//        if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
-//            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
-//        if(WRITE_FULL_MODEL || m->limits[idx].max != DEFAULT_SERVO_LIMIT)
-//            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
         if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
-//        if(WRITE_FULL_MODEL || m->limits[idx].speed != 0)
-//            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SPEED, m->limits[idx].speed);
-//        if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
-//            fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
-//        if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
-//            fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
-//        if(WRITE_FULL_MODEL || m->limits[idx].servoscale_neg != 0)
-//            fprintf(fh, "%s=%d\n", CHAN_SCALAR_NEG, m->limits[idx].servoscale_neg);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
         write_mixer(fh, m, idx);
@@ -1297,12 +1161,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
         write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));
-//        fprintf(fh, "%s=%s\n", TRIM_POS, INPUT_ButtonName(m->trims[idx].pos));
-//        fprintf(fh, "%s=%s\n", TRIM_NEG, INPUT_ButtonName(m->trims[idx].neg));
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
-//        if(WRITE_FULL_MODEL || m->trims[idx].step != 1)
-//            fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2])
             fprintf(fh, "%s=%d,%d,%d\n", TRIM_VALUE,
                     m->trims[idx].value[0], m->trims[idx].value[1], m->trims[idx].value[2]);
@@ -1317,12 +1177,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
             fprintf(fh, "%s=1\n", SWASH_COL_INV);
         write_int(fh, m, _secswash, MAPSIZE(_secswash));
-//        if (WRITE_FULL_MODEL || m->swashmix[0] != 60)
-//            fprintf(fh, "%s=%d\n", SWASH_AILMIX, m->swashmix[0]);
-//        if (WRITE_FULL_MODEL || m->swashmix[1] != 60)
-//            fprintf(fh, "%s=%d\n", SWASH_ELEMIX, m->swashmix[1]);
-//        if (WRITE_FULL_MODEL || m->swashmix[2] != 60)
-//            fprintf(fh, "%s=%d\n", SWASH_COLMIX, m->swashmix[2]);
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
@@ -1331,10 +1185,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
             fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
         write_int(fh, &m->timer[idx], _sectimer, MAPSIZE(_sectimer));
-//        if (WRITE_FULL_MODEL || m->timer[idx].src != 0)
-//            fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceNameReal(file, m->timer[idx].src));
-//        if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
-//            fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceNameReal(file, m->timer[idx].resetsrc));
         if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
         if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))

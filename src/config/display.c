@@ -193,115 +193,22 @@ static int ini_handler(void* user, const char* section, const char* name, const 
     if(MATCH_START(section, "select")) {
         if(assign_int(d, _secselect, MAPSIZE(_secselect)))
             return 1;
-//        if(MATCH_KEY(COLOR)) {
-//            d->select_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("width")) {
-//            d->select_width = atoi(value);
-//            return 1;
-//        }
     }
     if(MATCH_START(section, "keyboard")) {
         if(assign_int(&d->keyboard, _seckeybd, MAPSIZE(_seckeybd)))
             return 1;
-        
-//        if(MATCH_KEY(FONT)) {
-//            d->keyboard.font = FONT_GetFromString(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("bg_key1")) {
-//            d->keyboard.bg_key1 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("fg_key1")) {
-//            d->keyboard.fg_key1 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("bg_key2")) {
-//            d->keyboard.bg_key2 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("fg_key2")) {
-//            d->keyboard.fg_key2 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("bg_key3")) {
-//            d->keyboard.bg_key3 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("fg_key3")) {
-//            d->keyboard.fg_key3 = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(BG_COLOR)) {
-//            d->keyboard.fill_color = get_color(value);
-//            return 1;
-//        }
     }
     if(MATCH_START(section, "listbox")) {
         if(assign_int(&d->listbox, _seclistbox, MAPSIZE(_seclistbox)))
             return 1;
-//        if(MATCH_KEY(FONT)) {
-//            d->listbox.font = FONT_GetFromString(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(BG_COLOR)) {
-//            d->listbox.bg_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(FG_COLOR)) {
-//            d->listbox.fg_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("bg_select")) {
-//            d->listbox.bg_select = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY("fg_select")) {
-//            d->listbox.fg_select = get_color(value);
-//            return 1;
-//        }
     }
     if(MATCH_START(section, "scrollbar")) {
         if(assign_int(&d->scrollbar, _secscroll, MAPSIZE(_secscroll)))
             return 1;
-//        if(MATCH_KEY(BG_COLOR)) {
-//            d->scrollbar.bg_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(FG_COLOR)) {
-//            d->scrollbar.fg_color = get_color(value);
-//            return 1;
-//        }
     }
     if(MATCH_SECTION("xygraph")) {
         if(assign_int(&d->xygraph, _secxygraph, MAPSIZE(_secxygraph)))
             return 1;
-//        if(MATCH_KEY(BG_COLOR)) {
-//            d->xygraph.bg_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(FG_COLOR)) {
-//            d->xygraph.fg_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(XY_AXIS_COLOR)) {
-//            d->xygraph.axis_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(XY_GRID_COLOR)) {
-//            d->xygraph.grid_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(XY_POINT_COLOR)) {
-//            d->xygraph.point_color = get_color(value);
-//            return 1;
-//        }
-//        if(MATCH_KEY(OUTLINE_COLOR)) {
-//            d->xygraph.outline_color = get_color(value);
-//            return 1;
-//        }
     }
     for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
         if(MATCH_SECTION(BARGRAPH_VAL[idx])) {
@@ -324,26 +231,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
             assign_int(graph, _secbargraph, MAPSIZE(_secbargraph));
             return 1;
-//    if(MATCH_KEY(BG_COLOR)) {
-//        graph->bg_color = get_color(value);
-//        return 1;
-//    }
-//    if(MATCH_KEY(FG_COLOR_POS)) {
-//        graph->fg_color_pos = get_color(value);
-//        return 1;
-//    }
-//    if(MATCH_KEY(FG_COLOR_NEG)) {
-//        graph->fg_color_neg = get_color(value);
-//        return 1;
-//    }
-//    if(MATCH_KEY(FG_COLOR_ZERO)) {
-//        graph->fg_color_zero = get_color(value);
-//        return 1;
-//    }
-//    if(MATCH_KEY(OUTLINE_COLOR)) {
-//        graph->outline_color = get_color(value);
-//        return 1;
-//    }
         }
     }
     printf("Could not handle [%s] %s=%s\n", section, name, value);
