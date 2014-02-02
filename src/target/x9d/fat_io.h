@@ -1,7 +1,10 @@
 #ifndef _FATIO_H_
 #define _FATIO_H_
 
+#ifndef FILE_SIZE
+#include "FatFs/ff.h"
 #define FILE_SIZE sizeof(FIL)
+#endif
 
 #define fat_mount      f_mount
 #define fat_open       f_open

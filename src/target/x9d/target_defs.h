@@ -1,7 +1,6 @@
 #ifndef _DEVO10_TARGET_H_
 #define _DEVO10_TARGET_H_
 
-#include "FatFs/ff.h"
 #include "fat_io.h"
 
 #define TXID 0x9d

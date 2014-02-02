@@ -143,7 +143,7 @@ public:
                     gui.aileron = 0;
                 return 1;
             case 'z':
-                gui.gear = ! gui.gear;
+                gui.gear = (gui.gear + 1) % 6;
                 return 1;
             case 'x':
                 gui.rud_dr = (gui.rud_dr + 1) % 6;
@@ -156,10 +156,10 @@ public:
                 gui.dr = gui.ail_dr; /* for Devo6 */
                 return 1;
             case 'b':
-                gui.mix = (gui.mix + 1) % 3;
+                gui.mix = (gui.mix + 1) % 6;
                 return 1;
             case 'n':
-                gui.fmod = (gui.fmod + 1) % 3;
+                gui.fmod = (gui.fmod + 1) % 6;
                 return 1;
             case 'o':
                 if(++gui.aux2 > 10)
@@ -218,10 +218,10 @@ public:
                     gui.aux7 = 0;
                 return 1;
             case 'm':
-                gui.hold = ! gui.hold;
+                gui.hold = (gui.hold + 1) % 6;
                 return 1;
             case ',':
-                gui.trn = ! gui.trn;
+                gui.trn = (gui.trn + 1) % 6;
                 return 1;
 #ifdef KEYBOARD_LAYOUT_QWERTZ
 			//only to be prepared ü+ö#.-
