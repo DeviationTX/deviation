@@ -550,6 +550,7 @@ static void initialize()
     if (Model.protocol == PROTOCOL_WK2401)
         fixed_id |= 0x01;  //Fixed ID must be odd for 2401
     if(Model.protocol != PROTOCOL_WK2801 || ! Model.fixed_id) {
+        ele_start = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
         bind_counter = BIND_COUNT;
         state = WK_BIND;
         PROTOCOL_SetBindState(2980 * 2800 / 1000);
