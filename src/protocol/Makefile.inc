@@ -18,6 +18,7 @@ PROTO_MODULES += $(ODIR)/protocol/slt.mod
 PROTO_MODULES += $(ODIR)/protocol/usbhid.mod
 PROTO_MODULES += $(ODIR)/protocol/hisky.mod
 PROTO_MODULES += $(ODIR)/protocol/yd717.mod
+PROTO_MODULES += $(ODIR)/protocol/symax.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -91,6 +92,10 @@ $(ODIR)/protocol/hisky.mod : $(ODIR)/hisky_nrf24l01.bin
 
 $(ODIR)/protocol/yd717.mod : $(ODIR)/yd717_nrf24l01.bin
 	@echo Building 'yd717' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/symax.mod : $(ODIR)/yd717_nrf24l01.bin
+	@echo Building 'symax' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
