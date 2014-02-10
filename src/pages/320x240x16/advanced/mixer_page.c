@@ -76,7 +76,8 @@ static void _show_page()
                 break;
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
-            GUI_CreateLabelBox(&gui->src[i], XOFFSET+68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
+            if (CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED)
+                GUI_CreateLabelBox(&gui->src[i], XOFFSET+68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
                     GUI_CreateLabelBox(&gui->sw1[i], XOFFSET+200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
