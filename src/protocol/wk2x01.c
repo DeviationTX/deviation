@@ -75,7 +75,7 @@ static u8 pkt_num;
 static u8 last_beacon;
 
 #define STICK_MOVEMENT 15   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
-s16 ele_start, ail_start;
+static s16 ele_start, ail_start;
 u8 sticks_moved();
 
 static const char * const wk2601_opts[] = {
@@ -550,7 +550,7 @@ static void initialize()
     if (Model.protocol == PROTOCOL_WK2401)
         fixed_id |= 0x01;  //Fixed ID must be odd for 2401
     if(Model.protocol != PROTOCOL_WK2801 || ! Model.fixed_id) {
-        ele_start = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
+        ele_start = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
         bind_counter = BIND_COUNT;
         state = WK_BIND;
         PROTOCOL_SetBindState(2980 * 2800 / 1000);
