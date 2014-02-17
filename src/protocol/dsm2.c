@@ -679,10 +679,10 @@ static void initialize(u8 bind)
         if (RANDOM_CHANNELS) {
             u8 tmpch[10];
             CYRF_FindBestChannels(tmpch, 10, 5, 3, 75);
-            u8 idx = rand() % 10;
+            u8 idx = rand32() % 10;
             channels[0] = tmpch[idx];
             while(1) {
-               idx = rand() % 10;
+               idx = rand32() % 10;
                if (tmpch[idx] != channels[0])
                    break;
             }

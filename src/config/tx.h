@@ -66,7 +66,7 @@ struct Transmitter {
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u8 module_poweramp;
 #if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
-    u8 cyrf6936_id[6];
+    u32 txid;
 #endif
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;

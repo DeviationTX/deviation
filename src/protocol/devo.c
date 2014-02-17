@@ -453,11 +453,11 @@ static u16 devo_telemetry_cb()
             txState = 15;
         }
 #ifdef EMULATOR
-        u8 telem_bit = rand() % 7; // random number in [0, 7)
+        u8 telem_bit = rand32(); // random number in [0, 7)
         packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
         //printf("telem 1st packet: 0x%x\n", packet[0]);
         for(int i = 1; i < 13; i++)
-            packet[i] = rand() % 256;
+            packet[i] = rand32() % 256;
         parse_telemetry_packet(packet);
         for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
             Telemetry.updated[i] = 0xff;

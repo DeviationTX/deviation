@@ -27,7 +27,6 @@ extern void spi_set_unidirectional_mode();
 extern void UART_Stop();
 extern void rcc_peripheral_disable_clock();
 extern void _usleep();
-extern void rand();
 extern void TELEMETRY_SetUpdated();
 extern void TELEMETRY_SetType();
 extern void MCU_SerialNumber();
@@ -48,6 +47,5 @@ void PROTO_Stubs(int idx)
     UART_Stop();
     rcc_peripheral_disable_clock();
     _usleep();
-    rand();
     MCU_SerialNumber();
 }

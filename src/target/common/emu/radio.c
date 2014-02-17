@@ -247,7 +247,7 @@ void CYRF_ReadDataPacket(u8 dpbuffer[]) {(void)dpbuffer;}
 u8 CYRF_ReadRSSI(u32 dodummyread)
 {
     (void)dodummyread;
-    return rand();
+    return rand32();
 }
 u8 CYRF_ReadRegister(u8 addr) {
     if(addr == 0x04) {

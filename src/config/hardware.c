@@ -64,6 +64,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 Transmitter.extra_hardware |= VIBRATING_MOTOR;
         }
 #endif
+#if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
+        if(MATCH_KEY("txid")) {
+            Transmitter.txid = strtol(value, NULL, 16);
+        }
+#endif
         return 1;
     }
     if(MATCH_SECTION(SECTION_MODULES)) {
@@ -82,14 +87,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                return 1;
             }
         }
-#if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
-        if(MATCH_KEY("txid-cyrf6936")) {
-            void *ptr = &Transmitter.cyrf6936_id;
-            *((u32 *)ptr) = strtol(value, NULL, 16);
-            Transmitter.cyrf6936_id[4] = 0xaa;
-            Transmitter.cyrf6936_id[5] = 0xbb;
-        }
-#endif
     }
     return 0;
 }
