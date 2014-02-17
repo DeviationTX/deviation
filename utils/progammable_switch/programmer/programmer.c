@@ -125,7 +125,7 @@ int main() {
         }
         i += avr->page_size;
     }
-#if 0
+#if 1
     //Untested
     sprintf(tempstring, "%s\n3. Setting Fuses", avr_str);
     LCD_Clear(0x0000);
