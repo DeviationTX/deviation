@@ -87,7 +87,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             void *ptr = &Transmitter.cyrf6936_id;
             *((u32 *)ptr) = strtol(value, NULL, 16);
             Transmitter.cyrf6936_id[4] = 0xaa;
-            Transmitter.cyrf6936_id[4] = 0xbb;
+            Transmitter.cyrf6936_id[5] = 0xbb;
         }
 #endif
     }
