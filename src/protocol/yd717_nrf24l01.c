@@ -54,6 +54,11 @@
 #define BIND_COUNT 60
 #endif
 
+//printf inside an interrupt handler is really dangerous
+//this shouldn't be enabled even in debug builds without explicitly
+//turning it on
+#define dbgprintf if(0) printf
+
 // Timeout for callback in uSec, 8ms=8000us for YD717
 #define PACKET_PERIOD 8000
 
@@ -194,10 +199,10 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
-        printf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
+        dbgprintf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
                Channels[0], Channels[1], Channels[2], Channels[3],
                Channels[4], Channels[5], Channels[6], Channels[7]);
-        printf("Aileron %d, elevator %d, throttle %d, rudder %d, flip enable %d\n",
+        dbgprintf("Aileron %d, elevator %d, throttle %d, rudder %d, flip enable %d\n",
                (s16) *aileron, (s16) *elevator, (s16) *throttle, (s16) *rudder,
                (s16) *flags);
     }
@@ -298,9 +303,9 @@ static void yd717_init()
     // closing activate command changes state back even if it
     // does something on nRF24L01
     NRF24L01_Activate(0x53); // magic for BK2421 bank switch
-    printf("Trying to switch banks\n");
+    dbgprintf("Trying to switch banks\n");
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        printf("BK2421 detected\n");
+        dbgprintf("BK2421 detected\n");
         // Beken registers don't have such nice names, so we just mention
         // them by their numbers
         // It's all magic, eavesdropped from real transfer and not even from the
@@ -316,7 +321,7 @@ static void yd717_init()
         NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xDF\x96\x82\x1B", 4);
         NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xD9\x96\x82\x1B", 4);
     } else {
-        printf("nRF24L01 detected\n");
+        dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
 
@@ -417,18 +422,6 @@ static void set_rx_tx_addr(u32 id)
     rx_tx_addr[4] = 0xC1; // always uses first data port
 }
 
-// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
-static const uint32_t LFSR_INTAP = 32-1;
-
-static void update_lfsr(uint32_t *lfsr, uint8_t b)
-{
-    for (int i = 0; i < 8; ++i) {
-        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
-        b >>= 1;
-    }
-}
-
 // Generate address to use from TX id and manufacturer id (STM32 unique id)
 static void initialize_rx_tx_addr()
 {
@@ -437,20 +430,20 @@ static void initialize_rx_tx_addr()
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
-    printf("Manufacturer id: ");
+    dbgprintf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
-        printf("%02X", var[i]);
-        update_lfsr(&lfsr, var[i]);
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
     }
-    printf("\r\n");
+    dbgprintf("\r\n");
 #endif
 
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
     set_rx_tx_addr(lfsr);
 }

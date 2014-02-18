@@ -95,6 +95,12 @@ u8 CYRF_MaxPower()
  */
 void CYRF_GetMfgData(u8 data[])
 {
+#if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
+    if(Transmitter.txid) {
+        MCU_SerialNumber(data, 6);
+        return;
+    }
+#endif
     /* Fuses power on */
     CYRF_WriteRegister(0x25, 0xFF);
 

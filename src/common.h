@@ -179,6 +179,8 @@ u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
 int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
 int fexists(const char *file);
+u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
+u32 rand32(); //LFSR based PRNG
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined

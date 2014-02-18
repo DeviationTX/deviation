@@ -64,6 +64,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 Transmitter.extra_hardware |= VIBRATING_MOTOR;
         }
 #endif
+#if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
+        if(MATCH_KEY("txid")) {
+            Transmitter.txid = strtol(value, NULL, 16);
+        }
+#endif
         return 1;
     }
     if(MATCH_SECTION(SECTION_MODULES)) {

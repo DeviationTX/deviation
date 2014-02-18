@@ -49,17 +49,17 @@ void ADC_Init(void)
     adc_calibration(_ADC);
 
     //Build a RNG seed using ADC 14, 16, 17
-    u32 seed = 0;
     for(int i = 0; i < 8; i++) {
-        seed = seed << 4 | ((ADC_Read(16) & 0x03) << 2) | (ADC_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
+        u32 seed;
+        seed = ((ADC_Read(16) & 0x03) << 2) | (ADC_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
         seed ^= ADC_Read(adc_chan_sel[NUM_ADC_CHANNELS-1]) << i; //Get a couple more random bits from Voltage sensor
+        rand32_r(0, seed);
     }
     //This is important.  We're using the temp value as a buffer because otherwise the channel data
     //Can bleed into the voltage-sense data.
     //By disabling the temperature, we always read a consistent value
     adc_disable_temperature_sensor(_ADC);
-    printf("RNG Seed: %08x\n", (int)seed);
-    srand(seed);
+    printf("RNG Seed: %08x\n", (int)rand32());
 
     /* The following is based on code from here: http://code.google.com/p/rayaairbot */
     /* Enable DMA clock */

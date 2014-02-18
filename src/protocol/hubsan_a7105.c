@@ -409,8 +409,8 @@ static void initialize() {
         if (hubsan_init())
             break;
     }
-    sessionid = rand();
-    channel = allowed_ch[rand() % sizeof(allowed_ch)];
+    sessionid = rand32_r(0, 0);
+    channel = allowed_ch[rand32_r(0, 0) % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
     packet_count=0;

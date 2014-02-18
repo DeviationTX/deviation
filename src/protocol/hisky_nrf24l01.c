@@ -295,18 +295,6 @@ static u16 hisky_cb()
 #endif
 }
 
-// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
-static const uint32_t LFSR_INTAP = 32-1;
-
-static void update_lfsr(uint32_t *lfsr, uint8_t b)
-{
-    for (int i = 0; i < 8; ++i) {
-        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
-        b >>= 1;
-    }
-}
-
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
 static void initialize_tx_id()
 {
@@ -318,21 +306,21 @@ static void initialize_tx_id()
     printf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
         printf("%02X", var[i]);
-        update_lfsr(&lfsr, var[i]);
+        rand32_r(&lfsr, var[i]);
     }
     printf("\r\n");
 #endif
 
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(&lfsr, 0);
+    for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
     for (u8 i = 0; i < TXID_SIZE; ++i) {
         rf_adr_buf[i] = lfsr & 0xff;
-        update_lfsr(&lfsr, i);
+        rand32_r(&lfsr, i);
     }
 
     printf("Effective id: %02X%02X%02X%02X%02X\r\n",
@@ -340,7 +328,7 @@ static void initialize_tx_id()
 
     // Use LFSR to seed frequency hopping sequence after another
     // divergence round
-    for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     calc_fh_channels(lfsr);
 
     printf("FH Seq: ");
