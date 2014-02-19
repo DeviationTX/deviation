@@ -19,6 +19,8 @@
 #include "config/model.h"
 #include "config/tx.h"
 
+#include <stdlib.h>
+
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
@@ -189,6 +191,7 @@ void PROTOCOL_SetBindState(u32 msec)
         else
             bind_time = CLOCK_getms() + msec;
         proto_state |= PROTO_BINDING;
+        PROTOCOL_SticksMoved(1);  //Initialize Stick position
     } else {
         proto_state &= ~PROTO_BINDING;
     }
@@ -364,4 +367,20 @@ void PROTOCOL_SetSwitch(int module)
     u8 csn_high = toggle | set;
     u8 csn_low  = ~toggle & set;
     SPI_ConfigSwitch(csn_high, csn_low);
+}
+
+int PROTOCOL_SticksMoved(int init)
+{
+    const int STICK_MOVEMENT = 15;   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
+    static s16 ele_start, ail_start;
+    int ele = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
+    int ail = CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
+    if(init) {
+        ele_start = ele;
+        ail_start = ail;
+        return 0;
+    }
+    int ele_diff = abs(ele_start - ele);
+    int ail_diff = abs(ail_start - ail);
+    return ((ele_diff + ail_diff > 2 * STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
 }
