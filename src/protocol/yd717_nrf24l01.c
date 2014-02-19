@@ -50,14 +50,15 @@
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #define BIND_COUNT 5
+#define dbgprintf printf
 #else
 #define BIND_COUNT 60
-#endif
-
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
 #define dbgprintf if(0) printf
+#endif
+
 
 // Timeout for callback in uSec, 8ms=8000us for YD717
 #define PACKET_PERIOD 8000
@@ -87,7 +88,6 @@ enum {
 #define MAX_PACKET_SIZE 9   // YD717 packets have 8-byte payload, Syma X4 is 9
 
 static u8 packet[MAX_PACKET_SIZE];
-static u8 packet_sent;
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
@@ -118,38 +118,23 @@ enum {
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-
+// Packet ack status values
+enum {
+    PKT_PENDING = 0,
+    PKT_ACKED,
+    PKT_TIMEOUT
+};
+#define PACKET_CHKTIME 500      // time to wait if packet not yet acknowledged or timed out    
 
 static u8 packet_ack()
 {
-    u8 status = 0;
-    if (packet_sent) {
-        while (!(status = (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))))) ;
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
-        packet_sent = 0;
+    switch (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))) {
+    case BV(NRF24L01_07_TX_DS):
+        return PKT_ACKED;
+    case BV(NRF24L01_07_MAX_RT):
+        return PKT_TIMEOUT;
     }
-    return status & BV(NRF24L01_07_TX_DS);
-}
-
-
-static void packet_write()
-{
-    packet_ack();
-
-    NRF24L01_FlushTx();
-
-    if(Model.protocol == PROTOCOL_YD717) {
-        NRF24L01_WritePayload(packet, 8);
-    } else {
-        packet[8] = packet[0];  // checksum
-        for(u8 i=1; i < 8; i++) packet[8] += packet[i];
-        packet[8] = ~packet[8];
-
-        NRF24L01_WritePayload(packet, 9);
-    }
-
-    ++packet_counter;
-    packet_sent = 1;
+    return PKT_PENDING;
 }
 
 
@@ -227,18 +212,33 @@ static void send_packet(u8 bind)
         packet[3] = elevator;
         packet[4] = aileron;
         if(Model.protocol == PROTOCOL_YD717) {
-          packet[2] = elevator_trim;
-          packet[5] = aileron_trim;
-          packet[6] = rudder_trim;
+            packet[2] = elevator_trim;
+            packet[5] = aileron_trim;
+            packet[6] = rudder_trim;
         } else {
-          packet[2] = rudder_trim;
-          packet[5] = elevator_trim;
-          packet[6] = aileron_trim;
+            packet[2] = rudder_trim;
+            packet[5] = elevator_trim;
+            packet[6] = aileron_trim;
         }
         packet[7] = flags;
     }
 
-    packet_write();
+
+    // clear packet status bits and TX FIFO
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
+    NRF24L01_FlushTx();
+
+    if(Model.protocol == PROTOCOL_YD717) {
+        NRF24L01_WritePayload(packet, 8);
+    } else {
+        packet[8] = packet[0];  // checksum
+        for(u8 i=1; i < 8; i++) packet[8] += packet[i];
+        packet[8] = ~packet[8];
+
+        NRF24L01_WritePayload(packet, 9);
+    }
+
+    ++packet_counter;
 
 //    radio.ce(HIGH);
 //    delayMicroseconds(15);
@@ -325,8 +325,6 @@ static void yd717_init()
     }
     NRF24L01_Activate(0x53); // switch bank back
 
-    packet_sent = 0;
-
     // Implicit delay in callback
     // delay(50);
 }
@@ -341,20 +339,14 @@ static void YD717_init1()
 
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_rx_tx_addr, 5);
-
-    send_packet(1);
 }
 
 
-static u8 YD717_init2()
+static void YD717_init2()
 {
-    u8 status = packet_ack();   // acknowledge packet - must be complete before changing address
-
-    // set address
+    // set rx/tx address for data phase
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
-
-    return status;
 }
 
 
@@ -380,36 +372,49 @@ static u16 yd717_callback()
         phase = YD717_BIND3;
         MUSIC_Play(MUSIC_TELEMALARM1);
         break;
+
     case YD717_BIND2:
-        if (--counter == 0) {
-            YD717_init2();  // change to data phase rx/tx address
+        if (counter == 0) {
+            if (packet_ack() == PKT_PENDING)
+                return PACKET_CHKTIME;             // packet send not yet complete
+            YD717_init2();                         // change to data phase rx/tx address
             send_packet(0);
             phase = YD717_BIND3;
         } else {
+            if (packet_ack() == PKT_PENDING)
+                return PACKET_CHKTIME;             // packet send not yet complete
+            send_packet(1);
+            counter -= 1;
+        }
+        break;
+
+    case YD717_BIND3:
+        switch (packet_ack()) {
+        case PKT_PENDING:
+            return PACKET_CHKTIME;                 // packet send not yet complete
+        case PKT_ACKED:
+            phase = YD717_DATA;
+            PROTOCOL_SetBindState(0);
+            MUSIC_Play(MUSIC_DONE_BINDING);
+            break;
+        case PKT_TIMEOUT:
+            YD717_init1();                         // change to bind rx/tx address
+            counter = BIND_COUNT;
+            phase = YD717_BIND2;
             send_packet(1);
         }
         break;
-    case YD717_BIND3:
-        if (YD717_init2()) {
-          flags = 0;
-          phase = YD717_DATA;
-          PROTOCOL_SetBindState(0);
-          MUSIC_Play(MUSIC_DONE_BINDING);
-        } else {
-          YD717_init1();
-          counter = BIND_COUNT;
-          phase = YD717_BIND2;
-        }
-        break;
+
     case YD717_DATA:
 #ifdef YD717_TELEMETRY
         update_telemetry();
 #endif
+        if (packet_ack() == PKT_PENDING)
+            return PACKET_CHKTIME;                 // packet send not yet complete
         send_packet(0);
         break;
     }
-    // Packet every 8ms
-    return PACKET_PERIOD;
+    return PACKET_PERIOD;                          // Packet every 8ms
 }
 
 
@@ -454,7 +459,7 @@ static void initialize()
     tx_power = Model.tx_power;
     initialize_rx_tx_addr();
     packet_counter = 0;
-    packet_sent = 0;
+    flags = 0;
 
     yd717_init();
     phase = YD717_INIT1;
