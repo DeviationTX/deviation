@@ -261,7 +261,7 @@ const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return frsky_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? 1L : 0L);
+            return (void *)(long)(Model.proto_opts[PROTO_OPTS_TELEM] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
     }
     return 0;

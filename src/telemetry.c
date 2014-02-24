@@ -201,6 +201,15 @@ int TELEMETRY_Type()
     return (Telemetry.capabilities & CAP_DSM) ? TELEM_DSM : TELEM_DEVO;
 }
 
+int TELEMETRY_GetNumTelemSrc()
+{
+    return (TELEMETRY_Type() == TELEM_DEVO) ? NUM_DEVO_TELEM : NUM_DSM_TELEM;
+}
+
+int TELEMETRY_GetNumTelem()
+{
+    return TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST-1 : TELEM_DSM_LAST-1;
+}
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol)
 {
     if (protocol == PROTOCOL_DSM2 || protocol == PROTOCOL_DSMX)

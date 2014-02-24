@@ -1,7 +1,9 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-#define NUM_TELEM 9
+#define NUM_DEVO_TELEM 9
+#define NUM_DSM_TELEM  10
+#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM ? NUM_DEVO_TELEM : NUM_DSM_TELEM)
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
@@ -33,6 +35,7 @@ enum {
     TELEM_DSM_FLOG_VOLT2,
     TELEM_DSM_FLOG_RPM1,
     TELEM_DSM_FLOG_TEMP1,
+#if HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_AMPS1,
     TELEM_DSM_PBOX_VOLT1,
     TELEM_DSM_PBOX_VOLT2,
@@ -58,6 +61,7 @@ enum {
     TELEM_DSM_JETCAT_RPM,
     TELEM_DSM_JETCAT_TEMPEGT,
     TELEM_DSM_JETCAT_OFFCOND,
+#endif //HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_LAST,
 };
 #define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST) ? (int)TELEM_DSM_LAST : (int)TELEM_DEVO_LAST)
@@ -157,6 +161,13 @@ struct Telemetry {
     u16 capabilities;
     volatile u8 updated[TELEM_UPDATE_SIZE];
 };
+
+enum {
+    PROTO_TELEM_UNSUPPORTED = -1,
+    PROTO_TELEM_OFF = 0,
+    PROTO_TELEM_ON  = 1,
+};
+
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
@@ -172,4 +183,6 @@ void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol);
+int TELEMETRY_GetNumTelemSrc();
+int TELEMETRY_GetNumTelem();
 #endif

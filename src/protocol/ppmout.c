@@ -144,7 +144,7 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
                 Model.proto_opts[PERIOD_PW] = 22500;
             }
             return ppm_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

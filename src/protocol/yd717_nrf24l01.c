@@ -485,7 +485,10 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
 #ifdef YD717_TELEMETRY
         case PROTOCMD_GETOPTIONS: return yd717_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+#else
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
         case PROTOCMD_SET_TXPOWER:
             tx_power = Model.tx_power;

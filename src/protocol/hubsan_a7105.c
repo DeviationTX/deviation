@@ -440,7 +440,7 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
                 Model.proto_opts[PROTOOPTS_VTX_FREQ] = 5885;
             return hubsan4_opts;
         case PROTOCMD_TELEMETRYSTATE: 
-            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
     }
     return 0;

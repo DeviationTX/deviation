@@ -575,8 +575,7 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
             if(Model.protocol == PROTOCOL_WK2601)
                 return wk2601_opts;
             break;
-        case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

@@ -260,7 +260,7 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
         case PROTOCMD_GETOPTIONS:
             return flysky_opts;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

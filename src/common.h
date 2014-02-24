@@ -152,7 +152,7 @@ void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
 const char **PROTOCOL_GetOptions();
 void PROTOCOL_SetOptions();
-s8 PROTOCOL_GetTelemetryState();
+int PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
 int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);

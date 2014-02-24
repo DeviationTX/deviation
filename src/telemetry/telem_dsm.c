@@ -106,4 +106,3 @@ s32 _dsm_get_max_value(u8 telem)
         default: return 0;
     }
 }
-#define _dsm_get_max_value _devo_get_max_value

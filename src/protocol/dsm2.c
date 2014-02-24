@@ -449,6 +449,7 @@ static void parse_telemetry_packet()
             Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
             Telemetry.p.dsm.flog.volt[0] = pkt16_to_volt(packet+4);  //In 1/10 of Volts
             Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
+#if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
             break;
@@ -537,6 +538,7 @@ static void parse_telemetry_packet()
                 //0x1c:2nd ENGINE NO COMMUNICATION
                 //0x1d:MAX OFF CONDITION
             break;
+#endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
             altitude += (bcd_to_u8(packet[3]) * 100 
@@ -766,7 +768,7 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
     }
     return NULL;
