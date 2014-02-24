@@ -76,7 +76,7 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     
     u8 small_step = 1;
     u8 big_step = 10;
-    if (max > 256) {
+    if (max > 1000) {
         small_step = 10;
         big_step = 100;
     }
