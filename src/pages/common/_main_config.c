@@ -130,6 +130,22 @@ static const char *add_dlgbut_str_cb(guiObject_t *obj, const void *data)
     return data ? _tr("Add") : _tr("Load");
 }
 
+static int _adjust_src_for_telemetry(int src, int dir)
+{
+    if (src > NUM_RTC + NUM_TIMERS && src <= NUM_RTC + NUM_TIMERS + NUM_TELEM) {
+        if (PROTOCOL_GetTelemetryState() != PROTO_TELEM_ON) {
+            //We chose a telemetry item, but there is no telemetry
+            src = (dir > 0) ? NUM_RTC + NUM_TIMERS + NUM_TELEM + 1 : NUM_RTC + NUM_TIMERS;
+        } else {
+            int max = TELEMETRY_GetNumTelemSrc();
+            if (src > NUM_RTC + NUM_TIMERS + max) {
+                src = (dir > 0) ? NUM_RTC + NUM_TIMERS + NUM_TELEM + 1 : NUM_RTC + NUM_TIMERS + max;
+            }
+        }
+    }
+    return src;
+}
+
 static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -142,16 +158,7 @@ static const char *dlgts_cb(guiObject_t *obj, int dir, void *data)
             u8 changed = 0;
             pc->elem[idx].src = GUI_TextSelectHelper(pc->elem[idx].src, 0, NUM_RTC + NUM_TELEM + NUM_TIMERS + NUM_CHANNELS, dir, 1, 1, &changed);
             if(changed && dir) {
-                if(PROTOCOL_GetTelemetryState() != 1) {
-                    if (pc->elem[idx].src > NUM_RTC + NUM_TIMERS
-                        && pc->elem[idx].src <= NUM_RTC + NUM_TIMERS + NUM_TELEM)
-                    {
-                        //We chose a telemetry item, but there is no telemetry
-                        pc->elem[idx].src = (dir > 0)
-                            ? NUM_RTC + NUM_TIMERS + NUM_TELEM + 1
-                            : NUM_RTC + NUM_TIMERS;
-                    }
-                }
+                pc->elem[idx].src = _adjust_src_for_telemetry(pc->elem[idx].src, dir);
             }
             return GetBoxSource(tempstring, pc->elem[idx].src);
         }

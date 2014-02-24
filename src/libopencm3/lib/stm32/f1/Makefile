@@ -25,7 +25,8 @@ CC		= $(PREFIX)-gcc
 AR		= $(PREFIX)-ar
 CFLAGS		= -Os -g -Wall -Wextra -I../../../include -fno-common \
 		  -mcpu=cortex-m3 -mthumb -Wstrict-prototypes \
-		  -ffunction-sections -fdata-sections -MD -DSTM32F1
+		  -ffunction-sections -fdata-sections -MD -DSTM32F1 \
+		  --specs=nano.specs
 # ARFLAGS	= rcsv
 ARFLAGS		= rcs
 OBJS		= rcc.o gpio.o usart.o adc.o spi.o flash.o \

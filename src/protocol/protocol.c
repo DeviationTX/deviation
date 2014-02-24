@@ -302,9 +302,9 @@ void PROTOCOL_SetOptions()
         PROTO_Cmds(PROTOCMD_SETOPTIONS);
 }
 
-s8 PROTOCOL_GetTelemetryState()
+int PROTOCOL_GetTelemetryState()
 {
-    s8 telem_state=  -1;  // -1 means not support
+    int telem_state = PROTO_TELEM_UNSUPPORTED;
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         telem_state = (long)PROTO_Cmds(PROTOCMD_TELEMETRYSTATE);
     return telem_state;

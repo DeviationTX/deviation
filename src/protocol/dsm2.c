@@ -369,6 +369,10 @@ static void calc_dsmx_channel()
     }
 }
 
+static int bcd_to_u8(u8 data)
+{
+     return (data >> 4) * 10 + (data & 0x0f);
+}
 static int pkt16_to_u8(u8 *ptr)
 {
     u32 value = ((u32)ptr[0] <<8) | ptr[1];
@@ -400,6 +404,17 @@ static s32 pkt16_to_temp(u8 *ptr)
     return value;
 }
 
+static u32 pkt32_to_coord(u8 *ptr)
+{
+    u8 tmp[4];
+    for(int i = 0; i < 4; i++)
+        tmp[i] = bcd_to_u8(ptr[i]);
+    return tmp[3] * 3600000
+         + tmp[2] * 60000
+         + tmp[1] * 600
+         + tmp[0] * 6; // (decimal, format DD MM.SSSS)
+}
+
 static void parse_telemetry_packet()
 {
     static s32 altitude;
@@ -417,14 +432,15 @@ static void parse_telemetry_packet()
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
             update = update7f;
-            for(int i = 0; i < 4; i++)
-                Telemetry.p.dsm.flog.fades[i] = pkt16_to_u8(packet+(2*i+2));
-//            Telemetry.p.dsm.flog.fades[0] = pkt16_to_u8(packet+2); //FadesA 0xFFFF = (not connected)
-//            Telemetry.p.dsm.flog.fades[1] = pkt16_to_u8(packet+4); //FadesB 0xFFFF = (not connected)
-//            Telemetry.p.dsm.flog.fades[2] = pkt16_to_u8(packet+6); //FadesL 0xFFFF = (not connected)
-//            Telemetry.p.dsm.flog.fades[3] = pkt16_to_u8(packet+8); //FadesR 0xFFFF = (not connected)
-            Telemetry.p.dsm.flog.frameloss = pkt16_to_u8(packet+10);
-            Telemetry.p.dsm.flog.holds = pkt16_to_u8(packet+12);
+            //Telemetry.p.dsm.flog.fades[0] = pkt16_to_u8(packet+2); //FadesA 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[1] = pkt16_to_u8(packet+4); //FadesB 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[2] = pkt16_to_u8(packet+6); //FadesL 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[3] = pkt16_to_u8(packet+8); //FadesR 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.frameloss = pkt16_to_u8(packet+10);
+            //Telemetry.p.dsm.flog.holds = pkt16_to_u8(packet+12);
+            for(int i = 2; i < 14; i+=2) {
+                *(u8*)&Telemetry.p.dsm.flog = pkt16_to_u8(packet+i);
+            }
             Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
         case 0x7e: //TM1000
@@ -433,6 +449,7 @@ static void parse_telemetry_packet()
             Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
             Telemetry.p.dsm.flog.volt[0] = pkt16_to_volt(packet+4);  //In 1/10 of Volts
             Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
+#if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
             break;
@@ -521,21 +538,16 @@ static void parse_telemetry_packet()
                 //0x1c:2nd ENGINE NO COMMUNICATION
                 //0x1d:MAX OFF CONDITION
             break;
+#endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
-            altitude += (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
-                       + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
+            altitude += (bcd_to_u8(packet[3]) * 100 
+                       + bcd_to_u8(packet[2])) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
             Telemetry.gps.altitude = altitude;
-            Telemetry.gps.latitude = ((packet[7] >> 4) * 10 + (packet[7] & 0x0f)) * 3600000 
-                                   + ((packet[6] >> 4) * 10 + (packet[6] & 0x0f)) * 60000 
-                                   + ((packet[5] >> 4) * 10 + (packet[5] & 0x0f)) * 600 
-                                   + ((packet[4] >> 4) * 10 + (packet[4] & 0x0f)) * 6; // (decimal, format DD MM.SSSS)
+            Telemetry.gps.latitude = pkt32_to_coord(&packet[4]);
             if ((packet[15] & 0x01)  == 0)
                 Telemetry.gps.latitude *= -1; //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = ((packet[11] >> 4) * 10 + (packet[11] & 0x0f)) * 3600000 
-                                    + ((packet[10] >> 4) * 10 + (packet[10] & 0x0f)) * 60000 
-                                    + ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 600 
-                                    + ((packet[8] >> 4) * 10 + (packet[8] & 0x0f)) * 6; // (decimal, format DD MM.SSSS)
+            Telemetry.gps.longitude = pkt32_to_coord(&packet[8]);
             if ((packet[15] & 0x04) == 4)
                 Telemetry.gps.longitude += 360000000; //1=+100 degrees
             if ((packet[15] & 0x02) == 0)
@@ -545,11 +557,11 @@ static void parse_telemetry_packet()
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             update = update17;
-            Telemetry.gps.velocity = (((packet[3] >> 4) * 10 + (packet[3] & 0x0f)) * 100 
-                                    + ((packet[2] >> 4) * 10 + (packet[2] & 0x0f))) * 5556 / 108; //In m/s * 1000
-            u8 hour  = (packet[7] >> 4) * 10 + (packet[7] & 0x0f);
-            u8 min   = (packet[6] >> 4) * 10 + (packet[6] & 0x0f);
-            u8 sec   = (packet[5] >> 4) * 10 + (packet[5] & 0x0f);
+            Telemetry.gps.velocity = (bcd_to_u8(packet[3]) * 100 
+                                    + bcd_to_u8(packet[2])) * 5556 / 108; //In m/s * 1000
+            u8 sec   = bcd_to_u8(packet[5]);
+            u8 min   = bcd_to_u8(packet[6]);
+            u8 hour  = bcd_to_u8(packet[7]);
             //u8 ssec   = (packet[4] >> 4) * 10 + (packet[4] & 0x0f);
             u8 day   = 0;
             u8 month = 0;
@@ -561,7 +573,7 @@ static void parse_telemetry_packet()
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
             //Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
-            altitude = ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
+            altitude = bcd_to_u8(packet[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             break;
     }
     if (update) {
@@ -756,7 +768,7 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
         default: break;
     }
     return NULL;
