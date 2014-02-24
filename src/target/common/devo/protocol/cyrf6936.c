@@ -26,12 +26,37 @@
 #include "protocol/interface.h"
 
 //GPIOB.12
-#define CS_HI() gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin)
-#define CS_LO() gpio_clear(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin)
 #define RS_HI() gpio_set(GPIOB, GPIO11)
 #define RS_LO() gpio_clear(GPIOB, GPIO11)
 
 #define Delay usleep
+static void  CS_HI() {
+#if HAS_PROGAMMABLE_SWITCH
+    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
+        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    }
+    else
+#endif
+    {
+        gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
+    }
+}
+
+static void CS_LO() {
+#if HAS_PROGAMMABLE_SWITCH
+    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
+        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
+        for(int i = 0; i < 20; i++)
+            asm volatile ("nop");
+    }
+    else
+#endif
+    {
+        gpio_clear(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
+    }
+}
 void CYRF_WriteRegister(u8 address, u8 data)
 {
     CS_LO();
@@ -79,11 +104,16 @@ u8 CYRF_ReadRegister(u8 address)
 
 void CYRF_Reset()
 {
-    /* Reset the CYRF chip */
-    RS_HI();
-    Delay(100);
-    RS_LO();
-    Delay(100);
+#if HAS_PROGRAMABLE_SWITCH
+        CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
+        Delay(200);
+        /* Reset the CYRF chip */
+#else
+        RS_HI();
+        Delay(100);
+        RS_LO();
+        Delay(100);
+#endif
 }
 
 u8 CYRF_MaxPower()
@@ -114,6 +144,10 @@ void CYRF_GetMfgData(u8 data[])
  */
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
+#if HAS_PROGRAMMABLE_SWITCH
+    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
+    }
+#endif
     if(mode == TX_EN)
     {
         CYRF_WriteRegister(0x0E,0x80);

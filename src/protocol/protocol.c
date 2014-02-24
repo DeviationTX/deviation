@@ -354,6 +354,8 @@ int PROTOCOL_HasPowerAmp(int idx)
 
 void PROTOCOL_SetSwitch(int module)
 {
+    (void)module;
+#if HAS_PROGRAMMABLE_SWITCH
     if (! Transmitter.module_enable[PROGSWITCH].port)
         return;
     u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
@@ -367,6 +369,7 @@ void PROTOCOL_SetSwitch(int module)
     u8 csn_high = toggle | set;
     u8 csn_low  = ~toggle & set;
     SPI_ConfigSwitch(csn_high, csn_low);
+#endif
 }
 
 int PROTOCOL_SticksMoved(int init)

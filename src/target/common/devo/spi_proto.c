@@ -28,14 +28,16 @@
 #include "protocol/interface.h"
 #include <stdlib.h>
 
+#if HAS_PROGRAMMABLE_SWITCH
 void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 {
     int i;
-    spi_disable(SPI2);
+    //Switch output on clock before switching off SPI
+    //Otherwise the pin will float which could cause a false trigger
     //SCK is now on output
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    gpio_clear(GPIOB, GPIO13); // It should already be clear, but whatever
+    spi_disable(SPI2);
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     gpio_set(GPIOB, GPIO13);
@@ -80,6 +82,7 @@ int SPI_ProtoGetPinConfig(int module, int state) {
     }
     return 0;
 }
+#endif
 
 void SPI_ProtoInit()
 {
@@ -121,6 +124,7 @@ void SPI_ProtoInit()
     gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
 
+#if HAS_PROGRAMMABLE_SWITCH
     if(Transmitter.module_enable[PROGSWITCH].port) {
         struct mcu_pin *port = &Transmitter.module_enable[PROGSWITCH];
         printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
@@ -128,6 +132,7 @@ void SPI_ProtoInit()
                   GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
         gpio_set(port->port, port->pin);
     }
+#endif //HAS_PROGRAMMABLE_SWITCH
     for (int i = 0; i < PROGSWITCH; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
