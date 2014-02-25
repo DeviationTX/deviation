@@ -329,7 +329,6 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
-    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04);
     CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
     CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
@@ -442,8 +441,8 @@ static u16 devo_telemetry_cb()
             txState = 15;
         } else {
             CYRF_SetTxRxMode(RX_EN); //Receive mode
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
         }
     } else {
         if(CYRF_ReadRegister(0x07) & 0x20) { // this won't be true in emulator so we need to simulate it somehow

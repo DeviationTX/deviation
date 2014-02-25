@@ -28,21 +28,29 @@
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
 static void  CS_HI() {
-    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+#if HAS_PROGRAMMABLE_SWITCH
+    if (Transmitter.module_enable[CC2500].port == 0xFFFFFFFF) {
         gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
         for(int i = 0; i < 20; i++)
             asm volatile ("nop");
-    } else {
+    }
+    else
+#endif
+    {
         gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
     }
 }
 
 static void CS_LO() {
-    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
+#if HAS_PROGRAMMABLE_SWITCH
+    if (Transmitter.module_enable[CC2500].port == 0xFFFFFFFF) {
         gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
         for(int i = 0; i < 20; i++)
             asm volatile ("nop");
-    } else {
+    }
+    else
+#endif
+    {
         gpio_clear(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
     }
 }

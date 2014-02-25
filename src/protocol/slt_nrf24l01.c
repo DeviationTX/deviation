@@ -260,7 +260,7 @@ void send_data(u8 *data, u8 len)
     NRF24L01_FlushTx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_MAX_RT));
     NRF24L01_WritePayload(data, len);
-    NRF24L01_PulseCE();
+    //NRF24L01_PulseCE();
     packet_sent = 1;
 }
 

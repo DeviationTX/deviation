@@ -363,6 +363,10 @@ u8 NRF24L01_SetPower(u8 power)
     return 0;
 }
 
+void NRF24L01_SetTxRxMode(enum TXRX_State State) {
+    printf("Switching to %s mode\n", State ? "transmit" : "receive");
+}
+
 void NRF24L01_PulseCE() {}
 
 void PWM_Initialize() {}

@@ -245,6 +245,8 @@ static u8 get_pn_row(u8 channel)
 }
 
 static const u8 init_vals[][2] = {
+    {CYRF_02_TX_CTRL, 0x00},
+    {CYRF_05_RX_CTRL, 0x00},
     {CYRF_1D_MODE_OVERRIDE, 0x01},
     {CYRF_28_CLK_EN, 0x02},
     {CYRF_32_AUTO_CAL_TIME, 0x3c},

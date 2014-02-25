@@ -28,21 +28,29 @@
 #ifdef PROTO_HAS_A7105
 
 static void  CS_HI() {
+#if HAS_PROGRAMMABLE_SWITCH
     if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
         gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
         for(int i = 0; i < 20; i++)
             asm volatile ("nop");
-    } else {
+    }
+    else
+#endif
+   {
         gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
     }
 }
 
 static void CS_LO() {
+#if HAS_PROGRAMMABLE_SWITCH
     if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
         gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
         for(int i = 0; i < 20; i++)
             asm volatile ("nop");
-    } else {
+    }
+    else
+#endif
+    {
         gpio_clear(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
     }
 }
@@ -59,14 +67,6 @@ u8 A7105_ReadReg(u8 address)
 {
     u8 data;
     CS_LO();
-/*    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
-        //4wire SPI
-        spi_xfer(SPI2, 0x40 | address);
-        data = spi_xfer(SPI2, 0);
-        CS_HI();
-        return data;
-    }
-*/
     spi_xfer(SPI2, 0x40 | address);
     /* Wait for tx completion before spi shutdown */
     while(!(SPI_SR(SPI2) & SPI_SR_TXE))
