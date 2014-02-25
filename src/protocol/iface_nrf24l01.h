@@ -71,9 +71,10 @@ u8 NRF24L01_Activate(u8 code);
 u8 NRF24L01_SetBitrate(u8 bitrate);
 
 u8 NRF24L01_SetPower(u8 power);
+void NRF24L01_SetTxRxMode(enum TXRX_State);
 
 // To enable radio transmit after WritePayload you need to turn the radio
-void NRF24L01_PulseCE();
+//void NRF24L01_PulseCE();
 
 
 #endif

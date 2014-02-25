@@ -146,17 +146,32 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
 #if HAS_PROGRAMMABLE_SWITCH
     if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
-    }
-#endif
-    if(mode == TX_EN)
-    {
-        CYRF_WriteRegister(0x0E,0x80);
-        CYRF_WriteRegister(0x0F,0x2C);
+#if AWA24S
+        if(mode == TX_EN)
+        {
+            CYRF_WriteRegister(0x0D,0x40); //disable Rx (assume IRQ is set?)
+            SPI_ConfigSwitch(0x8f, 0x8e);
+        }
+        else
+        {
+            CYRF_WriteRegister(0x0D,0x00); //enable Rx (assume IRQ is set?)
+            SPI_ConfigSwitch(0x0f, 0x0e);
+        }
+#endif //AWA24S
     }
     else
+#endif
     {
-        CYRF_WriteRegister(0x0E,0x20);
-        CYRF_WriteRegister(0x0F,0x28);
+        if(mode == TX_EN)
+        {
+            CYRF_WriteRegister(0x0E,0x80);
+            CYRF_WriteRegister(0x0F,0x2C);
+        }
+        else
+        {
+            CYRF_WriteRegister(0x0E,0x20);
+            CYRF_WriteRegister(0x0F,0x28);
+        }
     }
 }
 /*

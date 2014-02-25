@@ -218,11 +218,47 @@ u8 NRF24L01_SetPower(u8 power)
     rf_setup = (rf_setup & 0xF9) | ((nrf_power & 0x03) << 1);
     return NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, rf_setup);
 }
-
-void NRF24L01_PulseCE()
+static void CE_lo()
 {
-    // Not implemented, CE is wired HIGH
-    // Should issue HIGH pulse ~15us wide
+#if HAS_PROGRAMMABLE_SWITCH
+    SPI_ConfigSwitch(0x0f, 0x0b);
+#endif
+}
+static void CE_hi()
+{
+#if HAS_PROGRAMMABLE_SWITCH
+    SPI_ConfigSwitch(0x1f, 0x1b);
+#endif
+}
+
+void NRF24L01_SetTxRxMode(enum TXRX_State mode)
+{
+    if(mode == TX_EN) {
+        CE_lo();
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, (1 << NRF24L01_07_RX_DR)    //reset the flag(s)
+                                            | (1 << NRF24L01_07_TX_DS)
+                                            | (1 << NRF24L01_07_MAX_RT));
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, (1 << NRF24L01_00_EN_CRC)   // switch to TX mode
+                                            | (1 << NRF24L01_00_CRCO)
+                                            | (1 << NRF24L01_00_PWR_UP));
+        usleep(130);
+        CE_hi();
+    } else if (mode == RX_EN) {
+        CE_lo();
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);        // reset the flag(s)
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0F);        // switch to RX mode
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, (1 << NRF24L01_07_RX_DR)    //reset the flag(s)
+                                            | (1 << NRF24L01_07_TX_DS)
+                                            | (1 << NRF24L01_07_MAX_RT));
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, (1 << NRF24L01_00_EN_CRC)   // switch to RX mode
+                                            | (1 << NRF24L01_00_CRCO)
+                                            | (1 << NRF24L01_00_PWR_UP)
+                                            | (1 << NRF24L01_00_PRIM_RX));
+        usleep(130);
+        CE_hi();
+    } else {
+        CE_lo();
+    }
 }
 
 #endif // defined(PROTO_HAS_NRF24L01)

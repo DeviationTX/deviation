@@ -229,7 +229,7 @@ static u16 j6pro_cb()
             return 30000; //30msec
         case J6PRO_BIND_03_CHECK:
             {
-            u8 rx = CYRF_ReadRegister(CYRF_07_RX_IRG_STATUS);
+            u8 rx = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
             if((rx & 0x1a) == 0x1a) {
                 rx = CYRF_ReadRegister(CYRF_0A_RX_LENGTH);
                 if(rx == 0x0f) {

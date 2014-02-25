@@ -7,7 +7,7 @@ enum {
     CYRF_04_TX_IRQ_STATUS  = 0x04,
     CYRF_05_RX_CTRL        = 0x05,
     CYRF_06_RX_CFG         = 0x06,
-    CYRF_07_RX_IRG_STATUS  = 0x07,
+    CYRF_07_RX_IRQ_STATUS  = 0x07,
     CYRF_09_RX_COUNT       = 0x09,
     CYRF_0A_RX_LENGTH      = 0x0A,
     CYRF_0B_PWR_CTRL       = 0x0B,
