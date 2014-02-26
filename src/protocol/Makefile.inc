@@ -22,15 +22,15 @@ PROTO_MODULES += $(ODIR)/protocol/symax.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
-$(ODIR)/protocol/devo.mod : $(ODIR)/devo.bin
+$(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
 	@echo Building 'devo' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/dsm2.mod : $(ODIR)/dsm2.bin
+$(ODIR)/protocol/dsm2.mod : $(ODIR)/dsm2_cyrf6936.bin
 	@echo Building 'dsm2' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/dsmx.mod : $(ODIR)/dsm2.bin
+$(ODIR)/protocol/dsmx.mod : $(ODIR)/dsm2_cyrf6936.bin
 	@echo Building 'dsmx' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
@@ -50,7 +50,7 @@ $(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
 	@echo Building 'hubsan4' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/j6pro.mod : $(ODIR)/j6pro.bin
+$(ODIR)/protocol/j6pro.mod : $(ODIR)/j6pro_cyrf6936.bin
 	@echo Building 'j6pro' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
