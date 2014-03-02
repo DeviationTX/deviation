@@ -132,5 +132,7 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
 void CC2500_Reset()
 {
     CC2500_Strobe(CC2500_SRES);
+    usleep(1000);
+    CC2500_SetTxRxMode(TXRX_OFF);
 }
 #endif
