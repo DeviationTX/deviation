@@ -186,6 +186,8 @@ u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);
 int AVR_SetFuses();
+int AVR_VerifyFuses();
+int AVR_Verify(u8 *data, int size);
 
 struct mcu_pin;
 void MCU_InitModules();
