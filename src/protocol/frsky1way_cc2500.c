@@ -35,10 +35,22 @@
 
 #include "iface_cc2500.h"
 
+static const char * const frsky_opts[] = {
+  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
+  _tr_noop("Freq-Course"),  "-127", "127", NULL,
+  NULL
+};
+enum {
+    PROTO_OPTS_FREQFINE = 0,
+    PROTO_OPTS_FREQCOURSE = 1,
+};
 static u8 packet[16];
 static u32 state;
-static u16 seed;
+static u32 seed;
 static u32 fixed_id;
+static u8 crc;
+static s8 course;
+static s8 fine;
 
 enum {
     FRSKY_BIND        = 0,
@@ -61,10 +73,10 @@ static void frsky_init()
         CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);
         CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
         CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x08);
-        CC2500_WriteReg(CC2500_0C_FSCTRL0, 0x00);
+        CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
         CC2500_WriteReg(CC2500_0D_FREQ2, 0x5c);
         CC2500_WriteReg(CC2500_0E_FREQ1, 0x58);
-        CC2500_WriteReg(CC2500_0F_FREQ0, 0x9d);
+        CC2500_WriteReg(CC2500_0F_FREQ0, 0x9d + course);
         CC2500_WriteReg(CC2500_10_MDMCFG4, 0xaa);
         CC2500_WriteReg(CC2500_11_MDMCFG3, 0x10);
         CC2500_WriteReg(CC2500_12_MDMCFG2, 0x93);
@@ -92,8 +104,8 @@ static void frsky_init()
         CC2500_SetTxRxMode(TX_EN);
 
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
-        CC2500_WriteReg(CC2500_02_IOCFG0,   0x06);
-        CC2500_WriteReg(CC2500_0A_CHANNR, 0x06);
+        //CC2500_WriteReg(CC2500_02_IOCFG0,   0x06);
+        //CC2500_WriteReg(CC2500_0A_CHANNR, 0x06);
 #if 0
         CC2500_WriteReg(CC2500_02_IOCFG0,   0x01); // reg 0x02: RX complete interrupt
         CC2500_WriteReg(CC2500_17_MCSM1,    0x0C); // reg 0x17: Stay in rx after packet complete
@@ -160,6 +172,27 @@ static u8 crc8(u32 result, u8 *data, int len)
     return result & 0xff;
 }
 
+static u8 crc8_le(u32 _result, u8 *data, int len)
+{
+    u32 polynomial = 0x83; //x^9 + x^8 + x^7 + 1 
+    u32 result = 0;
+    for(int i = 0; i < 8; i++) {
+        result = (result << 1) | (_result & 0x01);
+        _result >>= 1;
+    }
+    for(int i = 0; i < len; i++) {
+        result = result ^ data[i];
+        for(int j = 0; j < 8; j++) {
+            if(result & 0x01) {
+                result = (result >> 1) ^ polynomial;
+            } else {
+                result = result >> 1;
+            }
+        }
+    }
+    return result & 0xff;
+}
+
 static void build_bind_packet_1way()
 {
     //0e 03 01 57 12 00 06 0b 10 15 1a 00 00 00 61
@@ -205,12 +238,12 @@ static void build_data_packet_1way()
             packet[2*i + 6] = 0xc8;
             packet[2*i + 7] = 0x08;
         } else {
-            s32 value = (s32)Channels[i + idx + 6] * 0x600 / CHAN_MAX_VALUE + 0x8c8;
+            s32 value = (s32)Channels[i + idx] * 0x600 / CHAN_MAX_VALUE + 0x8c8;
             packet[2*i + 6] = value & 0xff;
             packet[2*i + 7] = value >> 8;
         }
     }
-    packet[14] = crc8(0xa6, packet, 14);
+    packet[14] = crc8(crc, packet, 14);
 //for(int i = 0; i < 15; i++) printf("%02x ", packet[i]); printf("\n");
 }
 static u16 frsky_cb()
@@ -230,6 +263,12 @@ static u16 frsky_cb()
     if (state >= FRSKY_DATA1) {
         u8 chan = calc_channel();
         CC2500_Strobe(CC2500_SIDLE);
+        if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE] || course != (s8)Model.proto_opts[PROTO_OPTS_FREQCOURSE]) {
+            course = Model.proto_opts[PROTO_OPTS_FREQCOURSE];
+            fine   = Model.proto_opts[PROTO_OPTS_FREQFINE];
+            CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+            CC2500_WriteReg(CC2500_0F_FREQ0, 0x9d + course);
+        }
         CC2500_WriteReg(CC2500_0A_CHANNR, chan * 5 + 6);
         build_data_packet_1way();
         CC2500_WriteData(packet, packet[0]+1);
@@ -242,12 +281,34 @@ static u16 frsky_cb()
     return 0;
 }
 
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static void get_tx_id()
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    fixed_id = rand32_r(&lfsr, 0) & 0xffff;
+    //fixed_id = 0x1257;
+    u8 data[2] = {(fixed_id >> 8) & 0xff, fixed_id & 0xff};
+    crc = crc8_le(0x6b, data, 2);
+    //crc = 0xa6;
+}
+
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+    course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
+    fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    get_tx_id();
+    printf("%04x - %02x\n", fixed_id, crc);
     frsky_init();
     seed = 1;
-    fixed_id = 0x1257;
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
@@ -263,7 +324,7 @@ const void *FRSKY1WAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_INIT:  initialize(0); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return 0; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)4L;
+        case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;

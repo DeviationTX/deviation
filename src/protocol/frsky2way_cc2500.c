@@ -247,13 +247,29 @@ static u16 frsky2way_cb()
     return 9000;
 }
 
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static int get_tx_id()
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    return rand32_r(&lfsr, 0);
+}
+
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
     course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    //fixed_id = 0x3e19;
+    fixed_id = get_tx_id();
     frsky2way_init(bind);
-    fixed_id = 0x3e19;
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
