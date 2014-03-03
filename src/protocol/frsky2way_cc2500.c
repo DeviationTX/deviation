@@ -37,10 +37,14 @@
 
 static const char * const frsky_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
+  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
+  _tr_noop("Freq-Course"),  "-127", "127", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_TELEM = 0,
+    PROTO_OPTS_FREQFINE = 1,
+    PROTO_OPTS_FREQCOURSE = 2,
 };
 #define TELEM_ON 0
 #define TELEM_OFF 1
@@ -48,6 +52,8 @@ static u8 packet[40];
 static u32 state;
 static u8 counter;
 static u32 fixed_id;
+static s8 course;
+static s8 fine;
 
 enum {
     FRSKY_BIND        = 0,
@@ -62,7 +68,6 @@ enum {
 static void frsky2way_init(int bind)
 {
         CC2500_Reset();
-
         CC2500_WriteReg(CC2500_17_MCSM1, 0x0c);
         CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
         CC2500_WriteReg(CC2500_06_PKTLEN, 0x19);
@@ -70,10 +75,10 @@ static void frsky2way_init(int bind)
         CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);
         CC2500_WriteReg(CC2500_3E_PATABLE, 0xff);
         CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x08);
-        CC2500_WriteReg(CC2500_0C_FSCTRL0, 0x00);
+        CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
         CC2500_WriteReg(CC2500_0D_FREQ2, 0x5c);
         CC2500_WriteReg(CC2500_0E_FREQ1, 0x76);
-        CC2500_WriteReg(CC2500_0F_FREQ0, 0x27);
+        CC2500_WriteReg(CC2500_0F_FREQ0, 0x27 + course);
         CC2500_WriteReg(CC2500_10_MDMCFG4, 0xaa);
         CC2500_WriteReg(CC2500_11_MDMCFG3, 0x39);
         CC2500_WriteReg(CC2500_12_MDMCFG2, 0x11);
@@ -178,11 +183,11 @@ static void frsky2way_build_data_packet()
             packet[16+((i-4)>>1)] |= ((value >> 8) & 0x0f) << (4 * ((i-4) & 0x01));
         }
     }
-    if(counter == 0) {
-        for(int i = 0; i < 18; i++)
-            printf("%02x ", packet[i]);
-        printf("\n");
-    }
+    //if(counter == 0) {
+    //    for(int i = 0; i < 18; i++)
+    //        printf("%02x ", packet[i]);
+    //    printf("\n");
+    //}
 }
 
 static u16 frsky2way_cb()
@@ -219,11 +224,18 @@ static u16 frsky2way_cb()
             int len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
             if (len && len < 40) {
                 CC2500_ReadData(packet, len);
+                //CC2500_WriteReg(CC2500_0C_FSCTRL0, CC2500_ReadReg(CC2500_32_FREQEST));
                 //parse telemetry packet here
             }
             CC2500_SetTxRxMode(TX_EN);
         }
         CC2500_Strobe(CC2500_SIDLE);
+        if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE] || course != (s8)Model.proto_opts[PROTO_OPTS_FREQCOURSE]) {
+            course = Model.proto_opts[PROTO_OPTS_FREQCOURSE];
+            fine   = Model.proto_opts[PROTO_OPTS_FREQFINE];
+            CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
+            CC2500_WriteReg(CC2500_0F_FREQ0, 0x27 + course);
+        }
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
@@ -235,11 +247,29 @@ static u16 frsky2way_cb()
     return 9000;
 }
 
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static int get_tx_id()
+{
+    u32 lfsr = 0x7649eca9ul;
+
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+    for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+        rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    return rand32_r(&lfsr, 0);
+}
+
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+    course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
+    fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    //fixed_id = 0x3e19;
+    fixed_id = get_tx_id();
     frsky2way_init(bind);
-    fixed_id = 0x3e19;
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;

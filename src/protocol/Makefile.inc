@@ -38,11 +38,11 @@ $(ODIR)/protocol/flysky.mod : $(ODIR)/flysky_a7105.bin
 	@echo Building 'flysky' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/frsky-1.mod : $(ODIR)/frsky1way_cc2500.bin
+$(ODIR)/protocol/frsky-v8.mod : $(ODIR)/frsky1way_cc2500.bin
 	@echo Building 'frsky1way' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/frsky-2.mod : $(ODIR)/frsky2way_cc2500.bin
+$(ODIR)/protocol/frsky.mod : $(ODIR)/frsky2way_cc2500.bin
 	@echo Building 'frsky2way' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 

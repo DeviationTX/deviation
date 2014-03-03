@@ -106,6 +106,22 @@ int AVR_Program(u32 address, u8 *data, int pagesize)
     return 1;
 }
 
+int AVR_Verify(u8 *data, int size)
+{
+    for(int i = 0; i < size; i++) {
+        int pos = i/2;
+        spi_xfer(SPI2, 0x20 | ((i % 2) * 0x08));
+        spi_xfer(SPI2, pos >> 8);
+        spi_xfer(SPI2, pos & 0xff);
+        u8 chk = spi_xfer(SPI2, 0x00);
+        if (chk != data[i]) {
+            printf("@%04x.%d: %02x != %02x\n", pos, i %2, chk, data[i]);
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int AVR_SetFuses()
 {
     int data;
@@ -129,4 +145,13 @@ int AVR_SetFuses()
     if (data != 0xe2)
         return 0;
     return 1;
+}
+
+int AVR_VerifyFuses()
+{
+    spi_xfer(SPI2, 0x50);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0x00);
+    int data = spi_xfer(SPI2, 0x00); //current fuse bits
+    return (data == 0xe2);
 }

@@ -106,15 +106,32 @@ int main() {
     }
     char avr_str[100];
     sprintf(avr_str, "Found AVR: %08x\nhex: %dbytes", type, size);
+    //Verify AVR
+    sprintf(tempstring, "%s\n2. Verifying", avr_str);
+    LCD_Clear(0x0000);
+    LCD_PrintStringXY(0,0, tempstring);
+    if(AVR_Verify(data, size)) {
+        sprintf(tempstring, "%s\n2a. Verify Fuse", avr_str);
+        LCD_Clear(0x0000);
+        LCD_PrintStringXY(0,0, tempstring);
+        if (AVR_VerifyFuses()) {
+            sprintf(tempstring, "%s\n6 Verified", avr_str);
+            LCD_Clear(0x0000);
+            LCD_PrintStringXY(0,0, tempstring);
+            while(1)
+                if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+        }
+        usleep(500000);
+    }
     //Erase AVR
-    sprintf(tempstring, "%s\n2. Erasing", avr_str);
+    sprintf(tempstring, "%s\n3. Erasing", avr_str);
     LCD_Clear(0x0000);
     LCD_PrintStringXY(0,0, tempstring);
     if(! AVR_Erase()) {
         sprintf(tempstring, "%s\nERR: Erase failed", avr_str);
         error(tempstring);
     }
-    sprintf(tempstring, "%s\n2. Programming", avr_str);
+    sprintf(tempstring, "%s\n4. Programming", avr_str);
     LCD_Clear(0x0000);
     LCD_PrintStringXY(0,0, tempstring);
     i = 0;
@@ -126,8 +143,7 @@ int main() {
         i += avr->page_size;
     }
 #if 1
-    //Untested
-    sprintf(tempstring, "%s\n3. Setting Fuses", avr_str);
+    sprintf(tempstring, "%s\n5. Setting Fuses", avr_str);
     LCD_Clear(0x0000);
     LCD_PrintStringXY(0,0, tempstring);
     if(!AVR_SetFuses()) {
@@ -135,7 +151,7 @@ int main() {
         error(tempstring);
     }
 #endif
-    sprintf(tempstring, "%s\n3. Done", avr_str);
+    sprintf(tempstring, "%s\n6. Done", avr_str);
     LCD_Clear(0x0000);
     LCD_PrintStringXY(0,0, tempstring);
     while(1)
