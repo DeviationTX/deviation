@@ -335,6 +335,7 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
+    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
     CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
     CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
@@ -347,7 +348,7 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x10);
     CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);
-    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0);
+    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x10);
     CYRF_WriteRegister(CYRF_27_CLK_OVERRIDE, 0x02);
     CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
