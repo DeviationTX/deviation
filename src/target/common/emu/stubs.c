@@ -129,3 +129,21 @@ void fempty(FILE *fh)
     ftruncate(fd, pos);
     fseek(fh, 0, SEEK_SET);
 }
+
+void MCU_SerialNumber(u8 *var, int len)
+{
+    int l = len > 12 ? 12 : len;
+    if(Transmitter.txid) {
+        u32 id[4];
+        u32 seed = 0x4d3ab5d0ul;
+        for(int i = 0; i < 4; i++)
+            rand32_r(&seed, Transmitter.txid >> (8*i));
+        for(int i = 0; i < 4; i++)
+            id[i] = rand32_r(&seed, 0x00);
+        memcpy(var, &id[1], len);
+        return;
+    }
+    const char data[] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+                         0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
+    memcpy(var, data, l);
+}
