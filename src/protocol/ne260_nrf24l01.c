@@ -139,10 +139,10 @@
 #define vRF_DR_2MBPS	(1<<(RF_DR_HIGH))
 #define vRF_DR_250KBPS	(1<<(RF_DR_LOW))
 
-#define vRF_PWR_M18DBM	0b000
-#define vRF_PWR_M12DBM	0b010
-#define vRF_PWR_M6DBM	0b100
-#define vRF_PWR_0DBM	0b110
+#define vRF_PWR_M18DBM	0x00
+#define vRF_PWR_M12DBM	0x02
+#define vRF_PWR_M6DBM	0x04
+#define vRF_PWR_0DBM	0x06
 
 #define vARD_250us		0x00
 #define vARD_500us		0x10

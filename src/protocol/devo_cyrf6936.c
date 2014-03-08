@@ -231,6 +231,12 @@ static void parse_telemetry_packet(u8 *packet)
         return;
     const u8 *update = NULL;
     scramble_pkt(); //This will unscramble the packet
+    if (packet[13] != (fixed_id  & 0xff)
+        || packet[14] != ((fixed_id >> 8) & 0xff)
+        || packet[15] != ((fixed_id >> 16) & 0xff))
+    {
+        return;
+    }
     //if (packet[0] < 0x37) {
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
@@ -329,6 +335,7 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
+    CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
     CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
     CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
@@ -341,7 +348,7 @@ static void cyrf_init()
     CYRF_WriteRegister(CYRF_1E_RX_OVERRIDE, 0x10);
     CYRF_WriteRegister(CYRF_1F_TX_OVERRIDE, 0x00);
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, 0x10);
-    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0);
+    CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO
     CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x10);
     CYRF_WriteRegister(CYRF_27_CLK_OVERRIDE, 0x02);
     CYRF_WriteRegister(CYRF_28_CLK_EN, 0x02);
@@ -445,7 +452,10 @@ static u16 devo_telemetry_cb()
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
         }
     } else {
-        if(CYRF_ReadRegister(0x07) & 0x20) { // this won't be true in emulator so we need to simulate it somehow
+        int reg = CYRF_ReadRegister(0x07);
+        if ((reg & 0x23) == 0x22)
+        //if(CYRF_ReadRegister(0x07) & 0x20)
+        { // this won't be true in emulator so we need to simulate it somehow
             CYRF_ReadDataPacket(packet);
             parse_telemetry_packet(packet);
             delay = 100 * (16 - txState);
