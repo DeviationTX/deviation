@@ -110,16 +110,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     int count = 0;
-    if (absrow < ROW1) {
-        int idx = DATALOG_BYTE(absrow);
-        int pos = DATALOG_POS(absrow);
+    int num_telem = TELEMETRY_GetNumTelemSrc();
+    int telem_delta = NUM_TELEM - num_telem;
+    int absrow1 = absrow;
+    if (absrow1 >= DLOG_INPUTS - telem_delta)
+        absrow1 += telem_delta;
+    if (absrow1 < ROW1) {
+        int idx = DATALOG_BYTE(absrow1);
+        int pos = DATALOG_POS(absrow1);
         GUI_CreateLabelBox(&gui->checked[relrow],
                     SCROLLABLE_X + 5, y, 16, 16,
                     (dlog->source[idx] & (1 << pos)) ? &SMALLBOXNEG_FONT : &SMALLBOX_FONT,
-                    emptystr_cb, press_cb, (void *)(long)absrow);
+                    emptystr_cb, press_cb, (void *)(long)absrow1);
         GUI_CreateLabelBox(&gui->source[relrow],
                     SCROLLABLE_X + 25, y, 16, 100,
-                    &DEFAULT_FONT, source_cb, NULL, (void *)(long)absrow);
+                    &DEFAULT_FONT, source_cb, NULL, (void *)(long)absrow1);
         count++;
     }
     if (absrow < ROW2) {
@@ -168,7 +173,8 @@ void PAGE_DatalogInit(int page)
     GUI_CreateButton(&gui->none, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, select_str_cb, 0, select_press_cb, (void *)1L);
     row += ROW_HEIGHT;
 
-    int count = ROW1 > ROW2 ? ROW1 : ROW2;
+    int row1 = ROW1 - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
+    int count = row1 > ROW2 ? row1 : ROW2;
     GUI_CreateScrollable(&gui->scrollable,
          SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
     next_update = CLOCK_getms() / 1000 + 5;

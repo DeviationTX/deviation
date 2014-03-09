@@ -104,9 +104,14 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         lbl_cb = NULL; lbl_data = _tr("Select");
         selpress_cb = select_press_cb; sel_cb = select_cb; sel_data = NULL;
     } else {
-        lbl_cb = source_cb; lbl_data = (void *)(long)(absrow-DL_SOURCE);
+        long row = absrow-DL_SOURCE;
+        int num_telem = TELEMETRY_GetNumTelemSrc();
+        int telem_delta = NUM_TELEM - num_telem;
+        if (row >= DLOG_INPUTS - telem_delta)
+            row += telem_delta;
+        lbl_cb = source_cb; lbl_data = (void *)row;
         but_press = checkbut_press_cb; but_txt = checkbut_txt_cb;
-        but_data = (void *)(long)(absrow-DL_SOURCE);
+        but_data = (void *)row;
     }
     if (lbl_data || lbl_cb) {
         GUI_CreateLabelBox(&gui->label[relrow], 0, y,
@@ -153,10 +158,11 @@ void PAGE_DatalogInit(int page)
     PAGE_SetActionCB(_action_cb);
     struct LabelDesc font = DEFAULT_FONT;
     font.style = LABEL_UNDERLINE;
+    int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
         LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
