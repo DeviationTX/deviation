@@ -261,6 +261,8 @@ void PAGE_TelemtestInit(int page)
         GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         return;
     }
+    if (current_page > telemetry_gps)
+        current_page = telemetry_basic;
 
     _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
 }
