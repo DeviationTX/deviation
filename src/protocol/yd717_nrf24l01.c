@@ -103,14 +103,24 @@ enum {
     YD717_DATA
 };
 
-#ifdef YD717_TELEMETRY
 static const char * const yd717_opts[] = {
+  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), NULL,
+#ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+#endif
   NULL
 };
 enum {
-    PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_FORMAT = 0,
+#ifdef YD717_TELEMETRY
+    PROTOOPTS_TELEMETRY,
+#endif
 };
+enum {
+    FORMAT_YD717 = 0,
+    FORMAT_SKYWLKR = 1,
+};
+#ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
 #define TELEM_ON 1
 #endif
@@ -211,7 +221,7 @@ static void send_packet(u8 bind)
         packet[1] = rudder;
         packet[3] = elevator;
         packet[4] = aileron;
-        if(Model.protocol == PROTOCOL_YD717) {
+        if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
             packet[2] = elevator_trim;
             packet[5] = aileron_trim;
             packet[6] = rudder_trim;
@@ -228,7 +238,7 @@ static void send_packet(u8 bind)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
     NRF24L01_FlushTx();
 
-    if(Model.protocol == PROTOCOL_YD717) {
+    if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
         NRF24L01_WritePayload(packet, 8);
     } else {
         packet[8] = packet[0];  // checksum
@@ -483,8 +493,8 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return Model.protocol == PROTOCOL_YD717 ? yd717_opts : 0;
 #ifdef YD717_TELEMETRY
-        case PROTOCMD_GETOPTIONS: return yd717_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
 #else
