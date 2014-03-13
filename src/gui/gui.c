@@ -252,7 +252,7 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
     obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
     while(obj) {
         if(! OBJ_IS_HIDDEN(obj)) {
-            if (obj->Type == Scrollable) {
+            if (obj->Type == Scrollable && ((guiScrollable_t *)obj)->head) {
                 //Redraw scrollable contents
                 _GUI_RefreshScreen(((guiScrollable_t *)obj)->head);
             } else if(OBJ_IS_DIRTY(obj)) {
