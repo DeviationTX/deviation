@@ -17,6 +17,7 @@
 #include "protocol/interface.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "protocol/iface_nrf24l01.h"
 
 #include <stdlib.h>
 
@@ -318,7 +319,7 @@ u8 NRF24L01_WritePayload(u8 *data, u8 length)
 
 u8 NRF24L01_ReadReg(u8 reg)
 {
-    (void)reg;
+    if (reg == NRF24L01_07_STATUS) return 1 << NRF24L01_07_TX_DS;
     return 0;
 }
 
