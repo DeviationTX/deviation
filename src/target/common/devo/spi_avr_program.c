@@ -32,8 +32,9 @@ u32 AVR_StartProgram()
 {
     const struct mcu_pin reset_pin = {.port = GPIO_BANK_JTCK_SWCLK, .pin = GPIO_JTCK_SWCLK} ;
     u32 sync = 0;
+    rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
     spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_256);
+    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
     spi_enable(SPI2);
     for(int i = 0; i < 5; i++) {
         gpio_set(reset_pin.port, reset_pin.pin);
@@ -122,6 +123,23 @@ int AVR_Verify(u8 *data, int size)
     return 1;
 }
 
+int AVR_ResetFuses()
+{
+    int data;
+    spi_xfer(SPI2, 0xAC);
+    spi_xfer(SPI2, 0xA0);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0x62); //enable divclkby8
+    usleep(4500);
+    spi_xfer(SPI2, 0x50);
+    spi_xfer(SPI2, 0x00);
+    spi_xfer(SPI2, 0x00);
+    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    if (data != 0x62)
+        return 0;
+    return 1;
+}
+
 int AVR_SetFuses()
 {
     int data;
@@ -129,10 +147,12 @@ int AVR_SetFuses()
     spi_xfer(SPI2, 0x00);
     spi_xfer(SPI2, 0x00);
     data = spi_xfer(SPI2, 0x00); //current fuse bits
+
     if (data == 0xe2)
         return 1; //already programmed
     if (data != 0x62)
         return 0; //Fuse bits aren't properly set
+
     spi_xfer(SPI2, 0xAC);
     spi_xfer(SPI2, 0xA0);
     spi_xfer(SPI2, 0x00);
