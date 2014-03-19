@@ -63,15 +63,22 @@ void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
 
     height_t = 0;
     width_t = 0;
+    *width = 0;
     while(*str != 0) {
         u32 ch;
         str = (u8*)utf8_to_u32((char*)str, &ch);
-        if(ch == '\n')
+        if(ch == '\n') {
+            if(*width < width_t)
+                *width = width_t;
+
             height_t++;
+            width_t = 0;
+        }
         width_t++;
     }
 
-    *width = width_t;
+    if(*width < width_t)
+        *width = width_t;
     *height = height_t;
 }
 

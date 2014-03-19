@@ -188,6 +188,7 @@ void LCD_DrawRLE(const u8 *data, int len, u32 color)
 
 void LCD_DrawUSBLogo(int lcd_width, int lcd_height)
 {
-  (void) lcd_width;
-  (void) lcd_height;
+  u16 width, height;
+  LCD_GetStringDimensions(_tr("Deviation USB"), &width, &height);
+  LCD_PrintStringXY((lcd_width - width)/2, lcd_height/2, _tr("Deviation USB"));
 }

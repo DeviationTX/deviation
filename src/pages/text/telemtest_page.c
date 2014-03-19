@@ -74,33 +74,33 @@ struct telem_layout2 {
 };
 
 const struct telem_layout devo_header_basic[] = {
-        {TYPE_HEADER,  8, 35, TEMP_LABEL},
-        {TYPE_HEADER, 45, 35, VOLT_LABEL},
-        {TYPE_HEADER, 88, 35, RPM_LABEL},
-        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER,  1, LCD_WIDTH/3, TEMP_LABEL},
+        {TYPE_HEADER, LCD_WIDTH/3, LCD_WIDTH/3, VOLT_LABEL},
+        {TYPE_HEADER, LCD_WIDTH/1.5, LCD_WIDTH/3, RPM_LABEL},
+        {TYPE_HEADER, LCD_WIDTH - 2, 2, ARROW_LABEL},
         {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_layout_basic[] = {
-    {TYPE_INDEX | 0,  0, 8,  1},
-    {TYPE_VALUE | 0,  8, 35, TELEM_DEVO_TEMP1},
-    {TYPE_VALUE | 0, 48, 35, TELEM_DEVO_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_DEVO_RPM1},
-    {TYPE_INDEX | 1,  0, 8,  2},
-    {TYPE_VALUE | 1,  8, 35, TELEM_DEVO_TEMP2},
-    {TYPE_VALUE | 1, 48, 35, TELEM_DEVO_VOLT2},
-    {TYPE_VALUE | 1, 87, 35, TELEM_DEVO_RPM2},
-    {TYPE_INDEX | 2,  0, 8,  3},
-    {TYPE_VALUE | 2,  8, 35, TELEM_DEVO_TEMP3},
-    {TYPE_VALUE | 2, 48, 35, TELEM_DEVO_VOLT3},
-    {TYPE_INDEX | 3,  0, 8,  4},
-    {TYPE_VALUE | 3,  8, 35, TELEM_DEVO_TEMP4},
+    {TYPE_INDEX | 0,  0, 1,  1},
+    {TYPE_VALUE | 0,  1, LCD_WIDTH/3, TELEM_DEVO_TEMP1},
+    {TYPE_VALUE | 0, LCD_WIDTH/3, LCD_WIDTH/3, TELEM_DEVO_VOLT1},
+    {TYPE_VALUE | 0, LCD_WIDTH/1.5, LCD_WIDTH/3, TELEM_DEVO_RPM1},
+    {TYPE_INDEX | 1,  0, 1,  2},
+    {TYPE_VALUE | 1,  1, LCD_WIDTH/3, TELEM_DEVO_TEMP2},
+    {TYPE_VALUE | 1, LCD_WIDTH/3, LCD_WIDTH/3, TELEM_DEVO_VOLT2},
+    {TYPE_VALUE | 1, LCD_WIDTH/1.5, LCD_WIDTH/3, TELEM_DEVO_RPM2},
+    {TYPE_INDEX | 2,  0, 1,  3},
+    {TYPE_VALUE | 2,  1, LCD_WIDTH/3, TELEM_DEVO_TEMP3},
+    {TYPE_VALUE | 2, LCD_WIDTH/3, LCD_WIDTH/3, TELEM_DEVO_VOLT3},
+    {TYPE_INDEX | 3,  0, 1,  4},
+    {TYPE_VALUE | 3,  1, LCD_WIDTH/3, TELEM_DEVO_TEMP4},
     {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER,  8, 35, GPS_LABEL},
-        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER,  0, LCD_WIDTH - 2, GPS_LABEL},
+        {TYPE_HEADER, LCD_WIDTH - 2, 2, ARROW_LABEL},
         {0, 0, 0, 0},
 };
 const struct telem_layout devo_layout_gps[] = {

@@ -19,6 +19,8 @@
 #include "config/display.h"
 
 static u16  blink_fontcolor = 0xffff;
+#include "_label.c"
+
 guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
@@ -60,7 +62,11 @@ void GUI_DrawLabel(struct guiObject *obj)
         str = label->strCallback(obj, label->cb_data);
     else
         str = (const char *)label->cb_data;
-    GUI_DrawLabelHelper(obj->box.x, obj->box.y, obj->box.width, obj->box.height, str, &label->desc, obj == objSELECTED);
+
+    if(_GUI_DrawLabelHelper)
+        _GUI_DrawLabelHelper(obj->box.x, obj->box.y, obj->box.width, obj->box.height, str, &label->desc, obj == objSELECTED);
+    else
+        GUI_DrawLabelHelper(obj->box.x, obj->box.y, obj->box.width, obj->box.height, str, &label->desc, obj == objSELECTED);
 }
 
 /**

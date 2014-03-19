@@ -34,7 +34,7 @@ void PAGE_SplashInit(int page)
     PAGE_SetActionCB(_action_cb);
 
     GUI_CreateLabelBox(&gui->splash_text, 0, 0, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Deviation"));
-    GUI_CreateLabelBox(&gui->version, 0, 7, 0, 0, &DEFAULT_FONT, NULL, NULL, DeviationVersion);
+    GUI_CreateLabelBox(&gui->version, 0, LCD_HEIGHT, 0, 0, &DEFAULT_FONT, NULL, NULL, DeviationVersion);
 }
 
 static unsigned int _action_cb(u32 button, unsigned int flags, void *data)

@@ -15,15 +15,26 @@
 #define DIALOG_HEADER_Y 0
 void _draw_dialog_box(struct guiBox *box, int x, const char *title)
 {
-    (void)x;
-    (void)title;
-    //Don't show title in devo10 as its screen has limited space
-    LCD_FillRect(box->x, box->y, box->width, box->height, 0);  // clear the background
-    LCD_DrawRoundRect(box->x, box->y, box->width, box->height,  3, 1);
-    LCD_DrawRoundRect(box->x +1, box->y +1, box->width -2, box->height -2,  3, 1);
+	(void) x;
+	(void) title;
+    u16 i,j;
+    char spaces[LCD_WIDTH+1];
+	for(i = 0; i <= box->height; i++) {
+    	for(j = 0; j <= (box->width-box->x) || j <= LCD_WIDTH; j++)
+    		spaces[j] = 0x20;
+    	spaces[box->width+1] = 0;
+    	LCD_PrintStringXY(box->x, box->y+i, spaces);
+  	}
 }
 
 void _dialog_draw_background(u16 x, u16 y, u16 w, u16 h)
 {
-    LCD_FillRoundRect(x, y, w, h, 3, 0);
+	u16 i,j;
+    char spaces[LCD_WIDTH+1];
+	for(i = 0; i <= h; i++) {
+    	for(j = 0; j <= (w-x) || j <= LCD_WIDTH; j++)
+    		spaces[j] = 0x20;
+    	spaces[w+1] = 0;
+    	LCD_PrintStringXY(x, y+i, spaces);
+  	}
 }

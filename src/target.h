@@ -61,6 +61,7 @@ void LCD_DrawPixel(unsigned int color);
 void LCD_DrawPixelXY(unsigned int x, unsigned int y, unsigned int color);
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir dir);
 void LCD_DrawStop(void);
+void LCD_ShowVideo(u8 enable);
 
 /* Touchscreen */
 struct touch {

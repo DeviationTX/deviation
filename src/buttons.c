@@ -115,6 +115,7 @@ void BUTTON_Handler()
     if(buttons_pressed && !longpress_release) {
         //printf("pressed: %08d\n", buttons_pressed);
         AUTODIMMER_Check();
+        print_buttons(buttons_pressed);
         exec_callbacks(buttons_pressed, BUTTON_PRESS);
         last_buttons_pressed = buttons_pressed;
         long_press_at = ms+500;

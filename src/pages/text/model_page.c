@@ -61,7 +61,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void) data;
-    u8 x = 14;
     u8 ts_x = 14;
     int count = 0;
     const void *label = NULL;
@@ -117,17 +116,17 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (label)
         GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,
-           0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+           14, 0, &DEFAULT_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            ITEM_HEIGHT*4, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            (ts_x != 0)?LCD_WIDTH - ts_x : 14, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
     if (but_txt) {
         if(but_txt == show_text_cb)
             but_txt = NULL;
-        GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            0, 0, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
+        GUI_CreateButtonPlateText(&gui->col2[relrow].but, 14, y,
+            LCD_WIDTH - 14, 0, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
         count++;
     }
     return count;
@@ -151,7 +150,7 @@ void PAGE_ModelInit(int page)
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
                          ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));

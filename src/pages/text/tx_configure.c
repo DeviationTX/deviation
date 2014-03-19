@@ -77,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
         case ITEM_MODE:
 #ifdef NO_LANGUAGE_SUPPORT
-            //title = _tr_noop("Generic settings");
+            title = _tr_noop("Generic settings");
 #endif
             label = _tr_noop("Stick mode");
             value = modeselect_cb;
@@ -151,22 +151,19 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             value = units_cb; data = (void *)0L;
             break;
     }
-    if (title) {
-        enum LabelType oldType = labelDesc.style;
-        labelDesc.style = LABEL_UNDERLINE;
+    /*if (title) {
         GUI_CreateLabelBox(&gui->title, 0, y,
-                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
-        labelDesc.style = oldType;
+                LCD_WIDTH -1, 0, &DEFAULT_FONT, NULL, NULL, _tr(title));
         y += ITEM_HEIGHT;
-    }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
+    }*/
+    GUI_CreateLabelBox(&gui->label[relrow], 1, y,
+            x-1, 0,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            0, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+        GUI_CreateButtonPlateText(&gui->value[relrow].but, 1+ x, y,
+            LCD_WIDTH - x -1, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
     } else {
-        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            0, 0, &DEFAULT_FONT, NULL, value, data);
+        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, 1+ x, y,
+            LCD_WIDTH - x -1, 0, &DEFAULT_FONT, NULL, value, data);
     }
     return 1;
 }
@@ -182,8 +179,8 @@ void PAGE_TxConfigureInit(int page)
     cp->total_items = 0;
 
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - 1,
+                     ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 

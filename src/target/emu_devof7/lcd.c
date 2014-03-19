@@ -224,3 +224,8 @@ u8 LCD_GetFont()
 {
     return cur_str.font.idx;
 }
+
+void LCD_ShowVideo(u8 enable)
+{
+    (void) enable;
+}

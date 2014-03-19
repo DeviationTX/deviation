@@ -51,8 +51,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    u8 w = 60;
-    u8 x = 63;
     const void *label = NULL;
     void *value = NULL;
     void *tgl = NULL;
@@ -87,9 +85,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-                0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-                w, ITEM_HEIGHT, &DEFAULT_FONT, tgl, value, data);
+                0, 0, &DEFAULT_FONT, NULL, NULL, label);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], 13, y,
+                LCD_WIDTH-13, 0, &DEFAULT_FONT, tgl, value, data);
     return 1;
 }
 void MODELPAGE_Config()
@@ -123,8 +121,8 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 static int row2_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w = 60;
-    u8 x = 63;
+    u8 x = 14;
+    u8 w = LCD_WIDTH - x;
     int idx = 0;
     int pos = 0;
     while(idx < absrow) {
@@ -143,8 +141,8 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
 static int row3_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w = 60;
-    u8 x = 63;
+    u8 x = 14;
+    u8 w = LCD_WIDTH - x;
     void *ts;
     void *ts_press = NULL;
     void *ts_data = NULL;

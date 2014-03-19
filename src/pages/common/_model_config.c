@@ -91,9 +91,11 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
     } else {
         Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
         snprintf(tempstring, sizeof(tempstring), "%s", _tr(proto_strs[pos+Model.proto_opts[idx]+1]));
+        printf("TRALALALAAA %s\r\n", tempstring);
     }
     if (changed)
         PROTOCOL_SetOptions();  // for devo, it needs to do protocol init as the telemerty state is changed
+
     return tempstring;
 }
 

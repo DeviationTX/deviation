@@ -4,7 +4,7 @@
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
-#define VECTOR_TABLE_LOCATION 0x0000 //0x3000
+#define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 512
 
@@ -15,7 +15,7 @@
  #define HAS_STANDARD_GUI   1
 #endif
 
-#define HAS_ADVANCED_GUI    1
+#define HAS_ADVANCED_GUI    0
 #define HAS_PERMANENT_TIMER 0
 #define HAS_TELEMETRY       1
 #define HAS_TOUCH           0

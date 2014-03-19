@@ -34,7 +34,7 @@ static void draw_chan(long ch, int row, int y)
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
         0, 0, &DEFAULT_FONT, _channum_cb, NULL, (void *)ch);
     GUI_CreateLabelBox(&gui->value[idx], x+7, y,
-        ITEM_HEIGHT, 4, &DEFAULT_FONT, value_cb, NULL, (void *)ch);
+        4, ITEM_HEIGHT, &DEFAULT_FONT, value_cb, NULL, (void *)ch);
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

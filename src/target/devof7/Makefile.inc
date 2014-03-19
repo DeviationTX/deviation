@@ -4,7 +4,7 @@ FILESYSTEM := devof7
 CRC_OFFSET       := 8192
 OPTIMIZE_DFU     := 1
 MODULAR          := 0x20004000
-DFU_ARGS         := -c 7 -b 0x08000000
+DFU_ARGS         := -c 7 -b 0x08003000
 # 0x08003000
 
 PRE_FS = $(ODIR)/.pre_fs

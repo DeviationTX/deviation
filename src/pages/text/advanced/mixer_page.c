@@ -37,7 +37,7 @@ static void _show_title(int page)
 
 static void _show_page()
 {
-    u8 h = 12;
+    u8 h = 1;
     int i;
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Mixer"));

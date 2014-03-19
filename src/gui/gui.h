@@ -352,6 +352,8 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *,u16 x, u16 y, u16 width, u16 height
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
              const void *data);
+void _GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
+        const char *str, const struct LabelDesc *desc, u8 is_selected) __attribute__((weak));
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected);
 void GUI_SetLabelDesc(guiLabel_t *obj, struct LabelDesc *desc);

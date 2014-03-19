@@ -100,8 +100,9 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         u8 page = (0 << 4) | MENUTYPE_MAINMENU;
         PAGE_ChangeByID(PAGEID_MENU, page);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-	for ( i=0; i< NUM_TIMERS; i++) 
-            TIMER_StartStop(i);
+        LCD_ShowVideo(1);
+	//for ( i=0; i< NUM_TIMERS; i++) 
+    //        TIMER_StartStop(i);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) {
         for ( i=0; i< NUM_TIMERS; i++)
             TIMER_Reset(i);

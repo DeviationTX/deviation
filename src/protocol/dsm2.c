@@ -45,12 +45,14 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const dsm_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Telemetry"),  _tr_noop("O"), _tr_noop("N"), _tr_noop("D"), NULL,
   NULL
 };
 enum {
     PROTOOPTS_TELEMETRY = 0,
 };
+#define TELEM_SUPERBITRF 3
+#define TELEM_DELFLY 2
 #define TELEM_ON 1
 #define TELEM_OFF 0
 
@@ -402,6 +404,13 @@ static void parse_telemetry_packet()
     static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
     static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, 0};
     const u8 *update = NULL;
+
+    // Check if delfly
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_DELFLY) {
+      printf("DELFLY TELEMETRY\r\n");
+      return;
+    }
+
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
@@ -590,14 +599,14 @@ static u16 dsm2_cb()
         set_sop_data_crc();
         return 10000;
     } else if(state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B
-           || state == DSM2_CH2_WRITE_A || state == DSM2_CH2_WRITE_B)
-    {
+           || state == DSM2_CH2_WRITE_A || state == DSM2_CH2_WRITE_B)       // First write then timeout for 1550, to verify write complete
+    {                                                                       // Second write then timeout again 1550
         if (state == DSM2_CH1_WRITE_A || state == DSM2_CH1_WRITE_B)
             build_data_packet(state == DSM2_CH1_WRITE_B);
         CYRF_WriteDataPacket(packet);
         state++;
         return WRITE_DELAY;
-    } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
+    } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {     // Verify first write complete then wait 4010-1550 for next transmit
         int i = 0;
         while (! (CYRF_ReadRegister(0x04) & 0x02)) {
             if(++i > NUM_WAIT_LOOPS)
@@ -606,8 +615,8 @@ static u16 dsm2_cb()
         set_sop_data_crc();
         state++;
         return CH1_CH2_DELAY - WRITE_DELAY;
-    } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
-        int i = 0;
+    } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {     // Verify second write, then either goto receive and wait for 11000-4010-1550-400 
+        int i = 0;                                                          // Or goto write procedure B, and wait 22000-4010-1550(< 8 chan) or 11000-4010-1550
         while (! (CYRF_ReadRegister(0x04) & 0x02)) {
             if(++i > NUM_WAIT_LOOPS)
                 break;
@@ -618,6 +627,13 @@ static u16 dsm2_cb()
         }
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
             state++;
+            CYRF_ConfigRxTx(0); //Receive mode
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
+        } else if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_DELFLY) {
+            state++;
+            CYRF_ConfigRFChannel(0x51);
             CYRF_ConfigRxTx(0); //Receive mode
             CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
@@ -742,7 +758,7 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? 1L : 0L);
+            return (void *)(Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_OFF ? 1L : 0L);
         default: break;
     }
     return NULL;
