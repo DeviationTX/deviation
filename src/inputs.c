@@ -26,9 +26,9 @@
 
 #ifndef HAS_MORE_THAN_32_INPUTS
     //Verify that INP_LAST is < 32 or HAS_MORE_THAN_32_INPUTS is defined
-    ctassert(too_many_inputs, (INP_LAST < 32));
+    ctassert(too_many_inputs, (INP_LAST <= 32));
 #else
-    ctassert(too_many_inputs, (INP_LAST < 64));
+    ctassert(too_many_inputs, (INP_LAST <= 64));
 #endif
 
 #define INPNAME_AILERON(x,y)  x = _tr_noop("AIL"); y = -1
