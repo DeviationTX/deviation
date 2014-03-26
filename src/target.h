@@ -36,7 +36,7 @@ enum {
     A7105,
     CC2500,
     NRF24L01,
-    PROGSWITCH,
+    MULTIMOD,
     TX_MODULE_LAST,
 };
 

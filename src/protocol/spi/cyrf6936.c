@@ -33,10 +33,10 @@
 #define Delay usleep
 static void  CS_HI() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[PROGSWITCH].port) {
+    if (Transmitter.module_enable[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(Transmitter.module_enable[PROGSWITCH]);
+        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
         if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();
@@ -49,10 +49,10 @@ static void  CS_HI() {
 
 static void CS_LO() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[PROGSWITCH].port) {
+    if (Transmitter.module_enable[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(Transmitter.module_enable[PROGSWITCH]);
+        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
         if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();

@@ -87,13 +87,6 @@ int SPI_ProtoGetPinConfig(int module, int state) {
 
 void SPI_ProtoInit()
 {
-    const char * const modules[PROGSWITCH] = {
-        [CYRF6936] = "CYRF",
-        [A7105]    = "A7105",
-        [CC2500]   = "CC2500",
-        [NRF24L01] = "nRF24L01",
-    };
-
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
@@ -126,20 +119,20 @@ void SPI_ProtoInit()
 #endif
 
 #if HAS_MULTIMOD_SUPPORT
-    if(Transmitter.module_enable[PROGSWITCH].port) {
-        struct mcu_pin *port = &Transmitter.module_enable[PROGSWITCH];
+    if(Transmitter.module_enable[MULTIMOD].port) {
+        struct mcu_pin *port = &Transmitter.module_enable[MULTIMOD];
         printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
         gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
         gpio_set(port->port, port->pin);
     }
 #endif //HAS_MULTIMOD_SUPPORT
-    for (int i = 0; i < PROGSWITCH; i++) {
+    for (int i = 0; i < MULTIMOD; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
         {
             struct mcu_pin *port = &Transmitter.module_enable[i];
-            printf("%s port: %08x pin: %04x\n", modules[i], port->port, port->pin);
+            printf("%s port: %08x pin: %04x\n", MODULE_NAME[i], port->port, port->pin);
             gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
                       GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
             gpio_set(port->port, port->pin);

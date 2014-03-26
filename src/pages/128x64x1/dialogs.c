@@ -198,10 +198,10 @@ void PAGE_ShowModuleDialog(const char **missing)
     dialogcrc = 0;
     int count = 0;
     sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
-    if(missing[PROGSWITCH]) {
-        sprintf(tempstring+strlen(tempstring), "%s", missing[PROGSWITCH]);
+    if(missing[MULTIMOD]) {
+        sprintf(tempstring+strlen(tempstring), "%s", missing[MULTIMOD]);
     } else {
-        for(int i = 0; i < PROGSWITCH; i++) {
+        for(int i = 0; i < MULTIMOD; i++) {
            if(missing[i]) {
                if(! count) {
                    sprintf(tempstring+strlen(tempstring), " %s", missing[i]);

@@ -367,11 +367,11 @@ int PROTOCOL_SetSwitch(int module)
 {
     (void)module;
 #if HAS_MULTIMOD_SUPPORT
-    if (! Transmitter.module_enable[PROGSWITCH].port)
+    if (! Transmitter.module_enable[MULTIMOD].port)
         return 0;
     u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
     u8 set    = SPI_ProtoGetPinConfig(module, ENABLED_PIN);
-    for (int i = 0; i < PROGSWITCH; i++) {
+    for (int i = 0; i < MULTIMOD; i++) {
         if (i == module)
             continue;
         set |= SPI_ProtoGetPinConfig(i, DISABLED_PIN);
@@ -410,8 +410,8 @@ void PROTOCOL_InitModules()
 
     if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
         //No Switch found
-        missing[PROGSWITCH] = MODULE_NAME[PROGSWITCH];
-        for(int i = 0; i < PROGSWITCH; i++) {
+        missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
+        for(int i = 0; i < MULTIMOD; i++) {
             if(Transmitter.module_enable[i].port == SWITCH_ADDRESS) {
                 error = 1;
                 printf("Disabling %s because switch wasn't found\n", MODULE_NAME[i]);
@@ -421,7 +421,7 @@ void PROTOCOL_InitModules()
         }
     }
     int orig_proto = Model.protocol;
-    for(int i = 0; i < PROGSWITCH; i++) {
+    for(int i = 0; i < MULTIMOD; i++) {
         if(Transmitter.module_enable[i].port) {
             for(int j = 1; j < PROTOCOL_COUNT; j++) {
                 if (get_module(j) == i) {
