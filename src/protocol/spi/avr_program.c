@@ -19,38 +19,31 @@
   Note that we lie aboiut the arguments to these functions. It is
   Important that the actual functions never execute
 */
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
-#include "devo.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
 #include <stdlib.h>
+#include "protospi.h"
 
 u32 AVR_StartProgram()
 {
-    const struct mcu_pin reset_pin = {.port = GPIO_BANK_JTCK_SWCLK, .pin = GPIO_JTCK_SWCLK} ;
     u32 sync = 0;
-    rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
-    spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
-    spi_enable(SPI2);
+    SPI_AVRProgramInit();
     for(int i = 0; i < 5; i++) {
-        gpio_set(reset_pin.port, reset_pin.pin);
+        PROTOSPI_pin_set(AVR_RESET_PIN);
         usleep(10000);
-        gpio_clear(reset_pin.port, reset_pin.pin);
+        PROTOSPI_pin_clear(AVR_RESET_PIN);
         usleep(30000);
-        spi_xfer(SPI2, 0xAC);
-        spi_xfer(SPI2, 0x53);
-        sync = spi_xfer(SPI2, 0x00);
-        spi_xfer(SPI2, 0x00);
+        PROTOSPI_xfer(0xAC);
+        PROTOSPI_xfer(0x53);
+        sync = PROTOSPI_xfer(0x00);
+        PROTOSPI_xfer(0x00);
         if (sync == 0x53) {
             for(int j = 0; j < 3; j++) {
-                spi_xfer(SPI2, 0x30);
-                spi_xfer(SPI2, 0x00);
-                spi_xfer(SPI2, j);
-                sync |= spi_xfer(SPI2, 0x00) << (8 * (j+1));
+                PROTOSPI_xfer(0x30);
+                PROTOSPI_xfer(0x00);
+                PROTOSPI_xfer(j);
+                sync |= PROTOSPI_xfer(0x00) << (8 * (j+1));
             }
             return sync;
         }
@@ -60,19 +53,19 @@ u32 AVR_StartProgram()
 
 int AVR_Erase()
 {
-    spi_xfer(SPI2, 0xAC);
-    spi_xfer(SPI2, 0x80);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x00);
+    PROTOSPI_xfer(0xAC);
+    PROTOSPI_xfer(0x80);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x00);
     usleep(20000);
     //verify 1st page is erased
     int ok = 1;
     for(int i = 0; i < 64; i++) {
         int pos = i/2;
-        spi_xfer(SPI2, 0x20 | ((i % 2) * 0x08));
-        spi_xfer(SPI2, pos >> 8);
-        spi_xfer(SPI2, pos & 0xff);
-        u8 chk = spi_xfer(SPI2, 0x00);
+        PROTOSPI_xfer(0x20 | ((i % 2) * 0x08));
+        PROTOSPI_xfer(pos >> 8);
+        PROTOSPI_xfer(pos & 0xff);
+        u8 chk = PROTOSPI_xfer(0x00);
         if (chk != 0xff)
             ok = 0;
     }
@@ -82,23 +75,23 @@ int AVR_Erase()
 int AVR_Program(u32 address, u8 *data, int pagesize)
 {
     for(int i = 0; i < pagesize; i++) {
-        spi_xfer(SPI2, 0x40 | ((i % 2) * 0x08));
-        spi_xfer(SPI2, (i / 2) >> 8);
-        spi_xfer(SPI2, (i / 2) & 0xff);
-        spi_xfer(SPI2, data[i]);
+        PROTOSPI_xfer(0x40 | ((i % 2) * 0x08));
+        PROTOSPI_xfer((i / 2) >> 8);
+        PROTOSPI_xfer((i / 2) & 0xff);
+        PROTOSPI_xfer(data[i]);
     }
     //Write
-    spi_xfer(SPI2, 0x4C);
-    spi_xfer(SPI2, address >> 8);
-    spi_xfer(SPI2, address & 0xff);
-    spi_xfer(SPI2, 0x00);
+    PROTOSPI_xfer(0x4C);
+    PROTOSPI_xfer(address >> 8);
+    PROTOSPI_xfer(address & 0xff);
+    PROTOSPI_xfer(0x00);
     usleep(4500);
     for(int i = 0; i < pagesize; i++) {
         int pos = address + i/2;
-        spi_xfer(SPI2, 0x20 | ((i % 2) * 0x08));
-        spi_xfer(SPI2, pos >> 8);
-        spi_xfer(SPI2, pos & 0xff);
-        u8 chk = spi_xfer(SPI2, 0x00);
+        PROTOSPI_xfer(0x20 | ((i % 2) * 0x08));
+        PROTOSPI_xfer(pos >> 8);
+        PROTOSPI_xfer(pos & 0xff);
+        u8 chk = PROTOSPI_xfer(0x00);
         if (chk != data[i]) {
             printf("@%04x.%d: %02x != %02x\n", pos, i %2, chk, data[i]);
             return 0;
@@ -111,10 +104,10 @@ int AVR_Verify(u8 *data, int size)
 {
     for(int i = 0; i < size; i++) {
         int pos = i/2;
-        spi_xfer(SPI2, 0x20 | ((i % 2) * 0x08));
-        spi_xfer(SPI2, pos >> 8);
-        spi_xfer(SPI2, pos & 0xff);
-        u8 chk = spi_xfer(SPI2, 0x00);
+        PROTOSPI_xfer(0x20 | ((i % 2) * 0x08));
+        PROTOSPI_xfer(pos >> 8);
+        PROTOSPI_xfer(pos & 0xff);
+        u8 chk = PROTOSPI_xfer(0x00);
         if (chk != data[i]) {
             printf("@%04x.%d: %02x != %02x\n", pos, i %2, chk, data[i]);
             return 0;
@@ -126,15 +119,15 @@ int AVR_Verify(u8 *data, int size)
 int AVR_ResetFuses()
 {
     int data;
-    spi_xfer(SPI2, 0xAC);
-    spi_xfer(SPI2, 0xA0);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x62); //enable divclkby8
+    PROTOSPI_xfer(0xAC);
+    PROTOSPI_xfer(0xA0);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x62); //enable divclkby8
     usleep(4500);
-    spi_xfer(SPI2, 0x50);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x00);
-    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    PROTOSPI_xfer(0x50);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x00);
+    data = PROTOSPI_xfer(0x00); //current fuse bits
     if (data != 0x62)
         return 0;
     return 1;
@@ -143,25 +136,25 @@ int AVR_ResetFuses()
 int AVR_SetFuses()
 {
     int data;
-    spi_xfer(SPI2, 0x50);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x00);
-    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    PROTOSPI_xfer(0x50);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x00);
+    data = PROTOSPI_xfer(0x00); //current fuse bits
 
     if (data == 0xe2)
         return 1; //already programmed
     if (data != 0x62)
         return 0; //Fuse bits aren't properly set
 
-    spi_xfer(SPI2, 0xAC);
-    spi_xfer(SPI2, 0xA0);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0xe2); //disable divclkby8
+    PROTOSPI_xfer(0xAC);
+    PROTOSPI_xfer(0xA0);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0xe2); //disable divclkby8
     usleep(4500);
-    spi_xfer(SPI2, 0x50);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x00);
-    data = spi_xfer(SPI2, 0x00); //current fuse bits
+    PROTOSPI_xfer(0x50);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x00);
+    data = PROTOSPI_xfer(0x00); //current fuse bits
     if (data != 0xe2)
         return 0;
     return 1;
@@ -169,9 +162,9 @@ int AVR_SetFuses()
 
 int AVR_VerifyFuses()
 {
-    spi_xfer(SPI2, 0x50);
-    spi_xfer(SPI2, 0x00);
-    spi_xfer(SPI2, 0x00);
-    int data = spi_xfer(SPI2, 0x00); //current fuse bits
+    PROTOSPI_xfer(0x50);
+    PROTOSPI_xfer(0x00);
+    PROTOSPI_xfer(0x00);
+    int data = PROTOSPI_xfer(0x00); //current fuse bits
     return (data == 0xe2);
 }

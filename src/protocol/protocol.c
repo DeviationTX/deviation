@@ -33,11 +33,12 @@ static const u8 const AETRG[PROTO_MAP_LEN] =
 
 static u8 proto_state;
 static u32 bind_time;
-#define PROTO_DEINIT  0x00
-#define PROTO_INIT    0x01
-#define PROTO_READY   0x02
-#define PROTO_BINDING 0x04
-#define PROTO_BINDDLG 0x08
+#define PROTO_DEINIT    0x00
+#define PROTO_INIT      0x01
+#define PROTO_READY     0x02
+#define PROTO_BINDING   0x04
+#define PROTO_BINDDLG   0x08
+#define PROTO_MODULEDLG 0x10
 
 #define PROTODEF(proto, module, map, cmd, name) map,
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
@@ -64,6 +65,8 @@ static int get_module(int idx);
 
 void PROTOCOL_Init(u8 force)
 {
+    if(! force && (proto_state & PROTO_MODULEDLG))
+        return;
     PROTOCOL_DeInit();
     PROTOCOL_Load(0);
     proto_state = PROTO_INIT;
@@ -312,6 +315,14 @@ int PROTOCOL_GetTelemetryState()
 
 void PROTOCOL_CheckDialogs()
 {
+    if (proto_state & PROTO_MODULEDLG) {
+        if(! PAGE_DialogVisible()) {
+            //Dialog was dismissed, proceed
+            proto_state &= ~PROTO_MODULEDLG;
+            PROTOCOL_Init(0);
+        }
+        return;
+    }
     if (PROTOCOL_WaitingForSafe()) {
         PAGE_ShowSafetyDialog();
     } else {
@@ -352,12 +363,12 @@ int PROTOCOL_HasPowerAmp(int idx)
     return 0;
 }
 
-void PROTOCOL_SetSwitch(int module)
+int PROTOCOL_SetSwitch(int module)
 {
     (void)module;
-#if HAS_PROGRAMMABLE_SWITCH
+#if HAS_MULTIMOD_SUPPORT
     if (! Transmitter.module_enable[PROGSWITCH].port)
-        return;
+        return 0;
     u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
     u8 set    = SPI_ProtoGetPinConfig(module, ENABLED_PIN);
     for (int i = 0; i < PROGSWITCH; i++) {
@@ -368,7 +379,9 @@ void PROTOCOL_SetSwitch(int module)
     }
     u8 csn_high = toggle | set;
     u8 csn_low  = ~toggle & set;
-    SPI_ConfigSwitch(csn_high, csn_low);
+    return SPI_ConfigSwitch(csn_high, csn_low);
+#else
+    return 0;
 #endif
 }
 
@@ -386,4 +399,55 @@ int PROTOCOL_SticksMoved(int init)
     int ele_diff = abs(ele_start - ele);
     int ail_diff = abs(ail_start - ail);
     return ((ele_diff + ail_diff > 2 * STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
+}
+
+void PROTOCOL_InitModules()
+{
+#if HAS_MULTIMOD_SUPPORT
+    int error = 0;
+    const char * missing[TX_MODULE_LAST];
+    memset(missing, 0, sizeof(missing));
+
+    if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+        //No Switch found
+        missing[PROGSWITCH] = MODULE_NAME[PROGSWITCH];
+        for(int i = 0; i < PROGSWITCH; i++) {
+            if(Transmitter.module_enable[i].port == SWITCH_ADDRESS) {
+                error = 1;
+                printf("Disabling %s because switch wasn't found\n", MODULE_NAME[i]);
+                missing[i] = MODULE_NAME[i];
+                Transmitter.module_enable[i].port = 0;
+            }
+        }
+    }
+    int orig_proto = Model.protocol;
+    for(int i = 0; i < PROGSWITCH; i++) {
+        if(Transmitter.module_enable[i].port) {
+            for(int j = 1; j < PROTOCOL_COUNT; j++) {
+                if (get_module(j) == i) {
+                    //Try this module
+                    Model.protocol = j;
+                    PROTOCOL_Load(1);
+                    int res = (long)PROTO_Cmds(PROTOCMD_RESET);
+                    if (res == 0)
+                        continue;
+                    if (res < 0) {
+                        error = 1;
+                        missing[i] = MODULE_NAME[i];
+                        Transmitter.module_enable[i].port = 0;
+                    }
+                    break;
+                }
+            } 
+        }
+    }
+    Model.protocol = orig_proto;
+    if(error) {
+        proto_state |= PROTO_MODULEDLG;
+        PAGE_ShowModuleDialog(missing);
+    } else
+#endif //HAS_MULTIMOD_SUPPORT
+    {
+        PROTOCOL_Init(0);
+    }
 }

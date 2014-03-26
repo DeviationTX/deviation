@@ -86,7 +86,7 @@ int main() {
         ;
 
     //Only do this after we've initialized all channel data so the saftey works
-    PROTOCOL_Init(0);
+    PROTOCOL_InitModules();
     GUI_DrawScreen();
 
 #ifdef HAS_EVENT_LOOP

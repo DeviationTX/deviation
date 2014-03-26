@@ -421,7 +421,10 @@ const void *SLT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, G, P

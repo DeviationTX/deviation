@@ -252,7 +252,10 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L;

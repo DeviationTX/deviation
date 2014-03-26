@@ -18,48 +18,50 @@
   #pragma long_calls
 #endif
 
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
+#include "protospi.h"
 
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
 static void  CS_HI() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[CC2500].port == 0xFFFFFFFF) {
-        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[PROGSWITCH].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_set(Transmitter.module_enable[PROGSWITCH]);
+        if(Transmitter.module_enable[CC2500].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_set(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
-    }
+    PROTOSPI_pin_set(Transmitter.module_enable[CC2500]);
 }
 
 static void CS_LO() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[CC2500].port == 0xFFFFFFFF) {
-        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[PROGSWITCH].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_clear(Transmitter.module_enable[PROGSWITCH]);
+        if(Transmitter.module_enable[CC2500].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_clear(Transmitter.module_enable[CC2500].port, Transmitter.module_enable[CC2500].pin);
-    }
+    PROTOSPI_pin_clear(Transmitter.module_enable[CC2500]);
 }
 
 void CC2500_WriteReg(u8 address, u8 data)
 {
     CS_LO();
-    spi_xfer(SPI2, address);
-    spi_xfer(SPI2, data);
+    PROTOSPI_xfer(address);
+    PROTOSPI_xfer(data);
     CS_HI();
 }
 
@@ -68,10 +70,10 @@ static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
     unsigned char i;
 
     CS_LO();
-    spi_xfer(SPI2, address);
+    PROTOSPI_xfer(address);
     for(i = 0; i < length; i++)
     {
-        data[i] = spi_xfer(SPI2, 0);
+        data[i] = PROTOSPI_xfer(0);
     }
     CS_HI();
 }
@@ -79,8 +81,8 @@ static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
 u8 CC2500_ReadReg(u8 address)
 {
     CS_LO();
-    spi_xfer(SPI2, CC2500_READ_SINGLE | address);
-    u8 data = spi_xfer(SPI2, 0);
+    PROTOSPI_xfer(CC2500_READ_SINGLE | address);
+    u8 data = PROTOSPI_xfer(0);
     CS_HI();
     return data;
 }
@@ -93,7 +95,7 @@ void CC2500_ReadData(u8 *dpbuffer, int len)
 void CC2500_Strobe(u8 state)
 {
     CS_LO();
-    spi_xfer(SPI2, state);
+    PROTOSPI_xfer(state);
     CS_HI();
 }
 
@@ -101,10 +103,10 @@ void CC2500_Strobe(u8 state)
 void CC2500_WriteRegisterMulti(u8 address, const u8 data[], u8 length)
 {
     CS_LO();
-    spi_xfer(SPI2, CC2500_WRITE_BURST | address);
+    PROTOSPI_xfer(CC2500_WRITE_BURST | address);
     for(int i = 0; i < length; i++)
     {
-        spi_xfer(SPI2, data[i]);
+        PROTOSPI_xfer(data[i]);
     }
     CS_HI();
 }
@@ -129,10 +131,11 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
         CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
     }
 }
-void CC2500_Reset()
+int CC2500_Reset()
 {
     CC2500_Strobe(CC2500_SRES);
     usleep(1000);
     CC2500_SetTxRxMode(TXRX_OFF);
+    return CC2500_ReadReg(CC2500_0E_FREQ1) == 0xC4;
 }
 #endif

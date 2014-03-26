@@ -426,10 +426,9 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
         case PROTOCMD_DEINIT:
-             CLOCK_StopTimer();
-             A7105_SetTxRxMode(TXRX_OFF);
-             A7105_Strobe(A7105_STANDBY);
-             return 0;
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Leds, Flips, Video Recording
