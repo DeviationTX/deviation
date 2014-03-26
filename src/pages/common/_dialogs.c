@@ -86,3 +86,8 @@ const char *reset_timer_string_cb(guiObject_t *obj, void *data)
     snprintf(tempstring, sizeof(tempstring), _tr("Do you really want\nto reset the\n permanent timer %d?"),idx+1);
     return tempstring;
 }
+
+int PAGE_DialogVisible()
+{
+   return dialog ? 1 : 0;
+}

@@ -15,53 +15,59 @@
 #ifdef MODULAR
   #pragma long_calls
 #endif
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
 //Some versions of gcc applythis to definitions, others to calls
 //So just use long_calls everywhere
 //#pragma long_calls_off
 #include "protocol/interface.h"
+#include "protospi.h"
 
-//GPIOB.12
-#define RS_HI() gpio_set(GPIOB, GPIO11)
-#define RS_LO() gpio_clear(GPIOB, GPIO11)
+//GPIOB.11
+#define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
+#define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
+
+//Disable AWA24S
+#define AWA24S 0
 
 #define Delay usleep
 static void  CS_HI() {
-#if HAS_PROGAMMABLE_SWITCH
-    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
-        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_set(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
-    }
+    PROTOSPI_pin_set(Transmitter.module_enable[CYRF6936]);
 }
 
 static void CS_LO() {
-#if HAS_PROGAMMABLE_SWITCH
-    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
-        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_clear(Transmitter.module_enable[CYRF6936].port, Transmitter.module_enable[CYRF6936].pin);
-    }
+    PROTOSPI_pin_clear(Transmitter.module_enable[CYRF6936]);
 }
+
 void CYRF_WriteRegister(u8 address, u8 data)
 {
     CS_LO();
-    spi_xfer(SPI2, 0x80 | address);
-    spi_xfer(SPI2, data);
+    PROTOSPI_xfer(0x80 | address);
+    PROTOSPI_xfer(data);
     CS_HI();
 }
 
@@ -70,10 +76,10 @@ static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
     unsigned char i;
 
     CS_LO();
-    spi_xfer(SPI2, 0x80 | address);
+    PROTOSPI_xfer(0x80 | address);
     for(i = 0; i < length; i++)
     {
-        spi_xfer(SPI2, data[i]);
+        PROTOSPI_xfer(data[i]);
     }
     CS_HI();
 }
@@ -83,10 +89,10 @@ static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
     unsigned char i;
 
     CS_LO();
-    spi_xfer(SPI2, address);
+    PROTOSPI_xfer(address);
     for(i = 0; i < length; i++)
     {
-        data[i] = spi_xfer(SPI2, 0);
+        data[i] = PROTOSPI_xfer(0);
     }
     CS_HI();
 }
@@ -96,15 +102,15 @@ u8 CYRF_ReadRegister(u8 address)
     u8 data;
 
     CS_LO();
-    spi_xfer(SPI2, address);
-    data = spi_xfer(SPI2, 0);
+    PROTOSPI_xfer(address);
+    data = PROTOSPI_xfer(0);
     CS_HI();
     return data;
 }
 
-void CYRF_Reset()
+int CYRF_Reset()
 {
-#if HAS_PROGRAMABLE_SWITCH
+#if HAS_MULTIMOD_SUPPORT
         CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
         Delay(200);
         /* Reset the CYRF chip */
@@ -114,6 +120,9 @@ void CYRF_Reset()
         RS_LO();
         Delay(100);
 #endif
+        CYRF_SetTxRxMode(TXRX_OFF);
+        //Verify the CYRD chip is responding
+        return (CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5);
 }
 
 u8 CYRF_MaxPower()
@@ -144,7 +153,7 @@ void CYRF_GetMfgData(u8 data[])
  */
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
-#if HAS_PROGRAMMABLE_SWITCH
+#if HAS_MULTIMOD_SUPPORT
     if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
 #if AWA24S
         if(mode == TX_EN)
@@ -217,10 +226,10 @@ void CYRF_ConfigDataCode(const u8 *datacodes, u8 len)
 void CYRF_WritePreamble(u32 preamble)
 {
     CS_LO();
-    spi_xfer(SPI2, 0x80 | 0x24);
-    spi_xfer(SPI2, preamble & 0xff);
-    spi_xfer(SPI2, (preamble >> 8) & 0xff);
-    spi_xfer(SPI2, (preamble >> 16) & 0xff);
+    PROTOSPI_xfer(0x80 | 0x24);
+    PROTOSPI_xfer(preamble & 0xff);
+    PROTOSPI_xfer((preamble >> 8) & 0xff);
+    PROTOSPI_xfer((preamble >> 16) & 0xff);
     CS_HI();
 }
 /*
@@ -280,7 +289,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     memset(channels, 0, sizeof(u8) * len);
     CYRF_ConfigCRCSeed(0x0000);
     CYRF_SetTxRxMode(RX_EN);
-    //Wait for pre-amp to switch from sned to receive
+    //Wait for pre-amp to switch from send to receive
     Delay(1000);
     for(i = 0; i < NUM_FREQ; i++) {
         CYRF_ConfigRFChannel(i);

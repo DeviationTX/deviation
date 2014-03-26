@@ -55,6 +55,7 @@ enum {
     
 
 void NRF24L01_Initialize();
+int NRF24L01_Reset();
 u8 NRF24L01_WriteReg(u8 reg, u8 data);
 u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length);
 u8 NRF24L01_WritePayload(u8 *data, u8 len);
@@ -72,6 +73,7 @@ u8 NRF24L01_SetBitrate(u8 bitrate);
 
 u8 NRF24L01_SetPower(u8 power);
 void NRF24L01_SetTxRxMode(enum TXRX_State);
+int NRF24L01_Reset();
 
 // To enable radio transmit after WritePayload you need to turn the radio
 //void NRF24L01_PulseCE();

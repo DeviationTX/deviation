@@ -18,48 +18,50 @@
   #define DEVO_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
+#include "protospi.h"
 
 #ifdef PROTO_HAS_A7105
 
 static void  CS_HI() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
-        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[A7105].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-   {
-        gpio_set(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
-    }
+    PROTOSPI_pin_set(Transmitter.module_enable[A7105]);
 }
 
 static void CS_LO() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[A7105].port == 0xFFFFFFFF) {
-        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[A7105].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_clear(Transmitter.module_enable[A7105].port, Transmitter.module_enable[A7105].pin);
-    }
+    PROTOSPI_pin_clear(Transmitter.module_enable[A7105]);
 }
 
 void A7105_WriteReg(u8 address, u8 data)
 {
     CS_LO();
-    spi_xfer(SPI2, address);
-    spi_xfer(SPI2, data);
+    PROTOSPI_xfer(address);
+    PROTOSPI_xfer(data);
     CS_HI();
 }
 
@@ -67,29 +69,10 @@ u8 A7105_ReadReg(u8 address)
 {
     u8 data;
     CS_LO();
-    spi_xfer(SPI2, 0x40 | address);
+    PROTOSPI_xfer(0x40 | address);
     /* Wait for tx completion before spi shutdown */
-    while(!(SPI_SR(SPI2) & SPI_SR_TXE))
-        ;
-    while((SPI_SR(SPI2) & SPI_SR_BSY))
-        ;
-
-    spi_disable(SPI2);
-    spi_set_bidirectional_receive_only_mode(SPI2);
-    /* Force read from SPI_DR to ensure RXNE is clear (probably not needed) */
-    volatile u8 x = SPI_DR(SPI2);
-    (void)x;
-    spi_enable(SPI2);  //This starts the data read
-    //Wait > 1 SPI clock (but less than 8).  clock is 4.5MHz
-    asm volatile ("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
-                  "nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
-                  "nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"
-                  "nop\n\tnop\n\tnop\n\tnop\n\tnop");
-    spi_disable(SPI2); //This ends the read window
-    data = spi_read(SPI2);
+    data = PROTOSPI_read3wire();
     CS_HI();
-    spi_set_unidirectional_mode(SPI2);
-    spi_enable(SPI2);
     return data;
 }
 
@@ -97,16 +80,16 @@ void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel)
 {
     int i;
     CS_LO();
-    spi_xfer(SPI2, A7105_RST_WRPTR);
-    spi_xfer(SPI2, 0x05);
+    PROTOSPI_xfer(A7105_RST_WRPTR);
+    PROTOSPI_xfer(0x05);
     for (i = 0; i < len; i++)
-        spi_xfer(SPI2, dpbuffer[i]);
+        PROTOSPI_xfer(dpbuffer[i]);
     CS_HI();
 
     A7105_WriteReg(0x0F, channel);
 
     CS_LO();
-    spi_xfer(SPI2, A7105_TX);
+    PROTOSPI_xfer(A7105_TX);
     CS_HI();
 }
 void A7105_ReadData(u8 *dpbuffer, u8 len)
@@ -114,22 +97,6 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
     A7105_Strobe(0xF0); //A7105_RST_RDPTR
     for(int i = 0; i < len; i++)
         dpbuffer[i] = A7105_ReadReg(0x05);
-/*
-    CS_LO();
-    spi_xfer(SPI2, 0x40 | 0x05);
-    spi_disable(SPI2);
-    spi_set_bidirectional_receive_only_mode(SPI2);
-    spi_enable(SPI2);
-    int i;
-    for(i = 0; i < 10; i++)
-       ;
-    spi_disable(SPI2);
-    for(i = 0; i < len; i++)
-        dpbuffer[i] = spi_read(SPI2);
-    CS_HI();
-    spi_set_unidirectional_mode(SPI2);
-    spi_enable(SPI2);
-*/
     return;
 }
 
@@ -154,21 +121,25 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
     }
 }
 
-void A7105_Reset()
+int A7105_Reset()
 {
     A7105_WriteReg(0x00, 0x00);
     usleep(1000);
     //Set both GPIO as output and low
     A7105_SetTxRxMode(TXRX_OFF);
+    int result = A7105_ReadReg(0x10) == 0x9E;
+    A7105_Strobe(A7105_STANDBY);
+    return result;
+    
 }
 void A7105_WriteID(u32 id)
 {
     CS_LO();
-    spi_xfer(SPI2, 0x06);
-    spi_xfer(SPI2, (id >> 24) & 0xFF);
-    spi_xfer(SPI2, (id >> 16) & 0xFF);
-    spi_xfer(SPI2, (id >> 8) & 0xFF);
-    spi_xfer(SPI2, (id >> 0) & 0xFF);
+    PROTOSPI_xfer(0x06);
+    PROTOSPI_xfer((id >> 24) & 0xFF);
+    PROTOSPI_xfer((id >> 16) & 0xFF);
+    PROTOSPI_xfer((id >> 8) & 0xFF);
+    PROTOSPI_xfer((id >> 0) & 0xFF);
     CS_HI();
 }
 
@@ -203,9 +174,9 @@ void A7105_SetPower(int power)
 void A7105_Strobe(enum A7105_State state)
 {
     CS_LO();
-    spi_xfer(SPI2, state);
+    PROTOSPI_xfer(state);
     CS_HI();
 }
 
-#pragma long_calls_off
+//#pragma long_calls_off
 #endif

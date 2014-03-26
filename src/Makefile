@@ -44,9 +44,9 @@ SRC_C    +=  $(wildcard *.c) $(wildcard screen/*.c) $(wildcard screen/$(SCREENSI
 
 ifdef MODULAR
    SRC_C    += protocol/protocol.c
-   PROTO_SRC_C := $(filter-out protocol/protocol.c, $(wildcard protocol/*.c))
+   PROTO_SRC_C := $(filter-out protocol/protocol.c, $(wildcard protocol/*.c) $(wildcard protocol/spi/*.c))
 else
-   SRC_C    := $(SRC_C) $(wildcard protocol/*.c)
+   SRC_C    := $(SRC_C) $(wildcard protocol/*.c) $(wildcard protocol/spi/*.c)
 endif
 
 SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
@@ -101,7 +101,7 @@ ifdef MODULAR
 CFLAGS   +=  -DMODULAR=$(MODULAR)
 endif
 
-CFLAGS   := $(CFLAGS) -Wall -Wextra -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
+CFLAGS   := $(CFLAGS) -Wall -Wextra -Werror=undef -I. -D$(PROGMODE) -std=gnu99 -Itarget/$(TARGET) -Igui/$(SCREENSIZE) \
             -DHGVERSION="\"${HGVERSION}\""
 CXXFLAGS := $(CXXFLAGS) $(patsubst -std=gnu99,,$(CFLAGS))
 EXEEXT   ?= elf

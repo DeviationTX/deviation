@@ -138,7 +138,8 @@ void PAGE_ShowWarning(const char *title, const char *str)
     (void)title;
     if (dialog)
         return;
-    strncpy(tempstring, str, sizeof(tempstring));
+    if (str != tempstring)
+        strncpy(tempstring, str, sizeof(tempstring));
     tempstring[sizeof(tempstring) - 1] = 0;
     current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
@@ -185,4 +186,32 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     if (dialog)
         return;
     dialog = GUI_CreateDialog(&gui->dialog, 2 , 2,  LCD_WIDTH - 4, LCD_HEIGHT - 4 , NULL , reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
+}
+
+/********************************/
+/* Show Missing Transceiver Modules */
+/********************************/
+void PAGE_ShowModuleDialog(const char **missing)
+{
+    if (dialog)
+        return;
+    dialogcrc = 0;
+    int count = 0;
+    sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
+    if(missing[MULTIMOD]) {
+        sprintf(tempstring+strlen(tempstring), "%s", missing[MULTIMOD]);
+    } else {
+        for(int i = 0; i < MULTIMOD; i++) {
+           if(missing[i]) {
+               if(! count) {
+                   sprintf(tempstring+strlen(tempstring), " %s", missing[i]);
+               } else if(count == 1) {
+                   sprintf(tempstring+strlen(tempstring), " ...");
+               }
+               count++;
+           }
+        }
+    } 
+    current_selected_obj = 0;
+    PAGE_ShowWarning(NULL, tempstring);
 }

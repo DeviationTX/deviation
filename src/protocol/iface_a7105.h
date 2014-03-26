@@ -77,7 +77,7 @@ void A7105_WriteReg(u8 addr, u8 value);
 void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel);
 void A7105_ReadData(u8 *dpbuffer, u8 len);
 u8 A7105_ReadReg(u8 addr);
-void A7105_Reset();
+int A7105_Reset();
 void A7105_WriteID(u32 id);
 void A7105_Strobe(enum A7105_State);
 void A7105_SetPower(int power);

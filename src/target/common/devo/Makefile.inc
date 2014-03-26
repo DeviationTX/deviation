@@ -16,13 +16,14 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
 
 ifdef MODULAR
 PROTO_EXTRA_C = $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
-                $(wildcard $(SDIR)/target/common/devo/hid/*.c)
+                $(wildcard $(SDIR)/target/common/devo/hid/*.c) \
+                $(wildcard $(SDIR)/protocol/spi/*.c)
 else
 SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -fno-builtin-printf -Os --specs=nano.specs
 MODULE_FLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib

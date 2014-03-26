@@ -36,10 +36,12 @@ enum {
     A7105,
     CC2500,
     NRF24L01,
-    PROGSWITCH,
+    MULTIMOD,
     TX_MODULE_LAST,
 };
 
+
+#define SWITCH_ADDRESS 0xFFFFFFFF
 /* The following functions must be provided by every target */
 
 /* General Functions */
@@ -180,12 +182,14 @@ u8 *BOOTLOADER_Read(int idx);
 #define PROTO_HAS_NRF24L01
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
-void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
+void SPI_AVRProgramInit();
+int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
 int SPI_ProtoGetPinConfig(int module, int state);
 u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);
 int AVR_SetFuses();
+int AVR_ResetFuses();
 int AVR_VerifyFuses();
 int AVR_Verify(u8 *data, int size);
 

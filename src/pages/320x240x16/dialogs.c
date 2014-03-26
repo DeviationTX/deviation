@@ -135,7 +135,8 @@ void PAGE_ShowWarning(const char *title, const char *str)
 {   
     if (dialog)
         return;
-    sprintf(tempstring, "%s", str);
+    if(str != tempstring)
+        sprintf(tempstring, "%s", str);
     dialogcrc = 0;
     current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, tempstring);
@@ -180,4 +181,18 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Reset Permanent Timer?"), reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }
 
+void PAGE_ShowModuleDialog(const char **missing)
+{
+    if (dialog)
+        return;
+    dialogcrc = 0;
+    sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
+    for(int i = 0; i < TX_MODULE_LAST; i++) {
+       if(missing[i]) {
+           sprintf(tempstring+strlen(tempstring), "%s\n", missing[i]);
+       }
+    } 
+    current_selected_obj = 0;
+    PAGE_ShowWarning(_tr("Module Error"), tempstring);
+}
 
