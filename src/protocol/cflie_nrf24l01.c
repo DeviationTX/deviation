@@ -177,17 +177,44 @@ static void send_search_packet()
     ++packet_counter;
 }
 
+// Frac 16.16
+#define FRAC_MANTISSA 16
+#define FRAC_SCALE (1 << FRAC_MANTISSA)
+
+// Convert fractional 16.16 to float32
+static void frac2float(s32 n, float* res)
+{
+    if (n == 0) {
+        *res = 0.0;
+        return;
+    }
+    u32 m = n < 0 ? -n : n;
+    int i;
+    for (i = (31-FRAC_MANTISSA); (m & 0x80000000) == 0; i--, m <<= 1) ;
+    m <<= 1; // Clear implicit leftmost 1
+    m >>= 9;
+    u32 e = 127 + i;
+    if (n < 0) m |= 0x80000000;
+    m |= e << 23;
+    *((u32 *) res) = m;
+}
 
 static void send_cmd_packet()
 {
     // Commander packet, 15 bytes
     uint8_t buf[15];
+    float x_roll, x_pitch, yaw;
   
     // Channels in AETR order
-    // Roll, aka aileron, float +- 45.0 in degrees
-    float roll  = -(float) Channels[0]*45.0/10000;
-    // Pitch, aka elevator, float +- 45.0 degrees
-    float pitch = -(float) Channels[1]*45.0/10000;
+
+    // Roll, aka aileron, float +- 50.0 in degrees
+    // float roll  = -(float) Channels[0]*50.0/10000;
+    s32 f_roll = -Channels[0] * FRAC_SCALE / (10000 / 50);
+
+    // Pitch, aka elevator, float +- 50.0 degrees
+    //float pitch = -(float) Channels[1]*50.0/10000;
+    s32 f_pitch = -Channels[1] * FRAC_SCALE / (10000 / 50);
+
     // Thrust, aka throttle 0..65535, working range 5535..65535
     // No space for overshoot here, hard limit Channel3 by -10000..10000
     s32 ch = Channels[2];
@@ -197,17 +224,22 @@ static void send_cmd_packet()
         ch = CHAN_MAX_VALUE;
     }
     uint16_t thrust  = ch*3L + 35535L;
+
     // Yaw, aka rudder, float +- 400.0 deg/s
-    float yaw   = -(float) Channels[3]*400.0/10000;
+    // float yaw   = -(float) Channels[3]*400.0/10000;
+    s32 f_yaw = - Channels[3] * FRAC_SCALE / (10000 / 400);
+    frac2float(f_yaw, &yaw);
   
-    // Convert + to X
-    float xRoll = 0.707 * (roll + pitch);
-    float xPitch = 0.707 * (pitch - roll);
+    // Convert + to X. 181 / 256 = 0.70703125 ~= sqrt(2) / 2
+    s32 f_x_roll = (f_roll + f_pitch) * 181 / 256;
+    frac2float(f_x_roll, &x_roll);
+    s32 f_x_pitch = (f_pitch - f_roll) * 181 / 256;
+    frac2float(f_x_pitch, &x_pitch);
 
     int bufptr = 0;
     buf[bufptr++] = 0x30; // Commander packet to channel 0
-    memcpy(&buf[bufptr], (char*) &xRoll, 4); bufptr += 4;
-    memcpy(&buf[bufptr], (char*) &xPitch, 4); bufptr += 4;
+    memcpy(&buf[bufptr], (char*) &x_roll, 4); bufptr += 4;
+    memcpy(&buf[bufptr], (char*) &x_pitch, 4); bufptr += 4;
     memcpy(&buf[bufptr], (char*) &yaw, 4); bufptr += 4;
     memcpy(&buf[bufptr], (char*) &thrust, 2); bufptr += 2;
 
@@ -242,7 +274,7 @@ static void send_cmd_packet()
                Channels[0], Channels[1], Channels[2], Channels[3],
                Channels[4], Channels[5], Channels[6], Channels[7]);
         dbgprintf("Roll %d, pitch %d, yaw %d, thrust %d\n",
-               (int) xRoll*100, (int) xPitch*100, (int) yaw*100, (int) thrust);
+               (int) f_x_roll*100/FRAC_SCALE, (int) f_x_pitch*100/FRAC_SCALE, (int) f_yaw*100/FRAC_SCALE, (int) thrust);
 
     }
 }
