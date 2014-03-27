@@ -106,6 +106,27 @@ int main() {
     }
     char avr_str[100];
     sprintf(avr_str, "Found AVR: %08x\nhex: %dbytes", type, size);
+
+    buttons = ScanButtons();
+    if(CHAN_ButtonIsPressed(buttons, BUT_UP)) {
+        sprintf(tempstring, "%s\n2. Erasing", avr_str);
+        LCD_Clear(0x0000);
+        LCD_PrintStringXY(0,0, tempstring);
+        if(! AVR_Erase()) {
+            sprintf(tempstring, "%s\nERR: Erase failed", avr_str);
+            error(tempstring);
+        }
+        sprintf(tempstring, "%s\n3. Erasing Fuses", avr_str);
+        LCD_Clear(0x0000);
+        LCD_PrintStringXY(0,0, tempstring);
+        if(!AVR_ResetFuses()) {
+            sprintf(tempstring, "%s\nERR: Couldn't erase fuses", avr_str);
+            error(tempstring);
+        }
+        while(1)
+            if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }
+
     //Verify AVR
     sprintf(tempstring, "%s\n2. Verifying", avr_str);
     LCD_Clear(0x0000);

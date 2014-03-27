@@ -167,6 +167,11 @@ void wait_release()
 void USB_Connect()
 {
     USB_Enable(0, 1);
+    //Disable USB Exit
+    while(1) {
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
     wait_release();
     wait_press();
     wait_release();

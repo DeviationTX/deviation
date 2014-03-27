@@ -351,7 +351,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
         return 1;
     }
-#if ENABLE_320x240_GUI
+#ifdef ENABLE_320x240_GUI
     static u8 seen_res = 0;
     enum {
         LOWRES = 1,

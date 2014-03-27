@@ -41,7 +41,7 @@ enum CYRF_PWR {
 
 /* SPI CYRF6936 */
 void CYRF_Initialize();
-void CYRF_Reset();
+int CYRF_Reset();
 void CYRF_GetMfgData(u8 data[]);
 
 void CYRF_SetTxRxMode(enum TXRX_State);

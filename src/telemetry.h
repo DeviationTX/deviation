@@ -7,6 +7,7 @@
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
+#define HAS_DSM_EXTENDED_TELEMETRY 0
 enum {
     TELEM_DEVO,
     TELEM_DSM,

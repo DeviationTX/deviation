@@ -28,8 +28,8 @@
 #include "protocol/interface.h"
 #include <stdlib.h>
 
-#if HAS_PROGRAMMABLE_SWITCH
-void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
+#if HAS_MULTIMOD_SUPPORT
+int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 {
     int i;
     //Switch output on clock before switching off SPI
@@ -51,14 +51,15 @@ void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     spi_enable(SPI2);
     //Finally ready to send a command
     
-    spi_xfer(SPI2, csn_high); //Set all other pins high
-    spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
+    int byte1 = spi_xfer(SPI2, csn_high); //Set all other pins high
+    int byte2 = spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     //Reset transfer speed
     spi_disable(SPI2);
     spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
     spi_enable(SPI2);
+    return byte1 == 0xa5 ? byte2 : 0;
 }
 
 int SPI_ProtoGetPinConfig(int module, int state) {
@@ -86,13 +87,6 @@ int SPI_ProtoGetPinConfig(int module, int state) {
 
 void SPI_ProtoInit()
 {
-    const char * const modules[PROGSWITCH] = {
-        [CYRF6936] = "CYRF",
-        [A7105]    = "A7105",
-        [CC2500]   = "CC2500",
-        [NRF24L01] = "nRF24L01",
-    };
-
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
@@ -124,21 +118,21 @@ void SPI_ProtoInit()
     gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
 
-#if HAS_PROGRAMMABLE_SWITCH
-    if(Transmitter.module_enable[PROGSWITCH].port) {
-        struct mcu_pin *port = &Transmitter.module_enable[PROGSWITCH];
+#if HAS_MULTIMOD_SUPPORT
+    if(Transmitter.module_enable[MULTIMOD].port) {
+        struct mcu_pin *port = &Transmitter.module_enable[MULTIMOD];
         printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
         gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
         gpio_set(port->port, port->pin);
     }
-#endif //HAS_PROGRAMMABLE_SWITCH
-    for (int i = 0; i < PROGSWITCH; i++) {
+#endif //HAS_MULTIMOD_SUPPORT
+    for (int i = 0; i < MULTIMOD; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
         {
             struct mcu_pin *port = &Transmitter.module_enable[i];
-            printf("%s port: %08x pin: %04x\n", modules[i], port->port, port->pin);
+            printf("%s port: %08x pin: %04x\n", MODULE_NAME[i], port->port, port->pin);
             gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
                       GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
             gpio_set(port->port, port->pin);
@@ -155,19 +149,15 @@ void SPI_ProtoInit()
     spi_set_nss_high(SPI2);
     spi_enable(SPI2);
 
-#ifndef MODULAR
-    //Need to figure out how to do this given the protocols are loaded as modules
-    //We want to set up modules for low-power mode
-    if (Transmitter.module_enable[A7105].port) {
-        PROTOCOL_SetSwitch(A7105);
-        A7105_SetTxRxMode(TXRX_OFF);
-    }
-    if (Transmitter.module_enable[CC2500].port) {
-        PROTOCOL_SetSwitch(CC2500);
-        CC2500_SetTxRxMode(TXRX_OFF);
-    }
-#endif
     PROTO_Stubs(0);
+}
+
+void SPI_AVRProgramInit()
+{
+    rcc_set_ppre1(RCC_CFGR_PPRE1_HCLK_DIV16);  //72 / 16 = 4.5MHz
+    spi_disable(SPI2);
+    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_256);// 4.5 / 256 = 17.5kHz
+    spi_enable(SPI2);
 }
 
 void MCU_InitModules()
@@ -200,13 +190,15 @@ int MCU_SetPin(struct mcu_pin *port, const char *name) {
         case 'G':
         case 'g':
             port->port = GPIOG; break;
+#if HAS_MULTIMOD_SUPPORT
         case 'S':
         case 's':
             port->port = SWITCH_ADDRESS; break;
+#endif
         default:
+            port->port = 0;
+            port->pin = 0;
             if(strcasecmp(name, "None") == 0) {
-                port->port = 0;
-                port->pin = 0;
                 return 1;
             }
             return 0;

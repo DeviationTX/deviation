@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 
+//Magic macro to check enum size
+#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
+
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
                              //But only after all sprintf are replaced with snprintf
@@ -51,6 +54,7 @@ int CONFIG_IniParse(const char* filename,
 u8 CONFIG_IsModelChanged();
 u8 CONFIG_SaveModelIfNeeded();
 void CONFIG_SaveTxIfNeeded();
+extern const char * const MODULE_NAME[TX_MODULE_LAST];
 
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);
@@ -94,6 +98,7 @@ void MIXER_CalcChannels();
 void PAGE_Init();
 void PAGE_Change(int dir);
 void PAGE_Event();
+int PAGE_DialogVisible();
 void PAGE_ShowSafetyDialog();
 void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
@@ -101,6 +106,7 @@ void PAGE_ShowLowBattDialog();
 void PAGE_DisableSafetyDialog(u8 disable);
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data);
 void PAGE_ShowInvalidModule();
+void PAGE_ShowModuleDialog(const char **missing);
 void PAGE_ShowWarning(const char *title, const char *str);
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
@@ -156,8 +162,10 @@ int PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
 int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);
-void PROTOCOL_SetSwitch(int module);
+int PROTOCOL_SetSwitch(int module);
 int PROTOCOL_SticksMoved(int init);
+void PROTOCOL_InitModules();
+
 
 /* Input */
 const char *INPUT_SourceName(char *str, unsigned src);

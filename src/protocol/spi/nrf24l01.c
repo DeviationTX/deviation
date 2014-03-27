@@ -18,12 +18,10 @@
   #pragma long_calls
 #endif
 
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
+#include "protospi.h"
 
 #ifdef PROTO_HAS_NRF24L01
 
@@ -46,31 +44,35 @@
 static u8 rf_setup;
 
 static void  CS_HI() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[NRF24L01].port == 0xFFFFFFFF) {
-        gpio_set(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[NRF24L01].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_set(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
-    }
+    PROTOSPI_pin_set(Transmitter.module_enable[NRF24L01]);
 }
 
 static void CS_LO() {
-#if HAS_PROGRAMMABLE_SWITCH
-    if (Transmitter.module_enable[NRF24L01].port == 0xFFFFFFFF) {
-        gpio_clear(Transmitter.module_enable[PROGSWITCH].port, Transmitter.module_enable[PROGSWITCH].pin);
-        for(int i = 0; i < 20; i++)
-            asm volatile ("nop");
+#if HAS_MULTIMOD_SUPPORT
+    if (Transmitter.module_enable[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
+        if(Transmitter.module_enable[NRF24L01].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
     }
-    else
 #endif
-    {
-        gpio_clear(Transmitter.module_enable[NRF24L01].port, Transmitter.module_enable[NRF24L01].pin);
-    }
+    PROTOSPI_pin_clear(Transmitter.module_enable[NRF24L01]);
 }
 void NRF24L01_Initialize()
 {
@@ -80,8 +82,8 @@ void NRF24L01_Initialize()
 u8 NRF24L01_WriteReg(u8 reg, u8 data)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, W_REGISTER | (REGISTER_MASK & reg));
-    spi_xfer(SPI2, data);
+    u8 res = PROTOSPI_xfer(W_REGISTER | (REGISTER_MASK & reg));
+    PROTOSPI_xfer(data);
     CS_HI();
     return res;
 }
@@ -89,10 +91,10 @@ u8 NRF24L01_WriteReg(u8 reg, u8 data)
 u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, W_REGISTER | ( REGISTER_MASK & reg));
+    u8 res = PROTOSPI_xfer(W_REGISTER | ( REGISTER_MASK & reg));
     for (u8 i = 0; i < length; i++)
     {
-        spi_xfer(SPI2, data[i]);
+        PROTOSPI_xfer(data[i]);
     }
     CS_HI();
     return res;
@@ -101,10 +103,10 @@ u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length)
 u8 NRF24L01_WritePayload(u8 *data, u8 length)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, W_TX_PAYLOAD);
+    u8 res = PROTOSPI_xfer(W_TX_PAYLOAD);
     for (u8 i = 0; i < length; i++)
     {
-        spi_xfer(SPI2, data[i]);
+        PROTOSPI_xfer(data[i]);
     }
     CS_HI();
     return res;
@@ -113,8 +115,8 @@ u8 NRF24L01_WritePayload(u8 *data, u8 length)
 u8 NRF24L01_ReadReg(u8 reg)
 {
     CS_LO();
-    spi_xfer(SPI2, R_REGISTER | (REGISTER_MASK & reg));
-    u8 data = spi_xfer(SPI2, 0xFF);
+    PROTOSPI_xfer(R_REGISTER | (REGISTER_MASK & reg));
+    u8 data = PROTOSPI_xfer(0xFF);
     CS_HI();
     return data;
 }
@@ -122,10 +124,10 @@ u8 NRF24L01_ReadReg(u8 reg)
 u8 NRF24L01_ReadRegisterMulti(u8 reg, u8 data[], u8 length)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, R_REGISTER | (REGISTER_MASK & reg));
+    u8 res = PROTOSPI_xfer(R_REGISTER | (REGISTER_MASK & reg));
     for(u8 i = 0; i < length; i++)
     {
-        data[i] = spi_xfer(SPI2, 0xFF);
+        data[i] = PROTOSPI_xfer(0xFF);
     }
     CS_HI();
     return res;
@@ -134,10 +136,10 @@ u8 NRF24L01_ReadRegisterMulti(u8 reg, u8 data[], u8 length)
 u8 NRF24L01_ReadPayload(u8 *data, u8 length)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, R_RX_PAYLOAD);
+    u8 res = PROTOSPI_xfer(R_RX_PAYLOAD);
     for(u8 i = 0; i < length; i++)
     {
-        data[i] = spi_xfer(SPI2, 0xFF);
+        data[i] = PROTOSPI_xfer(0xFF);
     }
     CS_HI();
     return res;
@@ -146,7 +148,7 @@ u8 NRF24L01_ReadPayload(u8 *data, u8 length)
 static u8 Strobe(u8 state)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, state);
+    u8 res = PROTOSPI_xfer(state);
     CS_HI();
     return res;
 }
@@ -164,8 +166,8 @@ u8 NRF24L01_FlushRx()
 u8 NRF24L01_Activate(u8 code)
 {
     CS_LO();
-    u8 res = spi_xfer(SPI2, ACTIVATE);
-    spi_xfer(SPI2, code);
+    u8 res = PROTOSPI_xfer(ACTIVATE);
+    PROTOSPI_xfer(code);
     CS_HI();
     return res;
 }
@@ -220,13 +222,13 @@ u8 NRF24L01_SetPower(u8 power)
 }
 static void CE_lo()
 {
-#if HAS_PROGRAMMABLE_SWITCH
+#if HAS_MULTIMOD_SUPPORT
     SPI_ConfigSwitch(0x0f, 0x0b);
 #endif
 }
 static void CE_hi()
 {
-#if HAS_PROGRAMMABLE_SWITCH
+#if HAS_MULTIMOD_SUPPORT
     SPI_ConfigSwitch(0x1f, 0x1b);
 #endif
 }
@@ -257,8 +259,14 @@ void NRF24L01_SetTxRxMode(enum TXRX_State mode)
         usleep(130);
         CE_hi();
     } else {
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, (1 << NRF24L01_00_EN_CRC)); //PowerDown
         CE_lo();
     }
 }
 
+int NRF24L01_Reset()
+{
+    NRF24L01_SetTxRxMode(TXRX_OFF);
+    return NRF24L01_ReadReg(0x07) == 0x0E;
+}
 #endif // defined(PROTO_HAS_NRF24L01)

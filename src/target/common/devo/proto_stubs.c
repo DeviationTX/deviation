@@ -30,6 +30,7 @@ extern void _usleep();
 extern void TELEMETRY_SetUpdated();
 extern void TELEMETRY_SetType();
 extern void MCU_SerialNumber();
+extern void USB_Disable();
 
 void PROTO_Stubs(int idx)
 {
@@ -48,4 +49,5 @@ void PROTO_Stubs(int idx)
     rcc_peripheral_disable_clock();
     _usleep();
     MCU_SerialNumber();
+    USB_Disable();
 }
