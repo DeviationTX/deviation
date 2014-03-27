@@ -153,9 +153,8 @@ void CYRF_GetMfgData(u8 data[])
  */
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
-#if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
 #if AWA24S
+    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
         if(mode == TX_EN)
         {
             CYRF_WriteRegister(0x0D,0x40); //disable Rx (assume IRQ is set?)
@@ -166,7 +165,6 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
             CYRF_WriteRegister(0x0D,0x00); //enable Rx (assume IRQ is set?)
             SPI_ConfigSwitch(0x0f, 0x0e);
         }
-#endif //AWA24S
     }
     else
 #endif

@@ -162,6 +162,10 @@ void SPI_AVRProgramInit()
 
 void MCU_InitModules()
 {
+    //CSN
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
+    gpio_set(GPIOB, GPIO12);
     Transmitter.module_enable[CYRF6936].port = GPIOB;
     Transmitter.module_enable[CYRF6936].pin = GPIO12;
     Transmitter.module_poweramp = (1 << CYRF6936);
