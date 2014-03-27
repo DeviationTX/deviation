@@ -59,9 +59,14 @@
 #define dbgprintf if(0) printf
 #endif
 
-
-// Timeout for callback in uSec, 8ms=8000us for YD717
-#define PACKET_PERIOD 8000
+#ifndef EMULATOR
+#define PACKET_PERIOD   8000     // Timeout for callback in uSec, 8ms=8000us for YD717
+#define INITIAL_WAIT   50000     // Initial wait before starting callbacks
+#else
+#define PACKET_PERIOD   1000     // Adjust timeouts for reasonable emulator printouts
+#define INITIAL_WAIT     500
+#endif
+#define PACKET_CHKTIME   500     // Time to wait if packet not yet acknowledged or timed out    
 
 // Stock tx fixed frequency is 0x3C. Receiver only binds on this freq.
 #define RF_CHANNEL 0x3C
@@ -103,14 +108,24 @@ enum {
     YD717_DATA
 };
 
-#ifdef YD717_TELEMETRY
 static const char * const yd717_opts[] = {
+  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), NULL,
+#ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+#endif
   NULL
 };
 enum {
-    PROTOOPTS_TELEMETRY = 0,
+    PROTOOPTS_FORMAT = 0,
+#ifdef YD717_TELEMETRY
+    PROTOOPTS_TELEMETRY,
+#endif
 };
+enum {
+    FORMAT_YD717 = 0,
+    FORMAT_SKYWLKR = 1,
+};
+#ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
 #define TELEM_ON 1
 #endif
@@ -124,7 +139,6 @@ enum {
     PKT_ACKED,
     PKT_TIMEOUT
 };
-#define PACKET_CHKTIME 500      // time to wait if packet not yet acknowledged or timed out    
 
 static u8 packet_ack()
 {
@@ -182,15 +196,10 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     else
       *flags |= FLAG_FLIP;
 
-    // Print channels every second or so
-    if ((packet_counter & 0xFF) == 1) {
-        dbgprintf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
-               Channels[0], Channels[1], Channels[2], Channels[3],
-               Channels[4], Channels[5], Channels[6], Channels[7]);
-        dbgprintf("Aileron %d, elevator %d, throttle %d, rudder %d, flip enable %d\n",
-               (s16) *aileron, (s16) *elevator, (s16) *throttle, (s16) *rudder,
-               (s16) *flags);
-    }
+
+    dbgprintf("ail %3d+%3d, ele %3d+%3d, thr %3d, rud %3d+%3d, flip enable %d\n",
+            *aileron, *aileron_trim, *elevator, *elevator_trim, *throttle,
+            *rudder, *rudder_trim, *flags);
 }
 
 
@@ -211,7 +220,7 @@ static void send_packet(u8 bind)
         packet[1] = rudder;
         packet[3] = elevator;
         packet[4] = aileron;
-        if(Model.protocol == PROTOCOL_YD717) {
+        if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
             packet[2] = elevator_trim;
             packet[5] = aileron_trim;
             packet[6] = rudder_trim;
@@ -228,7 +237,7 @@ static void send_packet(u8 bind)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
     NRF24L01_FlushTx();
 
-    if(Model.protocol == PROTOCOL_YD717) {
+    if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
         NRF24L01_WritePayload(packet, 8);
     } else {
         packet[8] = packet[0];  // checksum
@@ -470,7 +479,7 @@ static void initialize()
 #endif
 
     PROTOCOL_SetBindState(0xFFFFFFFF);
-    CLOCK_StartTimer(50000, yd717_callback);
+    CLOCK_StartTimer(INITIAL_WAIT, yd717_callback);
 }
 
 const void *YD717_Cmds(enum ProtoCmds cmd)
@@ -486,8 +495,8 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return Model.protocol == PROTOCOL_YD717 ? yd717_opts : 0;
 #ifdef YD717_TELEMETRY
-        case PROTOCMD_GETOPTIONS: return yd717_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
 #else
