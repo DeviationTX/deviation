@@ -30,7 +30,7 @@ if($target && ! exists $targetmap{$target}) {
 }
 exit 0 if($target && ! $targetmap{$target});
 
-my @lines = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
+my @lines = `/usr/bin/find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @files;
 my $str = "";
 my $idx = 0;
