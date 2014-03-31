@@ -44,6 +44,7 @@ SRC_C    +=  $(wildcard $(SDIR)/screen/*.c) \
              $(wildcard $(SDIR)/screen/$(SCREENSIZE)/*.c) \
              $(wildcard $(SDIR)/config/*.c) \
              $(SDIR)/misc.c \
+             $(SDIR)/protocol/spi/avr_program.c \
              $(wildcard *.c)
 
 

@@ -71,7 +71,7 @@ int main() {
     LCD_Contrast(Transmitter.contrast);
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(0xffff);
-    if (! Transmitter.module_enable[PROGSWITCH].port) {
+    if (! Transmitter.module_enable[MULTIMOD].port) {
         error("ERR: No switch cfg");
     }
     u8 data[2048]; //must be a multiple of 64
