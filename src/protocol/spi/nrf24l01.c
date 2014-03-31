@@ -266,7 +266,11 @@ void NRF24L01_SetTxRxMode(enum TXRX_State mode)
 
 int NRF24L01_Reset()
 {
+    NRF24L01_FlushTx();
+    NRF24L01_FlushRx();
+    u8 status1 = Strobe(NOP);
+    u8 status2 = NRF24L01_ReadReg(0x07);
     NRF24L01_SetTxRxMode(TXRX_OFF);
-    return NRF24L01_ReadReg(0x07) == 0x0E;
+    return (status1 == status2 && (status1 & 0x0f) == 0x0e);
 }
 #endif // defined(PROTO_HAS_NRF24L01)
