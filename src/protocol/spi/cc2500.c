@@ -131,6 +131,24 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
         CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
     }
 }
+
+void CC2500_SetPower(int power)
+{
+    const unsigned char patable[8]=
+    {
+        0xC5,  // -12dbm
+        0x97, // -10dbm
+        0x6E, // -8dbm
+        0x7F, // -6dbm
+        0xA9, // -4dbm
+        0xBB, // -2dbm
+        0xFE, // 0dbm
+        0xFF // 1.5dbm
+    };
+    if (power >= 8)
+        power = 8;
+    CC2500_WriteReg(CC2500_3E_PATABLE,  patable[power]);
+}
 int CC2500_Reset()
 {
     CC2500_Strobe(CC2500_SRES);

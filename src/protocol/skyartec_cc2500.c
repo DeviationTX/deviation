@@ -103,6 +103,7 @@ static void skyartec_init()
         CC2500_WriteReg(CC2500_04_SYNC1, 0x13);
         CC2500_WriteReg(CC2500_05_SYNC0, 0x18);
         CC2500_SetTxRxMode(TX_EN);
+        CC2500_SetPower(Model.tx_power);
         CC2500_Strobe(CC2500_SFTX);
         CC2500_Strobe(CC2500_SFRX);
         CC2500_Strobe(CC2500_SXOFF);
@@ -177,7 +178,12 @@ static u16 skyartec_cb()
 {
     if (state & 0x01) {
         CC2500_Strobe(CC2500_SIDLE);
-        state = (state == SKYARTEC_LAST) ? SKYARTEC_PKT1 : state + 1;
+        if (state == SKYARTEC_LAST) {
+            CC2500_SetPower(Model.tx_power);
+            state = SKYARTEC_PKT1;
+        } else {
+             state++;
+        }
         return 3000;
     }
     if (state == SKYARTEC_PKT1 && bind_count) {
