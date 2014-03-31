@@ -102,6 +102,7 @@ static void frsky_init()
         CC2500_WriteReg(CC2500_09_ADDR, 0x00);
 
         CC2500_SetTxRxMode(TX_EN);
+        CC2500_SetPower(Model.tx_power);
 
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
         //CC2500_WriteReg(CC2500_02_IOCFG0,   0x06);
@@ -271,10 +272,15 @@ static u16 frsky_cb()
         }
         CC2500_WriteReg(CC2500_0A_CHANNR, chan * 5 + 6);
         build_data_packet_1way();
-        CC2500_WriteData(packet, packet[0]+1);
-        state++;
-        if (state > FRSKY_DATA5)
+
+        if (state == FRSKY_DATA5) {
+            CC2500_SetPower(Model.tx_power);
             state = FRSKY_DATA1;
+        } else {
+            state++;
+        }
+
+        CC2500_WriteData(packet, packet[0]+1);
         return 9006;
     }
         

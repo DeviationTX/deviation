@@ -410,6 +410,7 @@ void PROTOCOL_InitModules()
 
     if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
         //No Switch found
+/*
         missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
         for(int i = 0; i < MULTIMOD; i++) {
             if(Transmitter.module_enable[i].port == SWITCH_ADDRESS) {
@@ -419,6 +420,7 @@ void PROTOCOL_InitModules()
                 Transmitter.module_enable[i].port = 0;
             }
         }
+*/
     }
     int orig_proto = Model.protocol;
     for(int i = 0; i < MULTIMOD; i++) {
@@ -440,6 +442,11 @@ void PROTOCOL_InitModules()
                 }
             } 
         }
+    }
+    //Put this last because the switch will not respond until after it has been initialized
+    if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+        //No Switch found
+        missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
     }
     Model.protocol = orig_proto;
     if(error) {

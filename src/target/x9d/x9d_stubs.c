@@ -73,10 +73,6 @@ void SPIFlash_EraseSector(u32 sectorAddress) {
     (void)sectorAddress;
 }
 
-void SPI_ProtoInit() {}
-int SPI_ProtoGetPinConfig(int module, int state) { return 0;}
-void SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low) {}
-
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
 volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
@@ -86,9 +82,6 @@ void PPMin_Start() {}
 
 void SPITouch_Init() {}
 void PPMin_TIM_Init() {}
-
-int MCU_SetPin(struct mcu_pin *port, const char *name) {return 0;}
-void MCU_InitModules() {}
 
 const char *MCU_GetPinName(char *str, struct mcu_pin *port) { return "None";}
 
