@@ -5,7 +5,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#define VERSION 0x02
+#define VERSION 0x03
 
 #define CSN_PIN (1 << PB0)
 #define SCK_PIN (1 << PA4)
@@ -29,6 +29,7 @@ register uint8_t global_tmp asm ("14");
 register uint8_t state asm ("17");
 //register uint8_t global_B asm ("14");
 //register uint8_t global_NOTB asm ("15");
+uint8_t seen_csn;
 
 enum {
     CLEAR = 0,
@@ -40,7 +41,10 @@ void setup_switch() {
     uint8_t data[2];
     TCNT0 = 0;
     TCCR0B = (1 << CS01) | (1 << CS00); // div-by-64 prescalar = ~2msec overflow
-    DDRA = (1 << PA0) | (1 << PA1) | (1 << PA2) | (1 << PA3) | (1 << PA7) | (1 << PA5);  //Enable MISO output
+    if(seen_csn) {
+        //Only write to the bus if we are sure the multi-module has been activated
+        DDRA = (1 << PA0) | (1 << PA1) | (1 << PA2) | (1 << PA3) | (1 << PA7) | (1 << PA5);  //Enable MISO output
+    }
 
     USICR = (1 << USIWM0) | (1 << USICS1);  // 3-sire (SPI), slave, rising clock
     USISR = 1 << USIOIF;                    // Reset USI interrupt flag
@@ -92,6 +96,7 @@ ISR(PCINT1_vect, ISR_NAKED) {
 
 int main (void)
 {
+    seen_csn = 0;
     state = CLEAR;
     global_A = 0x0f;
     global_NOTA = 0x0f;
@@ -127,6 +132,8 @@ int main (void)
            }
         } else {
            GIFR = 1 << PCIF0;  //clear clock toggle
+           if (global_A != 0x0f || global_NOTA != 0x0f)
+               seen_csn = 1;
         }
     }
 }
