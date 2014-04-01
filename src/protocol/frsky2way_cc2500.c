@@ -104,6 +104,7 @@ static void frsky2way_init(int bind)
         CC2500_WriteReg(CC2500_09_ADDR, 0x00);
 
         CC2500_SetTxRxMode(TX_EN);
+        CC2500_SetPower(Model.tx_power);
         
         CC2500_Strobe(CC2500_SIDLE);    // Go to idle...
 
@@ -228,6 +229,7 @@ static u16 frsky2way_cb()
                 //parse telemetry packet here
             }
             CC2500_SetTxRxMode(TX_EN);
+            CC2500_SetPower(Model.tx_power);
         }
         CC2500_Strobe(CC2500_SIDLE);
         if (fine != (s8)Model.proto_opts[PROTO_OPTS_FREQFINE] || course != (s8)Model.proto_opts[PROTO_OPTS_FREQCOURSE]) {
