@@ -115,7 +115,7 @@ static void frsky2way_init(int bind)
 
         CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
-        CC2500_WriteReg(CC2500_3E_PATABLE, 0x50);
+        //CC2500_WriteReg(CC2500_3E_PATABLE, 0x50);
         CC2500_Strobe(CC2500_SFRX);
 }
 
@@ -240,7 +240,7 @@ static u16 frsky2way_cb()
         }
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
-        CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
+        //CC2500_WriteReg(CC2500_3E_PATABLE, 0xfe);
         CC2500_Strobe(CC2500_SFRX);
         frsky2way_build_data_packet();
         CC2500_WriteData(packet, packet[0]+1);
