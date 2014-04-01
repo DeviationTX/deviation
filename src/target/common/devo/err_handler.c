@@ -144,7 +144,12 @@ void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
   fault_printf ("Backtrace:", NO_VALUE);
   while (ptr < (&_stack) && count < 20) {
     //iwdg_reset();
-    if ((*ptr & 0xFFF00001) == 0x08000001) {
+    if (
+        ((*ptr & 0xFFF00001) == 0x08000001)
+#ifdef MODULAR
+        || ((*ptr & 0xFFFFF001) == (MODULAR+1))
+#endif
+       ) {
         //This looks like it may be a return address
         write_long((unsigned int)ptr);
         fault_printf(" : ", *ptr);
