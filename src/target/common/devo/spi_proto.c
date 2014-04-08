@@ -76,11 +76,13 @@ int SPI_ProtoGetPinConfig(int module, int state) {
     if(state == DISABLED_PIN) {
         return 0;
     }
+    /*
     if(state == RESET_PIN) {
         if (module == CYRF6936)
             return 1 << ((Transmitter.module_enable[module].pin >> 8) & 0x0F);
         return 0;
     }
+    */
     return 0;
 }
 #endif

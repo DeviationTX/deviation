@@ -251,15 +251,12 @@ static const u8 init_vals[][2] = {
     {CYRF_28_CLK_EN, 0x02},
     {CYRF_32_AUTO_CAL_TIME, 0x3c},
     {CYRF_35_AUTOCAL_OFFSET, 0x14},
-    {CYRF_0D_IO_CFG, 0x04}, //From Devo - Enable PACTL as GPIO
-    {CYRF_0E_GPIO_CTRL, 0x20}, //From Devo
     {CYRF_06_RX_CFG, 0x48},
     {CYRF_1B_TX_OFFSET_LSB, 0x55},
     {CYRF_1C_TX_OFFSET_MSB, 0x05},
     {CYRF_0F_XACT_CFG, 0x24},
     {CYRF_03_TX_CFG, 0x38 | 7},
     {CYRF_12_DATA64_THOLD, 0x0a},
-    {CYRF_0C_XTAL_CTRL, 0xC0}, //From Devo - Enable XOUT as GPIO
     {CYRF_0F_XACT_CFG, 0x04},
     {CYRF_39_ANALOG_CTRL, 0x01},
     {CYRF_0F_XACT_CFG, 0x24}, //Force IDLE

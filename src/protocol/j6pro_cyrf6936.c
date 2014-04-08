@@ -132,10 +132,6 @@ static void cyrf_init()
        CYRF_WriteRegister(CYRF_35_AUTOCAL_OFFSET, 0x14);
        CYRF_WriteRegister(CYRF_1C_TX_OFFSET_MSB, 0x05);
        CYRF_WriteRegister(CYRF_1B_TX_OFFSET_LSB, 0x55);
-       //CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x00);
-       CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04);    //From Devo - Enable PACTL as GPIO
-       CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);  //From Devo
-       CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //From Devo - Enable XOUT as GPIO
        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x25);
        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x05 | Model.tx_power);
        CYRF_WriteRegister(CYRF_06_RX_CFG, 0x8a);

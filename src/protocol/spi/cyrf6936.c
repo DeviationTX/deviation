@@ -120,6 +120,8 @@ int CYRF_Reset()
         RS_LO();
         Delay(100);
 #endif
+        CYRF_WriteRegister(CYRF_0C_XTAL_CTRL, 0xC0); //Enable XOUT as GPIO
+        CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
         CYRF_SetTxRxMode(TXRX_OFF);
         //Verify the CYRD chip is responding
         return (CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5);
@@ -148,37 +150,53 @@ void CYRF_GetMfgData(u8 data[])
     /* Fuses power off */
     CYRF_WriteRegister(0x25, 0x00); 
 }
+
+static void AWA24S_SetTxRxMode(enum TXRX_State mode)
+{
+    //AWA24S
+    if(mode == TX_EN)
+    {
+        CYRF_WriteRegister(0x0D,0x40); //disable Rx (assume IRQ is set?)
+        SPI_ConfigSwitch(0x8f, 0x8e);
+    }
+    else
+    {
+        CYRF_WriteRegister(0x0D,0x00); //enable Rx (assume IRQ is set?)
+        SPI_ConfigSwitch(0x0f, 0x0e);
+    }
+}
+
+static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
+{
+    if(mode == TX_EN) {
+        CYRF_WriteRegister(0x0E,0x20);
+    } else if (mode == RX_EN) {
+        CYRF_WriteRegister(0x0E,0x80);
+    }
+}
 /*
  * 1 - Tx else Rx
  */
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
-#if AWA24S
+    //Set the post tx/rx state
+    CYRF_WriteRegister(0x0F, mode == TX_EN ? 0x2C : 0x28);
+#if HAS_MULTIMOD_SUPPORT
     if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
-        if(mode == TX_EN)
-        {
-            CYRF_WriteRegister(0x0D,0x40); //disable Rx (assume IRQ is set?)
-            SPI_ConfigSwitch(0x8f, 0x8e);
+        if ((Transmitter.module_enable[CYRF6936].pin >> 8) == 0x01) {
+            AWA24S_SetTxRxMode(mode);
+            return;
         }
-        else
-        {
-            CYRF_WriteRegister(0x0D,0x00); //enable Rx (assume IRQ is set?)
-            SPI_ConfigSwitch(0x0f, 0x0e);
+        if ((Transmitter.module_enable[CYRF6936].pin >> 8) == 0x02) {
+            BUYCHINA_SetTxRxMode(mode);
+            return;
         }
     }
-    else
 #endif
-    {
-        if(mode == TX_EN)
-        {
-            CYRF_WriteRegister(0x0E,0x80);
-            CYRF_WriteRegister(0x0F,0x2C);
-        }
-        else
-        {
-            CYRF_WriteRegister(0x0E,0x20);
-            CYRF_WriteRegister(0x0F,0x28);
-        }
+    if(mode == TX_EN) {
+        CYRF_WriteRegister(0x0E,0x80);
+    } else {
+        CYRF_WriteRegister(0x0E,0x20);
     }
 }
 /*
