@@ -331,7 +331,7 @@ static void cyrf_set_bound_sop_code()
 static void cyrf_init()
 {
     /* Initialise CYRF chip */
-    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x39);
+    CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x38);
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
     CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
