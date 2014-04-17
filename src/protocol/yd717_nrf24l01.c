@@ -109,7 +109,7 @@ enum {
 };
 
 static const char * const yd717_opts[] = {
-  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), NULL,
+  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), _tr_noop("XinXun"), NULL,
 #ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif
@@ -121,10 +121,11 @@ enum {
     PROTOOPTS_TELEMETRY,
 #endif
 };
-enum {
-    FORMAT_YD717 = 0,
-    FORMAT_SKYWLKR = 1,
-};
+
+#define FORMAT_YD717   0
+#define FORMAT_SKYWLKR 1
+#define FORMAT_XINXUN  2
+
 #ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
 #define TELEM_ON 1
@@ -148,7 +149,11 @@ static u8 packet_ack()
     case BV(NRF24L01_07_MAX_RT):
         return PKT_TIMEOUT;
     }
+#ifndef EMULATOR
     return PKT_PENDING;
+#else
+    return PKT_ACKED;
+#endif
 }
 
 
@@ -179,8 +184,13 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     *throttle = convert_channel(CHANNEL3);
 
     // Channel 4
-    *rudder = 0xff - convert_channel(CHANNEL4);
-    *rudder_trim = *rudder >> 1;
+    if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XINXUN) {
+      *rudder = convert_channel(CHANNEL4);
+      *rudder_trim = (0xff - *rudder) >> 1;
+    } else {
+      *rudder = 0xff - convert_channel(CHANNEL4);
+      *rudder_trim = *rudder >> 1;
+    }
 
     // Channel 2
     *elevator = convert_channel(CHANNEL2);
