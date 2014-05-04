@@ -114,7 +114,7 @@ static const u8 init_vals[][2] = {
     {NRF24L01_09_CD,          0x00},
     {NRF24L01_08_OBSERVE_TX,  0x00},
     {NRF24L01_07_STATUS,      0x07},
-    {NRF24L01_06_RF_SETUP,    0x07},
+//    {NRF24L01_06_RF_SETUP,    0x07},
     {NRF24L01_05_RF_CH,       0x18},
     {NRF24L01_04_SETUP_RETR,  0x3F},
     {NRF24L01_03_SETUP_AW,    0x03},
@@ -151,8 +151,9 @@ static void HM830_init()
     NRF24L01_Initialize();
     for (u32 i = 0; i < sizeof(init_vals) / sizeof(init_vals[0]); i++)
         NRF24L01_WriteReg(init_vals[i][0], init_vals[i][1]);
-    
-    NRF24L01_SetPower(Model.tx_power);
+
+    NRF24L01_SetTxRxMode(TX_EN);
+    NRF24L01_SetBitrate(0);
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_addr,   5);
     NRF24L01_WriteRegisterMulti(NRF24L01_0B_RX_ADDR_P1, bind_addr+1, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,    bind_addr,   5);
@@ -206,7 +207,7 @@ static void HM830_init()
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x0e);
     //NRF24L01_ReadReg(NRF24L01_00_CONFIG); ==> 0x0e
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0e);
-    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknoledgement
+    NRF24L01_ReadReg(NRF24L01_01_EN_AA);      // No Auto Acknoledgement
 }
 
 static void build_bind_packet()
@@ -239,8 +240,8 @@ static void build_data_packet()
 
 static void send_packet()
 {
-    NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00);
-    NRF24L01_WriteRegisterMulti(NRF24L01_A0_TX_PAYLOAD, packet, 7);
+    NRF24L01_ReadReg(NRF24L01_17_FIFO_STATUS);
+    NRF24L01_WritePayload(packet, 7);
 }
 
 static u16 handle_binding()
@@ -296,11 +297,10 @@ static u16 handle_binding()
         break;
     }
     NRF24L01_FlushTx();
-    //NRF24L01_ReadReg(NRF24L01_07_STATUS); ==> 1E
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x1E);
-    //NRF24L01_ReadReg(NRF24L01_00_CONFIG); ==> 0x0e
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0E);
-    NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00);
+    u8 rb = NRF24L01_ReadReg(NRF24L01_07_STATUS); //==> 0x0E
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, rb & 0x1E);
+    rb = NRF24L01_ReadReg(NRF24L01_00_CONFIG);    //==> 0x0E
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb & 0x0E);
     send_packet();
     phase++;
     if (phase == HM830_BIND7B+1) {
