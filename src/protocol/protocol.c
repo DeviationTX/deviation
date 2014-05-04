@@ -436,7 +436,8 @@ void PROTOCOL_InitModules()
                     if (res < 0) {
                         error = 1;
                         missing[i] = MODULE_NAME[i];
-                        Transmitter.module_enable[i].port = 0;
+                        if (! (Transmitter.extra_hardware & FORCE_MODULES))
+                            Transmitter.module_enable[i].port = 0;
                     }
                     break;
                 }
