@@ -32,6 +32,29 @@ static const struct mcu_pin SCK  = {GPIOA, GPIO14};
 static const struct mcu_pin MOSI = {GPIOA, GPIO7};
 static const struct mcu_pin MISO = {GPIOD, GPIO5};
 
+void SPI_Test()
+{
+    static const struct mcu_pin pins[] = {
+        {GPIOA, GPIO7},
+        {GPIOA, GPIO13},
+        {GPIOA, GPIO14},
+        {GPIOD, GPIO4},
+        {GPIOC, GPIO7},
+        {GPIOD, GPIO5},
+        {GPIOD, GPIO6},
+    };
+    for(unsigned int i = 0; i < (sizeof(pins) / sizeof(struct mcu_pin)); i++) {
+        gpio_mode_setup(pins[i].port, GPIO_MODE_OUTPUT,  GPIO_PUPD_PULLDOWN, pins[i].pin);
+    }
+    for(unsigned int i = 0; i < (sizeof(pins) / sizeof(struct mcu_pin)); i++) {
+        for(unsigned int j = 0; j < i+1; j++) {
+            PROTOSPI_pin_set(pins[i]);
+            usleep(50);
+            PROTOSPI_pin_clear(pins[i]);
+            usleep(50);
+        }
+    }
+} 
 void _SPI_DELAY()
 {
     for(int i = 0; i < 20; i++)
@@ -114,11 +137,6 @@ int SPI_ProtoGetPinConfig(int module, int state) {
     if(state == DISABLED_PIN) {
         return 0;
     }
-    if(state == RESET_PIN) {
-        if (module == CYRF6936)
-            return 1 << ((Transmitter.module_enable[module].pin >> 8) & 0x0F);
-        return 0;
-    }
     return 0;
 }
 #endif
@@ -130,7 +148,7 @@ void SPI_ProtoInit()
 
     gpio_mode_setup(SCK.port,  GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,   SCK.pin);
     gpio_mode_setup(MOSI.port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,   MOSI.pin);
-    gpio_mode_setup(MISO.port, GPIO_MODE_INPUT,  GPIO_PUPD_PULLDOWN, MOSI.pin);
+    gpio_mode_setup(MISO.port, GPIO_MODE_INPUT,  GPIO_PUPD_PULLDOWN, MISO.pin);
 
 
 #if HAS_MULTIMOD_SUPPORT
