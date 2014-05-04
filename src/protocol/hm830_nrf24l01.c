@@ -126,9 +126,9 @@ static const u8 init_vals[][2] = {
 static u8 packet[7];
 static s8 count;
 static u8 phase;
-static u8 rf_ch[]     = {0x08, 0x35, 0x12, 0x3f, 0x1c, 0x49, 0x26};
-static u8 bind_addr[] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xc2};
-static u8 rx_addr[]   = {0xb6, 0x0c, 0x00, 0x40, 0xee, 0xc2};
+static const u8 rf_ch[]     = {0x08, 0x35, 0x12, 0x3f, 0x1c, 0x49, 0x26};
+static const u8 bind_addr[] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xc2};
+static u8 rx_addr[6];    // = {0xb6, 0x0c, 0x00, 0x40, 0xee, 0xc2};
 
 static u8 crc8(u32 result, u8 *data, int len)
 {
@@ -373,11 +373,42 @@ static u16 HM830_callback()
         return handle_data();
 }
 
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static void initialize_tx_id()
+{
+    u32 lfsr = 0xb2c54a2ful;
+
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    printf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        printf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    printf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    rx_addr[0] = lfsr & 0xff;
+    rx_addr[1] = (lfsr >> 8) & 0xff;
+    rx_addr[2] = (lfsr >> 16) & 0xff;
+    rx_addr[3] = (lfsr >> 24) & 0xff;
+    rx_addr[4] = 0xee;
+    rx_addr[5] = 0xc2;
+}
+
 static void initialize()
 {
     CLOCK_StopTimer();
     PROTOCOL_SetBindState(0xFFFFFFFF); //Wait for binding
     count = 0;
+    initialize_tx_id();
     HM830_init();
     phase = HM830_BIND1A;
 
