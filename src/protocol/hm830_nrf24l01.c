@@ -124,7 +124,7 @@ static const u8 init_vals[][2] = {
 };
 
 static u8 packet[7];
-static u8 count;
+static s8 count;
 static u8 phase;
 static u8 rf_ch[]     = {0x08, 0x35, 0x12, 0x3f, 0x1c, 0x49, 0x26};
 static u8 bind_addr[] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xc2};
@@ -219,22 +219,37 @@ static void build_bind_packet()
 
 static void build_data_packet()
 {
+    u8 ail_sign = 0, trim_sign = 0;
     s8 throttle = (s32)Channels[0] * 50 / CHAN_MAX_VALUE + 50;
     if (throttle < 0)
         throttle = 0;
     s8 aileron = (s32)Channels[1] * 8 / CHAN_MAX_VALUE;
+    if (aileron < 0) {
+        aileron = -aileron;
+        ail_sign = 1;
+    }
+    if (aileron > 7)
+        aileron = 7;
     u8 turbo = (s32)Channels[2] > 0 ? 1 : 0;
-    u8 trim = ((s32)Channels[3] * 0x1f / CHAN_MAX_VALUE) & 0x3F;
+    s8 trim = ((s32)Channels[3] * 0x1f / CHAN_MAX_VALUE);
+    if (trim < 0) {
+        trim = -trim;
+        trim_sign = 1;
+    }
+    if (trim > 0x1f)
+        trim = 0x1f;
     u8 rbutton = (s32)Channels[4] > 0 ? 1 : 0;
     packet[0] = throttle;
-    packet[1] = aileron & 0x07;
-    if (aileron < 0)
+    packet[1] = aileron;
+    if (ail_sign)
         packet[1] |= 0x20;
     if (turbo)
         packet[1] |= 0x40;
     if (rbutton)
         packet[1] |= 0x80;
     packet[5] = trim;
+    if (trim_sign)
+        packet[5] |= 0x20;
     packet[6] = crc8(0xa5, packet, 6);
 }
 
@@ -249,7 +264,7 @@ static u16 handle_binding()
     u8 status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
     if (status & 0x20) {
         //Binding  complete
-        phase = HM830_DATA1;
+        phase = HM830_DATA1 + ((phase&0x7F)-HM830_BIND1A);
         count = 0;
         PROTOCOL_SetBindState(0);
         NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_addr,   5);
@@ -257,10 +272,10 @@ static u16 handle_binding()
         NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,    rx_addr,   5);
         NRF24L01_FlushTx();
         build_data_packet();
-        //NRF24L01_ReadReg(NRF24L01_07_STATUS); ==> 1E
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x1E);
-        //NRF24L01_ReadReg(NRF24L01_00_CONFIG); ==> 0x0e
-        NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0E);
+        u8 rb = NRF24L01_ReadReg(NRF24L01_07_STATUS); //==> 0x0E
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, rb);
+        rb = NRF24L01_ReadReg(NRF24L01_00_CONFIG);    //==> 0x0E
+        NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb);
         send_packet();
         return 14000;
     }
@@ -298,9 +313,9 @@ static u16 handle_binding()
     }
     NRF24L01_FlushTx();
     u8 rb = NRF24L01_ReadReg(NRF24L01_07_STATUS); //==> 0x0E
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, rb & 0x1E);
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, rb);
     rb = NRF24L01_ReadReg(NRF24L01_00_CONFIG);    //==> 0x0E
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb & 0x0E);
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb);
     send_packet();
     phase++;
     if (phase == HM830_BIND7B+1) {
@@ -314,8 +329,9 @@ static u16 handle_binding()
 static u16 handle_data()
 {
     u8 status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
-    if (count == 0) {
-        if(! (status & 0x20)) {
+    if (count <= 0 || !(status & 0x20)) {
+        if(count < 0 || ! (status & 0x20)) {
+            count = 0;
             //We didn't get a response on this channel, try the next one
             phase++;
             if (phase-HM830_DATA1 > 6)
@@ -324,10 +340,10 @@ static u16 handle_data()
             NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_ch[0]);
             NRF24L01_FlushTx();
             build_data_packet();
-            //NRF24L01_ReadReg(NRF24L01_07_STATUS); ==> 1E
-            NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x1E);
-            //NRF24L01_ReadReg(NRF24L01_00_CONFIG); ==> 0x0e
-            NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0E);
+            u8 rb = NRF24L01_ReadReg(NRF24L01_07_STATUS); //==> 0x0E
+            NRF24L01_WriteReg(NRF24L01_07_STATUS, rb);
+            rb = NRF24L01_ReadReg(NRF24L01_00_CONFIG);    //==> 0x0E
+            NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb);
             send_packet();
             return 14000;
         }
@@ -335,9 +351,13 @@ static u16 handle_data()
     build_data_packet();
     count++;
     if(count == 98) {
-        count = 0;
+        count = -1;
         NRF24L01_SetPower(Model.tx_power);
     }
+    u8 rb = NRF24L01_ReadReg(NRF24L01_07_STATUS); //==> 0x0E
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, rb);
+    rb = NRF24L01_ReadReg(NRF24L01_00_CONFIG);    //==> 0x0E
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, rb);
     send_packet();
     return 20000;
 }
