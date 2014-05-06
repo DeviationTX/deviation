@@ -72,6 +72,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         return 1;
     }
     if(MATCH_SECTION(SECTION_MODULES)) {
+        if(MATCH_KEY("force")) {
+            if (value_int)
+                Transmitter.extra_hardware |= FORCE_MODULES;
+            return 1;
+        }
         if(MATCH_START(name, MODULE_ENABLE_PIN)) {
             int pin = get_module_index(name+sizeof(MODULE_ENABLE_PIN));
             if(pin >= 0) {
