@@ -114,7 +114,7 @@ $(ODIR)/protocol/hm830.mod : $(ODIR)/hm830_nrf24l01.bin
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/kn.mod : $(ODIR)/kn_nrf24l01.bin
-	@echo Building 'hm830' module
+	@echo Building 'kn' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
