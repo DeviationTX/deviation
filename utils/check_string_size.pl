@@ -54,6 +54,7 @@ foreach my $target_dir (@dirs) {
     }
     my $cmd = "../utils/extract_strings.pl -target $target";
     $cmd .= " -objdir $objdir" if($objdir);
+    print $cmd . "\n";
     my @lines = `$cmd`;
     my $count = scalar(@lines);
     printf("%-35s: %5d lines\n", $target, $count) if(! $quiet);
