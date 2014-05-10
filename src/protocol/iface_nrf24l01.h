@@ -56,9 +56,14 @@ enum {
     NRF24L01_00_CRCO        = 2,
     NRF24L01_00_PWR_UP      = 1,
     NRF24L01_00_PRIM_RX     = 0,
+
     NRF24L01_07_RX_DR       = 6,
     NRF24L01_07_TX_DS       = 5,
     NRF24L01_07_MAX_RT      = 4,
+
+    NRF2401_1D_EN_DYN_ACK   = 0,
+    NRF2401_1D_EN_ACK_PAY   = 1,
+    NRF2401_1D_EN_DPL       = 2,
 };
 
 // Bitrates

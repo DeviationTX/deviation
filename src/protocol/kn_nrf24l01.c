@@ -102,6 +102,25 @@ enum {
     KN_DATA
 };
 
+static const char * const kn_opts[] = {
+  _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+  _tr_noop("1Mbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+  NULL
+};
+enum {
+    PROTOOPTS_STARTBIND = 0,
+    PROTOOPTS_USE1MBPS,
+};
+enum {
+    STARTBIND_NO  = 0,
+    STARTBIND_YES = 1,
+};
+enum {
+    USE1MBPS_NO  = 0,
+    USE1MBPS_YES = 1,
+};
+
+
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -138,10 +157,13 @@ static u16 kn_init()
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0);    // Disable retransmit
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
-//    NRF24L01_WriteReg(NRF24L01_08_OBSERVE_TX, 0x00); // no write bits in this field
-//    NRF24L01_WriteReg(NRF24L01_00_CD, 0x00);         // same
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOADSIZE);   // bytes of data payload for pipe 1
-//    NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00); // Just in case, no real bits to write here
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, 0x20);   // bytes of data payload for pipe 0
+
+
+    NRF24L01_Activate(0x73);
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 1); // Dynamic payload for data pipe 0
+    // Enable: Dynamic Payload Length, Payload with ACK , W_TX_PAYLOAD_NOACK
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL) | BV(NRF2401_1D_EN_ACK_PAY) | BV(NRF2401_1D_EN_DYN_ACK));
 
     // Check for Beken BK2421/BK2423 chip
     // It is done by using Beken specific activate code, 0x53
@@ -188,6 +210,7 @@ static u16 kn_init()
 static u16 kn_init2()
 {
     NRF24L01_FlushTx();
+    NRF24L01_FlushRx();
     packet_sent = 0;
     packet_count = 0;
     rf_ch_num = 0;
@@ -213,7 +236,11 @@ static void set_tx_for_data()
     for (int i = 0; i < TXID_SIZE; ++i)
         tx_addr[i] = tx_id[i];
     tx_addr[4] = 'K';
-    NRF24L01_SetBitrate(NRF24L01_BR_250K);
+    if (Model.proto_opts[PROTOOPTS_USE1MBPS] == USE1MBPS_YES) {
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);
+    } else {
+        NRF24L01_SetBitrate(NRF24L01_BR_250K);
+    }
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, tx_addr, 5);
 }
 
@@ -248,7 +275,10 @@ static void set_tx_id(u32 id)
     tx_id[1] = (id >> 16) & 0xFF;
     tx_id[2] = (id >> 8) & 0xFF;
     tx_id[3] = (id >> 0) & 0xFF;
+    printf("TX id %02X %02X %02X %02X\n", tx_id[0], tx_id[1], tx_id[2], tx_id[3]);
     calc_fh_channels(id);
+    printf("FQ ch %02X %02X %02X %02X\n", hopping_frequency[0], hopping_frequency[1],
+                                          hopping_frequency[2], hopping_frequency[3]);
 }
 
 
@@ -292,8 +322,8 @@ static void read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudde
     else *flags |= FLAG_GYRO3;
 
 
-    // Print channels every second or so
-    if ((total_packets & 0xFF) == 1) {
+    // Print channels every now and then
+    if ((total_packets & 0x3FF) == 1) {
         printf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
                Channels[0], Channels[1], Channels[2], Channels[3],
                Channels[4], Channels[5], Channels[6], Channels[7]);
@@ -326,7 +356,7 @@ static void send_packet(u8 bind)
         packet[12] = 0x00;
         packet[13] = 0x00;
         packet[14] = 0x00;
-        packet[15] = 0x00; // Always use 250Kbit/s
+        packet[15] = Model.proto_opts[PROTOOPTS_USE1MBPS] == USE1MBPS_YES ? 0x01 : 0x00;
     } else {
         rf_ch = hopping_frequency[rf_ch_num];
 
@@ -427,8 +457,10 @@ static u16 kn_callback()
         if (packet_count == 4)
             packet_count = 0;
         else {
-            if (packet_sent && packet_ack() != PKT_ACKED)
+            if (packet_sent && packet_ack() != PKT_ACKED) {
+                printf("Packet not sent\n");
                 return PACKET_CHKTIME;             // packet send not yet complete
+            }
             send_packet(0);
         }
         break;
@@ -480,17 +512,20 @@ static void initialize(u8 bind)
 const void *KN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_INIT:
+            initialize(Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES);
+            return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; // Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 8L; // T, R, E, A, DR, TH, IDLEUP, GYRO3
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return kn_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_SET_TXPOWER:
             tx_power = Model.tx_power;
