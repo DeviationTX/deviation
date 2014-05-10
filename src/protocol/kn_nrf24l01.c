@@ -87,7 +87,6 @@ static u8 packet_count;
 static u16 bind_counter;
 static u32 total_packets;
 static u8 tx_power;
-//static u8 auto_flip; // Channel 6 <= 0 - disabled > 0 - enabled
 static u16 throttle, rudder, elevator, aileron;
 static u8 flags;
 static u8 hopping_frequency[NFREQCHANNELS];
@@ -399,7 +398,6 @@ static void send_packet(u8 bind)
 
 
     packet_sent = 0;
-    //  Serial.print(rf_ch); Serial.write("\n");
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_ch);
     NRF24L01_FlushTx();
     NRF24L01_WritePayload(packet, sizeof(packet));
@@ -444,7 +442,7 @@ static u16 kn_callback()
         break;
     case KN_BIND:
         if (packet_sent && packet_ack() != PKT_ACKED)
-            return PACKET_CHKTIME;             // packet send not yet complete
+            return PACKET_CHKTIME;
         send_packet(1);
         if (--bind_counter == 0) {
             phase = KN_DATA;
@@ -458,8 +456,8 @@ static u16 kn_callback()
             packet_count = 0;
         else {
             if (packet_sent && packet_ack() != PKT_ACKED) {
-                printf("Packet not sent\n");
-                return PACKET_CHKTIME;             // packet send not yet complete
+                printf("Packet not sent yet\n");
+                return PACKET_CHKTIME;
             }
             send_packet(0);
         }
