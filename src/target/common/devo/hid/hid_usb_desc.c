@@ -102,7 +102,7 @@ const uint8_t Joystick_ConfigDescriptor[JOYSTICK_SIZ_CONFIG_DESC] =
 
     0x81,          /*bEndpointAddress: Endpoint Address (IN)*/
     0x03,          /*bmAttributes: Interrupt endpoint*/
-    0x08,          /*wMaxPacketSize: 8 Byte max */
+    0x09,          /*wMaxPacketSize: 9 Byte max */
     0x00,
     0x20,          /*bInterval: Polling Interval (32 ms)*/
     /* 34 */
@@ -135,6 +135,17 @@ const uint8_t Joystick_ReportDescriptor[JOYSTICK_SIZ_REPORT_DESC] =
     0x09, 0x37,                    //   USAGE (Dial)
     0x95, 0x04,                    //   REPORT_COUNT (4)
     0x81, 0x82,                    //   INPUT (Data,Var,Abs,Vol)
+    0x05, 0x09,                    //   USAGE_PAGE (Button)
+    0x19, 0x01,                    //   USAGE_MINIMUM (Button 1)
+    0x29, 0x04,                    //   USAGE_MAXIMUM (Button 4)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
+    0x95, 0x04,                    //   REPORT_COUNT (4)
+    0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x75, 0x04,                    //   REPORT_SIZE (4)
+    0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
     0xc0                           // END_COLLECTION
   }
   ; /* Joystick_ReportDescriptor */
