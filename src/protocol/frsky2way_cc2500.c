@@ -209,7 +209,7 @@ static u16 frsky2way_cb()
     } else if (state == FRSKY_DATA5) {
         CC2500_Strobe(CC2500_SRX);
         state = FRSKY_DATA1;
-        return 7500;
+        return 9200;
     }
     counter = (counter + 1) % 188;
     if (state == FRSKY_DATA4) {
@@ -219,7 +219,7 @@ static u16 frsky2way_cb()
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         state++;
-        return 1500;
+        return 1300;
     } else {
         if (state == FRSKY_DATA1) {
             int len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
@@ -227,6 +227,11 @@ static u16 frsky2way_cb()
                 CC2500_ReadData(packet, len);
                 //CC2500_WriteReg(CC2500_0C_FSCTRL0, CC2500_ReadReg(CC2500_32_FREQEST));
                 //parse telemetry packet here
+                //byte1 == data len (+ 2 for CRC)
+                //byte 2,3 = fixed=id
+                //byte 4 = A1 : 52mV per count; 4.5V = 0x56
+                //byte 5 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
+                //byte6 = RSSI?
             }
             CC2500_SetTxRxMode(TX_EN);
             CC2500_SetPower(Model.tx_power);
@@ -246,7 +251,7 @@ static u16 frsky2way_cb()
         CC2500_WriteData(packet, packet[0]+1);
         state++;
     }
-    return 9000;
+    return state == FRSKY_DATA4 ? 7500 : 9000;
 }
 
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
