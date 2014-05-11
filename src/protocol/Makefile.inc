@@ -22,6 +22,7 @@ PROTO_MODULES += $(ODIR)/protocol/symax.mod
 PROTO_MODULES += $(ODIR)/protocol/cflie.mod
 PROTO_MODULES += $(ODIR)/protocol/h377.mod
 PROTO_MODULES += $(ODIR)/protocol/hm830.mod
+PROTO_MODULES += $(ODIR)/protocol/kn.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
@@ -110,6 +111,10 @@ $(ODIR)/protocol/h377.mod : $(ODIR)/h377_nrf24l01.bin
 
 $(ODIR)/protocol/hm830.mod : $(ODIR)/hm830_nrf24l01.bin
 	@echo Building 'hm830' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/kn.mod : $(ODIR)/kn_nrf24l01.bin
+	@echo Building 'kn' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
