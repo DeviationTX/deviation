@@ -153,12 +153,29 @@ const struct telem_layout dsm_layout_basic[] = {
     {0, 0, 0, 0},
 };
 
+const struct telem_layout frsky_layout_basic[] = {
+    {TYPE_INDEX | 0,  0, 8,  1},
+    {TYPE_VALUE | 0,  8, 35, TELEM_FRSKY_TEMP1},
+    {TYPE_VALUE | 0, 48, 35, TELEM_FRSKY_VOLT1},
+    {TYPE_VALUE | 0, 87, 35, TELEM_FRSKY_RPM},
+    {TYPE_INDEX | 1,  0, 8,  2},
+    {TYPE_VALUE | 1,  8, 35, TELEM_FRSKY_TEMP2},
+    {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
+    {TYPE_INDEX | 2,  0, 8,  3},
+    {TYPE_VALUE | 2, 48, 35, TELEM_FRSKY_VOLT3},
+    {0, 0, 0, 0},
+};
+
 const struct telem_layout2 devo_page[] = {
     {devo_header_basic, devo_layout_basic, 4, 1},
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 dsm_page[] = {
     {dsm_header_basic, dsm_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
+};
+const struct telem_layout2 frsky_page[] = {
+    {devo_header_basic, frsky_layout_basic, 4, 1},
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)

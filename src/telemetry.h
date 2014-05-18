@@ -3,7 +3,13 @@
 
 #define NUM_DEVO_TELEM 9
 #define NUM_DSM_TELEM  10
-#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM ? NUM_DEVO_TELEM : NUM_DSM_TELEM)
+#define NUM_FRSKY_TELEM  7
+#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM              \
+                      ? (NUM_DEVO_TELEM > NUM_FRSKY_TELEM      \
+                          ? NUM_DEVO_TELEM : NUM_FRSKY_TELEM)  \
+                      : (NUM_DSM_TELEM > NUM_FRSKY_TELEM       \
+                          ? NUM_DSM_TELEM : NUM_FRSKY_TELEM)   \
+                   )
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
@@ -11,6 +17,7 @@
 enum {
     TELEM_DEVO,
     TELEM_DSM,
+    TELEM_FRSKY,
 };
 
 enum {
@@ -65,7 +72,23 @@ enum {
 #endif //HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_LAST,
 };
-#define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST) ? (int)TELEM_DSM_LAST : (int)TELEM_DEVO_LAST)
+
+enum {
+    TELEM_FRSKY_VOLT1 = 1,
+    TELEM_FRSKY_VOLT2,
+    TELEM_FRSKY_VOLT3,
+    TELEM_FRSKY_TEMP1,
+    TELEM_FRSKY_TEMP2,
+    TELEM_FRSKY_RPM,
+    TELEM_FRSKY_ALTITUDE,
+    TELEM_FRSKY_LAST
+};
+#define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
+                               ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
+                                   ? (int)TELEM_DSM_LAST : (int)TELEM_FRSKY_LAST)  \
+                               : (((int)TELEM_DEVO_LAST > (int)TELEM_FRSKY_LAST)   \
+                                   ? (int)TELEM_DEVO_LAST : (int)TELEM_FRSKY_LAST) \
+                          )
 enum {
     TELEM_GPS_LAT = TELEM_VALS,
     TELEM_GPS_LONG,
@@ -152,11 +175,21 @@ struct telem_dsm {
     struct telem_dsm_jetcat  jetcat;
 };
 
+struct telem_frsky {
+    u16 volt[3];
+    s16 temp[2];
+    u16 rpm;
+    s32 altitude;
+    //u16 current;
+    //u16 fuel;
+};
+
 #define TELEM_UPDATE_SIZE (((TELEM_VALS + 7)+ 7) / 8)
 struct Telemetry {
     union {
-        struct telem_devo devo;
-        struct telem_dsm  dsm;
+        struct telem_devo  devo;
+        struct telem_dsm   dsm;
+        struct telem_frsky frsky;
     } p;
     struct gps gps;
     u16 capabilities;
