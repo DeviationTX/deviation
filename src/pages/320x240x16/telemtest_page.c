@@ -54,6 +54,20 @@ const struct telem_layout devo8_layout[] = {
           {{10, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
+const struct telem_layout frsky_layout[] = {
+          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_FRSKY_TEMP1},
+          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_FRSKY_TEMP2},
+          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_FRSKY_VOLT1},
+          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_FRSKY_VOLT2},
+          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_FRSKY_VOLT3},
+          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_FRSKY_RPM},
+          {{10, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
+          {{10, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
+          {{10, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
+          {{10, 200, 60, 16}, {100, 200, 200, 16}, TELEM_GPS_SPEED},
+          {{10, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
+          {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
+};
 const struct telem_layout dsm_layout[] = {
           {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DSM_FLOG_FADESA},
           {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_DSM_FLOG_FADESB},
@@ -72,8 +86,22 @@ const struct telem_layout dsm_layout[] = {
           {{20, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
-static void show_page(const struct telem_layout *layout)
+static const struct telem_layout *_get_layout()
 {
+    const struct telem_layout *layout;
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        layout = devo8_layout;
+    else if (TELEMETRY_Type() == TELEM_FRSKY)
+        layout = frsky_layout;
+    else
+        layout = dsm_layout;
+    return layout;
+}
+
+static void show_page()
+{
+    const struct telem_layout *layout = _get_layout();
+    
     int i = 0;
     for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
         GUI_CreateLabelBox(&gui->label[i], ptr->label.x + TELEM_OFFSET_X, ptr->label.y + TELEM_OFFSET_Y,
@@ -97,7 +125,7 @@ void PAGE_TelemtestInit(int page)
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tempstring);
         return;
     }
-    show_page(TELEMETRY_Type() == TELEM_DEVO ? devo8_layout : dsm_layout);
+    show_page();
 }
 
 void PAGE_TelemtestModal(void(*return_page)(int page), int page)
@@ -113,11 +141,11 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
         return;
     }
 
-    show_page(TELEMETRY_Type() == TELEM_DEVO ? devo8_layout : dsm_layout);
+    show_page();
 }
 void PAGE_TelemtestEvent() {
     struct Telemetry cur_telem = Telemetry;
-    const struct telem_layout *ptr = TELEMETRY_Type() == TELEM_DEVO ? devo8_layout : dsm_layout;
+    const struct telem_layout *ptr = _get_layout();
     for (int i = 0; ptr->source; ptr++, i++) {
         long cur_val = _TELEMETRY_GetValue(&cur_telem, ptr->source);
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
