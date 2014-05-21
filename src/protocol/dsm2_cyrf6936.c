@@ -185,10 +185,15 @@ static void build_bind_packet()
     packet[9] = sum & 0xff;
     packet[10] = 0x01; //???
     packet[11] = num_channels;
-    if(Model.protocol == PROTOCOL_DSMX)
+    if(Model.protocol == PROTOCOL_DSMX) {
+#ifdef MODULAR
+        packet[12] = 0xb2;
+#else
         packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? 0xa2 : 0xb2;
-    else 
+#endif
+    } else {
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
+    }
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)
         sum += packet[i];
@@ -638,13 +643,8 @@ static u16 dsm2_cb()
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
         }
-        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-            state++;
-            CYRF_SetTxRxMode(RX_EN); //Receive mode
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
-            return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
-        } else {
+#ifndef MODULAR
+        if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF) {
             set_sop_data_crc();
             if (state == DSM2_CH2_CHECK_A) {
                 if(num_channels < 8) {
@@ -656,6 +656,14 @@ static u16 dsm2_cb()
                 state = DSM2_CH1_WRITE_A;
             }
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY;
+        } else
+#endif
+        {
+            state++;
+            CYRF_SetTxRxMode(RX_EN); //Receive mode
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
         }
     } else if(state == DSM2_CH2_READ_A || state == DSM2_CH2_READ_B) {
         //Read telemetry if needed
@@ -766,10 +774,15 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+#ifdef MODULAR
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)(PROTO_TELEM_ON);
+#else
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+#endif
         default: break;
     }
     return NULL;
