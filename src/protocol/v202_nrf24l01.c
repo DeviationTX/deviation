@@ -46,6 +46,9 @@
 
 // Timeout for callback in uSec, 4ms=4000us for V202
 #define PACKET_PERIOD 4000
+// Time to wait for packet to be sent (no ACK, so very short)
+#define PACKET_CHKTIME  100
+
 // Every second
 #define BLINK_COUNT 250
 // ~ every 0.25 sec
@@ -102,6 +105,24 @@ enum {
     V202_DATA
 };
 
+static const char * const v202_opts[] = {
+  _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+//  _tr_noop("Blink"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+  NULL
+};
+enum {
+    PROTOOPTS_STARTBIND = 0,
+    PROTOOPTS_USEBLINK,
+};
+enum {
+    STARTBIND_NO  = 0,
+    STARTBIND_YES = 1,
+};
+enum {
+    USEBLINK_NO  = 0,
+    USEBLINK_YES = 1,
+};
+
 // static u32 bind_count;
 
 // This is frequency hopping table for V202 protocol
@@ -126,6 +147,24 @@ static u8 rf_channels[16];
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
+
+// Packet ack status values
+enum {
+    PKT_PENDING = 0,
+    PKT_ACKED,
+    PKT_TIMEOUT
+};
+
+static u8 packet_ack()
+{
+    switch (NRF24L01_ReadReg(NRF24L01_07_STATUS) & (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT))) {
+    case BV(NRF24L01_07_TX_DS):
+        return PKT_ACKED;
+    case BV(NRF24L01_07_MAX_RT):
+        return PKT_TIMEOUT;
+    }
+    return PKT_PENDING;
+}
 
 static void v202_init()
 {
@@ -363,13 +402,7 @@ static void send_packet(u8 bind)
     //
     packet[14] = flags;
     add_pkt_checksum();
-    if (packet_sent) {
-        //bool report_done = false;
-        //    if  (!(radio.read_register(STATUS) & _BV(TX_DS))) { Serial.write("Waiting for radio\n"); report_done = true; }
-        while (!(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_TX_DS))) ;
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS));
-        //    if (report_done) Serial.write("Done\n");
-    }
+
     packet_sent = 0;
     // Each packet is repeated twice on the same
     // channel, hence >> 1
@@ -393,6 +426,7 @@ static void send_packet(u8 bind)
     // so as long as we have pins to do so, it is wise to turn
     // it back.
 //    radio.ce(LOW);
+
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
     // settings change -  we have plenty of time until next
@@ -426,6 +460,10 @@ static u16 v202_callback()
         if (throttle >= 240) phase = V202_BIND2;
         break;
     case V202_BIND2:
+        if (packet_sent && packet_ack() != PKT_ACKED) {
+            printf("Packet not sent yet\n");
+            return PACKET_CHKTIME;
+        }
         send_packet(1);
 //        if (throttle == 0) {
         if (--counter == 0) {
@@ -444,6 +482,10 @@ static u16 v202_callback()
         } else if (--counter == 0) {
             counter = led_blink_count;
             flags ^= FLAG_LED;
+        }
+        if (packet_sent && packet_ack() != PKT_ACKED) {
+            printf("Packet not sent yet\n");
+            return PACKET_CHKTIME;
         }
         send_packet(0);
         break;
@@ -501,7 +543,9 @@ static void initialize(u8 bind)
 const void *V202_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(0); return 0;
+        case PROTOCMD_INIT:
+            initialize(Model.proto_opts[PROTOOPTS_STARTBIND] == STARTBIND_YES);
+            return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
@@ -512,6 +556,7 @@ const void *V202_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return v202_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_SET_TXPOWER:
             tx_power = Model.tx_power;
