@@ -21,7 +21,6 @@ void TxName(u8 *var, int len)
 void MCU_SerialNumber(u8 *var, int len)
 {
     int l = len > 12 ? 12 : len;
-#if defined PROTO_HAS_CYRF6936 && ! defined MODULAR
     if(Transmitter.txid) {
         u32 id[4];
         u32 seed = 0x4d3ab5d0ul;
@@ -32,7 +31,6 @@ void MCU_SerialNumber(u8 *var, int len)
         memcpy(var, &id[1], len);
         return;
     }
-#endif
     // Every STM32 should have 12 bytes long unique id at 0x1FFFF7E8
     const u8 *stm32id = (u8*) 0x1FFFF7E8;
     for(int i = 0; i < l; i++) {
