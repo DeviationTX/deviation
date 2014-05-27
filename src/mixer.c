@@ -605,6 +605,9 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
     }
     unsigned pos = compact_mixers();
     for (i = 0; i < count; i++) {
+        if (! MIXER_SRC(mixers[i].src) && CURVE_TYPE(&mixers[i].curve) == CURVE_FIXED) {
+            mixers[i].src = mixers[i].sw || 1;
+        }
         if (MIXER_SRC(mixers[i].src)) {
             Model.mixers[pos] = mixers[i];
             if(Model.templates[mixers[i].dest] != MIXERTEMPLATE_COMPLEX) {
