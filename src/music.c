@@ -45,12 +45,17 @@ static const struct NoteMap note_map[] = {
     {"fx4",5920},{"g4", 6272},{"gx4",6645},{"a4", 7080},{"ax4",7459},{"b4", 7902},
 };
 
+#if NUM_TIMERS > 4
+#error "Number of timers is != 4.  This will cause the Alarm music to not work properly"
+#endif
 static const char const *sections[] = {
     "startup",
     "shutdown",
     "volume",
     "alarm1",
     "alarm2",
+    "alarm3",
+    "alarm4",
     "batt_alarm",
     "done_binding",
     "timer_warning",
