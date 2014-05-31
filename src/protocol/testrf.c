@@ -24,7 +24,7 @@
 #include "mixer.h"
 #include "config/model.h"
 
-#if 1 || defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
+#if defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
 #ifdef MODULAR
   #pragma long_calls_off
   extern unsigned _data_loadaddr;
@@ -32,9 +32,9 @@
 #endif
 
 static const char * const testrf_opts[] = {
-  _tr_noop("Radio"), _tr_noop("CYRF6936"), _tr_noop("A7105"), _tr_noop("CC2500"), _tr_noop("NRF24L01"), NULL,
-  _tr_noop("RF Channel"), "1", "85", NULL,
-  _tr_noop("Rate(ms)"), "1", "50", NULL,
+  "Radio", "CYRF6936", "A7105", "CC2500", "NRF24L01", NULL,
+  "RF Channel", "1", "85", NULL,
+  "Rate(ms)", "1", "50", NULL,
   NULL
 };
 enum {
