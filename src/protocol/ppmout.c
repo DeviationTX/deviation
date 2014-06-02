@@ -29,7 +29,7 @@
   extern unsigned _data_loadaddr;
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
-#define PPMOUT_MAX_CHANNELS 10
+#define PPMOUT_MAX_CHANNELS NUM_OUT_CHANNELS
 static volatile u16 pulses[PPMOUT_MAX_CHANNELS+1];
 u8 num_channels;
 
@@ -41,12 +41,13 @@ u8 num_channels;
 #ifndef EMULATOR
 #define BITBANG_PPM
 #endif
-#define STEP_SIZE "3276810" // == 10small/50large == (50 << 16) | 10
+#define STEP_SIZE "3276810"  // == 10small/50large == (50 << 16) | 10
+#define STEPSIZE2 "32768100" // == 100small / 500large == (500 << 16) | 100
 static const char * const ppm_opts[] = {
   _tr_noop("Center PW"),  "1000",  "1800",  STEP_SIZE, NULL,
   _tr_noop("Delta PW"),   "100",   "700",   STEP_SIZE, NULL,
   _tr_noop("Notch PW"),   "100",   "500",   STEP_SIZE, NULL,
-  _tr_noop("Frame Size"), "20000", "22500", STEP_SIZE, NULL,
+  _tr_noop("Frame Size"), "10000", "30000", STEPSIZE2, NULL,
   NULL
 };
 enum {
@@ -82,9 +83,7 @@ static u16 ppmout_cb()
         PWM_Set(1);
         if(state == num_channels * 2 + 1) {
             state = 0;
-            return num_channels > 9
-                   ? Model.proto_opts[PERIOD_PW] + (num_channels - 9) * 2000 - accum
-                   : Model.proto_opts[PERIOD_PW] - accum;
+            return Model.proto_opts[PERIOD_PW] - accum;
         }
         val = pulses[state / 2];
     } else {
@@ -134,7 +133,15 @@ const void * PPMOUT_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: PWM_Stop(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)((unsigned long)PPMOUT_MAX_CHANNELS);
+        case PROTOCMD_NUMCHAN:
+            if (Model.proto_opts[CENTER_PW] != 0) {
+                uint32_t chan = (Model.proto_opts[PERIOD_PW] - Model.proto_opts[NOTCH_PW])
+                              / (Model.proto_opts[CENTER_PW] + Model.proto_opts[DELTA_PW] + Model.proto_opts[NOTCH_PW]);
+                if (chan > NUM_OUT_CHANNELS)
+                    return (void *)(long)NUM_OUT_CHANNELS;
+                return (void *)(long)chan;
+            }
+            return (void *)10L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_GETOPTIONS:
             if (Model.proto_opts[CENTER_PW] == 0) {
