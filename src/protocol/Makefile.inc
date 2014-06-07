@@ -117,4 +117,8 @@ $(ODIR)/protocol/kn.mod : $(ODIR)/kn_nrf24l01.bin
 	@echo Building 'kn' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
+$(ODIR)/protocol/esky150.mod : $(ODIR)/esky150_nrf24l01.bin
+	@echo Building 'esky150' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
 endif #BUILD_TARGET
