@@ -322,7 +322,7 @@ static void read_controls(u16* throttle, u16* aileron, u16* elevator, u16* rudde
 
 
     // Print channels every now and then
-    if ((total_packets & 0x3FF) == 1) {
+    if (0) { //(total_packets & 0x3FF) == 1) {
         printf("Raw channels: %d, %d, %d, %d, %d, %d, %d, %d\n",
                Channels[0], Channels[1], Channels[2], Channels[3],
                Channels[4], Channels[5], Channels[6], Channels[7]);
