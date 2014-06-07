@@ -23,6 +23,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "config/tx.h"
 
 #if defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
 #ifdef MODULAR
@@ -33,14 +34,16 @@
 
 static const char * const testrf_opts[] = {
   "Radio", "CYRF6936", "A7105", "CC2500", "NRF24L01", NULL,
+  "Tx Power", "0", "7", NULL,
   "RF Channel", "1", "85", NULL,
-  "Rate(ms)", "1", "50", NULL,
+  "Rate(ms)", "5", "50", NULL,
   NULL
 };
 enum {
     TESTRF_RF = 0,
-    TESTRF_RFCHAN = 1,
-    TESTRF_RFRATE = 2,
+    TESTRF_POWER = 1,
+    TESTRF_RFCHAN = 2,
+    TESTRF_RFRATE = 3,
 };
 //if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
 static unsigned char packet[16];
@@ -51,27 +54,27 @@ static u16 testrf_cb()
 {
     packet[0]++;
     switch(Model.proto_opts[TESTRF_RF]) {
-        case 0: //CYRF
+        case CYRF6936: //CYRF
             if (packet[0] == 1) {
-                CYRF_SetPower(Model.tx_power);
+                CYRF_SetPower(Model.proto_opts[TESTRF_POWER]);
             }
             CYRF_WriteDataPacketLen(packet, 16);
             break;
-        case 1: //A7105
+        case A7105: //A7105
             if (packet[0] == 1) {
-                A7105_SetPower(Model.tx_power);
+                A7105_SetPower(Model.proto_opts[TESTRF_POWER]);
             }
             A7105_WriteData(packet, 16, Model.proto_opts[TESTRF_RFCHAN]);
             break;
-        case 2: //CC2500
+        case CC2500: //CC2500
             if (packet[0] == 1) {
-                CC2500_SetPower(Model.tx_power);
+                CC2500_SetPower(Model.proto_opts[TESTRF_POWER]);
             }
             CC2500_WriteData(packet, 16);
             break;
-        case 3: //NRF
+        case NRF24L01: //NRF
             if (packet[0] == 1) {
-                NRF24L01_SetPower(Model.tx_power);
+                NRF24L01_SetPower(Model.proto_opts[TESTRF_POWER]);
             }
             // clear packet status bits and TX FIFO
             NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
@@ -85,6 +88,7 @@ static u16 testrf_cb()
 
 static void init_cyrf()
 {
+    const u8 sopcode[] = {0x3C,0x37,0xCC,0x91,0xE2,0xF8,0xCC,0x91}; //0x91CCF8E291CC373C
     static u8 initcmd[] = {
         CYRF_1D_MODE_OVERRIDE,  0x38,
         CYRF_03_TX_CFG,         0x08,
@@ -109,6 +113,9 @@ static void init_cyrf()
     for(unsigned i = 0; i < sizeof(initcmd); i+= 2) {
         CYRF_WriteRegister(initcmd[i], initcmd[i+1]);
     }
+    CYRF_ConfigRFChannel(Model.proto_opts[TESTRF_RFCHAN]);
+    CYRF_ConfigCRCSeed(0x0000);
+    CYRF_ConfigSOPCode(sopcode);
     CYRF_SetTxRxMode(TX_EN);
 }
 
@@ -249,8 +256,9 @@ static void init_cc2500()
     for(unsigned i = 0; i < sizeof(initcmd); i+= 2) {
         CC2500_WriteReg(initcmd[i], initcmd[i+1]);
     }
+    CC2500_WriteReg(CC2500_0A_CHANNR, Model.proto_opts[TESTRF_RFCHAN]);
     CC2500_SetTxRxMode(TX_EN);
-    CC2500_SetPower(Model.tx_power);
+    CC2500_SetPower(Model.proto_opts[TESTRF_POWER]);
     CC2500_Strobe(CC2500_SFTX);
     CC2500_Strobe(CC2500_SFRX);
     CC2500_Strobe(CC2500_SXOFF);
@@ -327,31 +335,43 @@ static void init_nrf()
     NRF24L01_Activate(0x53); // switch bank back
 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, Model.proto_opts[TESTRF_RFCHAN]);   // reset packet loss counter
-    NRF24L01_SetPower(Model.tx_power);
+    NRF24L01_SetPower(Model.proto_opts[TESTRF_POWER]);
     NRF24L01_SetTxRxMode(TX_EN);
+}
+
+static void deinit()
+{
+    CLOCK_StopTimer();
+    if (Transmitter.module_enable[CYRF6936].port != 0)
+        CYRF_Reset();
+    if (Transmitter.module_enable[NRF24L01].port != 0)
+        NRF24L01_Reset();
+    if (Transmitter.module_enable[A7105].port != 0)
+        A7105_Reset();
+    if (Transmitter.module_enable[CC2500].port != 0)
+        CC2500_Reset();
 }
 
 static void initialize()
 {
-    CLOCK_StopTimer();
-    CYRF_Reset();
-    NRF24L01_Reset();
-    A7105_Reset();
-    CC2500_Reset();
+    deinit();
+    if (Transmitter.module_enable[Model.proto_opts[TESTRF_RF]].port == 0)
+        return;
+    printf("TestRF: Proto: %d\n", Model.proto_opts[TESTRF_RF]);
     switch(Model.proto_opts[TESTRF_RF]) {
-        case 0: //CYRF
+        case CYRF6936: //CYRF
             init_cyrf();
             break;
-        case 1: //A7105
+        case A7105: //A7105
             init_a7105();
             break;
-        case 2: //CC2500
+        case CC2500: //CC2500
             init_cc2500();
             break;
-        case 3: //NRF
+        case NRF24L01: //NRF
             init_nrf();
             break;
-        default: break;
+        default: return;
     }
     CLOCK_StartTimer(20000, testrf_cb);
 }
@@ -360,12 +380,7 @@ const void * TESTRF_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT:
-            CYRF_Reset();
-            NRF24L01_Reset();
-            A7105_Reset();
-            CC2500_Reset();
-            return 0;
+        case PROTOCMD_DEINIT: deinit(); return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;
