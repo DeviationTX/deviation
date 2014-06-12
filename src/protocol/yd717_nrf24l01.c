@@ -71,9 +71,8 @@
 // Stock tx fixed frequency is 0x3C. Receiver only binds on this freq.
 #define RF_CHANNEL 0x3C
 
-enum {
-    FLAG_FLIP   = 0x0F
-};
+#define FLAG_FLIP   0x0F
+#define FLAG_LIGHT  0x10
 
 // For code readability
 enum {
@@ -205,6 +204,12 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
       *flags &= ~FLAG_FLIP;
     else
       *flags |= FLAG_FLIP;
+
+    // Channel 6
+    if (Channels[CHANNEL6] <= 0)
+      *flags &= ~FLAG_LIGHT;
+    else
+      *flags |= FLAG_LIGHT;
 
 
     dbgprintf("ail %3d+%3d, ele %3d+%3d, thr %3d, rud %3d+%3d, flip enable %d\n",
@@ -502,7 +507,7 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, enable flip
+        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable light
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return Model.protocol == PROTOCOL_YD717 ? yd717_opts : 0;
