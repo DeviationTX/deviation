@@ -57,6 +57,28 @@ sub read_cc2500 {
     }
     return \%cmd;
 }
+
+sub read_cyrf6936 {
+    my($long) = @_;
+    my %cmd = (
+        WR_MASK     => 0x80, WR_MASK_VAL  => 0x80,
+        CMD_MASK    => 0xFF, CMD_MASK_VAL => 0xFF,
+        CHAIN_MASK  => 0x38, CHAIN_MASK_VAL => 0x20,
+        ADDR_MASK   => 0x3F
+        );
+    my $h = "$FindBin::Bin/../src/protocol/iface_cyrf6936.h";
+    open my $fh, "<", $h or die "Couldn't read $h\n";
+    while(<$fh>) {
+        if(/^enum {/ .. /^};/) {
+             if(/(CYRF_.._)(\S+)\s*=\s*(0x..)/) {
+                 $cmd{hex($3)} = ($long ? $1 : "") . $2;
+             }
+        }
+    }
+    return \%cmd;
+
+}
+
 sub parse_spi {
     my($file) = @_;
     open my $fh, "<", $file or die "Couldn't read $file\n";
@@ -76,6 +98,18 @@ sub parse_spi {
     return \@data;
 }
 
+sub find_multi_cmds {
+    my($cmds, $data) = @_;
+    for(my $i = 0; $i < $#$data; $i++) {
+        while($i < $#$data && $data->[$i][1][0] == $data->[$i+1][1][0] && 
+              ($data->[$i][1][0] & $cmds->{CHAIN_MASK}) == $cmds->{CHAIN_MASK_VAL})
+        {
+            my @vals  = @{$data->[$i+1]};
+            push @{$data->[$i]}, @vals[2..$#vals];
+            splice @$data, $i+1, 1;
+        }
+    }
+}
 sub show_full {
     my($time, $dir, $cmdstr, $mosi, $miso) = @_;
     my $format = "%-10.6f %s %s      %-40s => %s\n";
@@ -135,10 +169,15 @@ sub main {
         $cmds = read_a7105($long);
     } elsif ($tx =~ /^cc/ || $tx =~ /2500/) {
         $cmds = read_cc2500($long);
+    } elsif ($tx =~ /^cy/) {
+        $cmds = read_cyrf6936($long);
     } else {
         die "Unrecognized transceiver: $tx\n";
     }
     my $data = parse_spi($file);
+    if($cmds->{CHAIN_MASK}) {
+        find_multi_cmds($cmds, $data);
+    }
     display_results($data, $cmds, $long, $full);
 }
 main();
