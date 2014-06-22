@@ -165,7 +165,7 @@ language:
 
 zip: $(TARGET).zip
 
-%.zip: $(TARGET).dfu $(PROTO_MODULES) $(ALL)
+%.zip: $(ALL) $(TARGET).dfu $(PROTO_MODULES)
 	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
 	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
