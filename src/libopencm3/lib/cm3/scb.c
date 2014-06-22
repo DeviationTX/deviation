@@ -17,19 +17,31 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+
 #include <libopencm3/cm3/scb.h>
 
+/* Those are defined only on CM3 or CM4 */
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 void scb_reset_core(void)
 {
 	SCB_AIRCR = SCB_AIRCR_VECTKEY | SCB_AIRCR_VECTRESET;
+
+	while (1);
 }
+#endif
 
 void scb_reset_system(void)
 {
 	SCB_AIRCR = SCB_AIRCR_VECTKEY | SCB_AIRCR_SYSRESETREQ;
+
+	while (1);
 }
 
-void scb_set_priority_grouping(u32 prigroup)
+/* Those are defined only on CM3 or CM4 */
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+void scb_set_priority_grouping(uint32_t prigroup)
 {
 	SCB_AIRCR = SCB_AIRCR_VECTKEY | prigroup;
 }
+#endif

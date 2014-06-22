@@ -1,3 +1,17 @@
+/** @defgroup rtc_defines RTC Defines
+ *
+ * @brief <b>Defined Constants and Types for the STM32F1xx Real Time Clock</b>
+ *
+ * @ingroup STM32F1xx_defines
+ *
+ * @author @htmlonly &copy; @endhtmlonly 2010 Uwe Hermann <uwe@hermann-uwe.de>
+ *
+ * @version 1.0.0
+ *
+ * @date 4 March 2013
+ *
+ * LGPL License Terms @ref lgpl_license
+ *  */
 /*
  * This file is part of the libopencm3 project.
  *
@@ -17,13 +31,17 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * The F1 RTC is a straight time stamp, a completely different peripheral to
+ * that found in the F2, F3, F4, L1 and F0.
+ */
+
 #ifndef LIBOPENCM3_RTC_H
 #define LIBOPENCM3_RTC_H
+/**@{*/
 
-#include <libopencm3/stm32/memorymap.h>
-#include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/pwr.h>
-#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/rcc.h>
 
 /* --- RTC registers ------------------------------------------------------- */
 
@@ -128,24 +146,25 @@ typedef enum {
 
 BEGIN_DECLS
 
-void rtc_awake_from_off(osc_t clock_source);
+void rtc_awake_from_off(enum rcc_osc clock_source);
 void rtc_enter_config_mode(void);
 void rtc_exit_config_mode(void);
-void rtc_set_alarm_time(u32 alarm_time);
+void rtc_set_alarm_time(uint32_t alarm_time);
 void rtc_enable_alarm(void);
 void rtc_disable_alarm(void);
-void rtc_set_prescale_val(u32 prescale_val);
-u32 rtc_get_counter_val(void);
-u32 rtc_get_prescale_div_val(void);
-u32 rtc_get_alarm_val(void);
-void rtc_set_counter_val(u32 counter_val);
+void rtc_set_prescale_val(uint32_t prescale_val);
+uint32_t rtc_get_counter_val(void);
+uint32_t rtc_get_prescale_div_val(void);
+uint32_t rtc_get_alarm_val(void);
+void rtc_set_counter_val(uint32_t counter_val);
 void rtc_interrupt_enable(rtcflag_t flag_val);
 void rtc_interrupt_disable(rtcflag_t flag_val);
 void rtc_clear_flag(rtcflag_t flag_val);
-u32 rtc_check_flag(rtcflag_t flag_val);
+uint32_t rtc_check_flag(rtcflag_t flag_val);
 void rtc_awake_from_standby(void);
-void rtc_auto_awake(osc_t clock_source, u32 prescale_val);
+void rtc_auto_awake(enum rcc_osc clock_source, uint32_t prescale_val);
 
 END_DECLS
+/**@}*/
 
 #endif

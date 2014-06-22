@@ -1,3 +1,21 @@
+/** @defgroup rcc_file RCC
+ *
+ * @ingroup STM32F4xx
+ *
+ * @section rcc_f4_api_ex Reset and Clock Control API.
+ *
+ * @brief <b>libopencm3 STM32F4xx Reset and Clock Control</b>
+ *
+ * @author @htmlonly &copy; @endhtmlonly 2013 Frantisek Burian <BuFran at seznam.cz>
+ *
+ * @date 18 Jun 2013
+ *
+ * This library supports the Reset and Clock Control System in the STM32 series
+ * of ARM Cortex Microcontrollers by ST Microelectronics.
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
+
 /*
  * This file is part of the libopencm3 project.
  *
@@ -20,16 +38,31 @@
  */
 
 #include <libopencm3/cm3/assert.h>
-#include <libopencm3/stm32/f4/rcc.h>
-#include <libopencm3/stm32/f4/pwr.h>
-#include <libopencm3/stm32/f4/flash.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/pwr.h>
+#include <libopencm3/stm32/flash.h>
+
+/**@{*/
 
 /* Set the default ppre1 and ppre2 peripheral clock frequencies after reset. */
-u32 rcc_ppre1_frequency = 16000000;
-u32 rcc_ppre2_frequency = 16000000;
+uint32_t rcc_ppre1_frequency = 16000000;
+uint32_t rcc_ppre2_frequency = 16000000;
 
-const clock_scale_t hse_8mhz_3v3[CLOCK_3V3_END] =
-{
+const clock_scale_t hse_8mhz_3v3[CLOCK_3V3_END] = {
+	{ /* 48MHz */
+		.pllm = 8,
+		.plln = 96,
+		.pllp = 2,
+		.pllq = 2,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.power_save = 1,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
+		.apb1_frequency = 12000000,
+		.apb2_frequency = 24000000,
+	},
 	{ /* 120MHz */
 		.pllm = 8,
 		.plln = 240,
@@ -39,7 +72,8 @@ const clock_scale_t hse_8mhz_3v3[CLOCK_3V3_END] =
 		.ppre1 = RCC_CFGR_PPRE_DIV_4,
 		.ppre2 = RCC_CFGR_PPRE_DIV_2,
 		.power_save = 1,
-		.flash_config = FLASH_ICE | FLASH_DCE | FLASH_LATENCY_3WS,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
 		.apb1_frequency = 30000000,
 		.apb2_frequency = 60000000,
 	},
@@ -51,13 +85,102 @@ const clock_scale_t hse_8mhz_3v3[CLOCK_3V3_END] =
 		.hpre = RCC_CFGR_HPRE_DIV_NONE,
 		.ppre1 = RCC_CFGR_PPRE_DIV_4,
 		.ppre2 = RCC_CFGR_PPRE_DIV_2,
-		.flash_config = FLASH_ICE | FLASH_DCE | FLASH_LATENCY_5WS,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_5WS,
 		.apb1_frequency = 42000000,
 		.apb2_frequency = 84000000,
 	},
 };
 
-void rcc_osc_ready_int_clear(osc_t osc)
+const clock_scale_t hse_12mhz_3v3[CLOCK_3V3_END] = {
+	{ /* 48MHz */
+		.pllm = 12,
+		.plln = 96,
+		.pllp = 2,
+		.pllq = 2,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.power_save = 1,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
+		.apb1_frequency = 12000000,
+		.apb2_frequency = 24000000,
+	},
+	{ /* 120MHz */
+		.pllm = 12,
+		.plln = 240,
+		.pllp = 2,
+		.pllq = 5,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.power_save = 1,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
+		.apb1_frequency = 30000000,
+		.apb2_frequency = 60000000,
+	},
+	{ /* 168MHz */
+		.pllm = 12,
+		.plln = 336,
+		.pllp = 2,
+		.pllq = 7,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_5WS,
+		.apb1_frequency = 42000000,
+		.apb2_frequency = 84000000,
+	},
+};
+
+const clock_scale_t hse_16mhz_3v3[CLOCK_3V3_END] = {
+	{ /* 48MHz */
+		.pllm = 16,
+		.plln = 96,
+		.pllp = 2,
+		.pllq = 2,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.power_save = 1,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
+		.apb1_frequency = 12000000,
+		.apb2_frequency = 24000000,
+	},
+	{ /* 120MHz */
+		.pllm = 16,
+		.plln = 240,
+		.pllp = 2,
+		.pllq = 5,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.power_save = 1,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_3WS,
+		.apb1_frequency = 30000000,
+		.apb2_frequency = 60000000,
+	},
+	{ /* 168MHz */
+		.pllm = 16,
+		.plln = 336,
+		.pllp = 2,
+		.pllq = 7,
+		.hpre = RCC_CFGR_HPRE_DIV_NONE,
+		.ppre1 = RCC_CFGR_PPRE_DIV_4,
+		.ppre2 = RCC_CFGR_PPRE_DIV_2,
+		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+				FLASH_ACR_LATENCY_5WS,
+		.apb1_frequency = 42000000,
+		.apb2_frequency = 84000000,
+	},
+};
+
+void rcc_osc_ready_int_clear(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -78,7 +201,7 @@ void rcc_osc_ready_int_clear(osc_t osc)
 	}
 }
 
-void rcc_osc_ready_int_enable(osc_t osc)
+void rcc_osc_ready_int_enable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -99,7 +222,7 @@ void rcc_osc_ready_int_enable(osc_t osc)
 	}
 }
 
-void rcc_osc_ready_int_disable(osc_t osc)
+void rcc_osc_ready_int_disable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -120,7 +243,7 @@ void rcc_osc_ready_int_disable(osc_t osc)
 	}
 }
 
-int rcc_osc_ready_int_flag(osc_t osc)
+int rcc_osc_ready_int_flag(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -153,7 +276,7 @@ int rcc_css_int_flag(void)
 	return ((RCC_CIR & RCC_CIR_CSSF) != 0);
 }
 
-void rcc_wait_for_osc_ready(osc_t osc)
+void rcc_wait_for_osc_ready(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -174,7 +297,7 @@ void rcc_wait_for_osc_ready(osc_t osc)
 	}
 }
 
-void rcc_wait_for_sysclk_status(osc_t osc)
+void rcc_wait_for_sysclk_status(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -192,7 +315,7 @@ void rcc_wait_for_sysclk_status(osc_t osc)
 	}
 }
 
-void rcc_osc_on(osc_t osc)
+void rcc_osc_on(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -213,7 +336,7 @@ void rcc_osc_on(osc_t osc)
 	}
 }
 
-void rcc_osc_off(osc_t osc)
+void rcc_osc_off(enum rcc_osc osc)
 {
 	switch (osc) {
 	case PLL:
@@ -244,7 +367,7 @@ void rcc_css_disable(void)
 	RCC_CR &= ~RCC_CR_CSSON;
 }
 
-void rcc_osc_bypass_enable(osc_t osc)
+void rcc_osc_bypass_enable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case HSE:
@@ -261,7 +384,7 @@ void rcc_osc_bypass_enable(osc_t osc)
 	}
 }
 
-void rcc_osc_bypass_disable(osc_t osc)
+void rcc_osc_bypass_disable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case HSE:
@@ -278,81 +401,64 @@ void rcc_osc_bypass_disable(osc_t osc)
 	}
 }
 
-void rcc_peripheral_enable_clock(volatile u32 *reg, u32 en)
-{
-	*reg |= en;
-}
 
-void rcc_peripheral_disable_clock(volatile u32 *reg, u32 en)
-{
-	*reg &= ~en;
-}
 
-void rcc_peripheral_reset(volatile u32 *reg, u32 reset)
+void rcc_set_sysclk_source(uint32_t clk)
 {
-	*reg |= reset;
-}
-
-void rcc_peripheral_clear_reset(volatile u32 *reg, u32 clear_reset)
-{
-	*reg &= ~clear_reset;
-}
-
-void rcc_set_sysclk_source(u32 clk)
-{
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_CFGR;
 	reg32 &= ~((1 << 1) | (1 << 0));
 	RCC_CFGR = (reg32 | clk);
 }
 
-void rcc_set_pll_source(u32 pllsrc)
+void rcc_set_pll_source(uint32_t pllsrc)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_PLLCFGR;
 	reg32 &= ~(1 << 22);
 	RCC_PLLCFGR = (reg32 | (pllsrc << 22));
 }
 
-void rcc_set_ppre2(u32 ppre2)
+void rcc_set_ppre2(uint32_t ppre2)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_CFGR;
 	reg32 &= ~((1 << 13) | (1 << 14) | (1 << 15));
 	RCC_CFGR = (reg32 | (ppre2 << 13));
 }
 
-void rcc_set_ppre1(u32 ppre1)
+void rcc_set_ppre1(uint32_t ppre1)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_CFGR;
 	reg32 &= ~((1 << 10) | (1 << 11) | (1 << 12));
 	RCC_CFGR = (reg32 | (ppre1 << 10));
 }
 
-void rcc_set_hpre(u32 hpre)
+void rcc_set_hpre(uint32_t hpre)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_CFGR;
 	reg32 &= ~((1 << 4) | (1 << 5) | (1 << 6) | (1 << 7));
 	RCC_CFGR = (reg32 | (hpre << 4));
 }
 
-void rcc_set_rtcpre(u32 rtcpre)
+void rcc_set_rtcpre(uint32_t rtcpre)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	reg32 = RCC_CFGR;
 	reg32 &= ~((1 << 16) | (1 << 17) | (1 << 18) | (1 << 19) | (1 << 20));
 	RCC_CFGR = (reg32 | (rtcpre << 16));
 }
 
-void rcc_set_main_pll_hsi(u32 pllm, u32 plln, u32 pllp, u32 pllq)
+void rcc_set_main_pll_hsi(uint32_t pllm, uint32_t plln, uint32_t pllp,
+			  uint32_t pllq)
 {
 	RCC_PLLCFGR = (pllm << RCC_PLLCFGR_PLLM_SHIFT) |
 		(plln << RCC_PLLCFGR_PLLN_SHIFT) |
@@ -360,7 +466,8 @@ void rcc_set_main_pll_hsi(u32 pllm, u32 plln, u32 pllp, u32 pllq)
 		(pllq << RCC_PLLCFGR_PLLQ_SHIFT);
 }
 
-void rcc_set_main_pll_hse(u32 pllm, u32 plln, u32 pllp, u32 pllq)
+void rcc_set_main_pll_hse(uint32_t pllm, uint32_t plln, uint32_t pllp,
+			  uint32_t pllq)
 {
 	RCC_PLLCFGR = (pllm << RCC_PLLCFGR_PLLM_SHIFT) |
 		(plln << RCC_PLLCFGR_PLLN_SHIFT) |
@@ -369,10 +476,10 @@ void rcc_set_main_pll_hse(u32 pllm, u32 plln, u32 pllp, u32 pllq)
 		(pllq << RCC_PLLCFGR_PLLQ_SHIFT);
 }
 
-u32 rcc_system_clock_source(void)
+uint32_t rcc_system_clock_source(void)
 {
 	/* Return the clock source which is used as system clock. */
-	return ((RCC_CFGR & 0x000c) >> 2);
+	return (RCC_CFGR & 0x000c) >> 2;
 }
 
 void rcc_clock_setup_hse_3v3(const clock_scale_t *clock)
@@ -389,10 +496,11 @@ void rcc_clock_setup_hse_3v3(const clock_scale_t *clock)
 	rcc_wait_for_osc_ready(HSE);
 
 	/* Enable/disable high performance mode */
-	if (!clock->power_save)
+	if (!clock->power_save) {
 		pwr_set_vos_scale(SCALE1);
-	else
+	} else {
 		pwr_set_vos_scale(SCALE2);
+	}
 
 	/*
 	 * Set prescalers for AHB, ADC, ABP1, ABP2.
@@ -403,7 +511,7 @@ void rcc_clock_setup_hse_3v3(const clock_scale_t *clock)
 	rcc_set_ppre2(clock->ppre2);
 
 	rcc_set_main_pll_hse(clock->pllm, clock->plln,
-			     clock->pllp, clock->pllq);
+			clock->pllp, clock->pllq);
 
 	/* Enable PLL oscillator and wait for it to stabilize. */
 	rcc_osc_on(PLL);
@@ -421,13 +529,11 @@ void rcc_clock_setup_hse_3v3(const clock_scale_t *clock)
 	/* Set the peripheral clock frequencies used. */
 	rcc_ppre1_frequency = clock->apb1_frequency;
 	rcc_ppre2_frequency = clock->apb2_frequency;
+
+	/* Disable internal high-speed oscillator. */
+	rcc_osc_off(HSI);
 }
 
-void rcc_backupdomain_reset(void)
-{
-	/* Set the backup domain software reset. */
-	RCC_BDCR |= RCC_BDCR_BDRST;
 
-	/* Clear the backup domain software reset. */
-	RCC_BDCR &= ~RCC_BDCR_BDRST;
-}
+
+/**@}*/

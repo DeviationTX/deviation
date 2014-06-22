@@ -26,8 +26,8 @@
 /* --- STM32 specific peripheral definitions ------------------------------- */
 
 /* Memory map for all busses */
-#define PERIPH_BASE			((u32)0x40000000)
-#define INFO_BASE			((u32)0x1ff00000)
+#define PERIPH_BASE			(0x40000000U)
+#define INFO_BASE			(0x1ff00000U)
 #define PERIPH_BASE_APB1		(PERIPH_BASE + 0x00000)
 #define PERIPH_BASE_APB2		(PERIPH_BASE + 0x10000)
 #define PERIPH_BASE_AHB			(PERIPH_BASE + 0x20000)
@@ -47,7 +47,6 @@
 #define IWDG_BASE			(PERIPH_BASE_APB1 + 0x3000)
 /* PERIPH_BASE_APB1 + 0x3400 (0x4000 3400 - 0x4000 37FF): Reserved */
 #define SPI2_BASE			(PERIPH_BASE_APB1 + 0x3800)
-// datasheet has an error? here
 #define SPI3_BASE			(PERIPH_BASE_APB1 + 0x3c00)
 /* PERIPH_BASE_APB1 + 0x4000 (0x4000 4000 - 0x4000 3FFF): Reserved */
 #define USART2_BASE			(PERIPH_BASE_APB1 + 0x4400)
@@ -61,6 +60,7 @@
 /* gap */
 #define POWER_CONTROL_BASE		(PERIPH_BASE_APB1 + 0x7000)
 #define DAC_BASE			(PERIPH_BASE_APB1 + 0x7400)
+#define OPAMP_BASE			(PERIPH_BASE_APB1 + 0x7c5c)
 #define COMP_BASE			(PERIPH_BASE_APB1 + 0x7c00)
 #define ROUTING_BASE	                (PERIPH_BASE_APB1 + 0x7c04)
 
@@ -72,6 +72,8 @@
 #define TIM11_BASE			(PERIPH_BASE_APB2 + 0x1000)
 /* gap */
 #define ADC_BASE			(PERIPH_BASE_APB2 + 0x2400)
+/* ADC is the name in the L1 refman, but all other stm32's use ADC1 */
+#define ADC1_BASE			ADC_BASE
 /* gap */
 #define SDIO_BASE			(PERIPH_BASE_APB2 + 0x2c00)
 #define SPI1_BASE			(PERIPH_BASE_APB2 + 0x3000)
@@ -85,13 +87,16 @@
 #define GPIO_PORT_D_BASE		(PERIPH_BASE_AHB + 0x00c00)
 #define GPIO_PORT_E_BASE		(PERIPH_BASE_AHB + 0x01000)
 #define GPIO_PORT_H_BASE		(PERIPH_BASE_AHB + 0x01400)
+#define GPIO_PORT_F_BASE		(PERIPH_BASE_AHB + 0x01800)
+#define GPIO_PORT_G_BASE		(PERIPH_BASE_AHB + 0x01c00)
 /* gap */
 #define CRC_BASE			(PERIPH_BASE_AHB + 0x03000)
 /* gap */
 #define RCC_BASE			(PERIPH_BASE_AHB + 0x03800)
 #define FLASH_MEM_INTERFACE_BASE	(PERIPH_BASE_AHB + 0x03c00)
 /* gap */
-#define DMA_BASE			(PERIPH_BASE_AHB + 0x06000)
+#define DMA1_BASE			(PERIPH_BASE_AHB + 0x06000)
+#define DMA2_BASE			(PERIPH_BASE_AHB + 0x04000)
 
 /* PPIB */
 #define DBGMCU_BASE			(PPBI_BASE + 0x00042000)
@@ -102,7 +107,20 @@
 #define AES_BASE			(PERIPH_BASE +  0x10000000)
 
 /* Device Electronic Signature */
-#define DESIG_FLASH_SIZE_BASE           (INFO_BASE + 0x8004C)
-#define DESIG_UNIQUE_ID_BASE            (INFO_BASE + 0x80050)
+#define DESIG_FLASH_SIZE_BASE		(INFO_BASE + 0x8004C)
+#define DESIG_UNIQUE_ID_BASE		(INFO_BASE + 0x80050)
+#define DESIG_UNIQUE_ID0		MMIO32(DESIG_UNIQUE_ID_BASE)
+#define DESIG_UNIQUE_ID1		MMIO32(DESIG_UNIQUE_ID_BASE + 4)
+#define DESIG_UNIQUE_ID2		MMIO32(DESIG_UNIQUE_ID_BASE + 0x14)
+
+/* ST provided factory calibration values @ 3.0V */
+#define ST_VREFINT_CAL			MMIO16(0x1FF80078)
+#define ST_TSENSE_CAL1_30C		MMIO16(0x1FF8007A)
+#define ST_TSENSE_CAL2_110C		MMIO16(0x1FF8007E)
+
+/* Make the map names match those for other families to allow commonality */
+#define SPI1_I2S_BASE       SPI1_BASE
+#define SPI2_I2S_BASE       SPI2_BASE
+#define SPI3_I2S_BASE       SPI3_BASE
 
 #endif

@@ -1,13 +1,16 @@
-/** @defgroup STM32F4xx_adc_defines ADC Defines
+/** @defgroup adc_defines ADC Defines
 
-@brief <b>Defined Constants and Types for the STM32F4xx Analog to Digital Converters</b>
+@brief <b>Defined Constants and Types for the STM32F4xx Analog to Digital
+Converters</b>
 
 @ingroup STM32F4xx_defines
 
 @version 1.0.0
 
-@author @htmlonly &copy; @endhtmlonly 2012 Matthew Lai <m@matthewlai.ca>
-@author @htmlonly &copy; @endhtmlonly 2009 Edward Cheeseman <evbuilder@users.sourceforge.net>
+@author @htmlonly &copy; @endhtmlonly 2012
+Matthew Lai <m@matthewlai.ca>
+@author @htmlonly &copy; @endhtmlonly 2009
+Edward Cheeseman <evbuilder@users.sourceforge.net>
 
 @date 31 August 2012
 
@@ -36,178 +39,62 @@ LGPL License Terms @ref lgpl_license
 #ifndef LIBOPENCM3_ADC_H
 #define LIBOPENCM3_ADC_H
 
-#include <libopencm3/stm32/f4/memorymap.h>
-#include <libopencm3/cm3/common.h>
+#include <libopencm3/stm32/common/adc_common_v1.h>
 
 /* --- Convenience macros -------------------------------------------------- */
-
-/* ADC port base addresses (for convenience) */
-/****************************************************************************/
-/** @defgroup adc_reg_base ADC register base addresses
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC1				ADC1_BASE
-#define ADC2				ADC2_BASE
-#define ADC3				ADC3_BASE
-/**@}*/
-
-/* --- ADC registers ------------------------------------------------------- */
-
-/* ADC status register (ADC_SR) */
-#define ADC_SR(block)			MMIO32(block + 0x00)
-#define ADC1_SR				ADC_SR(ADC1)
-#define ADC2_SR				ADC_SR(ADC2)
-#define ADC3_SR				ADC_SR(ADC3)
-
-/* ADC control register 1 (ADC_CR1) */
-#define ADC_CR1(block)			MMIO32(block + 0x04)
-#define ADC1_CR1			ADC_CR1(ADC1)
-#define ADC2_CR1			ADC_CR1(ADC2)
-#define ADC3_CR1			ADC_CR1(ADC3)
-
-/* ADC control register 2 (ADC_CR2) */
-#define ADC_CR2(block)			MMIO32(block + 0x08)
-#define ADC1_CR2			ADC_CR2(ADC1)
-#define ADC2_CR2			ADC_CR2(ADC2)
-#define ADC3_CR2			ADC_CR2(ADC3)
-
-/* ADC sample time register 1 (ADC_SMPR1) */
-#define ADC_SMPR1(block)		MMIO32(block + 0x0c)
-#define ADC1_SMPR1			ADC_SMPR1(ADC1)
-#define ADC2_SMPR1			ADC_SMPR1(ADC2)
-#define ADC3_SMPR1			ADC_SMPR1(ADC3)
-
-/* ADC sample time register 2 (ADC_SMPR2) */
-#define ADC_SMPR2(block)		MMIO32(block + 0x10)
-#define ADC1_SMPR2			ADC_SMPR2(ADC1)
-#define ADC2_SMPR2			ADC_SMPR2(ADC2)
-#define ADC3_SMPR2			ADC_SMPR2(ADC3)
 
 /* ADC injected channel data offset register x (ADC_JOFRx) (x=1..4) */
 #define ADC_JOFR1(block)		MMIO32(block + 0x14)
 #define ADC_JOFR2(block)		MMIO32(block + 0x18)
 #define ADC_JOFR3(block)		MMIO32(block + 0x1c)
 #define ADC_JOFR4(block)		MMIO32(block + 0x20)
-#define ADC1_JOFR1			ADC_JOFR1(ADC1)
-#define ADC2_JOFR1			ADC_JOFR1(ADC2)
-#define ADC3_JOFR1			ADC_JOFR1(ADC3)
-#define ADC1_JOFR2			ADC_JOFR2(ADC1)
-#define ADC2_JOFR2			ADC_JOFR2(ADC2)
-#define ADC3_JOFR2			ADC_JOFR2(ADC3)
-#define ADC1_JOFR3			ADC_JOFR3(ADC1)
-#define ADC2_JOFR3			ADC_JOFR3(ADC2)
-#define ADC3_JOFR3			ADC_JOFR3(ADC3)
-#define ADC1_JOFR4			ADC_JOFR4(ADC1)
-#define ADC2_JOFR4			ADC_JOFR4(ADC2)
-#define ADC3_JOFR4			ADC_JOFR4(ADC3)
 
 /* ADC watchdog high threshold register (ADC_HTR) */
 #define ADC_HTR(block)			MMIO32(block + 0x24)
-#define ADC1_HTR			ADC_HTR(ADC1)
-#define ADC2_HTR			ADC_HTR(ADC2)
-#define ADC3_HTR			ADC_HTR(ADC3)
 
 /* ADC watchdog low threshold register (ADC_LTR) */
 #define ADC_LTR(block)			MMIO32(block + 0x28)
-#define ADC1_LTR			ADC_LTR(ADC1_BASE)
-#define ADC2_LTR			ADC_LTR(ADC2_BASE)
-#define ADC3_LTR			ADC_LTR(ADC3_BASE)
 
 /* ADC regular sequence register 1 (ADC_SQR1) */
 #define ADC_SQR1(block)			MMIO32(block + 0x2c)
-#define ADC1_SQR1			ADC_SQR1(ADC1)
-#define ADC2_SQR1			ADC_SQR1(ADC2)
-#define ADC3_SQR1			ADC_SQR1(ADC3)
 
 /* ADC regular sequence register 2 (ADC_SQR2) */
 #define ADC_SQR2(block)			MMIO32(block + 0x30)
-#define ADC1_SQR2			ADC_SQR2(ADC1)
-#define ADC2_SQR2			ADC_SQR2(ADC2)
-#define ADC3_SQR2			ADC_SQR2(ADC3)
 
 /* ADC regular sequence register 3 (ADC_SQR3) */
 #define ADC_SQR3(block)			MMIO32(block + 0x34)
-#define ADC1_SQR3			ADC_SQR3(ADC1)
-#define ADC2_SQR3			ADC_SQR3(ADC2)
-#define ADC3_SQR3			ADC_SQR3(ADC3)
 
 /* ADC injected sequence register (ADC_JSQR) */
 #define ADC_JSQR(block)			MMIO32(block + 0x38)
-#define ADC1_JSQR			ADC_JSQR(ADC1_BASE)
-#define ADC2_JSQR			ADC_JSQR(ADC2_BASE)
-#define ADC3_JSQR			ADC_JSQR(ADC3_BASE)
 
 /* ADC injected data register x (ADC_JDRx) (x=1..4) */
 #define ADC_JDR1(block)			MMIO32(block + 0x3c)
 #define ADC_JDR2(block)			MMIO32(block + 0x40)
 #define ADC_JDR3(block)			MMIO32(block + 0x44)
 #define ADC_JDR4(block)			MMIO32(block + 0x48)
-#define ADC1_JDR1			ADC_JDR1(ADC1)
-#define ADC2_JDR1			ADC_JDR1(ADC2)
-#define ADC3_JDR1			ADC_JDR1(ADC3)
-#define ADC1_JDR2			ADC_JDR2(ADC1)
-#define ADC2_JDR2			ADC_JDR2(ADC2)
-#define ADC3_JDR2			ADC_JDR2(ADC3)
-#define ADC1_JDR3			ADC_JDR3(ADC1)
-#define ADC2_JDR3			ADC_JDR3(ADC2)
-#define ADC3_JDR3			ADC_JDR3(ADC3)
-#define ADC1_JDR4			ADC_JDR4(ADC1)
-#define ADC2_JDR4			ADC_JDR4(ADC2)
-#define ADC3_JDR4			ADC_JDR4(ADC3)
 
 /* ADC regular data register (ADC_DR) */
 #define ADC_DR(block)			MMIO32(block + 0x4c)
-#define ADC1_DR				ADC_DR(ADC1)
-#define ADC2_DR				ADC_DR(ADC2)
-#define ADC3_DR				ADC_DR(ADC3)
 
 /* ADC common (shared) registers */
 #define	ADC_COMMON_REGISTERS_BASE	(ADC1_BASE+0x300)
-#define ADC_CSR						MMIO32(ADC_COMMON_REGISTERS_BASE + 0x0)
-#define ADC_CCR						MMIO32(ADC_COMMON_REGISTERS_BASE + 0x4)
-#define ADC_CDR						MMIO32(ADC_COMMON_REGISTERS_BASE + 0x8)
+#define ADC_CSR				MMIO32(ADC_COMMON_REGISTERS_BASE + 0x0)
+#define ADC_CCR				MMIO32(ADC_COMMON_REGISTERS_BASE + 0x4)
+#define ADC_CDR				MMIO32(ADC_COMMON_REGISTERS_BASE + 0x8)
 
 /* --- ADC Channels ------------------------------------------------------- */
 
-/****************************************************************************/
-/** @defgroup adc_channel ADC Channel Numbers
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC_CHANNEL0		0x00
-#define ADC_CHANNEL1		0x01
-#define ADC_CHANNEL2		0x02
-#define ADC_CHANNEL3		0x03
-#define ADC_CHANNEL4		0x04
-#define ADC_CHANNEL5		0x05
-#define ADC_CHANNEL6		0x06
-#define ADC_CHANNEL7		0x07
-#define ADC_CHANNEL8		0x08
-#define ADC_CHANNEL9		0x09
-#define ADC_CHANNEL10		0x0A
-#define ADC_CHANNEL11		0x0B
-#define ADC_CHANNEL12		0x0C
-#define ADC_CHANNEL13		0x0D
-#define ADC_CHANNEL14		0x0E
-#define ADC_CHANNEL15		0x0F
-#define ADC_CHANNEL16		0x10
-#define ADC_CHANNEL17		0x11
-#define ADC_CHANNEL18		0x12
-/**@}*/
-#define ADC_MASK		    0x1F
-#define ADC_SHIFT		    0
+/* Thanks ST! F40x and F41x are on 16, F42x and F43x are on 18! */
+#define ADC_CHANNEL_TEMP_F40	ADC_CHANNEL16
+#define ADC_CHANNEL_TEMP_F42	ADC_CHANNEL18
+#define ADC_CHANNEL_VREFINT	ADC_CHANNEL17
+#define ADC_CHANNEL_VBAT	ADC_CHANNEL18
 
 /* --- ADC_SR values ------------------------------------------------------- */
 
 #define ADC_SR_OVR			(1 << 5)
-#define ADC_SR_STRT			(1 << 4)
-#define ADC_SR_JSTRT			(1 << 3)
-#define ADC_SR_JEOC			(1 << 2)
-#define ADC_SR_EOC			(1 << 1)
-#define ADC_SR_AWD			(1 << 0)
 
-/* --- ADC_CR1 values specific to STM32F2,4------------------------------------ */
+/* --- ADC_CR1 values specific to STM32F2,4--------------------------------- */
 
 /* OVRIE: Overrun interrupt enable */
 #define ADC_CR1_OVRIE			(1 << 26)
@@ -215,7 +102,7 @@ LGPL License Terms @ref lgpl_license
 /* RES[1:0]: Resolution */
 /****************************************************************************/
 /** @defgroup adc_cr1_res ADC Resolution.
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CR1_RES_12BIT		(0x0 << 24)
@@ -229,89 +116,8 @@ LGPL License Terms @ref lgpl_license
 /* Note: Bits [21:16] are reserved, and must be kept at reset value. */
 
 /* --- ADC_CR1 values (note some of these are defined elsewhere) ----------- */
+#define ADC_CR1_AWDCH_MAX		18
 
-/* AWDEN: Analog watchdog enable on regular channels */
-#define ADC_CR1_AWDEN			(1 << 23)
-
-/* JAWDEN: Analog watchdog enable on injected channels */
-#define ADC_CR1_JAWDEN			(1 << 22)
-
-/* DISCNUM[2:0]: Discontinuous mode channel count. */
-/****************************************************************************/
-/** @defgroup adc_cr1_discnum ADC Number of channels in discontinuous mode.
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC_CR1_DISCNUM_1CHANNELS       (0x0 << 13)
-#define ADC_CR1_DISCNUM_2CHANNELS       (0x1 << 13)
-#define ADC_CR1_DISCNUM_3CHANNELS       (0x2 << 13)
-#define ADC_CR1_DISCNUM_4CHANNELS       (0x3 << 13)
-#define ADC_CR1_DISCNUM_5CHANNELS       (0x4 << 13)
-#define ADC_CR1_DISCNUM_6CHANNELS       (0x5 << 13)
-#define ADC_CR1_DISCNUM_7CHANNELS       (0x6 << 13)
-#define ADC_CR1_DISCNUM_8CHANNELS       (0x7 << 13)
-/**@}*/
-#define ADC_CR1_DISCNUM_MASK		(0x7 << 13)
-#define ADC_CR1_DISCNUM_SHIFT		13
-
-/* JDISCEN: */ /** Discontinuous mode on injected channels. */
-#define ADC_CR1_JDISCEN			(1 << 12)
-
-/* DISCEN: */ /** Discontinuous mode on regular channels. */
-#define ADC_CR1_DISCEN			(1 << 11)
-
-/* JAUTO: */ /** Automatic Injection Group conversion. */
-#define ADC_CR1_JAUTO			(1 << 10)
-
-/* AWDSGL: */ /** Enable the watchdog on a single channel in scan mode. */
-#define ADC_CR1_AWDSGL			(1 << 9)
-
-/* SCAN: */ /** Scan mode. */
-#define ADC_CR1_SCAN			(1 << 8)
-
-/* JEOCIE: */ /** Interrupt enable for injected channels. */
-#define ADC_CR1_JEOCIE			(1 << 7)
-
-/* AWDIE: */ /** Analog watchdog interrupt enable. */
-#define ADC_CR1_AWDIE			(1 << 6)
-
-/* EOCIE: */ /** Interrupt enable EOC. */
-#define ADC_CR1_EOCIE			(1 << 5)
-
-/* AWDCH[4:0]: Analog watchdog channel bits. (Up to 17 other values reserved) */
-/* Notes:
- * ADC1: Analog channel 16 and 17 are internally connected to the temperature
- * sensor and V_REFINT, respectively.
- * ADC2: Analog channel 16 and 17 are internally connected to V_SS.
- * ADC3: Analog channel 9, 14, 15, 16 and 17 are internally connected to V_SS.
- */
-/****************************************************************************/
-/* ADC_CR1 AWDCH[4:0] ADC watchdog channel */
-/** @defgroup adc_watchdog_channel ADC watchdog channel
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC_CR1_AWDCH_CHANNEL0		(0x00 << 0)
-#define ADC_CR1_AWDCH_CHANNEL1		(0x01 << 0)
-#define ADC_CR1_AWDCH_CHANNEL2		(0x02 << 0)
-#define ADC_CR1_AWDCH_CHANNEL3		(0x03 << 0)
-#define ADC_CR1_AWDCH_CHANNEL4		(0x04 << 0)
-#define ADC_CR1_AWDCH_CHANNEL5		(0x05 << 0)
-#define ADC_CR1_AWDCH_CHANNEL6		(0x06 << 0)
-#define ADC_CR1_AWDCH_CHANNEL7		(0x07 << 0)
-#define ADC_CR1_AWDCH_CHANNEL8		(0x08 << 0)
-#define ADC_CR1_AWDCH_CHANNEL9		(0x09 << 0)
-#define ADC_CR1_AWDCH_CHANNEL10		(0x0A << 0)
-#define ADC_CR1_AWDCH_CHANNEL11		(0x0B << 0)
-#define ADC_CR1_AWDCH_CHANNEL12		(0x0C << 0)
-#define ADC_CR1_AWDCH_CHANNEL13		(0x0D << 0)
-#define ADC_CR1_AWDCH_CHANNEL14		(0x0E << 0)
-#define ADC_CR1_AWDCH_CHANNEL15		(0x0F << 0)
-#define ADC_CR1_AWDCH_CHANNEL16		(0x10 << 0)
-#define ADC_CR1_AWDCH_CHANNEL17		(0x11 << 0)
-/**@}*/
-#define ADC_CR1_AWDCH_MASK		(0x1F << 0)
-#define ADC_CR1_AWDCH_SHIFT		0
 
 /* --- ADC_CR2 values ------------------------------------------------------ */
 
@@ -321,7 +127,7 @@ LGPL License Terms @ref lgpl_license
 /* EXTEN[1:0]: External trigger enable for regular channels. */
 /****************************************************************************/
 /** @defgroup adc_trigger_polarity_regular ADC Trigger Polarity
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CR2_EXTEN_DISABLED		(0x0 << 28)
@@ -335,7 +141,7 @@ LGPL License Terms @ref lgpl_license
 /* EXTSEL[3:0]: External event selection for regular group. */
 /****************************************************************************/
 /** @defgroup adc_trigger_regular ADC Trigger Identifier for Regular group
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 /** Timer 1 Compare Output 1 */
@@ -382,7 +188,7 @@ LGPL License Terms @ref lgpl_license
 /* JEXTEN[1:0]: External trigger enable for injected channels. */
 /****************************************************************************/
 /** @defgroup adc_trigger_polarity_injected ADC Injected Trigger Polarity
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CR2_JEXTEN_DISABLED		(0x0 << 20)
@@ -396,7 +202,7 @@ LGPL License Terms @ref lgpl_license
 /* JEXTSEL[3:0]: External event selection for injected group. */
 /****************************************************************************/
 /** @defgroup adc_trigger_injected ADC Trigger Identifier for Injected group
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CR2_JEXTSEL_TIM1_CC4	(0x0 << 16)
@@ -464,21 +270,6 @@ LGPL License Terms @ref lgpl_license
 #define ADC_SMPR1_SMP12_MSK		(0x7 << ADC_SMP12_LSB)
 #define ADC_SMPR1_SMP11_MSK		(0x7 << ADC_SMP11_LSB)
 #define ADC_SMPR1_SMP10_MSK		(0x7 << ADC_SMP10_LSB)
-/****************************************************************************/
-/* ADC_SMPR1 ADC Sample Time Selection for Channels */
-/** @defgroup adc_sample_r1 ADC Sample Time Selection for ADC1
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC_SMPR1_SMP_1DOT5CYC		0x0
-#define ADC_SMPR1_SMP_7DOT5CYC		0x1
-#define ADC_SMPR1_SMP_13DOT5CYC		0x2
-#define ADC_SMPR1_SMP_28DOT5CYC		0x3
-#define ADC_SMPR1_SMP_41DOT5CYC		0x4
-#define ADC_SMPR1_SMP_55DOT5CYC		0x5
-#define ADC_SMPR1_SMP_71DOT5CYC		0x6
-#define ADC_SMPR1_SMP_239DOT5CYC	0x7
-/**@}*/
 
 /* --- ADC_SMPR2 values ---------------------------------------------------- */
 
@@ -502,51 +293,28 @@ LGPL License Terms @ref lgpl_license
 #define ADC_SMPR2_SMP2_MSK		(0x7 << ADC_SMP2_LSB)
 #define ADC_SMPR2_SMP1_MSK		(0x7 << ADC_SMP1_LSB)
 #define ADC_SMPR2_SMP0_MSK		(0x7 << ADC_SMP0_LSB)
-/****************************************************************************/
-/* ADC_SMPR2 ADC Sample Time Selection for Channels */
-/** @defgroup adc_sample_r2 ADC Sample Time Selection for ADC2
-@ingroup STM32F4xx_adc_defines
 
-@{*/
-#define ADC_SMPR2_SMP_1DOT5CYC		0x0
-#define ADC_SMPR2_SMP_7DOT5CYC		0x1
-#define ADC_SMPR2_SMP_13DOT5CYC		0x2
-#define ADC_SMPR2_SMP_28DOT5CYC		0x3
-#define ADC_SMPR2_SMP_41DOT5CYC		0x4
-#define ADC_SMPR2_SMP_55DOT5CYC		0x5
-#define ADC_SMPR2_SMP_71DOT5CYC		0x6
-#define ADC_SMPR2_SMP_239DOT5CYC	0x7
-/**@}*/
-
-/* --- ADC_SMPRx generic values -------------------------------------------- */
+/* --- ADC_SMPRx values --------------------------------------------------- */
 /****************************************************************************/
 /* ADC_SMPRG ADC Sample Time Selection for Channels */
 /** @defgroup adc_sample_rg ADC Sample Time Selection for All Channels
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
-#define ADC_SMPR_SMP_1DOT5CYC		0x0
-#define ADC_SMPR_SMP_7DOT5CYC		0x1
-#define ADC_SMPR_SMP_13DOT5CYC		0x2
-#define ADC_SMPR_SMP_28DOT5CYC		0x3
-#define ADC_SMPR_SMP_41DOT5CYC		0x4
-#define ADC_SMPR_SMP_55DOT5CYC		0x5
-#define ADC_SMPR_SMP_71DOT5CYC		0x6
-#define ADC_SMPR_SMP_239DOT5CYC		0x7
+#define ADC_SMPR_SMP_3CYC		0x0
+#define ADC_SMPR_SMP_15CYC		0x1
+#define ADC_SMPR_SMP_28CYC		0x2
+#define ADC_SMPR_SMP_56CYC		0x3
+#define ADC_SMPR_SMP_84CYC		0x4
+#define ADC_SMPR_SMP_112CYC		0x5
+#define ADC_SMPR_SMP_144CYC		0x6
+#define ADC_SMPR_SMP_480CYC		0x7
 /**@}*/
-
-/* --- ADC_JOFRx, ADC_HTR, ADC_LTR values ---------------------------------- */
-
-#define ADC_JOFFSET_LSB			0
-#define ADC_JOFFSET_MSK			(0x7ff << 0)
-#define ADC_HT_LSB			0
-#define ADC_HT_MSK			(0x7ff << 0)
-#define ADC_LT_LSB			0
-#define ADC_LT_MSK			(0x7ff << 0)
 
 /* --- ADC_SQR1 values ----------------------------------------------------- */
 
-#define ADC_SQR1_L_LSB			20
+#define ADC_SQR_MAX_CHANNELS_REGULAR	16
+
 #define ADC_SQR1_SQ16_LSB		15
 #define ADC_SQR1_SQ15_LSB		10
 #define ADC_SQR1_SQ14_LSB		5
@@ -586,32 +354,6 @@ LGPL License Terms @ref lgpl_license
 #define ADC_SQR3_SQ3_MSK		(0x1f << ADC_SQR3_SQ3_LSB)
 #define ADC_SQR3_SQ2_MSK		(0x1f << ADC_SQR3_SQ2_LSB)
 #define ADC_SQR3_SQ1_MSK		(0x1f << ADC_SQR3_SQ1_LSB)
-
-/* --- ADC_JSQR values ----------------------------------------------------- */
-
-#define ADC_JSQR_JL_LSB			20
-#define ADC_JSQR_JSQ4_LSB		15
-#define ADC_JSQR_JSQ3_LSB		10
-#define ADC_JSQR_JSQ2_LSB		5
-#define ADC_JSQR_JSQ1_LSB		0
-
-/* JL[2:0]: Discontinous mode channel count injected channels. */
-/****************************************************************************/
-/** @defgroup adc_jsqr_jl ADC Number of channels in discontinuous mode fro injected channels.
-@ingroup STM32F4xx_adc_defines
-
-@{*/
-#define ADC_JSQR_JL_1CHANNELS       (0x0 << ADC_JSQR_JL_LSB)
-#define ADC_JSQR_JL_2CHANNELS       (0x1 << ADC_JSQR_JL_LSB)
-#define ADC_JSQR_JL_3CHANNELS       (0x2 << ADC_JSQR_JL_LSB)
-#define ADC_JSQR_JL_4CHANNELS       (0x3 << ADC_JSQR_JL_LSB)
-/**@}*/
-#define ADC_JSQR_JL_SHIFT		13
-#define ADC_JSQR_JL_MSK			(0x2 << ADC_JSQR_JL_LSB)
-#define ADC_JSQR_JSQ4_MSK		(0x1f << ADC_JSQR_JSQ4_LSB)
-#define ADC_JSQR_JSQ3_MSK		(0x1f << ADC_JSQR_JSQ3_LSB)
-#define ADC_JSQR_JSQ2_MSK		(0x1f << ADC_JSQR_JSQ2_LSB)
-#define ADC_JSQR_JSQ1_MSK		(0x1f << ADC_JSQR_JSQ1_LSB)
 
 /* --- ADC_JDRx, ADC_DR values --------------------------------------------- */
 
@@ -695,7 +437,7 @@ LGPL License Terms @ref lgpl_license
 /* ADCPRE: ADC prescaler. */
 /****************************************************************************/
 /** @defgroup adc_ccr_adcpre ADC Prescale
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CCR_ADCPRE_BY2		(0x0 << 16)
@@ -709,7 +451,7 @@ LGPL License Terms @ref lgpl_license
 /* DMA: Direct memory access mode for multi ADC mode. */
 /****************************************************************************/
 /** @defgroup adc_dma_mode ADC DMA mode for multi ADC mode
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CCR_DMA_DISABLE		(0x0 << 14)
@@ -728,7 +470,7 @@ LGPL License Terms @ref lgpl_license
 /* DELAY: Delay between 2 sampling phases. */
 /****************************************************************************/
 /** @defgroup adc_delay ADC Delay between 2 sampling phases
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 #define ADC_CCR_DELAY_5ADCCLK		(0x0 << 8)
@@ -756,40 +498,52 @@ LGPL License Terms @ref lgpl_license
 /* MULTI: Multi ADC mode selection. */
 /****************************************************************************/
 /** @defgroup adc_multi_mode ADC Multi mode selection
-@ingroup STM32F4xx_adc_defines
+@ingroup adc_defines
 
 @{*/
 
 /** All ADCs independent */
 #define ADC_CCR_MULTI_INDEPENDENT	(0x00 << 0)
 
-/* dual modes (ADC1 + ADC2) */
-/** Dual modes (ADC1 + ADC2) Combined regular simultaneous + injected simultaneous mode */
+/* Dual modes (ADC1 + ADC2) */
+/**
+ * Dual modes (ADC1 + ADC2) Combined regular simultaneous +
+ * injected simultaneous mode.
+ */
 #define ADC_CCR_MULTI_DUAL_REG_SIMUL_AND_INJECTED_SIMUL		(0x01 << 0)
-/** Dual modes (ADC1 + ADC2) Combined regular simultaneous + alternate trigger mode. */
+/**
+ * Dual modes (ADC1 + ADC2) Combined regular simultaneous +
+ * alternate trigger mode.
+ */
 #define ADC_CCR_MULTI_DUAL_REG_SIMUL_AND_ALTERNATE_TRIG		(0x02 << 0)
 /** Dual modes (ADC1 + ADC2) Injected simultaneous mode only. */
-#define ADC_CCR_MULTI_DUAL_INJECTED_SIMUL					(0x05 << 0)
+#define ADC_CCR_MULTI_DUAL_INJECTED_SIMUL			(0x05 << 0)
 /** Dual modes (ADC1 + ADC2) Regular simultaneous mode only. */
-#define ADC_CCR_MULTI_DUAL_REGULAR_SIMUL					(0x06 << 0)
+#define ADC_CCR_MULTI_DUAL_REGULAR_SIMUL			(0x06 << 0)
 /** Dual modes (ADC1 + ADC2) Interleaved mode only. */
-#define ADC_CCR_MULTI_DUAL_INTERLEAVED						(0x07 << 0)
+#define ADC_CCR_MULTI_DUAL_INTERLEAVED				(0x07 << 0)
 /** Dual modes (ADC1 + ADC2) Alternate trigger mode only. */
-#define ADC_CCR_MULTI_DUAL_ALTERNATE_TRIG					(0x09 << 0)
+#define ADC_CCR_MULTI_DUAL_ALTERNATE_TRIG			(0x09 << 0)
 
 /* Triple modes (ADC1 + ADC2 + ADC3) */
-/** Triple modes (ADC1 + ADC2 + ADC3) Combined regular simultaneous + injected simultaneous mode */
-#define ADC_CCR_MULTI_TRIPLE_REG_SIMUL_AND_INJECTED_SIMUL		(0x11 << 0)
-/** Triple modes (ADC1 + ADC2 + ADC3) Combined regular simultaneous + alternate trigger mode. */
-#define ADC_CCR_MULTI_TRIPLE_REG_SIMUL_AND_ALTERNATE_TRIG		(0x12 << 0)
+/**
+ * Triple modes (ADC1 + ADC2 + ADC3) Combined regular simultaneous +
+ * injected simultaneous mode.
+ */
+#define ADC_CCR_MULTI_TRIPLE_REG_SIMUL_AND_INJECTED_SIMUL	(0x11 << 0)
+/**
+ * Triple modes (ADC1 + ADC2 + ADC3) Combined regular simultaneous +
+ * alternate trigger mode.
+ */
+#define ADC_CCR_MULTI_TRIPLE_REG_SIMUL_AND_ALTERNATE_TRIG	(0x12 << 0)
 /** Triple modes (ADC1 + ADC2 + ADC3) Injected simultaneous mode only. */
-#define ADC_CCR_MULTI_TRIPLE_INJECTED_SIMUL						(0x15 << 0)
+#define ADC_CCR_MULTI_TRIPLE_INJECTED_SIMUL			(0x15 << 0)
 /** Triple modes (ADC1 + ADC2 + ADC3) Regular simultaneous mode only. */
-#define ADC_CCR_MULTI_TRIPLE_REGULAR_SIMUL						(0x16 << 0)
+#define ADC_CCR_MULTI_TRIPLE_REGULAR_SIMUL			(0x16 << 0)
 /** Triple modes (ADC1 + ADC2 + ADC3) Interleaved mode only. */
-#define ADC_CCR_MULTI_TRIPLE_INTERLEAVED						(0x17 << 0)
+#define ADC_CCR_MULTI_TRIPLE_INTERLEAVED			(0x17 << 0)
 /** Triple modes (ADC1 + ADC2 + ADC3) Alternate trigger mode only. */
-#define ADC_CCR_MULTI_TRIPLE_ALTERNATE_TRIG						(0x19 << 0)
+#define ADC_CCR_MULTI_TRIPLE_ALTERNATE_TRIG			(0x19 << 0)
 /**@}*/
 
 #define ADC_CCR_MULTI_MASK		(0x1f << 0)
@@ -805,64 +559,23 @@ LGPL License Terms @ref lgpl_license
 
 BEGIN_DECLS
 
-void adc_power_on(u32 adc);
-void adc_off(u32 adc);
-void adc_enable_analog_watchdog_regular(u32 adc);
-void adc_disable_analog_watchdog_regular(u32 adc);
-void adc_enable_analog_watchdog_injected(u32 adc);
-void adc_disable_analog_watchdog_injected(u32 adc);
-void adc_enable_discontinuous_mode_regular(u32 adc, u8 length);
-void adc_disable_discontinuous_mode_regular(u32 adc);
-void adc_enable_discontinuous_mode_injected(u32 adc);
-void adc_disable_discontinuous_mode_injected(u32 adc);
-void adc_enable_automatic_injected_group_conversion(u32 adc);
-void adc_disable_automatic_injected_group_conversion(u32 adc);
-void adc_enable_analog_watchdog_on_all_channels(u32 adc);
-void adc_enable_analog_watchdog_on_selected_channel(u32 adc, u8 channel);
-void adc_enable_scan_mode(u32 adc);
-void adc_disable_scan_mode(u32 adc);
-void adc_enable_eoc_interrupt_injected(u32 adc);
-void adc_disable_eoc_interrupt_injected(u32 adc);
-void adc_enable_awd_interrupt(u32 adc);
-void adc_disable_awd_interrupt(u32 adc);
-void adc_enable_eoc_interrupt(u32 adc);
-void adc_disable_eoc_interrupt(u32 adc);
-void adc_start_conversion_regular(u32 adc);
-void adc_start_conversion_injected(u32 adc);
-void adc_disable_external_trigger_regular(u32 adc);
-void adc_disable_external_trigger_injected(u32 adc);
-void adc_set_left_aligned(u32 adc);
-void adc_set_right_aligned(u32 adc);
-void adc_enable_dma(u32 adc);
-void adc_disable_dma(u32 adc);
-void adc_set_continuous_conversion_mode(u32 adc);
-void adc_set_single_conversion_mode(u32 adc);
-void adc_set_sample_time(u32 adc, u8 channel, u8 time);
-void adc_set_sample_time_on_all_channels(u32 adc, u8 time);
-void adc_set_watchdog_high_threshold(u32 adc, u16 threshold);
-void adc_set_watchdog_low_threshold(u32 adc, u16 threshold);
-void adc_set_regular_sequence(u32 adc, u8 length, u8 channel[]);
-void adc_set_injected_sequence(u32 adc, u8 length, u8 channel[]);
-bool adc_eoc(u32 adc);
-bool adc_eoc_injected(u32 adc);
-u32 adc_read_regular(u32 adc);
-u32 adc_read_injected(u32 adc, u8 reg);
-void adc_set_injected_offset(u32 adc, u8 reg, u32 offset);
+void adc_set_clk_prescale(uint32_t prescaler);
+void adc_set_multi_mode(uint32_t mode);
+void adc_enable_external_trigger_regular(uint32_t adc, uint32_t trigger,
+					 uint32_t polarity);
+void adc_enable_external_trigger_injected(uint32_t adc, uint32_t trigger,
+					  uint32_t polarity);
+void adc_set_resolution(uint32_t adc, uint32_t resolution);
+void adc_enable_overrun_interrupt(uint32_t adc);
+void adc_disable_overrun_interrupt(uint32_t adc);
+bool adc_get_overrun_flag(uint32_t adc);
+void adc_clear_overrun_flag(uint32_t adc);
+bool adc_awd(uint32_t adc);
+void adc_eoc_after_each(uint32_t adc);
+void adc_eoc_after_group(uint32_t adc);
+void adc_set_dma_continue(uint32_t adc);
+void adc_set_dma_terminate(uint32_t adc);
 
-void adc_set_clk_prescale(u32 prescaler);
-void adc_set_multi_mode(u32 mode);
-void adc_enable_external_trigger_regular(u32 adc, u32 trigger, u32 polarity);
-void adc_enable_external_trigger_injected(u32 adc, u32 trigger, u32 polarity);
-void adc_set_resolution(u32 adc, u16 resolution);
-void adc_enable_overrun_interrupt(u32 adc);
-void adc_disable_overrun_interrupt(u32 adc);
-bool adc_get_overrun_flag(u32 adc);
-void adc_clear_overrun_flag(u32 adc);
-bool adc_awd(u32 adc);
-void adc_eoc_after_each(u32 adc);
-void adc_eoc_after_group(u32 adc);
-void adc_set_dma_continue(u32 adc);
-void adc_set_dma_terminate(u32 adc);
 void adc_enable_temperature_sensor(void);
 void adc_disable_temperature_sensor(void);
 

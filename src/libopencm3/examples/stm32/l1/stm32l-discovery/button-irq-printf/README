@@ -1,3 +1,0 @@
-* Prints to the screen when the button is pushed/released (irq driven)
-  115200@8n1 console on PA2 (tx only)
-

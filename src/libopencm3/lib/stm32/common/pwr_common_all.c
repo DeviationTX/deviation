@@ -26,7 +26,6 @@ Ken Sarkies <ksarkies@internode.on.net>
 /**@{*/
 
 #include <libopencm3/stm32/pwr.h>
-#include <libopencm3/stm32/memorymap.h>
 
 /*---------------------------------------------------------------------------*/
 /** @brief Disable Backup Domain Write Protection.

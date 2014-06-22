@@ -20,15 +20,19 @@
 #ifndef LIBOPENCM3_FSMC_H
 #define LIBOPENCM3_FSMC_H
 
-#include <libopencm3/stm32/memorymap.h>
 #include <libopencm3/cm3/common.h>
+#include <libopencm3/stm32/memorymap.h>
+
+#if defined(STM32F4)
+#       include <libopencm3/stm32/f4/fmc.h>
+#endif
 
 /* --- Convenience macros -------------------------------------------------- */
 
-#define FSMC_BANK1_BASE			0x60000000 /* NOR / PSRAM */
-#define FSMC_BANK2_BASE			0x70000000 /* NAND flash */
-#define FSMC_BANK3_BASE			0x80000000 /* NAND flash */
-#define FSMC_BANK4_BASE			0x90000000 /* PC card */
+#define FSMC_BANK1_BASE			0x60000000U /* NOR / PSRAM */
+#define FSMC_BANK2_BASE			0x70000000U /* NAND flash */
+#define FSMC_BANK3_BASE			0x80000000U /* NAND flash */
+#define FSMC_BANK4_BASE			0x90000000U /* PC card */
 
 /* --- FSMC registers ------------------------------------------------------ */
 
@@ -123,7 +127,7 @@
 /* FACCEN: Flash access enable */
 #define FSMC_BCR_FACCEN			(1 << 6)
 
-/* MWID[5:4]: Memory databus width */
+/* MWID[5:4]: Memory data bus width */
 #define FSMC_BCR_MWID			(1 << 4)
 
 /* MTYP[3:2]: Memory type */

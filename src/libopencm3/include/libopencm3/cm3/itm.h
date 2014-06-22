@@ -22,19 +22,31 @@
 
 /* Cortex-M3 Instrumentation Trace Macrocell (ITM) */
 
+/* Those defined only on ARMv7 and above */
+#if !defined(__ARM_ARCH_7M__) && !defined(__ARM_ARCH_7EM__)
+#error "Instrumentation Trace Macrocell not available in CM0"
+#endif
+
 /* --- ITM registers ------------------------------------------------------- */
 
-/* Stimulus Port x (ITM_STIM[x]) */
-#define ITM_STIM			((volatile u32*)(ITM_BASE))
+/* Stimulus Port x (ITM_STIM<sz>(x)) */
+#define ITM_STIM8(n)			(MMIO8(ITM_BASE + (n*4)))
+#define ITM_STIM16(n)			(MMIO16(ITM_BASE + (n*4)))
+#define ITM_STIM32(n)			(MMIO32(ITM_BASE + (n*4)))
 
 /* Trace Enable ports (ITM_TER[x]) */
-#define ITM_TER				((volatile u32*)(ITM_BASE + 0xE00))
+#define ITM_TER				(&MMIO32(ITM_BASE + 0xE00))
 
 /* Trace Privilege (ITM_TPR) */
 #define ITM_TPR				MMIO32(ITM_BASE + 0xE40)
 
 /* Trace Control (ITM_TCR) */
 #define ITM_TCR				MMIO32(ITM_BASE + 0xE80)
+
+/* CoreSight Lock Status Register for this peripheral */
+#define ITM_LSR			MMIO32(ITM_BASE + 0xFB4)
+/* CoreSight Lock Access Register for this peripheral */
+#define ITM_LAR			MMIO32(ITM_BASE + 0xFB0)
 
 /* TODO: PID, CID */
 

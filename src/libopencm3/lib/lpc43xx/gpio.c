@@ -1,3 +1,16 @@
+/** @defgroup gpio_file GPIO
+
+@ingroup LPC43xx
+
+@brief <b>libopencm3 LPC43xx General Purpose I/O</b>
+
+@version 1.0.0
+
+@author @htmlonly &copy; @endhtmlonly 2009 Uwe Hermann <uwe@hermann-uwe.de>
+
+LGPL License Terms @ref lgpl_license
+*/
+
 /*
  * This file is part of the libopencm3 project.
  *
@@ -17,19 +30,24 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**@{*/
+
 #include <libopencm3/lpc43xx/gpio.h>
 
-void gpio_set(u32 gpioport, u32 gpios)
+void gpio_set(uint32_t gpioport, uint32_t gpios)
 {
 	GPIO_SET(gpioport) = gpios;
 }
 
-void gpio_clear(u32 gpioport, u32 gpios)
+void gpio_clear(uint32_t gpioport, uint32_t gpios)
 {
 	GPIO_CLR(gpioport) = gpios;
 }
 
-void gpio_toggle(u32 gpioport, u32 gpios)
+void gpio_toggle(uint32_t gpioport, uint32_t gpios)
 {
 	GPIO_NOT(gpioport) = gpios;
 }
+
+/**@}*/
+

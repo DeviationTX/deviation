@@ -1,3 +1,20 @@
+/** @defgroup pwr_file PWR
+ *
+ * @ingroup STM32F4xx
+ *
+ * @brief <b>libopencm3 STM32F4xx Power Control</b>
+ *
+ * @version 1.0.0
+ *
+ * @author @htmlonly &copy; @endhtmlonly 2011 Stephen Caudle <scaudle@doceme.com>
+ *
+ * @date 4 March 2013
+ *
+ * This library supports the power control system for the
+ * STM32F4 series of ARM Cortex Microcontrollers by ST Microelectronics.
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
 /*
  * This file is part of the libopencm3 project.
  *
@@ -17,12 +34,13 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libopencm3/stm32/f4/pwr.h>
+#include <libopencm3/stm32/pwr.h>
 
 void pwr_set_vos_scale(vos_scale_t scale)
 {
-	if (scale == SCALE1)
+	if (scale == SCALE1) {
 		PWR_CR |= PWR_CR_VOS;
-	else if (scale == SCALE2)
+	} else if (scale == SCALE2) {
 		PWR_CR &= PWR_CR_VOS;
+	}
 }

@@ -1,3 +1,17 @@
+/** @defgroup gpio_defines GPIO Defines
+
+@brief <b>Defined Constants and Types for the LPC17xx General Purpose I/O</b>
+
+@ingroup LPC17xx_defines
+
+@version 1.0.0
+
+@author @htmlonly &copy; @endhtmlonly 2009 Uwe Hermann <uwe@hermann-uwe.de>
+
+@date 10 March 2013
+
+LGPL License Terms @ref lgpl_license
+ */
 /*
  * This file is part of the libopencm3 project.
  *
@@ -19,6 +33,8 @@
 
 #ifndef LPC17XX_GPIO_H
 #define LPC17XX_GPIO_H
+
+/**@{*/
 
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/lpc17xx/memorymap.h>
@@ -110,33 +126,35 @@
 
 /* GPIO interrupt register map */
 /* Interrupt enable rising edge */
-#define GPIO0_IER                       MMIO32(GPIOINTERRPUT_BASE + 0x90)
-#define GPIO2_IER                       MMIO32(GPIOINTERRPUT_BASE + 0xB0)
+#define GPIO0_IER                       MMIO32(GPIOINTERRUPT_BASE + 0x90)
+#define GPIO2_IER                       MMIO32(GPIOINTERRUPT_BASE + 0xB0)
 
 /* Interrupt enable falling edge */
-#define GPIO0_IEF                       MMIO32(GPIOINTERRPUT_BASE + 0x94)
-#define GPIO2_IEF                       MMIO32(GPIOINTERRPUT_BASE + 0xB4)
+#define GPIO0_IEF                       MMIO32(GPIOINTERRUPT_BASE + 0x94)
+#define GPIO2_IEF                       MMIO32(GPIOINTERRUPT_BASE + 0xB4)
 
 /* Interrupt status rising edge */
-#define GPIO0_ISR                       MMIO32(GPIOINTERRPUT_BASE + 0x84)
-#define GPIO2_ISR                       MMIO32(GPIOINTERRPUT_BASE + 0xA4)
+#define GPIO0_ISR                       MMIO32(GPIOINTERRUPT_BASE + 0x84)
+#define GPIO2_ISR                       MMIO32(GPIOINTERRUPT_BASE + 0xA4)
 
 /* Interrupt status falling edge */
-#define GPIO0_ISF                       MMIO32(GPIOINTERRPUT_BASE + 0x88)
-#define GPIO2_ISF                       MMIO32(GPIOINTERRPUT_BASE + 0xA8)
+#define GPIO0_ISF                       MMIO32(GPIOINTERRUPT_BASE + 0x88)
+#define GPIO2_ISF                       MMIO32(GPIOINTERRUPT_BASE + 0xA8)
 
 /* Interrupt clear */
-#define GPIO0_IC                        MMIO32(GPIOINTERRPUT_BASE + 0x8C)
-#define GPIO1_IC                        MMIO32(GPIOINTERRPUT_BASE + 0xAC)
+#define GPIO0_IC                        MMIO32(GPIOINTERRUPT_BASE + 0x8C)
+#define GPIO1_IC                        MMIO32(GPIOINTERRUPT_BASE + 0xAC)
 
 /* Overall interrupt status */
-#define GPIO_IS                         MMIO32(GPIOINTERRPUT_BASE + 0x80)
+#define GPIO_IS                         MMIO32(GPIOINTERRUPT_BASE + 0x80)
 
 BEGIN_DECLS
 
-void gpio_set(u32 gpioport, u32 gpios);
-void gpio_clear(u32 gpioport, u32 gpios); 
+void gpio_set(uint32_t gpioport, uint32_t gpios);
+void gpio_clear(uint32_t gpioport, uint32_t gpios);
 
 END_DECLS
+
+/**@}*/
 
 #endif
