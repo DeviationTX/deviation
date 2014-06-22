@@ -33,7 +33,7 @@ LFLAGS2OPT  = -Wl,-T$(SDIR)/target/$(TARGET)/$(TARGET)_opt.ld
 
 #-lnosys
 
-ALL = $(TARGET).dfu
+ALL = $(LIBOPENCM3) $(TARGET).dfu
 
 else #BUILD_TARGET
 

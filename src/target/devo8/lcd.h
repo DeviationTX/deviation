@@ -15,7 +15,7 @@ struct lcdtype {
     void (*sleep)();
 };
 extern const struct lcdtype *disp_type;
-extern u8 screen_flip;
+extern uint8_t screen_flip;
 
 extern void lcd_cmd(uint8_t addr, uint8_t data);
 

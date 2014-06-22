@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/adc.h>
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/dma.h>
+#include <libopencm3/stm32/adc.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/dma.h>
 #include "common.h"
 #include "devo.h"
 #include <stdlib.h>

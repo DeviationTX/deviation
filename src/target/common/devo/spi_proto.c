@@ -19,8 +19,8 @@
   Note that we lie aboiut the arguments to these functions. It is
   Important that the actual functions never execute
 */
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "devo.h"
