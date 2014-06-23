@@ -23,6 +23,8 @@ PROTO_MODULES += $(ODIR)/protocol/cflie.mod
 PROTO_MODULES += $(ODIR)/protocol/h377.mod
 PROTO_MODULES += $(ODIR)/protocol/hm830.mod
 PROTO_MODULES += $(ODIR)/protocol/kn.mod
+PROTO_MODULES += $(ODIR)/protocol/esky150.mod
+PROTO_MODULES += $(ODIR)/protocol/esky.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
@@ -119,6 +121,10 @@ $(ODIR)/protocol/kn.mod : $(ODIR)/kn_nrf24l01.bin
 
 $(ODIR)/protocol/esky150.mod : $(ODIR)/esky150_nrf24l01.bin
 	@echo Building 'esky150' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/esky.mod : $(ODIR)/esky_nrf24l01.bin
+	@echo Building 'esky' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
