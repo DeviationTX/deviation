@@ -203,7 +203,7 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return objid == ITEM_GRAPH ? (guiObject_t *)&gui->bar[chan] : (guiObject_t *)&gui->value[chan];
 }
-static inline int _get_input_idx(int chan)
+static int _get_input_idx(int chan)
 {
     return page * NUM_BARS_PER_ROW + chan;
 }
