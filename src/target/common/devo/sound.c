@@ -44,7 +44,7 @@ void SOUND_Init()
 
     /* Polarity and state */
     timer_set_oc_polarity_low(_SOUND_TIM, _SOUND_TIM_OC);
-    timer_enable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
+    //timer_enable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
 
     /* Capture compare value */
     timer_set_oc_value(_SOUND_TIM, _SOUND_TIM_OC, 0x8000);
@@ -93,6 +93,7 @@ void SOUND_Stop()
 {
     CLOCK_ClearMsecCallback(TIMER_SOUND);
     timer_disable_counter(_SOUND_TIM);
+    timer_disable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
     VIBRATINGMOTOR_Stop();
 }
 
