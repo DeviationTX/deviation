@@ -113,4 +113,7 @@
 #define ST_TSENSE_CAL1_30C	MMIO16(0x1FFFF7B8)
 #define ST_TSENSE_CAL2_110	MMIO16(0x1FFFF7C2)
 
+/* Make the map names match those for other families to allow commonality */
+#define SPI1_I2S_BASE       SPI1_I2S1_BASE
+#define SPI2_I2S_BASE       SPI2_BASE
 #endif
