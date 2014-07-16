@@ -18,6 +18,8 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "common.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
@@ -32,8 +34,6 @@ static void clock_setup(void)
 	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOA);
-	rcc_periph_clock_enable(RCC_SYSCFG_COMP);
-
 }
 
 static void gpio_setup(void)
@@ -71,12 +71,13 @@ void adc_comp_isr()
 }
 int main(void)
 {
-	int i, j = 0, c = 0;
-
-	clock_setup();
-	gpio_setup();
+    PWR_Init();
+    clock_setup();
+    gpio_setup();
+    UART_Initialize();
+        
 	//usart_setup();
-
+	printf("Power Up\n");
 	/* Blink the LED (PD12) on the board with every transmitted byte. */
 	while (1) {
 		if(gpio_get(GPIOA, GPIO0)) {

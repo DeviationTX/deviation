@@ -7,6 +7,7 @@ struct model {
     u32 fixed_id;
     u8 num_channels;
     u8 protocol;
+    u8 module;
     s16 proto_opts[NUM_PROTO_OPTS];
     struct limit limits[9];
 };

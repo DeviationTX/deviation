@@ -11,8 +11,16 @@ LIBOPENCM3 = ../libopencm3/lib/libopencm3_stm32f0.a
 ###############################################
 # Source Files                                #
 ###############################################
-SRC_C = universaltx.c
-SRC_C    := $(SRC_C) $(wildcard ../protocol/*.c) $(wildcard ../protocol/spi/*.c)
+SRC_C = universaltx.c \
+        utx_uart.c    \
+        utx_power.c   \
+        utx_pactl.c
+
+SRC_C    := $(SRC_C) \
+            $(wildcard ../protocol/*.c) \
+            $(wildcard ../protocol/spi/*.c) \
+            $(wildcard ../target/common/stm32/*.c)
+
 EXCLUDE  := ../protocol/ppmout.c ../protocol/usbhid.c ../protocol/protocol.c ../protocol/spi/avr_program.c
 SRC_C    := $(filter-out $(EXCLUDE),$(SRC_C))
 

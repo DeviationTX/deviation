@@ -17,7 +17,7 @@ typedef int32_t  s32;
 #include <string.h>
 #include <unistd.h>
 #include "../../std.h"
-#include "target_defs.h"
+#include "target.h"
 
 #define CHAN_MAX_VALUE 10000
 #define CHAN_MIN_VALUE -10000
@@ -53,6 +53,14 @@ enum TxPower {
     TXPOWER_LAST,
 };
 
+enum {
+    CYRF6936,
+    A7105,
+    CC2500,
+    NRF24L01,
+    MULTIMOD,
+    TX_MODULE_LAST,
+};
 int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
 /*
 void pabort(const char *s);
