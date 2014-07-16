@@ -22,6 +22,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
