@@ -34,7 +34,7 @@
 #define LIBOPENCM3_EXTI_H
 /**@{*/
 
-#include <libopencm3/stm32/common/exti_common_all.h>
+#include <libopencm3/stm32/common/exti_common_l1f24.h>
 /**@}*/
 
 #endif
