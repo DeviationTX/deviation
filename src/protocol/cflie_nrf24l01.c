@@ -32,9 +32,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
-#ifdef CFLIE_TELEMETRY
 #include "telemetry.h"
-#endif
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
