@@ -27,34 +27,34 @@
 //GPIOA.14
 static void  CS_HI() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[MULTIMOD].port) {
+    if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
-        if(Transmitter.module_enable[CC2500].port == SWITCH_ADDRESS) {
+        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[CC2500].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();
             return;
         }
     }
 #endif
-    PROTOSPI_pin_set(Transmitter.module_enable[CC2500]);
+    PROTOSPI_pin_set(MODULE_ENABLE[CC2500]);
 }
 
 static void CS_LO() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[MULTIMOD].port) {
+    if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
-        if(Transmitter.module_enable[CC2500].port == SWITCH_ADDRESS) {
+        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[CC2500].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();
             return;
         }
     }
 #endif
-    PROTOSPI_pin_clear(Transmitter.module_enable[CC2500]);
+    PROTOSPI_pin_clear(MODULE_ENABLE[CC2500]);
 }
 
 void CC2500_WriteReg(u8 address, u8 data)

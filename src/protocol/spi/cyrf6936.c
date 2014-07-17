@@ -33,34 +33,34 @@
 #define Delay usleep
 static void  CS_HI() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[MULTIMOD].port) {
+    if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(Transmitter.module_enable[MULTIMOD]);
-        if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
+        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();
             return;
         }
     }
 #endif
-    PROTOSPI_pin_set(Transmitter.module_enable[CYRF6936]);
+    PROTOSPI_pin_set(MODULE_ENABLE[CYRF6936]);
 }
 
 static void CS_LO() {
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[MULTIMOD].port) {
+    if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
         //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMOD]);
-        if(Transmitter.module_enable[CYRF6936].port == SWITCH_ADDRESS) {
+        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
             for(int i = 0; i < 20; i++)
                 _NOP();
             return;
         }
     }
 #endif
-    PROTOSPI_pin_clear(Transmitter.module_enable[CYRF6936]);
+    PROTOSPI_pin_clear(MODULE_ENABLE[CYRF6936]);
 }
 
 void CYRF_WriteRegister(u8 address, u8 data)
@@ -149,6 +149,7 @@ void CYRF_GetMfgData(u8 data[])
     CYRF_WriteRegister(0x25, 0x00); 
 }
 
+#if HAS_MULTIMOD_SUPPORT
 static void AWA24S_SetTxRxMode(enum TXRX_State mode)
 {
     //AWA24S
@@ -172,6 +173,7 @@ static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
         CYRF_WriteRegister(0x0E,0x80);
     }
 }
+#endif
 /*
  * 1 - Tx else Rx
  */
@@ -180,12 +182,12 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
     //Set the post tx/rx state
     CYRF_WriteRegister(0x0F, mode == TX_EN ? 0x2C : 0x28);
 #if HAS_MULTIMOD_SUPPORT
-    if (Transmitter.module_enable[CYRF6936].port == 0xFFFFFFFF) {
-        if ((Transmitter.module_enable[CYRF6936].pin >> 8) == 0x01) {
+    if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
+        if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
             AWA24S_SetTxRxMode(mode);
             return;
         }
-        if ((Transmitter.module_enable[CYRF6936].pin >> 8) == 0x02) {
+        if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x02) {
             BUYCHINA_SetTxRxMode(mode);
             return;
         }
