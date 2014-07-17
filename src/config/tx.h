@@ -72,6 +72,8 @@ struct Transmitter {
 };
 
 extern struct Transmitter Transmitter;
+#define MODULE_ENABLE Transmitter.module_enable
+
 void CONFIG_LoadTx();
 void CONFIG_LoadHardware();
 
