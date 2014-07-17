@@ -40,6 +40,7 @@ void PACTL_Init()
     exti_enable_request(EXTI21);
     //comp_enable(COMP1);
     //nvic_enable_irq(NVIC_ADC_COMP_IRQ);
+    PACTL_SetTxRxMode(TXRX_OFF);
 }
 
 void adc_comp_isr()
@@ -56,7 +57,7 @@ void adc_comp_isr()
     exti_reset_request(EXTI21);
 }
 
-void PACTL_SetTxRxMode(enum TXRX_State mode)
+void PACTL_SetTxRxMode(int mode)
 {
     if (mode == TXRX_OFF) {
         comp_disable(COMP1);

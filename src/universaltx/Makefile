@@ -11,17 +11,20 @@ LIBOPENCM3 = ../libopencm3/lib/libopencm3_stm32f0.a
 ###############################################
 # Source Files                                #
 ###############################################
-SRC_C = universaltx.c \
-        utx_uart.c    \
-        utx_power.c   \
-        utx_pactl.c
+SRC_C = universaltx.c  \
+        utx_misc.c     \
+        utx_pactl.c    \
+        utx_power.c    \
+        utx_protospi.c \
+        utx_syscalls.c \
+        utx_uart.c
 
 SRC_C    := $(SRC_C) \
             $(wildcard ../protocol/*.c) \
             $(wildcard ../protocol/spi/*.c) \
             $(wildcard ../target/common/stm32/*.c)
 
-EXCLUDE  := ../protocol/ppmout.c ../protocol/usbhid.c ../protocol/protocol.c ../protocol/spi/avr_program.c
+EXCLUDE  := ../protocol/ppmout.c ../protocol/usbhid.c ../protocol/testrf.c ../protocol/protocol.c ../protocol/spi/avr_program.c
 SRC_C    := $(filter-out $(EXCLUDE),$(SRC_C))
 
 ###############################################
@@ -68,10 +71,14 @@ HGTEST := $(shell mkdir -p $(ODIR); \
 #This section contains switches used for building#
 ##################################################
 CFLAGS = -DSTM32F0 -mthumb -mcpu=cortex-m0 -msoft-float \
-         -Wall -Wextra -Werror=undef -std=gnu99 \
+         -fdata-sections -ffunction-sections -fno-builtin-printf \
+         -Wall -Wextra -Werror=undef -std=gnu99 --specs=nano.specs \
          -DHGVERSION="\"${HGVERSION}\"" \
          -I../libopencm3/include/ -Iinclude
-LFLAGS = --static -nostartfiles -Tuniversaltx.ld -Wl,-Map=universaltx.map -Wl,--gc-sections -L../libopencm3/lib/ -L../libopencm3/lib/stm32/f0/ -lopencm3_stm32f0 -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
+
+LFLAGS = --static -nostartfiles -Tuniversaltx.ld -Wl,-Map=universaltx.map \
+         -Wl,--gc-sections -L../libopencm3/lib/ -L../libopencm3/lib/stm32/f0/ \
+         -lopencm3_stm32f0 -Wl,--start-group -lc -lnosys -Wl,--end-group
 ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 endif
@@ -114,6 +121,7 @@ $(TARGET).dfu: $(TARGET).elf
 	$(DUMP) -d $(TARGET).elf > $(TARGET).list
 	../../utils/dfu.py -b 0x08000000:$(TARGET).bin $(TARGET).dfu
 	rm -f $(TARGET).bin
+	../../utils/get_mem_usage.pl $(TARGET).map
 
 ##############################
 #Build rules for all .o files#

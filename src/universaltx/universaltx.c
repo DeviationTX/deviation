@@ -19,78 +19,30 @@
  */
 
 #include "common.h"
+#include "config/model.h"
+#include "config/tx.h"
+#include "protocol/interface.h"
 
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/usart.h>
-#include <libopencm3/stm32/comparator.h>
-#include <libopencm3/stm32/exti.h>
-#include <libopencm3/cm3/nvic.h>
+struct model Model;
+struct Transmitter Transmitter;
 
-#define EXTI21				(1 << 21)
-static void clock_setup(void)
-{
-	/* Enable GPIOC clock for LED & USARTs. */
-	rcc_periph_clock_enable(RCC_GPIOC);
-	rcc_periph_clock_enable(RCC_GPIOB);
-	rcc_periph_clock_enable(RCC_GPIOA);
-}
-
-static void gpio_setup(void)
-{
-	/* Setup GPIO pin GPIO8/9 on GPIO port C for LEDs. */
-	gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO8 | GPIO7 | GPIO9);
-	gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO10 | GPIO11);
-
-	/* Setup GPIO pins for USART2 transmit. */
-	gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1);
-	gpio_mode_setup(GPIOA, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO0);
-
-	comp_select_input(COMP1, COMP_CSR_INSEL_1_4_VREFINT);
-        comp_select_speed(COMP1, COMP_CSR_SPEED_HIGH);
-	comp_select_output(COMP1, COMP_CSR_OUTSEL_NONE);
-        comp_select_hyst(COMP1, COMP_CSR_HYST_NO);
-	exti_set_trigger(EXTI21, EXTI_TRIGGER_BOTH);
-	exti_enable_request(EXTI21);
-	comp_enable(COMP1);
-	nvic_enable_irq(NVIC_ADC_COMP_IRQ);
-}
-
-void adc_comp_isr()
-{
-	if(COMP_CSR1 & COMP_CSR_OUT) {
-		gpio_set(GPIOB, GPIO10);
-		gpio_clear(GPIOB, GPIO11);
-		gpio_set(GPIOC, GPIO8);
-	} else {
-		gpio_clear(GPIOB, GPIO10);
-		gpio_set(GPIOB, GPIO11);
-		gpio_clear(GPIOC, GPIO8);
-	}
-	exti_reset_request(EXTI21);
-}
 int main(void)
 {
     PWR_Init();
-    clock_setup();
-    gpio_setup();
+    PACTL_Init();
     UART_Initialize();
+
+    printf("Power Up\n");
+
+    SPI_ProtoInit();
+    printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
+    printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
+    printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
+    printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
         
-	//usart_setup();
-	printf("Power Up\n");
 	/* Blink the LED (PD12) on the board with every transmitted byte. */
 	while (1) {
-		if(gpio_get(GPIOA, GPIO0)) {
-			gpio_set(GPIOC, GPIO7);
-		} else {
-			gpio_clear(GPIOC, GPIO7);
-		}
-		if(COMP_CSR1 & COMP_CSR_OUT) {
-			gpio_set(GPIOC, GPIO9);
-		} else {
-			gpio_clear(GPIOC, GPIO9);
-		}
-	}
+        }
 
 	return 0;
 }

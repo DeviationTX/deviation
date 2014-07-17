@@ -1,17 +1,12 @@
 #ifndef _TX_H_
 #define _TX_H_
 
-struct mcu_pin {
-    u32 port;
-    u16 pin;
-};
-
-
+/* note that MODULE_ENABLE is defined in protospi.h */
 struct Transmitter {
-    struct mcu_pin module_enable[TX_MODULE_LAST];
-    u8 txid;
+    u32 txid;
     //u8 module_poweramp;
 };
+
 extern struct Transmitter Transmitter;
 
 #endif

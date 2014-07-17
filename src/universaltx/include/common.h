@@ -1,6 +1,5 @@
-#define PROTO_HAS_CYRF6936
-#define PROTO_HAS_A7105
-#define PROTO_HAS_CC2500
+#ifndef _COMMON_H_
+#define _COMMON_H_
 
 #define MODULE_CALLTYPE
 
@@ -87,3 +86,4 @@ u32 rand32(); //LFSR based PRNG
 
 /* Target defs */
 void MCU_SerialNumber(u8 *var, int len);
+#endif /*_COMMON_H_ */
