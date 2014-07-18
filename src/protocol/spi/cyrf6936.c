@@ -110,7 +110,7 @@ u8 CYRF_ReadRegister(u8 address)
 
 int CYRF_Reset()
 {
-#if HAS_MULTIMOD_SUPPORT
+#if HAS_MULTIMOD_SUPPORT || (defined(HAS_CYRF_RESET) && ! HAS_CYRF_RESET)
         CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x01);
         Delay(200);
         /* Reset the CYRF chip */
