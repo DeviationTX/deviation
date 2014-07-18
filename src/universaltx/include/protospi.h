@@ -9,7 +9,7 @@ uint8_t spi_xfer8(uint32_t spi, uint8_t data);
 
 #define PROTOSPI_pin_set(io) gpio_set(io.port,io.pin)
 #define PROTOSPI_pin_clear(io) gpio_clear(io.port,io.pin)
-#define spi_xfer 0xdeadbeef
+#define spi_xfer DO_NOT_USE
 #define PROTOSPI_xfer(byte) spi_xfer8(SPI2, byte)
 #define PROTOSPI_mode_setup(io, mode, pullup) gpio_mode_setup(io.port, mode, pullup, io.pin)
 

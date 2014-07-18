@@ -35,10 +35,10 @@ int main(void)
     printf("Power Up\n");
 
     SPI_ProtoInit();
-    printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
-    printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
-    printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
     printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
+    printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
+    printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
+    printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
         
 	/* Blink the LED (PD12) on the board with every transmitted byte. */
 	while (1) {

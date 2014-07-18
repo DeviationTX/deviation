@@ -55,6 +55,17 @@ u8 PROTOSPI_read3wire(){
 }
 void SPI_ProtoInit()
 {
+#ifdef DISCOVERY
+    /* This is only relavent to the Discovery board
+       It uses SPI2 to control the MEMS chip, which interferest with theUniversalTx operation
+       CSN is on PC.0, so pull it high to ensure the MEMS device is disabled
+     */
+    rcc_periph_clock_enable(RCC_GPIOC);
+    gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO0);
+    gpio_set(GPIOC, GPIO0);
+#endif
+
+
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_SPI2);
@@ -82,6 +93,7 @@ void SPI_ProtoInit()
     PROTOSPI_pin_clear(RF_MUXSEL1);
     PROTOSPI_pin_clear(RF_MUXSEL2);
 
+    spi_reset(SPI2);
     spi_init_master(SPI2, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
@@ -90,8 +102,6 @@ void SPI_ProtoInit()
                     SPI_CR1_MSBFIRST);
     spi_enable_software_slave_management(SPI2);
     spi_set_nss_high(SPI2);
+    SPI_CR2(SPI2) = 0x1700;
     spi_enable(SPI2);
-printf("x\n");
-    spi_send8(SPI2, 0xa5);
-printf("y: %02x\n", SPI_SR(SPI2));
 }
