@@ -44,7 +44,10 @@ static const char * const frsky_opts[] = {
 enum {
     PROTO_OPTS_FREQFINE = 0,
     PROTO_OPTS_FREQCOURSE = 1,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 static u8 packet[16];
 static u32 state;
 static u32 seed;

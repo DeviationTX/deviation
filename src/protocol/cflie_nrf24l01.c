@@ -107,7 +107,10 @@ static const char * const cflie_opts[] = {
 };
 enum {
     PROTOOPTS_TELEMETRY = 0,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define TELEM_OFF 0
 #define TELEM_ON 1
 #endif

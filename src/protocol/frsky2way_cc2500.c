@@ -46,7 +46,10 @@ enum {
     PROTO_OPTS_TELEM = 0,
     PROTO_OPTS_FREQFINE = 1,
     PROTO_OPTS_FREQCOURSE = 2,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define TELEM_ON 0
 #define TELEM_OFF 1
 static u8 packet[40];

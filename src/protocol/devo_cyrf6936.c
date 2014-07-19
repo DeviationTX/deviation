@@ -54,12 +54,14 @@ static const char * const devo_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   NULL
 };
+enum {
+    PROTOOPTS_TELEMETRY = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 #define TELEM_ON 0
 #define TELEM_OFF 1
-
-typedef enum {
-    PROTOOPTS_TELEMETRY = 0,
-} PROTO_OPTS_DEFINITION;
 
 enum PktState {
     DEVO_BIND,

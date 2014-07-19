@@ -114,7 +114,10 @@ static const char * const v202_opts[] = {
 enum {
     PROTOOPTS_STARTBIND = 0,
     PROTOOPTS_USEBLINK,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 enum {
     STARTBIND_NO  = 0,
     STARTBIND_YES = 1,

@@ -45,11 +45,15 @@ static const char * const flysky_opts[] = {
   "WLToys V9x9",  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
 };
-#define WLTOYS_ON 1
-#define WLTOYS_OFF 0
 enum {
     PROTOOPTS_WLTOYS = 0,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+#define WLTOYS_ON 1
+#define WLTOYS_OFF 0
+
 static const u8 A7105_regs[] = {
      -1,  0x42, 0x00, 0x14, 0x00,  -1 ,  -1 , 0x00, 0x00, 0x00, 0x00, 0x01, 0x21, 0x05, 0x00, 0x50,
     0x9e, 0x4b, 0x00, 0x02, 0x16, 0x2b, 0x12, 0x00, 0x62, 0x80, 0x80, 0x00, 0x0a, 0x32, 0xc3, 0x0f,

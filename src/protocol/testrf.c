@@ -41,10 +41,13 @@ static const char * const testrf_opts[] = {
 };
 enum {
     TESTRF_RF = 0,
-    TESTRF_POWER = 1,
-    TESTRF_RFCHAN = 2,
-    TESTRF_RFRATE = 3,
+    TESTRF_POWER,
+    TESTRF_RFCHAN,
+    TESTRF_RFRATE,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 //if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
 static unsigned char packet[16];
 #define BV(bit) (1 << bit)

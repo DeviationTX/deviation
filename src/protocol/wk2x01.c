@@ -81,10 +81,13 @@ static const char * const wk2601_opts[] = {
   _tr_noop("COL Limit"), "-100", "100", NULL,
   NULL
 };
-#define WK2601_OPT_CHANMODE  0
-#define WK2601_OPT_PIT_INV   1
-#define WK2601_OPT_PIT_LIMIT 2
-
+enum {
+    WK2601_OPT_CHANMODE = 0,
+    WK2601_OPT_PIT_INV,
+    WK2601_OPT_PIT_LIMIT,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static void add_pkt_crc(u8 init)
 {

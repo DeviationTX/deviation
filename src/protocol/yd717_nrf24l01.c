@@ -117,7 +117,9 @@ enum {
 #ifdef YD717_TELEMETRY
     PROTOOPTS_TELEMETRY,
 #endif
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define FORMAT_YD717   0
 #define FORMAT_SKYWLKR 1

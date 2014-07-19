@@ -55,7 +55,9 @@ enum {
     DELTA_PW,
     NOTCH_PW,
     PERIOD_PW,
+    LAST_PROTO_OPT,
 };
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 volatile u8 state;
 static void build_data_pkt()

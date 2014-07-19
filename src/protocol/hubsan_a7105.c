@@ -55,8 +55,10 @@ static const char * const hubsan4_opts[] = {
 
 enum {
     PROTOOPTS_VTX_FREQ = 0,
-    PROTOOPTS_TELEMETRY
-} PROTO_OPTS_DEFINITION;
+    PROTOOPTS_TELEMETRY,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static u8 packet[16];
 static u8 channel;

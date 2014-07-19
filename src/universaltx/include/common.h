@@ -3,6 +3,10 @@
 
 #define MODULE_CALLTYPE
 
+//Magic macro to check enum size
+//#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
+#define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
+
 #include <stdint.h>
 typedef uint8_t  u8;
 typedef uint16_t u16;
