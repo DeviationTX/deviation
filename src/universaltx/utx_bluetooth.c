@@ -25,63 +25,109 @@
 
 volatile char *ptr;
 volatile char bt_buf[20];
+u8 state;
+
+static inline void BT_ResetPtr()
+{
+    ptr = bt_buf;
+}
 
 void BT_Initialize()
 {
     /* Enable clocks for GPIO port A (for GPIO_USART1_TX) and USART1. */
     rcc_periph_clock_enable(RCC_GPIOA);
+#ifdef DISCOVERY
+    rcc_periph_clock_enable(RCC_USART3);
+    rcc_periph_clock_enable(RCC_GPIOC);
+    nvic_enable_irq(NVIC_USART3_4_IRQ);
+#else
     rcc_periph_clock_enable(RCC_USART2);
+    nvic_enable_irq(NVIC_USART2_IRQ);
+#endif
 
     PORT_mode_setup(BT_STATE, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN);
+    PORT_mode_setup(BT_KEY, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
+    PORT_pin_clear(BT_KEY);
 
     /* Setup GPIO pin for Tx/Rx */
-    gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2 | GPIO3);
-    gpio_set_af(GPIOA, GPIO_AF1, GPIO2 | GPIO3); // AF4 ==> USART4
+    PORT_mode_setup(BT_TX, GPIO_MODE_AF, GPIO_PUPD_NONE);
+    PORT_mode_setup(BT_RX, GPIO_MODE_AF, GPIO_PUPD_NONE);
+    gpio_set_output_options(BT_RX.port, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, BT_RX.pin);
+    gpio_set_af(BT_TX.port, GPIO_AF1, BT_TX.pin | BT_RX.pin);
 
     /* Setup UART parameters. */
-    usart_set_baudrate(USART2, 9600);
-    usart_set_databits(USART2, 8);
-    usart_set_stopbits(USART2, USART_CR2_STOP_1_0BIT);
-    usart_set_mode(USART2, USART_MODE_TX_RX);
-    usart_set_parity(USART2, USART_PARITY_NONE);
-    usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
-    usart_enable_rx_interrupt(USART2);
+    usart_set_baudrate(BTUART, 9600);
+    usart_set_databits(BTUART, 8);
+    usart_set_stopbits(BTUART, USART_CR2_STOP_1_0BIT);
+    usart_set_mode(BTUART, USART_MODE_TX_RX);
+    usart_set_parity(BTUART, USART_PARITY_NONE);
+    usart_set_flow_control(BTUART, USART_FLOWCONTROL_NONE);
+    usart_enable_rx_interrupt(BTUART);
 
-    ptr = bt_buf;
-    nvic_enable_irq(NVIC_USART2_IRQ);
+    BT_ResetPtr();
+    state = 0;
     /* Finally enable the USART. */
-    usart_enable(USART2);
+    usart_enable(BTUART);
+}
+
+void BT_Test()
+{
+    usleep(1000000);
+    PORT_pin_set(BT_KEY);
+    usleep(100000);
+    BT_ResetPtr();
+    usart_send_blocking(BTUART, 'A');
+    usart_send_blocking(BTUART, 'T');
+    usart_send_blocking(BTUART, '\r');
+    usart_send_blocking(BTUART, '\n');
+    while(1) {
+        char tmp[32];
+        while(ptr == bt_buf || *(ptr-1) != '\n') {
+        }
+        int len = ptr - bt_buf;
+        memcpy(tmp, (char *)bt_buf, len);
+        BT_ResetPtr();
+        tmp[len] = 0;
+        printf("%s", tmp);
+        if((tmp[0] == 'O' && tmp[1] == 'K') || (tmp[0] == 'F' && tmp[1] == 'A')) {
+            printf("CmdDone\n");
+            break;
+        }
+    }
+    PORT_pin_clear(BT_KEY);
+    usleep(150000);
 }
 
 void BT_HandleInput()
 {
-    if(! PORT_pin_get(BT_STATE)) {
-        return;
+    u8 newstate = PORT_pin_get(BT_STATE);
+    char tmp[sizeof(bt_buf)];
+
+    if (newstate != state) {
+        state = newstate;
+        printf("Changed state to: %d\n", state);
     }
-    if(ptr != bt_buf) {
-        if(*(ptr-1) != '\r' || *ptr != '\r') {
-            return;
-        }
-        if((ptr - bt_buf) > (int)strlen("PROTOCOL") && strncmp((char *)bt_buf, "PROTOCOL", (ptr - bt_buf)) == 0) {
-            ptr = bt_buf;
-            printf("PROTOCOL\n");
+    if(state && ptr != bt_buf && *(ptr-1) == '\r') {
+        int len = ptr - bt_buf;
+        memcpy(tmp, (char *)bt_buf, len);
+        tmp[len] = 0;
+        BT_ResetPtr();
+        if(strcmp(tmp, "PROTOCOL\r") == 0) {
+            printf("PROTOCOL Cmd\n");
         }
     }
 }
 
-void usart2_isr(void)
+void BT_ISR(void)
 {
-    if (((USART_CR1(USART2) & USART_CR1_RXNEIE) != 0) &&
-        ((USART_ISR(USART2) & USART_ISR_RXNE) != 0))
+    if (((USART_CR1(BTUART) & USART_CR1_RXNEIE) != 0) &&
+        ((USART_ISR(BTUART) & USART_ISR_RXNE) != 0))
     {
-        /* Indicate that we got data. */
-        gpio_toggle(GPIOD, GPIO12);
-
         /* Retrieve the data from the peripheral. */
-        *ptr = usart_recv(USART2);
-        printf("%c", *ptr);
+        *ptr = usart_recv(BTUART);
         if ((ptr - bt_buf) <  (int)sizeof(bt_buf) -1) {
             ptr++;
         }
+        //printf("%c", *ptr);
     }
 }

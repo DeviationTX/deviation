@@ -22,6 +22,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
+#include "ports.h"
 
 struct model Model;
 struct Transmitter Transmitter;
@@ -32,15 +33,16 @@ int main(void)
     PACTL_Init();
     UART_Initialize();
     BT_Initialize();
+    SPI_ProtoInit();
 
     printf("Power Up\n");
-
-    SPI_ProtoInit();
     printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
     printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
     printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
-        
+printf("Here\n");
+    BT_Test();        
+    printf("Done\n");
     while (1) {
         BT_HandleInput();
     }

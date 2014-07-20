@@ -1,6 +1,8 @@
 #ifndef _PORTS_H_
 #define _PORTS_H_
 
+#include <libopencm3/stm32/gpio.h>
+
 #define PORT_mode_setup(io, mode, pullup) gpio_mode_setup(io.port, mode, pullup, io.pin)
 #define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
 #define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
@@ -22,7 +24,24 @@ static const struct mcu_pin MISO          = {GPIOB, GPIO14};
 static const struct mcu_pin SCK           = {GPIOB, GPIO13};
 
 static const struct mcu_pin PPM           = {GPIOA, GPIO0};
+
+
 static const struct mcu_pin BT_STATE      = {GPIOA, GPIO4};
+#if DISCOVERY
+    //PA7 used by touch sensor
+    static const struct mcu_pin BT_KEY        = {GPIOC, GPIO12};
+    static const struct mcu_pin BT_TX         = {GPIOC, GPIO10};
+    static const struct mcu_pin BT_RX         = {GPIOC, GPIO11};
+    #define BTUART USART3
+    #define BT_ISR usart3_4_isr
+#else
+    static const struct mcu_pin BT_KEY        = {GPIOA, GPIO7};
+    static const struct mcu_pin BT_TX         = {GPIOA, GPIO2};
+    static const struct mcu_pin BT_RX         = {GPIOA, GPIO3};
+    #define BTUART USART2
+    #define BT_ISR usart2_isr
+#endif
+
 
 static const struct mcu_pin module_enable[TX_MODULE_LAST] = {
        [CYRF6936] = {GPIOA, GPIO9},
