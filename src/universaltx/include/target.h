@@ -1,6 +1,7 @@
 #ifndef _TARGET_H_
 #define _TARGET_H_
 
+#define MAX_PPM_IN_CHANNELS 12
 struct mcu_pin {
     u32 port;
     u16 pin;

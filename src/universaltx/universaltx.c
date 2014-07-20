@@ -31,6 +31,7 @@ int main(void)
     PWR_Init();
     PACTL_Init();
     UART_Initialize();
+    BT_Initialize();
 
     printf("Power Up\n");
 
@@ -40,9 +41,9 @@ int main(void)
     printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
         
-	/* Blink the LED (PD12) on the board with every transmitted byte. */
-	while (1) {
-        }
+    while (1) {
+        BT_HandleInput();
+    }
 
-	return 0;
+    return 0;
 }

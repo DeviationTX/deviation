@@ -5,6 +5,9 @@
 struct model {
     u32 tx_power;
     u32 fixed_id;
+    u16 ppmin_centerpw;
+    u16 ppmin_deltapw;
+    u8 num_ppmin;
     u8 num_channels;
     u8 protocol;
     u8 module;

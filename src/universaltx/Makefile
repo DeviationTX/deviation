@@ -12,9 +12,11 @@ LIBOPENCM3 = ../libopencm3/lib/libopencm3_stm32f0.a
 # Source Files                                #
 ###############################################
 SRC_C = universaltx.c  \
+        utx_bluetooth.c \
         utx_misc.c     \
         utx_pactl.c    \
         utx_power.c    \
+        utx_ppmin.c    \
         utx_protospi.c \
         utx_syscalls.c \
         utx_uart.c
