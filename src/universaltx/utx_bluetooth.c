@@ -36,7 +36,7 @@ void BT_Initialize()
 {
     /* Enable clocks for GPIO port A (for GPIO_USART1_TX) and USART1. */
     rcc_periph_clock_enable(RCC_GPIOA);
-#ifdef DISCOVERY
+#if DISCOVERY
     rcc_periph_clock_enable(RCC_USART3);
     rcc_periph_clock_enable(RCC_GPIOC);
     nvic_enable_irq(NVIC_USART3_4_IRQ);

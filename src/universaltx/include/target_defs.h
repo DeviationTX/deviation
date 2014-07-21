@@ -6,7 +6,7 @@
 #define PROTO_HAS_CC2500
 #define PROTO_HAS_NRF24L01
 
-#define DISCOVERY 1 //FIXME: Disable this!
+#define DISCOVERY 0 //FIXME: Disable this!
 
 #define HAS_MULTIMOD_SUPPORT 0
 #define SWITCH_ADDRESS 0xFFFFFFFF

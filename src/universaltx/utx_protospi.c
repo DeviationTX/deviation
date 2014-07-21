@@ -119,7 +119,7 @@ void SPI_ProtoMasterSlaveInit(int slave)
 
 void SPI_ProtoInit()
 {
-#ifdef DISCOVERY
+#if DISCOVERY
     /* This is only relavent to the Discovery board
        It uses SPI2 to control the MEMS chip, which interferest with theUniversalTx operation
        CSN is on PC.0, so pull it high to ensure the MEMS device is disabled
