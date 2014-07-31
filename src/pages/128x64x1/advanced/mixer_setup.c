@@ -57,7 +57,7 @@ enum {
 };
 static int simple_row_cb(int absrow, int relrow, int y, void *data)
 {
-    const char *label = NULL;
+    const char *label = "";
     void *tgl = NULL;
     void *value = NULL;
     data = NULL;
@@ -118,7 +118,7 @@ static int complex_size_cb(int absrow, void *data) {
 
 static int complex_row_cb(int absrow, int relrow, int y, void *data)
 {
-    const char *label = NULL;
+    const char *label = "";
     void *tgl = NULL;
     void *value = NULL;
     data = NULL;

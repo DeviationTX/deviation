@@ -85,7 +85,7 @@ enum {
 static int row2_cb(int absrow, int relrow, int y, void *data)
 {
     data = NULL;
-    const void *label = NULL;
+    const void *label = "";
     void *value = NULL;
 
     switch(absrow) {

@@ -164,6 +164,7 @@ void navigate_symbolicons(s8 direction) {
     else
         GUI_SetSelected((guiObject_t *)GUI_GetNextSelectable(obj));
     return;
+#if 0
     obj = GUI_GetSelected();
     if (obj == (guiObject_t *)&gui->toggleicon[0]
         || obj == (guiObject_t *)&gui->toggleicon[1]
@@ -176,6 +177,7 @@ void navigate_symbolicons(s8 direction) {
             GUI_SetSelected((guiObject_t *)&gui->symbolicon[0]);
         }
     }
+#endif
 }
 
 unsigned _action_cb(u32 button, unsigned flags, void *data)

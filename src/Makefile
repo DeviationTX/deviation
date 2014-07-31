@@ -206,7 +206,8 @@ endif
 
 coverity:
 	rm -rf cov-int 2>/dev/null; make distclean
-	cov-build --dir cov-int make TARGET=$(TARGET)
+	cov-build --dir cov-int make TARGET=devo8
+	cov-build --dir cov-int make TARGET=devo10
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 ##########################################
 #Ensure necessray directories are created#
