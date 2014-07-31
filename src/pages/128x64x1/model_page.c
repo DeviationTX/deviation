@@ -39,7 +39,7 @@ static const char * show_icontext_cb(guiObject_t *obj, const void *data)
     unsigned int i;
     if(! Model.icon[0])
         return _tr("Default");
-    strcpy(tempstring, Model.icon+9);
+    tempstring_cpy(Model.icon+9);
     for(i = 0; i < strlen(tempstring); i++) {
         if(tempstring[i] == '.') {
             tempstring[i] = '\0';
@@ -146,7 +146,7 @@ void PAGE_ModelInit(int page)
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
 
     if(Model.fixed_id == 0)
-        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
+        strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
 
@@ -162,7 +162,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't 
     (void)data;
     GUI_RemoveObj(obj);
     if (callback_result == 1) {  // only change name when DONE is hit, otherwise, discard the change
-        strncpy(Model.name, (const char *)tempstring, sizeof(Model.name));
+        strlcpy(Model.name, (const char *)tempstring, sizeof(Model.name));
         //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
     }
@@ -175,7 +175,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     (void)data;
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
-    strcpy(tempstring, (const char *)Model.name); // Don't change model name directly
+    tempstring_cpy((const char *)Model.name); // Don't change model name directly
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, 20, // no more than 20 chars is allowed for model name
             _changename_done_cb, (void *)&callback_result);
 }

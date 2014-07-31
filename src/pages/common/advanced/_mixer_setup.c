@@ -376,7 +376,7 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 *source = (u8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
-        strcpy(tempstring, _tr("None"));
+        tempstring_cpy(_tr("None"));
         return tempstring;
     }
     u8 changed;
@@ -448,7 +448,7 @@ static void set_src_enable(int curve_type)
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
     if (!GUI_IsTextSelectEnabled(obj)) {
-        strcpy(tempstring, _tr("Linked"));
+        tempstring_cpy(_tr("Linked"));
         return tempstring;
     }
     u8 changed;
@@ -509,6 +509,7 @@ static void reorder_return_cb(u8 *list)
     int i;
     if (list) {
         struct Mixer tmpmix[NUM_COMPLEX_MIXERS];
+        memset(tmpmix, 0, sizeof(tmpmix));
         int new_cur_mixer = mp->cur_mixer - mp->mixer;
         for(i = 0; i < NUM_COMPLEX_MIXERS; i++) {
             if(list[i] == 0)

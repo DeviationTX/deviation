@@ -145,8 +145,8 @@ void CC2500_SetPower(int power)
         0xFE, // 0dbm
         0xFF // 1.5dbm
     };
-    if (power >= 8)
-        power = 8;
+    if (power > 7)
+        power = 7;
     CC2500_WriteReg(CC2500_3E_PATABLE,  patable[power]);
 }
 int CC2500_Reset()

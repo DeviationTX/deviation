@@ -54,7 +54,7 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int width; int height;
     u16 txt_w, txt_h;
-    strcpy(tempstring, (const char *)data);
+    tempstring_cpy((const char *)data);
     GUI_GetSize(obj, &width, &height);
     width -=2;
     while(1) {

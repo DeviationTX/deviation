@@ -94,7 +94,7 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
     if (obj && crc == dialogcrc)
         return tempstring;
     u32 bind_time = PROTOCOL_Binding();
-    strncpy(tempstring, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(tempstring));
+    tempstring_cpy(_tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."));
     u32 len = strlen(tempstring);
     if (bind_time != 0xFFFFFFFF && len < sizeof(tempstring)) {
         snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);

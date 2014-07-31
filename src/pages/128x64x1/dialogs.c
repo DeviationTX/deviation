@@ -139,8 +139,7 @@ void PAGE_ShowWarning(const char *title, const char *str)
     if (dialog)
         return;
     if (str != tempstring)
-        strncpy(tempstring, str, sizeof(tempstring));
-    tempstring[sizeof(tempstring) - 1] = 0;
+        tempstring_cpy(str);
     current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }

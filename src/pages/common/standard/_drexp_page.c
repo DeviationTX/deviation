@@ -54,13 +54,13 @@ static const char *set_type_cb(guiObject_t *obj, int dir, void *data)
     }
     switch (drexp_type) {
     case DREXP_AIL:
-        strcpy(tempstring, (const char *)_tr("AIL"));
+        tempstring_cpy((const char *)_tr("AIL"));
         break;
     case DREXP_ELE:
-        strcpy(tempstring, (const char *)_tr("ELE"));
+        tempstring_cpy((const char *)_tr("ELE"));
         break;
     default:
-        strcpy(tempstring, (const char *)_tr("RUD"));
+        tempstring_cpy((const char *)_tr("RUD"));
         break;
     }
     return tempstring;
@@ -103,7 +103,7 @@ static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
         update_graph(pit_mode);
     }
     if (curve->points[0] == 0)
-        strcpy(tempstring, _tr("LIN"));
+        tempstring_cpy(_tr("LIN"));
     else {
         sprintf(tempstring, "%d", curve->points[0]);
         strcat(tempstring, "%");

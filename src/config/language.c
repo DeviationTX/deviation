@@ -149,7 +149,7 @@ void CONFIG_ReadLang(u8 idx)
             lookup->hash = hash;
             lookup->pos = pos;
             lookup++;
-            strncpy(strings + pos, line, len);
+            strlcpy(strings + pos, line, len);
             pos += len;
         }
     }

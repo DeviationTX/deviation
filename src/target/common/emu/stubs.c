@@ -97,7 +97,7 @@ int FS_ReadDir(char *path)
     struct dirent *dir = readdir(dh);
     if (! dir)
         return 0;
-    strncpy(path, dir->d_name, 13);
+    strlcpy(path, dir->d_name, 13);
     return 1;
 }
 

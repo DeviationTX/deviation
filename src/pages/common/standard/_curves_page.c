@@ -56,7 +56,7 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         for ( i = 0; i < 9; i++)
             GUI_Redraw(&gui->val[i]);
     }
-    strcpy(tempstring, (const char *)STDMIX_ModeName(pit_mode));
+    tempstring_cpy((const char *)STDMIX_ModeName(pit_mode));
     return tempstring;
 }
 
@@ -104,11 +104,11 @@ static const char *set_holdstate_cb(guiObject_t *obj, int dir, void *data)
         update_textsel_state();
     }
     if (pit_mode != PITTHROMODE_HOLD)
-        strcpy(tempstring, "");
+        tempstring_cpy("");
     else if (pit_hold_state)
-        strcpy(tempstring, _tr("On"));
+        tempstring_cpy(_tr("On"));
     else
-        strcpy(tempstring, _tr("Off"));
+        tempstring_cpy(_tr("Off"));
     return tempstring;
 }
 

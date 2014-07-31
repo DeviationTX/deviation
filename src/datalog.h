@@ -31,7 +31,7 @@ enum {
 #define CLOCK_SIZE   4
 #define TIMER_SIZE   2
 
-#define NUM_DATALOG (NUM_TIMERS + NUM_TELEM + NUM_SOURCES + (HAS_RTC ? 3 : 2))
+#define NUM_DATALOG DLOG_LAST
 #define DATALOG_BYTE(x) ((x) / 8)
 #define DATALOG_POS(x) ((x) % 8)
 

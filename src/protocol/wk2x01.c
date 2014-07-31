@@ -508,7 +508,7 @@ static u16 wk_cb()
     return 1200;
 }
 
-static void bind()
+static void wk_bind()
 {
     if((Model.protocol != PROTOCOL_WK2801) || (! Model.fixed_id))
         return;
@@ -564,7 +564,7 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
-        case PROTOCMD_BIND:  bind(); return 0;
+        case PROTOCMD_BIND:  wk_bind(); return 0;
         case PROTOCMD_DEFAULT_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
               ? (void *)8L
               : (Model.protocol == PROTOCOL_WK2601)

@@ -245,8 +245,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
     PAGE_SetModal(0);
     if (callback_result) {
         int ch = callback_result - 1;
-        strncpy(Model.virtname[ch], tempstring, sizeof(Model.virtname[ch]));
-        Model.virtname[ch][sizeof(Model.virtname[0])-1] = '\0'; // strncpy doesn't put that '\0' at the end
+        strlcpy(Model.virtname[ch], tempstring, sizeof(Model.virtname[ch]));
     }
 }
 
@@ -256,7 +255,7 @@ void virtname_cb(guiObject_t *obj, const void *data)
     int ch = (long)data - NUM_OUT_CHANNELS;
     PAGE_SetModal(1);
     if (Model.virtname[ch][0]) {
-        strncpy(tempstring, Model.virtname[ch], sizeof(tempstring));
+        tempstring_cpy(Model.virtname[ch]);
     } else {
         snprintf(tempstring, sizeof(tempstring), "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
     }

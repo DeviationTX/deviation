@@ -204,6 +204,10 @@ ifneq "$(INCLUDE_FS)" "1"
 endif
 	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
 
+coverity:
+	rm -rf cov-int 2>/dev/null; make distclean
+	cov-build --dir cov-int make TARGET=$(TARGET)
+	tar -cvzf coverity-$(HGVERSION).tgz cov-int
 ##########################################
 #Ensure necessray directories are created#
 ##########################################

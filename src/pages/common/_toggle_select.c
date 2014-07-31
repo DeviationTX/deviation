@@ -66,9 +66,9 @@ struct ImageMap TGLICO_GetImage(int idx)
        fnum = 0;
     }
     struct ImageMap img;
+    memset(&img, 0, sizeof(img));
     img.file = toggle_files[fnum];
     img.x_off = offset * TOGGLEICON_WIDTH;
-    img.y_off = 0;
     return img;
 }
 

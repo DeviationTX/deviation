@@ -229,6 +229,19 @@ static s32 float_to_int(u8 *ptr)
 }
 static void parse_telemetry_packet(u8 *packet)
 {
+    static const u8 voltpkt[] = {
+            TELEM_DEVO_VOLT1, TELEM_DEVO_VOLT2, TELEM_DEVO_VOLT3,
+            TELEM_DEVO_RPM1, TELEM_DEVO_RPM2, 0
+        };
+    static const u8 temppkt[] = {
+            TELEM_DEVO_TEMP1, TELEM_DEVO_TEMP2, TELEM_DEVO_TEMP3, TELEM_DEVO_TEMP4, 0
+        };
+    static const u8 gpslongpkt[] = { TELEM_GPS_LONG, 0};
+    static const u8 gpslatpkt[] = { TELEM_GPS_LAT, 0};
+    static const u8 gpsaltpkt[] = { TELEM_GPS_ALT, 0};
+    static const u8 gpsspeedpkt[] = { TELEM_GPS_SPEED, 0};
+    static const u8 gpstimepkt[] = { TELEM_GPS_TIME, 0};
+
     if((packet[0] & 0xF0) != 0x30)
         return;
     const u8 *update = NULL;
@@ -243,10 +256,7 @@ static void parse_telemetry_packet(u8 *packet)
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
     if (packet[0] == TELEMETRY_ENABLE) {
-         update = (const u8[]){
-            TELEM_DEVO_VOLT1, TELEM_DEVO_VOLT2, TELEM_DEVO_VOLT3,
-            TELEM_DEVO_RPM1, TELEM_DEVO_RPM2, 0
-        };
+        update = voltpkt;
         Telemetry.p.devo.volt[0] = packet[1]; //In 1/10 of Volts
         Telemetry.p.devo.volt[1] = packet[3]; //In 1/10 of Volts
         Telemetry.p.devo.volt[2] = packet[5]; //In 1/10 of Volts
@@ -254,9 +264,7 @@ static void parse_telemetry_packet(u8 *packet)
         Telemetry.p.devo.rpm[1]  = packet[9] * 120; //In RPM
     }
     if (packet[0] == 0x31) {
-        update = (const u8[]){
-            TELEM_DEVO_TEMP1, TELEM_DEVO_TEMP2, TELEM_DEVO_TEMP3, TELEM_DEVO_TEMP4, 0
-        };
+        update = temppkt;
         Telemetry.p.devo.temp[0] = packet[1] == 0xff ? 0 : packet[1] - 20; //In degrees-C
         Telemetry.p.devo.temp[1] = packet[2] == 0xff ? 0 : packet[2] - 20; //In degrees-C
         Telemetry.p.devo.temp[2] = packet[3] == 0xff ? 0 : packet[3] - 20; //In degrees-C
@@ -270,7 +278,7 @@ static void parse_telemetry_packet(u8 *packet)
        36: 313832353532313531303132  = 2012-10-15 18:25:52 (UTC)
     */
     if (packet[0] == 0x32) {
-        update = (const u8[]){ TELEM_GPS_LONG, 0};
+        update = gpslongpkt;
         Telemetry.gps.longitude = ((packet[1]-'0') * 100 + (packet[2]-'0') * 10 + (packet[3]-'0')) * 3600000
                                   + ((packet[4]-'0') * 10 + (packet[5]-'0')) * 60000
                                   + ((packet[7]-'0') * 1000 + (packet[8]-'0') * 100
@@ -279,7 +287,7 @@ static void parse_telemetry_packet(u8 *packet)
             Telemetry.gps.longitude *= -1;
     }
     if (packet[0] == 0x33) {
-        update = (const u8[]){ TELEM_GPS_LAT, 0};
+        update = gpslatpkt;
         Telemetry.gps.latitude = ((packet[1]-'0') * 10 + (packet[2]-'0')) * 3600000
                                   + ((packet[3]-'0') * 10 + (packet[4]-'0')) * 60000
                                   + ((packet[6]-'0') * 1000 + (packet[7]-'0') * 100
@@ -288,15 +296,15 @@ static void parse_telemetry_packet(u8 *packet)
             Telemetry.gps.latitude *= -1;
     }
     if (packet[0] == 0x34) {
-        update = (const u8[]){ TELEM_GPS_ALT, 0};
+        update = gpsaltpkt;
         Telemetry.gps.altitude = float_to_int(packet+1);
     }
     if (packet[0] == 0x35) {
-        update = (const u8[]){ TELEM_GPS_SPEED, 0};
+        update = gpsspeedpkt;
         Telemetry.gps.velocity = float_to_int(packet+7);
     }
     if (packet[0] == 0x36) {
-        update = (const u8[]){ TELEM_GPS_TIME, 0};
+        update = gpstimepkt;
         u8 hour  = (packet[1]-'0') * 10 + (packet[2]-'0');
         u8 min   = (packet[3]-'0') * 10 + (packet[4]-'0');
         u8 sec   = (packet[5]-'0') * 10 + (packet[6]-'0');
@@ -516,7 +524,7 @@ static u16 devo_cb()
     return 1200;
 }
 
-static void bind()
+static void devo_bind()
 {
     fixed_id = Model.fixed_id;
     bind_counter = BIND_COUNT;
@@ -584,7 +592,7 @@ const void *DEVO_Cmds(enum ProtoCmds cmd)
             CLOCK_StopTimer();
             return (void *)(CYRF_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
-        case PROTOCMD_BIND:  bind(); return 0;
+        case PROTOCMD_BIND:  devo_bind(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID:  return (void *)((unsigned long)fixed_id);

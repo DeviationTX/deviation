@@ -186,6 +186,8 @@ void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
 int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
+size_t strlcpy(char* dst, const char* src, size_t bufsize);
+void tempstring_cpy(const char* src);
 int fexists(const char *file);
 u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
 u32 rand32(); //LFSR based PRNG

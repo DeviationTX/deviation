@@ -232,6 +232,7 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
 
     switch(Model.swash_type) {
     case SWASH_TYPE_NONE:
+    case SWASH_TYPE_LAST:
         cyc[0] = aileron;
         cyc[1] = elevator;
         cyc[2] = collective;
@@ -268,7 +269,6 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
         cyc[1] = collective + aileron;
         cyc[2] = collective - aileron;
         break;
-    case SWASH_TYPE_LAST: break;
     }
     
     return cyc[cycnum-1];
@@ -574,10 +574,11 @@ void fix_mixer_dependencies(unsigned mixer_count)
             }
         }
     }
-    if (mixer_count) {
-        printf("Could not place all mixers!\n");
-        return;
-    }
+    //mixer_count s gauranteed to be 0 when we get here
+    //if (mixer_count) {
+    //    printf("Could not place all mixers!\n");
+    //    return;
+    //}
     for (i = 0; i < NUM_MIXERS; i++)
         Model.mixers[i] = mixers[i];
 }
@@ -729,7 +730,7 @@ unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data)
             if (reach_end && (flags & BUTTON_LONGPRESS))
                 BUTTON_InterruptLongPress();
 
-            if (Model.trims[i].value == 0) {
+            if (Model.trims[i].value[0] == 0) {
                 SOUND_SetFrequency(3951, volume);
                 SOUND_StartWithoutVibrating(TRIM_MUSIC_DURATION, NULL);
             }

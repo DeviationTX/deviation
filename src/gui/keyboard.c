@@ -143,7 +143,7 @@ static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
     u16 bg_color;
     u16 fg_color;
     char ch[2];
-    const char *str = NULL;
+    const char *str = "";
     if ( c == '\x06') { //DONE
         str = "DONE";
         if (pressed) {

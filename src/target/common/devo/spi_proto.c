@@ -63,7 +63,7 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 }
 
 int SPI_ProtoGetPinConfig(int module, int state) {
-    if (Transmitter.module_enable[module].port != SWITCH_ADDRESS)
+    if (module >= TX_MODULE_LAST || Transmitter.module_enable[module].port != SWITCH_ADDRESS)
         return 0;
     if(state == CSN_PIN)
         return 1 << (Transmitter.module_enable[module].pin & 0x0F);

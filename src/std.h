@@ -2,6 +2,7 @@
 #define _STD_H_
 
 /* the following defines allow control over how stdio/stdlib functions are handles */
+#define strncpy "BAD_FUNC"  //Do not allow any use of strncpy (use strlcpy instead)
 #ifndef USE_OWN_PRINTF
     #define USE_OWN_PRINTF 1
 #endif

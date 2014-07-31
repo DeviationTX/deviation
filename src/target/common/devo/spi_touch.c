@@ -117,7 +117,9 @@ void SPITouch_Init()
 struct touch SPITouch_GetCoords()
 {
     #define TOUCH_READS 3
-    struct touch res, data[TOUCH_READS];
+    struct touch res = { 0 };
+    struct touch data[TOUCH_READS];
+    
     u32 center_x = 0, center_y = 0;
     CS_LO();
     // read TOUCH_READS times from the touchpad and store the values

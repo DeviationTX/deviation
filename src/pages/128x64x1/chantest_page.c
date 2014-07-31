@@ -170,9 +170,9 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(tempstring, (const char *)_tr("Stick input"));
+        tempstring_cpy((const char *)_tr("Stick input"));
     } else {
-        strcpy(tempstring, (const char *)_tr("Channel output"));
+        tempstring_cpy((const char *)_tr("Channel output"));
     }
     return tempstring;
 }
@@ -181,9 +181,9 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    strcpy(tempstring, (const char *)"->");  //this is actually used as an icon don't translate t
+    tempstring_cpy((const char *)"->");  //this is actually used as an icon don't translate t
     if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(tempstring, (const char *)"<-");
+        tempstring_cpy((const char *)"<-");
     }
     return tempstring;
 }

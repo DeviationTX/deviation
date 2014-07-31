@@ -248,7 +248,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
         mp->selected = 0;
         num_models = 1 + count_files("modelico", ".bmp", Model.icon[0] ? Model.icon+9 : NULL);
         const char *ico = mp->selected == 0 ? CONFIG_GetIcon(Model.type) : CONFIG_GetCurrentIcon();
-        strncpy(mp->iconstr, ico, sizeof(mp->iconstr));
+        strlcpy(mp->iconstr, ico, sizeof(mp->iconstr));
         mp->selected++;
     } else if (loadsave == LOAD_LAYOUT) { //Layout
         mp->selected = 1;
@@ -257,7 +257,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
         num_models += model_count();
     } else {
         num_models = model_count();
-        strncpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
+        strlcpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
         if (loadsave == SAVE_MODEL)
             mp->selected = 0;
         else

@@ -346,13 +346,13 @@ static void deinit()
 {
     CLOCK_StopTimer();
     if (Transmitter.module_enable[CYRF6936].port != 0)
-        CYRF_Reset();
+        (void)CYRF_Reset();
     if (Transmitter.module_enable[NRF24L01].port != 0)
-        NRF24L01_Reset();
+        (void)NRF24L01_Reset();
     if (Transmitter.module_enable[A7105].port != 0)
-        A7105_Reset();
+        (void)A7105_Reset();
     if (Transmitter.module_enable[CC2500].port != 0)
-        CC2500_Reset();
+        (void)CC2500_Reset();
 }
 
 static void initialize()

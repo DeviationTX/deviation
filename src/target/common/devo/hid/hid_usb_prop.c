@@ -328,7 +328,7 @@ uint8_t *Joystick_GetConfigDescriptor(uint16_t Length)
 uint8_t *Joystick_GetStringDescriptor(uint16_t Length)
 {
   uint8_t wValue0 = pInformation->USBwValue0;
-  if (wValue0 > 4)
+  if (wValue0 >= sizeof(HID_String_Descriptor)/sizeof(ONE_DESCRIPTOR))
   {
     return NULL;
   }

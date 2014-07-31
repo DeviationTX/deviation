@@ -56,11 +56,11 @@ u32 Crc(const void *buffer, u32 size)
  */
 const char *utf8_to_u32(const char *str, u32 *ch)
 {
-    char str1 = 0x3f & *(str + 1);
-    char str2 = 0x3f & *(str + 2);
-    char str3 = 0x3f & *(str + 2);
-    char str4 = 0x3f & *(str + 2);
-    char str5 = 0x3f & *(str + 2);
+    const char str1 = 0x3f & *(str + 1);
+    const char str2 = 0x3f & *(str + 2);
+    const char str3 = 0x3f & *(str + 3);
+    const char str4 = 0x3f & *(str + 4);
+    const char str5 = 0x3f & *(str + 5);
     if(! (*str & 0x80)) {
         *ch = *str;
         return str + 1;
@@ -91,6 +91,28 @@ const char *utf8_to_u32(const char *str, u32 *ch)
         return str + 6;
     }
     return NULL;
+}
+
+//strlcpy from
+//http://stackoverflow.com/questions/1453876/why-does-strncpy-not-null-terminate
+size_t strlcpy(char* dst, const char* src, size_t bufsize)
+{
+  size_t srclen =strlen(src);
+  size_t result =srclen; /* Result is always the length of the src string */
+  if(bufsize>0)
+  {
+    if(srclen>=bufsize)
+       srclen=bufsize-1;
+    if(srclen>0)
+       memcpy(dst,src,srclen);
+    dst[srclen]='\0';
+  }
+  return result;
+}
+
+void tempstring_cpy(const char* src)
+{
+    strlcpy(tempstring, src, sizeof(tempstring));
 }
 
 int exact_atoi(const char *str)

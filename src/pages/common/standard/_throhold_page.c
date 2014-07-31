@@ -37,11 +37,11 @@ static const char *throhold_cb(guiObject_t *obj, int dir, void *data)
             Model.limits[mapped_std_channels.throttle].safetysw = 0;
     }
     if (throhold_state == 1) {
-        strcpy(tempstring, (const char *)_tr("On"));
+        tempstring_cpy((const char *)_tr("On"));
         GUI_TextSelectEnable(&gui->value, 1);
     }
     else {
-        strcpy(tempstring, (const char *)_tr("Off"));
+        tempstring_cpy((const char *)_tr("Off"));
         GUI_TextSelectEnable(&gui->value, 0);
     }
     return tempstring;

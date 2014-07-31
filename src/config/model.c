@@ -564,8 +564,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
     unsigned i;
     if (MATCH_SECTION("")) {
         if(MATCH_KEY(MODEL_NAME)) {
-            strncpy(m->name, value, sizeof(m->name)-1);
-            m->name[sizeof(m->name)-1] = 0;
+            strlcpy(m->name, value, sizeof(m->name)-1);
             return 1;
         }
         if(MATCH_KEY(MODEL_TEMPLATE)) {
@@ -762,7 +761,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(VCHAN_NAME)) {
-            strncpy(m->virtname[idx - NUM_OUT_CHANNELS], value, sizeof(m->virtname[0]));
+            strlcpy(m->virtname[idx - NUM_OUT_CHANNELS], value, sizeof(m->virtname[0]));
             return 1;
         }
         printf("%s: Unknown key: %s\n", section, name);

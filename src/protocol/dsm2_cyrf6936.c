@@ -454,6 +454,7 @@ static void parse_telemetry_packet()
             Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
             Telemetry.p.dsm.flog.volt[0] = pkt16_to_volt(packet+4);  //In 1/10 of Volts
             Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
+            break;
 #if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
             //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)

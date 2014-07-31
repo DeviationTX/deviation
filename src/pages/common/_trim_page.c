@@ -78,13 +78,13 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     int hide_trim = 0;
     int hide_switch = 0;
     if (*value == TRIM_MOMENTARY) {
-        strcpy(tempstring, _tr("Momentary"));
+        tempstring_cpy(_tr("Momentary"));
         hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_TOGGLE) {
-        strcpy(tempstring, _tr("Toggle"));
+        tempstring_cpy(_tr("Toggle"));
         hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_ONOFF) {
-        strcpy(tempstring, _tr("On/Off"));
+        tempstring_cpy(_tr("On/Off"));
         hide_switch = 1;
     } else if (*value < 100) {
         sprintf(tempstring, "%d.%d", *value / 10, *value % 10);

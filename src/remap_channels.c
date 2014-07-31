@@ -102,7 +102,7 @@ void RemapChannelsForProtocol(const u8 *oldmap)
         map_inp(chmap, &Model.trims[i].sw);
     }
     //Map timers
-    for(i = 0; i < NUM_TRIMS; i++) {
+    for(i = 0; i < NUM_TIMERS; i++) {
         map_inp(chmap, &Model.timer[i].src);
         map_inp(chmap, &Model.timer[i].resetsrc);
     }

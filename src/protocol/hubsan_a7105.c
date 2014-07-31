@@ -274,11 +274,10 @@ static u8 hubsan_check_integrity()
 static void hubsan_update_telemetry()
 {
     const u8 *update = NULL;
+    static const u8 telempkt[] = { TELEM_DEVO_VOLT1, 0 };
     if( (packet[0]==0xe1) && hubsan_check_integrity()) {
         Telemetry.p.devo.volt[0] = packet[13];
-        update = (const u8[]){
-            TELEM_DEVO_VOLT1, 0
-        };
+        update = telempkt;
     }
     if (update) {
         while(*update) {

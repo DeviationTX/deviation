@@ -482,7 +482,7 @@ struct stdcurve_obj {
     guiButton_t auto_;
     guiLabel_t vallbl[9];
     guiTextSelect_t val[9];
-    guiButton_t lock[7];
+    guiButton_t lock[9];
     guiXYGraph_t graph;
 };
 

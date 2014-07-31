@@ -260,7 +260,7 @@ int INPUT_SelectSource(int src, int dir, u8 *changed)
     int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
     if(! dir)
         dir = -1;
-    while (Transmitter.ignore_src & (1 << newsrc))
+    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
        newsrc+= dir;
     MIXER_SET_SRC_INV(newsrc, is_neg);
     return newsrc;
@@ -271,7 +271,7 @@ int INPUT_SelectAbbrevSource(int src, int dir)
     int newsrc = GUI_TextSelectHelper(src, 0, NUM_SOURCES, dir, 1, 1, NULL);
     if(! dir)
         dir = -1;
-    while (Transmitter.ignore_src & (1 << newsrc))
+    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
        newsrc+= dir;
     newsrc = INPUT_GetAbbrevSource(src, newsrc, dir);
     return newsrc;
