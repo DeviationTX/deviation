@@ -1,7 +1,7 @@
 #include "common.h"
 void TxName(u8 *var, int len)
 {
-    strncpy((char *)var, "X9D", len);
+    strlcpy((char *)var, "X9D", len);
 }
 
 void MCU_SerialNumber(u8 *var, int len)
