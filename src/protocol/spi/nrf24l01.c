@@ -223,13 +223,15 @@ u8 NRF24L01_SetPower(u8 power)
 static void CE_lo()
 {
 #if HAS_MULTIMOD_SUPPORT
-    SPI_ConfigSwitch(0x0f, 0x0b);
+    PROTOCOL_SetSwitch(NRF24L01);
 #endif
 }
 static void CE_hi()
 {
 #if HAS_MULTIMOD_SUPPORT
-    SPI_ConfigSwitch(0x1f, 0x1b);
+    u8 en = SPI_ProtoGetPinConfig(NRF24L01, ENABLED_PIN);
+    u8 csn = SPI_ProtoGetPinConfig(NRF24L01, CSN_PIN);
+    SPI_ConfigSwitch(en | 0x0f, en | (0x0f ^ csn));
 #endif
 }
 
