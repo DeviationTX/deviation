@@ -181,6 +181,10 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
     //Set the post tx/rx state
     CYRF_WriteRegister(0x0F, mode == TX_EN ? 0x2C : 0x28);
+#if UNIVERSAL_TX
+    PACTL_SetTxRxMode(mode);
+    return;
+#endif
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {

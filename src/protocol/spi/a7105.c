@@ -105,6 +105,11 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
  */
 void A7105_SetTxRxMode(enum TXRX_State mode)
 {
+#if UNIVERSAL_TX
+    A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
+    PACTL_SetTxRxMode(mode);
+    return;
+#else
     if(mode == TX_EN) {
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x31);
@@ -119,6 +124,7 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
     }
+#endif
 }
 
 int A7105_Reset()

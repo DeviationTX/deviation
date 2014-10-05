@@ -22,8 +22,11 @@
 #include "common.h"
 #include "interface.h"
 #include "mixer.h"
+#include "telemetry.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "protospi.h"
+#include "ports.h"
 
 #if defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
 #ifdef MODULAR
@@ -120,6 +123,7 @@ static void init_cyrf()
     CYRF_ConfigCRCSeed(0x0000);
     CYRF_ConfigSOPCode(sopcode);
     CYRF_SetTxRxMode(TX_EN);
+    printf("CYRF: Channel %d Power: %d\n", Model.proto_opts[TESTRF_RFCHAN], Model.proto_opts[TESTRF_POWER]);
 }
 
 static void init_a7105()
@@ -345,20 +349,20 @@ static void init_nrf()
 static void deinit()
 {
     CLOCK_StopTimer();
-    if (Transmitter.module_enable[CYRF6936].port != 0)
+    if (MODULE_ENABLE[CYRF6936].port != 0)
         (void)CYRF_Reset();
-    if (Transmitter.module_enable[NRF24L01].port != 0)
+    if (MODULE_ENABLE[NRF24L01].port != 0)
         (void)NRF24L01_Reset();
-    if (Transmitter.module_enable[A7105].port != 0)
+    if (MODULE_ENABLE[A7105].port != 0)
         (void)A7105_Reset();
-    if (Transmitter.module_enable[CC2500].port != 0)
+    if (MODULE_ENABLE[CC2500].port != 0)
         (void)CC2500_Reset();
 }
 
 static void initialize()
 {
     deinit();
-    if (Transmitter.module_enable[Model.proto_opts[TESTRF_RF]].port == 0)
+    if (MODULE_ENABLE[Model.proto_opts[TESTRF_RF]].port == 0)
         return;
     printf("TestRF: Proto: %d\n", Model.proto_opts[TESTRF_RF]);
     switch(Model.proto_opts[TESTRF_RF]) {

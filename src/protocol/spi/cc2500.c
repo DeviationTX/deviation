@@ -120,6 +120,10 @@ void CC2500_WriteData(u8 *dpbuffer, u8 len)
 
 void CC2500_SetTxRxMode(enum TXRX_State mode)
 {
+#if UNIVERSAL_TX
+    PACTL_SetTxRxMode(mode);
+    return;
+#else
     if(mode == TX_EN) {
         CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F | 0x40);
         CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
@@ -130,6 +134,7 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
         CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F);
         CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
     }
+#endif
 }
 
 void CC2500_SetPower(int power)
