@@ -18,6 +18,8 @@
 #include <libopencm3/cm3/nvic.h>
 #include "common.h"
 #include "ports.h"
+#include "config/model.h"
+#include "protocol/interface.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -39,11 +41,12 @@ void BT_Initialize()
 #if DISCOVERY
     rcc_periph_clock_enable(RCC_USART3);
     rcc_periph_clock_enable(RCC_GPIOC);
-    nvic_enable_irq(NVIC_USART3_4_IRQ);
 #else
     rcc_periph_clock_enable(RCC_USART2);
-    nvic_enable_irq(NVIC_USART2_IRQ);
+
 #endif
+    nvic_set_priority(BT_IRQ, 3 << 6);
+    nvic_enable_irq(BT_IRQ);
 
     PORT_mode_setup(BT_STATE, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN);
     PORT_mode_setup(BT_KEY, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
@@ -112,6 +115,32 @@ void BT_HandleInput()
         memcpy(tmp, (char *)bt_buf, len);
         tmp[len] = 0;
         BT_ResetPtr();
+        if(strncmp(tmp, "TXCH ", 5) == 0) {
+            int val;
+            if(tmp[6] == '\r') {
+                val = tmp[5] - '0';
+            } else if(tmp[7] == '\r') {
+                val = (tmp[5] - '0') * 10 + (tmp[6] - '0');
+            } else {
+                printf("Unknown CH: %s\n", tmp);
+                return;
+            }
+            Model.proto_opts[2] = val; //RF Channel
+            TESTRF_Cmds(PROTOCMD_INIT);
+            return;
+        }
+        if(strncmp(tmp, "TXPWR ", 6) == 0) {
+            int val;
+            if(tmp[7] == '\r') {
+                val = tmp[6] - '0';
+            } else {
+                printf("Unknown POWER: %s\n", tmp);
+                return;
+            }
+            printf("Changed TX Power to: %d\n", val);
+            Model.proto_opts[1] = val; //RF Channel
+            return;
+        }
         if(strcmp(tmp, "PROTOCOL\r") == 0) {
             printf("PROTOCOL Cmd\n");
         }

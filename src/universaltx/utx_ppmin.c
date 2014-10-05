@@ -106,6 +106,7 @@ void PPMin_Init()
     rcc_periph_clock_enable(RCC_GPIOA);
 
     /* Enable EXTI interrupt. */
+    nvic_set_priority(NVIC_EXTI0_1_IRQ, 2 << 6);
     nvic_enable_irq(NVIC_EXTI0_1_IRQ);
 
     /* Set GPIO0 (in GPIO port A) to 'input float'. */

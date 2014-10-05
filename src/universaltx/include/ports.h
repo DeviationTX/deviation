@@ -34,12 +34,14 @@ static const struct mcu_pin BT_STATE      = {GPIOA, GPIO4};
     static const struct mcu_pin BT_RX         = {GPIOC, GPIO11};
     #define BTUART USART3
     #define BT_ISR usart3_4_isr
+    #define BT_IRQ NVIC_USART3_4_IRQ
 #else
     static const struct mcu_pin BT_KEY        = {GPIOA, GPIO7};
     static const struct mcu_pin BT_TX         = {GPIOA, GPIO2};
     static const struct mcu_pin BT_RX         = {GPIOA, GPIO3};
     #define BTUART USART2
     #define BT_ISR usart2_isr
+    #define BT_IRQ NVIC_USART2_IRQ
 #endif
 
 

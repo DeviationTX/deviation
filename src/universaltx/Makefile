@@ -19,6 +19,8 @@ SRC_C = universaltx.c  \
         utx_ppmin.c    \
         utx_protospi.c \
         utx_syscalls.c \
+        utx_clock.c    \
+        utx_err_handler.c \
         utx_uart.c
 
 SRC_C    := $(SRC_C) \
@@ -26,7 +28,7 @@ SRC_C    := $(SRC_C) \
             $(wildcard ../protocol/spi/*.c) \
             $(wildcard ../target/common/stm32/*.c)
 
-EXCLUDE  := ../protocol/ppmout.c ../protocol/usbhid.c ../protocol/testrf.c ../protocol/protocol.c ../protocol/spi/avr_program.c
+EXCLUDE  := ../protocol/ppmout.c ../protocol/usbhid.c ../protocol/protocol.c ../protocol/spi/avr_program.c
 SRC_C    := $(filter-out $(EXCLUDE),$(SRC_C))
 
 ###############################################

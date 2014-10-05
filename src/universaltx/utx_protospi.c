@@ -100,6 +100,7 @@ void SPI_ProtoMasterSlaveInit(int slave)
         } else {
            spi_set_nss_low(SPI2);
         }
+        nvic_set_priority(NVIC_EXTI4_15_IRQ, 0 << 6);
         nvic_enable_irq(NVIC_EXTI4_15_IRQ);
         //GPIO# == EXTI# (at least for # <16)
         exti_select_source(INPUT_CSN.pin, INPUT_CSN.port);

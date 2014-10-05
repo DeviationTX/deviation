@@ -30,4 +30,14 @@ static inline int FS_Mount(void *FAT, const char *drive) {(void)FAT; (void)drive
 
 //Load target-specific include
 #include "target_defs.h"
+
+enum MsecCallback {
+    MEDIUM_PRIORITY,
+    LOW_PRIORITY,
+    LAST_PRIORITY,
+};
+#define NUM_MSEC_CALLBACKS LAST_PRIORITY
+
+#define MEDIUM_PRIORITY_MSEC   5
+#define LOW_PRIORITY_MSEC    100
 #endif

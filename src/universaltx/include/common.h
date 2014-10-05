@@ -76,7 +76,7 @@ u8 SPI_ReadRegister(u8 address);
 
 void PROTOCOL_SetBindState(int i);
 void CLOCK_StopTimer();
-void CLOCK_StartTimer(int t, u16 (*_cmd)());
+void CLOCK_StartTimer(unsigned t, u16 (*_cmd)());
 void CLOCK_ResetWatchdog();
 
 u32 CLOCK_getms();
@@ -87,7 +87,17 @@ u32 Crc(const void *, int size);
 u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
 u32 rand32(); //LFSR based PRNG
 
+extern volatile u8 priority_ready;
 
+extern const char UTX_Version[33];
 /* Target defs */
 void MCU_SerialNumber(u8 *var, int len);
+
+void CLOCK_Init(void);
+u32 CLOCK_getms(void);
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
+void CLOCK_StopTimer();
+void CLOCK_SetMsecCallback(int cb, u32 msec);
+void CLOCK_StartWatchdog();
+void CLOCK_ResetWatchdog();
 #endif /*_COMMON_H_ */
