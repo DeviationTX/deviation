@@ -244,8 +244,8 @@ void LCD_Init()
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
 		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO9);  //ON, OFF?
 
-    // Set the 5.8GHz receiver on
-    gpio_set(GPIOB, GPIO9);
+    // Set the 5.8GHz receiver off (default)
+    gpio_clear(GPIOB, GPIO9);
 
     // Set the 5.8GHz channel
     gpio_set(GPIOA, GPIO0);
@@ -314,10 +314,14 @@ void LCD_ShowVideo(u8 enable)
     if(enable == video_enabled)
         return;
 
-    if(enable)
+    if(enable) {
+        gpio_set(GPIOB, GPIO9);
         LCD_Cmd(LCD_IA911_CLOCK | LCD_IA911_XOSC); // Set to external mode en enable ossilator
-    else
+    }
+    else {
+        gpio_clear(GPIOB, GPIO9);
         LCD_Cmd(LCD_IA911_CLOCK | LCD_IA911_I_MODE | LCD_IA911_XOSC); // Set to external mode en enable ossilator
+    }
 
     video_enabled = enable;
 }
