@@ -56,6 +56,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     u8 idx;
     struct Mixer *mix = MIXER_GetAllMixers();
 
+    int selectable = 2;
     int channel = mp->top_channel + absrow;
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
@@ -63,17 +64,18 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         labelDesc.style = LABEL_LEFTCENTER;
         GUI_CreateButtonPlateText(&gui->limit[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                 limitselect_cb, (void *)((long)channel));
-    } else if(! _is_virt_cyclic(absrow)) {
+    } else if(! _is_virt_cyclic(channel)) {
         GUI_CreateButtonPlateText(&gui->limit[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                 virtname_cb, (void *)((long)channel));
     } else {
         GUI_CreateLabelBox(&gui->name[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc,
                 MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)channel));
+        selectable = 1;
     }
     labelDesc.style = LABEL_CENTER;
     GUI_CreateButtonPlateText(&gui->tmpl[relrow], w1 + 1, y, w2, LINE_HEIGHT , &labelDesc, template_name_cb, 0,
         templateselect_cb, (void *)((long)channel));
-    
+   
     for (idx = 0; idx < NUM_MIXERS; idx++)
         if (mix[idx].src && mix[idx].dest == channel)
             break;
@@ -84,7 +86,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             GUI_CreateLabelBox(&gui->src[relrow], w1 + w2 + 4, y, w3 , LINE_HEIGHT, &labelDesc, show_source, NULL, &mix[idx].src);
         }
     }
-    return 1;
+    return selectable;
 }
 
 void PAGE_MixerExit()

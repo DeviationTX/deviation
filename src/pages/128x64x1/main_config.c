@@ -170,17 +170,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         }
         if (nxt == -1)
             continue;
-        if (type == ELEM_TOGGLE)
+
+        int selectable = 1;
+        if (type == ELEM_TOGGLE) {
             GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  50,
                     LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
+            selectable = 2;
+        }
         else
             GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
 
         GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
              LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
-        return 1;
+        return selectable;
     }
-    return 1;
+    return 0;
 }
 void show_config()
 {

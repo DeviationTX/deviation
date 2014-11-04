@@ -115,8 +115,17 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
 
     update_countdown(absrow);
-    return 4;
-}
+
+    //Return number of rows
+    int rows = (Model.timer[absrow].type < TIMER_COUNTDOWN) ? 2 : 3;
+    if (Model.mixer_mode == MIXER_ADVANCED)
+        rows++;
+#if HAS_PERMANENT_TIMER
+    if (Model.timer[absrow].type == TIMER_PERMANENT)
+        rows = 4;
+#endif
+    return rows;
+ }
 
 static void _show_page(int page)
 {

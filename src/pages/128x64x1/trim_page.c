@@ -44,7 +44,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             40, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], 75, y, 50, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
-    return 1;
+    return 2;
 }
 
 static void _show_page()
