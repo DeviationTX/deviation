@@ -212,14 +212,16 @@ guiObject_t * create_scrollable_objs(guiScrollable_t *scrollable, int row_offset
                                        scrollable->size_cb(row, scrollable->cb_data) : 1);
         if (y > bottom + scrollable->row_height - 3)
             break;  //Not really selectable because row is not fully visible
-        num_selectable += selectable;
+
         //Maintain selected index
         if (row_offset < 0 && idx >= 0) {
             idx += selectable; row_offset++; }    
         if (row_offset > 0 && rel_row >= scrollable->visible_rows - 1)
             idx -= selectable;
+
+        num_selectable += selectable;
     }
-    if (row_offset)
+    if (row_offset > 0)
         idx -= scrollable->num_selectable - num_selectable;
     scrollable->cur_row = row - rel_row;
     scrollable->visible_rows = rel_row;
@@ -305,24 +307,29 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
                     return (guiObject_t *)scrollable;
                 }
                 obj = create_scrollable_objs(scrollable, 1);
-                if(!obj)
+                if (! obj && scrollable->num_selectable)    //At next page
                     return set_selectable_idx(scrollable, 0);
             }
-            //find next selectable
-            obj = obj->next;
-            while(obj && ! OBJ_IS_SELECTABLE(obj)) {
+            if (obj) {
+                //find next selectable
                 obj = obj->next;
+                while(obj && (OBJ_IS_HIDDEN(obj) || ! OBJ_IS_SELECTABLE(obj))) {
+                    obj = obj->next;
+                }
+                if(obj)
+                    return obj;
             }
-            return obj;
+            obj = (guiObject_t *)scrollable;    // no selectable objects
         }
-    } else {
-        //last selection was not in the scrollable
-        if (! scrollable->num_selectable) {
-            //No selectable objects, just move the scrollbar
-            if (scrollable->cur_row + scrollable->visible_rows < scrollable->item_count)
-                create_scrollable_objs(scrollable, 1);
+    }
+    //Not in the scrollable or no selectable objects, just move the scrollbar
+    if (scrollable->cur_row + scrollable->visible_rows < scrollable->item_count) {
+        if (! obj)
+            create_scrollable_objs(scrollable, 1);
+        if (scrollable->num_selectable)
+            return set_selectable_idx(scrollable, 0);
+        else
             return (guiObject_t *)scrollable;
-        }
     }
     //scroll to first row and select first selectable
     if (scrollable->cur_row)
@@ -344,28 +351,34 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
                     return (guiObject_t *)scrollable;
                 }
                 obj = create_scrollable_objs(scrollable, -1);
+                if (! obj && scrollable->num_selectable)    //At previous page
+                    return set_selectable_idx(scrollable, scrollable->num_selectable - 1);
             }
-            //find previous selectable
-            guiObject_t *head = scrollable->head, *objLast = NULL;
-            while(head) {
-                if (head == obj)
-                    break;
-                if (! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
-                    objLast = head;
+            if(obj) {
+                //find previous selectable
+                guiObject_t *head = scrollable->head, *objLast = NULL;
+                while(head) {
+                    if (head == obj)
+                        break;
+                    if (! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+                        objLast = head;
+                    }
+                    head = head->next;
                 }
-                head = head->next;
+                if (objLast)
+                    return objLast;
             }
-            if (objLast)
-                return objLast;
+            obj = (guiObject_t *)scrollable;    // no selectable objects
         }
-    } else {
-        //last selection was not in the scrollable
-        if (! scrollable->num_selectable) {
-            //No selectable objects, just move the scrollbar
-            if (scrollable->cur_row)
-                create_scrollable_objs(scrollable, -1);
+    }
+    //Not in the scrollable or no selectable objects, just move the scrollbar
+    if (scrollable->cur_row) {
+        if(! obj)
+            create_scrollable_objs(scrollable, -1);
+        if (scrollable->num_selectable)
+            return set_selectable_idx(scrollable, scrollable->num_selectable -1);
+        else
             return (guiObject_t *)scrollable;
-        }
     }
     //scroll to last row and select last selectable
     int adjust = scrollable->item_count - (scrollable->cur_row + scrollable->visible_rows);
