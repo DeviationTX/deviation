@@ -146,8 +146,16 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
 
 int adjust_row(guiScrollable_t *scrollable, int offset)
 {
-    if (! scrollable->size_cb)
-        return scrollable->cur_row + offset;
+    //Validation checks
+    int target = scrollable->cur_row + offset;
+    if (target > scrollable->item_count - 1)
+        target = scrollable->item_count - 1;
+    if (target < 0)
+        target = 0;
+    offset = target - scrollable->cur_row;
+    if (! offset || ! scrollable->size_cb)
+        return target;
+
     //This ensures that the next/prev row is visible
     int height = scrollable->max_visible_rows;
     int count = 0;
@@ -214,9 +222,9 @@ int create_scrollable_objs(guiScrollable_t *scrollable, int row_offset)
             break;  //Not really selectable because row is not fully visible
 
         //Maintain selected index
-        if (row_offset < 0 && idx >= 0) {
+        if (idx >= 0 && row_offset < 0) {
             idx += selectable; row_offset++; }    
-        if (row_offset > 0 && rel_row >= scrollable->visible_rows - 1)
+        if (rel_row + row_offset >= scrollable->visible_rows)
             idx -= selectable;
 
         num_selectable += selectable;
