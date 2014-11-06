@@ -198,15 +198,13 @@ int adjust_row(guiScrollable_t *scrollable, int offset)
 int create_scrollable_objs(guiScrollable_t *scrollable, int row_offset)
 {
     int idx = get_selected_idx(scrollable, objSELECTED);    //Save selected index
-
-    if (scrollable->head && row_offset == 0)
-        return idx;
-
     int row = 0;
-    if (row_offset != 0) {
+    if (row_offset) {
         row = adjust_row(scrollable, row_offset);
         row_offset = row - scrollable->cur_row;
     }
+    else if (scrollable->head)
+        return idx;
     int rel_row = 0;
     int selectable, num_selectable = 0;
     GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
