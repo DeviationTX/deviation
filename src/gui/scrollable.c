@@ -148,8 +148,8 @@ int adjust_row(guiScrollable_t *scrollable, int offset)
 {
     //This ensures that return value does not cause a crash
     int target = scrollable->cur_row + offset;
-    if (target > scrollable->item_count - 1)
-        target = scrollable->item_count - 1;
+    if (target > scrollable->item_count - scrollable->visible_rows)
+        target = scrollable->item_count - scrollable->visible_rows;
     if (target < 0)
         target = 0;
     offset = target - scrollable->cur_row;
@@ -251,23 +251,8 @@ int create_scrollable_objs(guiScrollable_t *scrollable, int row_offset)
     //Return index of saved selectable
     if (idx >= 0 && idx < num_selectable)
         return idx;
-    //else has moved off screen, return -1 or num_selectable (makes move prev/next simple)
+    //else has moved off screen, return -1 or num_selectable
     return idx < 0 ? -1 : num_selectable;
-}
-
-guiObject_t *select_scrollable(guiScrollable_t *scrollable, int row, int col)
-{
-    if (scrollable->getobj_cb) {
-        while(1) {
-            guiObject_t *obj = scrollable->getobj_cb(row, col, NULL);
-            if (! obj)
-                return NULL;
-            if (! OBJ_IS_HIDDEN(obj))
-                return obj;
-            col = col + (col >= 0 ? 1 : -1);
-        }
-    }
-    return NULL;
 }
 
 #if HAS_TOUCH
@@ -276,29 +261,14 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)pos;
     guiScrollable_t *scrollable = (guiScrollable_t *)data;
     int adjust;
-    if (direction == 2) {
-        if (scrollable->cur_row + 2 * scrollable->visible_rows > scrollable->item_count)
-            adjust = scrollable->item_count - (scrollable->cur_row + scrollable->visible_rows);
-        else
-            adjust = scrollable->visible_rows;
-    } else if (direction == -2) {
-        if (scrollable->cur_row - scrollable->visible_rows < 0)
-            adjust = -scrollable->cur_row;
-        else
-            adjust = -scrollable->visible_rows;
-    } else if (direction == 1) {
-        if (scrollable->cur_row + scrollable->visible_rows == scrollable->item_count)
-            adjust = 0;
-        else
-            adjust = 1;
-    } else {
-        if (scrollable->cur_row == 0)
-            adjust = 0;
-        else
-            adjust = -1;
-    }
-    if (adjust)
-        create_scrollable_objs(scrollable, adjust);
+    if (direction > 1)
+        adjust = scrollable->visible_rows;
+    else if (direction < -1)
+        adjust = -scrollable->visible_rows;
+    else
+        adjust = direction;
+    //Note: adjust_row() will validate value of adjust
+    create_scrollable_objs(scrollable, adjust);
     return -1;
 }
 #endif
