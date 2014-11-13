@@ -339,17 +339,21 @@ static void _navigate_pages(s8 direction)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
-            if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+            if (CHAN_ButtonIsPressed(button, BUT_RIGHT))
                 _navigate_pages(1);
-            }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            else if (CHAN_ButtonIsPressed(button, BUT_LEFT))
                 _navigate_pages(-1);
-            } else {
+            else if (CHAN_ButtonIsPressed(button, BUT_UP))
+                GUI_ScrollableScroll(&gui->scrollable, -1);
+            else if (CHAN_ButtonIsPressed(button, BUT_DOWN))
+                GUI_ScrollableScroll(&gui->scrollable, 1);
+            else {
                 return 0;
             }
         }
