@@ -203,7 +203,7 @@ int create_scrollable_objs(guiScrollable_t *scrollable, int row_offset)
         row = adjust_row(scrollable, row_offset);
         row_offset = row - scrollable->cur_row;
     }
-    else if (scrollable->head)
+    if (scrollable->head && row_offset == 0)
         return idx;
     int rel_row = 0;
     int selectable, num_selectable = 0;
@@ -255,11 +255,9 @@ int create_scrollable_objs(guiScrollable_t *scrollable, int row_offset)
     return idx < 0 ? -1 : num_selectable;
 }
 
-#if HAS_TOUCH
-int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
-    (void)parent;
-    (void)pos;
-    guiScrollable_t *scrollable = (guiScrollable_t *)data;
+void GUI_ScrollableScroll(guiScrollable_t *scrollable, s8 direction)
+{
+    //Note: adjust_row() will validate and override value of adjust
     int adjust;
     if (direction > 1)
         adjust = scrollable->visible_rows;
@@ -267,8 +265,15 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
         adjust = -scrollable->visible_rows;
     else
         adjust = direction;
-    //Note: adjust_row() will validate value of adjust
     create_scrollable_objs(scrollable, adjust);
+}
+
+#if HAS_TOUCH
+int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+{
+    (void)parent;
+    (void)pos;
+    GUI_PageScrollable((guiScrollable_t *)data, direction);
     return -1;
 }
 #endif
@@ -339,10 +344,10 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
             return (guiObject_t *)scrollable;
     }
     //last selection was not in the scrollable
-    int adjust = scrollable->item_count - (scrollable->cur_row + scrollable->visible_rows);
-    create_scrollable_objs(scrollable, adjust);
+    create_scrollable_objs(scrollable, scrollable->item_count);
     return set_selected_idx(scrollable, scrollable->num_selectable -1);
 }
+
 guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
 {
     int relrow = row - scrollable->cur_row;
