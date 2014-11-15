@@ -33,6 +33,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 void PAGE_MainCfgInit(int page)
 {
     (void)page;
+    GUI_RemoveAllObjects();
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
 #else
@@ -49,13 +50,6 @@ void PAGE_MainCfgEvent()
 void PAGE_MainCfgExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-}
-void PAGE_MainCfgRestoreDialog(int idx)
-{
-    GUI_RemoveAllObjects();
-    PAGE_MainCfgInit(0);
-    lp->selected_for_move = idx;
-    show_config();
 }
 
 static int size_cb(int absrow, void *data)

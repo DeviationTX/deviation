@@ -30,7 +30,6 @@ static const int HEADER_Y = 1;
 
 #include "../common/_main_layout.c"
 
-extern void PAGE_MainCfgRestoreDialog(int);
 static const char *pos_cb(guiObject_t *obj, const void *data);
 static unsigned _layaction_cb(u32 button, unsigned flags, void *data);
 
@@ -99,6 +98,8 @@ void PAGE_MainLayoutExit()
 {
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(NULL);
+    lp->selected_for_move = -1;
+    PAGE_MainCfgInit(-1);
 }
 
 static void xpos_cb(guiObject_t *obj, int dir, void *data)
@@ -160,7 +161,7 @@ static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
         if (lp->selected_for_move >= 0) {
             set_selected_for_move(-1);
         } else {
-            PAGE_MainCfgRestoreDialog(-1);
+            PAGE_MainLayoutExit();
         }
         return 1;
     }
