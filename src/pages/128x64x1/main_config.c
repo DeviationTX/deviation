@@ -224,7 +224,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 #if HAS_LAYOUT_EDITOR
         else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_MainCfgExit();
-            PAGE_MainLayoutInit(0);
+            PAGE_MainLayoutInit(-1);
         }
 #endif //HAS_LAYOUT_EDITOR
         else {
