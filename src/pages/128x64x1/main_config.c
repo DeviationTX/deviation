@@ -30,17 +30,32 @@ static u16 current_selected = 0;
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-void PAGE_MainLayoutInit(int page)
+void PAGE_MainCfgInit(int page)
 {
     (void)page;
+#if HAS_LAYOUT_EDITOR
+    PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
+#else
+    PAGE_ShowHeader(_tr("Main page config"));
+#endif
+    PAGE_SetActionCB(_action_cb);
+    memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));
     show_config();
 }
-void PAGE_MainLayoutEvent()
+void PAGE_MainCfgEvent()
 {
 }
-void PAGE_MainLayoutExit()
+void PAGE_MainCfgExit()
 {
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+}
+void PAGE_MainCfgRestoreDialog(int idx)
+{
+    GUI_RemoveAllObjects();
+    PAGE_MainCfgInit(0);
+    lp->selected_for_move = idx;
+    show_config();
 }
 
 static int size_cb(int absrow, void *data)
@@ -101,7 +116,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_MainCfgExit();
     TGLICO_Select(obj, data);
 }
 
@@ -109,6 +124,8 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    current_selected += 1 << 8;
     create_element();
     show_config();
 }
@@ -124,6 +141,7 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
+        current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
         return _tr("Delete");
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 0);
@@ -188,15 +206,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 }
 void show_config()
 {
-    PAGE_MainLayoutExit();
-    GUI_RemoveAllObjects();
-#if HAS_LAYOUT_EDITOR
-    PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
-#else
-    PAGE_ShowHeader(_tr("Main page config"));
-#endif
-    PAGE_SetActionCB(_action_cb);
-    memset(gui, 0, sizeof(*gui));
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
         if (! ELEM_USED(pc->elem[count]))
@@ -219,8 +228,10 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
 #if HAS_LAYOUT_EDITOR
-        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS))
-            show_layout();
+        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+            PAGE_MainCfgExit();
+            PAGE_MainLayoutInit(0);
+        }
 #endif //HAS_LAYOUT_EDITOR
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
