@@ -30,7 +30,7 @@ static u16 current_selected = 0;
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-void PAGE_MainCfgInit(int page)
+void PAGE_MainLayoutInit(int page)
 {
     (void)page;
     GUI_RemoveAllObjects();
@@ -44,10 +44,10 @@ void PAGE_MainCfgInit(int page)
     memset(lp, 0, sizeof(*lp));
     show_config();
 }
-void PAGE_MainCfgEvent()
+void PAGE_MainLayoutEvent()
 {
 }
-void PAGE_MainCfgExit()
+void PAGE_MainLayoutExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
@@ -110,7 +110,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    PAGE_MainCfgExit();
+    PAGE_MainLayoutExit();
     TGLICO_Select(obj, data);
 }
 
@@ -223,8 +223,8 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
 #if HAS_LAYOUT_EDITOR
         else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
-            PAGE_MainCfgExit();
-            PAGE_MainLayoutInit(-1);
+            PAGE_MainLayoutExit();
+            show_layout();
         }
 #endif //HAS_LAYOUT_EDITOR
         else {

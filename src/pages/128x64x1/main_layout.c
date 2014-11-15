@@ -31,6 +31,7 @@ static const int HEADER_Y = 1;
 #include "../common/_main_layout.c"
 
 static const char *pos_cb(guiObject_t *obj, const void *data);
+
 static unsigned _layaction_cb(u32 button, unsigned flags, void *data);
 
 static void move_cb(guiObject_t *obj, const void *data)
@@ -56,9 +57,8 @@ static void move_cb(guiObject_t *obj, const void *data)
     }
 }
 
-void PAGE_MainLayoutInit(int page)
+void show_layout()
 {
-    (void)page;
     GUI_RemoveAllObjects();
     PAGE_SetActionCB(_layaction_cb);
     lp->selected_x = 0;
@@ -91,15 +91,12 @@ void PAGE_MainLayoutInit(int page)
     if(OBJ_IS_USED(&gui->elem[0]))
         GUI_SetSelected((guiObject_t *)&gui->elem[0]);
 }
-void PAGE_MainLayoutEvent()
-{
-}
-void PAGE_MainLayoutExit()
+void layout_exit()
 {
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(NULL);
     lp->selected_for_move = -1;
-    PAGE_MainCfgInit(-1);
+    PAGE_MainLayoutInit(-1);
 }
 
 static void xpos_cb(guiObject_t *obj, int dir, void *data)
@@ -153,7 +150,7 @@ static void select_for_move(guiLabel_t *obj)
     }
     set_selected_for_move(idx);
 }
-    
+
 static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
@@ -161,7 +158,7 @@ static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
         if (lp->selected_for_move >= 0) {
             set_selected_for_move(-1);
         } else {
-            PAGE_MainLayoutExit();
+            layout_exit();
         }
         return 1;
     }

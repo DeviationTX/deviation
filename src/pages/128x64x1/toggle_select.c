@@ -185,7 +185,7 @@ unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_MainCfgInit(-1);
+            PAGE_MainLayoutInit(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_UP))
             navigate_toggleicons(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_DOWN))
