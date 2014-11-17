@@ -422,7 +422,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         if (! OBJ_IS_HIDDEN(obj) && OBJ_IS_SELECTABLE(obj))
         {
             if(obj->Type == Scrollable) {
-                foundObj = GUI_ScrollableGetNextSelectable((guiScrollable_t *)obj, obj);
+                foundObj = GUI_ScrollableGetNextSelectable((guiScrollable_t *)obj, NULL);
             } else {
                 foundObj = obj;
             }
@@ -471,7 +471,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
     if (! objLast)
         objLast = origObj;
     if (objLast && objLast->Type == Scrollable)
-        return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)objLast, objLast);
+        return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)objLast, NULL);
     return objLast;
 }
 

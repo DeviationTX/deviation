@@ -133,22 +133,18 @@ static void _navigate_pages(s8 direction)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;
             if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
                 PAGE_ChangeByID(PAGEID_TXCFG, -1);
             else
                 PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else if (CHAN_ButtonIsPressed(button, BUT_RIGHT))
+        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
             _navigate_pages(1);
-        else if (CHAN_ButtonIsPressed(button, BUT_LEFT))
+        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
             _navigate_pages(-1);
-        else if (CHAN_ButtonIsPressed(button, BUT_UP))
-            GUI_ScrollableScroll(&gui->scrollable, -1);
-        else if (CHAN_ButtonIsPressed(button, BUT_DOWN))
-            GUI_ScrollableScroll(&gui->scrollable, 1);
+        }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
             return 0;

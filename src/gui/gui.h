@@ -296,7 +296,6 @@ extern struct guiObject *objModalButton;
 guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj);
 void GUI_RemoveScrollableObjs(guiObject_t *obj);
 void GUI_DrawScrollable(guiObject_t *obj);
-void GUI_ScrollableScroll(guiScrollable_t *scrollable, s8 direction);
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj);
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj);
