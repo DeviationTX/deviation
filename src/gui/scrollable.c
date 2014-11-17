@@ -146,7 +146,7 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
 
 static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
 {
-    int row_height = 0, height = scrollable->max_visible_rows;
+    int height = scrollable->max_visible_rows;
     int last_row = scrollable->item_count - 1;
     int first_row = row, count = 0;
     if (row < 0 || row > last_row)
@@ -157,16 +157,16 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
     //This ensures that the next/prev row is completely visible
     if (row < 0 || row > last_row)
         row = last_row;
-    first_row = row;//int orig_row = row;
+    first_row = row; //int orig_row = row;
     while(row <= last_row && height) {
-        height -= row_height = scrollable->size_cb(row, scrollable->cb_data);
+        height -= scrollable->size_cb(row, scrollable->cb_data);
         if (height < 0)
             break;
         row++;
         count++;
     }
     if (height < 0 && offset > 0) {
-        //Restart and work backwards to make sure last row is visible
+        //Restart and work backwards to make all of last row visible
         height = scrollable->max_visible_rows;
         first_row += count + 1;
         count = 0;
@@ -194,8 +194,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     } else {
         row = adjust_row(scrollable, row, row - scrollable->cur_row);
     }
-    offset = row - scrollable->cur_row;
-    old_last_row -= offset;
+    old_last_row -= offset = row - scrollable->cur_row;
     if (scrollable->head && offset == 0)
         return idx;
 
@@ -352,7 +351,9 @@ guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, i
 {
     if (absrow < scrollable->cur_row
         || absrow >= scrollable->cur_row + scrollable->visible_rows)
+    {
         create_scrollable_objs(scrollable, absrow, 0);
+    }
     int relrow = absrow - scrollable->cur_row;
     return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
 }
@@ -360,10 +361,12 @@ guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, i
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
 {
     create_scrollable_objs(scrollable, row_idx >> 8, 0);
+
     //number of rows and/or visible rows can change, ie. added, deleted or model changed
     int idx = row_idx & 0xff;
     if (idx > scrollable->num_selectable -1)
         idx = scrollable->num_selectable -1;
+
     return set_selectable_idx(scrollable, idx);
 }
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
