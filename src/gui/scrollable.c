@@ -252,6 +252,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
 int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)pos;
+    guiScrollable_t *scrollable = (guiScrollable_t *)data;
     int adjust;
     if (direction > 1)
         adjust = scrollable->visible_rows;
