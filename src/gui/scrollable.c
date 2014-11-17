@@ -24,7 +24,7 @@
     #define scroll_cb NULL
 #endif
 
-static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int row_offset);
+static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offset);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
@@ -146,7 +146,7 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
 
 static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
 {
-    int row_height, height = scrollable->max_visible_rows;
+    int row_height = 0, height = scrollable->max_visible_rows;
     int last_row = scrollable->item_count - 1;
     int first_row = row, count = 0;
     if (row < 0 || row > last_row)
@@ -157,21 +157,24 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
     //This ensures that the next/prev row is completely visible
     if (row < 0 || row > last_row)
         row = last_row;
-    //int orig_row = first_row = row;
-    first_row = row;
+    first_row = row;    //, orig_row = row;
     while(row <= last_row && height) {
         height -= row_height = scrollable->size_cb(row, scrollable->cb_data);
-        if (height < 0) {
-            height += row_height;
-            if (offset > 0) {   //Make sure last row is completely visible
-                height = scrollable->max_visible_rows;
-                first_row += count + 1;
-                count = 0;
-            }
+        if (height < 0)
             break;
-        }
         row++;
         count++;
+    }
+    if (height < 0) {
+        //An incomplete row, try again...
+        if (offset > 0)
+            height += row_height;
+        else {
+            //Restart and work backwards to make sure last row is visible
+            height = scrollable->max_visible_rows;
+            first_row += count + 1;
+            count = 0;
+        }
     }
     while(first_row) {
         height -= scrollable->size_cb(first_row-1, scrollable->cb_data);
@@ -185,18 +188,21 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
     return first_row;
 }
 
-static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int row_offset)
+static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offset)
 {
     int idx = get_selectable_idx(scrollable, objSELECTED);  //Save index of selectable
-    int last_row = scrollable->visible_rows - 1;    //Old cur_row (for scrolling down)
-    if (row_offset) {
-        row = adjust_row(scrollable, scrollable->cur_row + row_offset, row_offset);
+    int last_row = scrollable->visible_rows - 1;    //Old last_row (for scrolling down)
+
+    //adjust row and calculate visible_rows
+    if (offset) {
+        row = adjust_row(scrollable, scrollable->cur_row + offset, offset);
     }
     else if (row >= 0) {
         row = adjust_row(scrollable, row, row - scrollable->cur_row);
     }
-    row_offset = row - scrollable->cur_row;
-    if (scrollable->head && row_offset == 0)
+    offset = row - scrollable->cur_row;
+    last_row -= offset;
+    if (scrollable->head && offset == 0)
         return idx;
 
     int rel_row = 0;
@@ -215,14 +221,14 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int row_
             break;  //Is not really selectable because it is not completely visible
 
         //Maintain index of saved selectable
-        if (idx >= 0 && row_offset < 0) {
-            idx += selectable; row_offset++; }
-        if (rel_row > last_row - row_offset && row_offset > 0)
+        if (idx >= 0 && offset < 0) {
+            idx += selectable; offset++; }
+        if (rel_row > last_row && offset > 0)
             idx -= selectable;
 
         num_selectable += selectable;
     }
-    if (row_offset > 0)
+    if (offset > 0)
         idx += num_selectable - scrollable->num_selectable;
     scrollable->cur_row = row - rel_row;
     scrollable->visible_rows = rel_row;
@@ -350,8 +356,8 @@ guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, i
 
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
 {
-    //number of rows and/or visible rows can change, ie. added, deleted or model changed
     create_scrollable_objs(scrollable, row_idx >> 8, 0);
+    //number of rows and/or visible rows can change, ie. added, deleted or model changed
     int idx = row_idx & 0xff;
     if (idx > scrollable->num_selectable -1)
         idx = scrollable->num_selectable -1;
