@@ -272,10 +272,10 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj);
 
-    //selectables can scroll into view
+    //first handle any required scrolling, ...selectables can scroll into view
     if ((idx == scrollable->num_selectable -1 || ! scrollable->num_selectable)
             && scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
-        //At last selectable item (or no selectables),
+        //no next selectable (at last item, or no selectable)
         //and the last row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, 1);
 
@@ -289,9 +289,6 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
     obj = set_selectable_idx(scrollable, idx+1);
     if (obj)
         return obj;
-
-    //have scrolled to bottom; there is no next selectable
-    //go to the next item after the Scrollable
     return (guiObject_t *)scrollable;
 }
 
@@ -302,27 +299,23 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj);
 
-    //selectables can scroll into view
+    //first handle any required scrolling, ...selectables can scroll into view
     if ((idx == 0 || idx == -1 || ! scrollable->num_selectable) && scrollable->cur_row > 0)
-        //at first selectable item (or no selectables),
+        //no previous selectable (at first item, or no selectable)
         //and the first row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, -1);
 
     else if (idx == -2 && scrollable->cur_row == 0 && scrollable->num_selectable) {
         //last selection was not in the scrollable,
-        //wrap-around: scroll to last row and select last selectable
+        //wrap-around: scroll to last row and...
         create_scrollable_objs(scrollable, scrollable->item_count, 0);
     }
-    //if no current selection, go to last selectable
     if (idx < 0)
-        idx = scrollable->num_selectable;
+        idx = scrollable->num_selectable;   //select last selectable
 
     //go to previous selectable
     if (idx > 0)
         return set_selectable_idx(scrollable, idx-1);
-
-    //have scrolled to top; there is no previous selectable
-    //go to the previous item before the Scrollable
     return (guiObject_t *)scrollable;
 }
 
