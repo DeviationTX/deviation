@@ -154,7 +154,7 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
         row = max_firstrow;
 
     //This ensures that the next/prev row is completely visible
-    int orig_row = row, count = 0;
+    int first_row = row, count = 0; //int orig_row = row;
     while(row <= max_firstrow && height) {
         height -= scrollable->size_cb(row, scrollable->cb_data);
         if (height < 0)
@@ -162,25 +162,22 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
         row++;
         count++;
     }
-    if (height < 0) {
+    if (height < 0 && offset > 0) {
         //Restart and work backwards to make all of last row visible
         height = scrollable->max_visible_rows;
+        first_row = ++row;
         count = 0;
-        if (offset > 0)
-            row++;
-    } else
-        row = orig_row;
-
-    while(row) {
-        height -= scrollable->size_cb(row-1, scrollable->cb_data);
+    }
+    while(first_row) {
+        height -= scrollable->size_cb(first_row-1, scrollable->cb_data);
         if (height < 0)
             break;
-        row--;
+        first_row--;
         count++;
     }
     scrollable->visible_rows = count;
-    //printf("First row %d -> %d\n", orig_row, row);
-    return row;
+    //printf("First row %d -> %d\n", orig_row, first_row);
+    return first_row;
 }
 
 static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offset)
