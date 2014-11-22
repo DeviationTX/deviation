@@ -113,14 +113,18 @@ static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
 
 static guiObject_t * set_selectable_idx(guiScrollable_t *scrollable, int idx)
 {
-    guiObject_t *head = scrollable->head;
-    int id = 0;
-    while(head) {
-        if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
-            if(idx == id++)
-                return head;
+    //exclude not completely visible items on last row
+    if (idx >= 0 && idx < scrollable->num_selectable)
+    {
+        guiObject_t *head = scrollable->head;
+        int id = 0;
+        while(head) {
+            if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+                if(idx == id++)
+                    return head;
+            }
+            head = head->next;
         }
-        head = head->next;
     }
     return NULL;
 }
@@ -162,11 +166,14 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
         row++;
         count++;
     }
-    if (height < 0 && offset > 0) {
-        //Restart and work backwards to make all of last row visible
-        height = scrollable->max_visible_rows;
-        first_row = ++row;
-        count = 0;
+    if (height < 0) {
+        if (offset > 0) {
+            //Restart and work backwards to make all of last row visible
+            height = scrollable->max_visible_rows;
+            first_row = ++row;
+            count = 0;
+        } else
+            height += scrollable->size_cb(row, scrollable->cb_data);
     }
     while(first_row) {
         height -= scrollable->size_cb(first_row-1, scrollable->cb_data);
@@ -186,11 +193,11 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     int old_rel_lastrow = scrollable->visible_rows - 1;
 
     //adjust row and calculate visible_rows
-    if (row || ! offset) {
+    if (row || ! offset)
         row = adjust_row(scrollable, row, offset);
-    } else {
+    else
         row = adjust_row(scrollable, scrollable->cur_row + offset, offset);
-    }
+
     old_rel_lastrow -= offset = row - scrollable->cur_row;
     if (scrollable->head && ! offset)
         return idx;
