@@ -285,7 +285,7 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
         //and the last row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, 1);
 
-    else if (idx == -2 && scrollable->num_selectable) { //if no selectables, no wrap-around
+    else if (! obj && scrollable->num_selectable) { //if no selectables, no wrap-around
         //last selection was not in the scrollable
         //wrap-around: scroll to first row and select first selectable
         create_scrollable_objs(scrollable, 0, 0);
@@ -311,13 +311,13 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
         //and the first row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, -1);
 
-    else if (idx == -2 && scrollable->cur_row == 0 && scrollable->num_selectable) {
+    else if (! obj && scrollable->cur_row == 0 && scrollable->num_selectable) {
         //last selection was not in the scrollable,
-        //wrap-around: scroll to last row and...
+        //wrap-around: scroll to last row and select last selectable
         create_scrollable_objs(scrollable, scrollable->item_count, 0);
     }
     if (idx < 0)
-        idx = scrollable->num_selectable;   //select last selectable
+        idx = scrollable->num_selectable;
 
     //go to previous selectable
     if (idx > 0)
