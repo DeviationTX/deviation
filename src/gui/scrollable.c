@@ -277,19 +277,18 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj);
 
-    //first handle any required scrolling, ...selectables can scroll into view
+    else if (scrollable->num_selectable) {  // <- no wrap-around in Channel/Telemetry monitor
+        //last selection was not in the scrollable
+        //wrap-around: scroll to first row and select first selectable
+        create_scrollable_objs(scrollable, 0, 0);
+        idx = -1;
+    }
     if ((idx == scrollable->num_selectable -1 || ! scrollable->num_selectable)
             && scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
         //no next selectable (at last item, or no selectable)
         //and the last row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, 1);
 
-    else if (! obj && scrollable->num_selectable) { //if no selectables, no wrap-around
-        //last selection was not in the scrollable
-        //wrap-around: scroll to first row and select first selectable
-        create_scrollable_objs(scrollable, 0, 0);
-        idx = -1;
-    }
     //go to next selectable
     obj = set_selectable_idx(scrollable, idx+1);
     if (obj)
@@ -304,17 +303,16 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj);
 
-    //first handle any required scrolling, ...selectables can scroll into view
+    else if (scrollable->num_selectable)    // <- no wrap-around in Channel/Telemetry monitor
+        //last selection was not in the scrollable,
+        //wrap-around: scroll to last row and select last selectable
+        create_scrollable_objs(scrollable, scrollable->item_count, 0);
+
     if ((idx == 0 || idx == -1 || ! scrollable->num_selectable) && scrollable->cur_row)
         //no previous selectable (at first item, or no selectable)
         //and the first row is not visible, just move the scrollbar
         idx = create_scrollable_objs(scrollable, 0, -1);
 
-    else if (! obj && scrollable->cur_row == 0 && scrollable->num_selectable) {
-        //last selection was not in the scrollable,
-        //wrap-around: scroll to last row and select last selectable
-        create_scrollable_objs(scrollable, scrollable->item_count, 0);
-    }
     if (idx < 0)
         idx = scrollable->num_selectable;
 
