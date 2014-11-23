@@ -414,7 +414,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         //The current selected object is scrollable
         guiScrollable_t *scroll = GUI_FindScrollableParent(obj);
         obj = GUI_ScrollableGetNextSelectable(scroll, obj);
-        if (obj->Type != Scrollable)
+        if (obj && obj->Type != Scrollable)
             return obj;
     }
     obj = obj ? obj->next : modalObj ? modalObj : objHEAD;
@@ -438,14 +438,14 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
 
 struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
 {
-    struct guiObject *obj, *objLast = NULL;
+    struct guiObject *obj = origObj, *objLast = NULL;
     struct guiObject *modalObj;
-    if (origObj && OBJ_IS_SCROLLABLE(origObj)) {
+    if (obj && OBJ_IS_SCROLLABLE(obj)) {
         //The current selected object is scrollable
-        guiScrollable_t *scroll = GUI_FindScrollableParent(origObj);
-        origObj = GUI_ScrollableGetPrevSelectable(scroll, origObj);
-        if (origObj->Type != Scrollable)
-            return origObj;
+        guiScrollable_t *scroll = GUI_FindScrollableParent(obj);
+        obj = GUI_ScrollableGetPrevSelectable(scroll, obj);
+        if (obj && obj->Type != Scrollable)
+            return obj;
     }
     modalObj = GUI_IsModal();
     obj = modalObj ? modalObj : objHEAD;
