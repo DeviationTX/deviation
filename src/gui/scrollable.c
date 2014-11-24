@@ -66,6 +66,9 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
               obj,
               scroll_cb, scrollable);
     create_scrollable_objs(scrollable, 0, 0);
+    //force selection to be current object-if there are no selectable contents
+    if (! scrollable->num_selectable)
+        objSELECTED = obj;
 
     return obj;
 }
@@ -110,17 +113,16 @@ static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
 static guiObject_t * set_selectable_idx(guiScrollable_t *scrollable, int idx)
 {
     //exclude not completely visible items on last row
-    if (idx >= 0 && idx < scrollable->num_selectable)
-    {
-        guiObject_t *head = scrollable->head;
-        int id = 0;
-        while(head) {
-            if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
-                if(idx == id++)
-                    return head;
-            }
-            head = head->next;
+    if (idx < 0 || idx >= scrollable->num_selectable)
+        return NULL;
+    guiObject_t *head = scrollable->head;
+    int id = 0;
+    while(head) {
+        if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+            if(idx == id++)
+                return head;
         }
+        head = head->next;
     }
     return NULL;
 }
@@ -144,42 +146,37 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
 static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
 {
     int height = scrollable->max_visible_rows;
-    int max_firstrow = scrollable->item_count - height;
-    if (row < 0) row = 0;
-    if (! scrollable->size_cb)
-        return row > max_firstrow ? max_firstrow : row;
-
-    max_firstrow = scrollable->item_count - 1;
-    if (row > max_firstrow)
-        row = max_firstrow;
+    int maxrow = scrollable->item_count;
+    int bottom_row = scrollable->cur_row + scrollable->visible_rows + 1;
+    int first_row = row;
+    if (first_row < 0)
+        first_row = 0;
+    if (first_row > maxrow)
+        first_row = maxrow;
+    int last_row = first_row;
 
     //This ensures that the next/prev row is completely visible
-    int first_row = row, count = 0; //int orig_row = row;
-    while(row <= max_firstrow && height) {
-        height -= scrollable->size_cb(row, scrollable->cb_data);
-        if (height < 0)
-            break;
-        row++;
-        count++;
+    while(last_row < maxrow && height > 0) {
+        height -= scrollable->size_cb ? scrollable->size_cb(last_row, scrollable->cb_data) : 1;
+        last_row++;
     }
     if (height < 0) {
-        if (offset > 0) {
-            //Restart and work backwards to make all of last row visible
+        if (offset > 0 && last_row <= bottom_row) {
+            first_row = last_row;
             height = scrollable->max_visible_rows;
-            first_row = ++row;
-            count = 0;
-        } else
-            height += scrollable->size_cb(row, scrollable->cb_data);
+        }
+        else if (offset < 0)
+            height += scrollable->size_cb(--last_row, scrollable->cb_data);
     }
-    while(first_row) {
-        height -= scrollable->size_cb(first_row-1, scrollable->cb_data);
-        if (height < 0)
-            break;
+    while(first_row && height > 0) {
+        height -= scrollable->size_cb ? scrollable->size_cb(first_row-1, scrollable->cb_data) : 1;
         first_row--;
-        count++;
     }
-    scrollable->visible_rows = count;
-    //printf("First row %d -> %d\n", orig_row, first_row);
+    if (offset < 0 && first_row - height == row)
+        first_row = row;
+
+    scrollable->visible_rows = last_row - first_row;
+    //printf("First row %d -> %d \tcount %d\n", row, first_row, last_row - first_row);
     return first_row;
 }
 
