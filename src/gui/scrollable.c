@@ -143,14 +143,14 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
     return NULL;
 }
 
-static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
+static int adjust_row(guiScrollable_t *scrollable, int target_row, int offset)
 {
     //This ensures that the next/prev row is completely visible
-    //and is where row value is kept within the valid range
+    //and is where first_row is kept within a valid range
+    int bottom_row = scrollable->cur_row + scrollable->visible_rows + offset;
     int height = scrollable->max_visible_rows;
     int maxrow = scrollable->item_count;
-    int bottom_row = scrollable->cur_row + scrollable->visible_rows + 1;
-    int first_row = row;
+    int first_row = target_row;
     if (first_row < 0)
         first_row = 0;
     if (first_row > maxrow)
@@ -162,13 +162,12 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
         last_row++;
     }
     if (height < 0) {
+        last_row--;
         if (offset <= 0)
-            height += scrollable->size_cb(--last_row, scrollable->cb_data);
-        else if (last_row > bottom_row)
-            last_row--;
-        else {
+            height += scrollable->size_cb(last_row, scrollable->cb_data);
+        else if (last_row < bottom_row) {
             //Restart and work backwards to make all of last row visible
-            first_row = last_row;
+            first_row = ++last_row;
             height = scrollable->max_visible_rows;
         }
     }
@@ -176,10 +175,10 @@ static int adjust_row(guiScrollable_t *scrollable, int row, int offset)
         height -= scrollable->size_cb ? scrollable->size_cb(first_row-1, scrollable->cb_data) : 1;
         first_row--;
     }
-    if (offset <= 0 && first_row - height == row)
-        first_row = row;
+    if (offset <= 0 && first_row - height == target_row)
+        first_row = target_row;
 
-    //printf("First row %d -> %d \tcount %d\n", row, first_row, last_row - first_row);
+    //printf("First row %d -> %d \tcount %d\n", target_row, first_row, last_row - first_row);
     return first_row;
 }
 
