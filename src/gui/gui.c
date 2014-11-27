@@ -416,6 +416,7 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         obj = GUI_ScrollableGetNextSelectable(scroll, obj);
         if (obj)
             return obj;
+        obj = (guiObject_t *)scroll; 
     }
     obj = obj ? obj->next : modalObj ? modalObj : objHEAD;
     while(obj) {
@@ -446,6 +447,7 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         origObj = GUI_ScrollableGetPrevSelectable(scroll, origObj);
         if (origObj)
             return origObj;
+        origObj = (guiObject_t *)scroll; 
     }
     modalObj = GUI_IsModal();
     obj = modalObj ? modalObj : objHEAD;
