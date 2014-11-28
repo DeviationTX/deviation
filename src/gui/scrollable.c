@@ -274,7 +274,7 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
         idx = get_selectable_idx(scrollable, obj) + 1;
 
     if (idx == -1 || idx == scrollable->num_selectable) {
-        //no next selectable found, move the scrollbar
+        //no next selectable, move the scrollbar
         if ((scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
              && ! (! obj && ! scrollable->cur_row && scrollable->num_selectable))
         {
@@ -307,7 +307,7 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
         idx = get_selectable_idx(scrollable, obj) - 1;
 
     if (idx == -1) {
-        //no previous selectable found, move the scrollbar
+        //no previous selectable, move the scrollbar
         if (scrollable->cur_row && ! (! obj && scrollable->num_selectable &&
             scrollable->cur_row == scrollable->item_count - scrollable->visible_rows))
         {
