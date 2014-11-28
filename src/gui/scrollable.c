@@ -246,7 +246,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     if (idx >= 0 && idx < num_selectable)
         return idx;
     //else has moved off screen, return -1 or num_selectable
-    return idx > 0 && num_selectable ? num_selectable : -1;
+    return idx < 0 ? -1 : num_selectable;
 }
 
 #if HAS_TOUCH
