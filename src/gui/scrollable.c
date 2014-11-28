@@ -45,8 +45,6 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
         scrollable->max_visible_rows = item_count;
     scrollable->size_cb = size_cb;
     scrollable->cb_data = data;
-    scrollable->head = NULL;
-    scrollable->cur_row = 0;
 
     box->x = x;
     box->y = y;
@@ -149,11 +147,8 @@ static int adjust_row(guiScrollable_t *scrollable, int target_row, int offset)
     int bottom_row = scrollable->cur_row + scrollable->visible_rows + offset;
     int height = scrollable->max_visible_rows;
     int maxrow = scrollable->item_count;
-    int first_row = target_row;
-    if (first_row < 0)
-        first_row = 0;
-    if (first_row > maxrow)
-        first_row = maxrow;
+    int target = (target_row < 0) ? 0 : (target_row > maxrow) ? maxrow : target_row;
+    int first_row = target;
     int last_row = first_row;
 
     while(last_row < maxrow && height > 0) {
@@ -174,8 +169,8 @@ static int adjust_row(guiScrollable_t *scrollable, int target_row, int offset)
         height -= scrollable->size_cb ? scrollable->size_cb(first_row-1, scrollable->cb_data) : 1;
         first_row--;
     }
-    if (offset <= 0 && first_row - height == target_row)
-        first_row = target_row;
+    if (offset <= 0 && first_row - height == target)
+        first_row = target;
 
     //printf("First row %d -> %d \tcount %d\n", target_row, first_row, last_row - first_row);
     return first_row;
