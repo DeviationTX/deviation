@@ -246,7 +246,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     if (idx >= 0 && idx < num_selectable)
         return idx;
     //else has moved off screen, return -1 or num_selectable
-    return idx < 0 ? -1 : num_selectable;
+    return idx > 0 && num_selectable ? num_selectable : -1;
 }
 
 #if HAS_TOUCH
@@ -268,13 +268,15 @@ int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
 
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {
-    int idx = 0;
+    int idx = -1;
     if (obj)
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj) + 1;
-    if (idx == 0 || idx == scrollable->num_selectable) {
+
+    if (idx == -1 || idx == scrollable->num_selectable) {
         //no next selectable found, move the scrollbar
-        if (scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
+        if ((scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
+             && ! (! obj && ! scrollable->cur_row && scrollable->num_selectable))
         {
             idx = create_scrollable_objs(scrollable, 0, 1);
             if (idx < scrollable->num_selectable - 1)
@@ -282,14 +284,14 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
             else
                 idx = scrollable->num_selectable - 1;
         }
-        else if (wrap_around) {
+        else if (! obj && wrap_around) {
             //scroll to first row and select first selectable
             create_scrollable_objs(scrollable, 0, 0);
             idx = 0;
         }
     }
     //go to next selectable
-    if (idx < scrollable->num_selectable
+    if ((idx >= 0 && idx < scrollable->num_selectable)
             || scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
         return set_selectable_idx(scrollable, idx);
 
@@ -303,23 +305,23 @@ guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObj
     if (obj)
         //last selection was in the scrollable
         idx = get_selectable_idx(scrollable, obj) - 1;
+
     if (idx == -1) {
         //no previous selectable found, move the scrollbar
-        if (scrollable->cur_row)
+        if (scrollable->cur_row && ! (! obj && scrollable->num_selectable &&
+            scrollable->cur_row == scrollable->item_count - scrollable->visible_rows))
         {
             idx = create_scrollable_objs(scrollable, 0, -1);
             if (idx > 0)
                 idx--;  //found previous (scrolled into view)
             else
-                idx = scrollable->num_selectable - 1;
+                idx = 0;
         }
-        else if (wrap_around) {
+        else if (! obj && wrap_around) {
             //scroll to last row and select last selectable
             create_scrollable_objs(scrollable, scrollable->item_count, 0);
             idx = scrollable->num_selectable - 1;
         }
-        if (idx == -1)
-            idx = 0;
     }
     //go to previous selectable
     if (idx >= 0 || scrollable->cur_row)
