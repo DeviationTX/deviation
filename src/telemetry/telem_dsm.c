@@ -98,7 +98,7 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_FRAMELOSS:
         case TELEM_DSM_FLOG_HOLDS:
         case TELEM_DSM_FLOG_TEMP1:
-            return 255;
+            return 9999;
         case TELEM_DSM_FLOG_VOLT1:
         case TELEM_DSM_FLOG_VOLT2:
             return 999;

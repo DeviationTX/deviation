@@ -387,6 +387,12 @@ static u32 pkt16_to_volt(u8 *ptr)
 {
     return ((((u32)ptr[0] << 8) | ptr[1]) + 5) / 10;  //In 1/10 of Volts
 }
+static int pkt16_to_flog(u8 *ptr)
+{
+    u32 value = ((u32)ptr[0] <<8) | ptr[1];
+    return value > 9999 ? 9999 : value;
+}
+
 
 static u32 pkt16_to_rpm(u8 *ptr)
 {
@@ -437,15 +443,12 @@ static void parse_telemetry_packet()
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
             update = update7f;
-            //Telemetry.p.dsm.flog.fades[0] = pkt16_to_u8(packet+2); //FadesA 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[1] = pkt16_to_u8(packet+4); //FadesB 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[2] = pkt16_to_u8(packet+6); //FadesL 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[3] = pkt16_to_u8(packet+8); //FadesR 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.frameloss = pkt16_to_u8(packet+10);
-            //Telemetry.p.dsm.flog.holds = pkt16_to_u8(packet+12);
-            for(int i = 2; i < 14; i+=2) {
-                *(u8*)&Telemetry.p.dsm.flog = pkt16_to_u8(packet+i);
-            }
+            Telemetry.p.dsm.flog.fades[0] = pkt16_to_flog(packet+2); //FadesA 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[1] = pkt16_to_flog(packet+4); //FadesB 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[2] = pkt16_to_flog(packet+6); //FadesL 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.fades[3] = pkt16_to_flog(packet+8); //FadesR 0xFFFF = (not connected)
+            Telemetry.p.dsm.flog.frameloss = pkt16_to_flog(packet+10);
+            Telemetry.p.dsm.flog.holds = pkt16_to_flog(packet+12);
             Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
         case 0x7e: //TM1000

@@ -128,9 +128,9 @@ struct telem_devo {
 };
 struct telem_dsm_flog {
     //Do not change the order of these, they are aligned to the dsm packet
-    u8 fades[4];
-    u8 frameloss;
-    u8 holds;
+    u16 fades[4];
+    u16 frameloss;
+    u16 holds;
     u16 volt[2];
     u16 rpm;
     s16 temp;
