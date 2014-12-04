@@ -21,6 +21,8 @@
 
 #include "../common/_dialogs.c"
 
+#define MAX_CONCURRENT_MSGS 1
+
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
 static u32 dialogcrc;
@@ -32,6 +34,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     if (obj && crc == dialogcrc)
         return tempstring;
     u64 unsafe = PROTOCOL_CheckSafe();
+    unsafe = unsafe & (unsafe ^ disable_safety);
     int i;
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
@@ -49,24 +52,23 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
         int len = strlen(tempstring);
         snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%,\nsafe value = %d%%"),
                 val, safeval[Model.safety[i]]);
-        if (++count >= 5)
+        if (++count >= MAX_CONCURRENT_MSGS)
             break;
     }
     return tempstring;
 }
 void PAGE_ShowSafetyDialog()
 {
-    if (disable_safety) {
-        return; // don't show safety dialog when calibrating
-    }
     if (dialog == NULL) {
         tempstring[0] = 0;
         dialogcrc = 0;
         current_selected_obj = GUI_GetSelected();
-        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
+        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, 
+                        safety_string_cb, safety_ok_cb, dtOk, (void *)MAX_CONCURRENT_MSGS);
         return;
     }
     u64 unsafe = PROTOCOL_CheckSafe();
+    unsafe = unsafe & (unsafe ^ disable_safety);
     if (! unsafe) {
         GUI_RemoveObj(dialog);
         GUI_SetSelected(current_selected_obj);

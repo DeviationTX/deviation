@@ -21,6 +21,8 @@
 
 #include "../common/_dialogs.c"
 
+#define MAX_CONCURRENT_MSGS 5
+
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
 static const int DLG_XOFFSET = ((LCD_WIDTH - 320) / 2);
@@ -39,6 +41,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     const s8 safeval[4] = {0, -100, 0, 100};
     volatile s16 *raw = MIXER_GetInputs();
     u64 unsafe = PROTOCOL_CheckSafe();
+    unsafe = unsafe & (unsafe ^ disable_safety);
     tempstring[0] = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
@@ -52,7 +55,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
         int len = strlen(tempstring);
         snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%, safe value = %d%%\n"),
                 val, safeval[Model.safety[i]]);
-        if (++count >= 5)
+        if (++count >= MAX_CONCURRENT_MSGS)
             break;
     }
     return tempstring;
@@ -60,11 +63,9 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
 
 void PAGE_ShowSafetyDialog()
 {
-    if (disable_safety) {
-        return; // don't show safety dialog when calibrating
-    }
     if (dialog) {
         u64 unsafe = PROTOCOL_CheckSafe();
+        unsafe = unsafe & (unsafe ^ disable_safety);
         if (! unsafe) {
             GUI_RemoveObj(dialog);
             dialog = NULL;
@@ -80,7 +81,8 @@ void PAGE_ShowSafetyDialog()
     } else {
         tempstring[0] = 0;
         dialogcrc = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"), safety_string_cb, safety_ok_cb, dtOk, NULL);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188,
+                        _tr("Safety"), safety_string_cb, safety_ok_cb, dtOk, (void *)MAX_CONCURRENT_MSGS);
     }
 }
 
