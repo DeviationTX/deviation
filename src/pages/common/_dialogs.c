@@ -24,14 +24,14 @@ static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 static void safety_ok_cb(u8 state, void * data)
 {
     (void)state;
-    int max_concurrent_msgs = (int)data;
+    (void)data;
     int count = 0;
     u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
     for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
         disable_safety ^= 1LL << i;
-        if (++count >= max_concurrent_msgs)
+        if (++count >= MAX_CONCURRENT_MSGS)
             break;
     }
     dialog = NULL;

@@ -19,9 +19,9 @@
 #include "config/model.h"
 #include "config/ini.h"
 
-#include "../common/_dialogs.c"
-
 #define MAX_CONCURRENT_MSGS 5
+
+#include "../common/_dialogs.c"
 
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
@@ -80,8 +80,7 @@ void PAGE_ShowSafetyDialog()
     } else {
         tempstring[0] = 0;
         dialogcrc = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"),
-                                    safety_string_cb, safety_ok_cb, dtOk, (void *)(long)MAX_CONCURRENT_MSGS);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"), safety_string_cb, safety_ok_cb, dtOk, NULL);
     }
 }
 
