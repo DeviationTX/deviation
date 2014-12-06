@@ -15,7 +15,7 @@
 
 
 static guiObject_t *dialog = NULL;
-static u64 safety_enabled = 0xFFFFFFFFFFFFFFFF;
+static u64 safety_enabled = ~0xLL;
 static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
