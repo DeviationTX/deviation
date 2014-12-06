@@ -40,8 +40,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
     volatile s16 *raw = MIXER_GetInputs();
-    u64 unsafe = PROTOCOL_CheckSafe();
-    unsafe = unsafe & (unsafe ^ disable_safety);
+    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
     tempstring[0] = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
@@ -64,12 +63,12 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
 void PAGE_ShowSafetyDialog()
 {
     if (dialog) {
-        u64 unsafe = PROTOCOL_CheckSafe();
-        unsafe = unsafe & (unsafe ^ disable_safety);
+        u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
         if (! unsafe) {
+            disable_safety = 0LL;
             GUI_RemoveObj(dialog);
             dialog = NULL;
-            PROTOCOL_Init(0);
+            PROTOCOL_Init(1);
         } else {
             safety_string_cb(NULL, NULL);
             u32 crc = Crc(tempstring, strlen(tempstring));
@@ -81,8 +80,8 @@ void PAGE_ShowSafetyDialog()
     } else {
         tempstring[0] = 0;
         dialogcrc = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188,
-                        _tr("Safety"), safety_string_cb, safety_ok_cb, dtOk, (void *)MAX_CONCURRENT_MSGS);
+        dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Safety"),
+                                    safety_string_cb, safety_ok_cb, dtOk, (void *)(long)MAX_CONCURRENT_MSGS);
     }
 }
 

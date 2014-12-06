@@ -33,8 +33,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     u32 crc = Crc(tempstring, strlen(tempstring));
     if (obj && crc == dialogcrc)
         return tempstring;
-    u64 unsafe = PROTOCOL_CheckSafe();
-    unsafe = unsafe & (unsafe ^ disable_safety);
+    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
     int i;
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
@@ -64,16 +63,16 @@ void PAGE_ShowSafetyDialog()
         dialogcrc = 0;
         current_selected_obj = GUI_GetSelected();
         dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, 
-                        safety_string_cb, safety_ok_cb, dtOk, (void *)MAX_CONCURRENT_MSGS);
+                        safety_string_cb, safety_ok_cb, dtOk, (void *)(long)MAX_CONCURRENT_MSGS);
         return;
     }
-    u64 unsafe = PROTOCOL_CheckSafe();
-    unsafe = unsafe & (unsafe ^ disable_safety);
+    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
     if (! unsafe) {
+        disable_safety = 0LL;
         GUI_RemoveObj(dialog);
         GUI_SetSelected(current_selected_obj);
         dialog = NULL;
-        PROTOCOL_Init(0);
+        PROTOCOL_Init(1);
         return;
     }
     safety_string_cb(NULL, NULL);

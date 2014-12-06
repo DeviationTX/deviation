@@ -26,21 +26,19 @@ static void safety_ok_cb(u8 state, void * data)
     (void)state;
     int max_concurrent_msgs = (int)data;
     int count = 0;
-    u64 unsafe = PROTOCOL_CheckSafe();
-    unsafe = unsafe & (unsafe ^ disable_safety);
+    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
     for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
-        disable_safety = disable_safety ^ (1LL << i);
+        disable_safety ^= 1LL << i;
         if (++count >= max_concurrent_msgs)
             break;
     }
     dialog = NULL;
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
-    unsafe = unsafe & (unsafe ^ disable_safety);
-    if (! unsafe) {
-        disable_safety = 0;
+    if (!(unsafe & ~disable_safety)) {
+        disable_safety = 0LL;
         PROTOCOL_Init(1);
     }
 }
@@ -60,7 +58,7 @@ static void lowbatt_ok_cb(u8 state, void * data)
 
 void PAGE_DisableSafetyDialog(u8 disable)
 {
-    disable_safety = disable ? 0xFFFFFFFFFFFFFFFF : 0;
+    disable_safety = disable ? 0xFFFFFFFFFFFFFFFF : 0LL;
 }
 
 static void invalid_stdmixer_cb(u8 state, void *guiObj)
