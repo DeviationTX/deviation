@@ -15,7 +15,7 @@
 
 
 static guiObject_t *dialog = NULL;
-static u64 disable_safety = 0;//by default =0, means enable
+static u64 safety_enabled = 0xFFFFFFFFFFFFFFFF;
 static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
@@ -26,19 +26,19 @@ static void safety_ok_cb(u8 state, void * data)
     (void)state;
     (void)data;
     int count = 0;
-    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
+    u64 unsafe = PROTOCOL_CheckSafe() & safety_enabled;
     for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
-        disable_safety ^= 1LL << i;
+        safety_enabled ^= 1LL << i;
         if (++count >= MAX_CONCURRENT_MSGS)
             break;
     }
     dialog = NULL;
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
-    if (!(unsafe & ~disable_safety)) {
-        disable_safety = 0LL;
+    if (!(unsafe & safety_enabled)) {
+        safety_enabled = ~0LL;
         PROTOCOL_Init(1);
     }
 }
@@ -58,7 +58,7 @@ static void lowbatt_ok_cb(u8 state, void * data)
 
 void PAGE_DisableSafetyDialog(u8 disable)
 {
-    disable_safety = disable ? 0xFFFFFFFFFFFFFFFF : 0LL;
+    safety_enabled = disable ? 0LL : ~0LL;
 }
 
 static void invalid_stdmixer_cb(u8 state, void *guiObj)

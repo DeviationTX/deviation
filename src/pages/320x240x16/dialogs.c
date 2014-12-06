@@ -40,7 +40,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
     volatile s16 *raw = MIXER_GetInputs();
-    u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
+    u64 unsafe = PROTOCOL_CheckSafe() & safety_enabled;
     tempstring[0] = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
@@ -63,9 +63,9 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
 void PAGE_ShowSafetyDialog()
 {
     if (dialog) {
-        u64 unsafe = PROTOCOL_CheckSafe() & ~disable_safety;
+        u64 unsafe = PROTOCOL_CheckSafe() & safety_enabled;
         if (! unsafe) {
-            disable_safety = 0LL;
+            safety_enabled = ~0LL;
             GUI_RemoveObj(dialog);
             dialog = NULL;
             PROTOCOL_Init(1);
