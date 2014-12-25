@@ -168,7 +168,6 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
     switch (cp->type) {
     case MONITOR_CHANNELOUTPUT: sprintf(tempstring, "%d", (int)ch+1); break;
     case MONITOR_VIRTUALOUTPUT:
-      printf("Virtual channel %d is %s\n", ch, Model.virtname[ch]) ;
       if (Model.virtname[ch][0]) {
           tempstring_cpy(Model.virtname[ch]) ;
       } else {
