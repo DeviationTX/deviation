@@ -114,8 +114,20 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    if (cp->type) {
-        char *p = tempstring;
+    char *p = tempstring;
+
+    switch (cp->type) {
+    case MONITOR_CHANNELOUTPUT:
+        sprintf(tempstring, "\n%d", (int)ch+1);
+        break;
+    case MONITOR_VIRTUALOUTPUT:
+        if (Model.virtname[ch][0]) {
+            tempstring_cpy(Model.virtname[ch]) ;
+        } else {
+            sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+        }
+        break;
+    case MONITOR_RAWINPUT:
         if (ch & 0x01) {
             *p = '\n';
             p++;
@@ -126,8 +138,7 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
         if (! (ch & 0x01)) {
             sprintf(p + strlen(p), "\n");
         }
-    } else {
-       sprintf(tempstring, "\n%d", (int)ch+1);
+        break;
     }
     return tempstring;
 }

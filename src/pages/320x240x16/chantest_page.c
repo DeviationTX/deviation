@@ -41,9 +41,16 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
         u8 count;
         switch (cp->type) {
-        case MONITOR_CHANNELOUTPUT: count = Model.num_channels; break;
-        case MONITOR_RAWINPUT: case MONITOR_BUTTONTEST: count = NUM_INPUTS; break;
-        case MONITOR_VIRTUALOUTPUT: count = NUM_VIRT_CHANNELS; break;
+        case MONITOR_CHANNELOUTPUT:
+            count = Model.num_channels;
+            break;
+        case MONITOR_RAWINPUT:
+        case MONITOR_BUTTONTEST:
+            count = NUM_INPUTS;
+            break;
+        case MONITOR_VIRTUALOUTPUT:
+            count = NUM_VIRT_CHANNELS;
+            break;
         }
         _show_bar_page(count, newpos);
     }
@@ -115,6 +122,16 @@ void PAGE_ChantestInit(int page)
     cp->return_page = NULL;
     cp->type = MONITOR_CHANNELOUTPUT;
     _show_bar_page(Model.num_channels, 0);
+}
+
+void PAGE_VirttestInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_VIRTMON));
+    cp->return_page = NULL;
+    cp->type = MONITOR_VIRTUALOUTPUT;
+    _show_bar_page(NUM_VIRT_CHANNELS, 0);
 }
 
 void PAGE_InputtestInit(int page)

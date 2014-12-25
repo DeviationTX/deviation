@@ -58,6 +58,7 @@ struct page_group groups[] = {
     {2, PAGEID_TXCFG},
     {2, PAGEID_TELEMMON},
     {2, PAGEID_CHANMON},
+    {2, PAGEID_VIRTMON},
     {2, PAGEID_INPUTMON},
     {2, PAGEID_BTNMON},
 #if HAS_SCANNER
