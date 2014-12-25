@@ -113,6 +113,9 @@ void PAGE_ChantestInit(int page)
     case MONITOR_VIRTUALOUTPUT:
         _show_bar_page(NUM_VIRT_CHANNELS);
         break;
+    case MONITOR_PPMINPUT:
+        _show_bar_page(Model.num_ppmin & 0x3f);
+        break;
     default:
         cp->type = MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
@@ -133,7 +136,7 @@ static void _navigate_pages(s8 direction)
     int new = cp->type;
     new += direction;
     new = new < 0 ? 0
-        : new > MONITOR_RAWINPUT ? MONITOR_RAWINPUT
+        : new > MONITOR_PPMINPUT ? MONITOR_PPMINPUT
         : new ;
     if ((unsigned) new != cp->type) {
         cp->type = new;
@@ -169,6 +172,7 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     switch (cp->type) {
+    case MONITOR_PPMINPUT:
     case MONITOR_CHANNELOUTPUT:
         sprintf(tempstring, "%d", (int)ch+1);
         break;
@@ -203,6 +207,9 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     case MONITOR_RAWINPUT:
         tempstring_cpy((const char *)_tr("Stick input"));
         break;
+    case MONITOR_PPMINPUT:
+        tempstring_cpy((const char *)_tr("PPM input"));
+        break;
     default:
         printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
         break;
@@ -217,7 +224,7 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
     tempstring_cpy((const char *)"<>");  //this is actually used as an icon don't translate
     if (cp->type == MONITOR_CHANNELOUTPUT) {
         tempstring_cpy((const char *)"->");
-    } else if (cp->type == MONITOR_RAWINPUT) {
+    } else if (cp->type == MONITOR_PPMINPUT) {
         tempstring_cpy((const char *)"<-");
     }
     return tempstring;

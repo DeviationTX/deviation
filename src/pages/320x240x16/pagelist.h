@@ -14,6 +14,7 @@ PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,     
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Channel monitor"))
 PAGEDEF(PAGEID_VIRTMON,  PAGE_VirttestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Virtual monitor"))
 PAGEDEF(PAGEID_INPUTMON, PAGE_InputtestInit,   PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Input monitor"))
+PAGEDEF(PAGEID_PPMMON, PAGE_PPMInputInit,   PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("PPM monitor"))
 PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_ChantestExit,_tr_noop("Button monitor"))
 #if HAS_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit, _tr_noop("Scanner"))

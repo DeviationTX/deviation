@@ -42,7 +42,7 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         u8 count = 0;
         switch (cp->type) {
         case MONITOR_CHANNELOUTPUT:
-            count = Model.num_channels;
+            count = Model.num_channels & 0x3f;
             break;
         case MONITOR_RAWINPUT:
         case MONITOR_BUTTONTEST:
@@ -50,6 +50,9 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
             break;
         case MONITOR_VIRTUALOUTPUT:
             count = NUM_VIRT_CHANNELS;
+            break;
+        case MONITOR_PPMINPUT:
+            count = Model.num_ppmin & 0x3f;
             break;
         }
         _show_bar_page(count, newpos);
@@ -142,6 +145,16 @@ void PAGE_InputtestInit(int page)
     cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
     _show_bar_page(NUM_INPUTS, 0);
+}
+
+void PAGE_PPMInputInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_PPMMON));
+    cp->return_page = NULL;
+    cp->type = MONITOR_PPMINPUT;
+    _show_bar_page(Model.num_ppmin & 0x3f, 0);
 }
 
 void PAGE_ButtontestInit(int page)

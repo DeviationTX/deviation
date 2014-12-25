@@ -84,6 +84,7 @@ void PAGE_TestEvent();
 void PAGE_ChantestInit(int page);
 void PAGE_VirttestInit(int page);
 void PAGE_InputtestInit(int page);
+void PAGE_PPMInputInit(int page);
 void PAGE_ButtontestInit(int page);
 void PAGE_ChantestEvent();
 void PAGE_ChantestExit();

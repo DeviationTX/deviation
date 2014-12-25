@@ -85,6 +85,9 @@ void PAGE_ChantestEvent()
         case MONITOR_RAWINPUT:
             v = raw[j+1];
             break;
+        case MONITOR_PPMINPUT:
+            v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i + 1];
+            break;
         default:
             printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
             break;
@@ -126,6 +129,7 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
     char *p = tempstring;
 
     switch (cp->type) {
+    case MONITOR_PPMINPUT:
     case MONITOR_CHANNELOUTPUT:
         sprintf(tempstring, "\n%d", (int)ch+1);
         break;
