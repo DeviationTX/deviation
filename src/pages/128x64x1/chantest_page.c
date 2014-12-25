@@ -74,7 +74,7 @@ static void _show_bar_page(u8 num_bars)
     current_page = 0;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    int view_height = (cp->type == MONITOR_RAWINPUT)
+    int view_height = (cp->type == MONITOR_RAWINPUT || cp->type == MONITOR_VIRTUALOUTPUT)
                       ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
                       : 12;  // can only show 4 rows: (7 + 5) x 4
     labelDesc.style = LABEL_UNDERLINE;
