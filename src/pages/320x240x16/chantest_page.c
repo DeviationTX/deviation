@@ -117,44 +117,37 @@ static void _show_bar_page(u8 num_bars, u8 _page)
         
 }
 
+// Making this a function instead of a macro saves ~40 bytes
+#define PAGE_GenericInit(_title, _type, _count) ({ \
+    PAGE_SetModal(0); \
+    PAGE_ShowHeader(_title); \
+    cp->return_page = NULL; \
+    cp->type = _type; \
+    _show_bar_page(_count, 0); \
+    })
+
 void PAGE_ChantestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
-    cp->return_page = NULL;
-    cp->type = MONITOR_CHANNELOUTPUT;
-    _show_bar_page(Model.num_channels, 0);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_CHANMON), MONITOR_CHANNELOUTPUT, Model.num_channels);
 }
 
 void PAGE_VirttestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_VIRTMON));
-    cp->return_page = NULL;
-    cp->type = MONITOR_VIRTUALOUTPUT;
-    _show_bar_page(NUM_VIRT_CHANNELS, 0);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_VIRTMON), MONITOR_VIRTUALOUTPUT, NUM_VIRT_CHANNELS);
 }
 
 void PAGE_InputtestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
-    cp->return_page = NULL;
-    cp->type = MONITOR_RAWINPUT;
-    _show_bar_page(NUM_INPUTS, 0);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_INPUTMON), MONITOR_RAWINPUT, NUM_INPUTS);
 }
 
 void PAGE_PPMInputInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_PPMMON));
-    cp->return_page = NULL;
-    cp->type = MONITOR_PPMINPUT;
-    _show_bar_page(Model.num_ppmin & 0x3f, 0);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_PPMMON), MONITOR_PPMINPUT, Model.num_ppmin & 0x3f);
 }
 
 void PAGE_ButtontestInit(int page)
