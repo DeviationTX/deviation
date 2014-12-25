@@ -39,7 +39,7 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         newpos = num_pages-1;
     if (newpos != page) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
-        u8 count;
+        u8 count = 0;
         switch (cp->type) {
         case MONITOR_CHANNELOUTPUT:
             count = Model.num_channels;

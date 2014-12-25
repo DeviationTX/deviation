@@ -76,9 +76,18 @@ void PAGE_ChantestEvent()
         int j = _get_input_idx(i);
         int v = 0; // silly warning
         switch (cp->type) {
-        case MONITOR_CHANNELOUTPUT: v = Channels[j]; break;
-        case MONITOR_VIRTUALOUTPUT: v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + i + 1]; break;
-        case MONITOR_RAWINPUT: v = raw[j+1]; break;
+        case MONITOR_CHANNELOUTPUT:
+            v = Channels[j];
+            break;
+        case MONITOR_VIRTUALOUTPUT:
+            v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + i + 1];
+            break;
+        case MONITOR_RAWINPUT:
+            v = raw[j+1];
+            break;
+        default:
+            printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
+            break;
         }
         v = RANGE_TO_PCT(v) ;
         if (v != cp->pctvalue[i]) {
@@ -138,6 +147,9 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
         if (! (ch & 0x01)) {
             sprintf(p + strlen(p), "\n");
         }
+        break;
+    default:
+        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
         break;
     }
     return tempstring;

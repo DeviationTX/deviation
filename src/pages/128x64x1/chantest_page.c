@@ -110,7 +110,9 @@ void PAGE_ChantestInit(int page)
         }
         _show_bar_page(j);
         break;
-    case MONITOR_VIRTUALOUTPUT: _show_bar_page(NUM_VIRT_CHANNELS); break;
+    case MONITOR_VIRTUALOUTPUT:
+        _show_bar_page(NUM_VIRT_CHANNELS);
+        break;
     default:
         cp->type = MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
@@ -128,12 +130,13 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void _navigate_pages(s8 direction)
 {
-    int old = cp->type;
-    cp->type += direction;
-    cp->type = cp->type < 0 ? 0
-             : cp->type > MONITOR_RAWINPUT ? MONITOR_RAWINPUT
-             : cp->type ;
-    if (old != cp->type) {
+    int new = cp->type;
+    new += direction;
+    new = new < 0 ? 0
+        : new > MONITOR_RAWINPUT ? MONITOR_RAWINPUT
+        : new ;
+    if ((unsigned) new != cp->type) {
+        cp->type = new;
         PAGE_ChantestInit(0);
     }
 }
@@ -166,7 +169,9 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     switch (cp->type) {
-    case MONITOR_CHANNELOUTPUT: sprintf(tempstring, "%d", (int)ch+1); break;
+    case MONITOR_CHANNELOUTPUT:
+        sprintf(tempstring, "%d", (int)ch+1);
+        break;
     case MONITOR_VIRTUALOUTPUT:
       if (Model.virtname[ch][0]) {
           tempstring_cpy(Model.virtname[ch]) ;
@@ -174,7 +179,12 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
           sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
       }
       break;
-    case MONITOR_RAWINPUT: INPUT_SourceName(tempstring, ch+1); break;
+    case MONITOR_RAWINPUT:
+        INPUT_SourceName(tempstring, ch+1);
+        break;
+    default:
+        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
+        break;
     }
     return tempstring;
 }
@@ -184,9 +194,18 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     switch (cp->type) {
-    case MONITOR_CHANNELOUTPUT: tempstring_cpy((const char *)_tr("Channel output")); break;
-    case MONITOR_VIRTUALOUTPUT: tempstring_cpy((const char*)_tr("Virtual channels")); break;
-    case MONITOR_RAWINPUT: tempstring_cpy((const char *)_tr("Stick input")); break;
+    case MONITOR_CHANNELOUTPUT:
+        tempstring_cpy((const char *)_tr("Channel output"));
+        break;
+    case MONITOR_VIRTUALOUTPUT:
+        tempstring_cpy((const char*)_tr("Virtual channels"));
+        break;
+    case MONITOR_RAWINPUT:
+        tempstring_cpy((const char *)_tr("Stick input"));
+        break;
+    default:
+        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
+        break;
     }
     return tempstring;
 }
