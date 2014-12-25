@@ -31,7 +31,7 @@ static void draw_chan(long ch, int row, int y)
     int x = ch%2 ? 63 : 0;
     int idx = ch%2 ? 2*row + 1 : 2*row;
     int height;
-    if (cp->type == MONITOR_RAWINPUT) {
+    if (cp->type == MONITOR_RAWINPUT || cp->type == MONITOR_VIRTUALOUTPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;
     } else {
