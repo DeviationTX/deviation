@@ -6,7 +6,9 @@
 
 typedef enum  {
     MONITOR_CHANNELOUTPUT = 0,
+    MONITOR_VIRTUALOUTPUT,
     MONITOR_RAWINPUT,
+//    MONITOR_PPMINPUT,
     MONITOR_BUTTONTEST,
 } monitor_type;
 

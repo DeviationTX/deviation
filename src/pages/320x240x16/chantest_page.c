@@ -39,9 +39,12 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         newpos = num_pages-1;
     if (newpos != page) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
-        u8 count = (cp->type == MONITOR_CHANNELOUTPUT)
-            ? Model.num_channels
-            : NUM_INPUTS;
+        u8 count;
+        switch (cp->type) {
+        case MONITOR_CHANNELOUTPUT: count = Model.num_channels; break;
+        case MONITOR_RAWINPUT: case MONITOR_BUTTONTEST: count = NUM_INPUTS; break;
+        case MONITOR_VIRTUALOUTPUT: count = NUM_VIRT_CHANNELS; break;
+        }
         _show_bar_page(count, newpos);
     }
     return page;

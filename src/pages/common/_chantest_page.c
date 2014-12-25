@@ -74,7 +74,13 @@ void PAGE_ChantestEvent()
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
         int j = _get_input_idx(i);
-        int v = RANGE_TO_PCT(cp->type ? raw[j+1] : Channels[j]);
+        int v ;
+        switch (cp->type) {
+        case MONITOR_CHANNELOUTPUT: v = Channels[j]; break;
+        case MONITOR_VIRTUALOUTPUT: v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + i + 1]; break;
+        case MONITOR_RAWINPUT: v = raw[j+1]; break;
+        }
+        v = RANGE_TO_PCT(v) ;
         if (v != cp->pctvalue[i]) {
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {

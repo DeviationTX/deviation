@@ -98,8 +98,10 @@ void PAGE_ChantestInit(int page)
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
-    if(cp->type == MONITOR_RAWINPUT ) {
-        int j = 0;
+    switch (cp->type) {
+        int j ;
+    case MONITOR_RAWINPUT:
+        j = 0;
         for (int i = 0; i < NUM_INPUTS; i++) {
             if (Transmitter.ignore_src & (1 << (i+1))) {
                 continue;
@@ -107,9 +109,12 @@ void PAGE_ChantestInit(int page)
             j++;
         }
         _show_bar_page(j);
-    } else {
-        cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
+        break;
+    case MONITOR_VIRTUALOUTPUT: _show_bar_page(NUM_VIRT_CHANNELS); break;
+    default:
+        cp->type = MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
+        break;
     }
 }
 
@@ -123,9 +128,12 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void _navigate_pages(s8 direction)
 {
-    if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
-            (direction == 1 && cp->type == MONITOR_CHANNELOUTPUT)) {
-        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_CHANNELOUTPUT: MONITOR_RAWINPUT;
+    int old = cp->type;
+    cp->type += direction;
+    cp->type = cp->type < 0 ? 0
+             : cp->type > MONITOR_RAWINPUT ? MONITOR_RAWINPUT
+             : cp->type ;
+    if (old != cp->type) {
         PAGE_ChantestInit(0);
     }
 }
@@ -157,10 +165,17 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    if (cp->type == MONITOR_RAWINPUT) {
-       INPUT_SourceName(tempstring, ch+1);
-    } else {
-       sprintf(tempstring, "%d", (int)ch+1);
+    switch (cp->type) {
+    case MONITOR_CHANNELOUTPUT: sprintf(tempstring, "%d", (int)ch+1); break;
+    case MONITOR_VIRTUALOUTPUT:
+      printf("Virtual channel %d is %s\n", ch, Model.virtname[ch]) ;
+      if (Model.virtname[ch][0]) {
+          tempstring_cpy(Model.virtname[ch]) ;
+      } else {
+          sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+      }
+      break;
+    case MONITOR_RAWINPUT: INPUT_SourceName(tempstring, ch+1); break;
     }
     return tempstring;
 }
@@ -169,10 +184,10 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    if (cp->type == MONITOR_RAWINPUT) {
-        tempstring_cpy((const char *)_tr("Stick input"));
-    } else {
-        tempstring_cpy((const char *)_tr("Channel output"));
+    switch (cp->type) {
+    case MONITOR_CHANNELOUTPUT: tempstring_cpy((const char *)_tr("Channel output")); break;
+    case MONITOR_VIRTUALOUTPUT: tempstring_cpy((const char*)_tr("Virtual channels")); break;
+    case MONITOR_RAWINPUT: tempstring_cpy((const char *)_tr("Stick input")); break;
     }
     return tempstring;
 }
@@ -181,8 +196,10 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    tempstring_cpy((const char *)"->");  //this is actually used as an icon don't translate t
-    if (cp->type == MONITOR_RAWINPUT) {
+    tempstring_cpy((const char *)"<>");  //this is actually used as an icon don't translate
+    if (cp->type == MONITOR_CHANNELOUTPUT) {
+        tempstring_cpy((const char *)"->");
+    } else if (cp->type == MONITOR_RAWINPUT) {
         tempstring_cpy((const char *)"<-");
     }
     return tempstring;
@@ -196,7 +213,7 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 
 static int _get_input_idx(int chan)
 {
-    if (! cp->type)
+    if (cp->type != MONITOR_RAWINPUT)
         return chan;
     int i;
     for (i = 0; i < NUM_INPUTS; i++) {
