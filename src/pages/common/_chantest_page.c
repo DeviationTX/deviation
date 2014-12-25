@@ -74,7 +74,7 @@ void PAGE_ChantestEvent()
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
         int j = _get_input_idx(i);
-        int v ;
+        int v = 0; // silly warning
         switch (cp->type) {
         case MONITOR_CHANNELOUTPUT: v = Channels[j]; break;
         case MONITOR_VIRTUALOUTPUT: v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + i + 1]; break;
