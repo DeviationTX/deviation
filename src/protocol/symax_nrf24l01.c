@@ -138,11 +138,11 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u
     // Protocol is registered AETRF, that is
     // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
 
-    *aileron  = 0x80 ^ convert_channel(CHANNEL1);
+    *aileron  = convert_channel(CHANNEL1);
     *elevator = convert_channel(CHANNEL2);
     *throttle = convert_channel(CHANNEL3);
     *throttle = *throttle & 0x80 ? 0xff - *throttle : 0x80 + *throttle;
-    *rudder   = 0x80 ^ convert_channel(CHANNEL4);
+    *rudder   = convert_channel(CHANNEL4);
 
     // Channel 5
     if (Channels[CHANNEL5] <= 0)
