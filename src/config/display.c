@@ -35,7 +35,7 @@ static const char XY_AXIS_COLOR[] = "axis_color";
 static const char XY_GRID_COLOR[] = "grid_color";
 static const char XY_POINT_COLOR[] = "point_color";
 static const char BOX[] = "box_type";
-static const char * const BOX_VAL[] = { "none", "center", "fill", "outline", "underline", "squarebox" , "inverted"};
+static const char * const BOX_VAL[] = { "none", "center", "right", "fill", "outline", "underline", "squarebox", "inverted"};
 
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0

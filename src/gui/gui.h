@@ -43,14 +43,14 @@ enum KeyboardType {
 
 enum LabelType {
     LABEL_NO_BOX,
+    LABEL_LEFT=0,   // Alias for NO_BOX
     LABEL_CENTER,
+    LABEL_RIGHT,
     LABEL_FILL,
     LABEL_TRANSPARENT,
     LABEL_UNDERLINE,
     LABEL_SQUAREBOX,
     LABEL_INVERTED,
-    LABEL_LEFT,
-    LABEL_RIGHT,
     LABEL_BOX,
     LABEL_BRACKET,
     LABEL_BLINK,
