@@ -48,7 +48,7 @@ void PAGE_GyroSenseInit(int page)
 
     u8 w = 65;
     u8 x = 63;
-    u8 y = LINE_HEIGHT;
+    u8 y = HEADER_HEIGHT + 1;
     GUI_CreateLabelBox(&gui->chanlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
     GUI_CreateTextSelectPlate(&gui->chan, x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
 

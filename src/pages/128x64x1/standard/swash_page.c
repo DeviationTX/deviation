@@ -39,7 +39,7 @@ void PAGE_SwashInit(int page)
     u8 x = 63;
     GUI_CreateTextSelectPlate(&gui->type, x-3, 0, w + 8, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, swash_val_cb, NULL); // FIXME: need a special value for header button/textsels
 
-    u8 y = LINE_HEIGHT;
+    u8 y = HEADER_HEIGHT + 1;
     GUI_CreateLabelBox(&gui->lbl[0], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("ELE Mix"));
     GUI_CreateTextSelectPlate(&gui->mix[0], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, swashmix_val_cb, (void *)1);
 

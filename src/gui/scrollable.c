@@ -216,7 +216,7 @@ void create_scrollable_objs(guiScrollable_t *scrollable, int row)
         int num_rows = scrollable->size_cb ? scrollable->size_cb(row, scrollable->cb_data) : 1;
         if (rel_row + num_rows > scrollable->max_visible_rows)
             break;
-        selectable += scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
+        selectable += scrollable->row_cb(row, rel_row, y+1, scrollable->cb_data);
         y += scrollable->row_height * num_rows;
     }
     scrollable->visible_rows = rel_row;
