@@ -151,8 +151,8 @@ void navigate_toggleicons(s8 direction) {
         num_positions = 2;
     current_toggleicon += direction;
     if (current_toggleicon < 0)
-        current_toggleicon = num_positions -1;
-    else if (current_toggleicon >= num_positions)
+        current_toggleicon = num_positions;
+    else if (current_toggleicon > num_positions)
         current_toggleicon = 0;
     show_iconsel_page(current_toggleicon);
 }
