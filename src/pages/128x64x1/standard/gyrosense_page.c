@@ -48,23 +48,23 @@ void PAGE_GyroSenseInit(int page)
 
     u8 w = 65;
     u8 x = 63;
-    u8 row = LINE_SPACE;
-    GUI_CreateLabelBox(&gui->chanlbl, 0, row, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
-    GUI_CreateTextSelectPlate(&gui->chan, x, row, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
+    u8 y = LINE_HEIGHT;
+    GUI_CreateLabelBox(&gui->chanlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Channel"));
+    GUI_CreateTextSelectPlate(&gui->chan, x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_output_cb, NULL);
 
-    row += LINE_SPACE;
+    y += LINE_SPACE;
     w = 40;
-    GUI_CreateLabelBox(&gui->gyrolbl[0], 0, row, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)0);
-    GUI_CreateTextSelectPlate(&gui->gyro[0], x, row, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)0);
+    GUI_CreateLabelBox(&gui->gyrolbl[0], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)0);
+    GUI_CreateTextSelectPlate(&gui->gyro[0], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)0);
 
-    row += LINE_SPACE;
-    GUI_CreateLabelBox(&gui->gyrolbl[1], 0, row, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)1);
-    GUI_CreateTextSelectPlate(&gui->gyro[1], x, row, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)1);
+    y += LINE_SPACE;
+    GUI_CreateLabelBox(&gui->gyrolbl[1], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)1);
+    GUI_CreateTextSelectPlate(&gui->gyro[1], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)1);
 
     if(INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]) == 3) {
-        row += LINE_SPACE;
-        GUI_CreateLabelBox(&gui->gyrolbl[2], 0, row, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
-        GUI_CreateTextSelectPlate(&gui->gyro[2], x, row, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
+        y += LINE_SPACE;
+        GUI_CreateLabelBox(&gui->gyrolbl[2], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)2);
+        GUI_CreateTextSelectPlate(&gui->gyro[2], x, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, gyro_val_cb, (void *)2);
     }
 
     GUI_Select1stSelectableObj();

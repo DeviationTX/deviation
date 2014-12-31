@@ -66,7 +66,7 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_HEIGHT, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }

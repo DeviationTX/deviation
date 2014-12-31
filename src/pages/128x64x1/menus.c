@@ -88,7 +88,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     MenuItemType menu_item_type = menu_type_flag & 0x0f;
     u8 group = (menu_type_flag >> 4) &0x0f;
     u8 idx = 0;

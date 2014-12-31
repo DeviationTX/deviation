@@ -77,7 +77,7 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
         void (*press_cb)(guiObject_t *obj, void *data),
         const char *(*set_pointval_cb)(guiObject_t *obj, int value, void *data))
 {
-    u8 y = LINE_HEIGHT + 1;
+    u8 y = LINE_SPACE;
     u8 w1 = 5;
     u8 w2 = 32;
     u8 x = 0;
@@ -90,13 +90,13 @@ void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],
     x += w1;
     GUI_CreateTextSelectPlate(&val[8], x, y, w2, height, &TINY_FONT, NULL, set_pointval_cb, (void *)(long)8);
 
-    y += height;
+    y += height +1;
     x = 20;
     GUI_CreateLabelBox(&vallbl[4], x, y,  w1, height, &TINY_FONT, NULL, NULL, "M");
     x += w1;
     GUI_CreateTextSelectPlate(&val[4], x, y, w2, height, &TINY_FONT, press_cb, set_pointval_cb, (void *)(long)4);
 
-    y += height + 1;
+    y += height +1;
     x = 0;
     GUI_CreateLabelBox(&vallbl[1], x, y,  w1, height, &TINY_FONT, NULL, NULL, "2");
     x += w1;
