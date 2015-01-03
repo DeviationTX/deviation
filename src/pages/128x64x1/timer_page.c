@@ -115,8 +115,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
 
     update_countdown(absrow);
-    return 4;
-}
+
+    int selectable = (Model.timer[absrow].type < TIMER_COUNTDOWN) ? 2 : 3;
+    if (Model.mixer_mode == MIXER_ADVANCED)
+        selectable++;
+#if HAS_PERMANENT_TIMER
+    if (Model.timer[absrow].type == TIMER_PERMANENT)
+        selectable = 4;
+#endif
+    return selectable;
+ }
 
 static void _show_page(int page)
 {

@@ -28,6 +28,7 @@ enum {
     DL_SELECT,
     DL_SOURCE,
 };
+static u16 current_selected = 0;
 
 static void checkbut_press_cb(struct guiObject *obj, const void *data)
 {
@@ -163,7 +164,11 @@ void PAGE_DatalogInit(int page)
         LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
+void PAGE_DatalogExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+}
 #endif //HAS_DATLOG

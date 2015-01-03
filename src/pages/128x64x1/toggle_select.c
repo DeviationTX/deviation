@@ -144,7 +144,7 @@ static void show_iconsel_page(int SelectedIcon)
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Model.pagecfg.tglico[tp->tglidx][SelectedIcon]));
 }
 
-void navigate_toggleicons(s8 direction) {
+static void navigate_toggleicons(s8 direction) {
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)
@@ -157,7 +157,7 @@ void navigate_toggleicons(s8 direction) {
     show_iconsel_page(current_toggleicon);
 }
 
-void navigate_symbolicons(s8 direction) {
+static void navigate_symbolicons(s8 direction) {
     guiObject_t *obj = GUI_GetSelected();
     if (direction == -1)
         GUI_SetSelected((guiObject_t *)GUI_GetPrevSelectable(obj));
