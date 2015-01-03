@@ -200,7 +200,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
         y < bottom && row < scrollable->item_count;
         row++, rel_row++)
     {
-        selectable = scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
+        selectable = scrollable->row_cb(row, rel_row, y+1, scrollable->cb_data);
         y += scrollable->row_height * (scrollable->size_cb ? 
                                        scrollable->size_cb(row, scrollable->cb_data) : 1);
         if (y > bottom + scrollable->row_height - 4)
