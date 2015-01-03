@@ -55,9 +55,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     u8 w1 = 30;
     u8 w2 = 36;
+
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
         0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, STDMIX_ModeName(absrow - PITTHROMODE_NORMAL));
-    y += LINE_HEIGHT;
+    y += LINE_SPACE;
     GUI_CreateTextSelectPlate(&gui->value1[relrow], 0, y,
         w1, LINE_HEIGHT, &TINY_FONT, NULL, set_dr_cb, (void *)(long)(absrow - PITTHROMODE_NORMAL));
     GUI_CreateTextSelectPlate(&gui->value2[relrow], w1+1, y,
@@ -71,6 +72,7 @@ void PAGE_DrExpInit(int page)
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
+    PAGE_ShowHeader("");
     memset(mp, 0, sizeof(*mp));
     int count = get_mixers();
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_DREXP_AIL+drexp_type]);
@@ -78,16 +80,14 @@ void PAGE_DrExpInit(int page)
         GUI_CreateLabelBox(&gui->u.msg, 0, 10, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
-    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0,
-        60, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
+    GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, 60, HEADER_WIDGET_HEIGHT,
+                     &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 76, LCD_HEIGHT - HEADER_HEIGHT,
                      2 * LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
-    u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
-    s16 ymin = -ymax;
-    GUI_CreateXYGraph(&gui->graph, 77, 2, 50, RIGHT_VIEW_HEIGHT,
-            CHAN_MIN_VALUE, ymin, CHAN_MAX_VALUE, ymax,
+    GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
+            CHAN_MIN_VALUE, CHAN_MIN_VALUE, CHAN_MAX_VALUE, CHAN_MAX_VALUE,
             0, 0, show_curve_cb, curpos_cb, NULL, NULL);
 
     GUI_Select1stSelectableObj();

@@ -103,7 +103,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Alarm intvl");
             value = batalarmwarn_select_cb;
             break;
-	case ITEM_PWR_ALARM:
+        case ITEM_PWR_ALARM:
             label = _tr_noop("PwrOn alarm");
             value = poweralarm_select_cb;
             break;
@@ -157,7 +157,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->title[relrow], 0, y,
                 0, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
         labelDesc.style = oldType;
-        y += LINE_HEIGHT;
+        y += LINE_SPACE;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
             0, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));

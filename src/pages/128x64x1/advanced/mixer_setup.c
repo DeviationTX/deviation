@@ -81,7 +81,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     }
     int x = 0;
     u8 w = LEFT_VIEW_WIDTH;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
@@ -165,7 +165,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->cur_mixer->offset;
             break;
     }
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
@@ -299,7 +299,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         return 1;
     }
     if(label || label_cb) {
-        labelDesc.style = LABEL_LEFTCENTER;
+        labelDesc.style = LABEL_LEFT;
         GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, label_cb, NULL, label);
         if(underline)

@@ -46,13 +46,13 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     w = 40;
     GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
-    GUI_CreateRect(&gui->rect, 0, HEADER_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+    GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
 
     x = 0;
     u8 space = LINE_SPACE;
     u8 y = space;
     w = 74;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
 
     if (type >= CURVE_3POINT) {
         GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
@@ -68,7 +68,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     }
 
     y += space;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->valuelbl, x, y , w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
     y += space;
     labelDesc.style = LABEL_CENTER;
