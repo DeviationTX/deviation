@@ -31,7 +31,8 @@ static void draw_chan(long ch, int row, int y)
     int x = ch%2 ? 63 : 0;
     int idx = ch%2 ? 2*row + 1 : 2*row;
     int height;
-    if (cp->type == MONITOR_RAWINPUT || cp->type == MONITOR_VIRTUALOUTPUT) {
+    long r_ch = cp->type == MONITOR_MIXEROUTPUT ? active_mixer_map[ch] : ch;
+    if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;
     } else {
@@ -39,7 +40,7 @@ static void draw_chan(long ch, int row, int y)
         height = 7;
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(ch));
+        0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(r_ch));
     GUI_CreateLabelBox(&gui->value[idx], x+37, y,
         23, height, &MICRO_FONT, value_cb, NULL, (void *)ch);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
@@ -74,7 +75,7 @@ static void _show_bar_page(u8 num_bars)
     current_page = 0;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    int view_height = (cp->type == MONITOR_RAWINPUT || cp->type == MONITOR_VIRTUALOUTPUT)
+    int view_height = cp->type == MONITOR_RAWINPUT
                       ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
                       : 12;  // can only show 4 rows: (7 + 5) x 4
     labelDesc.style = LABEL_UNDERLINE;
@@ -110,22 +111,19 @@ void PAGE_ChantestInit(int page)
         }
         _show_bar_page(j);
         break;
-    case MONITOR_VIRTUALOUTPUT:
-        _show_bar_page(NUM_VIRT_CHANNELS);
-        break;
     case MONITOR_PPMINPUT:
         _show_bar_page(Model.num_ppmin & 0x3f);
         break;
     default:
-        cp->type = MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
-        _show_bar_page(Model.num_channels);
+        cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
+        _show_bar_page(make_active_mixer_map());
         break;
     }
 }
 
 void PAGE_ChantestModal(void(*return_page)(int page), int page)
 {
-    cp->type = MONITOR_CHANNELOUTPUT;
+    cp->type = MONITOR_MIXEROUTPUT;
     PAGE_ChantestInit(page);
     cp->return_page = return_page;
     cp->return_val = page;
@@ -172,17 +170,20 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     switch (cp->type) {
+    case MONITOR_MIXEROUTPUT:
+        if (ch >= NUM_OUT_CHANNELS) {
+            ch -= NUM_OUT_CHANNELS;
+            if (Model.virtname[ch][0]) {
+                tempstring_cpy(Model.virtname[ch]) ;
+            } else {
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+            }
+            break;
+        }
+        // else fall through to
     case MONITOR_PPMINPUT:
-    case MONITOR_CHANNELOUTPUT:
         sprintf(tempstring, "%d", (int)ch+1);
         break;
-    case MONITOR_VIRTUALOUTPUT:
-      if (Model.virtname[ch][0]) {
-          tempstring_cpy(Model.virtname[ch]) ;
-      } else {
-          sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
-      }
-      break;
     case MONITOR_RAWINPUT:
         INPUT_SourceName(tempstring, ch+1);
         break;
@@ -198,11 +199,8 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     switch (cp->type) {
-    case MONITOR_CHANNELOUTPUT:
-        tempstring_cpy((const char *)_tr("Channel output"));
-        break;
-    case MONITOR_VIRTUALOUTPUT:
-        tempstring_cpy((const char*)_tr("Virtual channels"));
+    case MONITOR_MIXEROUTPUT:
+        tempstring_cpy((const char *)_tr("Mixer output"));
         break;
     case MONITOR_RAWINPUT:
         tempstring_cpy((const char *)_tr("Stick input"));
@@ -222,7 +220,7 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     tempstring_cpy((const char *)"<>");  //this is actually used as an icon don't translate
-    if (cp->type == MONITOR_CHANNELOUTPUT) {
+    if (cp->type == MONITOR_MIXEROUTPUT) {
         tempstring_cpy((const char *)"->");
     } else if (cp->type == MONITOR_PPMINPUT) {
         tempstring_cpy((const char *)"<-");

@@ -21,6 +21,9 @@ static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int _get_input_idx(int chan);
 
+static u8 active_mixer_map[NUM_MIXERS];
+static u8 display_mixer_map[NUM_MIXERS];
+
 enum {
     ITEM_GRAPH,
     ITEM_VALUE,
@@ -73,17 +76,19 @@ void PAGE_ChantestEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
-        int j = _get_input_idx(i);
+        int ch = active_mixer_map[i];
         int v = 0; // silly warning
         switch (cp->type) {
-        case MONITOR_CHANNELOUTPUT:
-            v = Channels[j];
+        case MONITOR_MIXEROUTPUT: {
+            if (ch < NUM_OUT_CHANNELS) {
+                v = Channels[ch];
+            } else {
+                v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + ch + 1];
+            }
             break;
-        case MONITOR_VIRTUALOUTPUT:
-            v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + i + 1];
-            break;
+        }
         case MONITOR_RAWINPUT:
-            v = raw[j+1];
+            v = raw[_get_input_idx(i) + 1];
             break;
         case MONITOR_PPMINPUT:
             v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i + 1];
@@ -94,6 +99,7 @@ void PAGE_ChantestEvent()
         }
         v = RANGE_TO_PCT(v) ;
         if (v != cp->pctvalue[i]) {
+printf("Event updating display %d of channel %d to %d\n", i, ch, v);
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {
                 GUI_Redraw(obj);
@@ -111,6 +117,7 @@ void PAGE_ChantestExit()
 static s16 showchan_cb(void *data)
 {
     long ch = (long)data;
+printf("Showing channel %d to %d\n", ch, cp->pctvalue[ch]);
     return cp->pctvalue[ch];
 }
 
@@ -118,6 +125,7 @@ static const char *value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
+printf("Updating channel %d to %d\n", ch, cp->pctvalue[ch]);
     sprintf(tempstring, "%d", cp->pctvalue[ch]);
     return tempstring;
 }
@@ -129,16 +137,19 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
     char *p = tempstring;
 
     switch (cp->type) {
-    case MONITOR_PPMINPUT:
-    case MONITOR_CHANNELOUTPUT:
-        sprintf(tempstring, "\n%d", (int)ch+1);
-        break;
-    case MONITOR_VIRTUALOUTPUT:
-        if (Model.virtname[ch][0]) {
-            tempstring_cpy(Model.virtname[ch]) ;
-        } else {
-            sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+    case MONITOR_MIXEROUTPUT:
+        if (ch >= NUM_OUT_CHANNELS) {
+            ch -= NUM_OUT_CHANNELS;
+            if (Model.virtname[ch][0]) {
+                tempstring_cpy(Model.virtname[ch]) ;
+            } else {
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+            }
+            break;
         }
+        // otherwise fall through to
+    case MONITOR_PPMINPUT:
+        sprintf(tempstring, "\n%d", (int)ch+1);
         break;
     case MONITOR_RAWINPUT:
         if (ch & 0x01) {
@@ -157,4 +168,16 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
         break;
     }
     return tempstring;
+}
+
+static u8 make_active_mixer_map() {
+  u8 c = 0;
+  for (u8 i = 0; i < NUM_CHANNELS; i += 1) {
+      if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+          active_mixer_map[c] = i;
+          display_mixer_map[i] = c;
+          c += 1;
+      }
+  }
+  return c;
 }
