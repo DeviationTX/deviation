@@ -22,7 +22,6 @@ static inline guiObject_t *_get_obj(int chan, int objid);
 static int _get_input_idx(int chan);
 
 static u8 active_mixer_map[NUM_MIXERS];
-static u8 display_mixer_map[NUM_MIXERS];
 
 enum {
     ITEM_GRAPH,
@@ -83,7 +82,7 @@ void PAGE_ChantestEvent()
             if (ch < NUM_OUT_CHANNELS) {
                 v = Channels[ch];
             } else {
-                v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + ch + 1];
+                v = raw[NUM_INPUTS + ch + 1];
             }
             break;
         }
@@ -99,7 +98,6 @@ void PAGE_ChantestEvent()
         }
         v = RANGE_TO_PCT(v) ;
         if (v != cp->pctvalue[i]) {
-printf("Event updating display %d of channel %d to %d\n", i, ch, v);
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {
                 GUI_Redraw(obj);
@@ -117,7 +115,6 @@ void PAGE_ChantestExit()
 static s16 showchan_cb(void *data)
 {
     long ch = (long)data;
-printf("Showing channel %d to %d\n", ch, cp->pctvalue[ch]);
     return cp->pctvalue[ch];
 }
 
@@ -125,7 +122,6 @@ static const char *value_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-printf("Updating channel %d to %d\n", ch, cp->pctvalue[ch]);
     sprintf(tempstring, "%d", cp->pctvalue[ch]);
     return tempstring;
 }
@@ -175,7 +171,6 @@ static u8 make_active_mixer_map() {
   for (u8 i = 0; i < NUM_CHANNELS; i += 1) {
       if (Model.templates[i] != MIXERTEMPLATE_NONE) {
           active_mixer_map[c] = i;
-          display_mixer_map[i] = c;
           c += 1;
       }
   }
