@@ -40,17 +40,11 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         newpos = num_pages-1;
     if (newpos != page) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
-        u8 count = 0;
-        switch (cp->type) {
-        case MONITOR_MIXEROUTPUT:
-            count = count_channels();
-            break;
-        case MONITOR_RAWINPUT:
-            count = NUM_INPUTS + (Model.num_ppmin & 0x3f);
-            break;
-        case MONITOR_BUTTONTEST: // should this include PPM?
-            count = NUM_INPUTS;
-            break;
+        u8 count = (cp->type == MONITOR_MIXEROUTPUT)
+            ? count_channels()
+            : NUM_INPUTS;
+        if (cp->type == MONITOR_RAWINPUT) {
+            count += Model.num_ppmin & 0x3f;
         }
         _show_bar_page(count, newpos);
     }
@@ -114,25 +108,24 @@ static void _show_bar_page(u8 num_bars, u8 _page)
         
 }
 
-// Making this a function instead of a macro saves ~40 bytes
-#define PAGE_GenericInit(_title, _type, _count) ({ \
-    PAGE_SetModal(0); \
-    PAGE_ShowHeader(_title); \
-    cp->return_page = NULL; \
-    cp->type = _type; \
-    _show_bar_page(_count, 0); \
-    })
-
 void PAGE_ChantestInit(int page)
 {
     (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_CHANMON), MONITOR_MIXEROUTPUT, count_channels());
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
+    cp->return_page = NULL;
+    cp->type = MONITOR_MIXEROUTPUT;
+    _show_bar_page(count_channels(), 0);
 }
 
 void PAGE_InputtestInit(int page)
 {
     (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_INPUTMON), MONITOR_RAWINPUT, NUM_INPUTS + (Model.num_ppmin & 0x3f));
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
+    cp->return_page = NULL;
+    cp->type = MONITOR_RAWINPUT;
+    _show_bar_page(NUM_INPUTS + (Model.num_ppmin & 0x3f), 0);
 }
 
 void PAGE_ButtontestInit(int page)
