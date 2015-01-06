@@ -16,7 +16,6 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
-static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx();
@@ -106,39 +105,6 @@ static const char *value_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     sprintf(tempstring, "%d", cp->pctvalue[ch]);
-    return tempstring;
-}
-
-static const char *channum_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long disp = (long)data;
-    long ch = get_channel_idx(disp);
-    if (cp->type) {
-        char *p = tempstring;
-        if (disp & 0x01) {
-            *p = '\n';
-            p++;
-        }
-        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
-        INPUT_SourceName(p, ch+1);
-        CONFIG_EnableLanguage(1);
-        if (! (disp & 0x01)) {
-            sprintf(p + strlen(p), "\n");
-        }
-    } else {
-        ch -= NUM_INPUTS;
-        if (ch < NUM_OUT_CHANNELS) {
-            sprintf(tempstring, "\n%d", (int)ch+1);
-        } else {
-            ch -= NUM_OUT_CHANNELS;
-            if (Model.virtname[ch][0]) {
-                tempstring_cpy(Model.virtname[ch]) ;
-            } else {
-                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1);
-            }
-        }
-    }
     return tempstring;
 }
 

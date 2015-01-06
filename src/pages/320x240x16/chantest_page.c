@@ -22,6 +22,7 @@
 
 static void show_button_page();
 static void _show_bar_page(u8 num_bars, u8 _page);
+static const char *_channum_cb(guiObject_t *obj, const void *data);
 static u8 count_channels();
 
 static s8 page;
@@ -84,7 +85,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
-                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
+                           SEPARATION, 19, &TINY_FONT, _channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
@@ -94,7 +95,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
-                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
+                           SEPARATION, 19, &TINY_FONT, _channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
@@ -106,6 +107,39 @@ static void _show_bar_page(u8 num_bars, u8 _page)
         GUI_SetScrollbar(&gui->scrollbar, page);
     }
         
+}
+
+static const char *_channum_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    long disp = (long)data;
+    long ch = get_channel_idx(disp);
+    if (cp->type) {
+        char *p = tempstring;
+        if (disp & 0x01) {
+            *p = '\n';
+            p++;
+        }
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
+        INPUT_SourceName(p, ch+1);
+        CONFIG_EnableLanguage(1);
+        if (! (disp & 0x01)) {
+            sprintf(p + strlen(p), "\n");
+        }
+    } else {
+        ch -= NUM_INPUTS;
+        if (ch < NUM_OUT_CHANNELS) {
+            sprintf(tempstring, "\n%d", (int)ch+1);
+        } else {
+            ch -= NUM_OUT_CHANNELS;
+            if (Model.virtname[ch][0]) {
+                tempstring_cpy(Model.virtname[ch]) ;
+            } else {
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1);
+            }
+        }
+    }
+    return tempstring;
 }
 
 void PAGE_ChantestInit(int page)

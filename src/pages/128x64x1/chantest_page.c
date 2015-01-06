@@ -21,9 +21,9 @@
 #include "../common/_chantest_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
+static const char *_channum_cb(guiObject_t *obj, const void *data);
 static s8 current_page = 0; // bug fix
 
 static void draw_chan(long disp, int row, int y)
@@ -91,7 +91,6 @@ static void _show_bar_page(u8 num_bars)
 
 void PAGE_ChantestInit(int page)
 {
-    (void)channum_cb; // remove compile warning as this method is not used here
     (void)okcancel_cb;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
