@@ -113,8 +113,19 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-
-    if (! cp->type) {
+    if (cp->type) {
+        char *p = tempstring;
+        if (ch & 0x01) {
+            *p = '\n';
+            p++;
+        }
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
+        INPUT_SourceName(p, ch+1);
+        CONFIG_EnableLanguage(1);
+        if (! (ch & 0x01)) {
+            sprintf(p + strlen(p), "\n");
+        }
+    } else {
         ch -= NUM_INPUTS;
         if (ch < NUM_OUT_CHANNELS) {
             sprintf(tempstring, "\n%d", (int)ch+1);
@@ -125,18 +136,6 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
             } else {
                 sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1);
             }
-        }
-    } else {
-        char *p = tempstring;
-        if (ch & 0x01) {
-            *p = '\n';
-            p++;
-        }
-        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
-        INPUT_SourceName(p, ch+1);
-        CONFIG_EnableLanguage(1);
-        if (! (ch & 0x01)) {
-           sprintf(p + strlen(p), "\n");
         }
     }
     return tempstring;

@@ -75,7 +75,7 @@ static void _show_bar_page(u8 num_bars)
     current_page = 0;
     cp->num_bars = num_bars;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    int view_height = cp->type == MONITOR_RAWINPUT
+    int view_height = (cp->type == MONITOR_RAWINPUT)
                       ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
                       : 12;  // can only show 4 rows: (7 + 5) x 4
     labelDesc.style = LABEL_UNDERLINE;
@@ -93,23 +93,21 @@ void PAGE_ChantestInit(int page)
 {
     (void)channum_cb; // remove compile warning as this method is not used here
     (void)okcancel_cb;
-    int j = 0;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
-    switch (cp->type) {
-    case MONITOR_RAWINPUT:
+    int j = 0;
+    if (cp->type == MONITOR_RAWINPUT) {
         for (int i = 0; i < NUM_INPUTS; i++) {
           if (!(Transmitter.ignore_src & (1 << (i+1)))) {
-              j++;
+              j += 1;
             }
           }
         _show_bar_page(j + (Model.num_ppmin & 0x3f));
-        break;
-    default:
+    } else {
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
         for (int i = 0; i < NUM_CHANNELS; i += 1) {
             if (Model.templates[i] != MIXERTEMPLATE_NONE) {
@@ -117,7 +115,6 @@ void PAGE_ChantestInit(int page)
             }
         }
         _show_bar_page(j);
-        break;
     }
 }
 
@@ -176,7 +173,7 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     if (cp->type == MONITOR_RAWINPUT) {
         tempstring_cpy((const char *)_tr("Raw input"));
     } else {
-        tempstring_cpy((const char *)_tr("Channel output"));
+        tempstring_cpy((const char *)_tr("Mixer output"));
     }
     return tempstring;
 }
