@@ -84,7 +84,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
-                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)get_channel_idx(i));
+                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
@@ -94,7 +94,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
-                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)get_channel_idx(i));
+                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);

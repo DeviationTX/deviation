@@ -112,17 +112,18 @@ static const char *value_cb(guiObject_t *obj, const void *data)
 static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    long ch = (long)data;
+    long disp = (long)data;
+    long ch = get_channel_idx(disp);
     if (cp->type) {
         char *p = tempstring;
-        if (ch & 0x01) {
+        if (disp & 0x01) {
             *p = '\n';
             p++;
         }
         CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
         INPUT_SourceName(p, ch+1);
         CONFIG_EnableLanguage(1);
-        if (! (ch & 0x01)) {
+        if (! (disp & 0x01)) {
             sprintf(p + strlen(p), "\n");
         }
     } else {
