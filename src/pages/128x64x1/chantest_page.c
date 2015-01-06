@@ -26,12 +26,12 @@ static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
 static s8 current_page = 0; // bug fix
 
-static void draw_chan(long ch, int row, int y)
+static void draw_chan(long disp, int row, int y)
 {
-    int x = ch%2 ? 63 : 0;
-    int idx = ch%2 ? 2*row + 1 : 2*row;
+    int x = disp%2 ? 63 : 0;
+    int idx = disp%2 ? 2*row + 1 : 2*row;
     int height;
-    long r_ch = cp->type == MONITOR_MIXEROUTPUT ? active_mixer_map[ch] : ch;
+    long ch = get_channel_idx(disp);
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;
@@ -40,11 +40,11 @@ static void draw_chan(long ch, int row, int y)
         height = 7;
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(r_ch));
+        0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
     GUI_CreateLabelBox(&gui->value[idx], x+37, y,
-        23, height, &MICRO_FONT, value_cb, NULL, (void *)ch);
+        23, height, &MICRO_FONT, value_cb, NULL, (void *)disp);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
-        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
+        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)disp);
 
     // Bug fix: the labelDesc is shared in many pages, must reset it to DEFAULT_FONT after the page is drawn
     // Otherwise, page in other language will not display as only the DEFAULT_FONT supports multi-lang
@@ -93,6 +93,7 @@ void PAGE_ChantestInit(int page)
 {
     (void)channum_cb; // remove compile warning as this method is not used here
     (void)okcancel_cb;
+    int j = 0;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
@@ -100,23 +101,22 @@ void PAGE_ChantestInit(int page)
     if (page > 0)
         cp->return_val = page;
     switch (cp->type) {
-        int j ;
     case MONITOR_RAWINPUT:
-        j = 0;
         for (int i = 0; i < NUM_INPUTS; i++) {
-            if (Transmitter.ignore_src & (1 << (i+1))) {
-                continue;
+          if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+              j++;
             }
-            j++;
-        }
-        _show_bar_page(j);
-        break;
-    case MONITOR_PPMINPUT:
-        _show_bar_page(Model.num_ppmin & 0x3f);
+          }
+        _show_bar_page(j + (Model.num_ppmin & 0x3f));
         break;
     default:
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
-        _show_bar_page(make_active_mixer_map());
+        for (int i = 0; i < NUM_CHANNELS; i += 1) {
+            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+                j += 1;
+            }
+        }
+        _show_bar_page(j);
         break;
     }
 }
@@ -131,13 +131,9 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 
 static void _navigate_pages(s8 direction)
 {
-    int new = cp->type;
-    new += direction;
-    new = new < 0 ? 0
-        : new > MONITOR_PPMINPUT ? MONITOR_PPMINPUT
-        : new ;
-    if ((unsigned) new != cp->type) {
-        cp->type = new;
+    if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
+            (direction == 1 && cp->type == MONITOR_MIXEROUTPUT)) {
+        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_MIXEROUTPUT: MONITOR_RAWINPUT;
         PAGE_ChantestInit(0);
     }
 }
@@ -169,28 +165,7 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    switch (cp->type) {
-    case MONITOR_MIXEROUTPUT:
-        if (ch >= NUM_OUT_CHANNELS) {
-            ch -= NUM_OUT_CHANNELS;
-            if (Model.virtname[ch][0]) {
-                tempstring_cpy(Model.virtname[ch]) ;
-            } else {
-                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
-            }
-            break;
-        }
-        // else fall through to
-    case MONITOR_PPMINPUT:
-        sprintf(tempstring, "%d", (int)ch+1);
-        break;
-    case MONITOR_RAWINPUT:
-        INPUT_SourceName(tempstring, ch+1);
-        break;
-    default:
-        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
-        break;
-    }
+    INPUT_SourceName(tempstring, ch+1);
     return tempstring;
 }
 
@@ -198,19 +173,10 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    switch (cp->type) {
-    case MONITOR_MIXEROUTPUT:
-        tempstring_cpy((const char *)_tr("Mixer output"));
-        break;
-    case MONITOR_RAWINPUT:
-        tempstring_cpy((const char *)_tr("Stick input"));
-        break;
-    case MONITOR_PPMINPUT:
-        tempstring_cpy((const char *)_tr("PPM input"));
-        break;
-    default:
-        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
-        break;
+    if (cp->type == MONITOR_RAWINPUT) {
+        tempstring_cpy((const char *)_tr("Raw input"));
+    } else {
+        tempstring_cpy((const char *)_tr("Channel output"));
     }
     return tempstring;
 }
@@ -219,10 +185,8 @@ static const char *_page_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    tempstring_cpy((const char *)"<>");  //this is actually used as an icon don't translate
-    if (cp->type == MONITOR_MIXEROUTPUT) {
-        tempstring_cpy((const char *)"->");
-    } else if (cp->type == MONITOR_PPMINPUT) {
+    tempstring_cpy((const char *)"->");  //this is actually used as an icon don't translate
+    if (cp->type == MONITOR_RAWINPUT) {
         tempstring_cpy((const char *)"<-");
     }
     return tempstring;
@@ -234,17 +198,6 @@ static inline guiObject_t *_get_obj(int chan, int objid)
     return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
 
-static int _get_input_idx(int chan)
-{
-    if (cp->type != MONITOR_RAWINPUT)
-        return chan;
-    int i;
-    for (i = 0; i < NUM_INPUTS; i++) {
-        if (Transmitter.ignore_src & (1 << (i+1)))
-            continue;
-        chan--;
-        if(chan < 0)
-            break;
-    }
-    return i;
+static inline int get_channel_idx(int ch) {
+  return _get_channel_idx(ch);
 }

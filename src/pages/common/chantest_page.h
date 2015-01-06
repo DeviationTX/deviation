@@ -7,7 +7,6 @@
 typedef enum  {
     MONITOR_MIXEROUTPUT = 0,
     MONITOR_RAWINPUT,
-    MONITOR_PPMINPUT,
     MONITOR_BUTTONTEST,
 } monitor_type;
 

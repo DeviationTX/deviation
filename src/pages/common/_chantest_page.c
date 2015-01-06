@@ -19,9 +19,8 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
-static int _get_input_idx(int chan);
-
-static u8 active_mixer_map[NUM_MIXERS];
+static int get_channel_idx();
+static int _get_channel_idx(int chan);
 
 enum {
     ITEM_GRAPH,
@@ -75,26 +74,10 @@ void PAGE_ChantestEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
-        int ch = active_mixer_map[i];
-        int v = 0; // silly warning
-        switch (cp->type) {
-        case MONITOR_MIXEROUTPUT: {
-            if (ch < NUM_OUT_CHANNELS) {
-                v = Channels[ch];
-            } else {
-                v = raw[NUM_INPUTS + ch + 1];
-            }
-            break;
-        }
-        case MONITOR_RAWINPUT:
-            v = raw[_get_input_idx(i) + 1];
-            break;
-        case MONITOR_PPMINPUT:
-            v = raw[NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + i + 1];
-            break;
-        default:
-            printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
-            break;
+        int ch = get_channel_idx(i);
+        int v = raw[ch + 1];
+        if (ch >= NUM_INPUTS && ch < NUM_OUT_CHANNELS) {
+            v = Channels[ch - NUM_INPUTS];
         }
         v = RANGE_TO_PCT(v) ;
         if (v != cp->pctvalue[i]) {
@@ -130,49 +113,59 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    char *p = tempstring;
 
-    switch (cp->type) {
-    case MONITOR_MIXEROUTPUT:
-        if (ch >= NUM_OUT_CHANNELS) {
+    if (! cp->type) {
+        ch -= NUM_INPUTS;
+        if (ch < NUM_OUT_CHANNELS) {
+            sprintf(tempstring, "\n%d", (int)ch+1);
+        } else {
             ch -= NUM_OUT_CHANNELS;
             if (Model.virtname[ch][0]) {
                 tempstring_cpy(Model.virtname[ch]) ;
             } else {
-                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1); break;
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1);
             }
-            break;
         }
-        // otherwise fall through to
-    case MONITOR_PPMINPUT:
-        sprintf(tempstring, "\n%d", (int)ch+1);
-        break;
-    case MONITOR_RAWINPUT:
+    } else {
+        char *p = tempstring;
         if (ch & 0x01) {
             *p = '\n';
             p++;
         }
-        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limitied in character set
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
         INPUT_SourceName(p, ch+1);
         CONFIG_EnableLanguage(1);
         if (! (ch & 0x01)) {
-            sprintf(p + strlen(p), "\n");
+           sprintf(p + strlen(p), "\n");
         }
-        break;
-    default:
-        printf("Unhandled case in %s function %s, line %d.\n", __FILE__, __func__, __LINE__);
-        break;
     }
     return tempstring;
 }
 
-static u8 make_active_mixer_map() {
-  u8 c = 0;
-  for (u8 i = 0; i < NUM_CHANNELS; i += 1) {
-      if (Model.templates[i] != MIXERTEMPLATE_NONE) {
-          active_mixer_map[c] = i;
-          c += 1;
-      }
-  }
-  return c;
+static int _get_channel_idx(int chan)
+{
+    int i;
+    if (! cp->type) {
+        for (i = 0; i < NUM_CHANNELS; i+= 1) {
+            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+                chan--;
+            }
+            if (chan < 0)
+                break;
+        }
+        return i + NUM_INPUTS;
+    } else {
+        int ppms = Model.num_ppmin & 0x3f;
+        if (chan < ppms)
+            return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
+        chan -= ppms;
+        for (i = 0; i < NUM_INPUTS; i++) {
+            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+                chan--;
+            }
+            if (chan < 0)
+                break;
+        }
+        return i;
+    }
 }

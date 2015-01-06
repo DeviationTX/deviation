@@ -22,6 +22,7 @@
 
 static void show_button_page();
 static void _show_bar_page(u8 num_bars, u8 _page);
+static u8 count_channels();
 
 static s8 page;
 static u8 num_pages;
@@ -41,18 +42,14 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
         u8 count = 0;
         switch (cp->type) {
-        case MONITOR_CHANNELOUTPUT:
-            count = Model.num_channels & 0x3f;
+        case MONITOR_MIXEROUTPUT:
+            count = count_channels();
             break;
         case MONITOR_RAWINPUT:
-        case MONITOR_BUTTONTEST:
+            count = NUM_INPUTS + (Model.num_ppmin & 0x3f);
+            break;
+        case MONITOR_BUTTONTEST: // should this include PPM?
             count = NUM_INPUTS;
-            break;
-        case MONITOR_VIRTUALOUTPUT:
-            count = NUM_VIRT_CHANNELS;
-            break;
-        case MONITOR_PPMINPUT:
-            count = Model.num_ppmin & 0x3f;
             break;
         }
         _show_bar_page(count, newpos);
@@ -93,7 +90,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
-                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
+                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)get_channel_idx(i));
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
@@ -103,7 +100,7 @@ static void _show_bar_page(u8 num_bars, u8 _page)
     offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
-                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
+                           SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)get_channel_idx(i));
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)i);
@@ -129,25 +126,13 @@ static void _show_bar_page(u8 num_bars, u8 _page)
 void PAGE_ChantestInit(int page)
 {
     (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_CHANMON), MONITOR_CHANNELOUTPUT, Model.num_channels);
-}
-
-void PAGE_VirttestInit(int page)
-{
-    (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_VIRTMON), MONITOR_VIRTUALOUTPUT, NUM_VIRT_CHANNELS);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_CHANMON), MONITOR_MIXEROUTPUT, count_channels());
 }
 
 void PAGE_InputtestInit(int page)
 {
     (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_INPUTMON), MONITOR_RAWINPUT, NUM_INPUTS);
-}
-
-void PAGE_PPMInputInit(int page)
-{
-    (void)page;
-    PAGE_GenericInit(PAGE_GetName(PAGEID_PPMMON), MONITOR_PPMINPUT, Model.num_ppmin & 0x3f);
+    PAGE_GenericInit(PAGE_GetName(PAGEID_INPUTMON), MONITOR_RAWINPUT, NUM_INPUTS + (Model.num_ppmin & 0x3f));
 }
 
 void PAGE_ButtontestInit(int page)
@@ -165,12 +150,12 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     PAGE_SetModal(1);
     cp->return_page = return_page;
     cp->return_val = page;
-    cp->type = MONITOR_CHANNELOUTPUT;
+    cp->type = MONITOR_MIXEROUTPUT;
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
 
-    _show_bar_page(Model.num_channels, 0);
+    _show_bar_page(count_channels(), 0);
 }
 
 static void show_button_page()
@@ -229,7 +214,17 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return objid == ITEM_GRAPH ? (guiObject_t *)&gui->bar[chan] : (guiObject_t *)&gui->value[chan];
 }
-static int _get_input_idx(int chan)
+static int get_channel_idx(int chan)
 {
-    return page * NUM_BARS_PER_ROW + chan;
+    return _get_channel_idx(page * NUM_BARS_PER_ROW + chan);
+}
+
+static u8 count_channels() {
+    u8 j = 0;
+    for (u8 i = 0; i < NUM_CHANNELS; i += 1) {
+        if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+            j += 1;
+        }
+    }
+    return j;
 }
