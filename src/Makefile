@@ -3,8 +3,45 @@
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
-# Use VERBOSE=1 to enable verbose make
+###########################################
+## Provide some convenient make targets. ##
+###########################################
+ifndef  TARGET
 TARGET   ?= devo8
+default: $(TARGET)
+
+# The supported transmitters
+TXS = devo6 devo7e devo8 devo10 devo12
+# x9d needs more software installed.
+#TXS = devo6 devo7e devo8 devo10 devo12 x9d
+
+txs: $(TXS)
+emus: $(patsubst %,emu_%,$(TXS))
+both: txs emus
+fss: $(patsubst %,fs_%,$(TXS))
+zips: $(patsubst %,zip_%,$(TXS))
+everything: txs emus fss
+
+# Generate the targets for a transmitter.
+define make-target
+$1:
+	$(MAKE) TARGET=$1
+emu_$1:
+	$(MAKE) TARGET=emu_$1
+zip_$1:
+	$(MAKE) TARGET=$1 zip
+fs_$1:
+	$(MAKE) TARGERT=$1 fs
+all_$1:
+	$(MAKE) TARGET=$1 all
+both_$1: $1 emu_$1
+endef
+
+# Now generate all the convenience targets
+$(foreach t,$(TXS),$(eval $(call make-target,$t)))
+endif
+
+# Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
 NUM_MODELS ?= 30
 SDIR := .
