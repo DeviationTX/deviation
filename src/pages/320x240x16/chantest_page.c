@@ -44,7 +44,7 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
         u8 count = (cp->type == MONITOR_MIXEROUTPUT)
             ? count_channels()
             : NUM_INPUTS;
-        if (cp->type == MONITOR_RAWINPUT) {
+        if (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE) {
             count += Model.num_ppmin & 0x3f;
         }
         _show_bar_page(count, newpos);
@@ -159,7 +159,7 @@ void PAGE_InputtestInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
     cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
-    _show_bar_page(NUM_INPUTS + (Model.num_ppmin & 0x3f), 0);
+    _show_bar_page(NUM_INPUTS + ((PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f : 0), 0);
 }
 
 void PAGE_ButtontestInit(int page)

@@ -21,9 +21,9 @@
 #include "../common/_chantest_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
+static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
-static const char *_channum_cb(guiObject_t *obj, const void *data);
 static s8 current_page = 0; // bug fix
 
 static void draw_chan(long disp, int row, int y)
@@ -101,11 +101,14 @@ void PAGE_ChantestInit(int page)
     int j = 0;
     if (cp->type == MONITOR_RAWINPUT) {
         for (int i = 0; i < NUM_INPUTS; i++) {
-          if (!(Transmitter.ignore_src & (1 << (i+1)))) {
-              j += 1;
+            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+                j += 1;
             }
-          }
-        _show_bar_page(j + (Model.num_ppmin & 0x3f));
+        }
+        if (PPMin_Mode() == PPM_IN_SOURCE) {
+            j += Model.num_ppmin & 0x3f;
+        }
+        _show_bar_page(j);
     } else {
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
         for (int i = 0; i < NUM_CHANNELS; i += 1) {

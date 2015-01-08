@@ -121,7 +121,7 @@ static int _get_channel_idx(int chan)
         }
         return i + NUM_INPUTS;
     } else {
-        int ppms = Model.num_ppmin & 0x3f;
+        int ppms = (PPMin_Mode() == PPM_IN_SOURCE ) ? Model.num_ppmin & 0x3f: 0;
         if (chan < ppms)
             return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
         chan -= ppms;
