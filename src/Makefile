@@ -34,7 +34,7 @@ emu_$1:
 	$(MAKE) TARGET=emu_$1
 # This builds Windows emulators on a Linux system.
 win_$1:
-	#$(MAKE) TARGET=emu_$1 TYPE=prd WINDOWS=1 
+	#$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
 ifneq "$(findstring $1,$(NOFSTXS))" "$1"
