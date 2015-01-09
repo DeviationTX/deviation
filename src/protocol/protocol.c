@@ -370,16 +370,7 @@ int PROTOCOL_SetSwitch(int module)
     if (! Transmitter.module_enable[MULTIMOD].port)
         return 0;
     u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
-    u8 set    = SPI_ProtoGetPinConfig(module, ENABLED_PIN);
-    for (int i = 0; i < MULTIMOD; i++) {
-        if (i == module)
-            continue;
-        set |= SPI_ProtoGetPinConfig(i, DISABLED_PIN);
-        set |= SPI_ProtoGetPinConfig(i, CSN_PIN);
-    }
-    u8 csn_high = toggle | set;
-    u8 csn_low  = ~toggle & set;
-    return SPI_ConfigSwitch(csn_high, csn_low);
+    return SPI_ConfigSwitch(0x0f, 0x0f ^ csn);
 #else
     return 0;
 #endif
