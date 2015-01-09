@@ -287,6 +287,7 @@ static void yd717_init()
     NRF24L01_Initialize();
 
     // CRC, radio on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_PWR_UP)); 
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3F);      // Auto Acknoledgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3F);  // Enable all data pipes
