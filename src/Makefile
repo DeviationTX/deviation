@@ -32,12 +32,8 @@ $1:
 	$(MAKE) TARGET=$1
 emu_$1:
 	$(MAKE) TARGET=emu_$1
-zip_$1:
-	$(MAKE) TARGET=$1 zip
-emu_zip_$1:
-	$(MAKE) TARGET=emu_$1 zip
 # This builds Windows emulators on a Linux system.
-win_zip_$1:
+win_$1:
 	#$(MAKE) TARGET=emu_$1 TYPE=prd WINDOWS=1 
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
@@ -45,10 +41,14 @@ ifneq "$(findstring $1,$(NOFSTXS))" "$1"
 	$(MAKE) TARGET=$1 fs
 endif
 endif
+both_$1: $1 emu_$1
+zip_$1:
+	$(MAKE) TARGET=$1 zip
+zip_emu_$1:
+	$(MAKE) TARGET=emu_$1 zip
+release_$1: zip_$1 zip_emu_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
-both_$1: $1 emu_$1
-release_$1: zip_$1 emu_zip_$1 fs_$1
 endef
 
 # Now generate all the convenience targets
@@ -223,7 +223,7 @@ zip: $(TARGET).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
 	# $(MAKE) zipping more compatible with other distributions
-	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
