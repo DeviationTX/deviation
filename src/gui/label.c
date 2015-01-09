@@ -140,7 +140,10 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
             LCD_DrawFastHLine(obj_x, txt_y + txt_h - 1, old_w, 1);
         }
     } else {
-        if (desc->style != LABEL_FILL) {
+        if (desc->style == LABEL_RIGHT) {
+            GUI_DrawBackground(obj_x - obj_width, obj_y, obj_width, obj_height);
+        } else if (desc->style == LABEL_TRANSPARENT || desc->style == LABEL_CENTER || 
+                            desc->style == LABEL_LEFT || desc->style ==LABEL_BLINK) {
             GUI_DrawBackground(obj_x, obj_y, obj_width, obj_height);
         } else {
             LCD_FillRect(obj_x, obj_y, obj_width, obj_height, desc->fill_color);
@@ -155,8 +158,8 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
         txt_y = obj_y + (obj_height - txt_h + 1) / 2;
     else
         txt_y = obj_y + y_off;
-    if (obj_width > txt_w && desc->style == LABEL_RIGHT)
-        txt_x = obj_x + (obj_width - txt_w);
+    if (desc->style == LABEL_RIGHT)
+        txt_x = obj_x - txt_w;
     else if (obj_width > txt_w && !(desc->style == LABEL_NO_BOX || desc->style == LABEL_UNDERLINE))
         txt_x = obj_x + (obj_width - txt_w + 1) / 2;
     else
