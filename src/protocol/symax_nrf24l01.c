@@ -99,13 +99,6 @@ enum {
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-#if 0
-static const char * const symax_opts[] = {
-  _tr_noop("Extra In"), _tr_noop("Off"), _tr_noop("On"), NULL,
-  NULL
-};
-#endif
-
 
 
 
@@ -208,13 +201,6 @@ static void send_packet(u8 bind)
 
     ++packet_counter;
     ++current_chan;
-
-//    radio.ce(HIGH);
-//    delayMicroseconds(15);
-    // It saves power to turn off radio after the transmission,
-    // so as long as we have pins to do so, it is wise to turn
-    // it back.
-//    radio.ce(LOW);
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -370,43 +356,6 @@ static u16 symax_callback()
     return PACKET_PERIOD;
 }
 
-
-#if 0
-static void set_rx_tx_addr(u32 id)
-{
-    rx_tx_addr[0] = (id >> 24) & 0xFF;
-    rx_tx_addr[1] = (id >> 16) & 0xFF;
-    rx_tx_addr[2] = (id >>  8) & 0xFF;
-    rx_tx_addr[3] = (id >>  0) & 0xFF;
-    rx_tx_addr[4] = 0xCC;
-}
-
-// Generate address to use from TX id and manufacturer id (STM32 unique id)
-static void initialize_rx_tx_addr()
-{
-    u32 lfsr = 0xb2c54a2ful;
-
-#ifndef USE_FIXED_MFGID
-    u8 var[12];
-    MCU_SerialNumber(var, 12);
-    dbgprintf("Manufacturer id: ");
-    for (int i = 0; i < 12; ++i) {
-        dbgprintf("%02X", var[i]);
-        rand32_r(&lfsr, var[i]);
-    }
-    dbgprintf("\r\n");
-#endif
-
-    if (Model.fixed_id) {
-       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
-    }
-    // Pump zero bytes for LFSR to diverge more
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-
-    set_rx_tx_addr(lfsr);
-}
-#endif
 
 
 static void initialize()
