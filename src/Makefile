@@ -14,13 +14,16 @@ default: $(TARGET)
 TXS = devo6 devo7e devo8 devo10 devo12
 # x9d needs more software installed.
 #TXS = devo6 devo7e devo8 devo10 devo12 x9d
+# These txs use file systems for other txs, so don't have a file system target.
+NOFSTXS = devo6 devo7e
 
 txs: $(TXS)
-emus: $(patsubst %,emu_%,$(TXS))
+emus: $(TXS:%=emu_%)
 both: txs emus
-fss: $(patsubst %,fs_%,$(TXS))
-zips: $(patsubst %,zip_%,$(TXS))
-emuzips:  $(patsubst %,zip_emu_%,$(TXS))
+fss: $(TXS:%=fs_%)
+zips: $(TXS: %=zip_%)
+emuzips: $(TXS:%=emu_zip_%)
+winzips: $(TXS:%=win_zip_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
@@ -31,25 +34,21 @@ emu_$1:
 	$(MAKE) TARGET=emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
-zip_emu_$1:
+emu_zip_$1:
 	$(MAKE) TARGET=emu_$1 zip
+# This builds Windows emulators on a Linux system.
+win_zip_$1:
+	#$(MAKE) TARGET=emu_$1 TYPE=prd WINDOWS=1 
 fs_$1:
-	$(MAKE) TARGERT=$1 fs
-all_$1:
-	$(MAKE) TARGET=$1 all
-both_$1: $1 emu_$1
-release_$1: 
-	$(MAKE) TARGET=$1  zip
 ifneq "$(INCLUDE_FS)" "1"
-ifneq "$1" "devo6"
-ifneq "$1" "devo7e"
+ifneq "$(findstring $1,$(NOFSTXS))" "$1"
 	$(MAKE) TARGET=$1 fs
 endif
 endif
-endif
-	$(MAKE) TARGET=emu_$1 zip
-	#$(MAKE) TARGET=emu_devo8 TYPE=prd WINDOWS=1 
-
+all_$1:
+	$(MAKE) TARGET=$1 all
+both_$1: $1 emu_$1
+release_$1: zip_$1 emu_zip_$1 fs_$1
 endef
 
 # Now generate all the convenience targets
@@ -242,7 +241,7 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
-release:  $(patsubst %,release_%,$(TXS))
+release:  $(TXS:%=release_%)
 
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
