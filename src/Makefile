@@ -20,6 +20,7 @@ emus: $(patsubst %,emu_%,$(TXS))
 both: txs emus
 fss: $(patsubst %,fs_%,$(TXS))
 zips: $(patsubst %,zip_%,$(TXS))
+emuzips:  $(patsubst %,zip_emu_%,$(TXS))
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
@@ -30,11 +31,25 @@ emu_$1:
 	$(MAKE) TARGET=emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
+zip_emu_$1:
+	$(MAKE) TARGET=emu_$1 zip
 fs_$1:
 	$(MAKE) TARGERT=$1 fs
 all_$1:
 	$(MAKE) TARGET=$1 all
 both_$1: $1 emu_$1
+release_$1: 
+	$(MAKE) TARGET=$1  zip
+ifneq "$(INCLUDE_FS)" "1"
+ifneq "$1" "devo6"
+ifneq "$1" "devo7e"
+	$(MAKE) TARGET=$1 fs
+endif
+endif
+endif
+	$(MAKE) TARGET=emu_$1 zip
+	#$(MAKE) TARGET=emu_devo8 TYPE=prd WINDOWS=1 
+
 endef
 
 # Now generate all the convenience targets
@@ -227,19 +242,7 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
-release:
-	$(MAKE) TARGET=devo8  zip
-	$(MAKE) TARGET=devo6  zip
-	$(MAKE) TARGET=devo10 zip
-	$(MAKE) TARGET=devo7e zip
-	$(MAKE) TARGET=devo12 zip
-ifneq "$(INCLUDE_FS)" "1"
-	$(MAKE) TARGET=devo8 fs
-	$(MAKE) TARGET=devo10 fs
-	$(MAKE) TARGET=devo7e fs
-	$(MAKE) TARGET=devo12 fs
-endif
-	#$(MAKE) TARGET=emu_devo8 TYPE=prd WINDOWS=1 
+release:  $(patsubst %,release_%,$(TXS))
 
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
