@@ -99,7 +99,7 @@ $(ODIR)/protocol/yd717.mod : $(ODIR)/yd717_nrf24l01.bin
 	@echo Building 'yd717' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/symax.mod : $(ODIR)/yd717_nrf24l01.bin
+$(ODIR)/protocol/symax.mod : $(ODIR)/symax_nrf24l01.bin
 	@echo Building 'symax' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 

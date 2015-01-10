@@ -223,7 +223,7 @@ u8 NRF24L01_SetPower(u8 power)
 static void CE_lo()
 {
 #if HAS_MULTIMOD_SUPPORT
-    SPI_SetSwitch(NRF24L01);
+    PROTOCOL_SetSwitch(NRF24L01);
 #endif
 }
 static void CE_hi()

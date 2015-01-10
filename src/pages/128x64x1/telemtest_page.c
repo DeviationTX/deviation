@@ -339,7 +339,7 @@ static void _navigate_pages(s8 direction)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);

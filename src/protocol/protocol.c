@@ -369,7 +369,7 @@ int PROTOCOL_SetSwitch(int module)
 #if HAS_MULTIMOD_SUPPORT
     if (! Transmitter.module_enable[MULTIMOD].port)
         return 0;
-    u8 toggle = SPI_ProtoGetPinConfig(module, CSN_PIN);
+    u8 csn = SPI_ProtoGetPinConfig(module, CSN_PIN);
     return SPI_ConfigSwitch(0x0f, 0x0f ^ csn);
 #else
     return 0;

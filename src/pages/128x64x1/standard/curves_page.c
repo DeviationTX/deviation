@@ -99,14 +99,14 @@ static void show_page(CurvesMode _curve_mode, int page)
     
     // FIXME: need a special value for header button/textsels
     GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
     STANDARD_DrawCurvePoints(gui->vallbl, gui->val,
         selectable_bitmaps[curve_mode * 4 + pit_mode], press_cb, set_pointval_cb);
 
-    GUI_CreateXYGraph(&gui->graph, 77, LINE_HEIGHT + 1, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
                       CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                       CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                       0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

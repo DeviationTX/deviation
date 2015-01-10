@@ -36,7 +36,7 @@ void PAGE_ThroHoldInit(int page)
 
     PAGE_ShowHeader(_tr("Throttle hold"));
 
-    u8 y = HEADER_HEIGHT;
+    u8 y = HEADER_HEIGHT + 1;
     GUI_CreateLabelBox(&gui->enlbl, 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
     u8 w = 40;
     GUI_CreateTextSelectPlate(&gui->en, 75, y, w, LINE_HEIGHT, &DEFAULT_FONT, NULL, throhold_cb,  NULL);

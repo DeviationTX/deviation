@@ -3,8 +3,45 @@
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
-# Use VERBOSE=1 to enable verbose make
+###########################################
+## Provide some convenient make targets. ##
+###########################################
+ifndef  TARGET
 TARGET   ?= devo8
+default: $(TARGET)
+
+# The supported transmitters
+TXS = devo6 devo7e devo8 devo10 devo12
+# x9d needs more software installed.
+#TXS = devo6 devo7e devo8 devo10 devo12 x9d
+
+txs: $(TXS)
+emus: $(patsubst %,emu_%,$(TXS))
+both: txs emus
+fss: $(patsubst %,fs_%,$(TXS))
+zips: $(patsubst %,zip_%,$(TXS))
+everything: txs emus fss
+
+# Generate the targets for a transmitter.
+define make-target
+$1:
+	$(MAKE) TARGET=$1
+emu_$1:
+	$(MAKE) TARGET=emu_$1
+zip_$1:
+	$(MAKE) TARGET=$1 zip
+fs_$1:
+	$(MAKE) TARGERT=$1 fs
+all_$1:
+	$(MAKE) TARGET=$1 all
+both_$1: $1 emu_$1
+endef
+
+# Now generate all the convenience targets
+$(foreach t,$(TXS),$(eval $(call make-target,$t)))
+endif
+
+# Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
 NUM_MODELS ?= 30
 SDIR := .
@@ -156,7 +193,7 @@ clean:
 distclean:
 	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
 	rm -rf objs
-	make -C libopencm3 clean > /dev/null
+	$(MAKE) -C libopencm3 clean > /dev/null
 	rm -rf deviation*.zip
 
 language:
@@ -171,7 +208,7 @@ zip: $(TARGET).zip
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
-	# make zipping more compatible with other distributions
+	# $(MAKE) zipping more compatible with other distributions
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
@@ -191,21 +228,21 @@ fs: $(TARGET).fs
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
 release:
-	make TARGET=devo8  zip
-	make TARGET=devo6  zip
-	make TARGET=devo10 zip
-	make TARGET=devo7e zip
-	make TARGET=devo12 zip
+	$(MAKE) TARGET=devo8  zip
+	$(MAKE) TARGET=devo6  zip
+	$(MAKE) TARGET=devo10 zip
+	$(MAKE) TARGET=devo7e zip
+	$(MAKE) TARGET=devo12 zip
 ifneq "$(INCLUDE_FS)" "1"
-	make TARGET=devo8 fs
-	make TARGET=devo10 fs
-	make TARGET=devo7e fs
-	make TARGET=devo12 fs
+	$(MAKE) TARGET=devo8 fs
+	$(MAKE) TARGET=devo10 fs
+	$(MAKE) TARGET=devo7e fs
+	$(MAKE) TARGET=devo12 fs
 endif
-	#make TARGET=emu_devo8 TYPE=prd WINDOWS=1 
+	#$(MAKE) TARGET=emu_devo8 TYPE=prd WINDOWS=1 
 
 coverity:
-	rm -rf cov-int 2>/dev/null; make distclean
+	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
 	cov-build --dir cov-int make TARGET=devo8
 	cov-build --dir cov-int make TARGET=devo10
 	tar -cvzf coverity-$(HGVERSION).tgz cov-int

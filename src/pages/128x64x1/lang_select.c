@@ -69,7 +69,7 @@ void LANGPage_Select(void(*return_page)(int page))
         FS_CloseDir();
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_HEIGHT, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
+                     LINE_SPACE, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
 }
 
