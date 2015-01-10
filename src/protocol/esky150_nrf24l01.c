@@ -182,6 +182,7 @@ static u16 esky150_init2()
     rf_ch_num = 0;
 
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, CRC_CONFIG | BV(NRF24L01_00_PWR_UP));
     // delayMicroseconds(150);
     return 150u;

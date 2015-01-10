@@ -154,6 +154,7 @@ static void h377_init()
 	NRF24L01_WriteReg(NRF24L01_05_RF_CH, binding_ch); // binding packet must be set in channel 81
 
     // 2-bytes CRC, radio off
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address (byte -2)
     NRF24L01_SetBitrate(0);                          // 1Mbps
