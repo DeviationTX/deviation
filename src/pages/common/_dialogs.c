@@ -15,32 +15,43 @@
 
 
 static guiObject_t *dialog = NULL;
-static u64 safety_enabled = ~0LL;
 static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
 /*  Safety Dialog */
 /******************/
+static u64 safety_enabled = ~0LL;
+
+static u64 safety_check()
+{
+    return PROTOCOL_CheckSafe() & safety_enabled;
+}
+
+static void safety_confirmed()
+{
+    PROTOCOL_Init(1);
+    safety_enabled = ~0LL;
+}
+
 static void safety_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
     int count = 0;
-    u64 unsafe = PROTOCOL_CheckSafe() & safety_enabled;
+    u64 unsafe = safety_check();
     for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
         safety_enabled ^= 1LL << i;
-        if (++count >= MAX_CONCURRENT_MSGS)
+        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
             break;
     }
     dialog = NULL;
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
-    if (!(unsafe & safety_enabled)) {
-        safety_enabled = ~0LL;
-        PROTOCOL_Init(1);
-    }
+    if (unsafe & safety_enabled)
+        return;
+    safety_confirmed();
 }
 
 /**********************/
