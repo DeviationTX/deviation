@@ -56,11 +56,6 @@ static void lowbatt_ok_cb(u8 state, void * data)
 }
 
 
-void PAGE_DisableSafetyDialog(u8 disable)
-{
-    safety_enabled = disable ? 0LL : ~0LL;
-}
-
 static void invalid_stdmixer_cb(u8 state, void *guiObj)
 {
     static const char * const STANDARD_TEMPLATE = "heli_std.ini";
