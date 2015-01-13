@@ -28,38 +28,6 @@ static struct dialog_obj * const gui = &gui_objs.dialog;
 static const int DLG_XOFFSET = ((LCD_WIDTH - 320) / 2);
 static const int DLG_YOFFSET = ((LCD_HEIGHT - 240) / 2);
 
-u32 dialogcrc;
-
-static const char *safety_string_cb(guiObject_t *obj, void *data)
-{
-    (void)data;
-    int i;
-    u32 crc = Crc(tempstring, strlen(tempstring));
-    if (obj && crc == dialogcrc)
-        return tempstring;
-    int count = 0;
-    const s8 safeval[4] = {0, -100, 0, 100};
-    volatile s16 *raw = MIXER_GetInputs();
-    u64 unsafe = safety_check();
-    tempstring[0] = 0;
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
-        if (! (unsafe & (1LL << i)))
-            continue;
-        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
-      
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
-                      ? raw[ch+1]
-                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-        INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
-        int len = strlen(tempstring);
-        snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%, safe value = %d%%\n"),
-                val, safeval[Model.safety[i]]);
-        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
-            break;
-    }
-    return tempstring;
-}
-
 void PAGE_ShowSafetyDialog()
 {
     if (dialog) {

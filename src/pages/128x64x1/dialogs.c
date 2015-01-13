@@ -25,59 +25,29 @@
 
 static struct dialog_obj * const gui = &gui_objs.dialog;
 
-static u32 dialogcrc;
 
-static const char *safety_string_cb(guiObject_t *obj, void *data)
-{
-    (void)data;
-    u32 crc = Crc(tempstring, strlen(tempstring));
-    if (obj && crc == dialogcrc)
-        return tempstring;
-    u64 unsafe = safety_check();
-    int i;
-    int count = 0;
-    const s8 safeval[4] = {0, -100, 0, 100};
-    volatile s16 *raw = MIXER_GetInputs();
-    tempstring[0] = 0;
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
-        if (! (unsafe & (1LL << i)))
-            continue;
-        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
-
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
-                      ? raw[ch+1]
-                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-        INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
-        int len = strlen(tempstring);
-        snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%,\nsafe value = %d%%"),
-                val, safeval[Model.safety[i]]);
-        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
-            break;
-    }
-    return tempstring;
-}
 void PAGE_ShowSafetyDialog()
 {
-    if (dialog == NULL) {
+    if (dialog) {
+        u64 unsafe = safety_check();
+        if (! unsafe) {
+            GUI_RemoveObj(dialog);
+            GUI_SetSelected(current_selected_obj);
+            dialog = NULL;
+            safety_confirmed();
+        } else {
+            safety_string_cb(NULL, NULL);
+            u32 crc = Crc(tempstring, strlen(tempstring));
+            if (crc != dialogcrc) {
+                GUI_Redraw(dialog);
+                dialogcrc = crc;
+            }
+        }
+    } else {
         tempstring[0] = 0;
         dialogcrc = 0;
         current_selected_obj = GUI_GetSelected();
         dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
-        return;
-    }
-    u64 unsafe = safety_check();
-    if (! unsafe) {
-        GUI_RemoveObj(dialog);
-        GUI_SetSelected(current_selected_obj);
-        dialog = NULL;
-        safety_confirmed();
-        return;
-    }
-    safety_string_cb(NULL, NULL);
-    u32 crc = Crc(tempstring, strlen(tempstring));
-    if (crc != dialogcrc) {
-        dialogcrc = crc;
-        GUI_Redraw(dialog);
     }
 }
 

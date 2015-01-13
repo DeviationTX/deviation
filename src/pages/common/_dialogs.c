@@ -21,6 +21,7 @@ static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 /*  Safety Dialog */
 /******************/
 static u64 safety_enabled = ~0LL;
+static u32 dialogcrc;
 
 static u64 safety_check()
 {
@@ -53,6 +54,41 @@ static void safety_ok_cb(u8 state, void * data)
         return;
     safety_confirmed();
 }
+
+static const char *safety_string_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    u32 crc = Crc(tempstring, strlen(tempstring));
+    if (obj && crc == dialogcrc)
+        return tempstring;
+    u64 unsafe = safety_check();
+    int count = 0;
+    const s8 safeval[4] = {0, -100, 0, 100};
+    volatile s16 *raw = MIXER_GetInputs();
+    tempstring[0] = 0;
+    for(int i = 0; i < NUM_SOURCES + 1; i++) {
+        if (! (unsafe & (1LL << i)))
+            continue;
+        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
+      
+        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+                      ? raw[ch+1]
+                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
+        INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
+        int len = strlen(tempstring);
+        snprintf(tempstring + len, sizeof(tempstring) - len, 
+#if MAX_CONCURRENT_SAFETY_MSGS > 1
+                _tr(" is %d%%, safe value = %d%%\n"),
+#else
+                _tr(" is %d%%,\nsafe value = %d%%"),
+#endif
+                val, safeval[Model.safety[i]]);
+        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
+            break;
+    }
+    return tempstring;
+}
+
 
 /**********************/
 /* Low battery Dialog */
