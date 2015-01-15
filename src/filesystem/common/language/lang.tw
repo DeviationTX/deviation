@@ -5,7 +5,7 @@
 : is %d%%, safe value = %d%%\n
  = %d%%,熄火保護 = %d%%\n
 : is %d%%,\nsafe value = %d%%
- = %d%%,\n熄火保護 = %d%%\n
+ = %d%%,\n熄火保護 = %d%%
 >:1 sec
 :1-to-1
 等比例

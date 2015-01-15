@@ -5,7 +5,7 @@
 : is %d%%, safe value = %d%%\n
  = %d%%, valore sicuro  = %d%%\n
 : is %d%%,\nsafe value = %d%%
- = %d%%, \nvalore sicuro  = %d%%
+ = %d%%,\nvalore sicuro=%d%%
 >:1 sec
 :1-to-1
 1 a 1
