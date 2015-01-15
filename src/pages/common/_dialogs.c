@@ -38,16 +38,16 @@ static void safety_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
-    int count = 0;
+    dialog = NULL;
+    // Disable safety for all currently displayed unsafe's
     u64 unsafe = safety_check();
-    for(int i = 0; i < NUM_SOURCES + 1; i++) {
+    for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
-        safety_enabled ^= 1LL << i;
+        safety_enabled &= ~(1LL << i);
         if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
             break;
     }
-    dialog = NULL;
     if (current_selected_obj != NULL)
         GUI_SetSelected(current_selected_obj);
     if (unsafe & safety_enabled)
@@ -62,11 +62,10 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     if (obj && crc == dialogcrc)
         return tempstring;
     u64 unsafe = safety_check();
-    int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
     volatile s16 *raw = MIXER_GetInputs();
     tempstring[0] = 0;
-    for(int i = 0; i < NUM_SOURCES + 1; i++) {
+    for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
         int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
@@ -124,11 +123,11 @@ static void reset_permtimer_cb(u8 state, void *data)
 {
     u8 idx = (long)data;
     if (current_selected_obj != NULL)
-	GUI_SetSelected(current_selected_obj);
+        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1) {
-	Model.timer[idx].val = 0;
-	TIMER_Init();
+        Model.timer[idx].val = 0;
+        TIMER_Init();
     }
 }
 
