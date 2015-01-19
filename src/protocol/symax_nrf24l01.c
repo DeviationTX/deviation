@@ -56,8 +56,10 @@
 #define PACKET_PERIOD        4000     // Timeout for callback in uSec
 #define INITIAL_WAIT          500
 
-#define FLAG_FLIP   0x01
-#define FLAG_RATES  0x02
+#define FLAG_FLIP      0x01
+#define FLAG_RATES     0x02
+#define FLAG_VIDEO     0x04
+#define FLAG_PICTURE   0x08
 
 // For code readability
 enum {
@@ -73,10 +75,11 @@ enum {
     CHANNEL10
 };
 
-#define PAYLOADSIZE 10   // receive data pipes set to this size, but unused
-#define PACKET_SIZE 10   // SYMAX packets have 10-byte payload
+#define PAYLOADSIZE 10       // receive data pipes set to this size, but unused
+#define MAX_PACKET_SIZE 16   // X11,X12,X5C-1 10-byte, X5C 16-byte
 
-static u8 packet[PACKET_SIZE];
+static u8 packet[MAX_PACKET_SIZE];
+static u8 packet_size;
 static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
@@ -84,9 +87,10 @@ static u8 throttle, rudder, elevator, aileron, flags;
 static u8 rx_tx_addr[5];
 
 // frequency channel management
-#define NUM_RF_CHANNELS    8
+#define MAX_RF_CHANNELS    17
 static u8 current_chan;
-static u8 chans[NUM_RF_CHANNELS];
+static u8 chans[MAX_RF_CHANNELS];
+static u8 num_rf_channels;
 
 static u8 phase;
 enum {
@@ -99,16 +103,29 @@ enum {
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
+static const char * const symax_opts[] = {
+  _tr_noop("SymaX5C"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
+enum {
+    PROTOOPTS_X5C = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 
 static u8 checksum(u8 *data)
 {
     u8 sum = data[0];
-    for (int i=1; i < PACKET_SIZE-1; i++)
-        sum ^= data[i];
+
+    for (int i=1; i < packet_size-1; i++)
+        if (Model.proto_opts[PROTOOPTS_X5C])
+            sum += data[i];
+        else
+            sum ^= data[i];
     
-    return sum + 0x55;
+    return sum + (Model.proto_opts[PROTOOPTS_X5C] ? 0 : 0x55);
 }
 
 
@@ -139,15 +156,27 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u
 
     // Channel 5
     if (Channels[CHANNEL5] <= 0)
-      *flags &= ~FLAG_FLIP;
+        *flags &= ~FLAG_FLIP;
     else
-      *flags |= FLAG_FLIP;
+        *flags |= FLAG_FLIP;
 
     // Channel 6
     if (Channels[CHANNEL6] <= 0)
-      *flags &= ~FLAG_RATES;
+        *flags &= ~FLAG_RATES;
     else
-      *flags |= FLAG_RATES;
+        *flags |= FLAG_RATES;
+
+    // Channel 7
+    if (Channels[CHANNEL7] <= 0)
+        *flags &= ~FLAG_PICTURE;
+    else
+        *flags |= FLAG_PICTURE;
+
+    // Channel 8
+    if (Channels[CHANNEL8] <= 0)
+        *flags &= ~FLAG_VIDEO;
+    else
+        *flags |= FLAG_VIDEO;
 
 
 //    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%x\n",
@@ -155,8 +184,43 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u
 }
 
 
-static void send_packet(u8 bind)
+#define X5C_CHAN2TRIM(X) ((((X) & 0x80 ? 0xff - (X) : 0x80 + (X)) >> 2) + 0x20)
+
+static void build_packet_x5c(u8 bind)
 {
+    if (bind) {
+        memset(packet, 0, packet_size);
+        packet[7] = 0xae;
+        packet[8] = 0xa9;
+        packet[14] = 0xc0;
+        packet[15] = 0x17;
+    } else {
+        read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
+
+        packet[0] = throttle;
+        packet[1] = rudder;
+        packet[2] = elevator ^ 0x80;  // reversed from default
+        packet[3] = aileron;
+        packet[4] = X5C_CHAN2TRIM(rudder ^ 0x80);     // drive trims for extra control range
+        packet[5] = X5C_CHAN2TRIM(elevator);
+        packet[6] = X5C_CHAN2TRIM(aileron ^ 0x80);
+        packet[7] = 0xae;
+        packet[8] = 0xa9;
+        packet[9] = 0x00;
+        packet[10] = 0x00;
+        packet[11] = 0x00;
+        packet[12] = 0x00;
+        packet[13] = 0x00;
+        packet[14] = (flags & FLAG_VIDEO   ? 0x10 : 0x00) 
+                   | (flags & FLAG_PICTURE ? 0x08 : 0x00)
+                   | (flags & FLAG_FLIP    ? 0x01 : 0x00)
+                   | (flags & FLAG_RATES   ? 0x04 : 0x00);
+        packet[15] = checksum(packet);
+    }
+}
+
+
+static void build_packet(u8 bind) {
     if (bind) {
         packet[0] = rx_tx_addr[4];
         packet[1] = rx_tx_addr[3];
@@ -182,25 +246,33 @@ static void send_packet(u8 bind)
         packet[8] = 0x00;
         packet[9] = checksum(packet);
     }
+}
 
+
+static void send_packet(u8 bind)
+{
+    if (Model.proto_opts[PROTOOPTS_X5C])
+        build_packet_x5c(bind);
+    else
+        build_packet(bind);
 
     // clear packet status bits and TX FIFO
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x2e);
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, chans[current_chan]);
-    current_chan %= NUM_RF_CHANNELS;
     NRF24L01_FlushTx();
 
-    NRF24L01_WritePayload(packet, PACKET_SIZE);
+    NRF24L01_WritePayload(packet, packet_size);
 
 #ifdef EMULATOR
     dbgprintf("pkt %d: chan 0x%x, bind %d, data %02x", packet_counter, chans[current_chan], bind, packet[0]);
-    for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
+    for(int i=1; i < packet_size; i++) dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
 #endif
 
-    ++packet_counter;
-    ++current_chan;
+    if (packet_counter++ % 2) {   // use each channel twice
+        current_chan = (current_chan + 1) % num_rf_channels;
+    }
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -218,6 +290,7 @@ static void send_packet(u8 bind)
 static void symax_init()
 {
     const u8 bind_rx_tx_addr[] = {0xab,0xac,0xad,0xae,0xaf};
+    const u8 bind_rx_tx_addr_x5c[] = {0x6d,0x6a,0x73,0x73,0x73};
 
     NRF24L01_Initialize();
 
@@ -230,7 +303,15 @@ static void symax_init()
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xff); // 4mS retransmit t/o, 15 tries (retries w/o AA?)
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x08);
-    NRF24L01_SetBitrate(NRF24L01_BR_250K);
+
+    if (Model.proto_opts[PROTOOPTS_X5C]) {
+      NRF24L01_SetBitrate(NRF24L01_BR_1M);
+      packet_size = 16;
+    } else {
+      NRF24L01_SetBitrate(NRF24L01_BR_250K);
+      packet_size = 10;
+    }
+
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_08_OBSERVE_TX, 0x00);
@@ -247,7 +328,10 @@ static void symax_init()
     NRF24L01_WriteReg(NRF24L01_16_RX_PW_P5, PAYLOADSIZE);
     NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00); // Just in case, no real bits to write here
 
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_rx_tx_addr, 5);
+    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,
+                                Model.proto_opts[PROTOOPTS_X5C] ? bind_rx_tx_addr_x5c : bind_rx_tx_addr,
+                                5);
+
     NRF24L01_ReadReg(NRF24L01_07_STATUS);
 
     // Check for Beken BK2421/BK2423 chip
@@ -298,27 +382,45 @@ static void symax_init1()
 {
     // write a strange first packet to RF channel 8 ...
     u8 first_packet[] = {0xf9, 0x96, 0x82, 0x1b, 0x20, 0x08, 0x08, 0xf2, 0x7d, 0xef, 0xff, 0x00, 0x00, 0x00, 0x00};
-    u8 chans_bind[] = {0x4b, 0x4b, 0x30, 0x30, 0x40, 0x40, 0x2e, 0x2e};
+    u8 chans_bind[] = {0x4b, 0x30, 0x40, 0x2e};
+    u8 chans_bind_x5c[] = {0x27, 0x1b, 0x39, 0x28, 0x24, 0x22, 0x2e, 0x36,
+                           0x19, 0x21, 0x29, 0x14, 0x1e, 0x12, 0x2d, 0x18};
+
     u8 data_rx_tx_addr[] = {0x3b,0xb6,0x00,0x00,0xa2};
 
     NRF24L01_FlushTx();
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x08);
     NRF24L01_WritePayload(first_packet, 15);
 
-    memcpy(rx_tx_addr, data_rx_tx_addr, 5);
-    memcpy(chans, chans_bind, NUM_RF_CHANNELS);
+    if (Model.proto_opts[PROTOOPTS_X5C]) {
+      num_rf_channels = sizeof(chans_bind_x5c);
+      memcpy(chans, chans_bind_x5c, num_rf_channels);
+    } else {
+      memcpy(rx_tx_addr, data_rx_tx_addr, 5);   // make info available for bind packets
+      num_rf_channels = sizeof(chans_bind);
+      memcpy(chans, chans_bind, num_rf_channels);
+    }
     current_chan = 0;
+    packet_counter = 0;
 }
 
 static void symax_init2()
 {
-    u8 chans_data[] = {0x1d, 0x3d, 0x3d, 0x15, 0x15, 0x35, 0x35, 0x1d};
+    u8 chans_data[] = {0x1d, 0x3d, 0x15, 0x35};
+    u8 chans_data_x5c[] = {0x1d, 0x2f, 0x26, 0x3d, 0x15, 0x2b, 0x25, 0x24,
+                           0x27, 0x2c, 0x1c, 0x3e, 0x39, 0x2d, 0x22};
 
+    if (Model.proto_opts[PROTOOPTS_X5C]) {
+      num_rf_channels = sizeof(chans_data_x5c);
+      memcpy(chans, chans_data_x5c, num_rf_channels);
+    } else {
+      num_rf_channels = sizeof(chans_data);
+      memcpy(chans, chans_data, num_rf_channels);
 
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
-
-    memcpy(chans, chans_data, NUM_RF_CHANNELS);
+      NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
+    }
     current_chan = 0;
+    packet_counter = 0;
 }
 
 MODULE_CALLTYPE
@@ -383,10 +485,10 @@ const void *SYMAX_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable light
+        case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, special controls
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return symax_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         case PROTOCMD_SET_TXPOWER:
             tx_power = Model.tx_power;
