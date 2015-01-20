@@ -16,7 +16,6 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
-static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int _get_input_idx(int chan);
@@ -101,27 +100,5 @@ static const char *value_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long ch = (long)data;
     sprintf(tempstring, "%d", cp->pctvalue[ch]);
-    return tempstring;
-}
-
-static const char *channum_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long ch = (long)data;
-    if (cp->type) {
-        char *p = tempstring;
-        if (ch & 0x01) {
-            *p = '\n';
-            p++;
-        }
-        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limitied in character set
-        INPUT_SourceName(p, ch+1);
-        CONFIG_EnableLanguage(1);
-        if (! (ch & 0x01)) {
-            sprintf(p + strlen(p), "\n");
-        }
-    } else {
-       sprintf(tempstring, "\n%d", (int)ch+1);
-    }
     return tempstring;
 }

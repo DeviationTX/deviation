@@ -93,7 +93,6 @@ static void _show_bar_page(u8 num_bars)
 
 void PAGE_ChantestInit(int page)
 {
-    (void)channum_cb; // remove compile warning as this method is not used here
     (void)okcancel_cb;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
