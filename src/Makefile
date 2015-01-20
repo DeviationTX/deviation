@@ -14,12 +14,16 @@ default: $(TARGET)
 TXS = devo6 devo7e devo8 devo10 devo12
 # x9d needs more software installed.
 #TXS = devo6 devo7e devo8 devo10 devo12 x9d
+# These txs use file systems for other txs, so don't have a file system target.
+NOFSTXS = devo6 devo7e
 
 txs: $(TXS)
-emus: $(patsubst %,emu_%,$(TXS))
+emus: $(TXS:%=emu_%)
 both: txs emus
-fss: $(patsubst %,fs_%,$(TXS))
-zips: $(patsubst %,zip_%,$(TXS))
+fss: $(TXS:%=fs_%)
+zips: $(TXS: %=zip_%)
+emuzips: $(TXS:%=emu_zip_%)
+winzips: $(TXS:%=win_zip_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
@@ -28,13 +32,23 @@ $1:
 	$(MAKE) TARGET=$1
 emu_$1:
 	$(MAKE) TARGET=emu_$1
+# This builds Windows emulators on a Linux system.
+win_$1:
+	#$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+fs_$1:
+ifneq "$(INCLUDE_FS)" "1"
+ifneq "$(findstring $1,$(NOFSTXS))" "$1"
+	$(MAKE) TARGET=$1 fs
+endif
+endif
+both_$1: $1 emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
-fs_$1:
-	$(MAKE) TARGERT=$1 fs
+zip_emu_$1:
+	$(MAKE) TARGET=emu_$1 zip
+release_$1: zip_$1 zip_emu_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
-both_$1: $1 emu_$1
 endef
 
 # Now generate all the convenience targets
@@ -209,7 +223,7 @@ zip: $(TARGET).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
 	# $(MAKE) zipping more compatible with other distributions
-	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
 	export p=`pwd`; cd $(ODIR) && zip -u $$p/debug-$(HGVERSION).zip *.elf
@@ -227,19 +241,7 @@ fs: $(TARGET).fs
 %.fs:
 	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
 
-release:
-	$(MAKE) TARGET=devo8  zip
-	$(MAKE) TARGET=devo6  zip
-	$(MAKE) TARGET=devo10 zip
-	$(MAKE) TARGET=devo7e zip
-	$(MAKE) TARGET=devo12 zip
-ifneq "$(INCLUDE_FS)" "1"
-	$(MAKE) TARGET=devo8 fs
-	$(MAKE) TARGET=devo10 fs
-	$(MAKE) TARGET=devo7e fs
-	$(MAKE) TARGET=devo12 fs
-endif
-	#$(MAKE) TARGET=emu_devo8 TYPE=prd WINDOWS=1 
+release:  $(TXS:%=release_%)
 
 coverity:
 	rm -rf cov-int 2>/dev/null; $(MAKE) distclean
