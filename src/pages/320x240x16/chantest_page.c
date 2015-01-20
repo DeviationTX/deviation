@@ -22,6 +22,7 @@
 
 static void show_button_page();
 static void _show_bar_page(u8 num_bars, u8 _page);
+static const char *channum_cb(guiObject_t *obj, const void *data);
 
 static s8 page;
 static u8 num_pages;
@@ -206,4 +207,26 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 static int _get_input_idx(int chan)
 {
     return page * NUM_BARS_PER_ROW + chan;
+}
+
+static const char *channum_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    long ch = (long)data;
+    if (cp->type) {
+        char *p = tempstring;
+        if (ch & 0x01) {
+            *p = '\n';
+            p++;
+        }
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limitied in character set
+        INPUT_SourceName(p, ch+1);
+        CONFIG_EnableLanguage(1);
+        if (! (ch & 0x01)) {
+            sprintf(p + strlen(p), "\n");
+        }
+    } else {
+       sprintf(tempstring, "\n%d", (int)ch+1);
+    }
+    return tempstring;
 }
