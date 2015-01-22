@@ -36,11 +36,13 @@
 
 #include "iface_cc2500.h"
 
+#if	0
 static const char * const frsky_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   _tr_noop("Freq-Course"),  "-127", "127", NULL,
   NULL
 };
+#endif
 enum {
     PROTO_OPTS_FREQFINE = 0,
     PROTO_OPTS_FREQCOURSE = 1,

@@ -18,10 +18,7 @@
 
 #include "../../common/advanced/_mixer_setup.c"
 
-static const int FIRST_PAGE_ITEM_IDX = 2;  // 0 is the template obj and 1 is the button obj
 static const int LEFT_VIEW_WIDTH     = 60;
-static const int LEFT_VIEW_ID        = 0;
-static const int RIGHT_VIEW_ID       = 1;
 static const int RIGHT_VIEW_HEIGHT   = 48;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);

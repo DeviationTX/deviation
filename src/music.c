@@ -48,7 +48,7 @@ static const struct NoteMap note_map[] = {
 #if NUM_TIMERS > 4
 #error "Number of timers is != 4.  This will cause the Alarm music to not work properly"
 #endif
-static const char const *sections[] = {
+static const char *const sections[] = {
     "startup",
     "shutdown",
     "volume",
