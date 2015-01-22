@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/timeb.h>
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
@@ -617,10 +616,10 @@ void CLOCK_ClearMsecCallback(int cb)
 
 u32 CLOCK_getms()
 {
-    struct timeb tp;
+    struct timeval tp;
     u32 t;
-    ftime(&tp);
-    t = (tp.time * 1000) + tp.millitm;
+    gettimeofday(&tp, NULL);
+    t = (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
     return t;
 }
 }
