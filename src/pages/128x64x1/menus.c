@@ -70,7 +70,6 @@ struct menu_pages menus[] = {
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
-static const int VIEW_ID = 0;
 static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
 

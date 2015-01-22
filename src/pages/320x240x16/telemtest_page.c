@@ -20,7 +20,6 @@
 
 #include "../common/_telemtest_page.c"
 
-static const u8 row_height = 20;
 struct telempos {
     u16 x;
     u16 y;

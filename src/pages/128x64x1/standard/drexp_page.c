@@ -28,8 +28,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 //static u16 current_selected = 0;
 guiObject_t *scroll_bar;
-static const int RIGHT_VIEW_HEIGHT = 60;
-static const int RIGHT_VIEW_ID  = 1;
 
 enum {
     ITEM_NORMAL,
