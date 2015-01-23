@@ -16,10 +16,10 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s16 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
+static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
-static int get_channel_idx();
-static int _get_channel_idx(int chan);
+static int get_channel_idx(int chan);
 
 enum {
     ITEM_GRAPH,
@@ -27,6 +27,8 @@ enum {
     ITEM_GRAPH2,
     ITEM_VALUE2,
 };
+
+static int current_page = 0;
 
 const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
@@ -73,12 +75,10 @@ void PAGE_ChantestEvent()
     }
     volatile s16 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
-        int ch = get_channel_idx(i);
-        int v = raw[ch + 1];
-        if (ch >= NUM_INPUTS && ch < NUM_OUT_CHANNELS) {
-            v = Channels[ch - NUM_INPUTS];
-        }
-        v = RANGE_TO_PCT(v) ;
+        int ch = get_channel_idx(current_page * NUM_BARS_PER_ROW + i);
+        int v = RANGE_TO_PCT((ch >= NUM_INPUTS && ch < NUM_INPUTS + NUM_OUT_CHANNELS)
+                             ? Channels[ch - NUM_INPUTS]
+                             : raw[ch + 1]);
         if (v != cp->pctvalue[i]) {
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {
@@ -108,16 +108,15 @@ static const char *value_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static int _get_channel_idx(int chan)
+static int get_channel_idx(int chan)
 {
     int i;
-    if (! cp->type) {
-        for (i = 0; i < NUM_CHANNELS; i+= 1) {
+    if (cp->type == MONITOR_MIXEROUTPUT) {
+        for (i = 0; i < NUM_CHANNELS; i++) {
             if (Model.templates[i] != MIXERTEMPLATE_NONE) {
-                chan--;
+                if (--chan < 0)
+                    break;
             }
-            if (chan < 0)
-                break;
         }
         return i + NUM_INPUTS;
     } else {
@@ -127,11 +126,24 @@ static int _get_channel_idx(int chan)
         chan -= ppms;
         for (i = 0; i < NUM_INPUTS; i++) {
             if (!(Transmitter.ignore_src & (1 << (i+1)))) {
-                chan--;
+                if (--chan < 0)
+                    break;
             }
-            if (chan < 0)
-                break;
         }
         return i;
+    }
+}
+
+static int num_disp_bars() {
+    if (cp->type == MONITOR_MIXEROUTPUT) {
+        int j = 0;
+        for (int i = 0; i < NUM_CHANNELS; i++) {
+            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+                j++;
+            }
+        }
+        return j;
+    } else {
+        return NUM_INPUTS + ((PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f : 0);
     }
 }

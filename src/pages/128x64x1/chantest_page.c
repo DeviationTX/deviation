@@ -21,17 +21,14 @@
 #include "../common/_chantest_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
-static s8 current_page = 0; // bug fix
 
 static void draw_chan(long disp, int row, int y)
 {
     int x = disp%2 ? 63 : 0;
     int idx = disp%2 ? 2*row + 1 : 2*row;
     int height;
-    long ch = get_channel_idx(disp);
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;
@@ -40,7 +37,7 @@ static void draw_chan(long disp, int row, int y)
         height = 7;
     }
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, height, &labelDesc, _channum_cb, NULL, (void *)ch);
+        0, height, &labelDesc, channum_cb, NULL, (void *)(long)get_channel_idx(disp));
     GUI_CreateLabelBox(&gui->value[idx], x+37, y,
         23, height, &MICRO_FONT, value_cb, NULL, (void *)disp);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
@@ -70,10 +67,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-static void _show_bar_page(u8 num_bars)
+static void _show_bar_page()
 {
-    current_page = 0;
-    cp->num_bars = num_bars;
+    cp->num_bars = num_disp_bars();
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     int view_height = (cp->type == MONITOR_RAWINPUT)
                       ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
@@ -84,7 +80,7 @@ static void _show_bar_page(u8 num_bars)
     //GUI_CreateRect(&gui->rect, 0, HEADER_HEIGHT - 1, LCD_WIDTH, 1, &labelDesc);
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
+                         view_height, (cp->num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
     GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &DEFAULT_FONT, _page_cb, NULL, NULL);
 }
@@ -98,26 +94,9 @@ void PAGE_ChantestInit(int page)
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
-    int j = 0;
-    if (cp->type == MONITOR_RAWINPUT) {
-        for (int i = 0; i < NUM_INPUTS; i++) {
-            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
-                j += 1;
-            }
-        }
-        if (PPMin_Mode() == PPM_IN_SOURCE) {
-            j += Model.num_ppmin & 0x3f;
-        }
-        _show_bar_page(j);
-    } else {
+    if (cp->type != MONITOR_RAWINPUT )
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
-        for (int i = 0; i < NUM_CHANNELS; i += 1) {
-            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
-                j += 1;
-            }
-        }
-        _show_bar_page(j);
-    }
+    _show_bar_page();
 }
 
 void PAGE_ChantestModal(void(*return_page)(int page), int page)
@@ -132,7 +111,7 @@ static void _navigate_pages(s8 direction)
 {
     if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
             (direction == 1 && cp->type == MONITOR_MIXEROUTPUT)) {
-        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_MIXEROUTPUT: MONITOR_RAWINPUT;
+        cp->type = cp->type == MONITOR_RAWINPUT ? MONITOR_MIXEROUTPUT : MONITOR_RAWINPUT;
         PAGE_ChantestInit(0);
     }
 }
@@ -160,7 +139,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     return 1;
 }
 
-static const char *_channum_cb(guiObject_t *obj, const void *data)
+static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
@@ -173,9 +152,9 @@ static const char *_title_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     if (cp->type == MONITOR_RAWINPUT) {
-        tempstring_cpy((const char *)_tr("Raw input"));
+        tempstring_cpy((const char *)_tr("Stick input"));
     } else {
-        tempstring_cpy((const char *)_tr("Mixer output"));
+        tempstring_cpy((const char *)_tr("Channel output"));
     }
     return tempstring;
 }
@@ -197,6 +176,3 @@ static inline guiObject_t *_get_obj(int chan, int objid)
     return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
 }
 
-static inline int get_channel_idx(int ch) {
-  return _get_channel_idx(ch);
-}
