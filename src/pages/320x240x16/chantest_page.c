@@ -21,9 +21,8 @@
 #include "../common/_chantest_page.c"
 
 static void show_button_page();
-static void _show_bar_page(u8 num_bars, u8 _page);
+static void _show_bar_page(u8 page);
 
-static s8 page;
 static u8 num_pages;
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
@@ -44,14 +43,14 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     return current_page;
 }
 
-static void _show_bar_page(u8 _page)
+static void _show_bar_page(u8 page)
 {
     long i;
     u8 num_bars = num_disp_bars();
     u8 height;
     u8 count;
     int row_len;
-    current_page = _page;
+    current_page = page;
     num_pages = 0;
 
     if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
@@ -108,8 +107,8 @@ void PAGE_ChantestInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
     cp->return_page = NULL;
-    cp->type = MONITOR_CHANNELOUTPUT;
-    _show_bar_page(Model.num_channels, 0);
+    cp->type = MONITOR_MIXEROUTPUT;
+    _show_bar_page(0);
 }
 
 void PAGE_InputtestInit(int page)
@@ -119,7 +118,7 @@ void PAGE_InputtestInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
     cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
-    _show_bar_page(NUM_INPUTS, 0);
+    _show_bar_page(0);
 }
 
 void PAGE_ButtontestInit(int page)
@@ -137,12 +136,12 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     PAGE_SetModal(1);
     cp->return_page = return_page;
     cp->return_val = page;
-    cp->type = MONITOR_CHANNELOUTPUT;
+    cp->type = MONITOR_MIXEROUTPUT;
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
 
-    _show_bar_page(Model.num_channels, 0);
+    _show_bar_page(0);
 }
 
 static void show_button_page()

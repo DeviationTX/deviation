@@ -144,7 +144,7 @@ static int num_disp_bars() {
         }
         return j;
     } else {
-        return NUM_INPUTS + ((PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f : 0);
+        return NUM_INPUTS + (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE)
+                            ? Model.num_ppmin & 0x3f : 0;
     }
-    return tempstring;
 }
