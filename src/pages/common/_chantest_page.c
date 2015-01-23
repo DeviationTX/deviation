@@ -120,10 +120,12 @@ static int get_channel_idx(int chan)
         }
         return i + NUM_INPUTS;
     } else {
-        int ppms = (PPMin_Mode() == PPM_IN_SOURCE ) ? Model.num_ppmin & 0x3f: 0;
-        if (chan < ppms)
-            return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
-        chan -= ppms;
+        if (cp->type == MONITOR_RAWINPUT) {
+            int ppms = (PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f: 0;
+            if (chan < ppms)
+                return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
+            chan -= ppms;
+        }
         for (i = 0; i < NUM_INPUTS; i++) {
             if (!(Transmitter.ignore_src & (1 << (i+1)))) {
                 if (--chan < 0)
@@ -135,16 +137,22 @@ static int get_channel_idx(int chan)
 }
 
 static int num_disp_bars() {
+    int j = 0;
     if (cp->type == MONITOR_MIXEROUTPUT) {
-        int j = 0;
         for (int i = 0; i < NUM_CHANNELS; i++) {
             if (Model.templates[i] != MIXERTEMPLATE_NONE) {
                 j++;
             }
         }
-        return j;
     } else {
-        return NUM_INPUTS + (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE)
-                            ? Model.num_ppmin & 0x3f : 0;
+        for (int i = 0; i < NUM_INPUTS; i++) {
+            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+                j++;
+            }
+        }
+        if (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE) {
+            j += Model.num_ppmin & 0x3f;
+        }
     }
+    return j;
 }
