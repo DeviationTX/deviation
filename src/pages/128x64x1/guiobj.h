@@ -9,6 +9,7 @@ struct splash_obj {
     guiImage_t splash_image;
 };
 
+#define NUM_BARS_PER_ROW    2
 struct chantest_obj {
     guiLabel_t title;
     guiRect_t  rect;
