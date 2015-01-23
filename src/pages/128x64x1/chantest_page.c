@@ -24,10 +24,10 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
 
-static void draw_chan(long disp, int row, int y)
+static void draw_chan(int disp, int row, int y)
 {
     int x = disp%2 ? 63 : 0;
-    int idx = disp%2 ? 2*row + 1 : 2*row;
+    int idx = row * NUM_BARS_PER_ROW + (disp%2 ? 1 : 0);
     int height;
     struct LabelDesc labelValue = MICRO_FONT;
     labelValue.style = LABEL_RIGHT;
@@ -64,14 +64,16 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    draw_chan(absrow*2, relrow, y);
-    if(absrow*2+1 < cp->num_bars)
-        draw_chan(absrow*2+1, relrow, y);
+    int idx = absrow * NUM_BARS_PER_ROW;
+    draw_chan(idx, relrow, y);
+    if(idx+1 < cp->num_bars)
+        draw_chan(idx+1, relrow, y);
     return 0;
 }
 
-static void _show_bar_page()
+static void _show_bar_page(u8 top_row)
 {
+    cur_row = top_row;
     cp->num_bars = num_disp_bars();
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     int view_height = (cp->type == MONITOR_RAWINPUT)
@@ -99,7 +101,7 @@ void PAGE_ChantestInit(int page)
         cp->return_val = page;
     if (cp->type != MONITOR_RAWINPUT )
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
-    _show_bar_page();
+    _show_bar_page(0);
 }
 
 void PAGE_ChantestModal(void(*return_page)(int page), int page)

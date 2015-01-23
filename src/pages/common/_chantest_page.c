@@ -20,6 +20,8 @@ static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx(int chan);
+static void _show_bar_page(u8 top_row);
+static int cur_row = 0;
 
 enum {
     ITEM_GRAPH,
@@ -27,8 +29,6 @@ enum {
     ITEM_GRAPH2,
     ITEM_VALUE2,
 };
-
-static int current_page = 0;
 
 const char *lockstr_cb(guiObject_t *obj, const void *data)
 {
@@ -68,14 +68,13 @@ unsigned button_capture_cb(u32 button, unsigned flags, void *data)
 
 void PAGE_ChantestEvent()
 {
-    int i;
     if(cp->type == MONITOR_BUTTONTEST) {
         _handle_button_test();
         return;
     }
     volatile s16 *raw = MIXER_GetInputs();
-    for(i = 0; i < cp->num_bars; i++) {
-        int ch = get_channel_idx(current_page * NUM_BARS_PER_ROW + i);
+    for(int i = 0; i < cp->num_bars; i++) {
+        int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + i);
         int v = RANGE_TO_PCT((ch >= NUM_INPUTS && ch < NUM_INPUTS + NUM_OUT_CHANNELS)
                              ? Channels[ch - NUM_INPUTS]
                              : raw[ch + 1]);

@@ -21,9 +21,8 @@
 #include "../common/_chantest_page.c"
 
 static void show_button_page();
-static void _show_bar_page(u8 page);
 
-static u8 num_pages;
+static int num_rows;
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
@@ -31,32 +30,31 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     (void)parent;
     (void)data;
     
-    s8 newpos = current_page + (direction > 0 ? 1 : -1);
+    s8 newpos = cur_row + (direction > 0 ? 1 : -1);
     if (newpos < 0)
         newpos = 0;
-    else if (newpos >= num_pages)
-        newpos = num_pages-1;
-    if (newpos != current_page) {
+    else if (newpos > num_rows-2)
+        newpos = num_rows-2;
+    if (newpos != cur_row) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
         _show_bar_page(newpos);
     }
-    return current_page;
+    return cur_row;
 }
 
-static void _show_bar_page(u8 page)
+static void _show_bar_page(u8 top_row)
 {
     long i;
     u8 num_bars = num_disp_bars();
     u8 height;
     u8 count;
     int row_len;
-    current_page = page;
-    num_pages = 0;
+    cur_row = top_row;
+    num_rows = 1;
 
     if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
-        num_pages = (num_bars + NUM_BARS_PER_ROW - 1) / NUM_BARS_PER_ROW - 1;
-    
-        num_bars = num_bars - current_page * NUM_BARS_PER_ROW;
+        num_rows = num_bars / NUM_BARS_PER_ROW + 1;
+        num_bars -= cur_row * NUM_BARS_PER_ROW;
         if (num_bars > 2 * NUM_BARS_PER_ROW)
             num_bars = 2 * NUM_BARS_PER_ROW;
         row_len = NUM_BARS_PER_ROW;
@@ -73,7 +71,7 @@ static void _show_bar_page(u8 page)
         height = 155 + (LCD_HEIGHT - 240);
         count = num_bars;
     }
-    u16 offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
+    u16 offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_rows > 2 ? 1 : 0) + count)) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
@@ -84,7 +82,7 @@ static void _show_bar_page(u8 page)
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 53 + height,
                                       SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
-    offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
+    offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_rows > 2 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
                                       SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
@@ -94,9 +92,9 @@ static void _show_bar_page(u8 page)
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
                                       SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
     }
-    if(num_pages > 1) {
-        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_pages, NULL, scroll_cb, NULL);
-        GUI_SetScrollbar(&gui->scrollbar, current_page);
+    if(num_rows > 2) {
+        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_rows-1, NULL, scroll_cb, NULL);
+        GUI_SetScrollbar(&gui->scrollbar, cur_row);
     }
         
 }
@@ -205,7 +203,7 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long disp = (long)data;
-    long ch = get_channel_idx(current_page * NUM_BARS_PER_ROW + disp);
+    long ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + disp);
     if (cp->type) {
         char *p = tempstring;
         if (disp & 0x01) {
