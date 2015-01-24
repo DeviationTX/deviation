@@ -436,8 +436,9 @@ void PROTOCOL_InitModules()
         }
     }
     //Put this last because the switch will not respond until after it has been initialized
-    if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+    if (Transmitter.module_enable[MULTIMOD].port && PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
         //No Switch found
+	error = 1;
         missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
     }
     Model.protocol = orig_proto;
