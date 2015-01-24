@@ -15,7 +15,6 @@
 
 
 static guiObject_t *dialog = NULL;
-static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
 /*  Safety Dialog */
@@ -48,8 +47,6 @@ static void safety_ok_cb(u8 state, void * data)
         if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
             break;
     }
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     if (unsafe & safety_enabled)
         return;
     safety_confirmed();
@@ -96,8 +93,6 @@ static void lowbatt_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
 }
 
@@ -105,8 +100,6 @@ static void lowbatt_ok_cb(u8 state, void * data)
 static void invalid_stdmixer_cb(u8 state, void *guiObj)
 {
     static const char * const STANDARD_TEMPLATE = "heli_std.ini";
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1) {
         PAGE_RemoveHeader();
@@ -122,8 +115,6 @@ static void invalid_stdmixer_cb(u8 state, void *guiObj)
 static void reset_permtimer_cb(u8 state, void *data)
 {
     u8 idx = (long)data;
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1) {
         Model.timer[idx].val = 0;

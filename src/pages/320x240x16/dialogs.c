@@ -33,8 +33,7 @@ void PAGE_ShowSafetyDialog()
     if (dialog) {
         u64 unsafe = safety_check();
         if (! unsafe) {
-            GUI_RemoveObj(dialog);
-            dialog = NULL;
+            DialogClose(dialog, 0);
             safety_confirmed();
         } else {
             safety_string_cb(NULL, NULL);
@@ -78,8 +77,7 @@ static void binding_ok_cb(u8 state, void * data)
 void PAGE_CloseBindingDialog()
 {
     if (dialog) {
-        GUI_RemoveObj(dialog);
-        dialog = 0;
+        DialogClose(dialog, 0);
     }
 }
 
@@ -105,7 +103,6 @@ void PAGE_ShowWarning(const char *title, const char *str)
     if(str != tempstring)
         sprintf(tempstring, "%s", str);
     dialogcrc = 0;
-    current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
@@ -159,7 +156,6 @@ void PAGE_ShowModuleDialog(const char **missing)
            sprintf(tempstring+strlen(tempstring), "%s\n", missing[i]);
        }
     } 
-    current_selected_obj = 0;
     PAGE_ShowWarning(_tr("Module Error"), tempstring);
 }
 

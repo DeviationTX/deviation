@@ -31,9 +31,7 @@ void PAGE_ShowSafetyDialog()
     if (dialog) {
         u64 unsafe = safety_check();
         if (! unsafe) {
-            GUI_RemoveObj(dialog);
-            GUI_SetSelected(current_selected_obj);
-            dialog = NULL;
+            DialogClose(dialog, 0);
             safety_confirmed();
         } else {
             safety_string_cb(NULL, NULL);
@@ -46,7 +44,6 @@ void PAGE_ShowSafetyDialog()
     } else {
         tempstring[0] = 0;
         dialogcrc = 0;
-        current_selected_obj = GUI_GetSelected();
         dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
     }
 }
@@ -75,15 +72,13 @@ static void binding_ok_cb(u8 state, void * data)
     (void)state;
     (void)data;
     PROTOCOL_SetBindState(0); // interrupt the binding
-    PAGE_CloseBindingDialog();
+    dialog = NULL;
 }
 
 void PAGE_CloseBindingDialog()
 {
     if (dialog) {
-        GUI_RemoveObj(dialog);
-        GUI_SetSelected(current_selected_obj);
-        dialog = NULL;
+        DialogClose(dialog, 0);
     }
 }
 
@@ -96,7 +91,6 @@ void PAGE_ShowBindingDialog(u8 update)
     if (dialog && crc != dialogcrc) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        current_selected_obj = GUI_GetSelected();
         dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, tempstring);
     }
     dialogcrc = crc;
@@ -109,7 +103,6 @@ void PAGE_ShowWarning(const char *title, const char *str)
         return;
     if (str != tempstring)
         tempstring_cpy(str);
-    current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
@@ -132,7 +125,6 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
         return;
 
     tempstring[sizeof(tempstring) - 1] = 0;
-    current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL,
             invalidstdmixer_string_cb,
             invalid_stdmixer_cb, dtOkCancel, guiObj);
@@ -150,7 +142,6 @@ void PAGE_ShowInvalidModule()
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
 {
     (void)guiObject;
-    current_selected_obj = GUI_GetSelected();
     if (dialog)
         return;
     dialog = GUI_CreateDialog(&gui->dialog, 2 , 2,  LCD_WIDTH - 4, LCD_HEIGHT - 4 , NULL , reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
@@ -180,6 +171,5 @@ void PAGE_ShowModuleDialog(const char **missing)
            }
         }
     } 
-    current_selected_obj = 0;
     PAGE_ShowWarning(NULL, tempstring);
 }
