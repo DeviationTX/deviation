@@ -2,7 +2,7 @@
 : is %d%%, safe value = %d%%\n
  = %d%%, безопасное значение = %d%%\n
 : is %d%%,\nsafe value = %d%%
- = %d%%,\nбезопасное значение = %d%%
+ = %d%%,\nбезопасное = %d%%
 :# Channels
 Каналы
 |devo8:# Channels

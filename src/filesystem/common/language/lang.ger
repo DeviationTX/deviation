@@ -2,7 +2,7 @@
 : is %d%%, safe value = %d%%\n
  ist %d%%, Sicherer Wert = %d%%\n
 : is %d%%,\nsafe value = %d%%
-=%d%%, SOLL=%d%%\n
+ ist %d%%,\nSicherer Wert=%d%%
 :# Channels
 Kanäle
 :%d bytes left

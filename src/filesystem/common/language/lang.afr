@@ -2,7 +2,7 @@
 : is %d%%, safe value = %d%%\n
  %d%%, veilige waarde = %d%%\n
 : is %d%%,\nsafe value = %d%%
- %d%%,\nveilige waarde = %d%%
+ %d%%,\nveilig waarde=%d%%
 :# Channels
 Aantal Kanale
 :%d bytes left

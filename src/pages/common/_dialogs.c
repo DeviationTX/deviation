@@ -15,33 +15,76 @@
 
 
 static guiObject_t *dialog = NULL;
-static u64 safety_enabled = ~0LL;
-static guiObject_t *current_selected_obj = NULL; // used for devo10 only
 
 /******************/
 /*  Safety Dialog */
 /******************/
+static u64 safety_enabled = ~0LL;
+static u32 dialogcrc;
+
+static u64 safety_check()
+{
+    return PROTOCOL_CheckSafe() & safety_enabled;
+}
+
+static void safety_confirmed()
+{
+    PROTOCOL_Init(1);
+    safety_enabled = ~0LL;
+}
+
 static void safety_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
-    int count = 0;
-    u64 unsafe = PROTOCOL_CheckSafe() & safety_enabled;
-    for(int i = 0; i < NUM_SOURCES + 1; i++) {
+    dialog = NULL;
+    // Disable safety for all currently displayed unsafe's
+    u64 unsafe = safety_check();
+    for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
         if (! (unsafe & (1LL << i)))
             continue;
-        safety_enabled ^= 1LL << i;
-        if (++count >= MAX_CONCURRENT_MSGS)
+        safety_enabled &= ~(1LL << i);
+        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
             break;
     }
-    dialog = NULL;
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
-    if (!(unsafe & safety_enabled)) {
-        safety_enabled = ~0LL;
-        PROTOCOL_Init(1);
-    }
+    if (unsafe & safety_enabled)
+        return;
+    safety_confirmed();
 }
+
+static const char *safety_string_cb(guiObject_t *obj, void *data)
+{
+    (void)data;
+    u32 crc = Crc(tempstring, strlen(tempstring));
+    if (obj && crc == dialogcrc)
+        return tempstring;
+    u64 unsafe = safety_check();
+    const s8 safeval[4] = {0, -100, 0, 100};
+    volatile s16 *raw = MIXER_GetInputs();
+    tempstring[0] = 0;
+    for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
+        if (! (unsafe & (1LL << i)))
+            continue;
+        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
+      
+        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+                      ? raw[ch+1]
+                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
+        INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
+        int len = strlen(tempstring);
+        snprintf(tempstring + len, sizeof(tempstring) - len, 
+#if MAX_CONCURRENT_SAFETY_MSGS > 1
+                _tr(" is %d%%, safe value = %d%%\n"),
+#else
+                _tr(" is %d%%,\nsafe value = %d%%"),
+#endif
+                val, safeval[Model.safety[i]]);
+        if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
+            break;
+    }
+    return tempstring;
+}
+
 
 /**********************/
 /* Low battery Dialog */
@@ -50,22 +93,13 @@ static void lowbatt_ok_cb(u8 state, void * data)
 {
     (void)state;
     (void)data;
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
 }
 
 
-void PAGE_DisableSafetyDialog(u8 disable)
-{
-    safety_enabled = disable ? 0LL : ~0LL;
-}
-
 static void invalid_stdmixer_cb(u8 state, void *guiObj)
 {
     static const char * const STANDARD_TEMPLATE = "heli_std.ini";
-    if (current_selected_obj != NULL)
-        GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1) {
         PAGE_RemoveHeader();
@@ -81,12 +115,10 @@ static void invalid_stdmixer_cb(u8 state, void *guiObj)
 static void reset_permtimer_cb(u8 state, void *data)
 {
     u8 idx = (long)data;
-    if (current_selected_obj != NULL)
-	GUI_SetSelected(current_selected_obj);
     dialog = NULL;
     if (state == 1) {
-	Model.timer[idx].val = 0;
-	TIMER_Init();
+        Model.timer[idx].val = 0;
+        TIMER_Init();
     }
 }
 
