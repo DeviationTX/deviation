@@ -71,9 +71,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-static void _show_bar_page(u8 top_row)
+static void _show_bar_page(int row)
 {
-    cur_row = top_row;
+    cur_row = row;
     cp->num_bars = num_disp_bars();
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     int view_height = (cp->type == MONITOR_RAWINPUT)

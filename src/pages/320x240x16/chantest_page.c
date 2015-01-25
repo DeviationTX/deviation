@@ -22,19 +22,18 @@
 
 static void show_button_page();
 
-static int num_rows;
-
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
     (void)pos;
     (void)parent;
     (void)data;
     
-    s8 newpos = cur_row + (direction > 0 ? 1 : -1);
+    int newpos = cur_row + (direction > 0 ? 1 : -1);
+    int endpos = gui->scrollbar.num_items - 1;
     if (newpos < 0)
         newpos = 0;
-    else if (newpos > num_rows-2)
-        newpos = num_rows-2;
+    else if (newpos > endpos)
+        newpos = endpos;
     if (newpos != cur_row) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
         _show_bar_page(newpos);
@@ -42,15 +41,15 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     return cur_row;
 }
 
-static void _show_bar_page(u8 top_row)
+static void _show_bar_page(int row)
 {
-    long i;
-    u8 num_bars = num_disp_bars();
+    cur_row = row;
+    int i;
     u8 height;
     u8 count;
+    int num_bars = num_disp_bars();
+    int num_rows = 1;
     int row_len;
-    cur_row = top_row;
-    num_rows = 1;
 
     if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
         num_rows = num_bars / NUM_BARS_PER_ROW + 1;
@@ -78,9 +77,9 @@ static void _show_bar_page(u8 top_row)
                                       SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)i);
+                                    showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 53 + height,
-                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)(long)i);
     }
     offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_rows > 2 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
@@ -88,9 +87,9 @@ static void _show_bar_page(u8 top_row)
                                       SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
         GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)i);
+                                    showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
-                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)(long)i);
     }
     if(num_rows > 2) {
         GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_rows-1, NULL, scroll_cb, NULL);
@@ -202,8 +201,8 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    long disp = (long)data;
-    long ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + disp);
+    int disp = (int)data;
+    int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + disp);
     if (cp->type) {
         char *p = tempstring;
         if (disp & 0x01) {
@@ -219,13 +218,13 @@ static const char *channum_cb(guiObject_t *obj, const void *data)
     } else {
         ch -= NUM_INPUTS;
         if (ch < NUM_OUT_CHANNELS) {
-            sprintf(tempstring, "\n%d", (int)ch+1);
+            sprintf(tempstring, "\n%d", ch+1);
         } else {
             ch -= NUM_OUT_CHANNELS;
             if (Model.virtname[ch][0]) {
                 tempstring_cpy(Model.virtname[ch]) ;
             } else {
-                sprintf(tempstring, "%s%d", _tr("Virt"), ch + 1);
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch+1);
             }
         }
     }
