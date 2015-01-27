@@ -239,6 +239,12 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
         }
         return 0;
     }
+    if(CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
+        if (groups[cur_page].id == PAGEID_TELEMMON) {
+            TELEMETRY_MuteAlarm(1);
+            return 1;
+        }
+    }
     if(PAGE_QuickPage(buttons, flags, data))
         return 1;
     if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {

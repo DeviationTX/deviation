@@ -116,6 +116,11 @@ static void show_page()
     //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }
 
+void PAGE_ShowTelemetryAlarm()
+{
+    PAGE_ChangeByID(PAGEID_TELEMMON);
+}
+
 void PAGE_TelemtestInit(int page)
 {
     (void)page;
@@ -151,7 +156,11 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (cur_val != last_val) {
+        if (TELEMETRY_HasAlarm(ptr->source)) {
+            if ((CLOCK_getms() >> 7)%4==0)
+                font = &TELEM_ERR_FONT;
+            GUI_Redraw(&gui->value[i]);
+        } else if (cur_val != last_val) {
             GUI_Redraw(&gui->value[i]);
         } else if(! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;

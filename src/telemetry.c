@@ -31,6 +31,7 @@ static void _get_temp_str(char *str, int value);
 
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
+static u8 alarm_sound_count[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 telem_idx = 0;
 static u8 alarm = 0;
 static u32 alarm_time = 0;
@@ -282,6 +283,7 @@ void TELEMETRY_Alarm()
     s32 value = TELEMETRY_GetValue(idx);
     if (value == 0) {
         alarm &= ~(1 << telem_idx); // clear this set
+        alarm_sound_count[telem_idx] = 0;
         return;
     }
 
@@ -342,11 +344,33 @@ void TELEMETRY_Alarm()
     if ((alarm & (1 << telem_idx))) {
         if (current_time >= alarm_time + MUSIC_INTERVAL) {
             alarm_time = current_time;
+            if (alarm_sound_count[telem_idx] != 0xff) {
+                if (alarm_sound_count[telem_idx]++ == 0) {
+                    PAGE_ShowTelemetryAlarm();
+                }
 #ifdef DEBUG_TELEMALARM
-            printf("beep: %d\n\n", telem_idx);
+                printf("beep: %d\n\n", telem_idx);
 #endif
-            MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
+                MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
+            }
         }
+    }
+}
+
+void TELEMETRY_MuteAlarm(int mute)
+{
+    u8 val = (mute) ? 0xff : 0;
+start:
+    for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
+        if (alarm_sound_count[i] != 0 && alarm_sound_count[i] != val) {
+            alarm_sound_count[i] = val;
+            if (val)
+                return;
+        }
+    }
+    if (val != 0) {
+        val = 0;   // Clear all mutes
+        goto start;
     }
 }
 

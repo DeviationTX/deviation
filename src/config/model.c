@@ -863,7 +863,8 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         idx--;
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
-            unsigned last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : TELEM_DSM_LAST;
+            unsigned last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : 
+                            TELEMETRY_Type() == TELEM_DSM ? TELEM_DSM_LAST : TELEM_FRSKY_LAST;
             for(i = 1; i <= last; i++) {
                 if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
                     m->telem_alarm[idx] = i;
