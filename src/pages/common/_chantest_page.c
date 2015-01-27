@@ -14,7 +14,7 @@
  */
 static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
-static s16 showchan_cb(void *data);
+static s32 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
@@ -71,7 +71,7 @@ void PAGE_ChantestEvent()
         _handle_button_test();
         return;
     }
-    volatile s16 *raw = MIXER_GetInputs();
+    volatile s32 *raw = MIXER_GetInputs();
     for(i = 0; i < cp->num_bars; i++) {
         int j = _get_input_idx(i);
         int v = RANGE_TO_PCT(cp->type ? raw[j+1] : Channels[j]);
@@ -90,7 +90,7 @@ void PAGE_ChantestExit()
 {
     BUTTON_UnregisterCallback(&cp->action);
 }
-static s16 showchan_cb(void *data)
+static s32 showchan_cb(void *data)
 {
     long ch = (long)data;
     return cp->pctvalue[ch];

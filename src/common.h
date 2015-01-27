@@ -34,7 +34,7 @@ struct FAT {
 };
 
 
-extern volatile s16 Channels[NUM_OUT_CHANNELS];
+extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
 
 /* Temproary definition until we have real translation */

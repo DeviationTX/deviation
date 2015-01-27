@@ -18,7 +18,7 @@ typedef enum {
 const char *STDMIX_channelname_cb(guiObject_t *obj, const void *data);
 int STDMIX_GetMixers(struct Mixer **mixers, u8 dest_channel, int count);
 const char *STDMIX_ModeName(PitThroMode pit_mode);
-s16 STDMIX_EvalMixerCb(s16 xval, struct Mixer *mix, s16 max_value, s16 min_value);
+s32 STDMIX_EvalMixerCb(s32 xval, struct Mixer *mix, s32 max_value, s32 min_value);
 const char *STDMIX_TitleString(guiObject_t *obj, const void *data);
 #define SET_TITLE_DATA(x, y) (void *)((unsigned long)(x) | ((unsigned long)(y) << 16))
 #endif

@@ -18,8 +18,8 @@ static struct mainpage_obj * const gui = &gui_objs.u.mainpage;
 static struct PageCfg2     * const pc  = &Model.pagecfg2;
 const char *show_box_cb(guiObject_t *obj, const void *data);
 const char *voltage_cb(guiObject_t *obj, const void *data);
-static s16 trim_cb(void * data);
-static s16 bar_cb(void * data);
+static s32 trim_cb(void * data);
+static s32 bar_cb(void * data);
 void press_icon2_cb(guiObject_t *obj, const void *data);
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s32 get_boxval(u8 idx);
@@ -120,14 +120,14 @@ static const char *time_cb(guiObject_t *obj, const void *data) {
 }
 #endif
 
-s16 trim_cb(void * data)
+s32 trim_cb(void * data)
 {
     long i = (long)data;
     int value = *MIXER_GetTrim(i);
     return PCT_TO_RANGE(value);
 }
 
-s16 bar_cb(void * data)
+s32 bar_cb(void * data)
 {
     u8 idx = (long)data;
     return MIXER_GetChannel(idx-1, APPLY_SAFETY);
@@ -144,7 +144,7 @@ void PAGE_MainEvent()
 #endif
         return;
     }
-    volatile s16 *raw = MIXER_GetInputs();
+    volatile s32 *raw = MIXER_GetInputs();
     for(i = 0; i < NUM_ELEMS; i++) {
         if (! ELEM_USED(pc->elem[i]))
             break;
@@ -204,7 +204,7 @@ void PAGE_MainEvent()
             }
             case ELEM_BAR:
             {
-                s16 chan = MIXER_GetChannel(src-1, APPLY_SAFETY);
+                s32 chan = MIXER_GetChannel(src-1, APPLY_SAFETY);
                 if (mp->elem[i] != chan) {
                     mp->elem[i] = chan;
                     GUI_Redraw(&gui->elem[i].bar);

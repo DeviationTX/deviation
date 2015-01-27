@@ -23,7 +23,7 @@
 #define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
     switch(channel) {

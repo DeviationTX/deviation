@@ -37,7 +37,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
         return tempstring;
     int count = 0;
     const s8 safeval[4] = {0, -100, 0, 100};
-    volatile s16 *raw = MIXER_GetInputs();
+    volatile s32 *raw = MIXER_GetInputs();
     u64 unsafe = PROTOCOL_CheckSafe();
     tempstring[0] = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
@@ -45,7 +45,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
             continue;
         int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
       
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+        s32 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
         INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
