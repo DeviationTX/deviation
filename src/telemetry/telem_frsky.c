@@ -38,7 +38,7 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_FRSKY_VOLT3: _get_volt_str(str, value); break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2: _get_temp_str(str, value); break;
-        case TELEM_FRSKY_RPM:   sprintf(str, "%d", (int)value);
+        case TELEM_FRSKY_RPM:   _get_value_str(str, telem, value);
             break;
     }
     return str;

@@ -376,31 +376,29 @@ static void calc_dsmx_channel()
 
 static int bcd_to_u8(u8 data)
 {
-     return (data >> 4) * 10 + (data & 0x0f);
-}
-static int pkt16_to_u8(u8 *ptr)
-{
-    u32 value = ((u32)ptr[0] <<8) | ptr[1];
-    return value > 255 ? 255 : value;
-}
-static u32 pkt16_to_volt(u8 *ptr)
-{
-    return ((((u32)ptr[0] << 8) | ptr[1]) + 5) / 10;  //In 1/10 of Volts
-}
-static int pkt16_to_flog(u8 *ptr)
-{
-    u32 value = ((u32)ptr[0] <<8) | ptr[1];
-    return value > 9999 ? 9999 : value;
+    return (data >> 4) * 10 + (data & 0x0f);
 }
 
+static int pkt16_to_value(u8 *ptr)
+{
+    return (ptr[0] <<8) | ptr[1];
+}
+
+static u32 pkt16_to_volt(u8 *ptr)
+{
+    u32 value = pkt16_to_value(ptr);  //In 1/10 of Volts
+    if (value >= 0xfffe)
+        value = 0;
+    return value;
+}
 
 static u32 pkt16_to_rpm(u8 *ptr)
 {
-    u32 value = ((u32)ptr[0] << 8) | ptr[1];
+    u32 value = pkt16_to_value(ptr);
     //In RPM (2 = number of poles)
     //RPM = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
     //by default number_of_poles = 2, gear_ratio = 1.00
-    if (value == 0xffff || value < 200)
+    if (value >= 0xfffe || value < 200)
         value = 0;
     else
         value = 120000000 / 2 / value;
@@ -409,9 +407,11 @@ static u32 pkt16_to_rpm(u8 *ptr)
 
 static s32 pkt16_to_temp(u8 *ptr)
 {
-    s32 value = ((s32)((s16)(ptr[0] << 8) | ptr[1]) - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
-    if (value > 500 || value < -100)
+    s32 value = (s32)pkt16_to_value(ptr);
+    if (value > 1000 || value < -150)
         value = 0;
+    if (value)
+        value = (value - 32) * 5 / 9; //In degrees-C (16Bit signed integer)
     return value;
 }
 
@@ -443,12 +443,15 @@ static void parse_telemetry_packet()
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
             update = update7f;
-            Telemetry.p.dsm.flog.fades[0] = pkt16_to_flog(packet+2); //FadesA 0xFFFF = (not connected)
-            Telemetry.p.dsm.flog.fades[1] = pkt16_to_flog(packet+4); //FadesB 0xFFFF = (not connected)
-            Telemetry.p.dsm.flog.fades[2] = pkt16_to_flog(packet+6); //FadesL 0xFFFF = (not connected)
-            Telemetry.p.dsm.flog.fades[3] = pkt16_to_flog(packet+8); //FadesR 0xFFFF = (not connected)
-            Telemetry.p.dsm.flog.frameloss = pkt16_to_flog(packet+10);
-            Telemetry.p.dsm.flog.holds = pkt16_to_flog(packet+12);
+            //Telemetry.p.dsm.flog.fades[0] = pkt16_to_value(packet+2); //FadesA 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[1] = pkt16_to_value(packet+4); //FadesB 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[2] = pkt16_to_value(packet+6); //FadesL 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.fades[3] = pkt16_to_value(packet+8); //FadesR 0xFFFF = (not connected)
+            //Telemetry.p.dsm.flog.frameloss = pkt16_to_value(packet+10);
+            //Telemetry.p.dsm.flog.holds = pkt16_to_value(packet+12);
+            for(int i = 1; i < 7; i++) {
+                *((u16*)&Telemetry.p.dsm.flog+i-1) = pkt16_to_value(packet+i*2);
+            }
             Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
         case 0x7e: //TM1000
@@ -493,7 +496,7 @@ static void parse_telemetry_packet()
                 //0x00:OFF
                 //0x01:WAIT FOR RPM
                 //0x02:IGNITE
-                //0x03;ACCELERATE
+                //0x03:ACCELERATE
                 //0x04:STABILIZE
                 //0x05:LEARN HIGH
                 //0x06:LEARN LOW

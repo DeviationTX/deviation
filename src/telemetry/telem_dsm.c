@@ -40,7 +40,7 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
     case TELEM_DSM_FLOG_FADESR:
     case TELEM_DSM_FLOG_FRAMELOSS:
     case TELEM_DSM_FLOG_HOLDS:
-    case TELEM_DSM_FLOG_RPM1:      sprintf(str, "%d", (int)value); break;
+    case TELEM_DSM_FLOG_RPM1:      _get_value_str(str, telem, value); break;
     case TELEM_DSM_FLOG_VOLT1:
     case TELEM_DSM_FLOG_VOLT2:     _get_volt_str(str, value); break;
     case TELEM_DSM_FLOG_TEMP1:     _get_temp_str(str, value); break;
@@ -91,11 +91,12 @@ static const char * _dsm_short_name(char *str, u8 telem)
 s32 _dsm_get_max_value(u8 telem)
 {           
     switch(telem) {
+        case TELEM_DSM_FLOG_FRAMELOSS:
+            return 59999;
         case TELEM_DSM_FLOG_FADESA:
         case TELEM_DSM_FLOG_FADESB:
         case TELEM_DSM_FLOG_FADESL:
         case TELEM_DSM_FLOG_FADESR:
-        case TELEM_DSM_FLOG_FRAMELOSS:
         case TELEM_DSM_FLOG_HOLDS:
         case TELEM_DSM_FLOG_TEMP1:
             return 9999;

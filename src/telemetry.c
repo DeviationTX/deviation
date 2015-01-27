@@ -18,6 +18,7 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
+static void _get_value_str(char *str, u8 telem, s32 value);
 static void _get_volt_str(char *str, u32 value);
 static void _get_temp_str(char *str, int value);
 #include "telemetry/telem_devo.c"
@@ -38,21 +39,26 @@ static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
+void _get_value_str(char *str, u8 telem, s32 value)
+{
+    s32 max_value = TELEMETRY_GetMaxValue(telem);
+    if (value > max_value)
+        sprintf(str, "%d", max_value);
+    else
+        sprintf(str, "%d", value);
+}
+
 void _get_volt_str(char *str, u32 value)
 {
-    sprintf(str, "%d.%dV", (int)value /10, (int)value % 10);
+    sprintf(str, "%d.%dV", value / 10, value % 10);
 }
 
 void _get_temp_str(char *str, int value)
 {
-    if (value == 0) {
-        strcpy(str, "----");
+    if (Transmitter.telem & TELEMUNIT_FAREN) {
+        sprintf(str, "%dF", value ? (value * 9 + 160)/ 5 : 0);
     } else {
-        if (Transmitter.telem & TELEMUNIT_FAREN) {
-            sprintf(str, "%dF", ((int)value * 9 + 160)/ 5);
-        } else {
-            sprintf(str, "%dC", (int)value);
-        }
+        sprintf(str, "%dC", value);
     }
 }
 u32 TELEMETRY_IsUpdated(int val)

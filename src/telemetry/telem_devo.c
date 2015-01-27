@@ -44,7 +44,7 @@ const char * _devo_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DEVO_TEMP3:
         case TELEM_DEVO_TEMP4: _get_temp_str(str, value); break;
         case TELEM_DEVO_RPM1:
-        case TELEM_DEVO_RPM2:  sprintf(str, "%d", (int)value);
+        case TELEM_DEVO_RPM2:  _get_value_str(str, telem, value);
             break;
     }
     return str;
