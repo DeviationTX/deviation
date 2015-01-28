@@ -517,10 +517,6 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
 #else
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power);
-
         default: break;
     }
     return 0;
