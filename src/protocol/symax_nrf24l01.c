@@ -13,6 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+   Main protocol compatible with Syma X5C-1, X11, X11C, X12.
+   SymaX5C protocol option compatible with Syma X5C (original) and X2.
+*/
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
@@ -231,7 +235,6 @@ static void build_packet(u8 bind) {
         packet[6] = 0xaa;
         packet[7] = 0xaa;
         packet[8] = 0x00;
-        packet[9] = 0xda;
     } else {
         read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
 
@@ -239,13 +242,14 @@ static void build_packet(u8 bind) {
         packet[1] = elevator;
         packet[2] = rudder;
         packet[3] = aileron;
-        packet[4] = 0x00;
+        packet[4] = (flags & FLAG_VIDEO   ? 0x80 : 0x00) 
+                  | (flags & FLAG_PICTURE ? 0x40 : 0x00);
         packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;  // use trims to extend controls
-        packet[6] = (rudder >> 2) | (flags & FLAG_FLIP ? 0x40 : 0x00);
+        packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP ? 0x40 : 0x00);
         packet[7] = aileron >> 2;
         packet[8] = 0x00;
-        packet[9] = checksum(packet);
     }
+    packet[9] = checksum(packet);
 }
 
 
