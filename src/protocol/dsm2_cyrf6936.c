@@ -187,15 +187,10 @@ static void build_bind_packet()
     packet[9] = sum & 0xff;
     packet[10] = 0x01; //???
     packet[11] = num_channels;
-    if(Model.protocol == PROTOCOL_DSMX) {
-#ifdef MODULAR
-        packet[12] = 0xb2;
-#else
+    if(Model.protocol == PROTOCOL_DSMX)
         packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? 0xa2 : 0xb2;
-#endif
-    } else {
+    else 
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
-    }
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)
         sum += packet[i];
@@ -384,14 +379,6 @@ static int pkt16_to_value(u8 *ptr)
     return (ptr[0] <<8) | ptr[1];
 }
 
-static u32 pkt16_to_volt(u8 *ptr)
-{
-    u32 value = pkt16_to_value(ptr);  //In 1/10 of Volts
-    if (value >= 0xfffe)
-        value = 0;
-    return value;
-}
-
 static u32 pkt16_to_rpm(u8 *ptr)
 {
     u32 value = pkt16_to_value(ptr);
@@ -417,13 +404,10 @@ static s32 pkt16_to_temp(u8 *ptr)
 
 static u32 pkt32_to_coord(u8 *ptr)
 {
-    u8 tmp[4];
-    for(int i = 0; i < 4; i++)
-        tmp[i] = bcd_to_u8(ptr[i]);
-    return tmp[3] * 3600000
-         + tmp[2] * 60000
-         + tmp[1] * 600
-         + tmp[0] * 6; // (decimal, format DD MM.SSSS)
+    return bcd_to_u8(ptr[3]) * 3600000
+         + bcd_to_u8(ptr[2]) * 60000
+         + bcd_to_u8(ptr[1]) * 600
+         + bcd_to_u8(ptr[0]) * 6; // (decimal, format DD MM.SSSS)
 }
 
 static void parse_telemetry_packet()
@@ -449,16 +433,15 @@ static void parse_telemetry_packet()
             //Telemetry.p.dsm.flog.fades[3] = pkt16_to_value(packet+8); //FadesR 0xFFFF = (not connected)
             //Telemetry.p.dsm.flog.frameloss = pkt16_to_value(packet+10);
             //Telemetry.p.dsm.flog.holds = pkt16_to_value(packet+12);
-            for(int i = 1; i < 7; i++) {
+            for(int i = 1; i < 8; i++) {
                 *((u16*)&Telemetry.p.dsm.flog+i-1) = pkt16_to_value(packet+i*2);
             }
-            Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
             update = update7e;
             Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
-            Telemetry.p.dsm.flog.volt[0] = pkt16_to_volt(packet+4);  //In 1/10 of Volts
+            Telemetry.p.dsm.flog.volt[0] = pkt16_to_value(packet+4);  //In 1/10 of Volts
             Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
             break;
 #if HAS_DSM_EXTENDED_TELEMETRY
@@ -652,7 +635,6 @@ static u16 dsm2_cb()
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
         }
-#ifndef MODULAR
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF) {
             set_sop_data_crc();
             if (state == DSM2_CH2_CHECK_A) {
@@ -665,9 +647,7 @@ static u16 dsm2_cb()
                 state = DSM2_CH1_WRITE_A;
             }
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY;
-        } else
-#endif
-        {
+        } else {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
             CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
@@ -703,12 +683,12 @@ static void initialize(u8 bind)
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
-   if (Model.fixed_id) {
-       cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
-       cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
-       cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
-       cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
-   }
+    if (Model.fixed_id) {
+        cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+        cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+        cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
+    }
 #endif
     cyrf_config();
 
@@ -783,15 +763,10 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-#ifdef MODULAR
-        case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(PROTO_TELEM_ON);
-#else
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
-#endif
         default: break;
     }
     return NULL;

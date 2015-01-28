@@ -51,6 +51,8 @@ void _get_value_str(char *str, u8 telem, s32 value)
 
 void _get_volt_str(char *str, u32 value)
 {
+    if (value >= 0xfffe)
+        value = 0;
     sprintf(str, "%d.%dV", value / 10, value % 10);
 }
 
