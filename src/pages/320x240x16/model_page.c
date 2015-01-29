@@ -24,6 +24,7 @@
 // string too long for devo10, so define it separately for devo8 and devo10
 static const char * const HELI_LABEL = _tr_noop("Helicopter");
 static const char * const PLANE_LABEL = _tr_noop("Airplane");
+static const char * const MULTI_LABEL = _tr_noop("Multirotor");
 
 #include "../common/_model_page.c"
 
