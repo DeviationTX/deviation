@@ -42,9 +42,9 @@ static void draw_chan(int disp, int row, int y)
     GUI_CreateLabelBox(&gui->chan[idx], x, y,
         0, height, &labelDesc, channum_cb, NULL, (void *)(long)get_channel_idx(disp));
     GUI_CreateLabelBox(&gui->value[idx], x+59, y,
-        21, height, &labelValue, value_cb, NULL, (void *)disp);
+        21, height, &labelValue, value_cb, NULL, (void *)(long)disp);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
-        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)disp);
+        59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)(long)disp);
 
     // Bug fix: the labelDesc is shared in many pages, must reset it to DEFAULT_FONT after the page is drawn
     // Otherwise, page in other language will not display as only the DEFAULT_FONT supports multi-lang
