@@ -201,7 +201,7 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 static const char *channum_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    int disp = (int)data;
+    int disp = (int)(long)data;
     int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + disp);
     if (cp->type) {
         char *p = tempstring;
