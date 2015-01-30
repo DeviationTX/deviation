@@ -134,7 +134,7 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed = 0;
-    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, &changed);
+    Model.type = GUI_TextSelectHelper(Model.type, 0, MODELTYPE_LAST-1, dir, 1, 1, &changed);
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, Model.type == 0);
     if (changed && Model.type != 0) {
         //Standard GUI is not supported
@@ -147,8 +147,10 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     }
 
     switch (Model.type) {
-        case 0: return _tr(HELI_LABEL);
-        default: return _tr(PLANE_LABEL);
+        case MODELTYPE_HELI: return _tr(HELI_LABEL);
+        case MODELTYPE_PLANE: return _tr(PLANE_LABEL);
+        case MODELTYPE_MULTI: return _tr(MULTI_LABEL);
+        default: return 0; // supress warning.
     }
 }
 void type_press_cb(guiObject_t *obj, void *data)

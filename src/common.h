@@ -125,8 +125,9 @@ extern const char * const ProtocolNames[PROTOCOL_COUNT];
 enum ModelType {
     MODELTYPE_HELI,
     MODELTYPE_PLANE,
-    MODELTYPE_LAST,
+    MODELTYPE_MULTI,
 };
+#define MODELTYPE_LAST (MODELTYPE_MULTI + 1)
 
 enum TxPower {
     TXPOWER_100uW,
