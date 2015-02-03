@@ -13,7 +13,12 @@
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
-#define HAS_DSM_EXTENDED_TELEMETRY 0
+#ifdef MODULAR
+    #define HAS_DSM_EXTENDED_TELEMETRY 0
+#else
+    #define HAS_DSM_EXTENDED_TELEMETRY 0
+#endif
+
 enum {
     TELEM_DEVO,
     TELEM_DSM,
@@ -117,8 +122,8 @@ struct gps {
     s32 altitude;
     s32 velocity;
     u32 time;
-    u32 heading;
-    u32 satcount;
+    u16 heading;
+    u8 satcount;
 };
 
 struct telem_devo {
@@ -143,18 +148,18 @@ struct telem_dsm_pbox {
     u16 alarmc[2];
 };
 struct telem_dsm_sensors {
-    u16 amps;
+    s16 amps;
     u16 airspeed;
-    u16 altitude;
+    s16 altitude;
 };
 struct telem_dsm_gforce {
-    u16 x;
-    u16 y;
-    u16 z;
-    u16 xmax;
-    u16 ymax;
-    u16 zmax;
-    u16 zmin;
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 xmax;
+    s16 ymax;
+    s16 zmax;
+    s16 zmin;
 };
 
 struct telem_dsm_jetcat {
@@ -163,7 +168,7 @@ struct telem_dsm_jetcat {
     u16 throttle;
     u16 packvolt;
     u16 pumpvolt;
-    u16 rpm;
+    u32 rpm;
     u16 temp_egt;
 };
 
@@ -210,6 +215,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value);
 const char * TELEMETRY_Name(char *str, unsigned telem);
 const char * TELEMETRY_ShortName(char *str, unsigned telem);
 s32 TELEMETRY_GetMaxValue(unsigned telem);
+s32 TELEMETRY_GetMinValue(unsigned telem);
 void TELEMETRY_Alarm();
 void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);

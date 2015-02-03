@@ -208,10 +208,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
         return;
     len -= 2;
     //Get voltage A1 (52mv/count)
-    Telemetry.p.frsky.volt[0] = (u32)pkt[3] * 52 / 100; //In 1/10 of Volts
+    Telemetry.p.frsky.volt[0] = (u32)pkt[3] * 52 / 10; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
     //Get voltage A2 (~13.2mv/count) (Docs say 1/4 of A1)
-    Telemetry.p.frsky.volt[1] = (u32)pkt[4] * 132 / 1000; //In 1/10 of Volts
+    Telemetry.p.frsky.volt[1] = (u32)pkt[4] * 132 / 100; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
     //Telemetry.p.frsky.rssi = pkt[5];
     for(int i = 6; i < len - 4; i++) {

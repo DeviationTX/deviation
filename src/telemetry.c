@@ -18,9 +18,8 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
-static void _get_value_str(char *str, u8 telem, s32 value);
-static void _get_volt_str(char *str, u32 value);
-static void _get_temp_str(char *str, int value);
+static void _get_value_str(char *str, s32 value, u8 decimals, char units);
+static void _get_temp_str(char *str, s32 value, u8 decimals);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
 #include "telemetry/telem_frsky.c"
@@ -32,38 +31,39 @@ static void _get_temp_str(char *str, int value);
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 alarm_mute[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
-static u8 telem_idx = 0;
 static u8 alarm[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
+static u8 telem_idx = 0;
 static u32 alarm_time = 0;
 static u8 last_updated[TELEM_UPDATE_SIZE];
 static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
-void _get_value_str(char *str, u8 telem, s32 value)
+void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
-    s32 max_value = TELEMETRY_GetMaxValue(telem);
-    if (value > max_value)
-        sprintf(str, "%d", max_value);
-    else
-        sprintf(str, "%d", value);
-}
-
-void _get_volt_str(char *str, u32 value)
-{
-    if (value >= 0xfffe)
+    if (value == 0xffff)
         value = 0;
-    sprintf(str, "%d.%dV", value / 10, value % 10);
+    s32 div = 10 ^ decimals;
+    if (value == 0 || value >= div * div)
+        sprintf(str, "%d%c", value / div, units);
+    else if (value >= 10 * div || div == 10)
+        sprintf(str, "%d.%u%c", value / div, (value % div) * 10 / div, units);
+    else if (value >= 100 * div || div == 100)
+        sprintf(str, "%d.%02u%c", value / div, (value % div) * 100 / div, units);
+    else
+        sprintf(str, "%d.%03u%c", value / div, value % div, units);
 }
 
-void _get_temp_str(char *str, int value)
+void _get_temp_str(char *str, s32 value, u8 decimals)
 {
+    char units = 'C';
     if (Transmitter.telem & TELEMUNIT_FAREN) {
-        sprintf(str, "%dF", value ? (value * 9 + 160)/ 5 : 0);
-    } else {
-        sprintf(str, "%dC", value);
+        value = value ? (value * 9 + 160)/ 5 : 0;
+        units = 'F';
     }
+    _get_value_str(str, value, decimals, units);
 }
+
 u32 TELEMETRY_IsUpdated(int val)
 {
     if (val == 0xff) {
@@ -94,6 +94,10 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
         return t->gps.velocity;
     case TELEM_GPS_TIME:
         return t->gps.time;
+    case TELEM_GPS_HEADING:
+        return t->gps.heading;
+    case TELEM_GPS_SATCOUNT:
+        return t->gps.satcount;
     }
     if (TELEMETRY_Type() == TELEM_DEVO)
         return _devo_value(t, idx);
@@ -214,6 +218,14 @@ s32 TELEMETRY_GetMaxValue(unsigned telem)
         return _dsm_get_max_value(telem);
     return _frsky_get_max_value(telem);
 }
+s32 TELEMETRY_GetMinValue(unsigned telem)
+{
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        return _devo_get_min_value(telem);
+    if (TELEMETRY_Type() == TELEM_DSM)
+        return _dsm_get_min_value(telem);
+    return _frsky_get_min_value(telem);
+}
 
 void TELEMETRY_SetUpdated(int telem)
 {
@@ -278,6 +290,8 @@ void TELEMETRY_Alarm()
     // instead, check 1 of them at a time
     telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
     s32 value = TELEMETRY_GetValue( Model.telem_alarm[telem_idx] );
+    if (value == 0xffff)
+        return;
     if (value == 0 || ! Model.telem_alarm[telem_idx] || ! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
         alarm[telem_idx] = 0; // clear this set

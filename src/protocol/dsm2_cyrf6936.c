@@ -374,6 +374,11 @@ static int bcd_to_u8(u8 data)
     return (data >> 4) * 10 + (data & 0x0f);
 }
 
+static int bcd_to_u16(u8 *ptr)
+{
+    return bcd_to_u8(ptr[1]) * 100 + bcd_to_u8(ptr[0]);
+}
+
 static int pkt16_to_value(u8 *ptr)
 {
     return (ptr[0] <<8) | ptr[1];
@@ -385,7 +390,7 @@ static u32 pkt16_to_rpm(u8 *ptr)
     //In RPM (2 = number of poles)
     //RPM = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
     //by default number_of_poles = 2, gear_ratio = 1.00
-    if (value >= 0xfffe || value < 200)
+    if (value == 0xffff || value < 200)
         value = 0;
     else
         value = 120000000 / 2 / value;
@@ -402,7 +407,7 @@ static s32 pkt16_to_temp(u8 *ptr)
     return value;
 }
 
-static u32 pkt32_to_coord(u8 *ptr)
+static int pkt32_to_coord(u8 *ptr)
 {
     return bcd_to_u8(ptr[3]) * 3600000
          + bcd_to_u8(ptr[2]) * 60000
@@ -433,7 +438,8 @@ static void parse_telemetry_packet()
             //Telemetry.p.dsm.flog.fades[3] = pkt16_to_value(packet+8); //FadesR 0xFFFF = (not connected)
             //Telemetry.p.dsm.flog.frameloss = pkt16_to_value(packet+10);
             //Telemetry.p.dsm.flog.holds = pkt16_to_value(packet+12);
-            for(int i = 1; i < 8; i++) {
+            //Telemetry.p.dsm.flog.volt[1] = pkt16_to_value(packet+14);
+            for(int i = 1; i <= 7; i++) {
                 *((u16*)&Telemetry.p.dsm.flog+i-1) = pkt16_to_value(packet+i*2);
             }
             break;
@@ -441,123 +447,66 @@ static void parse_telemetry_packet()
         case 0xfe: //TM1100
             update = update7e;
             Telemetry.p.dsm.flog.rpm = pkt16_to_rpm(packet+2);
-            Telemetry.p.dsm.flog.volt[0] = pkt16_to_value(packet+4);  //In 1/10 of Volts
-            Telemetry.p.dsm.flog.temp = pkt16_to_temp(packet+6);
+            Telemetry.p.dsm.flog.volt[0] = pkt16_to_value(packet+4); //In 1/100 of Volts
+            Telemetry.p.dsm.flog.temp = (s16)pkt16_to_temp(packet+6);
             break;
 #if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
-            //Telemetry.current = (s32)((s16)(packet[2] << 8) | packet[3]) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
+            Telemetry.p.dsm.sensors.amps = (s32)((s16)pkt16_to_value(packet+2)) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
             break;
         case 0x0a: //Powerbox sensor
-            //Telemetry.pwb.volt1 = (((s32)packet[2] << 8) | packet[3] + 5) /10; //In 1/10 of Volts
-            //Telemetry.pwb.volt1 = (((s32)packet[4] << 8) | packet[5] + 5) /10; //In 1/10 of Volts
-            //Telemetry.pwb.capacity1 = ((s32)packet[6] << 8) | packet[7]; //In mAh
-            //Telemetry.pwb.capacity2 = ((s32)packet[8] << 8) | packet[9]; //In mAh
-            //Telemetry.pwb.alarm_v1 = packet[15] & 0x01; //0 = disable, 1 = enable
-            //Telemetry.pwb.alarm_v2 = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
-            //Telemetry.pwb.alarm_c1 = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
-            //Telemetry.pwb.alarm_c2 = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
+            Telemetry.p.dsm.pbox.volt[0] = pkt16_to_value(packet+2); //In 1/100 of Volts
+            Telemetry.p.dsm.pbox.volt[1] = pkt16_to_value(packet+4); //In 1/100 of Volts
+            Telemetry.p.dsm.pbox.capacity[0] = pkt16_to_value(packet+6); //In mAh
+            Telemetry.p.dsm.pbox.capacity[1] = pkt16_to_value(packet+8); //In mAh
+            Telemetry.p.dsm.pbox.alarmv[0] = packet[15] & 0x01; //0 = disable, 1 = enable
+            Telemetry.p.dsm.pbox.alarmv[1] = (packet[15] >> 1) & 0x01; //0 = disable, 1 = enable
+            Telemetry.p.dsm.pbox.alarmc[0] = (packet[15] >> 2) & 0x01; //0 = disable, 1 = enable
+            Telemetry.p.dsm.pbox.alarmc[1] = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
             break;
         case 0x11: //AirSpeed sensor
-            //Telemetry.airspeed = ((s32)packet[2] << 8) | packet[3]; //In km/h (16Bit value, 1 unit is 1 km/h)
+            Telemetry.p.dsm.sensors.airspeed = pkt16_to_value(packet+2); //In km/h (16Bit integer, 1 unit is 1 km/h)
             break;
         case 0x12: //Altimeter sensor
-            //Telemetry.altitude = (s16)(packet[2] << 8) | packet[3]; //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
+            Telemetry.p.dsm.sensors.altitude = (s16)pkt16_to_value(packet+2); //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
             break;
         case 0x14: //G-Force sensor
-            //Telemetry.gforce.x = (s16)(packet[2] << 8) | packet[3]; //In 0.01g (16Bit signed integers, unit is 0.01g)
-            //Telemetry.gforce.y = (s16)(packet[4] << 8) | packet[5];
-            //Telemetry.gforce.z = (s16)(packet[6] << 8) | packet[7];
-            //Telemetry.gforce.xmax = (s16)(packet[8] << 8) | packet[9];
-            //Telemetry.gforce.ymax = (s16)(packet[10] << 8) | packet[11];
-            //Telemetry.gforce.zmax = (s16)(packet[12] << 8) | packet[13];
-            //Telemetry.gforce.zmin = (s16)(packet[14] << 8) | packet[15];
+            //Telemetry.p.dsm.gforce.x = (s16)pkt16_to_value(packet+2); //In 0.01g (16Bit signed integers, unit is 0.01g)
+            //Telemetry.p.dsm.gforce.y = (s16)pkt16_to_value(packet+4);
+            //Telemetry.p.dsm.gforce.z = (s16)pkt16_to_value(packet+6);
+            //Telemetry.p.dsm.gforce.xmax = (s16)pkt16_to_value(packet+8);
+            //Telemetry.p.dsm.gforce.ymax = (s16)pkt16_to_value(packet+10);
+            //Telemetry.p.dsm.gforce.zmax = (s16)pkt16_to_value(packet+12);
+            //Telemetry.p.dsm.gforce.zmin = (s16)pkt16_to_value(packet+14);
+            for(int i = 1; i <= 7; i++) {
+                *((s16*)&Telemetry.p.dsm.gforce+i-1) = (s16)pkt16_to_value(packet+i*2);
+            }
             break;
         case 0x15: //JetCat sensor
-            //Telemetry.jc.status = packet[2];
-                //Possible messages for status:
-                //0x00:OFF
-                //0x01:WAIT FOR RPM
-                //0x02:IGNITE
-                //0x03:ACCELERATE
-                //0x04:STABILIZE
-                //0x05:LEARN HIGH
-                //0x06:LEARN LOW
-                //0x07:undef
-                //0x08:SLOW DOWN
-                //0x09:MANUAL
-                //0x0a,0x10:AUTO OFF
-                //0x0b,0x11:RUN
-                //0x0c,0x12:ACCELERATION DELAY
-                //0x0d,0x13:SPEED REG
-                //0x0e,0x14:TWO SHAFT REGULATE
-                //0x0f,0x15:PRE HEAT
-                //0x16:PRE HEAT 2
-                //0x17:MAIN F START
-                //0x18:not used
-                //0x19:KERO FULL ON
-                //0x1a:MAX STATE
-            //Telemetry.jc.throttle = (packet[3] >> 4) * 10 + (packet[3] & 0x0f); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
-            //Telemetry.jc.pack_volt = (((packet[5] >> 4) * 10 + (packet[5] & 0x0f)) * 100 
-            //                         + (packet[4] >> 4) * 10 + (packet[4] & 0x0f) + 5) / 10; //In 1/10 of Volts
-            //Telemetry.jc.pump_volt = (((packet[7] >> 6) * 10 + (packet[7] & 0x0f)) * 100 
-            //                         + (packet[6] >> 4) * 10 + (packet[6] & 0x0f) + 5) / 10; //In 1/10 of Volts (low voltage)
-            //Telemetry.jc.rpm = ((packet[10] >> 4) * 10 + (packet[10] & 0x0f)) * 10000 
-            //                 + ((packet[9] >> 4) * 10 + (packet[9] & 0x0f)) * 100 
-            //                 + ((packet[8] >> 4) * 10 + (packet[8] & 0x0f)); //RPM up to 999999
-            //Telemetry.jc.tempEGT = (packet[13] & 0x0f) * 100 + (packet[12] >> 4) * 10 + (packet[12] & 0x0f); //EGT temp up to 999°C
-            //Telemetry.jc.off_condition = packet[14];
-                //Messages for Off_Condition:
-                //0x00:NA
-                //0x01:OFF BY RC
-                //0x02:OVER TEMPERATURE
-                //0x03:IGNITION TIMEOUT
-                //0x04:ACCELERATION TIMEOUT
-                //0x05:ACCELERATION TOO SLOW
-                //0x06:OVER RPM
-                //0x07:LOW RPM OFF
-                //0x08:LOW BATTERY
-                //0x09:AUTO OFF
-                //0x0a,0x10:LOW TEMP OFF
-                //0x0b,0x11:HIGH TEMP OFF
-                //0x0c,0x12:GLOW PLUG DEFECTIVE
-                //0x0d,0x13:WATCH DOG TIMER
-                //0x0e,0x14:FAIL SAFE OFF
-                //0x0f,0x15:MANUAL OFF
-                //0x16:POWER BATT FAIL
-                //0x17:TEMP SENSOR FAIL
-                //0x18:FUEL FAIL
-                //0x19:PROP FAIL
-                //0x1a:2nd ENGINE FAIL
-                //0x1b:2nd ENGINE DIFFERENTIAL TOO HIGH
-                //0x1c:2nd ENGINE NO COMMUNICATION
-                //0x1d:MAX OFF CONDITION
+            Telemetry.p.dsm.jetcat.status = packet[2];
+            Telemetry.p.dsm.jetcat.throttle = bcd_to_u8(packet[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
+            Telemetry.p.dsm.jetcat.packvolt = bcd_to_u16(packet+4); //In 1/100 of Volts
+            Telemetry.p.dsm.jetcat.pumpvolt = bcd_to_u16(packet+6); //In 1/100 of Volts (low voltage)
+            Telemetry.p.dsm.jetcat.rpm = bcd_to_u8(packet[10]) * 10000 + bcd_to_u16(packet+8); //RPM up to 999999
+            Telemetry.p.dsm.jetcat.temp_egt = bcd_to_u16(packet+12); //EGT temp up to 999°C
+            Telemetry.p.dsm.jetcat.offcond = packet[14];
             break;
 #endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
-            altitude += (bcd_to_u8(packet[3]) * 100 
-                       + bcd_to_u8(packet[2])) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.altitude = altitude;
-            Telemetry.gps.latitude = pkt32_to_coord(&packet[4]);
-            if ((packet[15] & 0x01)  == 0)
-                Telemetry.gps.latitude *= -1; //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = pkt32_to_coord(&packet[8]);
-            if ((packet[15] & 0x04) == 4)
-                Telemetry.gps.longitude += 360000000; //1=+100 degrees
-            if ((packet[15] & 0x02) == 0)
-                Telemetry.gps.longitude *= -1; //1=E(+), 0=W(-)
-            //Telemetry.gps.heading = ((packet[13] >> 4) * 10 + (packet[13] & 0x0f)) * 10 
-            //                      + ((packet[12] >> 4) * 10 + (packet[12] & 0x0f)) / 10; //In degrees (16Bit decimal, 1 unit is 0.1 degree)
+            Telemetry.gps.altitude = altitude + bcd_to_u16(packet+2) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
+            Telemetry.gps.latitude =   pkt32_to_coord(packet+4) * (packet[15] & 0x01) ? 1 : -1; //1=N(+), 0=S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(packet+8) + (packet[15] & 0x04) ? 360000000 : 0) //1=+100 degrees
+                                                                * (packet[15] & 0x02) ? 1 : -1; //1=E(+), 0=W(-)
+            Telemetry.gps.heading = bcd_to_u16(packet+12); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             update = update17;
-            Telemetry.gps.velocity = (bcd_to_u8(packet[3]) * 100 
-                                    + bcd_to_u8(packet[2])) * 5556 / 108; //In m/s * 1000
+            Telemetry.gps.velocity = bcd_to_u16(packet+2) * 5556 / 108; //In m/s * 1000
+            //u8 ssec  = bcd_to_u8(packet[4]);
             u8 sec   = bcd_to_u8(packet[5]);
             u8 min   = bcd_to_u8(packet[6]);
             u8 hour  = bcd_to_u8(packet[7]);
-            //u8 ssec   = (packet[4] >> 4) * 10 + (packet[4] & 0x0f);
             u8 day   = 0;
             u8 month = 0;
             u8 year  = 0; // + 2000
@@ -567,7 +516,7 @@ static void parse_telemetry_packet()
                                | ((hour & 0x1F) << 12)
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
-            //Telemetry.gps.sats = ((packet[8] >> 4) * 10 + (packet[8] & 0x0f));
+            Telemetry.gps.satcount = bcd_to_u8(packet[8]);
             altitude = bcd_to_u8(packet[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             break;
     }

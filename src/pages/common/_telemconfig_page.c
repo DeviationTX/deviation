@@ -54,7 +54,7 @@ static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
     int val = (long)data;
     u8 changed;
     u8 type = (Model.telem_flags & (1 << val)) ? 1 : 0;
-    type = GUI_TextSelectHelper(type, 0, 1, dir, 1, 1, &changed);
+    type = GUI_TextSelectHelper(type, 0, 1, -dir, 1, 1, &changed);
     if (changed) {
         if (type) {
             Model.telem_flags |= 1 << val;
@@ -68,22 +68,35 @@ static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
 static const char *limit_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    int val = (long)data;
-    if (Model.telem_alarm[val] == 0) {
+    int idx = (long)data;
+    if (Model.telem_alarm[idx] == 0) {
         return "----";
     }
-    s32 max = TELEMETRY_GetMaxValue(Model.telem_alarm[val]);
-    
-    u8 small_step = 1;
-    u8 big_step = 10;
-    if (max > 1000) {
+    s32 min = TELEMETRY_GetMinValue(Model.telem_alarm[idx]);
+    s32 max = TELEMETRY_GetMaxValue(Model.telem_alarm[idx]);
+    s32 value = Model.telem_alarm_val[idx];
+
+    u32 small_step = 1;
+    u32 big_step = 10;
+    if (value > 1000 || (value == 1000 && dir > 0)) {
+        small_step = 10;
+        big_step = 100;
+    }
+    if (min >= 50) {  //RPM
+        small_step = 50;
+        big_step = 500;
+    } else if (max > 9999) {
+        if (value > 10000 || (value == 10000 && dir > 0)) {
+            small_step = 100;
+            big_step = 1000;
+        }
+    } else if (max > 999) {
         small_step = 10;
         big_step = 100;
     }
 
-    Model.telem_alarm_val[val] = GUI_TextSelectHelper(Model.telem_alarm_val[val],
-        0, max, dir, small_step, big_step, NULL);
-    return TELEMETRY_GetValueStrByValue(tempstring, Model.telem_alarm[val], Model.telem_alarm_val[val]);
+    Model.telem_alarm_val[idx] = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
+    return TELEMETRY_GetValueStrByValue(tempstring, Model.telem_alarm[idx], Model.telem_alarm_val[idx]);
 }
 
 void PAGE_TelemconfigEvent() {
