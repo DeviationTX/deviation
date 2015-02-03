@@ -33,7 +33,7 @@ struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 alarm_mute[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 telem_idx = 0;
-static u8 alarm = 0;
+static u8 alarm[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u32 alarm_time = 0;
 static u8 last_updated[TELEM_UPDATE_SIZE];
 static u32 last_time;
@@ -277,86 +277,43 @@ void TELEMETRY_Alarm()
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
     telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
-    if(! Model.telem_alarm[telem_idx]) {
-        alarm &= ~(1 << telem_idx); // clear this set
-        alarm_mute[telem_idx] = 0;
-        return;
-    }
-    unsigned idx = Model.telem_alarm[telem_idx];
-    s32 value = TELEMETRY_GetValue(idx);
-    if (value == 0) {
-        alarm &= ~(1 << telem_idx); // clear this set
-        alarm_mute[telem_idx] = 0;
-        return;
-    }
-
-    if (! TELEMETRY_IsUpdated(0xff)) {
+    s32 value = TELEMETRY_GetValue( Model.telem_alarm[telem_idx] );
+    if (value == 0 || ! Model.telem_alarm[telem_idx] || ! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
-        alarm &= ~(1 << telem_idx); // clear this set
+        alarm[telem_idx] = 0; // clear this set
         alarm_mute[telem_idx] = 0;
         return;
     }
 
-    if (Model.telem_flags & (1 << telem_idx)) {
-        if (! (alarm & (1 << telem_idx)) && (value <= Model.telem_alarm_val[telem_idx])) {
-            if (alarm_duration[telem_idx] == 0) {
-                alarm_duration[telem_idx] = current_time;
-            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
-                alarm_duration[telem_idx] = 0;
-                alarm |= 1 << telem_idx;
+    if (alarm_duration[telem_idx] == 0) {
+        alarm_duration[telem_idx] = current_time;
+    } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
+        s32 alarm_val = Model.telem_alarm_val[telem_idx];
+        if (! alarm[telem_idx] && ((value < alarm_val) == (Model.telem_flags & (1 << telem_idx)))) {
+            alarm_duration[telem_idx] = current_time;
+            alarm[telem_idx] = 1;
 #ifdef DEBUG_TELEMALARM
-                printf("set: 0x%x\n\n", alarm);
+            printf("set: 0x%x\n\n", alarm);
 #endif
-            }
-        } else if ((alarm & (1 << telem_idx)) && (value > (s32)Model.telem_alarm_val[telem_idx])) {
-            if (alarm_duration[telem_idx] == 0) {
-                alarm_duration[telem_idx] = current_time;
-            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
-                alarm_duration[telem_idx] = 0;
-                alarm &= ~(1 << telem_idx);
-                alarm_mute[telem_idx] = 0;
+        } else if (alarm[telem_idx] && ! ((value < alarm_val) == (Model.telem_flags & (1 << telem_idx)))) {
+            alarm_duration[telem_idx] = current_time;
+            alarm[telem_idx] = 0;
+            alarm_mute[telem_idx] = 0;
 #ifdef DEBUG_TELEMALARM
-                printf("clear: 0x%x\n\n", alarm);
+            printf("clear: 0x%x\n\n", alarm);
 #endif
-            }
-        } else
-            alarm_duration[telem_idx] = 0;
-    } else {
-        if (! (alarm & (1 << telem_idx)) && (value >= Model.telem_alarm_val[telem_idx])) {
-            if (alarm_duration[telem_idx] == 0) {
-                alarm_duration[telem_idx] = current_time;
-            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
-                alarm_duration[telem_idx] = 0;
-                alarm |= 1 << telem_idx;
-#ifdef DEBUG_TELEMALARM
-                printf("set: 0x%x\n\n", alarm);
-#endif
-            }
-        } else if ((alarm & (1 << telem_idx)) && (value < (s32)Model.telem_alarm_val[telem_idx])) {
-            if (alarm_duration[telem_idx] == 0) {
-                alarm_duration[telem_idx] = current_time;
-            } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
-                alarm_duration[telem_idx] = 0;
-                alarm &= ~(1 << telem_idx);
-                alarm_mute[telem_idx] = 0;
-#ifdef DEBUG_TELEMALARM
-                printf("clear: 0x%x\n\n", alarm);
-#endif
-            }
         } else
             alarm_duration[telem_idx] = 0;
     }
 
-    if ((alarm & (1 << telem_idx))) {
-        if (current_time >= alarm_time + MUSIC_INTERVAL) {
-            alarm_time = current_time;
-            if (! alarm_mute[telem_idx]) {
-                PAGE_ShowTelemetryAlarm();
+    if (alarm[telem_idx] && current_time >= alarm_time + MUSIC_INTERVAL) {
+        alarm_time = current_time;
+        if (! alarm_mute[telem_idx]) {
+            PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
-                printf("beep: %d\n\n", telem_idx);
+            printf("beep: %d\n\n", telem_idx);
 #endif
-                MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
-            }
+            MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
         }
     }
 }
@@ -364,7 +321,7 @@ void TELEMETRY_Alarm()
 void TELEMETRY_MuteAlarm()
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
-        if (alarm & (1 << i))
+        if (alarm[i])
             alarm_mute[i] = 1;
     }
 }
@@ -372,7 +329,7 @@ void TELEMETRY_MuteAlarm()
 int TELEMETRY_HasAlarm(int src)
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++)
-        if(Model.telem_alarm[i] == src && (alarm & (1 << i)))
+        if(alarm[i] && Model.telem_alarm[i] == src)
             return 1;
     return 0;
 }
