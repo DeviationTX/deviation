@@ -282,7 +282,9 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
 
 void PAGE_ShowTelemetryAlarm()
 {
-    PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+    int cur_page = PAGE_GetID();
+    if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
+        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
 }
 
 void PAGE_TelemtestInit(int page)
@@ -363,6 +365,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            TELEMETRY_MuteAlarm();
         } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
@@ -370,7 +373,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
                 _navigate_pages(-1);
             } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-                TELEMETRY_MuteAlarm(1);
+                TELEMETRY_MuteAlarm();
             } else {
                 return 0;
             }

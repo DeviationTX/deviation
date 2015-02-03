@@ -211,7 +211,7 @@ const char * TELEMETRY_Name(char *str, unsigned telem);
 const char * TELEMETRY_ShortName(char *str, unsigned telem);
 s32 TELEMETRY_GetMaxValue(unsigned telem);
 void TELEMETRY_Alarm();
-void TELEMETRY_MuteAlarm(int mute);
+void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);
 u32 TELEMETRY_IsUpdated(int val);
 void TELEMETRY_SetUpdated(int telem);

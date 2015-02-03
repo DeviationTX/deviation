@@ -31,7 +31,7 @@ static void _get_temp_str(char *str, int value);
 
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
-static u8 alarm_sound_count[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
+static u8 alarm_mute[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
 static u8 telem_idx = 0;
 static u8 alarm = 0;
 static u32 alarm_time = 0;
@@ -279,19 +279,21 @@ void TELEMETRY_Alarm()
     telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
     if(! Model.telem_alarm[telem_idx]) {
         alarm &= ~(1 << telem_idx); // clear this set
+        alarm_mute[telem_idx] = 0;
         return;
     }
     unsigned idx = Model.telem_alarm[telem_idx];
     s32 value = TELEMETRY_GetValue(idx);
     if (value == 0) {
         alarm &= ~(1 << telem_idx); // clear this set
-        alarm_sound_count[telem_idx] = 0;
+        alarm_mute[telem_idx] = 0;
         return;
     }
 
     if (! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
         alarm &= ~(1 << telem_idx); // clear this set
+        alarm_mute[telem_idx] = 0;
         return;
     }
 
@@ -312,6 +314,7 @@ void TELEMETRY_Alarm()
             } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
                 alarm_duration[telem_idx] = 0;
                 alarm &= ~(1 << telem_idx);
+                alarm_mute[telem_idx] = 0;
 #ifdef DEBUG_TELEMALARM
                 printf("clear: 0x%x\n\n", alarm);
 #endif
@@ -335,6 +338,7 @@ void TELEMETRY_Alarm()
             } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
                 alarm_duration[telem_idx] = 0;
                 alarm &= ~(1 << telem_idx);
+                alarm_mute[telem_idx] = 0;
 #ifdef DEBUG_TELEMALARM
                 printf("clear: 0x%x\n\n", alarm);
 #endif
@@ -346,10 +350,8 @@ void TELEMETRY_Alarm()
     if ((alarm & (1 << telem_idx))) {
         if (current_time >= alarm_time + MUSIC_INTERVAL) {
             alarm_time = current_time;
-            if (alarm_sound_count[telem_idx] != 0xff) {
-                if (alarm_sound_count[telem_idx]++ == 0) {
-                    PAGE_ShowTelemetryAlarm();
-                }
+            if (! alarm_mute[telem_idx]) {
+                PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
                 printf("beep: %d\n\n", telem_idx);
 #endif
@@ -359,20 +361,11 @@ void TELEMETRY_Alarm()
     }
 }
 
-void TELEMETRY_MuteAlarm(int mute)
+void TELEMETRY_MuteAlarm()
 {
-    u8 val = (mute) ? 0xff : 0;
-start:
     for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
-        if (alarm_sound_count[i] != 0 && alarm_sound_count[i] != val) {
-            alarm_sound_count[i] = val;
-            if (val)
-                return;
-        }
-    }
-    if (val != 0) {
-        val = 0;   // Clear all mutes
-        goto start;
+        if (alarm & (1 << i))
+            alarm_mute[i] = 1;
     }
 }
 
