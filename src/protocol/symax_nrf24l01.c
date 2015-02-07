@@ -244,8 +244,9 @@ static void build_packet(u8 bind) {
         packet[3] = aileron;
         packet[4] = (flags & FLAG_VIDEO   ? 0x80 : 0x00) 
                   | (flags & FLAG_PICTURE ? 0x40 : 0x00);
-        packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;  // use trims to extend controls
-        packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP ? 0x40 : 0x00);
+        // use trims to extend controls
+        packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;
+        packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP  ? 0x40 : 0x00);
         packet[7] = aileron >> 2;
         packet[8] = 0x00;
     }
@@ -314,10 +315,10 @@ static void initialize_rx_tx_addr()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-u8 data_rx_tx_addr[] = {0x3b,0xb6,0x00,0x00,0xa2};
-    for (u8 i = 0; i < sizeof(rx_tx_addr); ++i) {
-//        rx_tx_addr[i] = lfsr & 0xff;
-        rx_tx_addr[i] = data_rx_tx_addr[i];
+    rx_tx_addr[4] = 0xa2;
+    rx_tx_addr[3] = 0x00;
+    for (u8 i = 0; i < sizeof(rx_tx_addr)-2; ++i) {
+        rx_tx_addr[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
 }
@@ -437,9 +438,48 @@ static void symax_init1()
     packet_counter = 0;
 }
 
+
+// channels determined by last byte of tx address
+static void set_channels(u8 address) {
+  static const u8 start_chans_1[] = {0x0a, 0x1a, 0x2a, 0x3a};
+  static const u8 start_chans_2[] = {0x2a, 0x0a, 0x42, 0x22};
+  static const u8 start_chans_3[] = {0x1a, 0x3a, 0x12, 0x32};
+
+  u8 laddress = address & 0x1f;
+  u8 i;
+  u32 *pchans;
+
+  num_rf_channels = 4;
+
+  if (laddress < 0x10) {
+    if (laddress == 6) laddress = 7;
+    for(i=0; i < sizeof(start_chans_1); i++) {
+      chans[i] = start_chans_1[i] + laddress;
+    }
+  } else if (laddress < 0x18) {
+    for(i=0; i < sizeof(start_chans_2); i++) {
+      chans[i] = start_chans_2[i] + (laddress & 0x07);
+    }
+    if (laddress == 0x16) {
+      chans[0] += 1;
+      chans[1] += 1;
+    }
+  } else if (laddress < 0x1e) {
+    for(i=0; i < sizeof(start_chans_3); i++) {
+      chans[i] = start_chans_3[i] + (laddress & 0x07);
+    }
+  } else if (laddress == 0x1e) {
+      pchans = (u32*) chans;
+      *pchans = 0x38184121;
+  } else {
+      pchans = (u32*) chans;
+      *pchans = 0x39194121;
+  }
+}
+
+
 static void symax_init2()
 {
-    u8 chans_data[] = {0x1d, 0x3d, 0x15, 0x35};
     u8 chans_data_x5c[] = {0x1d, 0x2f, 0x26, 0x3d, 0x15, 0x2b, 0x25, 0x24,
                            0x27, 0x2c, 0x1c, 0x3e, 0x39, 0x2d, 0x22};
 
@@ -447,9 +487,7 @@ static void symax_init2()
       num_rf_channels = sizeof(chans_data_x5c);
       memcpy(chans, chans_data_x5c, num_rf_channels);
     } else {
-      num_rf_channels = sizeof(chans_data);
-      memcpy(chans, chans_data, num_rf_channels);
-
+      set_channels(rx_tx_addr[0]);  // channels determined by tx address
       NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
     }
     current_chan = 0;
