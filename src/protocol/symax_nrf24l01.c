@@ -296,7 +296,6 @@ static void initialize_rx_tx_addr()
 {
     u32 lfsr = 0xb2c54a2ful;
 
-
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
@@ -316,8 +315,7 @@ static void initialize_rx_tx_addr()
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
     rx_tx_addr[4] = 0xa2;
-    rx_tx_addr[3] = 0x00;
-    for (u8 i = 0; i < sizeof(rx_tx_addr)-2; ++i) {
+    for (u8 i = 0; i < sizeof(rx_tx_addr)-1; ++i) {
         rx_tx_addr[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
