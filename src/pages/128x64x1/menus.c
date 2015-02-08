@@ -33,6 +33,7 @@ struct menu_pages menus[] = {
     //main menu
     {PAGEID_MENU, _tr_noop("Model menu"),       MENUTYPE_MAINMENU, 0, MIXER_ALL, (0 << 4) | MENUTYPE_SUBMENU},
     {PAGEID_MENU, _tr_noop("Transmitter menu"), MENUTYPE_MAINMENU, 1, MIXER_ALL, (1 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, MIXER_ALL,  0},
     {PAGEID_ABOUT,    NULL, MENUTYPE_MAINMENU, 1, MIXER_ALL, PREVIOUS_ITEM},
     // sub menu items 1
     {PAGEID_MODEL,    NULL, MENUTYPE_SUBMENU,  0, MIXER_ALL, PREVIOUS_ITEM},
