@@ -244,8 +244,9 @@ static void build_packet(u8 bind) {
         packet[3] = aileron;
         packet[4] = (flags & FLAG_VIDEO   ? 0x80 : 0x00) 
                   | (flags & FLAG_PICTURE ? 0x40 : 0x00);
-        packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;  // use trims to extend controls
-        packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP ? 0x40 : 0x00);
+        // use trims to extend controls
+        packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;
+        packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP  ? 0x40 : 0x00);
         packet[7] = aileron >> 2;
         packet[8] = 0x00;
     }
@@ -290,11 +291,40 @@ static void send_packet(u8 bind)
 }
 
 
+// Generate address to use from TX id and manufacturer id (STM32 unique id)
+static void initialize_rx_tx_addr()
+{
+    u32 lfsr = 0xb2c54a2ful;
+
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    dbgprintf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    rx_tx_addr[4] = 0xa2;
+    for (u8 i = 0; i < sizeof(rx_tx_addr)-1; ++i) {
+        rx_tx_addr[i] = lfsr & 0xff;
+        rand32_r(&lfsr, i);
+    }
+}
 
 static void symax_init()
 {
     const u8 bind_rx_tx_addr[] = {0xab,0xac,0xad,0xae,0xaf};
-    const u8 bind_rx_tx_addr_x5c[] = {0x6d,0x6a,0x73,0x73,0x73};
+    const u8 rx_tx_addr_x5c[] = {0x6d,0x6a,0x73,0x73,0x73};   // X5C uses same address for bind and data
 
     NRF24L01_Initialize();
 
@@ -333,7 +363,7 @@ static void symax_init()
     NRF24L01_WriteReg(NRF24L01_17_FIFO_STATUS, 0x00); // Just in case, no real bits to write here
 
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,
-                                Model.proto_opts[PROTOOPTS_X5C] ? bind_rx_tx_addr_x5c : bind_rx_tx_addr,
+                                Model.proto_opts[PROTOOPTS_X5C] ? rx_tx_addr_x5c : bind_rx_tx_addr,
                                 5);
 
     NRF24L01_ReadReg(NRF24L01_07_STATUS);
@@ -390,8 +420,6 @@ static void symax_init1()
     u8 chans_bind_x5c[] = {0x27, 0x1b, 0x39, 0x28, 0x24, 0x22, 0x2e, 0x36,
                            0x19, 0x21, 0x29, 0x14, 0x1e, 0x12, 0x2d, 0x18};
 
-    u8 data_rx_tx_addr[] = {0x3b,0xb6,0x00,0x00,0xa2};
-
     NRF24L01_FlushTx();
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x08);
     NRF24L01_WritePayload(first_packet, 15);
@@ -400,7 +428,7 @@ static void symax_init1()
       num_rf_channels = sizeof(chans_bind_x5c);
       memcpy(chans, chans_bind_x5c, num_rf_channels);
     } else {
-      memcpy(rx_tx_addr, data_rx_tx_addr, 5);   // make info available for bind packets
+      initialize_rx_tx_addr();   // make info available for bind packets
       num_rf_channels = sizeof(chans_bind);
       memcpy(chans, chans_bind, num_rf_channels);
     }
@@ -408,9 +436,46 @@ static void symax_init1()
     packet_counter = 0;
 }
 
+
+// channels determined by last byte of tx address
+static void set_channels(u8 address) {
+  static const u8 start_chans_1[] = {0x0a, 0x1a, 0x2a, 0x3a};
+  static const u8 start_chans_2[] = {0x2a, 0x0a, 0x42, 0x22};
+  static const u8 start_chans_3[] = {0x1a, 0x3a, 0x12, 0x32};
+
+  u8 laddress = address & 0x1f;
+  u8 i;
+  u32 *pchans = (u32 *)chans;   // avoid compiler warning
+
+  num_rf_channels = 4;
+
+  if (laddress < 0x10) {
+    if (laddress == 6) laddress = 7;
+    for(i=0; i < num_rf_channels; i++) {
+      chans[i] = start_chans_1[i] + laddress;
+    }
+  } else if (laddress < 0x18) {
+    for(i=0; i < num_rf_channels; i++) {
+      chans[i] = start_chans_2[i] + (laddress & 0x07);
+    }
+    if (laddress == 0x16) {
+      chans[0] += 1;
+      chans[1] += 1;
+    }
+  } else if (laddress < 0x1e) {
+    for(i=0; i < num_rf_channels; i++) {
+      chans[i] = start_chans_3[i] + (laddress & 0x07);
+    }
+  } else if (laddress == 0x1e) {
+      *pchans = 0x38184121;
+  } else {
+      *pchans = 0x39194121;
+  }
+}
+
+
 static void symax_init2()
 {
-    u8 chans_data[] = {0x1d, 0x3d, 0x15, 0x35};
     u8 chans_data_x5c[] = {0x1d, 0x2f, 0x26, 0x3d, 0x15, 0x2b, 0x25, 0x24,
                            0x27, 0x2c, 0x1c, 0x3e, 0x39, 0x2d, 0x22};
 
@@ -418,9 +483,7 @@ static void symax_init2()
       num_rf_channels = sizeof(chans_data_x5c);
       memcpy(chans, chans_data_x5c, num_rf_channels);
     } else {
-      num_rf_channels = sizeof(chans_data);
-      memcpy(chans, chans_data, num_rf_channels);
-
+      set_channels(rx_tx_addr[0]);
       NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
     }
     current_chan = 0;
@@ -468,7 +531,6 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
-//    initialize_rx_tx_addr();
     packet_counter = 0;
     flags = 0;
 
