@@ -445,17 +445,17 @@ static void set_channels(u8 address) {
 
   u8 laddress = address & 0x1f;
   u8 i;
-  u32 *pchans;
+  u32 *pchans = (u32 *)chans;   // avoid compiler warning
 
   num_rf_channels = 4;
 
   if (laddress < 0x10) {
     if (laddress == 6) laddress = 7;
-    for(i=0; i < sizeof(start_chans_1); i++) {
+    for(i=0; i < num_rf_channels; i++) {
       chans[i] = start_chans_1[i] + laddress;
     }
   } else if (laddress < 0x18) {
-    for(i=0; i < sizeof(start_chans_2); i++) {
+    for(i=0; i < num_rf_channels; i++) {
       chans[i] = start_chans_2[i] + (laddress & 0x07);
     }
     if (laddress == 0x16) {
@@ -463,14 +463,12 @@ static void set_channels(u8 address) {
       chans[1] += 1;
     }
   } else if (laddress < 0x1e) {
-    for(i=0; i < sizeof(start_chans_3); i++) {
+    for(i=0; i < num_rf_channels; i++) {
       chans[i] = start_chans_3[i] + (laddress & 0x07);
     }
   } else if (laddress == 0x1e) {
-      pchans = (u32*) chans;
       *pchans = 0x38184121;
   } else {
-      pchans = (u32*) chans;
       *pchans = 0x39194121;
   }
 }
@@ -485,7 +483,7 @@ static void symax_init2()
       num_rf_channels = sizeof(chans_data_x5c);
       memcpy(chans, chans_data_x5c, num_rf_channels);
     } else {
-      set_channels(rx_tx_addr[0]);  // channels determined by tx address
+      set_channels(rx_tx_addr[0]);
       NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, 5);
     }
     current_chan = 0;
