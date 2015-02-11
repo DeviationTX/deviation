@@ -13,7 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if 0
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -53,5 +52,3 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 void PAGE_USBEvent()
 {
 }
-
-#endif
