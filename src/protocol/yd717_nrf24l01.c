@@ -14,7 +14,7 @@
  */
 
 /* Uncomment define below to enable packet loss telemetry. Also add
-   YD717 and SymaX protocols to TELEMETRY_SetTypeByProtocol to
+   YD717 protocol to TELEMETRY_SetTypeByProtocol to
    set type to DSM.
    */
 //#define YD717_TELEMETRY
@@ -106,7 +106,7 @@ enum {
 };
 
 static const char * const yd717_opts[] = {
-  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), _tr_noop("XinXun"), NULL,
+  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), _tr_noop("XinXun"), _tr_noop("Ni Hui"), _tr_noop("SymaX4"), NULL,
 #ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif
@@ -124,6 +124,8 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 #define FORMAT_YD717   0
 #define FORMAT_SKYWLKR 1
 #define FORMAT_XINXUN  2
+#define FORMAT_NI_HUI  3
+#define FORMAT_SYMAX2  4
 
 #ifdef YD717_TELEMETRY
 #define TELEM_OFF 0
@@ -183,7 +185,7 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     *throttle = convert_channel(CHANNEL3);
 
     // Channel 4
-    if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XINXUN) {
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XINXUN) {
       *rudder = convert_channel(CHANNEL4);
       *rudder_trim = (0xff - *rudder) >> 1;
     } else {
@@ -227,7 +229,7 @@ static void send_packet(u8 bind)
         packet[3]= rx_tx_addr[3];
         packet[4] = 0x56;
         packet[5] = 0xAA;
-        packet[6] = 0x32;
+        packet[6] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NI_HUI ? 0x00 : 0x32;
         packet[7] = 0x00;
     } else {
         read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &rudder_trim, &elevator_trim, &aileron_trim);
@@ -235,7 +237,7 @@ static void send_packet(u8 bind)
         packet[1] = rudder;
         packet[3] = elevator;
         packet[4] = aileron;
-        if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
             packet[2] = elevator_trim;
             packet[5] = aileron_trim;
             packet[6] = rudder_trim;
@@ -252,7 +254,7 @@ static void send_packet(u8 bind)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
     NRF24L01_FlushTx();
 
-    if(Model.protocol == PROTOCOL_YD717 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_YD717) {
         NRF24L01_WritePayload(packet, 8);
     } else {
         packet[8] = packet[0];  // checksum
@@ -287,6 +289,7 @@ static void yd717_init()
     NRF24L01_Initialize();
 
     // CRC, radio on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_PWR_UP)); 
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x3F);      // Auto Acknoledgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x3F);  // Enable all data pipes
@@ -358,8 +361,10 @@ static void YD717_init1()
 {
     // for bind packets set address to prearranged value known to receiver
     u8 bind_rx_tx_addr[] = {0x65, 0x65, 0x65, 0x65, 0x65};
-    if(Model.protocol == PROTOCOL_SymaX)
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_SYMAX2)
         for(u8 i=0; i < 5; i++) bind_rx_tx_addr[i]  = 0x60;
+    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NI_HUI)
+        for(u8 i=0; i < 5; i++) bind_rx_tx_addr[i]  = 0x64;
 
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, bind_rx_tx_addr, 5);
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, bind_rx_tx_addr, 5);
@@ -435,6 +440,11 @@ static u16 yd717_callback()
 #endif
         if (packet_ack() == PKT_PENDING)
             return PACKET_CHKTIME;                 // packet send not yet complete
+#if 0  // unimplemented channel hopping for Ni Hui quad
+        else if (packet_ack() == PKT_TIMEOUT && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NI_HUI) {
+            // Sequence (after default channel 0x3C) is channels 0x02, 0x21 (at least for TX Addr is 87 04 14 00)
+        }
+#endif
         send_packet(0);
         break;
     }
@@ -510,7 +520,7 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable light
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return Model.protocol == PROTOCOL_YD717 ? yd717_opts : 0;
+        case PROTOCMD_GETOPTIONS: return yd717_opts;
 #ifdef YD717_TELEMETRY
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);

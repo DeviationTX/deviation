@@ -203,6 +203,7 @@ static void esky_init2()
     end_bytes[5] = channel2*2;
 
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     u8 config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, config);
     // Implicit delay in callback
