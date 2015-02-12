@@ -33,7 +33,7 @@
 #define MIXER_CYC3 (NUM_TX_INPUTS + 3)
 
 extern volatile u8 ppmSync;
-extern volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
+extern volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];
 extern volatile u8 ppmin_num_channels;
 
 // Channels should be volatile:
@@ -48,16 +48,16 @@ extern volatile u8 ppmin_num_channels;
 // the main loop to the interrupt routine (since the optimizer
 // has no clue about interrupts)
 
-volatile s16 Channels[NUM_OUT_CHANNELS];
+volatile s32 Channels[NUM_OUT_CHANNELS];
 
 struct Transmitter Transmitter;
 
-static volatile s16 raw[NUM_SOURCES + 1];
+static volatile s32 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
-static unsigned switch_is_on(unsigned sw, volatile s16 *raw);
+static unsigned switch_is_on(unsigned sw, volatile s32 *raw);
 static s32 get_trim(unsigned src);
 
-static s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum);
+static s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -69,10 +69,10 @@ struct Trim *MIXER_GetAllTrims()
     return Model.trims;
 }
 
-void MIXER_EvalMixers(volatile s16 *raw)
+void MIXER_EvalMixers(volatile s32 *raw)
 {
     int i;
-    s16 orig_value[NUM_CHANNELS];
+    s32 orig_value[NUM_CHANNELS];
     //3rd step: apply mixers
     for (i = 0; i < NUM_CHANNELS; i++) {
         orig_value[i] = raw[i + NUM_INPUTS + 1];
@@ -84,7 +84,7 @@ void MIXER_EvalMixers(volatile s16 *raw)
             // Mixer is not defined so we are done
             break;
         }
-        //apply_mixer updates mixed[mirer->dest]
+        //apply_mixer updates mixed[mixer->dest]
         MIXER_ApplyMixer(mixer, raw, &orig_value[mixer->dest]);
     }
 
@@ -155,7 +155,7 @@ static void MIXER_UpdateRawInputs()
     }
 }
 
-int MIXER_GetCachedInputs(s16 *cache, unsigned threshold)
+int MIXER_GetCachedInputs(s32 *cache, unsigned threshold)
 {
     int changed = 0;
     int i;
@@ -203,27 +203,27 @@ void MIXER_CalcChannels()
     }
 }
 
-volatile s16 *MIXER_GetInputs()
+volatile s32 *MIXER_GetInputs()
 {
     return raw;
 }
 
-s16 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
+s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
 {
     return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, Channels, flags);
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
+s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
 {
-    s16 cyc[3];
+    s32 cyc[3];
     if (! Model.swash_type) {
         return raw[NUM_INPUTS + NUM_OUT_CHANNELS + cycnum];
     }
-    s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
-    s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
-    s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
+    s32 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
+    s32 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
+    s32 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
     const int normalize = 100;
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
@@ -274,7 +274,7 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
     return cyc[cycnum-1];
 }
 
-void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 {
     s32 value;
     if (! MIXER_SRC(mixer->src))
@@ -300,7 +300,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
     case MUX_REPLACE:
         break;
     case MUX_MULTIPLY:
-        value = raw[mixer->dest + NUM_INPUTS + 1] * (s32)value / CHAN_MAX_VALUE;
+        value = raw[mixer->dest + NUM_INPUTS + 1] * value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
         value = raw[mixer->dest + NUM_INPUTS + 1] + value;
@@ -349,8 +349,8 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
-s16 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s16 *_raw,
-                      volatile s16 *_Channels, enum LimitMask flags)
+s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
+                      volatile s32 *_Channels, enum LimitMask flags)
 {
     int applied_safety = 0;
     s32 value = _raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
@@ -430,7 +430,7 @@ s32 get_trim(unsigned src)
     return 0;
 }
 
-unsigned switch_is_on(unsigned sw, volatile s16 *raw)
+unsigned switch_is_on(unsigned sw, volatile s32 *raw)
 {
     unsigned is_neg = MIXER_SRC_IS_INV(sw);
     sw = MIXER_SRC(sw);
@@ -438,7 +438,7 @@ unsigned switch_is_on(unsigned sw, volatile s16 *raw)
         // No switch selected is the same as an on switch
         return 1;
     }
-    s16 value = raw[sw];
+    s32 value = raw[sw];
     if (is_neg)
         value = - value;
     return (value > 0);

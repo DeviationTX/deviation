@@ -21,7 +21,7 @@
 guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *graph, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
-                      s16 (*Callback)(s16 xval, void *data),
+                      s32 (*Callback)(s32 xval, void *data),
                       u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data),
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data)
