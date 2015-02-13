@@ -548,9 +548,6 @@ const void *SYMAX_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return symax_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power);
 
         default: break;
     }
