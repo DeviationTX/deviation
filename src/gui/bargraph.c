@@ -23,7 +23,7 @@
 
 guiObject_t *GUI_CreateBarGraph(guiBarGraph_t *graph, u16 x, u16 y, u16 width, u16 height,
                       s16 min, s16 max, u8 direction,
-                      s16 (*Callback)(void *data), void *cb_data)
+                      s32 (*Callback)(void *data), void *cb_data)
 {
     struct guiHeader   *obj = (guiObject_t *)graph;
     struct guiBox      *box;

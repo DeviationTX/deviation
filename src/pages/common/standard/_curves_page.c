@@ -174,12 +174,12 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     return 1;
 }
 
-static s16 show_curve_cb(s16 xval, void *data)
+static s32 show_curve_cb(s32 xval, void *data)
 {
     (void)data;
     if (! mp->cur_mixer)
         return 0;
-    s16 yval = CURVE_Evaluate(xval, &(mp->cur_mixer->curve));
+    s32 yval = CURVE_Evaluate(xval, &(mp->cur_mixer->curve));
     return yval;
 }
 

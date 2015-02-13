@@ -65,11 +65,11 @@ const char *STDMIX_ModeName(PitThroMode pit_mode)
     }
 }
 
-s16 STDMIX_EvalMixerCb(s16 xval, struct Mixer *mix, s16 max_value, s16 min_value)
+s32 STDMIX_EvalMixerCb(s32 xval, struct Mixer *mix, s32 max_value, s32 min_value)
 {
     if (MIXER_SRC_IS_INV(mix->src))
         xval = -xval;
-    s16 yval = CURVE_Evaluate(xval, &mix->curve);
+    s32 yval = CURVE_Evaluate(xval, &mix->curve);
     yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
 
     if (yval > max_value)

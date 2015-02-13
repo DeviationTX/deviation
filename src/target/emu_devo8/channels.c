@@ -16,7 +16,7 @@
 #include "../common/emu/fltk.h"
 #include "mixer.h"
 
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
     switch(channel) {
