@@ -29,7 +29,6 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
-#include "stdlib.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -61,9 +60,8 @@
 #define INITIAL_WAIT          500
 
 #define FLAG_FLIP      0x01
-#define FLAG_RATES     0x02
-#define FLAG_VIDEO     0x04
-#define FLAG_PICTURE   0x08
+#define FLAG_VIDEO     0x02
+#define FLAG_PICTURE   0x04
 
 // For code readability
 enum {
@@ -166,18 +164,12 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u
 
     // Channel 6
     if (Channels[CHANNEL6] <= 0)
-        *flags &= ~FLAG_RATES;
-    else
-        *flags |= FLAG_RATES;
-
-    // Channel 7
-    if (Channels[CHANNEL7] <= 0)
         *flags &= ~FLAG_PICTURE;
     else
         *flags |= FLAG_PICTURE;
 
-    // Channel 8
-    if (Channels[CHANNEL8] <= 0)
+    // Channel 7
+    if (Channels[CHANNEL7] <= 0)
         *flags &= ~FLAG_VIDEO;
     else
         *flags |= FLAG_VIDEO;
@@ -218,7 +210,7 @@ static void build_packet_x5c(u8 bind)
         packet[14] = (flags & FLAG_VIDEO   ? 0x10 : 0x00) 
                    | (flags & FLAG_PICTURE ? 0x08 : 0x00)
                    | (flags & FLAG_FLIP    ? 0x01 : 0x00)
-                   | (flags & FLAG_RATES   ? 0x04 : 0x00);
+                   | 0x04;  // always high rates (bit 3 is rate control)
         packet[15] = checksum(packet);
     }
 }
@@ -245,7 +237,7 @@ static void build_packet(u8 bind) {
         packet[4] = (flags & FLAG_VIDEO   ? 0x80 : 0x00) 
                   | (flags & FLAG_PICTURE ? 0x40 : 0x00);
         // use trims to extend controls
-        packet[5] = (elevator >> 2) | (flags & FLAG_RATES ? 0x80 : 0x00) | 0x40;
+        packet[5] = (elevator >> 2) | 0xc0;  // always high rates (bit 7 is rate control)
         packet[6] = (rudder >> 2)   | (flags & FLAG_FLIP  ? 0x40 : 0x00);
         packet[7] = aileron >> 2;
         packet[8] = 0x00;
@@ -552,7 +544,7 @@ const void *SYMAX_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, special controls
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return symax_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
