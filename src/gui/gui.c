@@ -111,7 +111,6 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Scrollable:
         GUI_RemoveScrollableObjs(obj);
-        GUI_RemoveObj((guiObject_t *)&((guiScrollable_t *)obj)->scrollbar);
         break;
     case Keyboard:
         BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
@@ -414,8 +413,9 @@ struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
         //The current selected object is scrollable
         guiScrollable_t *scroll = GUI_FindScrollableParent(obj);
         obj = GUI_ScrollableGetNextSelectable(scroll, obj);
-        if (obj->Type != Scrollable)
+        if (obj)
             return obj;
+        obj = (guiObject_t *)scroll; 
     }
     obj = obj ? obj->next : modalObj ? modalObj : objHEAD;
     while(obj) {
@@ -444,8 +444,9 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
         //The current selected object is scrollable
         guiScrollable_t *scroll = GUI_FindScrollableParent(origObj);
         origObj = GUI_ScrollableGetPrevSelectable(scroll, origObj);
-        if (origObj->Type != Scrollable)
+        if (origObj)
             return origObj;
+        origObj = (guiObject_t *)scroll; 
     }
     modalObj = GUI_IsModal();
     obj = modalObj ? modalObj : objHEAD;
@@ -468,12 +469,9 @@ struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj)
             obj = obj->next;
         }
     }
-    if (! objLast) {
-        if (origObj && origObj->Type == Scrollable)
-            return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)origObj, NULL);
-        return origObj;
-    }
-    if (objLast->Type == Scrollable)
+    if (! objLast)
+        objLast = origObj;
+    if (objLast && objLast->Type == Scrollable)
         return GUI_ScrollableGetPrevSelectable((guiScrollable_t *)objLast, NULL);
     return objLast;
 }
