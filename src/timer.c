@@ -149,7 +149,8 @@ void TIMER_Update()
                 volatile s32 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].src)];
             } else {
-                val = MIXER_GetChannel(Model.timer[i].src - NUM_INPUTS - 1, APPLY_SAFETY);
+                val = MIXER_GetChannel(MIXER_SRC(Model.timer[i].src)
+                                       - NUM_INPUTS - 1, APPLY_SAFETY);
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].src))
                 val = -val;
@@ -207,7 +208,7 @@ void TIMER_Update()
                 timer_val[i] -= delta;
             }
             last_time[i] = t;
-        } 
+        }
         if (Model.timer[i].resetsrc) {
             s32 val;
             if (MIXER_SRC(Model.timer[i].resetsrc) <= NUM_INPUTS) {
