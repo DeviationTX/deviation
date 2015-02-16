@@ -215,7 +215,7 @@ void TIMER_Update()
                 volatile s32 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].resetsrc)];
             } else {
-                val = MIXER_GetChannel(Model.timer[i].resetsrc - NUM_INPUTS - 1, APPLY_SAFETY);
+                val = MIXER_GetChannel(MIXER_SRC(Model.timer[i].resetsrc) - NUM_INPUTS - 1, APPLY_SAFETY);
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].resetsrc))
                 val = -val;
