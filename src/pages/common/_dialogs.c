@@ -19,7 +19,7 @@ static guiObject_t *dialog = NULL;
 /******************/
 /*  Safety Dialog */
 /******************/
-static u64 safety_enabled = ~0LL;
+static u64 safety_enabled = ~0ULL;
 static u32 dialogcrc;
 
 static u64 safety_check()
@@ -30,7 +30,7 @@ static u64 safety_check()
 static void safety_confirmed()
 {
     PROTOCOL_Init(1);
-    safety_enabled = ~0LL;
+    safety_enabled = ~0ULL;
 }
 
 static void safety_ok_cb(u8 state, void * data)
@@ -41,9 +41,9 @@ static void safety_ok_cb(u8 state, void * data)
     // Disable safety for all currently displayed unsafe's
     u64 unsafe = safety_check();
     for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
-        if (! (unsafe & (1LL << i)))
+        if (! (unsafe & (1ULL << i)))
             continue;
-        safety_enabled &= ~(1LL << i);
+        safety_enabled &= ~(1ULL << i);
         if (++count >= MAX_CONCURRENT_SAFETY_MSGS)
             break;
     }
@@ -63,7 +63,7 @@ static const char *safety_string_cb(guiObject_t *obj, void *data)
     volatile s32 *raw = MIXER_GetInputs();
     tempstring[0] = 0;
     for(int i = 0, count = 0; i <= NUM_SOURCES; i++) {
-        if (! (unsafe & (1LL << i)))
+        if (! (unsafe & (1ULL << i)))
             continue;
         int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
       

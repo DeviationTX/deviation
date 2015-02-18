@@ -1068,7 +1068,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
     u8 idx;
-    u8 i;
     struct Model *m = &Model;
 
 
@@ -1210,7 +1209,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #endif //HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
+    for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
             fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceNameReal(file, i), SAFETY_VAL[m->safety[i]]);
         }
