@@ -1,3 +1,5 @@
+You an find information about nightly builds and team deviationTx development on the team devaitionTx wik: https://bitbucket.org/deviationtx/deviation/wiki/Home
+
 There are multiple targets available for building the Deviation firmware:
 
 devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
@@ -96,4 +98,3 @@ Building the Windows binary on Windows
     * cd ~/src
     * cp -pf <path to deviation src code> deviation
     * cd deviation/src
-
