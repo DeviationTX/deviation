@@ -139,7 +139,7 @@ static void show_iconsel_page(int SelectedIcon)
     int count = get_toggle_icon_count();
     int rows = (count + NUM_COLS - 1) / NUM_COLS;
     int visible_toggle_rows = (LCD_HEIGHT - HEADER_HEIGHT - 2) / (TOGGLEICON_HEIGHT + 1);
-    GUI_CreateScrollable(&gui->scrollable, 22, HEADER_HEIGHT + 1, LCD_WIDTH - 22, visible_toggle_rows * (TOGGLEICON_HEIGHT + 1),
+    GUI_CreateScrollable(&gui->scrollable, 22, HEADER_HEIGHT + 2, LCD_WIDTH - 22, visible_toggle_rows * (TOGGLEICON_HEIGHT + 1),
                      TOGGLEICON_HEIGHT + 1, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
     //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Model.pagecfg.tglico[tp->tglidx][SelectedIcon]));
 }

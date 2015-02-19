@@ -30,20 +30,21 @@ static void draw_chan(long ch, int row, int y)
 {
     int x = ch%2 ? 63 : 0;
     int idx = ch%2 ? 2*row + 1 : 2*row;
-    int height;
+    int height, offset = 0;
     struct LabelDesc labelValue = MICRO_FONT;
     labelValue.style = LABEL_RIGHT;
     if (cp->type == MONITOR_RAWINPUT) {
         labelDesc.font = DEFAULT_FONT.font;  // Could be translated to other languages, hence using 12normal
         height = LINE_HEIGHT;
+        y++;
     } else {
         labelDesc.font = MICRO_FONT.font;  // only digits, can use smaller font to show more channels
         height = 8;
-        y--;
+        offset = 1;
     }
-    GUI_CreateLabelBox(&gui->chan[idx], x, y,
+    GUI_CreateLabelBox(&gui->chan[idx], x, y+offset,
         0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(ch));
-    GUI_CreateLabelBox(&gui->value[idx], x+39, y,
+    GUI_CreateLabelBox(&gui->value[idx], x+59, y,
         21, height, &labelValue, value_cb, NULL, (void *)ch);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
         59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
