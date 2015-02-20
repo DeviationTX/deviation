@@ -87,7 +87,7 @@ static void _draw_body() {
     for (u8 i = timer_page_num * 2 * TIMERCOLUMNS; i < NUM_TIMERS  && i < (timer_page_num + 1) * 2 * TIMERCOLUMNS; i++) {
         if (TIMERCOLUMNS == 1 || (TIMERCOLUMNS == 2 && i < timer_page_num * 2 * TIMERCOLUMNS + TIMERCOLUMNS)) {
             COL1 = 30;
-            COL2 = 103;
+            COL2 = 130;
         } else {
             COL1 = 270;
             COL2 = 343;
@@ -95,41 +95,41 @@ static void _draw_body() {
         int row = 48 + i%2 * 100;
         //Row 1
         if(firstObj == NULL)
-            firstObj = GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT,timer_str_cb, NULL, (void *)(long)i);
+            firstObj = GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT,timer_str_cb, NULL, (void *)(long)i);
         else
-            GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
+            GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
 
         GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
         //Row 2
         row+=20;
 #if 0 //HAS_RTC
-        //GUI_CreateLabelBox(&gui->timelbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL,NULL,_tr("Time:"));
-        GUI_CreateLabelBox(&gui->timevallbl[i], COL2+30, row, 96, 16, &DEFAULT_FONT, show_time_cb, NULL, (void *)(long)i);
+        //GUI_CreateLabelBox(&gui->timelbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL,NULL,_tr("Time:"));
+        GUI_CreateLabelBox(&gui->timevallbl[i], COL2+30, row, 96, 18, &DEFAULT_FONT, show_time_cb, NULL, (void *)(long)i);
 #endif
-        GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)i);
         GUI_CreateTextSelect(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
         //Row 3
         row+=20;
         /* Reset Perm timer*/
-        GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+        GUI_CreateLabelBox(&gui->resetpermlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
         GUI_CreateButton(&gui->resetperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)i);
         if(Model.mixer_mode != MIXER_STANDARD) {
             /* or Reset switch */
-            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
+            GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
             GUI_CreateTextSelect(&gui->resetsrc[i],  COL2, row, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
             row+=20;
         }
         //Row 4
-        GUI_CreateLabelBox(&gui->startlbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
+        GUI_CreateLabelBox(&gui->startlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
         GUI_CreateTextSelect(&gui->start[i], COL2, row, TEXTSELECT_96, NULL, set_start_cb, (void *)(long)i);
         if(Model.mixer_mode == MIXER_STANDARD)
             row += 20;
         GUI_CreateButton(&gui->setperm[i], COL2, row, BUTTON_96x16, show_timerperm_cb, 0x0000, reset_timerperm_cb, (void *)(long)(i | 0x80));
 #if 0 //HAS_RTC
         // date label and set date/time button
-        GUI_CreateLabelBox(&gui->datelbl[i], COL1, row, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Date:"));
-        GUI_CreateLabelBox(&gui->datevallbl[i], COL2+20, row, 96, 16, &DEFAULT_FONT, show_date_cb, NULL, (void *)(long)i);
-        GUI_CreateLabelBox(&gui->setlbl[i], COL1, row+20, COL2-COL1, 16, &DEFAULT_FONT, NULL, NULL, _tr("Set:"));
+        GUI_CreateLabelBox(&gui->datelbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Date:"));
+        GUI_CreateLabelBox(&gui->datevallbl[i], COL2+20, row, 96, 18, &DEFAULT_FONT, show_date_cb, NULL, (void *)(long)i);
+        GUI_CreateLabelBox(&gui->setlbl[i], COL1, row+20, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Set:"));
         GUI_CreateButton(&gui->set[i], COL2, row+20, BUTTON_96x16, show_set_cb, 0x0000, press_set_cb, (void *)(long)i);
 #endif
         update_countdown(i);

@@ -99,7 +99,7 @@ const struct telem_layout devo_layout_basic[] = {
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER,  8, 35, GPS_LABEL},
+        {TYPE_HEADER, 98, 35, GPS_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -120,7 +120,7 @@ const struct telem_layout devo_layout_gps[] = {
 };
 
 const struct telem_layout dsm_header_basic[] = {
-        {TYPE_HEADER,  8, 35, DSM_LABEL},
+        {TYPE_HEADER, 98, 35, DSM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -246,16 +246,19 @@ static void _show_page(const struct telem_layout2 *page)
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
+    DEFAULT_FONT.style = LABEL_LEFT;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
-                           ptr->source == ARROW_LABEL ? &TINY_FONT : &DEFAULT_FONT,
+                           ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
+    PAGE_ShowHeader(_tr("Telemetry monitor"));
+    DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+    DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
 

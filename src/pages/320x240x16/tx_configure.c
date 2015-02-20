@@ -66,7 +66,7 @@ enum {
         BUTTON_TOUCH = BUTTON_WIDE,
         COL2TEST     = (COL2+100),
         ADDSPACE     = 15,
-        ADDROW       = 6,
+        ADDROW       = 4,
     #endif
 };
 static void _show_page();
@@ -127,7 +127,7 @@ static void _show_page()
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->modelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode"));
         GUI_CreateTextSelect(&gui1->mode, col2, row, TEXTSELECT_96, NULL, modeselect_cb, NULL);
-        row += space + ADDSPACE;
+        row += space + (ADDSPACE-1) / 2;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
         GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
