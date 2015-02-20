@@ -75,7 +75,7 @@ static void _show_bar_page(int row)
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
                                       SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 52, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 53 + height,
@@ -85,7 +85,7 @@ static void _show_bar_page(int row)
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
                                       SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 230 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
                                     showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
@@ -149,20 +149,22 @@ static void show_button_page()
         OFFSET_Y    = ((LCD_HEIGHT - 240) / 2),
     };
     enum {X = 0, Y = 1};
+    struct LabelDesc alignRight = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_RIGHT };
     const int label_pos[NUM_TX_BUTTONS][2] = CHANTEST_BUTTON_PLACEMENT;
     cp->is_locked = 3;
     GUI_CreateLabelBox(&gui->lock, OFFSET_X, 34, 320, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (int i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(&gui->value[i],
                 OFFSET_X + (label_pos[i][X] > 0 ? label_pos[i][X] + 50 : -label_pos[i][X] -20),    // >0? box at left side of label, otherwise right
-                OFFSET_Y + label_pos[i][Y] - 2,                                          // -2 to center box and label
+                OFFSET_Y + label_pos[i][Y],
                 16, 16,
                 &SMALLBOX_FONT, NULL, NULL, (void *)"");
         GUI_CreateLabelBox(&gui->chan[i],
                 OFFSET_X + abs(label_pos[i][X]),                                         // no differencing for the label
                 OFFSET_Y + label_pos[i][Y],
-                0, 0,
-                &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
+                48, 16,
+                label_pos[i][X] > 0 ? &alignRight : &DEFAULT_FONT,
+                button_str_cb, NULL, (void *)(long)i);
     }
 }
 

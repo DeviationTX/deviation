@@ -37,52 +37,52 @@ static const int TELEM_OFFSET_X = ((LCD_WIDTH-320)/2);
 static const int TELEM_OFFSET_Y = ((LCD_HEIGHT-240)/2);
 
 const struct telem_layout devo8_layout[] = {
-          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DEVO_TEMP1},
-          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_DEVO_TEMP2},
-          {{10, 80, 40, 16}, {60, 80, 40, 16}, TELEM_DEVO_TEMP3},
-          {{10,100, 40, 16}, {60,100, 40, 16}, TELEM_DEVO_TEMP4},
-          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_DEVO_VOLT1},
-          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_DEVO_VOLT2},
-          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_DEVO_VOLT3},
-          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_DEVO_RPM1},
-          {{210, 60, 40, 16}, {255, 60, 40, 16}, TELEM_DEVO_RPM2},
-          {{10, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
-          {{10, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
-          {{10, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
-          {{10, 200, 60, 16}, {100, 200, 200, 16}, TELEM_GPS_SPEED},
-          {{10, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
+          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_DEVO_TEMP1},
+          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_DEVO_TEMP2},
+          {{15, 80, 40, 18}, {60, 80, 40, 18}, TELEM_DEVO_TEMP3},
+          {{15,100, 40, 18}, {60,100, 40, 18}, TELEM_DEVO_TEMP4},
+          {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_DEVO_VOLT1},
+          {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_DEVO_VOLT2},
+          {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_DEVO_VOLT3},
+          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_DEVO_RPM1},
+          {{215, 60, 40, 18}, {260, 60, 40, 18}, TELEM_DEVO_RPM2},
+          {{15, 140, 65, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
+          {{15, 160, 65, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
+          {{15, 180, 65, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
+          {{15, 200, 65, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
+          {{15, 220, 65, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout frsky_layout[] = {
-          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_FRSKY_TEMP1},
-          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_FRSKY_TEMP2},
-          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_FRSKY_VOLT1},
-          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_FRSKY_VOLT2},
-          {{110, 80, 40, 16}, {155, 80, 40, 16}, TELEM_FRSKY_VOLT3},
-          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_FRSKY_RPM},
-          {{10, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
-          {{10, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
-          {{10, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
-          {{10, 200, 60, 16}, {100, 200, 200, 16}, TELEM_GPS_SPEED},
-          {{10, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
+          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_FRSKY_TEMP1},
+          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_FRSKY_TEMP2},
+          {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_FRSKY_VOLT1},
+          {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_FRSKY_VOLT2},
+          {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_FRSKY_VOLT3},
+          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_FRSKY_RPM},
+          {{15, 140, 65, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
+          {{15, 160, 65, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
+          {{15, 180, 65, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
+          {{15, 200, 65, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
+          {{15, 220, 65, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout dsm_layout[] = {
-          {{10, 40, 40, 16}, {60, 40, 40, 16}, TELEM_DSM_FLOG_FADESA},
-          {{10, 60, 40, 16}, {60, 60, 40, 16}, TELEM_DSM_FLOG_FADESB},
-          {{10, 80, 40, 16}, {60, 80, 40, 16}, TELEM_DSM_FLOG_FADESL},
-          {{10,100, 40, 16}, {60,100, 40, 16}, TELEM_DSM_FLOG_FADESR},
-          {{110, 40, 40, 16}, {155, 40, 40, 16}, TELEM_DSM_FLOG_FRAMELOSS},
-          {{110, 60, 40, 16}, {155, 60, 40, 16}, TELEM_DSM_FLOG_HOLDS},
-          {{210, 40, 40, 16}, {255, 40, 40, 16}, TELEM_DSM_FLOG_VOLT1},
-          {{210, 60, 40, 16}, {255, 60, 40, 16}, TELEM_DSM_FLOG_VOLT2},
-          {{210, 80, 40, 16}, {255, 80, 40, 16}, TELEM_DSM_FLOG_RPM1},
-          {{210,100, 40, 16}, {255,100, 40, 16}, TELEM_DSM_FLOG_TEMP1},
-          {{20, 140, 60, 16}, {100, 140, 200, 16}, TELEM_GPS_LAT},
-          {{20, 160, 60, 16}, {100, 160, 200, 16}, TELEM_GPS_LONG},
-          {{20, 180, 60, 16}, {100, 180, 200, 16}, TELEM_GPS_ALT},
-          {{20, 200, 60, 16}, {100, 200, 200, 16}, TELEM_GPS_SPEED},
-          {{20, 220, 60, 16}, {100, 220, 200, 16}, TELEM_GPS_TIME},
+          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_DSM_FLOG_FADESA},
+          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_DSM_FLOG_FADESB},
+          {{15, 80, 40, 18}, {60, 80, 40, 18}, TELEM_DSM_FLOG_FADESL},
+          {{15,100, 40, 18}, {60,100, 40, 18}, TELEM_DSM_FLOG_FADESR},
+          {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_DSM_FLOG_FRAMELOSS},
+          {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_DSM_FLOG_HOLDS},
+          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_DSM_FLOG_VOLT1},
+          {{215, 60, 40, 18}, {260, 60, 40, 18}, TELEM_DSM_FLOG_VOLT2},
+          {{215, 80, 40, 18}, {260, 80, 40, 18}, TELEM_DSM_FLOG_RPM1},
+          {{215,100, 40, 18}, {260,100, 40, 18}, TELEM_DSM_FLOG_TEMP1},
+          {{15, 140, 65, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
+          {{15, 160, 65, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
+          {{15, 180, 65, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
+          {{15, 200, 65, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
+          {{15, 220, 65, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 static const struct telem_layout *_get_layout()
@@ -102,6 +102,8 @@ static void show_page()
     const struct telem_layout *layout = _get_layout();
     
     int i = 0;
+    enum LabelType style = TELEM_TXT_FONT.style;
+    TELEM_TXT_FONT.style = LABEL_RIGHT;
     for(const struct telem_layout *ptr = layout; ptr->source; ptr++) {
         GUI_CreateLabelBox(&gui->label[i], ptr->label.x + TELEM_OFFSET_X, ptr->label.y + TELEM_OFFSET_Y,
                            ptr->label.width, ptr->label.height, &TELEM_TXT_FONT,
@@ -111,6 +113,7 @@ static void show_page()
                            telem_cb, NULL, (void *)(long)ptr->source);
         i++;
     }
+    TELEM_TXT_FONT.style = style;
     tp->telem = Telemetry;
     //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }
