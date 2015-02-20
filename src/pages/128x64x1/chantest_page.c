@@ -22,7 +22,6 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
-static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
 static s8 current_page = 0; // bug fix
 
@@ -30,7 +29,7 @@ static void draw_chan(long ch, int row, int y)
 {
     int x = ch%2 ? 63 : 0;
     int idx = ch%2 ? 2*row + 1 : 2*row;
-    int height, offset = 0;
+    int height;
     struct LabelDesc labelValue = MICRO_FONT;
     labelValue.style = LABEL_RIGHT;
     if (cp->type == MONITOR_RAWINPUT) {
@@ -40,12 +39,11 @@ static void draw_chan(long ch, int row, int y)
     } else {
         labelDesc.font = MICRO_FONT.font;  // only digits, can use smaller font to show more channels
         height = 8;
-        offset = 1;
     }
-    GUI_CreateLabelBox(&gui->chan[idx], x, y+offset,
+    GUI_CreateLabelBox(&gui->chan[idx], x, y,
         0, height, &labelDesc, _channum_cb, NULL, (void *)(long)_get_input_idx(ch));
-    GUI_CreateLabelBox(&gui->value[idx], x+59, y,
-        21, height, &labelValue, value_cb, NULL, (void *)ch);
+    GUI_CreateLabelBox(&gui->value[idx], x+37, y,
+        23, height, &labelValue, value_cb, NULL, (void *)ch);
     GUI_CreateBarGraph(&gui->bar[idx], x, y + height,
         59, 4, -125, 125, TRIM_HORIZONTAL, showchan_cb, (void *)ch);
 
@@ -81,11 +79,6 @@ static void _show_bar_page(u8 num_bars)
     int view_height = (cp->type == MONITOR_RAWINPUT)
                       ? (LINE_HEIGHT + 5)   // can only show 3 rows: (12 + 5) x 3
                       : 13;  // can only show 4 rows: (8 + 5) x 4
-    labelDesc.style = LABEL_UNDERLINE;
-    GUI_CreateLabelBox(&gui->title, 0 , 0, LCD_WIDTH, LINE_HEIGHT, &labelDesc, _title_cb, NULL, (void *)NULL);
-    labelDesc.style = LABEL_LEFT;  // bug fix: must initialize to avoid unpredictable drawing
-    //GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
-
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          view_height, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
@@ -99,6 +92,7 @@ void PAGE_ChantestInit(int page)
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
+    PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Channel output"));
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
@@ -165,18 +159,6 @@ static const char *_channum_cb(guiObject_t *obj, const void *data)
        INPUT_SourceName(tempstring, ch+1);
     } else {
        sprintf(tempstring, "%d", (int)ch+1);
-    }
-    return tempstring;
-}
-
-static const char *_title_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if (cp->type == MONITOR_RAWINPUT) {
-        tempstring_cpy((const char *)_tr("Stick input"));
-    } else {
-        tempstring_cpy((const char *)_tr("Channel output"));
     }
     return tempstring;
 }
