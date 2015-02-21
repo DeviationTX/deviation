@@ -76,8 +76,8 @@ void PACTL_SetTxRxMode(int mode)
         switch (last_module) {
             case CYRF6936: /* Port 0 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
             case CC2500:   /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
-            case A7105:    /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-            case NRF24L01: /* Port 3 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+            case NRF24L01: /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
+            case A7105:    /* Port 3 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
         }
     }
     if (Model.module == NRF24L01) {
@@ -91,6 +91,7 @@ void PACTL_SetTxRxMode(int mode)
         PROTOSPI_pin_set(PA_RXEN);
         PROTOSPI_pin_clear(PA_TXEN);
     }
+    printf("Mode(%d): %d (%d,%d,%d,%d)\n", last_module, mode, PORT_pin_get(RF_MUXSEL1), PORT_pin_get(RF_MUXSEL2), PORT_pin_get(PA_TXEN), PORT_pin_get(PA_RXEN));
 #if DISCOVERY
     if (Model.module == CYRF6936) {
         //BUYCHINA_SetTxRxMode

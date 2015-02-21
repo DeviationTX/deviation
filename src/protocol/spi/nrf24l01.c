@@ -264,6 +264,9 @@ void NRF24L01_SetTxRxMode(enum TXRX_State mode)
         NRF24L01_WriteReg(NRF24L01_00_CONFIG, (1 << NRF24L01_00_EN_CRC)); //PowerDown
         CE_lo();
     }
+#if UNIVERSAL_TX
+    PACTL_SetTxRxMode(mode);
+#endif
 }
 
 int NRF24L01_Reset()

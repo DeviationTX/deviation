@@ -133,6 +133,7 @@ int A7105_Reset()
     usleep(1000);
     //Set both GPIO as output and low
     A7105_SetTxRxMode(TXRX_OFF);
+    A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
     int result = A7105_ReadReg(0x10) == 0x9E;
     A7105_Strobe(A7105_STANDBY);
     return result;

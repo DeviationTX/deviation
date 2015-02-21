@@ -364,6 +364,7 @@ static void initialize()
     deinit();
     if (MODULE_ENABLE[Model.proto_opts[TESTRF_RF]].port == 0)
         return;
+    Model.module = Model.proto_opts[TESTRF_RF];
     printf("TestRF: Proto: %d\n", Model.proto_opts[TESTRF_RF]);
     switch(Model.proto_opts[TESTRF_RF]) {
         case CYRF6936: //CYRF

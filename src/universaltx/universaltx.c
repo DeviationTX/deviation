@@ -52,10 +52,16 @@ int main(void)
     Model.proto_opts[3] = 10; //Rate(ms) => 20
     TESTRF_Cmds(PROTOCMD_INIT);
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
+    int i = 0;
     while (1) {
         if (priority_ready & (1 << LOW_PRIORITY)) {
             priority_ready = 0;
             BT_HandleInput();
+            i = (i + 1) & 0xFF;
+            if(i == 0) {
+                Model.proto_opts[0] = (Model.proto_opts[0] + 1) % 4;
+                TESTRF_Cmds(PROTOCMD_INIT);
+            }
         }
     }
 
