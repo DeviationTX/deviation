@@ -13,10 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/***
    Main protocol compatible with Syma X5C-1, X11, X11C, X12.
    SymaX5C protocol option compatible with Syma X5C (original) and X2.
-*/
+***/
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
