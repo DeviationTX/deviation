@@ -61,10 +61,10 @@ void PAGE_ModelInit(int page)
         PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     enum {
-        COL1 = (30 + ((LCD_WIDTH - 320) / 2)),
-        COL2 = (COL1 + 100),
-        COL3 = (COL1 + 200),
-        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+        COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
+        COL2 = (COL1 + 128),
+        COL3 = (COL1 + 228),
+        ROW1 = (44 + ((LCD_HEIGHT - 240) / 2)),
     };
     row = ROW1;
     GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));

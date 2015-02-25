@@ -95,7 +95,6 @@ void layout_exit()
 {
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(NULL);
-    lp->selected_for_move = -1;
     PAGE_MainLayoutInit(-1);
 }
 

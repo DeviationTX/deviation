@@ -118,7 +118,7 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_MainLayoutExit();
     current_selected += 1 << 8;
     create_element();
     show_config();
@@ -135,7 +135,7 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
-        current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+        PAGE_MainLayoutExit();
         return _tr("Delete");
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 0);

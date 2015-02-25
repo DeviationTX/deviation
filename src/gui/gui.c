@@ -111,7 +111,6 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Scrollable:
         GUI_RemoveScrollableObjs(obj);
-        GUI_RemoveObj((guiObject_t *)&((guiScrollable_t *)obj)->scrollbar);
         break;
     case Keyboard:
         BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
