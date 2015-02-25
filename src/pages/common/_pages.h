@@ -102,6 +102,7 @@ void PAGE_USBExit();
 void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));
+void PAGE_TxConfigureExit();
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
@@ -123,6 +124,7 @@ void PAGE_TelemconfigExit();
 /* Datalog */
 void PAGE_DatalogInit();
 void PAGE_DatalogEvent();
+void PAGE_DatalogExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
