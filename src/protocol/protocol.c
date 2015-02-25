@@ -233,11 +233,11 @@ u64 PROTOCOL_CheckSafe()
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
         if (Model.safety[i] == SAFE_MIN && val > -99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_ZERO && (val < -1 || val > 1))
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_MAX && val < 99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
     }
     return unsafe;
 }
