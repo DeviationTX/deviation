@@ -90,7 +90,6 @@ void GUI_RemoveScrollableObjs(struct guiObject *obj)
     GUI_RemoveAllObjects();
     objHEAD = head;
     scrollable->head = NULL;
-    GUI_RemoveObj((guiObject_t *)&scrollable->scrollbar);
 }
 
 static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
@@ -108,7 +107,7 @@ static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
     return -1;
 }
 
-static guiObject_t *set_selectable_idx(guiScrollable_t *scrollable, int idx)
+static guiObject_t * set_selectable_idx(guiScrollable_t *scrollable, int idx)
 {
     //exclude not completely visible items on last row
     if (idx >= 0 || idx < scrollable->num_selectable) {
@@ -216,8 +215,8 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     }
     if (offset > 0)
         idx += num_selectable - scrollable->num_selectable;
-    scrollable->visible_rows = rel_row;
     scrollable->num_selectable = num_selectable;
+    scrollable->visible_rows = rel_row;
     scrollable->head = objHEAD;
     objHEAD = head;
     head = scrollable->head;
@@ -242,7 +241,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
 }
 
 #if HAS_TOUCH
-int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
+static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)pos;
     guiScrollable_t *scrollable = (guiScrollable_t *)data;
