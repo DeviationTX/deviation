@@ -246,7 +246,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     switch(absrow) {
         case COMMON_SRC:
             label = _tr("Src");
-            tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
+            tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src;
             break;
         case COMMON_CURVE:
             label = _tr("High-Rate");
@@ -374,13 +374,11 @@ static void notify_cb(guiObject_t * obj)
         int idx = (row_offset >> 8) + (row_offset & 0xff);
         if(idx >= EXPO_SWITCH1 && idx <= EXPO_SCALE1) {
             if(mp->cur_mixer != &mp->mixer[1]) {
-                sync_mixers();
                 mp->cur_mixer = &mp->mixer[1];
                 GUI_Redraw(&gui->graph);
             }
         } else if(idx >= EXPO_SWITCH2 && idx <= EXPO_SCALE2) {
             if(mp->cur_mixer != &mp->mixer[2]) {
-                sync_mixers();
                 mp->cur_mixer = &mp->mixer[2];
                 GUI_Redraw(&gui->graph);
             }
