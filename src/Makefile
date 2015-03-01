@@ -21,9 +21,9 @@ txs: $(TXS)
 emus: $(TXS:%=emu_%)
 both: txs emus
 fss: $(TXS:%=fs_%)
-zips: $(TXS: %=zip_%)
-emuzips: $(TXS:%=emu_zip_%)
-winzips: $(TXS:%=win_zip_%)
+zips: $(TXS:%=zip_%)
+emuzips: $(TXS:%=zip_emu_%)
+winzips: $(TXS:%=zip_win_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
@@ -34,7 +34,7 @@ emu_$1:
 	$(MAKE) TARGET=emu_$1
 # This builds Windows emulators on a Linux system.
 win_$1:
-	#$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
 ifneq "$(findstring $1,$(NOFSTXS))" "$1"
@@ -46,6 +46,8 @@ zip_$1:
 	$(MAKE) TARGET=$1 zip
 zip_emu_$1:
 	$(MAKE) TARGET=emu_$1 zip
+zip_win_$1:
+	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
 release_$1: zip_$1 zip_emu_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
