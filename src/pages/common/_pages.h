@@ -11,6 +11,7 @@
 #include "timer_page.h"
 #include "model_page.h"
 #include "chantest_page.h"
+#include "range_page.h"
 #include "usb_page.h"
 #include "tx_configure.h"
 #include "telemtest_page.h"
@@ -79,6 +80,11 @@ void PAGE_RTCExit();
 /* Test */
 void PAGE_TestInit(int page);
 void PAGE_TestEvent();
+
+/* Range */
+void PAGE_RangeInit(int page);
+void PAGE_RangeEvent();
+void PAGE_RangeExit();
 
 /* Chantest */
 void PAGE_ChantestInit(int page);
