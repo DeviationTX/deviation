@@ -26,7 +26,6 @@ static void do_test(int start) {
           Model.tx_power = mp->old_power;
       }
       mp->testing = start;
-      PROTOCOL_Init(0);
       _draw_page(1);
   }
 }
