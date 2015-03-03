@@ -18,7 +18,7 @@
 #include "config/tx.h"
 #include "music.h"
 
-void PAGE_Exit();
+void PAGE_Test();
 
 static u8 warned = 0;
 static u32 next_battery_warning = 0;
@@ -38,7 +38,7 @@ u8 BATTERY_Check()
         next_battery_warning = ms + Transmitter.batt_warning_interval * 1000;
     }
     if (battery < Transmitter.batt_critical && ! (warned & BATTERY_CRITICAL)) {
-        PAGE_Exit();
+        PAGE_Test();
         CONFIG_SaveModelIfNeeded();
         CONFIG_SaveTxIfNeeded();
         SPI_FlashBlockWriteEnable(0); //Disable writing to all banks of SPIFlash

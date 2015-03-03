@@ -23,7 +23,7 @@ static struct range_obj * const gui = &gui_objs.u.range;
 
 static void start_test(struct guiObject *gui, const void *data) {
     (void) gui;
-    do_test(!data);
+    RANGE_test(!data);
 }
 
 static const char *startstop_dlg(struct guiObject *gui, const void *data) {

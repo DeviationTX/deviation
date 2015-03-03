@@ -17,7 +17,7 @@ static struct range_page * const mp = &pagemem.u.range_page;
 
 static void _draw_page(int);
 
-static void do_test(int start) {
+void RANGE_test(int start) {
   if (start != mp->testing) {
       if (start) {
           mp->old_power = Model.tx_power;
@@ -34,12 +34,13 @@ void PAGE_RangeInit(int page) {
     (void)page;
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(&mp));
+    mp->old_power = Model.tx_power;
     _draw_page(PROTOCOL_HasPowerAmp(Model.protocol) 
                && Model.tx_power != TXPOWER_100uW);
 }
 
 void PAGE_RangeExit() {
-    do_test(0);
+    RANGE_test(0);
 }
 
     

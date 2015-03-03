@@ -27,7 +27,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, 0);
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            do_test(!mp->testing);
+            RANGE_test(!mp->testing);
         }
     }
     return 1;
