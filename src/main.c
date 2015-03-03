@@ -32,6 +32,7 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
+void PAGE_Exit();
 
 #ifndef DUMP_BOOTLOADER
 int main() {
@@ -192,6 +193,7 @@ void EventLoop()
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
+            PAGE_Exit();
             CONFIG_SaveModelIfNeeded();
             CONFIG_SaveTxIfNeeded();
         }
