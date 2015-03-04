@@ -8,6 +8,7 @@ use Getopt::Long;
 my $target;
 my $quiet;
 my $objdir;
+my $log = "";
 GetOptions("target=s" => \$target, "quiet" => \$quiet, "objdir=s" => \$objdir);
 
 my @dirs = grep {$_ !~ /common/ && (! $target || $_ =~ /$target/)} glob("filesystem/*");
@@ -15,6 +16,7 @@ my $max_line_length = 0;
 my $max_bytes = 0;
 my $max_count = 0;
 my $error = 0;
+print "@dirs\n";
 foreach my $target_dir (@dirs) {
     my($target) = ($target_dir =~ /\/(.*)/);
     my @langfiles = glob("$target_dir/language/*");
@@ -47,7 +49,7 @@ foreach my $target_dir (@dirs) {
                 $idx++;
             }
         }
-        printf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", $file, $count, $bytes, $line_length) if(! $quiet);
+        $log .= sprintf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", $file, $count, $bytes, $line_length);
         $target_bytes = $bytes if($bytes > $target_bytes);
         $target_count = $count if($count > $target_count);
         $target_line_length = $line_length if($line_length > $target_line_length);
@@ -56,14 +58,14 @@ foreach my $target_dir (@dirs) {
     $cmd .= " -objdir $objdir" if($objdir);
     my @lines = `$cmd`;
     my $count = scalar(@lines);
-    printf("%-35s: %5d lines\n", $target, $count) if(! $quiet);
+    $log .= sprintf("%-35s: %5d lines\n", $target, $count);
     $target_count = $count if($count > $target_count);
-    printf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", $target_dir, $target_count, $target_bytes, $target_line_length) if(! $quiet);
+    $log .= sprintf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", $target_dir, $target_count, $target_bytes, $target_line_length);
     $max_bytes = $target_bytes if($target_bytes > $max_bytes);
     $max_count = $target_count if($target_count > $max_count);
     $max_line_length = $target_line_length if($target_line_length > $max_line_length);
 }
-printf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", "Total", $max_count, $max_bytes, $max_line_length) if(! $quiet);
+$log .= sprintf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", "Total", $max_count, $max_bytes, $max_line_length);
 open my $fh, "config/language.c" || die("Couldn't parse: config/language.c");
 my $allowed_line_length = 0;
 my $allowed_count = 0;
@@ -77,8 +79,10 @@ while(<$fh>) {
         $allowed_line_length = $1;
     }
 }
-printf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", "Allocated", $allowed_count, $allowed_bytes, $allowed_line_length) if(! $quiet);
+$log .= sprintf("%-35s: %5d lines, %5d bytes, %4d bytes/line\n", "Allocated", $allowed_count, $allowed_bytes, $allowed_line_length);
 $error |= ($allowed_line_length < $max_line_length || $allowed_count < $max_count || $allowed_bytes < $max_bytes);
+$log = "ERROR: Not enough stringspace allocated:\n$log" if($error);
+print $log if(! $quiet || $error);
 exit($error);
 
 sub fnv {
