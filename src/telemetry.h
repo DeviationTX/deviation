@@ -1,22 +1,13 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-#define NUM_DEVO_TELEM 9
-#define NUM_DSM_TELEM  10
-#define NUM_FRSKY_TELEM  7
-#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM              \
-                      ? (NUM_DEVO_TELEM > NUM_FRSKY_TELEM      \
-                          ? NUM_DEVO_TELEM : NUM_FRSKY_TELEM)  \
-                      : (NUM_DSM_TELEM > NUM_FRSKY_TELEM       \
-                          ? NUM_DSM_TELEM : NUM_FRSKY_TELEM)   \
-                   )
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
 #ifdef MODULAR
     #define HAS_DSM_EXTENDED_TELEMETRY 0
 #else
-    #define HAS_DSM_EXTENDED_TELEMETRY 0
+    #define HAS_DSM_EXTENDED_TELEMETRY 1
 #endif
 
 enum {
@@ -94,6 +85,7 @@ enum {
                                : (((int)TELEM_DEVO_LAST > (int)TELEM_FRSKY_LAST)   \
                                    ? (int)TELEM_DEVO_LAST : (int)TELEM_FRSKY_LAST) \
                           )
+#define NUM_TELEM   TELEM_VALS - 1
 enum {
     TELEM_GPS_LAT = TELEM_VALS,
     TELEM_GPS_LONG,
@@ -116,6 +108,7 @@ enum {
     TELEMUNIT_FEET   = 0x40,
     TELEMUNIT_FAREN  = 0x80,
 };
+
 struct gps {
     s32 latitude;
     s32 longitude;
@@ -131,6 +124,7 @@ struct telem_devo {
     s16 temp[4];
     u16 rpm[2];
 };
+
 struct telem_dsm_flog {
     //Do not change the order of these, they are aligned to the dsm packet
     u16 fades[4];
@@ -140,7 +134,6 @@ struct telem_dsm_flog {
     u16 rpm;
     s16 temp;
 };
-
 struct telem_dsm_pbox {
     u16 volt[2];
     u16 capacity[2];
@@ -161,7 +154,6 @@ struct telem_dsm_gforce {
     s16 zmax;
     s16 zmin;
 };
-
 struct telem_dsm_jetcat {
     u8 status;
     u8 offcond;
@@ -225,5 +217,4 @@ int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol);
 int TELEMETRY_GetNumTelemSrc();
-int TELEMETRY_GetNumTelem();
 #endif

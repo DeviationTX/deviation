@@ -418,15 +418,29 @@ static int pkt32_to_coord(u8 *ptr)
 static void parse_telemetry_packet()
 {
     static s32 altitude;
-    static const u8 update7f[] = {
-                 TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
-                 TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
-                 TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
-                 TELEM_DSM_FLOG_VOLT2, 0};
-    static const u8 update7e[] = {
-                TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT1, TELEM_DSM_FLOG_TEMP1, 0};
-    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
-    static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, 0};
+    static const u8 update7f[] = { TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
+                                   TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
+                                   TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
+                                   TELEM_DSM_FLOG_VOLT2, 0};
+    static const u8 update7e[] = { TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT1, TELEM_DSM_FLOG_TEMP1, 0};
+#if HAS_DSM_EXTENDED_TELEMETRY
+    static const u8 update03[] = { TELEM_DSM_AMPS1, 0};
+    static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
+                                   TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
+                                   TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
+                                   TELEM_DSM_PBOX_ALARMC1, TELEM_DSM_PBOX_ALARMC2, 0};
+    static const u8 update11[] = { TELEM_DSM_AIRSPEED, 0};
+    static const u8 update12[] = { TELEM_DSM_ALTITUDE, 0};
+    static const u8 update14[] = { TELEM_DSM_GFORCE_X, TELEM_DSM_GFORCE_Y, TELEM_DSM_GFORCE_Z,
+                                   TELEM_DSM_GFORCE_XMAX, TELEM_DSM_GFORCE_YMAX, TELEM_DSM_GFORCE_ZMAX,
+                                   TELEM_DSM_GFORCE_ZMIN, 0};
+    static const u8 update15[] = { TELEM_DSM_JETCAT_STATUS, TELEM_DSM_JETCAT_THROTTLE,
+                                   TELEM_DSM_JETCAT_PACKVOLT, TELEM_DSM_JETCAT_PUMPVOLT,
+                                   TELEM_DSM_JETCAT_RPM, TELEM_DSM_JETCAT_TEMPEGT,
+                                   TELEM_DSM_JETCAT_OFFCOND, 0};
+#endif
+    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, TELEM_GPS_HEADING, 0};
+    static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, TELEM_GPS_SATCOUNT, 0};
     const u8 *update = NULL;
     switch(packet[0]) {
         case 0x7f: //TM1000 Flight log
@@ -452,9 +466,11 @@ static void parse_telemetry_packet()
             break;
 #if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
+            update = update03;
             Telemetry.p.dsm.sensors.amps = (s32)((s16)pkt16_to_value(packet+2)) * 196791 / 100000; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
             break;
         case 0x0a: //Powerbox sensor
+            update = update0a;
             Telemetry.p.dsm.pbox.volt[0] = pkt16_to_value(packet+2); //In 1/100 of Volts
             Telemetry.p.dsm.pbox.volt[1] = pkt16_to_value(packet+4); //In 1/100 of Volts
             Telemetry.p.dsm.pbox.capacity[0] = pkt16_to_value(packet+6); //In mAh
@@ -465,12 +481,15 @@ static void parse_telemetry_packet()
             Telemetry.p.dsm.pbox.alarmc[1] = (packet[15] >> 3) & 0x01; //0 = disable, 1 = enable
             break;
         case 0x11: //AirSpeed sensor
+            update = update11;
             Telemetry.p.dsm.sensors.airspeed = pkt16_to_value(packet+2); //In km/h (16Bit integer, 1 unit is 1 km/h)
             break;
         case 0x12: //Altimeter sensor
+            update = update12;
             Telemetry.p.dsm.sensors.altitude = (s16)pkt16_to_value(packet+2); //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
             break;
         case 0x14: //G-Force sensor
+            update = update14;
             //Telemetry.p.dsm.gforce.x = (s16)pkt16_to_value(packet+2); //In 0.01g (16Bit signed integers, unit is 0.01g)
             //Telemetry.p.dsm.gforce.y = (s16)pkt16_to_value(packet+4);
             //Telemetry.p.dsm.gforce.z = (s16)pkt16_to_value(packet+6);
@@ -483,6 +502,7 @@ static void parse_telemetry_packet()
             }
             break;
         case 0x15: //JetCat sensor
+            update = update15;
             Telemetry.p.dsm.jetcat.status = packet[2];
             Telemetry.p.dsm.jetcat.throttle = bcd_to_u8(packet[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
             Telemetry.p.dsm.jetcat.packvolt = bcd_to_u16(packet+4); //In 1/100 of Volts

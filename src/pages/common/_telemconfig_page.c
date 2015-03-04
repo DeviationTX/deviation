@@ -37,9 +37,18 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int val = (long)data;
+    int last = TELEMETRY_GetNumTelemSrc();
+    u8 telem_idx = Model.telem_alarm[val];
     u8 changed;
-    Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
-        0, TELEMETRY_GetNumTelem(), dir, 1, 1, &changed);
+    while (1) {
+        telem_idx = GUI_TextSelectHelper(telem_idx, 0, last, dir, 1, 1, &changed);
+        //exclude telemetry src's with max=0 (eg. JETCAT_STATUS, JETCAT_OFFCOND)
+        if (telem_idx == 0 || TELEMETRY_GetMaxValue(telem_idx))
+            break;
+        if (telem_idx == last)
+            dir = -1;
+    }
+    Model.telem_alarm[val] = telem_idx;
     if (changed) {
         guiObject_t *valObj = _get_obj(val, 2);
         if (valObj)
@@ -69,11 +78,12 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int idx = (long)data;
-    if (Model.telem_alarm[idx] == 0) {
+    u8 telem_idx = Model.telem_alarm[idx];
+    if (telem_idx == 0) {
         return "----";
     }
-    s32 min = TELEMETRY_GetMinValue(Model.telem_alarm[idx]);
-    s32 max = TELEMETRY_GetMaxValue(Model.telem_alarm[idx]);
+    s32 min = TELEMETRY_GetMinValue(telem_idx);
+    s32 max = TELEMETRY_GetMaxValue(telem_idx);
     s32 value = Model.telem_alarm_val[idx];
 
     u32 small_step = 1;
@@ -96,7 +106,14 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     }
 
     Model.telem_alarm_val[idx] = GUI_TextSelectHelper(value, min, max, dir, small_step, big_step, NULL);
-    return TELEMETRY_GetValueStrByValue(tempstring, Model.telem_alarm[idx], Model.telem_alarm_val[idx]);
+    return TELEMETRY_GetValueStrByValue(tempstring, telem_idx, Model.telem_alarm_val[idx]);
+}
+
+static void sound_test_cb(guiObject_t *obj, void *data)
+{
+    (void)obj;
+    u8 idx = (long)data;
+    MUSIC_Play(MUSIC_TELEMALARM1 + idx);
 }
 
 void PAGE_TelemconfigEvent() {

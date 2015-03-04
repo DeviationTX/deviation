@@ -143,10 +143,11 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_FLOG_TEMP1:      _get_temp_str(str, value, 0); break;
 #if HAS_DSM_EXTENDED_TELEMETRY
         case TELEM_DSM_AMPS1:           _get_value_str(str, value, 1, 'A'); break;
-        case TELEM_DSM_AIRSPEED:        _get_value_str(str, value, 0, '\0'); break;
         case TELEM_DSM_ALTITUDE:        _get_value_str(str, value, 1, 'm'); break;
+        case TELEM_DSM_AIRSPEED:
         case TELEM_DSM_PBOX_CAPACITY1:
-        case TELEM_DSM_PBOX_CAPACITY2:  _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_PBOX_CAPACITY2:
+        case TELEM_DSM_JETCAT_RPM:      _get_value_str(str, value, 0, '\0'); break;
         case TELEM_DSM_GFORCE_X:
         case TELEM_DSM_GFORCE_Y:
         case TELEM_DSM_GFORCE_Z:
@@ -154,15 +155,21 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_GFORCE_YMAX:
         case TELEM_DSM_GFORCE_ZMAX:
         case TELEM_DSM_GFORCE_ZMIN:     _get_value_str(str, value, 2, 'g'); break;
+        case TELEM_DSM_PBOX_ALARMV1:
+        case TELEM_DSM_PBOX_ALARMV2:
+        case TELEM_DSM_PBOX_ALARMC1:
+        case TELEM_DSM_PBOX_ALARMC2:    strcpy(str, _tr(value?"On":"Off")); break;
         case TELEM_DSM_PBOX_VOLT1:
         case TELEM_DSM_PBOX_VOLT2:
         case TELEM_DSM_JETCAT_PACKVOLT:
         case TELEM_DSM_JETCAT_PUMPVOLT: _get_value_str(str, value, 2, 'V'); break;
+        case TELEM_DSM_JETCAT_THROTTLE: _get_value_str(str, value, 0, '%'); break;
         case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0); break;
-        case TELEM_DSM_JETCAT_STATUS:   _dsm_jetcat_status(value); break;
-        case TELEM_DSM_JETCAT_OFFCOND:  _dsm_jetcat_offcond(value); break;
+        case TELEM_DSM_JETCAT_STATUS:   strcpy(str, _dsm_jetcat_status(value)); break;
+        case TELEM_DSM_JETCAT_OFFCOND:  strcpy(str, _dsm_jetcat_offcond(value)); break;
 #endif
-        default:  strcpy(str, "Unknown");
+        default:
+            return "";
     }
     return str;
 }
@@ -189,7 +196,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_PBOX_ALARMV2:    sprintf(str, "%s%d", _tr("AlarmV"), telem - TELEM_DSM_PBOX_ALARMV1 + 1); break;
         case TELEM_DSM_PBOX_ALARMC1:
         case TELEM_DSM_PBOX_ALARMC2:    sprintf(str, "%s%d", _tr("AlarmC"), telem - TELEM_DSM_PBOX_ALARMC1 + 1); break;
-        case TELEM_DSM_AIRSPEED:        sprintf(str, "%s km/h", _tr("Air")); break;
+        case TELEM_DSM_AIRSPEED:        strcpy(str, _tr("AirSpeed")); break;
         case TELEM_DSM_ALTITUDE:        strcpy(str, _tr("Altitude")); break;
         case TELEM_DSM_GFORCE_X:        strcpy(str, "g -> X"); break;
         case TELEM_DSM_GFORCE_Y:        strcpy(str, "g -> Y"); break;
@@ -234,21 +241,49 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_FADESB:
         case TELEM_DSM_FLOG_FADESL:
         case TELEM_DSM_FLOG_FADESR:
-        case TELEM_DSM_FLOG_FRAMELOSS:
-        case TELEM_DSM_FLOG_TEMP1:  return 9999;
-        case TELEM_DSM_FLOG_HOLDS:  return 999;
+        case TELEM_DSM_FLOG_FRAMELOSS:  return 9999;
+        case TELEM_DSM_FLOG_HOLDS:      return 999;
+        case TELEM_DSM_FLOG_TEMP1:      return 538;
         case TELEM_DSM_FLOG_VOLT1:
-        case TELEM_DSM_FLOG_VOLT2:  return 65000;   // could not find maximum spec
-        case TELEM_DSM_FLOG_RPM1:   return 999999;
-        default: return 0;
+        case TELEM_DSM_FLOG_VOLT2:      return 6000;
+        case TELEM_DSM_FLOG_RPM1:       return 65500;
+#if HAS_DSM_EXTENDED_TELEMETRY
+        case TELEM_DSM_AMPS1:           return 999;
+        case TELEM_DSM_PBOX_VOLT1:
+        case TELEM_DSM_PBOX_VOLT2:      return 6000;
+        case TELEM_DSM_PBOX_CAPACITY1:
+        case TELEM_DSM_PBOX_CAPACITY2:  return 65000;
+        case TELEM_DSM_PBOX_ALARMV1:
+        case TELEM_DSM_PBOX_ALARMV2:
+        case TELEM_DSM_PBOX_ALARMC1:
+        case TELEM_DSM_PBOX_ALARMC2:    return 1;
+        case TELEM_DSM_AIRSPEED:        return 9999;
+        case TELEM_DSM_ALTITUDE:        return 65000;
+        case TELEM_DSM_GFORCE_X:
+        case TELEM_DSM_GFORCE_Y:
+        case TELEM_DSM_GFORCE_Z:
+        case TELEM_DSM_GFORCE_XMAX:
+        case TELEM_DSM_GFORCE_YMAX:
+        case TELEM_DSM_GFORCE_ZMAX:
+        case TELEM_DSM_GFORCE_ZMIN:     return 1000;
+        case TELEM_DSM_JETCAT_THROTTLE: return 159;
+        case TELEM_DSM_JETCAT_PACKVOLT:
+        case TELEM_DSM_JETCAT_PUMPVOLT: return 6000;
+        case TELEM_DSM_JETCAT_RPM:      return 999999;
+        case TELEM_DSM_JETCAT_TEMPEGT:  return 999;
+#endif
+        default: return 0;  //JETCAT status, offcond -- don't display raw values
     }
 }
 
 s32 _dsm_get_min_value(u8 telem)
 {           
     switch(telem) {
-        case TELEM_DSM_FLOG_TEMP1:  return -150;
-        case TELEM_DSM_FLOG_RPM1:   return 200;
+        case TELEM_DSM_FLOG_TEMP1:      return -40;
+        case TELEM_DSM_FLOG_RPM1:       return 200;
+#if HAS_DSM_EXTENDED_TELEMETRY
+        case TELEM_DSM_AMPS1:           return -999;
+#endif
         default: return 0;
     }
 }

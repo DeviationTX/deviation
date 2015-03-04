@@ -29,12 +29,12 @@ static void _get_temp_str(char *str, s32 value, u8 decimals);
 #define CAP_TYPEMASK 0x03
 
 struct Telemetry Telemetry;
-static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
-static u8 alarm_mute[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
-static u8 alarm[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
-static u8 telem_idx = 0;
+static u8 k = 0; // telem_idx
+static u8 alarm[TELEM_NUM_ALARMS] = {0};
+static u8 alarm_mute[TELEM_NUM_ALARMS] = {0};
+static u32 alarm_duration[TELEM_NUM_ALARMS] = {0};
 static u32 alarm_time = 0;
-static u8 last_updated[TELEM_UPDATE_SIZE];
+static u8 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
@@ -43,15 +43,22 @@ void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
     if (value == 0xffff)
         value = 0;
-    s32 div = 10 ^ decimals;
-    if (value == 0 || value >= div * div)
-        sprintf(str, "%d%c", value / div, units);
-    else if (value >= 10 * div || div == 10)
-        sprintf(str, "%d.%u%c", value / div, (value % div) * 10 / div, units);
-    else if (value >= 100 * div || div == 100)
-        sprintf(str, "%d.%02u%c", value / div, (value % div) * 100 / div, units);
-    else
-        sprintf(str, "%d.%03u%c", value / div, value % div, units);
+    char format[] = "%0*d";
+    format[2] = '1' + decimals;
+    sprintf(str, format, value);
+
+    int i, len = strlen(str);
+    if (decimals && len <= 2 + decimals && value) {
+        for (i = len; i > len - decimals; i--) {
+            str[i] = str[i-1];
+        }
+        str[i] = '.';
+        len += (len < 4) ? 1 : 0;
+    } else {
+        len -= decimals;
+    }
+    str[len++] = units;
+    str[len] = '\0';
 }
 
 void _get_temp_str(char *str, s32 value, u8 decimals)
@@ -168,6 +175,8 @@ const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
                     hour, min, sec, year, month, day);
             break;
         }
+        case TELEM_GPS_SATCOUNT:    _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_GPS_HEADING:     _get_value_str(str, value, 2, '\0'); break;
         default:
             if (TELEMETRY_Type() == TELEM_DEVO)
                 return _devo_str_by_value(str, telem, value);
@@ -196,11 +205,13 @@ const char * TELEMETRY_Name(char *str, unsigned telem)
 const char * TELEMETRY_ShortName(char *str, unsigned telem)
 {
     switch(telem) {
-        case TELEM_GPS_LONG:   strcpy(str, _tr("Longitude")); break;
-        case TELEM_GPS_LAT:    strcpy(str, _tr("Latitude")); break;
-        case TELEM_GPS_ALT:    strcpy(str, _tr("Altitude")); break;
-        case TELEM_GPS_SPEED:  strcpy(str, _tr("Speed")); break;
-        case TELEM_GPS_TIME:   strcpy(str, _tr("Time")); break;
+        case TELEM_GPS_LONG:    strcpy(str, _tr("Longitude")); break;
+        case TELEM_GPS_LAT:     strcpy(str, _tr("Latitude")); break;
+        case TELEM_GPS_ALT:     strcpy(str, _tr("Altitude")); break;
+        case TELEM_GPS_SPEED:   strcpy(str, _tr("Speed")); break;
+        case TELEM_GPS_TIME:    strcpy(str, _tr("Time")); break;
+        case TELEM_GPS_SATCOUNT:strcpy(str, _tr("SatCount")); break;
+        case TELEM_GPS_HEADING: strcpy(str, _tr("Heading")); break;
         default:
             if (TELEMETRY_Type() == TELEM_DEVO)
                 return _devo_short_name(str, telem);
@@ -244,16 +255,12 @@ int TELEMETRY_Type()
 int TELEMETRY_GetNumTelemSrc()
 {
     if (TELEMETRY_Type() == TELEM_DEVO)
-        return NUM_DEVO_TELEM;
+        return TELEM_DEVO_LAST-1;
     if (TELEMETRY_Type() == TELEM_DSM)
-        return NUM_DSM_TELEM;
-    return NUM_FRSKY_TELEM;
+        return TELEM_DSM_LAST-1;
+    return TELEM_FRSKY_LAST-1;
 }
 
-int TELEMETRY_GetNumTelem()
-{
-    return TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST-1 : TELEM_DSM_LAST-1;
-}
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol)
 {
     if (protocol == PROTOCOL_DSM2 || protocol == PROTOCOL_DSMX)
@@ -288,46 +295,46 @@ void TELEMETRY_Alarm()
     }
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
-    telem_idx = (telem_idx + 1) % TELEM_NUM_ALARMS;
-    s32 value = TELEMETRY_GetValue( Model.telem_alarm[telem_idx] );
+    k = (k + 1) % TELEM_NUM_ALARMS;
+    s32 value = TELEMETRY_GetValue( Model.telem_alarm[k] );
     if (value == 0xffff)
         return;
-    if (value == 0 || ! Model.telem_alarm[telem_idx] || ! TELEMETRY_IsUpdated(0xff)) {
+    if (value == 0 || ! Model.telem_alarm[k] || ! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
-        alarm[telem_idx] = 0; // clear this set
-        alarm_mute[telem_idx] = 0;
+        alarm[k] = 0; // clear this set
+        alarm_mute[k] = 0;
         return;
     }
 
-    if (alarm_duration[telem_idx] == 0) {
-        alarm_duration[telem_idx] = current_time;
-    } else if (current_time - alarm_duration[telem_idx] > CHECK_DURATION) {
-        s32 alarm_val = Model.telem_alarm_val[telem_idx];
-        if (! alarm[telem_idx] && ((value < alarm_val) == (Model.telem_flags & (1 << telem_idx)))) {
-            alarm_duration[telem_idx] = current_time;
-            alarm[telem_idx] = 1;
+    if (alarm_duration[k] == 0) {
+        alarm_duration[k] = current_time;
+    } else if (current_time - alarm_duration[k] > CHECK_DURATION) {
+        s32 alarm_val = Model.telem_alarm_val[k];
+        if (! alarm[k] && ((value < alarm_val) == (Model.telem_flags & (1 << k)))) {
+            alarm_duration[k] = current_time;
+            alarm[k] = 1;
 #ifdef DEBUG_TELEMALARM
             printf("set: 0x%x\n\n", alarm);
 #endif
-        } else if (alarm[telem_idx] && ! ((value < alarm_val) == (Model.telem_flags & (1 << telem_idx)))) {
-            alarm_duration[telem_idx] = current_time;
-            alarm[telem_idx] = 0;
-            alarm_mute[telem_idx] = 0;
+        } else if (alarm[k] && ! ((value < alarm_val) == (Model.telem_flags & (1 << k)))) {
+            alarm_duration[k] = current_time;
+            alarm[k] = 0;
+            alarm_mute[k] = 0;
 #ifdef DEBUG_TELEMALARM
             printf("clear: 0x%x\n\n", alarm);
 #endif
         } else
-            alarm_duration[telem_idx] = 0;
+            alarm_duration[k] = 0;
     }
 
-    if (alarm[telem_idx] && current_time >= alarm_time + MUSIC_INTERVAL) {
+    if (alarm[k] && current_time >= alarm_time + MUSIC_INTERVAL) {
         alarm_time = current_time;
-        if (! alarm_mute[telem_idx]) {
+        if (! alarm_mute[k]) {
             PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
-            printf("beep: %d\n\n", telem_idx);
+            printf("beep: %d\n\n", k);
 #endif
-            MUSIC_Play(MUSIC_TELEMALARM1 + telem_idx);
+            MUSIC_Play(MUSIC_TELEMALARM1 + k);
         }
     }
 }
