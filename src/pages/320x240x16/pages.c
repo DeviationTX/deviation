@@ -58,12 +58,12 @@ struct page_group groups[] = {
     {2, PAGEID_TXCFG},
     {2, PAGEID_TELEMMON},
     {2, PAGEID_CHANMON},
-    {2, PAGEID_RANGE},
     {2, PAGEID_INPUTMON},
     {2, PAGEID_BTNMON},
 #if HAS_SCANNER
     {2, PAGEID_SCANNER},
 #endif
+    {2, PAGEID_RANGE},
     {2, PAGEID_USB},
 #if HAS_STANDARD_GUI
     {0x81, PAGEID_MODELMENU},
