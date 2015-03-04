@@ -34,6 +34,16 @@ void PAGE_Exit()
         pages[cur_page].exit();
 }
 
+// Pages that need special handling before saving on power off or battery low
+void PAGE_Test(void)
+{
+    if (cur_page == PAGEID_RANGE) {
+        PAGE_RangeExit();
+        PAGE_RangeInit(0);
+    }
+}
+
+
 u8 PAGE_SetModal(u8 _modal)
 {
     u8 old = modal;

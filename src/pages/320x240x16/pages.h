@@ -26,6 +26,7 @@ struct pagemem {
         struct model_page model_page;
         struct timer_page timer_page;
         struct chantest_page chantest_page;
+        struct range_page range_page;
 #if HAS_SCANNER
         struct scanner_page scanner_page;
 #endif

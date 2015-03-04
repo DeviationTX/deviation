@@ -20,6 +20,10 @@ struct chantest_obj {
     guiScrollable_t scrollable;
 };
 
+struct range_obj {
+    guiLabel_t label;
+};
+
 struct dialog_obj {
     guiDialog_t dialog;
 };
@@ -325,6 +329,7 @@ struct gui_objs {
         struct about_obj about;
         struct splash_obj splash;
         struct chantest_obj chantest;
+        struct range_obj range;
         struct lang_obj lang;
         struct mainconfig_obj mainconfig;
         struct mainlayout_obj mainlayout;
@@ -347,7 +352,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
-
+        
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;
         struct advmixer_obj advmixer;
