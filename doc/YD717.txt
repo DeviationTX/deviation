@@ -1,6 +1,8 @@
 YD717 protocol    2014 Jan 19
 
-Other names: Sky-botz UFO Mini
+The YD717 is also sold as the Sky-botz UFO Mini. Slight variations of
+this protocol are used in models by Sky Walker, XinXun, Ni Hui, and
+Syma. These are supported in the source code as protocol options.
 
 These quads use the Beken BK2421 Transceiver chip.  It is compatible with
 the nRF24L01, with the addition of a special register set.
