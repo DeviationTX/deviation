@@ -50,7 +50,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
 
     box->x = x;
     box->y = y;
-    box->width = width - ARROW_WIDTH;
+    box->width = width;
     box->height = height;
 
     obj->Type = Scrollable;
@@ -171,7 +171,7 @@ static int adjust_row(guiScrollable_t *scrollable, int target_row, int offset)
     }
     if (offset <= 0 && first_row - height == target)
         first_row = target;
-    else if (height < 0)
+    else if (height < 0 && first_row < target)
         first_row++;
 
     //printf("First row %d -> %d \tcount %d\n", target_row, first_row, last_row - first_row);
@@ -198,14 +198,14 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     for(int y = scrollable->header.box.y, bottom = y + scrollable->header.box.height;
-        y < bottom && row < scrollable->item_count;
+        row < scrollable->item_count && rel_row < scrollable->max_visible_rows;
         row++, rel_row++)
     {
-        int num_rows = scrollable->size_cb ? scrollable->size_cb(row, scrollable->cb_data) : 1;
-        if (rel_row + num_rows > scrollable->max_visible_rows)
-            break;
         selectable = scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
-        y += scrollable->row_height * num_rows;
+        y += scrollable->row_height * (scrollable->size_cb ? 
+                                       scrollable->size_cb(row, scrollable->cb_data) : 1);
+        if (y > bottom + scrollable->row_height - 4)
+            break;  //is not selectable because it's not completely visible
 
         //maintain index of selected item
         if (offset < 0 && idx != -1) {
