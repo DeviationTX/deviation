@@ -516,24 +516,13 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
         {
             struct guiObject *obj = GUI_GetNextSelectable(objSELECTED);
             if (obj && obj != objSELECTED) {
-                if (objSELECTED)
-                    OBJ_SET_DIRTY(objSELECTED, 1);
-                objSELECTED = obj;
-                OBJ_SET_DIRTY(obj, 1);
-                if (select_notify)
-                    select_notify(obj);
+                GUI_SetSelected(obj);
                 return 1;
             }
         } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
             struct guiObject *obj = GUI_GetPrevSelectable(objSELECTED);
             if (obj && obj != objSELECTED) {
-                if (objSELECTED)
-                    OBJ_SET_DIRTY(objSELECTED, 1);
-                objSELECTED = obj;
-                OBJ_SET_DIRTY(obj, 1);
-                if (select_notify)
-                    select_notify(obj);
-                return 1;
+                GUI_SetSelected(obj);
             }
         } else if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             if (objDIALOG) {
@@ -607,16 +596,14 @@ guiObject_t *GUI_GetSelected()
 
 void GUI_SetSelected(guiObject_t *obj)
 {
-    if (obj == NULL) {
-        return;
+    if (obj && obj != objSELECTED) {
+        if (objSELECTED)
+            OBJ_SET_DIRTY(objSELECTED, 1);
+        objSELECTED = obj;
+        if(select_notify)
+            select_notify(obj);
+        OBJ_SET_DIRTY(obj, 1);
     }
-    if (objSELECTED != NULL && objSELECTED != obj) { // bug fix: should set old obj dirty as well
-        OBJ_SET_DIRTY(objSELECTED, 1);
-    }
-    objSELECTED = obj;
-    if(select_notify)
-        select_notify(obj);
-    OBJ_SET_DIRTY(obj, 1);
 }
 
 void GUI_SetSelectable(guiObject_t *obj, u8 selectable)
