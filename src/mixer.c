@@ -524,11 +524,11 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
     for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
         if (MIXER_SRC(mixer->src) && mixer->dest == ch) {
             found = 1;
-            if (MIXER_SRC(mixer->src) > NUM_INPUTS && MIXER_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
             } 
-            if (MIXER_SRC(mixer->sw) > NUM_INPUTS && MIXER_SRC(mixer->sw) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
             }
         }
     }
@@ -537,7 +537,7 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
 
 void fix_mixer_dependencies(unsigned mixer_count)
 {
-    unsigned dependencies[NUM_CHANNELS];
+    unsigned dependencies[NUM_SOURCES];
     unsigned placed[NUM_CHANNELS];
     unsigned pos = 0;
     unsigned last_count = 0;
