@@ -90,15 +90,12 @@ static void _show_simple()
 {
     GUI_SelectionNotify(NULL);
     GUI_Select1stSelectableObj(); // bug fix: muset reset to 1st selectable item, otherwise ,the focus will be wrong
-    /*
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
-                         2 * ITEM_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
-    */
+
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
-    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH,
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH,
                         left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
+
     // The following items are not draw in the logical view;
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
@@ -181,14 +178,9 @@ static void _show_complex(int page_change)
     if (page_change) {
         selection = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
     }
-    /*
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
-                         2 * ITEM_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
-    */
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
-    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH,
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH,
                         left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
 
     // The following items are not draw in the logical view;
@@ -319,14 +311,9 @@ static void _show_expo_dr()
 
     sync_mixers();
 
-    /*
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE + 1, LEFT_VIEW_WIDTH + ARROW_WIDTH, LCD_HEIGHT - ITEM_SPACE -1,
-                         ITEM_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
-    */
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
-    int scrollable_y = LCD_HEIGHT - left_side_num_elements * LINE_SPACE;
-    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, scrollable_y, LEFT_VIEW_WIDTH + ARROW_WIDTH, 
+    mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH, 
                         left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
     
     GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,

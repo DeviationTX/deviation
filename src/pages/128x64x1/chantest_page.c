@@ -80,7 +80,7 @@ static void _show_bar_page(int row)
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          view_height, (cp->num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     u8 w = 10;
-    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, 7, &DEFAULT_FONT, _page_cb, NULL, NULL);
+    GUI_CreateLabelBox(&gui->page, LCD_WIDTH -w, 0, w, HEADER_HEIGHT, &DEFAULT_FONT, _page_cb, NULL, NULL);
 }
 
 void PAGE_ChantestInit(int page)
