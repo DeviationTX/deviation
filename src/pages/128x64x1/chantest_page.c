@@ -89,7 +89,7 @@ void PAGE_ChantestInit(int page)
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Channel output"));
+    PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Mixer output"));
     cp->return_page = NULL;
     if (page > 0)
         cp->return_val = page;
