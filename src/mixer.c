@@ -519,16 +519,16 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
     unsigned found = 0;
     unsigned i;
     struct Mixer *mixer;
-    for (i = 0; i < NUM_CHANNELS; i++)
+    for (i = 0; i < NUM_SOURCES; i++)
         deps[i] = 0;
     for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
         if (MIXER_SRC(mixer->src) && mixer->dest == ch) {
             found = 1;
-            if (MIXER_SRC(mixer->src) > NUM_INPUTS && MIXER_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
             } 
-            if (MIXER_SRC(mixer->sw) > NUM_INPUTS && MIXER_SRC(mixer->sw) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
             }
         }
     }
@@ -537,8 +537,8 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
 
 void fix_mixer_dependencies(unsigned mixer_count)
 {
-    unsigned dependencies[NUM_CHANNELS];
-    unsigned placed[NUM_CHANNELS];
+    unsigned dependencies[NUM_SOURCES];
+    unsigned placed[NUM_SOURCES];
     unsigned pos = 0;
     unsigned last_count = 0;
     unsigned i;
@@ -550,7 +550,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
     memset(placed, 0, sizeof(placed));
     while(mixer_count || last_count != mixer_count) {
         last_count = mixer_count;
-        for (i = 0; i < NUM_CHANNELS; i++) {
+        for (i = 0; i < NUM_SOURCES; i++) {
             if (placed[i])
                 continue;
             if (! find_dependencies(i, dependencies)) {
@@ -560,7 +560,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
             unsigned ok = 1;
             unsigned j;
             // determine if all dependencies have been placed
-            for (j = 0; j < NUM_CHANNELS; j++) {
+            for (j = 0; j < NUM_SOURCES; j++) {
                 if (dependencies[i] && ! placed[i]) {
                     ok = 0;
                     break;
