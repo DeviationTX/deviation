@@ -146,14 +146,6 @@ void _write_8(s32 data)
     fwrite(x, 1, 1, fh);
     dlog_pos++;
 }
-void _write_16(s32 data)
-{
-    u8 x[2] = {(data & 0xff),
-               (data >> 8) & 0xff,
-              };
-    fwrite(x, 2, 1, fh);
-    dlog_pos+=2;
-}
 void _write_32(s32 data)
 {
     u8 x[4] = {(data & 0xff),
@@ -214,9 +206,9 @@ void DATALOG_Write()
                 val = -128;
             _write_8(val);
         } else if(i >= DLOG_TELEMETRY) {
-            _write_16(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
+            _write_32(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
         } else {
-            _write_16(TIMER_GetValue(i) / 1000);
+            _write_32(TIMER_GetValue(i) / 1000);
         }
     }
 }
