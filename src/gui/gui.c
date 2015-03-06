@@ -600,9 +600,9 @@ void GUI_SetSelected(guiObject_t *obj)
         if (objSELECTED)
             OBJ_SET_DIRTY(objSELECTED, 1);
         objSELECTED = obj;
-        OBJ_SET_DIRTY(obj, 1);
         if(select_notify)
             select_notify(obj);
+        OBJ_SET_DIRTY(obj, 1);
     }
 }
 
