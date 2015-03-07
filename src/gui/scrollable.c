@@ -198,7 +198,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     for(int y = scrollable->header.box.y, bottom = y + scrollable->header.box.height;
-        row < scrollable->item_count && rel_row < scrollable->max_visible_rows;
+        y < bottom && row < scrollable->item_count && rel_row < scrollable->max_visible_rows;
         row++, rel_row++)
     {
         selectable = scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
