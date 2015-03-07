@@ -157,14 +157,10 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (TELEMETRY_HasAlarm(ptr->source)) {
-            if ((CLOCK_getms() >> 7)%4==0)
-                font = &TELEM_ERR_FONT;
-            GUI_Redraw(&gui->value[i]);
+        if((TELEMETRY_HasAlarm(ptr->source) && (CLOCK_getms() >> 7)%4==0) || ! TELEMETRY_IsUpdated(ptr->source)) {
+            font = &TELEM_ERR_FONT;
         } else if (cur_val != last_val) {
             GUI_Redraw(&gui->value[i]);
-        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
-            font = &TELEM_ERR_FONT;
         }
         GUI_SetLabelDesc(&gui->value[i], font);
     }

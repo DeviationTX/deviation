@@ -76,7 +76,7 @@ struct telem_layout2 {
 const struct telem_layout devo_header_basic[] = {
         {TYPE_HEADER,  8, 35, TEMP_LABEL},
         {TYPE_HEADER, 48, 35, VOLT_LABEL},
-        {TYPE_HEADER, 88, 35, RPM_LABEL},
+        {TYPE_HEADER, 87, 35, RPM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -99,7 +99,7 @@ const struct telem_layout devo_layout_basic[] = {
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER,  8, 35, GPS_LABEL},
+        {TYPE_HEADER, 90, 35, GPS_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -120,7 +120,7 @@ const struct telem_layout devo_layout_gps[] = {
 };
 
 const struct telem_layout dsm_header_basic[] = {
-        {TYPE_HEADER,  8, 35, DSM_LABEL},
+        {TYPE_HEADER, 90, 35, DSM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -157,7 +157,7 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_INDEX | 0,  0, 8,  1},
     {TYPE_VALUE | 0,  8, 35, TELEM_FRSKY_TEMP1},
     {TYPE_VALUE | 0, 48, 35, TELEM_FRSKY_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_FRSKY_RPM},
+    {TYPE_VALUE | 0, 86, 35, TELEM_FRSKY_RPM},
     {TYPE_INDEX | 1,  0, 8,  2},
     {TYPE_VALUE | 1,  8, 35, TELEM_FRSKY_TEMP2},
     {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
@@ -255,20 +255,23 @@ static void _show_page()
 {
     const struct telem_layout2 *page = _get_telem_layout2();
     PAGE_RemoveAllObjects();
+    PAGE_ShowHeader(page->header==devo_header_basic ? "" : _tr("Telemetry monitor"));
     tp->font.font = TINY_FONT.font;
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
+    DEFAULT_FONT.style = LABEL_CENTER;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
-                           ptr->source == ARROW_LABEL ? &TINY_FONT : &DEFAULT_FONT,
+                           ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
+    DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+    DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
 
@@ -322,14 +325,10 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (TELEMETRY_HasAlarm(ptr->source)) {
-            if ((CLOCK_getms() >> 7)%4==0)
-                font = &TELEM_ERR_FONT;
-            GUI_Redraw(&gui->box[i]);
+        if((TELEMETRY_HasAlarm(ptr->source) && (CLOCK_getms() >> 7)%4==0) || ! TELEMETRY_IsUpdated(ptr->source)) {
+            font = &TELEM_ERR_FONT;
         } else if (cur_val != last_val) {
             GUI_Redraw(&gui->box[i]);
-        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
-            font = &TELEM_ERR_FONT;
         }
         GUI_SetLabelDesc(&gui->box[i], font);
     }

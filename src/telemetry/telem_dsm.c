@@ -109,6 +109,7 @@ s32 _dsm_value(struct Telemetry *_t, int idx)
         case TELEM_DSM_PBOX_ALARMC2:    return t->pbox.alarmc[idx - TELEM_DSM_PBOX_ALARMC1];
         case TELEM_DSM_AIRSPEED:        return t->sensors.airspeed;
         case TELEM_DSM_ALTITUDE:        return t->sensors.altitude;
+        case TELEM_DSM_ALTITUDE_MAX:    return t->sensors.altitudemax;
         case TELEM_DSM_GFORCE_X:        return t->gforce.x;
         case TELEM_DSM_GFORCE_Y:        return t->gforce.y;
         case TELEM_DSM_GFORCE_Z:        return t->gforce.z;
@@ -123,9 +124,39 @@ s32 _dsm_value(struct Telemetry *_t, int idx)
         case TELEM_DSM_JETCAT_RPM:      return t->jetcat.rpm;
         case TELEM_DSM_JETCAT_TEMPEGT:  return t->jetcat.temp_egt;
         case TELEM_DSM_JETCAT_OFFCOND:  return t->jetcat.offcond;
+        case TELEM_DSM_RXPCAP_AMPS:     return t->rxpcap.amps;
+        case TELEM_DSM_RXPCAP_CAPACITY: return t->rxpcap.capacity;
+        case TELEM_DSM_RXPCAP_VOLT:     return t->rxpcap.volt;
+        case TELEM_DSM_FPCAP_AMPS:      return t->fpcap.amps;
+        case TELEM_DSM_FPCAP_CAPACITY:  return t->fpcap.capacity;
+        case TELEM_DSM_FPCAP_TEMP:      return t->fpcap.temp;
+        case TELEM_DSM_VARIO_ALTITUDE:  return t->variometer.altitude;
+        case TELEM_DSM_VARIO_CLIMBRATE1:
+        case TELEM_DSM_VARIO_CLIMBRATE2:
+        case TELEM_DSM_VARIO_CLIMBRATE3:
+        case TELEM_DSM_VARIO_CLIMBRATE4:
+        case TELEM_DSM_VARIO_CLIMBRATE5:
+        case TELEM_DSM_VARIO_CLIMBRATE6:return t->variometer.climbrate[idx - TELEM_DSM_VARIO_CLIMBRATE1];
 #endif
         default:  return 999;
     }
+}
+
+s32 _dsm_rpm(u8 telem, s32 value)
+{
+    (void)telem;    //Might be useful to fetch gear_ratio setting.
+    if (value < 200)
+        return 0;
+    //In RPM (2 = number of poles)
+    //RPM = 120000000 / number_of_poles(2, 4, ... 32) / gear_ratio(0.01 - 30.99) / Telemetry.rpm[0];
+    //by default number_of_poles = 2, gear_ratio = 1.00
+    return 120000000 / 2 / value;
+}
+
+s32 _dsm_amps(s32 value)
+{
+    //1 unit is 0.196791A
+    return value * 196791 / 100000;
 }
 
 const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
@@ -136,18 +167,19 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_FLOG_FADESL:
         case TELEM_DSM_FLOG_FADESR:
         case TELEM_DSM_FLOG_FRAMELOSS:
-        case TELEM_DSM_FLOG_HOLDS:
-        case TELEM_DSM_FLOG_RPM1:       _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_FLOG_HOLDS:      _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_FLOG_RPM1:       _get_value_str(str, _dsm_rpm(telem, value), 0, '\0'); break;
         case TELEM_DSM_FLOG_VOLT1:
         case TELEM_DSM_FLOG_VOLT2:      _get_value_str(str, value, 2, 'V'); break;
-        case TELEM_DSM_FLOG_TEMP1:      _get_temp_str(str, value, 0); break;
+        case TELEM_DSM_FLOG_TEMP1:      _get_temp_str(str, value, 0, 'F'); break;
 #if HAS_DSM_EXTENDED_TELEMETRY
-        case TELEM_DSM_AMPS1:           _get_value_str(str, value, 1, 'A'); break;
-        case TELEM_DSM_ALTITUDE:        _get_value_str(str, value, 1, 'm'); break;
+        case TELEM_DSM_AMPS1:           _get_value_str(str, _dsm_amps(value), 1, 'A'); break;
+        case TELEM_DSM_ALTITUDE:        
+        case TELEM_DSM_ALTITUDE_MAX:    _get_altitude_str(str, value, 1, 'm'); break;
         case TELEM_DSM_AIRSPEED:
         case TELEM_DSM_PBOX_CAPACITY1:
-        case TELEM_DSM_PBOX_CAPACITY2:
-        case TELEM_DSM_JETCAT_RPM:      _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_PBOX_CAPACITY2:  _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_JETCAT_RPM:      _get_value_str(str, _dsm_rpm(telem, value), 0, '\0'); break;
         case TELEM_DSM_GFORCE_X:
         case TELEM_DSM_GFORCE_Y:
         case TELEM_DSM_GFORCE_Z:
@@ -164,9 +196,22 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_JETCAT_PACKVOLT:
         case TELEM_DSM_JETCAT_PUMPVOLT: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_DSM_JETCAT_THROTTLE: _get_value_str(str, value, 0, '%'); break;
-        case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0); break;
+        case TELEM_DSM_JETCAT_TEMPEGT:  _get_temp_str(str, value, 0, 'F'); break;
         case TELEM_DSM_JETCAT_STATUS:   strcpy(str, _dsm_jetcat_status(value)); break;
         case TELEM_DSM_JETCAT_OFFCOND:  strcpy(str, _dsm_jetcat_offcond(value)); break;
+        case TELEM_DSM_RXPCAP_AMPS:     _get_value_str(str, value, 2, 'A'); break;
+        case TELEM_DSM_RXPCAP_CAPACITY: _get_value_str(str, value, 1, '\0'); break;
+        case TELEM_DSM_RXPCAP_VOLT:     _get_value_str(str, value, 2, 'V'); break;
+        case TELEM_DSM_FPCAP_AMPS:      _get_value_str(str, value, 1, 'A'); break;
+        case TELEM_DSM_FPCAP_CAPACITY:  _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_DSM_FPCAP_TEMP:      _get_temp_str(str, value, 1, 'F'); break;
+        case TELEM_DSM_VARIO_ALTITUDE:
+        case TELEM_DSM_VARIO_CLIMBRATE1:
+        case TELEM_DSM_VARIO_CLIMBRATE2:
+        case TELEM_DSM_VARIO_CLIMBRATE3:
+        case TELEM_DSM_VARIO_CLIMBRATE4:
+        case TELEM_DSM_VARIO_CLIMBRATE5:
+        case TELEM_DSM_VARIO_CLIMBRATE6:_get_altitude_str(str, value, 1, 'm'); break;
 #endif
         default:
             return "";
@@ -198,6 +243,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_PBOX_ALARMC2:    sprintf(str, "%s%d", _tr("AlarmC"), telem - TELEM_DSM_PBOX_ALARMC1 + 1); break;
         case TELEM_DSM_AIRSPEED:        strcpy(str, _tr("AirSpeed")); break;
         case TELEM_DSM_ALTITUDE:        strcpy(str, _tr("Altitude")); break;
+        case TELEM_DSM_ALTITUDE_MAX:    strcpy(str, _tr("Alti-max")); break;
         case TELEM_DSM_GFORCE_X:        strcpy(str, "g -> X"); break;
         case TELEM_DSM_GFORCE_Y:        strcpy(str, "g -> Y"); break;
         case TELEM_DSM_GFORCE_Z:        strcpy(str, "g -> Z"); break;
@@ -212,6 +258,19 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_JETCAT_RPM:      strcpy(str, _tr("RPM")); break;
         case TELEM_DSM_JETCAT_TEMPEGT:  strcpy(str, _tr("TempEGT")); break;
         case TELEM_DSM_JETCAT_OFFCOND:  strcpy(str, _tr("Offcond")); break;
+        case TELEM_DSM_RXPCAP_AMPS:     sprintf(str, "%s%s", _tr("RxPc"), _tr("Amps")); break;
+        case TELEM_DSM_RXPCAP_CAPACITY: sprintf(str, "%s%s mAh", _tr("RxPc"), _tr("Bat")); break;
+        case TELEM_DSM_RXPCAP_VOLT:     sprintf(str, "%s%s", _tr("RxPc"), _tr("Volt")); break;
+        case TELEM_DSM_FPCAP_AMPS:      sprintf(str, "%s%s", _tr("FlPc"), _tr("Amps")); break;
+        case TELEM_DSM_FPCAP_CAPACITY:  sprintf(str, "%s%s mAh", _tr("FlPc"), _tr("Bat")); break;
+        case TELEM_DSM_FPCAP_TEMP:      sprintf(str, "%s%s", _tr("FlPc"), _tr("Temp")); break;
+        case TELEM_DSM_VARIO_ALTITUDE:  strcpy(str, _tr("VarioAlt")); break;
+        case TELEM_DSM_VARIO_CLIMBRATE1:
+        case TELEM_DSM_VARIO_CLIMBRATE2:
+        case TELEM_DSM_VARIO_CLIMBRATE3:
+        case TELEM_DSM_VARIO_CLIMBRATE4:
+        case TELEM_DSM_VARIO_CLIMBRATE5:
+        case TELEM_DSM_VARIO_CLIMBRATE6:sprintf(str, "%s%d", _tr("VarioCR"), telem - TELEM_DSM_VARIO_CLIMBRATE1 + 1); break;
 #endif
         default:
             return "";
@@ -223,10 +282,8 @@ static const char * _dsm_short_name(char *str, u8 telem)
 {
     switch(telem) {
         case 0: strcpy(str, _tr("None")); break;
-        case TELEM_DSM_FLOG_VOLT1:
-        case TELEM_DSM_FLOG_VOLT2:
-            sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_DSM_FLOG_VOLT1 + 1);
-            break;
+        case TELEM_DSM_FLOG_VOLT1: strcpy(str, _tr("RxV")); break;
+        case TELEM_DSM_FLOG_VOLT2: strcpy(str, _tr("Bat")); break;
         case TELEM_DSM_FLOG_RPM1:  strcpy(str, _tr("RPM")); break;
         case TELEM_DSM_FLOG_TEMP1: strcpy(str, _tr("Temp")); break;
         default: return _dsm_name(str, telem);
@@ -246,19 +303,33 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_TEMP1:      return 538;
         case TELEM_DSM_FLOG_VOLT1:
         case TELEM_DSM_FLOG_VOLT2:      return 6000;
-        case TELEM_DSM_FLOG_RPM1:       return 65500;
+        case TELEM_DSM_FLOG_RPM1:       return 65000;
 #if HAS_DSM_EXTENDED_TELEMETRY
-        case TELEM_DSM_AMPS1:           return 999;
+        case TELEM_DSM_AMPS1:
+        case TELEM_DSM_RXPCAP_AMPS:
+        case TELEM_DSM_FPCAP_AMPS:
+        case TELEM_DSM_FPCAP_TEMP:      return 999;
         case TELEM_DSM_PBOX_VOLT1:
-        case TELEM_DSM_PBOX_VOLT2:      return 6000;
+        case TELEM_DSM_PBOX_VOLT2:
+        case TELEM_DSM_RXPCAP_VOLT:     return 6000;
         case TELEM_DSM_PBOX_CAPACITY1:
-        case TELEM_DSM_PBOX_CAPACITY2:  return 65000;
+        case TELEM_DSM_PBOX_CAPACITY2:
+        case TELEM_DSM_RXPCAP_CAPACITY:
+        case TELEM_DSM_FPCAP_CAPACITY:  return 65000;
         case TELEM_DSM_PBOX_ALARMV1:
         case TELEM_DSM_PBOX_ALARMV2:
         case TELEM_DSM_PBOX_ALARMC1:
         case TELEM_DSM_PBOX_ALARMC2:    return 1;
         case TELEM_DSM_AIRSPEED:        return 9999;
-        case TELEM_DSM_ALTITUDE:        return 65000;
+        case TELEM_DSM_ALTITUDE:
+        case TELEM_DSM_ALTITUDE_MAX:
+        case TELEM_DSM_VARIO_ALTITUDE:  return 65000;
+        case TELEM_DSM_VARIO_CLIMBRATE1:return 25;
+        case TELEM_DSM_VARIO_CLIMBRATE2:
+        case TELEM_DSM_VARIO_CLIMBRATE3:
+        case TELEM_DSM_VARIO_CLIMBRATE4:
+        case TELEM_DSM_VARIO_CLIMBRATE5:
+        case TELEM_DSM_VARIO_CLIMBRATE6:return (telem - TELEM_DSM_VARIO_CLIMBRATE1) * 50;
         case TELEM_DSM_GFORCE_X:
         case TELEM_DSM_GFORCE_Y:
         case TELEM_DSM_GFORCE_Z:
@@ -282,7 +353,10 @@ s32 _dsm_get_min_value(u8 telem)
         case TELEM_DSM_FLOG_TEMP1:      return -40;
         case TELEM_DSM_FLOG_RPM1:       return 200;
 #if HAS_DSM_EXTENDED_TELEMETRY
-        case TELEM_DSM_AMPS1:           return -999;
+        case TELEM_DSM_AMPS1:
+        case TELEM_DSM_FPCAP_AMPS:
+        case TELEM_DSM_RXPCAP_AMPS:     return -999;
+        case TELEM_DSM_FPCAP_TEMP:      return -400;
 #endif
         default: return 0;
     }

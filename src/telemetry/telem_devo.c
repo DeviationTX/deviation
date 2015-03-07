@@ -42,7 +42,7 @@ const char * _devo_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DEVO_TEMP1:
         case TELEM_DEVO_TEMP2:
         case TELEM_DEVO_TEMP3:
-        case TELEM_DEVO_TEMP4: _get_temp_str(str, value, 0); break;
+        case TELEM_DEVO_TEMP4: _get_temp_str(str, value, 0, 'C'); break;
         case TELEM_DEVO_RPM1:
         case TELEM_DEVO_RPM2:  _get_value_str(str, value, 0, '\0'); break;
         default:

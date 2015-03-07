@@ -254,10 +254,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               //TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
               break;
           case 0x11: //GPS Speed (whole number and sign) in Knots
-              Telemetry.gps.velocity = value *100;
+              Telemetry.gps.velocity = value * 100;
               break;
           case 0x19: //GPS Speed (fraction)
-              Telemetry.gps.velocity = (Telemetry.gps.velocity + value) * 514 / 100; //Convert 1/100 knot to mm/sec
+              Telemetry.gps.velocity = (Telemetry.gps.velocity + value) * 5556 / 1080; //Convert 1/100 knot to mm/sec
               TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
               break;
           case 0x12: //GPS Longitude (whole number) dddmm.mmmm

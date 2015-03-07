@@ -32,7 +32,7 @@ static u8 telem_state_check()
 static const char *telem_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    u32 val = (long)data;
+    s32 val = (long)data;
     return TELEMETRY_GetValueStr(tempstring, val);
 }
 

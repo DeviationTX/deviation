@@ -70,6 +70,7 @@ void CYRF_ConfigSOPCode(const u8 *sopcodes);
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);
 void CYRF_ReadDataPacket(u8 dpbuffer[]); 
+void CYRF_ReadDataPacket16(u16 dpbuffer[]);
 void CYRF_WriteDataPacket(const u8 dpbuffer[]);
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len);
 void CYRF_WriteRegister(u8 address, u8 data);

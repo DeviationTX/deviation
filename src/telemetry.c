@@ -19,7 +19,8 @@
 #include "telemetry.h"
 
 static void _get_value_str(char *str, s32 value, u8 decimals, char units);
-static void _get_temp_str(char *str, s32 value, u8 decimals);
+static void _get_temp_str(char *str, s32 value, u8 decimals, char units);
+static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
 #include "telemetry/telem_frsky.c"
@@ -34,15 +35,13 @@ static u8 alarm[TELEM_NUM_ALARMS] = {0};
 static u8 alarm_mute[TELEM_NUM_ALARMS] = {0};
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0};
 static u32 alarm_time = 0;
-static u8 last_updated[TELEM_UPDATE_SIZE] = {0};
+static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 last_time;
 #define CHECK_DURATION 500
 #define MUSIC_INTERVAL 2000 // DON'T need to play music in every 100ms
 
 void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
-    if (value == 0xffff)
-        value = 0;
     char format[] = "%0*d";
     format[2] = '1' + decimals;
     sprintf(str, format, value);
@@ -61,12 +60,30 @@ void _get_value_str(char *str, s32 value, u8 decimals, char units)
     str[len] = '\0';
 }
 
-void _get_temp_str(char *str, s32 value, u8 decimals)
+void _get_temp_str(char *str, s32 value, u8 decimals, char units)
 {
-    char units = 'C';
     if (Transmitter.telem & TELEMUNIT_FAREN) {
-        value = value ? (value * 9 + 160)/ 5 : 0;
-        units = 'F';
+        if (units != 'F') {
+            value = value ? (value * 9 + 160)/ 5 : 0;
+            units = 'F';
+        }
+    } else if (units == 'F') {
+        value = value ? (value - 32) * 5 / 9: 0; //Convert to degrees-C
+        units = 'C';
+    }
+    _get_value_str(str, value, decimals, units);
+}
+
+void _get_altitude_str(char *str, s32 value, u8 decimals, char units)
+{
+    if (Transmitter.telem & TELEMUNIT_FEET) {
+        if (units != '\'') {
+            value = value ? value * 328 / 100 : 0;
+            units = '\'';
+        }
+    } else if (units != 'm') {
+        value = value ? value * 100 / 328 : 0;
+        units = 'm';
     }
     _get_value_str(str, value, decimals, units);
 }
@@ -80,12 +97,13 @@ u32 TELEMETRY_IsUpdated(int val)
         }
         return 0;
     }
-    return (last_updated[val / 8] | Telemetry.updated[val / 8]) & (1 << val % 8);
+    return (last_updated[val/32] | Telemetry.updated[val/32]) & (1 << val % 32);
 }
 
 s32 TELEMETRY_GetValue(int idx)
 {
-    return _TELEMETRY_GetValue(&Telemetry, idx);
+    s32 value = _TELEMETRY_GetValue(&Telemetry, idx);
+    return (value==0xffff) ? 0 : value;
 }
 
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
@@ -240,7 +258,7 @@ s32 TELEMETRY_GetMinValue(unsigned telem)
 
 void TELEMETRY_SetUpdated(int telem)
 {
-    Telemetry.updated[telem/8] |= (1 << telem % 8);
+    Telemetry.updated[telem/32] |= (1 << telem % 32);
 }
 
 int TELEMETRY_Type()
@@ -297,8 +315,6 @@ void TELEMETRY_Alarm()
     // instead, check 1 of them at a time
     k = (k + 1) % TELEM_NUM_ALARMS;
     s32 value = TELEMETRY_GetValue( Model.telem_alarm[k] );
-    if (value == 0xffff)
-        return;
     if (value == 0 || ! Model.telem_alarm[k] || ! TELEMETRY_IsUpdated(0xff)) {
         // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
         alarm[k] = 0; // clear this set

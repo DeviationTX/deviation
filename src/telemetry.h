@@ -51,6 +51,7 @@ enum {
     TELEM_DSM_PBOX_ALARMC2,
     TELEM_DSM_AIRSPEED,
     TELEM_DSM_ALTITUDE,
+    TELEM_DSM_ALTITUDE_MAX,
     TELEM_DSM_GFORCE_X,
     TELEM_DSM_GFORCE_Y,
     TELEM_DSM_GFORCE_Z,
@@ -65,6 +66,19 @@ enum {
     TELEM_DSM_JETCAT_RPM,
     TELEM_DSM_JETCAT_TEMPEGT,
     TELEM_DSM_JETCAT_OFFCOND,
+    TELEM_DSM_RXPCAP_AMPS,
+    TELEM_DSM_RXPCAP_CAPACITY,
+    TELEM_DSM_RXPCAP_VOLT,
+    TELEM_DSM_FPCAP_AMPS,
+    TELEM_DSM_FPCAP_CAPACITY,
+    TELEM_DSM_FPCAP_TEMP,
+    TELEM_DSM_VARIO_ALTITUDE,
+    TELEM_DSM_VARIO_CLIMBRATE1,
+    TELEM_DSM_VARIO_CLIMBRATE2,
+    TELEM_DSM_VARIO_CLIMBRATE3,
+    TELEM_DSM_VARIO_CLIMBRATE4,
+    TELEM_DSM_VARIO_CLIMBRATE5,
+    TELEM_DSM_VARIO_CLIMBRATE6,
 #endif //HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_LAST,
 };
@@ -113,7 +127,7 @@ struct gps {
     s32 latitude;
     s32 longitude;
     s32 altitude;
-    s32 velocity;
+    u32 velocity;
     u32 time;
     u16 heading;
     u8 satcount;
@@ -144,6 +158,7 @@ struct telem_dsm_sensors {
     s16 amps;
     u16 airspeed;
     s16 altitude;
+    s16 altitudemax;
 };
 struct telem_dsm_gforce {
     s16 x;
@@ -163,6 +178,20 @@ struct telem_dsm_jetcat {
     u32 rpm;
     u16 temp_egt;
 };
+struct telem_dsm_rxpcap {
+    s16 amps;
+    u16 capacity;
+    u16 volt;
+};
+struct telem_dsm_fpcap {
+    s16 amps;
+    u16 capacity;
+    s16 temp;
+};
+struct telem_dsm_vario {
+    s16 altitude;
+    s16 climbrate[6];
+};
 
 struct telem_dsm {
     struct telem_dsm_flog    flog;
@@ -170,6 +199,9 @@ struct telem_dsm {
     struct telem_dsm_sensors sensors;
     struct telem_dsm_gforce  gforce;
     struct telem_dsm_jetcat  jetcat;
+    struct telem_dsm_rxpcap  rxpcap;
+    struct telem_dsm_fpcap   fpcap;
+    struct telem_dsm_vario   variometer;
 };
 
 struct telem_frsky {
@@ -181,7 +213,7 @@ struct telem_frsky {
     //u16 fuel;
 };
 
-#define TELEM_UPDATE_SIZE (((TELEM_VALS + 7)+ 7) / 8)
+#define TELEM_UPDATE_SIZE (((TELEM_VALS + 7) + 31) / 32)
 struct Telemetry {
     union {
         struct telem_devo  devo;
@@ -190,7 +222,7 @@ struct Telemetry {
     } p;
     struct gps gps;
     u16 capabilities;
-    volatile u8 updated[TELEM_UPDATE_SIZE];
+    volatile u32 updated[TELEM_UPDATE_SIZE];
 };
 
 enum {
