@@ -50,7 +50,7 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
 
     box->x = x;
     box->y = y;
-    box->width = width;
+    box->width = width - ARROW_WIDTH;
     box->height = height;
 
     obj->Type = Scrollable;
