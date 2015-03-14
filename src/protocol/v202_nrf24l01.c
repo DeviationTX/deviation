@@ -59,13 +59,18 @@
 
 
 enum {
+    // flags going to byte 14
     FLAG_CAMERA = 0x01, // also automatic Missile Launcher and Hoist in one direction
     FLAG_VIDEO  = 0x02, // also Sprayer, Bubbler, Missile Launcher(1), and Hoist in the other dir.
     FLAG_FLIP   = 0x04,
     FLAG_UNK9   = 0x08,
     FLAG_LED    = 0x10,
     FLAG_UNK10  = 0x20,
-    FLAG_BIND   = 0xC0
+    FLAG_BIND   = 0xC0,
+    // flags going to byte 10
+    FLAG_HEADLESS = 0x0200,
+    FLAG_HCAL_X   = 0x0800,
+    FLAG_HCAL_Y   = 0x2000
 };
 
 // For code readability
@@ -79,7 +84,8 @@ enum {
     CHANNEL7,
     CHANNEL8,
     CHANNEL9,
-    CHANNEL10
+    CHANNEL10,
+    CHANNEL11
 };
 
 #define PAYLOADSIZE 16
@@ -93,7 +99,8 @@ static u32 packet_counter;
 static u8 tx_power;
 //static u8 auto_flip; // Channel 6 <= 0 - disabled > 0 - enabled
 static u16 led_blink_count;
-static u8 throttle, rudder, elevator, aileron, flags;
+static u8  throttle, rudder, elevator, aileron;
+static u16 flags;
 
 
 //
@@ -106,14 +113,22 @@ enum {
     V202_DATA
 };
 
+//#define USE_BLINK_OPTION
+
 static const char * const v202_opts[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
-//  _tr_noop("Blink"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+#if defined(USE_BLINK_OPTION)
+  _tr_noop("Blink"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+#endif
+  _tr_noop("250kbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   NULL
 };
 enum {
     PROTOOPTS_STARTBIND = 0,
+#if defined(USE_BLINK_OPTION)
     PROTOOPTS_USEBLINK,
+#endif
+    PROTOOPTS_BITRATE,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -122,9 +137,15 @@ enum {
     STARTBIND_NO  = 0,
     STARTBIND_YES = 1,
 };
+#if defined(USE_BLINK_OPTION)
 enum {
     USEBLINK_NO  = 0,
     USEBLINK_YES = 1,
+};
+#endif
+enum {
+    BITRATE_1MBPS   = 0,
+    BITRATE_250KBPS = 1
 };
 
 // static u32 bind_count;
@@ -181,7 +202,7 @@ static void v202_init()
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xFF); // 4ms retransmit t/o, 15 tries
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x08);      // Channel 8
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);                          // 1Mbps
+    NRF24L01_SetBitrate(Model.proto_opts[PROTOOPTS_BITRATE] == BITRATE_250KBPS ? NRF24L01_BR_250K: NRF24L01_BR_1M);
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
 //    NRF24L01_WriteReg(NRF24L01_08_OBSERVE_TX, 0x00); // no write bits in this field
@@ -296,7 +317,7 @@ static u8 convert_channel(u8 num)
 
 
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
-                          u8* flags, u16* led_blink_count)
+                          u16* flags, u16* led_blink_count)
 {
     // Protocol is registered AETRG, that is
     // Aileron is channel 0, Elevator - 1, Throttle - 2, Rudder - 3
@@ -330,13 +351,23 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     } else if (ch == CHAN_MAX_VALUE) {
         new_led_blink_count = BLINK_COUNT_MIN - 1;
     } else {
-        new_led_blink_count = (BLINK_COUNT_MAX+BLINK_COUNT_MIN)/2 -
-            ((s32) Channels[CHANNEL5] * (BLINK_COUNT_MAX-BLINK_COUNT_MIN) / (2*CHAN_MAX_VALUE));
+#if defined(USE_BLINK_OPTION)
+        if (Model.proto_opts[PROTOOPTS_USEBLINK] == USEBLINK_YES) {
+#endif
+            new_led_blink_count = (BLINK_COUNT_MAX+BLINK_COUNT_MIN)/2 -
+                ((s32) Channels[CHANNEL5] * (BLINK_COUNT_MAX-BLINK_COUNT_MIN) / (2*CHAN_MAX_VALUE));
+#if defined(USE_BLINK_OPTION)
+        } else {
+            new_led_blink_count = ch <=0 ? BLINK_COUNT_MAX + 1 : BLINK_COUNT_MIN - 1;
+        }
+#endif
     }
     if (*led_blink_count != new_led_blink_count) {
         if (counter > new_led_blink_count) counter = new_led_blink_count;
         *led_blink_count = new_led_blink_count;
     }
+
+    int num_channels = Model.num_channels;
 
 
     // Channel 6
@@ -344,20 +375,24 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     else *flags |= FLAG_FLIP;
 
     // Channel 7
-    if (Channels[CHANNEL7] <= 0) *flags &= ~FLAG_CAMERA;
+    if (num_channels < 7 || Channels[CHANNEL7] <= 0) *flags &= ~FLAG_CAMERA;
     else *flags |= FLAG_CAMERA;
 
     // Channel 8
-    if (Channels[CHANNEL8] <= 0) *flags &= ~FLAG_VIDEO;
+    if (num_channels < 8 || Channels[CHANNEL8] <= 0) *flags &= ~FLAG_VIDEO;
     else *flags |= FLAG_VIDEO;
 
     // Channel 9
-    if (Channels[CHANNEL9] <= 0) *flags &= ~FLAG_UNK9;
-    else *flags |= FLAG_UNK9;
+    if (num_channels < 9 || Channels[CHANNEL9] <= 0) *flags &= ~FLAG_HEADLESS;
+    else *flags |= FLAG_HEADLESS;
 
     // Channel 10
-    if (Channels[CHANNEL10] <= 0) *flags &= ~FLAG_UNK10;
-    else *flags |= FLAG_UNK10;
+    if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_HCAL_X;
+    else *flags |= FLAG_HCAL_X;
+
+    // Channel 10
+    if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_HCAL_Y;
+    else *flags |= FLAG_HCAL_Y;
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
@@ -400,12 +435,12 @@ static void send_packet(u8 bind)
     packet[8] = tx_id[1];
     packet[9] = tx_id[2];
     // empty
-    packet[10] = 0x00;
+    packet[10] = flags >> 8;
     packet[11] = 0x00;
     packet[12] = 0x00;
     packet[13] = 0x00;
     //
-    packet[14] = flags;
+    packet[14] = flags & 0xff;
     add_pkt_checksum();
 
     packet_sent = 0;
@@ -557,7 +592,7 @@ const void *V202_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L; // T, R, E, A, LED (on/off/blink), Auto flip, 4 unknown flags
+        case PROTOCMD_NUMCHAN: return (void *) 11L; // T, R, E, A, LED (on/off/blink), Auto flip, camera, video, headless, X-Y calibration
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
