@@ -117,18 +117,18 @@ enum {
 
 static const char * const v202_opts[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+  _tr_noop("250kbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
 #if defined(USE_BLINK_OPTION)
   _tr_noop("Blink"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
 #endif
-  _tr_noop("250kbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   NULL
 };
 enum {
     PROTOOPTS_STARTBIND = 0,
+    PROTOOPTS_BITRATE,
 #if defined(USE_BLINK_OPTION)
     PROTOOPTS_USEBLINK,
 #endif
-    PROTOOPTS_BITRATE,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -137,16 +137,16 @@ enum {
     STARTBIND_NO  = 0,
     STARTBIND_YES = 1,
 };
+enum {
+    BITRATE_1MBPS   = 0,
+    BITRATE_250KBPS = 1
+};
 #if defined(USE_BLINK_OPTION)
 enum {
     USEBLINK_NO  = 0,
     USEBLINK_YES = 1,
 };
 #endif
-enum {
-    BITRATE_1MBPS   = 0,
-    BITRATE_250KBPS = 1
-};
 
 // static u32 bind_count;
 
