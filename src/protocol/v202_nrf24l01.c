@@ -68,9 +68,9 @@ enum {
     FLAG_UNK10  = 0x20,
     FLAG_BIND   = 0xC0,
     // flags going to byte 10
-    FLAG_HEADLESS = 0x0200,
-    FLAG_HCAL_X   = 0x0800,
-    FLAG_HCAL_Y   = 0x2000
+    FLAG_HEADLESS  = 0x0200,
+    FLAG_MAG_CAL_X = 0x0800,
+    FLAG_MAG_CAL_Y = 0x2000
 };
 
 // For code readability
@@ -387,12 +387,12 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
     else *flags |= FLAG_HEADLESS;
 
     // Channel 10
-    if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_HCAL_X;
-    else *flags |= FLAG_HCAL_X;
+    if (num_channels < 10 || Channels[CHANNEL10] <= 0) *flags &= ~FLAG_MAG_CAL_X;
+    else *flags |= FLAG_MAG_CAL_X;
 
     // Channel 10
-    if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_HCAL_Y;
-    else *flags |= FLAG_HCAL_Y;
+    if (num_channels < 11 || Channels[CHANNEL11] <= 0) *flags &= ~FLAG_MAG_CAL_Y;
+    else *flags |= FLAG_MAG_CAL_Y;
 
     // Print channels every second or so
     if ((packet_counter & 0xFF) == 1) {
