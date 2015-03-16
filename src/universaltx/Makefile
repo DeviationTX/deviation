@@ -17,6 +17,7 @@ SRC_C = universaltx.c  \
         utx_pactl.c    \
         utx_power.c    \
         utx_ppmin.c    \
+        utx_protocol.c \
         utx_protospi.c \
         utx_syscalls.c \
         utx_clock.c    \

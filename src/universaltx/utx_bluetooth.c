@@ -28,6 +28,9 @@
 volatile char *ptr;
 volatile char bt_buf[20];
 u8 state;
+/* FIXME */
+const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
+     { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
 static inline void BT_ResetPtr()
 {
@@ -115,34 +118,63 @@ void BT_HandleInput()
         memcpy(tmp, (char *)bt_buf, len);
         tmp[len] = 0;
         BT_ResetPtr();
-        if(strncmp(tmp, "TXCH ", 5) == 0) {
-            int val;
-            if(tmp[6] == '\r') {
-                val = tmp[5] - '0';
-            } else if(tmp[7] == '\r') {
-                val = (tmp[5] - '0') * 10 + (tmp[6] - '0');
-            } else {
-                printf("Unknown CH: %s\n", tmp);
-                return;
+        //char *proto = ProtocolNames[Model.protocol];
+        //int protolen = strlen(proto);
+        //if(memcmp(tmp, proto, protolen) == 0 && tmp[protolen] ==':') {
+        if(strncmp(tmp, "SPV:", 4) == 0) {
+            char *valptr;
+            int idx = strtol(tmp+4, &valptr, 10);
+            if (valptr && valptr[0] == ':' && idx < NUM_PROTO_OPTS) {
+                int val = strtol(valptr+1, &valptr, 10);
+                if(valptr != NULL) {
+                    const char **proto_strs = PROTOCOL_GetOptions();
+                    int protoidx = 0;
+                    int pos = 0;
+                    while(protoidx < NUM_PROTO_OPTS) {
+                        if(proto_strs[pos] == NULL)
+                            break;
+                        if (idx == protoidx) {
+                            Model.proto_opts[idx] = val;
+                            printf("Set prototocol option '%s' to %d\n", proto_strs[pos], val);
+                            return;
+                        }
+                        while(proto_strs[++pos])
+                            ;
+                        pos++;
+                        protoidx++;
+                    }
+                }
             }
-            Model.proto_opts[2] = val; //RF Channel
-            TESTRF_Cmds(PROTOCMD_INIT);
+            printf("Couldn't parse SPV command: %s\n", tmp+4);
             return;
         }
-        if(strncmp(tmp, "TXPWR ", 6) == 0) {
-            int val;
-            if(tmp[7] == '\r') {
-                val = tmp[6] - '0';
+        if(strncmp(tmp, "STP:", 4) == 0) {
+            unsigned val;
+            if(tmp[5] == '\r') {
+                val = tmp[4] - '0';
             } else {
                 printf("Unknown POWER: %s\n", tmp);
                 return;
             }
-            printf("Changed TX Power to: %d\n", val);
-            Model.proto_opts[1] = val; //RF Channel
+            if (val < TXPOWER_LAST) {
+                printf("Changed TX Power to: %s\n", RADIO_TX_POWER_VAL[val]);
+                Model.tx_power = val; //RF Channel
+            } else {
+                printf("Requested power values is outside range: %d > %d\n", val, TXPOWER_LAST-1);
+            }
             return;
         }
-        if(strcmp(tmp, "PROTOCOL\r") == 0) {
-            printf("PROTOCOL Cmd\n");
+        if(strncmp(tmp, "SCP:", 4) == 0) {
+            tmp[len-1] = 0;
+            for (int i = 0; i < PROTOCOL_COUNT; i++) {
+                if (strcmp(tmp+4, ProtocolNames[i]) == 0) {
+                    Model.protocol = i;
+                    printf("Changed protocol to: %s\n", ProtocolNames[i]);
+                    return;
+                }
+            }
+            printf("Could not chnage protocol to: '%s'\n", tmp+4);
+            return;
         }
     }
 }

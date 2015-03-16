@@ -74,10 +74,10 @@ void PACTL_SetTxRxMode(int mode)
     if (Model.module != last_module) {
         last_module = Model.module;
         switch (last_module) {
-            case CYRF6936: /* Port 0 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-            case CC2500:   /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+            case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+            case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
             case NRF24L01: /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-            case A7105:    /* Port 3 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+            case A7105:    /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
         }
     }
     if (Model.module == NRF24L01) {

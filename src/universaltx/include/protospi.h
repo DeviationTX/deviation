@@ -16,4 +16,6 @@ uint8_t spi_xfer8(uint32_t spi, uint8_t data);
 #define _NOP()  asm volatile ("nop")
 
 #define MODULE_ENABLE module_enable
+#define CE_lo() PROTOSPI_pin_clear(NRF24L01_CE)
+#define CE_hi() PROTOSPI_pin_set(NRF24L01_CE)
 #endif // _SPIPROTO_H_

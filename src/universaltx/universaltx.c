@@ -46,7 +46,7 @@ int main(void)
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
     //BT_Test();        
     printf("Done\n");
-    Model.proto_opts[0] = 0; //Radio => CYRF6936
+    Model.proto_opts[0] = 3; //Radio => CYRF6936
     Model.proto_opts[1] = 7; //Tx Power => 0
     Model.proto_opts[2] = 20; //RF Channel => 1
     Model.proto_opts[3] = 10; //Rate(ms) => 20
@@ -58,7 +58,7 @@ int main(void)
             priority_ready = 0;
             BT_HandleInput();
             i = (i + 1) & 0xFF;
-            if(i == 0) {
+            if(0 && i == 0) {
                 Model.proto_opts[0] = (Model.proto_opts[0] + 1) % 4;
                 TESTRF_Cmds(PROTOCMD_INIT);
             }

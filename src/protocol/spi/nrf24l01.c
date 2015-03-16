@@ -220,12 +220,15 @@ u8 NRF24L01_SetPower(u8 power)
     rf_setup = (rf_setup & 0xF9) | ((nrf_power & 0x03) << 1);
     return NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, rf_setup);
 }
+#ifndef CE_lo
 static void CE_lo()
 {
 #if HAS_MULTIMOD_SUPPORT
     PROTOCOL_SetSwitch(NRF24L01);
 #endif
 }
+#endif
+#ifndef CE_hi
 static void CE_hi()
 {
 #if HAS_MULTIMOD_SUPPORT
@@ -234,7 +237,7 @@ static void CE_hi()
     SPI_ConfigSwitch(en | 0x0f, en | (0x0f ^ csn));
 #endif
 }
-
+#endif
 void NRF24L01_SetTxRxMode(enum TXRX_State mode)
 {
     if(mode == TX_EN) {
@@ -276,6 +279,7 @@ int NRF24L01_Reset()
     u8 status1 = Strobe(NOP);
     u8 status2 = NRF24L01_ReadReg(0x07);
     NRF24L01_SetTxRxMode(TXRX_OFF);
+    return 1;
     return (status1 == status2 && (status1 & 0x0f) == 0x0e);
 }
 #endif // defined(PROTO_HAS_NRF24L01)

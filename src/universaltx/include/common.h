@@ -43,6 +43,7 @@ enum Protocols {
     PROTOCOL_COUNT,
 };
 #undef PROTODEF
+extern const char * const ProtocolNames[PROTOCOL_COUNT];
 
 enum TxPower {
     TXPOWER_100uW,
@@ -75,6 +76,7 @@ u8 SPI_ReadRegister(u8 address);
 */
 
 void PROTOCOL_SetBindState(int i);
+const char **PROTOCOL_GetOptions();
 void CLOCK_StopTimer();
 void CLOCK_StartTimer(unsigned t, u16 (*_cmd)());
 void CLOCK_ResetWatchdog();
