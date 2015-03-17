@@ -38,7 +38,10 @@ enum {
     A7105,
     CC2500,
     NRF24L01,
+#if HAS_MULTIMOD_SUPPORT
     MULTIMOD,
+    MULTIMODCTL,
+#endif
     TX_MODULE_LAST,
 };
 
@@ -187,6 +190,7 @@ void SPI_ProtoInit();
 void SPI_AVRProgramInit();
 int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
 int SPI_ProtoGetPinConfig(int module, int state);
+void SPI_ProtoCSN(int module, int set);
 u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);

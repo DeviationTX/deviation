@@ -32,35 +32,11 @@
 
 #define Delay usleep
 static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[CYRF6936]);
+    SPI_ProtoCSN(CYRF6936, 1);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[CYRF6936]);
+    SPI_ProtoCSN(CYRF6936, 0);
 }
 
 void CYRF_WriteRegister(u8 address, u8 data)
@@ -181,12 +157,15 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
     //Set the post tx/rx state
     CYRF_WriteRegister(0x0F, mode == TX_EN ? 0x2C : 0x28);
-#if UNIVERSAL_TX
-    PACTL_SetTxRxMode(mode);
-    return;
-#endif
 #if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
+    if(MODULE_ENABLE[MULTIMOD].port && SPI_ProtoGetPinConfig(CYRF6936, PACTL_PIN)) {
+        // Special case to setup the PA on the UniversalTX board
+        SPI_ConfigSwitch(0xf0 | mode, 0xf0 | mode);
+        return;
+    }
+#endif 
+#if HAS_MULTIMOD_SUPPORT
+    if (MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
             AWA24S_SetTxRxMode(mode);
             return;

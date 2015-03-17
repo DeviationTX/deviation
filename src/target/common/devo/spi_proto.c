@@ -26,39 +26,54 @@
 #include "devo.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
+#include "protospi.h"
 #include <stdlib.h>
+
+static const struct mcu_pin SCK  = {GPIOB, GPIO13};
+static const struct mcu_pin MOSI = {GPIOB, GPIO15};
+static const struct mcu_pin MISO = {GPIOB, GPIO14};
+static const struct mcu_pin CYRF_RESET = {GPIOB, GPIO11};
 
 #if HAS_MULTIMOD_SUPPORT
 int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
 {
     int i;
+    int byte1, byte2;
     //Switch output on clock before switching off SPI
     //Otherwise the pin will float which could cause a false trigger
     //SCK is now on output
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-    spi_disable(SPI2);
-    for(i = 0; i < 100; i++)
-        asm volatile ("nop");
-    gpio_set(GPIOB, GPIO13);
-    for(i = 0; i < 100; i++)
-        asm volatile ("nop");
-    gpio_clear(GPIOB, GPIO13);
-    //Switch back to SPI
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
-    spi_enable(SPI2);
-    //Finally ready to send a command
-    
-    int byte1 = spi_xfer(SPI2, csn_high); //Set all other pins high
-    int byte2 = spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
-    for(i = 0; i < 100; i++)
-        asm volatile ("nop");
-    //Reset transfer speed
-    spi_disable(SPI2);
-    spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
-    spi_enable(SPI2);
+    if (! Transmitter.module_enable[MULTIMODCTL].port) {
+        gpio_set_mode(SCK.port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_PUSHPULL, SCK.pin);
+        spi_disable(SPI2);
+        for(i = 0; i < 100; i++)
+            asm volatile ("nop");
+        gpio_set(SCK.port, SCK.pin);
+        for(i = 0; i < 100; i++)
+            asm volatile ("nop");
+        gpio_clear(SCK.port, SCK.pin);
+        //Switch back to SPI
+        gpio_set_mode(SCK.port, GPIO_MODE_OUTPUT_50_MHZ,
+                      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SCK.pin);
+        spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
+        spi_enable(SPI2);
+        //Finally ready to send a command
+        
+        byte1 = spi_xfer(SPI2, csn_high); //Set all other pins high
+        byte2 = spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
+        for(i = 0; i < 100; i++)
+            asm volatile ("nop");
+        //Reset transfer speed
+        spi_disable(SPI2);
+        spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
+        spi_enable(SPI2);
+    } else {
+        //UniversalTx
+        gpio_clear(Transmitter.module_enable[MULTIMODCTL].port, Transmitter.module_enable[MULTIMODCTL].pin);
+        byte1 = spi_xfer(SPI2, csn_high); //Set all other pins high
+        byte2 = spi_xfer(SPI2, csn_low); //Toggle related pin with CSN
+        gpio_set(Transmitter.module_enable[MULTIMODCTL].port, Transmitter.module_enable[MULTIMODCTL].pin);
+    }
     return byte1 == 0xa5 ? byte2 : 0;
 }
 
@@ -76,6 +91,12 @@ int SPI_ProtoGetPinConfig(int module, int state) {
     if(state == DISABLED_PIN) {
         return 0;
     }
+    if(state == PACTL_PIN) {
+        return (Transmitter.module_enable[MULTIMODCTL].port) ? 1 : 0;
+    }
+    if(state == SPI4WIRE_PIN) {
+        return (module != A7105 || Transmitter.module_enable[MULTIMODCTL].port) ? 1 : 0;
+    }
     /*
     if(state == RESET_PIN) {
         if (module == CYRF6936)
@@ -87,6 +108,31 @@ int SPI_ProtoGetPinConfig(int module, int state) {
 }
 #endif
 
+void SPI_ProtoCSN(int module, int set)
+{
+#if HAS_MULTIMOD_SUPPORT
+    if (MODULE_ENABLE[MULTIMOD].port && ! MODULE_ENABLE[MULTIMODCTL].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        if (set) {
+            PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
+        } else {
+            PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
+        }
+        if(MODULE_ENABLE[module].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
+    }
+#endif
+    if (set) {
+        PROTOSPI_pin_set(MODULE_ENABLE[module]);
+    } else {
+        PROTOSPI_pin_clear(MODULE_ENABLE[module]);
+    }
+}
+
 void SPI_ProtoInit()
 {
     /* Enable SPI2 */
@@ -97,17 +143,17 @@ void SPI_ProtoInit()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
 
     /* SCK, MOSI */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO13 | GPIO15);
+    gpio_set_mode(SCK.port, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, SCK.pin | MOSI.pin);
     /* MISO */
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOAT, GPIO14);
+    gpio_set_mode(MISO.port, GPIO_MODE_INPUT,
+                  GPIO_CNF_INPUT_FLOAT, MISO.pin);
 
     /*CYRF cfg */
     /* Reset and CS */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
-    gpio_clear(GPIOB, GPIO11);
+    gpio_set_mode(CYRF_RESET.port, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, CYRF_RESET.pin);
+    gpio_clear(CYRF_RESET.port, CYRF_RESET.pin);
 
 #if 0 //In power.c
     //Disable JTAG and SWD and set both pins high
@@ -119,17 +165,7 @@ void SPI_ProtoInit()
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
     gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 #endif
-
-#if HAS_MULTIMOD_SUPPORT
-    if(Transmitter.module_enable[MULTIMOD].port) {
-        struct mcu_pin *port = &Transmitter.module_enable[MULTIMOD];
-        printf("Switch port: %08x pin: %04x\n", port->port, port->pin);
-        gpio_set_mode(port->port, GPIO_MODE_OUTPUT_50_MHZ,
-                  GPIO_CNF_OUTPUT_PUSHPULL, port->pin);
-        gpio_set(port->port, port->pin);
-    }
-#endif //HAS_MULTIMOD_SUPPORT
-    for (int i = 0; i < MULTIMOD; i++) {
+    for (int i = 0; i < TX_MODULE_LAST; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
         {

@@ -27,6 +27,8 @@ enum PinConfigState {
     ENABLED_PIN,
     DISABLED_PIN,
     RESET_PIN,
+    PACTL_PIN,
+    SPI4WIRE_PIN,
 };
 #ifndef MODULAR
 #define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);

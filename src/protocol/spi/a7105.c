@@ -26,35 +26,11 @@
 #ifdef PROTO_HAS_A7105
 
 static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[A7105].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[A7105]);
+    SPI_ProtoCSN(A7105, 1);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[A7105].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[A7105]);
+    SPI_ProtoCSN(A7105, 0);
 }
 
 void A7105_WriteReg(u8 address, u8 data)
@@ -71,7 +47,14 @@ u8 A7105_ReadReg(u8 address)
     CS_LO();
     PROTOSPI_xfer(0x40 | address);
     /* Wait for tx completion before spi shutdown */
-    data = PROTOSPI_read3wire();
+#if HAS_MULTIMOD_SUPPORT
+    if(SPI_ProtoGetPinConfig(A7105, SPI4WIRE_PIN)) {
+        data = PROTOSPI_xfer(0);
+    } else
+#endif
+    {
+        data = PROTOSPI_read3wire();
+    }
     CS_HI();
     return data;
 }
@@ -105,11 +88,14 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
  */
 void A7105_SetTxRxMode(enum TXRX_State mode)
 {
-#if UNIVERSAL_TX
-    A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
-    PACTL_SetTxRxMode(mode);
-    return;
-#else
+#if HAS_MULTIMOD_SUPPORT
+    if(MODULE_ENABLE[MULTIMOD].port && SPI_ProtoGetPinConfig(A7105, PACTL_PIN)) {
+        // Special case to setup the PA on the UniversalTX board
+        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
+        SPI_ConfigSwitch(0xf0 | mode, 0xf0 | mode);
+        return;
+    }
+#endif 
     if(mode == TX_EN) {
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x31);
@@ -124,7 +110,6 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x33);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
     }
-#endif
 }
 
 int A7105_Reset()
@@ -133,7 +118,6 @@ int A7105_Reset()
     usleep(1000);
     //Set both GPIO as output and low
     A7105_SetTxRxMode(TXRX_OFF);
-    A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
     int result = A7105_ReadReg(0x10) == 0x9E;
     A7105_Strobe(A7105_STANDBY);
     return result;
