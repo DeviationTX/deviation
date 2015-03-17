@@ -17,6 +17,7 @@ void PWR_Init(void);
 /* PA Control functions */
 void PACTL_Init();
 void PACTL_SetTxRxMode(int mode);
+int PACTL_SetSwitch(int module);
 
 /* Protocol functions */
 void SPI_ProtoInit();

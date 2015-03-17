@@ -77,6 +77,7 @@ u8 SPI_ReadRegister(u8 address);
 
 void PROTOCOL_SetBindState(int i);
 const char **PROTOCOL_GetOptions();
+int PROTOCOL_SetSwitch(int module);
 void CLOCK_StopTimer();
 void CLOCK_StartTimer(unsigned t, u16 (*_cmd)());
 void CLOCK_ResetWatchdog();

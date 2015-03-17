@@ -38,3 +38,6 @@ void PROTOCOL_SetOptions()
         PROTO_Cmds(PROTOCMD_SETOPTIONS);
 }
 
+int PROTOCOL_SetSwitch(int module) {
+    return PACTL_SetSwitch(module);
+}

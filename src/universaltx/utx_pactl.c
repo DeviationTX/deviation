@@ -24,7 +24,7 @@
 #include "config/model.h"
 #include "protocol/interface.h"
 
-static u8 last_module = CYRF6936; //MuxSel port 0 is CYRF6936
+u8 last_module = TX_MODULE_LAST;
 void PACTL_Init()
 {
     /* Enable Power Amp Rx/Tx signals */
@@ -62,6 +62,17 @@ void adc_comp_isr()
     exti_reset_request(EXTI21);
 }
 
+int PACTL_SetSwitch(int module) {
+    switch (module) {
+        case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+        case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
+        case NRF24L01: /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
+        case A7105:    /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
+    }
+    last_module = module;
+    return 0;
+}
+
 void PACTL_SetTxRxMode(int mode)
 {
     if (mode == TXRX_OFF) {
@@ -71,16 +82,7 @@ void PACTL_SetTxRxMode(int mode)
         PROTOSPI_pin_clear(PA_TXEN);
         return;
     }
-    if (Model.module != last_module) {
-        last_module = Model.module;
-        switch (last_module) {
-            case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
-            case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
-            case NRF24L01: /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-            case A7105:    /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-        }
-    }
-    if (Model.module == NRF24L01) {
+    if (last_module == NRF24L01) {
         comp_enable(COMP1);
         nvic_enable_irq(NVIC_ADC_COMP_IRQ);
     }
@@ -93,7 +95,7 @@ void PACTL_SetTxRxMode(int mode)
     }
     printf("Mode(%d): %d (%d,%d,%d,%d)\n", last_module, mode, PORT_pin_get(RF_MUXSEL1), PORT_pin_get(RF_MUXSEL2), PORT_pin_get(PA_TXEN), PORT_pin_get(PA_RXEN));
 #if DISCOVERY
-    if (Model.module == CYRF6936) {
+    if (last_module == CYRF6936) {
         //BUYCHINA_SetTxRxMode
         if(mode == TX_EN) {
             CYRF_WriteRegister(0x0E,0x20);
