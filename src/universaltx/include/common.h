@@ -63,6 +63,7 @@ enum {
     CC2500,
     NRF24L01,
     MULTIMOD,
+    MULTIMODCTL,
     TX_MODULE_LAST,
 };
 int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);

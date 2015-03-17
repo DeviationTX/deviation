@@ -63,6 +63,9 @@ void adc_comp_isr()
 }
 
 int PACTL_SetSwitch(int module) {
+    if (last_module == NRF24L01) {
+        PROTOSPI_pin_clear(NRF24L01_CE);
+    }
     switch (module) {
         case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
         case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;

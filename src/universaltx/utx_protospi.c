@@ -20,6 +20,7 @@
 #include "common.h"
 #include "protospi.h"
 #include "config/model.h"
+#include "protocol/interface.h"
 
 //These dont' work because a 'static const' is not actually a constant in C
 //ctassert(! (INPUT_CSN.pin & 0x07), INPUT_CSN_must_be_attached_to_pins4_to_15);
@@ -81,6 +82,42 @@ void exti4_15_isr(void)
         }
         exti_reset_request(INPUT_CSN.pin);
     }
+}
+
+void SPI_ProtoCSN(int module, int set)
+{
+    if (set) {
+        PROTOSPI_pin_set(MODULE_ENABLE[module]);
+    } else {
+        PROTOSPI_pin_clear(MODULE_ENABLE[module]);
+    }
+}
+int SPI_ProtoGetPinConfig(int module, int state)
+{
+    (void)module;
+    if (state == PACTL_PIN) {
+        //Code is checking whether 'mode' should be passed to SPI_ConfigSwitch and PACTL shoudl be bypassed
+        return 1;
+    }
+    if (state == ENABLED_PIN) {
+        //Set only when NRF CE is set
+        return 0x10;
+    }
+    return 0;
+}
+int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
+{
+    if((csn_high == csn_low) && ((csn_high & 0xf0) == 0xf0)) {
+        //This is a special case that defines a mode setting
+        int mode = csn_high & 0x0f;
+        PACTL_SetTxRxMode(mode);
+    }
+    if ((csn_high == csn_low) && ((csn_high & 0xf0) == 0x10)) {
+        //This is a special case that enables NRF CE pin
+        //Disable is handled by PACTL_SetSwitch
+        PROTOSPI_pin_set(NRF24L01_CE);
+    }
+    return 0;
 }
 
 void SPI_ProtoMasterSlaveInit(int slave)

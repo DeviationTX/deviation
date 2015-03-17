@@ -6,8 +6,6 @@
 //Load target-specific include
 #include "target_defs.h"
 
-#define UNIVERSAL_TX 0
-
 /* List of channels provided by the Tx */
 #define CHANDEF(x) INP_##x,
 #define UNDEF_INP

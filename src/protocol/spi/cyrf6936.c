@@ -163,8 +163,6 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
         SPI_ConfigSwitch(0xf0 | mode, 0xf0 | mode);
         return;
     }
-#endif 
-#if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
             AWA24S_SetTxRxMode(mode);

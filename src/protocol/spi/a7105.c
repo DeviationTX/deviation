@@ -47,14 +47,7 @@ u8 A7105_ReadReg(u8 address)
     CS_LO();
     PROTOSPI_xfer(0x40 | address);
     /* Wait for tx completion before spi shutdown */
-#if HAS_MULTIMOD_SUPPORT
-    if(SPI_ProtoGetPinConfig(A7105, SPI4WIRE_PIN)) {
-        data = PROTOSPI_xfer(0);
-    } else
-#endif
-    {
-        data = PROTOSPI_read3wire();
-    }
+    data = PROTOSPI_read3wire();
     CS_HI();
     return data;
 }

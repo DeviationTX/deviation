@@ -21,6 +21,8 @@ int PACTL_SetSwitch(int module);
 
 /* Protocol functions */
 void SPI_ProtoInit();
+void SPI_ProtoCSN(int module, int set);
+int SPI_ProtoGetPinConfig(int module, int state);
 
 void _usleep(u32 usec);
 #define usleep _usleep

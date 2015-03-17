@@ -50,6 +50,8 @@ static const struct mcu_pin module_enable[TX_MODULE_LAST] = {
        [A7105]    = {GPIOB, GPIO9},
        [CC2500]   = {GPIOA, GPIO10},
        [NRF24L01] = {GPIOB, GPIO6},
+       [MULTIMOD] = {GPIOB, GPIO12},
+       [MULTIMODCTL] = {GPIOA, GPIO8},
 };
 
 #endif //_PORTS_H_
