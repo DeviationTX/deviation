@@ -26,7 +26,7 @@
 #include "config/model.h"
 #include "config/tx.h"
 #include "protospi.h"
-#include "ports.h"
+//#include "ports.h"
 
 #if defined PROTO_HAS_CYRF6936 && defined PROTO_HAS_A7105 && defined PROTO_HAS_CC2500 && defined PROTO_HAS_NRF24L01
 #ifdef MODULAR
