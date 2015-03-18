@@ -30,13 +30,28 @@ struct Transmitter Transmitter;
 const char UTX_Version[33] = HGVERSION;
 volatile u8 priority_ready;
 
+extern void utx_devo();
+extern void utx_ppm();
+
+//Main routine for bidi-USART
+//Code here uses PPM pin as bidi USART.  This is intended for using the X9D with Deviation
+//Protocol parameters are from the transmitter, but the protocol code itself is via the UniversalTx module
+void utx_uart()
+{
+}
+
+//Main routine for USB control
+//Code here receives commands from USB interface, but is otherwise similar to the USART mode above
+void utx_usb()
+{
+}
+
 int main(void)
 {
     PWR_Init();
     CLOCK_Init();
     PACTL_Init();
     UART_Initialize();
-    BT_Initialize();
     SPI_ProtoInit();
 
     printf("Power Up\n");
@@ -44,26 +59,8 @@ int main(void)
     printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
     printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
-    //BT_Test();        
     printf("Done\n");
-    Model.proto_opts[0] = 3; //Radio => CYRF6936
-    Model.proto_opts[1] = 7; //Tx Power => 0
-    Model.proto_opts[2] = 20; //RF Channel => 1
-    Model.proto_opts[3] = 10; //Rate(ms) => 20
-    TESTRF_Cmds(PROTOCMD_INIT);
-    CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
-    int i = 0;
-    while (1) {
-        if (priority_ready & (1 << LOW_PRIORITY)) {
-            priority_ready = 0;
-            BT_HandleInput();
-            i = (i + 1) & 0xFF;
-            if(0 && i == 0) {
-                Model.proto_opts[0] = (Model.proto_opts[0] + 1) % 4;
-                TESTRF_Cmds(PROTOCMD_INIT);
-            }
-        }
-    }
 
+    TARGET();
     return 0;
 }

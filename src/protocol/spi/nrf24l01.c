@@ -44,11 +44,11 @@
 static u8 rf_setup;
 
 static void  CS_HI() {
-    SPI_ProtoCSN(NRF24L01, 1);
+    MODULE_CSN(NRF24L01, 1);
 }
 
 static void CS_LO() {
-    SPI_ProtoCSN(NRF24L01, 0);
+    MODULE_CSN(NRF24L01, 0);
 }
 
 void NRF24L01_Initialize()
@@ -201,7 +201,7 @@ u8 NRF24L01_SetPower(u8 power)
 static void CE_lo()
 {
 #if HAS_MULTIMOD_SUPPORT
-    PROTOCOL_SetSwitch(NRF24L01);
+    MULTIMOD_SwitchCommand(NRF24L01, CLEAR_PIN_ENABLE);
 #endif
 }
 #endif
@@ -209,9 +209,7 @@ static void CE_lo()
 static void CE_hi()
 {
 #if HAS_MULTIMOD_SUPPORT
-    u8 en = SPI_ProtoGetPinConfig(NRF24L01, ENABLED_PIN);
-    u8 csn = SPI_ProtoGetPinConfig(NRF24L01, CSN_PIN);
-    SPI_ConfigSwitch(en | 0x0f, en | (0x0f ^ csn));
+    MULTIMOD_SwitchCommand(NRF24L01, SET_PIN_ENABLE);
 #endif
 }
 #endif

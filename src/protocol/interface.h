@@ -25,11 +25,20 @@ enum TXRX_State {
 enum PinConfigState {
     CSN_PIN,
     ENABLED_PIN,
-    DISABLED_PIN,
-    RESET_PIN,
-    PACTL_PIN,
-    SPI4WIRE_PIN,
 };
+
+enum MultimodCmd {
+    //TXRX_OFF,
+    //TX_EN,
+    //RX_EN,
+    CHANGE_MODULE = 3,
+    CLEAR_PIN_ENABLE,
+    SET_PIN_ENABLE,
+};
+
+int MULTIMOD_SwitchCommand(int module, int command);
+void MODULE_CSN(int module, int set);
+
 #ifndef MODULAR
 #define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);
 #include "protocol.h"

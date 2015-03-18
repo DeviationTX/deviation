@@ -1,6 +1,9 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#ifndef TARGET
+    #error "Must specify TARGET define"
+#endif
 #define MODULE_CALLTYPE
 
 //Magic macro to check enum size

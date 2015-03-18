@@ -26,11 +26,11 @@
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
 static void  CS_HI() {
-    SPI_ProtoCSN(CC2500, 1);
+    MODULE_CSN(CC2500, 1);
 }
 
 static void CS_LO() {
-    SPI_ProtoCSN(CC2500, 0);
+    MODULE_CSN(CC2500, 0);
 }
 
 void CC2500_WriteReg(u8 address, u8 data)
@@ -97,9 +97,8 @@ void CC2500_WriteData(u8 *dpbuffer, u8 len)
 void CC2500_SetTxRxMode(enum TXRX_State mode)
 {
 #if HAS_MULTIMOD_SUPPORT
-    if(MODULE_ENABLE[MULTIMOD].port && SPI_ProtoGetPinConfig(CC2500, PACTL_PIN)) {
-        // Special case to setup the PA on the UniversalTX board
-        SPI_ConfigSwitch(0xf0 | mode, 0xf0 | mode);
+    if(MODULE_ENABLE[MULTIMOD].port && MULTIMOD_SwitchCommand(CC2500, mode)) {
+        //We only get here if the UniversalTx is enabled
         return;
     }
 #endif 

@@ -102,7 +102,7 @@ u8 PROTOSPI_xfer(u8 tx)
 }
 
 #if HAS_MULTIMOD_SUPPORT
-int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
+void SPI_SwitchStartData()
 {
     int i;
     //Switch output on clock before switching off SPI
@@ -115,31 +115,13 @@ int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low)
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
     PROTOSPI_pin_clear(SCK);
-    //Finally ready to send a command
-    int byte1 = PROTOSPI_xfer(csn_high);  //Set all other pins high
-    int byte2 = PROTOSPI_xfer(csn_low);   //Toggle related pin with CSN
+}
+void SPI_SwitchStartData()
+{
+    int i;
     for(i = 0; i < 100; i++)
         asm volatile ("nop");
-    return byte1 == 0xa5 ? byte2 : 0;
 }
-
-int SPI_ProtoGetPinConfig(int module, int state) {
-    if (Transmitter.module_enable[module].port != SWITCH_ADDRESS)
-        return 0;
-    if(state == CSN_PIN)
-        return 1 << (Transmitter.module_enable[module].pin & 0x0F);
-    if(state == ENABLED_PIN) {
-        if(module == NRF24L01) {
-            return 1 << ((Transmitter.module_enable[module].pin >> 8) & 0x0F);
-        }
-        return 0;
-    }
-    if(state == DISABLED_PIN) {
-        return 0;
-    }
-    return 0;
-}
-#endif
 
 void SPI_ProtoInit()
 {

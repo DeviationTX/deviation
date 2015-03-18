@@ -26,11 +26,11 @@
 #ifdef PROTO_HAS_A7105
 
 static void  CS_HI() {
-    SPI_ProtoCSN(A7105, 1);
+    MODULE_CSN(A7105, 1);
 }
 
 static void CS_LO() {
-    SPI_ProtoCSN(A7105, 0);
+    MODULE_CSN(A7105, 0);
 }
 
 void A7105_WriteReg(u8 address, u8 data)
@@ -82,10 +82,8 @@ void A7105_ReadData(u8 *dpbuffer, u8 len)
 void A7105_SetTxRxMode(enum TXRX_State mode)
 {
 #if HAS_MULTIMOD_SUPPORT
-    if(MODULE_ENABLE[MULTIMOD].port && SPI_ProtoGetPinConfig(A7105, PACTL_PIN)) {
-        // Special case to setup the PA on the UniversalTX board
-        A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode
-        SPI_ConfigSwitch(0xf0 | mode, 0xf0 | mode);
+    if(MODULE_ENABLE[MULTIMOD].port && MULTIMOD_SwitchCommand(A7105, mode)) {
+        //We only get here if the UniversalTx is enabled
         return;
     }
 #endif 
@@ -109,6 +107,7 @@ int A7105_Reset()
 {
     A7105_WriteReg(0x00, 0x00);
     usleep(1000);
+    A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x00); //Put GPIO1 into high-z mode (this will be changed if needed in SetTxRxMode)
     //Set both GPIO as output and low
     A7105_SetTxRxMode(TXRX_OFF);
     int result = A7105_ReadReg(0x10) == 0x9E;

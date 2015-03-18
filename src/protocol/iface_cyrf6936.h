@@ -56,6 +56,11 @@ enum CYRF_PWR {
     CYRF_PWR_DEFAULT,
 };
 
+enum {
+    CYRF6936_AWA24S = 0x01,
+    CYRF6932_BUYCHINA = 0x02,
+};
+
 /* SPI CYRF6936 */
 void CYRF_Initialize();
 int CYRF_Reset();

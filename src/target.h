@@ -186,9 +186,12 @@ u8 *BOOTLOADER_Read(int idx);
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
 void SPI_AVRProgramInit();
-int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
-int SPI_ProtoGetPinConfig(int module, int state);
-void SPI_ProtoCSN(int module, int set);
+
+#if HAS_MULTIMOD_SUPPORT
+void SPI_SwitchStartData();
+void SPI_SwitchStopData();
+#endif
+
 u32 AVR_StartProgram();
 int AVR_Erase();
 int AVR_Program(u32 address, u8 *data, int pagesize);

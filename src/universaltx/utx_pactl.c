@@ -62,10 +62,17 @@ void adc_comp_isr()
     exti_reset_request(EXTI21);
 }
 
-int PACTL_SetSwitch(int module) {
-    if (last_module == NRF24L01) {
+void PACTL_SetNRF24L01_CE(int state)
+{
+    if(state) {
+        PROTOSPI_pin_set(NRF24L01_CE);
+    } else {
         PROTOSPI_pin_clear(NRF24L01_CE);
     }
+}
+
+int PACTL_SetSwitch(int module) {
+    PACTL_SetNRF24L01_CE(0);
     switch (module) {
         case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
         case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
