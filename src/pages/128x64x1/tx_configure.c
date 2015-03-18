@@ -38,7 +38,7 @@ static int size_cb(int absrow, void *data)
 #ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
 #else
-//        case ITEM_MODE:
+        case ITEM_MODE:
 #endif
         case ITEM_BUZZ:
         case ITEM_BACKLIGHT:
@@ -77,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
         case ITEM_MODE:
 #ifdef NO_LANGUAGE_SUPPORT
-            //title = _tr_noop("Generic settings");
+            title = _tr_noop("Generic settings");
 #endif
             label = _tr_noop("Stick mode");
             value = modeselect_cb;
@@ -103,7 +103,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Alarm intvl");
             value = batalarmwarn_select_cb;
             break;
-	case ITEM_PWR_ALARM:
+        case ITEM_PWR_ALARM:
             label = _tr_noop("PwrOn alarm");
             value = poweralarm_select_cb;
             break;
@@ -157,7 +157,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateLabelBox(&gui->title[relrow], 0, y,
                 0, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
         labelDesc.style = oldType;
-        y += LINE_HEIGHT;
+        y += LINE_SPACE;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
             0, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
@@ -180,7 +180,6 @@ void PAGE_TxConfigureInit(int page)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Configure"));
     cp->total_items = 0;
-
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
@@ -227,6 +226,11 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         }
     }
     return 1;
+}
+
+void PAGE_TxConfigureExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid)

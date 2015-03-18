@@ -41,10 +41,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateButtonPlateText(&gui->src[relrow], 0, y, w, LINE_HEIGHT,
             &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], 32, y,
-            40, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
-    GUI_CreateLabelBox(&gui->name[relrow], 75, y, 50, LINE_HEIGHT,
+            50, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
+    GUI_CreateLabelBox(&gui->name[relrow], 84, y, 41, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  (void *)INPUT_ButtonName(trim[absrow].pos));
-    return 1;
+    return 2;
 }
 
 static void _show_page()
@@ -52,14 +52,13 @@ static void _show_page()
     PAGE_SetActionCB(_action_cb);
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
     PAGE_ShowHeader(_tr("Input"));
-    GUI_CreateLabelBox(&gui->steplbl, 40, 0, 30, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step"));
+    GUI_CreateLabelBox(&gui->steplbl, 46, 0, 30, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step"));
     // no enought space in Devo10, so just display trim + in the 1st page
     //GUI_CreateLabelBox(w + 40, 0, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim -"));
-    GUI_CreateLabelBox(&gui->trimposlbl, 80, 0, 30, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +"));
+    GUI_CreateLabelBox(&gui->trimposlbl, 88, 0, 30, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-
 }
 
 void PAGE_TrimExit()

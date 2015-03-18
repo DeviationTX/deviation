@@ -1,5 +1,5 @@
 #ifndef _FLTK_H_
-#define FLTK_H_
+#define _FLTK_H_
 
 #include "gui/gui.h"
 #include "emu.h"

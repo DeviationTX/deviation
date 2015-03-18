@@ -33,6 +33,7 @@ struct menu_pages menus[] = {
     //main menu
     {PAGEID_MENU, _tr_noop("Model menu"),       MENUTYPE_MAINMENU, 0, MIXER_ALL, (0 << 4) | MENUTYPE_SUBMENU},
     {PAGEID_MENU, _tr_noop("Transmitter menu"), MENUTYPE_MAINMENU, 1, MIXER_ALL, (1 << 4) | MENUTYPE_SUBMENU},
+    {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, MIXER_ALL,  0},
     {PAGEID_ABOUT,    NULL, MENUTYPE_MAINMENU, 1, MIXER_ALL, PREVIOUS_ITEM},
     // sub menu items 1
     {PAGEID_MODEL,    NULL, MENUTYPE_SUBMENU,  0, MIXER_ALL, PREVIOUS_ITEM},
@@ -67,10 +68,10 @@ struct menu_pages menus[] = {
 #if HAS_TELEMETRY
     {PAGEID_TELEMMON, NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
 #endif
+    {PAGEID_RANGE,    NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
-static const int VIEW_ID = 0;
 static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
 
@@ -88,7 +89,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     MenuItemType menu_item_type = menu_type_flag & 0x0f;
     u8 group = (menu_type_flag >> 4) &0x0f;
     u8 idx = 0;

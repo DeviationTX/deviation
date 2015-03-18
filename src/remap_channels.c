@@ -28,7 +28,7 @@
 #include "target.h"
 #include "datalog.h"
 #include <stdlib.h>
-extern const u8 const EATRG[PROTO_MAP_LEN];
+extern const u8 EATRG[PROTO_MAP_LEN];
 
 static void _map_inp(unsigned *chmap, u8 *val, int offset)
 {

@@ -9,6 +9,7 @@ struct splash_obj {
     guiImage_t splash_image;
 };
 
+#define NUM_BARS_PER_ROW    2
 struct chantest_obj {
     guiLabel_t title;
     guiRect_t  rect;
@@ -17,6 +18,10 @@ struct chantest_obj {
     guiBarGraph_t bar[8];
     guiLabel_t page;
     guiScrollable_t scrollable;
+};
+
+struct range_obj {
+    guiLabel_t label;
 };
 
 struct dialog_obj {
@@ -324,6 +329,7 @@ struct gui_objs {
         struct about_obj about;
         struct splash_obj splash;
         struct chantest_obj chantest;
+        struct range_obj range;
         struct lang_obj lang;
         struct mainconfig_obj mainconfig;
         struct mainlayout_obj mainlayout;
@@ -346,7 +352,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
-
+        
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;
         struct advmixer_obj advmixer;

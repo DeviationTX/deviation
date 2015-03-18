@@ -27,11 +27,13 @@ unsigned usb_cb(u32 button, unsigned flags, void *data)
     if(flags == BUTTON_RELEASE) {
         _draw_page(1);
         GUI_RefreshScreen();
+        CONFIG_SaveModelIfNeeded();
         USB_Enable(0, 1);
         wait_release();
         wait_press();
         wait_release();
         USB_Disable();
+        CONFIG_ReadModel(Transmitter.current_model);
         _draw_page(0);
     }
     return 1;

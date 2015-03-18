@@ -25,5 +25,5 @@ void _draw_dialog_box(struct guiBox *box, int x, const char *title)
 
 void _dialog_draw_background(u16 x, u16 y, u16 w, u16 h)
 {
-    LCD_FillRoundRect(x, y, w, h, 3, 0);
+    LCD_FillRect(x, y, w, h, 0);
 }

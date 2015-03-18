@@ -109,9 +109,9 @@ void TIMER_Init()
 void TIMER_Power(){
     static u32 timer = 0;
     u32 alert = Transmitter.power_alarm * 60 * 1000;
-    static u16 throttle;
-    u16 new_throttle;
-    u16 elevator;
+    static u32 throttle;
+    u32 new_throttle;
+    u32 elevator;
     unsigned mode = MODE_2 == Transmitter.mode || MODE_4 == Transmitter.mode ? 2 : 1;
 
     if( 0 == timer)
@@ -144,12 +144,13 @@ void TIMER_Update()
         TIMER_Power();
     for (i = 0; i < NUM_TIMERS; i++) {
         if (Model.timer[i].src) {
-            s16 val;
+            s32 val;
             if (MIXER_SRC(Model.timer[i].src) <= NUM_INPUTS) {
-                volatile s16 *raw = MIXER_GetInputs();
+                volatile s32 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].src)];
             } else {
-                val = MIXER_GetChannel(Model.timer[i].src - NUM_INPUTS - 1, APPLY_SAFETY);
+                val = MIXER_GetChannel(MIXER_SRC(Model.timer[i].src)
+                                       - NUM_INPUTS - 1, APPLY_SAFETY);
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].src))
                 val = -val;
@@ -207,14 +208,14 @@ void TIMER_Update()
                 timer_val[i] -= delta;
             }
             last_time[i] = t;
-        } 
+        }
         if (Model.timer[i].resetsrc) {
-            s16 val;
+            s32 val;
             if (MIXER_SRC(Model.timer[i].resetsrc) <= NUM_INPUTS) {
-                volatile s16 *raw = MIXER_GetInputs();
+                volatile s32 *raw = MIXER_GetInputs();
                 val = raw[MIXER_SRC(Model.timer[i].resetsrc)];
             } else {
-                val = MIXER_GetChannel(Model.timer[i].resetsrc - NUM_INPUTS - 1, APPLY_SAFETY);
+                val = MIXER_GetChannel(MIXER_SRC(Model.timer[i].resetsrc) - NUM_INPUTS - 1, APPLY_SAFETY);
             }
             if (MIXER_SRC_IS_INV(Model.timer[i].resetsrc))
                 val = -val;

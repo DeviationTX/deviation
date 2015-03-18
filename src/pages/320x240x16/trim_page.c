@@ -28,8 +28,7 @@ enum {
      PCOL3 = (134 + ((LCD_WIDTH - 320) / 2)),
      PCOL4 = (196 + ((LCD_WIDTH - 320) / 2)),
      PROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
-     //slightly higher on Devo12 screen for additional line
-     PROW2 = ((LCD_HEIGHT == 240 ? 66 : 64) + ((LCD_HEIGHT - 240) / 2)),
+     PROW2 = (64 + ((LCD_HEIGHT - 240) / 2)),
      PROW3 = (PROW2 + 2),
 };
 
@@ -55,7 +54,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
         trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
-    GUI_CreateLabelBox(&gui->neg[relrow], PCOL2 + 6, y, PCOL3 - PCOL2, 24, &DEFAULT_FONT, negtrim_str, NULL, (void *)(long)absrow);
+    GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, negtrim_str, DEFAULT_FONT, (void *)(long)absrow);
     GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
     GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL,
                          set_trimstep_cb, (void *)(long)(absrow + 0x000)); //0x000: Use Model.trims

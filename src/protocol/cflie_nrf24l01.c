@@ -285,6 +285,7 @@ static int cflie_init()
     NRF24L01_Initialize();
 
     // CRC, radio on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP)); 
 //    NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);              // No Auto Acknowledgement
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x01);              // Auto Acknowledgement for data pipe 0
@@ -497,10 +498,6 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
 #else
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
 #endif
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power);
-
         default: break;
     }
     return 0;

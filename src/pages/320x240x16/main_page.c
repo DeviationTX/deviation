@@ -33,7 +33,7 @@ enum {
     GRAPH_W      = 10,
     BOX_W       = 113,
     SMALLBOX_H   = 24,
-    BIGBOX_H     = 40,
+    BIGBOX_H     = 39,
     BATTERY_W    = 0,
     BATTERY_H    = 0,
     TXPOWER_W    = 0,

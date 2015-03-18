@@ -1,0 +1,69 @@
+SymaX protocol    2015 Mar 4
+
+This protocol is used on the latest Syma models: X5C-1, X11, X11C, X12, new
+X4, and new X6.  A variant supporting the original X5C and the X2 is
+included as a protocol option.  Additionally the Syma X3, old X4, and
+old X6 are supported with the SymaX4 option in the YD717 protocol.
+
+These quads use the Beken BK2423 and BK2425 radio devices.  The protocol is
+compatible with the nRF24L01+, with the addition of a special register set.
+Note the "plus" version of the nRF device is required to support the 250kbits/s
+data rate.
+
+Data is transmitted every 4 msec using 10-byte packets.
+
+Frequency hopping is used in both bind and data phases.  Four different channels
+are used.  In the data phase 32 different sets of 4 channels are used depending
+on the packet address.  All packets are sent twice to a channel before moving
+to the next channel.
+
+# Binding #
+After initialization, the transmitter sends bind packets for about 1.4 seconds.
+The tx address is sent in the first 5 bytes, followed by 3 bytes of 0xaa, then
+0x00, then a one-byte checksum.
+
+After the bind packets are sent, the tx changes its address and begins sending
+data packets.
+
+# Data Packets #
+Each channel is 8 bits in sign plus magnitude format.
+
+Trim values are sent in three separate bytes.  Trim values are 6 bits
+sign plus magnitude.  The SymaX implementation drives the trim values in
+parallel with the channel data to acheive additional control range.
+
+Features are enabled by setting various bits in the data packet. When auto-flip
+is enabled, full cyclic in any direction causes a flip to be executed in that
+direction.  For models with cameras one bit controls taking pictures while
+another turns video recoding on or off.
+
+## Example data packet ##
+Btye   Function
+  0    throttle
+  1    elevator
+  2    rudder
+  3    aileron
+  4    bit 7    video on/off
+       bit 6    take picture
+       bit 5-0  0
+  5    bit 7    high rates (always set 1 by SymaX)
+       bit 6    1
+       bit 5-0  elevator trim
+  6    bit 7    0
+       bit 6    auto-flip
+       bit 5-0  rudder trim
+  7    bit 7-6  0
+       bit 5-0  aileron trim
+  8    00
+  9    checksum (all bytes xor'd together then added to 0x55)
+
+# X5C protocol variant #
+The original X5C protocol is similar.  The main differences are:
+ - packet length is 16 bytes
+ - channel values are in twos-complement format
+ - the same tx address is always used
+ - frequency hopping is not used
+
+The last two points mean that models flown in the same area will interfere with
+each other.
+

@@ -24,11 +24,11 @@
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
-const u8 const EATRG[PROTO_MAP_LEN] =
+const u8 EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
-static const u8 const TAERG[PROTO_MAP_LEN] = 
+static const u8 TAERG[PROTO_MAP_LEN] = 
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
-static const u8 const AETRG[PROTO_MAP_LEN] = 
+static const u8 AETRG[PROTO_MAP_LEN] = 
     { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
 
 static u8 proto_state;
@@ -217,7 +217,7 @@ int PROTOCOL_MapChannel(int input, int default_ch)
 u64 PROTOCOL_CheckSafe()
 {
     int i;
-    volatile s16 *raw = MIXER_GetInputs();
+    volatile s32 *raw = MIXER_GetInputs();
     u64 unsafe = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! Model.safety[i])
@@ -229,15 +229,15 @@ u64 PROTOCOL_CheckSafe()
         } else {
             ch = i-1;
         }
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+        s32 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
         if (Model.safety[i] == SAFE_MIN && val > -99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_ZERO && (val < -1 || val > 1))
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_MAX && val < 99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
     }
     return unsafe;
 }
@@ -375,17 +375,17 @@ int PROTOCOL_SetSwitch(int module)
 
 int PROTOCOL_SticksMoved(int init)
 {
-    const int STICK_MOVEMENT = 15;   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
-    static s16 ele_start, ail_start;
-    int ele = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
-    int ail = CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
+    const s32 STICK_MOVEMENT = 15;   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
+    static s32 ele_start, ail_start;
+    s32 ele = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
+    s32 ail = CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
     if(init) {
         ele_start = ele;
         ail_start = ail;
         return 0;
     }
-    int ele_diff = abs(ele_start - ele);
-    int ail_diff = abs(ail_start - ail);
+    s32 ele_diff = abs(ele_start - ele);
+    s32 ail_diff = abs(ail_start - ail);
     return ((ele_diff + ail_diff > 2 * STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
 }
 
@@ -433,8 +433,9 @@ void PROTOCOL_InitModules()
         }
     }
     //Put this last because the switch will not respond until after it has been initialized
-    if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+    if (Transmitter.module_enable[MULTIMOD].port && PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
         //No Switch found
+	error = 1;
         missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
     }
     Model.protocol = orig_proto;

@@ -64,7 +64,7 @@ static void _show_page()
             obj = GUI_CreateButton(&gui->name[i].but, XOFFSET+4, row, BUTTON_64x16, MIXPAGE_ChanNameProtoCB,
                                    0x0000, virtname_cb, (void *)(long)ch);
         } else {
-            obj = GUI_CreateLabelBox(&gui->name[i].lbl, XOFFSET+4, row, 64, 16, &DEFAULT_FONT,
+            obj = GUI_CreateLabelBox(&gui->name[i].lbl, XOFFSET+4, row, 64, 18, &DEFAULT_FONT,
                                    MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)ch));
         }
         if (! mp->firstObj)
@@ -77,13 +77,13 @@ static void _show_page()
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
             if (CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED)
-                GUI_CreateLabelBox(&gui->src[i], XOFFSET+68, row, 60, 16, &NARROW_FONT, show_source, NULL, &mix[idx].src);
+                GUI_CreateLabelBox(&gui->src[i], XOFFSET+68, row, 60, 18, &NARROW_FONT, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
-                    GUI_CreateLabelBox(&gui->sw1[i], XOFFSET+200, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
+                    GUI_CreateLabelBox(&gui->sw1[i], XOFFSET+200, row, 52, 18, &SMALL_FONT, show_source, NULL, &mix[idx+1].sw);
                 }
                 if (mix[idx].src == mix[idx+2].src && mix[idx].dest == mix[idx+2].dest && mix[idx+2].sw) {
-                    GUI_CreateLabelBox(&gui->sw2[i], XOFFSET+252, row, 52, 16, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
+                    GUI_CreateLabelBox(&gui->sw2[i], XOFFSET+252, row, 52, 18, &SMALL_FONT, show_source, NULL, &mix[idx+2].sw);
                 }
             }
         }

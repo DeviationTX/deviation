@@ -109,11 +109,11 @@ int DATALOG_GetSize(u8 *src)
     return size;
 }
 
-s16 _get_src_value(int idx, u32 opts)
+s32 _get_src_value(int idx, u32 opts)
 {
-    s16 val;
+    s32 val;
     if (idx <= NUM_INPUTS || idx > NUM_INPUTS + NUM_CHANNELS /*PPM*/) {
-        volatile s16 *raw = MIXER_GetInputs();
+        volatile s32 *raw = MIXER_GetInputs();
         val = raw[idx];
     } else {
         val = MIXER_GetChannel(idx - NUM_INPUTS - 1, opts);
@@ -146,14 +146,6 @@ void _write_8(s32 data)
     fwrite(x, 1, 1, fh);
     dlog_pos++;
 }
-void _write_16(s32 data)
-{
-    u8 x[2] = {(data & 0xff),
-               (data >> 8) & 0xff,
-              };
-    fwrite(x, 2, 1, fh);
-    dlog_pos+=2;
-}
 void _write_32(s32 data)
 {
     u8 x[4] = {(data & 0xff),
@@ -179,7 +171,7 @@ int DATALOG_IsEnabled()
     if(! Model.datalog.enable)
         return 0;
     unsigned src = Model.datalog.enable;
-    int val = _get_src_value(MIXER_SRC(src), APPLY_SAFETY);
+    s32 val = _get_src_value(MIXER_SRC(src), APPLY_SAFETY);
     if (MIXER_SRC_IS_INV(src))
         val = -val;
     return (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
@@ -206,7 +198,7 @@ void DATALOG_Write()
             _write_32(Telemetry.gps.latitude);
             _write_32(Telemetry.gps.longitude);
         } else if(i >= DLOG_INPUTS) {
-            int val = _get_src_value(i - DLOG_INPUTS + 1, APPLY_SAFETY | APPLY_SCALAR);
+            s32 val = _get_src_value(i - DLOG_INPUTS + 1, APPLY_SAFETY | APPLY_SCALAR);
             val = RANGE_TO_PCT(val);
             if (val > 127)
                 val = 127;
@@ -214,9 +206,9 @@ void DATALOG_Write()
                 val = -128;
             _write_8(val);
         } else if(i >= DLOG_TELEMETRY) {
-            _write_16(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
+            _write_32(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
         } else {
-            _write_16(TIMER_GetValue(i) / 1000);
+            _write_32(TIMER_GetValue(i) / 1000);
         }
     }
 }

@@ -33,7 +33,7 @@
 #define MIXER_CYC3 (NUM_TX_INPUTS + 3)
 
 extern volatile u8 ppmSync;
-extern volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
+extern volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];
 extern volatile u8 ppmin_num_channels;
 
 // Channels should be volatile:
@@ -48,16 +48,16 @@ extern volatile u8 ppmin_num_channels;
 // the main loop to the interrupt routine (since the optimizer
 // has no clue about interrupts)
 
-volatile s16 Channels[NUM_OUT_CHANNELS];
+volatile s32 Channels[NUM_OUT_CHANNELS];
 
 struct Transmitter Transmitter;
 
-static volatile s16 raw[NUM_SOURCES + 1];
+static volatile s32 raw[NUM_SOURCES + 1];
 static buttonAction_t button_action;
-static unsigned switch_is_on(unsigned sw, volatile s16 *raw);
+static unsigned switch_is_on(unsigned sw, volatile s32 *raw);
 static s32 get_trim(unsigned src);
 
-static s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum);
+static s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum);
 
 struct Mixer *MIXER_GetAllMixers()
 {
@@ -69,10 +69,10 @@ struct Trim *MIXER_GetAllTrims()
     return Model.trims;
 }
 
-void MIXER_EvalMixers(volatile s16 *raw)
+void MIXER_EvalMixers(volatile s32 *raw)
 {
     int i;
-    s16 orig_value[NUM_CHANNELS];
+    s32 orig_value[NUM_CHANNELS];
     //3rd step: apply mixers
     for (i = 0; i < NUM_CHANNELS; i++) {
         orig_value[i] = raw[i + NUM_INPUTS + 1];
@@ -84,7 +84,7 @@ void MIXER_EvalMixers(volatile s16 *raw)
             // Mixer is not defined so we are done
             break;
         }
-        //apply_mixer updates mixed[mirer->dest]
+        //apply_mixer updates mixed[mixer->dest]
         MIXER_ApplyMixer(mixer, raw, &orig_value[mixer->dest]);
     }
 
@@ -155,7 +155,7 @@ static void MIXER_UpdateRawInputs()
     }
 }
 
-int MIXER_GetCachedInputs(s16 *cache, unsigned threshold)
+int MIXER_GetCachedInputs(s32 *cache, unsigned threshold)
 {
     int changed = 0;
     int i;
@@ -190,40 +190,40 @@ void MIXER_CalcChannels()
     }
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        if (PPMin_Mode() == PPM_IN_TRAIN1 && Model.train_sw && raw[Model.train_sw] > 0) {
-            int ppm_channel_map = map_ppm_channels(i);
-            if (ppm_channel_map >= 0) {
-                if (ppmSync) {
-                    Channels[i] = ppmChannels[ppm_channel_map];
-                }
-                continue;
-            }
-        }
-        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, Channels, APPLY_ALL);
+        Channels[i] = MIXER_GetChannel(i, APPLY_ALL);
     }
 }
 
-volatile s16 *MIXER_GetInputs()
+volatile s32 *MIXER_GetInputs()
 {
     return raw;
 }
 
-s16 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
+s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
 {
+    if (PPMin_Mode() == PPM_IN_TRAIN1 && Model.train_sw && raw[Model.train_sw] > 0) {
+        int ppm_channel_map = map_ppm_channels(channel);
+        if (ppm_channel_map >= 0) {
+            if (ppmSync) {
+                return ppmChannels[ppm_channel_map];
+            }
+            return Channels[channel];   // last value obtained from synchronized ppm set by CalcChannels
+        }
+    }
     return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, Channels, flags);
 }
 
 #define REZ_SWASH_X(x)  ((x) - (x)/8 - (x)/128 - (x)/512)   //  1024*sin(60) ~= 886
 #define REZ_SWASH_Y(x)  (1*(x))   //  1024 => 1024
-s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
+s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
 {
-    s16 cyc[3];
+    s32 cyc[3];
     if (! Model.swash_type) {
         return raw[NUM_INPUTS + NUM_OUT_CHANNELS + cycnum];
     }
-    s16 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
-    s16 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
-    s16 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
+    s32 aileron    = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 1];
+    s32 elevator   = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 2];
+    s32 collective = raw[NUM_INPUTS + NUM_OUT_CHANNELS + 3];
     const int normalize = 100;
 
     if (Model.swash_invert & SWASH_INV_ELEVATOR_MASK)   elevator   = -elevator;
@@ -274,7 +274,7 @@ s16 MIXER_CreateCyclicOutput(volatile s16 *raw, unsigned cycnum)
     return cyc[cycnum-1];
 }
 
-void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
 {
     s32 value;
     if (! MIXER_SRC(mixer->src))
@@ -300,7 +300,7 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
     case MUX_REPLACE:
         break;
     case MUX_MULTIPLY:
-        value = raw[mixer->dest + NUM_INPUTS + 1] * (s32)value / CHAN_MAX_VALUE;
+        value = raw[mixer->dest + NUM_INPUTS + 1] * value / CHAN_MAX_VALUE;
         break;
     case MUX_ADD:
         value = raw[mixer->dest + NUM_INPUTS + 1] + value;
@@ -349,8 +349,8 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value)
     raw[mixer->dest + NUM_INPUTS + 1] = value;
 }
 
-s16 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s16 *_raw,
-                      volatile s16 *_Channels, enum LimitMask flags)
+s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
+                      volatile s32 *_Channels, enum LimitMask flags)
 {
     int applied_safety = 0;
     s32 value = _raw[NUM_INPUTS + 1 + channel] + get_trim(NUM_INPUTS + 1 + channel);
@@ -430,7 +430,7 @@ s32 get_trim(unsigned src)
     return 0;
 }
 
-unsigned switch_is_on(unsigned sw, volatile s16 *raw)
+unsigned switch_is_on(unsigned sw, volatile s32 *raw)
 {
     unsigned is_neg = MIXER_SRC_IS_INV(sw);
     sw = MIXER_SRC(sw);
@@ -438,7 +438,7 @@ unsigned switch_is_on(unsigned sw, volatile s16 *raw)
         // No switch selected is the same as an on switch
         return 1;
     }
-    s16 value = raw[sw];
+    s32 value = raw[sw];
     if (is_neg)
         value = - value;
     return (value > 0);
@@ -519,16 +519,16 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
     unsigned found = 0;
     unsigned i;
     struct Mixer *mixer;
-    for (i = 0; i < NUM_CHANNELS; i++)
+    for (i = 0; i < NUM_SOURCES; i++)
         deps[i] = 0;
     for (mixer = Model.mixers; mixer < Model.mixers + NUM_MIXERS; mixer++) {
         if (MIXER_SRC(mixer->src) && mixer->dest == ch) {
             found = 1;
-            if (MIXER_SRC(mixer->src) > NUM_INPUTS && MIXER_SRC(mixer->src) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->src) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->src) > NUM_SOURCES && MIXER_SRC(mixer->src) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->src) - NUM_SOURCES - 1] = 1;
             } 
-            if (MIXER_SRC(mixer->sw) > NUM_INPUTS && MIXER_SRC(mixer->sw) != NUM_INPUTS + 1 + ch) {
-                deps[MIXER_SRC(mixer->sw) - NUM_INPUTS - 1] = 1;
+            if (MIXER_SRC(mixer->sw) > NUM_SOURCES && MIXER_SRC(mixer->sw) != NUM_SOURCES + 1 + ch) {
+                deps[MIXER_SRC(mixer->sw) - NUM_SOURCES - 1] = 1;
             }
         }
     }
@@ -537,8 +537,8 @@ unsigned find_dependencies(unsigned ch, unsigned *deps)
 
 void fix_mixer_dependencies(unsigned mixer_count)
 {
-    unsigned dependencies[NUM_CHANNELS];
-    unsigned placed[NUM_CHANNELS];
+    unsigned dependencies[NUM_SOURCES];
+    unsigned placed[NUM_SOURCES];
     unsigned pos = 0;
     unsigned last_count = 0;
     unsigned i;
@@ -550,7 +550,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
     memset(placed, 0, sizeof(placed));
     while(mixer_count || last_count != mixer_count) {
         last_count = mixer_count;
-        for (i = 0; i < NUM_CHANNELS; i++) {
+        for (i = 0; i < NUM_SOURCES; i++) {
             if (placed[i])
                 continue;
             if (! find_dependencies(i, dependencies)) {
@@ -560,7 +560,7 @@ void fix_mixer_dependencies(unsigned mixer_count)
             unsigned ok = 1;
             unsigned j;
             // determine if all dependencies have been placed
-            for (j = 0; j < NUM_CHANNELS; j++) {
+            for (j = 0; j < NUM_SOURCES; j++) {
                 if (dependencies[i] && ! placed[i]) {
                     ok = 0;
                     break;

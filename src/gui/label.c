@@ -40,7 +40,7 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *label, u16 x, u16 y, u16 width, u16 
     connect_object(obj);
 
     label->desc = *desc;
-    if ((width == 0 || height == 0) && label->desc.style != LABEL_UNDERLINE && label->desc.style != LABEL_UNDERLINE)
+    if ((width == 0 || height == 0) && label->desc.style != LABEL_UNDERLINE)
         label->desc.style = LABEL_NO_BOX;
     label->strCallback = strCallback;
     label->pressCallback = pressCallback;
@@ -66,47 +66,52 @@ void GUI_DrawLabel(struct guiObject *obj)
 /**
  * this hepler is created to let TextSelect share the label drawing behavior for Devo10
  */
-void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, const char *str,
+void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char *str,
         const struct LabelDesc *desc, u8 is_selected)
 {
     u16 txt_w, txt_h;
     u16 txt_x, txt_y;
-    u16 w = obj_width;
-    u16 h = obj_height;
+    u16 offset = (LCD_DEPTH > 1 && desc->font==NARROW_FONT.font) ? 1 : 0;
     LCD_SetFont(desc->font);
-    LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
+    LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h); txt_w++;
+    if (obj_w == 0)
+        obj_w = txt_w;
+    if (obj_h == 0)
+        obj_h = txt_h;
+    if (offset && obj_y >= offset) {
+        obj_y -= offset;
+    }
+    if (desc->style != LABEL_TRANSPARENT)
+    {
+        GUI_DrawBackground(obj_x, obj_y, obj_w, obj_h);
+    }
     if (desc->style == LABEL_BOX || desc->style == LABEL_BRACKET || desc->style == LABEL_SQUAREBOX) {
         // draw round rect for the textsel widget when it is pressable
-        if (obj_width == 0)
-            w = txt_w;
-        if (obj_height == 0)
-            h = txt_h;
-        GUI_DrawBackground(obj_x, obj_y, w, h);
         if (is_selected) {
-            if (desc->style == LABEL_SQUAREBOX || w < 5)
-                LCD_FillRect(obj_x, obj_y, w, h , 1);
+            if (desc->style == LABEL_SQUAREBOX ||obj_w < 5)
+                LCD_FillRect(obj_x, obj_y, obj_w, obj_h , 1);
             else
-                LCD_FillRoundRect(obj_x, obj_y, w, h , 3, 1);
+                LCD_FillRoundRect(obj_x, obj_y, obj_w, obj_h , 3, 1);
         }  else {
             if (desc->style == LABEL_SQUAREBOX)
                 if (desc->fill_color == 0)
-                    LCD_DrawRect(obj_x, obj_y, w, h, 1);
+                    LCD_DrawRect(obj_x, obj_y, obj_w, obj_h, 1);
                 else
-                    LCD_FillRect(obj_x, obj_y, w, h, desc->fill_color);
+                    LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
             else if (desc->style == LABEL_BRACKET) {
                 struct pos { int i1; int i2; int i3; int i4;};
                 struct { union { int p[4]; struct pos pos;} u;} x[2], y[2];
                 //int x[2][4];
                 //int y[2][4];
-                if (h > 2 * w) {
-                    x[0].u.pos = (struct pos){ 0,             2,             obj_width -3,  obj_width -1};
-                    y[0].u.pos = (struct pos){ 2,             0,             0,             2};
+                if (obj_h > 2 * obj_w) {
+                    x[0].u.pos = (struct pos){ 0, 2, obj_w -3, obj_w -1};
+                    y[0].u.pos = (struct pos){ 2, 0, 0, 2};
                     x[1].u.pos = x[0].u.pos;
-                    y[1].u.pos = (struct pos){ obj_height -3, obj_height -1, obj_height -1, obj_height -3};
+                    y[1].u.pos = (struct pos){ obj_h -3, obj_h -1, obj_h -1, obj_h -3};
                 } else {
-                    x[0].u.pos = (struct pos){ 2,            0,            0,             2};
-                    y[0].u.pos = (struct pos){ 0,            2,            obj_height -3, obj_height -1};
-                    x[1].u.pos = (struct pos){ obj_width -3, obj_width -1, obj_width -1,  obj_width -3};
+                    x[0].u.pos = (struct pos){ 2, 0, 0, 2};
+                    y[0].u.pos = (struct pos){ 0, 2, obj_h -3, obj_h -1};
+                    x[1].u.pos = (struct pos){ obj_w -3, obj_w -1, obj_w -1,  obj_w -3};
                     y[1].u.pos = y[0].u.pos;
                 }
                 for(int oc = 0; oc < 2; oc++) {
@@ -115,81 +120,34 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height, co
                     }
                 }
             } else
-                LCD_DrawRoundRect(obj_x, obj_y, w, h , 3,  1);
+                LCD_DrawRoundRect(obj_x, obj_y, obj_w, obj_h , 3,  1);
         }
-        if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
-        else
-            txt_y = obj_y;
-        if (obj_width > txt_w && desc->style != LABEL_LEFT)
-            txt_x = obj_x + (obj_width - txt_w) / 2 + 1;
-        else
-            txt_x = obj_x;
     }
-    else if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
-        if (w < txt_w)
-            w = txt_w;
-        if (txt_w && h < txt_h)
-            h = txt_h;
-        LCD_FillRect(obj_x, obj_y, w, h, 0xffff);
-        if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
-        else
-            txt_y = obj_y;
-        if (obj_width > txt_w && desc->style != LABEL_LEFT)
-            txt_x = obj_x + (obj_width - txt_w) / 2;
-        else
-            txt_x = obj_x;
-    } else if (desc->style == LABEL_NO_BOX) {
-        txt_x = obj_x;
-        txt_y = obj_y + 1;
-        u16 old_w = obj_width;
-        u16 old_h = obj_height;
-        if (old_w < txt_w)
-            old_w = txt_w;
-        if (old_h < txt_h)
-            old_h = txt_h;
-        //obj_width = txt_w;  //unused assignment
-        //obj_height = txt_h; //unused assignment
-        GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
-    } else if (desc->style == LABEL_UNDERLINE) {
-        txt_x = obj_x;
-        u16 old_w = obj_width;
-        u16 old_h = obj_height;
-        if (old_w < txt_w)
-            old_w = txt_w;
-        if (old_h < txt_h)
-            old_h = txt_h;
-        GUI_DrawBackground(obj_x, obj_y, old_w, old_h);
-        if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
-        else
-            txt_y = obj_y;
-        LCD_DrawFastHLine(obj_x, txt_y + txt_h - 1, old_w, 1);
-    } else {
-        u8 y_off = 0;
-        if (desc->style == LABEL_TRANSPARENT || desc->style == LABEL_CENTER || desc->style == LABEL_LEFT ||
-                desc->style == LABEL_LEFTCENTER || desc->style ==LABEL_BLINK) {
-           GUI_DrawBackground(obj_x, obj_y, obj_width, obj_height);
-        } else {
-            LCD_FillRect(obj_x, obj_y, obj_width, obj_height, desc->fill_color);
-            y_off = 1;
-        }
-        if (desc->style == LABEL_TRANSPARENT || desc->fill_color != desc->outline_color) {
-            LCD_DrawRect(obj_x, obj_y, obj_width, obj_height, desc->outline_color);
-            y_off = 1;
-        }
-        if (obj_height > txt_h)
-            txt_y = obj_y + (obj_height - txt_h) / 2 + 1;
-        else
-            txt_y = obj_y + y_off;
-        if (obj_width > txt_w && desc->style != LABEL_LEFT &&  desc->style != LABEL_LEFTCENTER)
-            txt_x = obj_x + (obj_width - txt_w) / 2;
-        else
-            txt_x = obj_x;
+    else if (desc->style == LABEL_FILL) {
+        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
+    }
+    else if (desc->style == LABEL_INVERTED || is_selected) {
+        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, 0xffff);
+    }
+    if (desc->style == LABEL_TRANSPARENT || (LCD_DEPTH > 1 && desc->fill_color != desc->outline_color)) {
+        LCD_DrawRect(obj_x, obj_y, obj_w, obj_h, desc->outline_color);
+        obj_x+=2; obj_w-=4;
     }
 
-    if (desc->style == LABEL_BLINK ) {
+    if (desc->style == LABEL_RIGHT) {
+        txt_x = obj_x + obj_w - txt_w;
+    } else if (obj_w > txt_w && !(desc->style == LABEL_LEFT || desc->style == LABEL_NO_BOX
+                                                            || desc->style == LABEL_UNDERLINE)) {
+        txt_x = obj_x+1 + (obj_w - txt_w + 1) / 2;
+    } else {
+        txt_x = obj_x+1;
+    }
+    txt_y = obj_y + offset + (obj_h - txt_h + 1) / 2;
+
+    if (desc->style == LABEL_UNDERLINE) {
+        LCD_DrawFastHLine(--txt_x, txt_y + txt_h - 1, obj_w, 1);
+    }
+    if (desc->style == LABEL_BLINK) {
         blink_fontcolor = ~blink_fontcolor;
         LCD_SetFontColor(blink_fontcolor);
     } else if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {

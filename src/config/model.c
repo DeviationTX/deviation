@@ -24,14 +24,14 @@ struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 static u32 crc32;
 
-const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
+const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
 const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
-#define MATCH_SECTION(s) strcasecmp(section, s) == 0
-#define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
-#define MATCH_KEY(s)     strcasecmp(name,    s) == 0
-#define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
+#define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
+#define MATCH_START(x,y) (strncasecmp(x, y, sizeof(y)-1) == 0)
+#define MATCH_KEY(s)     (strcasecmp(name,    s) == 0)
+#define MATCH_VALUE(s)   (strcasecmp(value,   s) == 0)
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 
 #define WRITE_FULL_MODEL 0
@@ -1068,7 +1068,6 @@ u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
     u8 idx;
-    u8 i;
     struct Model *m = &Model;
 
 
@@ -1210,7 +1209,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #endif //HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
+    for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
             fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceNameReal(file, i), SAFETY_VAL[m->safety[i]]);
         }
@@ -1352,6 +1351,7 @@ const char *CONFIG_GetIcon(enum ModelType type) {
     const char *const icons[] = {
        "modelico/heli.bmp",
        "modelico/plane.bmp",
+       "modelico/multi.bmp",
     };
     return icons[type];
 }

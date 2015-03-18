@@ -108,8 +108,6 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
 
 static void calibrate_sticks(void)
 {
-    // bug fix: should turn of safety dialog during calibrating, or it might fail when stick is not calibrated and safety setting is on
-    PAGE_DisableSafetyDialog(1);
     PROTOCOL_DeInit();
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
@@ -148,7 +146,6 @@ static void calibrate_sticks(void)
     PAGE_SetActionCB(NULL);
     PROTOCOL_Init(0);
     PAGE_TxConfigureInit(-1);   // should be -1 so that devo10 can get back to previous item selection
-    PAGE_DisableSafetyDialog(0);
 }
 
 static const char *calibratestr_cb(guiObject_t *obj, const void *data)

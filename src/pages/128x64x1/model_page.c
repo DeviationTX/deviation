@@ -25,6 +25,7 @@
 
 static const char * const HELI_LABEL = _tr_noop("Heli");
 static const char * const PLANE_LABEL = _tr_noop("Plane");
+static const char * const MULTI_LABEL = _tr_noop("Multi");
 #include "../common/_model_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
@@ -184,6 +185,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        PAGE_ModelExit();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         }

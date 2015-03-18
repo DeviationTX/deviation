@@ -203,6 +203,7 @@ static void esky_init2()
     end_bytes[5] = channel2*2;
 
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     u8 config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, config);
     // Implicit delay in callback
@@ -395,10 +396,6 @@ const void *ESKY_Cmds(enum ProtoCmds cmd)
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power); // Is it needed?
-            break;
         default: break;
     }
     return 0;

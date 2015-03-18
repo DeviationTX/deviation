@@ -24,6 +24,7 @@
 // string too long for devo10, so define it separately for devo8 and devo10
 static const char * const HELI_LABEL = _tr_noop("Helicopter");
 static const char * const PLANE_LABEL = _tr_noop("Airplane");
+static const char * const MULTI_LABEL = _tr_noop("Multirotor");
 
 #include "../common/_model_page.c"
 
@@ -63,7 +64,7 @@ void PAGE_ModelInit(int page)
         COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
         COL2 = (COL1 + 128),
         COL3 = (COL1 + 228),
-        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+        ROW1 = (44 + ((LCD_HEIGHT - 240) / 2)),
     };
     row = ROW1;
     GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));

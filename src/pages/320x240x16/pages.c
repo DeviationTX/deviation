@@ -63,6 +63,7 @@ struct page_group groups[] = {
 #if HAS_SCANNER
     {2, PAGEID_SCANNER},
 #endif
+    {2, PAGEID_RANGE},
     {2, PAGEID_USB},
 #if HAS_STANDARD_GUI
     {0x81, PAGEID_MODELMENU},
@@ -116,7 +117,9 @@ void PAGE_Change(int dir)
         //Don't use left/right on model pages in standard mode
         return;
     }
-    u8 nextpage = cur_page;
+    u8 nextpage = 0;
+    while (groups[nextpage].id != cur_page)
+        nextpage += 1;
     if(dir > 0) {
         if (groups[nextpage+1].group == groups[cur_page].group) {
             nextpage++;
@@ -132,9 +135,8 @@ void PAGE_Change(int dir)
                 nextpage++;
         }
     }
-    if (cur_page == nextpage)
+    if (cur_page == groups[nextpage].id)
         return;
-    PAGE_Exit();
     PAGE_ChangeByID(groups[nextpage].id);
 }
 

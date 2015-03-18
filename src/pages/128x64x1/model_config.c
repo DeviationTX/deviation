@@ -96,9 +96,13 @@ void MODELPAGE_Config()
 {
     PAGE_SetModal(1);
     PAGE_SetActionCB(_action_cb);
-    show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
+    switch (Model.type) {
+      case MODELTYPE_HELI: show_titlerow(_tr("Helicopter")); break; 
+      case MODELTYPE_PLANE: show_titlerow(_tr("Airplane")); break; 
+      case MODELTYPE_MULTI: show_titlerow(_tr("Multirotor")); break; 
+      }
 
-    if (Model.type == 0) {
+    if (Model.type == MODELTYPE_HELI) {
         GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, 
                          LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);

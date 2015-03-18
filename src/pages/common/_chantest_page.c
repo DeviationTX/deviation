@@ -14,12 +14,14 @@
  */
 static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
-static s16 showchan_cb(void *data);
+static s32 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
 static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
-static int _get_input_idx(int chan);
+static int get_channel_idx(int chan);
+static void _show_bar_page(int row);
+static int cur_row = 0;
 
 enum {
     ITEM_GRAPH,
@@ -66,15 +68,16 @@ unsigned button_capture_cb(u32 button, unsigned flags, void *data)
 
 void PAGE_ChantestEvent()
 {
-    int i;
     if(cp->type == MONITOR_BUTTONTEST) {
         _handle_button_test();
         return;
     }
-    volatile s16 *raw = MIXER_GetInputs();
-    for(i = 0; i < cp->num_bars; i++) {
-        int j = _get_input_idx(i);
-        int v = RANGE_TO_PCT(cp->type ? raw[j+1] : Channels[j]);
+    volatile s32 *raw = MIXER_GetInputs();
+    for(int i = 0; i < cp->num_bars; i++) {
+        int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + i);
+        int v = RANGE_TO_PCT((ch >= NUM_INPUTS && ch < NUM_INPUTS + NUM_OUT_CHANNELS)
+                             ? Channels[ch - NUM_INPUTS]
+                             : raw[ch + 1]);
         if (v != cp->pctvalue[i]) {
             guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
             if (obj) {
@@ -90,7 +93,7 @@ void PAGE_ChantestExit()
 {
     BUTTON_UnregisterCallback(&cp->action);
 }
-static s16 showchan_cb(void *data)
+static s32 showchan_cb(void *data)
 {
     long ch = (long)data;
     return cp->pctvalue[ch];
@@ -104,24 +107,51 @@ static const char *value_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static const char *channum_cb(guiObject_t *obj, const void *data)
+static int get_channel_idx(int chan)
 {
-    (void)obj;
-    long ch = (long)data;
-    if (cp->type) {
-        char *p = tempstring;
-        if (ch & 0x01) {
-            *p = '\n';
-            p++;
+    int i;
+    if (cp->type == MONITOR_MIXEROUTPUT) {
+        for (i = 0; i < NUM_CHANNELS; i++) {
+            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+                if (--chan < 0)
+                    break;
+            }
         }
-        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limitied in character set
-        INPUT_SourceName(p, ch+1);
-        CONFIG_EnableLanguage(1);
-        if (! (ch & 0x01)) {
-            sprintf(p + strlen(p), "\n");
+        return i + NUM_INPUTS;
+    } else {
+        if (cp->type == MONITOR_RAWINPUT) {
+            int ppms = (PPMin_Mode() == PPM_IN_SOURCE) ? Model.num_ppmin & 0x3f: 0;
+            if (chan < ppms)
+                return NUM_INPUTS + NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS + chan;
+            chan -= ppms;
+        }
+        for (i = 0; i < NUM_INPUTS; i++) {
+            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+                if (--chan < 0)
+                    break;
+            }
+        }
+        return i;
+    }
+}
+
+static int num_disp_bars() {
+    int j = 0;
+    if (cp->type == MONITOR_MIXEROUTPUT) {
+        for (int i = 0; i < NUM_CHANNELS; i++) {
+            if (Model.templates[i] != MIXERTEMPLATE_NONE) {
+                j++;
+            }
         }
     } else {
-       sprintf(tempstring, "\n%d", (int)ch+1);
+        for (int i = 0; i < NUM_INPUTS; i++) {
+            if (!(Transmitter.ignore_src & (1 << (i+1)))) {
+                j++;
+            }
+        }
+        if (cp->type == MONITOR_RAWINPUT && PPMin_Mode() == PPM_IN_SOURCE) {
+            j += Model.num_ppmin & 0x3f;
+        }
     }
-    return tempstring;
+    return j;
 }

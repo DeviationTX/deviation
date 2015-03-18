@@ -26,6 +26,11 @@ struct chantest_obj {
     guiScrollbar_t scrollbar;
 };
 
+struct range_obj {
+    guiLabel_t info;
+    guiButton_t button;
+};
+
 struct lang_obj {
     guiButton_t ok;
     guiListbox_t listbox;
@@ -558,6 +563,7 @@ struct gui_objs {
     union {
         struct splash_obj splash;
         struct chantest_obj chantest;
+        struct range_obj range;
         struct lang_obj lang;
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;

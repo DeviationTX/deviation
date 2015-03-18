@@ -34,7 +34,7 @@ struct FAT {
 };
 
 
-extern volatile s16 Channels[NUM_OUT_CHANNELS];
+extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
 
 /* Temproary definition until we have real translation */
@@ -102,7 +102,6 @@ void PAGE_ShowSafetyDialog();
 void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
 void PAGE_ShowLowBattDialog();
-void PAGE_DisableSafetyDialog(u8 disable);
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data);
 void PAGE_ShowInvalidModule();
 void PAGE_ShowModuleDialog(const char **missing);
@@ -126,8 +125,9 @@ extern const char * const ProtocolNames[PROTOCOL_COUNT];
 enum ModelType {
     MODELTYPE_HELI,
     MODELTYPE_PLANE,
-    MODELTYPE_LAST,
+    MODELTYPE_MULTI,
 };
+#define MODELTYPE_LAST (MODELTYPE_MULTI + 1)
 
 enum TxPower {
     TXPOWER_100uW,

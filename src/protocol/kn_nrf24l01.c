@@ -219,6 +219,7 @@ static u16 kn_init2()
     rf_ch_num = 0;
 
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, CRC_CONFIG | BV(NRF24L01_00_PWR_UP));
     // delayMicroseconds(150);
     return 150u;
@@ -529,10 +530,6 @@ const void *KN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return kn_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power);
-            break;
         default: break;
     }
     return 0;

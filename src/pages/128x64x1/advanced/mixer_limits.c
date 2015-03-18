@@ -93,7 +93,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limits_cb; value = &mp->limit.speed;
             break;
     }
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y, 60, LINE_HEIGHT, &labelDesc, label_cb, NULL, label);
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow], 60, y, 60, LINE_HEIGHT, &labelDesc, tgl, disp, value);
@@ -106,7 +106,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_limits()
 {
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 128, LCD_HEIGHT - HEADER_HEIGHT,
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, ITEM_REVERSE, 0));
 };
