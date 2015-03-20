@@ -8,6 +8,10 @@ TARGET	   ?= utx_devo
 TYPE      ?= dev
 LIBOPENCM3 = ../libopencm3/lib/libopencm3_stm32f0.a
 
+ifeq (,$(wildcard $(TARGET).c))
+    $(error $(TARGET) is not a valid target)
+endif
+
 ###############################################
 # Source Files                                #
 ###############################################

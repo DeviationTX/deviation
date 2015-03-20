@@ -30,6 +30,7 @@ static void spi_cb(u8 *ptr, unsigned length);
 //Code here converts universal TX into a simple switch and Devo TX does all the work
 void utx_devo()
 {
+    SPI_ProtoInit();
     SPI_ProtoMasterSlaveInit(&spi_cb);  //Switch SPI to slave mode
     while(1) ;
 }

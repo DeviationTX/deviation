@@ -31,6 +31,15 @@ void utx_ppm()
 {
     BT_Initialize();
 
+    SPI_ProtoInit();
+
+    printf("Power Up\n");
+    printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
+    printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
+    printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
+    printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
+    printf("Done\n");
+
     //BT_Test();        
     Model.proto_opts[0] = 3; //Radio => CYRF6936
     Model.proto_opts[1] = 7; //Tx Power => 0
