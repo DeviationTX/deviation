@@ -87,6 +87,7 @@ enum {
     TELEM_FRSKY_VOLT1 = 1,
     TELEM_FRSKY_VOLT2,
     TELEM_FRSKY_VOLT3,
+    TELEM_FRSKY_RSSI,
     TELEM_FRSKY_TEMP1,
     TELEM_FRSKY_TEMP2,
     TELEM_FRSKY_RPM,
@@ -205,7 +206,9 @@ struct telem_dsm {
 };
 
 struct telem_frsky {
+  //  u16 volt[2];
     u16 volt[3];
+    u16 rssi;
     s16 temp[2];
     u16 rpm;
     s32 altitude;

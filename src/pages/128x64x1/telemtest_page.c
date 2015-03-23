@@ -163,6 +163,7 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
     {TYPE_INDEX | 2,  0, 8,  3},
     {TYPE_VALUE | 2, 48, 35, TELEM_FRSKY_VOLT3},
+    {TYPE_VALUE | 2, 86, 35, TELEM_FRSKY_RSSI},
     {0, 0, 0, 0},
 };
 
