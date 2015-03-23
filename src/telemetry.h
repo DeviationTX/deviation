@@ -237,12 +237,12 @@ enum {
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
-const char * TELEMETRY_GetValueStr(char *str, unsigned telem);
-const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value);
-const char * TELEMETRY_Name(char *str, unsigned telem);
-const char * TELEMETRY_ShortName(char *str, unsigned telem);
-s32 TELEMETRY_GetMaxValue(unsigned telem);
-s32 TELEMETRY_GetMinValue(unsigned telem);
+const char * TELEMETRY_GetValueStr(char *str, int idx);
+const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value);
+const char * TELEMETRY_Name(char *str, int idx);
+const char * TELEMETRY_ShortName(char *str, int idx);
+s32 TELEMETRY_GetMaxValue(int idx);
+s32 TELEMETRY_GetMinValue(int idx);
 void TELEMETRY_Alarm();
 void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);

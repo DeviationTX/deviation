@@ -129,12 +129,12 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     return _frsky_value(t, idx);
 }
 
-const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
+const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
 {
     int h, m, s, ss;
     char letter = ' ';
     int unit = 0;    // rBE-OPT: Optimizing string usage, saves some bytes
-    switch(telem) {
+    switch(idx) {
         case TELEM_GPS_LONG:
             // allowed values: +/-180° = +/- 180*60*60*1000; W if value<0, E if value>=0; -180° = 180°
             if (value < 0) {
@@ -195,32 +195,32 @@ const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
         case TELEM_GPS_HEADING:     _get_value_str(str, value, 2, '\0'); break;
         default:
             if (TELEMETRY_Type() == TELEM_DEVO)
-                return _devo_str_by_value(str, telem, value);
+                return _devo_str_by_value(str, idx, value);
             if (TELEMETRY_Type() == TELEM_DSM)
-                return _dsm_str_by_value(str, telem, value);
-            return _frsky_str_by_value(str, telem, value);
+                return _dsm_str_by_value(str, idx, value);
+            return _frsky_str_by_value(str, idx, value);
     }
     return str;
 }
 
-const char * TELEMETRY_GetValueStr(char *str, unsigned telem)
+const char * TELEMETRY_GetValueStr(char *str, int idx)
 {
-    s32 value = TELEMETRY_GetValue(telem);
-    return TELEMETRY_GetValueStrByValue(str, telem, value);
+    s32 value = TELEMETRY_GetValue(idx);
+    return TELEMETRY_GetValueStrByValue(str, idx, value);
 }
 
-const char * TELEMETRY_Name(char *str, unsigned telem)
+const char * TELEMETRY_Name(char *str, int idx)
 {
     if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_name(str, telem);
+        return _devo_name(str, idx);
     if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_name(str, telem);
-    return _frsky_name(str, telem);
+        return _dsm_name(str, idx);
+    return _frsky_name(str, idx);
 }
 
-const char * TELEMETRY_ShortName(char *str, unsigned telem)
+const char * TELEMETRY_ShortName(char *str, int idx)
 {
-    switch(telem) {
+    switch(idx) {
         case TELEM_GPS_LONG:    strcpy(str, _tr("Longitude")); break;
         case TELEM_GPS_LAT:     strcpy(str, _tr("Latitude")); break;
         case TELEM_GPS_ALT:     strcpy(str, _tr("Altitude")); break;
@@ -230,33 +230,33 @@ const char * TELEMETRY_ShortName(char *str, unsigned telem)
         case TELEM_GPS_HEADING: strcpy(str, _tr("Heading")); break;
         default:
             if (TELEMETRY_Type() == TELEM_DEVO)
-                return _devo_short_name(str, telem);
+                return _devo_short_name(str, idx);
             if (TELEMETRY_Type() == TELEM_DSM)
-                return _dsm_short_name(str, telem);
-            return _frsky_short_name(str, telem);
+                return _dsm_short_name(str, idx);
+            return _frsky_short_name(str, idx);
     }
     return str;
 }
-s32 TELEMETRY_GetMaxValue(unsigned telem)
+s32 TELEMETRY_GetMaxValue(int idx)
 {
     if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_get_max_value(telem);
+        return _devo_get_max_value(idx);
     if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_get_max_value(telem);
-    return _frsky_get_max_value(telem);
+        return _dsm_get_max_value(idx);
+    return _frsky_get_max_value(idx);
 }
-s32 TELEMETRY_GetMinValue(unsigned telem)
+s32 TELEMETRY_GetMinValue(int idx)
 {
     if (TELEMETRY_Type() == TELEM_DEVO)
-        return _devo_get_min_value(telem);
+        return _devo_get_min_value(idx);
     if (TELEMETRY_Type() == TELEM_DSM)
-        return _dsm_get_min_value(telem);
-    return _frsky_get_min_value(telem);
+        return _dsm_get_min_value(idx);
+    return _frsky_get_min_value(idx);
 }
 
-void TELEMETRY_SetUpdated(int telem)
+void TELEMETRY_SetUpdated(int idx)
 {
-    Telemetry.updated[telem/32] |= (1 << telem % 32);
+    Telemetry.updated[idx/32] |= (1 << idx % 32);
 }
 
 int TELEMETRY_Type()

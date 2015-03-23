@@ -37,12 +37,12 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     int val = (long)data;
+    int telem_idx = Model.telem_alarm[val];
     int last = TELEMETRY_GetNumTelemSrc();
-    u8 telem_idx = Model.telem_alarm[val];
     u8 changed;
+    //skip over (don't allow selection of) telemetry src's with max=0 (eg. JETCAT_STATUS, JETCAT_OFFCOND)
     while (1) {
         telem_idx = GUI_TextSelectHelper(telem_idx, 0, last, dir, 1, 1, &changed);
-        //exclude telemetry src's with max=0 (eg. JETCAT_STATUS, JETCAT_OFFCOND)
         if (telem_idx == 0 || TELEMETRY_GetMaxValue(telem_idx))
             break;
         if (telem_idx == last)

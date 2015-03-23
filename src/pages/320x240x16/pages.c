@@ -220,6 +220,10 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
 {
     (void)data;
     (void)flags;
+    if (PAGE_GetID() == PAGEID_TELEMMON) {
+        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
+            TELEMETRY_MuteAlarm();
+    }
     if (ActionCB != NULL)
         return ActionCB(buttons, flags, data);
     if (flags & BUTTON_LONGPRESS) {
@@ -238,14 +242,6 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
             return 1;
         }
         return 0;
-    }
-    if (PAGE_GetID() == PAGEID_TELEMMON) {
-        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
-            TELEMETRY_MuteAlarm();
-            return 1;
-        } else if(CHAN_ButtonIsPressed(buttons, BUT_EXIT)) {
-            TELEMETRY_MuteAlarm();
-        }        
     }
     if(PAGE_QuickPage(buttons, flags, data))
         return 1;

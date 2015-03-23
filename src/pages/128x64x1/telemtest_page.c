@@ -364,18 +364,17 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
+            TELEMETRY_MuteAlarm();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-            TELEMETRY_MuteAlarm();
         } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
                 _navigate_pages(1);
             } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
                 _navigate_pages(-1);
-            } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-                TELEMETRY_MuteAlarm();
             } else {
                 return 0;
             }
