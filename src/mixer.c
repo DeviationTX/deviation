@@ -190,16 +190,7 @@ void MIXER_CalcChannels()
     }
     //5th step: apply limits
     for (i = 0; i < NUM_OUT_CHANNELS; i++) {
-        if (PPMin_Mode() == PPM_IN_TRAIN1 && Model.train_sw && raw[Model.train_sw] > 0) {
-            int ppm_channel_map = map_ppm_channels(i);
-            if (ppm_channel_map >= 0) {
-                if (ppmSync) {
-                    Channels[i] = ppmChannels[ppm_channel_map];
-                }
-                continue;
-            }
-        }
-        Channels[i] = MIXER_ApplyLimits(i, &Model.limits[i], raw, Channels, APPLY_ALL);
+        Channels[i] = MIXER_GetChannel(i, APPLY_ALL);
     }
 }
 
@@ -210,6 +201,15 @@ volatile s32 *MIXER_GetInputs()
 
 s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags)
 {
+    if (PPMin_Mode() == PPM_IN_TRAIN1 && Model.train_sw && raw[Model.train_sw] > 0) {
+        int ppm_channel_map = map_ppm_channels(channel);
+        if (ppm_channel_map >= 0) {
+            if (ppmSync) {
+                return ppmChannels[ppm_channel_map];
+            }
+            return Channels[channel];   // last value obtained from synchronized ppm set by CalcChannels
+        }
+    }
     return MIXER_ApplyLimits(channel, &Model.limits[channel], raw, Channels, flags);
 }
 
