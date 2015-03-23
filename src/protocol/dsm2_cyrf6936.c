@@ -44,16 +44,15 @@
 #define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 
 static const char * const dsm_opts[] = {
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), _tr_noop("B2"), NULL,
-  NULL
+   _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("A1"), _tr_noop("On"), NULL, NULL
 };
 enum {
     PROTOOPTS_TELEMETRY = 0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-#define TELEM_B2 2
-#define TELEM_ON 1
+#define TELEM_ON 2
+#define TELEM_A1 1
 #define TELEM_OFF 0
 
 //During binding we will send BIND_COUNT/2 packets
@@ -188,10 +187,11 @@ static void build_bind_packet()
     packet[9] = sum & 0xff;
     packet[10] = 0x01; //???
     packet[11] = num_channels;
-    if(Model.protocol == PROTOCOL_DSMX)
-        packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_B2 ? 0xa2 : 0xb2;
-    else
+    if(Model.protocol == PROTOCOL_DSMX) {
+        packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_ON ? 0xa2 : 0xb2;
+    } else {
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
+    }
     packet[13] = 0x00; //???
     for(i = 8; i < 14; i++)
         sum += packet[i];
@@ -248,6 +248,7 @@ static u8 get_pn_row(u8 channel)
 static const u8 init_vals[][2] = {
     {CYRF_02_TX_CTRL, 0x00},
     {CYRF_05_RX_CTRL, 0x00},
+    {CYRF_0E_GPIO_CTRL, 0x00},
     {CYRF_28_CLK_EN, 0x02},
     {CYRF_32_AUTO_CAL_TIME, 0x3c},
     {CYRF_35_AUTOCAL_OFFSET, 0x14},
@@ -630,7 +631,6 @@ static u16 dsm2_cb()
         } else {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
         }
@@ -638,13 +638,13 @@ static u16 dsm2_cb()
         //Read telemetry if needed and parse if good
         u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
         if (rx_state & 0x02) {
+            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Disable overwrite while reading receive buffer
             CYRF_ReadDataPacket16(pktTelem);
-            if ((rx_state & 0x01) == 0)
+            if (!(rx_state & 0x05) && !(CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS) & 0x01))
                 parse_telemetry_packet();
         }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
             return 11000;
         }

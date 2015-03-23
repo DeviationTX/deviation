@@ -143,10 +143,10 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
     {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, 61, 25, RXV_LABEL},
-    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT2},
+    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT1},
 
     {TYPE_HEADER | 3,  0, 25, BATT_LABEL},
-    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT1},
+    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT2},
     {TYPE_HEADER | 3, 61, 25, RPM_LABEL},
     {TYPE_VALUE  | 3, 86, 35, TELEM_DSM_FLOG_RPM1},
 
@@ -311,6 +311,8 @@ void PAGE_TelemtestInit(int page)
 void PAGE_TelemtestEvent() {
     if (current_page == telemetry_off)
         return;
+    static u32 count;
+    int flicker = (++count%4==0);
     struct Telemetry cur_telem = Telemetry;
     int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
     int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);
@@ -326,7 +328,7 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if((TELEMETRY_HasAlarm(ptr->source) && (CLOCK_getms() >> 7)%4==0) || ! TELEMETRY_IsUpdated(ptr->source)) {
+        if((TELEMETRY_HasAlarm(ptr->source) && flicker) || ! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
         } else if (cur_val != last_val) {
             GUI_Redraw(&gui->box[i]);
