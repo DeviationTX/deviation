@@ -148,6 +148,15 @@ HGTEST := $(shell mkdir -p $(ODIR); \
 ##################################################
 #This section contains switches used for building#
 ##################################################
+ifeq (,$(wildcard $(ODIR)/type))
+    $(shell echo $(TYPE) > $(ODIR)/type)
+else
+    LASTTYPE := $(shell cat $(ODIR)/type)
+    ifneq ($(TYPE), $(LASTTYPE))
+        $(shell echo $(TYPE) > $(ODIR)/type)
+    endif
+endif
+
 ifeq "$(TYPE)" "dev"
   CFLAGS   := $(CFLAGS) -g -DBUILDTYPE_DEV
 endif
@@ -192,7 +201,7 @@ all : $(ALL)
 ####################################
 # recompile if the Makefile changes#
 ####################################
-$(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES)
+$(OBJS) $(PROTO_OBJS) ($PROTO_EXTRA_OBJS): Makefile target/$(TARGET)/Makefile.inc $(EXTRA_MAKEFILES) $(ODIR)/type
 
 ##################################################################################
 # The following enables quiet output unless you use VERBOSE=1                    #
