@@ -351,6 +351,8 @@ static void initialize(u8 bind) {
     } else {
         id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
     }
+    if ((id & 0xf0) > 0x90) // limit offset to 9 as higher values don't work with some RX (ie V912)
+        id = id - 0x70;
     chanrow = id % 16;
     chancol = 0;
     chanoffset = (id & 0xff) / 16;
