@@ -200,6 +200,8 @@ s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32
         value = max;
     } else if (value < min) {
         value = min;
+    } else if (shortstep > 1) {
+        value = (value + (shortstep/2)) / shortstep * shortstep;
     }
     changed = (value == oldval) ? 0 : 1;
     if(_changed)

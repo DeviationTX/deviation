@@ -118,6 +118,12 @@ static void show_page()
     //memset(tp->telem.time, 0, sizeof(tp->telem.time));
 }
 
+void PAGE_ShowTelemetryAlarm()
+{
+    if (PAGE_GetID() != PAGEID_TELEMCFG)
+        PAGE_ChangeByID(PAGEID_TELEMMON);
+}
+
 void PAGE_TelemtestInit(int page)
 {
     (void)page;
@@ -146,6 +152,8 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
     show_page();
 }
 void PAGE_TelemtestEvent() {
+    static u32 count;
+    int flicker = (++count%4==0);
     struct Telemetry cur_telem = Telemetry;
     const struct telem_layout *ptr = _get_layout();
     for (int i = 0; ptr->source; ptr++, i++) {
@@ -153,10 +161,10 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (cur_val != last_val) {
-            GUI_Redraw(&gui->value[i]);
-        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
+        if((TELEMETRY_HasAlarm(ptr->source) && flicker) || ! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
+        } else if (cur_val != last_val) {
+            GUI_Redraw(&gui->value[i]);
         }
         GUI_SetLabelDesc(&gui->value[i], font);
     }

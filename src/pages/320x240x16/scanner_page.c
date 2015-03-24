@@ -97,7 +97,7 @@ void PAGE_ScannerEvent()
     Delay(10);
 
     CYRF_ReadDataPacket(dpbuffer);
-        sp->channelnoise[sp->channel] = CYRF_ReadRSSI(1) & 0x1F;
+        sp->channelnoise[sp->channel] = CYRF_ReadRSSI(1);
         GUI_Redraw(&gui->bar[sp->channel]);
 
     //printf("%02X : %d\n",sp->channel,sp->channelnoise[sp->channel]);

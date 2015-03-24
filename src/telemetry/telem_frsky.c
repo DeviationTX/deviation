@@ -21,6 +21,7 @@ s32 _frsky_value(struct Telemetry *_t, int idx)
     case TELEM_FRSKY_VOLT2:
     case TELEM_FRSKY_VOLT3:
         return t->volt[idx - TELEM_FRSKY_VOLT1];
+    case TELEM_FRSKY_RSSI:
     case TELEM_FRSKY_TEMP1:
     case TELEM_FRSKY_TEMP2:
         return t->temp[idx - TELEM_FRSKY_TEMP1];
@@ -35,11 +36,14 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
     switch(telem) {
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
-        case TELEM_FRSKY_VOLT3: _get_volt_str(str, value); break;
+        case TELEM_FRSKY_VOLT3: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_FRSKY_TEMP1:
-        case TELEM_FRSKY_TEMP2: _get_temp_str(str, value); break;
-        case TELEM_FRSKY_RPM:   sprintf(str, "%d", (int)value);
-            break;
+        case TELEM_FRSKY_TEMP2: _get_temp_str(str, value, 0, 'C'); break;
+        case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 1, '%'); break;
+        case TELEM_FRSKY_RPM:   _get_value_str(str, value, 0, '\0'); break;
+        case TELEM_FRSKY_ALTITUDE:  _get_altitude_str(str, value, 2, 'm'); break;
+        default:
+            return "";
     }
     return str;
 }
@@ -47,19 +51,19 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
 const char * _frsky_name(char *str, u8 telem)
 {
     switch (telem) {
-      case TELEM_FRSKY_VOLT1:
-      case TELEM_FRSKY_VOLT2:
-        sprintf(str, "%s%d", _tr("TelemV"), telem - TELEM_FRSKY_VOLT1 + 1);
-        break;
-      case TELEM_FRSKY_TEMP1:
-      case TELEM_FRSKY_TEMP2:
-        sprintf(str, "%s%d", _tr("TelemT"), telem - TELEM_FRSKY_TEMP1 + 1);
-        break;
-      case TELEM_FRSKY_RPM:
-        sprintf(str, "%s", _tr("TelemRPM"));
-        break;
-      default:
-        return "";
+        case TELEM_FRSKY_VOLT1:
+        case TELEM_FRSKY_VOLT2:
+            sprintf(str, "%s%d", _tr("TelemV"), telem - TELEM_FRSKY_VOLT1 + 1);
+            break;
+        case TELEM_FRSKY_TEMP1:
+        case TELEM_FRSKY_TEMP2:
+            sprintf(str, "%s%d", _tr("TelemT"), telem - TELEM_FRSKY_TEMP1 + 1);
+            break;
+        case TELEM_FRSKY_RPM:
+            strcpy(str, _tr("TelemRPM"));
+            break;
+        default:
+            return "";
     }
     return str;
 }
@@ -71,7 +75,8 @@ const char * _frsky_short_name(char *str, u8 telem)
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
         case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_DEVO_VOLT1 + 1); break;
-        case TELEM_FRSKY_RPM:  sprintf(str, "%s%d",  _tr("RPM"), telem - TELEM_DEVO_RPM1 + 1);  break;
+        case TELEM_FRSKY_RSSI:  strcpy(str, _tr("RSSI")); break;
+        case TELEM_FRSKY_RPM:   strcpy(str, _tr("RPM")); break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2: sprintf(str, "%s%d", _tr("Temp"), telem - TELEM_DEVO_TEMP1 + 1); break;
         default: str[0] = '\0'; break;
@@ -84,13 +89,24 @@ s32 _frsky_get_max_value(u8 telem)
     switch(telem) {
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
-        case TELEM_FRSKY_VOLT3:
-            return 255;
-        case TELEM_FRSKY_RPM:
-            return 20000;
+        case TELEM_FRSKY_VOLT3:     return 2500; //x100
         case TELEM_FRSKY_TEMP1:
-        case TELEM_FRSKY_TEMP2:
-            return 255;
+        case TELEM_FRSKY_TEMP2:     return 250;
+        case TELEM_FRSKY_RSSI:
+        case TELEM_FRSKY_RPM:       return 60000;
+        case TELEM_FRSKY_ALTITUDE:  return 900000; //x100
+        default:
+            return 0;
+    }
+}
+
+s32 _frsky_get_min_value(u8 telem)
+{
+    switch(telem) {
+        case TELEM_FRSKY_TEMP1:
+        case TELEM_FRSKY_TEMP2:     return -30;
+        case TELEM_FRSKY_RPM:       return 60;
+        case TELEM_FRSKY_ALTITUDE:  return -50000; //x100
         default:
             return 0;
     }

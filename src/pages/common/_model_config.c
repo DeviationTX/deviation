@@ -89,7 +89,10 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
         sprintf(tempstring, "%d", Model.proto_opts[idx]);
 
     } else {
-        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, 1, 1, &changed);
+        step = 1;
+        if (Model.protocol == PROTOCOL_DSM2 || (Model.protocol == PROTOCOL_DSMX && Model.num_channels >= 8))
+            step = 2;
+        Model.proto_opts[idx] = GUI_TextSelectHelper(Model.proto_opts[idx], 0, count-1, dir, step, step, &changed);
         snprintf(tempstring, sizeof(tempstring), "%s", _tr(proto_strs[pos+Model.proto_opts[idx]+1]));
     }
     if (changed)
