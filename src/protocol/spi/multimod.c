@@ -22,11 +22,17 @@
 #if HAS_MULTIMOD_SUPPORT
 static void utx_SendReceive(u8 *tx, u8 *rx, int len)
 {
+    //spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_128);
     PROTOSPI_pin_clear(Transmitter.module_enable[MULTIMODCTL]);
+    for(int i = 0; i < 50; i++)
+        _NOP();
     for (int i = 0; i < len; i++) {
         rx[i] = PROTOSPI_xfer(tx[i]);
     }
     PROTOSPI_pin_set(Transmitter.module_enable[MULTIMODCTL]);
+    for(int i = 0; i < 100; i++)
+        _NOP();
+    //spi_set_baudrate_prescaler(SPI2, SPI_CR1_BR_FPCLK_DIV_16);
 }
 
 static int utx_SwitchCommand(int module, int command)
@@ -48,7 +54,7 @@ static int utx_SwitchCommand(int module, int command)
             break;
     }
     utx_SendReceive(tx, rx, data_len);
-    return 1;
+    return (rx[0] == 0x5a);
 }
 
 static int mm_ProtoGetPinConfig(int module, int state) {
@@ -112,7 +118,7 @@ static int mm_SwitchCommand(int module, int command)
 
 int MULTIMOD_SwitchCommand(int module, int command)
 {
-    if(!Transmitter.module_enable[MULTIMOD].port || Transmitter.module_enable[module].port != SWITCH_ADDRESS) {
+    if(!Transmitter.module_enable[MULTIMOD].port || (module < MULTIMOD && Transmitter.module_enable[module].port != SWITCH_ADDRESS)) {
         return 0;
     }
     if(IS_UNIVERSALTX()) {
