@@ -13,8 +13,11 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/flash.h>
 void PWR_Init(void)
 {
+
+
     rcc_clock_setup_in_hsi_out_48mhz();
     rcc_periph_clock_enable(RCC_SYSCFG_COMP);
 }

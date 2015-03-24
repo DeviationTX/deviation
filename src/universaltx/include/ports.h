@@ -3,10 +3,20 @@
 
 #include <libopencm3/stm32/gpio.h>
 
+#define  REGISTER_32(ADDRESS) (*((volatile unsigned int *)(ADDRESS)))
+#define CLEAR_BIT(addr,mask) ((addr) &= ~(mask))
+#define SET_BIT(addr,mask) ((addr) |= (mask))
+#define ISER		REGISTER_32(NVIC_BASE + 0)
+
 #define PORT_mode_setup(io, mode, pullup) gpio_mode_setup(io.port, mode, pullup, io.pin)
 #define PORT_pin_set(io)                  gpio_set(io.port,io.pin)
 #define PORT_pin_clear(io)                gpio_clear(io.port,io.pin)
 #define PORT_pin_get(io)                  gpio_get(io.port,io.pin)
+#define TO_PIN(x) (1 << x)
+
+#define PORT_pin_set_fast(io)             GPIO_BSRR(io.port) = io.pin;
+#define PORT_pin_clear_fast(io)           GPIO_BRR(io.port) = io.pin;
+#define PORT_pin_get_fast(io)             GPIO_IDR(io.port) & io.pin
 
 static const struct mcu_pin CYRF_RESET_PIN ={0, 0};
 static const struct mcu_pin AVR_RESET_PIN ={0, 0};
@@ -18,7 +28,10 @@ static const struct mcu_pin PA_RXEN       = {GPIOB, GPIO11};
 static const struct mcu_pin RF_MUXSEL1    = {GPIOA, GPIO15};
 static const struct mcu_pin RF_MUXSEL2    = {GPIOB, GPIO3};
 static const struct mcu_pin INPUT_CSN     = {GPIOA, GPIO8};
-static const struct mcu_pin PASSTHRU_CSN  = {GPIOB, GPIO12};
+#define PASSTHRU_CSN_PORT                    GPIOB
+#define PASSTHRU_CSN_PIN_NUM                 12
+#define PASSTHRU_CSN_PIN                     TO_PIN(PASSTHRU_CSN_PIN_NUM)
+static const struct mcu_pin PASSTHRU_CSN  = {PASSTHRU_CSN_PORT, PASSTHRU_CSN_PIN};
 static const struct mcu_pin MOSI          = {GPIOB, GPIO15};
 static const struct mcu_pin MISO          = {GPIOB, GPIO14};
 static const struct mcu_pin SCK           = {GPIOB, GPIO13};

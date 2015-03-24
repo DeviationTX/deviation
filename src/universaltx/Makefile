@@ -18,7 +18,6 @@ endif
 SRC_C = universaltx.c  \
         utx_bluetooth.c \
         utx_misc.c     \
-        utx_pactl.c    \
         utx_power.c    \
         utx_ppmin.c    \
         utx_protocol.c \

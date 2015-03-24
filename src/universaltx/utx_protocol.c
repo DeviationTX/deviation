@@ -17,7 +17,12 @@
 #include "config/model.h"
 #include "protocol/interface.h"
 
+#ifdef BUILDTYPE_DEV
 const void * (*PROTO_Cmds)(enum ProtoCmds) = TESTRF_Cmds;
+#else
+const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
+#endif
+
 #define PROTODEF(proto, module, map, cmd, name) name,
 const char * const ProtocolNames[PROTOCOL_COUNT] = {
     "None",

@@ -24,7 +24,39 @@
 #include "config/model.h"
 #include "protocol/interface.h"
 
-u8 last_module = TX_MODULE_LAST;
+void PACTL_SetTxRxMode(int mode)
+{
+    if (mode == TXRX_OFF) {
+        comp_disable(COMP1);
+        nvic_disable_irq(NVIC_ADC_COMP_IRQ);
+        PORT_pin_clear_fast(PA_RXEN);
+        PORT_pin_clear_fast(PA_TXEN);
+        return;
+    }
+    if (Model.module == NRF24L01) {
+        comp_enable(COMP1);
+        nvic_enable_irq(NVIC_ADC_COMP_IRQ);
+    }
+    if (mode == TX_EN) {
+        PORT_pin_clear_fast(PA_RXEN);
+        PORT_pin_set_fast(PA_TXEN);
+    } else {
+        PORT_pin_set_fast(PA_RXEN);
+        PORT_pin_clear_fast(PA_TXEN);
+    }
+    //printf("Mode(%d): %d (%d,%d,%d,%d)\n", Model.module, mode, PORT_pin_get(RF_MUXSEL1), PORT_pin_get(RF_MUXSEL2), PORT_pin_get(PA_TXEN), PORT_pin_get(PA_RXEN));
+#if DISCOVERY
+    if (Model.module == CYRF6936) {
+        //BUYCHINA_SetTxRxMode
+        if(mode == TX_EN) {
+            CYRF_WriteRegister(0x0E,0x20);
+        } else if (mode == RX_EN) {
+            CYRF_WriteRegister(0x0E,0x80);
+        }
+    }
+#endif
+}
+
 void PACTL_Init()
 {
     /* Enable Power Amp Rx/Tx signals */
@@ -53,11 +85,11 @@ void adc_comp_isr()
     // If the PA_EN bit is >= 1.8V, TX_EN == 1, RX_EN == 0
     // else TX_EN == 0, RX_EN == 1
     if(COMP_CSR1 & COMP_CSR_OUT) {
-        gpio_set(GPIOB, GPIO10);
-        gpio_clear(GPIOB, GPIO11);
+        PORT_pin_clear_fast(PA_RXEN);
+        PORT_pin_set_fast(PA_TXEN);
     } else {
-        gpio_clear(GPIOB, GPIO10);
-       gpio_set(GPIOB, GPIO11);
+        PORT_pin_clear_fast(PA_TXEN);
+        PORT_pin_set_fast(PA_RXEN);
     }
     exti_reset_request(EXTI21);
 }
@@ -65,53 +97,21 @@ void adc_comp_isr()
 void PACTL_SetNRF24L01_CE(int state)
 {
     if(state) {
-        PROTOSPI_pin_set(NRF24L01_CE);
+        PORT_pin_set_fast(NRF24L01_CE);
     } else {
-        PROTOSPI_pin_clear(NRF24L01_CE);
+        PORT_pin_clear_fast(NRF24L01_CE);
     }
 }
 
 int PACTL_SetSwitch(int module) {
     PACTL_SetNRF24L01_CE(0);
     switch (module) {
-        case CYRF6936: /* Port 3 */ PROTOSPI_pin_clear(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
-        case CC2500:   /* Port 4 */   PROTOSPI_pin_set(RF_MUXSEL1);    PROTOSPI_pin_set(RF_MUXSEL2); break;
-        case NRF24L01: /* Port 2 */   PROTOSPI_pin_set(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
-        case A7105:    /* Port 1 */ PROTOSPI_pin_clear(RF_MUXSEL1);  PROTOSPI_pin_clear(RF_MUXSEL2); break;
+        case CYRF6936: /* Port 3 */ PORT_pin_clear_fast(RF_MUXSEL1);    PORT_pin_set_fast(RF_MUXSEL2); break;
+        case CC2500:   /* Port 4 */   PORT_pin_set_fast(RF_MUXSEL1);    PORT_pin_set_fast(RF_MUXSEL2); break;
+        case NRF24L01: /* Port 2 */   PORT_pin_set_fast(RF_MUXSEL1);  PORT_pin_clear_fast(RF_MUXSEL2); break;
+        case A7105:    /* Port 1 */ PORT_pin_clear_fast(RF_MUXSEL1);  PORT_pin_clear_fast(RF_MUXSEL2); break;
     }
-    last_module = module;
+    SetModule(module);
     return 0;
 }
 
-void PACTL_SetTxRxMode(int mode)
-{
-    if (mode == TXRX_OFF) {
-        comp_disable(COMP1);
-        nvic_disable_irq(NVIC_ADC_COMP_IRQ);
-        PROTOSPI_pin_clear(PA_RXEN);
-        PROTOSPI_pin_clear(PA_TXEN);
-        return;
-    }
-    if (last_module == NRF24L01) {
-        comp_enable(COMP1);
-        nvic_enable_irq(NVIC_ADC_COMP_IRQ);
-    }
-    if (mode == TX_EN) {
-        PROTOSPI_pin_clear(PA_RXEN);
-        PROTOSPI_pin_set(PA_TXEN);
-    } else {
-        PROTOSPI_pin_set(PA_RXEN);
-        PROTOSPI_pin_clear(PA_TXEN);
-    }
-    printf("Mode(%d): %d (%d,%d,%d,%d)\n", last_module, mode, PORT_pin_get(RF_MUXSEL1), PORT_pin_get(RF_MUXSEL2), PORT_pin_get(PA_TXEN), PORT_pin_get(PA_RXEN));
-#if DISCOVERY
-    if (last_module == CYRF6936) {
-        //BUYCHINA_SetTxRxMode
-        if(mode == TX_EN) {
-            CYRF_WriteRegister(0x0E,0x20);
-        } else if (mode == RX_EN) {
-            CYRF_WriteRegister(0x0E,0x80);
-        }
-    }
-#endif
-}

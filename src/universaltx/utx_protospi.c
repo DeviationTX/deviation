@@ -17,20 +17,19 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/exti.h>
+#include <libopencm3/stm32/dma.h>
 #include "common.h"
 #include "protospi.h"
 #include "config/model.h"
 #include "protocol/interface.h"
 
+//#include "stm31f05xxx.h"
+// clear/set macros 
+
 //These dont' work because a 'static const' is not actually a constant in C
 //ctassert(! (INPUT_CSN.pin & 0x07), INPUT_CSN_must_be_attached_to_pins4_to_15);
 //ctassert(! (PASSTHRU_CSN.pin & 0x07), PASSTHRU_CSN_must_be_attached_to_pins4_to_15);
-
-//Keep both of these multiples of 2
-#define MAX_PKT_SIZE 16
-static u8 read_buffer[MAX_PKT_SIZE];
-static unsigned write_pos;
-static void (*spi_pkt_handler)(u8 *ptr, unsigned length);
+ctassert(! (PASSTHRU_CSN_PIN & 0x07), PASSTHRU_CSN_must_be_attached_to_pins4_to_15);
 
 uint8_t spi_xfer8(uint32_t spi, uint8_t data)
 {
@@ -68,88 +67,69 @@ u8 PROTOSPI_read3wire(){
     return data;
 }
 
-//This interrupt will fire if either INPUT_CSN (PA.8) or PASSTHRU_CSN (PB.12) change state
-void exti4_15_isr(void)
-{
-    if (exti_get_flag_status(PASSTHRU_CSN.pin)) {
-        exti_reset_request(PASSTHRU_CSN.pin);
-        if(Model.module != TX_MODULE_LAST) {
-            if(PORT_pin_get(PASSTHRU_CSN)) {
-                PORT_pin_set(module_enable[Model.module]);
-            } else {
-                PORT_pin_set(module_enable[Model.module]);
-            }
-        }
-    }
-    if (exti_get_flag_status(INPUT_CSN.pin)) {
-        if(PORT_pin_get(INPUT_CSN)) {
-           spi_set_nss_high(SPI2);
-           if (spi_pkt_handler) {
-               spi_pkt_handler(read_buffer, write_pos);
-           }
-        } else {
-           spi_set_nss_low(SPI2);
-           write_pos = 0;
-        }
-        exti_reset_request(INPUT_CSN.pin);
-    }
-}
 
-//This interrupt will handle reading data from SPI in slave mode
-void spi2_isr(void)
-{
-    if(SPI_SR(SPI2) & SPI_SR_BSY) {
-       u8 data = SPI_DR8(SPI2);
-       if (write_pos < MAX_PKT_SIZE) {
-           read_buffer[write_pos++] = data;
-       }
-    }
-}
-
-void MODULE_CSN(int module, int set)
-{
-    if (set) {
-        PROTOSPI_pin_set(MODULE_ENABLE[module]);
-    } else {
-        PROTOSPI_pin_clear(MODULE_ENABLE[module]);
-    }
-}
-int MULTIMOD_SwitchCommand(int module, int command)
-{
-    switch(command) {
-        case TXRX_OFF:
-        case TX_EN:
-        case RX_EN:
-            PACTL_SetTxRxMode(command);
-            break;
-        case CLEAR_PIN_ENABLE:
-            PACTL_SetNRF24L01_CE(0);
-            break;
-        case SET_PIN_ENABLE:
-            PACTL_SetNRF24L01_CE(1);
-            break;
-        case CHANGE_MODULE:
-            PACTL_SetSwitch(module);
-            break;
-    }
-    return 1;
-}
-
-void SPI_ProtoMasterSlaveInit(void(*callback)(u8 *ptr, unsigned length))
+void SPI_ProtoMasterSlaveInit(u8 *read_buffer)
 {
     spi_disable(SPI2);
     spi_reset(SPI2);
+
+#if 0
+        nvic_set_priority(NVIC_EXTI4_15_IRQ, 0 << 6);
+        nvic_enable_irq(NVIC_EXTI4_15_IRQ);
+        //Setup EXTI8 (INPUT_CSN) to trigger interrupt
+        exti_select_source(INPUT_CSN.pin, INPUT_CSN.port);
+        exti_set_trigger(INPUT_CSN.pin, EXTI_TRIGGER_BOTH);
+        exti_enable_request(INPUT_CSN.pin);
+        //Setup EXTI12 (PASSTHROUGH_CSN) to trigger interrupt
+        exti_select_source(PASSTHRU_CSN.pin, PASSTHRU_CSN.port);
+        exti_set_trigger(PASSTHRU_CSN.pin, EXTI_TRIGGER_BOTH);
+        exti_enable_request(PASSTHRU_CSN.pin);
+
+	// Turn on SPI2
+	SET_BIT(RCC_APB1ENR,BIT14);
+	// Take SPI2 out of reset
+	CLEAR_BIT(RCC_APB1RSTR,BIT14);
+	// Set the baud rate (500kHz - assumes 8MHz pclk) not sure this has any effect in slave mode
+	SET_BIT(SPI2_CR1,BIT4);
+	// Set softawre NSS pin high
+	SET_BIT(SPI2_CR1,BIT8);
+	// Set softawre NSS
+	SET_BIT(SPI2_CR1,BIT9);
+	// Set the word size (8 bits)
+	SET_BIT(SPI2_CR2,(15 << 8));	
+	// Enable RX interrupts
+	SET_BIT(SPI2_CR2,BIT6);	
+	// Enable error handling interrupt
+	SET_BIT(SPI2_CR2,BIT5);
+        if(SPI2_SR) {*sendptr++ = 'I';}
+	// enable spi
+	SET_BIT(SPI2_CR1,BIT6);	
+	// Enable SPI2 interrupts in NVIC
+	ISER |= BIT26;
+	SPI2_DR = 0x5a;
+#else
     spi_init_master(SPI2, 
                     SPI_CR1_BAUDRATE_FPCLK_DIV_16,
                     SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
                     SPI_CR1_CPHA_CLK_TRANSITION_1, 
                     SPI_CR1_CRCL_8BIT,
                     SPI_CR1_MSBFIRST);
-    if (callback) {
-        write_pos = 0;
-        spi_pkt_handler = callback;
+    spi_enable_software_slave_management(SPI2);
+    if (read_buffer) {
         spi_set_slave_mode(SPI2);
         spi_set_nss_high(SPI2);  //Wait for 1st low transition so we don't capture half a packet
+
+	/* SPI2 RX on DMA1 Channel 4 */
+	dma_channel_reset(DMA1, DMA_CHANNEL4);
+	dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t)&SPI2_DR);
+	dma_set_memory_address(DMA1, DMA_CHANNEL4, (uint32_t)read_buffer);
+	dma_set_read_from_peripheral(DMA1, DMA_CHANNEL4);
+	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL4);
+	dma_set_peripheral_size(DMA1, DMA_CHANNEL4, DMA_CCR_PSIZE_8BIT);
+	dma_set_memory_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
+	dma_set_priority(DMA1, DMA_CHANNEL4, DMA_CCR_PL_VERY_HIGH);
+	//spi_enable_rx_dma(SPI2);
+
         nvic_set_priority(NVIC_EXTI4_15_IRQ, 0 << 6);
         nvic_enable_irq(NVIC_EXTI4_15_IRQ);
         //GPIO# == EXTI# (at least for # <16)
@@ -164,10 +144,11 @@ void SPI_ProtoMasterSlaveInit(void(*callback)(u8 *ptr, unsigned length))
     } else {
         spi_set_nss_high(SPI2);
         nvic_disable_irq(NVIC_EXTI4_15_IRQ);
+    	spi_disable_rx_dma(SPI2);
     }
-    spi_enable_software_slave_management(SPI2);
     SPI_CR2(SPI2) = 0x1700; //Force SPI into 8-bit mode
     spi_enable(SPI2);
+#endif
 }
 
 void SPI_ProtoInit()
@@ -182,10 +163,10 @@ void SPI_ProtoInit()
     gpio_set(GPIOC, GPIO0);
 #endif
 
-    spi_pkt_handler = NULL;
     rcc_periph_clock_enable(RCC_SPI2);
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
+    rcc_periph_clock_enable(RCC_DMA);
     PORT_mode_setup(module_enable[A7105]    , GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
     PORT_mode_setup(module_enable[CYRF6936] , GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
     PORT_mode_setup(module_enable[CC2500]   , GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
@@ -211,6 +192,4 @@ void SPI_ProtoInit()
     PORT_mode_setup(MOSI,       GPIO_MODE_AF, GPIO_PUPD_NONE); 
     PORT_mode_setup(MISO,       GPIO_MODE_AF, GPIO_PUPD_NONE); 
     gpio_set_af(GPIOB, GPIO_AF0, SCK.pin | MOSI.pin | MISO.pin);
-
-    SPI_ProtoMasterSlaveInit(0);  //initialize as master
 }
