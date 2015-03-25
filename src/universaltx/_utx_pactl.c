@@ -33,10 +33,6 @@ void PACTL_SetTxRxMode(int mode)
         PORT_pin_clear_fast(PA_TXEN);
         return;
     }
-    if (Model.module == NRF24L01) {
-        comp_enable(COMP1);
-        nvic_enable_irq(NVIC_ADC_COMP_IRQ);
-    }
     if (mode == TX_EN) {
         PORT_pin_clear_fast(PA_RXEN);
         PORT_pin_set_fast(PA_TXEN);
@@ -97,6 +93,10 @@ void adc_comp_isr()
 void PACTL_SetNRF24L01_CE(int state)
 {
     if(state) {
+        if (Model.module == NRF24L01) {
+            comp_enable(COMP1);
+            nvic_enable_irq(NVIC_ADC_COMP_IRQ);
+        }
         PORT_pin_set_fast(NRF24L01_CE);
     } else {
         PORT_pin_clear_fast(NRF24L01_CE);

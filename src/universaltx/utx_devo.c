@@ -36,7 +36,7 @@ register unsigned module_pin  asm ("r10");
 static u8 read_buffer[MAX_PKT_SIZE];
 
 static volatile char sendstr[256];
-volatile char *sendptr;
+volatile char *sendptr = sendstr;
 static volatile u8 ready;
 const char map[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd'};
 
