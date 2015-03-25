@@ -48,6 +48,8 @@ void CLOCK_Init()
     msecs = 0;
     msec_callbacks = 0;
     /* Start counting. */
+
+    systick_clear();
     systick_counter_enable();
 
     /* Setup timer for Transmitter */
