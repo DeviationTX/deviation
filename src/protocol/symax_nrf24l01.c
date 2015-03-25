@@ -157,19 +157,19 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u
     *rudder   = convert_channel(CHANNEL4);
 
     // Channel 5
-    if (Channels[CHANNEL5] <= 0)
+    if (Channels[CHANNEL6] <= 0)
         *flags &= ~FLAG_FLIP;
     else
         *flags |= FLAG_FLIP;
 
     // Channel 6
-    if (Channels[CHANNEL6] <= 0)
+    if (Channels[CHANNEL7] <= 0)
         *flags &= ~FLAG_PICTURE;
     else
         *flags |= FLAG_PICTURE;
 
     // Channel 7
-    if (Channels[CHANNEL7] <= 0)
+    if (Channels[CHANNEL8] <= 0)
         *flags &= ~FLAG_VIDEO;
     else
         *flags |= FLAG_VIDEO;
@@ -544,7 +544,7 @@ const void *SYMAX_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, special controls
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return symax_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
