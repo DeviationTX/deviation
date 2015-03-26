@@ -208,6 +208,7 @@ static void hisky_init()
 }
 
 // HiSky channel sequence: AILE  ELEV  THRO  RUDD  GEAR  PITH, channel data value is from 0 to 1000
+ // Channel 7 - Gyro mode, 0 - 6 axis, 3 - 3 axis 
 static void build_ch_data()
 {
     s32 temp;
@@ -219,6 +220,8 @@ static void build_ch_data()
             temp = (s32)Channels[i] * 450/CHAN_MAX_VALUE + 500; // max/min servo range is +-125%
             if (i == 2) // It is clear that hisky's thro stick is made reversely, so I adjust it here on purpose
                 temp = 1000 -temp;
+            if (i == 6)
+                temp = Channels[i] <= 0 ? 0 : 3;
             if (temp < 0)
                 ch_data[i] = 0;
             else if (temp > 1000)
@@ -369,7 +372,7 @@ const void *HiSky_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *)7L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
