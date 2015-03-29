@@ -17,18 +17,22 @@
 #include "config/model.h"
 #include "protocol/interface.h"
 
-#ifdef BUILDTYPE_DEV
-const void * (*PROTO_Cmds)(enum ProtoCmds) = TESTRF_Cmds;
-#else
-const void * (*PROTO_Cmds)(enum ProtoCmds) = NULL;
-#endif
-
 #define PROTODEF(proto, module, map, cmd, name) name,
 const char * const ProtocolNames[PROTOCOL_COUNT] = {
     "None",
     #include "../protocol/protocol.h"
 };
 #undef PROTODEF
+
+const void *PROTO_Cmds(enum ProtoCmds arg)
+{
+    #define PROTODEF(proto, module, map, cmd, name) case proto: return cmd(arg);
+    switch (Model.protocol) {
+        #include "../protocol/protocol.h"
+    }
+    #undef PROTODEF
+    return NULL;
+}
 const char **PROTOCOL_GetOptions()
 {
     const char **data = NULL;
@@ -46,3 +50,39 @@ void PROTOCOL_SetOptions()
 int PROTOCOL_SetSwitch(int module) {
     return PACTL_SetSwitch(module);
 }
+
+int PROTOCOL_DefaultNumChannels() {
+    int num_channels = MAX_PPM_IN_CHANNELS;
+    if(Model.protocol != PROTOCOL_NONE)
+        num_channels = (unsigned long)PROTO_Cmds(PROTOCMD_DEFAULT_NUMCHAN);
+    if (num_channels > MAX_PPM_IN_CHANNELS)
+        num_channels = MAX_PPM_IN_CHANNELS;
+    return num_channels;
+}
+
+int PROTOCOL_NumChannels() {
+    int num_channels = MAX_PPM_IN_CHANNELS;
+    if(Model.protocol != PROTOCOL_NONE)
+        num_channels = (unsigned long)PROTO_Cmds(PROTOCMD_NUMCHAN);
+    if (num_channels > MAX_PPM_IN_CHANNELS)
+        num_channels = MAX_PPM_IN_CHANNELS;
+    return num_channels;
+}
+
+u8 PROTOCOL_AutoBindEnabled() {
+    u8 binding = 0;
+    if(Model.protocol == PROTOCOL_NONE)
+        binding = 1;
+    else
+        binding = (unsigned long)PROTO_Cmds(PROTOCMD_CHECK_AUTOBIND);
+    return binding;
+}
+
+void PROTOCOL_SetBindState(u32 msec) {
+    //FIXME;
+}
+int PROTOCOL_SticksMoved(int init) {
+    //FIXME;
+    return 0;
+}
+

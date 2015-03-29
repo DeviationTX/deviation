@@ -23,23 +23,34 @@
 #include "config/tx.h"
 #include "protocol/interface.h"
 #include "ports.h"
+#include "telemetry.h"
+
+#include "_utx_pactl.c"
+#include "_utx_multimod.c"
+
+extern volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
+struct Telemetry Telemetry;
 
 //Main routine for PPM module
 //Code here translates PPM into protocol commands entirely in the UniversalTX module
 //Control is via bluetooth
 void utx_ppm()
 {
+    SetModule(TX_MODULE_LAST);
     BT_Initialize();
 
     SPI_ProtoInit();
+    SPI_ProtoMasterSlaveInit(NULL);  //Switch SPI to master mode
+    PPMin_TIM_Init();
 
     printf("Power Up\n");
     printf("A7105: %s\n", A7105_Reset() ? "Found" : "Not found");
     printf("NRF24L01: %s\n", NRF24L01_Reset() ? "Found" : "Not found");
     printf("CC2500: %s\n", CC2500_Reset() ? "Found" : "Not found");
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
+    //BT_Test();
     printf("Done\n");
-
+    PPMin_Start();
     //BT_Test();        
     Model.proto_opts[0] = 3; //Radio => CYRF6936
     Model.proto_opts[1] = 7; //Tx Power => 0
@@ -52,11 +63,14 @@ void utx_ppm()
         if (priority_ready & (1 << LOW_PRIORITY)) {
             priority_ready = 0;
             BT_HandleInput();
-            i = (i + 1) & 0xFF;
-            if(0 && i == 0) {
-                Model.proto_opts[0] = (Model.proto_opts[0] + 1) % 4;
-                TESTRF_Cmds(PROTOCMD_INIT);
+            i = (i + 1) & 0x7F;
+            if(i == 0) {
+                printf("%d\n", ppmin_num_channels);
             }
         }
     }
+}
+
+void SetModule(unsigned module) {
+    Model.module =  module;
 }

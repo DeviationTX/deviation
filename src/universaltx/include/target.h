@@ -15,14 +15,16 @@ void UART_Stop();
 void PWR_Init(void);
 
 /* PA Control functions */
-//void PACTL_Init();
+void PACTL_Init();
 //void PACTL_SetTxRxMode(int mode);
-//int PACTL_SetSwitch(int module);
+int PACTL_SetSwitch(int module);
 //void PACTL_SetNRF24L01_CE(int state);
 
 /* Protocol functions */
 void SPI_ProtoInit();
 void SPI_ProtoMasterSlaveInit(u8 *read_buffer);
+
+void SetModule(unsigned module);
 
 void _usleep(u32 usec);
 #define usleep _usleep

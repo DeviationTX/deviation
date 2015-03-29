@@ -5,6 +5,8 @@
 #define PROTO_HAS_A7105
 #define PROTO_HAS_CC2500
 #define PROTO_HAS_NRF24L01
+#define PROTO_HAS_PPM_OUT 0
+#define PROTO_HAS_USB_OUT 0
 
 #define DISCOVERY    0 //FIXME: Disable this!
 
@@ -12,5 +14,5 @@
 #define SWITCH_ADDRESS 0xFFFFFFFF
 #define HAS_CYRF_RESET 0
 
-#define _USART USART4
+#define _USART USART2
 #endif /*_UNIVERSALTX_TARGET_H_ */

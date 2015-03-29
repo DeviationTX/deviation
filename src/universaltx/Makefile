@@ -24,6 +24,7 @@ SRC_C = universaltx.c  \
         utx_protospi.c \
         utx_syscalls.c \
         utx_clock.c    \
+        utx_telemetry.c    \
         utx_err_handler.c \
         utx_uart.c     \
         $(TARGET).c

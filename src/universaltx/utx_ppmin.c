@@ -128,7 +128,7 @@ void PPMin_Init()
 ===get PPM===*/
 
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
-volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
+volatile s32 Channels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
 
 static u8 k[4];
@@ -160,6 +160,9 @@ void exti0_1_isr(void)
                 if (k[1]>1 && k[1]==k[2]) {     // compare total channels number k[1], k[2]
                     ppmin_num_channels = k[1];  // save number of channels found
                     ppmSync = 1;                // in-sync
+                    for(int m = ppmin_num_channels; m < MAX_PPM_IN_CHANNELS; m++) {
+                        Channels[m] = 0;
+                    }
                     i = 0;
                 }
             }
@@ -171,7 +174,7 @@ void exti0_1_isr(void)
         /*  (3) get  each channel value and set to  "Channel[i]" ,
                 [0...ppmin_num_channels-1] for each Channel-signal */
         int ch = (t - (Model.ppmin_centerpw * 2))*10000 / (Model.ppmin_deltapw * 2);  //Convert input to channel value
-        ppmChannels[i] = ch;
+        Channels[i] = ch;
         i++;                           // set for next count  ppm-signal width
         /*  (4) continue count channels and compare  "num_channels",
                 if not equal => disconnect(no-Sync) and re-connect (re-Sync) */
@@ -194,10 +197,9 @@ void PPMin_Stop()
 
 void PPMin_Start()
 {
-    if (Model.protocol == PROTOCOL_PPM)
-        CLOCK_StopTimer();
     PPMin_Init();
     ppmSync = 0;
+    memset((void *)Channels, 0, sizeof(Channels));
     timer_enable_counter(TIM1);
     nvic_enable_irq(NVIC_EXTI0_1_IRQ);
     exti_enable_request(EXTI0);

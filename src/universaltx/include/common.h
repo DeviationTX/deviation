@@ -30,7 +30,7 @@ typedef int32_t  s32;
 #define _tr(x) x
 #define _tr_noop(x) x
 
-extern s32 Channels[10];
+extern volatile s32 Channels[MAX_PPM_IN_CHANNELS];
 
 struct limit {
     u8 flags;
@@ -79,8 +79,11 @@ void SPI_WriteRegister(u8 address, u8 data);
 u8 SPI_ReadRegister(u8 address);
 */
 
-void PROTOCOL_SetBindState(int i);
+void PROTOCOL_SetBindState(u32 i);
 const char **PROTOCOL_GetOptions();
+u8 PROTOCOL_AutoBindEnabled();
+int PROTOCOL_DefaultNumChannels();
+int PROTOCOL_NumChannels();
 int PROTOCOL_SetSwitch(int module);
 void CLOCK_StopTimer();
 void CLOCK_StartTimer(unsigned t, u16 (*_cmd)());
@@ -90,7 +93,7 @@ u32 CLOCK_getms();
 #define PROTOCOL_Init(x) if(0) {};
 int PROTOCOL_SticksMoved(int init);
 
-u32 Crc(const void *, int size);
+u32 Crc(const void *, u32 size);
 u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
 u32 rand32(); //LFSR based PRNG
 

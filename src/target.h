@@ -183,6 +183,8 @@ u8 *BOOTLOADER_Read(int idx);
 #define PROTO_HAS_A7105
 #define PROTO_HAS_CC2500
 #define PROTO_HAS_NRF24L01
+#define PROTO_HAS_USB_OUT 1
+#define PROTO_HAS_PPM_OUT 1
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
 void SPI_AVRProgramInit();

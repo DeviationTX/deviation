@@ -25,17 +25,15 @@
 #include <string.h>
 #include <errno.h>
 
-volatile char *ptr;
-volatile char bt_buf[20];
+#define dbgprintf if(0)printf
+#define btprintf printf
+char bt_buf[30];
+volatile char *wptr;
+char *rptr = bt_buf;
 u8 state;
 /* FIXME */
 const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
-
-static inline void BT_ResetPtr()
-{
-    ptr = bt_buf;
-}
 
 void BT_Initialize()
 {
@@ -70,18 +68,20 @@ void BT_Initialize()
     usart_set_flow_control(BTUART, USART_FLOWCONTROL_NONE);
     usart_enable_rx_interrupt(BTUART);
 
-    BT_ResetPtr();
+    wptr = bt_buf;
+    rptr = bt_buf;
     state = 0;
     /* Finally enable the USART. */
     usart_enable(BTUART);
 }
 
+/*
 void BT_Test()
 {
     usleep(1000000);
     PORT_pin_set(BT_KEY);
     usleep(100000);
-    BT_ResetPtr();
+printf("here\n");
     usart_send_blocking(BTUART, 'A');
     usart_send_blocking(BTUART, 'T');
     usart_send_blocking(BTUART, '\r');
@@ -89,13 +89,13 @@ void BT_Test()
     while(1) {
         char tmp[32];
         while(ptr == bt_buf || *(ptr-1) != '\n') {
+            if(ptr != bt_buf) printf("%c", *ptr);
         }
         int len = ptr - bt_buf;
         memcpy(tmp, (char *)bt_buf, len);
-        BT_ResetPtr();
         tmp[len] = 0;
         printf("%s", tmp);
-        if((tmp[0] == 'O' && tmp[1] == 'K') || (tmp[0] == 'F' && tmp[1] == 'A')) {
+        if((tmp[0] == 'O' && tmp[1] == 'K') || (tmp[0] == 'F' && tmp[1] == 'A') ) {
             printf("CmdDone\n");
             break;
         }
@@ -103,78 +103,196 @@ void BT_Test()
     PORT_pin_clear(BT_KEY);
     usleep(150000);
 }
+*/
+
+void parse_cmd(char *tmp)
+{
+    if(strncmp(tmp, "GPL", 3) == 0) { //Get Protocol List
+        btprintf("GPL");
+        for (int i = 0; i < PROTOCOL_COUNT; i++) {
+            btprintf(":");
+            btprintf(ProtocolNames[i]);
+        }
+        btprintf("\n");
+        return;
+    }
+    if(strncmp(tmp, "GPO", 3) == 0) { //Get Protocol Options
+        btprintf("GPO:");
+        const char **proto_strs = PROTOCOL_GetOptions();
+        if (proto_strs) {
+            int pos = 0;
+            int protoidx = 0;
+            while(protoidx < NUM_PROTO_OPTS) {
+                if (proto_strs[pos] == NULL)
+                    break;
+                btprintf("::%s", proto_strs[pos]);
+                while(proto_strs[++pos]) {
+                    btprintf(":%s", proto_strs[pos]);
+                }
+                pos++;
+                protoidx++;
+            }
+        }
+        btprintf("\n");
+        return;
+    }
+    if(strncmp(tmp, "GPV", 3) == 0) { //Get Protocol Values
+        btprintf("GPV");
+        const char **proto_strs = PROTOCOL_GetOptions();
+        if (! proto_strs) {
+            btprintf(":\n");
+            return;
+        }
+        int protoidx = 0;
+        int pos = 0;
+        while(protoidx < NUM_PROTO_OPTS) {
+            if(proto_strs[pos] == NULL)
+                break;
+            while(proto_strs[++pos])
+                ;
+            pos++;
+            protoidx++;
+        }
+        for(int i = 0; i < protoidx; i++) {
+            btprintf(":%d", i);
+        }
+        btprintf("\n");
+        return;
+    }
+    if(strncmp(tmp, "GTL", 3) == 0) { //Get TxPower List
+        btprintf("GTL");
+        for (int i = 0; i < TXPOWER_LAST; i++) {
+            btprintf(":%s", RADIO_TX_POWER_VAL[i]);
+        }
+        btprintf("\n");
+        return;
+    }
+    if(strncmp(tmp, "GPI", 3) == 0) { //Get Channel Info (returns max_#_channels:default_#_channels
+        btprintf("GPI:%s:%d:%d\n", ProtocolNames[Model.protocol], PROTOCOL_NumChannels(), PROTOCOL_DefaultNumChannels());
+        return;
+    }
+    if(strncmp(tmp, "GMI", 3) == 0) { //Get Number of Channels
+        btprintf("GMI:%d:%d:%d:%d\n", Model.num_channels, Model.tx_power, Model.fixed_id,PROTOCOL_AutoBindEnabled());
+        return;
+    }
+    if(strncmp(tmp, "SCP:", 4) == 0) {
+        for (int i = 0; i < PROTOCOL_COUNT; i++) {
+            if (strcmp(tmp+4, ProtocolNames[i]) == 0) {
+                Model.protocol = i;
+                dbgprintf("Changed protocol to: %s\n", ProtocolNames[i]);
+                return;
+            }
+        }
+        dbgprintf("Could not chnage protocol to: '%s'\n", tmp+4);
+        return;
+    }
+    if(strncmp(tmp, "SPV:", 4) == 0) {
+        char *valptr;
+        int idx = strtol(tmp+4, &valptr, 10);
+        if (valptr && valptr[0] == ':' && idx < NUM_PROTO_OPTS) {
+            int val = strtol(valptr+1, &valptr, 10);
+            if(valptr != NULL) {
+                const char **proto_strs = PROTOCOL_GetOptions();
+                int protoidx = 0;
+                int pos = 0;
+                while(protoidx < NUM_PROTO_OPTS) {
+                    if(proto_strs[pos] == NULL)
+                        break;
+                    if (idx == protoidx) {
+                        Model.proto_opts[idx] = val;
+                        dbgprintf("Set prototocol option '%s' to %d\n", proto_strs[pos], val);
+                        return;
+                    }
+                    while(proto_strs[++pos])
+                        ;
+                    pos++;
+                    protoidx++;
+                }
+            }
+        }
+        dbgprintf("Couldn't parse SPV command: %s\n", tmp+4);
+        return;
+    }
+    if(strncmp(tmp, "STP:", 4) == 0) { //Set TxPower
+        unsigned val;
+        if(tmp[5] == '\r') {
+            val = tmp[4] - '0';
+        } else {
+            dbgprintf("Unknown POWER: %s\n", tmp);
+            return;
+        }
+        if (val < TXPOWER_LAST) {
+            dbgprintf("Changed TX Power to: %s\n", RADIO_TX_POWER_VAL[val]);
+            Model.tx_power = val; //RF Channel
+        } else {
+            dbgprintf("Requested power values is outside range: %d > %d\n", val, TXPOWER_LAST-1);
+        }
+        return;
+    }
+    if(strncmp(tmp, "SNC:", 4) == 0) { //Set Number of Channels
+        char *valptr;
+        unsigned idx = strtol(tmp+4, &valptr, 10);
+        if (!valptr) {
+            dbgprintf("Couldn't read number of channels to set\n");
+            return;
+        }
+        if (idx > (unsigned)PROTOCOL_NumChannels()) {
+            dbgprintf("Illegal channel count specified\n");
+            return;
+        }
+        Model.num_channels = idx;
+        return;
+    }
+    if(strncmp(tmp, "SID:", 4) == 0) { //Set Number of Channels
+        char *valptr;
+        unsigned id = strtol(tmp+4, &valptr, 10);
+        if (!valptr) {
+            dbgprintf("No Fixed ID specified\n");
+            return;
+        }
+        if(id > 999999) {
+            id = 999999;
+        }
+        Model.fixed_id = id;
+        return;
+    }
+}
 
 void BT_HandleInput()
 {
-    u8 newstate = PORT_pin_get(BT_STATE);
     char tmp[sizeof(bt_buf)];
+    char *tmpptr = tmp;
+
+    u8 newstate = PORT_pin_get(BT_STATE);
 
     if (newstate != state) {
         state = newstate;
-        printf("Changed state to: %d\n", state);
+        dbgprintf("Changed state to: %d\n", state);
     }
-    if(state && ptr != bt_buf && *(ptr-1) == '\r') {
-        int len = ptr - bt_buf;
-        memcpy(tmp, (char *)bt_buf, len);
-        tmp[len] = 0;
-        BT_ResetPtr();
-        //char *proto = ProtocolNames[Model.protocol];
-        //int protolen = strlen(proto);
-        //if(memcmp(tmp, proto, protolen) == 0 && tmp[protolen] ==':') {
-        if(strncmp(tmp, "SPV:", 4) == 0) {
-            char *valptr;
-            int idx = strtol(tmp+4, &valptr, 10);
-            if (valptr && valptr[0] == ':' && idx < NUM_PROTO_OPTS) {
-                int val = strtol(valptr+1, &valptr, 10);
-                if(valptr != NULL) {
-                    const char **proto_strs = PROTOCOL_GetOptions();
-                    int protoidx = 0;
-                    int pos = 0;
-                    while(protoidx < NUM_PROTO_OPTS) {
-                        if(proto_strs[pos] == NULL)
-                            break;
-                        if (idx == protoidx) {
-                            Model.proto_opts[idx] = val;
-                            printf("Set prototocol option '%s' to %d\n", proto_strs[pos], val);
-                            return;
-                        }
-                        while(proto_strs[++pos])
-                            ;
-                        pos++;
-                        protoidx++;
-                    }
-                }
+    char *_wptr = (char *)wptr;
+    if(! state || rptr == _wptr ) {
+        return;
+    }
+    char *lastwptr = _wptr-1;
+    if (lastwptr < bt_buf) {
+        lastwptr = bt_buf+sizeof(bt_buf)-1;
+    }
+    if (*lastwptr != '\r' && *lastwptr != '\n') {
+        return;
+    }
+    while(rptr != _wptr) {
+        if (*rptr == '\r' || *rptr == '\n') {
+            *tmpptr = 0;
+            if (tmpptr != tmp) {
+                parse_cmd(tmp);
             }
-            printf("Couldn't parse SPV command: %s\n", tmp+4);
-            return;
+            tmpptr = tmp;
+        } else {
+            *tmpptr++ = *rptr;
         }
-        if(strncmp(tmp, "STP:", 4) == 0) {
-            unsigned val;
-            if(tmp[5] == '\r') {
-                val = tmp[4] - '0';
-            } else {
-                printf("Unknown POWER: %s\n", tmp);
-                return;
-            }
-            if (val < TXPOWER_LAST) {
-                printf("Changed TX Power to: %s\n", RADIO_TX_POWER_VAL[val]);
-                Model.tx_power = val; //RF Channel
-            } else {
-                printf("Requested power values is outside range: %d > %d\n", val, TXPOWER_LAST-1);
-            }
-            return;
-        }
-        if(strncmp(tmp, "SCP:", 4) == 0) {
-            tmp[len-1] = 0;
-            for (int i = 0; i < PROTOCOL_COUNT; i++) {
-                if (strcmp(tmp+4, ProtocolNames[i]) == 0) {
-                    Model.protocol = i;
-                    printf("Changed protocol to: %s\n", ProtocolNames[i]);
-                    return;
-                }
-            }
-            printf("Could not chnage protocol to: '%s'\n", tmp+4);
-            return;
+        rptr++;
+        if (rptr == bt_buf+sizeof(bt_buf)) {
+            rptr = bt_buf;
         }
     }
 }
@@ -185,9 +303,11 @@ void BT_ISR(void)
         ((USART_ISR(BTUART) & USART_ISR_RXNE) != 0))
     {
         /* Retrieve the data from the peripheral. */
-        *ptr = usart_recv(BTUART);
-        if ((ptr - bt_buf) <  (int)sizeof(bt_buf) -1) {
-            ptr++;
+        *wptr = usart_recv(BTUART);
+        if (wptr+1 == bt_buf + sizeof(bt_buf)) {
+            wptr = bt_buf;
+        } else {
+            wptr++;
         }
         //printf("%c", *ptr);
     }
