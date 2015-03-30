@@ -62,7 +62,7 @@ static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     int val = (long)data;
     u8 changed;
-    u8 type = (Model.telem_flags & (1 << val)) ? 1 : 0;
+    u8 type = ((Model.telem_flags >> val) & 1);
     type = GUI_TextSelectHelper(type, 0, 1, -dir, 1, 1, &changed);
     if (changed) {
         if (type) {
@@ -70,8 +70,9 @@ static const char *gtlt_cb(guiObject_t *obj, int dir, void *data)
         } else {
             Model.telem_flags &= ~(1 << val);
         }
+        TELEMETRY_ResetAlarm(val);
     }
-    return type ? "<=" : ">=";
+    return type ? "<=" : ">";
 }
 
 static const char *limit_cb(guiObject_t *obj, int dir, void *data)

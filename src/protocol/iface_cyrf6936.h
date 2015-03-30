@@ -65,7 +65,7 @@ void CYRF_SetTxRxMode(enum TXRX_State);
 void CYRF_ConfigRFChannel(u8 ch);
 void CYRF_SetPower(u8 power);
 void CYRF_ConfigCRCSeed(u16 crc);
-void CYRF_StartReceive();
+void CYRF_WaitForTxIrq();
 void CYRF_ConfigSOPCode(const u8 *sopcodes);
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);

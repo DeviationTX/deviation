@@ -111,7 +111,7 @@ enum {
     TELEM_GPS_HEADING,
 };
 enum {
-    TELEMFLAG_ALARM1 = 0x00,
+    TELEMFLAG_ALARM1 = 0x01,
     TELEMFLAG_ALARM2 = 0x02,
     TELEMFLAG_ALARM3 = 0x04,
     TELEMFLAG_ALARM4 = 0x08,
@@ -244,6 +244,7 @@ const char * TELEMETRY_ShortName(char *str, int idx);
 s32 TELEMETRY_GetMaxValue(int idx);
 s32 TELEMETRY_GetMinValue(int idx);
 void TELEMETRY_Alarm();
+void TELEMETRY_ResetAlarm(int i);
 void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);
 u32 TELEMETRY_IsUpdated(int val);

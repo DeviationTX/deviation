@@ -312,7 +312,7 @@ void PAGE_TelemtestEvent() {
     if (current_page == telemetry_off)
         return;
     static u32 count;
-    int flicker = (++count%4==0);
+    int flicker = ((++count & 3) == 0);
     struct Telemetry cur_telem = Telemetry;
     int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
     int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);

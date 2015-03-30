@@ -31,7 +31,9 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 
 struct Telemetry Telemetry;
 static u8 k = 0; // telem_idx
-static u32 alarm_time[TELEM_NUM_ALARMS] = {0}; // (value & ~3) = time, 2 = mute, 1 = alarm
+static u8 alarm_state[TELEM_NUM_ALARMS] = {0};  // 4 states (0-3) = off -> on -> mute -> mute -> off
+static s32 mute_value[TELEM_NUM_ALARMS] = {0};
+static u32 alarm_time[TELEM_NUM_ALARMS] = {0};
 static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
 static u32 music_time = 0;
 static u32 error_time = 0;
@@ -95,13 +97,13 @@ u32 TELEMETRY_IsUpdated(int val)
         }
         return 0;
     }
-    return (last_updated[val/32] | Telemetry.updated[val/32]) & (1 << val % 32);
+    return ((last_updated[val/32] | Telemetry.updated[val/32]) >> (val % 32)) & 1;
 }
 
 s32 TELEMETRY_GetValue(int idx)
 {
     s32 value = _TELEMETRY_GetValue(&Telemetry, idx);
-    return (value==0xffff) ? 0 : value;
+    return (value==0xff||value==0xffff) ? 0 : value;
 }
 
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
@@ -312,31 +314,31 @@ void TELEMETRY_Alarm()
     // don't need to check all the 6 telem-configs at one time, this is not a critical and urgent task
     // instead, check 1 of them at a time
     k = (k + 1) % TELEM_NUM_ALARMS;
-    s32 value = TELEMETRY_GetValue( Model.telem_alarm[k] );
-    if (value == 0 || ! Model.telem_alarm[k] || ! TELEMETRY_IsUpdated(0xff)) {
-        // bug fix: do not alarm when no telem packet is received, it might caused by RX is powered off
-        alarm_time[k] &= ~1; // clear alarm
-        return;
-    }
-
     if (current_time >= alarm_time[k]) {
-        alarm_time[k] = (alarm_time[k] & 3) | ((current_time + CHECK_DURATION) & ~3);
-        if ((value < Model.telem_alarm_val[k]) == (Model.telem_flags & (1 << k))) {
-            if (!(alarm_time[k] & 3)) {
-                alarm_time[k]++;
+        alarm_time[k] = current_time + CHECK_DURATION;
+        if (! TELEMETRY_IsUpdated(Model.telem_alarm[k])) {
+            TELEMETRY_ResetAlarm(k);
+        } else if ((TELEMETRY_GetValue( Model.telem_alarm[k] ) - mute_value[k] <=
+                                        Model.telem_alarm_val[k]) == ((Model.telem_flags >> k) & 1)) {
+            if (!alarm_state[k]) {
+                alarm_state[k]++;
 #ifdef DEBUG_TELEMALARM
                 printf("set: 0x%x\n\n", k);
 #endif
             }
-        } else if (alarm_time[k] & 3) {
-            alarm_time[k] &= ~3;
+        } else {
+            if (alarm_state[k]) {
+                alarm_state[k]++;
+                alarm_state[k] &= 3;
 #ifdef DEBUG_TELEMALARM
-            printf("clear: 0x%x\n\n", k);
+                if (!alarm_state[k])
+                    printf("clear: 0x%x\n\n", k);
 #endif
+            }
         }
     }
 
-    if (current_time >= music_time && (alarm_time[k] & 1)) {
+    if (alarm_state[k]==1 && current_time >= music_time) {
         music_time = current_time + MUSIC_INTERVAL;
         PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
@@ -346,18 +348,26 @@ void TELEMETRY_Alarm()
     }
 }
 
+void TELEMETRY_ResetAlarm(int i)
+{
+    alarm_state[i] = 0;
+    mute_value[i] = 0;
+}
+
 void TELEMETRY_MuteAlarm()
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
-        if (alarm_time[i] & 1)
-            alarm_time[i]++;
+        if (alarm_state[i]==1) {
+            alarm_state[i]++;
+            mute_value[i] = TELEMETRY_GetValue( Model.telem_alarm[i] ) - (((Model.telem_flags >> k) & 1) << 8);
+        }
     }
 }
 
 int TELEMETRY_HasAlarm(int src)
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++)
-        if(Model.telem_alarm[i] == src && (alarm_time[i] & 1))
-            return 1;
+        if(Model.telem_alarm[i] == src)
+            return (alarm_state[i]==1);
     return 0;
 }

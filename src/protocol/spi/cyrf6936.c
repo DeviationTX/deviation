@@ -30,6 +30,7 @@
 //Disable AWA24S
 #define AWA24S 0
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 #define Delay usleep
 static void  CS_HI() {
 #if HAS_MULTIMOD_SUPPORT
@@ -247,6 +248,15 @@ void CYRF_WritePreamble(u32 preamble)
 /*
  *
  */
+void CYRF_WaitForTxIrq()
+{
+    unsigned i = 0;
+    unsigned tx_state = 0x00;
+    while (! tx_state && ++i < NUM_WAIT_LOOPS) {
+        tx_state |= (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02);
+    }
+}
+
 void CYRF_StartReceive()
 {
     CYRF_WriteRegister(CYRF_05_RX_CTRL,0x87);
@@ -254,21 +264,17 @@ void CYRF_StartReceive()
 
 void CYRF_ReadDataPacket(u8 dpbuffer[])
 {
+    CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80);    // need to set RXOW before data read.
     ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, 0x10);
 }
 
 void CYRF_ReadDataPacket16(u16 dpbuffer[])
 {
-    CS_LO();
-    PROTOSPI_xfer(CYRF_21_RX_BUFFER);
-    for(uint_fast8_t i = 0; i < 8; i++)
-    {
-        uint_fast8_t a, b;
-        a = PROTOSPI_xfer(0);
-        b = PROTOSPI_xfer(0);
-        dpbuffer[i] = (a << 8) | b;
+    u8 tmp[16];
+    CYRF_ReadDataPacket(tmp);
+    for(u8 i=0; i < 8; ++i) {
+        dpbuffer[i] = (tmp[i*2] <<8) | tmp[i*2+1];
     }
-    CS_HI();
 }
 
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)
@@ -320,7 +326,7 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     for(i = 0; i < NUM_FREQ; i++) {
         CYRF_ConfigRFChannel(i);
         CYRF_ReadRegister(CYRF_13_RSSI);
-        CYRF_StartReceive();
+        CYRF_WriteRegister(CYRF_05_RX_CTRL,0x87); //Prepare to receive
         Delay(10);
         rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI);
     }

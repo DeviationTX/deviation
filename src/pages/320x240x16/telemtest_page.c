@@ -153,7 +153,7 @@ void PAGE_TelemtestModal(void(*return_page)(int page), int page)
 }
 void PAGE_TelemtestEvent() {
     static u32 count;
-    int flicker = (++count%4==0);
+    int flicker = ((++count & 3) == 0);
     struct Telemetry cur_telem = Telemetry;
     const struct telem_layout *ptr = _get_layout();
     for (int i = 0; ptr->source; ptr++, i++) {
