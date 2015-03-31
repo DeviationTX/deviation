@@ -51,7 +51,9 @@ void utx_ppm()
     //BT_Test();
     printf("Done\n");
     PPMin_Start();
-    //BT_Test();        
+    //BT_Test();
+    Model.ppmin_centerpw = 1100;
+    Model.ppmin_deltapw = 400;
     Model.proto_opts[0] = 3; //Radio => CYRF6936
     Model.proto_opts[1] = 7; //Tx Power => 0
     Model.proto_opts[2] = 20; //RF Channel => 1
@@ -65,7 +67,13 @@ void utx_ppm()
             BT_HandleInput();
             i = (i + 1) & 0x7F;
             if(i == 0) {
-                printf("%d\n", ppmin_num_channels);
+                printf("#Ch: %d", ppmin_num_channels);
+                if (ppmin_num_channels) {
+                   for(int j = 0; j < ppmin_num_channels; j++) {
+                       printf(" %d:%d", j, Channels[j]);
+                   }
+                }
+                printf("\n");
             }
         }
     }

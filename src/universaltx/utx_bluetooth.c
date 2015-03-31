@@ -27,6 +27,8 @@
 
 #define dbgprintf if(0)printf
 #define btprintf printf
+extern s32 bind_time;
+static s32 last_bind_time;
 char bt_buf[30];
 volatile char *wptr;
 char *rptr = bt_buf;
@@ -71,6 +73,7 @@ void BT_Initialize()
     wptr = bt_buf;
     rptr = bt_buf;
     state = 0;
+    last_bind_time = 0;
     /* Finally enable the USART. */
     usart_enable(BTUART);
 }
@@ -175,9 +178,16 @@ void parse_cmd(char *tmp)
         btprintf("GMI:%d:%d:%d:%d\n", Model.num_channels, Model.tx_power, Model.fixed_id,PROTOCOL_AutoBindEnabled());
         return;
     }
+    if(strncmp(tmp, "BIN", 3) == 0) { //Start Binding
+        PROTOCOL_Init(0);
+        if (! PROTOCOL_AutoBindEnabled()) {
+            PROTOCOL_Bind();
+        }
+    }
     if(strncmp(tmp, "SCP:", 4) == 0) {
         for (int i = 0; i < PROTOCOL_COUNT; i++) {
             if (strcmp(tmp+4, ProtocolNames[i]) == 0) {
+                PROTOCOL_Deinit();
                 Model.protocol = i;
                 dbgprintf("Changed protocol to: %s\n", ProtocolNames[i]);
                 return;
@@ -269,8 +279,20 @@ void BT_HandleInput()
         state = newstate;
         dbgprintf("Changed state to: %d\n", state);
     }
+    if(! state) {
+        return;
+    }
     char *_wptr = (char *)wptr;
-    if(! state || rptr == _wptr ) {
+    if (bind_time || last_bind_time) {
+        if (bind_time && last_bind_time == 0) {
+            btprintf("BIN:%d\n", bind_time);
+            last_bind_time = bind_time;
+        } else if (last_bind_time && bind_time == 0) {
+            btprintf("BIN:0\n");
+            last_bind_time = 0;
+        }
+    }
+    if(rptr == _wptr ) {
         return;
     }
     char *lastwptr = _wptr-1;

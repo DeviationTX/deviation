@@ -17,6 +17,7 @@
 #include "config/model.h"
 #include "protocol/interface.h"
 
+s32 bind_time = 0;
 #define PROTODEF(proto, module, map, cmd, name) name,
 const char * const ProtocolNames[PROTOCOL_COUNT] = {
     "None",
@@ -24,8 +25,21 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
 };
 #undef PROTODEF
 
+static int get_module(int idx)
+{
+    int m = TX_MODULE_LAST;
+    #define PROTODEF(proto, module, map, cmd, name) case proto: m = module; break;
+    switch(idx) {
+        #include "../protocol/protocol.h"
+    }
+    #undef PROTODEF
+    return m;
+}
+
 const void *PROTO_Cmds(enum ProtoCmds arg)
 {
+    if (Model.protocol == PROTOCOL_NONE)
+        return NULL;
     #define PROTODEF(proto, module, map, cmd, name) case proto: return cmd(arg);
     switch (Model.protocol) {
         #include "../protocol/protocol.h"
@@ -35,16 +49,12 @@ const void *PROTO_Cmds(enum ProtoCmds arg)
 }
 const char **PROTOCOL_GetOptions()
 {
-    const char **data = NULL;
-    if(Model.protocol != PROTOCOL_NONE)
-        data = (const char **)PROTO_Cmds(PROTOCMD_GETOPTIONS);
-    return data;
+    return (const char **)PROTO_Cmds(PROTOCMD_GETOPTIONS);
 }
 
 void PROTOCOL_SetOptions()
 {
-    if(Model.protocol != PROTOCOL_NONE)
-        PROTO_Cmds(PROTOCMD_SETOPTIONS);
+    PROTO_Cmds(PROTOCMD_SETOPTIONS);
 }
 
 int PROTOCOL_SetSwitch(int module) {
@@ -79,10 +89,32 @@ u8 PROTOCOL_AutoBindEnabled() {
 }
 
 void PROTOCOL_SetBindState(u32 msec) {
-    //FIXME;
+    if (msec == 0xFFFFFFFF) {
+        bind_time = 1;
+    } else {
+        bind_time = msec / 1000;
+    }
 }
 int PROTOCOL_SticksMoved(int init) {
     //FIXME;
     return 0;
 }
 
+void PROTOCOL_Bind()
+{
+    PROTO_Cmds(PROTOCMD_BIND);
+}
+
+void PROTOCOL_Deinit()
+{
+    CLOCK_StopTimer();
+    PACTL_SetTxRxMode(TXRX_OFF);
+    PROTO_Cmds(PROTOCMD_DEINIT);
+}
+
+void PROTOCOL_Init(u8 force)
+{
+    (void)force;
+    PACTL_SetSwitch(get_module(Model.protocol));
+    PROTO_Cmds(PROTOCMD_INIT);
+}
