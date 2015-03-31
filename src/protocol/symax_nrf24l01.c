@@ -13,10 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/***
    Main protocol compatible with Syma X5C-1, X11, X11C, X12.
    SymaX5C protocol option compatible with Syma X5C (original) and X2.
-*/
+***/
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
@@ -147,36 +147,26 @@ static u8 convert_channel(u8 num)
 
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron, u8* flags)
 {
-    // Protocol is registered AETRF, that is
-    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
-
     *aileron  = convert_channel(CHANNEL1);
     *elevator = convert_channel(CHANNEL2);
     *throttle = convert_channel(CHANNEL3);
     *throttle = *throttle & 0x80 ? 0xff - *throttle : 0x80 + *throttle;
     *rudder   = convert_channel(CHANNEL4);
 
-    // Channel 5
-    if (Channels[CHANNEL5] <= 0)
+    if (Channels[CHANNEL6] <= 0)
         *flags &= ~FLAG_FLIP;
     else
         *flags |= FLAG_FLIP;
 
-    // Channel 6
-    if (Channels[CHANNEL6] <= 0)
+    if (Channels[CHANNEL7] <= 0)
         *flags &= ~FLAG_PICTURE;
     else
         *flags |= FLAG_PICTURE;
 
-    // Channel 7
-    if (Channels[CHANNEL7] <= 0)
+    if (Channels[CHANNEL8] <= 0)
         *flags &= ~FLAG_VIDEO;
     else
         *flags |= FLAG_VIDEO;
-
-
-//    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%x\n",
-//            *aileron, *elevator, *throttle, *rudder, *flags);
 }
 
 
@@ -406,7 +396,7 @@ static void symax_init()
 
 static void symax_init1()
 {
-    // write a strange first packet to RF channel 8 ...
+    // duplicate stock tx sending strange packet (effect unknown)
     u8 first_packet[] = {0xf9, 0x96, 0x82, 0x1b, 0x20, 0x08, 0x08, 0xf2, 0x7d, 0xef, 0xff, 0x00, 0x00, 0x00, 0x00};
     u8 chans_bind[] = {0x4b, 0x30, 0x40, 0x2e};
     u8 chans_bind_x5c[] = {0x27, 0x1b, 0x39, 0x28, 0x24, 0x22, 0x2e, 0x36,
@@ -543,8 +533,8 @@ const void *SYMAX_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, special controls
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
+        case PROTOCMD_NUMCHAN: return (void *) 8L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return symax_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
