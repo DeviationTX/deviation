@@ -50,22 +50,28 @@ void utx_ppm()
     printf("CYRF6936: %s\n", CYRF_Reset() ? "Found" : "Not found");
     //BT_Test();
     printf("Done\n");
-    PPMin_Start();
     //BT_Test();
-    Model.ppmin_centerpw = 1100;
+    memset(&Model, 0, sizeof(Model));
+    Model.ppmin_centerpw = 1500;
     Model.ppmin_deltapw = 400;
-    Model.proto_opts[0] = 3; //Radio => CYRF6936
-    Model.proto_opts[1] = 7; //Tx Power => 0
-    Model.proto_opts[2] = 20; //RF Channel => 1
-    Model.proto_opts[3] = 10; //Rate(ms) => 20
-    TESTRF_Cmds(PROTOCMD_INIT);
+    Model.protocol = PROTOCOL_DEVO;
+    Model.num_channels = 6;
+    //Model.proto_opts[0] = 3; //Radio => CYRF6936
+    //Model.proto_opts[1] = 7; //Tx Power => 0
+    //Model.proto_opts[2] = 20; //RF Channel => 1
+    //Model.proto_opts[3] = 10; //Rate(ms) => 20
+    //TESTRF_Cmds(PROTOCMD_INIT);
+    PPMin_Start();
     CLOCK_SetMsecCallback(LOW_PRIORITY, LOW_PRIORITY_MSEC);
     int i = 0;
     while (1) {
         if (priority_ready & (1 << LOW_PRIORITY)) {
             priority_ready = 0;
             BT_HandleInput();
-            i = (i + 1) & 0x7F;
+            i++;
+            if (i >= 20) { //2 seconds
+                i = 0;
+            }
             if(i == 0) {
                 printf("#Ch: %d", ppmin_num_channels);
                 if (ppmin_num_channels) {

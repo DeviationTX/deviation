@@ -30,7 +30,15 @@ typedef int32_t  s32;
 #define _tr(x) x
 #define _tr_noop(x) x
 
+enum {
+    PRIORITY_HIGHEST = (0 << 6),
+    PRIORITY_HIGH    = (1 << 6),
+    PRIORITY_LOW     = (2 << 6),
+    PRIORITY_LOWEST  = (3 << 6),
+};
+
 extern volatile s32 Channels[MAX_PPM_IN_CHANNELS];
+extern u8 ChannelMap[MAX_PPM_IN_CHANNELS];
 
 struct limit {
     u8 flags;

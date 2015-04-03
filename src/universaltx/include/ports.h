@@ -2,11 +2,26 @@
 #define _PORTS_H_
 
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/cm3/nvic.h>
 
 #define  REGISTER_32(ADDRESS) (*((volatile unsigned int *)(ADDRESS)))
 #define CLEAR_BIT(addr,mask) ((addr) &= ~(mask))
 #define SET_BIT(addr,mask) ((addr) |= (mask))
 #define ISER		REGISTER_32(NVIC_BASE + 0)
+
+#define _BIT_SHIFT(IRQn)         (  (((uint32_t)(IRQn)       )    &  0x03) * 8 )
+#define SCB_SHPR32(shpr_id)	MMIO32(SCB_BASE + 0x18 + (shpr_id))
+#define NVIC_IPR32(ipr_id)	MMIO32(NVIC_BASE + 0x300 + (ipr_id))
+
+#define NVIC_SET_PRIORITY(irqn, priority) \
+	if (irqn >= NVIC_IRQ_COUNT) { \
+		/* Cortex-M  system interrupts */ \
+		SCB_SHPR32((irqn & 0x0C) - 4) = (SCB_SHPR32((irqn & 0x0C) - 4) & ~(0xFF << _BIT_SHIFT(irqn))) | \
+                                                (priority << _BIT_SHIFT(irqn)); \
+	} else { \
+		NVIC_IPR32(irqn & 0xFC) = (NVIC_IPR32(irqn & 0xFC) & ~(0xFF << _BIT_SHIFT(irqn))) | \
+                                                (priority << _BIT_SHIFT(irqn)); \
+	}
 
 #define PORT_mode_setup(io, mode, pullup) gpio_mode_setup(io.port, mode, pullup, io.pin)
 #define PORT_pin_set(io)                  gpio_set(io.port,io.pin)

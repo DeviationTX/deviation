@@ -21,6 +21,7 @@
 #include <libopencm3/stm32/iwdg.h>
 
 #include "common.h"
+#include "ports.h"
 
 //The following is from an unreleased libopencm3
 //We should remove it eventually
@@ -38,10 +39,10 @@ void CLOCK_Init()
 
     /* 6000000/6000 = 1000 overflows per second - every 1ms one interrupt */
     systick_set_reload(6000);
-    nvic_set_priority(NVIC_SYSTICK_IRQ, 0 << 6); //Highest priority
+    NVIC_SET_PRIORITY(NVIC_SYSTICK_IRQ, PRIORITY_HIGHEST); //Highest priority
 
     /* We trigger exti2 right before the watchdog fires to do a stack dump */
-    nvic_set_priority(NVIC_EXTI2_3_IRQ, 0 << 6); //Highest priority
+    //nvic_set_priority(NVIC_EXTI2_3_IRQ, PRIORITY_HIGHEST); //Highest priority
 
     systick_interrupt_enable();
 
@@ -59,7 +60,7 @@ void CLOCK_Init()
 
     /* Enable TIM2 interrupt. */
     nvic_enable_irq(NVIC_TIM14_IRQ);
-    nvic_set_priority(NVIC_TIM14_IRQ, 1 << 6); //High priority
+    NVIC_SET_PRIORITY(NVIC_TIM14_IRQ, PRIORITY_HIGH); //High priority
 
     timer_disable_counter(TIM14);
     /* Reset TIM14 peripheral. */
@@ -122,8 +123,8 @@ void CLOCK_StartWatchdog()
     iwdg_start();
 
     wdg_time = msecs;
-    nvic_clear_pending_irq(NVIC_EXTI2_3_IRQ);
-    nvic_enable_irq(NVIC_EXTI2_3_IRQ);
+    //nvic_clear_pending_irq(NVIC_EXTI2_3_IRQ);
+    //nvic_enable_irq(NVIC_EXTI2_3_IRQ);
 }
 
 void CLOCK_ResetWatchdog()

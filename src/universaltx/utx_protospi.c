@@ -74,7 +74,7 @@ void SPI_ProtoMasterSlaveInit(u8 *read_buffer)
     spi_reset(SPI2);
 
 #if 0
-        nvic_set_priority(NVIC_EXTI4_15_IRQ, 0 << 6);
+        nvic_set_priority(NVIC_EXTI4_15_IRQ, PRIORITY_HIGHEST);
         nvic_enable_irq(NVIC_EXTI4_15_IRQ);
         //Setup EXTI8 (INPUT_CSN) to trigger interrupt
         exti_select_source(INPUT_CSN.pin, INPUT_CSN.port);
@@ -130,7 +130,7 @@ void SPI_ProtoMasterSlaveInit(u8 *read_buffer)
 	dma_set_priority(DMA1, DMA_CHANNEL4, DMA_CCR_PL_VERY_HIGH);
 	//spi_enable_rx_dma(SPI2);
 
-        nvic_set_priority(NVIC_EXTI4_15_IRQ, 0 << 6);
+        NVIC_SET_PRIORITY(NVIC_EXTI4_15_IRQ, PRIORITY_HIGHEST);
         nvic_enable_irq(NVIC_EXTI4_15_IRQ);
         //GPIO# == EXTI# (at least for # <16)
         //Setup EXTI8 (INPUT_CSN) to trigger interrupt

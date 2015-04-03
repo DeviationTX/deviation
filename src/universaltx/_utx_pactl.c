@@ -71,7 +71,7 @@ void PACTL_Init()
     exti_set_trigger(EXTI21, EXTI_TRIGGER_BOTH);
     exti_enable_request(EXTI21);
     //comp_enable(COMP1);
-    nvic_set_priority(NVIC_ADC_COMP_IRQ, 0 << 6);
+    NVIC_SET_PRIORITY(NVIC_ADC_COMP_IRQ, PRIORITY_HIGHEST);
     //nvic_enable_irq(NVIC_ADC_COMP_IRQ);
     PACTL_SetTxRxMode(TXRX_OFF);
 }

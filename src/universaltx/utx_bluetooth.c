@@ -29,7 +29,7 @@
 #define btprintf printf
 extern s32 bind_time;
 static s32 last_bind_time;
-char bt_buf[30];
+char bt_buf[64];
 volatile char *wptr;
 char *rptr = bt_buf;
 u8 state;
@@ -48,7 +48,7 @@ void BT_Initialize()
     rcc_periph_clock_enable(RCC_USART2);
 
 #endif
-    nvic_set_priority(BT_IRQ, 3 << 6);
+    NVIC_SET_PRIORITY(BT_IRQ, PRIORITY_LOWEST);
     nvic_enable_irq(BT_IRQ);
 
     PORT_mode_setup(BT_STATE, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN);
@@ -178,6 +178,14 @@ void parse_cmd(char *tmp)
         btprintf("GMI:%d:%d:%d:%d\n", Model.num_channels, Model.tx_power, Model.fixed_id,PROTOCOL_AutoBindEnabled());
         return;
     }
+    if(strncmp(tmp, "GCO", 3) == 0) { //Get channel ordering
+        btprintf("GCO");
+        for(unsigned i = 0; i < Model.num_channels; i++) {
+            btprintf(":%d", ChannelMap[i]);
+        }
+        btprintf("\n");
+        return;
+    }
     if(strncmp(tmp, "BIN", 3) == 0) { //Start Binding
         PROTOCOL_Init(0);
         if (! PROTOCOL_AutoBindEnabled()) {
@@ -242,7 +250,7 @@ void parse_cmd(char *tmp)
     if(strncmp(tmp, "SNC:", 4) == 0) { //Set Number of Channels
         char *valptr;
         unsigned idx = strtol(tmp+4, &valptr, 10);
-        if (!valptr) {
+        if (valptr == tmp+4) {
             dbgprintf("Couldn't read number of channels to set\n");
             return;
         }
@@ -251,6 +259,28 @@ void parse_cmd(char *tmp)
             return;
         }
         Model.num_channels = idx;
+        return;
+    }
+    if(strncmp(tmp, "SCO:", 4) == 0) { //Set Channel Ordering
+        char *valptr;
+        char *tmpptr = tmp+4;
+        int count = 0;
+        unsigned size = strlen(tmp);
+        PROTOCOL_Deinit(); //It is dangerous to change protocol ordering, so shutdown protocol 1st
+        while (count < Model.num_channels) {
+            unsigned idx = strtol(tmpptr, &valptr, 10);
+            if (valptr == tmpptr) {
+                break;
+            }
+            if (idx < Model.num_channels) {
+                ChannelMap[count] = idx;
+            }
+            count++;
+            tmpptr = valptr+1;
+            if (tmpptr >= tmp+size) {
+                break;
+            }
+        }
         return;
     }
     if(strncmp(tmp, "SID:", 4) == 0) { //Set Number of Channels

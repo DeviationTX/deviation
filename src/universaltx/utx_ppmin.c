@@ -51,7 +51,7 @@ void PPMin_TIM_Init()
   
     /* Now Enable TIM1 interrupt. */
     // nvic_enable_irq(NVIC_TIM1_IRQ);
-    // nvic_set_priority(NVIC_TIM1_IRQ, 16); //High priority
+    // nvic_set_priority(NVIC_TIM1_IRQ, PRIORTIY_HIGH); //High priority
 
     /* Reset TIM1 peripheral. */
     timer_disable_counter(TIM1);
@@ -106,8 +106,12 @@ void PPMin_Init()
     rcc_periph_clock_enable(RCC_GPIOA);
 
     /* Enable EXTI interrupt. */
-    nvic_set_priority(NVIC_EXTI0_1_IRQ, 2 << 6);
+    NVIC_SET_PRIORITY(NVIC_EXTI0_1_IRQ, PRIORITY_HIGHEST);
     nvic_enable_irq(NVIC_EXTI0_1_IRQ);
+
+    /* Enable EXTI2_3 interrupt */
+    NVIC_SET_PRIORITY(NVIC_EXTI2_3_IRQ, PRIORITY_LOW);
+    nvic_enable_irq(NVIC_EXTI2_3_IRQ);
 
     /* Set GPIO0 (in GPIO port A) to 'input float'. */
     PORT_mode_setup(PPM, GPIO_MODE_INPUT, GPIO_PUPD_NONE);
@@ -131,18 +135,35 @@ volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:pp
 volatile s32 Channels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
 
+u8 ChannelMap[MAX_PPM_IN_CHANNELS];
 static u8 k[4];
 static u8 j = 0;
 static u8 i = 0;
-static u16 t0 = 0;
+static u32 t0 = 0;
+static volatile u32 tim1_val;
+static volatile u32 deltapw;
 
+/* Higherst priority interrupt to handle capture event */
 void exti0_1_isr(void)
 {
-    u16 t1 = 0;
-    u16 t = 0;
+    tim1_val = TIM_CNT(TIM1);                                           //Get timer value
+    EXTI_PR = EXTI0;                                                    //Reset PA0 interrupt
+    NVIC_ISPR(NVIC_EXTI2_3_IRQ / 32) = (1 << (NVIC_EXTI2_3_IRQ % 32));  //Trigger EXTI2_3 interrupt to process event
+    if (PORT_pin_get_fast(PASSTHRU_CSN)) {
+        PORT_pin_clear_fast(PASSTHRU_CSN);
+    } else {
+        PORT_pin_set_fast(PASSTHRU_CSN);
+    }
+}
+
+/* Low priority interrupt to handle channel calculation */
+void exti2_3_isr(void)
+{
+    u32 t1 = 0;
+    u32 t = 0;
     
-    t1 = timer_get_counter(TIM1);     // get the counter(TIM1) value    
-    exti_reset_request(EXTI0);        //  reset(clean) the IRQ
+    t1 = tim1_val;
+    //exti_reset_request(EXTI0);        //  reset(clean) the IRQ
     
     t = (t1>=t0) ? (t1-t0) : (65536+t1-t0);     // none-stop TIM1 counter, compute ppm-signal width (2MHz = 0.5uSecond)
     t0 = t1;
@@ -173,8 +194,9 @@ void exti0_1_isr(void)
     } else {                // ppm-in status : Sync, 
         /*  (3) get  each channel value and set to  "Channel[i]" ,
                 [0...ppmin_num_channels-1] for each Channel-signal */
-        int ch = (t - (Model.ppmin_centerpw * 2))*10000 / (Model.ppmin_deltapw * 2);  //Convert input to channel value
-        Channels[i] = ch;
+        s32 ch = ((s32)t - (Model.ppmin_centerpw * 2)) * 10000 / (2*Model.ppmin_deltapw);
+        //s32 ch = ((s32)t - (Model.ppmin_centerpw * 2))* deltapw / 1024; //Convert input to channel value
+        Channels[ChannelMap[i]] = ch;
         i++;                           // set for next count  ppm-signal width
         /*  (4) continue count channels and compare  "num_channels",
                 if not equal => disconnect(no-Sync) and re-connect (re-Sync) */
@@ -200,6 +222,12 @@ void PPMin_Start()
     PPMin_Init();
     ppmSync = 0;
     memset((void *)Channels, 0, sizeof(Channels));
+    for (int i = 0; i < MAX_PPM_IN_CHANNELS; i++) {
+        ChannelMap[i] = i;
+    }
+    PORT_mode_setup(PASSTHRU_CSN , GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
+    deltapw = CHAN_MAX_VALUE * 1024 / Model.ppmin_deltapw;
+    tim1_val = TIM_CNT(TIM1);
     timer_enable_counter(TIM1);
     nvic_enable_irq(NVIC_EXTI0_1_IRQ);
     exti_enable_request(EXTI0);

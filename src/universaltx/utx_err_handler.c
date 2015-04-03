@@ -49,6 +49,7 @@ void hard_fault_handler()
 "    MOVS  R1, #0\n"
 "    B fault_handler_c\n");
 }
+/*
 void exti2_3_isr()
 {
     asm(
@@ -56,6 +57,7 @@ void exti2_3_isr()
 "    MOVS  R1, #1\n"
 "    B fault_handler_c\n");
 }
+*/
 void write_byte(u8 x) {
     usart_send_blocking(_USART,(x));
 }
