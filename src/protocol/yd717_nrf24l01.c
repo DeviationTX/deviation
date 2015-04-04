@@ -69,8 +69,11 @@
 // Stock tx fixed frequency is 0x3C. Receiver only binds on this freq.
 #define RF_CHANNEL 0x3C
 
-#define FLAG_FLIP   0x0F
-#define FLAG_LIGHT  0x10
+#define FLAG_FLIP     0x0F
+#define FLAG_LIGHT    0x80
+#define FLAG_PICTURE  0x40
+#define FLAG_VIDEO    0x20
+#define FLAG_HEADLESS 0x10
 
 // For code readability
 enum {
@@ -178,13 +181,8 @@ static u8 convert_channel(u8 num)
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
                           u8* flags, u8* rudder_trim, u8* elevator_trim, u8* aileron_trim)
 {
-    // Protocol is registered AETRF, that is
-    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
-
-    // Channel 3
     *throttle = convert_channel(CHANNEL3);
 
-    // Channel 4
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XINXUN) {
       *rudder = convert_channel(CHANNEL4);
       *rudder_trim = (0xff - *rudder) >> 1;
@@ -193,28 +191,38 @@ static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
       *rudder_trim = *rudder >> 1;
     }
 
-    // Channel 2
     *elevator = convert_channel(CHANNEL2);
     *elevator_trim = *elevator >> 1;
 
-    // Channel 1
     *aileron = 0xff - convert_channel(CHANNEL1);
     *aileron_trim = *aileron >> 1;
 
-    // Channel 5
     if (Channels[CHANNEL5] <= 0)
       *flags &= ~FLAG_FLIP;
     else
       *flags |= FLAG_FLIP;
 
-    // Channel 6
     if (Channels[CHANNEL6] <= 0)
       *flags &= ~FLAG_LIGHT;
     else
       *flags |= FLAG_LIGHT;
 
+    if (Channels[CHANNEL7] <= 0)
+      *flags &= ~FLAG_PICTURE;
+    else
+      *flags |= FLAG_PICTURE;
 
-    dbgprintf("ail %3d+%3d, ele %3d+%3d, thr %3d, rud %3d+%3d, flip enable %d\n",
+    if (Channels[CHANNEL8] <= 0)
+      *flags &= ~FLAG_VIDEO;
+    else
+      *flags |= FLAG_VIDEO;
+
+    if (Channels[CHANNEL9] <= 0)
+      *flags &= ~FLAG_HEADLESS;
+    else
+      *flags |= FLAG_HEADLESS;
+
+    dbgprintf("ail %3d+%3d, ele %3d+%3d, thr %3d, rud %3d+%3d, flags 0x%02x\n",
             *aileron, *aileron_trim, *elevator, *elevator_trim, *throttle,
             *rudder, *rudder_trim, *flags);
 }
@@ -515,9 +523,9 @@ const void *YD717_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L;
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable light
+        case PROTOCMD_NUMCHAN: return (void *) 9L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return yd717_opts;
