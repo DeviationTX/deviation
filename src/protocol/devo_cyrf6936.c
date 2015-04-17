@@ -378,6 +378,9 @@ static void set_radio_channels()
 
 void DEVO_BuildPacket()
 {
+    static unsigned cnt = 0;
+    char foo[20];
+    snprintf(foo, 20, "%d: %d", cnt++, state);
     switch(state) {
         case DEVO_BIND:
             bind_counter--;

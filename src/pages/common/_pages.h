@@ -132,6 +132,11 @@ void PAGE_DatalogInit();
 void PAGE_DatalogEvent();
 void PAGE_DatalogExit();
 
+/* Debuglog */
+void PAGE_DebuglogInit();
+void PAGE_DebuglogEvent();
+void PAGE_DebuglogExit();
+
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
 int PAGE_IsValid(int page);
