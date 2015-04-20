@@ -449,7 +449,7 @@ static u16 devo_telemetry_cb()
      	    CYRF_Reset();
             cyrf_init();
             cyrf_set_bound_sop_code();
-            printf("Rst CYRF\n");
+            //printf("Rst CYRF\n");
             delay = 1500;
             txState = 15;
         } else {
