@@ -449,6 +449,7 @@ static u16 devo_telemetry_cb()
      	    CYRF_Reset();
             cyrf_init();
             cyrf_set_bound_sop_code();
+            CYRF_ConfigRFChannel(*radio_ch_ptr);
             //printf("Rst CYRF\n");
             delay = 1500;
             txState = 15;
