@@ -440,26 +440,32 @@ static u16 devo_telemetry_cb()
     int delay = 100;
     if (txState == 1) {
         int i = 0;
-        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
-            if(++i > NUM_WAIT_LOOPS) {
-                delay = 1500;
-                txState = 15;
+        u8 reg;
+        while (! ((reg = CYRF_ReadRegister(0x04)) & 0x02)) {
+            if (++i >= NUM_WAIT_LOOPS)
                 break;
-            }
         }
-     
-        if (state == DEVO_BOUND) {
-            /* exit binding state */
-            state = DEVO_BOUND_3;
+        if (((reg & 0x22) == 0x20) || (CYRF_ReadRegister(0x02) & 0x80)) {
+     	    CYRF_Reset();
+            cyrf_init();
             cyrf_set_bound_sop_code();
-        }
-        if(pkt_num == 0 || bind_counter > 0) {
+            //printf("Rst CYRF\n");
             delay = 1500;
             txState = 15;
         } else {
-            CYRF_SetTxRxMode(RX_EN); //Receive mode
-            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
+            if (state == DEVO_BOUND) {
+                /* exit binding state */
+                state = DEVO_BOUND_3;
+                cyrf_set_bound_sop_code();
+            }
+            if(pkt_num == 0 || bind_counter > 0) {
+                delay = 1500;
+                txState = 15;
+            } else {
+                CYRF_SetTxRxMode(RX_EN); //Receive mode
+                CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Prepare to receive
+                CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
+            }
         }
     } else {
         int reg = CYRF_ReadRegister(0x07);
