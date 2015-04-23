@@ -443,8 +443,9 @@ static void parse_telemetry_packet()
             //Telemetry.p.dsm.flog.fades[3] = pkt16_to_u8(packet+8); //FadesR 0xFFFF = (not connected)
             //Telemetry.p.dsm.flog.frameloss = pkt16_to_u8(packet+10);
             //Telemetry.p.dsm.flog.holds = pkt16_to_u8(packet+12);
+            u8 *flog = (u8*)&Telemetry.p.dsm.flog;
             for(int i = 2; i < 14; i+=2) {
-                *(u8*)&Telemetry.p.dsm.flog = pkt16_to_u8(packet+i);
+                *flog++ = pkt16_to_u8(packet+i);
             }
             Telemetry.p.dsm.flog.volt[1] = pkt16_to_volt(packet+14);
             break;
@@ -547,9 +548,8 @@ static void parse_telemetry_packet()
 #endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
-            altitude += (bcd_to_u8(packet[3]) * 100 
-                       + bcd_to_u8(packet[2])) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.altitude = altitude;
+            Telemetry.gps.altitude = altitude + (bcd_to_u8(packet[3]) * 100
+                                               + bcd_to_u8(packet[2])) * 100; //In meters * 1000 (16Bit decimal, 1 unit is 0.1m)
             Telemetry.gps.latitude = pkt32_to_coord(&packet[4]);
             if ((packet[15] & 0x01)  == 0)
                 Telemetry.gps.latitude *= -1; //1=N(+), 0=S(-)
