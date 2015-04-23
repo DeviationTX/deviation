@@ -103,7 +103,7 @@ u32 TELEMETRY_IsUpdated(int val)
 s32 TELEMETRY_GetValue(int idx)
 {
     s32 value = _TELEMETRY_GetValue(&Telemetry, idx);
-    return (value==0xff||value==0xffff) ? 0 : value;
+    return ((value & 0x7fff)==0x7fff) ? 0 : value;
 }
 
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
@@ -164,12 +164,12 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             sprintf(str, "%c %3d° %02d' %02d.%03d\"", letter, h, m, s, ss);
             break;
         case TELEM_GPS_ALT:
+            if (value < 0) {
+                letter = '-';
+                value = -value;
+            }
             if (Transmitter.telem & TELEMUNIT_FEET) {
                 value = value * 328 / 100;
-                if (value < 0) {
-                    letter = '-';
-                    value =-value;
-                }
                 unit = 1;
             }
             sprintf(str, "%c%d.%03d%s", letter, (int)value / 1000, (int)value % 1000, unit ? "ft" : "m");
@@ -178,8 +178,10 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             if (Transmitter.telem & TELEMUNIT_FEET) {
                 value = value * 2237 / 1000;
                 unit = 1;
+            } else {
+                value = value * 3600 / 1000;
             }
-            sprintf(str, "%d.%03d%s", (int)value / 1000, (int)value % 1000, unit ? "mph" : "m/s");
+            sprintf(str, "%d.%03d%s", (int)value / 1000, (int)value % 1000, unit ? "mph" : "km/h");
             break;
         case TELEM_GPS_TIME:
         {
@@ -302,6 +304,9 @@ void TELEMETRY_SetType(int type)
 //#define DEBUG_TELEMALARM
 void TELEMETRY_Alarm()
 {
+    if (! PROTOCOL_GetTelemetryState())
+        return;
+
     //Update 'updated' state every time we get here
     u32 current_time = CLOCK_getms();
     if (current_time >= error_time) {

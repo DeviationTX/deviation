@@ -204,9 +204,9 @@ static void build_data_pkt()
     add_pkt_suffix();
 }
 
-static s32 float_to_int(u8 *ptr)
+static u32 float_to_int(u8 *ptr)
 {
-    s32 value = 0;
+    u32 value = 0;
     int seen_decimal = 0;
     for(int i = 0; i < 7; i++) {
         if(ptr[i] == '.') {
@@ -227,9 +227,9 @@ static s32 float_to_int(u8 *ptr)
     }
     return value;
 }
-static s32 text_to_int(u8 *ptr, u8 len)
+static u32 text_to_int(u8 *ptr, u8 len)
 {
-    s32 value = 0;
+    u32 value = 0;
     for(int i = 0; i < len; i++) {
         value = value * 10 + (ptr[i] - '0');
     }
@@ -251,25 +251,29 @@ static void parse_telemetry_packet(u8 *packet)
     static const u8 gpstimepkt[] = { TELEM_GPS_TIME, 0};
 
     const u8 *update = gpslongpkt+1;
-    u8 step = 1;
+    u32 step = 1;
+    u32 idx = 0;
     //if (packet[0] < 0x37) {
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
     if (packet[0] == TELEMETRY_ENABLE) {
         update = voltpkt;
         step = 2;
-        Telemetry.p.devo.volt[0] = packet[1]; //In 1/10 of Volts
-        Telemetry.p.devo.volt[1] = packet[3]; //In 1/10 of Volts
-        Telemetry.p.devo.volt[2] = packet[5]; //In 1/10 of Volts
-        Telemetry.p.devo.rpm[0]  = packet[7] * 120; //In RPM
-        Telemetry.p.devo.rpm[1]  = packet[9] * 120; //In RPM
+        Telemetry.value[TELEM_DEVO_VOLT1] = packet[1]; //In 1/10 of Volts
+        Telemetry.value[TELEM_DEVO_VOLT2] = packet[3]; //In 1/10 of Volts
+        Telemetry.value[TELEM_DEVO_VOLT3] = packet[5]; //In 1/10 of Volts
+        Telemetry.value[TELEM_DEVO_RPM1]  = packet[7] * 120; //In RPM
+        Telemetry.value[TELEM_DEVO_RPM2]  = packet[9] * 120; //In RPM
     }
     if (packet[0] == 0x31) {
         update = temppkt;
-        Telemetry.p.devo.temp[0] = packet[1]; //In degrees-C + 20
-        Telemetry.p.devo.temp[1] = packet[2]; //In degrees-C + 20
-        Telemetry.p.devo.temp[2] = packet[3]; //In degrees-C + 20
-        Telemetry.p.devo.temp[3] = packet[4]; //In degrees-C + 20
+        while (*update) {
+            Telemetry.value[*update] = packet[++idx];
+            if (packet[idx] != 0xff)
+                TELEMETRY_SetUpdated(*update);
+            update++;
+        }
+        return;
     }
     /* GPS Data
        32: 30333032302e3832373045fb  = 030°20.8270E
@@ -281,16 +285,16 @@ static void parse_telemetry_packet(u8 *packet)
     if (packet[0] == 0x32) {
         update = gpslongpkt;
         Telemetry.gps.longitude = text_to_int(packet+1, 3) * 3600000
-                                  + text_to_int(packet+4, 2) * 60000
-                                  + text_to_int(packet+7, 4) * 6;
+                                + text_to_int(packet+4, 2) * 60000
+                                + text_to_int(packet+7, 4) * 6;
         if (packet[11] == 'W')
             Telemetry.gps.longitude *= -1;
     }
     if (packet[0] == 0x33) {
         update = gpslatpkt;
         Telemetry.gps.latitude = text_to_int(packet+1, 2) * 3600000
-                                  + text_to_int(packet+3, 2) * 60000
-                                  + text_to_int(packet+6, 4) * 6;
+                               + text_to_int(packet+3, 2) * 60000
+                               + text_to_int(packet+6, 4) * 6;
         if (packet[10] == 'S')
             Telemetry.gps.latitude *= -1;
     }
@@ -317,13 +321,12 @@ static void parse_telemetry_packet(u8 *packet)
                            | ((min & 0x3F) << 6)
                            | ((sec & 0x3F) << 0);
     }
-    u32 temp = (update[0] == TELEM_DEVO_TEMP1) ? 1 : 0;
-    u32 i=1;
+    idx = 1;
     while (*update) {
-        if (temp ? packet[i] != 0xff : packet[i])
+        if (packet[idx])
             TELEMETRY_SetUpdated(*update);
         update++;
-        i += step;
+        idx += step;
     }
 }
 

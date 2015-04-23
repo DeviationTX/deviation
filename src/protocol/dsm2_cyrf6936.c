@@ -148,7 +148,6 @@ static const u8 ch_map11[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 0xff, 0
 static const u8 ch_map12[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 11, 0xff, 0xff};
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9, ch_map10, ch_map11, ch_map12};
 
-u16 pktTelem[8];
 u8 packet[16];
 u8 channels[23];
 u8 chidx;
@@ -367,175 +366,170 @@ static void calc_dsmx_channel()
     }
 }
 
-static u32 bcd_to_u16(u16 data)
+#if HAS_DSM_EXTENDED_TELEMETRY
+static u32 bcd_to_int(u32 data)
 {
-    return ((data & 0xf000) >> 12) * 1000 + ((data & 0x0f00) >> 8) * 100 + ((data & 0x00f0) >> 4) * 10 + (data & 0x000f);
+    u32 value = 0, multi = 1;
+    while (data) {
+        value += (data & 0x000f) * multi;
+        multi *= 10;
+        data >>= 4;
+    }
+    return value;
 }
 
-static u32 pkt32_to_coord(u16 *ptr)
+static int pkt32_to_coord(u8 *ptr)
 {
-    return (bcd_to_u16(ptr[1]) >> 8) * 3600000
-         + (bcd_to_u16(ptr[1]) | 0x00ff) * 60000
-         + bcd_to_u16(ptr[0]) * 6; // (decimal, format DD MM.MMMM)
+    // (decimal, format DD MM.MMMM)
+    return bcd_to_int(ptr[3]) * 3600000
+         + bcd_to_int(ptr[2] << 16 | ptr[1] << 8 | ptr[0]) * 6;
 }
+#endif
 
 static void parse_telemetry_packet()
 {
+#if HAS_DSM_EXTENDED_TELEMETRY
     static s32 altitude;
+    static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
+                                   TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
+                                   TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
+                                   TELEM_DSM_PBOX_ALARMC1, TELEM_DSM_PBOX_ALARMC2, 0};
+    static const u8 update15[] = { TELEM_DSM_JETCAT_STATUS, TELEM_DSM_JETCAT_THROTTLE,
+                                   TELEM_DSM_JETCAT_PACKVOLT, TELEM_DSM_JETCAT_PUMPVOLT,
+                                   TELEM_DSM_JETCAT_RPM, TELEM_DSM_JETCAT_TEMPEGT,
+                                   TELEM_DSM_JETCAT_OFFCOND, 0};
+    static const u8 update20[] = { TELEM_DSM_HYPOTHETIC_RPM, TELEM_DSM_HYPOTHETIC_VOLT1,
+                                   TELEM_DSM_HYPOTHETIC_TEMP1, TELEM_DSM_HYPOTHETIC_AMPS1,
+                                   TELEM_DSM_HYPOTHETIC_TEMP2, TELEM_DSM_HYPOTHETIC_AMPS2,
+                                   TELEM_DSM_HYPOTHETIC_VOLT2, TELEM_DSM_HYPOTHETIC_THROTTLE,
+                                   TELEM_DSM_HYPOTHETIC_OUTPUT, 0};
+    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, TELEM_GPS_HEADING, 0};
+    static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, TELEM_GPS_SATCOUNT, 0};
+#endif
     static const u8 update7f[] = { TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
                                    TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
                                    TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
                                    TELEM_DSM_FLOG_VOLT1, 0};
     static const u8 update7e[] = { TELEM_DSM_FLOG_RPM1, TELEM_DSM_FLOG_VOLT2, TELEM_DSM_FLOG_TEMP1, 0};
-#if HAS_DSM_EXTENDED_TELEMETRY
     static const u8 update03[] = { TELEM_DSM_AMPS1, 0};
-    static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
-                                   TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
-                                   TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
-                                   TELEM_DSM_PBOX_ALARMC1, TELEM_DSM_PBOX_ALARMC2, 0};
     static const u8 update11[] = { TELEM_DSM_AIRSPEED, 0};
-    static const u8 update12[] = { TELEM_DSM_ALTITUDE, 0};
+    static const u8 update12[] = { TELEM_DSM_ALTITUDE, TELEM_DSM_ALTITUDE_MAX, 0};
     static const u8 update14[] = { TELEM_DSM_GFORCE_X, TELEM_DSM_GFORCE_Y, TELEM_DSM_GFORCE_Z,
                                    TELEM_DSM_GFORCE_XMAX, TELEM_DSM_GFORCE_YMAX, TELEM_DSM_GFORCE_ZMAX,
                                    TELEM_DSM_GFORCE_ZMIN, 0};
-    static const u8 update15[] = { TELEM_DSM_JETCAT_STATUS, TELEM_DSM_JETCAT_THROTTLE,
-                                   TELEM_DSM_JETCAT_PACKVOLT, TELEM_DSM_JETCAT_PUMPVOLT,
-                                   TELEM_DSM_JETCAT_RPM, TELEM_DSM_JETCAT_TEMPEGT,
-                                   TELEM_DSM_JETCAT_OFFCOND, 0};
     static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
     static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
     static const u8 update40[] = { TELEM_DSM_VARIO_ALTITUDE, TELEM_DSM_VARIO_CLIMBRATE1,
                                    TELEM_DSM_VARIO_CLIMBRATE2, TELEM_DSM_VARIO_CLIMBRATE3,
                                    TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
                                    TELEM_DSM_VARIO_CLIMBRATE6, 0};
-#endif
-    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, TELEM_GPS_HEADING, 0};
-    static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, TELEM_GPS_SATCOUNT, 0};
     const u8 *update = update7f+7;
-    switch(pktTelem[0]>>8) {
+    unsigned idx = 0;
+    u16 pktTelem[8];
+    u8 pkt[16];
+    CYRF_ReadDataPacket(pkt);
+    u8 data_type = pkt[0], end_byte = pkt[15];
+    u8 LSB_1st = ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34)) ? 1 : 0;
+    if (LSB_1st) {
+        for(u8 i=1; i < 8; ++i) {
+            pktTelem[i] = (pkt[i*2+1] <<8) | pkt[i*2];
+        }
+    } else {
+        for(u8 i=1; i < 8; ++i) {
+            pktTelem[i] = (pkt[i*2] <<8) | pkt[i*2+1];
+        }
+    }
+    switch(data_type) {
         case 0x7f: //TM1000 Flight log
         case 0xff: //TM1100 Flight log
             update = update7f;
-            //Telemetry.p.dsm.flog.fades[0] = pktTelem[1]; //FadesA 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[1] = pktTelem[2]; //FadesB 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[2] = pktTelem[3]; //FadesL 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.fades[3] = pktTelem[4]; //FadesR 0xFFFF = (not connected)
-            //Telemetry.p.dsm.flog.frameloss = pktTelem[5];
-            //Telemetry.p.dsm.flog.holds = pktTelem[6];
-            //Telemetry.p.dsm.flog.volt[0] = pktTelem[7]; //RxV in 1/100 of Volts
-            for(int i = 1; i <= 7; i++) {
-                *((u16*)&Telemetry.p.dsm.flog+i-1) = pktTelem[i];
-            }
             break;
         case 0x7e: //TM1000
         case 0xfe: //TM1100
             update = update7e;
-            Telemetry.p.dsm.flog.rpm = pktTelem[1];
-            Telemetry.p.dsm.flog.volt[1] = pktTelem[2]; //Batt in 1/100 of Volts
-            Telemetry.p.dsm.flog.temp = (s16)pktTelem[3];
             break;
-#if HAS_DSM_EXTENDED_TELEMETRY
         case 0x03: //High Current sensor
             update = update03;
-            Telemetry.p.dsm.sensors.amps = (s16)pktTelem[1]; //In 1/10 of Amps (16bit signed integer, 1 unit is 0.196791A)
-            break;
-        case 0x0a: //Powerbox sensor
-            update = update0a;
-            Telemetry.p.dsm.pbox.volt[0] = pktTelem[1]; //In 1/100 of Volts
-            Telemetry.p.dsm.pbox.volt[1] = pktTelem[2]; //In 1/100 of Volts
-            Telemetry.p.dsm.pbox.capacity[0] = pktTelem[3]; //In mAh
-            Telemetry.p.dsm.pbox.capacity[1] = pktTelem[4]; //In mAh
-            Telemetry.p.dsm.pbox.alarmv[0] = pktTelem[7] & 0x0001; //0 = disable, 1 = enable
-            Telemetry.p.dsm.pbox.alarmv[1] = pktTelem[7] & 0x0002; //0 = disable, 1 = enable
-            Telemetry.p.dsm.pbox.alarmc[0] = pktTelem[7] & 0x0004; //0 = disable, 1 = enable
-            Telemetry.p.dsm.pbox.alarmc[1] = pktTelem[7] & 0x0008; //0 = disable, 1 = enable
             break;
         case 0x11: //AirSpeed sensor
             update = update11;
-            Telemetry.p.dsm.sensors.airspeed = pktTelem[1]; //In km/h (16Bit value, 1 unit is 1 km/h)
             break;
         case 0x12: //Altimeter sensor
             update = update12;
-            Telemetry.p.dsm.sensors.altitude = (s16)pktTelem[1];    //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
-            Telemetry.p.dsm.sensors.altitudemax = (s16)pktTelem[2]; //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
             break;
         case 0x14: //G-Force sensor
             update = update14;
-            //Telemetry.p.dsm.gforce.x = (s16)pktTelem[1]; //In 0.01g (16Bit signed integers, unit is 0.01g)
-            //Telemetry.p.dsm.gforce.y = (s16)pktTelem[2];
-            //Telemetry.p.dsm.gforce.z = (s16)pktTelem[3];
-            //Telemetry.p.dsm.gforce.xmax = (s16)pktTelem[4];
-            //Telemetry.p.dsm.gforce.ymax = (s16)pktTelem[5];
-            //Telemetry.p.dsm.gforce.zmax = (s16)pktTelem[6];
-            //Telemetry.p.dsm.gforce.zmin = (s16)pktTelem[7];
-            for(int i = 1; i <= 7; i++) {
-                *((s16*)&Telemetry.p.dsm.gforce+i-1) = (s16)pktTelem[i];
-            }
-            break;
-        case 0x15: //JetCat sensor
-            update = update15;
-            Telemetry.p.dsm.jetcat.status = (pktTelem[1] >> 8);
-            Telemetry.p.dsm.jetcat.throttle = bcd_to_u16(pktTelem[1] & 0x00ff); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
-            Telemetry.p.dsm.jetcat.packvolt = bcd_to_u16(pktTelem[2]); //In 1/100 of Volts
-            Telemetry.p.dsm.jetcat.pumpvolt = bcd_to_u16(pktTelem[3]); //In 1/100 of Volts (low voltage)
-            Telemetry.p.dsm.jetcat.rpm = bcd_to_u16(pktTelem[4]) & 0x0fff; //RPM up to 999999
-            Telemetry.p.dsm.jetcat.temp_egt = bcd_to_u16(pktTelem[6]); //EGT temp up to 999°C
-            Telemetry.p.dsm.jetcat.offcond = (pktTelem[7] >> 8);
             break;
         case 0x18: //RX Pack Cap sensor (SPMA9604)
             update = update18;
-            Telemetry.p.dsm.rxpcap.amps = (s16)pktTelem[1]; //In 1/100 of Amps (16bit signed integer)
-            Telemetry.p.dsm.rxpcap.capacity = pktTelem[2];  //In 1/10 of mAh
-            Telemetry.p.dsm.rxpcap.volt = pktTelem[3];      //In 1/100 of Volts
-            break;
-        case 0x20: //Hypothetic sensor
-            //update = update20;
-            //Telemetry.p.dsm.hypothetic.rpm = pktTelem[1]; //In 10 rpm
-            //Telemetry.p.dsm.hypothetic.volt[0] = pktTelem[2]; //Batt in 1/100 of Volts (Volt2)
-            //Telemetry.p.dsm.hypothetic.temp[0] = (s16)pktTelem[3]; //FET Temp in 1/10 of degree (Fahrenheit???)
-            //Telemetry.p.dsm.hypothetic.amps[0] = (s16)pktTelem[4]; //In 1/100 Amp
-            //Telemetry.p.dsm.hypothetic.temp[1] = (s16)pktTelem[5]; //BEC Temp in 1/10 of degree (Fahrenheit???)
-            //Telemetry.p.dsm.hypothetic.amps[1] = (pktTelem[6] >> 8);     //BEC current in 1/10 Amp
-            //Telemetry.p.dsm.hypothetic.volt[1] = (pktTelem[6] & 0x00ff) * 5; //BEC voltage in 1/100 of Volt
-            //Telemetry.p.dsm.hypothetic.throttle= (pktTelem[7] >> 8) * 5; //Throttle % in 0.1%
-            //Telemetry.p.dsm.hypothetic.output  = (pktTelem[7] & 0x00ff) * 5; //Output % in 0.1%
             break;
         case 0x34: //Flight Pack Cap sensor (SPMA9605)
             update = update34;
-            Telemetry.p.dsm.fpcap.amps = (s16)pktTelem[1]; //In 1/10 of Amps (16bit signed integer)
-            Telemetry.p.dsm.fpcap.capacity = pktTelem[2];  //In mAh
-            Telemetry.p.dsm.fpcap.temp = (s16)pktTelem[3]; //In 1/10 of degree (Fahrenheit???)
             break;
         case 0x40: //Variometer sensor (SPMA9589)
             update = update40;
-            //Telemetry.p.dsm.variometer.altitude = (s16)pktTelem[1]; //In 0.1 meters (16Bit signed integer, 1 unit is 0.1m)
-            //Telemetry.p.dsm.variometer.climbrate[0] = (s16)pktTelem[2]; //In 0.1 meters (change during the last 250ms)
-            //Telemetry.p.dsm.variometer.climbrate[1] = (s16)pktTelem[3]; //In 0.1 meters (change during the last 500ms)
-            //Telemetry.p.dsm.variometer.climbrate[2] = (s16)pktTelem[4]; //In 0.1 meters (change during the last 1000ms)
-            //Telemetry.p.dsm.variometer.climbrate[3] = (s16)pktTelem[5]; //In 0.1 meters (change during the last 1500ms)
-            //Telemetry.p.dsm.variometer.climbrate[4] = (s16)pktTelem[6]; //In 0.1 meters (change during the last 2000ms)
-            //Telemetry.p.dsm.variometer.climbrate[5] = (s16)pktTelem[7]; //In 0.1 meters (change during the last 3000ms)
-            for(int i = 1; i <= 7; i++) {
-                *((s16*)&Telemetry.p.dsm.variometer+i-1) = (s16)pktTelem[i];
-            }
             break;
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+    }
+    if (*update) {
+        while (*update) {
+            Telemetry.value[*update] = pktTelem[++idx];
+            if (pktTelem[idx] != 0xffff)
+                TELEMETRY_SetUpdated(*update);
+            update++;
+        }
+        return;
+    }
+#if HAS_DSM_EXTENDED_TELEMETRY
+    switch(data_type) {
+        case 0x0a: //Powerbox sensor
+            update = update0a;
+            Telemetry.value[TELEM_DSM_PBOX_VOLT1] = pktTelem[1]; //In 1/100 of Volts
+            Telemetry.value[TELEM_DSM_PBOX_VOLT2] = pktTelem[2]; //In 1/100 of Volts
+            Telemetry.value[TELEM_DSM_PBOX_CAPACITY1] = pktTelem[3]; //In mAh
+            Telemetry.value[TELEM_DSM_PBOX_CAPACITY2] = pktTelem[4]; //In mAh
+            Telemetry.value[TELEM_DSM_PBOX_ALARMV1] = end_byte & 0x01; //0 = disable, 1 = enable
+            Telemetry.value[TELEM_DSM_PBOX_ALARMV2] = end_byte & 0x02; //0 = disable, 1 = enable
+            Telemetry.value[TELEM_DSM_PBOX_ALARMC1] = end_byte & 0x04; //0 = disable, 1 = enable
+            Telemetry.value[TELEM_DSM_PBOX_ALARMC2] = end_byte & 0x08; //0 = disable, 1 = enable
+            break;
+        case 0x15: //JetCat sensor
+            update = update15;
+            Telemetry.value[TELEM_DSM_JETCAT_STATUS] = pkt[2];
+            Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(pkt[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
+            Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
+            Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
+            Telemetry.value[TELEM_DSM_JETCAT_RPM] =      bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
+            Telemetry.value[TELEM_DSM_JETCAT_TEMPEGT] =  bcd_to_int(pktTelem[6]); //EGT temp up to 999°C
+            Telemetry.value[TELEM_DSM_JETCAT_OFFCOND] = end_byte;
+            break;
+        case 0x20: //Hypothetic sensor
+            update = update20;
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_RPM] =   pktTelem[1]; //In 10 rpm
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT1] = pktTelem[2]; //Batt in 1/100 of Volts (Volt2)
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP1] = pktTelem[3]; //FET Temp in 1/10 of degree (Fahrenheit???)
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS1] = pktTelem[4]; //In 1/100 Amp
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP2] = pktTelem[5]; //BEC Temp in 1/10 of degree (Fahrenheit???)
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS2] = pkt[12];     //BEC current in 1/10 Amp
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT2] = pkt[13] * 5; //BEC voltage in 1/100 of Volt
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = pkt[14]* 5; //Throttle % in 0.1%
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_OUTPUT] = end_byte * 5; //Output % in 0.1%
+            break;
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
             Telemetry.gps.altitude = altitude + 100 * //((altitude >= 0) ? 100: -100) *
-                                     bcd_to_u16(pktTelem[1]); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.latitude  =  pkt32_to_coord(pktTelem+2) * (pktTelem[7] & 0x0001)? 1: -1; //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = (pkt32_to_coord(pktTelem+4) + (pktTelem[7] & 0x0004)? 360000000: 0) //1=+100 degrees
-                                                                * (pktTelem[7] & 0x0002)? 1: -1; //1=E(+), 0=W(-)
-            Telemetry.gps.heading = bcd_to_u16(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
+                                     bcd_to_int(pktTelem[1]); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
+            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * (end_byte & 0x01)? 1: -1; //1=N(+), 0=S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + (end_byte & 0x04)? 360000000: 0) //1=+100 degrees
+                                                                  * (end_byte & 0x02)? 1: -1; //1=E(+), 0=W(-)
+            Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             update = update17;
-            Telemetry.gps.velocity = bcd_to_u16(pktTelem[1]) * 5556 / 108; //In m/s * 1000
-            //u8 ssec  = bcd_to_u16(pktTelem[2]) >> 8;
-            u8 sec   = bcd_to_u16(pktTelem[2]) & 0x00ff;
-            u8 min   = bcd_to_u16(pktTelem[3]) >> 8;
-            u8 hour  = bcd_to_u16(pktTelem[3]) & 0x00ff;
+            Telemetry.gps.velocity = bcd_to_int(pktTelem[1]) * 5556 / 108; //In m/s * 1000
+            //u8 ssec  = bcd_to_int(pkt[4]);
+            u8 sec   = bcd_to_int(pkt[5]);
+            u8 min   = bcd_to_int(pkt[6]);
+            u8 hour  = bcd_to_int(pkt[7]);
             u8 day   = 0;
             u8 month = 0;
             u8 year  = 0; // + 2000
@@ -545,16 +539,17 @@ static void parse_telemetry_packet()
                                | ((hour & 0x1F) << 12)
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
-            Telemetry.gps.satcount = bcd_to_u16(pktTelem[4]) >> 8;
-            altitude = (bcd_to_u16(pktTelem[4]) & 0x00ff) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
+            Telemetry.gps.satcount = bcd_to_int(pkt[8]);
+            altitude = bcd_to_int(pkt[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             break;
     }
-    u32 i=0;
+    idx = 0;
     while (*update) {
-        if (pktTelem[++i] != 0xffff)
+        if (pktTelem[++idx] != 0xffff)
             TELEMETRY_SetUpdated(*update);
         update++;
     }
+#endif //HAS_DSM_EXTENDED_TELEMETRY
 }
 
 MODULE_CALLTYPE

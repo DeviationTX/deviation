@@ -13,22 +13,17 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-s32 _devo_value(struct Telemetry *_t, int idx)
+s32 _devo_value(struct Telemetry *t, int idx)
 {
-    struct telem_devo *t = &_t->p.devo;
     switch (idx) {
-        case TELEM_DEVO_VOLT1:
-        case TELEM_DEVO_VOLT2:
-        case TELEM_DEVO_VOLT3:
-            return t->volt[idx - TELEM_DEVO_VOLT1];
         case TELEM_DEVO_TEMP1:
         case TELEM_DEVO_TEMP2:
         case TELEM_DEVO_TEMP3:
         case TELEM_DEVO_TEMP4:
-            return t->temp[idx - TELEM_DEVO_TEMP1];
-        case TELEM_DEVO_RPM1:
-        case TELEM_DEVO_RPM2:
-            return t->rpm[idx - TELEM_DEVO_RPM1];
+            return t->value[idx] == 0xff ? 0xffff // Not connected
+            : (s16)t->value[idx];
+        default:
+            return t->value[idx];
     }
     return 0;
 }

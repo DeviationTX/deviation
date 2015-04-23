@@ -39,7 +39,6 @@ enum {
     TELEM_DSM_FLOG_VOLT2,
     TELEM_DSM_FLOG_RPM1,
     TELEM_DSM_FLOG_TEMP1,
-#if HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_AMPS1,
     TELEM_DSM_PBOX_VOLT1,
     TELEM_DSM_PBOX_VOLT2,
@@ -79,7 +78,15 @@ enum {
     TELEM_DSM_VARIO_CLIMBRATE4,
     TELEM_DSM_VARIO_CLIMBRATE5,
     TELEM_DSM_VARIO_CLIMBRATE6,
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+    TELEM_DSM_HYPOTHETIC_AMPS1,
+    TELEM_DSM_HYPOTHETIC_AMPS2,
+    TELEM_DSM_HYPOTHETIC_VOLT1,
+    TELEM_DSM_HYPOTHETIC_VOLT2,
+    TELEM_DSM_HYPOTHETIC_TEMP1,
+    TELEM_DSM_HYPOTHETIC_TEMP2,
+    TELEM_DSM_HYPOTHETIC_RPM,
+    TELEM_DSM_HYPOTHETIC_THROTTLE,
+    TELEM_DSM_HYPOTHETIC_OUTPUT,
     TELEM_DSM_LAST,
 };
 
@@ -134,96 +141,10 @@ struct gps {
     u8 satcount;
 };
 
-struct telem_devo {
-    u16 volt[3];
-    s16 temp[4];
-    u16 rpm[2];
-};
-
-struct telem_dsm_flog {
-    //Do not change the order of these, they are aligned to the dsm packet
-    u16 fades[4];
-    u16 frameloss;
-    u16 holds;
-    u16 volt[2];
-    u16 rpm;
-    s16 temp;
-};
-struct telem_dsm_pbox {
-    u16 volt[2];
-    u16 capacity[2];
-    u16 alarmv[2];
-    u16 alarmc[2];
-};
-struct telem_dsm_sensors {
-    s16 amps;
-    u16 airspeed;
-    s16 altitude;
-    s16 altitudemax;
-};
-struct telem_dsm_gforce {
-    s16 x;
-    s16 y;
-    s16 z;
-    s16 xmax;
-    s16 ymax;
-    s16 zmax;
-    s16 zmin;
-};
-struct telem_dsm_jetcat {
-    u8 status;
-    u8 offcond;
-    u16 throttle;
-    u16 packvolt;
-    u16 pumpvolt;
-    u32 rpm;
-    u16 temp_egt;
-};
-struct telem_dsm_rxpcap {
-    s16 amps;
-    u16 capacity;
-    u16 volt;
-};
-struct telem_dsm_fpcap {
-    s16 amps;
-    u16 capacity;
-    s16 temp;
-};
-struct telem_dsm_vario {
-    s16 altitude;
-    s16 climbrate[6];
-};
-
-struct telem_dsm {
-    struct telem_dsm_flog    flog;
-    struct telem_dsm_pbox    pbox;
-    struct telem_dsm_sensors sensors;
-    struct telem_dsm_gforce  gforce;
-    struct telem_dsm_jetcat  jetcat;
-    struct telem_dsm_rxpcap  rxpcap;
-    struct telem_dsm_fpcap   fpcap;
-    struct telem_dsm_vario   variometer;
-};
-
-struct telem_frsky {
-  //  u16 volt[2];
-    u16 volt[3];
-    u16 rssi;
-    s16 temp[2];
-    u16 rpm;
-    s32 altitude;
-    //u16 current;
-    //u16 fuel;
-};
-
 #define TELEM_UPDATE_SIZE (((TELEM_VALS + 7) + 31) / 32)
 struct Telemetry {
-    union {
-        struct telem_devo  devo;
-        struct telem_dsm   dsm;
-        struct telem_frsky frsky;
-    } p;
     struct gps gps;
+    u16 value[TELEM_VALS];
     u16 capabilities;
     volatile u32 updated[TELEM_UPDATE_SIZE];
 };

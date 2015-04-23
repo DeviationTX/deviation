@@ -13,20 +13,15 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-s32 _frsky_value(struct Telemetry *_t, int idx)
+s32 _frsky_value(struct Telemetry *t, int idx)
 {
-    struct telem_frsky *t = &_t->p.frsky;
     switch (idx) {
-    case TELEM_FRSKY_VOLT1:
-    case TELEM_FRSKY_VOLT2:
-    case TELEM_FRSKY_VOLT3:
-        return t->volt[idx - TELEM_FRSKY_VOLT1];
-    case TELEM_FRSKY_RSSI:
-    case TELEM_FRSKY_TEMP1:
-    case TELEM_FRSKY_TEMP2:
-        return t->temp[idx - TELEM_FRSKY_TEMP1];
-    case TELEM_FRSKY_RPM:
-        return t->rpm;
+        case TELEM_FRSKY_TEMP1:
+        case TELEM_FRSKY_TEMP2:
+        case TELEM_FRSKY_ALTITUDE:
+            return (s16)t->value[idx];
+        default:
+            return t->value[idx];
     }
     return 0;
 }
