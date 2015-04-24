@@ -65,6 +65,9 @@ struct page_group groups[] = {
 #endif
     {2, PAGEID_RANGE},
     {2, PAGEID_USB},
+#if DEBUG_WINDOW_SIZE
+    {2, PAGEID_DEBUGLOG},
+#endif
 #if HAS_STANDARD_GUI
     {0x81, PAGEID_MODELMENU},
 #endif

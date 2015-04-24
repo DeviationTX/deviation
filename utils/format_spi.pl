@@ -81,7 +81,12 @@ sub read_cyrf6936 {
 
 sub parse_spi {
     my($file) = @_;
-    open my $fh, "<", $file or die "Couldn't read $file\n";
+    my $fh;
+    if ($file) {
+       open $fh, "<", $file or die "Couldn't read $file\n";
+    } else {
+       open $fh, "<&STDIN" or die "Couldn't read STDIN\n";
+    }
     my @data = ();
     my $basetime = -1;
     $_ = <$fh>;
