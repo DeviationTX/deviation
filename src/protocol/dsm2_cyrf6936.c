@@ -148,6 +148,7 @@ static const u8 ch_map11[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 0xff, 0
 static const u8 ch_map12[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 11, 0xff, 0xff};
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9, ch_map10, ch_map11, ch_map12};
 
+u8 telem_pkt[16];
 u8 packet[16];
 u8 channels[23];
 u8 chidx;
@@ -245,7 +246,6 @@ static u8 get_pn_row(u8 channel)
 static const u8 init_vals[][2] = {
     {CYRF_02_TX_CTRL, 0x00},
     {CYRF_05_RX_CTRL, 0x00},
-    {CYRF_0E_GPIO_CTRL, 0x00},
     {CYRF_28_CLK_EN, 0x02},
     {CYRF_32_AUTO_CAL_TIME, 0x3c},
     {CYRF_35_AUTOCAL_OFFSET, 0x14},
@@ -371,7 +371,7 @@ static u32 bcd_to_int(u32 data)
 {
     u32 value = 0, multi = 1;
     while (data) {
-        value += (data & 0x000f) * multi;
+        value += (data & 15) * multi;
         multi *= 10;
         data >>= 4;
     }
@@ -386,7 +386,7 @@ static int pkt32_to_coord(u8 *ptr)
 }
 #endif
 
-static void parse_telemetry_packet()
+static void parse_telemetry_packet(u8 *pkt)
 {
 #if HAS_DSM_EXTENDED_TELEMETRY
     static s32 altitude;
@@ -425,11 +425,13 @@ static void parse_telemetry_packet()
                                    TELEM_DSM_VARIO_CLIMBRATE6, 0};
     const u8 *update = update7f+7;
     unsigned idx = 0;
-    u16 pktTelem[8];
-    u8 pkt[16];
-    CYRF_ReadDataPacket(pkt);
-    u8 data_type = pkt[0], end_byte = pkt[15];
-    u8 LSB_1st = ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34)) ? 1 : 0;
+
+#define data_type  pkt[0]
+#define end_byte   pkt[15]
+#define LSB_1st    ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34))
+
+    // Convert 8bit packet into 16bit equivalent
+    static u16 pktTelem[8];
     if (LSB_1st) {
         for(u8 i=1; i < 8; ++i) {
             pktTelem[i] = (pkt[i*2+1] <<8) | pkt[i*2];
@@ -621,15 +623,11 @@ static u16 dsm2_cb()
         }
     } else if(state == DSM2_CH2_READ_A || state == DSM2_CH2_READ_B) {
         //Read telemetry if needed and parse if good
-        u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-        if ((rx_state & 0x02) && !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
-            //Receive complete and not currently receiving
-            CYRF_ReadDataPacket16(pktTelem);
-            if ((rx_state & 0x21) == 0x20 && !(CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS) & 0x01)) {
-                //Receive buffer full with no receive errors and (2nd check) no receive error
-                parse_telemetry_packet();
-            }
-        }
+        if (CYRF_ReadDataPacketLen(telem_pkt, 0x10))
+            parse_telemetry_packet(telem_pkt);
+        else
+            CYRF_ReadDataPacketLen(NULL, 0x00);
+
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
@@ -644,11 +642,6 @@ static u16 dsm2_cb()
         return READ_DELAY;
     } 
     return 0;
-}
-
-static u8 add_pkt8x3(const u8 *ptr1, const u8 *ptr2, const u8 *ptr3)
-{
-    return *ptr1 + *ptr2 + *ptr3;
 }
 
 static void initialize(u8 bind)
@@ -681,10 +674,10 @@ static void initialize(u8 bind)
             }
             channels[1] = tmpch[idx];
         } else {
-            channels[0] = (add_pkt8x3(cyrfmfg_id, cyrfmfg_id+2, cyrfmfg_id+4)
+            channels[0] = (cyrfmfg_id[0] + cyrfmfg_id[2] + cyrfmfg_id[4]
                           + ((Model.fixed_id >> 0) & 0xff) + ((Model.fixed_id >> 16) & 0xff)) % 39 + 1;
-            channels[1] = (add_pkt8x3(cyrfmfg_id+1, cyrfmfg_id+3, cyrfmfg_id+5)
-                          + ((Model.fixed_id >> 8) & 0xff) * 2) % 40 + 40;
+            channels[1] = (cyrfmfg_id[1] + cyrfmfg_id[3] + cyrfmfg_id[5]
+                          + ((Model.fixed_id >> 8) & 0xff) + ((Model.fixed_id >> 8) & 0xff)) % 40 + 40;
         }
     }
     /*
@@ -700,7 +693,7 @@ static void initialize(u8 bind)
     */
     crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]);
     crcidx = 0;
-    sop_col = (add_pkt8x3(cyrfmfg_id, cyrfmfg_id+1, cyrfmfg_id+2) + 2) & 0x07;
+    sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
     model = MODEL;
     num_channels = Model.num_channels;

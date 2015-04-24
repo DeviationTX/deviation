@@ -212,12 +212,7 @@ static u16 j6pro_cb()
             state = J6PRO_BIND_03_START;
             return 3000; //3msec
         case J6PRO_BIND_03_START:
-            {
-                int i = 0;
-                while (! (CYRF_ReadRegister(0x04) & 0x06))
-                    if(++i > NUM_WAIT_LOOPS)
-                        break;
-            }
+            CYRF_WaitForTxIrq();
             CYRF_ConfigRFChannel(0x53);
             CYRF_SetTxRxMode(RX_EN);
             CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4a);
@@ -225,36 +220,25 @@ static u16 j6pro_cb()
             state = J6PRO_BIND_03_CHECK;
             return 30000; //30msec
         case J6PRO_BIND_03_CHECK:
-            {
-            u8 rx = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-            if((rx & 0x1a) == 0x1a) {
-                rx = CYRF_ReadRegister(CYRF_0A_RX_LENGTH);
-                if(rx == 0x0f) {
-                    rx = CYRF_ReadRegister(CYRF_09_RX_COUNT);
-                    if(rx == 0x0f) {
-                        //Expected and actual length are both 15
-                        CYRF_ReadDataPacket(packet);
-                        if (packet[0] == 0x03 &&
-                            packet[3] == cyrfmfg_id[0] &&
-                            packet[4] == cyrfmfg_id[1] &&
-                            packet[5] == cyrfmfg_id[2] &&
-                            packet[6] == cyrfmfg_id[3] &&
-                            packet[7] == cyrfmfg_id[4] &&
-                            packet[8] == cyrfmfg_id[5])
-                        {
-                            //Send back Ack
-                            packet[0] = 0x05;
-                            CYRF_ConfigRFChannel(0x54);
-                            CYRF_SetTxRxMode(TX_EN);
-                            state = J6PRO_BIND_05_1;
-                            return 2000; //2msec
-                         }
-                    }
-                }
+            if (CYRF_ReadDataPacketLen(packet, 0x0f)) {
+                if (packet[0] == 0x03 &&
+                    packet[3] == cyrfmfg_id[0] &&
+                    packet[4] == cyrfmfg_id[1] &&
+                    packet[5] == cyrfmfg_id[2] &&
+                    packet[6] == cyrfmfg_id[3] &&
+                    packet[7] == cyrfmfg_id[4] &&
+                    packet[8] == cyrfmfg_id[5])
+                {
+                    //Send back Ack
+                    packet[0] = 0x05;
+                    CYRF_ConfigRFChannel(0x54);
+                    CYRF_SetTxRxMode(TX_EN);
+                    state = J6PRO_BIND_05_1;
+                    return 2000; //2msec
+                 }
             }
             state = J6PRO_BIND_01;
             return 500;
-            }
         case J6PRO_BIND_05_1:
         case J6PRO_BIND_05_2:
         case J6PRO_BIND_05_3:

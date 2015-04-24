@@ -31,7 +31,7 @@ static void _get_altitude_str(char *str, s32 value, u8 decimals, char units);
 
 struct Telemetry Telemetry;
 static u8 k = 0; // telem_idx
-static u8 alarm_state[TELEM_NUM_ALARMS] = {0};  // 4 states (0-3) = off -> on -> mute -> mute -> off
+static u8 alarm_state[TELEM_NUM_ALARMS] = {0};  // 3 states: 0 = off, 1 = on, 2 = mute
 static s32 mute_value[TELEM_NUM_ALARMS] = {0};
 static u32 alarm_time[TELEM_NUM_ALARMS] = {0};
 static u32 last_updated[TELEM_UPDATE_SIZE] = {0};
@@ -331,15 +331,11 @@ void TELEMETRY_Alarm()
                 printf("set: 0x%x\n\n", k);
 #endif
             }
-        } else {
-            if (alarm_state[k]) {
-                alarm_state[k]++;
-                alarm_state[k] &= 3;
+        } else if (alarm_state[k]) {
+            alarm_state[k] = 0;
 #ifdef DEBUG_TELEMALARM
-                if (!alarm_state[k])
-                    printf("clear: 0x%x\n\n", k);
+            printf("clear: 0x%x\n\n", k);
 #endif
-            }
         }
     }
 
@@ -363,8 +359,8 @@ void TELEMETRY_MuteAlarm()
 {
     for(int i = 0; i < TELEM_NUM_ALARMS; i++) {
         if (alarm_state[i]==1) {
-            alarm_state[i]++;
             mute_value[i] = TELEMETRY_GetValue( Model.telem_alarm[i] ) - (((Model.telem_flags >> k) & 1) << 8);
+            alarm_state[i]++;
         }
     }
 }

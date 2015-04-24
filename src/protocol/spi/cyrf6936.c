@@ -74,11 +74,9 @@ void CYRF_WriteRegister(u8 address, u8 data)
 
 static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
 {
-    unsigned char i;
-
     CS_LO();
     PROTOSPI_xfer(0x80 | address);
-    for(i = 0; i < length; i++)
+    for(u8 i = 0; i < length; i++)
     {
         PROTOSPI_xfer(data[i]);
     }
@@ -87,24 +85,22 @@ static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
 
 static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
 {
-    unsigned char i;
-
     CS_LO();
     PROTOSPI_xfer(address);
-    for(i = 0; i < length; i++)
+    for(u8 i = 0; i < length; i++)
     {
-        data[i] = PROTOSPI_xfer(0);
+        u8 byte = PROTOSPI_xfer(0);
+        if (data != NULL)
+            data[i] = byte;
     }
     CS_HI();
 }
 
 u8 CYRF_ReadRegister(u8 address)
 {
-    u8 data;
-
     CS_LO();
     PROTOSPI_xfer(address);
-    data = PROTOSPI_xfer(0);
+    u8 data = PROTOSPI_xfer(0);
     CS_HI();
     return data;
 }
@@ -181,7 +177,7 @@ static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
     //Set the post tx/rx state
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x2C : 0x28);
+    CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x2C : 0x08);
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
@@ -253,28 +249,31 @@ void CYRF_WaitForTxIrq()
     unsigned i = 0;
     unsigned tx_state = 0x00;
     while (! tx_state && ++i < NUM_WAIT_LOOPS) {
-        tx_state |= (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02);
+        tx_state |= (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x06);
     }
 }
 
-void CYRF_StartReceive()
+int CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 len)
 {
-    CYRF_WriteRegister(CYRF_05_RX_CTRL,0x87);
-}
-
-void CYRF_ReadDataPacket(u8 dpbuffer[])
-{
-    CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80);    // need to set RXOW before data read.
-    ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, 0x10);
-}
-
-void CYRF_ReadDataPacket16(u16 dpbuffer[])
-{
-    u8 tmp[16];
-    CYRF_ReadDataPacket(tmp);
-    for(u8 i=0; i < 8; ++i) {
-        dpbuffer[i] = (tmp[i*2] <<8) | tmp[i*2+1];
+    unsigned rx_state = 0x03;
+    if (len) {
+        rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
     }
+    if (rx_state & 0x02) {              // receive complete (or force)
+        if (!(rx_state & 0x01)) {       // RXC=1, RXE=0 then 2nd check is required (debouncing)
+            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
+        }
+        CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80);    // need to set RXOW before data read.
+        u8 length = CYRF_ReadRegister(CYRF_09_RX_COUNT);
+        if (((rx_state & 0x25) == 0x20) && len == length) {
+            ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, len);
+            return 1;
+        }
+        // else empty buffer: dummy read all received bytes
+        if (length)
+            ReadRegisterMulti(CYRF_21_RX_BUFFER, NULL, length);
+    }
+    return 0;
 }
 
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)

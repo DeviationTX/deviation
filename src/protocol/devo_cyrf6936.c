@@ -349,7 +349,7 @@ static void cyrf_init()
     /* Initialise CYRF chip */
     CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x38);
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x48);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
     CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
@@ -481,31 +481,25 @@ static u16 devo_cb()
         }
     } else if (txState < 15) {
         //Read telemetry if needed and parse if good
-        u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-        if ((rx_state & 0x02) && !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
-            //Receive complete and not currently receiving
-            CYRF_ReadDataPacket(telem_pkt);
-            if ((rx_state & 0x21) == 0x20 && !(CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS) & 0x01)) {
-                //Receive buffer full with no receive errors and (2nd check) no receive error
-                scramble_pkt(telem_pkt); //This will unscramble the packet
-                if ((telem_pkt[0] & 0xF0) == TELEMETRY_ENABLE
-                 && telem_pkt[13] == (fixed_id  & 0xff)
-                 && telem_pkt[14] == ((fixed_id >> 8) & 0xff)
-                 && telem_pkt[15] == ((fixed_id >> 16) & 0xff))
-                {
-                    parse_telemetry_packet(telem_pkt);
-                }
+        if (CYRF_ReadDataPacketLen(telem_pkt, 0x10)) {
+            scramble_pkt(telem_pkt); //This will unscramble the packet
+            if ((telem_pkt[0] & 0xF0) == TELEMETRY_ENABLE
+             && telem_pkt[13] == (fixed_id  & 0xff)
+             && telem_pkt[14] == ((fixed_id >> 8) & 0xff)
+             && telem_pkt[15] == ((fixed_id >> 16) & 0xff))
+            {
+                parse_telemetry_packet(telem_pkt);
             }
             delay = 100 * (16 - txState);
             txState = 15;
         }
 #ifdef EMULATOR
         u8 telem_bit = rand32() % 7; // random number in [0, 7)
-        packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
-        //printf("telem 1st packet: 0x%x\n", packet[0]);
+        telem_pkt[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
+        //printf("telem 1st packet: 0x%x\n", telem_pkt[0]);
         for(int i = 1; i < 13; i++)
-            packet[i] = rand32() % 256;
-        parse_telemetry_packet(packet);
+            telem_pkt[i] = rand32() % 256;
+        parse_telemetry_packet(telem_pkt);
         for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
             Telemetry.updated[i] = 0xff;
         delay = 100 * (16 - txState);
