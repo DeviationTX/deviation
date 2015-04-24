@@ -366,7 +366,7 @@ struct rtc_obj {
     guiButton_t     setdate;
 };
 
-#define DEBUG_LINE_COUNT ((LCD_HEIGHT-40) / 20)
+#define DEBUG_LINE_COUNT (LCD_WIDTH == 320 ? 10 : 12)
 struct debuglog_obj {
     guiLabel_t      line[DEBUG_LINE_COUNT];
     guiScrollable_t scrollable;
