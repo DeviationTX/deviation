@@ -603,6 +603,7 @@ static u16 dsm2_cb()
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
         }
+#ifndef MODULAR
         if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF) {
             set_sop_data_crc();
             if (state == DSM2_CH2_CHECK_A) {
@@ -615,7 +616,9 @@ static u16 dsm2_cb()
                 state = DSM2_CH1_WRITE_A;
             }
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY;
-        } else {
+        } else
+#endif
+        {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive

@@ -6,7 +6,11 @@ use Data::Dumper;
 use Getopt::Long;
 
 sub read_a7105 {
-    my %cmd;
+    my %cmd = (
+        WR_MASK     => 0x40, WR_MASK_VAL  => 0x00,
+        CMD_MASK    => 0x80, CMD_MASK_VAL => 0x80,
+        ADDR_MASK   => 0x3F
+        );
     my $h = "$FindBin::Bin/../src/protocol/iface_a7105.h";
     open my $fh, "<", $h or die "Couldn't read $h\n";
     while(<$fh>) {

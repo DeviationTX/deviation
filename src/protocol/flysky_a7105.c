@@ -42,7 +42,7 @@
 #endif
 
 static const char * const flysky_opts[] = {
-  "WLToys V9x9",  _tr_noop("Off"), _tr_noop("On"), NULL,
+  "WLToys ext.",  _tr_noop("Off"), _tr_noop("V9x9"), _tr_noop("V6x6"), _tr_noop("V912"), NULL,
   NULL
 };
 enum {
@@ -51,8 +51,10 @@ enum {
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
-#define WLTOYS_ON 1
-#define WLTOYS_OFF 0
+#define WLTOYS_EXT_OFF 0
+#define WLTOYS_EXT_V9X9 1
+#define WLTOYS_EXT_V6X6 2
+#define WLTOYS_EXT_V912 3
 
 static const u8 A7105_regs[] = {
      -1,  0x42, 0x00, 0x14, 0x00,  -1 ,  -1 , 0x00, 0x00, 0x00, 0x00, 0x01, 0x21, 0x05, 0x00, 0x50,
@@ -78,8 +80,53 @@ static const u8 tx_channels[16][16] = {
   {0x46, 0x96, 0x0a, 0x5a, 0x50, 0xa0, 0x3c, 0x8c, 0x28, 0x78, 0x1e, 0x6e, 0x32, 0x82, 0x14, 0x64},
   {0x64, 0x14, 0x82, 0x32, 0x6e, 0x1e, 0x78, 0x28, 0x8c, 0x3c, 0xa0, 0x50, 0x5a, 0x0a, 0x96, 0x46},
 };
+
+// For code readability
+enum {
+    CHANNEL1 = 0,
+    CHANNEL2,
+    CHANNEL3,
+    CHANNEL4,
+    CHANNEL5,
+    CHANNEL6,
+    CHANNEL7,
+    CHANNEL8,
+    CHANNEL9,
+    CHANNEL10,
+    CHANNEL11,
+    CHANNEL12,
+};
+
+enum {
+    // flags going to byte 10
+    FLAG_V9X9_VIDEO = 0x40,
+    FLAG_V9X9_CAMERA= 0x80,
+    // flags going to byte 12
+    FLAG_V9X9_UNK   = 0x10, // undocumented ?
+    FLAG_V9X9_LED   = 0x20,
+};
+
+enum {
+    // flags going to byte 13
+    FLAG_V6X6_HLESS1= 0x80,
+    // flags going to byte 14
+    FLAG_V6X6_VIDEO = 0x01,
+    FLAG_V6X6_YCAL  = 0x02,
+    FLAG_V6X6_XCAL  = 0x04,
+    FLAG_V6X6_RTH   = 0x08,
+    FLAG_V6X6_CAMERA= 0x10,
+    FLAG_V6X6_HLESS2= 0x20,
+    FLAG_V6X6_LED   = 0x40,
+    FLAG_V6X6_FLIP  = 0x80,
+};
+
+enum {
+    // flags going to byte 14
+    FLAG_V912_TOPBTN= 0x40,
+    FLAG_V912_BTMBTN= 0x80,
+};
+
 static u32 id;
-//static const u8 id[] = { 0x02, 0x00, 0x00, 0x70 };
 static u8 chanrow;
 static u8 chancol;
 static u8 chanoffset;
@@ -171,6 +218,79 @@ static int flysky_init()
     return 1;
 }
 
+static void flysky_apply_extension_flags()
+{
+    const u8 V912_X17_SEQ[10] = { 0x14, 0x31, 0x40, 0x49, 0x49,    // sometime first byte is 0x15 ?
+                                  0x49, 0x49, 0x49, 0x49, 0x49, }; 
+    static u8 seq_counter;
+    switch(Model.proto_opts[PROTOOPTS_WLTOYS]) {
+        case WLTOYS_EXT_V9X9:
+            if(Channels[CHANNEL5] > 0)
+                packet[12] |= FLAG_V9X9_LED;
+            if(Channels[CHANNEL6] > 0)
+                packet[10] |= FLAG_V9X9_VIDEO;
+            if(Channels[CHANNEL7] > 0)
+                packet[10] |= FLAG_V9X9_CAMERA;
+            if(Channels[CHANNEL8] > 0)
+                packet[12] |= FLAG_V9X9_UNK;
+            break;
+            
+        case WLTOYS_EXT_V6X6:
+            packet[13] = 0x03; // 3 = 100% rate (0=40%, 1=60%, 2=80%)
+            packet[14] = 0x00;
+            if(Channels[CHANNEL5] > 0) 
+                packet[14] |= FLAG_V6X6_LED;
+            if(Channels[CHANNEL6] > 0) 
+                packet[14] |= FLAG_V6X6_FLIP;
+            if(Channels[CHANNEL7] > 0) 
+                packet[14] |= FLAG_V6X6_CAMERA;
+            if(Channels[CHANNEL8] > 0) 
+                packet[14] |= FLAG_V6X6_VIDEO;
+            if(Model.num_channels >= 9 && Channels[CHANNEL9] > 0) { 
+                packet[13] |= FLAG_V6X6_HLESS1;
+                packet[14] |= FLAG_V6X6_HLESS2;
+            }
+            if(Model.num_channels >= 10 && Channels[CHANNEL10] > 0) 
+                packet[14] |= FLAG_V6X6_RTH;
+            if(Model.num_channels >= 11 && Channels[CHANNEL11] > 0) 
+                packet[14] |= FLAG_V6X6_XCAL;
+            if(Model.num_channels >= 12 && Channels[CHANNEL12] > 0) 
+                packet[14] |= FLAG_V6X6_YCAL;
+            packet[15] = 0x10; // unknown
+            packet[16] = 0x10; // unknown
+            packet[17] = 0xAA; // unknown
+            packet[18] = 0xAA; // unknown
+            packet[19] = 0x60; // unknown, changes at irregular interval in stock TX
+            packet[20] = 0x02; // unknown
+            break;
+            
+        case WLTOYS_EXT_V912:
+            seq_counter++;
+            if( seq_counter > 9)
+                seq_counter = 0;
+            packet[12] |= 0x20; // bit 6 is always set ?
+            packet[13] = 0x00;  // unknown
+            packet[14] = 0x00;
+            if(Channels[CHANNEL5] > 0)
+                packet[14] |= FLAG_V912_BTMBTN;
+            if(Channels[CHANNEL6] > 0)
+                packet[14] |= FLAG_V912_TOPBTN;
+            packet[15] = 0x27; // [15] and [16] apparently hold an analog channel with a value lower than 1000
+            packet[16] = 0x03; // maybe it's there for a pitch channel for a CP copter ?
+            packet[17] = V912_X17_SEQ[seq_counter]; // not sure what [17] & [18] are for
+            if(seq_counter == 0)                    // V912 Rx does not even read those bytes... [17-20]
+                packet[18] = 0x02;
+            else
+                packet[18] = 0x00;
+            packet[19] = 0x00; // unknown
+            packet[20] = 0x00; // unknown
+            break;
+            
+        default:
+            break; 
+    }
+}
+
 static void flysky_build_packet(u8 init)
 {
     int i;
@@ -196,17 +316,7 @@ static void flysky_build_packet(u8 init)
         packet[5 + i*2] = value & 0xff;
         packet[6 + i*2] = (value >> 8) & 0xff;
     }
-    if (Model.proto_opts[PROTOOPTS_WLTOYS] == WLTOYS_ON) {
-        if(Channels[4] > 0)
-            packet[12] |= 0x20;
-        if(Channels[5] > 0)
-            packet[10] |= 0x40;
-        if(Channels[6] > 0)
-            packet[10] |= 0x80;
-        if(Channels[7] > 0)
-            packet[12] |= 0x10;
-
-    }
+    flysky_apply_extension_flags();
 }
 
 MODULE_CALLTYPE
@@ -241,6 +351,8 @@ static void initialize(u8 bind) {
     } else {
         id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
     }
+    if ((id & 0xf0) > 0x90) // limit offset to 9 as higher values don't work with some RX (ie V912)
+        id = id - 0x70;
     chanrow = id % 16;
     chancol = 0;
     chanoffset = (id & 0xff) / 16;
@@ -263,7 +375,7 @@ const void *FLYSKY_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)8L;
+        case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
         case PROTOCMD_GETOPTIONS:
