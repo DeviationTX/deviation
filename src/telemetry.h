@@ -11,9 +11,9 @@
 #endif
 
 enum {
+    TELEM_FRSKY,
     TELEM_DEVO,
     TELEM_DSM,
-    TELEM_FRSKY,
 };
 
 enum {

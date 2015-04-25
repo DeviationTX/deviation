@@ -201,6 +201,7 @@ static void frsky2way_build_data_packet()
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
+    static u32 velocity;
     //byte1 == data len (+ 2 for CRC)
     //byte 2,3 = fixed=id
     //byte 4 = A1 : 52mV per count; 4.5V = 0x56
@@ -261,10 +262,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
               break;
           case 0x11: //GPS Speed (whole number and sign) in Knots
-              Telemetry.gps.velocity = value * 100;
+              Telemetry.gps.velocity = velocity = value * 100;
               break;
           case 0x19: //GPS Speed (fraction)
-              Telemetry.gps.velocity = (Telemetry.gps.velocity + value) * 5556 / 1080; //Convert 1/100 knot to mm/sec
+              Telemetry.gps.velocity = (velocity + value) * 5556 / 1080; //Convert 1/100 knot to mm/sec
               TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
               break;
           case 0x12: //GPS Longitude (whole number) dddmm.mmmm

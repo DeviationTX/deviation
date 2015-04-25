@@ -255,25 +255,27 @@ void CYRF_WaitForTxIrq()
 
 int CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 len)
 {
-    unsigned rx_state = 0x03;
-    if (len) {
-        rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-    }
-    if (rx_state & 0x02) {              // receive complete (or force)
-        if (!(rx_state & 0x01)) {       // RXC=1, RXE=0 then 2nd check is required (debouncing)
+    int ok = 0;
+    unsigned rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
+    if (rx_state & 0x02) {
+        // receive complete
+        if (!(rx_state & 0x01)) // RXC=1, RXE=0 then 2nd check is required (debouncing)
             rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-        }
-        CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80);    // need to set RXOW before data read.
-        u8 length = CYRF_ReadRegister(CYRF_09_RX_COUNT);
-        if (((rx_state & 0x25) == 0x20) && len == length) {
-            ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, len);
-            return 1;
-        }
-        // else empty buffer: dummy read all received bytes
-        if (length)
-            ReadRegisterMulti(CYRF_21_RX_BUFFER, NULL, length);
     }
-    return 0;
+    if (rx_state) {
+        u8 length = 0;   
+        if ((rx_state & 0x87) == 0x02) {
+            length = CYRF_ReadRegister(CYRF_09_RX_COUNT);
+            ok = (length == len) ? 1 : 0;
+        } else if (dpbuffer == NULL) {
+            length = 0x10; // burp buffer
+        }
+        if (length) {
+            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read.
+            ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, length);
+        }
+    }
+    return ok;
 }
 
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)

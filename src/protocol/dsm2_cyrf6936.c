@@ -371,7 +371,7 @@ static u32 bcd_to_int(u32 data)
 {
     u32 value = 0, multi = 1;
     while (data) {
-        value += (data & 15) * multi;
+        value += (data & 15U) * multi;
         multi *= 10;
         data >>= 4;
     }
@@ -382,7 +382,7 @@ static int pkt32_to_coord(u8 *ptr)
 {
     // (decimal, format DD MM.MMMM)
     return bcd_to_int(ptr[3]) * 3600000
-         + bcd_to_int(ptr[2] << 16 | ptr[1] << 8 | ptr[0]) * 6;
+         + bcd_to_int((u32)ptr[2] << 16 | (u32)ptr[1] << 8 | ptr[0]) * 6;
 }
 #endif
 
@@ -629,7 +629,7 @@ static u16 dsm2_cb()
         if (CYRF_ReadDataPacketLen(telem_pkt, 0x10))
             parse_telemetry_packet(telem_pkt);
         else
-            CYRF_ReadDataPacketLen(NULL, 0x00);
+            CYRF_ReadDataPacketLen(NULL, 0x00); //End receive (buffer clean-up)
 
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;

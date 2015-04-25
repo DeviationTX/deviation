@@ -205,9 +205,9 @@ static void build_data_pkt()
     add_pkt_suffix();
 }
 
-static u32 float_to_int(u8 *ptr)
+static s32 float_to_int(u8 *ptr)
 {
-    u32 value = 0;
+    s32 value = 0;
     int seen_decimal = 0;
     for(int i = 0; i < 7; i++) {
         if(ptr[i] == '.') {
@@ -464,22 +464,17 @@ static u16 devo_cb()
                 cyrf_set_bound_sop_code();
             }
             if(pkt_num == 0 || bind_counter > 0) {
-                //Keep tx power updated
-                CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-                radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
-                CYRF_ConfigRFChannel(*radio_ch_ptr);
-            }
-            if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
-                CYRF_SetTxRxMode(RX_EN); //Receive mode
-                CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
-                delay = 900;
-                txState = 9;
-            } else {
                 delay = 1500;
                 txState = 15;
+            } else {
+                CYRF_SetTxRxMode(RX_EN); //Receive mode
+                CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
             }
         }
-    } else if (txState < 15) {
+    } else if (txState == 15) {
+        CYRF_ReadDataPacketLen(NULL, 0x00); //End receive (buffer clean-up)
+        CYRF_SetTxRxMode(TX_EN); //Write mode
+    } else {
         //Read telemetry if needed and parse if good
         if (CYRF_ReadDataPacketLen(telem_pkt, 0x10)) {
             scramble_pkt(telem_pkt); //This will unscramble the packet
@@ -490,8 +485,8 @@ static u16 devo_cb()
             {
                 parse_telemetry_packet(telem_pkt);
             }
-            delay = 100 * (16 - txState);
-            txState = 15;
+            delay = 100 * (15 - txState);
+            txState = 14;
         }
 #ifdef EMULATOR
         u8 telem_bit = rand32() % 7; // random number in [0, 7)
@@ -502,13 +497,18 @@ static u16 devo_cb()
         parse_telemetry_packet(telem_pkt);
         for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
             Telemetry.updated[i] = 0xff;
-        delay = 100 * (16 - txState);
-        txState = 15;
+        delay = 100 * (15 - txState);
+        txState = 14;
 #endif
     }
     txState++;
     if(txState == 16) { //2.3msec have passed
-        CYRF_SetTxRxMode(TX_EN); //Write mode
+        if(pkt_num == 0) {
+            //Keep tx power updated
+            CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+            radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
+            CYRF_ConfigRFChannel(*radio_ch_ptr);
+        }
         txState = 0;
     }
     return delay;

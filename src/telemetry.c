@@ -341,7 +341,8 @@ void TELEMETRY_Alarm()
 
     if (alarm_state[k]==1 && current_time >= music_time) {
         music_time = current_time + MUSIC_INTERVAL;
-        PAGE_ShowTelemetryAlarm();
+        if (k < 9 + TELEMETRY_Type())
+            PAGE_ShowTelemetryAlarm();
 #ifdef DEBUG_TELEMALARM
         printf("beep: %d\n\n", k);
 #endif
