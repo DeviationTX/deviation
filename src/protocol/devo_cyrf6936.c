@@ -98,7 +98,6 @@ static s16 bind_counter;
 static enum PktState state;
 static u8 txState;
 static u8 packet[16];
-static u8 telem_pkt[16];
 static u32 fixed_id;
 static u8 radio_ch[5];
 static u8 *radio_ch_ptr;
@@ -109,14 +108,14 @@ static u8 ch_idx;
 static u8 use_fixed_id;
 static u8 failsafe_pkt;
 
-static void scramble_pkt(u8 *pkt)
+static void scramble_pkt()
 {
 #ifdef NO_SCRAMBLE
     return;
 #else
     u8 i;
     for(i = 0; i < 15; i++) {
-        pkt[i + 1] ^= cyrfmfg_id[i % 4];
+        packet[i + 1] ^= cyrfmfg_id[i % 4];
     }
 #endif
 }
@@ -236,7 +235,7 @@ static u32 text_to_int(u8 *ptr, u8 len)
     }
     return value;
 }
-static void parse_telemetry_packet(u8 *packet)
+static void parse_telemetry_packet()
 {
     static const u8 voltpkt[] = {
             TELEM_DEVO_VOLT1, TELEM_DEVO_VOLT2, TELEM_DEVO_VOLT3,
@@ -251,7 +250,13 @@ static void parse_telemetry_packet(u8 *packet)
     static const u8 gpsspeedpkt[] = { TELEM_GPS_SPEED, 0};
     static const u8 gpstimepkt[] = { TELEM_GPS_TIME, 0};
 
-    const u8 *update = gpslongpkt+1;
+    scramble_pkt(); //This will unscramble the packet
+    if (((packet[0] & 0xF0) != TELEMETRY_ENABLE) ||
+        ((((u32)packet[15] << 16) | ((u32)packet[14] << 8) | packet[13]) == (fixed_id & 0x00ffffff)))
+    {
+        return;
+    }
+    const u8 *update = &gpstimepkt[1];
     u32 step = 1;
     u32 idx = 1;
     //if (packet[0] < 0x37) {
@@ -349,7 +354,7 @@ static void cyrf_init()
     /* Initialise CYRF chip */
     CYRF_WriteRegister(CYRF_1D_MODE_OVERRIDE, 0x38);
     CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
-    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x48);
+    CYRF_WriteRegister(CYRF_06_RX_CFG, 0x4A);
     CYRF_WriteRegister(CYRF_0B_PWR_CTRL, 0x00);
     CYRF_WriteRegister(CYRF_10_FRAMING_CFG, 0xA4);
     CYRF_WriteRegister(CYRF_11_DATA32_THOLD, 0x05);
@@ -396,7 +401,7 @@ void DEVO_BuildPacket()
         case DEVO_BIND_SENDCH:
             bind_counter--;
             build_data_pkt();
-            scramble_pkt(packet);
+            scramble_pkt();
             if (bind_counter <= 0) {
                 state = DEVO_BOUND;
                 PROTOCOL_SetBindState(0);
@@ -415,7 +420,7 @@ void DEVO_BuildPacket()
         case DEVO_BOUND_8:
         case DEVO_BOUND_9:
             build_data_pkt();
-            scramble_pkt(packet);
+            scramble_pkt();
             state++;
             if (bind_counter > 0) {
                 bind_counter--;
@@ -426,7 +431,7 @@ void DEVO_BuildPacket()
         case DEVO_BOUND_10:
             build_beacon_pkt(num_channels > 8 ? failsafe_pkt : 0);
             failsafe_pkt = failsafe_pkt ? 0 : 1;
-            scramble_pkt(packet);
+            scramble_pkt();
             state = DEVO_BOUND_1;
             break;
     }
@@ -435,14 +440,16 @@ void DEVO_BuildPacket()
         pkt_num = 0;
 }
 MODULE_CALLTYPE
-static u16 devo_cb()
+static u16 devo_telemetry_cb()
 {
-    int delay = 100;
     if (txState == 0) {
+        txState = 1;
         DEVO_BuildPacket();
         CYRF_WriteDataPacket(packet);
-        delay = 900;
-    } else if (txState == 1) {
+        return 900;
+    }
+    int delay = 100;
+    if (txState == 1) {
         int i = 0;
         u8 reg;
         while (! ((reg = CYRF_ReadRegister(0x04)) & 0x02)) {
@@ -454,7 +461,7 @@ static u16 devo_cb()
             cyrf_init();
             cyrf_set_bound_sop_code();
             CYRF_ConfigRFChannel(*radio_ch_ptr);
-            printf("Rst CYRF\n");
+            //printf("Rst CYRF\n");
             delay = 1500;
             txState = 15;
         } else {
@@ -468,41 +475,36 @@ static u16 devo_cb()
                 txState = 15;
             } else {
                 CYRF_SetTxRxMode(RX_EN); //Receive mode
+                CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Prepare to receive
                 CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
             }
         }
-    } else if (txState == 15) {
-        CYRF_ReadDataPacketLen(NULL, 0x00); //End receive (buffer clean-up)
-        CYRF_SetTxRxMode(TX_EN); //Write mode
     } else {
-        //Read telemetry if needed and parse if good
-        if (CYRF_ReadDataPacketLen(telem_pkt, 0x10)) {
-            scramble_pkt(telem_pkt); //This will unscramble the packet
-            if ((telem_pkt[0] & 0xF0) == TELEMETRY_ENABLE
-             && telem_pkt[13] == (fixed_id  & 0xff)
-             && telem_pkt[14] == ((fixed_id >> 8) & 0xff)
-             && telem_pkt[15] == ((fixed_id >> 16) & 0xff))
-            {
-                parse_telemetry_packet(telem_pkt);
-            }
-            delay = 100 * (15 - txState);
-            txState = 14;
+        int reg = CYRF_ReadRegister(0x07);
+        if ((reg & 0x23) == 0x22)
+        //if(CYRF_ReadRegister(0x07) & 0x20)
+        { // this won't be true in emulator so we need to simulate it somehow
+            CYRF_ReadDataPacket(packet);
+            parse_telemetry_packet(packet);
+            delay = 100 * (16 - txState);
+            txState = 15;
         }
 #ifdef EMULATOR
         u8 telem_bit = rand32() % 7; // random number in [0, 7)
-        telem_pkt[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
-        //printf("telem 1st packet: 0x%x\n", telem_pkt[0]);
+        packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
+        //printf("telem 1st packet: 0x%x\n", packet[0]);
         for(int i = 1; i < 13; i++)
-            telem_pkt[i] = rand32() % 256;
-        parse_telemetry_packet(telem_pkt);
+            packet[i] = rand32() % 256;
+        parse_telemetry_packet(packet);
         for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
             Telemetry.updated[i] = 0xff;
-        delay = 100 * (15 - txState);
-        txState = 14;
+        delay = 100 * (16 - txState);
+        txState = 15;
 #endif
     }
     txState++;
     if(txState == 16) { //2.3msec have passed
+        CYRF_SetTxRxMode(TX_EN); //Write mode
         if(pkt_num == 0) {
             //Keep tx power updated
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
@@ -512,6 +514,35 @@ static u16 devo_cb()
         txState = 0;
     }
     return delay;
+}
+
+MODULE_CALLTYPE
+static u16 devo_cb()
+{
+    if (txState == 0) {
+        txState = 1;
+        DEVO_BuildPacket();
+        CYRF_WriteDataPacket(packet);
+        return 1200;
+    }
+    txState = 0;
+    int i = 0;
+    while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        if(++i > NUM_WAIT_LOOPS)
+            return 1200;
+    }
+    if (state == DEVO_BOUND) {
+        /* exit binding state */
+        state = DEVO_BOUND_3;
+        cyrf_set_bound_sop_code();
+    }   
+    if(pkt_num == 0) {
+        //Keep tx power updated
+        CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
+        radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
+        CYRF_ConfigRFChannel(*radio_ch_ptr);
+    }
+    return 1200;
 }
 
 static void devo_bind()
@@ -537,7 +568,6 @@ static void initialize()
     radio_ch_ptr = radio_ch;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
-    CYRF_SetTxRxMode(TX_EN);
     /*
     parse_telemetry_packet("203020.8270E\0");
     parse_telemetry_packet("35954.776N\0\0");
@@ -567,7 +597,11 @@ static void initialize()
         bind_counter = 0;
         cyrf_set_bound_sop_code();
     }
-    CLOCK_StartTimer(2400, devo_cb);
+    if (Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON) {
+        CLOCK_StartTimer(2400, devo_telemetry_cb);
+    } else {
+        CLOCK_StartTimer(2400, devo_cb);
+    }
 }
 
 const void *DEVO_Cmds(enum ProtoCmds cmd)

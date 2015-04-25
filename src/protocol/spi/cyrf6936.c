@@ -30,7 +30,6 @@
 //Disable AWA24S
 #define AWA24S 0
 
-#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
 #define Delay usleep
 static void  CS_HI() {
 #if HAS_MULTIMOD_SUPPORT
@@ -74,9 +73,11 @@ void CYRF_WriteRegister(u8 address, u8 data)
 
 static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
 {
+    unsigned char i;
+
     CS_LO();
     PROTOSPI_xfer(0x80 | address);
-    for(u8 i = 0; i < length; i++)
+    for(i = 0; i < length; i++)
     {
         PROTOSPI_xfer(data[i]);
     }
@@ -85,22 +86,24 @@ static void WriteRegisterMulti(u8 address, const u8 data[], u8 length)
 
 static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
 {
+    unsigned char i;
+
     CS_LO();
     PROTOSPI_xfer(address);
-    for(u8 i = 0; i < length; i++)
+    for(i = 0; i < length; i++)
     {
-        u8 byte = PROTOSPI_xfer(0);
-        if (data != NULL)
-            data[i] = byte;
+        data[i] = PROTOSPI_xfer(0);
     }
     CS_HI();
 }
 
 u8 CYRF_ReadRegister(u8 address)
 {
+    u8 data;
+
     CS_LO();
     PROTOSPI_xfer(address);
-    u8 data = PROTOSPI_xfer(0);
+    data = PROTOSPI_xfer(0);
     CS_HI();
     return data;
 }
@@ -138,12 +141,12 @@ void CYRF_GetMfgData(u8 data[])
         return;
     }
     /* Fuses power on */
-    CYRF_WriteRegister(CYRF_25_MFG_ID, 0xFF);
+    CYRF_WriteRegister(0x25, 0xFF);
 
-    ReadRegisterMulti(CYRF_25_MFG_ID, data, 6);
+    ReadRegisterMulti(0x25, data, 6);
 
     /* Fuses power off */
-    CYRF_WriteRegister(CYRF_25_MFG_ID, 0x00);
+    CYRF_WriteRegister(0x25, 0x00); 
 }
 
 #if HAS_MULTIMOD_SUPPORT
@@ -152,12 +155,12 @@ static void AWA24S_SetTxRxMode(enum TXRX_State mode)
     //AWA24S
     if(mode == TX_EN)
     {
-        CYRF_WriteRegister(CYRF_0D_IO_CFG,0x40); //disable Rx (assume IRQ is set?)
+        CYRF_WriteRegister(0x0D,0x40); //disable Rx (assume IRQ is set?)
         SPI_ConfigSwitch(0x8f, 0x8e);
     }
     else
     {
-        CYRF_WriteRegister(CYRF_0D_IO_CFG,0x00); //enable Rx (assume IRQ is set?)
+        CYRF_WriteRegister(0x0D,0x00); //enable Rx (assume IRQ is set?)
         SPI_ConfigSwitch(0x0f, 0x0e);
     }
 }
@@ -165,9 +168,9 @@ static void AWA24S_SetTxRxMode(enum TXRX_State mode)
 static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
 {
     if(mode == TX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL,0x20);
+        CYRF_WriteRegister(0x0E,0x20);
     } else if (mode == RX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL,0x80);
+        CYRF_WriteRegister(0x0E,0x80);
     }
 }
 #endif
@@ -177,7 +180,7 @@ static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
     //Set the post tx/rx state
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x2C : 0x08);
+    CYRF_WriteRegister(0x0F, mode == TX_EN ? 0x2C : 0x28);
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
@@ -191,9 +194,9 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
     }
 #endif
     if(mode == TX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL,0x80);
+        CYRF_WriteRegister(0x0E,0x80);
     } else {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL,0x20);
+        CYRF_WriteRegister(0x0E,0x20);
     }
 }
 /*
@@ -201,13 +204,13 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
  */
 void CYRF_ConfigRFChannel(u8 ch)
 {
-    CYRF_WriteRegister(CYRF_00_CHANNEL,ch);
+    CYRF_WriteRegister(0x00,ch);
 }
 
 void CYRF_SetPower(u8 power)
 {
-    u8 val = CYRF_ReadRegister(CYRF_03_TX_CFG) & 0xF8;
-    CYRF_WriteRegister(CYRF_03_TX_CFG, val | (power & 0x07));
+    u8 val = CYRF_ReadRegister(0x03) & 0xF8;
+    CYRF_WriteRegister(0x03, val | (power & 0x07));
 }
 
 /*
@@ -215,8 +218,8 @@ void CYRF_SetPower(u8 power)
  */
 void CYRF_ConfigCRCSeed(u16 crc)
 {
-    CYRF_WriteRegister(CYRF_15_CRC_SEED_LSB,crc & 0xff);
-    CYRF_WriteRegister(CYRF_16_CRC_SEED_MSB,crc >> 8);
+    CYRF_WriteRegister(0x15,crc & 0xff);
+    CYRF_WriteRegister(0x16,crc >> 8);
 }
 /*
  * these are the recommended sop codes from Crpress
@@ -226,64 +229,44 @@ void CYRF_ConfigSOPCode(const u8 *sopcodes)
 {
     //NOTE: This can also be implemented as:
     //for(i = 0; i < 8; i++) WriteRegister)0x23, sopcodes[i];
-    WriteRegisterMulti(CYRF_22_SOP_CODE, sopcodes, 8);
+    WriteRegisterMulti(0x22, sopcodes, 8);
 }
 
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len)
 {
     //NOTE: This can also be implemented as:
     //for(i = 0; i < len; i++) WriteRegister)0x23, datacodes[i];
-    WriteRegisterMulti(CYRF_23_DATA_CODE, datacodes, len);
+    WriteRegisterMulti(0x23, datacodes, len);
 }
 
 void CYRF_WritePreamble(u32 preamble)
 {
-    u8 datacodes[] = {preamble & 0xff, (preamble >> 8) & 0xff, (preamble >> 16) & 0xff};
-    WriteRegisterMulti(CYRF_24_PREAMBLE, datacodes, 3);
+    CS_LO();
+    PROTOSPI_xfer(0x80 | 0x24);
+    PROTOSPI_xfer(preamble & 0xff);
+    PROTOSPI_xfer((preamble >> 8) & 0xff);
+    PROTOSPI_xfer((preamble >> 16) & 0xff);
+    CS_HI();
 }
 /*
  *
  */
-void CYRF_WaitForTxIrq()
+void CYRF_StartReceive()
 {
-    unsigned i = 0;
-    unsigned tx_state = 0x00;
-    while (! tx_state && ++i < NUM_WAIT_LOOPS) {
-        tx_state |= (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x06);
-    }
+    CYRF_WriteRegister(0x05,0x87);
 }
 
-int CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 len)
+void CYRF_ReadDataPacket(u8 dpbuffer[])
 {
-    int ok = 0;
-    unsigned rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-    if (rx_state & 0x02) {
-        // receive complete
-        if (!(rx_state & 0x01)) // RXC=1, RXE=0 then 2nd check is required (debouncing)
-            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
-    }
-    if (rx_state) {
-        u8 length = 0;   
-        if ((rx_state & 0x87) == 0x02) {
-            length = CYRF_ReadRegister(CYRF_09_RX_COUNT);
-            ok = (length == len) ? 1 : 0;
-        } else if (dpbuffer == NULL) {
-            length = 0x10; // burp buffer
-        }
-        if (length) {
-            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read.
-            ReadRegisterMulti(CYRF_21_RX_BUFFER, dpbuffer, length);
-        }
-    }
-    return ok;
+    ReadRegisterMulti(0x21, dpbuffer, 0x10);
 }
 
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len)
 {
     CYRF_WriteRegister(CYRF_01_TX_LENGTH, len);
-    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0x40);
-    WriteRegisterMulti(CYRF_20_TX_BUFFER, dpbuffer, len);
-    CYRF_WriteRegister(CYRF_02_TX_CTRL, 0xBF);
+    CYRF_WriteRegister(0x02, 0x40);
+    WriteRegisterMulti(0x20, dpbuffer, len);
+    CYRF_WriteRegister(0x02, 0xBF);
 }
 void CYRF_WriteDataPacket(const u8 dpbuffer[])
 {
@@ -295,14 +278,14 @@ u8 CYRF_ReadRSSI(u32 dodummyread)
     u8 result;
     if(dodummyread)
     {
-        CYRF_ReadRegister(CYRF_13_RSSI);
+        CYRF_ReadRegister(0x13);
     }
-    result = CYRF_ReadRegister(CYRF_13_RSSI);
+    result = CYRF_ReadRegister(0x13);
     if(result & 0x80)
     {
-        result = CYRF_ReadRegister(CYRF_13_RSSI);
+        result = CYRF_ReadRegister(0x13);
     }
-    return (result & 0x1F);//rssi has 5 bits, not 4
+    return (result & 0x0F);
 }
 
 //NOTE: This routine will reset the CRC Seed
@@ -326,10 +309,10 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     Delay(1000);
     for(i = 0; i < NUM_FREQ; i++) {
         CYRF_ConfigRFChannel(i);
-        CYRF_ReadRegister(CYRF_13_RSSI);
-        CYRF_WriteRegister(CYRF_05_RX_CTRL,0x87); //Prepare to receive
+        CYRF_ReadRegister(0x13);
+        CYRF_StartReceive();
         Delay(10);
-        rssi[i] = CYRF_ReadRegister(CYRF_13_RSSI);
+        rssi[i] = CYRF_ReadRegister(0x13);
     }
 
     for (i = 0; i < len; i++) {

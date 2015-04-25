@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "common.h"
 #include "interface.h"
+#include "mixer.h"
 #include "telemetry.h"
 #include "config/model.h"
 
@@ -41,16 +42,18 @@
 #define BIND_CHANNEL 0x0d //This can be any odd channel
 #define MODEL 0
 
+#define NUM_WAIT_LOOPS (100 / 5) //each loop is ~5us.  Do not wait more than 100us
+
 static const char * const dsm_opts[] = {
-   _tr_noop("Telemetry"), _tr_noop("Off"), _tr_noop("A1"), _tr_noop("On"), NULL, NULL
+  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
 };
 enum {
     PROTOOPTS_TELEMETRY = 0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-#define TELEM_ON 2
-#define TELEM_A1 1
+#define TELEM_ON 1
 #define TELEM_OFF 0
 
 //During binding we will send BIND_COUNT/2 packets
@@ -148,7 +151,6 @@ static const u8 ch_map11[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 0xff, 0
 static const u8 ch_map12[] = {3, 2, 1, 5, 0,    4,    6,    7, 8, 9, 10, 11, 0xff, 0xff};
 static const u8 * const ch_map[] = {ch_map4, ch_map5, ch_map6, ch_map7, ch_map8, ch_map9, ch_map10, ch_map11, ch_map12};
 
-u8 telem_pkt[16];
 u8 packet[16];
 u8 channels[23];
 u8 chidx;
@@ -186,7 +188,11 @@ static void build_bind_packet()
     packet[10] = 0x01; //???
     packet[11] = num_channels;
     if(Model.protocol == PROTOCOL_DSMX) {
-        packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] != TELEM_ON ? 0xa2 : 0xb2;
+#ifdef MODULAR
+        packet[12] = 0xb2;
+#else
+        packet[12] = num_channels < 8 && Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? 0xa2 : 0xb2;
+#endif
     } else {
         packet[12] = num_channels < 8 ? 0x01 : 0x02;
     }
@@ -199,6 +205,7 @@ static void build_bind_packet()
 
 static void build_data_packet(u8 upper)
 {
+    u8 i;
     const u8 *chmap = ch_map[num_channels - 4];
     if (binding && PROTOCOL_SticksMoved(0)) {
         //Don't turn off dialog until sticks are moved
@@ -215,24 +222,25 @@ static void build_data_packet(u8 upper)
     u8 bits = Model.protocol == PROTOCOL_DSMX ? 11 : 10;
     u16 max = 1 << bits;
     u16 pct_100 = (u32)max * 100 / 150;
-    for (u8 i = 0; i < 7;) {
-        unsigned idx = chmap[(upper ? 7 : 0) + i];
-        s32 value = 0xffff;
-        if (!(idx == 0xff)) {
-            if (binding && Model.limits[idx].flags & CH_FAILSAFE_EN) {
-                value = (s32)Model.limits[idx].failsafe * (pct_100 / 2) / 100 + (max / 2);
-            } else {
-                value = (s32)Channels[idx] * (pct_100 / 2) / CHAN_MAX_VALUE + (max / 2);
-            }
-            if (value >= max)
-                value = max-1;
-            else if (value < 0)
-                value = 0;
-            value = (upper && i == 0 ? 0x8000 : 0) | (idx << bits) | value;
-        }
-       ++i;
-       packet[i*2] = (value >> 8) & 0xff;
-       packet[i*2+1] = (value >> 0) & 0xff;
+    for (i = 0; i < 7; i++) {
+       unsigned idx = chmap[upper * 7 + i];
+       s32 value;
+       if (chmap[upper*7 + i] == 0xff) {
+           value = 0xffff;
+       } else {
+           if (binding && Model.limits[idx].flags & CH_FAILSAFE_EN) {
+               value = (s32)Model.limits[idx].failsafe * (pct_100 / 2) / 100 + (max / 2);
+           } else {
+               value = (s32)Channels[idx] * (pct_100 / 2) / CHAN_MAX_VALUE + (max / 2);
+           }
+           if (value >= max)
+               value = max-1;
+           else if (value < 0)
+               value = 0;
+           value = (upper && i == 0 ? 0x8000 : 0) | (chmap[upper * 7 + i] << bits) | value;
+       }
+       packet[i*2+2] = (value >> 8) & 0xff;
+       packet[i*2+3] = (value >> 0) & 0xff;
     }
 }
 
@@ -384,10 +392,10 @@ static int pkt32_to_coord(u8 *ptr)
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
 
-static void parse_telemetry_packet(u8 *pkt)
+static void parse_telemetry_packet()
 {
-#if HAS_DSM_EXTENDED_TELEMETRY
     static s32 altitude;
+#if HAS_DSM_EXTENDED_TELEMETRY
     static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
                                    TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
                                    TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
@@ -401,19 +409,11 @@ static void parse_telemetry_packet(u8 *pkt)
                                    TELEM_DSM_HYPOTHETIC_TEMP2, TELEM_DSM_HYPOTHETIC_AMPS2,
                                    TELEM_DSM_HYPOTHETIC_VOLT2, TELEM_DSM_HYPOTHETIC_THROTTLE,
                                    TELEM_DSM_HYPOTHETIC_OUTPUT, 0};
-    static const u8 update40[] = { TELEM_DSM_VARIO_ALTITUDE, TELEM_DSM_VARIO_CLIMBRATE1,
-                                   TELEM_DSM_VARIO_CLIMBRATE2, TELEM_DSM_VARIO_CLIMBRATE3,
-                                   TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
-                                   TELEM_DSM_VARIO_CLIMBRATE6, 0};
     static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
     static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
+#endif
     static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, TELEM_GPS_HEADING, 0};
     static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, TELEM_GPS_SATCOUNT, 0};
-#else
-    static u8 altitude_pkt17;
-    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
-    static const u8 update17[] = { TELEM_GPS_SPEED, 0};
-#endif
     static const u8 update7f[] = { TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
                                    TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
                                    TELEM_DSM_FLOG_FRAMELOSS, TELEM_DSM_FLOG_HOLDS,
@@ -425,22 +425,26 @@ static void parse_telemetry_packet(u8 *pkt)
     static const u8 update14[] = { TELEM_DSM_GFORCE_X, TELEM_DSM_GFORCE_Y, TELEM_DSM_GFORCE_Z,
                                    TELEM_DSM_GFORCE_XMAX, TELEM_DSM_GFORCE_YMAX, TELEM_DSM_GFORCE_ZMAX,
                                    TELEM_DSM_GFORCE_ZMIN, 0};
-    const u8 *update = update7f+7;
+    static const u8 update40[] = { TELEM_DSM_VARIO_ALTITUDE, TELEM_DSM_VARIO_CLIMBRATE1,
+                                   TELEM_DSM_VARIO_CLIMBRATE2, TELEM_DSM_VARIO_CLIMBRATE3,
+                                   TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
+                                   TELEM_DSM_VARIO_CLIMBRATE6, 0};
+    const u8 *update = &update7f[7];
     unsigned idx = 0;
 
-#define data_type  pkt[0]
-#define end_byte   pkt[15]
+#define data_type  packet[0]
+#define end_byte   packet[15]
 #define LSB_1st    ((data_type >= 0x15 && data_type <= 0x18) || (data_type == 0x34))
 
     // Convert 8bit packet into 16bit equivalent
     static u16 pktTelem[8];
     if (LSB_1st) {
         for(u8 i=1; i < 8; ++i) {
-            pktTelem[i] = (pkt[i*2+1] <<8) | pkt[i*2];
+            pktTelem[i] = (packet[i*2+1] <<8) | packet[i*2];
         }
     } else {
         for(u8 i=1; i < 8; ++i) {
-            pktTelem[i] = (pkt[i*2] <<8) | pkt[i*2+1];
+            pktTelem[i] = (packet[i*2] <<8) | packet[i*2+1];
         }
     }
     switch(data_type) {
@@ -471,10 +475,10 @@ static void parse_telemetry_packet(u8 *pkt)
         case 0x34: //Flight Pack Cap sensor (SPMA9605)
             update = update34;
             break;
+#endif
         case 0x40: //Variometer sensor (SPMA9589)
             update = update40;
             break;
-#endif
     }
     if (*update) {
         while (*update) {
@@ -500,8 +504,8 @@ static void parse_telemetry_packet(u8 *pkt)
             break;
         case 0x15: //JetCat sensor
             update = update15;
-            Telemetry.value[TELEM_DSM_JETCAT_STATUS] = pkt[2];
-            Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(pkt[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
+            Telemetry.value[TELEM_DSM_JETCAT_STATUS] = packet[2];
+            Telemetry.value[TELEM_DSM_JETCAT_THROTTLE] = bcd_to_int(packet[3]); //up to 159% (the upper nibble is 0-f, the lower nibble 0-9)
             Telemetry.value[TELEM_DSM_JETCAT_PACKVOLT] = bcd_to_int(pktTelem[2]); //In 1/100 of Volts
             Telemetry.value[TELEM_DSM_JETCAT_PUMPVOLT] = bcd_to_int(pktTelem[3]); //In 1/100 of Volts (low voltage)
             Telemetry.value[TELEM_DSM_JETCAT_RPM] =      bcd_to_int(pktTelem[4] & 0x0fff); //RPM up to 999999
@@ -515,27 +519,28 @@ static void parse_telemetry_packet(u8 *pkt)
             Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP1] = pktTelem[3]; //FET Temp in 1/10 of degree (Fahrenheit???)
             Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS1] = pktTelem[4]; //In 1/100 Amp
             Telemetry.value[TELEM_DSM_HYPOTHETIC_TEMP2] = pktTelem[5]; //BEC Temp in 1/10 of degree (Fahrenheit???)
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS2] = pkt[12];     //BEC current in 1/10 Amp
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT2] = pkt[13] * 5; //BEC voltage in 1/100 of Volt
-            Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = pkt[14]* 5; //Throttle % in 0.1%
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_AMPS2] = packet[12];     //BEC current in 1/10 Amp
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_VOLT2] = packet[13] * 5; //BEC voltage in 1/100 of Volt
+            Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = packet[14]* 5; //Throttle % in 0.1%
             Telemetry.value[TELEM_DSM_HYPOTHETIC_OUTPUT] = end_byte * 5; //Output % in 0.1%
             break;
+#endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
             Telemetry.gps.altitude = altitude + 100 * //((altitude >= 0) ? 100: -100) *
                                      bcd_to_int(pktTelem[1]); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
+            Telemetry.gps.latitude  =  pkt32_to_coord(&packet[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(&packet[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
                                                                   * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
             Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             update = update17;
             Telemetry.gps.velocity = bcd_to_int(pktTelem[1]) * 5556 / 108; //In m/s * 1000
-            //u8 ssec  = bcd_to_int(pkt[4]);
-            u8 sec   = bcd_to_int(pkt[5]);
-            u8 min   = bcd_to_int(pkt[6]);
-            u8 hour  = bcd_to_int(pkt[7]);
+            //u8 ssec  = bcd_to_int(packet[4]);
+            u8 sec   = bcd_to_int(packet[5]);
+            u8 min   = bcd_to_int(packet[6]);
+            u8 hour  = bcd_to_int(packet[7]);
             u8 day   = 0;
             u8 month = 0;
             u8 year  = 0; // + 2000
@@ -545,23 +550,9 @@ static void parse_telemetry_packet(u8 *pkt)
                                | ((hour & 0x1F) << 12)
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
-            Telemetry.gps.satcount = bcd_to_int(pkt[8]);
-            altitude = bcd_to_int(pkt[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
+            Telemetry.gps.satcount = bcd_to_int(packet[8]);
+            altitude = bcd_to_int(packet[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             break;
-#else
-        case 0x16: //GPS sensor (always second GPS packet)
-            update = update16;
-            Telemetry.gps.altitude  = bcd_to_int((altitude_pkt17 << 24) | ((u32)pktTelem[1] << 8)); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
-                                                                  * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
-            break;
-        case 0x17: //GPS sensor (always first GPS packet)
-            update = update17;
-            Telemetry.gps.velocity = bcd_to_int(pktTelem[1]) * 5556 / 108; //In m/s * 1000
-            altitude_pkt17 = pkt[9];
-            break;
-#endif //HAS_DSM_EXTENDED_TELEMETRY
     }
     idx = 0;
     while (*update) {
@@ -610,12 +601,20 @@ static u16 dsm2_cb()
         state++;
         return WRITE_DELAY;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
-        CYRF_WaitForTxIrq();
+        int i = 0;
+        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+            if(++i > NUM_WAIT_LOOPS)
+                break;
+        }
         set_sop_data_crc();
         state++;
         return CH1_CH2_DELAY - WRITE_DELAY;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
-        CYRF_WaitForTxIrq();
+        int i = 0;
+        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+            if(++i > NUM_WAIT_LOOPS)
+                break;
+        }
         if (state == DSM2_CH2_CHECK_A) {
             //Keep transmit power in sync
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x28 | Model.tx_power);
@@ -638,18 +637,19 @@ static u16 dsm2_cb()
         {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
         }
     } else if(state == DSM2_CH2_READ_A || state == DSM2_CH2_READ_B) {
-        //Read telemetry if needed and parse if good
-        if (CYRF_ReadDataPacketLen(telem_pkt, 0x10))
-            parse_telemetry_packet(telem_pkt);
-        else
-            CYRF_ReadDataPacketLen(NULL, 0x00); //End receive (buffer clean-up)
-
+        //Read telemetry if needed
+        if(CYRF_ReadRegister(0x07) & 0x02) {
+           CYRF_ReadDataPacket(packet);
+           parse_telemetry_packet();
+        }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
+            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
             CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
             return 11000;
         }
@@ -670,12 +670,12 @@ static void initialize(u8 bind)
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
-    if (Model.fixed_id) {
-        cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
-        cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
-        cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
-        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
-    }
+   if (Model.fixed_id) {
+       cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+       cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+       cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+       cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
+   }
 #endif
     cyrf_config();
 
@@ -711,7 +711,7 @@ static void initialize(u8 bind)
     cyrfmfg_id[3] = 0xff ^ ((Model.fixed_id >> 0) & 0xff);
     printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
     */
-    crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]);
+    crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
     crcidx = 0;
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
@@ -750,10 +750,15 @@ const void *DSM2_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)12L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+#ifdef MODULAR
+        case PROTOCMD_TELEMETRYSTATE:
+            return (void *)(long)(PROTO_TELEM_ON);
+#else
         case PROTOCMD_GETOPTIONS:
             return dsm_opts;
         case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_OFF ? PROTO_TELEM_OFF : PROTO_TELEM_ON);
+            return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
+#endif
         default: break;
     }
     return NULL;

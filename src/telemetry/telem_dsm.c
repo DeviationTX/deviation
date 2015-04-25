@@ -101,6 +101,7 @@ s32 _dsm_value(struct Telemetry *t, int idx)
         case TELEM_DSM_RXPCAP_AMPS:
         case TELEM_DSM_FPCAP_AMPS:
         case TELEM_DSM_FPCAP_TEMP:
+#endif
         case TELEM_DSM_VARIO_ALTITUDE:
         case TELEM_DSM_VARIO_CLIMBRATE1:
         case TELEM_DSM_VARIO_CLIMBRATE2:
@@ -108,7 +109,6 @@ s32 _dsm_value(struct Telemetry *t, int idx)
         case TELEM_DSM_VARIO_CLIMBRATE4:
         case TELEM_DSM_VARIO_CLIMBRATE5:
         case TELEM_DSM_VARIO_CLIMBRATE6:
-#endif
             return (s16)t->value[idx];
         default:
             return t->value[idx];
@@ -187,6 +187,7 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_FPCAP_AMPS:      _get_value_str(str, value, 1, 'A'); break;
         case TELEM_DSM_FPCAP_CAPACITY:  _get_value_str(str, value, 0, '\0'); break;
         case TELEM_DSM_FPCAP_TEMP:      _get_temp_str(str, value, 1, 'F'); break;
+#endif
         case TELEM_DSM_VARIO_ALTITUDE:
         case TELEM_DSM_VARIO_CLIMBRATE1:
         case TELEM_DSM_VARIO_CLIMBRATE2:
@@ -194,7 +195,6 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_VARIO_CLIMBRATE4:
         case TELEM_DSM_VARIO_CLIMBRATE5:
         case TELEM_DSM_VARIO_CLIMBRATE6:_get_altitude_str(str, value, 1, 'm'); break;
-#endif
         default:
             return "";
     }
@@ -255,6 +255,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_FPCAP_AMPS:      sprintf(str, "%s%s", _tr("FlPc"), _tr("Amps")); break;
         case TELEM_DSM_FPCAP_CAPACITY:  sprintf(str, "%s%s mAh", _tr("FlPc"), _tr("Bat")); break;
         case TELEM_DSM_FPCAP_TEMP:      sprintf(str, "%s%s", _tr("FlPc"), _tr("Temp")); break;
+#endif
         case TELEM_DSM_VARIO_ALTITUDE:  strcpy(str, _tr("VarioAlt")); break;
         case TELEM_DSM_VARIO_CLIMBRATE1:
         case TELEM_DSM_VARIO_CLIMBRATE2:
@@ -262,7 +263,6 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_VARIO_CLIMBRATE4:
         case TELEM_DSM_VARIO_CLIMBRATE5:
         case TELEM_DSM_VARIO_CLIMBRATE6:sprintf(str, "%s%d", _tr("VarioCR"), telem - TELEM_DSM_VARIO_CLIMBRATE1 + 1); break;
-#endif
         default:
             return "";
     }
@@ -323,6 +323,10 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_RXPCAP_AMPS:
         case TELEM_DSM_FPCAP_AMPS:
         case TELEM_DSM_FPCAP_TEMP:      return 999;
+#endif
+        case TELEM_DSM_AIRSPEED:        return 9999;
+        case TELEM_DSM_ALTITUDE:
+        case TELEM_DSM_ALTITUDE_MAX:
         case TELEM_DSM_VARIO_ALTITUDE:  return 65000;
         case TELEM_DSM_VARIO_CLIMBRATE1:return 25;
         case TELEM_DSM_VARIO_CLIMBRATE2:
@@ -330,10 +334,6 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_VARIO_CLIMBRATE4:
         case TELEM_DSM_VARIO_CLIMBRATE5:
         case TELEM_DSM_VARIO_CLIMBRATE6:return (telem - TELEM_DSM_VARIO_CLIMBRATE1) * 50;
-#endif
-        case TELEM_DSM_AIRSPEED:        return 9999;
-        case TELEM_DSM_ALTITUDE:
-        case TELEM_DSM_ALTITUDE_MAX:    return 65000;
         case TELEM_DSM_GFORCE_X:
         case TELEM_DSM_GFORCE_Y:
         case TELEM_DSM_GFORCE_Z:

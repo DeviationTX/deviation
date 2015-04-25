@@ -494,7 +494,11 @@ static u16 wk_cb()
         return 1600;
     }
     txState = 0;
-    CYRF_WaitForTxIrq();
+    int i = 0;
+    while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        if(++i > NUM_WAIT_LOOPS)
+            break;
+    }
     if((pkt_num & 0x03) == 0) {
         radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
         CYRF_ConfigRFChannel(*radio_ch_ptr);
