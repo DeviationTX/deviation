@@ -366,7 +366,6 @@ static void calc_dsmx_channel()
     }
 }
 
-#if HAS_DSM_EXTENDED_TELEMETRY
 static u32 bcd_to_int(u32 data)
 {
     u32 value = 0, multi = 1;
@@ -384,7 +383,6 @@ static int pkt32_to_coord(u8 *ptr)
     return bcd_to_int(ptr[3]) * 3600000
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
-#endif
 
 static void parse_telemetry_packet(u8 *pkt)
 {
@@ -403,8 +401,18 @@ static void parse_telemetry_packet(u8 *pkt)
                                    TELEM_DSM_HYPOTHETIC_TEMP2, TELEM_DSM_HYPOTHETIC_AMPS2,
                                    TELEM_DSM_HYPOTHETIC_VOLT2, TELEM_DSM_HYPOTHETIC_THROTTLE,
                                    TELEM_DSM_HYPOTHETIC_OUTPUT, 0};
+    static const u8 update40[] = { TELEM_DSM_VARIO_ALTITUDE, TELEM_DSM_VARIO_CLIMBRATE1,
+                                   TELEM_DSM_VARIO_CLIMBRATE2, TELEM_DSM_VARIO_CLIMBRATE3,
+                                   TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
+                                   TELEM_DSM_VARIO_CLIMBRATE6, 0};
+    static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
+    static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
     static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, TELEM_GPS_HEADING, 0};
     static const u8 update17[] = { TELEM_GPS_SPEED, TELEM_GPS_TIME, TELEM_GPS_SATCOUNT, 0};
+#else
+    static u8 altitude_pkt17;
+    static const u8 update16[] = { TELEM_GPS_ALT, TELEM_GPS_LAT, TELEM_GPS_LONG, 0};
+    static const u8 update17[] = { TELEM_GPS_SPEED, 0};
 #endif
     static const u8 update7f[] = { TELEM_DSM_FLOG_FADESA, TELEM_DSM_FLOG_FADESB,
                                    TELEM_DSM_FLOG_FADESL, TELEM_DSM_FLOG_FADESR,
@@ -417,12 +425,6 @@ static void parse_telemetry_packet(u8 *pkt)
     static const u8 update14[] = { TELEM_DSM_GFORCE_X, TELEM_DSM_GFORCE_Y, TELEM_DSM_GFORCE_Z,
                                    TELEM_DSM_GFORCE_XMAX, TELEM_DSM_GFORCE_YMAX, TELEM_DSM_GFORCE_ZMAX,
                                    TELEM_DSM_GFORCE_ZMIN, 0};
-    static const u8 update18[] = { TELEM_DSM_RXPCAP_AMPS, TELEM_DSM_RXPCAP_CAPACITY, TELEM_DSM_RXPCAP_VOLT, 0};
-    static const u8 update34[] = { TELEM_DSM_FPCAP_AMPS, TELEM_DSM_FPCAP_CAPACITY, TELEM_DSM_FPCAP_TEMP, 0};
-    static const u8 update40[] = { TELEM_DSM_VARIO_ALTITUDE, TELEM_DSM_VARIO_CLIMBRATE1,
-                                   TELEM_DSM_VARIO_CLIMBRATE2, TELEM_DSM_VARIO_CLIMBRATE3,
-                                   TELEM_DSM_VARIO_CLIMBRATE4, TELEM_DSM_VARIO_CLIMBRATE5,
-                                   TELEM_DSM_VARIO_CLIMBRATE6, 0};
     const u8 *update = update7f+7;
     unsigned idx = 0;
 
@@ -462,6 +464,7 @@ static void parse_telemetry_packet(u8 *pkt)
         case 0x14: //G-Force sensor
             update = update14;
             break;
+#if HAS_DSM_EXTENDED_TELEMETRY
         case 0x18: //RX Pack Cap sensor (SPMA9604)
             update = update18;
             break;
@@ -471,6 +474,7 @@ static void parse_telemetry_packet(u8 *pkt)
         case 0x40: //Variometer sensor (SPMA9589)
             update = update40;
             break;
+#endif
     }
     if (*update) {
         while (*update) {
@@ -481,8 +485,8 @@ static void parse_telemetry_packet(u8 *pkt)
         }
         return;
     }
-#if HAS_DSM_EXTENDED_TELEMETRY
     switch(data_type) {
+#if HAS_DSM_EXTENDED_TELEMETRY
         case 0x0a: //Powerbox sensor
             update = update0a;
             Telemetry.value[TELEM_DSM_PBOX_VOLT1] = pktTelem[1]; //In 1/100 of Volts
@@ -544,6 +548,20 @@ static void parse_telemetry_packet(u8 *pkt)
             Telemetry.gps.satcount = bcd_to_int(pkt[8]);
             altitude = bcd_to_int(pkt[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
             break;
+#else
+        case 0x16: //GPS sensor (always second GPS packet)
+            update = update16;
+            Telemetry.gps.altitude  = bcd_to_int((altitude_pkt17 << 24) | ((u32)pktTelem[1] << 8)); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
+            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
+                                                                  * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
+            break;
+        case 0x17: //GPS sensor (always first GPS packet)
+            update = update17;
+            Telemetry.gps.velocity = bcd_to_int(pktTelem[1]) * 5556 / 108; //In m/s * 1000
+            altitude_pkt17 = pkt[9];
+            break;
+#endif //HAS_DSM_EXTENDED_TELEMETRY
     }
     idx = 0;
     while (*update) {
@@ -551,7 +569,6 @@ static void parse_telemetry_packet(u8 *pkt)
             TELEMETRY_SetUpdated(*update);
         update++;
     }
-#endif //HAS_DSM_EXTENDED_TELEMETRY
 }
 
 MODULE_CALLTYPE
