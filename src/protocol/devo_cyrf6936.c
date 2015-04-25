@@ -253,7 +253,7 @@ static void parse_telemetry_packet(u8 *packet)
 
     const u8 *update = gpslongpkt+1;
     u32 step = 1;
-    u32 idx = 0;
+    u32 idx = 1;
     //if (packet[0] < 0x37) {
     //    memcpy(Telemetry.line[packet[0]-0x30], packet+1, 12);
     //}
@@ -269,8 +269,8 @@ static void parse_telemetry_packet(u8 *packet)
     if (packet[0] == 0x31) {
         update = temppkt;
         while (*update) {
-            Telemetry.value[*update] = packet[++idx];
-            if (packet[idx] != 0xff)
+            Telemetry.value[*update] = packet[idx];
+            if (packet[idx++] != 0xff)
                 TELEMETRY_SetUpdated(*update);
             update++;
         }
@@ -285,36 +285,37 @@ static void parse_telemetry_packet(u8 *packet)
     */
     if (packet[0] == 0x32) {
         update = gpslongpkt;
-        Telemetry.gps.longitude = text_to_int(packet+1, 3) * 3600000
-                                + text_to_int(packet+4, 2) * 60000
-                                + text_to_int(packet+7, 4) * 6;
+        Telemetry.gps.longitude = text_to_int(&packet[1], 3) * 3600000
+                                + text_to_int(&packet[4], 2) * 60000
+                                + text_to_int(&packet[7], 4) * 6;
         if (packet[11] == 'W')
             Telemetry.gps.longitude *= -1;
     }
     if (packet[0] == 0x33) {
         update = gpslatpkt;
-        Telemetry.gps.latitude = text_to_int(packet+1, 2) * 3600000
-                               + text_to_int(packet+3, 2) * 60000
-                               + text_to_int(packet+6, 4) * 6;
+        Telemetry.gps.latitude = text_to_int(&packet[1], 2) * 3600000
+                               + text_to_int(&packet[3], 2) * 60000
+                               + text_to_int(&packet[6], 4) * 6;
         if (packet[10] == 'S')
             Telemetry.gps.latitude *= -1;
     }
     if (packet[0] == 0x34) {
         update = gpsaltpkt;
-        Telemetry.gps.altitude = float_to_int(packet+1);
+        Telemetry.gps.altitude = float_to_int(&packet[1]);
     }
     if (packet[0] == 0x35) {
         update = gpsspeedpkt;
-        Telemetry.gps.velocity = float_to_int(packet+7);
+        Telemetry.gps.velocity = float_to_int(&packet[7]);
+        idx = 7;
     }
     if (packet[0] == 0x36) {
         update = gpstimepkt;
-        u8 hour  = text_to_int(packet+1, 2);
-        u8 min   = text_to_int(packet+3, 2);
-        u8 sec   = text_to_int(packet+5, 2);
-        u8 day   = text_to_int(packet+7, 2);
-        u8 month = text_to_int(packet+9, 2);
-        u8 year  = text_to_int(packet+11, 2); // + 2000
+        u8 hour  = text_to_int(&packet[1], 2);
+        u8 min   = text_to_int(&packet[3], 2);
+        u8 sec   = text_to_int(&packet[5], 2);
+        u8 day   = text_to_int(&packet[7], 2);
+        u8 month = text_to_int(&packet[9], 2);
+        u8 year  = text_to_int(&packet[11], 2); // + 2000
         Telemetry.gps.time = ((year & 0x3F) << 26)
                            | ((month & 0x0F) << 22)
                            | ((day & 0x1F) << 17)
@@ -322,7 +323,6 @@ static void parse_telemetry_packet(u8 *packet)
                            | ((min & 0x3F) << 6)
                            | ((sec & 0x3F) << 0);
     }
-    idx = 1;
     while (*update) {
         if (packet[idx])
             TELEMETRY_SetUpdated(*update);

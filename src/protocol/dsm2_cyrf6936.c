@@ -382,7 +382,7 @@ static int pkt32_to_coord(u8 *ptr)
 {
     // (decimal, format DD MM.MMMM)
     return bcd_to_int(ptr[3]) * 3600000
-         + bcd_to_int((u32)ptr[2] << 16 | (u32)ptr[1] << 8 | ptr[0]) * 6;
+         + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
 #endif
 
@@ -520,9 +520,9 @@ static void parse_telemetry_packet(u8 *pkt)
             update = update16;
             Telemetry.gps.altitude = altitude + 100 * //((altitude >= 0) ? 100: -100) *
                                      bcd_to_int(pktTelem[1]); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
-            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * (end_byte & 0x01)? 1: -1; //1=N(+), 0=S(-)
-            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + (end_byte & 0x04)? 360000000: 0) //1=+100 degrees
-                                                                  * (end_byte & 0x02)? 1: -1; //1=E(+), 0=W(-)
+            Telemetry.gps.latitude  =  pkt32_to_coord(&pkt[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
+            Telemetry.gps.longitude = (pkt32_to_coord(&pkt[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
+                                                                  * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
             Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
