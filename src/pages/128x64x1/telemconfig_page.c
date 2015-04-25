@@ -25,7 +25,6 @@
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *idx_cb(guiObject_t *obj, const void *data);
 
-
 static u16 current_selected = 0;
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -44,16 +43,16 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     int x = 9;
-    u8 w1 = 44;
+    u8 w1 = 46;
     u8 w2 = 21;
     u8 w3 = 40;
     GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
             9, LINE_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->name[relrow], x, y,
             w1, LINE_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
-    x += w1 + 5;
+    x += w1 + 3;
     GUI_CreateTextSelectPlate(&gui->gtlt[relrow], x, y,
-            w2, LINE_HEIGHT, &TINY_FONT, NULL, gtlt_cb, (void *)(long)absrow);
+            w2, LINE_HEIGHT, &TINY_FONT, sound_test_cb, gtlt_cb, (void *)(long)absrow);
     x += w2 + 3;
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
             w3, LINE_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);

@@ -50,7 +50,7 @@ struct Model {
     struct PageCfg2 pagecfg2;
     u8 safety[NUM_SOURCES+1];
     u8 telem_alarm[TELEM_NUM_ALARMS];
-    u16 telem_alarm_val[TELEM_NUM_ALARMS];
+    s32 telem_alarm_val[TELEM_NUM_ALARMS];
     u8 telem_flags;
     MixerMode mixer_mode;
     u32 permanent_timer;
