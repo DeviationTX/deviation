@@ -252,7 +252,7 @@ static void parse_telemetry_packet()
 
     scramble_pkt(); //This will unscramble the packet
     if (((packet[0] & 0xF0) != TELEMETRY_ENABLE) ||
-        ((((u32)packet[15] << 16) | ((u32)packet[14] << 8) | packet[13]) == (fixed_id & 0x00ffffff)))
+        ((((u32)packet[15] << 16) | ((u32)packet[14] << 8) | packet[13]) != (fixed_id & 0x00ffffff)))
     {
         return;
     }
