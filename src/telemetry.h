@@ -1,23 +1,19 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-#define NUM_DEVO_TELEM 9
-#define NUM_DSM_TELEM  10
-#define NUM_FRSKY_TELEM  7
-#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM              \
-                      ? (NUM_DEVO_TELEM > NUM_FRSKY_TELEM      \
-                          ? NUM_DEVO_TELEM : NUM_FRSKY_TELEM)  \
-                      : (NUM_DSM_TELEM > NUM_FRSKY_TELEM       \
-                          ? NUM_DSM_TELEM : NUM_FRSKY_TELEM)   \
-                   )
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
-#define HAS_DSM_EXTENDED_TELEMETRY 0
+#ifdef MODULAR
+    #define HAS_DSM_EXTENDED_TELEMETRY 0
+#else
+    #define HAS_DSM_EXTENDED_TELEMETRY 1
+#endif
+
 enum {
+    TELEM_FRSKY,
     TELEM_DEVO,
     TELEM_DSM,
-    TELEM_FRSKY,
 };
 
 enum {
@@ -43,7 +39,6 @@ enum {
     TELEM_DSM_FLOG_VOLT2,
     TELEM_DSM_FLOG_RPM1,
     TELEM_DSM_FLOG_TEMP1,
-#if HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_AMPS1,
     TELEM_DSM_PBOX_VOLT1,
     TELEM_DSM_PBOX_VOLT2,
@@ -55,6 +50,7 @@ enum {
     TELEM_DSM_PBOX_ALARMC2,
     TELEM_DSM_AIRSPEED,
     TELEM_DSM_ALTITUDE,
+    TELEM_DSM_ALTITUDE_MAX,
     TELEM_DSM_GFORCE_X,
     TELEM_DSM_GFORCE_Y,
     TELEM_DSM_GFORCE_Z,
@@ -69,7 +65,28 @@ enum {
     TELEM_DSM_JETCAT_RPM,
     TELEM_DSM_JETCAT_TEMPEGT,
     TELEM_DSM_JETCAT_OFFCOND,
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+    TELEM_DSM_RXPCAP_AMPS,
+    TELEM_DSM_RXPCAP_CAPACITY,
+    TELEM_DSM_RXPCAP_VOLT,
+    TELEM_DSM_FPCAP_AMPS,
+    TELEM_DSM_FPCAP_CAPACITY,
+    TELEM_DSM_FPCAP_TEMP,
+    TELEM_DSM_VARIO_ALTITUDE,
+    TELEM_DSM_VARIO_CLIMBRATE1,
+    TELEM_DSM_VARIO_CLIMBRATE2,
+    TELEM_DSM_VARIO_CLIMBRATE3,
+    TELEM_DSM_VARIO_CLIMBRATE4,
+    TELEM_DSM_VARIO_CLIMBRATE5,
+    TELEM_DSM_VARIO_CLIMBRATE6,
+    TELEM_DSM_HYPOTHETIC_AMPS1,
+    TELEM_DSM_HYPOTHETIC_AMPS2,
+    TELEM_DSM_HYPOTHETIC_VOLT1,
+    TELEM_DSM_HYPOTHETIC_VOLT2,
+    TELEM_DSM_HYPOTHETIC_TEMP1,
+    TELEM_DSM_HYPOTHETIC_TEMP2,
+    TELEM_DSM_HYPOTHETIC_RPM,
+    TELEM_DSM_HYPOTHETIC_THROTTLE,
+    TELEM_DSM_HYPOTHETIC_OUTPUT,
     TELEM_DSM_LAST,
 };
 
@@ -77,6 +94,7 @@ enum {
     TELEM_FRSKY_VOLT1 = 1,
     TELEM_FRSKY_VOLT2,
     TELEM_FRSKY_VOLT3,
+    TELEM_FRSKY_RSSI,
     TELEM_FRSKY_TEMP1,
     TELEM_FRSKY_TEMP2,
     TELEM_FRSKY_RPM,
@@ -89,6 +107,7 @@ enum {
                                : (((int)TELEM_DEVO_LAST > (int)TELEM_FRSKY_LAST)   \
                                    ? (int)TELEM_DEVO_LAST : (int)TELEM_FRSKY_LAST) \
                           )
+#define NUM_TELEM   TELEM_VALS - 1
 enum {
     TELEM_GPS_LAT = TELEM_VALS,
     TELEM_GPS_LONG,
@@ -99,7 +118,7 @@ enum {
     TELEM_GPS_HEADING,
 };
 enum {
-    TELEMFLAG_ALARM1 = 0x00,
+    TELEMFLAG_ALARM1 = 0x01,
     TELEMFLAG_ALARM2 = 0x02,
     TELEMFLAG_ALARM3 = 0x04,
     TELEMFLAG_ALARM4 = 0x08,
@@ -111,89 +130,23 @@ enum {
     TELEMUNIT_FEET   = 0x40,
     TELEMUNIT_FAREN  = 0x80,
 };
+
 struct gps {
     s32 latitude;
     s32 longitude;
     s32 altitude;
-    s32 velocity;
+    u32 velocity;
     u32 time;
-    u32 heading;
-    u32 satcount;
+    u16 heading;
+    u8 satcount;
 };
 
-struct telem_devo {
-    u16 volt[3];
-    s16 temp[4];
-    u16 rpm[2];
-};
-struct telem_dsm_flog {
-    //Do not change the order of these, they are aligned to the dsm packet
-    u8 fades[4];
-    u8 frameloss;
-    u8 holds;
-    u16 volt[2];
-    u16 rpm;
-    s16 temp;
-};
-
-struct telem_dsm_pbox {
-    u16 volt[2];
-    u16 capacity[2];
-    u16 alarmv[2];
-    u16 alarmc[2];
-};
-struct telem_dsm_sensors {
-    u16 amps;
-    u16 airspeed;
-    u16 altitude;
-};
-struct telem_dsm_gforce {
-    u16 x;
-    u16 y;
-    u16 z;
-    u16 xmax;
-    u16 ymax;
-    u16 zmax;
-    u16 zmin;
-};
-
-struct telem_dsm_jetcat {
-    u8 status;
-    u8 offcond;
-    u16 throttle;
-    u16 packvolt;
-    u16 pumpvolt;
-    u16 rpm;
-    u16 temp_egt;
-};
-
-struct telem_dsm {
-    struct telem_dsm_flog    flog;
-    struct telem_dsm_pbox    pbox;
-    struct telem_dsm_sensors sensors;
-    struct telem_dsm_gforce  gforce;
-    struct telem_dsm_jetcat  jetcat;
-};
-
-struct telem_frsky {
-    u16 volt[3];
-    s16 temp[2];
-    u16 rpm;
-    s32 altitude;
-    //u16 current;
-    //u16 fuel;
-};
-
-#define TELEM_UPDATE_SIZE (((TELEM_VALS + 7)+ 7) / 8)
+#define TELEM_UPDATE_SIZE (((TELEM_VALS + 7) + 31) / 32)
 struct Telemetry {
-    union {
-        struct telem_devo  devo;
-        struct telem_dsm   dsm;
-        struct telem_frsky frsky;
-    } p;
     struct gps gps;
+    u16 value[TELEM_VALS];
     u16 capabilities;
-    volatile u8 updated[TELEM_UPDATE_SIZE];
+    volatile u32 updated[TELEM_UPDATE_SIZE];
 };
 
 enum {
@@ -205,12 +158,15 @@ enum {
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
-const char * TELEMETRY_GetValueStr(char *str, unsigned telem);
-const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value);
-const char * TELEMETRY_Name(char *str, unsigned telem);
-const char * TELEMETRY_ShortName(char *str, unsigned telem);
-s32 TELEMETRY_GetMaxValue(unsigned telem);
+const char * TELEMETRY_GetValueStr(char *str, int idx);
+const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value);
+const char * TELEMETRY_Name(char *str, int idx);
+const char * TELEMETRY_ShortName(char *str, int idx);
+s32 TELEMETRY_GetMaxValue(int idx);
+s32 TELEMETRY_GetMinValue(int idx);
 void TELEMETRY_Alarm();
+void TELEMETRY_ResetAlarm(int i);
+void TELEMETRY_MuteAlarm();
 int TELEMETRY_HasAlarm(int src);
 u32 TELEMETRY_IsUpdated(int val);
 void TELEMETRY_SetUpdated(int telem);
@@ -218,5 +174,4 @@ int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol);
 int TELEMETRY_GetNumTelemSrc();
-int TELEMETRY_GetNumTelem();
 #endif

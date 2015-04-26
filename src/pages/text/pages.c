@@ -204,6 +204,11 @@ int PAGE_GetNumPages()
     return sizeof(pages) / sizeof(struct page);
 }
 
+int PAGE_GetID()
+{
+    return cur_page;
+}
+
 void PAGE_SaveMixerSetup(struct mixer_page * const mp)
 {
     MIXER_SetLimit(mp->channel, &mp->limit);

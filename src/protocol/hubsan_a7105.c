@@ -276,7 +276,7 @@ static void hubsan_update_telemetry()
     const u8 *update = NULL;
     static const u8 telempkt[] = { TELEM_DEVO_VOLT1, 0 };
     if( (packet[0]==0xe1) && hubsan_check_integrity()) {
-        Telemetry.p.devo.volt[0] = packet[13];
+        Telemetry.value[TELEM_DEVO_VOLT1] = packet[13];
         update = telempkt;
     }
     if (update) {

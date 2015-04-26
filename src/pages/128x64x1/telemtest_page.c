@@ -76,7 +76,7 @@ struct telem_layout2 {
 const struct telem_layout devo_header_basic[] = {
         {TYPE_HEADER,  8, 35, TEMP_LABEL},
         {TYPE_HEADER, 48, 35, VOLT_LABEL},
-        {TYPE_HEADER, 88, 35, RPM_LABEL},
+        {TYPE_HEADER, 87, 35, RPM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -99,7 +99,7 @@ const struct telem_layout devo_layout_basic[] = {
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER, 98, 35, GPS_LABEL},
+        {TYPE_HEADER, 90, 35, GPS_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -120,7 +120,7 @@ const struct telem_layout devo_layout_gps[] = {
 };
 
 const struct telem_layout dsm_header_basic[] = {
-        {TYPE_HEADER, 98, 35, DSM_LABEL},
+        {TYPE_HEADER, 90, 35, DSM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -143,10 +143,10 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
     {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
     {TYPE_HEADER | 2, 61, 25, RXV_LABEL},
-    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT2},
+    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT1},
 
     {TYPE_HEADER | 3,  0, 25, BATT_LABEL},
-    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT1},
+    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT2},
     {TYPE_HEADER | 3, 61, 25, RPM_LABEL},
     {TYPE_VALUE  | 3, 86, 35, TELEM_DSM_FLOG_RPM1},
 
@@ -157,12 +157,13 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_INDEX | 0,  0, 8,  1},
     {TYPE_VALUE | 0,  8, 35, TELEM_FRSKY_TEMP1},
     {TYPE_VALUE | 0, 48, 35, TELEM_FRSKY_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_FRSKY_RPM},
+    {TYPE_VALUE | 0, 86, 35, TELEM_FRSKY_RPM},
     {TYPE_INDEX | 1,  0, 8,  2},
     {TYPE_VALUE | 1,  8, 35, TELEM_FRSKY_TEMP2},
     {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
     {TYPE_INDEX | 2,  0, 8,  3},
     {TYPE_VALUE | 2, 48, 35, TELEM_FRSKY_VOLT3},
+    {TYPE_VALUE | 2, 86, 35, TELEM_FRSKY_RSSI},
     {0, 0, 0, 0},
 };
 
@@ -239,21 +240,34 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-static void _show_page(const struct telem_layout2 *page)
+static const struct telem_layout2 *_get_telem_layout2()
 {
+    const struct telem_layout2 *page;
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        page = &devo_page[current_page];
+    else if (TELEMETRY_Type() == TELEM_DSM)
+        page = &dsm_page[current_page];
+    else
+        page = &frsky_page[current_page];
+    return page;
+}
+
+static void _show_page()
+{
+    const struct telem_layout2 *page = _get_telem_layout2();
     PAGE_RemoveAllObjects();
+    PAGE_ShowHeader(page->header==devo_header_basic ? "" : _tr("Telemetry monitor"));
     tp->font.font = TINY_FONT.font;
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
-    DEFAULT_FONT.style = LABEL_LEFT;
+    DEFAULT_FONT.style = LABEL_CENTER;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
                            ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    PAGE_ShowHeader(_tr("Telemetry monitor"));
     DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
@@ -270,6 +284,13 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+void PAGE_ShowTelemetryAlarm()
+{
+    int cur_page = PAGE_GetID();
+    if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
+        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+}
+
 void PAGE_TelemtestInit(int page)
 {
     (void)okcancel_cb;
@@ -284,18 +305,18 @@ void PAGE_TelemtestInit(int page)
     if (current_page > telemetry_gps)
         current_page = telemetry_basic;
 
-    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
+    _show_page();
 }
 
 void PAGE_TelemtestEvent() {
     if (current_page == telemetry_off)
         return;
+    static u32 count;
+    int flicker = ((++count & 3) == 0);
     struct Telemetry cur_telem = Telemetry;
     int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
     int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);
-    const struct telem_layout *ptr = TELEMETRY_Type() == TELEM_DEVO
-                                     ? devo_page[current_page].layout
-                                     : dsm_page[current_page].layout;
+    const struct telem_layout *ptr = _get_telem_layout2()->layout;
     for (long i = 0; ptr->source; ptr++, i++) {
         if ((ptr->row_type & 0x0f) < current_row)
             continue;
@@ -307,10 +328,10 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (cur_val != last_val) {
-            GUI_Redraw(&gui->box[i]);
-        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
+        if((TELEMETRY_HasAlarm(ptr->source) && flicker) || ! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
+        } else if (cur_val != last_val) {
+            GUI_Redraw(&gui->box[i]);
         }
         GUI_SetLabelDesc(&gui->box[i], font);
     }
@@ -328,7 +349,7 @@ static void _press_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
-    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
+    _show_page();
 }
 
 static void _navigate_pages(s8 direction)
@@ -343,6 +364,8 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS) {
+        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
+            TELEMETRY_MuteAlarm();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
@@ -350,7 +373,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
                 _navigate_pages(1);
-            }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
                 _navigate_pages(-1);
             } else {
                 return 0;
