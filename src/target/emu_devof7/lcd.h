@@ -5,13 +5,11 @@
 #ifndef LCD_H
 #define LCD_H
 
-#define NUM_FONTS 10
-#define CHAR_WIDTH 8
-#define CHAR_HEIGHT 10
+#define CHAR_WIDTH 12
+#define CHAR_HEIGHT 18
 #define RANGE_TABLE_SIZE 20
 
 struct FAT FontFAT;
-char FontNames[NUM_FONTS][9];
 
 struct font_def 
 {

@@ -19,7 +19,15 @@
 #include "gui/gui.h"
 #include "../common/emu/fltk.h"
 #include "lcd.h"
+#include "ia9211font.h"
 
+struct rgb {
+    u8 r;
+    u8 g;
+    u8 b;
+};
+struct rgb background = {0x00, 0x00, 0xff};
+struct rgb foreground = {0xff, 0xff, 0xff};
 static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
 #define HEIGHT(x) x.height
 
@@ -30,20 +38,20 @@ static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
 void LCD_DrawPixel(unsigned int color)
 {
 	if (gui.x < LCD_WIDTH*LCD_WIDTH_MULT/2 && gui.y < LCD_HEIGHT*LCD_WIDTH_MULT/2) {	// both are unsigned, can not be < 0
-		u8 c;
+		struct rgb c;
 		int row, col;
 		int i, j;
 		// for emulator of devo 10, 0x0 means white while others mean black
-		c = color ? 0x00 : 0xaa; // 0xaa is grey color(not dot)
+		c = color ? foreground : background; // 0xaa is grey color(not dot)
 
 		//Fill in 4 dots
 		row = 2 * gui.y;
 		col = 2 * gui.x;
 		for (i = 0; i < 2; i++) {
 			for (j = 0; j < 2; j++) {
-                gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
+                gui.image[3*(logical_lcd_width* (row + i) + col + j)]     = c.r;
+                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c.g;
+                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c.b;
             }
         }
 	}
@@ -57,7 +65,11 @@ void LCD_DrawPixel(unsigned int color)
 
 void LCD_Clear(unsigned int color) {
 	(void)color;
-	memset(gui.image, 0xaa, sizeof(gui.image));
+        for (unsigned i = 0; i < sizeof(gui.image); i+= 3) {
+            gui.image[i] = background.r;
+            gui.image[i+1] = background.g;
+            gui.image[i+2] = background.b;
+        }
 
 }
 
@@ -66,17 +78,7 @@ void LCD_Clear(unsigned int color) {
  */
 u8 FONT_GetFromString(const char *value)
 {
-    int i;
-    for (i = 0; i < NUM_FONTS; i++) {
-        if (FontNames[i][0] == 0) {
-            strlcpy(FontNames[i], value, 13);
-            return i + 1;
-        }
-        if(strcasecmp(FontNames[i], value) == 0) {
-            return i + 1;
-        }
-    }
-    printf("Unknown font: %s\n", value);
+    (void) value;
     return 0;
 }
 
@@ -96,9 +98,7 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
         range += 2;
         pos += 4;
     }
-    fseek(cur_str.font.fh, pos, SEEK_SET);
-    u8 *font = cur_str.font.font;
-    fread(font, 6, 1, cur_str.font.fh);
+    u8 *font = ia911_fon + pos;
     *begin = font[0] | (font[1] << 8) | (font[2] << 16);
     *end   = font[3] | (font[4] << 8) | (font[5] << 16);
     return 1;
@@ -113,13 +113,12 @@ const u8 *char_offset(u32 c, u8 *width)
     u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
     get_char_range(c, &begin, &end);
     *width = (end - begin) / row_bytes;
-    fseek(cur_str.font.fh, begin, SEEK_SET);
     if (end - begin > sizeof(cur_str.font.font)) {
         printf("Character '%04d' is larger than allowed size\n", (int)c);
         end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
         *width = (end - begin) / row_bytes;
     }
-    fread(font, end - begin, 1, cur_str.font.fh);
+    return ia911_fon + begin;
     return font;
 }
 
@@ -163,48 +162,20 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 
 void close_font()
 {
-    if(cur_str.font.fh) {
-        fclose(cur_str.font.fh);
-        cur_str.font.fh = NULL;
-    }
 }
 
-u8 open_font(unsigned int idx)
+u8 open_font()
 {
-    char font[20];
-    close_font();
-    if (! idx) {
-        cur_str.font.idx = 0;
-        return 1;
-    }
-    sprintf(font, "media/%s.fon", FontNames[idx-1]);
-    finit(&FontFAT, "media");
-    cur_str.font.fh = fopen2(&FontFAT, font, "rb");
-    if (! cur_str.font.fh) {
-        printf("Couldn't open font file: %s\n", font);
-        return 0;
-    }
-    setbuf(cur_str.font.fh, 0);
-    if(fread(&cur_str.font.height, 1, 1, cur_str.font.fh) != 1) {
-        printf("Failed to read height from font\n");
-        fclose(cur_str.font.fh);
-        cur_str.font.fh = NULL;
-        return 0;
-    }
-    cur_str.font.idx = idx;
-    idx = 0;
-    u8 *f = (u8 *)font;
+    cur_str.font.height = ia911_fon[0];
+    cur_str.font.idx = 0;
+    int idx = 0;
+    u8 *f = ia911_fon+1;
     while(1) {
-        if (fread(f, 4, 1, cur_str.font.fh) != 1) {
-            printf("Failed to parse font range table\n");
-            fclose(cur_str.font.fh);
-            cur_str.font.fh = NULL;
-            return 0;
-        }
         u16 start_c = f[0] | (f[1] << 8);
         u16 end_c = f[2] | (f[3] << 8);
         cur_str.font.range[idx++] = start_c;
         cur_str.font.range[idx++] = end_c;
+        f+= 4;
         if (start_c == 0 && end_c == 0)
             break;
     }
@@ -213,17 +184,18 @@ u8 open_font(unsigned int idx)
 
 u8 LCD_SetFont(unsigned int idx)
 {
-    u8 old = LCD_GetFont();
-    if (old == idx)
-        return old;
-    if (! open_font(idx))
-        open_font(old);
-    return old;
+    (void)idx;
+    static int loaded = 0;
+    if (! loaded) {
+        open_font();
+        loaded = 1;
+    }
+    return 0;
 }
 
 u8 LCD_GetFont()
 {
-    return cur_str.font.idx;
+    return 0;
 }
 
 void LCD_ShowVideo(u8 enable)
