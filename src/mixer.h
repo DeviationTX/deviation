@@ -9,8 +9,8 @@
 //MAX = 10000
 //MIN = -10000
 #define CHAN_MULTIPLIER 100
-#define PCT_TO_RANGE(x) ((s16)(x) * CHAN_MULTIPLIER)
-#define RANGE_TO_PCT(x) ((s16)(x) / CHAN_MULTIPLIER)
+#define PCT_TO_RANGE(x) ((x) * CHAN_MULTIPLIER)
+#define RANGE_TO_PCT(x) ((x) / CHAN_MULTIPLIER)
 #define CHAN_MAX_VALUE (100 * CHAN_MULTIPLIER)
 #define CHAN_MIN_VALUE (-100 * CHAN_MULTIPLIER)
 #define NUM_CHANNELS (NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS)
@@ -170,13 +170,13 @@ struct Trim {
 };
 
 /* Curve functions */
-s16 CURVE_Evaluate(s16 value, struct Curve *curve);
+s32 CURVE_Evaluate(s32 value, struct Curve *curve);
 const char *CURVE_GetName(char *str, struct Curve *curve);
 unsigned CURVE_NumPoints(struct Curve *curve);
 
 /* Mixer functions */
-volatile s16 *MIXER_GetInputs();
-s16 MIXER_GetChannel(unsigned channel, enum LimitMask flags);
+volatile s32 *MIXER_GetInputs();
+s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags);
 
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIXER_SetMixers(struct Mixer *mixers, int count);
@@ -189,9 +189,9 @@ enum TemplateType MIXER_GetTemplate(int ch);
 
 void MIXER_InitMixer(struct Mixer *mixer, unsigned ch);
 
-void MIXER_ApplyMixer(struct Mixer *mixer, volatile s16 *raw, s16 *orig_value);
-void MIXER_EvalMixers(volatile s16 *raw);
-int MIXER_GetCachedInputs(s16 *raw, unsigned threshold);
+void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value);
+void MIXER_EvalMixers(volatile s32 *raw);
+int MIXER_GetCachedInputs(s32 *raw, unsigned threshold);
 
 struct Mixer *MIXER_GetAllMixers();
 
@@ -199,14 +199,13 @@ struct Trim *MIXER_GetAllTrims();
 
 void MIXER_RegisterTrimButtons();
 
-s16 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s16 *_raw,
-                      volatile s16 *_Channels, enum LimitMask flags);
+s32 MIXER_ApplyLimits(unsigned channel, struct Limit *limit, volatile s32 *_raw,
+                      volatile s32 *__Channels, enum LimitMask flags);
 void MIXER_SetDefaultLimit(struct Limit *limit);
 const char *MIXER_TemplateName(enum TemplateType t);
 const char *MIXER_SwashType(enum SwashType);
 unsigned MIXER_SourceHasTrim(unsigned src);
 unsigned MIXER_MapChannel(unsigned channel);
-void MIXER_AdjustForProtocol();
 unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data);
 s8 *MIXER_GetTrim(unsigned i);
 s32 MIXER_GetTrimValue(int i);

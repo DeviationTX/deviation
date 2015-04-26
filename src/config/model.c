@@ -24,14 +24,14 @@ struct Model Model;
 /*set this to write all model data even if it is the same as the default */
 static u32 crc32;
 
-const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane" };
+const char * const MODEL_TYPE_VAL[MODELTYPE_LAST] = { "heli", "plane", "multi" };
 const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST] =
      { "100uW", "300uW", "1mW", "3mW", "10mW", "30mW", "100mW", "150mW" };
 
-#define MATCH_SECTION(s) strcasecmp(section, s) == 0
-#define MATCH_START(x,y) strncasecmp(x, y, sizeof(y)-1) == 0
-#define MATCH_KEY(s)     strcasecmp(name,    s) == 0
-#define MATCH_VALUE(s)   strcasecmp(value,   s) == 0
+#define MATCH_SECTION(s) (strcasecmp(section, s) == 0)
+#define MATCH_START(x,y) (strncasecmp(x, y, sizeof(y)-1) == 0)
+#define MATCH_KEY(s)     (strcasecmp(name,    s) == 0)
+#define MATCH_VALUE(s)   (strcasecmp(value,   s) == 0)
 #define NUM_STR_ELEMS(s) (sizeof(s) / sizeof(char *))
 
 #define WRITE_FULL_MODEL 0
@@ -351,7 +351,7 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
         printf("%s: Unknown page '%s' for quickpage%d\n", section, value, idx+1);
         return 1;
     }
-#if ENABLE_320x240_GUI
+#ifdef ENABLE_320x240_GUI
     static u8 seen_res = 0;
     enum {
         LOWRES = 1,
@@ -477,15 +477,94 @@ static int layout_ini_handler(void* user, const char* section, const char* name,
     return 1;
 }
 
+struct struct_map {const char *str;  u16 offset; u16 defval;};
+#define MAPSIZE(x)  (sizeof(x) / sizeof(struct struct_map))
+#define OFFSET(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)-1) << 13))
+#define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
+#define OFFSET_SRC(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
+#define OFFSET_BUT(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
+static const struct struct_map _secnone[] =
+{
+    {PERMANENT_TIMER, OFFSET(Model, permanent_timer), 0},
+};
+static const struct struct_map _secradio[] = {
+    {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
+    {RADIO_FIXED_ID, OFFSET(Model, fixed_id), 0},
+};
+static const struct struct_map _secmixer[] = {
+    {MIXER_SWITCH, OFFSET_SRC(Model.mixers[0], sw), 0},
+    {MIXER_SCALAR, OFFSETS(Model.mixers[0], scalar), 100},
+    {MIXER_OFFSET, OFFSETS(Model.mixers[0], offset), 0},
+};
+static const struct struct_map _seclimit[] = {
+    {CHAN_LIMIT_SAFETYSW,  OFFSET_SRC(Model.limits[0], safetysw), 0},
+    {CHAN_LIMIT_SAFETYVAL, OFFSETS(Model.limits[0], safetyval), 0},
+    {CHAN_LIMIT_MAX,       OFFSET(Model.limits[0], max), DEFAULT_SERVO_LIMIT},
+    {CHAN_LIMIT_SPEED,     OFFSET(Model.limits[0], speed), 0},
+    {CHAN_SCALAR,          OFFSET(Model.limits[0], servoscale), 100},
+    {CHAN_SCALAR_NEG,      OFFSET(Model.limits[0], servoscale_neg), 0},
+    {CHAN_SUBTRIM,         OFFSETS(Model.limits[0], subtrim), 0},
+};
+static const struct struct_map _sectrim[] = {
+    {TRIM_SOURCE, OFFSET_SRC(Model.trims[0], src), 0xFFFF},
+    {TRIM_POS,    OFFSET_BUT(Model.trims[0], pos), 0},
+    {TRIM_NEG,    OFFSET_BUT(Model.trims[0], neg), 0},
+    {TRIM_STEP,   OFFSET(Model.trims[0], step), 1},
+};
+static const struct struct_map _secswash[] = {
+    {SWASH_AILMIX, OFFSET(Model, swashmix[0]), 60},
+    {SWASH_ELEMIX, OFFSET(Model, swashmix[1]), 60},
+    {SWASH_COLMIX, OFFSET(Model, swashmix[2]), 60},
+};
+static const struct struct_map _sectimer[] = {
+    {TIMER_TIME,     OFFSET(Model.timer[0], timer), 0xFFFF},
+    {TIMER_VAL,      OFFSET(Model.timer[0], val), 0xFFFF},
+    {TIMER_SOURCE,   OFFSET_SRC(Model.timer[0], src), 0},
+    {TIMER_RESETSRC, OFFSET_SRC(Model.timer[0], resetsrc), 0},
+};
+static const struct struct_map _secppm[] = {
+    {PPMIN_CENTERPW, OFFSET(Model, ppmin_centerpw), 0},
+    {PPMIN_DELTAPW,  OFFSET(Model, ppmin_deltapw), 0},
+    {PPMIN_SWITCH,   OFFSET_SRC(Model, train_sw), 0xFFFF},
+};
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
-    CLOCK_ResetWatchdog();
+    int value_int = atoi(value);
     struct Model *m = (struct Model *)user;
-    u16 i;
+int assign_int(void* ptr, const struct struct_map *map, int map_size)
+{
+    for(int i = 0; i < map_size; i++) {
+        if(MATCH_KEY(map[i].str)) {
+            int size = map[i].offset >> 13;
+            int offset = map[i].offset & 0x1FFF;
+            switch(size) {
+                case 0:
+                    *((u8 *)((long)ptr + offset)) = value_int; break;
+                case 1:
+                    *((u16 *)((long)ptr + offset)) = value_int; break;
+                case 2:
+                    *((u8 *)((long)ptr + offset)) = get_source(section, value); break;
+                case 3:
+                    *((u32 *)((long)ptr + offset)) = value_int; break;
+                case 4:
+                    *((s8 *)((long)ptr + offset)) = value_int; break;
+                case 5:
+                    *((s16 *)((long)ptr + offset)) = value_int; break;
+                case 6:
+                    *((u8 *)((long)ptr + offset)) = get_button(section, value); break;
+                case 7:
+                    *((s32 *)((long)ptr + offset)) = value_int; break;
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+    CLOCK_ResetWatchdog();
+    unsigned i;
     if (MATCH_SECTION("")) {
         if(MATCH_KEY(MODEL_NAME)) {
-            strncpy(m->name, value, sizeof(m->name)-1);
-            m->name[sizeof(m->name)-1] = 0;
+            strlcpy(m->name, value, sizeof(m->name)-1);
             return 1;
         }
         if(MATCH_KEY(MODEL_TEMPLATE)) {
@@ -496,10 +575,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             CONFIG_ParseIconName(m->icon, value);
             return 1;
         }
-	if (MATCH_KEY(PERMANENT_TIMER)) {
-            m->permanent_timer = atoi(value);
+        if(assign_int(&Model, _secnone, MAPSIZE(_secnone)))
             return 1;
-        }
         if (MATCH_KEY(MODEL_TYPE)) {
             for (i = 0; i < NUM_STR_ELEMS(MODEL_TYPE_VAL); i++) {
                 if (MATCH_VALUE(MODEL_TYPE_VAL[i])) {
@@ -514,10 +591,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(MODEL_MIXERMODE)) {
-            if (!strcmp(value, "0") || !strcmp(value, "1"))   {// for backward compatibility, older model files use 1 for simplified GUI
-                m->mixer_mode = atoi(value);
-                return 1;
-            }
             for(i = 0; i < 2; i++) {
                 if(MATCH_VALUE(STDMIXER_ModeName(i)))
                     m->mixer_mode = i;
@@ -538,14 +611,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("Unknown protocol: %s\n", value);
             return 1;
         }
-        if (MATCH_KEY(RADIO_NUM_CHANNELS)) {
-            m->num_channels = atoi(value);
+        if(assign_int(&Model, _secradio, MAPSIZE(_secradio)))
             return 1;
-        }
-        if (MATCH_KEY(RADIO_FIXED_ID)) {
-            m->fixed_id = atoi(value);
-            return 1;
-        }
         if (MATCH_KEY(RADIO_TX_POWER)) {
             for (i = 0; i < NUM_STR_ELEMS(RADIO_TX_POWER_VAL); i++) {
                 if (MATCH_VALUE(RADIO_TX_POWER_VAL[i])) {
@@ -571,7 +638,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             if(m->mixers[idx].src == 0)
                 break;
         }
-        s16 value_int = atoi(value);
         if (MATCH_KEY(MIXER_SOURCE)) {
             if (idx == NUM_MIXERS) {
                 printf("%s: Only %d mixers are supported\n", section, NUM_MIXERS);
@@ -585,18 +651,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             m->mixers[idx].dest = get_source(section, value) - NUM_INPUTS - 1;
             return 1;
         }
-        if (MATCH_KEY(MIXER_SWITCH)) {
-            m->mixers[idx].sw = get_source(section, value);
+        if(assign_int(&m->mixers[idx], _secmixer, MAPSIZE(_secmixer)))
             return 1;
-        }
-        if (MATCH_KEY(MIXER_SCALAR)) {
-            m->mixers[idx].scalar = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(MIXER_OFFSET)) {
-            m->mixers[idx].offset = value_int;
-            return 1;
-        }
         if (MATCH_KEY(MIXER_USETRIM)) {
             MIXER_SET_APPLY_TRIM(&m->mixers[idx], value_int);
             return 1;
@@ -647,7 +703,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         idx--;
-        s16 value_int = atoi(value);
         if (MATCH_KEY(CHAN_LIMIT_REVERSE)) {
             if (value_int)
                 m->limits[idx].flags |= CH_REVERSE;
@@ -664,36 +719,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
             return 1;
         }
-        if (MATCH_KEY(CHAN_LIMIT_SAFETYSW)) {
-            m->limits[idx].safetysw = get_source(section, value);
+       
+        if(assign_int(&m->limits[idx], _seclimit, MAPSIZE(_seclimit)))
             return 1;
-        }
-        if (MATCH_KEY(CHAN_LIMIT_SAFETYVAL)) {
-            m->limits[idx].safetyval = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CHAN_LIMIT_MAX)) {
-            m->limits[idx].max = value_int;
-            return 1;
-        }
         if (MATCH_KEY(CHAN_LIMIT_MIN)) {
             m->limits[idx].min = -value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CHAN_LIMIT_SPEED)) {
-            m->limits[idx].speed = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CHAN_SCALAR)) {
-            m->limits[idx].servoscale = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CHAN_SCALAR_NEG)) {
-            m->limits[idx].servoscale_neg = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(CHAN_SUBTRIM)) {
-            m->limits[idx].subtrim = value_int;
             return 1;
         }
         if (MATCH_KEY(CHAN_TEMPLATE)) {
@@ -731,7 +761,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(VCHAN_NAME)) {
-            strncpy(m->virtname[idx - NUM_OUT_CHANNELS], value, sizeof(m->virtname[0]));
+            strlcpy(m->virtname[idx - NUM_OUT_CHANNELS], value, sizeof(m->virtname[0]));
             return 1;
         }
         printf("%s: Unknown key: %s\n", section, name);
@@ -748,11 +778,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         idx--;
-        s16 value_int = atoi(value);
-        if (MATCH_KEY(TRIM_SOURCE)) {
-            m->trims[idx].src = get_source(section, value);
+        if(assign_int(&m->trims[idx], _sectrim, MAPSIZE(_sectrim)))
             return 1;
-        }
         if (MATCH_KEY(TRIM_SWITCH)) {
             for (int i = 0; i <= NUM_SOURCES; i++) {
                 char cmp[10];
@@ -761,18 +788,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                     return 1;
                 }
             }
-            return 1;
-        }
-        if (MATCH_KEY(TRIM_POS)) {
-            m->trims[idx].pos = get_button(section, value);
-            return 1;
-        }
-        if (MATCH_KEY(TRIM_NEG)) {
-            m->trims[idx].neg = get_button(section, value);
-            return 1;
-        }
-        if (MATCH_KEY(TRIM_STEP)) {
-            m->trims[idx].step = value_int;
             return 1;
         }
         if (MATCH_KEY(TRIM_VALUE)) {
@@ -793,7 +808,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown swash_type: %s\n", section, value);
             return 1;
         }
-        s16 value_int = atoi(value);
         if (MATCH_KEY(SWASH_ELE_INV)) {
             if (value_int) 
                 m->swash_invert |= 0x01;
@@ -809,21 +823,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                 m->swash_invert |= 0x04;
             return 1;
         }
-        if (MATCH_KEY(SWASH_AILMIX)) {
-            if (value_int) 
-                m->swashmix[0] = value_int;
+        if(assign_int(m, _secswash, MAPSIZE(_secswash)))
             return 1;
-        }
-        if (MATCH_KEY(SWASH_ELEMIX)) {
-            if (value_int) 
-                m->swashmix[1] = value_int;
-            return 1;
-        }
-        if (MATCH_KEY(SWASH_COLMIX)) {
-            if (value_int) 
-                m->swashmix[2] = value_int;
-            return 1;
-        }
     }
     if (MATCH_START(section, SECTION_TIMER)) {
         u8 idx = atoi(section + sizeof(SECTION_TIMER)-1);
@@ -846,22 +847,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             printf("%s: Unknown timer type: %s\n", section, value);
             return 1;
         }
-        if (MATCH_KEY(TIMER_SOURCE)) {
-            m->timer[idx].src = get_source(section, value);
+        if(assign_int(&m->timer[idx], _sectimer, MAPSIZE(_sectimer)))
             return 1;
-        }
-	if (MATCH_KEY(TIMER_RESETSRC)) {
-            m->timer[idx].resetsrc = get_source(section, value);
-            return 1;
-        }
-        if (MATCH_KEY(TIMER_TIME)) {
-            m->timer[idx].timer = atoi(value);
-            return 1;
-        }
-	if (MATCH_KEY(TIMER_VAL)) {
-            m->timer[idx].val = atoi(value);
-            return 1;
-        }
     }
     if (MATCH_START(section, SECTION_TELEMALARM)) {
         u8 idx = atoi(section + sizeof(SECTION_TELEMALARM)-1);
@@ -876,7 +863,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
         idx--;
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
-            int last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : TELEM_DSM_LAST;
+            unsigned last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : TELEM_DSM_LAST;
             for(i = 1; i <= last; i++) {
                 if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
                     m->telem_alarm[idx] = i;
@@ -957,14 +944,8 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             }
             return 1;
         }
-        if (MATCH_KEY(PPMIN_CENTERPW)) {
-            m->ppmin_centerpw = atoi(value);
+        if(assign_int(m, _secppm, MAPSIZE(_secppm)))
             return 1;
-        }
-        if (MATCH_KEY(PPMIN_DELTAPW)) {
-            m->ppmin_deltapw = atoi(value);
-            return 1;
-        }
         if (MATCH_START(name, PPMIN_MAP)) {
             u8 idx = atoi(name + sizeof(PPMIN_MAP)-1) -1;
             if (idx < MAX_PPM_IN_CHANNELS) {
@@ -975,10 +956,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                                        : m->ppm_map[idx] - (NUM_INPUTS + 1);
                 }
             }
-            return 1;
-        }
-        if (MATCH_KEY(PPMIN_SWITCH)) {
-            m->train_sw = get_source(section, value);
             return 1;
         }
     }
@@ -994,6 +971,36 @@ static void get_model_file(char *file, u8 model_num)
         sprintf(file, "models/model%d.ini", model_num);
 }
 
+void write_int(FILE *fh, void* ptr, const struct struct_map *map, int map_size)
+{
+    char tmpstr[20];
+    for(int i = 0; i < map_size; i++) {
+        int size = map[i].offset >> 13;
+        int offset = map[i].offset & 0x1FFF;
+        int value;
+        if (map[i].defval == 0xffff)
+            continue;
+        switch(size) {
+            case 0: 
+            case 2: //SRC
+            case 6: //BUTTON
+                    value = *((u8 *)((long)ptr + offset)); break;
+            case 1: value = *((u16 *)((long)ptr + offset)); break;
+            case 3: value = *((u32 *)((long)ptr + offset)); break;
+            case 4: value = *((s8 *)((long)ptr + offset)); break;
+            case 5: value = *((s16 *)((long)ptr + offset)); break;
+            case 7: value = *((s32 *)((long)ptr + offset)); break;
+            default: continue;
+        }
+        if(WRITE_FULL_MODEL || value != map[i].defval) {
+            if (2 == (size & 0x03)) //2, 6
+                fprintf(fh, "%s=%s\n", map[i].str, size == 2 ? INPUT_SourceNameReal(tmpstr, value) : INPUT_ButtonName(value));
+            else
+                fprintf(fh, "%s=%d\n", map[i].str, value);
+        }
+    }
+}
+
 u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
 {
     int idx;
@@ -1007,12 +1014,7 @@ u8 write_mixer(FILE *fh, struct Model *m, u8 channel)
         fprintf(fh, "[%s]\n", SECTION_MIXER);
         fprintf(fh, "%s=%s\n", MIXER_SOURCE, INPUT_SourceNameReal(tmpstr, m->mixers[idx].src));
         fprintf(fh, "%s=%s\n", MIXER_DEST, INPUT_SourceNameReal(tmpstr, m->mixers[idx].dest + NUM_INPUTS + 1));
-        if(WRITE_FULL_MODEL || m->mixers[idx].sw != 0)
-            fprintf(fh, "%s=%s\n", MIXER_SWITCH, INPUT_SourceNameReal(tmpstr, m->mixers[idx].sw));
-        if(WRITE_FULL_MODEL || m->mixers[idx].scalar != 100)
-            fprintf(fh, "%s=%d\n", MIXER_SCALAR, m->mixers[idx].scalar);
-        if(WRITE_FULL_MODEL || m->mixers[idx].offset != 0)
-            fprintf(fh, "%s=%d\n", MIXER_OFFSET, m->mixers[idx].offset);
+        write_int(fh, &m->mixers[idx], _secmixer, MAPSIZE(_secmixer));
         if(WRITE_FULL_MODEL || ! MIXER_APPLY_TRIM(&m->mixers[idx]))
             fprintf(fh, "%s=%d\n", MIXER_USETRIM, MIXER_APPLY_TRIM(&m->mixers[idx]) ? 1 : 0);
         if(WRITE_FULL_MODEL || MIXER_MUX(&m->mixers[idx]))
@@ -1066,8 +1068,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
     char file[20];
     FILE *fh;
     u8 idx;
-    u8 i;
     struct Model *m = &Model;
+
+
     get_model_file(file, model_num);
     fh = fopen(file, "w");
     if (! fh) {
@@ -1076,8 +1079,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
     CONFIG_EnableLanguage(0);
     fprintf(fh, "%s=%s\n", MODEL_NAME, m->name);
-    if(WRITE_FULL_MODEL || m->permanent_timer != 0 )
-    	fprintf(fh, "%s=%d\n", PERMANENT_TIMER, m->permanent_timer);
+    write_int(fh, m, _secnone, MAPSIZE(_secnone));
     fprintf(fh, "%s=%s\n", MODEL_MIXERMODE, STDMIXER_ModeName(m->mixer_mode));
     if(m->icon[0] != 0)
         fprintf(fh, "%s=%s\n", MODEL_ICON, m->icon + 9);
@@ -1085,22 +1087,17 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "%s=%s\n", MODEL_TYPE, MODEL_TYPE_VAL[m->type]);
     fprintf(fh, "[%s]\n", SECTION_RADIO);
     fprintf(fh, "%s=%s\n", RADIO_PROTOCOL, RADIO_PROTOCOL_VAL[m->protocol]);
-    fprintf(fh, "%s=%d\n", RADIO_NUM_CHANNELS, m->num_channels);
-    if(WRITE_FULL_MODEL || m->fixed_id != 0)
-        fprintf(fh, "%s=%d\n", RADIO_FIXED_ID, (int)m->fixed_id);
+    write_int(fh, m, _secradio, MAPSIZE(_secradio));
     fprintf(fh, "%s=%s\n", RADIO_TX_POWER, RADIO_TX_POWER_VAL[m->tx_power]);
     fprintf(fh, "\n");
     write_proto_opts(fh, m);
+    struct Limit default_limit;
+    memset(&default_limit, 0, sizeof(default_limit));
+    MIXER_SetDefaultLimit(&default_limit);
     for(idx = 0; idx < NUM_OUT_CHANNELS; idx++) {
-        if(!WRITE_FULL_MODEL &&
-           m->limits[idx].flags == 0 &&
-           m->limits[idx].safetysw == 0 &&
-           m->limits[idx].safetyval == 0 &&
-           m->limits[idx].max == DEFAULT_SERVO_LIMIT &&
-           m->limits[idx].min == DEFAULT_SERVO_LIMIT &&
-           m->limits[idx].servoscale == 100 &&
-           m->limits[idx].servoscale_neg == 0 &&
-           m->templates[idx] == 0)
+        if(!WRITE_FULL_MODEL
+           && memcmp(&m->limits[idx], &default_limit, sizeof(default_limit)) == 0
+           && m->templates[idx] == 0)
         {
             if (write_mixer(fh, m, idx))
                 fprintf(fh, "\n");
@@ -1109,8 +1106,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s%d]\n", SECTION_CHANNEL, idx+1);
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_REVERSE))
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_REVERSE, (m->limits[idx].flags & CH_REVERSE) ? 1 : 0);
-        if(WRITE_FULL_MODEL || m->limits[idx].safetysw != 0)
-            fprintf(fh, "%s=%s\n", CHAN_LIMIT_SAFETYSW, INPUT_SourceNameReal(file, m->limits[idx].safetysw));
+        write_int(fh, &m->limits[idx], _seclimit, MAPSIZE(_seclimit));
         if(WRITE_FULL_MODEL || (m->limits[idx].flags & CH_FAILSAFE_EN)) {
             if(m->limits[idx].flags & CH_FAILSAFE_EN) {
                 fprintf(fh, "%s=%d\n", CHAN_LIMIT_FAILSAFE, m->limits[idx].failsafe);
@@ -1118,20 +1114,8 @@ u8 CONFIG_WriteModel(u8 model_num) {
                 fprintf(fh, "%s=Off\n", CHAN_LIMIT_FAILSAFE);
             }
         }
-        if(WRITE_FULL_MODEL || m->limits[idx].safetyval != 0)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SAFETYVAL, m->limits[idx].safetyval);
-        if(WRITE_FULL_MODEL || m->limits[idx].max != DEFAULT_SERVO_LIMIT)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_MAX, m->limits[idx].max);
         if(WRITE_FULL_MODEL || m->limits[idx].min != DEFAULT_SERVO_LIMIT)
             fprintf(fh, "%s=%d\n", CHAN_LIMIT_MIN, -(int)m->limits[idx].min);
-        if(WRITE_FULL_MODEL || m->limits[idx].speed != 0)
-            fprintf(fh, "%s=%d\n", CHAN_LIMIT_SPEED, m->limits[idx].speed);
-        if(WRITE_FULL_MODEL || m->limits[idx].subtrim != 0)
-            fprintf(fh, "%s=%d\n", CHAN_SUBTRIM, m->limits[idx].subtrim);
-        if(WRITE_FULL_MODEL || m->limits[idx].servoscale != 100)
-            fprintf(fh, "%s=%d\n", CHAN_SCALAR, m->limits[idx].servoscale);
-        if(WRITE_FULL_MODEL || m->limits[idx].servoscale_neg != 0)
-            fprintf(fh, "%s=%d\n", CHAN_SCALAR_NEG, m->limits[idx].servoscale_neg);
         if(WRITE_FULL_MODEL || m->templates[idx] != 0)
             fprintf(fh, "%s=%s\n", CHAN_TEMPLATE, CHAN_TEMPLATE_VAL[m->templates[idx]]);
         write_mixer(fh, m, idx);
@@ -1155,8 +1139,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             fprintf(fh, "%s=%s\n", PPMIN_SWITCH, INPUT_SourceNameReal(file, m->train_sw));
         }
-        fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
-        fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
+        write_int(fh, m, _secppm, MAPSIZE(_secppm));
+        //fprintf(fh, "%s=%d\n", PPMIN_CENTERPW, m->ppmin_centerpw);
+        //fprintf(fh, "%s=%d\n", PPMIN_DELTAPW, m->ppmin_deltapw);
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             int offset = (PPMin_Mode() == PPM_IN_TRAIN1) ? NUM_INPUTS + 1: 0;
             for(idx = 0; idx < MAX_PPM_IN_CHANNELS; idx++) {
@@ -1175,12 +1160,9 @@ u8 CONFIG_WriteModel(u8 model_num) {
              m->trims[idx].src >= 1 && m->trims[idx].src <= 4 
              ? tx_stick_names[m->trims[idx].src-1]
              : INPUT_SourceNameReal(file, m->trims[idx].src));
-        fprintf(fh, "%s=%s\n", TRIM_POS, INPUT_ButtonName(m->trims[idx].pos));
-        fprintf(fh, "%s=%s\n", TRIM_NEG, INPUT_ButtonName(m->trims[idx].neg));
+        write_int(fh, &m->trims[idx], _sectrim, MAPSIZE(_sectrim));
         if(WRITE_FULL_MODEL || m->trims[idx].sw)
             fprintf(fh, "%s=%s\n", TRIM_SWITCH, INPUT_SourceNameAbbrevSwitchReal(file, m->trims[idx].sw));
-        if(WRITE_FULL_MODEL || m->trims[idx].step != 1)
-            fprintf(fh, "%s=%d\n", TRIM_STEP, m->trims[idx].step);
         if(WRITE_FULL_MODEL || m->trims[idx].value[0] || m->trims[idx].value[1] || m->trims[idx].value[2])
             fprintf(fh, "%s=%d,%d,%d\n", TRIM_VALUE,
                     m->trims[idx].value[0], m->trims[idx].value[1], m->trims[idx].value[2]);
@@ -1194,12 +1176,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
             fprintf(fh, "%s=1\n", SWASH_AIL_INV);
         if (WRITE_FULL_MODEL || m->swash_invert & 0x04)
             fprintf(fh, "%s=1\n", SWASH_COL_INV);
-        if (WRITE_FULL_MODEL || m->swashmix[0] != 60)
-            fprintf(fh, "%s=%d\n", SWASH_AILMIX, m->swashmix[0]);
-        if (WRITE_FULL_MODEL || m->swashmix[1] != 60)
-            fprintf(fh, "%s=%d\n", SWASH_ELEMIX, m->swashmix[1]);
-        if (WRITE_FULL_MODEL || m->swashmix[2] != 60)
-            fprintf(fh, "%s=%d\n", SWASH_COLMIX, m->swashmix[2]);
+        write_int(fh, m, _secswash, MAPSIZE(_secswash));
     }
     for(idx = 0; idx < NUM_TIMERS; idx++) {
         if (! WRITE_FULL_MODEL && m->timer[idx].src == 0 && m->timer[idx].type == TIMER_STOPWATCH)
@@ -1207,10 +1184,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
         fprintf(fh, "[%s%d]\n", SECTION_TIMER, idx+1);
         if (WRITE_FULL_MODEL || m->timer[idx].type != TIMER_STOPWATCH)
             fprintf(fh, "%s=%s\n", TIMER_TYPE, TIMER_TYPE_VAL[m->timer[idx].type]);
-        if (WRITE_FULL_MODEL || m->timer[idx].src != 0)
-            fprintf(fh, "%s=%s\n", TIMER_SOURCE, INPUT_SourceNameReal(file, m->timer[idx].src));
-        if (WRITE_FULL_MODEL || m->timer[idx].resetsrc != 0)
-            fprintf(fh, "%s=%s\n", TIMER_RESETSRC, INPUT_SourceNameReal(file, m->timer[idx].resetsrc));
+        write_int(fh, &m->timer[idx], _sectimer, MAPSIZE(_sectimer));
         if (WRITE_FULL_MODEL || ((m->timer[idx].type == TIMER_COUNTDOWN || m->timer[idx].type == TIMER_COUNTDOWN_PROP) && m->timer[idx].timer))
             fprintf(fh, "%s=%d\n", TIMER_TIME, m->timer[idx].timer);
         if (WRITE_FULL_MODEL || (m->timer[idx].val != 0 && m->timer[idx].type == TIMER_PERMANENT))
@@ -1235,7 +1209,7 @@ u8 CONFIG_WriteModel(u8 model_num) {
     }
 #endif //HAS_DATALOG
     fprintf(fh, "[%s]\n", SECTION_SAFETY);
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
+    for(int i = 0; i < NUM_SOURCES + 1; i++) {
         if (WRITE_FULL_MODEL || m->safety[i]) {
             fprintf(fh, "%s=%s\n", i == 0 ? "Auto" : INPUT_SourceNameReal(file, i), SAFETY_VAL[m->safety[i]]);
         }
@@ -1334,7 +1308,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
-        MIXER_AdjustForProtocol();
+        RemapChannelsForProtocol(NULL);
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
@@ -1363,6 +1337,7 @@ u8 CONFIG_SaveModelIfNeeded() {
 void CONFIG_ResetModel()
 {
     u8 model_num = Transmitter.current_model;
+    PROTOCOL_DeInit();
     CONFIG_ReadModel(0);
     Transmitter.current_model = model_num;
     sprintf(Model.name, "Model%d", model_num);
@@ -1376,6 +1351,7 @@ const char *CONFIG_GetIcon(enum ModelType type) {
     const char *const icons[] = {
        "modelico/heli.bmp",
        "modelico/plane.bmp",
+       "modelico/multi.bmp",
     };
     return icons[type];
 }
@@ -1439,7 +1415,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
         return 0;
     }
     if(auto_map)
-        MIXER_AdjustForProtocol();
+        RemapChannelsForProtocol(NULL);
     MIXER_RegisterTrimButtons();
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     if (Model.mixer_mode == MIXER_STANDARD)

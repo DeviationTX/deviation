@@ -22,6 +22,7 @@
 
 static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
 #define HEIGHT(x) x.height
+
 /*
  * // since devo10's screen is too small in emulator , we have it zoomed by 2 for both rows and columns
  * color = 0x0 means white, other value means black
@@ -68,7 +69,7 @@ u8 FONT_GetFromString(const char *value)
     int i;
     for (i = 0; i < NUM_FONTS; i++) {
         if (FontNames[i][0] == 0) {
-            strncpy(FontNames[i], value, 13);
+            strlcpy(FontNames[i], value, 13);
             return i + 1;
         }
         if(strcasecmp(FontNames[i], value) == 0) {

@@ -24,6 +24,7 @@
 // string too long for devo10, so define it separately for devo8 and devo10
 static const char * const HELI_LABEL = _tr_noop("Helicopter");
 static const char * const PLANE_LABEL = _tr_noop("Airplane");
+static const char * const MULTI_LABEL = _tr_noop("Multirotor");
 
 #include "../common/_model_page.c"
 
@@ -63,7 +64,7 @@ void PAGE_ModelInit(int page)
         COL1 = (8 + ((LCD_WIDTH - 320) / 2)),
         COL2 = (COL1 + 128),
         COL3 = (COL1 + 228),
-        ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
+        ROW1 = (44 + ((LCD_HEIGHT - 240) / 2)),
     };
     row = ROW1;
     GUI_CreateLabel(&gui->filelbl, COL1, row, NULL, DEFAULT_FONT, _tr("File"));
@@ -103,7 +104,7 @@ void PAGE_ModelInit(int page)
 
     row += 20;
     if(Model.fixed_id == 0)
-        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
+        strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
     GUI_CreateLabel(&gui->fixedidlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Fixed ID"));
@@ -118,7 +119,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
     (void)data;
     GUI_RemoveObj(obj);
     if (callback_result == 1) {
-        strcpy(Model.name, tempstring);
+        strlcpy(Model.name, tempstring, sizeof(Model.name));
         //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
     }
@@ -131,7 +132,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     (void)data;
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
-    strcpy(tempstring, Model.name);
+    tempstring_cpy(Model.name);
     callback_result = 1;
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, sizeof(Model.name)-1, _changename_done_cb, &callback_result);
 }

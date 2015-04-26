@@ -28,7 +28,7 @@
 #include "mixer_standard.h"
 
 MappedSimpleChannels mapped_std_channels;
-extern const u8 const EATRG[PROTO_MAP_LEN];
+extern const u8 EATRG[PROTO_MAP_LEN];
 
 void STDMIXER_Preset()
 {

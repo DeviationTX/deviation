@@ -75,7 +75,7 @@ struct telem_layout2 {
 
 const struct telem_layout devo_header_basic[] = {
         {TYPE_HEADER,  8, 35, TEMP_LABEL},
-        {TYPE_HEADER, 45, 35, VOLT_LABEL},
+        {TYPE_HEADER, 48, 35, VOLT_LABEL},
         {TYPE_HEADER, 88, 35, RPM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
@@ -99,7 +99,7 @@ const struct telem_layout devo_layout_basic[] = {
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER,  8, 35, GPS_LABEL},
+        {TYPE_HEADER, 98, 35, GPS_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -120,7 +120,7 @@ const struct telem_layout devo_layout_gps[] = {
 };
 
 const struct telem_layout dsm_header_basic[] = {
-        {TYPE_HEADER,  8, 35, DSM_LABEL},
+        {TYPE_HEADER, 98, 35, DSM_LABEL},
         {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -138,7 +138,7 @@ const struct telem_layout dsm_layout_basic[] = {
     {TYPE_HEADER | 1, 43, 8,  R_LABEL},
     {TYPE_VALUE  | 1, 50, 35, TELEM_DSM_FLOG_FADESR},
     {TYPE_HEADER | 1, 86, 8,  H_LABEL},
-    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_FRAMELOSS},
+    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_HOLDS},
 
     {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
     {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
@@ -153,13 +153,30 @@ const struct telem_layout dsm_layout_basic[] = {
     {0, 0, 0, 0},
 };
 
+const struct telem_layout frsky_layout_basic[] = {
+    {TYPE_INDEX | 0,  0, 8,  1},
+    {TYPE_VALUE | 0,  8, 35, TELEM_FRSKY_TEMP1},
+    {TYPE_VALUE | 0, 48, 35, TELEM_FRSKY_VOLT1},
+    {TYPE_VALUE | 0, 87, 35, TELEM_FRSKY_RPM},
+    {TYPE_INDEX | 1,  0, 8,  2},
+    {TYPE_VALUE | 1,  8, 35, TELEM_FRSKY_TEMP2},
+    {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
+    {TYPE_INDEX | 2,  0, 8,  3},
+    {TYPE_VALUE | 2, 48, 35, TELEM_FRSKY_VOLT3},
+    {0, 0, 0, 0},
+};
+
 const struct telem_layout2 devo_page[] = {
-    {devo_header_basic, devo_layout_basic, 4, ITEM_SPACE},
-    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+    {devo_header_basic, devo_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 dsm_page[] = {
-    {dsm_header_basic, dsm_layout_basic, 4, ITEM_SPACE},
-    {devo_header_gps, devo_layout_gps, 3, 4 * ITEM_HEIGHT + 4},
+    {dsm_header_basic, dsm_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
+};
+const struct telem_layout2 frsky_page[] = {
+    {devo_header_basic, frsky_layout_basic, 4, 1},
+    {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)
 {
@@ -211,12 +228,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             case TYPE_INDEX:  font = &TINY_FONT; cmd = idx_cb; break;
             case TYPE_HEADER: cmd = header_cb; break;
             case TYPE_LABEL:  cmd = label_cb; break;
-            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*ITEM_HEIGHT; break;
+            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*LINE_HEIGHT; break;
             case TYPE_VALUE:  font = &tp->font;  cmd = telem_cb; break;
-            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + ITEM_HEIGHT;break;
-            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*ITEM_HEIGHT; break;
+            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + LINE_HEIGHT;break;
+            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*LINE_HEIGHT; break;
         }
-        GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, ITEM_HEIGHT,
+        GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, LINE_HEIGHT,
                 font, cmd, NULL, (void *)(long)ptr->source);
     }
     return 0;
@@ -229,15 +246,19 @@ static void _show_page(const struct telem_layout2 *page)
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
+    DEFAULT_FONT.style = LABEL_LEFT;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
-        GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, ITEM_HEIGHT,
-                           ptr->source == ARROW_LABEL ? &TINY_FONT : &DEFAULT_FONT,
+        GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
+                           ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    PAGE_ShowHeader(_tr_noop("")); // to draw a underline only
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         page->row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+    PAGE_ShowHeader(_tr("Telemetry monitor"));
+    DEFAULT_FONT.style = LABEL_RIGHT;
+    u8 row_height = page->row_height * LINE_SPACE;
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+    DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
 
@@ -260,6 +281,8 @@ void PAGE_TelemtestInit(int page)
         GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         return;
     }
+    if (current_page > telemetry_gps)
+        current_page = telemetry_basic;
 
     _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
 }
@@ -319,7 +342,7 @@ static void _navigate_pages(s8 direction)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
@@ -340,8 +363,4 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     }
     return 1;
 }
-static inline guiObject_t *_get_obj(int idx, int objid) {
-    return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
-}
-
 #endif //HAS_TELEMETRY

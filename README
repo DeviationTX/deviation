@@ -1,3 +1,7 @@
+You an find information about nightly builds and team deviationTx development on the team devaitionTx wik: https://bitbucket.org/deviationtx/deviation/wiki/Home
+
+Bugs can be reported and features requested at http://deviationtx.com/mantisbt/
+
 There are multiple targets available for building the Deviation firmware:
 
 devo8:  This is the default target for the Walkera Devention 'DEVO8' transmitter
@@ -21,15 +25,21 @@ the default target is 'devo8'
 Installing the build environment:
 
 #################################
+    Only the official embedded-arm build system is supported now
+    Get the most recent release from here:
+    https://launchpad.net/gcc-arm-embedded
+    Current build version: gcc-arm-none-eabi-4_8-2013q4-20131204
+#################################
+
 Building for ARM (on Linux):
-    I use the following script to install a cross-compiled gcc,
-    and the relevant libraries:
-           https://github.com/esden/summon-arm-toolchain
+    1) download and install the precompiled linux compiler from here:
+       https://launchpad.net/gcc-arm-embedded
+    2) Add path to 'bin' directory to your PATH
 Building for ARM (on Windows):
     Install the arm toolchain:
-    1) download and install YAGARTO (install into /mingw/stm32)
-        http://www.yagarto.de/#download
-    1a) add YAGARTO to your PATH (I like to put this into ~/.profile
+    1) download and install the precompiled windows compiler from here:
+       https://launchpad.net/gcc-arm-embedded
+    1a) add path to 'bin' directory to your PATH (I like to put this into ~/.profile
         so it is there each time I start msys)
         export PATH=/mingw/stm32/bin:$PATH
     2) ensure python is installed.  If not install it from here:
@@ -90,4 +100,3 @@ Building the Windows binary on Windows
     * cd ~/src
     * cp -pf <path to deviation src code> deviation
     * cd deviation/src
-

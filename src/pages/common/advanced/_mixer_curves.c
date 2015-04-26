@@ -22,13 +22,13 @@ static const char *set_pointnum_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_expopoint_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_value_cb(guiObject_t *obj, int dir, void *data);
 static u8 touch_cb(s16 x, s16 y, void *data);
-static s16 show_curve_cb(s16 xval, void *data);
+static s32 show_curve_cb(s32 xval, void *data);
 
-s16 show_curve_cb(s16 xval, void *data)
+s32 show_curve_cb(s32 xval, void *data)
 {
     (void)data;
     s16 oldpoint;
-    s16 yval;
+    s32 yval;
     if (edit->reverse)
         xval = -xval; 
     if (edit->pointnum < 0) {

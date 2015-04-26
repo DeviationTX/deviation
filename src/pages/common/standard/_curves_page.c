@@ -56,7 +56,7 @@ static const char *set_mode_cb(guiObject_t *obj, int dir, void *data)
         for ( i = 0; i < 9; i++)
             GUI_Redraw(&gui->val[i]);
     }
-    strcpy(tempstring, (const char *)STDMIX_ModeName(pit_mode));
+    tempstring_cpy((const char *)STDMIX_ModeName(pit_mode));
     return tempstring;
 }
 
@@ -104,11 +104,11 @@ static const char *set_holdstate_cb(guiObject_t *obj, int dir, void *data)
         update_textsel_state();
     }
     if (pit_mode != PITTHROMODE_HOLD)
-        strcpy(tempstring, "");
+        tempstring_cpy("");
     else if (pit_hold_state)
-        strcpy(tempstring, _tr("On"));
+        tempstring_cpy(_tr("On"));
     else
-        strcpy(tempstring, _tr("Off"));
+        tempstring_cpy(_tr("Off"));
     return tempstring;
 }
 
@@ -174,12 +174,12 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     return 1;
 }
 
-static s16 show_curve_cb(s16 xval, void *data)
+static s32 show_curve_cb(s32 xval, void *data)
 {
     (void)data;
     if (! mp->cur_mixer)
         return 0;
-    s16 yval = CURVE_Evaluate(xval, &(mp->cur_mixer->curve));
+    s32 yval = CURVE_Evaluate(xval, &(mp->cur_mixer->curve));
     return yval;
 }
 

@@ -49,7 +49,8 @@ struct FAT FontFAT = {{0}};
 #define NUM_FONTS 10
 
 #define HEIGHT(x) x.height
-char FontNames[NUM_FONTS][9];
+#define FONT_NAME_LEN 9
+char FontNames[NUM_FONTS][FONT_NAME_LEN];
 
 struct font_def 
 {
@@ -72,7 +73,7 @@ u8 FONT_GetFromString(const char *value)
     int i;
     for (i = 0; i < NUM_FONTS; i++) {
         if (FontNames[i][0] == 0) {
-            strncpy(FontNames[i], value, 13);
+            strlcpy(FontNames[i], value, FONT_NAME_LEN);
             return i + 1;
         }
         if(strcasecmp(FontNames[i], value) == 0) {

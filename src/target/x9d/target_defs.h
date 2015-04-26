@@ -1,7 +1,6 @@
 #ifndef _DEVO10_TARGET_H_
 #define _DEVO10_TARGET_H_
 
-#include "FatFs/ff.h"
 #include "fat_io.h"
 
 #define TXID 0x9d
@@ -21,6 +20,8 @@
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   1
+#define HAS_EXTRA_SWITCHES  0
+#define HAS_MULTIMOD_SUPPORT 1
 
 #define MIN_BRIGHTNESS 0
 #define DEFAULT_BATTERY_ALARM 6000

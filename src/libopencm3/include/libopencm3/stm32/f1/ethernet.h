@@ -17,11 +17,11 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <libopencm3/cm3/common.h>
+#include <libopencm3/stm32/memorymap.h>
+
 #ifndef LIBOPENCM3_ETHERNET_H
 #define LIBOPENCM3_ETHERNET_H
-
-#include <libopencm3/stm32/memorymap.h>
-#include <libopencm3/cm3/common.h>
 
 /* Ethernet MAC registers */
 #define ETH_MACCR			MMIO32(ETHERNET_BASE + 0x00)
@@ -137,14 +137,14 @@
 #define ETH_MACFCR_ZQPD			0x00000080
 #define ETH_MACFCR_PT			0xFFFF0000
 
-/* Ethernet MAC interrupt status regster ETH_MACSR bits */
+/* Ethernet MAC interrupt status register ETH_MACSR bits */
 #define ETH_MACSR_PMTS			0x0008
 #define ETH_MACSR_MMCS			0x0010
 #define ETH_MACSR_MMCRS			0x0020
 #define ETH_MACSR_MMCTS			0x0040
 #define ETH_MACSR_TSTS			0x0200
 
-/* Ethernet MAC interrupt mask regster ETH_MACIMR bits */
+/* Ethernet MAC interrupt mask register ETH_MACIMR bits */
 #define ETH_MACIMR_PMTIM		0x0008
 #define ETH_MACIMR_TSTIM		0x0200
 
@@ -199,5 +199,12 @@
 #define ETH_DMAIER_ERIE			0x00004000
 #define ETH_DMAIER_AISE			0x00008000
 #define ETH_DMAIER_NSIE			0x00010000
+
+BEGIN_DECLS
+
+void eth_smi_write(uint8_t phy, uint8_t reg, uint16_t data);
+uint16_t eth_smi_read(uint8_t phy, uint8_t reg);
+
+END_DECLS
 
 #endif

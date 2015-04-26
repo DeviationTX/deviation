@@ -85,52 +85,96 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
     return 0;
 }
 
-static int handle_bargraph(struct display_settings *d, u8 idx, const char *name, const char *value)
+struct struct_map {const char *str;  u16 offset;};
+#define MAPSIZE(x)  (sizeof(x) / sizeof(struct struct_map))
+#define OFFSET(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)-1) << 13))
+#define OFFSETS(s,v) (((long)(&s.v) - (long)(&s)) | ((sizeof(s.v)+3) << 13))
+#define OFFSET_COL(s,v) (((long)(&s.v) - (long)(&s)) | (2 << 13))
+#define OFFSET_FON(s,v) (((long)(&s.v) - (long)(&s)) | (6 << 13))
+static const struct struct_map _secgeneral[] =
 {
-    struct disp_bargraph *graph;
-    enum DispFlags flag;
-    if (idx == 0) {
-        graph = &d->bargraph;
-        flag = BAR_TRANSPARENT;
-    } else {
-        graph = &d->trim;
-        flag = TRIM_TRANSPARENT;
-    }
-    if(MATCH_KEY(BG_COLOR)) {
-        graph->bg_color = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(FG_COLOR)) {
-        graph->fg_color_pos = graph->fg_color_neg = graph->fg_color_zero = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(FG_COLOR_POS)) {
-        graph->fg_color_pos = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(FG_COLOR_NEG)) {
-        graph->fg_color_neg = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(FG_COLOR_ZERO)) {
-        graph->fg_color_zero = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(OUTLINE_COLOR)) {
-        graph->outline_color = get_color(value);
-        return 1;
-    }
-    if(MATCH_KEY(IS_TRANSPARENT)) {
-        d->flags = SET_FLAG(d->flags, atoi(value), flag);
-        return 1;
-    }
-    return 0;
-}
+    {"header_height",        OFFSET(Display.metrics, header_height)},
+    {"header_widget_height", OFFSET(Display.metrics, header_widget_height)},
+    {"line_height",          OFFSET(Display.metrics, line_height)},
+    {"line_space",           OFFSET(Display.metrics, line_space)},
+};
+static const struct struct_map _secselect[] =
+{
+    {"width",                OFFSET(Display, select_width)},
+    {COLOR,                  OFFSET_COL(Display, select_color)},
+};
+static const struct struct_map _seckeybd[] =
+{
+    {FONT,                   OFFSET_FON(Display.keyboard, font)},
+    {"bg_key1",              OFFSET_COL(Display.keyboard, bg_key1)},
+    {"fg_key1",              OFFSET_COL(Display.keyboard, fg_key1)},
+    {"bg_key2",              OFFSET_COL(Display.keyboard, bg_key2)},
+    {"fg_key2",              OFFSET_COL(Display.keyboard, fg_key2)},
+    {"bg_key3",              OFFSET_COL(Display.keyboard, bg_key3)},
+    {"fg_key3",              OFFSET_COL(Display.keyboard, fg_key3)},
+    {BG_COLOR,               OFFSET_COL(Display.keyboard, fill_color)},
+};
+static const struct struct_map _seclistbox[] =
+{
+    {FONT,                   OFFSET_FON(Display.listbox, font)},
+    {BG_COLOR,               OFFSET_COL(Display.listbox, bg_color)},
+    {FG_COLOR,               OFFSET_COL(Display.listbox, fg_color)},
+    {"bg_select",            OFFSET_COL(Display.listbox, bg_select)},
+    {"fg_select",            OFFSET_COL(Display.listbox, fg_select)},
+};
+static const struct struct_map _secscroll[] =
+{
+    {BG_COLOR,               OFFSET_COL(Display.scrollbar, bg_color)},
+    {FG_COLOR,               OFFSET_COL(Display.scrollbar, fg_color)},
+};
+static const struct struct_map _secxygraph[] =
+{
+    {BG_COLOR,               OFFSET_COL(Display.xygraph, bg_color)},
+    {FG_COLOR,               OFFSET_COL(Display.xygraph, fg_color)},
+    {XY_AXIS_COLOR,          OFFSET_COL(Display.xygraph, axis_color)},
+    {XY_GRID_COLOR,          OFFSET_COL(Display.xygraph, grid_color)},
+    {XY_POINT_COLOR,         OFFSET_COL(Display.xygraph, point_color)},
+    {OUTLINE_COLOR,          OFFSET_COL(Display.xygraph, outline_color)},
+};
+static const struct struct_map _secbargraph[] =
+{
+    {BG_COLOR,               OFFSET_COL(Display.bargraph, bg_color)},
+    {FG_COLOR_POS,           OFFSET_COL(Display.bargraph, fg_color_pos)},
+    {FG_COLOR_NEG,           OFFSET_COL(Display.bargraph, fg_color_neg)},
+    {FG_COLOR_ZERO,          OFFSET_COL(Display.bargraph, fg_color_zero)},
+    {OUTLINE_COLOR,          OFFSET_COL(Display.bargraph, outline_color)},
+};
 
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     u8 idx;
     struct display_settings *d = (struct display_settings *)user;
+    int value_int = atoi(value);
+
+    int assign_int(void* ptr, const struct struct_map *map, int map_size)
+    {
+        for(int i = 0; i < map_size; i++) {
+            if(MATCH_KEY(map[i].str)) {
+                int size = map[i].offset >> 13;
+                int offset = map[i].offset & 0x1FFF;
+                switch(size) {
+                    case 0:
+                        *((u8 *)((long)ptr + offset)) = value_int; break;
+                    case 1:
+                        *((u16 *)((long)ptr + offset)) = value_int; break;
+                    case 2:
+                        *((u16 *)((long)ptr + offset)) = get_color(value); break;
+                    case 3:
+                        *((u32 *)((long)ptr + offset)) = value_int; break;
+                    case 6:
+                        *((u8 *)((long)ptr + offset)) = FONT_GetFromString(value);
+                }
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     if(MATCH_START(section, FONT) && strlen(section) > sizeof(FONT)) {
         for (idx = 0; idx < NUM_STR_ELEMS(FONT_VAL); idx++) {
             if (0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
@@ -152,112 +196,49 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #endif
             return 1;
         }
+        if(assign_int(&d->metrics, _secgeneral, MAPSIZE(_secgeneral)))
+            return 1;
     }
     if(MATCH_START(section, "select")) {
-        if(MATCH_KEY(COLOR)) {
-            d->select_color = get_color(value);
+        if(assign_int(d, _secselect, MAPSIZE(_secselect)))
             return 1;
-        }
-        if(MATCH_KEY("width")) {
-            d->select_width = atoi(value);
-            return 1;
-        }
     }
     if(MATCH_START(section, "keyboard")) {
-        if(MATCH_KEY(FONT)) {
-            d->keyboard.font = FONT_GetFromString(value);
+        if(assign_int(&d->keyboard, _seckeybd, MAPSIZE(_seckeybd)))
             return 1;
-        }
-        if(MATCH_KEY("bg_key1")) {
-            d->keyboard.bg_key1 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("fg_key1")) {
-            d->keyboard.fg_key1 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("bg_key2")) {
-            d->keyboard.bg_key2 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("fg_key2")) {
-            d->keyboard.fg_key2 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("bg_key3")) {
-            d->keyboard.bg_key3 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("fg_key3")) {
-            d->keyboard.fg_key3 = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(BG_COLOR)) {
-            d->keyboard.fill_color = get_color(value);
-            return 1;
-        }
     }
     if(MATCH_START(section, "listbox")) {
-        if(MATCH_KEY(FONT)) {
-            d->listbox.font = FONT_GetFromString(value);
+        if(assign_int(&d->listbox, _seclistbox, MAPSIZE(_seclistbox)))
             return 1;
-        }
-        if(MATCH_KEY(BG_COLOR)) {
-            d->listbox.bg_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(FG_COLOR)) {
-            d->listbox.fg_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("bg_select")) {
-            d->listbox.bg_select = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY("fg_select")) {
-            d->listbox.fg_select = get_color(value);
-            return 1;
-        }
     }
     if(MATCH_START(section, "scrollbar")) {
-        if(MATCH_KEY(BG_COLOR)) {
-            d->scrollbar.bg_color = get_color(value);
+        if(assign_int(&d->scrollbar, _secscroll, MAPSIZE(_secscroll)))
             return 1;
-        }
-        if(MATCH_KEY(FG_COLOR)) {
-            d->scrollbar.fg_color = get_color(value);
-            return 1;
-        }
     }
     if(MATCH_SECTION("xygraph")) {
-        if(MATCH_KEY(BG_COLOR)) {
-            d->xygraph.bg_color = get_color(value);
+        if(assign_int(&d->xygraph, _secxygraph, MAPSIZE(_secxygraph)))
             return 1;
-        }
-        if(MATCH_KEY(FG_COLOR)) {
-            d->xygraph.fg_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(XY_AXIS_COLOR)) {
-            d->xygraph.axis_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(XY_GRID_COLOR)) {
-            d->xygraph.grid_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(XY_POINT_COLOR)) {
-            d->xygraph.point_color = get_color(value);
-            return 1;
-        }
-        if(MATCH_KEY(OUTLINE_COLOR)) {
-            d->xygraph.outline_color = get_color(value);
-            return 1;
-        }
     }
     for (idx = 0; idx < NUM_STR_ELEMS(BARGRAPH_VAL); idx++) {
         if(MATCH_SECTION(BARGRAPH_VAL[idx])) {
-            handle_bargraph(d, idx, name, value);
+            struct disp_bargraph *graph;
+            enum DispFlags flag;
+            if (idx == 0) {
+                graph = &d->bargraph;
+                flag = BAR_TRANSPARENT;
+            } else {
+                graph = &d->trim;
+                flag = TRIM_TRANSPARENT;
+            }
+            if(MATCH_KEY(IS_TRANSPARENT)) {
+                d->flags = SET_FLAG(d->flags, value_int, flag);
+                return 1;
+            }
+            if(MATCH_KEY(FG_COLOR)) {
+                graph->fg_color_pos = graph->fg_color_neg = graph->fg_color_zero = get_color(value);
+                return 1;
+            }
+            assign_int(graph, _secbargraph, MAPSIZE(_secbargraph));
             return 1;
         }
     }

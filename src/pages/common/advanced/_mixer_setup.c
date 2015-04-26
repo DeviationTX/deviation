@@ -20,8 +20,8 @@ static inline guiObject_t * _get_obj(int idx, int objid);
 static const char *templatetype_cb(guiObject_t *obj, int value, void *data);
 static void sync_mixers();
 static const char *set_number100_cb(guiObject_t *obj, int dir, void *data);
-static s16 eval_mixer_cb(s16 xval, void * data);
-static s16 eval_chan_cb(void * data);
+static s32 eval_mixer_cb(s32 xval, void * data);
+static s32 eval_chan_cb(void * data);
 static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data);
 static void toggle_link_cb(guiObject_t *obj, const void *data);
 static const char *show_trim_cb(guiObject_t *obj, const void *data);
@@ -170,12 +170,12 @@ static const char *show_rate_cb(guiObject_t *obj, const void *data)
     return (long)data == 0 ? _tr("Mid-Rate") : _tr("Low-Rate");
 }
 
-s16 eval_mixer_cb(s16 xval, void * data)
+s32 eval_mixer_cb(s32 xval, void * data)
 {
     struct Mixer *mix = data ? (struct Mixer *)data : mp->cur_mixer;
     if (MIXER_SRC_IS_INV(mix->src))
         xval = -xval;
-    s16 yval = CURVE_Evaluate(xval, &mix->curve);
+    s32 yval = CURVE_Evaluate(xval, &mix->curve);
     yval = yval * mix->scalar / 100 + PCT_TO_RANGE(mix->offset);
 
     /* Min/Max is a servo limit, shouldn't be shown here
@@ -196,7 +196,7 @@ s16 eval_mixer_cb(s16 xval, void * data)
     //    yval = -yval;
     return yval;
 }
-s16 eval_chan_cb(void * data)
+s32 eval_chan_cb(void * data)
 {
     (void)data;
     int i;
@@ -207,7 +207,7 @@ s16 eval_chan_cb(void * data)
     }
     for (i = 0; i < mp->num_mixers; i++)
         MIXER_ApplyMixer(&mp->mixer[i], mp->raw, NULL);
-    s16 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, NULL, APPLY_ALL);
+    s32 value = MIXER_ApplyLimits(mp->cur_mixer->dest, &mp->limit, mp->raw, NULL, APPLY_ALL);
     if (value > CHAN_MAX_VALUE)
         return CHAN_MAX_VALUE;
     if (value < CHAN_MIN_VALUE)
@@ -376,13 +376,11 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     u8 *source = (u8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
-        strcpy(tempstring, _tr("None"));
+        tempstring_cpy(_tr("None"));
         return tempstring;
     }
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 1, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
+    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         if(mp->cur_template == MIXERTEMPLATE_COMPLEX) {
             guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
@@ -404,11 +402,9 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    u8 is_neg = MIXER_SRC_IS_INV(*source);
     u8 changed;
     u8 oldsrc = *source;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, &changed);
-    MIXER_SET_SRC_INV(*source, is_neg);
+    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         sync_mixers();
         if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
@@ -452,7 +448,7 @@ static void set_src_enable(int curve_type)
 static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data)
 {
     if (!GUI_IsTextSelectEnabled(obj)) {
-        strcpy(tempstring, _tr("Linked"));
+        tempstring_cpy(_tr("Linked"));
         return tempstring;
     }
     u8 changed;
@@ -513,6 +509,7 @@ static void reorder_return_cb(u8 *list)
     int i;
     if (list) {
         struct Mixer tmpmix[NUM_COMPLEX_MIXERS];
+        memset(tmpmix, 0, sizeof(tmpmix));
         int new_cur_mixer = mp->cur_mixer - mp->mixer;
         for(i = 0; i < NUM_COMPLEX_MIXERS; i++) {
             if(list[i] == 0)

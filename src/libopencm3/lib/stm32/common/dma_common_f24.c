@@ -61,9 +61,6 @@ void dma_stream_reset(uint32_t dma, uint8_t stream)
 {
 /* Disable stream (must be done before register is otherwise changed). */
 	DMA_SCR(dma, stream) &= ~DMA_SxCR_EN;
-/* Wait for DMA to complete (as documented in the Rference manual */
-	while((DMA_SCR(dma, stream)) & DMA_SxCR_EN)
-		;
 /* Reset all config bits. */
 	DMA_SCR(dma, stream) = 0;
 /* Reset data transfer number. */

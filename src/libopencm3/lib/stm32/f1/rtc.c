@@ -1,3 +1,19 @@
+/** @defgroup rtc_file RTC
+ *
+ * @ingroup STM32F1xx
+ *
+ * @brief <b>libopencm3 STM32F1xx RTC</b>
+ *
+ * @author @htmlonly &copy; @endhtmlonly 2010 Uwe Hermann <uwe@hermann-uwe.de>
+ * @author @htmlonly &copy; @endhtmlonly 2010 Lord James <lordjames@y7mail.com>
+ *
+ * @version 1.0.0
+ *
+ * @date 4 March 2013
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
+
 /*
  * This file is part of the libopencm3 project.
  *
@@ -17,14 +33,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**@{*/
 
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/rtc.h>
+
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/pwr.h>
 
-void rtc_awake_from_off(osc_t clock_source)
+void rtc_awake_from_off(enum rcc_osc clock_source)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Enable power and backup interface clocks. */
 	RCC_APB1ENR |= (RCC_APB1ENR_PWREN | RCC_APB1ENR_BKPEN);
@@ -67,6 +85,8 @@ void rtc_awake_from_off(osc_t clock_source)
 		RCC_BDCR |= (1 << 9) | (1 << 8);
 		break;
 	case PLL:
+	case PLL2:
+	case PLL3:
 	case HSI:
 		/* Unusable clock source, here to prevent warnings. */
 		/* Turn off clock sources to RTC. */
@@ -88,7 +108,7 @@ void rtc_awake_from_off(osc_t clock_source)
 
 void rtc_enter_config_mode(void)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Wait until the RTOFF bit is 1 (no RTC register writes ongoing). */
 	while ((reg32 = (RTC_CRL & RTC_CRL_RTOFF)) == 0);
@@ -99,7 +119,7 @@ void rtc_enter_config_mode(void)
 
 void rtc_exit_config_mode(void)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Exit configuration mode. */
 	RTC_CRL &= ~RTC_CRL_CNF;
@@ -108,7 +128,7 @@ void rtc_exit_config_mode(void)
 	while ((reg32 = (RTC_CRL & RTC_CRL_RTOFF)) == 0);
 }
 
-void rtc_set_alarm_time(u32 alarm_time)
+void rtc_set_alarm_time(uint32_t alarm_time)
 {
 	rtc_enter_config_mode();
 	RTC_ALRL = (alarm_time & 0x0000ffff);
@@ -130,7 +150,7 @@ void rtc_disable_alarm(void)
 	rtc_exit_config_mode();
 }
 
-void rtc_set_prescale_val(u32 prescale_val)
+void rtc_set_prescale_val(uint32_t prescale_val)
 {
 	rtc_enter_config_mode();
 	RTC_PRLL = prescale_val & 0x0000ffff;         /* PRL[15:0] */
@@ -138,22 +158,22 @@ void rtc_set_prescale_val(u32 prescale_val)
 	rtc_exit_config_mode();
 }
 
-u32 rtc_get_counter_val(void)
+uint32_t rtc_get_counter_val(void)
 {
 	return (RTC_CNTH << 16) | RTC_CNTL;
 }
 
-u32 rtc_get_prescale_div_val(void)
+uint32_t rtc_get_prescale_div_val(void)
 {
 	return (RTC_DIVH << 16) | RTC_DIVL;
 }
 
-u32 rtc_get_alarm_val(void)
+uint32_t rtc_get_alarm_val(void)
 {
 	return (RTC_ALRH << 16) | RTC_ALRL;
 }
 
-void rtc_set_counter_val(u32 counter_val)
+void rtc_set_counter_val(uint32_t counter_val)
 {
 	rtc_enter_config_mode();
 	RTC_CNTH = (counter_val & 0xffff0000) >> 16; /* CNT[31:16] */
@@ -219,9 +239,9 @@ void rtc_clear_flag(rtcflag_t flag_val)
 	}
 }
 
-u32 rtc_check_flag(rtcflag_t flag_val)
+uint32_t rtc_check_flag(rtcflag_t flag_val)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Read correct flag. */
 	switch (flag_val) {
@@ -244,7 +264,7 @@ u32 rtc_check_flag(rtcflag_t flag_val)
 
 void rtc_awake_from_standby(void)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Enable power and backup interface clocks. */
 	RCC_APB1ENR |= (RCC_APB1ENR_PWREN | RCC_APB1ENR_BKPEN);
@@ -261,9 +281,9 @@ void rtc_awake_from_standby(void)
 	while ((reg32 = (RTC_CRL & RTC_CRL_RTOFF)) == 0);
 }
 
-void rtc_auto_awake(osc_t clock_source, u32 prescale_val)
+void rtc_auto_awake(enum rcc_osc clock_source, uint32_t prescale_val)
 {
-	u32 reg32;
+	uint32_t reg32;
 
 	/* Enable power and backup interface clocks. */
 	RCC_APB1ENR |= (RCC_APB1ENR_PWREN | RCC_APB1ENR_BKPEN);
@@ -272,10 +292,14 @@ void rtc_auto_awake(osc_t clock_source, u32 prescale_val)
 	/* TODO: Not sure if this is necessary to just read the flag. */
 	PWR_CR |= PWR_CR_DBP;
 
-	if ((reg32 = RCC_BDCR & RCC_BDCR_RTCEN) != 0) {
+	reg32 = RCC_BDCR & RCC_BDCR_RTCEN;
+
+	if (reg32 != 0) {
 		rtc_awake_from_standby();
 	} else {
 		rtc_awake_from_off(clock_source);
 		rtc_set_prescale_val(prescale_val);
 	}
 }
+/**@}*/
+

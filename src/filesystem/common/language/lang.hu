@@ -6,7 +6,7 @@ Csatornák
 : is %d%%, safe value = %d%%\n
  = %d%%, a biztonságos érték = %d%%\n
 :n is %d%%,\nsafe value = %d%%
- = %d%%,\na biztonságos érték = %d%%\n
+ = %d%%,\nbiztonságos = %d%%\n
 :1 sec
 1 mp
 :1-to-1

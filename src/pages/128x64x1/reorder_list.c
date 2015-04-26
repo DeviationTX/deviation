@@ -60,30 +60,30 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
             list[i] = 0;
     }
 
-    u8 space = ITEM_HEIGHT + 1;
+    u8 space = LINE_HEIGHT;
     u8 y = 0;
     u8 w = 55;
 
-    guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, 0, y, w/2 -2, ITEM_HEIGHT,
+    guiObject_t *obj = GUI_CreateButtonPlateText(&gui->up, 0, y, w/2 -2, LINE_HEIGHT,
             &DEFAULT_FONT,  _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
     GUI_SetSelected(obj);
-    GUI_CreateButtonPlateText(&gui->down, w/2, y, w/2 -2 , ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->down, w/2, y, w/2 -2 , LINE_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
     y += space;
-    GUI_CreateTextSelectPlate(&gui->value, 0, y, w, ITEM_HEIGHT,
+    GUI_CreateTextSelectPlate(&gui->value, 0, y, w, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, copy_val_cb, NULL);
     y += space;
-    GUI_CreateButtonPlateText(&gui->apply, 0, y, w, ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->apply, 0, y, w, LINE_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
     if (max_allowed) {
         y += space;
-        GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButtonPlateText(&gui->remove, w/2, y, w/2 - 2, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->remove, w/2, y, w/2 - 2, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
     y += space;
-    GUI_CreateButtonPlateText(&gui->save, (w -30)/2, y, 30, ITEM_HEIGHT,
+    GUI_CreateButtonPlateText(&gui->save, (w -30)/2, y, 30, LINE_HEIGHT,
         &DEFAULT_FONT, NULL, 0x0000, _okcancel_cb, (void *)_tr("Save"));
 
     u8 x = w + 4;

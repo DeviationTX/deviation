@@ -56,11 +56,11 @@ u32 Crc(const void *buffer, u32 size)
  */
 const char *utf8_to_u32(const char *str, u32 *ch)
 {
-    char str1 = 0x3f & *(str + 1);
-    char str2 = 0x3f & *(str + 2);
-    char str3 = 0x3f & *(str + 2);
-    char str4 = 0x3f & *(str + 2);
-    char str5 = 0x3f & *(str + 2);
+    const char str1 = 0x3f & *(str + 1);
+    const char str2 = 0x3f & *(str + 2);
+    const char str3 = 0x3f & *(str + 3);
+    const char str4 = 0x3f & *(str + 4);
+    const char str5 = 0x3f & *(str + 5);
     if(! (*str & 0x80)) {
         *ch = *str;
         return str + 1;
@@ -93,6 +93,28 @@ const char *utf8_to_u32(const char *str, u32 *ch)
     return NULL;
 }
 
+//strlcpy from
+//http://stackoverflow.com/questions/1453876/why-does-strncpy-not-null-terminate
+size_t strlcpy(char* dst, const char* src, size_t bufsize)
+{
+  size_t srclen =strlen(src);
+  size_t result =srclen; /* Result is always the length of the src string */
+  if(bufsize>0)
+  {
+    if(srclen>=bufsize)
+       srclen=bufsize-1;
+    if(srclen>0)
+       memcpy(dst,src,srclen);
+    dst[srclen]='\0';
+  }
+  return result;
+}
+
+void tempstring_cpy(const char* src)
+{
+    strlcpy(tempstring, src, sizeof(tempstring));
+}
+
 int exact_atoi(const char *str)
 {
     char *endptr;
@@ -103,6 +125,29 @@ int exact_atoi(const char *str)
     return value;
 }
 
+static u32 rand_seed = 0xb2c54a2ful;
+// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
+static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
+static const uint32_t LFSR_INTAP = 32-1;
+static void update_lfsr(uint32_t *lfsr, uint8_t b)
+{
+    for (int i = 0; i < 8; ++i) {
+        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
+        b >>= 1;
+    }
+}
+u32 rand32_r(u32 *seed, u8 update)
+{
+    if(! seed)
+        seed = &rand_seed;
+    update_lfsr(seed, update);
+    return *seed;
+}
+u32 rand32()
+{
+    return rand32_r(0, 0);
+}
+
 int fexists(const char *file)
 {
    FILE *fh = fopen(file, "r");
@@ -111,3 +156,47 @@ int fexists(const char *file)
    fclose(fh);
    return 1;
 }
+
+/* USB */
+void wait_press()
+{
+    printf("Wait Press\n");
+    while(1) {
+        CLOCK_ResetWatchdog();
+        u32 buttons = ScanButtons();
+        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
+            break;
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+    printf("Pressed\n");
+}
+
+void wait_release()
+{
+    printf("Wait Release\n");
+    while(1) {
+        CLOCK_ResetWatchdog();
+        u32 buttons = ScanButtons();
+        if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
+            break;
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+    printf("Released\n");
+}
+
+void USB_Connect()
+{
+    USB_Enable(0, 1);
+    //Disable USB Exit
+    while(1) {
+        if(PWR_CheckPowerSwitch())
+            PWR_Shutdown();
+    }
+    wait_release();
+    wait_press();
+    wait_release();
+    USB_Disable();
+}
+

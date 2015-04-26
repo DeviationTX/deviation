@@ -21,10 +21,6 @@
 #include "../common/_chantest_page.c"
 
 static void show_button_page();
-static void _show_bar_page(u8 num_bars, u8 _page);
-
-static s8 page;
-static u8 num_pages;
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {
@@ -32,34 +28,32 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     (void)parent;
     (void)data;
     
-    s8 newpos = page + (direction > 0 ? 1 : -1);
+    int newpos = cur_row + (direction > 0 ? 1 : -1);
+    int endpos = gui->scrollbar.num_items - 1;
     if (newpos < 0)
         newpos = 0;
-    else if (newpos >= num_pages)
-        newpos = num_pages-1;
-    if (newpos != page) {
+    else if (newpos > endpos)
+        newpos = endpos;
+    if (newpos != cur_row) {
         GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
-        u8 count = (cp->type == MONITOR_CHANNELOUTPUT)
-            ? Model.num_channels
-            : NUM_INPUTS;
-        _show_bar_page(count, newpos);
+        _show_bar_page(newpos);
     }
-    return page;
+    return cur_row;
 }
 
-static void _show_bar_page(u8 num_bars, u8 _page)
+static void _show_bar_page(int row)
 {
-    long i;
+    cur_row = row;
+    int i;
     u8 height;
     u8 count;
+    int num_bars = num_disp_bars();
+    int num_rows = 1;
     int row_len;
-    page = _page;
-    num_pages = 0;
 
     if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
-        num_pages = (num_bars + NUM_BARS_PER_ROW - 1) / NUM_BARS_PER_ROW - 1;
-    
-        num_bars = num_bars - page * NUM_BARS_PER_ROW;
+        num_rows = num_bars / NUM_BARS_PER_ROW + 1;
+        num_bars -= cur_row * NUM_BARS_PER_ROW;
         if (num_bars > 2 * NUM_BARS_PER_ROW)
             num_bars = 2 * NUM_BARS_PER_ROW;
         row_len = NUM_BARS_PER_ROW;
@@ -76,30 +70,30 @@ static void _show_bar_page(u8 num_bars, u8 _page)
         height = 155 + (LCD_HEIGHT - 240);
         count = num_bars;
     }
-    u16 offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + count)) / 2;
+    u16 offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_rows > 2 ? 1 : 0) + count)) / 2;
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     for(i = 0; i < count; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 32,
-                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 50, 10, height,
+                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * i, 52, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)i);
+                                    showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * i - (SEPARATION - 10)/2, 53 + height,
-                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)(long)i);
     }
-    offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_pages > 1 ? 1 : 0) + (num_bars - count))) / 2;
+    offset = (LCD_WIDTH + (SEPARATION - 10) - SEPARATION * ((num_rows > 2 ? 1 : 0) + (num_bars - count))) / 2;
     for(i = count; i < num_bars; i++) {
         GUI_CreateLabelBox(&gui->chan[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 210 + (LCD_HEIGHT - 240) - height,
-                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(i+NUM_BARS_PER_ROW*page));
-        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 229 + (LCD_HEIGHT - 240) - height, 10, height,
+                                      SEPARATION, 19, &TINY_FONT, channum_cb, NULL, (void *)(long)i);
+        GUI_CreateBarGraph(&gui->bar[i], offset + SEPARATION * (i - count), 230 + (LCD_HEIGHT - 240) - height, 10, height,
                                     -100, 100, BAR_VERTICAL,
-                                    showchan_cb, (void *)i);
+                                    showchan_cb, (void *)(long)i);
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
-                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)i);
+                                      SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)(long)i);
     }
-    if(num_pages > 1) {
-        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_pages, NULL, scroll_cb, NULL);
-        GUI_SetScrollbar(&gui->scrollbar, page);
+    if(num_rows > 2) {
+        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_rows-1, NULL, scroll_cb, NULL);
+        GUI_SetScrollbar(&gui->scrollbar, cur_row);
     }
         
 }
@@ -110,8 +104,8 @@ void PAGE_ChantestInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
     cp->return_page = NULL;
-    cp->type = MONITOR_CHANNELOUTPUT;
-    _show_bar_page(Model.num_channels, 0);
+    cp->type = MONITOR_MIXEROUTPUT;
+    _show_bar_page(0);
 }
 
 void PAGE_InputtestInit(int page)
@@ -121,7 +115,7 @@ void PAGE_InputtestInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
     cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
-    _show_bar_page(NUM_INPUTS, 0);
+    _show_bar_page(0);
 }
 
 void PAGE_ButtontestInit(int page)
@@ -139,12 +133,12 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
     PAGE_SetModal(1);
     cp->return_page = return_page;
     cp->return_val = page;
-    cp->type = MONITOR_CHANNELOUTPUT;
+    cp->type = MONITOR_MIXEROUTPUT;
     PAGE_RemoveAllObjects();
 
     PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
 
-    _show_bar_page(Model.num_channels, 0);
+    _show_bar_page(0);
 }
 
 static void show_button_page()
@@ -155,20 +149,22 @@ static void show_button_page()
         OFFSET_Y    = ((LCD_HEIGHT - 240) / 2),
     };
     enum {X = 0, Y = 1};
+    struct LabelDesc alignRight = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_RIGHT };
     const int label_pos[NUM_TX_BUTTONS][2] = CHANTEST_BUTTON_PLACEMENT;
     cp->is_locked = 3;
     GUI_CreateLabelBox(&gui->lock, OFFSET_X, 34, 320, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);
     for (int i = 0; i < NUM_TX_BUTTONS; i++) {
         GUI_CreateLabelBox(&gui->value[i],
                 OFFSET_X + (label_pos[i][X] > 0 ? label_pos[i][X] + 50 : -label_pos[i][X] -20),    // >0? box at left side of label, otherwise right
-                OFFSET_Y + label_pos[i][Y] - 2,                                          // -2 to center box and label
+                OFFSET_Y + label_pos[i][Y],
                 16, 16,
                 &SMALLBOX_FONT, NULL, NULL, (void *)"");
         GUI_CreateLabelBox(&gui->chan[i],
                 OFFSET_X + abs(label_pos[i][X]),                                         // no differencing for the label
                 OFFSET_Y + label_pos[i][Y],
-                0, 0,
-                &DEFAULT_FONT, button_str_cb, NULL, (void *)(long)i);
+                48, 16,
+                label_pos[i][X] > 0 ? &alignRight : &DEFAULT_FONT,
+                button_str_cb, NULL, (void *)(long)i);
     }
 }
 
@@ -203,7 +199,36 @@ static inline guiObject_t *_get_obj(int chan, int objid)
 {
     return objid == ITEM_GRAPH ? (guiObject_t *)&gui->bar[chan] : (guiObject_t *)&gui->value[chan];
 }
-static inline int _get_input_idx(int chan)
+
+static const char *channum_cb(guiObject_t *obj, const void *data)
 {
-    return page * NUM_BARS_PER_ROW + chan;
+    (void)obj;
+    int disp = (long)data;
+    int ch = get_channel_idx(cur_row * NUM_BARS_PER_ROW + disp);
+    if (cp->type) {
+        char *p = tempstring;
+        if (disp & 0x01) {
+            *p = '\n';
+            p++;
+        }
+        CONFIG_EnableLanguage(0);  //Disable translation because tiny font is limited in character set
+        INPUT_SourceName(p, ch+1);
+        CONFIG_EnableLanguage(1);
+        if (! (disp & 0x01)) {
+            sprintf(p + strlen(p), "\n");
+        }
+    } else {
+        ch -= NUM_INPUTS;
+        if (ch < NUM_OUT_CHANNELS) {
+            sprintf(tempstring, "\n%d", ch+1);
+        } else {
+            ch -= NUM_OUT_CHANNELS;
+            if (Model.virtname[ch][0]) {
+                tempstring_cpy(Model.virtname[ch]) ;
+            } else {
+                sprintf(tempstring, "%s%d", _tr("Virt"), ch+1);
+            }
+        }
+    }
+    return tempstring;
 }

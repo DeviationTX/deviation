@@ -1,3 +1,17 @@
+/** @defgroup timer_defines Timer
+
+@brief <b>Defined Constants and Types for the LPC43xx timer</b>
+
+@ingroup LPC43xx_defines
+
+@version 1.0.0
+
+@author @htmlonly &copy; @endhtmlonly 2012 Michael Ossmann <mike@ossmann.com>
+
+@date 10 March 2013
+
+LGPL License Terms @ref lgpl_license
+ */
 /*
  * This file is part of the libopencm3 project.
  *
@@ -19,6 +33,8 @@
 
 #ifndef LPC43XX_TIMER_H
 #define LPC43XX_TIMER_H
+
+/**@{*/
 
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/lpc43xx/memorymap.h>
@@ -152,5 +168,103 @@
 #define TIMER1_CTCR                     TIMER_CTCR(TIMER1)
 #define TIMER2_CTCR                     TIMER_CTCR(TIMER2)
 #define TIMER3_CTCR                     TIMER_CTCR(TIMER3)
+
+/* --- TIMERx_IR values ----------------------------------------------------- */
+
+#define TIMER_IR_MR0INT                 (1 << 0)
+#define TIMER_IR_MR1INT                 (1 << 1)
+#define TIMER_IR_MR2INT                 (1 << 2)
+#define TIMER_IR_MR3INT                 (1 << 3)
+#define TIMER_IR_CR0INT                 (1 << 4)
+#define TIMER_IR_CR1INT                 (1 << 5)
+#define TIMER_IR_CR2INT                 (1 << 6)
+#define TIMER_IR_CR3INT                 (1 << 7)
+
+/* --- TIMERx_TCR values --------------------------------------------------- */
+
+#define TIMER_TCR_CEN                   (1 << 0)
+#define TIMER_TCR_CRST                  (1 << 1)
+
+/* --- TIMERx_MCR values --------------------------------------------------- */
+
+#define TIMER_MCR_MR0I                  (1 << 0)
+#define TIMER_MCR_MR0R                  (1 << 1)
+#define TIMER_MCR_MR0S                  (1 << 2)
+#define TIMER_MCR_MR1I                  (1 << 3)
+#define TIMER_MCR_MR1R                  (1 << 4)
+#define TIMER_MCR_MR1S                  (1 << 5)
+#define TIMER_MCR_MR2I                  (1 << 6)
+#define TIMER_MCR_MR2R                  (1 << 7)
+#define TIMER_MCR_MR2S                  (1 << 8)
+#define TIMER_MCR_MR3I                  (1 << 9)
+#define TIMER_MCR_MR3R                  (1 << 10)
+#define TIMER_MCR_MR3S                  (1 << 11)
+
+/* --- TIMERx_MCR values --------------------------------------------------- */
+
+#define TIMER_CCR_CAP0RE                (1 << 0)
+#define TIMER_CCR_CAP0FE                (1 << 1)
+#define TIMER_CCR_CAP0I                 (1 << 2)
+#define TIMER_CCR_CAP1RE                (1 << 3)
+#define TIMER_CCR_CAP1FE                (1 << 4)
+#define TIMER_CCR_CAP1I                 (1 << 5)
+#define TIMER_CCR_CAP2RE                (1 << 6)
+#define TIMER_CCR_CAP2FE                (1 << 7)
+#define TIMER_CCR_CAP2I                 (1 << 8)
+#define TIMER_CCR_CAP3RE                (1 << 9)
+#define TIMER_CCR_CAP3FE                (1 << 10)
+#define TIMER_CCR_CAP3I                 (1 << 11)
+
+/* --- TIMERx_EMR values --------------------------------------------------- */
+
+#define TIMER_EMR_EM0                   (1 << 0)
+#define TIMER_EMR_EM1                   (1 << 1)
+#define TIMER_EMR_EM2                   (1 << 2)
+#define TIMER_EMR_EM3                   (1 << 3)
+#define TIMER_EMR_EMC0_SHIFT            4
+#define TIMER_EMR_EMC0_MASK             (0x3 << TIMER_EMR_EMC0_SHIFT)
+#define TIMER_EMR_EMC1_SHIFT            6
+#define TIMER_EMR_EMC1_MASK             (0x3 << TIMER_EMR_EMC1_SHIFT)
+#define TIMER_EMR_EMC2_SHIFT            8
+#define TIMER_EMR_EMC2_MASK             (0x3 << TIMER_EMR_EMC2_SHIFT)
+#define TIMER_EMR_EMC3_SHIFT            10
+#define TIMER_EMR_EMC3_MASK             (0x3 << TIMER_EMR_EMC3_SHIFT)
+
+#define TIMER_EMR_EMC_NOTHING           0x0
+#define TIMER_EMR_EMC_CLEAR             0x1
+#define TIMER_EMR_EMC_SET               0x2
+#define TIMER_EMR_EMC_TOGGLE            0x3
+
+/* --- TIMERx_CTCR values -------------------------------------------------- */
+
+#define TIMER_CTCR_MODE_TIMER           (0x0 << 0)
+#define TIMER_CTCR_MODE_COUNTER_RISING  (0x1 << 0)
+#define TIMER_CTCR_MODE_COUNTER_FALLING (0x2 << 0)
+#define TIMER_CTCR_MODE_COUNTER_BOTH    (0x3 << 0)
+#define TIMER_CTCR_MODE_MASK            (0x3 << 0)
+
+#define TIMER_CTCR_CINSEL_CAPN_0        (0x0 << 2)
+#define TIMER_CTCR_CINSEL_CAPN_1        (0x1 << 2)
+#define TIMER_CTCR_CINSEL_CAPN_2        (0x2 << 2)
+#define TIMER_CTCR_CINSEL_CAPN_3        (0x3 << 2)
+#define TIMER_CTCR_CINSEL_MASK          (0x3 << 2)
+
+/* --- TIMER function prototypes ------------------------------------------- */
+
+BEGIN_DECLS
+
+void timer_reset(uint32_t timer_peripheral);
+void timer_enable_counter(uint32_t timer_peripheral);
+void timer_disable_counter(uint32_t timer_peripheral);
+uint32_t timer_get_counter(uint32_t timer_peripheral);
+void timer_set_counter(uint32_t timer_peripheral, uint32_t count);
+uint32_t timer_get_prescaler(uint32_t timer_peripheral);
+void timer_set_prescaler(uint32_t timer_peripheral, uint32_t prescaler);
+void timer_set_mode(uint32_t timer_peripheral, uint32_t mode);
+void timer_set_count_input(uint32_t timer_peripheral, uint32_t input);
+
+END_DECLS
+
+/**@}*/
 
 #endif

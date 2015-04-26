@@ -14,10 +14,17 @@
 #define HAS_TELEMETRY       1
 #define HAS_TOUCH           1
 #define HAS_RTC             0
-#define HAS_VIBRATINGMOTOR  0
+#define HAS_VIBRATINGMOTOR  OPTIONAL
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
+#define HAS_MULTIMOD_SUPPORT 1
+#define HAS_EXTRA_SWITCHES  0
 
+#ifdef BUILDTYPE_DEV
+   #define DEBUG_WINDOW_SIZE 200
+#else
+   #define DEBUG_WINDOW_SIZE 0
+#endif
 #define MIN_BRIGHTNESS 1 
 #define DEFAULT_BATTERY_ALARM 4000
 #define DEFAULT_BATTERY_CRITICAL 3800

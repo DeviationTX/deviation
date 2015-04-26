@@ -20,20 +20,21 @@
 
 #include "common.h"
 #include "protocol/interface.h"
+#include "config/tx.h"
 #include "fltk.h"
 
 #undef usleep
 void _usleep(u32 usec) {
     usleep(usec);
 }
-void TxName(u8 *var, u8 len) {
+void TxName(u8 *var, int len) {
     const u8 model[] = EMU_STRING;
     if(len > 12)
          len = 12;
     memcpy(var, model, len - 1);
     var[len-1] = 0;
 }
-void USB_Enable(u8 type, u8 use_interrupt) {
+void USB_Enable(unsigned type, unsigned use_interrupt) {
     (void) type;
     (void)use_interrupt;
 }
@@ -47,7 +48,7 @@ void HID_Write(s8 *pkt, u8 size) {
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
 void PWR_Sleep() {}
-u16  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
+unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
 
 void CLOCK_StartWatchdog() {}
@@ -63,7 +64,7 @@ void CLOCK_ResetWatchdog() {
 
 void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
-void SPI_FlashBlockWriteEnable(u8 enable) {(void)enable;}
+void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
 
 u8 *BOOTLOADER_Read(int idx) {
@@ -96,7 +97,7 @@ int FS_ReadDir(char *path)
     struct dirent *dir = readdir(dh);
     if (! dir)
         return 0;
-    strncpy(path, dir->d_name, 13);
+    strlcpy(path, dir->d_name, 13);
     return 1;
 }
 
@@ -105,8 +106,8 @@ void FS_CloseDir() {
 }
 
 void BACKLIGHT_Init() {}
-void BACKLIGHT_Brightness(u8 brightness) { printf("Brightness: %d\n", brightness); }
-void LCD_Contrast(u8 contrast) { printf("Contrast: %d\n", contrast); }
+void BACKLIGHT_Brightness(unsigned brightness) { printf("Brightness: %d\n", brightness); }
+void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
 
 void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}
@@ -116,7 +117,7 @@ void PPMin_Start() {}
 void PPMin_Stop() {}
 void PPMin_TIM_Init() {}
 volatile u8 ppmSync;
-volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];
+volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];
 volatile u8 ppmin_num_channels;
 
 void fempty(FILE *fh)
@@ -127,4 +128,22 @@ void fempty(FILE *fh)
     ftruncate(fd, 0);
     ftruncate(fd, pos);
     fseek(fh, 0, SEEK_SET);
+}
+
+void MCU_SerialNumber(u8 *var, int len)
+{
+    int l = len > 12 ? 12 : len;
+    if(Transmitter.txid) {
+        u32 id[4];
+        u32 seed = 0x4d3ab5d0ul;
+        for(int i = 0; i < 4; i++)
+            rand32_r(&seed, Transmitter.txid >> (8*i));
+        for(int i = 0; i < 4; i++)
+            id[i] = rand32_r(&seed, 0x00);
+        memcpy(var, &id[1], len);
+        return;
+    }
+    const char data[] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+                         0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
+    memcpy(var, data, l);
 }

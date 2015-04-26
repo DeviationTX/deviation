@@ -19,23 +19,26 @@
 #include "config/model.h"
 #include "config/tx.h"
 
+#include <stdlib.h>
+
 extern struct FAT FontFAT; //defined in screen/lcd_string.c
 
 //Not static because we need it in mixer.c
-const u8 const EATRG[PROTO_MAP_LEN] =
+const u8 EATRG[PROTO_MAP_LEN] =
     { INP_ELEVATOR, INP_AILERON, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
-static const u8 const TAERG[PROTO_MAP_LEN] = 
+static const u8 TAERG[PROTO_MAP_LEN] = 
     { INP_THROTTLE, INP_AILERON, INP_ELEVATOR, INP_RUDDER, INP_GEAR1 };
-static const u8 const AETRG[PROTO_MAP_LEN] = 
+static const u8 AETRG[PROTO_MAP_LEN] = 
     { INP_AILERON, INP_ELEVATOR, INP_THROTTLE, INP_RUDDER, INP_GEAR1 };
 
 static u8 proto_state;
 static u32 bind_time;
-#define PROTO_DEINIT  0x00
-#define PROTO_INIT    0x01
-#define PROTO_READY   0x02
-#define PROTO_BINDING 0x04
-#define PROTO_BINDDLG 0x08
+#define PROTO_DEINIT    0x00
+#define PROTO_INIT      0x01
+#define PROTO_READY     0x02
+#define PROTO_BINDING   0x04
+#define PROTO_BINDDLG   0x08
+#define PROTO_MODULEDLG 0x10
 
 #define PROTODEF(proto, module, map, cmd, name) map,
 const u8 *ProtocolChannelMap[PROTOCOL_COUNT] = {
@@ -58,9 +61,12 @@ const char * const ProtocolNames[PROTOCOL_COUNT] = {
     #include "protocol.h"
 };
 #undef PROTODEF
+static int get_module(int idx);
 
 void PROTOCOL_Init(u8 force)
 {
+    if(! force && (proto_state & PROTO_MODULEDLG))
+        return;
     PROTOCOL_DeInit();
     PROTOCOL_Load(0);
     proto_state = PROTO_INIT;
@@ -160,6 +166,7 @@ void PROTOCOL_Load(int no_dlg)
     }
     #undef PROTODEF
 #endif
+    PROTOCOL_SetSwitch(get_module(Model.protocol));
 }
  
 u8 PROTOCOL_WaitingForSafe()
@@ -187,6 +194,7 @@ void PROTOCOL_SetBindState(u32 msec)
         else
             bind_time = CLOCK_getms() + msec;
         proto_state |= PROTO_BINDING;
+        PROTOCOL_SticksMoved(1);  //Initialize Stick position
     } else {
         proto_state &= ~PROTO_BINDING;
     }
@@ -209,7 +217,7 @@ int PROTOCOL_MapChannel(int input, int default_ch)
 u64 PROTOCOL_CheckSafe()
 {
     int i;
-    volatile s16 *raw = MIXER_GetInputs();
+    volatile s32 *raw = MIXER_GetInputs();
     u64 unsafe = 0;
     for(i = 0; i < NUM_SOURCES + 1; i++) {
         if (! Model.safety[i])
@@ -221,15 +229,15 @@ u64 PROTOCOL_CheckSafe()
         } else {
             ch = i-1;
         }
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
+        s32 val = RANGE_TO_PCT((ch < NUM_INPUTS)
                       ? raw[ch+1]
                       : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
         if (Model.safety[i] == SAFE_MIN && val > -99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_ZERO && (val < -1 || val > 1))
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
         else if (Model.safety[i] == SAFE_MAX && val < 99)
-            unsafe |= 1LL << i;
+            unsafe |= 1ULL << i;
     }
     return unsafe;
 }
@@ -297,9 +305,9 @@ void PROTOCOL_SetOptions()
         PROTO_Cmds(PROTOCMD_SETOPTIONS);
 }
 
-s8 PROTOCOL_GetTelemetryState()
+int PROTOCOL_GetTelemetryState()
 {
-    s8 telem_state=  -1;  // -1 means not support
+    int telem_state = PROTO_TELEM_UNSUPPORTED;
     if(Model.protocol != PROTOCOL_NONE && PROTOCOL_LOADED)
         telem_state = (long)PROTO_Cmds(PROTOCMD_TELEMETRYSTATE);
     return telem_state;
@@ -307,6 +315,14 @@ s8 PROTOCOL_GetTelemetryState()
 
 void PROTOCOL_CheckDialogs()
 {
+    if (proto_state & PROTO_MODULEDLG) {
+        if(! PAGE_DialogVisible()) {
+            //Dialog was dismissed, proceed
+            proto_state &= ~PROTO_MODULEDLG;
+            PROTOCOL_Init(0);
+        }
+        return;
+    }
     if (PROTOCOL_WaitingForSafe()) {
         PAGE_ShowSafetyDialog();
     } else {
@@ -345,4 +361,93 @@ int PROTOCOL_HasPowerAmp(int idx)
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
     return 0;
+}
+
+int PROTOCOL_SetSwitch(int module)
+{
+    (void)module;
+#if HAS_MULTIMOD_SUPPORT
+    if (! Transmitter.module_enable[MULTIMOD].port)
+        return 0;
+    u8 csn = SPI_ProtoGetPinConfig(module, CSN_PIN);
+    return SPI_ConfigSwitch(0x0f, 0x0f ^ csn);
+#else
+    return 0;
+#endif
+}
+
+int PROTOCOL_SticksMoved(int init)
+{
+    const s32 STICK_MOVEMENT = 15;   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
+    static s32 ele_start, ail_start;
+    s32 ele = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
+    s32 ail = CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
+    if(init) {
+        ele_start = ele;
+        ail_start = ail;
+        return 0;
+    }
+    s32 ele_diff = abs(ele_start - ele);
+    s32 ail_diff = abs(ail_start - ail);
+    return ((ele_diff + ail_diff > 2 * STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
+}
+
+void PROTOCOL_InitModules()
+{
+#if HAS_MULTIMOD_SUPPORT
+    int error = 0;
+    const char * missing[TX_MODULE_LAST];
+    memset(missing, 0, sizeof(missing));
+
+    if (PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+        //No Switch found
+/*
+        missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
+        for(int i = 0; i < MULTIMOD; i++) {
+            if(Transmitter.module_enable[i].port == SWITCH_ADDRESS) {
+                error = 1;
+                printf("Disabling %s because switch wasn't found\n", MODULE_NAME[i]);
+                missing[i] = MODULE_NAME[i];
+                Transmitter.module_enable[i].port = 0;
+            }
+        }
+*/
+    }
+    int orig_proto = Model.protocol;
+    for(int i = 0; i < MULTIMOD; i++) {
+        if(Transmitter.module_enable[i].port) {
+            for(int j = 1; j < PROTOCOL_COUNT; j++) {
+                if (get_module(j) == i) {
+                    //Try this module
+                    Model.protocol = j;
+                    PROTOCOL_Load(1);
+                    int res = (long)PROTO_Cmds(PROTOCMD_RESET);
+                    if (res == 0)
+                        continue;
+                    if (res < 0) {
+                        error = 1;
+                        missing[i] = MODULE_NAME[i];
+                        if (! (Transmitter.extra_hardware & FORCE_MODULES))
+                            Transmitter.module_enable[i].port = 0;
+                    }
+                    break;
+                }
+            } 
+        }
+    }
+    //Put this last because the switch will not respond until after it has been initialized
+    if (Transmitter.module_enable[MULTIMOD].port && PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
+        //No Switch found
+	error = 1;
+        missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
+    }
+    Model.protocol = orig_proto;
+    if(error) {
+        proto_state |= PROTO_MODULEDLG;
+        PAGE_ShowModuleDialog(missing);
+    } else
+#endif //HAS_MULTIMOD_SUPPORT
+    {
+        PROTOCOL_Init(0);
+    }
 }

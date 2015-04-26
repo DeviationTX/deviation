@@ -1,13 +1,23 @@
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
-#define NUM_TELEM 9
+#define NUM_DEVO_TELEM 9
+#define NUM_DSM_TELEM  10
+#define NUM_FRSKY_TELEM  7
+#define NUM_TELEM (NUM_DEVO_TELEM > NUM_DSM_TELEM              \
+                      ? (NUM_DEVO_TELEM > NUM_FRSKY_TELEM      \
+                          ? NUM_DEVO_TELEM : NUM_FRSKY_TELEM)  \
+                      : (NUM_DSM_TELEM > NUM_FRSKY_TELEM       \
+                          ? NUM_DSM_TELEM : NUM_FRSKY_TELEM)   \
+                   )
 #define TELEM_ERROR_TIME 5000
 #define TELEM_NUM_ALARMS 6
 
+#define HAS_DSM_EXTENDED_TELEMETRY 0
 enum {
     TELEM_DEVO,
     TELEM_DSM,
+    TELEM_FRSKY,
 };
 
 enum {
@@ -33,6 +43,7 @@ enum {
     TELEM_DSM_FLOG_VOLT2,
     TELEM_DSM_FLOG_RPM1,
     TELEM_DSM_FLOG_TEMP1,
+#if HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_AMPS1,
     TELEM_DSM_PBOX_VOLT1,
     TELEM_DSM_PBOX_VOLT2,
@@ -58,9 +69,26 @@ enum {
     TELEM_DSM_JETCAT_RPM,
     TELEM_DSM_JETCAT_TEMPEGT,
     TELEM_DSM_JETCAT_OFFCOND,
+#endif //HAS_DSM_EXTENDED_TELEMETRY
     TELEM_DSM_LAST,
 };
-#define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST) ? (int)TELEM_DSM_LAST : (int)TELEM_DEVO_LAST)
+
+enum {
+    TELEM_FRSKY_VOLT1 = 1,
+    TELEM_FRSKY_VOLT2,
+    TELEM_FRSKY_VOLT3,
+    TELEM_FRSKY_TEMP1,
+    TELEM_FRSKY_TEMP2,
+    TELEM_FRSKY_RPM,
+    TELEM_FRSKY_ALTITUDE,
+    TELEM_FRSKY_LAST
+};
+#define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
+                               ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
+                                   ? (int)TELEM_DSM_LAST : (int)TELEM_FRSKY_LAST)  \
+                               : (((int)TELEM_DEVO_LAST > (int)TELEM_FRSKY_LAST)   \
+                                   ? (int)TELEM_DEVO_LAST : (int)TELEM_FRSKY_LAST) \
+                          )
 enum {
     TELEM_GPS_LAT = TELEM_VALS,
     TELEM_GPS_LONG,
@@ -99,6 +127,7 @@ struct telem_devo {
     u16 rpm[2];
 };
 struct telem_dsm_flog {
+    //Do not change the order of these, they are aligned to the dsm packet
     u8 fades[4];
     u8 frameloss;
     u8 holds;
@@ -146,16 +175,33 @@ struct telem_dsm {
     struct telem_dsm_jetcat  jetcat;
 };
 
+struct telem_frsky {
+    u16 volt[3];
+    s16 temp[2];
+    u16 rpm;
+    s32 altitude;
+    //u16 current;
+    //u16 fuel;
+};
+
 #define TELEM_UPDATE_SIZE (((TELEM_VALS + 7)+ 7) / 8)
 struct Telemetry {
     union {
-        struct telem_devo devo;
-        struct telem_dsm  dsm;
+        struct telem_devo  devo;
+        struct telem_dsm   dsm;
+        struct telem_frsky frsky;
     } p;
     struct gps gps;
     u16 capabilities;
     volatile u8 updated[TELEM_UPDATE_SIZE];
 };
+
+enum {
+    PROTO_TELEM_UNSUPPORTED = -1,
+    PROTO_TELEM_OFF = 0,
+    PROTO_TELEM_ON  = 1,
+};
+
 extern struct Telemetry Telemetry; 
 s32 TELEMETRY_GetValue(int idx);
 s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx);
@@ -171,4 +217,6 @@ void TELEMETRY_SetUpdated(int telem);
 int TELEMETRY_Type();
 void TELEMETRY_SetType(int type);
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol);
+int TELEMETRY_GetNumTelemSrc();
+int TELEMETRY_GetNumTelem();
 #endif

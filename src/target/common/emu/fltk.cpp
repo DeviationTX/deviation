@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/timeb.h>
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
@@ -36,12 +35,17 @@
 #include <FL/fl_ask.H>
 
 #define USE_OWN_PRINTF 0 //Disable sprintf mappingdue to need for %f
+//Windows
+#ifdef OPTIONAL
+    #undef OPTIONAL
+#endif
 extern "C" {
 #include "common.h"
 #include "fltk.h"
 #include "mixer.h"
 #include "config/tx.h"
 }
+
 
 static const u16 keymap[BUT_LAST] = BUTTON_MAP;
 
@@ -138,7 +142,7 @@ public:
                     gui.aileron = 0;
                 return 1;
             case 'z':
-                gui.gear = ! gui.gear;
+                gui.gear = (gui.gear + 1) % 6;
                 return 1;
             case 'x':
                 gui.rud_dr = (gui.rud_dr + 1) % 6;
@@ -151,10 +155,10 @@ public:
                 gui.dr = gui.ail_dr; /* for Devo6 */
                 return 1;
             case 'b':
-                gui.mix = (gui.mix + 1) % 3;
+                gui.mix = (gui.mix + 1) % 6;
                 return 1;
             case 'n':
-                gui.fmod = (gui.fmod + 1) % 3;
+                gui.fmod = (gui.fmod + 1) % 6;
                 return 1;
             case 'o':
                 if(++gui.aux2 > 10)
@@ -213,10 +217,10 @@ public:
                     gui.aux7 = 0;
                 return 1;
             case 'm':
-                gui.hold = ! gui.hold;
+                gui.hold = (gui.hold + 1) % 6;
                 return 1;
             case ',':
-                gui.trn = ! gui.trn;
+                gui.trn = (gui.trn + 1) % 6;
                 return 1;
 #ifdef KEYBOARD_LAYOUT_QWERTZ
 			//only to be prepared ü+ö#.-
@@ -587,7 +591,7 @@ void CLOCK_Init()
     }
 }
 #endif
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void))
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
 {
     timer_callback = cb;
     msec_cbtime[TIMER_ENABLE] = CLOCK_getms() + us;
@@ -612,10 +616,10 @@ void CLOCK_ClearMsecCallback(int cb)
 
 u32 CLOCK_getms()
 {
-    struct timeb tp;
+    struct timeval tp;
     u32 t;
-    ftime(&tp);
-    t = (tp.time * 1000) + tp.millitm;
+    gettimeofday(&tp, NULL);
+    t = (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
     return t;
 }
 }

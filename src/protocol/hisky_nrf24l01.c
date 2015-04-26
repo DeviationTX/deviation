@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc apply this to definitions, others to calls
@@ -157,6 +158,7 @@ static void hisky_init()
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, 81); // binding packet must be set in channel 81
 
     // 2-bytes CRC, radio off
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG,
             BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address (byte -2)
@@ -206,6 +208,7 @@ static void hisky_init()
 }
 
 // HiSky channel sequence: AILE  ELEV  THRO  RUDD  GEAR  PITH, channel data value is from 0 to 1000
+ // Channel 7 - Gyro mode, 0 - 6 axis, 3 - 3 axis 
 static void build_ch_data()
 {
     s32 temp;
@@ -217,6 +220,8 @@ static void build_ch_data()
             temp = (s32)Channels[i] * 450/CHAN_MAX_VALUE + 500; // max/min servo range is +-125%
             if (i == 2) // It is clear that hisky's thro stick is made reversely, so I adjust it here on purpose
                 temp = 1000 -temp;
+            if (i == 6)
+                temp = Channels[i] <= 0 ? 0 : 3;
             if (temp < 0)
                 ch_data[i] = 0;
             else if (temp > 1000)
@@ -295,18 +300,6 @@ static u16 hisky_cb()
 #endif
 }
 
-// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
-static const uint32_t LFSR_INTAP = 32-1;
-
-static void update_lfsr(uint32_t *lfsr, uint8_t b)
-{
-    for (int i = 0; i < 8; ++i) {
-        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
-        b >>= 1;
-    }
-}
-
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
 static void initialize_tx_id()
 {
@@ -318,21 +311,21 @@ static void initialize_tx_id()
     printf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
         printf("%02X", var[i]);
-        update_lfsr(&lfsr, var[i]);
+        rand32_r(&lfsr, var[i]);
     }
     printf("\r\n");
 #endif
 
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(&lfsr, 0);
+    for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
     for (u8 i = 0; i < TXID_SIZE; ++i) {
         rf_adr_buf[i] = lfsr & 0xff;
-        update_lfsr(&lfsr, i);
+        rand32_r(&lfsr, i);
     }
 
     printf("Effective id: %02X%02X%02X%02X%02X\r\n",
@@ -340,7 +333,7 @@ static void initialize_tx_id()
 
     // Use LFSR to seed frequency hopping sequence after another
     // divergence round
-    for (u8 i = 0; i < sizeof(lfsr); ++i) update_lfsr(&lfsr, 0);
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     calc_fh_channels(lfsr);
 
     printf("FH Seq: ");
@@ -373,13 +366,16 @@ const void *HiSky_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(0); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *)7L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

@@ -20,8 +20,8 @@
 #ifndef LIBOPENCM3_WWDG_H
 #define LIBOPENCM3_WWDG_H
 
-#include <libopencm3/stm32/memorymap.h>
 #include <libopencm3/cm3/common.h>
+#include <libopencm3/stm32/memorymap.h>
 
 /* --- WWDG registers ------------------------------------------------------ */
 
@@ -76,7 +76,7 @@
 /* EWIF: Early wakeup interrupt flag */
 #define WWDG_SR_EWIF			(1 << 0)
 
-/* --- WWDG funtion prototypes---------------------------------------------- */
+/* --- WWDG function prototypes---------------------------------------------- */
 
 /* TODO */
 

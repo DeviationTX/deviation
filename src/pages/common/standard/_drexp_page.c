@@ -54,13 +54,13 @@ static const char *set_type_cb(guiObject_t *obj, int dir, void *data)
     }
     switch (drexp_type) {
     case DREXP_AIL:
-        strcpy(tempstring, (const char *)_tr("AIL"));
+        tempstring_cpy((const char *)_tr("AIL"));
         break;
     case DREXP_ELE:
-        strcpy(tempstring, (const char *)_tr("ELE"));
+        tempstring_cpy((const char *)_tr("ELE"));
         break;
     default:
-        strcpy(tempstring, (const char *)_tr("RUD"));
+        tempstring_cpy((const char *)_tr("RUD"));
         break;
     }
     return tempstring;
@@ -103,7 +103,7 @@ static const char *set_exp_cb(guiObject_t *obj, int dir, void *data)
         update_graph(pit_mode);
     }
     if (curve->points[0] == 0)
-        strcpy(tempstring, _tr("LIN"));
+        tempstring_cpy(_tr("LIN"));
     else {
         sprintf(tempstring, "%d", curve->points[0]);
         strcat(tempstring, "%");
@@ -128,11 +128,11 @@ static u8 curpos_cb(s16 *x, s16 *y, u8 pos, void *data)
     return 1;
 }
 
-static s16 show_curve_cb(s16 xval, void *data)
+static s32 show_curve_cb(s32 xval, void *data)
 {
     (void)data;
     int idx = data ? ((long)data - 1) : current_pit_mode;
-    s16 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[idx]->curve));
+    s32 yval = CURVE_Evaluate(xval, &(mp->mixer_ptr[idx]->curve));
     yval = yval * mp->mixer_ptr[idx]->scalar / 100 ;
     return yval;
 }

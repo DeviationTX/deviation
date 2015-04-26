@@ -75,7 +75,7 @@ static void _show_page()
                 break;
         if (idx != NUM_MIXERS) {
             enum TemplateType template = MIXER_GetTemplate(ch);
-            labelDesc.style = LABEL_LEFTCENTER;
+            labelDesc.style = LABEL_LEFT;
             GUI_CreateLabelBox(&gui->src[i], 0, row, w1, h, &labelDesc, show_source, NULL, &mix[idx].src);
             if (template == MIXERTEMPLATE_EXPO_DR) {
                 if (mix[idx].src == mix[idx+1].src && mix[idx].dest == mix[idx+1].dest && mix[idx+1].sw) {
@@ -186,3 +186,6 @@ unsigned action_cb(u32 button, unsigned flags, void *data)
     return 1;
 }
 
+void PAGE_MixerExit()
+{
+}

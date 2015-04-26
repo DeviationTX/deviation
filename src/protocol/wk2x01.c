@@ -23,6 +23,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   #pragma long_calls_off
@@ -74,20 +75,19 @@ static u8 *radio_ch_ptr;
 static u8 pkt_num;
 static u8 last_beacon;
 
-#define STICK_MOVEMENT 15   // defines when the bind dialog should be interrupted (stick movement STICK_MOVEMENT %)
-s16 ele_start, ail_start;
-u8 sticks_moved();
-
 static const char * const wk2601_opts[] = {
   _tr_noop("Chan mode"), _tr_noop("5+1"), _tr_noop("Heli"), _tr_noop("6+1"), NULL,
   _tr_noop("COL Inv"), _tr_noop("Normal"), _tr_noop("Inverted"), NULL,
   _tr_noop("COL Limit"), "-100", "100", NULL,
   NULL
 };
-#define WK2601_OPT_CHANMODE  0
-#define WK2601_OPT_PIT_INV   1
-#define WK2601_OPT_PIT_LIMIT 2
-
+enum {
+    WK2601_OPT_CHANMODE = 0,
+    WK2601_OPT_PIT_INV,
+    WK2601_OPT_PIT_LIMIT,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 static void add_pkt_crc(u8 init)
 {
@@ -419,8 +419,7 @@ void WK_BuildPacket_2801()
     switch(state) {
         case WK_BIND:
             build_bind_pkt(init_2801);
-            if ((--bind_counter == 0) || sticks_moved()) {
-                ele_start = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
+            if ((--bind_counter == 0) || PROTOCOL_SticksMoved(0)) {
                 bind_counter = 0;
                 PROTOCOL_SetBindState(0);
                 state = WK_BOUND_1;
@@ -454,8 +453,7 @@ void WK_BuildPacket_2601()
     if (bind_counter) {
         bind_counter--;
         build_bind_pkt(init_2601);
-        if ((bind_counter == 0) || sticks_moved()) {
-            ele_start = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
+        if ((bind_counter == 0) || PROTOCOL_SticksMoved(0)) {
             bind_counter = 0;
             PROTOCOL_SetBindState(0);
         }
@@ -470,8 +468,7 @@ void WK_BuildPacket_2401()
     if (bind_counter) {
         bind_counter--;
         build_bind_pkt(init_2401);
-        if ((bind_counter == 0) || sticks_moved()) {
-            ele_start = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
+        if ((bind_counter == 0) || PROTOCOL_SticksMoved(0)) {
             bind_counter = 0;
             PROTOCOL_SetBindState(0);
         }
@@ -511,9 +508,8 @@ static u16 wk_cb()
     return 1200;
 }
 
-static void bind()
+static void wk_bind()
 {
-    ele_start = CHAN_MAX_VALUE  - CHAN_MIN_VALUE;   // set an invalid value for checking stick movement
     if((Model.protocol != PROTOCOL_WK2801) || (! Model.fixed_id))
         return;
     fixed_id = ((Model.fixed_id << 2)  & 0x0ffc00) |
@@ -528,7 +524,7 @@ static void initialize()
     CLOCK_StopTimer();
     CYRF_Reset();
     cyrf_init();
-    CYRF_ConfigRxTx(1);
+    CYRF_SetTxRxMode(TX_EN);
     set_radio_channels();
     radio_ch_ptr = radio_ch;
     CYRF_ConfigRFChannel(*radio_ch_ptr);
@@ -568,7 +564,7 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEINIT: return 0;
         case PROTOCMD_CHECK_AUTOBIND:
             return (Model.protocol == PROTOCOL_WK2801 && Model.fixed_id) ? 0 : (void *)1L;
-        case PROTOCMD_BIND:  bind(); return 0;
+        case PROTOCMD_BIND:  wk_bind(); return 0;
         case PROTOCMD_DEFAULT_NUMCHAN: return (Model.protocol == PROTOCOL_WK2801)
               ? (void *)8L
               : (Model.protocol == PROTOCOL_WK2601)
@@ -583,30 +579,10 @@ const void *WK2x01_Cmds(enum ProtoCmds cmd)
             if(Model.protocol == PROTOCOL_WK2601)
                 return wk2601_opts;
             break;
-        case PROTOCMD_TELEMETRYSTATE:
-            return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;
 }
 
-u8 sticks_moved()
-{
-    if (ele_start == CHAN_MAX_VALUE - CHAN_MIN_VALUE) {
-        ele_start = CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
-        ail_start = CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
-        return 0;
-    }
-    s16 ele_diff = ele_start - CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR));
-    s16 ail_diff = ail_start - CHAN_ReadInput(MIXER_MapChannel(INP_AILERON));
-    if (ele_diff < 0) ele_diff = -ele_diff;
-    if (ail_diff < 0) ail_diff = -ail_diff;
-    return ((ele_diff + ail_diff > 2 * STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
-//    ||
-//            (ail_now > STICK_MOVEMENT * CHAN_MAX_VALUE / 100));
-//    return ((CHAN_ReadInput(MIXER_MapChannel(INP_AILERON)) > STICK_MOVEMENT * CHAN_MAX_VALUE / 100) ||
-//            (CHAN_ReadInput(MIXER_MapChannel(INP_AILERON)) < STICK_MOVEMENT * CHAN_MIN_VALUE / 100) ||
-//            (CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR)) > STICK_MOVEMENT * CHAN_MAX_VALUE / 100) ||
-//            (CHAN_ReadInput(MIXER_MapChannel(INP_ELEVATOR)) < STICK_MOVEMENT * CHAN_MIN_VALUE / 100));
-}
 #endif //PROTO_HAS_CYRF6936

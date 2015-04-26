@@ -52,7 +52,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     u8 space = ITEM_HEIGHT + 1;
     u8 y = space;
     w = 74;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
 
     if (type >= CURVE_3POINT) {
         GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
@@ -68,7 +68,7 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     }
 
     y += space;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->valuelbl, x, y , w, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
     y += space;
     labelDesc.style = LABEL_CENTER;

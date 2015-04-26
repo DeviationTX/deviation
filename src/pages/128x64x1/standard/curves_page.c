@@ -90,21 +90,23 @@ static void show_page(CurvesMode _curve_mode, int page)
     }
     expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_FLYMODE]) + pit_hold_state;
     if (count != expected) {
-        GUI_CreateLabelBox(&gui->msg, 0, 10, 0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
+        GUI_CreateLabelBox(&gui->msg, 0, 10, 0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "Invalid model ini!");// must be invalid model ini
         return;
     }
 
     set_cur_mixer();
     PAGE_ShowHeader(_tr("Mode"));
-    GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
-    GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
+    
+    // FIXME: need a special value for header button/textsels
+    GUI_CreateTextSelectPlate(&gui->mode, 35, 0, 55, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_mode_cb, (void *)(long)curve_mode);
+    GUI_CreateTextSelectPlate(&gui->hold, 92, 0, 36, HEADER_WIDGET_HEIGHT, &DEFAULT_FONT, NULL, set_holdstate_cb, NULL);
     if (pit_mode != PITTHROMODE_HOLD)
         GUI_SetHidden((guiObject_t *)&gui->hold, 1);
 
     STANDARD_DrawCurvePoints(gui->vallbl, gui->val,
         selectable_bitmaps[curve_mode * 4 + pit_mode], press_cb, set_pointval_cb);
 
-    GUI_CreateXYGraph(&gui->graph, 77, ITEM_SPACE, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
                       CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                       CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                       0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,

@@ -9,12 +9,17 @@ struct splash_obj {
     guiLabel_t splash_text;
 };
 
+#define NUM_BARS_PER_ROW    1
 struct chantest_obj {
     guiLabel_t title;
     guiLabel_t chan[16];
     guiLabel_t value[16];
     guiLabel_t page;
     guiScrollable_t scrollable;
+};
+
+struct range_obj {
+    guiLabel_t label;
 };
 
 struct dialog_obj {
@@ -321,6 +326,7 @@ struct gui_objs {
         struct about_obj about;
         struct splash_obj splash;
         struct chantest_obj chantest;
+        struct range_obj range;
         struct lang_obj lang;
         struct mainconfig_obj mainconfig;
         struct mainlayout_obj mainlayout;

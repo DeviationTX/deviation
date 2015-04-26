@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "config/tx.h"
@@ -60,7 +60,7 @@ PA7 : SPI1_MOSI
 #define CS_LO() gpio_clear(_TOUCH_PORT, _TOUCH_PIN)
 #define pen_is_down() (! gpio_get(_TOUCH_PORT, _TOUCH_IRQ_PIN))
 
-u8 read_channel(u8 address)
+unsigned read_channel(unsigned address)
 {
     spi_xfer(SPI1, address);
     while(pen_is_down())
@@ -117,7 +117,9 @@ void SPITouch_Init()
 struct touch SPITouch_GetCoords()
 {
     #define TOUCH_READS 3
-    struct touch res, data[TOUCH_READS];
+    struct touch res = { 0 };
+    struct touch data[TOUCH_READS];
+    
     u32 center_x = 0, center_y = 0;
     CS_LO();
     // read TOUCH_READS times from the touchpad and store the values

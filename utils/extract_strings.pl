@@ -21,6 +21,8 @@ my %alt_targets = (
     devo12 => ["devo8"],
 );
 
+
+$ENV{CROSS} ||= "";
 GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count, "objdir=s" => \$objdir);
 if($target && ! exists $targetmap{$target}) {
     my @t = keys(%targetmap);
@@ -29,7 +31,7 @@ if($target && ! exists $targetmap{$target}) {
 }
 exit 0 if($target && ! $targetmap{$target});
 
-my @lines = `find . -name "*.[hc]" | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
+my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @files;
 my $str = "";
 my $idx = 0;
@@ -79,7 +81,7 @@ if($objdir) {
     my @files = glob("$objdir/*.o");
     foreach my $file (@files) {
         #Parse all strings from the object files and add to the allstr hash
-        my @od = `objdump -s $file`;
+        my @od = `$ENV{CROSS}objdump -s $file`;
         my $str = "";
         my $state = 0;
         foreach(@od) {

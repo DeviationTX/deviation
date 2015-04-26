@@ -21,8 +21,8 @@
 #include "common.h"
 #ifndef DISABLE_PWM
 
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/nvic.h>
 
@@ -116,7 +116,7 @@ void PWM_Set(int val)
         gpio_clear(GPIOA, _PWM_PIN);
 }
 
-void PPM_Enable(u16 low_time, volatile u16 *pulses)
+void PPM_Enable(unsigned low_time, volatile u16 *pulses)
 {
     timer_disable_counter(TIM1);
     timer_set_oc_value(TIM1, TIM_OC2, low_time);

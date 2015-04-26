@@ -11,6 +11,7 @@
 #include "timer_page.h"
 #include "model_page.h"
 #include "chantest_page.h"
+#include "range_page.h"
 #include "usb_page.h"
 #include "tx_configure.h"
 #include "telemtest_page.h"
@@ -44,6 +45,8 @@ void TGLICO_Select(guiObject_t *obj, const void *data);
 /* Mixer */
 void PAGE_MixerInit(int page);
 void PAGE_MixerEvent();
+void PAGE_MixerExit();
+
 
 /* Trim */
 void PAGE_TrimInit(int page);
@@ -78,6 +81,11 @@ void PAGE_RTCExit();
 void PAGE_TestInit(int page);
 void PAGE_TestEvent();
 
+/* Range */
+void PAGE_RangeInit(int page);
+void PAGE_RangeEvent();
+void PAGE_RangeExit();
+
 /* Chantest */
 void PAGE_ChantestInit(int page);
 void PAGE_InputtestInit(int page);
@@ -100,6 +108,7 @@ void PAGE_USBExit();
 void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));
+void PAGE_TxConfigureExit();
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
@@ -121,6 +130,12 @@ void PAGE_TelemconfigExit();
 /* Datalog */
 void PAGE_DatalogInit();
 void PAGE_DatalogEvent();
+void PAGE_DatalogExit();
+
+/* Debuglog */
+void PAGE_DebuglogInit();
+void PAGE_DebuglogEvent();
+void PAGE_DebuglogExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
@@ -129,6 +144,7 @@ int PAGE_IsValid(int page);
 
 /* Simple Mixer pages */
 void PAGE_ModelMenuInit(int page);
+void PAGE_ModelMenuExit();
 void PAGE_ReverseInit(int page);
 void PAGE_TravelAdjInit(int page);
 void PAGE_TravelAdjExit();

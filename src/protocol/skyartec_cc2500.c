@@ -22,6 +22,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -96,14 +97,14 @@ static void skyartec_init()
         CC2500_WriteReg(CC2500_2C_TEST2, 0x88);
         CC2500_WriteReg(CC2500_2D_TEST1, 0x31);
         CC2500_WriteReg(CC2500_2E_TEST0, 0x0b);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x0b);
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);
         CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
         CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x05);
         CC2500_WriteReg(CC2500_09_ADDR, 0x43);
         CC2500_WriteReg(CC2500_06_PKTLEN, 0xff);
         CC2500_WriteReg(CC2500_04_SYNC1, 0x13);
         CC2500_WriteReg(CC2500_05_SYNC0, 0x18);
+        CC2500_SetTxRxMode(TX_EN);
+        CC2500_SetPower(Model.tx_power);
         CC2500_Strobe(CC2500_SFTX);
         CC2500_Strobe(CC2500_SFRX);
         CC2500_Strobe(CC2500_SXOFF);
@@ -178,7 +179,12 @@ static u16 skyartec_cb()
 {
     if (state & 0x01) {
         CC2500_Strobe(CC2500_SIDLE);
-        state = (state == SKYARTEC_LAST) ? SKYARTEC_PKT1 : state + 1;
+        if (state == SKYARTEC_LAST) {
+            CC2500_SetPower(Model.tx_power);
+            state = SKYARTEC_PKT1;
+        } else {
+             state++;
+        }
         return 3000;
     }
     if (state == SKYARTEC_PKT1 && bind_count) {
@@ -226,13 +232,16 @@ const void *SKYARTEC_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(CC2500_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; //Never Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)7L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

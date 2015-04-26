@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/cm3/scb.h>
 #include "common.h"
 #include "devo.h"
@@ -38,6 +38,15 @@ void PWR_Init(void)
     /* When Pin 3 goes high, the user turned off the Tx */
     gpio_set_mode(_PWRSW_PORT, GPIO_MODE_INPUT,
                   GPIO_CNF_INPUT_FLOAT, _PWRSW_PIN);
+
+    /* Disable SWD and set SWD pins as I/O for programable switch */
+    AFIO_MAPR = (AFIO_MAPR & ~AFIO_MAPR_SWJ_MASK) | AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF;
+    gpio_set_mode(GPIO_BANK_JTMS_SWDIO, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTMS_SWDIO);
+    gpio_set(GPIO_BANK_JTMS_SWDIO, GPIO_JTMS_SWDIO);
+    gpio_set_mode(GPIO_BANK_JTCK_SWCLK, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_PUSHPULL, GPIO_JTCK_SWCLK);
+    gpio_set(GPIO_BANK_JTCK_SWCLK, GPIO_JTCK_SWCLK);
 }
 
 void PWR_Shutdown()
@@ -72,7 +81,7 @@ void PWR_Sleep()
 }
 
 /* Return milivolts */
-u16 PWR_ReadVoltage(void)
+unsigned PWR_ReadVoltage(void)
 {
     u32 v = adc_array_raw[NUM_ADC_CHANNELS-1];
     /* Multily the above by 1000 to get milivolts */

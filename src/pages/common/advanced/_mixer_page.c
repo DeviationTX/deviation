@@ -197,6 +197,7 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     (void)obj;
     long idx = (long)data;
     u8 i;
+    PAGE_MixerExit();
     mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
     MIXER_GetLimit(idx, &mp->limit);
@@ -230,6 +231,7 @@ void limitselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
+    PAGE_MixerExit();
     MIXER_GetLimit(ch, &mp->limit);
     mp->channel = ch;
     MIXPAGE_EditLimits();
@@ -243,8 +245,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)
     PAGE_SetModal(0);
     if (callback_result) {
         int ch = callback_result - 1;
-        strncpy(Model.virtname[ch], tempstring, sizeof(Model.virtname[ch]));
-        Model.virtname[ch][sizeof(Model.virtname[0])-1] = '\0'; // strncpy doesn't put that '\0' at the end
+        strlcpy(Model.virtname[ch], tempstring, sizeof(Model.virtname[ch]));
     }
 }
 
@@ -254,7 +255,7 @@ void virtname_cb(guiObject_t *obj, const void *data)
     int ch = (long)data - NUM_OUT_CHANNELS;
     PAGE_SetModal(1);
     if (Model.virtname[ch][0]) {
-        strncpy(tempstring, Model.virtname[ch], sizeof(tempstring));
+        tempstring_cpy(Model.virtname[ch]);
     } else {
         snprintf(tempstring, sizeof(tempstring), "Virt%d", ch+1); //Do not use _tr() here because the keyboard can't support it
     }

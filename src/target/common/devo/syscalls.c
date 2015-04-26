@@ -111,7 +111,7 @@ int FS_ReadDir(char *path)
     if (pf_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
         return 0;
     dbgprintf("Read: %s %d\n", fi.fname, fi.fattrib);
-    strncpy(path, fi.fname, 13);
+    strlcpy(path, fi.fname, 13);
     return fi.fattrib & AM_DIR ? 2 : 1;
 }
 

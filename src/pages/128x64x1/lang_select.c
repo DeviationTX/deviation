@@ -44,7 +44,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
+            0, LINE_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
     return 1;
 }
 
@@ -68,8 +68,8 @@ void LANGPage_Select(void(*return_page)(int page))
         }
         FS_CloseDir();
     }
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
 }
 

@@ -35,7 +35,7 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    *source = GUI_TextSelectHelper(MIXER_SRC(*source), 0, NUM_SOURCES, dir, 1, 1, NULL);
+    *source = INPUT_SelectSource(*source, dir, NULL);
     return INPUT_SourceName(tempstring, MIXER_MapChannel(*source));
 }
 
@@ -45,15 +45,7 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
         return _tr("None");
     }
     u8 *source = (u8 *)data;
-    u8 changed;
-    u8 val = MIXER_SRC(*source);
-
-    int newval = GUI_TextSelectHelper(val, 0, NUM_SOURCES, dir, 1, 1, &changed);
-    newval = INPUT_GetAbbrevSource(val, newval, dir);
-    if (val != newval) {
-        val = newval;
-        *source = val;
-    }
+    *source = INPUT_SelectAbbrevSource(*source, dir);
     return INPUT_SourceNameAbbrevSwitch(tempstring, *source);
 }
 
@@ -86,13 +78,13 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     int hide_trim = 0;
     int hide_switch = 0;
     if (*value == TRIM_MOMENTARY) {
-        strcpy(tempstring, _tr("Momentary"));
+        tempstring_cpy(_tr("Momentary"));
         hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_TOGGLE) {
-        strcpy(tempstring, _tr("Toggle"));
+        tempstring_cpy(_tr("Toggle"));
         hide_trim = 1; hide_switch = 1;
     } else if (*value == TRIM_ONOFF) {
-        strcpy(tempstring, _tr("On/Off"));
+        tempstring_cpy(_tr("On/Off"));
         hide_switch = 1;
     } else if (*value < 100) {
         sprintf(tempstring, "%d.%d", *value / 10, *value % 10);

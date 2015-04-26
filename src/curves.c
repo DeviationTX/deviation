@@ -52,7 +52,7 @@ s32 compute_tangent(struct Curve *curve, int num_points, int i)
    http://en.wikipedia.org/wiki/Cubic_Hermite_spline
    The tangents are computed via the 'cubic monotone' rules (allowing for local-maxima)
 */
-s16 hermite_spline(struct Curve *curve, s32 value)
+s32 hermite_spline(struct Curve *curve, s32 value)
 {
     int num_points = (CURVE_TYPE(curve) - CURVE_3POINT) * 2 + 3;
     s32 step = PCT_TO_RANGE(2 * 100) / (num_points - 1) ;
@@ -93,7 +93,7 @@ s16 hermite_spline(struct Curve *curve, s32 value)
     return 0;
 }
 
-s16 interpolate(struct Curve *curve, s32 value)
+s32 interpolate(struct Curve *curve, s32 value)
 {
     int i;
     int num_points = (CURVE_TYPE(curve) - CURVE_3POINT) * 2 + 3;
@@ -120,7 +120,7 @@ s16 interpolate(struct Curve *curve, s32 value)
  * f(x,k)=1+(x-1)*(x-1)*(x-1)*k/10 + (x-1)*(1-k/10) ;P[0,1,2,3,4,5,6,7,8,9,10]
  */
 
-s16 expou(u32 x, u16 k)
+s32 expou(u32 x, u16 k)
 {
     // k*x*x*x + (1-k)*x
     // 0 <= k <= 100
@@ -129,7 +129,7 @@ s16 expou(u32 x, u16 k)
                + (KMAX - k) * x + KMAX / 2) / KMAX;
     return val;
 }
-s16 expo(struct Curve *curve, s32 value)
+s32 expo(struct Curve *curve, s32 value)
 {
 
     s32  y;
@@ -151,7 +151,7 @@ s16 expo(struct Curve *curve, s32 value)
     return neg ? -y : y;
 }
 
-s16 deadband(struct Curve *curve, s32 value)
+s32 deadband(struct Curve *curve, s32 value)
 {
     unsigned neg = value < 0;
     s32 k = neg ? (u8)curve->points[1] : (u8)curve->points[0];
@@ -165,7 +165,7 @@ s16 deadband(struct Curve *curve, s32 value)
     return max * ((1000 * (value - max) + (1000 - k) * max) / (1000 - k)) / value;
 }
 
-s16 CURVE_Evaluate(s16 xval, struct Curve *curve)
+s32 CURVE_Evaluate(s32 xval, struct Curve *curve)
 {
     s32 divisor;
     if (CURVE_TYPE(curve) != CURVE_NONE) {

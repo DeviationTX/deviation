@@ -33,7 +33,10 @@ struct menu_pages menus[] = {
     //main menu
     {PAGEID_MENU, _tr_noop("Model menu"),       MENUTYPE_MAINMENU, 0, MIXER_ALL, (0 << 4) | MENUTYPE_SUBMENU},
     {PAGEID_MENU, _tr_noop("Transmitter menu"), MENUTYPE_MAINMENU, 1, MIXER_ALL, (1 << 4) | MENUTYPE_SUBMENU},
-    {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, MIXER_ALL, 0},
+    {PAGEID_USB,      NULL, MENUTYPE_MAINMENU, 0, MIXER_ALL,  0},
+#if DEBUG_WINDOW_SIZE
+    {PAGEID_DEBUGLOG, NULL, MENUTYPE_MAINMENU,  0, MIXER_ALL, 0},
+#endif
     {PAGEID_ABOUT,    NULL, MENUTYPE_MAINMENU, 1, MIXER_ALL, PREVIOUS_ITEM},
     // sub menu items 1
     {PAGEID_MODEL,    NULL, MENUTYPE_SUBMENU,  0, MIXER_ALL, PREVIOUS_ITEM},
@@ -68,10 +71,10 @@ struct menu_pages menus[] = {
 #if HAS_TELEMETRY
     {PAGEID_TELEMMON, NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
 #endif
+    {PAGEID_RANGE,    NULL, MENUTYPE_SUBMENU,  1, MIXER_ALL, PREVIOUS_ITEM},
 };
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
-static const int VIEW_ID = 0;
 static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 static u8 menu_type_flag;   // don't put these items into pagemem, which shared the same union struct with other pages and might be changed
 
@@ -89,7 +92,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     MenuItemType menu_item_type = menu_type_flag & 0x0f;
     u8 group = (menu_type_flag >> 4) &0x0f;
     u8 idx = 0;
@@ -102,9 +105,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             continue;
         if (idx == absrow) {
             GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
-                16, ITEM_HEIGHT,  &TINY_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
+                16, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
             GUI_CreateLabelBox(&gui->name[relrow], 17, y,
-                0, ITEM_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+                0, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;
@@ -142,8 +145,8 @@ void PAGE_MenuInit(int page)
         idx++;
     }
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, idx, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, idx, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, *mp->current_selected));
 }

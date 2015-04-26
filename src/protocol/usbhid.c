@@ -30,9 +30,15 @@
   const unsigned long protocol_type = (unsigned long)&_data_loadaddr;
 #endif
 //To change USBHID_MAX_CHANNELS you must change the Report_Descriptor in hid_usb_desc.c as well
-//It also must be a multiple of 4
-#define USBHID_MAX_CHANNELS 8
-static s8 packet[USBHID_MAX_CHANNELS];
+#define USBHID_ANALOG_CHANNELS 8
+#define USBHID_DIGITAL_CHANNELS 4
+#define USBHID_MAX_CHANNELS (USBHID_ANALOG_CHANNELS + USBHID_DIGITAL_CHANNELS)
+#if USBHID_DIGITAL_CHANNELS > 8
+    //We only allow one byte of digital channels
+    #error "USBHID_DIGITAL_CHANNELS must be <= 8"
+#endif
+//if sizeof(packet) changes, must change wMaxPacketSize to match in Joystick_ConfigDescriptor
+static s8 packet[USBHID_ANALOG_CHANNELS + 1];
 u8 num_channels;
 volatile u8 PrevXferComplete;
 extern void HID_Write(s8 *packet, u8 num_channels);
@@ -40,7 +46,7 @@ extern void HID_Write(s8 *packet, u8 num_channels);
 static void build_data_pkt()
 {
     int i;
-    for (i = 0; i < USBHID_MAX_CHANNELS; i++) {
+    for (i = 0; i < USBHID_ANALOG_CHANNELS; i++) {
         if (i >= num_channels) {
             packet[i] = 0;
             continue;
@@ -52,6 +58,15 @@ static void build_data_pkt()
             value = -127;
         packet[i] = value;
     }
+    u8 digital = 0;
+    for (i = 0; i < USBHID_DIGITAL_CHANNELS; i++) {
+        if (i >= num_channels)
+            continue;
+        s32 value = RANGE_TO_PCT(Channels[USBHID_ANALOG_CHANNELS+i]);
+        if (value > 0)
+            digital |= (1 << i);
+    }
+    packet[USBHID_ANALOG_CHANNELS] = digital;
 }
 
 MODULE_CALLTYPE
@@ -60,7 +75,7 @@ static u16 usbhid_cb()
     if(PrevXferComplete) {
         build_data_pkt();
         
-        HID_Write(packet, USBHID_MAX_CHANNELS);
+        HID_Write(packet, sizeof(packet));
     }
     return 50000;
 }
@@ -83,7 +98,7 @@ const void * USBHID_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((unsigned long)USBHID_MAX_CHANNELS);
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

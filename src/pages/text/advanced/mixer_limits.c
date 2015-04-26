@@ -93,7 +93,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limits_cb; value = &mp->limit.speed;
             break;
     }
-    labelDesc.style = LABEL_LEFTCENTER;
+    labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y, 60, ITEM_HEIGHT, &labelDesc, label_cb, NULL, label);
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow], 60, y, 60, ITEM_HEIGHT, &labelDesc, tgl, disp, value);

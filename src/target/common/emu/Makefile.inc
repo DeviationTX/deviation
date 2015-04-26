@@ -4,7 +4,7 @@ SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common/emu/*.cpp
 SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c)
 
 LFLAGS = -lfltk
-CFLAGS = -DEMULATOR
+CFLAGS = -DEMULATOR -Itarget/common/emu
 
 ALL = $(TARGET).$(EXEEXT)
 

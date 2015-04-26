@@ -54,7 +54,7 @@ const char *show_text_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int width; int height;
     u16 txt_w, txt_h;
-    strcpy(tempstring, (const char *)data);
+    tempstring_cpy((const char *)data);
     GUI_GetSize(obj, &width, &height);
     width -=2;
     while(1) {
@@ -134,7 +134,7 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     (void)obj;
     u8 changed = 0;
-    Model.type = GUI_TextSelectHelper(Model.type, 0, 1, dir, 1, 1, &changed);
+    Model.type = GUI_TextSelectHelper(Model.type, 0, MODELTYPE_LAST-1, dir, 1, 1, &changed);
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, Model.type == 0);
     if (changed && Model.type != 0) {
         //Standard GUI is not supported
@@ -147,8 +147,10 @@ static const char *type_val_cb(guiObject_t *obj, int dir, void *data)
     }
 
     switch (Model.type) {
-        case 0: return _tr(HELI_LABEL);
-        default: return _tr(PLANE_LABEL);
+        case MODELTYPE_HELI: return _tr(HELI_LABEL);
+        case MODELTYPE_PLANE: return _tr(PLANE_LABEL);
+        case MODELTYPE_MULTI: return _tr(MULTI_LABEL);
+        default: return 0; // supress warning.
     }
 }
 void type_press_cb(guiObject_t *obj, void *data)
@@ -241,6 +243,7 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
     enum Protocols new_protocol;
     new_protocol = GUI_TextSelectHelper(Model.protocol, PROTOCOL_NONE, PROTOCOL_COUNT-1, dir, 1, 1, &changed);
     if (changed) {
+        const u8 *oldmap = ProtocolChannelMap[Model.protocol];
     	// DeInit() the old protocol (Model.protocol unchanged)
         PROTOCOL_DeInit();
         // Load() the new protocol
@@ -261,6 +264,8 @@ static const char *protoselect_cb(guiObject_t *obj, int dir, void *data)
             GUI_Redraw(obj);
         if (Model.mixer_mode == MIXER_STANDARD)
             STDMIXER_SetChannelOrderByProtocol();
+        else
+            RemapChannelsForProtocol(oldmap);
         configure_bind_button();
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, PROTOCOL_GetOptions() ? 1 : 0);
@@ -330,6 +335,7 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
             PAGE_ShowInvalidStandardMixerDialog(obj);
         } else {
             STDMIXER_SetChannelOrderByProtocol();
+            STDMIXER_SaveSwitches();
         }
     }
     return STDMIXER_ModeName(Model.mixer_mode);

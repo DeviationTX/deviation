@@ -36,14 +36,14 @@
 
 #define TABLE_SIZE   (250)
 #ifdef NO_SOUND
-void SOUND_SetFrequency(u16 freq, u8 volume) {(void)freq; (void)volume;}
+void SOUND_SetFrequency(unsigned freq, unsigned volume) {(void)freq; (void)volume;}
 void SOUND_Init() {}
-void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
     (void)msec;
     (void)next_note_cb;
     printf("beep\n");
 }
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)()) {
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
     (void)msec;
     (void)next_note_cb;
     printf("beep\n");
@@ -66,7 +66,7 @@ struct {
     char message[20];
 } paData;
 
-void SOUND_SetFrequency(u16 freq, u8 volume)
+void SOUND_SetFrequency(unsigned freq, unsigned volume)
 {
     int i;
     if (freq == 0) {
@@ -143,12 +143,12 @@ void SOUND_Init()
     paData.enable = 1;
 }
 
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)())
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)())
 {
     SOUND_Start(msec, next_note_cb);
 }
 
-void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
     PaError err;
     if (! paData.enable)
         return;

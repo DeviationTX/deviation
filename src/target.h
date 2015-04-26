@@ -2,6 +2,7 @@
 #define _TARGET_H_
 //#define printf if(0) printf
 
+#define OPTIONAL 2
 //Load target-specific include
 #include "target_defs.h"
 
@@ -15,7 +16,6 @@ enum {
 };
 #undef CHANDEF
 #undef UNDEF_INP
-
 /* List of buttons provided by the Tx */
 #define BUTTONDEF(x) BUT_##x,
 enum {
@@ -36,21 +36,24 @@ enum {
     A7105,
     CC2500,
     NRF24L01,
+    MULTIMOD,
     TX_MODULE_LAST,
 };
 
+
+#define SWITCH_ADDRESS 0xFFFFFFFF
 /* The following functions must be provided by every target */
 
 /* General Functions */
-void TxName(u8 *var, u8 len);
+void TxName(u8 *var, int len);
 
 /* Backlight Functions */
 void BACKLIGHT_Init();
-void BACKLIGHT_Brightness(u8 brightness);
+void BACKLIGHT_Brightness(unsigned brightness);
 
 /* Display Functions */
 void LCD_Init();
-void LCD_Contrast(u8 contrast);
+void LCD_Contrast(unsigned contrast);
 
     /* Primitives */
 enum DrawDir {
@@ -81,7 +84,7 @@ u32 ScanButtons();
 
 /* Power functions */
 void PWR_Init(void);
-u16  PWR_ReadVoltage(void);
+unsigned  PWR_ReadVoltage(void);
 int  PWR_CheckPowerSwitch();
 void PWR_Shutdown();
 void PWR_Sleep();
@@ -97,7 +100,7 @@ enum MsecCallback {
 
 void CLOCK_Init(void);
 u32 CLOCK_getms(void);
-void CLOCK_StartTimer(u16 us, u16 (*cb)(void));
+void CLOCK_StartTimer(unsigned us, u16 (*cb)(void));
 void CLOCK_StopTimer();
 void CLOCK_SetMsecCallback(int cb, u32 msec);
 void CLOCK_StartWatchdog();
@@ -107,7 +110,7 @@ void CLOCK_ResetWatchdog();
 void PWM_Initialize();
 void PWM_Stop();
 void PWM_Set(int);
-void PPM_Enable(u16 low_time, volatile u16 *pulses);
+void PPM_Enable(unsigned low_time, volatile u16 *pulses);
 
 /* PPM-In functions */
 #define MAX_PPM_IN_CHANNELS 8
@@ -118,8 +121,9 @@ void PPMin_Stop();
 
 /* Sticks */
 void CHAN_Init();
-s16  CHAN_ReadInput(int channel);
+s32  CHAN_ReadInput(int channel);
 s32  CHAN_ReadRawInput(int channel);
+extern void CHAN_SetSwitchCfg(const char *str);
 #define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
 
 /* SPI Flash */
@@ -128,16 +132,16 @@ u32  SPIFlash_ReadID();
 void SPIFlash_EraseSector(u32 sectorAddress);
 void SPIFlash_BulkErase();
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer);
-void SPIFlash_WriteByte(u32 writeAddress, const u8 byte);
+void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte);
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer);
 int  SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer);
-void SPI_FlashBlockWriteEnable(u8 enable);
+void SPI_FlashBlockWriteEnable(unsigned enable);
 
 /* Sound */
 void SOUND_Init();
-void SOUND_SetFrequency(u16 freq, u8 volume);
-void SOUND_Start(u16 msec, u16 (*next_note_cb)());
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)());
+void SOUND_SetFrequency(unsigned freq, unsigned volume);
+void SOUND_Start(unsigned msec, u16 (*next_note_cb)());
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)());
 void SOUND_Stop();
 
 /* Vibrating motor */
@@ -150,7 +154,7 @@ void UART_Initialize();
 void UART_Stop();
 
 /* USB*/
-void USB_Enable(u8 type, u8 use_interrupt);
+void USB_Enable(unsigned type, unsigned use_interrupt);
 void USB_Disable();
 void USB_HandleISR();
 void USB_Connect();
@@ -179,11 +183,22 @@ u8 *BOOTLOADER_Read(int idx);
 #define PROTO_HAS_NRF24L01
 //Ensure functions are loaded for protocol modules
 void SPI_ProtoInit();
+void SPI_AVRProgramInit();
+int SPI_ConfigSwitch(unsigned csn_high, unsigned csn_low);
+int SPI_ProtoGetPinConfig(int module, int state);
+u32 AVR_StartProgram();
+int AVR_Erase();
+int AVR_Program(u32 address, u8 *data, int pagesize);
+int AVR_SetFuses();
+int AVR_ResetFuses();
+int AVR_VerifyFuses();
+int AVR_Verify(u8 *data, int size);
+
 struct mcu_pin;
 void MCU_InitModules();
 int MCU_SetPin(struct mcu_pin *, const char *name);
 const char *MCU_GetPinName(char *str, struct mcu_pin *);
-void MCU_SerialNumber(u8 *var, u8 len);
+void MCU_SerialNumber(u8 *var, int len);
 #ifdef MODULAR
   #define MODULE_CALLTYPE __attribute__((__long_call__))
 #else

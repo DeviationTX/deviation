@@ -20,7 +20,15 @@
 #define HAS_VIBRATINGMOTOR  0
 #define HAS_DATALOG         1
 #define HAS_SCANNER         0
+#define HAS_EXTRA_SWITCHES  0
+#define HAS_MULTIMOD_SUPPORT 1
 #define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x360 ones
+
+#ifdef BUILDTYPE_DEV
+   #define DEBUG_WINDOW_SIZE 200
+#else
+   #define DEBUG_WINDOW_SIZE 0
+#endif
 
 #define MIN_BRIGHTNESS 1 
 #define DEFAULT_BATTERY_ALARM 4000

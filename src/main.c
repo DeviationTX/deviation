@@ -32,6 +32,7 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
+void PAGE_Test();
 
 #ifndef DUMP_BOOTLOADER
 int main() {
@@ -86,7 +87,7 @@ int main() {
         ;
 
     //Only do this after we've initialized all channel data so the saftey works
-    PROTOCOL_Init(0);
+    PROTOCOL_InitModules();
     GUI_DrawScreen();
 
 #ifdef HAS_EVENT_LOOP
@@ -119,7 +120,7 @@ void Init() {
 
     LCD_Init();
     CHAN_Init();
-    
+
     SPITouch_Init();
     SOUND_Init();
     BACKLIGHT_Init();
@@ -192,6 +193,7 @@ void EventLoop()
     priority_ready &= ~(1 << MEDIUM_PRIORITY);
     if(PWR_CheckPowerSwitch()) {
         if(! (BATTERY_Check() & BATTERY_CRITICAL)) {
+            PAGE_Test();
             CONFIG_SaveModelIfNeeded();
             CONFIG_SaveTxIfNeeded();
         }

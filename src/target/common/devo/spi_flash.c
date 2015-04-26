@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 
@@ -55,7 +55,7 @@ void SPIFlash_Init()
 
     spi_enable(SPI1);
 }
-static void SPIFlash_SetAddr(u8 cmd, u32 address)
+static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 {
     CS_LO();
     spi_xfer(SPI1, cmd);
@@ -85,7 +85,7 @@ u32 SPIFlash_ReadID()
     return result;
 }
 
-void SPI_FlashBlockWriteEnable(u8 enable)
+void SPI_FlashBlockWriteEnable(unsigned enable)
 {
     CS_LO();
     spi_xfer(SPI1, 0x50);
@@ -128,7 +128,7 @@ void DisableHWRYBY()
  */
 void WaitForWriteComplete()
 {
-    u8 sr;
+    unsigned sr;
     CS_LO();
     spi_xfer(SPI1, 0x05);
     do
@@ -225,11 +225,11 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 
 }
 
-void SPIFlash_WriteByte(u32 writeAddress, const u8 byte) {
+void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
    DisableHWRYBY();
    WriteFlashWriteEnable();
    SPIFlash_SetAddr(0x02, writeAddress);
-   spi_xfer(SPI1, ~byte);
+   spi_xfer(SPI1, (u8)(~byte));
    CS_HI();
    WaitForWriteComplete();
    WriteFlashWriteDisable();

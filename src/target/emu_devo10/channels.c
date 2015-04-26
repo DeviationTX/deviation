@@ -16,7 +16,7 @@
 #include "../common/emu/fltk.h"
 #include "mixer.h"
 
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
     switch(channel) {
@@ -32,14 +32,14 @@ s16 CHAN_ReadInput(int channel)
         case INP_ELE_DR1:  return (gui.ele_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_AIL_DR0:  return (gui.ail_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
         case INP_AIL_DR1:  return (gui.ail_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_GEAR0:    return gui.gear   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_GEAR1:    return gui.gear   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_MIX0:     return gui.mix == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_MIX1:     return gui.mix == 1  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_MIX2:     return gui.mix == 2  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD0:    return gui.fmod == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD1:    return gui.fmod == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD2:    return gui.fmod == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_GEAR0:    return (gui.gear % 2)   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_GEAR1:    return (gui.gear % 2)   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX0:     return (gui.mix % 3) == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX1:     return (gui.mix % 3) == 1  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX2:     return (gui.mix % 3) == 2  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD0:    return (gui.fmod % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD1:    return (gui.fmod % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD2:    return (gui.fmod % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
     return 0;
 }

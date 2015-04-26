@@ -91,13 +91,14 @@ void show_layout()
     if(OBJ_IS_USED(&gui->elem[0]))
         GUI_SetSelected((guiObject_t *)&gui->elem[0]);
 }
-void layout_exit() 
+void layout_exit()
 {
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(NULL);
+    PAGE_MainLayoutInit(-1);
 }
 
-void xpos_cb(guiObject_t *obj, int dir, void *data)
+static void xpos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
@@ -110,7 +111,7 @@ void xpos_cb(guiObject_t *obj, int dir, void *data)
     }
 }
 
-void ypos_cb(guiObject_t *obj, int dir, void *data)
+static void ypos_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
     (void)data;
@@ -129,14 +130,14 @@ void set_selected_for_move(int idx)
     GUI_SetHidden((guiObject_t *)&gui->editelem, idx >= 0 ? 0 : 1);
 }
 
-const char *pos_cb(guiObject_t *obj, const void *data)
+static const char *pos_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     sprintf(tempstring, "%d", data ? lp->selected_y : lp->selected_x);
     return tempstring;
 }
 
-void select_for_move(guiLabel_t *obj)
+static void select_for_move(guiLabel_t *obj)
 {
     GUI_SetSelected((guiObject_t *)obj);
     notify_cb((guiObject_t *)obj);
@@ -149,7 +150,6 @@ void select_for_move(guiLabel_t *obj)
     set_selected_for_move(idx);
 }
 
-    
 static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
@@ -158,7 +158,6 @@ static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
             set_selected_for_move(-1);
         } else {
             layout_exit();
-            show_config();
         }
         return 1;
     }

@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 
 #include "common.h"
@@ -44,7 +44,7 @@ void SOUND_Init()
 
     /* Polarity and state */
     timer_set_oc_polarity_low(_SOUND_TIM, _SOUND_TIM_OC);
-    timer_enable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
+    //timer_enable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
 
     /* Capture compare value */
     timer_set_oc_value(_SOUND_TIM, _SOUND_TIM_OC, 0x8000);
@@ -55,7 +55,7 @@ void SOUND_Init()
     VIBRATINGMOTOR_Init(); // Since the vibrating motor is tightly controlled by sound, we put its init() here instead of in the main()
 }
 
-void SOUND_SetFrequency(u16 frequency, u8 volume)
+void SOUND_SetFrequency(unsigned frequency, unsigned volume)
 {
     if (volume == 0) {
         //We need to keep the timer running (for the vibration motor, but also in case there is a pause in the music)
@@ -71,18 +71,18 @@ void SOUND_SetFrequency(u16 frequency, u8 volume)
     /* use quadratic to approximate exponential volume control */
     u32 period = 14400000 / frequency;
     /* Taylor series: x + x^2/2 + x^3/6 + x^4/24 */
-    u32 duty_cycle = volume == 100 ? (period >> 1) : (u32)volume * volume * volume * 12 / 10000;
+    u32 duty_cycle = (period >> 1) * (u32)volume / 100 * volume / 100 * volume / 100;
     timer_set_period(_SOUND_TIM, period);
     timer_set_oc_value(_SOUND_TIM, _SOUND_TIM_OC, duty_cycle);
 }
 
-void SOUND_Start(u16 msec, u16(*next_note_cb)())
+void SOUND_Start(unsigned msec, u16(*next_note_cb)())
 {
     SOUND_StartWithoutVibrating(msec, next_note_cb);
     VIBRATINGMOTOR_Start();
 }
 
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)())
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)())
 {
     CLOCK_SetMsecCallback(TIMER_SOUND, msec);
     Callback = next_note_cb;
@@ -93,6 +93,7 @@ void SOUND_Stop()
 {
     CLOCK_ClearMsecCallback(TIMER_SOUND);
     timer_disable_counter(_SOUND_TIM);
+    timer_disable_oc_output(_SOUND_TIM, _SOUND_TIM_OC);
     VIBRATINGMOTOR_Stop();
 }
 
@@ -102,7 +103,7 @@ u32 SOUND_Callback()
         SOUND_Stop();
         return 0;
     }
-    u16 msec = Callback();
+    unsigned msec = Callback();
     if(! msec)
         SOUND_Stop();
     return msec;

@@ -24,7 +24,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
 static const char *_title_cb(guiObject_t *obj, const void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
-static s8 current_page = 0; // bug fix
 
 static void draw_chan(long ch, int row, int y)
 {
@@ -55,15 +54,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-static void _show_bar_page(u8 num_bars)
+static void _show_bar_page(int row)
 {
-    current_page = 0;
-    cp->num_bars = num_bars;
+    cur_row = row;
+    cp->num_bars = num_disp_bars();
     memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
     GUI_CreateLabelBox(&gui->title, 0 , 0, 0, 0, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT * 2, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
-                         ITEM_HEIGHT, (num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
+                         ITEM_HEIGHT, (cp->num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
     GUI_CreateLabelBox(&gui->page, LCD_WIDTH-(ITEM_SPACE*2), 0, 0, 0, &DEFAULT_FONT, _page_cb, NULL, NULL);
 }
 
@@ -80,14 +79,14 @@ void PAGE_ChantestInit(int page)
     if(cp->type == MONITOR_RAWINPUT )
         _show_bar_page(NUM_INPUTS);
     else {
-        cp->type =  MONITOR_CHANNELOUTPUT;// cp->type may not be initialized yet, so do it here
+        cp->type =  MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
         _show_bar_page(Model.num_channels);
     }
 }
 
 void PAGE_ChantestModal(void(*return_page)(int page), int page)
 {
-    cp->type = MONITOR_CHANNELOUTPUT;
+    cp->type = MONITOR_MIXEROUTPUT;
     PAGE_ChantestInit(page);
     cp->return_page = return_page;
     cp->return_val = page;
@@ -96,8 +95,8 @@ void PAGE_ChantestModal(void(*return_page)(int page), int page)
 static void _navigate_pages(s8 direction)
 {
     if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
-            (direction == 1 && cp->type == MONITOR_CHANNELOUTPUT)) {
-        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_CHANNELOUTPUT: MONITOR_RAWINPUT;
+            (direction == 1 && cp->type == MONITOR_MIXEROUTPUT)) {
+        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_MIXEROUTPUT: MONITOR_RAWINPUT;
         PAGE_ChantestInit(0);
     }
 }

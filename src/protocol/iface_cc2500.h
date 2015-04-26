@@ -51,23 +51,24 @@ enum {
     CC2500_2E_TEST0            = 0x2E,        // Various test settings
 
 // Status registers
-    CC2500_30_PARTNUM          = 0x30,        // Part number
-    CC2500_31_VERSION          = 0x31,        // Current version number
-    CC2500_32_FREQEST          = 0x32,        // Frequency offset estimate
-    CC2500_33_LQI              = 0x33,        // Demodulator estimate for link quality
-    CC2500_34_RSSI             = 0x34,        // Received signal strength indication
-    CC2500_35_MARCSTATE        = 0x35,        // Control state machine state
-    CC2500_36_WORTIME1         = 0x36,        // High byte of WOR timer
-    CC2500_37_WORTIME0         = 0x37,        // Low byte of WOR timer
-    CC2500_38_PKTSTATUS        = 0x38,        // Current GDOx status and packet status
-    CC2500_39_VCO_VC_DAC       = 0x39,        // Current setting from PLL cal module
-    CC2500_3A_TXBYTES          = 0x3A,        // Underflow and # of bytes in TXFIFO
-    CC2500_3B_RXBYTES          = 0x3B,        // Overflow and # of bytes in RXFIFO
+    CC2500_30_PARTNUM          = 0x70,        // Part number
+    CC2500_31_VERSION          = 0x71,        // Current version number
+    CC2500_32_FREQEST          = 0x72,        // Frequency offset estimate
+    CC2500_33_LQI              = 0x73,        // Demodulator estimate for link quality
+    CC2500_34_RSSI             = 0x74,        // Received signal strength indication
+    CC2500_35_MARCSTATE        = 0x75,        // Control state machine state
+    CC2500_36_WORTIME1         = 0x76,        // High byte of WOR timer
+    CC2500_37_WORTIME0         = 0x77,        // Low byte of WOR timer
+    CC2500_38_PKTSTATUS        = 0x78,        // Current GDOx status and packet status
+    CC2500_39_VCO_VC_DAC       = 0x79,        // Current setting from PLL cal module
+    CC2500_3A_TXBYTES          = 0x7A,        // Underflow and # of bytes in TXFIFO
+    CC2500_3B_RXBYTES          = 0x7B,        // Overflow and # of bytes in RXFIFO
 
 // Multi byte memory locations
     CC2500_3E_PATABLE          = 0x3E,
     CC2500_3F_TXFIFO           = 0x3F,
     CC2500_3F_RXFIFO           = 0x3F,
+    CC2500_3F_FIFO             = 0x3F,
 };
 
 // Definitions for burst/single access to registers
@@ -126,8 +127,10 @@ enum {
 
 void CC2500_WriteReg(u8 addr, u8 data);
 u8 CC2500_ReadReg(u8 addr);
-void CC2500_Reset();
+int CC2500_Reset();
 void CC2500_Strobe(u8 cmd);
 void CC2500_WriteData(u8 *packet, u8 length);
 void CC2500_ReadData(u8 *dpbuffer, int len);
+void CC2500_SetTxRxMode(enum TXRX_State);
+void CC2500_SetPower(int power);
 #endif

@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 
+//Magic macro to check enum size
+//#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
+#define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
+
+
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
                              //But only after all sprintf are replaced with snprintf
@@ -12,8 +17,6 @@
 extern char tempstring[TEMPSTRINGLENGTH];
 
 
-#ifndef LIBOPENCM3_CM3_COMMON_H
-//Older gcc does not allow typedef redefinition even to thesame type
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
@@ -21,7 +24,6 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
-#endif
 
 #include "target.h"
 #include "std.h"
@@ -32,7 +34,7 @@ struct FAT {
 };
 
 
-extern volatile s16 Channels[NUM_OUT_CHANNELS];
+extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
 
 /* Temproary definition until we have real translation */
@@ -51,6 +53,7 @@ int CONFIG_IniParse(const char* filename,
 u8 CONFIG_IsModelChanged();
 u8 CONFIG_SaveModelIfNeeded();
 void CONFIG_SaveTxIfNeeded();
+extern const char * const MODULE_NAME[TX_MODULE_LAST];
 
 /* LCD primitive functions */
 void LCD_Clear(unsigned int color);
@@ -94,13 +97,14 @@ void MIXER_CalcChannels();
 void PAGE_Init();
 void PAGE_Change(int dir);
 void PAGE_Event();
+int PAGE_DialogVisible();
 void PAGE_ShowSafetyDialog();
 void PAGE_CloseBindingDialog();
 void PAGE_ShowBindingDialog(u8 update);
 void PAGE_ShowLowBattDialog();
-void PAGE_DisableSafetyDialog(u8 disable);
 void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data);
 void PAGE_ShowInvalidModule();
+void PAGE_ShowModuleDialog(const char **missing);
 void PAGE_ShowWarning(const char *title, const char *str);
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
@@ -121,8 +125,9 @@ extern const char * const ProtocolNames[PROTOCOL_COUNT];
 enum ModelType {
     MODELTYPE_HELI,
     MODELTYPE_PLANE,
-    MODELTYPE_LAST,
+    MODELTYPE_MULTI,
 };
+#define MODELTYPE_LAST (MODELTYPE_MULTI + 1)
 
 enum TxPower {
     TXPOWER_100uW,
@@ -152,10 +157,14 @@ void PROTOCOL_CheckDialogs();
 u32 PROTOCOL_CurrentID();
 const char **PROTOCOL_GetOptions();
 void PROTOCOL_SetOptions();
-s8 PROTOCOL_GetTelemetryState();
+int PROTOCOL_GetTelemetryState();
 int PROTOCOL_MapChannel(int input, int default_ch);
 int PROTOCOL_HasModule(int idx);
 int PROTOCOL_HasPowerAmp(int idx);
+int PROTOCOL_SetSwitch(int module);
+int PROTOCOL_SticksMoved(int init);
+void PROTOCOL_InitModules();
+
 
 /* Input */
 const char *INPUT_SourceName(char *str, unsigned src);
@@ -166,6 +175,8 @@ int INPUT_GetAbbrevSource(int origval, int newval, int dir);
 int INPUT_SwitchPos(unsigned src);
 int INPUT_NumSwitchPos(unsigned src);
 int INPUT_GetFirstSwitch(int src);
+int INPUT_SelectSource(int src, int dir, u8 *changed);
+int INPUT_SelectAbbrevSource(int src, int dir);
 
 const char *INPUT_MapSourceName(unsigned idx, unsigned *val);
 const char *INPUT_ButtonName(unsigned src);
@@ -175,10 +186,15 @@ void Delay(u32 count);
 u32 Crc(const void *buffer, u32 size);
 const char *utf8_to_u32(const char *str, u32 *ch);
 int exact_atoi(const char *str); //Like atoi but will not decode a number followed by non-number
+size_t strlcpy(char* dst, const char* src, size_t bufsize);
+void tempstring_cpy(const char* src);
 int fexists(const char *file);
+u32 rand32_r(u32 *seed, u8 update); //LFSR based PRNG
+u32 rand32(); //LFSR based PRNG
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
+void DEBUGLOG_Putc(char c);
 /* Battery */
 #define BATTERY_CRITICAL 0x01
 #define BATTERY_LOW      0x02
@@ -200,6 +216,6 @@ void STDMIXER_SaveSwitches();
 const char *GetElemName(int type);
 const char *GetBoxSource(char *str, int src);
 const char *GetBoxSourceReal(char *str, int src);
-
+void RemapChannelsForProtocol(const u8 *oldmap);
 #define PPMin_Mode() (Model.num_ppmin >> 6)
 #endif

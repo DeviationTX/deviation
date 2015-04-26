@@ -37,23 +37,23 @@ static const char *label_cb(guiObject_t *obj, const void *data)
     FunctionSwitch i = (long)data;
     switch (i) {
     case SWITCHFUNC_FLYMODE:
-        strcpy(tempstring, _tr("Fly mode"));
+        tempstring_cpy(_tr("Fly mode"));
         break;
     case SWITCHFUNC_HOLD:
-        strcpy(tempstring, _tr("Thr hold"));
+        tempstring_cpy(_tr("Thr hold"));
         break;
     case SWITCHFUNC_GYROSENSE:
-        strcpy(tempstring, _tr("Gyro sense"));
+        tempstring_cpy(_tr("Gyro sense"));
         break;
     case SWITCHFUNC_DREXP_AIL:
-        strcpy(tempstring, _tr("D/R&Exp -AIL"));
+        tempstring_cpy(_tr("D/R&Exp -AIL"));
         break;
     case SWITCHFUNC_DREXP_ELE:
-        strcpy(tempstring, _tr("D/R&Exp -ELE"));
+        tempstring_cpy(_tr("D/R&Exp -ELE"));
         break;
     case SWITCHFUNC_DREXP_RUD:
     default:
-        strcpy(tempstring, _tr("D/R&Exp -RUD"));
+        tempstring_cpy(_tr("D/R&Exp -RUD"));
         break;
     }
     return tempstring;
@@ -64,9 +64,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     u8 w = 46;
     u8 x = 77;
-    GUI_CreateLabelBox(&gui->name[relrow], 0, y, 0, ITEM_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->name[relrow], 0, y, 0, LINE_HEIGHT, &DEFAULT_FONT, label_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)absrow);
+        w, LINE_HEIGHT, &DEFAULT_FONT, NULL, switch_cb, (void *)(long)absrow);
     return 1;
 }
 
@@ -79,8 +79,8 @@ void PAGE_SwitchAssignInit(int page)
     refresh_switches();
 
     PAGE_ShowHeader(_tr("Press ENT to change"));
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 

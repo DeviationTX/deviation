@@ -6,10 +6,6 @@
 
 @version 1.0.0
 
-@author @htmlonly &copy; @endhtmlonly 2009 Uwe Hermann <uwe@hermann-uwe.de>
-@author @htmlonly &copy; @endhtmlonly 2012 Piotr Esden-Tempski <piotr@esden.net>
-@author @htmlonly &copy; @endhtmlonly 2012 Ken Sarkies <ksarkies@internode.on.net>
-
 @date 1 July 2012
 
 LGPL License Terms @ref lgpl_license
@@ -35,7 +31,6 @@ LGPL License Terms @ref lgpl_license
 #ifndef LIBOPENCM3_GPIO_H
 #define LIBOPENCM3_GPIO_H
 
-#include <libopencm3/stm32/f2/memorymap.h>
 #include <libopencm3/stm32/common/gpio_common_f24.h>
 
 #endif

@@ -18,8 +18,6 @@
 #include "gui.h"
 #include "config/display.h"
 
-#include "_label.c"
-
 guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
@@ -179,11 +177,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         else
 #endif
         {
-            if(_GUI_DrawLabelHelper)
-                _GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
-                    str, &select->desc, obj == objSELECTED);
-            else
-                GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
+            GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
                     str, &select->desc, obj == objSELECTED);
         }
     }
@@ -325,7 +319,7 @@ void GUI_TextSelectEnablePress(guiTextSelect_t *select, u8 enable)
     }
     enum ImageNames fileidx;
     switch (select->type) {
-        case TEXTSELECT_224: fileidx = enable ? FILE_SPIN192 : FILE_SPIN192; break;
+        case TEXTSELECT_224: fileidx = FILE_SPIN192; /* enable ? FILE_SPIN192 : FILE_SPIN192;*/ break;
         case TEXTSELECT_128: fileidx = enable ? FILE_SPINPRESS96 : FILE_SPIN96; break;
         case TEXTSELECT_96:  fileidx = enable ? FILE_SPINPRESS64 : FILE_SPIN64; break;
         case TEXTSELECT_64:  fileidx = enable ? FILE_SPINPRESS32 : FILE_SPIN32; break;

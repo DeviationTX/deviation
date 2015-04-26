@@ -22,15 +22,15 @@
 
 #include <libopencm3/cm3/memorymap.h>
 
-/* --- STM32F20x specific peripheral definitions ------------------------------- */
+/* --- STM32F20x specific peripheral definitions --------------------------- */
 
 /* Memory map for all busses */
-#define PERIPH_BASE			0x40000000
+#define PERIPH_BASE			(0x40000000U)
 #define PERIPH_BASE_APB1		(PERIPH_BASE + 0x00000)
 #define PERIPH_BASE_APB2		(PERIPH_BASE + 0x10000)
 #define PERIPH_BASE_AHB1		(PERIPH_BASE + 0x20000)
-#define PERIPH_BASE_AHB2		0x50000000
-#define PERIPH_BASE_AHB3		0x60000000
+#define PERIPH_BASE_AHB2		(0x50000000U)
+#define PERIPH_BASE_AHB3		(0x60000000U)
 
 /* Register boundary addresses */
 
@@ -78,7 +78,7 @@
 #define ADC2_BASE			(PERIPH_BASE_APB2 + 0x2000)
 #define ADC3_BASE			(PERIPH_BASE_APB2 + 0x2000)
 /* PERIPH_BASE_APB2 + 0x2400 (0x4001 2400 - 0x4001 27FF): Reserved */
-#define SDIO_BASE			(PERIPH_BASE_APB2 + 0x2800)
+#define SDIO_BASE			(PERIPH_BASE_APB2 + 0x2C00)
 /* PERIPH_BASE_APB2 + 0x2C00 (0x4001 2C00 - 0x4001 2FFF): Reserved */
 #define SPI1_BASE			(PERIPH_BASE_APB2 + 0x3000)
 /* PERIPH_BASE_APB2 + 0x3400 (0x4001 3400 - 0x4001 37FF): Reserved */
@@ -118,7 +118,9 @@
 #define USB_OTG_FS_BASE			(PERIPH_BASE_AHB2 + 0x0000)
 /* PERIPH_BASE_AHB2 + 0x40000 (0x5004 0000 - 0x5004 FFFF): Reserved */
 #define DCMI_BASE			(PERIPH_BASE_AHB2 + 0x50000)
-/* PERIPH_BASE_AHB2 + 0x50400 (0x5005 0400 - 0x5006 07FF): Reserved */
+/* PERIPH_BASE_AHB2 + 0x50400 (0x5005 0400 - 0x5005 FFFF): Reserved */
+#define CRYP_BASE			(PERIPH_BASE_AHB2 + 0x60000)
+#define HASH_BASE			(PERIPH_BASE_AHB2 + 0x60400)
 #define RNG_BASE			(PERIPH_BASE_AHB2 + 0x60800)
 /* PERIPH_BASE_AHB2 + 0x61000 (0x5006 1000 - 0x5FFF FFFF): Reserved */
 
@@ -127,5 +129,13 @@
 
 /* PPIB */
 #define DBGMCU_BASE			(PPBI_BASE + 0x00042000)
+
+/* Device Electronic Signature */
+#define DESIG_FLASH_SIZE_BASE		(0x1FFF7A22U)
+#define DESIG_UNIQUE_ID_BASE		(0x1FFF7A10U)
+#define DESIG_UNIQUE_ID0		MMIO32(DESIG_UNIQUE_ID_BASE)
+#define DESIG_UNIQUE_ID1		MMIO32(DESIG_UNIQUE_ID_BASE + 4)
+#define DESIG_UNIQUE_ID2		MMIO32(DESIG_UNIQUE_ID_BASE + 8)
+
 
 #endif

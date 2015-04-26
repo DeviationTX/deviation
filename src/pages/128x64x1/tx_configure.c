@@ -38,7 +38,7 @@ static int size_cb(int absrow, void *data)
 #ifndef NO_LANGUAGE_SUPPORT
         case ITEM_LANG:
 #else
-//        case ITEM_MODE:
+        case ITEM_MODE:
 #endif
         case ITEM_BUZZ:
         case ITEM_BACKLIGHT:
@@ -59,7 +59,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     data = NULL;
-    const void *label = NULL;
+    const void *label = "";
     const void *title = NULL;
     void *tgl = NULL;
     void *value = NULL;
@@ -77,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #endif
         case ITEM_MODE:
 #ifdef NO_LANGUAGE_SUPPORT
-            //title = _tr_noop("Generic settings");
+            title = _tr_noop("Generic settings");
 #endif
             label = _tr_noop("Stick mode");
             value = modeselect_cb;
@@ -103,7 +103,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Alarm intvl");
             value = batalarmwarn_select_cb;
             break;
-	case ITEM_PWR_ALARM:
+        case ITEM_PWR_ALARM:
             label = _tr_noop("PwrOn alarm");
             value = poweralarm_select_cb;
             break;
@@ -154,19 +154,19 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (title) {
         enum LabelType oldType = labelDesc.style;
         labelDesc.style = LABEL_UNDERLINE;
-        GUI_CreateLabelBox(&gui->title, 0, y,
-                0, ITEM_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
+        GUI_CreateLabelBox(&gui->title[relrow], 0, y,
+                0, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
         labelDesc.style = oldType;
-        y += ITEM_HEIGHT + 1;
+        y += LINE_SPACE;
     }
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
+            0, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, ITEM_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            LCD_WIDTH - ARROW_WIDTH - x - 1, LINE_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, ITEM_HEIGHT, &DEFAULT_FONT, NULL, value, data);
+            LCD_WIDTH - ARROW_WIDTH - x - 1, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);
     }
     return 1;
 }
@@ -181,9 +181,8 @@ void PAGE_TxConfigureInit(int page)
     PAGE_ShowHeader(_tr("Configure"));
     cp->total_items = 0;
 
-
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
@@ -227,6 +226,11 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         }
     }
     return 1;
+}
+
+void PAGE_TxConfigureExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid)

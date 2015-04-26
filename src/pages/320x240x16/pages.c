@@ -63,7 +63,11 @@ struct page_group groups[] = {
 #if HAS_SCANNER
     {2, PAGEID_SCANNER},
 #endif
+    {2, PAGEID_RANGE},
     {2, PAGEID_USB},
+#if DEBUG_WINDOW_SIZE
+    {2, PAGEID_DEBUGLOG},
+#endif
 #if HAS_STANDARD_GUI
     {0x81, PAGEID_MODELMENU},
 #endif
@@ -112,11 +116,13 @@ void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (Model.mixer_mode != 0 && (cur_page >= sizeof(groups) / sizeof(struct page_group) || groups[cur_page].group == 1)) {
+    if (Model.mixer_mode != 0 || (cur_page >= sizeof(groups) / sizeof(struct page_group) - 1) || groups[cur_page].group & 0x80) {
         //Don't use left/right on model pages in standard mode
         return;
     }
-    u8 nextpage = cur_page;
+    u8 nextpage = 0;
+    while (groups[nextpage].id != cur_page)
+        nextpage += 1;
     if(dir > 0) {
         if (groups[nextpage+1].group == groups[cur_page].group) {
             nextpage++;
@@ -132,15 +138,14 @@ void PAGE_Change(int dir)
                 nextpage++;
         }
     }
-    if (cur_page == nextpage)
+    if (cur_page == groups[nextpage].id)
         return;
-    PAGE_Exit();
     PAGE_ChangeByID(groups[nextpage].id);
 }
 
 void PAGE_ChangeByID(enum PageID id)
 {
-    if (cur_page != id) {
+    if (cur_page != id && id < sizeof(pages) / sizeof(struct page)) {
         PAGE_Exit();
         cur_page = id;
         PAGE_RemoveAllObjects();

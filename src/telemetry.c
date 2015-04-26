@@ -22,8 +22,11 @@ static void _get_volt_str(char *str, u32 value);
 static void _get_temp_str(char *str, int value);
 #include "telemetry/telem_devo.c"
 #include "telemetry/telem_dsm.c"
+#include "telemetry/telem_frsky.c"
 
-#define CAP_DSM 1
+#define CAP_DSM   1
+#define CAP_FRSKY 2
+#define CAP_TYPEMASK 0x03
 
 struct Telemetry Telemetry;
 static u32 alarm_duration[TELEM_NUM_ALARMS] = {0, 0, 0, 0, 0, 0};
@@ -83,7 +86,11 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
     case TELEM_GPS_TIME:
         return t->gps.time;
     }
-    return TELEMETRY_Type() == TELEM_DEVO ? _devo_value(t, idx) : _dsm_value(t, idx);
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        return _devo_value(t, idx);
+    if (TELEMETRY_Type() == TELEM_DSM)
+        return _dsm_value(t, idx);
+    return _frsky_value(t, idx);
 }
 
 const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
@@ -149,9 +156,11 @@ const char * TELEMETRY_GetValueStrByValue(char *str, unsigned telem, s32 value)
             break;
         }
         default:
-           return TELEMETRY_Type() == TELEM_DEVO
-                  ? _devo_str_by_value(str, telem, value)
-                  : _dsm_str_by_value(str, telem, value);
+            if (TELEMETRY_Type() == TELEM_DEVO)
+                return _devo_str_by_value(str, telem, value);
+            if (TELEMETRY_Type() == TELEM_DSM)
+                return _dsm_str_by_value(str, telem, value);
+            return _frsky_str_by_value(str, telem, value);
     }
     return str;
 }
@@ -164,9 +173,11 @@ const char * TELEMETRY_GetValueStr(char *str, unsigned telem)
 
 const char * TELEMETRY_Name(char *str, unsigned telem)
 {
-   return (TELEMETRY_Type() == TELEM_DEVO)
-          ? _devo_name(str, telem)
-          : _dsm_name(str, telem);
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        return _devo_name(str, telem);
+    if (TELEMETRY_Type() == TELEM_DSM)
+        return _dsm_name(str, telem);
+    return _frsky_name(str, telem);
 }
 
 const char * TELEMETRY_ShortName(char *str, unsigned telem)
@@ -178,17 +189,21 @@ const char * TELEMETRY_ShortName(char *str, unsigned telem)
         case TELEM_GPS_SPEED:  strcpy(str, _tr("Speed")); break;
         case TELEM_GPS_TIME:   strcpy(str, _tr("Time")); break;
         default:
-            return TELEMETRY_Type() == TELEM_DEVO
-                   ? _devo_short_name(str, telem)
-                   : _dsm_short_name(str, telem);
+            if (TELEMETRY_Type() == TELEM_DEVO)
+                return _devo_short_name(str, telem);
+            if (TELEMETRY_Type() == TELEM_DSM)
+                return _dsm_short_name(str, telem);
+            return _frsky_short_name(str, telem);
     }
     return str;
 }
 s32 TELEMETRY_GetMaxValue(unsigned telem)
 {
-   return TELEMETRY_Type() == TELEM_DEVO
-          ? _devo_get_max_value(telem)
-          : _dsm_get_max_value(telem);
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        return _devo_get_max_value(telem);
+    if (TELEMETRY_Type() == TELEM_DSM)
+        return _dsm_get_max_value(telem);
+    return _frsky_get_max_value(telem);
 }
 
 void TELEMETRY_SetUpdated(int telem)
@@ -198,23 +213,44 @@ void TELEMETRY_SetUpdated(int telem)
 
 int TELEMETRY_Type()
 {
-    return (Telemetry.capabilities & CAP_DSM) ? TELEM_DSM : TELEM_DEVO;
+    if (Telemetry.capabilities & CAP_DSM)
+        return TELEM_DSM;
+    if (Telemetry.capabilities & CAP_FRSKY)
+        return TELEM_FRSKY;
+    return TELEM_DEVO;
 }
 
+int TELEMETRY_GetNumTelemSrc()
+{
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        return NUM_DEVO_TELEM;
+    if (TELEMETRY_Type() == TELEM_DSM)
+        return NUM_DSM_TELEM;
+    return NUM_FRSKY_TELEM;
+}
+
+int TELEMETRY_GetNumTelem()
+{
+    return TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST-1 : TELEM_DSM_LAST-1;
+}
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol)
 {
     if (protocol == PROTOCOL_DSM2 || protocol == PROTOCOL_DSMX)
         TELEMETRY_SetType(TELEM_DSM);
+    else if (protocol == PROTOCOL_FRSKY2WAY)
+        TELEMETRY_SetType(TELEM_FRSKY);
     else
         TELEMETRY_SetType(TELEM_DEVO);
 }
 
 void TELEMETRY_SetType(int type)
 {
+    unsigned  cap = Telemetry.capabilities & ~CAP_TYPEMASK;
     if (type == TELEM_DSM)
-        Telemetry.capabilities |= CAP_DSM;
-    else
-        Telemetry.capabilities &= ~CAP_DSM;
+        cap |= CAP_DSM;
+    if (type == TELEM_FRSKY)
+        cap |= CAP_FRSKY;
+    Telemetry.capabilities = cap;
 }
 
 //#define DEBUG_TELEMALARM

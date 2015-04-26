@@ -25,6 +25,7 @@
 
 static const char * const HELI_LABEL = _tr_noop("Heli");
 static const char * const PLANE_LABEL = _tr_noop("Plane");
+static const char * const MULTI_LABEL = _tr_noop("Multi");
 #include "../common/_model_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
@@ -39,7 +40,7 @@ static const char * show_icontext_cb(guiObject_t *obj, const void *data)
     unsigned int i;
     if(! Model.icon[0])
         return _tr("Default");
-    strcpy(tempstring, Model.icon+9);
+    tempstring_cpy(Model.icon+9);
     for(i = 0; i < strlen(tempstring); i++) {
         if(tempstring[i] == '.') {
             tempstring[i] = '\0';
@@ -118,15 +119,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (label)
         GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,
-           0, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+           0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            w, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
     if (but_txt) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
+            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
         count++;
     }
     return count;
@@ -146,12 +147,12 @@ void PAGE_ModelInit(int page)
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
 
     if(Model.fixed_id == 0)
-        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
+        strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
 
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
@@ -162,7 +163,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't 
     (void)data;
     GUI_RemoveObj(obj);
     if (callback_result == 1) {  // only change name when DONE is hit, otherwise, discard the change
-        strncpy(Model.name, (const char *)tempstring, sizeof(Model.name));
+        strlcpy(Model.name, (const char *)tempstring, sizeof(Model.name));
         //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
     }
@@ -175,7 +176,7 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     (void)data;
     PAGE_SetModal(1);
     PAGE_RemoveAllObjects();
-    strcpy(tempstring, (const char *)Model.name); // Don't change model name directly
+    tempstring_cpy((const char *)Model.name); // Don't change model name directly
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, 20, // no more than 20 chars is allowed for model name
             _changename_done_cb, (void *)&callback_result);
 }
@@ -184,6 +185,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        PAGE_ModelExit();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
         }

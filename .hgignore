@@ -8,6 +8,10 @@ gz$
 ^src/libopencm3/.*\.d$
 ^src/libopencm3/.*\.a$
 ^src/libopencm3/lib/.*\.ld$
+^src/libopencm3/lib/.*/.*/vector_nvic.c$
+^src/libopencm3/lib/(lm3s|lpc13xx|lpc17xx)/vector_nvic.c$
+^src/libopencm3/include/libopencm3/.*/.*/nvic.h$
+^src/libopencm3/include/libopencm3/(lm3s|lpc13xx|lpc17xx)/nvic.h$
 #src/gz*
 #src/elf*
 map$
@@ -17,6 +21,7 @@ push
 glob:*.o
 utils/midicsv/csvmidi
 utils/midicsv/midicsv
+utils/multi-module/programmer/objs
 .cproject
 .project
 .settings/org.eclipse.cdt.*
@@ -46,6 +51,7 @@ src/filesystem/devo7e/
 src/filesystem/devof7/
 src/filesystem/devo12/
 src/filesystem/x9d/
+src/cov-int/
 glob:src/filesystem/devo10/media/*.fon
 glob:*.dll
 glob:*~

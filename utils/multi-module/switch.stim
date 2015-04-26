@@ -1,0 +1,123 @@
+//stimulus file for AtmelStudio 6.1
+PINB = 0xFF
+#100
+PINA |= 0x10
+#30
+PINA &= 0xEF
+#100
+//0
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//1
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//2
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//3
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//4
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//5
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//6
+	PINA |= 0x40
+	#10
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#20
+	PINA &= 0xB0
+	#10
+//7
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//8
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//9
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//10
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//11
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//12
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//13
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//14
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#30
+//15
+	PINA |= 0x40
+	#10
+	PINA |= 0x10
+	#30
+	PINA &= 0xEF
+	#20
+	PINA &= 0xB0
+	#10
+//This should set A0 to toggle with CSN and A1 to be high
+//
+$log PINA
+$log PINB
+$startlog test.log
+#2000
+PINB |= 0x01
+#1000
+PINB &= 0xFE
+#1000
+//
+PINB |= 0x01
+#1000
+PINB &= 0xFE
+#1000
+//
+PINB |= 0x01
+#1000
+PINB &= 0xFE
+#1000
+//
+PINB |= 0x01
+#1000
+PINB &= 0xFE
+#1000
+//
+$stoplog
+

@@ -7,7 +7,7 @@
 # Common Include File
 #---------------------------------------------------------------------------
 
-@INCLUDE 			   = ../Doxyfile_common
+@INCLUDE 	       = ../Doxyfile_common
 
 #---------------------------------------------------------------------------
 # Local settings
@@ -16,19 +16,23 @@
 WARN_LOGFILE           = doxygen_stm32f4.log
 
 INPUT                  = ../../include/libopencm3/license.dox \
-					     ../../include/libopencm3/stm32/f4 \
-						 ../../include/libopencm3/stm32/common/gpio_common_all.h \
-						 ../../include/libopencm3/stm32/common/gpio_common_f24.h
+			 ../../include/libopencm3/stm32/f4 \
+			 ../../include/libopencm3/stm32/common
 
 INPUT                 += ../../lib/stm32/f4 \
-						 ../../lib/stm32/common/gpio_common_all.c \
-						 ../../lib/stm32/common/gpio_common_f24.c
+			 ../../lib/stm32/common
 
-EXCLUDE                =
+EXCLUDE                = 
 
-LAYOUT_FILE 		   = DoxygenLayout_stm32f4.xml
+EXCLUDE_PATTERNS       = *_common_f*3.h *_common_f*3.c \
+                         *_common_*f013.h *_common_*f013.c \
+                         *_common_*f01.h *_common_*f01.c \ \
+                         *_common_*f03.h *_common_*f03.c
 
-TAGFILES               = ../cm3/cm3.tag=../../cm3/html
+LAYOUT_FILE 	       = DoxygenLayout_stm32f4.xml
 
 GENERATE_TAGFILE       = stm32f4.tag
+
+ENABLE_PREPROCESSING    = YES
+
 

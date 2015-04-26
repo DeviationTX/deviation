@@ -49,8 +49,8 @@ enum LabelType {
     LABEL_UNDERLINE,
     LABEL_SQUAREBOX,
     LABEL_INVERTED,
-    LABEL_LEFT,    // align left and top vertically
-    LABEL_LEFTCENTER, // align left and center vertically
+    LABEL_LEFT,
+    LABEL_RIGHT,
     LABEL_BOX,
     LABEL_BRACKET,
     LABEL_BLINK,
@@ -219,7 +219,7 @@ typedef struct guiXYGraph {
     s16 max_y;
     u16 grid_x;
     u16 grid_y;
-    s16 (*CallBack)(s16 xval, void * data);
+    s32 (*CallBack)(s32 xval, void * data);
     u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data);
     u8 (*touch_cb)(s16 x, s16 y, void *data);
     void *cb_data;
@@ -230,7 +230,7 @@ typedef struct guiBarGraph {
     s16 min;
     s16 max;
     u8 direction;
-    s16 (*CallBack)(void * data);
+    s32 (*CallBack)(void * data);
     void *cb_data;
 } guiBarGraph_t;
 
@@ -352,8 +352,6 @@ guiObject_t *GUI_CreateLabelBox(guiLabel_t *,u16 x, u16 y, u16 width, u16 height
              const char *(*strCallback)(guiObject_t *, const void *),
              void (*pressCallback)(guiObject_t *obj, s8 press_type, const void *data),
              const void *data);
-void _GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
-        const char *str, const struct LabelDesc *desc, u8 is_selected) __attribute__((weak));
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected);
 void GUI_SetLabelDesc(guiLabel_t *obj, struct LabelDesc *desc);
@@ -399,12 +397,12 @@ guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_id
 guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
                       u16 gridx, u16 gridy,
-                      s16 (*Callback)(s16 xval, void *data), 
+                      s32 (*Callback)(s32 xval, void *data), 
                       u8 (*point_cb)(s16 *x, s16 *y, u8 pos, void *data),
                       u8 (*touch_cb)(s16 x, s16 y, void *data),
                       void *cb_data);
 guiObject_t *GUI_CreateBarGraph(guiBarGraph_t *, u16 x, u16 y, u16 width, u16 height, s16 min,
-        s16 max, u8 direction, s16 (*Callback)(void * data), void * cb_data);
+        s16 max, u8 direction, s32 (*Callback)(void * data), void * cb_data);
 guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *, u16 x, u16 y, enum TextSelectType type,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),

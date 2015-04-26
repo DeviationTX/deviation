@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #include "common.h"
-void USB_Enable(u8 type, u8 use_interrupt) {
+void USB_Enable(unsigned type, unsigned use_interrupt) {
     (void) type;
     (void)use_interrupt;
 }
@@ -30,15 +30,15 @@ void HID_Write(s8 *pkt, u8 size) {
     (void)size;
 }
 void SOUND_Init() {}
-void SOUND_SetFrequency(u16 frequency, u8 volume) {
+void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;
     (void)volume;
 }
-void SOUND_Start(u16 msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
     (void)msec;
     (void)next_note_cb;
 }
-void SOUND_StartWithoutVibrating(u16 msec, u16(*next_note_cb)()) {
+void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
     (void)msec;
     (void)next_note_cb;
 }
@@ -46,7 +46,7 @@ void SOUND_Stop() {}
 u32 SOUND_Callback() { return 0;}
 
 void SPIFlash_Init() {}
-void SPI_FlashBlockWriteEnable(u8 enable) {
+void SPI_FlashBlockWriteEnable(unsigned enable) {
     (void)enable;
 }
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer) {
@@ -60,7 +60,7 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer) {
     (void)buffer;
     return 0;
 }
-void SPIFlash_WriteByte(u32 writeAddress, const u8 byte) {
+void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
     (void)writeAddress;
     (void)byte;
 }
@@ -73,10 +73,8 @@ void SPIFlash_EraseSector(u32 sectorAddress) {
     (void)sectorAddress;
 }
 
-void SPI_ProtoInit() {}
-
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
-volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
+volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
 void PPMin_Init() {}
 void PPMin_Stop() {}
@@ -84,9 +82,6 @@ void PPMin_Start() {}
 
 void SPITouch_Init() {}
 void PPMin_TIM_Init() {}
-
-int MCU_SetPin(struct mcu_pin *port, const char *name) {return 0;}
-void MCU_InitModules() {}
 
 const char *MCU_GetPinName(char *str, struct mcu_pin *port) { return "None";}
 

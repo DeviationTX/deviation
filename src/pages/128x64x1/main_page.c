@@ -29,7 +29,7 @@ enum {
      MODEL_ICO_W  = 52,
      MODEL_ICO_H  = 36,
      BOX_W        = 48,
-     SMALLBOX_H   =  9,
+     SMALLBOX_H   = 10,
      BIGBOX_H     = 14,
      GRAPH_W      = (VTRIM_W),
      GRAPH_H      = (VTRIM_H / 2),

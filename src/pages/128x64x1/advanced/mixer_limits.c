@@ -30,10 +30,10 @@ static void _show_titlerow()
 
     labelDesc.style = LABEL_UNDERLINE;
     u8 w = 50;
-    GUI_CreateLabelBox(&gui->title, 0, 0 , LCD_WIDTH - w, ITEM_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->title, 0, 0 , LCD_WIDTH, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, ITEM_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -93,10 +93,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             disp = set_limits_cb; value = &mp->limit.speed;
             break;
     }
-    labelDesc.style = LABEL_LEFTCENTER;
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y, 60, ITEM_HEIGHT, &labelDesc, label_cb, NULL, label);
+    labelDesc.style = LABEL_LEFT;
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y, 60, LINE_HEIGHT, &labelDesc, label_cb, NULL, label);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow], 60, y, 60, ITEM_HEIGHT, &labelDesc, tgl, disp, value);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], 60, y, 60, LINE_HEIGHT, &labelDesc, tgl, disp, value);
 
     if(absrow == ITEM_SAFEVAL)
         GUI_TextSelectEnable(&gui->value[relrow], mp->limit.safetysw);
@@ -106,8 +106,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_limits()
 {
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, 128, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_HEIGHT+1, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, ITEM_REVERSE, 0));
 };
 

@@ -70,53 +70,61 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     (void)relrow;
-    u8 space = ITEM_HEIGHT + 1;
+    u8 space = LINE_SPACE;
     u8 w = 65;
     u8 x = 55;
     //Row 1
     GUI_CreateLabelBox(&gui->name, 0, y,
-            55, ITEM_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
+            55, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->type, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
 
     //Row 2
     y += space;
     GUI_CreateLabelBox(&gui->switchlbl, 0, y,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
+            55, LINE_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->src, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
     /*prem-timer reset */
     GUI_CreateLabelBox(&gui->resetpermlbl, 0, y  ,
-            55, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-    GUI_CreateButtonPlateText(&gui->resetperm, x, y ,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
+            55, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+    GUI_CreateButtonPlateText(&gui->resetperm, x+3, y ,
+            w-6, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
         /* or Reset switch */
     	GUI_CreateLabelBox(&gui->resetlbl, 0, y ,
-            55, ITEM_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
+            55, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
     	GUI_CreateTextSelectPlate(&gui->resetsrc, x, y ,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
 	y += space;
     }
     //Row 4
     GUI_CreateLabelBox(&gui->startlbl, 0, y ,
             50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
-            ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
+            LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
     GUI_CreateTextSelectPlate(&gui->start, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
+            w, LINE_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
     if(Model.mixer_mode == MIXER_STANDARD)
         y+= space;
-    GUI_CreateButtonPlateText(&gui->setperm, x, y,
-        55, ITEM_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
+    GUI_CreateButtonPlateText(&gui->setperm, x+3, y,
+        w-6, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
 
     update_countdown(absrow);
-    return 4;
-}
+
+    int selectable = (Model.timer[absrow].type < TIMER_COUNTDOWN) ? 2 : 3;
+    if (Model.mixer_mode == MIXER_ADVANCED)
+        selectable++;
+#if HAS_PERMANENT_TIMER
+    if (Model.timer[absrow].type == TIMER_PERMANENT)
+        selectable = 4;
+#endif
+    return selectable;
+ }
 
 static void _show_page(int page)
 {
@@ -124,8 +132,8 @@ static void _show_page(int page)
     PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
     PAGE_SetActionCB(_action_cb);
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     LCD_HEIGHT - ITEM_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 

@@ -2,11 +2,11 @@ FILESYSTEM := devo8
 SCREENSIZE := 320x240x16
 DFU_ARGS   := -c 8 -b 0x08004000
 
-include target/common/devo/Makefile.inc
+include $(SDIR)/target/common/devo/Makefile.inc
 
 ifndef BUILD_TARGET
-SRC_C   += target/devo8/backlight.c \
-           target/devo8/lcd.c \
-           target/devo8/ili9341.c \
-           target/devo8/hx8347.c
+SRC_C   += $(SDIR)/target/devo8/backlight.c \
+           $(SDIR)/target/devo8/lcd.c \
+           $(SDIR)/target/devo8/ili9341.c \
+           $(SDIR)/target/devo8/hx8347.c
 endif

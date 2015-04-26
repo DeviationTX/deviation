@@ -1,3 +1,16 @@
+/** @defgroup flash_defines FLASH Defines
+ *
+ * @ingroup STM32F1xx_defines
+ *
+ * @brief Defined Constants and Types for the STM32F1xx FLASH Memory
+ *
+ * @version 1.0.0
+ *
+ * @date 14 January 2014
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
+
 /*
  * This file is part of the libopencm3 project.
  *
@@ -22,96 +35,86 @@
  * For details see:
  * PM0075 programming manual: STM32F10xxx Flash programming
  * August 2010, Doc ID 17863 Rev 1
- * http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/PROGRAMMING_MANUAL/CD00283419.pdf
+ * https://github.com/libopencm3/libopencm3-archive/blob/master/st_micro/CD00283419.pdf
  */
 
 #ifndef LIBOPENCM3_FLASH_H
 #define LIBOPENCM3_FLASH_H
 
-#include <libopencm3/stm32/memorymap.h>
-#include <libopencm3/cm3/common.h>
+/**@{*/
 
-/* --- FLASH registers ----------------------------------------------------- */
+#include <libopencm3/stm32/common/flash_common_f01.h>
 
-#define FLASH_ACR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x00)
-#define FLASH_KEYR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x04)
-#define FLASH_OPTKEYR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x08)
-#define FLASH_SR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x0C)
-#define FLASH_CR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x10)
-#define FLASH_AR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x14)
-#define FLASH_OBR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x1C)
-#define FLASH_WRPR			MMIO32(FLASH_MEM_INTERFACE_BASE + 0x20)
+/* --- FLASH_OPTION bytes ------------------------------------------------- */
+
+/** @defgroup flash_options Option Byte Addresses
+@ingroup flash_defines
+@{*/
+#define FLASH_OPTION_BYTE_0             FLASH_OPTION_BYTE(0)
+#define FLASH_OPTION_BYTE_1             FLASH_OPTION_BYTE(1)
+#define FLASH_OPTION_BYTE_2             FLASH_OPTION_BYTE(2)
+#define FLASH_OPTION_BYTE_3             FLASH_OPTION_BYTE(3)
+#define FLASH_OPTION_BYTE_4             FLASH_OPTION_BYTE(4)
+#define FLASH_OPTION_BYTE_5             FLASH_OPTION_BYTE(5)
+#define FLASH_OPTION_BYTE_6             FLASH_OPTION_BYTE(6)
+#define FLASH_OPTION_BYTE_7             FLASH_OPTION_BYTE(7)
+/**@}*/
+
+/*****************************************************************************/
+/* Register values                                                           */
+/*****************************************************************************/
 
 /* --- FLASH_ACR values ---------------------------------------------------- */
 
-#define FLASH_PRFTBS			(1 << 5)
-#define FLASH_PRFTBE			(1 << 4)
-#define FLASH_HLFCYA			(1 << 3)
-#define FLASH_LATENCY_0WS		0x00
-#define FLASH_LATENCY_1WS		0x01
-#define FLASH_LATENCY_2WS		0x02
+/** @defgroup flash_latency FLASH Wait States
+@ingroup flash_defines
+@{*/
+#define FLASH_ACR_LATENCY_0WS		0x00
+#define FLASH_ACR_LATENCY_1WS		0x01
+#define FLASH_ACR_LATENCY_2WS		0x02
+/**@}*/
+#define FLASH_ACR_HLFCYA		(1 << 3)
 
 /* --- FLASH_SR values ----------------------------------------------------- */
 
-#define FLASH_EOP			(1 << 5)
-#define FLASH_WRPRTERR			(1 << 4)
-#define FLASH_PGERR			(1 << 2)
-#define FLASH_BSY			(1 << 0)
+#define FLASH_SR_EOP			(1 << 5)
+#define FLASH_SR_WRPRTERR		(1 << 4)
+#define FLASH_SR_PGERR			(1 << 2)
+#define FLASH_SR_BSY			(1 << 0)
 
 /* --- FLASH_CR values ----------------------------------------------------- */
-
-#define FLASH_EOPIE			(1 << 12)
-#define FLASH_ERRIE			(1 << 10)
-#define FLASH_OPTWRE			(1 << 9)
-#define FLASH_LOCK			(1 << 7)
-#define FLASH_STRT			(1 << 6)
-#define FLASH_OPTER			(1 << 5)
-#define FLASH_OPTPG			(1 << 4)
-#define FLASH_MER			(1 << 2)
-#define FLASH_PER			(1 << 1)
-#define FLASH_PG			(1 << 0)
 
 /* --- FLASH_OBR values ---------------------------------------------------- */
 
 /* FLASH_OBR[25:18]: Data1 */
 /* FLASH_OBR[17:10]: Data0 */
-#define FLASH_NRST_STDBY		(1 << 4)
-#define FLASH_NRST_STOP			(1 << 3)
-#define FLASH_WDG_SW			(1 << 2)
-#define FLASH_RDPRT			(1 << 1)
-#define FLASH_OPTERR			(1 << 0)
+#define FLASH_OBR_NRST_STDBY		(1 << 4)
+#define FLASH_OBR_NRST_STOP		(1 << 3)
+#define FLASH_OBR_WDG_SW		(1 << 2)
+#define FLASH_OBR_RDPRT_EN		(1 << FLASH_OBR_RDPRT_SHIFT)
 
-/* --- FLASH Keys -----------------------------------------------------------*/
+/*****************************************************************************/
+/* API definitions                                                           */
+/*****************************************************************************/
 
-#define RDP_KEY				((u16)0x00a5)
-#define FLASH_KEY1			((u32)0x45670123)
-#define FLASH_KEY2			((u32)0xcdef89ab)
+/* Read protection option byte protection enable key */
+#define FLASH_RDP_KEY			((uint16_t)0x00a5)
 
 /* --- Function prototypes ------------------------------------------------- */
 
 BEGIN_DECLS
 
-void flash_prefetch_buffer_enable(void);
-void flash_prefetch_buffer_disable(void);
 void flash_halfcycle_enable(void);
 void flash_halfcycle_disable(void);
-void flash_set_ws(u32 ws);
-void flash_unlock(void);
-void flash_lock(void);
-void flash_clear_pgerr_flag(void);
-void flash_clear_eop_flag(void);
-void flash_clear_wrprterr_flag(void);
-void flash_clear_bsy_flag(void);
-void flash_clear_status_flags(void);
-void flash_unlock_option_bytes(void);
-void flash_erase_all_pages(void);
-void flash_erase_page(u32 page_address);
-void flash_program_word(u32 address, u32 data);
-void flash_program_half_word(u32 address, u16 data);
-void flash_wait_for_last_operation(void);
-void flash_erase_option_bytes(void);
-void flash_program_option_bytes(u32 address, u16 data);
+void flash_unlock_upper(void);
+void flash_lock_upper(void);
+void flash_clear_pgerr_flag_upper(void);
+void flash_clear_eop_flag_upper(void);
+void flash_clear_wrprterr_flag_upper(void);
+void flash_clear_bsy_flag_upper(void);
 
 END_DECLS
+
+/**@}*/
 
 #endif

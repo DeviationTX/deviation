@@ -25,6 +25,8 @@ static void dlgbut_presscancel_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strok_cb(struct guiObject *obj, const void *data);
 const char *dlgbut_strcancel_cb(struct guiObject *obj, const void *data);
 
+static guiObject_t *previous_selected_obj = NULL; // used for devo10 only
+
 guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 height, const char *title,
         const char *(*string_cb)(guiObject_t *obj, void *data),
         void (*CallBack)(u8 state, void *data),
@@ -62,7 +64,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     case dtOk:
     case dtCancel:
         {
-        but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 1,
+        but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 3,
                     DIALOG_BUTTON,
                     dgType == dtOk ? dlgbut_strok_cb : dlgbut_strcancel_cb,
                     0x0000,
@@ -71,9 +73,9 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
         }
         break;
     case dtOkCancel: {
-        GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2, y + height - button_height - 1,
+        GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2 - 1, y + height - button_height - 3,
                 DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-        but = GUI_CreateButton(&dialog->but2, x + width/2, y + height - button_height - 1,
+        but = GUI_CreateButton(&dialog->but2, x + width/2 + 1, y + height - button_height - 3,
                  DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
         }
         break;
@@ -83,6 +85,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     objDIALOG = obj;
 
     GUI_HandleModalButtons(1);
+    previous_selected_obj = objSELECTED;    // used for devo10 only   
     objSELECTED = but;
     //bug fix: using objSELECTED for dialog is not safe in devo10
     objModalButton = but;
@@ -124,6 +127,8 @@ void DialogClose(struct guiObject *obj, u8 state)
     void (*func)(u8, void*) = dialog->CallBack;
     GUI_RemoveObj(obj);
     func(state, data);
+    if (previous_selected_obj != NULL)
+        GUI_SetSelected(previous_selected_obj);
 }
 void dlgbut_pressok_cb(struct guiObject *obj, const void *data)
 {

@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include "common.h"
 #include "mixer.h"
 #include "config/tx.h"
@@ -72,7 +72,7 @@ s32 CHAN_ReadRawInput(int channel)
     }
     return value;
 }
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadInput(int channel)
 {
     s32 value = CHAN_ReadRawInput(channel);
     if(channel <= INP_HAS_CALIBRATION) {

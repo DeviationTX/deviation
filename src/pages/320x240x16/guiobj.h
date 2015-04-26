@@ -26,6 +26,11 @@ struct chantest_obj {
     guiScrollbar_t scrollbar;
 };
 
+struct range_obj {
+    guiLabel_t info;
+    guiButton_t button;
+};
+
 struct lang_obj {
     guiButton_t ok;
     guiListbox_t listbox;
@@ -317,6 +322,11 @@ struct tx_obj {
              guiTextSelect_t temp;
              guiLabel_t lengthlbl;
              guiTextSelect_t length;
+             //These are for the virating motor which may or may-not be installed
+             guiLabel_t head3_3;
+             guiLabel_t viblbl;
+             guiTextSelect_t vib;
+
         } g3;
     } u;
 };
@@ -354,6 +364,12 @@ struct rtc_obj {
     // buttons for setting time and date
     guiButton_t     settime;
     guiButton_t     setdate;
+};
+
+#define DEBUG_LINE_COUNT (LCD_WIDTH == 320 ? 10 : 12)
+struct debuglog_obj {
+    guiLabel_t      line[DEBUG_LINE_COUNT];
+    guiScrollable_t scrollable;
 };
 
 /****Advanced ****/
@@ -477,7 +493,7 @@ struct stdcurve_obj {
     guiButton_t auto_;
     guiLabel_t vallbl[9];
     guiTextSelect_t val[9];
-    guiButton_t lock[7];
+    guiButton_t lock[9];
     guiXYGraph_t graph;
 };
 
@@ -553,6 +569,7 @@ struct gui_objs {
     union {
         struct splash_obj splash;
         struct chantest_obj chantest;
+        struct range_obj range;
         struct lang_obj lang;
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
@@ -575,6 +592,7 @@ struct gui_objs {
         struct calibrate_obj calibrate;
         struct usb_obj usb;
         struct rtc_obj rtc;
+        struct debuglog_obj debuglog;
 
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

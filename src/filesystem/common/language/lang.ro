@@ -6,7 +6,7 @@ Canale
 : is %d%%, safe value = %d%%\n
  = %d%%, valoare de siguranță = %d%%\n
 : is %d%%,\nsafe value = %d%%
- = %d%%,\nvaloare de siguranță = %d%%\n
+ = %d%%,\nvaloare sigur=%d%%\n
 :1 sec
 1 sec
 :1-to-1

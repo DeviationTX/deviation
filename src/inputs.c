@@ -22,6 +22,14 @@
 #include "common.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "config/tx.h"
+
+#ifndef HAS_MORE_THAN_32_INPUTS
+    //Verify that INP_LAST is < 32 or HAS_MORE_THAN_32_INPUTS is defined
+    ctassert((INP_LAST <= 32), too_many_inputs);
+#else
+    ctassert((INP_LAST <= 64), too_many_inputs);
+#endif
 
 #define INPNAME_AILERON(x,y)  x = _tr_noop("AIL"); y = -1
 #define INPNAME_ELEVATOR(x,y) x = _tr_noop("ELE"); y = -1
@@ -174,13 +182,19 @@ int INPUT_GetAbbrevSource(int origval, int newval, int dir)
 {
     if (origval == newval || ! newval)
         return newval;
-    int pos = INPUT_SwitchPos(newval);
-    int num_pos = INPUT_NumSwitchPos(newval);
-    if (num_pos != 0 && pos) {
-        if (dir > 0)
-            newval += (num_pos - pos);
+    while(1) {
+        int pos = INPUT_SwitchPos(newval);
+        int num_pos = INPUT_NumSwitchPos(newval);
+        if (num_pos != 0 && pos) {
+            if (dir > 0)
+                newval += (num_pos - pos);
+            else
+                newval -= pos;
+        }
+        if (Transmitter.ignore_src & (1 << newval))
+            newval += dir;
         else
-            newval -= pos;
+            break;
     }
     return newval;
 }
@@ -207,6 +221,8 @@ int INPUT_NumSwitchPos(unsigned src)
         }
         idx = idx2;
         src++;
+        while(Transmitter.ignore_src & (1 << (src+1)))
+            src++;
     }
     return idx+1;
 }
@@ -236,4 +252,27 @@ const char *INPUT_ButtonName(unsigned button)
     };
     #undef BUTTONDEF
     return "";
+}
+
+int INPUT_SelectSource(int src, int dir, u8 *changed)
+{
+    u8 is_neg = MIXER_SRC_IS_INV(src);
+    int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
+    if(! dir)
+        dir = -1;
+    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
+       newsrc+= dir;
+    MIXER_SET_SRC_INV(newsrc, is_neg);
+    return newsrc;
+}
+
+int INPUT_SelectAbbrevSource(int src, int dir)
+{
+    int newsrc = GUI_TextSelectHelper(src, 0, NUM_SOURCES, dir, 1, 1, NULL);
+    if(! dir)
+        dir = -1;
+    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
+       newsrc+= dir;
+    newsrc = INPUT_GetAbbrevSource(src, newsrc, dir);
+    return newsrc;
 }

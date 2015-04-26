@@ -39,7 +39,7 @@ static const char *telem_name_cb(guiObject_t *obj, int dir, void *data)
     int val = (long)data;
     u8 changed;
     Model.telem_alarm[val] = GUI_TextSelectHelper(Model.telem_alarm[val],
-        0, TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST-1 : TELEM_DSM_LAST-1, dir, 1, 1, &changed);
+        0, TELEMETRY_GetNumTelem(), dir, 1, 1, &changed);
     if (changed) {
         guiObject_t *valObj = _get_obj(val, 2);
         if (valObj)
@@ -76,7 +76,7 @@ static const char *limit_cb(guiObject_t *obj, int dir, void *data)
     
     u8 small_step = 1;
     u8 big_step = 10;
-    if (TELEMETRY_GetMaxValue(Model.telem_alarm[val]) > 256) {
+    if (max > 1000) {
         small_step = 10;
         big_step = 100;
     }

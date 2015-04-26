@@ -28,7 +28,23 @@ enum {
     NRF24L01_16_RX_PW_P5    = 0x16,
     NRF24L01_17_FIFO_STATUS = 0x17,
     NRF24L01_1C_DYNPD       = 0x1C,
-    NRF24L01_1D_FEATURE     = 0x1D
+    NRF24L01_1D_FEATURE     = 0x1D,
+    //Instructions
+    NRF24L01_61_RX_PAYLOAD  = 0x61,
+    NRF24L01_A0_TX_PAYLOAD  = 0xA0,
+    NRF24L01_E1_FLUSH_TX    = 0xE1,
+    NRF24L01_E2_FLUSH_RX    = 0xE2,
+    NRF24L01_E3_REUSE_TX_PL = 0xE3,
+    NRF24L01_50_ACTIVATE    = 0x50,
+    NRF24L01_60_R_RX_PL_WID = 0x60,
+    NRF24L01_B0_TX_PYLD_NOACK = 0xB0,
+    NRF24L01_FF_NOP         = 0xFF,
+    NRF24L01_A8_W_ACK_PAYLOAD0 = 0xA8,
+    NRF24L01_A8_W_ACK_PAYLOAD1 = 0xA9,
+    NRF24L01_A8_W_ACK_PAYLOAD2 = 0xAA,
+    NRF24L01_A8_W_ACK_PAYLOAD3 = 0xAB,
+    NRF24L01_A8_W_ACK_PAYLOAD4 = 0xAC,
+    NRF24L01_A8_W_ACK_PAYLOAD5 = 0xAD,
 };
 
 // Bit mnemonics
@@ -40,9 +56,14 @@ enum {
     NRF24L01_00_CRCO        = 2,
     NRF24L01_00_PWR_UP      = 1,
     NRF24L01_00_PRIM_RX     = 0,
+
     NRF24L01_07_RX_DR       = 6,
     NRF24L01_07_TX_DS       = 5,
     NRF24L01_07_MAX_RT      = 4,
+
+    NRF2401_1D_EN_DYN_ACK   = 0,
+    NRF2401_1D_EN_ACK_PAY   = 1,
+    NRF2401_1D_EN_DPL       = 2,
 };
 
 // Bitrates
@@ -55,8 +76,9 @@ enum {
     
 
 void NRF24L01_Initialize();
+int NRF24L01_Reset();
 u8 NRF24L01_WriteReg(u8 reg, u8 data);
-u8 NRF24L01_WriteRegisterMulti(u8 reg, u8 data[], u8 length);
+u8 NRF24L01_WriteRegisterMulti(u8 reg, const u8 data[], u8 length);
 u8 NRF24L01_WritePayload(u8 *data, u8 len);
 u8 NRF24L01_ReadReg(u8 reg);
 u8 NRF24L01_ReadRegisterMulti(u8 reg, u8 data[], u8 length);
@@ -71,9 +93,11 @@ u8 NRF24L01_Activate(u8 code);
 u8 NRF24L01_SetBitrate(u8 bitrate);
 
 u8 NRF24L01_SetPower(u8 power);
+void NRF24L01_SetTxRxMode(enum TXRX_State);
+int NRF24L01_Reset();
 
 // To enable radio transmit after WritePayload you need to turn the radio
-void NRF24L01_PulseCE();
+//void NRF24L01_PulseCE();
 
 
 #endif

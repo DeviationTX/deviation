@@ -33,6 +33,14 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 void PAGE_MainLayoutInit(int page)
 {
     (void)page;
+    GUI_RemoveAllObjects();
+#if HAS_LAYOUT_EDITOR
+    PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
+#else
+    PAGE_ShowHeader(_tr("Main page config"));
+#endif
+    PAGE_SetActionCB(_action_cb);
+    memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));
     show_config();
 }
@@ -41,6 +49,7 @@ void PAGE_MainLayoutEvent()
 }
 void PAGE_MainLayoutExit()
 {
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static int size_cb(int absrow, void *data)
@@ -101,7 +110,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_MainLayoutExit();
     TGLICO_Select(obj, data);
 }
 
@@ -109,6 +118,8 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
+    PAGE_MainLayoutExit();
+    current_selected += 1 << 8;
     create_element();
     show_config();
 }
@@ -124,6 +135,7 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
+        PAGE_MainLayoutExit();
         return _tr("Delete");
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 0);
@@ -140,21 +152,21 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 #if HAS_LAYOUT_EDITOR
     if (absrow == num_elems + NUM_QUICKPAGES) {
         GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y_ts,
-                 LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
+                 LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
         GUI_CreateButtonPlateText(&gui->col1[relrow].button, LCD_WIDTH-x-4, y,  50,
-                 ITEM_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
+                 LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
         return 2;
     }
 #endif
     if (absrow >= num_elems + NUM_QUICKPAGES) {
-        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, ITEM_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, LINE_HEIGHT,
                  &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
         return 1;
     }
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
-        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
-        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + ITEM_HEIGHT,
-             LCD_WIDTH-4, ITEM_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
+        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
+        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + LINE_HEIGHT,
+             LCD_WIDTH-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
         return 1;
     }
     for(int type = 0; type < ELEM_LAST; type++) {
@@ -170,27 +182,24 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         }
         if (nxt == -1)
             continue;
-        if (type == ELEM_TOGGLE)
+
+        int selectable = 1;
+        if (type == ELEM_TOGGLE) {
             GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  50,
-                    ITEM_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
+                    LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
+            selectable = 2;
+        }
         else
-            GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, ITEM_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
+            GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
 
         GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
-             LCD_WIDTH-x-4, ITEM_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
-        return 1;
+             LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
+        return selectable;
     }
-    return 1;
+    return 0;
 }
 void show_config()
 {
-    PAGE_MainLayoutExit();
-    GUI_RemoveAllObjects();
-#if HAS_LAYOUT_EDITOR
-    PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
-#endif
-    PAGE_SetActionCB(_action_cb);
-    memset(gui, 0, sizeof(*gui));
     long count = 0;
     for (count = 0; count < NUM_ELEMS; count++) {
         if (! ELEM_USED(pc->elem[count]))
@@ -201,8 +210,8 @@ void show_config()
 # else
     static const int ADD_LOAD = 1;
 #endif
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, count+NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
@@ -213,8 +222,10 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
 #if HAS_LAYOUT_EDITOR
-        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS))
+        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+            PAGE_MainLayoutExit();
             show_layout();
+        }
 #endif //HAS_LAYOUT_EDITOR
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

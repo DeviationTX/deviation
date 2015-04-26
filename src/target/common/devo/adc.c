@@ -12,15 +12,15 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/adc.h>
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/dma.h>
+#include <libopencm3/stm32/adc.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/dma.h>
 #include "common.h"
 #include "devo.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-u16 ADC_Read(u8 channel);
+unsigned ADC_Read(unsigned channel);
 volatile u16 adc_array_raw[NUM_ADC_CHANNELS];
 #define WINDOW_SIZE 10
 #define SAMPLE_COUNT NUM_ADC_CHANNELS * WINDOW_SIZE * ADC_OVERSAMPLE_WINDOW_COUNT
@@ -49,17 +49,17 @@ void ADC_Init(void)
     adc_calibration(_ADC);
 
     //Build a RNG seed using ADC 14, 16, 17
-    u32 seed = 0;
     for(int i = 0; i < 8; i++) {
-        seed = seed << 4 | ((ADC_Read(16) & 0x03) << 2) | (ADC_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
+        u32 seed;
+        seed = ((ADC_Read(16) & 0x03) << 2) | (ADC_Read(17) & 0x03); //Get 2bits of RNG from Temp and Vref
         seed ^= ADC_Read(adc_chan_sel[NUM_ADC_CHANNELS-1]) << i; //Get a couple more random bits from Voltage sensor
+        rand32_r(0, seed);
     }
     //This is important.  We're using the temp value as a buffer because otherwise the channel data
     //Can bleed into the voltage-sense data.
     //By disabling the temperature, we always read a consistent value
     adc_disable_temperature_sensor(_ADC);
-    printf("RNG Seed: %08x\n", (int)seed);
-    srand(seed);
+    printf("RNG Seed: %08x\n", (int)rand32());
 
     /* The following is based on code from here: http://code.google.com/p/rayaairbot */
     /* Enable DMA clock */
@@ -92,7 +92,7 @@ void ADC_Init(void)
     adc_start_conversion_direct(_ADC);
 }
 
-u16 ADC_Read(u8 channel)
+unsigned ADC_Read(unsigned channel)
 {
     u8 channel_array[1];
     /* Select the channel we want to convert. 16=temperature_sensor. */

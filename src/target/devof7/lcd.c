@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <libopencm3/stm32/f1/gpio.h>
-#include <libopencm3/stm32/f1/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 #include "gui/gui.h"
@@ -151,7 +151,7 @@ void LCD_Cmd(const u16 cmd) {
         LCD_CMDLength(&new_cmd[1], 1);
 }
 
-void LCD_Contrast(u8 contrast)
+void LCD_Contrast(unsigned contrast)
 {
     (void) contrast;
 }

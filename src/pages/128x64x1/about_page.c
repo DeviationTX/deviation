@@ -19,7 +19,7 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-static struct usb_page  * const up  = &pagemem.u.usb_page;
+static struct usb_page  * const up = &pagemem.u.usb_page;
 static struct about_obj * const gui = &gui_objs.u.about;
 
 void PAGE_AboutInit(int page)
@@ -29,10 +29,10 @@ void PAGE_AboutInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_ABOUT));
     PAGE_SetActionCB(_action_cb);
 
-    strcpy(tempstring, (const char *) _tr("Deviation FW version:"));
-    GUI_CreateLabelBox(&gui->label[0], 0, 15, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
-    GUI_CreateLabelBox(&gui->label[1], 0, 30, LCD_WIDTH, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, tempstring);
-    GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, ITEM_HEIGHT, &MICRO_FONT, NULL, NULL, _tr_noop(DeviationVersion));
+    tempstring_cpy((const char *) _tr("Deviation FW version:"));
+    GUI_CreateLabelBox(&gui->label[0], 0, 15, LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, "www.deviationtx.com");
+    GUI_CreateLabelBox(&gui->label[1], 0, 30, LCD_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, tempstring);
+    GUI_CreateLabelBox(&gui->label[2], 0, 45, LCD_WIDTH, LINE_HEIGHT, &MICRO_FONT, NULL, NULL, _tr_noop(DeviationVersion));
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)

@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -159,6 +160,7 @@ static void SLT_init2()
     rf_ch_num = 0;
 
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     u8 config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, config);
     // Implicit delay in callback
@@ -260,7 +262,7 @@ void send_data(u8 *data, u8 len)
     NRF24L01_FlushTx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_MAX_RT));
     NRF24L01_WritePayload(data, len);
-    NRF24L01_PulseCE();
+    //NRF24L01_PulseCE();
     packet_sent = 1;
 }
 
@@ -377,18 +379,6 @@ static u16 SLT_callback()
     return delay_us;
 }
 
-// Linear feedback shift register with 32-bit Xilinx polinomial x^32 + x^22 + x^2 + x + 1
-static const uint32_t LFSR_FEEDBACK = 0x80200003ul;
-static const uint32_t LFSR_INTAP = 32-1;
-
-static void update_lfsr(uint32_t *lfsr, uint8_t b)
-{
-    for (int i = 0; i < 8; ++i) {
-        *lfsr = (*lfsr >> 1) ^ ((-(*lfsr & 1u) & LFSR_FEEDBACK) ^ ~((uint32_t)(b & 1) << LFSR_INTAP));
-        b >>= 1;
-    }
-}
-
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
 static void initialize_tx_id()
 {
@@ -400,17 +390,17 @@ static void initialize_tx_id()
     printf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
         printf("%02X", var[i]);
-        update_lfsr(&lfsr, var[i]);
+        rand32_r(&lfsr, var[i]);
     }
     printf("\r\n");
 #endif
 
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
-           update_lfsr(&lfsr, (Model.fixed_id >> j) & 0xff);
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
-    for (int i = 0; i < TXID_SIZE; ++i) update_lfsr(&lfsr, 0);
+    for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
 
     set_tx_id(lfsr);
 }
@@ -433,18 +423,17 @@ const void *SLT_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
-        case PROTOCMD_DEINIT: return 0;
+        case PROTOCMD_DEINIT:
+        case PROTOCMD_RESET:
+            CLOCK_StopTimer();
+            return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, G, P
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
-        case PROTOCMD_SET_TXPOWER:
-            tx_power = Model.tx_power;
-            NRF24L01_SetPower(tx_power);
-            break;
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

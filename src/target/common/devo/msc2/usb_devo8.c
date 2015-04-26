@@ -17,8 +17,8 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <stdlib.h>
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include "common.h"
 
@@ -74,7 +74,7 @@ void HID_Init() {
     User_Standard_Requests = &HID_User_Standard_Requests;
 }
 #endif
-void USB_Enable(u8 type, u8 use_interrupt)
+void USB_Enable(unsigned type, unsigned use_interrupt)
 {
     if (type == 0) {
         //Mass Storage

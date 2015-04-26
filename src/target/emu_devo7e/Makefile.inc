@@ -7,7 +7,7 @@ include target/common/emu/Makefile.inc
 
 ifdef BUILD_TARGET
 $(TARGET).fs_wrapper: $(LAST_MODEL)
-	perl -p -i -e 's/; has_pa-cyrf6936 = 1/  has_pa-cyrf6936 = 0/' filesystem/$(FILESYSTEM)/tx.ini
+	perl -p -i -e 's/; has_pa-cyrf6936 = 1/  has_pa-cyrf6936 = 0/' filesystem/$(FILESYSTEM)/hardware.ini
 
 $(PRE_FS):
 	mkdir -p filesystem/$(FILESYSTEM)/media/ 2>/dev/null || true

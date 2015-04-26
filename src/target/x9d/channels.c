@@ -103,7 +103,7 @@ s32 CHAN_ReadRawInput(int channel)
     }
     return value;
 }
-s16 CHAN_ReadInput(int channel)
+s32 CHAN_ReadInput(int channel)
 {
     s32 value = CHAN_ReadRawInput(channel);
     if(channel <= INP_HAS_CALIBRATION) {

@@ -25,6 +25,7 @@
 
 static const char * const HELI_LABEL = _tr_noop("Heli");
 static const char * const PLANE_LABEL = _tr_noop("Plane");
+static const char * const MULTI_LABEL = _tr_noop("Multi");
 #include "../common/_model_page.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
@@ -146,7 +147,7 @@ void PAGE_ModelInit(int page)
     PAGE_ShowHeader(_tr("Model setup")); // using the same name as related menu item to reduce language strings
 
     if(Model.fixed_id == 0)
-        strncpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
+        strlcpy(mp->fixed_id, _tr("None"), sizeof(mp->fixed_id));
     else
         sprintf(mp->fixed_id, "%d", (int)Model.fixed_id);
 
@@ -162,7 +163,7 @@ static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't 
     (void)data;
     GUI_RemoveObj(obj);
     if (callback_result == 1) {  // only change name when DONE is hit, otherwise, discard the change
-        strncpy(Model.name, (const char *)tempstring, sizeof(Model.name));
+        strlcpy(Model.name, (const char *)tempstring, sizeof(Model.name));
         //Save model info here so it shows up on the model page
         CONFIG_SaveModelIfNeeded();
     }

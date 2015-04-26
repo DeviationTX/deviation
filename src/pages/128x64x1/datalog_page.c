@@ -28,6 +28,7 @@ enum {
     DL_SELECT,
     DL_SOURCE,
 };
+static u16 current_selected = 0;
 
 static void checkbut_press_cb(struct guiObject *obj, const void *data)
 {
@@ -56,7 +57,7 @@ static void select_press_cb(struct guiObject *obj, const void *data)
         return;
     memset(&dlog->source, seltype ? 0xff : 0, sizeof(dlog->source));
     DATALOG_UpdateState();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 7; i++) {
         if(OBJ_IS_USED(&gui->col2[i].but))
              GUI_Redraw(&gui->col2[i].but);
     }
@@ -104,20 +105,25 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         lbl_cb = NULL; lbl_data = _tr("Select");
         selpress_cb = select_press_cb; sel_cb = select_cb; sel_data = NULL;
     } else {
-        lbl_cb = source_cb; lbl_data = (void *)(long)(absrow-DL_SOURCE);
+        long row = absrow-DL_SOURCE;
+        int num_telem = TELEMETRY_GetNumTelemSrc();
+        int telem_delta = NUM_TELEM - num_telem;
+        if (row >= DLOG_INPUTS - telem_delta)
+            row += telem_delta;
+        lbl_cb = source_cb; lbl_data = (void *)row;
         but_press = checkbut_press_cb; but_txt = checkbut_txt_cb;
-        but_data = (void *)(long)(absrow-DL_SOURCE);
+        but_data = (void *)row;
     }
     if (lbl_data || lbl_cb) {
         GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, ITEM_HEIGHT, &DEFAULT_FONT, lbl_cb, NULL, lbl_data);
+            0, LINE_HEIGHT, &DEFAULT_FONT, lbl_cb, NULL, lbl_data);
     }
     if (but_press) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_press, but_data);
+            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_press, but_data);
     } else {
         GUI_CreateTextSelectPlate(&gui->col2[relrow].ts, x, y,
-            w, ITEM_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_data);
+            w, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_data);
     }
     return 1;
 }
@@ -151,12 +157,18 @@ void PAGE_DatalogInit(int page)
     memset(gui, 0, sizeof(*gui));
     seltype = 0;
     PAGE_SetActionCB(_action_cb);
-    PAGE_ShowHeader("");
+    struct LabelDesc font = DEFAULT_FONT;
+    font.style = LABEL_UNDERLINE;
+    int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
-        LCD_WIDTH-1, ITEM_HEIGHT, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+        LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
+void PAGE_DatalogExit()
+{
+    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+}
 #endif //HAS_DATLOG

@@ -19,6 +19,8 @@
 #include "config/model.h"
 #include "config/ini.h"
 
+#define MAX_CONCURRENT_SAFETY_MSGS 5
+
 #include "../common/_dialogs.c"
 
 static struct dialog_obj * const gui = &gui_objs.dialog;
@@ -26,49 +28,13 @@ static struct dialog_obj * const gui = &gui_objs.dialog;
 static const int DLG_XOFFSET = ((LCD_WIDTH - 320) / 2);
 static const int DLG_YOFFSET = ((LCD_HEIGHT - 240) / 2);
 
-u32 dialogcrc;
-
-static const char *safety_string_cb(guiObject_t *obj, void *data)
-{
-    (void)data;
-    int i;
-    u32 crc = Crc(tempstring, strlen(tempstring));
-    if (obj && crc == dialogcrc)
-        return tempstring;
-    int count = 0;
-    const s8 safeval[4] = {0, -100, 0, 100};
-    volatile s16 *raw = MIXER_GetInputs();
-    u64 unsafe = PROTOCOL_CheckSafe();
-    tempstring[0] = 0;
-    for(i = 0; i < NUM_SOURCES + 1; i++) {
-        if (! (unsafe & (1LL << i)))
-            continue;
-        int ch = (i == 0) ? PROTOCOL_MapChannel(INP_THROTTLE, NUM_INPUTS + 2) : i-1;
-      
-        s16 val = RANGE_TO_PCT((ch < NUM_INPUTS)
-                      ? raw[ch+1]
-                      : MIXER_GetChannel(ch - (NUM_INPUTS), APPLY_SAFETY));
-        INPUT_SourceName(tempstring + strlen(tempstring), ch + 1);
-        int len = strlen(tempstring);
-        snprintf(tempstring + len, sizeof(tempstring) - len, _tr(" is %d%%, safe value = %d%%\n"),
-                val, safeval[Model.safety[i]]);
-        if (++count >= 5)
-            break;
-    }
-    return tempstring;
-}
-
 void PAGE_ShowSafetyDialog()
 {
-    if (disable_safety) {
-        return; // don't show safety dialog when calibrating
-    }
     if (dialog) {
-        u64 unsafe = PROTOCOL_CheckSafe();
+        u64 unsafe = safety_check();
         if (! unsafe) {
-            GUI_RemoveObj(dialog);
-            dialog = NULL;
-            PROTOCOL_Init(0);
+            DialogClose(dialog, 0);
+            safety_confirmed();
         } else {
             safety_string_cb(NULL, NULL);
             u32 crc = Crc(tempstring, strlen(tempstring));
@@ -94,7 +60,7 @@ static const char *binding_string_cb(guiObject_t *obj, void *data)
     if (obj && crc == dialogcrc)
         return tempstring;
     u32 bind_time = PROTOCOL_Binding();
-    strncpy(tempstring, _tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."), sizeof(tempstring));
+    tempstring_cpy(_tr("Binding is in progress...\nMake sure model is on!\n\nPressing OK will NOT cancel binding procedure\nbut will allow full control of Tx."));
     u32 len = strlen(tempstring);
     if (bind_time != 0xFFFFFFFF && len < sizeof(tempstring)) {
         snprintf(tempstring + len, sizeof(tempstring) - len, _tr("\n\nBinding will end in %d seconds..."), (int)bind_time / 1000);
@@ -111,8 +77,7 @@ static void binding_ok_cb(u8 state, void * data)
 void PAGE_CloseBindingDialog()
 {
     if (dialog) {
-        GUI_RemoveObj(dialog);
-        dialog = 0;
+        DialogClose(dialog, 0);
     }
 }
 
@@ -135,9 +100,9 @@ void PAGE_ShowWarning(const char *title, const char *str)
 {   
     if (dialog)
         return;
-    sprintf(tempstring, "%s", str);
+    if(str != tempstring)
+        sprintf(tempstring, "%s", str);
     dialogcrc = 0;
-    current_selected_obj = GUI_GetSelected();
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, title, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
@@ -180,4 +145,17 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     dialog = GUI_CreateDialog(&gui->dialog, 10 + DLG_XOFFSET, 42 + DLG_YOFFSET, 300, 188, _tr("Reset Permanent Timer?"), reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }
 
+void PAGE_ShowModuleDialog(const char **missing)
+{
+    if (dialog)
+        return;
+    dialogcrc = 0;
+    sprintf(tempstring, "%s", _tr("Missing Modules:\n"));
+    for(int i = 0; i < TX_MODULE_LAST; i++) {
+       if(missing[i]) {
+           sprintf(tempstring+strlen(tempstring), "%s\n", missing[i]);
+       }
+    } 
+    PAGE_ShowWarning(_tr("Module Error"), tempstring);
+}
 

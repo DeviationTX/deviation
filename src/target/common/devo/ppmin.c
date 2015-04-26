@@ -13,8 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libopencm3/stm32/f1/rcc.h>
-#include <libopencm3/stm32/f1/gpio.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/exti.h>
 
@@ -39,7 +39,7 @@
 (3) set GPIO PA10 into source(EXTI10) interrupt(NVIC_EXTI15_10_IRQ) to trigger-call "exti15_10_isr()" function
 (4) transfer value for mixer.c   
     (4.1) "ppmin_num_channels"
-    (4.2) "Channels[i]" or "raw[i+1]" : each channel value (volatile s16 Channels[NUM_OUT_CHANNELS];)
+    (4.2) "Channels[i]" or "raw[i+1]" : each channel value (volatile s32 Channels[NUM_OUT_CHANNELS];)
           Channels[i]
                       = ((ppmChannels[i]*2MHz:uSecond - 1.5mSecond)/(1.0mSecond))*(CHAN_MAX_VALUE-CHAN_MIN_VALUE)
                       = (ppmChannels[i]-3000)*10
@@ -133,7 +133,7 @@ void PPMin_Init()
 ===get PPM===*/
 
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
-volatile s16 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
+volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
 volatile u8 ppmin_num_channels;     //  the ppmin_num_channels for mixer.c 
 
 static u8 k[4];

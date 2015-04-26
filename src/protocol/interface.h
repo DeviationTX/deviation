@@ -9,12 +9,24 @@ enum ProtoCmds {
     PROTOCMD_NUMCHAN,
     PROTOCMD_DEFAULT_NUMCHAN,
     PROTOCMD_CURRENT_ID,
-    PROTOCMD_SET_TXPOWER,
     PROTOCMD_GETOPTIONS,
     PROTOCMD_SETOPTIONS,
     PROTOCMD_TELEMETRYSTATE,
+    PROTOCMD_RESET,
 };
 
+enum TXRX_State {
+    TXRX_OFF,
+    TX_EN,
+    RX_EN,
+};
+
+enum PinConfigState {
+    CSN_PIN,
+    ENABLED_PIN,
+    DISABLED_PIN,
+    RESET_PIN,
+};
 #ifndef MODULAR
 #define PROTODEF(proto, module, map, cmd, name) extern const void * cmd(enum ProtoCmds);
 #include "protocol.h"
