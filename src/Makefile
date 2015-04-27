@@ -311,16 +311,16 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 #Necessary Font files#
 ######################
 filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
-	../utils/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
+	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
 
 filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
-	../utils/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
+	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
-	../utils/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
+	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo10/media/04b03.fon: fonts/04b03.bdf
-	../utils/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
+	../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################
 #Build rules for all .o files#
