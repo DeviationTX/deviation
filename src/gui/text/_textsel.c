@@ -15,20 +15,20 @@
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {
     struct guiBox *box = &select->header.box;
-        int selected = 0;
-        int is_selected = (guiObject_t *)select == objSELECTED;
-        GUI_DrawBackground(box->x, box->y, box->width, box->height);
-        if (select->enable  & 0x01) {
-            u16 x1 = box->x + box->width;
-            if (select->enable  & 0x02) {
-            if (is_selected) {
+    int selected = 0;
+    int is_selected = (guiObject_t *)select == objSELECTED;
+    GUI_DrawBackground(box->x, box->y, box->width, box->height);
+    if (select->enable  & 0x01) {
+        u16 x1 = box->x + box->width;
+        if (select->enable  & 0x02) {
+           if (is_selected) {
                 LCD_PrintStringXY(box->x-1, box->y, "<");
                 LCD_PrintStringXY(x1, box->y, ">");
             } else {
                 LCD_PrintStringXY(box->x-1, box->y, " ");
                 LCD_PrintStringXY(x1, box->y, " ");
             }
-            } else {
+        } else {
             if (is_selected) {
                 LCD_PrintStringXY(box->x-1, box->y, "[");
                 LCD_PrintStringXY(x1, box->y, "]");
@@ -36,17 +36,16 @@ void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
                 LCD_PrintStringXY(box->x-1, box->y, " ");
                 LCD_PrintStringXY(x1, box->y, " ");
             }
-            }
-        }  else if (select->enable == 2) {  // ENBALBE == 2 means the textsel can be pressed but not be selected
+        }
+    }  else if (select->enable == 2) {  // ENBALBE == 2 means the textsel can be pressed but not be selected
+        //FIXME
+    } else {
+        if (!select->enable)  // avoid drawing button box when it is disable
             //FIXME
+        if (is_selected) {
+            selected = 1;
         }
-        else {
-            if (!select->enable)  // avoid drawing button box when it is disable
-                //FIXME
-            if (is_selected) {
-                selected = 1;
-            }
-        }
-        GUI_DrawLabelHelper(box->x + 1 , box->y, box->width - 2 , box->height,
-                str, &select->desc, selected);
+    }
+    GUI_DrawLabelHelper(box->x + 1 , box->y, box->width - 2 , box->height,
+            str, &select->desc, selected);
 }
