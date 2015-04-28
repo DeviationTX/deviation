@@ -14,29 +14,51 @@
  */
 #define DIALOG_HEADER_Y 0
 #define DIALOG_TXTOFFSET_X 2
+#define OK_WIDTH 3
+#define CANCEL_WIDTH 7
+#define DIALOG_SINGLE_BUTTON_X (x + (width - (dgType == dtOk ? OK_WIDTH : CANCEL_WIDTH)) / 2)
+#define DIALOG_SINGLE_BUTTON_Y (y + height - 1)
+#define DIALOG_DUAL_BUTTON_X1 (x + 2)
+#define DIALOG_DUAL_BUTTON_X2 (x + width - CANCEL_WIDTH - 2)
+#define DIALOG_DUAL_BUTTON_Y (y + height - 1)
 
 void _draw_dialog_box(struct guiBox *box, int x, const char *title)
 {
-	(void) x;
-	(void) title;
-    u16 i,j;
-    char spaces[LCD_WIDTH+1];
-	for(i = 0; i <= box->height; i++) {
-    	for(j = 0; j <= (box->width-box->x) || j <= LCD_WIDTH; j++)
-    		spaces[j] = 0x20;
-    	spaces[box->width+1] = 0;
-    	LCD_PrintStringXY(box->x, box->y+i, spaces);
-  	}
+    (void) x;
+    (void) title;
+    int i,j;
+    char fill[LCD_WIDTH+1];
+    int width = box->x + box->width > LCD_WIDTH ? LCD_WIDTH - box->x : box->width;
+    fill[0] = ' ';
+    fill[width] = 0;
+    for (i = 1; i < width -1; i++) {
+         fill[i] = '-';
+    }
+    fill[width -1] = ' ';
+    LCD_PrintStringXY(box->x, box->y+box->height-1,fill);
+    LCD_PrintStringXY(box->x, box->y,fill);
+    fill[0] ='l';
+    fill[width -1] = 'l';
+    for(j = 1; j < width-1; j++) {
+        fill[j] = 0x20;
+    }
+    for(i = 1; i < box->height-1; i++) {
+        LCD_PrintStringXY(box->x, box->y+i, fill);
+    }
 }
 
 void _dialog_draw_background(u16 x, u16 y, u16 w, u16 h)
 {
-	u16 i,j;
+    unsigned i,j;
     char spaces[LCD_WIDTH+1];
-	for(i = 0; i <= h; i++) {
-    	for(j = 0; j <= (w-x) || j <= LCD_WIDTH; j++)
-    		spaces[j] = 0x20;
-    	spaces[w+1] = 0;
-    	LCD_PrintStringXY(x, y+i, spaces);
-  	}
+    if (w+x > LCD_WIDTH)
+        w = LCD_WIDTH - x;
+
+    for(j = 0; j < w; j++)
+        spaces[j] = 0x20;
+    spaces[w] = 0;
+
+    for(i = 0; i < h; i++) {
+        LCD_PrintStringXY(x, y+i, spaces);
+    }
 }

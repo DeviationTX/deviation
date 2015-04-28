@@ -64,7 +64,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     case dtOk:
     case dtCancel:
         {
-        but = GUI_CreateButton(&dialog->but1, x + (width - button_width) / 2, y + height - button_height - 3,
+        but = GUI_CreateButton(&dialog->but1, DIALOG_SINGLE_BUTTON_X, DIALOG_SINGLE_BUTTON_Y,
                     DIALOG_BUTTON,
                     dgType == dtOk ? dlgbut_strok_cb : dlgbut_strcancel_cb,
                     0x0000,
@@ -73,9 +73,9 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
         }
         break;
     case dtOkCancel: {
-        GUI_CreateButton(&dialog->but1, x + (width - button_width - button_width) / 2 - 1, y + height - button_height - 3,
+        GUI_CreateButton(&dialog->but1, DIALOG_DUAL_BUTTON_X1, DIALOG_DUAL_BUTTON_Y,
                 DIALOG_BUTTON, dlgbut_strok_cb, 0x0000, dlgbut_pressok_cb, obj);
-        but = GUI_CreateButton(&dialog->but2, x + width/2 + 1, y + height - button_height - 3,
+        but = GUI_CreateButton(&dialog->but2, DIALOG_DUAL_BUTTON_X2, DIALOG_DUAL_BUTTON_Y,
                  DIALOG_BUTTON, dlgbut_strcancel_cb, 0x0000, dlgbut_presscancel_cb, obj);
         }
         break;

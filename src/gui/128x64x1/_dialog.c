@@ -14,6 +14,11 @@
  */
 #define DIALOG_HEADER_Y 0
 #define DIALOG_TXTOFFSET_X 10
+#define DIALOG_SINGLE_BUTTON_X (x + (width - button_width) / 2)
+#define DIALOG_SINGLE_BUTTON_Y (y + height - button_height - 3)
+#define DIALOG_DUAL_BUTTON_X1 (x + (width - button_width - button_width) / 2 - 1)
+#define DIALOG_DUAL_BUTTON_X2 (x + width/2 + 1)
+#define DIALOG_DUAL_BUTTON_Y (y + height - button_height - 3)
 
 void _draw_dialog_box(struct guiBox *box, int x, const char *title)
 {

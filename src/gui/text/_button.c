@@ -34,13 +34,17 @@ void _DrawButton(struct guiObject *obj)
     else
         txt = (const char *)button->cb_data;
     u16 text_w, text_h;
-    u16 w = box->width;
-    u16 h = box->height;
+    unsigned w = box->width;
+    unsigned h = box->height;
+    unsigned x = obj->box.x;
+    
     LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
     if (box->width == 0)
         w = text_w;
     if (box->height == 0)
         h = text_h;
-    GUI_DrawLabelHelper(obj->box.x, obj->box.y, w, h, txt, &button->desc, obj == objSELECTED);
+    if (obj != objSELECTED)
+        LCD_PrintCharXY(x++, obj->box.y, ' '); // Box width should be constant, and LabelHelper will be different if selected
+    GUI_DrawLabelHelper(x, obj->box.y, w, h, txt, &button->desc, obj == objSELECTED);
     return;
 }

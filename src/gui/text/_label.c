@@ -14,7 +14,7 @@
  */
 
 //char SELECT_CHAR[] = "☼";
-char SELECT_CHAR[] = "]";
+static const char SELECT_CHAR = ']';
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
 	u16 txt_w, txt_h;
@@ -23,12 +23,11 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
 
     if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
         txt_w++;
-        LCD_PrintStringXY(obj_x, obj_y, SELECT_CHAR);
-        obj_x++;
+        LCD_PrintCharXY(obj_x++, obj_y, SELECT_CHAR);
     }
 
     //printf("%s, %d, %d\n", tempstring, txt_w, obj_width);
     LCD_PrintStringXY(obj_x, obj_y, str);
     for(;txt_w < obj_width;txt_w++)
-    	LCD_PrintStringXY(obj_x+txt_w, obj_y, " ");
+    	LCD_PrintCharXY(obj_x+txt_w, obj_y, ' ');
 }
