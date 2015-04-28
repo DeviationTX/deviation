@@ -22,3 +22,58 @@ const struct ImageMap *_button_image_map(enum ButtonType type)
     }
     return NULL;
 }
+
+void _DrawButton(struct guiObject *obj)
+{
+    struct guiButton *button = (struct guiButton *)obj;
+    struct guiBox *box = &obj->box;
+    const char *txt;
+    u16 x_off, y_off;
+
+#define BUTTON_ROUND 3
+    LCD_SetFont(button->desc.font); //Set Font here so callback can calculate size
+    if (button->strCallback)
+        txt = button->strCallback(obj, button->cb_data);
+    else
+        txt = (const char *)button->cb_data;
+    u16 text_w, text_h;
+    u16 w = box->width;
+    u16 h = box->height;
+    LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+    if (box->width == 0)
+        w = text_w;
+    if (box->height == 0)
+        h = text_h;
+    GUI_DrawLabelHelper(obj->box.x, obj->box.y, w, h, txt, &button->desc, obj == objSELECTED);
+    return;
+    if (obj == objSELECTED) {
+        LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 1);
+        LCD_SetFontColor(0);
+    }  else {
+        LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
+        if (button->enable)
+            LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
+        /* Bracket style button, disable temporarily
+        u16 y1 = obj->box.y + 2;
+        u16 y2 = obj->box.y + obj->box.height -3;
+        u16 x1 = obj->box.x + obj->box.width - 1;
+        LCD_DrawLine(obj->box.x, y1, obj->box.x + 2, obj->box.y, 1);
+        LCD_DrawLine(obj->box.x, y2, obj->box.x + 2, obj->box.y + obj->box.height -1, 1);
+        LCD_DrawLine(obj->box.x, y1, obj->box.x, y2, 1);
+        LCD_DrawLine(x1, y1, x1 - 2, obj->box.y, 1);
+        LCD_DrawLine(x1, y2, x1 - 2, obj->box.y + obj->box.height -1, 1);
+        LCD_DrawLine(x1, y1, x1, y2, 1); */
+        LCD_SetFontColor(0xffff);
+    }
+    // bug fix: if the string width is wider than box width, e.g. changing to Chinese, x_off might be very big(actuall
+    //it is negative)
+    if (box->width > text_w)
+        x_off = (box->width - text_w) / 2 + box->x +1;
+    else
+        x_off = box->x +1;
+    if (box->height > text_h)
+        y_off = (box->height - text_h) / 2 + box->y + 1;
+    else
+        y_off = box->y;
+    LCD_PrintStringXY(x_off, y_off, txt);
+}
