@@ -204,7 +204,7 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
         selectable = scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
         y += scrollable->row_height * (scrollable->size_cb ? 
                                        scrollable->size_cb(row, scrollable->cb_data) : 1);
-        if (y > bottom + scrollable->row_height - 4)
+        if (y > bottom)
             break;  //is not selectable because it's not completely visible
 
         //maintain index of selected item
@@ -272,6 +272,7 @@ guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObj
         idx = 0;
         goto exit;
     }
+printf("Next: 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d\n", idx, scrollable->cur_row, scrollable->num_selectable, scrollable->visible_rows, scrollable->max_visible_rows, scrollable->item_count);
     if (idx == -1 || idx == scrollable->num_selectable) {
         //no next selectable, move the scrollbar
         if (scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)

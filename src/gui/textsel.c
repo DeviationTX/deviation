@@ -126,15 +126,15 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         else
 #endif
         {
-            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                    box->y, select->button, DRAW_NORMAL);
-            if (select->enable & 0x01) {
-                GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
-                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-                GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                        box->y, ARROW_RIGHT,
-                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-            }
+//            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
+//                    box->y, select->button, DRAW_NORMAL);
+//            if (select->enable & 0x01) {
+//                GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
+//                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
+//                GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
+//                        box->y, ARROW_RIGHT,
+//                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
+//            }
         }
         LCD_SetFont(TEXTSEL_FONT.font);
         LCD_SetFontColor(TEXTSEL_FONT.font_color);
@@ -143,6 +143,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
         y = box->y + 1 + (box->height - h) / 2; // one pixel higher (+1) to avoid artifacts
         LCD_PrintStringXY(x, y, str);
     } else {   // plate text select for devo 10, copy most behavior from label.c
+        int selected = 0;
         GUI_DrawBackground(box->x, box->y, box->width, box->height);
         u8 arrow_width = ARROW_WIDTH - 1;
 // only used for RTC config in Devo12
@@ -151,7 +152,25 @@ void GUI_DrawTextSelect(struct guiObject *obj)
 #endif
         if (select->enable  & 0x01) {
             u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
-            u16 x1 = box->x + arrow_width -1;
+            u16 x1 = box->x + box->width;
+            if (select->enable  & 0x02) {
+            if (obj == objSELECTED) {
+                LCD_PrintStringXY(box->x-1, box->y, "<");
+                LCD_PrintStringXY(x1, box->y, ">");
+            } else {
+                LCD_PrintStringXY(box->x-1, box->y, " ");
+                LCD_PrintStringXY(x1, box->y, " ");
+            }
+            } else {
+            if (obj == objSELECTED) {
+                LCD_PrintStringXY(box->x-1, box->y, "[");
+                LCD_PrintStringXY(x1, box->y, "]");
+            } else {
+                LCD_PrintStringXY(box->x-1, box->y, " ");
+                LCD_PrintStringXY(x1, box->y, " ");
+            }
+            }
+/*            u16 x1 = box->x + arrow_width -1;
             LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
             LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
             //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
@@ -161,12 +180,16 @@ void GUI_DrawTextSelect(struct guiObject *obj)
             //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
             LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
             LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
+*/
         }  else if (select->enable == 2) {  // ENBALBE == 2 means the textsel can be pressed but not be selected
             select->desc.style = LABEL_BOX;
         }
         else {
             if (!select->enable)  // avoid drawing button box when it is disable
                 select->desc.style = LABEL_CENTER;
+            if (obj == objSELECTED) {
+                selected = 1;
+            }
         }
 // only used for RTC config in Devo12
 #if HAS_RTC
@@ -178,7 +201,7 @@ void GUI_DrawTextSelect(struct guiObject *obj)
 #endif
         {
             GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
-                    str, &select->desc, obj == objSELECTED);
+                    str, &select->desc, selected);
         }
     }
 }

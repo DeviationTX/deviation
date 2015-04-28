@@ -133,6 +133,8 @@ void GUI_DrawButton(struct guiObject *obj)
             w = text_w;
         if (box->height == 0)
             h = text_h;
+        GUI_DrawLabelHelper(obj->box.x, obj->box.y, w, h, txt, &button->desc, obj == objSELECTED);
+        return;
         if (obj == objSELECTED) {
             LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 1);
             LCD_SetFontColor(0);

@@ -105,7 +105,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
                 0, 0, &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
             GUI_CreateLabelBox(&gui->name[relrow], ITEM_SPACE*2, y,
-                0, 0, &DEFAULT_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
+                LCD_WIDTH-ITEM_SPACE*2, 0, &DEFAULT_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;

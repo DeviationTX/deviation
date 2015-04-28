@@ -13,16 +13,18 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//char SELECT_CHAR[] = "☼";
+char SELECT_CHAR[] = "]";
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
 	u16 txt_w, txt_h;
     (void)obj_height;
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
 
-	if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
-        LCD_SetFontColor(~desc->font_color);
-    } else {
-        LCD_SetFontColor(desc->font_color);
+    if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
+        txt_w++;
+        LCD_PrintStringXY(obj_x, obj_y, SELECT_CHAR);
+        obj_x++;
     }
 
     //printf("%s, %d, %d\n", tempstring, txt_w, obj_width);

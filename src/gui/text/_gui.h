@@ -1,5 +1,5 @@
 #define LCD_WIDTH 24
-#define LCD_HEIGHT 11
+#define LCD_HEIGHT 12
 #define LCD_DEPTH 1
 enum ImageNames {
     DRAW_BTN32_15,

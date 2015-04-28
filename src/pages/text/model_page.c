@@ -97,7 +97,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             ts_tgl = ppmin_press_cb; ts_value = ppmin_select_cb;
             break;
         case ITEM_PROTO:
-            ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = 0;
+            ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = 1;
             but_txt = show_bindtext_cb; but_tgl = bind_cb;
             break;
         case ITEM_FIXEDID:
@@ -120,7 +120,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
            14, 0, &DEFAULT_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            (ts_x != 0)?LCD_WIDTH - ts_x : 14, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            (ts_x != 1)?LCD_WIDTH - ts_x - 1: 12, 0, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
     if (but_txt) {

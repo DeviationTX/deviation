@@ -188,11 +188,11 @@ struct datalog_obj {
 
 struct tx_obj {
     guiLabel_t title;
-    guiLabel_t label[10];
+    guiLabel_t label[LCD_HEIGHT-1];
     union {
         guiButton_t but;
         guiTextSelect_t ts;
-    } value[10];
+    } value[LCD_HEIGHT-1];
     guiScrollable_t scrollable;
 };
 

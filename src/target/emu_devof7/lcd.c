@@ -37,7 +37,7 @@ static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
  */
 void LCD_DrawPixel(unsigned int color)
 {
-	if (gui.x < LCD_WIDTH*LCD_WIDTH_MULT/2 && gui.y < LCD_HEIGHT*LCD_WIDTH_MULT/2) {	// both are unsigned, can not be < 0
+	if (gui.x < LCD_WIDTH*LCD_CHAR_W && gui.y < LCD_HEIGHT*LCD_CHAR_H) {	// both are unsigned, can not be < 0
 		struct rgb c;
 		int row, col;
 		int i, j;
@@ -45,15 +45,15 @@ void LCD_DrawPixel(unsigned int color)
 		c = color ? foreground : background; // 0xaa is grey color(not dot)
 
 		//Fill in 4 dots
-		row = 2 * gui.y;
-		col = 2 * gui.x;
-		for (i = 0; i < 2; i++) {
-			for (j = 0; j < 2; j++) {
-                gui.image[3*(logical_lcd_width* (row + i) + col + j)]     = c.r;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c.g;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c.b;
-            }
-        }
+		row = ZOOM_Y * gui.y;
+		col = ZOOM_X * gui.x;
+		for (i = 0; i < ZOOM_Y; i++) {
+			for (j = 0; j < ZOOM_X; j++) {
+				gui.image[3*(logical_lcd_width* (row + i) + col + j)]     = c.r;
+				gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c.g;
+				gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c.b;
+			}
+		}
 	}
 	// this must be executed to continue drawing in the next row
     gui.x++;

@@ -160,10 +160,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             x-1, 0,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, 1+ x, y,
-            LCD_WIDTH - x -1, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            LCD_WIDTH - x -2, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, 1+ x, y,
-            LCD_WIDTH - x -1, 0, &DEFAULT_FONT, NULL, value, data);
+            LCD_WIDTH - x -2, 0, &DEFAULT_FONT, NULL, value, data);
     }
     return 1;
 }
@@ -179,7 +179,7 @@ void PAGE_TxConfigureInit(int page)
     cp->total_items = 0;
 
 
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - 1,
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT-1,
                      ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
