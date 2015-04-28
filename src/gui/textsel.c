@@ -224,7 +224,7 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
 void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 {
     struct touch coords;
-    coords.y = obj->box.y + 1;
+    coords.y = obj->box.y + KEY_ADJUST_Y;
     if (button == BUT_RIGHT) {
         coords.x = obj->box.x + obj->box.width + 1 - ARROW_WIDTH;
     } else if(button == BUT_LEFT) {

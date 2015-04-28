@@ -12,6 +12,9 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#define KEY_ADJUST_Y 0 /* no adjustment needed for character display */
+
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {
     struct guiBox *box = &select->header.box;
