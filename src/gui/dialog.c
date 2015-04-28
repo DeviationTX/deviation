@@ -52,7 +52,7 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     dialog->title = title;
     dialog->CallBack = *CallBack;
     dialog->cbData = data;
-    dialog->txtbox.x = x + 2;
+    dialog->txtbox.x = x + DIALOG_TXTOFFSET_X;
     dialog->txtbox.y = 0;
     dialog->txtbox.width = 0;
     dialog->txtbox.height = 0;

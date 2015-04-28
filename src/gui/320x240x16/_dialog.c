@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #define DIALOG_HEADER_Y 24
+#define DIALOG_TXTOFFSET_X 10
+
 void _draw_dialog_box(struct guiBox *box, int x, const char *title)
 {
     LCD_DrawRect(box->x, box->y, box->width, box->height, DIALOGTITLE_FONT.fill_color);
