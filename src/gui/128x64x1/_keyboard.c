@@ -31,6 +31,7 @@ static const char caps_str[] = "CAP";
 static const char del_str[]  = "DEL";
 static const char mix_str[]  = ".?12";
 static const char char_str[] = "ABC";
+static const char space_str[] = " ";
 
 static void _make_box(struct guiBox *box, u16 x, u16 y, u16 width, u16 height)
 {

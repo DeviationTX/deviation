@@ -167,9 +167,13 @@ static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
             fg_color = Display.keyboard.fg_key2;
         }
     } else {
-        ch[0] = c;
-        ch[1] = 0;
-        str = ch;
+        if (c == ' ') {
+            str = space_str;
+        } else {
+            ch[0] = c;
+            ch[1] = 0;
+            str = ch;
+        }
         if (pressed) {
             bg_color = Display.keyboard.fg_key1;
             fg_color = Display.keyboard.bg_key1;
