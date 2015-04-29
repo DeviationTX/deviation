@@ -421,6 +421,8 @@ void PROTOCOL_InitModules()
                     //Try this module
                     Model.protocol = j;
                     PROTOCOL_Load(1);
+                    if (! PROTOCOL_LOADED)
+                        continue;
                     int res = (long)PROTO_Cmds(PROTOCMD_RESET);
                     if (res == 0)
                         continue;
