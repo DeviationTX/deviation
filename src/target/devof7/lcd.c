@@ -185,7 +185,7 @@ void lcd_show_line(const char string[], u8 line, u8 align, u16 color) {
     j = 0;
     for(i = 0; i < LCD_SCREEN_CHARS; i++) {
         if(i < pos_x || pos_x+length <= i)
-            new_string[i] = 0x7F; //del
+            new_string[i] = ' '; //del
         else {
             new_string[i] = string[j];
             j++;
