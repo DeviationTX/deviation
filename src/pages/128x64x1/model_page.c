@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -20,6 +21,16 @@
 #include "config/tx.h"
 #include "mixer_standard.h"
 #include "standard/standard.h"
+
+enum {
+    DEFAULT_TEXTSEL_X = 63,
+    LEFT_TEXTSEL_X    = 0,
+    TEXTSEL_WIDTH     = 59,
+    LABEL_WIDTH       = 0,
+    BUTTON_X          = 63,
+    BUTTON_WIDTH      = 59,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include <stdlib.h>
 
@@ -62,9 +73,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void) data;
-    u8 w = 59;
-    u8 x = 63;
-    u8 ts_x = 63;
+    u8 ts_x = DEFAULT_TEXTSEL_X;
     int count = 0;
     const void *label = NULL;
     void *ts_tgl = NULL;
@@ -99,7 +108,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             ts_tgl = ppmin_press_cb; ts_value = ppmin_select_cb;
             break;
         case ITEM_PROTO:
-            ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = 0;
+            ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = LEFT_TEXTSEL_X;
             but_txt = show_bindtext_cb; but_tgl = bind_cb;
             break;
         case ITEM_FIXEDID:
@@ -119,15 +128,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     if (label)
         GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,
-           0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+           LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
     if (ts_value) {
         GUI_CreateTextSelectPlate(but_txt ? &gui->col1[relrow].ts : &gui->col2[relrow].ts, ts_x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
     if (but_txt) {
-        GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
+        GUI_CreateButtonPlateText(&gui->col2[relrow].but, BUTTON_X, y,
+            BUTTON_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
         count++;
     }
     return count;
