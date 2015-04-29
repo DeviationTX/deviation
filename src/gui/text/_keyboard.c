@@ -52,3 +52,8 @@ void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
         LCD_PrintCharXY(box->x, box->y, ' ');
     }
 }
+
+static void _kb_draw_text(const char *str)
+{
+    GUI_DrawLabelHelper(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET, LCD_WIDTH - TEXTBOX_X_OFFSET, 1, str, NULL, 0);
+}

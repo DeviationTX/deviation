@@ -48,3 +48,19 @@ void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
     (void)pressed;
     LCD_FillRoundRect(box->x, box->y, box->width, box->height, 3, color);
 }
+
+static void _kb_draw_text(const char *str)
+{
+    u16 w, h;
+
+    LCD_SetFont(Display.keyboard.font);
+    LCD_GetCharDimensions('A', &w, &h);
+    LCD_FillRoundRect(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET,
+                      LCD_WIDTH - 2 * TEXTBOX_X_OFFSET,
+                      TEXTBOX_HEIGHT,
+                      TEXTBOX_ROUND,
+                      TEXTBOX_BG_COLOR);  // clear the backgroup firstly
+    LCD_SetXY(TEXTBOX_X_OFFSET + 2, (TEXTBOX_HEIGHT - h) / 2 + TEXTBOX_Y_OFFSET);
+    LCD_SetFontColor(TEXTBOX_COLOR);
+    LCD_PrintString(str);
+}

@@ -84,27 +84,6 @@ guiObject_t *GUI_CreateKeyboard(guiKeyboard_t *keyboard, enum KeyboardType type,
     return obj;
 }
 
-static void kb_draw_text(const char *str)
-{
-    u16 w, h;
-
-    LCD_SetFont(Display.keyboard.font);
-    LCD_GetCharDimensions('A', &w, &h);
-    LCD_FillRoundRect(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET,
-                      LCD_WIDTH - 2 * TEXTBOX_X_OFFSET,
-                      TEXTBOX_HEIGHT,
-                      TEXTBOX_ROUND,
-                      TEXTBOX_BG_COLOR);  // clear the backgroup firstly
-    if(TEXTBOX_OUTLINE)
-        LCD_DrawRoundRect(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET,
-                          LCD_WIDTH - 2 * TEXTBOX_X_OFFSET,
-                          TEXTBOX_HEIGHT,
-                          TEXTBOX_ROUND,
-                          TEXTBOX_OUTLINE);
-    LCD_SetXY(TEXTBOX_X_OFFSET + 2, (TEXTBOX_HEIGHT - h) / 2 + TEXTBOX_Y_OFFSET);
-    LCD_SetFontColor(TEXTBOX_COLOR);
-    LCD_PrintString(str);
-}
 
 void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
 {
@@ -112,7 +91,7 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
     if(ch == '\x08') {
         if (len > 0) {
             keyboard->text[len - 1] = 0;
-            kb_draw_text(keyboard->text);
+            _kb_draw_text(keyboard->text);
         }
         return;
     }
@@ -122,7 +101,7 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
         if (val > keyboard->max_size)
             return;
         sprintf(keyboard->text, "%d", (int)val);
-        kb_draw_text(keyboard->text);
+        _kb_draw_text(keyboard->text);
         return;
     }
     if (len >= keyboard->max_size) {
@@ -134,7 +113,7 @@ void kb_update_string(struct guiKeyboard *keyboard, u8 ch)
     }
     keyboard->text[len] = ch;
     keyboard->text[len+1] = 0;
-    kb_draw_text(keyboard->text);
+    _kb_draw_text(keyboard->text);
 }
 
 static void kb_draw_key(struct guiBox *box, char c, u8 pressed)
@@ -281,7 +260,7 @@ void GUI_DrawKeyboard(struct guiObject *obj)
 
     LCD_Clear(FILL);
     keyboard_cmd(KB_DRAW, keyboard, NULL);
-    kb_draw_text(keyboard->text);
+    _kb_draw_text(keyboard->text);
     return;
 }
 
@@ -314,7 +293,7 @@ u8 GUI_TouchKeyboard(struct guiObject *obj, struct touch *coords, s8 press_type)
     } else if (press_type == 1 && keyboard->lastchar == '\x08') {
         //DEL Long Press erases whole string
         keyboard->text[0] = '\0';
-        kb_draw_text(keyboard->text);
+        _kb_draw_text(keyboard->text);
     }
     return 1;
 }
@@ -372,7 +351,7 @@ static unsigned press_cb(u32 button, unsigned flags, void *data)
         if ( flags & BUTTON_LONGPRESS && CHAN_ButtonIsPressed(button, BUT_ENTER) && keyboard->lastchar == '\x08') {
             //DEL Long Press erases whole string
             keyboard->text[0] = '\0';
-            kb_draw_text(keyboard->text);
+            _kb_draw_text(keyboard->text);
         }
         else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) { // allow user to press the EXT key to discard changes
             if (keyboard->CallBack) {

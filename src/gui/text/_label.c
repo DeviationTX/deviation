@@ -21,7 +21,7 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
     (void)obj_height;
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
 
-    if (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected)) {
+    if (desc && (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected))) {
         txt_w++;
         LCD_PrintCharXY(obj_x++, obj_y, SELECT_CHAR);
     }
