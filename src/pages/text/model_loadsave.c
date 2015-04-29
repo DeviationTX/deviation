@@ -58,13 +58,34 @@ static void iconpress_cb(guiObject_t *obj, void *data)
     okcancel_cb(NULL, (void *)(LOAD_ICON+1));
 }
 
+static const char *model_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    int absrow = (long)data;
+    return string_cb(absrow, (void *)(long)LOAD_MODEL);
+}
+
+void modelpress_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    (void)press_type;
+    int absrow = (long)data;
+    mp->selected = absrow+1;
+    okcancel_cb(NULL, (void *)(long)(load_save +1));
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+    (void) data;
+    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
+       LCD_WIDTH, 0, &DEFAULT_FONT, model_cb, modelpress_cb, (void *)(long)absrow);
+    return 1;
+}
 static void _show_list(int loadsave,u8 num_models)
 {
-    OBJ_SET_USED(&gui->image, 0);
-    guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1, num_models,
-    mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
-            string_cb, select_cb, _press_cb, (void *)(long)loadsave);
-    GUI_SetSelected(obj);
+    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
+                         ITEM_SPACE, num_models, row_cb, NULL, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, mp->selected-1));
 }
 
 static void _press_cb(guiObject_t *obj, u16 selected, void *data)

@@ -85,6 +85,8 @@ struct modelcfg_obj {
 };
 
 struct modelload_obj {
+    guiLabel_t label[11];
+    guiScrollable_t scrollable;
     guiTextSelect_t ico;
     guiImage_t image;
     guiListbox_t listbox;
