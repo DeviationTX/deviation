@@ -19,7 +19,7 @@
 #include "gui/gui.h"
 #include "../common/emu/fltk.h"
 #include "lcd.h"
-#include "ia9211font.h"
+#include "ia9211_font.h"
 
 struct rgb {
     u8 r;
@@ -98,7 +98,7 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
         range += 2;
         pos += 4;
     }
-    u8 *font = ia911_fon + pos;
+    u8 *font = ia9211_fon + pos;
     *begin = font[0] | (font[1] << 8) | (font[2] << 16);
     *end   = font[3] | (font[4] << 8) | (font[5] << 16);
     return 1;
@@ -118,13 +118,14 @@ const u8 *char_offset(u32 c, u8 *width)
         end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
         *width = (end - begin) / row_bytes;
     }
-    return ia911_fon + begin;
+    return ia9211_fon + begin;
     return font;
 }
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
+    c = IA9211_map_char(c);
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {
         printf("Could not locate character U-%04x\n", (int)c);
@@ -166,10 +167,10 @@ void close_font()
 
 u8 open_font()
 {
-    cur_str.font.height = ia911_fon[0];
+    cur_str.font.height = ia9211_fon[0];
     cur_str.font.idx = 0;
     int idx = 0;
-    u8 *f = ia911_fon+1;
+    u8 *f = ia9211_fon+1;
     while(1) {
         u16 start_c = f[0] | (f[1] << 8);
         u16 end_c = f[2] | (f[3] << 8);

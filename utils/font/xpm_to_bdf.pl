@@ -58,11 +58,11 @@ sub make_bdf {
     print "CHARS " . scalar(keys(%font)) . "\n";
     foreach my $chr (keys %font) {
         my $enc = hex($chr);
-        if ($map[$enc]) {
-            $enc = $map[$enc];
-        } else {
-            die "Couldn't map $chr\n";
-        }
+        #if ($map[$enc]) {
+        #    $enc = $map[$enc];
+        #} else {
+        #    die "Couldn't map $chr\n";
+        #}
         printf "STARTCHAR U+%04x\n", $enc;
         print "ENCODING $enc\n";
         print "SWIDTH 500 0\n";

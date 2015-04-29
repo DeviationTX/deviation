@@ -28,4 +28,5 @@ struct {
     u16          color;
 } cur_str;
 
+u32 IA9211_map_char(u32 c);
 #endif //LCD_H

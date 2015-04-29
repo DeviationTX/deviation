@@ -13,6 +13,8 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "char_map.h"
+
 #define TEXTBOX_X_OFFSET 3
 #define TEXTBOX_Y_OFFSET 3
 #define TEXTBOX_HEIGHT  1
@@ -27,7 +29,7 @@
 #define KEY_W2 4  // 3 chars
 #define KEY_W3 5  // 4 chars
 
-static const char caps_str[] = "↑";
+static const char caps_str[] = { IA9211_UP_ARROW, 0 };
 static const char del_str[]  = "DEL";
 static const char mix_str[]  = "012";
 static const char char_str[] = "ABC";
