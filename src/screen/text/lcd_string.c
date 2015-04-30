@@ -16,6 +16,11 @@
 #include "gui/gui.h"
 #include "lcd.h"
 
+//characters are always 1x1 or 2x2
+#define CHAR_SPACING 0
+#define HEIGHT(x) (x.height / CHAR_HEIGHT)
+#define get_width(x) HEIGHT(cur_str.font)
+
 struct FAT FontFAT = {{0}};
 
 void LCD_SetXY(unsigned int x, unsigned int y)
@@ -45,43 +50,46 @@ void LCD_PrintChar(u32 c)
     if(c == '\n') {
         // New line
         cur_str.x = cur_str.x_start;
-        cur_str.y++;
+        cur_str.y += HEIGHT(cur_str.font);
     } else {
         LCD_PrintCharXY(cur_str.x, cur_str.y, c);
-        cur_str.x++;
+        cur_str.x += get_width(c);
     }
 }
 
 void LCD_GetCharDimensions(u32 c, u16 *width, u16 *height) {
     (void) c;
-    *height = 1;
-    *width = 1;
+    *height = HEIGHT(cur_str.font);
+    *width = get_width(c);
 }
 
 void LCD_GetStringDimensions(const u8 *str, u16 *width, u16 *height) {
-    u16 width_t, height_t;
-
-    height_t = 0;
-    width_t = 0;
+    int line_width = 0;
+    *height = HEIGHT(cur_str.font);
     *width = 0;
-    while(*str != 0) {
+    //printf("String: %s\n", str);
+    while(*str) {
         u32 ch;
-        str = (u8*)utf8_to_u32((char*)str, &ch);
+        str = (const u8 *)utf8_to_u32((const char *)str, &ch);
         if(ch == '\n') {
-            if(*width < width_t)
-                *width = width_t;
-
-            height_t++;
-            width_t = 0;
+            *height += HEIGHT(cur_str.font) + LINE_SPACING;
+            if(line_width > *width)
+                *width = line_width;
+            line_width = 0;
+        } else {
+            line_width += get_width(ch) + CHAR_SPACING;
         }
-        width_t++;
     }
-
-    if(*width < width_t)
-        *width = width_t;
-    *height = height_t;
+    if(line_width > *width)
+        *width = line_width;
+    //printf("W: %d   H: %d\n",(int)*width,(int)*height);
 }
 
 void LCD_SetFontColor(u16 color) {
     cur_str.color = color;
+}
+
+u8 LCD_GetFont()
+{
+    return cur_str.font.idx;
 }

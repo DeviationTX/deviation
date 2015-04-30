@@ -20,15 +20,22 @@
 #include "../common/emu/fltk.h"
 #include "lcd.h"
 #include "ia9211_font.h"
+#include "ia9211_bigfont.h"
 
 struct rgb {
     u8 r;
     u8 g;
     u8 b;
 };
-struct rgb background = {0x00, 0x00, 0xff};
-struct rgb foreground = {0xff, 0xff, 0xff};
+static const struct rgb background = {0x00, 0x00, 0xff};
+static const struct rgb foreground = {0xff, 0xff, 0xff};
 static int logical_lcd_width = LCD_WIDTH*LCD_WIDTH_MULT;
+
+static struct font_def default_font;
+static struct font_def big_font;
+struct font_str cur_str;
+
+
 #define HEIGHT(x) x.height
 
 /*
@@ -76,12 +83,6 @@ void LCD_Clear(unsigned int color) {
 /*
  * Since we have a text based screen we need some of the text writing functions here
  */
-u8 FONT_GetFromString(const char *value)
-{
-    (void) value;
-    return 0;
-}
-
 u8 get_char_range(u32 c, u32 *begin, u32 *end)
 {
     u32 offset = 0;
@@ -98,7 +99,7 @@ u8 get_char_range(u32 c, u32 *begin, u32 *end)
         range += 2;
         pos += 4;
     }
-    u8 *font = ia9211_fon + pos;
+    const u8 *font = cur_str.font.data + pos;
     *begin = font[0] | (font[1] << 8) | (font[2] << 16);
     *end   = font[3] | (font[4] << 8) | (font[5] << 16);
     return 1;
@@ -108,35 +109,31 @@ const u8 *char_offset(u32 c, u8 *width)
 {
     u32 begin;
     u32 end;
-    u8 *font = cur_str.font.font;
 
     u8 row_bytes = ((cur_str.font.height - 1) / 8) + 1;
     get_char_range(c, &begin, &end);
     *width = (end - begin) / row_bytes;
-    if (end - begin > sizeof(cur_str.font.font)) {
-        printf("Character '%04d' is larger than allowed size\n", (int)c);
-        end = begin + (sizeof(cur_str.font.font) / row_bytes) * row_bytes;
-        *width = (end - begin) / row_bytes;
-    }
-    return ia9211_fon + begin;
-    return font;
+    return cur_str.font.data + begin;
 }
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
     c = IA9211_map_char(c);
+    int font_size = cur_str.font.height / CHAR_HEIGHT;
+
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {
         printf("Could not locate character U-%04x\n", (int)c);
         return;
     }
+    for (unsigned int i = 0; i < y; i++)
     // Check if the requested character is available
-    LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+1) * CHAR_WIDTH,  (y+1) * CHAR_HEIGHT, DRAW_NWSE);
+    LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+font_size) * CHAR_WIDTH,  (y+font_size) * CHAR_HEIGHT, DRAW_NWSE);
 
     // First clean th area
-    for(col = 0; col < CHAR_WIDTH; col++) {
-        for(row = 0; row < CHAR_HEIGHT; row++) {
+    for(col = 0; col < font_size * CHAR_WIDTH; col++) {
+        for(row = 0; row < font_size * CHAR_HEIGHT; row++) {
             LCD_DrawPixelXY((x * CHAR_WIDTH) + col, (y * CHAR_HEIGHT) + row, 0);
         }
     }
@@ -165,38 +162,43 @@ void close_font()
 {
 }
 
-u8 open_font()
+void open_font(struct font_def *font, const u8 *data, int fontidx)
 {
-    cur_str.font.height = ia9211_fon[0];
-    cur_str.font.idx = 0;
+    font->height = *data;
+    font->idx = fontidx;
+    font->data = data;
     int idx = 0;
-    u8 *f = ia9211_fon+1;
+    const u8 *f = data+1;
     while(1) {
         u16 start_c = f[0] | (f[1] << 8);
         u16 end_c = f[2] | (f[3] << 8);
-        cur_str.font.range[idx++] = start_c;
-        cur_str.font.range[idx++] = end_c;
+        font->range[idx++] = start_c;
+        font->range[idx++] = end_c;
         f+= 4;
         if (start_c == 0 && end_c == 0)
             break;
     }
-    return 1;
+}
+
+void _lcd_init()
+{
+    open_font(&default_font, ia9211_fon, 1);
+    open_font(&big_font, ia9211_bigfon, 2);
 }
 
 u8 LCD_SetFont(unsigned int idx)
 {
-    (void)idx;
-    static int loaded = 0;
-    if (! loaded) {
-        open_font();
-        loaded = 1;
-    }
-    return 0;
+    u8 old = LCD_GetFont();
+    cur_str.font = (idx <= 1) ? default_font : big_font;
+    return old;
 }
 
-u8 LCD_GetFont()
+u8 FONT_GetFromString(const char *value)
 {
-    return 0;
+    if (strcmp(value, "big") == 0) {
+        return 2;
+    }
+    return 1;
 }
 
 void LCD_ShowVideo(u8 enable)

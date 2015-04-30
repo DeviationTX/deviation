@@ -2,12 +2,18 @@
 use strict;
 use warnings;
 
+my $scale = 2;
+
 my $descent = 2;
 my $width = 12;
 my $height = 18;
 
+$height  *= $scale;
+$width   *= $scale;
+$descent *= $scale;
+
 my $padding = 8 - ($width % 8);
-my $bytes = 2* ($width+$padding)/8;
+my $bytes = 2* ($width  +$padding)/8;
 my %font;
 
 # This is mapping from the IA911 font ROM to and ASCII table
@@ -32,10 +38,14 @@ sub read_fon {
        my(@cols) = split(//, $_);
        my $val = 0;
        foreach my $pxl (@cols) {
-           $val = ($val << 1) | ($pxl eq "*" ? 1: 0);
+           foreach (my $s =0; $s < $scale; $s++) {
+               $val = ($val << 1) | ($pxl eq "*" ? 1: 0);
+           }
        }
        $val = $val << $padding;
-       push @lines, $val;
+       foreach (my $s =0; $s < $scale; $s++) {
+           push @lines, $val;
+       }
    }
    return \@lines;
 }

@@ -21,6 +21,13 @@
 
 u32 IA9211_map_char(u32 c);
 
+static const struct font_def default_font = {1, 1};
+static const struct font_def big_font = {2, 2};
+struct font_str cur_str;
+static u16 is_double_row = 0x00;
+
+#define CUR_CHAR_SIZE  (cur_str.font.height)
+
 #define CS_HI() gpio_set(GPIOB, GPIO0)
 #define CS_LO() gpio_clear(GPIOB, GPIO0)
 
@@ -131,8 +138,12 @@ void lcd_convert_string(const char string[], u8 length, u8* output) {
 
 // Calculate string length
 u8 lcd_string_length(const char string[]) {
-    u8 i = 0;
-    while(string[i] != 0 && i < LCD_SCREEN_CHARS) i++;
+    unsigned i = 0;
+    unsigned size = 0;
+    while(string[i] != 0 && size < LCD_SCREEN_CHARS) {
+         i++;
+         size += CUR_CHAR_SIZE; // chwaracter width
+    }
     return i;
 }
 
@@ -141,11 +152,34 @@ void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
     u8 cmd[LCD_SCREEN_CHARS+2];
     u8 length = lcd_string_length(string);
     if(pos < 0)
-        pos = LCD_SCREEN_CHARS-length+pos+1;
+        pos = LCD_SCREEN_CHARS-length*CUR_CHAR_SIZE+pos+1;
 
     // Check if it fits inside the screen
-    if(line > LCD_SCREEN_LINES || pos+length > LCD_SCREEN_CHARS)
+    if(line > LCD_SCREEN_LINES || pos > LCD_SCREEN_CHARS)
         return;
+
+    //fix line due to big-font rows
+    //NOTE:  This will ony work properly if screen is drawn from top to bottom.
+    //       Otherwise adding a double row at the top will cause the bottom items to shift
+    unsigned double_line = 0;
+    for(unsigned i = 0; i < line; i++) {
+        if (is_double_row & ( 1 << i)) {
+           double_line++;
+        }
+    }
+
+    if ((is_double_row & ( 1 << line)) && CUR_CHAR_SIZE == 1) {
+        is_double_row  &= ~( 1 << line);
+        LCD_Cmd(LCD_IA911_CHAR_SIZE | (line - double_line));
+    } else if (! (is_double_row & ( 1 << line)) && CUR_CHAR_SIZE == 2) {
+        is_double_row  |= ( 1 << line);
+        LCD_Cmd(LCD_IA911_CHAR_SIZE | 0x40 | (line - double_line));
+    }
+    if (pos+length * CUR_CHAR_SIZE > LCD_SCREEN_CHARS) {
+        length = (LCD_SCREEN_CHARS - pos) >> (CUR_CHAR_SIZE == 1 ? 0 : 1);
+    }
+
+    line -= double_line;
 
     // Send the position
     LCD_Cmd(LCD_IA911_WRITE_ADDR | ((line << 5) + pos));
@@ -298,8 +332,10 @@ void LCD_ShowVideo(u8 enable)
  **/
 u8 FONT_GetFromString(const char *value)
 {
-    (void) value;
-    return 0;
+    if (strcmp(value, "big") == 0) {
+        return 2;
+    }
+    return 1;
 }
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
@@ -310,11 +346,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 
 u8 LCD_SetFont(unsigned int idx)
 {
-    (void) idx;
-    return 0;
-}
-
-u8 LCD_GetFont()
-{
-    return 0;
+    u8 old = LCD_GetFont();
+    cur_str.font = (idx <= 1) ? default_font : big_font;
+    return old;
 }
