@@ -66,8 +66,8 @@ void PAGE_MainInit(int page)
 
     GUI_CreateLabelBox(&gui->name, 0, 0, //64, 12,
             0, 0, &DEFAULT_FONT, NULL, NULL, Model.name);
-
-
+	_bargraph_trim_horizontal2(1, 10, 9,10);
+	
     show_elements();
     //Battery
     mp->battery = PWR_ReadVoltage();
