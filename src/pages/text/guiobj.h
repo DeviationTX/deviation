@@ -189,7 +189,7 @@ struct datalog_obj {
 };
 
 struct tx_obj {
-    guiLabel_t title;
+    guiLabel_t title[LCD_HEIGHT-1];
     guiLabel_t label[LCD_HEIGHT-1];
     union {
         guiButton_t but;

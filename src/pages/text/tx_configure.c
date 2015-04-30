@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -20,213 +21,15 @@
 #include "config/model.h"
 #include "autodimmer.h"
 
-static const int MIN_BATTERY_ALARM_STEP = 10;
-#include "../common/_tx_configure.c"
+enum {
+  LARGE_SEL_X_OFFSET = 14,
+  MED_SEL_X_OFFSET   = 14,
+  SMALL_SEL_X_OFFSET = 14,
+  TITLE_X_OFFSET     = 2,
+  TITLE_WIDTH        = LCD_WIDTH - 2,
+  LABEL_X_OFFSET     = 0,
+  LABEL_WIDTH        = 13,
+  TEXTSEL_X_WIDTH    = LCD_WIDTH - 14 - 2,
+};
 
-static struct tx_obj * const gui = &gui_objs.u.tx;
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
-static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
-static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
-static u16 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
-
-static int size_cb(int absrow, void *data)
-{
-    (void)data;
-    switch(absrow) {
-#ifndef NO_LANGUAGE_SUPPORT
-        case ITEM_LANG:
-#else
-//        case ITEM_MODE:
-#endif
-        case ITEM_BUZZ:
-        case ITEM_BACKLIGHT:
-        case ITEM_PREALERT:
-        case ITEM_TELEMTEMP:
-            return 2;
-    }
-    return 1;
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
-
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    data = NULL;
-    const void *label = NULL;
-    const void *title = NULL;
-    void *tgl = NULL;
-    void *value = NULL;
-    void *but_str = NULL;
-    const int X = 14;
-    u8 x = X;
-
-    switch(absrow) {
-#ifndef NO_LANGUAGE_SUPPORT
-        case ITEM_LANG:
-            title = _tr_noop("Generic settings");
-            label = _tr_noop("Language");
-            but_str = langstr_cb; tgl = lang_select_cb;
-            break;
-#endif
-        case ITEM_MODE:
-#ifdef NO_LANGUAGE_SUPPORT
-            title = _tr_noop("Generic settings");
-#endif
-            label = _tr_noop("Stick mode");
-            value = modeselect_cb;
-            break;
-        case ITEM_STICKS:
-            label = _tr_noop("Sticks");
-            but_str = calibratestr_cb; tgl = press_cb; data = (void *)CALIB_STICK;
-            break;
-        case ITEM_BUZZ:
-            title = _tr_noop("Buzz settings");
-            label = _tr_noop("Buzz volume");
-            value = _buzz_vol_cb; data = &Transmitter.volume;
-            break;
-        case ITEM_HAPTIC:
-            label = _tr_noop("Vibration");
-            value = _vibration_state_cb; data = &Transmitter.vibration_state;
-            break;
-        case ITEM_BATT:
-            label = _tr_noop("Batt alarm");
-            value = batalarm_select_cb;
-            break;
-        case ITEM_ALARM_INTV:
-            label = _tr_noop("Alarm intvl");
-            value = batalarmwarn_select_cb;
-            break;
-	case ITEM_PWR_ALARM:
-            label = _tr_noop("PwrOn alarm");
-            value = poweralarm_select_cb;
-            break;
-        case ITEM_PWRDN_ALARM:
-            label = _tr_noop("PwrDn alert");
-            value = _music_shutdown_cb;
-            break;
-        case ITEM_BACKLIGHT:
-            title = _tr_noop("LCD settings");
-            label = _tr_noop("Backlight");
-            value = brightness_select_cb;
-            break;
-        case ITEM_CONTRAST:
-            label = _tr_noop("Contrast");
-            value = _contrast_select_cb;
-            break;
-        case ITEM_DIMTIME:
-            label = _tr_noop("Dimmer time");
-            value = auto_dimmer_time_cb; //x = X+10;
-            break;
-        case ITEM_DIMVAL:
-            label = _tr_noop("Dimmer target");
-            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value;// x= X+10;
-            break;
-        case ITEM_PREALERT:
-            title = _tr_noop("Timer settings");
-            label = _tr_noop("Prealert time");
-            value = prealert_time_cb; data = (void *)0L; //x= X+10;
-            break;
-        case ITEM_PREALERT_IVAL:
-            label = _tr_noop("Prealert intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; //x= X+15;
-            break;
-        case ITEM_TIMEUP:
-            label = _tr_noop("Timeup intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; //x= X+15;
-            break;
-        case ITEM_TELEMTEMP:
-            title = _tr_noop("Telemetry settings");
-            label = _tr_noop("Temperature");
-            value = units_cb; data = (void *)1L;
-            break;
-        case ITEM_TELEMLEN:
-            label = _tr_noop("Length");
-            value = units_cb; data = (void *)0L;
-            break;
-    }
-    /*if (title) {
-        GUI_CreateLabelBox(&gui->title, 0, y,
-                LCD_WIDTH -1, 0, &DEFAULT_FONT, NULL, NULL, _tr(title));
-        y += ITEM_HEIGHT;
-    }*/
-    GUI_CreateLabelBox(&gui->label[relrow], 1, y,
-            x-1, 0,  &DEFAULT_FONT, NULL, NULL, _tr(label));
-    if(but_str) {
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, 1+ x, y,
-            LCD_WIDTH - x -2, 0, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
-    } else {
-        GUI_CreateTextSelectPlate(&gui->value[relrow].ts, 1+ x, y,
-            LCD_WIDTH - x -2, 0, &DEFAULT_FONT, NULL, value, data);
-    }
-    return 1;
-}
-
-void PAGE_TxConfigureInit(int page)
-{
-    (void)page;
-    cp->enable = CALIB_NONE;
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(_tr("Configure"));
-    cp->total_items = 0;
-
-
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT-1,
-                     ITEM_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-
-static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    Transmitter.contrast = GUI_TextSelectHelper(Transmitter.contrast,
-                                  0, 10, dir, 1, 1, &changed);
-    if (changed) {
-        LCD_Contrast(Transmitter.contrast);
-    }
-    if (Transmitter.contrast == 0)
-        return _tr("Off");
-    sprintf(tempstring, "%d", Transmitter.contrast);
-    return tempstring;
-}
-
-static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    Transmitter.vibration_state = GUI_TextSelectHelper(Transmitter.vibration_state, 0, 1, dir, 1, 1, NULL);
-    if (Transmitter.vibration_state == 0)
-        return _tr("Off");
-    else
-        return _tr("On");
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-static inline guiObject_t *_get_obj(int idx, int objid)
-{
-    return GUI_GetScrollableObj(&gui->scrollable, idx, objid);
-}
+#include "../128x64x1/tx_configure.c"
