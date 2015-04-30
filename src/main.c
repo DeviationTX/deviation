@@ -48,7 +48,7 @@ int main() {
     ADC_ScanChannels(); while(1);
 #endif
     u32 buttons = ScanButtons();
-    if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount(NULL, NULL)) {
+    if(1 || CHAN_ButtonIsPressed(buttons, BUT_ENTER) || !FS_Mount(NULL, NULL)) {
         LCD_DrawUSBLogo(LCD_WIDTH, LCD_HEIGHT);
         USB_Connect();
         LCD_Clear(0x0000);

@@ -47,6 +47,7 @@ u32 IA9211_map_char(u32 c)
 {
     if (c >= OFFSET && c < OFFSET + sizeof(map_rom) && map_rom[c-OFFSET] != 0x1f)
         return map_rom[c-OFFSET];
-    printf("Illegal character: %c (%d)\n", c, c);
+    printf("Illegal character: (%d)\n",c);
+    //exti2_isr();
     return _100;
 }

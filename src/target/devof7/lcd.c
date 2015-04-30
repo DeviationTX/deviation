@@ -152,7 +152,7 @@ void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
     u8 cmd[LCD_SCREEN_CHARS+2];
     u8 length = lcd_string_length(string);
     if(pos < 0)
-        pos = LCD_SCREEN_CHARS-length*CUR_CHAR_SIZE+pos+1;
+        pos = LCD_SCREEN_CHARS-length*CUR_CHAR_SIZE;
 
     // Check if it fits inside the screen
     if(line > LCD_SCREEN_LINES || pos > LCD_SCREEN_CHARS)
@@ -180,7 +180,9 @@ void lcd_show_string(const char string[], u8 line, s8 pos, u16 color) {
     }
 
     line -= double_line;
-
+    if (CUR_CHAR_SIZE == 2) {
+        pos = pos >> 1;
+    }
     // Send the position
     LCD_Cmd(LCD_IA911_WRITE_ADDR | ((line << 5) + pos));
 
@@ -231,6 +233,7 @@ void lcd_show_line(const char string[], u8 line, u8 align, u16 color) {
 
 void LCD_Init()
 {
+    LCD_SetFont(1);
     /* Enable GPIOA clock. */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
 
@@ -259,7 +262,6 @@ void LCD_Init()
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
 
     LCD_Cmd(LCD_IA911_CLEAR_VRAM); //Clear the VRAM
-
     // Wait for a couple of clock ticks
     volatile int i = 800;
     while(i) i--;
@@ -273,19 +275,15 @@ void LCD_Init()
     LCD_Cmd(LCD_IA911_TEST_MODE); // Test the internal circuit
     LCD_Cmd(LCD_IA911_CLOCK | LCD_IA911_I_MODE | LCD_IA911_XOSC); // Set to internal mode en enable ossilator (0x45)
     LCD_Cmd(LCD_IA911_DISPLAY_POS | (13-1)<<4 | (5-1)); //13 Vertical and 5 Horizontal as display position
-
-    // Set the character size to 1dot for all lines
-    for(i = 0; i < LCD_SCREEN_LINES; i++)
-        LCD_Cmd(LCD_IA911_CHAR_SIZE | i);
 }
 
-void LCD_Clear(unsigned int val)
+void LCD_Clear(unsigned int i)
 {
-    u8 i;
-    (void) val;
-
-    for(i = 0; i <= LCD_SCREEN_LINES; i++)
+    // Set the character size to 1dot for all lines
+    for(i = 0; i < LCD_SCREEN_LINES; i++) {
+        LCD_Cmd(LCD_IA911_CHAR_SIZE | i);
         lcd_show_line("", i, LCD_ALIGN_LEFT, 0);
+    }
 }
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)
