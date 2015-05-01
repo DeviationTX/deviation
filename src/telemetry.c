@@ -196,7 +196,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             break;
         }
         case TELEM_GPS_SATCOUNT:    _get_value_str(str, value, 0, '\0'); break;
-        case TELEM_GPS_HEADING:     _get_value_str(str, value, 2, '\0'); break;
+        case TELEM_GPS_HEADING:     _get_value_str(str, value, 1, '\0'); break;
         default:
             if (TELEMETRY_Type() == TELEM_DEVO)
                 return _devo_str_by_value(str, idx, value);
