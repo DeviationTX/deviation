@@ -341,8 +341,7 @@ void close_window(Fl_Widget *widget, void *param)
     exit(0);
 }
 
-void __attribute__((weak)) _lcd_init();
-void _lcd_init() {}
+extern void _lcd_init();
 
 void LCD_Init()
 {
@@ -396,7 +395,9 @@ void LCD_Init()
   Fl::wait();
   gui.last_redraw = CLOCK_getms();
   gui.init = 1;
+#ifdef HAS_LCD_INIT
   _lcd_init();
+#endif
 }
 
 struct touch SPITouch_GetCoords() {

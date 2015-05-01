@@ -9,4 +9,5 @@
 #define LCD_HEIGHT_MULT (LCD_CHAR_H * ZOOM_Y)
 #define EMU_STRING "DEVO-F7-Emu"
 #define FILESYSTEM_DIR "filesystem/devof7"
+#define HAS_LCD_INIT    1
 #endif
