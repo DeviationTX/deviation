@@ -20,7 +20,13 @@
 #include <stdio.h>
 
 #if HAS_DATALOG
-#define DATALOG_VERSION 0x01
+#define DATALOG_VERSION 0x02
+
+//This is pretty crude.  need a more robust check
+#if TXID == 10
+//ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
+ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
+#endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
 #define DATALOG_HEADER_SIZE (3 + ((7 + NUM_DATALOG) / 8))
@@ -159,7 +165,7 @@ void _write_32(s32 data)
 
 void _write_header() {
     need_header_update = 0;
-    _write_8(0x01);
+    _write_8(DATALOG_VERSION);
     _write_8(TXID);
     _write_8(Model.datalog.rate);
     fwrite(Model.datalog.source, sizeof(Model.datalog.source), 1, fh);

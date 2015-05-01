@@ -41,6 +41,10 @@ class Capture(object):
         telem_volt = ["Volt1", "Volt2", "Volt3"]
         telem_temp = ["Temp1(C)", "Temp2(C)", "Temp3(C)", "Temp4(C)"]
         telem_rpm  = ["RPM1", "RPM2"]
+        telem_extra_items = 49
+        telem_extra = []
+        for i in range(telem_extra_items):
+            telem_extra.append("TELEM_" + `i`)
         inp    = []
         outch  = ["Channel1", "Channel2", "Channel3", "Channel4",
                   "Channel5", "Channel6", "Channel7", "Channel8",
@@ -86,7 +90,8 @@ class Capture(object):
         self.TELEM_VOLT = self.TIMER      + len(timers)
         self.TELEM_TEMP = self.TELEM_VOLT + len(telem_volt)
         self.TELEM_RPM  = self.TELEM_TEMP + len(telem_temp)
-        self.INPUT      = self.TELEM_RPM  + len(telem_rpm)
+        self.TELEM_EXTRA= self.TELEM_RPM  + len(telem_rpm)
+        self.INPUT      = self.TELEM_EXTRA+ len(telem_extra)
         self.CHAN       = self.INPUT      + len(inp)
         self.PPM        = self.CHAN       + len(outch) + len(virtch)
         self.GPS_LOC    = self.PPM        + len(ppm)
@@ -95,7 +100,8 @@ class Capture(object):
         self.GPS_TIME   = self.GPS_SPEED  + len(gps_speed)
         self.RTC        = self.GPS_TIME   + len(gps_time)
         self.max_elem   = self.RTC        + len(rtc)
-        self.elem_names = timers + telem_volt + telem_temp + telem_rpm \
+
+        self.elem_names = timers + telem_volt + telem_temp + telem_rpm + telem_extra \
                           + inp + outch + virtch + ppm + gps_loc + gps_alt + gps_speed + gps_time + rtc
         return (7 + self.max_elem) / 8
     def to_rate(self, value):
@@ -111,7 +117,7 @@ class Capture(object):
             self.rate = "1 min"
     def get_size(self, idx):
         if idx < self.INPUT:
-            return 2
+            return 4
         if idx < self.GPS_LOC:
             return 1
         if idx == self.GPS_LOC:
@@ -275,7 +281,7 @@ def parse_file(bin):
             info[-1].add_elem(data[idx+1:])
             idx += info[-1].capture_size+1
             continue
-        if data[idx] != 0x01:
+        if data[idx] != 0x02:
             printf("Cannot handle API version 0x%02x\n", data[idx])
             return info
         info.append(Capture(data[idx:]))
