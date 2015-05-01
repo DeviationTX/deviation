@@ -394,7 +394,7 @@ static int pkt32_to_coord(u8 *ptr)
 
 static void parse_telemetry_packet()
 {
-    static s32 altitude;
+    static u8 altitude; // byte from first GPS packet
 #if HAS_DSM_EXTENDED_TELEMETRY
     static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
                                    TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
@@ -527,12 +527,11 @@ static void parse_telemetry_packet()
 #endif //HAS_DSM_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
-            Telemetry.gps.altitude = altitude + 100 * //((altitude >= 0) ? 100: -100) *
-                                     bcd_to_int(pktTelem[1]); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
+            Telemetry.gps.altitude  = bcd_to_int((altitude << 24) | ((u32)pktTelem[1] << 8)); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)
             Telemetry.gps.latitude  =  pkt32_to_coord(&packet[4]) * ((end_byte & 0x01)? 1: -1); //1=N(+), 0=S(-)
             Telemetry.gps.longitude = (pkt32_to_coord(&packet[8]) + ((end_byte & 0x04)? 360000000: 0)) //1=+100 degrees
                                                                   * ((end_byte & 0x02)? 1: -1); //1=E(+), 0=W(-)
-            Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.01 degree)
+            Telemetry.gps.heading = bcd_to_int(pktTelem[6]); //In degrees (16Bit decimal, 1 unit is 0.1 degree)
             break;
         case 0x17: //GPS sensor (always first GPS packet)
             update = update17;
@@ -551,7 +550,7 @@ static void parse_telemetry_packet()
                                | ((min & 0x3F) << 6)
                                | ((sec & 0x3F) << 0);
             Telemetry.gps.satcount = bcd_to_int(packet[8]);
-            altitude = bcd_to_int(packet[9]) * 1000000; //In 1000 meters * 1000 (8Bit decimal, 1 unit is 1000m)
+            altitude = packet[9];
             break;
     }
     idx = 0;
@@ -670,12 +669,12 @@ static void initialize(u8 bind)
     CYRF_Reset();
 #ifndef USE_FIXED_MFGID
     CYRF_GetMfgData(cyrfmfg_id);
-   if (Model.fixed_id) {
-       cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
-       cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
-       cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
-       cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
-   }
+    if (Model.fixed_id) {
+        cyrfmfg_id[0] ^= (Model.fixed_id >> 0) & 0xff;
+        cyrfmfg_id[1] ^= (Model.fixed_id >> 8) & 0xff;
+        cyrfmfg_id[2] ^= (Model.fixed_id >> 16) & 0xff;
+        cyrfmfg_id[3] ^= (Model.fixed_id >> 24) & 0xff;
+    }
 #endif
     cyrf_config();
 
@@ -711,7 +710,7 @@ static void initialize(u8 bind)
     cyrfmfg_id[3] = 0xff ^ ((Model.fixed_id >> 0) & 0xff);
     printf("DSM2 Channels: %02x %02x\n", channels[0], channels[1]);
     */
-    crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]); 
+    crc = ~((cyrfmfg_id[0] << 8) + cyrfmfg_id[1]);
     crcidx = 0;
     sop_col = (cyrfmfg_id[0] + cyrfmfg_id[1] + cyrfmfg_id[2] + 2) & 0x07;
     data_col = 7 - sop_col;
