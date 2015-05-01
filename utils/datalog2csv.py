@@ -117,7 +117,7 @@ class Capture(object):
             self.rate = "1 min"
     def get_size(self, idx):
         if idx < self.INPUT:
-            return 4
+            return 2
         if idx < self.GPS_LOC:
             return 1
         if idx == self.GPS_LOC:
