@@ -191,7 +191,7 @@ void error(char *str)
 static int hex2int(char *data, unsigned len)
 {
     char tmp[9];
-    strncpy(tmp, data, len);
+    strlcpy(tmp, data, len);
     tmp[len] = '\0';
     return strtol(tmp, NULL, 16);
 }
