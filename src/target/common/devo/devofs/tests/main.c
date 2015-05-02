@@ -24,7 +24,7 @@ int FS_ReadDir(char *path)
 }
 
 int main(int argc, char *argv[]) {
-	FATFS fat;
+	FATFS fat, fat1;
 	FILE *fh;
 	unsigned char data[1024 * 1024];
         unsigned char *ptr = data;
@@ -39,7 +39,28 @@ int main(int argc, char *argv[]) {
 	printf("pf_mount: %d\n", res);
         FS_OpenDir("media");
         while((res = FS_ReadDir(data))) {
+            fat1 = fat;
             printf("ReadDir: %d: %s\n", res, data);
+            char filename[256];
+            sprintf(filename, "media/%s", data);
+            res = pf_open(filename, 0);
+            printf("pf_open: %d\n", res);
+            if (res) {
+                fat= fat1;
+                continue;
+            }
+            char *ptr = data;
+            while(1) {
+                u16 bytes;
+                res = pf_read(ptr, 1024, &bytes);
+                printf("pf_read: %d %dbytes\n", res, bytes);
+                ptr += bytes;
+                if(res || bytes != 1024)
+                    break;
+            }
+            *ptr = 0;
+            printf("%s\n", data);
+            fat= fat1;
         }
 
 #if 0

@@ -2,7 +2,7 @@
 #include "devofs.h"
 #include <fcntl.h>
 #include <assert.h>
-
+#include <string.h>
 enum {
     START_SECTOR_ID = 0xFF,
     SECTOR_SIZE     = 4096,
@@ -114,7 +114,7 @@ FRESULT pf_mount (FATFS* fs)
     _fs = fs;
     int recovery_sector;
     fs->file_addr = -1;
-    fs->file_handle_pos = -1;
+    fs->file_cur_pos = -1;
     fs->parent_dir = 0;
     disk_initialize();
     fs->start_sector = _find_start_sector(&fs->compact_sector);
@@ -131,7 +131,7 @@ int _expand_chars(char *dest, const char *src, int len)
 {
    int i, j;
    for(i = 0; i < len; i++) {
-       if(src[i] == 0) {
+       if(src[i] == 0 || src[i] == '.') {
            for(j = i; j < len; j++) {
                dest[j] = 0;
            }
@@ -145,10 +145,19 @@ int _expand_chars(char *dest, const char *src, int len)
 FRESULT _find_file(const char *fullname)
 {
    char name[11];
-   int i;
+   int i, j;
 
-   _expand_chars(name, fullname, 8);   
-   _expand_chars(name+8, fullname+9, 3);   
+   int len = strlen(fullname);
+   memset(name, 0, 11);
+   for (i = 0, j = 0; i < len; i++, j++) {
+       if(fullname[i] == 0)
+           break;
+       if(fullname[i] == '.') {
+          j = 7;
+       } else {
+          name[j] = fullname[i];
+       }
+   }
    int start = _fs->start_sector * SECTOR_SIZE + 1;
    _read(&_fs->file_header, start, sizeof(struct file_header));
 
@@ -156,7 +165,7 @@ FRESULT _find_file(const char *fullname)
        if (_fs->parent_dir == _fs->file_header.parent_dir && strncmp(_fs->file_header.name, name, 11) == 0) {
            //Found matching file
            _fs->file_addr = start;
-           _fs->file_handle_pos = -1;
+           _fs->file_cur_pos = -1;
            return FR_OK;
        }
        start = _get_addr(start, sizeof(struct file_header) + FILE_SIZE(_fs->file_header));
@@ -183,10 +192,10 @@ FRESULT pf_readdir (DIR *dir, FILINFO *fi)
     if (_fs->file_addr == -1) {
         return FR_NO_FILE;
     }
-    if (_fs->file_handle_pos == -1) {
+    if (_fs->file_cur_pos == -1) {
         //Start at the beginning
         _fs->file_addr = _fs->start_sector + 1;
-        _fs->file_handle_pos = _fs->file_addr;
+        _fs->file_cur_pos = 0;
     } else {
         if (_fs->file_header.type == FILEOBJ_NONE)
             return FR_NO_PATH;
@@ -235,16 +244,36 @@ void _create_empty_file()
     }
     //duplicate file header to new location
     _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
-    _fs->file_handle_pos = _get_addr(_fs->file_addr, sizeof(struct file_header));
+    _fs->file_cur_pos = 0;
 }
 
 FRESULT pf_open (const char *name, unsigned flags)
 {
-    int res = _find_file(name);
+    char cur_dir[13];
+    int i = 0;
+    _fs->parent_dir = 0;
+    int cur_idx = 0;
+    while(1) {
+        if (name[i] == '/') {
+            cur_dir[cur_idx] = 0;
+            if (_find_file(cur_dir) != FR_OK || _fs->file_header.type != FILEOBJ_DIR) {
+                return FR_NO_PATH;
+            }
+            _fs->parent_dir = FILE_ID(_fs->file_header);
+            cur_idx = 0;
+        } else {
+            cur_dir[cur_idx++] = name[i];
+            if (name[i] == 0) {
+                break;
+            }
+        }
+        i++;
+    }
+    int res = _find_file(cur_dir);
     if (res)
         return res;
     if (_fs->file_header.type == FILEOBJ_FILE) {
-        _fs->file_handle_pos = _get_addr(_fs->file_addr, sizeof(struct file_header));
+        _fs->file_cur_pos = 0;
         if (flags && O_WRONLY) {
             _create_empty_file();
         }
@@ -255,8 +284,11 @@ FRESULT pf_open (const char *name, unsigned flags)
 
 FRESULT pf_read (void *buf, u16 requested, u16 *actual)
 {
-    _read(buf, _fs->file_handle_pos, requested);
-    _fs->file_handle_pos = _get_addr(_fs->file_handle_pos, requested);
+    if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
+        requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
+    } 
+    _read(buf, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
+    _fs->file_cur_pos += requested;
     *actual = requested;
     return FR_OK;
 }
@@ -283,13 +315,16 @@ FRESULT pf_lseek (u32 pos) {
     if (pos > FILE_SIZE(_fs->file_header)) {
         return FR_DISK_ERR;
     }
-    _fs->file_handle_pos = _get_addr(_fs->file_addr, sizeof(struct file_header) + pos);
+    _fs->file_cur_pos = pos;
     return FR_OK;
 }
 FRESULT pf_write (const void *buffer, u16 requested, u16 *written)
 {
-    _write(buffer, _fs->file_handle_pos, requested);
-    _fs->file_handle_pos = _get_addr(_fs->file_handle_pos, requested);
+    if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
+        requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
+    } 
+    _write(buffer, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
+    _fs->file_cur_pos += requested;
     *written = requested;
     return FR_OK;  
 }

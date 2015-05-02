@@ -35,7 +35,7 @@ typedef struct {
     int start_sector;
     int compact_sector;
     int file_addr;
-    int file_handle_pos;
+    int file_cur_pos;
     int parent_dir;
     struct file_header file_header;
 } FATFS;
