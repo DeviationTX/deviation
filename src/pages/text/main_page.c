@@ -66,7 +66,10 @@ void PAGE_MainInit(int page)
 
     GUI_CreateLabelBox(&gui->name, 0, 0, //64, 12,
             0, 0, &DEFAULT_FONT, NULL, NULL, Model.name);
-
+	GUI_CreateBarGraph(&gui->elem[1].bar, 1, 10, 9, 10, -10000, 10000, TRIM_INVHORIZONTAL, NULL, 0);
+	//GUI_CreateBarGraph(&gui->elem[0].bar, 5, 10, 9, 10, -10000, 10000, TRIM_INVHORIZONTAL, NULL, 0);
+	GUI_CreateBarGraph(&gui->elem[2].bar, 11, 2, 9, 10, -10000, 10000, TRIM_VERTICAL, NULL, 0);
+	
 
     show_elements();
     //Battery
