@@ -17,7 +17,7 @@
 #include "petit_io.h"
 #include <stdio.h>
 
-extern char * image_file;
+extern char image_file[1024];
 
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */

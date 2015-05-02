@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-char *image_file;
+char image_file[1024];
 static DIR   dir;
 int FS_OpenDir(const char *path)
 {
@@ -24,7 +24,7 @@ int FS_ReadDir(char *path)
 }
 
 int main(int argc, char *argv[]) {
-	FATFS fat, fat1;
+	FATFS fat;
 	FILE *fh;
 	unsigned char data[1024 * 1024];
         unsigned char *ptr = data;
@@ -34,19 +34,20 @@ int main(int argc, char *argv[]) {
             printf("%s <devofs image>\n", argv[1]);
             exit(0);
         }
-        image_file = argv[1];
+        sprintf(image_file, "%s.tmp", argv[1]);
+        char cmd[1024];
+        sprintf(cmd, "/bin/cp %s %s", argv[1], image_file);
+        system(cmd);
 	res = pf_mount(&fat);
 	printf("pf_mount: %d\n", res);
         FS_OpenDir("media");
         while((res = FS_ReadDir(data))) {
-            fat1 = fat;
             printf("ReadDir: %d: %s\n", res, data);
             char filename[256];
             sprintf(filename, "media/%s", data);
             res = pf_open(filename, 0);
             printf("pf_open: %d\n", res);
             if (res) {
-                fat= fat1;
                 continue;
             }
             char *ptr = data;
@@ -60,7 +61,6 @@ int main(int argc, char *argv[]) {
             }
             *ptr = 0;
             printf("%s\n", data);
-            fat= fat1;
         }
 
 #if 0

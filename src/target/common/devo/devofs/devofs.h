@@ -40,7 +40,7 @@ typedef struct {
     struct file_header file_header;
 } FATFS;
 
-typedef struct file_header DIR;
+#define DIR FATFS
 
 typedef struct {
         u8      fattrib;

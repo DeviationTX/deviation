@@ -70,9 +70,9 @@ int _write(const void* buf, int addr, int len)
     return FR_OK;
 }
 
-void _get_next_fileobj()
+void _get_next_fileobj(FATFS *fs)
 {
-    _fs->file_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + FILE_SIZE(_fs->file_header));
+    fs->file_addr = _get_addr(fs->file_addr, sizeof(struct file_header) + FILE_SIZE(fs->file_header));
 }
 
 //search each sector for either a single start-sector or 2 back-to-back start sectors
@@ -142,7 +142,7 @@ int _expand_chars(char *dest, const char *src, int len)
    return i;
 }
 
-FRESULT _find_file(const char *fullname)
+FRESULT _find_file(FATFS *fs, const char *fullname)
 {
    char name[11];
    int i, j;
@@ -158,63 +158,64 @@ FRESULT _find_file(const char *fullname)
           name[j] = fullname[i];
        }
    }
-   int start = _fs->start_sector * SECTOR_SIZE + 1;
-   _read(&_fs->file_header, start, sizeof(struct file_header));
+   int start = fs->start_sector * SECTOR_SIZE + 1;
+   _read(&fs->file_header, start, sizeof(struct file_header));
 
-   while(_fs->file_header.type != FILEOBJ_NONE) {
-       if (_fs->parent_dir == _fs->file_header.parent_dir && strncmp(_fs->file_header.name, name, 11) == 0) {
+   while(fs->file_header.type != FILEOBJ_NONE) {
+       if (fs->parent_dir == fs->file_header.parent_dir && strncmp(fs->file_header.name, name, 11) == 0) {
            //Found matching file
-           _fs->file_addr = start;
-           _fs->file_cur_pos = -1;
+           fs->file_addr = start;
+           fs->file_cur_pos = -1;
            return FR_OK;
        }
-       start = _get_addr(start, sizeof(struct file_header) + FILE_SIZE(_fs->file_header));
-       _read(&_fs->file_header, start, sizeof(struct file_header));
+       start = _get_addr(start, sizeof(struct file_header) + FILE_SIZE(fs->file_header));
+       _read(&fs->file_header, start, sizeof(struct file_header));
    }
    return FR_NO_PATH;
 }
 
 FRESULT pf_opendir (DIR *dir, const char *name)
 {
-    int res = _find_file(name);
+    *dir = *_fs;
+    int res = _find_file(dir, name);
     if (res)
         return res;
-    if (_fs->file_header.type == FILEOBJ_DIR) {
-        _fs->parent_dir = FILE_ID(_fs->file_header);
+    if (dir->file_header.type == FILEOBJ_DIR) {
+        dir->parent_dir = FILE_ID(dir->file_header);
         return FR_OK;
     }
-    _fs->file_addr = -1;
+    dir->file_addr = -1;
     return FR_NO_FILE;
 }
 
 FRESULT pf_readdir (DIR *dir, FILINFO *fi)
 {
-    if (_fs->file_addr == -1) {
+    if (dir->file_addr == -1) {
         return FR_NO_FILE;
     }
-    if (_fs->file_cur_pos == -1) {
+    if (dir->file_cur_pos == -1) {
         //Start at the beginning
-        _fs->file_addr = _fs->start_sector + 1;
-        _fs->file_cur_pos = 0;
+        dir->file_addr = dir->start_sector + 1;
+        dir->file_cur_pos = 0;
     } else {
-        if (_fs->file_header.type == FILEOBJ_NONE)
+        if (dir->file_header.type == FILEOBJ_NONE)
             return FR_NO_PATH;
-        _get_next_fileobj();
+        _get_next_fileobj(dir);
     }
-    _read(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
-    while (_fs->file_header.type != FILEOBJ_NONE) {
-        if (_fs->file_header.parent_dir == _fs->parent_dir) {
+    _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
+    while (dir->file_header.type != FILEOBJ_NONE) {
+        if (dir->file_header.parent_dir == dir->parent_dir) {
             //Found next object
             fi->fname[9] = 0;
-            int len = _expand_chars(fi->fname, _fs->file_header.name, 8);
+            int len = _expand_chars(fi->fname, dir->file_header.name, 8);
             fi->fname[len++] = '.';
-            _expand_chars(fi->fname+len, _fs->file_header.name + 8, 3);
-            fi->fattrib = (_fs->file_header.type == FILEOBJ_DIR) ? AM_DIR : 0;
+            _expand_chars(fi->fname+len, dir->file_header.name + 8, 3);
+            fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : 0;
             fi->fname[12] = 0;
             return FR_OK;
         }
-        _get_next_fileobj();
-        _read(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+        _get_next_fileobj(dir);
+        _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
     }
     return FR_NO_PATH;
 }
@@ -256,7 +257,7 @@ FRESULT pf_open (const char *name, unsigned flags)
     while(1) {
         if (name[i] == '/') {
             cur_dir[cur_idx] = 0;
-            if (_find_file(cur_dir) != FR_OK || _fs->file_header.type != FILEOBJ_DIR) {
+            if (_find_file(_fs, cur_dir) != FR_OK || _fs->file_header.type != FILEOBJ_DIR) {
                 return FR_NO_PATH;
             }
             _fs->parent_dir = FILE_ID(_fs->file_header);
@@ -269,7 +270,7 @@ FRESULT pf_open (const char *name, unsigned flags)
         }
         i++;
     }
-    int res = _find_file(cur_dir);
+    int res = _find_file(_fs, cur_dir);
     if (res)
         return res;
     if (_fs->file_header.type == FILEOBJ_FILE) {
