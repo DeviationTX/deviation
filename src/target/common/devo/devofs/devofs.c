@@ -158,18 +158,16 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
           name[j] = fullname[i];
        }
    }
-   int start = fs->start_sector * SECTOR_SIZE + 1;
-   _read(&fs->file_header, start, sizeof(struct file_header));
+   _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
 
    while(fs->file_header.type != FILEOBJ_NONE) {
        if (fs->parent_dir == fs->file_header.parent_dir && strncmp(fs->file_header.name, name, 11) == 0) {
            //Found matching file
-           fs->file_addr = start;
            fs->file_cur_pos = -1;
            return FR_OK;
        }
-       start = _get_addr(start, sizeof(struct file_header) + FILE_SIZE(fs->file_header));
-       _read(&fs->file_header, start, sizeof(struct file_header));
+       fs->file_addr = _get_addr(fs->file_addr, sizeof(struct file_header) + FILE_SIZE(fs->file_header));
+       _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
    }
    return FR_NO_PATH;
 }
@@ -177,6 +175,7 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
 FRESULT pf_opendir (DIR *dir, const char *name)
 {
     *dir = *_fs;
+    dir->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
     int res = _find_file(dir, name);
     if (res)
         return res;
@@ -253,6 +252,7 @@ FRESULT pf_open (const char *name, unsigned flags)
     char cur_dir[13];
     int i = 0;
     _fs->parent_dir = 0;
+    _fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
     int cur_idx = 0;
     while(1) {
         if (name[i] == '/') {
@@ -261,6 +261,7 @@ FRESULT pf_open (const char *name, unsigned flags)
                 return FR_NO_PATH;
             }
             _fs->parent_dir = FILE_ID(_fs->file_header);
+            _get_next_fileobj(_fs); //get the next file object
             cur_idx = 0;
         } else {
             cur_dir[cur_idx++] = name[i];
