@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
 
 char image_file[1024];
 static DIR   dir;
@@ -21,6 +22,22 @@ int FS_ReadDir(char *path)
     printf("Read: %s %d\n", fi.fname, fi.fattrib);
     strncpy(path, fi.fname, 13);
     return fi.fattrib & AM_DIR ? 2 : 1;
+}
+
+int FS_ReadData(char *data)
+{
+    int res;
+    char *ptr = data;
+    while(1) {
+        u16 bytes;
+        res = pf_read(ptr, 1024, &bytes);
+        printf("pf_read: %d %dbytes\n", res, bytes);
+        ptr += bytes;
+        if(res || bytes != 1024)
+            break;
+    }
+    *ptr = 0;
+    return ptr - data;
 }
 
 int main(int argc, char *argv[]) {
@@ -50,19 +67,39 @@ int main(int argc, char *argv[]) {
             if (res) {
                 continue;
             }
-            char *ptr = data;
-            while(1) {
-                u16 bytes;
-                res = pf_read(ptr, 1024, &bytes);
-                printf("pf_read: %d %dbytes\n", res, bytes);
-                ptr += bytes;
-                if(res || bytes != 1024)
-                    break;
-            }
-            *ptr = 0;
+            FS_ReadData(data);
             printf("%s\n", data);
         }
-
+        res = pf_open("template/foo", 0);
+        printf("pf_open(template/foo): %d\n", res);
+        if(res == 0) {
+            int len = FS_ReadData(data);
+            int fh;
+            fh = open("foo.tmp", O_WRONLY | O_CREAT);
+            write(fh, data, len);
+            close(fh);
+        }
+        res = pf_open("template/foo", O_WRONLY);
+        printf("pf_open('template/foo', O_WRONLY): %d\n", res);
+        int i;
+        for(i = 0; i < 128; i++) {
+            int len = 8192 / 256;
+            memset(data, 0xff-i, len);
+            u16 result;
+            res = pf_write(data, len, &result);
+            printf("pf_write(%d) : %d %d\n", res, len, result);
+            if (res || result != len)
+                break;
+        }
+        res = pf_open("template/foo", 0);
+        printf("pf_open(template/foo): %d\n", res);
+        if(res == 0) {
+            int len = FS_ReadData(data);
+            int fh;
+            fh = open("foo.tmp1", O_WRONLY | O_CREAT);
+            write(fh, data, len);
+            close(fh);
+        }
 #if 0
 	res = pf_open("model/model1.ini");
 	printf("pf_open: %d\n", res);

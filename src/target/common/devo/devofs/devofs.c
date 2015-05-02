@@ -63,7 +63,7 @@ int _write(const void* buf, int addr, int len)
             //write sector_id
             disk_writep_rand(&sector_id, sector, 0, 1);
         } else {
-            disk_readp(buf, sector, offset, len);
+            disk_writep_rand(buf, sector, offset, len);
             len = 0;
         }
     }
@@ -161,7 +161,7 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
    _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
 
    while(fs->file_header.type != FILEOBJ_NONE) {
-       if (fs->parent_dir == fs->file_header.parent_dir && strncmp(fs->file_header.name, name, 11) == 0) {
+       if (fs->file_header.type != FILEOBJ_DELETED && fs->parent_dir == fs->file_header.parent_dir && memcmp(fs->file_header.name, name, 11) == 0) {
            //Found matching file
            fs->file_cur_pos = -1;
            return FR_OK;
