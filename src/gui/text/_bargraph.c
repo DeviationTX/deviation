@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #define TRIM_THICKNESS 10
 #define TRIM_MARGIN 1
 u32 _bargraph_get_color(s32 val, struct guiBarGraph *graph, struct disp_bargraph *disp)
