@@ -34,7 +34,7 @@ void _write_sector_id(int sector, u8 id) {
     disk_writep_rand(&id, sector, 0, 1);
 }
 
-int _compact()
+FRESULT pf_compact()
 {
     u8 buf[BUF_SIZE];
     u8 *buf_ptr;
@@ -105,6 +105,7 @@ int _compact()
     _fs->start_sector = _fs->compact_sector;
     _fs->compact_sector = last_sec;
     _fs->file_addr = file_addr;
+    return FR_OK;
 }
 
 int _read(void * buf, int addr, int len)
@@ -200,7 +201,7 @@ FRESULT pf_mount (FATFS* fs)
         return FR_NO_FILESYSTEM;
     }
     if (fs->compact_sector >= 0) {
-        return _compact(fs);
+        return pf_compact(fs);
     }
     fs->compact_sector = fs->start_sector == 0 ? SECTOR_COUNT-1 : fs->start_sector-1;
 }
@@ -318,7 +319,7 @@ void _create_empty_file()
     int end_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + FILE_SIZE(_fs->file_header));
     if (end_addr >= _fs->compact_sector*SECTOR_SIZE) {
         //file won't fit.  need to compact
-        _compact();
+        pf_compact();
     }
     //duplicate file header to new location
     _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));

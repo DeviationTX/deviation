@@ -56,3 +56,4 @@ FRESULT pf_maximize_file_size();
 FRESULT pf_lseek (u32);						/* Move file pointer of the open file */
 FRESULT pf_opendir (DIR*, const char*);			/* Open a directory */
 FRESULT pf_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
+FRESULT pf_compact ();

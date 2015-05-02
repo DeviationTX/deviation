@@ -100,6 +100,8 @@ int main(int argc, char *argv[]) {
             write(fh, data, len);
             close(fh);
         }
+        res = pf_compact();
+        printf("pf_compact(): %d\n", res);
 #if 0
 	res = pf_open("model/model1.ini");
 	printf("pf_open: %d\n", res);
