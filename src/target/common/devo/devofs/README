@@ -1,0 +1,45 @@
+sector boundary
+---------------
+id/counter (0 - 254)
+
+file
+---------------
+type/status:	file/dir/currently-writing/deleted
+				ff: no more data in the sector
+				80: directory
+				0c: writing file (no size info)
+				08: file
+				00: deleted
+parent-dir:		0 - 255
+name:			8.3 (11 bytes)
+size:			2 bytes
+data:
+
+directory
+---------------
+type:			80
+parent_dir:		0-255
+name:			8.3
+id:				1-255
+
+compacting
+---------------
+cursec = find sector 0
+nextsec = cursec+1
+emptysec = find sector 255
+while (1) {
+	copy all non-deleted data from cursec to emptysec
+	while (! full) {
+		fill emptysec with non deleted data from nextsec
+		if (no more files) {
+			clear cursec
+			return
+		}
+		nextsec++
+	}
+	offset = nextsec index of uncopied data
+	nextfile = bytes in nextsec to next file boundary
+	clear cursec (now sector 255)
+	cursec = nextsec
+	nextsec = nextsec + 1 (may not be old cursec due to compressing multiple setcors)
+}
