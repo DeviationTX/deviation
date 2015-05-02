@@ -1,6 +1,61 @@
+The DevoFS filesystem is designed to provide a filesystem to very small FLASH 
+memories with large sector sizes (ex 64kB flash with 4k sector-size). It is
+optimized for flash layout efficiency over all else.
+
+
+-----------------------------------------------------------------------
+| NOTE:  It is not recommended to use this filesystem on devices with |
+|                   larger than 512kB of FLASH space                  |
+-----------------------------------------------------------------------
+
+The only supported file attributes are file/directory bit and file-size.  No
+other data is stored.  **** The maximum file size is 65535 **** (this could be
+changed by adding an extra byte to the file-system header)
+
+The file-system is a log-based filesystem with built in wear-leveling.
+Sequential read and write speeds will be very fast, however, open and read-dir
+functions will be quite slow.
+
+DevoFS will slow down linearly with the number of files present, as well as
+with the number of files written since the last compact() event
+
+The filesystem will automatically run compact() when necessary, butit is
+recommended to run it more frequently to optimize performance
+
+The filesystem has an overhead of 15 bytes for each file and directory, and does
+not require file alignment to sector boundaries.  Additionally, one sector must
+be left vacant to allow for running the compact operation (unless the equivalent
+amount of RAM is available)
+
+A very simple algorithm is used:
+   * find current filesystem start
+       - will be sector aligned
+       - not restricted to the 1st sector.  Will move backwards by one sector
+         every time compact() is run
+   * read file header (15 bytes)
+   * use current file-header to identify start of next file-header
+   * repeat until requested file/directory is found
+
+Support for creating new files or directories is not currently implemented, but
+could easily be added in the future.  Also, file-size cannot currently be
+changed.
+
+For efficiency, it is required that a directory be created before any files that
+reside within that directory.  The code does not check this condition, and it 
+leaves the burden to the developer
+
+Reads and writes will automatically be partitioned to sector boundaries so the
+sector-id bytes are not inadvertently read
+
+DevoFS layout:
+---------------------------------------
+
+The constant values below assume the FLASH resets to 0xff.  negate all values if reset is 0x00
+
 sector boundary
 ---------------
-id/counter (0 - 254)
+id/counter: 0x00 - start of filesystem
+          : 0xff - empty sector
 
 file
 ---------------

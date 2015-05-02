@@ -16,6 +16,7 @@
 
 #include "petit_io.h"
 #include <stdio.h>
+#include <string.h>
 
 extern char image_file[1024];
 
@@ -75,6 +76,16 @@ DRESULT disk_writep_rand (
 	return RES_OK;
 }
 
+DRESULT disk_erasep (
+        DWORD sc
+)
+{
+	unsigned char data[4096];
+	memset(data, 0, 4096);
+	// Initiate write process
+	fseek(fh, sc * 4096, SEEK_SET);
+	fwrite(data, 4096, 1, fh);
+}
 DRESULT disk_writep (
 	const BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
 	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
@@ -85,7 +96,11 @@ DRESULT disk_writep (
 
 	if (!buff) {
 		if (sc) {
+                        unsigned char data[4096];
+                        memset(data, 0, 4096);
 			// Initiate write process
+			fseek(fh, sc * 4096, SEEK_SET);
+			fwrite(data, 4096, 1, fh);
 			fseek(fh, sc * 4096, SEEK_SET);
 		} else {
 			// Finalize write process

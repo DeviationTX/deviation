@@ -4,10 +4,15 @@
 #include <assert.h>
 #include <string.h>
 enum {
-    START_SECTOR_ID = 0xFF,
     SECTOR_SIZE     = 4096,
     SECTOR_COUNT    = 16,
     BUF_SIZE        = 100,
+};
+
+enum {
+    SECTORID_START = 0xFF,
+    SECTORID_EMPTR = 0x00,
+    SECTORID_DATA  = 0x02,
 };
 
 #define FILE_SIZE(x) ((x).type == FILEOBJ_DIR ? 0 : (((x).size1 << 8) | (x).size2))
@@ -21,14 +26,89 @@ enum {
 };
 static FATFS *_fs;
 
+int _get_next_sector(int sec) {
+    return (sec + 1) % SECTOR_COUNT;
+}
+
+void _write_sector_id(int sector, u8 id) {
+    disk_writep_rand(&id, sector, 0, 1);
+}
+
 int _compact()
 {
-    assert(0);
+    u8 buf[BUF_SIZE];
+    u8 *buf_ptr;
+    struct file_header fh;
+    int read_sec = _fs->start_sector;
+    int read_addr = _fs->start_sector * SECTOR_SIZE + 1;
+    int write_sec = _fs->compact_sector;
+    int file_addr = _fs->file_addr;
+    int write_off = 1;
+    int buf_len;
+    disk_erasep(write_sec);
+    _write_sector_id(write_sec, SECTORID_START);
+    while(1) {
+        // process one file/directory
+        if (read_addr == file_addr)
+            file_addr = write_sec * SECTOR_SIZE + write_off;
+
+        _read(&fh, read_addr, sizeof(struct file_header));
+        if (fh.type == FILEOBJ_NONE)
+            break;
+        int len = FILE_SIZE(fh);
+        if (fh.type == FILEOBJ_DELETED) {
+            read_addr = _get_addr(read_addr, sizeof(struct file_header) + len);
+            continue;
+        }
+        read_addr = _get_addr(read_addr, sizeof(struct file_header));
+        //write header/directory-entry
+        memcpy(buf, &fh, sizeof(struct file_header));
+        buf_len = sizeof(struct file_header);
+        buf_ptr = buf;
+        while(buf_len) {
+            int sector_overwrite = (write_off + buf_len >= SECTOR_SIZE);
+            if (sector_overwrite){
+                //write to end of sector
+                int sector_buf_len = SECTOR_SIZE - write_off;
+                disk_writep_rand(buf_ptr, write_sec, write_off, sector_buf_len);
+                buf_len -= sector_buf_len;
+                buf_ptr += sector_buf_len;
+                write_sec = _get_next_sector(write_sec);
+                write_off = 1;
+                disk_erasep(write_sec);
+                _write_sector_id(write_sec, SECTORID_DATA);
+                if (buf_len)
+                    continue;
+            } else {
+                //write whole buffer
+                disk_writep_rand(buf_ptr, write_sec, write_off, buf_len);
+                write_off += buf_len;
+            }
+            if (! len)
+                break;
+            buf_len = len > BUF_SIZE ? BUF_SIZE : len;
+            _read(buf, read_addr, buf_len);
+            buf_ptr = buf;
+            len -= buf_len;
+            read_addr = _get_addr(read_addr, buf_len);
+        }
+    }
+    //erase remaining sectors
+    int last_sec = write_sec;
+    write_sec = _get_next_sector(write_sec);
+    while (write_sec != _fs->compact_sector) {
+        disk_erasep(write_sec);
+        last_sec = write_sec;
+        write_sec = _get_next_sector(write_sec);
+    }
+    //update _fs
+    _fs->start_sector = _fs->compact_sector;
+    _fs->compact_sector = last_sec;
+    _fs->file_addr = file_addr;
 }
 
 int _read(void * buf, int addr, int len)
 {
-    //FIXME  Need to properly handle sector crossings here
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
     while(len) {
@@ -48,7 +128,6 @@ int _read(void * buf, int addr, int len)
 }
 int _write(const void* buf, int addr, int len)
 {
-    //FIXME  Need to properly handle sector crossings here
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
     while(len) {
@@ -59,9 +138,8 @@ int _write(const void* buf, int addr, int len)
             len -= bytes;
             offset = 1;
             sector++;
-            u8 sector_id = 2;
+            _write_sector_id(sector, SECTORID_DATA);
             //write sector_id
-            disk_writep_rand(&sector_id, sector, 0, 1);
         } else {
             disk_writep_rand(buf, sector, offset, len);
             len = 0;
@@ -87,7 +165,7 @@ int _find_start_sector(int *recovery_sector)
     for (i = 0; i < SECTOR_COUNT; i++) {
         u8 id;
         disk_readp(&id, i, 0, 1);
-        if (id == START_SECTOR_ID) {
+        if (id == SECTORID_START) {
             start[start_ptr++] = i;
             if (start_ptr == 2) {
                 break;
