@@ -11,6 +11,8 @@ LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a
 SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(wildcard $(SDIR)/target/common/stm32/*.c) \
            $(wildcard $(SDIR)/target/common/devo/*.c) \
+           $(wildcard $(SDIR)/target/common/devo/devofs/*.c) \
+           $(wildcard $(SDIR)/target/common/devo/petit_fat/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/*.c) \
            $(wildcard $(SDIR)/target/common/devo/msc2/lib/*.c)
 
@@ -23,7 +25,7 @@ SRC_C   += $(wildcard $(SDIR)/target/common/devo/protocol/*.c) \
            $(wildcard $(SDIR)/target/common/devo/hid/*.c)
 endif
 
-CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -fno-builtin-printf -Os --specs=nano.specs
+CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/devo/devofs -I$(SDIR)/target/common/devo/petit_fat -fno-builtin-printf -Os --specs=nano.specs
 MODULE_FLAGS = -fno-builtin
 
 #LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -nostdlib

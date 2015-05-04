@@ -47,13 +47,13 @@ typedef struct {
         char    fname[13];      /* File name */
 } FILINFO;
 
-FRESULT pf_mount (FATFS*);						/* Mount/Unmount a logical drive */
-FRESULT pf_switchfile (FATFS *);
-FRESULT pf_open (const char*, unsigned flags);					/* Open a file */
-FRESULT pf_read (void*, u16, u16*);			/* Read data from the open file */
-FRESULT pf_write (const void*, u16, u16*);	/* Write data to the open file */
-FRESULT pf_maximize_file_size();
-FRESULT pf_lseek (u32);						/* Move file pointer of the open file */
-FRESULT pf_opendir (DIR*, const char*);			/* Open a directory */
-FRESULT pf_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
-FRESULT pf_compact ();
+FRESULT df_mount (FATFS*);						/* Mount/Unmount a logical drive */
+FRESULT df_switchfile (FATFS *);
+FRESULT df_open (const char*, unsigned flags);					/* Open a file */
+FRESULT df_read (void*, u16, u16*);			/* Read data from the open file */
+FRESULT df_write (const void*, u16, u16*);	/* Write data to the open file */
+FRESULT df_maximize_file_size();
+FRESULT df_lseek (u32);						/* Move file pointer of the open file */
+FRESULT df_opendir (DIR*, const char*);			/* Open a directory */
+FRESULT df_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
+FRESULT df_compact ();
