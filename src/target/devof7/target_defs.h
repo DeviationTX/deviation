@@ -6,7 +6,8 @@
 #define TXID 0xF7
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
-#define SPIFLASH_SECTORS 512
+#define SPIFLASH_SECTORS 16
+#define SPIFLASH_AAI_AF 1
 
 #if defined BUILDTYPE_DEV && ! defined EMULATOR
 //No room for debug and standard gui
