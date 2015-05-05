@@ -1,12 +1,8 @@
 #ifndef _COMMON_DEVO_H_
 #define _COMMON_DEVO_H_
 
-#define PETIT_FAT 0
-#define DEVOFS    1
-#define FS_TYPE DEVOFS
-
 #ifndef FILE_SIZE
-#if FS_TYPE == DEVOFS
+#if defined USE_DEVOFS && USE_DEVOFS == 1
     #include "devofs.h"
 #else
     #include "petit_fat.h"
@@ -14,7 +10,7 @@
 #define FILE_SIZE sizeof(FATFS)
 #endif
 
-#if FS_TYPE == DEVOFS
+#if defined USE_DEVOFS && USE_DEVOFS == 1
     #define fs_mount      df_mount
     #define fs_open       df_open
     #define fs_read       df_read

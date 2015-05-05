@@ -173,7 +173,7 @@ void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
 }
 
 void init_err_handler() {
-#if FS_TYPE == PETIT_FAT
+#if defined USE_DEVOFS && USE_DEVOFS == 1
     //This is a hack to get the memory address of a file
     //we can't use 'fopen' because it masks the structure we need
     FATFS fat;
