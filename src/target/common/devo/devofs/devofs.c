@@ -116,20 +116,25 @@ int _read(void * buf, int addr, int len)
 {
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
+    u16 actual;
+    int orig_len = len;
     while(len) {
         if (offset + len > SECTOR_SIZE) {
             int bytes = SECTOR_SIZE - offset;
-            disk_readp(buf, sector, offset, bytes);
-            buf += bytes;
-            len -= bytes;
+            disk_readp_cnt(buf, sector, offset, bytes, &actual);
+            buf += actual;
+            len -= actual;
+            if (actual != bytes)
+                break;
             offset = 1;
             sector++;
         } else {
-            disk_readp(buf, sector, offset, len);
-            len = 0;
+            disk_readp_cnt(buf, sector, offset, len, &actual);
+            len -= actual;
+            break;
         }
     }
-    return FR_OK;
+    return orig_len - len;
 }
 int _write(const void* buf, int addr, int len)
 {
@@ -372,9 +377,8 @@ FRESULT df_read (void *buf, u16 requested, u16 *actual)
     if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
         requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
     } 
-    _read(buf, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
-    _fs->file_cur_pos += requested;
-    *actual = requested;
+    *actual = _read(buf, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
+    _fs->file_cur_pos += *actual;
     return FR_OK;
 }
 
