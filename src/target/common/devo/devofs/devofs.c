@@ -264,6 +264,12 @@ FRESULT df_opendir (DIR *dir, const char *name)
 {
     *dir = *_fs;
     dir->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    if (name[0] == 0 || (name[0] == '/' && name[1] == 0)) {
+        dir->parent_dir = 0;
+        dir->file_cur_pos = -1;
+        dir->file_addr = 0;
+        return FR_OK;
+    }
     int res = _find_file(dir, name);
     if (res)
         return res;
@@ -293,13 +299,21 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
     while (dir->file_header.type != FILEOBJ_NONE) {
         if (dir->file_header.parent_dir == dir->parent_dir) {
             //Found next object
-            fi->fname[9] = 0;
-            int len = _expand_chars(fi->fname, dir->file_header.name, 8);
-            fi->fname[len++] = '.';
-            _expand_chars(fi->fname+len, dir->file_header.name + 8, 3);
+            char *ptr1 = fi->fname;
+            int  pos = 0;
+            while(pos < 8 && dir->file_header.name[pos]) {
+                *ptr1++ = dir->file_header.name[pos++];
+            }
+            if (dir->file_header.name[8]) {
+                pos = 8;
+                *ptr1++ = '.';
+                while(pos < 11 && dir->file_header.name[pos]) {
+                    *ptr1++ = dir->file_header.name[pos++];
+                }
+            }
+            *ptr1 = 0;
             fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : 0;
             fi->fsize = FILE_SIZE(dir->file_header);
-            fi->fname[12] = 0;
             return FR_OK;
         }
         _get_next_fileobj(dir);
