@@ -58,6 +58,17 @@ DRESULT disk_readp (
 	return RES_OK;
 }
 
+DRESULT disk_readp_cnt (
+	BYTE* dest,			/* Pointer to the destination object */
+	DWORD sector,		/* Sector number (LBA) */
+	WORD sofs,			/* Offset in the sector */
+	WORD count,			/* Byte count (bit15:destination) */
+	WORD *actual
+)
+{
+	*actual = count;
+	return disk_readp(dest, sector, sofs, count);
+}
 
 
 /*-----------------------------------------------------------------------*/

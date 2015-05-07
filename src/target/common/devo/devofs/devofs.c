@@ -298,6 +298,7 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
             fi->fname[len++] = '.';
             _expand_chars(fi->fname+len, dir->file_header.name + 8, 3);
             fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : 0;
+            fi->fsize = FILE_SIZE(dir->file_header);
             fi->fname[12] = 0;
             return FR_OK;
         }

@@ -43,6 +43,7 @@ typedef struct {
 #define DIR FATFS
 
 typedef struct {
+	u32	fsize;		/* File size */
         u8      fattrib;
         char    fname[13];      /* File name */
 } FILINFO;

@@ -9,7 +9,7 @@ static DIR   dir;
 int FS_OpenDir(const char *path)
 {
     
-    FRESULT res = pf_opendir(&dir, path);
+    FRESULT res = df_opendir(&dir, path);
     printf("Opendir: %d\n", res);
     return (res == FR_OK);
 }
@@ -17,7 +17,7 @@ int FS_OpenDir(const char *path)
 int FS_ReadDir(char *path)
 {
     FILINFO fi;
-    if (pf_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
+    if (df_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
         return 0;
     printf("Read: %s %d\n", fi.fname, fi.fattrib);
     strncpy(path, fi.fname, 13);
@@ -30,8 +30,8 @@ int FS_ReadData(char *data)
     char *ptr = data;
     while(1) {
         u16 bytes;
-        res = pf_read(ptr, 1024, &bytes);
-        printf("pf_read: %d %dbytes\n", res, bytes);
+        res = df_read(ptr, 1024, &bytes);
+        printf("df_read: %d %dbytes\n", res, bytes);
         ptr += bytes;
         if(res || bytes != 1024)
             break;
@@ -55,23 +55,23 @@ int main(int argc, char *argv[]) {
         char cmd[1024];
         sprintf(cmd, "/bin/cp %s %s", argv[1], image_file);
         system(cmd);
-	res = pf_mount(&fat);
-	printf("pf_mount: %d\n", res);
+	res = df_mount(&fat);
+	printf("df_mount: %d\n", res);
         FS_OpenDir("media");
         while((res = FS_ReadDir(data))) {
             printf("ReadDir: %d: %s\n", res, data);
             char filename[256];
             sprintf(filename, "media/%s", data);
-            res = pf_open(filename, 0);
-            printf("pf_open: %d\n", res);
+            res = df_open(filename, 0);
+            printf("df_open: %d\n", res);
             if (res) {
                 continue;
             }
             FS_ReadData(data);
             printf("%s\n", data);
         }
-        res = pf_open("template/foo", 0);
-        printf("pf_open(template/foo): %d\n", res);
+        res = df_open("template/foo", 0);
+        printf("df_open(template/foo): %d\n", res);
         if(res == 0) {
             int len = FS_ReadData(data);
             int fh;
@@ -79,20 +79,20 @@ int main(int argc, char *argv[]) {
             write(fh, data, len);
             close(fh);
         }
-        res = pf_open("template/foo", O_WRONLY);
-        printf("pf_open('template/foo', O_WRONLY): %d\n", res);
+        res = df_open("template/foo", O_WRONLY);
+        printf("df_open('template/foo', O_WRONLY): %d\n", res);
         int i;
         for(i = 0; i < 128; i++) {
             int len = 8192 / 256;
             memset(data, 0xff-i, len);
             u16 result;
-            res = pf_write(data, len, &result);
-            printf("pf_write(%d) : %d %d\n", res, len, result);
+            res = df_write(data, len, &result);
+            printf("df_write(%d) : %d %d\n", res, len, result);
             if (res || result != len)
                 break;
         }
-        res = pf_open("template/foo", 0);
-        printf("pf_open(template/foo): %d\n", res);
+        res = df_open("template/foo", 0);
+        printf("df_open(template/foo): %d\n", res);
         if(res == 0) {
             int len = FS_ReadData(data);
             int fh;
@@ -100,23 +100,23 @@ int main(int argc, char *argv[]) {
             write(fh, data, len);
             close(fh);
         }
-        res = pf_compact();
-        printf("pf_compact(): %d\n", res);
+        res = df_compact();
+        printf("df_compact(): %d\n", res);
 #if 0
-	res = pf_open("model/model1.ini");
-	printf("pf_open: %d\n", res);
-	pf_maximize_file_size();
-	res = pf_open("bmp/devo8.bmp");
-	printf("pf_open: %d\n", res);
+	res = df_open("model/model1.ini");
+	printf("df_open: %d\n", res);
+	df_maximize_file_size();
+	res = df_open("bmp/devo8.bmp");
+	printf("df_open: %d\n", res);
         while(1) {
             WORD b;
-            res = pf_read(ptr, 0x1000, &b);
+            res = df_read(ptr, 0x1000, &b);
             len += b;
             if(res || b != 0x1000)
                 break;
             ptr+= 0x1000;
         }
-	printf("pf_read: %d\n", res);
+	printf("df_read: %d\n", res);
 	printf("Read %d\n", len);
 	fh = fopen("out.bmp", "w");
 	fwrite(data, len, 1, fh);
