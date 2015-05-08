@@ -5,8 +5,6 @@
 
 #########################
 
-# change 'tests => 1' to 'tests => last_test_to_print';
-
 use strict;
 use warnings;
 
@@ -16,7 +14,7 @@ use File::Temp;
 use Digest::MD5;
 use Data::Dumper;
 
-use Test::More tests => 1;
+use Test::More tests => 146;
 BEGIN { use_ok('DevoFS') };
 
 #########################
@@ -33,11 +31,13 @@ my $MAX_FILE_SIZE = 65535;
 
 #tests here
 init();
-%files = verify_files();
+verify_files();
 read_partial();
 lseek();
-#write_file();
+write_file();
 auto_compact();
+manual_compact();
+write_around_the_horn();
 
 sub msg
 {
@@ -46,19 +46,6 @@ sub msg
         $a[3] =~ s/^.*:://;
         $a[3] .= " - $msg" if($msg);
         return $a[3];
-}
-
-sub init {
-    @imgfiles = split(/\n/, `chdir $imgdir; find . -type f`);
-    foreach (@imgfiles) {
-        s/^\.\///;
-    }
-    @imgfiles = sort(@imgfiles);
-    $image = $tmpdir . "/devofs.img";
-    ok(system("perl $FindBin::Bin/../buildfs.pl $imgdir > $image") == 0, "Built filesystem");
-    $fat = DevoFS::mount($image);
-    ok($fat, "Mounted image");
-    return;
 }
 
 sub _read_all_files {
@@ -78,12 +65,47 @@ sub _read_all_files {
     return %files;
 }
 
-sub verify_files {
-    my %files = _read_all_files("");
-    my @dirs = sort(keys %files);
-    ok(eq_array(\@dirs, \@imgfiles), msg("Matched file list"));
-    foreach my $file (@dirs) {
+sub _compare_fs {
+    my($ref, $msg) = @_;
+    my $parent = (caller(1))[3];
+    $parent =~ s/^.*:://;
+    $parent .= " - $msg" if($msg);
+    my %new = _read_all_files("");
+    my @ref_files = sort(keys(%$ref));
+    my @new_files = sort(keys(%new));
+    ok(eq_array(\@ref_files, \@new_files), "$parent - Matched file list");
+    foreach my $file (sort keys %$ref) {
+        is(DevoFS::open($file, 0), 0, "$parent - Opened $file");
+        my $data1 = "";
         my $len = 0;
+        my $ret = DevoFS::read($data1, $MAX_FILE_SIZE, $len);
+        is($len, $ref->{$file}{SIZE}, "$parent - Read expected number of bytes from $file");
+        my $new_md5 = Digest::MD5::md5_hex($data1);
+        $new{$file}{MD5} = $new_md5;
+        $new{$file}{DATA} = $data1;
+        is($new_md5, $ref->{$file}{MD5}, "$parent - $file matches reference");
+    }
+    return %new;
+}
+
+#######################################################################################################
+sub init {
+    @imgfiles = split(/\n/, `chdir $imgdir; find . -type f`);
+    foreach (@imgfiles) {
+        s/^\.\///;
+    }
+    @imgfiles = sort(@imgfiles);
+    $image = $tmpdir . "/devofs.img";
+    ok(system("perl $FindBin::Bin/../buildfs.pl $imgdir > $image") == 0, "Built filesystem");
+    system("cp $image $image.1");
+    $fat = DevoFS::mount("$image.1");
+    ok($fat, "Mounted image");
+    return;
+}
+
+sub verify_files {
+    my %ref;
+    foreach my $file (@imgfiles) {
         my $data;
         {
             local $/=undef;
@@ -93,17 +115,9 @@ sub verify_files {
             close $fh;
         }
         my $ref_md5 = Digest::MD5::md5_hex($data);
-        is(DevoFS::open($file, 0), 0, msg("Opened $file"));
-        my $data1 = "";
-        my $ret = DevoFS::read($data1, $MAX_FILE_SIZE, $len);
-        is($ret, 0, msg("Read $file"));
-        is($len, $files{$file}{SIZE}, msg("Read expected number of bytes from $file"));
-        ok(\$data1, msg("Read $file"));
-        $files{$file}{DATA} = $data1;
-        my $new_md5 = Digest::MD5::md5_hex($data1);
-        $files{$file}{MD5} = $new_md5;
-        is($ref_md5, $new_md5, msg("Data matches reference"));
+        $ref{$file} = {SIZE => length($data), MD5 => $ref_md5};
     }
+    %files = _compare_fs(\%ref);
     return %files;
 }
 
@@ -143,25 +157,41 @@ sub write_file {
     is($new_md5, $ref_md5, msg("Written data is correct"));
 }
 
+
 sub auto_compact {
     my $data = "";
     my $len = 0;
-    for my $i (0 .. 11) {
+    for my $i (0 .. 12) {
         #20 iterations is enough to cause auto-compaction
         DevoFS::open("protocol/devo.mod", $O_WRONLY);
         DevoFS::write($files{"protocol/devo.mod"}{DATA}, 4096, $len);
     }
-    system("cp $image .");
-    DevoFS::open("protocol/devo.mod", $O_WRONLY);
-    DevoFS::write($files{"protocol/devo.mod"}{DATA}, 4096, $len);
-    system("cp $image ./devofs.bad");
-    my %newfiles = _read_all_files("");
-    foreach my $file (sort keys %files) {
-        ok($newfiles{$file}, msg("Found $file after compact"));
-        is(DevoFS::open($file, 0), 0, msg("Opened $file"));
-        my $data1 = "";
-        my $ret = DevoFS::read($data1, $MAX_FILE_SIZE, $len);
-        my $new_md5 = Digest::MD5::md5_hex($data1);
-        is($new_md5, $files{$file}{MD5}, msg("Mismatch after compaction in $file"));
+    _compare_fs(\%files);
+}
+
+sub manual_compact {
+    for my $i (0 .. 3) {
+        DevoFS::compact();
+        _compare_fs(\%files, $i);
     }
+}
+
+sub write_around_the_horn {
+    #Start with a clean database
+    system("cp $image $image.2");
+    $fat = DevoFS::mount("$image.2");
+    #
+    #compact thrice (this will move the start 'before the horn)
+    DevoFS::compact();
+    DevoFS::compact();
+    DevoFS::compact();
+    #Write mod file (this will go around the horn
+    my $len = 0;
+    DevoFS::open("protocol/devo.mod", $O_WRONLY);
+    is(DevoFS::write($files{"protocol/devo.mod"}{DATA}, 4096, $len), 0, msg("Wrote mod file"));
+    #
+    my $data = "";
+    DevoFS::open("protocol/devo.mod", 0);
+    is(DevoFS::read($data, 4096, $len), 0, msg("Read written data"));
+    is(Digest::MD5::md5_hex($data), $files{"protocol/devo.mod"}{MD5}, msg("Data matched"));
 }

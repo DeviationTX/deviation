@@ -30,6 +30,7 @@ struct file_header {
     char name[11];
     u8 size1; //also id
     u8 size2;
+    u8 size3;
 };
 typedef struct {
     int start_sector;

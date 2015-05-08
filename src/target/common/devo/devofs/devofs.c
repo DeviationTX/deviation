@@ -17,7 +17,7 @@ enum {
     SECTORID_DATA  = 0x02,
 };
 
-#define FILE_SIZE(x) ((x).type == FILEOBJ_DIR ? 0 : (((x).size1 << 8) | (x).size2))
+#define FILE_SIZE(x) ((x).type == FILEOBJ_DIR ? 0 : (((x).size1 << 16) | ((x).size2 << 8) | (x).size3))
 #define FILE_ID(x) ((x).size1)
 /* This assumes flash reset = 0x00.  bits are defined to ensure only 1 type can e set before a reset happens */
 enum {

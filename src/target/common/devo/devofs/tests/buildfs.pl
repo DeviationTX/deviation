@@ -9,14 +9,14 @@ my $outf = "";
 sub add_dir {
     my($name, $parent, $id) = @_;
     my ($root, $ext) = split(/\./, $name);
-    $outf .= pack("C C a8 a3 C C", $FILEOBJ_DIR, $parent, $root, $ext, $id, 0);
+    $outf .= pack("C C a8 a3 C C C", $FILEOBJ_DIR, $parent, $root, $ext, $id, 0, 0);
 }
 
 sub add_file {
     my($name, $parent, $data) = @_;
     my ($root, $ext) = split(/\./, $name);
     my $size = length($data);
-    $outf .= pack("C C a8 a3 C C a*", $FILEOBJ_FILE, $parent, $root, $ext, $size >> 8, $size & 0xff, $data);
+    $outf .= pack("C C a8 a3 C C C a*", $FILEOBJ_FILE, $parent, $root, $ext, $size >> 16, 0xff & ($size >> 8), $size & 0xff, $data);
 }
 my $root = shift(@ARGV);
 my $next_dir = 1;
