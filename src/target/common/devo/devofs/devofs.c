@@ -44,6 +44,7 @@ FRESULT df_compact()
     u8 buf[BUF_SIZE];
     u8 *buf_ptr;
     struct file_header fh;
+    //printf("Start: %08x %08x %08x %08x\n", _fs->start_sector, _fs->compact_sector, _fs->file_addr, _fs->file_cur_pos);
     int read_addr = _fs->start_sector * SECTOR_SIZE + 1;
     int write_sec = _fs->compact_sector;
     int file_addr = _fs->file_addr;
@@ -109,6 +110,7 @@ FRESULT df_compact()
     _fs->start_sector = _fs->compact_sector;
     _fs->compact_sector = last_sec;
     _fs->file_addr = file_addr;
+    //printf("End: %08x %08x %08x %08x\n", _fs->start_sector, _fs->compact_sector, _fs->file_addr, _fs->file_cur_pos);
     return FR_OK;
 }
 
@@ -127,7 +129,7 @@ int _read(void * buf, int addr, int len)
             if (actual != bytes)
                 break;
             offset = 1;
-            sector++;
+            sector = (sector + 1) % SECTOR_COUNT;
         } else {
             disk_readp_cnt(buf, sector, offset, len, &actual);
             len -= actual;
@@ -147,7 +149,7 @@ int _write(const void* buf, int addr, int len)
             buf += bytes;
             len -= bytes;
             offset = 1;
-            sector++;
+            sector = (sector + 1) % SECTOR_COUNT;
             _write_sector_id(sector, SECTORID_DATA);
             //write sector_id
         } else {
@@ -264,10 +266,9 @@ FRESULT df_opendir (DIR *dir, const char *name)
 {
     *dir = *_fs;
     dir->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    dir->parent_dir = 0;
     if (name[0] == 0 || (name[0] == '/' && name[1] == 0)) {
-        dir->parent_dir = 0;
         dir->file_cur_pos = -1;
-        dir->file_addr = 0;
         return FR_OK;
     }
     int res = _find_file(dir, name);
@@ -288,7 +289,7 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
     }
     if (dir->file_cur_pos == -1) {
         //Start at the beginning
-        dir->file_addr = dir->start_sector + 1;
+        dir->file_addr = dir->start_sector * SECTOR_SIZE + 1; //reset current position
         dir->file_cur_pos = 0;
     } else {
         if (dir->file_header.type == FILEOBJ_NONE)

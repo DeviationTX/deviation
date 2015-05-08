@@ -84,6 +84,13 @@ DRESULT disk_writep_rand (
 	dbgprintf("Writing sector: %d, offset: %d size: %d\n", (int)sector, (int)sofs, (int)count);
 	fseek(fh, sector * 4096 + sofs, SEEK_SET);
 	fwrite(src, count, 1, fh);
+        fflush(fh);
+        int max = count > 64 ? 64 : count;
+        int i;
+        for(i = 0; i < max; i++) {
+            dbgprintf("%02x ", src[i]);
+        }
+        dbgprintf("\n");
 	return RES_OK;
 }
 
@@ -119,6 +126,7 @@ DRESULT disk_writep (
 	} else {
 		// Send data to the disk
 		fwrite(buff, sc, 1, fh);
+                fflush(fh);
 	}
 
 	return res;
