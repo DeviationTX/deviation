@@ -96,7 +96,7 @@ sub init {
     }
     @imgfiles = sort(@imgfiles);
     $image = $tmpdir . "/devofs.img";
-    ok(system("perl $FindBin::Bin/../buildfs.pl $imgdir > $image") == 0, "Built filesystem");
+    ok(system("perl $FindBin::Bin/../../buildfs.pl $imgdir > $image") == 0, "Built filesystem");
     system("cp $image $image.1");
     $fat = DevoFS::mount("$image.1");
     ok($fat, "Mounted image");
