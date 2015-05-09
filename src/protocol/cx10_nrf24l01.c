@@ -53,8 +53,8 @@
 #define PACKET_PERIOD   1316     // Timeout for callback in uSec
 #define INITIAL_WAIT     500
 
-#define FLAG_FLIP   0x0100
-#define FLAG_LIGHT  0x0200
+#define FLAG_FLIP       0x1000 // goes to rudder channel
+#define FLAG_MODE_MASK  0x0003
 
 // For code readability
 enum {
@@ -78,13 +78,13 @@ static u16 counter;
 static u32 packet_counter;
 static u8 tx_power;
 static u16 throttle, rudder, elevator, aileron, flags;
-static u8 rx_tx_addr[] = {0xcc, 0xcc, 0xcc, 0xcc, 0xcc};
+static const u8 rx_tx_addr[] = {0xcc, 0xcc, 0xcc, 0xcc, 0xcc};
 
 // frequency channel management
 #define RF_BIND_CHANNEL 0x02
 #define NUM_RF_CHANNELS    4
 static u8 current_chan = 0;
-static u8 chans[] = {0x16, 0x33, 0x40, 0x0e};
+static const u8 chans[] = {0x16, 0x33, 0x40, 0x0e};
 
 static u8 phase;
 enum {
@@ -101,6 +101,7 @@ enum {
 static int xn297_addr_len;
 static u8  xn297_tx_addr[5];
 static u8  xn297_rx_addr[5];
+static u8  xn297_crc = 0;
 static u8  is_xn297 = 0;
 static const uint8_t xn297_scramble[] = {
   0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,
@@ -111,12 +112,12 @@ static const uint8_t xn297_scramble[] = {
 
 static uint8_t bit_reverse(uint8_t b_in)
 {
-  uint8_t b_out = 0;
-  for (int i = 0; i < 8; ++i) {
-    b_out = (b_out << 1) | (b_in & 1);
-    b_in >>= 1;
-  }
-  return b_out;
+    uint8_t b_out = 0;
+    for (int i = 0; i < 8; ++i) {
+        b_out = (b_out << 1) | (b_in & 1);
+        b_in >>= 1;
+    }
+    return b_out;
 }
 
 
@@ -125,69 +126,123 @@ static const uint16_t initial    = 0xb5d2;
 static const uint16_t xorout     = 0x9ba7;
 static uint16_t crc16_update(uint16_t crc, unsigned char a)
 {
-  crc ^= a << 8;
-  for (int i = 0; i < 8; ++i) {
-    if (crc & 0x8000) {
-      crc = (crc << 1) ^ polynomial;
+    crc ^= a << 8;
+    for (int i = 0; i < 8; ++i) {
+        if (crc & 0x8000) {
+            crc = (crc << 1) ^ polynomial;
+        } else {
+            crc = crc << 1;
+        }
+    }
+    return crc;
+}
+
+
+void XN297_SetTXAddr(const u8* addr, int len)
+{
+    if (len > 5) len = 5;
+    if (len < 3) len = 3;
+    if (is_xn297) {
+        u8 buf[] = { 0, 0, 0, 0, 0 };
+        memcpy(buf, addr, len);
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, buf, 5);
     } else {
-      crc = crc << 1;
+        u8 buf[] = { 0x55, 0x0F, 0x71, 0x0C, 0x00 }; // bytes for XN297 preamble 0xC710F55 (28 bit)
+        xn297_addr_len = len;
+        if (xn297_addr_len < 4) {
+            for (int i = 0; i < 4; ++i) {
+                buf[i] = buf[i+1];
+            }
+        }
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, buf, 5);
+        // Receive address is complicated. We need to use scrambled actual address as a receive address
+        // but the TX code now assumes fixed 4-byte transmit address for preamble. We need to adjust it
+        // first. Also, if the scrambled address begings with 1 nRF24 will look for preamble byte 0xAA
+        // instead of 0x55 to ensure enough 0-1 transitions to tune the receiver. Still need to experiment
+        // with receiving signals.
+        memcpy(xn297_tx_addr, addr, len);
     }
-  }
-  return crc;
 }
 
 
-void XN297_SetTXAddr(uint8_t* addr, int len)
+void XN297_SetRXAddr(const u8* addr, int len)
 {
-  if (len > 5) len = 5;
-  if (len < 3) len = 3;
-  if (is_xn297) {
-    uint8_t buf[] = { 0, 0, 0, 0, 0 };
+    if (len > 5) len = 5;
+    if (len < 3) len = 3;
+    u8 buf[] = { 0, 0, 0, 0, 0 };
     memcpy(buf, addr, len);
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, addr, 5);
-    NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, addr, 5);
-  } else {
-    uint8_t buf[] = { 0x55, 0x0F, 0x71, 0x0C, 0x00 }; // bytes for XN297 preamble 0xC710F55 (28 bit)
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 2);
-    NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, buf, 5);
-    // Receive address is complicated. We need to use scrambled actual address as a receive address
-    // but the TX code now assumes fixed 4-byte transmit address for preamble. We need to adjust it
-    // first. Also, if the scrambled address begings with 1 nRF24 will look for preamble byte 0xAA
-    // instead of 0x55 to ensure enough 0-1 transitions to tune the receiver. Still need to experiment
-    // with receiving signals.
-    xn297_addr_len = len;
-    memcpy(xn297_tx_addr, addr, len);
-  }
+    if (is_xn297) {
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, buf, 5);
+    } else {
+        memcpy(xn297_rx_addr, addr, len);
+        for (int i = 0; i < xn297_addr_len; ++i) {
+            buf[i] = xn297_rx_addr[i] ^ xn297_scramble[xn297_addr_len-i-1];
+        }
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, len-2);
+        NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, buf, 5);
+    }
 }
 
 
-void XN297_WritePayload(uint8_t* msg, int len)
+void XN297_Configure(u8 flags)
 {
-  uint8_t packet[32];
-  if (is_xn297) {
-    NRF24L01_WritePayload(msg, len);
-  } else {
-    for (int i = 0; i < xn297_addr_len; ++i) {
-      packet[i] = xn297_tx_addr[xn297_addr_len-i-1] ^ xn297_scramble[i];
+    if (!is_xn297) {
+        xn297_crc = !!(flags & BV(NRF24L01_00_EN_CRC));
+        flags &= ~(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO));
     }
-
-    for (int i = 0; i < len; ++i) {
-      // bit-reverse bytes in packet
-      uint8_t b_out = bit_reverse(msg[i]);
-      packet[xn297_addr_len+i] = b_out ^ xn297_scramble[xn297_addr_len+i];
-    }
-    int crc_ind = xn297_addr_len + len;
-    uint16_t crc = initial;
-    for (int i = 0; i < crc_ind; ++i) {
-      crc = crc16_update(crc, packet[i]);
-    }
-    crc ^= xorout;
-    packet[crc_ind++] = crc >> 8;
-    packet[crc_ind++] = crc & 0xff;
-    NRF24L01_WritePayload(packet, crc_ind);
-  }
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, flags);      
 }
+
+
+u8 XN297_WritePayload(u8* msg, int len)
+{
+    u8 packet[32];
+    u8 res;
+    if (is_xn297) {
+        res = NRF24L01_WritePayload(msg, len);
+    } else {
+        int last = 0;
+        if (xn297_addr_len < 4) {
+            // If address length (which is defined by receive address length)
+            // is less than 4 the TX address can't fit the preamble, so the last
+            // byte goes here
+            packet[last++] = 0x55;
+        }
+        for (int i = 0; i < xn297_addr_len; ++i) {
+            packet[last++] = xn297_tx_addr[xn297_addr_len-i-1] ^ xn297_scramble[i];
+        }
+
+        for (int i = 0; i < len; ++i) {
+            // bit-reverse bytes in packet
+            u8 b_out = bit_reverse(msg[i]);
+            packet[last++] = b_out ^ xn297_scramble[xn297_addr_len+i];
+        }
+        if (xn297_crc) {
+            int offset = xn297_addr_len < 4 ? 1 : 0;
+            u16 crc = initial;
+            for (int i = offset; i < last; ++i) {
+                crc = crc16_update(crc, packet[i]);
+            }
+            crc ^= xorout;
+            packet[last++] = crc >> 8;
+            packet[last++] = crc & 0xff;
+        }
+        res = NRF24L01_WritePayload(packet, last);
+    }
+    return res;
+}
+
+
+u8 XN297_ReadPayload(u8* msg, int len)
+{
+    (void) msg;
+    (void) len;
+    return 0;
+}
+
 
 // End of XN297 emulation
 
@@ -211,25 +266,29 @@ static u16 convert_channel(u8 num)
 static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* aileron, u16* flags)
 {
     // Protocol is registered AETRF, that is
-    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4, Flip control - 5
+    // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4
 
     *aileron  = convert_channel(CHANNEL1);
-    *elevator = convert_channel(CHANNEL2);
+    // Correct direction so the model file would be straightforward
+    *elevator = 3000 - convert_channel(CHANNEL2);
     *throttle = convert_channel(CHANNEL3);
-    *rudder   = convert_channel(CHANNEL4);
+    // Same for rudder
+    *rudder   = 3000 - convert_channel(CHANNEL4);
 
-    // Channel 5
-    if (Channels[CHANNEL5] <= 0)
+    *flags &= ~FLAG_MODE_MASK;
+    // Channel 5 - mode
+    if (Channels[CHANNEL5] > 0) {
+        if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
+          *flags |= 1;
+        else
+          *flags |= 2;
+    }
+
+    // Channel 6 - flip flag
+    if (Channels[CHANNEL6] <= 0)
       *flags &= ~FLAG_FLIP;
     else
       *flags |= FLAG_FLIP;
-
-    // Channel 6
-    if (Channels[CHANNEL6] <= 0)
-      *flags &= ~FLAG_LIGHT;
-    else
-      *flags |= FLAG_LIGHT;
-
 
     dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%x\n",
             *aileron, *elevator, *throttle, *rudder, *flags);
@@ -256,12 +315,15 @@ static void send_packet(u8 bind)
     packet[9] = throttle & 0xff;
     packet[10] = (throttle >> 8) & 0xff;
     packet[11] = rudder & 0xff;
-    packet[12] = (rudder >> 8) & 0xff;
-    packet[13] = (flags >> 8) & 0xff;
-    packet[14] = flags & 0xff;
+    packet[12] = ((rudder >> 8) & 0xff) | ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
+    packet[13] = flags & 0xff;
+    packet[14] = 0;
 
     // clear packet status bits and TX FIFO
-    NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0e);      // Power on, TX mode, 2byte CRC
+    // Power on, TX mode, 2byte CRC
+    //NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0e);      // Power on, TX mode, 2byte CRC
+    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
+    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     if (bind) {
       NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
     } else {
@@ -448,7 +510,7 @@ const void *CX10_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, enable flip, enable light
+        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, flight mode, enable flip
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;
