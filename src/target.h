@@ -169,6 +169,7 @@ int FS_ReadDir(char *path);
 void FS_CloseDir();
 
 void _usleep(u32 usec);
+void _msleep(u32 msec);
 #define usleep _usleep
 
 /* Abstract bootloader access */

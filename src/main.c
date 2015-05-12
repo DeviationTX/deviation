@@ -321,3 +321,42 @@ void debug_timing(u32 type, int startend)
     }
 }
 #endif
+
+void debug_switches()
+{
+    s32 data[INP_LAST];
+    for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+        data[i] = CHAN_ReadRawInput(i);
+    }
+    while(1) {
+        u32 changed = 0;
+        for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+            s32 val = CHAN_ReadRawInput(i);
+            if (val != data[i]) {
+                printf("%s=%d  ", INPUT_SourceName(tempstring, i), val);
+                data[i] = val;
+                changed = 1;
+            }
+        }
+        if (changed) { printf("\n"); }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}
+void debug_buttons()
+{
+    u32 data = ScanButtons();
+    while(1) {
+        u32 val = ScanButtons();
+        u32 delta = val ^ data;
+        for(int i = 1; i < BUT_LAST; i++) {
+            if(delta & (1 << (i-1))) {
+                printf("%s  ", INPUT_ButtonName(i));
+            }
+        }
+        if (delta) {
+            printf("\n");
+            data = val;
+        }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}
