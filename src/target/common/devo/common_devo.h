@@ -46,4 +46,9 @@
 
 #include "ports.h"
 
+//Devo does drawing with LCD_Stop so ForceUpdate isn't needed
+#ifndef LCD_ForceUpdate
+static inline void LCD_ForceUpdate() {}
+#endif
+
 #endif //_COMMON_DEVO_H_

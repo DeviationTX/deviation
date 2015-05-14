@@ -194,6 +194,7 @@ void GUI_DrawScreen(void)
     FullRedraw = 1;
     GUI_DrawObjects();
     FullRedraw = 0;
+    LCD_ForceUpdate();
 }
 
 struct guiObject *GUI_IsModal(void)
@@ -268,6 +269,7 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 
 void GUI_RefreshScreen() {
     _GUI_RefreshScreen(NULL);
+    LCD_ForceUpdate();
 }
     
 void GUI_TouchRelease()

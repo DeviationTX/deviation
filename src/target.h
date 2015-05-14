@@ -54,6 +54,7 @@ void BACKLIGHT_Brightness(unsigned brightness);
 /* Display Functions */
 void LCD_Init();
 void LCD_Contrast(unsigned contrast);
+void LCD_ForceUpdate();
 
     /* Primitives */
 enum DrawDir {
