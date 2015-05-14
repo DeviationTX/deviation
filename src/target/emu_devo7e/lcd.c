@@ -19,7 +19,7 @@
 #include "gui/gui.h"
 #include "../common/emu/fltk.h"
 
-static int logical_lcd_width = LCD_WIDTH*2;
+//NOTE: LCD scaling used to be done here, but is now done in the fltk code
 /*
  * // since devo10's screen is too small in emulator , we have it zoomed by 2 for both rows and columns
  * color = 0x0 means white, other value means black
@@ -28,22 +28,12 @@ void LCD_DrawPixel(unsigned int color)
 {
 	if (gui.x < LCD_WIDTH && gui.y < LCD_HEIGHT) {	// both are unsigned, can not be < 0
 		u8 c;
-		int row, col;
-		int i, j;
 		// for emulator of devo 10, 0x0 means white while others mean black
 		c = color ? 0x00 : 0xaa; // 0xaa is grey color(not dot)
-
-		//Fill in 4 dots
-		row = LCD_HEIGHT_MULT * gui.y;
-		col = LCD_WIDTH_MULT * gui.x;
-		for (i = 0; i < LCD_HEIGHT_MULT; i++) {
-			for (j = 0; j < LCD_WIDTH_MULT; j++) {
-                gui.image[3*(logical_lcd_width* (row + i) + col + j)] = c;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 1] = c;
-                gui.image[3*(logical_lcd_width* (row + i) + col + j) + 2] = c;
-            }
+		gui.image[3*(LCD_WIDTH * gui.y + gui.x)] = c;
+		gui.image[3*(LCD_WIDTH * gui.y + gui.x) + 1] = c;
+		gui.image[3*(LCD_WIDTH * gui.y + gui.x) + 2] = c;
         }
-	}
 	// this must be executed to continue drawing in the next row
     gui.x++;
     if(gui.x > gui.xend) {

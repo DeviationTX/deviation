@@ -97,7 +97,10 @@ int main() {
         if(priority_ready) {
             EventLoop();
         }
-        //PWR_Sleep();  //This does not appear to have any impact on power
+        //This does not appear to have any impact on power
+        //and has been disabled in common/devo/power.c
+        //but it helps a huge amount for the emulator
+        PWR_Sleep();
     }
 #endif
 }
