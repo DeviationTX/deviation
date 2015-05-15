@@ -49,8 +49,11 @@ void connect_object(struct guiObject *obj)
 
 u8 coords_in_box(struct guiBox *box, struct touch *coords)
 {
-    return(coords->x >= box->x && coords->x <= (box->x + box->width)
-        && coords->y >= box->y && coords->y <= (box->y + box->height));
+    printf("(%dx%d)-(%dx%d) <-> (%dx%d) : %d\n", box->x, box->y, box->x + box->width, box->y + box->height, coords->x, coords->y, (coords->x >= box->x && coords->x < (box->x + box->width)
+        && coords->y >= box->y && coords->y < (box->y + box->height)) ? 1 : 0);
+
+    return(coords->x >= box->x && coords->x < (box->x + box->width)
+        && coords->y >= box->y && coords->y < (box->y + box->height));
 }
 
 void GUI_DrawObject(struct guiObject *obj)

@@ -26,8 +26,10 @@ void _gui_hilite_selected(struct guiObject *obj)
 
 void _gui_draw_background(int x, int y, int w, int h)
 {
-    LCD_Clear(0x00);
-    //LCD_FillRect(x, y, w, h, 0x0);  // clear the area
+    if (w == LCD_WIDTH && h == LCD_HEIGHT)
+        LCD_Clear(0x00);
+    else
+        LCD_FillRect(x, y, w, h, 0x0);  // clear the area
 }
 
 // Bug fix: Unlike devo8, devo10's page always has 1 default selected objects. When a dialog, e.g. saftydialog,

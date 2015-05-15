@@ -14,22 +14,23 @@
  */
 
 #include "char_map.h"
+#include "lcd_page_props.h"
 
 #define TEXTBOX_X_OFFSET 3
 #define TEXTBOX_Y_OFFSET 3
-#define TEXTBOX_HEIGHT  1
+#define TEXTBOX_HEIGHT  1*2
 #define TEXTBOX_ROUND    1
 #define TEXTBOX_BG_COLOR 0x0000
 #define TEXTBOX_COLOR    0xFFFF
 #define TEXTBOX_OUTLINE  0xFFFF
 
-#define Y_OFFSET 5
-#define KEY_H 1
-#define KEY_W1 2  // TINY_FONT'S max size is actually 7x6 instead of 7x5
-#define KEY_W2 4  // 3 chars
-#define KEY_W3 5  // 4 chars
+#define Y_OFFSET (5*ITEM_SPACE)
+#define KEY_H (1*ITEM_SPACE)
+#define KEY_W1 (2*ITEM_SPACE)
+#define KEY_W2 (4*ITEM_SPACE)  // 3 chars
+#define KEY_W3 (5*ITEM_SPACE)  // 4 chars
 
-static const char caps_str[] = { IA9211_UP_ARROW, 0 };
+static const char caps_str[] = { LCD_UP_ARROW, 0 };
 static const char del_str[]  = "DEL";
 static const char mix_str[]  = "012";
 static const char char_str[] = "ABC";
@@ -47,7 +48,7 @@ void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
 {
     (void)color;
     if (pressed) {
-        LCD_PrintCharXY(box->x, box->y, ']');
+        LCD_PrintCharXY(box->x, box->y, LCD_SELECT_CHAR);
     } else {
         LCD_PrintCharXY(box->x, box->y, ' ');
     }

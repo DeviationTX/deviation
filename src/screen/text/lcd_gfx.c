@@ -18,6 +18,9 @@ All text above must be included in any redistribution
 #include <stdlib.h>
 #include <stdio.h>
 #include "gui/gui.h"
+#include "lcd.h"
+
+#define ZOOM cur_str.font.zoom
 
 #if HAS_MAPPED_GFX
 #define LCD_DrawPixelXY LCD_DrawMappedPixelXY
@@ -28,6 +31,7 @@ All text above must be included in any redistribution
 #define LCD_FillRect    LCD_FilMappedlRect
 #include "../320x240x16/lcd_gfx.c"
 #else
+
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
                  int16_t h, uint16_t color) {
     (void) x;
@@ -198,9 +202,9 @@ void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
          return;
      }
   #endif
-  for(i = 0; i < h; i++) {
+  for(i = 0; i < h; i+= ZOOM) {
     LCD_SetXY(x, y + i);
-    for(j = 0; j < w; j++)
+    for(j = 0; j < w; j+= ZOOM)
       LCD_PrintChar(' ');
   }
 }
