@@ -110,7 +110,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
     c = IA9211_map_char(c);
-    int font_size = cur_str.font.height / CHAR_HEIGHT;
+    int font_size = cur_str.font.zoom;
 
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {
@@ -155,6 +155,7 @@ void close_font()
 void open_font(struct font_def *font, const u8 *data, int fontidx)
 {
     font->height = *data;
+    font->zoom = *data / CHAR_HEIGHT;
     font->idx = fontidx;
     font->data = data;
     int idx = 0;

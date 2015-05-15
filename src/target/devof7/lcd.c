@@ -26,7 +26,7 @@ static const struct font_def big_font = {2, 2};
 struct font_str cur_str;
 static u16 is_double_row = 0x00;
 
-#define CUR_CHAR_SIZE  (cur_str.font.height)
+#define CUR_CHAR_SIZE  (cur_str.font.zoom)
 
 #define CS_HI() gpio_set(GPIOB, GPIO0)
 #define CS_LO() gpio_clear(GPIOB, GPIO0)

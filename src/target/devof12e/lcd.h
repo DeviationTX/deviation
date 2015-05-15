@@ -30,7 +30,7 @@ struct FAT FontFAT;
 struct font_def 
 {
         u8 idx;
-        u8 height;          /* Character height for storage        */
+        u8 zoom;          /* Character size relative to a 1x1 character */
 };
 struct font_str {
     struct font_def font;
