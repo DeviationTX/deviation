@@ -12,11 +12,22 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "config/tx.h"
+
+enum {
+    LABELNUM_X        = 0,
+    LABELNUM_WIDTH    = 16,
+    LABEL_X           = 17,
+    LABEL_WIDTH       = 0,
+};
+#endif //OVERRIDE_PLACEMENT
 
 static struct menu_obj * const gui = &gui_objs.u.menu;
 
@@ -104,10 +115,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (menu_item_type == MENUTYPE_SUBMENU &&  group != menus[i].menu_num)
             continue;
         if (idx == absrow) {
-            GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
-                16, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
-            GUI_CreateLabelBox(&gui->name[relrow], 17, y,
-                0, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+            GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
+                LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
+            GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
+                LABEL_WIDTH, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;
