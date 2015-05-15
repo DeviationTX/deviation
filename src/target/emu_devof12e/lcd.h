@@ -5,6 +5,8 @@
 #ifndef LCD_H
 #define LCD_H
 
+u32 TW8816_map_char(u32);
+
 #define RANGE_TABLE_SIZE 20
 
 struct font_def 

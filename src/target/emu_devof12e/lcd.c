@@ -112,7 +112,7 @@ const u8 *char_offset(u32 c, u8 *width)
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    //c = IA9211_map_char(c);
+    c = TW8816_map_char(c);
     int font_size = cur_str.font.zoom;
     const u8 *offset = char_offset(c, &width);
     if (! offset || ! width) {

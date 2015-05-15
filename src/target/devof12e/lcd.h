@@ -15,6 +15,7 @@ void TW8816_ReinitPixelClock();
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr);
 void TW8816_ClearDisplay();
 void TW8816_SetWindow(int i);
+u32 TW8816_map_char(u32);
 
 
 void LCD_WriteReg(unsigned reg, u8 val);
