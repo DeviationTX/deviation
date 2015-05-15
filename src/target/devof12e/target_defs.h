@@ -1,6 +1,7 @@
 #ifndef _DEVO7E_TARGET_H_
 #define _DEVO7E_TARGET_H_
 
+#define USE_DEVOFS 1 //Must be before common_devo include
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xEC
@@ -8,6 +9,11 @@
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
 #define SPIFLASH_AAI_AF 1
+
+#define LCD_WIDTH (33*2)
+#define LCD_HEIGHT (13*2)
+#define CHAR_WIDTH 12
+#define CHAR_HEIGHT 18
 
 #if defined BUILDTYPE_DEV && ! defined EMULATOR
 //No room for debug and standard gui
@@ -27,6 +33,7 @@
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_MULTIMOD_SUPPORT 1
+#define HAS_MAPPED_GFX      1
 
 #define NO_LANGUAGE_SUPPORT 1
 

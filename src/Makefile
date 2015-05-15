@@ -59,10 +59,10 @@ endif
 
 # Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
-NUM_MODELS ?= 30
 SDIR := .
 include target/$(TARGET)/Makefile.inc
 
+NUM_MODELS ?= 30
 TYPE     ?= prd
 
 ###############################################
@@ -300,7 +300,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
                ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir $(ODIR)
 	export tx=$(FILESYSTEM); \
-	number=2 ; while [ $$number -le 30 ] ; do \
+	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
 		number=`expr $$number + 1`; \
 		done

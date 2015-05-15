@@ -1,10 +1,12 @@
 #!/usr/bin/perl
+use Getopt::Long;
 
 my $FILEOBJ_DIR = 0x7F;
 my $FILEOBJ_FILE = 0xF7;
 my $START_SECTOR = 0xFF;
 
 my $outf = "";
+my $invert = 0;
 
 sub add_dir {
     my($name, $parent, $id) = @_;
@@ -18,6 +20,8 @@ sub add_file {
     my $size = length($data);
     $outf .= pack("C C a8 a3 C C C a*", $FILEOBJ_FILE, $parent, $root, $ext, $size >> 16, 0xff & ($size >> 8), $size & 0xff, $data);
 }
+GetOptions("invert" => \$invert);
+
 my $root = shift(@ARGV);
 my $next_dir = 1;
 my %dirid;
@@ -48,14 +52,16 @@ my @data = split(//, $outf);
 my $next_sec = $START_SECTOR;
 for my $i (0 .. 65535) {
     if (! @data || $i >= 65536 - 4096) {
-        printf("%c", 0x00);
+        printf("%c", $invert ? 0xff : 0x00);
         next;
     }
     if(! ($i % 4096)) {
-        printf("%c", $next_sec);
+        printf("%c", $invert ? 0xff - $next_sec : $next_sec);
         $next_sec = 1;
         next;
     }
-    print shift(@data);
+    $val = shift(@data);
+    $val = chr(0xff-ord($val)) if ($invert);
+    print $val;
 }
 

@@ -8,7 +8,6 @@
 #define LCD_ALIGN_LEFT      0
 #define LCD_ALIGN_CENTER    1
 #define LCD_ALIGN_RIGHT     2
-#define CHAR_HEIGHT         1
 
 struct FAT FontFAT;
 

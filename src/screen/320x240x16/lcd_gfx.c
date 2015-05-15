@@ -524,6 +524,7 @@ void LCD_DrawRLE(const u8 *data, int len, u32 color)
     }
 }
 
+#ifndef LCD_DrawUSBLogo
 extern u8 usb_logo[];
 void LCD_DrawUSBLogo(int lcd_width, int lcd_height)
 {
@@ -536,3 +537,4 @@ void LCD_DrawUSBLogo(int lcd_width, int lcd_height)
     LCD_DrawRLE(usb_logo+6, size, 0xffff);
     LCD_DrawStop();
 }
+#endif

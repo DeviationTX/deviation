@@ -20,6 +20,7 @@
 #include "common.h"
 #include "lcd.h"
 
+extern u8 window;
 void TW8816_Init()
 {
     static const u8 reg_init[] = {
@@ -372,7 +373,8 @@ void TW8816_Init()
  0xA6,   0xE,
  0xA7,  0x36,
  0xA8,     0,
- 0xA9,  0xA0,
+// 0xA9,  0xA0,
+ 0xA9,  0x50,
  0xAA,     0,
  0xAB,  0x12,
  0xAC,   0xF,
@@ -534,6 +536,48 @@ void TW8816_Init()
         printf("Could not identify display\n");
     }
     printf("3\n");
+    //Clear screen
+    LCD_WriteReg(0xFF, 0);
+    LCD_WriteReg(0x94, 2);
+
+    //Setup XY Graph
+    LCD_WriteReg(0x9e, 0x00);
+    LCD_WriteReg(0x9f, 0x01);
+    LCD_WriteReg(0xa0, (564 >> 8));
+    LCD_WriteReg(0xa1, 0xff & 564); //564
+    LCD_WriteReg(0xa2, 126); //126
+    LCD_WriteReg(0xa3, 6);
+    LCD_WriteReg(0xa4, 4);
+    LCD_WriteReg(0xa5, 6);
+    LCD_WriteReg(0xa6, 0x00);
+    LCD_WriteReg(0xa7, 0x00);
+    LCD_WriteReg(0xa8, 0x00);
+    LCD_WriteReg(0xa9, 0xA1);
+    LCD_WriteReg(0xaa, 0xAE); //0x1AE = 430
+    LCD_WriteReg(0xAB,  0x12);
+    LCD_WriteReg(0xAC,   0x08);
+    LCD_WriteReg(0xAD,     0);
+    LCD_WriteReg(0xAE,     0);
+    window = 1;
+    for(int i = 0; i < 24; i++)
+        TW8816_DisplayCharacter(i, 'A' + i, 7);
+
+    //Setup normal display
+    LCD_WriteReg(0x9e, 0x01);
+    LCD_WriteReg(0x9f, 0x01);
+    LCD_WriteReg(0xa0, 0x00);
+    LCD_WriteReg(0xa1, 0x00);
+    LCD_WriteReg(0xa2, 0x00);
+    LCD_WriteReg(0xa6, 0x00);
+    LCD_WriteReg(0xa7, 0x00);
+    LCD_WriteReg(0xa3, 33);
+    LCD_WriteReg(0xa4, 13);
+    LCD_WriteReg(0xAC, 0x00);
+    LCD_WriteReg(0xA9,  0x50);
+    window = 0;
+    for(int i = 0; i < 24; i++)
+        TW8816_DisplayCharacter(i, 'A' + i, 7);
+
 }
 
 void TW8816_Reset()
@@ -544,8 +588,17 @@ void TW8816_Reset()
     _msleep(100);
 }
 
-void TW8816_LoadFont()
+void TW8816_LoadFont(u8 *data, unsigned count)
 {
+    LCD_WriteReg(0x94, 1);
+    LCD_WriteReg(0x9B, 0xE2);
+    LCD_WriteReg(0xE0, 0x10);
+    for (unsigned i = 0; i < count; i++) {
+        LCD_WriteReg(0x99, i);
+        I2C1_WriteBufferDMA(0x45, data + i * 27, 0x9A, 27);
+    }
+    LCD_WriteReg(0x94, 0);
+    LCD_WriteReg(0xE0, 0);
 }
 
 void TW8816_SetVideoMode(unsigned enable)
@@ -567,26 +620,71 @@ void TW8816_ReinitPixelClock()
 
 void TW8816_Test()
 {
-    char str[] = "0123456789012345678901";
+    unsigned cols = 10;
+    unsigned rows = 7;
+    const char str[] = "0123456789012345678901234567890123456789";
     printf("Begin\n");
-    LCD_WriteReg(0x9e, 0x00);
+  LCD_WriteReg(0xFF, 0);
+  LCD_WriteReg(0x94, 2);
+
+    LCD_WriteReg(0x9e, 0x01);
     LCD_WriteReg(0x9f, 0x01);
     LCD_WriteReg(0xa0, 0x00);
     LCD_WriteReg(0xa1, 0x00);
     LCD_WriteReg(0xa2, 0x00);
     LCD_WriteReg(0xa6, 0x00);
     LCD_WriteReg(0xa7, 0x00);
-    LCD_WriteReg(0xa3, 22);
-    LCD_WriteReg(0xa4, 10);
+    LCD_WriteReg(0xa3, cols);
+    LCD_WriteReg(0xa4, rows);
+    LCD_WriteReg(0xAC, 0x00);
 
-  LCD_WriteReg(0xFF, 0);
-  LCD_WriteReg(0x94, 2);
-
-for (int j = 0; j < 10; j++) {
-    for (unsigned i = 0; i < strlen(str); i++) {
-        TW8816_DisplayCharacter(22*j+i, str[i], i % 6 + 1);
+    LCD_WriteReg(0x9e, 0x00);
+    LCD_WriteReg(0x9f, 0x01);
+    LCD_WriteReg(0xa0, (564 >> 8));
+    LCD_WriteReg(0xa1, 0xff & 564); //564
+    LCD_WriteReg(0xa2, 126); //126
+    LCD_WriteReg(0xa3, 6);
+    LCD_WriteReg(0xa4, 4);
+    LCD_WriteReg(0xa5, 6);
+    LCD_WriteReg(0xa6, 0x00);
+    LCD_WriteReg(0xa7, 0x00);
+    LCD_WriteReg(0xa8, 0x00);
+    LCD_WriteReg(0xa9, 0xA1);
+    LCD_WriteReg(0xaa, 0xAE);
+    LCD_WriteReg(0xAB,  0x12);
+    LCD_WriteReg(0xAC,   0x00);
+    LCD_WriteReg(0xAD,     0);
+    LCD_WriteReg(0xAE,     0);
+for (int j = 0; j < rows; j++) {
+    for (unsigned i = 0; i < cols; i++) {
+        TW8816_DisplayCharacter(cols*j+i, str[i], i % 6 + 1);
     };
 }
+
+    LCD_WriteReg(0x9e, 0x00);
+    LCD_WriteReg(0x9f, 0x01);
+    LCD_WriteReg(0xa0, 0x00);
+    LCD_WriteReg(0xa1, 0x00);
+    LCD_WriteReg(0xa2, 0x00);
+    LCD_WriteReg(0xa3, 5);
+    LCD_WriteReg(0xa4, 2);
+    LCD_WriteReg(0xa5, 6);
+    LCD_WriteReg(0xa6, 0x00);
+    LCD_WriteReg(0xa7, 0x00);
+    LCD_WriteReg(0xa8, 0x00);
+    LCD_WriteReg(0xa9, 0xA1);
+    LCD_WriteReg(0xaa, 0xf4);
+    LCD_WriteReg(0xAB,  0x12);
+    LCD_WriteReg(0xAC,   0x00);
+    LCD_WriteReg(0xAD,     0);
+    LCD_WriteReg(0xAE,     0);
+
+for (int j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < 5; i++) {
+        TW8816_DisplayCharacter(500+5*j+i, str[i], i % 6 + 1);
+    };
+}
+
 /*
     while(1) {
         for(int i = 0; i < 256; i ++) {
@@ -598,11 +696,23 @@ for (int j = 0; j < 10; j++) {
  */           
     printf("End\n");
 }
+
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)
 {
-    LCD_WriteReg(0x94, chr > 256 ? 0x80 : 0x00); // isRamFont
+    if (window == 1)
+        pos += 430;
+    LCD_WriteReg(0x94, (chr & 0x100) ? 0x80 : 0x00); // isRamFont
     LCD_WriteReg(0x95, pos >> 8);
     LCD_WriteReg(0x96, pos & 0xff);
     LCD_WriteReg(0x97, chr & 0xff);
     LCD_WriteReg(0x98, attr);
+}
+
+void TW8816_ClearDisplay()
+{
+    LCD_WriteReg(0x94, 2);
+}
+
+void TW8816_SetWindow(int i) {
+    LCD_WriteReg(0x9e, i);
 }

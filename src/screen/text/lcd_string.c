@@ -18,7 +18,7 @@
 
 //characters are always 1x1 or 2x2
 #define CHAR_SPACING 0
-#define HEIGHT(x) (x.height / CHAR_HEIGHT)
+#define HEIGHT(x) (x.height)
 #define get_width(x) HEIGHT(cur_str.font)
 
 struct FAT FontFAT = {{0}};

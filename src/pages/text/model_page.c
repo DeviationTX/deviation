@@ -22,6 +22,19 @@
 #include "mixer_standard.h"
 #include "standard/standard.h"
 
+#if LCD_WIDTH == 66
+//devof12e
+#define TEXTSEL_WIDTH   ((ts_x != LEFT_TEXTSEL_X) ? LCD_WIDTH - ts_x - 1: 24)
+enum {
+    DEFAULT_TEXTSEL_X = 14*2,
+    LEFT_TEXTSEL_X    = 2,
+    LABEL_WIDTH       = 14*2,
+    BUTTON_X          = 14*2,
+    BUTTON_WIDTH      = LCD_WIDTH - 14*2,
+};
+#else
+#define TEXTSEL_WIDTH   ((ts_x != LEFT_TEXTSEL_X) ? LCD_WIDTH - ts_x - 1: 12)
+//devof7
 enum {
     DEFAULT_TEXTSEL_X = 14,
     LEFT_TEXTSEL_X    = 1,
@@ -29,6 +42,5 @@ enum {
     BUTTON_X          = 14,
     BUTTON_WIDTH      = LCD_WIDTH - 14,
 };
-#define TEXTSEL_WIDTH   ((ts_x != LEFT_TEXTSEL_X) ? LCD_WIDTH - ts_x - 1: 12)
-
+#endif
 #include "../128x64x1/model_page.c"

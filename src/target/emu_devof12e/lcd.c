@@ -16,11 +16,13 @@
 #include <assert.h>
 
 #include "common.h"
+#include "config/display.h"
 #include "gui/gui.h"
 #include "../common/emu/fltk.h"
 #include "lcd.h"
-#include "ia9211_font.h"
-#include "ia9211_bigfont.h"
+#include "tw8816_font.h"
+#include "tw8816_2_font.h"
+#include "tw8816_3_font.h"
 
 struct rgb {
     u8 r;
@@ -30,8 +32,9 @@ struct rgb {
 static const struct rgb background = {0x00, 0x00, 0xff};
 static const struct rgb foreground = {0xff, 0xff, 0xff};
 
+static struct font_def tiny_font;
 static struct font_def default_font;
-static struct font_def big_font;
+static struct font_def large_font;
 struct font_str cur_str;
 
 
@@ -48,9 +51,9 @@ void LCD_DrawPixel(unsigned int color)
 		// for emulator of devo 10, 0x0 means white while others mean black
 		c = color ? foreground : background; // 0xaa is grey color(not dot)
 
-		gui.image[3*(gui.y*IMAGE_X + gui.x) + 0] = c.r;
-		gui.image[3*(gui.y*IMAGE_X + gui.x) + 1] = c.g;
-		gui.image[3*(gui.y*IMAGE_X + gui.x) + 2] = c.b;
+		gui.image[3*(IMAGE_X * gui.y + gui.x) + 0]     = c.r;
+		gui.image[3*(IMAGE_X * gui.y + gui.x) + 1]     = c.g;
+		gui.image[3*(IMAGE_X * gui.y + gui.x) + 2]     = c.b;
 	}
 	// this must be executed to continue drawing in the next row
     gui.x++;
@@ -109,7 +112,7 @@ const u8 *char_offset(u32 c, u8 *width)
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
-    c = IA9211_map_char(c);
+    //c = IA9211_map_char(c);
     int font_size = cur_str.font.height / CHAR_HEIGHT;
 
     const u8 *offset = char_offset(c, &width);
@@ -117,7 +120,6 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
         printf("Could not locate character U-%04x\n", (int)c);
         return;
     }
-    for (unsigned int i = 0; i < y; i++)
     // Check if the requested character is available
     LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+font_size) * CHAR_WIDTH,  (y+font_size) * CHAR_HEIGHT, DRAW_NWSE);
 
@@ -172,22 +174,29 @@ void open_font(struct font_def *font, const u8 *data, int fontidx)
 
 void _lcd_init()
 {
-    open_font(&default_font, ia9211_fon, 1);
-    open_font(&big_font, ia9211_bigfon, 2);
+    open_font(&tiny_font,    tw8816_fon, 3);
+    open_font(&default_font, tw8816_2_fon, 1);
+    open_font(&large_font,   tw8816_3_fon, 2);
+    Display.xygraph.grid_color = 0xffff;
+    Display.xygraph.axis_color = 0xffff;
+    Display.xygraph.fg_color = 0xffff;
+    Display.xygraph.point_color = 0xffff;
 }
 
 u8 LCD_SetFont(unsigned int idx)
 {
     u8 old = LCD_GetFont();
-    cur_str.font = (idx <= 1) ? default_font : big_font;
+    if (idx == 3)
+        cur_str.font = tiny_font;
+    else if (idx == 2)
+        cur_str.font = large_font;
+    else
+        cur_str.font = default_font;
     return old;
 }
 
 u8 FONT_GetFromString(const char *value)
 {
-    if (strcmp(value, "big") == 0) {
-        return 2;
-    }
     return 1;
 }
 
@@ -195,3 +204,47 @@ void LCD_ShowVideo(u8 enable)
 {
     (void) enable;
 }
+
+void DrawMappedChar(int pos, u8 *data) {
+    int x_off = 564 + ((pos % 6) * 12 * 3);
+    int y_off = 126 + ((pos / 6) * 18 * 3);
+    for (int x = 0; x < 12; x++) {
+        for (int y = 0; y < 18; y++) {
+            int byte = y / 2 * 3 + x / 4;
+            int bit = 4 * (y & 1) + 3 - (x & 0x3);
+            struct rgb c;
+            c = (data[byte] & (1 << bit)) ? foreground : background;
+            for (int my = 0; my < 3; my++) {
+                for (int mx = 0; mx < 3; mx++) {
+                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 0] = c.r;
+                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 1] = c.g;
+                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 2] = c.b;
+                }
+            }
+        }
+    }
+}
+
+extern u8 font_map[27 * 6* 4];
+extern u8 window;
+void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
+{
+    (void)x;
+
+    (void)y;
+    (void)w;
+    (void)h;
+}
+
+void LCD_SetMappedWindow(unsigned val)
+{
+    window = val;
+    if (val == 1) {
+        memset(font_map, 0, sizeof(font_map));
+    } else {
+        for (int i = 0; i < 24; i++) {
+            DrawMappedChar(i, font_map + i * 27);
+        }
+    }
+}
+

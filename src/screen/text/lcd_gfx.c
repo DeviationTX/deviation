@@ -19,19 +19,28 @@ All text above must be included in any redistribution
 #include <stdio.h>
 #include "gui/gui.h"
 
+#if HAS_MAPPED_GFX
+#define LCD_DrawPixelXY LCD_DrawMappedPixelXY
+#define LCD_DrawPixel   LCD_DrawMappedPixel
+#define LCD_DrawStart   LCD_DrawMappedStart
+#define LCD_DrawStop()  (void)1
+#define LCD_DrawUSBLogo LCD_DrawUSBLogo
+#define LCD_FillRect    LCD_FilMappedlRect
+#include "../320x240x16/lcd_gfx.c"
+#else
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
                  int16_t h, uint16_t color) {
-  (void) x;
-  (void) y;
-  (void) h;
-  (void) color;
+    (void) x;
+    (void) y;
+    (void) h;
+    (void) color;
 }
 
 void LCD_DrawFastHLine(u16 x, u16 y, u16 w, u16 color) {
-  (void) x;
-  (void) y;
-  (void) w;
-  (void) color;
+    (void) x;
+    (void) y;
+    (void) w;
+    (void) color;
 }
 
 void LCD_DrawDashedHLine(int16_t x, int16_t y, 
@@ -91,18 +100,6 @@ void LCD_DrawRect(u16 x, u16 y, u16 w, u16 h, u16 color)
   (void) color;
 }
 
-void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
-{
-  unsigned i, j;
-  (void) color;
-
-  for(i = 0; i < h; i++) {
-    LCD_SetXY(x, y + i);
-    for(j = 0; j < w; j++)
-      LCD_PrintChar(' ');
-  }
-}
-
 // draw a rounded rectangle!
 void LCD_DrawRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color)
 {
@@ -128,9 +125,13 @@ void LCD_FillRoundRect(u16 x, u16 y, u16 w, u16 h, u16 r, u16 color)
 // draw a triangle!
 void LCD_DrawTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 {
-  LCD_DrawLine(x0, y0, x1, y1, color);
-  LCD_DrawLine(x1, y1, x2, y2, color);
-  LCD_DrawLine(x2, y2, x0, y0, color);
+  (void) x0;
+  (void) y0;
+  (void) x1;
+  (void) y1;
+  (void) x2;
+  (void) y2;
+  (void) color;
 }
 
 // fill a triangle!
@@ -182,6 +183,26 @@ void LCD_DrawRLE(const u8 *data, int len, u32 color)
   (void) data;
   (void) len;
   (void) color;
+}
+#endif
+
+#undef LCD_FillRect
+void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)
+{
+  unsigned i, j;
+  (void) color;
+
+  #if HAS_MAPPED_GFX
+     if (LCD_GetMappedWindow()) {
+         LCD_FilMappedlRect(x, y, w, h, color);
+         return;
+     }
+  #endif
+  for(i = 0; i < h; i++) {
+    LCD_SetXY(x, y + i);
+    for(j = 0; j < w; j++)
+      LCD_PrintChar(' ');
+  }
 }
 
 void LCD_DrawUSBLogo(int lcd_width, int lcd_height)

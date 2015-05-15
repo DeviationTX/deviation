@@ -351,6 +351,69 @@ void LCD_Init()
               GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
     TW8816_Reset();
     TW8816_Init();
-    TW8816_Test();
+    //TW8816_Test();
 }
 
+void LCD_Clear(unsigned int color) {
+    (void)color;
+    printf("Clearing display\n");
+    TW8816_ClearDisplay();
+}
+
+void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
+{
+    u32 pos = ((y*LCD_WIDTH)>>2) + (x>>1);
+    printf("%02x: %d, %d, %d\n", c, x, y, pos);
+    TW8816_DisplayCharacter(pos, c, 7);
+}
+
+static const struct font_def default_font = {2, 2};
+struct font_str cur_str;
+
+u8 LCD_SetFont(unsigned int idx)
+{
+    cur_str.font = default_font;
+    return 1;
+}
+u8 FONT_GetFromString(const char *value)
+{
+    return 1;
+}
+void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)
+{
+    (void) x0; (void) y0; (void) x1; (void) y1; (void) _dir;
+}
+
+void LCD_DrawStop(void)
+{
+
+}
+void LCD_ShowVideo(u8 enable)
+{
+    (void)enable;
+}
+
+extern u8 font_map[27 * 6* 4];
+extern u8 window;
+void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
+{
+    (void)x;
+    (void)y;
+    (void)w;
+    (void)h;
+    (void)val;
+}
+void LCD_SetMappedWindow(unsigned val)
+{
+    if (val == 1) {
+        TW8816_SetWindow(0);
+        memset(font_map, 0, sizeof(font_map));
+    } else {
+        TW8816_LoadFont(font_map, 6 * 4);
+        for (int i = 0; i < 24; i++) {
+            TW8816_DisplayCharacter(i, 0x100 + i, 7);
+        }
+        TW8816_SetWindow(1);
+    }
+    window = val;
+}   

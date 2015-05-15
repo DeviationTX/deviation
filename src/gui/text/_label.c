@@ -13,17 +13,19 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "lcd_page_props.h"
 //char SELECT_CHAR[] = "☼";
-static const char SELECT_CHAR = ']';
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_width, u16 obj_height,
         const char *str, const struct LabelDesc *desc, u8 is_selected) {
 	u16 txt_w, txt_h;
     (void)obj_height;
     LCD_GetStringDimensions((const u8 *)str, &txt_w, &txt_h);
-
     if (desc && (desc->style == LABEL_INVERTED || (desc->style != LABEL_FILL && is_selected))) {
-        txt_w++;
-        LCD_PrintCharXY(obj_x++, obj_y, SELECT_CHAR);
+        u16 cx, cy;
+        LCD_GetCharDimensions(SELECT_CHAR, &cx, &cy);
+        LCD_PrintCharXY(obj_x, obj_y, SELECT_CHAR);
+        txt_w += cx;
+        obj_x += cx;
     }
 
     //printf("%s, %d, %d\n", tempstring, txt_w, obj_width);

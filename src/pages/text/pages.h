@@ -4,6 +4,7 @@
 #include "../common/_pages.h"
 #include "menus.h"
 #include "guiobj.h"
+#include "lcd_page_props.h"
 
 #define PAGEDEF(id, init, event, exit, name) id,
 enum PageID {
@@ -33,14 +34,7 @@ struct pagemem {
     u8 modal_page;
 };
 
-#define ITEM_HEIGHT 1
-#define LINE_HEIGHT 1
-#define LINE_SPACE 1
-#define HEADER_HEIGHT 1
-#define HEADER_SPACE 1
-#define ITEM_SPACE 1
 #define PREVIOUS_ITEM -1
-#define PAGE_ITEM_MAX 8
 #define TOGGLE_FILE    "media/switches.bmp"
 #define SPLASH_FILE    "media/splash.bmp"
 
