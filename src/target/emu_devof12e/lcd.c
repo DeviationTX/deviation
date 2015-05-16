@@ -121,7 +121,6 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     }
     // Check if the requested character is available
     LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+font_size) * CHAR_WIDTH,  (y+font_size) * CHAR_HEIGHT, DRAW_NWSE);
-printf("%d,%d: '%c'\n", x, y, c);
     // First clean th area
     for(col = 0; col < font_size * CHAR_WIDTH; col++) {
         for(row = 0; row < font_size * CHAR_HEIGHT; row++) {

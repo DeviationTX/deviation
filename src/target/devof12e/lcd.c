@@ -363,8 +363,10 @@ void LCD_Clear(unsigned int color) {
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     c = TW8816_map_char(c);
+    if (x >= LCD_WIDTH)
+        x = LCD_WIDTH-1;
     u32 pos = ((y*LCD_WIDTH)>>2) + (x>>1);
-    printf("%02x: %d, %d, %d\n", c, x, y, pos);
+    //printf("%02x: %d, %d, %d\n", c, x, y, pos);
     TW8816_DisplayCharacter(pos, c, 7);
 }
 
