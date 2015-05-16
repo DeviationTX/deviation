@@ -10,8 +10,8 @@
 #define SPIFLASH_SECTORS 16
 #define SPIFLASH_AAI_AF 1
 
-#define LCD_WIDTH (33*2)
-#define LCD_HEIGHT (13*2)
+#define LCD_WIDTH 66
+#define LCD_HEIGHT 26
 #define CHAR_WIDTH 12
 #define CHAR_HEIGHT 18
 

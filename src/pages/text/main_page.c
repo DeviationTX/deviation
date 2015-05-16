@@ -21,6 +21,7 @@
 #include "config/tx.h"
 #include "telemetry.h"
 
+#define OVERRIDE_PLACEMENT
 enum {
      VTRIM_W      =  4,
      VTRIM_H      = 49,
@@ -29,7 +30,7 @@ enum {
      MODEL_ICO_W  = 52,
      MODEL_ICO_H  = 36,
      BOX_W        = 48,
-     SMALLBOX_H   =  9,
+     SMALLBOX_H   = 10,
      BIGBOX_H     = 14,
      GRAPH_W      = (VTRIM_W),
      GRAPH_H      = (VTRIM_H / 2),
@@ -37,77 +38,9 @@ enum {
      BATTERY_H    = 6,
      TXPOWER_W    = 26,
      TXPOWER_H    = 6,
+//
+    MODEL_NAME_X  = 0,
+    MODEL_NAME_Y  = 0,
 };
 
-#define press_icon_cb NULL
-#define press_box_cb NULL
-
-#include "../common/_main_page.c"
-
-static const int BATTERY_SCAN_MSEC = 2000; // refresh battery for every 2sec to avoid its label blinking
-static u32 next_scan=0;
-
-/*
- * Main page
- * KEY_UP: Press once to start timers, press again to stop timers
- * KEY_DOWN: Press to rest timers
- * KEY_ENT: enter the main menu page
- */
-void PAGE_MainInit(int page)
-{
-    (void)page;
-    (void)bar_cb;
-    memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
-    memset(gui, 0, sizeof(struct mainpage_obj));
-    PAGE_SetModal(0);
-    PAGE_SetActionCB(_action_cb);
-    PAGE_RemoveAllObjects();
-    next_scan = CLOCK_getms()+BATTERY_SCAN_MSEC;
-
-    GUI_CreateLabelBox(&gui->name, 0, 0, //64, 12,
-            0, 0, &DEFAULT_FONT, NULL, NULL, Model.name);
-
-
-    show_elements();
-    //Battery
-    mp->battery = PWR_ReadVoltage();
-}
-
-static void _check_voltage(guiLabel_t *obj)
-{
-    if (CLOCK_getms() > next_scan)  {  // don't need to check battery too frequently, to avoid blink of the battery label
-        next_scan = CLOCK_getms() + BATTERY_SCAN_MSEC;
-        s16 batt = PWR_ReadVoltage();
-        if (batt < Transmitter.batt_alarm) {
-            obj->desc.style = LABEL_INVERTED;
-            GUI_Redraw(obj);
-        }
-        if (batt / 10 != mp->battery / 10 && batt / 10 != mp->battery / 10 + 1) {
-            mp->battery = batt;
-            GUI_Redraw(obj);
-        }
-    }
-}
-
-void PAGE_MainExit()
-{
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    u8 i;
-    if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-        u8 page = (0 << 4) | MENUTYPE_MAINMENU;
-        PAGE_ChangeByID(PAGEID_MENU, page);
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-        LCD_ShowVideo(1);
-	//for ( i=0; i< NUM_TIMERS; i++) 
-    //        TIMER_StartStop(i);
-    } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-        for ( i=0; i< NUM_TIMERS; i++)
-            TIMER_Reset(i);
-    } else if (! PAGE_QuickPage(button, flags, data)) {
-        MIXER_UpdateTrim(button, flags, data);
-    }
-    return 1;
-}
+#include "../128x64x1/main_page.c"
