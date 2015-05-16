@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <string.h>
+#include <stddef.h>
 
 #include "devofs_io.h"
 enum {
@@ -23,6 +24,7 @@ enum {
 enum {
     FILEOBJ_NONE    = 0x00,
     FILEOBJ_FILE    = 0xf7,
+    FILEOBJ_WRITE   = 0xf6, //File is being written (this state will never be written to disk)
     FILEOBJ_DIR     = 0x7f,
     FILEOBJ_DELETED = 0xff,
 };
@@ -313,7 +315,7 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
                 }
             }
             *ptr1 = 0;
-            fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : 0;
+            fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : AM_FILE;
             fi->fsize = FILE_SIZE(dir->file_header);
             return FR_OK;
         }
@@ -341,13 +343,30 @@ void _create_empty_file()
     data[0] = FILEOBJ_DELETED;
     disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
     _fs->file_addr = _get_next_write_addr();
-    int end_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + FILE_SIZE(_fs->file_header));
+
+    unsigned cur_size = FILE_SIZE(_fs->file_header);
+    if (cur_size == 0 ) //we need to make sure max_size is non-zero
+        cur_size = 1;
+    unsigned max_size = ((4095 + cur_size) / 4096) * 4096; //round to nearest sector
+    if (max_size - cur_size > sizeof(struct file_header))
+        max_size -= sizeof(struct file_header);
+
+    int end_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + max_size);
     if (end_addr >= _fs->compact_sector*SECTOR_SIZE) {
         //file won't fit.  need to compact
         df_compact();
     }
     //duplicate file header to new location
+    //zero file size (we'll write the actual size at close
+    _fs->file_header.size1 = 0; 
+    _fs->file_header.size2 = 0; 
+    _fs->file_header.size3 = 0; 
     _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+    //place the maximum allocated filesize as a place-holder
+    _fs->file_header.size1 = 0xff & (max_size >> 16);
+    _fs->file_header.size2 = 0xff & (max_size >> 8);
+    _fs->file_header.size3 = 0xff & (max_size);
+    _fs->file_header.type  = FILEOBJ_WRITE;
     _fs->file_cur_pos = 0;
 }
 
@@ -380,12 +399,24 @@ FRESULT df_open (const char *name, unsigned flags)
         return res;
     if (_fs->file_header.type == FILEOBJ_FILE) {
         _fs->file_cur_pos = 0;
-        if (flags && O_WRONLY) {
+        if (flags & O_CREAT) {
             _create_empty_file();
         }
         return FR_OK;
     }
     return FR_NO_FILE;
+}
+
+FRESULT df_close ()
+{
+    if (_fs->file_header.type == FILEOBJ_WRITE) {
+        _fs->file_header.size1 = 0xff & (_fs->file_cur_pos >> 16);
+        _fs->file_header.size2 = 0xff & (_fs->file_cur_pos >> 8);
+        _fs->file_header.size3 = 0xff & (_fs->file_cur_pos >> 0);
+        _write(&_fs->file_header.size1, _fs->file_addr + offsetof(struct file_header, size1), 3);
+    }
+    _fs->file_cur_pos = -1;
+    return FR_OK;
 }
 
 FRESULT df_read (void *buf, u16 requested, u16 *actual)

@@ -12,14 +12,13 @@ use ExtUtils::testlib;
 use FindBin;
 use File::Temp;
 use Digest::MD5;
+use Fcntl;
 use Data::Dumper;
 
-use Test::More tests => 146;
+use Test::More tests => 181;
 BEGIN { use_ok('DevoFS') };
 
 #########################
-
-my $O_WRONLY = 4;
 
 my $fat;
 my $image;
@@ -37,6 +36,7 @@ lseek();
 write_file();
 auto_compact();
 manual_compact();
+change_filesize();
 write_around_the_horn();
 
 sub msg
@@ -145,9 +145,10 @@ sub write_file {
     my $len = 0;
     for (0..4095) { $data .= chr( int(rand(255)) ); }
     my $ref_md5 = Digest::MD5::md5_hex($data);
-    DevoFS::open("protocol/devo.mod", $O_WRONLY);
+    DevoFS::open("protocol/devo.mod", O_CREAT);
     is(DevoFS::write($data, 4096, $len), 0, msg("Write successful"));
     is($len, 4096, msg("Wrote correct length"));
+    DevoFS::close();
     DevoFS::open("protocol/devo.mod", 0);
     is(DevoFS::read($data1, 4096, $len), 0, msg("Read written data"));
     is($len, 4096, msg("Read proper length"));
@@ -157,14 +158,49 @@ sub write_file {
     is($new_md5, $ref_md5, msg("Written data is correct"));
 }
 
+sub change_filesize {
+    for my $size (20, 2000, 0, 1, 4096-16, 15) {
+        my $len = -1;
+        my $data = "";
+        my $rdata = "";
+        for (1 .. $size) { $data .= chr( 32 + int(rand(95)) ); } #Only printable chars
+        $files{"models/model10.ini"}{MD5} = Digest::MD5::md5_hex($data);
+        DevoFS::open("models/model10.ini", O_CREAT);
+        is(DevoFS::write($data, $size, $len), 0, msg("Write successful: $size"));
+        DevoFS::close();
+        is($len, $size, msg("Wrote proper length: $size"));
+        DevoFS::open("models/model10.ini", 0);
+        $len = -1;
+        is(DevoFS::read($rdata, 4096, $len), 0, msg("Read written data"));
+        is($len, $size, msg("File size is as expected"));
+        is(Digest::MD5::md5_hex($rdata), $files{"models/model10.ini"}{MD5}, msg("Data matched"));
+    }
+    # We round max-size tothe nearestsector includeing the header
+    my $len = -1;
+    my $data = "";
+    my $rdata = "";
+    my $expected_size = 4096-16;
+    for (1 .. 4096) { $data .= chr( 32 + int(rand(95)) ); } #Only printable chars
+    $files{"models/model10.ini"}{MD5} = Digest::MD5::md5_hex(substr($data, 0, $expected_size));
+    DevoFS::open("models/model10.ini", O_CREAT);
+    is(DevoFS::write($data, 4096, $len), 0, msg("Write successful: 4096"));
+    DevoFS::close();
+    is($len, $expected_size, msg("Wrote proper length: 4096 (actual: $expected_size)"));
+    DevoFS::open("models/model10.ini", 0);
+    $len = -1;
+    is(DevoFS::read($rdata, 4096, $len), 0, msg("Read written data"));
+    is($len, $expected_size, msg("File size is as expected"));
+    is(Digest::MD5::md5_hex($rdata), $files{"models/model10.ini"}{MD5}, msg("Data matched"));
+}
 
 sub auto_compact {
     my $data = "";
     my $len = 0;
     for my $i (0 .. 12) {
         #20 iterations is enough to cause auto-compaction
-        DevoFS::open("protocol/devo.mod", $O_WRONLY);
+        DevoFS::open("protocol/devo.mod", O_CREAT);
         DevoFS::write($files{"protocol/devo.mod"}{DATA}, 4096, $len);
+        DevoFS::close();
     }
     _compare_fs(\%files);
 }
@@ -187,8 +223,9 @@ sub write_around_the_horn {
     DevoFS::compact();
     #Write mod file (this will go around the horn
     my $len = 0;
-    DevoFS::open("protocol/devo.mod", $O_WRONLY);
+    DevoFS::open("protocol/devo.mod", O_CREAT);
     is(DevoFS::write($files{"protocol/devo.mod"}{DATA}, 4096, $len), 0, msg("Wrote mod file"));
+    DevoFS::close();
     #
     my $data = "";
     DevoFS::open("protocol/devo.mod", 0);

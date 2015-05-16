@@ -151,6 +151,13 @@ readdir(fs)
         }
 
 int
+close()
+    CODE:
+        RETVAL = df_close();
+    OUTPUT:
+        RETVAL
+
+int
 compact()
     CODE:
         RETVAL = df_compact();

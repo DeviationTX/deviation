@@ -22,7 +22,7 @@ typedef enum {
 	FR_NO_FILESYSTEM	/* 7 */
 } FRESULT;
 
-enum {AM_DIR = 0x01};
+enum {AM_FILE = 0x00, AM_DIR = 0x01};
 
 struct file_header {
     u8 type;
@@ -52,6 +52,7 @@ typedef struct {
 FRESULT df_mount (FATFS*);						/* Mount/Unmount a logical drive */
 FRESULT df_switchfile (FATFS *);
 FRESULT df_open (const char*, unsigned flags);					/* Open a file */
+FRESULT df_close ();
 FRESULT df_read (void*, u16, u16*);			/* Read data from the open file */
 FRESULT df_write (const void*, u16, u16*);	/* Write data to the open file */
 FRESULT df_maximize_file_size();
