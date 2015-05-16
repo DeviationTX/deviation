@@ -21,6 +21,21 @@
 #include "config/model.h"
 #include "autodimmer.h"
 
+#if LCD_WIDTH == 66
+//devof12e
+enum {
+  LARGE_SEL_X_OFFSET = 32,
+  MED_SEL_X_OFFSET   = 32,
+  SMALL_SEL_X_OFFSET = 32,
+  TITLE_X_OFFSET     = 4,
+  TITLE_WIDTH        = LCD_WIDTH - 4,
+  LABEL_X_OFFSET     = 2,
+  LABEL_WIDTH        = 30,
+  TEXTSEL_X_WIDTH    = 24,
+};
+
+#else
+//devof7
 enum {
   LARGE_SEL_X_OFFSET = 14,
   MED_SEL_X_OFFSET   = 14,
@@ -31,5 +46,5 @@ enum {
   LABEL_WIDTH        = 13,
   TEXTSEL_X_WIDTH    = LCD_WIDTH - 14 - 2,
 };
-
+#endif
 #include "../128x64x1/tx_configure.c"
