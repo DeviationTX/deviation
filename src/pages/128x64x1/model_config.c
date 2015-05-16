@@ -13,10 +13,19 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+
+enum {
+    LABEL_X      = 0,
+    LABEL_WIDTH  = 0,
+    SELECT_X     = 63,
+    SELECT_WIDTH = 60,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_model_config.c"
 
@@ -51,8 +60,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    u8 w = 60;
-    u8 x = 63;
     const void *label = NULL;
     void *value = NULL;
     void *tgl = NULL;
@@ -86,10 +93,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             value = swashmix_val_cb; data = (void *)2L;
             break;
     }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-                0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-                w, LINE_HEIGHT, &DEFAULT_FONT, tgl, value, data);
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
+                LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, label);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
+                SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, tgl, value, data);
     return 1;
 }
 void MODELPAGE_Config()
@@ -128,8 +135,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 static int row2_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w = 60;
-    u8 x = 63;
     int idx = 0;
     int pos = 0;
     while(idx < absrow) {
@@ -138,18 +143,16 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
         pos++;
         idx++;
     }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(proto_strs[pos]));
+    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
+            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, proto_opt_cb, (void *)(long)absrow);
     return 1;
 }
 
 static int row3_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w = 60;
-    u8 x = 63;
     void *ts;
     void *ts_press = NULL;
     void *ts_data = NULL;
@@ -179,10 +182,10 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
         ts = set_chmap_cb; ts_data = label;
         break;
     }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
+    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
+            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
     return 1;
 }
 
