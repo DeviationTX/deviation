@@ -23,12 +23,20 @@
     #define fs_set_drive_num(x,num) if(0) {}
     #define fs_get_drive_num(x) 0
     #define fs_is_open(x) ((x)->file_cur_pos != -1)
-    #define fs_close(x) (x)->file_cur_pos = -1
+    #define fs_close(x) df_close()
     #define fs_filesize(x) (((x)->file_header.size1 << 8) | (x)->file_header.size2)
     #define fs_ltell(x)   ((x)->file_cur_pos)
 #else
     #define fs_mount                  pf_mount
-    #define fs_open(str, flags)       pf_open(str)
+#ifdef O_CREAT
+inline int fs_open(char *file, unsigned flags) {
+    int ret = pf_open(file);
+    if (flags & O_CREAT)
+        pf_maximize_file_size();
+    return ret;
+}
+#endif
+    #define fs_open(str, flags)       pf_open(str) 
     #define fs_read                   pf_read
     #define fs_lseek                  pf_lseek
     #define fs_opendir                pf_opendir
