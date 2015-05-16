@@ -26,8 +26,8 @@
 //devof12e
 enum {
     DEFAULT_TEXTSEL_X = 14*2,
-    LEFT_TEXTSEL_X    = 2,
-    TEXTSEL_WIDTH     = 24,
+    LEFT_TEXTSEL_X    = 4,
+    TEXTSEL_WIDTH     = 22,
     LABEL_X           = 4,
     LABEL_WIDTH       = 14*2,
     BUTTON_X          = 14*2,

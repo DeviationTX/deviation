@@ -14,6 +14,7 @@
  */
 
 #define KEY_ADJUST_Y 0 /* no adjustment needed for character display */
+#define KEY_ADJUST_X 0
 
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {

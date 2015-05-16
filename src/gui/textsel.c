@@ -226,9 +226,9 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
     struct touch coords;
     coords.y = obj->box.y + KEY_ADJUST_Y;
     if (button == BUT_RIGHT) {
-        coords.x = obj->box.x + obj->box.width + 1 - ARROW_WIDTH;
+        coords.x = obj->box.x + obj->box.width + KEY_ADJUST_X - ARROW_WIDTH;
     } else if(button == BUT_LEFT) {
-        coords.x = obj->box.x + 1;
+        coords.x = obj->box.x + KEY_ADJUST_X;
     } else if(button == BUT_ENTER) {
         coords.x = obj->box.x + (obj->box.width >> 1);
     } else {

@@ -14,6 +14,7 @@
  */
 
 #define KEY_ADJUST_Y 1 /* ensure cooridnate is within button */
+#define KEY_ADJUST_X 1
 
 void _DrawTextSelectHelper(struct guiTextSelect *select, const char *str)
 {
