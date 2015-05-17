@@ -119,6 +119,8 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
         printf("Could not locate character U-%04x\n", (int)c);
         return;
     }
+    x = x - x % 2;
+    y = y - y % 2;
     // Check if the requested character is available
     LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+font_size) * CHAR_WIDTH,  (y+font_size) * CHAR_HEIGHT, DRAW_NWSE);
     // First clean th area

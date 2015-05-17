@@ -22,11 +22,13 @@
 #include "telemetry.h"
 
 #define OVERRIDE_PLACEMENT
+#if LCD_WIDTH == 66
+//devof12e
 enum {
-     VTRIM_W      =  4,
-     VTRIM_H      = 49,
-     HTRIM_W      = 49,
-     HTRIM_H      =  4,
+     VTRIM_W      =  2,
+     VTRIM_H      = 18,
+     HTRIM_W      = 22,
+     HTRIM_H      =  2,
      MODEL_ICO_W  = 52,
      MODEL_ICO_H  = 36,
      BOX_W        = 48,
@@ -42,5 +44,26 @@ enum {
     MODEL_NAME_X  = 0,
     MODEL_NAME_Y  = 0,
 };
-
+#else
+enum {
+     VTRIM_W      =  1,
+     VTRIM_H      =  9,
+     HTRIM_W      = 11,
+     HTRIM_H      =  1,
+     MODEL_ICO_W  = 52,
+     MODEL_ICO_H  = 36,
+     BOX_W        =  6,
+     SMALLBOX_H   = 10,
+     BIGBOX_H     = 14,
+     GRAPH_W      = (VTRIM_W),
+     GRAPH_H      = (VTRIM_H / 2),
+     BATTERY_W    = 4,
+     BATTERY_H    = 1,
+     TXPOWER_W    = 2,
+     TXPOWER_H    = 1,
+//
+    MODEL_NAME_X  = 0,
+    MODEL_NAME_Y  = 0,
+};
+#endif
 #include "../128x64x1/main_page.c"

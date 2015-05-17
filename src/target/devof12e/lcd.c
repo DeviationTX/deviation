@@ -366,7 +366,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     if (x >= LCD_WIDTH)
         x = LCD_WIDTH-1;
     u32 pos = ((y*LCD_WIDTH)>>2) + (x>>1);
-    //printf("%02x: %d, %d, %d\n", c, x, y, pos);
+    //printf("%02x(%c): %d, %d, %d\n", c, c, x, y, pos);
     TW8816_DisplayCharacter(pos, c, 7);
 }
 
