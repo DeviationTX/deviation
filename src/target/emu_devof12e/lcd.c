@@ -205,10 +205,11 @@ void LCD_ShowVideo(u8 enable)
 {
     (void) enable;
 }
+unsigned window_x, window_y;
 
 void DrawMappedChar(int pos, u8 *data) {
-    int x_off = 564 + ((pos % 6) * 12 * 3);
-    int y_off = 126 + ((pos / 6) * 18 * 3);
+    int x_off = window_x + ((pos % 6) * 12 * 3);
+    int y_off = window_y + ((pos / 6) * 18 * 3);
     for (int x = 0; x < 12; x++) {
         for (int y = 0; y < 18; y++) {
             int byte = y / 2 * 3 + x / 4;
@@ -230,8 +231,8 @@ extern u8 font_map[27 * 6* 4];
 extern u8 window;
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
-    (void)x;
-
+    window_x = x * 12;
+    window_y = y * 18;
     (void)y;
     (void)w;
     (void)h;

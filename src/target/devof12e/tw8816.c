@@ -710,9 +710,26 @@ void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)
 
 void TW8816_ClearDisplay()
 {
+    TW8816_CreateMappedWindow(0, 0, 0, 0);
     LCD_WriteReg(0x94, 2);
 }
 
+void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
+{
+    TW8816_SetWindow(val);
+    if (w == 0 && h == 0) {
+        LCD_WriteReg(0x9f, 0x00);
+    } else {
+        LCD_WriteReg(0x9f, 0x01);
+        x *= 12;
+        y *= 18;
+        LCD_WriteReg(0xa0, (y >> 8) | (x >> 8));
+        LCD_WriteReg(0xa1, 0xff & x);
+        LCD_WriteReg(0xa2, 0xff & y);
+    }   
+    TW8816_SetWindow(window);
+    
+}
 void TW8816_SetWindow(int i) {
     LCD_WriteReg(0x9e, i);
 }

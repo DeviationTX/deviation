@@ -400,11 +400,7 @@ extern u8 font_map[27 * 6* 4];
 extern u8 window;
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
-    (void)x;
-    (void)y;
-    (void)w;
-    (void)h;
-    (void)val;
+    TW8816_CreateMappedWindow(val, x, y, w, h);
 }
 void LCD_SetMappedWindow(unsigned val)
 {
