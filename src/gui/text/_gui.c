@@ -81,7 +81,6 @@ void _GUI_CreateMappedItem_Helper(guiObject_t *obj)
     box->y = 0;
     box->width = box->width * CHAR_WIDTH;
     box->height = box->height * CHAR_HEIGHT;
-    printf("w: %d h: %d\n", box->width, box->height);
 }
 
 void _GUI_DrawMappedStart()
