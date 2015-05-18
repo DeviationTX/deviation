@@ -13,11 +13,26 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "telemetry.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+
+enum {
+    LABEL_X    = 0,
+    LABEL_W    = 9,
+    TEXTSEL1_X = 9,
+    TEXTSEL1_W = 46,
+    TEXTSEL2_X = 58,
+    TEXTSEL2_W = 21,
+    TEXTSEL3_X = 82,
+    TEXTSEL3_W = 40,
+    MSG_X      = 20,
+    MSG_Y      = 10,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #if HAS_TELEMETRY
 #include "../common/_telemconfig_page.c"
@@ -42,20 +57,14 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    int x = 9;
-    u8 w1 = 46;
-    u8 w2 = 21;
-    u8 w3 = 40;
-    GUI_CreateLabelBox(&gui->idx[relrow], 0, y,
-            9, LINE_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->name[relrow], x, y,
-            w1, LINE_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
-    x += w1 + 3;
-    GUI_CreateTextSelectPlate(&gui->gtlt[relrow], x, y,
-            w2, LINE_HEIGHT, &TINY_FONT, sound_test_cb, gtlt_cb, (void *)(long)absrow);
-    x += w2 + 3;
-    GUI_CreateTextSelectPlate(&gui->value[relrow], x, y,
-            w3, LINE_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->idx[relrow], LABEL_X, y,
+            LABEL_W, LINE_HEIGHT, &TINY_FONT, idx_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->name[relrow], TEXTSEL1_X, y,
+            TEXTSEL1_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, telem_name_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->gtlt[relrow], TEXTSEL2_X, y,
+            TEXTSEL2_W, LINE_HEIGHT, &TINY_FONT, sound_test_cb, gtlt_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], TEXTSEL3_X, y,
+            TEXTSEL3_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, limit_cb, (void *)(long)absrow);
     return 3;
 }
 
@@ -69,7 +78,7 @@ void PAGE_TelemconfigInit(int page)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui->msg, 20, 10, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
+        GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         OBJ_SET_USED(&gui->value, 0);  // A indication not allow to scroll up/down
         return;
     }
