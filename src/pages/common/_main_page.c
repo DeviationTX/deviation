@@ -310,8 +310,9 @@ int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
         return 0;
     *x = ELEM_X(*elem);
     GetElementSize(type, w, h);
-    if (type == ELEM_MODELICO)
+    if (type == ELEM_MODELICO) {
         AdjustIconSize(x, y, h, w);
+    }
     return 1;
 }
 
@@ -344,6 +345,7 @@ void show_elements()
         int type = ELEM_TYPE(pc->elem[i]);
         switch(type) {
             case ELEM_MODELICO:
+                printf("Icon: %dx%dx%dx%d\n", x, y, w, h);
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h, 0, 0, CONFIG_GetCurrentIcon(), press_icon_cb, (void *)1);
                 break;
             case ELEM_VTRIM:

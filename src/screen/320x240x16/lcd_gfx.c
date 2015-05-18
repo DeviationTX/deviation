@@ -323,6 +323,97 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
   }
 }
 
+#ifdef USE_PBM_IMAGE
+#define IS_WHITESPACE(x) (x == 0x0a || x == ' ')
+u8 LCD_ImageIsTransparent(const char *file)
+{
+    (void)file;
+    return 0;
+}
+static int image_read_header(FILE *fh, u16 *w, u16 *h)
+{
+    u8 buf[3];
+    int err = 0;
+    *w = 0;
+    *h = 0;
+    int ret = fread(buf,3, 1, fh);
+    if (ret != 1 || buf[0] != 'P' || buf[1] != '4') {
+        err = 1;
+    }
+
+    while(!err) {
+        ret = fread(buf,1, 1, fh);
+        if (ret != 1 || (! IS_WHITESPACE(buf[0]) && (buf[0] < '0' || buf[0] > '9'))) {
+            err = 1;
+            break;
+        }
+        if (IS_WHITESPACE(buf[0]))
+            break;
+        *w = *w * 10 + buf[0] - '0';
+    }
+    while(!err) {
+        ret = fread(buf,1, 1, fh);
+        if (ret != 1 || (! IS_WHITESPACE(buf[0]) && (buf[0] < '0' || buf[0] > '9'))) {
+            err = 1;
+            break;
+        }
+        if (IS_WHITESPACE(buf[0]))
+            break;
+        *h = *h * 10 + buf[0] - '0';
+    }
+    if (err || *h > 72 || *w > 72) {
+        printf("DEBUG: image_read_header: Error: %d, h:%d w:%d\n", err, *h, *w);
+        return 0;
+    }
+    return 1;
+}
+
+u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
+{
+    FILE *fh;
+    fh = fopen(file, "r");
+    if(! fh) {
+        return 0;
+    }
+    int ret = image_read_header(fh, w, h);
+    fclose(fh);
+    return ret;
+}
+
+void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
+{
+    FILE *fh;
+    u8 buf[9];
+    u16 img_w = 0, img_h = 0;
+    
+    fh = fopen(file, "rb");
+    if(! fh) {
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
+        if (w > 0 && h > 0)
+            LCD_FillRect(x, y, w, h, 0);
+        return;
+    }
+    if (! image_read_header(fh, &img_w, &img_h)) {
+        fclose(fh);
+        return;
+    }
+    LCD_DrawStart(x, y, x + img_w, y + img_h, DRAW_NWSE);
+    unsigned bytes = (img_w + 7) / 8;
+    for (unsigned i = 0; i < img_h; i++) {
+        int ret = fread(buf, bytes, 1, fh);
+        if (ret != 1) {
+            fclose(fh);
+            printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
+            break;
+        }
+        for (unsigned j = 0; j < img_w; j++) {
+            unsigned val = buf[j / 8] & (1 << (7 - (j % 8)));
+            LCD_DrawPixelXY(j, i, val ? 0xffff : 0x0000);
+        }
+    }
+    LCD_DrawStop(); 
+}
+#else
 u8 LCD_ImageIsTransparent(const char *file)
 {
     FILE *fh;
@@ -506,6 +597,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     LCD_DrawStop();
     fclose(fh);
 }
+#endif
 
 void LCD_DrawImageFromFile(u16 x, u16 y, const char *file)
 {

@@ -72,3 +72,24 @@ static unsigned int _handle_modalbuttons_devo10(u32 button, unsigned int flags, 
     return 1;
 }
 
+#if HAS_MAPPED_GFX
+void _GUI_CreateMappedItem_Helper(guiObject_t *obj)
+{
+    struct guiBox *box = &obj->box;
+    LCD_CreateMappedWindow(1, box->x, box->y, box->width, box->height);
+    box->x = 0;
+    box->y = 0;
+    box->width = box->width * CHAR_WIDTH;
+    box->height = box->height * CHAR_HEIGHT;
+    printf("w: %d h: %d\n", box->width, box->height);
+}
+
+void _GUI_DrawMappedStart()
+{
+    LCD_SetMappedWindow(1);
+}
+void _GUI_DrawMappedStop()
+{
+    LCD_SetMappedWindow(0);
+}
+#endif

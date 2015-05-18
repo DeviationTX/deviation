@@ -18,7 +18,7 @@
 #include "gui.h"
 #include "config/display.h"
 
-#include "_xygraph.c"
+#include "_mapped_gfx.h"
 
 guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *graph, u16 x, u16 y, u16 width, u16 height,
                       s16 min_x, s16 min_y, s16 max_x, s16 max_y,
@@ -54,7 +54,7 @@ guiObject_t *GUI_CreateXYGraph(guiXYGraph_t *graph, u16 x, u16 y, u16 width, u16
     graph->touch_cb = touch_cb;
     graph->cb_data = cb_data;
 
-    _CreateXYGraph_Helper(graph);
+    _GUI_CreateMappedItem_Helper(obj);
 
     return obj;
 }
@@ -69,8 +69,8 @@ void GUI_DrawXYGraph(struct guiObject *obj)
         (u32)(box->x + (((s32)(xval)) - graph->min_x) * box->width / (1 + graph->max_x - graph->min_x))
     #define VAL_TO_Y(yval) \
         (u32)(box->y + box->height - (((s32)(yval)) - graph->min_y) * box->height / (1 + graph->max_y - graph->min_y))
-    _DrawXYStart();
-    _ClearXYGraphBG(box, Display.xygraph.bg_color);
+    _GUI_DrawMappedStart();
+    _GUI_ClearMappedBox(box, Display.xygraph.bg_color);
     if (graph->grid_x) {
         int xval;
         for (xval = graph->min_x + graph->grid_x; xval < graph->max_x; xval += graph->grid_x) {
@@ -136,7 +136,7 @@ void GUI_DrawXYGraph(struct guiObject *obj)
     }
     if(Display.xygraph.outline_color != Display.xygraph.bg_color)
         LCD_DrawRect(box->x, box->y, box->width, box->height, Display.xygraph.outline_color);
-    _DrawXYStop();
+    _GUI_DrawMappedStop();
 }
 
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press)
