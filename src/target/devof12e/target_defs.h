@@ -22,8 +22,8 @@
  #define HAS_STANDARD_GUI   1
 #endif
 
-#define HAS_ADVANCED_GUI    0
-#define HAS_PERMANENT_TIMER 0
+#define HAS_ADVANCED_GUI    1
+#define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
 #define HAS_TOUCH           0
 #define HAS_RTC             0
