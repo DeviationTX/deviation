@@ -19,8 +19,8 @@
 static const u16 columns[] = {GPIO4, GPIO5, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};
 static const u8 buttonmap[] = {
-    BUT_LEFT,        BUT_TRIM_RH_NEG, BUT_TRIM_RH_POS, BUT_ENTER,       BUT_RIGHT,
-    BUT_TRIM_LH_POS, BUT_TRIM_LH_NEG, BUT_EXIT,        BUT_UP,          BUT_DOWN,
+    BUT_LEFT,        BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_ENTER,       BUT_RIGHT,
+    BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, BUT_EXIT,        BUT_UP,          BUT_DOWN,
     BUT_TRIM_L_POS,  BUT_TRIM_L_NEG,  BUT_TRIM_R_NEG,  BUT_TRIM_R_POS,  BUT_LAST,
     BUT_LAST,        BUT_TRIM_LV_POS, BUT_TRIM_RV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_RV_NEG,
     };
