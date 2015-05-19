@@ -303,12 +303,12 @@ void AdjustIconSize(u16 *x, u16 *y, u16 *h, u16 *w)
 int GetWidgetLoc(struct elem *elem, u16 *x, u16 *y, u16 *w, u16 *h)
 {
     *y = ELEM_Y(*elem);
-    if (*y == 0)
+    *x = ELEM_X(*elem);
+    if (*y == 0 && *x == 0)
         return 0;
     int type = ELEM_TYPE(*elem);
     if (type >= ELEM_LAST)
         return 0;
-    *x = ELEM_X(*elem);
     GetElementSize(type, w, h);
     if (type == ELEM_MODELICO) {
         AdjustIconSize(x, y, h, w);

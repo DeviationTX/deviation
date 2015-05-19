@@ -54,7 +54,7 @@ struct elem {
 
 #define ELEM_X(elem)    (*((u32 *)(&(elem))) & 0x1FF)
 #define ELEM_Y(elem)    ((*((u32 *)(&(elem))) >> 9) & 0x1FF)
-#define ELEM_USED(elem) (*((u32 *)(&(elem))) & 0x3FE00)
+#define ELEM_USED(elem) (*((u32 *)(&(elem))) & 0x3FFFF)
 #define ELEM_TYPE(elem) ((*((u32 *)(&(elem))) >> 18) & 0x0F)
 #define ELEM_SET_X(elem, x)       *((u32 *)(&(elem))) = ((*((u32 *)(&(elem))) & ~0x1FF) | (x))
 #define ELEM_SET_Y(elem, y)       *((u32 *)(&(elem))) = ((*((u32 *)(&(elem))) & ~(0x1FF << 9)) | ((y) << 9))
