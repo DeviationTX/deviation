@@ -92,7 +92,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y, LABEL_W, LINE_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
@@ -171,7 +171,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y, LABEL_W, LINE_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
@@ -211,23 +211,35 @@ static void _show_complex(int page_change)
 enum {
     EXPO_SWITCH1 = COMMON_LAST,
     EXPO_LINK1,
-    EXPO_CURVE1,
+//    EXPO_CURVE1,
     EXPO_SCALE1,
     EXPO_SWITCH2,
     EXPO_LINK2,
-    EXPO_CURVE2,
+//    EXPO_CURVE2,
     EXPO_SCALE2,
     EXPO_LAST,
 };
 
+static guiObject_t *expo_getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    (void)col;
+printf("Getobj: 1\n");
+    if (col == 1 || ((guiObject_t *)&gui->label[relrow])->Type == Label) {
+        return (guiObject_t *)&gui->value[relrow];
+    }
+    printf("Getobj: label\n");
+    return (guiObject_t *)&gui->label[relrow];
+}
 static int expo_size_cb(int absrow, void *data)
 {
     (void)data;
+    return LINES_PER_ROW;
     switch(absrow) {
         case EXPO_LINK1:
-        case EXPO_CURVE1:
+//        case EXPO_CURVE1:
         case EXPO_LINK2:
-        case EXPO_CURVE2:
+//        case EXPO_CURVE2:
             return 1;
     }
     return LINES_PER_ROW;
@@ -243,6 +255,9 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     int but = 0;
     int disable = 0;
     long idx;
+    long butidx;
+    void *buttgl = NULL;
+    void *butdata = NULL;
 
     switch(absrow) {
         case COMMON_SRC:
@@ -266,14 +281,15 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
             break;
         case EXPO_LINK1:
         case EXPO_LINK2:
-            idx = (absrow == EXPO_LINK1) ? 0 : 1;
-            tgl = toggle_link_cb; label_cb = show_rate_cb; data = (void *)idx; but = 1;
-            if(! MIXER_SRC(mp->mixer[idx+1].sw))
+            butidx = (absrow == EXPO_LINK1) ? 0 : 1;
+            buttgl = toggle_link_cb; label_cb = show_rate_cb; butdata = (void *)butidx; but = 1;
+            if(! MIXER_SRC(mp->mixer[butidx+1].sw))
                 disable = 1;
-            break;
-        case EXPO_CURVE1:
-        case EXPO_CURVE2:
-            idx = (absrow == EXPO_CURVE1) ? 1 : 2;
+            idx = butidx+1;
+            //break;
+        //case EXPO_CURVE1:
+        //case EXPO_CURVE2:
+            //idx = (absrow == EXPO_CURVE1) ? 1 : 2;
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[idx];
             if(! MIXER_SRC(mp->mixer[idx].sw) || mp->link_curves & idx)
                 disable = 1;
@@ -287,19 +303,19 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
                 disable = 1;
             break;
     }
-printf("row: %d/%d y: %d\n", absrow, relrow, y);
+    int count = 1;
     if (but) {
         labelDesc.style = LABEL_CENTER;
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, LABEL_X, y,
-            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, tgl, data);
+        GUI_CreateButtonPlateText(&gui->label[relrow].but, LABEL_X, y,
+            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, buttgl, butdata);
         if(disable) {
-            GUI_ButtonEnable((guiObject_t *)&gui->value[relrow].but, 0);
+            GUI_ButtonEnable((guiObject_t *)&gui->label[relrow].but, 0);
         }
-        return 1;
-    }
-    if(label || label_cb) {
+        count++;
+        y += (LINES_PER_ROW - 1) * LINE_SPACE;
+    } else if(label || label_cb) {
         labelDesc.style = LABEL_LEFT;
-        GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y, LABEL_W, LINE_HEIGHT,
+        GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, label_cb, NULL, label);
         if(underline)
             GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &labelDesc);
@@ -311,7 +327,7 @@ printf("row: %d/%d y: %d\n", absrow, relrow, y);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
-    return 1;
+    return count;
 }
 
 static void _show_expo_dr()
@@ -325,7 +341,7 @@ static void _show_expo_dr()
     //left_side_num_elements = ((LINES_PER_ROW - 1) + left_side_num_elements) / LINES_PER_ROW;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH, 
-                        left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
+                        left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, expo_getobj_cb, expo_size_cb, NULL);
     
     GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
@@ -340,7 +356,7 @@ static void _update_rate_widgets(u8 idx)
 {
     u8 mix = idx + 1;
     guiObject_t *link = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_LINK2 : EXPO_LINK1, 0);
-    guiObject_t *curve = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_CURVE2 : EXPO_CURVE1, 0);
+    guiObject_t *curve = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_LINK2 : EXPO_LINK1, 1);
     guiObject_t *scale = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_SCALE2 : EXPO_SCALE1, 0);
     if (MIXER_SRC(mp->mixer[mix].sw)) {
         if(link)

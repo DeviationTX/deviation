@@ -255,7 +255,10 @@ struct advmixcfg_obj {
     guiRect_t rect1;
     guiBarGraph_t bar;
     guiXYGraph_t graph;
-    guiLabel_t label[7];
+    union {
+        guiLabel_t lbl;
+        guiButton_t but;
+    } label[7];
     union {
         guiButton_t but;
         guiTextSelect_t ts;
