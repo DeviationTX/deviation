@@ -13,9 +13,32 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 
+enum {
+    NAME_X = 0,
+    NAME_W = 60,
+    SAVE_X = LCD_WIDTH - 60,
+    SAVE_W = 60,
+    UNDERLINE = 1,
+    LABEL_X = 0,
+    LABEL_W = 74,
+    LABEL1_W = 39,
+    LABEL2_W = 50,
+    TEXTSEL1_X = 39,
+    TEXTSEL1_W = 35,
+    TEXTSEL2_X = 50,
+    TEXTSEL2_W = 24,
+    VALUE_X = 0,
+    #define VALUE_Y_OFFSET LINE_SPACE
+    GRAPH_X = 77,
+    #define GRAPH_Y LINE_HEIGHT
+    GRAPH_W = 50,
+    GRAPH_H = 50,
+};
+#endif //OVERRIDE_PLACEMENT
 #include "../../common/advanced/_mixer_curves.c"
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
@@ -40,41 +63,37 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
     edit->curveptr = curve;
 
     labelDesc.style = LABEL_CENTER;
-    u8 w = 60;
-    GUI_CreateTextSelectPlate(&gui->name, 0, 0, w, HEADER_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
-    u8 x =40;
-    w = 40;
-    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc , NULL, 0, okcancel_cb, (void *)_tr("Save"));
     // Draw a line
-    GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
+    if (UNDERLINE)
+        GUI_CreateRect(&gui->rect, 0, HEADER_WIDGET_HEIGHT, LCD_WIDTH, 1, &labelDesc);
 
-    x = 0;
     u8 space = LINE_SPACE;
     u8 y = space;
-    w = 74;
     labelDesc.style = LABEL_LEFT;
 
     if (type >= CURVE_3POINT) {
-        GUI_CreateLabelBox(&gui->smoothlbl, x, y, w-35, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
-        GUI_CreateTextSelectPlate(&gui->smooth, x + w - 35, y, 35, LINE_HEIGHT, &labelDesc, NULL, set_smooth_cb, NULL);
+        GUI_CreateLabelBox(&gui->smoothlbl, LABEL_X, y, LABEL1_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Smooth"));
+        GUI_CreateTextSelectPlate(&gui->smooth, TEXTSEL1_X, y, TEXTSEL1_W, LINE_HEIGHT, &labelDesc, NULL, set_smooth_cb, NULL);
         y += space;
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w-24, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
-        GUI_CreateTextSelectPlate(&gui->point, x + w - 24, y, 24, LINE_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
+        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL2_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Point"));
+        GUI_CreateTextSelectPlate(&gui->point, TEXTSEL2_X, y, TEXTSEL2_W, LINE_HEIGHT, &TINY_FONT, NULL, set_pointnum_cb, NULL);
     } else if(type == CURVE_DEADBAND || type == CURVE_EXPO) {
-        GUI_CreateLabelBox(&gui->pointlbl, x, y , w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
+        GUI_CreateLabelBox(&gui->pointlbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Pos/Neg"));
         y += space;
         labelDesc.style = LABEL_CENTER;
-        GUI_CreateTextSelectPlate(&gui->point, x, y, w, LINE_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
+        GUI_CreateTextSelectPlate(&gui->point, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, set_expopoint_cb, NULL);
     }
 
     y += space;
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->valuelbl, x, y , w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
-    y += space;
+    GUI_CreateLabelBox(&gui->valuelbl, LABEL_X, y , LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr("Value"));
+    y += VALUE_Y_OFFSET;
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value, x, y, w, LINE_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
+    GUI_CreateTextSelectPlate(&gui->value, VALUE_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, set_value_cb, NULL);
 
-    GUI_CreateXYGraph(&gui->graph, 77, LINE_HEIGHT, 50, 50,
+    GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE,
                               0, 0, //CHAN_MAX_VALUE / 4, CHAN_MAX_VALUE / 4,
