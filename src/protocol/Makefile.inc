@@ -27,6 +27,7 @@ PROTO_MODULES += $(ODIR)/protocol/esky150.mod
 PROTO_MODULES += $(ODIR)/protocol/esky.mod
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/cx10.mod
+PROTO_MODULES += $(ODIR)/protocol/cg023.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
@@ -137,4 +138,8 @@ $(ODIR)/protocol/cx10.mod : $(ODIR)/cx10_nrf24l01.bin
 	@echo Building 'cx10' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
+$(ODIR)/protocol/cg023.mod : $(ODIR)/cx10_nrf24l01.bin
+	@echo Building 'cg023' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+    
 endif #BUILD_TARGET
