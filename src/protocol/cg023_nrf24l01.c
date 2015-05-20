@@ -55,22 +55,16 @@
 #define PACKET_SIZE 15   // packets have 15-byte payload
 #define RF_BIND_CHANNEL 0x2D
 
-static const char * const cg023_opts[] = {
-    "Rate", _tr_noop("High"), _tr_noop("Middle"), _tr_noop("Low"), NULL, 
+static const char * const cg023_opts[] = { 
     "Dyn Trims", _tr_noop("Off"), _tr_noop("On"), NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_RATE = 0,
-    PROTOOPTS_DYNTRIM,
+    PROTOOPTS_DYNTRIM=0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-
-#define RATE_HIGH 0
-#define RATE_MID 1
-#define RATE_LOW 2
 
 #define DYNTRIM_OFF 0
 #define DYNTRIM_ON 1
@@ -85,7 +79,8 @@ enum {
     CHANNEL6,     // Flip
     CHANNEL7,     // Still camera
     CHANNEL8,     // Video camera
-    CHANNEL9      // Headless
+    CHANNEL9,     // Headless
+    CHANNEL10     // Rate (3 pos)
 };
 
 enum{
@@ -165,12 +160,15 @@ static void send_packet(u8 bind)
         packet[11] = 0x40;
         packet[12] = 0x40;
     }
-    if( Model.proto_opts[PROTOOPTS_RATE] == RATE_HIGH)
+    // rate
+    if(Channels[CHANNEL10] > 0) {
+        if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
+            packet[13] = FLAG_RATE_MID;
+        else
+            packet[13] = FLAG_RATE_LOW;
+    } else
         packet[13] = FLAG_RATE_HIGH; 
-    else if( Model.proto_opts[PROTOOPTS_RATE] == RATE_MID)
-        packet[13] = FLAG_RATE_MID;
-    else
-        packet[13] = FLAG_RATE_LOW;
+    // flags
     if(Channels[CHANNEL5] > 0)
         packet[13] |= FLAG_LED_OFF;
     if(Channels[CHANNEL6] > 0)
@@ -337,8 +335,8 @@ const void *CG023_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 9L; // A, E, T, R, light, flip, photo, video, headless
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
+        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, light, flip, photo, video, headless, rate
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cg023_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
