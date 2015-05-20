@@ -138,7 +138,7 @@ $(ODIR)/protocol/cx10.mod : $(ODIR)/cx10_nrf24l01.bin
 	@echo Building 'cx10' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
-$(ODIR)/protocol/cg023.mod : $(ODIR)/cx10_nrf24l01.bin
+$(ODIR)/protocol/cg023.mod : $(ODIR)/cg023_nrf24l01.bin
 	@echo Building 'cg023' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
     
