@@ -47,7 +47,6 @@ void HID_Write(s8 *pkt, u8 size) {
 }
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
-void PWR_Sleep() {}
 unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
 
@@ -147,3 +146,4 @@ void MCU_SerialNumber(u8 *var, int len)
                          0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
     memcpy(var, data, l);
 }
+void PWR_JumpToProgrammer() {}

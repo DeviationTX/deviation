@@ -77,7 +77,7 @@ int PWR_CheckPowerSwitch()
 
 void PWR_Sleep()
 {
-    asm("wfi");
+    //asm("wfi");
 }
 
 /* Return milivolts */
@@ -87,4 +87,9 @@ unsigned PWR_ReadVoltage(void)
     /* Multily the above by 1000 to get milivolts */
     v = v * VOLTAGE_NUMERATOR / 100 + VOLTAGE_OFFSET;
     return v;
+}
+
+void PWR_JumpToProgrammer()
+{
+    scb_reset_system();
 }

@@ -33,6 +33,9 @@
 #include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
 #include <FL/fl_ask.H>
+#include "fltk_resample.h"
+
+bool changed = false;
 
 #define USE_OWN_PRINTF 0 //Disable sprintf mappingdue to need for %f
 //Windows
@@ -250,12 +253,12 @@ public:
             int y = Fl::event_y() - image_ypos;
             if (x < 0)
                 x = 0;
-            if (x >= LCD_WIDTH)
-                x = LCD_WIDTH -1;
+            if (x >= SCREEN_X)
+                x = SCREEN_X -1;
             if (y < 0)
                 y = 0;
-            if (y >= LCD_HEIGHT)
-                y = LCD_HEIGHT -1;
+            if (y >= SCREEN_Y)
+                y = SCREEN_Y -1;
             gui.mouse = 1;
             gui.mousex = calibration.xscale * x / 0x10000 + calibration.xoffset;
             gui.mousey = calibration.yscale * y / 0x10000 + calibration.yoffset;
@@ -274,7 +277,17 @@ public:
     image_box(int X, int Y, int W, int H) : Fl_Box(X, Y, W, H) {
     }
     void draw() {
+#if (IMAGE_X < SCREEN_X && IMAGE_Y < SCREEN_Y && ((SCREEN_X / IMAGE_X) * IMAGE_X) && ((SCREEN_Y / IMAGE_Y) * IMAGE_Y))
+      //ZOOM_X and ZOOM_Y are integers
+      pixel_mult(gui.scaled_img, gui.image, IMAGE_X, IMAGE_Y, ZOOM_X, ZOOM_Y, 3);
+      fl_draw_image(gui.scaled_img, x(), y(), w(), h(), 3, 0);
+#elif SCREEN_RESIZE
+      //non-integer zoom
+      resample(w(), h(), gui.image, IMAGE_X, IMAGE_Y, 3, 0, 0, gui.scaled_img);
+      fl_draw_image(gui.scaled_img, x(), y(), w(), h(), 3, 0);
+#else
       fl_draw_image(gui.image, x(), y(), w(), h(), 3, 0);
+#endif
     }
 };
 
@@ -346,8 +359,8 @@ void LCD_Init()
   int i;
   Fl::visual(FL_RGB);
   // 85 is for 4 rows' height
-  int lcdScreenWidth = LCD_WIDTH * LCD_WIDTH_MULT;
-  int lcdScreenHeight = LCD_HEIGHT * LCD_HEIGHT_MULT;
+  int lcdScreenWidth = SCREEN_X;
+  int lcdScreenHeight = SCREEN_Y;
 
   int height = (lcdScreenHeight > INP_LAST + (INP_LAST - 1) * 10 + 85) ?
                 lcdScreenHeight : INP_LAST + (INP_LAST - 1) * 10 + 85;
@@ -430,10 +443,11 @@ void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
 }
 
 void LCD_DrawStop(void) {
-    image->redraw();
+    changed = true;
+    //image->redraw();
     //Fl::redraw();
 #ifndef HAS_EVENT_LOOP
-    Fl::check();
+//    Fl::check();
 #endif
 }
 
@@ -496,8 +510,9 @@ void ALARMhandler()
     } */
 
     if(timer_callback && timer_enable & (1 << TIMER_ENABLE) &&
-            CLOCK_getms() >= msec_cbtime[TIMER_ENABLE]) {
-            //msecs == msec_cbtime[TIMER_ENABLE]) {
+            CLOCK_getms() >= msec_cbtime[TIMER_ENABLE])
+            //msecs == msec_cbtime[TIMER_ENABLE])
+    {
 #ifdef TIMING_DEBUG
         debug_timing(4, 0);
 #endif
@@ -510,15 +525,17 @@ void ALARMhandler()
         }
     }
     if(timer_enable & (1 << MEDIUM_PRIORITY) &&
-            CLOCK_getms() >= msec_cbtime[MEDIUM_PRIORITY]) {
-            // msecs == msec_cbtime[MEDIUM_PRIORITY]) {
+            CLOCK_getms() >= msec_cbtime[MEDIUM_PRIORITY])
+            // msecs == msec_cbtime[MEDIUM_PRIORITY])
+    {
         medium_priority_cb();
         priority_ready |= 1 << MEDIUM_PRIORITY;
         msec_cbtime[MEDIUM_PRIORITY] += MEDIUM_PRIORITY_MSEC;
     }
     if(timer_enable & (1 << LOW_PRIORITY) &&
-            CLOCK_getms() >= msec_cbtime[LOW_PRIORITY]) {
-            // msecs == msec_cbtime[LOW_PRIORITY]) {
+            CLOCK_getms() >= msec_cbtime[LOW_PRIORITY])
+            // msecs == msec_cbtime[LOW_PRIORITY])
+    {
         priority_ready |= 1 << LOW_PRIORITY;
         msec_cbtime[LOW_PRIORITY] += LOW_PRIORITY_MSEC;
     }
@@ -622,4 +639,15 @@ u32 CLOCK_getms()
     t = (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
     return t;
 }
+
+void PWR_Sleep() {
+    Fl::wait();
 }
+void LCD_ForceUpdate() {
+    if (changed) {
+        changed = false;
+        image->redraw();
+        Fl::check();
+    }
+}
+} //extern "C"
