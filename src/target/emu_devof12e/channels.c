@@ -24,10 +24,24 @@ s32 CHAN_ReadInput(int channel)
         case INP_RUDDER:   return CHAN_MIN_VALUE + step * gui.rudder;
         case INP_ELEVATOR: return CHAN_MIN_VALUE + step * gui.elevator;
         case INP_AILERON:  return CHAN_MIN_VALUE + step * gui.aileron;
-        case INP_HOLD0:    return (gui.rud_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_HOLD1:    return (gui.rud_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD0:    return gui.gear ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_FMOD1:    return gui.gear ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_AUX4:     return CHAN_MIN_VALUE + step * gui.aux4;
+        case INP_AUX5:     return CHAN_MIN_VALUE + step * gui.aux5;
+        case INP_AUX6:     return CHAN_MIN_VALUE + step * gui.aux6;
+        case INP_AUX7:     return CHAN_MIN_VALUE + step * gui.aux7;
+        case INP_RUD_DR0:  return (gui.rud_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_RUD_DR1:  return (gui.rud_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_ELE_DR0:  return (gui.ele_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_ELE_DR1:  return (gui.ele_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_AIL_DR0:  return (gui.ail_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_AIL_DR1:  return (gui.ail_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_GEAR0:    return (gui.gear % 2)   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_GEAR1:    return (gui.gear % 2)   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX0:     return (gui.mix % 3) == 0  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX1:     return (gui.mix % 3) == 1  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_MIX2:     return (gui.mix % 3) == 2  ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD0:    return (gui.fmod % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD1:    return (gui.fmod % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD2:    return (gui.fmod % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
     return 0;
 }
