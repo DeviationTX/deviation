@@ -84,7 +84,8 @@ static const u8 rx_tx_addr[] = {0xcc, 0xcc, 0xcc, 0xcc, 0xcc};
 #define RF_BIND_CHANNEL 0x02
 #define NUM_RF_CHANNELS    4
 static u8 current_chan = 0;
-static const u8 chans[] = {0x16, 0x33, 0x40, 0x0e};
+static u8 txid[4];
+static u8 rf_chans[4];
 
 static u8 phase;
 enum {
@@ -151,10 +152,10 @@ static void send_packet(u8 bind)
     } else {
       packet[0]= 0x55;
     }
-    packet[1] = 0x0b;
-    packet[2] = 0x06;
-    packet[3] = 0x34;
-    packet[4] = 0x12;
+    packet[1] = txid[0];
+    packet[2] = txid[1];
+    packet[3] = txid[2];
+    packet[4] = txid[3];
 
     read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
     packet[5] = aileron & 0xff;
@@ -176,7 +177,7 @@ static void send_packet(u8 bind)
     if (bind) {
       NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
     } else {
-      NRF24L01_WriteReg(NRF24L01_05_RF_CH, chans[current_chan++]);
+      NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_chans[current_chan++]);
       current_chan %= NUM_RF_CHANNELS;
     }
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -304,9 +305,8 @@ static u16 cx10_callback()
 }
 
 
-#if 0
 // Generate address to use from TX id and manufacturer id (STM32 unique id)
-static void initialize_rx_tx_addr()
+static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
 
@@ -328,16 +328,24 @@ static void initialize_rx_tx_addr()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    set_rx_tx_addr(lfsr);
+    txid[0] = (lfsr >> 24) & 0xFF;
+    txid[1] = ((lfsr >> 16) & 0xFF) % 0x30;
+    txid[2] = (lfsr >> 8) & 0xFF;
+    txid[3] = lfsr & 0xFF;
+    
+    // rf channels
+    rf_chans[0] = 0x03 + (txid[0] & 0x0F);
+    rf_chans[1] = 0x16 + (txid[0] >> 4);
+    rf_chans[2] = 0x2D + (txid[1] & 0x0F);
+    rf_chans[3] = 0x40 + (txid[1] >> 4);
 }
-#endif
 
 
 static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
-//    initialize_rx_tx_addr();
+    initialize_txid();
     packet_counter = 0;
     counter = BIND_COUNT;
     flags = 0;
