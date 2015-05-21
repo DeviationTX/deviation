@@ -99,5 +99,11 @@ int NRF24L01_Reset();
 // To enable radio transmit after WritePayload you need to turn the radio
 //void NRF24L01_PulseCE();
 
+// XN297 emulation layer
+void XN297_SetTXAddr(const u8* addr, int len);
+void XN297_SetRXAddr(const u8* addr, int len);
+void XN297_Configure(u8 flags);
+u8 XN297_WritePayload(u8* msg, int len);
+u8 XN297_ReadPayload(u8* msg, int len);
 
 #endif

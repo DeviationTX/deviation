@@ -48,13 +48,6 @@ SRC_C    +=  $(wildcard $(SDIR)/screen/*.c) \
              $(wildcard *.c)
 
 
-ifdef MODULAR
-   SRC_C    += protocol/protocol.c
-   PROTO_SRC_C := $(filter-out protocol/protocol.c, $(wildcard protocol/*.c))
-else
-   SRC_C    := $(SRC_C) $(wildcard protocol/*.c)
-endif
-
 SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/standard/*.c)
 SRC_C    := $(SRC_C) $(wildcard pages/$(SCREENSIZE)/advanced/*.c)
 

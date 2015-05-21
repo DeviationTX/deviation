@@ -20,7 +20,13 @@
 #include <stdio.h>
 
 #if HAS_DATALOG
-#define DATALOG_VERSION 0x01
+#define DATALOG_VERSION 0x02
+
+//This is pretty crude.  need a more robust check
+#if TXID == 10
+//ctassert((DLOG_LAST == 67), dlog_api_changed); // DATALOG_VERSION = 0x01
+ctassert((DLOG_LAST == 116), dlog_api_changed); // DATALOG_VERSION = 0x02
+#endif
 
 #define UPDATE_DELAY 4000 //wiat 4 seconds after changing enable before sample start
 #define DATALOG_HEADER_SIZE (3 + ((7 + NUM_DATALOG) / 8))
@@ -146,6 +152,15 @@ void _write_8(s32 data)
     fwrite(x, 1, 1, fh);
     dlog_pos++;
 }
+void _write_16(s32 data)
+{
+    u8 x[2] = {(data & 0xff),
+               (data >> 8) & 0xff,
+              };
+    fwrite(x, 2, 1, fh);
+    dlog_pos+=2;
+}
+
 void _write_32(s32 data)
 {
     u8 x[4] = {(data & 0xff),
@@ -159,7 +174,7 @@ void _write_32(s32 data)
 
 void _write_header() {
     need_header_update = 0;
-    _write_8(0x01);
+    _write_8(DATALOG_VERSION);
     _write_8(TXID);
     _write_8(Model.datalog.rate);
     fwrite(Model.datalog.source, sizeof(Model.datalog.source), 1, fh);
@@ -206,9 +221,9 @@ void DATALOG_Write()
                 val = -128;
             _write_8(val);
         } else if(i >= DLOG_TELEMETRY) {
-            _write_32(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
+            _write_16(TELEMETRY_GetValue(i - DLOG_TELEMETRY + 1));
         } else {
-            _write_32(TIMER_GetValue(i) / 1000);
+            _write_16(TIMER_GetValue(i) / 1000); //seconds
         }
     }
 }

@@ -43,11 +43,11 @@ $(TARGET).bin: $(TARGET).elf
 ifdef OPTIMIZE_DFU
 	$(CP) $(TARGET).elf objs/$(TARGET)/$(TARGET).elf
 	@echo " + Optimizing placement and re-linking"
-	../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/optimize.ld
+	$(SDIR)/../utils/repack_ld.pl -mapfile $(TARGET).map -size $(CRC_OFFSET) > objs/optimize.ld
 	$(CC) -o $< $(OBJS) $(LIBOPENCM3) $(LFLAGS) $(LFLAGS2OPT) $(CFLAGS)
 endif
 ifdef MODULAR # the following builds a symbol file with thumb addresses (address+1 for functions, address+0 for variables)
-	$(DUMP) -t $< | ../utils/build_symbolfile.pl > $(SYMBOL_FILE)
+	$(DUMP) -t $< | $(SDIR)/../utils/build_symbolfile.pl > $(SYMBOL_FILE)
 endif
 	$(CP) -O binary $< $@
 	$(DUMP) -S $< > $(TARGET).list

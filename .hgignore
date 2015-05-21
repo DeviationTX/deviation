@@ -12,6 +12,7 @@ gz$
 ^src/libopencm3/lib/(lm3s|lpc13xx|lpc17xx)/vector_nvic.c$
 ^src/libopencm3/include/libopencm3/.*/.*/nvic.h$
 ^src/libopencm3/include/libopencm3/(lm3s|lpc13xx|lpc17xx)/nvic.h$
+^src/libopencm3/.*irqhandlers.h$
 #src/gz*
 #src/elf*
 map$
