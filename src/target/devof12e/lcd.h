@@ -9,7 +9,7 @@ u32 I2C1_WriteBufferDMA(u16 deviceId, u8 *dmaAddr, s16 periphMemAddr, int len);
 
 void TW8816_Init();
 void TW8816_Reset();
-void TW8816_LoadFont();
+void TW8816_LoadFont(u8 *data, unsigned offset, unsigned count);
 void TW8816_SetVideoMode(unsigned enable);
 void TW8816_ReinitPixelClock();
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr);

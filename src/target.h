@@ -40,6 +40,11 @@ enum {
     TX_MODULE_LAST,
 };
 
+#ifdef USE_PBM_IMAGE
+    #define IMG_EXT  ".pbm"
+#else
+    #define IMG_EXT  ".bmp"
+#endif
 
 #define SWITCH_ADDRESS 0xFFFFFFFF
 /* The following functions must be provided by every target */
@@ -58,6 +63,7 @@ void LCD_ForceUpdate();
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
 void LCD_SetMappedWindow(unsigned val);
 unsigned LCD_GetMappedWindow();
+void LCD_LoadFont(int idx, const char *file, int x_off, int y_off, int w, int h);
 
     /* Primitives */
 enum DrawDir {

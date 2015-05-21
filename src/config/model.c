@@ -1347,11 +1347,6 @@ u8 CONFIG_GetCurrentModel() {
     return Transmitter.current_model;
 }
 
-#ifdef USE_PBM_IMAGE
-    #define IMG_EXT  ".pbm"
-#else
-    #define IMG_EXT  ".bmp"
-#endif
 const char *CONFIG_GetIcon(enum ModelType type) {
     const char *const icons[] = {
        "modelico/heli" IMG_EXT,

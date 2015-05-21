@@ -22,6 +22,9 @@
 #include "telemetry.h"
 
 #define OVERRIDE_PLACEMENT
+extern char *TGLICO_font_cb(guiObject_t *obj, const void *data);
+#define HAS_CHAR_ICONS
+
 #if LCD_WIDTH == 66
 //devof12e
 enum {
@@ -31,20 +34,21 @@ enum {
      HTRIM_H      =  2,
      MODEL_ICO_W  =  6,
      MODEL_ICO_H  =  4,
-     BOX_W        = 48,
-     SMALLBOX_H   = 10,
-     BIGBOX_H     = 14,
+     BOX_W        = 10,
+     SMALLBOX_H   =  2,
+     BIGBOX_H     =  2,
      GRAPH_W      = (VTRIM_W),
      GRAPH_H      = (VTRIM_H / 2),
      BATTERY_W    = 10,
      BATTERY_H    = 2,
      TXPOWER_W    = 10,
-     TXPOWER_H    = 1,
+     TXPOWER_H    = 2,
 //
     MODEL_NAME_X  = 0,
     MODEL_NAME_Y  = 0,
 };
 #else
+#define TGLICO_LoadFonts() (void)1
 enum {
      VTRIM_W      =  1,
      VTRIM_H      =  9,

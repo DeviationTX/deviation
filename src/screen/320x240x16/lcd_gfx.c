@@ -361,7 +361,7 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h)
             break;
         *h = *h * 10 + buf[0] - '0';
     }
-    if (err || *h > 72 || *w > 72) {
+    if (err) {
         printf("DEBUG: image_read_header: Error: %d, h:%d w:%d\n", err, *h, *w);
         return 0;
     }
@@ -383,7 +383,7 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
     FILE *fh;
-    u8 buf[9];
+    u8 buf[32];
     u16 img_w = 0, img_h = 0;
     
     fh = fopen(file, "rb");
@@ -397,20 +397,32 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         fclose(fh);
         return;
     }
-    LCD_DrawStart(x, y, x + img_w, y + img_h, DRAW_NWSE);
+    if (img_w > sizeof(buf)*8) {
+        printf("DEBUG: LCD_DrawWindowedImageFromFile: Image is too wide: %d > %d\n", img_w, sizeof(buf)*8);
+        fclose(fh);
+        return;
+    }
+    if (w < 0)
+        w = img_w;
+    if (h < 0)
+        h = img_h;
+    LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE);
     unsigned bytes = (img_w + 7) / 8;
-    for (unsigned i = 0; i < img_h; i++) {
+    for (unsigned i = 0; i < y_off; i++) {
+        read(buf, bytes, 1, fh);
+    }
+    for (unsigned i = 0; i < h; i++) {
         int ret = fread(buf, bytes, 1, fh);
         if (ret != 1) {
-            fclose(fh);
-            printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue?\n");
+            //printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue? (%s, %d, %d)\n", file, ret, i);
             break;
         }
-        for (unsigned j = 0; j < img_w; j++) {
-            unsigned val = buf[j / 8] & (1 << (7 - (j % 8)));
-            LCD_DrawPixelXY(j, i, val ? 0xffff : 0x0000);
+        for (unsigned j = 0; j < w; j++) {
+            unsigned val = buf[(j + x_off) / 8] & (1 << (7 - ((j + x_off) % 8)));
+            LCD_DrawPixelXY(x+j, y+i, val ? 0xffff : 0x0000);
         }
     }
+    fclose(fh);
     LCD_DrawStop(); 
 }
 #else

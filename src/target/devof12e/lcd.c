@@ -404,15 +404,20 @@ void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, un
 }
 void LCD_SetMappedWindow(unsigned val)
 {
-    if (val == 1) {
+    if (val != 0) {
         TW8816_SetWindow(0);
         memset(font_map, 0, sizeof(font_map));
     } else {
-        TW8816_LoadFont(font_map, 6 * 4);
-        for (int i = 0; i < 24; i++) {
-            TW8816_DisplayCharacter(i, 0x100 + i, 7);
+        if (window < 4) {
+            TW8816_LoadFont(font_map, 0, 6 * 4);
+            for (int i = 0; i < 24; i++) {
+                TW8816_DisplayCharacter(i, 0x100 + i, 7);
+            }
+        } else {
+            TW8816_LoadFont(font_map, window, 1);
         }
         TW8816_SetWindow(1);
     }
     window = val;
-}   
+}
+

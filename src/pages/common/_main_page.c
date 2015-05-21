@@ -214,17 +214,14 @@ void PAGE_MainEvent()
             case ELEM_TOGGLE:
             {
                 src = MIXER_SRC(src);
-                struct ImageMap img;
-                (void)img.x_off;
-                (void)img.y_off;
-                img.file = NULL;
+                int idx = -1;
                 if(src) {
                     if (src > INP_HAS_CALIBRATION && src < INP_LAST) {
                         //switch
                         for (int j = 0; j < 3; j++) {
                             // Assume switch 0/1/2 are in order
                             if(ELEM_ICO(pc->elem[i], j) && raw[src+j] > 0) {
-                                img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], j));
+                                idx = ELEM_ICO(pc->elem[i], j);
                                 break;
                             }
                         }
@@ -232,15 +229,21 @@ void PAGE_MainEvent()
                         //Non switch
                         int sw = raw[src] > 0 ? 1 : 0;
                         if (ELEM_ICO(pc->elem[i], sw)) {
-                            img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], sw));
+                            idx = ELEM_ICO(pc->elem[i], sw);
                         }
                     }
                 }
-                if (img.file) {
+                if (idx != -1) {
+#ifdef HAS_CHAR_ICONS
+                    gui->elem[i].box.cb_data = (void *)(long)idx;
+#else
+                    struct ImageMap img;
+                    img = TGLICO_GetImage(idx);
                     GUI_ChangeImage(&gui->elem[i].img, img.file, img.x_off, img.y_off);
-                    GUI_SetHidden((guiObject_t *)&gui->elem[i].img, 0);
+#endif
+                    GUI_SetHidden((guiObject_t *)&gui->elem[i], 0);
                 } else {
-                    GUI_SetHidden((guiObject_t *)&gui->elem[i].img, 1);
+                    GUI_SetHidden((guiObject_t *)&gui->elem[i], 1);
                 }
             }
             break;
@@ -394,9 +397,13 @@ void show_elements()
             }
             case ELEM_TOGGLE:
             {
+#ifdef HAS_CHAR_ICONS
+                GUI_CreateLabelBox(&gui->elem[i].box, x, y, 2, 2, &DEFAULT_FONT, TGLICO_font_cb, NULL, (void *)(long)ELEM_ICO(pc->elem[i], 0));
+#else
                 struct ImageMap img = TGLICO_GetImage(ELEM_ICO(pc->elem[i], 0)); //We'll set this properly down below
                 GUI_CreateImageOffset(&gui->elem[i].img, x, y, w, h,
                                   img.x_off, img.y_off, img.file, NULL, NULL);
+#endif
                 break;
             }
             case ELEM_BATTERY:

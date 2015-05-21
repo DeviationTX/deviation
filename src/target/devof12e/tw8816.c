@@ -588,13 +588,13 @@ void TW8816_Reset()
     _msleep(100);
 }
 
-void TW8816_LoadFont(u8 *data, unsigned count)
+void TW8816_LoadFont(u8 *data, unsigned offset, unsigned count)
 {
     LCD_WriteReg(0x94, 1);
     LCD_WriteReg(0x9B, 0xE2);
     LCD_WriteReg(0xE0, 0x10);
     for (unsigned i = 0; i < count; i++) {
-        LCD_WriteReg(0x99, i);
+        LCD_WriteReg(0x99, offset + i);
         I2C1_WriteBufferDMA(0x45, data + i * 27, 0x9A, 27);
     }
     LCD_WriteReg(0x94, 0);

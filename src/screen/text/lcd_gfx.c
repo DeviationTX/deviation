@@ -29,6 +29,21 @@ All text above must be included in any redistribution
 #define LCD_DrawStop()  (void)1
 #define LCD_DrawUSBLogo LCD_DrawUSBLogo
 #define LCD_FillRect    LCD_FilMappedlRect
+
+void LCD_LoadFont(int idx, const char *file, int x_off, int y_off, int w, int h)
+{
+    LCD_SetMappedWindow(idx+4);
+    LCD_DrawWindowedImageFromFile(2, 5, file, 8, 11, x_off, y_off);
+    for (int i = 0; i < 12; i++) {
+        LCD_DrawMappedPixelXY(i, 0, 0xffff);
+        LCD_DrawMappedPixelXY(i, 17, 0xffff);
+    }
+    for (int i = 1; i < 17; i++) {
+        LCD_DrawMappedPixelXY(0, i, 0xffff);
+        LCD_DrawMappedPixelXY(11, i, 0xffff);
+    }
+    LCD_SetMappedWindow(0);
+}
 #include "../320x240x16/lcd_gfx.c"
 #else
 

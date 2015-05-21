@@ -108,10 +108,24 @@ const u8 *char_offset(u32 c, u8 *width)
     *width = (end - begin) / row_bytes;
     return cur_str.font.data + begin;
 }
-
+unsigned window_x, window_y;
+int window_mult;
+u8 font_ram[27 * 202];
+extern u8 font_map[27 * 4 * 6];
+extern u8 window;
+void DrawMappedChar(int pos, u8 *data);
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
     u8 row, col, width;
+    if (c > 0xff) {
+        window_mult = cur_str.font.zoom;
+        window_x = x * 12;
+        window_y = y * 18;
+        LCD_DrawStart(x * CHAR_WIDTH, y * CHAR_HEIGHT, (x+window_mult) * CHAR_WIDTH,  (y+window_mult) * CHAR_HEIGHT, DRAW_NWSE);
+        DrawMappedChar(0, font_ram + (c & 0xff) * 27);
+        LCD_DrawStop();
+        return;
+    }
     c = TW8816_map_char(c);
     int font_size = cur_str.font.zoom;
     const u8 *offset = char_offset(c, &width);
@@ -205,7 +219,6 @@ void LCD_ShowVideo(u8 enable)
 {
     (void) enable;
 }
-unsigned window_x, window_y;
 
 void DrawMappedChar(int pos, u8 *data) {
     int x_off = window_x + ((pos % 6) * 12 * 3);
@@ -216,19 +229,17 @@ void DrawMappedChar(int pos, u8 *data) {
             int bit = 4 * (y & 1) + 3 - (x & 0x3);
             struct rgb c;
             c = (data[byte] & (1 << bit)) ? foreground : background;
-            for (int my = 0; my < 3; my++) {
-                for (int mx = 0; mx < 3; mx++) {
-                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 0] = c.r;
-                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 1] = c.g;
-                    gui.image[3*((IMAGE_X * (y_off +y*3+my)) + x_off + x*3 + mx) + 2] = c.b;
+            for (int my = 0; my < window_mult; my++) {
+                for (int mx = 0; mx < window_mult; mx++) {
+                    gui.image[3*((IMAGE_X * (y_off +y*window_mult+my)) + x_off + x*window_mult + mx) + 0] = c.r;
+                    gui.image[3*((IMAGE_X * (y_off +y*window_mult+my)) + x_off + x*window_mult + mx) + 1] = c.g;
+                    gui.image[3*((IMAGE_X * (y_off +y*window_mult+my)) + x_off + x*window_mult + mx) + 2] = c.b;
                 }
             }
         }
     }
 }
 
-extern u8 font_map[27 * 6* 4];
-extern u8 window;
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
     window_x = x * 12;
@@ -240,13 +251,18 @@ void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, un
 
 void LCD_SetMappedWindow(unsigned val)
 {
-    window = val;
-    if (val == 1) {
+    if (val != 0) {
         memset(font_map, 0, sizeof(font_map));
     } else {
-        for (int i = 0; i < 24; i++) {
-            DrawMappedChar(i, font_map + i * 27);
+        if (window < 4) {
+            window_mult = 3;
+            for (int i = 0; i < 24; i++) {
+                DrawMappedChar(i, font_map + i * 27);
+            }
+        } else {
+            memcpy(font_ram + (window - 4) * 27, font_map, 27);
         }
     }
+    window = val;
 }
 

@@ -13,56 +13,35 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
+#define SEPARATOR 1
+enum {
+    NUM_COLS      = 8,
+    REVERT_X      = LCD_WIDTH - 50,
+    REVERT_W      = 50,
+    SEPARATOR_X   = 12 + TOGGLEICON_WIDTH,
+    #define ROW_Y   (HEADER_HEIGHT + 5)
+    ROW_INCREMENT = TOGGLEICON_HEIGHT + 2,
+    LABEL_X       = 0,
+    LABEL_W       = 9,
+    LABEL_H       = TOGGLEICON_HEIGHT,
+    ICON_X        = 10,
+    ICON_W        = TOGGLEICON_WIDTH,
+    SCROLLABLE_X  = 22,
+    #define SCROLLABLE_Y (HEADER_HEIGHT + 1)
+    #define SCROLL_ROW_H (TOGGLEICON_HEIGHT + 1)
+    #define SCROLLABLE_H (((LCD_HEIGHT - HEADER_HEIGHT - 2) / SCROLL_ROW_H) * SCROLL_ROW_H)
+};
+
 static struct toggleselect_obj   * const gui = &gui_objs.u.toggleselect;
 static struct toggle_select_page * const tp  = &pagemem.u.toggle_select_page;
 
-static const int NUM_COLS = 8;
-
 #include "../common/_toggle_select.c"
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static s8 current_toggleicon = 0;
-
-static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
-        u8 IconPosition = ((long)data      ) & 0xff;
-        u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
-        Model.pagecfg2.elem[tp->tglidx].extra[IconNumber] = IconPosition;
-        show_iconsel_page(IconNumber);
-    }
-}
-
-static void revert_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
-    show_iconsel_page(0);
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    int idx;
-    if (col == -1) {
-        idx = relrow * NUM_COLS + NUM_COLS -1;
-        if (relrow == 3) {
-            while(! OBJ_IS_USED(&gui->symbolicon[idx]))
-                idx--;
-        }
-    } else {
-        idx = relrow * NUM_COLS + col;
-    }
-    return (guiObject_t *)&gui->symbolicon[idx];
-}
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -89,59 +68,80 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return i;
 }
 
+#endif //OVERRIDE_PLACEMENT
+
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
+static s8 current_toggleicon = 0;
+
+static void revert_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
+    show_iconsel_page(0);
+}
+
+static guiObject_t *getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    int idx;
+    if (col == -1) {
+        idx = relrow * NUM_COLS + NUM_COLS -1;
+        if (relrow == 3) {
+            while(! OBJ_IS_USED(&gui->symbolicon[idx]))
+                idx--;
+        }
+    } else {
+        idx = relrow * NUM_COLS + col;
+    }
+    return (guiObject_t *)&gui->symbolicon[idx];
+}
+
 static void show_iconsel_page(int SelectedIcon)
 {
-    struct ImageMap img;
-    u16 w;
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     memset(gui, 0, sizeof(*gui));
     current_toggleicon = SelectedIcon;
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
-    int num_positions = INPUT_NumSwitchPos(toggleinput);
-    if(num_positions < 2)
-        num_positions = 2;
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
     labelDesc.style = LABEL_CENTER;
-    w = 50;
-    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
 
+#if SEPARATOR
+    GUI_CreateRect(&gui->separator, SEPARATOR_X, HEADER_WIDGET_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &labelDesc);
+#endif
+
+    int row = ROW_Y;
+    int num_positions = INPUT_NumSwitchPos(toggleinput);
+    if(num_positions < 2)
+        num_positions = 2;
+
+    static const char * const tglidx[3] = {"0:", "1:", "2:"};
     labelDesc.style = LABEL_INVERTED;
-
-    GUI_CreateRect(&gui->separator, 12 + TOGGLEICON_WIDTH, HEADER_WIDGET_HEIGHT, 1, LCD_HEIGHT-HEADER_HEIGHT, &labelDesc);
-
-    int row = HEADER_HEIGHT + 5;
-    GUI_CreateLabelBox(&gui->togglelabel[0], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 0 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "0:");
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[0]);
-    GUI_CreateImageOffset(&gui->toggleicon[0], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
+    for (int i = 0; i < num_positions; i++) {
+        GUI_CreateLabelBox(&gui->togglelabel[i], LABEL_X, row, LABEL_W, LABEL_H, SelectedIcon == i ? &labelDesc : &DEFAULT_FONT, NULL, NULL, tglidx[i]);
+#ifdef HAS_CHAR_ICONS
+        GUI_CreateLabelBox(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, &DEFAULT_FONT, TGLICO_font_cb,
+                           NULL, (void *)(long)Model.pagecfg2.elem[tp->tglidx].extra[i]); 
+#else
+        struct ImageMap img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[i]);
+        GUI_CreateImageOffset(&gui->toggleicon[i], ICON_X, row, ICON_W, LABEL_H, img.x_off, img.y_off, img.file,
              NULL, //SelectedIcon == 0 ? tglico_reset_cb : tglico_setpos_cb,
-             (void *)0L);
+             (void *)(long)i);
+#endif
 
-    row += TOGGLEICON_HEIGHT + 2;
-    GUI_CreateLabelBox(&gui->togglelabel[1], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 1 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "1:");
-    img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[1]);
-    GUI_CreateImageOffset(&gui->toggleicon[1], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             NULL, //SelectedIcon == 1 ? tglico_reset_cb : tglico_setpos_cb,
-             (void *)1L);
-
-    if (num_positions == 3) {
-        row += TOGGLEICON_HEIGHT + 2;
-        GUI_CreateLabelBox(&gui->togglelabel[2], 0, row, 9, TOGGLEICON_HEIGHT, SelectedIcon == 2 ? &labelDesc : &DEFAULT_FONT, NULL, NULL, "2:");
-        img = TGLICO_GetImage(Model.pagecfg2.elem[tp->tglidx].extra[2]);
-        GUI_CreateImageOffset(&gui->toggleicon[2], 10, row, TOGGLEICON_WIDTH, TOGGLEICON_HEIGHT, img.x_off, img.y_off, img.file,
-             NULL, //SelectedIcon == 2 ? tglico_reset_cb : tglico_setpos_cb,
-             (void *)2L);
+        row += ROW_INCREMENT;
     }
 
     int count = get_toggle_icon_count();
     int rows = (count + NUM_COLS - 1) / NUM_COLS;
-    int visible_toggle_rows = (LCD_HEIGHT - HEADER_HEIGHT - 2) / (TOGGLEICON_HEIGHT + 1);
-    GUI_CreateScrollable(&gui->scrollable, 22, HEADER_HEIGHT + 1, LCD_WIDTH - 22, visible_toggle_rows * (TOGGLEICON_HEIGHT + 1),
-                     TOGGLEICON_HEIGHT + 1, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
-    //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Model.pagecfg.tglico[tp->tglidx][SelectedIcon]));
+    GUI_CreateScrollable(&gui->scrollable, SCROLLABLE_X, SCROLLABLE_Y, LCD_WIDTH - SCROLLABLE_X,
+                     SCROLLABLE_H,
+                     SCROLL_ROW_H, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
 }
 
 static void navigate_toggleicons(s8 direction) {

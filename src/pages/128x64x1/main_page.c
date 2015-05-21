@@ -22,6 +22,7 @@
 #include "telemetry.h"
 
 #ifndef OVERRIDE_PLACEMENT
+#define TGLICO_LoadFonts() (void)1
 enum {
      VTRIM_W      =  4,
      VTRIM_H      = 49,
@@ -62,6 +63,7 @@ void PAGE_MainInit(int page)
 {
     (void)page;
     (void)bar_cb;
+    TGLICO_LoadFonts();
     memset(mp, 0, sizeof(struct main_page));// Bug fix: must initialize this structure to avoid unpredictable issues in the PAGE_MainEvent
     memset(gui, 0, sizeof(struct mainpage_obj));
     PAGE_SetModal(0);

@@ -58,8 +58,8 @@ struct toggleselect_obj {
     guiLabel_t   switchbox;
     guiLabel_t   togglelabel[3];
     guiRect_t    separator;
-    guiImage_t   toggleicon[3];
-    guiImage_t   symbolicon[32];
+    guiLabel_t   toggleicon[3];
+    guiLabel_t   symbolicon[35];
     guiRect_t    symbolframe;
     guiScrollable_t scrollable;
 };
