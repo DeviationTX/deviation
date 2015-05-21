@@ -45,7 +45,7 @@ void LCD_LoadFont(int idx, const char *file, int x_off, int y_off, int w, int h)
     LCD_SetMappedWindow(0);
 }
 #include "../320x240x16/lcd_gfx.c"
-#else
+#else //MAPPED_GFX
 
 void LCD_DrawFastVLine(int16_t x, int16_t y, 
                  int16_t h, uint16_t color) {
@@ -203,7 +203,7 @@ void LCD_DrawRLE(const u8 *data, int len, u32 color)
   (void) len;
   (void) color;
 }
-#endif
+#endif //MAPPED_GFX
 
 #undef LCD_FillRect
 void LCD_FillRect(u16 x, u16 y, u16 w, u16 h, u16 color)

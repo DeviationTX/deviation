@@ -70,7 +70,6 @@ void LCD_Clear(unsigned int color) {
             gui.image[i+1] = background.g;
             gui.image[i+2] = background.b;
         }
-
 }
 
 /*
@@ -248,7 +247,10 @@ void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, un
     (void)w;
     (void)h;
 }
-
+void LCD_UnmapWindow(unsigned val)
+{
+    (void)val;
+}
 void LCD_SetMappedWindow(unsigned val)
 {
     if (val != 0) {

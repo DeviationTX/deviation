@@ -400,7 +400,13 @@ extern u8 font_map[27 * 6* 4];
 extern u8 window;
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
+    val = val == 1 ? 0 : 1;
     TW8816_CreateMappedWindow(val, x, y, w, h);
+}
+void LCD_UnmapWindow(unsigned i)
+{
+    i = i == 1 ? 0 : 1;
+    TW8816_UnmapWindow(i);
 }
 void LCD_SetMappedWindow(unsigned val)
 {
@@ -409,12 +415,12 @@ void LCD_SetMappedWindow(unsigned val)
         memset(font_map, 0, sizeof(font_map));
     } else {
         if (window < 4) {
-            TW8816_LoadFont(font_map, 0, 6 * 4);
+            TW8816_LoadFont(font_map, 200, 6 * 4);
             for (int i = 0; i < 24; i++) {
-                TW8816_DisplayCharacter(i, 0x100 + i, 7);
+                TW8816_DisplayCharacter(i, 0x100 + 200 + i, 7);
             }
         } else {
-            TW8816_LoadFont(font_map, window, 1);
+            TW8816_LoadFont(font_map, window-4, 1);
         }
         TW8816_SetWindow(1);
     }

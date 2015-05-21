@@ -62,6 +62,7 @@ void LCD_Contrast(unsigned contrast);
 void LCD_ForceUpdate();
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
 void LCD_SetMappedWindow(unsigned val);
+void LCD_UnmapWindow(unsigned val);
 unsigned LCD_GetMappedWindow();
 void LCD_LoadFont(int idx, const char *file, int x_off, int y_off, int w, int h);
 

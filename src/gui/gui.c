@@ -17,6 +17,7 @@
 #include "gui.h"
 #include "target_defs.h"
 #include "config/display.h"
+#include "_mapped_gfx.h"
 
 struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
@@ -120,6 +121,10 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Listbox:
         BUTTON_UnregisterCallback(&((guiListbox_t *)obj)->action);
+        break;
+    case Image:
+    case XYGraph:
+        _GUI_UnmapWindow(1);
         break;
     default: break;
     }

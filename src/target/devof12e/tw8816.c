@@ -618,85 +618,6 @@ void TW8816_ReinitPixelClock()
     LCD_WriteReg(0xB6, 0x34);
 }
 
-void TW8816_Test()
-{
-    unsigned cols = 10;
-    unsigned rows = 7;
-    const char str[] = "0123456789012345678901234567890123456789";
-    printf("Begin\n");
-  LCD_WriteReg(0xFF, 0);
-  LCD_WriteReg(0x94, 2);
-
-    LCD_WriteReg(0x9e, 0x01);
-    LCD_WriteReg(0x9f, 0x01);
-    LCD_WriteReg(0xa0, 0x00);
-    LCD_WriteReg(0xa1, 0x00);
-    LCD_WriteReg(0xa2, 0x00);
-    LCD_WriteReg(0xa6, 0x00);
-    LCD_WriteReg(0xa7, 0x00);
-    LCD_WriteReg(0xa3, cols);
-    LCD_WriteReg(0xa4, rows);
-    LCD_WriteReg(0xAC, 0x00);
-
-    LCD_WriteReg(0x9e, 0x00);
-    LCD_WriteReg(0x9f, 0x01);
-    LCD_WriteReg(0xa0, (564 >> 8));
-    LCD_WriteReg(0xa1, 0xff & 564); //564
-    LCD_WriteReg(0xa2, 126); //126
-    LCD_WriteReg(0xa3, 6);
-    LCD_WriteReg(0xa4, 4);
-    LCD_WriteReg(0xa5, 6);
-    LCD_WriteReg(0xa6, 0x00);
-    LCD_WriteReg(0xa7, 0x00);
-    LCD_WriteReg(0xa8, 0x00);
-    LCD_WriteReg(0xa9, 0xA1);
-    LCD_WriteReg(0xaa, 0xAE);
-    LCD_WriteReg(0xAB,  0x12);
-    LCD_WriteReg(0xAC,   0x00);
-    LCD_WriteReg(0xAD,     0);
-    LCD_WriteReg(0xAE,     0);
-for (int j = 0; j < rows; j++) {
-    for (unsigned i = 0; i < cols; i++) {
-        TW8816_DisplayCharacter(cols*j+i, str[i], i % 6 + 1);
-    };
-}
-
-    LCD_WriteReg(0x9e, 0x00);
-    LCD_WriteReg(0x9f, 0x01);
-    LCD_WriteReg(0xa0, 0x00);
-    LCD_WriteReg(0xa1, 0x00);
-    LCD_WriteReg(0xa2, 0x00);
-    LCD_WriteReg(0xa3, 5);
-    LCD_WriteReg(0xa4, 2);
-    LCD_WriteReg(0xa5, 6);
-    LCD_WriteReg(0xa6, 0x00);
-    LCD_WriteReg(0xa7, 0x00);
-    LCD_WriteReg(0xa8, 0x00);
-    LCD_WriteReg(0xa9, 0xA1);
-    LCD_WriteReg(0xaa, 0xf4);
-    LCD_WriteReg(0xAB,  0x12);
-    LCD_WriteReg(0xAC,   0x00);
-    LCD_WriteReg(0xAD,     0);
-    LCD_WriteReg(0xAE,     0);
-
-for (int j = 0; j < 2; j++) {
-    for (unsigned i = 0; i < 5; i++) {
-        TW8816_DisplayCharacter(500+5*j+i, str[i], i % 6 + 1);
-    };
-}
-
-/*
-    while(1) {
-        for(int i = 0; i < 256; i ++) {
-            TW8816_DisplayCharacter(0, 'H', i);
-            if(PWR_CheckPowerSwitch()) PWR_Shutdown();
-            _msleep(50);
-        }
-    }
- */           
-    printf("End\n");
-}
-
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)
 {
     if (window == 1)
@@ -710,26 +631,27 @@ void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr)
 
 void TW8816_ClearDisplay()
 {
-    TW8816_CreateMappedWindow(0, 0, 0, 0);
     LCD_WriteReg(0x94, 2);
 }
 
 void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
     TW8816_SetWindow(val);
-    if (w == 0 && h == 0) {
-        LCD_WriteReg(0x9f, 0x00);
-    } else {
-        LCD_WriteReg(0x9f, 0x01);
-        x *= 12;
-        y *= 18;
-        LCD_WriteReg(0xa0, (y >> 8) | (x >> 8));
-        LCD_WriteReg(0xa1, 0xff & x);
-        LCD_WriteReg(0xa2, 0xff & y);
-    }   
+    LCD_WriteReg(0x9f, 0x01);
+    x *= 12;
+    y *= 18;
+    LCD_WriteReg(0xa0, (0x30 & (y >> 4)) | (0x07 & (x >> 8)));
+    LCD_WriteReg(0xa1, 0xff & x);
+    LCD_WriteReg(0xa2, 0xff & y);
     TW8816_SetWindow(window);
-    
 }
-void TW8816_SetWindow(int i) {
+
+void TW8816_SetWindow(unsigned i) {
     LCD_WriteReg(0x9e, i);
+}
+void TW8816_UnmapWindow(unsigned i)
+{
+    TW8816_SetWindow(i);
+    LCD_WriteReg(0x9f, 0x00);
+    TW8816_SetWindow(window);
 }

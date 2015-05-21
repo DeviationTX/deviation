@@ -14,7 +14,9 @@ void TW8816_SetVideoMode(unsigned enable);
 void TW8816_ReinitPixelClock();
 void TW8816_DisplayCharacter(unsigned pos, unsigned chr, unsigned attr);
 void TW8816_ClearDisplay();
-void TW8816_SetWindow(int i);
+void TW8816_SetWindow(unsigned i);
+void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
+void TW8816_UnmapWindow(unsigned i);
 u32 TW8816_map_char(u32);
 
 

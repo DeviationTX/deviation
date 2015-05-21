@@ -56,7 +56,6 @@ void GUI_DrawImage(struct guiObject *obj)
 #define SELECT_BORDER_OFFSET 1
     struct guiImage *image = (struct guiImage *)obj;
     struct guiBox *box = &obj->box;
-
     _GUI_DrawMappedStart();
     //  clear the whole widget, including its selected border for devo10/7e
     if (LCD_DEPTH == 1)
