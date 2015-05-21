@@ -23,7 +23,7 @@
 #include "../common/_model_loadsave.c"
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static void _press_cb(guiObject_t *obj, u16 selected, void *data);
+static void _press_cb(guiObject_t *obj, u16 selected, void *data) _UNUSED;
 
 static u8 load_save;
 
@@ -40,6 +40,7 @@ static void _show_buttons(int loadsave)
     //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
 }
 
+static const char *iconstr_cb(guiObject_t *obj, int dir, void *data) _UNUSED;
 static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -51,6 +52,7 @@ static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)
     return string_cb(mp->selected-1, (void *)LOAD_ICON);
 }
 
+static void iconpress_cb(guiObject_t *obj, void *data) _UNUSED;
 static void iconpress_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -83,6 +85,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 }
 static void _show_list(int loadsave,u8 num_models)
 {
+    (void) loadsave;
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
                          ITEM_SPACE, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, mp->selected-1));

@@ -60,6 +60,8 @@ guiObject_t *GUI_CreateDialog(guiDialog_t *dialog, u16 x, u16 y, u16 width, u16 
     struct guiObject *but = NULL;
     int button_width  = GUI_ButtonWidth(DIALOG_BUTTON);
     int button_height = GUI_ButtonHeight(DIALOG_BUTTON);
+    (void)button_width;
+    (void)button_height;
     switch (dgType) {
     case dtOk:
     case dtCancel:

@@ -409,15 +409,15 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
     LCD_DrawStart(x, y, x + w - 1, y + h -1, DRAW_NWSE);
     unsigned bytes = (img_w + 7) / 8;
     for (unsigned i = 0; i < y_off; i++) {
-        read(buf, bytes, 1, fh);
+        fread(buf, bytes, 1, fh);
     }
-    for (unsigned i = 0; i < h; i++) {
+    for (int i = 0; i < h; i++) {
         int ret = fread(buf, bytes, 1, fh);
         if (ret != 1) {
             //printf("DEBUG: LCD_DrawWindowedImageFromFile: Buffer read issue? (%s, %d, %d)\n", file, ret, i);
             break;
         }
-        for (unsigned j = 0; j < w; j++) {
+        for (int j = 0; j < w; j++) {
             unsigned val = buf[(j + x_off) / 8] & (1 << (7 - ((j + x_off) % 8)));
             LCD_DrawPixelXY(x+j, y+i, val ? 0xffff : 0x0000);
         }

@@ -18,7 +18,10 @@
 #include "gui/gui.h"
 #include "config/model.h"
 
+
 #include "../common/_chantest_page.c"
+
+static s32 showchan_cb(void *data)                                _UNUSED;
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_channum_cb(guiObject_t *obj, const void *data);
@@ -68,7 +71,6 @@ static void _show_bar_page(int row)
 
 void PAGE_ChantestInit(int page)
 {
-    (void)channum_cb; // remove compile warning as this method is not used here
     (void)okcancel_cb;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);

@@ -32,6 +32,8 @@ All text above must be included in any redistribution
 
 void LCD_LoadFont(int idx, const char *file, int x_off, int y_off, int w, int h)
 {
+    (void)w;
+    (void)h;
     LCD_SetMappedWindow(idx+4);
     LCD_DrawWindowedImageFromFile(2, 5, file, 8, 11, x_off, y_off);
     for (int i = 0; i < 12; i++) {
@@ -229,7 +231,7 @@ void LCD_DrawUSBLogo(int lcd_width, int lcd_height)
   u16 width, height;
   LCD_SetFont(2);
   LCD_SetFontColor(0xffff);
-  LCD_GetStringDimensions(_tr("Deviation\n   USB"), &width, &height);
+  LCD_GetStringDimensions((u8 *)_tr("Deviation\n   USB"), &width, &height);
   printf("(%d, %d)- > (%d, %d)", lcd_width, lcd_height, width, height);
   LCD_PrintStringXY((lcd_width - width)/2, lcd_height/2-1, _tr("Deviation\n   USB"));
 }

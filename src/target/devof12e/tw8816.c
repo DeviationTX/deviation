@@ -636,6 +636,8 @@ void TW8816_ClearDisplay()
 
 void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h)
 {
+    (void)w;
+    (void)h;
     TW8816_SetWindow(val);
     LCD_WriteReg(0x9f, 0x01);
     x *= 12;

@@ -211,6 +211,7 @@ u8 LCD_SetFont(unsigned int idx)
 
 u8 FONT_GetFromString(const char *value)
 {
+    (void)value;
     return 1;
 }
 
@@ -243,6 +244,7 @@ void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, un
 {
     window_x = x * 12;
     window_y = y * 18;
+    (void)val;
     (void)y;
     (void)w;
     (void)h;

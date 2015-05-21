@@ -22,6 +22,7 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_page_cb(guiObject_t *obj, const void *data);
+static const char *channum_cb(guiObject_t *obj, const void *data);
 
 static void draw_chan(int disp, int row, int y)
 {

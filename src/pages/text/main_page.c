@@ -22,8 +22,8 @@
 #include "telemetry.h"
 
 #define OVERRIDE_PLACEMENT
-extern char *TGLICO_font_cb(guiObject_t *obj, const void *data);
-#define HAS_CHAR_ICONS
+extern const char *TGLICO_font_cb(guiObject_t *obj, const void *data);
+extern void TGLICO_LoadFonts();
 
 #if LCD_WIDTH == 66
 //devof12e

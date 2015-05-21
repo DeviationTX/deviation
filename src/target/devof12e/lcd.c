@@ -375,11 +375,13 @@ struct font_str cur_str;
 
 u8 LCD_SetFont(unsigned int idx)
 {
+    (void)idx;
     cur_str.font = default_font;
     return 1;
 }
 u8 FONT_GetFromString(const char *value)
 {
+    (void)value;
     return 1;
 }
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)

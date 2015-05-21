@@ -16,7 +16,6 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s32 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
-static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx(int chan);
@@ -93,6 +92,7 @@ void PAGE_ChantestExit()
 {
     BUTTON_UnregisterCallback(&cp->action);
 }
+
 static s32 showchan_cb(void *data)
 {
     long ch = (long)data;
