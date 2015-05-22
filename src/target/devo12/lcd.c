@@ -28,7 +28,11 @@
 #define CS_HI() gpio_set(GPIOB, GPIO1)
 #define CS_LO() gpio_clear(GPIOB, GPIO1)
 
-#define TRANSPARENT 0xFEFEFE
+//See this thread: http://www.deviationtx.com/forum/6-general-discussions/4278-please-help-devo-12s-fonts-is-out-of-wack
+//The new Devo12 uses a different rev of the Epson chip, which doesn't like our transparency value
+//Note that the new value could be accidently triggered by a bad color choice since it is in the 15bit colorspace
+//#define TRANSPARENT 0xFEFEFE
+#define TRANSPARENT 0xA850A8 //FIXME
 static u8 invert;
 static u16 xpos, ypos, xstart, xend;
 
