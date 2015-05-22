@@ -112,6 +112,9 @@ void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}
 void VIBRATINGMOTOR() {}
 
+void VIDEO_SetChannel(int ch) {printf("Video Channel: %d\n", ch); }
+void VIDEO_Enable(int on)     {printf("Video Enable: %s\n", on ? "On" : "Off"); }
+
 void PPMin_Start() {}
 void PPMin_Stop() {}
 void PPMin_TIM_Init() {}

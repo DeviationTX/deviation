@@ -108,6 +108,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("PPM In");
             ts_tgl = ppmin_press_cb; ts_value = ppmin_select_cb;
             break;
+#if HAS_VIDEO
+        case ITEM_VIDEO:
+            label = _tr_noop("Video");
+            but_data = _tr_noop("Setup"); but_tgl = video_settings_cb;
+            break;
+#endif
         case ITEM_PROTO:
             ts_tgl = proto_press_cb; ts_value = protoselect_cb; ts_x = LEFT_TEXTSEL_X;
             but_txt = show_bindtext_cb; but_tgl = bind_cb;
@@ -135,7 +141,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_tgl, ts_value, NULL);
         count++;
     }
-    if (but_txt) {
+    if (but_tgl) {
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, BUTTON_X, y,
             BUTTON_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_tgl, but_data);
         count++;

@@ -48,6 +48,8 @@ const char *MODEL_MIXERMODE = "mixermode";
 static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
+static const char RADIO_VIDEOSRC[] = "videosrc";
+static const char RADIO_VIDEOCH[]  = "videoch";
 #define RADIO_PROTOCOL_VAL ProtocolNames
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
@@ -489,7 +491,11 @@ static const struct struct_map _secnone[] =
 };
 static const struct struct_map _secradio[] = {
     {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
-    {RADIO_FIXED_ID, OFFSET(Model, fixed_id), 0},
+    {RADIO_FIXED_ID,     OFFSET(Model, fixed_id), 0},
+#if HAS_VIDEO
+    {RADIO_VIDEOSRC,     OFFSET_SRC(Model, videosrc), 0},
+    {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
+#endif
 };
 static const struct struct_map _secmixer[] = {
     {MIXER_SWITCH, OFFSET_SRC(Model.mixers[0], sw), 0},

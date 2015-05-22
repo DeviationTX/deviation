@@ -115,17 +115,6 @@ int DATALOG_GetSize(u8 *src)
     return size;
 }
 
-s32 _get_src_value(int idx, u32 opts)
-{
-    s32 val;
-    if (idx <= NUM_INPUTS || idx > NUM_INPUTS + NUM_CHANNELS /*PPM*/) {
-        volatile s32 *raw = MIXER_GetInputs();
-        val = raw[idx];
-    } else {
-        val = MIXER_GetChannel(idx - NUM_INPUTS - 1, opts);
-    }
-    return val;
-}
 long _find_fpos() {
     dlog_pos = 0;
     int size = 1;
@@ -181,17 +170,6 @@ void _write_header() {
     dlog_pos += 3 + sizeof(Model.datalog.source);
 }
 
-int DATALOG_IsEnabled()
-{
-    if(! Model.datalog.enable)
-        return 0;
-    unsigned src = Model.datalog.enable;
-    s32 val = _get_src_value(MIXER_SRC(src), APPLY_SAFETY);
-    if (MIXER_SRC_IS_INV(src))
-        val = -val;
-    return (val - CHAN_MIN_VALUE > (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 20) ? 1 : 0;
-}
-
 void DATALOG_Write()
 {
     _write_8(0xff);
@@ -213,7 +191,7 @@ void DATALOG_Write()
             _write_32(Telemetry.gps.latitude);
             _write_32(Telemetry.gps.longitude);
         } else if(i >= DLOG_INPUTS) {
-            s32 val = _get_src_value(i - DLOG_INPUTS + 1, APPLY_SAFETY | APPLY_SCALAR);
+            s32 val = MIXER_GetSourceVal(i - DLOG_INPUTS + 1, APPLY_SAFETY | APPLY_SCALAR);
             val = RANGE_TO_PCT(val);
             if (val > 127)
                 val = 127;
@@ -232,7 +210,7 @@ void DATALOG_Update()
 {
     if (! fh)
         return;
-    if(DATALOG_IsEnabled() && ((int)dlog_size - ftell(fh) >= data_size)) {
+    if(MIXER_SourceAsBoolean(Model.datalog.enable) && ((int)dlog_size - ftell(fh) >= data_size)) {
         u32 time = CLOCK_getms();
         if(time >= next_update) {
             if (need_header_update)

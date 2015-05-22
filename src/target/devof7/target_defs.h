@@ -36,6 +36,7 @@
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_MAPPED_GFX      0
 #define HAS_CHAR_ICONS      1
+#define HAS_VIDEO           1
 
 #define NO_LANGUAGE_SUPPORT 1
 

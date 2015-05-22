@@ -81,6 +81,8 @@ void LCD_DrawStop(void);
 void LCD_DrawMappedStop(void);
 void LCD_ShowVideo(u8 enable);
 
+void VIDEO_SetChannel(int ch);
+void VIDEO_Enable(int on);
 /* Touchscreen */
 struct touch {
     u16 x;

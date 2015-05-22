@@ -349,6 +349,17 @@ void LCD_Init()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPBEN);
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN, GPIO6 | GPIO7);
+
+
+    //Video channel bits 2:0 and av on/off
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
+    gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
+              GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
+    gpio_clear(GPIOE, GPIO8 | GPIO9 | GPIO10 | GPIO11);
+    //Video channel bit 3
+    gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
+              GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
+    gpio_clear(GPIOD, GPIO10);
     TW8816_Reset();
     TW8816_Init();
     //TW8816_Test();
@@ -427,5 +438,37 @@ void LCD_SetMappedWindow(unsigned val)
         TW8816_SetWindow(1);
     }
     window = val;
+}
+
+void VIDEO_SetChannel(int ch)
+{
+    if(ch & 0x01)
+        gpio_set(GPIOE, GPIO8);
+    else
+        gpio_clear(GPIOE, GPIO8);
+
+    if(ch & 0x02)
+        gpio_set(GPIOE, GPIO9);
+    else
+        gpio_clear(GPIOE, GPIO9);
+
+    if(ch & 0x04)
+        gpio_set(GPIOE, GPIO10);
+    else
+        gpio_clear(GPIOE, GPIO10);
+
+    if(ch & 0x08)
+        gpio_set(GPIOD, GPIO10);
+    else
+        gpio_clear(GPIOD, GPIO10);
+}
+
+void VIDEO_Enable(int on)
+{
+    if(on) {
+        gpio_set(GPIOE, GPIO11);
+    } else {
+        gpio_clear(GPIOE, GPIO11);
+    }
 }
 

@@ -179,3 +179,20 @@ const char *input_chname_cb(guiObject_t *obj, const void *data)
     snprintf(tempstring, sizeof(tempstring), _tr("PPM%d"), idx+1);
     return tempstring;
 }
+
+#if HAS_VIDEO
+const char *set_videoch_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.videoch;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, 0, 15, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_SetChannel(value);
+        Model.videoch = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
+#endif //HAS_VIDEO

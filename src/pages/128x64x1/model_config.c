@@ -188,6 +188,43 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
             SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
     return 1;
 }
+#if HAS_VIDEO
+static int row4_cb(int absrow, int relrow, int y, void *data)
+{
+    (void)data;
+    void *ts = NULL;
+    void *ts_press = NULL;
+    void *ts_data = NULL;
+    char *label = NULL;
+
+    switch (absrow) {
+    case 0:
+        label = _tr_noop("Video Enable");
+        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.videosrc;
+        break;
+    case 1:
+        label = _tr_noop("Video Channel");
+        ts = set_videoch_cb;
+        break;
+    }
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
+    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
+            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
+    return 1;
+}
+
+void MODELVIDEO_Config()
+{
+    PAGE_SetModal(1);
+    PAGE_SetActionCB(_action_cb);
+    show_titlerow(_tr("Video"));
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, 2, row4_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+}
+
+#endif //HAS_VIDEO
 
 void MODELPROTO_Config()
 {

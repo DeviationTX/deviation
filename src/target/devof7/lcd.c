@@ -324,6 +324,9 @@ void LCD_ShowVideo(u8 enable)
     video_enabled = enable;
 }
 
+void VIDEO_Enable(int on) {}
+void VIDEO_SetChannel(int ch) {}
+
 
 /**
  * Since this is a text based screen some of the LCD string functions are here

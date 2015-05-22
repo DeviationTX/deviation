@@ -32,6 +32,7 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
+void VIDEO_Update();
 void PAGE_Test();
 
 #ifndef DUMP_BOOTLOADER
@@ -223,6 +224,9 @@ void EventLoop()
 #if HAS_DATALOG
         DATALOG_Update();
 #endif
+#if HAS_VIDEO
+        VIDEO_Update();
+#endif
         GUI_RefreshScreen();
     }
 #ifdef TIMING_DEBUG
@@ -266,6 +270,20 @@ void TOUCH_Handler() {
     }
     pen_down_last=pen_down;
 }
+
+#if HAS_VIDEO
+void VIDEO_Update()
+{
+    static u8 video_enable = 0;
+    //FIXME This is just like DATALOG_IsEnabled
+    int enabled = MIXER_SourceAsBoolean(Model.videosrc);
+
+    if (enabled != video_enable) {
+        VIDEO_Enable(enabled);
+        video_enable = enabled;
+    }
+}
+#endif //HAS_VIDEO
 
 #ifdef TIMING_DEBUG
 void debug_timing(u32 type, int startend)
