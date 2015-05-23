@@ -572,7 +572,7 @@ void TW8816_Init()
     LCD_WriteReg(0xa7, 0x00);
     LCD_WriteReg(0xa3, 33);
     LCD_WriteReg(0xa4, 13);
-    LCD_WriteReg(0xAC, 0x00);
+    LCD_WriteReg(0xAC, 0x08);
     LCD_WriteReg(0xA9,  0x50);
     window = 0;
     for(int i = 0; i < 24; i++)

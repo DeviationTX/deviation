@@ -376,7 +376,7 @@ void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
     c = TW8816_map_char(c);
     if (x >= LCD_WIDTH)
         x = LCD_WIDTH-1;
-    u32 pos = ((y*LCD_WIDTH)>>2) + (x>>1);
+    u32 pos = ((y >> 1)*(LCD_WIDTH>>1)) + (x>>1);
     //printf("%02x(%c): %d, %d, %d\n", c, c, x, y, pos);
     TW8816_DisplayCharacter(pos, c, 7);
 }
@@ -406,7 +406,7 @@ void LCD_DrawStop(void)
 }
 void LCD_ShowVideo(u8 enable)
 {
-    (void)enable;
+    TW8816_SetVideoMode(enable);
 }
 
 extern u8 font_map[27 * 6* 4];
@@ -467,8 +467,10 @@ void VIDEO_Enable(int on)
 {
     if(on) {
         gpio_set(GPIOE, GPIO11);
+        LCD_ShowVideo(1);
     } else {
         gpio_clear(GPIOE, GPIO11);
+        LCD_ShowVideo(0);
     }
 }
 
