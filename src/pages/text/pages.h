@@ -3,8 +3,8 @@
 
 #include "../common/_pages.h"
 #include "menus.h"
-#include "guiobj.h"
 #include "lcd_page_props.h"
+#include "guiobj.h"
 
 #define PAGEDEF(id, init, event, exit, name) id,
 enum PageID {

@@ -356,10 +356,10 @@ void LCD_Init()
     gpio_set_mode(GPIOE, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO9 | GPIO10 | GPIO11);
     gpio_clear(GPIOE, GPIO8 | GPIO9 | GPIO10 | GPIO11);
-    //Video channel bit 3
+    //Video channel bit 3, 4
     gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
-              GPIO_CNF_OUTPUT_PUSHPULL, GPIO10);
-    gpio_clear(GPIOD, GPIO10);
+              GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO10);
+    gpio_clear(GPIOD, GPIO8 | GPIO10);
     TW8816_Reset();
     TW8816_Init();
     //TW8816_Test();
@@ -443,24 +443,28 @@ void LCD_SetMappedWindow(unsigned val)
 void VIDEO_SetChannel(int ch)
 {
     if(ch & 0x01)
-        gpio_set(GPIOE, GPIO8);
-    else
         gpio_clear(GPIOE, GPIO8);
+    else
+        gpio_set(GPIOE, GPIO8);
 
     if(ch & 0x02)
-        gpio_set(GPIOE, GPIO9);
-    else
         gpio_clear(GPIOE, GPIO9);
+    else
+        gpio_set(GPIOE, GPIO9);
 
     if(ch & 0x04)
-        gpio_set(GPIOE, GPIO10);
-    else
         gpio_clear(GPIOE, GPIO10);
+    else
+        gpio_set(GPIOE, GPIO10);
 
     if(ch & 0x08)
-        gpio_set(GPIOD, GPIO10);
-    else
         gpio_clear(GPIOD, GPIO10);
+    else
+        gpio_set(GPIOD, GPIO10);
+    if(ch & 0x10)
+        gpio_set(GPIOD, GPIO8);
+    else
+        gpio_clear(GPIOD, GPIO8);
 }
 
 void VIDEO_Enable(int on)

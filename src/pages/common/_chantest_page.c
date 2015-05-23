@@ -78,10 +78,10 @@ void PAGE_ChantestEvent()
                              ? Channels[ch - NUM_INPUTS]
                              : raw[ch + 1]);
         if (v != cp->pctvalue[i]) {
-            guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
+            guiObject_t *obj = _get_obj(i, ITEM_VALUE);
             if (obj) {
                 GUI_Redraw(obj);
-                GUI_Redraw(_get_obj(i, ITEM_VALUE));
+                GUI_Redraw(_get_obj(i, ITEM_GRAPH));
             }
             cp->pctvalue[i] = v;
         }

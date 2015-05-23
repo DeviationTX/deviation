@@ -1,6 +1,6 @@
 #ifndef _GUIOBJ_H_
 #define _GUIOBJ_H_
-#define SCROLLABLE_ROWS (LCD_HEIGHT - 1)
+#define SCROLLABLE_ROWS ((LCD_HEIGHT / LINE_HEIGHT) - 1)
 struct about_obj {
     guiLabel_t label[3];
 };
@@ -10,11 +10,12 @@ struct splash_obj {
     guiLabel_t splash_text;
 };
 
-#define NUM_BARS_PER_ROW    1
+#define NUM_BARS_PER_ROW    2
 struct chantest_obj {
     guiLabel_t title;
-    guiLabel_t chan[16];
-    guiLabel_t value[16];
+    guiLabel_t chan[SCROLLABLE_ROWS*2];
+    guiLabel_t value[SCROLLABLE_ROWS*2];
+    guiBarGraph_t bar[SCROLLABLE_ROWS*2];
     guiLabel_t page;
     guiScrollable_t scrollable;
 };

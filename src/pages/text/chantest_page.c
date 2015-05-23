@@ -13,161 +13,28 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define OVERRIDE_PLACEMENT
+
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
+#define RAW_FONT    DEFAULT_FONT.font
+#define CHAN_FONT   DEFAULT_FONT.font
+enum {
+    LABEL_COL1_X = ITEM_SPACE,
+    LABEL_COL2_X = 15*ITEM_SPACE,
+    LABEL_IDX_W  = 7*ITEM_SPACE,
+    LABEL_CHAN_H = LINE_HEIGHT,
+    RAW_HEIGHT   = LINE_HEIGHT,
+    CHAN_HEIGHT  = LINE_HEIGHT,
+    CHAN_X_OFFSET = 8*ITEM_SPACE,
+    LABEL_CHAN_W = 5*ITEM_SPACE,
+    BAR_W        = 0,
+    BAR_H        = 0,
+    SCROLLABLE_X = 0,
+    ARROW_W      = 2*ITEM_SPACE,
+};
 
-#include "../common/_chantest_page.c"
-
-static s32 showchan_cb(void *data)                                _UNUSED;
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static const char *_channum_cb(guiObject_t *obj, const void *data);
-static const char *_title_cb(guiObject_t *obj, const void *data);
-static const char *_page_cb(guiObject_t *obj, const void *data);
-
-static void draw_chan(long ch, int row, int y)
-{
-    int x = ch%2 ? 13 : 0;
-    int idx = ch%2 ? 2*row + 1 : 2*row;
-
-    GUI_CreateLabelBox(&gui->chan[idx], x, y,
-        0, 0, &DEFAULT_FONT, _channum_cb, NULL, (void *)ch);
-    GUI_CreateLabelBox(&gui->value[idx], x+7, y,
-        4, ITEM_HEIGHT, &DEFAULT_FONT, value_cb, NULL, (void *)ch);
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    switch(col) {
-        case ITEM_GRAPH2:
-        case ITEM_VALUE2: return (guiObject_t *)&gui->value[2*relrow+1];
-        default:          return (guiObject_t *)&gui->value[2*relrow];
-    }
-}
-static int row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void)data;
-    draw_chan(absrow*2, relrow, y);
-    if(absrow*2+1 < cp->num_bars)
-        draw_chan(absrow*2+1, relrow, y);
-    return 0;
-}
-
-static void _show_bar_page(int row)
-{
-    cur_row = row;
-    cp->num_bars = num_disp_bars();
-    memset(cp->pctvalue, 0, sizeof(cp->pctvalue));
-    GUI_CreateLabelBox(&gui->title, 0 , 0, 0, 0, &DEFAULT_FONT, _title_cb, NULL, (void *)NULL);
-
-    GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT * 2, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT,
-                         ITEM_HEIGHT, (cp->num_bars + 1)/2, row_cb, getobj_cb, NULL, NULL);
-    GUI_CreateLabelBox(&gui->page, LCD_WIDTH-(ITEM_SPACE*2), 0, 0, 0, &DEFAULT_FONT, _page_cb, NULL, NULL);
-}
-
-void PAGE_ChantestInit(int page)
-{
-    (void)okcancel_cb;
-    PAGE_SetModal(0);
-    PAGE_SetActionCB(_action_cb);
-    PAGE_RemoveAllObjects();
-    cp->return_page = NULL;
-    if (page > 0)
-        cp->return_val = page;
-    if(cp->type == MONITOR_RAWINPUT )
-        _show_bar_page(NUM_INPUTS);
-    else {
-        cp->type =  MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
-        _show_bar_page(Model.num_channels);
-    }
-}
-
-void PAGE_ChantestModal(void(*return_page)(int page), int page)
-{
-    cp->type = MONITOR_MIXEROUTPUT;
-    PAGE_ChantestInit(page);
-    cp->return_page = return_page;
-    cp->return_val = page;
-}
-
-static void _navigate_pages(s8 direction)
-{
-    if ((direction == -1 && cp->type == MONITOR_RAWINPUT) ||
-            (direction == 1 && cp->type == MONITOR_MIXEROUTPUT)) {
-        cp->type = cp->type == MONITOR_RAWINPUT?MONITOR_MIXEROUTPUT: MONITOR_RAWINPUT;
-        PAGE_ChantestInit(0);
-    }
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            labelDesc.font = DEFAULT_FONT.font;
-            if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
-                PAGE_ChangeByID(PAGEID_TXCFG, -1);
-            else
-                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            _navigate_pages(1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
-            _navigate_pages(-1);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-static const char *_channum_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    long ch = (long)data;
-    if (cp->type == MONITOR_RAWINPUT) {
-       INPUT_SourceName(tempstring, ch+1);
-    } else {
-       sprintf(tempstring, "%d", (int)ch+1);
-    }
-    return tempstring;
-}
-
-static const char *_title_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(tempstring, (const char *)_tr("Stick input"));
-    } else {
-        strcpy(tempstring, (const char *)_tr("Channel output"));
-    }
-    return tempstring;
-}
-
-static const char *_page_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    strcpy(tempstring, (const char *)"->");  //this is actually used as an icon don't translate t
-    if (cp->type == MONITOR_RAWINPUT) {
-        strcpy(tempstring, (const char *)"<-");
-    }
-    return tempstring;
-}
-void _handle_button_test() {}
-
-static inline guiObject_t *_get_obj(int chan, int objid)
-{
-    return GUI_GetScrollableObj(&gui->scrollable, chan / 2, chan % 2 ? objid + 2 : objid);
-}
-
-static inline int _get_input_idx(int chan)
-{
-    return chan;
-}
+#include "../128x64x1/chantest_page.c"
