@@ -58,8 +58,8 @@ s32 CHAN_ReadRawInput(int channel)
 {
     s32 value = 0;
     switch(channel) {
-    case INP_THROTTLE: value = adc_array_raw[0]; break;  // bug fix: right vertical
-    case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
+    case INP_THROTTLE: value = adc_array_raw[1]; break;  // bug fix: right vertical
+    case INP_AILERON:   value = adc_array_raw[0]; break;  // bug fix: right horizon
     case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
     case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
     case INP_AUX4:     value = adc_array_raw[4]; break;
@@ -110,7 +110,7 @@ s32 CHAN_ReadInput(int channel)
     } else {
         value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
-    if (channel == INP_THROTTLE || channel == INP_RUDDER)
+    if (channel == INP_ELEVATOR || channel == INP_AILERON)
         value = -value;
     return value;
 }
