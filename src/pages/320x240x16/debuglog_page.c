@@ -25,12 +25,7 @@ void PAGE_DebuglogInit(int page)
 {
     (void)page;
     const int ROW_HEIGHT = 20;
-#if HAS_STANDARD_GUI
-    if (Model.mixer_mode == MIXER_STANDARD)
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DEBUGLOG), MODELMENU_Show);
-    else
-#endif
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
     find_line_ends();
     GUI_CreateScrollable(&gui->scrollable,
          0, 40, LCD_WIDTH, LCD_HEIGHT - 40, ROW_HEIGHT, NUM_ROWS, row_cb, getobj_cb, NULL, NULL);
