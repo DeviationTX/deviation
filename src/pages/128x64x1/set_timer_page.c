@@ -13,11 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 
+enum {
+    LABEL_X = 75,
+    LABEL_W = LCD_WIDTH - 75,
+    TEXTSEL1_X  = 0,
+    TEXTSEL1_W  = 55,
+    TEXTSEL2_X  = 75,
+    TEXTSEL2_W  = 24,
+};
+#endif //OVERRIDE_PLACEMENT
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
 #include "../common/_set_timer_page.c"
@@ -91,25 +101,23 @@ static void _show_settimer_page(u8 index)
     PAGE_SetActionCB(_action_cb);
 
     u8 space = LINE_HEIGHT;
-    u8 x = 55;
-    u8 xtime = 75;
     u8 y = LINE_HEIGHT; // under headline
     //Row 1
-    GUI_CreateLabelBox(&guiset->oldtime, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
+    GUI_CreateLabelBox(&guiset->oldtime, LABEL_X, y, LABEL_W, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)OLD_TIMER);
 
     //Row 2
     y += space;
-    GUI_CreateTextSelectPlate(&guiset->hms, 0, y, x, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
-    GUI_CreateTextSelectPlate(&guiset->value, xtime, y, 24, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
+    GUI_CreateTextSelectPlate(&guiset->hms, TEXTSEL1_X, y, TEXTSEL1_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_HMS);
+    GUI_CreateTextSelectPlate(&guiset->value, TEXTSEL2_X, y, TEXTSEL2_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, settimer_select_cb, (void *)(long)SELECT_VALUE);
 
     //Row 3
     y += space;
-    GUI_CreateLabelBox(&guiset->addtime, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
-    GUI_CreateTextSelectPlate(&guiset->addset, 0, y , x, LINE_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
+    GUI_CreateLabelBox(&guiset->addtime, LABEL_X, y, LABEL_W, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)ADD_TIMER);
+    GUI_CreateTextSelectPlate(&guiset->addset, TEXTSEL1_X, y , TEXTSEL1_W, LINE_HEIGHT, &DEFAULT_FONT, add_set_button_cb, settimer_select_cb, (void *)(long)ADDSET_SELECT);
     y += space;
 
     //Row 4
-    GUI_CreateLabelBox(&guiset->newvalue, xtime, y, LCD_WIDTH - xtime, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
+    GUI_CreateLabelBox(&guiset->newvalue, LABEL_X, y, LABEL_W, LINE_HEIGHT, &DEFAULT_FONT, timer_value_str_cb, NULL, (void *)(long)NEW_TIMER);
 
 }
 

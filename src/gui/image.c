@@ -18,6 +18,8 @@
 #include "gui.h"
 #include "config/display.h"
 
+#include "_mapped_gfx.h"
+
 guiObject_t *GUI_CreateImageOffset(guiImage_t *image, u16 x, u16 y, u16 width, u16 height, u16 x_off, u16 y_off, const char *file,
     void (*CallBack)(guiObject_t *obj, s8 press_type, const void *data), const void *cb_data)
 {
@@ -44,6 +46,7 @@ guiObject_t *GUI_CreateImageOffset(guiImage_t *image, u16 x, u16 y, u16 width, u
     OBJ_SET_SELECTABLE(obj, CallBack ? 1 :0);
     connect_object(obj);
 
+    _GUI_CreateMappedItem_Helper(obj);
     return obj;
 
 }
@@ -53,7 +56,7 @@ void GUI_DrawImage(struct guiObject *obj)
 #define SELECT_BORDER_OFFSET 1
     struct guiImage *image = (struct guiImage *)obj;
     struct guiBox *box = &obj->box;
-
+    _GUI_DrawMappedStart();
     //  clear the whole widget, including its selected border for devo10/7e
     if (LCD_DEPTH == 1)
         GUI_DrawBackground(box->x -SELECT_BORDER_OFFSET, box->y -SELECT_BORDER_OFFSET,
@@ -66,6 +69,7 @@ void GUI_DrawImage(struct guiObject *obj)
     if (LCD_DEPTH == 1 && GUI_GetSelected() == obj)
         LCD_DrawRect(box->x -SELECT_BORDER_OFFSET, box->y -SELECT_BORDER_OFFSET,
             box->width + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET, box->height + SELECT_BORDER_OFFSET + SELECT_BORDER_OFFSET, 1);
+    _GUI_DrawMappedStop();
 }
 
 

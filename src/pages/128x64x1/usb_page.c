@@ -13,9 +13,18 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
+
+enum {
+    LABEL_X      = 0,
+    LABEL_WIDTH  = LCD_WIDTH,
+    LABEL_Y      = 15,
+    LABEL_HEIGHT = 40,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_usb_page.c"
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
@@ -31,7 +40,7 @@ static void _draw_page(u8 enable)
     snprintf(tempstring, sizeof(tempstring), "%s %s",
             _tr("Press ENT to turn \nUSB drive"),
             enable == 0 ? _tr("On") : _tr("Off"));
-    GUI_CreateLabelBox(&gui->label, 0, 15, LCD_WIDTH, 40, &DEFAULT_FONT, NULL, NULL, tempstring);
+    GUI_CreateLabelBox(&gui->label, LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, &DEFAULT_FONT, NULL, NULL, tempstring);
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)

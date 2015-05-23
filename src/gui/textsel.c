@@ -18,6 +18,8 @@
 #include "gui.h"
 #include "config/display.h"
 
+#include "_textsel.c"
+
 guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
@@ -104,83 +106,10 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 
 void GUI_DrawTextSelect(struct guiObject *obj)
 {
-    u16 x, y, w, h;
-    struct guiBox *box = &obj->box;
     struct guiTextSelect *select = (struct guiTextSelect *)obj;
     //Call the callback 1st in case it calls GUI_TextSelectEnablePress
     const char *str =select->ValueCB(obj, 0, select->cb_data);
-
-    if (select->type != TEXTSELECT_DEVO10) {
-// only used for RTC config in Devo12
-#if HAS_RTC
-        if (select->type == TEXTSELECT_VERT_64) {
-            GUI_DrawImageHelper(box->x,
-                    box->y + ARROW_HEIGHT, select->button, DRAW_NORMAL);
-            if (select->enable & 0x01) {
-                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y, ARROW_UP,
-                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-                GUI_DrawImageHelper(box->x + (box->width - ARROW_WIDTH) / 2, box->y + box->height - ARROW_HEIGHT, ARROW_DOWN,
-                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-            }
-        }
-        else
-#endif
-        {
-            GUI_DrawImageHelper(box->x + ARROW_WIDTH,
-                    box->y, select->button, DRAW_NORMAL);
-            if (select->enable & 0x01) {
-                GUI_DrawImageHelper(box->x, box->y, ARROW_LEFT,
-                        select->state & 0x01 ? DRAW_PRESSED : DRAW_NORMAL);
-                GUI_DrawImageHelper(box->x + box->width - ARROW_WIDTH,
-                        box->y, ARROW_RIGHT,
-                        select->state & 0x02 ? DRAW_PRESSED : DRAW_NORMAL);
-            }
-        }
-        LCD_SetFont(TEXTSEL_FONT.font);
-        LCD_SetFontColor(TEXTSEL_FONT.font_color);
-        LCD_GetStringDimensions((const u8 *)str, &w, &h);
-        x = box->x + (box->width - w) / 2;
-        y = box->y + 1 + (box->height - h) / 2; // one pixel higher (+1) to avoid artifacts
-        LCD_PrintStringXY(x, y, str);
-    } else {   // plate text select for devo 10, copy most behavior from label.c
-        GUI_DrawBackground(box->x, box->y, box->width, box->height);
-        u8 arrow_width = ARROW_WIDTH - 1;
-// only used for RTC config in Devo12
-#if HAS_RTC
-        u8 arrow_height = ARROW_HEIGHT - 1;
-#endif
-        if (select->enable  & 0x01) {
-            u16 y = box->y + obj->box.height / 2;  // Bug fix: since the logic view is introduce, a coordinate could be greater than 10000
-            u16 x1 = box->x + arrow_width -1;
-            LCD_DrawLine(box->x, y, x1, y - 2, 0xffff);
-            LCD_DrawLine(box->x, y, x1, y + 2, 0xffff); //"<"
-            //LCD_DrawFastHLine(box->x, y, ARROW_WIDTH, 0xffff); //"-"
-            x1 = box->x + box->width - arrow_width;
-            u16 x2 = box->x + box->width -1;
-            //LCD_DrawFastHLine(x1, y, ARROW_WIDTH, 0xffff); //"+"
-            //LCD_DrawFastVLine(x1 +1, y-1, ARROW_WIDTH, 0xffff); //"+"
-            LCD_DrawLine(x1, y - 2, x2, y, 0xffff);
-            LCD_DrawLine(x1, y + 2, x2, y, 0xffff); //">"
-        }  else if (select->enable == 2) {  // ENBALBE == 2 means the textsel can be pressed but not be selected
-            select->desc.style = LABEL_BOX;
-        }
-        else {
-            if (!select->enable)  // avoid drawing button box when it is disable
-                select->desc.style = LABEL_CENTER;
-        }
-// only used for RTC config in Devo12
-#if HAS_RTC
-        if (select->type == TEXTSELECT_VERT_64) {
-            GUI_DrawLabelHelper(box->x , box->y + arrow_height, box->width, box->height - 2 * arrow_height,
-                    str, &select->desc, obj == objSELECTED);
-        }
-        else
-#endif
-        {
-            GUI_DrawLabelHelper(box->x + arrow_width , box->y, box->width - 2 * arrow_width , obj->box.height,
-                    str, &select->desc, obj == objSELECTED);
-        }
-    }
+    _DrawTextSelectHelper(select, str);
 }
 
 s32 GUI_TextSelectHelper(s32 value, s32 min, s32 max, s8 dir, u32 shortstep, u32 longstep, u8 *_changed)
@@ -295,11 +224,11 @@ u8 GUI_TouchTextSelect(struct guiObject *obj, struct touch *coords, s8 press_typ
 void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 {
     struct touch coords;
-    coords.y = obj->box.y + 1;
+    coords.y = obj->box.y + KEY_ADJUST_Y;
     if (button == BUT_RIGHT) {
-        coords.x = obj->box.x + obj->box.width + 1 - ARROW_WIDTH;
+        coords.x = obj->box.x + obj->box.width + KEY_ADJUST_X - ARROW_WIDTH;
     } else if(button == BUT_LEFT) {
-        coords.x = obj->box.x + 1;
+        coords.x = obj->box.x + KEY_ADJUST_X;
     } else if(button == BUT_ENTER) {
         coords.x = obj->box.x + (obj->box.width >> 1);
     } else {

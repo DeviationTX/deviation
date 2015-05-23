@@ -42,7 +42,7 @@ void press_cb(guiObject_t *obj, s8 press, const void *data)
     //press = 0  : short press
     //press = 1  : long press
     int absrow = (long)data;
-    if (DATALOG_IsEnabled())
+    if (MIXER_SourceAsBoolean(Model.datalog.enable))
         return;
     if (press == 0) {
         dlog->source[DATALOG_BYTE(absrow)] ^= (1 << DATALOG_POS(absrow));
@@ -66,7 +66,7 @@ static void select_press_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    if (DATALOG_IsEnabled())
+    if (MIXER_SourceAsBoolean(Model.datalog.enable))
         return;
     memset(&dlog->source, data ? 0 : 0xff, sizeof(dlog->source));
     DATALOG_UpdateState();

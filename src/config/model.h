@@ -57,6 +57,10 @@ struct Model {
 #if HAS_DATALOG
     struct datalog datalog;
 #endif
+#if HAS_VIDEO
+    u8 videosrc;
+    u8 videoch;
+#endif
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

@@ -70,6 +70,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 void MODELPAGE_Config();
 void MODELPROTO_Config();
 void MODELTRAIN_Config();
+void MODELVIDEO_Config();
 void MODELPage_Template();
 
 /* RTC */

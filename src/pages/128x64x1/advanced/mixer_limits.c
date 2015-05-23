@@ -12,9 +12,22 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include <stdlib.h>
+enum {
+    TITLE_X  = 0,
+    TITLE_W  = LCD_WIDTH - 51,
+    REVERT_X = LCD_WIDTH - 50,
+    REVERT_W = 50,
+    LABEL_X  = 0,
+    LABEL_W  = 60,
+    TEXTSEL_X = 60,
+    TEXTSEL_W = 60,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../../common/advanced/_mixer_limits.c"
 
@@ -29,11 +42,10 @@ static void _show_titlerow()
     memset(gui, 0, sizeof(*gui));
 
     labelDesc.style = LABEL_UNDERLINE;
-    u8 w = 50;
-    GUI_CreateLabelBox(&gui->title, 0, 0 , LCD_WIDTH, HEADER_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->title, TITLE_X, 0 , TITLE_W, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)(long)mp->channel);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->revert, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
+    GUI_CreateButtonPlateText(&gui->revert, REVERT_X, 0, REVERT_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, revert_cb, (void *)_tr("Revert"));
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -94,9 +106,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y, 60, LINE_HEIGHT, &labelDesc, label_cb, NULL, label);
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, NULL, label);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow], 60, y, 60, LINE_HEIGHT, &labelDesc, tgl, disp, value);
+    GUI_CreateTextSelectPlate(&gui->value[relrow], TEXTSEL_X, y, TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, disp, value);
 
     if(absrow == ITEM_SAFEVAL)
         GUI_TextSelectEnable(&gui->value[relrow], mp->limit.safetysw);

@@ -40,6 +40,22 @@ u16 (*timer_callback)(void);
 volatile u8 msec_callbacks;
 volatile u32 msec_cbtime[NUM_MSEC_CALLBACKS];
 
+void _msleep(u32 msec)
+{
+    u32 final;
+    if (msec < 2) {
+        usleep(1000 * msec);
+    } else {
+        final = msec + msecs;
+        if (final < msec) {
+            while(msec + msecs < final + msec)
+                CLOCK_ResetWatchdog();
+        } else {
+            while(msecs < final)
+                CLOCK_ResetWatchdog();
+        }
+    }
+}
 void CLOCK_Init()
 {
     /* 72MHz / 8 => 9000000 counts per second */

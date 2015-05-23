@@ -4,7 +4,7 @@
 void dump_bootloader()
 {
     u32 *ptr = (u32*)0x08000000;
-    for(int j = 0; j < 3; j++) {
+    for(int j = 0; j < VECTOR_TABLE_LOCATION / 0x1000; j++) {
         printf("\nAddress: 0x%08x\n", (u32)ptr);
         for(int i = 0; i < 0x1000 / 4; i++) {
             u32 b = *ptr;

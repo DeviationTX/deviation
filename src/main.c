@@ -32,6 +32,7 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
+void VIDEO_Update();
 void PAGE_Test();
 
 #ifndef DUMP_BOOTLOADER
@@ -223,6 +224,9 @@ void EventLoop()
 #if HAS_DATALOG
         DATALOG_Update();
 #endif
+#if HAS_VIDEO
+        VIDEO_Update();
+#endif
         GUI_RefreshScreen();
     }
 #ifdef TIMING_DEBUG
@@ -266,6 +270,20 @@ void TOUCH_Handler() {
     }
     pen_down_last=pen_down;
 }
+
+#if HAS_VIDEO
+void VIDEO_Update()
+{
+    static u8 video_enable = 0;
+    //FIXME This is just like DATALOG_IsEnabled
+    int enabled = MIXER_SourceAsBoolean(Model.videosrc);
+
+    if (enabled != video_enable) {
+        VIDEO_Enable(enabled);
+        video_enable = enabled;
+    }
+}
+#endif //HAS_VIDEO
 
 #ifdef TIMING_DEBUG
 void debug_timing(u32 type, int startend)
@@ -324,3 +342,42 @@ void debug_timing(u32 type, int startend)
     }
 }
 #endif
+
+void debug_switches()
+{
+    s32 data[INP_LAST];
+    for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+        data[i] = CHAN_ReadRawInput(i);
+    }
+    while(1) {
+        u32 changed = 0;
+        for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+            s32 val = CHAN_ReadRawInput(i);
+            if (val != data[i]) {
+                printf("%s=%d  ", INPUT_SourceName(tempstring, i), val);
+                data[i] = val;
+                changed = 1;
+            }
+        }
+        if (changed) { printf("\n"); }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}
+void debug_buttons()
+{
+    u32 data = ScanButtons();
+    while(1) {
+        u32 val = ScanButtons();
+        u32 delta = val ^ data;
+        for(int i = 1; i < BUT_LAST; i++) {
+            if(delta & (1 << (i-1))) {
+                printf("%s  ", INPUT_ButtonName(i));
+            }
+        }
+        if (delta) {
+            printf("\n");
+            data = val;
+        }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}

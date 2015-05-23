@@ -26,3 +26,25 @@ const struct ImageMap *_button_image_map(enum ButtonType type)
     }
     return NULL;
 }
+
+void _DrawButton(struct guiObject *obj)
+{
+    struct guiBox *box = &obj->box;
+    const char *txt;
+    u16 x_off, y_off;
+    struct guiButton *button = (struct guiButton *)obj;
+    GUI_DrawImageHelper(box->x, box->y, button->image, obj == objTOUCHED ? DRAW_PRESSED : DRAW_NORMAL);
+    if (button->strCallback) {
+        u16 text_w, text_h;
+        LCD_SetFont(BUTTON_FONT.font); //Set Font here so callback can calculate size
+        txt = button->strCallback(obj, button->cb_data);
+        if (txt) {
+            LCD_GetStringDimensions((u8 *) txt, &text_w, &text_h);
+            x_off = (box->width - text_w) / 2 + box->x;
+            y_off = (box->height - text_h) / 2 + box->y + 1;
+            LCD_SetFontColor(BUTTON_FONT.font_color);
+            LCD_PrintStringXY(x_off, y_off, txt);
+        }
+    }
+}
+

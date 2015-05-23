@@ -12,14 +12,32 @@
  You should have received a copy of the GNU General Public License
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "config/model.h"
 
+enum {
+   TYPE_X     = 40,
+   TYPE_W     = 50,
+   SAVE_X     = LCD_WIDTH - 38,
+   SAVE_W     = 38,
+   LABEL_X    = 0,
+   LABEL_W    = 60,
+   TEXTSEL_X  = 0,
+   TEXTSEL_W  = 60,
+   GRAPH_X    = 77,
+   GRAPH_Y    = LCD_HEIGHT - 48,
+   GRAPH_W    = 48,
+   GRAPH_H    = 48,
+   LEFT_VIEW_WIDTH   = 60,
+   RIGHT_VIEW_HEIGHT = 48,
+   LINES_PER_ROW     = 2,
+   UNDERLINE         = 1,
+};
+#endif //OVERRIDE_PLACEMENT
 #include "../../common/advanced/_mixer_setup.c"
-
-static const int LEFT_VIEW_WIDTH     = 60;
-static const int RIGHT_VIEW_HEIGHT   = 48;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 static void notify_cb(guiObject_t * obj);
@@ -32,14 +50,11 @@ static void _show_titlerow()
 
     labelDesc.style = LABEL_UNDERLINE;
     labelDesc.font_color = labelDesc.fill_color = labelDesc.outline_color = 0xffff;
-    GUI_CreateLabelBox(&gui->chan, 0, 0 , LCD_WIDTH, HEADER_HEIGHT, &labelDesc,
+    GUI_CreateLabelBox(&gui->chan, LABEL_X, 0 , TYPE_X - LABEL_X, HEADER_HEIGHT, &labelDesc,
             MIXPAGE_ChanNameProtoCB, NULL, (void *)((long)mp->cur_mixer->dest));
-    u8 x = 40;
-    u8 w = 50;
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->tmpl, x, 0,  w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
-    w = 38;
-    GUI_CreateButtonPlateText(&gui->save, LCD_WIDTH - w, 0, w, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateTextSelectPlate(&gui->tmpl, TYPE_X, 0,  TYPE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, templatetype_cb, (void *)((long)mp->channel));
+    GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
 }
 
 static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
@@ -76,14 +91,12 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             value = set_number100_cb; data = &mp->mixer[0].offset;
             break;
     }
-    int x = 0;
-    u8 w = LEFT_VIEW_WIDTH;
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + LINE_SPACE,
-            w, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+            TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
     return 1;
 }
 static void _show_simple()
@@ -94,10 +107,10 @@ static void _show_simple()
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH,
-                        left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
+                        left_side_num_elements * LINE_SPACE, LINES_PER_ROW * LINE_SPACE, SIMPLE_LAST, simple_row_cb, simple_getobj_cb, NULL, NULL);
 
     // The following items are not draw in the logical view;
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, touch_cb,
@@ -107,7 +120,7 @@ static void _show_simple()
 
 static int complex_size_cb(int absrow, void *data) {
     (void)data;
-    return (absrow + COMMON_LAST == COMPLEX_TRIM) ? 2 : 1;
+    return (absrow + COMMON_LAST == COMPLEX_TRIM) ? LINES_PER_ROW : 1;
 }
 
 static int complex_row_cb(int absrow, int relrow, int y, void *data)
@@ -116,11 +129,9 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     void *value = NULL;
     data = NULL;
-    int x = 0;
-    int w = LEFT_VIEW_WIDTH;
     if (absrow + COMMON_LAST == COMPLEX_TRIM) {
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            w, LINE_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
+        GUI_CreateButtonPlateText(&gui->value[relrow].but, LABEL_X, y,
+            LABEL_W, LINE_HEIGHT, &labelDesc, show_trim_cb, 0x0000, toggle_trim_cb, NULL);
         if (! MIXER_SourceHasTrim(MIXER_SRC(mp->mixer[0].src)))
             GUI_SetHidden((guiObject_t *)&gui->label[relrow], 1);
         return 1;
@@ -160,11 +171,11 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
     }
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + LINE_SPACE,
-            w, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+            TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     return 1;
@@ -181,12 +192,12 @@ static void _show_complex(int page_change)
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH,
-                        left_side_num_elements * LINE_SPACE, 2 * LINE_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
+                        left_side_num_elements * LINE_SPACE, LINES_PER_ROW * LINE_SPACE, COMPLEX_LAST - COMMON_LAST, complex_row_cb, simple_getobj_cb, complex_size_cb, NULL);
 
     // The following items are not draw in the logical view;
     GUI_CreateBarGraph(&gui->bar, LEFT_VIEW_WIDTH +10, LCD_HEIGHT - RIGHT_VIEW_HEIGHT -1, 5, RIGHT_VIEW_HEIGHT,
                               CHAN_MIN_VALUE, CHAN_MAX_VALUE, BAR_VERTICAL, eval_chan_cb, NULL);
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
                                   CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                                   CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                                   0, 0, eval_mixer_cb, curpos_cb, touch_cb, mp->cur_mixer);
@@ -200,26 +211,38 @@ static void _show_complex(int page_change)
 enum {
     EXPO_SWITCH1 = COMMON_LAST,
     EXPO_LINK1,
-    EXPO_CURVE1,
+//    EXPO_CURVE1,
     EXPO_SCALE1,
     EXPO_SWITCH2,
     EXPO_LINK2,
-    EXPO_CURVE2,
+//    EXPO_CURVE2,
     EXPO_SCALE2,
     EXPO_LAST,
 };
 
+static guiObject_t *expo_getobj_cb(int relrow, int col, void *data)
+{
+    (void)data;
+    (void)col;
+printf("Getobj: 1\n");
+    if (col == 1 || ((guiObject_t *)&gui->label[relrow])->Type == Label) {
+        return (guiObject_t *)&gui->value[relrow];
+    }
+    printf("Getobj: label\n");
+    return (guiObject_t *)&gui->label[relrow];
+}
 static int expo_size_cb(int absrow, void *data)
 {
     (void)data;
+    return LINES_PER_ROW;
     switch(absrow) {
         case EXPO_LINK1:
-        case EXPO_CURVE1:
+//        case EXPO_CURVE1:
         case EXPO_LINK2:
-        case EXPO_CURVE2:
+//        case EXPO_CURVE2:
             return 1;
     }
-    return 2;
+    return LINES_PER_ROW;
 }
 static int expo_row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -232,9 +255,10 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     int but = 0;
     int disable = 0;
     long idx;
+    long butidx;
+    void *buttgl = NULL;
+    void *butdata = NULL;
 
-    int x = 0;
-    int w = LEFT_VIEW_WIDTH;
     switch(absrow) {
         case COMMON_SRC:
             label = _tr("Src");
@@ -252,19 +276,20 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         case EXPO_SWITCH2:
             idx = (absrow == EXPO_SWITCH1) ? 1 : 2;
             label = idx == 1 ? _tr("Switch1") : _tr("Switch2");
-            underline = 1;
+            underline = UNDERLINE;
             tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw;
             break;
         case EXPO_LINK1:
         case EXPO_LINK2:
-            idx = (absrow == EXPO_LINK1) ? 0 : 1;
-            tgl = toggle_link_cb; label_cb = show_rate_cb; data = (void *)idx; but = 1;
-            if(! MIXER_SRC(mp->mixer[idx+1].sw))
+            butidx = (absrow == EXPO_LINK1) ? 0 : 1;
+            buttgl = toggle_link_cb; label_cb = show_rate_cb; butdata = (void *)butidx; but = 1;
+            if(! MIXER_SRC(mp->mixer[butidx+1].sw))
                 disable = 1;
-            break;
-        case EXPO_CURVE1:
-        case EXPO_CURVE2:
-            idx = (absrow == EXPO_CURVE1) ? 1 : 2;
+            idx = butidx+1;
+            //break;
+        //case EXPO_CURVE1:
+        //case EXPO_CURVE2:
+            //idx = (absrow == EXPO_CURVE1) ? 1 : 2;
             tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[idx];
             if(! MIXER_SRC(mp->mixer[idx].sw) || mp->link_curves & idx)
                 disable = 1;
@@ -278,30 +303,31 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
                 disable = 1;
             break;
     }
+    int count = 1;
     if (but) {
         labelDesc.style = LABEL_CENTER;
-        GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            w, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, tgl, data);
+        GUI_CreateButtonPlateText(&gui->label[relrow].but, LABEL_X, y,
+            LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, 0xffff, buttgl, butdata);
         if(disable) {
-            GUI_ButtonEnable((guiObject_t *)&gui->value[relrow].but, 0);
+            GUI_ButtonEnable((guiObject_t *)&gui->label[relrow].but, 0);
         }
-        return 1;
-    }
-    if(label || label_cb) {
+        count++;
+        y += (LINES_PER_ROW - 1) * LINE_SPACE;
+    } else if(label || label_cb) {
         labelDesc.style = LABEL_LEFT;
-        GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
+        GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, label_cb, NULL, label);
         if(underline)
-            GUI_CreateRect(&gui->rect1, x, y , LEFT_VIEW_WIDTH, 1, &labelDesc);
-        y += LINE_SPACE;
+            GUI_CreateRect(&gui->rect1, LABEL_X, y, LABEL_W, 1, &labelDesc);
+        y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-        w, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y,
+        TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
-    return 1;
+    return count;
 }
 
 static void _show_expo_dr()
@@ -312,11 +338,12 @@ static void _show_expo_dr()
     sync_mixers();
 
     int left_side_num_elements = (LCD_HEIGHT - HEADER_HEIGHT) / LINE_SPACE;
+    //left_side_num_elements = ((LINES_PER_ROW - 1) + left_side_num_elements) / LINES_PER_ROW;
     left_side_num_elements = left_side_num_elements - left_side_num_elements%2;
     mp->firstObj = GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LEFT_VIEW_WIDTH + ARROW_WIDTH, 
-                        left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, simple_getobj_cb, expo_size_cb, NULL);
+                        left_side_num_elements * LINE_SPACE, LINE_SPACE, EXPO_LAST, expo_row_cb, expo_getobj_cb, expo_size_cb, NULL);
     
-    GUI_CreateXYGraph(&gui->graph, 77, LCD_HEIGHT - RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT, RIGHT_VIEW_HEIGHT,
+    GUI_CreateXYGraph(&gui->graph, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H,
                               CHAN_MIN_VALUE, CHAN_MIN_VALUE * 5 / 4,
                               CHAN_MAX_VALUE, CHAN_MAX_VALUE * 5 / 4,
                               0, 0, eval_mixer_cb, curpos_cb, NULL, NULL);
@@ -329,7 +356,7 @@ static void _update_rate_widgets(u8 idx)
 {
     u8 mix = idx + 1;
     guiObject_t *link = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_LINK2 : EXPO_LINK1, 0);
-    guiObject_t *curve = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_CURVE2 : EXPO_CURVE1, 0);
+    guiObject_t *curve = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_LINK2 : EXPO_LINK1, 1);
     guiObject_t *scale = GUI_GetScrollableObj(&gui->scrollable, idx ? EXPO_SCALE2 : EXPO_SCALE1, 0);
     if (MIXER_SRC(mp->mixer[mix].sw)) {
         if(link)

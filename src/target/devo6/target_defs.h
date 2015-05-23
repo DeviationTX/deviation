@@ -19,6 +19,7 @@
 #define HAS_SCANNER         0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_EXTRA_SWITCHES  0
+#define HAS_VIDEO           0
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200

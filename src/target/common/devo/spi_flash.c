@@ -164,7 +164,44 @@ void SPIFlash_BulkErase()
 
     WaitForWriteComplete();
 }
+
+#ifdef SPIFLASH_AAI_AF
 /*
+ * Use '0xAF' command to write byte-sized data with auto-increment-address
+ */
+void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
+{
+    u32 i;
+
+    DisableHWRYBY();
+
+    if(!length) return; // just in case...
+
+
+    //printf("SPI write fast mode, length %d\r\n", fast_write_length);
+    WriteFlashWriteEnable();
+
+    SPIFlash_SetAddr(0xAF, writeAddress);
+    spi_xfer(SPI1, ~buffer[0]);
+    CS_HI();
+
+    WaitForWriteComplete();
+
+    for(i=1;i<length;i++)
+    {
+        CS_LO();
+        spi_xfer(SPI1, 0xAF);
+        spi_xfer(SPI1, ~buffer[i]);
+        CS_HI();
+
+        WaitForWriteComplete();
+    }
+    WriteFlashWriteDisable();
+}
+
+#else // ! defined SPIFLASH_AAI_AF
+/*
+ * Use '0xAD' command to write word-sized data with auto-increment-address
  * Length should be multiple of 2
  */
 void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
@@ -224,6 +261,7 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
     }
 
 }
+#endif
 
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
    DisableHWRYBY();

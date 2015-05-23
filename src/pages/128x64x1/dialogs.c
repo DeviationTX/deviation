@@ -13,12 +13,30 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "gui/gui.h"
 #include "pages.h"
 #include "config/model.h"
 #include "config/ini.h"
 
+enum {
+    DIALOG1_X      = 2,
+    DIALOG1_Y      = 5,
+    DIALOG1_WIDTH  = LCD_WIDTH - 4,
+    DIALOG1_HEIGHT = LCD_HEIGHT - 10,
+    //
+    DIALOG2_X      = 2,
+    DIALOG2_Y      = 2,
+    DIALOG2_WIDTH  = LCD_WIDTH - 4,
+    DIALOG2_HEIGHT = LCD_HEIGHT - 4,
+    //
+    DIALOG3_X      = 5,
+    DIALOG3_Y      = 5,
+    DIALOG3_WIDTH  = LCD_WIDTH - 10,
+    DIALOG3_HEIGHT = LCD_HEIGHT - 10,
+};
+#endif //OVERRIDE_PLACEMENT
 #define MAX_CONCURRENT_SAFETY_MSGS 1
 
 #include "../common/_dialogs.c"
@@ -44,7 +62,8 @@ void PAGE_ShowSafetyDialog()
     } else {
         tempstring[0] = 0;
         dialogcrc = 0;
-        dialog = GUI_CreateDialog(&gui->dialog, 2, 5, LCD_WIDTH - 4, LCD_HEIGHT - 10, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
+        dialog = GUI_CreateDialog(&gui->dialog, DIALOG1_X, DIALOG1_Y,
+                 DIALOG1_WIDTH, DIALOG1_HEIGHT, NULL, safety_string_cb, safety_ok_cb, dtOk, NULL);
     }
 }
 
@@ -91,7 +110,8 @@ void PAGE_ShowBindingDialog(u8 update)
     if (dialog && crc != dialogcrc) {
         GUI_Redraw(dialog);
     } else if(! dialog) {
-        dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL, NULL, binding_ok_cb, dtOk, tempstring);
+        dialog = GUI_CreateDialog(&gui->dialog, DIALOG2_X, DIALOG2_Y,
+                     DIALOG2_WIDTH, DIALOG2_HEIGHT, NULL, NULL, binding_ok_cb, dtOk, tempstring);
     }
     dialogcrc = crc;
 }
@@ -103,7 +123,8 @@ void PAGE_ShowWarning(const char *title, const char *str)
         return;
     if (str != tempstring)
         tempstring_cpy(str);
-    dialog = GUI_CreateDialog(&gui->dialog, 5, 5, LCD_WIDTH - 10, LCD_HEIGHT - 10, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
+    dialog = GUI_CreateDialog(&gui->dialog, DIALOG3_X, DIALOG3_Y,
+                 DIALOG3_WIDTH, DIALOG3_HEIGHT, NULL, NULL, lowbatt_ok_cb, dtOk, tempstring);
 }
 
 
@@ -125,7 +146,7 @@ void PAGE_ShowInvalidStandardMixerDialog(void *guiObj)
         return;
 
     tempstring[sizeof(tempstring) - 1] = 0;
-    dialog = GUI_CreateDialog(&gui->dialog, 2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, NULL,
+    dialog = GUI_CreateDialog(&gui->dialog, DIALOG2_X, DIALOG2_Y, DIALOG2_WIDTH, DIALOG2_HEIGHT, NULL,
             invalidstdmixer_string_cb,
             invalid_stdmixer_cb, dtOkCancel, guiObj);
 }
@@ -144,7 +165,8 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data)
     (void)guiObject;
     if (dialog)
         return;
-    dialog = GUI_CreateDialog(&gui->dialog, 2 , 2,  LCD_WIDTH - 4, LCD_HEIGHT - 4 , NULL , reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
+    dialog = GUI_CreateDialog(&gui->dialog, DIALOG2_X, DIALOG2_Y, DIALOG2_WIDTH, DIALOG2_HEIGHT,
+                              NULL, reset_timer_string_cb, reset_permtimer_cb, dtOkCancel, data);
 }
 
 /********************************/

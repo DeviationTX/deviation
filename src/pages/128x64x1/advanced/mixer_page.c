@@ -13,10 +13,21 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "../pages.h"
 #include "config/model.h"
 //#include "icons.h"
+
+enum {
+    COL1_X     = 0,
+    COL1_W     = 35,
+    COL2_X     = 36,
+    COL2_W     = 46,
+    COL3_X     = 85,
+    COL3_W     = 45,
+};
+#endif //OVERRIDE_PLACEMENT
 
 static u16 current_selected = 0;
 #include "../../common/advanced/_mixer_page.c"
@@ -50,9 +61,6 @@ static void _show_page()
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    u8 w1 = 35;
-    u8 w2 = 46;
-    u8 w3 = 45;
     u8 idx;
     struct Mixer *mix = MIXER_GetAllMixers();
 
@@ -62,18 +70,18 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
         labelDesc.style = LABEL_LEFT;
-        GUI_CreateButtonPlateText(&gui->limit[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                 limitselect_cb, (void *)((long)channel));
     } else if(! _is_virt_cyclic(channel)) {
-        GUI_CreateButtonPlateText(&gui->limit[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
+        GUI_CreateButtonPlateText(&gui->limit[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc, MIXPAGE_ChanNameProtoCB, 0,
                 virtname_cb, (void *)((long)channel));
     } else {
-        GUI_CreateLabelBox(&gui->name[relrow], 0, y, w1, LINE_HEIGHT, &labelDesc,
+        GUI_CreateLabelBox(&gui->name[relrow], COL1_X, y, COL1_W, LINE_HEIGHT, &labelDesc,
                 MIXPAGE_ChanNameProtoCB, NULL, (const void *)((long)channel));
         selectable = 1;
     }
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateButtonPlateText(&gui->tmpl[relrow], w1 + 1, y, w2, LINE_HEIGHT , &labelDesc, template_name_cb, 0,
+    GUI_CreateButtonPlateText(&gui->tmpl[relrow], COL2_X, y, COL2_W, LINE_HEIGHT , &labelDesc, template_name_cb, 0,
         templateselect_cb, (void *)((long)channel));
    
     for (idx = 0; idx < NUM_MIXERS; idx++)
@@ -83,7 +91,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         // don't show source if curve type is fixed, works only for the first mix per channel
         if(CURVE_TYPE(&mix[idx].curve) != CURVE_FIXED){
             labelDesc.style = LABEL_LEFT;
-            GUI_CreateLabelBox(&gui->src[relrow], w1 + w2 + 4, y, w3 , LINE_HEIGHT, &labelDesc, show_source, NULL, &mix[idx].src);
+            GUI_CreateLabelBox(&gui->src[relrow], COL3_X, y, COL3_W , LINE_HEIGHT, &labelDesc, show_source, NULL, &mix[idx].src);
         }
     }
     return selectable;

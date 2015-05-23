@@ -30,18 +30,6 @@ extern void PAGE_MainLayoutRestoreDialog(int);
 
 static const struct LabelDesc outline = {0, 0, 0, 0, LABEL_TRANSPARENT};
 
-void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
-        u8 IconPosition = ((long)data      ) & 0xff;
-        u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
-        Model.pagecfg2.elem[tp->tglidx].extra[IconNumber] = IconPosition;
-        show_iconsel_page(IconNumber);
-    }
-}
-
 static void tglico_cancel_cb(guiObject_t *obj, const void *data)
 {
     (void)data;

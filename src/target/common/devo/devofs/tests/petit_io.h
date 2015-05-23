@@ -25,7 +25,6 @@ typedef enum {
 
 DSTATUS disk_initialize (void);
 DRESULT disk_readp (BYTE*, DWORD, WORD, WORD);
-DRESULT disk_readp_cnt (BYTE*, DWORD, WORD, WORD, WORD *);
 DRESULT disk_writep (const BYTE*, DWORD);
 DRESULT disk_writep_rand (const BYTE*, DWORD, WORD, WORD);
 

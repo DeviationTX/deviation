@@ -21,6 +21,7 @@
 #include "../common/_chantest_page.c"
 
 static void show_button_page();
+static const char *channum_cb(guiObject_t *obj, const void *data);
 
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
 {

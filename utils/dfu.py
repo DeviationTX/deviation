@@ -79,10 +79,10 @@ def build(file,targets,options):
   data = ''
   for t,target in enumerate(targets):
     tdata = ''
-    for image in target:
+    for image in target['images']:
       tdata += struct.pack('<2I',image['address'],len(image['data']))
       tdata += encrypt(image['data'],options.crypt)
-    tdata = struct.pack('<6sBI255s2I','Target',options.alt,1,options.name,len(tdata),len(target)) + tdata
+    tdata = struct.pack('<6sBI255s2I','Target',target['alt'],1,options.name,len(tdata),len(target['images'])) + tdata
     data += tdata
   data  = struct.pack('<5sBIB','DfuSe',1,len(data)+11,len(targets)) + data
   v,d=map(lambda x: int(x,0) & 0xFFFF, options.device.split(':',1))
@@ -104,8 +104,8 @@ if __name__=="__main__":
     default=False, help="dump contained images to current directory")
   parser.add_option("-c", "--crypt", action="store", type="int", dest="crypt",
     default=0, help="use scramble offset of 'xx' (6, 7, 8, 10, 12)")
-  parser.add_option("-a", "--alt", action="store", type="int", dest="alt",
-    default=0, help="specifies alternate-seting")
+  parser.add_option("-a", "--alt", action="append", dest="alt",
+    help="specifies alternate-seting")
   parser.add_option("-v", "--version", action="store", type="int", dest="version",
     default=0, help="specifies firmware version")
   parser.add_option("-n", "--name", action="store", dest="name",
@@ -138,7 +138,18 @@ if __name__=="__main__":
     except:
       print "Invalid device '%s'." % options.device
       sys.exit(1)
-    build(outfile,[target],options)
+    if not options.alt:
+        options.alt = ["0"]
+    if len(options.alt) != 1 and len(options.alt) != len(target):
+      print "Number of alt devices (%d) must match number of targets(%d)" % (len(options.alt), len(target))
+      sys.exit(1)
+    targets = []
+    if len(options.alt) == 1: 
+      targets.append({'alt': int(options.alt[0]), 'images' : target})
+    else:
+      for t,image in enumerate(target):
+        targets.append({'alt': int(options.alt[t]), 'images' : [image] })
+    build(outfile,targets,options)
   elif len(args)==1:
     infile = args[0]
     if not os.path.isfile(infile):

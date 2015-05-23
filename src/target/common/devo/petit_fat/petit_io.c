@@ -100,6 +100,14 @@ DRESULT disk_writep_rand (
 	return RES_OK;
 }
 
+DRESULT disk_erasep (
+        DWORD sc
+)
+{
+	drive[_drive_num].EraseSector((sc + drive[_drive_num].SECTOR_OFFSET) * 0x1000);
+        return RES_OK;
+}
+
 DRESULT disk_writep (
 	const BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
 	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
