@@ -95,6 +95,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
     select->enable |= 0x01;
+    select->InputValueCB = NULL;
 
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
