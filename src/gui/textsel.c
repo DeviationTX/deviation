@@ -106,11 +106,11 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 }
 
 
-guiObject_t *GUI_CreateTextSelectInputPlate(guiTextSelect_t *select, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+guiObject_t *GUI_CreateTextSource(guiTextSelect_t *select, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
-        void *cb_data,
-        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data))
+        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data),
+        void *cb_data)
 {
     GUI_CreateTextSelectPlate(select, x, y, width, height, desc, select_cb, value_cb, cb_data);
     select->InputValueCB = input_value_cb;

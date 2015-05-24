@@ -81,9 +81,9 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     switch(absrow) {
         case COMMON_SRC:
-            GUI_CreateTextSelectInputPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                           TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Src"),
-                                           sourceselect_cb, set_source_cb, &mp->mixer[0].src, set_input_source_cb);
+            GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+                                 TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Src"),
+                                 sourceselect_cb, set_source_cb, set_input_source_cb, &mp->mixer[0].src);
             break;
         case COMMON_CURVE:
             GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
