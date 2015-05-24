@@ -99,6 +99,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
             GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                                       TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Offset"),
                                       NULL, set_number100_cb, &mp->mixer[0].offset);
+            break;
         default:
             GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                                       TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, ""), NULL, NULL, NULL);
