@@ -57,6 +57,15 @@ static void _show_titlerow()
     GUI_CreateButtonPlateText(&gui->save, SAVE_X, 0, SAVE_W, HEADER_WIDGET_HEIGHT, &labelDesc, NULL, 0, okcancel_cb, (void *)_tr("Save"));
 }
 
+static struct LabelDesc *set_labeldesc(guiLabel_t *label, int y, const char *text) {
+    int x = LABEL_X;
+    u8 w = LABEL_W;
+    labelDesc.style = LABEL_LEFT;
+    GUI_CreateLabelBox(label, x, y, w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(_tr_noop(text)));
+    labelDesc.style = LABEL_CENTER;
+    return &labelDesc;
+}
+
 static guiObject_t *simple_getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
@@ -69,34 +78,42 @@ enum {
 };
 static int simple_row_cb(int absrow, int relrow, int y, void *data)
 {
-    const char *label = "";
-    void *tgl = NULL;
-    void *value = NULL;
-    data = NULL;
+    (void)data;
+    int x = 0;
+    u8 w = LEFT_VIEW_WIDTH;
     switch(absrow) {
         case COMMON_SRC:
-            label = _tr_noop("Src");
-            tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src;
+            GUI_CreateTextSelectInputPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE, TEXTSEL_W, LINE_HEIGHT,
+                                           set_labeldesc(&gui->label[relrow].lbl, y, "Src"),
+                                           sourceselect_cb, set_source_cb, &mp->mixer[0].src, set_input_source_cb);
             break;
         case COMMON_CURVE:
-            label = _tr_noop("Curve");
-            tgl = curveselect_cb; value = set_curvename_cb; data = &mp->mixer[0];
+            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE, TEXTSEL_W, LINE_HEIGHT,
+                                      set_labeldesc(&gui->label[relrow].lbl, y, "Curve"),
+                                      curveselect_cb, set_curvename_cb, &mp->mixer[0]);
             break;
         case COMMON_SCALE:
-            label = _tr_noop("Scale");
-            value = set_number100_cb; data = &mp->mixer[0].scalar;
+            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE, TEXTSEL_W, LINE_HEIGHT,
+                                      set_labeldesc(&gui->label[relrow].lbl, y, "Scale"),
+                                      NULL, set_number100_cb, &mp->mixer[0].scalar);
             break;
         case SIMPLE_OFFSET:
-            label = _tr_noop("Offset");
-            value = set_number100_cb; data = &mp->mixer[0].offset;
+            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE, TEXTSEL_W, LINE_HEIGHT,
+                                      set_labeldesc(&gui->label[relrow].lbl, y, "Offset"),
+                                      NULL, set_number100_cb, &mp->mixer[0].offset);
+        default:
+            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE, TEXTSEL_W, LINE_HEIGHT,
+                                      set_labeldesc(&gui->label[relrow].lbl, y, ""), NULL, NULL, NULL);
             break;
     }
+    int x = 0;
+    u8 w = LEFT_VIEW_WIDTH;
     labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
+    GUI_CreateLabelBox(&gui->label[relrow], x, y, w, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-            TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y + LINE_SPACE,
+            w, LINE_HEIGHT, &labelDesc, tgl, value, data);
     return 1;
 }
 static void _show_simple()

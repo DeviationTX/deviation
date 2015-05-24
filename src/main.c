@@ -212,6 +212,7 @@ void EventLoop()
     }
     BUTTON_Handler();
     TOUCH_Handler();
+    INPUT_CheckChanges();
 
     if (priority_ready & (1 << LOW_PRIORITY)) {
         priority_ready  &= ~(1 << LOW_PRIORITY);

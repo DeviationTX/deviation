@@ -23,6 +23,7 @@
 #include "mixer.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include <stdlib.h>
 
 #ifndef HAS_MORE_THAN_32_INPUTS
     //Verify that INP_LAST is < 32 or HAS_MORE_THAN_32_INPUTS is defined
@@ -254,14 +255,20 @@ const char *INPUT_ButtonName(unsigned button)
     return "";
 }
 
-int INPUT_SelectSource(int src, int dir, u8 *changed)
+int INPUT_SelectSource(int src, int dir, u8 *changed, int new_source)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
-    int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
-    if(! dir)
-        dir = -1;
-    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
-       newsrc+= dir;
+    int newsrc;
+    if (new_source >= 0) {
+        newsrc = new_source;
+        *changed = MIXER_SRC(src) == newsrc ? 0 : 1;
+    } else {
+        newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
+        if(! dir)
+            dir = -1;
+        while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
+           newsrc+= dir;
+    }
     MIXER_SET_SRC_INV(newsrc, is_neg);
     return newsrc;
 }
@@ -275,4 +282,29 @@ int INPUT_SelectAbbrevSource(int src, int dir)
        newsrc+= dir;
     newsrc = INPUT_GetAbbrevSource(src, newsrc, dir);
     return newsrc;
+}
+
+
+void INPUT_CheckChanges(void) {
+    static s32 last_inputs[NUM_INPUTS+1];
+
+    s32 changed_input = -1;
+    s32 value;
+    for (int i=0; i <= NUM_INPUTS; i++) {
+      if(i <= INP_HAS_CALIBRATION) {
+          value = CHAN_ReadInput(i);
+          if (changed_input < 0 && abs(value - last_inputs[i]) > PCT_TO_RANGE(50)) {
+             changed_input = MIXER_MapChannel(i);
+             last_inputs[i] = value;
+          }
+      } else {
+          value = CHAN_ReadRawInput(i);
+          if (changed_input < 0 && value > 0 && value != last_inputs[i]) {
+             changed_input = MIXER_MapChannel(i);
+          }
+          last_inputs[i] = value;
+      }
+    }
+    if (changed_input >= 0)
+        GUI_HandleInput(changed_input, last_inputs[changed_input]);
 }
