@@ -286,25 +286,36 @@ int INPUT_SelectAbbrevSource(int src, int dir)
 
 
 void INPUT_CheckChanges(void) {
-    static s32 last_inputs[NUM_INPUTS+1];
+    static s8 last_analogs[INP_HAS_CALIBRATION+1];
+#ifdef HAS_MORE_THAN_32_INPUTS
+    static u64 last_switches;
+#else
+    static u32 last_switches;
+#endif
 
-    s32 changed_input = -1;
-    s32 value;
-    for (int i=0; i <= NUM_INPUTS; i++) {
+    s8 changed_input = -1;
+    s32 changed_analog_value;
+    s8 value;
+    for (int i=1; i <= NUM_INPUTS; i++) {
       if(i <= INP_HAS_CALIBRATION) {
-          value = CHAN_ReadInput(i);
-          if (changed_input < 0 && abs(value - last_inputs[i]) > PCT_TO_RANGE(50)) {
+          changed_analog_value = CHAN_ReadInput(i);
+          value = changed_analog_value >> 7;
+          if (changed_input < 0 && abs(value - last_analogs[i]) > 30) {
              changed_input = MIXER_MapChannel(i);
-             last_inputs[i] = value;
+             last_analogs[i] = value;
           }
       } else {
           value = CHAN_ReadRawInput(i);
-          if (changed_input < 0 && value > 0 && value != last_inputs[i]) {
+          if (changed_input < 0 && value > 0 && !(last_switches & (1 << i))) {
              changed_input = MIXER_MapChannel(i);
           }
-          last_inputs[i] = value;
+          if (value > 0)
+              last_switches |= (1 << i);
+          else
+              last_switches &= ~(1 << i);
       }
     }
     if (changed_input >= 0)
-        GUI_HandleInput(changed_input, last_inputs[changed_input]);
+        GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : 1);
+
 }
