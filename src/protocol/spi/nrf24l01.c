@@ -431,9 +431,11 @@ u8 XN297_WritePayload(u8* msg, int len)
 
 u8 XN297_ReadPayload(u8* msg, int len)
 {
-    (void) msg;
-    (void) len;
-    return 0;
+    // TODO: if xn297_crc==1, check CRC before filling *msg 
+    u8 res = NRF24L01_ReadPayload(msg, len);
+    for(u8 i=0; i<len; i++)
+      msg[i] = bit_reverse(msg[i])^bit_reverse(xn297_scramble[i+xn297_addr_len]);
+    return res;
 }
 
 
