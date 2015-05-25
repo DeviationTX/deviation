@@ -101,7 +101,7 @@ static const char *proto_opt_cb(guiObject_t *obj, int dir, void *data)
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
-    int source = INPUT_SelectSource(*(u8 *)data, dir, NULL, -1);
+    int source = INPUT_SelectSource(*(u8 *)data, dir, NULL);
     *(u8 *)data = source;
     return INPUT_SourceName(tempstring, source);
 }

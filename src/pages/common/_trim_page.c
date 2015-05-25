@@ -35,7 +35,7 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
     (void) obj;
     u8 *source = (u8 *)data;
-    *source = INPUT_SelectSource(*source, dir, NULL, -1);
+    *source = INPUT_SelectSource(*source, dir, NULL);
     return INPUT_SourceName(tempstring, MIXER_MapChannel(*source));
 }
 

@@ -177,7 +177,8 @@ int INPUT_GetAbbrevSource(int origval, int newval, int dir);
 int INPUT_SwitchPos(unsigned src);
 int INPUT_NumSwitchPos(unsigned src);
 int INPUT_GetFirstSwitch(int src);
-int INPUT_SelectSource(int src, int dir, u8 *changed, int newsrc);
+int INPUT_SelectSource(int src, int dir, u8 *changed);
+int INPUT_SelectInput(int src, int newsrc, u8 *changed);
 int INPUT_SelectAbbrevSource(int src, int dir);
 
 const char *INPUT_MapSourceName(unsigned idx, unsigned *val);

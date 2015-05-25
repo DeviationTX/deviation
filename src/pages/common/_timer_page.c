@@ -88,7 +88,7 @@ const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx)
         MIXER_SET_SRC_INV(newsrc, is_neg);
         *src = newsrc;
     } else {
-        *src = INPUT_SelectSource(*src, dir, &changed, -1);
+        *src = INPUT_SelectSource(*src, dir, &changed);
     }
     if (changed) {
         TIMER_Reset(idx);

@@ -255,20 +255,22 @@ const char *INPUT_ButtonName(unsigned button)
     return "";
 }
 
-int INPUT_SelectSource(int src, int dir, u8 *changed, int new_source)
+int INPUT_SelectInput(int src, int new_source, u8 *changed) {
+    u8 is_neg = MIXER_SRC_IS_INV(src);
+    int newsrc = MIXER_SRC(new_source);
+    *changed = MIXER_SRC(src) == newsrc ? 0 : 1;
+    MIXER_SET_SRC_INV(newsrc, is_neg);
+    return newsrc;
+}
+
+int INPUT_SelectSource(int src, int dir, u8 *changed)
 {
     u8 is_neg = MIXER_SRC_IS_INV(src);
-    int newsrc;
-    if (new_source >= 0) {
-        newsrc = new_source;
-        *changed = MIXER_SRC(src) == newsrc ? 0 : 1;
-    } else {
-        newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
-        if(! dir)
-            dir = -1;
-        while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
-           newsrc+= dir;
-    }
+    int newsrc = GUI_TextSelectHelper(MIXER_SRC(src), 0, NUM_SOURCES, dir, 1, 1, changed);
+    if(! dir)
+        dir = -1;
+    while (newsrc < INP_LAST && Transmitter.ignore_src & (1 << newsrc))
+       newsrc+= dir;
     MIXER_SET_SRC_INV(newsrc, is_neg);
     return newsrc;
 }

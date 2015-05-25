@@ -68,47 +68,7 @@ enum {
     SIMPLE_OFFSET = COMMON_LAST,
     SIMPLE_LAST,
 };
-#if 0
-static struct LabelDesc *set_labeldesc(guiLabel_t *label, int y, const char *text) {
-    int x = LABEL_X;
-    u8 w = LABEL_W;
-    labelDesc.style = LABEL_LEFT;
-    GUI_CreateLabelBox(label, x, y, w, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(_tr_noop(text)));
-    labelDesc.style = LABEL_CENTER;
-    return &labelDesc;
-}
-static int simple_row_cb(int absrow, int relrow, int y, void *data)
-{
-    (void)data;
-    switch(absrow) {
-        case COMMON_SRC:
-            GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                 TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Src"),
-                                 sourceselect_cb, set_source_cb, set_input_source_cb, &mp->mixer[0].src);
-            break;
-        case COMMON_CURVE:
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                      TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Curve"),
-                                      curveselect_cb, set_curvename_cb, &mp->mixer[0]);
-            break;
-        case COMMON_SCALE:
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                      TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Scale"),
-                                      NULL, set_number100_cb, &mp->mixer[0].scalar);
-            break;
-        case SIMPLE_OFFSET:
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                      TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, "Offset"),
-                                      NULL, set_number100_cb, &mp->mixer[0].offset);
-            break;
-        default:
-            GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-                                      TEXTSEL_W, LINE_HEIGHT, set_labeldesc(&gui->label[relrow].lbl, y, ""), NULL, NULL, NULL);
-            break;
-    }
-    return 1;
-}
-#endif
+
 static int simple_row_cb(int absrow, int relrow, int y, void *data)
 {
     const char *label = "";

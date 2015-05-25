@@ -371,15 +371,13 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-static const char *set_source_helper(guiObject_t *obj, int dir, void *data, int newsrc) {
+static const char *set_source_helper(guiObject_t *obj, void *data, int changed) {
     (void) obj;
     u8 *source = (u8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
         tempstring_cpy(_tr("None"));
         return tempstring;
     }
-    u8 changed;
-    *source = INPUT_SelectSource(*source, dir, &changed, newsrc);
     if (changed) {
         if(mp->cur_template == MIXERTEMPLATE_COMPLEX) {
             guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
@@ -399,12 +397,16 @@ static const char *set_source_helper(guiObject_t *obj, int dir, void *data, int 
 
 const char *set_source_cb(guiObject_t *obj, int dir, void *data)
 {
-    return set_source_helper(obj, dir, data, -1);
+    u8 changed;
+    *(u8 *)data = INPUT_SelectSource(*(u8 *)data, dir, &changed);
+    return set_source_helper(obj, data, changed);
 }
 
 const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data) {
     (void)value;
-    return set_source_helper(obj, -1, data, src);
+    u8 changed;
+    *(u8 *)data = INPUT_SelectInput(*(u8 *)data, src, &changed);
+    return set_source_helper(obj, data, changed);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
@@ -413,7 +415,7 @@ const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     u8 changed;
     u8 oldsrc = *source;
-    *source = INPUT_SelectSource(*source, dir, &changed, -1);
+    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         sync_mixers();
         if ((!! MIXER_SRC(oldsrc)) ^ (!! MIXER_SRC(*source))) {
