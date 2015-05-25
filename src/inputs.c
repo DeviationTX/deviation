@@ -302,12 +302,12 @@ void INPUT_CheckChanges(void) {
       if(i <= INP_HAS_CALIBRATION) {
           changed_analog_value = CHAN_ReadInput(i);
           value = changed_analog_value >> 7;
-          if (changed_input < 0 && abs(value - last_analogs[i]) > 30) {
+          if (changed_input < 0 && abs(value - last_analogs[i]) > 35) {
              changed_input = MIXER_MapChannel(i);
              last_analogs[i] = value;
           }
       } else {
-          value = CHAN_ReadRawInput(i);
+          value = CHAN_ReadInput(i);
           if (changed_input < 0 && value > 0 && !(last_switches & (1 << i))) {
              changed_input = MIXER_MapChannel(i);
           }
@@ -317,7 +317,8 @@ void INPUT_CheckChanges(void) {
               last_switches &= ~(1 << i);
       }
     }
-    if (changed_input >= 0)
+    if (changed_input >= 0) {
         GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : 1);
-
+        AUTODIMMER_Check();
+    }
 }

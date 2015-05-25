@@ -97,7 +97,7 @@ static int simple_row_cb(int absrow, int relrow, int y, void *data)
     labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+    GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc,
                          tgl, value, input_value, data);
     return 1;
@@ -178,7 +178,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+    GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
                          TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
@@ -327,7 +327,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y,
+    GUI_CreateTextSourcePlate(&gui->value[relrow].ts, TEXTSEL_X, y,
         TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
