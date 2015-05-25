@@ -276,6 +276,9 @@ int NRF24L01_Reset()
     u8 status1 = Strobe(NOP);
     u8 status2 = NRF24L01_ReadReg(0x07);
     NRF24L01_SetTxRxMode(TXRX_OFF);
+#ifdef EMULATOR
+    return 1;
+#endif
     return (status1 == status2 && (status1 & 0x0f) == 0x0e);
 }
 
