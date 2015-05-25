@@ -131,6 +131,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     const char *label = "";
     void *tgl = NULL;
     void *value = NULL;
+    void *input_value = NULL;
     data = NULL;
     if (absrow + COMMON_LAST == COMPLEX_TRIM) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, LABEL_X, y,
@@ -150,7 +151,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
         case COMPLEX_SWITCH:
             label = _tr_noop("Switch");
-            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->cur_mixer->sw;
+            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->cur_mixer->sw; input_value = set_input_source_cb;
             break;
         case COMPLEX_MUX:
             label = _tr_noop("Mux");
@@ -158,7 +159,7 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
             break;
         case COMPLEX_SRC:
             label = _tr_noop("Src");
-            tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src;
+            tgl = sourceselect_cb; value = set_source_cb; data = &mp->cur_mixer->src; input_value = set_input_source_cb;
             break;
         case COMPLEX_CURVE:
             label = _tr_noop("Curve");
@@ -177,8 +178,8 @@ static int complex_row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->label[relrow].lbl, LABEL_X, y, LABEL_W, LINE_HEIGHT,
             &labelDesc, NULL, NULL, _tr(label));
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
-            TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y + (LINES_PER_ROW - 1) * LINE_SPACE,
+                         TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if (absrow + COMMON_LAST == COMPLEX_SRC)
         set_src_enable(CURVE_TYPE(&mp->cur_mixer->curve));
     return 1;
@@ -254,6 +255,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     void * label_cb = NULL;
     void *tgl = NULL;
     void *value = NULL;
+    void *input_value = NULL;
     data = NULL;
     int but = 0;
     int disable = 0;
@@ -265,7 +267,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
     switch(absrow) {
         case COMMON_SRC:
             label = _tr("Src");
-            tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src;
+            tgl = sourceselect_cb; value = set_source_cb; data = &mp->mixer[0].src; input_value = set_input_source_cb;
             break;
         case COMMON_CURVE:
             label = _tr("High-Rate");
@@ -280,7 +282,7 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
             idx = (absrow == EXPO_SWITCH1) ? 1 : 2;
             label = idx == 1 ? _tr("Switch1") : _tr("Switch2");
             underline = UNDERLINE;
-            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw;
+            tgl = sourceselect_cb; value = set_drsource_cb; data = &mp->mixer[idx].sw; input_value = set_input_source_cb;
             break;
         case EXPO_LINK1:
         case EXPO_LINK2:
@@ -325,8 +327,8 @@ static int expo_row_cb(int absrow, int relrow, int y, void *data)
         y += (LINES_PER_ROW - 1) * LINE_SPACE;
     }
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow].ts, TEXTSEL_X, y,
-        TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, data);
+    GUI_CreateTextSource(&gui->value[relrow].ts, TEXTSEL_X, y,
+        TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, value, input_value, data);
     if(disable) {
         GUI_TextSelectEnable(&gui->value[relrow].ts, 0);
     }
