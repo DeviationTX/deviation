@@ -107,7 +107,7 @@ void MODELTRAIN_Config()
     int row = ROW1;
     if (PPMin_Mode() != PPM_IN_SOURCE) {
         GUI_CreateLabel(&gui->trainswlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Trainer Sw"));
-        GUI_CreateTextSelect(&gui->trainsw, COL2, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, &Model.train_sw);
+        GUI_CreateTextSource(&gui->trainsw, COL2, row, TEXTSELECT_96, sourceselect_cb, set_source_cb, set_input_source_cb, &Model.train_sw);
     } else {
         GUI_CreateLabel(&gui->numchlbl, COL1, row, NULL, DEFAULT_FONT, _tr("Num Channels"));
         GUI_CreateTextSelect(&gui->numch, COL2, row, TEXTSELECT_96, NULL, set_train_cb, (void *)0L);

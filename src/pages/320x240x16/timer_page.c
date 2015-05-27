@@ -107,7 +107,7 @@ static void _draw_body() {
         GUI_CreateLabelBox(&gui->timevallbl[i], COL2+30, row, 96, 18, &DEFAULT_FONT, show_time_cb, NULL, (void *)(long)i);
 #endif
         GUI_CreateLabelBox(&gui->switchlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)i);
-        GUI_CreateTextSelect(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, (void *)(long)i);
+        GUI_CreateTextSource(&gui->src[i],  COL2, row, TEXTSELECT_96, toggle_source_cb, set_source_cb, set_input_source_cb, (void *)(long)i);
         //Row 3
         row+=20;
         /* Reset Perm timer*/
@@ -116,7 +116,7 @@ static void _draw_body() {
         if(Model.mixer_mode != MIXER_STANDARD) {
             /* or Reset switch */
             GUI_CreateLabelBox(&gui->resetlbl[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
-            GUI_CreateTextSelect(&gui->resetsrc[i],  COL2, row, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)i);
+            GUI_CreateTextSource(&gui->resetsrc[i],  COL2, row, TEXTSELECT_96, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)i);
             row+=20;
         }
         //Row 4
