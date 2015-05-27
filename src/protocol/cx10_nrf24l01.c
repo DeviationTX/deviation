@@ -57,11 +57,16 @@
 
 #define INITIAL_WAIT     500
 
+// flags 
 #define FLAG_FLIP       0x1000 // goes to rudder channel
 #define FLAG_MODE_MASK  0x0003
+#define FLAG_HEADLESS   0x0004
+// flags2
+#define FLAG_VIDEO      0x0002
+#define FLAG_SNAPSHOT   0x0004
 
 static const char * const cx10_opts[] = {
-    "Format", _tr_noop("Green"), _tr_noop("Blue-A"), NULL, 
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), _tr_noop("DM007"), NULL, 
     NULL
 };
 
@@ -73,20 +78,21 @@ enum {
 enum {
     FORMAT_CX10_GREEN = 0,
     FORMAT_CX10_BLUE,
+    FORMAT_DM007,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // For code readability
 enum {
-    CHANNEL1 = 0,
-    CHANNEL2,
-    CHANNEL3,
-    CHANNEL4,
-    CHANNEL5,
-    CHANNEL6,
-    CHANNEL7,
-    CHANNEL8,
-    CHANNEL9,
+    CHANNEL1 = 0,   // Aileron
+    CHANNEL2,       // Elevator
+    CHANNEL3,       // Throttle
+    CHANNEL4,       // Rudder
+    CHANNEL5,       // Rate/Mode (+ Headless on CX-10A)
+    CHANNEL6,       // Flip
+    CHANNEL7,       // Still Camera (DM007)
+    CHANNEL8,       // Video Camera (DM007)
+    CHANNEL9,       // Headless (DM007)
     CHANNEL10
 };
 
@@ -97,7 +103,7 @@ static u8 phase;
 static u8 bind_phase;
 static u16 bind_counter;
 static u8 tx_power;
-static u16 throttle, rudder, elevator, aileron, flags;
+static u16 throttle, rudder, elevator, aileron, flags, flags2;
 static const u8 rx_tx_addr[] = {0xcc, 0xcc, 0xcc, 0xcc, 0xcc};
 
 // frequency channel management
@@ -130,7 +136,7 @@ static u16 convert_channel(u8 num)
     return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 1500);
 }
 
-static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* aileron, u16* flags)
+static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* aileron, u16* flags, u16* flags2)
 {
     // Protocol is registered AETRF, that is
     // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4
@@ -146,19 +152,42 @@ static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* ailero
     // Channel 5 - mode
     if (Channels[CHANNEL5] > 0) {
         if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
-          *flags |= 1;
+            *flags |= 1;
         else
-          *flags |= 2;
+            *flags |= 2; // headless on CX-10A
     }
 
     // Channel 6 - flip flag
-    if (Channels[CHANNEL6] <= 0)
-      *flags &= ~FLAG_FLIP;
+    if (Model.num_channels < 6 || Channels[CHANNEL6] <= 0)
+        *flags &= ~FLAG_FLIP;
     else
-      *flags |= FLAG_FLIP;
+        *flags |= FLAG_FLIP;
 
-    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%x\n",
-            *aileron, *elevator, *throttle, *rudder, *flags);
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DM007) {
+        // invert aileron direction
+        *aileron = 3000 - *aileron;
+        
+        // Channel 7 - snapshot
+        if( Model.num_channels < 7 || Channels[CHANNEL7] <= 0)
+            *flags2 &= ~FLAG_SNAPSHOT;
+        else
+            *flags2 |= FLAG_SNAPSHOT;
+
+        // Channel 8 - video
+        if( Model.num_channels < 8 || Channels[CHANNEL8] <=0)
+            *flags2 &= ~FLAG_VIDEO;
+        else
+            *flags2 |= FLAG_VIDEO;
+
+        // Channel 9 - headless
+        if (Model.num_channels < 9 || Channels[CHANNEL9] <= 0)
+            *flags &= ~FLAG_HEADLESS;
+        else
+            *flags |= FLAG_HEADLESS;
+    }
+
+    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%4x, flags2 0x%2x\n",
+            *aileron, *elevator, *throttle, *rudder, *flags, *flags2);
 }
 
 static void send_packet(u8 bind)
@@ -172,7 +201,7 @@ static void send_packet(u8 bind)
     packet[3] = txid[2];
     packet[4] = txid[3];
     // for CX-10A [5]-[8] is aircraft id received during bind 
-    read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
+    read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &flags2);
     packet[5+offset] = aileron & 0xff;
     packet[6+offset] = (aileron >> 8) & 0xff;
     packet[7+offset] = elevator & 0xff;
@@ -182,7 +211,7 @@ static void send_packet(u8 bind)
     packet[11+offset] = rudder & 0xff;
     packet[12+offset] = ((rudder >> 8) & 0xff) | ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
     packet[13+offset] = flags & 0xff;
-    packet[14+offset] = 0;
+    packet[14+offset] = flags2 & 0xff;
 
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
@@ -362,24 +391,29 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX10_GREEN){
-        packet_size = CX10_PACKET_SIZE;
-        packet_period = CX10_PACKET_PERIOD;
-        bind_phase = CX10_BIND1;
-        bind_counter = BIND_COUNT;
-        PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
-    }
-    else if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX10_BLUE){
-        packet_size = CX10A_PACKET_SIZE;
-        packet_period = CX10A_PACKET_PERIOD;
-        bind_phase = CX10_BIND2;
-        for(u8 i=0; i<4; i++)
-            packet[5+i] = 0xFF; // aircraft id
-        packet[9] = 0;
-        PROTOCOL_SetBindState(0xFFFFFFFF);
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_CX10_GREEN:
+        case FORMAT_DM007:
+            packet_size = CX10_PACKET_SIZE;
+            packet_period = CX10_PACKET_PERIOD;
+            bind_phase = CX10_BIND1;
+            bind_counter = BIND_COUNT;
+            PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
+            break;
+        
+        case FORMAT_CX10_BLUE:
+            packet_size = CX10A_PACKET_SIZE;
+            packet_period = CX10A_PACKET_PERIOD;
+            bind_phase = CX10_BIND2;
+            for(u8 i=0; i<4; i++)
+                packet[5+i] = 0xFF; // clear aircraft id
+            packet[9] = 0;
+            PROTOCOL_SetBindState(0xFFFFFFFF);
+            break;
     }
     initialize_txid();
     flags = 0;
+    flags2 = 0;
     cx10_init();
     phase = CX10_INIT1;
     CLOCK_StartTimer(INITIAL_WAIT, cx10_callback);
@@ -395,7 +429,7 @@ const void *CX10_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, flight mode, enable flip
+        case PROTOCMD_NUMCHAN: return (void *) 9L; // A, E, T, R, flight mode, enable flip, photo, video, headless
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cx10_opts;
