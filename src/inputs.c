@@ -257,10 +257,9 @@ const char *INPUT_ButtonName(unsigned button)
 
 int INPUT_SelectInput(int src, int new_source, u8 *changed) {
     u8 is_neg = MIXER_SRC_IS_INV(src);
-    int newsrc = MIXER_SRC(new_source);
-    *changed = MIXER_SRC(src) == newsrc ? 0 : 1;
-    MIXER_SET_SRC_INV(newsrc, is_neg);
-    return newsrc;
+    if (changed) *changed = MIXER_SRC(src) == new_source ? 0 : 1;
+    MIXER_SET_SRC_INV(new_source, is_neg);
+    return new_source;
 }
 
 int INPUT_SelectSource(int src, int dir, u8 *changed)
@@ -309,7 +308,7 @@ void INPUT_CheckChanges(void) {
       } else {
           value = CHAN_ReadInput(i);
           if (changed_input < 0 && value > 0 && !(last_switches & (1 << i))) {
-             changed_input = MIXER_MapChannel(i);
+             changed_input = i;
           }
           if (value > 0)
               last_switches |= (1 << i);

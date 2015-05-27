@@ -93,8 +93,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     y += space;
     GUI_CreateLabelBox(&gui->switchlbl, LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->src, TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
+    GUI_CreateTextSourcePlate(&gui->src, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, set_input_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
     /*prem-timer reset */
@@ -106,8 +106,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         /* or Reset switch */
     	GUI_CreateLabelBox(&gui->resetlbl, LABEL_X, y ,
             LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
-    	GUI_CreateTextSelectPlate(&gui->resetsrc, TEXTSEL_X, y ,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
+    	GUI_CreateTextSourcePlate(&gui->resetsrc, TEXTSEL_X, y ,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)absrow);
 	y += space;
     }
     //Row 4

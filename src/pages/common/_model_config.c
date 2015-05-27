@@ -106,6 +106,13 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return INPUT_SourceName(tempstring, source);
 }
 
+const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data) {
+    (void)obj;
+    (void)value;
+    *(u8 *)data = INPUT_SelectInput(*(u8 *)data, src, NULL);
+    return INPUT_SourceName(tempstring, *(u8 *)data);
+}
+
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;

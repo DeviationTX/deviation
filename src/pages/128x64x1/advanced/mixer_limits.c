@@ -62,6 +62,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void * label_cb = NULL;
     const void * label = NULL;
     void * disp = NULL;
+    void * input_disp = NULL;
     void * value = NULL;
     switch(absrow) {
         case ITEM_REVERSE:
@@ -74,7 +75,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_SAFETY:
             label = _tr("Safety");
-            tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit.safetysw;
+            tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit.safetysw; input_disp = set_input_source_cb;
             break;
         case ITEM_SAFEVAL:
             label = _tr("Safe Val");
@@ -108,7 +109,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     labelDesc.style = LABEL_LEFT;
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y, LABEL_W, LINE_HEIGHT, &labelDesc, label_cb, NULL, label);
     labelDesc.style = LABEL_CENTER;
-    GUI_CreateTextSelectPlate(&gui->value[relrow], TEXTSEL_X, y, TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, disp, value);
+    GUI_CreateTextSourcePlate(&gui->value[relrow], TEXTSEL_X, y, TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, disp, input_disp, value);
 
     if(absrow == ITEM_SAFEVAL)
         GUI_TextSelectEnable(&gui->value[relrow], mp->limit.safetysw);

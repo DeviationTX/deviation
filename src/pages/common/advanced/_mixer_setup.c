@@ -114,6 +114,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static void curveselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_input_source_cb(guiObject_t *obj, int source, int value, void *data);
 static const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
