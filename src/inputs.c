@@ -290,34 +290,37 @@ void INPUT_CheckChanges(void) {
     static s8 last_analogs[INP_HAS_CALIBRATION+1];
 #ifdef HAS_MORE_THAN_32_INPUTS
     static u64 last_switches;
+    u64 switch_mask = 1;
 #else
     static u32 last_switches;
+    u32 switch_mask = 1;
 #endif
 
-    s8 changed_input = -1;
     s32 changed_analog_value;
+    s8 changed_input = INP_NONE;
     s8 value;
     for (int i=1; i <= NUM_INPUTS; i++) {
       if(i <= INP_HAS_CALIBRATION) {
           changed_analog_value = CHAN_ReadInput(i);
           value = changed_analog_value >> 7;
-          if (changed_input < 0 && abs(value - last_analogs[i]) > 35) {
+          if (changed_input == INP_NONE && abs(value - last_analogs[i]) > 35) {
              changed_input = MIXER_MapChannel(i);
              last_analogs[i] = value;
           }
       } else {
           value = CHAN_ReadInput(i);
-          if (changed_input < 0 && value > 0 && !(last_switches & (1 << i))) {
+          if (changed_input == INP_NONE && value > 0 && !(last_switches & switch_mask)) {
              changed_input = i;
           }
           if (value > 0)
-              last_switches |= (1 << i);
+              last_switches |= switch_mask;
           else
-              last_switches &= ~(1 << i);
+              last_switches &= ~switch_mask;
+          switch_mask <<= 1;
       }
     }
-    if (changed_input >= 0) {
-        GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : 1);
+    if (changed_input != INP_NONE) {
+        GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : CHAN_MAX_VALUE);
         AUTODIMMER_Check();
     }
 }
