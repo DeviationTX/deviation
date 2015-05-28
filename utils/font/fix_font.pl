@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use Getopt::Long;
 
 my $skip = 31;

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # this script takes on stdin the ouput of the MikroElectronica GLCD FontCreator
 # with the '-old' switch, the input should be in 'mikroC' X-GLCD lib format
 # without it, the format should be in 'new GLCD' format
