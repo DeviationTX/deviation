@@ -40,12 +40,14 @@ static const char * const frsky_opts[] = {
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   _tr_noop("Freq-Course"),  "-127", "127", NULL,
+  _tr_noop("AD2GAIN"),  "1", "255", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_TELEM = 0,
     PROTO_OPTS_FREQFINE = 1,
     PROTO_OPTS_FREQCOURSE = 2,
+    PROTO_OPTS_AD2GAIN = 3,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -58,6 +60,8 @@ static u8 counter;
 static u32 fixed_id;
 static s8 course;
 static s8 fine;
+static u8 AD2gain;
+
 
 enum {
     FRSKY_BIND        = 0,
@@ -212,7 +216,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[3] * 52 / 10; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
     //Get voltage A2 (~13.2mv/count) (Docs say 1/4 of A1)
-    Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * 132 / 1000; //In 1/100 of Volts *(A2gain/10)
+    Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
     Telemetry.value[TELEM_FRSKY_RSSI] = (pkt[5]*10 - 310)*12987/10000; // max value 108, min value = 31
@@ -422,6 +426,7 @@ static void initialize(int bind)
     CLOCK_StopTimer();
     course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     //fixed_id = 0x3e19;
     fixed_id = get_tx_id();
     frsky2way_init(bind);
