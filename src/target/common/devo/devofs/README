@@ -67,7 +67,7 @@ type/status:	file/dir/currently-writing/deleted
 				00: deleted
 parent-dir:		0 - 255
 name:			8.3 (11 bytes)
-size:			2 bytes
+size:			3 bytes
 data:
 
 directory
