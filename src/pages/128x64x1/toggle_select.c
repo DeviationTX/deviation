@@ -63,7 +63,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                               (void *)((long)(SelectedIcon << 8) | idx));
         idx = get_next_icon(idx);
         if(idx < 0)
-            break;
+            return i+1;
     }
     return i;
 }
