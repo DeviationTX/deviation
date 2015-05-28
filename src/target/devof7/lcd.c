@@ -251,9 +251,9 @@ void LCD_Init()
     gpio_clear(GPIOB, GPIO9);
 
     // Set the 5.8GHz channel
-    gpio_set(GPIOA, GPIO0);
-    gpio_set(GPIOA, GPIO8);
-    gpio_set(GPIOA, GPIO15);
+    gpio_clear(GPIOA, GPIO0);
+    gpio_clear(GPIOA, GPIO8);
+    gpio_clear(GPIOA, GPIO15);
 
     //Initialization is mostly done in SPI Flash
     //Setup CS as B.0 Data/Control = C.5
@@ -324,8 +324,34 @@ void LCD_ShowVideo(u8 enable)
     video_enabled = enable;
 }
 
-void VIDEO_Enable(int on) {}
-void VIDEO_SetChannel(int ch) {}
+void VIDEO_Enable(int on) 
+{
+    if(on) {
+        gpio_set(GPIOE, GPIO11);
+        LCD_ShowVideo(1);
+    } else {
+        gpio_clear(GPIOE, GPIO11);
+        LCD_ShowVideo(0);
+    }
+
+}
+void VIDEO_SetChannel(int ch) 
+{
+    if(ch & 0x01)
+        gpio_clear(GPIOA, GPIO0);
+    else
+        gpio_set(GPIOA, GPIO0);
+
+    if(ch & 0x02)
+        gpio_clear(GPIOA, GPIO8);
+    else
+        gpio_set(GPIOA, GPIO8);
+
+    if(ch & 0x04)
+        gpio_clear(GPIOA, GPIO15);
+    else
+        gpio_set(GPIOA, GPIO15);
+}
 
 
 /**
@@ -341,7 +367,7 @@ u8 FONT_GetFromString(const char *value)
 
 void LCD_PrintCharXY(unsigned int x, unsigned int y, u32 c)
 {
-    LCD_ShowVideo(0);
+    //LCD_ShowVideo(0);
     lcd_show_string((char*)&c, y, x, cur_str.color);
 }
 
