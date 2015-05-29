@@ -333,16 +333,18 @@ static u16 cx10_callback()
             XN297_ReadPayload(packet, packet_size);
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
-            bind_counter = 10;
-            phase = CX10_BIND1; 
+            if(packet[9] == 1) {
+                phase = CX10_BIND1;
+            }
         } else {
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
             send_packet(1);
-            NRF24L01_SetTxRxMode(TXRX_OFF);
+            usleep(300);
             // switch to RX mode
+            NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_FlushRx();
-            NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70); // Clear data ready, data sent, and retransmit
+            NRF24L01_SetTxRxMode(RX_EN);
             XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
                           | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
         }
@@ -405,6 +407,7 @@ static void initialize()
             packet_size = CX10A_PACKET_SIZE;
             packet_period = CX10A_PACKET_PERIOD;
             bind_phase = CX10_BIND2;
+            bind_counter=0;
             for(u8 i=0; i<4; i++)
                 packet[5+i] = 0xFF; // clear aircraft id
             packet[9] = 0;
