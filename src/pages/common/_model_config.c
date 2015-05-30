@@ -194,7 +194,7 @@ const char *set_videoch_cb(guiObject_t *obj, int dir, const void *data)
     (void)data;
     int value = Model.videoch;
     u8 changed;
-    value = GUI_TextSelectHelper(value, 0, 15, dir, 1, 1, &changed);
+    value = GUI_TextSelectHelper(value, 0, HAS_VIDEO-1, dir, 1, 1, &changed);
     if (changed) {
         VIDEO_SetChannel(value);
         Model.videoch = value;
