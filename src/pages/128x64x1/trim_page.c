@@ -110,11 +110,12 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
     data = NULL;
     const void *label = "";
     void *value = NULL;
+    void *input_value = NULL;
 
     switch(absrow) {
         case ITEM_INPUT:
             label = _tr_noop("Input");
-            value = set_source_cb; data = &tp->trim.src;
+            value = set_source_cb; data = &tp->trim.src; input_value = set_input_source_cb;
             break;
         case ITEM_TRIMNEG:
             label = _tr_noop("Trim -");
@@ -130,13 +131,13 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_TRIMSWITCH:
             label = _tr_noop("Switch");
-            value = set_switch_cb; data = &tp->trim.sw;
+            value = set_switch_cb; data = &tp->trim.sw; input_value = set_input_switch_cb;
             break;
     }
     GUI_CreateLabelBox(&guit->label[relrow], LABEL2_X, y, LABEL2_WIDTH, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, NULL,  _tr(label));
-    GUI_CreateTextSelectPlate(&guit->value[relrow], TEXTSEL2_X, y,
-            TEXTSEL2_WIDTH, LINE_HEIGHT, &DEFAULT_FONT,  NULL, value, data);
+    GUI_CreateTextSourcePlate(&guit->value[relrow], TEXTSEL2_X, y,
+            TEXTSEL2_WIDTH, LINE_HEIGHT, &DEFAULT_FONT,  NULL, value, input_value, data);
     return 1;
 } 
 static void _edit_cb(guiObject_t *obj, const void *data)

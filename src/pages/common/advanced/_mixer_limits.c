@@ -20,6 +20,7 @@ static struct mixer_page   * const mp  = &pagemem.u.mixer_page;
 static inline guiObject_t *_get_obj(int idx, int objid);
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_input_source_cb(guiObject_t *obj, int source, int value, void *data);
 static const char *reverse_cb(guiObject_t *obj, int dir, void *data);
 static void toggle_reverse_cb(guiObject_t *obj, void *data);
 static void _show_titlerow();
@@ -83,6 +84,19 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     u8 isCurrentItemChanged = 0;
     *source = INPUT_SelectSource(*source, dir, &isCurrentItemChanged);
+    mp->are_limits_changed |= isCurrentItemChanged;
+    update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
+    GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
+    return INPUT_SourceName(tempstring, *source);
+}
+
+const char *set_input_source_cb(guiObject_t *obj, int newsrc, int value, void *data)
+{
+    (void) obj;
+    (void) value;
+    u8 *source = (u8 *)data;
+    u8 isCurrentItemChanged = 0;
+    *source = INPUT_SelectInput(*source, newsrc, &isCurrentItemChanged);
     mp->are_limits_changed |= isCurrentItemChanged;
     update_safe_val_state();  // even there is no change, update_safe_val_state() should still be invoked, otherwise, the revert will fail
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));

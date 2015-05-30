@@ -102,7 +102,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     };
     //Row 1
     GUI_CreateLabel(&gui_ed->srclbl, COL1, ROW1, NULL, DEFAULT_FONT, _tr("Input"));
-    GUI_CreateTextSelect(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, &tp->trim.src);
+    GUI_CreateTextSource(&gui_ed->src, COL2, ROW1, TEXTSELECT_96, NULL, set_source_cb, set_input_source_cb, &tp->trim.src);
     //Row 2
     GUI_CreateLabel(&gui_ed->steplbl, COL1, ROW2, NULL, DEFAULT_FONT, _tr("Trim Step"));
     GUI_CreateTextSelect(&gui_ed->step, COL2, ROW2, TEXTSELECT_96, NULL,
@@ -115,7 +115,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_CreateTextSelect(&gui_ed->pos, COL2, ROW4, TEXTSELECT_96, NULL, set_trim_cb, &tp->trim.pos);
     //Row 5
     GUI_CreateLabelBox(&gui_ed->swlbl, COL1, ROW5, COL2-COL1, ROW5-ROW4, &DEFAULT_FONT, NULL, NULL, _tr("Switch"));
-    GUI_CreateTextSelect(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, &tp->trim.sw);
+    GUI_CreateTextSource(&gui_ed->sw, COL2, ROW5, TEXTSELECT_96, NULL, set_switch_cb, set_input_switch_cb, &tp->trim.sw);
 }
 
 static inline guiObject_t * _get_obj(int idx, int objid) {

@@ -43,6 +43,18 @@ static const char *sourcesel_cb(guiObject_t *obj, int dir, void *data)
     return INPUT_SourceName(tempstring, dlog->enable);
 }
 
+static const char *sourcesel_input_cb(guiObject_t *obj, int source, int value, void *data)
+{
+    (void)obj;
+    (void)data;
+    (void)value;
+    u8 changed;
+    dlog->enable = INPUT_SelectInput(dlog->enable, source, &changed);
+    if (changed)
+        DATALOG_UpdateState();
+    return INPUT_SourceName(tempstring, dlog->enable);
+}
+
 static const char *reset_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

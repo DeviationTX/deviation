@@ -89,12 +89,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     const void *but_data = NULL;
     void *but_txt = NULL;
     void *sel_cb = NULL;
+    void *sel_input_cb = NULL;
     void *sel_data = NULL;
     void *selpress_cb = NULL;
 
     if (absrow == DL_ENABLE) {
         lbl_cb = NULL; lbl_data = _tr("Enable");
-        sel_cb = sourcesel_cb; sel_data = NULL;
+        sel_cb = sourcesel_cb; sel_data = NULL; sel_input_cb = sourcesel_input_cb;
     } else if (absrow == DL_RESET) {
         lbl_data = NULL;
         but_press = reset_press_cb; but_txt = reset_str_cb;
@@ -122,8 +123,8 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         GUI_CreateButtonPlateText(&gui->col2[relrow].but, x, y,
             w, LINE_HEIGHT, &DEFAULT_FONT, but_txt, 0x0000, but_press, but_data);
     } else {
-        GUI_CreateTextSelectPlate(&gui->col2[relrow].ts, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_data);
+        GUI_CreateTextSourcePlate(&gui->col2[relrow].ts, x, y,
+            w, LINE_HEIGHT, &DEFAULT_FONT, selpress_cb, sel_cb, sel_input_cb, sel_data);
     }
     return 1;
 }

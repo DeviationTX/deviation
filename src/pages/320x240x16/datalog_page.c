@@ -156,7 +156,7 @@ void PAGE_DatalogInit(int page)
 
     //Col1
     GUI_CreateLabelBox(&gui->enlbl, SCROLLABLE_X, row, 80, 18, &DEFAULT_FONT, NULL, NULL, _tr("Enable"));
-    GUI_CreateTextSelect(&gui->en, SCROLLABLE_X + 78, row, TEXTSELECT_96, NULL, sourcesel_cb, NULL);
+    GUI_CreateTextSource(&gui->en, SCROLLABLE_X + 78, row, TEXTSELECT_96, NULL, sourcesel_cb, sourcesel_input_cb, NULL);
     //Col2
     GUI_CreateButton(&gui->reset, SCROLLABLE_X + SCROLLABLE_WIDTH - 64, row, BUTTON_64x16, reset_str_cb, 0, reset_press_cb, NULL);
     row += ROW_HEIGHT;

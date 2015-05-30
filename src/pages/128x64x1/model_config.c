@@ -154,6 +154,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     void *ts;
+    void *input_ts = NULL;
     void *ts_press = NULL;
     void *ts_data = NULL;
     char *label = NULL;
@@ -171,7 +172,7 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
     case 2:
         if (PPMin_Mode() != PPM_IN_SOURCE) {
             label = _tr_noop("Trainer Sw");
-            ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw;
+            ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.train_sw; input_ts = set_input_source_cb;
         } else {
             label = _tr_noop("Num Channels");
             ts = set_train_cb; ts_data = (void *)0L;
@@ -184,8 +185,8 @@ static int row3_cb(int absrow, int relrow, int y, void *data)
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, label_cmd, NULL, label_cmd ? label : _tr(label));
-    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
-            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
+    GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
+            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, input_ts, ts_data);
     return 1;
 }
 #if HAS_VIDEO
@@ -193,6 +194,7 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     void *ts = NULL;
+    void *input_ts = NULL;
     void *ts_press = NULL;
     void *ts_data = NULL;
     char *label = NULL;
@@ -200,7 +202,7 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
     switch (absrow) {
     case 0:
         label = _tr_noop("Video Enable");
-        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.videosrc;
+        ts = set_source_cb; ts_press = sourceselect_cb; ts_data = (void *)&Model.videosrc; input_ts = set_input_source_cb;
         break;
     case 1:
         label = _tr_noop("Video Channel");
@@ -209,8 +211,8 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
-    GUI_CreateTextSelectPlate(&gui->value[relrow], SELECT_X, y,
-            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, ts_data);
+    GUI_CreateTextSourcePlate(&gui->value[relrow], SELECT_X, y,
+            SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, ts_press, ts, input_ts, ts_data);
     return 1;
 }
 

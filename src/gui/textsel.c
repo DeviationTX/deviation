@@ -60,11 +60,24 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *select, u16 x, u16 y, enum Te
     select->fontColor = 0;
     select->ValueCB   = value_cb;
     select->SelectCB  = select_cb;
+    select->InputValueCB = NULL;
     select->cb_data   = cb_data;
     select->enable |= 0x01;
 
     return obj;
 }
+
+guiObject_t *GUI_CreateTextSource(guiTextSelect_t *select, u16 x, u16 y, enum TextSelectType type,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data),
+        void *cb_data)
+{
+    GUI_CreateTextSelect(select, x, y, type, select_cb, value_cb, cb_data);
+    select->InputValueCB = input_value_cb;
+    return (guiObject_t *)select;
+}
+
 
 guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         void (*select_cb)(guiObject_t *obj, void *data),
@@ -95,6 +108,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     select->SelectCB  = select_cb;
     select->cb_data   = cb_data;
     select->enable |= 0x01;
+    select->InputValueCB = NULL;
 
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
@@ -103,6 +117,19 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 
     return obj;
 }
+
+
+guiObject_t *GUI_CreateTextSourcePlate(guiTextSelect_t *select, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data),
+        void *cb_data)
+{
+    GUI_CreateTextSelectPlate(select, x, y, width, height, desc, select_cb, value_cb, cb_data);
+    select->InputValueCB = input_value_cb;
+    return (guiObject_t *)select;
+}
+
 
 void GUI_DrawTextSelect(struct guiObject *obj)
 {

@@ -93,6 +93,16 @@ void GUI_DrawObjects(void)
     }
 }
 
+void GUI_HandleInput(int source, int value) {
+    if(objSELECTED && objSELECTED->Type == TextSelect) {
+        guiTextSelect_t *select = (guiTextSelect_t *)objSELECTED;
+        if (select->InputValueCB) {
+            select->InputValueCB(objSELECTED, source, value, select->cb_data);
+            OBJ_SET_DIRTY(objSELECTED, 1);
+        }
+    }
+}
+
 void GUI_RemoveAllObjects()
 {
     while(objHEAD)

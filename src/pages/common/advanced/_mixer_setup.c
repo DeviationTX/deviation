@@ -114,6 +114,7 @@ static const char *set_curvename_cb(guiObject_t *obj, int dir, void *data);
 static void sourceselect_cb(guiObject_t *obj, void *data);
 static void curveselect_cb(guiObject_t *obj, void *data);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_input_source_cb(guiObject_t *obj, int source, int value, void *data);
 static const char *set_drsource_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_mux_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_nummixers_cb(guiObject_t *obj, int dir, void *data);
@@ -371,16 +372,13 @@ const char *set_mixernum_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-const char *set_source_cb(guiObject_t *obj, int dir, void *data)
-{
+static const char *set_source_helper(guiObject_t *obj, void *data, int changed) {
     (void) obj;
     u8 *source = (u8 *)data;
     if (!GUI_IsTextSelectEnabled(obj) ) {
         tempstring_cpy(_tr("None"));
         return tempstring;
     }
-    u8 changed;
-    *source = INPUT_SelectSource(*source, dir, &changed);
     if (changed) {
         if(mp->cur_template == MIXERTEMPLATE_COMPLEX) {
             guiObject_t *trim = _get_obj(COMPLEX_TRIM, 0);
@@ -396,6 +394,20 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, MIXER_SRC(*source));
     return INPUT_SourceName(tempstring, *source);
+}
+
+const char *set_source_cb(guiObject_t *obj, int dir, void *data)
+{
+    u8 changed;
+    *(u8 *)data = INPUT_SelectSource(*(u8 *)data, dir, &changed);
+    return set_source_helper(obj, data, changed);
+}
+
+const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data) {
+    (void)value;
+    u8 changed;
+    *(u8 *)data = INPUT_SelectInput(*(u8 *)data, src, &changed);
+    return set_source_helper(obj, data, changed);
 }
 
 const char *set_drsource_cb(guiObject_t *obj, int dir, void *data)

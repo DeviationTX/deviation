@@ -38,7 +38,7 @@ static void _show_limits()
     y += height;
     //Row 3
     GUI_CreateLabel(&gui->safetylbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safety"));
-    GUI_CreateTextSelect(&gui->safety, COL2, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->limit.safetysw);
+    GUI_CreateTextSource(&gui->safety, COL2, y, TEXTSELECT_96, sourceselect_cb, set_source_cb, set_input_source_cb, &mp->limit.safetysw);
     y += height;
     //Row 4
     GUI_CreateLabel(&gui->safevallbl, COL1, y, NULL, DEFAULT_FONT, _tr("Safe Val"));
