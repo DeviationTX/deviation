@@ -50,34 +50,60 @@
 #define dbgprintf if(0) printf
 #endif
 
-#define PACKET_PERIOD   1316     // Timeout for callback in uSec
+#define CX10_PACKET_SIZE 15
+#define CX10A_PACKET_SIZE 19       // CX10 blue board packets have 19-byte payload
+#define CX10_PACKET_PERIOD   1316  // Timeout for callback in uSec
+#define CX10A_PACKET_PERIOD  6000
+
 #define INITIAL_WAIT     500
 
+// flags 
 #define FLAG_FLIP       0x1000 // goes to rudder channel
 #define FLAG_MODE_MASK  0x0003
+#define FLAG_HEADLESS   0x0004
+// flags2
+#define FLAG_VIDEO      0x0002
+#define FLAG_SNAPSHOT   0x0004
+
+static const char * const cx10_opts[] = {
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), _tr_noop("DM007"), NULL, 
+    NULL
+};
+
+enum {
+    PROTOOPTS_FORMAT = 0,
+    LAST_PROTO_OPT,
+};
+
+enum {
+    FORMAT_CX10_GREEN = 0,
+    FORMAT_CX10_BLUE,
+    FORMAT_DM007,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 // For code readability
 enum {
-    CHANNEL1 = 0,
-    CHANNEL2,
-    CHANNEL3,
-    CHANNEL4,
-    CHANNEL5,
-    CHANNEL6,
-    CHANNEL7,
-    CHANNEL8,
-    CHANNEL9,
+    CHANNEL1 = 0,   // Aileron
+    CHANNEL2,       // Elevator
+    CHANNEL3,       // Throttle
+    CHANNEL4,       // Rudder
+    CHANNEL5,       // Rate/Mode (+ Headless on CX-10A)
+    CHANNEL6,       // Flip
+    CHANNEL7,       // Still Camera (DM007)
+    CHANNEL8,       // Video Camera (DM007)
+    CHANNEL9,       // Headless (DM007)
     CHANNEL10
 };
 
-#define PAYLOADSIZE 15   // receive data pipes set to this size, but unused
-#define PACKET_SIZE 15   // CX10 packets have 15-byte payload
-
-static u8 packet[PACKET_SIZE];
-static u16 counter;
-static u32 packet_counter;
+static u8 packet[CX10A_PACKET_SIZE]; // CX10A (blue board) has larger packet size
+static u8 packet_size;
+static u16 packet_period;
+static u8 phase;
+static u8 bind_phase;
+static u16 bind_counter;
 static u8 tx_power;
-static u16 throttle, rudder, elevator, aileron, flags;
+static u16 throttle, rudder, elevator, aileron, flags, flags2;
 static const u8 rx_tx_addr[] = {0xcc, 0xcc, 0xcc, 0xcc, 0xcc};
 
 // frequency channel management
@@ -87,17 +113,15 @@ static u8 current_chan = 0;
 static u8 txid[4];
 static u8 rf_chans[4];
 
-static u8 phase;
 enum {
     CX10_INIT1 = 0,
+    CX10_BIND1,
     CX10_BIND2,
     CX10_DATA
 };
 
-
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
-
 
 // Channel values are servo time in ms, 1500ms is the middle,
 // 1000 and 2000 are min and max values
@@ -112,8 +136,7 @@ static u16 convert_channel(u8 num)
     return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 1500);
 }
 
-
-static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* aileron, u16* flags)
+static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* aileron, u16* flags, u16* flags2)
 {
     // Protocol is registered AETRF, that is
     // Aileron is channel 1, Elevator - 2, Throttle - 3, Rudder - 4
@@ -129,63 +152,81 @@ static void read_controls(u16* throttle, u16* rudder, u16* elevator, u16* ailero
     // Channel 5 - mode
     if (Channels[CHANNEL5] > 0) {
         if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
-          *flags |= 1;
+            *flags |= 1;
         else
-          *flags |= 2;
+            *flags |= 2; // headless on CX-10A
     }
 
     // Channel 6 - flip flag
-    if (Channels[CHANNEL6] <= 0)
-      *flags &= ~FLAG_FLIP;
+    if (Model.num_channels < 6 || Channels[CHANNEL6] <= 0)
+        *flags &= ~FLAG_FLIP;
     else
-      *flags |= FLAG_FLIP;
+        *flags |= FLAG_FLIP;
 
-    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%x\n",
-            *aileron, *elevator, *throttle, *rudder, *flags);
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DM007) {
+        // invert aileron direction
+        *aileron = 3000 - *aileron;
+        
+        // Channel 7 - snapshot
+        if( Model.num_channels < 7 || Channels[CHANNEL7] <= 0)
+            *flags2 &= ~FLAG_SNAPSHOT;
+        else
+            *flags2 |= FLAG_SNAPSHOT;
+
+        // Channel 8 - video
+        if( Model.num_channels < 8 || Channels[CHANNEL8] <=0)
+            *flags2 &= ~FLAG_VIDEO;
+        else
+            *flags2 |= FLAG_VIDEO;
+
+        // Channel 9 - headless
+        if (Model.num_channels < 9 || Channels[CHANNEL9] <= 0)
+            *flags &= ~FLAG_HEADLESS;
+        else
+            *flags |= FLAG_HEADLESS;
+    }
+
+    dbgprintf("ail %5d, ele %5d, thr %5d, rud %5d, flags 0x%4x, flags2 0x%2x\n",
+            *aileron, *elevator, *throttle, *rudder, *flags, *flags2);
 }
-
 
 static void send_packet(u8 bind)
 {
-    if (bind) {
-      packet[0]= 0xaa;
-    } else {
-      packet[0]= 0x55;
-    }
+    u8 offset=0;
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX10_BLUE)
+        offset = 4;
+    packet[0] = bind ? 0xAA : 0x55;
     packet[1] = txid[0];
     packet[2] = txid[1];
     packet[3] = txid[2];
     packet[4] = txid[3];
+    // for CX-10A [5]-[8] is aircraft id received during bind 
+    read_controls(&throttle, &rudder, &elevator, &aileron, &flags, &flags2);
+    packet[5+offset] = aileron & 0xff;
+    packet[6+offset] = (aileron >> 8) & 0xff;
+    packet[7+offset] = elevator & 0xff;
+    packet[8+offset] = (elevator >> 8) & 0xff;
+    packet[9+offset] = throttle & 0xff;
+    packet[10+offset] = (throttle >> 8) & 0xff;
+    packet[11+offset] = rudder & 0xff;
+    packet[12+offset] = ((rudder >> 8) & 0xff) | ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
+    packet[13+offset] = flags & 0xff;
+    packet[14+offset] = flags2 & 0xff;
 
-    read_controls(&throttle, &rudder, &elevator, &aileron, &flags);
-    packet[5] = aileron & 0xff;
-    packet[6] = (aileron >> 8) & 0xff;
-    packet[7] = elevator & 0xff;
-    packet[8] = (elevator >> 8) & 0xff;
-    packet[9] = throttle & 0xff;
-    packet[10] = (throttle >> 8) & 0xff;
-    packet[11] = rudder & 0xff;
-    packet[12] = ((rudder >> 8) & 0xff) | ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
-    packet[13] = flags & 0xff;
-    packet[14] = 0;
-
-    // clear packet status bits and TX FIFO
     // Power on, TX mode, 2byte CRC
-    //NRF24L01_WriteReg(NRF24L01_00_CONFIG, 0x0e);      // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     if (bind) {
-      NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
     } else {
-      NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_chans[current_chan++]);
-      current_chan %= NUM_RF_CHANNELS;
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_chans[current_chan++]);
+        current_chan %= NUM_RF_CHANNELS;
     }
+    // clear packet status bits and TX FIFO
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
-    XN297_WritePayload(packet, PACKET_SIZE);
-
-    ++packet_counter;
+    XN297_WritePayload(packet, packet_size);
 
 //    radio.ce(HIGH);
 //    delayMicroseconds(15);
@@ -208,7 +249,6 @@ static void send_packet(u8 bind)
 static void cx10_init()
 {
     NRF24L01_Initialize();
-
     NRF24L01_SetTxRxMode(TX_EN);
 
     // SPI trace of stock TX has these writes to registers that don't appear in
@@ -217,23 +257,19 @@ static void cx10_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-
     XN297_SetTXAddr(rx_tx_addr, 5);
-
+    XN297_SetRXAddr(rx_tx_addr, 5);
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, packet_size); // bytes of data payload for rx pipe 1 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
+    NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-
-// This one should be emulated if we need to receive data as well
-//    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PAYLOADSIZE);   // bytes of data payload for pipe 1
-
-    NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
-
+    
     // this sequence necessary for module from stock tx
     NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
     NRF24L01_Activate(0x73);                          // Activate feature register
@@ -241,7 +277,6 @@ static void cx10_init()
 
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);     // Set feature bits on
-
 
     // Check for Beken BK2421/BK2423 chip
     // It is done by using Beken specific activate code, 0x53
@@ -271,11 +306,7 @@ static void cx10_init()
         dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
-
-    // Implicit delay in callback
-    // delay(50);
 }
-
 
 MODULE_CALLTYPE
 static u16 cx10_callback()
@@ -283,17 +314,39 @@ static u16 cx10_callback()
     switch (phase) {
     case CX10_INIT1:
         MUSIC_Play(MUSIC_TELEMALARM1);
-        phase = CX10_BIND2;
+        phase = bind_phase;
         break;
 
-    case CX10_BIND2:
-        if (counter == 0) {
+    case CX10_BIND1:
+        if (bind_counter == 0) {
             phase = CX10_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             send_packet(1);
-            counter -= 1;
+            bind_counter -= 1;
+        }
+        break;
+        
+    case CX10_BIND2:
+        if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
+            XN297_ReadPayload(packet, packet_size);
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            if(packet[9] == 1) {
+                phase = CX10_BIND1;
+            }
+        } else {
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            send_packet(1);
+            usleep(300);
+            // switch to RX mode
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_FlushRx();
+            NRF24L01_SetTxRxMode(RX_EN);
+            XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) 
+                          | BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_PRIM_RX)); 
         }
         break;
 
@@ -301,15 +354,13 @@ static u16 cx10_callback()
         send_packet(0);
         break;
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
-
 
 // Generate address to use from TX id and manufacturer id (STM32 unique id)
 static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
-
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
@@ -320,19 +371,17 @@ static void initialize_txid()
     }
     dbgprintf("\r\n");
 #endif
-
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-
+    // tx id
     txid[0] = (lfsr >> 24) & 0xFF;
     txid[1] = ((lfsr >> 16) & 0xFF) % 0x30;
     txid[2] = (lfsr >> 8) & 0xFF;
     txid[3] = lfsr & 0xFF;
-    
     // rf channels
     rf_chans[0] = 0x03 + (txid[0] & 0x0F);
     rf_chans[1] = 0x16 + (txid[0] >> 4);
@@ -340,20 +389,36 @@ static void initialize_txid()
     rf_chans[3] = 0x40 + (txid[1] >> 4);
 }
 
-
 static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_CX10_GREEN:
+        case FORMAT_DM007:
+            packet_size = CX10_PACKET_SIZE;
+            packet_period = CX10_PACKET_PERIOD;
+            bind_phase = CX10_BIND1;
+            bind_counter = BIND_COUNT;
+            PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
+            break;
+        
+        case FORMAT_CX10_BLUE:
+            packet_size = CX10A_PACKET_SIZE;
+            packet_period = CX10A_PACKET_PERIOD;
+            bind_phase = CX10_BIND2;
+            bind_counter=0;
+            for(u8 i=0; i<4; i++)
+                packet[5+i] = 0xFF; // clear aircraft id
+            packet[9] = 0;
+            PROTOCOL_SetBindState(0xFFFFFFFF);
+            break;
+    }
     initialize_txid();
-    packet_counter = 0;
-    counter = BIND_COUNT;
     flags = 0;
-
+    flags2 = 0;
     cx10_init();
     phase = CX10_INIT1;
-
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
     CLOCK_StartTimer(INITIAL_WAIT, cx10_callback);
 }
 
@@ -367,10 +432,10 @@ const void *CX10_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, flight mode, enable flip
+        case PROTOCMD_NUMCHAN: return (void *) 9L; // A, E, T, R, flight mode, enable flip, photo, video, headless
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return cx10_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }

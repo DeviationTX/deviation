@@ -276,6 +276,9 @@ int NRF24L01_Reset()
     u8 status1 = Strobe(NOP);
     u8 status2 = NRF24L01_ReadReg(0x07);
     NRF24L01_SetTxRxMode(TXRX_OFF);
+#ifdef EMULATOR
+    return 1;
+#endif
     return (status1 == status2 && (status1 & 0x0f) == 0x0e);
 }
 
@@ -293,6 +296,13 @@ static const uint8_t xn297_scramble[] = {
   0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
   0x8e, 0xc5, 0x2f};
 
+ static const u16 xn297_crc_xorout[] = {
+    0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C, // 1st entry is missing, probably never needed
+    0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x8148, // it's used for 3-byte address w/ 0 byte payload only
+    0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
+    0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401, 
+    0x2138, 0x129F, 0xB3A0, 0x2988};
+  
 static uint8_t bit_reverse(uint8_t b_in)
 {
     uint8_t b_out = 0;
@@ -306,7 +316,7 @@ static uint8_t bit_reverse(uint8_t b_in)
 
 static const uint16_t polynomial = 0x1021;
 static const uint16_t initial    = 0xb5d2;
-static const uint16_t xorout     = 0x9ba7;
+
 static uint16_t crc16_update(uint16_t crc, unsigned char a)
 {
     crc ^= a << 8;
@@ -409,7 +419,7 @@ u8 XN297_WritePayload(u8* msg, int len)
             for (int i = offset; i < last; ++i) {
                 crc = crc16_update(crc, packet[i]);
             }
-            crc ^= xorout;
+            crc ^= xn297_crc_xorout[xn297_addr_len - 3 + len];
             packet[last++] = crc >> 8;
             packet[last++] = crc & 0xff;
         }
@@ -421,9 +431,11 @@ u8 XN297_WritePayload(u8* msg, int len)
 
 u8 XN297_ReadPayload(u8* msg, int len)
 {
-    (void) msg;
-    (void) len;
-    return 0;
+    // TODO: if xn297_crc==1, check CRC before filling *msg 
+    u8 res = NRF24L01_ReadPayload(msg, len);
+    for(u8 i=0; i<len; i++)
+      msg[i] = bit_reverse(msg[i])^bit_reverse(xn297_scramble[i+xn297_addr_len]);
+    return res;
 }
 
 
