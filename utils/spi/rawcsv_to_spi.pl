@@ -7,8 +7,8 @@ use Getopt::Long;
 
 my($mosi, $miso, $clk, $enable) = (4, 3, 2, 1);
 my $sample = 8000000;
-GetOptions("mosi=i" => \$mosi, "miso=i" => \$miso, "clk=i" => \$clk, "enable=i" =>\$enable, "sample=i", $sample);
-my $last_en;
+GetOptions("mosi=i" => \$mosi, "miso=i" => \$miso, "clk=i" => \$clk, "enable=i" =>\$enable, "sample=i", \$sample);
+my $last_en = 1;
 my $last_clk;
 my $packet = 0;
 my $in = 0;
@@ -32,7 +32,12 @@ while(<>) {
     chomp;
     my @data = split(/\s*,\s*/, $_);
     if($enable && $data[$enable]) {
-        if ($last_en) {
+        if ($last_en && ($c == 4 || $c == 8)) {
+            if ($c == 4) {
+                $out <<= 4;
+                $in <<= 4;
+            }
+            printf("%11.9f,$packet,0x%02X,0x%02X\n", $sample ? $tick * 1.0 / $sample : $data[0], $out, $in);
             $last_en = 0;
             $in = 0;
             $out = 0;

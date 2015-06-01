@@ -5,19 +5,20 @@ use FindBin;
 use Data::Dumper;
 use Getopt::Long;
 
+my $proto_dir = "$FindBin::Bin/../../src/protocol";
 sub read_a7105 {
     my %cmd = (
         WR_MASK     => 0x40, WR_MASK_VAL  => 0x00,
         CMD_MASK    => 0x80, CMD_MASK_VAL => 0x80,
         ADDR_MASK   => 0x3F
         );
-    my $h = "$FindBin::Bin/../src/protocol/iface_a7105.h";
+    my $h = "$proto_dir/iface_a7105.h";
     open my $fh, "<", $h or die "Couldn't read $h\n";
     while(<$fh>) {
-        if(/^enum {/ .. /^};/) {
-             if(/A7105_.._(\S+)\s*=\s*(0x..)/) {
-                 $cmd{hex($2)} = $1;
-             }
+        if(/^\s*A7105_.._(\S+)\s*=\s*(0x..)/) {
+            $cmd{hex($2)} = $1;
+        } elsif(/^\s*A7105_(\S+)\s*=\s*(0x..)/) {
+            $cmd{hex($2)} = "STROBE_$1";
         }
     }
     return \%cmd;
@@ -29,7 +30,7 @@ sub read_nrf24l01 {
         CMD_MASK    => 0xC0, CMD_MASK_VAL => 0xC0,
         ADDR_MASK   => 0x1F
         );
-    my $h = "$FindBin::Bin/../src/protocol/iface_nrf24l01.h";
+    my $h = "$proto_dir/iface_nrf24l01.h";
     open my $fh, "<", $h or die "Couldn't read $h\n";
     while(<$fh>) {
         if(/^enum {/ .. /^};/) {
@@ -48,7 +49,7 @@ sub read_cc2500 {
         CMD_MASK    => 0x70, CMD_MASK_VAL => 0x30,
         ADDR_MASK   => 0x3F
         );
-    my $h = "$FindBin::Bin/../src/protocol/iface_cc2500.h";
+    my $h = "$proto_dir/iface_cc2500.h";
     open my $fh, "<", $h or die "Couldn't read $h\n";
     while(<$fh>) {
         if(/^enum {/ .. /^};/) {
@@ -70,7 +71,7 @@ sub read_cyrf6936 {
         CHAIN_MASK  => 0x38, CHAIN_MASK_VAL => 0x20,
         ADDR_MASK   => 0x3F
         );
-    my $h = "$FindBin::Bin/../src/protocol/iface_cyrf6936.h";
+    my $h = "$proto_dir/iface_cyrf6936.h";
     open my $fh, "<", $h or die "Couldn't read $h\n";
     while(<$fh>) {
         if(/^enum {/ .. /^};/) {
