@@ -142,6 +142,7 @@ sub display_results {
         $cmdlen = length($_) if(length($_) > $cmdlen);
     }
     foreach my $d (@$data) {
+        next unless($d);
         my @d = @$d;
         my($time) = shift @d;
         my @mosi;

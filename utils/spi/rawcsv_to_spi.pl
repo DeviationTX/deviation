@@ -32,12 +32,14 @@ while(<>) {
     chomp;
     my @data = split(/\s*,\s*/, $_);
     if($enable && $data[$enable]) {
-        if ($last_en && ($c == 4 || $c == 8)) {
+        if ($last_en) {
             if ($c == 4) {
                 $out <<= 4;
                 $in <<= 4;
             }
-            printf("%11.9f,$packet,0x%02X,0x%02X\n", $sample ? $tick * 1.0 / $sample : $data[0], $out, $in);
+            if ($c == 4 || $c == 8) {
+                printf("%11.9f,$packet,0x%02X,0x%02X\n", $sample ? $tick * 1.0 / $sample : $data[0], $out, $in);
+            }
             $last_en = 0;
             $in = 0;
             $out = 0;
@@ -52,7 +54,8 @@ while(<>) {
             $in = 0;
             $out = 0;
             $c = 0;
-            $last_clk = 0;
+            $last_clk = $data[$clk];
+            next;
     }
     if($data[$clk] && ! $last_clk) {
         $c++;
