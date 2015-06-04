@@ -35,7 +35,8 @@
 #ifdef PROTO_HAS_A7105
 
 
-
+#define EVEN_ODD 0x00
+//#define EVEN_ODD 0x01
 static const u8 A7105_regs[] = {
     0x00, 0x62,   -1, 0x0f, 0x00,  -1 ,  -1 , 0x00,     0x00, 0x05, 0x00, 0x01, 0x00, 0xf5, 0x00, 0x15,
     0x9e, 0x4b, 0x00, 0x03, 0x56, 0x2b, 0x12, 0x4a,     0x02, 0x80, 0x80, 0x00, 0x0e, 0x91, 0x03, 0x0f,
@@ -131,7 +132,7 @@ static void flysky_build_packet()
     packet[5] = 0x00;
     static const int chmap[4] = {6, 7, 10, 11};
     for (i = 0; i < 4; i++) {
-        if (i > Model.num_channels) {
+        if (i >= Model.num_channels) {
             packet[chmap[i]] = 0x64;
             continue;
         }
@@ -162,19 +163,23 @@ static u16 joysway_cb()
         counter = 0;
         A7105_WriteID(0x5475c52a);
         ch = 0x0a;
+    } else if (counter == 2) {
+        A7105_WriteID(id);
+        ch = 0x30;
     } else {
-        if (counter == 2)
-            A7105_WriteID(id);
-        if (! (counter & 0x01) ) {
+        if ((counter & 0x01) ^ EVEN_ODD) {
             ch = 0x30;
         } else {
             ch = next_ch;
-            next_ch++;
-            if (next_ch == 0x45)
-                next_ch = 0x30;
         }
     }
+    if (! ((counter & 0x01) ^ EVEN_ODD)) {
+        next_ch++;
+        if (next_ch == 0x45)
+            next_ch = 0x30;
+    }
     flysky_build_packet();
+    A7105_Strobe(A7105_STANDBY);
     A7105_WriteData(packet, 16, ch);
     counter++;
     return 6000;
