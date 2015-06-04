@@ -147,7 +147,7 @@ static void flysky_build_packet()
     packet[9] = 0x64;
     packet[12] = 0x64;
     packet[13] = 0x64;
-    packet[14] = 0xaa;
+    packet[14] = counter == 0 ? 0x30 : 0xaa;
     u8 value = 0;
     for (int i = 0; i < 15; i++) {
         value += packet[i];
