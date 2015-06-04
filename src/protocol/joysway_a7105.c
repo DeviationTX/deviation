@@ -58,7 +58,6 @@ static int joysway_init()
 
     counter = 0;
     next_ch = 0x30;
-    id = 0xf82dcaa0;
 
     for (i = 0; i < 0x33; i++)
         if((s8)A7105_regs[i] != -1)
@@ -187,17 +186,28 @@ static u16 joysway_cb()
 
 static void initialize() {
     CLOCK_StopTimer();
+
+    //id = 0xf82dcaa0;
+    if (Model.fixed_id) {
+        id = Model.fixed_id;
+    } else {
+        id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter)));
+    }
+    u32 lfsr = 0xb2c54a2ful;
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(id); ++i, j += 8)
+           rand32_r(&lfsr, (id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    id = lfsr;
+
     while(1) {
         A7105_Reset();
         CLOCK_ResetWatchdog();
         if (joysway_init())
             break;
     }
-    //if (Model.fixed_id) {
-    //    id = Model.fixed_id;
-    //} else {
-    //    id = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) % 999999;
-    //}
     CLOCK_StartTimer(2400, joysway_cb);
 }
 
@@ -213,7 +223,7 @@ const void *JOYSWAY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)4L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
-        case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
             return NULL;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
