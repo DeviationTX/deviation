@@ -5,6 +5,7 @@ PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
 PROTO_MODULES += $(ODIR)/protocol/flysky.mod
 PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
+PROTO_MODULES += $(ODIR)/protocol/joysway.mod
 PROTO_MODULES += $(ODIR)/protocol/j6pro.mod
 PROTO_MODULES += $(ODIR)/protocol/ppm.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2801.mod
@@ -56,6 +57,10 @@ $(ODIR)/protocol/frsky.mod : $(ODIR)/frsky2way_cc2500.bin
 
 $(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
 	@echo Building 'hubsan4' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/joysway.mod : $(ODIR)/joysway_a7105.bin
+	@echo Building 'joysway' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/j6pro.mod : $(ODIR)/j6pro_cyrf6936.bin
