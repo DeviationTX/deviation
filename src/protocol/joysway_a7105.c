@@ -200,7 +200,7 @@ static void initialize() {
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    id = lfsr;
+    id = (lfsr >> 8) | 0xf8000000;
 
     while(1) {
         A7105_Reset();
