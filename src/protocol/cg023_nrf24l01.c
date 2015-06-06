@@ -50,21 +50,27 @@
 #define dbgprintf if(0) printf
 #endif
 
-#define PACKET_PERIOD    8200 // Timeout for callback in uSec
+#define CG023_PACKET_PERIOD    8200 // Timeout for callback in uSec
+#define YD829_PACKET_PERIOD    2600 // stock tx is 4100, but seems to work better with shorter period
 #define INITIAL_WAIT     500
 #define PACKET_SIZE 15   // packets have 15-byte payload
 #define RF_BIND_CHANNEL 0x2D
 
 static const char * const cg023_opts[] = { 
+    "Format", "CG023", "YD-829", NULL,  
     "Dyn Trims", _tr_noop("Off"), _tr_noop("On"), NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_DYNTRIM=0,
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_DYNTRIM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+#define FORMAT_CG023 0
+#define FORMAT_YD829 1
 
 #define DYNTRIM_OFF 0
 #define DYNTRIM_ON 1
@@ -84,15 +90,26 @@ enum {
 };
 
 enum{
-    // flags going to packet[13]
+    // flags going to packet[13] (CG023)
     FLAG_FLIP     = 0x01, 
     FLAG_EASY     = 0x02, 
     FLAG_VIDEO    = 0x04, 
     FLAG_STILL    = 0x08, 
     FLAG_LED_OFF  = 0x10,
-    FLAG_RATE_LOW = 0x00,
+    MASK_RATE     = 0x60,
     FLAG_RATE_MID = 0x20,
     FLAG_RATE_HIGH= 0x40,
+};
+
+enum{
+    // flags going to packet[13] (YD-829)
+    YD_FLAG_FLIP     = 0x01,
+    YD_MASK_RATE     = 0x0C,
+    YD_FLAG_RATE_MID = 0x04,
+    YD_FLAG_RATE_HIGH= 0x08,
+    YD_FLAG_HEADLESS = 0x20,
+    YD_FLAG_STILL    = 0x40, // untested
+    YD_FLAG_VIDEO    = 0x80, // untested
 };
 
 enum {
@@ -108,6 +125,7 @@ static u8 txid[2];
 static u8 rf_chan; 
 static const u8 rx_tx_addr[] = {0x26, 0xA8, 0x67, 0x35, 0xCC};
 static u8 phase;
+static u32 packet_period;
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -160,25 +178,44 @@ static void send_packet(u8 bind)
         packet[11] = 0x40;
         packet[12] = 0x40;
     }
-    // rate
-    if(Channels[CHANNEL10] > 0) {
-        if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
-            packet[13] = FLAG_RATE_MID;
-        else
-            packet[13] = FLAG_RATE_LOW;
-    } else
-        packet[13] = FLAG_RATE_HIGH; 
     // flags
-    if(Channels[CHANNEL5] > 0)
-        packet[13] |= FLAG_LED_OFF;
-    if(Channels[CHANNEL6] > 0)
-        packet[13] |= FLAG_FLIP;
-    if(Channels[CHANNEL7] > 0)
-        packet[13] |= FLAG_STILL;
-    if(Channels[CHANNEL8] > 0)
-        packet[13] |= FLAG_VIDEO;
-    if(Channels[CHANNEL9] > 0)
-        packet[13] |= FLAG_EASY;
+    packet[13] = 0x00;
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_CG023:
+            if(Channels[CHANNEL10] > 0) {
+                if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
+                    packet[13] |= FLAG_RATE_MID;
+            } else
+                packet[13] |= FLAG_RATE_HIGH;             
+            if(Channels[CHANNEL5] > 0)
+                packet[13] |= FLAG_LED_OFF;
+            if(Channels[CHANNEL6] > 0)
+                packet[13] |= FLAG_FLIP;
+            if(Channels[CHANNEL7] > 0)
+                packet[13] |= FLAG_STILL;
+            if(Channels[CHANNEL8] > 0)
+                packet[13] |= FLAG_VIDEO;
+            if(Channels[CHANNEL9] > 0)
+                packet[13] |= FLAG_EASY;
+            break;
+        case FORMAT_YD829:
+            // reverse aileron direction
+            packet[8] = 0xFE - packet[8];
+            if(Channels[CHANNEL10] > 0) {
+                if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
+                    packet[13] |= YD_FLAG_RATE_MID;
+            } else
+                packet[13] |= YD_FLAG_RATE_HIGH; 
+            if(Channels[CHANNEL6] > 0)
+                packet[13] |= YD_FLAG_FLIP;
+            if(Channels[CHANNEL7] > 0)
+                packet[13] |= YD_FLAG_STILL;
+            if(Channels[CHANNEL8] > 0)
+                packet[13] |= YD_FLAG_VIDEO;
+            if(Channels[CHANNEL9] > 0)
+                packet[13] |= YD_FLAG_HEADLESS;
+            break;
+    }
     packet[14] = 0;
     
     // Power on, TX mode, 2byte CRC
@@ -225,10 +262,9 @@ static void cg023_init()
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
+    NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-
-    NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
 
     // this sequence necessary for module from stock tx
     NRF24L01_ReadReg(NRF24L01_1D_FEATURE);
@@ -292,7 +328,7 @@ static u16 cg023_callback()
         send_packet(0);
         break;
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
 
 static void initialize_txid()
@@ -320,8 +356,15 @@ static void initialize()
     initialize_txid();
     cg023_init();
     phase = CG023_INIT1;
-
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_YD829:
+            packet_period = YD829_PACKET_PERIOD;
+            break;
+        case FORMAT_CG023:
+            packet_period = CG023_PACKET_PERIOD;
+            break;    
+    }
+    PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
     CLOCK_StartTimer(INITIAL_WAIT, cg023_callback);
 }
 
