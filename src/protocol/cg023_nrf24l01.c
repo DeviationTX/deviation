@@ -108,8 +108,8 @@ enum{
     YD_FLAG_RATE_MID = 0x04,
     YD_FLAG_RATE_HIGH= 0x08,
     YD_FLAG_HEADLESS = 0x20,
-    YD_FLAG_STILL    = 0x40, // untested
-    YD_FLAG_VIDEO    = 0x80, // untested
+    YD_FLAG_VIDEO    = 0x40,
+    YD_FLAG_STILL    = 0x80,
 };
 
 enum {
