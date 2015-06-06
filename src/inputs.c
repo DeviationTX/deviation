@@ -321,6 +321,5 @@ void INPUT_CheckChanges(void) {
     }
     if (changed_input != INP_NONE) {
         GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : CHAN_MAX_VALUE);
-        AUTODIMMER_Check();
     }
 }
