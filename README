@@ -71,7 +71,7 @@ Builing the Windows binary on Linux
 Building the Windows binary on Windows
 #################################
     Install MingW:
-    * Download the mingw installer from here: sourceforge.net/projects/mingw/files/Ins...0120426.exe/download
+    * Download the mingw installer as per: http://www.mingw.org/wiki/Getting_Started
     * Run the installer, and select 'C++', 'MSYS' and the 'Developer Toolkit'
 
     Install fltk:
