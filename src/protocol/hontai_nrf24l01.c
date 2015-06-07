@@ -262,6 +262,12 @@ static void ht_init()
     NRF24L01_Activate(0x53); // switch bank back
 }
 
+static void ht_init2()
+{
+    static const u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
+    XN297_SetTXAddr(data_tx_addr, 5);
+}
+
 MODULE_CALLTYPE
 static u16 ht_callback()
 {
@@ -273,6 +279,7 @@ static u16 ht_callback()
 
     case HonTai_BIND2:
         if (counter == 0) {
+            ht_init2();
             phase = HonTai_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
