@@ -264,7 +264,7 @@ static void ht_init()
 
 static void ht_init2()
 {
-    static const u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
+    const u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
     XN297_SetTXAddr(data_tx_addr, 5);
 }
 
