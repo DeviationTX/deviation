@@ -17,7 +17,7 @@ $(TARGET)-lib.dfu: $(wildcard filesystem/devo12/media/*.*) $(TARGET).dfu $(PRE_F
 	../utils/mkfat/mkfat.py --size 16M $(ODIR)/filesystem/ $(ODIR)/$(TARGET)-lib.bin
 	../utils/dfu.py --alt 2 --name "$(HGVERSION) Library" -b 0x64080000:$(ODIR)/$(TARGET)-lib.bin $@
 
-$(PRE_FS):
+$(PRE_FS): $(FONTS)
 	mkdir -p filesystem/$(FILESYSTEM)/media/ 2>/dev/null || true
 	cp -prf filesystem/devo8/* filesystem/$(FILESYSTEM)/
 	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
