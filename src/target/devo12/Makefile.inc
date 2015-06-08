@@ -31,7 +31,7 @@ $(TARGET).fs:
 	export p=`pwd`; cd $(ODIR); zip -x filesystem/media/\* -ur $$p/deviation-fs-$(HGVERSION).zip filesystem
 
 $(TARGET).zip: $(TARGET).dfu $(ALL)
-	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf

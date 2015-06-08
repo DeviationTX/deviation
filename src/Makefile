@@ -220,7 +220,7 @@ zip: $(TARGET).zip
 
 %.zip: $(ALL) $(TARGET).dfu $(PROTO_MODULES)
 	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
-	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
