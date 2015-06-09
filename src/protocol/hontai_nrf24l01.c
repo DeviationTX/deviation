@@ -106,14 +106,13 @@ static u8 tx_power;
 static u8 txid[5];
 static u8 rf_chan = 0; 
 static u8 rf_channels[] = {0x05, 0x19, 0x28}; 
-static const u8 rx_tx_addr[] = {0x99, 0xb5, 0xd2};
+static const u8 rx_tx_addr[] = {0x4a, 0xb3, 0x99, 0xb5, 0xd2};
 static u8 phase;
 
 #define TX_ADDRESS_LENGTH  sizeof(rx_tx_addr)
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
-
 
 // proudly swiped from http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
 #define POLY 0x8408
@@ -264,7 +263,7 @@ static void ht_init()
 
 static void ht_init2()
 {
-    const u8 data_tx_addr[] = {0xa5, 0xda, 0x2a};
+    const u8 data_tx_addr[] = {0x24, 0x25, 0xa5, 0xda, 0x2a};
     XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
 }
 
