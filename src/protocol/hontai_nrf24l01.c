@@ -52,10 +52,11 @@
 #define dbgprintf if(0) printf
 #endif
 
-#define INITIAL_WAIT     500
-#define BIND_PACKET_SIZE 10
-#define PACKET_SIZE      12
-#define RF_BIND_CHANNEL  0
+#define INITIAL_WAIT       500
+#define BIND_PACKET_SIZE   10
+#define PACKET_SIZE        12
+#define RF_BIND_CHANNEL    0
+#define TX_ADDRESS_LENGTH  3
 
 enum {
     LAST_PROTO_OPT,
@@ -162,8 +163,7 @@ static void send_packet(u8 bind)
       packet[1] = 0x00;
       packet[2] = 0x00;
       packet[3] = scale_channel(CHANNEL3, 0x00, 0xFF);              // throttle
-     // packet[4] = (0x3f - scale_channel(CHANNEL1, 0x00, 0x3F))      // aileron
-      packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)      // aileron
+      packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)               // aileron
                 | (Channels[CHANNEL_RTH] > 0 ? 0x80 : 0x00)
                 | (Channels[CHANNEL_HEADLESS] > 0 ? 0x40 : 0x00);
       packet[5] = (0x3f - scale_channel(CHANNEL2, 0x00, 0x3F))      // elevator
@@ -218,13 +218,12 @@ static void ht_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-    XN297_SetTXAddr(rx_tx_addr, 5);
+    XN297_SetTXAddr(rx_tx_addr, TX_ADDRESS_LENGTH);
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 3-byte address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);   // 1Mbps
     NRF24L01_Activate(0x73);                          // Activate feature register
@@ -265,7 +264,7 @@ static void ht_init()
 static void ht_init2()
 {
     const u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
-    XN297_SetTXAddr(data_tx_addr, 5);
+    XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
 }
 
 MODULE_CALLTYPE
