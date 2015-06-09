@@ -166,14 +166,17 @@ static void send_packet(u8 bind)
       packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)               // aileron
                 | (Channels[CHANNEL_RTH] > 0 ? 0x80 : 0x00)
                 | (Channels[CHANNEL_HEADLESS] > 0 ? 0x40 : 0x00);
+      packet[5] = scale_channel(CHANNEL2, 0x00, 0xFF);     // elevator
+#if 0
       packet[5] = (0x3f - scale_channel(CHANNEL2, 0x00, 0x3F))      // elevator
                 | (Channels[CHANNEL_CALIBRATE] > 0 ? 0x80 : 0x00)
                 | (Channels[CHANNEL_FLIP] > 0 ? 0x40 : 0x00);
+#endif
       packet[6] = scale_channel(CHANNEL4, 0x00, 0x3F)               // rudder
                 | (Channels[CHANNEL_VIDEO] > 0 ? 0x80 : 0x00);
-      packet[7] = scale_channel(CHANNEL1, 32, -32);
-      packet[8] = scale_channel(CHANNEL4, 32, -32);
-      packet[9] = scale_channel(CHANNEL2, -32, 32);
+      packet[7] = 0; //scale_channel(CHANNEL1, 32, -32);
+      packet[8] = 0; //scale_channel(CHANNEL4, 32, -32);
+      packet[9] = 0; //scale_channel(CHANNEL2, -32, 32);
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
