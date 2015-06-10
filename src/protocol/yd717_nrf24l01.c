@@ -161,6 +161,7 @@ static u8 packet_ack()
 }
 
 
+#if 0
 static u8 convert_channel(u8 num)
 {
     // Sometimes due to imperfect calibration or mixer settings
@@ -176,25 +177,37 @@ static u8 convert_channel(u8 num)
 
     return (u8) (((ch * 0xFF / CHAN_MAX_VALUE) + 0x100) >> 1);
 }
+#endif
+
+static s16 scale_channel(u8 ch, s32 destMin, s32 destMax)
+{
+    s32 a = (destMax - destMin) * ((s32)Channels[ch] - CHAN_MIN_VALUE);
+    s32 b = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
+    return ((a / b) - (destMax - destMin)) + destMax;
+}
 
 
 static void read_controls(u8* throttle, u8* rudder, u8* elevator, u8* aileron,
                           u8* flags, u8* rudder_trim, u8* elevator_trim, u8* aileron_trim)
 {
-    *throttle = convert_channel(CHANNEL3);
+    //*throttle = convert_channel(CHANNEL3);
+    *throttle = scale_channel(CHANNEL3, 0x00, 0xff);
 
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_XINXUN) {
-      *rudder = convert_channel(CHANNEL4);
+      //*rudder = convert_channel(CHANNEL4);
+      *rudder = scale_channel(CHANNEL4, 0x00, 0xff);
       *rudder_trim = (0xff - *rudder) >> 1;
     } else {
-      *rudder = 0xff - convert_channel(CHANNEL4);
+      //*rudder = 0xff - convert_channel(CHANNEL4);
+      *rudder = scale_channel(CHANNEL4, 0xff, 0x00);
       *rudder_trim = *rudder >> 1;
     }
 
-    *elevator = convert_channel(CHANNEL2);
+    //*elevator = convert_channel(CHANNEL2);
+    *elevator = scale_channel(CHANNEL2, 0x00, 0xff);
     *elevator_trim = *elevator >> 1;
 
-    *aileron = 0xff - convert_channel(CHANNEL1);
+    *aileron = scale_channel(CHANNEL1, 0xff, 0x00);
     *aileron_trim = *aileron >> 1;
 
     if (Channels[CHANNEL5] <= 0)
