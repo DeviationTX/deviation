@@ -166,7 +166,7 @@ static void send_packet(u8 bind)
       packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)               // aileron
                 | (Channels[CHANNEL_RTH] > 0 ? 0x80 : 0x00)
                 | (Channels[CHANNEL_HEADLESS] > 0 ? 0x40 : 0x00);
-      packet[5] = scale_channel(CHANNEL2, 0x3f, 0x00)               // elevator
+      packet[5] = scale_channel(CHANNEL2, 0x00, 0x3f)               // elevator
                 | (Channels[CHANNEL_CALIBRATE] > 0 ? 0x80 : 0x00)
                 | (Channels[CHANNEL_FLIP] > 0 ? 0x40 : 0x00);
       packet[6] = scale_channel(CHANNEL4, 0x00, 0x3f)               // rudder
