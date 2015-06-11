@@ -163,7 +163,8 @@ static void send_packet(u8 bind)
       packet[0] = 0x0b;
       packet[1] = 0x00;
       packet[2] = 0x00;
-      packet[3] = scale_channel(CHANNEL3, 0x00, 0xFF);              // throttle
+      packet[3] = (scale_channel(CHANNEL3, 0x00, 0xFF) & 0xFE)       // throttle
+                | GET_FLAG(CHANNEL_PICTURE, 0x01);
       packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)               // aileron
                 | GET_FLAG(CHANNEL_RTH, 0x80)
                 | GET_FLAG(CHANNEL_HEADLESS, 0x40);
@@ -171,8 +172,7 @@ static void send_packet(u8 bind)
                 | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
       packet[6] = 0x20  //scale_channel(CHANNEL4, 0x00, 0x3f)               // rudder
-                | GET_FLAG(CHANNEL_VIDEO, 0x80)
-                | GET_FLAG(CHANNEL_PICTURE, 0x40);
+                | GET_FLAG(CHANNEL_VIDEO, 0x80);
       packet[7] = 0; //scale_channel(CHANNEL1, 32, -32);
       packet[8] = scale_channel(CHANNEL4, 32, -32);
       packet[9] = 0; //scale_channel(CHANNEL2, -32, 32);
