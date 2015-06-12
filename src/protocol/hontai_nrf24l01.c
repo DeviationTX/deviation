@@ -171,10 +171,10 @@ static void send_packet(u8 bind)
       packet[5] = scale_channel(CHANNEL2, 0x00, 0x3f)               // elevator
                 | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
-      packet[6] = 0x20  //scale_channel(CHANNEL4, 0x00, 0x3f)               // rudder
+      packet[6] = scale_channel(CHANNEL4, 0x00, 0x3f)               // rudder
                 | GET_FLAG(CHANNEL_VIDEO, 0x80);
       packet[7] = 0; //scale_channel(CHANNEL1, 32, -32);
-      packet[8] = scale_channel(CHANNEL4, 32, -32);
+      packet[8] = scale_channel(CHANNEL4, -32, 32);
       packet[9] = 0; //scale_channel(CHANNEL2, -32, 32);
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
@@ -315,8 +315,8 @@ static void initialize_txid()
     txid[0] = 0x4c;
     txid[1] = 0x4b;
     txid[2] = 0x3a;
-    txid[3] = 0xf2;
-    txid[4] = 0x04;
+    txid[3] = (Model.fixed_id >> 8) & 0xff; //0xf2;
+    txid[4] = Model.fixed_id & 0xff; //0x04;
 }
 
 static void initialize()
