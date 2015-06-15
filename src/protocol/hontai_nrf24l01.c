@@ -265,7 +265,19 @@ static void ht_init()
 
 static void ht_init2()
 {
-    const u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
+    u8 offsets[4][16] = {{0, 2, 6, 8, 14, 16, 18, 38, 40, 42, 48, 50, 54, 64, 66, 70},
+                         {0, 2, 4, 8, 18, 20, 26, 32, 34, 36, 56, 58, 64, 66, 68, 72},
+                         {0, 2, 6, 8, 18, 22, 24, 26, 32, 34, 54, 56, 58, 64, 66, 70},
+                         {0, 4, 6, 8, 14, 16, 36, 38, 40, 52, 54, 64, 68, 70, 72, 73}};
+    u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
+
+    data_tx_addr[0] = 0x24 + offsets[0][ txid[3]       & 0x0f];
+    data_tx_addr[1] = 0x92 + offsets[1][(txid[3] >> 4) & 0x0f];
+    data_tx_addr[2] = 0x93 + offsets[2][ txid[4]       & 0x0f];
+    data_tx_addr[3] = 0x25 + offsets[3][(txid[4] >> 4) & 0x0f];
+#ifdef EMULATOR
+    printf("rx_addr = %02x, %02x, %02x, %02x\n", data_tx_addr[0], data_tx_addr[1], data_tx_addr[2], data_tx_addr[3]);
+#endif
     XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
 }
 
@@ -310,7 +322,6 @@ static void initialize_txid()
         txid[0] ++;
     txid[1] = (temp >> 8) & 0xFF;
 
-//TODO Figure out relationship of txid to rx/tx address and rf channels
     rf_chan = 0;
     txid[0] = 0x4c;
     txid[1] = 0x4b;
