@@ -45,7 +45,7 @@
 #define dbgprintf printf
 #else
 #define BIND_COUNT 80
-#define PACKET_PERIOD    15000 // Timeout for callback in uSec
+#define PACKET_PERIOD    13500 // Timeout for callback in uSec
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -100,14 +100,24 @@ enum {
     HonTai_DATA
 };
 
+static u8 phase;
 static u8 packet[PACKET_SIZE];
-static u16 counter;
 static u8 tx_power;
 static u8 txid[5];
 static u8 rf_chan = 0; 
-static u8 rf_channels[] = {0x05, 0x19, 0x28}; 
+static u16 counter;
+static const u8 rf_channels[] = {0x05, 0x19, 0x28}; 
 static const u8 rx_tx_addr[] = {0xd2, 0xb5, 0x99, 0xb3, 0x4a};
-static u8 phase;
+static const u8 addr_vals[4][16] = {
+                    {0x24, 0x26, 0x2a, 0x2c, 0x32, 0x34, 0x36, 0x4a,
+                     0x4c, 0x4e, 0x54, 0x56, 0x5a, 0x64, 0x66, 0x6a},
+                    {0x92, 0x94, 0x96, 0x9a, 0xa4, 0xa6, 0xac, 0xb2,
+                     0xb4, 0xb6, 0xca, 0xcc, 0xd2, 0xd4, 0xd6, 0xda},
+                    {0x93, 0x95, 0x99, 0x9b, 0xa5, 0xa9, 0xab, 0xad,
+                     0xb3, 0xb5, 0xc9, 0xcb, 0xcd, 0xd3, 0xd5, 0xd9},
+                    {0x25, 0x29, 0x2b, 0x2d, 0x33, 0x35, 0x49, 0x4b,
+                     0x4d, 0x59, 0x5b, 0x65, 0x69, 0x6b, 0x6d, 0x6e}};
+
 
 #define TX_ADDRESS_LENGTH  sizeof(rx_tx_addr)
 
@@ -265,17 +275,14 @@ static void ht_init()
 
 static void ht_init2()
 {
-    u8 offsets[4][16] = {{0, 2, 6, 8, 14, 16, 18, 38, 40, 42, 48, 50, 54, 64, 66, 70},
-                         {0, 2, 4, 8, 18, 20, 26, 32, 34, 36, 56, 58, 64, 66, 68, 72},
-                         {0, 2, 6, 8, 18, 22, 24, 26, 32, 34, 54, 56, 58, 64, 66, 70},
-                         {0, 4, 6, 8, 14, 16, 36, 38, 40, 52, 54, 64, 68, 70, 72, 73}};
     u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
 
-    data_tx_addr[0] = 0x24 + offsets[0][ txid[3]       & 0x0f];
-    data_tx_addr[1] = 0x92 + offsets[1][(txid[3] >> 4) & 0x0f];
-    data_tx_addr[2] = 0x93 + offsets[2][ txid[4]       & 0x0f];
-    data_tx_addr[3] = 0x25 + offsets[3][(txid[4] >> 4) & 0x0f];
+    data_tx_addr[0] = addr_vals[0][ txid[3]       & 0x0f];
+    data_tx_addr[1] = addr_vals[1][(txid[3] >> 4) & 0x0f];
+    data_tx_addr[2] = addr_vals[2][ txid[4]       & 0x0f];
+    data_tx_addr[3] = addr_vals[3][(txid[4] >> 4) & 0x0f];
 #ifdef EMULATOR
+    printf("txid = %02x, %02x\n", txid[3], txid[4]);
     printf("rx_addr = %02x, %02x, %02x, %02x\n", data_tx_addr[0], data_tx_addr[1], data_tx_addr[2], data_tx_addr[3]);
 #endif
     XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
@@ -311,23 +318,31 @@ static u16 ht_callback()
 
 static void initialize_txid()
 {
-    u32 temp;
-    if (Model.fixed_id) {
-        temp = Crc(&Model.fixed_id, sizeof(Model.fixed_id));
-    } else {
-        temp = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) ;
-    }
-    txid[0] = 0x80 | (temp % 0x40); 
-    if( txid[0] == 0xAA) // avoid using same freq for bind and data channel
-        txid[0] ++;
-    txid[1] = (temp >> 8) & 0xFF;
+    u32 lfsr = 0xb2c54a2ful;
 
-    rf_chan = 0;
-    txid[0] = 0x4c;
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    dbgprintf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+
+    txid[0] = 0x4c; // first three bytes ignored by receiver - set same as stock tx
     txid[1] = 0x4b;
     txid[2] = 0x3a;
-    txid[3] = (Model.fixed_id >> 8) & 0xff; //0xf2;
-    txid[4] = Model.fixed_id & 0xff; //0x04;
+    txid[3] = (lfsr >> 8 ) & 0xff;
+    txid[4] = lfsr & 0xff; 
 }
 
 static void initialize()
