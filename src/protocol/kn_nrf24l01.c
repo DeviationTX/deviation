@@ -51,21 +51,36 @@
 #define BINDING_PACKET_PERIOD  1000
 
 // Timeout for sending data packets, in uSec, KN protocol requires 2ms
-#define SENDING_PACKET_PERIOD  2000
+#define WL_SENDING_PACKET_PERIOD  2000
+// Timeout for sending data packets, in uSec, KNFX protocol requires 1.2 ms
+#define FX_SENDING_PACKET_PERIOD  1200
 
-// packets to be sent during binding, last 0.5 seconds
-#define BIND_COUNT 500 
+
+// packets to be sent during binding, last 0.5 seconds in WL Toys and 0.2 seconds in Feilun
+#ifdef EMULATOR
+#define USE_FIXED_MFGID
+#define WL_BIND_COUNT 5
+#define FX_BIND_COUNT 5
+#else
+#define WL_BIND_COUNT 500
+#define FX_BIND_COUNT 200 
+#endif 
+
+
 
 #define PAYLOADSIZE 16
 
 //24L01 has 126 RF channels, can we use all of them?
 #define MAX_RF_CHANNEL 73
 
-//KN protocol changes RF frequency every 10 ms, repeats with only 4 channels.
+//KN protocol for WL Toys changes RF frequency every 10 ms, repeats with only 4 channels.
+//Feilun variant uses only 2 channels, so we will just repeat the hopping channels later
 #define RF_CH_COUNT 4
 
-//KN protocol sends 4 data packets every 2ms per frequency, plus a 2ms gap.
-#define PACEKT_SEND_COUNT 5
+//KN protocol for WL Toys sends 4 data packets every 2ms per frequency, plus a 2ms gap.
+#define WL_PACKET_SEND_COUNT 5
+//KN protocol for Feilun sends 8 data packets every 1.2ms per frequency, plus a 0.3ms gap.
+#define FX_PACKET_SEND_COUNT 8
  
 #define TX_ADDRESS_SIZE 5
 
@@ -100,6 +115,7 @@ enum {
 enum {
     PROTOOPTS_STARTBIND = 0,
     PROTOOPTS_USE1MBPS,
+    PROTOOPTS_FORMAT,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -112,6 +128,11 @@ enum {
 enum {
     USE1MBPS_NO  = 0,
     USE1MBPS_YES = 1,
+};
+
+enum {
+    FORMAT_WLTOYS = 0,
+    FORMAT_FEILUN,
 };
  
 enum {
@@ -130,7 +151,7 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[]);
  
 static void kn_bind_init(u8 tx_addr[], u8 hopping_ch[], u8 bind_packet[]);
  
-static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels[]);
+static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels[], u8 tx_addr[]);
 static void kn_calculate_tx_addr(u8 tx_addr[]);
 static void kn_send_packet(u8 packet[], s32 rf_ch);
  
@@ -144,15 +165,20 @@ static u16  kn_convert_channel(u8 num);
 //================================================================================================
 // Local Variables
 //================================================================================================
-static const char * const kKN_PROTOCOL_OPTIONS[] = {
+static const char * const KN_PROTOCOL_OPTIONS[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   _tr_noop("1Mbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
+  _tr_noop("Format"), _tr_noop("WLToys"), _tr_noop("Feilun"), NULL, 
   NULL
 };
  
 //Payload data buffer
 static u8 packet_[PAYLOADSIZE];
 static u8 hopping_channels_[RF_CH_COUNT];
+
+static u16 sending_packet_period;
+static u8 bind_count;
+static u8 packet_send_count;
  
 //KN only use 4 of 5 bytes address, the 5th byte has fixed value 'K'
 static u8 tx_addr_[TX_ADDRESS_SIZE];
@@ -185,7 +211,7 @@ const void *KN_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_CURRENT_ID: 
             return (Model.fixed_id) ? (void *)Model.fixed_id : 0;
         case PROTOCMD_GETOPTIONS: 
-            return kKN_PROTOCOL_OPTIONS;
+            return KN_PROTOCOL_OPTIONS;
         case PROTOCMD_TELEMETRYSTATE: 
             return (void *)PROTO_TELEM_UNSUPPORTED;
         default: break;
@@ -198,11 +224,27 @@ const void *KN_Cmds(enum ProtoCmds cmd)
 //================================================================================================
 static void kn_start_tx(BOOL bind_yes)
 {
-	CLOCK_StopTimer();
+    CLOCK_StopTimer();
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:
+            sending_packet_period = WL_SENDING_PACKET_PERIOD;
+            bind_count = WL_BIND_COUNT;
+            packet_send_count = WL_PACKET_SEND_COUNT;
+            printf("KN protocol: WL Toys\n");
+            break;
+        
+       case FORMAT_FEILUN:
+            sending_packet_period = FX_SENDING_PACKET_PERIOD;
+            bind_count =FX_BIND_COUNT;
+            packet_send_count = FX_PACKET_SEND_COUNT;
+            printf("KN protocol: Feilun\n");
+            break;
+    }
+ 
     kn_init(tx_addr_, hopping_channels_);
     if(bind_yes)
     {
-        PROTOCOL_SetBindState(BIND_COUNT * BINDING_PACKET_PERIOD / 1000); //msec
+        PROTOCOL_SetBindState(bind_count * BINDING_PACKET_PERIOD / 1000); //msec
         tx_state_ = STATE_PRE_BIND;
     } else {
         tx_state_ = STATE_PRE_SEND;
@@ -232,7 +274,7 @@ static s32 rf_ch_idx = 0;
         packet_sent = 0;
         //Do once, no break needed
     case STATE_BINDING:
-        if(packet_sent < BIND_COUNT)
+        if(packet_sent < bind_count)
         {
             packet_sent++;
             kn_send_packet(packet_, NO_RF_CHANNEL_CHANGE);
@@ -251,7 +293,7 @@ static s32 rf_ch_idx = 0;
             tx_state_ = STATE_SENDING;
            //Do once, no break needed
     case STATE_SENDING:
-        if(packet_sent >= PACEKT_SEND_COUNT)
+        if(packet_sent >= packet_send_count)
         {
             packet_sent = 0;
             rf_ch_idx++;
@@ -263,13 +305,13 @@ static s32 rf_ch_idx = 0;
             kn_send_packet(packet_, NO_RF_CHANNEL_CHANGE);
         }
         packet_sent++;
-        return SENDING_PACKET_PERIOD;
+        return sending_packet_period;
     } //switch
  
     //Bad things happened, rest
     packet_sent = 0;
     tx_state_ = STATE_PRE_SEND;
-    return SENDING_PACKET_PERIOD;
+    return sending_packet_period;
 }
  
 //-------------------------------------------------------------------------------------------------
@@ -286,8 +328,8 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[])
     #define BV(bit) (1 << bit)
  
     kn_calculate_tx_addr(tx_addr);
-    //use tx_addr as seed to randomize the RF hopping channels
-    kn_calculate_freqency_hopping_channels(*((u32*)tx_addr), hopping_ch);
+    //use tx_addr as seed to randomize the RF hopping channels or to calculate channels for Feilun variant
+    kn_calculate_freqency_hopping_channels(*((u32*)tx_addr), hopping_ch, tx_addr);
  
     NRF24L01_Initialize();
  
@@ -318,25 +360,42 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[])
 // This function generates "random" RF hopping frequency channel numbers.
 // These numbers must be repeatable for a specific seed
 // The generated number range is from 0 to MAX_RF_CHANNEL. No repeat or adjacent numbers
+//
+// For Feilun variant, the channels are calculated from TXID, and since only 2 channels are used
+// we copy them to fill up to MAX_RF_CHANNEL
 //-------------------------------------------------------------------------------------------------
-static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels[])
+static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels[], u8 tx_addr[])
 {
-    s32 idx = 0;
-    u32 rnd = seed;
-    while (idx < RF_CH_COUNT) {
-        s32 i;
-        rnd = rnd * 0x0019660D + 0x3C6EF35F; // Randomization
-        // Drop least-significant byte for better randomization. Start from 1
-        u8 next_ch = (rnd >> 8) % MAX_RF_CHANNEL + 1;
-        // Check that it's not duplicate nor adjacent
-        for (i = 0; i < idx; i++) {
-        	u8 ch = hopping_channels[i];
-            if( (ch <= next_ch + 1) && (ch >= next_ch - 1) ) break;
-        }
-        if (i != idx)
-            continue;
-        hopping_channels[idx++] = next_ch;
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:;
+            s32 idx = 0;
+            u32 rnd = seed;
+            while (idx < RF_CH_COUNT) {
+              s32 i;
+              rnd = rnd * 0x0019660D + 0x3C6EF35F; // Randomization
+              // Drop least-significant byte for better randomization. Start from 1
+              u8 next_ch = (rnd >> 8) % MAX_RF_CHANNEL + 1;
+              // Check that it's not duplicate nor adjacent
+              for (i = 0; i < idx; i++) {
+        	  u8 ch = hopping_channels[i];
+                  if( (ch <= next_ch + 1) && (ch >= next_ch - 1) ) break;
+              }
+              if (i != idx)
+              continue;
+              hopping_channels[idx++] = next_ch;
+            }
+            break;
+        
+       case FORMAT_FEILUN:
+            hopping_channels[0] = tx_addr[0] + tx_addr[1] + tx_addr[2] + tx_addr[3] - 256; 
+            hopping_channels[1] = hopping_channels[0] + 32;
+            hopping_channels[2] = hopping_channels[0];
+            hopping_channels[3] = hopping_channels[1];
+            break;
+
     }
+    printf("FQ ch %02u %02u %02u %02u\n", hopping_channels[0], hopping_channels[1], hopping_channels[2], hopping_channels[3]);
+
 }
  
 //-------------------------------------------------------------------------------------------------
@@ -349,17 +408,37 @@ static void kn_calculate_freqency_hopping_channels(u32 seed, u8 hopping_channels
 static void kn_calculate_tx_addr(u8 tx_addr[])
 {
     u32 rnd;
-	s32 i;
+    s32 i;
     MCU_SerialNumber((u8*)&rnd, 4);
+    printf("Manufacturer id: %X\n", rnd);
     if(Model.fixed_id != 0) rnd *= Model.fixed_id;
-
-    for (i=0; i<8; i++)
-    {
-        rnd = (rnd * 0x3eeb2c54a2f) + 0xE0F3AD019660;
+    printf("Model id: %u\n", Model.fixed_id);
+    for (i=0; i<8; i++) {
+      rnd = (rnd * 0x3eeb2c54a2f) + 0xE0F3AD019660;
     }
-    *((u32*)tx_addr) = rnd;
+
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:
+            *((u32*)tx_addr) = rnd;
+            break;
+        
+       case FORMAT_FEILUN:
+            // Generate TXID with sum of minimum 256 and maximum 256+MAX_RF_CHANNEL-32
+            tx_addr[0] = rnd % 256;
+            tx_addr[1] = 1 + rnd % (MAX_RF_CHANNEL-33);
+            rnd = (rnd * 0x3eeb2c54a2f) + 0xE0F3AD019660;
+            if (tx_addr[0] + tx_addr[1] < 256)
+              tx_addr[2] = 1 + rnd % (MAX_RF_CHANNEL-33);
+            else
+              tx_addr[2] = 0x00;
+            tx_addr[3] = 0x00;
+             while((tx_addr[0] + tx_addr[1] + tx_addr[2] + tx_addr[3])<257) tx_addr[3] = tx_addr[3] + 1 + (rnd % (MAX_RF_CHANNEL-33));
+            break;
+
+    }
     //The 5th byte is a constant, must be 'K'
     tx_addr[4] = 'K';
+    printf("TX ID %02X %02X %02X %02X\n", tx_addr[0], tx_addr[1], tx_addr[2], tx_addr[3]);
 }
  
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -372,7 +451,7 @@ static void kn_calculate_tx_addr(u8 tx_addr[])
 //-------------------------------------------------------------------------------------------------
 // This function init 24L01 regs and packet data for binding
 //
-// Send tx address, hopping table, and data rate to the KN receiver during binding.
+// Send tx address, hopping table (for Wl Toys), and data rate to the KN receiver during binding.
 // It seems that KN can remember these parameters, no binding needed after power up.
 //
 // Bind uses fixed TX address "KNDZK", 1 Mbps data rate and channel 83
@@ -390,10 +469,22 @@ static void kn_bind_init(u8 tx_addr[], u8 hopping_ch[], u8 bind_packet[])
     bind_packet[5]  = tx_addr[1];
     bind_packet[6]  = tx_addr[2];
     bind_packet[7]  = tx_addr[3];
-    bind_packet[8]  = hopping_ch[0];
-    bind_packet[9]  = hopping_ch[1];
-    bind_packet[10] = hopping_ch[2];
-    bind_packet[11] = hopping_ch[3];
+ 
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:
+            bind_packet[8]  = hopping_ch[0];
+            bind_packet[9]  = hopping_ch[1];
+            bind_packet[10] = hopping_ch[2];
+            bind_packet[11] = hopping_ch[3];
+            break;
+
+       case FORMAT_FEILUN:
+            bind_packet[8]  = 0x00;
+            bind_packet[9]  = 0x00;
+            bind_packet[10] = 0x00;
+            bind_packet[11] = 0x00;
+            break;
+    }
     bind_packet[12] = 0x00;
     bind_packet[13] = 0x00;
     bind_packet[14] = 0x00;
@@ -431,10 +522,21 @@ static void kn_send_init(u8 tx_addr[], u8 packet[])
 // Update sending count and RF channel index.
 // The protocol sends 4 data packets every 2ms per frequency, plus a 2ms gap.
 // Each data packet need a packet number and RF channel index
+// 
+// 
 //-------------------------------------------------------------------------------------------------
 static void kn_update_packet_send_count(u8 packet[], s32 packet_sent, s32 rf_ch_idx )
 {
-  packet[13] = (packet_sent << 5) | (rf_ch_idx << 2);
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:
+            packet[13] = (packet_sent << 5) | (rf_ch_idx << 2);
+            break;
+
+       case FORMAT_FEILUN:
+            packet[13] = 0x00;
+            break;
+    }
+
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -468,8 +570,17 @@ static void kn_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_
     packet[11] = 0x64; // R
  
     packet[12] = *((u8*)&flags);
-    packet[13] = (packet_count << 5) | (rf_ch_idx << 2);
- 
+    
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+       case FORMAT_WLTOYS:
+            packet[13] = (packet_count << 5) | (rf_ch_idx << 2);
+            break;
+
+       case FORMAT_FEILUN:
+            packet[13] = 0x00;
+            break;
+    }
+
     packet[14] = 0x00;
     packet[15] = 0x00;
  
