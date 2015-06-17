@@ -177,7 +177,7 @@ static u8 packet_[PAYLOADSIZE];
 static u8 hopping_channels_[RF_CH_COUNT];
 
 static u16 sending_packet_period;
-static u8 bind_count;
+static u16 bind_count;
 static u8 packet_send_count;
  
 //KN only use 4 of 5 bytes address, the 5th byte has fixed value 'K'
@@ -410,9 +410,7 @@ static void kn_calculate_tx_addr(u8 tx_addr[])
     u32 rnd;
     s32 i;
     MCU_SerialNumber((u8*)&rnd, 4);
-    printf("Manufacturer id: %X\n", rnd);
     if(Model.fixed_id != 0) rnd *= Model.fixed_id;
-    printf("Model id: %u\n", Model.fixed_id);
     for (i=0; i<8; i++) {
       rnd = (rnd * 0x3eeb2c54a2f) + 0xE0F3AD019660;
     }
