@@ -37,6 +37,7 @@
 #define USE_PBM_IMAGE       1
 #define HAS_CHAR_ICONS      1
 #define HAS_VIDEO           32
+#define HAS_EXTRA_SCREEN_TUNING 1
 
 #define NO_LANGUAGE_SUPPORT 1
 

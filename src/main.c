@@ -62,8 +62,11 @@ int main() {
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     CONFIG_ReadLang(Transmitter.language);
 
-    BACKLIGHT_Brightness(Transmitter.brightness);
+    BACKLIGHT_Brightness(Transmitter.backlight);
     LCD_Contrast(Transmitter.contrast);
+#if HAS_VIDEO
+    LCD_Brightness(Transmitter.video_brightness);
+#endif
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 

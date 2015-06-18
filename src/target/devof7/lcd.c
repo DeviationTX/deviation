@@ -129,6 +129,11 @@ void LCD_Contrast(unsigned contrast)
     (void) contrast;
 }
 
+void LCD_Brightness(int brightness)
+{
+    (void) brightness;
+}
+
 // Convert a string with the charmap
 void lcd_convert_string(const char string[], u8 length, u8* output) {
     u8 i;

@@ -59,6 +59,7 @@ void BACKLIGHT_Brightness(unsigned brightness);
 /* Display Functions */
 void LCD_Init();
 void LCD_Contrast(unsigned contrast);
+void LCD_Brightness(int brightness);
 void LCD_ForceUpdate();
 void LCD_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
 void LCD_SetMappedWindow(unsigned val);

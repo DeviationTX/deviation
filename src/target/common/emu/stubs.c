@@ -105,8 +105,9 @@ void FS_CloseDir() {
 }
 
 void BACKLIGHT_Init() {}
-void BACKLIGHT_Brightness(unsigned brightness) { printf("Brightness: %d\n", brightness); }
+void BACKLIGHT_Brightness(unsigned brightness) { printf("Backlight: %d\n", brightness); }
 void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
+void LCD_Brightness(int brightness) { printf("Video Brightness: %d\n", brightness); }
 
 void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}
