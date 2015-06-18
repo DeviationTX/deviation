@@ -229,7 +229,7 @@ static const char *_brightness_select_cb(guiObject_t *obj, int dir, void *data)
     (void)obj;
     u8 changed;
     Transmitter.video_brightness = GUI_TextSelectHelper(Transmitter.video_brightness,
-                                  0, 10, dir, 1, 1, &changed);
+                                  -10, 10, dir, 1, 1, &changed);
     if (changed) {
         LCD_Brightness(Transmitter.video_brightness);
     }
