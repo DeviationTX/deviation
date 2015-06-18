@@ -250,7 +250,8 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
               break;
           case 0x06: //VOLT3 0V-4.2V (0.01V/count)
-              Telemetry.value[TELEM_FRSKY_VOLT3] = value;
+              value = (pkt[i+2] << 8) + pkt[i+3];
+              Telemetry.value[TELEM_FRSKY_VOLT3] = (u16)(value & 0xFFF) * 2 / 10;
               TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
               break;
           case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
@@ -434,7 +435,7 @@ static void initialize(int bind)
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
     } else {
-        state = FRSKY_DATA2;
+        state = FRSKY_BIND_DONE;
     }
     CLOCK_StartTimer(10000, frsky2way_cb);
 }
