@@ -156,11 +156,12 @@ static u16 crc16(u8 *data_p, u32 length)
     return crc;
 }
 
-static s16 scale_channel(u8 ch, s32 destMin, s32 destMax)
+#define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
+static s8 scale_channel(u8 ch, s8 destMin, s8 destMax)
 {
-    s32 a = (destMax - destMin) * ((s32)Channels[ch] - CHAN_MIN_VALUE);
-    s32 b = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
-    return ((a / b) - (destMax - destMin)) + destMax;
+    s32 range = destMax - destMin;
+    s32 round = range * destMin < 0 ? 0 : CHAN_RANGE / range;
+    return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + destMin;
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
@@ -173,19 +174,19 @@ static void send_packet(u8 bind)
       packet[0] = 0x0b;
       packet[1] = 0x00;
       packet[2] = 0x00;
-      packet[3] = (scale_channel(CHANNEL3, 0x00, 0x7F) << 1)        // throttle
+      packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)       // throttle
                 | GET_FLAG(CHANNEL_PICTURE, 0x01);
-      packet[4] = scale_channel(CHANNEL1, 0x3f, 0x00)               // aileron
+      packet[4] = scale_channel(CHANNEL1, 63, 0)               // aileron
                 | GET_FLAG(CHANNEL_RTH, 0x80)
                 | GET_FLAG(CHANNEL_HEADLESS, 0x40);
-      packet[5] = scale_channel(CHANNEL2, 0x00, 0x3f)               // elevator
+      packet[5] = scale_channel(CHANNEL2, 0, 63)               // elevator
                 | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
-      packet[6] = scale_channel(CHANNEL4, 0x00, 0x3f)               // rudder
+      packet[6] = scale_channel(CHANNEL4, 0, 63)               // rudder
                 | GET_FLAG(CHANNEL_VIDEO, 0x80);
-      packet[7] = 0; //scale_channel(CHANNEL1, 32, -32);
-      packet[8] = scale_channel(CHANNEL4, -32, 32);
-      packet[9] = 0; //scale_channel(CHANNEL2, -32, 32);
+      packet[7] = 0; // aileron trim (range -32, 32)
+      packet[8] = 0; // rudder trim
+      packet[9] = 0; // elevator trim
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
