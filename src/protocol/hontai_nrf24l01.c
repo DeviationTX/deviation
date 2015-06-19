@@ -157,11 +157,12 @@ static u16 crc16(u8 *data_p, u32 length)
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static s8 scale_channel(u8 ch, s8 destMin, s8 destMax)
+static s8 scale_channel(u8 ch, s8 start, s8 end)
 {
-    s32 range = destMax - destMin;
-    s32 round = range * destMin < 0 ? 0 : CHAN_RANGE / range;
-    return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + destMin;
+    s32 range = end - start;
+    s32 round = range < 0 ? 0 : CHAN_RANGE / range;   // oddball rounding to match rx idea of zero
+    if (start < 0) round = CHAN_RANGE / range / 2;
+    return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
@@ -184,9 +185,9 @@ static void send_packet(u8 bind)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
       packet[6] = scale_channel(CHANNEL4, 0, 63)               // rudder
                 | GET_FLAG(CHANNEL_VIDEO, 0x80);
-      packet[7] = 0; // aileron trim (range -32, 32)
-      packet[8] = 0; // rudder trim
-      packet[9] = 0; // elevator trim
+      packet[7] = scale_channel(CHANNEL1, -16, 16);//0; // aileron trim (range -32, 32)
+      packet[8] = scale_channel(CHANNEL4, -16, 16);//0; // rudder trim
+      packet[9] = scale_channel(CHANNEL2, -16, 16);//0; // elevator trim
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
@@ -238,7 +239,8 @@ static void ht_init()
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
-    NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);   // 1Mbps
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
