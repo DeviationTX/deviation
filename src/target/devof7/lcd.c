@@ -129,7 +129,12 @@ void LCD_Contrast(unsigned contrast)
     (void) contrast;
 }
 
-void LCD_Brightness(int brightness)
+void VIDEO_Contrast(int contrast)
+{
+    (void) contrast;
+}
+
+void VIDEO_Brightness(int brightness)
 {
     (void) brightness;
 }

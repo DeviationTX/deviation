@@ -50,6 +50,9 @@ static const char SECTION_RADIO[]   = "radio";
 static const char RADIO_PROTOCOL[] = "protocol";
 static const char RADIO_VIDEOSRC[] = "videosrc";
 static const char RADIO_VIDEOCH[]  = "videoch";
+static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
+static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
+
 #define RADIO_PROTOCOL_VAL ProtocolNames
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
@@ -495,6 +498,8 @@ static const struct struct_map _secradio[] = {
 #if HAS_VIDEO
     {RADIO_VIDEOSRC,     OFFSET_SRC(Model, videosrc), 0},
     {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
+    {RADIO_VIDEOCONTRAST,OFFSET(Model, video_contrast), 0},
+    {RADIO_VIDEOBRIGHTNESS,OFFSET(Model, video_brightness), 0},
 #endif
 };
 static const struct struct_map _secmixer[] = {

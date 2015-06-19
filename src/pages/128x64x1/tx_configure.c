@@ -42,9 +42,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
-#if HAS_VIDEO
-static const char *_brightness_select_cb(guiObject_t *obj, int dir, void *data);
-#endif
 static u16 current_selected = 0;  // do not put current_selected into pagemem as it shares the same structure with other pages by using union
 
 static int size_cb(int absrow, void *data)
@@ -135,12 +132,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             label = _tr_noop("Contrast");
             value = _contrast_select_cb;
             break;
-#if HAS_VIDEO
-        case ITEM_BRIGHTNESS:
-            label = _tr_noop("Brightness");;
-            value = _brightness_select_cb;
-            break;
-#endif
         case ITEM_DIMTIME:
             label = _tr_noop("Dimmer time");
             value = auto_dimmer_time_cb; x = SMALL_SEL_X_OFFSET;
@@ -222,21 +213,6 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", Transmitter.contrast);
     return tempstring;
 }
-#if HAS_VIDEO
-static const char *_brightness_select_cb(guiObject_t *obj, int dir, void *data)
-{
-    (void)data;
-    (void)obj;
-    u8 changed;
-    Transmitter.video_brightness = GUI_TextSelectHelper(Transmitter.video_brightness,
-                                  -10, 10, dir, 1, 1, &changed);
-    if (changed) {
-        LCD_Brightness(Transmitter.video_brightness);
-    }
-    sprintf(tempstring, "%d", Transmitter.video_brightness);
-    return tempstring;
-}
-#endif
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

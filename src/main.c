@@ -64,9 +64,6 @@ int main() {
 
     BACKLIGHT_Brightness(Transmitter.backlight);
     LCD_Contrast(Transmitter.contrast);
-#if HAS_VIDEO
-    LCD_Brightness(Transmitter.video_brightness);
-#endif
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
@@ -285,6 +282,11 @@ void VIDEO_Update()
     if (enabled != video_enable) {
         VIDEO_Enable(enabled);
         video_enable = enabled;
+        if (enabled) {
+            VIDEO_SetChannel(Model.videoch);
+            VIDEO_Contrast(Model.video_contrast);
+            VIDEO_Brightness(Model.video_brightness);
+        }
     }
 }
 #endif //HAS_VIDEO

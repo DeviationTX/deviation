@@ -442,12 +442,18 @@ void LCD_SetMappedWindow(unsigned val)
 
 void LCD_Contrast(unsigned contrast)
 {
-    contrast = (contrast * 256) / 10;
-    if (contrast > 255)
-        contrast = 255;
-    TW8816_Contrast(contrast);
+    (void)contrast;
 }
-void LCD_Brightness(int brightness)
+void VIDEO_Contrast(int contrast)
+{
+    int c = (int)contrast * 128 / 10 + 128;
+    if (c < 0)
+        c = 0;
+    if (c > 255)
+        c = 255;
+    TW8816_Contrast(c);
+}
+void VIDEO_Brightness(int brightness)
 {
     int b = (int)brightness * 128 / 10;
     if (b < -128)
@@ -456,7 +462,7 @@ void LCD_Brightness(int brightness)
         b = 127;
     TW8816_Brightness(b);
 }
-void LCD_Chroma(unsigned chromau, unsigned chromav)
+void VIDEO_Chroma(unsigned chromau, unsigned chromav)
 {
     chromau *= 20;
     chromav *= 20;

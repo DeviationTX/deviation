@@ -60,6 +60,8 @@ struct Model {
 #if HAS_VIDEO
     u8 videosrc;
     u8 videoch;
+    s8 video_contrast;
+    s8 video_brightness;
 #endif
 };
 extern struct Model Model;
