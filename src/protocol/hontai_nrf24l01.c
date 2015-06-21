@@ -160,8 +160,8 @@ static u16 crc16(u8 *data_p, u32 length)
 static s8 scale_channel(u8 ch, s8 start, s8 end)
 {
     s32 range = end - start;
-    s32 round = range < 0 ? 0 : CHAN_RANGE / range;   // oddball rounding to match rx idea of zero
-    if (start < 0) round = CHAN_RANGE / range / 2;
+    s32 round = range < 0 ? 0 : CHAN_RANGE / range;   // channels round up
+    if (start < 0) round = CHAN_RANGE / range / 2;    // trims zero centered around zero
     return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
 }
 
@@ -175,19 +175,19 @@ static void send_packet(u8 bind)
       packet[0] = 0x0b;
       packet[1] = 0x00;
       packet[2] = 0x00;
-      packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)       // throttle
+      packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)    // throttle
                 | GET_FLAG(CHANNEL_PICTURE, 0x01);
-      packet[4] = scale_channel(CHANNEL1, 63, 0)               // aileron
+      packet[4] = scale_channel(CHANNEL1, 63, 0)            // aileron
                 | GET_FLAG(CHANNEL_RTH, 0x80)
                 | GET_FLAG(CHANNEL_HEADLESS, 0x40);
-      packet[5] = scale_channel(CHANNEL2, 0, 63)               // elevator
+      packet[5] = scale_channel(CHANNEL2, 0, 63)            // elevator
                 | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
-      packet[6] = scale_channel(CHANNEL4, 0, 63)               // rudder
+      packet[6] = scale_channel(CHANNEL4, 0, 63)            // rudder
                 | GET_FLAG(CHANNEL_VIDEO, 0x80);
-      packet[7] = scale_channel(CHANNEL1, -16, 16);//0; // aileron trim (range -32, 32)
-      packet[8] = scale_channel(CHANNEL4, -16, 16);//0; // rudder trim
-      packet[9] = scale_channel(CHANNEL2, -16, 16);//0; // elevator trim
+      packet[7] = scale_channel(CHANNEL1, -16, 16);         // aileron trim
+      packet[8] = scale_channel(CHANNEL4, -16, 16);         // rudder trim
+      packet[9] = scale_channel(CHANNEL2, -16, 16);         // elevator trim
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
@@ -284,10 +284,6 @@ static void ht_init2()
     data_tx_addr[1] = addr_vals[1][(txid[3] >> 4) & 0x0f];
     data_tx_addr[2] = addr_vals[2][ txid[4]       & 0x0f];
     data_tx_addr[3] = addr_vals[3][(txid[4] >> 4) & 0x0f];
-#ifdef EMULATOR
-    printf("txid = %02x, %02x\n", txid[3], txid[4]);
-    printf("rx_addr = %02x, %02x, %02x, %02x\n", data_tx_addr[0], data_tx_addr[1], data_tx_addr[2], data_tx_addr[3]);
-#endif
     XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
 }
 
