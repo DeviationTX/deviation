@@ -34,7 +34,7 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_FRSKY_VOLT3: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2: _get_temp_str(str, value, 0, 'C'); break;
-        case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 1, '%'); break;
+        case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 0, '\0'); break;
         case TELEM_FRSKY_RPM:   _get_value_str(str, value, 0, '\0'); break;
         case TELEM_FRSKY_ALTITUDE:  _get_altitude_str(str, value, 2, 'm'); break;
         default:
