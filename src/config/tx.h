@@ -41,7 +41,7 @@ enum ExtraHardware {
 struct Transmitter {
     u8 current_model;
     u8 language;
-    u8 brightness;
+    u8 backlight;
     u8 contrast;
     u8 telem;
     u8 music_shutdown;

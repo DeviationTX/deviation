@@ -39,6 +39,15 @@ static const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return INPUT_SourceName(tempstring, MIXER_MapChannel(*source));
 }
 
+static const char *set_input_source_cb(guiObject_t *obj, int newsrc, int value, void *data)
+{
+    (void) obj;
+    (void) value;
+    u8 *source = (u8 *)data;
+    *source = INPUT_SelectInput(*source, MIXER_MapChannel(newsrc), NULL);
+    return INPUT_SourceName(tempstring, MIXER_MapChannel(*source));
+}
+
 static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
 {
     if(! GUI_IsTextSelectEnabled(obj)){
@@ -47,6 +56,14 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
     u8 *source = (u8 *)data;
     *source = INPUT_SelectAbbrevSource(*source, dir);
     return INPUT_SourceNameAbbrevSwitch(tempstring, *source);
+}
+
+static const char *set_input_switch_cb(guiObject_t *obj, int newsrc, int value, void *data)
+{
+    (void)obj;
+    (void)value;
+    *(u8 *)data = newsrc;
+    return INPUT_SourceNameAbbrevSwitch(tempstring, newsrc);
 }
 
 const char *set_trim_cb(guiObject_t *obj, int dir, void *data)

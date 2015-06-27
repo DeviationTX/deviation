@@ -13,11 +13,48 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
+
 #include "common.h"
 #include "pages.h"
 #include "telemetry.h"
 #include "gui/gui.h"
 
+enum {
+    ITEM1_X      = 8,
+    ITEM1_WIDTH  = 35,
+    ITEM2_X      = 48,
+    ITEM3_X      = 87,
+    ARROW_X      = LCD_WIDTH - 11,
+    ARROW_W      = 10,
+    //
+    LBL1_X       = 0,
+    LBL1_WIDTH   = 8,
+    LBL2_X       = 43,
+    LBL3_X       = 86,
+    LBL4_X       = 0,
+    LBL4_WIDTH   = 25,
+    LBL5_X       = 61,
+    //
+    HEADER_X     = 90,
+    HEADER_WIDTH = 35,
+    //
+    GPS_X        = 0,
+    GPS_WIDTH    = LCD_WIDTH - ARROW_WIDTH - 3,
+    //
+    DSM1_X       = 7,
+    DSM1_WIDTH   = 35,
+    DSM2_X       = 50,
+    DSM3_X       = 93,
+    DSM4_X       = 25,
+    DSM5_X       = 86,
+    //
+    FRSKY1_X     = 8,
+    FRSKY1_WIDTH = 35,
+    FRSKY2_X     = 48,
+    FRSKY3_X     = 86,
+};
+#endif //OVERRIDE_PLACEMENT
 #if HAS_TELEMETRY
 #include "../common/_telemtest_page.c"
 
@@ -74,95 +111,96 @@ struct telem_layout2 {
 };
 
 const struct telem_layout devo_header_basic[] = {
-        {TYPE_HEADER,  8, 35, TEMP_LABEL},
-        {TYPE_HEADER, 48, 35, VOLT_LABEL},
-        {TYPE_HEADER, 88, 35, RPM_LABEL},
-        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER, ITEM1_X, ITEM1_WIDTH, TEMP_LABEL},
+        {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, VOLT_LABEL},
+        {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, RPM_LABEL},
+        {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
         {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_layout_basic[] = {
-    {TYPE_INDEX | 0,  0, 8,  1},
-    {TYPE_VALUE | 0,  8, 35, TELEM_DEVO_TEMP1},
-    {TYPE_VALUE | 0, 48, 35, TELEM_DEVO_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_DEVO_RPM1},
-    {TYPE_INDEX | 1,  0, 8,  2},
-    {TYPE_VALUE | 1,  8, 35, TELEM_DEVO_TEMP2},
-    {TYPE_VALUE | 1, 48, 35, TELEM_DEVO_VOLT2},
-    {TYPE_VALUE | 1, 87, 35, TELEM_DEVO_RPM2},
-    {TYPE_INDEX | 2,  0, 8,  3},
-    {TYPE_VALUE | 2,  8, 35, TELEM_DEVO_TEMP3},
-    {TYPE_VALUE | 2, 48, 35, TELEM_DEVO_VOLT3},
-    {TYPE_INDEX | 3,  0, 8,  4},
-    {TYPE_VALUE | 3,  8, 35, TELEM_DEVO_TEMP4},
+    {TYPE_INDEX | 0, LBL1_X, LBL1_WIDTH,  1},
+    {TYPE_VALUE | 0, ITEM1_X, ITEM1_WIDTH, TELEM_DEVO_TEMP1},
+    {TYPE_VALUE | 0, ITEM2_X, ITEM1_WIDTH, TELEM_DEVO_VOLT1},
+    {TYPE_VALUE | 0, ITEM3_X, ITEM1_WIDTH, TELEM_DEVO_RPM1},
+    {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
+    {TYPE_VALUE | 1, ITEM1_X, ITEM1_WIDTH, TELEM_DEVO_TEMP2},
+    {TYPE_VALUE | 1, ITEM2_X, ITEM1_WIDTH, TELEM_DEVO_VOLT2},
+    {TYPE_VALUE | 1, ITEM3_X, ITEM1_WIDTH, TELEM_DEVO_RPM2},
+    {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
+    {TYPE_VALUE | 2, ITEM1_X, ITEM1_WIDTH, TELEM_DEVO_TEMP3},
+    {TYPE_VALUE | 2, ITEM2_X, ITEM1_WIDTH, TELEM_DEVO_VOLT3},
+    {TYPE_INDEX | 3, LBL1_X, LBL1_WIDTH,  4},
+    {TYPE_VALUE | 3, ITEM1_X, ITEM1_WIDTH, TELEM_DEVO_TEMP4},
     {0, 0, 0, 0},
 };
 
 const struct telem_layout devo_header_gps[] = {
-        {TYPE_HEADER, 98, 35, GPS_LABEL},
-        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER, HEADER_X, HEADER_WIDTH, GPS_LABEL},
+        {TYPE_HEADER, ARROW_X,  ARROW_W,     ARROW_LABEL},
         {0, 0, 0, 0},
 };
 const struct telem_layout devo_layout_gps[] = {
-    {TYPE_LABEL  | 0,  0, 0,  TELEM_GPS_LAT},
-    {TYPE_VALUE2 | 0, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_LAT},
-    {TYPE_LABEL3 | 0, 0, 0,  TELEM_GPS_LONG},
-    {TYPE_VALUE4 | 0, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_LONG},
+    {TYPE_LABEL  | 0, GPS_X, 0,  TELEM_GPS_LAT},
+    {TYPE_VALUE2 | 0, GPS_X, GPS_WIDTH, TELEM_GPS_LAT},
+    {TYPE_LABEL3 | 0, GPS_X, 0,  TELEM_GPS_LONG},
+    {TYPE_VALUE4 | 0, GPS_X, GPS_WIDTH, TELEM_GPS_LONG},
 
-    {TYPE_LABEL  | 1,  0, 0,  TELEM_GPS_ALT},
-    {TYPE_VALUE2 | 1, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_ALT},
-    {TYPE_LABEL3 | 1, 0, 0,  TELEM_GPS_SPEED},
-    {TYPE_VALUE4 | 1, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_SPEED},
+    {TYPE_LABEL  | 1, GPS_X, 0,  TELEM_GPS_ALT},
+    {TYPE_VALUE2 | 1, GPS_X, GPS_WIDTH, TELEM_GPS_ALT},
+    {TYPE_LABEL3 | 1, GPS_X, 0,  TELEM_GPS_SPEED},
+    {TYPE_VALUE4 | 1, GPS_X, GPS_WIDTH, TELEM_GPS_SPEED},
 
-    {TYPE_LABEL  | 2,  0, 0,  TELEM_GPS_TIME},
-    {TYPE_VALUE2 | 2, 0, LCD_WIDTH - ARROW_WIDTH - 3, TELEM_GPS_TIME},
+    {TYPE_LABEL  | 2, GPS_X, 0,  TELEM_GPS_TIME},
+    {TYPE_VALUE2 | 2, GPS_X, GPS_WIDTH, TELEM_GPS_TIME},
     {0, 0, 0, 0},
 };
 
 const struct telem_layout dsm_header_basic[] = {
-        {TYPE_HEADER, 98, 35, DSM_LABEL},
-        {TYPE_HEADER, LCD_WIDTH - 11, 10, ARROW_LABEL},
+        {TYPE_HEADER, HEADER_X, HEADER_WIDTH, DSM_LABEL},
+        {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
         {0, 0, 0, 0},
 };
 
 const struct telem_layout dsm_layout_basic[] = {
-    {TYPE_HEADER | 0,  0, 8,  A_LABEL},
-    {TYPE_VALUE  | 0,  7, 35, TELEM_DSM_FLOG_FADESA},
-    {TYPE_HEADER | 0, 43, 8,  B_LABEL},
-    {TYPE_VALUE  | 0, 50, 35, TELEM_DSM_FLOG_FADESB},
-    {TYPE_HEADER | 0, 86, 8,  F_LABEL},
-    {TYPE_VALUE  | 0, 93, 35, TELEM_DSM_FLOG_FRAMELOSS},
+    {TYPE_HEADER | 0, LBL1_X, LBL1_WIDTH,  A_LABEL},
+    {TYPE_VALUE  | 0, DSM1_X, DSM1_WIDTH, TELEM_DSM_FLOG_FADESA},
+    {TYPE_HEADER | 0, LBL2_X, LBL1_WIDTH,  B_LABEL},
+    {TYPE_VALUE  | 0, DSM2_X, DSM1_WIDTH, TELEM_DSM_FLOG_FADESB},
+    {TYPE_HEADER | 0, LBL3_X, LBL1_WIDTH,  F_LABEL},
+    {TYPE_VALUE  | 0, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_FRAMELOSS},
 
-    {TYPE_HEADER | 1,  0, 8,  L_LABEL},
-    {TYPE_VALUE  | 1,  7, 35, TELEM_DSM_FLOG_FADESL},
-    {TYPE_HEADER | 1, 43, 8,  R_LABEL},
-    {TYPE_VALUE  | 1, 50, 35, TELEM_DSM_FLOG_FADESR},
-    {TYPE_HEADER | 1, 86, 8,  H_LABEL},
-    {TYPE_VALUE  | 1, 93, 35, TELEM_DSM_FLOG_HOLDS},
+    {TYPE_HEADER | 1, LBL1_X, LBL1_WIDTH,  L_LABEL},
+    {TYPE_VALUE  | 1, DSM1_X, DSM1_WIDTH, TELEM_DSM_FLOG_FADESL},
+    {TYPE_HEADER | 1, LBL2_X, LBL1_WIDTH,  R_LABEL},
+    {TYPE_VALUE  | 1, DSM2_X, DSM1_WIDTH, TELEM_DSM_FLOG_FADESR},
+    {TYPE_HEADER | 1, LBL3_X, LBL1_WIDTH,  H_LABEL},
+    {TYPE_VALUE  | 1, DSM3_X, DSM1_WIDTH, TELEM_DSM_FLOG_HOLDS},
 
-    {TYPE_HEADER | 2,  0, 25, TEMP_LABEL},
-    {TYPE_VALUE  | 2, 25, 35, TELEM_DSM_FLOG_TEMP1},
-    {TYPE_HEADER | 2, 61, 25, RXV_LABEL},
-    {TYPE_VALUE  | 2, 86, 35, TELEM_DSM_FLOG_VOLT2},
+    {TYPE_HEADER | 2, LBL4_X, LBL4_WIDTH, TEMP_LABEL},
+    {TYPE_VALUE  | 2, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_TEMP1},
+    {TYPE_HEADER | 2, LBL5_X, LBL4_WIDTH, RXV_LABEL},
+    {TYPE_VALUE  | 2, DSM5_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT1},
 
-    {TYPE_HEADER | 3,  0, 25, BATT_LABEL},
-    {TYPE_VALUE  | 3, 25, 35, TELEM_DSM_FLOG_VOLT1},
-    {TYPE_HEADER | 3, 61, 25, RPM_LABEL},
-    {TYPE_VALUE  | 3, 86, 35, TELEM_DSM_FLOG_RPM1},
+    {TYPE_HEADER | 3, LBL4_X, LBL4_WIDTH, BATT_LABEL},
+    {TYPE_VALUE  | 3, DSM4_X, DSM1_WIDTH, TELEM_DSM_FLOG_VOLT2},
+    {TYPE_HEADER | 3, LBL5_X, LBL4_WIDTH, RPM_LABEL},
+    {TYPE_VALUE  | 3, DSM5_X, DSM1_WIDTH, TELEM_DSM_FLOG_RPM1},
 
     {0, 0, 0, 0},
 };
 
 const struct telem_layout frsky_layout_basic[] = {
-    {TYPE_INDEX | 0,  0, 8,  1},
-    {TYPE_VALUE | 0,  8, 35, TELEM_FRSKY_TEMP1},
-    {TYPE_VALUE | 0, 48, 35, TELEM_FRSKY_VOLT1},
-    {TYPE_VALUE | 0, 87, 35, TELEM_FRSKY_RPM},
-    {TYPE_INDEX | 1,  0, 8,  2},
-    {TYPE_VALUE | 1,  8, 35, TELEM_FRSKY_TEMP2},
-    {TYPE_VALUE | 1, 48, 35, TELEM_FRSKY_VOLT2},
-    {TYPE_INDEX | 2,  0, 8,  3},
-    {TYPE_VALUE | 2, 48, 35, TELEM_FRSKY_VOLT3},
+    {TYPE_INDEX | 0, LBL1_X, LBL1_WIDTH,  1},
+    {TYPE_VALUE | 0, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP1},
+    {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT1},
+    {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
+    {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
+    {TYPE_VALUE | 1, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP2},
+    {TYPE_VALUE | 1, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT2},
+    {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
+    {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT3},
+    {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_RSSI},
     {0, 0, 0, 0},
 };
 
@@ -239,21 +277,34 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-static void _show_page(const struct telem_layout2 *page)
+static const struct telem_layout2 *_get_telem_layout2()
 {
+    const struct telem_layout2 *page;
+    if (TELEMETRY_Type() == TELEM_DEVO)
+        page = &devo_page[current_page];
+    else if (TELEMETRY_Type() == TELEM_DSM)
+        page = &dsm_page[current_page];
+    else
+        page = &frsky_page[current_page];
+    return page;
+}
+
+static void _show_page()
+{
+    const struct telem_layout2 *page = _get_telem_layout2();
     PAGE_RemoveAllObjects();
+    PAGE_ShowHeader(page->header==devo_header_basic ? "" : _tr("Telemetry monitor"));
     tp->font.font = TINY_FONT.font;
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
     tp->font.style = LABEL_SQUAREBOX;
-    DEFAULT_FONT.style = LABEL_LEFT;
+    DEFAULT_FONT.style = LABEL_CENTER;
     long i = 0;
     for(const struct telem_layout *ptr = page->header; ptr->source; ptr++, i++) {
         GUI_CreateLabelBox(&gui->header[i], ptr->x, 0, ptr->width, HEADER_HEIGHT,
                            ptr->source == ARROW_LABEL ? &NARROW_FONT : &DEFAULT_FONT,
                            header_cb, NULL, (void *)(long)ptr->source);
     }
-    PAGE_ShowHeader(_tr("Telemetry monitor"));
     DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
@@ -270,6 +321,13 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+void PAGE_ShowTelemetryAlarm()
+{
+    int cur_page = PAGE_GetID();
+    if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
+        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+}
+
 void PAGE_TelemtestInit(int page)
 {
     (void)okcancel_cb;
@@ -284,18 +342,18 @@ void PAGE_TelemtestInit(int page)
     if (current_page > telemetry_gps)
         current_page = telemetry_basic;
 
-    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
+    _show_page();
 }
 
 void PAGE_TelemtestEvent() {
     if (current_page == telemetry_off)
         return;
+    static u32 count;
+    int flicker = ((++count & 3) == 0);
     struct Telemetry cur_telem = Telemetry;
     int current_row = GUI_ScrollableCurrentRow(&gui->scrollable);
     int visible_rows = GUI_ScrollableVisibleRows(&gui->scrollable);
-    const struct telem_layout *ptr = TELEMETRY_Type() == TELEM_DEVO
-                                     ? devo_page[current_page].layout
-                                     : dsm_page[current_page].layout;
+    const struct telem_layout *ptr = _get_telem_layout2()->layout;
     for (long i = 0; ptr->source; ptr++, i++) {
         if ((ptr->row_type & 0x0f) < current_row)
             continue;
@@ -307,10 +365,10 @@ void PAGE_TelemtestEvent() {
         long last_val = _TELEMETRY_GetValue(&tp->telem, ptr->source);
         struct LabelDesc *font;
         font = &TELEM_FONT;
-        if (cur_val != last_val) {
-            GUI_Redraw(&gui->box[i]);
-        } else if(! TELEMETRY_IsUpdated(ptr->source)) {
+        if((TELEMETRY_HasAlarm(ptr->source) && flicker) || ! TELEMETRY_IsUpdated(ptr->source)) {
             font = &TELEM_ERR_FONT;
+        } else if (cur_val != last_val) {
+            GUI_Redraw(&gui->box[i]);
         }
         GUI_SetLabelDesc(&gui->box[i], font);
     }
@@ -328,7 +386,7 @@ static void _press_cb(guiObject_t *obj, const void *data)
     (void)obj;
     (void)data;
     current_page = current_page == telemetry_gps?telemetry_basic: telemetry_gps;
-    _show_page(TELEMETRY_Type() == TELEM_DEVO ? &devo_page[current_page] : &dsm_page[current_page]);
+    _show_page();
 }
 
 static void _navigate_pages(s8 direction)
@@ -343,6 +401,8 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (flags & BUTTON_PRESS) {
+        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
+            TELEMETRY_MuteAlarm();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
             PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
@@ -350,7 +410,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
                 _navigate_pages(1);
-            }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
+            } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
                 _navigate_pages(-1);
             } else {
                 return 0;

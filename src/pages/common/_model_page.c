@@ -40,6 +40,9 @@ enum {
     ITEM_TYPE,
     ITEM_TXPOWER,
     ITEM_PPMIN,
+#if HAS_VIDEO
+    ITEM_VIDEO,
+#endif
     ITEM_PROTO,
     ITEM_FIXEDID,
     ITEM_NUMCHAN,
@@ -322,6 +325,16 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
     MODELPage_ShowLoadSave(LOAD_ICON, PAGE_ModelInit);
 }
 
+#if HAS_VIDEO
+static void video_settings_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    PAGE_RemoveAllObjects();
+    MODELVIDEO_Config();
+}
+#endif //HAS_VIDEO
+
 #if HAS_STANDARD_GUI
 static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
 {
@@ -340,4 +353,4 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
     }
     return STDMIXER_ModeName(Model.mixer_mode);
 }
-#endif
+#endif //HAS_STANDARD_GUI

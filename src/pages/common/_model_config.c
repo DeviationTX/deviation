@@ -106,6 +106,13 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     return INPUT_SourceName(tempstring, source);
 }
 
+const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data) {
+    (void)obj;
+    (void)value;
+    *(u8 *)data = INPUT_SelectInput(*(u8 *)data, src, NULL);
+    return INPUT_SourceName(tempstring, *(u8 *)data);
+}
+
 void sourceselect_cb(guiObject_t *obj, void *data)
 {
     u8 *source = (u8 *)data;
@@ -179,3 +186,48 @@ const char *input_chname_cb(guiObject_t *obj, const void *data)
     snprintf(tempstring, sizeof(tempstring), _tr("PPM%d"), idx+1);
     return tempstring;
 }
+
+#if HAS_VIDEO
+const char *set_videoch_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.videoch;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, 0, HAS_VIDEO-1, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_SetChannel(value);
+        Model.videoch = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
+const char *set_videocontrast_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.video_contrast;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, -10, 10, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_Contrast(value);
+        Model.video_contrast = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
+const char *set_videobrightness_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.video_brightness;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, -10, 10, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_Brightness(value);
+        Model.video_brightness = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
+#endif //HAS_VIDEO

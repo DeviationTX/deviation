@@ -113,7 +113,7 @@ static void calibrate_sticks(void)
     PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
     snprintf(tempstring, sizeof(tempstring), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
-    GUI_CreateLabelBox(&guic->msg, 1, 10, LCD_WIDTH -1, LCD_HEIGHT - 10,
+    GUI_CreateLabelBox(&guic->msg, 1, 0, 0, 0,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, tempstring);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
@@ -173,18 +173,18 @@ static const char *modeselect_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
-static const char *brightness_select_cb(guiObject_t *obj, int dir, void *data)
+static const char *backlight_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;
     (void)obj;
     u8 changed;
-    Transmitter.brightness = GUI_TextSelectHelper(Transmitter.brightness,
+    Transmitter.backlight = GUI_TextSelectHelper(Transmitter.backlight,
                                   MIN_BRIGHTNESS, 10, dir, 1, 1, &changed);
     if (changed)
-        BACKLIGHT_Brightness(Transmitter.brightness);
-    if (Transmitter.brightness == 0)
+        BACKLIGHT_Brightness(Transmitter.backlight);
+    if (Transmitter.backlight == 0)
         return _tr("Off");
-    sprintf(tempstring, "%d", Transmitter.brightness);
+    sprintf(tempstring, "%d", Transmitter.backlight);
     return tempstring;
 }
 

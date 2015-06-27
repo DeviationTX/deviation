@@ -16,7 +16,6 @@ static struct chantest_page * const cp = &pagemem.u.chantest_page;
 static struct chantest_obj * const gui = &gui_objs.u.chantest;
 static s32 showchan_cb(void *data);
 static const char *value_cb(guiObject_t *obj, const void *data);
-static const char *channum_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx(int chan);
@@ -79,10 +78,10 @@ void PAGE_ChantestEvent()
                              ? Channels[ch - NUM_INPUTS]
                              : raw[ch + 1]);
         if (v != cp->pctvalue[i]) {
-            guiObject_t *obj = _get_obj(i, ITEM_GRAPH);
+            guiObject_t *obj = _get_obj(i, ITEM_VALUE);
             if (obj) {
                 GUI_Redraw(obj);
-                GUI_Redraw(_get_obj(i, ITEM_VALUE));
+                GUI_Redraw(_get_obj(i, ITEM_GRAPH));
             }
             cp->pctvalue[i] = v;
         }
@@ -93,6 +92,7 @@ void PAGE_ChantestExit()
 {
     BUTTON_UnregisterCallback(&cp->action);
 }
+
 static s32 showchan_cb(void *data)
 {
     long ch = (long)data;

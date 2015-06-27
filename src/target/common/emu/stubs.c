@@ -47,7 +47,6 @@ void HID_Write(s8 *pkt, u8 size) {
 }
 void Initialize_ButtonMatrix() {}
 void PWR_Init(void) {}
-void PWR_Sleep() {}
 unsigned  PWR_ReadVoltage() { return (DEFAULT_BATTERY_ALARM + 1000); }
 void CHAN_Init() {}
 
@@ -106,12 +105,17 @@ void FS_CloseDir() {
 }
 
 void BACKLIGHT_Init() {}
-void BACKLIGHT_Brightness(unsigned brightness) { printf("Brightness: %d\n", brightness); }
+void BACKLIGHT_Brightness(unsigned brightness) { printf("Backlight: %d\n", brightness); }
 void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
 
 void VIBRATINGMOTOR_Init() {}
 void VIBRATINGMOTOR_Start() {}
 void VIBRATINGMOTOR() {}
+
+void VIDEO_SetChannel(int ch) {printf("Video Channel: %d\n", ch); }
+void VIDEO_Enable(int on)     {printf("Video Enable: %s\n", on ? "On" : "Off"); }
+void VIDEO_Brightness(int brightness) { printf("Video Brightness: %d\n", brightness); }
+void VIDEO_Contrast(int contrast) { printf("Video Contrast: %d\n", contrast); }
 
 void PPMin_Start() {}
 void PPMin_Stop() {}
@@ -147,3 +151,4 @@ void MCU_SerialNumber(u8 *var, int len)
                          0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
     memcpy(var, data, l);
 }
+void PWR_JumpToProgrammer() {}

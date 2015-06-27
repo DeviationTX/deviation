@@ -1,0 +1,44 @@
+#define LCD_DEPTH 1
+enum ImageNames {
+    DRAW_BTN32_15,
+    //FIXME: Deprecated
+    FILE_BTN96_24,
+    FILE_BTN48_24,
+    FILE_BTN96_16,
+    FILE_BTN64_16,
+    FILE_BTN48_16,
+    FILE_BTN32_16,
+    FILE_SPIN192,
+    FILE_SPIN96,
+    FILE_SPIN64,
+    FILE_SPIN32,
+    FILE_SPINPRESS96,
+    FILE_SPINPRESS64,
+    FILE_SPINPRESS32,
+    FILE_ARROW_16_UP,
+    FILE_ARROW_16_DOWN,
+    FILE_ARROW_16_RIGHT,
+    FILE_ARROW_16_LEFT,
+};
+#define IMAGE_MAP_END (FILE_ARROW_16_LEFT + 1)
+
+enum ButtonType {
+    BUTTON_DEVO10,
+    //FIXME: Deprecated
+    BUTTON_96,
+    BUTTON_48,
+    BUTTON_96x16,
+    BUTTON_64x16,
+    BUTTON_48x16,
+    BUTTON_32x16,
+};
+
+#define DIALOG_BUTTON BUTTON_DEVO10
+
+#define ARROW_LEFT  (&image_map[DRAW_BTN32_15])
+#define ARROW_RIGHT (&image_map[DRAW_BTN32_15])
+#define ARROW_UP    NULL
+#define ARROW_DOWN  NULL
+#define ARROW_WIDTH 1
+#define ARROW_HEIGHT 1
+#define LINE_SPACING 0

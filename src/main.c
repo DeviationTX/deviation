@@ -32,6 +32,7 @@ void EventLoop();
 volatile u8 priority_ready;
 
 void TOUCH_Handler(); // temporarily in main()
+void VIDEO_Update();
 void PAGE_Test();
 
 #ifndef DUMP_BOOTLOADER
@@ -61,7 +62,7 @@ int main() {
     CONFIG_ReadModel(CONFIG_GetCurrentModel());
     CONFIG_ReadLang(Transmitter.language);
 
-    BACKLIGHT_Brightness(Transmitter.brightness);
+    BACKLIGHT_Brightness(Transmitter.backlight);
     LCD_Contrast(Transmitter.contrast);
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
@@ -97,7 +98,10 @@ int main() {
         if(priority_ready) {
             EventLoop();
         }
-        //PWR_Sleep();  //This does not appear to have any impact on power
+        //This does not appear to have any impact on power
+        //and has been disabled in common/devo/power.c
+        //but it helps a huge amount for the emulator
+        PWR_Sleep();
     }
 #endif
 }
@@ -208,6 +212,7 @@ void EventLoop()
     }
     BUTTON_Handler();
     TOUCH_Handler();
+    INPUT_CheckChanges();
 
     if (priority_ready & (1 << LOW_PRIORITY)) {
         priority_ready  &= ~(1 << LOW_PRIORITY);
@@ -219,6 +224,9 @@ void EventLoop()
         AUTODIMMER_Update();
 #if HAS_DATALOG
         DATALOG_Update();
+#endif
+#if HAS_VIDEO
+        VIDEO_Update();
 #endif
         GUI_RefreshScreen();
     }
@@ -263,6 +271,25 @@ void TOUCH_Handler() {
     }
     pen_down_last=pen_down;
 }
+
+#if HAS_VIDEO
+void VIDEO_Update()
+{
+    static u8 video_enable = 0;
+    //FIXME This is just like DATALOG_IsEnabled
+    int enabled = MIXER_SourceAsBoolean(Model.videosrc);
+
+    if (enabled != video_enable) {
+        VIDEO_Enable(enabled);
+        video_enable = enabled;
+        if (enabled) {
+            VIDEO_SetChannel(Model.videoch);
+            VIDEO_Contrast(Model.video_contrast);
+            VIDEO_Brightness(Model.video_brightness);
+        }
+    }
+}
+#endif //HAS_VIDEO
 
 #ifdef TIMING_DEBUG
 void debug_timing(u32 type, int startend)
@@ -321,3 +348,42 @@ void debug_timing(u32 type, int startend)
     }
 }
 #endif
+
+void debug_switches()
+{
+    s32 data[INP_LAST];
+    for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+        data[i] = CHAN_ReadRawInput(i);
+    }
+    while(1) {
+        u32 changed = 0;
+        for(int i = INP_HAS_CALIBRATION+1; i < INP_LAST; i++) {
+            s32 val = CHAN_ReadRawInput(i);
+            if (val != data[i]) {
+                printf("%s=%d  ", INPUT_SourceName(tempstring, i), val);
+                data[i] = val;
+                changed = 1;
+            }
+        }
+        if (changed) { printf("\n"); }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}
+void debug_buttons()
+{
+    u32 data = ScanButtons();
+    while(1) {
+        u32 val = ScanButtons();
+        u32 delta = val ^ data;
+        for(int i = 1; i < BUT_LAST; i++) {
+            if(delta & (1 << (i-1))) {
+                printf("%s  ", INPUT_ButtonName(i));
+            }
+        }
+        if (delta) {
+            printf("\n");
+            data = val;
+        }
+        if(PWR_CheckPowerSwitch()) PWR_Shutdown();
+    }    
+}

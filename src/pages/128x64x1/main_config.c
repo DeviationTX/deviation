@@ -13,12 +13,33 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
 #include "telemetry.h"
 
+enum {
+    NEWTEXTSEL_X = 0,
+    NEWTEXTSEL_W = 68,
+    NEWBUTTON_X = 68,
+    NEWBUTTON_W = 50,
+    QPBUTTON_X  = 0,
+    QPBUTTON_W  = 124,
+    MENULABEL_X = 0,
+    MENULABEL_W = 56,
+    MENUTEXT_X  = 0,
+    MENUTEXT_W  = 124,
+    #define LINE_OFFSET 1
+    ELEMBUT_X   = 0,
+    ELEMBUT_W   = 50,
+    ELEMLBL_X   = 0,
+    ELEMLBL_W   = 56,
+    ELEMTXT_X   = 56,
+    ELEMTXT_W   = 68,
+};
+#endif //OVERRIDE_PLACEMENT
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
 static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
@@ -55,7 +76,7 @@ void PAGE_MainLayoutExit()
 static int size_cb(int absrow, void *data)
 {
     int num_elems = (long)data;
-    return (absrow >= num_elems  && absrow < num_elems + NUM_QUICKPAGES) ? 2 : 1;
+    return (absrow >= num_elems  && absrow < num_elems + NUM_QUICKPAGES) ? 1 + LINE_OFFSET : 1;
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -145,28 +166,27 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     int num_elems = (long)data;
-    int x = 56;
     int y_ts = y;
     //show elements in order
     int row = -1;
 #if HAS_LAYOUT_EDITOR
     if (absrow == num_elems + NUM_QUICKPAGES) {
-        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y_ts,
-                 LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
-        GUI_CreateButtonPlateText(&gui->col1[relrow].button, LCD_WIDTH-x-4, y,  50,
+        GUI_CreateTextSelectPlate(&gui->value[relrow], NEWTEXTSEL_X, y_ts,
+                 NEWTEXTSEL_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, newelem_cb, NULL);
+        GUI_CreateButtonPlateText(&gui->col1[relrow].button, NEWBUTTON_X, y,  NEWBUTTON_W,
                  LINE_HEIGHT, &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, newelem_press_cb, (void *)1);
         return 2;
     }
 #endif
     if (absrow >= num_elems + NUM_QUICKPAGES) {
-        GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  LCD_WIDTH-4, LINE_HEIGHT,
+        GUI_CreateButtonPlateText(&gui->col1[relrow].button, QPBUTTON_X, y, QPBUTTON_W, LINE_HEIGHT,
                  &DEFAULT_FONT, add_dlgbut_str_cb, 0x0000, add_dlgbut_cb, (void *)0);
         return 1;
     }
     if (absrow >= num_elems && absrow < num_elems + NUM_QUICKPAGES) {
-        GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
-        GUI_CreateTextSelectPlate(&gui->value[relrow], 0, y + LINE_HEIGHT,
-             LCD_WIDTH-4, LINE_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
+        GUI_CreateLabelBox(&gui->col1[relrow].label, MENULABEL_X, y,  MENULABEL_W, LINE_HEIGHT, &DEFAULT_FONT, menulabel_cb, NULL, (void *)(long)(absrow - num_elems));
+        GUI_CreateTextSelectPlate(&gui->value[relrow], MENUTEXT_X, y + LINE_HEIGHT * LINE_OFFSET,
+             MENUTEXT_W, LINE_HEIGHT, &DEFAULT_FONT, NULL, menusel_cb, (void *)(long)(absrow - num_elems));
         return 1;
     }
     for(int type = 0; type < ELEM_LAST; type++) {
@@ -185,15 +205,15 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
         int selectable = 1;
         if (type == ELEM_TOGGLE) {
-            GUI_CreateButtonPlateText(&gui->col1[relrow].button, 0, y,  50,
+            GUI_CreateButtonPlateText(&gui->col1[relrow].button, ELEMBUT_X, y, ELEMBUT_W,
                     LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, 0x0000, switchicon_press_cb, (void *)item);
             selectable = 2;
         }
         else
-            GUI_CreateLabelBox(&gui->col1[relrow].label, 0, y,  x, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
+            GUI_CreateLabelBox(&gui->col1[relrow].label, ELEMLBL_X, y, ELEMLBL_W, LINE_HEIGHT, &DEFAULT_FONT, cfglabel_cb, NULL, (void *)item);
 
-        GUI_CreateTextSelectPlate(&gui->value[relrow], x, y_ts,
-             LCD_WIDTH-x-4, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
+        GUI_CreateTextSelectPlate(&gui->value[relrow], ELEMTXT_X, y_ts,
+             ELEMTXT_W, LINE_HEIGHT, &DEFAULT_FONT, (void(*)(guiObject_t *, void *))dlgbut_cb, dlgts1_cb, (void *)item);
         return selectable;
     }
     return 0;

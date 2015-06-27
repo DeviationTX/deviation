@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 while(<>) {
 	if(/^(\S+) g.....([FO])..* (\S+)/) {
             printf "$3 = 0x%08x;\n", hex($1) + ($2 eq "O" ? 0 : 1);

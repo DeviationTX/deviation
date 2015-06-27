@@ -33,11 +33,11 @@ void AUTODIMMER_Check()
     last_time = CLOCK_getms();
     if (Transmitter.auto_dimmer.timer == 0) // no auto dimmer set, return ASAP
         return;
-    if (Transmitter.brightness <= Transmitter.auto_dimmer.backlight_dim_value)
+    if (Transmitter.backlight <= Transmitter.auto_dimmer.backlight_dim_value)
         return; // dimmer target is even higher than current brightness, no need to make backlight dimmer
     if (auto_dimmer_state == AUTODIMMER_STOP)
         return; //backlight is already on, no need to turn it on again
-    BACKLIGHT_Brightness(Transmitter.brightness); // Turn on the back-light immediately ,don't wait to next loop
+    BACKLIGHT_Brightness(Transmitter.backlight); // Turn on the back-light immediately ,don't wait to next loop
     auto_dimmer_state = AUTODIMMER_STOP;
 }
 
@@ -45,7 +45,7 @@ void AUTODIMMER_Update()
 {
     if (Transmitter.auto_dimmer.timer == 0) // no auto dimmer set, return ASAP
         return;
-    if (Transmitter.brightness <= Transmitter.auto_dimmer.backlight_dim_value)
+    if (Transmitter.backlight <= Transmitter.auto_dimmer.backlight_dim_value)
         return; // dimmer target is even higher than current brightness, no need to make backlight dimmer
     if (auto_dimmer_state == AUTODIMMER_START)
         return; //backlight is already dimmer, no need to re-dim it

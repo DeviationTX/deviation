@@ -31,6 +31,7 @@ static const char caps_str[] = "CAP";
 static const char del_str[]  = "DEL";
 static const char mix_str[]  = ".?12";
 static const char char_str[] = "ABC";
+static const char space_str[] = " ";
 
 static void _make_box(struct guiBox *box, u16 x, u16 y, u16 width, u16 height)
 {
@@ -49,4 +50,25 @@ void _draw_key_bg(struct guiBox *box, int pressed, u32 color)
         LCD_FillRoundRect(box->x, box->y, box->width, box->height, 1, 0);
         LCD_DrawRoundRect(box->x, box->y, box->width, box->height, 1, 1);
     }
+}
+
+static void _kb_draw_text(const char *str)
+{
+    u16 w, h;
+
+    LCD_SetFont(Display.keyboard.font);
+    LCD_GetCharDimensions('A', &w, &h);
+    LCD_FillRoundRect(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET,
+                      LCD_WIDTH - 2 * TEXTBOX_X_OFFSET,
+                      TEXTBOX_HEIGHT,
+                      TEXTBOX_ROUND,
+                      TEXTBOX_BG_COLOR);  // clear the backgroup firstly
+    LCD_DrawRoundRect(TEXTBOX_X_OFFSET, TEXTBOX_Y_OFFSET,
+                      LCD_WIDTH - 2 * TEXTBOX_X_OFFSET,
+                      TEXTBOX_HEIGHT,
+                      TEXTBOX_ROUND,
+                      TEXTBOX_OUTLINE);
+    LCD_SetXY(TEXTBOX_X_OFFSET + 2, (TEXTBOX_HEIGHT - h) / 2 + TEXTBOX_Y_OFFSET);
+    LCD_SetFontColor(TEXTBOX_COLOR);
+    LCD_PrintString(str);
 }

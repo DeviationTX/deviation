@@ -57,7 +57,7 @@ static void _show_simple()
     int x = 60;
     //Row 1
     mp->firstObj = GUI_CreateLabel(&gui1->srclbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Src"));
-    GUI_CreateTextSelect(&gui1->src, COL1_VALUE, x, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
+    GUI_CreateTextSource(&gui1->src, COL1_VALUE, x, TEXTSELECT_96, sourceselect_cb, set_source_cb, set_input_source_cb, &mp->mixer[0].src);
     x += space;
     //Row 2
     GUI_CreateLabel(&gui1->curvelbl, COL1_TEXT, x, NULL, DEFAULT_FONT, _tr("Curve"));
@@ -105,9 +105,12 @@ static void _show_expo_dr()
     GUI_CreateLabelBox(&gui2->sw1lbl, COL_EXP2, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch1"));
     GUI_CreateLabelBox(&gui2->sw2lbl, COL_EXP3, 32, 96, 16, &NARROW_FONT, NULL, NULL, _tr("Switch2"));
     //Row 2
-    GUI_CreateTextSelect(&gui2->src, COL1_TEXT, 48, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->mixer[0].src);
-    GUI_CreateTextSelect(&gui2->sw1, COL_EXP2, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[1].sw);
-    GUI_CreateTextSelect(&gui2->sw2, COL_EXP3, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->mixer[2].sw);
+    GUI_CreateTextSource(&gui2->src, COL1_TEXT, 48, TEXTSELECT_96, sourceselect_cb, set_source_cb,
+                         set_input_source_cb, &mp->mixer[0].src);
+    GUI_CreateTextSource(&gui2->sw1, COL_EXP2, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb,
+                         set_input_source_cb, &mp->mixer[1].sw);
+    GUI_CreateTextSource(&gui2->sw2, COL_EXP3, 48, TEXTSELECT_96, sourceselect_cb, set_drsource_cb,
+                         set_input_source_cb, &mp->mixer[2].sw);
     //Row 3
     GUI_CreateLabelBox(&gui2->high, COL1_TEXT, 72, 96, 16, &NARROW_FONT, NULL, NULL, _tr("High-Rate"));
     GUI_CreateButton(&gui2->rate[0], COL_EXP2, 72, BUTTON_96x16, show_rate_cb, 0x0000, toggle_link_cb, (void *)0);
@@ -160,12 +163,14 @@ static void _show_complex(int page_change)
     }
     //Row 2
     GUI_CreateLabel(&gui3->swlbl, COL1_TEXT, 64, NULL, DEFAULT_FONT, _tr("Switch"));
-    GUI_CreateTextSelect(&gui3->sw, COL1_VALUE, 64, TEXTSELECT_96, sourceselect_cb, set_drsource_cb, &mp->cur_mixer->sw);
+    GUI_CreateTextSource(&gui3->sw, COL1_VALUE, 64, TEXTSELECT_96, sourceselect_cb, set_drsource_cb,
+                         set_input_source_cb, &mp->cur_mixer->sw);
     GUI_CreateLabel(&gui3->muxlbl, COL2_TEXT, 64, NULL, DEFAULT_FONT, _tr("Mux"));
     GUI_CreateTextSelect(&gui3->mux, COL2_VALUE, 64, TEXTSELECT_96, NULL, set_mux_cb, NULL);
     //Row 3
     GUI_CreateLabel(&gui3->srclbl, COL1_TEXT, 98, NULL, DEFAULT_FONT, _tr("Src"));
-    GUI_CreateTextSelect(&gui3->src, COL1_VALUE, 98, TEXTSELECT_96, sourceselect_cb, set_source_cb, &mp->cur_mixer->src);
+    GUI_CreateTextSource(&gui3->src, COL1_VALUE, 98, TEXTSELECT_96, sourceselect_cb, set_source_cb,
+                         set_input_source_cb, &mp->cur_mixer->src);
     //Row 4
     GUI_CreateLabel(&gui3->curvelbl, COL1_TEXT, 122, NULL, DEFAULT_FONT, _tr("Curve"));
     GUI_CreateTextSelect(&gui3->curve, COL1_VALUE, 122, TEXTSELECT_96, curveselect_cb, set_curvename_cb, mp->cur_mixer);

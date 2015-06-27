@@ -22,11 +22,23 @@ static void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data);
 #else
     static const char * const toggle_files[4] = {
 #endif
-        "media/toggle0.bmp",
-        "media/toggle1.bmp",
-        "media/toggle2.bmp",
-        "media/toggle3.bmp",
+        "media/toggle0" IMG_EXT,
+        "media/toggle1" IMG_EXT,
+        "media/toggle2" IMG_EXT,
+        "media/toggle3" IMG_EXT,
     };
+
+void tglico_select_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type == -1) {
+        // --> data = (ToggleNumber << 12) | (IconNumber << 8) | IconPosition
+        u8 IconPosition = ((long)data      ) & 0xff;
+        u8 IconNumber   = ((long)data >> 8 ) & 0x0f;
+        Model.pagecfg2.elem[tp->tglidx].extra[IconNumber] = IconPosition;
+        show_iconsel_page(IconNumber);
+    }
+}
 
 static u32 _get_icon_info()
 {
@@ -37,7 +49,7 @@ static u32 _get_icon_info()
             FILE *fh;
             fh = fopen(toggle_files[3], "r");
             if(!fh)
-                toggle_files[3] = "mymedia/toggle3.bmp";
+                toggle_files[3] = "mymedia/toggle3 " IMG_EXT;
             else
                 fclose(fh);
             checked = 1;

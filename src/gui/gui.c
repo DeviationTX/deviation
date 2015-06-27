@@ -17,6 +17,7 @@
 #include "gui.h"
 #include "target_defs.h"
 #include "config/display.h"
+#include "_mapped_gfx.h"
 
 struct guiObject *objHEAD     = NULL;
 struct guiObject *objTOUCHED  = NULL;
@@ -49,8 +50,10 @@ void connect_object(struct guiObject *obj)
 
 u8 coords_in_box(struct guiBox *box, struct touch *coords)
 {
-    return(coords->x >= box->x && coords->x <= (box->x + box->width)
-        && coords->y >= box->y && coords->y <= (box->y + box->height));
+    unsigned result = ((coords->x == box->x || (coords->x > box->x && coords->x < box->x + box->width))
+                    && (coords->y == box->y || (coords->y > box->y && coords->y < box->y + box->height)));
+    //printf("(%dx%d)-(%dx%d) <-> (%dx%d) : %d\n", box->x, box->y, box->x + box->width, box->y + box->height, coords->x, coords->y, result);
+    return result;
 }
 
 void GUI_DrawObject(struct guiObject *obj)
@@ -90,6 +93,16 @@ void GUI_DrawObjects(void)
     }
 }
 
+void GUI_HandleInput(int source, int value) {
+    if(objSELECTED && objSELECTED->Type == TextSelect) {
+        guiTextSelect_t *select = (guiTextSelect_t *)objSELECTED;
+        if (select->InputValueCB) {
+            select->InputValueCB(objSELECTED, source, value, select->cb_data);
+            OBJ_SET_DIRTY(objSELECTED, 1);
+        }
+    }
+}
+
 void GUI_RemoveAllObjects()
 {
     while(objHEAD)
@@ -118,6 +131,10 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Listbox:
         BUTTON_UnregisterCallback(&((guiListbox_t *)obj)->action);
+        break;
+    case Image:
+    case XYGraph:
+        _GUI_UnmapWindow(1);
         break;
     default: break;
     }
@@ -194,6 +211,7 @@ void GUI_DrawScreen(void)
     FullRedraw = 1;
     GUI_DrawObjects();
     FullRedraw = 0;
+    LCD_ForceUpdate();
 }
 
 struct guiObject *GUI_IsModal(void)
@@ -268,6 +286,7 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 
 void GUI_RefreshScreen() {
     _GUI_RefreshScreen(NULL);
+    LCD_ForceUpdate();
 }
     
 void GUI_TouchRelease()
@@ -364,7 +383,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                 }
                 break;
             case XYGraph:
-                if(coords_in_box(&obj->box, coords)) {
+                if(OBJ_IS_SELECTABLE(obj) && coords_in_box(&obj->box, coords)) {
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;

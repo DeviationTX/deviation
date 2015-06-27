@@ -8,7 +8,7 @@
 //Magic macro to check enum size
 //#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
-
+#define _UNUSED __attribute__ ((unused))
 
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
@@ -106,9 +106,11 @@ void PAGE_ShowResetPermTimerDialog(void *guiObject, void *data);
 void PAGE_ShowInvalidModule();
 void PAGE_ShowModuleDialog(const char **missing);
 void PAGE_ShowWarning(const char *title, const char *str);
+void PAGE_ShowTelemetryAlarm();
 const char *PAGE_GetName(int idx);
 int PAGE_GetNumPages();
 int PAGE_GetStartPage();
+int PAGE_GetID();
 
 /* Protocol */
 #define PROTODEF(proto, module, map, init, name) proto,
@@ -176,10 +178,12 @@ int INPUT_SwitchPos(unsigned src);
 int INPUT_NumSwitchPos(unsigned src);
 int INPUT_GetFirstSwitch(int src);
 int INPUT_SelectSource(int src, int dir, u8 *changed);
+int INPUT_SelectInput(int src, int newsrc, u8 *changed);
 int INPUT_SelectAbbrevSource(int src, int dir);
 
 const char *INPUT_MapSourceName(unsigned idx, unsigned *val);
 const char *INPUT_ButtonName(unsigned src);
+void INPUT_CheckChanges(void);
 
 /* Misc */
 void Delay(u32 count);
@@ -194,6 +198,7 @@ u32 rand32(); //LFSR based PRNG
 extern volatile u8 priority_ready;
 void medium_priority_cb();
 void debug_timing(u32 type, int startend); //This is only defined if TIMING_DEBUG is defined
+void DEBUGLOG_Putc(char c);
 /* Battery */
 #define BATTERY_CRITICAL 0x01
 #define BATTERY_LOW      0x02

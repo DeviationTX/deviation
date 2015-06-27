@@ -175,7 +175,7 @@ static void _show_page()
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->backlightlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Backlight"));
-        GUI_CreateTextSelect(&gui2->backlight, col2, row, TEXTSELECT_96, NULL, brightness_select_cb, NULL);
+        GUI_CreateTextSelect(&gui2->backlight, col2, row, TEXTSELECT_96, NULL, backlight_select_cb, NULL);
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->dimtimelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Dimmer time"));

@@ -65,6 +65,9 @@ struct page_group groups[] = {
 #endif
     {2, PAGEID_RANGE},
     {2, PAGEID_USB},
+#if DEBUG_WINDOW_SIZE
+    {2, PAGEID_DEBUGLOG},
+#endif
 #if HAS_STANDARD_GUI
     {0x81, PAGEID_MODELMENU},
 #endif
@@ -113,7 +116,7 @@ void PAGE_Change(int dir)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (Model.mixer_mode != 0 || (cur_page >= sizeof(groups) / sizeof(struct page_group) - 1) || groups[cur_page].group & 0x80) {
+    if ((Model.mixer_mode == MIXER_STANDARD && (groups[cur_page].group & 0x7f) == 1) || (cur_page >= sizeof(groups) / sizeof(struct page_group) - 1) || groups[cur_page].group & 0x80) {
         //Don't use left/right on model pages in standard mode
         return;
     }
@@ -222,6 +225,10 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
 {
     (void)data;
     (void)flags;
+    if (PAGE_GetID() == PAGEID_TELEMMON) {
+        if(CHAN_ButtonIsPressed(buttons, BUT_ENTER) || CHAN_ButtonIsPressed(buttons, BUT_EXIT))
+            TELEMETRY_MuteAlarm();
+    }
     if (ActionCB != NULL)
         return ActionCB(buttons, flags, data);
     if (flags & BUTTON_LONGPRESS) {
@@ -292,6 +299,11 @@ int PAGE_GetStartPage()
 int PAGE_GetNumPages()
 {
     return sizeof(pages) / sizeof(struct page);
+}
+
+int PAGE_GetID()
+{
+    return groups[cur_page].id;
 }
 
 void PAGE_ChangeQuick(int dir)

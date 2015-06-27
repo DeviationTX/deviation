@@ -209,6 +209,8 @@ unsigned MIXER_MapChannel(unsigned channel);
 unsigned MIXER_UpdateTrim(u32 buttons, unsigned flags, void *data);
 s8 *MIXER_GetTrim(unsigned i);
 s32 MIXER_GetTrimValue(int i);
+int MIXER_GetSourceVal(int idx, u32 opts);
+int MIXER_SourceAsBoolean(unsigned src);
 
 void MIXER_Init();
 

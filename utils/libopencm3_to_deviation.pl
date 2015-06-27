@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This script will modify an existing libopencm3 clone so that
 # it has only what is needed for deviation

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 my $rom_start = 0;
 my $rom_end = 0;
 my $data_end = 0;

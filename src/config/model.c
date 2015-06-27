@@ -48,6 +48,11 @@ const char *MODEL_MIXERMODE = "mixermode";
 static const char SECTION_RADIO[]   = "radio";
 
 static const char RADIO_PROTOCOL[] = "protocol";
+static const char RADIO_VIDEOSRC[] = "videosrc";
+static const char RADIO_VIDEOCH[]  = "videoch";
+static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
+static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
+
 #define RADIO_PROTOCOL_VAL ProtocolNames
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
@@ -489,7 +494,13 @@ static const struct struct_map _secnone[] =
 };
 static const struct struct_map _secradio[] = {
     {RADIO_NUM_CHANNELS, OFFSET(Model, num_channels), 0},
-    {RADIO_FIXED_ID, OFFSET(Model, fixed_id), 0},
+    {RADIO_FIXED_ID,     OFFSET(Model, fixed_id), 0},
+#if HAS_VIDEO
+    {RADIO_VIDEOSRC,     OFFSET_SRC(Model, videosrc), 0},
+    {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
+    {RADIO_VIDEOCONTRAST,OFFSET(Model, video_contrast), 0},
+    {RADIO_VIDEOBRIGHTNESS,OFFSET(Model, video_brightness), 0},
+#endif
 };
 static const struct struct_map _secmixer[] = {
     {MIXER_SWITCH, OFFSET_SRC(Model.mixers[0], sw), 0},
@@ -863,7 +874,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
         idx--;
         if (MATCH_KEY(TELEM_SRC)) {
             char str[20];
-            unsigned last = TELEMETRY_Type() == TELEM_DEVO ? TELEM_DEVO_LAST : TELEM_DSM_LAST;
+            unsigned last = TELEMETRY_GetNumTelemSrc();
             for(i = 1; i <= last; i++) {
                 if (strcasecmp(TELEMETRY_ShortName(str, i), value) == 0) {
                     m->telem_alarm[idx] = i;
@@ -1349,9 +1360,9 @@ u8 CONFIG_GetCurrentModel() {
 
 const char *CONFIG_GetIcon(enum ModelType type) {
     const char *const icons[] = {
-       "modelico/heli.bmp",
-       "modelico/plane.bmp",
-       "modelico/multi.bmp",
+       "modelico/heli" IMG_EXT,
+       "modelico/plane" IMG_EXT,
+       "modelico/multi" IMG_EXT,
     };
     return icons[type];
 }

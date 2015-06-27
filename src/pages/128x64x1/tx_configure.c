@@ -13,12 +13,25 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/tx.h"
 #include "config/model.h"
 #include "autodimmer.h"
+
+enum {
+  LARGE_SEL_X_OFFSET = 68,
+  MED_SEL_X_OFFSET   = 68 + 10,
+  SMALL_SEL_X_OFFSET = 68 + 15,
+  TITLE_X_OFFSET     = 0,
+  TITLE_WIDTH        = 0,
+  LABEL_X_OFFSET     = 0,
+  LABEL_WIDTH        = 0,
+};
+#define TEXTSEL_X_WIDTH (LCD_WIDTH - ARROW_WIDTH - x - 1)
+#endif //#ifndef OVERRIDE_PLACEMENT
 
 static const int MIN_BATTERY_ALARM_STEP = 10;
 #include "../common/_tx_configure.c"
@@ -64,8 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     void *tgl = NULL;
     void *value = NULL;
     void *but_str = NULL;
-    const int X = 68;
-    u8 x = X;
+    u8 x = LARGE_SEL_X_OFFSET;
 
     switch(absrow) {
 #ifndef NO_LANGUAGE_SUPPORT
@@ -114,7 +126,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
             label = _tr_noop("Backlight");
-            value = brightness_select_cb;
+            value = backlight_select_cb;
             break;
         case ITEM_CONTRAST:
             label = _tr_noop("Contrast");
@@ -122,24 +134,24 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_DIMTIME:
             label = _tr_noop("Dimmer time");
-            value = auto_dimmer_time_cb; x = X+10;
+            value = auto_dimmer_time_cb; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_DIMVAL:
             label = _tr_noop("Dimmer target");
-            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x= X+10;
+            value = common_select_cb; data = &Transmitter.auto_dimmer.backlight_dim_value; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_PREALERT:
             title = _tr_noop("Timer settings");
             label = _tr_noop("Prealert time");
-            value = prealert_time_cb; data = (void *)0L; x= X+10;
+            value = prealert_time_cb; data = (void *)0L; x = MED_SEL_X_OFFSET;
             break;
         case ITEM_PREALERT_IVAL:
             label = _tr_noop("Prealert intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; x= X+15;
+            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.prealert_interval; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_TIMEUP:
             label = _tr_noop("Timeup intvl");
-            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; x= X+15;
+            value = timer_interval_cb; data = &Transmitter.countdown_timer_settings.timeup_interval; x = SMALL_SEL_X_OFFSET;
             break;
         case ITEM_TELEMTEMP:
             title = _tr_noop("Telemetry settings");
@@ -154,19 +166,19 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     if (title) {
         enum LabelType oldType = labelDesc.style;
         labelDesc.style = LABEL_UNDERLINE;
-        GUI_CreateLabelBox(&gui->title[relrow], 0, y,
-                0, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
+        GUI_CreateLabelBox(&gui->title[relrow], TITLE_X_OFFSET, y,
+                TITLE_WIDTH, LINE_HEIGHT, &labelDesc, NULL, NULL, _tr(title));
         labelDesc.style = oldType;
         y += LINE_SPACE;
     }
-    GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
+    GUI_CreateLabelBox(&gui->label[relrow], LABEL_X_OFFSET, y,
+            LABEL_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, NULL, NULL, _tr(label));
     if(but_str) {
         GUI_CreateButtonPlateText(&gui->value[relrow].but, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, LINE_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, but_str, 0x0000, tgl, data);
     } else {
         GUI_CreateTextSelectPlate(&gui->value[relrow].ts, x, y,
-            LCD_WIDTH - ARROW_WIDTH - x - 1, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);
+            TEXTSEL_X_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, value, data);
     }
     return 1;
 }
@@ -201,7 +213,6 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", Transmitter.contrast);
     return tempstring;
 }
-
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

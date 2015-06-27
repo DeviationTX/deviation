@@ -15,7 +15,9 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/stm32/iwdg.h>
+
 #include "common.h"
+#include <fcntl.h>
 
 /* This code will write a stack-trace to disk should a fault happen
  * Since when it runs, memory may be corrupted, we want to use as
@@ -23,7 +25,7 @@
  * The code bypasses the entire file I/O system, and writes directly
  * to the disk address.
  */
-extern int disk_writep (const BYTE*, DWORD);
+extern int disk_writep (const u8*, u32);
 //Memory start is constant for all Tx
 #define MEMORY_START  ((unsigned int *)0x20000000)
 #define MEMORY_END    (&_stack)
@@ -35,6 +37,7 @@ extern int disk_writep (const BYTE*, DWORD);
 
 #define MEMORY_DUMP BACKTRACE
 extern unsigned _stack; //Defined in devo.ld
+extern u8 _drive_num;
 
 /*
     asm(
@@ -113,8 +116,10 @@ void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
   stacked_pc = ((unsigned long) hardfault_args[6]);
   stacked_psr = ((unsigned long) hardfault_args[7]);
 
-  if(debug_addr)
+  if(debug_addr) {
+      _drive_num = 0;
       disk_writep(0, debug_addr);
+  }
   if (fault_type) {
       fault_printf ("\n\n[Soft fault]", NO_VALUE);
   } else {
@@ -171,20 +176,22 @@ void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
 }
 
 void init_err_handler() {
+#if ! defined USE_DEVOFS || USE_DEVOFS != 1
     //This is a hack to get the memory address of a file
     //we can't use 'fopen' because it masks the structure we need
     FATFS fat;
-    if(pf_mount(&fat) != FR_OK)
+    if(fs_mount(&fat) != FR_OK)
         return;
-    if(pf_open("errors.txt") != FR_OK) {
-        pf_mount(0);
+    if(fs_open("errors.txt", O_WRONLY) != FR_OK) {
+        fs_mount(0);
         return;
     }
-    pf_maximize_file_size();
-    if(pf_lseek(1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
-        pf_mount(0);
+    fs_maximize_file_size();
+    if(fs_lseek(1) != FR_OK) {  //Seeking to a non-zero address causes petitfat to calculatethe disk-address
+        fs_mount(0);
         return;
     }
     debug_addr = fat.dsect;
-    pf_mount(0);
+    fs_mount(0);
+#endif
 }

@@ -11,7 +11,7 @@ TARGET   ?= devo8
 default: $(TARGET)
 
 # The supported transmitters
-TXS = devo6 devo7e devo8 devo10 devo12
+TXS = devo6 devo7e devo8 devo10 devo12 devof7 devof12e
 # x9d needs more software installed.
 #TXS = devo6 devo7e devo8 devo10 devo12 x9d
 # These txs use file systems for other txs, so don't have a file system target.
@@ -59,10 +59,10 @@ endif
 
 # Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
-NUM_MODELS ?= 30
 SDIR := .
 include target/$(TARGET)/Makefile.inc
 
+NUM_MODELS ?= 30
 TYPE     ?= prd
 
 ###############################################
@@ -220,7 +220,7 @@ zip: $(TARGET).zip
 
 %.zip: $(ALL) $(TARGET).dfu $(PROTO_MODULES)
 	#This is not an emulator build (emulator is hanled in target/common/emu/Makefile.inc)
-	mv -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
 	rm -f deviation-$(HGVERSION).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
@@ -300,7 +300,7 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
                ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir $(ODIR)
 	export tx=$(FILESYSTEM); \
-	number=2 ; while [ $$number -le 30 ] ; do \
+	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
 		number=`expr $$number + 1`; \
 		done
@@ -311,16 +311,16 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 #Necessary Font files#
 ######################
 filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
-	../utils/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
+	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
 
 filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
-	../utils/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
+	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
-	../utils/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
+	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo10/media/04b03.fon: fonts/04b03.bdf
-	../utils/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
+	../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################
 #Build rules for all .o files#

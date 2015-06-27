@@ -208,6 +208,12 @@ struct usb_obj {
     guiLabel_t label;
 };
 
+#define DEBUG_LINE_COUNT 7
+struct debuglog_obj {
+    guiLabel_t      line[DEBUG_LINE_COUNT];
+    guiScrollable_t scrollable;
+};
+
 /****Advanced ****/
 struct advcurve_obj {
     guiTextSelect_t name;
@@ -249,7 +255,10 @@ struct advmixcfg_obj {
     guiRect_t rect1;
     guiBarGraph_t bar;
     guiXYGraph_t graph;
-    guiLabel_t label[7];
+    union {
+        guiLabel_t lbl;
+        guiButton_t but;
+    } label[7];
     union {
         guiButton_t but;
         guiTextSelect_t ts;
@@ -352,6 +361,7 @@ struct gui_objs {
         struct tx_obj tx;
         struct calibrate_obj calibrate;
         struct usb_obj usb;
+        struct debuglog_obj debuglog;
         
         struct advcurve_obj advcurve;
         struct advlimit_obj advlimit;

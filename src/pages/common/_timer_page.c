@@ -21,6 +21,7 @@ const char *timer_str_cb(guiObject_t *obj, const void *data);
 static const char *show_timerperm_cb(guiObject_t *obj, const void *data);
 static void update_countdown(u8 idx);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
+static const char *set_input_source_cb(guiObject_t *obj, int source, int value, void *data);
 static void toggle_source_cb(guiObject_t *obj, void *data);
 static void toggle_timertype_cb(guiObject_t *obj, void *data);
 static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
@@ -78,7 +79,7 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     return "";
 }
 
-const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx)
+const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx, int source)
 {
     u8 changed;
     if (Model.mixer_mode == MIXER_STANDARD && Model.type == MODELTYPE_HELI)  { //Improvement: only to intelligent switch setting for heli type in standard mode
@@ -88,7 +89,10 @@ const char *_set_src_cb(guiTextSelect_t *obj, u8 *src, int dir, int idx)
         MIXER_SET_SRC_INV(newsrc, is_neg);
         *src = newsrc;
     } else {
-        *src = INPUT_SelectSource(*src, dir, &changed);
+        if (source <= INP_NONE)
+            *src = INPUT_SelectSource(*src, dir, &changed);
+        else
+            *src = INPUT_SelectInput(*src, source, &changed);
     }
     if (changed) {
         TIMER_Reset(idx);
@@ -102,7 +106,16 @@ const char *set_resetsrc_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     int idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    return _set_src_cb((guiTextSelect_t *)obj, &timer->resetsrc, dir, idx);
+    return _set_src_cb((guiTextSelect_t *)obj, &timer->resetsrc, dir, idx, INP_NONE);
+}
+
+const char *set_input_rstsrc_cb(guiObject_t *obj, int source, int value, void *data)
+{
+    (void) obj;
+    (void) value;
+    int idx = (long)data;
+    struct Timer *timer = &Model.timer[idx];
+    return _set_src_cb((guiTextSelect_t *)obj, &timer->resetsrc, 0, idx, source);
 }
 
 void toggle_resetsrc_cb(guiObject_t *obj, void *data)
@@ -129,11 +142,20 @@ const char *set_source_cb(guiObject_t *obj, int dir, void *data)
     (void) obj;
     int idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
-    const char *str = _set_src_cb((guiTextSelect_t *)obj, &timer->src, dir, idx);
+    const char *str = _set_src_cb((guiTextSelect_t *)obj, &timer->src, dir, idx, INP_NONE);
     //if (0 && Model.mixer_mode == MIXER_STANDARD)  {
     //    return MIXER_SRC(timer->src) ? _tr("On") : _tr("Off");
     //}
     return str;
+}
+
+const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data)
+{
+    (void) obj;
+    (void) value;
+    int idx = (long)data;
+    struct Timer *timer = &Model.timer[idx];
+    return _set_src_cb((guiTextSelect_t *)obj, &timer->src, 0, idx, src);
 }
 
 void toggle_timertype_cb(guiObject_t *obj, void *data)

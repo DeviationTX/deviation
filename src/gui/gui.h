@@ -253,6 +253,7 @@ typedef struct guiTextSelect {
     u16 fontColor;
     const char *(*ValueCB)(guiObject_t *obj, int dir, void *data);
     void (*SelectCB)(guiObject_t *obj, void *data);
+    const char *(*InputValueCB)(guiObject_t *obj, int src, int value, void *data);
     void *cb_data;
     struct LabelDesc desc;
     u8 enable;
@@ -407,9 +408,19 @@ guiObject_t *GUI_CreateTextSelect(guiTextSelect_t *, u16 x, u16 y, enum TextSele
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
         void *cb_data);
+guiObject_t *GUI_CreateTextSource(guiTextSelect_t *, u16 x, u16 y, enum TextSelectType type,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data),
+        void *cb_data);
 guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
         void (*select_cb)(guiObject_t *obj, void *data),
         const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        void *cb_data);
+guiObject_t *GUI_CreateTextSourcePlate(guiTextSelect_t *, u16 x, u16 y, u16 width, u16 height, const struct LabelDesc *desc,
+        void (*select_cb)(guiObject_t *obj, void *data),
+        const char *(*value_cb)(guiObject_t *obj, int value, void *data),
+        const char *(*input_value_cb)(guiObject_t *obj, int src, int value, void *data),
         void *cb_data);
 guiObject_t *GUI_CreateKeyboard(guiKeyboard_t *, enum KeyboardType type, char *text, s32 max_size,
         void (*CallBack)(guiObject_t *obj, void *data), void *cb_data);
@@ -442,6 +453,7 @@ void GUI_SetSelectable(guiObject_t *obj, u8 selectable);
 u8 GUI_ObjectNeedsRedraw(guiObject_t *obj);
 guiObject_t *GUI_IsModal(void);
 void GUI_HandleButtons(u8 enable);
+void GUI_HandleInput(int source, int value);
 struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj);
 struct guiObject *GUI_GetPrevSelectable(struct guiObject *origObj);
 void GUI_GetSize(guiObject_t *obj, int *width, int *height);

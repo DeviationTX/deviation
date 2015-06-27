@@ -70,6 +70,7 @@ void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 void MODELPAGE_Config();
 void MODELPROTO_Config();
 void MODELTRAIN_Config();
+void MODELVIDEO_Config();
 void MODELPage_Template();
 
 /* RTC */
@@ -131,6 +132,11 @@ void PAGE_TelemconfigExit();
 void PAGE_DatalogInit();
 void PAGE_DatalogEvent();
 void PAGE_DatalogExit();
+
+/* Debuglog */
+void PAGE_DebuglogInit();
+void PAGE_DebuglogEvent();
+void PAGE_DebuglogExit();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);

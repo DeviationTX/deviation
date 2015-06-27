@@ -29,10 +29,16 @@ typedef void (*putcf) (void*,char);
 #define stdout_putp NULL
 static void stdout_putf (void *p, char c) {
     (void)p;
+    (void)c;
     //if (c == '\n')
     //    usart_send_blocking(USART1, '\r');
     //usart_send_blocking(USART1, c);
-    fputc(c, stdout);
+#if DEBUG_WINDOW_SIZE
+        DEBUGLOG_Putc(c);
+#endif
+#if defined BUILDTYPE_DEV
+        fputc(c, stdout);
+#endif
 };
 static void fputf (void *p, char c) {
     fputc(c, (FILE *)p);

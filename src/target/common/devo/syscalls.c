@@ -61,7 +61,7 @@ int FS_Mount(void *_f, const char *drive)
 #endif
         if (res) {
             init_err_handler();
-            pf_switchfile(&fat[0]);
+            fs_switchfile(&fat[0]);
             return 1;
         }
         return 0;
@@ -73,8 +73,8 @@ int FS_Mount(void *_f, const char *drive)
         _drive_num = 1;
     }
 #endif
-    int res = pf_mount(f);
-    f->pad1 = _drive_num;
+    int res = fs_mount(f);
+    fs_set_drive_num(f, _drive_num);
     dbgprintf("Mount: %d\n", res);
     _drive_num = 0;
     return (res == FR_OK);
@@ -82,7 +82,7 @@ int FS_Mount(void *_f, const char *drive)
 
 void FS_Unmount()
 {
-    pf_mount(0);
+    fs_mount(0);
 }
 
 int FS_OpenDir(const char *path)
@@ -93,9 +93,9 @@ int FS_OpenDir(const char *path)
         ptr = &fat[1];
     }
 #endif
-    pf_switchfile(ptr);
-    _drive_num = ptr->pad1;
-    FRESULT res = pf_opendir(&dir, path);
+    fs_switchfile(ptr);
+    _drive_num = fs_get_drive_num(ptr);
+    FRESULT res = fs_opendir(&dir, path);
     dbgprintf("Opendir: %d\n", res);
     return (res == FR_OK);
 }
@@ -108,7 +108,7 @@ int FS_OpenDir(const char *path)
 int FS_ReadDir(char *path)
 {
     FILINFO fi;
-    if (pf_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
+    if (fs_readdir(&dir, &fi) != FR_OK || ! fi.fname[0])
         return 0;
     dbgprintf("Read: %s %d\n", fi.fname, fi.fattrib);
     strlcpy(path, fi.fname, 13);
@@ -131,20 +131,20 @@ long _open_r (FATFS *r, const char *file, int flags, int mode) {
 #endif
             r = &fat[0];
     }
-    if(r->flag & FA_OPENED) {
+    if(fs_is_open(r)) {
         dbgprintf("_open_r(%p): file already open.\n", r);
         return -1;
     } else {
-        pf_switchfile(r);
-        _drive_num = r->pad1;
-        int res=pf_open(file);
+        fs_switchfile(r);
+        _drive_num = fs_get_drive_num(r);
+        int res=fs_open(file, flags);
         if(res==FR_OK) {
-            dbgprintf("_open_r(%08lx): pf_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
+            dbgprintf("_open_r(%08lx): fs_open (%s) flags: %d, mode: %d ok\r\n", r, file, flags, mode);
             if (flags & O_CREAT)
-                pf_maximize_file_size();
+                fs_maximize_file_size();
             return (long)r;
         } else {
-            dbgprintf("_open_r(%08lx): pf_open (%s) failed: %d\r\n", r, file, res);
+            dbgprintf("_open_r(%08lx): fs_open (%s) failed: %d\r\n", r, file, res);
             return -1;
         }
     }
@@ -152,7 +152,7 @@ long _open_r (FATFS *r, const char *file, int flags, int mode) {
 
 int _close_r (FATFS *r) {
     if(r) {
-       r->flag = 0;
+       fs_close(r);
        dbgprintf("_close_r(%p): file closed.\r\n", r);
     }
     return 0;
@@ -160,12 +160,12 @@ int _close_r (FATFS *r) {
 
 int _read_r (FATFS *r, char * ptr, int len)
 {
-    if((unsigned long)r>2 && r->flag & FA_OPENED) {
+    if((unsigned long)r>2 && fs_is_open(r)) {
         if(len <= 0xffff) {
-            WORD bytes_read;
-            pf_switchfile(r);
-            _drive_num = r->pad1;
-            int res=pf_read(ptr, len, &bytes_read);
+            u16  bytes_read;
+            fs_switchfile(r);
+            _drive_num = fs_get_drive_num(r);
+            int res=fs_read(ptr, len, &bytes_read);
             dbgprintf("_read_r: len %d, bytes_read %d, result %d\r\n", len, bytes_read, res); 
             if(res==FR_OK) return bytes_read;
         }
@@ -191,11 +191,11 @@ int _write_r (FATFS *r, char * ptr, int len)
         }    
         return len;
     } else if(r) {
-        if(r->flag & FA_OPENED) {
-            WORD bytes_written;
-            pf_switchfile(r);
-            _drive_num = r->pad1;
-            int res=pf_write(ptr, len, &bytes_written);
+        if(fs_is_open(r)) {
+            u16 bytes_written;
+            fs_switchfile(r);
+            _drive_num = fs_get_drive_num(r);
+            int res=fs_write(ptr, len, &bytes_written);
             dbgprintf("_write_r: len %d, bytes_written %d, result %d\r\n",len, bytes_written, res);
             if(res==FR_OK) return bytes_written;
         }
@@ -206,8 +206,8 @@ int _write_r (FATFS *r, char * ptr, int len)
 
 long _ltell_r (FATFS *r)
 {
-    if((unsigned long)r>2 && (r->flag & FA_OPENED)) {
-        return r->fptr;
+    if((unsigned long)r>2 && fs_is_open(r)) {
+        return fs_ltell(r);
     }
     return -1;
 }
@@ -216,17 +216,17 @@ int _lseek_r (FATFS *r, int ptr, int dir)
 {
     (void)r;
     
-    if((unsigned long)r>2 && (r->flag & FA_OPENED)) {
+    if((unsigned long)r>2 && fs_is_open(r)) {
         if(dir==SEEK_CUR) {
-            ptr += r->fptr;
+            ptr += fs_ltell(r);
         } else if (dir==SEEK_END) {
-            ptr += r->fsize;
+            ptr += fs_filesize(r);
         }
-        pf_switchfile(r);
-        _drive_num = r->pad1;
-        int res=pf_lseek(ptr);
+        fs_switchfile(r);
+        _drive_num = fs_get_drive_num(r);
+        int res=fs_lseek(ptr);
         if(res==FR_OK) {
-           return r->fptr;
+           return fs_ltell(r);
         }
     }
     errno=EINVAL;

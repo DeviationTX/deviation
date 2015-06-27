@@ -13,10 +13,22 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
 #include "config/model.h"
+
+enum {
+    LABEL_X        = 0,
+    LABEL_WIDTH    = 55,
+    TEXTSEL_X      = 55,
+    TEXTSEL_WIDTH  = 65,
+    RESET_X        = 58,
+    RESET_WIDTH    = 59,
+    START_WIDTH    = 50,
+};
+#endif //OVERRIDE_PLACEMENT
 
 #include "../common/_timer_page.c"
 
@@ -71,47 +83,45 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     (void)relrow;
     u8 space = LINE_SPACE;
-    u8 w = 65;
-    u8 x = 55;
     //Row 1
-    GUI_CreateLabelBox(&gui->name, 0, y,
-            55, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->type, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->name, LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->type, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
 
     //Row 2
     y += space;
-    GUI_CreateLabelBox(&gui->switchlbl, 0, y,
-            55, LINE_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
-    GUI_CreateTextSelectPlate(&gui->src, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, (void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->switchlbl, LABEL_X, y,
+            LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, switch_str_cb, NULL, (void *)(long)absrow);
+    GUI_CreateTextSourcePlate(&gui->src, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_source_cb, set_source_cb, set_input_source_cb, (void *)(long)absrow);
     //Row 3
     y += space;
     /*prem-timer reset */
-    GUI_CreateLabelBox(&gui->resetpermlbl, 0, y  ,
-            55, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
-    GUI_CreateButtonPlateText(&gui->resetperm, x+3, y ,
-            w-6, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
+    GUI_CreateLabelBox(&gui->resetpermlbl, LABEL_X, y  ,
+            LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Reset"));
+    GUI_CreateButtonPlateText(&gui->resetperm, RESET_X, y ,
+            RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)absrow);
     if(Model.mixer_mode != MIXER_STANDARD) {
         /* or Reset switch */
-    	GUI_CreateLabelBox(&gui->resetlbl, 0, y ,
-            55, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
-    	GUI_CreateTextSelectPlate(&gui->resetsrc, x, y ,
-            w, LINE_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, (void *)(long)absrow);
+    	GUI_CreateLabelBox(&gui->resetlbl, LABEL_X, y ,
+            LABEL_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, NULL, NULL, _tr("Reset sw"));
+    	GUI_CreateTextSourcePlate(&gui->resetsrc, TEXTSEL_X, y ,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_resetsrc_cb, set_resetsrc_cb, set_input_rstsrc_cb, (void *)(long)absrow);
 	y += space;
     }
     //Row 4
-    GUI_CreateLabelBox(&gui->startlbl, 0, y ,
-            50, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
+    GUI_CreateLabelBox(&gui->startlbl, LABEL_X, y,
+            START_WIDTH, // bug fix: label width and height can't be 0, otherwise, the label couldn't be hidden dynamically
             LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Start"));
-    GUI_CreateTextSelectPlate(&gui->start, x, y,
-            w, LINE_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
+    GUI_CreateTextSelectPlate(&gui->start, TEXTSEL_X, y,
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT,NULL, set_start_cb, (void *)(long)absrow);
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
     if(Model.mixer_mode == MIXER_STANDARD)
         y+= space;
-    GUI_CreateButtonPlateText(&gui->setperm, x+3, y,
-        w-6, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
+    GUI_CreateButtonPlateText(&gui->setperm, RESET_X, y,
+        RESET_WIDTH, LINE_HEIGHT,&DEFAULT_FONT, show_timerperm_cb, 0x0000, reset_timerperm_cb,(void *)(long)(absrow | 0x80));
 #endif
 
     update_countdown(absrow);
