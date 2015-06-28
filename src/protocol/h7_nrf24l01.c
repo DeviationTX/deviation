@@ -54,12 +54,12 @@
 #define INITIAL_WAIT     500
 #define PACKET_SIZE 9
 
-static const s8 data_freq[] = {
+static const u8 data_freq[] = {
     0x02, 0x48, 0x0C, 0x3e, 0x16, 0x34, 0x20, 0x2A,
     0x2A, 0x20, 0x34, 0x16, 0x3e, 0x0c, 0x48, 0x02
 };
 
-static const s8 mys_byte[] = {
+static const u8 mys_byte[] = {
     0x01, 0x11, 0x02, 0x12, 0x03, 0x13, 0x04, 0x14, 
     0x05, 0x15, 0x06, 0x16, 0x07, 0x17, 0x00, 0x10
 };
@@ -108,8 +108,8 @@ static s16 scale_channel(u8 ch, s32 destMin, s32 destMax)
     return ((a / b) - (destMax - destMin)) + destMax;
 }
 
-static s8 calcChecksum() {
-    s8 result=checksum_offset;
+static u8 calcChecksum() {
+    u8 result=checksum_offset;
     for(uint8_t i=0; i<8; i++)
         result += packet[i];
     return result & 0xFF;
