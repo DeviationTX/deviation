@@ -119,8 +119,8 @@ static void h7_send_packet()
 {
     packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
     packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
-    packet[2] = scale_channel(CHANNEL2, 0xe1, 0x00); // elevator
-    packet[3] = scale_channel(CHANNEL1, 0x00, 0xe1); // aileron
+    packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
+    packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
     packet[4] = scale_channel(CHANNEL7, 0x3f, 0x00); // elevator trim
     packet[5] = scale_channel(CHANNEL8, 0x3f, 0x00); // aileron trim
     packet[6] = 0x00;
