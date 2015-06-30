@@ -122,7 +122,7 @@ static void h7_send_packet()
     packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
     packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
     packet[4] = scale_channel(CHANNEL7, 0x3f, 0x00); // elevator trim
-    packet[5] = scale_channel(CHANNEL8, 0x3f, 0x00); // aileron trim
+    packet[5] = scale_channel(CHANNEL8, 0x00, 0x3f); // aileron trim
     packet[6] = 0x00;
     if( Channels[CHANNEL5] > 0 ) // high rate
         packet[6] |= FLAG_HIGH_RATE;
