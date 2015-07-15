@@ -114,13 +114,11 @@ enum {
 #define BV(bit) (1 << bit)
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static s8 scale_channel(u8 ch, s8 destMin, s8 destMax)
+static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 {
     s32 range = destMax - destMin;
-    s32 round = range * destMin < 0 ? 0 : CHAN_RANGE / range;
-    return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + destMin;
+    return (range * (Channels[ch] - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
-
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
@@ -237,15 +235,20 @@ static u16 fy326_callback()
         break;
 
     case FY326_BIND1:
+#ifdef EMULATOR
+        if (1) {
+            packet[13] = 0x7e;
+#else
         if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) { // RX fifo data ready
             NRF24L01_ReadPayload(packet, PACKET_SIZE);
+#endif
             rxid = packet[13];
             txid[0] = 0xaa;
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_SetTxRxMode(TX_EN);
-            phase = FY326_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
+            phase = FY326_DATA;
         } else if (bind_counter-- == 0) {
             bind_counter = BIND_COUNT;
             NRF24L01_SetTxRxMode(TXRX_OFF);
@@ -257,11 +260,16 @@ static u16 fy326_callback()
         break;
 
     case FY326_BIND2:
+#ifdef EMULATOR
+        if (1) {
+#else
         if( NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_TX_DS)) { // TX data sent
+#endif
             // switch to RX mode
             NRF24L01_SetTxRxMode(TXRX_OFF);
             NRF24L01_FlushRx();
             NRF24L01_SetTxRxMode(RX_EN);
+            phase = FY326_BIND1;
         } else {
             return PACKET_CHKTIME;
         }
