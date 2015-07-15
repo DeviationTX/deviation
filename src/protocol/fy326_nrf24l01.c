@@ -50,6 +50,7 @@
 
 #define INITIAL_WAIT    500
 #define PACKET_PERIOD   1500  // Timeout for callback in uSec
+#define PACKET_CHKTIME  300   // Time to wait if packet not yet received or sent
 #define PACKET_SIZE     15
 #define BIND_COUNT      16
 
@@ -232,7 +233,7 @@ static u16 fy326_callback()
         bind_counter = BIND_COUNT;
         phase = FY326_BIND2;
         send_packet(1);
-        return 300;
+        return PACKET_CHKTIME;
         break;
 
     case FY326_BIND1:
@@ -251,7 +252,7 @@ static u16 fy326_callback()
             NRF24L01_SetTxRxMode(TX_EN);
             send_packet(1);
             phase = FY326_BIND2;
-            return 300;
+            return PACKET_CHKTIME;
         }
         break;
 
@@ -262,7 +263,7 @@ static u16 fy326_callback()
             NRF24L01_FlushRx();
             NRF24L01_SetTxRxMode(RX_EN);
         } else {
-            return 300;
+            return PACKET_CHKTIME;
         }
         break;
 
@@ -339,8 +340,8 @@ const void *FY326_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 6L; // A, E, T, R, expert mode, enable flip
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
+        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, enable flip, expert mode
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0; //fy326_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
