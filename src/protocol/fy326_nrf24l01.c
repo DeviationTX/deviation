@@ -80,15 +80,17 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,
+    CHANNEL5,     // Leds
     CHANNEL6,     // Flip
-    CHANNEL7,
-    CHANNEL8,
-    CHANNEL9,
-    CHANNEL10     // Expert mode
+    CHANNEL7,     // Still camera
+    CHANNEL8,     // Video camera
+    CHANNEL9,     // Headless
+    CHANNEL10,    // Return To Home
+    CHANNEL11,    // Calibrate
 };
-#define CHANNEL_FLIP    CHANNEL6
-#define CHANNEL_EXPERT  CHANNEL10
+#define CHANNEL_FLIP      CHANNEL6
+#define CHANNEL_HEADLESS  CHANNEL9
+#define CHANNEL_RTH       CHANNEL10
 
 static u8 bind_counter;
 static u8 phase;
@@ -124,7 +126,14 @@ static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 static void send_packet(u8 bind)
 {
     packet[0] = txid[3];
-    packet[1] = bind ? 0x55 : (GET_FLAG(CHANNEL_FLIP, 0x02) | GET_FLAG(CHANNEL_EXPERT, 0x04));
+    if (bind) {
+        packet[1] = 0x55;
+    } else {
+        packet[1] = GET_FLAG(CHANNEL_HEADLESS, 0x80)
+                  | GET_FLAG(CHANNEL_RTH,      0x40)
+                  | GET_FLAG(CHANNEL_FLIP,     0x02)
+                  | 0x04; // always in "expert mode"
+    }
     packet[2] = scale_channel(CHANNEL1, 0, 200);  // aileron
     packet[3] = scale_channel(CHANNEL2, 0, 200);  // elevator
     packet[4] = scale_channel(CHANNEL4, 0, 200);  // rudder
