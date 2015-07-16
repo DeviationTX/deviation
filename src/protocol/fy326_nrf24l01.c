@@ -55,24 +55,18 @@
 #define BIND_COUNT      16
 
 
-#if 0
 static const char * const fy326_opts[] = {
-    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), _tr_noop("DM007"), NULL, 
+    _tr_noop("Expert"), _tr_noop("On"), _tr_noop("Off"), NULL, 
     NULL
 };
+#define EXPERT_ON  0
+#define EXPERT_OFF 1
 
 enum {
-    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_EXPERT = 0,
     LAST_PROTO_OPT,
 };
-
-enum {
-    FORMAT_FY326_GREEN = 0,
-    FORMAT_FY326_BLUE,
-    FORMAT_DM007,
-};
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-#endif
 
 
 enum {
@@ -132,9 +126,9 @@ static void send_packet(u8 bind)
         packet[1] = GET_FLAG(CHANNEL_HEADLESS, 0x80)
                   | GET_FLAG(CHANNEL_RTH,      0x40)
                   | GET_FLAG(CHANNEL_FLIP,     0x02)
-                  | 0x04; // always in "expert mode"
+                  | (Model.proto_opts[PROTOOPTS_EXPERT] == EXPERT_ON ? 4 : 0);
     }
-    packet[2] = scale_channel(CHANNEL1, 0, 200);  // aileron
+    packet[2] = 200 - scale_channel(CHANNEL1, 0, 200);  // aileron
     packet[3] = scale_channel(CHANNEL2, 0, 200);  // elevator
     packet[4] = scale_channel(CHANNEL4, 0, 200);  // rudder
     packet[5] = scale_channel(CHANNEL3, 0, 200);  // throttle
@@ -360,7 +354,7 @@ const void *FY326_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, enable flip, expert mode
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0; //fy326_opts;
+        case PROTOCMD_GETOPTIONS: return fy326_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
