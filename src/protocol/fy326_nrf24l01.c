@@ -57,6 +57,7 @@
 
 static const char * const fy326_opts[] = {
     _tr_noop("Expert"), _tr_noop("On"), _tr_noop("Off"), NULL, 
+    _tr_noop("DynTrim"), _tr_noop("On"), _tr_noop("Off"), NULL, 
     NULL
 };
 #define EXPERT_ON  0
@@ -64,6 +65,7 @@ static const char * const fy326_opts[] = {
 
 enum {
     PROTOOPTS_EXPERT = 0,
+    PROTOOPTS_DYNTRIM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -117,6 +119,7 @@ static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define CHAN_TO_TRIM(chanval) ((u8)(((s16)chanval/5)-20))
 static void send_packet(u8 bind)
 {
     packet[0] = txid[3];
@@ -128,17 +131,24 @@ static void send_packet(u8 bind)
                   | GET_FLAG(CHANNEL_FLIP,     0x02)
                   | (Model.proto_opts[PROTOOPTS_EXPERT] == EXPERT_ON ? 4 : 0);
     }
-    packet[2] = 200 - scale_channel(CHANNEL1, 0, 200);  // aileron
-    packet[3] = scale_channel(CHANNEL2, 0, 200);  // elevator
-    packet[4] = scale_channel(CHANNEL4, 0, 200);  // rudder
-    packet[5] = scale_channel(CHANNEL3, 0, 200);  // throttle
-    packet[6] = txid[0];
-    packet[7] = txid[1];
-    packet[8] = txid[2];
-    packet[9] = 0; //aileron_trim;
-    packet[10] = 0; //elevator_trim;
-    packet[11] = 0; //yaw_trim;
-    packet[12] = 0; //throttle_trim;
+    packet[2]  = 200 - scale_channel(CHANNEL1, 0, 200);  // aileron
+    packet[3]  = scale_channel(CHANNEL2, 0, 200);        // elevator
+    packet[4]  = 200 - scale_channel(CHANNEL4, 0, 200);  // rudder
+    packet[5]  = scale_channel(CHANNEL3, 0, 200);        // throttle
+    packet[6]  = txid[0];
+    packet[7]  = txid[1];
+    packet[8]  = txid[2];
+if (Model.proto_opts[PROTOOPTS_DYNTRIM] == 0) {
+    packet[9]  = CHAN_TO_TRIM(packet[2]); // aileron_trim;
+    packet[10] = CHAN_TO_TRIM(packet[3]); // elevator_trim;
+    packet[11] = CHAN_TO_TRIM(packet[4]); // rudder_trim;
+    packet[12] = CHAN_TO_TRIM(packet[5]); // throttle_trim;
+} else {
+    packet[9]  = 0; // aileron_trim;
+    packet[10] = 0; // elevator_trim;
+    packet[11] = 0; // rudder_trim;
+    packet[12] = 0; // throttle_trim;
+}
     packet[13] = rxid;
     packet[14] = txid[4];
 
