@@ -114,12 +114,16 @@ enum {
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
 static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 {
+    s32 chanval = Channels[ch];
     s32 range = destMax - destMin;
-    return (range * (Channels[ch] - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+
+    if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
+    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-#define CHAN_TO_TRIM(chanval) ((u8)(((s16)chanval/5)-20))
+#define CHAN_TO_TRIM(chanval) ((u8)(((s16)chanval/10)-10))  // -10 to +10
 static void send_packet(u8 bind)
 {
     packet[0] = txid[3];
@@ -142,13 +146,12 @@ if (Model.proto_opts[PROTOOPTS_DYNTRIM] == 0) {
     packet[9]  = CHAN_TO_TRIM(packet[2]); // aileron_trim;
     packet[10] = CHAN_TO_TRIM(packet[3]); // elevator_trim;
     packet[11] = CHAN_TO_TRIM(packet[4]); // rudder_trim;
-    packet[12] = CHAN_TO_TRIM(packet[5]); // throttle_trim;
 } else {
     packet[9]  = 0; // aileron_trim;
     packet[10] = 0; // elevator_trim;
     packet[11] = 0; // rudder_trim;
-    packet[12] = 0; // throttle_trim;
 }
+    packet[12] = 0; // throttle_trim;
     packet[13] = rxid;
     packet[14] = txid[4];
 
