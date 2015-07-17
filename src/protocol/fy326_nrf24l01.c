@@ -123,7 +123,7 @@ static u8 scale_channel(u8 ch, u8 destMin, u8 destMax)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-#define CHAN_TO_TRIM(chanval) ((u8)(((s16)chanval/10)-10))  // -10 to +10
+#define CHAN_TO_TRIM(chanval) ((u8)(((s16)chanval/10)-10))  // scale to [-10,10]. [-20,20] caused problems.
 static void send_packet(u8 bind)
 {
     packet[0] = txid[3];
@@ -316,7 +316,7 @@ static void initialize_txid()
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
-#if 0
+#if 1
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     // tx id
