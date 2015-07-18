@@ -70,15 +70,20 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // Flip flag
-    CHANNEL6,     // Rate
+    CHANNEL5,     // Rate
+    CHANNEL6,     // Flip flag
     CHANNEL7,     // Elevator trim
     CHANNEL8,     // Aileron trim
 };
 
 enum{
     // flags going to packet[6]
+    
+    // 0x40 always set on mt9916 ?
     FLAG_HIGH_RATE= 0x01,
+    FLAG_VIDEO    = 0x02, // ?
+    FLAG_SNAPSHOT = 0x10, // ?
+    // = 0x20, // ?
     FLAG_FLIP     = 0x80 
 };
 
