@@ -316,24 +316,16 @@ static void initialize_txid()
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
            rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
     }
-#if 1
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    // tx id
+
     txid[0] = (lfsr >> 24) & 0xFF;
     txid[1] = ((lfsr >> 16) & 0xFF);
     txid[2] = (lfsr >> 8) & 0xFF;
     txid[3] = lfsr & 0xFF;
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     txid[4] = lfsr & 0xFF;
-#else
-    txid[0] = Model.fixed_id & 0xFF;
-    txid[1] = (Model.fixed_id >> 8) & 0xFF;
-    txid[2] = 0xc0 + ((Model.fixed_id >> 16) & 0xFF);
-    txid[3] = 0x90;
-    txid[4] = 0x1c;
-#endif
-    // rf channels
+
     rf_chans[0] =         txid[0] & 0x0F;
     rf_chans[1] = 0x10 + (txid[0] >> 4);
     rf_chans[2] = 0x20 + (txid[1] & 0x0F);
