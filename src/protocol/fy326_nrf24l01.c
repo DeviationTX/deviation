@@ -87,6 +87,7 @@ enum {
 #define CHANNEL_FLIP      CHANNEL6
 #define CHANNEL_HEADLESS  CHANNEL9
 #define CHANNEL_RTH       CHANNEL10
+#define CHANNEL_CALIBRATE CHANNEL11
 
 static u8 bind_counter;
 static u8 phase;
@@ -130,9 +131,10 @@ static void send_packet(u8 bind)
     if (bind) {
         packet[1] = 0x55;
     } else {
-        packet[1] = GET_FLAG(CHANNEL_HEADLESS, 0x80)
-                  | GET_FLAG(CHANNEL_RTH,      0x40)
-                  | GET_FLAG(CHANNEL_FLIP,     0x02)
+        packet[1] = GET_FLAG(CHANNEL_HEADLESS,  0x80)
+                  | GET_FLAG(CHANNEL_RTH,       0x40)
+                  | GET_FLAG(CHANNEL_FLIP,      0x02)
+                  | GET_FLAG(CHANNEL_CALIBRATE, 0x01)
                   | (Model.proto_opts[PROTOOPTS_EXPERT] == EXPERT_ON ? 4 : 0);
     }
     packet[2]  = 200 - scale_channel(CHANNEL1, 0, 200);  // aileron
@@ -356,8 +358,8 @@ const void *FY326_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, enable flip, expert mode
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 11L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *) 11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return fy326_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
