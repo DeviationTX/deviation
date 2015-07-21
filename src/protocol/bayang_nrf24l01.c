@@ -135,7 +135,7 @@ static void send_packet(u8 bind)
     } chanval;
 
     if (bind) {
-        packet[0] = 0xa5;
+        packet[0] = 0xa4;
         packet[1] = rx_tx_addr[0];
         packet[2] = rx_tx_addr[1];
         packet[3] = rx_tx_addr[2];
@@ -313,6 +313,7 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
+#if 0
     txid[0] = (lfsr >>  8 ) & 0xff;
     txid[1] = (lfsr >> 16 ) & 0xff;
     txid[2] = (lfsr >> 24 ) & 0xff;
@@ -327,6 +328,20 @@ static void initialize_txid()
     rf_channels[1] = (lfsr >>  8 ) & 0xff;
     rf_channels[2] = (lfsr >> 16 ) & 0xff;
     rf_channels[3] = (lfsr >> 24 ) & 0xff;
+#else
+    txid[0] = 0x43 + ((Model.fixed_id       ) & 0xff);
+    txid[1] = 0x20 + ((Model.fixed_id >>  8 ) & 0xff);
+    txid[2] = 0x69 + ((Model.fixed_id >> 16 ) & 0xff);
+    rx_tx_addr[0] = 0x58;
+    rx_tx_addr[1] = 0x2f;
+    rx_tx_addr[2] = 0x20;
+    rx_tx_addr[3] = 0x0b;
+    rx_tx_addr[4] = 0xeb;
+    rf_channels[0] = 0;
+    rf_channels[1] = 0x18;
+    rf_channels[2] = 0x22;
+    rf_channels[3] = 0x2e;
+#endif
 }
 
 static void initialize()
