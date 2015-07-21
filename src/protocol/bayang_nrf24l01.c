@@ -313,7 +313,7 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-#if 0
+#if 1
     txid[0] = (lfsr >>  8 ) & 0xff;
     txid[1] = (lfsr >> 16 ) & 0xff;
     txid[2] = (lfsr >> 24 ) & 0xff;
