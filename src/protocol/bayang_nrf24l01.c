@@ -150,7 +150,7 @@ static void send_packet(u8 bind)
     } else {
         packet[0] = 0xa5;
         packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
-        packet[2] = GET_FLAG(CHANNEL_RTH, 0x08)
+        packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
                   | GET_FLAG(CHANNEL_HEADLESS, 0x01);
         packet[3] = 0x00;
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
