@@ -40,11 +40,11 @@
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
-#define BIND_COUNT 20
+#define BIND_COUNT 10
 #define PACKET_PERIOD    450
 #define dbgprintf printf
 #else
-#define BIND_COUNT 80
+#define BIND_COUNT       1000
 #define PACKET_PERIOD    2000 // Timeout for callback in uSec
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
