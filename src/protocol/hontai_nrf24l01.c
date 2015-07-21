@@ -160,9 +160,14 @@ static u16 crc16(u8 *data_p, u32 length)
 static s8 scale_channel(u8 ch, s8 start, s8 end)
 {
     s32 range = end - start;
+    s32 chanval = Channels[ch];
+
+    if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
+
     s32 round = range < 0 ? 0 : CHAN_RANGE / range;   // channels round up
     if (start < 0) round = CHAN_RANGE / range / 2;    // trims zero centered around zero
-    return (range * (Channels[ch] - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
+    return (range * (chanval - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
