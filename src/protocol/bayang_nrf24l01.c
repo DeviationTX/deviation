@@ -216,8 +216,9 @@ static void bay_init()
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
-    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
+    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
