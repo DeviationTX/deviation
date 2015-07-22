@@ -184,7 +184,7 @@ static void send_packet(u8 bind)
 
 static void mjxq_init()
 {
-    *(u32 *)rf_channels = 0x3d42350a;
+    memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
 
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
@@ -243,7 +243,7 @@ static void mjxq_init()
 
 static void mjxq_init2()
 {
-    *(u32 *)rf_channels = 0x423a460a;
+    memcpy(rf_channels, "\x0a\x46\x3a\x42", sizeof(rf_channels));
 }
 
 
