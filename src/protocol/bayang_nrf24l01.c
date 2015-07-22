@@ -58,7 +58,14 @@
 #define RF_BIND_CHANNEL    0
 #define ADDRESS_LENGTH     5
 
+
+static const char * const bayang_opts[] = {
+    _tr_noop("DynTrim"), _tr_noop("Off"), _tr_noop("On"), NULL, 
+    NULL
+};
+
 enum {
+    PROTOOPTS_DYNTRIM = 0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -123,6 +130,14 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
+static u8 dyntrim(u16 chanval) {
+  if (Model.proto_opts[PROTOOPTS_DYNTRIM]) {
+      return (chanval >> 2) & 0xfc;
+  } else {
+      return 0x7c;
+  }
+}
+
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
@@ -155,16 +170,16 @@ static void send_packet(u8 bind)
                   | GET_FLAG(CHANNEL_RTH, 0x01);
         packet[3] = 0x00;
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
-        packet[4] = chanval.bytes.msb + 0x7c;  // add trim: + ((chanval << 6) & 0xfc)
+        packet[4] = chanval.bytes.msb + dyntrim(chanval.value);
         packet[5] = chanval.bytes.lsb;
         chanval.value = scale_channel(CHANNEL2, 0, 0x3ff);   // elevator
-        packet[6] = chanval.bytes.msb + 0x7c;  // add trim: + ((chanval << 6) & 0xfc)
+        packet[6] = chanval.bytes.msb + dyntrim(chanval.value);
         packet[7] = chanval.bytes.lsb;
         chanval.value = scale_channel(CHANNEL3, 0, 0x3ff);   // throttle
         packet[8] = chanval.bytes.msb + 0x7c;
         packet[9] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);  // rudder
-        packet[10] = chanval.bytes.msb + 0x7c;
+        chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);   // rudder
+        packet[10] = chanval.bytes.msb + dyntrim(chanval.value);
         packet[11] = chanval.bytes.lsb;
     }
     packet[12] = txid[2];
@@ -357,7 +372,7 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 11L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return bayang_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
