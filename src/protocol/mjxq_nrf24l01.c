@@ -143,9 +143,9 @@ static void send_packet(u8 bind)
     packet[4] = 0x40;         // trim
     packet[5] = 0x40;         // trim
     packet[6] = 0x40;         // trim
-    packet[7] = txid[0];
-    packet[8] = txid[1];
-    packet[9] = txid[2];
+    packet[7] = 0xf8; //txid[0];
+    packet[8] = 0x4f; //txid[1];
+    packet[9] = 0x1c; //txid[2];
     packet[10] = 0;
     packet[11] = 0;
     packet[12] = 0;
@@ -176,7 +176,7 @@ static void send_packet(u8 bind)
     }
 
 #ifdef EMULATOR
-    dbgprintf("next chan 0x%02x, bind %d, data %02x", rf_channels[rf_chan], bind, packet[0]);
+    dbgprintf("next chan 0x%02x, bind %d, data %02x", rf_channels[rf_chan/2], bind, packet[0]);
     for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
 #endif
