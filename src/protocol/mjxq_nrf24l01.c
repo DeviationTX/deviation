@@ -84,14 +84,6 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_CALIBRATE   CHANNEL11
 
-enum{
-    FLAG_FLIP      = 0x01, 
-    FLAG_PICTURE   = 0x02, 
-    FLAG_VIDEO     = 0x04, 
-    FLAG_HEADLESS  = 0x08, 
-    FLAG_RTH       = 0x10,
-    FLAG_CALIBRATE = 0x20,
-};
 
 enum {
     MJXq_INIT1 = 0,
@@ -128,29 +120,30 @@ static u8 convert_channel(u8 num)
     s32 ch = Channels[num];
     if (ch < CHAN_MIN_VALUE)      ch = CHAN_MIN_VALUE;
     else if (ch > CHAN_MAX_VALUE) ch = CHAN_MAX_VALUE;
-    return (u8) ((ch > 0 ? 0x80 : 0) | BABS(ch * 127 / CHAN_MAX_VALUE));
+    return (u8) ((ch < 0 ? 0x80 : 0) | BABS(ch * 127 / CHAN_MAX_VALUE));
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
     packet[0] = convert_channel(CHANNEL3);          // throttle
-    packet[0] = packet[0] & 0x80 ? packet[0] : 0x7f - packet[0];
+    packet[0] = packet[0] & 0x80 ? 0xff - packet[0] : 0x80 + packet[0];
 
     packet[1] = convert_channel(CHANNEL4);          // rudder
-    packet[2] = convert_channel(CHANNEL2);          // elevator
+    packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
     packet[4] = 0x40;         // trim
     packet[5] = 0x40;         // trim
     packet[6] = 0x40;         // trim
-    packet[7] = 0xf8; //txid[0];
-    packet[8] = 0x4f; //txid[1];
-    packet[9] = 0x1c; //txid[2];
+    packet[7] = txid[0];
+    packet[8] = txid[1];
+    packet[9] = txid[2];
     packet[10] = 0;
     packet[11] = 0;
     packet[12] = 0;
     packet[13] = 0;
-    packet[14] = bind ? 0xc4 : 0x04;
+    packet[14] = bind ? 0xc4 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+                                    | GET_FLAG(CHANNEL_HEADLESS, 0x20);
     packet[15] = checksum();
     
     // Power on, TX mode, 2byte CRC
@@ -297,9 +290,9 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    txid[0] = (lfsr >> 16) & 0xff;
-    txid[1] = (lfsr >> 8 ) & 0xff;
-    txid[2] = lfsr & 0xff; 
+    txid[0] = 0xf8 + (Model.fixed_id & 0xff); //(lfsr >> 16) & 0xff;
+    txid[1] = (0x4f + ((Model.fixed_id >> 8) & 0xff)); //(lfsr >> 8 ) & 0xff;
+    txid[2] = (0x1c + ((Model.fixed_id >> 16) & 0xff)); //lfsr & 0xff; 
 }
 
 static void initialize()
@@ -326,8 +319,8 @@ const void *MJXq_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 4L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
+        case PROTOCMD_NUMCHAN: return (void *) 10L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
