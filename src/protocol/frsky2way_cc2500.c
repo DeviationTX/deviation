@@ -435,7 +435,7 @@ static void initialize(int bind)
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
     } else {
-        state = FRSKY_DATA2;
+        state = FRSKY_BIND_DONE;
     }
     CLOCK_StartTimer(10000, frsky2way_cb);
 }
