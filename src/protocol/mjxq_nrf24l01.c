@@ -56,7 +56,12 @@
 #define PACKET_SIZE        16
 #define RF_NUM_CHANNELS    4
 
+static const char * const mjxq_opts[] = {
+  _tr_noop("Bit test"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  NULL
+};
 enum {
+    PROTOOPTS_BITTEST = 0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -142,8 +147,11 @@ static void send_packet(u8 bind)
     packet[11] = 0;
     packet[12] = 0;
     packet[13] = 0;
-    packet[14] = bind ? 0xc4 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+    packet[14] = bind ? 0xc0 : 0x00 | GET_FLAG(CHANNEL_FLIP, 0x10)
                                     | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+    packet[14] += Model.proto_opts[PROTOOPTS_BITTEST] ? 0 : 4; // is this an auto-flip control?
+//    packet[14] = bind ? 0xc4 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+//                                    | GET_FLAG(CHANNEL_HEADLESS, 0x20);
     packet[15] = checksum();
     
     // Power on, TX mode, 2byte CRC
@@ -322,7 +330,7 @@ const void *MJXq_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 10L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return mjxq_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
