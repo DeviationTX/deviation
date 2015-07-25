@@ -144,7 +144,7 @@ static void send_packet(u8 bind)
     packet[8] = txid[1];
     packet[9] = txid[2];
     packet[10] = 0;
-    packet[11] = 0;
+    packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
     packet[12] = 0;
     packet[13] = 0;
     packet[14] = bind ? 0xc0 : 0x00 | GET_FLAG(CHANNEL_FLIP, 0x10)
