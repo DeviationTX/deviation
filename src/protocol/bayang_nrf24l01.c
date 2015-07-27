@@ -59,17 +59,6 @@
 #define ADDRESS_LENGTH     5
 
 
-static const char * const bayang_opts[] = {
-    _tr_noop("DynTrim"), _tr_noop("Off"), _tr_noop("On"), NULL, 
-    NULL
-};
-
-enum {
-    PROTOOPTS_DYNTRIM = 0,
-    LAST_PROTO_OPT,
-};
-ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
-
 
 // For code readability
 enum {
@@ -130,14 +119,7 @@ static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
     return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
-static u8 dyntrim(u16 chanval) {
-  if (Model.proto_opts[PROTOOPTS_DYNTRIM]) {
-      return (chanval >> 2) & 0xfc;
-  } else {
-      return 0x7c;
-  }
-}
-
+#define DYNTRIM(chval) ((u8)((chval >> 2) & 0xfc))
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
@@ -151,15 +133,8 @@ static void send_packet(u8 bind)
 
     if (bind) {
         packet[0] = 0xa4;
-        packet[1] = rx_tx_addr[0];
-        packet[2] = rx_tx_addr[1];
-        packet[3] = rx_tx_addr[2];
-        packet[4] = rx_tx_addr[3];
-        packet[5] = rx_tx_addr[4];
-        packet[6] = rf_channels[0];
-        packet[7] = rf_channels[1];
-        packet[8] = rf_channels[2];
-        packet[9] = rf_channels[3];
+        memcpy(&packet[1], rx_tx_addr, 5);
+        memcpy(&packet[6], rf_channels, 4);
         packet[10] = txid[0];
         packet[11] = txid[1];
     } else {
@@ -170,16 +145,16 @@ static void send_packet(u8 bind)
                   | GET_FLAG(CHANNEL_RTH, 0x01);
         packet[3] = 0x00;
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
-        packet[4] = chanval.bytes.msb + dyntrim(chanval.value);
+        packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[5] = chanval.bytes.lsb;
         chanval.value = scale_channel(CHANNEL2, 0, 0x3ff);   // elevator
-        packet[6] = chanval.bytes.msb + dyntrim(chanval.value);
+        packet[6] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[7] = chanval.bytes.lsb;
         chanval.value = scale_channel(CHANNEL3, 0, 0x3ff);   // throttle
         packet[8] = chanval.bytes.msb + 0x7c;
         packet[9] = chanval.bytes.lsb;
         chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);   // rudder
-        packet[10] = chanval.bytes.msb + dyntrim(chanval.value);
+        packet[10] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[11] = chanval.bytes.lsb;
     }
     packet[12] = txid[2];
@@ -372,7 +347,7 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 11L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return bayang_opts;
+        case PROTOCMD_GETOPTIONS: return 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
