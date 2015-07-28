@@ -72,19 +72,22 @@ enum {
     CHANNEL4,     // Rudder
     CHANNEL5,     // Rate
     CHANNEL6,     // Flip flag
-    CHANNEL7,     // Elevator trim
-    CHANNEL8,     // Aileron trim
+    CHANNEL7,     // Snapshot
+    CHANNEL8,     // Video
+    CHANNEL9,
+    CHANNEL10,
+    CHANNEL11,    // Pitch trim
+    CHANNEL12,    // Roll trim
 };
 
 enum{
     // flags going to packet[6]
-    
-    // 0x40 always set on mt9916 ?
-    FLAG_HIGH_RATE= 0x01,
-    FLAG_VIDEO    = 0x02, // ?
-    FLAG_SNAPSHOT = 0x10, // ?
-    // = 0x20, // ?
-    FLAG_FLIP     = 0x80 
+    // H7_FLAG_RATE0, // default rate, no flag
+    FLAG_RATE1   = 0x01,
+    FLAG_RATE2   = 0x02,
+    FLAG_VIDEO   = 0x10,
+    FLAG_SNAPSHOT= 0x20,
+    FLAG_FLIP    = 0x80,
 };
 
 enum {
@@ -126,14 +129,27 @@ static void h7_send_packet()
     packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
     packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
     packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
-    packet[4] = scale_channel(CHANNEL7, 0x3f, 0x00); // elevator trim
-    packet[5] = scale_channel(CHANNEL8, 0x00, 0x3f); // aileron trim
-    packet[6] = 0x00;
-    if( Channels[CHANNEL5] > 0 ) // high rate
-        packet[6] |= FLAG_HIGH_RATE;
+    if(Model.num_channels >= 12) {
+        packet[4] = scale_channel(CHANNEL11,0x3f, 0x00); // pitch trim
+        packet[5] = scale_channel(CHANNEL12,0x00, 0x3f); // roll trim
+    } else {
+        packet[4] = 0x20;
+        packet[5] = 0x20;
+    }
+    packet[6] = 0x40; // flags, default on stock MT9916 TX
+    if (Channels[CHANNEL5] > 0) {
+        if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
+            packet[6] |= FLAG_RATE1; // mid rate
+        else
+            packet[6] |= FLAG_RATE2; // high rate
+    }
     if( Channels[CHANNEL6] > 0 ) // flip flag
         packet[6] |= FLAG_FLIP;
-    packet[7] = mys_byte[rf_chan]; 
+    if( Channels[CHANNEL7] > 0 ) // snapshot
+        packet[6] |= FLAG_SNAPSHOT;
+    if( Channels[CHANNEL8] > 0 ) // video
+        packet[6] |= FLAG_VIDEO;
+    packet[7] = mys_byte[rf_chan];
     packet[8] = calcChecksum();
     
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan] + channel_offset);
@@ -296,7 +312,7 @@ const void *H7_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, flip, rate, E trim, A trim
+        case PROTOCMD_NUMCHAN: return (void *) 12L; // A, E, T, R, flip, rate, pitch trim (ch 11), roll trim (ch12)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;
