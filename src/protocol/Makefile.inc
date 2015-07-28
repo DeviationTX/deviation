@@ -29,6 +29,7 @@ PROTO_MODULES += $(ODIR)/protocol/esky.mod
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/cx10.mod
 PROTO_MODULES += $(ODIR)/protocol/cg023.mod
+PROTO_MODULES += $(ODIR)/protocol/hontai.mod
 PROTO_MODULES += $(ODIR)/protocol/h7.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -148,8 +149,12 @@ $(ODIR)/protocol/cg023.mod : $(ODIR)/cg023_nrf24l01.bin
 	@echo Building 'cg023' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
     
+$(ODIR)/protocol/hontai.mod : $(ODIR)/hontai_nrf24l01.bin
+	@echo Building 'hontai' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
 $(ODIR)/protocol/h7.mod : $(ODIR)/h7_nrf24l01.bin
 	@echo Building 'h7' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
-    
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
 endif #BUILD_TARGET
