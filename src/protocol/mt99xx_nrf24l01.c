@@ -16,7 +16,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define H7_Cmds PROTO_Cmds
+  #define MT99XX_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -70,7 +70,7 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // Rate
+    CHANNEL5,     // Rate (3 positions)
     CHANNEL6,     // Flip flag
     CHANNEL7,     // Snapshot
     CHANNEL8,     // Video
@@ -82,18 +82,18 @@ enum {
 
 enum{
     // flags going to packet[6]
-    // H7_FLAG_RATE0, // default rate, no flag
+    // MT99XX_FLAG_RATE0, // default rate, no flag
     FLAG_RATE1   = 0x01,
-    FLAG_RATE2   = 0x02,
+    FLAG_RATE2   = 0x02, // (MT9916 only)
     FLAG_VIDEO   = 0x10,
     FLAG_SNAPSHOT= 0x20,
     FLAG_FLIP    = 0x80,
 };
 
 enum {
-    H7_INIT = 0,
-    H7_BIND,
-    H7_DATA
+    MT99XX_INIT = 0,
+    MT99XX_BIND,
+    MT99XX_DATA
 };
 
 static u8 packet[PACKET_SIZE];
@@ -123,7 +123,7 @@ static u8 calcChecksum() {
     return result & 0xFF;
 }
 
-static void h7_send_packet()
+static void mt99xx_send_packet()
 {
     packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
     packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
@@ -172,7 +172,7 @@ static void h7_send_packet()
     }
 }
 
-static void h7_init()
+static void mt99xx_init()
 {
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
@@ -242,22 +242,22 @@ static void initialize_txid()
 }
 
 MODULE_CALLTYPE
-static u16 h7_callback()
+static u16 mt99xx_callback()
 {
     switch (state) {
-    case H7_INIT:
+    case MT99XX_INIT:
         MUSIC_Play(MUSIC_TELEMALARM1);
-        state = H7_BIND;
+        state = MT99XX_BIND;
         break;
 
-    case H7_BIND:
+    case MT99XX_BIND:
         if (bind_counter == 0) {
             rx_tx_addr[0] = txid[0];
             rx_tx_addr[1] = txid[1];
             rx_tx_addr[2] = 0x00;
             // set tx address for data packets
             XN297_SetTXAddr(rx_tx_addr, 5);
-            state = H7_DATA;
+            state = MT99XX_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
@@ -272,8 +272,8 @@ static u16 h7_callback()
         }
         break;
 
-    case H7_DATA:
-        h7_send_packet();
+    case MT99XX_DATA:
+        mt99xx_send_packet();
         break;
     }
     return PACKET_PERIOD;
@@ -285,8 +285,8 @@ static void initialize()
     tx_power = Model.tx_power;
     bind_counter = BIND_COUNT;
     initialize_txid();
-    h7_init();
-    state = H7_INIT;
+    mt99xx_init();
+    state = MT99XX_INIT;
     // bind packet
     packet[0] = 0x20;
     packet[1] = 0x14;
@@ -299,10 +299,10 @@ static void initialize()
     packet[8] = 0xAA; // fixed
     
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
-    CLOCK_StartTimer(INITIAL_WAIT, h7_callback);
+    CLOCK_StartTimer(INITIAL_WAIT, mt99xx_callback);
 }
 
-const void *H7_Cmds(enum ProtoCmds cmd)
+const void *MT99XX_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
