@@ -57,7 +57,6 @@
 
 static const char * const fy326_opts[] = {
     _tr_noop("Expert"), _tr_noop("On"), _tr_noop("Off"), NULL, 
-    _tr_noop("DynTrim"), _tr_noop("On"), _tr_noop("Off"), NULL, 
     NULL
 };
 #define EXPERT_ON  0
@@ -65,7 +64,6 @@ static const char * const fy326_opts[] = {
 
 enum {
     PROTOOPTS_EXPERT = 0,
-    PROTOOPTS_DYNTRIM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -144,15 +142,9 @@ static void send_packet(u8 bind)
     packet[6]  = txid[0];
     packet[7]  = txid[1];
     packet[8]  = txid[2];
-if (Model.proto_opts[PROTOOPTS_DYNTRIM] == 0) {
     packet[9]  = CHAN_TO_TRIM(packet[2]); // aileron_trim;
     packet[10] = CHAN_TO_TRIM(packet[3]); // elevator_trim;
     packet[11] = CHAN_TO_TRIM(packet[4]); // rudder_trim;
-} else {
-    packet[9]  = 0; // aileron_trim;
-    packet[10] = 0; // elevator_trim;
-    packet[11] = 0; // rudder_trim;
-}
     packet[12] = 0; // throttle_trim;
     packet[13] = rxid;
     packet[14] = txid[4];
