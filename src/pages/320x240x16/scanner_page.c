@@ -21,14 +21,39 @@
 #if HAS_SCANNER
 static struct scanner_page * const sp = &pagemem.u.scanner_page;
 static struct scanner_obj * const gui = &gui_objs.u.scanner;
+static u8 scanState = 0;
 
-u16 scan_trigger_cb()
+u16 scan_cb()
 {
-    sp->time_to_scan = 1;
-    return 1250;
+    int delay;
+    
+    if(scanState == 0) {
+        if(sp->time_to_scan == 0) {
+            CYRF_ConfigRFChannel(sp->channel + MIN_RADIOCHANNEL);
+            sp->time_to_scan = 1;
+        }
+        scanState = 1;
+        delay = 350; //slow channel require 270usec for synthesizer to settle 
+    } else {
+        if ( !(CYRF_ReadRegister(CYRF_05_RX_CTRL) & 0x80)) {
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
+            Delay(10);
+            CYRF_ReadRegister(CYRF_13_RSSI); //dummy read
+        }
+        int rssi = CYRF_ReadRegister(CYRF_13_RSSI) & 0x1F;
+        if(sp->scan_mode) {
+            sp->channelnoise[sp->channel] = (sp->channelnoise[sp->channel] + rssi) / 2;
+        } else {
+            if(rssi > sp->channelnoise[sp->channel])
+                sp->channelnoise[sp->channel] = rssi;
+        }
+        scanState = 0;
+        delay = 900;
+    }
+    return delay;
 }
 
-static s16 show_bar_cb(void *data)
+static s32 show_bar_cb(void *data)
 {
     long ch = (long)data;
     return sp->channelnoise[ch];
@@ -40,7 +65,15 @@ static const char *enablestr_cb(guiObject_t *obj, const void *data)
     (void)data;
     return sp->enable ? _tr("Turn Off") : _tr("Turn On");
 }
-static void press_cb(guiObject_t *obj, const void *data)
+
+static const char *modestr_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return sp->scan_mode ? _tr("Average") : _tr("Peak");
+}
+
+static void press_enable_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
 #ifndef MODULAR
@@ -50,13 +83,20 @@ static void press_cb(guiObject_t *obj, const void *data)
         DEVO_Cmds(0);  //Switch to DEVO configuration
         PROTOCOL_SetBindState(0); //Disable binding message
         CLOCK_StopTimer();
-        CYRF_ConfigRxTx(0);
-        CYRF_ConfigCRCSeed(0);
-        CLOCK_StartTimer(1250, scan_trigger_cb);
-        //CYRF_ConfigSOPCode(0);
+        CYRF_SetTxRxMode(RX_EN); //Receive mode
+        CLOCK_StartTimer(1250, scan_cb);
     } else {
         PROTOCOL_Init(0);
     }
+#endif
+    GUI_Redraw(obj);
+}
+
+static void press_mode_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+#ifndef MODULAR
+    sp->scan_mode ^= 1;
 #endif
     GUI_Redraw(obj);
 }
@@ -73,39 +113,29 @@ void PAGE_ScannerInit(int page)
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_SCANNER));
     sp->enable = 0;
-    GUI_CreateButton(&gui->enable, LCD_WIDTH/2-48, 40, BUTTON_96, enablestr_cb, 0x0000, press_cb, NULL);
-
+    GUI_CreateButton(&gui->enable, LCD_WIDTH/2 - 100, 40, BUTTON_96, enablestr_cb, 0x0000, press_enable_cb, NULL);
+    sp->scan_mode = 0;
+    GUI_CreateButton(&gui->scan_mode, LCD_WIDTH/2 + 4, 40, BUTTON_96, modestr_cb, 0x0000, press_mode_cb, NULL);
+    sp->channel = 0;
     sp->time_to_scan = 0;
-    sp->channel = MIN_RADIOCHANNEL;
-    for(i = 0; i < MAX_RADIOCHANNEL - MIN_RADIOCHANNEL; i++) {
+    for(i = 0; i < (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL); i++) {
         GUI_CreateBarGraph(&gui->bar[i], SCANBARXOFFSET + i * SCANBARWIDTH, 70, SCANBARWIDTH, SCANBARHEIGHT, 0, 0x20, BAR_VERTICAL, show_bar_cb, (void *)((long)i));
-        sp->channelnoise[i] = 0x10;
+        sp->channelnoise[i] = 0;
     }
 }
 
 void PAGE_ScannerEvent()
 {
 #ifndef MODULAR
-    u8 dpbuffer[16];
     if(! sp->enable)
         return;
-    if(sp->time_to_scan) {
-        sp->time_to_scan = 0;
-        CYRF_ConfigRFChannel(sp->channel + MIN_RADIOCHANNEL);
-    CYRF_ReadRSSI(1);
-    CYRF_StartReceive();
-    Delay(10);
-
-    CYRF_ReadDataPacket(dpbuffer);
-        sp->channelnoise[sp->channel] = CYRF_ReadRSSI(1) & 0x1F;
-        GUI_Redraw(&gui->bar[sp->channel]);
-
+    GUI_Redraw(&gui->bar[sp->channel]);
     //printf("%02X : %d\n",sp->channel,sp->channelnoise[sp->channel]);
-
-        sp->channel++;
-        if(sp->channel == MAX_RADIOCHANNEL - MIN_RADIOCHANNEL)
-            sp->channel = 0;
-    }
+    sp->channel++;
+    if(sp->channel == (MAX_RADIOCHANNEL - MIN_RADIOCHANNEL))
+        sp->channel = 0;
+    sp->channelnoise[sp->channel] = 0;
+    sp->time_to_scan = 0;
 #endif
 }
 
