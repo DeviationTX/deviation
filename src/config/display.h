@@ -28,7 +28,6 @@
 #define NUM_LABELS 21
 
 struct disp_keyboard {
-    u8 font;
     u16 fill_color;
     u16 fg_key1;
     u16 bg_key1;
@@ -36,6 +35,8 @@ struct disp_keyboard {
     u16 bg_key2;
     u16 fg_key3;
     u16 bg_key3;
+    u8 font;
+    u8 padding_1[1];
 };
 
 struct disp_listbox {

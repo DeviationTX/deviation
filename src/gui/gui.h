@@ -68,10 +68,10 @@ enum ListBoxNavigateKeyType {
 
 struct LabelDesc {
     u8 font;
+    enum LabelType style;
     u16 font_color;
     u16 fill_color;
     u16 outline_color;
-    enum LabelType style;
 };
 
 struct ImageMap {
