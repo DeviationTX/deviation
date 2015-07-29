@@ -257,7 +257,7 @@ static const u8 init_vals[][2] = {
     {CYRF_28_CLK_EN, 0x02},
     {CYRF_32_AUTO_CAL_TIME, 0x3c},
     {CYRF_35_AUTOCAL_OFFSET, 0x14},
-    {CYRF_06_RX_CFG, 0x48},
+    {CYRF_06_RX_CFG, 0x4A},
     {CYRF_1B_TX_OFFSET_LSB, 0x55},
     {CYRF_1C_TX_OFFSET_MSB, 0x05},
     {CYRF_0F_XACT_CFG, 0x24},
@@ -601,7 +601,7 @@ static u16 dsm2_cb()
         return WRITE_DELAY;
     } else if(state == DSM2_CH1_CHECK_A || state == DSM2_CH1_CHECK_B) {
         int i = 0;
-        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        while (! (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02)) {
             if(++i > NUM_WAIT_LOOPS)
                 break;
         }
@@ -610,7 +610,7 @@ static u16 dsm2_cb()
         return CH1_CH2_DELAY - WRITE_DELAY;
     } else if(state == DSM2_CH2_CHECK_A || state == DSM2_CH2_CHECK_B) {
         int i = 0;
-        while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+        while (! (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02)) {
             if(++i > NUM_WAIT_LOOPS)
                 break;
         }
@@ -636,20 +636,30 @@ static u16 dsm2_cb()
         {
             state++;
             CYRF_SetTxRxMode(RX_EN); //Receive mode
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
             return 11000 - CH1_CH2_DELAY - WRITE_DELAY - READ_DELAY;
         }
     } else if(state == DSM2_CH2_READ_A || state == DSM2_CH2_READ_B) {
         //Read telemetry if needed
-        if(CYRF_ReadRegister(0x07) & 0x02) {
-           CYRF_ReadDataPacket(packet);
-           parse_telemetry_packet();
+        u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
+        if((rx_state & 0x03) == 0x02) {  // RXC=1, RXE=0 then 2nd check is required (debouncing)
+            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);   
+        }
+        if((rx_state & 0x07) == 0x02) { // good data (complete with no errors)
+            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read
+            CYRF_ReadDataPacketLen(packet, CYRF_ReadRegister(CYRF_09_RX_COUNT));
+            parse_telemetry_packet(packet);
         }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
-            CYRF_WriteRegister(0x07, 0x80); //Prepare to receive
-            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x87); //Prepare to receive
+            //Reseat RX mode just in case any error
+            CYRF_WriteRegister(CYRF_0F_XACT_CFG, (CYRF_ReadRegister(CYRF_0F_XACT_CFG) | 0x20));  // Force end state
+            int i = 0;
+            while (CYRF_ReadRegister(CYRF_0F_XACT_CFG) & 0x20) {
+                if(++i > NUM_WAIT_LOOPS)
+                    break;
+            }
+            CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
             return 11000;
         }
         if (state == DSM2_CH2_READ_A)
