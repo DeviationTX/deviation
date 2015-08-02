@@ -315,9 +315,9 @@ static void initialize_txid()
     rx_tx_addr[4] = (lfsr >> 24 ) & 0xff;
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     rf_channels[0] = 0;
-    rf_channels[1] = (lfsr >>  8 ) & 0x7f;
-    rf_channels[2] = (lfsr >> 16 ) & 0x7f;
-    rf_channels[3] = (lfsr >> 24 ) & 0x7f;
+    rf_channels[1] = (lfsr & 0x1f) + 0x10;;
+    rf_channels[2] = rf_channels[1] + 0x20;
+    rf_channels[3] = rf_channels[2] + 0x20;
 }
 
 static void initialize()
