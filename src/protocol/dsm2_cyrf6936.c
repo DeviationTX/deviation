@@ -391,8 +391,7 @@ static int pkt32_to_coord(u8 *ptr)
     return bcd_to_int(ptr[3]) * 3600000
          + bcd_to_int(((u32)ptr[2] << 16) | ((u32)ptr[1] << 8) | ptr[0]) * 6;
 }
-
-static void parse_telemetry_packet()
+NO_INLINE static void parse_telemetry_packet()
 {
     static u8 altitude; // byte from first GPS packet
 #if HAS_DSM_EXTENDED_TELEMETRY
@@ -648,7 +647,7 @@ static u16 dsm2_cb()
         if((rx_state & 0x07) == 0x02) { // good data (complete with no errors)
             CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read
             CYRF_ReadDataPacketLen(packet, CYRF_ReadRegister(CYRF_09_RX_COUNT));
-            parse_telemetry_packet(packet);
+            parse_telemetry_packet();
         }
         if (state == DSM2_CH2_READ_A && num_channels < 8) {
             state = DSM2_CH2_READ_B;
