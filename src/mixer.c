@@ -241,32 +241,32 @@ s32 MIXER_CreateCyclicOutput(volatile s32 *raw, unsigned cycnum)
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + elevator/2 + aileron;
+        cyc[0] = collective + elevator/2 + aileron;
+        cyc[1] = collective - elevator;
         cyc[2] = collective + elevator/2 - aileron;
         break;
     case SWASH_TYPE_120X:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - aileron;
-        cyc[1] = collective + aileron/2 + elevator;
+        cyc[0] = collective + aileron/2 + elevator;
+        cyc[1] = collective - aileron;
         cyc[2] = collective + aileron/2 - elevator;
         break;
     case SWASH_TYPE_140:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + elevator + aileron;
+        cyc[0] = collective + elevator + aileron;
+        cyc[1] = collective - elevator;
         cyc[2] = collective + elevator - aileron;
         break;
     case SWASH_TYPE_90:
         aileron  = Model.swashmix[0] * aileron / normalize;
         elevator = Model.swashmix[1] * elevator / normalize;
         collective = Model.swashmix[2] * collective / normalize;
-        cyc[0] = collective - elevator;
-        cyc[1] = collective + aileron;
+        cyc[0] = collective + aileron;
+        cyc[1] = collective - elevator;
         cyc[2] = collective - aileron;
         break;
     }
