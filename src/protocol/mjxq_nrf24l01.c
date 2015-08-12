@@ -55,13 +55,14 @@
 #define INITIAL_WAIT       500
 #define PACKET_SIZE        16
 #define RF_NUM_CHANNELS    4
+#define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Bit test"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("WLH08"),  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
 };
 enum {
-    PROTOOPTS_BITTEST = 0,
+    PROTOOPTS_WLH08 = 0,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -103,10 +104,6 @@ static u8 rf_chan;
 static u8 txid[3];
 static u8 packet[PACKET_SIZE];
 static u8 rf_channels[RF_NUM_CHANNELS]; 
-static const u8 rx_tx_addr[] = {0x6D, 0x6A, 0x73, 0x73, 0x73};
-
-
-#define ADDRESS_LENGTH  sizeof(rx_tx_addr)
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -147,12 +144,19 @@ static void send_packet(u8 bind)
     packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
     packet[12] = 0;
     packet[13] = 0;
-    packet[14] = bind ? 0xc0 : 0x00 | GET_FLAG(CHANNEL_FLIP, 0x10)
-                                    | GET_FLAG(CHANNEL_HEADLESS, 0x20);
-    packet[14] += Model.proto_opts[PROTOOPTS_BITTEST] ? 0 : 4; // is this an auto-flip control?
-//    packet[14] = bind ? 0xc4 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
-//                                    | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+    // always high rates by bit2 = 1
+    if (Model.proto_opts[PROTOOPTS_WLH08]) {
+        packet[11] += GET_FLAG(CHANNEL_HEADLESS, 0x02);
+        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+                                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
+                                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                                        | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
+    } else {
+        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+                                        | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+    }
     packet[15] = checksum();
+
     
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
@@ -185,7 +189,16 @@ static void send_packet(u8 bind)
 
 static void mjxq_init()
 {
-    memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
+    u8 rx_tx_addr[ADDRESS_LENGTH];
+
+    if (Model.proto_opts[PROTOOPTS_WLH08]) {
+        memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
+        memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
+    } else {
+        memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
+        memcpy(rx_tx_addr, "\x6d\x6a\x73\x73\x73", sizeof(rx_tx_addr));
+    }
+
 
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
@@ -196,7 +209,7 @@ static void mjxq_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-    XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
+    XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
@@ -244,7 +257,9 @@ static void mjxq_init()
 
 static void mjxq_init2()
 {
-    memcpy(rf_channels, "\x0a\x46\x3a\x42", sizeof(rf_channels));
+    if (!Model.proto_opts[PROTOOPTS_WLH08])
+        memcpy(rf_channels, "\x0a\x46\x3a\x42", sizeof(rf_channels));
+    
 }
 
 
