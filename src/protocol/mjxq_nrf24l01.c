@@ -323,8 +323,8 @@ static void initialize_txid()
         txid[2] = 0x1c;
     }
     txid[0] = Model.fixed_id & 0xff; //(lfsr >> 16) & 0xff;
-    txid[1] = (Model.fixed_id >> 8) & 0xff); //(lfsr >> 8 ) & 0xff;
-    txid[2] = (Model.fixed_id >> 16) & 0xff); //lfsr & 0xff; 
+    txid[1] = (Model.fixed_id >> 8) & 0xff; //(lfsr >> 8 ) & 0xff;
+    txid[2] = (Model.fixed_id >> 16) & 0xff; //lfsr & 0xff; 
 }
 
 static void initialize()
