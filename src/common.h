@@ -8,7 +8,8 @@
 //Magic macro to check enum size
 //#define ctassert(n,e) extern unsigned char n[(e)?0:-1]
 #define ctassert(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
-#define _UNUSED __attribute__ ((unused))
+#define _UNUSED   __attribute__ ((unused))
+#define NO_INLINE __attribute__ ((noinline))
 
 #define TEMPSTRINGLENGTH 400 //This is the max dialog size (80 characters * 5 lines)
                              //We could reduce this to ~240 on the 128x64 screens
