@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use Getopt::Long;
 
 my $FILEOBJ_DIR = 0x7F;

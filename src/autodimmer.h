@@ -2,9 +2,11 @@
 #define _AUTODIMMER_H_
 #include "timer.h"
 
+// AutoDimmer is part of struct Transmitter and must beword aligned
 struct AutoDimmer {
     u32 timer;  //bug fix: overflow when timer > 1minutes
     u8 backlight_dim_value;
+    u8 padding_1[3];
 };
 
 typedef enum {

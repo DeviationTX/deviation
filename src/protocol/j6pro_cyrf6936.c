@@ -233,7 +233,7 @@ static u16 j6pro_cb()
                     rx = CYRF_ReadRegister(CYRF_09_RX_COUNT);
                     if(rx == 0x0f) {
                         //Expected and actual length are both 15
-                        CYRF_ReadDataPacket(packet);
+                        CYRF_ReadDataPacketLen(packet, rx);
                         if (packet[0] == 0x03 &&
                             packet[3] == cyrfmfg_id[0] &&
                             packet[4] == cyrfmfg_id[1] &&

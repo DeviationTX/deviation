@@ -9,5 +9,6 @@ struct scanner_page {
     u8 channel;
     u8 time_to_scan;
     u8 enable;
+    u8 scan_mode;
 };
 #endif
