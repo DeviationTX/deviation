@@ -126,17 +126,18 @@ static u8 convert_channel(u8 num)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define CHAN2TRIM(X) ((((X) & 0x80 ? 0xff - (X) : 0x80 + (X)) >> 1) + 0x00)
 static void send_packet(u8 bind)
 {
     packet[0] = convert_channel(CHANNEL3);          // throttle
     packet[0] = packet[0] & 0x80 ? 0xff - packet[0] : 0x80 + packet[0];
 
     packet[1] = convert_channel(CHANNEL4);          // rudder
+    packet[4] = CHAN2TRIM(packet[1]); // 0x40;      // trim rudder
     packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
+    packet[5] = CHAN2TRIM(packet[2]); // 0x40;      // trim elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
-    packet[4] = 0x40;         // trim
-    packet[5] = 0x40;         // trim
-    packet[6] = 0x40;         // trim
+    packet[6] = CHAN2TRIM(packet[3]); // 0x40;      // trim aileron
     packet[7] = txid[0];
     packet[8] = txid[1];
     packet[9] = txid[2];
@@ -318,18 +319,10 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    if (Model.proto_opts[PROTOOPTS_WLH08]) {
-        txid[0] = 0xb0;
-        txid[1] = 0x00;
-        txid[2] = 0x00;
-    } else {
-        txid[0] = 0xf8;
-        txid[1] = 0x4f;
-        txid[2] = 0x1c;
-    }
-    txid[0] += Model.fixed_id & 0xff; //(lfsr >> 16) & 0xff;
-    txid[1] += (Model.fixed_id >> 8) & 0xff; //(lfsr >> 8 ) & 0xff;
-    txid[2] += (Model.fixed_id >> 16) & 0xff; //lfsr & 0xff; 
+    // txid must be multiple of 8
+    txid[0] = (lfsr >> 16) & 0xf8;
+    txid[1] = (lfsr >> 8 ) & 0xff;
+    txid[2] = lfsr & 0xff; 
 }
 
 static void initialize()
