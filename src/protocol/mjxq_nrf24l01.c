@@ -140,18 +140,23 @@ static void send_packet(u8 bind)
     packet[7] = txid[0];
     packet[8] = txid[1];
     packet[9] = txid[2];
-    packet[10] = 0;
-    packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
+
+
     packet[12] = 0;
     packet[13] = 0;
-    // always high rates by bit2 = 1
     if (Model.proto_opts[PROTOOPTS_WLH08]) {
-        packet[11] += GET_FLAG(CHANNEL_HEADLESS, 0x02);
-        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
+        packet[10] =  GET_FLAG(CHANNEL_RTH, 0x02)
+                   |  GET_FLAG(CHANNEL_HEADLESS, 0x01);
+        packet[11] = 0;
+        // always high rates by bit2 = 1
+        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x01)
                                         | GET_FLAG(CHANNEL_PICTURE, 0x08)
                                         | GET_FLAG(CHANNEL_VIDEO, 0x10)
                                         | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
     } else {
+        packet[10] = 0;
+        packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
+        // always high rates by bit2 = 1
         packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
                                         | GET_FLAG(CHANNEL_HEADLESS, 0x20);
     }
@@ -322,9 +327,9 @@ static void initialize_txid()
         txid[1] = 0x4f;
         txid[2] = 0x1c;
     }
-    txid[0] = Model.fixed_id & 0xff; //(lfsr >> 16) & 0xff;
-    txid[1] = (Model.fixed_id >> 8) & 0xff; //(lfsr >> 8 ) & 0xff;
-    txid[2] = (Model.fixed_id >> 16) & 0xff; //lfsr & 0xff; 
+    txid[0] += Model.fixed_id & 0xff; //(lfsr >> 16) & 0xff;
+    txid[1] += (Model.fixed_id >> 8) & 0xff; //(lfsr >> 8 ) & 0xff;
+    txid[2] += (Model.fixed_id >> 16) & 0xff; //lfsr & 0xff; 
 }
 
 static void initialize()
