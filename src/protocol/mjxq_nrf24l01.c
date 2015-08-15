@@ -126,7 +126,8 @@ static u8 convert_channel(u8 num)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
-#define CHAN2TRIM(X) ((((X) & 0x80 ? 0xff - (X) : 0x80 + (X)) >> 1) + 0x00)
+//#define CHAN2TRIM(X) ((((X) & 0x80 ? 0xff - (X) : 0x80 + (X)) >> 1) + 0x00)
+#define CHAN2TRIM(X) (((X) & 0x80 ? (X) : 0x7f - (X)) >> 1)
 static void send_packet(u8 bind)
 {
     packet[0] = convert_channel(CHANNEL3);          // throttle
