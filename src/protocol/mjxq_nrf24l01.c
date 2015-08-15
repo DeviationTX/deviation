@@ -320,10 +320,16 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    // txid must be multiple of 8
-    txid[0] = (lfsr >> 16) & 0xf8;
-    txid[1] = (lfsr >> 8 ) & 0xff;
-    txid[2] = lfsr & 0xff; 
+    if (Model.proto_opts[PROTOOPTS_WLH08]) {
+        // txid must be multiple of 8
+        txid[0] = (lfsr >> 16) & 0xf8;
+        txid[1] = (lfsr >> 8 ) & 0xff;
+        txid[2] = lfsr & 0xff; 
+    } else {
+        txid[0] = 0xf8 + (Model.fixed_id & 0xff); //(lfsr >> 16) & 0xff;
+        txid[1] = (0x4f + ((Model.fixed_id >> 8) & 0xff)); //(lfsr >> 8 ) & 0xff;
+        txid[2] = (0x1c + ((Model.fixed_id >> 16) & 0xff)); //lfsr & 0xff; 
+    }
 }
 
 static void initialize()
