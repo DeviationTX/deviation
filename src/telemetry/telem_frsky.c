@@ -77,11 +77,11 @@ const char * _frsky_short_name(char *str, u8 telem)
         case 0: strcpy(str, _tr("None")); break;
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
-        case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_DEVO_VOLT1 + 1); break;
+        case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
         case TELEM_FRSKY_RSSI:  strcpy(str, _tr("RSSI")); break;
         case TELEM_FRSKY_RPM:   strcpy(str, _tr("RPM")); break;
         case TELEM_FRSKY_TEMP1:
-        case TELEM_FRSKY_TEMP2: sprintf(str, "%s%d", _tr("Temp"), telem - TELEM_DEVO_TEMP1 + 1); break;
+        case TELEM_FRSKY_TEMP2: sprintf(str, "%s%d", _tr("Temp"), telem - TELEM_FRSKY_TEMP1 + 1); break;
         case TELEM_FRSKY_ALTITUDE: strcpy(str, _tr("Altitude")); break;
         default: sprintf(str, "FrST%d", telem); break;
     }
