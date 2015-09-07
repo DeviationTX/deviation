@@ -257,6 +257,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
           case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
               //convert to mm
               Telemetry.value[TELEM_FRSKY_ALTITUDE] = value;
+              TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
               break;
           case 0x21: //ALT (fraction)
               Telemetry.value[TELEM_FRSKY_ALTITUDE_DECIMETERS] = value;
