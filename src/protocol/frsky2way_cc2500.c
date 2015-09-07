@@ -249,11 +249,27 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               Telemetry.value[TELEM_FRSKY_TEMP2] = value;
               TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
               break;
-          case 0x06: //VOLT3 0V-4.2V (0.01V/count)
-              value = (pkt[i+2] << 8) + pkt[i+3];
-              Telemetry.value[TELEM_FRSKY_VOLT3] = (u16)(value & 0xFFF) * 2 / 10;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
+          case 0x06: { //Battery voltages - CELL# and VOLT
+              u8 cell = pkt[i + 2] >> 4;
+              if (cell < 6) {
+                  value = (((u16)(pkt[i + 2] & 0x0F) << 8) + pkt[i + 3]) / 5;
+                  Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
+                  TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
+
+                  if (cell == 0 || Telemetry.value[TELEM_FRSKY_MIN_CELL] > value) {
+                      Telemetry.value[TELEM_FRSKY_MIN_CELL] = value;
+                      TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
+                  }
+
+                  if (cell == 0) {
+                      Telemetry.value[TELEM_FRSKY_VOLT3] = value;
+                  } else {
+                      Telemetry.value[TELEM_FRSKY_VOLT3] += value;
+                  }
+                  TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
+              }
               break;
+          }
           case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
               //convert to mm
               Telemetry.value[TELEM_FRSKY_ALTITUDE] = value;
