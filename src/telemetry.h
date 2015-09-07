@@ -102,6 +102,8 @@ enum {
     TELEM_FRSKY_ALTITUDE_DECIMETERS,
     TELEM_FRSKY_LAST
 };
+#define TELEM_FRSKY_LAST_DISPLAYED TELEM_FRSKY_ALTITUDE
+
 #define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
                                ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
                                    ? (int)TELEM_DSM_LAST : (int)TELEM_FRSKY_LAST)  \

@@ -278,7 +278,7 @@ int TELEMETRY_GetNumTelemSrc()
         return TELEM_DEVO_LAST-1;
     if (TELEMETRY_Type() == TELEM_DSM)
         return TELEM_DSM_LAST-1;
-    return TELEM_FRSKY_LAST-1;
+    return TELEM_FRSKY_LAST_DISPLAYED;	 
 }
 
 void TELEMETRY_SetTypeByProtocol(enum Protocols protocol)
