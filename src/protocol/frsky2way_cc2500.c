@@ -256,10 +256,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               break;
           case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
               //convert to mm
-              Telemetry.value[TELEM_FRSKY_ALTITUDE] = value * 1000;
+              Telemetry.value[TELEM_FRSKY_ALTITUDE] = value;
               break;
           case 0x21: //ALT (fraction)
-              Telemetry.value[TELEM_FRSKY_ALTITUDE] += value * 10;
+              Telemetry.value[TELEM_FRSKY_ALTITUDE_DECIMETERS] = value;
               TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
               break;
           case 0x11: //GPS Speed (whole number and sign) in Knots

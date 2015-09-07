@@ -18,8 +18,11 @@ s32 _frsky_value(struct Telemetry *t, int idx)
     switch (idx) {
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:
-        case TELEM_FRSKY_ALTITUDE:
             return (s16)t->value[idx];
+        case TELEM_FRSKY_ALTITUDE:
+            // Multiply by 100 because of decimal 2 in _frsky_str_by_value
+            return 100 * ((s32) t->value[idx])
+                   + t->value[TELEM_FRSKY_ALTITUDE_DECIMETERS];
         default:
             return t->value[idx];
     }
@@ -36,7 +39,11 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_FRSKY_TEMP2: _get_temp_str(str, value, 0, 'C'); break;
         case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 0, '\0'); break;
         case TELEM_FRSKY_RPM:   _get_value_str(str, value, 0, '\0'); break;
-        case TELEM_FRSKY_ALTITUDE:  _get_altitude_str(str, value, 2, 'm'); break;
+        case TELEM_FRSKY_ALTITUDE:
+            // The decimal value of 2 here means we multiplyl
+            // t->value[TELEM_FRSKY_ALTITUDE] by 100 in _frsky_value
+            _get_altitude_str(str, value, 2, 'm');
+            break;
         default:
             return "";
     }
