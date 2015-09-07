@@ -223,10 +223,35 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
     for(int i = 6; i < len - 4; i++) {
-        if(pkt[i] != 0x5e || pkt[i+4] != 0x5e)
+        if(pkt[i] != 0x5e)
            continue;
-        u16 value = (pkt[i+3] << 8) + pkt[i+2];
-        switch(pkt[i+1]) {
+        u8 id = pkt[i + 1];
+        if (id > 0x3F)
+            continue;
+        i += 1;
+
+        // Deal with stuffing bytes
+        u8 lobyte = pkt[i + 1];
+        if (lobyte == 0x5e)
+            continue ;
+        if (lobyte == 0x5d) {
+            lobyte = pkt[++i + 1] ^ 0x60;
+            if (lobyte == 0x3e)
+                continue;
+        }
+        u8 hibyte = pkt[++i + 1];
+        if (hibyte == 0x5e)
+            continue;
+        if (hibyte == 0x5d) {
+            hibyte = pkt[++i + 1] ^ 0x60;
+            if (hibyte == 0x3e)
+                continue;
+        }
+        if (pkt[++i + 1] != 0x5e)
+          continue ;
+        i += 1 ;
+        u16 value = (hibyte << 8) + lobyte;
+        switch(id) {
           //defined in protocol_sensor_hub.pdf
           case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)
               //convert to mm
@@ -250,9 +275,9 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
               break;
           case 0x06: { //Battery voltages - CELL# and VOLT
-              u8 cell = pkt[i + 2] >> 4;
+              u8 cell = lobyte >> 4;
               if (cell < 6) {
-                  value = (((u16)(pkt[i + 2] & 0x0F) << 8) + pkt[i + 3]) / 5;
+                  value = (((u16)(lobyte & 0x0F) << 8) + hibyte) / 5;
                   Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
                   TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
 
@@ -323,15 +348,15 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
           //case 0x14: //GPS Compass (whole number) (0-259.99) (.01degree/count)
           //case 0x1C: //GPS Compass (fraction)
           case 0x15: //GPS Date/Month
-              Telemetry.gps.time = ((pkt[i+2] & 0x1F) << 17)  //day
-                                 | ((pkt[i+3] & 0x0F) << 22); //month
+              Telemetry.gps.time = ((lobyte & 0x1F) << 17)  //day
+                                 | ((hibyte & 0x0F) << 22); //month
               break;
           case 0x16: //GPS Year
               Telemetry.gps.time |= (value & 0x3F) << 26;
               break;
           case 0x17: //GPS Hour/Minute
-              Telemetry.gps.time |= ((pkt[i+2] & 0x1F) << 12)  //hour
-                                  | ((pkt[i+3] & 0x3F) << 6);  //min
+              Telemetry.gps.time |= ((lobyte & 0x1F) << 12)  //hour
+                                  | ((hibyte & 0x3F) << 6);  //min
               break;
           case 0x18: //GPS Second
               Telemetry.gps.time |= (value & 0x3F) << 0;
