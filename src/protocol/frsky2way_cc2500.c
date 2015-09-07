@@ -60,7 +60,6 @@ static u8 counter;
 static u32 fixed_id;
 static s8 course;
 static s8 fine;
-static u8 AD2gain;
 
 
 enum {
@@ -202,6 +201,7 @@ static void frsky2way_build_data_packet()
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
     static u32 velocity;
+    u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     //byte1 == data len (+ 2 for CRC)
     //byte 2,3 = fixed=id
     //byte 4 = A1 : 52mV per count; 4.5V = 0x56
@@ -444,7 +444,6 @@ static void initialize(int bind)
     CLOCK_StopTimer();
     course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
-    AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     //fixed_id = 0x3e19;
     fixed_id = get_tx_id();
     frsky2way_init(bind);
