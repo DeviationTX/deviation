@@ -192,10 +192,18 @@ const struct telem_layout dsm_layout_basic[] = {
     {0, 0, 0, 0},
 };
 
+#if HAS_FRSKY_CELL_TELEMETRY
+    #define OTHER_LABEL CELLS_LABEL
+    #define FRSKY_TELEM_LINES 6
+#else
+    #define OTHER_LABEL RPM_LABEL
+    #define FRSKY_TELEM_LINES 4
+#endif
+
 const struct telem_layout frsky_header_basic[] = {
         {TYPE_HEADER, ITEM1_X, ITEM1_WIDTH, MISC_LABEL},
         {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, VOLT_LABEL},
-        {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, CELLS_LABEL},
+        {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, OTHER_LABEL},
         {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
         {0, 0, 0, 0},
 };
@@ -204,29 +212,43 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_INDEX | 0, LBL1_X, LBL1_WIDTH,  1},
     {TYPE_VALUE | 0, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_RSSI},
     {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT1},
+#if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL1},
+#else
+    {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
+#endif
 
     {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
     {TYPE_VALUE | 1, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP1},
     {TYPE_VALUE | 1, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT2},
+#if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL2},
+#endif
 
     {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
     {TYPE_VALUE | 2, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP2},
     {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT3},
+#if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL3},
+#endif
 
     {TYPE_INDEX | 3, LBL1_X, LBL1_WIDTH, 4},
     {TYPE_VALUE | 3, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_ALTITUDE},
     {TYPE_VALUE | 3, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_MIN_CELL},
+#if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 3, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL4},
+#endif
 
+
+#if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_INDEX | 4, LBL1_X, LBL1_WIDTH, 5},
     {TYPE_VALUE | 4, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
     {TYPE_VALUE | 4, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL5},
 
+    // All the Cell values in column 4
     {TYPE_INDEX | 5, LBL1_X, LBL1_WIDTH, 6},
     {TYPE_VALUE | 5, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL6},
+#endif
 
     {0, 0, 0, 0},
 };
@@ -240,7 +262,7 @@ const struct telem_layout2 dsm_page[] = {
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 frsky_page[] = {
-    {frsky_header_basic, frsky_layout_basic, 6, 1},
+    {frsky_header_basic, frsky_layout_basic, FRSKY_TELEM_LINES, 1},
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)

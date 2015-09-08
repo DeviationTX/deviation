@@ -33,12 +33,14 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
 {
     switch(telem) {
         case TELEM_FRSKY_MIN_CELL:
+#if	HAS_FRSKY_CELL_TELEMETRY
         case TELEM_FRSKY_CELL1:
         case TELEM_FRSKY_CELL2:
         case TELEM_FRSKY_CELL3:
         case TELEM_FRSKY_CELL4:
         case TELEM_FRSKY_CELL5:
         case TELEM_FRSKY_CELL6:
+#endif
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
         case TELEM_FRSKY_VOLT3: _get_value_str(str, value, 2, 'V'); break;
@@ -65,12 +67,14 @@ const char * _frsky_short_name(char *str, u8 telem)
         case TELEM_FRSKY_VOLT2:
         case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
         case TELEM_FRSKY_MIN_CELL: strcpy(str, _tr("MinCell")); break;
+#if HAS_FRSKY_CELL_TELEMETRY
         case TELEM_FRSKY_CELL1:
         case TELEM_FRSKY_CELL2:
         case TELEM_FRSKY_CELL3:
         case TELEM_FRSKY_CELL4:
         case TELEM_FRSKY_CELL5:
         case TELEM_FRSKY_CELL6: sprintf(str, "%s%d", _tr("Cell"), telem - TELEM_FRSKY_CELL1 + 1); break;
+#endif
         case TELEM_FRSKY_RSSI:  strcpy(str, _tr("RSSI")); break;
         case TELEM_FRSKY_RPM:   strcpy(str, _tr("RPM")); break;
         case TELEM_FRSKY_TEMP1:

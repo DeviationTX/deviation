@@ -278,9 +278,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               u8 cell = lobyte >> 4;
               if (cell < 6) {
                   value = (((u16)(lobyte & 0x0F) << 8) + hibyte) / 5;
+#if HAS_FRSKY_CELL_TELEMETRY
                   Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
                   TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
-
+#endif
                   if (cell == 0 || Telemetry.value[TELEM_FRSKY_MIN_CELL] > value) {
                       Telemetry.value[TELEM_FRSKY_MIN_CELL] = value;
                       TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
