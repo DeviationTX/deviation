@@ -373,8 +373,12 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
             Telemetry.value[TELEM_FRSKY_CURRENT] = value;
             TELEMETRY_SetUpdated(TELEM_FRSKY_CURRENT);
             break;
-          //case 0x3A: //Ampere sensor (whole number) (measured as V) 0V-48V (0.5V/count)
-          //case 0x3B: //Ampere sensor (fractional)
+          case 0x3A: //Ampere sensor (whole number) (measured as V) 0V-48V (0.5V/count)
+            Telemetry.value[TELEM_FRSKY_VOLTA] = value * 50;
+          case 0x3B: //Ampere sensor (fractional)
+            Telemetry.value[TELEM_FRSKY_VOLTA] += value / 2;
+            TELEMETRY_SetUpdated(TELEM_FRSKY_VOLTA);
+            break;
         }
     }
 }

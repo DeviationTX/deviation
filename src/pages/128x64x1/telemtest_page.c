@@ -232,6 +232,8 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT3},
 #if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL3},
+#else
+    {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLTA},
 #endif
 
     {TYPE_INDEX | 3, LBL1_X, LBL1_WIDTH, 4},
@@ -247,6 +249,7 @@ const struct telem_layout frsky_layout_basic[] = {
 #if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_INDEX | 4, LBL1_X, LBL1_WIDTH, 5},
     {TYPE_VALUE | 4, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
+    {TYPE_VALUE | 4, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLTA},
     {TYPE_VALUE | 4, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL5},
 
     // All the Cell values in column 4

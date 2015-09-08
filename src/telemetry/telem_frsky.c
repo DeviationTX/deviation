@@ -43,7 +43,8 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
 #endif
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
-        case TELEM_FRSKY_VOLT3: _get_value_str(str, value, 2, 'V'); break;
+        case TELEM_FRSKY_VOLT3:
+        case TELEM_FRSKY_VOLTA: _get_value_str(str, value, 2, 'V'); break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2: _get_temp_str(str, value, 0, 'C'); break;
         case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 0, 'd'); break;
@@ -68,6 +69,7 @@ const char * _frsky_short_name(char *str, u8 telem)
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
         case TELEM_FRSKY_VOLT3: sprintf(str, "%s%d", _tr("Volt"), telem - TELEM_FRSKY_VOLT1 + 1); break;
+        case TELEM_FRSKY_VOLTA: sprintf(str, "%s%c", _tr("Volt"), (_tr("Amps"))[0]); break;
         case TELEM_FRSKY_MIN_CELL: strcpy(str, _tr("MinCell")); break;
 #if HAS_FRSKY_CELL_TELEMETRY
         case TELEM_FRSKY_CELL1:
@@ -97,6 +99,9 @@ const char * _frsky_name(char *str, u8 telem)
         case TELEM_FRSKY_VOLT3:
             sprintf(str, "%s%d", _tr("TelemV"), telem - TELEM_FRSKY_VOLT1 + 1);
             break;
+        case TELEM_FRSKY_VOLTA:
+            sprintf(str, "%s%s", _tr("TelemV"), _tr("Amp"));
+            break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:
             sprintf(str, "%s%d", _tr("TelemT"), telem - TELEM_FRSKY_TEMP1 + 1);
@@ -120,6 +125,7 @@ s32 _frsky_get_max_value(u8 telem)
         case TELEM_FRSKY_VOLT1:     return 1326; // All voltages are x100
         case TELEM_FRSKY_VOLT2:     return 8538; //should be 33 * AD2gain, but ugh
         case TELEM_FRSKY_VOLT3:     return 819 * 6;
+        case TELEM_FRSKY_VOLTA:     return 4800;
         case TELEM_FRSKY_MIN_CELL:  return 819 ;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:     return 250;
