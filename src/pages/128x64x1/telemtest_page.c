@@ -202,7 +202,7 @@ const struct telem_layout dsm_layout_basic[] = {
 
 const struct telem_layout frsky_header_basic[] = {
         {TYPE_HEADER, ITEM1_X, ITEM1_WIDTH, MISC_LABEL},
-        {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, VOLT_LABEL},
+        {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, BATT_LABEL},
         {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, OTHER_LABEL},
         {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
         {0, 0, 0, 0},
@@ -239,6 +239,8 @@ const struct telem_layout frsky_layout_basic[] = {
     {TYPE_VALUE | 3, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_MIN_CELL},
 #if HAS_FRSKY_CELL_TELEMETRY
     {TYPE_VALUE | 3, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL4},
+#else
+    {TYPE_VALUE | 3, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CURRENT},
 #endif
 
 
@@ -250,6 +252,7 @@ const struct telem_layout frsky_layout_basic[] = {
     // All the Cell values in column 4
     {TYPE_INDEX | 5, LBL1_X, LBL1_WIDTH, 6},
     {TYPE_VALUE | 5, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_FUEL},
+    {TYPE_VALUE | 5, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_CURRENT},
     {TYPE_VALUE | 5, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL6},
 #endif
 

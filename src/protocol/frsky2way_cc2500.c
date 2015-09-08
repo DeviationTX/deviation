@@ -369,7 +369,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
           //case 0x24: //Accel X
           //case 0x25: //Accel Y
           //case 0x26: //Accel Z
-          //case 0x28: //Current 0A-100A (0.1A/count)
+          case 0x28: //Current 0A-100A (0.1A/count)
+            Telemetry.value[TELEM_FRSKY_CURRENT] = value;
+            TELEMETRY_SetUpdated(TELEM_FRSKY_CURRENT);
+            break;
           //case 0x3A: //Ampere sensor (whole number) (measured as V) 0V-48V (0.5V/count)
           //case 0x3B: //Ampere sensor (fractional)
         }
