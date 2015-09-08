@@ -48,8 +48,9 @@ const char * _frsky_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_FRSKY_TEMP2: _get_temp_str(str, value, 0, 'C'); break;
         case TELEM_FRSKY_RSSI:  _get_value_str(str, value, 0, 'd'); break;
         case TELEM_FRSKY_RPM:   _get_value_str(str, value, 0, 'R'); break;
+        case TELEM_FRSKY_FUEL: _get_value_str(str, value, 0, '%'); break;
         case TELEM_FRSKY_ALTITUDE:
-            // The decimal value of 2 here means we multiplyl
+            // The decimal value of 2 here means we multiply
             // t->value[TELEM_FRSKY_ALTITUDE] by 100 in _frsky_value
             _get_altitude_str(str, value, 2, 'm');
             break;
@@ -79,6 +80,7 @@ const char * _frsky_short_name(char *str, u8 telem)
         case TELEM_FRSKY_RPM:   strcpy(str, _tr("RPM")); break;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2: sprintf(str, "%s%d", _tr("Temp"), telem - TELEM_FRSKY_TEMP1 + 1); break;
+        case TELEM_FRSKY_FUEL: strcpy(str, _tr("Fuel")); break;
         case TELEM_FRSKY_ALTITUDE: strcpy(str, _tr("Altitude")); break;
         default: sprintf(str, "FrST%d", telem); break;
     }
@@ -121,6 +123,7 @@ s32 _frsky_get_max_value(u8 telem)
         case TELEM_FRSKY_TEMP2:     return 250;
         case TELEM_FRSKY_RSSI:
         case TELEM_FRSKY_RPM:       return 60000;
+        case TELEM_FRSKY_FUEL:      return 100;
         case TELEM_FRSKY_ALTITUDE:  return 900000; //x100
         default:
             return 0;
@@ -134,6 +137,7 @@ s32 _frsky_get_min_value(u8 telem)
         case TELEM_FRSKY_TEMP2:     return -30;
         case TELEM_FRSKY_RPM:       return 60;
         case TELEM_FRSKY_ALTITUDE:  return -50000; //x100
+        case TELEM_FRSKY_FUEL:      // is 0, so we fall through.
         default:
             return 0;
     }

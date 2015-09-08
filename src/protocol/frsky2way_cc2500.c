@@ -269,7 +269,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               Telemetry.value[TELEM_FRSKY_RPM] = value * 60;
               TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
               break;
-          //case 0x04: //Fuel  0, 25, 50, 75, 100
+          case 0x04: //Fuel  0, 25, 50, 75, 100
+              Telemetry.value[TELEM_FRSKY_FUEL] = value;
+              TELEMETRY_SetUpdated(TELEM_FRSKY_FUEL);
+              break;
           case 0x05: //TEMP2 -30C-250C (1C/ count)
               Telemetry.value[TELEM_FRSKY_TEMP2] = value;
               TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
