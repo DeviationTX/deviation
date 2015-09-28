@@ -80,7 +80,7 @@ enum {
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
     CHANNEL10,    // Return To Home
-    CHANNEL11,    // Calibrate
+    CHANNEL11,    // AutoFlip button
 };
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
@@ -88,7 +88,7 @@ enum {
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
-#define CHANNEL_CALIBRATE   CHANNEL11
+#define CHANNEL_AUTOFLIP    CHANNEL11
 
 
 enum {
@@ -132,9 +132,8 @@ static void send_packet(u8 bind)
 {
     packet[0] = convert_channel(CHANNEL3);          // throttle
     packet[0] = packet[0] & 0x80 ? 0xff - packet[0] : 0x80 + packet[0];
-
     packet[1] = convert_channel(CHANNEL4);          // rudder
-    packet[4] = CHAN2TRIM(packet[1]); // 0x40;      // trim rudder
+    packet[4] = 0x40;         // rudder does not work well with dyntrim
     packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
     packet[5] = CHAN2TRIM(packet[2]); // 0x40;      // trim elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
@@ -156,11 +155,14 @@ static void send_packet(u8 bind)
                                         | GET_FLAG(CHANNEL_VIDEO, 0x10)
                                         | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
     } else {
-        packet[10] = 0;
+        packet[10] = 0x10 | GET_FLAG(CHANNEL_LED, 0x02)
+                          | (GET_FLAG(CHANNEL_AUTOFLIP, 0x01) ^ 0x01);   // auto-flip off when bit set
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
-        // always high rates by bit2 = 1
-        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x10)
-                                        | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+        // always high rates by bit1 = 1
+        packet[14] = bind ? 0xc0 : (GET_FLAG(CHANNEL_FLIP, 0x01) ? 0x04 : 0x02)
+                                  | GET_FLAG(CHANNEL_PICTURE, 0x08)
+                                  | GET_FLAG(CHANNEL_VIDEO, 0x10)		
+                                  | GET_FLAG(CHANNEL_HEADLESS, 0x20);
     }
     packet[15] = checksum();
 
@@ -356,8 +358,8 @@ const void *MJXq_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 11L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return mjxq_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
