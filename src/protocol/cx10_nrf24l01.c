@@ -137,6 +137,14 @@ static u16 convert_channel(u8 num)
     return (u16) ((ch * 500 / CHAN_MAX_VALUE) + 1500);
 }
 
+static u8 set_video(u8 channel, u8 video_state) {
+    if (Channels[channel] > 0) {
+        if (!(video_state & 0x20)) return video_state ^ 0x21;
+    } else {
+        if (video_state & 0x20) return video_state & 0x01;
+    }
+    return video_state;
+}
 
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
@@ -178,7 +186,7 @@ static void send_packet(u8 bind)
                    | GET_FLAG(CHANNEL_LED, 0x40)
                    | GET_FLAG(CHANNEL_PICTURE, 0x10)
                    | GET_FLAG(CHANNEL_HEADLESS, 0x08)
-                   | GET_FLAG(CHANNEL_VIDEO, 0x21);
+                   | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
         memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
     } else {
         // rate mode is 2 lsb of byte 13
