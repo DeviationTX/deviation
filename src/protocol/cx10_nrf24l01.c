@@ -392,6 +392,7 @@ static void initialize()
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
+    packet_size = 0;
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_Q282:
             packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // only difference in Q282 is packet size
