@@ -67,7 +67,7 @@
 #define FLAG_SNAPSHOT   0x0004
 
 static const char * const cx10_opts[] = {
-    _tr_noop("Format"), "Green", "Blue-A", "DM007", "Q282", NULL, 
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", NULL, 
     NULL
 };
 
