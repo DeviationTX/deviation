@@ -161,6 +161,9 @@ static void send_packet(u8 bind)
     u16 rudder   = 3000 - convert_channel(CHANNEL4);
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DM007) {
         aileron = 3000 - aileron;
+    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
+        aileron = 3000 - aileron;
+        rudder = 3000 - rudder;
     }
 
     u8 offset=0;
