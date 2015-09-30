@@ -409,7 +409,7 @@ static void initialize()
             packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // only difference in Q282 is packet size
         case FORMAT_CX10_GREEN:
         case FORMAT_DM007:
-            packet_size += CX10_PACKET_SIZE;  // this code relies on statics being initialized to 0
+            packet_size += CX10_PACKET_SIZE;
             packet_period = CX10_PACKET_PERIOD;
             bind_phase = CX10_BIND1;
             bind_counter = BIND_COUNT;
