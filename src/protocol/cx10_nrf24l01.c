@@ -383,26 +383,22 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
     // tx id
-if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
-    txid[0] = 0xa4;
-    txid[1] = 0x12;
-    txid[2] = 0x36;
-    txid[3] = 0x95;
-    rf_chans[0] = 0x46;
-    rf_chans[1] = 0x48;
-    rf_chans[2] = 0x4a;
-    rf_chans[3] = 0x4c;
-} else {
     txid[0] = (lfsr >> 24) & 0xFF;
     txid[1] = ((lfsr >> 16) & 0xFF) % 0x30;
     txid[2] = (lfsr >> 8) & 0xFF;
     txid[3] = lfsr & 0xFF;
     // rf channels
-    rf_chans[0] = 0x03 + (txid[0] & 0x0F);
-    rf_chans[1] = 0x16 + (txid[0] >> 4);
-    rf_chans[2] = 0x2D + (txid[1] & 0x0F);
-    rf_chans[3] = 0x40 + (txid[1] >> 4);
-}
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
+        rf_chans[0] = 0x46;
+        rf_chans[1] = 0x48;
+        rf_chans[2] = 0x4a;
+        rf_chans[3] = 0x4c;
+    } else {
+        rf_chans[0] = 0x03 + (txid[0] & 0x0F);
+        rf_chans[1] = 0x16 + (txid[0] >> 4);
+        rf_chans[2] = 0x2D + (txid[1] & 0x0F);
+        rf_chans[3] = 0x40 + (txid[1] >> 4);
+    }
 }
 
 static void initialize()
