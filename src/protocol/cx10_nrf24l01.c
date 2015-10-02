@@ -92,10 +92,12 @@ enum {
     CHANNEL4,       // Rudder
     CHANNEL5,       // Rate/Mode (+ Headless on CX-10A)
     CHANNEL6,       // Flip
-    CHANNEL7,       // Still Camera (DM007)
-    CHANNEL8,       // Video Camera (DM007)
-    CHANNEL9,       // Headless (DM007)
-    CHANNEL10
+    CHANNEL7,       // Still Camera (DM007, Q282)
+    CHANNEL8,       // Video Camera (DM007, Q282)
+    CHANNEL9,       // Headless (DM007, Q282)
+    CHANNEL10,      // RTH (Q282)
+    CHANNEL11,      // X Calibration (Q282)
+    CHANNEL12,      // Y Calibration (Q282)
 };
 
 static u8 packet[Q282_PACKET_SIZE]; // Set to largest packet size
@@ -152,6 +154,8 @@ static u8 set_video(u8 channel, u8 video_state) {
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
+#define CHANNEL_XCAL        CHANNEL11
+#define CHANNEL_YCAL        CHANNEL12
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
@@ -185,10 +189,12 @@ static void send_packet(u8 bind)
     packet[12+offset] = ((rudder >> 8) & 0xff) | GET_FLAG(CHANNEL_FLIP, 0x10);  // ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
     if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
         packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
-        packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
-                   | GET_FLAG(CHANNEL_LED, 0x40)
-                   | GET_FLAG(CHANNEL_PICTURE, 0x10)
+        packet[14] = GET_FLAG(CHANNEL_FLIP,     0x80)
+                   | GET_FLAG(CHANNEL_LED,      0x40)
+                   | GET_FLAG(CHANNEL_PICTURE,  0x10)
                    | GET_FLAG(CHANNEL_HEADLESS, 0x08)
+                   | GET_FLAG(CHANNEL_XCAL,     0x04)
+                   | GET_FLAG(CHANNEL_YCAL,     0x02)
                    | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
         memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
     } else {
@@ -443,7 +449,7 @@ const void *CX10_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, flight mode, enable flip, photo, video, headless, RTH
+        case PROTOCMD_NUMCHAN: return (void *) 12L; // A, E, T, R, flight mode, enable flip, photo, video, headless, RTH, X and Y calibration
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cx10_opts;
