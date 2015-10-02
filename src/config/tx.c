@@ -105,7 +105,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
             return 1;
         }
         if (MATCH_KEY(BRIGHTNESS)) {
-            t->brightness = atoi(value);
+            t->backlight = atoi(value);
             return 1;
         }
         if (MATCH_KEY(CONTRAST)) {
@@ -250,7 +250,7 @@ void CONFIG_WriteTx()
     fprintf(fh, "%s=%d\n", LANGUAGE, Transmitter.language);
     fprintf(fh, "%s=%d\n", MUSIC_SHUTD, Transmitter.music_shutdown);
     fprintf(fh, "%s=%d\n", MODE, Transmitter.mode);
-    fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.brightness);
+    fprintf(fh, "%s=%d\n", BRIGHTNESS, Transmitter.backlight);
     fprintf(fh, "%s=%d\n", CONTRAST, Transmitter.contrast);
     fprintf(fh, "%s=%d\n", VOLUME, Transmitter.volume);
     fprintf(fh, "%s=%d\n", VIBRATION, Transmitter.vibration_state);
@@ -298,7 +298,7 @@ void CONFIG_LoadTx()
     Transmitter.current_model = 1;
     Transmitter.music_shutdown = 0; // default to off
     Transmitter.mode = MODE_2;
-    Transmitter.brightness = 5;
+    Transmitter.backlight = 5;
     Transmitter.contrast = 5;
     Transmitter.volume = 10;
     Transmitter.vibration_state = 0; // default to off since only devo10 support it

@@ -126,7 +126,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         case ITEM_BACKLIGHT:
             title = _tr_noop("LCD settings");
             label = _tr_noop("Backlight");
-            value = brightness_select_cb;
+            value = backlight_select_cb;
             break;
         case ITEM_CONTRAST:
             label = _tr_noop("Contrast");
@@ -213,7 +213,6 @@ static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
     sprintf(tempstring, "%d", Transmitter.contrast);
     return tempstring;
 }
-
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)data;

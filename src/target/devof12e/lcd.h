@@ -18,6 +18,10 @@ void TW8816_SetWindow(unsigned i);
 void TW8816_CreateMappedWindow(unsigned val, unsigned x, unsigned y, unsigned w, unsigned h);
 void TW8816_UnmapWindow(unsigned i);
 u32 TW8816_map_char(u32);
+void TW8816_Contrast(unsigned contrast);
+void TW8816_Brightness(int brightness);
+void TW8816_Sharpness(unsigned sharpness);
+void TW8816_Chroma(unsigned chromau, unsigned chromav);
 
 
 void LCD_WriteReg(unsigned reg, u8 val);

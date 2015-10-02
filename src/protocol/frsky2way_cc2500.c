@@ -206,7 +206,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     //byte 2,3 = fixed=id
     //byte 4 = A1 : 52mV per count; 4.5V = 0x56
     //byte 5 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
-    //byte6 = RSSI?
+    //byte6 = RSSI
     //verify pkt
     //printf("%02x<>%02x %02x<>%02x %d<>%d\n", pkt[1], fixed_id & 0xff, pkt[2], (fixed_id >> 8) & 0xff, len, pkt[0]+3);
     if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
@@ -219,7 +219,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_VOLT2] = pkt[4] * (132*AD2gain) / 1000; //In 1/100 of Volts *(A2gain/10)
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
 
-    Telemetry.value[TELEM_FRSKY_RSSI] = (pkt[5]*10 - 310)*12987/10000; // max value 108, min value = 31
+    Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
     for(int i = 6; i < len - 4; i++) {
@@ -250,7 +250,8 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
               TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
               break;
           case 0x06: //VOLT3 0V-4.2V (0.01V/count)
-              Telemetry.value[TELEM_FRSKY_VOLT3] = value;
+              value = (pkt[i+2] << 8) + pkt[i+3];
+              Telemetry.value[TELEM_FRSKY_VOLT3] = (u16)(value & 0xFFF) * 2 / 10;
               TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
               break;
           case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
@@ -434,7 +435,7 @@ static void initialize(int bind)
         PROTOCOL_SetBindState(0xFFFFFFFF);
         state = FRSKY_BIND;
     } else {
-        state = FRSKY_DATA2;
+        state = FRSKY_BIND_DONE;
     }
     CLOCK_StartTimer(10000, frsky2way_cb);
 }

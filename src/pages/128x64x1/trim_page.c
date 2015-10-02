@@ -149,7 +149,7 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     tp->index = (long)data;
     tp->trim = trim[tp->index];
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader("Edit"); // to draw a line only
+    PAGE_ShowHeader(_tr("Edit")); // to draw a line only
 
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));

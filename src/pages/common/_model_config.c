@@ -202,4 +202,32 @@ const char *set_videoch_cb(guiObject_t *obj, int dir, const void *data)
     sprintf(tempstring, "%d", value);
     return tempstring;
 }
+const char *set_videocontrast_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.video_contrast;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, -10, 10, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_Contrast(value);
+        Model.video_contrast = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
+const char *set_videobrightness_cb(guiObject_t *obj, int dir, const void *data)
+{
+    (void)obj;
+    (void)data;
+    int value = Model.video_brightness;
+    u8 changed;
+    value = GUI_TextSelectHelper(value, -10, 10, dir, 1, 1, &changed);
+    if (changed) {
+        VIDEO_Brightness(value);
+        Model.video_brightness = value;
+    }
+    sprintf(tempstring, "%d", value);
+    return tempstring;
+}
 #endif //HAS_VIDEO

@@ -19,6 +19,7 @@
 #include "tx.h"
 #include <stdlib.h>
 #include <string.h>
+extern const u8 EATRG[PROTO_MAP_LEN];
 
 struct Model Model;
 /*set this to write all model data even if it is the same as the default */
@@ -50,6 +51,9 @@ static const char SECTION_RADIO[]   = "radio";
 static const char RADIO_PROTOCOL[] = "protocol";
 static const char RADIO_VIDEOSRC[] = "videosrc";
 static const char RADIO_VIDEOCH[]  = "videoch";
+static const char RADIO_VIDEOCONTRAST[]  = "videocontrast";
+static const char RADIO_VIDEOBRIGHTNESS[]  = "videobrightness";
+
 #define RADIO_PROTOCOL_VAL ProtocolNames
 
 static const char RADIO_NUM_CHANNELS[] = "num_channels";
@@ -495,6 +499,8 @@ static const struct struct_map _secradio[] = {
 #if HAS_VIDEO
     {RADIO_VIDEOSRC,     OFFSET_SRC(Model, videosrc), 0},
     {RADIO_VIDEOCH,      OFFSET(Model, videoch), 0},
+    {RADIO_VIDEOCONTRAST,OFFSET(Model, video_contrast), 0},
+    {RADIO_VIDEOBRIGHTNESS,OFFSET(Model, video_brightness), 0},
 #endif
 };
 static const struct struct_map _secmixer[] = {
@@ -1314,7 +1320,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);
     if(auto_map)
-        RemapChannelsForProtocol(NULL);
+        RemapChannelsForProtocol(EATRG);
     TIMER_Init();
     MIXER_RegisterTrimButtons();
     crc32 = Crc(&Model, sizeof(Model));
@@ -1421,7 +1427,7 @@ u8 CONFIG_ReadTemplate(const char *filename) {
         return 0;
     }
     if(auto_map)
-        RemapChannelsForProtocol(NULL);
+        RemapChannelsForProtocol(EATRG);
     MIXER_RegisterTrimButtons();
     STDMIXER_Preset(); // bug fix: this must be invoked in all modes
     if (Model.mixer_mode == MIXER_STANDARD)

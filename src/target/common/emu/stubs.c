@@ -105,7 +105,7 @@ void FS_CloseDir() {
 }
 
 void BACKLIGHT_Init() {}
-void BACKLIGHT_Brightness(unsigned brightness) { printf("Brightness: %d\n", brightness); }
+void BACKLIGHT_Brightness(unsigned brightness) { printf("Backlight: %d\n", brightness); }
 void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
 
 void VIBRATINGMOTOR_Init() {}
@@ -114,6 +114,8 @@ void VIBRATINGMOTOR() {}
 
 void VIDEO_SetChannel(int ch) {printf("Video Channel: %d\n", ch); }
 void VIDEO_Enable(int on)     {printf("Video Enable: %s\n", on ? "On" : "Off"); }
+void VIDEO_Brightness(int brightness) { printf("Video Brightness: %d\n", brightness); }
+void VIDEO_Contrast(int contrast) { printf("Video Contrast: %d\n", contrast); }
 
 void PPMin_Start() {}
 void PPMin_Stop() {}

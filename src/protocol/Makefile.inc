@@ -5,6 +5,7 @@ PROTO_MODULES += $(ODIR)/protocol/dsm2.mod
 PROTO_MODULES += $(ODIR)/protocol/dsmx.mod
 PROTO_MODULES += $(ODIR)/protocol/flysky.mod
 PROTO_MODULES += $(ODIR)/protocol/hubsan4.mod
+PROTO_MODULES += $(ODIR)/protocol/joysway.mod
 PROTO_MODULES += $(ODIR)/protocol/j6pro.mod
 PROTO_MODULES += $(ODIR)/protocol/ppm.mod
 PROTO_MODULES += $(ODIR)/protocol/wk2801.mod
@@ -28,6 +29,9 @@ PROTO_MODULES += $(ODIR)/protocol/esky.mod
 PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/cx10.mod
 PROTO_MODULES += $(ODIR)/protocol/cg023.mod
+PROTO_MODULES += $(ODIR)/protocol/hontai.mod
+PROTO_MODULES += $(ODIR)/protocol/fy326.mod
+PROTO_MODULES += $(ODIR)/protocol/bayang.mod
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
@@ -56,6 +60,10 @@ $(ODIR)/protocol/frsky.mod : $(ODIR)/frsky2way_cc2500.bin
 
 $(ODIR)/protocol/hubsan4.mod : $(ODIR)/hubsan_a7105.bin
 	@echo Building 'hubsan4' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
+
+$(ODIR)/protocol/joysway.mod : $(ODIR)/joysway_a7105.bin
+	@echo Building 'joysway' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/j6pro.mod : $(ODIR)/j6pro_cyrf6936.bin
@@ -142,4 +150,16 @@ $(ODIR)/protocol/cg023.mod : $(ODIR)/cg023_nrf24l01.bin
 	@echo Building 'cg023' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
     
+$(ODIR)/protocol/hontai.mod : $(ODIR)/hontai_nrf24l01.bin
+	@echo Building 'hontai' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/fy326.mod : $(ODIR)/fy326_nrf24l01.bin
+	@echo Building 'fy326' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/bayang.mod : $(ODIR)/bayang_nrf24l01.bin
+	@echo Building 'bayang' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
 endif #BUILD_TARGET

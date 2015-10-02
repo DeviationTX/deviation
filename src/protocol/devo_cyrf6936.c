@@ -442,22 +442,23 @@ void DEVO_BuildPacket()
 MODULE_CALLTYPE
 static u16 devo_telemetry_cb()
 {
+    int delay;
+
     if (txState == 0) {
-        txState = 1;
         DEVO_BuildPacket();
         CYRF_WriteDataPacket(packet);
+        txState = 1;
         return 900;
     }
-    int delay = 100;
     if (txState == 1) {
         int i = 0;
         u8 reg;
-        while (! ((reg = CYRF_ReadRegister(0x04)) & 0x02)) {
+        while (! ((reg = CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS)) & 0x02)) {
             if (++i >= NUM_WAIT_LOOPS)
                 break;
         }
-        if (((reg & 0x22) == 0x20) || (CYRF_ReadRegister(0x02) & 0x80)) {
-     	    CYRF_Reset();
+        if (((reg & 0x22) == 0x20) || (CYRF_ReadRegister(CYRF_02_TX_CTRL) & 0x80)) {
+            CYRF_Reset();
             cyrf_init();
             cyrf_set_bound_sop_code();
             CYRF_ConfigRFChannel(*radio_ch_ptr);
@@ -470,49 +471,45 @@ static u16 devo_telemetry_cb()
                 state = DEVO_BOUND_3;
                 cyrf_set_bound_sop_code();
             }
-            if(pkt_num == 0 || bind_counter > 0) {
-                delay = 1500;
-                txState = 15;
-            } else {
+            if((pkt_num != 0) && (bind_counter == 0)) {
                 CYRF_SetTxRxMode(RX_EN); //Receive mode
-                CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); //Prepare to receive
-                CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive (do not enable any IRQ)
+                CYRF_WriteRegister(CYRF_05_RX_CTRL, 0x80); //Prepare to receive
+                txState = 2;
+                return 1300;
             }
         }
-    } else {
-        int reg = CYRF_ReadRegister(0x07);
-        if ((reg & 0x23) == 0x22)
-        //if(CYRF_ReadRegister(0x07) & 0x20)
-        { // this won't be true in emulator so we need to simulate it somehow
-            CYRF_ReadDataPacket(packet);
-            parse_telemetry_packet(packet);
-            delay = 100 * (16 - txState);
-            txState = 15;
-        }
-#ifdef EMULATOR
-        u8 telem_bit = rand32() % 7; // random number in [0, 7)
-        packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
-        //printf("telem 1st packet: 0x%x\n", packet[0]);
-        for(int i = 1; i < 13; i++)
-            packet[i] = rand32() % 256;
-        parse_telemetry_packet(packet);
-        for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
-            Telemetry.updated[i] = 0xff;
-        delay = 100 * (16 - txState);
-        txState = 15;
-#endif
-    }
-    txState++;
-    if(txState == 16) { //2.3msec have passed
-        CYRF_SetTxRxMode(TX_EN); //Write mode
         if(pkt_num == 0) {
             //Keep tx power updated
             CYRF_WriteRegister(CYRF_03_TX_CFG, 0x08 | Model.tx_power);
             radio_ch_ptr = radio_ch_ptr == &radio_ch[2] ? radio_ch : radio_ch_ptr + 1;
             CYRF_ConfigRFChannel(*radio_ch_ptr);
         }
-        txState = 0;
+        delay = 1500;
     }
+    if(txState == 2) {  // this won't be true in emulator so we need to simulate it somehow
+        u8 rx_state = CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);
+        if((rx_state & 0x03) == 0x02) {  // RXC=1, RXE=0 then 2nd check is required (debouncing)
+            rx_state |= CYRF_ReadRegister(CYRF_07_RX_IRQ_STATUS);   
+        }
+        if((rx_state & 0x07) == 0x02) { // good data (complete with no errors)
+            CYRF_WriteRegister(CYRF_07_RX_IRQ_STATUS, 0x80); // need to set RXOW before data read
+            CYRF_ReadDataPacketLen(packet, CYRF_ReadRegister(CYRF_09_RX_COUNT));
+            parse_telemetry_packet();
+        }
+        CYRF_SetTxRxMode(TX_EN); //Write mode
+#ifdef EMULATOR
+        u8 telem_bit = rand32() % 7; // random number in [0, 7)
+        packet[0] =  TELEMETRY_ENABLE + telem_bit; // allow emulator to simulate telemetry parsing to prevent future bugs in the telemetry monitor
+        //printf("telem 1st packet: 0x%x\n", packet[0]);
+        for(int i = 1; i < 13; i++)
+            packet[i] = rand32() % 256;
+        parse_telemetry_packet();
+        for(int i = 0; i < TELEM_UPDATE_SIZE; i++)
+            Telemetry.updated[i] = 0xff;
+#endif
+        delay = 200;
+    }
+    txState = 0;   
     return delay;
 }
 
@@ -527,7 +524,7 @@ static u16 devo_cb()
     }
     txState = 0;
     int i = 0;
-    while (! (CYRF_ReadRegister(0x04) & 0x02)) {
+    while (! (CYRF_ReadRegister(CYRF_04_TX_IRQ_STATUS) & 0x02)) {
         if(++i > NUM_WAIT_LOOPS)
             return 1200;
     }

@@ -42,7 +42,7 @@
 #endif
 
 static const char * const flysky_opts[] = {
-  "WLToys ext.",  _tr_noop("Off"), _tr_noop("V9x9"), _tr_noop("V6x6"), _tr_noop("V912"), NULL,
+  "WLToys ext.",  _tr_noop("Off"), "V9x9", "V6x6", "V912", NULL,
   NULL
 };
 enum {
