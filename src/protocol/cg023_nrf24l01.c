@@ -51,7 +51,7 @@
 #endif
 
 #define CG023_PACKET_PERIOD    8200 // Timeout for callback in uSec
-#define YD829_PACKET_PERIOD    2600 // stock tx is 4100, but seems to work better with shorter period
+#define YD829_PACKET_PERIOD    4100
 #define INITIAL_WAIT     500
 #define PACKET_SIZE 15   // packets have 15-byte payload
 #define RF_BIND_CHANNEL 0x2D
