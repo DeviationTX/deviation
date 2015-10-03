@@ -86,7 +86,6 @@ enum {
     CHANNEL7,     // Still camera
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
-    CHANNEL10     // Rate (3 pos)
 };
 
 enum{
@@ -182,11 +181,7 @@ static void send_packet(u8 bind)
     packet[13] = 0x00;
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_CG023:
-            if(Channels[CHANNEL10] > 0) {
-                if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
-                    packet[13] |= FLAG_RATE_MID;
-            } else
-                packet[13] |= FLAG_RATE_HIGH;             
+            packet[13] |= FLAG_RATE_HIGH;            
             if(Channels[CHANNEL5] > 0)
                 packet[13] |= FLAG_LED_OFF;
             if(Channels[CHANNEL6] > 0)
@@ -201,11 +196,7 @@ static void send_packet(u8 bind)
         case FORMAT_YD829:
             // reverse aileron direction
             packet[8] = 0xFE - packet[8];
-            if(Channels[CHANNEL10] > 0) {
-                if(Channels[CHANNEL10] < CHAN_MAX_VALUE / 2)
-                    packet[13] |= YD_FLAG_RATE_MID;
-            } else
-                packet[13] |= YD_FLAG_RATE_HIGH; 
+            packet[13] |= YD_FLAG_RATE_HIGH;
             if(Channels[CHANNEL6] > 0)
                 packet[13] |= YD_FLAG_FLIP;
             if(Channels[CHANNEL7] > 0)
@@ -378,8 +369,8 @@ const void *CG023_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, light, flip, photo, video, headless, rate
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 9L; // A, E, T, R, light, flip, photo, video, headless
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return cg023_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
