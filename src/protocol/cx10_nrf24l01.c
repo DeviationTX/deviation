@@ -222,8 +222,7 @@ static void send_packet(u8 bind)
         case FORMAT_DM007:
             packet[13] |= GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
             packet[14] = GET_FLAG(CHANNEL_PICTURE, FLAG_SNAPSHOT)
-                    | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
-                    | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+                    | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
             break;
             
         case FORMAT_JC3015_1:
