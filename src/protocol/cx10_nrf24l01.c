@@ -240,7 +240,7 @@ static void send_packet(u8 bind)
         
         case FORMAT_MK33041:
             packet[13] |= GET_FLAG(CHANNEL_PICTURE, BV(7))
-                    | GET_FLAG(CHANNEL_RTH, BV(4));
+                    | GET_FLAG(CHANNEL_RTH, BV(2));
             packet[14] = GET_FLAG(CHANNEL_VIDEO, BV(0))
                     | GET_FLAG(CHANNEL_HEADLESS, BV(5));
             break;
