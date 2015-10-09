@@ -67,7 +67,7 @@
 #define FLAG_SNAPSHOT   0x0004
 
 static const char * const cx10_opts[] = {
-    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", NULL, 
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", NULL, 
     NULL
 };
 
@@ -81,6 +81,9 @@ enum {
     FORMAT_CX10_BLUE,
     FORMAT_DM007,
     FORMAT_Q282,
+    FORMAT_JC3015_1,
+    FORMAT_JC3015_2,
+    FORMAT_MK33041,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -95,7 +98,7 @@ enum {
     CHANNEL7,       // Still Camera (DM007)
     CHANNEL8,       // Video Camera (DM007)
     CHANNEL9,       // Headless (DM007)
-    CHANNEL10
+    CHANNEL10       // RTH (MK33041)
 };
 
 static u8 packet[Q282_PACKET_SIZE]; // Set to largest packet size
@@ -159,13 +162,25 @@ static void send_packet(u8 bind)
     u16 elevator = 3000 - convert_channel(CHANNEL2);
     u16 throttle = convert_channel(CHANNEL3);
     u16 rudder   = 3000 - convert_channel(CHANNEL4);
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_DM007) {
-        aileron = 3000 - aileron;
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
-        aileron = 3000 - aileron;
-        rudder = 3000 - rudder;
+    
+    switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_DM007:
+            aileron = 3000 - aileron;
+            break;
+        case FORMAT_Q282:
+            aileron = 3000 - aileron;
+            rudder = 3000 - rudder;
+            break;
+        case FORMAT_JC3015_1:
+        case FORMAT_JC3015_2:
+            aileron = 3000 - aileron;
+            elevator = 3000 - elevator;
+            break;
+        case FORMAT_MK33041:
+            elevator = 3000 - elevator;
+            break;
     }
-
+    
     u8 offset=0;
     if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_CX10_BLUE)
         offset = 4;
@@ -182,30 +197,56 @@ static void send_packet(u8 bind)
     packet[9+offset] = throttle & 0xff;
     packet[10+offset] = (throttle >> 8) & 0xff;
     packet[11+offset] = rudder & 0xff;
-    packet[12+offset] = ((rudder >> 8) & 0xff) | GET_FLAG(CHANNEL_FLIP, 0x10);  // ((flags & FLAG_FLIP) >> 8);  // 0x10 here is a flip flag 
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
-        packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
-        packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
+    packet[12+offset] = ((rudder >> 8) & 0xff) | GET_FLAG(CHANNEL_FLIP, 0x10);  // 0x10 here is a flip flag 
+    
+    // rate mode is 2 lsb of byte 13
+    packet[13+offset] = 0;
+    if (Channels[CHANNEL5] > 0) {
+        if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
+            packet[13+offset] |= 1;
+        else
+            packet[13+offset] |= 2; // headless on CX-10A
+    }
+    
+    switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case FORMAT_Q282:
+            packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
+            packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
                    | GET_FLAG(CHANNEL_LED, 0x40)
                    | GET_FLAG(CHANNEL_PICTURE, 0x10)
                    | GET_FLAG(CHANNEL_HEADLESS, 0x08)
                    | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
-        memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
-    } else {
-        // rate mode is 2 lsb of byte 13
-        packet[13+offset] = 0;
-        if (Channels[CHANNEL5] > 0) {
-            if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
-                packet[13+offset] |= 1;
-            else
-                packet[13+offset] |= 2; // headless on CX-10A
-        }
-        packet[13+offset] |= GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
-                           | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-        packet[14+offset] = GET_FLAG(CHANNEL_PICTURE, FLAG_SNAPSHOT)
-                          | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO);
+            memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
+            break;
+            
+        case FORMAT_DM007:
+            packet[13] |= GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+            packet[14] = GET_FLAG(CHANNEL_PICTURE, FLAG_SNAPSHOT)
+                    | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                    | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+            break;
+            
+        case FORMAT_JC3015_1:
+            packet[14] = GET_FLAG(CHANNEL_PICTURE, BV(3))
+                    | GET_FLAG(CHANNEL_VIDEO, BV(4));
+            break;
+            
+        case FORMAT_JC3015_2:
+            packet[14] = GET_FLAG(CHANNEL_PICTURE, BV(3)); // this channel controls lights
+            if( Channels[CHANNEL_FLIP] > CHAN_MAX_VALUE / 2) { // double flip
+                packet[12] &= ~0x10;
+                packet[14] |= BV(4);
+            }
+            break;
+        
+        case FORMAT_MK33041:
+            packet[13] |= GET_FLAG(CHANNEL_PICTURE, BV(7))
+                    | GET_FLAG(CHANNEL_RTH, BV(4));
+            packet[14] = GET_FLAG(CHANNEL_VIDEO, BV(0))
+                    | GET_FLAG(CHANNEL_HEADLESS, BV(5));
+            break;
     }
-
+    
 #ifdef EMULATOR
     dbgprintf("chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_chans[current_chan], bind, packet[0]);
     for(int i=1; i < packet_size; i++) dbgprintf(" %02x", packet[i]);
@@ -409,6 +450,9 @@ static void initialize()
             packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // only difference in Q282 is packet size
         case FORMAT_CX10_GREEN:
         case FORMAT_DM007:
+        case FORMAT_JC3015_1:
+        case FORMAT_JC3015_2:
+        case FORMAT_MK33041:
             packet_size += CX10_PACKET_SIZE;
             packet_period = CX10_PACKET_PERIOD;
             bind_phase = CX10_BIND1;
