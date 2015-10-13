@@ -20,23 +20,23 @@ def compute_crc(data):
   return 0xFFFFFFFF & -zlib.crc32(data) -1
 
 def encrypt(data, offset):
-    result = ""
+    result = []
     for val in map(ord, data):
         if(val >= 0x80 and val <= 0xcf - offset):
             val += offset
         elif(val >= 0xd0 - offset and val < 0xd0):
             val -= (0x50 - offset)
         result += chr(val)
-    return result
+    return ''.join(result)
 def decrypt(data, offset):
-    result = ""
+    result = []
     for val in map(ord, data):
         if(val >= 0x80 + offset and val <= 0xcf):
             val -= offset
         elif(val >= 0x80 and val < 0x80 + offset):
             val += (0x50 - offset)
         result += chr(val)
-    return result
+    return ''.join(result)
 
 def parse(file,dump_images=False,crypt=0):
   print 'File: "%s"' % file
