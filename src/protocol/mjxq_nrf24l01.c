@@ -58,12 +58,17 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("WLH08"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", NULL,
   NULL
 };
 enum {
-    PROTOOPTS_WLH08 = 0,
+    PROTOOPTS_FORMAT = 0,
     LAST_PROTO_OPT,
+};
+enum {
+    FORMAT_WLH08 = 0,
+    FORMAT_X600,
+    FORMAT_X800,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -80,7 +85,7 @@ enum {
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
     CHANNEL10,    // Return To Home
-    CHANNEL11,    // AutoFlip button
+    CHANNEL11,    // AutoFlip By Button
 };
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
@@ -143,26 +148,46 @@ static void send_packet(u8 bind)
     packet[9] = txid[2];
 
 
+    packet[11] = 0;   // overwritten below for X600
     packet[12] = 0;
     packet[13] = 0;
-    if (Model.proto_opts[PROTOOPTS_WLH08]) {
-        packet[10] =  GET_FLAG(CHANNEL_RTH, 0x02)
-                   |  GET_FLAG(CHANNEL_HEADLESS, 0x01);
-        packet[11] = 0;
-        // always high rates by bit2 = 1
-        packet[14] = bind ? 0xc0 : 0x04 | GET_FLAG(CHANNEL_FLIP, 0x01)
-                                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
-                                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                                        | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
-    } else {
-        packet[10] = 0x10 | GET_FLAG(CHANNEL_LED, 0x02)
-                          | (GET_FLAG(CHANNEL_AUTOFLIP, 0x01) ^ 0x01);   // auto-flip off when bit set
+
+    packet[14] = 0xc0;  // bind value
+    switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
+    case FORMAT_WLH08:
+        packet[10] = GET_FLAG(CHANNEL_RTH, 0x02)
+                   | GET_FLAG(CHANNEL_HEADLESS, 0x01);
+        if (!bind) {
+            packet[14] = 0x04
+                       | GET_FLAG(CHANNEL_FLIP, 0x01)
+                       | GET_FLAG(CHANNEL_PICTURE, 0x08)
+                       | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                       | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
+        }
+        break;
+
+    case FORMAT_X600:
+        packet[10] = GET_FLAG(CHANNEL_LED, 0x02);
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
-        // always high rates by bit1 = 1
-        packet[14] = bind ? 0xc0 : (GET_FLAG(CHANNEL_FLIP, 0x01) ? 0x04 : 0x02)
-                                  | GET_FLAG(CHANNEL_PICTURE, 0x08)
-                                  | GET_FLAG(CHANNEL_VIDEO, 0x10)		
-                                  | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+        if (!bind) {
+            packet[14] = 0x02      // always high rates by bit2 = 1
+                       | GET_FLAG(CHANNEL_FLIP, 0x04)
+                       | GET_FLAG(CHANNEL_AUTOFLIP, 0x10)
+                       | GET_FLAG(CHANNEL_HEADLESS, 0x20);
+        }
+        break;
+
+    case FORMAT_X800:
+    default:
+        packet[10] = 0x10
+                   | GET_FLAG(CHANNEL_LED, 0x02)
+                   | GET_FLAG(CHANNEL_AUTOFLIP, 0x01);
+        if (!bind) {
+            packet[14] = 0x02      // always high rates by bit2 = 1
+                       | GET_FLAG(CHANNEL_FLIP, 0x04)
+                       | GET_FLAG(CHANNEL_PICTURE, 0x08)
+                       | GET_FLAG(CHANNEL_VIDEO, 0x10);    
+        }
     }
     packet[15] = checksum();
 
@@ -200,7 +225,7 @@ static void mjxq_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
-    if (Model.proto_opts[PROTOOPTS_WLH08]) {
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
         memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     } else {
@@ -266,7 +291,7 @@ static void mjxq_init()
 
 static void mjxq_init2()
 {
-    if (!Model.proto_opts[PROTOOPTS_WLH08])
+    if (!Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08)
         memcpy(rf_channels, "\x0a\x46\x3a\x42", sizeof(rf_channels));
     
 }
@@ -322,7 +347,7 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    if (Model.proto_opts[PROTOOPTS_WLH08]) {
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         // txid must be multiple of 8
         txid[0] = (lfsr >> 16) & 0xf8;
         txid[1] = (lfsr >> 8 ) & 0xff;
@@ -368,3 +393,4 @@ const void *MJXq_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 #endif
+
