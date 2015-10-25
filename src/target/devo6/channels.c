@@ -19,6 +19,11 @@
 #include "config/tx.h"
 #include "../common/devo/devo.h"
 
+#define SWITCH_2x2  (1 << INP_SWA2)
+#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1))
+#define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1))
+
 const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 11, 10, 12, 16, 14};
 
 void CHAN_Init()
@@ -61,6 +66,14 @@ s32 CHAN_ReadRawInput(int channel)
     case INP_MIX2:     value = ! gpio_get(GPIOC, GPIO6); break;
     case INP_GEAR0:    value = gpio_get(GPIOC, GPIO7); break;
     case INP_GEAR1:    value = ! gpio_get(GPIOC, GPIO7); break;
+    case INP_SWA0:     value = gpio_get(GPIOC, GPIO9); break;
+    case INP_SWA1:     value = Transmitter.ignore_src == SWITCH_2x2
+                             ? ! gpio_get(GPIOC, GPIO9)
+                             : (! gpio_get(GPIOC, GPIO9)) && (! gpio_get(GPIOC, GPIO10));
+                             break;
+    case INP_SWA2: case INP_SWB0:
+                       value = gpio_get(GPIOC, GPIO10); break;
+    case INP_SWB1:     value = ! gpio_get(GPIOC, GPIO10); break;
     }
     return value;
 }
@@ -94,4 +107,15 @@ s32 CHAN_ReadInput(int channel)
     if (channel == INP_THROTTLE || channel == INP_RUDDER)
         value = -value;
     return value;
+}
+
+void CHAN_SetSwitchCfg(const char *str)
+{
+    if(strcmp(str, "2x2") == 0) {
+        Transmitter.ignore_src = SWITCH_2x2;
+    } else if(strcmp(str, "3x1") == 0) {
+        Transmitter.ignore_src = SWITCH_3x1;
+    } else {
+        Transmitter.ignore_src = SWITCH_NONE;
+    }
 }
