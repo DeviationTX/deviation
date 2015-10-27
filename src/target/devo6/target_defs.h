@@ -19,6 +19,7 @@
 #define HAS_SCANNER         1
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_EXTRA_SWITCHES  1
+#define HAS_EXTRA_BUTTONS   1
 #define HAS_VIDEO           0
 
 #ifdef BUILDTYPE_DEV

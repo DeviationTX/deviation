@@ -24,6 +24,7 @@
 #define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1))
 
+
 const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 11, 10, 12, 16, 14};
 
 void CHAN_Init()

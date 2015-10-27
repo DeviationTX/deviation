@@ -15,6 +15,16 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include "common.h"
+#include "config/tx.h"
+
+#define BUTTON_LEFT_UP     (1 << BUT_TRIM_L_POS)
+#define BUTTON_LEFT_DOWN   (1 << BUT_TRIM_L_NEG)
+#define BUTTON_LEFT_BOTH   (1 << BUT_TRIM_L_POS | 1 << BUT_TRIM_L_NEG)
+#define BUTTON_RIGHT_UP    (1 << BUT_TRIM_R_POS)
+#define BUTTON_RIGHT_DOWN  (1 << BUT_TRIM_R_NEG)
+#define BUTTON_RIGHT_BOTH  (1 << BUT_TRIM_R_POS | 1 << BUT_TRIM_R_NEG)
+#define BUTTON_ALL         (1 << BUT_TRIM_R_POS | 1 << BUT_TRIM_R_NEG \
+                          | 1 << BUT_TRIM_L_POS | 1 << BUT_TRIM_L_NEG)
 
 static const u16 columns[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, 0xffff};
@@ -66,11 +76,33 @@ u32 ScanButtons()
         u16 but = gpio_port_read(ROW_PORT);
         gpio_set(COL_PORT, *c);
         for(r = rows; *r != 0xffff; r++) {
-            if(! (but & *r)) {
+            if((! (but & *r))
+               && (!(1 << (buttonmap[idx] - 1) & Transmitter.ignore_buttons))) {
                 result |= 1 << (buttonmap[idx] - 1);
             }
             idx++;
         }
     }
     return result;
+}
+
+void CHAN_SetButtonCfg(const char *str)
+{
+    if(strcmp(str, "trim-left-both") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_LEFT_BOTH;
+    } else if(strcmp(str, "trim-left-up") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_LEFT_UP;
+    } else if(strcmp(str, "trim-left-down") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_LEFT_DOWN;
+    } else if(strcmp(str, "trim-right-both") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_RIGHT_BOTH;
+    } else if(strcmp(str, "trim-right-up") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_RIGHT_UP;
+    } else if(strcmp(str, "trim-right-down") == 0) {
+        Transmitter.ignore_buttons &= ~BUTTON_RIGHT_DOWN;
+    } else if(strcmp(str, "trim-all") == 0) {
+        Transmitter.ignore_buttons = 0;
+    } else {
+        Transmitter.ignore_buttons = BUTTON_ALL;
+    }
 }
