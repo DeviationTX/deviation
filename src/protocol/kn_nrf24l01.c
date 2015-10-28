@@ -168,7 +168,7 @@ static u16  kn_convert_channel(u8 num);
 static const char * const KN_PROTOCOL_OPTIONS[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   _tr_noop("1Mbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
-  _tr_noop("Format"), _tr_noop("WLToys"), _tr_noop("Feilun"), NULL, 
+  _tr_noop("Format"), "WLToys", "Feilun", NULL, 
   NULL
 };
  

@@ -104,7 +104,14 @@ static void show_iconsel_page(int SelectedIcon)
     u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
 
     // style the switch textbox
-    struct LabelDesc outline = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_TRANSPARENT };
+    struct LabelDesc outline = {
+        .font = DEFAULT_FONT.font,
+        .style = LABEL_TRANSPARENT,
+        .font_color = DEFAULT_FONT.font_color,
+        .fill_color = DEFAULT_FONT.fill_color,
+        .outline_color = DEFAULT_FONT.outline_color
+    };
+
     GUI_CreateRect(&gui->toggleframe, 80+80*SelectedIcon, 39, 77, 33, &outline);
 
     GUI_CreateLabelBox(&gui->switchbox,  4, 47, 70, 22, &NORMALBOX_FONT, NULL, NULL,
