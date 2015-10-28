@@ -166,5 +166,6 @@ $(ODIR)/protocol/bayang.mod : $(ODIR)/bayang_nrf24l01.bin
 
 $(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
 	@echo Building 'mjxq' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
 
 endif #BUILD_TARGET
