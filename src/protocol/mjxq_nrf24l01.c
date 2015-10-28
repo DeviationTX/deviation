@@ -131,6 +131,7 @@ static u8 convert_channel(u8 num)
 }
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+#define GET_FLAG_INV(ch, mask) (Channels[ch] < 0 ? mask : 0)
 //#define CHAN2TRIM(X) ((((X) & 0x80 ? 0xff - (X) : 0x80 + (X)) >> 1) + 0x00)
 #define CHAN2TRIM(X) (((X) & 0x80 ? (X) : 0x7f - (X)) >> 1)
 static void send_packet(u8 bind)
@@ -162,12 +163,16 @@ static void send_packet(u8 bind)
                        | GET_FLAG(CHANNEL_FLIP, 0x01)
                        | GET_FLAG(CHANNEL_PICTURE, 0x08)
                        | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                       | GET_FLAG(CHANNEL_LED, 0x20); // air/ground mode
+                       | GET_FLAG_INV(CHANNEL_LED, 0x20); // air/ground mode
         }
         break;
 
     case FORMAT_X600:
-        packet[10] = GET_FLAG(CHANNEL_LED, 0x02);
+        if (GET_FLAG(CHANNEL_HEADLESS, 1)) { // driven trims cause issues when headless is enabled
+            packet[5] = 0x40;
+            packet[6] = 0x40;
+        }
+        packet[10] = GET_FLAG_INV(CHANNEL_LED, 0x02);
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
         if (!bind) {
             packet[14] = 0x02      // always high rates by bit2 = 1
@@ -180,7 +185,7 @@ static void send_packet(u8 bind)
     case FORMAT_X800:
     default:
         packet[10] = 0x10
-                   | GET_FLAG(CHANNEL_LED, 0x02)
+                   | GET_FLAG_INV(CHANNEL_LED, 0x02)
                    | GET_FLAG(CHANNEL_AUTOFLIP, 0x01);
         if (!bind) {
             packet[14] = 0x02      // always high rates by bit2 = 1
