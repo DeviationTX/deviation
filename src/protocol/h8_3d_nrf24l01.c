@@ -16,7 +16,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define H8_3D_Cmds PROTO_CmdsA
+  #define H8_3D_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -72,7 +72,7 @@ enum {
 };
 
 #define CHANNEL_FLIP        CHANNEL6
-#define CHANNEL_RTH         CHANNEL10
+#define CHANNEL_RTH         CHANNEL9
 
 enum {
     H8_3D_INIT1 = 0,
@@ -151,11 +151,11 @@ static void send_packet(u8 bind)
         packet[15] = 0x20;
         packet[16] = 0x20;
         packet[17] = FLAG_RATE_HIGH;
-        packet[17] |= GET_FLAG( CHANNEL9, FLAG_RTH);
-        if( Channels[CHANNEL6] > 0 ) { // 180° flip
+        packet[17] |= GET_FLAG( CHANNEL_RTH, FLAG_RTH);
+        if( Channels[CHANNEL_FLIP] > 0 ) { // 180° flip
             packet[17] |= FLAG_FLIP;
         }
-        if( Channels[CHANNEL6] > CHAN_MAX_VALUE / 2) { // 360° flip
+        if( Channels[CHANNEL_FLIP] > CHAN_MAX_VALUE / 2) { // 360° flip
             packet[17] |= FLAG_FLIP360;
         }
     }
@@ -183,13 +183,6 @@ static void send_packet(u8 bind)
         tx_power = Model.tx_power;
         NRF24L01_SetPower(tx_power);
     }
-
-#ifdef EMULATOR
-    dbgprintf("rudder : 0x%02x\n", packet[10]);
-    //dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind, packet[0]);
-    //for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
-    //dbgprintf("\n");
-#endif
 }
 
 static void h8_3d_init()
