@@ -55,7 +55,6 @@
 #define INITIAL_WAIT       500
 #define PACKET_SIZE        20
 #define RF_NUM_CHANNELS    4
-#define RF_BIND_CHANNEL    0x0F
 #define ADDRESS_LENGTH     5
 
 // For code readability
@@ -93,7 +92,7 @@ static u16 counter;
 static u8 phase;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
-//static u8 txid[3];
+static u8 txid[4] = { 0xae, 0xb8, 0x0b, 0x10};
 static u8 rf_chan; 
 static u8 rf_channels[RF_NUM_CHANNELS] = { 0x19, 0x2f, 0x34, 0x0f}; 
 static const u8 rx_tx_addr[ADDRESS_LENGTH] = { 0xc4, 0x57, 0x09, 0x65, 0x21};
@@ -124,11 +123,11 @@ static s16 scale_channel(u8 ch, s16 destMin, s16 destMax)
 static void send_packet(u8 bind)
 {
     packet[0] = 0x13;
-    packet[1] = 0xae;
-    packet[2] = 0xb8;
-    packet[3] = 0x0b;
-    packet[4] = 0x10;
-    packet[8] = 0x81;
+    packet[1] = txid[0];
+    packet[2] = txid[1];
+    packet[3] = txid[2];
+    packet[4] = txid[3];
+    packet[8] = txid[0]+txid[1]+txid[2]+txid[3]; // txid checksum
     if (bind) {    
         packet[5] = 0x00;
         packet[6] = 0x00;
@@ -160,13 +159,13 @@ static void send_packet(u8 bind)
         }
     }
     packet[18] = 0x00;
-    packet[19] = checksum();
+    packet[19] = checksum(); // data checksum
     
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[3] : rf_channels[rf_chan++]);
         rf_chan %= sizeof(rf_channels);
     
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
@@ -195,7 +194,7 @@ static void h8_3d_init()
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
+    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable RX pipe 1 (unused)
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5 byte address width
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
