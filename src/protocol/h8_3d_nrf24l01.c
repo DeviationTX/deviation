@@ -64,10 +64,11 @@ enum {
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
     CHANNEL5,     // 
-    CHANNEL6,     // Flip 180 / Flip 360
+    CHANNEL6,     // Flip
     CHANNEL7,     // 
     CHANNEL8,     // 
-    CHANNEL9,     // RTH + Headless
+    CHANNEL9,     // RTH + Headless (H8 3D), Headless (H20)
+    Channel10,    // 180/360 flip mode (H8 3D), RTH (H20)
 };
 
 #define CHANNEL_FLIP        CHANNEL6
@@ -84,8 +85,8 @@ enum {
     FLAG_FLIP     = 0x01,
     FLAG_RATE_MID = 0x02,
     FLAG_RATE_HIGH= 0x04,
-    FLAG_RTH      = 0x10,
-    FLAG_FLIP360  = 0x20, // 180° flip if clear
+    FLAG_RTH      = 0x10, // RTH + headless on H8, headless on JJRC H20
+    FLAG_FLIP360  = 0x20, // 180° flip if clear (H8 3D), RTH on JJRC H20
 };
 
 static u16 counter;
@@ -94,7 +95,7 @@ static u8 packet[PACKET_SIZE];
 static u8 tx_power;
 static u8 txid[4] = { 0xae, 0xb8, 0x0b, 0x10};
 static u8 rf_chan; 
-static u8 rf_channels[RF_NUM_CHANNELS] = { 0x19, 0x2f, 0x34, 0x0f}; 
+static u8 rf_channels[RF_NUM_CHANNELS] = { 0x0f, 0x19, 0x2f, 0x34}; 
 static const u8 rx_tx_addr[ADDRESS_LENGTH] = { 0xc4, 0x57, 0x09, 0x65, 0x21};
 
 
@@ -165,7 +166,7 @@ static void send_packet(u8 bind)
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
     XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[3] : rf_channels[rf_chan++]);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? rf_channels[0] : rf_channels[rf_chan++]);
         rf_chan %= sizeof(rf_channels);
     
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
