@@ -68,11 +68,12 @@ enum {
     CHANNEL7,     // 
     CHANNEL8,     // 
     CHANNEL9,     // RTH + Headless (H8 3D), Headless (H20)
-    Channel10,    // 180/360 flip mode (H8 3D), RTH (H20)
+    CHANNEL10,    // 180/360 flip mode (H8 3D), RTH (H20)
 };
 
 #define CHANNEL_FLIP        CHANNEL6
-#define CHANNEL_RTH         CHANNEL9
+#define CHANNEL_HEADLESS    CHANNEL9  // RTH + Headless on H8 3D
+#define CHANNEL_RTH         CHANNEL10 // 180/360 flip mode on H8 3D
 
 enum {
     H8_3D_INIT1 = 0,
@@ -85,8 +86,8 @@ enum {
     FLAG_FLIP     = 0x01,
     FLAG_RATE_MID = 0x02,
     FLAG_RATE_HIGH= 0x04,
-    FLAG_RTH      = 0x10, // RTH + headless on H8, headless on JJRC H20
-    FLAG_FLIP360  = 0x20, // 180° flip if clear (H8 3D), RTH on JJRC H20
+    FLAG_HEADLESS = 0x10, // RTH + headless on H8, headless on JJRC H20
+    FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
 
 static u16 counter;
@@ -150,14 +151,10 @@ static void send_packet(u8 bind)
         packet[14] = 0x20;
         packet[15] = 0x20;
         packet[16] = 0x20;
-        packet[17] = FLAG_RATE_HIGH;
-        packet[17] |= GET_FLAG( CHANNEL_RTH, FLAG_RTH);
-        if( Channels[CHANNEL_FLIP] > 0 ) { // 180° flip
-            packet[17] |= FLAG_FLIP;
-        }
-        if( Channels[CHANNEL_FLIP] > CHAN_MAX_VALUE / 2) { // 360° flip
-            packet[17] |= FLAG_FLIP360;
-        }
+        packet[17] = FLAG_RATE_HIGH
+                   | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
+                   | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
+                   | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
     }
     packet[18] = 0x00;
     packet[19] = checksum(); // data checksum
