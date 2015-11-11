@@ -94,9 +94,9 @@ static u16 counter;
 static u8 phase;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
-static u8 txid[4] = { 0xae, 0xb8, 0x0b, 0x10};
+static u8 txid[4];
 static u8 rf_chan; 
-static u8 rf_channels[RF_NUM_CHANNELS] = { 0x0f, 0x19, 0x2f, 0x34}; 
+static u8 rf_channels[RF_NUM_CHANNELS]; 
 static const u8 rx_tx_addr[ADDRESS_LENGTH] = { 0xc4, 0x57, 0x09, 0x65, 0x21};
 
 
@@ -129,7 +129,7 @@ static void send_packet(u8 bind)
     packet[2] = txid[1];
     packet[3] = txid[2];
     packet[4] = txid[3];
-    packet[8] = txid[0]+txid[1]+txid[2]+txid[3]; // txid checksum
+    packet[8] = (txid[0]+txid[1]+txid[2]+txid[3]) & 0xff; // txid checksum
     if (bind) {    
         packet[5] = 0x00;
         packet[6] = 0x00;
@@ -281,7 +281,17 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    // todo: txid/rf channels relationship
+    // tx id
+    txid[0] = 0xa0 + (((lfsr >> 24) & 0xFF) % 0x10);
+    txid[1] = 0xb0 + (((lfsr >> 16) & 0xFF) % 0x20);
+    txid[2] = ((lfsr >> 8) & 0xFF) % 0x20;
+    txid[3] = (lfsr & 0xFF) % 0x11;
+    
+    // rf channels
+    rf_channels[0] = 0x06 + (((txid[0]>>8) + (txid[0]&0x0f)) % 0x0f);
+    rf_channels[1] = 0x15 + (((txid[1]>>8) + (txid[1]&0x0f)) % 0x0f);
+    rf_channels[2] = 0x24 + (((txid[2]>>8) + (txid[2]&0x0f)) % 0x0f);
+    rf_channels[3] = 0x33 + (((txid[3]>>8) + (txid[3]&0x0f)) % 0x0f);
 }
 
 static void initialize()
