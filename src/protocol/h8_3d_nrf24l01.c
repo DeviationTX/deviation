@@ -90,6 +90,11 @@ enum {
     FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
 
+enum {
+    // flags going to packet[18]
+    FLAG_CALIBRATE= 0x20, // accelerometer calibration
+};
+
 static u16 counter;
 static u8 phase;
 static u8 packet[PACKET_SIZE];
@@ -130,11 +135,11 @@ static void send_packet(u8 bind)
     packet[3] = txid[2];
     packet[4] = txid[3];
     packet[8] = (txid[0]+txid[1]+txid[2]+txid[3]) & 0xff; // txid checksum
+    memset(&packet[9], 0, 10);
     if (bind) {    
         packet[5] = 0x00;
         packet[6] = 0x00;
         packet[7] = 0x01;
-        memset( &packet[9], 0, 10);
     } else {
         packet[5] = rf_chan;
         packet[6] = 0x08;
@@ -155,8 +160,10 @@ static void send_packet(u8 bind)
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
+    
+        if(packet[9] == 0x00 && packet[10] >= 0xb6 && packet[11] <= 0x49 && packet[12] >= 0xb5)
+            packet[18] |= FLAG_CALIBRATE;
     }
-    packet[18] = 0x00;
     packet[19] = checksum(); // data checksum
     
     // Power on, TX mode, 2byte CRC
