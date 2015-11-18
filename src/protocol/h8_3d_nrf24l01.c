@@ -161,7 +161,8 @@ static void send_packet(u8 bind)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
     
-        if(packet[9] == 0x00 && packet[10] >= 0xb6 && packet[11] <= 0x49 && packet[12] >= 0xb5)
+        // both sticks bottom left: calibrate acc
+        if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
             packet[18] |= FLAG_CALIBRATE;
     }
     packet[19] = checksum(); // data checksum
