@@ -109,7 +109,7 @@ enum {
 };
 
 static const char * const yd717_opts[] = {
-  _tr_noop("Format"),  _tr_noop("YD717"), _tr_noop("Sky Wlkr"), _tr_noop("XinXun"), _tr_noop("Ni Hui"), _tr_noop("SymaX4"), NULL,
+  _tr_noop("Format"),  "YD717", "Sky Wlkr", "XinXun", "Ni Hui", "SymaX4", NULL,
 #ifdef YD717_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif

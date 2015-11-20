@@ -16,7 +16,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define Bayang_Cmds PROTO_Cmds
+  #define HonTai_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -40,12 +40,12 @@
 
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
-#define BIND_COUNT 10
-#define PACKET_PERIOD    450
+#define BIND_COUNT 20
+#define PACKET_PERIOD    150
 #define dbgprintf printf
 #else
-#define BIND_COUNT       1000
-#define PACKET_PERIOD    2000 // Timeout for callback in uSec
+#define BIND_COUNT 80
+#define PACKET_PERIOD    13500 // Timeout for callback in uSec
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -53,11 +53,14 @@
 #endif
 
 #define INITIAL_WAIT       500
-#define PACKET_SIZE        15
-#define RF_NUM_CHANNELS    4
+#define BIND_PACKET_SIZE   10
+#define PACKET_SIZE        12
 #define RF_BIND_CHANNEL    0
-#define ADDRESS_LENGTH     5
 
+enum {
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 
 // For code readability
@@ -74,7 +77,7 @@ enum {
     CHANNEL10,    // Return To Home
     CHANNEL11,    // Calibrate
 };
-#define CHANNEL_INVERTED    CHANNEL5 // inverted flight on Floureon H101
+#define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -82,84 +85,116 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 #define CHANNEL_CALIBRATE   CHANNEL11
 
-enum {
-    Bayang_INIT1 = 0,
-    Bayang_BIND2,
-    Bayang_DATA
+enum{
+    FLAG_FLIP      = 0x01, 
+    FLAG_PICTURE   = 0x02, 
+    FLAG_VIDEO     = 0x04, 
+    FLAG_HEADLESS  = 0x08, 
+    FLAG_RTH       = 0x10,
+    FLAG_CALIBRATE = 0x20,
 };
 
-static u16 counter;
+enum {
+    HonTai_INIT1 = 0,
+    HonTai_BIND2,
+    HonTai_DATA
+};
+
 static u8 phase;
 static u8 packet[PACKET_SIZE];
 static u8 tx_power;
-static u8 txid[3];
-static u8 rf_chan; 
-static u8 rf_channels[RF_NUM_CHANNELS]; 
-static u8 rx_tx_addr[ADDRESS_LENGTH];
+static u8 txid[5];
+static u8 rf_chan = 0; 
+static u16 counter;
+static const u8 rf_channels[] = {0x05, 0x19, 0x28}; 
+static const u8 rx_tx_addr[] = {0xd2, 0xb5, 0x99, 0xb3, 0x4a};
+static const u8 addr_vals[4][16] = {
+                    {0x24, 0x26, 0x2a, 0x2c, 0x32, 0x34, 0x36, 0x4a,
+                     0x4c, 0x4e, 0x54, 0x56, 0x5a, 0x64, 0x66, 0x6a},
+                    {0x92, 0x94, 0x96, 0x9a, 0xa4, 0xa6, 0xac, 0xb2,
+                     0xb4, 0xb6, 0xca, 0xcc, 0xd2, 0xd4, 0xd6, 0xda},
+                    {0x93, 0x95, 0x99, 0x9b, 0xa5, 0xa9, 0xab, 0xad,
+                     0xb3, 0xb5, 0xc9, 0xcb, 0xcd, 0xd3, 0xd5, 0xd9},
+                    {0x25, 0x29, 0x2b, 0x2d, 0x33, 0x35, 0x49, 0x4b,
+                     0x4d, 0x59, 0x5b, 0x65, 0x69, 0x6b, 0x6d, 0x6e}};
 
+
+#define TX_ADDRESS_LENGTH  sizeof(rx_tx_addr)
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-static u8 checksum()
+// proudly swiped from http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
+#define POLY 0x8408
+static u16 crc16(u8 *data_p, u32 length)
 {
-    u8 sum = packet[0];
-    for (int i=1; i < PACKET_SIZE-1; i++) sum += packet[i];
-    return sum;
+    u8 i;
+    u32 data;
+    u32 crc;
+     
+    crc = 0xffff;
+     
+    if (length == 0) return (~crc);
+     
+    length -= 2;
+    do {
+        for (i = 0, data = (u8)0xff & *data_p++;
+             i < 8;
+             i++, data >>= 1) {
+                 if ((crc & 0x0001) ^ (data & 0x0001))
+                     crc = (crc >> 1) ^ POLY;
+                 else
+                     crc >>= 1;
+        }
+    } while (--length);
+     
+    crc = ~crc;
+    data = crc;
+    crc = (crc << 8) | (data >> 8 & 0xFF);
+    *data_p++ = crc >> 8;
+    *data_p   = crc & 0xff;
+    return crc;
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
+static s8 scale_channel(u8 ch, s8 start, s8 end)
 {
+    s32 range = end - start;
     s32 chanval = Channels[ch];
-    s32 range = destMax - destMin;
 
     if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
     else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
-    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
+
+    s32 round = range < 0 ? 0 : CHAN_RANGE / range;   // channels round up
+    if (start < 0) round = CHAN_RANGE / range / 2;    // trims zero centered around zero
+    return (range * (chanval - CHAN_MIN_VALUE + round)) / CHAN_RANGE + start;
 }
 
-#define DYNTRIM(chval) ((u8)((chval >> 2) & 0xfc))
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 static void send_packet(u8 bind)
 {
-    union {
-        u16 value;
-        struct {
-            u8 lsb;
-            u8 msb;
-        } bytes;
-    } chanval;
-
     if (bind) {
-        packet[0] = 0xa4;
-        memcpy(&packet[1], rx_tx_addr, 5);
-        memcpy(&packet[6], rf_channels, 4);
-        packet[10] = txid[0];
-        packet[11] = txid[1];
+      memcpy(packet, txid, 5);
+      memset(&packet[5], 0, 3);
     } else {
-        packet[0] = 0xa5;
-        packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
-        packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
-                  | GET_FLAG(CHANNEL_HEADLESS, 0x02)
-                  | GET_FLAG(CHANNEL_RTH, 0x01);
-        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80);
-        chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
-        packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[5] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL2, 0, 0x3ff);   // elevator
-        packet[6] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[7] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL3, 0, 0x3ff);   // throttle
-        packet[8] = chanval.bytes.msb + 0x7c;
-        packet[9] = chanval.bytes.lsb;
-        chanval.value = scale_channel(CHANNEL4, 0x3ff, 0);   // rudder
-        packet[10] = chanval.bytes.msb + DYNTRIM(chanval.value);
-        packet[11] = chanval.bytes.lsb;
+      packet[0] = 0x0b;
+      packet[1] = 0x00;
+      packet[2] = 0x00;
+      packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)    // throttle
+                | GET_FLAG(CHANNEL_PICTURE, 0x01);
+      packet[4] = scale_channel(CHANNEL1, 63, 0)            // aileron
+                | GET_FLAG(CHANNEL_RTH, 0x80)
+                | GET_FLAG(CHANNEL_HEADLESS, 0x40);
+      packet[5] = scale_channel(CHANNEL2, 0, 63)            // elevator
+                | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
+                | GET_FLAG(CHANNEL_FLIP, 0x40);
+      packet[6] = scale_channel(CHANNEL4, 0, 63)            // rudder
+                | GET_FLAG(CHANNEL_VIDEO, 0x80);
+      packet[7] = scale_channel(CHANNEL1, -16, 16);         // aileron trim
+      packet[8] = scale_channel(CHANNEL4, -16, 16);         // rudder trim
+      packet[9] = scale_channel(CHANNEL2, -16, 16);         // elevator trim
     }
-    packet[12] = txid[2];
-    packet[13] = 0x0a;
-    packet[14] = checksum();
+    crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
     // Power on, TX mode, 2byte CRC
     // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
@@ -171,7 +206,7 @@ static void send_packet(u8 bind)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
-    XN297_WritePayload(packet, PACKET_SIZE);
+    XN297_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -185,16 +220,15 @@ static void send_packet(u8 bind)
 
 #ifdef EMULATOR
     dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind, packet[0]);
-    for(int i=1; i < PACKET_SIZE; i++) dbgprintf(" %02x", packet[i]);
+    for(int i=1; i < (bind ? BIND_PACKET_SIZE : PACKET_SIZE); i++) dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
 #endif
 }
 
-static void bay_init()
+static void ht_init()
 {
-    u8 bind_address[] = {0,0,0,0,0};
-
     NRF24L01_Initialize();
+
     NRF24L01_SetTxRxMode(TX_EN);
 
     // SPI trace of stock TX has these writes to registers that don't appear in
@@ -203,19 +237,18 @@ static void bay_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-    XN297_SetTXAddr(bind_address, ADDRESS_LENGTH);
+    XN297_SetTXAddr(rx_tx_addr, TX_ADDRESS_LENGTH);
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
+    NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-    NRF24L01_Activate(0x73);                         // Activate feature register
-    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);      // Disable dynamic payload length on all pipes
-    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x01);
+    NRF24L01_Activate(0x73);                          // Activate feature register
+    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
     NRF24L01_Activate(0x73);
 
     // Check for Beken BK2421/BK2423 chip
@@ -248,25 +281,30 @@ static void bay_init()
     NRF24L01_Activate(0x53); // switch bank back
 }
 
-static void bay_init2()
+static void ht_init2()
 {
-    XN297_SetTXAddr(rx_tx_addr, ADDRESS_LENGTH);
+    u8 data_tx_addr[] = {0x2a, 0xda, 0xa5, 0x25, 0x24};
+
+    data_tx_addr[0] = addr_vals[0][ txid[3]       & 0x0f];
+    data_tx_addr[1] = addr_vals[1][(txid[3] >> 4) & 0x0f];
+    data_tx_addr[2] = addr_vals[2][ txid[4]       & 0x0f];
+    data_tx_addr[3] = addr_vals[3][(txid[4] >> 4) & 0x0f];
+    XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
 }
 
-
 MODULE_CALLTYPE
-static u16 bay_callback()
+static u16 ht_callback()
 {
     switch (phase) {
-    case Bayang_INIT1:
+    case HonTai_INIT1:
         MUSIC_Play(MUSIC_TELEMALARM1);
-        phase = Bayang_BIND2;
+        phase = HonTai_BIND2;
         break;
 
-    case Bayang_BIND2:
+    case HonTai_BIND2:
         if (counter == 0) {
-            bay_init2();
-            phase = Bayang_DATA;
+            ht_init2();
+            phase = HonTai_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
@@ -275,7 +313,7 @@ static u16 bay_callback()
         }
         break;
 
-    case Bayang_DATA:
+    case HonTai_DATA:
         send_packet(0);
         break;
     }
@@ -304,20 +342,11 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    txid[0] = (lfsr >>  8 ) & 0xff;
-    txid[1] = (lfsr >> 16 ) & 0xff;
-    txid[2] = (lfsr >> 24 ) & 0xff;
-    rx_tx_addr[0] = lfsr & 0xff;
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    rx_tx_addr[1] = lfsr & 0xff;
-    rx_tx_addr[2] = (lfsr >>  8 ) & 0xff;
-    rx_tx_addr[3] = (lfsr >> 16 ) & 0xff;
-    rx_tx_addr[4] = (lfsr >> 24 ) & 0xff;
-    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    rf_channels[0] = 0;
-    rf_channels[1] = (lfsr & 0x1f) + 0x10;;
-    rf_channels[2] = rf_channels[1] + 0x20;
-    rf_channels[3] = rf_channels[2] + 0x20;
+    txid[0] = 0x4c; // first three bytes ignored by receiver - set same as stock tx
+    txid[1] = 0x4b;
+    txid[2] = 0x3a;
+    txid[3] = (lfsr >> 8 ) & 0xff;
+    txid[4] = lfsr & 0xff; 
 }
 
 static void initialize()
@@ -327,14 +356,14 @@ static void initialize()
     
     counter = BIND_COUNT;
     initialize_txid();
-    bay_init();
-    phase = Bayang_INIT1;
+    ht_init();
+    phase = HonTai_INIT1;
 
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
-    CLOCK_StartTimer(INITIAL_WAIT, bay_callback);
+    CLOCK_StartTimer(INITIAL_WAIT, ht_callback);
 }
 
-const void *Bayang_Cmds(enum ProtoCmds cmd)
+const void *HonTai_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
         case PROTOCMD_INIT:  initialize(); return 0;
@@ -344,7 +373,7 @@ const void *Bayang_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 11L;
+        case PROTOCMD_NUMCHAN: return (void *) 11L; // A, E, T, R, light, flip, photo, video, headless, RTH, calibrate
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;

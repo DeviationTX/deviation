@@ -107,7 +107,7 @@ enum {
 #define BV(bit) (1 << bit)
 
 static const char * const symax_opts[] = {
-  _tr_noop("SymaX5C"),  _tr_noop("Off"), _tr_noop("On"), NULL,
+  "SymaX5C",  _tr_noop("Off"), _tr_noop("On"), NULL,
   NULL
 };
 enum {

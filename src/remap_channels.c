@@ -28,7 +28,6 @@
 #include "target.h"
 #include "datalog.h"
 #include <stdlib.h>
-extern const u8 EATRG[PROTO_MAP_LEN];
 
 static void _map_inp(unsigned *chmap, u8 *val, int offset)
 {
@@ -49,11 +48,10 @@ void RemapChannelsForProtocol(const u8 *oldmap)
     int i, j;
     const u8 *map = ProtocolChannelMap[Model.protocol];
     unsigned chmap[PROTO_MAP_LEN];
-    //Automap assumes input is EATRG
-    if(! oldmap)
-        oldmap = EATRG;
-    if(! map || map == oldmap)
+
+    if(! oldmap || ! map || map == oldmap)
         return;
+
     for(i = 0; i < PROTO_MAP_LEN; i++) {
         for (j= 0; j < PROTO_MAP_LEN; j++) {
             if (oldmap[i] == map[j]) {

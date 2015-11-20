@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include <stdlib.h>
+#include <limits.h>
 
 void Delay(u32 count)
 {
@@ -158,32 +159,26 @@ int fexists(const char *file)
 }
 
 /* USB */
-void wait_press()
+void wait_press_release(u32 release)
 {
-    printf("Wait Press\n");
+    printf("Wait %s\n", release ? "Release" : "Press");
     while(1) {
         CLOCK_ResetWatchdog();
         u32 buttons = ScanButtons();
-        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER))
+        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER) > release)
             break;
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
     }
-    printf("Pressed\n");
+    printf("%sed\n", release ? "Release" : "Press");
 }
 
+void wait_press() {
+    wait_press_release(0);
+}
 void wait_release()
 {
-    printf("Wait Release\n");
-    while(1) {
-        CLOCK_ResetWatchdog();
-        u32 buttons = ScanButtons();
-        if (! CHAN_ButtonIsPressed(buttons, BUT_ENTER))
-            break;
-        if(PWR_CheckPowerSwitch())
-            PWR_Shutdown();
-    }
-    printf("Released\n");
+    wait_press_release(UINT_MAX);
 }
 
 void USB_Connect()

@@ -25,6 +25,7 @@ struct Timer {
     u16 timer;
     u32 val;
     enum TimerType type;
+    u8 padding_1[3];  //Needed to ensure structure is word aligned
 };
 
 struct CountDownTimerSettings {
