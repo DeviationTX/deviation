@@ -116,6 +116,7 @@ enum {
     PROTOOPTS_STARTBIND = 0,
     PROTOOPTS_USE1MBPS,
     PROTOOPTS_FORMAT,
+    PROTOOPTS_DYNTRIM,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -168,7 +169,8 @@ static u16  kn_convert_channel(u8 num);
 static const char * const KN_PROTOCOL_OPTIONS[] = {
   _tr_noop("Re-bind"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
   _tr_noop("1Mbps"),  _tr_noop("No"), _tr_noop("Yes"), NULL,
-  _tr_noop("Format"), _tr_noop("WLToys"), _tr_noop("Feilun"), NULL, 
+  _tr_noop("Format"), "WLToys", "Feilun", NULL, 
+  _tr_noop("DynTrim"), _tr_noop("Off"), _tr_noop("On"), NULL, 
   NULL
 };
  
@@ -321,6 +323,7 @@ static s32 rf_ch_idx = 0;
 //   Some RX reg settings are actually for enable PCF
 // 
 //-------------------------------------------------------------------------------------------------
+#define CRC_CONFIG (BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO))
  
 static void kn_init(u8 tx_addr[], u8 hopping_ch[])
 {
@@ -332,28 +335,68 @@ static void kn_init(u8 tx_addr[], u8 hopping_ch[])
     kn_calculate_freqency_hopping_channels(*((u32*)tx_addr), hopping_ch, tx_addr);
  
     NRF24L01_Initialize();
- 
+
+    NRF24L01_WriteReg(NRF24L01_00_CONFIG, CRC_CONFIG); 
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknoledgement
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0);    // Disable retransmit
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
-    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, 0x00);   // bytes of RX data payload for pipe 0. Any value is ok, we do not use RX anyway
- 
+    NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, 0x20);   // bytes of data payload for pipe 0
+
+
     NRF24L01_Activate(0x73);
-    //As PTX that transmits to a PRX with DPL enabled, DPL_P0 must be set
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 1); // Dynamic payload for data pipe 0
- 
     // Enable: Dynamic Payload Length to enable PCF
-    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL)); 
- 
+    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, BV(NRF2401_1D_EN_DPL));
+
+    
+    // Check for Beken BK2421/BK2423 chip
+    // It is done by using Beken specific activate code, 0x53
+    // and checking that status register changed appropriately
+    // There is no harm to run it on nRF24L01 because following
+    // closing activate command changes state back even if it
+    // does something on nRF24L01
+    NRF24L01_Activate(0x53); // magic for BK2421 bank switch
+    printf("Trying to switch banks\n");
+    if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
+        printf("BK2421 detected\n");
+//        long nul = 0;
+        // Beken registers don't have such nice names, so we just mention
+        // them by their numbers
+        // It's all magic, eavesdropped from real transfer and not even from the
+        // data sheet - it has slightly different values
+        NRF24L01_WriteRegisterMulti(0x00, (u8 *) "\x40\x4B\x01\xE2", 4);
+        NRF24L01_WriteRegisterMulti(0x01, (u8 *) "\xC0\x4B\x00\x00", 4);
+        NRF24L01_WriteRegisterMulti(0x02, (u8 *) "\xD0\xFC\x8C\x02", 4);
+        NRF24L01_WriteRegisterMulti(0x03, (u8 *) "\xF9\x00\x39\x21", 4);
+        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
+        NRF24L01_WriteRegisterMulti(0x05, (u8 *) "\x24\x06\x7F\xA6", 4);
+//        NRF24L01_WriteRegisterMulti(0x06, (u8 *) &nul, 4);
+//        NRF24L01_WriteRegisterMulti(0x07, (u8 *) &nul, 4);
+//        NRF24L01_WriteRegisterMulti(0x08, (u8 *) &nul, 4);
+//        NRF24L01_WriteRegisterMulti(0x09, (u8 *) &nul, 4);
+//        NRF24L01_WriteRegisterMulti(0x0A, (u8 *) &nul, 4);
+//        NRF24L01_WriteRegisterMulti(0x0B, (u8 *) &nul, 4);
+        NRF24L01_WriteRegisterMulti(0x0C, (u8 *) "\x00\x12\x73\x00", 4);
+        NRF24L01_WriteRegisterMulti(0x0D, (u8 *) "\x46\xB4\x80\x00", 4);
+        NRF24L01_WriteRegisterMulti(0x0E, (u8 *) "\x41\x10\x04\x82\x20\x08\x08\xF2\x7D\xEF\xFF", 11);
+        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC7\x96\x9A\x1B", 4);
+        NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
+    } else {
+        printf("nRF24L01 detected\n");
+    }
+    NRF24L01_Activate(0x53); // switch bank back
+
     tx_power_ = Model.tx_power;
     NRF24L01_SetPower(Model.tx_power);
- 
+    
     NRF24L01_FlushTx();
     // Turn radio power on
+    NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    
 }
  
 //-------------------------------------------------------------------------------------------------
@@ -563,10 +606,15 @@ static void kn_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_
     packet[7]  = rudder & 0xFF;
     // Trims, middle is 0x64 (100) range 0-200
     packet[8]  = Channels[CHANNEL9] /101 + 100; // 0x64; // T
-    packet[9]  = Channels[CHANNEL10] /101 + 100; // 0x64; // A
-    packet[10] = Channels[CHANNEL11] /101 + 100; // 0x64; // E
-    packet[11] = 0x64; // R
- 
+    if (Model.proto_opts[PROTOOPTS_DYNTRIM] == 1) {
+       packet[9]  = Channels[CHANNEL2] / 101 + 100; // A;
+       packet[10] = Channels[CHANNEL3] / 101 + 100; // E;
+       packet[11] = Channels[CHANNEL4] / 101 + 100; // R;
+    } else {
+       packet[9]  = Channels[CHANNEL10] /101 + 100; // 0x64; // A
+       packet[10] = Channels[CHANNEL11] /101 + 100; // 0x64; // E
+       packet[11] = 0x64; // R
+    }
     packet[12] = *((u8*)&flags);
     
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
@@ -578,10 +626,8 @@ static void kn_update_packet_control_data(u8 packet[], s32 packet_count, s32 rf_
             packet[13] = 0x00;
             break;
     }
-
     packet[14] = 0x00;
     packet[15] = 0x00;
- 
     if(tx_power_ != (u32)Model.tx_power)
     {
        NRF24L01_SetPower(Model.tx_power);

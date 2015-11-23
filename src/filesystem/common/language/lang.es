@@ -77,7 +77,7 @@ Alarma bat
 :Battery alarm
 Alarma Batería
 :Battery too low,\ncan't save!
-Batería demadiado baja,\nno se puede grabar!
+Batería demasiado baja,\nno se puede grabar!
 >:Big-box
 :Bind
 Bind
@@ -141,7 +141,7 @@ Copiar a
 :Copy To...
 Copiar a...
 :Critical battery level detected.\nSettings have been saved.\nAny future configuration settings\nwill NOT be saved.\n\nChange batteries now!
-Nivel crítico de baterías detectado.\nLos ajustes no se grabarán.\nCualquier cambio futuro en los ajustes\nNO será grabado.\n\nCambie las baterías ahora!
+Nivel crítico de baterías detectado.\nLos ajustes se han grabado.\nCualquier cambio futuro en los ajustes\nNO será grabado.\n\nCambie las baterías ahora!
 :Curve
 Curva
 :Cyclic1
@@ -163,7 +163,7 @@ DR
 >:Date:
 >:Day
 :Deadband
-Zona muert
+Zona muerta
 :Default
 Defecto
 >:Delete

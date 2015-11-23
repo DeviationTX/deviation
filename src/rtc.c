@@ -253,11 +253,9 @@ void RTC_GetDateFormattedOrder(unsigned index, u8 *left, u8 *middle, u8 *right)
 // for big boxes only these will fit
 void RTC_GetTimeFormattedBigbox(char *str, u32 time)
 {
-    unsigned am = ((time % DAYSEC) / 3600) < 12;
-    unsigned hour = _RTC_GetHour(time);
-    if (hour == 12) hour = 0;
-    sprintf(str, "%2d:%02d:%02d", hour + (am ? 0 : 12), _RTC_GetMinute(time), _RTC_GetSecond(time));
+    sprintf(str, "%2d:%02d:%02d", _RTC_GetHour(time), _RTC_GetMinute(time), _RTC_GetSecond(time));
 }
+
 void RTC_GetDateFormattedBigbox(char *str, u32 date)
 {
     _RTC_SetDayStart(date);
