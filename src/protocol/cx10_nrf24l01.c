@@ -215,8 +215,8 @@ static void send_packet(u8 bind)
     switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_CX10_BLUE:
             if(Channels[CHANNEL_PICTURE] <= 0)
-                packet[13] |= 0x10;
-            packet[13] |= GET_FLAG(CHANNEL_VIDEO, 0x08);
+                packet[13+offset] |= 0x10;
+            packet[13+offset] |= GET_FLAG(CHANNEL_VIDEO, 0x08);
             break;
         case FORMAT_Q282:
             packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
