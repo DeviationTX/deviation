@@ -1,4 +1,5 @@
 .hgignore
+tags
 bin$
 dfu$
 elf$

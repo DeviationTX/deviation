@@ -150,7 +150,14 @@ static void show_button_page()
         OFFSET_Y    = ((LCD_HEIGHT - 240) / 2),
     };
     enum {X = 0, Y = 1};
-    struct LabelDesc alignRight = { DEFAULT_FONT.font, 0, 0, DEFAULT_FONT.font_color, LABEL_RIGHT };
+    struct LabelDesc alignRight = {
+        .font = DEFAULT_FONT.font,
+        .style = LABEL_RIGHT,
+        .font_color = DEFAULT_FONT.font_color,
+        .fill_color = DEFAULT_FONT.fill_color,
+        .outline_color = DEFAULT_FONT.outline_color
+    };
+
     const int label_pos[NUM_TX_BUTTONS][2] = CHANTEST_BUTTON_PLACEMENT;
     cp->is_locked = 3;
     GUI_CreateLabelBox(&gui->lock, OFFSET_X, 34, 320, 20, &NARROW_FONT, lockstr_cb, NULL, NULL);

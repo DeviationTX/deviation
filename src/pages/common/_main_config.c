@@ -193,6 +193,7 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
             break;
         pc->elem[i-1] = pc->elem[i];
     }
+         ELEM_SET_X(pc->elem[i-1], 0);
          ELEM_SET_Y(pc->elem[i-1], 0);
     idx = MAINPAGE_FindNextElem(type, 0);
     set_selected_for_move(idx);
