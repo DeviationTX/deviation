@@ -36,9 +36,6 @@
 #endif
 #ifdef PROTO_HAS_A7105
 
-#define TELEM_ON 0
-#define TELEM_OFF 1
-
 enum{
     FLAG_VIDEO= 0x01,   // record video
     FLAG_FLIP = 0x08,   // enable flips
@@ -48,17 +45,29 @@ enum{
 #define VTX_STEP_SIZE "5"
 
 static const char * const hubsan4_opts[] = {
+    _tr_noop("Format"), _tr_noop("Normal"), _tr_noop("+ Series"), NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_VTX_FREQ = 0,
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum {
+    FORMAT_NORMAL = 0,
+    FORMAT_PLUS,
+};
+
+enum {
+    TELEM_ON = 0,
+    TELEM_OFF,
+};
 
 static u8 packet[16];
 static u8 channel;
@@ -90,8 +99,10 @@ static int hubsan_init()
     u8 vco_calibration0;
     u8 vco_calibration1;
     //u8 vco_current;
-
-    A7105_WriteID(0x55201041);
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS)
+        A7105_WriteID(0xAA201041);
+    else
+        A7105_WriteID(0x55201041);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x63);
     A7105_WriteReg(A7105_03_FIFOI, 0x0f);
     A7105_WriteReg(A7105_0D_CLOCK, 0x05);
