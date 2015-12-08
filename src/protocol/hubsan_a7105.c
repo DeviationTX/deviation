@@ -360,7 +360,6 @@ static u16 hubsan_cb()
         A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
-        state++;
         if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
             if(state == BIND_7 && packet[2] == 9) {
                 state = DATA_1;
@@ -369,6 +368,7 @@ static u16 hubsan_cb()
                 //return 28000;
             }
         }
+        state++;
         return 4500; //7.5msec elapsed since last write
     case BIND_2:
     case BIND_4:
