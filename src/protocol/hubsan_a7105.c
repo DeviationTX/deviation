@@ -365,7 +365,7 @@ static u16 hubsan_cb()
                 state = DATA_1;
                 A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
                 PROTOCOL_SetBindState(0);
-                //return 28000;
+                return 4500;
             }
         }
         state++;
