@@ -197,23 +197,39 @@ static void update_crc()
         sum += packet[i];
     packet[15] = (256 - (sum % 256)) & 0xff;
 }
-static void hubsan_build_bind_packet(u8 state)
+static void hubsan_build_bind_packet(u8 bind_state)
 {
-    packet[0] = state;
+    static s8 handshake_counter;
+    if(state < BIND_7)
+        handshake_counter = -1;
+    memset(packet, 0, 16);
+    packet[0] = bind_state;
     packet[1] = channel;
     packet[2] = (sessionid >> 24) & 0xff;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS && state == BIND_7) {
+        handshake_counter++;
+        packet[2] = handshake_counter;
+    }
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
-    packet[6] = 0x08;
-    packet[7] = 0xe4; //???
-    packet[8] = 0xea;
-    packet[9] = 0x9e;
-    packet[10] = 0x50;
-    packet[11] = (txid >> 24) & 0xff;
-    packet[12] = (txid >> 16) & 0xff;
-    packet[13] = (txid >>  8) & 0xff;
-    packet[14] = (txid >>  0) & 0xff;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+        packet[6] = 0x08;
+        packet[7] = 0xe4; //???
+        packet[8] = 0xea;
+        packet[9] = 0x9e;
+        packet[10] = 0x50;
+        packet[11] = (txid >> 24) & 0xff;
+        packet[12] = (txid >> 16) & 0xff;
+        packet[13] = (txid >>  8) & 0xff;
+        packet[14] = (txid >>  0) & 0xff;
+    }
+    else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+        if(state >= BIND_3) {
+            packet[7] = 0x62;
+            packet[8] = 0x16;
+        }
+    }
     update_crc();
 }
 
@@ -266,11 +282,28 @@ static void hubsan_build_packet()
         if(Channels[6] >0) // off by default
             packet[9] |= FLAG_VIDEO;
     }
-    packet[10] = 0x64;
-    packet[11] = (txid >> 24) & 0xff;
-    packet[12] = (txid >> 16) & 0xff;
-    packet[13] = (txid >>  8) & 0xff;
-    packet[14] = (txid >>  0) & 0xff;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+        packet[10] = 0x64;
+        packet[11] = (txid >> 24) & 0xff;
+        packet[12] = (txid >> 16) & 0xff;
+        packet[13] = (txid >>  8) & 0xff;
+        packet[14] = (txid >>  0) & 0xff;
+    }
+    else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+        if(packet_count < 100) { // set channels to neutral for first few packets
+            packet[2] = 0x80;
+            packet[4] = 0x80;
+            packet[6] = 0x80;
+            packet[8] = 0x80;
+        }
+        packet[3] = 0x64;
+        packet[5] = 0x64;
+        packet[7] = 0x64;
+        packet[9] = 0x06; // todo : flags for plus series
+        packet[10]= 0x19;
+        packet[12]= 0x5C; // ghost channel ?
+        packet[14]= 0x49; // ghost channel ?
+    }
     update_crc();
 }
 
@@ -329,6 +362,14 @@ static u16 hubsan_cb()
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
         state++;
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+            if(packet[2] == 9) {
+                state = DATA_1;
+                A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
+                PROTOCOL_SetBindState(0);
+                //return 28000;
+            }
+        }
         return 4500; //7.5msec elapsed since last write
     case BIND_2:
     case BIND_4:
@@ -351,7 +392,7 @@ static u16 hubsan_cb()
             return 15000; //22.5msec elapsed since last write
         }
         A7105_ReadData(packet, 16);
-        if(packet[1] == 9) {
+        if(packet[1] == 9 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
             state = DATA_1;
             A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
             PROTOCOL_SetBindState(0);
@@ -371,7 +412,7 @@ static u16 hubsan_cb()
                 A7105_SetPower( Model.tx_power); //Keep transmit power in sync
             hubsan_build_packet();
             A7105_Strobe(A7105_STANDBY);
-            A7105_WriteData( packet, 16, state == DATA_5 ? channel + 0x23 : channel);
+            A7105_WriteData( packet, 16, state == DATA_5 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL ? channel + 0x23 : channel);
             if (state == DATA_5)
                 state = DATA_1;
             else
