@@ -199,17 +199,13 @@ static void update_crc()
 }
 static void hubsan_build_bind_packet(u8 bind_state)
 {
-    static s8 handshake_counter;
+    static u8 handshake_counter;
     if(state < BIND_7)
-        handshake_counter = -1;
+        handshake_counter = 0;
     memset(packet, 0, 16);
     packet[0] = bind_state;
     packet[1] = channel;
     packet[2] = (sessionid >> 24) & 0xff;
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS && state == BIND_7) {
-        handshake_counter++;
-        packet[2] = handshake_counter;
-    }
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
@@ -228,6 +224,9 @@ static void hubsan_build_bind_packet(u8 bind_state)
         if(state >= BIND_3) {
             packet[7] = 0x62;
             packet[8] = 0x16;
+        }
+        if(state == BIND_7) {
+            packet[2] = handshake_counter++;
         }
     }
     update_crc();
@@ -363,7 +362,7 @@ static u16 hubsan_cb()
         state &= ~WAIT_WRITE;
         state++;
         if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
-            if(packet[2] == 9) {
+            if(state == BIND_7 && packet[2] == 9) {
                 state = DATA_1;
                 A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
                 PROTOCOL_SetBindState(0);
