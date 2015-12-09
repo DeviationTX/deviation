@@ -36,10 +36,41 @@
 #endif
 #ifdef PROTO_HAS_A7105
 
+// For code readability
+enum {
+    CHANNEL1 = 0, // Aileron
+    CHANNEL2,     // Elevator
+    CHANNEL3,     // Throttle
+    CHANNEL4,     // Rudder
+    CHANNEL5,     // Leds
+    CHANNEL6,     // Flip
+    CHANNEL7,     // Still camera
+    CHANNEL8,     // Video camera
+    CHANNEL9,     // Headless
+};
+
+#define CHANNEL_LED         CHANNEL5
+#define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_SNAPSHOT    CHANNEL7
+#define CHANNEL_VIDEO       CHANNEL8
+#define CHANNEL_HEADLESS    CHANNEL9
+
 enum{
+    // flags going to packet[9] (Normal)
     FLAG_VIDEO= 0x01,   // record video
     FLAG_FLIP = 0x08,   // enable flips
     FLAG_LED  = 0x04    // enable LEDs
+};
+
+enum{
+    // flags going to packet[9] (Plus series)
+    FLAG_HEADLESS = 0x08, // headless mode
+};
+
+enum{
+    // flags going to packet[13] (Plus series)
+    FLAG_SNAPSHOT  = 0x01,
+    FLAG_FLIP_PLUS = 0x80,
 };
 
 #define VTX_STEP_SIZE "5"
@@ -242,46 +273,37 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
     return value;
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+
 static void hubsan_build_packet()
 {
     static s16 vtx_freq = 0; 
     memset(packet, 0, 16);
-    if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) // set vTX frequency (H107D)
-    {
+    if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) { // set vTX frequency
         vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
-        packet[0] = 0x40;
+        packet[0] = 0x40; // vtx data packet
         packet[1] = (vtx_freq >> 8) & 0xff;
         packet[2] = vtx_freq & 0xff;
         packet[3] = 0x82;
         packet_count++;      
-    }
-    else //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
-    {
-        packet[0] = 0x20;
+    } else {
+        packet[0] = 0x20; // normal data packet
         packet[2] = get_channel(2, 0x80, 0x80, 0x80); //Throttle
     }
     packet[4] = 0xff - get_channel(3, 0x80, 0x80, 0x80); //Rudder is reversed
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
-    if(packet_count < 100)
-    {
-        packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
-        packet_count++;
-    }
-    else
-    {
-        packet[9] = 0x02;
-        // Channel 5
-        if(Channels[4] >= 0)
-            packet[9] |= FLAG_LED;
-        // Channel 6
-        if(Channels[5] >= 0)
-            packet[9] |= FLAG_FLIP;
-        // Channel 7
-        if(Channels[6] >0) // off by default
-            packet[9] |= FLAG_VIDEO;
-    }
+    
     if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+        if(packet_count < 100) {
+            packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
+            packet_count++;
+        } else {
+            packet[9] = 0x02
+                      | GET_FLAG(CHANNEL_LED, FLAG_LED)
+                      | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO); // H102D
+        }
         packet[10] = 0x64;
         packet[11] = (txid >> 24) & 0xff;
         packet[12] = (txid >> 16) & 0xff;
@@ -289,19 +311,26 @@ static void hubsan_build_packet()
         packet[14] = (txid >>  0) & 0xff;
     }
     else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
-        if(packet_count < 100) { // set channels to neutral for first few packets
-            packet[2] = 0x80;
-            packet[4] = 0x80;
-            packet[6] = 0x80;
-            packet[8] = 0x80;
-        }
         packet[3] = 0x64;
         packet[5] = 0x64;
         packet[7] = 0x64;
-        packet[9] = 0x06; // todo : flags for plus series
+        packet[9] = 0x06
+                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
         packet[10]= 0x19;
         packet[12]= 0x5C; // ghost channel ?
+        packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
         packet[14]= 0x49; // ghost channel ?
+        if(packet_count < 100) { // set channels to neutral for first 100 packets
+            packet[2] = 0x80; // throttle neutral is at mid stick on plus series
+            packet[4] = 0x80;
+            packet[6] = 0x80;
+            packet[8] = 0x80;
+            packet[9] = 0x06;
+            packet[13]= 0x00;
+            packet_count++;
+        }
     }
     update_crc();
 }
@@ -483,8 +512,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Leds, Flips, Video Recording
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
+        case PROTOCMD_NUMCHAN: return (void *)9L; // A, E, T, R, Leds, Flips, Snapshot, Video Recording, Headless
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
