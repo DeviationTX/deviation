@@ -76,14 +76,12 @@ enum{
 #define VTX_STEP_SIZE "5"
 
 static const char * const hubsan4_opts[] = {
-    _tr_noop("Format"), _tr_noop("Normal"), _tr_noop("+ Series"), NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
     NULL
 };
 
 enum {
-    PROTOOPTS_FORMAT = 0,
     PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
     LAST_PROTO_OPT,
@@ -91,22 +89,24 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
-    FORMAT_NORMAL = 0,
-    FORMAT_PLUS,
-};
-
-enum {
     TELEM_ON = 0,
     TELEM_OFF,
 };
 
+#define ID_NORMAL 0x55201041
+#define ID_PLUS   0xAA201041
+
 static u8 packet[16];
 static u8 channel;
+static s16 vtx_freq;
 static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};
 static u32 sessionid;
 static const u32 txid = 0xdb042679;
 static u8 state;
 static u8 packet_count;
+static u8 bind_count;
+static u32 id_data;
+
 enum {
     BIND_1,
     BIND_2,
@@ -129,11 +129,8 @@ static int hubsan_init()
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
-    //u8 vco_current;
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS)
-        A7105_WriteID(0xAA201041);
-    else
-        A7105_WriteID(0x55201041);
+    
+    A7105_WriteID(ID_NORMAL);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x63);
     A7105_WriteReg(A7105_03_FIFOI, 0x0f);
     A7105_WriteReg(A7105_0D_CLOCK, 0x05);
@@ -240,7 +237,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+    if(id_data == ID_NORMAL) {
         packet[6] = 0x08;
         packet[7] = 0xe4; //???
         packet[8] = 0xea;
@@ -251,7 +248,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+    else if(id_data == ID_PLUS) {
         if(state >= BIND_3) {
             packet[7] = 0x62;
             packet[8] = 0x16;
@@ -277,7 +274,6 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 static void hubsan_build_packet()
 {
-    static s16 vtx_freq = 0; 
     memset(packet, 0, 16);
     if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) { // set vTX frequency
         vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
@@ -294,7 +290,7 @@ static void hubsan_build_packet()
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+    if(id_data == ID_NORMAL) {
         if(packet_count < 100) {
             packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
             packet_count++;
@@ -310,7 +306,7 @@ static void hubsan_build_packet()
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+    else if(id_data == ID_PLUS) {
         packet[3] = 0x64;
         packet[5] = 0x64;
         packet[7] = 0x64;
@@ -367,6 +363,15 @@ static u16 hubsan_cb()
     int i;
     switch(state) {
     case BIND_1:
+        bind_count++;
+        if(bind_count == 20) {
+            if(id_data == ID_NORMAL)
+                id_data = ID_PLUS;
+            else
+                id_data = ID_NORMAL;
+            A7105_WriteID(id_data);    
+            bind_count = 0;
+        }
     case BIND_3:
     case BIND_5:
     case BIND_7:
@@ -389,7 +394,7 @@ static u16 hubsan_cb()
         A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
-        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_PLUS) {
+        if(id_data == ID_PLUS) {
             if(state == BIND_7 && packet[2] == 9) {
                 state = DATA_1;
                 A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
@@ -420,7 +425,7 @@ static u16 hubsan_cb()
             return 15000; //22.5msec elapsed since last write
         }
         A7105_ReadData(packet, 16);
-        if(packet[1] == 9 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL) {
+        if(packet[1] == 9 && id_data == ID_NORMAL) {
             state = DATA_1;
             A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
             PROTOCOL_SetBindState(0);
@@ -440,7 +445,7 @@ static u16 hubsan_cb()
                 A7105_SetPower( Model.tx_power); //Keep transmit power in sync
             hubsan_build_packet();
             A7105_Strobe(A7105_STANDBY);
-            A7105_WriteData( packet, 16, state == DATA_5 && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_NORMAL ? channel + 0x23 : channel);
+            A7105_WriteData( packet, 16, state == DATA_5 && id_data == ID_NORMAL ? channel + 0x23 : channel);
             if (state == DATA_5)
                 state = DATA_1;
             else
@@ -494,7 +499,10 @@ static void initialize() {
     channel = allowed_ch[rand32_r(0, 0) % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
+    vtx_freq = 0;
     packet_count=0;
+    bind_count = 0;
+    id_data = ID_NORMAL;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
     if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
