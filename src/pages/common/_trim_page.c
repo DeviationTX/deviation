@@ -72,7 +72,9 @@ const char *set_trim_cb(guiObject_t *obj, int dir, void *data)
         return _tr("None");
     }
     u8 *button = (u8 *)data;
-    *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
+    do {
+      *button = GUI_TextSelectHelper(*button, 0, NUM_TX_BUTTONS, dir, 1, 1, NULL);
+    } while ((1 << *button) & Transmitter.ignore_buttons);
     return INPUT_ButtonName(*button);
 }
 

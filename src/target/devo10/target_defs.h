@@ -19,6 +19,7 @@
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_SCANNER         0
 #define HAS_EXTRA_SWITCHES  0
+#define HAS_EXTRA_BUTTONS  0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 
