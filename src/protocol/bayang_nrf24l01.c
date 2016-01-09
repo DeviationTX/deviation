@@ -74,7 +74,7 @@ enum {
     CHANNEL10,    // Return To Home
     CHANNEL11,    // Calibrate
 };
-#define CHANNEL_LED         CHANNEL5
+#define CHANNEL_INVERTED    CHANNEL5 // inverted flight on Floureon H101
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -142,8 +142,10 @@ static void send_packet(u8 bind)
         packet[1] = 0xfa;   // normal mode is 0xf7, expert 0xfa
         packet[2] = GET_FLAG(CHANNEL_FLIP, 0x08)
                   | GET_FLAG(CHANNEL_HEADLESS, 0x02)
-                  | GET_FLAG(CHANNEL_RTH, 0x01);
-        packet[3] = 0x00;
+                  | GET_FLAG(CHANNEL_RTH, 0x01)
+                  | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                  | GET_FLAG(CHANNEL_PICTURE, 0x20);
+        packet[3] = GET_FLAG(CHANNEL_INVERTED, 0x80);
         chanval.value = scale_channel(CHANNEL1, 0x3ff, 0);   // aileron
         packet[4] = chanval.bytes.msb + DYNTRIM(chanval.value);
         packet[5] = chanval.bytes.lsb;
