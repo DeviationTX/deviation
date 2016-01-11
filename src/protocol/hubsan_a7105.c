@@ -76,17 +76,24 @@ enum{
 #define VTX_STEP_SIZE "5"
 
 static const char * const hubsan4_opts[] = {
+    _tr_noop("Format"), "H107", "H501", NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
     NULL
 };
 
 enum {
+    PROTOOPTS_FORMAT,
     PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum {
+    FORMAT_H107 = 0,
+    FORMAT_H501,
+};
 
 enum {
     TELEM_ON = 0,
@@ -237,7 +244,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
-    if(id_data == ID_NORMAL) {
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_H501) {
         packet[6] = 0x08;
         packet[7] = 0xe4; //???
         packet[8] = 0xea;
@@ -248,7 +255,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(id_data == ID_PLUS) {
+    else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
         if(state >= BIND_3) {
             packet[7] = 0x62;
             packet[8] = 0x16;
@@ -290,7 +297,7 @@ static void hubsan_build_packet()
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     
-    if(id_data == ID_NORMAL) {
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
         if(packet_count < 100) {
             packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
             packet_count++;
@@ -306,14 +313,14 @@ static void hubsan_build_packet()
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(id_data == ID_PLUS) {
-        packet[3] = 0x64;
-        packet[5] = 0x64;
-        packet[7] = 0x64;
+    else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+        packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[5] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[7] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
         packet[9] = 0x06
                   | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
                   | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-        packet[10]= 0x19;
+        packet[10]= Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x1a : 0x19;
         packet[12]= 0x5C; // ghost channel ?
         packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
                    | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
@@ -326,6 +333,19 @@ static void hubsan_build_packet()
             packet[9] = 0x06;
             packet[13]= 0x00;
             packet_count++;
+        }
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+            static u32 h501_packet = 0;
+            h501_packet++;
+            if(h501_packet == 10) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe8;
+            }
+            else if(h501_packet == 20) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe9;
+            }
+            if(h501_packet >= 20) h501_packet = 0;
         }
     }
     update_crc();
@@ -343,7 +363,7 @@ static void hubsan_update_telemetry()
 {
     const u8 *update = NULL;
     static const u8 telempkt[] = { TELEM_DEVO_VOLT1, 0 };
-    if( (packet[0]==0xe1) && hubsan_check_integrity()) {
+    if( ((packet[0]==0xe1 || packet[0]==0xe7)) && hubsan_check_integrity()) {
         Telemetry.value[TELEM_DEVO_VOLT1] = packet[13];
         update = telempkt;
     }
@@ -364,7 +384,7 @@ static u16 hubsan_cb()
     switch(state) {
     case BIND_1:
         bind_count++;
-        if(bind_count == 20) {
+        if(bind_count == 20 && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_H501) {
             if(id_data == ID_NORMAL)
                 id_data = ID_PLUS;
             else
