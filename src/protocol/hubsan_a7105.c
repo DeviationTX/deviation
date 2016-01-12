@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include "telemetry.h"
 
+#ifdef EMULATOR
+#define USE_FIXED_MFGID
+#endif
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -100,8 +103,8 @@ enum {
     TELEM_OFF,
 };
 
-#define ID_NORMAL 0x55201041
-#define ID_PLUS   0xAA201041
+#define ID_NORMAL 0x55201041 // H102D, H107/L/C/D, H501S
+#define ID_PLUS   0xAA201041 // H107P/C+/D+
 
 static u8 packet[16];
 static u8 channel;
@@ -465,7 +468,14 @@ static u16 hubsan_cb()
                 A7105_SetPower( Model.tx_power); //Keep transmit power in sync
             hubsan_build_packet();
             A7105_Strobe(A7105_STANDBY);
-            A7105_WriteData( packet, 16, state == DATA_5 && id_data == ID_NORMAL ? channel + 0x23 : channel);
+            u8 ch;
+            if((state == DATA_5 && id_data == ID_NORMAL) && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
+                ch = channel + 0x23;
+            }
+            else {
+                ch = channel;
+            }
+            A7105_WriteData( packet, 16, ch);
             if (state == DATA_5)
                 state = DATA_1;
             else
@@ -507,7 +517,7 @@ static u16 hubsan_cb()
     return 0;
 }
 
-static void initialize() {
+static void initialize(u8 bind) {
     CLOCK_StopTimer();
     while(1) {
         A7105_Reset();
@@ -515,14 +525,41 @@ static void initialize() {
         if (hubsan_init())
             break;
     }
-    sessionid = rand32_r(0, 0);
-    channel = allowed_ch[rand32_r(0, 0) % sizeof(allowed_ch)];
-    PROTOCOL_SetBindState(0xFFFFFFFF);
-    state = BIND_1;
+    
+    u32 lfsr = 0xb2c54a2ful;
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    printf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        printf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
+    }
+    printf("\r\n");
+#endif
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    
+    sessionid = lfsr;
+    channel = allowed_ch[sessionid % sizeof(allowed_ch)]; // not optimal, but not worse than stock tx after all ...
+    id_data = ID_NORMAL;
+    if(bind || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
+        PROTOCOL_SetBindState(0xFFFFFFFF);
+        state = BIND_1;
+    }
+    else {
+        state = DATA_1;
+        A7105_WriteID(sessionid);
+        A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
+        PROTOCOL_SetBindState(0);
+    }
     vtx_freq = 0;
     packet_count=0;
     bind_count = 0;
-    id_data = ID_NORMAL;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
     if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
@@ -533,13 +570,13 @@ static void initialize() {
 const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
-        case PROTOCMD_BIND:  initialize(); return 0;
+        case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
         case PROTOCMD_NUMCHAN: return (void *)9L; // A, E, T, R, Leds, Flips, Snapshot, Video Recording, Headless
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return 0;
