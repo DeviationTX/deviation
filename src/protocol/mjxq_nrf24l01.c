@@ -58,7 +58,7 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Format"), "WLH08", "X600", "X800", NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", NULL,
   NULL
 };
 enum {
@@ -69,6 +69,7 @@ enum {
     FORMAT_WLH08 = 0,
     FORMAT_X600,
     FORMAT_X800,
+    FORMAT_H26D,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -230,9 +231,11 @@ static void mjxq_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
+    memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
-        memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
+    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
+        memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
     } else {
         memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
         memcpy(rx_tx_addr, "\x6d\x6a\x73\x73\x73", sizeof(rx_tx_addr));
@@ -296,9 +299,11 @@ static void mjxq_init()
 
 static void mjxq_init2()
 {
-    if (!Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08)
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
+        memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
+    } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08) {
         memcpy(rf_channels, "\x0a\x46\x3a\x42", sizeof(rf_channels));
-    
+    }
 }
 
 
