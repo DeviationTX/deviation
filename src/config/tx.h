@@ -65,6 +65,7 @@ struct Transmitter {
     #else
         u32 ignore_src;
     #endif
+    u32 ignore_buttons;
     struct mcu_pin module_enable[TX_MODULE_LAST];
     u32 txid;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];

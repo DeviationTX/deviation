@@ -32,6 +32,7 @@ PROTO_MODULES += $(ODIR)/protocol/cg023.mod
 PROTO_MODULES += $(ODIR)/protocol/hontai.mod
 PROTO_MODULES += $(ODIR)/protocol/fy326.mod
 PROTO_MODULES += $(ODIR)/protocol/bayang.mod
+PROTO_MODULES += $(ODIR)/protocol/h8-3d.mod
 PROTO_MODULES += $(ODIR)/protocol/mjxq.mod
 
 ALL += $(PROTO_MODULES)
@@ -162,6 +163,10 @@ $(ODIR)/protocol/fy326.mod : $(ODIR)/fy326_nrf24l01.bin
 
 $(ODIR)/protocol/bayang.mod : $(ODIR)/bayang_nrf24l01.bin
 	@echo Building 'bayang' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/h8-3d.mod : $(ODIR)/h8_3d_nrf24l01.bin
+	@echo Building 'h8-3d' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
 
 $(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
