@@ -18,7 +18,8 @@
 #define HAS_DATALOG         1
 #define HAS_SCANNER         1
 #define HAS_MULTIMOD_SUPPORT 1
-#define HAS_EXTRA_SWITCHES  0
+#define HAS_EXTRA_SWITCHES  1
+#define HAS_EXTRA_BUTTONS   1
 #define HAS_VIDEO           0
 
 #ifdef BUILDTYPE_DEV
@@ -36,7 +37,7 @@
 #define NUM_OUT_CHANNELS 12
 #define NUM_VIRT_CHANNELS 10
 
-#define NUM_TRIMS 6
+#define NUM_TRIMS 10
 #define NUM_TOGGLES 4
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
@@ -53,6 +54,7 @@
 #define CHANTEST_BUTTON_PLACEMENT { \
     {51, 120}, {51, 105}, {-229, 120}, {-229, 105}, \
     {-106, 135}, {21, 135}, {-259, 135}, {174, 135}, \
+    {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
     {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
     }
 #endif //_DEVO6_TARGET_H_
