@@ -284,6 +284,7 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 static void hubsan_build_packet()
 {
+    static u32 h501_packet = 0;
     memset(packet, 0, 16);
     if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) { // set vTX frequency
         vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
@@ -291,7 +292,8 @@ static void hubsan_build_packet()
         packet[1] = (vtx_freq >> 8) & 0xff;
         packet[2] = vtx_freq & 0xff;
         packet[3] = 0x82;
-        packet_count++;      
+        packet_count++;
+        h501_packet = 0;
     } else {
         packet[0] = 0x20; // normal data packet
         packet[2] = get_channel(2, 0x80, 0x80, 0x80); //Throttle
@@ -320,14 +322,23 @@ static void hubsan_build_packet()
         packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
         packet[5] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
         packet[7] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
-        packet[9] = 0x06
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
-                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-        packet[10]= Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x1a : 0x19;
-        packet[12]= 0x5C; // ghost channel ?
-        packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
-                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
-        packet[14]= 0x49; // ghost channel ?
+        if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+            packet[9] = 0x02
+                      | GET_FLAG(CHANNEL_LED, FLAG_LED);
+            
+            
+            
+        }
+        else {
+            packet[9] = 0x06
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+            packet[10]= Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x1a : 0x19;
+            packet[12]= 0x5C; // ghost channel ?
+            packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                       | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
+            packet[14]= 0x49; // ghost channel ?
+        }
         if(packet_count < 100) { // set channels to neutral for first 100 packets
             packet[2] = 0x80; // throttle neutral is at mid stick on plus series
             packet[4] = 0x80;
@@ -338,7 +349,6 @@ static void hubsan_build_packet()
             packet_count++;
         }
         if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
-            static u32 h501_packet = 0;
             h501_packet++;
             if(h501_packet == 10) {
                 memset(packet, 0, 16);
@@ -412,8 +422,6 @@ static u16 hubsan_cb()
            if(! (A7105_ReadReg(A7105_00_MODE) & 0x01))
                break;
         }
-        //if (i == 20)
-        //    printf("Failed to complete write\n");
         A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
@@ -530,12 +538,9 @@ static void initialize(u8 bind) {
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
-    printf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
-        printf("%02X", var[i]);
         rand32_r(&lfsr, var[i]);
     }
-    printf("\r\n");
 #endif
     if (Model.fixed_id) {
        for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
