@@ -344,7 +344,7 @@ static void hubsan_build_packet()
             memset(packet, 0, 16);
             packet[0] = 0xe8;
         }
-        if(h501_packet % 103 == 0) { 
+        else if(h501_packet % 103 == 0) { 
             packet_count = 100; // keep vTX frequency in synch
         } 
     }
