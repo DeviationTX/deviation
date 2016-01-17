@@ -114,6 +114,14 @@ static u8 txid[3];
 static u8 packet[PACKET_SIZE];
 static u8 rf_channels[RF_NUM_CHANNELS]; 
 
+// haven't figured out txid<-->rf channel mapping for MJX models
+static const struct {
+    u8 txid[3];
+    u8 rfchan[RF_NUM_CHANNELS];
+} mjx_tx_rf_map[] = {{{0xF8, 0x4F, 0x1C}, {0x0A, 0x46, 0x3A, 0x42}},
+                     {{0xC8, 0x6E, 0x02}, {0x0A, 0x3C, 0x36, 0x3F}},
+                     {{0x48, 0x6A, 0x40}, {0x0A, 0x43, 0x36, 0x3F}}};
+
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
@@ -156,44 +164,6 @@ static u8 pan_tilt_value()
     return pan;
 }
 
-#if 0
-typedef struct {
-    u8 channel;
-    u8 dir_pos;
-    u8 dir_neg;
-    u8 current_value;
-    u8 counter;
-} pt_info_t ; 
-
-static pt_info_t pt_info[2];
-
-u8 pan_tilt_value()
-{
-    s32 ch;
-    s8 count;
-
-    for (int i=0; i < 2; i++) {
-        ch = LIMIT_CHAN(Channels[pt_info[i].channel]);
-//        count = PAN_TILT_MAX - BABS(ch * PAN_TILT_MAX / CHAN_MAX_VALUE);
-        count = PAN_TILT_MAX;
-        if (ch > CHAN_MAX_VALUE/2 || ch < CHAN_MIN_VALUE/2)
-            count /= 2;
-
-        pt_info[i].counter += 1;
-        if (count >= PAN_TILT_MAX) {
-            pt_info[i].current_value = 0;
-        } else if (pt_info[i].counter > count) {
-            if (pt_info[i].current_value & (pt_info[i].dir_neg + pt_info[i].dir_pos)) {
-                pt_info[i].current_value = 0;
-            } else {
-                pt_info[i].current_value = ch < 0 ? pt_info[i].dir_neg : pt_info[i].dir_pos;
-            }
-            pt_info[i].counter = 0;
-        }
-    }
-    return pt_info[0].current_value + pt_info[1].current_value;
-}
-#endif
 
 #define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
 #define GET_FLAG_INV(ch, mask) (Channels[ch] < 0 ? mask : 0)
@@ -306,12 +276,6 @@ static void mjxq_init()
 {
     u8 rx_tx_addr[ADDRESS_LENGTH];
 
-#if 0
-    pt_info_t pt_info_initvals[] = { {CHANNEL_PAN, PAN_UP, PAN_DOWN, 0, 0},
-                                     {CHANNEL_TILT, TILT_UP, TILT_DOWN, 0, 0} };
-    memcpy(pt_info, pt_info_initvals, sizeof(pt_info));
-#endif
-
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
@@ -384,16 +348,10 @@ static void mjxq_init()
 
 static void mjxq_init2()
 {
-  // haven't figured out txid<-->rf channel mapping for MJX models
-  // this lookup table must match mjx_txid
-  u8 mjx_rfchan[][4] = {{0x0A, 0x46, 0x3A, 0x42},
-                        {0x0A, 0x3C, 0x36, 0x3F},
-                        {0x0A, 0x43, 0x36, 0x3F}};
-
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
         memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
     } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08) {
-        memcpy(rf_channels, mjx_rfchan[Model.fixed_id % (sizeof(mjx_rfchan)/sizeof(rf_channels))], sizeof(rf_channels));
+        memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
     }
 }
 
@@ -430,12 +388,6 @@ static void initialize_txid()
 {
     u32 lfsr = 0xb2c54a2ful;
 
-    // haven't figured out txid<-->rf channel mapping for MJX models
-    // this lookup table must match mjx_rfchan
-    u8 mjx_txid[][3] = {{0xF8, 0x4F, 0x1C},
-                        {0xC8, 0x6E, 0x02}, 
-                        {0x48, 0x6A, 0x40}};
-
 
 #ifndef USE_FIXED_MFGID
     u8 var[12];
@@ -461,7 +413,7 @@ static void initialize_txid()
         txid[1] = (lfsr >> 8 ) & 0xff;
         txid[2] = lfsr & 0xff; 
     } else {
-        memcpy(txid, mjx_txid[Model.fixed_id % (sizeof(mjx_txid)/sizeof(txid))], sizeof(txid));
+        memcpy(txid, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].txid, sizeof(txid));
     }
 }
 
