@@ -46,34 +46,55 @@ enum {
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
     CHANNEL5,     // Leds
-    CHANNEL6,     // Flip
+    CHANNEL6,     // Flip (or Altitude Hold on H501S)
     CHANNEL7,     // Still camera
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
+    CHANNEL10,    // RTH
+    CHANNEL11,    // GPS HOLD
 };
 
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_ALT_HOLD    CHANNEL6
 #define CHANNEL_SNAPSHOT    CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
+#define CHANNEL_RTH         CHANNEL10
+#define CHANNEL_GPS_HOLD    CHANNEL11
 
 enum{
-    // flags going to packet[9] (Normal)
+    // flags going to packet[9] (H107)
     FLAG_VIDEO= 0x01,   // record video
     FLAG_FLIP = 0x08,   // enable flips
     FLAG_LED  = 0x04    // enable LEDs
 };
 
 enum{
-    // flags going to packet[9] (Plus series)
+    // flags going to packet[9] (H107 Plus series)
     FLAG_HEADLESS = 0x08, // headless mode
 };
 
 enum{
-    // flags going to packet[13] (Plus series)
+    // flags going to packet[13] (H107 Plus series)
     FLAG_SNAPSHOT  = 0x01,
     FLAG_FLIP_PLUS = 0x80,
+};
+
+enum{
+    // flags going to packet[9] (H501S)
+    FLAG_H501_VIDEO     = 0x01,
+    FLAG_H501_LED       = 0x04,
+    FLAG_H501_RTH       = 0x20,
+    FLAG_H501_HEADLESS1 = 0x40,
+    FLAG_H501_GPS_HOLD  = 0x80,
+};
+
+enum{
+    // flags going to packet[13] (H501S)
+    FLAG_H501_SNAPSHOT  = 0x01,
+    FLAG_H501_HEADLESS2 = 0x02,
+    FLAG_H501_ALT_HOLD  = 0x08,
 };
 
 #define VTX_STEP_SIZE "5"
@@ -302,7 +323,7 @@ static void hubsan_build_packet()
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     
-    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) { // H107/L/C/D, H102D
         if(packet_count < 100) {
             packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
             packet_count++;
@@ -322,14 +343,18 @@ static void hubsan_build_packet()
         packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
         packet[5] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
         packet[7] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
-        if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+        if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) { // H501S
             packet[9] = 0x02
-                      | GET_FLAG(CHANNEL_LED, FLAG_LED);
-            
-            
-            
+                      | GET_FLAG(CHANNEL_LED, FLAG_H501_LED)
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_H501_VIDEO)
+                      | GET_FLAG(CHANNEL_RTH, FLAG_H501_RTH)
+                      | GET_FLAG(CHANNEL_GPS_HOLD, FLAG_H501_GPS_HOLD)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS1);
+            packet[13] = GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS2)
+                       | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
+                       | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
         }
-        else {
+        else { // H107P/C+/D+
             packet[9] = 0x06
                       | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
                       | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
@@ -582,8 +607,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)9L; // A, E, T, R, Leds, Flips, Snapshot, Video Recording, Headless
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
+        case PROTOCMD_NUMCHAN: return (void *)11L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
