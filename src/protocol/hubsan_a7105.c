@@ -335,16 +335,15 @@ static void hubsan_build_packet()
                    | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
                    | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
         h501_packet++;
-        packet_count++;
-        if(h501_packet % 20 == 0) {
-            memset(packet, 0, 16);
-            packet[0] = 0xe9;
-        }
-        else if(h501_packet % 10 == 0) {
+        if(h501_packet == 10) {
             memset(packet, 0, 16);
             packet[0] = 0xe8;
         }
-        else if(h501_packet % 103 == 0) { 
+        else if(h501_packet == 20) {
+            memset(packet, 0, 16);
+            packet[0] = 0xe9;
+        }
+        else if(h501_packet == 29) { 
             packet_count = 100; // keep vTX frequency in synch
         } 
     }
