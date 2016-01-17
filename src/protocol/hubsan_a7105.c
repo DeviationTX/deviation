@@ -335,15 +335,18 @@ static void hubsan_build_packet()
                    | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
                    | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
         h501_packet++;
-        if(h501_packet == 10) {
-            memset(packet, 0, 16);
-            packet[0] = 0xe8;
-        }
-        else if(h501_packet == 20) {
+        packet_count++;
+        if(h501_packet % 20 == 0) {
             memset(packet, 0, 16);
             packet[0] = 0xe9;
         }
-        if(h501_packet >= 20) h501_packet = 0;
+        else if(h501_packet % 10 == 0) {
+            memset(packet, 0, 16);
+            packet[0] = 0xe8;
+        }
+        if(h501_packet % 103 == 0) { 
+            packet_count = 100; // keep vTX frequency in synch
+        } 
     }
     else if(id_data == ID_NORMAL) { // H107/L/C/D, H102D
         if(packet_count < 100) {
