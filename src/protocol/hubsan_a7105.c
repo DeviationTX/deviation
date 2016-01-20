@@ -323,31 +323,7 @@ static void hubsan_build_packet()
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     
-    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) { // H501S
-        packet[9] = 0x02
-                  | GET_FLAG(CHANNEL_LED, FLAG_H501_LED)
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_H501_VIDEO)
-                  | GET_FLAG(CHANNEL_RTH, FLAG_H501_RTH)
-                  | GET_FLAG(CHANNEL_GPS_HOLD, FLAG_H501_GPS_HOLD)
-                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS1);
-        packet[10] = 0x1a; // 0x19 sometimes, seems to be ignored by rx
-        packet[13] = GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS2)
-                   | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
-                   | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
-        h501_packet++;
-        if(h501_packet == 10) {
-            memset(packet, 0, 16);
-            packet[0] = 0xe8;
-        }
-        else if(h501_packet == 20) {
-            memset(packet, 0, 16);
-            packet[0] = 0xe9;
-        }
-        else if(h501_packet == 22) { 
-            packet_count = 100; // keep vTX frequency in synch
-        } 
-    }
-    else if(id_data == ID_NORMAL) { // H107/L/C/D, H102D
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) { // H107/L/C/D, H102D
         if(packet_count < 100) {
             packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
             packet_count++;
@@ -363,18 +339,31 @@ static void hubsan_build_packet()
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(id_data == ID_PLUS) { // H107P/C+/D+
-        packet[3] = 0x64;
-        packet[5] = 0x64;
-        packet[7] = 0x64;
-        packet[9] = 0x06
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
-                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-        packet[10]= 0x19;
-        packet[12]= 0x5C; // ghost channel ?
-        packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
-                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
-        packet[14]= 0x49; // ghost channel ?
+    else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+        packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[5] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[7] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) { // H501S
+            packet[9] = 0x02
+                      | GET_FLAG(CHANNEL_LED, FLAG_H501_LED)
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_H501_VIDEO)
+                      | GET_FLAG(CHANNEL_RTH, FLAG_H501_RTH)
+                      | GET_FLAG(CHANNEL_GPS_HOLD, FLAG_H501_GPS_HOLD)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS1);
+            packet[13] = GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS2)
+                       | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
+                       | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
+        }
+        else { // H107P/C+/D+
+            packet[9] = 0x06
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+            packet[10]= Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x1a : 0x19;
+            packet[12]= 0x5C; // ghost channel ?
+            packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                       | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
+            packet[14]= 0x49; // ghost channel ?
+        }
         if(packet_count < 100) { // set channels to neutral for first 100 packets
             packet[2] = 0x80; // throttle neutral is at mid stick on plus series
             packet[4] = 0x80;
@@ -383,6 +372,18 @@ static void hubsan_build_packet()
             packet[9] = 0x06;
             packet[13]= 0x00;
             packet_count++;
+        }
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+            h501_packet++;
+            if(h501_packet == 10) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe8;
+            }
+            else if(h501_packet == 20) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe9;
+            }
+            if(h501_packet >= 20) h501_packet = 0;
         }
     }
     update_crc();
