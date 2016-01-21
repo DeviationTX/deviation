@@ -315,6 +315,9 @@ void CONFIG_LoadTx()
 #if HAS_EXTRA_SWITCHES
     CHAN_SetSwitchCfg("");
 #endif
+#if HAS_EXTRA_BUTTONS
+    CHAN_SetButtonCfg("");
+#endif
     MCU_InitModules();
     CONFIG_LoadHardware();
     CONFIG_IniParse("tx.ini", ini_handler, (void *)&Transmitter);

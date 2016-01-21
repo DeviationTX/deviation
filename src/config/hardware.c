@@ -20,7 +20,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if HAS_EXTRA_SWITCHES
 const char SWITCH_CFG[] = "extra-switches";
+#endif
+#if HAS_EXTRA_BUTTONS
+const char BUTTON_CFG[] = "extra-buttons";
+#endif
 const char HAPTIC_ENABLE[] = "enable-haptic";
 /* Section: TX Module */
 static const char SECTION_MODULES[] = "modules";
@@ -55,6 +60,11 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 #if HAS_EXTRA_SWITCHES
         if (MATCH_KEY(SWITCH_CFG)) {
             CHAN_SetSwitchCfg(value);
+        }
+#endif
+#if HAS_EXTRA_BUTTONS
+        if (MATCH_KEY(BUTTON_CFG)) {
+            CHAN_SetButtonCfg(value);
         }
 #endif
 #if HAS_VIBRATINGMOTOR == OPTIONAL

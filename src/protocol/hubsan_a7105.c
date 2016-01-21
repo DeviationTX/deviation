@@ -36,13 +36,41 @@
 #endif
 #ifdef PROTO_HAS_A7105
 
-#define TELEM_ON 0
-#define TELEM_OFF 1
+// For code readability
+enum {
+    CHANNEL1 = 0, // Aileron
+    CHANNEL2,     // Elevator
+    CHANNEL3,     // Throttle
+    CHANNEL4,     // Rudder
+    CHANNEL5,     // Leds
+    CHANNEL6,     // Flip
+    CHANNEL7,     // Still camera
+    CHANNEL8,     // Video camera
+    CHANNEL9,     // Headless
+};
+
+#define CHANNEL_LED         CHANNEL5
+#define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_SNAPSHOT    CHANNEL7
+#define CHANNEL_VIDEO       CHANNEL8
+#define CHANNEL_HEADLESS    CHANNEL9
 
 enum{
+    // flags going to packet[9] (Normal)
     FLAG_VIDEO= 0x01,   // record video
     FLAG_FLIP = 0x08,   // enable flips
     FLAG_LED  = 0x04    // enable LEDs
+};
+
+enum{
+    // flags going to packet[9] (Plus series)
+    FLAG_HEADLESS = 0x08, // headless mode
+};
+
+enum{
+    // flags going to packet[13] (Plus series)
+    FLAG_SNAPSHOT  = 0x01,
+    FLAG_FLIP_PLUS = 0x80,
 };
 
 #define VTX_STEP_SIZE "5"
@@ -54,19 +82,31 @@ static const char * const hubsan4_opts[] = {
 };
 
 enum {
-    PROTOOPTS_VTX_FREQ = 0,
+    PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
+enum {
+    TELEM_ON = 0,
+    TELEM_OFF,
+};
+
+#define ID_NORMAL 0x55201041
+#define ID_PLUS   0xAA201041
+
 static u8 packet[16];
 static u8 channel;
+static s16 vtx_freq;
 static const u8 allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};
 static u32 sessionid;
 static const u32 txid = 0xdb042679;
 static u8 state;
 static u8 packet_count;
+static u8 bind_count;
+static u32 id_data;
+
 enum {
     BIND_1,
     BIND_2,
@@ -89,9 +129,8 @@ static int hubsan_init()
     u8 if_calibration1;
     u8 vco_calibration0;
     u8 vco_calibration1;
-    //u8 vco_current;
-
-    A7105_WriteID(0x55201041);
+    
+    A7105_WriteID(ID_NORMAL);
     A7105_WriteReg(A7105_01_MODE_CONTROL, 0x63);
     A7105_WriteReg(A7105_03_FIFOI, 0x0f);
     A7105_WriteReg(A7105_0D_CLOCK, 0x05);
@@ -186,23 +225,38 @@ static void update_crc()
         sum += packet[i];
     packet[15] = (256 - (sum % 256)) & 0xff;
 }
-static void hubsan_build_bind_packet(u8 state)
+static void hubsan_build_bind_packet(u8 bind_state)
 {
-    packet[0] = state;
+    static u8 handshake_counter;
+    if(state < BIND_7)
+        handshake_counter = 0;
+    memset(packet, 0, 16);
+    packet[0] = bind_state;
     packet[1] = channel;
     packet[2] = (sessionid >> 24) & 0xff;
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
-    packet[6] = 0x08;
-    packet[7] = 0xe4; //???
-    packet[8] = 0xea;
-    packet[9] = 0x9e;
-    packet[10] = 0x50;
-    packet[11] = (txid >> 24) & 0xff;
-    packet[12] = (txid >> 16) & 0xff;
-    packet[13] = (txid >>  8) & 0xff;
-    packet[14] = (txid >>  0) & 0xff;
+    if(id_data == ID_NORMAL) {
+        packet[6] = 0x08;
+        packet[7] = 0xe4; //???
+        packet[8] = 0xea;
+        packet[9] = 0x9e;
+        packet[10] = 0x50;
+        packet[11] = (txid >> 24) & 0xff;
+        packet[12] = (txid >> 16) & 0xff;
+        packet[13] = (txid >>  8) & 0xff;
+        packet[14] = (txid >>  0) & 0xff;
+    }
+    else if(id_data == ID_PLUS) {
+        if(state >= BIND_3) {
+            packet[7] = 0x62;
+            packet[8] = 0x16;
+        }
+        if(state == BIND_7) {
+            packet[2] = handshake_counter++;
+        }
+    }
     update_crc();
 }
 
@@ -216,50 +270,64 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
     return value;
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+
 static void hubsan_build_packet()
 {
-    static s16 vtx_freq = 0; 
     memset(packet, 0, 16);
-    if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) // set vTX frequency (H107D)
-    {
+    if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) { // set vTX frequency
         vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
-        packet[0] = 0x40;
+        packet[0] = 0x40; // vtx data packet
         packet[1] = (vtx_freq >> 8) & 0xff;
         packet[2] = vtx_freq & 0xff;
         packet[3] = 0x82;
         packet_count++;      
-    }
-    else //20 00 00 00 80 00 7d 00 84 02 64 db 04 26 79 7b
-    {
-        packet[0] = 0x20;
+    } else {
+        packet[0] = 0x20; // normal data packet
         packet[2] = get_channel(2, 0x80, 0x80, 0x80); //Throttle
     }
     packet[4] = 0xff - get_channel(3, 0x80, 0x80, 0x80); //Rudder is reversed
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
-    if(packet_count < 100)
-    {
-        packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
-        packet_count++;
+    
+    if(id_data == ID_NORMAL) {
+        if(packet_count < 100) {
+            packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
+            packet_count++;
+        } else {
+            packet[9] = 0x02
+                      | GET_FLAG(CHANNEL_LED, FLAG_LED)
+                      | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO); // H102D
+        }
+        packet[10] = 0x64;
+        packet[11] = (txid >> 24) & 0xff;
+        packet[12] = (txid >> 16) & 0xff;
+        packet[13] = (txid >>  8) & 0xff;
+        packet[14] = (txid >>  0) & 0xff;
     }
-    else
-    {
-        packet[9] = 0x02;
-        // Channel 5
-        if(Channels[4] >= 0)
-            packet[9] |= FLAG_LED;
-        // Channel 6
-        if(Channels[5] >= 0)
-            packet[9] |= FLAG_FLIP;
-        // Channel 7
-        if(Channels[6] >0) // off by default
-            packet[9] |= FLAG_VIDEO;
+    else if(id_data == ID_PLUS) {
+        packet[3] = 0x64;
+        packet[5] = 0x64;
+        packet[7] = 0x64;
+        packet[9] = 0x06
+                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+        packet[10]= 0x19;
+        packet[12]= 0x5C; // ghost channel ?
+        packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
+        packet[14]= 0x49; // ghost channel ?
+        if(packet_count < 100) { // set channels to neutral for first 100 packets
+            packet[2] = 0x80; // throttle neutral is at mid stick on plus series
+            packet[4] = 0x80;
+            packet[6] = 0x80;
+            packet[8] = 0x80;
+            packet[9] = 0x06;
+            packet[13]= 0x00;
+            packet_count++;
+        }
     }
-    packet[10] = 0x64;
-    packet[11] = (txid >> 24) & 0xff;
-    packet[12] = (txid >> 16) & 0xff;
-    packet[13] = (txid >>  8) & 0xff;
-    packet[14] = (txid >>  0) & 0xff;
     update_crc();
 }
 
@@ -295,6 +363,15 @@ static u16 hubsan_cb()
     int i;
     switch(state) {
     case BIND_1:
+        bind_count++;
+        if(bind_count == 20) {
+            if(id_data == ID_NORMAL)
+                id_data = ID_PLUS;
+            else
+                id_data = ID_NORMAL;
+            A7105_WriteID(id_data);    
+            bind_count = 0;
+        }
     case BIND_3:
     case BIND_5:
     case BIND_7:
@@ -317,6 +394,14 @@ static u16 hubsan_cb()
         A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
+        if(id_data == ID_PLUS) {
+            if(state == BIND_7 && packet[2] == 9) {
+                state = DATA_1;
+                A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
+                PROTOCOL_SetBindState(0);
+                return 4500;
+            }
+        }
         state++;
         return 4500; //7.5msec elapsed since last write
     case BIND_2:
@@ -340,7 +425,7 @@ static u16 hubsan_cb()
             return 15000; //22.5msec elapsed since last write
         }
         A7105_ReadData(packet, 16);
-        if(packet[1] == 9) {
+        if(packet[1] == 9 && id_data == ID_NORMAL) {
             state = DATA_1;
             A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
             PROTOCOL_SetBindState(0);
@@ -360,7 +445,7 @@ static u16 hubsan_cb()
                 A7105_SetPower( Model.tx_power); //Keep transmit power in sync
             hubsan_build_packet();
             A7105_Strobe(A7105_STANDBY);
-            A7105_WriteData( packet, 16, state == DATA_5 ? channel + 0x23 : channel);
+            A7105_WriteData( packet, 16, state == DATA_5 && id_data == ID_NORMAL ? channel + 0x23 : channel);
             if (state == DATA_5)
                 state = DATA_1;
             else
@@ -414,7 +499,10 @@ static void initialize() {
     channel = allowed_ch[rand32_r(0, 0) % sizeof(allowed_ch)];
     PROTOCOL_SetBindState(0xFFFFFFFF);
     state = BIND_1;
+    vtx_freq = 0;
     packet_count=0;
+    bind_count = 0;
+    id_data = ID_NORMAL;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
     if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
@@ -432,8 +520,8 @@ const void *HUBSAN_Cmds(enum ProtoCmds cmd)
             return (void *)(A7105_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)7L; // A, E, T, R, Leds, Flips, Video Recording
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)7L;
+        case PROTOCMD_NUMCHAN: return (void *)9L; // A, E, T, R, Leds, Flips, Snapshot, Video Recording, Headless
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
