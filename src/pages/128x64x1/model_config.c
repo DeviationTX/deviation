@@ -208,6 +208,14 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
         label = _tr_noop("Video Channel");
         ts = set_videoch_cb;
         break;
+    case 2:
+        label = _tr_noop("Contrast");
+        ts = set_videocontrast_cb;
+        break;
+    case 3:
+        label = _tr_noop("Brightness");
+        ts = set_videobrightness_cb;
+        break;
     }
     GUI_CreateLabelBox(&gui->label[relrow], LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr(label));
@@ -222,7 +230,7 @@ void MODELVIDEO_Config()
     PAGE_SetActionCB(_action_cb);
     show_titlerow(_tr("Video"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, 2, row4_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 

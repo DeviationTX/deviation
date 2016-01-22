@@ -25,7 +25,7 @@ struct TouchCalibration {
 
 struct mcu_pin {
     u32 port;
-    u16 pin;
+    u32 pin; //This only needs to be u16, but we need the struct to be word-aligned
 };
 
 enum ExtraHardware {
@@ -41,29 +41,32 @@ enum ExtraHardware {
 struct Transmitter {
     u8 current_model;
     u8 language;
-    u8 brightness;
+    u8 backlight;
     u8 contrast;
     u8 telem;
     u8 music_shutdown;
     u8 extra_hardware;
     enum Mode mode;
     u16 batt_alarm;
-    u8 power_alarm;
     u16 batt_critical;
     u16 batt_warning_interval;
+    u8 power_alarm;
     u8 splash_delay;
     u8 volume;
+    u8 module_poweramp;
     u8 vibration_state; // for future vibration on/off support
+    u8 padding_1[1];
 #if HAS_RTC
     u8 rtcflags;    // bit0: clock12hr, bit1-3: time format, bit4-7 date format (see pages/320x240x16/rtc_config.c)
 #endif
+    
     #ifdef HAS_MORE_THAN_32_INPUTS
         u64 ignore_src;
     #else
         u32 ignore_src;
     #endif
+    u32 ignore_buttons;
     struct mcu_pin module_enable[TX_MODULE_LAST];
-    u8 module_poweramp;
     u32 txid;
     struct StickCalibration calibration[INP_HAS_CALIBRATION];
     struct TouchCalibration touch;

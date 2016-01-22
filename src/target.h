@@ -83,6 +83,8 @@ void LCD_ShowVideo(u8 enable);
 
 void VIDEO_SetChannel(int ch);
 void VIDEO_Enable(int on);
+void VIDEO_Contrast(int contrast);
+void VIDEO_Brightness(int brightness);
 /* Touchscreen */
 struct touch {
     u16 x;
@@ -141,6 +143,7 @@ void CHAN_Init();
 s32  CHAN_ReadInput(int channel);
 s32  CHAN_ReadRawInput(int channel);
 extern void CHAN_SetSwitchCfg(const char *str);
+extern void CHAN_SetButtonCfg(const char *str);
 #define CHAN_ButtonIsPressed(buttons, btn) (buttons & (CHAN_ButtonMask(btn)))
 
 /* SPI Flash */

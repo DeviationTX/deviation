@@ -37,6 +37,7 @@ extern int disk_writep (const u8*, u32);
 
 #define MEMORY_DUMP BACKTRACE
 extern unsigned _stack; //Defined in devo.ld
+extern u8 _drive_num;
 
 /*
     asm(
@@ -115,8 +116,10 @@ void fault_handler_c (unsigned int * hardfault_args, unsigned int fault_type)
   stacked_pc = ((unsigned long) hardfault_args[6]);
   stacked_psr = ((unsigned long) hardfault_args[7]);
 
-  if(debug_addr)
+  if(debug_addr) {
+      _drive_num = 0;
       disk_writep(0, debug_addr);
+  }
   if (fault_type) {
       fault_printf ("\n\n[Soft fault]", NO_VALUE);
   } else {

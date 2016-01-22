@@ -63,8 +63,3 @@ void BACKLIGHT_Brightness(unsigned brightness)
     }
 }
 
-void LCD_Contrast(unsigned contrast)
-{
-    (void)contrast; // dummy method for devo8. Only valid in devo10 now
-}
-

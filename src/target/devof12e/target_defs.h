@@ -25,6 +25,7 @@
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
+#define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1
@@ -32,19 +33,21 @@
 #define HAS_SCANNER         0
 #define HAS_LAYOUT_EDITOR   0
 #define HAS_EXTRA_SWITCHES  0
+#define HAS_EXTRA_BUTTONS  0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_MAPPED_GFX      1
 #define USE_PBM_IMAGE       1
 #define HAS_CHAR_ICONS      1
 #define HAS_VIDEO           32
+#define HAS_EXTRA_SCREEN_TUNING 1
 
 #define NO_LANGUAGE_SUPPORT 1
 
 #define DEBUG_WINDOW_SIZE 0
 #define MIN_BRIGHTNESS 0
-#define DEFAULT_BATTERY_ALARM 4100
+#define DEFAULT_BATTERY_ALARM 9600
 #define DEFAULT_BATTERY_CRITICAL 3900
-#define MAX_BATTERY_ALARM 6000
+#define MAX_BATTERY_ALARM 12000
 #define MIN_BATTERY_ALARM 3300
 #define MAX_POWER_ALARM 60
 
@@ -58,9 +61,9 @@
 
 #define INP_HAS_CALIBRATION 8
 
-/* Compute voltage from y = 2.1592x + 0.2493 */
-#define VOLTAGE_NUMERATOR 216
-#define VOLTAGE_OFFSET    249
+/* Compute voltage from y = 3.261x + 507 */
+#define VOLTAGE_NUMERATOR 326
+#define VOLTAGE_OFFSET    507
 
 #endif //_DEVO7E_TARGET_H_
 

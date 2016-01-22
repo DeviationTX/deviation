@@ -657,3 +657,24 @@ void TW8816_UnmapWindow(unsigned i)
     LCD_WriteReg(0x9f, 0x00);
     TW8816_SetWindow(window);
 }
+
+void TW8816_Contrast(unsigned contrast)
+{
+    LCD_WriteReg(0x11, contrast);
+}
+void TW8816_Brightness(int brightness)
+{
+    LCD_WriteReg(0x10, brightness);
+}
+void TW8816_Sharpness(unsigned sharpness)
+{
+    int s = LCD_ReadReg(0x12);
+    s = (s & ~0x0f) | sharpness;
+    LCD_WriteReg(0x12, s);
+}
+
+void TW8816_Chroma(unsigned chromau, unsigned chromav)
+{
+    LCD_WriteReg(0x13, chromau);
+    LCD_WriteReg(0x14, chromav);
+}

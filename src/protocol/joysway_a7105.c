@@ -15,7 +15,7 @@
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define FLYSKY_Cmds PROTO_Cmds
+  #define JOYSWAY_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 

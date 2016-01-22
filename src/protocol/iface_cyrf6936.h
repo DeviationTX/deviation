@@ -27,7 +27,7 @@ enum {
     CYRF_17_TX_CRC_LSB     = 0x17,
     CYRF_18_TX_CRC_MSB     = 0x18,
     CYRF_19_RX_CRC_LSB     = 0x19,
-    CYRF_20_RX_CRC_MSB     = 0x1A,
+    CYRF_1A_RX_CRC_MSB     = 0x1A,
     CYRF_1B_TX_OFFSET_LSB  = 0x1B,
     CYRF_1C_TX_OFFSET_MSB  = 0x1C,
     CYRF_1D_MODE_OVERRIDE  = 0x1D,
@@ -69,7 +69,7 @@ void CYRF_StartReceive();
 void CYRF_ConfigSOPCode(const u8 *sopcodes);
 void CYRF_ConfigDataCode(const u8 *datacodes, u8 len);
 u8 CYRF_ReadRSSI(u32 dodummyread);
-void CYRF_ReadDataPacket(u8 dpbuffer[]); 
+void CYRF_ReadDataPacketLen(u8 dpbuffer[], u8 length); 
 void CYRF_WriteDataPacket(const u8 dpbuffer[]);
 void CYRF_WriteDataPacketLen(const u8 dpbuffer[], u8 len);
 void CYRF_WriteRegister(u8 address, u8 data);
