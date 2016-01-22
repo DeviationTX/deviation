@@ -57,10 +57,20 @@
 #define PACKET_SIZE        12
 #define RF_BIND_CHANNEL    0
 
+static const char * const hontai_opts[] = {
+  _tr_noop("Format"), "Hontai", "JJRCX1", NULL,
+  NULL
+};
 enum {
+    PROTOOPTS_FORMAT = 0,
     LAST_PROTO_OPT,
 };
+enum {
+    FORMAT_HONTAI = 0,
+    FORMAT_JJRCX1,
+};
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
 
 
 // For code readability
@@ -78,6 +88,7 @@ enum {
     CHANNEL11,    // Calibrate
 };
 #define CHANNEL_LED         CHANNEL5
+#define CHANNEL_ARM         CHANNEL5    // for JJRC X1
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_PICTURE     CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
@@ -106,7 +117,8 @@ static u8 tx_power;
 static u8 txid[5];
 static u8 rf_chan = 0; 
 static u16 counter;
-static const u8 rf_channels[] = {0x05, 0x19, 0x28}; 
+static const u8 rf_channels[][3] = {{0x05, 0x19, 0x28},     // Hontai
+                                    {0x0a, 0x1e, 0x2d}};    // JJRC X1
 static const u8 rx_tx_addr[] = {0xd2, 0xb5, 0x99, 0xb3, 0x4a};
 static const u8 addr_vals[4][16] = {
                     {0x24, 0x26, 0x2a, 0x2c, 0x32, 0x34, 0x36, 0x4a,
@@ -117,9 +129,6 @@ static const u8 addr_vals[4][16] = {
                      0xb3, 0xb5, 0xc9, 0xcb, 0xcd, 0xd3, 0xd5, 0xd9},
                     {0x25, 0x29, 0x2b, 0x2d, 0x33, 0x35, 0x49, 0x4b,
                      0x4d, 0x59, 0x5b, 0x65, 0x69, 0x6b, 0x6d, 0x6e}};
-
-
-#define TX_ADDRESS_LENGTH  sizeof(rx_tx_addr)
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -177,36 +186,57 @@ static void send_packet(u8 bind)
       memcpy(packet, txid, 5);
       memset(&packet[5], 0, 3);
     } else {
-      packet[0] = 0x0b;
+      if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+          packet[0] = 0x0b;
+      } else {
+          packet[0] = GET_FLAG(CHANNEL_ARM, 0x02);
+      }
       packet[1] = 0x00;
       packet[2] = 0x00;
       packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)    // throttle
                 | GET_FLAG(CHANNEL_PICTURE, 0x01);
-      packet[4] = scale_channel(CHANNEL1, 63, 0)            // aileron
-                | GET_FLAG(CHANNEL_RTH, 0x80)
-                | GET_FLAG(CHANNEL_HEADLESS, 0x40);
+      packet[4] = scale_channel(CHANNEL1, 63, 0);           // aileron
+      if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+          packet[4] |= GET_FLAG(CHANNEL_RTH, 0x80)
+                     | GET_FLAG(CHANNEL_HEADLESS, 0x40);
+      } else {
+          packet[4] |= 0x80;                                // not sure what this bit does
+      }
       packet[5] = scale_channel(CHANNEL2, 0, 63)            // elevator
                 | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
                 | GET_FLAG(CHANNEL_FLIP, 0x40);
       packet[6] = scale_channel(CHANNEL4, 0, 63)            // rudder
                 | GET_FLAG(CHANNEL_VIDEO, 0x80);
       packet[7] = scale_channel(CHANNEL1, -16, 16);         // aileron trim
-      packet[8] = scale_channel(CHANNEL4, -16, 16);         // rudder trim
+      if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+          packet[8] = scale_channel(CHANNEL4, -16, 16);         // rudder trim
+      } else {
+          packet[8] = 0xc0    // always in expert mode
+                    | GET_FLAG(CHANNEL_RTH, 0x02)
+                    | GET_FLAG(CHANNEL_HEADLESS, 0x01);
+      }
       packet[9] = scale_channel(CHANNEL2, -16, 16);         // elevator trim
     }
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
     // Power on, TX mode, 2byte CRC
-    // Why CRC0? xn297 does not interpret it - either 16-bit CRC or nothing
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    } else {
+        NRF24L01_SetTxRxMode(TX_EN);
+    }
 
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[rf_chan++]);
-    rf_chan %= sizeof(rf_channels);
+    NRF24L01_WriteReg(NRF24L01_05_RF_CH, bind ? RF_BIND_CHANNEL : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan++]);
+    rf_chan %= sizeof(rf_channels[0]);
 
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
 
-    XN297_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        XN297_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
+    } else {
+        NRF24L01_WritePayload(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
+    }
 
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
@@ -219,7 +249,7 @@ static void send_packet(u8 bind)
     }
 
 #ifdef EMULATOR
-    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[rf_chan], bind, packet[0]);
+    dbgprintf("next chan 0x%02x, bind %d, data %02x", bind ? RF_BIND_CHANNEL : rf_channels[Model.proto_opts[PROTOOPTS_FORMAT]][rf_chan], bind, packet[0]);
     for(int i=1; i < (bind ? BIND_PACKET_SIZE : PACKET_SIZE); i++) dbgprintf(" %02x", packet[i]);
     dbgprintf("\n");
 #endif
@@ -237,19 +267,29 @@ static void ht_init()
     // NRF24L01_WriteRegisterMulti(0x3e, "\xc9\x9a\xb0,\x61,\xbb,\xab,\x9c", 7); 
     // NRF24L01_WriteRegisterMulti(0x39, "\x0b\xdf\xc4,\xa7,\x03,\xab,\x9c", 7); 
 
-    XN297_SetTXAddr(rx_tx_addr, TX_ADDRESS_LENGTH);
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        XN297_SetTXAddr(rx_tx_addr, sizeof(rx_tx_addr));
+    } else {
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, rx_tx_addr, sizeof(rx_tx_addr));
+    }
 
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
-    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
-    NRF24L01_Activate(0x73);                          // Activate feature register
-    NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
-    NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
-    NRF24L01_Activate(0x73);
+    NRF24L01_Activate(0x73);                              // Activate feature register
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);  // no retransmits
+        NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
+        NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
+        NRF24L01_Activate(0x73);                          // Deactivate feature register
+    } else {
+        NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0xff);  // JJRC uses dynamic payload length
+        NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x3f);       // match other stock settings even though AA disabled...
+        NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x07);
+    }
 
     // Check for Beken BK2421/BK2423 chip
     // It is done by using Beken specific activate code, 0x53
@@ -289,7 +329,12 @@ static void ht_init2()
     data_tx_addr[1] = addr_vals[1][(txid[3] >> 4) & 0x0f];
     data_tx_addr[2] = addr_vals[2][ txid[4]       & 0x0f];
     data_tx_addr[3] = addr_vals[3][(txid[4] >> 4) & 0x0f];
-    XN297_SetTXAddr(data_tx_addr, TX_ADDRESS_LENGTH);
+
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        XN297_SetTXAddr(data_tx_addr, sizeof(data_tx_addr));
+    } else {
+        NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR, data_tx_addr, sizeof(data_tx_addr));
+    }
 }
 
 MODULE_CALLTYPE
@@ -342,9 +387,15 @@ static void initialize_txid()
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
-    txid[0] = 0x4c; // first three bytes ignored by receiver - set same as stock tx
-    txid[1] = 0x4b;
-    txid[2] = 0x3a;
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        txid[0] = 0x4c; // first three bytes some kind of model id? - set same as stock tx
+        txid[1] = 0x4b;
+        txid[2] = 0x3a;
+    } else {
+        txid[0] = 0x4b; // JJRC X1
+        txid[1] = 0x59;
+        txid[2] = 0x3a;
+    }
     txid[3] = (lfsr >> 8 ) & 0xff;
     txid[4] = lfsr & 0xff; 
 }
@@ -376,7 +427,7 @@ const void *HonTai_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 11L; // A, E, T, R, light, flip, photo, video, headless, RTH, calibrate
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return hontai_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
