@@ -68,6 +68,24 @@ static unsigned int ch_data[8];
 static u8 payload[10];
 static u8 counter1ms;
 
+static const char * const hisky_opts[] = {
+    _tr_noop("Format"),  _tr_noop("Air"), _tr_noop("Surface"), NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_FORMAT = 0,
+};
+
+enum {
+    PROTOOPTS_FORMAT_AIR = 0,
+    PROTOOPTS_FORMAT_SURFACE, // 3 channel RXs, HKR3000/3100, XY3000/3100 ...
+};
+
+enum {
+    STICKS = 0,
+    FAILSAFE,
+};
 
 // HiSky protocol uses TX id as an address for nRF24L01, and uses frequency hopping sequence
 // which does not depend on this id and is passed explicitly in binding sequence. So we are free
@@ -108,6 +126,16 @@ static void calc_fh_channels(u32 seed)
     }
 }
 
+// for HiSky surface protocol, the transmitter always generates hop channels in sequencial order. 
+// The transmitter only generates the first hop channel between 0 and 49. So the channel range is from 0 to 69.
+static void calc_surface_fh_channels(u32 seed)
+{
+    u8 idx = 0;
+    u8 chan = seed % 50;
+    while(idx < FREQUENCE_NUM) {
+        hopping_frequency[idx++] = chan++;
+    }
+}
 
 static void build_binding_packet(void)
 {
@@ -162,7 +190,10 @@ static void hisky_init()
     NRF24L01_WriteReg(NRF24L01_00_CONFIG,
             BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // 5-byte RX/TX address (byte -2)
-    NRF24L01_SetBitrate(0);                          // 1Mbps
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_SURFACE)
+        NRF24L01_SetBitrate(NRF24L01_BR_250K); // 250Kbps (works with nRF24L01+ only)
+    else
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);   // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
 
@@ -250,10 +281,74 @@ static void build_ch_data()
 #endif
 }
 
+// Stick values are sent as direct timer values for an 8051 timer with a 750 ns clock
+static u16 convert_surface_channel(u8 num)
+{
+    // -/+ 125% mixer scale = 1000-2000us
+    u16 val = ((s32)Channels[num] * 400 / CHAN_MAX_VALUE) + 1500;
+    return 0xffff-(4*val)/3;
+}
+
+static u16 convert_failsafe_channel(u8 num)
+{
+    // -/+ 125 failsafe value = 1000-2000us
+    u16 val = ((s32)Model.limits[num].failsafe + 125) * 4 + 1000;
+    return 0xffff-(4*val)/3;
+}
+
+static void build_surface_ch_data(u8 packet_type)
+{
+    u8 index=0;
+    u16 value;
+    if(packet_type == STICKS) {
+        for(u8 ch=0; ch<3; ch++) {
+            value = convert_surface_channel(ch);
+            payload[index++] = value & 0xff;
+            payload[index++] = value >> 8;
+        }
+        payload[7] = 0x55;
+        payload[8] = 0x67;
+    }
+    else if(packet_type == FAILSAFE) {
+        u8 failsafe_enabled = 0;
+        for(u8 ch=0; ch<3; ch++) {
+            if(Model.limits[ch].flags & CH_FAILSAFE_EN) {
+                failsafe_enabled = 1;
+                value = convert_failsafe_channel(ch);
+            }
+            else if(ch<2) {
+                value =  0xf82f; // 1500us
+            }
+            payload[index++] = value & 0xff;
+            payload[index++] = value >> 8;
+        }
+        payload[7] = 0xaa;
+        payload[8] = failsafe_enabled ? 0x5a : 0x5b;
+    }
+}
+
 MODULE_CALLTYPE
 static u16 hisky_cb()
 {
     counter1ms++;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_SURFACE) {
+        switch(counter1ms) {
+            case 1:
+                NRF24L01_SetPower(Model.tx_power);
+                counter1ms = 2;
+                break;
+            case 4:
+                counter1ms = 6;
+                break;
+            case 7:
+                if(hopping_frequency_no != 0)
+                    build_surface_ch_data(STICKS);
+                else
+                    build_surface_ch_data(FAILSAFE);
+                counter1ms = 8; // hops channel every 5ms
+                break;
+        }
+    }
     if(counter1ms==1)
         NRF24L01_FlushTx();
     else if(counter1ms==2) {
@@ -334,8 +429,12 @@ static void initialize_tx_id()
     // Use LFSR to seed frequency hopping sequence after another
     // divergence round
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-    calc_fh_channels(lfsr);
-
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_AIR) {
+        calc_fh_channels(lfsr);
+    }
+    else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_SURFACE) {
+        calc_surface_fh_channels(lfsr);
+    }
     printf("FH Seq: ");
     for (int i = 0; i < FREQUENCE_NUM; ++i) {
         printf("%d, ", hopping_frequency[i]);
@@ -375,6 +474,7 @@ const void *HiSky_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)7L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
+        case PROTOCMD_GETOPTIONS: return hisky_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
