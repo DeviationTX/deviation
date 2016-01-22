@@ -19,7 +19,8 @@
 #include "config/tx.h"
 #include "../common/devo/devo.h"
 
-const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {13, 12, 11, 15, 10, 4, 0, 8, 16, 14};
+//  ADC channels for AUX4,5,6 and 7 mapped as defined in Devo F12E manual
+const u8 adc_chan_sel[NUM_ADC_CHANNELS] =   {13, 12, 11, 15, 10, 8, 4, 0, 16, 14};
 
 void CHAN_Init()
 {
