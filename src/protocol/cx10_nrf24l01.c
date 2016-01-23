@@ -222,29 +222,26 @@ static void send_packet(u8 bind)
             break;
 
         case FORMAT_Q282:
-            packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
+        case FORMAT_Q242:
             packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
                        | GET_FLAG(CHANNEL_LED, 0x40)
-                       | GET_FLAG(CHANNEL_PICTURE, 0x10)
                        | GET_FLAG(CHANNEL_HEADLESS, 0x08)
-                       | GET_FLAG(CHANNEL_XCAL,     0x04)
-                       | GET_FLAG(CHANNEL_YCAL,     0x02)
-                       | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
-            memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
+                       | GET_FLAG(CHANNEL_XCAL, 0x04)
+                       | GET_FLAG(CHANNEL_YCAL, 0x02);
+
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
+                packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
+                packet[14] |= GET_FLAG(CHANNEL_PICTURE, 0x10)
+                            | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
+                memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
+            } else {
+                packet[13] = 0x02 | GET_FLAG(CHANNEL_RTH, 0x80);
+                packet[14] |= GET_FLAG(CHANNEL_PICTURE, 0x01)
+                            | GET_FLAG(CHANNEL_VIDEO, 0x10);
+                memcpy(&packet[15], "\x10\x10\x00\x00\x00\x00", 6);
+            }
             break;
 
-        case FORMAT_Q242:
-            packet[13] = GET_FLAG(CHANNEL_HEADLESS, 0x80);
-            packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
-                       | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                       | GET_FLAG(CHANNEL_RTH, 0x08)
-                       | GET_FLAG(CHANNEL_PICTURE, 0x01)
-                       | GET_FLAG(CHANNEL_LED, 0x40)
-                       | GET_FLAG(CHANNEL_XCAL,     0x04)
-                       | GET_FLAG(CHANNEL_YCAL,     0x02);
-            memcpy(&packet[15], "\x10\x10\x00\x00\x00\x00", 6);
-            break;
-            
         case FORMAT_DM007:
             packet[13] |= GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
             packet[14] = GET_FLAG(CHANNEL_PICTURE, FLAG_SNAPSHOT)
@@ -332,11 +329,7 @@ static void cx10_init()
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, packet_size); // bytes of data payload for rx pipe 1 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
     NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242) {
-        NRF24L01_SetBitrate(NRF24L01_BR_2M);             // 1Mbps
-    } else {
-        NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
-    }
+    NRF24L01_SetBitrate(NRF24L01_BR_1M);
     NRF24L01_SetPower(Model.tx_power);
     
     // this sequence necessary for module from stock tx
