@@ -67,7 +67,7 @@
 #define FLAG_SNAPSHOT   0x0004
 
 static const char * const cx10_opts[] = {
-    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", NULL, 
+    _tr_noop("Format"), _tr_noop("Green"), _tr_noop("Blue-A"), "DM007", "Q282", "JC3015-1", "JC3015-2", "MK33041", "Q242", NULL, 
     NULL
 };
 
@@ -84,6 +84,7 @@ enum {
     FORMAT_JC3015_1,
     FORMAT_JC3015_2,
     FORMAT_MK33041,
+    FORMAT_Q242,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -172,6 +173,7 @@ static void send_packet(u8 bind)
             aileron = 3000 - aileron;
             break;
         case FORMAT_Q282:
+        case FORMAT_Q242:
             aileron = 3000 - aileron;
             rudder = 3000 - rudder;
             break;
@@ -218,6 +220,7 @@ static void send_packet(u8 bind)
                 packet[13+offset] |= 0x10;
             packet[13+offset] |= GET_FLAG(CHANNEL_VIDEO, 0x08);
             break;
+
         case FORMAT_Q282:
             packet[13] = 0x03 | GET_FLAG(CHANNEL_RTH, 0x80);
             packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
@@ -229,6 +232,18 @@ static void send_packet(u8 bind)
                        | set_video(CHANNEL_VIDEO, packet[14] & 0x21);
             memcpy(&packet[15], "\x10\x10\xaa\xaa\x00\x00", 6);
             break;
+
+        case FORMAT_Q242:
+            packet[13] = GET_FLAG(CHANNEL_HEADLESS, 0x80);
+            packet[14] = GET_FLAG(CHANNEL_FLIP, 0x80)
+                       | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                       | GET_FLAG(CHANNEL_RTH, 0x08)
+                       | GET_FLAG(CHANNEL_PICTURE, 0x01)
+                       | GET_FLAG(CHANNEL_LED, 0x40)
+                       | GET_FLAG(CHANNEL_XCAL,     0x04)
+                       | GET_FLAG(CHANNEL_YCAL,     0x02);
+            memcpy(&packet[15], "\x10\x10\x00\x00\x00\x00", 6);
+            break;
             
         case FORMAT_DM007:
             packet[13] |= GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
@@ -238,7 +253,7 @@ static void send_packet(u8 bind)
             
         case FORMAT_JC3015_1:
             packet[14] = GET_FLAG(CHANNEL_PICTURE, BV(3))
-                    | GET_FLAG(CHANNEL_VIDEO, BV(4));
+                       | GET_FLAG(CHANNEL_VIDEO, BV(4));
             break;
             
         case FORMAT_JC3015_2:
@@ -251,9 +266,9 @@ static void send_packet(u8 bind)
         
         case FORMAT_MK33041:
             packet[13] |= GET_FLAG(CHANNEL_PICTURE, BV(7))
-                    | GET_FLAG(CHANNEL_RTH, BV(2));
+                        | GET_FLAG(CHANNEL_RTH, BV(2));
             packet[14] = GET_FLAG(CHANNEL_VIDEO, BV(0))
-                    | GET_FLAG(CHANNEL_HEADLESS, BV(5));
+                       | GET_FLAG(CHANNEL_HEADLESS, BV(5));
             break;
     }
     
@@ -317,7 +332,11 @@ static void cx10_init()
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, packet_size); // bytes of data payload for rx pipe 1 
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
     NRF24L01_WriteReg(NRF24L01_06_RF_SETUP, 0x07);
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242) {
+        NRF24L01_SetBitrate(NRF24L01_BR_2M);             // 1Mbps
+    } else {
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    }
     NRF24L01_SetPower(Model.tx_power);
     
     // this sequence necessary for module from stock tx
@@ -433,12 +452,19 @@ static void initialize_txid()
     txid[2] = (lfsr >> 8) & 0xFF;
     txid[3] = lfsr & 0xFF;
     // rf channels
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q282) {
+    switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+    case FORMAT_Q282:
+    case FORMAT_Q242:
         rf_chans[0] = 0x46;
         rf_chans[1] = 0x48;
         rf_chans[2] = 0x4a;
         rf_chans[3] = 0x4c;
-    } else {
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_Q242)
+            for (u8 i=0; i < 4; i++)
+                rf_chans[i] += 2;
+        break;
+
+    default:
         rf_chans[0] = 0x03 + (txid[0] & 0x0F);
         rf_chans[1] = 0x16 + (txid[0] >> 4);
         rf_chans[2] = 0x2D + (txid[1] & 0x0F);
@@ -453,7 +479,8 @@ static void initialize()
     packet_size = 0;
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
         case FORMAT_Q282:
-            packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // only difference in Q282 is packet size
+        case FORMAT_Q242:
+            packet_size = Q282_PACKET_SIZE - CX10_PACKET_SIZE;  // difference in packet size
         case FORMAT_CX10_GREEN:
         case FORMAT_DM007:
         case FORMAT_JC3015_1:
