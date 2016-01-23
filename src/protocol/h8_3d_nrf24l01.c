@@ -63,7 +63,7 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // 
+    CHANNEL5,     // LED Light
     CHANNEL6,     // Flip
     CHANNEL7,     // 
     CHANNEL8,     // 
@@ -71,6 +71,7 @@ enum {
     CHANNEL10,    // 180/360 flip mode (H8 3D), RTH (H20)
 };
 
+#define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_HEADLESS    CHANNEL9  // RTH + Headless on H8 3D
 #define CHANNEL_RTH         CHANNEL10 // 180/360 flip mode on H8 3D
@@ -86,6 +87,7 @@ enum {
     FLAG_FLIP     = 0x01,
     FLAG_RATE_MID = 0x02,
     FLAG_RATE_HIGH= 0x04,
+    FLAG_LED      = 0x08,
     FLAG_HEADLESS = 0x10, // RTH + headless on H8, headless on JJRC H20
     FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
@@ -157,6 +159,7 @@ static void send_packet(u8 bind)
         packet[15] = 0x20;
         packet[16] = 0x20;
         packet[17] = FLAG_RATE_HIGH
+                   | GET_FLAG( CHANNEL_LED, FLAG_LED)
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
