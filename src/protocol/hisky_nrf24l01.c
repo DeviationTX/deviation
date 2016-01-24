@@ -337,15 +337,19 @@ static u16 hisky_cb()
                 NRF24L01_SetPower(Model.tx_power);
                 counter1ms = 2;
                 break;
+            case 3:
+                if(!counter)
+                    NRF24L01_WritePayload(payload,10);
+                break;
             case 4:
-                counter1ms = 6;
+                counter1ms = 6; // hops channel every 5ms
                 break;
             case 7:
                 if(hopping_frequency_no != 0)
                     build_hk310_ch_data(STICKS);
                 else
                     build_hk310_ch_data(FAILSAFE);
-                counter1ms = 8; // hops channel every 5ms
+                counter1ms = 8; 
                 break;
         }
     }
