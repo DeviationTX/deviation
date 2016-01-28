@@ -50,7 +50,8 @@
 #define dbgprintf if(0) printf
 #endif
 
-#define PACKET_PERIOD    2625 // Timeout for callback in uSec
+#define PACKET_PERIOD_MT 2625 // Timeout for callback in uSec
+#define PACKET_PERIOD_YZ 3125 // Yi Zhan i6S
 #define INITIAL_WAIT     500
 #define PACKET_SIZE 9
 
@@ -70,30 +71,52 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // Rate (3 positions)
+    CHANNEL5,     // Light
     CHANNEL6,     // Flip flag
     CHANNEL7,     // Snapshot
     CHANNEL8,     // Video
-    CHANNEL9,
-    CHANNEL10,
-    CHANNEL11,    // Pitch trim
-    CHANNEL12,    // Roll trim
+    CHANNEL9,     // Headless
+};
+
+#define CHANNEL_FLIP     CHANNEL6
+#define CHANNEL_SNAPSHOT CHANNEL7
+#define CHANNEL_VIDEO    CHANNEL8
+
+enum{
+    // flags going to packet[6] (MT99xx, H7)
+    FLAG_MT_RATE1   = 0x01, // (H7 high rate)
+    FLAG_MT_RATE2   = 0x02, // (MT9916 only)
+    FLAG_MT_VIDEO   = 0x10,
+    FLAG_MT_SNAPSHOT= 0x20,
+    FLAG_MT_FLIP    = 0x80,
 };
 
 enum{
-    // flags going to packet[6]
-    // MT99XX_FLAG_RATE0, // default rate, no flag
-    FLAG_RATE1   = 0x01,
-    FLAG_RATE2   = 0x02, // (MT9916 only)
-    FLAG_VIDEO   = 0x10,
-    FLAG_SNAPSHOT= 0x20,
-    FLAG_FLIP    = 0x80,
+    // flags going to ?????? (Yi Zhan i6S)
+    BLABLA,
 };
 
 enum {
     MT99XX_INIT = 0,
     MT99XX_BIND,
     MT99XX_DATA
+};
+
+static const char * const mt99xx_opts[] = {
+    _tr_noop("Format"), "MT9916", "H7", "YZ i6S", NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_FORMAT = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum {
+    PROTOOPTS_FORMAT_MT99,
+    PROTOOPTS_FORMAT_H7,
+    PROTOOPTS_FORMAT_YZ,
 };
 
 static u8 packet[PACKET_SIZE];
@@ -105,15 +128,20 @@ static u8 channel_offset;
 static u8 rf_chan; 
 static u8 rx_tx_addr[5];
 static u8 state;
+static u32 packet_period;
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
 
-static s16 scale_channel(u8 ch, s32 destMin, s32 destMax)
+#define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
+static s16 scale_channel(u8 ch, s16 destMin, s16 destMax)
 {
-    s32 a = (destMax - destMin) * ((s32)Channels[ch] - CHAN_MIN_VALUE);
-    s32 b = CHAN_MAX_VALUE - CHAN_MIN_VALUE;
-    return ((a / b) - (destMax - destMin)) + destMax;
+    s32 chanval = Channels[ch];
+    s32 range = destMax - destMin;
+
+    if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
+    else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;
+    return (range * (chanval - CHAN_MIN_VALUE)) / CHAN_RANGE + destMin;
 }
 
 static u8 calcChecksum() {
@@ -123,44 +151,77 @@ static u8 calcChecksum() {
     return result & 0xFF;
 }
 
+#define GET_FLAG(ch, mask) (Channels[ch] > 0 ? mask : 0)
+
 static void mt99xx_send_packet()
 {
-    packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
-    packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
-    packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
-    packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
-    if(Model.num_channels >= 12) {
-        packet[4] = scale_channel(CHANNEL11,0x3f, 0x00); // pitch trim
-        packet[5] = scale_channel(CHANNEL12,0x00, 0x3f); // roll trim
-    } else {
-        packet[4] = 0x20;
-        packet[5] = 0x20;
-    }
-    packet[6] = 0x40; // flags, default on stock MT9916 TX
-    if (Channels[CHANNEL5] > 0) {
-        if (Channels[CHANNEL5] < CHAN_MAX_VALUE / 2)
-            packet[6] |= FLAG_RATE1; // mid rate
-        else
-            packet[6] |= FLAG_RATE2; // high rate
-    }
-    if( Channels[CHANNEL6] > 0 ) // flip flag
-        packet[6] |= FLAG_FLIP;
-    if( Channels[CHANNEL7] > 0 ) // snapshot
-        packet[6] |= FLAG_SNAPSHOT;
-    if( Channels[CHANNEL8] > 0 ) // video
-        packet[6] |= FLAG_VIDEO;
-    packet[7] = mys_byte[rf_chan];
-    packet[8] = calcChecksum();
+    const u8 yz_p4_seq[3] = {0xa0, 0x20, 0x60};
+    static u8 packet_count=0;
+    static u8 yz_seq_num=0;
     
+    switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case PROTOOPTS_FORMAT_MT99:
+        case PROTOOPTS_FORMAT_H7:
+            packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
+            packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
+            packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
+            packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
+            packet[4] = 0x20; // neutral pitch trim (0x3f-0x20-0x00)
+            packet[5] = 0x20; // neutral roll trim (0x00-0x20-0x3f)
+            packet[6] = GET_FLAG( CHANNEL_FLIP, FLAG_MT_FLIP)
+                      | GET_FLAG( CHANNEL_SNAPSHOT, FLAG_MT_SNAPSHOT)
+                      | GET_FLAG( CHANNEL_VIDEO, FLAG_MT_VIDEO);
+            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_MT99) {
+                packet[6] |= 0x40 | FLAG_MT_RATE2;
+            }
+            else {
+                packet[6] |= FLAG_MT_RATE1; // max rate on H7
+            }
+            // todo: mys_byte = next channel index ? 
+            // low nibble: index in chan list ?
+            // high nibble: 0->start from start of list, 1->start from end of list ?
+            packet[7] = mys_byte[rf_chan];
+            packet[8] = calcChecksum();
+            break;
+        case PROTOOPTS_FORMAT_YZ:
+            packet[0] = scale_channel(CHANNEL3, 0, 0x64); // throttle
+            packet[1] = scale_channel(CHANNEL4, 0, 0x64); // rudder
+            packet[2] = scale_channel(CHANNEL1, 0x64, 0); // aileron
+            packet[3] = scale_channel(CHANNEL2, 0, 0x64); // elevator
+            if(packet_count++ >= 23) {
+                yz_seq_num ++;
+                if(yz_seq_num > 2)
+                    yz_seq_num = 0;
+                packet_count=0;
+            }
+            packet[4]= yz_p4_seq[yz_seq_num]; 
+            
+            packet[5]= 0x02; // armed, expert ?
+                     
+            packet[6] = 0x80;    
+            u8 idx = PACKET_SIZE;
+            packet[7] = packet[0];
+            while(idx--) {
+                packet[7] += packet[idx]; // checksum
+            }
+            packet[8] = 0xff;
+            break;
+    }
+
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan] + channel_offset);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
     XN297_WritePayload(packet, PACKET_SIZE);
     
     rf_chan++;
-    if(rf_chan > 15)
-        rf_chan = 0;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ) {
+        rf_chan++; // skip every other channel
+    }
         
+    if(rf_chan > 15) {
+        rf_chan = 0;
+    }
+    
     // Check and adjust transmission power. We do this after
     // transmission to not bother with timeout after power
     // settings change -  we have plenty of time until next
@@ -186,7 +247,10 @@ static void mt99xx_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);  // 5 bytes address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);// no auto retransmit
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
+        NRF24L01_SetBitrate(NRF24L01_BR_250K);        // 250Kbps (nRF24L01+ only)
+    else
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);          // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     // this sequence necessary for module from stock tx
     NRF24L01_WriteReg(NRF24L01_1D_FEATURE, 0x00);
@@ -237,6 +301,9 @@ static void initialize_txid()
     }
     txid[0] = (temp >> 8) & 0xff;
     txid[1] = (temp >> 0) & 0xff;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ) {
+        txid[1] = 0x00;
+    }
     checksum_offset = (txid[0] + txid[1]) & 0xff;
     channel_offset = (((checksum_offset & 0xf0)>>4) + (checksum_offset & 0x0f)) % 8;
 }
@@ -276,7 +343,7 @@ static u16 mt99xx_callback()
         mt99xx_send_packet();
         break;
     }
-    return PACKET_PERIOD;
+    return packet_period;
 }
 
 static void initialize()
@@ -288,17 +355,30 @@ static void initialize()
     mt99xx_init();
     state = MT99XX_INIT;
     // bind packet
-    packet[0] = 0x20;
-    packet[1] = 0x14;
-    packet[2] = 0x03;
-    packet[3] = 0x25;
+    switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+        case PROTOOPTS_FORMAT_MT99:
+        case PROTOOPTS_FORMAT_H7:
+            packet_period = PACKET_PERIOD_MT;
+            packet[0] = 0x20;
+            packet[1] = 0x14;
+            packet[2] = 0x03;
+            packet[3] = 0x25;
+            break;
+        case PROTOOPTS_FORMAT_YZ:
+            packet_period = PACKET_PERIOD_YZ;
+            packet[0] = 0x20;
+            packet[1] = 0x15;
+            packet[2] = 0x05;
+            packet[3] = 0x06;
+            break;
+    }
     packet[4] = txid[0]; // 1th byte for data state tx address  
-    packet[5] = txid[1]; // 2th byte for data state tx address 
+    packet[5] = txid[1]; // 2th byte for data state tx address (always 0x00 on Yi Zhan ?)
     packet[6] = 0x00; // 3th byte for data state tx address (always 0x00 ?)
     packet[7] = checksum_offset; // checksum offset
     packet[8] = 0xAA; // fixed
     
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    PROTOCOL_SetBindState(BIND_COUNT * packet_period / 1000);
     CLOCK_StartTimer(INITIAL_WAIT, mt99xx_callback);
 }
 
@@ -312,10 +392,10 @@ const void *MT99XX_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 12L; // A, E, T, R, flip, rate, pitch trim (ch 11), roll trim (ch12)
+        case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, flip, , snapshot, video
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return 0;
+        case PROTOCMD_GETOPTIONS: return mt99xx_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
