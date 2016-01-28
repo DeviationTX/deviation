@@ -76,11 +76,15 @@ enum {
     CHANNEL7,     // Snapshot
     CHANNEL8,     // Video
     CHANNEL9,     // Headless
+    CHANNEL10,    // RTH
 };
 
+#define CHANNEL_LIGHT    CHANNEL5
 #define CHANNEL_FLIP     CHANNEL6
 #define CHANNEL_SNAPSHOT CHANNEL7
 #define CHANNEL_VIDEO    CHANNEL8
+#define CHANNEL_HEADLESS CHANNEL9
+#define CHANNEL_RTH      CHANNEL10
 
 enum{
     // flags going to packet[6] (MT99xx, H7)
@@ -196,14 +200,12 @@ static void mt99xx_send_packet()
             }
             packet[4]= yz_p4_seq[yz_seq_num]; 
             
-            packet[5]= 0x02; // armed, expert ?
+            packet[5]= 0x02; // expert ? (0=unarmed, 1=normal)
                      
-            packet[6] = 0x80;    
-            u8 idx = PACKET_SIZE;
-            packet[7] = packet[0];
-            while(idx--) {
-                packet[7] += packet[idx]; // checksum
-            }
+            packet[6] = 0x80;
+            packet[7] = packet[0];            
+            for(u8 idx = 1; idx < PACKET_SIZE-2; idx++)
+                packet[7] += packet[idx];
             packet[8] = 0xff;
             break;
     }
@@ -302,6 +304,7 @@ static void initialize_txid()
     txid[0] = (temp >> 8) & 0xff;
     txid[1] = (temp >> 0) & 0xff;
     if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ) {
+        txid[0] = 0x53; // test (SB id)
         txid[1] = 0x00;
     }
     checksum_offset = (txid[0] + txid[1]) & 0xff;
@@ -333,6 +336,8 @@ static u16 mt99xx_callback()
             NRF24L01_FlushTx();
             XN297_WritePayload(packet, PACKET_SIZE); // bind packet
             rf_chan++;
+            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
+                rf_chan++; // skip every other channel
             if(rf_chan > 15)
                 rf_chan = 0;
             bind_counter -= 1;
@@ -392,8 +397,8 @@ const void *MT99XX_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 8L; // A, E, T, R, flip, , snapshot, video
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
+        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, light, flip, snapshot, video, headless, rth
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return mt99xx_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
