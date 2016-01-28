@@ -30,10 +30,11 @@ PROTO_MODULES += $(ODIR)/protocol/bluefly.mod
 PROTO_MODULES += $(ODIR)/protocol/cx10.mod
 PROTO_MODULES += $(ODIR)/protocol/cg023.mod
 PROTO_MODULES += $(ODIR)/protocol/hontai.mod
-PROTO_MODULES += $(ODIR)/protocol/mt99xx.mod
 PROTO_MODULES += $(ODIR)/protocol/fy326.mod
 PROTO_MODULES += $(ODIR)/protocol/bayang.mod
 PROTO_MODULES += $(ODIR)/protocol/h8-3d.mod
+PROTO_MODULES += $(ODIR)/protocol/mjxq.mod
+PROTO_MODULES += $(ODIR)/protocol/mt99xx.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -157,10 +158,6 @@ $(ODIR)/protocol/hontai.mod : $(ODIR)/hontai_nrf24l01.bin
 	@echo Building 'hontai' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
 
-$(ODIR)/protocol/mt99xx.mod : $(ODIR)/mt99xx_nrf24l01.bin
-	@echo Building 'mt99xx' module
-	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
-
 $(ODIR)/protocol/fy326.mod : $(ODIR)/fy326_nrf24l01.bin
 	@echo Building 'fy326' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
@@ -172,5 +169,13 @@ $(ODIR)/protocol/bayang.mod : $(ODIR)/bayang_nrf24l01.bin
 $(ODIR)/protocol/h8-3d.mod : $(ODIR)/h8_3d_nrf24l01.bin
 	@echo Building 'h8-3d' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+    
+$(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
+	@echo Building 'mjxq' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/mt99xx.mod : $(ODIR)/mt99xx_nrf24l01.bin
+	@echo Building 'mt99xx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
 endif #BUILD_TARGET
