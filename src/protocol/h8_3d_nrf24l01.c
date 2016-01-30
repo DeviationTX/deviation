@@ -118,9 +118,32 @@ static u8 checksum()
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static s16 scale_channel(u8 ch, s16 destMin, s16 destMax)
+static s16 scale_channel(u8 ch)
 {
     s32 chanval = Channels[ch];
+    s16 destMin=0, destMax=0;
+    switch(ch) {
+        case CHANNEL1:
+        case CHANNEL2:
+            destMin = 0x43;
+            destMax = 0xbb;
+            break;
+        case CHANNEL3:
+            destMin = 0;
+            destMax = 0xff;
+            break;
+        case CHANNEL4:
+            if(chanval > 0) {
+                destMin = 0x44;
+                destMax = 0xbc;
+            }
+            else {
+                destMin = 0x3c;
+                destMax = -0x3c;
+            }
+            break;
+    }
+    
     s32 range = destMax - destMin;
 
     if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
@@ -146,13 +169,10 @@ static void send_packet(u8 bind)
         packet[5] = rf_chan;
         packet[6] = 0x08;
         packet[7] = 0x03;
-        packet[9] = scale_channel( CHANNEL3, 0, 0xff); // throttle
-        if( Channels[CHANNEL4] > 0)
-            packet[10] = scale_channel( CHANNEL4, 0x44, 0xbc); // rudder
-        else
-            packet[10] = scale_channel( CHANNEL4, 0x3c, -0x3c ); // rudder
-        packet[11]= scale_channel( CHANNEL2, 0x43, 0xbb); // elevator
-        packet[12]= scale_channel( CHANNEL1, 0x43, 0xbb); // aileron
+        packet[9] = scale_channel( CHANNEL3); // throttle
+        packet[10] = scale_channel( CHANNEL4); // rudder
+        packet[11]= scale_channel( CHANNEL2); // elevator
+        packet[12]= scale_channel( CHANNEL1); // aileron
         // neutral trims
         packet[13] = 0x20;
         packet[14] = 0x20;
