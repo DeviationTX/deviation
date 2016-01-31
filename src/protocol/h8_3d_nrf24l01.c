@@ -133,13 +133,16 @@ static s16 scale_channel(u8 ch)
             destMax = 0xff;
             break;
         case CHANNEL4:
-            if(chanval > 0) {
+            if(chanval > CHAN_MAX_VALUE / 60) {
                 destMin = 0x44;
                 destMax = 0xbc;
             }
-            else {
+            else if(chanval < CHAN_MIN_VALUE / 60) {
                 destMin = 0x3c;
                 destMax = -0x3c;
+            }
+            else {
+                return 0;
             }
             break;
     }
