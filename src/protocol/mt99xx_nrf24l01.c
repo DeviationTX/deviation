@@ -239,10 +239,6 @@ static void mt99xx_init()
 {
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-    // set tx address for bind packets
-    for(u8 i=0; i<5; i++)
-        rx_tx_addr[i] = 0xCC;
-    XN297_SetTXAddr(rx_tx_addr, 5);
     NRF24L01_FlushTx();
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
@@ -294,6 +290,10 @@ static void mt99xx_init()
     if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
         rf_config |= XN297_UNSCRAMBLED;
     XN297_Configure(rf_config);
+    // set tx address for bind packets
+    for(u8 i=0; i<5; i++)
+        rx_tx_addr[i] = 0xCC;
+    XN297_SetTXAddr(rx_tx_addr, 5);
 }
 
 static void initialize_txid()
