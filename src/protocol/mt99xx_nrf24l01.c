@@ -290,7 +290,10 @@ static void mt99xx_init()
     }
     NRF24L01_Activate(0x53); // switch bank back
     // Power on, TX mode, 2byte CRC
-    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
+    u16 rf_config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
+        rf_config |= XN297_UNSCRAMBLED;
+    XN297_Configure(rf_config);
 }
 
 static void initialize_txid()
