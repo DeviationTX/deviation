@@ -189,9 +189,9 @@ static void mt99xx_send_packet()
             break;
         case PROTOOPTS_FORMAT_YZ:
             packet[0] = scale_channel(CHANNEL3, 0, 0x64); // throttle
-            packet[1] = scale_channel(CHANNEL4, 0, 0x64); // rudder
-            packet[2] = scale_channel(CHANNEL1, 0x64, 0); // aileron
-            packet[3] = scale_channel(CHANNEL2, 0, 0x64); // elevator
+            packet[1] = scale_channel(CHANNEL4, 0x64, 0); // rudder
+            packet[2] = scale_channel(CHANNEL2, 0x64, 0); // elevator
+            packet[3] = scale_channel(CHANNEL1, 0, 0x64); // aileron
             if(packet_count++ >= 23) {
                 yz_seq_num ++;
                 if(yz_seq_num > 2)
