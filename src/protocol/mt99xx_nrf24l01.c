@@ -246,7 +246,7 @@ static void mt99xx_init()
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);  // 5 bytes address
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00);// no auto retransmit
     if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
-        NRF24L01_SetBitrate(NRF24L01_BR_250K);        // 250Kbps (nRF24L01+ only)
+        NRF24L01_SetBitrate(NRF24L01_BR_250K);     // 250Kbps (nRF24L01+ only)
     else
         NRF24L01_SetBitrate(NRF24L01_BR_1M);          // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
@@ -288,7 +288,7 @@ static void mt99xx_init()
     // Power on, TX mode, 2byte CRC
     u16 rf_config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
     if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
-        rf_config |= XN297_UNSCRAMBLED;
+        rf_config |= BV(XN297_UNSCRAMBLED);
     XN297_Configure(rf_config);
     // set tx address for bind packets
     for(u8 i=0; i<5; i++)
