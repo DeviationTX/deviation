@@ -76,7 +76,6 @@ enum {
     CHANNEL7,     // Snapshot
     CHANNEL8,     // Video
     CHANNEL9,     // Headless
-    CHANNEL10,    // RTH
 };
 
 #define CHANNEL_LIGHT    CHANNEL5
@@ -84,7 +83,6 @@ enum {
 #define CHANNEL_SNAPSHOT CHANNEL7
 #define CHANNEL_VIDEO    CHANNEL8
 #define CHANNEL_HEADLESS CHANNEL9
-#define CHANNEL_RTH      CHANNEL10
 
 enum{
     // flags going to packet[6] (MT99xx, H7)
@@ -200,9 +198,12 @@ static void mt99xx_send_packet()
             }
             packet[4]= yz_p4_seq[yz_seq_num]; 
             
-            packet[5]= 0x02; // expert ? (0=unarmed, 1=normal)
-                     
-            packet[6] = 0x80;
+            packet[5]= 0x02 // expert ? (0=unarmed, 1=normal)
+                     | GET_FLAG(CHANNEL_VIDEO, 0x10)
+                     //| GET_FLAG(CHANNEL_FLIP,  0x??)
+                     | GET_FLAG(CHANNEL_HEADLESS, 0x04)
+                     | GET_FLAG(CHANNEL_SNAPSHOT, 0x20);
+            packet[6] = GET_FLAG(CHANNEL_LIGHT, 0x80);
             packet[7] = packet[0];            
             for(u8 idx = 1; idx < PACKET_SIZE-2; idx++)
                 packet[7] += packet[idx];
@@ -402,8 +403,8 @@ const void *MT99XX_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L; // A, E, T, R, light, flip, snapshot, video, headless, rth
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 9L; // A, E, T, R, light, flip, snapshot, video, headless
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return mt99xx_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
