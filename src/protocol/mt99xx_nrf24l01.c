@@ -200,7 +200,7 @@ static void mt99xx_send_packet()
             
             packet[5]= 0x02 // expert ? (0=unarmed, 1=normal)
                      | GET_FLAG(CHANNEL_VIDEO, 0x10)
-                     //| GET_FLAG(CHANNEL_FLIP,  0x??)
+                     | GET_FLAG(CHANNEL_FLIP,  0x80)
                      | GET_FLAG(CHANNEL_HEADLESS, 0x04)
                      | GET_FLAG(CHANNEL_SNAPSHOT, 0x20);
             packet[6] = GET_FLAG(CHANNEL_LIGHT, 0x80);
