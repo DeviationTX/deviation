@@ -100,7 +100,7 @@ int NRF24L01_Reset();
 //void NRF24L01_PulseCE();
 
 // XN297 emulation layer
-#define XN297_UNSCRAMBLED 0x0100
+#define XN297_UNSCRAMBLED 8
 void XN297_SetTXAddr(const u8* addr, int len);
 void XN297_SetRXAddr(const u8* addr, int len);
 void XN297_Configure(u16 flags);

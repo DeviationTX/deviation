@@ -285,18 +285,12 @@ static void mt99xx_init()
         dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
-    
     // Power on, TX mode, 2byte CRC
     u16 rf_config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
-    
     if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
-        rf_config |= XN297_UNSCRAMBLED; // use xn297 unscrambled mode
-    
+        rf_config |= BV(XN297_UNSCRAMBLED);
     XN297_Configure(rf_config);
-    
     // set tx address for bind packets
-    // it is important to set address *after* XN297_Configure
-    // as i6S is using XN297L unscrambled mode
     for(u8 i=0; i<5; i++)
         rx_tx_addr[i] = 0xCC;
     XN297_SetTXAddr(rx_tx_addr, 5);
