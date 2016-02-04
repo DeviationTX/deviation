@@ -284,11 +284,11 @@ int NRF24L01_Reset()
 
 // XN297 emulation layer
 
+static u8  xn297_scramble_enabled;
 static int xn297_addr_len;
 static u8  xn297_tx_addr[5];
 static u8  xn297_rx_addr[5];
 static u8  xn297_crc = 0;
-static u8  xn297_scramble_enabled = 1;
 
 static const uint8_t xn297_scramble[] = {
   0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66,
