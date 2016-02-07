@@ -77,7 +77,7 @@ u32 ScanButtons()
         gpio_set(COL_PORT, *c);
         for(r = rows; *r != 0xffff; r++) {
             if((! (but & *r))
-               && (!(1 << (buttonmap[idx] - 1) & Transmitter.ignore_buttons))) {
+               && (!(1 << buttonmap[idx] & Transmitter.ignore_buttons))) {
                 result |= 1 << (buttonmap[idx] - 1);
             }
             idx++;
