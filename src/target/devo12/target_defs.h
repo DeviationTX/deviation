@@ -15,7 +15,6 @@
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
-#define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           1
 #define HAS_RTC             1
 #define HAS_VIBRATINGMOTOR  0
