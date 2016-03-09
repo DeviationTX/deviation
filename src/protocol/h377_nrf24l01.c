@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc apply this to definitions, others to calls
@@ -403,7 +404,7 @@ const void *H377_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: printf("=>H377 : cmd %d PROTOCMD_NUMCHAN\n", cmd); return (void *)6L;
         case PROTOCMD_DEFAULT_NUMCHAN: printf("=>H377 : cmd %d PROTOCMD_DEFAULT_NUMCHAN\n", cmd); return (void *)6L;
         case PROTOCMD_CURRENT_ID: printf("=>H377 : cmd %d PROTOCMD_CURRENT_ID\n", cmd); return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: printf("=>H377 : cmd %d PROTOCMD_TELEMETRYSTATE\n", cmd); return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;
