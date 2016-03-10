@@ -44,6 +44,42 @@ s32 CHAN_ReadInput(int channel)
         case INP_FMOD0:    return (gui.fmod % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_FMOD1:    return (gui.fmod % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_FMOD2:    return (gui.fmod % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_SWA0:
+            if(Transmitter.ignore_src == SWITCH_NONE)
+                return CHAN_MIN_VALUE;
+            if(Transmitter.ignore_src == SWITCH_2x2) {
+                return (gui.ele_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+            } else { //3x1 or 3x2
+                return (gui.ele_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            }
+        case INP_SWA1:
+            if(Transmitter.ignore_src == SWITCH_NONE)
+                return CHAN_MIN_VALUE;
+            if(Transmitter.ignore_src == SWITCH_2x2) {
+                return (gui.ele_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            } else { //3x1 or 3x2
+                return (gui.ele_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            }
+        case INP_SWA2:
+            if(Transmitter.ignore_src == SWITCH_NONE || Transmitter.ignore_src == SWITCH_2x2)
+                return CHAN_MIN_VALUE;
+             return (gui.ele_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_SWB0:
+            if(Transmitter.ignore_src == SWITCH_NONE || Transmitter.ignore_src == SWITCH_3x1)
+                return CHAN_MIN_VALUE;
+            if(Transmitter.ignore_src == SWITCH_2x2) {
+                return (gui.ail_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+            } else { //3x2
+                return (gui.ail_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            }
+        case INP_SWB1:
+            if(Transmitter.ignore_src == SWITCH_NONE || Transmitter.ignore_src == SWITCH_3x1)
+                return CHAN_MIN_VALUE;
+            if(Transmitter.ignore_src == SWITCH_2x2) {
+                return (gui.ail_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            } else { //3x2
+                return (gui.ail_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+            }
     }
     return 0;
 }
