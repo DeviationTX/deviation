@@ -89,7 +89,8 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
                 for (i = 0; i < INP_HAS_CALIBRATION; i++) {
                     printf("Input %d: Max: %d Min: %d Zero: %d\n", i+1, Transmitter.calibration[i].max, Transmitter.calibration[i].min, Transmitter.calibration[i].zero);
                 }
-                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Calibration done."));
+                GUI_DrawBackground(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                snprintf(tempstring, sizeof(tempstring), "%s", _tr("Calibration done.\n \nPress ENT."));
                 GUI_Redraw(&guic->msg);
                 calibrate_state = CALI_SUCCESS;
                 break;
