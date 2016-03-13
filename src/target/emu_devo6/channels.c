@@ -68,17 +68,17 @@ s32 CHAN_ReadInput(int channel)
             if(Transmitter.ignore_src == SWITCH_NONE || Transmitter.ignore_src == SWITCH_3x1)
                 return CHAN_MIN_VALUE;
             if(Transmitter.ignore_src == SWITCH_2x2) {
-                return (gui.ail_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+                return (gui.rud_dr & 0x01) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
             } else { //3x2
-                return (gui.ail_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+                return (gui.rud_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
             }
         case INP_SWB1:
             if(Transmitter.ignore_src == SWITCH_NONE || Transmitter.ignore_src == SWITCH_3x1)
                 return CHAN_MIN_VALUE;
             if(Transmitter.ignore_src == SWITCH_2x2) {
-                return (gui.ail_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+                return (gui.rud_dr & 0x01) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
             } else { //3x2
-                return (gui.ail_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+                return (gui.rud_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
             }
     }
     return 0;
