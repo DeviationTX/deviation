@@ -48,7 +48,7 @@ zip_emu_$1:
 	$(MAKE) TARGET=emu_$1 zip
 zip_win_$1:
 	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
-release_$1: zip_$1 zip_emu_$1 fs_$1
+release_$1: zip_$1 zip_win_$1 fs_$1 INCLUDE_FS=1
 all_$1:
 	$(MAKE) TARGET=$1 all
 endef
