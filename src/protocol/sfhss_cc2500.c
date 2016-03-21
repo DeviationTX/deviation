@@ -74,9 +74,12 @@ static s8 fine;
 enum {
     SFHSS_START = 0x101,
     SFHSS_CAL   = 0x102,
+    SFHSS_TUNE  = 0x103,
     SFHSS_DATA1 = 0x02,
     SFHSS_DATA2 = 0x0b
 };
+
+#define FREQ0_VAL 0xC4
 
 // Some important initialization parameters, all others are either default,
 // or not important in the context of transmitter
@@ -106,14 +109,17 @@ enum {
 // MCSM1    0C - no CCA (transmit always), when packet received stay in RX, when sent go to IDLE
 // MCSM0    08 - no autocalibration, PO_TIMEOUT - 64, no pin radio control, no forcing XTAL to stay in SLEEP
 // FOCCFG   1D - not interesting, Frequency Offset Compensation
+// FREND0   10 - PA_POWER = 0
 static const u8 init_values[] = {
-  0x2F, 0x2E, 0x2F, 0x07, 0xD3, 0x91, 0x0D, 0x04,
-  0x0C, 0x29, 0x10, 0x06, 0x00, 0x5C, 0x4E, 0xC4,
-  0x7C, 0x43, 0x83, 0x23, 0x3B, 0x44, 0x07, 0x0C,
-  0x08, 0x1D, 0x1C, 0x43, 0x40, 0x91, 0x57, 0x6B,
-  0xF8, 0xB6, 0x10, 0xEA, 0x0A, 0x11, 0x11
+  /* 00 */ 0x2F, 0x2E, 0x2F, 0x07, 0xD3, 0x91, 0x0D, 0x04,
+  /* 08 */ 0x0C, 0x29, 0x10, 0x06, 0x00, 0x5C, 0x4E, FREQ0_VAL,
+  /* 10 */ 0x7C, 0x43, 0x83, 0x23, 0x3B, 0x44, 0x07, 0x0C,
+  /* 18 */ 0x08, 0x1D, 0x1C, 0x43, 0x40, 0x91, 0x57, 0x6B,
+  /* 20 */ 0xF8, 0xB6, 0x10, 0xEA, 0x0A, 0x11, 0x11
 };
 
+// Fast calibration table, see page 55 of swrs040c.pdf
+// 31.2 Frequency Hopping and Multi-Channel Systems
 static u8 rf_cal[30][3];
 
 static void tune_chan()
@@ -140,7 +146,7 @@ static void tune_freq() {
         coarse = Model.proto_opts[PROTO_OPTS_FREQCOARSE];
         fine   = Model.proto_opts[PROTO_OPTS_FREQFINE];
         CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-        CC2500_WriteReg(CC2500_0F_FREQ0, 0xC4 + coarse);
+        CC2500_WriteReg(CC2500_0F_FREQ0, FREQ0_VAL + coarse);
     }
 }
 #endif
@@ -199,16 +205,6 @@ static u16 convert_channel(u8 num)
 static void build_data_packet()
 {
     unsigned ch_offset = state == SFHSS_DATA1 ? 0 : 4;
-    /*
-    u8 spacer1;
-    if (state == SFHSS_DATA1) {
-        ch_offset = 0;
-        spacer1 = 0b10;
-    } else {
-        ch_offset = 4;
-        spacer1 = 0b10;
-    }
-    */
     static const u8 spacer1 = 0b10;
     static const u8 spacer2 = spacer1 << 4;
 
@@ -257,28 +253,29 @@ static u16 SFHSS_cb()
             state = SFHSS_DATA1;
         }
         return 2000;
+
+    /* Work cycle, 6.8ms, second packet 1.65ms after first */
     case SFHSS_DATA1:
         build_data_packet();
         send_packet();
         state = SFHSS_DATA2;
-        return 1650; // 1500
+        return 1650;
     case SFHSS_DATA2:
         build_data_packet();
         send_packet();
         calc_next_chan();
+        state = SFHSS_TUNE;
+        return 2000;
+    case SFHSS_TUNE:
+        tune_power();
         state = SFHSS_DATA1;
-        return 5150; // 5100 Values tune to achieve 6.8ms between cycles
-        //TODO: Add tune_power state here, some 1.6ms before DATA1
+        return 3150;
 /*
     case SFHSS_DATA1:
         build_data_packet();
         send_packet();
-        state = SFHSS_CAL1;
-        return 300;
-    case SFHSS_CAL1:
-//        tune_chan();
         state = SFHSS_DATA2;
-        return 1350;
+        return 1650;
     case SFHSS_DATA2:
         build_data_packet();
         send_packet();
@@ -290,7 +287,7 @@ static u16 SFHSS_cb()
         calc_next_chan();
         tune_chan();
         state = SFHSS_DATA1;
-        return 4650; // Values tune to achieve 6.8ms between cycles
+        return 4650;
 */
     }
     return 0;
@@ -360,7 +357,7 @@ const void *SFHSS_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return 0; // Never Autobind
+        case PROTOCMD_CHECK_AUTOBIND: return 1L; // Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
