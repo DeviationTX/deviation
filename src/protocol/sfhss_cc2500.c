@@ -204,9 +204,9 @@ static u16 convert_channel(u8 num)
 
 static void build_data_packet()
 {
+#define spacer1 0b10
+#define spacer2 (spacer1 << 4)
     unsigned ch_offset = state == SFHSS_DATA1 ? 0 : 4;
-    static const u8 spacer1 = 0b10;
-    static const u8 spacer2 = spacer1 << 4;
 
     u16 ch1 = convert_channel(ch_offset+0);
     u16 ch2 = convert_channel(ch_offset+1);
