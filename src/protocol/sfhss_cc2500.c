@@ -357,7 +357,7 @@ const void *SFHSS_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(CC2500_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return 1L; // Always autobind
+        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // Always autobind
         case PROTOCMD_BIND:  initialize(); return 0;
         case PROTOCMD_NUMCHAN: return (void *)8L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
