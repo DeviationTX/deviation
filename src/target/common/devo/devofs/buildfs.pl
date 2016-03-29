@@ -50,7 +50,7 @@ foreach my $file (@files) {
 
 my @data = split(//, $outf);
 my $free_space = 65536-4096-scalar(@data);
-printf STDERR "Devo5s Size:  %dkB.  Free Space: %dkB\n", scalar(@data)/1024, $free_space / 1024;
+printf STDERR "Devo FS Size:  %dkB.  Free Space: %dkB\n", scalar(@data)/1024, $free_space / 1024;
 die "Not enough free spacei (at least 2kB required)\n" if ($free_space < 2048); 
 my $next_sec = $START_SECTOR;
 for my $i (0 .. 65535) {

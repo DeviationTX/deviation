@@ -56,14 +56,20 @@
 
 
 static const char * const fy326_opts[] = {
+    _tr_noop("Format"), "FY326", "FY319", NULL,
     _tr_noop("Expert"), _tr_noop("On"), _tr_noop("Off"), NULL, 
     NULL
 };
+
+#define FORMAT_FY326 0
+#define FORMAT_FY319 1
+
 #define EXPERT_ON  0
 #define EXPERT_OFF 1
 
 enum {
-    PROTOOPTS_EXPERT = 0,
+    PROTOOPTS_FORMAT = 0,
+    PROTOOPTS_EXPERT,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -104,7 +110,10 @@ enum {
     FY326_INIT1 = 0,
     FY326_BIND1,
     FY326_BIND2,
-    FY326_DATA
+    FY326_DATA,
+    FY319_INIT1,
+    FY319_BIND1,
+    FY319_BIND2,
 };
 
 // Bit vector from bit position
@@ -139,9 +148,16 @@ static void send_packet(u8 bind)
     packet[3]  = scale_channel(CHANNEL2, 0, 200);        // elevator
     packet[4]  = 200 - scale_channel(CHANNEL4, 0, 200);  // rudder
     packet[5]  = scale_channel(CHANNEL3, 0, 200);        // throttle
-    packet[6]  = txid[0];
-    packet[7]  = txid[1];
-    packet[8]  = txid[2];
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FY319) {
+        packet[6] = 255 - scale_channel(CHANNEL1, 0, 255);
+        packet[7] = scale_channel(CHANNEL2, 0, 255);
+        packet[8] = 255 - scale_channel(CHANNEL4, 0, 255);
+    }
+    else {
+        packet[6]  = txid[0];
+        packet[7]  = txid[1];
+        packet[8]  = txid[2];
+    }
     packet[9]  = CHAN_TO_TRIM(packet[2]); // aileron_trim;
     packet[10] = CHAN_TO_TRIM(packet[3]); // elevator_trim;
     packet[11] = CHAN_TO_TRIM(packet[4]); // rudder_trim;
@@ -185,7 +201,10 @@ static void fy326_init()
 
     NRF24L01_Initialize();
     NRF24L01_SetTxRxMode(TX_EN);
-    NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x01);   // Three-byte rx/tx address
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FY319)
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x03);   // Five-byte rx/tx address
+    else
+        NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, 0x01);   // Three-byte rx/tx address
     NRF24L01_WriteRegisterMulti(NRF24L01_10_TX_ADDR,    rx_tx_addr, sizeof(rx_tx_addr));
     NRF24L01_WriteRegisterMulti(NRF24L01_0A_RX_ADDR_P0, rx_tx_addr, sizeof(rx_tx_addr));
     NRF24L01_FlushTx();
@@ -235,7 +254,51 @@ static void fy326_init()
 MODULE_CALLTYPE
 static u16 fy326_callback()
 {
+    u8 i;
     switch (phase) {
+    case FY319_INIT1:
+        MUSIC_Play(MUSIC_TELEMALARM1);
+        NRF24L01_SetTxRxMode(TXRX_OFF);
+        NRF24L01_FlushRx();
+        NRF24L01_SetTxRxMode(RX_EN);
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_BIND_CHANNEL);
+        phase = FY319_BIND1;
+        return PACKET_CHKTIME;
+        break;
+        
+    case FY319_BIND1:
+        if(NRF24L01_ReadReg(NRF24L01_07_STATUS) & BV(NRF24L01_07_RX_DR)) {
+            NRF24L01_ReadPayload(packet, PACKET_SIZE);
+            rxid = packet[13];
+            packet[0] = txid[3];
+            packet[1] = 0x80;
+            packet[14]= txid[4];
+            bind_counter = BIND_COUNT;
+            NRF24L01_SetTxRxMode(TXRX_OFF);
+            NRF24L01_SetTxRxMode(TX_EN);
+            NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+            NRF24L01_FlushTx();
+            bind_counter = 255;
+            for(i=2; i<6; i++)
+                packet[i] = rf_chans[0];
+            phase = FY319_BIND2;
+        }
+        return PACKET_CHKTIME;
+        break;
+    
+    case FY319_BIND2:
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
+        NRF24L01_FlushTx();
+        NRF24L01_WritePayload(packet, PACKET_SIZE);
+        if(bind_counter == 250)
+            packet[1] = 0x40;
+        if(--bind_counter == 0) {
+            PROTOCOL_SetBindState(0);
+            MUSIC_Play(MUSIC_DONE_BINDING);
+            phase = FY326_DATA;
+        }
+        break;
+    
     case FY326_INIT1:
         MUSIC_Play(MUSIC_TELEMALARM1);
         bind_counter = BIND_COUNT;
@@ -325,6 +388,11 @@ static void initialize_txid()
     rf_chans[2] = 0x20 + (txid[1] & 0x0F);
     rf_chans[3] = 0x30 + (txid[1] >> 4);
     rf_chans[4] = 0x40 + (txid[2] >> 4);
+    
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FY319) {        
+        for(u8 i=0; i<5; i++)
+            rf_chans[i] = txid[0] & ~0x80;
+    }
 }
 
 static void initialize()
@@ -333,7 +401,10 @@ static void initialize()
     PROTOCOL_SetBindState(0xFFFFFFFF);
     tx_power = Model.tx_power;
     rxid = 0xaa;
-    phase = FY326_INIT1;
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FY319)
+        phase = FY319_INIT1;
+    else
+        phase = FY326_INIT1;
     bind_counter = BIND_COUNT;
     initialize_txid();
     fy326_init();

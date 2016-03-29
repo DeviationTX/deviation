@@ -159,26 +159,26 @@ int fexists(const char *file)
 }
 
 /* USB */
-void wait_press_release(u32 release)
+void wait_press_release(u32 press)
 {
-    printf("Wait %s\n", release ? "Release" : "Press");
+    printf("Wait %s\n", press ? "Press" : "Release");
     while(1) {
         CLOCK_ResetWatchdog();
         u32 buttons = ScanButtons();
-        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER) > release)
+        if (CHAN_ButtonIsPressed(buttons, BUT_ENTER) == press)
             break;
         if(PWR_CheckPowerSwitch())
             PWR_Shutdown();
     }
-    printf("%sed\n", release ? "Release" : "Press");
+    printf("%sed\n", press ? "Press" : "Release");
 }
 
 void wait_press() {
-    wait_press_release(0);
+    wait_press_release(CHAN_ButtonMask(BUT_ENTER));
 }
 void wait_release()
 {
-    wait_press_release(UINT_MAX);
+    wait_press_release(0);
 }
 
 void USB_Connect()

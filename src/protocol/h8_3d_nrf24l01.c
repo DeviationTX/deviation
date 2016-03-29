@@ -63,7 +63,7 @@ enum {
     CHANNEL2,     // Elevator
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
-    CHANNEL5,     // 
+    CHANNEL5,     // LED Light
     CHANNEL6,     // Flip
     CHANNEL7,     // 
     CHANNEL8,     // 
@@ -71,6 +71,7 @@ enum {
     CHANNEL10,    // 180/360 flip mode (H8 3D), RTH (H20)
 };
 
+#define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_HEADLESS    CHANNEL9  // RTH + Headless on H8 3D
 #define CHANNEL_RTH         CHANNEL10 // 180/360 flip mode on H8 3D
@@ -86,6 +87,7 @@ enum {
     FLAG_FLIP     = 0x01,
     FLAG_RATE_MID = 0x02,
     FLAG_RATE_HIGH= 0x04,
+    FLAG_LED      = 0x08,
     FLAG_HEADLESS = 0x10, // RTH + headless on H8, headless on JJRC H20
     FLAG_RTH      = 0x20, // 360° flip mode on H8 3D, RTH on JJRC H20
 };
@@ -116,9 +118,35 @@ static u8 checksum()
 }
 
 #define CHAN_RANGE (CHAN_MAX_VALUE - CHAN_MIN_VALUE)
-static s16 scale_channel(u8 ch, s16 destMin, s16 destMax)
+static s16 scale_channel(u8 ch)
 {
     s32 chanval = Channels[ch];
+    s16 destMin=0, destMax=0;
+    switch(ch) {
+        case CHANNEL1:
+        case CHANNEL2:
+            destMin = 0x43;
+            destMax = 0xbb;
+            break;
+        case CHANNEL3:
+            destMin = 0;
+            destMax = 0xff;
+            break;
+        case CHANNEL4:
+            if(chanval > CHAN_MAX_VALUE / 60) {
+                destMin = 0x44;
+                destMax = 0xbc;
+            }
+            else if(chanval < CHAN_MIN_VALUE / 60) {
+                destMin = 0x3c;
+                destMax = -0x3c;
+            }
+            else {
+                return 0;
+            }
+            break;
+    }
+    
     s32 range = destMax - destMin;
 
     if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
@@ -144,19 +172,17 @@ static void send_packet(u8 bind)
         packet[5] = rf_chan;
         packet[6] = 0x08;
         packet[7] = 0x03;
-        packet[9] = scale_channel( CHANNEL3, 0, 0xff); // throttle
-        if( Channels[CHANNEL4] > 0)
-            packet[10] = scale_channel( CHANNEL4, 0x44, 0xbc); // rudder
-        else
-            packet[10] = scale_channel( CHANNEL4, 0x3c, -0x3c ); // rudder
-        packet[11]= scale_channel( CHANNEL2, 0x43, 0xbb); // elevator
-        packet[12]= scale_channel( CHANNEL1, 0x43, 0xbb); // aileron
+        packet[9] = scale_channel( CHANNEL3); // throttle
+        packet[10] = scale_channel( CHANNEL4); // rudder
+        packet[11]= scale_channel( CHANNEL2); // elevator
+        packet[12]= scale_channel( CHANNEL1); // aileron
         // neutral trims
         packet[13] = 0x20;
         packet[14] = 0x20;
         packet[15] = 0x20;
         packet[16] = 0x20;
         packet[17] = FLAG_RATE_HIGH
+                   | GET_FLAG( CHANNEL_LED, FLAG_LED)
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D

@@ -33,6 +33,9 @@ PROTO_MODULES += $(ODIR)/protocol/hontai.mod
 PROTO_MODULES += $(ODIR)/protocol/fy326.mod
 PROTO_MODULES += $(ODIR)/protocol/bayang.mod
 PROTO_MODULES += $(ODIR)/protocol/h8-3d.mod
+PROTO_MODULES += $(ODIR)/protocol/mjxq.mod
+PROTO_MODULES += $(ODIR)/protocol/s-fhss.mod
+
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
 $(ODIR)/protocol/devo.mod : $(ODIR)/devo_cyrf6936.bin
@@ -96,7 +99,7 @@ $(ODIR)/protocol/v202.mod : $(ODIR)/v202_nrf24l01.bin
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/slt.mod : $(ODIR)/slt_nrf24l01.bin
-	@echo Building 'tacticsl' module
+	@echo Building 'slt' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 $(ODIR)/protocol/usbhid.mod : $(ODIR)/usbhid.bin
@@ -166,5 +169,13 @@ $(ODIR)/protocol/bayang.mod : $(ODIR)/bayang_nrf24l01.bin
 $(ODIR)/protocol/h8-3d.mod : $(ODIR)/h8_3d_nrf24l01.bin
 	@echo Building 'h8-3d' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
-    
+
+$(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
+	@echo Building 'mjxq' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/s-fhss.mod : $(ODIR)/sfhss_cc2500.bin
+	@echo Building 'sfhss' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
 endif #BUILD_TARGET
