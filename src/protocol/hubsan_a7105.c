@@ -103,7 +103,7 @@ static const char * const hubsan4_opts[] = {
     _tr_noop("Format"), "H107", "H501", NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
-    NULL
+    NULL 
 };
 
 enum {
