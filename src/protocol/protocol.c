@@ -122,8 +122,10 @@ void PROTOCOL_Load(int no_dlg)
     fh = fopen2(&FontFAT, file, "r");
     //printf("Loading %s: %08lx\n", file, fh);
     if(! fh) {
-        if(! no_dlg)
-            PAGE_ShowInvalidModule();
+        if(! no_dlg) {
+            sprintf(tempstring, "Misisng protocol:\n%s", file);
+            PAGE_ShowWarning(NULL, tempstring);
+        }
         LCD_SetFont(old_font);
         return;
     }
@@ -145,8 +147,10 @@ void PROTOCOL_Load(int no_dlg)
     fclose(fh);
     LCD_SetFont(old_font);
     if ((unsigned long)&_data_loadaddr != *loaded_protocol) {
-        if(! no_dlg)
-            PAGE_ShowInvalidModule();
+        if(! no_dlg) {
+            sprintf(tempstring, "Protocol Mismatch:\n%08x\n%08x", (unsigned long)&_data_loadaddr, *loaded_protocol);
+            PAGE_ShowWarning(NULL, tempstring);
+        }
         *loaded_protocol = 0;
         return;
     }

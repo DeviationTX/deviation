@@ -1,0 +1,4 @@
+
+TYPEMAP
+     FATFS *  T_PTROBJ
+

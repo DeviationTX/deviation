@@ -37,6 +37,7 @@ foreach my $file (@files) {
         }
         $cur_dir = $dirid{$dir};
     }
+    next if($filename =~ /^\./); #ignore dot-files
     my $data;
     {
         local $/=undef;

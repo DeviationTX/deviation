@@ -1,6 +1,7 @@
 #ifndef _DEVO7E_TARGET_H_
 #define _DEVO7E_TARGET_H_
 
+#define USE_DEVOFS 1 //Must be before common_devo include
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
@@ -8,7 +9,6 @@
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
 #define SPIFLASH_AAI_AF 1
-#define USE_DEVOFS 1
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12

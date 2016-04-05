@@ -4,8 +4,14 @@
 #include <assert.h>
 #include <string.h>
 #include <stddef.h>
+#include <ctype.h>
 
 #include "devofs_io.h"
+
+#ifndef DEVOFS_CREATE_FILE
+    #define DEVOFS_CREATE_FILE 0
+#endif
+
 enum {
     SECTOR_SIZE     = 4096,
     SECTOR_COUNT    = 16,
@@ -39,6 +45,24 @@ int _get_next_sector(int sec) {
 
 void _write_sector_id(int sector, u8 id) {
     disk_writep_rand(&id, sector, 0, 1);
+}
+
+void _fill_fileinfo(FATFS *dir, FILINFO *fi) {
+    char *ptr1 = fi->fname;
+    int  pos = 0;
+    while(pos < 8 && dir->file_header.name[pos]) {
+        *ptr1++ = dir->file_header.name[pos++];
+    }
+    if (dir->file_header.name[8]) {
+        pos = 8;
+        *ptr1++ = '.';
+        while(pos < 11 && dir->file_header.name[pos]) {
+            *ptr1++ = dir->file_header.name[pos++];
+        }
+    }
+    *ptr1 = 0;
+    fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : AM_FILE;
+    fi->fsize = FILE_SIZE(dir->file_header);
 }
 
 FRESULT df_compact()
@@ -200,6 +224,7 @@ int _find_start_sector(int *recovery_sector)
     }
     return start[0];
 }
+
 /* Mount/Unmount a logical drive */
 FRESULT df_mount (FATFS* fs)
 {
@@ -234,22 +259,28 @@ int _expand_chars(char *dest, const char *src, int len)
    return i;
 }
 
+void _format_filename(const char *filename, char *expanded_name)
+{
+   unsigned char i, j;
+
+   unsigned len = strlen(filename);
+   memset(expanded_name, 0, 11);
+   for (i = 0, j = 0; i < len; i++, j++) {
+       if(filename[i] == 0)
+           break;
+       if(filename[i] == '.') {
+          j = 7;
+       } else {
+          expanded_name[j] = tolower((unsigned char)filename[i]);
+       }
+   }
+}
+
 FRESULT _find_file(FATFS *fs, const char *fullname)
 {
    char name[11];
-   int i, j;
 
-   int len = strlen(fullname);
-   memset(name, 0, 11);
-   for (i = 0, j = 0; i < len; i++, j++) {
-       if(fullname[i] == 0)
-           break;
-       if(fullname[i] == '.') {
-          j = 7;
-       } else {
-          name[j] = fullname[i];
-       }
-   }
+   _format_filename(fullname, name);
    _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
 
    while(fs->file_header.type != FILEOBJ_NONE) {
@@ -264,16 +295,51 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
    return FR_NO_PATH;
 }
 
+int _find_parent_dir(FATFS *fs, const char *path, char *cur_dir)
+{
+    int i = 0;
+    fs->parent_dir = 0;
+    fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    int cur_idx = 0;
+    //Find file's owner directory
+    while(1) {
+        if (path[i] == '/') {
+            cur_dir[cur_idx] = 0;
+            if (_find_file(fs, cur_dir) != FR_OK || _fs->file_header.type != FILEOBJ_DIR) {
+                return FR_NO_PATH;
+            }
+            fs->parent_dir = FILE_ID(fs->file_header);
+            _get_next_fileobj(fs); //get the next file object
+            cur_idx = 0;
+        } else {
+            cur_dir[cur_idx++] = path[i];
+            if (path[i] == 0) {
+                break;
+            }
+        }
+        i++;
+    }
+    return FR_OK;
+}
+
 FRESULT df_opendir (DIR *dir, const char *name)
 {
+    char cur_dir[13];
     *dir = *_fs;
+
+    // First check if this is the root directory
     dir->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
     dir->parent_dir = 0;
     if (name[0] == 0 || (name[0] == '/' && name[1] == 0)) {
         dir->file_cur_pos = -1;
         return FR_OK;
     }
-    int res = _find_file(dir, name);
+
+    int res = _find_parent_dir(dir, name, cur_dir);
+    if (res)
+        return res;
+    //Find the dir itself
+    res = _find_file(dir, cur_dir);
     if (res)
         return res;
     if (dir->file_header.type == FILEOBJ_DIR) {
@@ -300,23 +366,8 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
     }
     _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
     while (dir->file_header.type != FILEOBJ_NONE) {
-        if (dir->file_header.parent_dir == dir->parent_dir) {
-            //Found next object
-            char *ptr1 = fi->fname;
-            int  pos = 0;
-            while(pos < 8 && dir->file_header.name[pos]) {
-                *ptr1++ = dir->file_header.name[pos++];
-            }
-            if (dir->file_header.name[8]) {
-                pos = 8;
-                *ptr1++ = '.';
-                while(pos < 11 && dir->file_header.name[pos]) {
-                    *ptr1++ = dir->file_header.name[pos++];
-                }
-            }
-            *ptr1 = 0;
-            fi->fattrib = (dir->file_header.type == FILEOBJ_DIR) ? AM_DIR : AM_FILE;
-            fi->fsize = FILE_SIZE(dir->file_header);
+        if (dir->file_header.type != FILEOBJ_DELETED && dir->file_header.parent_dir == dir->parent_dir) {
+            _fill_fileinfo(dir, fi);
             return FR_OK;
         }
         _get_next_fileobj(dir);
@@ -336,13 +387,15 @@ int _get_next_write_addr()
     return addr;
 }
 
-void _create_empty_file()
+void _create_empty_file(int delete_first)
 {
     //Delete file 1st
     u8 data[BUF_SIZE];
-    data[0] = FILEOBJ_DELETED;
-    disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
-    _fs->file_addr = _get_next_write_addr();
+    if (delete_first) {
+        data[0] = FILEOBJ_DELETED;
+        disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
+        _fs->file_addr = _get_next_write_addr();
+    }
 
     unsigned cur_size = FILE_SIZE(_fs->file_header);
     if (cur_size == 0 ) //we need to make sure max_size is non-zero
@@ -358,49 +411,115 @@ void _create_empty_file()
     }
     //duplicate file header to new location
     //zero file size (we'll write the actual size at close
-    _fs->file_header.size1 = 0; 
-    _fs->file_header.size2 = 0; 
-    _fs->file_header.size3 = 0; 
-    _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
-    //place the maximum allocated filesize as a place-holder
-    _fs->file_header.size1 = 0xff & (max_size >> 16);
-    _fs->file_header.size2 = 0xff & (max_size >> 8);
-    _fs->file_header.size3 = 0xff & (max_size);
-    _fs->file_header.type  = FILEOBJ_WRITE;
-    _fs->file_cur_pos = 0;
+    if(_fs->file_header.type != FILEOBJ_DIR) {
+        _fs->file_header.size1 = 0; 
+        _fs->file_header.size2 = 0; 
+        _fs->file_header.size3 = 0; 
+        _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+        //place the maximum allocated filesize as a place-holder
+        _fs->file_header.size1 = 0xff & (max_size >> 16);
+        _fs->file_header.size2 = 0xff & (max_size >> 8);
+        _fs->file_header.size3 = 0xff & (max_size);
+        _fs->file_header.type  = FILEOBJ_WRITE;
+        _fs->file_cur_pos = 0;
+    } else {
+        _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+    }
 }
 
+FRESULT df_unlink(const char *name)
+{
+    char cur_dir[13];
+    int res = _find_parent_dir(_fs, name, cur_dir);
+    if (res)
+        return res;
+    res = _find_file(_fs, cur_dir);
+    if (res == 0) {
+        u8 data[2];
+        data[0] = FILEOBJ_DELETED;
+        disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
+        return FR_OK;
+    }
+    return FR_NO_FILE;
+}
+
+void _create_file_or_dir(char *fname, int type)
+{
+    // Need to initialzie addr and read 1st item for get_next_write_addr
+    _fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    _read(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+    if (type == AM_FILE) {
+        _fs->file_addr = _get_next_write_addr();
+        _fs->file_header.type = FILEOBJ_FILE;
+    } else {
+        int id;
+        int i;
+        unsigned char seen_dir[8];
+        struct file_header fh = _fs->file_header;
+        memset(seen_dir, 0, 8);
+        seen_dir[0] = 1;
+        while(fh.type != FILEOBJ_NONE) {
+            if (fh.type == FILEOBJ_DIR) {
+                id = FILE_ID(fh);
+                seen_dir[id / 8] |= 1 << (id % 8);
+            }
+            _fs->file_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + FILE_SIZE(fh));
+            _read(&fh, _fs->file_addr, sizeof(struct file_header));
+        }
+        for(i = 0; i < 256; i++) {
+            if((seen_dir[i/8] & (1 << (i % 8))) == 0)
+               break;
+        }
+        if (i == 256)
+            return;
+        _fs->file_header.size1 = i;
+        _fs->file_header.size2 = 0;
+        _fs->file_header.size3 = 0;
+    }
+    _fs->file_header.parent_dir = _fs->parent_dir;
+    _format_filename(fname, _fs->file_header.name);
+    _fs->file_header.type = type == AM_DIR ? FILEOBJ_DIR : FILEOBJ_FILE;
+    _fs->file_cur_pos = -1;
+    _create_empty_file(0);
+}
+
+#if DEVOFS_CREATE_FILE
+FRESULT df_mkdir(const char *name)
+{
+    char cur_dir[13];
+    int res = _find_parent_dir(_fs, name, cur_dir);
+    if (res)
+        return res;
+    if (_find_file(_fs, cur_dir) == FR_OK)
+        return FR_NO_FILE;
+    _create_file_or_dir(cur_dir, AM_DIR);
+    return FR_OK;
+}
+#endif    
 FRESULT df_open (const char *name, unsigned flags)
 {
     char cur_dir[13];
-    int i = 0;
-    _fs->parent_dir = 0;
-    _fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
-    int cur_idx = 0;
-    while(1) {
-        if (name[i] == '/') {
-            cur_dir[cur_idx] = 0;
-            if (_find_file(_fs, cur_dir) != FR_OK || _fs->file_header.type != FILEOBJ_DIR) {
-                return FR_NO_PATH;
-            }
-            _fs->parent_dir = FILE_ID(_fs->file_header);
-            _get_next_fileobj(_fs); //get the next file object
-            cur_idx = 0;
-        } else {
-            cur_dir[cur_idx++] = name[i];
-            if (name[i] == 0) {
-                break;
-            }
-        }
-        i++;
-    }
-    int res = _find_file(_fs, cur_dir);
+    int res = _find_parent_dir(_fs, name, cur_dir);
     if (res)
         return res;
+    //Find the file itself
+    res = _find_file(_fs, cur_dir);
+    if (res) {
+#if DEVOFS_CREATE_FILE
+        // Only enable if creating new files is required, since it pulls in a bunch of extra code
+        if (flags & O_CREAT) {
+            //File doesn't exist but we want to create it
+            _create_file_or_dir(cur_dir, AM_FILE);
+            _fs->file_cur_pos = 0;
+            return FR_OK;
+        }
+#endif
+        return res;
+    }
     if (_fs->file_header.type == FILEOBJ_FILE) {
         _fs->file_cur_pos = 0;
         if (flags & O_CREAT) {
-            _create_empty_file();
+            _create_empty_file(1);
         }
         return FR_OK;
     }
@@ -465,6 +584,14 @@ FRESULT df_write (const void *buffer, u16 requested, u16 *written)
     return FR_OK;  
 }
 
+FRESULT df_stat(FILINFO *fi) {
+    if(_fs->file_header.type == FILEOBJ_NONE || _fs->file_header.type == FILEOBJ_DELETED) {
+        return FR_NO_PATH;
+    }
+    _fill_fileinfo(_fs, fi);
+    return FR_OK;
+}
+        
 FRESULT df_switchfile (FATFS *fs)
 {
     _fs = fs;
