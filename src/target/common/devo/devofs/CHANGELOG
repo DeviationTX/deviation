@@ -1,0 +1,5 @@
+2015-05-02 : Initial Version
+2016-04-05 : Change Filesystem to Version 02
+             Filesystem format is now incompatible with previous code
+             the 'type' field was modified to have a proper bitfield syntax
+             This change was needed to distinguish between deleted files and deleted directories

@@ -72,11 +72,11 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-Geoffrey Hausheer, E<lt>ghaushe@E<gt>
+Phractured Blue<lt>rc2012@pblue.org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Geoffrey Hausheer
+Copyright (C) 2015 by Phractured Blue
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

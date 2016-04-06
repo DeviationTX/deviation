@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use Getopt::Long;
 
-my $FILEOBJ_DIR = 0x7F;
-my $FILEOBJ_FILE = 0xF7;
+my $FILEOBJ_DIR  = 0x41;
+my $FILEOBJ_FILE = 0x43;
 my $START_SECTOR = 0xFF;
 
 my $outf = "";
@@ -33,6 +33,7 @@ foreach my $file (@files) {
     foreach my $dir (@dirs) {
         if(! $dirid{$dir}) {
             $dirid{$dir} = $next_dir++;
+            # print stderr "DIR: " . join("/", @dirs) . "\n";
             add_dir($dir, $cur_dir, $dirid{$dir});
         }
         $cur_dir = $dirid{$dir};
@@ -46,6 +47,7 @@ foreach my $file (@files) {
         $data = <$fh>;
         close $fh;
     }
+    # print stderr "FILE: $file\n";
     add_file($filename, $cur_dir, $data);
 }
 

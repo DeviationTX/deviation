@@ -26,13 +26,16 @@ enum {
 
 #define FILE_SIZE(x) ((x).type == FILEOBJ_DIR ? 0 : (((x).size1 << 16) | ((x).size2 << 8) | (x).size3))
 #define FILE_ID(x) ((x).size1)
+#define FILE_DELETED(x) (((x).type & FILEOBJ_DELMASK) == FILEOBJ_DELMASK)
 /* This assumes flash reset = 0x00.  bits are defined to ensure only 1 type can e set before a reset happens */
 enum {
     FILEOBJ_NONE    = 0x00,
-    FILEOBJ_FILE    = 0xf7,
-    FILEOBJ_WRITE   = 0xf6, //File is being written (this state will never be written to disk)
-    FILEOBJ_DIR     = 0x7f,
-    FILEOBJ_DELETED = 0xff,
+    FILEOBJ_FILE    = 0x43,
+    FILEOBJ_WRITE   = 0x03, //File is being written (this state will never be written to disk)
+    FILEOBJ_DIR     = 0x41,
+    FILEOBJ_FILEDEL = 0xC3,
+    FILEOBJ_DIRDEL  = 0xC1,
+    FILEOBJ_DELMASK = 0xC0,
 };
 static FATFS *_fs;
 
@@ -87,7 +90,7 @@ FRESULT df_compact()
         if (fh.type == FILEOBJ_NONE)
             break;
         int len = FILE_SIZE(fh);
-        if (fh.type == FILEOBJ_DELETED) {
+        if (FILE_DELETED(fh)) {
             read_addr = _get_addr(read_addr, sizeof(struct file_header) + len);
             continue;
         }
@@ -284,7 +287,7 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
    _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
 
    while(fs->file_header.type != FILEOBJ_NONE) {
-       if (fs->file_header.type != FILEOBJ_DELETED && fs->parent_dir == fs->file_header.parent_dir && memcmp(fs->file_header.name, name, 11) == 0) {
+       if (! FILE_DELETED(fs->file_header) && fs->parent_dir == fs->file_header.parent_dir && memcmp(fs->file_header.name, name, 11) == 0) {
            //Found matching file
            fs->file_cur_pos = -1;
            return FR_OK;
@@ -366,7 +369,7 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
     }
     _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
     while (dir->file_header.type != FILEOBJ_NONE) {
-        if (dir->file_header.type != FILEOBJ_DELETED && dir->file_header.parent_dir == dir->parent_dir) {
+        if (! FILE_DELETED(dir->file_header) && dir->file_header.parent_dir == dir->parent_dir) {
             _fill_fileinfo(dir, fi);
             return FR_OK;
         }
@@ -392,7 +395,7 @@ void _create_empty_file(int delete_first)
     //Delete file 1st
     u8 data[BUF_SIZE];
     if (delete_first) {
-        data[0] = FILEOBJ_DELETED;
+        data[0] = FILEOBJ_FILEDEL;
         disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
         _fs->file_addr = _get_next_write_addr();
     }
@@ -436,7 +439,7 @@ FRESULT df_unlink(const char *name)
     res = _find_file(_fs, cur_dir);
     if (res == 0) {
         u8 data[2];
-        data[0] = FILEOBJ_DELETED;
+        data[0] = _fs->file_header.type |= FILEOBJ_DELMASK;
         disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
         return FR_OK;
     }
@@ -585,7 +588,7 @@ FRESULT df_write (const void *buffer, u16 requested, u16 *written)
 }
 
 FRESULT df_stat(FILINFO *fi) {
-    if(_fs->file_header.type == FILEOBJ_NONE || _fs->file_header.type == FILEOBJ_DELETED) {
+    if(_fs->file_header.type == FILEOBJ_NONE || FILE_DELETED(_fs->file_header)) {
         return FR_NO_PATH;
     }
     _fill_fileinfo(_fs, fi);
