@@ -39,7 +39,7 @@ enum {
 };
 static FATFS *_fs;
 
-static int _read(void * buf, int addr, int len);
+static int _spiread(void * buf, int addr, int len);
 static int _get_addr(int addr, int offset);
 
 int _get_next_sector(int sec) {
@@ -86,7 +86,7 @@ FRESULT df_compact()
         if (read_addr == file_addr)
             file_addr = write_sec * SECTOR_SIZE + write_off;
 
-        _read(&fh, read_addr, sizeof(struct file_header));
+        _spiread(&fh, read_addr, sizeof(struct file_header));
         if (fh.type == FILEOBJ_NONE)
             break;
         int len = FILE_SIZE(fh);
@@ -121,7 +121,7 @@ FRESULT df_compact()
             if (! len)
                 break;
             buf_len = len > BUF_SIZE ? BUF_SIZE : len;
-            _read(buf, read_addr, buf_len);
+            _spiread(buf, read_addr, buf_len);
             buf_ptr = buf;
             len -= buf_len;
             read_addr = _get_addr(read_addr, buf_len);
@@ -143,7 +143,7 @@ FRESULT df_compact()
     return FR_OK;
 }
 
-int _read(void * buf, int addr, int len)
+int _spiread(void * buf, int addr, int len)
 {
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
@@ -167,7 +167,7 @@ int _read(void * buf, int addr, int len)
     }
     return orig_len - len;
 }
-int _write(const void* buf, int addr, int len)
+int _spiwrite(const void* buf, int addr, int len)
 {
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
@@ -284,7 +284,7 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
    char name[11];
 
    _format_filename(fullname, name);
-   _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
+   _spiread(&fs->file_header, fs->file_addr, sizeof(struct file_header));
 
    while(fs->file_header.type != FILEOBJ_NONE) {
        if (! FILE_DELETED(fs->file_header) && fs->parent_dir == fs->file_header.parent_dir && memcmp(fs->file_header.name, name, 11) == 0) {
@@ -293,7 +293,7 @@ FRESULT _find_file(FATFS *fs, const char *fullname)
            return FR_OK;
        }
        fs->file_addr = _get_addr(fs->file_addr, sizeof(struct file_header) + FILE_SIZE(fs->file_header));
-       _read(&fs->file_header, fs->file_addr, sizeof(struct file_header));
+       _spiread(&fs->file_header, fs->file_addr, sizeof(struct file_header));
    }
    return FR_NO_PATH;
 }
@@ -367,14 +367,14 @@ FRESULT df_readdir (DIR *dir, FILINFO *fi)
             return FR_NO_PATH;
         _get_next_fileobj(dir);
     }
-    _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
+    _spiread(&dir->file_header, dir->file_addr, sizeof(struct file_header));
     while (dir->file_header.type != FILEOBJ_NONE) {
         if (! FILE_DELETED(dir->file_header) && dir->file_header.parent_dir == dir->parent_dir) {
             _fill_fileinfo(dir, fi);
             return FR_OK;
         }
         _get_next_fileobj(dir);
-        _read(&dir->file_header, dir->file_addr, sizeof(struct file_header));
+        _spiread(&dir->file_header, dir->file_addr, sizeof(struct file_header));
     }
     return FR_NO_PATH;
 }
@@ -385,7 +385,7 @@ int _get_next_write_addr()
     int addr = _fs->file_addr;
     while(fh.type != FILEOBJ_NONE) {
         addr = _get_addr(addr, sizeof(struct file_header) + FILE_SIZE(fh));
-        _read(&fh, addr, sizeof(struct file_header));
+        _spiread(&fh, addr, sizeof(struct file_header));
     }
     return addr;
 }
@@ -418,7 +418,7 @@ void _create_empty_file(int delete_first)
         _fs->file_header.size1 = 0; 
         _fs->file_header.size2 = 0; 
         _fs->file_header.size3 = 0; 
-        _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+        _spiwrite(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
         //place the maximum allocated filesize as a place-holder
         _fs->file_header.size1 = 0xff & (max_size >> 16);
         _fs->file_header.size2 = 0xff & (max_size >> 8);
@@ -426,7 +426,7 @@ void _create_empty_file(int delete_first)
         _fs->file_header.type  = FILEOBJ_WRITE;
         _fs->file_cur_pos = 0;
     } else {
-        _write(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+        _spiwrite(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
     }
 }
 
@@ -450,7 +450,7 @@ void _create_file_or_dir(char *fname, int type)
 {
     // Need to initialzie addr and read 1st item for get_next_write_addr
     _fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
-    _read(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
+    _spiread(&_fs->file_header, _fs->file_addr, sizeof(struct file_header));
     if (type == AM_FILE) {
         _fs->file_addr = _get_next_write_addr();
         _fs->file_header.type = FILEOBJ_FILE;
@@ -467,7 +467,7 @@ void _create_file_or_dir(char *fname, int type)
                 seen_dir[id / 8] |= 1 << (id % 8);
             }
             _fs->file_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + FILE_SIZE(fh));
-            _read(&fh, _fs->file_addr, sizeof(struct file_header));
+            _spiread(&fh, _fs->file_addr, sizeof(struct file_header));
         }
         for(i = 0; i < 256; i++) {
             if((seen_dir[i/8] & (1 << (i % 8))) == 0)
@@ -535,7 +535,7 @@ FRESULT df_close ()
         _fs->file_header.size1 = 0xff & (_fs->file_cur_pos >> 16);
         _fs->file_header.size2 = 0xff & (_fs->file_cur_pos >> 8);
         _fs->file_header.size3 = 0xff & (_fs->file_cur_pos >> 0);
-        _write(&_fs->file_header.size1, _fs->file_addr + offsetof(struct file_header, size1), 3);
+        _spiwrite(&_fs->file_header.size1, _fs->file_addr + offsetof(struct file_header, size1), 3);
     }
     _fs->file_cur_pos = -1;
     return FR_OK;
@@ -546,7 +546,7 @@ FRESULT df_read (void *buf, u16 requested, u16 *actual)
     if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
         requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
     } 
-    *actual = _read(buf, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
+    *actual = _spiread(buf, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
     _fs->file_cur_pos += *actual;
     return FR_OK;
 }
@@ -581,7 +581,7 @@ FRESULT df_write (const void *buffer, u16 requested, u16 *written)
     if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
         requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
     } 
-    _write(buffer, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
+    _spiwrite(buffer, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
     _fs->file_cur_pos += requested;
     *written = requested;
     return FR_OK;  
