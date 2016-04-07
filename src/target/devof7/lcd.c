@@ -337,10 +337,8 @@ void LCD_ShowVideo(u8 enable)
 void VIDEO_Enable(int on) 
 {
     if(on) {
-        gpio_set(GPIOE, GPIO11);
         LCD_ShowVideo(1);
     } else {
-        gpio_clear(GPIOE, GPIO11);
         LCD_ShowVideo(0);
     }
 
