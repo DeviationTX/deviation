@@ -204,7 +204,7 @@ static u16 convert_channel(u8 num)
 
 static void build_data_packet()
 {
-#define spacer1 0b10
+#define spacer1 0x02 //0b10
 #define spacer2 (spacer1 << 4)
     unsigned ch_offset = state == SFHSS_DATA1 ? 0 : 4;
 
@@ -220,11 +220,11 @@ static void build_data_packet()
     packet[4]  = 0;
     packet[5]  = (rf_chan << 3) | spacer1 | ((ch1 >> 9) & 0x01);
     packet[6]  = (ch1 >> 1);
-    packet[7]  = (ch1 << 7) | spacer2 | ((ch2 >> 5) & 0b11111);
+    packet[7]  = (ch1 << 7) | spacer2 | ((ch2 >> 5) & 0x1F /*0b11111*/);
     packet[8]  = (ch2 << 3) | spacer1  | ((ch3 >> 9) & 0x01);
     packet[9]  = (ch3 >> 1);
-    packet[10] = (ch3 << 7) | spacer2  | ((ch4 >> 5) & 0b11111);
-    packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0b111);
+    packet[10] = (ch3 << 7) | spacer2  | ((ch4 >> 5) & 0x1F /*0b11111*/);
+    packet[11] = (ch4 << 3) | ((fhss_code >> 2) & 0x07 /*0b111 */);
     packet[12] = (fhss_code << 6) | state;
 }
 
