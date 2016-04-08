@@ -25,8 +25,8 @@ emus: $(EMUS)
 both: txs emus
 fss: $(TXS:%=fs_%)
 zips: $(TXS:%=zip_%)
-emuzips: $(TXS:%=zip_emu_%)
-winzips: $(TXS:%=zip_win_%)
+emuzips: $(EMUS:%=zip_%)
+winzips: $(EMUS:%=zip_win_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
@@ -48,9 +48,9 @@ both_$1: $1 emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
 zip_emu_$1:
-	$(MAKE) TARGET=emu_$1 zip
+	$(MAKE) TARGET=$1 zip
 zip_win_$1:
-	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
+	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
 release_$1: zip_$1 zip_win_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
