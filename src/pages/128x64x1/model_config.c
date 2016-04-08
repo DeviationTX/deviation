@@ -234,6 +234,17 @@ void MODELVIDEO_Config()
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
+void PAGE_VideoSetupInit(int page)
+{
+    (void)page;
+    PAGE_SetModal(0);
+    PAGE_RemoveAllObjects();
+    show_titlerow(_tr("Video"));
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+}
+
 #endif //HAS_VIDEO
 
 void MODELPROTO_Config()

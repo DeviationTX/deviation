@@ -26,6 +26,9 @@ PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,     
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, PAGE_TelemconfigExit, _tr_noop("Telemetry config"))
 #endif
+#if HAS_VIDEO
+PAGEDEF(PAGEID_VIDEOCFG, PAGE_VideoSetupInit,  NULL,                  NULL,             _tr_noop("Video setup"))
+#endif
 PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        PAGE_TrimExit,    _tr_noop("Trims"))
 #if HAS_DATALOG
 PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     PAGE_DatalogExit, _tr_noop("Datalog"))
