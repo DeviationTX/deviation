@@ -33,11 +33,9 @@ everything: txs emus fss
 define make-target
 $1:
 	$(MAKE) TARGET=$1
-emu_$1:
-	$(MAKE) TARGET=emu_$1
 # This builds Windows emulators on a Linux system.
 win_$1:
-	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
 ifneq "$(findstring $1,$(NOFSTXS))" "$1"
@@ -47,8 +45,6 @@ endif
 both_$1: $1 emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
-zip_emu_$1:
-	$(MAKE) TARGET=$1 zip
 zip_win_$1:
 	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
 release_$1: zip_$1 zip_win_$1 fs_$1
@@ -57,7 +53,7 @@ all_$1:
 endef
 
 # Now generate all the convenience targets
-$(foreach t,$(TXS),$(eval $(call make-target,$t)))
+$(foreach t,$(TXS) $(EMUS),$(eval $(call make-target,$t)))
 endif
 
 # We want to turn on INCLUDE_FS by default
