@@ -8,7 +8,7 @@ my $fh;
 my $tag;
 my $version;
 my $count = 0;
-if (! -d "$FindBin::Bin/../.hg") {
+if (! -d "$FindBin::Bin/../.git") {
     #No hg found
     if (! -f "$FindBin::Bin/../.hg_archival.txt") {
         print "${target}-Unknown";
@@ -33,21 +33,12 @@ if (! -d "$FindBin::Bin/../.hg") {
         }
     }
 } else {
-    if (! open $fh, "hg log -f --template 'Version: {node} Tags: {tags}\n' 2> /dev/null |") {
+    if (! open $fh, "git describe --tags 2> /dev/null |") {
         print "${target}-Unknown";
         exit 0;
     }
-    while(<$fh>) {
-        chomp;
-        if(! /Version:\s+(\S+)\s+Tags:\s+(.*)/) {
-            next;
-        }
-        $version ||= $1;
-        if($2 && $2 ne "tip") {
-            $tag = $2;
-            last;
-        }
-        $count++;
+    if (<$fh> =~ /^(.*)-(\d+)-([^-]*)$/) {
+        ($tag, $count, $version) = ($1, $2, $3);
     }
 }
 if(! $version) {

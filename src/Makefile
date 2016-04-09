@@ -128,11 +128,7 @@ PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o)))
 SYMBOL_FILE := $(ODIR)/symbolfile
 endif
 
-ifeq "$(wildcard ../.hg )" ""
-  HGVERSION := ${TARGET}-Unknown
-else
-  HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
-endif
+HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
 
 # Rebuild on hg version change.
 # Based on http://mercurial.selenic.com/wiki/VersioningWithMake

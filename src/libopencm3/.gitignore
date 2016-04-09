@@ -1,0 +1,12 @@
+*.d
+*.a
+lib/*.ld
+lib/*/*/vector_nvic.c
+lib/lm3s/vector_nvic.c
+lib/lpc13xx/vector_nvic.c
+lib/lpc17xx/vector_nvic.c
+include/libopencm3/*/*/nvic.h
+include/libopencm3/lm3s/nvic.h
+include/libopencm3/lpc13xx/nvic.h
+include/libopencm3/lpc17xx/nvic.h
+*irqhandlers.h
