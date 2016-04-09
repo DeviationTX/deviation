@@ -23,7 +23,8 @@ SRC_C   += $(SDIR)/target/devof7/backlight.c\
            $(SDIR)/target/devof7/channels.c \
            $(SDIR)/target/devof7/ia9211_map.c \
            $(SDIR)/target/devof7/lcd.c \
-           $(SDIR)/target/devof7/tx_buttons.c
+           $(SDIR)/target/devof7/tx_buttons.c \
+           $(SDIR)/target/devof7/crc.c
 
 else
 
