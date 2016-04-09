@@ -1,0 +1,47 @@
+# boards are ordered by priority so that when monitoring a build developers get feedback on the important ones first.
+env:
+  - TARGET=devo8
+  - TARGET=devo10
+  - TARGET=devo12
+  - TARGET=devo7e
+#  - COMPILER=latest TARGET=devo8
+
+# use new docker environment
+sudo: false
+
+#sudo: required
+#dist: trusty
+
+addons:
+  apt:
+    packages:
+      - build-essential
+      - git
+      - libc6-i386
+#      - gcc-arm-none-eabi
+
+language: c
+compiler: gcc
+
+before_install:
+   - if [ ! -d "$HOME/gcc-arm-none-eabi-4_8-2013q4/bin" ]; then
+       pushd $HOME;
+       curl --retry 10 --retry-max-time 120 -L "https://launchpad.net/gcc-arm-embedded/4.8/4.8-2013-q4-major/+download/gcc-arm-none-eabi-4_8-2013q4-20131204-linux.tar.bz2" | tar xfj -;
+       popd;
+     fi;
+
+install:
+  - export PATH=$PATH:$HOME/gcc-arm-none-eabi-4_8-2013q4/bin
+
+before_script:
+  - echo $PATH
+  - echo $HOME
+  - arm-none-eabi-gcc --version
+
+script: cd src && make
+
+cache:
+  apt: true
+  directories:
+  - $HOME/gcc-arm-none-eabi-4_8-2013q4
+
