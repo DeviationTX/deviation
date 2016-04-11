@@ -8,37 +8,18 @@ my $fh;
 my $tag;
 my $version;
 my $count = 0;
-if (! -d "$FindBin::Bin/../.git") {
-    #No hg found
-    if (! -f "$FindBin::Bin/../.hg_archival.txt") {
-        print "${target}-Unknown";
-        exit 0;
-    }
-    open $fh, "$FindBin::Bin/../.hg_archival.txt";
-    $count = 1;
-#repo: 193697f59e5cf61947faf6102a5b3c786b1f50a3
-#node: 6cec02426da64186f78bea51486e15659a6c16ad
-#branch: default
-#latesttag: v3.0.0
-#latesttagdistance: 365
-    while(<$fh>) {
-        if(/^\s*(?:latest)?tag:\s+(.*\S)/) {
-            $tag = $1;
-        }
-        elsif(/latesttagdistance:\s+(\d+)/) {
-            $count = $1+1;
-        }
-        elsif(/node:\s+(.*\S)/) {
-            $version = $1;
-        }
-    }
+my $git_root = `git rev-parse --show-toplevel 2> /dev/null | tr -d '\n'`;
+if (! $git_root || ! -d $git_root) {
+    print "${target}-Unknown";
+    exit 0;
 } else {
-    if (! open $fh, "git describe --tags 2> /dev/null |") {
-        print "${target}-Unknown";
-        exit 0;
-    }
-    if (<$fh> =~ /^(.*)-(\d+)-([^-]*)$/) {
+    if (`git describe --tags 2> /dev/null` =~ /^(.*)-(\d+)-g([^-]*)$/) {
         ($tag, $count, $version) = ($1, $2, $3);
+    } else {
+        # This can fail if we have a shallow clone
+        $version = `git rev-parse HEAD`;
+        $tag = `git ls-remote --tags \`git config --get remote.origin.url\` | sort -Vk2 | tail -n 1 | sed -e 's/.*\\///'`;
+        chomp($tag);
     }
 }
 if(! $version) {
