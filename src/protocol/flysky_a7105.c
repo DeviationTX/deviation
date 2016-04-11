@@ -41,6 +41,8 @@
 #define BIND_COUNT 2500
 #endif
 
+#define PACKET_PERIOD 1510
+
 static const char * const flysky_opts[] = {
   "WLToys ext.",  _tr_noop("Off"), "V9x9", "V6x6", "V912", NULL,
   NULL
@@ -335,7 +337,7 @@ static u16 flysky_cb()
         if (! chancol) //Keep transmit power updated
             A7105_SetPower(Model.tx_power);
     }
-    return 1460;
+    return PACKET_PERIOD;
 }
 
 static void initialize(u8 bind) {
@@ -358,7 +360,7 @@ static void initialize(u8 bind) {
     chanoffset = (id & 0xff) / 16;
     if (bind || ! Model.fixed_id) {
         counter = BIND_COUNT;
-        PROTOCOL_SetBindState(2500 * 1460 / 1000); //msec
+        PROTOCOL_SetBindState(2500 * PACKET_PERIOD / 1000); //msec
     } else {
         counter = 0;
     }
