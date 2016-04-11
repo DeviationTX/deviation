@@ -106,12 +106,26 @@ int main() {
 #endif
 }
 #else //DUMP_BOOTLOADER
+#define SPI_BOOTLOADER 1
 int main() {
     PWR_Init();
     CLOCK_Init();
     UART_Initialize();
     if(PWR_CheckPowerSwitch()) PWR_Shutdown();
-    dump_bootloader();
+#if SPI_BOOTLOADER
+    Initialize_ButtonMatrix();
+    SPIFlash_Init(); //This must come before LCD_Init() for 7e
+    SPI_FlashBlockWriteEnable(1); //Enable writing to all banks of SPIFlash
+    LCD_Init();
+    LCD_Clear(0x0000);
+    BACKLIGHT_Init();
+    BACKLIGHT_Brightness(5);
+    LCD_SetFont(0);
+    LCD_SetFontColor(0xffff);
+    dump_bootloader(0);
+#else
+    dump_bootloader(1);
+#endif
 }
 #endif //DUMP_BOOTLOADER
 
@@ -119,6 +133,7 @@ void Init() {
     PWR_Init();
     CLOCK_Init();
     UART_Initialize();
+    printf("Start\n");
     Initialize_ButtonMatrix();
     SPIFlash_Init(); //This must come before LCD_Init() for 7e
 

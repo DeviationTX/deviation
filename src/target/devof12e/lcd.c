@@ -360,7 +360,7 @@ void LCD_Init()
     gpio_set_mode(GPIOD, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_PUSHPULL, GPIO8 | GPIO10);
     gpio_clear(GPIOD, GPIO8 | GPIO10);
-    TW8816_Reset();
+    TW8816_ResetLoop();
     TW8816_Init();
     //TW8816_Test();
 }

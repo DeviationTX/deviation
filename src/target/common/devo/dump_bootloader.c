@@ -1,20 +1,28 @@
 #include "common.h"
 
 //UART bootloader dump
-void dump_bootloader()
+void dump_bootloader(int uart)
 {
     u32 *ptr = (u32*)0x08000000;
     for(int j = 0; j < VECTOR_TABLE_LOCATION / 0x1000; j++) {
         printf("\nAddress: 0x%08x\n", (u32)ptr);
-        for(int i = 0; i < 0x1000 / 4; i++) {
-            u32 b = *ptr;
-            printf("%02x", 0xff & (b >> 0));
-            printf("%02x", 0xff & (b >> 8));
-            printf("%02x", 0xff & (b >> 16));
-            printf("%02x", 0xff & (b >> 24));
-            ptr++;
+        if (uart) {
+            for(int i = 0; i < 0x1000 / 4; i++) {
+                u32 b = *ptr;
+                printf("%02x", 0xff & (b >> 0));
+                printf("%02x", 0xff & (b >> 8));
+                printf("%02x", 0xff & (b >> 16));
+                printf("%02x", 0xff & (b >> 24));
+                ptr++;
+            }
+        } else {
+            unsigned pos = j * 0x1000;
+            SPIFlash_EraseSector(0x1000*SPIFLASH_SECTOR_OFFSET + pos);
+            SPIFlash_WriteBytes(0x1000*SPIFLASH_SECTOR_OFFSET +  pos, 0x1000, (u8*)0x08000000 + pos);
         }
     }
+    LCD_PrintStringXY(0, 0, "    Done");
+    USB_Connect();
 
     while(1)
     {
