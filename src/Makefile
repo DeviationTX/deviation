@@ -11,7 +11,7 @@ TARGET   ?= devo8
 default: $(TARGET)
 
 # The supported transmitters
-TXS = devo6 devo7e devo7e_256 devo7e_512 devo8 devo10 devo12 devof7 devof4 devof12e
+TXS = devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e
 # x9d needs more software installed.
 #TXS = devo6 devo7e devo8 devo10 devo12 x9d
 # These txs use file systems for other txs, so don't have a file system target.
