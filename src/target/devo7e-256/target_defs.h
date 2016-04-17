@@ -20,6 +20,7 @@
 #define HAS_LAYOUT_EDITOR   1
 #define HAS_EXTRA_SWITCHES  OPTIONAL
 #define HAS_EXTRA_BUTTONS  0
+#define HAS_EXTRA_POTS      0
 #define HAS_MULTIMOD_SUPPORT 1
 #define HAS_VIDEO           0
 
@@ -44,7 +45,11 @@
 #define MAX_POINTS 13
 #define NUM_MIXERS ((NUM_OUT_CHANNELS + NUM_VIRT_CHANNELS) * 4)
 
-#define INP_HAS_CALIBRATION 6
+#if HAS_EXTRA_POTS
+  #define INP_HAS_CALIBRATION 6
+#else
+  #define INP_HAS_CALIBRATION 4
+#endif
 
 /* Compute voltage from y = 2.1592x + 0.2493 */
 #define VOLTAGE_NUMERATOR 216
