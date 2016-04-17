@@ -11,7 +11,6 @@ include $(SDIR)/target/common/devo/Makefile.inc
 ifndef BUILD_TARGET
 
 SRC_C   += $(SDIR)/target/devo7e/backlight.c \
-					 $(SDIR)/target/devo7e/channels.c \
 					 $(SDIR)/target/devo7e/crc.c \
            $(SDIR)/target/devo7e/lcd.c \
            $(SDIR)/target/devo7e/tx_buttons.c
