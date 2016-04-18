@@ -95,7 +95,7 @@ enum{
     // flags going to packet[6] (MT99xx, H7)
     FLAG_MT_RATE1   = 0x01, // (H7 high rate)
     FLAG_MT_RATE2   = 0x02, // (MT9916 only)
-    FLAG_MT_VIDEO   = 0x10,
+    FLAG_MT_VIDEO   = 0x10, // HeadLess on LS114
     FLAG_MT_SNAPSHOT= 0x20,
     FLAG_MT_FLIP    = 0x80,
 };
@@ -175,27 +175,25 @@ static void mt99xx_send_packet()
             packet[3] = scale_channel(CHANNEL2, 0x00, 0xe1); // elevator
             packet[4] = 0x20; // neutral pitch trim (0x3f-0x20-0x00)
             packet[5] = 0x20; // neutral roll trim (0x00-0x20-0x3f)
-            packet[6] = GET_FLAG( CHANNEL_FLIP, FLAG_MT_FLIP)
-                      | GET_FLAG( CHANNEL_SNAPSHOT, FLAG_MT_SNAPSHOT)
-                      | GET_FLAG( CHANNEL_VIDEO, FLAG_MT_VIDEO);
+            packet[6] = GET_FLAG( CHANNEL_FLIP, FLAG_MT_FLIP);
+            packet[7] = h7_mys_byte[rf_chan]; // next rf channel index ?
+            
             if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_H7) {
                 packet[6] |= FLAG_MT_RATE1; // max rate on H7
             }
             else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_MT99) {
-                packet[6] |= 0x40 | FLAG_MT_RATE2; // max rate on MT99xx
+                packet[6] |= 0x40 | FLAG_MT_RATE2
+                          | GET_FLAG( CHANNEL_SNAPSHOT, FLAG_MT_SNAPSHOT)
+                          | GET_FLAG( CHANNEL_VIDEO, FLAG_MT_VIDEO); // max rate on MT99xx
             }
-            else {
-                packet[6] |= FLAG_MT_RATE2; // max rate on LS114
-            }
-            
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+            else if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+                packet[6] |= FLAG_MT_RATE2; // max rate
+                packet[6] |= GET_FLAG( CHANNEL_HEADLESS, 0x10);
                 packet[7] = ls_mys_byte[ls_counter++];
                 if(ls_counter >= sizeof(ls_mys_byte))
                     ls_counter = 0;
             }
-            else {
-                packet[7] = h7_mys_byte[rf_chan];
-            }
+           
             packet[8] = calcChecksum();
             break;
         case PROTOOPTS_FORMAT_YZ:
