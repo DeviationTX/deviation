@@ -60,9 +60,16 @@ static const u8 data_freq[] = {
     0x2A, 0x20, 0x34, 0x16, 0x3e, 0x0c, 0x48, 0x02
 };
 
-static const u8 mys_byte[] = {
+static const u8 h7_mys_byte[] = {
     0x01, 0x11, 0x02, 0x12, 0x03, 0x13, 0x04, 0x14, 
     0x05, 0x15, 0x06, 0x16, 0x07, 0x17, 0x00, 0x10
+};
+
+static const u8 ls_mys_byte[] = {
+    0x05, 0x15, 0x25, 0x06, 0x16, 0x26,
+    0x07, 0x17, 0x27, 0x00, 0x10, 0x20,
+    0x01, 0x11, 0x21, 0x02, 0x12, 0x22,
+    0x03, 0x13, 0x23, 0x04, 0x14, 0x24
 };
 
 // For code readability
@@ -93,11 +100,6 @@ enum{
     FLAG_MT_FLIP    = 0x80,
 };
 
-enum{
-    // flags going to ?????? (Yi Zhan i6S)
-    BLABLA,
-};
-
 enum {
     MT99XX_INIT = 0,
     MT99XX_BIND,
@@ -105,7 +107,7 @@ enum {
 };
 
 static const char * const mt99xx_opts[] = {
-    _tr_noop("Format"), "MT9916", "H7", "YZ i6S", NULL,
+    _tr_noop("Format"), "MT9916", "H7", "YZ i6S", "LS114", NULL,
     NULL
 };
 
@@ -119,6 +121,7 @@ enum {
     PROTOOPTS_FORMAT_MT99,
     PROTOOPTS_FORMAT_H7,
     PROTOOPTS_FORMAT_YZ,
+    PROTOOPTS_FORMAT_LS,
 };
 
 static u8 packet[PACKET_SIZE];
@@ -160,10 +163,12 @@ static void mt99xx_send_packet()
     const u8 yz_p4_seq[3] = {0xa0, 0x20, 0x60};
     static u8 packet_count=0;
     static u8 yz_seq_num=0;
+    static u8 ls_counter=0;
     
     switch( Model.proto_opts[PROTOOPTS_FORMAT]) {
         case PROTOOPTS_FORMAT_MT99:
         case PROTOOPTS_FORMAT_H7:
+        case PROTOOPTS_FORMAT_LS:
             packet[0] = scale_channel(CHANNEL3, 0xe1, 0x00); // throttle
             packet[1] = scale_channel(CHANNEL4, 0x00, 0xe1); // rudder
             packet[2] = scale_channel(CHANNEL1, 0xe1, 0x00); // aileron
@@ -173,16 +178,24 @@ static void mt99xx_send_packet()
             packet[6] = GET_FLAG( CHANNEL_FLIP, FLAG_MT_FLIP)
                       | GET_FLAG( CHANNEL_SNAPSHOT, FLAG_MT_SNAPSHOT)
                       | GET_FLAG( CHANNEL_VIDEO, FLAG_MT_VIDEO);
-            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_MT99) {
-                packet[6] |= 0x40 | FLAG_MT_RATE2;
-            }
-            else {
+            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_H7) {
                 packet[6] |= FLAG_MT_RATE1; // max rate on H7
             }
-            // todo: mys_byte = next channel index ? 
-            // low nibble: index in chan list ?
-            // high nibble: 0->start from start of list, 1->start from end of list ?
-            packet[7] = mys_byte[rf_chan];
+            else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_MT99) {
+                packet[6] |= 0x40 | FLAG_MT_RATE2; // max rate on MT99xx
+            }
+            else {
+                packet[6] |= FLAG_MT_RATE2; // max rate on LS114
+            }
+            
+            if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+                packet[7] = ls_mys_byte[ls_counter++];
+                if(ls_counter >= sizeof(ls_mys_byte))
+                    ls_counter = 0;
+            }
+            else {
+                packet[7] = h7_mys_byte[rf_chan];
+            }
             packet[8] = calcChecksum();
             break;
         case PROTOOPTS_FORMAT_YZ:
@@ -210,8 +223,13 @@ static void mt99xx_send_packet()
             packet[8] = 0xff;
             break;
     }
-
-    NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan] + channel_offset);
+    
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x2d); // LS always transmits on the same channel
+    }
+    else {
+        NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan] + channel_offset);
+    }
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
     XN297_WritePayload(packet, PACKET_SIZE);
@@ -313,7 +331,10 @@ static void initialize_txid()
         txid[0] = 0x53; // test (SB id)
         txid[1] = 0x00;
     }
-    checksum_offset = (txid[0] + txid[1]) & 0xff;
+    checksum_offset = (Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) ? 0xcc : 0;
+    checksum_offset += txid[0];
+    checksum_offset += txid[1];
+    checksum_offset &= 0xff;
     channel_offset = (((checksum_offset & 0xf0)>>4) + (checksum_offset & 0x0f)) % 8;
 }
 
@@ -328,16 +349,27 @@ static u16 mt99xx_callback()
 
     case MT99XX_BIND:
         if (bind_counter == 0) {
-            rx_tx_addr[0] = txid[0];
-            rx_tx_addr[1] = txid[1];
-            rx_tx_addr[2] = 0x00;
+            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+                rx_tx_addr[1] = txid[0];
+                rx_tx_addr[2] = txid[1];
+            }
+            else {
+                rx_tx_addr[0] = txid[0];
+                rx_tx_addr[1] = txid[1];
+                rx_tx_addr[2] = 0x00;
+            }
             // set tx address for data packets
             XN297_SetTXAddr(rx_tx_addr, 5);
             state = MT99XX_DATA;
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
-            NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan]);
+            if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, 0x2d);
+            }
+            else {
+                NRF24L01_WriteReg(NRF24L01_05_RF_CH, data_freq[rf_chan]);
+            }
             NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
             NRF24L01_FlushTx();
             XN297_WritePayload(packet, PACKET_SIZE); // bind packet
@@ -382,10 +414,24 @@ static void initialize()
             packet[2] = 0x05;
             packet[3] = 0x06;
             break;
+        case PROTOOPTS_FORMAT_LS:
+            packet_period = PACKET_PERIOD_MT;
+            packet[0] = 0x20;
+            packet[1] = 0x14;
+            packet[2] = 0x05;
+            packet[3] = 0x11;
     }
-    packet[4] = txid[0]; // 1th byte for data state tx address  
-    packet[5] = txid[1]; // 2th byte for data state tx address (always 0x00 on Yi Zhan ?)
-    packet[6] = 0x00; // 3th byte for data state tx address (always 0x00 ?)
+    
+    if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_LS) {
+        packet[4] = 0xcc;
+        packet[5] = txid[0];
+        packet[6] = txid[1];
+    }
+    else {
+        packet[4] = txid[0]; // 1th byte for data state tx address  
+        packet[5] = txid[1]; // 2th byte for data state tx address (always 0x00 on Yi Zhan ?)
+        packet[6] = 0x00; // 3th byte for data state tx address (always 0x00 ?)
+    }
     packet[7] = checksum_offset; // checksum offset
     packet[8] = 0xAA; // fixed
     
