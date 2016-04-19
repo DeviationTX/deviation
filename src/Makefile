@@ -10,15 +10,16 @@ ifndef  TARGET
 TARGET   ?= devo8
 default: $(TARGET)
 
+ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
+
 # The supported transmitters
 TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e
-# x9d needs more software installed.
-#TXS = devo6 devo7e devo8 devo10 devo12 x9d
 # These txs use file systems for other txs, so don't have a file system target.
 NOFSTXS = devo6 devo7e
 
 #Filter non-existant emus
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
 
 txs: $(TXS)
 emus: $(EMUS)
@@ -53,7 +54,7 @@ all_$1:
 endef
 
 # Now generate all the convenience targets
-$(foreach t,$(TXS) $(EMUS),$(eval $(call make-target,$t)))
+$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t)))
 endif
 
 # We want to turn on INCLUDE_FS by default
