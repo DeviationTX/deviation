@@ -86,9 +86,15 @@ after_success:
         export NIGHTLY_DATE=$(echo $TRAVIS_COMMIT_MSG | egrep -o '[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}');
         if [[ "$TRAVIS_COMMIT_MSG" == "Nightly Build "* ]] && [ "$NIGHTLY_DATE" != "" ]; then
             echo "Uploading Nightly - $NIGHTLY_DATE";
-            pwd;
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" -delete;
             ../utils/upload_test_build.pl -skip -nightly "$NIGHTLY_DATE" *.zip;
+        else
+            export RELEASE_VERSION=$(echo $TRAVIS_BRANCH | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+');
+            if [ "$RELEASE_VERSION" != "" ] && [ "$TRAVIS_BRANCH" == "v$RELEASE_VERSION" ]; then
+                echo "Releasing $RELEASE_VERSION";
+                ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" -delete;
+                ../utils/upload_test_build.pl -skip -release "$RELEASE_VERSION" *.zip;
+            fi;
         fi;
     fi;
        

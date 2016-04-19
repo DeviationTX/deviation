@@ -13,8 +13,11 @@ if (! $git_root || ! -d $git_root) {
     print "${target}-Unknown";
     exit 0;
 } else {
-    if (`git describe --tags 2> /dev/null` =~ /^(.*)-(\d+)-g([^-]*)$/) {
+    my $describe = `git describe --tags 2> /dev/null`;
+    if ($describe =~ /^(.*)-(\d+)-g([^-]*)$/) {
         ($tag, $count, $version) = ($1, $2, $3);
+    } elsif ($describe =~ /^(v\d+\.\d+\.\d+)$/) {
+        $version = $1;
     } else {
         # This can fail if we have a shallow clone
         $version = `git rev-parse HEAD`;
