@@ -18,11 +18,29 @@
 #include "config/tx.h"
 
 //Duplicated in channels.c
-#define SWITCH_3x2  0
-#define SWITCH_2x2  ((1 << INP_SWA2) | (1 << INP_SWB2))
-#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+//Duplicated in tx_buttons.c
+#define SWITCH_3x4_2x2  0
+#define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_2x2  ((1 << INP_SWA2) \
+                   | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
 #define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
-                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
 
 enum {
   SWT_SWA0 = 23,
@@ -117,7 +135,7 @@ u32 ScanButtons()
             idx++;
         }
     }
-    if (Transmitter.ignore_src != SWITCH_NONE) {
+    if ((Transmitter.ignore_src != SWITCH_NONE) && (Transmitter.ignore_src != SWITCH_3x4_2x2)) {
         //Write to C.6, read B
         if (result == 0) {
             gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);

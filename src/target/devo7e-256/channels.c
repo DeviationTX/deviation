@@ -20,12 +20,30 @@
 #include "../common/devo/devo.h"
 
 //Duplicated in tx_buttons.c
-#define SWITCH_3x2  0
-#define SWITCH_2x2  ((1 << INP_SWA2) | (1 << INP_SWB2))
-#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_3x4_2x2  0
+#define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_2x2  ((1 << INP_SWA2) \
+                   | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
 #define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
-                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1))
 
+//Duplicated in tx_buttons.c
 enum {
   SWT_SWA0 = 23,
   SWT_SWA2,
@@ -138,7 +156,9 @@ s32 CHAN_ReadInput(int channel)
 
 void CHAN_SetSwitchCfg(const char *str)
 {
-    if(strcmp(str, "3x2") == 0) {
+    if(strcmp(str, "3x4_2x2") == 0) {
+      Transmitter.ignore_src = SWITCH_3x4_2x2;
+    } else if(strcmp(str, "3x2") == 0) {
         Transmitter.ignore_src = SWITCH_3x2;
     } else if(strcmp(str, "2x2") == 0) {
         Transmitter.ignore_src = SWITCH_2x2;
