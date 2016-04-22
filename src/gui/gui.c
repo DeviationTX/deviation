@@ -227,7 +227,7 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 
 void GUI_DrawScreen(void)
 {
-#if DEBUG_DRAW
+#ifdef DEBUG_DRAW
     printf("DrawScreen\n");
 #endif
     /*
@@ -286,7 +286,7 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 
     struct guiObject *obj;
     if (FullRedraw) {
-#if DEBUG_DRAW
+#ifdef DEBUG_DRAW
         printf("Full Redraw requested: %d\n", FullRedraw);
 #endif
         if (modalObj && modalObj->Type == Dialog && FullRedraw != REDRAW_EVERYTHING) {
