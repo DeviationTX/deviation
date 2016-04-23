@@ -98,10 +98,12 @@ void GUI_DrawDialog(struct guiObject *obj)
 {
     struct guiBox *box = &obj->box;
     struct guiDialog *dialog = (struct guiDialog *)obj;
-    if (dialog->txtbox.height == 0) {
+    if (dialog->txtbox.height == 0 || dialog->txtbox.width == 0) {
+        // If this is the 1st time displaying the dialog, or the dialog has no text
+        // then do a full redraw
         _draw_dialog_box(box, dialog->txtbox.x, dialog->title);
-    } else if(dialog->txtbox.width) {
-        // NOTE: We assume all redraw events after the 1st are incremental!
+    } else {
+        // Otherwise do a incremental redraw
         GUI_DialogDrawBackground(dialog->txtbox.x, dialog->txtbox.y,
                                  dialog->txtbox.width, dialog->txtbox.height);
     }
