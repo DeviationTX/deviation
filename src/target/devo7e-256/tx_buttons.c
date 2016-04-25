@@ -63,10 +63,10 @@ static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, GPIO10, GPIO11, 0xffff};
 static const u8 buttonmap[] = {
 //         C.6              C.7              C.8              C.9              C.10      C.11
-/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SWT_SWA0, SWT_SWA2,
-/*B.6*/    SWT_SWE0,        BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SWT_SWB0, SWT_SWB2,
-/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SWT_SWC0, SWT_SWC2,
-/*B.8*/    SWT_SWF0,        BUT_DOWN,        BUT_UP,          BUT_EXIT,        SWT_SWD0, SWT_SWD2,
+/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SWT_SWD0, SWT_SWD2,
+/*B.6*/    SWT_SWF0,        BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SWT_SWC0, SWT_SWC2,
+/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SWT_SWA0, SWT_SWA2,
+/*B.8*/    SWT_SWE0,        BUT_DOWN,        BUT_UP,          BUT_EXIT,        SWT_SWB0, SWT_SWB2,
     };
 
 // Extra switch connections
