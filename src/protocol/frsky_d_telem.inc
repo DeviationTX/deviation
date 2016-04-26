@@ -20,7 +20,7 @@ static struct s_fr_gps {
 } fr_gps;
 
 
-void processHubPacket(u8 id, u16 value) {
+static void processHubPacket(u8 id, u16 value) {
     switch (id) {
     //defined in protocol_sensor_hub.pdf
     case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)
