@@ -26,13 +26,19 @@ struct guiObject *objModalButton = NULL;
 struct guiObject *objDIALOG   = NULL;
 static void (*select_notify)(guiObject_t *obj) = NULL;
 
+enum FULL_REDRAW {
+    REDRAW_ONLY_DIRTY   = 0x00,
+    REDRAW_IF_NOT_MODAL = 0x01,
+    REDRAW_EVERYTHING   = 0x02,
+};
+
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
-u8 FullRedraw;
+static u8 FullRedraw;
 
 static unsigned handle_buttons(u32 button, unsigned flags, void*data);
 #include "_gui.c"
-
+ 
 void connect_object(struct guiObject *obj)
 {
     if (objHEAD == NULL) {
@@ -58,6 +64,26 @@ u8 coords_in_box(struct guiBox *box, struct touch *coords)
 
 void GUI_DrawObject(struct guiObject *obj)
 {
+#ifdef DEBUG_DRAW
+    switch (obj->Type) {
+    case UnknownGUI: printf("Draw Unknown: "); break;
+    case CheckBox:   printf("Draw Checkbox:"); break;
+    case Dropdown:   printf("Draw Dropdown:"); break;
+    case Button:     printf("Draw Button:  "); break;
+    case Label:      printf("Draw Label:   "); break;
+    case Image:      printf("Draw Image:   "); break;
+    case Dialog:     printf("Draw Dialog:  "); break;
+    case XYGraph:    printf("Draw XYGraph: "); break;
+    case BarGraph:   printf("Draw BarGraph:"); break;
+    case TextSelect: printf("Draw TextSel: "); break;
+    case Listbox:    printf("Draw ListBox: "); break;
+    case Keyboard:   printf("Draw Keyboard:"); break;
+    case Scrollbar:  printf("Draw ScrlBar: "); break;
+    case Scrollable: printf("Draw Scrlable:"); break;
+    case Rect:       printf("Draw Rect:    "); break;
+    }
+    printf(" ptr: %08x Selected: %s\n", obj, obj == objSELECTED ? "true" : "false");
+#endif
     switch (obj->Type) {
     case UnknownGUI: break;
     case CheckBox:   break;
@@ -107,7 +133,7 @@ void GUI_RemoveAllObjects()
 {
     while(objHEAD)
         GUI_RemoveObj(objHEAD);
-    FullRedraw = 2;
+    FullRedraw = REDRAW_EVERYTHING;
 }
 
 void GUI_RemoveObj(struct guiObject *obj)
@@ -157,7 +183,7 @@ void GUI_RemoveObj(struct guiObject *obj)
             prev = prev->next;
         }
     }
-    FullRedraw = objHEAD ? 1 : 2;
+    FullRedraw = objHEAD ? REDRAW_IF_NOT_MODAL : REDRAW_EVERYTHING;
 }
 
 void GUI_RemoveHierObjects(struct guiObject *obj)
@@ -173,7 +199,7 @@ void GUI_RemoveHierObjects(struct guiObject *obj)
         return;
     while(parent->next)
         GUI_RemoveObj(parent->next);
-    FullRedraw = 1;
+    FullRedraw = REDRAW_IF_NOT_MODAL;
 }
 
 void GUI_SetHidden(struct guiObject *obj, u8 state)
@@ -188,7 +214,7 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 {
     if(w == 0 || h == 0)
         return;
-    if(FullRedraw) {
+    if(FullRedraw != REDRAW_ONLY_DIRTY) {
         if(w == LCD_WIDTH && h == LCD_HEIGHT)
             _gui_draw_background(x, y, w, h); //Optimization to prevent partial redraw when it isn't needed
         return;  //Optimization to prevent partial redraw when it isn't needed
@@ -201,6 +227,9 @@ void GUI_DrawBackground(u16 x, u16 y, u16 w, u16 h)
 
 void GUI_DrawScreen(void)
 {
+#ifdef DEBUG_DRAW
+    printf("DrawScreen\n");
+#endif
     /*
      * First we need to draw the main background
      *  */
@@ -208,9 +237,9 @@ void GUI_DrawScreen(void)
     /*
      * Then we need to draw any supporting GUI
      */
-    FullRedraw = 1;
+    FullRedraw = REDRAW_IF_NOT_MODAL;
     GUI_DrawObjects();
-    FullRedraw = 0;
+    FullRedraw = REDRAW_ONLY_DIRTY;
     LCD_ForceUpdate();
 }
 
@@ -234,7 +263,7 @@ void _GUI_Redraw(struct guiObject *obj)
 
 void GUI_RedrawAllObjects()
 {
-    FullRedraw = 2;
+    FullRedraw = REDRAW_EVERYTHING;
 }
 
 void GUI_HideObjects(struct guiObject *headObj, struct guiObject *modalObj)
@@ -257,9 +286,12 @@ void _GUI_RefreshScreen(struct guiObject *headObj)
 
     struct guiObject *obj;
     if (FullRedraw) {
-        if (modalObj && modalObj->Type == Dialog && FullRedraw != 2) {
+#ifdef DEBUG_DRAW
+        printf("Full Redraw requested: %d\n", FullRedraw);
+#endif
+        if (modalObj && modalObj->Type == Dialog && FullRedraw != REDRAW_EVERYTHING) {
             //Handle Dialog redraw as an incremental
-            FullRedraw = 0;
+            FullRedraw = REDRAW_ONLY_DIRTY;
         } else {
             GUI_DrawScreen();
             return;
