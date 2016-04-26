@@ -43,16 +43,16 @@
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
 
 enum {
-  SWT_SWA0 = 23,
-  SWT_SWA2,
-  SWT_SWB0,
-  SWT_SWB2,
-  SWT_SWC0,
-  SWT_SWC2,
-  SWT_SWD0,
-  SWT_SWD2,
-  SWT_SWE0,
-  SWT_SWF0
+  SW_A0 = 23,
+  SW_A2,
+  SW_B0,
+  SW_B2,
+  SW_C0,
+  SW_C2,
+  SW_D0,
+  SW_D2,
+  SW_E0,
+  SW_F0
 };
 
 u32 global_extra_switches = 0;
@@ -62,11 +62,11 @@ static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
 */
 static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, GPIO10, GPIO11, 0xffff};
 static const u8 buttonmap[] = {
-//         C.6              C.7              C.8              C.9              C.10      C.11
-/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SWT_SWD0, SWT_SWD2,
-/*B.6*/    SWT_SWF0,        BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SWT_SWC0, SWT_SWC2,
-/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SWT_SWA0, SWT_SWA2,
-/*B.8*/    SWT_SWE0,        BUT_DOWN,        BUT_UP,          BUT_EXIT,        SWT_SWB0, SWT_SWB2,
+//         C.6              C.7              C.8              C.9              C.10   C.11
+/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SW_D0, SW_D2,
+/*B.6*/    SW_F0,           BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SW_C0, SW_C2,
+/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SW_A0, SW_A2,
+/*B.8*/    SW_E0,           BUT_DOWN,        BUT_UP,          BUT_EXIT,        SW_B0, SW_B2,
     };
 
 // Extra switch connections
@@ -117,7 +117,6 @@ void Initialize_ButtonMatrix()
   gpio_set(GPIOC, GPIO6 | GPIO7 | GPIO8 | GPIO9 | GPIO10 | GPIO11);
 }
 
-u32 glbl_buttons = 0;
 u32 ScanButtons()
 {
     u8 idx = 0;
@@ -153,6 +152,6 @@ u32 ScanButtons()
         }
     }
     if (! (result & 0xFFFF))
-      glbl_buttons = result;
+      global_extra_switches = result;
     return result & 0xFFFF;
 }
