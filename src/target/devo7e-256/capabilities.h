@@ -3,6 +3,10 @@
   CHANDEF(ELEVATOR)
   CHANDEF(THROTTLE)
   CHANDEF(RUDDER)
+  #if HAS_EXTRA_POTS
+    CHANDEF(AUX4)
+    CHANDEF(AUX5)
+  #endif
 /*
   CHANDEF(HOLD0)
   CHANDEF(HOLD1)
@@ -62,6 +66,7 @@
 #define INP_GEAR0  INP_SWF0
 #define INP_GEAR1  INP_SWF1
 #endif
+
 #ifdef CHANMAP
 //These are legacy mappings
 /*
