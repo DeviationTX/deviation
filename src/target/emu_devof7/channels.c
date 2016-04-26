@@ -15,6 +15,13 @@
 #include "common.h"
 #include "../common/emu/fltk.h"
 #include "mixer.h"
+#include "config/tx.h"
+
+#define SWITCH_3x2  0
+#define SWITCH_2x2  ((1 << INP_SWA2) | (1 << INP_SWB2))
+#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 
 s32 CHAN_ReadInput(int channel)
 {
@@ -42,4 +49,16 @@ s32 CHAN_ReadInput(int channel)
 s32 CHAN_ReadRawInput(int channel)
 {
     return CHAN_ReadInput(channel);
+}
+void CHAN_SetSwitchCfg(const char *str)
+{
+    if(strcmp(str, "3x2") == 0) {
+        Transmitter.ignore_src = SWITCH_3x2;
+    } else if(strcmp(str, "2x2") == 0) {
+        Transmitter.ignore_src = SWITCH_2x2;
+    } else if(strcmp(str, "3x1") == 0) {
+        Transmitter.ignore_src = SWITCH_3x1;
+    } else {
+        Transmitter.ignore_src = SWITCH_NONE;
+    }
 }
