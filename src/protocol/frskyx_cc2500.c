@@ -59,6 +59,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 #define PACKET_SIZE 30
 
+// Statics are not initialized on 7e so in initialize() if necessary
 static u8 chanskip;
 static u8 calData[48][3];
 static u8 channr;
@@ -68,6 +69,8 @@ static s8 coarse;
 static s8 fine;
 static u8 seq_last_sent;
 static u8 seq_last_rcvd;
+
+
 // u8 ptr[4] = {0x01,0x12,0x23,0x30};
 //u8 ptr[4] = {0x00,0x11,0x22,0x33};
 static enum {
@@ -235,15 +238,17 @@ static u16 scaleForPXX(u8 chan, u8 failsafe)
 #define FAILSAFE_TIMEOUT 1032
 #endif
 
+// These are local to function but 7e modules don't initialize statics
+// so make file scope and set in initialize()
+    static u16 failsafe_count;
+    static u8 chan_offset;
+    static u8 FS_flag;
 static void frskyX_data_frame() {
     //0x1D 0xB3 0xFD 0x02 0x56 0x07 0x15 0x00 0x00 0x00 0x04 0x40 0x00 0x04 0x40 0x00 0x04 0x40 0x00 0x04 0x40 0x08 0x00 0x00 0x00 0x00 0x00 0x00 0x96 0x12
     // channel packing: H (0)7-4, L (0)3-0; H (1)3-0, L (0)11-8; H (1)11-8, L (1)7-4 etc
 
     u16 chan_0;
     u16 chan_1; 
-    static u16 failsafe_count;
-    static u8 chan_offset;
-    static u8 FS_flag;
     static u8 failsafe_chan;
     u8 startChan = 0;
 
@@ -832,15 +837,23 @@ static int get_tx_id()
 static void initialize(int bind)
 {
     CLOCK_StopTimer();
+
+    // initialize statics since 7e modules don't initialize
     coarse = (int)Model.proto_opts[PROTO_OPTS_FREQCOARSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     fixed_id = (u16) get_tx_id();
+    failsafe_count = 0;
+    chan_offset = 0;
+    FS_flag = 0;
+    chanskip = 0;
+    ctr = 0;
+    seq_last_sent = 0;
+    seq_last_rcvd = 8;
 
     while (!chanskip)
         chanskip = (get_tx_id() & 0xfefefefe) % 47;
     while((chanskip - ctr) % 4)
         ctr = (ctr+1) % 4;
-    
     counter_rst = (chanskip - ctr) >> 2;
 
     frskyX_init(); 
@@ -854,8 +867,7 @@ static void initialize(int bind)
         state = FRSKY_DATA1;
         initialize_data(0);
     }
-    seq_last_sent = 0;
-    seq_last_rcvd = 8;
+
 #ifndef EMULATOR
     CLOCK_StartTimer(10000, frskyx_cb);
 #else
