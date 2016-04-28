@@ -387,9 +387,13 @@ static void update_cell(u8 cell, s32 value) {
 
         Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
         TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
+    }
+}
 
-        if (Telemetry.value[TELEM_FRSKY_MIN_CELL] == 0 || (value < Telemetry.value[TELEM_FRSKY_MIN_CELL])) {
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = value;
+static void update_min_cell(u8 num_cells) {
+    for (int i=0; i < num_cells; i++) {
+        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL]) {
+            Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
             TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
         }
     }
@@ -465,6 +469,7 @@ static void processSportPacket(u8 *packet) {
         update_cell(cell_index, ((data & 0x000FFF00) >> 8) / 5);
         if (cell_index+1 < cells_count)
             update_cell(cell_index+1, ((data & 0xFFF00000) >> 20) / 5);
+        update_min_cell(cells_count);
         break;}
 
     case T1_FIRST_ID & 0xfff0:
