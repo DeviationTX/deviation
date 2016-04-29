@@ -1,3 +1,18 @@
+/***************************************************************
+ telemetry processing that's common for Frsky and FrskyX
+***************************************************************/
+
+static s32 ground_level;
+static u32 discharge_time;
+static u32 discharge_dAms;   // deciAmp-milliseconds
+
+
+static void set_telemetry(u8 offset, s32 value) {
+    Telemetry.value[offset] = value;
+    TELEMETRY_SetUpdated(offset);
+}
+
+
 // store "before punctuation" and "after punctuation" values locally
 // keeps Telemetry.gps compatible with devo and dsm
 static struct s_fr_gps {
@@ -66,13 +81,12 @@ static void processHubPacket(u8 id, u16 value) {
         break;
         }
     case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
-        Telemetry.value[TELEM_FRSKY_ALTITUDE] = value / 100;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
+        if (ground_level == 0) ground_level = value;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, value - ground_level);
         break;
     case 0x21: //ALT (fraction)
             //convert to mm
-        Telemetry.value[TELEM_FRSKY_ALTITUDE_DECIMETERS] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
+        set_telemetry(TELEM_FRSKY_ALTITUDE_DECIMETERS, value);
         break;
     case 0x11: //GPS Speed (whole number and sign) in Knots
         fr_gps.velocity_bp = value;

@@ -404,9 +404,6 @@ static void update_min_cell(u8 num_cells) {
     }
 }
 
-static s32 ground_level;
-static u32 discharge_time;
-static u32 discharge_dAms;   // deciAmp-milliseconds
 
 #include "frsky_d_telem.inc"
 
