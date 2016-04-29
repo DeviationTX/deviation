@@ -186,11 +186,6 @@ static void frskyX_build_bind_packet()
     u16 lcrc = crc(&packet[3], 25);
     packet[28] = lcrc >> 8;
     packet[29] = lcrc;
-#ifdef EMULATOR
-//    printf("packet %02x", packet[0]);
-//    for(int i=1; i < PACKET_SIZE; i++) printf(" %02x", packet[i]);
-//    printf("\n");
-#endif
 
 }
 
@@ -527,14 +522,13 @@ static void processSportPacket(u8 *packet) {
         }
         break;
     } // switch
-#if 0 // not sure about these
-    case A3_FIRST_ID & 0xfff0:
-    case A4_FIRST_ID & 0xfff0:
-    case AIR_SPEED_FIRST_ID & 0xfff0:
-    case ACCX_FIRST_ID & 0xfff0:
-    case ACCY_FIRST_ID & 0xfff0:
-    case ACCZ_FIRST_ID & 0xfff0:
-#endif
+// not sure about these
+//    case A3_FIRST_ID & 0xfff0:
+//    case A4_FIRST_ID & 0xfff0:
+//    case AIR_SPEED_FIRST_ID & 0xfff0:
+//    case ACCX_FIRST_ID & 0xfff0:
+//    case ACCY_FIRST_ID & 0xfff0:
+//    case ACCZ_FIRST_ID & 0xfff0:
 }
 
 
@@ -602,7 +596,7 @@ void frsky_check_telemetry(u8 *pkt, u8 len) {
 //    u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     // only process packets with the required id and packet length
     if (pkt[1] == (fixed_id & 0xff) && pkt[2] == (fixed_id >> 8) && pkt[0] == len-3) {
-        if (pkt[4] > 0x36) {   // 0x36 magic number? TODO
+        if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
             Telemetry.value[TELEM_FRSKY_RSSI] = pkt[4] / 2; 	// Value in Db
             TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
         } else {
@@ -664,9 +658,6 @@ static const u8 telem_test[][17] = {
 u16 frskyx_cb() {
   u8 len;
 
-#ifdef EMULATOR
-//    printf("state %d, channr %d, counter_rst %d, ctr %d, chanskip %d\n", state, channr, counter_rst, ctr, chanskip);
-#endif
   switch(state) { 
     default: 
       set_start(47);    
