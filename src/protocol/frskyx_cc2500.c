@@ -837,6 +837,7 @@ static void initialize(int bind)
     failsafe_count = 0;
     chan_offset = 0;
     FS_flag = 0;
+    channr = 0;
     chanskip = 0;
     ctr = 0;
     seq_last_sent = 0;
