@@ -39,14 +39,12 @@
 
 static const char * const frskyx_opts[] = {
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
-  _tr_noop("Freq-Coarse"),  "-127", "127", NULL,
   _tr_noop("AD2GAIN"),  "1", "255", NULL,
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
   NULL
 };
 enum {
     PROTO_OPTS_FREQFINE,
-    PROTO_OPTS_FREQCOARSE,
     PROTO_OPTS_AD2GAIN,
     PROTO_OPTS_FAILSAFE,
     LAST_PROTO_OPT,
@@ -65,7 +63,6 @@ static u8 calData[48][3];
 static u8 channr;
 static u8 counter_rst;
 static u8 ctr;
-static s8 coarse;
 static s8 fine;
 static u8 seq_last_sent;
 static u8 seq_last_rcvd;
@@ -763,7 +760,7 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_0D_FREQ2, 0x5c);
   CC2500_WriteReg(CC2500_0E_FREQ1, 0x76);
 //  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27); 
-  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27 + coarse);
+  CC2500_WriteReg(CC2500_0F_FREQ0, 0x27);
   CC2500_WriteReg(CC2500_10_MDMCFG4, 0x7B); 
   CC2500_WriteReg(CC2500_11_MDMCFG3, 0x61);
   CC2500_WriteReg(CC2500_12_MDMCFG2, 0x13);
@@ -831,7 +828,6 @@ static void initialize(int bind)
     CLOCK_StopTimer();
 
     // initialize statics since 7e modules don't initialize
-    coarse = (int)Model.proto_opts[PROTO_OPTS_FREQCOARSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
