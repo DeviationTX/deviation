@@ -380,11 +380,6 @@ static void frskyX_data_frame() {
 #if HAS_EXTENDED_TELEMETRY
 
 // helper functions
-static void set_telemetry(u8 offset, s32 value) {
-    Telemetry.value[offset] = value;
-    TELEMETRY_SetUpdated(offset);
-}
-
 static void update_cell(u8 cell, s32 value) {
     if (cell < 6) {
         Telemetry.value[TELEM_FRSKY_VOLT3] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
