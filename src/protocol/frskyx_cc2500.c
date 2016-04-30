@@ -592,7 +592,7 @@ static void frsky_parse_sport_stream(u8 data) {
 
 #endif // HAS_EXTENDED_TELEMETRY
 
-void frsky_check_telemetry(u8 *pkt, u8 len) {
+static void frsky_check_telemetry(u8 *pkt, u8 len) {
 //    u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     // only process packets with the required id and packet length
     if (pkt[1] == (fixed_id & 0xff) && pkt[2] == (fixed_id >> 8) && pkt[0] == len-3) {
@@ -655,7 +655,7 @@ static const u8 telem_test[][17] = {
 #endif
 
   
-u16 frskyx_cb() {
+static u16 frskyx_cb() {
   u8 len;
 
   switch(state) { 
@@ -779,14 +779,14 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
   CC2500_Strobe(CC2500_SIDLE);    
   //calibrate hop channels
-  for(u8 c = 0; c < 47; c++){
-    CC2500_Strobe(CC2500_SIDLE);    
-    CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
-    CC2500_Strobe(CC2500_SCAL);
-    usleep(900);
-    calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
-    calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2); 
-    calData[c][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
+  for (u8 c = 0; c < 47; c++) {
+      CC2500_Strobe(CC2500_SIDLE);    
+      CC2500_WriteReg(CC2500_0A_CHANNR, hop_data[c]);
+      CC2500_Strobe(CC2500_SCAL);
+      usleep(900);
+      calData[c][0] = CC2500_ReadReg(CC2500_23_FSCAL3);
+      calData[c][1] = CC2500_ReadReg(CC2500_24_FSCAL2); 
+      calData[c][2] = CC2500_ReadReg(CC2500_25_FSCAL1);
   }
   CC2500_Strobe(CC2500_SIDLE);      
   CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
