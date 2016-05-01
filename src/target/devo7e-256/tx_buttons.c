@@ -19,7 +19,8 @@
 
 //Duplicated in channels.c
 //Duplicated in tx_buttons.c
-#define SWITCH_3x4_2x2  0
+#define SWITCH_3x4_2x2  ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                       | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 #define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
                    | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
                    | (1 << INP_SWE0) | (1 << INP_SWE1) \
