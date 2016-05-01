@@ -24,6 +24,16 @@
 #include "common.h"
 #include "devo.h"
 
+// Let's abuse the preprocessor to let us specify a single
+// sysclock timer value 'SYSCLK_TIM'
+
+#define _TIM_CONCAT(x, y, z) x ## y ## z
+#define TIM_CONCAT(x, y, z)  _TIM_CONCAT(x, y, z)
+
+#define TIMx               TIM_CONCAT(TIM,             SYSCLK_TIM,)
+#define NVIC_TIMx_IRQ      TIM_CONCAT(NVIC_TIM,        SYSCLK_TIM, _IRQ)
+#define RCC_APB1ENR_TIMxEN TIM_CONCAT(RCC_APB1ENR_TIM, SYSCLK_TIM, EN)
+#define TIMx_ISR           TIM_CONCAT(tim,             SYSCLK_TIM, _isr)
 //The following is from an unreleased libopencm3
 //We should remove it eventually
 #if 1
@@ -59,10 +69,12 @@ void _msleep(u32 msec)
 void CLOCK_Init()
 {
     /* 72MHz / 8 => 9000000 counts per second */
+    /* 60MHz / 8 => 7500000 counts per second */
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
     /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
-    systick_set_reload(9000);
+    /* 7500000/7500 = 1000 overflows per second - every 1ms one interrupt */
+    systick_set_reload((FREQ_MHz * 1000) / 8);
     nvic_set_priority(NVIC_SYSTICK_IRQ, 0x0); //Highest priority
 
     /* We trigger exti2 right before the watchdog fires to do a stack dump */
@@ -77,51 +89,51 @@ void CLOCK_Init()
 
     /* Setup timer for Transmitter */
     timer_callback = NULL;
-    /* Enable TIM4 clock. */
-    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIM4EN);
+    /* Enable TIMx clock. */
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_TIMxEN);
 
-    /* Enable TIM2 interrupt. */
-    nvic_enable_irq(NVIC_TIM4_IRQ);
-    nvic_set_priority(NVIC_TIM4_IRQ, 16); //High priority
+    /* Enable TIMx interrupt. */
+    nvic_enable_irq(NVIC_TIMx_IRQ);
+    nvic_set_priority(NVIC_TIMx_IRQ, 16); //High priority
 
-    timer_disable_counter(TIM4);
-    /* Reset TIM4 peripheral. */
-    timer_reset(TIM4);
+    timer_disable_counter(TIMx);
+    /* Reset TIMx peripheral. */
+    timer_reset(TIMx);
 
     /* Timer global mode:
      * - No divider
      * - Alignment edge
      * - Direction up
      */
-    timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT,
+    timer_set_mode(TIMx, TIM_CR1_CKD_CK_INT,
                    TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 
     /* timer updates each microsecond */
-    timer_set_prescaler(TIM4, 72 - 1);
-    timer_set_period(TIM4, 65535);
+    timer_set_prescaler(TIMx, FREQ_MHz - 1);
+    timer_set_period(TIMx, 65535);
 
     /* Disable preload. */
-    timer_disable_preload(TIM4);
+    timer_disable_preload(TIMx);
 
     /* Continous mode. */
-    timer_continuous_mode(TIM4);
+    timer_continuous_mode(TIMx);
 
     /* Disable outputs. */
-    timer_disable_oc_output(TIM4, TIM_OC1);
-    timer_disable_oc_output(TIM4, TIM_OC2);
-    timer_disable_oc_output(TIM4, TIM_OC3);
-    timer_disable_oc_output(TIM4, TIM_OC4);
+    timer_disable_oc_output(TIMx, TIM_OC1);
+    timer_disable_oc_output(TIMx, TIM_OC2);
+    timer_disable_oc_output(TIMx, TIM_OC3);
+    timer_disable_oc_output(TIMx, TIM_OC4);
 
     /* Enable CCP1 */
-    timer_disable_oc_clear(TIM4, TIM_OC1);
-    timer_disable_oc_preload(TIM4, TIM_OC1);
-    timer_set_oc_slow_mode(TIM4, TIM_OC1);
-    timer_set_oc_mode(TIM4, TIM_OC1, TIM_OCM_FROZEN);
+    timer_disable_oc_clear(TIMx, TIM_OC1);
+    timer_disable_oc_preload(TIMx, TIM_OC1);
+    timer_set_oc_slow_mode(TIMx, TIM_OC1);
+    timer_set_oc_mode(TIMx, TIM_OC1, TIM_OCM_FROZEN);
 
     /* Disable CCP1 interrupt. */
-    timer_disable_irq(TIM4, TIM_DIER_CC1IE);
+    timer_disable_irq(TIMx, TIM_DIER_CC1IE);
 
-    timer_enable_counter(TIM4);
+    timer_enable_counter(TIMx);
 
     /* Enable EXTI1 interrupt. */
     /* We are enabling only the interrupt
@@ -144,12 +156,12 @@ void CLOCK_StartTimer(unsigned us, u16 (*cb)(void))
         return;
     timer_callback = cb;
     /* Counter enable. */
-    unsigned t = timer_get_counter(TIM4);
+    unsigned t = timer_get_counter(TIMx);
     /* Set the capture compare value for OC1. */
-    timer_set_oc_value(TIM4, TIM_OC1, us + t);
+    timer_set_oc_value(TIMx, TIM_OC1, us + t);
 
-    timer_clear_flag(TIM4, TIM_SR_CC1IF);
-    timer_enable_irq(TIM4, TIM_DIER_CC1IE);
+    timer_clear_flag(TIMx, TIM_SR_CC1IF);
+    timer_enable_irq(TIMx, TIM_DIER_CC1IE);
 }
 
 void CLOCK_StartWatchdog()
@@ -168,11 +180,11 @@ void CLOCK_ResetWatchdog()
     wdg_time = msecs;
 }
 void CLOCK_StopTimer() {
-    timer_disable_irq(TIM4, TIM_DIER_CC1IE);
+    timer_disable_irq(TIMx, TIM_DIER_CC1IE);
     timer_callback = NULL;
 }
 
-void tim4_isr()
+void TIMx_ISR()
 {
     if(timer_callback) {
 #ifdef TIMING_DEBUG
@@ -182,9 +194,9 @@ void tim4_isr()
 #ifdef TIMING_DEBUG
         debug_timing(4, 1);
 #endif
-        timer_clear_flag(TIM4, TIM_SR_CC1IF);
+        timer_clear_flag(TIMx, TIM_SR_CC1IF);
         if (us) {
-            timer_set_oc_value(TIM4, TIM_OC1, us + TIM_CCR1(TIM4));
+            timer_set_oc_value(TIMx, TIM_OC1, us + TIM_CCR1(TIMx));
             return;
         }
     }
