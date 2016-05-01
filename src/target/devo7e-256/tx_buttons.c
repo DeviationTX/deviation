@@ -57,9 +57,6 @@ enum {
 
 u32 global_extra_switches = 0;
 static const u16 columns[] = {GPIO5, GPIO6, GPIO7, GPIO8, 0xffff};
-/*
-static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, 0xffff};
-*/
 static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, GPIO10, GPIO11, 0xffff};
 static const u8 buttonmap[] = {
 //         C.6              C.7              C.8              C.9              C.10   C.11
@@ -105,12 +102,6 @@ void Initialize_ButtonMatrix()
 
   gpio_set(GPIOB, GPIO5 | GPIO6| GPIO7 | GPIO8);
 
-  /* PortC 6-9 are pull-up inputs */
-/*
-  gpio_set_mode(GPIOC, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6 | GPIO7 | GPIO8 | GPIO9);
-  gpio_set(GPIOC, GPIO6 | GPIO7 | GPIO8 | GPIO9);
-*/
   /* PortC 6-11 are pull-up inputs */
   gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                 GPIO6 | GPIO7 | GPIO8 | GPIO9 | GPIO10 | GPIO11);
@@ -151,7 +142,7 @@ u32 ScanButtons()
             }
         }
     }
-    if (! (result & 0xFFFF))
+    if (!(result & 0xFFFF) && (Transmitter.ignore_src == SWITCH_3x4_2x2))
       global_extra_switches = result;
     return result & 0xFFFF;
 }
