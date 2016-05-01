@@ -22,7 +22,7 @@
 #include <libopencm3/stm32/iwdg.h>
 
 #include "common.h"
-#include "devo.h"
+#include "../devo/devo.h"
 
 // Let's abuse the preprocessor to let us specify a single
 // sysclock timer value 'SYSCLK_TIM'
