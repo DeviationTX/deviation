@@ -10,6 +10,8 @@
 
 #define USE_DEVOFS 1 //Must be before common_devo include
 
+#define DISABLE_PWM 1                 //FIXME
+
 #include "devofs.h"
 #define FILE_SIZE sizeof(FATFS)
 
@@ -29,6 +31,7 @@
     #define fs_filesize(x) (((x)->file_header.size1 << 8) | (x)->file_header.size2)
     #define fs_ltell(x)   ((x)->file_cur_pos)
 
+static inline void LCD_ForceUpdate() {}
 
 #define HAS_STANDARD_GUI    0
 #define HAS_ADVANCED_GUI    1
@@ -42,7 +45,7 @@
 #define HAS_SCANNER         0
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS  0
-#define HAS_MULTIMOD_SUPPORT 1
+#define HAS_MULTIMOD_SUPPORT 0
 #define HAS_VIDEO           0
 
 #ifdef BUILDTYPE_DEV

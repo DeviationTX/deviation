@@ -23,12 +23,6 @@
 //    (void)use_interrupt;
 //}
 //void USB_Disable() {}
-void HID_Enable() {}
-void HID_Disable() {}
-void HID_Write(s8 *pkt, u8 size) {
-    (void)pkt;
-    (void)size;
-}
 void SOUND_Init() {}
 void SOUND_SetFrequency(unsigned frequency, unsigned volume) {
     (void)frequency;
@@ -82,6 +76,7 @@ void PPMin_Start() {}
 
 void SPITouch_Init() {}
 void PPMin_TIM_Init() {}
+int  SPITouch_IRQ() { return 0; }
 
 const char *MCU_GetPinName(char *str, struct mcu_pin *port) { return "None";}
 
