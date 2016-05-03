@@ -66,9 +66,9 @@ static void processHubPacket(u8 id, u16 value) {
         u8 cell = (value >> 4) & 0x0f;
         value = (((u16)(value & 0x0F) << 8) + (value & 0xff00)) / 5;
         if (cell < 6 || value == 0) {
-            Telemetry.value[TELEM_FRSKY_VOLT3] +=
+            Telemetry.value[TELEM_FRSKY_ALL_CELL] +=
               value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-            TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
+            TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);
 
             Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
             TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);

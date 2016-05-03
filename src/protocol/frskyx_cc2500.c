@@ -371,28 +371,24 @@ static void frskyX_data_frame() {
 
 #if HAS_EXTENDED_TELEMETRY
 
+#include "frsky_d_telem.inc"
+
 // helper functions
 static void update_cell(u8 cell, s32 value) {
     if (cell < 6) {
-        Telemetry.value[TELEM_FRSKY_VOLT3] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
-        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);    // battery total
+        Telemetry.value[TELEM_FRSKY_ALL_CELL] += value - Telemetry.value[TELEM_FRSKY_CELL1 + cell];
+        TELEMETRY_SetUpdated(TELEM_FRSKY_ALL_CELL);    // battery total
 
-        Telemetry.value[TELEM_FRSKY_CELL1 + cell] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_CELL1 + cell);
+        set_telemetry(TELEM_FRSKY_CELL1 + cell, value);
     }
 }
 
 static void update_min_cell(u8 num_cells) {
     for (int i=0; i < num_cells; i++) {
-        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL]) {
-            Telemetry.value[TELEM_FRSKY_MIN_CELL] = Telemetry.value[TELEM_FRSKY_CELL1 + i];
-            TELEMETRY_SetUpdated(TELEM_FRSKY_MIN_CELL);
-        }
+        if (Telemetry.value[TELEM_FRSKY_CELL1 + i] < Telemetry.value[TELEM_FRSKY_MIN_CELL])
+            set_telemetry(TELEM_FRSKY_MIN_CELL, Telemetry.value[TELEM_FRSKY_CELL1 + i]);
     }
 }
-
-
-#include "frsky_d_telem.inc"
 
 
 static void processSportPacket(u8 *packet) {
