@@ -383,7 +383,7 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
     FILE *fh;
-    u8 buf[32];
+    u8 buf[48];
     u16 img_w = 0, img_h = 0;
     
     fh = fopen(file, "rb");

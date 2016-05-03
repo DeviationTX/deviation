@@ -47,8 +47,8 @@ struct pagemem {
 #endif
 
 #define PREVIOUS_ITEM -1
-#define TOGGLE_FILE    "media/switches.bmp"
-#define SPLASH_FILE    "media/splash.bmp"
+#define TOGGLE_FILE    "media/switches" IMG_EXT
+#define SPLASH_FILE    "media/splash"   IMG_EXT
 
 #define TOGGLEICON_WIDTH 8
 #define TOGGLEICON_HEIGHT 11

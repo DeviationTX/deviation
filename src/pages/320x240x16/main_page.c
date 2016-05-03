@@ -79,14 +79,14 @@ void PAGE_MainInit(int page)
     //Battery
     mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat.bmp");
+        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat" IMG_EXT);
     } else {
         GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - left_offset,10, 45, 20,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - left_offset - 50,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
+    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - left_offset - 50,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower" IMG_EXT, NULL, NULL);
 }
 
 void PAGE_MainExit()
