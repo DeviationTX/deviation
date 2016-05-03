@@ -43,16 +43,27 @@ void SPIFlash_Init() {}
 void SPI_FlashBlockWriteEnable(unsigned enable) {
     (void)enable;
 }
+
+#define FS_ADDRESS (void *)0x08040000
 void SPIFlash_ReadBytes(u32 readAddress, u32 length, u8 * buffer) {
-    (void)readAddress;
-    (void)length;
-    (void)buffer;
+    u8 *address = FS_ADDRESS + readAddress;
+    for(unsigned i=0;i<length;i++)
+    {
+        buffer[i] = ~address[i];
+    }
 }
 int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer) {
-    (void)readAddress;
-    (void)length;
-    (void)buffer;
-    return 0;
+    unsigned i;
+    u8 *address = FS_ADDRESS + readAddress;
+    for(i=0;i<length;i++)
+    {
+        buffer[i] = ~address[i];
+        if (buffer[i] == '\n') {
+            i++;
+            break;
+        }
+    }
+    return i;
 }
 void SPIFlash_WriteByte(u32 writeAddress, const unsigned byte) {
     (void)writeAddress;

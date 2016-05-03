@@ -4,10 +4,10 @@
 #define TXID 0xA9
 #define VECTOR_TABLE_LOCATION 0x3000
 
-#define SPIFLASH_SECTOR_OFFSET 0
-#define SPIFLASH_SECTORS 0
-#define SPIFLASH_AAI_AF 1
+#define SPIFLASH_SECTOR_OFFSET 0x0000
+#define SPIFLASH_SECTORS 64
 
+#define USE_PBM_IMAGE 1
 #define USE_DEVOFS 1 //Must be before common_devo include
 
 #define DISABLE_PWM 1                 //FIXME
