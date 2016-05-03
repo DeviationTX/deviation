@@ -38,15 +38,15 @@
 
 
 static const char * const frskyx_opts[] = {
-  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
-  _tr_noop("AD2GAIN"),  "1", "255", NULL,
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
+  _tr_noop("AD2GAIN"),  "0", "255", NULL,
+  _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
 enum {
-    PROTO_OPTS_FREQFINE,
-    PROTO_OPTS_AD2GAIN,
     PROTO_OPTS_FAILSAFE,
+    PROTO_OPTS_AD2GAIN,
+    PROTO_OPTS_FREQFINE,
     LAST_PROTO_OPT,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -423,7 +423,7 @@ static void processSportPacket(u8 *packet) {
         TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
         break;
     case ADC2_ID:
-        Telemetry.value[TELEM_FRSKY_VOLT3] = SPORT_DATA_U8(packet);      // In 1/100 of Volts
+        Telemetry.value[TELEM_FRSKY_VOLT3] = SPORT_DATA_U8(packet) * (Model.proto_opts[PROTO_OPTS_AD2GAIN] / 10);      // In 1/100 of Volts
         TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
         break;
     case BATT_ID:
@@ -593,7 +593,6 @@ static void frsky_parse_sport_stream(u8 data) {
 #endif // HAS_EXTENDED_TELEMETRY
 
 static void frsky_check_telemetry(u8 *pkt, u8 len) {
-//    u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     // only process packets with the required id and packet length
     if (pkt[1] == (fixed_id & 0xff) && pkt[2] == (fixed_id >> 8) && pkt[0] == len-3) {
         if (pkt[4] > 0x36) {   // distinguish RSSI from VOLT1 (maybe bit 7 always set for RSSI?)
@@ -820,6 +819,13 @@ static void initialize(int bind)
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+#ifdef EMULATOR
+    printf("Model.proto_opts[PROTO_OPTS_AD2GAIN] = %02x\n", Model.proto_opts[PROTO_OPTS_AD2GAIN]);
+#endif
+    if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 10;  // if not set, default to no gain
+#ifdef EMULATOR
+    printf("Model.proto_opts[PROTO_OPTS_AD2GAIN] = %02x\n", Model.proto_opts[PROTO_OPTS_AD2GAIN]);
+#endif
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
     chan_offset = 0;
