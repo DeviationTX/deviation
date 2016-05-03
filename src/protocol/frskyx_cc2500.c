@@ -819,13 +819,6 @@ static void initialize(int bind)
 
     // initialize statics since 7e modules don't initialize
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
-#ifdef EMULATOR
-    printf("Model.proto_opts[PROTO_OPTS_AD2GAIN] = %02x\n", Model.proto_opts[PROTO_OPTS_AD2GAIN]);
-#endif
-    if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 10;  // if not set, default to no gain
-#ifdef EMULATOR
-    printf("Model.proto_opts[PROTO_OPTS_AD2GAIN] = %02x\n", Model.proto_opts[PROTO_OPTS_AD2GAIN]);
-#endif
     fixed_id = (u16) get_tx_id();
     failsafe_count = 0;
     chan_offset = 0;
@@ -871,6 +864,7 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
+            if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 10;  // if not set, default to no gain
             return frskyx_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)1L;
