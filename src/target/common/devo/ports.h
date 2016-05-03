@@ -51,5 +51,13 @@
 #ifndef _USART
     #define _USART USART1
 #endif
+
+#ifndef SYSCLK_TIM // System-clock timer
+    #define SYSCLK_TIM 4
+#endif
+
+#ifndef FREQ_MHz
+    #define FREQ_MHz 72
+#endif
 #endif //_PORTS_H_
 
