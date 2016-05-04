@@ -412,19 +412,18 @@ static void processSportPacket(u8 *packet) {
         return;
     }
 
-    // rx telemetry ??
+    // rx telemetry in stream data
+    // 8 bit voltages are raw ADC with 3.3V reference => 13.2mV/bit
+    // Convert to two decimal places (hundredths of volts)
     switch(id) {
     case ADC1_ID:
-        Telemetry.value[TELEM_FRSKY_VOLT2] = SPORT_DATA_U8(packet);      // In 1/100 of Volts
-        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT2);
+        set_telemetry(TELEM_FRSKY_VOLT2, SPORT_DATA_U8(packet) * 132 / 100);
         break;
     case ADC2_ID:
-        Telemetry.value[TELEM_FRSKY_VOLT3] = SPORT_DATA_U8(packet) * (Model.proto_opts[PROTO_OPTS_AD2GAIN] / 10);      // In 1/100 of Volts
-        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
+        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 * (Model.proto_opts[PROTO_OPTS_AD2GAIN] / 10) / 100);
         break;
     case BATT_ID:
-        Telemetry.value[TELEM_FRSKY_VOLTA] = SPORT_DATA_U8(packet);      // In 1/100 of Volts
-        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLTA);
+        set_telemetry(TELEM_FRSKY_VOLTA, SPORT_DATA_U8(packet) * 132 / 100);
         break;
     }
     
