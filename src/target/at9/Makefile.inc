@@ -1,9 +1,11 @@
-FILESYSTEM := devo8
+FILESYSTEM := at9
 SCREENSIZE  := 320x240x16
 DFU_ARGS   := -D 0x0483:0xdf12 -b 0x08003000
 
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
+
+NUM_MODELS ?= 10
 
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
 LIBOPENCM3 = $(SDIR)/libopencm3/lib/libopencm3_stm32f1.a

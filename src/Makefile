@@ -168,6 +168,7 @@ EXEEXT   ?= elf
 FONTS    = filesystem/devo10/media/12normal.fon \
            filesystem/devo8/media/15normal.fon \
            filesystem/devo8/media/23bold.fon \
+           filesystem/at9/media/23bold.fon \
            filesystem/devo10/media/04b03.fon
 
 MODELDIR = filesystem/$(FILESYSTEM)/models
@@ -317,6 +318,9 @@ filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
 	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
+	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
+
+filesystem/at9/media/23bold.fon: fonts/23bold.bdf
 	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
 filesystem/devo10/media/04b03.fon: fonts/04b03.bdf

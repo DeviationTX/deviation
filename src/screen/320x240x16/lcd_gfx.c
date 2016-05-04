@@ -324,16 +324,21 @@ void LCD_FillTriangle(u16 x0, u16 y0, u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 }
 
 #ifdef USE_PBM_IMAGE
-#define IS_WHITESPACE(x) (x == 0x0a || x == ' ')
+#define IS_WHITESPACE(x) ((x) == 0x0a || (x) == ' ')
 u8 LCD_ImageIsTransparent(const char *file)
 {
     (void)file;
     return 0;
 }
-static int image_read_header(FILE *fh, u16 *w, u16 *h)
+
+static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
 {
-    u8 buf[3];
+    u8 buf[16];
     int err = 0;
+    u16 *w_h[] = {w, h};
+    *white = 0xffffff;
+    *black = 0x000000;
+
     *w = 0;
     *h = 0;
     int ret = fread(buf,3, 1, fh);
@@ -341,25 +346,39 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h)
         err = 1;
     }
 
-    while(!err) {
-        ret = fread(buf,1, 1, fh);
-        if (ret != 1 || (! IS_WHITESPACE(buf[0]) && (buf[0] < '0' || buf[0] > '9'))) {
-            err = 1;
-            break;
-        }
-        if (IS_WHITESPACE(buf[0]))
-            break;
-        *w = *w * 10 + buf[0] - '0';
+    if (fgets((char *)buf, sizeof(buf), fh) == NULL) {
+        printf("DEBUG: image_read_header: Error: failed to read comment or dimensions\n");
+        return 0;
     }
-    while(!err) {
-        ret = fread(buf,1, 1, fh);
-        if (ret != 1 || (! IS_WHITESPACE(buf[0]) && (buf[0] < '0' || buf[0] > '9'))) {
-            err = 1;
-            break;
+    if (buf[0] == '#') {
+        char *ptr1,  *ptr2;
+        u32 tmp_black = strtol((char *)buf+1, &ptr1, 16);
+        if (ptr1 != (char *)buf+1) {
+            ptr1++;
+            u32 tmp_white = strtol(ptr1, &ptr2, 16);
+            if (ptr2 != ptr1) {
+                *black = tmp_black;
+                *white = tmp_white;
+            }
         }
-        if (IS_WHITESPACE(buf[0]))
-            break;
-        *h = *h * 10 + buf[0] - '0';
+        if (fgets((char *)buf, sizeof(buf), fh) == NULL) {
+            printf("DEBUG: image_read_header: Error: failed to read dimensions\n");
+            return 0;
+        }
+    }
+    u8 *ptr = buf;
+    for (int i = 0; i < 2; i++) {
+        u16 *v = w_h[i];
+        while(!err) {
+            if (ptr == buf + sizeof(buf) || (! IS_WHITESPACE(*ptr) && (*ptr < '0' || *ptr > '9'))) {
+                err = 1;
+                break;
+            }
+            if (IS_WHITESPACE(*ptr))
+                break;
+            *v = *v * 10 + *ptr - '0';
+            ptr++;
+        }
     }
     if (err) {
         printf("DEBUG: image_read_header: Error: %d, h:%d w:%d\n", err, *h, *w);
@@ -371,11 +390,12 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h)
 u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 {
     FILE *fh;
+    u32 black, white;
     fh = fopen(file, "r");
     if(! fh) {
         return 0;
     }
-    int ret = image_read_header(fh, w, h);
+    int ret = image_read_header(fh, w, h, &black, &white);
     fclose(fh);
     return ret;
 }
@@ -383,9 +403,10 @@ u8 LCD_ImageDimensions(const char *file, u16 *w, u16 *h)
 void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h, u16 x_off, u16 y_off)
 {
     FILE *fh;
+    u32 black, white;
     u8 buf[48];
     u16 img_w = 0, img_h = 0;
-    
+
     fh = fopen(file, "rb");
     if(! fh) {
         printf("DEBUG: LCD_DrawWindowedImageFromFile: Image not found: %s\n", file);
@@ -393,10 +414,11 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
             LCD_FillRect(x, y, w, h, 0);
         return;
     }
-    if (! image_read_header(fh, &img_w, &img_h)) {
+    if (! image_read_header(fh, &img_w, &img_h, &black, &white)) {
         fclose(fh);
         return;
     }
+    //printf("DEBUG: LCD_DrawWindowedImageFromFile: %s %dx%d %06x %06x\n", file, img_w, img_h, black, white);
     if (img_w > sizeof(buf)*8) {
         printf("DEBUG: LCD_DrawWindowedImageFromFile: Image is too wide: %d > %d\n", img_w, sizeof(buf)*8);
         fclose(fh);
@@ -419,7 +441,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         }
         for (int j = 0; j < w; j++) {
             unsigned val = buf[(j + x_off) / 8] & (1 << (7 - ((j + x_off) % 8)));
-            LCD_DrawPixelXY(x+j, y+i, val ? 0xffff : 0x0000);
+            LCD_DrawPixelXY(x+j, y+i, val ? white : black);
         }
     }
     fclose(fh);

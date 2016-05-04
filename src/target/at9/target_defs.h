@@ -11,7 +11,7 @@
 #define USE_DEVOFS 1 //Must be before common_devo include
 
 #define DISABLE_PWM 1                 //FIXME
-
+#define NO_LANGUAGE_SUPPORT 1
 #include "devofs.h"
 #define FILE_SIZE sizeof(FATFS)
 
