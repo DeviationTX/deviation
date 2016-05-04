@@ -39,7 +39,7 @@
 
 static const char * const frskyx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
-  _tr_noop("AD2GAIN"),  "0", "255", NULL,
+  _tr_noop("AD2GAIN"),  "0", "1000", "6553601", NULL,       // big step 100, little step 1
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
@@ -420,7 +420,7 @@ static void processSportPacket(u8 *packet) {
         set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
         break;
     case ADC2_ID:    // put in VOLT2 for consistency with frsky2way
-        set_telemetry(TELEM_FRSKY_VOLT2, SPORT_DATA_U8(packet) * 132 * (Model.proto_opts[PROTO_OPTS_AD2GAIN] / 10) / 100);
+        set_telemetry(TELEM_FRSKY_VOLT2, SPORT_DATA_U8(packet) * 132 * (Model.proto_opts[PROTO_OPTS_AD2GAIN] / 100) / 100);
         break;
     case BATT_ID:
         set_telemetry(TELEM_FRSKY_VOLTA, SPORT_DATA_U8(packet) * 132 / 100);
@@ -859,7 +859,7 @@ const void *FRSKYX_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
-            if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 10;  // if not set, default to no gain
+            if (!Model.proto_opts[PROTO_OPTS_AD2GAIN]) Model.proto_opts[PROTO_OPTS_AD2GAIN] = 100;  // if not set, default to no gain
             return frskyx_opts;
         case PROTOCMD_TELEMETRYSTATE:
             return (void *)1L;
