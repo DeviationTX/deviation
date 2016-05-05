@@ -39,7 +39,7 @@
 
 static const char * const frskyx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
-  _tr_noop("AD2GAIN"),  "0", "1000", "6553601", NULL,       // big step 100, little step 1
+  _tr_noop("AD2GAIN"),  "0", "1000", "655361", NULL,       // big step 10, little step 1
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
