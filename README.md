@@ -1,4 +1,4 @@
-The Deviation firmware project is hosetd at http://www.deviationtx.com
+The Deviation firmware project is hosted at http://www.deviationtx.com
 
 There you can find links to:
   * pre-built binaries: http://www.deviationtx.com/downloads-new/category/1-deviation-releases
@@ -9,10 +9,10 @@ There you can find links to:
 Building Deviation requires setting up a cross-compiler.  On certain
 transmitters (like the devo7e), the firmware takes up nearly 100% of the
 available ROM, and we have found that only specific versions of the
-cross-compiler can build t successfully.
+cross-compiler can build it successfully.
 
 To facilitate building Deviation consistently, we have provided Docker images
-to guarantee constsent builds across platforms.  Instruction for building with
+to guarantee consistent builds across platforms.  Instruction for building with
 Docker can be found here: http://www.deviationtx.com/wiki/development/docker
 
 While not recommended, other methods of building Deviation are documented
