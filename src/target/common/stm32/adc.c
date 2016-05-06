@@ -16,7 +16,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/dma.h>
 #include "common.h"
-#include "devo.h"
+#include "../common/devo/devo.h"
 #include <stdlib.h>
 #include <stdio.h>
 
