@@ -101,7 +101,9 @@ const char * _frsky_name(char *str, u8 telem)
     switch (telem) {
         case TELEM_FRSKY_VOLT1:
         case TELEM_FRSKY_VOLT2:
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_VOLT3:
+#endif
             sprintf(str, "%s%d", _tr("TelemV"), telem - TELEM_FRSKY_VOLT1 + 1);
             break;
         case TELEM_FRSKY_RSSI:
