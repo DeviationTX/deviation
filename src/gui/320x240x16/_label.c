@@ -41,9 +41,14 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     }
     else if (desc->style == LABEL_FILL) {
         LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
-    } else {
+    }
+    else if (desc->style == LABEL_INVERTED || is_selected) {
+        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, 0xffff);
+    }
+    else {
         GUI_DrawBackground(obj_x, obj_y, obj_w, obj_h);
     }
+
     if (desc->fill_color != desc->outline_color) {
         LCD_DrawRect(obj_x, obj_y, obj_w, obj_h, desc->outline_color);
         obj_x+=2; obj_w-=4;

@@ -46,6 +46,7 @@ enum LabelType {
     LABEL_CENTER,
     LABEL_FILL,
     LABEL_TRANSPARENT,
+    LABEL_INVERTED,
     LABEL_LEFT,
     LABEL_RIGHT,
     LABEL_BOX,
@@ -53,7 +54,7 @@ enum LabelType {
     LABEL_SQUAREBOX,
     LABEL_BRACKET,
     LABEL_UNDERLINE,
-    LABEL_INVERTED,
+
 #endif
 
 };
