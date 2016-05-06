@@ -416,12 +416,12 @@ static void processSportPacket(u8 *packet) {
     // 8 bit voltages are raw ADC with 3.3V reference => 13.2mV/bit
     // Convert to two decimal places (hundredths of volts)
     switch(id) {
-//TODO    case ADC1_ID:    // put in VOLT3 so ADC2_ID (external input) stays consistent with frsky2way
-    case ADC2_ID:    // put in VOLT3 so ADC2_ID (external input) stays consistent with frsky2way
-        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
-//TODO        break;
-//TODO    case ADC2_ID:    // put in VOLT2 for consistency with frsky2way
-        set_telemetry(TELEM_FRSKY_VOLT2, (s32)SPORT_DATA_U8(packet) * 132 * Model.proto_opts[PROTO_OPTS_AD2GAIN] / 10000);
+    case ADC1_ID:    // put in VOLT3 so ADC2_ID (external input) stays consistent with frsky2way
+//        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
+        break;
+    case ADC2_ID:    // put in VOLT2 for consistency with frsky2way
+        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);  //TODO
+        set_telemetry(TELEM_FRSKY_VOLT2, ((s32)SPORT_DATA_U8(packet) * 132 * Model.proto_opts[PROTO_OPTS_AD2GAIN]) / 10000);
         break;
     case BATT_ID:
         set_telemetry(TELEM_FRSKY_VOLTA, SPORT_DATA_U8(packet) * 132 / 100);
