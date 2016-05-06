@@ -39,7 +39,7 @@
 
 static const char * const frskyx_opts[] = {
   _tr_noop("Failsafe"), "Hold", "NoPulse", "RX", NULL,
-  _tr_noop("AD2GAIN"),  "0", "1000", "655361", NULL,       // big step 10, little step 1
+  _tr_noop("AD2GAIN"),  "0", "2000", "655361", NULL,       // big step 10, little step 1
   _tr_noop("Freq-Fine"),  "-127", "127", NULL,
   NULL
 };
@@ -392,16 +392,9 @@ static void update_min_cell(u8 num_cells) {
 
 
 static void processSportPacket(u8 *packet) {
-//    u8  instance = (packet[0] & 0x1F) + 1;
+//    u8  instance = (packet[0] & 0x1F) + 1;    // all instances of same sensor write to same telemetry value
     u8  prim                = packet[1];
     u16 id                  = *((u16 *)(packet+2));
-
-#ifdef EMULATOR
-//printf("processing sport packet %02x", packet[0]);
-//for(int i=1; i < FRSKY_SPORT_PACKET_SIZE; i++) printf(" %02x", packet[i]);
-//printf("\n");
-//printf("prim 0x%02x, id 0x%02x\n", prim, id);
-#endif
 
     if (prim != DATA_FRAME)
         return;
@@ -417,10 +410,9 @@ static void processSportPacket(u8 *packet) {
     // Convert to two decimal places (hundredths of volts)
     switch(id) {
     case ADC1_ID:    // put in VOLT3 so ADC2_ID (external input) stays consistent with frsky2way
-//        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
+        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);
         break;
     case ADC2_ID:    // put in VOLT2 for consistency with frsky2way
-        set_telemetry(TELEM_FRSKY_VOLT3, SPORT_DATA_U8(packet) * 132 / 100);  //TODO
         set_telemetry(TELEM_FRSKY_VOLT2, ((s32)SPORT_DATA_U8(packet) * 132 * Model.proto_opts[PROTO_OPTS_AD2GAIN]) / 10000);
         break;
     case BATT_ID:
