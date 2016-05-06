@@ -617,6 +617,8 @@ static void frsky_check_telemetry(u8 *pkt, u8 len) {
 
 
 #ifdef EMULATOR
+// for emulation to match fixed_id set tx fixed id to 123456 and add
+// txid=F6C4FBB3 to top of hardware.ini
 static u8 telem_idx;
 static const u8 telem_test[][17] = {
 {0x0e, 0x20, 0xe6, 0x02, 0x2d, 0x88, 0x00, 0x00, 0x00, 0x00, 0x10, 0x01, 0xd3, 0xba, 0x56, 0xc4, 0x28},
