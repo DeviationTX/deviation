@@ -564,7 +564,6 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
     int press_type = is_release ? -1 : is_longpress ? 1 : 0;
     //TextSelect can handle Left, Right, and Enter
     if (obj->Type == TextSelect) {
-        printf("Pressing with type: %d\n", press_type);
         GUI_PressTextSelect(obj, button, press_type);
         return 1;
     }
@@ -605,6 +604,32 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
     //When modal, we capture all button presses
     int modalActive = GUI_IsModal() ? 1 : 0;
 
+#if USE_4BUTTON_MODE
+    // IN 4 button mode, up/down can also act as left/right for TextSelect
+    static struct guiObject *objACTIVE = NULL;
+    if (objACTIVE) {
+        if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            button = CHAN_ButtonMask(BUT_LEFT);
+        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            button = CHAN_ButtonMask(BUT_RIGHT);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            if (flags & BUTTON_RELEASE)
+                objACTIVE = NULL;
+        } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            if (flags & BUTTON_RELEASE)
+                objACTIVE = NULL;
+            return 1;
+        }
+    } else {
+        if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
+            if (flags & BUTTON_RELEASE) {
+                objACTIVE = objSELECTED;
+            }
+            return 1;
+        }
+    }
+#endif
+    //printf("Button: %08x Flags: %08x Active: %08x\n", button, flags, objACTIVE);
     if (CHAN_ButtonIsPressed(button, BUT_LEFT) ||
         CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
         CHAN_ButtonIsPressed(button, BUT_ENTER))
