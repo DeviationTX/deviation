@@ -160,8 +160,7 @@ void exec_callbacks(u32 buttons, enum ButtonFlags flags) {
                 //We only send a release to the button that accepted a press
                 if(ptr->callback(buttons, flags, ptr->data)) {
                     //Exit after the 1st action accepts the button
-                    if (flags & BUTTON_PRESS)
-                        buttonPressed = ptr;
+                    buttonPressed = (flags & BUTTON_PRESS) ? ptr : NULL;
                     return;
                 }
             }
