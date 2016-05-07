@@ -33,6 +33,7 @@
 
 static inline void LCD_ForceUpdate() {}
 
+#define USE_4BUTTON_MODE    1
 #define HAS_STANDARD_GUI    0
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
