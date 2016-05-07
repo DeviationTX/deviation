@@ -604,10 +604,12 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
     (void)data;
     //When modal, we capture all button presses
     int modalActive = GUI_IsModal() ? 1 : 0;
+
     if (CHAN_ButtonIsPressed(button, BUT_LEFT) ||
         CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
         CHAN_ButtonIsPressed(button, BUT_ENTER))
     {
+        // Widgets can only handle Left, Right and Enter
         if (objSELECTED)
              return GUI_ObjButton(objSELECTED, button, flags) || modalActive;
         return modalActive;
@@ -638,6 +640,8 @@ unsigned handle_buttons(u32 button, unsigned flags, void *data)
             }
         }
     } else if (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        // We need to tell the button handler that we will handle this press
+        // But we ignore an EXIT if there is nothing selected
         return modalActive;
     }
     return 1;
