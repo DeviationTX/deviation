@@ -229,7 +229,7 @@ static void frsky_parse_telem_stream(u8 byte) {
         state = TS_IDLE;
       }
       else {
-        data_id = byte * 2;
+        data_id = byte;
         state = TS_DATA_LOW;
       }
       return;
@@ -241,9 +241,8 @@ static void frsky_parse_telem_stream(u8 byte) {
     }
 
     state = TS_IDLE;
-    u16 value = (byte << 8) + lowByte;
 
-    processHubPacket(data_id, value);
+    processHubPacket(data_id, (byte << 8) + lowByte);
 }
 
 #endif // HAS_EXTENDED_TELEMETRY
