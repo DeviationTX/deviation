@@ -200,7 +200,7 @@ static void frsky2way_build_data_packet()
 
 #if HAS_EXTENDED_TELEMETRY
 
-#include "frsky_d_telem.inc"
+#include "frsky_d_telem._c"
 
 
 static void frsky_parse_telem_stream(u8 byte) {

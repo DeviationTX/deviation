@@ -371,7 +371,7 @@ static void frskyX_data_frame() {
 
 #if HAS_EXTENDED_TELEMETRY
 
-#include "frsky_d_telem.inc"
+#include "frsky_d_telem._c"
 
 // helper functions
 static void update_cell(u8 cell, s32 value) {
