@@ -64,7 +64,11 @@ static s8 fine;
 
 enum {
     FRSKY_BIND        = 0,
+#ifdef EMULATOR
+    FRSKY_BIND_DONE  = 10,
+#else
     FRSKY_BIND_DONE  = 1000,
+#endif
     FRSKY_DATA1,
     FRSKY_DATA2,
     FRSKY_DATA3,
@@ -206,7 +210,7 @@ static void frsky2way_build_data_packet()
 static void frsky_parse_telem_stream(u8 byte) {
     static int8_t data_id;
     static uint8_t lowByte;
-    static TS_STATE state = TS_IDLE;
+    static TS_STATE state = TS_IDLE;    // this code not included in modular build so init okay
 
 
     if (byte == 0x5e) {
@@ -285,7 +289,11 @@ static u16 frsky2way_cb()
         CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
         CC2500_WriteData(packet, packet[0]+1);
         state++;
+#ifdef EMULATOR
+        return 90;
+#else
         return 9000;
+#endif
     }
     if (state == FRSKY_BIND_DONE) {
         state = FRSKY_DATA2;
@@ -295,7 +303,11 @@ static u16 frsky2way_cb()
     } else if (state == FRSKY_DATA5) {
         CC2500_Strobe(CC2500_SRX);
         state = FRSKY_DATA1;
+#ifdef EMULATOR
+        return 92;
+#else
         return 9200;
+#endif
     }
     counter = (counter + 1) % 188;
     if (state == FRSKY_DATA4) {
@@ -305,7 +317,11 @@ static u16 frsky2way_cb()
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         state++;
+#ifdef EMULATOR
+        return 13;
+#else
         return 1300;
+#endif
     } else {
         if (state == FRSKY_DATA1) {
             unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
@@ -351,7 +367,11 @@ static u16 frsky2way_cb()
         CC2500_WriteData(packet, packet[0]+1);
         state++;
     }
+#ifdef EMULATOR
+    return state == FRSKY_DATA4 ? 75 : 90;
+#else
     return state == FRSKY_DATA4 ? 7500 : 9000;
+#endif
 }
 
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
@@ -383,7 +403,11 @@ static void initialize(int bind)
     } else {
         state = FRSKY_BIND_DONE;
     }
+#ifdef EMULATOR
+    CLOCK_StartTimer(100, frsky2way_cb);
+#else
     CLOCK_StartTimer(10000, frsky2way_cb);
+#endif
 }
 
 const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)
