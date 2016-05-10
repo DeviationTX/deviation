@@ -333,20 +333,20 @@ static u16 frsky2way_cb()
             }
 #ifdef EMULATOR
             const u8 t[] = {0x24, 0x25, 0x26, 0x10, 0x21, 0x02, 0x05, 0x06, 0x28, 0x3a, 0x3b, 0x03, 0x14, 0x1c, 0x13, 0x1b, 0x23, 0x12, 0x1a, 0x22, 0x11, 0x19, 0x01, 0x09, 0x04, 0x15, 0x16, 0x17, 0x18};
-            u8 p[sizeof(t) * 4 + 4 +5];
+            u8 p[6 + sizeof(t) * 4 + 1 ];
             p[0] = sizeof(p) - 3;
             p[1] = fixed_id & 0xff;
             p[2] = fixed_id >> 8;
             p[3] = rand32() % 256;
             p[4] = rand32() % 256;
-            //p[5] = rssi;
+            p[5] = 10;
             for(unsigned i = 0; i < sizeof(t); i++) {
-                p[5+i*4+0] = 0x5e;
-                p[5+i*4+1] = t[i];
-                p[5+i*4+2] = rand32() & 0xff;
-                p[5+i*4+3] = 0x00;
+                p[6+i*4+0] = 0x5e;
+                p[6+i*4+1] = t[i];
+                p[6+i*4+2] = rand32() & 0xff;
+                p[6+i*4+3] = 0x00;
             }
-            p[5+4*sizeof(t)] = 0x5e;
+            p[6+4*sizeof(t)] = 0x5e;
             frsky2way_parse_telem(p, sizeof(p));
 #endif //EMULATOR
             CC2500_SetTxRxMode(TX_EN);
