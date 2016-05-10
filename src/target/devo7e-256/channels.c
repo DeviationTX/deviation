@@ -20,6 +20,22 @@
 #include "../common/devo/devo.h"
 
 //Duplicated in tx_buttons.c
+/*
+#define IGNORE_MASK     ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
+#define SWITCH_3x4_2X2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                       | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                       | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                       | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                       | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                       | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_3x2      ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                       | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_2x2      ((1 << INP_SWA0) | (1 << INP_SWA1) \
+                       | (1 << INP_SWB0) | (1 << INP_SWB1))
+#define SWITCH_3x1      ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
+#define SWITCH_NONE     ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                       | (1 << INP_FMOD0) | (1 << INP_FMOD1))
+*/
 #define SWITCH_3x4_2x2  ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
                        | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 #define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
