@@ -254,8 +254,8 @@ static void frsky_parse_telem_stream(u8 byte) {
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    //byte1 == data len (+ 2 for CRC)
-    //byte 2,3 = fixed=id
+    //byte1 == data len (+ 2 for CRC and 1 for link quality) OR just fixed value of 0x11?
+    //byte 2,3 = fixed_id
     //byte 4 = A1 : 52mV per count; 4.5V = 0x56
     //byte 5 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
     //byte6 = RSSI
@@ -263,7 +263,6 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     //printf("%02x<>%02x %02x<>%02x %d<>%d\n", pkt[1], fixed_id & 0xff, pkt[2], (fixed_id >> 8) & 0xff, len, pkt[0]+3);
     if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
         return;
-    len -= 2;
     //Get voltage A1 (52mv/count)
     Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[3] * 52 / 10; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
@@ -275,7 +274,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #if HAS_EXTENDED_TELEMETRY
-    for(int i = 6; i < len - 4; i++)
+    for(int i = 6; i < pkt[0]-1; i++)
         frsky_parse_telem_stream(pkt[i]);
 #endif // HAS_EXTENDED_TELEMETRY
 }
@@ -332,8 +331,9 @@ static u16 frsky2way_cb()
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR
-            const u8 t[] = {0x24, 0x25, 0x26, 0x10, 0x21, 0x02, 0x05, 0x06, 0x28, 0x3a, 0x3b, 0x03, 0x14, 0x1c, 0x13, 0x1b, 0x23, 0x12, 0x1a, 0x22, 0x11, 0x19, 0x01, 0x09, 0x04, 0x15, 0x16, 0x17, 0x18};
-            u8 p[6 + sizeof(t) * 4 + 1 ];
+            const u8 t[] = {0x24, 0x25, 0x26, 0x10, 0x21, 0x02, 0x05, 0x06, 0x28, 0x3a, 0x3b, 0x03, 0x14, 0x1c, 0x13, 0x1b, 0x23, 0x12, 0x1a, 0x22, 0x11, 0x19, 0x01, 0x09, 0x04, 0x15, 0x16, 0x17, 0x18, 0x30};
+//            const u8 t[] = {0x17, 0x18, 0x30};
+            u8 p[6 + sizeof(t) * 4 + 1 + 3];
             p[0] = sizeof(p) - 3;
             p[1] = fixed_id & 0xff;
             p[2] = fixed_id >> 8;
@@ -343,10 +343,11 @@ static u16 frsky2way_cb()
             for(unsigned i = 0; i < sizeof(t); i++) {
                 p[6+i*4+0] = 0x5e;
                 p[6+i*4+1] = t[i];
-                p[6+i*4+2] = rand32() & 0xff;
-                p[6+i*4+3] = 0x00;
+                p[6+i*4+2] = 0x00; //rand32() & 0xff;
+                p[6+i*4+3] = 0x01;
             }
             p[6+4*sizeof(t)] = 0x5e;
+
             frsky2way_parse_telem(p, sizeof(p));
 #endif //EMULATOR
             CC2500_SetTxRxMode(TX_EN);
