@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+
+my $docker_container = "deviation_build";
+
+my $runonce = "$FindBin::Bin/.run_once";
+open my $fh, ">", $runonce or die "ERROR: Can't write $runonce\n";
+print $fh "#!/bin/sh\n";
+print $fh "make";
+foreach (@ARGV) {
+    print $fh " \"$_\"";
+}
+close($fh);
+chmod 0755, $runonce;
+system("docker start -i $docker_container");
+unlink($runonce);
