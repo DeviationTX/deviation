@@ -28,10 +28,6 @@ static struct s_fr_gps {
     u16 second;                // 0x18
 //    u16 heading;
 //    u8 satcount;
-
-    // non-gps values that are split bp/ap
-    u16 baro_altitude_bp;
-    u16 amp_voltage_bp;
 } fr_gps;
 
 
@@ -39,13 +35,15 @@ static struct s_fr_gps {
 
 static void processHubPacket(u8 id, u16 value) {
     static u8 varioHighPrecision = 0;
+    static u8 last_id;
+    static u16 last_value;
 
     switch (id) {
     //defined in protocol_sensor_hub.pdf
     case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)
         fr_gps.altitude_bp = value;
         break;
-    case 0x09: //GPS_ALT (fraction)
+    case 0x09: //GPS_ALT (fraction)  TODO opentx throws away the ap value and only uses bp
         Telemetry.gps.altitude = (fr_gps.altitude_bp * 100 + value) * 10;
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
@@ -84,14 +82,16 @@ static void processHubPacket(u8 id, u16 value) {
         break;
         }
     case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
-        fr_gps.baro_altitude_bp = value;
+        last_id = id;
+        last_value = value;
         break;
     case 0x21: //ALT (fraction)  (.01m/count)
+        if (last_id != 0x10) return;
         if (value > 9 || varioHighPrecision) {
             varioHighPrecision = 1;
             value /= 10;    // map hi precision vario into low precision. Altitude is stored in 0.1m anyways
         }
-        value = fr_gps.baro_altitude_bp + (((s16)fr_gps.baro_altitude_bp < 0) ? -value : value);
+        value = last_value + (((s16)last_value < 0) ? -value : value);
 
         if (ground_level == 0) ground_level = value;
         set_telemetry(TELEM_FRSKY_ALTITUDE, value - ground_level);
@@ -180,11 +180,12 @@ static void processHubPacket(u8 id, u16 value) {
 				break;
 
     case 0x3A: //Ampere sensor voltage (whole number) (measured as V) 0V-48V (0.5V/count)
-        fr_gps.amp_voltage_bp = value;
+        last_id = id;
+        last_value = value;
         break;
     case 0x3B: //Ampere sensor voltage (fractional)
-        Telemetry.value[TELEM_FRSKY_VOLTA] = ((fr_gps.amp_voltage_bp * 100 + value * 10) * 210) / 110;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_VOLTA);
+        if (last_id != 0x3A) return;
+        set_telemetry(TELEM_FRSKY_VOLTA, ((last_value * 100 + value * 10) * 210) / 110);
         break;
     }
 }
