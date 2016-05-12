@@ -22,6 +22,19 @@ struct pagemem pagemem;
 static u8 modal;
 static u8 cur_page;
 
+struct page {
+    void (*init)(int i);
+    void (*event)();
+    void (*exit)();
+    const char *pageName;
+};
+
+#define PAGEDEF(id, init, event, exit, menu, name) {init, event, exit, name},
+static const struct page pages[] = {
+#include "pagelist.h"
+};
+#undef PAGEDEF
+
 void PAGE_Event()
 {
     if(pages[cur_page].event)
@@ -83,37 +96,35 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
     return 1;
 }
 
-int PAGE_IsValid(int page) {
+int PAGE_IsValidQuickPage(int page) {
 #if HAS_STANDARD_GUI
-    if (Model.mixer_mode == MIXER_ADVANCED) {
-        switch(page) {
-#ifdef PAGEID_MODELMENU
-            case PAGEID_MODELMENU:
-#endif
-            case PAGEID_REVERSE:
-            case PAGEID_DREXP:
-            case PAGEID_SUBTRIM:
-            case PAGEID_TRAVELADJ:
-            case PAGEID_THROCURVES:
-            case PAGEID_PITCURVES:
-            case PAGEID_THROHOLD:
-            case PAGEID_GYROSENSE:
-            case PAGEID_SWASH:
-            case PAGEID_FAILSAFE:
-            case PAGEID_SWITCHASSIGN:
-                return 0;
-        }
-    } else
-#endif //HAS_STANDARD_GUI
-    {
-        switch(page) {
-            case PAGEID_MIXER:
-                return 0;
-        }
+    int menu;
+    #define PAGEDEF(_id, _init, _event, _exit, _menu, _name) \
+        case _id: menu = _menu; break;
+    switch(page) {
+        #include <pagelist.h>
     }
+    #undef PAGEDEF
+    if (! (menu & Model.mixer_mode)) {
+        return 0;
+    }
+#endif //HAS_STANDARD_GUI
     switch(page) {
         case PAGEID_SPLASH:
             return 0;
     }
     return 1;
 }
+
+const char *PAGE_GetName(int i)
+{
+    if(i == 0 || i == 1)
+        return _tr("None");
+    return _tr(pages[i].pageName);
+}
+
+int PAGE_GetNumPages()
+{
+    return sizeof(pages) / sizeof(struct page);
+}
+

@@ -14,7 +14,6 @@
  */
 
 
-#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -27,14 +26,14 @@ enum {
     LABEL_X           = 17,
     LABEL_WIDTH       = 0,
 };
-#endif //OVERRIDE_PLACEMENT
-
+#define HEADER_HEIGHT 36
+#define LINE_SPACE    24
+#define LINE_HEIGHT   20
 #include "../common/_menus.c"
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFT;
     int idx = 0;
     unsigned i = 0;
     while(1) {
@@ -45,7 +44,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
                 LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
             GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-                LABEL_WIDTH, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+                LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;

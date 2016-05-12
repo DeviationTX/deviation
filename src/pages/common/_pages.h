@@ -17,10 +17,19 @@
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
 #include "toggle_select.h"
+#include "menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
 
 #define PAGE_NAME_MAX 10
+
+#define PAGEDEF(id, init, event, exit, menu, name) id,
+enum PageID {
+#include "pagelist.h"
+PAGEID_LAST
+};
+#undef PAGEDEF
+
 extern struct pagemem pagemem;
 
 void PAGE_RemoveHeader();
@@ -138,9 +147,10 @@ void PAGE_DebuglogInit();
 void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
+void PAGE_ChangeByID(enum PageID id, s8 menuPage);
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
-int PAGE_IsValid(int page);
+int PAGE_IsValidQuickPage(int page);
 
 
 /* Simple Mixer pages */

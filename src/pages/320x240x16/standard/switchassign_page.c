@@ -37,7 +37,7 @@ void PAGE_SwitchAssignInit(int page)
     const int COL2 = (150 + ((LCD_WIDTH - 320) / 2));
     const int ROW_SPACE = 30;
 
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SWITCHASSIGN), MODELMENU_Show);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SWITCHASSIGN));
     refresh_switches();
 
     /* Row 1 */

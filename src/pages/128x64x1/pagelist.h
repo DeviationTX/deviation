@@ -31,6 +31,7 @@ PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,     
 PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,               MAIN_MENU,   _tr_noop("About Deviation"))
 
 //Model menu
+//----------
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       PAGE_ModelExit,     MODEL_MENU,  _tr_noop("Model setup"))
 PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       PAGE_MixerExit,     ADVGUI_MENU, _tr_noop("Mixer"))
 #if HAS_STANDARD_GUI
@@ -46,7 +47,7 @@ PAGEDEF(PAGEID_SWASH,    PAGE_SwashInit,       NULL,                  NULL,     
 PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,               STDGUI_MENU, _tr_noop("Fail-safe"))
 PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,               STDGUI_MENU, _tr_noop("Switch assignment"))
 #endif
-PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,     STDGUI_MENU, _tr_noop("Timers"))
+PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,     MODEL_MENU,  _tr_noop("Timers"))
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, PAGE_TelemconfigExit,MODEL_MENU, _tr_noop("Telemetry config"))
 #endif
