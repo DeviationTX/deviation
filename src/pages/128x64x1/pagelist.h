@@ -1,16 +1,21 @@
 #ifdef PAGEDEF
 
+#ifndef MENUID_MAIN
+    #define MENUID_MAIN   (1 << 4)
+    #define MENUID_MODEL  (2 << 4)
+    #define MENUID_TX     (3 << 4)
+#endif
 //                  Menu ID     CONDITION
-#define MAIN_MENU   (1 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Top-level menu, always shown
-#define MODEL_MENU  (2 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Model-menu, always shown
-#define STDGUI_MENU (2 << 4) |  MIXER_STANDARD        // Model-menu, only shown for standard-gui
-#define ADVGUI_MENU (2 << 4) |  MIXER_ADVANCED        // Model-menu, only shown for advanced-gui
-#define TX_MENU     (3 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Transmitter-menu, always shown
+#define MAIN_MENU   MENUID_MAIN  |  (MIXER_STANDARD | MIXER_ADVANCED)        // Top-level menu, always shown
+#define MODEL_MENU  MENUID_MODEL |  (MIXER_STANDARD | MIXER_ADVANCED)        // Model-menu, always shown
+#define STDGUI_MENU MENUID_MODEL |  MIXER_STANDARD        // Model-menu, only shown for standard-gui
+#define ADVGUI_MENU MENUID_MODEL |  MIXER_ADVANCED        // Model-menu, only shown for advanced-gui
+#define TX_MENU     MENUID_TX    |  (MIXER_STANDARD | MIXER_ADVANCED)        // Transmitter-menu, always shown
 
 //The following pages are not part of the menu system
 //---------------------------------------------------
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
-PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           "")  //This is the main menu
+PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           _tr_noop("Main menu"))
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER

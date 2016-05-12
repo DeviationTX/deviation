@@ -325,7 +325,7 @@ void PAGE_ShowTelemetryAlarm()
 {
     int cur_page = PAGE_GetID();
     if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+        PAGE_Pop();
 }
 
 void PAGE_TelemtestInit(int page)

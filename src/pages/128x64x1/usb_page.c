@@ -48,7 +48,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
+            PAGE_Pop();
         }
         else {
             // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb

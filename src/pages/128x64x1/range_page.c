@@ -25,7 +25,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data) {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             RANGE_test(!mp->testing);
         }
@@ -37,7 +37,7 @@ static unsigned action_cb_notest(u32 button, unsigned flags, void *data) {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
+            PAGE_Pop();
         }
     }
     return 1;

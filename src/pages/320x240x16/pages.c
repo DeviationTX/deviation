@@ -60,6 +60,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
+    (void)data;
     PAGE_ChangeByID(PAGEID_MAIN, 0);
 #if 0
     if((long)data == 0) {
@@ -92,7 +93,7 @@ void PAGE_RemoveHeader()
 
 void PAGE_ShowHeader(const char *title)
 {
-    guiObject_t *obj;
+    //guiObject_t *obj;
     GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);

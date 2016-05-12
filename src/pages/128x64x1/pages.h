@@ -5,13 +5,6 @@
 #include "menus.h"
 #include "guiobj.h"
 
-#define PAGEDEF(id, init, event, exit, menu, name) id,
-enum PageID {
-#include "pagelist.h"
-    PAGEID_LAST
-};
-#undef PAGEDEF
-
 struct pagemem {
     union {
         struct main_page main_page;

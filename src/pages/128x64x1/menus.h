@@ -2,7 +2,8 @@
 #define _MENUS_H__
 
 struct menu_page {
-    u16 *current_selected;
+    u8 *current_selected;
+    unsigned menu_id;
 };
 
 #endif /* MENUS_H_ */

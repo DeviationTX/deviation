@@ -148,6 +148,9 @@ void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
+void PAGE_PushByID(enum PageID id);
+void PAGE_Pop();
+
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
 int PAGE_IsValidQuickPage(int page);

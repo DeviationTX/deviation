@@ -16,6 +16,9 @@
 static buttonAction_t button_action;
 static unsigned (*ActionCB)(u32 button, unsigned flags, void *data);
 
+static u8 _page_stack[5];
+static u8 *page_stack = _page_stack;
+
 void PAGE_ChangeQuick(int dir);
 
 struct pagemem pagemem;
@@ -118,8 +121,6 @@ int PAGE_IsValidQuickPage(int page) {
 
 const char *PAGE_GetName(int i)
 {
-    if(i == 0 || i == 1)
-        return _tr("None");
     return _tr(pages[i].pageName);
 }
 
@@ -128,3 +129,20 @@ int PAGE_GetNumPages()
     return sizeof(pages) / sizeof(struct page);
 }
 
+void PAGE_PushByID(enum PageID id)
+{
+    page_stack++;
+    *page_stack = id;
+    PAGE_ChangeByID(id, 0);
+}
+void PAGE_Pop()
+{
+    //page 0 is always PAGEID_MAIN
+    if (page_stack > _page_stack+1) {
+        page_stack--;
+        PAGE_ChangeByID(*page_stack, 0);
+    } else {
+        page_stack = _page_stack;
+        PAGE_ChangeByID(PAGEID_MAIN, 0);
+    }
+}

@@ -145,10 +145,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;
-            if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
-                PAGE_ChangeByID(PAGEID_TXCFG, -1);
-            else
-                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
             _navigate_pages(1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
