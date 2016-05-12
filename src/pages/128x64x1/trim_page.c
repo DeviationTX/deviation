@@ -47,7 +47,6 @@ enum {
 static struct trim_obj  * const gui  = &gui_objs.u.trim;
 static struct trim2_obj * const guit = &gui_objs.u.trim2;
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static unsigned _sub_action_cb(u32 button, unsigned flags, void *data);
 static u16 current_selected = 0;
 
@@ -73,7 +72,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_page()
 {
-    PAGE_SetActionCB(_action_cb);
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
     PAGE_ShowHeader(_tr("Input"));
     GUI_CreateLabelBox(&gui->steplbl, STEP_X, STEP_Y, STEP_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step"));
@@ -158,20 +156,6 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 
 static unsigned _sub_action_cb(u32 button, unsigned flags, void *data)
 {

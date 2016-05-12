@@ -37,7 +37,6 @@ enum {
 #if HAS_TELEMETRY
 #include "../common/_telemconfig_page.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *idx_cb(guiObject_t *obj, const void *data);
 
 static u16 current_selected = 0;
@@ -76,7 +75,6 @@ void PAGE_TelemconfigInit(int page)
     //    page = current_selected;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb);
     if (telem_state_check() == 0) {
         GUI_CreateLabelBox(&gui->msg, MSG_X, MSG_Y, 0, 0, &DEFAULT_FONT, NULL, NULL, tempstring);
         OBJ_SET_USED(&gui->value, 0);  // A indication not allow to scroll up/down
@@ -101,21 +99,6 @@ static const char *idx_cb(guiObject_t *obj, const void *data)
     u8 idx = (long)data;
     sprintf(tempstring, "%d", idx+1);
     return tempstring;
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid)

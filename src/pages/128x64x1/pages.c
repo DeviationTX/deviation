@@ -27,7 +27,7 @@ void PAGE_Init()
     cur_page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
-    ActionCB = NULL;
+    ActionCB = _action_cb;
     // For Devo10, there is no need to register and then unregister buttons in almost every page
     // since all buttons are needed in all pages, so we just register them in this common page
     BUTTON_RegisterCallback(&button_action,

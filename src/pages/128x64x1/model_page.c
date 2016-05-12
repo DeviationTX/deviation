@@ -40,8 +40,6 @@ static const char * const PLANE_LABEL = _tr_noop("Plane");
 static const char * const MULTI_LABEL = _tr_noop("Multi");
 #include "../common/_model_page.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
 static u16 current_selected = 0;
 
 
@@ -154,7 +152,6 @@ void PAGE_ModelInit(int page)
     (void)page;
     //if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
     //    page = current_selected;
-    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     memset(gui, 0, sizeof(struct modelpage_obj));
@@ -195,22 +192,6 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     tempstring_cpy((const char *)Model.name); // Don't change model name directly
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, 20, // no more than 20 chars is allowed for model name
             _changename_done_cb, (void *)&callback_result);
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        PAGE_ModelExit();
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
 
 void PAGE_ModelExit()
