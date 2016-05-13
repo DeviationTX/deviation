@@ -207,44 +207,44 @@ static void frsky2way_build_data_packet()
 #include "frsky_d_telem._c"
 
 
+    static TS_STATE ts_state = TS_IDLE;    // file scope so can reset on sequence error. this code not included in modular build so init okay
 static void frsky_parse_telem_stream(u8 byte) {
     static int8_t data_id;
     static uint8_t lowByte;
-    static TS_STATE state = TS_IDLE;    // this code not included in modular build so init okay
 
 
     if (byte == 0x5e) {
-      state = TS_DATA_ID;
+      ts_state = TS_DATA_ID;
       return;
     }
-    if (state == TS_IDLE) {
+    if (ts_state == TS_IDLE) {
       return;
     }
-    if (state & TS_XOR) {
+    if (ts_state & TS_XOR) {
       byte = byte ^ 0x60;
-      state = (TS_STATE)(state - TS_XOR);
+      ts_state = (TS_STATE)(ts_state - TS_XOR);
     }
     else if (byte == 0x5d) {
-      state = (TS_STATE)(state | TS_XOR);
+      ts_state = (TS_STATE)(ts_state | TS_XOR);
       return;
     }
-    if (state == TS_DATA_ID) {
+    if (ts_state == TS_DATA_ID) {
       if (byte > 0x3f) {
-        state = TS_IDLE;
+        ts_state = TS_IDLE;
       }
       else {
         data_id = byte;
-        state = TS_DATA_LOW;
+        ts_state = TS_DATA_LOW;
       }
       return;
     }
-    if (state == TS_DATA_LOW) {
+    if (ts_state == TS_DATA_LOW) {
       lowByte = byte;
-      state = TS_DATA_HIGH;
+      ts_state = TS_DATA_HIGH;
       return;
     }
 
-    state = TS_IDLE;
+    ts_state = TS_IDLE;
 
     processHubPacket(data_id, (byte << 8) + lowByte);
 }
@@ -253,13 +253,18 @@ static void frsky_parse_telem_stream(u8 byte) {
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
+    static u8 sequence;
+
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    //byte1 == data len (+ 2 for CRC and 1 for link quality) OR just fixed value of 0x11?
-    //byte 2,3 = fixed_id
-    //byte 4 = A1 : 52mV per count; 4.5V = 0x56
-    //byte 5 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
-    //byte6 = RSSI
-    //verify pkt
+    //pkt 0 = len not counting crc
+    //pkt 1,2 = fixed_id
+    //pkt 3 = A1 : 52mV per count; 4.5V = 0x56
+    //pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
+    //pkt 5 = RSSI
+    //pkt 6 = number of stream bytes
+    //pkt 7 = sequence number increments mod 7 with each packet containing stream data
+    //pkt 8-17 = stream data
+    //pkt 18-19 = crc
     //printf("%02x<>%02x %02x<>%02x %d<>%d\n", pkt[1], fixed_id & 0xff, pkt[2], (fixed_id >> 8) & 0xff, len, pkt[0]+3);
     if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
         return;
@@ -274,8 +279,20 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #if HAS_EXTENDED_TELEMETRY
-    for(int i = 6; i < pkt[0]-1; i++)
-        frsky_parse_telem_stream(pkt[i]);
+    if (pkt[6]) {
+        if ((pkt[7] & 7) != sequence) {
+            ts_state = TS_IDLE;
+            sequence = pkt[7] % 7;    // should be able to recover in middle of sequence
+            return;
+        }
+        sequence = (sequence + 1) % 7;
+            
+        for(int i=8; i < 8+pkt[6]; i++)
+            frsky_parse_telem_stream(pkt[i]);
+    } else {
+        sequence = 0;
+    }
+
 #endif // HAS_EXTENDED_TELEMETRY
 }
 
