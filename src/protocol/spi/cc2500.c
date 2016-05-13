@@ -35,7 +35,7 @@ static void  CS_HI() {
             for(int i = 0; i < 20; i++)
                 _NOP();
             return;
-        }
+			}
     }
 #endif
     PROTOSPI_pin_set(MODULE_ENABLE[CC2500]);
@@ -136,7 +136,7 @@ void CC2500_SetPower(int power)
 {
     const unsigned char patable[8]=
     {
-        0xC5,  // -12dbm
+        0xC6,  // -12dbm
         0x97, // -10dbm
         0x6E, // -8dbm
         0x7F, // -6dbm

@@ -94,7 +94,7 @@ void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel)
 }
 void A7105_ReadData(u8 *dpbuffer, u8 len)
 {
-    A7105_Strobe(0xF0); //A7105_RST_RDPTR
+    A7105_Strobe(A7105_RST_RDPTR);
     for(int i = 0; i < len; i++)
         dpbuffer[i] = A7105_ReadReg(0x05);
     return;
