@@ -5,9 +5,10 @@
 #include "menus.h"
 #include "guiobj.h"
 
-#define PAGEDEF(id, init, event, exit, name) id,
+#define PAGEDEF(id, init, event, exit, menu, name) id,
 enum PageID {
 #include "pagelist.h"
+    PAGEID_LAST
 };
 #undef PAGEDEF
 
@@ -64,6 +65,8 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
 // Menu
 void PAGE_MenuInit(int page);
 void PAGE_MenuExit();
+void PAGE_TxMenuInit(int page);
+void PAGE_ModelMenuInit(int page);
 
 void PAGE_AboutInit(int page);
 void PAGE_SplashInit(int page);

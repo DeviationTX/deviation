@@ -207,9 +207,8 @@ u8 BATTERY_Check();
 
 /* Mixer mode */
 typedef enum {
-    MIXER_ADVANCED = 0,
-    MIXER_STANDARD,
-    MIXER_ALL,
+    MIXER_ADVANCED = 0x01,
+    MIXER_STANDARD = 0x02,
 } MixerMode;
 void PAGE_ShowInvalidStandardMixerDialog(void *guiObj);
 void STDMIXER_Preset();
