@@ -102,7 +102,7 @@ typedef enum {
 } TS_STATE;
 
 
-enum {
+typedef enum {
     TELEM_FRSKY_RSSI = 1,
     TELEM_FRSKY_VOLT1,
     TELEM_FRSKY_VOLT2,
@@ -127,7 +127,7 @@ enum {
     TELEM_FRSKY_DISCHARGE,    // mAh
 #endif
     TELEM_FRSKY_LAST
-};
+} frsky_telem_t;
 
 #define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
                                ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
