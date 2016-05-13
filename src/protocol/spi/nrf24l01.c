@@ -555,7 +555,7 @@ uint8_t LT8900_ReadPayload(uint8_t* msg, uint8_t len)
 	uint8_t i,pos=0,shift,end,buffer[32];
 	unsigned int crc=LT8900_CRC_Initial_Data,a;
 	pos=LT8900_buffer_overhead_bits/8-LT8900_buffer_start;
-	end=pos+len+(LT8900_Flags&_BV(LT8900_PACKET_LENGTH_EN)?1:0)+(LT8900_Flags&_BV(LT8900_CRC_ON)?2:0);
+	end=pos+len+(LT8900_Flags& BV(LT8900_PACKET_LENGTH_EN)?1:0)+(LT8900_Flags& BV(LT8900_CRC_ON)?2:0);
 	//Read payload
 	NRF24L01_ReadPayload(buffer,end+1);
 	//Check address + trail
@@ -571,7 +571,7 @@ uint8_t LT8900_ReadPayload(uint8_t* msg, uint8_t len)
 		buffer[i]=(a>>8)&0xFF;
 	}
 	//Check len
-	if(LT8900_Flags&_BV(LT8900_PACKET_LENGTH_EN))
+	if(LT8900_Flags& BV(LT8900_PACKET_LENGTH_EN))
 	{
 		crc=crc16_update(crc,buffer[pos]);
 		if(bit_reverse(len)!=buffer[pos++])
@@ -584,7 +584,7 @@ uint8_t LT8900_ReadPayload(uint8_t* msg, uint8_t len)
 		msg[i]=bit_reverse(buffer[pos++]);
 	}
 	//Check CRC
-	if(LT8900_Flags&_BV(LT8900_CRC_ON))
+	if(LT8900_Flags& BV(LT8900_CRC_ON))
 	{
 		if(buffer[pos++]!=((crc>>8)&0xFF)) return 0;	// wrong CRC...
 		if(buffer[pos]!=(crc&0xFF)) return 0;			// wrong CRC...
@@ -598,7 +598,7 @@ void LT8900_WritePayload(uint8_t* msg, uint8_t len)
 	unsigned int crc=LT8900_CRC_Initial_Data,a,mask;
 	uint8_t i, pos=0,tmp, buffer[64], pos_final,shift;
 	//Add packet len
-	if(LT8900_Flags&_BV(LT8900_PACKET_LENGTH_EN))
+	if(LT8900_Flags& BV(LT8900_PACKET_LENGTH_EN))
 	{
 		tmp=bit_reverse(len);
 		buffer[pos++]=tmp;
@@ -612,7 +612,7 @@ void LT8900_WritePayload(uint8_t* msg, uint8_t len)
 		crc=crc16_update(crc,tmp);
 	}
 	//Add CRC
-	if(LT8900_Flags&_BV(LT8900_CRC_ON))
+	if(LT8900_Flags & BV(LT8900_CRC_ON))
 	{
 		buffer[pos++]=crc>>8;
 		buffer[pos++]=crc;
