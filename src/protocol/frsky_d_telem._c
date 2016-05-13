@@ -7,7 +7,7 @@ static u32 discharge_time;
 static u32 discharge_dAms;   // deciAmp-milliseconds
 
 
-static void set_telemetry(u8 offset, s32 value) {
+static void set_telemetry(frsky_telem_t offset, s32 value) {
     Telemetry.value[offset] = value;
     TELEMETRY_SetUpdated(offset);
 }
@@ -38,6 +38,7 @@ static void processHubPacket(u8 id, u16 value) {
     static u8 last_id;
     static u16 last_value;
 
+//printf("id=0x%02x, value=0x%02x\n", id, value);
     switch (id) {
     //defined in protocol_sensor_hub.pdf
     case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)
@@ -82,10 +83,12 @@ static void processHubPacket(u8 id, u16 value) {
         break;
         }
     case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
+//printf("ALT BP, value=0x%04x\n", value);
         last_id = id;
         last_value = value;
         break;
     case 0x21: //ALT (fraction)  (.01m/count)
+//printf("ALT AP, value=0x%04x, last_id=0x%02x\n", value, last_id);
         if (last_id != 0x10) return;
         if (value > 9 || varioHighPrecision) {
             varioHighPrecision = 1;
@@ -165,7 +168,8 @@ static void processHubPacket(u8 id, u16 value) {
         break;
 
     case 0x30: //VARIO
-        set_telemetry(TELEM_FRSKY_VARIO, value);
+        set_telemetry(TELEM_FRSKY_VARIO, (s16)value);
+//printf("VARIO, value=0x%04x, value=%d, (s16)value=%d\n", value, value, (s16)value);
 				break;
 
     case 0x39: //VFAS_ID
@@ -180,10 +184,12 @@ static void processHubPacket(u8 id, u16 value) {
 				break;
 
     case 0x3A: //Ampere sensor voltage (whole number) (measured as V) 0V-48V (0.5V/count)
+//printf("AMP BP, value=0x%04x\n", value);
         last_id = id;
         last_value = value;
         break;
     case 0x3B: //Ampere sensor voltage (fractional)
+//printf("AMP AP, value=0x%04x, last_id=0x%02x\n", value, last_id);
         if (last_id != 0x3A) return;
         set_telemetry(TELEM_FRSKY_VOLTA, ((last_value * 100 + value * 10) * 210) / 110);
         break;

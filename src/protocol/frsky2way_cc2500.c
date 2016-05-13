@@ -253,19 +253,19 @@ static void frsky_parse_telem_stream(u8 byte) {
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
+// pkt 0 = len not counting crc
+// pkt 1,2 = fixed_id
+// pkt 3 = A1 : 52mV per count; 4.5V = 0x56
+// pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
+// pkt 5 = RSSI
+// pkt 6 = number of stream bytes
+// pkt 7 = sequence number increments mod 7 with each packet containing stream data
+// pkt 8-17 = stream data
+// pkt 18-19 = crc
+
     static u8 sequence;
 
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    //pkt 0 = len not counting crc
-    //pkt 1,2 = fixed_id
-    //pkt 3 = A1 : 52mV per count; 4.5V = 0x56
-    //pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
-    //pkt 5 = RSSI
-    //pkt 6 = number of stream bytes
-    //pkt 7 = sequence number increments mod 7 with each packet containing stream data
-    //pkt 8-17 = stream data
-    //pkt 18-19 = crc
-    //printf("%02x<>%02x %02x<>%02x %d<>%d\n", pkt[1], fixed_id & 0xff, pkt[2], (fixed_id >> 8) & 0xff, len, pkt[0]+3);
     if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
         return;
     //Get voltage A1 (52mv/count)
@@ -279,10 +279,12 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #if HAS_EXTENDED_TELEMETRY
+//printf("pkt[6]=0x%02x\n", pkt[6]);
     if (pkt[6]) {
+//printf("pkt[7]=0x%02x, sequence=0x%02x\n", pkt[7], sequence);
         if ((pkt[7] & 7) != sequence) {
             ts_state = TS_IDLE;
-            sequence = pkt[7] % 7;    // should be able to recover in middle of sequence
+            sequence = (pkt[7] + 1) % 7;    // should be able to recover in middle of sequence
             return;
         }
         sequence = (sequence + 1) % 7;
@@ -297,6 +299,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 }
 
 
+#ifdef EMULATOR
+#include "frskyD8_telemetry_test._c"
+static const u8 *data = testdata;
+#endif
 static u16 frsky2way_cb()
 {
     if (state < FRSKY_BIND_DONE) {
@@ -348,25 +354,15 @@ static u16 frsky2way_cb()
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR
-            const u8 t[] = {0x24, 0x25, 0x26, 0x10, 0x21, 0x02, 0x05, 0x06, 0x28, 0x3a, 0x3b, 0x03, 0x14, 0x1c, 0x13, 0x1b, 0x23, 0x12, 0x1a, 0x22, 0x11, 0x19, 0x01, 0x09, 0x04, 0x15, 0x16, 0x17, 0x18, 0x30};
-//            const u8 t[] = {0x17, 0x18, 0x30};
-            u8 p[6 + sizeof(t) * 4 + 1 + 3];
-            p[0] = sizeof(p) - 3;
-            p[1] = fixed_id & 0xff;
-            p[2] = fixed_id >> 8;
-            p[3] = rand32() % 256;
-            p[4] = rand32() % 256;
-            p[5] = 10;
-            for(unsigned i = 0; i < sizeof(t); i++) {
-                p[6+i*4+0] = 0x5e;
-                p[6+i*4+1] = t[i];
-                p[6+i*4+2] = 0x00; //rand32() & 0xff;
-                p[6+i*4+3] = 0x01;
+            len = *data++;
+            if (!len) {
+                data = testdata;
+                len = *data++;
             }
-            p[6+4*sizeof(t)] = 0x5e;
-
-            frsky2way_parse_telem(p, sizeof(p));
+            frsky2way_parse_telem(data, len);
+            data += len;
 #endif //EMULATOR
+
             CC2500_SetTxRxMode(TX_EN);
             CC2500_SetPower(Model.tx_power);
         }
