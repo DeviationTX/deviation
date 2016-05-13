@@ -119,10 +119,12 @@ static void _show_page()
     if (page_num == 0 || LCD_WIDTH == 480) {
         obj = GUI_CreateLabelBox(&gui1->head1_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Generic settings"));
         if (firstObj == NULL) firstObj = obj;
+#ifndef NO_LANGUAGE_SUPPORT
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->langlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Language"));
         GUI_CreateButton(&gui1->lang, col2, row, BUTTON_WIDE, langstr_cb, 0x0000, lang_select_cb, NULL);
+#endif
         row += space + ADDSPACE ;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->modelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode"));

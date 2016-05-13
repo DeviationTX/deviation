@@ -12,6 +12,7 @@
 
 #define DISABLE_PWM 1                 //FIXME
 #define NO_LANGUAGE_SUPPORT 1
+#ifndef FILE_SIZE
 #include "devofs.h"
 #define FILE_SIZE sizeof(FATFS)
 
@@ -30,8 +31,11 @@
     #define fs_close(x) df_close()
     #define fs_filesize(x) (((x)->file_header.size1 << 8) | (x)->file_header.size2)
     #define fs_ltell(x)   ((x)->file_cur_pos)
+#endif
 
+#ifndef LCD_ForceUpdate
 static inline void LCD_ForceUpdate() {}
+#endif
 
 #define USE_4BUTTON_MODE    1
 #define HAS_STANDARD_GUI    0

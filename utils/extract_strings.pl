@@ -15,6 +15,7 @@ my %targetmap = (
     devo10 => "128x64x1",
     devo7e => undef,
     devof7 => undef,
+    at9    => undef,
     x9d => "128x64x1",
 );
 my %alt_targets = (
