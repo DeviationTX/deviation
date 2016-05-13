@@ -19,9 +19,7 @@ static struct menu_obj * const gui = &gui_objs.u.menu;
 static struct menu_page * const mp = &pagemem.u.menu_page;
 static u8 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 
-static unsigned action_cb(u32 button, unsigned flags, void *data);
 static const char *idx_string_cb(guiObject_t *obj, const void *data);
-static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data);
 static const char *menu_name_cb(guiObject_t *obj, const void *data);
 static int row_cb(int absrow, int relrow, int y, void *data);
 
@@ -55,7 +53,6 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
 void _menu_init(int page)
 {
     PAGE_SetModal(0);
-    PAGE_SetActionCB(action_cb);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr(PAGE_GetName(page)));
 
@@ -115,25 +112,3 @@ const char *idx_string_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static unsigned action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    if (press_type == -1) {
-        long i = (long)data;
-        PAGE_PushByID(i);
-    }
-}

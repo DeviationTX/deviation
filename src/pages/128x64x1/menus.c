@@ -31,6 +31,15 @@ enum {
 
 #include "../common/_menus.c"
 
+static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    if (press_type == -1) {
+        long i = (long)data;
+        PAGE_PushByID(i);
+    }
+}
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;

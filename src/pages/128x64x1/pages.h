@@ -2,7 +2,6 @@
 #define _PAGES_H_
 
 #include "../common/_pages.h"
-#include "menus.h"
 #include "guiobj.h"
 
 struct pagemem {

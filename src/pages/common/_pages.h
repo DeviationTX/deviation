@@ -1,3 +1,5 @@
+#ifndef __PAGES_H__
+#define __PAGES_H__
 #include "common.h"
 #include "music.h"
 #include "gui/gui.h"
@@ -17,7 +19,7 @@
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
 #include "toggle_select.h"
-#include "menus.h"
+#include "_menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
 
@@ -173,3 +175,5 @@ void PAGE_CurvesEvent();
 void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
+
+#endif //__PAGES_H__

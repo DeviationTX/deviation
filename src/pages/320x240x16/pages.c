@@ -35,8 +35,13 @@ void PAGE_Init()
     enter_cmd = NULL;
     exit_cmd = NULL;
     BUTTON_RegisterCallback(&button_action,
-        CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT),
-        BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
+          CHAN_ButtonMask(BUT_ENTER)
+          | CHAN_ButtonMask(BUT_EXIT)
+          | CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_UP)
+          | CHAN_ButtonMask(BUT_DOWN),
+          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, page_change_cb, NULL);
     PAGE_ChangeByID(PAGEID_SPLASH, 0);
     //PAGE_ChangeByID(PAGEID_MAIN);
 }
@@ -54,6 +59,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
+    ActionCB = _action_cb;
     pages[cur_page].init(menuPage);
 }
 
@@ -61,7 +67,7 @@ void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    PAGE_ChangeByID(PAGEID_MAIN, 0);
+    PAGE_Pop();
 #if 0
     if((long)data == 0) {
         PAGE_SetSection(SECTION_MAIN);
@@ -93,8 +99,9 @@ void PAGE_RemoveHeader()
 
 void PAGE_ShowHeader(const char *title)
 {
-    //guiObject_t *obj;
-    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    guiObject_t *obj;
+    obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_SetSelectable(obj, 0);
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
     //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);

@@ -27,7 +27,6 @@ void PAGE_Init()
     cur_page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
-    ActionCB = _action_cb;
     // For Devo10, there is no need to register and then unregister buttons in almost every page
     // since all buttons are needed in all pages, so we just register them in this common page
     BUTTON_RegisterCallback(&button_action,
@@ -59,6 +58,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
+    ActionCB = _action_cb;
     pages[cur_page].init(menuPage);
 }
 
