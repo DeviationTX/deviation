@@ -18,18 +18,6 @@ struct LabelDesc labelDesc; // create a style-customizable font so that it can b
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 
-struct page {
-    void (*init)(int i);
-    void (*event)();
-    void (*exit)();
-    const char *pageName;
-};
-
-#define PAGEDEF(id, init, event, exit, menu, name) {init, event, exit, name},
-static const struct page pages[] = {
-#include "pagelist.h"
-};
-#undef PAGEDEF
 #include "../common/_pages.c"
 
 static u8 quick_page_enabled;
@@ -39,7 +27,6 @@ void PAGE_Init()
     cur_page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
-    ActionCB = NULL;
     // For Devo10, there is no need to register and then unregister buttons in almost every page
     // since all buttons are needed in all pages, so we just register them in this common page
     BUTTON_RegisterCallback(&button_action,
@@ -71,6 +58,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
+    ActionCB = _action_cb;
     pages[cur_page].init(menuPage);
 }
 
@@ -169,21 +157,10 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     }
     return 0;
 }
-const char *PAGE_GetName(int i)
-{
-    if(i == 0 || i == 1)
-        return _tr("None");
-    return _tr(pages[i].pageName);
-}
 
 int PAGE_GetStartPage()
 {
     return 1; // main menu shouldn't be put to quick page
-}
-
-int PAGE_GetNumPages()
-{
-    return sizeof(pages) / sizeof(struct page);
 }
 
 int PAGE_GetID()

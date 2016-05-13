@@ -23,8 +23,6 @@
 
 static struct stdtravel_obj * const gui = &gui_objs.u.stdtravel;
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
 static u16 current_selected = 0;
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
@@ -55,7 +53,6 @@ void PAGE_TravelAdjInit(int page)
     (void)page;
     //if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
     //    page = current_selected;
-    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
 
@@ -71,20 +68,6 @@ void PAGE_TravelAdjInit(int page)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 }
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 void PAGE_TravelAdjExit()
 {
     current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());

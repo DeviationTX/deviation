@@ -1283,6 +1283,7 @@ void clear_model(u8 full)
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
     }
+    Model.mixer_mode = MIXER_ADVANCED;
     Model.swashmix[0] = 60;
     Model.swashmix[1] = 60;
     Model.swashmix[2] = 60;

@@ -23,139 +23,52 @@ static const void *exit_data;
 static unsigned page_change_cb(u32 buttons, unsigned flags, void *data);
 void PAGE_Exit();
 
-struct page {
-    void (*init)(int i);
-    void (*event)();
-    void (*exit)();
-    const char *name;
-};
-
-
-#define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
-static const struct page pages[] = {
-#include "pagelist.h"
-};
-#undef PAGEDEF
-static u8 cur_section;
+static u8 quick_page_enabled = 1;
 #include "../common/_pages.c"
-
-struct page_group {
-    u8 group;
-    enum PageID id;
-};
-
-struct page_group groups[] = {
-    {0, PAGEID_MAIN},
-    {1, PAGEID_MIXER},
-    {1, PAGEID_MODEL},
-    {1, PAGEID_TIMER},
-    {1, PAGEID_TELEMCFG},
-    {1, PAGEID_TRIM},
-#if HAS_DATALOG
-    {1, PAGEID_DATALOG},
-#endif
-    {1, PAGEID_MAINCFG},
-    {2, PAGEID_TXCFG},
-    {2, PAGEID_TELEMMON},
-    {2, PAGEID_CHANMON},
-    {2, PAGEID_INPUTMON},
-    {2, PAGEID_BTNMON},
-#if HAS_SCANNER
-    {2, PAGEID_SCANNER},
-#endif
-    {2, PAGEID_RANGE},
-    {2, PAGEID_USB},
-#if DEBUG_WINDOW_SIZE
-    {2, PAGEID_DEBUGLOG},
-#endif
-#if HAS_STANDARD_GUI
-    {0x81, PAGEID_MODELMENU},
-#endif
-    {255, PAGEID_SPLASH},
-    {255, 0}
-};
 
 
 void PAGE_Init()
 {
-    cur_page = sizeof(pages) / sizeof(struct page) - 1;
-    cur_section = 0;
+    cur_page = 0;
     modal = 0;
     GUI_RemoveAllObjects();
     enter_cmd = NULL;
     exit_cmd = NULL;
     BUTTON_RegisterCallback(&button_action,
-        CHAN_ButtonMask(BUT_ENTER) | CHAN_ButtonMask(BUT_EXIT)
-        | CHAN_ButtonMask(BUT_RIGHT) | CHAN_ButtonMask(BUT_LEFT),
-        BUTTON_PRESS | BUTTON_LONGPRESS, page_change_cb, NULL);
-    PAGE_ChangeByID(PAGEID_SPLASH);
+          CHAN_ButtonMask(BUT_ENTER)
+          | CHAN_ButtonMask(BUT_EXIT)
+          | CHAN_ButtonMask(BUT_LEFT)
+          | CHAN_ButtonMask(BUT_RIGHT)
+          | CHAN_ButtonMask(BUT_UP)
+          | CHAN_ButtonMask(BUT_DOWN),
+          BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, page_change_cb, NULL);
+    PAGE_ChangeByID(PAGEID_SPLASH, 0);
     //PAGE_ChangeByID(PAGEID_MAIN);
 }
 
-void PAGE_SetSection(u8 section)
-{
-    u8 p;
-    u8 newpage = cur_page;
-
-    if (section == SECTION_MODEL && Model.mixer_mode == MIXER_STANDARD)
-        section = 0x80 | SECTION_MODEL;
-
-    for(p = 0; groups[p].group != 255; p++) {
-        if(groups[p].group == section) {
-            newpage = p;
-            break;
-        }
-    }
-    if (newpage != cur_page) {
-        cur_section = section;
-        PAGE_ChangeByID(groups[newpage].id);
-    }
-}
-
-void PAGE_Change(int dir)
+void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
-    if ((Model.mixer_mode == MIXER_STANDARD && (groups[cur_page].group & 0x7f) == 1) || (cur_page >= sizeof(groups) / sizeof(struct page_group) - 1) || groups[cur_page].group & 0x80) {
-        //Don't use left/right on model pages in standard mode
-        return;
-    }
-    u8 nextpage = 0;
-    while (groups[nextpage].id != cur_page)
-        nextpage += 1;
-    if(dir > 0) {
-        if (groups[nextpage+1].group == groups[cur_page].group) {
-            nextpage++;
-        } else {
-            while(nextpage && groups[nextpage-1].group == groups[cur_page].group)
-              nextpage--;
-        } 
-    } else if (dir < 0) {
-        if (nextpage && groups[nextpage-1].group == groups[cur_page].group) {
-            nextpage--;
-        } else {
-            while(groups[nextpage+1].group == groups[cur_page].group)
-                nextpage++;
-        }
-    }
-    if (cur_page == groups[nextpage].id)
-        return;
-    PAGE_ChangeByID(groups[nextpage].id);
-}
-
-void PAGE_ChangeByID(enum PageID id)
-{
-    if (cur_page != id && id < sizeof(pages) / sizeof(struct page)) {
-        PAGE_Exit();
-        cur_page = id;
-        PAGE_RemoveAllObjects();
-        pages[cur_page].init(0);
-    }
+    if (pages[cur_page].exit)
+        pages[cur_page].exit();
+    cur_page = id;
+    BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
+    if (pages[cur_page].init == PAGE_MainInit)
+        quick_page_enabled = 1;
+    else if (pages[cur_page].init == PAGE_MenuInit)
+        quick_page_enabled = 0;
+    PAGE_RemoveAllObjects();
+    ActionCB = _action_cb;
+    pages[cur_page].init(menuPage);
 }
 
 void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
+    (void)data;
+    PAGE_Pop();
+#if 0
     if((long)data == 0) {
         PAGE_SetSection(SECTION_MAIN);
     } else if ((long)data == 1) {
@@ -169,6 +82,7 @@ void changepage_cb(guiObject_t *obj, const void *data)
         else
             PAGE_Change(-1);
     }
+#endif
 }
 
 void PAGE_RemoveHeader()
@@ -177,25 +91,27 @@ void PAGE_RemoveHeader()
         GUI_RemoveObj((guiObject_t *)&gui->exitico);
     if(OBJ_IS_USED(&gui->title))
         GUI_RemoveObj((guiObject_t *)&gui->title);
-    if(OBJ_IS_USED(&gui->previco))
-        GUI_RemoveObj((guiObject_t *)&gui->previco);
-    if(OBJ_IS_USED(&gui->nextico))
-        GUI_RemoveObj((guiObject_t *)&gui->nextico);
+    //if(OBJ_IS_USED(&gui->previco))
+    //    GUI_RemoveObj((guiObject_t *)&gui->previco);
+    //if(OBJ_IS_USED(&gui->nextico))
+    //    GUI_RemoveObj((guiObject_t *)&gui->nextico);
 }
 
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
-    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_SetSelectable(obj, 0);
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
-    obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
-    GUI_SetSelectable(obj, 0);
-    obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
-    GUI_SetSelectable(obj, 0);
+    //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    //GUI_SetSelectable(obj, 0);
+    //obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    //GUI_SetSelectable(obj, 0);
     exit_cmd = changepage_cb;
     exit_data = NULL;
 }
+
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
 {
@@ -250,13 +166,13 @@ unsigned page_change_cb(u32 buttons, unsigned flags, void *data)
     }
     if(PAGE_QuickPage(buttons, flags, data))
         return 1;
-    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
-        PAGE_Change(1);
-        return 1;
-    } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
-        PAGE_Change(-1);
-        return 1;
-    }
+//    if(CHAN_ButtonIsPressed(buttons, BUT_RIGHT)) {
+//        PAGE_Change(1);
+//        return 1;
+//    } else if(CHAN_ButtonIsPressed(buttons, BUT_LEFT)) {
+//        PAGE_Change(-1);
+//        return 1;
+//    }
     return 0;
 }
 
@@ -284,26 +200,14 @@ guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj
     return GUI_CreateButton(&gui->nextico, x, y, BUTTON_48, okcancelstr_cb, 0x0000, CallBack, (void *)1);
 }
 
-const char *PAGE_GetName(int i)
-{
-    if(i == 0)
-        return _tr("None");
-    return _tr(pages[i].name);
-}
-
 int PAGE_GetStartPage()
 {
     return 0;
 }
 
-int PAGE_GetNumPages()
-{
-    return sizeof(pages) / sizeof(struct page);
-}
-
 int PAGE_GetID()
 {
-    return groups[cur_page].id;
+    return cur_page;
 }
 
 void PAGE_ChangeQuick(int dir)
@@ -319,15 +223,15 @@ void PAGE_ChangeQuick(int dir)
     while(1) {
        quick = (quick + increment) % 5;
        if (quick == 0
-           || (Model.pagecfg2.quickpage[quick-1] && PAGE_IsValid(Model.pagecfg2.quickpage[quick-1])))
+           || (Model.pagecfg2.quickpage[quick-1] && PAGE_IsValidQuickPage(Model.pagecfg2.quickpage[quick-1])))
        {
            break;
        }
     }
     if (quick == 0) {
-        PAGE_ChangeByID(PAGEID_MAIN);
+        PAGE_ChangeByID(PAGEID_MAIN, 0);
     } else {
-        PAGE_ChangeByID(Model.pagecfg2.quickpage[quick-1]);
+        PAGE_ChangeByID(Model.pagecfg2.quickpage[quick-1], 0);
     }
 }
 
@@ -336,8 +240,8 @@ int PAGE_QuickPage(u32 buttons, u8 flags, void *data)
     (void)data;
     (void)flags;
     //static s8 press = 0;
-    if(cur_section != 0)
-        return 0;
+    //if(cur_section != 0)
+    //    return 0;
 
 /*    if (press) {
         if (flags & BUTTON_RELEASE) {

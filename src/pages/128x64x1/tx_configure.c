@@ -38,7 +38,6 @@ static const int MIN_BATTERY_ALARM_STEP = 10;
 
 static struct tx_obj * const gui = &gui_objs.u.tx;
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data);
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data);
 static const char *_buzz_vol_cb(guiObject_t *obj, int dir, void *data);
@@ -187,7 +186,6 @@ void PAGE_TxConfigureInit(int page)
 {
     (void)page;
     cp->enable = CALIB_NONE;
-    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Configure"));
@@ -222,21 +220,6 @@ static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Off");
     else
         return _tr("On");
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
 
 void PAGE_TxConfigureExit()
