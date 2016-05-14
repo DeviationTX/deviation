@@ -56,7 +56,7 @@ void TGLICO_Select(guiObject_t *obj, const void *data);
 void PAGE_MixerInit(int page);
 void PAGE_MixerEvent();
 void PAGE_MixerExit();
-
+void PAGE_EditLimitsInit(int page);
 
 /* Trim */
 void PAGE_TrimInit(int page);

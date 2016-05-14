@@ -164,7 +164,6 @@ int PAGE_GetID()
 
 void PAGE_SaveMixerSetup(struct mixer_page * const mp)
 {
-    MIXER_SetLimit(mp->channel, &mp->limit);
     MIXER_SetTemplate(mp->channel, mp->cur_template);
     MIXER_SetMixers(mp->mixer, mp->num_mixers);
     MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini

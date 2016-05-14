@@ -20,7 +20,6 @@ struct curve_edit {
 
 struct mixer_page {
     struct buttonAction action;
-    u8 are_limits_changed;
     u8 top_channel;
     u8 max_scroll;
     guiObject_t *firstObj;
@@ -35,7 +34,7 @@ struct mixer_page {
     struct Mixer mixer[NUM_COMPLEX_MIXERS];
     struct Mixer *mixer_ptr[4];
     struct Mixer *cur_mixer;
-    struct Limit limit;
+    struct Limit *limit;
 /*
     guiObject_t *graphs[3];
     guiObject_t *bar;

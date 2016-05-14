@@ -36,7 +36,7 @@ static void show_page(int page)
         long ch = page  + i;
         if (ch >= Model.num_channels)
             break;
-        MIXER_GetLimit(ch, &mp->limit);
+        mp->limit = MIXER_GetLimit(ch);
         guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 10 + ((LCD_WIDTH - 320) / 2), row, 0, 16, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)ch);
         if (! mp->firstObj)
             mp->firstObj = obj;

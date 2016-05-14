@@ -393,6 +393,7 @@ struct advcurve_obj {
 };
 
 struct advlimit_obj {
+    guiButton_t revert;
     guiLabel_t title;
     guiLabel_t reverselbl;
     guiTextSelect_t reverse;

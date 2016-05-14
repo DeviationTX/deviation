@@ -16,7 +16,6 @@
 static struct advmixer_obj  * const gui  = &gui_objs.u.advmixer;
 static struct advmixcfg_obj * const guim = &gui_objs.u.advmixcfg;
 static struct mixer_page    * const mp   = &pagemem.u.mixer_page;
-static u8 show_chantest;
 static void templateselect_cb(guiObject_t *obj, const void *data);
 static void limitselect_cb(guiObject_t *obj, const void *data);
 static void virtname_cb(guiObject_t *obj, const void *data);
@@ -149,7 +148,6 @@ void PAGE_MixerInit(int page)
     PAGE_SetModal(0);
     memset(mp, 0, sizeof(*mp));
     mp->top_channel = page;
-    show_chantest = 0;
     _show_title(page);
     _show_page();
 }
@@ -183,7 +181,7 @@ void templateselect_cb(guiObject_t *obj, const void *data)
     PAGE_MixerExit();
     mp->cur_template = MIXER_GetTemplate(idx);
     PAGE_SetModal(1);
-    MIXER_GetLimit(idx, &mp->limit);
+    mp->limit = MIXER_GetLimit(idx);
     mp->channel = idx;
     mp->num_complex_mixers = 1;
     for(i = 0; i < sizeof(mp->mixer) / sizeof(struct Mixer); i++) {
@@ -214,10 +212,7 @@ void limitselect_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long ch = (long)data;
-    PAGE_MixerExit();
-    MIXER_GetLimit(ch, &mp->limit);
-    mp->channel = ch;
-    MIXPAGE_EditLimits();
+    PAGE_PushByID(PAGEID_EDITLIMIT, ch);
 }
 
 static int callback_result;
