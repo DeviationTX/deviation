@@ -18,30 +18,22 @@
 #include "config/tx.h"
 
 //Duplicated in channels.c
-//Duplicated in tx_buttons.c
-#define SWITCH_3x4_2x2  ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
-                       | (1 << INP_FMOD0) | (1 << INP_FMOD1))
-#define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_2x2  ((1 << INP_SWA2) \
-                   | (1 << INP_SWB2) \
-                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
-                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+#define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
+#define SWITCH_3x4  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
                    | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2))
+#define SWITCH_3x3  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2))
+#define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_3x1  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
+#define SWITCH_2x2  ((1 << INP_SWE0) | (1 << INP_SWE1) \
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_2x1  ((1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_NONE ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                   | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
 enum {
   SW_A0 = 23,
@@ -126,7 +118,7 @@ u32 ScanButtons()
             idx++;
         }
     }
-    if ((Transmitter.ignore_src != SWITCH_NONE) && (Transmitter.ignore_src != SWITCH_3x4_2x2)) {
+    if (((~Transmitter.ignore_src && SWITCH_NONE) != SWITCH_NONE) && ((~Transmitter.ignore_src && SWITCH_3x3) != SWITCH_3x3)) {
         //Write to C.6, read B
         if (result == 0) {
             gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
@@ -134,16 +126,16 @@ u32 ScanButtons()
             u32 port = gpio_port_read(GPIOB);
             gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
             gpio_set(GPIOC, GPIO6);
-            if (Transmitter.ignore_src == SWITCH_3x1) {
+            if ((~Transmitter.ignore_src && SWITCH_3x1) == SWITCH_3x1) {
                 global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
-            } else if (Transmitter.ignore_src == SWITCH_2x2) {
+            } else if ((~Transmitter.ignore_src && SWITCH_2x2) == SWITCH_2x2) {
                 global_extra_switches  = (port>>6)&0x05;
             } else {
                 global_extra_switches  = (~(port>>5))&0xf;
             }
         }
     }
-    if (!(result & 0xFFFF) && (Transmitter.ignore_src == SWITCH_3x4_2x2))
+    if (!(result & 0xFFFF) && ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3))
       global_extra_switches = result;
     return result & 0xFFFF;
 }
