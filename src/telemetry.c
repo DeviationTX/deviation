@@ -44,10 +44,13 @@ void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
     char format[] = "%0*d";
     format[2] = '1' + decimals;
+    if (value < 0) {
+        *str++ = '-';    // work-around tfp_format negative number bug
+        value = -value;
+    }
     sprintf(str, format, value);
 
     int i, len = strlen(str);
-    if (str[0] == '-') { str++; len--; }
     if (decimals && len <= 2 + decimals && value) {
         for (i = len; i > len - decimals; i--) {
             str[i] = str[i-1];
