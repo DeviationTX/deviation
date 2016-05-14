@@ -13,7 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
 const char * _dsm_jetcat_status(u8 idx)
 {
     const char * text[] = {
@@ -81,7 +81,7 @@ const char * _dsm_jetcat_offcond(u8 idx)
     else
         return "";
 }
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+#endif //HAS_EXTENDED_TELEMETRY
 
 s32 _dsm_value(struct Telemetry *t, int idx)
 {
@@ -97,7 +97,7 @@ s32 _dsm_value(struct Telemetry *t, int idx)
         case TELEM_DSM_GFORCE_YMAX:
         case TELEM_DSM_GFORCE_ZMAX:
         case TELEM_DSM_GFORCE_ZMIN:
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_RXPCAP_AMPS:
         case TELEM_DSM_FPCAP_AMPS:
         case TELEM_DSM_FPCAP_TEMP:
@@ -156,7 +156,7 @@ const char * _dsm_str_by_value(char *str, u8 telem, s32 value)
         case TELEM_DSM_GFORCE_YMAX:
         case TELEM_DSM_GFORCE_ZMAX:
         case TELEM_DSM_GFORCE_ZMIN:     _get_value_str(str, value, 2, 'g'); break;
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_PBOX_ALARMV1:
         case TELEM_DSM_PBOX_ALARMV2:
         case TELEM_DSM_PBOX_ALARMC1:
@@ -224,7 +224,7 @@ const char * _dsm_name(char *str, u8 telem)
         case TELEM_DSM_GFORCE_YMAX:     strcpy(str, "g max Y"); break;
         case TELEM_DSM_GFORCE_ZMAX:     strcpy(str, "g max Z"); break;
         case TELEM_DSM_GFORCE_ZMIN:     strcpy(str, "g min Z"); break;
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_PBOX_VOLT1:
         case TELEM_DSM_PBOX_VOLT2:      sprintf(str, "%s%s%d", _tr("Pb"), _tr("Volt"), telem - TELEM_DSM_PBOX_VOLT1 + 1); break;
         case TELEM_DSM_PBOX_CAPACITY1:
@@ -294,7 +294,7 @@ s32 _dsm_get_max_value(u8 telem)
         case TELEM_DSM_FLOG_VOLT2:      return 6000;
         case TELEM_DSM_FLOG_RPM1:       return 65000;
         case TELEM_DSM_AMPS1:
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_PBOX_CAPACITY1:
         case TELEM_DSM_PBOX_CAPACITY2:
         case TELEM_DSM_FPCAP_CAPACITY:
@@ -351,7 +351,7 @@ s32 _dsm_get_min_value(u8 telem)
         case TELEM_DSM_FLOG_TEMP1:      return -40;
         case TELEM_DSM_FLOG_RPM1:       return 200;
         case TELEM_DSM_AMPS1:           return -999;
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case TELEM_DSM_FPCAP_AMPS:
         case TELEM_DSM_RXPCAP_AMPS:     return -999;
         case TELEM_DSM_FPCAP_TEMP:      return -400;
