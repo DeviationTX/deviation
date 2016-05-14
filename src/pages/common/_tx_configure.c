@@ -301,7 +301,7 @@ static void press_cb(guiObject_t *obj, const void *data)
     cp->enable = (long)data;
 #if HAS_RTC
     if (cp->enable == SET_CLOCK) {
-        PAGE_PushByID(PAGEID_RTC);
+        PAGE_PushByID(PAGEID_RTC, 0);
         return;
     }
 #endif
