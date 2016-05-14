@@ -127,9 +127,11 @@ static void _show_page()
         GUI_CreateLabelBox(&gui1->modelbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Stick mode"));
         GUI_CreateTextSelect(&gui1->mode, col2, row, TEXTSELECT_96, NULL, modeselect_cb, NULL);
         row += space + (ADDSPACE-1) / 2;
-        if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
-        GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
-        GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+        if (HAS_TOUCH) {
+            if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
+            GUI_CreateLabelBox(&gui1->touchlbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Touch screen"));
+            GUI_CreateButton(&gui1->touchcalib, col2, row, BUTTON_WIDE, calibratestr_cb, 0x0000, press_cb, (void *)CALIB_TOUCH);
+        }
         row += space + ADDSPACE;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui1->sticklbl, col1, row+ADDROW, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Sticks"));
@@ -274,6 +276,7 @@ const char *coords_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+#if HAS_TOUCH
 void PAGE_TouchInit(int page)
 {
     (void)page;
@@ -342,4 +345,4 @@ void PAGE_TouchEvent(void)
         }
     }
 }
-
+#endif //HAS_TOUCH
