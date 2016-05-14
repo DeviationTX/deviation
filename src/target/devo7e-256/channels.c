@@ -20,45 +20,22 @@
 #include "../common/devo/devo.h"
 
 //Duplicated in tx_buttons.c
-/*
-#define IGNORE_MASK     ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
-#define SWITCH_3x4_2X2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
-                       | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
-                       | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                       | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                       | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                       | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_3x2      ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
-                       | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
-#define SWITCH_2x2      ((1 << INP_SWA0) | (1 << INP_SWA1) \
-                       | (1 << INP_SWB0) | (1 << INP_SWB1))
-#define SWITCH_3x1      ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
-#define SWITCH_NONE     ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
-                       | (1 << INP_FMOD0) | (1 << INP_FMOD1))
-*/
-#define SWITCH_3x4_2x2  ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
-                       | (1 << INP_FMOD0) | (1 << INP_FMOD1))
-#define SWITCH_3x2  ((1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_2x2  ((1 << INP_SWA2) \
-                   | (1 << INP_SWB2) \
-                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_3x1  ((1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
-                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
-                   | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_NONE ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+#define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
+#define SWITCH_3x4  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
                    | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
-                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
-                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2))
+#define SWITCH_3x3  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2))
+#define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
+#define SWITCH_3x1  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
+#define SWITCH_2x2  ((1 << INP_SWE0) | (1 << INP_SWE1) \
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
+#define SWITCH_2x1  ((1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                    | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
 //Duplicated in tx_buttons.c
 enum {
@@ -102,7 +79,7 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
     /* configure switches for digital I/O */
-    if (Transmitter.ignore_src != SWITCH_3x4_2x2) {
+    if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
       gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                      GPIO10 | GPIO11);
       gpio_set(GPIOC, GPIO10 | GPIO11);
@@ -112,7 +89,7 @@ void CHAN_Init()
 s32 CHAN_ReadRawInput(int channel)
 {
     s32 value = 0;
-    if (Transmitter.ignore_src != SWITCH_3x4_2x2) {
+    if ((~Transmitter.ignore_src & SWITCH_3x3) != SWITCH_3x3) {
       switch(channel) {
         case INP_HOLD0:    value = gpio_get(GPIOC, GPIO11); break;
         case INP_HOLD1:    value = ! gpio_get(GPIOC, GPIO11); break;
@@ -124,6 +101,10 @@ s32 CHAN_ReadRawInput(int channel)
         case INP_SWB0:     value = global_extra_switches   & 0x01;  break;
         case INP_SWB1:     value = !(global_extra_switches & 0x03); break;
         case INP_SWB2:     value = global_extra_switches   & 0x02;  break;
+        case INP_SWE0:     value = global_extra_switches   & 0x04;  break;
+        case INP_SWE1:     value = !(global_extra_switches & 0x0c); break;
+        case INP_SWF0:     value = global_extra_switches   & 0x01;  break;
+        case INP_SWF1:     value = !(global_extra_switches & 0x03); break;
       }
     } else {
       switch(channel) {
@@ -191,15 +172,22 @@ s32 CHAN_ReadInput(int channel)
 
 void CHAN_SetSwitchCfg(const char *str)
 {
-    if(strcmp(str, "3x4_2x2") == 0) {
-      Transmitter.ignore_src = SWITCH_3x4_2x2;
+    if(strcmp(str, "3x4") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_3x4;
+    } else if(strcmp(str, "3x3") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_3x3;
     } else if(strcmp(str, "3x2") == 0) {
-        Transmitter.ignore_src = SWITCH_3x2;
-    } else if(strcmp(str, "2x2") == 0) {
-        Transmitter.ignore_src = SWITCH_2x2;
+        Transmitter.ignore_src &= ~SWITCH_3x2;
     } else if(strcmp(str, "3x1") == 0) {
-        Transmitter.ignore_src = SWITCH_3x1;
+        Transmitter.ignore_src &= ~SWITCH_3x1;
+    } else if(strcmp(str, "2x2") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x2;
+    } else if(strcmp(str, "2x1") == 0) {
+        Transmitter.ignore_src &= ~SWITCH_2x1;
     } else {
-        Transmitter.ignore_src = SWITCH_NONE;
+        Transmitter.ignore_src = ~IGNORE_MASK & ~SWITCH_STOCK;
+    }
+    if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
+        Transmitter.ignore_src |= SWITCH_STOCK;
     }
 }
