@@ -100,8 +100,10 @@ void PAGE_RemoveHeader()
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
-    obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
-    GUI_SetSelectable(obj, 0);
+    if (HAS_TOUCH) {
+        obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+        GUI_SetSelectable(obj, 0);
+    }
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
     //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
@@ -115,11 +117,15 @@ void PAGE_ShowHeader(const char *title)
 
 void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
 {
+    guiObject_t *obj;
     enter_cmd = CallBack;
     enter_data = (void *)1;
     exit_cmd = CallBack;
     exit_data = (void *)0;
-    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
+    if (HAS_TOUCH) {
+        obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
+        GUI_SetSelectable(obj, 0);
+    }
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
 }

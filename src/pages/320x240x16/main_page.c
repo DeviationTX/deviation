@@ -61,7 +61,9 @@ void PAGE_MainInit(int page)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
-    GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+    if (HAS_TOUCH) {
+        GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+    }
     if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
         GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
 

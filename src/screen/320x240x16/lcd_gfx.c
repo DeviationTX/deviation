@@ -357,8 +357,11 @@ static int image_read_header(FILE *fh, u16 *w, u16 *h, u32 *black, u32 *white)
             ptr1++;
             u32 tmp_white = strtol(ptr1, &ptr2, 16);
             if (ptr2 != ptr1) {
-                *black = tmp_black;
-                *white = tmp_white;
+                unsigned r, g, b;
+                r = 0xff & (tmp_black >> 16); g =  0xff & (tmp_black >> 8); b =  0xff & (tmp_black >> 0);
+                *black = RGB888_to_RGB565(r, g, b);
+                r = 0xff & (tmp_white >> 16); g =  0xff & (tmp_white >> 8); b =  0xff & (tmp_white >> 0);
+                *white = RGB888_to_RGB565(r, g, b);
             }
         }
         if (fgets((char *)buf, sizeof(buf), fh) == NULL) {
@@ -441,7 +444,7 @@ void LCD_DrawWindowedImageFromFile(u16 x, u16 y, const char *file, s16 w, s16 h,
         }
         for (int j = 0; j < w; j++) {
             unsigned val = buf[(j + x_off) / 8] & (1 << (7 - ((j + x_off) % 8)));
-            LCD_DrawPixelXY(x+j, y+i, val ? white : black);
+            LCD_DrawPixelXY(x+j, y+i, val ? black : white);
         }
     }
     fclose(fh);
