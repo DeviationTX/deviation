@@ -259,11 +259,10 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 // pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
 // pkt 5 = RSSI
 // pkt 6 = number of stream bytes
-// pkt 7 = sequence number increments mod 7 with each packet containing stream data
+// pkt 7 = sequence number increments mod 8 with each packet containing stream data
 // pkt 8-17 = stream data
 // pkt 18-19 = crc
 
-    static u8 sequence;
 
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
@@ -279,20 +278,19 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #if HAS_EXTENDED_TELEMETRY
+    static u8 sequence;
 //printf("pkt[6]=0x%02x\n", pkt[6]);
     if (pkt[6]) {
 //printf("pkt[7]=0x%02x, sequence=0x%02x\n", pkt[7], sequence);
         if ((pkt[7] & 7) != sequence) {
             ts_state = TS_IDLE;
-            sequence = (pkt[7] + 1) % 7;    // should be able to recover in middle of sequence
+            sequence = (pkt[7] + 1) % 8;    // should be able to recover in middle of sequence
             return;
         }
-        sequence = (sequence + 1) % 7;
+        sequence = (sequence + 1) % 8;
             
         for(int i=8; i < 8+pkt[6]; i++)
             frsky_parse_telem_stream(pkt[i]);
-    } else {
-        sequence = 0;
     }
 
 #endif // HAS_EXTENDED_TELEMETRY
@@ -302,6 +300,7 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 #ifdef EMULATOR
 #include "frskyD8_telemetry_test._c"
 static const u8 *data = testdata;
+static u8 p[100];
 #endif
 static u16 frsky2way_cb()
 {
@@ -359,7 +358,10 @@ static u16 frsky2way_cb()
                 data = testdata;
                 len = *data++;
             }
-            frsky2way_parse_telem(data, len);
+            memcpy(p, data, len);
+            p[1] = fixed_id & 0xff;
+            p[2] = fixed_id >> 8;
+            frsky2way_parse_telem(p, len);
             data += len;
 #endif //EMULATOR
 
