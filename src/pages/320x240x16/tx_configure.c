@@ -35,9 +35,6 @@ static const int MIN_BATTERY_ALARM_STEP  = 50;
 u8 page_num;
 guiObject_t *firstObj;
 
-static void calibrate_touch(void);
-static void init_touch_calib();
-
 
 void PAGE_ChangeByName(const char *pageName, u8 menuPage)
 {   // dummy method for devo8, only used in devo10
@@ -275,10 +272,9 @@ const char *coords_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static void init_touch_calib()
+void PAGE_TouchInit(int page)
 {
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
+    (void)page;
     //PAGE_ShowHeader_ExitOnly("Touch Calibrate", okcancel_cb); //Can't do this while calibrating
     GUI_CreateLabel(&guic->title, 40, 10, NULL, TITLE_FONT, _tr("Touch Calibrate"));
     GUI_CreateLabelBox(&guic->msg, XCOORD - 5, YCOORD + 32 - 5, 11, 11, &SMALLBOX_FONT, NULL, NULL, "");
@@ -288,14 +284,7 @@ static void init_touch_calib()
     cp->state = 0;
 }
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_TxConfigureInit(0);
-}
-
-static void calibrate_touch(void)
+void PAGE_TouchEvent(void)
 {
     if (cp->state == 0 || cp->state == 3) {
         if (GUI_ObjectNeedsRedraw((guiObject_t *)&guic->msg))
@@ -333,8 +322,7 @@ static void calibrate_touch(void)
             printf("Debug: scale(%d, %d) offset(%d, %d)\n", (int)xscale, (int)yscale, (int)xoff, (int)yoff);
             SPITouch_Calibrate(xscale, yscale, xoff, yoff);
             PAGE_RemoveAllObjects();
-            PAGE_SetModal(1);
-            PAGE_ShowHeader_ExitOnly(_tr("Touch Test"), okcancel_cb);
+            PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_TOUCH)));
             GUI_CreateLabelBox(&guic->msg, (LCD_WIDTH - 150) / 2, (LCD_HEIGHT - 25) / 2, 150, 25, &SMALLBOX_FONT, coords_cb, NULL, NULL);
             memset(&cp->coords, 0, sizeof(cp->coords));
             cp->state = 6;

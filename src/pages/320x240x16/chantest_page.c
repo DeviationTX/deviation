@@ -129,19 +129,6 @@ void PAGE_ButtontestInit(int page)
     show_button_page();
 }
 
-void PAGE_ChantestModal(void(*return_page)(int page), int page)
-{
-    PAGE_SetModal(1);
-    cp->return_page = return_page;
-    cp->return_val = page;
-    cp->type = MONITOR_MIXEROUTPUT;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
-
-    _show_bar_page(0);
-}
-
 static void show_button_page()
 {
     // show elements where they are located on the real tx

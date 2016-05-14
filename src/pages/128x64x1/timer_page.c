@@ -85,7 +85,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->name, LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->type, TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_timertype_cb, (void *)(long)absrow);
 
     //Row 2
     y += space;

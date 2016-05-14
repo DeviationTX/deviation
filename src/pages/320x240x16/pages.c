@@ -113,17 +113,6 @@ void PAGE_ShowHeader(const char *title)
 }
 
 
-void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
-{
-    enter_cmd = CallBack;
-    enter_data = (void *)1;
-    exit_cmd = CallBack;
-    exit_data = (void *)0;
-    GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-    if(title)
-        GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
-}
-
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
 {
     if(OBJ_IS_USED(&gui->title))

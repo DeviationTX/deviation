@@ -50,4 +50,7 @@ void PAGE_MenuExit();
 void PAGE_TxMenuInit(int page);
 void PAGE_ModelMenuInit(int page);
 
+//Touch
+void PAGE_TouchInit(int page);
+void PAGE_TouchEvent();
 #endif

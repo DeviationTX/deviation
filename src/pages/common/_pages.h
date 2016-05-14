@@ -36,7 +36,6 @@ extern struct pagemem pagemem;
 
 void PAGE_RemoveHeader();
 void PAGE_ShowHeader(const char *title);
-void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data);
 
 u8 PAGE_SetModal(u8 _modal);
@@ -150,7 +149,7 @@ void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
-void PAGE_PushByID(enum PageID id);
+void PAGE_PushByID(enum PageID id, int page);
 void PAGE_Pop();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);

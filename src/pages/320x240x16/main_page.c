@@ -115,9 +115,9 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if(press_type == -1) {
         if ((long)data == 0) {
-            PAGE_PushByID(PAGEID_MENU);
+            PAGE_PushByID(PAGEID_MENU, 0);
         } else if ((long)data == 1) {
-            PAGE_PushByID(PAGEID_MODEL);
+            PAGE_PushByID(PAGEID_MODEL, 0);
         } else {
             PAGE_SetModal(1);
             PAGE_MainExit();
@@ -151,8 +151,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
     } else if (idx - NUM_RTC - NUM_TIMERS<= NUM_TELEM) {
         if(press_type == -1) {
             pagemem.modal_page = 2;
-            PAGE_MainExit();
-            PAGE_TelemtestModal(PAGE_MainInit, 0);
+            PAGE_PushByID(PAGEID_TELEMMON, 0);
         }
     }
 }
@@ -162,7 +161,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     if(! GUI_GetSelected()) {
         if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             //see pagelist.h for mapping of 'page' to menu_id 
-            PAGE_PushByID(PAGEID_MENU);
+            PAGE_PushByID(PAGEID_MENU, 0);
         } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             mp->ignore_release = 1;
             for (u8 timer=0; timer<NUM_TIMERS; timer++) {

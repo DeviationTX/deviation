@@ -85,12 +85,6 @@ void PAGE_ShowHeaderWithHeight(const char *title, u8 font, u8 width, u8 height)
     GUI_CreateLabelBox(&headerLabel, 0, 0, width, height, &labelDesc, NULL, NULL, title);
 }
 
-void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
-{
-    (void)title;
-    (void)CallBack;
-}
-
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
 {
     (void)label_cb;

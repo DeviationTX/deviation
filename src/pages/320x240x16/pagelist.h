@@ -18,11 +18,13 @@
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
 PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           _tr_noop("Main menu"))
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
-PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,               0,           _tr_noop("Set permanent timer"))
+PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  PAGE_SetTimerExit,  0,           _tr_noop("Set permanent timer"))
 #if HAS_RTC
 PAGEDEF(PAGEID_RTC,      PAGE_RTCInit,         PAGE_RTCEvent,         NULL,               0,           _tr_noop("Real Time Clock"))
 #endif
-
+#if HAS_TOUCH
+PAGEDEF(PAGEID_TOUCH,    PAGE_TouchInit,       PAGE_TouchEvent,       NULL,               0,           _tr_noop("Touch Test"))
+#endif
 //Main menu
 //---------
 PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Model menu"))

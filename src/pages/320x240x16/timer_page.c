@@ -94,7 +94,7 @@ static void _draw_body() {
         else
             GUI_CreateLabelBox(&gui->timer[i], COL1, row, COL2-COL1, 18, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)i);
 
-        GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, toggle_timertype_cb, set_timertype_cb, (void *)(long)i);
+        GUI_CreateTextSelect(&gui->type[i], COL2, row, TEXTSELECT_96, NULL, set_timertype_cb, (void *)(long)i);
         //Row 2
         row+=20;
 #if 0 //HAS_RTC
@@ -163,8 +163,7 @@ void reset_timerperm_cb(guiObject_t *obj, const void *data)
 {
     long index = (long)data & 0xff;
     if (index & 0x80) {   // set
-        PAGE_RemoveAllObjects();
-        PAGE_SetTimerInit(index & 0x7f);
+        PAGE_PushByID(PAGEID_SETTIMER, index & 0x7f);
     } else  {  // reset
         PAGE_ShowResetPermTimerDialog(obj,(void *)(index & 0x7f));
     }

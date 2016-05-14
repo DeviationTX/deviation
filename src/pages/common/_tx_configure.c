@@ -307,7 +307,7 @@ static void press_cb(guiObject_t *obj, const void *data)
 #endif
 #if HAS_TOUCH
     if (cp->enable == CALIB_TOUCH)
-        init_touch_calib();
+        PAGE_PushByID(PAGEID_TOUCH, 0);
     else if (cp->enable == CALIB_STICK)
 #endif
         calibrate_state = CALI_CENTER; // bug fix: must reset state before calibrating
@@ -354,11 +354,6 @@ static const char *units_cb(guiObject_t *obj, int dir, void *data)
 void PAGE_TxConfigureEvent()
 {
     switch(cp->enable) {
-#if HAS_TOUCH
-    case CALIB_TOUCH:
-        calibrate_touch();
-        break;
-#endif
     case CALIB_STICK:
         calibrate_sticks();
         break;

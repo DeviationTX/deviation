@@ -144,11 +144,11 @@ int PAGE_GetNumPages()
     return sizeof(pages) / sizeof(struct page);
 }
 
-void PAGE_PushByID(enum PageID id)
+void PAGE_PushByID(enum PageID id, int page)
 {
     page_stack++;
     *page_stack = id;
-    PAGE_ChangeByID(id, 0);
+    PAGE_ChangeByID(id, page);
 }
 void PAGE_Pop()
 {

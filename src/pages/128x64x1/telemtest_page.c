@@ -330,7 +330,6 @@ void PAGE_ShowTelemetryAlarm()
 
 void PAGE_TelemtestInit(int page)
 {
-    (void)okcancel_cb;
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);

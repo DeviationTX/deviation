@@ -35,7 +35,7 @@ static void menu_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     long i = (long)data;
-    PAGE_PushByID(i);
+    PAGE_PushByID(i, 0);
 }
 static int row_cb(int absrow, int relrow, int y, void *data)
 {

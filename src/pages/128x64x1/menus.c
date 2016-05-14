@@ -36,7 +36,7 @@ static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if (press_type == -1) {
         long i = (long)data;
-        PAGE_PushByID(i);
+        PAGE_PushByID(i, 0);
     }
 }
 
