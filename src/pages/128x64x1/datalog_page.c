@@ -28,7 +28,6 @@ enum {
     DL_SELECT,
     DL_SOURCE,
 };
-static u16 current_selected = 0;
 
 static void checkbut_press_cb(struct guiObject *obj, const void *data)
 {

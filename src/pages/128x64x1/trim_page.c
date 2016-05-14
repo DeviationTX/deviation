@@ -48,7 +48,6 @@ static struct trim_obj  * const gui  = &gui_objs.u.trim;
 static struct trim2_obj * const guit = &gui_objs.u.trim2;
 
 static unsigned _sub_action_cb(u32 button, unsigned flags, void *data);
-static u16 current_selected = 0;
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {

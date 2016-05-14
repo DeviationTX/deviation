@@ -26,7 +26,6 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-//static u16 current_selected = 0;
 guiObject_t *scroll_bar;
 static const int RIGHT_VIEW_HEIGHT = 60;
 static const int RIGHT_VIEW_ID  = 1;
@@ -82,7 +81,6 @@ void PAGE_DrExpInit(int page)
         60, ITEM_HEIGHT, &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_SPACE, 76, LCD_HEIGHT - ITEM_SPACE,
                      2 *ITEM_SPACE, count, row_cb, getobj_cb, NULL, NULL);
-    //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
 
     u16 ymax = CHAN_MAX_VALUE/100 * MAX_SCALAR;
     s16 ymin = -ymax;

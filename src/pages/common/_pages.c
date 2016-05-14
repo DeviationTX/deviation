@@ -19,6 +19,9 @@ static unsigned (*ActionCB)(u32 button, unsigned flags, void *data);
 static u8 _page_stack[5];
 static u8 *page_stack = _page_stack;
 
+static u16 *current_selected;
+static guiScrollable_t *page_scrollable;
+
 void PAGE_ChangeQuick(int dir);
 
 struct pagemem pagemem;
@@ -160,4 +163,10 @@ void PAGE_Pop()
         page_stack = _page_stack;
         PAGE_ChangeByID(PAGEID_MAIN, 0);
     }
+}
+
+void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected)
+{
+    page_scrollable = scroll;
+    current_selected = selected;
 }

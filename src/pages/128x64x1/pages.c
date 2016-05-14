@@ -180,8 +180,3 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     BUTTON_InterruptLongPress();
 }
 
-void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected)
-{
-    page_scrollable = scroll;
-    current_selected = selected;
-}

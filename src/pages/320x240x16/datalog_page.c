@@ -173,5 +173,6 @@ void PAGE_DatalogInit(int page)
     GUI_CreateScrollable(&gui->scrollable,
          SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
     next_update = CLOCK_getms() / 1000 + 5;
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 #endif //HAS_DATALOG

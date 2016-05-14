@@ -31,6 +31,7 @@ void PAGE_Init()
 {
     cur_page = 0;
     modal = 0;
+    page_scrollable = NULL;
     GUI_RemoveAllObjects();
     enter_cmd = NULL;
     exit_cmd = NULL;
@@ -50,6 +51,10 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
+    if (page_scrollable) {
+        *current_selected = GUI_ScrollableGetObjRowOffset(page_scrollable, GUI_GetSelected());
+        page_scrollable = NULL;
+    }
     if (pages[cur_page].exit)
         pages[cur_page].exit();
     cur_page = id;
@@ -61,6 +66,9 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     PAGE_RemoveAllObjects();
     ActionCB = _action_cb;
     pages[cur_page].init(menuPage);
+    if (page_scrollable) {
+        GUI_SetSelected(GUI_ShowScrollableRowOffset(page_scrollable, *current_selected));
+    }
 }
 
 void changepage_cb(guiObject_t *obj, const void *data)

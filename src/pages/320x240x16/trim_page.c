@@ -72,6 +72,8 @@ static void _show_page()
     GUI_CreateScrollable(&gui->scrollable,
          PCOL1, PROW2,  LCD_WIDTH - 2 * PCOL1, NUM_TRIM_ROWS * 24 - 8,
          24, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
+
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static void _edit_cb(guiObject_t *obj, const void *data)

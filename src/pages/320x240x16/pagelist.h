@@ -16,7 +16,7 @@
 //---------------------------------------------------
 
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
-PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           _tr_noop("Main menu"))
+PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,               0,           _tr_noop("Main menu"))
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
 PAGEDEF(PAGEID_EDITLIMIT,PAGE_EditLimitsInit,  NULL,                  NULL,               0,           "")
 #if HAS_PERMANENT_TIMER
@@ -30,8 +30,8 @@ PAGEDEF(PAGEID_TOUCH,    PAGE_TouchInit,       PAGE_TouchEvent,       NULL,     
 #endif
 //Main menu
 //---------
-PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Model menu"))
-PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Transmitter menu"))
+PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  NULL,               MAIN_MENU,   _tr_noop("Model menu"))
+PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  NULL,               MAIN_MENU,   _tr_noop("Transmitter menu"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,       MAIN_MENU,   _tr_noop("USB"))
 #if DEBUG_WINDOW_SIZE
 PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,               MAIN_MENU,   _tr_noop("Debuglog"))
