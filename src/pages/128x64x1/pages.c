@@ -51,10 +51,8 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (page_scrollable) {
-        *current_selected = GUI_ScrollableGetObjRowOffset(page_scrollable, GUI_GetSelected());
-        page_scrollable = NULL;
-    }
+    PAGE_SaveCurrentPos();
+    page_scrollable = NULL;
     if (pages[cur_page].exit) {
         pages[cur_page].exit();
     }

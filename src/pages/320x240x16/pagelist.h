@@ -17,8 +17,6 @@
 
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
 PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,               0,           _tr_noop("Main menu"))
-PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
-PAGEDEF(PAGEID_EDITLIMIT,PAGE_EditLimitsInit,  NULL,                  NULL,               0,           "")
 #if HAS_PERMANENT_TIMER
 PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  PAGE_SetTimerExit,  0,           _tr_noop("Set permanent timer"))
 #endif
@@ -40,7 +38,7 @@ PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,     
 //Model menu
 //----------
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       NULL,               MODEL_MENU,  _tr_noop("Model setup"))
-PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       NULL,               ADVGUI_MENU, _tr_noop("Mixer"))
+PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       NULL,                  NULL,               ADVGUI_MENU, _tr_noop("Mixer"))
 #if HAS_STANDARD_GUI
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,               STDGUI_MENU, _tr_noop("Reverse"))
 PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_DrExpCurvesEvent, NULL,               STDGUI_MENU, _tr_noop("D/R & Exp"))
@@ -73,5 +71,12 @@ PAGEDEF(PAGEID_BTNMON,   PAGE_ButtontestInit,  PAGE_ChantestEvent,    PAGE_Chant
 #if HAS_SCANNER
 PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_ScannerExit,   TX_MENU,     _tr_noop("Scanner"))
 #endif
-/* Simple */
+
+//These pages should not be lisetd for quickpages
+PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
+PAGEDEF(PAGEID_EDITLIMIT, PAGE_EditLimitsInit, NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_MIXREORDER, PAGE_MixReorderInit, NULL,                 NULL,               0,           "")
+PAGEDEF(PAGEID_MIXTEMPL, PAGE_MixTemplateInit, PAGE_MixTemplateEvent, NULL,               0,           "")
+PAGEDEF(PAGEID_EDITCURVE, PAGE_EditCurvesInit, NULL,                  NULL,               0,           "")
+
 #endif /* PAGEDEF */

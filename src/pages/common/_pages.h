@@ -45,6 +45,7 @@ guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t 
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 void PAGE_SetActionCB(unsigned (*callback)(u32 button, unsigned flags, void *data));
 void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected);
+void PAGE_SaveCurrentPos();
 
 /* Main */
 void PAGE_MainInit(int page);
@@ -55,9 +56,12 @@ void TGLICO_Select(guiObject_t *obj, const void *data);
 
 /* Mixer */
 void PAGE_MixerInit(int page);
-void PAGE_MixerEvent();
 void PAGE_MixerExit();
 void PAGE_EditLimitsInit(int page);
+void PAGE_MixReorderInit(int page);
+void PAGE_MixTemplateInit(int page);
+void PAGE_MixTemplateEvent();
+void PAGE_EditCurvesInit(int page);
 
 /* Trim */
 void PAGE_TrimInit(int page);

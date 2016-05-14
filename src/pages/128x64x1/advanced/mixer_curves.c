@@ -43,15 +43,13 @@ enum {
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 
-void MIXPAGE_EditCurves(struct Curve *curve, void *data)
+void PAGE_EditCurvesInit(int page)
 {
+    (void)page;
+    struct Curve *curve = edit->curveptr;
     u8 type = CURVE_TYPE(curve);
-    if (type < CURVE_FIXED)
-        return;
     GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
-    PAGE_RemoveAllObjects();
-    edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
     edit->reverse = MIXER_SRC_IS_INV(pagemem.u.mixer_page.cur_mixer->src);
     if ((type == CURVE_EXPO || type == CURVE_DEADBAND)
@@ -60,7 +58,6 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         edit->pointnum = -1;
     }
     edit->curve = *curve;
-    edit->curveptr = curve;
 
     labelDesc.style = LABEL_CENTER;
     GUI_CreateTextSelectPlate(&gui->name, NAME_X, 0, NAME_W, HEADER_HEIGHT, &labelDesc, NULL, set_curvename_cb, NULL);
@@ -106,8 +103,7 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_RemoveAllObjects();
-            edit->parent();
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER) && (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting
             if (edit->pointnum < 0)

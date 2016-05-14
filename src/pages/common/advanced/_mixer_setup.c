@@ -57,6 +57,24 @@ enum {
     COMPLEX_LAST,
 };
 
+void PAGE_MixTemplateInit(int page)
+{
+    (void)page;
+    MIXPAGE_ChangeTemplate(1);
+}
+
+void PAGE_MixTemplateEvent()
+{
+    if (mp->cur_template == MIXERTEMPLATE_SIMPLE
+        || mp->cur_template == MIXERTEMPLATE_EXPO_DR
+        || mp->cur_template == MIXERTEMPLATE_COMPLEX)
+    {
+        if(MIXER_GetCachedInputs(mp->raw, CHAN_MAX_VALUE / 100)) { // +/-1%
+            MIXPAGE_RedrawGraphs();
+        }
+    }
+}
+
 void MIXPAGE_ChangeTemplate(int show_header)
 {
     if (mp->cur_template != MIXERTEMPLATE_COMPLEX
@@ -487,12 +505,6 @@ void sourceselect_cb(guiObject_t *obj, void *data)
     }
 }
 
-void graph_cb()
-{
-    mp->edit.parent = NULL;
-    MIXPAGE_ChangeTemplate(1);
-}
-
 void curveselect_cb(guiObject_t *obj, void *data)
 {
     (void)obj;
@@ -503,7 +515,8 @@ void curveselect_cb(guiObject_t *obj, void *data)
     int idx = (mix == &mp->mixer[1]) ? 1 : (mix == &mp->mixer[2]) ? 2 : 0;
     if (CURVE_TYPE(&mix->curve) > CURVE_FIXED
         && (mp->cur_template != MIXERTEMPLATE_EXPO_DR || mix == 0 || ! (mp->link_curves & idx))) {
-        MIXPAGE_EditCurves(&mix->curve, graph_cb);
+        mp->edit.curveptr = &mix->curve;
+        PAGE_PushByID(PAGEID_EDITCURVE, 0);
     }
 }
 
@@ -562,8 +575,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         MIXER_SetTemplate(mp->channel, mp->cur_template);
         MIXER_SetMixers(mp->mixer, mp->num_mixers);
     }
-    PAGE_RemoveAllObjects();
-    PAGE_MixerInit(mp->top_channel);
+    PAGE_Pop();
 }
 
 static u8 touch_cb(s16 x, s16 y, void *data)

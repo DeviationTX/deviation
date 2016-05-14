@@ -16,8 +16,6 @@
 //---------------------------------------------------
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
 PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,               0,           _tr_noop("Main menu"))
-PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
-PAGEDEF(PAGEID_EDITLIMIT,PAGE_EditLimitsInit,  NULL,                  NULL,               0,           "")
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
 PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,               0,           _tr_noop("Set permanent timer"))
@@ -39,7 +37,7 @@ PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,     
 //Model menu
 //----------
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       NULL,               MODEL_MENU,  _tr_noop("Model setup"))
-PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       NULL,               ADVGUI_MENU, _tr_noop("Mixer"))
+PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       NULL,                  NULL,               ADVGUI_MENU, _tr_noop("Mixer"))
 #if HAS_STANDARD_GUI
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,               STDGUI_MENU, _tr_noop("Reverse"))
 PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_DrExpCurvesEvent, NULL,               STDGUI_MENU, _tr_noop("D/R & Exp"))
@@ -72,6 +70,13 @@ PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,     
 #endif
 PAGEDEF(PAGEID_RANGE,    PAGE_RangeInit,       NULL,	              PAGE_RangeExit,      TX_MENU,    _tr_noop("Range Test"))
 //-------------------
+
+//These pages should not be lisetd for quickpages
+PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
+PAGEDEF(PAGEID_EDITLIMIT,PAGE_EditLimitsInit,  NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_MIXREORDER, PAGE_MixReorderInit, NULL,                 NULL,               0,           "")
+PAGEDEF(PAGEID_MIXTEMPL, PAGE_MixTemplateInit, PAGE_MixTemplateEvent, NULL,               0,           "")
+PAGEDEF(PAGEID_EDITCURVE, PAGE_EditCurvesInit, NULL,                  NULL,               0,           "")
 #undef MAIN_MENU
 #undef MODEL_MENU
 #undef STDGUI_MENU

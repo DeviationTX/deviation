@@ -16,7 +16,8 @@
 static buttonAction_t button_action;
 static unsigned (*ActionCB)(u32 button, unsigned flags, void *data);
 
-static u8 _page_stack[5];
+#define MAX_PAGE_STACK 6
+static u8 _page_stack[MAX_PAGE_STACK];
 static u8 *page_stack = _page_stack;
 
 static u16 *current_selected;
@@ -149,6 +150,10 @@ int PAGE_GetNumPages()
 
 void PAGE_PushByID(enum PageID id, int page)
 {
+    if (page_stack - _page_stack >= MAX_PAGE_STACK-1) {
+        printf("ERROR: Page stack limit(%d) exceeded\n", MAX_PAGE_STACK);
+        return;
+    }
     page_stack++;
     *page_stack = id;
     PAGE_ChangeByID(id, page);
@@ -169,4 +174,11 @@ void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected)
 {
     page_scrollable = scroll;
     current_selected = selected;
+}
+
+void PAGE_SaveCurrentPos()
+{
+    if (page_scrollable) {
+        *current_selected = GUI_ScrollableGetObjRowOffset(page_scrollable, GUI_GetSelected());
+    }
 }

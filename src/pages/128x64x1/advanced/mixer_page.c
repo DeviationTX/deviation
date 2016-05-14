@@ -29,25 +29,19 @@ enum {
 };
 #endif //OVERRIDE_PLACEMENT
 
-static u16 current_selected = 0;
 #include "../../common/advanced/_mixer_page.c"
-
-static u8 top_channel = 0;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 static int row_cb(int absrow, int relrow, int y, void *data);
 static guiObject_t *getobj_cb(int relrow, int col, void *data);
 
-static void _show_title(int page)
+static void _show_title()
 {
-    (void)page;
     PAGE_SetActionCB(action_cb);
-    mp->top_channel = top_channel;
 }
 
 static void _show_page()
 {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Mixer    Reorder:Hold R+"));
     memset(gui, 0, sizeof(*gui));
     
@@ -65,7 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     struct Mixer *mix = MIXER_GetAllMixers();
 
     int selectable = 2;
-    int channel = mp->top_channel + absrow;
+    int channel = absrow;
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
@@ -104,6 +98,7 @@ static guiObject_t *getobj_cb(int relrow, int col, void *data)
         return (guiObject_t *)&gui->limit[relrow];
     return (guiObject_t *)&gui->tmpl[relrow];
 }
+
 
 unsigned action_cb(u32 button, unsigned flags, void *data)
 {
