@@ -121,7 +121,7 @@ static void show_page()
 void PAGE_ShowTelemetryAlarm()
 {
     if (PAGE_GetID() != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON);
+        PAGE_ChangeByID(PAGEID_TELEMMON, 0);
 }
 
 void PAGE_TelemtestInit(int page)
@@ -136,21 +136,6 @@ void PAGE_TelemtestInit(int page)
     show_page();
 }
 
-void PAGE_TelemtestModal(void(*return_page)(int page), int page)
-{
-    PAGE_SetModal(1);
-    tp->return_page = return_page;
-    tp->return_val = page;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
-    if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tempstring);
-        return;
-    }
-
-    show_page();
-}
 void PAGE_TelemtestEvent() {
     static u32 count;
     int flicker = ((++count & 3) == 0);

@@ -97,6 +97,13 @@ struct mainpage_obj {
     guiImage_t pwr;
 };
 
+struct menu_obj {
+    guiLabel_t idx[ENTRIES_PER_PAGE];
+    //guiLabel_t name[ENTRIES_PER_PAGE];
+    guiButton_t name[ENTRIES_PER_PAGE];
+    guiScrollable_t scrollable;
+};
+
 #define DATALOG_NUM_SCROLLABLE (LCD_HEIGHT == 240 ? 7 : 8)
 struct datalog_obj {
     guiLabel_t enlbl;
@@ -386,6 +393,7 @@ struct advcurve_obj {
 };
 
 struct advlimit_obj {
+    guiButton_t revert;
     guiLabel_t title;
     guiLabel_t reverselbl;
     guiTextSelect_t reverse;
@@ -420,8 +428,8 @@ struct advmixer_obj {
     guiLabel_t src[ENTRIES_PER_PAGE];
     guiLabel_t sw1[ENTRIES_PER_PAGE];
     guiLabel_t sw2[ENTRIES_PER_PAGE];
-    guiScrollbar_t scroll;
     guiKeyboard_t keyboard;
+    guiScrollable_t scrollable;
 };
 
 struct advmixcfg_obj {
@@ -575,6 +583,7 @@ struct gui_objs {
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
         struct mainpage_obj mainpage;
+        struct menu_obj menu;
         struct datalog_obj  datalog;
         struct modelcfg_obj modelcfg;
         struct modelload_obj modelload;

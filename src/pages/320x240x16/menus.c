@@ -14,7 +14,6 @@
  */
 
 
-#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -27,23 +26,20 @@ enum {
     LABEL_X           = 17,
     LABEL_WIDTH       = 0,
 };
-#endif //OVERRIDE_PLACEMENT
-
+#define HEADER_HEIGHT 36
+#define LINE_SPACE    30
+#define LINE_HEIGHT   20
 #include "../common/_menus.c"
 
-static void menu_press_cb(guiObject_t *obj, s8 press_type, const void *data)
+static void menu_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
-    if (press_type == -1) {
-        long i = (long)data;
-        PAGE_PushByID(i, 0);
-    }
+    long i = (long)data;
+    PAGE_PushByID(i, 0);
 }
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
-    labelDesc.style = LABEL_LEFT;
     int idx = 0;
     unsigned i = 0;
     while(1) {
@@ -53,8 +49,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         if (idx == absrow) {
             GUI_CreateLabelBox(&gui->idx[relrow], LABELNUM_X, y,
                 LABELNUM_WIDTH, LINE_HEIGHT,  &DEFAULT_FONT, idx_string_cb, NULL, (void *)(absrow+ 1L));
-            GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
-                LABEL_WIDTH, LINE_HEIGHT, &labelDesc, menu_name_cb, menu_press_cb, (const void *)(long)i);
+            GUI_CreateButton(&gui->name[relrow], LABEL_X, y, BUTTON_96, menu_name_cb, 0x0000, menu_press_cb, (const void *)(long)i);
+            //GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y,
+            //    LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, menu_name_cb, menu_press_cb, (const void *)(long)i);
             break;
         }
         idx++;

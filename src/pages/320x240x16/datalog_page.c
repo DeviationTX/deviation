@@ -147,12 +147,7 @@ void PAGE_DatalogInit(int page)
     (void)page;
     int row = 40;
     const int ROW_HEIGHT = 20;
-#if HAS_STANDARD_GUI
-    if (Model.mixer_mode == MIXER_STANDARD)
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_DATALOG), MODELMENU_Show);
-    else
-#endif
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_DATALOG));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_DATALOG));
 
     //Col1
     GUI_CreateLabelBox(&gui->enlbl, SCROLLABLE_X, row, 80, 18, &DEFAULT_FONT, NULL, NULL, _tr("Enable"));
@@ -178,5 +173,6 @@ void PAGE_DatalogInit(int page)
     GUI_CreateScrollable(&gui->scrollable,
          SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
     next_update = CLOCK_getms() / 1000 + 5;
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 #endif //HAS_DATALOG

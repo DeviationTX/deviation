@@ -232,7 +232,7 @@ void show_config()
 #endif
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
@@ -240,7 +240,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
 #if HAS_LAYOUT_EDITOR
         else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_MainLayoutExit();

@@ -83,9 +83,9 @@ static void _show_simple()
         GUI_SetHidden(mp->trimObj, 1);
 
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min"));
-    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.min);
+    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->tmplimit.min);
     GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max"));
-    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.max);
+    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->tmplimit.max);
     */
 }
 
@@ -193,9 +193,9 @@ static void _show_complex(int page_change)
         GUI_SetHidden((guiObject_t *)&gui3->trim, 1);
     /*
     GUI_CreateLabel(COL1_TEXT, 216, NULL, DEFAULT_FONT, _tr("Min"));
-    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.min);
+    GUI_CreateTextSelect(COL1_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->tmplimit.min);
     GUI_CreateLabel(COL2_TEXT, 216, NULL, DEFAULT_FONT, _tr("Max"));
-    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->limit.max);
+    GUI_CreateTextSelect(COL2_VALUE, 216, TEXTSELECT_96, NULL, set_number100_cb, &mp->tmplimit.max);
     */
 }
 

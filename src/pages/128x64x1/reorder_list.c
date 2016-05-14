@@ -18,7 +18,6 @@
 #include "gui/gui.h"
 
 #include "../common/_reorder_list.c"
-static s8 current_selected = 0;
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static void _okcancel_cb(guiObject_t *obj, const void *data);
@@ -51,7 +50,6 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
 
     PAGE_RemoveAllObjects();
     PAGE_SetModal(1);
-    current_selected = 0;
     int i;
     for(i = 0; i < rl.max; i++) {
         if (i < count)

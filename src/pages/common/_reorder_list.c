@@ -53,6 +53,7 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     PAGE_RemoveAllObjects();
+    PAGE_SetModal(0);
     if (data) {
         rl.return_page(rl.list);
     }

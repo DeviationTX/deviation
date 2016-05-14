@@ -622,12 +622,12 @@ int MIXER_SetMixers(struct Mixer *mixers, int count)
     return 1;
 }
 
-void MIXER_GetLimit(int ch, struct Limit *limit)
+struct Limit *MIXER_GetLimit(int ch)
 {
     if (ch < NUM_OUT_CHANNELS)
-        *limit = Model.limits[ch];
+        return &Model.limits[ch];
     else
-        memset(limit, 0, sizeof(struct Limit));
+        return NULL;
 }
 
 void MIXER_SetLimit(int ch, struct Limit *limit)

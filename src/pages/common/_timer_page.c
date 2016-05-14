@@ -23,7 +23,6 @@ static void update_countdown(u8 idx);
 static const char *set_source_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_input_source_cb(guiObject_t *obj, int source, int value, void *data);
 static void toggle_source_cb(guiObject_t *obj, void *data);
-static void toggle_timertype_cb(guiObject_t *obj, void *data);
 static const char *set_timertype_cb(guiObject_t *obj, int dir, void *data);
 static const char *set_start_cb(guiObject_t *obj, int dir, void *data);
 static void reset_timerperm_cb(guiObject_t *obj, const void *data);
@@ -63,8 +62,10 @@ const char *set_timertype_cb(guiObject_t *obj, int dir, void *data)
     u8 idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
     u8 changed;
-    timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST - 1, dir, 1, 1, &changed);
+    timer->type = GUI_TextSelectHelper(timer->type, 0, TIMER_LAST, dir, 1, 1, &changed);
     if (changed){
+        if (timer->type == TIMER_LAST)
+            timer->type = 0;
         TIMER_Reset(idx);
         update_countdown(idx);
     }
@@ -156,16 +157,6 @@ const char *set_input_source_cb(guiObject_t *obj, int src, int value, void *data
     int idx = (long)data;
     struct Timer *timer = &Model.timer[idx];
     return _set_src_cb((guiTextSelect_t *)obj, &timer->src, 0, idx, src);
-}
-
-void toggle_timertype_cb(guiObject_t *obj, void *data)
-{
-    u8 idx = (long)data;
-    struct Timer *timer = &Model.timer[idx];
-    timer->type = TIMER_LAST == timer->type + 1 ? 0 : timer->type + 1;
-    TIMER_Reset(idx);
-    update_countdown(idx);
-    GUI_Redraw(obj);
 }
 
 void toggle_source_cb(guiObject_t *obj, void *data)

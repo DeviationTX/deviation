@@ -89,7 +89,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             MUSIC_Play(MUSIC_SAVING);
             save_changes();

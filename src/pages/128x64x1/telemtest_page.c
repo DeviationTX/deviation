@@ -325,12 +325,11 @@ void PAGE_ShowTelemetryAlarm()
 {
     int cur_page = PAGE_GetID();
     if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+        PAGE_Pop();
 }
 
 void PAGE_TelemtestInit(int page)
 {
-    (void)okcancel_cb;
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
@@ -405,7 +404,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             TELEMETRY_MuteAlarm();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
         } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {

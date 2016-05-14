@@ -21,7 +21,6 @@
 
 #include "../common/_lang_select.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static const char *_string_cb(guiObject_t *obj, const void *data);
 
 static struct lang_obj * const gui = &gui_objs.u.lang;
@@ -51,7 +50,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void LANGPage_Select(void(*return_page)(int page))
 {
     PAGE_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(1);
     cp->return_page = return_page;
 
@@ -78,19 +76,4 @@ const char *_string_cb(guiObject_t *obj, const void *data)
     (void)obj;
     u8 idx = (long)data;
     return string_cb(idx, NULL);
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_TxConfigureInit(-1);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
