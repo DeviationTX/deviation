@@ -59,7 +59,12 @@ static void _show_page(int page)
     firstObj = NULL;
     timer_page_num = (LCD_WIDTH == 480 ? 0 : page);  // ignore for big screen because everything is on one page
 
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER));
+#if HAS_STANDARD_GUI
+    if (Model.mixer_mode == MIXER_STANDARD)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TIMER), MODELMENU_Show);
+    else
+#endif
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_TIMER));
     
     GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, MAX_TIMER_PAGE + 1, NULL, scroll_cb, NULL);
     GUI_SetScrollbar(&gui->scrollbar,timer_page_num);

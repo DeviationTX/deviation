@@ -240,7 +240,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_Pop();
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
 #if HAS_LAYOUT_EDITOR
         else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
             PAGE_MainLayoutExit();

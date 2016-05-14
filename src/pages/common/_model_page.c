@@ -341,7 +341,7 @@ static const char *mixermode_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     u8 changed = 0;
     int max_mode = Model.type ? 0 : 1; //Only allow Standard GUI for Helis
-    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode-1, 0, max_mode, dir, 1, 1, &changed) + 1;
+    Model.mixer_mode = GUI_TextSelectHelper(Model.mixer_mode, 0, max_mode, dir, 1, 1, &changed);
     if (changed && Model.mixer_mode == MIXER_STANDARD) {
         if (!STDMIXER_ValidateTraditionModel()) {
             Model.mixer_mode = MIXER_ADVANCED;

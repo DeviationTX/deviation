@@ -45,7 +45,7 @@ void PAGE_GyroSenseInit(int page)
         ROW4 = (110 + ((LCD_HEIGHT - 240) / 2)),
         ROW5 = (130 + ((LCD_HEIGHT - 240) / 2)),
     };
-    PAGE_ShowHeader(NULL);
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_GYROSENSE, SWITCHFUNC_GYROSENSE));
     memset(mp, 0, sizeof(*mp));
     int expected = INPUT_NumSwitchPos(mapped_std_channels.switches[SWITCHFUNC_GYROSENSE]);

@@ -97,13 +97,6 @@ struct mainpage_obj {
     guiImage_t pwr;
 };
 
-struct menu_obj {
-    guiLabel_t idx[ENTRIES_PER_PAGE];
-    //guiLabel_t name[ENTRIES_PER_PAGE];
-    guiButton_t name[ENTRIES_PER_PAGE];
-    guiScrollable_t scrollable;
-};
-
 #define DATALOG_NUM_SCROLLABLE (LCD_HEIGHT == 240 ? 7 : 8)
 struct datalog_obj {
     guiLabel_t enlbl;
@@ -582,7 +575,6 @@ struct gui_objs {
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
         struct mainpage_obj mainpage;
-        struct menu_obj menu;
         struct datalog_obj  datalog;
         struct modelcfg_obj modelcfg;
         struct modelload_obj modelload;

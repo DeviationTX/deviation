@@ -32,7 +32,7 @@ void PAGE_SwashInit(int page)
         COL2 = (150 + ((LCD_WIDTH - 320) / 2)),
         ROW_SPACE = 30,
     };
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_SWASH));
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SWASH), MODELMENU_Show);
     get_swash();
     /* Row 1 */
     int row = 40 + ((LCD_HEIGHT - 240) / 2);

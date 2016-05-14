@@ -25,7 +25,7 @@ void PAGE_SplashInit(int page)
 {
     (void)page;
     if (Transmitter.splash_delay == 0) {
-        PAGE_ChangeByID(PAGEID_MAIN, 0);
+        PAGE_ChangeByID(PAGEID_MAIN);
         return;
     }
     PAGE_RemoveAllObjects();
@@ -42,7 +42,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     (void)button;
     (void)flags;
-    PAGE_ChangeByID(PAGEID_MAIN, 0);
+    PAGE_ChangeByID(PAGEID_MAIN);
     return 1;
 }
 
@@ -56,7 +56,7 @@ void PAGE_SplashEvent()
     // We use SPITouch_IRQ() here instead of attaching an event to the image because
     // We want to abort regardless of where on the page the touch occurred
     if ( CLOCK_getms() > time || SPITouch_IRQ()) 
-	PAGE_ChangeByID(PAGEID_MAIN, 0);
+	PAGE_ChangeByID(PAGEID_MAIN);
 }
 
 void PAGE_SplashExit()

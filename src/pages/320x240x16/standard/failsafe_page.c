@@ -47,7 +47,7 @@ void PAGE_FailSafeInit(int page)
 {
     (void)page;
     struct mixer_page * mp = &pagemem.u.mixer_page;
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_FAILSAFE));
+    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_FAILSAFE), MODELMENU_Show);
     mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;

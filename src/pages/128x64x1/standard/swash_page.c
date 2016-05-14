@@ -24,10 +24,12 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_swash_page.c"
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 void PAGE_SwashInit(int page)
 {
     (void)page;
+    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     get_swash();
@@ -53,4 +55,19 @@ void PAGE_SwashInit(int page)
     GUI_Select1stSelectableObj();
 }
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    //u8 total_items = 2;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
 #endif //HAS_STANDARD_GUI

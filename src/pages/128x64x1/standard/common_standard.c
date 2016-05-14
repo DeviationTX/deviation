@@ -24,6 +24,8 @@
 
 static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
+
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)col;
@@ -46,12 +48,28 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 void STANDARD_Init(const struct page_defs *page_defs)
 {
+    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr(page_defs->title));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, (void *)page_defs);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
+}
+
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void STANDARD_DrawCurvePoints(guiLabel_t vallbl[], guiTextSelect_t val[],

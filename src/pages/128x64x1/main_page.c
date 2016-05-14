@@ -105,7 +105,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     u8 i;
     if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         //see pagelist.h for mapping of 'page' to menu_id 
-        PAGE_PushByID(PAGEID_MENU);
+        PAGE_ChangeByID(PAGEID_MENU, 1 << 4);
     } else if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
 	for ( i=0; i< NUM_TIMERS; i++) 
             TIMER_StartStop(i);

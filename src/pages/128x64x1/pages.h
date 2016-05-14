@@ -2,7 +2,15 @@
 #define _PAGES_H_
 
 #include "../common/_pages.h"
+#include "menus.h"
 #include "guiobj.h"
+
+#define PAGEDEF(id, init, event, exit, menu, name) id,
+enum PageID {
+#include "pagelist.h"
+    PAGEID_LAST
+};
+#undef PAGEDEF
 
 struct pagemem {
     union {

@@ -117,9 +117,9 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if(press_type == -1) {
         if ((long)data == 0) {
-            PAGE_PushByID(PAGEID_MENU);
+            PAGE_SetSection(SECTION_OPTIONS);
         } else if ((long)data == 1) {
-            PAGE_PushByID(PAGEID_MODEL);
+            PAGE_SetSection(SECTION_MODEL);
         } else {
             PAGE_SetModal(1);
             PAGE_MainExit();
@@ -162,10 +162,10 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     if(! GUI_GetSelected()) {
-        if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            //see pagelist.h for mapping of 'page' to menu_id 
-            PAGE_PushByID(PAGEID_MENU);
-        } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            mp->ignore_release = 1;
+            GUI_SetSelected((guiObject_t *)&gui->optico);
+        }else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             mp->ignore_release = 1;
             for (u8 timer=0; timer<NUM_TIMERS; timer++) {
                 TIMER_Reset(timer);

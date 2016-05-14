@@ -137,11 +137,27 @@ static const char *remaining_str_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void PAGE_DatalogInit(int page)
 {
     (void)page;
     memset(gui, 0, sizeof(*gui));
     seltype = 0;
+    PAGE_SetActionCB(_action_cb);
     struct LabelDesc font = DEFAULT_FONT;
     font.style = LABEL_UNDERLINE;
     int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry

@@ -1,5 +1,3 @@
-#ifndef __PAGES_H__
-#define __PAGES_H__
 #include "common.h"
 #include "music.h"
 #include "gui/gui.h"
@@ -19,19 +17,10 @@
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
 #include "toggle_select.h"
-#include "_menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
 
 #define PAGE_NAME_MAX 10
-
-#define PAGEDEF(id, init, event, exit, menu, name) id,
-enum PageID {
-#include "pagelist.h"
-PAGEID_LAST
-};
-#undef PAGEDEF
-
 extern struct pagemem pagemem;
 
 void PAGE_RemoveHeader();
@@ -149,13 +138,9 @@ void PAGE_DebuglogInit();
 void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
-void PAGE_ChangeByID(enum PageID id, s8 menuPage);
-void PAGE_PushByID(enum PageID id);
-void PAGE_Pop();
-
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
-int PAGE_IsValidQuickPage(int page);
+int PAGE_IsValid(int page);
 
 
 /* Simple Mixer pages */
@@ -175,5 +160,3 @@ void PAGE_CurvesEvent();
 void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
-
-#endif //__PAGES_H__

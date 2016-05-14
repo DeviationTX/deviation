@@ -1,21 +1,16 @@
 #ifdef PAGEDEF
 
-#ifndef MENUID_MAIN
-    #define MENUID_MAIN   (1 << 4)
-    #define MENUID_MODEL  (2 << 4)
-    #define MENUID_TX     (3 << 4)
-#endif
 //                  Menu ID     CONDITION
-#define MAIN_MENU   MENUID_MAIN  |  (MIXER_STANDARD | MIXER_ADVANCED)        // Top-level menu, always shown
-#define MODEL_MENU  MENUID_MODEL |  (MIXER_STANDARD | MIXER_ADVANCED)        // Model-menu, always shown
-#define STDGUI_MENU MENUID_MODEL |  MIXER_STANDARD        // Model-menu, only shown for standard-gui
-#define ADVGUI_MENU MENUID_MODEL |  MIXER_ADVANCED        // Model-menu, only shown for advanced-gui
-#define TX_MENU     MENUID_TX    |  (MIXER_STANDARD | MIXER_ADVANCED)        // Transmitter-menu, always shown
+#define MAIN_MENU   (1 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Top-level menu, always shown
+#define MODEL_MENU  (2 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Model-menu, always shown
+#define STDGUI_MENU (2 << 4) |  MIXER_STANDARD        // Model-menu, only shown for standard-gui
+#define ADVGUI_MENU (2 << 4) |  MIXER_ADVANCED        // Model-menu, only shown for advanced-gui
+#define TX_MENU     (3 << 4) |  (MIXER_STANDARD | MIXER_ADVANCED)        // Transmitter-menu, always shown
 
 //The following pages are not part of the menu system
 //---------------------------------------------------
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
-PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           _tr_noop("Main menu"))
+PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           "")  //This is the main menu
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
@@ -27,8 +22,8 @@ PAGEDEF(PAGEID_VIDEOCFG, PAGE_VideoSetupInit,  NULL,                  NULL,     
 
 //Main menu
 //---------
-PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Model menu"))
-PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Transmitter menu"))
+PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  NULL,               MAIN_MENU,   _tr_noop("Model menu"))
+PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  NULL,               MAIN_MENU,   _tr_noop("Transmitter menu"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,       MAIN_MENU,   _tr_noop("USB"))
 #if DEBUG_WINDOW_SIZE
 PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,               MAIN_MENU,   _tr_noop("Debuglog"))
@@ -36,7 +31,6 @@ PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,     
 PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,               MAIN_MENU,   _tr_noop("About Deviation"))
 
 //Model menu
-//----------
 PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       PAGE_ModelExit,     MODEL_MENU,  _tr_noop("Model setup"))
 PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       PAGE_MixerExit,     ADVGUI_MENU, _tr_noop("Mixer"))
 #if HAS_STANDARD_GUI
@@ -52,7 +46,7 @@ PAGEDEF(PAGEID_SWASH,    PAGE_SwashInit,       NULL,                  NULL,     
 PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,               STDGUI_MENU, _tr_noop("Fail-safe"))
 PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,               STDGUI_MENU, _tr_noop("Switch assignment"))
 #endif
-PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,     MODEL_MENU,  _tr_noop("Timers"))
+PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,     STDGUI_MENU, _tr_noop("Timers"))
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, PAGE_TelemconfigExit,MODEL_MENU, _tr_noop("Telemetry config"))
 #endif

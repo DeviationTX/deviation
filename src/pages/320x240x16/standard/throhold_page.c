@@ -43,7 +43,7 @@ void PAGE_ThroHoldInit(int page)
         ROW1 = (80 + ((LCD_HEIGHT - 240) / 2)),
         ROW2 = (120 + ((LCD_HEIGHT - 240) / 2)),
     };
-    PAGE_ShowHeader(NULL);
+    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
     PAGE_ShowHeader_SetLabel(STDMIX_TitleString, SET_TITLE_DATA(PAGEID_THROHOLD, SWITCHFUNC_HOLD));
     GUI_CreateLabelBox(&gui->enlbl, COL1, ROW1, 0, 16, &DEFAULT_FONT, NULL, NULL, _tr("Thr hold"));
     GUI_CreateTextSelect(&gui->en, COL2, ROW1, TEXTSELECT_128, toggle_thold_cb, throhold_cb,  NULL);

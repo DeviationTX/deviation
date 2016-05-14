@@ -33,7 +33,12 @@ void PAGE_TelemconfigInit(int page)
     };
     const u8 row_height = 25;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
+#if HAS_STANDARD_GUI
+    if (Model.mixer_mode == MIXER_STANDARD)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMCFG), MODELMENU_Show);
+    else
+#endif
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_TELEMCFG));
 
     if (telem_state_check() == 0) {
         GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tempstring);

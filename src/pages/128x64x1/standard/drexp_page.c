@@ -24,6 +24,8 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
+static unsigned _action_cb(u32 button, unsigned flags, void *data);
+
 //static u16 current_selected = 0;
 guiObject_t *scroll_bar;
 
@@ -65,6 +67,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_DrExpInit(int page)
 {
     (void)page;
+    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader("");
@@ -92,6 +95,22 @@ static void _refresh_page()
 {
     PAGE_RemoveAllObjects();
     PAGE_DrExpInit(0);
+}
+
+static unsigned _action_cb(u32 button, unsigned flags, void *data)
+{
+    (void)data;
+    //u8 total_items = 2;
+    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+        }
+        else {
+            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void PAGE_DrExpCurvesEvent()

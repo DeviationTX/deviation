@@ -35,7 +35,10 @@ static const char *_mixermode_cb(guiObject_t *obj, int dir, void *data)
     if(Model.mixer_mode != mp->last_mixermode) {
         mp->last_mixermode = Model.mixer_mode;
         PAGE_RemoveHeader();
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
+        if (Model.mixer_mode == MIXER_STANDARD)
+            PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
+        else
+            PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
     }
     return ret;
 }
@@ -50,7 +53,12 @@ void PAGE_ModelInit(int page)
     mp->last_txpower = Model.tx_power;
     mp->file_state = 0;
     PAGE_SetModal(0);
-    PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
+#if HAS_STANDARD_GUI
+    if (Model.mixer_mode == MIXER_STANDARD)
+        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_MODEL), MODELMENU_Show);
+    else
+#endif
+        PAGE_ShowHeader(PAGE_GetName(PAGEID_MODEL));
 
     enum {
         COL1 = (8 + ((LCD_WIDTH - 320) / 2)),

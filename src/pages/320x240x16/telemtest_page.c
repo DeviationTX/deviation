@@ -121,7 +121,7 @@ static void show_page()
 void PAGE_ShowTelemetryAlarm()
 {
     if (PAGE_GetID() != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON, 0);
+        PAGE_ChangeByID(PAGEID_TELEMMON);
 }
 
 void PAGE_TelemtestInit(int page)
