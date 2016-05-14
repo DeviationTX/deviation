@@ -120,7 +120,7 @@ u8 PAGE_TelemStateCheck(char *str, int strlen)
 
 int PAGE_IsValidQuickPage(int page) {
 #if HAS_STANDARD_GUI
-    int menu;
+    int menu = 0;
     #define PAGEDEF(_id, _init, _event, _exit, _menu, _name) \
         case _id: menu = _menu; break;
     switch(page) {

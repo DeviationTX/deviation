@@ -104,7 +104,6 @@ void PAGE_ChantestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_MIXEROUTPUT;
     _show_bar_page(0);
 }
@@ -114,7 +113,6 @@ void PAGE_InputtestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
     _show_bar_page(0);
 }
@@ -124,7 +122,6 @@ void PAGE_ButtontestInit(int page)
     (void)page;
     PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_BTNMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_BUTTONTEST;
     show_button_page();
 }

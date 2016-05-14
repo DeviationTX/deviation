@@ -109,25 +109,13 @@ static void _show_bar_page(int row)
 
 void PAGE_ChantestInit(int page)
 {
-    (void)okcancel_cb;
-    PAGE_SetModal(0);
+    (void)page;
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Mixer output"));
-    cp->return_page = NULL;
-    if (page > 0)
-        cp->return_val = page;
     if (cp->type != MONITOR_RAWINPUT )
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
     _show_bar_page(0);
-}
-
-void PAGE_ChantestModal(void(*return_page)(int page), int page)
-{
-    cp->type = MONITOR_MIXEROUTPUT;
-    PAGE_ChantestInit(page);
-    cp->return_page = return_page;
-    cp->return_val = page;
 }
 
 static void _navigate_pages(s8 direction)
