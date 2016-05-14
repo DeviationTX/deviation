@@ -256,8 +256,13 @@ static void mt99xx_send_packet()
 static void mt99xx_init()
 {
     NRF24L01_Initialize();
+    if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
+        XN297_SetScrambledMode(XN297_UNSCRAMBLED);
     NRF24L01_SetTxRxMode(TX_EN);
     NRF24L01_FlushTx();
+    for(u8 i=0; i<5; i++)
+        rx_tx_addr[i] = 0xCC;
+    XN297_SetTXAddr(rx_tx_addr, 5);
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);     // Clear data ready, data sent, and retransmit
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);      // No Auto Acknowldgement on all data pipes
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);  // Enable data pipe 0 only
@@ -303,17 +308,8 @@ static void mt99xx_init()
         dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
-    // Power on, TX mode, 2byte CRC
-    u16 rf_config = BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP);
-    if( Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_YZ)
-        rf_config |= BV(XN297_UNSCRAMBLED);
-    XN297_Configure(rf_config);
-    // set tx address for bind packets
-    // it is important to set address 
-    // *after* XN297_Configure() as the i6S is using unscrambled mode
-    for(u8 i=0; i<5; i++)
-        rx_tx_addr[i] = 0xCC;
-    XN297_SetTXAddr(rx_tx_addr, 5);
+    // Power on, TX mode, 2byte CRC    
+    XN297_Configure(BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_PWR_UP));
 }
 
 static void initialize_txid()
