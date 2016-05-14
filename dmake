@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cwd;
+use FindBin;
+
+my $docker_container = "deviation_build";
+
+my $gitroot = `git rev-parse --show-toplevel 2> /dev/null`;
+chomp($gitroot);
+if ($gitroot eq "") {
+    print "ERROR: Not in a GIT repository.  Cannot determine which directory in the docker container to use\n";
+    exit(1);
+}
+if (! -d "$gitroot/../deviation") {
+    print "ERROR: Could not locate 'deviation' GIT repository\n";
+    exit(1);
+}
+my $runonce = "$gitroot/../deviation/.run_once";
+my ($curdir) = (cwd() =~ /^\Q$gitroot\E\/(.*)$/);
+$curdir ||= "";
+my $reponame = (split(/\//, $gitroot))[-1];
+
+open my $fh, ">", $runonce or die "ERROR: Can't write $runonce\n";
+print $fh "#!/bin/sh\n";
+print $fh "cd /git/$reponame/$curdir\n" if ($reponame);
+print $fh "make";
+foreach (@ARGV) {
+    print $fh " \"$_\"";
+}
+close($fh);
+chmod 0755, $runonce;
+system("docker start -i $docker_container");
+unlink($runonce);

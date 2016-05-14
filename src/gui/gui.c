@@ -545,100 +545,131 @@ void GUI_HandleButtons(u8 enable)
                 NULL);
 }
 
+unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
+{
+    //These objects dont handle buttons
+    switch (obj->Type) {
+      case UnknownGUI:
+      case Dialog:
+      case CheckBox:
+      case Dropdown:
+      case BarGraph:
+      case Rect:
+        return 0;
+      default:
+        break;
+    }
+    unsigned is_release = flags & BUTTON_RELEASE;
+    unsigned is_longpress = flags & BUTTON_LONGPRESS;
+    int press_type = is_release ? -1 : is_longpress ? 1 : 0;
+    //TextSelect can handle Left, Right, and Enter
+    if (obj->Type == TextSelect) {
+        GUI_PressTextSelect(obj, button, press_type);
+        return 1;
+    }
+    //These objects handle ENTER only
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+        switch (obj->Type) {
+          case Button:
+            if (is_longpress) {
+                // Don't handle long-press ENTER
+                return 0;
+            }
+            objTOUCHED = obj;
+            OBJ_SET_DIRTY(obj, 1);
+            if (is_release) {
+                struct guiButton *button = (struct guiButton *)obj;
+                if(button->CallBack)
+                    button->CallBack(obj, button->cb_data);
+            }
+            return 1;
+          case Image:
+            objTOUCHED = obj;
+            GUI_TouchImage(obj, NULL, press_type);
+            return 1;
+          case Label:
+            objTOUCHED = obj;
+            GUI_TouchLabel(obj, NULL, press_type);
+            return 1;
+          default:
+            break;
+        }
+    }
+    return 0;
+}
+
 unsigned handle_buttons(u32 button, unsigned flags, void *data)
 {
     (void)data;
     //When modal, we capture all button presses
-    u8 modalActive = GUI_IsModal() ? 1 : 0;
-    if (flags & BUTTON_RELEASE) {
-        if (objSELECTED && objTOUCHED == objSELECTED && (
-             CHAN_ButtonIsPressed(button, BUT_LEFT) ||
-             CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
-             CHAN_ButtonIsPressed(button, BUT_ENTER)))
-        {
-            //Button is emulating a touch, so send a release
-            GUI_TouchRelease();
+    int modalActive = GUI_IsModal() ? 1 : 0;
+
+#if USE_4BUTTON_MODE
+    // IN 4 button mode, up/down can also act as left/right for TextSelect
+    static struct guiObject *objACTIVE = NULL;
+    if (objACTIVE) {
+        if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+            button = CHAN_ButtonMask(BUT_LEFT);
+        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+            button = CHAN_ButtonMask(BUT_RIGHT);
+        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+            if (flags & BUTTON_RELEASE)
+                objACTIVE = NULL;
+        } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+            if (flags & BUTTON_RELEASE)
+                objACTIVE = NULL;
             return 1;
-        } else if (flags & BUTTON_HAD_LONGPRESS) {
-            //ignore long-press release
-            return 0;
-        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
-                   (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_UP)))
-        {
-            struct guiObject *obj = GUI_GetNextSelectable(objSELECTED);
-            if (obj && obj != objSELECTED) {
-                GUI_SetSelected(obj);
-                return 1;
+        }
+    } else {
+        if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
+            if (flags & BUTTON_RELEASE) {
+                objACTIVE = objSELECTED;
             }
-        } else if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            struct guiObject *obj = GUI_GetPrevSelectable(objSELECTED);
+            return 1;
+        }
+    }
+#endif
+    //printf("Button: %08x Flags: %08x Active: %08x\n", button, flags, objACTIVE);
+    if (CHAN_ButtonIsPressed(button, BUT_LEFT) ||
+        CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
+        CHAN_ButtonIsPressed(button, BUT_ENTER))
+    {
+        // Widgets can only handle Left, Right and Enter
+        if (objSELECTED)
+             return GUI_ObjButton(objSELECTED, button, flags) || modalActive;
+        return modalActive;
+    }
+    if (flags & BUTTON_RELEASE) {
+       if (flags & BUTTON_HAD_LONGPRESS) {
+            //ignore long-press release
+            return modalActive;
+        }
+        else if (CHAN_ButtonIsPressed(button, BUT_DOWN) || CHAN_ButtonIsPressed(button, BUT_UP)) 
+        {
+            
+            struct guiObject *obj = (CHAN_ButtonIsPressed(button, BUT_DOWN) || ! objSELECTED)
+                    ? GUI_GetNextSelectable(objSELECTED)
+                    : GUI_GetPrevSelectable(objSELECTED);
             if (obj && obj != objSELECTED) {
                 GUI_SetSelected(obj);
             }
         } else if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             if (objDIALOG) {
+                //Why doesn't the dialog handle its own buttons?
                 DialogClose(objDIALOG, 0);
-                return 1;
-            }
-            OBJ_SET_DIRTY(objSELECTED, 1);
-            objSELECTED = NULL;
-            if (select_notify)
-                select_notify(objSELECTED);
-            return 1;
-        }
-        return modalActive;
-    }
-    if (! objHEAD)
-        return modalActive;
-
-    if (CHAN_ButtonIsPressed(button, BUT_DOWN) ||
-        CHAN_ButtonIsPressed(button, BUT_UP) ||
-        CHAN_ButtonIsPressed(button, BUT_EXIT))
-    {
-        return (flags & BUTTON_LONGPRESS) ? modalActive : 1;
-    }
-    if (CHAN_ButtonIsPressed(button, BUT_ENTER) && flags & BUTTON_LONGPRESS) {
-        //long-press on enter is ignored so it can be handled by the menu
-        return modalActive;
-    }
-    if (objSELECTED) {
-        void(*press)(struct guiObject *obj, u32 button, u8 press_type) = NULL;
-        if (objSELECTED->Type == TextSelect) {
-            press = GUI_PressTextSelect;
-        }
-        //else if(objSELECTED->Type == Listbox) {  // Bug fix for issue #81, listbox should handle up/down as well
-        //    press = GUI_PressListbox;
-        //}
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            if (! objTOUCHED || objTOUCHED == objSELECTED) {
-                if (press) {
-                    press(objSELECTED, BUT_ENTER, flags & BUTTON_LONGPRESS);
-                    objTOUCHED = objSELECTED;
-                    return 1;
-                } else {
-                    struct touch coords;
-                    coords.x = objSELECTED->box.x + (objSELECTED->box.width >> 1);
-                    coords.y = objSELECTED->box.y + (objSELECTED->box.height >> 1);
-                    _GUI_CheckTouch(&coords, flags & BUTTON_LONGPRESS, NULL);
-                    return 1;
-                }
-            }
-        } else if (press) {
-            if (! objTOUCHED || objTOUCHED == objSELECTED) {
-                if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-                    press(objSELECTED, BUT_RIGHT, flags & BUTTON_LONGPRESS);
-                    objTOUCHED = objSELECTED;
-                    return 1;
-                } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-                    press(objSELECTED, BUT_LEFT, flags & BUTTON_LONGPRESS);
-                    objTOUCHED = objSELECTED;
-                    return 1;
-                }
+            } else {
+                OBJ_SET_DIRTY(objSELECTED, 1);
+                objSELECTED = NULL;
+                if (select_notify)
+                    select_notify(objSELECTED);
             }
         }
-        return 1;
+    } else if (! objSELECTED && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        // We need to tell the button handler that we will handle this press
+        // But we ignore an EXIT if there is nothing selected
+        return modalActive;
     }
-    return modalActive;
+    return 1;
 }
 guiObject_t *GUI_GetSelected()
 {

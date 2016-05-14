@@ -25,31 +25,11 @@ struct page {
     const char *pageName;
 };
 
-#define PAGEDEF(id, init, event, exit, name) {init, event, exit, name},
+#define PAGEDEF(id, init, event, exit, menu, name) {init, event, exit, name},
 static const struct page pages[] = {
 #include "pagelist.h"
 };
 #undef PAGEDEF
-#if 0
-    {PAGE_MainInit, PAGE_MainEvent, PAGE_MainExit, "MainPage"},  // Note: the page name length should not exceed 10 chars
-    {PAGE_MenuInit, NULL, NULL, "Menu"},
-    {PAGE_ChantestInit, PAGE_ChantestEvent, PAGE_ChantestExit, "Monitor"},
-    {PAGE_MixerInit, PAGE_MixerEvent, NULL, "Mixer"},
-    {PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL, "TxConfig"},
-    {PAGE_ModelInit, PAGE_ModelEvent, NULL, "ModelCon"},
-    {PAGE_TrimInit, PAGE_TrimEvent, NULL, "Trim"},
-    {PAGE_TimerInit, PAGE_TimerEvent, NULL, "Timer"},
-    {PAGE_USBInit, PAGE_USBEvent, PAGE_USBExit, "USB"},
-    {PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL, "TeleConf"},
-    {PAGE_TelemtestInit, PAGE_TelemtestEvent, NULL, "TeleMoni"},
-    {PAGE_TelemtestGPSInit, PAGE_TelemtestEvent, NULL, "TeleGPS"},
-    {PAGE_MainCfgInit, PAGE_MainCfgEvent, NULL, "MainConf"},
-    {PAGE_AboutInit, NULL, NULL, "About"},
-    {PAGE_SplashInit, PAGE_SplashEvent, PAGE_SplashExit, "Splash"},
-
-    //{PAGE_ScannerInit, PAGE_ScannerEvent, PAGE_ScannerExit},
-};
-#endif
 #include "../common/_pages.c"
 
 static u8 quick_page_enabled;

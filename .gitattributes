@@ -1,0 +1,4 @@
+* text=auto
+src/libopencm3/scripts/* eol=lf
+*.pl eol=lf
+*.py eol=lf
