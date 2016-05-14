@@ -141,12 +141,7 @@ static void _show_page(int page)
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-
-void PAGE_TimerExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static void update_countdown(u8 idx)

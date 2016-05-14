@@ -80,12 +80,7 @@ static void _show_page()
     GUI_CreateLabelBox(&gui->trimposlbl, TRIMPOS_X, STEP_Y, TRIMPOS_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-
-void PAGE_TrimExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static guiObject_t *getobj2_cb(int relrow, int col, void *data)

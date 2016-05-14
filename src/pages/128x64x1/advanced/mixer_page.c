@@ -55,7 +55,7 @@ static void _show_page()
     
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, channel_count, row_cb, getobj_cb, NULL, NULL);// 7 lines
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -95,11 +95,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
         }
     }
     return selectable;
-}
-
-void PAGE_MixerExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static guiObject_t *getobj_cb(int relrow, int col, void *data)

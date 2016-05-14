@@ -42,7 +42,6 @@ static const char * const MULTI_LABEL = _tr_noop("Multi");
 
 static u16 current_selected = 0;
 
-
 static const char * show_icontext_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
@@ -150,8 +149,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_ModelInit(int page)
 {
     (void)page;
-    //if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-    //    page = current_selected;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     memset(gui, 0, sizeof(struct modelpage_obj));
@@ -167,7 +164,7 @@ void PAGE_ModelInit(int page)
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
 
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static void _changename_done_cb(guiObject_t *obj, void *data)  // devo8 doesn't handle cancel/discard properly,
@@ -192,11 +189,6 @@ static void _changename_cb(guiObject_t *obj, const void *data)
     tempstring_cpy((const char *)Model.name); // Don't change model name directly
     GUI_CreateKeyboard(&gui->keyboard, KEYBOARD_ALPHA, tempstring, 20, // no more than 20 chars is allowed for model name
             _changename_done_cb, (void *)&callback_result);
-}
-
-void PAGE_ModelExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static inline guiObject_t *_get_obj(int type, int objid)

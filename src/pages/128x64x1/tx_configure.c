@@ -193,7 +193,7 @@ void PAGE_TxConfigureInit(int page)
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static const char *_contrast_select_cb(guiObject_t *obj, int dir, void *data)
@@ -220,11 +220,6 @@ static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
         return _tr("Off");
     else
         return _tr("On");
-}
-
-void PAGE_TxConfigureExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid)

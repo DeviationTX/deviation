@@ -17,7 +17,7 @@
 static struct menu_obj * const gui = &gui_objs.u.menu;
 
 static struct menu_page * const mp = &pagemem.u.menu_page;
-static u8 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
+static u16 current_selected[3] = {0, 0, 0};  // 0 is used for main menu, 1& 2 are used for sub menu
 
 static const char *idx_string_cb(guiObject_t *obj, const void *data);
 static const char *menu_name_cb(guiObject_t *obj, const void *data);
@@ -67,34 +67,28 @@ void _menu_init(int page)
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, idx, row_cb, getobj_cb, NULL, NULL);
-
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, *mp->current_selected));
 }
 
 void PAGE_MenuInit(int page)
 {
     (void)page;
-    mp->current_selected = &current_selected[0];
     mp->menu_id = MENUID_MAIN;
     _menu_init(PAGEID_MENU);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected[0]);
 }
 void PAGE_ModelMenuInit(int page)
 {
     (void)page;
-    mp->current_selected = &current_selected[1];
     mp->menu_id = MENUID_MODEL;
     _menu_init(PAGEID_MODELMNU);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected[1]);
 }
 void PAGE_TxMenuInit(int page)
 {
     (void)page;
-    mp->current_selected = &current_selected[2];
     mp->menu_id = MENUID_TX;
     _menu_init(PAGEID_TXMENU);
-}
-void PAGE_MenuExit()
-{
-    *mp->current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_SetScrollable(&gui->scrollable, &current_selected[2]);
 }
 
 const char *menu_name_cb(guiObject_t *obj, const void *data)

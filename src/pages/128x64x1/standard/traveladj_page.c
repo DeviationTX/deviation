@@ -51,8 +51,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_TravelAdjInit(int page)
 {
     (void)page;
-    //if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-    //    page = current_selected;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
 
@@ -65,11 +63,7 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
 
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
-void PAGE_TravelAdjExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-}
 #endif //HAS_STANDARD_GUI

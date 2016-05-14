@@ -15,7 +15,7 @@
 //The following pages are not part of the menu system
 //---------------------------------------------------
 PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainExit,      0,           _tr_noop("Main page"))
-PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  PAGE_MenuExit,      0,           _tr_noop("Main menu"))
+PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,               0,           _tr_noop("Main menu"))
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
 PAGEDEF(PAGEID_EDITLIMIT,PAGE_EditLimitsInit,  NULL,                  NULL,               0,           "")
 // don't include this in Devo7e due to memory restrictions
@@ -28,8 +28,8 @@ PAGEDEF(PAGEID_VIDEOCFG, PAGE_VideoSetupInit,  NULL,                  NULL,     
 
 //Main menu
 //---------
-PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Model menu"))
-PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  PAGE_MenuExit,      MAIN_MENU,   _tr_noop("Transmitter menu"))
+PAGEDEF(PAGEID_MODELMNU, PAGE_ModelMenuInit,   NULL,                  NULL,               MAIN_MENU,   _tr_noop("Model menu"))
+PAGEDEF(PAGEID_TXMENU,   PAGE_TxMenuInit,      NULL,                  NULL,               MAIN_MENU,   _tr_noop("Transmitter menu"))
 PAGEDEF(PAGEID_USB,      PAGE_USBInit,         PAGE_USBEvent,         PAGE_USBExit,       MAIN_MENU,   _tr_noop("USB"))
 #if DEBUG_WINDOW_SIZE
 PAGEDEF(PAGEID_DEBUGLOG, PAGE_DebuglogInit,    PAGE_DebuglogEvent,    NULL,               MAIN_MENU,   _tr_noop("Debuglog"))
@@ -38,13 +38,13 @@ PAGEDEF(PAGEID_ABOUT,    PAGE_AboutInit,       NULL,                  NULL,     
 
 //Model menu
 //----------
-PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       PAGE_ModelExit,     MODEL_MENU,  _tr_noop("Model setup"))
-PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       PAGE_MixerExit,     ADVGUI_MENU, _tr_noop("Mixer"))
+PAGEDEF(PAGEID_MODEL,    PAGE_ModelInit,       PAGE_ModelEvent,       NULL,               MODEL_MENU,  _tr_noop("Model setup"))
+PAGEDEF(PAGEID_MIXER,    PAGE_MixerInit,       PAGE_MixerEvent,       NULL,               ADVGUI_MENU, _tr_noop("Mixer"))
 #if HAS_STANDARD_GUI
 PAGEDEF(PAGEID_REVERSE,  PAGE_ReverseInit,     NULL,                  NULL,               STDGUI_MENU, _tr_noop("Reverse"))
 PAGEDEF(PAGEID_DREXP,    PAGE_DrExpInit ,      PAGE_DrExpCurvesEvent, NULL,               STDGUI_MENU, _tr_noop("D/R & Exp"))
 PAGEDEF(PAGEID_SUBTRIM,  PAGE_SubtrimInit,     NULL,                  NULL,               STDGUI_MENU, _tr_noop("Subtrim"))
-PAGEDEF(PAGEID_TRAVELADJ,PAGE_TravelAdjInit,   NULL,                  PAGE_TravelAdjExit, STDGUI_MENU, _tr_noop("Travel adjust"))
+PAGEDEF(PAGEID_TRAVELADJ,PAGE_TravelAdjInit,   NULL,                  NULL,               STDGUI_MENU, _tr_noop("Travel adjust"))
 PAGEDEF(PAGEID_THROCURVES,PAGE_ThroCurvesInit, PAGE_CurvesEvent,      NULL,               STDGUI_MENU, _tr_noop("Throttle curves"))
 PAGEDEF(PAGEID_PITCURVES,PAGE_PitCurvesInit,   PAGE_CurvesEvent,      NULL,               STDGUI_MENU, _tr_noop("Pitch curves"))
 PAGEDEF(PAGEID_THROHOLD, PAGE_ThroHoldInit,    NULL,                  NULL,               STDGUI_MENU, _tr_noop("Throttle hold"))
@@ -53,19 +53,19 @@ PAGEDEF(PAGEID_SWASH,    PAGE_SwashInit,       NULL,                  NULL,     
 PAGEDEF(PAGEID_FAILSAFE, PAGE_FailSafeInit,    NULL,                  NULL,               STDGUI_MENU, _tr_noop("Fail-safe"))
 PAGEDEF(PAGEID_SWITCHASSIGN,PAGE_SwitchAssignInit, NULL,              NULL,               STDGUI_MENU, _tr_noop("Switch assignment"))
 #endif
-PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       PAGE_TimerExit,     MODEL_MENU,  _tr_noop("Timers"))
+PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       NULL,               MODEL_MENU,  _tr_noop("Timers"))
 #if HAS_TELEMETRY
-PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, PAGE_TelemconfigExit,MODEL_MENU, _tr_noop("Telemetry config"))
+PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL,               MODEL_MENU,  _tr_noop("Telemetry config"))
 #endif
-PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        PAGE_TrimExit,      ADVGUI_MENU, _tr_noop("Trims"))
+PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        NULL,               ADVGUI_MENU, _tr_noop("Trims"))
 #if HAS_DATALOG
-PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     PAGE_DatalogExit,   MODEL_MENU,  _tr_noop("Datalog"))
+PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,               MODEL_MENU,  _tr_noop("Datalog"))
 #endif
 PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  PAGE_MainLayoutEvent,  PAGE_MainLayoutExit, MODEL_MENU, _tr_noop("Main page config"))
 
 // Transmitter menu
 //-----------------
-PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, PAGE_TxConfigureEvent, PAGE_TxConfigureExit,TX_MENU,    _tr_noop("Transmitter config"))
+PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL,                TX_MENU,    _tr_noop("Transmitter config"))
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,   TX_MENU,    _tr_noop("Channel monitor"))
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,                TX_MENU,    _tr_noop("Telemetry monitor"))

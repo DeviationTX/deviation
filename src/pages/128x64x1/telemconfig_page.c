@@ -85,12 +85,7 @@ void PAGE_TelemconfigInit(int page)
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, TELEM_NUM_ALARMS, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-void PAGE_TelemconfigExit()
-{
-    if(telem_state_check())
-        current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static const char *idx_cb(guiObject_t *obj, const void *data)

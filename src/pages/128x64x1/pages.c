@@ -21,11 +21,13 @@ static unsigned action_cb(u32 button, unsigned flags, void *data);
 #include "../common/_pages.c"
 
 static u8 quick_page_enabled;
-
+static u16 *current_selected;
+static guiScrollable_t *page_scrollable;
 void PAGE_Init()
 {
     cur_page = 0;
     modal = 0;
+    page_scrollable = NULL;
     GUI_RemoveAllObjects();
     // For Devo10, there is no need to register and then unregister buttons in almost every page
     // since all buttons are needed in all pages, so we just register them in this common page
@@ -49,8 +51,13 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
 {
     if ( modal || GUI_IsModal())
         return;
-    if (pages[cur_page].exit)
+    if (page_scrollable) {
+        *current_selected = GUI_ScrollableGetObjRowOffset(page_scrollable, GUI_GetSelected());
+        page_scrollable = NULL;
+    }
+    if (pages[cur_page].exit) {
         pages[cur_page].exit();
+    }
     cur_page = id;
     BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
     if (pages[cur_page].init == PAGE_MainInit)
@@ -60,6 +67,9 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     PAGE_RemoveAllObjects();
     ActionCB = _action_cb;
     pages[cur_page].init(menuPage);
+    if (page_scrollable) {
+        GUI_SetSelected(GUI_ShowScrollableRowOffset(page_scrollable, *current_selected));
+    }
 }
 
 static guiLabel_t headerLabel;
@@ -168,4 +178,10 @@ void PAGE_SaveMixerSetup(struct mixer_page * const mp)
     MIXER_SetMixers(mp->mixer, mp->num_mixers);
     MUSIC_Play(MUSIC_SAVING); // no saving tone in the sound.ini
     BUTTON_InterruptLongPress();
+}
+
+void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected)
+{
+    page_scrollable = scroll;
+    current_selected = selected;
 }
