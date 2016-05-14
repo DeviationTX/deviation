@@ -177,36 +177,27 @@ void PAGE_RemoveHeader()
         GUI_RemoveObj((guiObject_t *)&gui->exitico);
     if(OBJ_IS_USED(&gui->title))
         GUI_RemoveObj((guiObject_t *)&gui->title);
+    //if(OBJ_IS_USED(&gui->previco))
+    //    GUI_RemoveObj((guiObject_t *)&gui->previco);
+    //if(OBJ_IS_USED(&gui->nextico))
+    //    GUI_RemoveObj((guiObject_t *)&gui->nextico);
 }
 
 void PAGE_ShowHeader(const char *title)
 {
     guiObject_t *obj;
-    if (HAS_TOUCH) {
-        obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
-        GUI_SetSelectable(obj, 0);
-    }
+    obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], changepage_cb, (void *)0);
+    GUI_SetSelectable(obj, 0);
     if(title)
         GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
+    //obj = GUI_CreateIcon(&gui->previco, LCD_WIDTH-64, 0, &icons[ICON_PREVPAGE], changepage_cb, (void *)-1);
+    //GUI_SetSelectable(obj, 0);
+    //obj = GUI_CreateIcon(&gui->nextico, LCD_WIDTH-32, 0, &icons[ICON_NEXTPAGE], changepage_cb, (void *)1);
+    //GUI_SetSelectable(obj, 0);
     exit_cmd = changepage_cb;
     exit_data = NULL;
 }
 
-
-void PAGE_ShowHeader_ExitOnly(const char *title, void (*CallBack)(guiObject_t *obj, const void *data))
-{
-    guiObject_t *obj;
-    enter_cmd = CallBack;
-    enter_data = (void *)1;
-    exit_cmd = CallBack;
-    exit_data = (void *)0;
-    if (HAS_TOUCH) {
-        obj = GUI_CreateIcon(&gui->exitico, 0, 0, &icons[ICON_EXIT], CallBack, (void *)0);
-        GUI_SetSelectable(obj, 0);
-    }
-    if(title)
-        GUI_CreateLabel(&gui->title, 40, 10, NULL, TITLE_FONT, (void *)title);
-}
 
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data)
 {
