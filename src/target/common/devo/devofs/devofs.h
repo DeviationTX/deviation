@@ -1,6 +1,8 @@
 
 #include <stdint.h>
 
+#define DEVOFS_VERSION  0x02
+
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
@@ -59,4 +61,7 @@ FRESULT df_maximize_file_size();
 FRESULT df_lseek (u32);						/* Move file pointer of the open file */
 FRESULT df_opendir (DIR*, const char*);			/* Open a directory */
 FRESULT df_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
+FRESULT df_mkdir(const char *name);
+FRESULT df_unlink(const char *name);
+FRESULT df_stat(FILINFO *fi);
 FRESULT df_compact ();

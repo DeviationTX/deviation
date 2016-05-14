@@ -120,14 +120,9 @@ void LCD_Init()
 
 void LCD_Clear(unsigned int val)
 {
-    int i,j;
-    val = (val & 0xFF);
-    for (i=0; i<LCD_PAGES; i++) {
-        lcd_set_page_address(i);
-        lcd_set_column_address(0);
-        for (j=0;j<PHY_LCD_WIDTH;j++)
-            LCD_Data(val ? 0xff : 0x00);
-    }
+    val = (val & 0xFF) ? 0xff : 0x00;
+    memset(img, val, sizeof(img));
+    memset(dirty, 0xFF, sizeof(dirty));
 }
 
 void LCD_DrawStart(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, enum DrawDir _dir)

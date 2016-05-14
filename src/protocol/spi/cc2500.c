@@ -65,12 +65,12 @@ void CC2500_WriteReg(u8 address, u8 data)
     CS_HI();
 }
 
-static void ReadRegisterMulti(u8 address, u8 data[], u8 length)
+void CC2500_ReadRegisterMulti(u8 address, u8 data[], u8 length)
 {
     unsigned char i;
 
     CS_LO();
-    PROTOSPI_xfer(address);
+    PROTOSPI_xfer(CC2500_READ_BURST | address);
     for(i = 0; i < length; i++)
     {
         data[i] = PROTOSPI_xfer(0);
@@ -89,7 +89,7 @@ u8 CC2500_ReadReg(u8 address)
 
 void CC2500_ReadData(u8 *dpbuffer, int len)
 {
-    ReadRegisterMulti(CC2500_3F_RXFIFO | CC2500_READ_BURST, dpbuffer, len);
+    CC2500_ReadRegisterMulti(CC2500_3F_RXFIFO, dpbuffer, len);
 }
 
 void CC2500_Strobe(u8 state)

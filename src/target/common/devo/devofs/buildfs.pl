@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use Getopt::Long;
 
-my $FILEOBJ_DIR = 0x7F;
-my $FILEOBJ_FILE = 0xF7;
+my $FILEOBJ_DIR  = 0x41;
+my $FILEOBJ_FILE = 0x43;
 my $START_SECTOR = 0xFF;
 
 my $outf = "";
@@ -33,10 +33,12 @@ foreach my $file (@files) {
     foreach my $dir (@dirs) {
         if(! $dirid{$dir}) {
             $dirid{$dir} = $next_dir++;
+            # print stderr "DIR: " . join("/", @dirs) . "\n";
             add_dir($dir, $cur_dir, $dirid{$dir});
         }
         $cur_dir = $dirid{$dir};
     }
+    next if($filename =~ /^\./); #ignore dot-files
     my $data;
     {
         local $/=undef;
@@ -45,12 +47,13 @@ foreach my $file (@files) {
         $data = <$fh>;
         close $fh;
     }
+    # print stderr "FILE: $file\n";
     add_file($filename, $cur_dir, $data);
 }
 
 my @data = split(//, $outf);
 my $free_space = 65536-4096-scalar(@data);
-printf STDERR "Devo5s Size:  %dkB.  Free Space: %dkB\n", scalar(@data)/1024, $free_space / 1024;
+printf STDERR "Devo FS Size:  %dkB.  Free Space: %dkB\n", scalar(@data)/1024, $free_space / 1024;
 die "Not enough free spacei (at least 2kB required)\n" if ($free_space < 2048); 
 my $next_sec = $START_SECTOR;
 for my $i (0 .. 65535) {

@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include "telemetry.h"
 
+#ifdef EMULATOR
+#define USE_FIXED_MFGID
+#endif
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -43,45 +46,68 @@ enum {
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
     CHANNEL5,     // Leds
-    CHANNEL6,     // Flip
+    CHANNEL6,     // Flip (or Altitude Hold on H501S)
     CHANNEL7,     // Still camera
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
+    CHANNEL10,    // RTH
+    CHANNEL11,    // GPS HOLD
 };
 
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_ALT_HOLD    CHANNEL6
 #define CHANNEL_SNAPSHOT    CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
+#define CHANNEL_RTH         CHANNEL10
+#define CHANNEL_GPS_HOLD    CHANNEL11
 
 enum{
-    // flags going to packet[9] (Normal)
+    // flags going to packet[9] (H107)
     FLAG_VIDEO= 0x01,   // record video
     FLAG_FLIP = 0x08,   // enable flips
     FLAG_LED  = 0x04    // enable LEDs
 };
 
 enum{
-    // flags going to packet[9] (Plus series)
+    // flags going to packet[9] (H107 Plus series)
     FLAG_HEADLESS = 0x08, // headless mode
 };
 
 enum{
-    // flags going to packet[13] (Plus series)
+    // flags going to packet[13] (H107 Plus series)
     FLAG_SNAPSHOT  = 0x01,
     FLAG_FLIP_PLUS = 0x80,
+};
+
+enum{
+    // flags going to packet[9] (H501S)
+    FLAG_H501_VIDEO     = 0x01,
+    FLAG_H501_LED       = 0x04,
+    FLAG_H501_RTH       = 0x20,
+    FLAG_H501_HEADLESS1 = 0x40,
+    FLAG_H501_GPS_HOLD  = 0x80,
+};
+
+enum{
+    // flags going to packet[13] (H501S)
+    FLAG_H501_SNAPSHOT  = 0x01,
+    FLAG_H501_HEADLESS2 = 0x02,
+    FLAG_H501_ALT_HOLD  = 0x08,
 };
 
 #define VTX_STEP_SIZE "5"
 
 static const char * const hubsan4_opts[] = {
+    _tr_noop("Format"), "H107", "H501", NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
-    NULL
+    NULL 
 };
 
 enum {
+    PROTOOPTS_FORMAT,
     PROTOOPTS_VTX_FREQ,
     PROTOOPTS_TELEMETRY,
     LAST_PROTO_OPT,
@@ -89,12 +115,17 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
+    FORMAT_H107 = 0,
+    FORMAT_H501,
+};
+
+enum {
     TELEM_ON = 0,
     TELEM_OFF,
 };
 
-#define ID_NORMAL 0x55201041
-#define ID_PLUS   0xAA201041
+#define ID_NORMAL 0x55201041 // H102D, H107/L/C/D, H501S
+#define ID_PLUS   0xAA201041 // H107P/C+/D+
 
 static u8 packet[16];
 static u8 channel;
@@ -237,7 +268,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
     packet[3] = (sessionid >> 16) & 0xff;
     packet[4] = (sessionid >>  8) & 0xff;
     packet[5] = (sessionid >>  0) & 0xff;
-    if(id_data == ID_NORMAL) {
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_H501) {
         packet[6] = 0x08;
         packet[7] = 0xe4; //???
         packet[8] = 0xea;
@@ -248,7 +279,7 @@ static void hubsan_build_bind_packet(u8 bind_state)
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(id_data == ID_PLUS) {
+    else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
         if(state >= BIND_3) {
             packet[7] = 0x62;
             packet[8] = 0x16;
@@ -274,6 +305,7 @@ static s16 get_channel(u8 ch, s32 scale, s32 center, s32 range)
 
 static void hubsan_build_packet()
 {
+    static u32 h501_packet = 0;
     memset(packet, 0, 16);
     if(vtx_freq != Model.proto_opts[PROTOOPTS_VTX_FREQ] || packet_count==100) { // set vTX frequency
         vtx_freq = Model.proto_opts[PROTOOPTS_VTX_FREQ];
@@ -281,7 +313,8 @@ static void hubsan_build_packet()
         packet[1] = (vtx_freq >> 8) & 0xff;
         packet[2] = vtx_freq & 0xff;
         packet[3] = 0x82;
-        packet_count++;      
+        packet_count++;
+        h501_packet = 0;
     } else {
         packet[0] = 0x20; // normal data packet
         packet[2] = get_channel(2, 0x80, 0x80, 0x80); //Throttle
@@ -290,7 +323,7 @@ static void hubsan_build_packet()
     packet[6] = 0xff - get_channel(1, 0x80, 0x80, 0x80); //Elevator is reversed
     packet[8] = get_channel(0, 0x80, 0x80, 0x80); //Aileron 
     
-    if(id_data == ID_NORMAL) {
+    if(id_data == ID_NORMAL && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) { // H107/L/C/D, H102D
         if(packet_count < 100) {
             packet[9] = 0x02 | FLAG_LED | FLAG_FLIP; // sends default value for the 100 first packets
             packet_count++;
@@ -306,18 +339,31 @@ static void hubsan_build_packet()
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
     }
-    else if(id_data == ID_PLUS) {
-        packet[3] = 0x64;
-        packet[5] = 0x64;
-        packet[7] = 0x64;
-        packet[9] = 0x06
-                  | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
-                  | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-        packet[10]= 0x19;
-        packet[12]= 0x5C; // ghost channel ?
-        packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
-                   | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
-        packet[14]= 0x49; // ghost channel ?
+    else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+        packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[5] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        packet[7] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
+        if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) { // H501S
+            packet[9] = 0x02
+                      | GET_FLAG(CHANNEL_LED, FLAG_H501_LED)
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_H501_VIDEO)
+                      | GET_FLAG(CHANNEL_RTH, FLAG_H501_RTH)
+                      | GET_FLAG(CHANNEL_GPS_HOLD, FLAG_H501_GPS_HOLD)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS1);
+            packet[13] = GET_FLAG(CHANNEL_HEADLESS, FLAG_H501_HEADLESS2)
+                       | GET_FLAG(CHANNEL_ALT_HOLD, FLAG_H501_ALT_HOLD)
+                       | GET_FLAG(CHANNEL_SNAPSHOT, FLAG_H501_SNAPSHOT);
+        }
+        else { // H107P/C+/D+
+            packet[9] = 0x06
+                      | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+            packet[10]= Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x1a : 0x19;
+            packet[12]= 0x5C; // ghost channel ?
+            packet[13] = GET_FLAG(CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                       | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP_PLUS);
+            packet[14]= 0x49; // ghost channel ?
+        }
         if(packet_count < 100) { // set channels to neutral for first 100 packets
             packet[2] = 0x80; // throttle neutral is at mid stick on plus series
             packet[4] = 0x80;
@@ -326,6 +372,18 @@ static void hubsan_build_packet()
             packet[9] = 0x06;
             packet[13]= 0x00;
             packet_count++;
+        }
+        if(Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
+            h501_packet++;
+            if(h501_packet == 10) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe8;
+            }
+            else if(h501_packet == 20) {
+                memset(packet, 0, 16);
+                packet[0] = 0xe9;
+            }
+            if(h501_packet >= 20) h501_packet = 0;
         }
     }
     update_crc();
@@ -343,7 +401,7 @@ static void hubsan_update_telemetry()
 {
     const u8 *update = NULL;
     static const u8 telempkt[] = { TELEM_DEVO_VOLT1, 0 };
-    if( (packet[0]==0xe1) && hubsan_check_integrity()) {
+    if( ((packet[0]==0xe1 || packet[0]==0xe7)) && hubsan_check_integrity()) {
         Telemetry.value[TELEM_DEVO_VOLT1] = packet[13];
         update = telempkt;
     }
@@ -364,7 +422,7 @@ static u16 hubsan_cb()
     switch(state) {
     case BIND_1:
         bind_count++;
-        if(bind_count == 20) {
+        if(bind_count == 20 && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_H501) {
             if(id_data == ID_NORMAL)
                 id_data = ID_PLUS;
             else
@@ -389,8 +447,6 @@ static u16 hubsan_cb()
            if(! (A7105_ReadReg(A7105_00_MODE) & 0x01))
                break;
         }
-        //if (i == 20)
-        //    printf("Failed to complete write\n");
         A7105_SetTxRxMode(RX_EN);
         A7105_Strobe(A7105_RX);
         state &= ~WAIT_WRITE;
@@ -445,7 +501,14 @@ static u16 hubsan_cb()
                 A7105_SetPower( Model.tx_power); //Keep transmit power in sync
             hubsan_build_packet();
             A7105_Strobe(A7105_STANDBY);
-            A7105_WriteData( packet, 16, state == DATA_5 && id_data == ID_NORMAL ? channel + 0x23 : channel);
+            u8 ch;
+            if((state == DATA_5 && id_data == ID_NORMAL) && Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
+                ch = channel + 0x23;
+            }
+            else {
+                ch = channel;
+            }
+            A7105_WriteData( packet, 16, ch);
             if (state == DATA_5)
                 state = DATA_1;
             else
@@ -487,7 +550,7 @@ static u16 hubsan_cb()
     return 0;
 }
 
-static void initialize() {
+static void initialize(u8 bind) {
     CLOCK_StopTimer();
     while(1) {
         A7105_Reset();
@@ -495,14 +558,38 @@ static void initialize() {
         if (hubsan_init())
             break;
     }
-    sessionid = rand32_r(0, 0);
-    channel = allowed_ch[rand32_r(0, 0) % sizeof(allowed_ch)];
-    PROTOCOL_SetBindState(0xFFFFFFFF);
-    state = BIND_1;
+    
+    u32 lfsr = 0xb2c54a2ful;
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    for (int i = 0; i < 12; ++i) {
+        rand32_r(&lfsr, var[i]);
+    }
+#endif
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    
+    sessionid = lfsr;
+    channel = allowed_ch[sessionid % sizeof(allowed_ch)]; // not optimal, but not worse than stock tx after all ...
+    id_data = ID_NORMAL;
+    if(bind || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107) {
+        PROTOCOL_SetBindState(0xFFFFFFFF);
+        state = BIND_1;
+    }
+    else {
+        state = DATA_1;
+        A7105_WriteID(sessionid);
+        A7105_WriteReg(A7105_1F_CODE_I, 0x0F);
+        PROTOCOL_SetBindState(0);
+    }
     vtx_freq = 0;
     packet_count=0;
     bind_count = 0;
-    id_data = ID_NORMAL;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_DEVO);
     if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)
@@ -513,15 +600,15 @@ static void initialize() {
 const void *HUBSAN_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT: initialize(0); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; //Always autobind
-        case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)9L; // A, E, T, R, Leds, Flips, Snapshot, Video Recording, Headless
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)9L;
+        case PROTOCMD_CHECK_AUTOBIND: return Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H107 ? (void*)1L : 0;
+        case PROTOCMD_BIND:  initialize(1); return 0;
+        case PROTOCMD_NUMCHAN: return (void *)11L; // A, E, T, R, Leds, Flips(or alt-hold), Snapshot, Video Recording, Headless, RTH, GPS Hold
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_VTX_FREQ] == 0)

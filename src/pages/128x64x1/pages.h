@@ -5,9 +5,10 @@
 #include "menus.h"
 #include "guiobj.h"
 
-#define PAGEDEF(id, init, event, exit, name) id,
+#define PAGEDEF(id, init, event, exit, menu, name) id,
 enum PageID {
 #include "pagelist.h"
+    PAGEID_LAST
 };
 #undef PAGEDEF
 
@@ -33,10 +34,18 @@ struct pagemem {
     u8 modal_page;
 };
 
-#define HEADER_HEIGHT (Display.metrics.header_height)
-#define HEADER_WIDGET_HEIGHT (Display.metrics.header_widget_height)
-#define LINE_HEIGHT (Display.metrics.line_height)
-#define LINE_SPACE (Display.metrics.line_space)
+#ifndef HEADER_HEIGHT
+    #define HEADER_HEIGHT (Display.metrics.header_height)
+#endif
+#ifndef HEADER_WIDGET_HEIGHT
+    #define HEADER_WIDGET_HEIGHT (Display.metrics.header_widget_height)
+#endif
+#ifndef LINE_HEIGHT
+    #define LINE_HEIGHT (Display.metrics.line_height)
+#endif
+#ifndef LINE_SPACE
+    #define LINE_SPACE (Display.metrics.line_space)
+#endif
 
 #define PREVIOUS_ITEM -1
 #define TOGGLE_FILE    "media/switches.bmp"
@@ -56,10 +65,13 @@ void PAGE_NavigateItems(s8 direction, u8 view_id, u8 total_items, s8 *selectedId
 // Menu
 void PAGE_MenuInit(int page);
 void PAGE_MenuExit();
+void PAGE_TxMenuInit(int page);
+void PAGE_ModelMenuInit(int page);
 
 void PAGE_AboutInit(int page);
 void PAGE_SplashInit(int page);
 void PAGE_SplashEvent();
 void PAGE_SplashExit();
+void PAGE_VideoSetupInit(int page);
 
 #endif

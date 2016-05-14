@@ -59,4 +59,8 @@ inline int fs_open(char *file, unsigned flags) {
 static inline void LCD_ForceUpdate() {}
 #endif
 
+#ifndef USE_4BUTTON_MODE
+    #define USE_4BUTTON_MODE 0
+#endif
+
 #endif //_COMMON_DEVO_H_

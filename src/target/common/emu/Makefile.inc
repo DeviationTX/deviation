@@ -12,13 +12,13 @@ TYPE ?= dev
 
 ifdef WINDOWS
     #CROSS=i586-mingw32msvc-
-    FLTK_DIR = /usr/local
     ifdef CROSS
-        FLTK_DIR = /opt/fltk-w32
-        PORTAUDIO_DIR = /opt/portaudio-w32
+        FLTK_DIR      ?= /opt/fltk-w32
+        PORTAUDIO_DIR ?= /opt/portaudio-w32
         LFLAGS += -mno-cygwin
         CFLAGS += -mno-cygwin
     else
+        FLTK_DIR ?= /usr/local
         LFLAGS += -static-libgcc -static-libstdc++
     endif
     LFLAGS := -L$(FLTK_DIR)/lib -L$(PORTAUDIO_DIR)/lib $(LFLAGS) -lole32 -luuid -lcomctl32 -lwsock32 -lgdi32 -lcomdlg32 -lportaudio 

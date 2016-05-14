@@ -27,6 +27,7 @@
 #include "interface.h"
 #include "mixer.h"
 #include "config/model.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc applythis to definitions, others to calls
@@ -320,7 +321,7 @@ const void *NE260_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *)4L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

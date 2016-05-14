@@ -24,6 +24,7 @@
 #include "config/model.h"
 #include "config/tx.h" // for Transmitter
 #include "music.h"
+#include "telemetry.h"
 
 #ifdef MODULAR
   //Some versions of gcc apply this to definitions, others to calls
@@ -395,7 +396,7 @@ const void *ESKY_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)6L;
         // TODO: return id correctly
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)-1;
+        case PROTOCMD_TELEMETRYSTATE: return (void *) PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
     return 0;

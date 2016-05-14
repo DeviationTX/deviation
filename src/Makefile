@@ -10,31 +10,33 @@ ifndef  TARGET
 TARGET   ?= devo8
 default: $(TARGET)
 
+ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
+
 # The supported transmitters
-TXS = devo6 devo7e devo8 devo10 devo12 devof7 devof12e
-# x9d needs more software installed.
-#TXS = devo6 devo7e devo8 devo10 devo12 x9d
+TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e
 # These txs use file systems for other txs, so don't have a file system target.
 NOFSTXS = devo6 devo7e
 
+#Filter non-existant emus
+EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+ALLEMUS = $(foreach dir,$(ALLTXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
+
 txs: $(TXS)
-emus: $(TXS:%=emu_%)
+emus: $(EMUS)
 both: txs emus
 fss: $(TXS:%=fs_%)
 zips: $(TXS:%=zip_%)
-emuzips: $(TXS:%=zip_emu_%)
-winzips: $(TXS:%=zip_win_%)
+emuzips: $(EMUS:%=zip_%)
+winzips: $(EMUS:%=zip_win_%)
 everything: txs emus fss
 
 # Generate the targets for a transmitter.
 define make-target
 $1:
 	$(MAKE) TARGET=$1
-emu_$1:
-	$(MAKE) TARGET=emu_$1
 # This builds Windows emulators on a Linux system.
 win_$1:
-	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc-
+	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
 ifneq "$(findstring $1,$(NOFSTXS))" "$1"
@@ -44,18 +46,19 @@ endif
 both_$1: $1 emu_$1
 zip_$1:
 	$(MAKE) TARGET=$1 zip
-zip_emu_$1:
-	$(MAKE) TARGET=emu_$1 zip
 zip_win_$1:
-	$(MAKE) TARGET=emu_$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
-release_$1: zip_$1 zip_emu_$1 fs_$1
+	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc- zip
+release_$1: zip_$1 zip_win_$1 fs_$1
 all_$1:
 	$(MAKE) TARGET=$1 all
 endef
 
 # Now generate all the convenience targets
-$(foreach t,$(TXS),$(eval $(call make-target,$t)))
+$(foreach t,$(ALLTARGETS),$(eval $(call make-target,$t)))
 endif
+
+# We want to turn on INCLUDE_FS by default
+INCLUDE_FS ?= 1
 
 # Use VERBOSE=1 to enable verbose make
 PROGMODE ?= STATUS_SCREEN
@@ -126,11 +129,7 @@ PROTO_EXTRA_OBJS := $(addprefix $(ODIR)/, $(notdir $(PROTO_EXTRA_C:.c=.o)))
 SYMBOL_FILE := $(ODIR)/symbolfile
 endif
 
-ifeq "$(wildcard ../.hg )" ""
-  HGVERSION := ${TARGET}-Unknown
-else
-  HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
-endif
+HGVERSION := $(shell ../utils/get_version.pl ${TARGET})
 
 # Rebuild on hg version change.
 # Based on http://mercurial.selenic.com/wiki/VersioningWithMake
@@ -225,6 +224,7 @@ zip: $(TARGET).zip
 	rm -f debug-$(HGVERSION).zip
 	zip debug-$(HGVERSION).zip $(TARGET).elf
 	# $(MAKE) zipping more compatible with other distributions
+	export p=`pwd`; cd $(ODIR) && test -e devo.fs && zip -u $$p/deviation-$(HGVERSION).zip devo.fs && rm devo.fs || true
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu UPDATING.md
 ifdef MODULAR
 	export p=`pwd`; cd $(ODIR) && zip -ur $$p/deviation-$(HGVERSION).zip protocol/*.mod
@@ -241,7 +241,7 @@ endif
 fs: $(TARGET).fs
 
 %.fs:
-	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(TARGET)
+	rm -f deviation-fs-$(HGVERSION).zip; zip -r deviation-fs-$(HGVERSION).zip filesystem/$(FILESYSTEM)
 
 release:  $(TXS:%=release_%)
 
