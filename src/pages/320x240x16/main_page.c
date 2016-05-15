@@ -64,9 +64,10 @@ void PAGE_MainInit(int page)
     if (HAS_TOUCH) {
         GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
     }
-    if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
-        GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
-
+    if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0) {
+        void (*cb)(guiObject_t *, const void *) = HAS_TOUCH ? press_icon2_cb : NULL;
+        GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], cb, (void *)1);
+    }
     GUI_CreateLabelBox(&gui->name, (LCD_WIDTH-128)/2, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
@@ -119,7 +120,10 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
         if ((long)data == 0) {
             PAGE_PushByID(PAGEID_MENU, 0);
         } else if ((long)data == 1) {
-            PAGE_PushByID(PAGEID_MODEL, 0);
+            if(HAS_STANDARD_GUI && Model.mixer_mode == MIXER_STANDARD)
+                PAGE_PushByID(PAGEID_MODELMNU, 0);
+            else
+                PAGE_PushByID(PAGEID_MIXER, 0);
         } else {
             PAGE_SetModal(1);
             PAGE_MainExit();
