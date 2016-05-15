@@ -26,6 +26,8 @@ struct guiObject *objModalButton = NULL;
 struct guiObject *objDIALOG   = NULL;
 static void (*select_notify)(guiObject_t *obj) = NULL;
 
+static struct guiObject *objACTIVE = NULL;
+
 enum FULL_REDRAW {
     REDRAW_ONLY_DIRTY   = 0x00,
     REDRAW_IF_NOT_MODAL = 0x01,
@@ -598,37 +600,46 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
     return 0;
 }
 
+unsigned GUI_GetRemappedButtons()
+{
+    if (USE_4BUTTON_MODE) {
+        if (objACTIVE) {
+            return CHAN_ButtonMask(BUT_UP) | CHAN_ButtonMask(BUT_DOWN);
+        }
+    }
+    return 0;
+}
+
 unsigned handle_buttons(u32 button, unsigned flags, void *data)
 {
     (void)data;
     //When modal, we capture all button presses
     int modalActive = GUI_IsModal() ? 1 : 0;
 
-#if USE_4BUTTON_MODE
-    // IN 4 button mode, up/down can also act as left/right for TextSelect
-    static struct guiObject *objACTIVE = NULL;
-    if (objACTIVE) {
-        if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            button = CHAN_ButtonMask(BUT_LEFT);
-        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            button = CHAN_ButtonMask(BUT_RIGHT);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            if (flags & BUTTON_RELEASE)
-                objACTIVE = NULL;
-        } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            if (flags & BUTTON_RELEASE)
-                objACTIVE = NULL;
-            return 1;
-        }
-    } else {
-        if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
-            if (flags & BUTTON_RELEASE) {
-                objACTIVE = objSELECTED;
+    if(USE_4BUTTON_MODE) {
+        // IN 4 button mode, up/down can also act as left/right for TextSelect
+        if (objACTIVE) {
+            if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+                button = CHAN_ButtonMask(BUT_LEFT);
+            } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+                button = CHAN_ButtonMask(BUT_RIGHT);
+            } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                if (flags & BUTTON_RELEASE)
+                    objACTIVE = NULL;
+            } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+                if (flags & BUTTON_RELEASE)
+                    objACTIVE = NULL;
+                return 1;
             }
-            return 1;
+        } else {
+            if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
+                if (flags & BUTTON_RELEASE) {
+                    objACTIVE = objSELECTED;
+                }
+                return 1;
+            }
         }
     }
-#endif
     //printf("Button: %08x Flags: %08x Active: %08x\n", button, flags, objACTIVE);
     if (CHAN_ButtonIsPressed(button, BUT_LEFT) ||
         CHAN_ButtonIsPressed(button, BUT_RIGHT) ||

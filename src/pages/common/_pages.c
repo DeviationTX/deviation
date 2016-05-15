@@ -45,6 +45,9 @@ static const struct page pages[] = {
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
+    if (USE_4BUTTON_MODE && GUI_GetRemappedButtons()) {
+        return 0;
+    }
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             PAGE_Pop();

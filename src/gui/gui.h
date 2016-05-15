@@ -502,4 +502,5 @@ s8 GUI_GetViewId(s16 x, s16 y);
 void GUI_ViewInit();
 int GUI_IsEmpty();
 void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
+unsigned GUI_GetRemappedButtons();
 #endif /* GUI_H_ */
