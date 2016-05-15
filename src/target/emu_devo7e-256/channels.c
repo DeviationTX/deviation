@@ -34,6 +34,9 @@
 #define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
                     | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
+#define POT_2  ((1 << INP_AUX4) | (1 << INP_AUX5))
+#define POT_1  (1 << INP_AUX4)
+
 s32 CHAN_ReadInput(int channel)
 {
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
@@ -124,6 +127,15 @@ s32 CHAN_ReadInput(int channel)
             if((~Transmitter.ignore_src & SWITCH_2x2) != SWITCH_2x2)
                 return CHAN_MIN_VALUE;
              return (gui.rud_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+
+        case INP_AUX4:
+            if((~Transmitter.ignore_src & POT_1) != POT_1)
+                return CHAN_MIN_VALUE;
+             return CHAN_MIN_VALUE + step * gui.aux4;
+        case INP_AUX5:
+            if((~Transmitter.ignore_src & POT_2) != POT_2)
+                return CHAN_MIN_VALUE;
+             return CHAN_MIN_VALUE + step * gui.aux5;
     }
     return 0;
 }
@@ -146,6 +158,10 @@ void CHAN_SetSwitchCfg(const char *str)
         Transmitter.ignore_src &= ~SWITCH_2x2;
     } else if(strcmp(str, "2x1") == 0) {
         Transmitter.ignore_src &= ~SWITCH_2x1;
+    } else if(strcmp(str, "potx2") == 0) {
+        Transmitter.ignore_src &= ~POT_2;
+    } else if(strcmp(str, "potx1") == 0) {
+        Transmitter.ignore_src &= ~POT_1;
     } else {
         Transmitter.ignore_src = ~IGNORE_MASK & ~SWITCH_STOCK;
     }

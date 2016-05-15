@@ -51,6 +51,9 @@ enum {
   SW_F0
 };
 
+#define POT_2  ((1 << INP_AUX4) | (1 << INP_AUX5))
+#define POT_1  (1 << INP_AUX4)
+
 #if HAS_EXTRA_POTS
   const u8 adc_chan_sel[NUM_ADC_CHANNELS] = {10, 12, 13, 11, 0, 4, 16, 14};
 #else
@@ -131,10 +134,8 @@ s32 CHAN_ReadRawInput(int channel)
       case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
       case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
       case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
-      #if HAS_EXTRA_POTS
-        case INP_AUX4: value = adc_array_raw[4]; break;  // bug fix: left horizon
-        case INP_AUX5:  value = adc_array_raw[5]; break;  // bug fix: left vertical
-      #endif
+      case INP_AUX4: value = adc_array_raw[4]; break;  // bug fix: left horizon
+      case INP_AUX5:  value = adc_array_raw[5]; break;  // bug fix: left vertical
     }
     return value;
 }
@@ -184,6 +185,10 @@ void CHAN_SetSwitchCfg(const char *str)
         Transmitter.ignore_src &= ~SWITCH_2x2;
     } else if(strcmp(str, "2x1") == 0) {
         Transmitter.ignore_src &= ~SWITCH_2x1;
+    } else if(strcmp(str, "potx2") == 0) {
+        Transmitter.ignore_src &= ~POT_2;
+    } else if(strcmp(str, "potx1") == 0) {
+        Transmitter.ignore_src &= ~POT_1;
     } else {
         Transmitter.ignore_src = ~IGNORE_MASK & ~SWITCH_STOCK;
     }
