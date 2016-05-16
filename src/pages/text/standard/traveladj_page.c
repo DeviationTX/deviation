@@ -27,14 +27,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static u16 current_selected = 0;
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if(col == 0)
-        return (guiObject_t *)&gui->dn[relrow];
-    else
-        return (guiObject_t *)&gui->up[relrow];
-}
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -64,7 +56,7 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, Model.num_channels, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 

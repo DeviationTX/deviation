@@ -33,12 +33,7 @@ void press_cb(struct guiObject *obj, s8 press_type, const void *data)
     CONFIG_ReadLang(idx);
     cp->return_page(0);
 }
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return  (guiObject_t *)&gui->label[relrow];
-}
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -67,7 +62,7 @@ void LANGPage_Select(void(*return_page)(int page))
         FS_CloseDir();
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, cp->total_items++, row_cb, getobj_cb, NULL, NULL);
+                     LINE_SPACE, cp->total_items++, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
 }
 

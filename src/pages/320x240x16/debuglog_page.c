@@ -28,6 +28,6 @@ void PAGE_DebuglogInit(int page)
     PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
     find_line_ends();
     GUI_CreateScrollable(&gui->scrollable,
-         0, 40, LCD_WIDTH, LCD_HEIGHT - 40, ROW_HEIGHT, NUM_ROWS, row_cb, getobj_cb, NULL, NULL);
+         0, 40, LCD_WIDTH, LCD_HEIGHT - 40, ROW_HEIGHT, NUM_ROWS, row_cb, NULL, NULL, NULL);
 }
 #endif //DEBUG_WINDOW_SIZE

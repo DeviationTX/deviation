@@ -32,42 +32,6 @@ enum {
 
 #include "../common/_timer_page.c"
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)relrow;
-    (void)data;
-    /* This is really evil*/
-    int idx = gui->scrollable.cur_row;
-    int rows = (Model.timer[idx].type < TIMER_COUNTDOWN) ? 2 : 3;
-    if (Model.mixer_mode == MIXER_ADVANCED)
-        rows++;
-#if HAS_PERMANENT_TIMER
-    if (Model.timer[idx].type == TIMER_PERMANENT)
-        rows = 4;
-#endif
-    col = (rows + col) % rows;
-    switch(col) {
-        case 0: return (guiObject_t *)&gui->type;
-        case 1: return (guiObject_t *)&gui->src;
-        case 2:
-#if HAS_PERMANENT_TIMER
-            if(Model.timer[idx].type == TIMER_PERMANENT)
-                return (guiObject_t *)&gui->resetperm;
-#endif
-            if(Model.mixer_mode == MIXER_ADVANCED)
-                return (guiObject_t *)&gui->resetsrc;
-            else
-                return (guiObject_t *)&gui->start;
-        case 3:
-#if HAS_PERMANENT_TIMER
-            if(Model.timer[idx].type == TIMER_PERMANENT)
-                return (guiObject_t *)&gui->setperm;
-#endif
-            return (guiObject_t *)&gui->start;
-    }
-    return 0;
-}
-
 /*            Advanced                     Standard
    Row1       Timer                        Timer
    Row2       Switch                       Switch
@@ -138,7 +102,7 @@ static void _show_page(int page)
     PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_TIMER))); // using the same name as related menu item to reduce language strings
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
+                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 

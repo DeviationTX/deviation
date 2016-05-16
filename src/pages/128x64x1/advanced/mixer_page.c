@@ -33,7 +33,6 @@ enum {
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 static int row_cb(int absrow, int relrow, int y, void *data);
-static guiObject_t *getobj_cb(int relrow, int col, void *data);
 
 static void _show_title()
 {
@@ -48,7 +47,7 @@ static void _show_page()
     u8 channel_count = Model.num_channels + NUM_VIRT_CHANNELS;
     
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, channel_count, row_cb, getobj_cb, NULL, NULL);// 7 lines
+                     LINE_SPACE, channel_count, row_cb, NULL, NULL, NULL);// 7 lines
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
@@ -90,15 +89,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     }
     return selectable;
 }
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if(col==0)
-        return (guiObject_t *)&gui->limit[relrow];
-    return (guiObject_t *)&gui->tmpl[relrow];
-}
-
 
 unsigned action_cb(u32 button, unsigned flags, void *data)
 {

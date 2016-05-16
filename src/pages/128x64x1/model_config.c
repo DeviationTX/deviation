@@ -52,12 +52,6 @@ static void show_titlerow(const char *header)
     //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, _tr("Save"));
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     const void *label = NULL;
@@ -112,7 +106,7 @@ void MODELPAGE_Config()
     if (Model.type == MODELTYPE_HELI) {
         GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, 
                          LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, ITEM_LAST, row_cb, NULL, NULL, NULL);
         GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
     }
 }
@@ -230,7 +224,7 @@ void MODELVIDEO_Config()
     PAGE_SetActionCB(_action_cb);
     show_titlerow(_tr("Video"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, 4, row4_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
@@ -241,7 +235,7 @@ void PAGE_VideoSetupInit(int page)
     PAGE_RemoveAllObjects();
     show_titlerow(_tr("Video"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, 4, row4_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
@@ -266,7 +260,7 @@ void MODELPROTO_Config()
     }
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, idx, row2_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
@@ -282,6 +276,6 @@ void MODELTRAIN_Config()
                     : _tr("PPMIn Cfg (Extend)"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
-                         row3_cb, getobj_cb, NULL, NULL);
+                         row3_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

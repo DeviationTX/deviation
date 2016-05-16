@@ -38,12 +38,6 @@ void update_graph(int graph)
     (void)graph;
     GUI_Redraw(&gui->graph);
 }
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    col = (2 + col) % 2;
-    return col ? (guiObject_t *)&gui->value2[relrow] : (guiObject_t *)&gui->value1[relrow];
-}
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -77,7 +71,7 @@ void PAGE_DrExpInit(int page)
     GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, 60, HEADER_WIDGET_HEIGHT,
                      &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 76, LCD_HEIGHT - HEADER_HEIGHT,
-                     2 * LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
+                     2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 
     GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
             CHAN_MIN_VALUE, CHAN_MIN_VALUE, CHAN_MAX_VALUE, CHAN_MAX_VALUE,

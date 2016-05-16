@@ -43,13 +43,6 @@ static int menu_get_next_rowidx(unsigned *i)
     return -1;
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return  (guiObject_t *)&gui->name[relrow];
-}
-
 void _menu_init(int page)
 {
     PAGE_SetModal(0);
@@ -66,7 +59,7 @@ void _menu_init(int page)
         i++;
     }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, idx, row_cb, getobj_cb, NULL, NULL);
+                     LINE_SPACE, idx, row_cb, NULL, NULL, NULL);
 }
 
 void PAGE_MenuInit(int page)

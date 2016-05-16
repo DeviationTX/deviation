@@ -80,14 +80,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return selectable;
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if(col==0)
-        return (guiObject_t *)&gui->name[relrow];
-    return (guiObject_t *)&gui->tmpl[relrow];
-}
-
 static void _show_page()
 {
     // Note for future maintenance: DO NOT use logical view to draw all the channel items at a time for this page:  I just
@@ -97,7 +89,7 @@ static void _show_page()
     u8 channel_count = Model.num_channels + NUM_VIRT_CHANNELS;
 
     GUI_CreateScrollable(&gui->scrollable, 0, init_y, LCD_WIDTH, LCD_HEIGHT - init_y,
-                     24, channel_count, row_cb, getobj_cb, NULL, NULL);
+                     24, channel_count, row_cb, NULL, NULL, NULL);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 

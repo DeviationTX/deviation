@@ -79,26 +79,6 @@ static int size_cb(int absrow, void *data)
     return (absrow >= num_elems  && absrow < num_elems + NUM_QUICKPAGES) ? 1 + LINE_OFFSET : 1;
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if (OBJ_IS_USED(&gui->col1[relrow].label) && gui->col1[relrow].label.header.Type == Button) {
-        if(! OBJ_IS_USED(&gui->value[relrow])) {
-            return (guiObject_t *)&gui->col1[relrow].label;
-        }
-        col = (2 + col) % 2;
-        //Both button and text-select
-        if (gui->value[relrow].header.box.x == 0) {
-            //ts is 1st
-            return (col ? (guiObject_t *)&gui->col1[relrow].label : (guiObject_t *)&gui->value[relrow]);
-        } else {
-            //button is 1st
-            return (!col ? (guiObject_t *)&gui->col1[relrow].label : (guiObject_t *)&gui->value[relrow]);
-        }
-    }
-    return (guiObject_t *)&gui->value[relrow];
-}
-
 static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -231,7 +211,7 @@ void show_config()
     static const int ADD_LOAD = 1;
 #endif
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
+                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, NULL, size_cb, (void *)count);
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 

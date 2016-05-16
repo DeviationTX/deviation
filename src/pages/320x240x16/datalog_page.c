@@ -92,20 +92,6 @@ static const char *select_str_cb(guiObject_t *obj, const void *data)
     return data ? _tr("None") : _tr("All");
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    if (OBJ_IS_USED(&gui->checked[relrow]) && OBJ_IS_USED(&gui->checked2[relrow])) {
-        col = (col + 2) % 2;
-        return (guiObject_t *)(col ? &gui->checked2[relrow] : &gui->checked[relrow]);
-    } else if (OBJ_IS_USED(&gui->checked[relrow])) {
-        return (guiObject_t *)&gui->checked[relrow];
-    } else {
-        return (guiObject_t *)&gui->checked2[relrow];
-    }
-}
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -171,7 +157,7 @@ void PAGE_DatalogInit(int page)
     int row1 = ROW1 - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     int count = row1 > ROW2 ? row1 : ROW2;
     GUI_CreateScrollable(&gui->scrollable,
-         SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, getobj_cb, NULL, NULL);
+         SCROLLABLE_X, row, SCROLLABLE_WIDTH, ROW_HEIGHT * DATALOG_NUM_SCROLLABLE, ROW_HEIGHT, count, row_cb, NULL, NULL, NULL);
     next_update = CLOCK_getms() / 1000 + 5;
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }

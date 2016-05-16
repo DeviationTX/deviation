@@ -81,21 +81,6 @@ static void revert_cb(guiObject_t *obj, const void *data)
     show_iconsel_page(0);
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    int idx;
-    if (col == -1) {
-        idx = relrow * NUM_COLS + NUM_COLS -1;
-        if (relrow == 3) {
-            while(! OBJ_IS_USED(&gui->symbolicon[idx]))
-                idx--;
-        }
-    } else {
-        idx = relrow * NUM_COLS + col;
-    }
-    return (guiObject_t *)&gui->symbolicon[idx];
-}
 
 static void show_iconsel_page(int SelectedIcon)
 {
@@ -141,7 +126,7 @@ static void show_iconsel_page(int SelectedIcon)
     int rows = (count + NUM_COLS - 1) / NUM_COLS;
     GUI_CreateScrollable(&gui->scrollable, SCROLLABLE_X, SCROLLABLE_Y, LCD_WIDTH - SCROLLABLE_X,
                      SCROLLABLE_H,
-                     SCROLL_ROW_H, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
+                     SCROLL_ROW_H, rows, row_cb, NULL, NULL, (void *)(long)SelectedIcon);
 }
 
 static void navigate_toggleicons(s8 direction) {

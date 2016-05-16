@@ -239,14 +239,6 @@ static const char *header_cb(guiObject_t *obj, const void *data)
     return "";
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    (void)relrow;
-    (void)col;
-    return (guiObject_t *)&gui->box[0];
-}
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)relrow;
@@ -308,7 +300,7 @@ static void _show_page()
     DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+                         row_height, page->num_items, row_cb, NULL, NULL, (void *)page->layout);
     DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
