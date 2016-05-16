@@ -1,5 +1,5 @@
-SCREENSIZE := text
-FILESYSTEM := devof7
+SCREENSIZE  := text
+FILESYSTEMS := common
 
 CRC_OFFSET       := 8192
 OPTIMIZE_DFU     := 1
@@ -35,6 +35,5 @@ else
 #	../utils/dfu.py --name "$(HGVERSION) Library" --alt 2 -b 0x0000:$(ODIR)/$(TARGET)-lib.1.bin --alt 1 -b 0x1000:$(ODIR)/$(TARGET)-lib.2.bin $@
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
-	rm filesystem/devof7/media/*.fon
-	rm filesystem/devof7/datalog.bin
+	rm filesystem/$(FILESYSTEM)/datalog.bin
 endif

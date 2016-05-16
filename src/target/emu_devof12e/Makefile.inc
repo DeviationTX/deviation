@@ -1,6 +1,6 @@
-SCREENSIZE := text
-FILESYSTEM := devof7
-NUM_MODELS ?= 10
+SCREENSIZE  := text
+NUM_MODELS  ?= 10
+FILESYSTEMS := common text_gfx
 
 PRE_FS = $(ODIR)/.pre_fs
 

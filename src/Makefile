@@ -1,4 +1,3 @@
-## the following disable builtin rules which we don't need
 ## and make debugging harder
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
@@ -165,13 +164,7 @@ EXEEXT   ?= elf
 ############################################
 #this section defines final build files    #
 ############################################
-
-FONTS    = filesystem/devo10/media/12normal.fon \
-           filesystem/devo8/media/15normal.fon \
-           filesystem/devo8/media/23bold.fon \
-           filesystem/at9/media/23bold.fon \
-           filesystem/devo10/media/04b03.fon
-
+FILESYSTEM = $(subst emu_,,$(TARGET))
 MODELDIR = filesystem/$(FILESYSTEM)/models
 
 LAST_MODEL := $(MODELDIR)/model$(NUM_MODELS).ini
@@ -205,11 +198,12 @@ $(VERBOSE).SILENT:
 clean:
 	rm -f $(TARGET).$(EXEEXT) $(TARGET).bin $(TARGET).dfu $(TARGET).list \
 		$(TARGET).map $(ODIR)/*.o $(ODIR)/*.o_ $(ODIR)/*.P  $(ODIR)/*.bin \
-		filesystem/devo7e filesystem/devo12 2> /dev/null || true
+		filesystem/$(FILESYSYTEM) 2> /dev/null || true
 
 distclean:
 	rm -f *.$(EXEEXT) *.bin *.dfu *.list *.map
 	rm -rf objs
+	rm -rf  filesystem
 	$(MAKE) -C libopencm3 clean > /dev/null
 	rm -rf deviation*.zip
 
@@ -287,20 +281,18 @@ endif
 $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 	@echo " + Copying template files for $(FILESYSTEM)"
 	mkdir -p filesystem/$(FILESYSTEM) || true
-	cp -prf filesystem/common/media filesystem/$(FILESYSTEM)/
-	cp -prf filesystem/common/template filesystem/$(FILESYSTEM)/
-	mkdir filesystem/$(FILESYSTEM)/layout 2> /dev/null; \
-        cp -prf filesystem/common/layout/*.* filesystem/$(FILESYSTEM)/layout/
+	for i in $(FILESYSTEMS); do cp -prf fs/$$i/* filesystem/$(FILESYSTEM)/; done
+	rm filesystem/$(FILESYSTEM)/*/.ignore 2>/dev/null || true
 	cp tx_template.ini filesystem/$(FILESYSTEM)/tx.ini
-	cp filesystem/common/datalog.bin filesystem/$(FILESYSTEM)/datalog.bin
-	cp filesystem/common/hardware.ini filesystem/$(FILESYSTEM)/hardware.ini
 	echo 'empty' > filesystem/$(FILESYSTEM)/errors.txt
 	mkdir filesystem/$(FILESYSTEM)/models 2> /dev/null || true
 	echo 'name=Model1' > filesystem/$(FILESYSTEM)/models/model1.ini \
 		&& cat model_template.ini >> filesystem/$(FILESYSTEM)/models/model1.ini
 	cp model_template.ini filesystem/$(FILESYSTEM)/models/default.ini
+ifdef LANGUAGE
 	mkdir filesystem/$(FILESYSTEM)/language 2> /dev/null; \
-               ../utils/extract_strings.pl -target $(FILESYSTEM) -update -objdir $(ODIR)
+               ../utils/extract_strings.pl -fs $(FILESYSTEM) -targets $(LANGUAGE) -update -objdir $(ODIR)
+endif
 	export tx=$(FILESYSTEM); \
 	number=2 ; while [ $$number -le $(NUM_MODELS) ] ; do \
 		cp model_template.ini filesystem/$$tx/models/model$$number.ini; \
@@ -312,19 +304,20 @@ $(LAST_MODEL): model_template.ini tx_template.ini $(FONTS) $(PRE_FS)
 ######################
 #Necessary Font files#
 ######################
-filesystem/devo10/media/12normal.fon: fonts/12normal.bdf
+filesystem/$(FILESYSTEM)/media/12normal.fon: fonts/12normal.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 12 -mode bin $< -out $@ -minspace 10
 
-filesystem/devo8/media/15normal.fon: fonts/15normal.bdf
+filesystem/$(FILESYSTEM)/media/15normal.fon: fonts/15normal.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 15 -mode bin $< -out $@ -minspace 8
 
-filesystem/devo8/media/23bold.fon: fonts/23bold.bdf
+filesystem/$(FILESYSTEM)/media/23bold.fon: fonts/23bold.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
 
-filesystem/at9/media/23bold.fon: fonts/23bold.bdf
-	../utils/font/bdf_to_font.pl -maxsize 23 -mode bin $< -out $@ -minspace 8
-
-filesystem/devo10/media/04b03.fon: fonts/04b03.bdf
+filesystem/$(FILESYSTEM)/media/04b03.fon: fonts/04b03.bdf
+	mkdir -p filesystem/$(FILESYSTEM)/media/
 	../utils/font/bdf_to_font.pl -maxsize 5 -mode bin $< -out $@ -minspace 5
 
 ##############################

@@ -8,9 +8,10 @@ REQUIRED_PROTOCOLS = $(addprefix $(ODIR)/protocol/, $(DEFAULT_PROTOCOLS))
 
 else
 
-$(ODIR)/devo.fs: $(wildcard filesystem/$(FILESYSTEM)/media/*.*) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper $(REQUIRED_PROTOCOLS)
+$(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper $(REQUIRED_PROTOCOLS)
 	rm -rf $(ODIR)/tmpfs | true
 	cp -prf filesystem/$(FILESYSTEM) $(ODIR)/tmpfs
+	mkdir $(ODIR)/tmpfs/protocol || true
 ifneq "$(REQUIRED_PROTOCOLS)" ""
 	cp -pf $(REQUIRED_PROTOCOLS) $(ODIR)/tmpfs/protocol/
 endif

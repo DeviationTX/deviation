@@ -42,7 +42,7 @@ void _gui_hilite_selected(struct guiObject *obj)
 
 void _gui_draw_background(int x, int y, int w, int h)
 {
-    LCD_DrawWindowedImageFromFile(x, y, "media/devo8" IMG_EXT, w, h, x, y);
+    LCD_DrawWindowedImageFromFile(x, y, "media/backgrnd" IMG_EXT, w, h, x, y);
 }
 
 // Bug fix: Unlike devo8, devo10's page always has 1 default selected objects. When a dialog, e.g. saftydialog,

@@ -1,6 +1,7 @@
-FILESYSTEM := at9
+FILESYSTEMS := common base_fonts 320x240x1
 SCREENSIZE  := 320x240x16
-DFU_ARGS   := -D 0x0483:0xdf12 -b 0x08003000
+DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
+FONTS        = filesystem/$(FILESYSTEM)/media/23bold.fon
 
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
