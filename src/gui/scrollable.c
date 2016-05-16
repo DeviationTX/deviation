@@ -25,7 +25,8 @@
     #define scroll_cb NULL
 #endif
 
-static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offset);
+static void create_scrollable_objs(guiScrollable_t *scrollable, int row);
+static int has_selectable(guiScrollable_t *scrollable);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
@@ -66,9 +67,9 @@ guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16
               item_count,
               obj,
               scroll_cb, scrollable);
-    create_scrollable_objs(scrollable, 0, 0);
+    create_scrollable_objs(scrollable, 0);
     //force selection to be current object-if there are no selectable contents
-    if (scrollable->num_selectable == 0)
+    if (! has_selectable(scrollable))
         objSELECTED = obj;
 
     return obj;
@@ -108,22 +109,127 @@ static int get_selectable_idx(guiScrollable_t *scrollable, guiObject_t *obj)
     return -1;
 }
 
+
+static guiObject_t *get_selectable_obj(guiScrollable_t *scrollable, int row, int col)
+{
+    guiObject_t *head = scrollable->head;
+    guiObject_t *last_head = NULL;
+    int cur_row = scrollable->cur_row-1;
+    int cur_col = 0;
+    while(head) {
+        if (OBJ_IS_ROWSTART(head)) {
+            if (row == cur_row && col < 0) {
+                return last_head;
+            }
+            cur_row++;
+            cur_col = 0;
+        }
+        if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+            if(row == cur_row) {
+                if (col == cur_col) {
+                    return head;
+                }
+                last_head = head;
+                cur_col++;
+            }
+        }
+        head = head->next;
+    }
+    if (row == cur_row && col < 0) {
+        return last_head;
+    }
+    return NULL;
+}
+
+static guiObject_t * get_last_object()
+{
+    guiObject_t *head = objHEAD;
+    if (! head)
+        return NULL;
+    while(head->next)
+        head = head->next;
+    return head;
+}
+
+static void get_obj_abs_row_col(guiScrollable_t *scrollable, guiObject_t *obj, int *row, int *col)
+{
+    guiObject_t *head = scrollable->head;
+    *row = scrollable->cur_row-1;
+    *col = 0;
+    while(head) {
+        if (OBJ_IS_ROWSTART(head)) {
+            (*row)++;
+            *col = 0;
+        }
+        if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+            if(head == obj)
+                return;
+            (*col)++;
+        }
+        head = head->next;
+    }
+    return;
+}
+
+static guiObject_t *set_selected_abs_row_col(guiScrollable_t *scrollable, int row, int col)
+{
+    //Note that col must be >= -1 and row must be between >=0 and <=item_count
+    //1st we normalize row and column, including wrap-around
+    if (col < 0)
+        row--;
+    if (row < 0)
+        row = scrollable->item_count-1;
+    if (row >= scrollable->item_count) {
+        row = 0;
+        col = 0;
+    }
+    if (row >= scrollable->cur_row && row < scrollable->cur_row + scrollable->visible_rows) {
+        //requested row is already visible
+        guiObject_t *obj = get_selectable_obj(scrollable, row, col);
+        if (obj)
+            return obj;
+        row++;
+        col = 0;
+    }
+    create_scrollable_objs(scrollable, row);
+    return get_selectable_obj(scrollable, row, col);
+}
+
+
 static guiObject_t * set_selectable_idx(guiScrollable_t *scrollable, int idx)
 {
-    //exclude not completely visible items on last row
-    if (idx >= 0 || idx < scrollable->num_selectable) {
-        guiObject_t *head = scrollable->head;
-        int id = 0;
-        while(head) {
-            if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
-                if(id == idx)
-                    return head;
-                id++;
-            }
-            head = head->next;
+    int num_rows = 0;
+    guiObject_t *head = scrollable->head;
+    guiObject_t *last_head = NULL;
+    int id = 0;
+    if (idx < 0)
+        return (guiObject_t *)scrollable;
+    while(head) {
+        if (OBJ_IS_ROWSTART(head)) {
+            num_rows++;
+            if(num_rows > scrollable->selectable_rows)
+                break; //exclude not completely visible items on last row
         }
+        if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+            if(id == idx)
+                return head;
+            id++;
+            last_head = head;
+        }
+        head = head->next;
     }
-    return (guiObject_t *)scrollable;
+    return last_head;
+}
+
+static int has_selectable(guiScrollable_t *scrollable) {
+    guiObject_t *head = scrollable->head;
+    while(head) {
+        if (! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
+            return 1;
+        }
+        head = head->next;
+    }
+    return 0;
 }
 
 guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
@@ -142,84 +248,65 @@ guiScrollable_t *GUI_FindScrollableParent(guiObject_t *obj) {
     return NULL;
 }
 
-static int adjust_row(guiScrollable_t *scrollable, int target_row, int offset)
+
+//This ensures that the requested row is completely visible
+//and that first_row is kept within a valid range
+//it will also do the minimal change possible from the current position
+static int adjust_row(guiScrollable_t *scrollable, int target_row)
 {
-    //This ensures that the next/prev row is completely visible
-    //and is where first_row is kept within a valid range
-#define bottom_row  (scrollable->cur_row + scrollable->visible_rows + offset)
-    int height = scrollable->max_visible_rows;
-    int maxrow = scrollable->item_count;
+    int maxrow = scrollable->item_count - 1;
     int target = (target_row < 0) ? 0 : (target_row > maxrow) ? maxrow : target_row;
-    int first_row = target, last_row = target;
+    int first_row = scrollable->cur_row;
+    int last_row = scrollable->cur_row;
+    int max_y = scrollable->header.box.height;
 
-    while(last_row < maxrow && height > 0) {
-        height -= scrollable->size_cb ? scrollable->size_cb(last_row, scrollable->cb_data) : 1;
-        last_row++;
-    }
-    if (height < 0) {
-        last_row--;
-        if (offset <= 0)
-            height += scrollable->size_cb(last_row, scrollable->cb_data);
-        else if (last_row < bottom_row) {
-            //Restart and work backwards to make all of last row visible
-            first_row = ++last_row;
-            height = scrollable->max_visible_rows;
+    if (target <= first_row)
+        return target;
+    while (1) {
+        int y = 0;
+        last_row = 0;
+        for(int row = first_row; row <= maxrow; row++) {
+            y += scrollable->row_height * (scrollable->size_cb ?
+                                       scrollable->size_cb(row, scrollable->cb_data) : 1);
+            if (y > max_y)
+                break;
+            last_row = row;
         }
-    }
-    while(first_row && height > 0) {
-        height -= scrollable->size_cb ? scrollable->size_cb(first_row-1, scrollable->cb_data) : 1;
-        first_row--;
-    }
-    if (offset <= 0 && first_row - height == target)
-        first_row = target;
-    else if (height < 0 && first_row < target)
+        if (target <= last_row)
+            break;
         first_row++;
-
-    //printf("First row %d -> %d \tcount %d\n", target_row, first_row, last_row - first_row);
+    }
     return first_row;
 }
 
-static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offset)
+static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
 {
-    int idx = get_selectable_idx(scrollable, objSELECTED);  //save index of selected
-    int old_rel_lastrow = scrollable->visible_rows - 1;
-    if (! row && offset)
-        row = scrollable->cur_row + offset;
-
-    row = adjust_row(scrollable, row, offset);
-
-    offset = row - scrollable->cur_row;
-    old_rel_lastrow -= offset;
+    row = adjust_row(scrollable, row);
+    int offset = row - scrollable->cur_row;
     if (scrollable->head && offset == 0)
-        return idx;
+        return;
     scrollable->cur_row = row;
     int rel_row = 0;
-    int selectable, num_selectable = 0;
+    int selectable_rows = 0;
     GUI_RemoveScrollableObjs((guiObject_t *)scrollable);
+
     guiObject_t *head = objHEAD;
     objHEAD = NULL;
     for(int y = scrollable->header.box.y, bottom = y + scrollable->header.box.height;
         y < bottom && row < scrollable->item_count && rel_row < scrollable->max_visible_rows;
         row++, rel_row++)
     {
-        selectable = scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
+        guiObject_t *row_start = get_last_object();
+        scrollable->row_cb(row, rel_row, y, scrollable->cb_data);
+        OBJ_SET_ROWSTART(row_start ? row_start->next : objHEAD, 1);
         y += scrollable->row_height * (scrollable->size_cb ? 
                                        scrollable->size_cb(row, scrollable->cb_data) : 1);
         if (y > bottom + scrollable->row_height - ROW_HEIGHT_OFFSET)
             break;  //is not selectable because it's not completely visible
-
-        //maintain index of selected item
-        if (offset < 0 && idx != -1) {
-            idx += selectable; offset++; }
-        if (offset > 0 && rel_row > old_rel_lastrow)
-            idx -= selectable;
-
-        num_selectable += selectable;
+        selectable_rows++;
     }
-    if (offset > 0)
-        idx += num_selectable - scrollable->num_selectable;
-    scrollable->num_selectable = num_selectable;
     scrollable->visible_rows = rel_row;
+    scrollable->selectable_rows = selectable_rows;
     scrollable->head = objHEAD;
     objHEAD = head;
     head = scrollable->head;
@@ -236,11 +323,6 @@ static int create_scrollable_objs(guiScrollable_t *scrollable, int row, int offs
     GUI_SetHidden((guiObject_t *)&scrollable->scrollbar, hidden);
     if (! hidden)
         GUI_SetScrollbar(&scrollable->scrollbar, scroll_pos);
-    //return new index of selected item
-    if (idx >= 0 && idx < num_selectable)
-        return idx;
-    //else selected item has moved off screen
-    return idx < 0 ? -1 : num_selectable;
 }
 
 #if HAS_TOUCH
@@ -255,76 +337,51 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
         row -= scrollable->visible_rows;
     else
         row += direction;
-    create_scrollable_objs(scrollable, row, 0);
+    create_scrollable_objs(scrollable, row);
     return -1;
 }
 #endif
 
 guiObject_t *GUI_ScrollableGetNextSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {
-    int idx = -1;
-    if (obj)
-        //last selection was in the scrollable
-        idx = get_selectable_idx(scrollable, obj) + 1;
-
-    else if (scrollable->num_selectable) {  // <- no wrap-around in Channel/Telemetry monitor
-        //scroll to first row and select first selectable
-        create_scrollable_objs(scrollable, 0, 0);
-        idx = 0;
-        goto exit;
-    }
-    if (idx == -1 || idx == scrollable->num_selectable) {
-        //no next selectable, move the scrollbar
-        if (scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
-        {
-            idx = create_scrollable_objs(scrollable, 0, 1);
-            if (idx < scrollable->num_selectable - 1)
-                idx++;  //found next (scrolled into view)
-            else
-                idx = scrollable->num_selectable - 1;
+    int row, col;
+    if (! obj) {
+        if (! has_selectable(scrollable)) {
+            //there are no selectable rows, increment by one if possible, no wrap-around
+            row = scrollable->cur_row + scrollable->visible_rows;
+            if (row >= scrollable->item_count)
+                row = scrollable->item_count-1;
+            create_scrollable_objs(scrollable, row);
+            return NULL;
         }
+        row = 0;
+        col = 0;
+    } else {
+        get_obj_abs_row_col(scrollable, obj, &row, &col);
+        col++;
     }
-exit:
-    //go to next selectable
-    if ((idx >= 0 && idx < scrollable->num_selectable)
-            || scrollable->cur_row < scrollable->item_count - scrollable->visible_rows)
-        return set_selectable_idx(scrollable, idx);
-
-    //go to the next item after the Scrollable
-    return NULL;
+    return set_selected_abs_row_col(scrollable, row, col);
 }
 
 guiObject_t *GUI_ScrollableGetPrevSelectable(guiScrollable_t *scrollable, guiObject_t *obj)
 {
-    int idx = -1;
-    if (obj)
-        //last selection was in the scrollable
-        idx = get_selectable_idx(scrollable, obj) - 1;
-
-    else if (scrollable->num_selectable) {  // <- no wrap-around in Channel/Telemetry monitor
-        //scroll to last row and select last selectable
-        create_scrollable_objs(scrollable, scrollable->item_count, 0);
-        idx = scrollable->num_selectable - 1;
-        goto exit;
-    }
-    if (idx == -1) {
-        //no previous selectable, move the scrollbar
-        if (scrollable->cur_row)
-        {
-            idx = create_scrollable_objs(scrollable, 0, -1);
-            if (idx > 0)
-                idx--;  //found previous (scrolled into view)
-            else
-                idx = 0;
+    int row, col;
+    if (! obj) {
+        if (! has_selectable(scrollable)) {
+            //there are no selectable rows, increment by one if possible, no wrap-around
+            row = scrollable->cur_row - 1;
+            if (row < 0)
+                row = 0;
+            create_scrollable_objs(scrollable, row);
+            return NULL;
         }
+        row = scrollable->item_count;
+        col = -1;
+    } else {
+        get_obj_abs_row_col(scrollable, obj, &row, &col);
+        col--;
     }
-exit:
-    //go to previous selectable
-    if (idx >= 0 || scrollable->cur_row)
-        return set_selectable_idx(scrollable, idx);
-
-    //go to the previous item before the Scrollable
-    return NULL;
+    return set_selected_abs_row_col(scrollable, row, col);
 }
 
 guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
@@ -336,24 +393,15 @@ guiObject_t *GUI_GetScrollableObj(guiScrollable_t *scrollable, int row, int col)
 }
 guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, int col)
 {
-    if (absrow < scrollable->cur_row
-        || absrow >= scrollable->cur_row + scrollable->visible_rows)
-    {
-        create_scrollable_objs(scrollable, absrow, 0);
-    }
-    int relrow = absrow - scrollable->cur_row;
-    return scrollable->getobj_cb(relrow, col, scrollable->cb_data);
+    return set_selected_abs_row_col(scrollable, absrow, col);
 }
 
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
 {
-    create_scrollable_objs(scrollable, row_idx >> 8, 0);
+    create_scrollable_objs(scrollable, row_idx >> 8);
 
     //number of rows and/or visible rows can change, ie. added, deleted or model changed
     int idx = row_idx & 0xff;
-    if (idx > scrollable->num_selectable -1)
-        idx = scrollable->num_selectable -1;
-
     return set_selectable_idx(scrollable, idx);
 }
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
