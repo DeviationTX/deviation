@@ -271,7 +271,7 @@ struct trimedit_obj {
 };
 
 struct tx_obj {
-    guiScrollbar_t scrollbar;
+    guiScrollable_t scrollable;
     union {
 #if LCD_WIDTH != 480
         struct tx_obj_g1

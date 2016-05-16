@@ -32,9 +32,6 @@ static struct tx_obj_g3 * const gui3 = &gui_objs.u.tx.u.g3;
 
 static const int MIN_BATTERY_ALARM_STEP  = 50;
 
-u8 page_num;
-guiObject_t *firstObj;
-
 
 void PAGE_ChangeByName(const char *pageName, u8 menuPage)
 {   // dummy method for devo8, only used in devo10
@@ -66,24 +63,6 @@ enum {
         ADDROW       = 4,
     #endif
 };
-static void _show_page();
-
-static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
-{
-    (void)pos;
-    (void)parent;
-    (void)data;
-    s8 newpos = (s8)page_num + (direction > 0 ? 1 : -1);
-    if (newpos < 0)
-        newpos = 0;
-    else if (newpos > MAX_PAGE)
-        newpos = MAX_PAGE;
-    if (newpos != page_num) {
-        page_num = newpos;
-        _show_page();
-    }
-    return page_num;
-}
 
 #if HAS_VIBRATINGMOTOR
 static const char *_vibration_state_cb(guiObject_t *obj, int dir, void *data)
@@ -102,20 +81,18 @@ static void _vibration_test_cb(guiObject_t *obj, void *data)
 }
 #endif
 
-static void _show_page()
+static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    if (firstObj) {
-        GUI_RemoveHierObjects(firstObj);
-        firstObj = NULL;
-    }
-    guiObject_t *obj;
+    (void)relrow;
+    (void)y;
+    (void)data;
+    int page_num = absrow;
     u8 space = 19;
     int row = 40;
     int col1 = COL1;
     int col2 = COL2;
     if (page_num == 0 || LCD_WIDTH == 480) {
-        obj = GUI_CreateLabelBox(&gui1->head1_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Generic settings"));
-        if (firstObj == NULL) firstObj = obj;
+        GUI_CreateLabelBox(&gui1->head1_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Generic settings"));
 #ifndef NO_LANGUAGE_SUPPORT
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
@@ -148,8 +125,7 @@ static void _show_page()
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
     }
     if (page_num == 1 || LCD_WIDTH == 480) {
-        obj = GUI_CreateLabelBox(&gui2->head2_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Buzzer settings"));
-        if (firstObj == NULL) firstObj = obj;
+        GUI_CreateLabelBox(&gui2->head2_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Buzzer settings"));
         row += space;
         if (row+12 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui2->power_alarmlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL, _tr("Power On alarm"));
@@ -190,8 +166,7 @@ static void _show_page()
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
     }
     if (page_num == 2 || LCD_WIDTH == 480) {
-        obj = GUI_CreateLabelBox(&gui3->head3_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Timer settings"));
-        if (firstObj == NULL) firstObj = obj;
+        GUI_CreateLabelBox(&gui3->head3_1, col1, row, 0, 0, &SECTION_FONT, NULL, NULL, _tr("Timer settings"));
         row += space;
         if (row+8 >= LCD_HEIGHT) { row = 40; col1 = COL3; col2 = COL4; }
         GUI_CreateLabelBox(&gui3->prealertlbl, col1, row, 0, 0, &DEFAULT_FONT, NULL, NULL,  _tr("Prealert time"));
@@ -229,6 +204,7 @@ static void _show_page()
 #endif
 
     }
+    return 0;
 }
 
 void PAGE_TxConfigureInit(int page)
@@ -238,10 +214,8 @@ void PAGE_TxConfigureInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_TXCFG));
-    GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, MAX_PAGE+1, NULL, scroll_cb, NULL);
-    firstObj = NULL;
-    page_num = 0;
-    _show_page();
+    GUI_CreateScrollable(&gui->scrollable, 0, 32, LCD_WIDTH, LCD_HEIGHT-32,
+                     LCD_HEIGHT-32, MAX_PAGE+1, row_cb, NULL, NULL, NULL);
 }
 
 static inline guiObject_t *_get_obj(int idx, int objid)
