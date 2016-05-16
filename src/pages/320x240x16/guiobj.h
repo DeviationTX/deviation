@@ -18,6 +18,7 @@ struct dialog_obj {
 #define MAX_BUTT          (NUM_TX_BUTTONS > NUM_CHANNELS ? NUM_TX_BUTTONS : NUM_CHANNELS)
 #define MAX_CHAN          (MAX_CHAN_ELEMENTS > MAX_BUTT ? MAX_CHAN_ELEMENTS : MAX_BUTT)
 #define MAX_IDX           (MAX_CHAN > MAX_BUTT ? MAX_CHAN : MAX_BUTT)
+#define TIMERS_PER_PAGE   (LCD_WIDTH == 320 ? 2 : 4)
 struct chantest_obj {
     guiLabel_t lock;
     guiLabel_t chan[MAX_CHAN];
@@ -214,24 +215,24 @@ struct telemtest_obj {
 };
 
 struct timer_obj {
-    guiScrollbar_t scrollbar;
-    guiLabel_t timer[NUM_TIMERS];
-    guiTextSelect_t type[NUM_TIMERS];
-    guiLabel_t switchlbl[NUM_TIMERS];
-    guiTextSelect_t src[NUM_TIMERS];
-    guiLabel_t resetlbl[NUM_TIMERS];
-    guiTextSelect_t resetsrc[NUM_TIMERS];
-    guiLabel_t startlbl[NUM_TIMERS];
-    guiLabel_t resetpermlbl[NUM_TIMERS];
-    guiButton_t resetperm[NUM_TIMERS];
-    guiButton_t setperm[NUM_TIMERS];
-    guiLabel_t timelbl[NUM_TIMERS];
-    guiLabel_t timevallbl[NUM_TIMERS];
-    guiLabel_t datelbl[NUM_TIMERS];
-    guiLabel_t datevallbl[NUM_TIMERS];
-    guiLabel_t setlbl[NUM_TIMERS];
-    guiButton_t set[NUM_TIMERS];
-    guiTextSelect_t start[NUM_TIMERS];
+    guiScrollable_t scrollable;
+    guiLabel_t timer[TIMERS_PER_PAGE];
+    guiTextSelect_t type[TIMERS_PER_PAGE];
+    guiLabel_t switchlbl[TIMERS_PER_PAGE];
+    guiTextSelect_t src[TIMERS_PER_PAGE];
+    guiLabel_t resetlbl[TIMERS_PER_PAGE];
+    guiTextSelect_t resetsrc[TIMERS_PER_PAGE];
+    guiLabel_t startlbl[TIMERS_PER_PAGE];
+    guiLabel_t resetpermlbl[TIMERS_PER_PAGE];
+    guiButton_t resetperm[TIMERS_PER_PAGE];
+    guiButton_t setperm[TIMERS_PER_PAGE];
+    guiLabel_t timelbl[TIMERS_PER_PAGE];
+    guiLabel_t timevallbl[TIMERS_PER_PAGE];
+    guiLabel_t datelbl[TIMERS_PER_PAGE];
+    guiLabel_t datevallbl[TIMERS_PER_PAGE];
+    guiLabel_t setlbl[TIMERS_PER_PAGE];
+    guiButton_t set[TIMERS_PER_PAGE];
+    guiTextSelect_t start[TIMERS_PER_PAGE];
 };
 
 struct settimer_obj {

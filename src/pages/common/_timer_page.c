@@ -15,6 +15,8 @@
 #include "mixer_standard.h"
 static struct timer_page * const tp = &pagemem.u.timer_page;
 static struct timer_obj * const gui = &gui_objs.u.timer;
+static u16 current_selected = 0;
+
 
 const char *timer_str_cb(guiObject_t *obj, const void *data);
 

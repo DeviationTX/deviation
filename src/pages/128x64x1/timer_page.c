@@ -32,8 +32,6 @@ enum {
 
 #include "../common/_timer_page.c"
 
-static u16 current_selected = 0;
-
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)relrow;
