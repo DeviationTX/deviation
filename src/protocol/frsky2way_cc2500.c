@@ -253,7 +253,7 @@ static void frsky_parse_telem_stream(u8 byte) {
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
-// pkt 0 = len not counting crc
+// pkt 0 = len not counting appended status bytes
 // pkt 1,2 = fixed_id
 // pkt 3 = A1 : 52mV per count; 4.5V = 0x56
 // pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
@@ -261,11 +261,11 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 // pkt 6 = number of stream bytes
 // pkt 7 = sequence number increments mod 8 with each packet containing stream data
 // pkt 8-17 = stream data
-// pkt 18-19 = crc
-
+// pkt 18 = local RSSI
+// pkt 19 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
 
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
+    if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3 || !(pkt[len-1] & 0x80))
         return;
     //Get voltage A1 (52mv/count)
     Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[3] * 52 / 10; //In 1/100 of Volts
