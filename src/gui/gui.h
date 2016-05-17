@@ -200,7 +200,7 @@ typedef struct guiScrollable {
     struct guiHeader header;
     u8 item_count;
     u8 row_height;
-    u8 num_selectable;
+    u8 selectable_rows;
     u8 cur_row;
     u8 visible_rows;
     u8 max_visible_rows;
@@ -275,6 +275,7 @@ typedef struct guiRect {
 #define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
 #define OBJ_IS_SELECTABLE(x)  ((x)->flags & 0x20) /* bool: UI element can be selected */
 #define OBJ_IS_SCROLLABLE(x)  ((x)->flags & 0x40) /* bool: UI element is part of a scrollable container */
+#define OBJ_IS_ROWSTART(x)    ((x)->flags & 0x80) /* bool: UI element is the 1st element in a selectable row */
 #define OBJ_SET_FLAG(obj,flag,set)  ((guiObject_t *)(obj))->flags = (set) \
                                     ? ((guiObject_t *)(obj))->flags | (flag) \
                                     : ((guiObject_t *)(obj))->flags & ~(flag)
@@ -285,6 +286,7 @@ typedef struct guiRect {
 #define OBJ_SET_TRANSPARENT(x,y) OBJ_SET_FLAG(x, 0x10, y)
 #define OBJ_SET_SELECTABLE(x,y)  OBJ_SET_FLAG(x, 0x20, y)
 #define OBJ_SET_SCROLLABLE(x,y)  OBJ_SET_FLAG(x, 0x40, y)
+#define OBJ_SET_ROWSTART(x,y)    OBJ_SET_FLAG(x, 0x80, y)
 #define CLEAR_OBJ(x) memset((x), 0, sizeof(*(x)))
 
 #define DRAW_NORMAL  0
@@ -502,4 +504,5 @@ s8 GUI_GetViewId(s16 x, s16 y);
 void GUI_ViewInit();
 int GUI_IsEmpty();
 void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
+unsigned GUI_GetRemappedButtons();
 #endif /* GUI_H_ */

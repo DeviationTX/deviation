@@ -394,7 +394,7 @@ static int pkt32_to_coord(u8 *ptr)
 NO_INLINE static void parse_telemetry_packet()
 {
     static u8 altitude; // byte from first GPS packet
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
     static const u8 update0a[] = { TELEM_DSM_PBOX_VOLT1, TELEM_DSM_PBOX_VOLT2,
                                    TELEM_DSM_PBOX_CAPACITY1, TELEM_DSM_PBOX_CAPACITY2,
                                    TELEM_DSM_PBOX_ALARMV1, TELEM_DSM_PBOX_ALARMV2,
@@ -467,7 +467,7 @@ NO_INLINE static void parse_telemetry_packet()
         case 0x14: //G-Force sensor
             update = update14;
             break;
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case 0x18: //RX Pack Cap sensor (SPMA9604)
             update = update18;
             break;
@@ -489,7 +489,7 @@ NO_INLINE static void parse_telemetry_packet()
         return;
     }
     switch(data_type) {
-#if HAS_DSM_EXTENDED_TELEMETRY
+#if HAS_EXTENDED_TELEMETRY
         case 0x0a: //Powerbox sensor
             update = update0a;
             Telemetry.value[TELEM_DSM_PBOX_VOLT1] = pktTelem[1]; //In 1/100 of Volts
@@ -523,7 +523,7 @@ NO_INLINE static void parse_telemetry_packet()
             Telemetry.value[TELEM_DSM_HYPOTHETIC_THROTTLE] = packet[14]* 5; //Throttle % in 0.1%
             Telemetry.value[TELEM_DSM_HYPOTHETIC_OUTPUT] = end_byte * 5; //Output % in 0.1%
             break;
-#endif //HAS_DSM_EXTENDED_TELEMETRY
+#endif //HAS_EXTENDED_TELEMETRY
         case 0x16: //GPS sensor (always second GPS packet)
             update = update16;
             Telemetry.gps.altitude  = bcd_to_int((altitude << 24) | ((u32)pktTelem[1] << 8)); //In m * 1000 (16Bit decimal, 1 unit is 0.1m)

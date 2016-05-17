@@ -60,7 +60,6 @@ static u8 counter;
 static u32 fixed_id;
 static s8 course;
 static s8 fine;
-static u8 AD2gain;
 
 
 enum {
@@ -182,8 +181,8 @@ static void frsky2way_build_data_packet()
         if(i >= Model.num_channels) {
             value = 0x8ca;
         } else {
-            value = (s32)Channels[i] * 600 / CHAN_MAX_VALUE + 0x8ca;
-        }
+            value = (s32)Channels[i] * 600 / CHAN_MAX_VALUE + 0x8ca; // 0-2047, 0 = 817, 1024 = 1500, 2047 = 2182
+        }                                                            // H (0)7-4, L (0)3-0, H (1)3-0, L (0)11-8, H (1)11-8, L (1)7-4 etc
         if(i < 4) {
             packet[6+i] = value & 0xff;
             packet[10+(i>>1)] |= ((value >> 8) & 0x0f) << (4 *(i & 0x01));
@@ -199,9 +198,58 @@ static void frsky2way_build_data_packet()
     //}
 }
 
+#if HAS_EXTENDED_TELEMETRY
+
+#include "frsky_d_telem._c"
+
+
+static void frsky_parse_telem_stream(u8 byte) {
+    static int8_t data_id;
+    static uint8_t lowByte;
+    static TS_STATE state = TS_IDLE;
+
+
+    if (byte == 0x5e) {
+      state = TS_DATA_ID;
+      return;
+    }
+    if (state == TS_IDLE) {
+      return;
+    }
+    if (state & TS_XOR) {
+      byte = byte ^ 0x60;
+      state = (TS_STATE)(state - TS_XOR);
+    }
+    else if (byte == 0x5d) {
+      state = (TS_STATE)(state | TS_XOR);
+      return;
+    }
+    if (state == TS_DATA_ID) {
+      if (byte > 0x3f) {
+        state = TS_IDLE;
+      }
+      else {
+        data_id = byte;
+        state = TS_DATA_LOW;
+      }
+      return;
+    }
+    if (state == TS_DATA_LOW) {
+      lowByte = byte;
+      state = TS_DATA_HIGH;
+      return;
+    }
+
+    state = TS_IDLE;
+
+    processHubPacket(data_id, (byte << 8) + lowByte);
+}
+
+#endif // HAS_EXTENDED_TELEMETRY
+
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
-    static u32 velocity;
+    u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     //byte1 == data len (+ 2 for CRC)
     //byte 2,3 = fixed=id
     //byte 4 = A1 : 52mV per count; 4.5V = 0x56
@@ -222,113 +270,12 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     Telemetry.value[TELEM_FRSKY_RSSI] = pkt[5]; 	// Value in Db
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
-    for(int i = 6; i < len - 4; i++) {
-        if(pkt[i] != 0x5e || pkt[i+4] != 0x5e)
-           continue;
-        u16 value = (pkt[i+3] << 8) + pkt[i+2];
-        switch(pkt[i+1]) {
-          //defined in protocol_sensor_hub.pdf
-          case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)
-              //convert to mm
-              Telemetry.gps.altitude = (s16)value * 1000;
-              break;
-          case 0x09: //GPS_ALT (fraction)
-              Telemetry.gps.altitude += value * 10;
-              TELEMETRY_SetUpdated(TELEM_GPS_ALT);
-              break;
-          case 0x02: //TEMP1 -30C-250C (1C/ count)
-              Telemetry.value[TELEM_FRSKY_TEMP1] = value;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
-              break;
-          case 0x03: //RPM   0-60000
-              Telemetry.value[TELEM_FRSKY_RPM] = value * 60;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_RPM);
-              break;
-          //case 0x04: //Fuel  0, 25, 50, 75, 100
-          case 0x05: //TEMP2 -30C-250C (1C/ count)
-              Telemetry.value[TELEM_FRSKY_TEMP2] = value;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
-              break;
-          case 0x06: //VOLT3 0V-4.2V (0.01V/count)
-              value = (pkt[i+2] << 8) + pkt[i+3];
-              Telemetry.value[TELEM_FRSKY_VOLT3] = (u16)(value & 0xFFF) * 2 / 10;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT3);
-              break;
-          case 0x10: //ALT (whole number & sign) -500m-9000m (.01m/count)
-              //convert to mm
-              Telemetry.value[TELEM_FRSKY_ALTITUDE] = value * 1000;
-              break;
-          case 0x21: //ALT (fraction)
-              Telemetry.value[TELEM_FRSKY_ALTITUDE] += value * 10;
-              TELEMETRY_SetUpdated(TELEM_FRSKY_ALTITUDE);
-              break;
-          case 0x11: //GPS Speed (whole number and sign) in Knots
-              Telemetry.gps.velocity = velocity = value * 100;
-              break;
-          case 0x19: //GPS Speed (fraction)
-              Telemetry.gps.velocity = (velocity + value) * 5556 / 1080; //Convert 1/100 knot to mm/sec
-              TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
-              break;
-          case 0x12: //GPS Longitude (whole number) dddmm.mmmm
-              {
-              //Convert to ms
-              //hh * 60 * 60 * 1000
-              //mm * 60 * 1000
-              //ss * 1000
-              s32 deg = (value / 100);
-              s32 min = (value % 100);
-              Telemetry.gps.longitude = (deg * 60 + min) * 60 * 1000;
-              break;
-              }
-          case 0x1A: //GPS Longitude (fraction)
-              Telemetry.gps.longitude += value * 6;
-              break;
-          case 0x22: //GPS Longitude E/W
-              if (value == 'W')
-                  Telemetry.gps.longitude = -Telemetry.gps.longitude;
-              TELEMETRY_SetUpdated(TELEM_GPS_LONG);
-              break;
-          case 0x13: //GPS Latitude (whole number) ddmm.mmmm
-              {
-              s32 deg = (value / 100);
-              s32 min = (value % 100);
-              Telemetry.gps.latitude = (deg * 60 + min) * 60 * 1000;
-              break;
-              }
-          case 0x1B: //GPS Latitude (fraction)
-              Telemetry.gps.latitude += value * 6;
-              break;
-          case 0x23: //GPS Latitude N/S
-              if (value == 'S')
-                  Telemetry.gps.latitude = -Telemetry.gps.latitude;
-               TELEMETRY_SetUpdated(TELEM_GPS_LAT);
-              break;
-          //case 0x14: //GPS Compass (whole number) (0-259.99) (.01degree/count)
-          //case 0x1C: //GPS Compass (fraction)
-          case 0x15: //GPS Date/Month
-              Telemetry.gps.time = ((pkt[i+2] & 0x1F) << 17)  //day
-                                 | ((pkt[i+3] & 0x0F) << 22); //month
-              break;
-          case 0x16: //GPS Year
-              Telemetry.gps.time |= (value & 0x3F) << 26;
-              break;
-          case 0x17: //GPS Hour/Minute
-              Telemetry.gps.time |= ((pkt[i+2] & 0x1F) << 12)  //hour
-                                  | ((pkt[i+3] & 0x3F) << 6);  //min
-              break;
-          case 0x18: //GPS Second
-              Telemetry.gps.time |= (value & 0x3F) << 0;
-              TELEMETRY_SetUpdated(TELEM_GPS_TIME);
-              break;
-          //case 0x24: //Accel X
-          //case 0x25: //Accel Y
-          //case 0x26: //Accel Z
-          //case 0x28: //Current 0A-100A (0.1A/count)
-          //case 0x3A: //Ampere sensor (whole number) (measured as V) 0V-48V (0.5V/count)
-          //case 0x3B: //Ampere sensor (fractional)
-        }
-    }
+#if HAS_EXTENDED_TELEMETRY
+    for(int i = 6; i < len - 4; i++)
+        frsky_parse_telem_stream(pkt[i]);
+#endif // HAS_EXTENDED_TELEMETRY
 }
+
 
 static u16 frsky2way_cb()
 {
@@ -427,7 +374,6 @@ static void initialize(int bind)
     CLOCK_StopTimer();
     course = (int)Model.proto_opts[PROTO_OPTS_FREQCOURSE];
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
-    AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
     //fixed_id = 0x3e19;
     fixed_id = get_tx_id();
     frsky2way_init(bind);

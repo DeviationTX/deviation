@@ -34,7 +34,9 @@ PROTO_MODULES += $(ODIR)/protocol/fy326.mod
 PROTO_MODULES += $(ODIR)/protocol/bayang.mod
 PROTO_MODULES += $(ODIR)/protocol/h8-3d.mod
 PROTO_MODULES += $(ODIR)/protocol/mjxq.mod
+PROTO_MODULES += $(ODIR)/protocol/mt99xx.mod
 PROTO_MODULES += $(ODIR)/protocol/s-fhss.mod
+PROTO_MODULES += $(ODIR)/protocol/frskyx.mod
 
 ALL += $(PROTO_MODULES)
 else #BUILD_TARGET
@@ -174,8 +176,16 @@ $(ODIR)/protocol/mjxq.mod : $(ODIR)/mjxq_nrf24l01.bin
 	@echo Building 'mjxq' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
 
+$(ODIR)/protocol/mt99xx.mod : $(ODIR)/mt99xx_nrf24l01.bin
+	@echo Building 'mt99xx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
 $(ODIR)/protocol/s-fhss.mod : $(ODIR)/sfhss_cc2500.bin
 	@echo Building 'sfhss' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@    
+
+$(ODIR)/protocol/frskyx.mod : $(ODIR)/frskyx_cc2500.bin
+	@echo Building 'frskyx' module
+	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
 endif #BUILD_TARGET
