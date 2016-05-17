@@ -281,7 +281,12 @@ static int adjust_row(guiScrollable_t *scrollable, int target_row)
 
 static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
 {
-    row = adjust_row(scrollable, row);
+    if (row >= 0) {
+        row = adjust_row(scrollable, row);
+    } else {
+        //Force row #
+        row = - row;
+    }
     int offset = row - scrollable->cur_row;
     if (scrollable->head && offset == 0)
         return;
@@ -398,7 +403,8 @@ guiObject_t *GUI_ShowScrollableRowCol(guiScrollable_t *scrollable, int absrow, i
 
 guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_idx)
 {
-    create_scrollable_objs(scrollable, row_idx >> 8);
+    //printf("Restoring position:%04x\n", row_idx);
+    create_scrollable_objs(scrollable, -(row_idx >> 8));
 
     //number of rows and/or visible rows can change, ie. added, deleted or model changed
     int idx = row_idx & 0xff;
@@ -406,7 +412,9 @@ guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_id
 }
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
 {
-    return (scrollable->cur_row << 8) | get_selectable_idx(scrollable, obj);
+    int idx = (scrollable->cur_row << 8) | get_selectable_idx(scrollable, obj);
+    //printf("Saving position:%04x\n", idx);
+    return idx;
 }
 int GUI_ScrollableCurrentRow(guiScrollable_t *scrollable)
 {
