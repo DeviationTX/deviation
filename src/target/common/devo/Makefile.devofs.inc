@@ -15,6 +15,6 @@ $(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper $(RE
 ifneq "$(REQUIRED_PROTOCOLS)" ""
 	cp -pf $(REQUIRED_PROTOCOLS) $(ODIR)/tmpfs/protocol/
 endif
-	target/common/devo/devofs/buildfs.pl $(ODIR)/tmpfs > $@
+	target/common/devo/devofs/buildfs.py -c -f $@ -d $(ODIR)/tmpfs
 
 endif

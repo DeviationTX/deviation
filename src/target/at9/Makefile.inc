@@ -6,6 +6,8 @@ FONTS        = filesystem/$(FILESYSTEM)/media/23bold.fon
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
+ALL = $(LIBOPENCM3) $(TARGET).dfu $(TARGET)-fs.dfu
+
 NUM_MODELS ?= 10
 
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
@@ -27,7 +29,6 @@ MODULE_FLAGS = -fno-builtin
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR)
 LFLAGS2  = -Wl,-T$(LINKFILE)
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu
 
 else #BUILD_TARGET
 
@@ -42,4 +43,12 @@ $(TARGET).dfu: $(TARGET).bin
 	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Firmware" $(DFU_ARGS):$< $@
 	$(SDIR)/../utils/get_mem_usage.pl $(TARGET).map
 
+$(ODIR)/devo.fs: $(LAST_MODEL) $(TARGET).dfu $(PRE_FS) $(TARGET).fs_wrapper
+	target/common/devo/devofs/buildfs.py -c -i -f $@ -d filesystem/$(FILESYSTEM)
+
+$(TARGET)-fs.dfu: $(ODIR)/devo.fs
+	$(SDIR)/../utils/dfu.py --name "$(HGVERSION) Filesystem" -D 0x0483:0xdf12 -b 0x08040000:$< $@
+
+$(TARGET).fs_wrapper: $(LAST_MODEL)
+	rm filesystem/$(FILESYSTEM)/datalog.bin
 endif #BUILD_TARGET

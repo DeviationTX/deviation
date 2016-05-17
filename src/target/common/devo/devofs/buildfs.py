@@ -47,7 +47,7 @@ def main():
     if opt.extract:
         data = bytearray(open(opt.fs, "rb").read())
         if opt.invert:
-            data = map(lambda x: 0xff-x, data)
+            data = bytearray(map(lambda x: 0xff-x, data))
         data = align_data(data)
 	build_dirs(opt.dir, data)
 

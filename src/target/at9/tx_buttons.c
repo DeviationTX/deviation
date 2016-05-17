@@ -73,7 +73,7 @@ u32 ScanButtons()
     int dir = handle_rotary_encoder(rotary);
     if (rotary != 0) {
         if ( dir != 0) {
-            last_rotary = dir > 0 ? CHAN_ButtonMask(BUT_RIGHT) : CHAN_ButtonMask(BUT_LEFT);
+            last_rotary = dir > 0 ? CHAN_ButtonMask(BUT_DOWN) : CHAN_ButtonMask(BUT_UP);
         }
     } else {
         last_rotary = 0;
