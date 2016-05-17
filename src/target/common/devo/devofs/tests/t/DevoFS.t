@@ -33,7 +33,9 @@ init();
 verify_files();
 read_partial();
 lseek();
-write_file();
+#write_file(4096);
+#write_file(14325);
+#write_file(212);
 auto_compact();
 manual_compact();
 change_filesize();
@@ -140,22 +142,23 @@ sub lseek {
 }
 
 sub write_file {
+    my($size) = @_;
     my $data = "";
     my $data1 = "";
     my $len = 0;
-    for (0..4095) { $data .= chr( int(rand(255)) ); }
+    for (0..($size-1)) { $data .= chr( int(rand(255)) ); }
     my $ref_md5 = Digest::MD5::md5_hex($data);
     DevoFS::open("protocol/devo.mod", O_CREAT);
-    is(DevoFS::write($data, 4096, $len), 0, msg("Write successful"));
-    is($len, 4096, msg("Wrote correct length"));
+    is(DevoFS::write($data, $size, $len), 0, msg("Write successful ($size)"));
+    is($len, $size, msg("Wrote correct length ($size)"));
     DevoFS::close();
     DevoFS::open("protocol/devo.mod", 0);
-    is(DevoFS::read($data1, 4096, $len), 0, msg("Read written data"));
-    is($len, 4096, msg("Read proper length"));
+    is(DevoFS::read($data1, $size, $len), 0, msg("Read written data ($size)"));
+    is($len, $size, msg("Read proper length ($size)"));
     my $new_md5 = Digest::MD5::md5_hex($data1);
     $files{"protocol/devo.mod"}{DATA} = $data1;
     $files{"protocol/devo.mod"}{MD5} = $new_md5;
-    is($new_md5, $ref_md5, msg("Written data is correct"));
+    is($new_md5, $ref_md5, msg("Written data is correct ($size)"));
 }
 
 sub change_filesize {
