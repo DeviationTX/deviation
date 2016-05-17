@@ -94,10 +94,10 @@ static void processHubPacket(u8 id, u16 value) {
             varioHighPrecision = 1;
             value /= 10;    // map hi precision vario into low precision. Altitude is stored in 0.1m anyways
         }
-        value = last_value + (((s16)last_value < 0) ? -value : value);
+        s32 altitude = (s16)last_value + (((s16)last_value < 0) ? -value : value);
 
-        if (ground_level == 0) ground_level = value;
-        set_telemetry(TELEM_FRSKY_ALTITUDE, value - ground_level);
+//TODO        if (ground_level == 0) ground_level = altitude;
+        set_telemetry(TELEM_FRSKY_ALTITUDE, altitude - ground_level);
         break;
     case 0x11: //GPS Speed (whole number and sign) in Knots
         fr_gps.velocity_bp = value;
