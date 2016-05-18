@@ -19,10 +19,10 @@ functions will be quite slow.
 DevoFS will slow down linearly with the number of files present, as well as
 with the number of files written since the last compact() event
 
-The filesystem will automatically run compact() when necessary, butit is
+The filesystem will automatically run compact() when necessary, but it is
 recommended to run it more frequently to optimize performance
 
-The filesystem has an overhead of 15 bytes for each file and directory, and does
+The filesystem has an overhead of 16 bytes for each file and directory, and does
 not require file alignment to sector boundaries.  Additionally, one sector must
 be left vacant to allow for running the compact operation (unless the equivalent
 amount of RAM is available)
@@ -46,6 +46,15 @@ leaves the burden to the developer
 
 Reads and writes will automatically be partitioned to sector boundaries so the
 sector-id bytes are not inadvertently read
+
+Multiple files can be opened concurrently, but each concurrent file must have
+its own FATFS structure, which must be initialized using df_add_filedescriptor.
+df_mount can only be executed once.  When using multiple file-descriptors,
+only one can be opened with O_CREAT.  It is strongly recommended that only the
+1st file descriptor (that created by df_mount) be used for opening files for
+write.  This restriction may be codified in the future.  Also note that if
+df_compact is executed while writing a file, it will corrupt the file contents.
+
 
 DevoFS layout:
 ---------------------------------------

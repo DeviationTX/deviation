@@ -26,11 +26,13 @@ my @imgfiles;
 my %files;
 my $img_idx = 0;
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
+#my $tmpdir = "./";
 my $imgdir = $FindBin::Bin . "/../image";
 my $MAX_FILE_SIZE = 65535;
 
 #tests here
 init();
+if(0) {
 read_partial();
 lseek();
 write_file(4096);
@@ -41,6 +43,8 @@ manual_compact();
 change_filesize();
 file_sector_align();
 write_around_the_horn();
+}
+multiple_file_descriptors();
 
 sub msg
 {
@@ -278,4 +282,58 @@ sub write_around_the_horn {
     DevoFS::open("protocol/devo.mod", 0);
     is(DevoFS::read($data, 4096, $len), 0, msg("Read written data"));
     _compare_fs(\%files);
+}
+
+sub multiple_file_descriptors {
+    #Start with a clean database
+    _reset_fs();
+
+    # You MUST initialize $data nd $len, otherwise pass by refernec will not work in DevoFS module
+    my($data, $data1, $data2, $data3) = ("", "", "", "");
+    my $len = -1;
+    for (1..4096) { $data1 .= chr( int(rand(255)) ); }
+
+    my $open1 = DevoFS::open("protocol/devo.mod", O_CREAT);
+    is($open1, 0, msg("Opened FD 1"));
+
+    my $fat2 = DevoFS::add_file_descriptor();
+    DevoFS::switchfile($fat2);
+    my $open2 = DevoFS::open("media/config.ini", 0);
+    is($open2, 0, msg("Opened FD 2"));
+
+    my $fat3 = DevoFS::add_file_descriptor();
+    DevoFS::switchfile($fat3);
+    my $open3 = DevoFS::open("models/model10.ini", 0);
+    is($open3, 0, msg("Opened FD 3"));
+    DevoFS::read($data3, 100, $len);
+
+    DevoFS::switchfile($fat2);
+    DevoFS::read($data2, 150, $len);
+
+    DevoFS::compact();
+
+    DevoFS::read($data, 4096, $len);
+    $data2 .= $data;
+    DevoFS::close();
+
+    DevoFS::switchfile($fat);
+    DevoFS::switchfile($fat);
+    DevoFS::write($data1, 1000, $len);
+    $data = substr($data1, 1000);
+    DevoFS::write($data, 4096, $len);
+    DevoFS::close();
+    
+    DevoFS::switchfile($fat3);
+    DevoFS::read($data, 4096, $len);
+    $data3 .= $data;
+    DevoFS::close();
+    
+    DevoFS::switchfile($fat);
+    DevoFS::open("protocol/devo.mod", 0);
+    DevoFS::read($data, 4096, $len);
+    DevoFS::close();
+
+    is(Digest::MD5::md5_hex($data1), Digest::MD5::md5_hex($data), msg("Write data verified ($len)"));
+    is(Digest::MD5::md5_hex($data2), $files{"media/config.ini"}{MD5}, msg("Read 2 data verified"));
+    is(Digest::MD5::md5_hex($data3), $files{"models/model10.ini"}{MD5}, msg("Read 3 data verified"));
 }

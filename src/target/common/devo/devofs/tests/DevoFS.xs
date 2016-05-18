@@ -25,6 +25,19 @@ mount(path)
     OUTPUT:
         RETVAL
 
+FATFS *
+add_file_descriptor()
+    CODE:
+        FATFS *fs = malloc(sizeof(FATFS));
+        int res = df_add_file_descriptor(fs);
+        if (res != FR_OK) {
+            free(fs);
+            fs = NULL;
+        }
+        RETVAL = fs;
+    OUTPUT:
+        RETVAL
+
 int
 switchfile(fs)
         FATFS *fs

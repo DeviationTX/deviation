@@ -34,13 +34,15 @@ struct file_header {
     u8 size2;
     u8 size3;
 };
-typedef struct {
+
+typedef struct FATFS_s{
     int start_sector;
     int compact_sector;
     int file_addr;
     int file_cur_pos;
     int parent_dir;
     struct file_header file_header;
+    struct FATFS_s *next;
 } FATFS;
 
 #define DIR FATFS
@@ -51,16 +53,17 @@ typedef struct {
         char    fname[13];      /* File name */
 } FILINFO;
 
-FRESULT df_mount (FATFS*);						/* Mount/Unmount a logical drive */
+FRESULT df_mount (FATFS*);			/* Mount/Unmount a logical drive */
+FRESULT df_add_file_descriptor (FATFS *);
 FRESULT df_switchfile (FATFS *);
-FRESULT df_open (const char*, unsigned flags);					/* Open a file */
+FRESULT df_open (const char*, unsigned flags);	/* Open a file */
 FRESULT df_close ();
-FRESULT df_read (void*, u16, u16*);			/* Read data from the open file */
+FRESULT df_read (void*, u16, u16*);		/* Read data from the open file */
 FRESULT df_write (const void*, u16, u16*);	/* Write data to the open file */
 FRESULT df_maximize_file_size();
-FRESULT df_lseek (u32);						/* Move file pointer of the open file */
-FRESULT df_opendir (DIR*, const char*);			/* Open a directory */
-FRESULT df_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
+FRESULT df_lseek (u32);				/* Move file pointer of the open file */
+FRESULT df_opendir (DIR*, const char*);		/* Open a directory */
+FRESULT df_readdir (DIR*, FILINFO*);		/* Read a directory item from the open directory */
 FRESULT df_mkdir(const char *name);
 FRESULT df_unlink(const char *name);
 FRESULT df_stat(FILINFO *fi);

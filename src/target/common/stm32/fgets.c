@@ -92,8 +92,9 @@ size_t devo_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 void devo_finit(void *FAT, const char *drive)
 {
-    if(! ((char *)FAT)[0])
-        FS_Mount(FAT, drive);
+    (void)drive;
+    if(! fs_is_initialized(FAT))
+        fs_add_file_descriptor(FAT, drive);
 }
 
 void fempty(FILE *stream)

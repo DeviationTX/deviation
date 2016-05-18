@@ -19,15 +19,19 @@
     #define fs_readdir    df_readdir
     #define fs_write      df_write
     #define fs_switchfile df_switchfile
-    #define fs_maximize_file_size() if(0) {}
-    #define fs_set_drive_num(x,num) if(0) {}
-    #define fs_get_drive_num(x) 0
-    #define fs_is_open(x) ((x)->file_cur_pos != -1)
-    #define fs_close(x) df_close()
-    #define fs_filesize(x) (((x)->file_header.size1 << 8) | (x)->file_header.size2)
-    #define fs_ltell(x)   ((x)->file_cur_pos)
+    #define fs_maximize_file_size()         if(0) {}
+    #define fs_set_drive_num(x,num)         if(0) {}
+    #define fs_get_drive_num(x)             0
+    #define fs_is_open(x)                   ((x)->file_cur_pos != -1)
+    #define fs_close(x)                     df_close()
+    #define fs_filesize(x)                  (((x)->file_header.size1 << 8) | (x)->file_header.size2)
+    #define fs_ltell(x)                     ((x)->file_cur_pos)
+    #define fs_is_initialized(x)            (((FATFS *)(x))->start_sector != ((FATFS *)(x))->compact_sector)
+    #define fs_add_file_descriptor(x, y)    df_add_file_descriptor((FATFS *)(x))
 #else
-    #define fs_mount                  pf_mount
+    #define fs_mount                        pf_mount
+    #define fs_is_initialized(x)            (((char *)(x))[0] != 0)
+    #define fs_add_file_descriptor(x, y)    FS_Mount(x, y)
 #ifdef O_CREAT
 inline int fs_open(char *file, unsigned flags) {
     int ret = pf_open(file);

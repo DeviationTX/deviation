@@ -39,12 +39,12 @@ enum {
     FILEOBJ_DIRDEL  = 0xC1,
     FILEOBJ_DELMASK = 0xC0,
 };
-static FATFS *_fs;
+static FATFS *_fs, *_mountfs;
 
 static int _spiread(void * buf, int addr, int len);
 static int _get_addr(int addr, int offset);
 
-int _get_next_sector(int sec) {
+inline int _get_next_sector(int sec) {
     return (sec + 1) % SECTOR_COUNT;
 }
 
@@ -72,22 +72,25 @@ void _fill_fileinfo(FATFS *dir, FILINFO *fi) {
 
 FRESULT df_compact()
 {
+    FATFS *head = _mountfs;
     u8 buf[BUF_SIZE];
     u8 *buf_ptr;
     struct file_header fh;
     //printf("Start: %08x %08x %08x %08x\n", _fs->start_sector, _fs->compact_sector, _fs->file_addr, _fs->file_cur_pos);
     int read_addr = _fs->start_sector * SECTOR_SIZE + 1;
     int write_sec = _fs->compact_sector;
-    int file_addr = _fs->file_addr;
     int write_off = 1;
     int buf_len;
     disk_erasep(write_sec);
     _write_sector_id(write_sec, SECTORID_START);
     while(1) {
         // process one file/directory
-        if (read_addr == file_addr)
-            file_addr = write_sec * SECTOR_SIZE + write_off;
-
+        head = _mountfs;
+        while(head) {
+            if (read_addr == head->file_addr)
+                head->file_addr = write_sec * SECTOR_SIZE + write_off;
+            head = head->next;
+        }
         _spiread(&fh, read_addr, sizeof(struct file_header));
         if (fh.type == FILEOBJ_NONE)
             break;
@@ -138,10 +141,13 @@ FRESULT df_compact()
         write_sec = _get_next_sector(write_sec);
     }
     //update _fs
-    _fs->start_sector = _fs->compact_sector;
-    _fs->compact_sector = last_sec;
-    _fs->file_addr = file_addr;
-    //printf("End: %08x %08x %08x %08x\n", _fs->start_sector, _fs->compact_sector, _fs->file_addr, _fs->file_cur_pos);
+    head = _mountfs;
+    while(head) {
+        head->start_sector = _fs->compact_sector;
+        head->compact_sector = last_sec;
+        //printf("End: %08x %08x %08x %08x\n", head->start_sector, head->compact_sector, head->file_addr, head->file_cur_pos);
+        head = head->next;
+    }
     return FR_OK;
 }
 
@@ -160,7 +166,7 @@ int _spiread(void * buf, int addr, int len)
             if (actual != bytes)
                 break;
             offset = 1;
-            sector = (sector + 1) % SECTOR_COUNT;
+            sector = _get_next_sector(sector);
         } else {
             disk_readp_cnt(buf, sector, offset, len, &actual);
             len -= actual;
@@ -180,7 +186,7 @@ int _spiwrite(const void* buf, int addr, int len)
             buf += bytes;
             len -= bytes;
             offset = 1;
-            sector = (sector + 1) % SECTOR_COUNT;
+            sector = _get_next_sector(sector);
             _write_sector_id(sector, SECTORID_DATA);
             //write sector_id
         } else {
@@ -234,9 +240,11 @@ int _find_start_sector(int *recovery_sector)
 FRESULT df_mount (FATFS* fs)
 {
     _fs = fs;
+    _mountfs = fs;
     fs->file_addr = -1;
     fs->file_cur_pos = -1;
     fs->parent_dir = 0;
+    fs->next = NULL;
     disk_initialize();
     fs->start_sector = _find_start_sector(&fs->compact_sector);
     if (fs->start_sector  == -1) {
@@ -248,11 +256,29 @@ FRESULT df_mount (FATFS* fs)
     fs->compact_sector = fs->start_sector == 0 ? SECTOR_COUNT-1 : fs->start_sector-1;
 
     //Must initialize file_addr and file_header in case the 1st action on the FS is a write
-    fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    fs->file_addr = fs->start_sector * SECTOR_SIZE + 1; //reset current position
     _spiread(&fs->file_header, fs->file_addr, sizeof(struct file_header));
     return FR_OK;
 }
 
+FRESULT df_add_file_descriptor (FATFS *fs)
+{
+    FATFS *head = _mountfs;
+    memcpy(fs, _mountfs, sizeof(FATFS));
+    fs->file_cur_pos = -1;
+    fs->parent_dir = 0;
+    fs->next = NULL;
+
+    while(head->next)
+        head = head->next;
+    head->next = fs;
+
+    //Must initialize file_addr and file_header in case the 1st action on the FS is a write
+    fs->file_addr = fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    _spiread(&fs->file_header, fs->file_addr, sizeof(struct file_header));
+    
+    return FR_OK;
+}
 int _expand_chars(char *dest, const char *src, int len)
 {
    int i, j;
