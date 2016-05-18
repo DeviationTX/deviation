@@ -13,9 +13,11 @@
 #endif
 
 enum {
-    SECTOR_SIZE     = 4096,
-    SECTOR_COUNT    = 16,
-    BUF_SIZE        = 100,
+    SECTOR_SIZE         = 4096,
+    MINIMUM_EXTRA_BYTES = 4096,
+    MINIMUM_NEW_FILE_SIZE = 8192,
+    SECTOR_COUNT        = 16,
+    BUF_SIZE            = 100,
 };
 
 enum {
@@ -150,7 +152,7 @@ int _spiread(void * buf, int addr, int len)
     u16 actual;
     int orig_len = len;
     while(len) {
-        if (offset + len > SECTOR_SIZE) {
+        if (offset + len >= SECTOR_SIZE) {
             int bytes = SECTOR_SIZE - offset;
             disk_readp_cnt(buf, sector, offset, bytes, &actual);
             buf += actual;
@@ -172,7 +174,7 @@ int _spiwrite(const void* buf, int addr, int len)
     int sector = addr / SECTOR_SIZE;
     int offset = addr % SECTOR_SIZE;
     while(len) {
-        if (offset + len > SECTOR_SIZE) {
+        if (offset + len >= SECTOR_SIZE) {
             int bytes = SECTOR_SIZE - offset;
             disk_writep_rand(buf, sector, offset, bytes);
             buf += bytes;
@@ -244,6 +246,10 @@ FRESULT df_mount (FATFS* fs)
         return df_compact(fs);
     }
     fs->compact_sector = fs->start_sector == 0 ? SECTOR_COUNT-1 : fs->start_sector-1;
+
+    //Must initialize file_addr and file_header in case the 1st action on the FS is a write
+    fs->file_addr = _fs->start_sector * SECTOR_SIZE + 1; //reset current position
+    _spiread(&fs->file_header, fs->file_addr, sizeof(struct file_header));
     return FR_OK;
 }
 
@@ -279,6 +285,13 @@ void _format_filename(const char *filename, char *expanded_name)
    }
 }
 
+//void _print_header(struct file_header *header)
+//{
+//   char name[13];
+//   memset(name, 0, sizeof(name));
+//   _format_filename(header->name, name);
+//    printf("%02x  %d  %13s    %d    %d\n", header->type, header->parent_dir, name, FILE_ID(*header), FILE_SIZE(*header));
+//}
 FRESULT _find_file(FATFS *fs, const char *fullname)
 {
    char name[11];
@@ -390,27 +403,47 @@ int _get_next_write_addr()
     return addr;
 }
 
+int _get_free_space()
+{
+    // This assues _fs->file_addr is already at the next writeable location
+    int delta = _fs->compact_sector - (1 + (_fs->file_addr / SECTOR_SIZE)); //# sectors from next boundary to the compact_sector
+    if (delta < 0)
+        delta += SECTOR_COUNT;
+    delta = delta * (SECTOR_SIZE - 1);
+    delta += SECTOR_SIZE - (_fs->file_addr % SECTOR_SIZE);
+    return delta - 1;
+}
+    
 void _create_empty_file(int delete_first)
 {
     //Delete file 1st
     u8 data[BUF_SIZE];
     if (delete_first) {
         data[0] = FILEOBJ_FILEDEL;
-        disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
+        disk_writep_rand(data, _fs->file_addr / SECTOR_SIZE, _fs->file_addr % SECTOR_SIZE, 1);
         _fs->file_addr = _get_next_write_addr();
     }
 
     unsigned cur_size = FILE_SIZE(_fs->file_header);
     if (cur_size == 0 ) //we need to make sure max_size is non-zero
         cur_size = 1;
-    unsigned max_size = ((4095 + cur_size) / 4096) * 4096; //round to nearest sector
+    unsigned requested_size = cur_size + MINIMUM_EXTRA_BYTES;
+    if (requested_size < MINIMUM_NEW_FILE_SIZE)
+        requested_size = MINIMUM_NEW_FILE_SIZE;
+    int max_size = _get_free_space();
+    if (requested_size > max_size)
+        max_size = requested_size;
+    //Max size is total space available, we need to subtract the file_header
     if (max_size - cur_size > sizeof(struct file_header))
         max_size -= sizeof(struct file_header);
-
+    
     int end_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + max_size);
-    if (end_addr >= _fs->compact_sector*SECTOR_SIZE) {
+    //Check whether end_addr is past the compact_sector
+    if (end_addr > _fs->compact_sector*SECTOR_SIZE || end_addr < _fs->file_addr && _fs->file_addr <= _fs->compact_sector*SECTOR_SIZE) {
         //file won't fit.  need to compact
         df_compact();
+        max_size = _get_free_space();
+        //printf("Compacting: New max size: %d\n", max_size);
     }
     //duplicate file header to new location
     //zero file size (we'll write the actual size at close
@@ -440,7 +473,7 @@ FRESULT df_unlink(const char *name)
     if (res == 0) {
         u8 data[2];
         data[0] = _fs->file_header.type |= FILEOBJ_DELMASK;
-        disk_writep_rand(data, _fs->file_addr / 4096, _fs->file_addr % 4096, 1);
+        disk_writep_rand(data, _fs->file_addr / SECTOR_SIZE, _fs->file_addr % SECTOR_SIZE, 1);
         return FR_OK;
     }
     return FR_NO_FILE;
@@ -535,7 +568,7 @@ FRESULT df_close ()
         _fs->file_header.size1 = 0xff & (_fs->file_cur_pos >> 16);
         _fs->file_header.size2 = 0xff & (_fs->file_cur_pos >> 8);
         _fs->file_header.size3 = 0xff & (_fs->file_cur_pos >> 0);
-        _spiwrite(&_fs->file_header.size1, _fs->file_addr + offsetof(struct file_header, size1), 3);
+        _spiwrite(&_fs->file_header.size1, _get_addr(_fs->file_addr, offsetof(struct file_header, size1)), 3);
     }
     _fs->file_cur_pos = -1;
     return FR_OK;
@@ -555,13 +588,13 @@ int _get_addr(int addr, int offset)
 {
     int base_addr  = addr / SECTOR_SIZE;
     int sec_offset = addr % SECTOR_SIZE;
-    while(sec_offset + offset > SECTOR_SIZE) {
+    while(sec_offset + offset >= SECTOR_SIZE) {
         base_addr++;
         sec_offset++; // account for sector header byte
-        if (sec_offset == SECTOR_SIZE) { //account for edge-of-sector case
-            base_addr++;
-            sec_offset = 1;
-        }
+        //if (sec_offset == SECTOR_SIZE) { //account for edge-of-sector case
+        //    base_addr++;
+        //    sec_offset = 1;
+        //}
         offset -= SECTOR_SIZE;
     }
     sec_offset += offset;
@@ -579,7 +612,9 @@ FRESULT df_lseek (u32 pos) {
 FRESULT df_write (const void *buffer, u16 requested, u16 *written)
 {
     if (requested + _fs->file_cur_pos > FILE_SIZE(_fs->file_header)) {
+        //printf( "Truncating request from %d", requested);
         requested = FILE_SIZE(_fs->file_header) - _fs->file_cur_pos;
+        //printf(" to %d\n", requested);
     } 
     _spiwrite(buffer, _get_addr(_fs->file_addr, sizeof(struct file_header) + _fs->file_cur_pos), requested);
     _fs->file_cur_pos += requested;

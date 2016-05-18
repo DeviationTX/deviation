@@ -603,7 +603,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(MODEL_MIXERMODE)) {
-            for(i = 0; i < 2; i++) {
+            for(i = 1; i < 3; i++) {
                 if(MATCH_VALUE(STDMIXER_ModeName(i)))
                     m->mixer_mode = i;
             }
