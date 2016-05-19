@@ -38,7 +38,6 @@ static void processHubPacket(u8 id, u16 value) {
     static u8 last_id;
     static u16 last_value;
 
-//printf("id=0x%02x, value=0x%02x\n", id, value);
     switch (id) {
     //defined in protocol_sensor_hub.pdf
     case 0x01: //GPS_ALT (whole number & sign) -500m-9000m (.01m/count)

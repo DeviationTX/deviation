@@ -207,7 +207,7 @@ static void frsky2way_build_data_packet()
 #include "frsky_d_telem._c"
 
 
-    static TS_STATE ts_state = TS_IDLE;    // file scope so can reset on sequence error. this code not included in modular build so init okay
+static TS_STATE ts_state;    // file scope so can reset on sequence error
 static void frsky_parse_telem_stream(u8 byte) {
     static u8 data_id;
     static u8 lowByte;
@@ -253,20 +253,31 @@ static void frsky_parse_telem_stream(u8 byte) {
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
-// pkt 0 = len not counting appended status bytes
+// pkt 0 = length not counting appended status bytes
 // pkt 1,2 = fixed_id
 // pkt 3 = A1 : 52mV per count; 4.5V = 0x56
 // pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
 // pkt 5 = RSSI
 // pkt 6 = number of stream bytes
 // pkt 7 = sequence number increments mod 8 with each packet containing stream data
-// pkt 8-17 = stream data
-// pkt 18 = local RSSI
-// pkt 19 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
+// pkt 8-(8+pkt[7]) = stream data
+// pkt len-2 = downlink RSSI
+// pkt len-1 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
+
+
+// D-series receivers seem to return a lot of bad packets.  Do as much as possible to
+// avoid bad data.
+
 
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3 || !(pkt[len-1] & 0x80))
-        return;
+
+    // packet checks: sensible length, good CRC, matching fixed id
+    if (len != pkt[0] + 3 || pkt[0] < 5
+        || !(pkt[len-1] & 0x80)
+        || pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff)) {
+            return;
+    }
+
     //Get voltage A1 (52mv/count)
     Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[3] * 52 / 10; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
@@ -279,20 +290,19 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
 
 #if HAS_EXTENDED_TELEMETRY
     static u8 sequence;
-//printf("pkt[6]=0x%02x\n", pkt[6]);
-    if (pkt[6]) {
-//printf("pkt[7]=0x%02x, sequence=0x%02x\n", pkt[7], sequence);
-        if ((pkt[7] & 7) != sequence) {
+
+    if (pkt[0] < 7) return;   // be paranoid about packet length
+
+    if (pkt[6] && pkt[6] <= pkt[0]-7) {   // be paranoid about packet length
+        if (pkt[7] != sequence) {
             ts_state = TS_IDLE;
-            sequence = (pkt[7] + 1) % 8;    // should be able to recover in middle of sequence
-            return;
+            sequence = pkt[7];    // should be able to recover in middle of sequence
         }
         sequence = (sequence + 1) % 8;
             
         for(int i=8; i < 8+pkt[6]; i++)
             frsky_parse_telem_stream(pkt[i]);
     }
-
 #endif // HAS_EXTENDED_TELEMETRY
 }
 
@@ -412,6 +422,9 @@ static void initialize(int bind)
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     //fixed_id = 0x3e19;
     fixed_id = get_tx_id();
+#if HAS_EXTENDED_TELEMETRY
+    ts_state = TS_IDLE;
+#endif
     frsky2way_init(bind);
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
