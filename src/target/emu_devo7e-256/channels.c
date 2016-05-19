@@ -17,7 +17,7 @@
 #include "mixer.h"
 #include "config/tx.h"
 
-#define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER))
+#define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER) | (1 << INP_NONE) | (1 << INP_LAST))
 #define SWITCH_3x4  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
                    | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
