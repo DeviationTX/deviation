@@ -209,8 +209,8 @@ static void frsky2way_build_data_packet()
 
     static TS_STATE ts_state = TS_IDLE;    // file scope so can reset on sequence error. this code not included in modular build so init okay
 static void frsky_parse_telem_stream(u8 byte) {
-    static int8_t data_id;
-    static uint8_t lowByte;
+    static u8 data_id;
+    static u8 lowByte;
 
 
     if (byte == 0x5e) {
