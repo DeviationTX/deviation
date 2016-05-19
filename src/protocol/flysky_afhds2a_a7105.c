@@ -313,14 +313,14 @@ static void calc_fh_channels(uint32_t seed)
                 count_43_85++;
             else if (hopping_frequency[i] <= 128)
                 count_86_128++;
-			else
-				count_129_168++;
+            else
+                count_129_168++;
         }
         if (i != idx)
             continue;
         if ((next_ch <= 42 && count_1_42 < 5)
           ||(next_ch >= 43 && next_ch <= 85 && count_43_85 < 5)
-		  ||(next_ch >= 86 && next_ch <=128 && count_86_128 < 5)
+          ||(next_ch >= 86 && next_ch <=128 && count_86_128 < 5)
           ||(next_ch >= 129 && count_129_168 < 5))
         {
             hopping_frequency[idx++] = next_ch;
