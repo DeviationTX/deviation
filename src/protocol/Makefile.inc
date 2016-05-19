@@ -57,7 +57,7 @@ $(ODIR)/protocol/flysky.mod : $(ODIR)/flysky_a7105.bin
 	@echo Building 'flysky' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
     
-$(ODIR)/protocol/afhds2a.mod : $(ODIR)/flysky_afhds2a_a7105.bin
+$(ODIR)/protocol/afhds-2a.mod : $(ODIR)/flysky_afhds2a_a7105.bin
 	@echo Building 'afhds-2a' module
 	/bin/mkdir -p $(ODIR)/protocol/ 2>/dev/null; /bin/cp $< $@
 
