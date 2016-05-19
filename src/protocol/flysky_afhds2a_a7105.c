@@ -34,38 +34,55 @@
 
 #ifdef PROTO_HAS_A7105
 
-static const u8 AFHDS2A_TXID[4] = {0x0f, 0x6b, 0xd0, 0xb2};
-static const u8 AFHDS2A_RXID[4] = {0x25, 0x27, 0x9B, 0x3B};
+#define TXPACKET_SIZE 38
+#define RXPACKET_SIZE 37
+#define NUMFREQ       16
+#define TXID_SIZE     4
+#define RXID_SIZE     4
 
-static const u8 AFHDS2A_CH[16] = {0x86,0x19,0x28,0x63,0x92,0x5d,0x4c,0x8b,0x2e,0x24,0x1f,0x45,0x14,0x37,0x96,0x0f};
+static u8 packet[TXPACKET_SIZE];
+static u8 txid[TXID_SIZE];
+static u8 rxid[RXID_SIZE];
+static u8 hopping_frequency[NUMFREQ];
+static u8 packet_type;
+static u8 bind_count;
+static u8 bind_reply;
+static u8 state;
+static u8 channel;
 
 static const u8 AFHDS2A_regs[] = {
     -1  , 0x42 | (1<<5), 0x00, 0x25, 0x00,   -1,   -1, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3c, 0x05, 0x00, 0x50, // 00 - 0f
     0x9e, 0x4b, 0x00, 0x02, 0x16, 0x2b, 0x12, 0x4f, 0x62, 0x80,   -1,   -1, 0x2a, 0x32, 0xc3, 0x1f, // 10 - 1f
     0x1e,   -1, 0x00,   -1, 0x00, 0x00, 0x3b, 0x00, 0x17, 0x47, 0x80, 0x03, 0x01, 0x45, 0x18, 0x00, // 20 - 2f
-    0x01, 0x0f                                                                                      // 30 - 31
+    0x01, 0x0f // 30 - 31
 };
 
 enum{
-    AFHDS2A_DATA1,  
-    AFHDS2A_DATA2,
-    AFHDS2A_DATA3,
+    PACKET_STICKS,
+    PACKET_SETTINGS,
 };
 
-static u8 AFHDS2A_state;
-static u8 AFHDS2A_channel;
-static u32 id;
-static u8 packet[38];
+enum{
+    BIND1,
+    BIND2,
+    BIND3,
+    BIND4,
+    DATA1,
+};
 
 static const char * const afhds2a_opts[] = {
     _tr_noop("PPM"), _tr_noop("Off"), _tr_noop("On"), NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
+    "RX ID", "-32768", "32768", "1", NULL, // todo: store that elsewhere
+    "RX ID2","-32768", "32768", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
     NULL
 };
 
 enum {
     PROTOOPTS_PPM = 0,
     PROTOOPTS_SERVO_HZ,
+    PROTOOPTS_RXID, // todo: store that elsewhere
+    PROTOOPTS_RXID2,// ^^^^^^^^^^^^^^^^^^^^^^^^^^
     LAST_PROTO_OPT,
 };
 
@@ -129,7 +146,7 @@ static int afhds2a_init()
 
     //Calibrate channel 0xa0?
     //Set Channel
-    A7105_WriteReg(0x0f, 0xa0); //Should we choose a different channel?
+    A7105_WriteReg(0x0f, 0xa0);
     //VCO Calibration
     A7105_WriteReg(0x02, 2);
     ms = CLOCK_getms();
@@ -156,11 +173,11 @@ static int afhds2a_init()
     return 1;
 }
 
-void afhds2a_build_packet()
+static void build_sticks_packet()
 {
     packet[0] = 0x58;
-    memcpy( &packet[1], AFHDS2A_TXID, 4);
-    memcpy( &packet[5], AFHDS2A_RXID, 4);
+    memcpy( &packet[1], txid, 4);
+    memcpy( &packet[5], rxid, 4);
     for(u8 i=0; i<14; i++)
     {
         if (i >= Model.num_channels) {
@@ -169,7 +186,7 @@ void afhds2a_build_packet()
             continue;
         }
         s32 value = (s32)Channels[i] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
-        if (value < 950 || value > 2050)
+        if (value < 900 || value > 2100)
             value = 1500;
         packet[9 +  i*2] = value & 0xff;
         packet[10 + i*2] = (value >> 8) & 0xff;
@@ -177,11 +194,11 @@ void afhds2a_build_packet()
     packet[37] = 0x00;
 }
 
-void afhds2a_build_option_packet()
+static void build_settings_packet()
 {
     packet[0] = 0xaa;
-    memcpy( &packet[1], AFHDS2A_TXID, 4);
-    memcpy( &packet[5], AFHDS2A_RXID, 4);
+    memcpy( &packet[1], txid, 4);
+    memcpy( &packet[5], rxid, 4);
     packet[9] = 0xfd;
     packet[10]= 0xff;
     packet[11]= Model.proto_opts[PROTOOPTS_SERVO_HZ] & 0xff;
@@ -193,68 +210,256 @@ void afhds2a_build_option_packet()
     packet[37] = 0x00;
 }
 
-static void afhds2a_update_telemetry()
+static void build_packet(u8 type)
 {
-    const u8 *update = NULL;
-    static const u8 telempkt[] = { TELEM_FRSKY_VOLT1, TELEM_FRSKY_RSSI, 0 };
+    switch(type) {
+        case PACKET_STICKS:
+            build_sticks_packet();
+            break;
+        case PACKET_SETTINGS:
+            build_settings_packet();
+            break;
+    }
+}
+
+// telemetry sensors ID
+enum{
+    SENSOR_RX_VOLTAGE   = 0x00,
+    SENSOR_RX_ERR_RATE  = 0xfe,
+    SENSOR_RX_RSSI      = 0xfc,
+};
+
+static void update_telemetry()
+{
+    // AA | TXID | RXID | sensor id | sensor # | value 16 bit big endian | sensor id ......
+    // max 7 sensors per packet
     
-    // todo: check txid & rxid
-    // todo: check sensor type and ID
-    Telemetry.value[TELEM_FRSKY_VOLT1] = ((u16)(packet[12]<<8) | (packet[11] & 0xff)); // RX voltage
-    Telemetry.value[TELEM_FRSKY_RSSI] = 100 - packet[15]; // % droped / missed packets
-    update = telempkt;
-    
-    if (update) {
-        while(*update) {
-            TELEMETRY_SetUpdated(*update++);
+    for(u8 sensor=0; sensor<7; sensor++) {
+        u8 index = 9+(4*sensor);
+        switch(packet[index]) {
+            case SENSOR_RX_VOLTAGE:
+                Telemetry.value[TELEM_FRSKY_VOLT1] = packet[index+3]<<8 | packet[index+2];
+                TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
+                break;
+            case SENSOR_RX_ERR_RATE:
+                // packet[index+2];
+                break;
+            case SENSOR_RX_RSSI:
+                Telemetry.value[TELEM_FRSKY_RSSI] = -packet[index+2];
+                TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
+                break;
+            case 0xff:
+                return;
+            default:
+                // unknown sensor ID
+                break;
+            }
+    }
+}
+
+static void build_bind_packet()
+{
+    u8 ch;
+    memcpy( &packet[1], txid, 4);
+    memset( &packet[5], 0xff, 4);
+    packet[10]= 0x00;
+    for(ch=0; ch<16; ch++) {
+        packet[11+ch] = hopping_frequency[ch];
+    }
+    memset( &packet[27], 0xff, 10);
+    packet[37] = 0x00;
+    switch(state) {
+        case BIND1:
+            packet[0] = 0xbb;
+            packet[9] = 0x01;
+            break;
+        case BIND2:
+        case BIND3:
+        case BIND4:
+            packet[0] = 0xbc;
+            if(state == BIND4) {
+                memcpy( &packet[5], &rxid, 4);
+                memset( &packet[11], 0xff, 16);
+            }
+            packet[9] = state-1;
+            if(packet[9] > 0x02)
+                packet[9] = 0x02;
+            packet[27]= 0x01;
+            packet[28]= 0x80;
+            break;
+    }
+}
+
+static void calc_fh_channels(uint32_t seed)
+{
+    int idx = 0;
+    uint32_t rnd = seed;
+    while (idx < NUMFREQ) {
+        int i;
+        int count_1_42 = 0, count_43_85 = 0, count_86_128 = 0, count_129_168=0;
+        rnd = rnd * 0x0019660D + 0x3C6EF35F; // Randomization
+
+        uint8_t next_ch = ((rnd >> (idx%32)) % 0xa8) + 1;
+        // Keep the distance 2 between the channels - either odd or even
+        if (((next_ch ^ seed) & 0x01 )== 0)
+            continue;
+        // Check that it's not duplicate and spread uniformly
+        for (i = 0; i < idx; i++) {
+            if(hopping_frequency[i] == next_ch)
+                break;
+            if(hopping_frequency[i] <= 42)
+                count_1_42++;
+            else if (hopping_frequency[i] <= 85)
+                count_43_85++;
+            else if (hopping_frequency[i] <= 128)
+                count_86_128++;
+			else
+				count_129_168++;
+        }
+        if (i != idx)
+            continue;
+        if ((next_ch <= 42 && count_1_42 < 5)
+          ||(next_ch >= 43 && next_ch <= 85 && count_43_85 < 5)
+		  ||(next_ch >= 86 && next_ch <=128 && count_86_128 < 5)
+          ||(next_ch >= 129 && count_129_168 < 5))
+        {
+            hopping_frequency[idx++] = next_ch;
         }
     }
 }
 
-u16 afhds2a_cb()
+// Generate internal id from TX id and manufacturer id (STM32 unique id)
+static void initialize_tx_id()
 {
-    static u8 state=0;
-    switch(AFHDS2A_state) {
-        case AFHDS2A_DATA1:
-            if(state==1)
-                afhds2a_build_option_packet();
-            else
-                afhds2a_build_packet();
-            A7105_Strobe(A7105_STANDBY);
-            A7105_SetTxRxMode(TX_EN);
-            A7105_WriteData(packet, 38, AFHDS2A_CH[AFHDS2A_channel++]);
-            if(AFHDS2A_channel >= 16)
-                AFHDS2A_channel = 0;
-            
-            state = 0;
-            
-            // got some data from RX ?
-            if(A7105_ReadReg(0) == 0x1b) {
-                A7105_Strobe(A7105_RST_RDPTR);
-                A7105_ReadData(packet, 37);
-                if(packet[0] == 0xaa && packet[9] == 0xfc) { // rx is asking for options ?
-                    state=1;
-                    printf("setup\n");
-                }
-                else if(packet[0] == 0xaa) {
-                    afhds2a_update_telemetry();
-                    //printf("%02x %02x\n", packet[11], packet[12]);
-                }
-            }
-            
-            AFHDS2A_state = AFHDS2A_DATA2;
-            return 1700;
-            
-        case AFHDS2A_DATA2:
-            A7105_SetTxRxMode(RX_EN);
-            A7105_Strobe(A7105_RX);
-            AFHDS2A_state = AFHDS2A_DATA1;
-            return 2150;
+    u32 lfsr = 0x7649eca9ul;
+    
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    printf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        printf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
     }
-    return 1000; // just to please the compiler
+    printf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    
+    // Pump zero bytes for LFSR to diverge more
+    for (int i = 0; i < TXID_SIZE; ++i) rand32_r(&lfsr, 0);
+
+    for (u8 i = 0; i < TXID_SIZE; ++i) {
+        txid[i] = lfsr & 0xff;
+        rand32_r(&lfsr, i);
+    }
+    
+    // Use LFSR to seed frequency hopping sequence after another
+    // divergence round
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+    calc_fh_channels(lfsr);
 }
 
-void initialize(u8 bind)
+#define WAIT_WRITE 0x80
+
+static u16 afhds2a_cb()
+{
+    switch(state) {
+        case BIND1:
+        case BIND2:
+        case BIND3:    
+            A7105_Strobe(A7105_STANDBY);
+            build_bind_packet();
+            A7105_WriteData(packet, 38, bind_count%2 ? 0x0d : 0x8c);
+            if(A7105_ReadReg(0) == 0x1b) { // todo: replace with check crc+fec
+                A7105_Strobe(A7105_RST_RDPTR);
+                A7105_ReadData(packet, RXPACKET_SIZE);
+                if(packet[0] == 0xbc) {
+                    for(u8 i=0; i<4; i++) {
+                        rxid[i] = packet[5+i];
+                    }
+                    Model.proto_opts[PROTOOPTS_RXID] = (u16)rxid[0]<<8 | rxid[1];
+                    Model.proto_opts[PROTOOPTS_RXID2]= (u16)rxid[2]<<8 | rxid[3];
+                    if(packet[9] == 0x01)
+                        state = BIND4;
+                }
+            } 
+            bind_count++;
+            state |= WAIT_WRITE;
+            return 1700;
+        
+        case BIND1|WAIT_WRITE:
+        case BIND2|WAIT_WRITE:
+        case BIND3|WAIT_WRITE:
+            A7105_Strobe(A7105_RX);
+            state &= ~WAIT_WRITE;
+            state++;
+            if(state > BIND3)
+                state = BIND1;
+            return 2150;
+        
+        case BIND4:
+            A7105_Strobe(A7105_STANDBY);
+            build_bind_packet();
+            A7105_WriteData(packet, 38, bind_count%2 ? 0x0d : 0x8c);
+            bind_count++;
+            bind_reply++;
+            if(bind_reply>=4) { 
+                bind_count=0;
+                channel=1;
+                state = DATA1;
+                PROTOCOL_SetBindState(0);
+            }                        
+            state |= WAIT_WRITE;
+            return 1700;
+            
+        case BIND4|WAIT_WRITE:
+            A7105_Strobe(A7105_RX);
+            state &= ~WAIT_WRITE;
+            return 2150;
+        
+        case DATA1:    
+            A7105_Strobe(A7105_STANDBY);
+            build_packet(packet_type);
+            A7105_WriteData(packet, 38, hopping_frequency[channel++]);
+            if(channel >= 16)
+                channel = 0;
+            packet_type = PACKET_STICKS; // todo : check for settings changes
+             // got some data from RX ?
+             // we've no way to know if RX fifo has been filled
+             // as we can't poll GIO1 or GIO2 to check WTR
+             // we can't check A7105_MASK_TREN either as we know
+             // it's currently in transmit mode.
+             if(!(A7105_ReadReg(0) & (1<<5 | 1<<6))) { // FECF+CRCF Ok
+                 A7105_Strobe(A7105_RST_RDPTR);
+                 u8 check;
+                 A7105_ReadData(&check,1);
+                 if(check == 0xaa) {
+                     A7105_Strobe(A7105_RST_RDPTR);
+                     A7105_ReadData(packet, RXPACKET_SIZE);
+                     if(packet[9] == 0xfc) { // rx is asking for settings ?
+                         packet_type=PACKET_SETTINGS;
+                     }
+                     else {
+                         update_telemetry();
+                     }
+                 }
+             }
+            state |= WAIT_WRITE;
+            return 1700;
+            
+        case DATA1|WAIT_WRITE:
+            state &= ~WAIT_WRITE;
+            A7105_Strobe(A7105_RX);
+            return 2150;
+    }
+    return 3850; // never reached, please the compiler
+}
+
+static void initialize(u8 bind)
 {
     CLOCK_StopTimer();
     while(1) {
@@ -263,12 +468,25 @@ void initialize(u8 bind)
         if (afhds2a_init())
             break;
     }
-    AFHDS2A_state = AFHDS2A_DATA1;
-    AFHDS2A_channel = 0;
+    initialize_tx_id();
+    packet_type = PACKET_STICKS;
+    bind_count = 0;
+    bind_reply = 0;
+    if(bind) {
+        state = BIND1;
+        PROTOCOL_SetBindState(0xffffffff);
+    }
+    else {
+        state = DATA1;
+        rxid[0] = (Model.proto_opts[PROTOOPTS_RXID] >> 8) & 0xff;
+        rxid[1] = (Model.proto_opts[PROTOOPTS_RXID]) & 0xff;
+        rxid[2] = (Model.proto_opts[PROTOOPTS_RXID2] >> 8)  & 0xff;
+        rxid[3] = (Model.proto_opts[PROTOOPTS_RXID2]) & 0xff;
+    }
+    channel = 0;
     memset(&Telemetry, 0, sizeof(Telemetry));
     TELEMETRY_SetType(TELEM_FRSKY);
-    printf("\n\nAFHDS2A initialize OK\n");
-    CLOCK_StartTimer(2400, afhds2a_cb);
+    CLOCK_StartTimer(50000, afhds2a_cb);
 }
 
 const void *AFHDS2A_Cmds(enum ProtoCmds cmd)
@@ -279,11 +497,11 @@ const void *AFHDS2A_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(A7105_Reset() ? 1L : -1L);
-        case PROTOCMD_CHECK_AUTOBIND: return Model.fixed_id ? 0 : (void *)1L;
+        case PROTOCMD_CHECK_AUTOBIND: return 0;
         case PROTOCMD_BIND:  initialize(1); return 0;
-        case PROTOCMD_NUMCHAN: return (void *)12L;
+        case PROTOCMD_NUMCHAN: return (void *)12L; // todo: test 14 channels
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)8L;
-        case PROTOCMD_CURRENT_ID: return (void *)((unsigned long)id);
+        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS:
             if( Model.proto_opts[PROTOOPTS_SERVO_HZ] < 50 || Model.proto_opts[PROTOOPTS_SERVO_HZ] > 400)
                 Model.proto_opts[PROTOOPTS_SERVO_HZ] = 50;
