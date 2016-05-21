@@ -404,7 +404,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                 }
                 break;
             case XYGraph:
-                if(OBJ_IS_SELECTABLE(obj) && coords_in_box(&obj->box, coords)) {
+                if(((guiXYGraph_t *)obj)->touch_cb && coords_in_box(&obj->box, coords)) {
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;
