@@ -456,7 +456,7 @@ void _create_empty_file(int delete_first)
     unsigned requested_size = cur_size + MINIMUM_EXTRA_BYTES;
     if (requested_size < MINIMUM_NEW_FILE_SIZE)
         requested_size = MINIMUM_NEW_FILE_SIZE;
-    int max_size = _get_free_space();
+    unsigned max_size = _get_free_space();
     if (requested_size > max_size)
         max_size = requested_size;
     //Max size is total space available, we need to subtract the file_header
@@ -465,7 +465,7 @@ void _create_empty_file(int delete_first)
     
     int end_addr = _get_addr(_fs->file_addr, sizeof(struct file_header) + max_size);
     //Check whether end_addr is past the compact_sector
-    if (end_addr > _fs->compact_sector*SECTOR_SIZE || end_addr < _fs->file_addr && _fs->file_addr <= _fs->compact_sector*SECTOR_SIZE) {
+    if (end_addr > _fs->compact_sector*SECTOR_SIZE || (end_addr < _fs->file_addr && _fs->file_addr <= _fs->compact_sector*SECTOR_SIZE)) {
         //file won't fit.  need to compact
         df_compact();
         max_size = _get_free_space();

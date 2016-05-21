@@ -53,7 +53,7 @@ void PAGE_LoadSaveInit(int page)
 {
     int num_models;
     int selected;
-    const char * name;
+    const char * name = NULL;
     enum loadSaveType menu_type = page;
     mp->menu_type = page;
     OBJ_SET_USED(&gui->image, 0);

@@ -12,9 +12,7 @@ default: $(TARGET)
 ALLTARGETS = $(filter-out common,$(notdir $(wildcard target/*)))
 
 # The supported transmitters
-TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e
-# These txs use file systems for other txs, so don't have a file system target.
-NOFSTXS = devo6 devo7e
+TXS ?= devo6 devo7e devo8 devo10 devo12 devof7 devof4 devof12e at9
 
 #Filter non-existant emus
 EMUS = $(foreach dir,$(TXS:%=emu_%),$(if $(wildcard target/$(dir)),$(dir),))
@@ -38,9 +36,7 @@ win_$1:
 	$(MAKE) TARGET=$1 WINDOWS=1 CROSS=i586-mingw32msvc-
 fs_$1:
 ifneq "$(INCLUDE_FS)" "1"
-ifneq "$(findstring $1,$(NOFSTXS))" "$1"
 	$(MAKE) TARGET=$1 fs
-endif
 endif
 both_$1: $1 emu_$1
 zip_$1:
