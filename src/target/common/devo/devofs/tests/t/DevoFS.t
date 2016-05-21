@@ -32,7 +32,6 @@ my $MAX_FILE_SIZE = 65535;
 
 #tests here
 init();
-if(0) {
 read_partial();
 lseek();
 write_file(4096);
@@ -43,7 +42,6 @@ manual_compact();
 change_filesize();
 file_sector_align();
 write_around_the_horn();
-}
 multiple_file_descriptors();
 
 sub msg
