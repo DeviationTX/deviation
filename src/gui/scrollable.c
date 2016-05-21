@@ -342,7 +342,12 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
         row -= scrollable->visible_rows;
     else
         row += direction;
-    create_scrollable_objs(scrollable, row);
+    if (row < 0) {
+        row = 0;
+    } else if (row > scrollable->item_count - scrollable->visible_rows) {
+        row = scrollable->item_count - scrollable->visible_rows;
+    }
+    create_scrollable_objs(scrollable, -row);
     return -1;
 }
 #endif
@@ -412,7 +417,10 @@ guiObject_t *GUI_ShowScrollableRowOffset(guiScrollable_t *scrollable, int row_id
 }
 int GUI_ScrollableGetObjRowOffset(guiScrollable_t *scrollable, guiObject_t *obj)
 {
-    int idx = (scrollable->cur_row << 8) | get_selectable_idx(scrollable, obj);
+    int idx = get_selectable_idx(scrollable, obj);
+    if (idx < 0)
+        idx = 0;
+    idx |= (scrollable->cur_row << 8);
     //printf("Saving position:%04x\n", idx);
     return idx;
 }
