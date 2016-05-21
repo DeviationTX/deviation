@@ -48,16 +48,18 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     if (USE_4BUTTON_MODE && GUI_GetRemappedButtons()) {
         return 0;
     }
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+    if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        if (flags & BUTTON_LONGPRESS) {
+            //Return to main page
+            page_stack = _page_stack;
+            printf("Long press\n");
+            PAGE_Pop();
+        } else if (flags & BUTTON_RELEASE) {
             PAGE_Pop();
         }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 void PAGE_Event()
