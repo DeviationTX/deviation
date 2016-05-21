@@ -1,5 +1,5 @@
 SCREENSIZE  := text
-FILESYSTEMS := common
+FILESYSTEMS := common text
 
 CRC_OFFSET       := 8192
 OPTIMIZE_DFU     := 1

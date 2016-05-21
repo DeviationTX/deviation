@@ -1,6 +1,6 @@
 SCREENSIZE  := text
 NUM_MODELS  ?= 10
-FILESYSTEMS := common text_gfx
+FILESYSTEMS := common text text_gfx
 
 PRE_FS = $(ODIR)/.pre_fs
 

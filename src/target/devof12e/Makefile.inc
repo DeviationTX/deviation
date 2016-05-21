@@ -1,5 +1,5 @@
 SCREENSIZE  := text
-FILESYSTEMS := common text_gfx
+FILESYSTEMS := common text text_gfx
 
 DFU_ARGS         := -c 12 -b 0x08004000
 
