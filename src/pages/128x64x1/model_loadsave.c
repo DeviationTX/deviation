@@ -13,6 +13,7 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef OVERRIDE_PLACEMENT
 #include "common.h"
 #include "pages.h"
 #include "gui/gui.h"
@@ -27,6 +28,7 @@ enum {
     LABEL_WIDTH       = 0,
 };
 
+#endif //OVERRIDE_PLACEMENT
 #include "../common/_model_loadsave.c"
 
 static void icon_notify_cb(guiObject_t *obj)
