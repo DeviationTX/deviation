@@ -56,6 +56,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     if (pages[cur_page].exit) {
         pages[cur_page].exit();
     }
+    GUI_SelectionNotify(NULL);
     cur_page = id;
     BUTTON_InterruptLongPress(); //Make sure button press is not passed to the new page
     if (pages[cur_page].init == PAGE_MainInit)

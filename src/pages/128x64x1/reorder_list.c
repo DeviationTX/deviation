@@ -19,10 +19,6 @@
 
 #include "../common/_reorder_list.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static void _okcancel_cb(guiObject_t *obj, const void *data);
-static struct buttonAction action;
-
 static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -36,6 +32,30 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
     return "";
 }
 
+static void redraw()
+{
+    GUI_Redraw(&gui->value);
+    GUI_Redraw(&gui->copy);
+    GUI_Redraw(&gui->scrollable);
+    for(unsigned i = 0; i < sizeof(gui->name) / sizeof(guiLabel_t); i++) {
+        GUI_Redraw(&gui->name[i]);
+    }
+}
+static void display_list(int idx)
+{
+    GUI_ShowScrollableRowCol(&gui->scrollable, idx, 0);
+}
+
+static int row_cb(int absrow, int relrow, int y, void *data)
+{
+#define LABEL_X 59
+#define LABEL_WIDTH (LCD_WIDTH-59-4)
+    (void)data;
+    GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
+            &DEFAULT_FONT, list_cb, NULL, (void *)(long)absrow);
+    return 0;
+}
+
 void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *))
 {
     rl.return_page = return_page;
@@ -47,15 +67,18 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
     rl.max = max_allowed;
     if (rl.max < count)
         rl.max = count;
+    PAGE_PushByID(PAGEID_REORDER, 0);
+}
 
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
+void PAGE_ReorderInit(int page)
+{
+    (void)page;
     int i;
     for(i = 0; i < rl.max; i++) {
-        if (i < count)
-            list[i] = i+1;
+        if (i < rl.count)
+            rl.list[i] = i+1;
         else
-            list[i] = 0;
+            rl.list[i] = 0;
     }
 
     u8 space = LINE_HEIGHT;
@@ -69,67 +92,26 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
     y += space;
     GUI_CreateTextSelectPlate(&gui->value, 0, y, w, LINE_HEIGHT,
-            &DEFAULT_FONT, NULL, copy_val_cb, NULL);
+            &DEFAULT_FONT, NULL, value_val_cb, NULL);
     y += space;
     GUI_CreateButtonPlateText(&gui->apply, 0, y, w, LINE_HEIGHT,
             &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
-    if (max_allowed) {
+    y += space;
+    GUI_CreateTextSelectPlate(&gui->copy, 0, y, w, LINE_HEIGHT,
+            &DEFAULT_FONT, NULL, copy_val_cb, NULL);
+    if (rl.max) {
         y += space;
         GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
         GUI_CreateButtonPlateText(&gui->remove, w/2, y, w/2 - 2, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
-    y += space;
-    GUI_CreateButtonPlateText(&gui->save, (w -30)/2, y, 30, LINE_HEIGHT,
-        &DEFAULT_FONT, NULL, 0x0000, _okcancel_cb, (void *)_tr("Save"));
+    GUI_CreateButtonPlateText(&gui->save, (w+LCD_WIDTH)/2 - 15 + 2, 0, 30, LINE_HEIGHT,
+        &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, (void *)_tr("Save"));
 
     u8 x = w + 4;
-    GUI_CreateListBoxPlateText(&gui->list, x, 0, LCD_WIDTH - x , LCD_HEIGHT, rl.max, selected, &DEFAULT_FONT,
-        LISTBOX_KEY_RIGHTLEFT, string_cb, select_cb, NULL, NULL);
-    GUI_SetSelectable((guiObject_t *)&gui->list, 0);
-
-    PAGE_SetActionCB(NULL);
-    // we need to grab the key handler from the listbox to let rl.textsel catch left/right keys when it is selected
-    // hence registerCallback has to be used here
-    BUTTON_RegisterCallback(&action,
-            CHAN_ButtonMask(BUT_ENTER)
-            | CHAN_ButtonMask(BUT_EXIT)
-            | CHAN_ButtonMask(BUT_LEFT)
-            | CHAN_ButtonMask(BUT_RIGHT)
-            | CHAN_ButtonMask(BUT_UP)
-            | CHAN_ButtonMask(BUT_DOWN),
-            BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY,
-            _action_cb, obj);
+    GUI_CreateScrollable(&gui->scrollable, x, LINE_HEIGHT, LCD_WIDTH - x , LCD_HEIGHT-LINE_HEIGHT,
+                         LINE_SPACE, rl.max, row_cb, NULL, NULL, NULL);
+    GUI_SetSelectable((guiObject_t *)&gui->scrollable, 0);
 }
 
-static void _okcancel_cb(guiObject_t *obj, const void *data)
-{
-    BUTTON_UnregisterCallback(&action);
-    okcancel_cb(obj, data);
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            BUTTON_UnregisterCallback(&action);
-            PAGE_RemoveAllObjects();
-            rl.return_page(NULL);
-        } else if (CHAN_ButtonIsPressed(button, BUT_LEFT) && ((guiObject_t *)&gui->value == GUI_GetSelected())) {
-            // catch the left/right keys when r1.textsel is selected
-            copy_val_cb(NULL, 1, NULL);
-            GUI_Redraw(&gui->value);
-
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)&& ((guiObject_t *)&gui->value == GUI_GetSelected())) {
-            copy_val_cb(NULL, -1, NULL);
-            GUI_Redraw(&gui->value);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}

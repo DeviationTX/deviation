@@ -96,7 +96,6 @@ void show_chantest_cb(guiObject_t *obj, const void *data)
     PAGE_PushByID(PAGEID_CHANMON, 0);
 }
 
-void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 static const char *reorder_text_cb(u8 idx)
 {
     long i = idx-1;
@@ -135,20 +134,12 @@ static void reorder_return_cb(u8 *list)
         memcpy(Model.limits, tmplimits, sizeof(Model.limits));
         MIXER_SetMixers(NULL, 0);
     }
-    
-    PAGE_Pop();
 }
 
 void reorder_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    PAGE_PushByID(PAGEID_MIXREORDER, 0);
-}
-
-void PAGE_MixReorderInit(int page)
-{
-    (void)page;
     PAGE_ShowReorderList(mp->list, NUM_CHANNELS, 0, 0, reorder_text_cb, reorder_return_cb);
 }
 

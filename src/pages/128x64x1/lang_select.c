@@ -21,54 +21,23 @@
 
 #include "../common/_lang_select.c"
 
-static const char *_string_cb(guiObject_t *obj, const void *data);
-
 static struct lang_obj * const gui = &gui_objs.u.lang;
-
-void press_cb(struct guiObject *obj, s8 press_type, const void *data)
-{
-    (void)obj;
-    (void)press_type;
-    long idx = (long)data;
-    CONFIG_ReadLang(idx);
-    cp->return_page(0);
-}
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     GUI_CreateLabelBox(&gui->label[relrow], 0, y,
-            0, LINE_HEIGHT, &DEFAULT_FONT, _string_cb, press_cb, (void *)(long)absrow);
+            0, LINE_HEIGHT, &DEFAULT_FONT, string_cb, press_cb, (void *)(long)absrow);
     return 1;
 }
 
-void LANGPage_Select(void(*return_page)(int page))
+void PAGE_LanguageInit(int page)
 {
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    cp->return_page = return_page;
-
+    (void)page;
+    int num_lang = count_num_languages();
     PAGE_ShowHeader(_tr("Press ENT to change"));
 
-    cp->total_items = 1;
-    if (FS_OpenDir("language")) {
-        char filename[13];
-        int type;
-        while((type = FS_ReadDir(filename)) != 0) {
-            if (type == 1 && strncasecmp(filename, "lang", 4) == 0) {
-                cp->total_items++;
-            }
-        }
-        FS_CloseDir();
-    }
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, cp->total_items++, row_cb, NULL, NULL, NULL);
+                     LINE_SPACE, num_lang, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, Transmitter.language));
-}
-
-const char *_string_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    u8 idx = (long)data;
-    return string_cb(idx, NULL);
 }

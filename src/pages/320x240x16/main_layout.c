@@ -118,7 +118,6 @@ void PAGE_MainLayoutEvent()
 }
 void PAGE_MainLayoutExit()
 {
-    GUI_SelectionNotify(NULL);
     BUTTON_UnregisterCallback(&action);
 }
 void PAGE_MainLayoutRestoreDialog(int idx)

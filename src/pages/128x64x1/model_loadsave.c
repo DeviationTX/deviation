@@ -20,81 +20,57 @@
 #include "config/ini.h"
 #include <stdlib.h>
 
+enum {
+    LABELNUM_X        = 0,
+    LABELNUM_WIDTH    = 16,
+    LABEL_X           = 17,
+    LABEL_WIDTH       = 0,
+};
+
 #include "../common/_model_loadsave.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static void _press_cb(guiObject_t *obj, u16 selected, void *data);
-
-static u8 load_save;
-
-static void _show_buttons(int loadsave)
+static void icon_notify_cb(guiObject_t *obj)
 {
-    (void)show_loadsave_cb;
-    load_save = loadsave;
-    PAGE_SetActionCB(_action_cb);
-    if (loadsave == LOAD_TEMPLATE || loadsave == LOAD_MODEL || loadsave == LOAD_ICON || loadsave == LOAD_LAYOUT)
-        PAGE_ShowHeader(_tr("Press ENT to load"));
-    else if (loadsave == SAVE_MODEL)
-        PAGE_ShowHeader(_tr("Press ENT to copy to"));
-    //u8 w = 40;
-    //GUI_CreateButtonPlateText(LCD_WIDTH -w -5, 0, w, ITEM_HEIGHT, &DEFAULT_FONT, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    int idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, obj);
+    if (idx < 0)
+        return;
+    int absrow = (idx >> 8) + (idx & 0xff);
+    change_icon(absrow);
 }
-
-static const char *iconstr_cb(guiObject_t *obj, int dir, void *data)
+    
+static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    (void)obj;
-    long num_icons = (long)data;
-    u8 changed;
-    mp->selected = GUI_TextSelectHelper(mp->selected, 1, num_icons, dir, 1, 1, &changed);
-    if (changed)
-        select_cb(NULL, mp->selected-1, (void *)LOAD_ICON);
-    return string_cb(mp->selected-1, (void *)LOAD_ICON);
-}
-
-static void iconpress_cb(guiObject_t *obj, void *data)
-{
-    (void)obj;
     (void)data;
-    okcancel_cb(NULL, (void *)(LOAD_ICON+1));
+    labelDesc.style = LABEL_LEFT;
+    GUI_CreateLabelBox(&gui->name[relrow], 0, y,
+        LABEL_WIDTH, LINE_HEIGHT, &labelDesc, name_cb, press_cb, (const void *)(long)absrow);
+    return 0;
 }
 
-static void _show_list(int loadsave,u8 num_models)
+void PAGE_LoadSaveInit(int page)
 {
-    if (loadsave == LOAD_ICON) {
-        mp->modeltype = Model.type;
-        guiObject_t *obj = GUI_CreateTextSelectPlate(&gui->ico, 10, HEADER_HEIGHT, LCD_WIDTH - 20, 
-                                LINE_HEIGHT, &DEFAULT_FONT, iconpress_cb, iconstr_cb, (void *)(long)num_models);
-        GUI_CreateImage(&gui->image, LCD_WIDTH / 2 - 18, LCD_HEIGHT-37, 52, 36, mp->iconstr);
-        GUI_SetSelected(obj);
+    const char *name;
+    int num_models;
+    int selected;
+    int width = LCD_WIDTH;
+    mp->menu_type = page;
+    OBJ_SET_USED(&gui->image, 0);
+
+    if (page == SAVE_MODEL) {
+        name = _tr("Press ENT to copy to");
     } else {
-        OBJ_SET_USED(&gui->image, 0);
-        guiObject_t *obj = GUI_CreateListBoxPlateText(&gui->listbox, 0, HEADER_HEIGHT, LCD_WIDTH,
-                                LCD_HEIGHT - HEADER_HEIGHT, num_models,
-                                mp->selected-1, &DEFAULT_FONT, LISTBOX_KEY_UPDOWN, // change listbox's browser key to up/down since there is only 1 widget in this page
-                string_cb, select_cb, _press_cb, (void *)(long)loadsave);
-        GUI_SetSelected(obj);
+        name = _tr("Press ENT to load");
     }
-}
-
-static void _press_cb(guiObject_t *obj, u16 selected, void *data)
-{
-    (void)obj;
-    (void)data;
-    mp->selected = selected + 1;
-    okcancel_cb(NULL, (void *)(long)(load_save +1));
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT) || load_save == LOAD_LAYOUT) {
-            okcancel_cb(NULL, 0);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (page == LOAD_ICON) {
+        width = 75;
+        GUI_CreateImage(&gui->image, 75, 20, 52, 36, mp->iconstr);
+        GUI_SelectionNotify(icon_notify_cb);
     }
-    return 1;
+    selected = get_scroll_count(page);
+
+    num_models = mp->total_items; /* set by get_scroll_page */
+    PAGE_ShowHeader(name);
+    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, width, LCD_HEIGHT - HEADER_HEIGHT,
+                         LINE_SPACE, num_models, row_cb, NULL, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
 }

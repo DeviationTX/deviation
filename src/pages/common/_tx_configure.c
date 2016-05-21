@@ -325,8 +325,7 @@ static void lang_select_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    PAGE_SetModal(1);
-    LANGPage_Select(PAGE_TxConfigureInit);
+    PAGE_PushByID(PAGEID_LANGUAGE, 0);
 }
 #endif
 

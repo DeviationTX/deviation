@@ -22,21 +22,55 @@
 
 #include "../common/_model_loadsave.c"
 
-static void _show_buttons(int loadsave)
+static void icon_notify_cb(guiObject_t *obj)
 {
-    PAGE_CreateCancelButton(LCD_WIDTH - 208, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, LCD_WIDTH - 104, 4, BUTTON_96, show_loadsave_cb, 0x0000, okcancel_cb, (void *)(loadsave+1L));
+    int idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, obj);
+    if (idx < 0)
+        return;
+    int absrow = (idx >> 8) + (idx & 0xff);
+    change_icon(absrow);
 }
-
-static void _show_list(int loadsave, u8 num_models)
+static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    GUI_CreateListBox(&gui->list, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48, num_models, mp->selected-1, string_cb, select_cb, NULL, (void *)(long)loadsave);
-    if (loadsave != LOAD_TEMPLATE && loadsave != LOAD_LAYOUT) {
+    (void)data;
+    struct LabelDesc listbox = {
+        .font = DEFAULT_FONT.font,
+        .style = LABEL_LISTBOX,
+        .font_color = DEFAULT_FONT.font_color,
+        .fill_color = DEFAULT_FONT.fill_color,
+        .outline_color = DEFAULT_FONT.outline_color
+    };
+    if (absrow >= mp->total_items) {
+        GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
+            200 - ARROW_WIDTH, 24, &listbox, NULL, NULL, "");
+    } else {
+        GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
+            200 - ARROW_WIDTH, 24, &listbox, name_cb, press_cb, (void *)(long)absrow);
+    }
+    return 0;
+}
+void PAGE_LoadSaveInit(int page)
+{
+    int num_models;
+    int selected;
+    mp->menu_type = page;
+    OBJ_SET_USED(&gui->image, 0);
+
+    selected = get_scroll_count(page);
+
+    num_models = mp->total_items;
+    if (num_models < LISTBOX_ITEMS)
+        num_models = LISTBOX_ITEMS;
+    GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48,
+                         24, num_models, row_cb, NULL, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
+    if (page != LOAD_TEMPLATE && page != LOAD_LAYOUT) {
         u16 w = 0, h = 0;
         char *img = mp->iconstr;
         if(! fexists(img))
             img = UNKNOWN_ICON;
         LCD_ImageDimensions(img, &w, &h);
         GUI_CreateImage(&gui->image, 212 + ((LCD_WIDTH - 320) / 2), 88, w, h, mp->iconstr);
+        GUI_SelectionNotify(icon_notify_cb);
     }
 }

@@ -16,9 +16,6 @@
 static struct model_page * const mp = &pagemem.u.model_page;
 static struct modelload_obj * const gui = &gui_objs.u.modelload;
 
-static void _show_buttons(int loadsave);
-static void _show_list(int loadsave, u8 num_models);
-
 static int ini_handle_icon(void* user, const char* section, const char* name, const char* value)
 {
     (void)user;
@@ -41,15 +38,12 @@ static int ini_handle_name(void* user, const char* section, const char* name, co
     return 1;
 }
 
-static void select_cb(guiObject_t *obj, u16 sel, void *data)
+static void change_icon(int sel)
 {
-    (void)obj;
-    (void)data;
     const char *ico;
-    mp->selected = sel + 1;
     if(! OBJ_IS_USED(&gui->image))
         return;
-    if ((long)data == LOAD_ICON) {
+    if (mp->menu_type == LOAD_ICON) {
         ico = CONFIG_GetIcon(mp->modeltype);
         if (sel > 0 && FS_OpenDir("modelico")) {
             char filename[13];
@@ -68,11 +62,11 @@ static void select_cb(guiObject_t *obj, u16 sel, void *data)
             FS_CloseDir();
         }
     } else {
-        sprintf(tempstring, "models/model%d.ini", mp->selected);
+        sprintf(tempstring, "models/model%d.ini", sel);
         mp->modeltype = 0;
         mp->iconstr[0] = 0;
         ini_parse(tempstring, ini_handle_icon, NULL);
-        if (mp->selected == CONFIG_GetCurrentModel() && Model.icon[0])
+        if (sel == CONFIG_GetCurrentModel() && Model.icon[0])
             ico = Model.icon;
         else {
             if (mp->iconstr[0])
@@ -106,20 +100,21 @@ int get_idx_filename(char *result, const char *dir, const char *ext, int idx, co
     FS_CloseDir();
     return 0;
 }
-static const char *string_cb(u8 idx, void *data)
+static const char *name_cb(guiObject_t *obj, const void *data)
 {
-    (void)data;
+    (void)obj;
+    long idx = (long)data;
     FILE *fh;
-    if ((long)data == LOAD_TEMPLATE) { //Template
+    if (mp->menu_type == LOAD_TEMPLATE) { //Template
         if (! get_idx_filename(tempstring, "template", ".ini", idx, "template/"))
             return _tr("Unknown");
-    } else if ((long)data == LOAD_ICON) { //Icon
+    } else if (mp->menu_type == LOAD_ICON) { //Icon
         if (idx == 0)
             return _tr("Default");
         if (! get_idx_filename(tempstring, "modelico", IMG_EXT, idx-1, ""))
             return _tr("Unknown");
         return tempstring;
-    } else if ((long)data == LOAD_LAYOUT) {
+    } else if (mp->menu_type == LOAD_LAYOUT) {
         if (idx >= mp->file_state)
             sprintf(tempstring, "models/model%d.ini", idx + 1 - mp->file_state);
         else
@@ -136,63 +131,14 @@ static const char *string_cb(u8 idx, void *data)
     sprintf(tempstring, "%d: NONE", idx + 1);
     if (fh) {
         long user = idx + 1;
-        if ((long)data == LOAD_TEMPLATE)
+        if (mp->menu_type == LOAD_TEMPLATE)
             user = -user;
         ini_parse_file(fh, ini_handle_name, (void *)user);
         fclose(fh);
     }
-    if ((long)data == LOAD_LAYOUT && idx >= mp->file_state)
+    if (mp->menu_type == LOAD_LAYOUT && idx >= mp->file_state)
         strcat(tempstring + strlen(tempstring), "(M)");
     return tempstring;
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    int msg = (long)data;
-    (void)obj;
-    if (msg == LOAD_MODEL + 1) {
-        /* Load Model */
-        if (mp->selected != CONFIG_GetCurrentModel()) { // don't do that if model didn't change
-            CONFIG_SaveModelIfNeeded();
-            PROTOCOL_DeInit();
-            CONFIG_ReadModel(mp->selected);
-            CONFIG_SaveTxIfNeeded();  //Save here to ensure in case of crash we restart on the right model
-            /* Need to recalculate channels to see if we're in a safe state */
-            MIXER_Init();
-            MIXER_CalcChannels();
-            PROTOCOL_Init(0);
-        }
-    } else if (msg == SAVE_MODEL + 1) {
-        /* Save Model */
-        CONFIG_WriteModel(mp->selected);
-        CONFIG_ReadModel(mp->selected);  //Reload the model after saving to switch (for future saves)
-    } else if (msg == LOAD_TEMPLATE + 1) {
-        /* Load Template */
-        get_idx_filename(tempstring, "template", ".ini", mp->selected-1, "");
-        CONFIG_ReadTemplate(tempstring);
-    } else if (msg == LOAD_ICON + 1) {
-        if (mp->selected == 1)
-            Model.icon[0] = 0;
-        else
-            strcpy(Model.icon, mp->iconstr);
-    } else if (msg == LOAD_LAYOUT + 1) {
-        /* Load Layout */
-        if (mp->selected > mp->file_state) {
-            sprintf(tempstring, "models/model%d.ini", mp->selected - mp->file_state);
-        } else {
-            get_idx_filename(tempstring, "layout", ".ini", mp->selected-1, "layout/");
-        }
-        CONFIG_ReadLayout(tempstring);
-    }
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    mp->return_page(-1);  // -1 for devo10 means return to the focus of previous page, which is important so that users don't need to scroll down from the 1st item
-}
-
-static const char *show_loadsave_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    return ((long)data) == SAVE_MODEL + 1 ? _tr("Save") : _tr("Load");
 }
 
 int model_count()
@@ -209,9 +155,11 @@ int model_count()
     return num_models;
 }
 
-int count_files(const char *dir, const char *ext, const char *match)
+/*count will be in mp->total_items. Return is selection if any */
+static int count_files(const char *dir, const char *ext, const char *match)
 {
     int num_files = 0;
+    int selected = 0;
     if (FS_OpenDir(dir)) {
         char filename[13];
         int type;
@@ -219,49 +167,82 @@ int count_files(const char *dir, const char *ext, const char *match)
             if (type == 1 && strncasecmp(filename + strlen(filename) - 4, ext, 4) == 0) {
                 num_files++;
                 if(match && strncasecmp(match, filename, 13) == 0) {
-                    mp->selected = num_files;
+                    selected = num_files;
                 }
             }
         }
         FS_CloseDir();
     }
-    return num_files;
+    mp->total_items = num_files;
+    return selected;
 }
-/* loadsave values:
- * 0 : Load Model
- * 1 : Save Model
- * 2 : Load Template
- * 3 : Load Icon
- * 4 : Load Layout
- */
-void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page))
+
+static void press_cb(guiObject_t *obj, s8 press_type, const void *data)
 {
-    u8 num_models = 0;
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    mp->return_page = return_page;
-    _show_buttons(loadsave);
-    if (loadsave == LOAD_TEMPLATE) { //Template
-        num_models = count_files("template", ".ini", NULL);
-        mp->selected = 1;
-    } else if (loadsave == LOAD_ICON) { //Icon
-        mp->selected = 0;
-        num_models = 1 + count_files("modelico", IMG_EXT, Model.icon[0] ? Model.icon+9 : NULL);
-        const char *ico = mp->selected == 0 ? CONFIG_GetIcon(Model.type) : CONFIG_GetCurrentIcon();
-        strlcpy(mp->iconstr, ico, sizeof(mp->iconstr));
-        mp->selected++;
-    } else if (loadsave == LOAD_LAYOUT) { //Layout
-        mp->selected = 1;
-        num_models = count_files("layout", ".ini", "default.ini");
-        mp->file_state = num_models;
-        num_models += model_count();
-    } else {
-        num_models = model_count();
-        strlcpy(mp->iconstr, CONFIG_GetCurrentIcon(), sizeof(mp->iconstr));
-        if (loadsave == SAVE_MODEL)
-            mp->selected = 0;
+    (void)obj;
+    int selected = (long)data + 1;
+    if (press_type != -1)
+        return;
+
+    if (mp->menu_type == LOAD_MODEL) {
+        /* Load Model */
+        if (selected != CONFIG_GetCurrentModel()) { // don't do that if model didn't change
+            CONFIG_SaveModelIfNeeded();
+            PROTOCOL_DeInit();
+            CONFIG_ReadModel(selected);
+            CONFIG_SaveTxIfNeeded();  //Save here to ensure in case of crash we restart on the right model
+            /* Need to recalculate channels to see if we're in a safe state */
+            MIXER_Init();
+            MIXER_CalcChannels();
+            PROTOCOL_Init(0);
+        }
+    } else if (mp->menu_type == SAVE_MODEL) {
+        /* Save Model */
+        CONFIG_WriteModel(selected);
+        CONFIG_ReadModel(selected);  //Reload the model after saving to switch (for future saves)
+    } else if (mp->menu_type == LOAD_TEMPLATE) {
+        /* Load Template */
+        get_idx_filename(tempstring, "template", ".ini", selected-1, "");
+        CONFIG_ReadTemplate(tempstring);
+    } else if (mp->menu_type == LOAD_ICON) {
+        if (selected == 1)
+            Model.icon[0] = 0;
         else
-            mp->selected = CONFIG_GetCurrentModel();
+            strcpy(Model.icon, mp->iconstr);
+    } else if (mp->menu_type == LOAD_LAYOUT) {
+        /* Load Layout */
+        if (selected > mp->file_state) {
+            sprintf(tempstring, "models/model%d.ini", selected - mp->file_state);
+        } else {
+            get_idx_filename(tempstring, "layout", ".ini", selected-1, "layout/");
+        }
+        CONFIG_ReadLayout(tempstring);
     }
-    _show_list(loadsave, num_models);
+    PAGE_Pop();
+}
+
+static int get_scroll_count(enum loadSaveType p)
+{
+    int selected = 0;
+    switch(p) {
+      case LOAD_MODEL:
+      case SAVE_MODEL:
+        mp->total_items = model_count();
+        selected = CONFIG_GetCurrentModel()-1;
+        break;
+      case LOAD_TEMPLATE:
+        selected = count_files("template", ".ini", NULL);
+        break;
+      case LOAD_ICON:
+        strlcpy(mp->iconstr, CONFIG_GetIcon(Model.type), sizeof(mp->iconstr));
+        selected = count_files("modelico", IMG_EXT, Model.icon[0] ? Model.icon+9 : NULL) + 1;
+        mp->total_items++;
+        break;
+      case LOAD_LAYOUT:
+        selected = count_files("layout", ".ini", "default.ini");
+        mp->file_state = mp->total_items;
+        mp->total_items += model_count();
+        break;
+    }
+    return selected;
 }

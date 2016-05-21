@@ -58,10 +58,11 @@ void TGLICO_Select(guiObject_t *obj, const void *data);
 void PAGE_MixerInit(int page);
 void PAGE_MixerExit();
 void PAGE_EditLimitsInit(int page);
-void PAGE_MixReorderInit(int page);
 void PAGE_MixTemplateInit(int page);
 void PAGE_MixTemplateEvent();
 void PAGE_EditCurvesInit(int page);
+void PAGE_ReorderInit(int page);
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 
 /* Trim */
 void PAGE_TrimInit(int page);
@@ -81,12 +82,12 @@ void PAGE_SetTimerExit();
 void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
 void PAGE_ModelExit();
-void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
 void MODELPAGE_Config();
 void MODELPROTO_Config();
 void MODELTRAIN_Config();
 void MODELVIDEO_Config();
 void MODELPage_Template();
+void PAGE_LoadSaveInit(int page);
 
 /* RTC */
 void PAGE_RTCInit(int page);
@@ -125,6 +126,7 @@ void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));
 void PAGE_TxConfigureExit();
+void PAGE_LanguageInit(int page);
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);

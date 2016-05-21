@@ -19,6 +19,8 @@ struct dialog_obj {
 #define MAX_CHAN          (MAX_CHAN_ELEMENTS > MAX_BUTT ? MAX_CHAN_ELEMENTS : MAX_BUTT)
 #define MAX_IDX           (MAX_CHAN > MAX_BUTT ? MAX_CHAN : MAX_BUTT)
 #define TIMERS_PER_PAGE   (LCD_WIDTH == 320 ? 2 : 4)
+#define LISTBOX_ITEMS     ((LCD_HEIGHT - 48) / 24)
+
 struct chantest_obj {
     guiLabel_t lock;
     guiLabel_t chan[MAX_CHAN];
@@ -34,7 +36,8 @@ struct range_obj {
 
 struct lang_obj {
     guiButton_t ok;
-    guiListbox_t listbox;
+    guiLabel_t label[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 #define NUM_SYMBOL_COLS ((LCD_WIDTH-24) / 40)
@@ -149,8 +152,9 @@ struct modelcfg_obj {
 
 struct modelload_obj {
     guiButton_t ok;
-    guiListbox_t list;
     guiImage_t image;
+    guiLabel_t label[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 struct modelpage_obj {
@@ -191,7 +195,8 @@ struct reorder_obj {
     guiButton_t apply;
     guiButton_t insert;
     guiButton_t remove;
-    guiListbox_t list;
+    guiLabel_t  name[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 struct scanner_obj {

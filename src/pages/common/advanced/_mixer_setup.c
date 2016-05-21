@@ -27,7 +27,6 @@ static void toggle_link_cb(guiObject_t *obj, const void *data);
 static const char *show_trim_cb(guiObject_t *obj, const void *data);
 static void toggle_trim_cb(guiObject_t *obj, const void *data);
 
-void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 static void reorder_cb(guiObject_t *obj, void *data);
 
 static void _show_titlerow();
@@ -555,8 +554,8 @@ static void reorder_return_cb(u8 *list)
         memcpy(mp->mixer, tmpmix, sizeof(mp->mixer));
         mp->num_complex_mixers = i;
     }
-    MIXPAGE_ChangeTemplate(1);
 }
+
 void reorder_cb(guiObject_t *obj, void *data)
 {
     (void)data;

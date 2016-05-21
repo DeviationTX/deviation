@@ -415,7 +415,6 @@ static unsigned action_cb(u32 button, unsigned flags, void *data)
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            GUI_SelectionNotify(NULL);
             PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
             // long press enter = save without exiting

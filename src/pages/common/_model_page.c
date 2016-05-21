@@ -314,7 +314,7 @@ static void file_press_cb(guiObject_t *obj, void *data)
         CONFIG_SaveModelIfNeeded();
         GUI_RedrawAllObjects();
     } else {
-        MODELPage_ShowLoadSave(mp->file_state, PAGE_ModelInit);
+        PAGE_PushByID(PAGEID_LOADSAVE, mp->file_state);
     }
 }
 
@@ -322,7 +322,7 @@ static void changeicon_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    MODELPage_ShowLoadSave(LOAD_ICON, PAGE_ModelInit);
+    PAGE_PushByID(PAGEID_LOADSAVE, LOAD_ICON);
 }
 
 #if HAS_VIDEO

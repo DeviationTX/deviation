@@ -125,10 +125,7 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
             else
                 PAGE_PushByID(PAGEID_MIXER, 0);
         } else {
-            PAGE_SetModal(1);
-            PAGE_MainExit();
-            pagemem.modal_page = 1;
-            MODELPage_ShowLoadSave(0, PAGE_MainInit);
+            PAGE_PushByID(PAGEID_LOADSAVE, LOAD_MODEL);
         }
     }
 }

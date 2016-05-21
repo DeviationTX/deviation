@@ -204,10 +204,8 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
 static void add_dlgbut_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
-    if(data) {
-    } else {
-        PAGE_MainLayoutExit();
-        MODELPage_ShowLoadSave(LOAD_LAYOUT, PAGE_MainLayoutInit);
+    if(!data) {
+        PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
     }
 }
 

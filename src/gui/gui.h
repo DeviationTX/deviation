@@ -54,18 +54,10 @@ enum LabelType {
     LABEL_BRACKET,
     LABEL_UNDERLINE,
     LABEL_INVERTED,
+#else
+    LABEL_LISTBOX,
 #endif
 
-};
-
-enum ListBoxType {
-    LISTBOX_DEVO10,
-    LISTBOX_OTHERS,
-};
-
-enum ListBoxNavigateKeyType {
-    LISTBOX_KEY_UPDOWN,
-    LISTBOX_KEY_RIGHTLEFT,
 };
 
 struct LabelDesc {
@@ -99,7 +91,6 @@ enum GUIType {
     XYGraph,
     BarGraph,
     TextSelect,
-    Listbox,
     Keyboard,
     Scrollbar,
     Scrollable,
@@ -177,24 +168,6 @@ typedef struct guiButton {
     const void *cb_data;
     u8 enable;
 } guiButton_t;
-
-typedef struct guiListbox {
-    struct guiHeader header;
-    struct LabelDesc desc;
-    u8 text_height;
-    u8 entries_per_page;
-    u8 item_count;
-    u8 cur_pos;
-    s16 selected;
-    struct guiScrollbar scrollbar;
-    const char * (*string_cb)(u8 idx, void * data);
-    void (*select_cb)(struct guiObject *obj, u16 selected, void * data);
-    void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
-    void *cb_data;
-    enum ListBoxType style;
-    enum ListBoxNavigateKeyType key_style;
-    buttonAction_t action; // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN
-} guiListbox_t;
 
 typedef struct guiScrollable {
     struct guiHeader header;
@@ -318,10 +291,6 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type);
 void GUI_DrawXYGraph(struct guiObject *obj);
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press);
 
-void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
-u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
-void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type);
-
 void GUI_DrawLabel(struct guiObject *obj);
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type);
 
@@ -375,19 +344,6 @@ guiObject_t *GUI_CreateIcon(guiButton_t *, u16 x, u16 y, const struct ImageMap *
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 void GUI_ButtonEnable(guiObject_t *obj, u8 enable);
 u8 GUI_IsButtonEnabled(guiObject_t *obj);
-
-guiObject_t *GUI_CreateListBox(guiListbox_t *, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
-        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
-        void *cb_data);
-guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const struct LabelDesc *desc, enum ListBoxNavigateKeyType keyType,
-        const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
-        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
-        void *cb_data);
-void GUI_ListBoxSelect(guiListbox_t *obj, u16 selected);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),

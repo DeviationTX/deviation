@@ -75,8 +75,10 @@ PAGEDEF(PAGEID_SCANNER,  PAGE_ScannerInit,     PAGE_ScannerEvent,     PAGE_Scann
 //These pages should not be lisetd for quickpages
 PAGEDEF(PAGEID_SPLASH,   PAGE_SplashInit,      PAGE_SplashEvent,      PAGE_SplashExit,    0,           _tr_noop("Welcome"))
 PAGEDEF(PAGEID_EDITLIMIT, PAGE_EditLimitsInit, NULL,                  NULL,               0,           "")
-PAGEDEF(PAGEID_MIXREORDER, PAGE_MixReorderInit, NULL,                 NULL,               0,           "")
 PAGEDEF(PAGEID_MIXTEMPL, PAGE_MixTemplateInit, PAGE_MixTemplateEvent, NULL,               0,           "")
 PAGEDEF(PAGEID_EDITCURVE, PAGE_EditCurvesInit, NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_LOADSAVE, PAGE_LoadSaveInit,    NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           _tr_noop("Select Language"))
 
 #endif /* PAGEDEF */

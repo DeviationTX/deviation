@@ -78,7 +78,6 @@ void GUI_DrawObject(struct guiObject *obj)
     case XYGraph:    printf("Draw XYGraph: "); break;
     case BarGraph:   printf("Draw BarGraph:"); break;
     case TextSelect: printf("Draw TextSel: "); break;
-    case Listbox:    printf("Draw ListBox: "); break;
     case Keyboard:   printf("Draw Keyboard:"); break;
     case Scrollbar:  printf("Draw ScrlBar: "); break;
     case Scrollable: printf("Draw Scrlable:"); break;
@@ -97,7 +96,6 @@ void GUI_DrawObject(struct guiObject *obj)
     case XYGraph:    GUI_DrawXYGraph(obj);           break;
     case BarGraph:   GUI_DrawBarGraph(obj);          break;
     case TextSelect: GUI_DrawTextSelect(obj);        break;
-    case Listbox:    GUI_DrawListbox(obj, 1);        break;
     case Keyboard:   GUI_DrawKeyboard(obj);          break;
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
     case Scrollable: GUI_DrawScrollable(obj);        break;
@@ -156,9 +154,6 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Keyboard:
         BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
-        break;
-    case Listbox:
-        BUTTON_UnregisterCallback(&((guiListbox_t *)obj)->action);
         break;
     case Image:
     case XYGraph:
@@ -406,14 +401,6 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                         return 0;
                     objTOUCHED = obj;
                     return GUI_TouchTextSelect(obj, coords, long_press);
-                }
-                break;
-            case Listbox:
-                if(coords_in_box(&obj->box, coords)) {
-                    if (objTOUCHED && objTOUCHED != obj)
-                        return 0;
-                    objTOUCHED = obj;
-                    return GUI_TouchListbox(obj, coords, long_press);
                 }
                 break;
             case XYGraph:

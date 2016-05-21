@@ -48,7 +48,6 @@ void PAGE_EditCurvesInit(int page)
     (void)page;
     struct Curve *curve = edit->curveptr;
     u8 type = CURVE_TYPE(curve);
-    GUI_SelectionNotify(NULL);
     PAGE_SetActionCB(action_cb);
     edit->pointnum = 0;
     edit->reverse = MIXER_SRC_IS_INV(pagemem.u.mixer_page.cur_mixer->src);

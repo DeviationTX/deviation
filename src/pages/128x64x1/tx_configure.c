@@ -189,7 +189,6 @@ void PAGE_TxConfigureInit(int page)
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Configure"));
-    cp->total_items = 0;
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                      LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, size_cb, NULL);
