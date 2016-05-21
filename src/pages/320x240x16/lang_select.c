@@ -50,6 +50,6 @@ void PAGE_LanguageInit(int page)
     PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_LANGUAGE)));
 
     int min_rows = num_lang >= LISTBOX_ITEMS ? num_lang : LISTBOX_ITEMS;
-    GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, 40, 200, LCD_HEIGHT-48, LINE_HEIGHT, min_rows, row_cb, NULL, NULL, (void *)(long)num_lang);
+    GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, 40, 200, LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT, min_rows, row_cb, NULL, NULL, (void *)(long)num_lang);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, Transmitter.language, 0));
 }

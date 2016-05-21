@@ -81,7 +81,7 @@ void PAGE_LoadSaveInit(int page)
         GUI_CreateImage(&gui->image, 212 + ((LCD_WIDTH - 320) / 2), 88, w, h, mp->iconstr);
         GUI_SelectionNotify(icon_notify_cb);
     }
-    GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48,
+    GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LISTBOX_ITEMS * 24,
                          24, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
 }

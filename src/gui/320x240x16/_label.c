@@ -13,8 +13,6 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static u16  blink_fontcolor = 0xffff;
-
 void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char *str,
         const struct LabelDesc *desc, u8 is_selected)
 {

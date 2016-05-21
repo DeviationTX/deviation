@@ -57,15 +57,6 @@ struct Rtc {
     int clocksourceready;
 } Rtc;
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    PAGE_Pop();
-}
-
 void PAGE_RTCInit(int page)
 {
     (void)page;
