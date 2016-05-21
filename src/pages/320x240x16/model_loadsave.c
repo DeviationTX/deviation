@@ -53,17 +53,25 @@ void PAGE_LoadSaveInit(int page)
 {
     int num_models;
     int selected;
+    const char * name;
+    enum loadSaveType menu_type = page;
     mp->menu_type = page;
     OBJ_SET_USED(&gui->image, 0);
 
     selected = get_scroll_count(page);
 
+    switch(menu_type) {
+      case LOAD_MODEL:      name = _tr("Load Model"); break;
+      case SAVE_MODEL:      name = _tr("Save Model as..."); break;
+      case LOAD_TEMPLATE:   name = _tr("Load Model Template"); break;
+      case LOAD_ICON:       name = _tr("Select Icon"); break;
+      case LOAD_LAYOUT:     name = _tr("Load Layout"); break;
+    }
+    PAGE_ShowHeader(name);
+
     num_models = mp->total_items;
     if (num_models < LISTBOX_ITEMS)
         num_models = LISTBOX_ITEMS;
-    GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48,
-                         24, num_models, row_cb, NULL, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
     if (page != LOAD_TEMPLATE && page != LOAD_LAYOUT) {
         u16 w = 0, h = 0;
         char *img = mp->iconstr;
@@ -73,4 +81,7 @@ void PAGE_LoadSaveInit(int page)
         GUI_CreateImage(&gui->image, 212 + ((LCD_WIDTH - 320) / 2), 88, w, h, mp->iconstr);
         GUI_SelectionNotify(icon_notify_cb);
     }
+    GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LCD_HEIGHT - 48,
+                         24, num_models, row_cb, NULL, NULL, NULL);
+    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
 }

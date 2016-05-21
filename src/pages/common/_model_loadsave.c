@@ -228,15 +228,16 @@ static int get_scroll_count(enum loadSaveType p)
       case LOAD_MODEL:
       case SAVE_MODEL:
         mp->total_items = model_count();
-        selected = CONFIG_GetCurrentModel()-1;
+        selected = CONFIG_GetCurrentModel();
         break;
       case LOAD_TEMPLATE:
         selected = count_files("template", ".ini", NULL);
         break;
       case LOAD_ICON:
         strlcpy(mp->iconstr, CONFIG_GetIcon(Model.type), sizeof(mp->iconstr));
-        selected = count_files("modelico", IMG_EXT, Model.icon[0] ? Model.icon+9 : NULL) + 1;
-        mp->total_items++;
+        selected = count_files("modelico", IMG_EXT, Model.icon[0] ? Model.icon+9 : NULL);
+        selected++; //Selected is actually accurate, so we increment here to decrement below
+        mp->total_items++; //Default is 1st
         break;
       case LOAD_LAYOUT:
         selected = count_files("layout", ".ini", "default.ini");
@@ -244,5 +245,7 @@ static int get_scroll_count(enum loadSaveType p)
         mp->total_items += model_count();
         break;
     }
+    if (selected > 0)
+        selected--;
     return selected;
 }
