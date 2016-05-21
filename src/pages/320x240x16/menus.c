@@ -26,8 +26,8 @@ enum {
     LABEL_X           = 17,
     LABEL_WIDTH       = 0,
 };
-#define HEADER_HEIGHT 36
-#define LINE_SPACE    30
+#define HEADER_HEIGHT (LCD_HEIGHT==240 ? 37 : 40)
+#define LINE_SPACE    29
 #define LINE_HEIGHT   20
 #include "../common/_menus.c"
 
