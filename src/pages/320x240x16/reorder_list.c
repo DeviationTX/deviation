@@ -21,14 +21,6 @@
 
 static const int REORD_XOFFSET = ((LCD_WIDTH - 320) / 2);
 
-void redraw() {
-}
-
-static void display_list(int idx)
-{
-    GUI_ShowScrollableRowCol(&gui->scrollable, idx, 0);
-}
-
 static const char *_show_button_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -38,6 +30,7 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
         case APPLY:     return _tr("Copy To");
         case INSERT:    return _tr("Insert");
         case REMOVE:    return _tr("Remove");
+        case SAVE:      return _tr("Save");
     }
     return "";
 }
@@ -57,40 +50,32 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 1;
 }
 
-void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *))
-{
-    rl.return_page = return_page;
-    rl.list = list;
-    rl.selected = selected;
-    rl.copyto = selected;
-    rl.count = count;
-    rl.text_cb = text_cb;
-    rl.max = max_allowed;
-    if (rl.max < count)
-        rl.max = count;
-   PAGE_PushByID(PAGEID_REORDER, 0);
-}
 
 void PAGE_ReorderInit(int page)
 {
     (void)page;
     int i;
+    int requested = rl.max;
+    if (rl.max < rl.count)
+        rl.max = rl.count;
+
     for(i = 0; i < rl.max; i++) {
         if (i < rl.count)
             rl.list[i] = i+1;
         else
             rl.list[i] = 0;
     }
-    PAGE_CreateCancelButton(160 + (LCD_WIDTH - 320), 4, okcancel_cb);
-    PAGE_CreateOkButton(264 + (LCD_WIDTH - 320), 4, okcancel_cb);
+    PAGE_ShowHeader("");
+    GUI_CreateButton(&gui->save, 220 + (LCD_WIDTH - 320), 4, BUTTON_96, _show_button_cb, 0x0000, okcancel_cb, (void *)SAVE);
     GUI_CreateButton(&gui->up, 8 + REORD_XOFFSET, 40, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_UP);
     GUI_CreateButton(&gui->down, 8 + REORD_XOFFSET, 60, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)MOVE_DOWN);
 
-    GUI_CreateTextSelect(&gui->value, 8 + REORD_XOFFSET, 90, TEXTSELECT_96, NULL, copy_val_cb, NULL);
+    GUI_CreateTextSelect(&gui->value, 8 + REORD_XOFFSET, 90, TEXTSELECT_96, NULL, value_val_cb, NULL);
     GUI_CreateButton(&gui->apply, 8 + REORD_XOFFSET, 110, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)APPLY);
-    if (rl.max) {
-        GUI_CreateButton(&gui->insert, 8 + REORD_XOFFSET, 140, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
-        GUI_CreateButton(&gui->remove, 8 + REORD_XOFFSET, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
+    GUI_CreateTextSelect(&gui->copy, 8 + REORD_XOFFSET, 130, TEXTSELECT_96, NULL, copy_val_cb, NULL);
+    if (requested) {
+        GUI_CreateButton(&gui->insert, 8 + REORD_XOFFSET, 160, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
+        GUI_CreateButton(&gui->remove, 8 + REORD_XOFFSET, 180, BUTTON_96x16, _show_button_cb, 0x0000, press_button_cb, (void *)REMOVE);
     }
     GUI_CreateScrollable(&gui->scrollable, 112 + REORD_XOFFSET, 40, 200, LCD_HEIGHT - 48,
                          24, rl.max, row_cb, NULL, NULL, NULL);

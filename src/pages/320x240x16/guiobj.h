@@ -192,9 +192,11 @@ struct reorder_obj {
     guiButton_t up;
     guiButton_t down;
     guiTextSelect_t value;
+    guiTextSelect_t copy;
     guiButton_t apply;
     guiButton_t insert;
     guiButton_t remove;
+    guiButton_t save;
     guiLabel_t  name[LISTBOX_ITEMS];
     guiScrollable_t scrollable;
 };

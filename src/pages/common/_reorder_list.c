@@ -28,28 +28,22 @@ enum {
     APPLY,
     INSERT,
     REMOVE,
+    SAVE,
 };
 
-static void display_list(int idx);
-static void redraw();
-static const char *string_cb(u8 idx, void *data)
+static void redraw()
 {
-    (void)data;
-    return rl.text_cb(rl.list[idx]);
+    GUI_Redraw(&gui->value);
+    GUI_Redraw(&gui->copy);
+    GUI_Redraw(&gui->scrollable);
+    for(unsigned i = 0; i < sizeof(gui->name) / sizeof(guiLabel_t); i++) {
+        GUI_Redraw(&gui->name[i]);
+    }
 }
 
-static void select_cb(guiObject_t *obj, u16 sel, void *data)
+static void display_list(int idx)
 {
-    (void)obj;
-    (void)data;
-    if(sel < rl.count)  {
-        rl.copyto = sel;
-        rl.selected = sel;
-        GUI_Redraw(&gui->value);
-    } else {
-        display_list(rl.selected);
-        //GUI_ListBoxSelect(&gui->list, rl.selected);
-    }
+    GUI_ShowScrollableRowCol(&gui->scrollable, idx, 0);
 }
 
 static void okcancel_cb(guiObject_t *obj, const void *data)
@@ -146,4 +140,16 @@ static const char *list_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int idx = (long)data;
     return rl.text_cb(rl.list[idx]);
+}
+
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *))
+{
+    rl.return_page = return_page;
+    rl.list = list;
+    rl.selected = selected;
+    rl.copyto = selected;
+    rl.count = count;
+    rl.text_cb = text_cb;
+    rl.max = max_allowed;
+   PAGE_PushByID(PAGEID_REORDER, 0);
 }

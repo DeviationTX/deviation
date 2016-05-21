@@ -32,19 +32,6 @@ static const char *_show_button_cb(guiObject_t *obj, const void *data)
     return "";
 }
 
-static void redraw()
-{
-    GUI_Redraw(&gui->value);
-    GUI_Redraw(&gui->copy);
-    GUI_Redraw(&gui->scrollable);
-    for(unsigned i = 0; i < sizeof(gui->name) / sizeof(guiLabel_t); i++) {
-        GUI_Redraw(&gui->name[i]);
-    }
-}
-static void display_list(int idx)
-{
-    GUI_ShowScrollableRowCol(&gui->scrollable, idx, 0);
-}
 
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
@@ -56,24 +43,13 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *))
-{
-    rl.return_page = return_page;
-    rl.list = list;
-    rl.selected = selected;
-    rl.copyto = selected;
-    rl.count = count;
-    rl.text_cb = text_cb;
-    rl.max = max_allowed;
-    if (rl.max < count)
-        rl.max = count;
-    PAGE_PushByID(PAGEID_REORDER, 0);
-}
-
 void PAGE_ReorderInit(int page)
 {
     (void)page;
     int i;
+    int requested = rl.max;
+    if (rl.max < rl.count)
+        rl.max = rl.count;
     for(i = 0; i < rl.max; i++) {
         if (i < rl.count)
             rl.list[i] = i+1;
@@ -99,7 +75,7 @@ void PAGE_ReorderInit(int page)
     y += space;
     GUI_CreateTextSelectPlate(&gui->copy, 0, y, w, LINE_HEIGHT,
             &DEFAULT_FONT, NULL, copy_val_cb, NULL);
-    if (rl.max) {
+    if (requested) {
         y += space;
         GUI_CreateButtonPlateText(&gui->insert, 0, y, w/2 -2, LINE_HEIGHT,
                     &DEFAULT_FONT, _show_button_cb, 0x0000, press_button_cb, (void *)INSERT);
