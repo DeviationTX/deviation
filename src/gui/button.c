@@ -19,6 +19,10 @@
 #include "config/display.h"
 
 #include "_button.c"
+enum {
+    FLAG_ENABLE = 0x01,
+    FLAG_LONGPRESS = 0x02,
+};
 
 guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType type,
     const char *(*strCallback)(struct guiObject *, const void *), u16 fontColor,
@@ -50,7 +54,7 @@ guiObject_t *GUI_CreateButton(guiButton_t *button, u16 x, u16 y, enum ButtonType
     button->strCallback = strCallback;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
-    button->enable = 1;
+    button->flags |= FLAG_ENABLE;
 
     return obj;
 }
@@ -80,7 +84,7 @@ guiObject_t *GUI_CreateIcon(guiButton_t *button, u16 x, u16 y, const struct Imag
     button->strCallback = NULL;
     button->CallBack = CallBack;
     button->cb_data = cb_data;
-    button->enable = 1;
+    button->flags |= FLAG_ENABLE;
 
     return obj;
 }
@@ -117,14 +121,40 @@ int GUI_ButtonHeight(enum ButtonType type)
 void GUI_ButtonEnable(struct guiObject *obj, u8 enable)
 {
     struct guiButton *button = (struct guiButton *)obj;
-    if (button->enable != enable) {
-        button->enable = enable;
+    int is_enabled = button->flags & FLAG_ENABLE;
+    enable = enable ? FLAG_ENABLE : 0;
+    if (enable ^ is_enabled) {
+        button->flags = (button->flags & ~FLAG_ENABLE) | enable;
         OBJ_SET_DIRTY(obj, 1);
     }
 }
 
-u8 GUI_IsButtonEnabled(struct guiObject *obj)
+unsigned GUI_IsButtonEnabled(struct guiObject *obj)
 {
     struct guiButton *button = (struct guiButton *)obj;
-    return button->enable;
+    return button->flags & FLAG_ENABLE;
+}
+
+unsigned GUI_IsButtonLongPress(struct guiObject *obj)
+{
+    struct guiButton *button = (struct guiButton *)obj;
+    return button->flags & FLAG_LONGPRESS;
+}
+
+int GUI_TouchButton(struct guiObject *obj, int press_type)
+{
+    //press_type: 1=long_press, -1=release
+    struct guiButton *button = (struct guiButton *)obj;
+    if (press_type == 1) {
+        button->flags |= FLAG_LONGPRESS;
+        return 0;
+    }
+    OBJ_SET_DIRTY(objTOUCHED, 1);
+    if (press_type == -1) {
+        if(button->CallBack) {
+            button->CallBack(objTOUCHED, button->cb_data);
+        }
+        button->flags &= ~FLAG_LONGPRESS;
+    }
+    return 1;
 }

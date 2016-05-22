@@ -162,11 +162,11 @@ typedef struct guiButton {
     struct guiHeader header;
     struct LabelDesc desc;
     const struct ImageMap *image;
-    u16 fontColor;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*CallBack)(struct guiObject *obj, const void *data);
     const void *cb_data;
-    u8 enable;
+    u16 fontColor;
+    u8 flags;
 } guiButton_t;
 
 typedef struct guiScrollable {
@@ -342,8 +342,10 @@ guiObject_t *GUI_CreateButtonPlateText(guiButton_t *, u16 x, u16 y, u16 width, u
         u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 guiObject_t *GUI_CreateIcon(guiButton_t *, u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+int GUI_TouchButton(struct guiObject *obj, int press_type);
 void GUI_ButtonEnable(guiObject_t *obj, u8 enable);
-u8 GUI_IsButtonEnabled(guiObject_t *obj);
+unsigned GUI_IsButtonEnabled(guiObject_t *obj);
+unsigned GUI_IsButtonLongPress(guiObject_t *obj);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),

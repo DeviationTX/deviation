@@ -324,10 +324,7 @@ void GUI_TouchRelease()
         switch (objTOUCHED->Type) {
         case Button:
           {
-            struct guiButton *button = (struct guiButton *)objTOUCHED;
-            OBJ_SET_DIRTY(objTOUCHED, 1);
-            if(button->CallBack)
-                button->CallBack(objTOUCHED, button->cb_data);
+            GUI_TouchButton(objTOUCHED, -1);
             break;
           }
         case Image:
@@ -371,8 +368,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;
-                    OBJ_SET_DIRTY(obj, 1);
-                    return 1;
+                    return GUI_TouchButton(obj, long_press);
                 }
                 break;
             case Image:
@@ -560,18 +556,8 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
     if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         switch (obj->Type) {
           case Button:
-            if (is_longpress) {
-                // Don't handle long-press ENTER
-                return 0;
-            }
             objTOUCHED = obj;
-            OBJ_SET_DIRTY(obj, 1);
-            if (is_release) {
-                struct guiButton *button = (struct guiButton *)obj;
-                if(button->CallBack)
-                    button->CallBack(obj, button->cb_data);
-            }
-            return 1;
+            return GUI_TouchButton(obj, press_type);
           case Image:
             objTOUCHED = obj;
             GUI_TouchImage(obj, NULL, press_type);

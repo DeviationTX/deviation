@@ -52,7 +52,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         if (flags & BUTTON_LONGPRESS) {
             //Return to main page
             page_stack = _page_stack;
-            printf("Long press\n");
             PAGE_Pop();
         } else if (flags & BUTTON_RELEASE) {
             PAGE_Pop();

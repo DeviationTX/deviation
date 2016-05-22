@@ -74,6 +74,9 @@ void changepage_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
+    if(GUI_IsButtonLongPress(obj)) {
+        page_stack = _page_stack;
+    } 
     PAGE_Pop();
 #if 0
     if((long)data == 0) {
