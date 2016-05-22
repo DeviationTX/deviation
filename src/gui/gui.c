@@ -344,7 +344,7 @@ void GUI_TouchRelease()
         default: break;
         }
         if (change_selection_on_touch) {
-            objSELECTED = objTOUCHED;
+            GUI_SetSelected(objTOUCHED);
         }
         objTOUCHED = NULL;
     }
