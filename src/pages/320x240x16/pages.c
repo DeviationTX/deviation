@@ -63,6 +63,9 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
+    if (HAS_TOUCH) {
+        GUI_ChangeSelectionOnTouch(1);
+    }
     ActionCB = default_button_action_cb;
     pages[cur_page].init(menuPage);
     if (page_scrollable) {

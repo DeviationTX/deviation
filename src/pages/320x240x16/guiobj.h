@@ -102,9 +102,9 @@ struct mainpage_obj {
 };
 
 struct menu_obj {
-    guiLabel_t idx[ENTRIES_PER_PAGE];
+    guiLabel_t idx[ENTRIES_BY_SCREENSIZE];
     //guiLabel_t name[ENTRIES_PER_PAGE];
-    guiButton_t name[ENTRIES_PER_PAGE];
+    guiButton_t name[ENTRIES_BY_SCREENSIZE];
     guiScrollable_t scrollable;
 };
 

@@ -37,6 +37,7 @@ enum FULL_REDRAW {
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
+static u8 change_selection_on_touch = 1;
 
 static unsigned handle_buttons(u32 button, unsigned flags, void*data);
 #include "_gui.c"
@@ -323,10 +324,8 @@ void GUI_TouchRelease()
     if (objTOUCHED) {
         switch (objTOUCHED->Type) {
         case Button:
-          {
             GUI_TouchButton(objTOUCHED, -1);
             break;
-          }
         case Image:
             GUI_TouchImage(objTOUCHED, NULL, -1);
             break;
@@ -343,6 +342,9 @@ void GUI_TouchRelease()
             GUI_TouchScrollbar(objTOUCHED, NULL, -1);
             break;
         default: break;
+        }
+        if (change_selection_on_touch) {
+            objSELECTED = objTOUCHED;
         }
         objTOUCHED = NULL;
     }
@@ -724,3 +726,8 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 {
     select_notify = notify_cb;
 }
+void GUI_ChangeSelectionOnTouch(int enable)
+{
+    change_selection_on_touch = enable;
+}
+

@@ -145,7 +145,9 @@ int GUI_TouchButton(struct guiObject *obj, int press_type)
 {
     //press_type: 1=long_press, -1=release
     struct guiButton *button = (struct guiButton *)obj;
-    if (press_type == 1) {
+    if (press_type == 0) {
+        button->flags &= ~FLAG_LONGPRESS;
+    } else if (press_type == 1) {
         button->flags |= FLAG_LONGPRESS;
         return 0;
     }
@@ -153,8 +155,8 @@ int GUI_TouchButton(struct guiObject *obj, int press_type)
     if (press_type == -1) {
         if(button->CallBack) {
             button->CallBack(objTOUCHED, button->cb_data);
+            //The object may have been destroyed by now, the obj may be invalid
         }
-        button->flags &= ~FLAG_LONGPRESS;
     }
     return 1;
 }

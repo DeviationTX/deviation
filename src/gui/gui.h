@@ -463,4 +463,5 @@ void GUI_ViewInit();
 int GUI_IsEmpty();
 void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
 unsigned GUI_GetRemappedButtons();
+void GUI_ChangeSelectionOnTouch(int enable);
 #endif /* GUI_H_ */

@@ -63,6 +63,7 @@ void PAGE_MainInit(int page)
 
     if (HAS_TOUCH) {
         GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+        GUI_ChangeSelectionOnTouch(0);
     }
     if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0) {
         void (*cb)(guiObject_t *, const void *) = HAS_TOUCH ? press_icon2_cb : NULL;
@@ -162,24 +163,22 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     if(! GUI_GetSelected()) {
-        if ((flags & BUTTON_PRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            //see pagelist.h for mapping of 'page' to menu_id 
-            PAGE_PushByID(PAGEID_MENU, 0);
-        } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            mp->ignore_release = 1;
-            for (u8 timer=0; timer<NUM_TIMERS; timer++) {
-                TIMER_Reset(timer);
+        if (flags & BUTTON_RELEASE) {
+            if ((flags & BUTTON_HAD_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                //GUI_SetSelected((guiObject_t *)&gui->name);
+            } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                //see pagelist.h for mapping of 'page' to menu_id 
+                PAGE_PushByID(PAGEID_MENU, 0);
+            } else if ((flags & BUTTON_HAD_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+                for (u8 timer=0; timer<NUM_TIMERS; timer++) {
+                    TIMER_Reset(timer);
+                }
+            } else if (! PAGE_QuickPage(button, flags, data)) {
+                MIXER_UpdateTrim(button, flags, data);
             }
-        } else if (! PAGE_QuickPage(button, flags, data)) {
-            MIXER_UpdateTrim(button, flags, data);
         }
         return 1;
     } else {
-        if(mp->ignore_release) {
-            if (flags & BUTTON_RELEASE)
-                mp->ignore_release = 0;
-            return 1;
-        }
         return 0;
     }
 }
