@@ -178,10 +178,12 @@ static guiObject_t *set_selected_abs_row_col(guiScrollable_t *scrollable, int ro
     if (col < 0)
         row--;
     if (row < 0)
-        row = scrollable->item_count-1;
+        return NULL; //We shouldn't wrap here.  Let the main GUI code do the wrap for us
+        //row = scrollable->item_count-1;
     if (row >= scrollable->item_count) {
-        row = 0;
-        col = 0;
+        return NULL;
+        //row = 0;
+        //col = 0;
     }
     if (row >= scrollable->cur_row && row < scrollable->cur_row + scrollable->visible_rows) {
         //requested row is already visible
@@ -190,6 +192,9 @@ static guiObject_t *set_selected_abs_row_col(guiScrollable_t *scrollable, int ro
             return obj;
         row++;
         col = 0;
+        if (row >= scrollable->item_count) {
+            return NULL;
+        }
     }
     create_scrollable_objs(scrollable, row);
     return get_selectable_obj(scrollable, row, col);
