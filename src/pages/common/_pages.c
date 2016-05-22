@@ -42,7 +42,7 @@ static const struct page pages[] = {
 };
 #undef PAGEDEF
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
+unsigned default_button_action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
     if (USE_4BUTTON_MODE && GUI_GetRemappedButtons()) {

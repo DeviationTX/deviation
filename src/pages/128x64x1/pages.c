@@ -64,7 +64,7 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     else if (pages[cur_page].init == PAGE_MenuInit)
         quick_page_enabled = 0;
     PAGE_RemoveAllObjects();
-    ActionCB = _action_cb;
+    ActionCB = default_button_action_cb;
     pages[cur_page].init(menuPage);
     if (page_scrollable) {
         GUI_SetSelected(GUI_ShowScrollableRowOffset(page_scrollable, *current_selected));

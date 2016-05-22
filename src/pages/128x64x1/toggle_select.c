@@ -168,7 +168,11 @@ static void navigate_symbolicons(s8 direction) {
 unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER))
+        return 0;
+    if (! (flags & BUTTON_RELEASE))
+        return 1;
+    {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
             PAGE_MainLayoutInit(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_UP))

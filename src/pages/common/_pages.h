@@ -182,4 +182,6 @@ void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
 
+unsigned default_button_action_cb(u32 button, unsigned flags, void *data);
+
 #endif //__PAGES_H__

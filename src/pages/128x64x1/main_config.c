@@ -43,34 +43,31 @@ enum {
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
 static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
+static u16 current_selected = 0;
+
 static const int HEADER_Y = 10;
 
 #include "../common/_main_config.c"
 
-static u16 current_selected = 0;
-
+#if HAS_LAYOUT_EDITOR
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
+#endif
 
 void PAGE_MainLayoutInit(int page)
 {
-    (void)page;
-    GUI_RemoveAllObjects();
+    GUI_RemoveAllObjects(); //This is needed because we haven't fully finished converting this page to push/pop
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
-#else
-    PAGE_ShowHeader(_tr("Main page config"));
-#endif
     PAGE_SetActionCB(_action_cb);
+#else
+    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_MAINCFG)));
+#endif
     memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));
     show_config();
-}
-void PAGE_MainLayoutEvent()
-{
-}
-void PAGE_MainLayoutExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    if (page == -1) {
+        GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+    }
 }
 
 static int size_cb(int absrow, void *data)
@@ -111,7 +108,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    PAGE_MainLayoutExit();
+    PAGE_SaveCurrentPos();
     TGLICO_Select(obj, data);
 }
 
@@ -119,10 +116,10 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    PAGE_MainLayoutExit();
-    current_selected += 1 << 8;
+    //PAGE_MainLayoutExit();
     create_element();
-    show_config();
+    current_selected = 0;
+    PAGE_MainLayoutInit(-1);
 }
 
 static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
@@ -136,7 +133,7 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
-        PAGE_MainLayoutExit();
+        //PAGE_MainLayoutExit();
         return _tr("Delete");
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 0);
@@ -215,22 +212,14 @@ void show_config()
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
+#if HAS_LAYOUT_EDITOR
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_Pop();
-#if HAS_LAYOUT_EDITOR
-        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
-            PAGE_MainLayoutExit();
-            show_layout();
-        }
-#endif //HAS_LAYOUT_EDITOR
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+        PAGE_PushByID(PAGEID_LAYOUT, 0);
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
+#endif //HAS_LAYOUT_EDITOR

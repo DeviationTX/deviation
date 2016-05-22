@@ -59,7 +59,7 @@ PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        NULL,     
 #if HAS_DATALOG
 PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,               MODEL_MENU,  _tr_noop("Datalog"))
 #endif
-PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  PAGE_MainLayoutEvent,  PAGE_MainLayoutExit, MODEL_MENU, _tr_noop("Main page config"))
+PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,               MODEL_MENU,  _tr_noop("Main page config"))
 
 // Transmitter menu
 //-----------------
@@ -79,6 +79,10 @@ PAGEDEF(PAGEID_EDITCURVE, PAGE_EditCurvesInit, NULL,                  NULL,     
 PAGEDEF(PAGEID_LOADSAVE, PAGE_LoadSaveInit,    NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           "")
+#if HAS_LAYOUT_EDITOR
+PAGEDEF(PAGEID_LAYOUT,   PAGE_LayoutEditInit,  NULL,                  NULL,               0,           "")
+#endif
+
 #undef MAIN_MENU
 #undef MODEL_MENU
 #undef STDGUI_MENU
