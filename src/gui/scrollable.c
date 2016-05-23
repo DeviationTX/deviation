@@ -151,7 +151,7 @@ static guiObject_t * get_last_object()
     return head;
 }
 
-static void get_obj_abs_row_col(guiScrollable_t *scrollable, guiObject_t *obj, int *row, int *col)
+static int get_obj_abs_row_col(guiScrollable_t *scrollable, guiObject_t *obj, int *row, int *col)
 {
     guiObject_t *head = scrollable->head;
     *row = scrollable->cur_row-1;
@@ -163,12 +163,12 @@ static void get_obj_abs_row_col(guiScrollable_t *scrollable, guiObject_t *obj, i
         }
         if(! OBJ_IS_HIDDEN(head) && OBJ_IS_SELECTABLE(head)) {
             if(head == obj)
-                return;
+                return 1;
             (*col)++;
         }
         head = head->next;
     }
-    return;
+    return 0;
 }
 
 static guiObject_t *set_selected_abs_row_col(guiScrollable_t *scrollable, int row, int col)
@@ -339,6 +339,8 @@ static void create_scrollable_objs(guiScrollable_t *scrollable, int row)
 static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     (void)parent;
     (void)pos;
+    int sel_row = -1;
+    int sel_col = 0;
     guiScrollable_t *scrollable = (guiScrollable_t *)data;
     int row = scrollable->cur_row;
     if (direction > 1)
@@ -352,7 +354,25 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data) {
     } else if (row > scrollable->item_count - scrollable->visible_rows) {
         row = scrollable->item_count - scrollable->visible_rows;
     }
+    guiObject_t *sel = GUI_GetSelected();
+    if (sel) {
+        if(get_obj_abs_row_col(scrollable, sel, &sel_row, &sel_col)) {
+            if (sel_row < row) {
+                sel_row = row;
+                sel_col = 0;
+            }
+        } else {
+            sel_row = -1;
+        }
+    }
     create_scrollable_objs(scrollable, -row);
+    if (sel_row >= 0) {
+        if(sel_row >= row + scrollable->visible_rows) {
+            sel_row = row + scrollable->visible_rows - 1;
+            sel_col = 0;
+        }
+        GUI_SetSelected(set_selected_abs_row_col(scrollable, sel_row, sel_col));
+    }
     return -1;
 }
 #endif
