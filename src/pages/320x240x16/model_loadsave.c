@@ -22,14 +22,46 @@
 
 #include "../common/_model_loadsave.c"
 
+static u8 list_selected = 0;
 static void icon_notify_cb(guiObject_t *obj)
 {
     int idx = GUI_ScrollableGetObjRowOffset(&gui->scrollable, obj);
     if (idx < 0)
         return;
     int absrow = (idx >> 8) + (idx & 0xff);
+    list_selected = absrow;
     change_icon(absrow);
 }
+
+static void ok_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    press_cb(NULL, -1, (void *)(long)list_selected);
+}
+static void press1_cb(guiObject_t *obj, s8 press_type, const void *data)
+{
+    list_selected = (long)data;
+    if (HAS_TOUCH && OBJ_IS_USED(&gui->image)) {
+        //differentiate between touch and button
+        static int is_touch = 0;
+        if (press_type >= 0) {
+            u32 buttons = ScanButtons();
+            is_touch = 0;
+            if(! CHAN_ButtonIsPressed(buttons, BUT_ENTER)) {
+                is_touch = 1;
+            }
+            return;
+        }
+        if (press_type == -1 && is_touch) {
+            is_touch = -1;
+            icon_notify_cb(obj);
+            return;
+        }
+    }
+    press_cb(obj, press_type, data);
+}
+
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -45,7 +77,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             200 - ARROW_WIDTH, 24, &listbox, NULL, NULL, "");
     } else {
         GUI_CreateLabelBox(&gui->label[relrow], 8 + ((LCD_WIDTH - 320) / 2), y,
-            200 - ARROW_WIDTH, 24, &listbox, name_cb, press_cb, (void *)(long)absrow);
+            200 - ARROW_WIDTH, 24, &listbox, name_cb, press1_cb, (void *)(long)absrow);
     }
     return 0;
 }
@@ -79,9 +111,11 @@ void PAGE_LoadSaveInit(int page)
             img = UNKNOWN_ICON;
         LCD_ImageDimensions(img, &w, &h);
         GUI_CreateImage(&gui->image, 212 + ((LCD_WIDTH - 320) / 2), 88, w, h, mp->iconstr);
+        PAGE_CreateOkButton(LCD_WIDTH - 48, 4, ok_cb);
         GUI_SelectionNotify(icon_notify_cb);
     }
     GUI_CreateScrollable(&gui->scrollable, 8 + ((LCD_WIDTH - 320) / 2), 40, 200, LISTBOX_ITEMS * 24,
                          24, num_models, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, selected, 0));
+    list_selected = selected;
 }

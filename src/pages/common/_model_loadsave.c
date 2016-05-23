@@ -62,6 +62,7 @@ static void change_icon(int sel)
             FS_CloseDir();
         }
     } else {
+        sel++; //models are indexed from 1
         sprintf(tempstring, "models/model%d.ini", sel);
         mp->modeltype = 0;
         mp->iconstr[0] = 0;
