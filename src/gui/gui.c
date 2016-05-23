@@ -37,7 +37,9 @@ enum FULL_REDRAW {
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
+#if HAS_TOUCH
 static u8 change_selection_on_touch = 1;
+#endif
 
 static unsigned handle_buttons(u32 button, unsigned flags, void*data);
 #include "_gui.c"
@@ -343,11 +345,13 @@ void GUI_TouchRelease()
             break;
         default: break;
         }
+#if HAS_TOUCH
         if (change_selection_on_touch) {
             if (objTOUCHED && OBJ_IS_SELECTABLE(objTOUCHED)) {
                 GUI_SetSelected(objTOUCHED);
             }
         }
+#endif
         objTOUCHED = NULL;
     }
 }
@@ -728,8 +732,9 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 {
     select_notify = notify_cb;
 }
+#if HAS_TOUCH
 void GUI_ChangeSelectionOnTouch(int enable)
 {
     change_selection_on_touch = enable;
 }
-
+#endif
