@@ -312,11 +312,6 @@ static void frskyX_data_frame() {
     u16 lcrc = crc(&packet[3], 25);
     packet[28] = lcrc >> 8;
     packet[29] = lcrc;
-#ifdef EMULATOR
-//    printf("packet %02x", packet[0]);
-//    for(int i=1; i < PACKET_SIZE; i++) printf(" %02x", packet[i]);
-//    printf("\n");
-#endif
 } 
 
 
@@ -713,6 +708,8 @@ static u16 frskyx_cb() {
 #else
       memcpy(packet, &telem_test[telem_idx], sizeof(telem_test[0]));
       telem_idx = (telem_idx + 1) % (sizeof(telem_test)/sizeof(telem_test[0]));
+      packet[1] = fixed_id & 0xff;
+      packet[2] = fixed_id >> 8;
       frsky_check_telemetry(packet, sizeof(telem_test[0]));
 #endif
       state = FRSKY_DATA1;
