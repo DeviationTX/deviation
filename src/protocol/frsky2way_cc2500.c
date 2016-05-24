@@ -210,43 +210,52 @@ static void frsky2way_build_data_packet()
 static TS_STATE ts_state;    // file scope so can reset on sequence error
 static void frsky_parse_telem_stream(u8 byte) {
     static u8 data_id;
-    static u8 lowByte;
+    static u8 lowByte, highByte;
 
 
+    if (ts_state == TS_DATA_END) {
+        if (byte == 0x5e) {
+            processHubPacket(data_id, (highByte << 8) + lowByte);
+            ts_state = TS_DATA_ID;
+        } else {
+            ts_state = TS_IDLE;
+        }
+        return;
+    }
     if (byte == 0x5e) {
-      ts_state = TS_DATA_ID;
-      return;
+        ts_state = TS_DATA_ID;
+        return;
     }
     if (ts_state == TS_IDLE) {
-      return;
+        return;
     }
     if (ts_state & TS_XOR) {
-      byte = byte ^ 0x60;
-      ts_state = (TS_STATE)(ts_state - TS_XOR);
+        byte = byte ^ 0x60;
+        ts_state = (TS_STATE)(ts_state - TS_XOR);
     }
     else if (byte == 0x5d) {
-      ts_state = (TS_STATE)(ts_state | TS_XOR);
-      return;
+        ts_state = (TS_STATE)(ts_state | TS_XOR);
+        return;
     }
     if (ts_state == TS_DATA_ID) {
-      if (byte > 0x3f) {
-        ts_state = TS_IDLE;
-      }
-      else {
-        data_id = byte;
-        ts_state = TS_DATA_LOW;
-      }
-      return;
+        if (byte > 0x3f) {
+            ts_state = TS_IDLE;
+        }
+        else {
+            data_id = byte;
+            ts_state = TS_DATA_LOW;
+        }
+        return;
     }
     if (ts_state == TS_DATA_LOW) {
-      lowByte = byte;
-      ts_state = TS_DATA_HIGH;
-      return;
+        lowByte = byte;
+        ts_state = TS_DATA_HIGH;
+        return;
     }
-
-    ts_state = TS_IDLE;
-
-    processHubPacket(data_id, (byte << 8) + lowByte);
+    if (ts_state == TS_DATA_HIGH) {
+        highByte = byte;
+        ts_state = TS_DATA_END;
+    }
 }
 
 #endif // HAS_EXTENDED_TELEMETRY

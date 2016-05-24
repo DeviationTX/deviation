@@ -98,6 +98,7 @@ typedef enum {
   TS_DATA_ID,   // waiting for dataID
   TS_DATA_LOW,  // waiting for data low byte
   TS_DATA_HIGH, // waiting for data high byte
+  TS_DATA_END,  // waiting for 0x5e end of frame marker
   TS_XOR = 0x80 // decode stuffed byte
 } TS_STATE;
 
