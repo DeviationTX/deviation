@@ -87,6 +87,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     struct guiObject *obj = (guiObject_t *)select;
     struct guiBox *box;
 
+    CLEAR_OBJ(select);
     box = &obj->box;
 
     select->type = TEXTSELECT_DEVO10;

@@ -64,7 +64,11 @@ static s8 fine;
 
 enum {
     FRSKY_BIND        = 0,
+#ifdef EMULATOR
+    FRSKY_BIND_DONE  = 10,
+#else
     FRSKY_BIND_DONE  = 1000,
+#endif
     FRSKY_DATA1,
     FRSKY_DATA2,
     FRSKY_DATA3,
@@ -203,63 +207,86 @@ static void frsky2way_build_data_packet()
 #include "frsky_d_telem._c"
 
 
+static TS_STATE ts_state;    // file scope so can reset on sequence error
 static void frsky_parse_telem_stream(u8 byte) {
-    static int8_t data_id;
-    static uint8_t lowByte;
-    static TS_STATE state = TS_IDLE;
+    static u8 data_id;
+    static u8 lowByte, highByte;
 
 
+    if (ts_state == TS_DATA_END) {
+        if (byte == 0x5e) {
+            processHubPacket(data_id, (highByte << 8) + lowByte);
+            ts_state = TS_DATA_ID;
+        } else {
+            ts_state = TS_IDLE;
+        }
+        return;
+    }
     if (byte == 0x5e) {
-      state = TS_DATA_ID;
-      return;
+        ts_state = TS_DATA_ID;
+        return;
     }
-    if (state == TS_IDLE) {
-      return;
+    if (ts_state == TS_IDLE) {
+        return;
     }
-    if (state & TS_XOR) {
-      byte = byte ^ 0x60;
-      state = (TS_STATE)(state - TS_XOR);
+    if (ts_state & TS_XOR) {
+        byte = byte ^ 0x60;
+        ts_state = (TS_STATE)(ts_state - TS_XOR);
     }
     else if (byte == 0x5d) {
-      state = (TS_STATE)(state | TS_XOR);
-      return;
+        ts_state = (TS_STATE)(ts_state | TS_XOR);
+        return;
     }
-    if (state == TS_DATA_ID) {
-      if (byte > 0x3f) {
-        state = TS_IDLE;
-      }
-      else {
-        data_id = byte;
-        state = TS_DATA_LOW;
-      }
-      return;
+    if (ts_state == TS_DATA_ID) {
+        if (byte > 0x3f) {
+            ts_state = TS_IDLE;
+        }
+        else {
+            data_id = byte;
+            ts_state = TS_DATA_LOW;
+        }
+        return;
     }
-    if (state == TS_DATA_LOW) {
-      lowByte = byte;
-      state = TS_DATA_HIGH;
-      return;
+    if (ts_state == TS_DATA_LOW) {
+        lowByte = byte;
+        ts_state = TS_DATA_HIGH;
+        return;
     }
-
-    state = TS_IDLE;
-
-    processHubPacket(data_id, (byte << 8) + lowByte);
+    if (ts_state == TS_DATA_HIGH) {
+        highByte = byte;
+        ts_state = TS_DATA_END;
+    }
 }
 
 #endif // HAS_EXTENDED_TELEMETRY
 
 static void frsky2way_parse_telem(u8 *pkt, int len)
 {
+// pkt 0 = length not counting appended status bytes
+// pkt 1,2 = fixed_id
+// pkt 3 = A1 : 52mV per count; 4.5V = 0x56
+// pkt 4 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
+// pkt 5 = RSSI
+// pkt 6 = number of stream bytes
+// pkt 7 = sequence number increments mod 8 with each packet containing stream data
+// pkt 8-(8+(pkt[6]-1)) = stream data
+// pkt len-2 = downlink RSSI
+// pkt len-1 = crc status (bit7 set indicates good), link quality indicator (bits6-0)
+
+
+// D-series receivers seem to return a lot of bad packets.  Do as much as possible to
+// avoid bad data.
+
+
     u8 AD2gain = Model.proto_opts[PROTO_OPTS_AD2GAIN];
-    //byte1 == data len (+ 2 for CRC)
-    //byte 2,3 = fixed=id
-    //byte 4 = A1 : 52mV per count; 4.5V = 0x56
-    //byte 5 = A2 : 13.4mV per count; 3.0V = 0xE3 on D6FR
-    //byte6 = RSSI
-    //verify pkt
-    //printf("%02x<>%02x %02x<>%02x %d<>%d\n", pkt[1], fixed_id & 0xff, pkt[2], (fixed_id >> 8) & 0xff, len, pkt[0]+3);
-    if(pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff) || len != pkt[0] + 3)
-        return;
-    len -= 2;
+
+    // packet checks: sensible length, good CRC, matching fixed id
+    if (len != pkt[0] + 3 || pkt[0] < 5
+        || !(pkt[len-1] & 0x80)
+        || pkt[1] != (fixed_id & 0xff) || pkt[2] != ((fixed_id >> 8) & 0xff)) {
+            return;
+    }
+
     //Get voltage A1 (52mv/count)
     Telemetry.value[TELEM_FRSKY_VOLT1] = pkt[3] * 52 / 10; //In 1/100 of Volts
     TELEMETRY_SetUpdated(TELEM_FRSKY_VOLT1);
@@ -271,8 +298,20 @@ static void frsky2way_parse_telem(u8 *pkt, int len)
     TELEMETRY_SetUpdated(TELEM_FRSKY_RSSI);
 
 #if HAS_EXTENDED_TELEMETRY
-    for(int i = 6; i < len - 4; i++)
-        frsky_parse_telem_stream(pkt[i]);
+    static u8 sequence;
+
+    if (pkt[0] < 7) return;   // be paranoid about packet length
+
+    if (pkt[6] && pkt[6] <= pkt[0]-7) {   // be paranoid about packet length
+        if (pkt[7] != sequence) {
+            ts_state = TS_IDLE;
+            sequence = pkt[7];    // should be able to recover in middle of sequence
+        }
+        sequence = (sequence + 1) % 8;
+            
+        for(int i=8; i < 8+pkt[6]; i++)
+            frsky_parse_telem_stream(pkt[i]);
+    }
 #endif // HAS_EXTENDED_TELEMETRY
 }
 
@@ -285,7 +324,11 @@ static u16 frsky2way_cb()
         CC2500_WriteReg(CC2500_0A_CHANNR, 0x00);
         CC2500_WriteData(packet, packet[0]+1);
         state++;
+#ifdef EMULATOR
+        return 90;
+#else
         return 9000;
+#endif
     }
     if (state == FRSKY_BIND_DONE) {
         state = FRSKY_DATA2;
@@ -295,7 +338,11 @@ static u16 frsky2way_cb()
     } else if (state == FRSKY_DATA5) {
         CC2500_Strobe(CC2500_SRX);
         state = FRSKY_DATA1;
+#ifdef EMULATOR
+        return 92;
+#else
         return 9200;
+#endif
     }
     counter = (counter + 1) % 188;
     if (state == FRSKY_DATA4) {
@@ -305,7 +352,11 @@ static u16 frsky2way_cb()
         CC2500_WriteReg(CC2500_0A_CHANNR, get_chan_num(counter % 47));
         CC2500_WriteReg(CC2500_23_FSCAL3, 0x89);
         state++;
+#ifdef EMULATOR
+        return 13;
+#else
         return 1300;
+#endif
     } else {
         if (state == FRSKY_DATA1) {
             unsigned len = CC2500_ReadReg(CC2500_3B_RXBYTES | CC2500_READ_BURST);
@@ -316,23 +367,36 @@ static u16 frsky2way_cb()
                 frsky2way_parse_telem(packet, len);
             }
 #ifdef EMULATOR
-            const u8 t[] = {0x24, 0x25, 0x26, 0x10, 0x21, 0x02, 0x05, 0x06, 0x28, 0x3a, 0x3b, 0x03, 0x14, 0x1c, 0x13, 0x1b, 0x23, 0x12, 0x1a, 0x22, 0x11, 0x19, 0x01, 0x09, 0x04, 0x15, 0x16, 0x17, 0x18};
-            u8 p[sizeof(t) * 4 + 4 +5];
-            p[0] = sizeof(p) - 3;
-            p[1] = fixed_id & 0xff;
-            p[2] = fixed_id >> 8;
-            p[3] = rand32() % 256;
-            p[4] = rand32() % 256;
-            //p[5] = rssi;
-            for(unsigned i = 0; i < sizeof(t); i++) {
-                p[5+i*4+0] = 0x5e;
-                p[5+i*4+1] = t[i];
-                p[5+i*4+2] = rand32() & 0xff;
-                p[5+i*4+3] = 0x00;
-            }
-            p[5+4*sizeof(t)] = 0x5e;
-            frsky2way_parse_telem(p, sizeof(p));
+static u8 testdata[] = {
+ 0x11, 0x5a, 0xdf, 0x45, 0x00, 0x4b, 0x0a, 0x00, 0x10, 0x46, 0x00, 0x5e, 0x04, 0x64, 0x00, 0x5e, 0x02, 0x1a, 0x40, 0xad,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4a, 0x0a, 0x01, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x4c, 0xad,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x02, 0x05, 0xec, 0xff, 0x5e, 0x10, 0x46, 0x00, 0x5e, 0x02, 0x1a, 0x3e, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x03, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x4d, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4c, 0x0a, 0x04, 0x05, 0xec, 0xff, 0x5e, 0x04, 0x64, 0x00, 0x5e, 0x10, 0x46, 0x3e, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x05, 0x00, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x4d, 0xac,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4a, 0x0a, 0x06, 0x10, 0x46, 0x00, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0x3e, 0xaf,
+ 0x11, 0x5a, 0xdf, 0x47, 0x00, 0x4b, 0x0a, 0x07, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x4d, 0xad,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4c, 0x0a, 0x00, 0x10, 0x46, 0x00, 0x5e, 0x21, 0x64, 0x00, 0x5e, 0x02, 0x1a, 0x4b, 0xad,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4a, 0x0a, 0x01, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x3f, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4c, 0x0a, 0x02, 0x05, 0xec, 0xff, 0x5e, 0x10, 0x46, 0x00, 0x5e, 0x21, 0x1a, 0x4b, 0xac,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x03, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x3e, 0xac,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x04, 0x05, 0xec, 0xff, 0x5e, 0x04, 0x64, 0x00, 0x5e, 0x10, 0x46, 0x4a, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4a, 0x0a, 0x05, 0x00, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x41, 0xae,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x0a, 0x06, 0x10, 0x46, 0x00, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0x4a, 0xad,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4a, 0x0a, 0x07, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x41, 0xac,
+ 0x11, 0x5a, 0xdf, 0x44, 0x00, 0x4b, 0x00, 0x00, 0xff, 0x5e, 0x02, 0x1a, 0x00, 0x5e, 0x05, 0xec, 0xff, 0x5e, 0x49, 0xae,
+ 0x00 };
+static u8 *data = testdata;
+
+            if (!*data) data = testdata;
+            len = *data + 3;
+            memcpy(packet, data, len);
+            data[1] = fixed_id & 0xff;
+            data[2] = fixed_id >> 8;
+            data += len;
+            frsky2way_parse_telem(packet, len);
 #endif //EMULATOR
+
             CC2500_SetTxRxMode(TX_EN);
             CC2500_SetPower(Model.tx_power);
         }
@@ -351,7 +415,11 @@ static u16 frsky2way_cb()
         CC2500_WriteData(packet, packet[0]+1);
         state++;
     }
+#ifdef EMULATOR
+    return state == FRSKY_DATA4 ? 75 : 90;
+#else
     return state == FRSKY_DATA4 ? 7500 : 9000;
+#endif
 }
 
 // Generate internal id from TX id and manufacturer id (STM32 unique id)
@@ -376,6 +444,9 @@ static void initialize(int bind)
     fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
     //fixed_id = 0x3e19;
     fixed_id = get_tx_id();
+#if HAS_EXTENDED_TELEMETRY
+    ts_state = TS_IDLE;
+#endif
     frsky2way_init(bind);
     if (bind) {
         PROTOCOL_SetBindState(0xFFFFFFFF);
@@ -383,7 +454,11 @@ static void initialize(int bind)
     } else {
         state = FRSKY_BIND_DONE;
     }
+#ifdef EMULATOR
+    CLOCK_StartTimer(100, frsky2way_cb);
+#else
     CLOCK_StartTimer(10000, frsky2way_cb);
+#endif
 }
 
 const void *FRSKY2WAY_Cmds(enum ProtoCmds cmd)

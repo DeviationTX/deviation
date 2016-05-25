@@ -20,30 +20,15 @@
 #if DEBUG_WINDOW_SIZE
 #include "../common/_debuglog_page.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
 void PAGE_DebuglogInit(int page)
 {
     (void)page;
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(PAGE_GetName(PAGEID_DEBUGLOG));
-    PAGE_SetActionCB(_action_cb);
 
     find_line_ends();
     GUI_CreateScrollable(&gui->scrollable,
-         0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, NUM_ROWS, row_cb, getobj_cb, NULL, NULL);
+         0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT, LINE_SPACE, NUM_ROWS, row_cb, NULL, NULL, NULL);
 }
 #endif //DEBUG_WINDOW_SIZE

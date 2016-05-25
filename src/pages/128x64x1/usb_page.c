@@ -27,7 +27,6 @@ enum {
 #endif //OVERRIDE_PLACEMENT
 
 #include "../common/_usb_page.c"
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static struct usb_obj * const gui = &gui_objs.u.usb;
 
@@ -35,7 +34,6 @@ static void _draw_page(u8 enable)
 {
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("USB"));
-    PAGE_SetActionCB(_action_cb);
 
     snprintf(tempstring, sizeof(tempstring), "%s %s",
             _tr("Press ENT to turn \nUSB drive"),
@@ -43,20 +41,6 @@ static void _draw_page(u8 enable)
     GUI_CreateLabelBox(&gui->label, LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, &DEFAULT_FONT, NULL, NULL, tempstring);
 }
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 
 void PAGE_USBEvent()
 {

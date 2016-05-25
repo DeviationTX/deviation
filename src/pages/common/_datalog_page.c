@@ -15,6 +15,7 @@
 
 static struct datalog_obj * const gui = &gui_objs.u.datalog;
 static struct datalog     * const dlog = &Model.datalog;
+static u16 current_selected = 0;
 u16 next_update;
 u32 remaining;
 

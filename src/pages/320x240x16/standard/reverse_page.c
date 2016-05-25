@@ -54,7 +54,7 @@ static void show_page(int page)
 void PAGE_ReverseInit(int page)
 {
     struct mixer_page * mp = &pagemem.u.mixer_page;
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_REVERSE), MODELMENU_Show);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_REVERSE));
     mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;

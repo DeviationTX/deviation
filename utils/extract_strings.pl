@@ -5,31 +5,31 @@ use warnings;
 use Getopt::Long;
 my $update;
 my $lang;
-my $target;
+my $fs;
+my $target_list;
 my $objdir;
 my $count;
-my @targets = ("320x240x16", "128x64x1");
-my %targetmap = (
-    devo8 => "320x240x16",
-    devo12 => "480x272x16",
-    devo10 => "128x64x1",
-    devo7e => undef,
-    devof7 => undef,
-    x9d => "128x64x1",
-);
-my %alt_targets = (
-    devo12 => ["devo8"],
-);
-
+# The following are legal alternatives to the default string
+my @targets = ("devo8", "devo10", "devo12");
 
 $ENV{CROSS} ||= "";
-GetOptions("update" => \$update, "language=s" => \$lang, "target=s" => \$target, "count" => \$count, "objdir=s" => \$objdir);
-if($target && ! exists $targetmap{$target}) {
-    my @t = keys(%targetmap);
-    print "Target must be one of: @t\n";
-    exit 1;
+GetOptions("update" => \$update, "language=s" => \$lang, "fs=s" => \$fs, "targets=s" => \$target_list, "count" => \$count, "objdir=s" => \$objdir);
+my @requested_targets = ();
+@requested_targets = split(/,/, $target_list) if($target_list);
+if($fs || @requested_targets) {
+    if (! @requested_targets || ! $fs) {
+        print "ERROR: Must specify both -fs and -targets\n";
+        exit 1;
+    }
+    my $ok = 1;
+    foreach my $t (@requested_targets) {
+        if(! grep {$_ eq $t} @targets) {
+            print "ERROR: Target '$t' is not in list (@targets)\n";
+            $ok = 0;
+        }
+    }
+    exit 1 if(! $ok);
 }
-exit 0 if($target && ! $targetmap{$target});
 
 my @lines = `/usr/bin/find . -name "*.[hc]" | grep -v libopencm3 | xargs xgettext -o - --omit-header -k --keyword=_tr --keyword=_tr_noop --no-wrap`;
 my @files;
@@ -125,7 +125,7 @@ if($objdir) {
     @out = values(%filemap);
 }
 #append template names
-foreach (`head -n 1 filesystem/common/template/*.ini`) {
+foreach (`head -n 1 fs/common/template/*.ini`) {
     chomp;
     if(/template=(.*?)\s*$/) {
         push @out, $1;
@@ -145,8 +145,8 @@ if(! $update) {
 }
 
 @files = glob($lang ?
-              "filesystem/common/language/lang*.$lang"
-              : "filesystem/common/language/lang*");
+              "fs/language/lang*.$lang"
+              : "fs/language/lang*");
 
 foreach my $file (@files) {
     my %strings = %uniq;
@@ -180,21 +180,17 @@ foreach my $file (@files) {
         }
         
     }
-    if($target) {
+    if($fs) {
         #if target is specified, we want to return a filtered list of strings
         my $outf = $file;
-        $outf =~ s/common/$target/;
-        open $fh, ">", $outf;
+        $outf =~ s/fs/filesystem\/$fs/;
+        open $fh, ">", $outf or die "ERROR: Can't write $outf\n";
         print $fh $name;
-        $targetstr{$target} ||= {};
-        if($alt_targets{$target}) {
+        foreach (@requested_targets) {
             #Hierarchically try to find best string
-            foreach(@{ $alt_targets{$target} }) {
-                $targetstr{$_} ||= {};
-                %strings = (%strings, %{$targetstr{$_}});
-            }
+            $targetstr{$_} ||= {};
+            %strings = (%strings, %{$targetstr{$_}});
         }
-        %strings = (%strings, %{$targetstr{$target}});
         foreach (sort keys %strings) {
             if(! $unused{$_} && defined($strings{$_})) {
                 print $fh ":$_\n$strings{$_}\n";
@@ -206,11 +202,11 @@ foreach my $file (@files) {
         print $fh $name;
         foreach my $str (sort (keys(%strings))) {
             if ($unused{$str}) {
-                if (scalar(grep {defined $targetstr{$_}{$str}} keys(%targetmap)) != scalar(keys(%targetmap))) {
+                if (scalar(grep {defined $targetstr{$_}{$str}} @targets) != scalar(@targets)) {
                     #print generic if not all targetshave a translation
                     print $fh "<:$str\n<$strings{$str}\n";
                 }
-                foreach my $key (sort keys %targetmap) {
+                foreach my $key (sort @targets) {
                     if(defined $targetstr{$key}{$str}) {
                         print $fh "<|$key:$str\n<$targetstr{$key}{$str}\n";
                     }
@@ -218,11 +214,11 @@ foreach my $file (@files) {
             } elsif(! defined($strings{$str})) {
                 print $fh ">:$str\n";
             } else {
-                if (scalar(grep {defined $targetstr{$_}{$str}} keys(%targetmap)) != scalar(keys(%targetmap))) {
+                if (scalar(grep {defined $targetstr{$_}{$str}} @targets) != scalar(@targets)) {
                     #print generic if not all targetshave a translation
                     print $fh ":$str\n$strings{$str}\n";
                 }
-                foreach my $key (sort keys %targetmap) {
+                foreach my $key (sort @targets) {
                     if(defined $targetstr{$key}{$str}) {
                         print $fh "|$key:$str\n$targetstr{$key}{$str}\n";
                     }

@@ -70,13 +70,6 @@ static const char *select_cb(guiObject_t *obj, int dir, void *data)
     return seltype ? _tr("All") : _tr("None");
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->col2[relrow].but;
-}
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
@@ -155,7 +148,7 @@ void PAGE_DatalogInit(int page)
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
         LCD_WIDTH-1, ITEM_HEIGHT, &DEFAULT_FONT, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, getobj_cb, NULL, NULL);
+                         ITEM_SPACE, DL_SOURCE + DLOG_LAST, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 

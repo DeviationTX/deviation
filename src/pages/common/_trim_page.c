@@ -23,6 +23,8 @@ static struct trim_page * const tp = &pagemem.u.trim_page;
 static void _show_page();
 static void _edit_cb(guiObject_t *obj, const void *data);
 
+static u16 current_selected = 0;
+
 const char *trimsource_name_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;

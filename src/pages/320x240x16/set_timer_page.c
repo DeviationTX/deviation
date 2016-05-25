@@ -52,12 +52,11 @@ void add_set_button_cb(struct guiObject *obj, const void *data)
     GUI_Redraw(&guiset->newvalue);
 }
 
-void exit_page(guiObject_t *obj, const void *data)
+void PAGE_SetTimerExit()
 {
-    (void)data;
     TIMER_SetValue(permanent.index, permanent.newvalue);
     Model.timer[permanent.index].val = permanent.newvalue;
-    TIMERPAGE_Show(obj, (void *)(long)(LCD_WIDTH == 480 ? 0 : (permanent.index / 2)));   // 2 timers per page on 320x240-screen - show page 2 for timer 3 and 4
+    //TIMERPAGE_Show(obj, (void *)(long)(LCD_WIDTH == 480 ? 0 : (permanent.index / 2)));   // 2 timers per page on 320x240-screen - show page 2 for timer 3 and 4
 }
 
 static void _show_settimer_page(u8 index)
@@ -68,7 +67,7 @@ static void _show_settimer_page(u8 index)
     permanent.newvalue = TIMER_GetValue(permanent.index);   // set to original value since it is written anyway
 
     firstObj = NULL;
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SETTIMER), exit_page);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SETTIMER));
     if (firstObj) {
         GUI_RemoveHierObjects(firstObj);
         firstObj = NULL;

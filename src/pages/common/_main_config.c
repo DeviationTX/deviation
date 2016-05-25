@@ -204,10 +204,8 @@ static void dlgbut_cb(struct guiObject *obj, const void *data)
 static void add_dlgbut_cb(struct guiObject *obj, const void *data)
 {
     (void)obj;
-    if(data) {
-    } else {
-        PAGE_MainLayoutExit();
-        MODELPage_ShowLoadSave(LOAD_LAYOUT, PAGE_MainLayoutInit);
+    if(!data) {
+        PAGE_PushByID(PAGEID_LOADSAVE, LOAD_LAYOUT);
     }
 }
 
@@ -229,7 +227,7 @@ const char *menusel_cb(guiObject_t *obj, int dir, void *data)
     int page = GUI_TextSelectHelper(pc->quickpage[i], start_page, max_pages -1, dir, 1, 1, NULL);
     if (page != pc->quickpage[i]) {
         int increment = (page > pc->quickpage[i]) ? 1 : -1;
-        while (page >= start_page && page != max_pages && ! PAGE_IsValid(page)) {
+        while (page >= start_page && page != max_pages && ! PAGE_IsValidQuickPage(page)) {
             page = (page + increment);
         }
         if (page >= start_page && page != max_pages)

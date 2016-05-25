@@ -25,19 +25,9 @@ static unsigned action_cb(u32 button, unsigned flags, void *data) {
     (void)data;
     if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
             RANGE_test(!mp->testing);
-        }
-    }
-    return 1;
-}
-
-static unsigned action_cb_notest(u32 button, unsigned flags, void *data) {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, 0);
         }
     }
     return 1;
@@ -48,7 +38,6 @@ static void _draw_page(int has_pa) {
     PAGE_ShowHeader(PAGE_GetName(PAGEID_RANGE));
 
     if (!has_pa) {
-        PAGE_SetActionCB(action_cb_notest);
         snprintf(tempstring, sizeof(tempstring), _tr("No range test possible."));
     } else {
         PAGE_SetActionCB(action_cb);

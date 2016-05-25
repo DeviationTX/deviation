@@ -49,7 +49,7 @@ void _DrawButton(struct guiObject *obj)
         LCD_SetFontColor(0);
     }  else {
         LCD_FillRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND, 0); // clear the background
-        if (button->enable)
+        if (GUI_IsButtonEnabled(obj))
             LCD_DrawRoundRect(obj->box.x, obj->box.y, w, h , BUTTON_ROUND,  1);
         /* Bracket style button, disable temporarily
         u16 y1 = obj->box.y + 2;

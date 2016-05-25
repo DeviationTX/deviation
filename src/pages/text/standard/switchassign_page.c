@@ -24,13 +24,6 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
-
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -80,7 +73,7 @@ void PAGE_SwitchAssignInit(int page)
 
     PAGE_ShowHeader(_tr("Press ENT to change"));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
+                     ITEM_SPACE, SWITCHFUNC_LAST, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
