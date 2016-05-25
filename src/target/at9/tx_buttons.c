@@ -58,10 +58,10 @@ u32 ScanButtons()
     result |= ! gpio_get(GPIOB, GPIO5)  ? CHAN_ButtonMask(BUT_TRIM_LV_POS) : 0;
     result |= ! gpio_get(GPIOD, GPIO3)  ? CHAN_ButtonMask(BUT_TRIM_RV_NEG) : 0;
     result |= ! gpio_get(GPIOD, GPIO2)  ? CHAN_ButtonMask(BUT_TRIM_RV_POS) : 0;
-    result |= ! gpio_get(GPIOD, GPIO12) ? CHAN_ButtonMask(BUT_TRIM_LH_NEG) : 0;
-    result |= ! gpio_get(GPIOD, GPIO13) ? CHAN_ButtonMask(BUT_TRIM_LH_POS) : 0;
-    result |= ! gpio_get(GPIOB, GPIO3)  ? CHAN_ButtonMask(BUT_TRIM_RH_NEG) : 0;
-    result |= ! gpio_get(GPIOB, GPIO4)  ? CHAN_ButtonMask(BUT_TRIM_RH_POS) : 0;
+    result |= ! gpio_get(GPIOD, GPIO13) ? CHAN_ButtonMask(BUT_TRIM_LH_NEG) : 0;
+    result |= ! gpio_get(GPIOD, GPIO12) ? CHAN_ButtonMask(BUT_TRIM_LH_POS) : 0;
+    result |= ! gpio_get(GPIOB, GPIO4)  ? CHAN_ButtonMask(BUT_TRIM_RH_NEG) : 0;
+    result |= ! gpio_get(GPIOB, GPIO3)  ? CHAN_ButtonMask(BUT_TRIM_RH_POS) : 0;
 
     result |= ! gpio_get(GPIOA, GPIO14) ? CHAN_ButtonMask(BUT_DOWN) : 0; // MODE
     result |= ! gpio_get(GPIOC, GPIO15) ? CHAN_ButtonMask(BUT_ENTER) : 0;

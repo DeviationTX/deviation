@@ -20,9 +20,9 @@
 #include "../common/devo/devo.h"
 
 //Order is MODE1: AIL, ELE, THR, RUD, LeftDial, Right Dial, Left Shoulder, Right Shoulder, Vdd, Voltage
-//                PA3  PA1, PA2, PA0, PA5,      PA6,        PB0            PA4,                 PB1
+//                PA0  PA1, PA2, PA3, PA5,      PA6,        PB0            PA4,                 PB1
 const u8 adc_chan_sel[NUM_ADC_CHANNELS] =  
-                 {3,   1,   2,   0,   5,        6,          8,             4,              16,  9};
+                 {0,   1,   2,   3,   5,        6,          8,             4,              16,  9};
 
 void CHAN_Init()
 {
@@ -115,7 +115,10 @@ s32 CHAN_ReadInput(int channel)
     } else {
         value = value ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
     }
-    if (channel == INP_THROTTLE || channel == INP_RUDDER)
+    if (channel == INP_AILERON || channel == INP_ELEVATOR ||
+        channel == INP_THROTTLE || channel == INP_RUDDER)
+    {
         value = -value;
+    }
     return value;
 }
