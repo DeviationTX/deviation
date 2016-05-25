@@ -39,6 +39,7 @@ static buttonAction_t button_modalaction;
 static u8 FullRedraw;
 #if HAS_TOUCH
 static u8 change_selection_on_touch = 1;
+static u8 in_touch = 0;
 #endif
 
 static unsigned handle_buttons(u32 button, unsigned flags, void*data);
@@ -323,6 +324,9 @@ void GUI_RefreshScreen() {
     
 void GUI_TouchRelease()
 {
+#if HAS_TOUCH
+    in_touch = 1;
+#endif
     if (objTOUCHED) {
         switch (objTOUCHED->Type) {
         case Button:
@@ -351,6 +355,7 @@ void GUI_TouchRelease()
                 GUI_SetSelected(objTOUCHED);
             }
         }
+        in_touch = 0;
 #endif
         objTOUCHED = NULL;
     }
@@ -360,7 +365,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
 {
     struct guiObject *modalObj = GUI_IsModal();
     struct guiObject *obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
-
+    
     while(obj) {
         if (! OBJ_IS_HIDDEN(obj)) {
             switch (obj->Type) {
@@ -444,7 +449,14 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
-    return _GUI_CheckTouch(coords, long_press, NULL);
+#if HAS_TOUCH
+    in_touch = 1;
+    int ret = _GUI_CheckTouch(coords, long_press, NULL);
+    in_touch = 0;
+    return ret;
+#else
+    return 0;
+#endif
 }
 
 struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
@@ -736,5 +748,9 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 void GUI_ChangeSelectionOnTouch(int enable)
 {
     change_selection_on_touch = enable;
+}
+int GUI_InTouch()
+{
+    return in_touch;
 }
 #endif

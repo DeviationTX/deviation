@@ -69,7 +69,9 @@ void PAGE_ChangeByID(enum PageID id, s8 menuPage)
     ActionCB = default_button_action_cb;
     pages[cur_page].init(menuPage);
     if (page_scrollable) {
-        GUI_SetSelected(GUI_ShowScrollableRowOffset(page_scrollable, *current_selected));
+        guiObject_t *obj = GUI_ShowScrollableRowOffset(page_scrollable, *current_selected);
+        if(! HAS_TOUCH || ! GUI_InTouch())
+            GUI_SetSelected(obj);
     }
 }
 
