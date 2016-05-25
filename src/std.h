@@ -14,10 +14,10 @@
 #else
     #ifndef USE_OWN_STDIO
         #define USE_OWN_STDIO 0
+        #define fopen2(fat, p, m) fopen(p, m)
+        #define finit if(0) FS_Mount
+        void fempty(FILE *fh);
     #endif
-    #define fopen2(fat, p, m) fopen(p, m)
-    #define finit if(0) FS_Mount
-    void fempty(FILE *fh);
 #endif //EMULATOR
 
 #if USE_OWN_STDIO

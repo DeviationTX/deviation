@@ -32,46 +32,6 @@ enum {
 
 #include "../common/_timer_page.c"
 
-static u16 current_selected = 0;
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)relrow;
-    (void)data;
-    /* This is really evil*/
-    int idx = gui->scrollable.cur_row;
-    int rows = (Model.timer[idx].type < TIMER_COUNTDOWN) ? 2 : 3;
-    if (Model.mixer_mode == MIXER_ADVANCED)
-        rows++;
-#if HAS_PERMANENT_TIMER
-    if (Model.timer[idx].type == TIMER_PERMANENT)
-        rows = 4;
-#endif
-    col = (rows + col) % rows;
-    switch(col) {
-        case 0: return (guiObject_t *)&gui->type;
-        case 1: return (guiObject_t *)&gui->src;
-        case 2:
-#if HAS_PERMANENT_TIMER
-            if(Model.timer[idx].type == TIMER_PERMANENT)
-                return (guiObject_t *)&gui->resetperm;
-#endif
-            if(Model.mixer_mode == MIXER_ADVANCED)
-                return (guiObject_t *)&gui->resetsrc;
-            else
-                return (guiObject_t *)&gui->start;
-        case 3:
-#if HAS_PERMANENT_TIMER
-            if(Model.timer[idx].type == TIMER_PERMANENT)
-                return (guiObject_t *)&gui->setperm;
-#endif
-            return (guiObject_t *)&gui->start;
-    }
-    return 0;
-}
-
 /*            Advanced                     Standard
    Row1       Timer                        Timer
    Row2       Switch                       Switch
@@ -87,7 +47,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateLabelBox(&gui->name, LABEL_X, y,
             LABEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, timer_str_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->type, TEXTSEL_X, y,
-            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, toggle_timertype_cb, set_timertype_cb, (void *)(long)absrow);
+            TEXTSEL_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, set_timertype_cb, (void *)(long)absrow);
 
     //Row 2
     y += space;
@@ -139,31 +99,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static void _show_page(int page)
 {
     (void)page;
-    PAGE_ShowHeader(_tr("Timers")); // using the same name as related menu item to reduce language strings
-    PAGE_SetActionCB(_action_cb);
+    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_TIMER))); // using the same name as related menu item to reduce language strings
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-
-void PAGE_TimerExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
+                     LCD_HEIGHT - HEADER_HEIGHT, NUM_TIMERS, row_cb, NULL, NULL, NULL);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static void update_countdown(u8 idx)

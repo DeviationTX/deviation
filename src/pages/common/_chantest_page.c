@@ -46,17 +46,6 @@ const char *button_str_cb(guiObject_t *obj, const void *data)
     return INPUT_ButtonName(button + 1);
 }
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(cp->return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        cp->return_page(cp->return_val);
-    }
-}
-
 unsigned button_capture_cb(u32 button, unsigned flags, void *data)
 {
     (void)button;

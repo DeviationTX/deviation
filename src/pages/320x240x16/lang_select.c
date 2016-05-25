@@ -20,51 +20,36 @@
 #include <string.h>
 
 #include "../common/_lang_select.c"
-
+#define LINE_HEIGHT 24
 static struct lang_obj * const gui = &gui_objs.u.lang;
 
-static void select_cb(guiObject_t *obj, u16 sel, void *data)
+static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    (void)obj;
-    (void)data;
-    cp->selected = sel;
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    if (data)
-        CONFIG_ReadLang(cp->selected);
-    PAGE_RemoveAllObjects();
-    cp->return_page(0);
-}
-
-static const char *show_load_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    return _tr("Load");
-}
-
-void LANGPage_Select(void(*return_page)(int page))
-{
-    u8 num_lang;
-    PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    cp->return_page = return_page;
-    PAGE_CreateCancelButton(LCD_WIDTH-208, 4, okcancel_cb);
-    GUI_CreateButton(&gui->ok, LCD_WIDTH-104, 4, BUTTON_96, show_load_cb, 0x0000, okcancel_cb, (void *)1L);
-    num_lang = 1;
-    if (FS_OpenDir("language")) {
-        char filename[13];
-        int type;
-        while((type = FS_ReadDir(filename)) != 0) {
-            if (type == 1 && strncasecmp(filename, "lang", 4) == 0) {
-                num_lang++;
-            }
-        }
-        FS_CloseDir();
+    int row_count = (long)data;
+    struct LabelDesc listbox = {
+        .font = DEFAULT_FONT.font,
+        .style = LABEL_LISTBOX,
+        .font_color = DEFAULT_FONT.font_color,
+        .fill_color = DEFAULT_FONT.fill_color,
+        .outline_color = DEFAULT_FONT.outline_color
+    };
+    if (absrow >= row_count) {
+        GUI_CreateLabelBox(&gui->label[relrow], LCD_WIDTH/2-100, y,
+                200 - ARROW_WIDTH, LINE_HEIGHT, &listbox, NULL, NULL, "");
+    } else {
+        GUI_CreateLabelBox(&gui->label[relrow], LCD_WIDTH/2-100, y,
+                200 - ARROW_WIDTH, LINE_HEIGHT, &listbox, string_cb, press_cb, (void *)(long)absrow);
     }
-    cp->selected = Transmitter.language;
-    GUI_CreateListBox(&gui->listbox, LCD_WIDTH/2-100, 40, 200, LCD_HEIGHT-48, num_lang, cp->selected, string_cb, select_cb, NULL, NULL);
+    return 1;
+}
+
+void PAGE_LanguageInit(int page)
+{
+    (void)page;
+    int num_lang = count_num_languages();
+    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_LANGUAGE)));
+
+    int min_rows = num_lang >= LISTBOX_ITEMS ? num_lang : LISTBOX_ITEMS;
+    GUI_CreateScrollable(&gui->scrollable, LCD_WIDTH/2-100, 40, 200, LISTBOX_ITEMS * LINE_HEIGHT, LINE_HEIGHT, min_rows, row_cb, NULL, NULL, (void *)(long)num_lang);
+    GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, Transmitter.language, 0));
 }

@@ -181,7 +181,7 @@ s32 MIXER_GetChannel(unsigned channel, enum LimitMask flags);
 int MIXER_GetMixers(int ch, struct Mixer *mixers, int count);
 int MIXER_SetMixers(struct Mixer *mixers, int count);
 
-void MIXER_GetLimit(int ch, struct Limit *limit);
+struct Limit *MIXER_GetLimit(int ch);
 void MIXER_SetLimit(int ch, struct Limit *limit);
 
 void MIXER_SetTemplate(int ch, enum TemplateType value);

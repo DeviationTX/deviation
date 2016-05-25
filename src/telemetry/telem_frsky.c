@@ -15,21 +15,7 @@
 
 s32 _frsky_value(struct Telemetry *t, int idx)
 {
-    switch (idx) {
-#if HAS_EXTENDED_TELEMETRY
-        case TELEM_FRSKY_TEMP1:
-        case TELEM_FRSKY_TEMP2:
-            return (s16)t->value[idx];
-        case TELEM_FRSKY_ALTITUDE:
-            return ((s32) t->value[idx])
-                   + t->value[TELEM_FRSKY_ALTITUDE_DECIMETERS];
-        case TELEM_FRSKY_VARIO:
-            return ((s32) t->value[idx]);
-#endif
-        default:
-            return t->value[idx];
-    }
-    return 0;
+    return t->value[idx];
 }
 
 const char * _frsky_str_by_value(char *str, u8 telem, s32 value)

@@ -1,55 +1,12 @@
 #ifndef _COMMON_DEVO_H_
 #define _COMMON_DEVO_H_
 
-#ifndef FILE_SIZE
-#if defined USE_DEVOFS && USE_DEVOFS == 1
-    #include "devofs.h"
-#else
-    #include "petit_fat.h"
-#endif
-#define FILE_SIZE sizeof(FATFS)
-#endif
-
-#if defined USE_DEVOFS && USE_DEVOFS == 1
-    #define fs_mount      df_mount
-    #define fs_open       df_open
-    #define fs_read       df_read
-    #define fs_lseek      df_lseek
-    #define fs_opendir    df_opendir
-    #define fs_readdir    df_readdir
-    #define fs_write      df_write
-    #define fs_switchfile df_switchfile
-    #define fs_maximize_file_size() if(0) {}
-    #define fs_set_drive_num(x,num) if(0) {}
-    #define fs_get_drive_num(x) 0
-    #define fs_is_open(x) ((x)->file_cur_pos != -1)
-    #define fs_close(x) df_close()
-    #define fs_filesize(x) (((x)->file_header.size1 << 8) | (x)->file_header.size2)
-    #define fs_ltell(x)   ((x)->file_cur_pos)
-#else
-    #define fs_mount                  pf_mount
-#ifdef O_CREAT
-inline int fs_open(char *file, unsigned flags) {
-    int ret = pf_open(file);
-    if (flags & O_CREAT)
-        pf_maximize_file_size();
-    return ret;
-}
-#endif
-    #define fs_open(str, flags)       pf_open(str) 
-    #define fs_read                   pf_read
-    #define fs_lseek                  pf_lseek
-    #define fs_opendir                pf_opendir
-    #define fs_readdir                pf_readdir
-    #define fs_write                  pf_write
-    #define fs_switchfile             pf_switchfile
-    #define fs_maximize_file_size     pf_maximize_file_size
-    #define fs_ltell(x)               (x)->fptr
-    #define fs_get_drive_num(x)       (x)->pad1
-    #define fs_set_drive_num(x,num)   (x)->pad1 = num
-    #define fs_is_open(x)             ((x)->flag & FA_OPENED)
-    #define fs_close(x)               (x)->flag = 0
-    #define fs_filesize(x)            (x)->fsize
+#ifndef FATSTRUCT_SIZE
+    #if defined USE_DEVOFS && USE_DEVOFS == 1
+        #include "enable_devofs.h"
+    #else
+        #include "enable_petit_fat.h"
+    #endif
 #endif
 
 #include "ports.h"

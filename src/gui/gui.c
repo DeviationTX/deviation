@@ -26,6 +26,8 @@ struct guiObject *objModalButton = NULL;
 struct guiObject *objDIALOG   = NULL;
 static void (*select_notify)(guiObject_t *obj) = NULL;
 
+static struct guiObject *objACTIVE = NULL;
+
 enum FULL_REDRAW {
     REDRAW_ONLY_DIRTY   = 0x00,
     REDRAW_IF_NOT_MODAL = 0x01,
@@ -35,6 +37,10 @@ enum FULL_REDRAW {
 static buttonAction_t button_action;
 static buttonAction_t button_modalaction;
 static u8 FullRedraw;
+#if HAS_TOUCH
+static u8 change_selection_on_touch = 1;
+static u8 in_touch = 0;
+#endif
 
 static unsigned handle_buttons(u32 button, unsigned flags, void*data);
 #include "_gui.c"
@@ -76,7 +82,6 @@ void GUI_DrawObject(struct guiObject *obj)
     case XYGraph:    printf("Draw XYGraph: "); break;
     case BarGraph:   printf("Draw BarGraph:"); break;
     case TextSelect: printf("Draw TextSel: "); break;
-    case Listbox:    printf("Draw ListBox: "); break;
     case Keyboard:   printf("Draw Keyboard:"); break;
     case Scrollbar:  printf("Draw ScrlBar: "); break;
     case Scrollable: printf("Draw Scrlable:"); break;
@@ -95,7 +100,6 @@ void GUI_DrawObject(struct guiObject *obj)
     case XYGraph:    GUI_DrawXYGraph(obj);           break;
     case BarGraph:   GUI_DrawBarGraph(obj);          break;
     case TextSelect: GUI_DrawTextSelect(obj);        break;
-    case Listbox:    GUI_DrawListbox(obj, 1);        break;
     case Keyboard:   GUI_DrawKeyboard(obj);          break;
     case Scrollbar:  GUI_DrawScrollbar(obj);         break;
     case Scrollable: GUI_DrawScrollable(obj);        break;
@@ -154,9 +158,6 @@ void GUI_RemoveObj(struct guiObject *obj)
         break;
     case Keyboard:
         BUTTON_UnregisterCallback(&((guiKeyboard_t *)obj)->action);
-        break;
-    case Listbox:
-        BUTTON_UnregisterCallback(&((guiListbox_t *)obj)->action);
         break;
     case Image:
     case XYGraph:
@@ -323,16 +324,14 @@ void GUI_RefreshScreen() {
     
 void GUI_TouchRelease()
 {
+#if HAS_TOUCH
+    in_touch = 1;
+#endif
     if (objTOUCHED) {
         switch (objTOUCHED->Type) {
         case Button:
-          {
-            struct guiButton *button = (struct guiButton *)objTOUCHED;
-            OBJ_SET_DIRTY(objTOUCHED, 1);
-            if(button->CallBack)
-                button->CallBack(objTOUCHED, button->cb_data);
+            GUI_TouchButton(objTOUCHED, -1);
             break;
-          }
         case Image:
             GUI_TouchImage(objTOUCHED, NULL, -1);
             break;
@@ -350,6 +349,14 @@ void GUI_TouchRelease()
             break;
         default: break;
         }
+#if HAS_TOUCH
+        if (change_selection_on_touch) {
+            if (objTOUCHED && OBJ_IS_SELECTABLE(objTOUCHED)) {
+                GUI_SetSelected(objTOUCHED);
+            }
+        }
+        in_touch = 0;
+#endif
         objTOUCHED = NULL;
     }
 }
@@ -358,7 +365,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
 {
     struct guiObject *modalObj = GUI_IsModal();
     struct guiObject *obj = headObj ? headObj : modalObj ? modalObj : objHEAD;
-
+    
     while(obj) {
         if (! OBJ_IS_HIDDEN(obj)) {
             switch (obj->Type) {
@@ -374,8 +381,7 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;
-                    OBJ_SET_DIRTY(obj, 1);
-                    return 1;
+                    return GUI_TouchButton(obj, long_press);
                 }
                 break;
             case Image:
@@ -406,16 +412,8 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
                     return GUI_TouchTextSelect(obj, coords, long_press);
                 }
                 break;
-            case Listbox:
-                if(coords_in_box(&obj->box, coords)) {
-                    if (objTOUCHED && objTOUCHED != obj)
-                        return 0;
-                    objTOUCHED = obj;
-                    return GUI_TouchListbox(obj, coords, long_press);
-                }
-                break;
             case XYGraph:
-                if(OBJ_IS_SELECTABLE(obj) && coords_in_box(&obj->box, coords)) {
+                if(((guiXYGraph_t *)obj)->touch_cb && coords_in_box(&obj->box, coords)) {
                     if (objTOUCHED && objTOUCHED != obj)
                         return 0;
                     objTOUCHED = obj;
@@ -451,7 +449,14 @@ u8 _GUI_CheckTouch(struct touch *coords, u8 long_press, struct guiObject *headOb
 
 u8 GUI_CheckTouch(struct touch *coords, u8 long_press)
 {
-    return _GUI_CheckTouch(coords, long_press, NULL);
+#if HAS_TOUCH
+    in_touch = 1;
+    int ret = _GUI_CheckTouch(coords, long_press, NULL);
+    in_touch = 0;
+    return ret;
+#else
+    return 0;
+#endif
 }
 
 struct guiObject *GUI_GetNextSelectable(struct guiObject *origObj)
@@ -571,18 +576,8 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
     if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         switch (obj->Type) {
           case Button:
-            if (is_longpress) {
-                // Don't handle long-press ENTER
-                return 0;
-            }
             objTOUCHED = obj;
-            OBJ_SET_DIRTY(obj, 1);
-            if (is_release) {
-                struct guiButton *button = (struct guiButton *)obj;
-                if(button->CallBack)
-                    button->CallBack(obj, button->cb_data);
-            }
-            return 1;
+            return GUI_TouchButton(obj, press_type);
           case Image:
             objTOUCHED = obj;
             GUI_TouchImage(obj, NULL, press_type);
@@ -598,37 +593,46 @@ unsigned GUI_ObjButton(struct guiObject *obj, u32 button, unsigned flags)
     return 0;
 }
 
+unsigned GUI_GetRemappedButtons()
+{
+    if (USE_4BUTTON_MODE) {
+        if (objACTIVE) {
+            return CHAN_ButtonMask(BUT_UP) | CHAN_ButtonMask(BUT_DOWN);
+        }
+    }
+    return 0;
+}
+
 unsigned handle_buttons(u32 button, unsigned flags, void *data)
 {
     (void)data;
     //When modal, we capture all button presses
     int modalActive = GUI_IsModal() ? 1 : 0;
 
-#if USE_4BUTTON_MODE
-    // IN 4 button mode, up/down can also act as left/right for TextSelect
-    static struct guiObject *objACTIVE = NULL;
-    if (objACTIVE) {
-        if (CHAN_ButtonIsPressed(button, BUT_UP)) {
-            button = CHAN_ButtonMask(BUT_LEFT);
-        } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
-            button = CHAN_ButtonMask(BUT_RIGHT);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            if (flags & BUTTON_RELEASE)
-                objACTIVE = NULL;
-        } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            if (flags & BUTTON_RELEASE)
-                objACTIVE = NULL;
-            return 1;
-        }
-    } else {
-        if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
-            if (flags & BUTTON_RELEASE) {
-                objACTIVE = objSELECTED;
+    if(USE_4BUTTON_MODE) {
+        // IN 4 button mode, up/down can also act as left/right for TextSelect
+        if (objACTIVE) {
+            if (CHAN_ButtonIsPressed(button, BUT_UP)) {
+                button = CHAN_ButtonMask(BUT_LEFT);
+            } else if (CHAN_ButtonIsPressed(button, BUT_DOWN)) {
+                button = CHAN_ButtonMask(BUT_RIGHT);
+            } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                if (flags & BUTTON_RELEASE)
+                    objACTIVE = NULL;
+            } else if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+                if (flags & BUTTON_RELEASE)
+                    objACTIVE = NULL;
+                return 1;
             }
-            return 1;
+        } else {
+            if (objSELECTED && CHAN_ButtonIsPressed(button, BUT_ENTER) && objSELECTED->Type == TextSelect) {
+                if (flags & BUTTON_RELEASE) {
+                    objACTIVE = objSELECTED;
+                }
+                return 1;
+            }
         }
     }
-#endif
     //printf("Button: %08x Flags: %08x Active: %08x\n", button, flags, objACTIVE);
     if (CHAN_ButtonIsPressed(button, BUT_LEFT) ||
         CHAN_ButtonIsPressed(button, BUT_RIGHT) ||
@@ -740,3 +744,13 @@ void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj))
 {
     select_notify = notify_cb;
 }
+#if HAS_TOUCH
+void GUI_ChangeSelectionOnTouch(int enable)
+{
+    change_selection_on_touch = enable;
+}
+int GUI_InTouch()
+{
+    return in_touch;
+}
+#endif

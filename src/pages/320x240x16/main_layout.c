@@ -82,12 +82,7 @@ void PAGE_MainLayoutInit(int page)
           | CHAN_ButtonMask(BUT_UP)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_PRIORITY, _action_cb, NULL);
-#if HAS_STANDARD_GUI
-     if (Model.mixer_mode == MIXER_STANDARD)
-         PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
-     else
-#endif
-         PAGE_ShowHeader(NULL);
+    PAGE_ShowHeader(NULL);
     lp->long_press = 0;
     lp->newelem = 0;
     lp->selected_x = 0;
@@ -123,7 +118,6 @@ void PAGE_MainLayoutEvent()
 }
 void PAGE_MainLayoutExit()
 {
-    GUI_SelectionNotify(NULL);
     BUTTON_UnregisterCallback(&action);
 }
 void PAGE_MainLayoutRestoreDialog(int idx)
@@ -251,20 +245,6 @@ static void add_dlg_cb(guiObject_t *obj, const void *data)
     GUI_SetSelected((guiObject_t *)&gui->dlgbut[0]);
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if (OBJ_IS_USED(&gui->dlgbut2[0]))
-        col = (3 + col) % 3;
-    else 
-        col = (2 + col) % 2;
-    if (col == 0)
-        return (guiObject_t *)&gui->dlgts[relrow];
-    if (col == 1 && OBJ_IS_USED(&gui->dlgbut2[0])) 
-        return (guiObject_t *)&gui->dlgbut2[relrow];
-    return (guiObject_t *)&gui->dlgbut[relrow];
-}
-
 const char *dlgbut_str_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
@@ -334,7 +314,7 @@ void show_config()
          x + LAYDLG_SCROLLABLE_X, LAYDLG_Y + LAYDLG_SCROLLABLE_Y,
          width - 2 * LAYDLG_SCROLLABLE_X + 1, 
          LAYDLG_SCROLLABLE_HEIGHT,
-         LAYDLG_TEXT_HEIGHT, count, row_cb, getobj_cb, NULL, (void *)type);
+         LAYDLG_TEXT_HEIGHT, count, row_cb, NULL, NULL, (void *)type);
     GUI_SetSelected(GUI_ShowScrollableRowCol(&gui->scrollable, row_idx, 0));
 }
     

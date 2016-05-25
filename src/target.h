@@ -3,6 +3,11 @@
 //#define printf if(0) printf
 
 #define OPTIONAL 2
+
+//These are used to enable(1) or disable(2) the internal filesystem code */
+#define USE_NATIVE_FS   0
+#define USE_INTERNAL_FS 1
+
 //Load target-specific include
 #include "target_defs.h"
 

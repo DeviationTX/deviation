@@ -50,15 +50,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return 0;
 }
 
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->line[relrow];
-}
-
 static void find_line_ends()
 {
     const char *r = (char *)rptr;

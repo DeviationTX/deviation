@@ -31,13 +31,8 @@ enum {
 
 #include "../../common/advanced/_mixer_limits.c"
 
-static unsigned action_cb(u32 button, unsigned flags, void *data);
-static void revert_cb(guiObject_t *obj, const void *data);
-
 static void _show_titlerow()
 {
-    (void)okcancel_cb;
-    PAGE_SetActionCB(action_cb);
     mp->entries_per_page = 4;
     memset(gui, 0, sizeof(*gui));
 
@@ -75,7 +70,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_SAFETY:
             label = _tr("Safety");
-            tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit.safetysw; input_disp = set_input_source_cb;
+            tgl = sourceselect_cb; disp = set_source_cb; value = &mp->limit->safetysw; input_disp = set_input_source_cb;
             break;
         case ITEM_SAFEVAL:
             label = _tr("Safe Val");
@@ -83,27 +78,27 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             break;
         case ITEM_MINLIMIT:
             label = _tr("Min Limit");
-            disp = set_limits_cb; value = &mp->limit.min;
+            disp = set_limits_cb; value = &mp->limit->min;
             break;
         case ITEM_MAXLIMIT:
             label = _tr("Max Limit");        
-            disp = set_limits_cb; value = &mp->limit.max;
+            disp = set_limits_cb; value = &mp->limit->max;
             break;
         case ITEM_SCALEPOS:
             label_cb = scalestring_cb; label = (void *)1L;
-            disp = set_limitsscale_cb; value = &mp->limit.servoscale;
+            disp = set_limitsscale_cb; value = &mp->limit->servoscale;
             break;
         case ITEM_SCALENEG:
             label_cb = scalestring_cb; label = (void *)0L;
-            disp = set_limitsscale_cb; value = &mp->limit.servoscale_neg;
+            disp = set_limitsscale_cb; value = &mp->limit->servoscale_neg;
             break;
         case ITEM_SUBTRIM:
             label = _tr("Subtrim");
-            disp = set_trimstep_cb; value = &mp->limit.subtrim;
+            disp = set_trimstep_cb; value = &mp->limit->subtrim;
             break;
         case ITEM_SPEED:
             label = _tr("Speed");
-            disp = set_limits_cb; value = &mp->limit.speed;
+            disp = set_limits_cb; value = &mp->limit->speed;
             break;
     }
     labelDesc.style = LABEL_LEFT;
@@ -112,7 +107,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     GUI_CreateTextSourcePlate(&gui->value[relrow], TEXTSEL_X, y, TEXTSEL_W, LINE_HEIGHT, &labelDesc, tgl, disp, input_disp, value);
 
     if(absrow == ITEM_SAFEVAL)
-        GUI_TextSelectEnable(&gui->value[relrow], mp->limit.safetysw);
+        GUI_TextSelectEnable(&gui->value[relrow], mp->limit->safetysw);
 
     return 1;
 }
@@ -123,30 +118,6 @@ static void _show_limits()
                          LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
     GUI_SetSelected(GUI_GetScrollableObj(&gui->scrollable, ITEM_REVERSE, 0));
 };
-
-void revert_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    memcpy(&mp->limit, (const void *)&origin_limit, sizeof(origin_limit));
-    MIXER_SetLimit(mp->channel, &mp->limit);  // save
-    GUI_DrawScreen();
-}
-
-static unsigned action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_RemoveAllObjects();  // Discard unsaved items and exit to upper page
-            PAGE_MixerInit(mp->top_channel);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 
 static inline guiObject_t *_get_obj(int idx, int objid) {
     return (guiObject_t *)GUI_GetScrollableObj(&gui->scrollable, idx, objid);

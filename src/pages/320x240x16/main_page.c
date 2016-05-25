@@ -61,10 +61,14 @@ void PAGE_MainInit(int page)
           | CHAN_ButtonMask(BUT_DOWN),
           BUTTON_PRESS | BUTTON_LONGPRESS | BUTTON_RELEASE | BUTTON_PRIORITY, _action_cb, NULL);
 
-    GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
-    if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0)
-        GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], press_icon2_cb, (void *)1);
-
+    if (HAS_TOUCH) {
+        GUI_CreateIcon(&gui->optico, 0, 0, &icons[ICON_OPTIONS], press_icon2_cb, (void *)0);
+        GUI_ChangeSelectionOnTouch(0);
+    }
+    if (MAINPAGE_FindNextElem(ELEM_MODELICO, 0) < 0) {
+        void (*cb)(guiObject_t *, const void *) = HAS_TOUCH ? press_icon2_cb : NULL;
+        GUI_CreateIcon(&gui->modelico, 32, 0, &icons[ICON_MODELICO], cb, (void *)1);
+    }
     GUI_CreateLabelBox(&gui->name, (LCD_WIDTH-128)/2, 8, 128, 24, &MODELNAME_FONT,
                                       NULL, press_icon_cb, Model.name);
 
@@ -79,14 +83,14 @@ void PAGE_MainInit(int page)
     //Battery
     mp->battery = PWR_ReadVoltage();
     if (Display.flags & SHOW_BAT_ICON) {
-        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat.bmp");
+        GUI_CreateImage(&gui->batt.ico, LCD_WIDTH - left_offset - 5,1,48,22,"media/bat" IMG_EXT);
     } else {
         GUI_CreateLabelBox(&gui->batt.lbl, LCD_WIDTH - left_offset,10, 45, 20,
                         mp->battery < Transmitter.batt_alarm ? &BATTALARM_FONT : &BATTERY_FONT,
                         voltage_cb, NULL, NULL);
     }
     //TxPower
-    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - left_offset - 50,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower.bmp", NULL, NULL);
+    GUI_CreateImageOffset(&gui->pwr, LCD_WIDTH - left_offset - 50,4, 48, 24, 48 * Model.tx_power, 0, "media/txpower" IMG_EXT, NULL, NULL);
 }
 
 void PAGE_MainExit()
@@ -115,14 +119,14 @@ void press_icon_cb(guiObject_t *obj, s8 press_type, const void *data)
     (void)obj;
     if(press_type == -1) {
         if ((long)data == 0) {
-            PAGE_SetSection(SECTION_OPTIONS);
+            PAGE_PushByID(PAGEID_MENU, 0);
         } else if ((long)data == 1) {
-            PAGE_SetSection(SECTION_MODEL);
+            if(HAS_STANDARD_GUI && Model.mixer_mode == MIXER_STANDARD)
+                PAGE_PushByID(PAGEID_MODELMNU, 0);
+            else
+                PAGE_PushByID(PAGEID_MIXER, 0);
         } else {
-            PAGE_SetModal(1);
-            PAGE_MainExit();
-            pagemem.modal_page = 1;
-            MODELPage_ShowLoadSave(0, PAGE_MainInit);
+            PAGE_PushByID(PAGEID_LOADSAVE, LOAD_MODEL);
         }
     }
 }
@@ -151,8 +155,7 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
     } else if (idx - NUM_RTC - NUM_TIMERS<= NUM_TELEM) {
         if(press_type == -1) {
             pagemem.modal_page = 2;
-            PAGE_MainExit();
-            PAGE_TelemtestModal(PAGE_MainInit, 0);
+            PAGE_PushByID(PAGEID_TELEMMON, 0);
         }
     }
 }
@@ -160,24 +163,22 @@ void press_box_cb(guiObject_t *obj, s8 press_type, const void *data)
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     if(! GUI_GetSelected()) {
-        if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            mp->ignore_release = 1;
-            GUI_SetSelected((guiObject_t *)&gui->optico);
-        }else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            mp->ignore_release = 1;
-            for (u8 timer=0; timer<NUM_TIMERS; timer++) {
-                TIMER_Reset(timer);
+        if (flags & BUTTON_RELEASE) {
+            if ((flags & BUTTON_HAD_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                //GUI_SetSelected((guiObject_t *)&gui->name);
+            } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+                //see pagelist.h for mapping of 'page' to menu_id 
+                PAGE_PushByID(PAGEID_MENU, 0);
+            } else if ((flags & BUTTON_HAD_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+                for (u8 timer=0; timer<NUM_TIMERS; timer++) {
+                    TIMER_Reset(timer);
+                }
+            } else if (! PAGE_QuickPage(button, flags, data)) {
+                MIXER_UpdateTrim(button, flags, data);
             }
-        } else if (! PAGE_QuickPage(button, flags, data)) {
-            MIXER_UpdateTrim(button, flags, data);
         }
         return 1;
     } else {
-        if(mp->ignore_release) {
-            if (flags & BUTTON_RELEASE)
-                mp->ignore_release = 0;
-            return 1;
-        }
         return 0;
     }
 }

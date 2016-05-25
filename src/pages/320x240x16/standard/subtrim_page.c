@@ -36,7 +36,7 @@ static void show_page(int page)
         long ch = page  + i;
         if (ch >= Model.num_channels)
             break;
-        MIXER_GetLimit(ch, &mp->limit);
+        mp->limit = MIXER_GetLimit(ch);
         guiObject_t *obj = GUI_CreateLabelBox(&gui->name[i], 30 + ((LCD_WIDTH - 320) / 2), row, 0, 16, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(ch));
         if (! mp->firstObj)
             mp->firstObj = obj;
@@ -47,7 +47,7 @@ void PAGE_SubtrimInit(int page)
 {
     (void)page;
     struct mixer_page * mp = &pagemem.u.mixer_page;
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_SUBTRIM), MODELMENU_Show);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_SUBTRIM));
     mp->max_scroll = Model.num_channels > ENTRIES_PER_PAGE ?
                           Model.num_channels - ENTRIES_PER_PAGE
                         : 0;
