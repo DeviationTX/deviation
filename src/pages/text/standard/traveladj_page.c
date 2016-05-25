@@ -27,20 +27,12 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 static u16 current_selected = 0;
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if(col == 0)
-        return (guiObject_t *)&gui->dn[relrow];
-    else
-        return (guiObject_t *)&gui->up[relrow];
-}
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)data;
     u8 w = 35;
     u8 x = 50;
-    MIXER_GetLimit(absrow, &mp->limit);
+    mp->limit = MIXER_GetLimit(absrow);
     GUI_CreateLabelBox(&gui->chan[relrow], 0, y,
             0, ITEM_HEIGHT, &DEFAULT_FONT, STDMIX_channelname_cb, NULL, (void *)(long)absrow);
     GUI_CreateTextSelectPlate(&gui->dn[relrow], x, y,
@@ -53,8 +45,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_TravelAdjInit(int page)
 {
     (void)page;
-    //if (page < 0 && current_selected > 0) // enter this page from childen page , so we need to get its previous mp->current_selected item
-    //    page = current_selected;
     PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
@@ -66,9 +56,8 @@ void PAGE_TravelAdjInit(int page)
     GUI_CreateLabelBox(&gui->uplbl, x + w +5, 0,  w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Up"));
 
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                         ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, NULL);
-
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+                         ITEM_SPACE, Model.num_channels, row_cb, NULL, NULL, NULL);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
@@ -84,9 +73,5 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
         }
     }
     return 1;
-}
-void PAGE_TravelAdjExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 #endif //HAS_STANDARD_GUI

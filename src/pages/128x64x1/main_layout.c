@@ -57,9 +57,9 @@ static void move_cb(guiObject_t *obj, const void *data)
     }
 }
 
-void show_layout()
+void PAGE_LayoutEditInit(int page)
 {
-    GUI_RemoveAllObjects();
+    (void)page;
     PAGE_SetActionCB(_layaction_cb);
     lp->selected_x = 0;
     lp->selected_y = 0;
@@ -90,12 +90,6 @@ void show_layout()
     draw_elements();
     if(OBJ_IS_USED(&gui->elem[0]))
         GUI_SetSelected((guiObject_t *)&gui->elem[0]);
-}
-void layout_exit()
-{
-    GUI_SelectionNotify(NULL);
-    PAGE_SetActionCB(NULL);
-    PAGE_MainLayoutInit(-1);
 }
 
 static void xpos_cb(guiObject_t *obj, int dir, void *data)
@@ -153,11 +147,13 @@ static void select_for_move(guiLabel_t *obj)
 static unsigned _layaction_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if(CHAN_ButtonIsPressed(button, BUT_EXIT) && !(flags & BUTTON_RELEASE)) {
-        if (lp->selected_for_move >= 0) {
-            set_selected_for_move(-1);
-        } else {
-            layout_exit();
+    if(CHAN_ButtonIsPressed(button, BUT_EXIT)) {
+        if (flags & BUTTON_RELEASE) {
+            if (lp->selected_for_move >= 0) {
+                set_selected_for_move(-1);
+            } else {
+                PAGE_Pop();
+            }
         }
         return 1;
     }

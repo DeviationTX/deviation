@@ -109,25 +109,13 @@ static void _show_bar_page(int row)
 
 void PAGE_ChantestInit(int page)
 {
-    (void)okcancel_cb;
-    PAGE_SetModal(0);
+    (void)page;
     PAGE_SetActionCB(_action_cb);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(cp->type == MONITOR_RAWINPUT ? _tr("Stick input") : _tr("Mixer output"));
-    cp->return_page = NULL;
-    if (page > 0)
-        cp->return_val = page;
     if (cp->type != MONITOR_RAWINPUT )
         cp->type = MONITOR_MIXEROUTPUT;// cp->type may not be initialized yet, so do it here
     _show_bar_page(0);
-}
-
-void PAGE_ChantestModal(void(*return_page)(int page), int page)
-{
-    cp->type = MONITOR_MIXEROUTPUT;
-    PAGE_ChantestInit(page);
-    cp->return_page = return_page;
-    cp->return_val = page;
 }
 
 static void _navigate_pages(s8 direction)
@@ -145,10 +133,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
     if (flags & BUTTON_PRESS) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;
-            if (cp->return_val == 2) // indicating this page is entered from calibration page, so back to its parent page
-                PAGE_ChangeByID(PAGEID_TXCFG, -1);
-            else
-                PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
         } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
             _navigate_pages(1);
         }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {

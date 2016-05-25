@@ -24,9 +24,6 @@
 #if HAS_STANDARD_GUI
 #include "../../common/standard/_drexp_page.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
-//static u16 current_selected = 0;
 guiObject_t *scroll_bar;
 
 enum {
@@ -40,12 +37,6 @@ void update_graph(int graph)
 {
     (void)graph;
     GUI_Redraw(&gui->graph);
-}
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    col = (2 + col) % 2;
-    return col ? (guiObject_t *)&gui->value2[relrow] : (guiObject_t *)&gui->value1[relrow];
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -67,7 +58,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 void PAGE_DrExpInit(int page)
 {
     (void)page;
-    PAGE_SetActionCB(_action_cb);
     PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader("");
@@ -81,8 +71,7 @@ void PAGE_DrExpInit(int page)
     GUI_CreateTextSelectPlate(&gui->u.type, 0, 0, 60, HEADER_WIDGET_HEIGHT,
                      &DEFAULT_FONT, NULL, set_type_cb, (void *)NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, 76, LCD_HEIGHT - HEADER_HEIGHT,
-                     2 * LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
-    //GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+                     2 * LINE_SPACE, count, row_cb, NULL, NULL, NULL);
 
     GUI_CreateXYGraph(&gui->graph, 77, HEADER_HEIGHT, 50, 50,
             CHAN_MIN_VALUE, CHAN_MIN_VALUE, CHAN_MAX_VALUE, CHAN_MAX_VALUE,
@@ -95,22 +84,6 @@ static void _refresh_page()
 {
     PAGE_RemoveAllObjects();
     PAGE_DrExpInit(0);
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    //u8 total_items = 2;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
 
 void PAGE_DrExpCurvesEvent()

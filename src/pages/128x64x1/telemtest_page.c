@@ -282,14 +282,6 @@ static const char *header_cb(guiObject_t *obj, const void *data)
     return "";
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    (void)relrow;
-    (void)col;
-    return (guiObject_t *)&gui->box[0];
-}
-
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     (void)relrow;
@@ -353,7 +345,7 @@ static void _show_page()
     DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+                         row_height, page->num_items, row_cb, NULL, NULL, (void *)page->layout);
     DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
@@ -370,12 +362,11 @@ void PAGE_ShowTelemetryAlarm()
 {
     int cur_page = PAGE_GetID();
     if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+        PAGE_Pop();
 }
 
 void PAGE_TelemtestInit(int page)
 {
-    (void)okcancel_cb;
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
@@ -450,7 +441,7 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data)
             TELEMETRY_MuteAlarm();
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
+            PAGE_Pop();
         } else if (current_page != telemetry_off) {
             // this indicates whether telem is off or not supported
             if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {

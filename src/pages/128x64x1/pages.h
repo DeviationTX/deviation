@@ -2,15 +2,7 @@
 #define _PAGES_H_
 
 #include "../common/_pages.h"
-#include "menus.h"
 #include "guiobj.h"
-
-#define PAGEDEF(id, init, event, exit, menu, name) id,
-enum PageID {
-#include "pagelist.h"
-    PAGEID_LAST
-};
-#undef PAGEDEF
 
 struct pagemem {
     union {
@@ -48,8 +40,8 @@ struct pagemem {
 #endif
 
 #define PREVIOUS_ITEM -1
-#define TOGGLE_FILE    "media/switches.bmp"
-#define SPLASH_FILE    "media/splash.bmp"
+#define TOGGLE_FILE    "media/switches" IMG_EXT
+#define SPLASH_FILE    "media/splash"   IMG_EXT
 
 #define TOGGLEICON_WIDTH 8
 #define TOGGLEICON_HEIGHT 11
@@ -73,5 +65,5 @@ void PAGE_SplashInit(int page);
 void PAGE_SplashEvent();
 void PAGE_SplashExit();
 void PAGE_VideoSetupInit(int page);
-
+void PAGE_LayoutEditInit(int page);
 #endif

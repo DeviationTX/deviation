@@ -1,7 +1,7 @@
 #ifndef __MODEL_PAGE_H_
 #define __MODEL_PAGE_H_
 
-enum {
+enum loadSaveType {
    LOAD_MODEL,
    SAVE_MODEL,
    LOAD_TEMPLATE,
@@ -16,9 +16,8 @@ struct model_page {
     u8 last_mixermode;
     u8 last_txpower;
 /*Load save */
-    s8 selected;
     u8 total_items;
-    void(*return_page)(int page);
+    u8 menu_type;
     enum ModelType modeltype;
 };
 
