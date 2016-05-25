@@ -16,7 +16,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/mman.h>
+#ifndef _WIN32
+    #include <sys/mman.h>
+#endif
 #include "common.h"
 
 #if EMULATOR == USE_INTERNAL_FS
@@ -31,7 +33,13 @@ void SPIFlash_Init()
     }
     struct stat st;
     fstat(fd, &st);
+#ifdef _WIN32
+    _data = malloc(st.st_size);
+    read(fd, _data, st.st_size);
+    close(fd);
+#else
     _data = mmap((caddr_t)0, st.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+#endif
 }
 
 void SPIFlash_EraseSector(u32 sectorAddress)
