@@ -21,10 +21,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <libopencm3/stm32/usart.h>
 
 #include "common.h"
 
+#if ! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS
+extern void printstr(char *, int);
 //#define dbgprintf(args...) printf(args)
 #define dbgprintf(args...) 
 static DIR   dir;
@@ -178,17 +179,7 @@ int _read_r (FATFS *r, char * ptr, int len)
 int _write_r (FATFS *r, char * ptr, int len)
 {  
     if((unsigned long)r==1 || (unsigned long)r==2) {
-        int index;
-
-        if (0 == (USART_CR1(_USART) & USART_CR1_UE))
-            return len; //Don't send if USART is disabled
-
-        for(index=0; index<len; index++) {
-            if (ptr[index] == '\n') {
-                usart_send_blocking(_USART,'\r');
-            }  
-            usart_send_blocking(_USART, ptr[index]);
-        }    
+        printstr(ptr, len);
         return len;
     } else if(r) {
         if(fs_is_open(r)) {
@@ -232,3 +223,4 @@ int _lseek_r (FATFS *r, int ptr, int dir)
     errno=EINVAL;
     return -1;
 }
+#endif //! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS

@@ -44,7 +44,7 @@ static FATFS *_fs, *_mountfs;
 static int _spiread(void * buf, int addr, int len);
 static int _get_addr(int addr, int offset);
 
-inline int _get_next_sector(int sec) {
+static inline int _get_next_sector(int sec) {
     return (sec + 1) % SECTOR_COUNT;
 }
 

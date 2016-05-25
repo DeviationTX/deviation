@@ -29,11 +29,11 @@ src/cov-int/
 *.zip
 .DS_Store
 
-src/target/common/devo/devofs/tests/DevoFS.bs
-src/target/common/devo/devofs/tests/DevoFS.c
-src/target/common/devo/devofs/tests/MYMETA.json
-src/target/common/devo/devofs/tests/MYMETA.yml
-src/target/common/devo/devofs/tests/blib
-src/target/common/devo/devofs/tests/pm_to_blib
-src/target/common/devo/devofs/tests/Makefile.old
+src/target/common/filesystems/devofs/tests/DevoFS.bs
+src/target/common/filesystems/devofs/tests/DevoFS.c
+src/target/common/filesystems/devofs/tests/MYMETA.json
+src/target/common/filesystems/devofs/tests/MYMETA.yml
+src/target/common/filesystems/devofs/tests/blib
+src/target/common/filesystems/devofs/tests/pm_to_blib
+src/target/common/filesystems/devofs/tests/Makefile.old
 

@@ -13,9 +13,10 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <fcntl.h>
-
 #define USE_OWN_STDIO 0  //Prevent std.h from defining prototypes for devo_*
 #include "common.h"
+
+#if ! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS
 
 #define FILE void
 long _open_r (void *r, const char *file, int flags, int mode);
@@ -115,3 +116,4 @@ void devo_setbuf(FILE *stream, char *buf)
     (void)stream;
     (void)buf;
 }
+#endif //! defined(EMULATOR) || EMULATOR == USE_INTERNAL_FS

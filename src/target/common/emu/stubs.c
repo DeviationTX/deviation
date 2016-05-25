@@ -61,7 +61,6 @@ void CLOCK_ResetWatchdog() {
     }
 }
 
-void SPIFlash_Init() {}
 u32  SPIFlash_ReadID() { return 0x12345678; }
 void SPI_FlashBlockWriteEnable(unsigned enable) {(void)enable;}
 void SPITouch_Init() {}
@@ -77,8 +76,20 @@ u8 *BOOTLOADER_Read(int idx) {
     }
     return str[ret];
 }
-    
 void UART_Initialize() {}
+void init_err_handler() {}
+#if EMULATOR == USE_NATIVE_FS
+void SPIFlash_Init() {}
+void fempty(FILE *fh)
+{
+    fseek(fh, 0, SEEK_END);
+    long pos = ftell(fh);
+    int fd = fileno(fh);
+    ftruncate(fd, 0);
+    ftruncate(fd, pos);
+    fseek(fh, 0, SEEK_SET);
+}
+
 int FS_Mount(void *FAT, const char *drive) {
     (void)FAT;
     (void)drive;
@@ -104,7 +115,7 @@ int FS_ReadDir(char *path)
 void FS_CloseDir() {
     closedir(dh);
 }
-
+#endif //USE_NATIVE_FS
 void BACKLIGHT_Init() {}
 void BACKLIGHT_Brightness(unsigned brightness) { printf("Backlight: %d\n", brightness); }
 void LCD_Contrast(unsigned contrast) { printf("Contrast: %d\n", contrast); }
@@ -124,16 +135,6 @@ void PPMin_TIM_Init() {}
 volatile u8 ppmSync;
 volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];
 volatile u8 ppmin_num_channels;
-
-void fempty(FILE *fh)
-{
-    fseek(fh, 0, SEEK_END);
-    long pos = ftell(fh);
-    int fd = fileno(fh);
-    ftruncate(fd, 0);
-    ftruncate(fd, pos);
-    fseek(fh, 0, SEEK_SET);
-}
 
 void MCU_SerialNumber(u8 *var, int len)
 {

@@ -31,7 +31,7 @@ typedef uint64_t u64;
 
 //FATFS is defined by target_defs.h
 struct FAT {
-    char a[FILE_SIZE];
+    char inaccessible[FATSTRUCT_SIZE];
 };
 
 
