@@ -98,11 +98,12 @@ typedef enum {
   TS_DATA_ID,   // waiting for dataID
   TS_DATA_LOW,  // waiting for data low byte
   TS_DATA_HIGH, // waiting for data high byte
+  TS_DATA_END,  // waiting for 0x5e end of frame marker
   TS_XOR = 0x80 // decode stuffed byte
 } TS_STATE;
 
 
-enum {
+typedef enum {
     TELEM_FRSKY_RSSI = 1,
     TELEM_FRSKY_VOLT1,
     TELEM_FRSKY_VOLT2,
@@ -123,12 +124,11 @@ enum {
     TELEM_FRSKY_FUEL,
     TELEM_FRSKY_CURRENT,
     TELEM_FRSKY_ALTITUDE,
-    TELEM_FRSKY_ALTITUDE_DECIMETERS,
     TELEM_FRSKY_VARIO,
     TELEM_FRSKY_DISCHARGE,    // mAh
 #endif
     TELEM_FRSKY_LAST
-};
+} frsky_telem_t;
 
 #define TELEM_VALS        (((int)TELEM_DSM_LAST > (int)TELEM_DEVO_LAST)            \
                                ? (((int)TELEM_DSM_LAST > (int)TELEM_FRSKY_LAST)    \
