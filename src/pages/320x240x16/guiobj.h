@@ -26,7 +26,7 @@ struct chantest_obj {
     guiLabel_t chan[MAX_CHAN];
     guiLabel_t value[MAX_IDX];
     guiBarGraph_t bar[MAX_IDX];
-    guiScrollbar_t scrollbar;
+    guiScrollable_t scrollable;
 };
 
 struct range_obj {
