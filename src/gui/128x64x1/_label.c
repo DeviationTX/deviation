@@ -70,7 +70,9 @@ void GUI_DrawLabelHelper(u16 obj_x, u16 obj_y, u16 obj_w, u16 obj_h, const char 
     else if (desc->style == LABEL_INVERTED || is_selected) {
         LCD_FillRect(obj_x, obj_y, obj_w, obj_h, 0xffff);
     }
-
+    else if (desc->style == LABEL_FILL) {
+        LCD_FillRect(obj_x, obj_y, obj_w, obj_h, desc->fill_color);
+    }
     if (desc->style == LABEL_RIGHT) {
         txt_x = obj_x + obj_w - txt_w;
     } else if (obj_w > txt_w && !(desc->style == LABEL_LEFT || desc->style == LABEL_NO_BOX
