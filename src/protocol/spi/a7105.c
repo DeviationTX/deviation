@@ -25,36 +25,12 @@
 
 #ifdef PROTO_HAS_A7105
 
-static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[A7105].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[A7105]);
+static void CS_HI() {
+    PROTO_CS_HI(A7105);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[A7105].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[A7105]);
+    PROTO_CS_LO(A7105);
 }
 
 void A7105_WriteReg(u8 address, u8 data)
@@ -94,7 +70,7 @@ void A7105_WriteData(u8 *dpbuffer, u8 len, u8 channel)
 }
 void A7105_ReadData(u8 *dpbuffer, u8 len)
 {
-    A7105_Strobe(0xF0); //A7105_RST_RDPTR
+    A7105_Strobe(A7105_RST_RDPTR);
     for(int i = 0; i < len; i++)
         dpbuffer[i] = A7105_ReadReg(0x05);
     return;
