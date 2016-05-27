@@ -25,36 +25,12 @@
 
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
-static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CC2500].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[CC2500]);
+static void CS_HI() {
+    PROTO_CS_HI(CC2500);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CC2500].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[CC2500]);
+    PROTO_CS_LO(CC2500);
 }
 
 void CC2500_WriteReg(u8 address, u8 data)
@@ -136,7 +112,7 @@ void CC2500_SetPower(int power)
 {
     const unsigned char patable[8]=
     {
-        0xC5,  // -12dbm
+        0xC6,  // -12dbm
         0x97, // -10dbm
         0x6E, // -8dbm
         0x7F, // -6dbm

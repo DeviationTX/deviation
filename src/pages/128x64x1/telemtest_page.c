@@ -254,7 +254,11 @@ const struct telem_layout2 dsm_page[] = {
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 frsky_page[] = {
+#if HAS_EXTENDED_TELEMETRY
     {frsky_header_basic, frsky_layout_basic, 7, 1},
+#else
+    {frsky_header_basic, frsky_layout_basic, 2, 1},
+#endif
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)

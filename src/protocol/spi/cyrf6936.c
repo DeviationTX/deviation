@@ -23,44 +23,24 @@
 #include "protocol/interface.h"
 #include "protospi.h"
 
-//GPIOB.11
+#ifdef PROTO_HAS_CYRF6936
+
+#if (defined(HAS_CYRF_RESET) && HAS_CYRF_RESET)
+	//GPIOB.11
 #define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
 #define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
-
+#endif
+	
 //Disable AWA24S
 #define AWA24S 0
 
 #define Delay usleep
-static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[CYRF6936]);
+static void CS_HI() {
+    PROTO_CS_HI(CYRF6936);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[CYRF6936].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[CYRF6936]);
+    PROTO_CS_LO(CYRF6936);
 }
 
 void CYRF_WriteRegister(u8 address, u8 data)
@@ -168,19 +148,25 @@ static void AWA24S_SetTxRxMode(enum TXRX_State mode)
 static void BUYCHINA_SetTxRxMode(enum TXRX_State mode)
 {
     if(mode == TX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20); 	// XOUT=0, PACTL=1
     } else if (mode == RX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x80);
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x80); 	// XOUT=1, PACTL=0
+    } else {
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x00);	// XOUT=0, PACTL=0
     }
 }
 #endif
 /*
- * 1 - Tx else Rx
+ * 1 - Tx/Rx/Off
  */
 void CYRF_SetTxRxMode(enum TXRX_State mode)
 {
+    if(mode==TXRX_OFF) {
+        CYRF_WriteRegister(CYRF_0F_XACT_CFG, 0x24);							// 4=IDLE, 8=TX, C=RX
+    } else {
+        CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x28 : 0x2C);	// 4=IDLE, 8=TX, C=RX
+    }
     //Set the post tx/rx state
-    CYRF_WriteRegister(CYRF_0F_XACT_CFG, mode == TX_EN ? 0x28 : 0x2C);
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[CYRF6936].port == 0xFFFFFFFF) {
         if ((MODULE_ENABLE[CYRF6936].pin >> 8) == 0x01) {
@@ -194,9 +180,11 @@ void CYRF_SetTxRxMode(enum TXRX_State mode)
     }
 #endif
     if(mode == TX_EN) {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x80);
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x80); 	// XOUT=1, PACTL=0
+    } else if(mode == RX_EN) {
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);	// XOUT=0, PACTL=1
     } else {
-        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x20);
+        CYRF_WriteRegister(CYRF_0E_GPIO_CTRL, 0x00);	// XOUT=0, PACTL=0
     }
 }
 /*
@@ -332,3 +320,4 @@ void CYRF_FindBestChannels(u8 *channels, u8 len, u8 minspace, u8 min, u8 max)
     }
     CYRF_SetTxRxMode(TX_EN);
 }
+#endif // defined(PROTO_HAS_CYRF6936)

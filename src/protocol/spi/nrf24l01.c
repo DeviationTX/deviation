@@ -37,7 +37,7 @@
 #define FLUSH_TX      0xE1
 #define FLUSH_RX      0xE2
 #define REUSE_TX_PL   0xE3
-#define NOP           0xFF
+//#define NOP           0xFF	// already defined as NRF24L01_FF_NOP in iface_nrf24l01.h
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -46,36 +46,12 @@
 
 static u8 rf_setup;
 
-static void  CS_HI() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[NRF24L01].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_set(MODULE_ENABLE[NRF24L01]);
+static void CS_HI() {
+    PROTO_CS_HI(NRF24L01);
 }
 
 static void CS_LO() {
-#if HAS_MULTIMOD_SUPPORT
-    if (MODULE_ENABLE[MULTIMOD].port) {
-        //We need to set the multimodule CSN even if we don't use it
-        //for this protocol so that it doesn't interpret commands
-        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
-        if(MODULE_ENABLE[NRF24L01].port == SWITCH_ADDRESS) {
-            for(int i = 0; i < 20; i++)
-                _NOP();
-            return;
-        }
-    }
-#endif
-    PROTOSPI_pin_clear(MODULE_ENABLE[NRF24L01]);
+    PROTO_CS_LO(NRF24L01);
 }
 void NRF24L01_Initialize()
 {
@@ -274,8 +250,8 @@ int NRF24L01_Reset()
 {
     NRF24L01_FlushTx();
     NRF24L01_FlushRx();
-    u8 status1 = Strobe(NOP);
-    u8 status2 = NRF24L01_ReadReg(0x07);
+    u8 status1 = Strobe(NRF24L01_FF_NOP);
+    u8 status2 = NRF24L01_ReadReg(NRF24L01_07_STATUS);
     NRF24L01_SetTxRxMode(TXRX_OFF);
 #ifdef EMULATOR
     return 1;
@@ -298,14 +274,14 @@ static const uint8_t xn297_scramble[] = {
     0x1b, 0x5d, 0x19, 0x10, 0x24, 0xd3, 0xdc, 0x3f,
     0x8e, 0xc5, 0x2f};
 
- static const u16 xn297_crc_xorout_scrambled[] = {
+FLASHWORDTABLE xn297_crc_xorout_scrambled[] = {
     0x0000, 0x3448, 0x9BA7, 0x8BBB, 0x85E1, 0x3E8C,
     0x451E, 0x18E6, 0x6B24, 0xE7AB, 0x3828, 0x814B,
     0xD461, 0xF494, 0x2503, 0x691D, 0xFE8B, 0x9BA7,
     0x8B17, 0x2920, 0x8B5F, 0x61B1, 0xD391, 0x7401,
     0x2138, 0x129F, 0xB3A0, 0x2988};
 
-static const u16 xn297_crc_xorout[] = {
+FLASHWORDTABLE xn297_crc_xorout[] = {
     0x0000, 0x3d5f, 0xa6f1, 0x3a23, 0xaa16, 0x1caf,
     0x62b2, 0xe0eb, 0x0821, 0xbe07, 0x5f1a, 0xaf15,
     0x4f0a, 0xad24, 0x5e48, 0xed34, 0x068c, 0xf2c9,
@@ -426,9 +402,9 @@ u8 XN297_WritePayload(u8* msg, int len)
             crc = crc16_update(crc, packet[i]);
         }
         if(xn297_scramble_enabled)
-            crc ^= xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len];
+            crc ^= pgm_read_word(&xn297_crc_xorout_scrambled[xn297_addr_len - 3 + len]);
         else
-            crc ^= xn297_crc_xorout[xn297_addr_len - 3 + len];
+            crc ^= pgm_read_word(&xn297_crc_xorout[xn297_addr_len - 3 + len]);
         packet[last++] = crc >> 8;
         packet[last++] = crc & 0xff;
     }
