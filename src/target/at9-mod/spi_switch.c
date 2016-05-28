@@ -20,11 +20,32 @@
 #define CS_HI() gpio_set(GPIOB, GPIO11)
 #define CS_LO() gpio_clear(GPIOB, GPIO11)
 
+// Numbers correspond to connection order on 4-in-1 board
+// and on Discrete Logic board
+enum {
+   MODULE_A7105 = 0,
+   MODULE_CC2500,
+   MODULE_NRF24L01,
+   MODULE_CYRF6936,
+   MODULE_FLASH
+};
 
+// Traditional RF module definitions from target.h do not match 4-in-1
+// module order
+static int module_map[] = {
+    MODULE_CYRF6936, MODULE_A7105, MODULE_CC2500, MODULE_NRF24L01
+};
+
+
+#define CYRF6936_RESET 0x40
+#define NRF24L01_CE    0x80
 static int last_module_used;
+static u8 extra_bits;
+
 void SPISwitch_Init()
 {
     last_module_used = -1;
+    extra_bits = NRF24L01_CE;
     /* CS for switch */
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO11);
@@ -32,11 +53,11 @@ void SPISwitch_Init()
 }
 
 
-void SPISwitch_UseModule(int module)
+static void UseModule(int module)
 {
     if (module == last_module_used) return;
 
-    u8 cmd = (module & 0x07) | 0xC0;
+    u8 cmd = (module & 0x07) | extra_bits;
     CS_LO();
     spi_xfer(SPI2, cmd);
     CS_HI();
@@ -51,4 +72,44 @@ void SPISwitch_UseModule(int module)
     spi_enable(SPI2);
 
     last_module_used = module;
+}
+
+void SPISwitch_CS_HI(int module)
+{
+    (void) module;
+    gpio_set(GPIOB, GPIO12);
+}
+
+void SPISwitch_CS_LO(int module)
+{
+    UseModule(module_map[module]);
+    gpio_clear(GPIOB, GPIO12);
+}
+    
+
+void SPISwitch_UseFlashModule()
+{
+    UseModule(MODULE_FLASH);
+}
+
+
+static void SetExtraBits(u8 mask, int state)
+{
+//    if (!!(extra_bits & mask) == state) return;
+    if (state) extra_bits |= mask;
+    else       extra_bits &= ~mask;
+    u8 cmd = (last_module_used & 0x07) | extra_bits;
+    CS_LO();
+    spi_xfer(SPI2, cmd);
+    CS_HI();
+}
+
+void SPISwitch_CYRF6936_RESET(int state)
+{
+    SetExtraBits(CYRF6936_RESET, state);
+}
+
+void SPISwitch_NRF24L01_CE(int state)
+{
+    SetExtraBits(NRF24L01_CE, state);
 }

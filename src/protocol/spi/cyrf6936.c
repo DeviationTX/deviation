@@ -25,10 +25,15 @@
 
 #ifdef PROTO_HAS_CYRF6936
 
-#if (defined(HAS_CYRF_RESET) && HAS_CYRF_RESET)
+#if ! HAS_MULTIMOD_SUPPORT && (!defined(HAS_CYRF_RESET) || HAS_CYRF_RESET)
 	//GPIOB.11
+#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+#define RS_HI() SPISwitch_CYRF6936_RESET(1)
+#define RS_LO() SPISwitch_CYRF6936_RESET(0)
+#else
 #define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
 #define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
+#endif
 #endif
 	
 //Disable AWA24S

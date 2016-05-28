@@ -354,18 +354,26 @@ static int get_module(int idx)
 
 int PROTOCOL_HasModule(int idx)
 {
+#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+    return 1;
+#else    
     int m = get_module(idx);
     if(m == TX_MODULE_LAST || Transmitter.module_enable[m].port != 0)
         return 1;
     return 0;
+#endif
 }
 
 int PROTOCOL_HasPowerAmp(int idx)
 {
+#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+    return 1;
+#else
     int m = get_module(idx);
     if(m != TX_MODULE_LAST && Transmitter.module_poweramp & (1 << m))
         return 1;
     return 0;
+#endif
 }
 
 int PROTOCOL_SetSwitch(int module)
@@ -461,6 +469,9 @@ void PROTOCOL_InitModules()
 
 void PROTO_CS_HI(int module)
 {
+#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+    SPISwitch_CS_HI(module);
+#else
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
@@ -474,10 +485,14 @@ void PROTO_CS_HI(int module)
     }
 #endif
     PROTOSPI_pin_set(MODULE_ENABLE[module]);
+#endif
 }
 
 void PROTO_CS_LO(int module)
 {
+#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+    SPISwitch_CS_LO(module);
+#else
 #if HAS_MULTIMOD_SUPPORT
     if (MODULE_ENABLE[MULTIMOD].port) {
         //We need to set the multimodule CSN even if we don't use it
@@ -491,4 +506,5 @@ void PROTO_CS_LO(int module)
     }
 #endif
     PROTOSPI_pin_clear(MODULE_ENABLE[module]);
+#endif
 }

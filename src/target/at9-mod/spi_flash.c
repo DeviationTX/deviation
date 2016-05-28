@@ -15,10 +15,12 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
+#include <libopencm3/cm3/cortex.h>
 #include "common.h"
 
-#define CS_HI() gpio_set(GPIOB, GPIO12)
-#define CS_LO() gpio_clear(GPIOB, GPIO12)
+#define CS_HI() do { cm_enable_interrupts(); gpio_set(GPIOB, GPIO12); } while(0)
+#define CS_LO() do { cm_disable_interrupts(); SPISwitch_UseFlashModule(); \
+                     gpio_clear(GPIOB, GPIO12); } while(0)
 #define SPI_FLASH SPI2
 
 // Defaults for SST25B (Devo 10, 7E etc)
@@ -72,7 +74,6 @@ void SPIFlash_Init()
     spi_enable(SPI2);
     
     SPISwitch_Init();
-    SPISwitch_UseModule(MODULE_FLASH);
 }
 
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
@@ -160,13 +161,19 @@ void DisableHWRYBY()
 void WaitForWriteComplete()
 {
     unsigned sr;
-    CS_LO();
-    spi_xfer(SPI_FLASH, 0x05);
-    do
-    {
-        sr = spi_xfer(SPI_FLASH, 0x00);
-    } while(sr & 0x01); 
-    CS_HI();
+    // We disable interrupts in SPI operation so we
+    // need to periodically re-enable them.
+    while(true) {
+        int i;
+        CS_LO();
+        spi_xfer(SPI_FLASH, 0x05);
+        for (i = 0; i < 100; ++i) {
+            sr = spi_xfer(SPI_FLASH, 0x00);
+            if (!(sr & 0x01)) break;
+        }
+        CS_HI();
+        if (i < 100) break;
+    }
 }
 /*
  *
