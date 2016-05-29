@@ -45,7 +45,7 @@ static u8 txid[TXID_SIZE];
 static u8 rxid[RXID_SIZE];
 static u8 hopping_frequency[NUMFREQ];
 static u8 packet_type;
-static u8 bind_count;
+static s32 packet_count;
 static u8 bind_reply;
 static u8 state;
 static u8 channel;
@@ -60,6 +60,7 @@ static const u8 AFHDS2A_regs[] = {
 enum{
     PACKET_STICKS,
     PACKET_SETTINGS,
+    PACKET_FAILSAFE,
 };
 
 enum{
@@ -73,8 +74,8 @@ enum{
 static const char * const afhds2a_opts[] = {
     _tr_noop("PPM"), _tr_noop("Off"), _tr_noop("On"), NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
-    "RX ID", "-32768", "32768", "1", NULL, // todo: store that elsewhere
-    "RX ID2","-32768", "32768", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
+    "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
     NULL
 };
 
@@ -178,18 +179,39 @@ static void build_sticks_packet()
     packet[0] = 0x58;
     memcpy( &packet[1], txid, 4);
     memcpy( &packet[5], rxid, 4);
-    for(u8 i=0; i<14; i++)
+    for(u8 ch=0; ch<14; ch++)
     {
-        if (i >= Model.num_channels) {
-            packet[9 + i*2] = 0xdc;
-            packet[10 + i*2] = 0x05;
+        if (ch >= Model.num_channels) {
+            packet[9 + ch*2] = 0xdc;
+            packet[10 + ch*2] = 0x05;
             continue;
         }
-        s32 value = (s32)Channels[i] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
-        if (value < 900 || value > 2100)
-            value = 1500;
-        packet[9 +  i*2] = value & 0xff;
-        packet[10 + i*2] = (value >> 8) & 0xff;
+        s32 value = (s32)Channels[ch] * 0x1f1 / CHAN_MAX_VALUE + 0x5d9;
+        if (value < 900)
+            value = 900;
+        else if (value > 2100)
+            value = 2100;
+        packet[9 +  ch*2] = value & 0xff;
+        packet[10 + ch*2] = (value >> 8) & 0xff;
+    }
+    packet[37] = 0x00;
+}
+
+static void build_failsafe_packet()
+{
+    packet[0] = 0x56;
+    memcpy( &packet[1], txid, 4);
+    memcpy( &packet[5], rxid, 4);
+    for(u8 ch=0; ch<14; ch++) {
+        if(ch < Model.num_channels && (Model.limits[ch].flags & CH_FAILSAFE_EN)) {
+            s32 value = ((s32)Model.limits[ch].failsafe + 100) * 5 + 1000;
+            packet[9 + ch*2] = value & 0xff;
+            packet[10+ ch*2] = (value >> 8) & 0xff;
+        }
+        else {
+            packet[9 + ch*2] = 0xff;
+            packet[10+ ch*2] = 0xff;
+        }
     }
     packet[37] = 0x00;
 }
@@ -219,6 +241,9 @@ static void build_packet(u8 type)
         case PACKET_SETTINGS:
             build_settings_packet();
             break;
+        case PACKET_FAILSAFE:
+            build_failsafe_packet();
+            break;
     }
 }
 
@@ -227,6 +252,8 @@ enum{
     SENSOR_RX_VOLTAGE   = 0x00,
     SENSOR_RX_ERR_RATE  = 0xfe,
     SENSOR_RX_RSSI      = 0xfc,
+    SENSOR_RX_NOISE     = 0xfb,
+    SENSOR_RX_SNR       = 0xfa,
 };
 
 static void update_telemetry()
@@ -373,7 +400,7 @@ static u16 afhds2a_cb()
         case BIND3:    
             A7105_Strobe(A7105_STANDBY);
             build_bind_packet();
-            A7105_WriteData(packet, 38, bind_count%2 ? 0x0d : 0x8c);
+            A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
             if(A7105_ReadReg(0) == 0x1b) { // todo: replace with check crc+fec
                 A7105_Strobe(A7105_RST_RDPTR);
                 A7105_ReadData(packet, RXPACKET_SIZE);
@@ -387,7 +414,7 @@ static u16 afhds2a_cb()
                         state = BIND4;
                 }
             } 
-            bind_count++;
+            packet_count++;
             state |= WAIT_WRITE;
             return 1700;
         
@@ -404,11 +431,11 @@ static u16 afhds2a_cb()
         case BIND4:
             A7105_Strobe(A7105_STANDBY);
             build_bind_packet();
-            A7105_WriteData(packet, 38, bind_count%2 ? 0x0d : 0x8c);
-            bind_count++;
+            A7105_WriteData(packet, 38, packet_count%2 ? 0x0d : 0x8c);
+            packet_count++;
             bind_reply++;
             if(bind_reply>=4) { 
-                bind_count=0;
+                packet_count=0;
                 channel=1;
                 state = DATA1;
                 PROTOCOL_SetBindState(0);
@@ -427,27 +454,33 @@ static u16 afhds2a_cb()
             A7105_WriteData(packet, 38, hopping_frequency[channel++]);
             if(channel >= 16)
                 channel = 0;
-            packet_type = PACKET_STICKS; // todo : check for settings changes
-             // got some data from RX ?
-             // we've no way to know if RX fifo has been filled
-             // as we can't poll GIO1 or GIO2 to check WTR
-             // we can't check A7105_MASK_TREN either as we know
-             // it's currently in transmit mode.
-             if(!(A7105_ReadReg(0) & (1<<5 | 1<<6))) { // FECF+CRCF Ok
-                 A7105_Strobe(A7105_RST_RDPTR);
-                 u8 check;
-                 A7105_ReadData(&check,1);
-                 if(check == 0xaa) {
-                     A7105_Strobe(A7105_RST_RDPTR);
-                     A7105_ReadData(packet, RXPACKET_SIZE);
-                     if(packet[9] == 0xfc) { // rx is asking for settings ?
-                         packet_type=PACKET_SETTINGS;
-                     }
-                     else {
-                         update_telemetry();
-                     }
-                 }
-             }
+            if(!(packet_count % 1313))
+                packet_type = PACKET_SETTINGS;
+            else if(!(packet_count % 1569))
+                packet_type = PACKET_FAILSAFE;
+            else
+                packet_type = PACKET_STICKS; // todo : check for settings changes
+            // got some data from RX ?
+            // we've no way to know if RX fifo has been filled
+            // as we can't poll GIO1 or GIO2 to check WTR
+            // we can't check A7105_MASK_TREN either as we know
+            // it's currently in transmit mode.
+            if(!(A7105_ReadReg(0) & (1<<5 | 1<<6))) { // FECF+CRCF Ok
+                A7105_Strobe(A7105_RST_RDPTR);
+                u8 check;
+                A7105_ReadData(&check,1);
+                if(check == 0xaa) {
+                    A7105_Strobe(A7105_RST_RDPTR);
+                    A7105_ReadData(packet, RXPACKET_SIZE);
+                    if(packet[9] == 0xfc) { // rx is asking for settings
+                        packet_type=PACKET_SETTINGS;
+                    }
+                    else {
+                        update_telemetry();
+                    }
+                }
+            }
+            packet_count++;
             state |= WAIT_WRITE;
             return 1700;
             
@@ -470,7 +503,7 @@ static void initialize(u8 bind)
     }
     initialize_tx_id();
     packet_type = PACKET_STICKS;
-    bind_count = 0;
+    packet_count = 0;
     bind_reply = 0;
     if(bind) {
         state = BIND1;
