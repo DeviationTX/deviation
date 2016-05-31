@@ -65,16 +65,20 @@ enum {
     CHANNEL4,     // Rudder
     CHANNEL5,     // LED Light
     CHANNEL6,     // Flip
-    CHANNEL7,     // 
-    CHANNEL8,     // 
+    CHANNEL7,     // Picture snapshot
+    CHANNEL8,     // Video recording
     CHANNEL9,     // RTH + Headless (H8 3D), Headless (H20)
     CHANNEL10,    // 180/360 flip mode (H8 3D), RTH (H20)
+    CHANNEL11,    // Camera gimbal down / neutral / up
 };
 
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_SNAPSHOT    CHANNEL7  // (H11D)
+#define CHANNEL_VIDEO       CHANNEL8  // (H11D)
 #define CHANNEL_HEADLESS    CHANNEL9  // RTH + Headless on H8 3D
 #define CHANNEL_RTH         CHANNEL10 // 180/360 flip mode on H8 3D
+#define CHANNEL_GIMBALL     CHANNEL11 // H11D
 
 enum {
     H8_3D_INIT1 = 0,
@@ -94,7 +98,11 @@ enum {
 
 enum {
     // flags going to packet[18]
+    FLAG_CAM_UP   = 0x04,
+    FLAG_CAM_DOWN = 0x08,
     FLAG_CALIBRATE= 0x20, // accelerometer calibration
+    FLAG_SNAPSHOT = 0x40,
+    FLAG_VIDEO    = 0x80,
 };
 
 static u16 counter;
@@ -186,7 +194,14 @@ static void send_packet(u8 bind)
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
-    
+        packet[18] = GET_FLAG( CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                   | GET_FLAG( CHANNEL_VIDEO, FLAG_VIDEO);
+         // camera gimball
+        if(Channels[CHANNEL_GIMBALL] < CHAN_MIN_VALUE / 2)
+            packet[18] |= FLAG_CAM_DOWN;
+        else if(Channels[CHANNEL_GIMBALL] > CHAN_MAX_VALUE / 2)
+            packet[18] |= FLAG_CAM_UP;
+        
         // both sticks bottom left: calibrate acc
         if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
             packet[18] |= FLAG_CALIBRATE;
@@ -352,8 +367,8 @@ const void *H8_3D_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 11L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
