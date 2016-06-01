@@ -46,6 +46,7 @@ enum {
   LABEL_X_OFFSET     = 0,
   LABEL_WIDTH        = 13,
   TEXTSEL_X_WIDTH    = LCD_WIDTH - 14 - 2,
+  CALIB_Y            = 0,
 };
 #endif
 #include "../128x64x1/tx_configure.c"
