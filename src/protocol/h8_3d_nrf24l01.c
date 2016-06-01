@@ -100,7 +100,8 @@ enum {
     // flags going to packet[18]
     FLAG_CAM_UP   = 0x04,
     FLAG_CAM_DOWN = 0x08,
-    FLAG_CALIBRATE= 0x20, // accelerometer calibration
+    FLAG_CALIBRATE2=0x10, // acc calib. (H11D, H20)
+    FLAG_CALIBRATE= 0x20, // acc calib. (H8 3D), headless calib (H20)
     FLAG_SNAPSHOT = 0x40,
     FLAG_VIDEO    = 0x80,
 };
@@ -205,6 +206,10 @@ static void send_packet(u8 bind)
         // both sticks bottom left: calibrate acc
         if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
             packet[18] |= FLAG_CALIBRATE;
+        
+        // both sticks bottom right: calib2
+        if(packet[9] <= 0x05 && (packet[10] >= 0x27 && packet[10] <= 0x3c) && packet[11] <= 0x57 && packet[12] <= 0x57)
+            packet[18] |= FLAG_CALIBRATE2;
     }
     packet[19] = checksum(); // data checksum
     
