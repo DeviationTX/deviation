@@ -31,7 +31,7 @@ static struct tx_obj_g3 * const gui3 = &gui_objs.u.tx.u.g3;
 #endif
 
 static const int MIN_BATTERY_ALARM_STEP  = 50;
-
+static const int CALIB_Y = 40;
 u8 page_num;
 guiObject_t *firstObj;
 
