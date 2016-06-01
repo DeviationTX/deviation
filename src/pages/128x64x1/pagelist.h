@@ -63,7 +63,7 @@ PAGEDEF(PAGEID_MAINCFG,  PAGE_MainLayoutInit,  NULL,                  NULL,     
 
 // Transmitter menu
 //-----------------
-PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, PAGE_TxConfigureEvent, NULL,                TX_MENU,    _tr_noop("Transmitter config"))
+PAGEDEF(PAGEID_TXCFG,    PAGE_TxConfigureInit, NULL,                  NULL,                TX_MENU,    _tr_noop("Transmitter config"))
 PAGEDEF(PAGEID_CHANMON,  PAGE_ChantestInit,    PAGE_ChantestEvent,    PAGE_ChantestExit,   TX_MENU,    _tr_noop("Channel monitor"))
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMMON, PAGE_TelemtestInit,   PAGE_TelemtestEvent,   NULL,                TX_MENU,    _tr_noop("Telemetry monitor"))
@@ -79,6 +79,7 @@ PAGEDEF(PAGEID_EDITCURVE, PAGE_EditCurvesInit, NULL,                  NULL,     
 PAGEDEF(PAGEID_LOADSAVE, PAGE_LoadSaveInit,    NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_CALIB,    PAGE_CalibInit,       NULL,                  NULL,               0,           "")
 #if HAS_LAYOUT_EDITOR
 PAGEDEF(PAGEID_LAYOUT,   PAGE_LayoutEditInit,  NULL,                  NULL,               0,           "")
 #endif

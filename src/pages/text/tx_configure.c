@@ -32,6 +32,7 @@ enum {
   LABEL_X_OFFSET     = 2,
   LABEL_WIDTH        = 30,
   TEXTSEL_X_WIDTH    = 24,
+  CALIB_Y            = 0,
 };
 
 #else
