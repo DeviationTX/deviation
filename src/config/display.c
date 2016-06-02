@@ -18,9 +18,31 @@
 #include "display.h"
 #include <stdlib.h>
 #include <string.h>
-
+#define font_index(x) (&(x) - Display.font)
 static const char FONT[] = "font";
-static const char * const FONT_VAL[] = { "default", "modelname", "title", "bigbox", "smallbox", "battery", "batt_alarm", "tiny", "micro", "bold", "narrow", "small", "bigboxneg", "smallboxneg", "dialogtitle", "dialogbody", "normalbox", "normalboxneg", "section", "textsel", "button"};
+static const char * const FONT_VAL[] = {
+    [font_index(DEFAULT_FONT)]      = "default",
+    [font_index(MODELNAME_FONT)]    = "modelname",
+    [font_index(TITLE_FONT)]        = "title",
+    [font_index(BIGBOX_FONT)]       = "bigbox",
+    [font_index(SMALLBOX_FONT)]     = "smallbox",
+    [font_index(BATTERY_FONT)]      = "battery",
+    [font_index(BATTALARM_FONT)]    = "batt_alarm",
+    [font_index(TINY_FONT)]         = "tiny",
+    [font_index(MICRO_FONT)]        = "micro",
+    [font_index(BOLD_FONT)]         = "bold",
+    [font_index(NARROW_FONT)]       = "narrow",
+    [font_index(SMALL_FONT)]        = "small",
+    [font_index(BIGBOXNEG_FONT)]    = "bigboxneg",
+    [font_index(SMALLBOXNEG_FONT)]  = "smallboxneg",
+    [font_index(DIALOGTITLE_FONT)]  = "dialogtitle",
+    [font_index(DIALOGBODY_FONT)]   = "dialogbody",
+    [font_index(NORMALBOX_FONT)]    = "normalbox",
+    [font_index(NORMALBOXNEG_FONT)] = "normalboxneg",
+    [font_index(SECTION_FONT)]      = "section",
+    [font_index(TEXTSEL_FONT)]      = "textsel", 
+    [font_index(BUTTON_FONT)]       = "button"
+    };
 static const char COLOR[] = "color";
 static const char BG_COLOR[] = "bg_color";
 static const char FG_COLOR[] = "fg_color";
@@ -35,7 +57,17 @@ static const char XY_AXIS_COLOR[] = "axis_color";
 static const char XY_GRID_COLOR[] = "grid_color";
 static const char XY_POINT_COLOR[] = "point_color";
 static const char BOX[] = "box_type";
-static const char * const BOX_VAL[] = { "none", "center", "fill", "outline", "underline", "squarebox" , "inverted"};
+static const char * const BOX_VAL[] = {
+    [LABEL_NO_BOX]      = "none",
+    [LABEL_CENTER]      = "center",
+    [LABEL_FILL]        = "fill",
+    [LABEL_BOX]         = "outline",
+#if LCD_DEPTH == 1
+    [LABEL_SQUAREBOX]   = "squarebox",
+    [LABEL_UNDERLINE]   = "underline",
+    [LABEL_INVERTED]    = "inverted"
+#endif
+    };
 
 
 #define MATCH_SECTION(s) strcasecmp(section, s) == 0
@@ -77,7 +109,7 @@ static int handle_label(struct LabelDesc *label, const char *name, const char *v
     if(MATCH_KEY(BOX)) {
         u8 idx;
         for (idx = 0; idx < NUM_STR_ELEMS(BOX_VAL); idx++) {
-            if(MATCH_VALUE(BOX_VAL[idx])) {
+            if(BOX_VAL[idx] && MATCH_VALUE(BOX_VAL[idx])) {
                 label->style = idx;
             }
         }
@@ -177,7 +209,7 @@ static int ini_handler(void* user, const char* section, const char* name, const 
 
     if(MATCH_START(section, FONT) && strlen(section) > sizeof(FONT)) {
         for (idx = 0; idx < NUM_STR_ELEMS(FONT_VAL); idx++) {
-            if (0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
+            if (FONT_VAL[idx] && 0 == strcasecmp(section + sizeof(FONT), FONT_VAL[idx])) {
                 handle_label(&d->font[idx], name, value);
                 return 1;
             }

@@ -19,7 +19,6 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx(int chan);
-static void _show_bar_page(int row);
 static int cur_row = 0;
 
 enum {
