@@ -17,7 +17,7 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 
-#if defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 
 #define CS_HI() gpio_set(GPIOB, GPIO11)
 #define CS_LO() gpio_clear(GPIOB, GPIO11)
@@ -118,4 +118,4 @@ void SPISwitch_NRF24L01_CE(int state)
     SetExtraBits(NRF24L01_CE, state);
 }
 
-#endif // defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT
+#endif // defined HAS_4IN1_FLASH && HAS_4IN1_FLASH

@@ -354,7 +354,7 @@ static int get_module(int idx)
 
 int PROTOCOL_HasModule(int idx)
 {
-#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+#if 0 // defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     return 1;
 #else    
     int m = get_module(idx);
@@ -366,7 +366,7 @@ int PROTOCOL_HasModule(int idx)
 
 int PROTOCOL_HasPowerAmp(int idx)
 {
-#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     return 1;
 #else
     int m = get_module(idx);
@@ -469,7 +469,7 @@ void PROTOCOL_InitModules()
 
 void PROTO_CS_HI(int module)
 {
-#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     SPISwitch_CS_HI(module);
 #else
 #if HAS_MULTIMOD_SUPPORT
@@ -490,7 +490,7 @@ void PROTO_CS_HI(int module)
 
 void PROTO_CS_LO(int module)
 {
-#if defined(HAS_4IN1_DL_SUPPORT) && HAS_4IN1_DL_SUPPORT
+#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     SPISwitch_CS_LO(module);
 #else
 #if HAS_MULTIMOD_SUPPORT

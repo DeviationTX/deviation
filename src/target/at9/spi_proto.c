@@ -17,20 +17,16 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
-/*
-#include "../common/devo/devo.h"
+//#include "../common/devo/devo.h"
 #include "config/tx.h"
-#include "protocol/interface.h"
-#include <stdlib.h>
-*/
+//#include "protocol/interface.h"
+//#include <stdlib.h>
 
-/*
- */
 void SPI_ProtoInit()
 {
 // If we use Discrete Logic board then SPI2 is shared between RF chips
 // and flash, so it is initialized in SPIFlash.
-#if !defined HAS_4IN1_DL_SUPPORT || !HAS_4IN1_DL_SUPPORT
+#if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
@@ -70,7 +66,8 @@ void MCU_InitModules()
 }
 
 int MCU_SetPin(struct mcu_pin *port, const char *name) {
-    (void)port;
+//    (void)port;
     (void)name;
+    port->port = 1;
     return 1;
 }

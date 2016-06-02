@@ -18,7 +18,7 @@
 #include <libopencm3/cm3/cortex.h>
 #include "common.h"
 
-#if defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 
 #define CS_HI() do { cm_enable_interrupts(); gpio_set(GPIOB, GPIO12); } while(0)
 #define CS_LO() do { cm_disable_interrupts(); SPISwitch_UseFlashModule(); \
@@ -424,4 +424,4 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
     return i;
 }
 
-#endif // defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT
+#endif // defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
