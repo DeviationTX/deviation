@@ -17,6 +17,8 @@
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
 
+#if defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT
+
 #define CS_HI() gpio_set(GPIOB, GPIO11)
 #define CS_LO() gpio_clear(GPIOB, GPIO11)
 
@@ -106,10 +108,14 @@ static void SetExtraBits(u8 mask, int state)
 
 void SPISwitch_CYRF6936_RESET(int state)
 {
+    last_module_used = MODULE_CYRF6936;
     SetExtraBits(CYRF6936_RESET, state);
 }
 
 void SPISwitch_NRF24L01_CE(int state)
 {
+    last_module_used = MODULE_NRF24L01;
     SetExtraBits(NRF24L01_CE, state);
 }
+
+#endif // defined HAS_4IN1_DL_SUPPORT && HAS_4IN1_DL_SUPPORT

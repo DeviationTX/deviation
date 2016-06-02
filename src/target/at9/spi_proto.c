@@ -13,23 +13,24 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*The following will force the loading of various
-  functions used in the protocol modules, but unused elsewhere
-  in Deviation.
-  Note that we lie aboiut the arguments to these functions. It is
-  Important that the actual functions never execute
-*/
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 #include "common.h"
+/*
 #include "../common/devo/devo.h"
 #include "config/tx.h"
 #include "protocol/interface.h"
 #include <stdlib.h>
+*/
 
+/*
+ */
 void SPI_ProtoInit()
 {
+// If we use Discrete Logic board then SPI2 is shared between RF chips
+// and flash, so it is initialized in SPIFlash.
+#if !defined HAS_4IN1_DL_SUPPORT || !HAS_4IN1_DL_SUPPORT
     /* Enable SPI2 */
     rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_SPI2EN);
     /* Enable GPIOA */
@@ -61,6 +62,7 @@ void SPI_ProtoInit()
     spi_enable_software_slave_management(SPI2);
     spi_set_nss_high(SPI2);
     spi_enable(SPI2);
+#endif
 }
 
 void MCU_InitModules()
@@ -68,5 +70,7 @@ void MCU_InitModules()
 }
 
 int MCU_SetPin(struct mcu_pin *port, const char *name) {
+    (void)port;
+    (void)name;
     return 1;
 }
