@@ -29,6 +29,7 @@ enum {
   TITLE_WIDTH        = 0,
   LABEL_X_OFFSET     = 0,
   LABEL_WIDTH        = 0,
+  CALIB_Y            = 0,
 };
 #define TEXTSEL_X_WIDTH (LCD_WIDTH - ARROW_WIDTH - x - 1)
 #endif //#ifndef OVERRIDE_PLACEMENT
