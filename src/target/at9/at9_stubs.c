@@ -41,6 +41,7 @@ void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
 void SOUND_Stop() {}
 u32 SOUND_Callback() { return 0;}
 
+#if !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
 void SPIFlash_Init() {}
 void SPI_FlashBlockWriteEnable(unsigned enable) {
     (void)enable;
@@ -79,6 +80,7 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer) {
 void SPIFlash_EraseSector(u32 sectorAddress) {
     (void)sectorAddress;
 }
+#endif // !defined HAS_4IN1_FLASH || !HAS_4IN1_FLASH
 
 volatile u8 ppmSync = 0;     //  the ppmSync for mixer.c,  0:ppm-Not-Sync , 1:ppm-Got-Sync
 volatile s32 ppmChannels[MAX_PPM_IN_CHANNELS];    //  [0...ppmin_num_channels-1] for each channels width, [ppmin_num_channels] for sync-signal width
@@ -91,7 +93,11 @@ void SPITouch_Init() {}
 void PPMin_TIM_Init() {}
 int  SPITouch_IRQ() { return 0; }
 
-const char *MCU_GetPinName(char *str, struct mcu_pin *port) { return "None";}
+const char *MCU_GetPinName(char *str, struct mcu_pin *port) {
+    (void)str;
+    (void)port;
+    return "None";
+}
 
 void PWM_Initialize() {}
 void PWM_Stop() {}

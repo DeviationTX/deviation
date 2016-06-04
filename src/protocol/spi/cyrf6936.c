@@ -25,10 +25,15 @@
 
 #ifdef PROTO_HAS_CYRF6936
 
-#if (defined(HAS_CYRF_RESET) && HAS_CYRF_RESET)
+#if ! HAS_MULTIMOD_SUPPORT && (!defined(HAS_CYRF_RESET) || HAS_CYRF_RESET)
 	//GPIOB.11
+#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
+#define RS_HI() SPISwitch_CYRF6936_RESET(1)
+#define RS_LO() SPISwitch_CYRF6936_RESET(0)
+#else
 #define RS_HI() PROTOSPI_pin_set(CYRF_RESET_PIN)
 #define RS_LO() PROTOSPI_pin_clear(CYRF_RESET_PIN)
+#endif
 #endif
 	
 //Disable AWA24S
@@ -104,7 +109,9 @@ int CYRF_Reset()
         CYRF_WriteRegister(CYRF_0D_IO_CFG, 0x04); //Enable PACTL as GPIO
         CYRF_SetTxRxMode(TXRX_OFF);
         //Verify the CYRD chip is responding
-        return (CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5);
+        int res = CYRF_ReadRegister(CYRF_10_FRAMING_CFG) == 0xa5;
+        printf("CYRF6936 reset %s\n", res ? "succeded" : "failed");
+        return res;
 }
 
 u8 CYRF_MaxPower()
