@@ -354,10 +354,10 @@ static int get_module(int idx)
 
 int PROTOCOL_HasModule(int idx)
 {
-// Temporary enable hardware.ini [modules] to
+// If you need to enable hardware.ini [modules] to
 // enable/disable individual modules for 4-in-1 flash
-// for debugging purposes.
-#if 0 // defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
+// replace the condition with #if 0.
+#if defined(HAS_4IN1_FLASH) && HAS_4IN1_FLASH
     return 1;
 #else    
     int m = get_module(idx);
