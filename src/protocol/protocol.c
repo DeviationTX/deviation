@@ -18,6 +18,7 @@
 #include "interface.h"
 #include "config/model.h"
 #include "config/tx.h"
+#include "protospi.h"
 
 #include <stdlib.h>
 
@@ -456,4 +457,38 @@ void PROTOCOL_InitModules()
     {
         PROTOCOL_Init(0);
     }
+}
+
+void PROTO_CS_HI(int module)
+{
+#if HAS_MULTIMOD_SUPPORT
+    if (MODULE_ENABLE[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_set(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[module].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
+    }
+#endif
+    PROTOSPI_pin_set(MODULE_ENABLE[module]);
+}
+
+void PROTO_CS_LO(int module)
+{
+#if HAS_MULTIMOD_SUPPORT
+    if (MODULE_ENABLE[MULTIMOD].port) {
+        //We need to set the multimodule CSN even if we don't use it
+        //for this protocol so that it doesn't interpret commands
+        PROTOSPI_pin_clear(MODULE_ENABLE[MULTIMOD]);
+        if(MODULE_ENABLE[module].port == SWITCH_ADDRESS) {
+            for(int i = 0; i < 20; i++)
+                _NOP();
+            return;
+        }
+    }
+#endif
+    PROTOSPI_pin_clear(MODULE_ENABLE[module]);
 }
