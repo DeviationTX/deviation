@@ -67,7 +67,7 @@ void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
-void PAGE_TrimExit();
+void PAGE_TrimEditInit(int page);
 
 /* Timer */
 void PAGE_TimerInit(int page);

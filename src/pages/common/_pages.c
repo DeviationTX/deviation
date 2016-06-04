@@ -164,6 +164,8 @@ void PAGE_PushByID(enum PageID id, int page)
 }
 void PAGE_Pop()
 {
+    if (modal)
+        return;
     //page 0 is always PAGEID_MAIN
     if (page_stack > _page_stack+1) {
         page_stack--;

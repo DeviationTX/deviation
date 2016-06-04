@@ -53,7 +53,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
-        trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+        trimsource_name_cb, 0x0000, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, negtrim_str, DEFAULT_FONT, (void *)(long)absrow);
     GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
     GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL,
@@ -76,16 +76,13 @@ static void _show_page()
     PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
-static void _edit_cb(guiObject_t *obj, const void *data)
+void PAGE_TrimEditInit(int page)
 {
-    (void)obj;
     struct Trim *trim = MIXER_GetAllTrims();
-    PAGE_SetModal(1);
-    tp->index = (long)data;
+    tp->index = page;
     tp->trim = trim[tp->index];
 
-    PAGE_RemoveAllObjects();
-    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_ShowHeader(_tr("Trim"));
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 
     enum {
