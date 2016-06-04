@@ -55,9 +55,10 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
     if(! GUI_IsTextSelectEnabled(obj)){
         return _tr("None");
     }
+    u8 changed;
     u8 *source = (u8 *)data;
-    *source = INPUT_SelectAbbrevSource(*source, dir);
-    return INPUT_SourceNameAbbrevSwitch(tempstring, *source);
+    *source = INPUT_SelectSource(*source, dir, &changed);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 static const char *set_input_switch_cb(guiObject_t *obj, int newsrc, int value, void *data)
