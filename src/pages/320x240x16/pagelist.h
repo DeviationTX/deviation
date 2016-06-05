@@ -82,5 +82,6 @@ PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,     
 PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           _tr_noop("Select Language"))
 PAGEDEF(PAGEID_CALIB,    PAGE_CalibInit,       NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_TRIMEDIT, PAGE_TrimEditInit,    NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TGLEDIT,  PAGE_ToggleEditInit,  NULL,                  PAGE_ToggleEditExit,0,           "")
 
 #endif /* PAGEDEF */

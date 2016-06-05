@@ -81,6 +81,7 @@ PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,     
 PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_CALIB,    PAGE_CalibInit,       NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_TRIMEDIT, PAGE_TrimEditInit,    NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TGLEDIT,  PAGE_ToggleEditInit,  NULL,                  NULL,               0,           "")
 #if HAS_LAYOUT_EDITOR
 PAGEDEF(PAGEID_LAYOUT,   PAGE_LayoutEditInit,  NULL,                  NULL,               0,           "")
 #endif

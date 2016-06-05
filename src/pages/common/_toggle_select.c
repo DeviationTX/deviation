@@ -89,9 +89,7 @@ void TGLICO_Select(guiObject_t *obj, const void *data)
     (void)obj;
     if(Model.pagecfg2.elem[(long)data].src)
     {
-        tp->tglidx = (long)data;
-        memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
-        show_iconsel_page(0);
+        PAGE_PushByID(PAGEID_TGLEDIT, (long)data);
     }
 }
 
@@ -138,5 +136,12 @@ static int get_next_icon(int idx)
     return (fnum << 6) | offset;
 }
 
+static void revert_cb(guiObject_t *obj, const void *data)
+{
+    (void)data;
+    (void)obj;
+    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
+    PAGE_ChangeByID(PAGEID_TGLEDIT, tp->tglidx);
+}
 
 

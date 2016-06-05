@@ -53,6 +53,8 @@ void PAGE_MainEvent();
 void PAGE_MainExit();
 struct ImageMap TGLICO_GetImage(int idx);
 void TGLICO_Select(guiObject_t *obj, const void *data);
+void PAGE_ToggleEditInit(int page);
+void PAGE_ToggleEditExit();
 
 /* Mixer */
 void PAGE_MixerInit(int page);
@@ -158,6 +160,7 @@ void PAGE_DebuglogExit();
 void PAGE_ChangeByID(enum PageID id, s8 menuPage);
 void PAGE_PushByID(enum PageID id, int page);
 void PAGE_Pop();
+int PAGE_GetCurrentID();
 
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
