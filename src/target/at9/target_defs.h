@@ -8,32 +8,7 @@
 #if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
 #define SPIFLASH_SECTORS 1024
 
-// Various SPI flash memories use different commands to
-// block-protect memory and to write more than 1 byte
-// Possible variants:
-// ISSI IS25CQ032
-// Microchip SST25VF032B - original Devo 10
-// Microchip SST26VF032B - not fully supported, block protection needs work
-// adesto AT25DF321A
-// Winbond W25Q
-
-// Microchip SST25VF032B and Winbond W25Q use EWSR (0x50) to enable write to status reg,
-// everyone else uses WREN (0x06)
-#define SPIFLASH_USE_EWSR 0
-
-// Microchip SST25VF032B uses AAI (0xAD or 0xAF) to write more than 1 byte
-// everyone else uses PAGE_PROG (0x02)
-#define SPIFLASH_USE_AAI 0
-//#define SPIFLASH_AAI_AF // SST25VF512A uses 0xAF for AAI
-
-// Use STATUS register for global protect and use this constant
-// 0x3C for AT25 and IS25
-// 0x1C for W25Q and SST25B - correct value, not 0x38
-// 0x0C for SST25A
-// don't define for SST26 - it uses special block protection register
-#define SPIFLASH_USE_GLOBAL_PROTECT 0x3C
-
-#define SPIFLASH_USE_FAST_READ 1
+#define SPIFLASH_TYPE IS25CQxxx
 
 #else
 

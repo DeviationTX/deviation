@@ -5,6 +5,12 @@
 
 #define SYSCLK_TIM 3
 
+#define _SPI_FLASH_PORT              2 //SPI2
+    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO12}
+    #define _SPI_FLASH_SCK_PIN       {GPIOB, GPIO13}
+    #define _SPI_FLASH_MISO_PIN      {GPIOB, GPIO14}
+    #define _SPI_FLASH_MOSI_PIN      {GPIOB, GPIO15}
+
 #define _USART USART1
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
     #define _ADC                    ADC1
