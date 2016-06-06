@@ -21,7 +21,7 @@ enum {
 static inline guiObject_t * _get_obj(int idx, int objid);
 static struct trim_page * const tp = &pagemem.u.trim_page;
 static void _show_page();
-static void _edit_cb(guiObject_t *obj, const void *data);
+static void edit_trim_cb(guiObject_t *obj, const void *data);
 
 static u16 current_selected = 0;
 
@@ -55,9 +55,10 @@ static const char *set_switch_cb(guiObject_t *obj, int dir, void *data)
     if(! GUI_IsTextSelectEnabled(obj)){
         return _tr("None");
     }
+    u8 changed;
     u8 *source = (u8 *)data;
-    *source = INPUT_SelectAbbrevSource(*source, dir);
-    return INPUT_SourceNameAbbrevSwitch(tempstring, *source);
+    *source = INPUT_SelectSource(*source, dir, &changed);
+    return INPUT_SourceName(tempstring, *source);
 }
 
 static const char *set_input_switch_cb(guiObject_t *obj, int newsrc, int value, void *data)
@@ -123,6 +124,12 @@ static const char *set_trimstep_cb(guiObject_t *obj, int dir, void *data)
     return tempstring;
 }
 
+static void edit_trim_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    PAGE_PushByID(PAGEID_TRIMEDIT, (long)data);
+}
+
 static void okcancel_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -132,20 +139,14 @@ static void okcancel_cb(guiObject_t *obj, const void *data)
         trim[tp->index] = tp->trim;
         MIXER_RegisterTrimButtons();
     }
-    PAGE_RemoveAllObjects();
-    PAGE_TrimInit(0);
+    PAGE_Pop();
 }
 
 void PAGE_TrimInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_RemoveAllObjects();
 
     _show_page();
-}
-
-void PAGE_TrimEvent()
-{
 }
 

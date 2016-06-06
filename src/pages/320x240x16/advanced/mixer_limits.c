@@ -68,7 +68,7 @@ static void _show_limits()
     GUI_CreateTextSelect(&gui->speed, COL2, y, TEXTSELECT_96, NULL, set_limits_cb, &mp->limit->speed);
 }
 
-const char * revert_str_cb(guiObject_t *obj, const void *data)
+static const char * revert_str_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;

@@ -55,7 +55,7 @@ PAGEDEF(PAGEID_TIMER,    PAGE_TimerInit,       PAGE_TimerEvent,       NULL,     
 #if HAS_TELEMETRY
 PAGEDEF(PAGEID_TELEMCFG, PAGE_TelemconfigInit, PAGE_TelemconfigEvent, NULL,               MODEL_MENU,  _tr_noop("Telemetry config"))
 #endif
-PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        PAGE_TrimEvent,        NULL,               ADVGUI_MENU, _tr_noop("Trims"))
+PAGEDEF(PAGEID_TRIM,     PAGE_TrimInit,        NULL,                  NULL,               ADVGUI_MENU, _tr_noop("Trims"))
 #if HAS_DATALOG
 PAGEDEF(PAGEID_DATALOG,  PAGE_DatalogInit,     PAGE_DatalogEvent,     NULL,               MODEL_MENU,  _tr_noop("Datalog"))
 #endif
@@ -80,6 +80,8 @@ PAGEDEF(PAGEID_LOADSAVE, PAGE_LoadSaveInit,    NULL,                  NULL,     
 PAGEDEF(PAGEID_REORDER,  PAGE_ReorderInit,     NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_CALIB,    PAGE_CalibInit,       NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TRIMEDIT, PAGE_TrimEditInit,    NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TGLEDIT,  PAGE_ToggleEditInit,  NULL,                  NULL,               0,           "")
 #if HAS_LAYOUT_EDITOR
 PAGEDEF(PAGEID_LAYOUT,   PAGE_LayoutEditInit,  NULL,                  NULL,               0,           "")
 #endif

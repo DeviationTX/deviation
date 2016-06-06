@@ -73,23 +73,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s8 current_toggleicon = 0;
 
-static void revert_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
-    show_iconsel_page(0);
-}
-
-
-static void show_iconsel_page(int SelectedIcon)
-{
-    PAGE_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
+static void show_iconsel_page(int SelectedIcon) {
+    GUI_RemoveAllObjects();
     memset(gui, 0, sizeof(*gui));
     current_toggleicon = SelectedIcon;
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
+    int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
@@ -129,8 +117,16 @@ static void show_iconsel_page(int SelectedIcon)
                      SCROLL_ROW_H, rows, row_cb, NULL, NULL, (void *)(long)SelectedIcon);
 }
 
+void PAGE_ToggleEditInit(int page)
+{
+    tp->tglidx = page;
+    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
+    PAGE_SetActionCB(_action_cb);
+    show_iconsel_page(0);
+}
+
 static void navigate_toggleicons(s8 direction) {
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
+    int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)
         num_positions = 2;
@@ -174,7 +170,7 @@ unsigned _action_cb(u32 button, unsigned flags, void *data)
         return 1;
     {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_MainLayoutInit(-1);
+            PAGE_Pop();
         else if (CHAN_ButtonIsPressed(button, BUT_UP))
             navigate_toggleicons(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_DOWN))

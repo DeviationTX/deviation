@@ -55,7 +55,6 @@ static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
 void PAGE_MainLayoutInit(int page)
 {
-    GUI_RemoveAllObjects(); //This is needed because we haven't fully finished converting this page to push/pop
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
     PAGE_SetActionCB(_action_cb);
@@ -65,9 +64,6 @@ void PAGE_MainLayoutInit(int page)
     memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));
     show_config();
-    if (page == -1) {
-        GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-    }
 }
 
 static int size_cb(int absrow, void *data)
@@ -119,7 +115,7 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
     //PAGE_MainLayoutExit();
     create_element();
     current_selected = 0;
-    PAGE_MainLayoutInit(-1);
+    PAGE_ChangeByID(PAGEID_MAINCFG, 0);
 }
 
 static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)

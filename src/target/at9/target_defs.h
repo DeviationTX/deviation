@@ -5,16 +5,29 @@
 #define VECTOR_TABLE_LOCATION 0x3000
 
 #define SPIFLASH_SECTOR_OFFSET 0x0000
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
+#define SPIFLASH_SECTORS 1024
+
+#define SPIFLASH_TYPE IS25CQxxx
+
+#else
+
 #define SPIFLASH_SECTORS 64
 
 #define USE_PBM_IMAGE 1
 #define USE_DEVOFS 1 //Must be before common_devo include
 
+#endif
+
 #define DISABLE_PWM 1                 //FIXME
 #define NO_LANGUAGE_SUPPORT 1
 
 #ifndef FATSTRUCT_SIZE
-    #include "enable_devofs.h"
+    #if defined USE_DEVOFS && USE_DEVOFS == 1
+        #include "enable_devofs.h"
+    #else
+        #include "enable_petit_fat.h"
+    #endif
 #endif
 
 #ifndef LCD_ForceUpdate
@@ -36,6 +49,7 @@ static inline void LCD_ForceUpdate() {}
 #define HAS_EXTRA_SWITCHES  0
 #define HAS_EXTRA_BUTTONS  0
 #define HAS_MULTIMOD_SUPPORT 0
+//#define HAS_4IN1_FLASH 1 // NB set in the Makefile.inc
 #define HAS_VIDEO           0
 
 #ifdef BUILDTYPE_DEV
@@ -76,4 +90,15 @@ static inline void LCD_ForceUpdate() {}
     {30, 71}, {30, 56}, {-250, 71}, {-250, 56}, \
     {185, 220}, {185, 200}, {-95, 220}, {-95, 200}, {200, 180}, {-80, 180}, \
     }
+
+#if defined HAS_4IN1_FLASH && HAS_4IN1_FLASH
+void SPISwitch_Init();
+void SPISwitch_CS_HI(int module);
+void SPISwitch_CS_LO(int module);
+void SPISwitch_UseFlashModule();
+void SPISwitch_CYRF6936_RESET(int state);
+void SPISwitch_NRF24L01_CE(int state);
+#endif
+
+
 #endif //_AT9_TARGET_DEFS_H_

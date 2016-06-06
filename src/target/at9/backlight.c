@@ -58,7 +58,7 @@ void BACKLIGHT_Brightness(unsigned brightness)
         // Turn on Backlight full
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_PUSHPULL, GPIO9);
-        gpio_clear(GPIOB, GPIO9);
+        gpio_set(GPIOB, GPIO9);
     } else {
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO9);

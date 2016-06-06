@@ -1,12 +1,24 @@
+HAS_4IN1_FLASH ?= 0
+
+ifeq "$(HAS_4IN1_FLASH)" "1"
+FILESYSTEMS := common base_fonts 320x240x16
+SCREENSIZE  := 320x240x16
+FONTS        = filesystem/$(FILESYSTEM)/media/15normal.fon \
+               filesystem/$(FILESYSTEM)/media/23bold.fon
+else
 FILESYSTEMS := common base_fonts 320x240x1
 SCREENSIZE  := 320x240x16
-DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 FONTS        = filesystem/$(FILESYSTEM)/media/23bold.fon
+endif
+DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu $(TARGET)-fs.dfu
+ALL = $(LIBOPENCM3) $(TARGET).dfu
+ifneq "$(HAS_4IN1_FLASH)" "1"
+ALL += $(TARGET)-fs.dfu
+endif
 
 NUM_MODELS ?= 10
 
@@ -25,6 +37,9 @@ SRC_C    = $(wildcard $(SDIR)/target/$(TARGET)/*.c) \
            $(SDIR)/target/devo8/ili9341.c
 
 CFLAGS   = -D"assert_param(x)=" -DSTM32F10X_HD -DSTM32F1 -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd -fdata-sections -ffunction-sections -I$(SDIR)/target/common/devo/msc2/lib -I$(SDIR)/target/common/devo/msc2 -I$(SDIR)/libopencm3/include -I$(SDIR)/target/common/filesystems -fno-builtin-printf -Os --specs=nano.specs
+ifeq "$(HAS_4IN1_FLASH)" "1"
+CFLAGS += -D"HAS_4IN1_FLASH=1"
+endif
 MODULE_FLAGS = -fno-builtin
 
 LFLAGS   = -nostartfiles -Wl,-gc-sections -Wl,-Map=$(TARGET).map,--cref -lc -lnosys -L$(SDIR)
