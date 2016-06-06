@@ -5,10 +5,10 @@
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
+#define SPIFLASH_TYPE SST25VFxxxA
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
-#define SPIFLASH_TYPE SST25VFxxxA
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12
