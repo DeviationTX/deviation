@@ -132,7 +132,7 @@ u32 SPIFlash_ReadID()
 void SPI_FlashBlockWriteEnable(unsigned enable)
 {
     CS_LO();
-    spi_xfer(SPIx, SPIFLASH_PROTECT_MASK);
+    spi_xfer(SPIx, SPIFLASH_SR_ENABLE);
     CS_HI();
     CS_LO();
     if (SPIFLASH_PROTECT_MASK) {
@@ -233,13 +233,14 @@ void SPIFlash_WriteBytes(u32 writeAddress, u32 length, const u8 * buffer)
 
     if (SPIFLASH_USE_AAI) {
         if (SPIFLASH_WRITE_SIZE == 2 && writeAddress & 0x01) {
-            //printf("SPI write slow start\r\n");
+            //printf("SPI write slow start(%08x, %d)\n", writeAddress, length);
             SPIFlash_WriteByte(writeAddress,buffer[0]);
             buffer++;
             writeAddress++;
             length--;
             if (length == 0)
                 return;
+            WriteFlashWriteEnable();
         }
         SPIFlash_SetAddr(SPIFLASH_WRITE_CMD, writeAddress);
         spi_xfer(SPIx, (u8)~buffer[i++]);
@@ -324,5 +325,53 @@ int SPIFlash_ReadBytesStopCR(u32 readAddress, u32 length, u8 * buffer)
 
     CS_HI();
     return i;
+}
+
+void debug_spi_flash()
+{
+    u8 data[512];
+    u8 check[512];
+    unsigned i;
+    memset(check, 0, sizeof(check));
+    int start = 0x1000*SPIFLASH_SECTOR_OFFSET;
+
+    for (i = 0; i < sizeof(data); i++) {
+        data[i] = rand32();
+    }
+    WriteFlashWriteEnable();
+    SPIFlash_EraseSector(start);
+    SPIFlash_ReadBytes(start, 101, check);
+    for (i = 0; i < 101; i++) {
+        if (check[i] != 0) {
+          printf("Failed to erase at %d (%02x)\n", i, check[i]);
+          break;
+        }
+    }
+    SPIFlash_WriteBytes(start, 101, data);
+    SPIFlash_ReadBytes(start, 101, check);
+    printf("--------1\n");
+    for (i = 0; i < 101; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    printf("--------2\n");
+    SPIFlash_WriteBytes(start +101 , 100, data + 101);
+    SPIFlash_ReadBytes(start  +101 , 100, check + 101);
+    for (i = 100; i < 201; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    SPIFlash_WriteBytes(start + 223, 33, data+223);
+    SPIFlash_WriteBytes(start + 201, 22, data+201);
+    SPIFlash_ReadBytes(start + 200,  56, check + 200);
+    printf("--------3\n");
+    for (i = 200; i < 256; i++) {
+        if (data[i] != check[i])  {
+            printf("%04x: %02x != %02x\n", i, data[i], check[i]);
+        }
+    }
+    while(1) { if(PWR_CheckPowerSwitch()) PWR_Shutdown(); }
 }
 #endif //SPIFLASH_TYPE
