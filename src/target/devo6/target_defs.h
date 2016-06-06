@@ -22,6 +22,7 @@
 #define HAS_EXTRA_SWITCHES  1
 #define HAS_EXTRA_BUTTONS   1
 #define HAS_VIDEO           0
+#define HAS_EXTENDED_AUDIO  1
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200

@@ -4,6 +4,7 @@
 #include "mixer.h"
 #include "autodimmer.h"
 #include "telemetry.h"
+#include "music.h"
 
 #define DEFAULT_BATTERY_WARNING_INTERVAL 30
 #define MIN_BATTERY_WARNING_INTERVAL 0
@@ -46,6 +47,10 @@ struct Transmitter {
     u8 telem;
     u8 music_shutdown;
     u8 extra_hardware;
+#if HAS_EXTENDED_AUDIO 
+    enum AudioPlayers audio_player;
+    u8 audio_2way;	// Currently unused.
+#endif 
     enum Mode mode;
     u16 batt_alarm;
     u16 batt_critical;

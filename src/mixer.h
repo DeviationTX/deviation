@@ -106,6 +106,9 @@ enum MuxType {
     MUX_MAX,
     MUX_MIN,
     MUX_DELAY,
+#if HAS_EXTENDED_AUDIO
+    MUX_BEEP,
+#endif
     MUX_LAST,
 };
 

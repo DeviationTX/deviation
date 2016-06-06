@@ -333,6 +333,17 @@ void MIXER_ApplyMixer(struct Mixer *mixer, volatile s32 *raw, s32 *orig_value)
             else if(value - *orig_value < -rate)
                 value = *orig_value - rate;
         }
+#if HAS_EXTENDED_AUDIO
+    case MUX_BEEP:
+        if (orig_value) {
+            s32 new = value / (CHAN_MULTIPLIER / 10);
+            if (new != *orig_value / (CHAN_MULTIPLIER / 10)
+            && new == raw[mixer->dest + NUM_INPUTS + 1] / (CHAN_MULTIPLIER / 10))
+                MUSIC_Play(MUSIC_TELEMALARM1 + 5);
+          }
+        value = raw[mixer->dest + NUM_INPUTS + 1];	// Use input value
+        break;
+#endif
     case MUX_LAST: break;
     }
 

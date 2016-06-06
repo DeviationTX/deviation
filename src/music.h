@@ -23,5 +23,16 @@ enum Music {
     MUSIC_TELEMALARM6,
 };
 
+enum AudioPlayers {
+  AUDIO_NONE = 0,	// Just use Tx beeps.
+  AUDIO_AUDIOFX,	// Adafruit AUDIOFX board
+  AUDIO_DF_PLAYER,	// DF Player Mini
+  AUDIO_LAST
+};
+
+#if HAS_EXTENDED_AUDIO
+int AUDIO_Play(enum Music music);
+#endif
+
 void MUSIC_Play(enum Music music);
 #endif

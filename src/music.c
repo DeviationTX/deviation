@@ -105,6 +105,12 @@ u16 next_note_cb() {
 
 void MUSIC_Play(enum Music music)
 {
+    #if HAS_EXTENDED_AUDIO
+    /* Try and play via extended audio. Return if it plays something */
+    if (AUDIO_Play(music))
+       return ;
+    #endif
+
     /* NOTE: We need to do all this even if volume is zero, because
        the haptic sensor may be enabled */
     num_notes = 0;

@@ -27,17 +27,23 @@ void UART_Initialize()
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_USART1EN);
 
-    /* Setup GPIO pin GPIO_USART1_TX/GPIO9 on GPIO port A for transmit. */
+    /* Setup GPIO pins to use USART1 */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
                     GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
+                  GPIO_USART1_RX);
 
     /* Setup UART parameters. */
+#ifdef BUILDTYPE_DEV
     usart_set_baudrate(USART1, 115200);
+#else
+    usart_set_baudrate(USART1, 9600);
+#endif
     usart_set_databits(USART1, 8);
     usart_set_stopbits(USART1, USART_STOPBITS_1);
-    usart_set_mode(USART1, USART_MODE_TX);
     usart_set_parity(USART1, USART_PARITY_NONE);
     usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
+    usart_set_mode(USART1, USART_MODE_TX_RX);
 
     /* Finally enable the USART. */
     usart_enable(USART1);

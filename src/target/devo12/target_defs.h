@@ -26,6 +26,7 @@
 #define HAS_MULTIMOD_SUPPORT 1
 #define ENABLE_320x240_GUI  1 //Enable support for 320x240 gui items as well as 480x360 ones
 #define HAS_VIDEO           0
+#define HAS_EXTENDED_AUDIO  1
 
 #ifdef BUILDTYPE_DEV
    #define DEBUG_WINDOW_SIZE 200
