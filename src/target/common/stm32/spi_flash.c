@@ -30,9 +30,11 @@
 #if _SPI_FLASH_PORT == 1
     #define SPIx    SPI1
     #define SPIxEN  RCC_APB2ENR_SPI1EN
+    #define RCC_APBxENR RCC_APB2ENR
 #elif _SPI_FLASH_PORT == 2
     #define SPIx    SPI2
     #define SPIxEN  RCC_APB1ENR_SPI2EN
+    #define RCC_APBxENR RCC_APB1ENR
 #endif
 
 
@@ -67,16 +69,18 @@ void CS_LO()
 {
     if (HAS_4IN1_FLASH) {
         cm_disable_interrupts();
+        SPISwitch_UseFlashModule();
     }
     PORT_pin_clear(FLASH_CSN_PIN);
 }
+
 /*
  *
  */
 void SPIFlash_Init()
 {
-    /* Enable SPI1 */
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, SPIxEN);
+    /* Enable SPIx */
+    rcc_peripheral_enable_clock(&RCC_APBxENR, SPIxEN);
     /* Enable GPIOA */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     /* Enable GPIOB */
@@ -99,7 +103,11 @@ void SPIFlash_Init()
     spi_set_nss_high(SPIx);
 
     spi_enable(SPIx);
+    if (HAS_4IN1_FLASH) {
+        SPISwitch_Init();
+    }
 }
+
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
 {
     CS_LO();
