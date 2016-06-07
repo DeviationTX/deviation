@@ -28,13 +28,13 @@
 //#define SPIxEN         SPI_CONCAT(RCC_APB2ENR_SPI,             _SPI_FLASH_PORT, EN)
 
 #if _SPI_FLASH_PORT == 1
-    #define SPIx    SPI1
-    #define SPIxEN  RCC_APB2ENR_SPI1EN
-    #define RCC_APBxENR RCC_APB2ENR
+    #define SPIx        SPI1
+    #define SPIxEN      RCC_APB2ENR_SPI1EN
+    #define APB_SPIxEN  RCC_APB2ENR
 #elif _SPI_FLASH_PORT == 2
-    #define SPIx    SPI2
-    #define SPIxEN  RCC_APB1ENR_SPI2EN
-    #define RCC_APBxENR RCC_APB1ENR
+    #define SPIx        SPI2
+    #define SPIxEN      RCC_APB1ENR_SPI2EN
+    #define APB_SPIxEN  RCC_APB1ENR
 #endif
 
 
@@ -79,8 +79,8 @@ void CS_LO()
  */
 void SPIFlash_Init()
 {
-    /* Enable SPIx */
-    rcc_peripheral_enable_clock(&RCC_APBxENR, SPIxEN);
+    /* Enable SPI1 */
+    rcc_peripheral_enable_clock(&APB_SPIxEN,  SPIxEN);
     /* Enable GPIOA */
     rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPAEN);
     /* Enable GPIOB */
@@ -106,6 +106,16 @@ void SPIFlash_Init()
     if (HAS_4IN1_FLASH) {
         SPISwitch_Init();
     }
+#if 0 //4IN1DEBUG
+    // This code is equivalent to using SPISwitch_Init
+    static const struct mcu_pin FLASH_RESET_PIN ={GPIOB, GPIO11};
+    PORT_mode_setup(FLASH_RESET_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    // And this is equivalent of using SPISwitch_UseFlashModule in CS_LO
+    u8 cmd = 4;
+    PORT_pin_clear(FLASH_RESET_PIN);
+    spi_xfer(SPIx, cmd);
+    PORT_pin_set(FLASH_RESET_PIN);
+#endif
 }
 
 static void SPIFlash_SetAddr(unsigned cmd, u32 address)
@@ -139,6 +149,7 @@ u32 SPIFlash_ReadID()
 
 void SPI_FlashBlockWriteEnable(unsigned enable)
 {
+    //printf("SPI_FlashBlockWriteEnable: %d\n", enable);
     CS_LO();
     spi_xfer(SPIx, SPIFLASH_SR_ENABLE);
     CS_HI();
