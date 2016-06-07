@@ -48,8 +48,7 @@ static void processHubPacket(u8 id, u16 value) {
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
         break;
     case 0x02: //TEMP1 -30C-250C (1C/ count)
-        Telemetry.value[TELEM_FRSKY_TEMP1] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP1);
+        set_telemetry(TELEM_FRSKY_TEMP1, (s16)value);
         break;
     case 0x03: //RPM   0-60000
         Telemetry.value[TELEM_FRSKY_RPM] = value * 60;
@@ -60,8 +59,7 @@ static void processHubPacket(u8 id, u16 value) {
         TELEMETRY_SetUpdated(TELEM_FRSKY_FUEL);
         break;
     case 0x05: //TEMP2 -30C-250C (1C/ count)
-        Telemetry.value[TELEM_FRSKY_TEMP2] = value;
-        TELEMETRY_SetUpdated(TELEM_FRSKY_TEMP2);
+        set_telemetry(TELEM_FRSKY_TEMP2, (s16)value);
         break;
     case 0x06: { //Battery voltages - CELL# and VOLT
         u8 cell = (value >> 4) & 0x0f;
