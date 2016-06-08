@@ -15,11 +15,11 @@ DFU_ARGS    := -D 0x0483:0xdf12 -b 0x08003000
 ifndef BUILD_TARGET
 CROSS    = arm-none-eabi-
 
-ALL = $(LIBOPENCM3) $(TARGET).dfu
 ifneq "$(HAS_4IN1_FLASH)" "1"
-ALL += $(TARGET)-fs.dfu
+EXTRA_DFUS = $(TARGET)-fs.dfu
 endif
 
+ALL = $(LIBOPENCM3) $(TARGET).dfu $(EXTRA_DFUS)
 NUM_MODELS ?= 10
 
 LINKFILE = $(SDIR)/target/$(TARGET)/$(TARGET).ld
@@ -67,4 +67,16 @@ $(TARGET)-fs.dfu: $(ODIR)/devo.fs
 
 $(TARGET).fs_wrapper: $(LAST_MODEL)
 	rm filesystem/$(FILESYSTEM)/datalog.bin
+
+$(TARGET).zip: $(ALL)
+	cp -f $(TARGET).dfu deviation-$(HGVERSION).dfu
+	rm -f deviation-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	zip debug-$(HGVERSION).zip $(TARGET).elf
+	# make zipping more compatible with other distributions
+	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).dfu $(EXTRA_DFUS)
+	zip -u deviation-$(HGVERSION).zip debug-$(HGVERSION).zip
+	rm -f debug-$(HGVERSION).zip
+	rm -f deviation-$(HGVERSION).dfu
+
 endif #BUILD_TARGET
