@@ -47,9 +47,32 @@ void UART_Initialize()
 
     /* Finally enable the USART. */
     usart_enable(USART1);
+
+#if HAS_AUDIO_UART5
+    /* Enable clocks for GPIO port C (for GPIO_UART5_TX) and UART5. */
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPCEN);
+    rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_UART5EN);
+
+    /* Setup GPIO pins to use UART5 */
+    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ,
+                    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_UART5_TX);
+
+    /* Setup UART5 parameters. */
+    usart_set_baudrate(UART5, 9600);
+    usart_set_databits(UART5, 8);
+    usart_set_stopbits(UART5, USART_STOPBITS_1);
+    usart_set_parity(UART5, USART_PARITY_NONE);
+    usart_set_mode(UART5, USART_MODE_TX);
+
+    /* Finally enable the UART5. */
+    usart_enable(UART5);
+#endif
 }
 
 void UART_Stop()
 {
     usart_disable(USART1);
+#ifdef AUDIO_UART5
+    usart_disable(UART5);
+#endif
 }
