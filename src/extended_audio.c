@@ -20,7 +20,7 @@
 
 #if HAS_EXTENDED_AUDIO
 
-#ifndef BUILDTYPE_DEV
+#if HAS_AUDIO_UART5 || !defined(BUILDTYPE_DEV)
 
 // Send a block of len bytes to the Audio device.
 void
@@ -36,18 +36,25 @@ void
 AUDIO_Print(char *string) {
   AUDIO_Send((uint8_t *)string, strlen(string));
 }
-#endif // BUILDTYPE_DEV
+#endif
 
 // Generate a string to play.
 int AUDIO_Play(enum Music music) {
   #ifdef BUILDTYPE_DEV
   // dev builds log to the serial port, so just report it.
   printf("Playing alert #%d\n", music);
-  #else
+  #endif
 
+  #if !defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
+
+#if HAS_AUDIO_UART5
+  // If we are just playing beeps....
+  if (music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN)
+#else
   // If we are using the PPM port or are just playing beeps anyway....
-  if (PPMin_Mode() || Model.protocol == PROTOCOL_PPM
+  if ( PPMin_Mode() || Model.protocol == PROTOCOL_PPM
   || music == MUSIC_KEY_PRESSING || music == MUSIC_MAXLEN)
+#endif
     return 0;
 
   switch (Transmitter.audio_player) {

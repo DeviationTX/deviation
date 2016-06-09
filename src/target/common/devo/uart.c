@@ -34,7 +34,7 @@ void UART_Initialize()
                   GPIO_USART1_RX);
 
     /* Setup UART parameters. */
-#ifdef BUILDTYPE_DEV
+#if defined(BUILDTYPE_DEV) || HAS_AUDIO_UART5
     usart_set_baudrate(USART1, 115200);
 #else
     usart_set_baudrate(USART1, 9600);
@@ -72,7 +72,7 @@ void UART_Initialize()
 void UART_Stop()
 {
     usart_disable(USART1);
-#ifdef AUDIO_UART5
+#if HAS_AUDIO_UART5
     usart_disable(UART5);
 #endif
 }
