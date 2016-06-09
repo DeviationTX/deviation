@@ -203,47 +203,70 @@ static void frac2float(s32 n, float* res)
 static void send_cmd_packet()
 {
     // Commander packet, 15 bytes
-    uint8_t buf[15];
-    float x_roll, x_pitch, yaw;
-  
-    // Channels in AETR order
+    u8 buf[15];
+    s32 f_roll;
+    s32 f_pitch;
+    s32 f_yaw;
+    s32 thrust_truncated;
+    u16 thrust;
 
+    struct CommanderPacker
+    {
+      float roll;
+      float pitch;
+      float yaw;
+      uint16_t thrust;
+    } __attribute__((packed)) cpkt;
+
+    // Channels in AETR order
     // Roll, aka aileron, float +- 50.0 in degrees
     // float roll  = -(float) Channels[0]*50.0/10000;
-    s32 f_roll = -Channels[0] * FRAC_SCALE / (10000 / 50);
+    f_roll = -Channels[0] * FRAC_SCALE / (10000 / 50);
 
     // Pitch, aka elevator, float +- 50.0 degrees
     //float pitch = -(float) Channels[1]*50.0/10000;
-    s32 f_pitch = -Channels[1] * FRAC_SCALE / (10000 / 50);
+    f_pitch = -Channels[1] * FRAC_SCALE / (10000 / 50);
 
     // Thrust, aka throttle 0..65535, working range 5535..65535
     // No space for overshoot here, hard limit Channel3 by -10000..10000
-    s32 ch = Channels[2];
-    if (ch < CHAN_MIN_VALUE) {
-        ch = CHAN_MIN_VALUE;
-    } else if (ch > CHAN_MAX_VALUE) {
-        ch = CHAN_MAX_VALUE;
+    thrust_truncated = Channels[2];
+    if (thrust_truncated < CHAN_MIN_VALUE) {
+      thrust_truncated = CHAN_MIN_VALUE;
+    } else if (thrust_truncated > CHAN_MAX_VALUE) {
+      thrust_truncated = CHAN_MAX_VALUE;
     }
-    uint16_t thrust  = ch*3L + 35535L;
+
+    thrust = thrust_truncated*3L + 35535L;
+    // Crazyflie needs zero thrust to unlock
+    if (thrust < 6000)
+      cpkt.thrust = 0;
+    else
+      cpkt.thrust = thrust;
 
     // Yaw, aka rudder, float +- 400.0 deg/s
     // float yaw   = -(float) Channels[3]*400.0/10000;
-    s32 f_yaw = - Channels[3] * FRAC_SCALE / (10000 / 400);
-    frac2float(f_yaw, &yaw);
-  
-    // Convert + to X. 181 / 256 = 0.70703125 ~= sqrt(2) / 2
-    s32 f_x_roll = (f_roll + f_pitch) * 181 / 256;
-    frac2float(f_x_roll, &x_roll);
-    s32 f_x_pitch = (f_pitch - f_roll) * 181 / 256;
-    frac2float(f_x_pitch, &x_pitch);
+    f_yaw = - Channels[3] * FRAC_SCALE / (10000 / 400);
+    frac2float(f_yaw, &cpkt.yaw);
 
-    int bufptr = 0;
-    buf[bufptr++] = 0x30; // Commander packet to channel 0
-    memcpy(&buf[bufptr], (char*) &x_roll, 4); bufptr += 4;
-    memcpy(&buf[bufptr], (char*) &x_pitch, 4); bufptr += 4;
-    memcpy(&buf[bufptr], (char*) &yaw, 4); bufptr += 4;
-    memcpy(&buf[bufptr], (char*) &thrust, 2); bufptr += 2;
+    // Switch on/off?
+    if(Channels[4] >= 0)
+    {
+      frac2float(f_roll, &cpkt.roll);
+      frac2float(f_pitch, &cpkt.pitch);
+    }
+    else
+    {
+      // Rotate 45 degrees going from X to + mode or opposite.
+      // 181 / 256 = 0.70703125 ~= sqrt(2) / 2
+      s32 f_x_roll = (f_roll + f_pitch) * 181 / 256;
+      frac2float(f_x_roll, &cpkt.roll);
+      s32 f_x_pitch = (f_pitch - f_roll) * 181 / 256;
+      frac2float(f_x_pitch, &cpkt.pitch);
+    }
 
+    // Construct packet
+    buf[0] = 0x30; // Commander packet to channel 0
+    memcpy(&buf[1], (char*) &cpkt, sizeof(cpkt));
 
     // clear packet status bits and TX FIFO
     NRF24L01_WriteReg(NRF24L01_07_STATUS, (BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT)));
@@ -275,7 +298,7 @@ static void send_cmd_packet()
                Channels[0], Channels[1], Channels[2], Channels[3],
                Channels[4], Channels[5], Channels[6], Channels[7]);
         dbgprintf("Roll %d, pitch %d, yaw %d, thrust %d\n",
-               (int) f_x_roll*100/FRAC_SCALE, (int) f_x_pitch*100/FRAC_SCALE, (int) f_yaw*100/FRAC_SCALE, (int) thrust);
+               (int) f_roll*100/FRAC_SCALE, (int) f_pitch*100/FRAC_SCALE, (int) f_yaw*100/FRAC_SCALE, (int) thrust);
 
     }
 }
@@ -488,8 +511,8 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
             return 0;
         case PROTOCMD_CHECK_AUTOBIND: return (void *)0L; // never Autobind // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 4L; // A, E, T, R
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)4L;
+        case PROTOCMD_NUMCHAN: return (void *) 5L; // A, E, T, R, + or x mode,
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)5L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
 #ifdef CFLIE_TELEMETRY
         case PROTOCMD_GETOPTIONS: return cflie_opts;
@@ -503,4 +526,3 @@ const void *CFlie_Cmds(enum ProtoCmds cmd)
     return 0;
 }
 #endif
-
