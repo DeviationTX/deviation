@@ -439,28 +439,15 @@ static void _navigate_pages(s8 direction)
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
-            TELEMETRY_MuteAlarm();
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_Pop();
-        } else if (current_page != telemetry_off) {
-            // this indicates whether telem is off or not supported
-            if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-                _navigate_pages(1);
-            } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-                _navigate_pages(-1);
-            } else {
-                return 0;
-            }
+    if (current_page != telemetry_off && (CHAN_ButtonIsPressed(button, BUT_RIGHT) || CHAN_ButtonIsPressed(button, BUT_LEFT))) {
+        if (flags & BUTTON_RELEASE) {
+            _navigate_pages(CHAN_ButtonIsPressed(button, BUT_RIGHT) ? 1 : -1);
         }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+        return 1;
     }
-    return 1;
+    if (flags & BUTTON_PRESS && (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))) {
+        TELEMETRY_MuteAlarm();
+    }
+    return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_TELEMETRY
