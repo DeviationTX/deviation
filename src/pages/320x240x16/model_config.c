@@ -45,10 +45,10 @@ enum {
     ROW1 = (40 + ((LCD_HEIGHT - 240) / 2)),
 };
 
-void MODELPAGE_Config()
+void PAGE_ModelConfigInit(int page)
 {
-    PAGE_SetModal(1);
-    show_titlerow(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
+    (void)page;
+    PAGE_ShowHeader(Model.type == 0 ? _tr("Helicopter") : _tr("Airplane"));
     if (Model.type == 0) {
         u8 i = ROW1;
         GUI_CreateLabel(&gui->swashlbl, COL1, i, NULL, DEFAULT_FONT, _tr("SwashType"));
@@ -74,10 +74,10 @@ void MODELPAGE_Config()
     }
 }
 
-void MODELPROTO_Config()
+void PAGE_ModelProtoInit(int page)
 {
-    PAGE_SetModal(1);
-    show_titlerow(ProtocolNames[Model.protocol]);
+    (void)page;
+    PAGE_ShowHeader(ProtocolNames[Model.protocol]);
     proto_strs = PROTOCOL_GetOptions();
     int row = ROW1;
     int pos = 0;
@@ -95,11 +95,11 @@ void MODELPROTO_Config()
     }
 }
 
-void MODELTRAIN_Config()
+void PAGE_TrainConfigInit(int page)
 {
-    PAGE_SetModal(1);
+    (void)page;
     int mode = PPMin_Mode();
-    show_titlerow(mode == PPM_IN_TRAIN1
+    PAGE_ShowHeader(mode == PPM_IN_TRAIN1
                   ? _tr("Trainer Cfg (Channel)")
                   : mode == PPM_IN_TRAIN2
                     ? _tr("Trainer Cfg (Stick)")

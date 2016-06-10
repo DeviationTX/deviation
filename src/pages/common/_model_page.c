@@ -161,8 +161,7 @@ void type_press_cb(guiObject_t *obj, void *data)
     (void)data;
     (void)obj;
     if(Model.type == 0) {
-        PAGE_RemoveAllObjects();
-        MODELPAGE_Config();
+        PAGE_PushByID(PAGEID_TYPECFG, 0);
     }
 }
 static const char *numchanselect_cb(guiObject_t *obj, int dir, void *data)
@@ -233,8 +232,7 @@ void ppmin_press_cb(guiObject_t *obj, void *data)
 {
     (void)data;
     (void)obj;
-    PAGE_RemoveAllObjects();
-    MODELTRAIN_Config();
+    PAGE_PushByID(PAGEID_TRAINCFG, 0);
     return;
 }
 
@@ -284,8 +282,7 @@ void proto_press_cb(guiObject_t *obj, void *data)
     (void)data;
     (void)obj;
     if(PROTOCOL_GetOptions()) {
-        PAGE_RemoveAllObjects();
-        MODELPROTO_Config();
+        PAGE_PushByID(PAGEID_PROTOCFG, 0);
     }
 }
 static const char *file_val_cb(guiObject_t *obj, int dir, void *data)
@@ -330,8 +327,7 @@ static void video_settings_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    PAGE_RemoveAllObjects();
-    MODELVIDEO_Config();
+    PAGE_PushByID(PAGEID_VIDEOCFG, 0);
 }
 #endif //HAS_VIDEO
 
