@@ -82,11 +82,9 @@ void CHAN_Init()
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG, GPIO4);
 
     /* configure switches for digital I/O */
-    if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
-      gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                     GPIO10 | GPIO11);
-      gpio_set(GPIOC, GPIO10 | GPIO11);
-    }
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+                   GPIO10 | GPIO11);
+    gpio_set(GPIOC, GPIO10 | GPIO11);
 }
 
 s32 CHAN_ReadRawInput(int channel)
@@ -134,8 +132,8 @@ s32 CHAN_ReadRawInput(int channel)
       case INP_AILERON:   value = adc_array_raw[1]; break;  // bug fix: right horizon
       case INP_RUDDER: value = adc_array_raw[2]; break;  // bug fix: left horizon
       case INP_ELEVATOR:  value = adc_array_raw[3]; break;  // bug fix: left vertical
-      case INP_AUX4: value = adc_array_raw[4]; break;  // bug fix: left horizon
-      case INP_AUX5:  value = adc_array_raw[5]; break;  // bug fix: left vertical
+      case INP_AUX4: value = adc_array_raw[4]; break;
+      case INP_AUX5:  value = adc_array_raw[5]; break;
     }
     return value;
 }
