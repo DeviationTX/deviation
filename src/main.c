@@ -67,7 +67,10 @@ int main() {
     LCD_SetFont(DEFAULT_FONT.font);
     LCD_SetFontColor(DEFAULT_FONT.font_color);
 
+#if !HAS_EXTENDED_AUDIO
+    // If Extended Audio is present, move startup msg to Splash page to allow additional audio hardware initialization time
     MUSIC_Play(MUSIC_STARTUP);
+#endif
     GUI_HandleButtons(1);
 
     MIXER_Init();

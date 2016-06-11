@@ -17,6 +17,9 @@
 #include "model.h"
 #include "telemetry.h"
 #include "tx.h"
+#if HAS_EXTENDED_AUDIO
+#include "alertcfg.h"
+#endif
 #include <stdlib.h>
 #include <string.h>
 extern const u8 EATRG[PROTO_MAP_LEN];
@@ -1314,7 +1317,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
     Transmitter.current_model = model_num;
     clear_model(1);
 
-    char file[20];
+    char file[30];
     auto_map = 0;
     get_model_file(file, model_num);
     if (CONFIG_IniParse(file, ini_handler, &Model)) {
@@ -1322,6 +1325,11 @@ u8 CONFIG_ReadModel(u8 model_num) {
     }
     if (! ELEM_USED(Model.pagecfg2.elem[0]))
         CONFIG_ReadLayout("layout/default.ini");
+#if HAS_EXTENDED_AUDIO
+    file[strlen(file)-4] = '\0';
+    strcat(file, ".map");
+    CONFIG_AlertParse(file, Model.switch_music_no);
+#endif
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;
     MIXER_SetMixers(NULL, 0);

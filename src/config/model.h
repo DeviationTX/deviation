@@ -64,6 +64,9 @@ struct Model {
 #if HAS_DATALOG
     struct datalog datalog;
 #endif
+#if HAS_EXTENDED_AUDIO
+    u16 switch_music_no[NUM_INPUTS - INP_HAS_CALIBRATION];	//Switch array to point to music file number, no pots
+#endif
 };
 extern struct Model Model;
 extern const char * const RADIO_TX_POWER_VAL[TXPOWER_LAST];

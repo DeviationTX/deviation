@@ -109,6 +109,9 @@ void MUSIC_Play(enum Music music)
     /* Try and play via extended audio. Return if it plays something */
     if (AUDIO_Play(music))
        return ;
+    /* Do nothing if Switch feedback audio is not defined */
+    if (music > MUSIC_TOTAL)
+       return ;
     #endif
 
     /* NOTE: We need to do all this even if volume is zero, because

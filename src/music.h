@@ -21,6 +21,7 @@ enum Music {
     MUSIC_TELEMALARM4,
     MUSIC_TELEMALARM5,
     MUSIC_TELEMALARM6,
+    MUSIC_TOTAL,	// Indicate total number of system music entries
 };
 
 enum AudioPlayers {

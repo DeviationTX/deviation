@@ -321,5 +321,14 @@ void INPUT_CheckChanges(void) {
     }
     if (changed_input != INP_NONE) {
         GUI_HandleInput(changed_input, changed_input <= INP_HAS_CALIBRATION ? changed_analog_value : CHAN_MAX_VALUE);
+#if HAS_EXTENDED_AUDIO
+	s8 switch_idx = changed_input - INP_HAS_CALIBRATION - 1;
+
+	/* Skip pots */
+	if (switch_idx >= 0)
+	// Play music file if the switch has a voice file number defined
+        if (Model.switch_music_no[switch_idx])
+		MUSIC_Play(Model.switch_music_no[switch_idx]);
+#endif
     }
 }

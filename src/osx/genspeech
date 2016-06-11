@@ -1,0 +1,42 @@
+#!/bin/bash
+
+FILENUM=1
+IDX=100
+TMPFILE="/tmp/speechidx.tmp"
+cp /dev/null $TMPFILE
+SPEECHDIR="mp3"
+mkdir $SPEECHDIR 2>/dev/null
+
+
+for INFILE in models/model*Alert.txt
+do
+	echo "Processing file $INFILE..."
+	OUTFILE=`echo $INFILE | sed -e 's/Alert\.txt/\.map/'`
+	rm $OUTFILE 2>/dev/null
+	
+	while read LINE
+	do
+		SWITCH=`echo $LINE | cut -d':' -f1`
+		SWITCH=`echo $SWITCH | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		MSG=`echo $LINE | cut -d':' -f2`
+		MSG=`echo $MSG | sed -e 's/^ *//;s/ *$//' | tr [a-z] [A-Z]`
+		R=`grep "@${MSG}@" $TMPFILE`
+		if [ $? != 0 ]
+		then
+			IDXTEXT=`printf '%04d' $IDX`
+			echo "${SWITCH}:${IDXTEXT}" >> $OUTFILE
+			say -o ${SPEECHDIR}/${IDXTEXT}.aiff $MSG
+			command -v lame >/dev/null 2>&1
+			if [ $? = 0 ]
+			then
+				lame --quiet ${SPEECHDIR}/${IDXTEXT}.aiff ${SPEECHDIR}/${IDXTEXT}.mp3
+				rm ${SPEECHDIR}/${IDXTEXT}.aiff
+			fi
+			echo "@${MSG}@:${IDXTEXT}" >> $TMPFILE
+			IDX=`expr $IDX + 1`
+		else
+			echo "${SWITCH}:`echo $R|cut -d':' -f2`" >> $OUTFILE
+		fi
+	done < $INFILE
+done
+rm $TMPFILE
