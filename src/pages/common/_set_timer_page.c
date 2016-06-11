@@ -28,9 +28,13 @@ static struct permanent_timer { u8 index; u8 second, minute, hour; u32 oldvalue;
 
 void PAGE_SetTimerInit(int index)
 {
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     _show_settimer_page(index);
+}
+
+void PAGE_SetTimerExit()
+{
+    TIMER_SetValue(permanent.index, permanent.newvalue);
+    Model.timer[permanent.index].val = permanent.newvalue;
 }
 
 const char * timer_value_str_cb(guiObject_t *obj, const void *data)
