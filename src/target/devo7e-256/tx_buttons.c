@@ -32,8 +32,8 @@
 #define SWITCH_2x2  ((1 << INP_SWE0) | (1 << INP_SWE1) \
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
 #define SWITCH_2x1  ((1 << INP_SWE0) | (1 << INP_SWE1))
-#define SWITCH_NONE ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
-                   | (1 << INP_FMOD0) | (1 << INP_FMOD1))
+#define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
+                    | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
 enum {
   SW_A0 = 23,
@@ -118,17 +118,17 @@ u32 ScanButtons()
             idx++;
         }
     }
-    if (((~Transmitter.ignore_src && SWITCH_NONE) != SWITCH_NONE) && ((~Transmitter.ignore_src && SWITCH_3x3) != SWITCH_3x3)) {
+    if ((((~Transmitter.ignore_src & SWITCH_2x2) == SWITCH_2x2) || ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1)) && ((~Transmitter.ignore_src & SWITCH_3x3) != SWITCH_3x3)) {
         //Write to C.6, read B
-        if (result == 0) {
+        if (!(result & 0xFFFF)) {
             gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
             gpio_clear(GPIOC, GPIO6);
             u32 port = gpio_port_read(GPIOB);
             gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
             gpio_set(GPIOC, GPIO6);
-            if ((~Transmitter.ignore_src && SWITCH_3x1) == SWITCH_3x1) {
+            if (((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1) && ((~Transmitter.ignore_src & SWITCH_3x2) != SWITCH_3x2)) {
                 global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
-            } else if ((~Transmitter.ignore_src && SWITCH_2x2) == SWITCH_2x2) {
+            } else if ((~Transmitter.ignore_src & SWITCH_2x2) == SWITCH_2x2) {
                 global_extra_switches  = (port>>6)&0x05;
             } else {
                 global_extra_switches  = (~(port>>5))&0xf;
