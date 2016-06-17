@@ -31,6 +31,14 @@ enum AudioPlayers {
   AUDIO_LAST
 };
 
+enum AudioDevices {
+    AUDDEV_UNDEF = 0,	// Undefined (Use EXTAUDIO if extended-audio is enabled, otherwise use BUZZER)
+    AUDDEV_ALL,
+    AUDDEV_BUZZER,
+    AUDDEV_EXTAUDIO,
+    AUDDEV_LAST
+};
+
 #if HAS_EXTENDED_AUDIO
 int AUDIO_Play(enum Music music);
 #endif

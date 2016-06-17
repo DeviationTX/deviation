@@ -38,9 +38,10 @@
 #ifdef NO_SOUND
 void SOUND_SetFrequency(unsigned freq, unsigned volume) {(void)freq; (void)volume;}
 void SOUND_Init() {}
-void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)(), u8 vibrate) {
     (void)msec;
     (void)next_note_cb;
+    (void)vibrate;
     printf("beep\n");
 }
 void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)()) {
@@ -145,10 +146,11 @@ void SOUND_Init()
 
 void SOUND_StartWithoutVibrating(unsigned msec, u16(*next_note_cb)())
 {
-    SOUND_Start(msec, next_note_cb);
+    SOUND_Start(msec, next_note_cb, 0);
 }
 
-void SOUND_Start(unsigned msec, u16(*next_note_cb)()) {
+void SOUND_Start(unsigned msec, u16(*next_note_cb)(), u8 vibrate) {
+    (void)vibrate;
     PaError err;
     if (! paData.enable)
         return;
