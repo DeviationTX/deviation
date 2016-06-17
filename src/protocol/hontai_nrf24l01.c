@@ -342,7 +342,7 @@ static u16 ht_callback()
 {
     switch (phase) {
     case HonTai_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = HonTai_BIND2;
         break;
 

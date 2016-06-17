@@ -407,7 +407,7 @@ static u16 yd717_callback()
     case YD717_INIT1:
         send_packet(0);      // receiver doesn't re-enter bind mode if connection lost...check if already bound
         phase = YD717_BIND3;
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         break;
 
     case YD717_BIND2:

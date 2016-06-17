@@ -485,7 +485,7 @@ static u16 v202_callback()
     switch (phase) {
     case V202_INIT2:
         V202_init2();
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
 //        phase = V202_BIND1;
         phase = V202_BIND2;
         return 150;

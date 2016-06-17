@@ -258,7 +258,7 @@ static u16 bay_callback()
 {
     switch (phase) {
     case Bayang_INIT1:
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = Bayang_BIND2;
         break;
 

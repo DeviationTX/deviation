@@ -76,14 +76,16 @@ static const char *const sections[] = {
 static int ini_handler(void* user, const char* section, const char* name, const char* value)
 {
     u16 i;
+    u8 vol;
     const char *requested_sec = (const char *)user;
     if (strcasecmp(section, requested_sec) == 0) {
         if (strcasecmp("volume", name) == 0) {
-            Volume = atoi(value);
-            if (Volume > 100)
-                Volume = 100;
+            vol = atoi(value);
+            if (vol > 100)
+                vol = 100;
             // The music volume should be controlled by TX volume setting as well as sound.ini
-            Volume = Transmitter.volume * Volume/10; // = Transmitter.volume * 10 * sound_volume/100;
+            if (Volume)
+                Volume = Transmitter.volume * vol/10;	// Keep quiet if volume has been silenced previously
         }
         for(i = 0; i < NUM_NOTES; i++) {
             if(strcasecmp(note_map[i].str, name) == 0) {
@@ -105,10 +107,12 @@ u16 next_note_cb() {
 
 void MUSIC_Play(enum Music music)
 {
+    int music_played = 0;
+
     #if HAS_EXTENDED_AUDIO
-    /* Try and play via extended audio. Return if it plays something */
-    if (AUDIO_Play(music))
-       return ;
+    /* Try and play via extended audio. Still need to proceed for the haptic sensor */
+    music_played = AUDIO_Play(music);
+
     /* Do nothing if Switch feedback audio is not defined */
     if (music > MUSIC_TOTAL)
        return ;
@@ -118,7 +122,10 @@ void MUSIC_Play(enum Music music)
        the haptic sensor may be enabled */
     num_notes = 0;
     next_note = 1;
-    Volume = Transmitter.volume * 10;
+    if (music_played)
+        Volume = 0;	// Just activate the haptic sensor, no buzzer
+    else
+        Volume = Transmitter.volume * 10;
     char filename[] = "media/sound.ini\0\0\0"; // placeholder for longer folder name
     #ifdef _DEVO12_TARGET_H_
     static u8 checked;

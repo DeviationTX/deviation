@@ -340,7 +340,7 @@ static u16 SLT_callback()
     switch (phase) {
     case SLT_INIT2:
         SLT_init2();
-        MUSIC_Play(MUSIC_TELEMALARM1);
+        // MUSIC_Play(MUSIC_TELEMALARM1);	// Shouldn't play telemetry alarm doing bind init
         phase = SLT_BIND;
         delay_us = 150;
         break;

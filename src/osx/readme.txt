@@ -13,7 +13,7 @@ Usage:
    Description: The 1st field is the Switch name, followed by a colon.  Then the message to be spoken.
 
 2. Place all the Switch to Alert Message files under "models" directory.  There are 2 sample Alert Message files
-   provided in the "models" directory.  You can remove them before playing your own files.
+   provided in the "models" directory.  You can remove them before placing your own files.
 
 3. Run "genspeech" and it will generate a mapping file for each Switch to Alert Message file, such as
    model1.map, model2.map, etc.  The mapping file contains the mapping of Switches and their corresponding
@@ -24,8 +24,8 @@ Usage:
             HOLD1:0102
             HOLD0:0103
 
-4. All the mapping files above will need to be copied to your Transmitter under model directory.
+4. All the mapping files above will need to be copied to your Transmitter under "models" directory.
 
-5. A new directory of named "mp3" will also be generated with various voice files in it.  These voice files will
+5. A new directory named "mp3" will also be generated with various voice files in it.  These voice files will
    need to be moved to your DFPlayer Mini or other hardware players.
 
