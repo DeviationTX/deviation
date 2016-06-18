@@ -72,6 +72,7 @@ struct Transmitter {
     struct TouchCalibration touch;
     struct AutoDimmer auto_dimmer;
     struct CountDownTimerSettings countdown_timer_settings;
+    u8 module_swap_control;
 };
 
 extern struct Transmitter Transmitter;

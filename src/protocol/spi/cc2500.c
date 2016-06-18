@@ -96,15 +96,22 @@ void CC2500_WriteData(u8 *dpbuffer, u8 len)
 
 void CC2500_SetTxRxMode(enum TXRX_State mode)
 {
+    int R0 = CC2500_02_IOCFG0;
+    int R2 = CC2500_00_IOCFG2;
+    if (Transmitter.module_swap_control && (1 << CC2500)) {
+      R0 = CC2500_00_IOCFG2;
+      R2 = CC2500_02_IOCFG0;
+    }
+
     if(mode == TX_EN) {
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F | 0x40);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
+        CC2500_WriteReg(R0, 0x2F | 0x40);
+        CC2500_WriteReg(R2, 0x2F);
     } else if (mode == RX_EN) {
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F | 0x40);
+        CC2500_WriteReg(R0, 0x2F);
+        CC2500_WriteReg(R2, 0x2F | 0x40);
     } else {
-        CC2500_WriteReg(CC2500_02_IOCFG0, 0x2F);
-        CC2500_WriteReg(CC2500_00_IOCFG2, 0x2F);
+        CC2500_WriteReg(R0, 0x2F);
+        CC2500_WriteReg(R2, 0x2F);
     }
 }
 
