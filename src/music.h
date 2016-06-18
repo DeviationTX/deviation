@@ -40,6 +40,19 @@ enum AudioDevices {
 };
 
 #if HAS_EXTENDED_AUDIO
+#define NUM_STICKS	4
+#define NUM_AUX_KNOBS	(INP_HAS_CALIBRATION - NUM_STICKS)	// Exclude sticks
+
+struct AuxMusic {
+    u16 up_state_music;              // Music to be played when Aux turns up
+    u16 down_state_music;            // Music to be played when Aux turns down
+};
+
+struct ButtonMusic {
+    u16 on_state_music;             // Music to be played when button is On
+    u16 off_state_music;            // Music to be played when button is Off
+};
+
 int AUDIO_Play(enum Music music);
 #endif
 

@@ -3,14 +3,32 @@ the aiff speech files.  Then, it will use "lame" (if installed) to convert aiff 
 If you don't have lame installed, you'll need to convert the aiff files to mp3 format by yourself.
 
 Usage:
-1. For each model file, you can optionally provide a Switch to Alert Message file.  For example,
+1. For each model file, you can optionally provide a Switch/Trim Button/Auxillary Knob to Alert Message file.  For example,
    File: Model1Alert.txt
    Content: FMODE0:		Acro Mode
             FMODE1:		Angle Mode
             HOLD1:		GPS Hold Activated
             HOLD0:		GPS Hold Deactivated
+            TRIMLV+:		Beeper On
+            TRIMLV-:		Beeper Off
+            TRIMLH+:		Taking Photo
+            TRIMRV+_ON:		Lights On
+            TRIMRV+_OFF:	Lights Off
+            AUX4_UP:		Camera Up
+            AUX4_DOWN:		Camera Down
 
-   Description: The 1st field is the Switch name, followed by a colon.  Then the message to be spoken.
+   Description: The 1st field is the Switch, Trim Button or Auxillary Knob, followed by a colon.
+                Then the message to be spoken.
+                Switch: Switch name following by its postion, such as FMODE0, FMODE1, SW B0, etc.
+                Trim Button: When trim buttons are used as virtual switches, they can also have voice feedback.
+                             Trim buttons as ON/OFF switches, Momentary switches & Toggles switches are all
+                             supported.  When used as ON/OFF switches, use only the Trim button name, such as
+                             TRIMLV+, TRIMLV-, etc.  When used as Momentary switches or Toggles switches, each
+                             Trim button can have 2 states, indicated by suffix "_ON" & "_OFF".  Example,
+                             TRIMRV+_ON & TRIMRV+_OFF representing its toggle on/off or momentary on/off states.
+                Auxillary Knob: Auxillary knob name followed by its controlling direction, "_UP" or "_DOWN"
+                                (turning up or down).  For example, AUX4_UP indicating knob has been turned up;
+                                and AUX4_DOWN indicating knob has been turned down.
 
 2. Place all the Switch to Alert Message files under "models" directory.  There are 2 sample Alert Message files
    provided in the "models" directory.  You can remove them before placing your own files.

@@ -660,6 +660,25 @@ void MIXER_InitMixer(struct Mixer *mixer, unsigned ch)
         mixer->curve.points[i] = 0;
 }
 
+#if HAS_EXTENDED_AUDIO
+static void _trim_music_play(int trim_idx, int is_neg, int on_state)
+{
+    int button_idx;
+
+    if (is_neg)
+        button_idx = Model.trims[trim_idx].neg - 1;
+    else
+        button_idx = Model.trims[trim_idx].pos - 1;
+    if (on_state) {
+        if (Model.button_music_no[button_idx].on_state_music)
+            MUSIC_Play(Model.button_music_no[button_idx].on_state_music);
+    } else {
+        if (Model.button_music_no[button_idx].off_state_music)
+            MUSIC_Play(Model.button_music_no[button_idx].off_state_music);
+    }
+}
+#endif
+
 static void _trim_as_switch(unsigned flags, int i, int is_neg)
 {
     s8 *value = MIXER_GetTrim(i);
@@ -667,16 +686,28 @@ static void _trim_as_switch(unsigned flags, int i, int is_neg)
         //Momentarty
         if (flags & BUTTON_PRESS) {
             *value = 100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 1);
+#endif
         } else if (flags & BUTTON_RELEASE) {
             *value = -100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 0);
+#endif
         }
     } else if (flags & BUTTON_PRESS) {
         if (Model.trims[i].step == TRIM_ONOFF) {
             //On/Off
             *value = is_neg ? -100 : 100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, 1);
+#endif
         } else {
             //Toggle
             *value = *value == -100 ? 100 : -100;
+#if HAS_EXTENDED_AUDIO
+            _trim_music_play(i, is_neg, *value == -100 ? 0 : 1);
+#endif
         }
     }
 }

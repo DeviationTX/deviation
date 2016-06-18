@@ -1328,7 +1328,7 @@ u8 CONFIG_ReadModel(u8 model_num) {
 #if HAS_EXTENDED_AUDIO
     file[strlen(file)-4] = '\0';
     strcat(file, ".map");
-    CONFIG_AlertParse(file, Model.switch_music_no);
+    CONFIG_AlertParse(file);
 #endif
     if(! PROTOCOL_HasPowerAmp(Model.protocol))
         Model.tx_power = TXPOWER_150mW;

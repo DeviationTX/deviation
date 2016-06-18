@@ -16,19 +16,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include "common.h"
+#include "model.h"
 
 #define MAX_LINE 80
 #define MAX_NAME 50
 
 #if HAS_EXTENDED_AUDIO
-void CONFIG_AlertParse(const char* filename, u16 *switch_music_no)
+void CONFIG_AlertParse(const char* filename)
 {
     FILE *file;
     char *pt;
     int textlen;
     int val;
     char line[MAX_LINE];
-    char switch_name[MAX_NAME];
+    char name[MAX_NAME];
+    const char *button_name;
 
     file = fopen(filename, "r");
     if (!file) {
@@ -63,13 +65,45 @@ void CONFIG_AlertParse(const char* filename, u16 *switch_music_no)
             if (*pt == '\0')
                 continue;
             val = atoi(pt);
-	    for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
-                INPUT_SourceName(switch_name, i);
-		if (!strcmp(switch_name, line)) {
-                    switch_music_no[i - INP_HAS_CALIBRATION - 1] = val;
+            for (int i = INP_HAS_CALIBRATION+1; i <= NUM_INPUTS; i++) {
+                INPUT_SourceName(name, i);
+                if (!strcmp(name, line)) {
+                    Model.switch_music_no[i - INP_HAS_CALIBRATION - 1] = val;
                     break;
                 }
             }
+            for (int i = 1; i <= NUM_TX_BUTTONS; i++) {
+                button_name = INPUT_ButtonName(i);
+                strcpy(name, button_name);
+                strcat(name, "_ON");
+                // Button name alone or with suffix "_ON" will be considered the same
+                if (!strcmp(button_name, line) || !strcmp(name, line)) {
+                    Model.button_music_no[i-1].on_state_music = val;
+                    break;
+                }
+                strcpy(name, button_name);
+                strcat(name, "_OFF");
+                if (!strcmp(name, line)) {
+                    Model.button_music_no[i-1].off_state_music = val;
+                    break;
+                }
+            }
+#if NUM_AUX_KNOBS
+            for (int i = NUM_STICKS+1; i <= NUM_STICKS + NUM_AUX_KNOBS; i++) {
+                INPUT_SourceName(name, i);
+                strcat(name, "_UP");
+                if (!strcmp(name, line)) {
+                    Model.aux_music_no[i - (NUM_STICKS+1)].up_state_music = val;
+                    break;
+                }
+                INPUT_SourceName(name, i);
+                strcat(name, "_DOWN");
+                if (!strcmp(name, line)) {
+                    Model.aux_music_no[i - (NUM_STICKS+1)].down_state_music = val;
+                    break;
+                }
+            }
+#endif
         }
     }
     fclose(file);
