@@ -109,7 +109,6 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                return 1;
             }
         }
- 
     }
     return 0;
 }
