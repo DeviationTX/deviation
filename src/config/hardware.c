@@ -31,6 +31,7 @@ const char HAPTIC_ENABLE[] = "enable-haptic";
 static const char SECTION_MODULES[] = "modules";
 static const char MODULE_ENABLE_PIN[] = "enable";
 static const char MODULE_HAS_PA[] = "has_pa";
+static const char MODULE_SWAP_CONTROL[] = "swap_control";
 const char * const MODULE_NAME[TX_MODULE_LAST] = {
       [CYRF6936] = "CYRF6936",
       [A7105]    = "A7105",
