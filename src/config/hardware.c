@@ -100,6 +100,15 @@ static int ini_handler(void* user, const char* section, const char* name, const 
                return 1;
             }
         }
+        if(MATCH_START(name, MODULE_SWAP_CONTROL)) {
+            int pin = get_module_index(name+sizeof(MODULE_SWAP_CONTROL));
+            if(pin >= 0) {
+               int v = value_int ? 1 : 0;
+               Transmitter.module_swap_control = (Transmitter.module_swap_control & ~(1 << pin)) | (v << pin);
+               return 1;
+            }
+        }
+ 
     }
     return 0;
 }
