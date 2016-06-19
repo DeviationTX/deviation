@@ -1,6 +1,7 @@
-The genspeech utility needs to be run under OSX.  It will use OSX text-to-speech command "say" to generate
-the aiff speech files.  Then, it will use "lame" (if installed) to convert aiff files to mp3 format.
-If you don't have lame installed, you'll need to convert the aiff files to mp3 format by yourself.
+The genspeech utility needs to be run under OSX or linux.  On OSX, it will use text-to-speech command "say"
+to generate the aiff speech files.  On Linux, it will use text-to-speech command espeak to generate wave
+speech files.  Then, it will use "lame" to convert aiff or wave files to mp3 format.  Please make sure
+you've installed these command line utilities onto your system.
 
 Usage:
 1. For each model file, you can optionally provide a Switch/Trim Button/Auxillary Knob to Alert Message file.  For example,
