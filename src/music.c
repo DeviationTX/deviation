@@ -68,6 +68,7 @@ static const char *const sections[] = {
     "telem_alarm4",
     "telem_alarm5",
     "telem_alarm6",
+    "inactivity_alarm",
 };
 
 #if HAS_EXTENDED_AUDIO
