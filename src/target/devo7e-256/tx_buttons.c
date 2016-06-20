@@ -19,6 +19,11 @@
 
 //Duplicated in channels.c
 #define IGNORE_MASK ((1 << INP_AILERON) | (1 << INP_ELEVATOR) | (1 << INP_THROTTLE) | (1 << INP_RUDDER) | (1 << INP_NONE) | (1 << INP_LAST))
+#define SWITCH_3x5  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) | (1 << INP_SWD2) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) | (1 << INP_SWE2))
 #define SWITCH_3x4  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2) \
                    | (1 << INP_SWC0) | (1 << INP_SWC1) | (1 << INP_SWC2) \
@@ -29,23 +34,56 @@
 #define SWITCH_3x2  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2) \
                    | (1 << INP_SWB0) | (1 << INP_SWB1) | (1 << INP_SWB2))
 #define SWITCH_3x1  ((1 << INP_SWA0) | (1 << INP_SWA1) | (1 << INP_SWA2))
-#define SWITCH_2x2  ((1 << INP_SWE0) | (1 << INP_SWE1) \
+#define SWITCH_2x8  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1) \
+                   | (1 << INP_SWA0) | (1 << INP_SWA1))
+#define SWITCH_2x7  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1) \
+                   | (1 << INP_SWB0) | (1 << INP_SWB1))
+#define SWITCH_2x6  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1) \
+                   | (1 << INP_SWC0) | (1 << INP_SWC1))
+#define SWITCH_2x5  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1) \
+                   | (1 << INP_SWD0) | (1 << INP_SWD1))
+#define SWITCH_2x4  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
+                   | (1 << INP_SWF0) | (1 << INP_SWF1) \
+                   | (1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_2x3  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1) \
                    | (1 << INP_SWF0) | (1 << INP_SWF1))
-#define SWITCH_2x1  ((1 << INP_SWE0) | (1 << INP_SWE1))
+#define SWITCH_2x2  ((1 << INP_SWH0) | (1 << INP_SWH1) \
+                   | (1 << INP_SWG0) | (1 << INP_SWG1))
+#define SWITCH_2x1  ((1 << INP_SWH0) | (1 << INP_SWH1))
 #define SWITCH_STOCK ((1 << INP_HOLD0) | (1 << INP_HOLD1) \
                     | (1 << INP_FMOD0) | (1 << INP_FMOD1))
 
 enum {
-  SW_A0 = 23,
-  SW_A2,
-  SW_B0,
-  SW_B2,
-  SW_C0,
-  SW_C2,
-  SW_D0,
-  SW_D2,
-  SW_E0,
-  SW_F0
+  SW_01 = 23,
+  SW_02,
+  SW_03,
+  SW_04,
+  SW_05,
+  SW_06,
+  SW_07,
+  SW_08,
+  SW_09,
+  SW_10
 };
 
 u32 global_extra_switches = 0;
@@ -53,10 +91,10 @@ static const u16 columns[] = {GPIO5, GPIO6, GPIO7, GPIO8, 0xffff};
 static const u16 rows[] = {GPIO6, GPIO7, GPIO8, GPIO9, GPIO10, GPIO11, 0xffff};
 static const u8 buttonmap[] = {
 //         C.6              C.7              C.8              C.9              C.10   C.11
-/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SW_D0, SW_D2,
-/*B.6*/    SW_F0,           BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SW_C0, SW_C2,
-/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SW_A0, SW_A2,
-/*B.8*/    SW_E0,           BUT_DOWN,        BUT_UP,          BUT_EXIT,        SW_B0, SW_B2,
+/*B.5*/    BUT_TRIM_RH_POS, BUT_TRIM_RH_NEG, BUT_TRIM_RV_POS, BUT_TRIM_RV_NEG, SW_07, SW_08,
+/*B.6*/    SW_10,           BUT_ENTER,       BUT_RIGHT,       BUT_LEFT,        SW_05, SW_06,
+/*B.7*/    BUT_TRIM_LV_POS, BUT_TRIM_LV_NEG, BUT_TRIM_LH_NEG, BUT_TRIM_LH_POS, SW_01, SW_02,
+/*B.8*/    SW_09,           BUT_DOWN,        BUT_UP,          BUT_EXIT,        SW_03, SW_04,
     };
 
 // Extra switch connections
@@ -118,7 +156,7 @@ u32 ScanButtons()
             idx++;
         }
     }
-    if ((((~Transmitter.ignore_src & SWITCH_2x2) == SWITCH_2x2) || ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1)) && ((~Transmitter.ignore_src & SWITCH_3x3) != SWITCH_3x3)) {
+    if ((((~Transmitter.ignore_src & SWITCH_2x2) == (unsigned)SWITCH_2x2) || ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1)) && ((~Transmitter.ignore_src & SWITCH_STOCK) == SWITCH_STOCK)) {
         //Write to C.6, read B
         if (!(result & 0xFFFF)) {
             gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
@@ -128,14 +166,14 @@ u32 ScanButtons()
             gpio_set(GPIOC, GPIO6);
             if (((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1) && ((~Transmitter.ignore_src & SWITCH_3x2) != SWITCH_3x2)) {
                 global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
-            } else if ((~Transmitter.ignore_src & SWITCH_2x2) == SWITCH_2x2) {
+            } else if ((~Transmitter.ignore_src & SWITCH_2x2) == (unsigned)SWITCH_2x2) {
                 global_extra_switches  = (port>>6)&0x05;
             } else {
                 global_extra_switches  = (~(port>>5))&0xf;
             }
         }
     }
-    if (!(result & 0xFFFF) && ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3))
+    if (!(result & 0xFFFF) && ((~Transmitter.ignore_src & SWITCH_STOCK) != SWITCH_STOCK))
       global_extra_switches = result;
     return result & 0xFFFF;
 }
