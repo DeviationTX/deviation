@@ -99,7 +99,7 @@ void CC2500_SetTxRxMode(enum TXRX_State mode)
     // config-cc2500 = 0x01 for swapping GDO0 and GDO2.
     int R0 = CC2500_02_IOCFG0;
     int R2 = CC2500_00_IOCFG2;
-    if (Transmitter.module_config[CC2500] == 1) {
+    if (Transmitter.module_config[CC2500] == CC2500_REVERSE_GD02) {
       R0 = CC2500_00_IOCFG2;
       R2 = CC2500_02_IOCFG0;
     }
