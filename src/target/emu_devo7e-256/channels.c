@@ -75,68 +75,68 @@ s32 CHAN_ReadInput(int channel)
     s32 step = (CHAN_MAX_VALUE - CHAN_MIN_VALUE) / 10;
     if ((~Transmitter.ignore_src & SWITCH_STOCK) == SWITCH_STOCK) {
       switch(channel) {
-        case INP_HOLD0: return (gui.rud_dr % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_HOLD1: return (gui.rud_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_FMOD0: return (gui.gear % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_FMOD1: return (gui.gear % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_HOLD0: return (gui.gear % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_HOLD1: return (gui.gear % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_FMOD0: return (gui.rud_dr % 2) ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_FMOD1: return (gui.rud_dr % 2) ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWA0:  return (gui.ele_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWA1:  return (gui.ele_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWA2:  return (gui.ele_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWB0:  return (gui.ail_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWB1:  return (gui.ail_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         case INP_SWB2:  return (gui.ail_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_SWG0:  return (gui.hold % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_SWG1:  return (gui.hold % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-        case INP_SWH0:  return (gui.trn % 2)   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
-        case INP_SWH1:  return (gui.trn % 2)   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_SWG0:  return (gui.mix % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_SWG1:  return (gui.mix % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+        case INP_SWH0:  return (gui.fmod % 2)   ? CHAN_MIN_VALUE : CHAN_MAX_VALUE;
+        case INP_SWH1:  return (gui.fmod % 2)   ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
       }
     } else {
       if ((~Transmitter.ignore_src & SWITCH_3x1) == SWITCH_3x1) {
         switch(channel) {
-          case INP_SWA0:  return (gui.rud_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWA1:  return (gui.rud_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWA2:  return (gui.rud_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWA0:  return (gui.gear % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWA1:  return (gui.gear % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWA2:  return (gui.gear % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       } else if ((~Transmitter.ignore_src & SWITCH_2x8) == SWITCH_2x8) {
         switch(channel) {
-          case INP_SWA0:  return (gui.rud_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWA1:  return (gui.rud_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWA0:  return (gui.gear % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWA1:  return (gui.gear % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       }
       if ((~Transmitter.ignore_src & SWITCH_3x2) == SWITCH_3x2) {
         switch(channel) {
-          case INP_SWB0:  return (gui.ele_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWB1:  return (gui.ele_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWB2:  return (gui.ele_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWB0:  return (gui.rud_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWB1:  return (gui.rud_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWB2:  return (gui.rud_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       } else if ((~Transmitter.ignore_src & SWITCH_2x7) == SWITCH_2x7) {
         switch(channel) {
-          case INP_SWB0:  return (gui.ele_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWB1:  return (gui.ele_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWB0:  return (gui.rud_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWB1:  return (gui.rud_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       }
       if ((~Transmitter.ignore_src & SWITCH_3x3) == SWITCH_3x3) {
         switch(channel) {
-          case INP_SWC0:  return (gui.ail_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWC1:  return (gui.ail_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWC2:  return (gui.ail_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWC0:  return (gui.ele_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWC1:  return (gui.ele_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWC2:  return (gui.ele_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       } else if ((~Transmitter.ignore_src & SWITCH_2x6) == SWITCH_2x6) {
         switch(channel) {
-          case INP_SWC0:  return (gui.ail_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWC1:  return (gui.ail_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWC0:  return (gui.ele_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWC1:  return (gui.ele_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       }
       if ((~Transmitter.ignore_src & SWITCH_3x4) == SWITCH_3x4) {
         switch(channel) {
-          case INP_SWD0:  return (gui.gear % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWD1:  return (gui.gear % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWD2:  return (gui.gear % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWD0:  return (gui.ail_dr % 3) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWD1:  return (gui.ail_dr % 3) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWD2:  return (gui.ail_dr % 3) == 2 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       } else if ((~Transmitter.ignore_src & SWITCH_2x5) == SWITCH_2x5) {
         switch(channel) {
-          case INP_SWD0:  return (gui.gear % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
-          case INP_SWD1:  return (gui.gear % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWD0:  return (gui.ail_dr % 2) == 0 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
+          case INP_SWD1:  return (gui.ail_dr % 2) == 1 ? CHAN_MAX_VALUE : CHAN_MIN_VALUE;
         }
       }
       if ((~Transmitter.ignore_src & SWITCH_2x4) == SWITCH_2x4) {
