@@ -412,22 +412,11 @@ static void notify_cb(guiObject_t * obj)
 
 static unsigned action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            GUI_SelectionNotify(NULL);
-            PAGE_RemoveAllObjects();  // Discard unsaved items and exit to upper page
-            PAGE_MixerInit(mp->top_channel);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
-            // long press enter = save without exiting
-            PAGE_SaveMixerSetup(mp);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER)&& (flags & BUTTON_LONGPRESS)) {
+        PAGE_SaveMixerSetup(mp);
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 
 void MIXPAGE_RedrawGraphs()

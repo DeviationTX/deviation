@@ -28,7 +28,6 @@ enum {
     DL_SELECT,
     DL_SOURCE,
 };
-static u16 current_selected = 0;
 
 static void checkbut_press_cb(struct guiObject *obj, const void *data)
 {
@@ -69,13 +68,6 @@ static const char *select_cb(guiObject_t *obj, int dir, void *data)
     (void)data;
     seltype = GUI_TextSelectHelper(seltype, 0, 1, dir, 1, 1, NULL);
     return seltype ? _tr("All") : _tr("None");
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->col2[relrow].but;
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -137,39 +129,19 @@ static const char *remaining_str_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
 void PAGE_DatalogInit(int page)
 {
     (void)page;
     memset(gui, 0, sizeof(*gui));
     seltype = 0;
-    PAGE_SetActionCB(_action_cb);
     struct LabelDesc font = DEFAULT_FONT;
     font.style = LABEL_UNDERLINE;
     int count = DL_SOURCE + DLOG_LAST - (NUM_TELEM - TELEMETRY_GetNumTelemSrc()); //Remove unused telemetry
     GUI_CreateLabelBox(&gui->remaining, 0, 0,
         LCD_WIDTH-1, LINE_HEIGHT, &font, remaining_str_cb, NULL, NULL);
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, count, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+                         LINE_SPACE, count, row_cb, NULL, NULL, NULL);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
-void PAGE_DatalogExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-}
 #endif //HAS_DATLOG

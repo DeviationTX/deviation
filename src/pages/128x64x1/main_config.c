@@ -43,60 +43,33 @@ enum {
 static struct layout_page    * const lp  = &pagemem.u.layout_page;
 static struct PageCfg2       * const pc  = &Model.pagecfg2;
 static struct mainconfig_obj * const gui = &gui_objs.u.mainconfig;
+static u16 current_selected = 0;
+
 static const int HEADER_Y = 10;
 
 #include "../common/_main_config.c"
 
-static u16 current_selected = 0;
-
+#if HAS_LAYOUT_EDITOR
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
+#endif
 
 void PAGE_MainLayoutInit(int page)
 {
-    (void)page;
-    GUI_RemoveAllObjects();
 #if HAS_LAYOUT_EDITOR
     PAGE_ShowHeader(_tr("Layout: Long-Press ENT"));
-#else
-    PAGE_ShowHeader(_tr("Main page config"));
-#endif
     PAGE_SetActionCB(_action_cb);
+#else
+    PAGE_ShowHeader(_tr(PAGE_GetName(PAGEID_MAINCFG)));
+#endif
     memset(gui, 0, sizeof(*gui));
     memset(lp, 0, sizeof(*lp));
     show_config();
-}
-void PAGE_MainLayoutEvent()
-{
-}
-void PAGE_MainLayoutExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
 }
 
 static int size_cb(int absrow, void *data)
 {
     int num_elems = (long)data;
     return (absrow >= num_elems  && absrow < num_elems + NUM_QUICKPAGES) ? 1 + LINE_OFFSET : 1;
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if (OBJ_IS_USED(&gui->col1[relrow].label) && gui->col1[relrow].label.header.Type == Button) {
-        if(! OBJ_IS_USED(&gui->value[relrow])) {
-            return (guiObject_t *)&gui->col1[relrow].label;
-        }
-        col = (2 + col) % 2;
-        //Both button and text-select
-        if (gui->value[relrow].header.box.x == 0) {
-            //ts is 1st
-            return (col ? (guiObject_t *)&gui->col1[relrow].label : (guiObject_t *)&gui->value[relrow]);
-        } else {
-            //button is 1st
-            return (!col ? (guiObject_t *)&gui->col1[relrow].label : (guiObject_t *)&gui->value[relrow]);
-        }
-    }
-    return (guiObject_t *)&gui->value[relrow];
 }
 
 static const char *cfglabel_cb(guiObject_t *obj, const void *data)
@@ -131,7 +104,7 @@ static const char *cfglabel_cb(guiObject_t *obj, const void *data)
 
 static void switchicon_press_cb(guiObject_t *obj, const void *data)
 {
-    PAGE_MainLayoutExit();
+    PAGE_SaveCurrentPos();
     TGLICO_Select(obj, data);
 }
 
@@ -139,10 +112,10 @@ void newelem_press_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
     (void)data;
-    PAGE_MainLayoutExit();
-    current_selected += 1 << 8;
+    //PAGE_MainLayoutExit();
     create_element();
-    show_config();
+    current_selected = 0;
+    PAGE_ChangeByID(PAGEID_MAINCFG, 0);
 }
 
 static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
@@ -156,7 +129,7 @@ static const char *dlgts1_cb(guiObject_t *obj, int dir, void *data)
     }
     if ((s8)pc->elem[idx].src < 0) {
         GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 1);
-        PAGE_MainLayoutExit();
+        //PAGE_MainLayoutExit();
         return _tr("Delete");
     }
     GUI_TextSelectEnablePress((guiTextSelect_t *)obj, 0);
@@ -231,26 +204,18 @@ void show_config()
     static const int ADD_LOAD = 1;
 #endif
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, getobj_cb, size_cb, (void *)count);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+                     LINE_SPACE, count + NUM_QUICKPAGES + ADD_LOAD, row_cb, NULL, size_cb, (void *)count);
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
+#if HAS_LAYOUT_EDITOR
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-#if HAS_LAYOUT_EDITOR
-        else if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
-            PAGE_MainLayoutExit();
-            show_layout();
-        }
-#endif //HAS_LAYOUT_EDITOR
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER) &&(flags & BUTTON_LONGPRESS)) {
+        PAGE_PushByID(PAGEID_LAYOUT, 0);
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
+#endif //HAS_LAYOUT_EDITOR

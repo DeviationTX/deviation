@@ -41,8 +41,10 @@
 #ifdef EMULATOR
 #define USE_FIXED_MFGID
 #define BIND_COUNT 5
+#define dbgprintf printf
 #else
 #define BIND_COUNT 800
+#define dbgprintf if(0) printf
 #endif
 
 static int counter;
@@ -207,9 +209,9 @@ static void hisky_init()
     // For detailed description of what's happening here see 
     //   http://www.inhaos.com/uploadfile/otherpic/AN0008-BK2423%20Communication%20In%20250Kbps%20Air%20Rate.pdf
     NRF24L01_Activate(0x53); // magic for BK2421 bank switch
-    printf("Trying to switch banks\n");
+    dbgprintf("Trying to switch banks\n");
     if (NRF24L01_ReadReg(NRF24L01_07_STATUS) & 0x80) {
-        printf("BK2421 detected\n");
+        dbgprintf("BK2421 detected\n");
         long nul = 0;
         // Beken registers don't have such nice names, so we just mention
         // them by their numbers
@@ -233,7 +235,7 @@ static void hisky_init()
         NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC7\x96\x9A\x1B", 4);
         NRF24L01_WriteRegisterMulti(0x04, (u8 *) "\xC1\x96\x9A\x1B", 4);
     } else {
-        printf("nRF24L01 detected\n");
+        dbgprintf("nRF24L01 detected\n");
     }
     NRF24L01_Activate(0x53); // switch bank back
 }
@@ -275,9 +277,9 @@ static void build_ch_data()
     payload[9] |= (u8)((ch_data[7]>>2)&0x00c0);
 #ifdef EMULATOR
     for (i = 0; i < 8; i++)
-        printf("ch[%d]=%d,  payload[%d]=%d\n", i, ch_data[i], i, payload[i]);
-    printf("payload[8]=%d\n", payload[8]);
-    printf("payload[9]=%d\n", payload[9]);
+        dbgprintf("ch[%d]=%d,  payload[%d]=%d\n", i, ch_data[i], i, payload[i]);
+    dbgprintf("payload[8]=%d\n", payload[8]);
+    dbgprintf("payload[9]=%d\n", payload[9]);
 #endif
 }
 
@@ -407,12 +409,12 @@ static void initialize_tx_id()
 #ifndef USE_FIXED_MFGID
     u8 var[12];
     MCU_SerialNumber(var, 12);
-    printf("Manufacturer id: ");
+    dbgprintf("Manufacturer id: ");
     for (int i = 0; i < 12; ++i) {
-        printf("%02X", var[i]);
+        dbgprintf("%02X", var[i]);
         rand32_r(&lfsr, var[i]);
     }
-    printf("\r\n");
+    dbgprintf("\r\n");
 #endif
 
     if (Model.fixed_id) {
@@ -427,7 +429,7 @@ static void initialize_tx_id()
         rand32_r(&lfsr, i);
     }
 
-    printf("Effective id: %02X%02X%02X%02X%02X\r\n",
+    dbgprintf("Effective id: %02X%02X%02X%02X%02X\r\n",
         rf_adr_buf[0], rf_adr_buf[1], rf_adr_buf[2], rf_adr_buf[3], rf_adr_buf[4]);
 
     // Use LFSR to seed frequency hopping sequence after another
@@ -439,11 +441,11 @@ static void initialize_tx_id()
     else if(Model.proto_opts[PROTOOPTS_FORMAT] == PROTOOPTS_FORMAT_HK310) {
         calc_hk310_fh_channels(lfsr);
     }
-    printf("FH Seq: ");
+    dbgprintf("FH Seq: ");
     for (int i = 0; i < FREQUENCE_NUM; ++i) {
-        printf("%d, ", hopping_frequency[i]);
+        dbgprintf("%d, ", hopping_frequency[i]);
     }
-    printf("\r\n");
+    dbgprintf("\r\n");
 }
 
 static void initialize(u8 bind)

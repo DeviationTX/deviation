@@ -46,24 +46,18 @@ enum LabelType {
     LABEL_CENTER,
     LABEL_FILL,
     LABEL_TRANSPARENT,
-    LABEL_UNDERLINE,
-    LABEL_SQUAREBOX,
-    LABEL_INVERTED,
     LABEL_LEFT,
     LABEL_RIGHT,
     LABEL_BOX,
+#if LCD_DEPTH == 1
+    LABEL_SQUAREBOX,
     LABEL_BRACKET,
-    LABEL_BLINK,
-};
+    LABEL_UNDERLINE,
+    LABEL_INVERTED,
+#else
+    LABEL_LISTBOX,
+#endif
 
-enum ListBoxType {
-    LISTBOX_DEVO10,
-    LISTBOX_OTHERS,
-};
-
-enum ListBoxNavigateKeyType {
-    LISTBOX_KEY_UPDOWN,
-    LISTBOX_KEY_RIGHTLEFT,
 };
 
 struct LabelDesc {
@@ -97,7 +91,6 @@ enum GUIType {
     XYGraph,
     BarGraph,
     TextSelect,
-    Listbox,
     Keyboard,
     Scrollbar,
     Scrollable,
@@ -169,36 +162,18 @@ typedef struct guiButton {
     struct guiHeader header;
     struct LabelDesc desc;
     const struct ImageMap *image;
-    u16 fontColor;
     const char *(*strCallback)(struct guiObject *obj, const void *data);
     void (*CallBack)(struct guiObject *obj, const void *data);
     const void *cb_data;
-    u8 enable;
+    u16 fontColor;
+    u8 flags;
 } guiButton_t;
-
-typedef struct guiListbox {
-    struct guiHeader header;
-    struct LabelDesc desc;
-    u8 text_height;
-    u8 entries_per_page;
-    u8 item_count;
-    u8 cur_pos;
-    s16 selected;
-    struct guiScrollbar scrollbar;
-    const char * (*string_cb)(u8 idx, void * data);
-    void (*select_cb)(struct guiObject *obj, u16 selected, void * data);
-    void (*longpress_cb)(struct guiObject *obj, u16 selected, void * data);
-    void *cb_data;
-    enum ListBoxType style;
-    enum ListBoxNavigateKeyType key_style;
-    buttonAction_t action; // fix bug for issue #81: DEVO10: Model list should be browsable with UP/DOWN
-} guiListbox_t;
 
 typedef struct guiScrollable {
     struct guiHeader header;
     u8 item_count;
     u8 row_height;
-    u8 num_selectable;
+    u8 selectable_rows;
     u8 cur_row;
     u8 visible_rows;
     u8 max_visible_rows;
@@ -273,6 +248,7 @@ typedef struct guiRect {
 #define OBJ_IS_TRANSPARENT(x) ((x)->flags & 0x10) /* bool: UI element has transparency */
 #define OBJ_IS_SELECTABLE(x)  ((x)->flags & 0x20) /* bool: UI element can be selected */
 #define OBJ_IS_SCROLLABLE(x)  ((x)->flags & 0x40) /* bool: UI element is part of a scrollable container */
+#define OBJ_IS_ROWSTART(x)    ((x)->flags & 0x80) /* bool: UI element is the 1st element in a selectable row */
 #define OBJ_SET_FLAG(obj,flag,set)  ((guiObject_t *)(obj))->flags = (set) \
                                     ? ((guiObject_t *)(obj))->flags | (flag) \
                                     : ((guiObject_t *)(obj))->flags & ~(flag)
@@ -283,6 +259,7 @@ typedef struct guiRect {
 #define OBJ_SET_TRANSPARENT(x,y) OBJ_SET_FLAG(x, 0x10, y)
 #define OBJ_SET_SELECTABLE(x,y)  OBJ_SET_FLAG(x, 0x20, y)
 #define OBJ_SET_SCROLLABLE(x,y)  OBJ_SET_FLAG(x, 0x40, y)
+#define OBJ_SET_ROWSTART(x,y)    OBJ_SET_FLAG(x, 0x80, y)
 #define CLEAR_OBJ(x) memset((x), 0, sizeof(*(x)))
 
 #define DRAW_NORMAL  0
@@ -313,10 +290,6 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type);
 
 void GUI_DrawXYGraph(struct guiObject *obj);
 u8 GUI_TouchXYGraph(struct guiObject *obj, struct touch *coords, u8 long_press);
-
-void GUI_DrawListbox(struct guiObject *obj, u8 redraw_all);
-u8 GUI_TouchListbox(struct guiObject *obj, struct touch *coords, u8 long_press);
-void GUI_PressListbox(struct guiObject *obj, u32 button, u8 press_type);
 
 void GUI_DrawLabel(struct guiObject *obj);
 u8 GUI_TouchLabel(struct guiObject *obj, struct touch *coords, s8 press_type);
@@ -369,21 +342,10 @@ guiObject_t *GUI_CreateButtonPlateText(guiButton_t *, u16 x, u16 y, u16 width, u
         u16 fontColor, void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
 guiObject_t *GUI_CreateIcon(guiButton_t *, u16 x, u16 y, const struct ImageMap *image,
         void (*CallBack)(guiObject_t *obj, const void *data), const void *cb_data);
+int GUI_TouchButton(struct guiObject *obj, int press_type);
 void GUI_ButtonEnable(guiObject_t *obj, u8 enable);
-u8 GUI_IsButtonEnabled(guiObject_t *obj);
-
-guiObject_t *GUI_CreateListBox(guiListbox_t *, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
-        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
-        void *cb_data);
-guiObject_t *GUI_CreateListBoxPlateText(guiListbox_t *, u16 x, u16 y, u16 width, u16 height, u8 item_count, s16 selected,
-        const struct LabelDesc *desc, enum ListBoxNavigateKeyType keyType,
-        const char *(*string_cb)(u8 idx, void *data),
-        void (*select_cb)(guiObject_t *obj, u16 selected, void *data),
-        void (*longpress_cb)(guiObject_t *obj, u16 selected, void *data),
-        void *cb_data);
-void GUI_ListBoxSelect(guiListbox_t *obj, u16 selected);
+unsigned GUI_IsButtonEnabled(guiObject_t *obj);
+unsigned GUI_IsButtonLongPress(guiObject_t *obj);
 
 guiObject_t *GUI_CreateScrollable(guiScrollable_t *scrollable, u16 x, u16 y, u16 width, u16 height, u8 row_height, u8 item_count,
      int (*row_cb)(int absrow, int relrow, int x, void *data),
@@ -500,4 +462,7 @@ s8 GUI_GetViewId(s16 x, s16 y);
 void GUI_ViewInit();
 int GUI_IsEmpty();
 void GUI_SelectionNotify(void (*notify_cb)(guiObject_t *obj));
+unsigned GUI_GetRemappedButtons();
+void GUI_ChangeSelectionOnTouch(int enable);
+int GUI_InTouch();
 #endif /* GUI_H_ */

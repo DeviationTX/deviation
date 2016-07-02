@@ -29,33 +29,26 @@ enum {
 };
 #endif //OVERRIDE_PLACEMENT
 
-static u16 current_selected = 0;
 #include "../../common/advanced/_mixer_page.c"
-
-static u8 top_channel = 0;
 
 static unsigned action_cb(u32 button, unsigned flags, void *data);
 static int row_cb(int absrow, int relrow, int y, void *data);
-static guiObject_t *getobj_cb(int relrow, int col, void *data);
 
-static void _show_title(int page)
+static void _show_title()
 {
-    (void)page;
     PAGE_SetActionCB(action_cb);
-    mp->top_channel = top_channel;
 }
 
 static void _show_page()
 {
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Mixer    Reorder:Hold R+"));
     memset(gui, 0, sizeof(*gui));
     
     u8 channel_count = Model.num_channels + NUM_VIRT_CHANNELS;
     
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, channel_count, row_cb, getobj_cb, NULL, NULL);// 7 lines
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
+                     LINE_SPACE, channel_count, row_cb, NULL, NULL, NULL);// 7 lines
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -65,7 +58,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     struct Mixer *mix = MIXER_GetAllMixers();
 
     int selectable = 2;
-    int channel = mp->top_channel + absrow;
+    int channel = absrow;
     if (channel >= Model.num_channels)
         channel += (NUM_OUT_CHANNELS - Model.num_channels);
     if (channel < NUM_OUT_CHANNELS) {
@@ -97,32 +90,12 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     return selectable;
 }
 
-void PAGE_MixerExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    if(col==0)
-        return (guiObject_t *)&gui->limit[relrow];
-    return (guiObject_t *)&gui->tmpl[relrow];
-}
-
 unsigned action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            reorder_cb(NULL, NULL);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+        reorder_cb(NULL, NULL);
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 

@@ -47,10 +47,6 @@ enum {
 static struct trim_obj  * const gui  = &gui_objs.u.trim;
 static struct trim2_obj * const guit = &gui_objs.u.trim2;
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-static unsigned _sub_action_cb(u32 button, unsigned flags, void *data);
-static u16 current_selected = 0;
-
 static guiObject_t *getobj_cb(int relrow, int col, void *data)
 {
     (void)data;
@@ -63,7 +59,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButtonPlateText(&gui->src[relrow], BUTTON_X, y, BUTTON_WIDTH, LINE_HEIGHT,
-            &DEFAULT_FONT, trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+            &DEFAULT_FONT, trimsource_name_cb, 0x0000, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateTextSelectPlate(&gui->item[relrow], TEXTSEL_X, y,
             TEXTSEL_WIDTH, LINE_HEIGHT, &TINY_FONT,  NULL, set_trimstep_cb, (void *)(long)(absrow+0x000)); //0x000: Use Model.trims
     GUI_CreateLabelBox(&gui->name[relrow], LABEL_X, y, LABEL_WIDTH, LINE_HEIGHT,
@@ -73,7 +69,6 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_page()
 {
-    PAGE_SetActionCB(_action_cb);
     //PAGE_ShowHeader(_tr("Trim")); // no title for devo10
     PAGE_ShowHeader(_tr("Input"));
     GUI_CreateLabelBox(&gui->steplbl, STEP_X, STEP_Y, STEP_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Step"));
@@ -82,12 +77,7 @@ static void _show_page()
     GUI_CreateLabelBox(&gui->trimposlbl, TRIMPOS_X, STEP_Y, TRIMPOS_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, NULL, NULL, _tr("Trim +"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, current_selected));
-}
-
-void PAGE_TrimExit()
-{
-    current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
 static guiObject_t *getobj2_cb(int relrow, int col, void *data)
@@ -140,15 +130,11 @@ static int row2_cb(int absrow, int relrow, int y, void *data)
             TEXTSEL2_WIDTH, LINE_HEIGHT, &DEFAULT_FONT,  NULL, value, input_value, data);
     return 1;
 } 
-static void _edit_cb(guiObject_t *obj, const void *data)
+void PAGE_TrimEditInit(int page)
 {
-    (void)obj;
-    PAGE_SetActionCB(_sub_action_cb);
     struct Trim *trim = MIXER_GetAllTrims();
-    PAGE_SetModal(1);
-    tp->index = (long)data;
+    tp->index = page;
     tp->trim = trim[tp->index];
-    PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr("Edit")); // to draw a line only
 
     GUI_CreateButtonPlateText(&guit->save, BUTTON2_X, BUTTON2_Y, BUTTON2_WIDTH, LINE_HEIGHT,
@@ -158,35 +144,6 @@ static void _edit_cb(guiObject_t *obj, const void *data)
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
-
-static unsigned _sub_action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_TrimInit(0);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 static inline guiObject_t * _get_obj(int idx, int objid) {
     if (PAGE_GetModal()) {
         if(objid == TRIM_MINUS) {

@@ -32,8 +32,6 @@ enum {
 #if HAS_PERMANENT_TIMER
 #include "../common/_set_timer_page.c"
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
-
 const char *settimer_select_cb(guiObject_t *obj, int dir, void *data)
 {
     (void)obj;
@@ -98,7 +96,6 @@ static void _show_settimer_page(u8 index)
 
     snprintf(tempstring, sizeof(tempstring), "%s %d", _tr(PAGE_GetName(PAGEID_SETTIMER)), index + 1);
     PAGE_ShowHeader(tempstring);
-    PAGE_SetActionCB(_action_cb);
 
     u8 space = LINE_HEIGHT;
     u8 y = LINE_HEIGHT; // under headline
@@ -121,19 +118,4 @@ static void _show_settimer_page(u8 index)
 
 }
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if (flags & BUTTON_PRESS || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            TIMER_SetValue(permanent.index, permanent.newvalue);
-            Model.timer[permanent.index].val = permanent.newvalue;
-            PAGE_TimerInit(permanent.index);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
-}
 #endif // HAS_PERMANENT_TIMER

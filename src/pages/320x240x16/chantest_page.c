@@ -23,32 +23,16 @@
 static void show_button_page();
 static const char *channum_cb(guiObject_t *obj, const void *data);
 
-static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
+static int row_cb(int absrow, int relrow, int y, void *data)
 {
-    (void)pos;
-    (void)parent;
+    (void)relrow;
+    (void)y;
     (void)data;
-    
-    int newpos = cur_row + (direction > 0 ? 1 : -1);
-    int endpos = gui->scrollbar.num_items - 1;
-    if (newpos < 0)
-        newpos = 0;
-    else if (newpos > endpos)
-        newpos = endpos;
-    if (newpos != cur_row) {
-        GUI_RemoveHierObjects((guiObject_t *)&gui->chan[0]);
-        _show_bar_page(newpos);
-    }
-    return cur_row;
-}
-
-static void _show_bar_page(int row)
-{
-    cur_row = row;
+    cur_row = absrow;
     int i;
     u8 height;
     u8 count;
-    int num_bars = num_disp_bars();
+    int num_bars = cp->num_bars;
     int num_rows = 1;
     int row_len;
 
@@ -62,7 +46,6 @@ static void _show_bar_page(int row)
         row_len = NUM_BARS_PER_ROW + 1;
     }
 
-    cp->num_bars = num_bars;
 
     if (num_bars > row_len) {
         height = 70 + (LCD_HEIGHT - 240) / 2;
@@ -92,54 +75,47 @@ static void _show_bar_page(int row)
         GUI_CreateLabelBox(&gui->value[i], offset + SEPARATION * (i - count) - (SEPARATION - 10)/2, 230 + (LCD_HEIGHT - 240),
                                       SEPARATION, 10, &TINY_FONT, value_cb, NULL, (void *)(long)i);
     }
-    if(num_rows > 2) {
-        GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 32, LCD_HEIGHT-32, num_rows-1, NULL, scroll_cb, NULL);
-        GUI_SetScrollbar(&gui->scrollbar, cur_row);
+    return 0;
+}
+
+static void _show_bar_page()
+{
+    int num_bars = num_disp_bars();
+    int num_rows = 1;
+
+    if (num_bars > 2 * (NUM_BARS_PER_ROW + 1)) {
+        num_rows = num_bars / NUM_BARS_PER_ROW + 1;
+        num_bars -= cur_row * NUM_BARS_PER_ROW;
+        if (num_bars > 2 * NUM_BARS_PER_ROW)
+            num_bars = 2 * NUM_BARS_PER_ROW;
     }
-        
+    cp->num_bars = num_bars;
+    GUI_CreateScrollable(&gui->scrollable,
+        0, 32, LCD_WIDTH, LCD_HEIGHT-32, LCD_HEIGHT - 32, num_rows, row_cb, NULL, NULL, NULL);
 }
 
 void PAGE_ChantestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_CHANMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_MIXEROUTPUT;
-    _show_bar_page(0);
+    _show_bar_page();
 }
 
 void PAGE_InputtestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_INPUTMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_RAWINPUT;
-    _show_bar_page(0);
+    _show_bar_page();
 }
 
 void PAGE_ButtontestInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
     PAGE_ShowHeader(PAGE_GetName(PAGEID_BTNMON));
-    cp->return_page = NULL;
     cp->type = MONITOR_BUTTONTEST;
     show_button_page();
-}
-
-void PAGE_ChantestModal(void(*return_page)(int page), int page)
-{
-    PAGE_SetModal(1);
-    cp->return_page = return_page;
-    cp->return_val = page;
-    cp->type = MONITOR_MIXEROUTPUT;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_CHANMON), okcancel_cb);
-
-    _show_bar_page(0);
 }
 
 static void show_button_page()

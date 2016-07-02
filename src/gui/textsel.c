@@ -87,6 +87,7 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
     struct guiObject *obj = (guiObject_t *)select;
     struct guiBox *box;
 
+    CLEAR_OBJ(select);
     box = &obj->box;
 
     select->type = TEXTSELECT_DEVO10;
@@ -112,7 +113,12 @@ guiObject_t *GUI_CreateTextSelectPlate(guiTextSelect_t *select, u16 x, u16 y, u1
 
     GUI_TextSelectEnablePress(select, select_cb ? 1 : 0);
 
-    if ((width == 0 || height == 0) && select->desc.style != LABEL_UNDERLINE)
+#if LCD_DEPTH == 1
+    int underline = select->desc.style == LABEL_UNDERLINE;
+#else
+   const int underline = 0;
+#endif
+    if ((width == 0 || height == 0) && ! underline)
         select->desc.style = LABEL_NO_BOX;
 
     return obj;
@@ -252,11 +258,11 @@ void GUI_PressTextSelect(struct guiObject *obj, u32 button, u8 press_type)
 {
     struct touch coords;
     coords.y = obj->box.y + KEY_ADJUST_Y;
-    if (button == BUT_RIGHT) {
+    if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
         coords.x = obj->box.x + obj->box.width + KEY_ADJUST_X - ARROW_WIDTH;
-    } else if(button == BUT_LEFT) {
+    } else if(CHAN_ButtonIsPressed(button, BUT_LEFT)) {
         coords.x = obj->box.x + KEY_ADJUST_X;
-    } else if(button == BUT_ENTER) {
+    } else if(CHAN_ButtonIsPressed(button, BUT_ENTER)) {
         coords.x = obj->box.x + (obj->box.width >> 1);
     } else {
         return;

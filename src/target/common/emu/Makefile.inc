@@ -1,10 +1,19 @@
 ifndef BUILD_TARGET
 
 SRC_CXX  = $(wildcard target/$(TARGET)/*.cpp) $(wildcard target/common/emu/*.cpp)
-SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c)
+SRC_C  = $(wildcard target/$(TARGET)/*.c) $(wildcard target/common/emu/*.c) \
+         $(wildcard $(SDIR)/target/common/filesystems/*.c)
 
+ifdef USE_INTERNAL_FS
+SRC_C  += $(wildcard $(SDIR)/target/common/filesystems/devofs/*.c) \
+          $(wildcard $(SDIR)/target/common/filesystems/petit_fat/*.c)
+CFLAGS = -DEMULATOR=USE_INTERNAL_FS
+else
+CFLAGS = -DEMULATOR=USE_NATIVE_FS
+endif
+
+CFLAGS += -Itarget/common/emu -I$(SDIR)/target/common/filesystems
 LFLAGS = -lfltk
-CFLAGS = -DEMULATOR -Itarget/common/emu
 
 ALL = $(TARGET).$(EXEEXT)
 
@@ -34,8 +43,9 @@ else
     endif
 endif
 else #BUILD_TARGET
+CFLAGS += -DFILESYSTEM_DIR="\"filesystem/$(FILESYSTEM)\""
 
-$(TARGET).zip: $(TARGET).$(EXEEXT)
+$(TARGET).zip: $(TARGET).$(EXEEXT) $(TARGET).fs_wrapper
 	mv -f $(TARGET).$(EXEEXT) deviation-$(HGVERSION).$(EXEEXT)
 	rm -f deviation-$(HGVERSION).zip
 	zip deviation-$(HGVERSION).zip deviation-$(HGVERSION).$(EXEEXT)

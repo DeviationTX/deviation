@@ -64,7 +64,9 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
 {
     (void)data;
     u8 i;
-    if (flags & BUTTON_PRESS) {
+    if (flags & BUTTON_PRESS)
+        return 1;
+    if (flags & BUTTON_RELEASE) {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
             // bug fix: when most users see the "Calibration done", it is very likely tha they will press ext to exit,
             // then all calibration data are rollback, and cause the calibration failed -- what a tough bug!!
@@ -107,14 +109,13 @@ static unsigned _action_cb_calibrate(u32 button, unsigned flags, void *data)
     return 1;
 }
 
-static void calibrate_sticks(void)
+void PAGE_CalibInit(int page)
 {
+    (void)page;
     PROTOCOL_DeInit();
-    PAGE_SetModal(1);
-    PAGE_RemoveAllObjects();
     PAGE_SetActionCB(_action_cb_calibrate);
     snprintf(tempstring, sizeof(tempstring), "%s",  _tr("Center all \nsticks and knobs\nthen press ENT"));
-    GUI_CreateLabelBox(&guic->msg, 1, 0, 0, 0,
+    GUI_CreateLabelBox(&guic->msg, 1, CALIB_Y, 0, 0,
             LCD_HEIGHT > 70? &NARROW_FONT:&DEFAULT_FONT, NULL, NULL, tempstring);
     memcpy(cp->calibration, Transmitter.calibration, sizeof(cp->calibration));
 
@@ -144,9 +145,12 @@ static void calibrate_sticks(void)
     if (calibrate_state == CALI_EXIT)
         memcpy(Transmitter.calibration, cp->calibration, sizeof(cp->calibration));
 
-    PAGE_SetActionCB(NULL);
-    PROTOCOL_Init(0);
-    PAGE_TxConfigureInit(-1);   // should be -1 so that devo10 can get back to previous item selection
+    PAGE_Pop();
+//    PAGE_SetActionCB(NULL);
+//    PROTOCOL_Init(0);
+//    PAGE_SetModal(0);
+//    //cp->enable = CALIB_NONE;
+//    PAGE_ChangeByID(PAGEID_TXCFG, 0);
 }
 
 static const char *calibratestr_cb(guiObject_t *obj, const void *data)
@@ -301,16 +305,19 @@ static void press_cb(guiObject_t *obj, const void *data)
     cp->enable = (long)data;
 #if HAS_RTC
     if (cp->enable == SET_CLOCK) {
-        PAGE_ChangeByID(PAGEID_RTC);
+        PAGE_PushByID(PAGEID_RTC, 0);
         return;
     }
 #endif
 #if HAS_TOUCH
     if (cp->enable == CALIB_TOUCH)
-        init_touch_calib();
+        PAGE_PushByID(PAGEID_TOUCH, 0);
     else if (cp->enable == CALIB_STICK)
 #endif
+    {
         calibrate_state = CALI_CENTER; // bug fix: must reset state before calibrating
+        PAGE_PushByID(PAGEID_CALIB, 0);
+    }
 }
 
 #ifndef NO_LANGUAGE_SUPPORT
@@ -325,8 +332,7 @@ static void lang_select_cb(guiObject_t *obj, const void *data)
 {
     (void)data;
     (void)obj;
-    PAGE_SetModal(1);
-    LANGPage_Select(PAGE_TxConfigureInit);
+    PAGE_PushByID(PAGEID_LANGUAGE, 0);
 }
 #endif
 
@@ -348,22 +354,6 @@ static const char *units_cb(guiObject_t *obj, int dir, void *data)
         return type ? _tr("Fahren") : _tr("Celsius");
     } else {
         return type ? _tr("Foot") : _tr("Meter");
-    }
-}
-
-void PAGE_TxConfigureEvent()
-{
-    switch(cp->enable) {
-#if HAS_TOUCH
-    case CALIB_TOUCH:
-        calibrate_touch();
-        break;
-#endif
-    case CALIB_STICK:
-        calibrate_sticks();
-        break;
-    case CALIB_STICK_TEST:
-    default: break;
     }
 }
 

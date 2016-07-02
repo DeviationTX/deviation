@@ -14,23 +14,23 @@
  */
 
 const struct ImageMap image_map[] = {
-    {"media/btn96_24.bmp", 96, 24, 0, 0}, /*FILE_BTN96_24 */
-    {"media/btn48_24.bmp", 48, 24, 0, 0}, /*FILE_BTN48_24 */
-    {"media/btn96_16.bmp", 96, 16, 0, 0}, /*FILE_BTN96_16 */
-    {"media/btn64_16.bmp", 64, 16, 0, 0}, /*FILE_BTN64_16 */
-    {"media/btn48_16.bmp", 48, 16, 0, 0}, /*FILE_BTN48_16 */
-    {"media/btn32_16.bmp", 32, 16, 0, 0}, /*FILE_BTN32_16 */
-    {"media/spin192.bmp", 192, 16, 0, 0}, /*FILE_SPIN192 */
-    {"media/spin96.bmp",   96, 16, 0, 0}, /*FILE_SPIN96 */
-    {"media/spin64.bmp",   64, 16, 0, 0}, /*FILE_SPIN64 */
-    {"media/spin32.bmp",   32, 16, 0, 0}, /*FILE_SPIN32 */
-    {"media/spinp96.bmp",   96, 16, 0, 0}, /*FILE_SPINPRESS96 */
-    {"media/spinp64.bmp",   64, 16, 0, 0}, /*FILE_SPINPRESS64 */
-    {"media/spinp32.bmp",   32, 16, 0, 0}, /*FILE_SPINPRESS32 */
-    {"media/arrows16.bmp", 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
-    {"media/arrows16.bmp", 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
-    {"media/arrows16.bmp", 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
-    {"media/arrows16.bmp", 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
+    {"media/btn96_24" IMG_EXT, 96, 24, 0, 0}, /*FILE_BTN96_24 */
+    {"media/btn48_24" IMG_EXT, 48, 24, 0, 0}, /*FILE_BTN48_24 */
+    {"media/btn96_16" IMG_EXT, 96, 16, 0, 0}, /*FILE_BTN96_16 */
+    {"media/btn64_16" IMG_EXT, 64, 16, 0, 0}, /*FILE_BTN64_16 */
+    {"media/btn48_16" IMG_EXT, 48, 16, 0, 0}, /*FILE_BTN48_16 */
+    {"media/btn32_16" IMG_EXT, 32, 16, 0, 0}, /*FILE_BTN32_16 */
+    {"media/spin192"  IMG_EXT,192, 16, 0, 0}, /*FILE_SPIN192 */
+    {"media/spin96"   IMG_EXT, 96, 16, 0, 0}, /*FILE_SPIN96 */
+    {"media/spin64"   IMG_EXT, 64, 16, 0, 0}, /*FILE_SPIN64 */
+    {"media/spin32"   IMG_EXT, 32, 16, 0, 0}, /*FILE_SPIN32 */
+    {"media/spinp96"  IMG_EXT, 96, 16, 0, 0}, /*FILE_SPINPRESS96 */
+    {"media/spinp64"  IMG_EXT, 64, 16, 0, 0}, /*FILE_SPINPRESS64 */
+    {"media/spinp32"  IMG_EXT, 32, 16, 0, 0}, /*FILE_SPINPRESS32 */
+    {"media/arrows16" IMG_EXT, 16, 16, 0, 0}, /*FILE_ARROW_16_UP */
+    {"media/arrows16" IMG_EXT, 16, 16, 16, 0}, /*FILE_ARROW_16_DOWN */
+    {"media/arrows16" IMG_EXT, 16, 16, 32, 0}, /*FILE_ARROW_16_RIGHT */
+    {"media/arrows16" IMG_EXT, 16, 16, 48, 0}, /*FILE_ARROW_16_LEFT */
 };
 
 void _gui_hilite_selected(struct guiObject *obj)
@@ -42,7 +42,7 @@ void _gui_hilite_selected(struct guiObject *obj)
 
 void _gui_draw_background(int x, int y, int w, int h)
 {
-    LCD_DrawWindowedImageFromFile(x, y, "media/devo8.bmp", w, h, x, y);
+    LCD_DrawWindowedImageFromFile(x, y, "media/backgrnd" IMG_EXT, w, h, x, y);
 }
 
 // Bug fix: Unlike devo8, devo10's page always has 1 default selected objects. When a dialog, e.g. saftydialog,

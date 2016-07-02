@@ -53,7 +53,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
     (void)data;
     struct Trim *trim = MIXER_GetAllTrims();
     GUI_CreateButton(&gui->src[relrow], PCOL1, y, BUTTON_64x16,
-        trimsource_name_cb, 0x0000, _edit_cb, (void *)((long)absrow));
+        trimsource_name_cb, 0x0000, edit_trim_cb, (void *)((long)absrow));
     GUI_CreateLabel(&gui->neg[relrow], PCOL2 + 6, y, negtrim_str, DEFAULT_FONT, (void *)(long)absrow);
     GUI_CreateLabel(&gui->pos[relrow], PCOL3 + 6, y, NULL, DEFAULT_FONT, (void *)INPUT_ButtonName(trim[absrow].pos));
     GUI_CreateTextSelect(&gui->step[relrow], PCOL4 + 6, y, TEXTSELECT_96, NULL,
@@ -63,12 +63,7 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 static void _show_page()
 {
-#if HAS_STANDARD_GUI
-    if (Model.mixer_mode == MIXER_STANDARD)
-        PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TRIM), MODELMENU_Show);
-    else
-#endif
-        PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_TRIM));
     GUI_CreateLabelBox(&gui->inplbl, PCOL1, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Input"));
     GUI_CreateLabelBox(&gui->neglbl, PCOL2, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim -"));
     GUI_CreateLabelBox(&gui->poslbl, PCOL3, PROW1, 64, 15, &NARROW_FONT, NULL, NULL, _tr("Trim +"));
@@ -77,18 +72,17 @@ static void _show_page()
     GUI_CreateScrollable(&gui->scrollable,
          PCOL1, PROW2,  LCD_WIDTH - 2 * PCOL1, NUM_TRIM_ROWS * 24 - 8,
          24, NUM_TRIMS, row_cb, getobj_cb, NULL, NULL);
+
+    PAGE_SetScrollable(&gui->scrollable, &current_selected);
 }
 
-static void _edit_cb(guiObject_t *obj, const void *data)
+void PAGE_TrimEditInit(int page)
 {
-    (void)obj;
     struct Trim *trim = MIXER_GetAllTrims();
-    PAGE_SetModal(1);
-    tp->index = (long)data;
+    tp->index = page;
     tp->trim = trim[tp->index];
 
-    PAGE_RemoveAllObjects();
-    PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
+    PAGE_ShowHeader(_tr("Trim"));
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);
 
     enum {

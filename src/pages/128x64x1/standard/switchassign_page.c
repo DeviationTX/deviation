@@ -24,13 +24,6 @@
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
-
 static const char *label_cb(guiObject_t *obj, const void *data)
 {
     (void)obj;
@@ -80,25 +73,17 @@ void PAGE_SwitchAssignInit(int page)
 
     PAGE_ShowHeader(_tr("Press ENT to change"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                     LINE_SPACE, SWITCHFUNC_LAST, row_cb, getobj_cb, NULL, NULL);
+                     LINE_SPACE, SWITCHFUNC_LAST, row_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            MUSIC_Play(MUSIC_SAVING);
-            save_changes();
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+        MUSIC_Play(MUSIC_SAVING);
+        save_changes();
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_STANDARD_GUI

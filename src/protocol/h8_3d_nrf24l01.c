@@ -66,16 +66,20 @@ enum {
     CHANNEL4,     // Rudder
     CHANNEL5,     // LED Light
     CHANNEL6,     // Flip
-    CHANNEL7,     // 
-    CHANNEL8,     // 
+    CHANNEL7,     // Picture snapshot
+    CHANNEL8,     // Video recording
     CHANNEL9,     // RTH + Headless (H8 3D), Headless (H20)
     CHANNEL10,    // 180/360 flip mode (H8 3D), RTH (H20)
+    CHANNEL11,    // Camera gimbal down / neutral / up
 };
 
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
+#define CHANNEL_SNAPSHOT    CHANNEL7  // (H11D)
+#define CHANNEL_VIDEO       CHANNEL8  // (H11D)
 #define CHANNEL_HEADLESS    CHANNEL9  // RTH + Headless on H8 3D
 #define CHANNEL_RTH         CHANNEL10 // 180/360 flip mode on H8 3D
+#define CHANNEL_GIMBALL     CHANNEL11 // H11D
 
 enum {
     H8_3D_INIT1 = 0,
@@ -95,7 +99,12 @@ enum {
 
 enum {
     // flags going to packet[18]
-    FLAG_CALIBRATE= 0x20, // accelerometer calibration
+    FLAG_CAM_UP   = 0x04,
+    FLAG_CAM_DOWN = 0x08,
+    FLAG_CALIBRATE2=0x10, // acc calib. (H11D, H20)
+    FLAG_CALIBRATE= 0x20, // acc calib. (H8 3D), headless calib (H20)
+    FLAG_SNAPSHOT = 0x40,
+    FLAG_VIDEO    = 0x80,
 };
 
 static u16 counter;
@@ -187,10 +196,21 @@ static void send_packet(u8 bind)
                    | GET_FLAG( CHANNEL_FLIP, FLAG_FLIP)
                    | GET_FLAG( CHANNEL_HEADLESS, FLAG_HEADLESS)
                    | GET_FLAG( CHANNEL_RTH, FLAG_RTH); // 180/360 flip mode on H8 3D
-    
+        packet[18] = GET_FLAG( CHANNEL_SNAPSHOT, FLAG_SNAPSHOT)
+                   | GET_FLAG( CHANNEL_VIDEO, FLAG_VIDEO);
+         // camera gimball
+        if(Channels[CHANNEL_GIMBALL] < CHAN_MIN_VALUE / 2)
+            packet[18] |= FLAG_CAM_DOWN;
+        else if(Channels[CHANNEL_GIMBALL] > CHAN_MAX_VALUE / 2)
+            packet[18] |= FLAG_CAM_UP;
+        
         // both sticks bottom left: calibrate acc
         if(packet[9] <= 0x05 && packet[10] >= 0xa7 && packet[11] <= 0x57 && packet[12] >= 0xa7)
             packet[18] |= FLAG_CALIBRATE;
+        
+        // both sticks bottom right: calib2
+        if(packet[9] <= 0x05 && (packet[10] >= 0x27 && packet[10] <= 0x3c) && packet[11] <= 0x57 && packet[12] <= 0x57)
+            packet[18] |= FLAG_CALIBRATE2;
     }
     packet[19] = checksum(); // data checksum
     
@@ -317,16 +337,14 @@ static void initialize_txid()
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
 
     // tx id
-    txid[0] = 0xa0 + (((lfsr >> 24) & 0xFF) % 0x10);
-    txid[1] = 0xb0 + (((lfsr >> 16) & 0xFF) % 0x20);
-    txid[2] = ((lfsr >> 8) & 0xFF) % 0x20;
-    txid[3] = (lfsr & 0xFF) % 0x11;
+    txid[0] = (lfsr >> 24) & 0xFF;
+    txid[1] = (lfsr >> 16) & 0xFF;
+    txid[2] = (lfsr >> 8) & 0xFF;
+    txid[3] = lfsr & 0xFF;
     
     // rf channels
-    rf_channels[0] = 0x06 + (((txid[0]>>8) + (txid[0]&0x0f)) % 0x0f);
-    rf_channels[1] = 0x15 + (((txid[1]>>8) + (txid[1]&0x0f)) % 0x0f);
-    rf_channels[2] = 0x24 + (((txid[2]>>8) + (txid[2]&0x0f)) % 0x0f);
-    rf_channels[3] = 0x33 + (((txid[3]>>8) + (txid[3]&0x0f)) % 0x0f);
+    for(u8 ch=0; ch<4; ch++)
+        rf_channels[ch] = 6 + (0x0f*ch) + (((txid[ch] >> 4) + (txid[ch] & 0x0f)) % 0x0f);
 }
 
 static void initialize()
@@ -353,8 +371,8 @@ const void *H8_3D_Cmds(enum ProtoCmds cmd)
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
         case PROTOCMD_BIND:  initialize(); return 0;
-        case PROTOCMD_NUMCHAN: return (void *) 10L;
-        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
+        case PROTOCMD_NUMCHAN: return (void *) 11L;
+        case PROTOCMD_DEFAULT_NUMCHAN: return (void *)11L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
         case PROTOCMD_GETOPTIONS: return 0;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;

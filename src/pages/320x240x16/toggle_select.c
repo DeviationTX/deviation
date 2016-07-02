@@ -30,21 +30,6 @@ extern void PAGE_MainLayoutRestoreDialog(int);
 
 static const struct LabelDesc outline = {0, 0, 0, 0, LABEL_TRANSPARENT};
 
-static void tglico_cancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
-    PAGE_MainLayoutRestoreDialog(tp->tglidx);
-}
-
-static void tglico_ok_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    PAGE_MainLayoutRestoreDialog(tp->tglidx);
-}
-
 static void show_icons(int SelectedIcon, int idx)
 {
     int x, y;
@@ -92,16 +77,21 @@ static int scroll_cb(guiObject_t *parent, u8 pos, s8 direction, void *data)
     return page;
 }
 
+static const char * revert_str_cb(guiObject_t *obj, const void *data)
+{
+    (void)obj;
+    (void)data;
+    return _tr("Revert");
+}
+
 static void show_iconsel_page(int SelectedIcon)
 {
     struct ImageMap img;
+    int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     PAGE_RemoveAllObjects();
-    PAGE_SetModal(1);
-    PAGE_CreateCancelButton(LCD_WIDTH-104, 4, tglico_cancel_cb);
-    // Ok-Button for saving
-    PAGE_CreateOkButton(LCD_WIDTH-155, 4, tglico_ok_cb);
+    PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
+    GUI_CreateButton(&gui->revert, LCD_WIDTH-96-8, 4, BUTTON_96, revert_str_cb, 0x0000, revert_cb, NULL);
     // Show name of source for toggle icon
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
 
     // style the switch textbox
     struct LabelDesc outline = {
@@ -141,4 +131,18 @@ static void show_iconsel_page(int SelectedIcon)
     int max_scroll = (count + NUM_SYMBOL_COLS - 1) / NUM_SYMBOL_COLS - (NUM_SYMBOL_ROWS - 1);
     if (max_scroll > 1) GUI_CreateScrollbar(&gui->scrollbar, LCD_WIDTH-16, 80, LCD_HEIGHT-80, max_scroll, NULL, scroll_cb, (void *)(long)SelectedIcon);
     show_icons(SelectedIcon, 0);
+}
+
+void PAGE_ToggleEditInit(int page) {
+    tp->tglidx = page;
+    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
+    show_iconsel_page(0);
+}
+
+void PAGE_ToggleEditExit()
+{
+    if (PAGE_GetCurrentID() == PAGEID_MAINCFG) {
+        PAGE_MainLayoutRestoreDialog(tp->tglidx);
+    }
+        
 }

@@ -73,38 +73,11 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static s8 current_toggleicon = 0;
 
-static void revert_cb(guiObject_t *obj, const void *data)
-{
-    (void)data;
-    (void)obj;
-    memcpy(Model.pagecfg2.elem[tp->tglidx].extra, tp->tglicons, sizeof(tp->tglicons));
-    show_iconsel_page(0);
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    int idx;
-    if (col == -1) {
-        idx = relrow * NUM_COLS + NUM_COLS -1;
-        if (relrow == 3) {
-            while(! OBJ_IS_USED(&gui->symbolicon[idx]))
-                idx--;
-        }
-    } else {
-        idx = relrow * NUM_COLS + col;
-    }
-    return (guiObject_t *)&gui->symbolicon[idx];
-}
-
-static void show_iconsel_page(int SelectedIcon)
-{
-    PAGE_RemoveAllObjects();
-    PAGE_SetActionCB(_action_cb);
-    PAGE_SetModal(0);
+static void show_iconsel_page(int SelectedIcon) {
+    GUI_RemoveAllObjects();
     memset(gui, 0, sizeof(*gui));
     current_toggleicon = SelectedIcon;
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
+    int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
 
     //Header
     PAGE_ShowHeader(INPUT_SourceNameAbbrevSwitch(tempstring, toggleinput));
@@ -141,11 +114,19 @@ static void show_iconsel_page(int SelectedIcon)
     int rows = (count + NUM_COLS - 1) / NUM_COLS;
     GUI_CreateScrollable(&gui->scrollable, SCROLLABLE_X, SCROLLABLE_Y, LCD_WIDTH - SCROLLABLE_X,
                      SCROLLABLE_H,
-                     SCROLL_ROW_H, rows, row_cb, getobj_cb, NULL, (void *)(long)SelectedIcon);
+                     SCROLL_ROW_H, rows, row_cb, NULL, NULL, (void *)(long)SelectedIcon);
+}
+
+void PAGE_ToggleEditInit(int page)
+{
+    tp->tglidx = page;
+    memcpy(tp->tglicons, Model.pagecfg2.elem[tp->tglidx].extra, sizeof(tp->tglicons));
+    PAGE_SetActionCB(_action_cb);
+    show_iconsel_page(0);
 }
 
 static void navigate_toggleicons(s8 direction) {
-    u8 toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
+    int toggleinput = MIXER_SRC(Model.pagecfg2.elem[tp->tglidx].src);
     int num_positions = INPUT_NumSwitchPos(toggleinput);
     if(num_positions < 2)
         num_positions = 2;
@@ -183,9 +164,13 @@ static void navigate_symbolicons(s8 direction) {
 unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
     (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER))
+        return 0;
+    if (! (flags & BUTTON_RELEASE))
+        return 1;
+    {
         if (CHAN_ButtonIsPressed(button, BUT_EXIT))
-            PAGE_MainLayoutInit(-1);
+            PAGE_Pop();
         else if (CHAN_ButtonIsPressed(button, BUT_UP))
             navigate_toggleicons(-1);
         else if (CHAN_ButtonIsPressed(button, BUT_DOWN))

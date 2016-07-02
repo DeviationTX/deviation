@@ -26,12 +26,6 @@ static struct stdchan_obj * const gui = &gui_objs.u.stdchan;
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data);
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     struct page_defs *page_defs = (struct page_defs *)data;
@@ -53,7 +47,7 @@ void STANDARD_Init(const struct page_defs *page_defs)
     PAGE_RemoveAllObjects();
     PAGE_ShowHeader(_tr(page_defs->title));
     GUI_CreateScrollable(&gui->scrollable, 0, ITEM_HEIGHT + 1, LCD_WIDTH, LCD_HEIGHT - ITEM_HEIGHT -1,
-                     ITEM_SPACE, Model.num_channels, row_cb, getobj_cb, NULL, (void *)page_defs);
+                     ITEM_SPACE, Model.num_channels, row_cb, NULL, NULL, (void *)page_defs);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 

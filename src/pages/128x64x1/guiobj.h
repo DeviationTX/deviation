@@ -89,7 +89,8 @@ struct modelcfg_obj {
 struct modelload_obj {
     guiTextSelect_t ico;
     guiImage_t image;
-    guiListbox_t listbox;
+    guiScrollable_t scrollable;
+    guiLabel_t name[7];
 };
 
 struct modelpage_obj {
@@ -110,11 +111,13 @@ struct reorder_obj {
     guiButton_t up;
     guiButton_t down;
     guiTextSelect_t value;
+    guiTextSelect_t copy;
     guiButton_t apply;
     guiButton_t insert;
     guiButton_t remove;
     guiButton_t save;
-    guiListbox_t list;
+    guiLabel_t  name[7];
+    guiScrollable_t scrollable;
 };
 
 struct telemcfg_obj {
@@ -129,7 +132,7 @@ struct telemcfg_obj {
 struct telemtest_obj {
     guiLabel_t msg;
     guiLabel_t header[7];
-    guiLabel_t box[20];
+    guiLabel_t box[28];
     guiScrollable_t scrollable;
 };
 

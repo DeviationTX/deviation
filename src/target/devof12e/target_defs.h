@@ -2,13 +2,14 @@
 #define _DEVO7E_TARGET_H_
 
 #define USE_DEVOFS 1 //Must be before common_devo include
+#define SPIFLASH_TYPE SST25VFxxxA
+
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xEC
 #define VECTOR_TABLE_LOCATION 0x4000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
-#define SPIFLASH_AAI_AF 1
 
 #define LCD_WIDTH 66
 #define LCD_HEIGHT 26
@@ -25,6 +26,7 @@
 #define HAS_ADVANCED_GUI    1
 #define HAS_PERMANENT_TIMER 1
 #define HAS_TELEMETRY       1
+#define HAS_EXTENDED_TELEMETRY 1
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1

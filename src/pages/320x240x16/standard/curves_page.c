@@ -102,7 +102,7 @@ static void show_page(CurvesMode _curve_mode, int page)
     };
     curve_mode = _curve_mode;
     memset(mp, 0, sizeof(*mp));
-    PAGE_ShowHeader_ExitOnly(NULL, MODELMENU_Show);
+    PAGE_ShowHeader(NULL);
     int count;
     int expected;
     if (curve_mode == CURVESMODE_PITCH) {

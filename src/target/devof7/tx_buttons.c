@@ -67,7 +67,7 @@ void Initialize_ButtonMatrix()
   
   /* PortB 5, 6, 7, 8 are open-drain output */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_PUSHPULL, GPIO5 | GPIO6 | GPIO7 | GPIO8);
+                GPIO_CNF_OUTPUT_OPENDRAIN, GPIO5 | GPIO6 | GPIO7 | GPIO8);
 
   gpio_set(GPIOB, GPIO5 | GPIO6| GPIO7 | GPIO8);
 
@@ -95,13 +95,13 @@ u32 ScanButtons()
         }
     }
     if (Transmitter.ignore_src != SWITCH_NONE) {
-        //Write to C.6, read B
+        //Write to C.9, read B
         if (result == 0) {
-            gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO6);
-            gpio_clear(GPIOC, GPIO6);
+            gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_OPENDRAIN, GPIO9);
+            gpio_clear(GPIOC, GPIO9);
             u32 port = gpio_port_read(GPIOB);
-            gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
-            gpio_set(GPIOC, GPIO6);
+            gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO9);
+            gpio_set(GPIOC, GPIO9);
             if (Transmitter.ignore_src == SWITCH_3x1) {
                 global_extra_switches = (((~port) >> 4) & 0x04) | (((~port) >> 5) & 0x08);
             } else if (Transmitter.ignore_src == SWITCH_2x2) {

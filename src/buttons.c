@@ -125,12 +125,12 @@ void BUTTON_Handler()
     if(buttons_released) {
         //printf("release: %08d\n", buttons_released);
         interrupt_longpress = 0;
-        longpress_release = 0;
         if(!longpress_release) {
             exec_callbacks(buttons_released, BUTTON_RELEASE);
         } else {
             exec_callbacks(buttons_released, BUTTON_RELEASE | BUTTON_HAD_LONGPRESS);
         }
+        longpress_release = 0;
     }
 
     if(buttons && (buttons == last_buttons) && !interrupt_longpress) {
@@ -160,8 +160,7 @@ void exec_callbacks(u32 buttons, enum ButtonFlags flags) {
                 //We only send a release to the button that accepted a press
                 if(ptr->callback(buttons, flags, ptr->data)) {
                     //Exit after the 1st action accepts the button
-                    if (flags & BUTTON_PRESS)
-                        buttonPressed = ptr;
+                    buttonPressed = (flags & (BUTTON_PRESS | BUTTON_LONGPRESS)) ? ptr : NULL;
                     return;
                 }
             }

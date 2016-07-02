@@ -392,7 +392,7 @@ void debug_buttons()
         u32 delta = val ^ data;
         for(int i = 1; i < BUT_LAST; i++) {
             if(delta & (1 << (i-1))) {
-                printf("%s  ", INPUT_ButtonName(i));
+                printf("%s(%s)  ", INPUT_ButtonName(i), (val &(1 << (i-1)))? "Down" : "Up");
             }
         }
         if (delta) {

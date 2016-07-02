@@ -603,7 +603,7 @@ int assign_int(void* ptr, const struct struct_map *map, int map_size)
             return 1;
         }
         if (MATCH_KEY(MODEL_MIXERMODE)) {
-            for(i = 0; i < 2; i++) {
+            for(i = 1; i < 3; i++) {
                 if(MATCH_VALUE(STDMIXER_ModeName(i)))
                     m->mixer_mode = i;
             }
@@ -1283,6 +1283,7 @@ void clear_model(u8 full)
         Model.swash_type = SWASH_TYPE_NONE;
         Model.swash_invert = 0;
     }
+    Model.mixer_mode = MIXER_ADVANCED;
     Model.swashmix[0] = 60;
     Model.swashmix[1] = 60;
     Model.swashmix[2] = 60;

@@ -31,9 +31,16 @@ typedef uint64_t u64;
 
 //FATFS is defined by target_defs.h
 struct FAT {
-    char a[FILE_SIZE];
+    char inaccessible[FATSTRUCT_SIZE];
 };
 
+//Compatibility with Atmega
+#define FLASHBYTETABLE static const u8
+#define FLASHWORDTABLE static const u16
+#define pgm_read_word(x) (*(x))
+#define pgm_read_byte(x) (*(x))
+void PROTO_CS_HI(int module);
+void PROTO_CS_LO(int module);
 
 extern volatile s32 Channels[NUM_OUT_CHANNELS];
 extern const char DeviationVersion[33];
@@ -207,9 +214,8 @@ u8 BATTERY_Check();
 
 /* Mixer mode */
 typedef enum {
-    MIXER_ADVANCED = 0,
-    MIXER_STANDARD,
-    MIXER_ALL,
+    MIXER_ADVANCED = 0x01,
+    MIXER_STANDARD = 0x02,
 } MixerMode;
 void PAGE_ShowInvalidStandardMixerDialog(void *guiObj);
 void STDMIXER_Preset();

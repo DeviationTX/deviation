@@ -44,6 +44,10 @@ void _get_value_str(char *str, s32 value, u8 decimals, char units)
 {
     char format[] = "%0*d";
     format[2] = '1' + decimals;
+    if (value < 0) {
+        *str++ = '-';    // work-around tfp_format negative number bug
+        value = -value;
+    }
     sprintf(str, format, value);
 
     int i, len = strlen(str);
@@ -133,7 +137,7 @@ s32 _TELEMETRY_GetValue(struct Telemetry *t, int idx)
 
 const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
 {
-    int h, m, s, ss;
+    unsigned h, m, s, ss;
     char letter = ' ';
     int unit = 0;    // rBE-OPT: Optimizing string usage, saves some bytes
     switch(idx) {
@@ -148,7 +152,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             m = (value - h * 1000 * 60 * 60) / 1000 / 60;
             s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
             ss = value % 1000;
-            sprintf(str, "%c %3d° %02d' %02d.%03d\"", letter, h, m, s, ss);
+            sprintf(str, "%c %3u° %02u' %02u.%03u\"", letter, h, m, s, ss);
             break;
         case TELEM_GPS_LAT:
             // allowed values: +/-90° = +/- 90*60*60*1000; S if value<0, N if value>=0
@@ -161,7 +165,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             m = (value - h * 1000 * 60 * 60) / 1000 / 60;
             s = (value - h * 1000 * 60 * 60 - m * 1000 * 60) / 1000;
             ss = value % 1000;
-            sprintf(str, "%c %3d° %02d' %02d.%03d\"", letter, h, m, s, ss);
+            sprintf(str, "%c %3u° %02u' %02u.%03u\"", letter, h, m, s, ss);
             break;
         case TELEM_GPS_ALT:
             if (value < 0) {
@@ -172,7 +176,7 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
                 value = value * 328 / 100;
                 unit = 1;
             }
-            sprintf(str, "%c%d.%03d%s", letter, (int)value / 1000, (int)value % 1000, unit ? "ft" : "m");
+            sprintf(str, "%c%u.%03u%s", letter, (unsigned)value / 1000, (unsigned)value % 1000, unit ? "ft" : "m");
             break;
         case TELEM_GPS_SPEED:
             if (Transmitter.telem & TELEMUNIT_FEET) {
@@ -181,17 +185,17 @@ const char * TELEMETRY_GetValueStrByValue(char *str, int idx, s32 value)
             } else {
                 value = value * 3600 / 1000;
             }
-            sprintf(str, "%d.%03d%s", (int)value / 1000, (int)value % 1000, unit ? "mph" : "km/h");
+            sprintf(str, "%u.%03u%s", (unsigned)value / 1000, (unsigned)value % 1000, unit ? "mph" : "km/h");
             break;
         case TELEM_GPS_TIME:
         {
-            int year = 2000 + (((u32)Telemetry.gps.time >> 26) & 0x3F);
-            int month = ((u32)Telemetry.gps.time >> 22) & 0x0F;
-            int day = ((u32)Telemetry.gps.time >> 17) & 0x1F;
-            int hour = ((u32)Telemetry.gps.time >> 12) & 0x1F;
-            int min = ((u32)Telemetry.gps.time >> 6) & 0x3F;
-            int sec = ((u32)Telemetry.gps.time >> 0) & 0x3F;
-            sprintf(str, "%2d:%02d:%02d %4d-%02d-%02d",
+            unsigned year = 2000 + (((u32)Telemetry.gps.time >> 26) & 0x3F);
+            unsigned month = ((u32)Telemetry.gps.time >> 22) & 0x0F;
+            unsigned day = ((u32)Telemetry.gps.time >> 17) & 0x1F;
+            unsigned hour = ((u32)Telemetry.gps.time >> 12) & 0x1F;
+            unsigned min = ((u32)Telemetry.gps.time >> 6) & 0x3F;
+            unsigned sec = ((u32)Telemetry.gps.time >> 0) & 0x3F;
+            sprintf(str, "%2u:%02u:%02u %4u-%02u-%02u",
                     hour, min, sec, year, month, day);
             break;
         }
@@ -285,7 +289,7 @@ void TELEMETRY_SetTypeByProtocol(enum Protocols protocol)
 {
     if (protocol == PROTOCOL_DSM2 || protocol == PROTOCOL_DSMX)
         TELEMETRY_SetType(TELEM_DSM);
-    else if (protocol == PROTOCOL_FRSKY2WAY)
+    else if (protocol == PROTOCOL_FRSKY2WAY || protocol == PROTOCOL_FRSKYX)
         TELEMETRY_SetType(TELEM_FRSKY);
     else
         TELEMETRY_SetType(TELEM_DEVO);

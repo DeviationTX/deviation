@@ -646,7 +646,7 @@ u32 CLOCK_getms()
 }
 
 void PWR_Sleep() {
-    Fl::wait();
+    Fl::wait(0.1);
 }
 void LCD_ForceUpdate() {
     if (changed) {

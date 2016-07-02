@@ -36,7 +36,6 @@
 #endif
 
 #ifdef PROTO_HAS_NRF24L01
-
 #include "iface_nrf24l01.h"
 
 #ifdef EMULATOR
@@ -46,7 +45,7 @@
 #define dbgprintf printf
 #else
 #define BIND_COUNT       1000
-#define PACKET_PERIOD    2000 // Timeout for callback in uSec
+#define PACKET_PERIOD    2000UL // Timeout for callback in uSec
 //printf inside an interrupt handler is really dangerous
 //this shouldn't be enabled even in debug builds without explicitly
 //turning it on
@@ -58,8 +57,6 @@
 #define RF_NUM_CHANNELS    4
 #define RF_BIND_CHANNEL    0
 #define ADDRESS_LENGTH     5
-
-
 
 // For code readability
 enum {
@@ -113,7 +110,7 @@ static u8 checksum()
 static u16 scale_channel(u8 ch, u16 destMin, u16 destMax)
 {
     s32 chanval = Channels[ch];
-    s32 range = destMax - destMin;
+    s32 range = (s32)destMax - (s32)destMin;
 
     if      (chanval < CHAN_MIN_VALUE) chanval = CHAN_MIN_VALUE;
     else if (chanval > CHAN_MAX_VALUE) chanval = CHAN_MAX_VALUE;

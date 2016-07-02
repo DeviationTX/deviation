@@ -15,6 +15,5 @@ extern int MAINPAGE_FindNextElem(unsigned type, int idx);
 extern void GetElementSize(unsigned type, u16 *w, u16 *h);
 extern void set_selected_for_move(int idx);
 extern void show_config();
-extern void show_layout();
 
 #endif

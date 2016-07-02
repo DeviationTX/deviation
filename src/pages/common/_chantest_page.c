@@ -19,7 +19,6 @@ static const char *value_cb(guiObject_t *obj, const void *data);
 static void _handle_button_test();
 static inline guiObject_t *_get_obj(int chan, int objid);
 static int get_channel_idx(int chan);
-static void _show_bar_page(int row);
 static int cur_row = 0;
 
 enum {
@@ -44,17 +43,6 @@ const char *button_str_cb(guiObject_t *obj, const void *data)
     (void)obj;
     int button = (long)data;
     return INPUT_ButtonName(button + 1);
-}
-
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(cp->return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        cp->return_page(cp->return_val);
-    }
 }
 
 unsigned button_capture_cb(u32 button, unsigned flags, void *data)

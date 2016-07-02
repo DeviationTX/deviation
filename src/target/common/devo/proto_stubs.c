@@ -31,6 +31,8 @@ extern void TELEMETRY_SetUpdated();
 extern void TELEMETRY_SetType();
 extern void MCU_SerialNumber();
 extern void USB_Disable();
+extern void PROTO_CS_HI();
+extern void PROTO_CS_LO();
 
 void PROTO_Stubs(int idx)
 {
@@ -50,4 +52,6 @@ void PROTO_Stubs(int idx)
     _usleep();
     MCU_SerialNumber();
     USB_Disable();
+    PROTO_CS_HI();
+    PROTO_CS_LO();
 }

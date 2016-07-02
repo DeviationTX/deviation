@@ -20,13 +20,11 @@
 
 static const int ADDITIONAL_H = (LCD_HEIGHT - 240); // additional space for the bigger Devo12-screen
 
-void MIXPAGE_EditCurves(struct Curve *curve, void *data)
+void PAGE_EditCurvesInit(int page)
 {
+    (void)page;
+    struct Curve *curve = edit->curveptr;
     u8 type = CURVE_TYPE(curve);
-    if (type <= CURVE_FIXED)
-        return;
-    PAGE_RemoveAllObjects();
-    edit->parent = (void (*)(void))data;
     edit->pointnum = 0;
     edit->reverse = MIXER_SRC_IS_INV(pagemem.u.mixer_page.cur_mixer->src);
     if ((type == CURVE_EXPO || type == CURVE_DEADBAND)
@@ -35,7 +33,6 @@ void MIXPAGE_EditCurves(struct Curve *curve, void *data)
         edit->pointnum = -1;
     }
     edit->curve = *curve;
-    edit->curveptr = curve;
     GUI_CreateTextSelect(&gui->name, 8, 8, TEXTSELECT_96, NULL, set_curvename_cb, NULL);
     PAGE_CreateCancelButton(LCD_WIDTH-160, 4, okcancel_cb);
     PAGE_CreateOkButton(LCD_WIDTH-56, 4, okcancel_cb);

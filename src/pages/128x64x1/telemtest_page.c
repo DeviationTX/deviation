@@ -100,6 +100,8 @@ enum {
     RXV_LABEL,
     BATT_LABEL,
     DSM_LABEL,
+    CELLS_LABEL,
+    MISC_LABEL,
     ARROW_LABEL = 0xff,
 };
 
@@ -190,17 +192,56 @@ const struct telem_layout dsm_layout_basic[] = {
     {0, 0, 0, 0},
 };
 
+const struct telem_layout frsky_header_basic[] = {
+        {TYPE_HEADER, ITEM1_X, ITEM1_WIDTH, MISC_LABEL},
+        {TYPE_HEADER, ITEM2_X, ITEM1_WIDTH, BATT_LABEL},
+        {TYPE_HEADER, ITEM3_X, ITEM1_WIDTH, CELLS_LABEL},
+        {TYPE_HEADER, ARROW_X, ARROW_W,     ARROW_LABEL},
+        {0, 0, 0, 0},
+};
+
 const struct telem_layout frsky_layout_basic[] = {
     {TYPE_INDEX | 0, LBL1_X, LBL1_WIDTH,  1},
-    {TYPE_VALUE | 0, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP1},
+    {TYPE_VALUE | 0, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_RSSI},
     {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT1},
-    {TYPE_VALUE | 0, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
+#if HAS_EXTENDED_TELEMETRY
+    {TYPE_VALUE | 0, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL1},
+#endif
+
     {TYPE_INDEX | 1, LBL1_X, LBL1_WIDTH,  2},
-    {TYPE_VALUE | 1, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP2},
+#if HAS_EXTENDED_TELEMETRY
+    {TYPE_VALUE | 1, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP1},
+#endif
     {TYPE_VALUE | 1, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT2},
+#if HAS_EXTENDED_TELEMETRY
+    {TYPE_VALUE | 1, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL2},
+
     {TYPE_INDEX | 2, LBL1_X, LBL1_WIDTH,  3},
+    {TYPE_VALUE | 2, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_TEMP2},
     {TYPE_VALUE | 2, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLT3},
-    {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_RSSI},
+    {TYPE_VALUE | 2, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL3},
+
+    {TYPE_INDEX | 3, LBL1_X, LBL1_WIDTH, 4},
+    {TYPE_VALUE | 3, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_RPM},
+    {TYPE_VALUE | 3, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_MIN_CELL},
+    {TYPE_VALUE | 3, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL4},
+
+    {TYPE_INDEX | 4, LBL1_X, LBL1_WIDTH, 5},
+    {TYPE_VALUE | 4, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_FUEL},
+    {TYPE_VALUE | 4, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_ALL_CELL},
+    {TYPE_VALUE | 4, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL5},
+
+    {TYPE_INDEX | 5, LBL1_X, LBL1_WIDTH, 6},
+    {TYPE_VALUE | 5, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_ALTITUDE},
+    {TYPE_VALUE | 5, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_VOLTA},
+    {TYPE_VALUE | 5, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_CELL6},
+
+    {TYPE_INDEX | 6, LBL1_X, LBL1_WIDTH, 7},
+    {TYPE_VALUE | 6, FRSKY1_X, FRSKY1_WIDTH, TELEM_FRSKY_VARIO},
+    {TYPE_VALUE | 6, FRSKY2_X, FRSKY1_WIDTH, TELEM_FRSKY_CURRENT},
+    {TYPE_VALUE | 6, FRSKY3_X, FRSKY1_WIDTH, TELEM_FRSKY_DISCHARGE},
+#endif
+
     {0, 0, 0, 0},
 };
 
@@ -213,7 +254,11 @@ const struct telem_layout2 dsm_page[] = {
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 const struct telem_layout2 frsky_page[] = {
-    {devo_header_basic, frsky_layout_basic, 4, 1},
+#if HAS_EXTENDED_TELEMETRY
+    {frsky_header_basic, frsky_layout_basic, 7, 1},
+#else
+    {frsky_header_basic, frsky_layout_basic, 2, 1},
+#endif
     {devo_header_gps, devo_layout_gps, 3, 4},
 };
 static const char *header_cb(guiObject_t *obj, const void *data)
@@ -234,17 +279,11 @@ static const char *header_cb(guiObject_t *obj, const void *data)
         case RXV_LABEL: return "RxV";
         case BATT_LABEL: return "Bat";
         case DSM_LABEL: return "DSM";
+        case CELLS_LABEL:return "Cells";
+        case MISC_LABEL: return "Misc";
         case ARROW_LABEL: return current_page== telemetry_gps ? "<-" : "->";
     }
     return "";
-}
-
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)data;
-    (void)relrow;
-    (void)col;
-    return (guiObject_t *)&gui->box[0];
 }
 
 static int row_cb(int absrow, int relrow, int y, void *data)
@@ -266,10 +305,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
             case TYPE_INDEX:  font = &TINY_FONT; cmd = idx_cb; break;
             case TYPE_HEADER: cmd = header_cb; break;
             case TYPE_LABEL:  cmd = label_cb; break;
-            case TYPE_LABEL3: cmd = label_cb; y =orig_y + 2*LINE_HEIGHT; break;
+            case TYPE_LABEL3: cmd = label_cb; y = orig_y + 2*LINE_HEIGHT; break;
             case TYPE_VALUE:  font = &tp->font;  cmd = telem_cb; break;
-            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + LINE_HEIGHT;break;
-            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y =orig_y + 3*LINE_HEIGHT; break;
+            case TYPE_VALUE2: font = &tp->font;  cmd = telem_cb; y = orig_y + LINE_HEIGHT; break;
+            case TYPE_VALUE4: font = &tp->font;  cmd = telem_cb; y = orig_y + 3*LINE_HEIGHT; break;
         }
         GUI_CreateLabelBox(&gui->box[i], ptr->x, y, ptr->width, LINE_HEIGHT,
                 font, cmd, NULL, (void *)(long)ptr->source);
@@ -293,7 +332,9 @@ static void _show_page()
 {
     const struct telem_layout2 *page = _get_telem_layout2();
     PAGE_RemoveAllObjects();
-    PAGE_ShowHeader(page->header==devo_header_basic ? "" : _tr("Telemetry monitor"));
+    PAGE_ShowHeader((page->header==devo_header_basic
+                     || page->header==frsky_header_basic)
+                    ? "" : _tr("Telemetry monitor"));
     tp->font.font = TINY_FONT.font;
     tp->font.font_color = 0xffff;
     tp->font.fill_color = 0;
@@ -308,7 +349,7 @@ static void _show_page()
     DEFAULT_FONT.style = LABEL_RIGHT;
     u8 row_height = page->row_height * LINE_SPACE;
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         row_height, page->num_items, row_cb, getobj_cb, NULL, (void *)page->layout);
+                         row_height, page->num_items, row_cb, NULL, NULL, (void *)page->layout);
     DEFAULT_FONT.style = LABEL_LEFT;
     tp->telem = Telemetry;
 }
@@ -325,12 +366,11 @@ void PAGE_ShowTelemetryAlarm()
 {
     int cur_page = PAGE_GetID();
     if (cur_page != PAGEID_TELEMMON && cur_page != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON, PREVIOUS_ITEM);
+        PAGE_Pop();
 }
 
 void PAGE_TelemtestInit(int page)
 {
-    (void)okcancel_cb;
     (void)page;
     PAGE_SetModal(0);
     PAGE_SetActionCB(_action_cb);
@@ -399,28 +439,15 @@ static void _navigate_pages(s8 direction)
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))
-            TELEMETRY_MuteAlarm();
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            labelDesc.font = DEFAULT_FONT.font;  // set it back to 12x12 font
-            PAGE_ChangeByID(PAGEID_MENU, PREVIOUS_ITEM);
-        } else if (current_page != telemetry_off) {
-            // this indicates whether telem is off or not supported
-            if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-                _navigate_pages(1);
-            } else if (CHAN_ButtonIsPressed(button, BUT_LEFT)) {
-                _navigate_pages(-1);
-            } else {
-                return 0;
-            }
+    if (current_page != telemetry_off && (CHAN_ButtonIsPressed(button, BUT_RIGHT) || CHAN_ButtonIsPressed(button, BUT_LEFT))) {
+        if (flags & BUTTON_RELEASE) {
+            _navigate_pages(CHAN_ButtonIsPressed(button, BUT_RIGHT) ? 1 : -1);
         }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+        return 1;
     }
-    return 1;
+    if (flags & BUTTON_PRESS && (CHAN_ButtonIsPressed(button, BUT_ENTER) || CHAN_ButtonIsPressed(button, BUT_EXIT))) {
+        TELEMETRY_MuteAlarm();
+    }
+    return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_TELEMETRY

@@ -15,9 +15,10 @@
 
 static struct tx_configure_page * const cp = &pagemem.u.tx_configure_page;  // MACRO is not good when debugging
 
-static const char *string_cb(u8 idx, void *data)
+static const char *string_cb(guiObject_t *obj, const void *data)
 {
-    (void)data;
+    (void)obj;
+    int idx = (long)data;
     FILE *fh;
     char filename[13];
     int type;
@@ -61,3 +62,27 @@ static const char *string_cb(u8 idx, void *data)
     return _tr("Unknown");
 }
 
+static void press_cb(struct guiObject *obj, s8 press_type, const void *data)
+{
+    (void)obj;
+    (void)press_type;
+    long idx = (long)data;
+    CONFIG_ReadLang(idx);
+    PAGE_Pop();
+}
+
+static int count_num_languages()
+{
+    int num_lang = 1;
+    if (FS_OpenDir("language")) {
+        char filename[13];
+        int type;
+        while((type = FS_ReadDir(filename)) != 0) {
+            if (type == 1 && strncasecmp(filename, "lang", 4) == 0) {
+                num_lang++;
+            }
+        }
+        FS_CloseDir();
+    }
+    return num_lang;
+}

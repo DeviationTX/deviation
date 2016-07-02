@@ -18,12 +18,15 @@ struct dialog_obj {
 #define MAX_BUTT          (NUM_TX_BUTTONS > NUM_CHANNELS ? NUM_TX_BUTTONS : NUM_CHANNELS)
 #define MAX_CHAN          (MAX_CHAN_ELEMENTS > MAX_BUTT ? MAX_CHAN_ELEMENTS : MAX_BUTT)
 #define MAX_IDX           (MAX_CHAN > MAX_BUTT ? MAX_CHAN : MAX_BUTT)
+#define TIMERS_PER_PAGE   (LCD_WIDTH == 320 ? 2 : 4)
+#define LISTBOX_ITEMS     ((LCD_HEIGHT - 48) / 24)
+
 struct chantest_obj {
     guiLabel_t lock;
     guiLabel_t chan[MAX_CHAN];
     guiLabel_t value[MAX_IDX];
     guiBarGraph_t bar[MAX_IDX];
-    guiScrollbar_t scrollbar;
+    guiScrollable_t scrollable;
 };
 
 struct range_obj {
@@ -33,15 +36,15 @@ struct range_obj {
 
 struct lang_obj {
     guiButton_t ok;
-    guiListbox_t listbox;
+    guiLabel_t label[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 #define NUM_SYMBOL_COLS ((LCD_WIDTH-24) / 40)
 #define NUM_SYMBOL_ROWS ((LCD_HEIGHT-(80-(40-31))) / 40)    //allows one row more to show (no gap for last row needed)
 #define NUM_SYMBOL_ELEMS (NUM_SYMBOL_COLS * NUM_SYMBOL_ROWS)
 struct toggle_obj {
-    guiButton_t  okbutton;
-    guiButton_t  cancelbutton;
+    guiButton_t  revert;
     guiLabel_t   switchbox;
     guiLabel_t   togglelabel[3];
     guiRect_t    toggleframe;
@@ -97,6 +100,13 @@ struct mainpage_obj {
     guiImage_t pwr;
 };
 
+struct menu_obj {
+    guiLabel_t idx[ENTRIES_BY_SCREENSIZE];
+    //guiLabel_t name[ENTRIES_PER_PAGE];
+    guiButton_t name[ENTRIES_BY_SCREENSIZE];
+    guiScrollable_t scrollable;
+};
+
 #define DATALOG_NUM_SCROLLABLE (LCD_HEIGHT == 240 ? 7 : 8)
 struct datalog_obj {
     guiLabel_t enlbl;
@@ -141,8 +151,9 @@ struct modelcfg_obj {
 
 struct modelload_obj {
     guiButton_t ok;
-    guiListbox_t list;
     guiImage_t image;
+    guiLabel_t label[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 struct modelpage_obj {
@@ -180,10 +191,13 @@ struct reorder_obj {
     guiButton_t up;
     guiButton_t down;
     guiTextSelect_t value;
+    guiTextSelect_t copy;
     guiButton_t apply;
     guiButton_t insert;
     guiButton_t remove;
-    guiListbox_t list;
+    guiButton_t save;
+    guiLabel_t  name[LISTBOX_ITEMS];
+    guiScrollable_t scrollable;
 };
 
 struct scanner_obj {
@@ -202,29 +216,29 @@ struct telemcfg_obj {
 
 struct telemtest_obj {
    guiLabel_t msg;
-   guiLabel_t label[15];
-   guiLabel_t value[15];
+   guiLabel_t label[28];
+   guiLabel_t value[28];
 };
 
 struct timer_obj {
-    guiScrollbar_t scrollbar;
-    guiLabel_t timer[NUM_TIMERS];
-    guiTextSelect_t type[NUM_TIMERS];
-    guiLabel_t switchlbl[NUM_TIMERS];
-    guiTextSelect_t src[NUM_TIMERS];
-    guiLabel_t resetlbl[NUM_TIMERS];
-    guiTextSelect_t resetsrc[NUM_TIMERS];
-    guiLabel_t startlbl[NUM_TIMERS];
-    guiLabel_t resetpermlbl[NUM_TIMERS];
-    guiButton_t resetperm[NUM_TIMERS];
-    guiButton_t setperm[NUM_TIMERS];
-    guiLabel_t timelbl[NUM_TIMERS];
-    guiLabel_t timevallbl[NUM_TIMERS];
-    guiLabel_t datelbl[NUM_TIMERS];
-    guiLabel_t datevallbl[NUM_TIMERS];
-    guiLabel_t setlbl[NUM_TIMERS];
-    guiButton_t set[NUM_TIMERS];
-    guiTextSelect_t start[NUM_TIMERS];
+    guiScrollable_t scrollable;
+    guiLabel_t timer[TIMERS_PER_PAGE];
+    guiTextSelect_t type[TIMERS_PER_PAGE];
+    guiLabel_t switchlbl[TIMERS_PER_PAGE];
+    guiTextSelect_t src[TIMERS_PER_PAGE];
+    guiLabel_t resetlbl[TIMERS_PER_PAGE];
+    guiTextSelect_t resetsrc[TIMERS_PER_PAGE];
+    guiLabel_t startlbl[TIMERS_PER_PAGE];
+    guiLabel_t resetpermlbl[TIMERS_PER_PAGE];
+    guiButton_t resetperm[TIMERS_PER_PAGE];
+    guiButton_t setperm[TIMERS_PER_PAGE];
+    guiLabel_t timelbl[TIMERS_PER_PAGE];
+    guiLabel_t timevallbl[TIMERS_PER_PAGE];
+    guiLabel_t datelbl[TIMERS_PER_PAGE];
+    guiLabel_t datevallbl[TIMERS_PER_PAGE];
+    guiLabel_t setlbl[TIMERS_PER_PAGE];
+    guiButton_t set[TIMERS_PER_PAGE];
+    guiTextSelect_t start[TIMERS_PER_PAGE];
 };
 
 struct settimer_obj {
@@ -263,7 +277,7 @@ struct trimedit_obj {
 };
 
 struct tx_obj {
-    guiScrollbar_t scrollbar;
+    guiScrollable_t scrollable;
     union {
 #if LCD_WIDTH != 480
         struct tx_obj_g1
@@ -386,6 +400,7 @@ struct advcurve_obj {
 };
 
 struct advlimit_obj {
+    guiButton_t revert;
     guiLabel_t title;
     guiLabel_t reverselbl;
     guiTextSelect_t reverse;
@@ -420,8 +435,8 @@ struct advmixer_obj {
     guiLabel_t src[ENTRIES_PER_PAGE];
     guiLabel_t sw1[ENTRIES_PER_PAGE];
     guiLabel_t sw2[ENTRIES_PER_PAGE];
-    guiScrollbar_t scroll;
     guiKeyboard_t keyboard;
+    guiScrollable_t scrollable;
 };
 
 struct advmixcfg_obj {
@@ -575,6 +590,7 @@ struct gui_objs {
         struct toggle_obj toggle;
         struct mainlayout_obj mainlayout;
         struct mainpage_obj mainpage;
+        struct menu_obj menu;
         struct datalog_obj  datalog;
         struct modelcfg_obj modelcfg;
         struct modelload_obj modelload;

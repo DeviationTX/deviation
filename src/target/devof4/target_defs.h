@@ -5,10 +5,10 @@
 #include "../common/devo/common_devo.h"
 
 #define TXID 0xF7
+#define SPIFLASH_TYPE SST25VFxxxA
 #define VECTOR_TABLE_LOCATION 0x3000 //0x3000
 #define SPIFLASH_SECTOR_OFFSET 0
 #define SPIFLASH_SECTORS 16
-#define SPIFLASH_AAI_AF 1
 
 #define LCD_WIDTH 24
 #define LCD_HEIGHT 12
@@ -26,6 +26,7 @@
 #define HAS_ADVANCED_GUI    0
 #define HAS_PERMANENT_TIMER 0
 #define HAS_TELEMETRY       1
+#define HAS_EXTENDED_TELEMETRY 0
 #define HAS_TOUCH           0
 #define HAS_RTC             0
 #define HAS_VIBRATINGMOTOR  1

@@ -42,7 +42,6 @@ enum {
     ITEM_LAST,
 };
 
-static unsigned _action_cb(u32 button, unsigned flags, void *data);
 static void show_titlerow(const char *header)
 {
     PAGE_ShowHeader(header);
@@ -52,12 +51,6 @@ static void show_titlerow(const char *header)
     //        w, ITEM_HEIGHT, &DEFAULT_FONT, NULL, 0x0000, okcancel_cb, _tr("Save"));
 }
 
-static guiObject_t *getobj_cb(int relrow, int col, void *data)
-{
-    (void)col;
-    (void)data;
-    return (guiObject_t *)&gui->value[relrow];
-}
 static int row_cb(int absrow, int relrow, int y, void *data)
 {
     const void *label = NULL;
@@ -99,10 +92,9 @@ static int row_cb(int absrow, int relrow, int y, void *data)
                 SELECT_WIDTH, LINE_HEIGHT, &DEFAULT_FONT, tgl, value, data);
     return 1;
 }
-void MODELPAGE_Config()
+void PAGE_ModelConfigInit(int page)
 {
-    PAGE_SetModal(1);
-    PAGE_SetActionCB(_action_cb);
+    (void)page;
     switch (Model.type) {
       case MODELTYPE_HELI: show_titlerow(_tr("Helicopter")); break; 
       case MODELTYPE_PLANE: show_titlerow(_tr("Airplane")); break; 
@@ -112,24 +104,9 @@ void MODELPAGE_Config()
     if (Model.type == MODELTYPE_HELI) {
         GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, 
                          LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, ITEM_LAST, row_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, ITEM_LAST, row_cb, NULL, NULL, NULL);
         GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
     }
-}
-
-static unsigned _action_cb(u32 button, unsigned flags, void *data)
-{
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_ModelInit(-1);
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
-    }
-    return 1;
 }
 
 static int row2_cb(int absrow, int relrow, int y, void *data)
@@ -224,33 +201,20 @@ static int row4_cb(int absrow, int relrow, int y, void *data)
     return 1;
 }
 
-void MODELVIDEO_Config()
-{
-    PAGE_SetModal(1);
-    PAGE_SetActionCB(_action_cb);
-    show_titlerow(_tr("Video"));
-    GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
-    GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
-}
-
 void PAGE_VideoSetupInit(int page)
 {
     (void)page;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
     show_titlerow(_tr("Video"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, 4, row4_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, 4, row4_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
 #endif //HAS_VIDEO
 
-void MODELPROTO_Config()
+void PAGE_ModelProtoInit(int page)
 {
-    PAGE_SetModal(1);
-    PAGE_SetActionCB(_action_cb);
+    (void) page;
     show_titlerow(ProtocolNames[Model.protocol]);
 
     proto_strs = PROTOCOL_GetOptions();
@@ -266,14 +230,13 @@ void MODELPROTO_Config()
     }
 
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
-                         LINE_SPACE, idx, row2_cb, getobj_cb, NULL, NULL);
+                         LINE_SPACE, idx, row2_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }
 
-void MODELTRAIN_Config()
+void PAGE_TrainConfigInit(int page)
 {
-    PAGE_SetModal(1);
-    PAGE_SetActionCB(_action_cb);
+    (void)page;
     int mode = PPMin_Mode();
     show_titlerow(mode == PPM_IN_TRAIN1
                   ? _tr("Trainer Cfg (Channel)")
@@ -282,6 +245,6 @@ void MODELTRAIN_Config()
                     : _tr("PPMIn Cfg (Extend)"));
     GUI_CreateScrollable(&gui->scrollable, 0, HEADER_HEIGHT, LCD_WIDTH, LCD_HEIGHT - HEADER_HEIGHT,
                          LINE_SPACE, PPMin_Mode() == PPM_IN_SOURCE ? 3 : 3 + MAX_PPM_IN_CHANNELS,
-                         row3_cb, getobj_cb, NULL, NULL);
+                         row3_cb, NULL, NULL, NULL);
     GUI_SetSelected(GUI_ShowScrollableRowOffset(&gui->scrollable, 0));
 }

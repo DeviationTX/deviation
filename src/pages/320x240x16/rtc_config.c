@@ -57,21 +57,11 @@ struct Rtc {
     int clocksourceready;
 } Rtc;
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    PAGE_SetModal(0);
-    PAGE_RemoveAllObjects();
-    PAGE_ChangeByID(PAGEID_TXCFG);
-}
-
 void PAGE_RTCInit(int page)
 {
     (void)page;
-    PAGE_SetModal(1);
-    PAGE_RemoveAllObjects();
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_RTC), okcancel_cb);
+    PAGE_SetModal(0);
+    PAGE_ShowHeader(PAGE_GetName(PAGEID_RTC));
     u32 time = RTC_GetValue();
     u32 timevalue = RTC_GetTimeValue(time);
     Rtc.value[HOUR] = (u16)(timevalue / 3600);

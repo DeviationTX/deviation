@@ -1,3 +1,5 @@
+#ifndef __PAGES_H__
+#define __PAGES_H__
 #include "common.h"
 #include "music.h"
 #include "gui/gui.h"
@@ -17,15 +19,23 @@
 #include "telemtest_page.h"
 #include "telemconfig_page.h"
 #include "toggle_select.h"
+#include "_menus.h"
 #include "config/display.h"
 #include "rtc_config.h"
 
 #define PAGE_NAME_MAX 10
+
+#define PAGEDEF(id, init, event, exit, menu, name) id,
+enum PageID {
+#include "pagelist.h"
+PAGEID_LAST
+};
+#undef PAGEDEF
+
 extern struct pagemem pagemem;
 
 void PAGE_RemoveHeader();
 void PAGE_ShowHeader(const char *title);
-void PAGE_ShowHeader_ExitOnly(const char *str, void (*CallBack)(guiObject_t *obj, const void *data));
 void PAGE_ShowHeader_SetLabel(const char *(*label_cb)(guiObject_t *obj, const void *data), void *data);
 
 u8 PAGE_SetModal(u8 _modal);
@@ -34,6 +44,8 @@ void PAGE_RemoveAllObjects();
 guiObject_t *PAGE_CreateCancelButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 guiObject_t *PAGE_CreateOkButton(u16 x, u16 y, void (*CallBack)(guiObject_t *obj, const void *data));
 void PAGE_SetActionCB(unsigned (*callback)(u32 button, unsigned flags, void *data));
+void PAGE_SetScrollable(guiScrollable_t *scroll, u16 *selected);
+void PAGE_SaveCurrentPos();
 
 /* Main */
 void PAGE_MainInit(int page);
@@ -41,17 +53,23 @@ void PAGE_MainEvent();
 void PAGE_MainExit();
 struct ImageMap TGLICO_GetImage(int idx);
 void TGLICO_Select(guiObject_t *obj, const void *data);
+void PAGE_ToggleEditInit(int page);
+void PAGE_ToggleEditExit();
 
 /* Mixer */
 void PAGE_MixerInit(int page);
-void PAGE_MixerEvent();
 void PAGE_MixerExit();
-
+void PAGE_EditLimitsInit(int page);
+void PAGE_MixTemplateInit(int page);
+void PAGE_MixTemplateEvent();
+void PAGE_EditCurvesInit(int page);
+void PAGE_ReorderInit(int page);
+void PAGE_ShowReorderList(u8 *list, u8 count, u8 selected, u8 max_allowed, const char *(*text_cb)(u8 idx), void(*return_page)(u8 *));
 
 /* Trim */
 void PAGE_TrimInit(int page);
 void PAGE_TrimEvent();
-void PAGE_TrimExit();
+void PAGE_TrimEditInit(int page);
 
 /* Timer */
 void PAGE_TimerInit(int page);
@@ -66,12 +84,12 @@ void PAGE_SetTimerExit();
 void PAGE_ModelInit(int page);
 void PAGE_ModelEvent();
 void PAGE_ModelExit();
-void MODELPage_ShowLoadSave(int loadsave, void(*return_page)(int page));
-void MODELPAGE_Config();
-void MODELPROTO_Config();
-void MODELTRAIN_Config();
+void PAGE_ModelConfigInit(int page);
+void PAGE_ModelProtoInit(int page);
+void PAGE_TrainConfigInit(int page);
 void MODELVIDEO_Config();
 void MODELPage_Template();
+void PAGE_LoadSaveInit(int page);
 
 /* RTC */
 void PAGE_RTCInit(int page);
@@ -110,6 +128,7 @@ void PAGE_TxConfigureInit(int page);
 void PAGE_TxConfigureEvent();
 void LANGPage_Select(void(*return_page)(int page));
 void PAGE_TxConfigureExit();
+void PAGE_LanguageInit(int page);
 
 void PAGE_MainCfgEvent();
 void PAGE_MainCfgInit(int page);
@@ -138,9 +157,14 @@ void PAGE_DebuglogInit();
 void PAGE_DebuglogEvent();
 void PAGE_DebuglogExit();
 
+void PAGE_ChangeByID(enum PageID id, s8 menuPage);
+void PAGE_PushByID(enum PageID id, int page);
+void PAGE_Pop();
+int PAGE_GetCurrentID();
+
 int PAGE_QuickPage(u32 buttons, u8 flags, void *data);
 u8 PAGE_TelemStateCheck(char *str, int strlen);
-int PAGE_IsValid(int page);
+int PAGE_IsValidQuickPage(int page);
 
 
 /* Simple Mixer pages */
@@ -160,3 +184,8 @@ void PAGE_CurvesEvent();
 void PAGE_DrExpCurvesEvent();
 void PAGE_SwitchAssignInit(int page);
 void PAGE_FailSafeInit(int page);
+
+void PAGE_CalibInit(int page);
+unsigned default_button_action_cb(u32 button, unsigned flags, void *data);
+
+#endif //__PAGES_H__

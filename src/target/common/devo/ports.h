@@ -1,6 +1,18 @@
 #ifndef _PORTS_H_
 #define _PORTS_H_
 
+//SPI Flash
+#ifndef _SPI_FLASH_PORT
+    #define _SPI_FLASH_PORT          1 //SPI1
+    #define _SPI_FLASH_CSN_PIN       {GPIOB, GPIO2}
+    #define _SPI_FLASH_SCK_PIN       {GPIOA, GPIO5}
+    #define _SPI_FLASH_MISO_PIN      {GPIOA, GPIO6}
+    #define _SPI_FLASH_MOSI_PIN      {GPIOA, GPIO7}
+#endif
+#ifndef SPIFLASH_TYPE
+    #define SPIFLASH_TYPE SST25VFxxxB
+#endif
+
 #ifndef _ADC
 #define ADC_OVERSAMPLE_WINDOW_COUNT 1
     #define _ADC                    ADC1
@@ -50,6 +62,14 @@
 
 #ifndef _USART
     #define _USART USART1
+#endif
+
+#ifndef SYSCLK_TIM // System-clock timer
+    #define SYSCLK_TIM 4
+#endif
+
+#ifndef FREQ_MHz
+    #define FREQ_MHz 72
 #endif
 #endif //_PORTS_H_
 

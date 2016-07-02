@@ -54,17 +54,34 @@ const struct telem_layout devo8_layout[] = {
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout frsky_layout[] = {
-          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_FRSKY_TEMP1},
-          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_FRSKY_TEMP2},
+          {{15, 40, 40, 18}, {60, 40, 40, 18}, TELEM_FRSKY_RSSI},
+          {{15, 60, 40, 18}, {60, 60, 40, 18}, TELEM_FRSKY_TEMP1},
+          {{15, 80, 40, 18}, {60, 80, 40, 18}, TELEM_FRSKY_TEMP2},
+          {{15, 100, 40, 18}, {60, 100, 40, 18}, TELEM_FRSKY_RPM},
+          {{15, 120, 40, 18}, {60, 120, 40, 18}, TELEM_FRSKY_FUEL},
+
           {{115, 40, 40, 18}, {160, 40, 40, 18}, TELEM_FRSKY_VOLT1},
           {{115, 60, 40, 18}, {160, 60, 40, 18}, TELEM_FRSKY_VOLT2},
           {{115, 80, 40, 18}, {160, 80, 40, 18}, TELEM_FRSKY_VOLT3},
-          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_FRSKY_RPM},
-          {{15, 140, 65, 18}, {85, 140, 190, 18}, TELEM_GPS_LAT},
-          {{15, 160, 65, 18}, {85, 160, 190, 18}, TELEM_GPS_LONG},
-          {{15, 180, 65, 18}, {85, 180, 190, 18}, TELEM_GPS_ALT},
-          {{15, 200, 65, 18}, {85, 200, 190, 18}, TELEM_GPS_SPEED},
-          {{15, 220, 65, 18}, {85, 220, 190, 18}, TELEM_GPS_TIME},
+          {{115, 100, 40, 18}, {160, 100, 40, 18}, TELEM_FRSKY_MIN_CELL},
+          {{115, 120, 40, 18}, {160, 120, 40, 18}, TELEM_FRSKY_ALL_CELL},
+
+          {{215, 40, 40, 18}, {260, 40, 40, 18}, TELEM_FRSKY_CELL1},
+          {{215, 60, 40, 18}, {260, 60, 40, 18}, TELEM_FRSKY_CELL2},
+          {{215, 80, 40, 18}, {260, 80, 40, 18}, TELEM_FRSKY_CELL3},
+          {{215, 100, 40, 18}, {260, 100, 40, 18}, TELEM_FRSKY_CELL4},
+          {{215, 120, 40, 18}, {260, 120, 40, 18}, TELEM_FRSKY_CELL5},
+          {{215, 140, 40, 18}, {260, 140, 40, 18}, TELEM_FRSKY_CURRENT},
+          {{215, 160, 40, 18}, {260, 160, 40, 18}, TELEM_FRSKY_DISCHARGE},
+          {{215, 180, 40, 18}, {260, 180, 40, 18}, TELEM_FRSKY_VOLTA},
+          {{215, 200, 40, 18}, {260, 200, 40, 18}, TELEM_FRSKY_ALTITUDE},
+          {{215, 220, 40, 18}, {260, 220, 40, 18}, TELEM_FRSKY_VARIO},
+
+          {{0, 140, 55, 18}, {60, 140, 140, 18}, TELEM_GPS_LAT},
+          {{0, 160, 55, 18}, {60, 160, 140, 18}, TELEM_GPS_LONG},
+          {{0, 180, 55, 18}, {60, 180, 140, 18}, TELEM_GPS_ALT},
+          {{0, 200, 55, 18}, {60, 200, 140, 18}, TELEM_GPS_SPEED},
+          {{0, 220, 55, 18}, {60, 220, 140, 18}, TELEM_GPS_TIME},
           {{0, 0, 0, 0}, {0, 0, 0, 0}, 0},
 };
 const struct telem_layout dsm_layout[] = {
@@ -121,7 +138,7 @@ static void show_page()
 void PAGE_ShowTelemetryAlarm()
 {
     if (PAGE_GetID() != PAGEID_TELEMCFG)
-        PAGE_ChangeByID(PAGEID_TELEMMON);
+        PAGE_ChangeByID(PAGEID_TELEMMON, 0);
 }
 
 void PAGE_TelemtestInit(int page)
@@ -136,21 +153,6 @@ void PAGE_TelemtestInit(int page)
     show_page();
 }
 
-void PAGE_TelemtestModal(void(*return_page)(int page), int page)
-{
-    PAGE_SetModal(1);
-    tp->return_page = return_page;
-    tp->return_val = page;
-    PAGE_RemoveAllObjects();
-
-    PAGE_ShowHeader_ExitOnly(PAGE_GetName(PAGEID_TELEMMON), okcancel_cb);
-    if (telem_state_check() == 0) {
-        GUI_CreateLabelBox(&gui->msg, 20, 80, 280, 100, &NARROW_FONT, NULL, NULL, tempstring);
-        return;
-    }
-
-    show_page();
-}
 void PAGE_TelemtestEvent() {
     static u32 count;
     int flicker = ((++count & 3) == 0);

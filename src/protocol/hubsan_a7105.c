@@ -471,7 +471,7 @@ static u16 hubsan_cb()
         A7105_ReadData(packet, 16);
         state++;
         if (state == BIND_5)
-            A7105_WriteID((packet[2] << 24) | (packet[3] << 16) | (packet[4] << 8) | packet[5]);
+            A7105_WriteID(((u32)packet[2] << 24) | ((u32)packet[3] << 16) | ((u32)packet[4] << 8) | packet[5]);
         
         return 500;  //8msec elapsed time since last write;
     case BIND_8:

@@ -45,14 +45,3 @@ static const char *label_cb(guiObject_t *obj, const void *data)
     return tempstring;
 }
 
-static void okcancel_cb(guiObject_t *obj, const void *data)
-{
-    (void)obj;
-    (void)data;
-    if(tp->return_page) {
-        PAGE_SetModal(0);
-        PAGE_RemoveAllObjects();
-        tp->return_page(tp->return_val);
-    }
-}
-
