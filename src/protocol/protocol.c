@@ -383,10 +383,7 @@ int PROTOCOL_SetSwitch(int module)
 {
     (void)module;
 #if HAS_MULTIMOD_SUPPORT
-    if (! Transmitter.module_enable[MULTIMOD].port)
-        return 0;
-    u8 csn = SPI_ProtoGetPinConfig(module, CSN_PIN);
-    return SPI_ConfigSwitch(0x0f, 0x0f ^ csn);
+    return MULTIMOD_SwitchCommand(module, CHANGE_MODULE);
 #else
     return 0;
 #endif
@@ -450,13 +447,13 @@ void PROTOCOL_InitModules()
                     }
                     break;
                 }
-            } 
+            }
         }
     }
     //Put this last because the switch will not respond until after it has been initialized
     if (Transmitter.module_enable[MULTIMOD].port && PROTOCOL_SetSwitch(TX_MODULE_LAST) == 0) {
         //No Switch found
-	error = 1;
+        error = 1;
         missing[MULTIMOD] = MODULE_NAME[MULTIMOD];
     }
     Model.protocol = orig_proto;
