@@ -129,7 +129,7 @@ void SPI_ProtoInit()
         gpio_set(port->port, port->pin);
     }
 #endif //HAS_MULTIMOD_SUPPORT
-    for (int i = 0; i < MULTIMOD; i++) {
+    for (int i = 0; i < TX_MODULE_LAST; i++) {
         if(Transmitter.module_enable[i].port
            && Transmitter.module_enable[i].port != SWITCH_ADDRESS)
         {

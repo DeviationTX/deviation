@@ -109,11 +109,15 @@ static int mm_SwitchCommand(int module, int command)
     u8 csn = mm_ProtoGetPinConfig(module, CSN_PIN);
     u8 csn_high = static_val | 0x0f;
     u8 csn_low  = static_val | (0x0f ^ csn);
+#if 0
     SPI_SwitchStartData();
     int byte1 = PROTOSPI_xfer(csn_high);
     int byte2 = PROTOSPI_xfer(csn_low);
     SPI_SwitchStopData();
     return (command == CHANGE_MODULE && byte1 == 0xa5) ? byte2 : 0;
+#else
+    return SPI_ConfigSwitch(csn_high, csn_low);
+#endif
 }
 
 int MULTIMOD_SwitchCommand(int module, int command)
