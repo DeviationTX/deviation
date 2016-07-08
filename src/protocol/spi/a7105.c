@@ -26,11 +26,11 @@
 #ifdef PROTO_HAS_A7105
 
 static void CS_HI() {
-    PROTO_CS_HI(A7105);
+    MODULE_CSN(A7105, 1);
 }
 
 static void CS_LO() {
-    PROTO_CS_LO(A7105);
+    MODULE_CSN(A7105, 0);
 }
 
 void A7105_WriteReg(u8 address, u8 data)

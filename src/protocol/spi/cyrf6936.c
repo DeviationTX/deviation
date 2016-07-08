@@ -41,11 +41,11 @@
 
 #define Delay usleep
 static void CS_HI() {
-    PROTO_CS_HI(CYRF6936);
+    MODULE_CSN(CYRF6936, 1);
 }
 
 static void CS_LO() {
-    PROTO_CS_LO(CYRF6936);
+    MODULE_CSN(CYRF6936, 0);
 }
 
 void CYRF_WriteRegister(u8 address, u8 data)

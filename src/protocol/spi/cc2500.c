@@ -26,11 +26,11 @@
 #ifdef PROTO_HAS_CC2500
 //GPIOA.14
 static void CS_HI() {
-    PROTO_CS_HI(CC2500);
+    MODULE_CSN(CC2500, 1);
 }
 
 static void CS_LO() {
-    PROTO_CS_LO(CC2500);
+    MODULE_CSN(CC2500, 0);
 }
 
 void CC2500_WriteReg(u8 address, u8 data)
