@@ -1,0 +1,160 @@
+This describes the wireless protocol for control of the Cheerson CX-10A and
+CX-10 (blue).
+
+1. Operating Phase
+
+The controller and vehicle start in binding phase when powered on.  They tune to
+the binding channel, 2402 MHz, and the controller transmits a binding request
+packet every 6 ms until receiving a reply from a listening vehicle.  The
+binding request packet includes a special binding vehicle identifier (VID) that
+any vehicle may respond to.  The vehicle's binding response informs the
+controller of its unique VID.  Subsequently, the controller transmits a request
+containing that VID, and the vehicle replies with an acknowledgment.
+
+After this four packet binding handshake, the controller and vehicle switch to
+flying phase until powered off.  In flying phase, the controller transmits
+control commands; the vehicle never transmits.  The devices follow a
+four-channel repeated frequency hopping sequence derived from the controller's
+unique identifier (CID).  The controller transmits each packet on a new
+frequency in the hopping sequence, 5.25 ms after the start of the previous
+packet on the previous frequency.
+
+2. Packet Payload Format
+
+Packets in both binding phase and flying phase have the same format.  The packet
+payload has a fixed length of 21 bytes divided into 9 fields.  Each field is
+transmitted LSB first.
+
+field    byte     length   description
+name     offset   in bytes
+---------------------------------------------------
+phase    0        1        operating phase
+CID      1        4        controller identifier
+VID      5        4        vehicle identifier
+aileron  9        2        aileron (roll) control
+elevator 11       2        elevator (pitch) control
+throttle 13       2        throttle control
+rudder   15       1.5      rudder (yaw) control
+flip     16.5     0.5      flip control
+mode     17       2        flight control mode
+CRC      19       2        cyclic redundancy check
+
+ 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20
++---+---------------+---------------+-------+-------+-------+-----+-+-------+-------+
+|pha|      CID      |      VID      |aileron|elevato|throttl|rudde|f| mode  |  CRC  |
++---+---------------+---------------+-------+-------+-------+-----+-+-------+-------+
+
+2.1 Phase Field
+    
+    0xaa: binding phase
+    0x55: flying phase
+
+2.2 CID Field
+
+    The hopping sequence is derived from the four least significant nibbles of
+    the CID.  (See Frequency Hopping below.)
+
+2.3 VID Field
+
+    0xffffffff: binding VID
+
+2.4 Aileron Field
+
+    The aileron (roll) value is encoded as an integer ranging from 1000 (roll
+    to right) to 2000 (roll to left).  It sometimes encodes special conditions
+    in binding phase:
+
+    0x00: indicates this is the first binding request or binding reply packet
+    0x01: acknowledgment from vehicle before switch to flying phase
+
+2.5 Elevator Field
+
+    The elevator (pitch) value is encoded as an integer ranging from 1000
+    (forward) to 2000 (backward).
+
+2.6 Throttle Field
+
+    The throttle value is encoded as an integer ranging from 1000 (off) to 2000
+    (full throttle).  Note: 1000 observed in binding phase, 969 to 1938 observed
+    in flying phase.
+
+2.7 Rudder Field
+
+    The rudder (yaw) value is encoded as an integer ranging from 1000 (rotate
+    left) to 2000 (rotate right).
+
+2.8 Flip Field
+
+    1: Execute flip on next extreme aileron or elevator.
+
+2.9 Mode Field
+
+    0: junior (self-level) mode
+    1: intermediate (rate) mode
+    2: headless mode
+
+2.10 CRC Field
+
+    The 16-bit CRC is computed over all data fields, starting with the adress
+    and ending with the mode field.  See src/protocol/spi/nrf24l01.c for
+    details.
+
+3. Packet Framing
+
+Each packet begins with a synchronization word consisting of the following
+binary sequence:
+
+    sync word: 00000011100010000111101010101
+
+Ignoring the first five bits, this is 0x710f55 in hexadecimal.
+
+Following the sync word is a five byte address.  Every packet uses the same
+address:
+
+    address: 0xcccccccccc
+
+The payload follows the address.  Following the payload is a one byte trailer:
+
+    trailer: 0x49
+
+4. Packet Whitening
+
+Packet data, including the address and trailer, are whitened (scrambled) by
+XOR with a fixed whitening sequence:
+
+    0xe3, 0xb1, 0x4b, 0xea, 0x85, 0xbc, 0xe5, 0x66, 0x0d,
+    0xae, 0x8c, 0x88, 0x12, 0x69, 0xee, 0x1f, 0xc7, 0x62,
+    0x97, 0xd5, 0x0b, 0x79, 0xca, 0xcc, 0x1b, 0x5d, 0x19
+
+5. Modulation
+
+Packets are GFSK modulated at a rate of 1 Mbit/second and a frequency deviation
+of approximately +/- 340 kHz.  Zero bits are represented by the lower frequency
+deviation while one bits are represented by the higher deviation.  Each packet
+has a duration of 245 microseconds and is preceded by an unmodulated carrier
+for an additional 245 microseconds.
+
+6. Frequency Hopping
+
+The frequency hopping channel sequence in flying phase consists of four
+channels, one from each of the following frequency ranges, in order:
+
+    2403 - 2418 MHz
+    2422 - 2437 MHz
+    2445 - 2460 MHz
+    2464 - 2479 MHz
+
+The first channel frequency in MHz is determined by adding least significant
+nibble of the CID to 2403.  The second channel is determined by adding the
+second least significant nibble of the CID to 2422, and so on.
+
+7. Credits
+
+This document was written by Michael Ossmann based primarily on the deviation
+source code and information in this forum thread produced by various fine
+reverse engineers:
+
+http://www.deviationtx.com/forum/protocol-development/3368-jd-395-cx-10
+
+Secondarily, this was based on direct observations of the CX-10A.  The CX-10
+(blue) uses a nearly identical protocol.
