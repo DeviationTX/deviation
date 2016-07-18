@@ -145,8 +145,7 @@ void reset_timerperm_cb(guiObject_t *obj, const void *data)
 #if HAS_PERMANENT_TIMER
     if (index & 0x80) {   // set
         current_selected = GUI_ScrollableGetObjRowOffset(&gui->scrollable, GUI_GetSelected());
-        PAGE_RemoveAllObjects();
-        PAGE_SetTimerInit(index & 0x7f);
+        PAGE_PushByID(PAGEID_SETTIMER, index & 0x7f);
     } else  // reset
 #endif
         PAGE_ShowResetPermTimerDialog(obj,(void *)(index & 0x7f));

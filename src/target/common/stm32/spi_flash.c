@@ -69,9 +69,11 @@ void CS_LO()
 {
     if (HAS_4IN1_FLASH) {
         cm_disable_interrupts();
+        SPISwitch_UseFlashModule();
     }
     PORT_pin_clear(FLASH_CSN_PIN);
 }
+
 /*
  *
  */
@@ -101,10 +103,14 @@ void SPIFlash_Init()
     spi_set_nss_high(SPIx);
 
     spi_enable(SPIx);
-
+    if (HAS_4IN1_FLASH) {
+        SPISwitch_Init();
+    }
 #if 0 //4IN1DEBUG
+    // This code is equivalent to using SPISwitch_Init
     static const struct mcu_pin FLASH_RESET_PIN ={GPIOB, GPIO11};
     PORT_mode_setup(FLASH_RESET_PIN,  GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL);
+    // And this is equivalent of using SPISwitch_UseFlashModule in CS_LO
     u8 cmd = 4;
     PORT_pin_clear(FLASH_RESET_PIN);
     spi_xfer(SPIx, cmd);

@@ -18,7 +18,7 @@ PAGEDEF(PAGEID_MAIN,     PAGE_MainInit,        PAGE_MainEvent,        PAGE_MainE
 PAGEDEF(PAGEID_MENU,     PAGE_MenuInit,        NULL,                  NULL,               0,           _tr_noop("Main menu"))
 // don't include this in Devo7e due to memory restrictions
 #if HAS_PERMANENT_TIMER
-PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  NULL,               0,           _tr_noop("Set permanent timer"))
+PAGEDEF(PAGEID_SETTIMER, PAGE_SetTimerInit,    NULL,                  PAGE_SetTimerExit,  0,           _tr_noop("Set permanent timer"))
 #endif
 #if HAS_VIDEO
 PAGEDEF(PAGEID_VIDEOCFG, PAGE_VideoSetupInit,  NULL,                  NULL,               0,           _tr_noop("Video setup"))
@@ -82,6 +82,9 @@ PAGEDEF(PAGEID_LANGUAGE, PAGE_LanguageInit,    NULL,                  NULL,     
 PAGEDEF(PAGEID_CALIB,    PAGE_CalibInit,       NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_TRIMEDIT, PAGE_TrimEditInit,    NULL,                  NULL,               0,           "")
 PAGEDEF(PAGEID_TGLEDIT,  PAGE_ToggleEditInit,  NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_PROTOCFG, PAGE_ModelProtoInit,  NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TYPECFG,  PAGE_ModelConfigInit, NULL,                  NULL,               0,           "")
+PAGEDEF(PAGEID_TRAINCFG, PAGE_TrainConfigInit, NULL,                  NULL,               0,           "")
 #if HAS_LAYOUT_EDITOR
 PAGEDEF(PAGEID_LAYOUT,   PAGE_LayoutEditInit,  NULL,                  NULL,               0,           "")
 #endif

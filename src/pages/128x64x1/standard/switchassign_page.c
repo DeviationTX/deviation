@@ -79,19 +79,11 @@ void PAGE_SwitchAssignInit(int page)
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        } else if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
-            MUSIC_Play(MUSIC_SAVING);
-            save_changes();
-        }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if (CHAN_ButtonIsPressed(button, BUT_ENTER)) {
+        MUSIC_Play(MUSIC_SAVING);
+        save_changes();
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 #endif //HAS_STANDARD_GUI

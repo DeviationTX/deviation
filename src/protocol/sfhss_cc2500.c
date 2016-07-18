@@ -340,8 +340,9 @@ static void initialize()
 {
     CLOCK_StopTimer();
 #ifdef USE_TUNE_FREQ
-    coarse = (int)Model.proto_opts[PROTO_OPTS_FREQCOARSE];
-    fine = Model.proto_opts[PROTO_OPTS_FREQFINE];
+    /* Initialize to neutral values so tune_freq will work */
+    coarse = 0;
+    fine   = 0;
 #endif
     get_tx_id();
     u32 r = rand32_r(0, 0);

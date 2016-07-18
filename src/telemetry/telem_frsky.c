@@ -122,9 +122,15 @@ s32 _frsky_get_max_value(u8 telem)
         case TELEM_FRSKY_RSSI:      return 60000;
 #if HAS_EXTENDED_TELEMETRY
         case TELEM_FRSKY_RPM:       return 60000;
-        case TELEM_FRSKY_VOLT3:     return 500 * 6;
-        case TELEM_FRSKY_MIN_CELL:  return 819 ;
+        case TELEM_FRSKY_VOLT3:
         case TELEM_FRSKY_ALL_CELL:  return 500 * 6;   // in 100ths of volts
+        case TELEM_FRSKY_MIN_CELL:
+        case TELEM_FRSKY_CELL1:
+        case TELEM_FRSKY_CELL2:
+        case TELEM_FRSKY_CELL3:
+        case TELEM_FRSKY_CELL4:
+        case TELEM_FRSKY_CELL5:
+        case TELEM_FRSKY_CELL6:     return 500 ;
         case TELEM_FRSKY_VOLTA:     return 4800;
         case TELEM_FRSKY_TEMP1:
         case TELEM_FRSKY_TEMP2:     return 250;

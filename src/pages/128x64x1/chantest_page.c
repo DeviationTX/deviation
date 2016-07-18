@@ -129,22 +129,13 @@ static void _navigate_pages(s8 direction)
 
 static unsigned _action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if (flags & BUTTON_PRESS) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            labelDesc.font = DEFAULT_FONT.font;
-            PAGE_Pop();
-        } else if (CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            _navigate_pages(1);
-        }  else if (CHAN_ButtonIsPressed(button,BUT_LEFT)) {
-            _navigate_pages(-1);
+    if (CHAN_ButtonIsPressed(button, BUT_RIGHT) || CHAN_ButtonIsPressed(button, BUT_LEFT)) {
+        if (flags & BUTTON_RELEASE) {
+            _navigate_pages(CHAN_ButtonIsPressed(button, BUT_RIGHT) ? 1 : -1);
         }
-        else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 
 static const char *channum_cb(guiObject_t *obj, const void *data)

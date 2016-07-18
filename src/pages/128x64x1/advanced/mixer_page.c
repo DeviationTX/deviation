@@ -92,17 +92,10 @@ static int row_cb(int absrow, int relrow, int y, void *data)
 
 unsigned action_cb(u32 button, unsigned flags, void *data)
 {
-    (void)data;
-    if ((flags & BUTTON_PRESS) || (flags & BUTTON_LONGPRESS)) {
-        if (CHAN_ButtonIsPressed(button, BUT_EXIT)) {
-            PAGE_Pop();
-        } else if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
-            reorder_cb(NULL, NULL);
-        } else {
-            // only one callback can handle a button press, so we don't handle BUT_ENTER here, let it handled by press cb
-            return 0;
-        }
+    if ((flags & BUTTON_LONGPRESS) && CHAN_ButtonIsPressed(button, BUT_RIGHT)) {
+        reorder_cb(NULL, NULL);
+        return 1;
     }
-    return 1;
+    return default_button_action_cb(button, flags, data);
 }
 
