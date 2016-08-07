@@ -72,7 +72,8 @@ enum{
 };
 
 static const char * const afhds2a_opts[] = {
-    _tr_noop("PPM"), _tr_noop("Off"), _tr_noop("On"), NULL,
+    //_tr_noop("PPM"), _tr_noop("Off"), _tr_noop("On"), NULL,
+    _tr_noop("Outputs"), "PWM/IBUS", "PPM/IBUS", "PWM/SBUS", "PPM/SBUS", NULL,
     _tr_noop("Servo Hz"), "50", "400", "5", NULL,
     "RX ID", "-32768", "32767", "1", NULL, // todo: store that elsewhere
     "RX ID2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -80,7 +81,15 @@ static const char * const afhds2a_opts[] = {
 };
 
 enum {
-    PROTOOPTS_PPM = 0,
+    PWM_IBUS = 0,
+    PPM_IBUS,
+    PWM_SBUS,
+    PPM_SBUS
+};
+
+enum {
+    //PROTOOPTS_PPM = 0,
+    PROTOOPTS_OUTPUTS = 0,
     PROTOOPTS_SERVO_HZ,
     PROTOOPTS_RXID, // todo: store that elsewhere
     PROTOOPTS_RXID2,// ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -225,10 +234,21 @@ static void build_settings_packet()
     packet[10]= 0xff;
     packet[11]= Model.proto_opts[PROTOOPTS_SERVO_HZ] & 0xff;
     packet[12]= (Model.proto_opts[PROTOOPTS_SERVO_HZ] >> 8) & 0xff;
-    packet[13]= Model.proto_opts[PROTOOPTS_PPM];
+    //packet[13]= Model.proto_opts[PROTOOPTS_PPM];
+    if(Model.proto_opts[PROTOOPTS_OUTPUTS] == PPM_IBUS || Model.proto_opts[PROTOOPTS_OUTPUTS] == PPM_SBUS)
+        packet[13] = 0x01; // PPM output enabled
+    else
+        packet[13] = 0x00;
     packet[14]= 0x00;
     for(u8 i=15; i<37; i++)
         packet[i] = 0xff;
+    packet[18] = 0x05; // ?
+    packet[19] = 0xdc; // ?
+    packet[20] = 0x05; // ?
+    if(Model.proto_opts[PROTOOPTS_OUTPUTS] == PWM_SBUS || Model.proto_opts[PROTOOPTS_OUTPUTS] == PPM_SBUS)
+        packet[21] = 0xdd; // SBUS output enabled
+    else
+        packet[21] = 0xde;
     packet[37] = 0x00;
 }
 
