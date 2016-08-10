@@ -73,6 +73,6 @@ void UART_Stop()
 {
     usart_disable(USART1);
 #if HAS_AUDIO_UART5
-    usart_disable(UART5);
+    // usart_disable(UART5);	// When using PPM, it will call UART_Stop resulting in closing UART5 unexpectedly
 #endif
 }
