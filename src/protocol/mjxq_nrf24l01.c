@@ -192,17 +192,11 @@ static void send_packet(u8 bind)
 
     packet[14] = 0xc0;  // bind value
     switch (Model.proto_opts[PROTOOPTS_FORMAT]) {
-    case FORMAT_E010:
-        packet[10] = GET_FLAG(CHANNEL_HEADLESS, 0x01)
-                   | GET_FLAG(CHANNEL_RTH, 0x02);
-        if (!bind) 
-            packet[14] = GET_FLAG(CHANNEL_FLIP, 0x04);
-        break;
-        
     case FORMAT_H26D:
         packet[10] = pan_tilt_value();
         // fall through on purpose - no break
     case FORMAT_WLH08:
+    case FORMAT_E010:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
                     | GET_FLAG(CHANNEL_HEADLESS, 0x01);
         if (!bind) {
