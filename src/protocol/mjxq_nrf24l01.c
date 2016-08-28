@@ -195,7 +195,8 @@ static void send_packet(u8 bind)
     case FORMAT_E010:
         packet[10] = GET_FLAG(CHANNEL_HEADLESS, 0x01)
                    | GET_FLAG(CHANNEL_RTH, 0x02);
-        if (!bind) packet[14] = 0;
+        if (!bind) 
+            packet[14] = GET_FLAG(CHANNEL_FLIP, 0x04);
         break;
         
     case FORMAT_H26D:
