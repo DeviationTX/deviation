@@ -215,10 +215,12 @@ static void send_packet(u8 bind)
         packet_ori[2] = scale_channel(CHANNEL2,0,0x64); // elevator
         packet_ori[3] = scale_channel(CHANNEL1,0,0x64);  // aileron
         packet_ori[4] = trim_val; // calculated above
-        packet_ori[5] = FLAG_EXPERT
+        packet_ori[5] = FLAG_EXPERT | FLAG_RETURN
                       | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
-                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS)
-                      | GET_FLAG(CHANNEL_RTH, FLAG_RETURN);
+                      | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+        if( GET_FLAG(CHANNEL_RTH, 1))
+            packet_ori[5] &= ~FLAG_RETURN;
+                      
         packet_ori[6] = 0x00;
         // calculate checksum
         u8 checksum = 0;
