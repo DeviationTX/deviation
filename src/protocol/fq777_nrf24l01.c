@@ -211,9 +211,9 @@ static void send_packet(u8 bind)
                 trim_val = 0x60;
 
         packet_ori[0] = scale_channel(CHANNEL3,0,0x64); // throttle
-        packet_ori[1] = scale_channel(CHANNEL4,0,0x64);   // rudder
+        packet_ori[1] = scale_channel(CHANNEL4,0x64,0x0);   // rudder
         packet_ori[2] = scale_channel(CHANNEL2,0,0x64); // elevator
-        packet_ori[3] = scale_channel(CHANNEL1,0,0x64);  // aileron
+        packet_ori[3] = scale_channel(CHANNEL1,0x64,0);  // aileron
         packet_ori[4] = trim_val; // calculated above
         packet_ori[5] = FLAG_EXPERT | FLAG_RETURN
                       | GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
