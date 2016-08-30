@@ -81,6 +81,21 @@ enum {
 #define CHANNEL_HEADLESS    CHANNEL9
 #define CHANNEL_RTH         CHANNEL10
 
+static const char * const fq777_opts[] = {
+    _tr_noop("Format"), "124", NULL,
+    NULL
+};
+
+enum {
+    PROTOOPTS_FORMAT = 0,
+    LAST_PROTO_OPT,
+};
+ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
+
+enum {
+    PROTOOPTS_FORMAT_124,
+};
+
 static const u8 ssv_xor[] = {0x80,0x44,0x64,0x75,0x6C,0x71,0x2A,0x36,0x7C,0xF1,0x6E,0x52,0x9,0x9D,0x1F,0x78,0x3F,0xE1,0xEE,0x16,0x6D,0xE8,0x73,0x9,0x15,0xD7,0x92,0xE7,0x3,0xBA};
 static u8 bind_addr []   = {0xe7,0xe7,0xe7,0xe7,0x67};
 static u16 bind_counter;
@@ -350,7 +365,7 @@ const void *FQ777_Cmds(enum ProtoCmds cmd)
         case PROTOCMD_NUMCHAN: return (void *) 10L;
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)10L;
         case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-        case PROTOCMD_GETOPTIONS: return (void *)0L;
+        case PROTOCMD_GETOPTIONS: return fq777_opts;
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
         default: break;
     }
