@@ -331,19 +331,33 @@ u16 fq777_callback()
 
 void initFQ777(void)
 {
-    u32 temp;
+    u32 lfsr = 0xb2c54a2ful;
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
     bind_counter = BIND_COUNT;
     packet_count=0;
-    if (Model.fixed_id) {
-        temp = Crc(&Model.fixed_id, sizeof(Model.fixed_id));
-    } else {
-        temp = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) ;
+    
+#ifndef USE_FIXED_MFGID
+    u8 var[12];
+    MCU_SerialNumber(var, 12);
+    dbgprintf("Manufacturer id: ");
+    for (int i = 0; i < 12; ++i) {
+        dbgprintf("%02X", var[i]);
+        rand32_r(&lfsr, var[i]);
     }
-    rx_tx_addr[0] = (temp >> 8) & 0xff;
-    rx_tx_addr[1] = temp & 0xff;
+    dbgprintf("\r\n");
+#endif
+
+    if (Model.fixed_id) {
+       for (u8 i = 0, j = 0; i < sizeof(Model.fixed_id); ++i, j += 8)
+           rand32_r(&lfsr, (Model.fixed_id >> j) & 0xff);
+    }
+    // Pump zero bytes for LFSR to diverge more
+    for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
+        
+    rx_tx_addr[0] = (lfsr >> 8) & 0xff;
+    rx_tx_addr[1] = lfsr & 0xff;
     rx_tx_addr[2] = 0x00;
     rx_tx_addr[3] = 0xe7;
     rx_tx_addr[4] = 0x67;
