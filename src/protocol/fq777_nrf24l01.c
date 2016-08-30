@@ -86,7 +86,7 @@ static u8 bind_addr []   = {0xe7,0xe7,0xe7,0xe7,0x67};
 static u16 bind_counter;
 static u8 rx_tx_addr[5];
 static u32 packet_count;
-static u8 hopping_frequency[NUM_RF_CHANNELS];
+static const u8 hopping_frequency[NUM_RF_CHANNELS] = {0x4D,0x43,0x27,0x07};
 static u8 hopping_frequency_no;
 static u8 tx_power;
 static u8 packet[32];
@@ -316,19 +316,23 @@ u16 fq777_callback()
 
 void initFQ777(void)
 {
+    u32 temp;
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
     bind_counter = BIND_COUNT;
     packet_count=0;
-    hopping_frequency[0] = 0x4D;
-    hopping_frequency[1] = 0x43;
-    hopping_frequency[2] = 0x27;
-    hopping_frequency[3] = 0x07;
-    hopping_frequency_no=0;
+    if (Model.fixed_id) {
+        temp = Crc(&Model.fixed_id, sizeof(Model.fixed_id));
+    } else {
+        temp = (Crc(&Model, sizeof(Model)) + Crc(&Transmitter, sizeof(Transmitter))) ;
+    }
+    rx_tx_addr[0] = (temp >> 8) & 0xff;
+    rx_tx_addr[1] = temp & 0xff;
     rx_tx_addr[2] = 0x00;
     rx_tx_addr[3] = 0xe7;
     rx_tx_addr[4] = 0x67;
+    hopping_frequency_no=0;
     init();
     CLOCK_StartTimer(INITIAL_WAIT, fq777_callback);
 }
