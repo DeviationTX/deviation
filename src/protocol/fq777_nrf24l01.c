@@ -15,7 +15,7 @@
  
 #ifdef MODULAR
   //Allows the linker to properly relocate
-  #define Cmds PROTO_Cmds
+  #define FQ777_Cmds PROTO_Cmds
   #pragma long_calls
 #endif
 #include "common.h"
@@ -97,11 +97,11 @@ enum {
 };
 
 static const u8 ssv_xor[] = {0x80,0x44,0x64,0x75,0x6C,0x71,0x2A,0x36,0x7C,0xF1,0x6E,0x52,0x9,0x9D,0x1F,0x78,0x3F,0xE1,0xEE,0x16,0x6D,0xE8,0x73,0x9,0x15,0xD7,0x92,0xE7,0x3,0xBA};
-static u8 bind_addr []   = {0xe7,0xe7,0xe7,0xe7,0x67};
+static const u8 bind_addr [] = {0xe7,0xe7,0xe7,0xe7,0x67};
+static const u8 hopping_frequency[NUM_RF_CHANNELS] = {0x4D,0x43,0x27,0x07};
 static u16 bind_counter;
 static u8 rx_tx_addr[5];
 static u32 packet_count;
-static const u8 hopping_frequency[NUM_RF_CHANNELS] = {0x4D,0x43,0x27,0x07};
 static u8 hopping_frequency_no;
 static u8 tx_power;
 static u8 packet[32];
@@ -121,7 +121,7 @@ static u16 crc16_update(u16 crc, uint8_t a)
     return crc;
 }
 
-static void ssv_pack_dpl(u8 addr[], u8 pid, u8* len, u8* payload, u8* packed_payload)
+static void ssv_pack_dpl(u8 const addr[], u8 pid, u8* len, u8* payload, u8* packed_payload)
 {
     u8 i = 0;
 
