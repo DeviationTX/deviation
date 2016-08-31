@@ -162,7 +162,7 @@ u16 ASSAN_callback()
                 if(packet[19]==0x13)
                 { //Last frame received
                     state++;
-                    state &= WAIT;
+                    state |= WAIT;
                     //Switch to TX
                     NRF24L01_SetTxRxMode(TXRX_OFF);
                     NRF24L01_SetTxRxMode(TX_EN);
