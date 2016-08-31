@@ -82,7 +82,7 @@ enum {
 #define CHANNEL_RTH         CHANNEL10
 
 static const char * const fq777_opts[] = {
-    _tr_noop("Format"), "124", NULL,
+    _tr_noop("Format"), "124 SSV", NULL,
     NULL
 };
 
@@ -93,7 +93,7 @@ enum {
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
-    PROTOOPTS_FORMAT_124,
+    PROTOOPTS_FORMAT_124_SSV,
 };
 
 static const u8 ssv_xor[] = {0x80,0x44,0x64,0x75,0x6C,0x71,0x2A,0x36,0x7C,0xF1,0x6E,0x52,0x9,0x9D,0x1F,0x78,0x3F,0xE1,0xEE,0x16,0x6D,0xE8,0x73,0x9,0x15,0xD7,0x92,0xE7,0x3,0xBA};
@@ -112,11 +112,11 @@ static u8 packet[32];
 static const u16 polynomial = 0x1021;
 static u16 crc16_update(u16 crc, uint8_t a)
 {
-	crc ^= a << 8;
+    crc ^= a << 8;
     for (uint8_t i = 0; i < 8; ++i)
         if (crc & 0x8000)
             crc = (crc << 1) ^ polynomial;
-		else
+        else
             crc = crc << 1;
     return crc;
 }
@@ -253,6 +253,10 @@ static void send_packet(u8 bind)
     hopping_frequency_no %= NUM_RF_CHANNELS;
     NRF24L01_WriteReg(NRF24L01_07_STATUS, 0x70);
     NRF24L01_FlushTx();
+    // not sure how this could be useful to repeat
+    // transmit 3 times in a row as the first 2 won't 
+    // be transmitted actually, but it has been report 
+    // that fixes a lag issue ?
     NRF24L01_WritePayload(packet, packet_len);
     NRF24L01_WritePayload(packet, packet_len);
     NRF24L01_WritePayload(packet, packet_len);
