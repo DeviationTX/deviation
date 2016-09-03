@@ -49,21 +49,49 @@ enum {
 
 // Bit mnemonics
 enum {
-    NRF24L01_00_MASK_RX_DR  = 6,
-    NRF24L01_00_MASK_TX_DS  = 5,
-    NRF24L01_00_MASK_MAX_RT = 4,
-    NRF24L01_00_EN_CRC      = 3,
-    NRF24L01_00_CRCO        = 2,
-    NRF24L01_00_PWR_UP      = 1,
     NRF24L01_00_PRIM_RX     = 0,
+    NRF24L01_00_PWR_UP      = 1,
+    NRF24L01_00_CRCO        = 2,
+    NRF24L01_00_EN_CRC      = 3,
+    NRF24L01_00_MASK_MAX_RT = 4,
+    NRF24L01_00_MASK_TX_DS  = 5,
+    NRF24L01_00_MASK_RX_DR  = 6,
 
-    NRF24L01_07_RX_DR       = 6,
-    NRF24L01_07_TX_DS       = 5,
+    NRF24L01_01_ENAA_P0     = 0,
+    NRF24L01_01_ENAA_P1     = 1,
+
+    NRF24L01_02_ERX_P0      = 0,
+    NRF24L01_02_ERX_P1      = 1,
+
     NRF24L01_07_MAX_RT      = 4,
+    NRF24L01_07_TX_DS       = 5,
+    NRF24L01_07_RX_DR       = 6,
+
+    NRF24L01_17_RX_EMPTY    = 0,
+    NRF24L01_17_RX_FULL     = 1,
+    NRF24L01_17_TX_EMPTY    = 4,
+    NRF24L01_17_TX_FULL     = 5,
+
+    NRF24L01_1C_DYNPD_P0    = 0,
+    NRF24L01_1C_DYNPD_P1    = 1,
 
     NRF2401_1D_EN_DYN_ACK   = 0,
     NRF2401_1D_EN_ACK_PAY   = 1,
     NRF2401_1D_EN_DPL       = 2,
+};
+
+// Pre-shifted and combined bits
+enum {
+    NRF24L01_04_ARD_250us   = 0x00,
+    NRF24L01_04_ARD_500us   = 0x10,
+    NRF24L01_04_ARD_2500us  = 0x90,
+
+    NRF24L01_04_ARC_0       = 0x00,
+    NRF24L01_04_ARC_1       = 0x01,
+    NRF24L01_04_ARC_2       = 0x02,
+
+    NRF24L01_08_ARC_CNT_MASK  = 0x0f,
+    NRF24L01_08_PLOS_CNT_MASK = 0xf0,
 };
 
 // Bitrates
@@ -84,6 +112,8 @@ u8 NRF24L01_ReadReg(u8 reg);
 u8 NRF24L01_ReadRegisterMulti(u8 reg, u8 data[], u8 length);
 u8 NRF24L01_ReadPayload(u8 *data, u8 len);
 
+u8 NRF24L01_GetStatus(void);
+u8 NRF24L01_GetDynamicPayloadSize(void);
 u8 NRF24L01_FlushTx();
 u8 NRF24L01_FlushRx();
 u8 NRF24L01_Activate(u8 code);

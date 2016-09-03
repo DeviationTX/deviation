@@ -143,6 +143,20 @@ u8 NRF24L01_FlushRx()
     return Strobe(FLUSH_RX);
 }
 
+u8 NRF24L01_GetStatus(void)
+{
+    return Strobe(NRF24L01_FF_NOP);
+}
+
+u8 NRF24L01_GetDynamicPayloadSize(void)
+{
+    CS_LO();
+    PROTOSPI_xfer(R_RX_PL_WID);
+    const u8 res = PROTOSPI_xfer(NRF24L01_FF_NOP);
+    CS_HI();
+    return res;
+}
+
 u8 NRF24L01_Activate(u8 code)
 {
     CS_LO();
