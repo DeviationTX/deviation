@@ -35,7 +35,7 @@
  *
  * 2) Hops between RF channels generated from the address received in bind packet.
  *    The number of RF hopping channels is set during bind handshaking:
- *        the transmitter requests a number of bind channels in payload[7]
+ *        the transmitter requests a number of hopping channels in payload[7]
  *        the receiver sets ackPayload[7] with the number of hopping channels actually allocated - the transmitter must
  *        use this value.
  *    All receiver variants must support the 16 byte payload. Support for the 8 and 18 byte payload is optional.
@@ -57,12 +57,14 @@
 // debug build flags
 //#define NO_RF_CHANNEL_HOPPING
 
-// Auto Ack not yet implemented
+// Auto Ack not yet fully implemented
 #define USE_AUTO_ACKKNOWLEDGEMENT
+
 // Telemetry not yet implemented, requires AUTO_ACK
 //#define INAV_TELEMETRY
+//#define INAV_TELEMETRY_DEBUG
 
-//#define INAV_OPTS
+//#define INAV_CHANNEL_OPTS
 
 #ifdef MODULAR
   //Allows the linker to properly relocate
@@ -78,7 +80,7 @@
 #include "telemetry.h"
 
 #ifdef MODULAR
-  //Some versions of gcc applythis to definitions, others to calls
+  //Some versions of gcc apply this to definitions, others to calls
   //So just use long_calls everywhere
   //#pragma long_calls_off
   extern unsigned _data_loadaddr;
@@ -126,8 +128,8 @@ enum {
     CHANNEL16,
 };
 
-#define RC_CHANNEL_COUNT_DEFAULT    12 // Max supported by Devo 7e
-
+// Deviation transmitter channels
+#define DEVIATION_CHANNEL_COUNT    12 // Max supported by Devo 7e
 #define CHANNEL_AILERON     CHANNEL1
 #define CHANNEL_ELEVATOR    CHANNEL2
 #define CHANNEL_THROTTLE    CHANNEL3
@@ -159,6 +161,11 @@ enum {
 };
 
 typedef enum {
+    INIT_NOBIND = 0,
+    INIT_BIND,
+} init_bind_t;
+
+typedef enum {
     PHASE_INIT = 0,
     PHASE_BIND,
     PHASE_DATA
@@ -176,20 +183,27 @@ enum {
     PKT_TIMEOUT
 };
 
-#ifdef INAV_OPTS
 static const char * const inav_opts[] = {
+#ifdef INAV_CHANNEL_OPTS
   _tr_noop("Channels"),  _tr_noop("6"), _tr_noop("12"), NULL,
-#ifdef INAV_TELEMETRY
-  _tr_noop("Telemetry"),  _tr_noop("Off"), _tr_noop("On"), NULL,
 #endif
+#ifdef INAV_TELEMETRY
+  _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
+#endif
+  "RxTx Addr", "-32768", "32767", "1", NULL, // todo: store that elsewhere
+  "RxTx Addr2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
   NULL
 };
 
 enum {
+#ifdef INAV_CHANNEL_OPTS
     PROTOOPTS_CHANNELS = 0,
+#endif
 #ifdef INAV_TELEMETRY
     PROTOOPTS_TELEMETRY,
 #endif
+    PROTOOPTS_RX_TX_ADDR1, // todo: store that elsewhere
+    PROTOOPTS_RX_TX_ADDR2, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
     LAST_PROTO_OPT
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
@@ -198,7 +212,11 @@ enum {
     OPTS_6_CHANNELS = 0,
     OPTS_12_CHANNELS
 };
-#endif
+
+enum {
+    TELEM_ON = 0,
+    TELEM_OFF,
+};
 
 // Bit vector from bit position
 #define BV(bit) (1 << bit)
@@ -220,21 +238,23 @@ enum {
     NRF24L01_MAX_PAYLOAD_SIZE           = 32,
 };
 
-#define INAV_PROTOCOL_PAYLOAD_SIZE_MIN 8
-#define INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT 16
-//#define INAV_PROTOCOL_PAYLOAD_SIZE_MAX 18 // not supported by devo7e
-#define MAX_PAYLOAD_SIZE 16
-#define RX_TX_ADDR_LEN 5
+#define INAV_PROTOCOL_PAYLOAD_SIZE_MIN      8
+#define INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT  16
+#define INAV_PROTOCOL_PAYLOAD_SIZE_MAX      18
 
 static u32 packet_counter;
-static u8 packet[MAX_PAYLOAD_SIZE];
+static u8 packet[INAV_PROTOCOL_PAYLOAD_SIZE_MAX];
 static u8 payload_size;
-static u8 tx_power;
+
+#define RC_CHANNEL_COUNT_MIN         6
+#define RC_CHANNEL_COUNT_DEFAULT    16
+#define RC_CHANNEL_COUNT_MAX        18
 
 static u8 rc_channel_count;
-static u16 throttle, rudder, elevator, aileron;
-static u8 flags, rate;
 
+static u8 tx_power;
+
+#define RX_TX_ADDR_LEN 5
 static const u8 rx_tx_addr_bind[RX_TX_ADDR_LEN] = {0x4b,0x5c,0x6d,0x7e,0x8f};
 static u8 rx_tx_addr[RX_TX_ADDR_LEN];
 #define RX_TX_ADDR_4 0xD2 // rxTxAddr[4] always set to this value
@@ -259,7 +279,7 @@ static protocol_phase_t phase;
  */
 static u16 convert_channel(u8 channel)
 {
-    if (channel > rc_channel_count) {
+    if (channel > DEVIATION_CHANNEL_COUNT) {
         return 500;
     }
     s32 ch = Channels[channel]; // value in range [-10000,10000]
@@ -277,28 +297,9 @@ u8 convert_channel8(u8 channel)
     return (u8)(convert_channel(channel) >> 2);
 }
 
-static void read_controls(void)
-{
-    aileron  = convert_channel(CHANNEL_AILERON);
-    elevator = convert_channel(CHANNEL_ELEVATOR);
-    throttle = convert_channel(CHANNEL_THROTTLE);
-    rudder   = convert_channel(CHANNEL_RUDDER);
-    flags = GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
-               | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
-               | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
-               | GET_FLAG(CHANNEL_RTH, FLAG_RTH)    
-               | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
-    rate = RATE_LOW;
-    if (Channels[CHANNEL_RATE] > 0) {
-        rate = RATE_HIGH;
-    } else if (Channels[CHANNEL_RATE] == 0) {
-        rate = RATE_MID;
-    }
-}
-
 static void build_bind_packet(void)
 {
-    memset(packet, 0, MAX_PAYLOAD_SIZE);
+    memset(packet, 0, INAV_PROTOCOL_PAYLOAD_SIZE_MAX);
     packet[0] = 0xae; // 10101110
     packet[1] = 0xc9; // 11001001
     packet[2] = rx_tx_addr[0];
@@ -313,11 +314,13 @@ static void build_bind_packet(void)
 
 static void build_data_packet(void)
 {
-    read_controls();
-
     packet[0] = 0;
     packet[1] = 0;
     // AETR channels have 10 bit resolution
+    const u16 aileron  = convert_channel(CHANNEL_AILERON);
+    const u16 elevator = convert_channel(CHANNEL_ELEVATOR);
+    const u16 throttle = convert_channel(CHANNEL_THROTTLE);
+    const u16 rudder   = convert_channel(CHANNEL_RUDDER);
     packet[2] = aileron >> 2;
     packet[3] = elevator >> 2;
     packet[4] = throttle >> 2;
@@ -332,23 +335,44 @@ static void build_data_packet(void)
         return;
     }
 
-    packet[7] = rate;
-    packet[8] = flags;
+    u8 rate = RATE_LOW;
+    if (Channels[CHANNEL_RATE] > 0) {
+        rate = RATE_HIGH;
+    } else if (Channels[CHANNEL_RATE] == 0) {
+        rate = RATE_MID;
+    }
+    packet[7] = rate; // rate, deviation channel 5, is mapped to AUX1
 
-    // channels 11-14 have 10 bit resolution
+    const u8 flags = GET_FLAG(CHANNEL_FLIP, FLAG_FLIP)
+               | GET_FLAG(CHANNEL_PICTURE, FLAG_PICTURE)
+               | GET_FLAG(CHANNEL_VIDEO, FLAG_VIDEO)
+               | GET_FLAG(CHANNEL_RTH, FLAG_RTH)    
+               | GET_FLAG(CHANNEL_HEADLESS, FLAG_HEADLESS);
+    packet[8] = flags; // flags, deviation channels 6-10 are mapped to AUX2 t0 AUX6
+
+    // map deviation channels 9-12 to RC channels AUX7-AUX10, use 10 bit resolution
+    // deviation channels 9 (headless) and 10 (RTH) are mapped for a second time
+    // duplicate mapping makes maximum use of Deviation's 12 channels
+    const u16 channel9 = convert_channel(CHANNEL9);
+    const u16 channel10 = convert_channel(CHANNEL10);
     const u16 channel11 = convert_channel(CHANNEL11);
     const u16 channel12 = convert_channel(CHANNEL12);
-    const u16 channel13 = convert_channel(CHANNEL13);
-    const u16 channel14 = convert_channel(CHANNEL14);
-    packet[9] = channel11 >> 2;
-    packet[10] = channel12 >> 2;
-    packet[11] = channel13 >> 2;
-    packet[12] = channel14 >> 2;
-    packet[13] = (channel11 & 0x03) | ((channel12 & 0x03) << 2) | ((channel13 & 0x03) << 4) | ((channel14 & 0x03) << 6);
+    packet[9] = channel9 >> 2;
+    packet[10] = channel10 >> 2;
+    packet[11] = channel11 >> 2;
+    packet[12] = channel12 >> 2;
+    packet[13] = (channel9 & 0x03) | ((channel10 & 0x03) << 2) | ((channel11 & 0x03) << 4) | ((channel12 & 0x03) << 6);
 
-    // channels 15 and 16 have 8 bit resolution
-    packet[14] = convert_channel8(CHANNEL15);
-    packet[15] = convert_channel8(CHANNEL16);
+    // map deviation channels 7 and 8 to RC channels AUX11 and AUX12, use 10 bit resolution
+    // deviation channels 7 (picture) and 8 (video) are mapped for a second time
+    packet[14] = convert_channel8(CHANNEL7);
+    packet[15] = convert_channel8(CHANNEL8);
+    if (payload_size == INAV_PROTOCOL_PAYLOAD_SIZE_MAX) {
+        // map deviation channels 5 and 6 to RC channels AUX14 and AUX12, use 8 bit resolution
+        // deviation channels 5 (rate) and 6 (flip) are mapped for a second time
+        packet[16] = convert_channel8(CHANNEL5);
+        packet[17] = convert_channel8(CHANNEL6);
+    }
 }
 
 
@@ -356,14 +380,7 @@ static u8 packet_ack(void)
 {
 #ifdef USE_AUTO_ACKKNOWLEDGEMENT
     const u8 status = NRF24L01_ReadReg(NRF24L01_07_STATUS);
-    if (status & BV(NRF24L01_07_MAX_RT)) {
-        // max retries exceeded
-        // clear MAX_RT interrupt to allow further transmission
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_TX_DS) | BV(NRF24L01_07_MAX_RT));
-        NRF24L01_FlushTx(); // payload wasn't successfully transmitted, so remove it from TX FIFO
-        return PKT_TIMEOUT;
-    }
-    if ((status & BV(NRF24L01_07_TX_DS)) || (status & BV(NRF24L01_07_RX_DR))) { // NRF24L01_07_TX_DS asserted when ack payload received
+    if ((status & BV(NRF24L01_07_TX_DS))) { // NRF24L01_07_TX_DS asserted when ack payload received
         // ack payload recieved
         ackPayloadSize = NRF24L01_GetDynamicPayloadSize();
         if (ackPayloadSize > NRF24L01_MAX_PAYLOAD_SIZE) {
@@ -372,9 +389,16 @@ static u8 packet_ack(void)
         } else {
             NRF24L01_ReadPayload(ackPayload, ackPayloadSize);
         }
-        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_RX_DR) | BV(NRF24L01_07_TX_DS));
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS)); // clear TX_DS interrupt
         NRF24L01_FlushRx();
         return PKT_ACKED;
+    }
+    if (status & BV(NRF24L01_07_MAX_RT)) {
+        // max retries exceeded
+        // clear MAX_RT interrupt to allow further transmission
+        NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_MAX_RT));
+        NRF24L01_FlushTx(); // payload wasn't successfully transmitted, so remove it from TX FIFO
+        return PKT_TIMEOUT;
     }
     return PKT_PENDING;
 #else
@@ -435,6 +459,7 @@ static void send_packet(packet_type_t packet_type)
 
 static void set_data_phase(void)
 {
+    phase = PHASE_DATA;
     rf_channel_index = 0;
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[0]);
      // RX_ADDR_P0 must equal TX_ADDR for auto ACK
@@ -545,7 +570,8 @@ static void initialize_rx_tx_addr(void)
         rx_tx_addr[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
-    rx_tx_addr[4] = RX_TX_ADDR_4;
+    rx_tx_addr[3] &= 0x7f; // clear top bit, rx_tx_addr can be stored easily as a signed value
+    rx_tx_addr[4] = RX_TX_ADDR_4; // set to constant to, so variable part of rx_tx_addr can be stored in 32 value
 }
 
 // The hopping channels are determined by the value of rx_tx_addr[0]
@@ -560,8 +586,28 @@ static void set_hopping_channels(void)
     }
 }
 
+#ifdef INAV_TELEMETRY_DEBUG
+void debug_telemetry(void)
+{
+    ackPayload[1] = 'G';
+    const s32 latitude = 11000000 + (22 * 1000000 / 60) + (33 * 1000000 / 3600);
+    memcpy(&ackPayload[2], &latitude, sizeof(s32));
+
+    const s32 longitude = 15000000 + (36 * 1000000 / 60) + (47 * 1000000 / 3600);
+    memcpy(&ackPayload[6], &longitude, sizeof(s32));
+
+    ackPayload[10] = 37; // speed
+
+    const u32 altitude = 2345L;
+    memcpy(&ackPayload[11], &altitude, sizeof(u32));
+
+    ackPayload[15] = 12 << 2; // satelite count
+}
+#endif
+
+static void update_telemetry(void)
+{
 #ifdef INAV_TELEMETRY
-static void update_telemetry() {
     static u8 frameloss = 0;
 
     const u8 observeTx = NRF24L01_ReadReg(NRF24L01_08_OBSERVE_TX);
@@ -569,44 +615,110 @@ static void update_telemetry() {
 //    const u8 autoRetryCount = observeTx & NRF24L01_08_ARC_CNT_MASK;
     frameloss += lostPacketCount;
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_channel_index]); // reset packet loss counter
-
+#ifdef INAV_TELEMETRY_DEBUG
+    debug_telemetry();
+    Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = ackPayload[0];
+#else
     Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = frameloss;
+#endif
     TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
 
-    // !!TODO ackPayload contains telemetry in LTM format. Need to parse this.
+    // ackPayload contains telemetry in LTM format.
     // See https://github.com/stronnag/mwptools/blob/master/docs/ltm-definition.txt
     // ackPayload[0] is a sequence count, LTM begins at ackPayload[1]
     switch (ackPayload[1]) { // frame type
     case 'G': // GPS frame
-        Telemetry.gps.satcount = ackPayload[14] >> 2;
+        {
+        // LTM lat/long: int32 decimal degrees * 10,000,000 (1E7)
+        // LTM 1 degree = 1,000,000
+        // Deviation longitude: +/-180degrees = +/- 180*60*60*1000; W if value<0, E if value>=0; -180degrees = 180degrees
+        // Deviation latitude:   +/-90degrees =  +/- 90*60*60*1000; S if value<0, N if value>=0
+        // Deviation 1 degree = 3,600,000
+        s32 latitude;
+        memcpy(&latitude, &ackPayload[2], sizeof(s32));
+        Telemetry.gps.latitude = latitude * 18 / 5;
+        TELEMETRY_SetUpdated(TELEM_GPS_LAT);
+
+        s32 longitude;
+        memcpy(&longitude, &ackPayload[6], sizeof(s32));
+        Telemetry.gps.longitude = longitude * 18 / 5;
+        TELEMETRY_SetUpdated(TELEM_GPS_LONG);
+
+        Telemetry.gps.velocity = ackPayload[10] * 1000; // LTM m/s; DEV mm/s
+        TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
+
+        u32 altitude;
+        memcpy(&altitude, &ackPayload[11], sizeof(u32)); 
+        Telemetry.gps.altitude = altitude * 10; // LTM:cm; DEV:mm
+        TELEMETRY_SetUpdated(TELEM_GPS_ALT);
+
+        Telemetry.gps.satcount = ackPayload[15] >> 2;
         TELEMETRY_SetUpdated(TELEM_GPS_SATCOUNT);
+        }
+        break;
+    case 'A': // Attitude frame
+        {
+        //const u16 heading = ackPayload[6] | (ackPayload[7] << 8);
+        const u16 heading = 4567;
+        Telemetry.gps.heading = heading;
+        TELEMETRY_SetUpdated(TELEM_GPS_HEADING);
+        }
+        break;
+    case 'S': // Status frame
+        {
+            const u16 vBat = ackPayload[2] | (ackPayload[3] << 8);
+        Telemetry.value[TELEM_DSM_FLOG_VOLT2] = (s32)(vBat); // LTM:mV; DEV:V/10
+        TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+
+        const u16 amps = ackPayload[4] | (ackPayload[5] << 8);
+        Telemetry.value[TELEM_DSM_AMPS1] = (s32)(amps); // LTM:mA; DEV:A/10
+        TELEMETRY_SetUpdated(TELEM_DSM_AMPS1);
+
+        Telemetry.value[TELEM_DSM_AIRSPEED] = ackPayload[7];
+        TELEMETRY_SetUpdated(TELEM_DSM_AIRSPEED);
+        }
         break;
     default:
         break;
     }
-}
 #endif
+}
 
-static void inav_init()
+void save_rx_tx_addr(void)
+{
+    Model.proto_opts[PROTOOPTS_RX_TX_ADDR1] = rx_tx_addr[0] | ((u16)rx_tx_addr[1] << 8);
+    Model.proto_opts[PROTOOPTS_RX_TX_ADDR2] = rx_tx_addr[2] | ((u16)rx_tx_addr[3] << 8);
+}
+
+void load_rx_tx_addr(void)
+{
+    rx_tx_addr[0] = (Model.proto_opts[PROTOOPTS_RX_TX_ADDR1]) & 0xff;
+    rx_tx_addr[1] = (Model.proto_opts[PROTOOPTS_RX_TX_ADDR1] >> 8) & 0xff;
+    rx_tx_addr[2] = (Model.proto_opts[PROTOOPTS_RX_TX_ADDR2]) & 0xff;
+    rx_tx_addr[3] = (Model.proto_opts[PROTOOPTS_RX_TX_ADDR2] >> 8) & 0xff;
+}
+
+static void inav_init(init_bind_t bind)
 {
     // check options before proceeding with initialiasation
-#ifdef INAV_OPTS
+    payload_size = INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT;
+    rc_channel_count = RC_CHANNEL_COUNT_DEFAULT;
+    //!!TODO add option to set the number of hopping channels
+    rf_channel_count = RF_CHANNEL_COUNT_DEFAULT;
+#ifdef INAV_CHANNEL_OPTS
     if (Model.proto_opts[PROTOOPTS_CHANNELS] == OPTS_6_CHANNELS) {
         payload_size = INAV_PROTOCOL_PAYLOAD_SIZE_MIN;
         rc_channel_count = RC_CHANNEL_COUNT_MIN;
-    } else {
-        payload_size = INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT;
-        rc_channel_count = RC_CHANNEL_COUNT_DEFAULT;
     }
-#else
-    payload_size = INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT;
-    rc_channel_count = RC_CHANNEL_COUNT_DEFAULT;
 #endif
-    //!!TODO add option to set the number of hopping channels
-    rf_channel_count = RF_CHANNEL_COUNT_DEFAULT;
+    if (bind) {
+        initialize_rx_tx_addr();
+        save_rx_tx_addr();
+    } else {
+        load_rx_tx_addr();
+    }
 
     packet_counter = 0;
-    initialize_rx_tx_addr();
     set_hopping_channels();
 }
 
@@ -624,7 +736,6 @@ static u16 inav_callback()
 
     case PHASE_BIND:
         if (bind_counter == 0) {
-            phase = PHASE_DATA;
             set_data_phase();
             PROTOCOL_SetBindState(0);
             MUSIC_Play(MUSIC_DONE_BINDING);
@@ -640,9 +751,7 @@ static u16 inav_callback()
         break;
 
     case PHASE_DATA:
-#ifdef INAV_TELEMETRY
         update_telemetry();
-#endif
         /*#define PACKET_CHKTIME 500 // time to wait if packet not yet acknowledged or timed out    
         if (packet_ack() == PKT_PENDING) {
             return PACKET_CHKTIME; // packet send not yet complete
@@ -654,12 +763,12 @@ static u16 inav_callback()
     return PACKET_PERIOD;
 }
 
-static void initialize()
+static void initialize(init_bind_t bind)
 {
     CLOCK_StopTimer();
     tx_power = Model.tx_power;
     memset(ackPayload, 0, NRF24L01_MAX_PAYLOAD_SIZE);
-    inav_init();
+    inav_init(bind);
     init_nrf24l01();
 
 #ifdef INAV_TELEMETRY
@@ -667,31 +776,36 @@ static void initialize()
     TELEMETRY_SetType(TELEM_DSM);
 #endif
 
-    phase = PHASE_INIT;
-
-    PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    if (bind) {
+        phase = PHASE_INIT;
+        PROTOCOL_SetBindState(BIND_COUNT * PACKET_PERIOD / 1000);
+    } else {
+        set_data_phase();
+        PROTOCOL_SetBindState(0);
+    }
     CLOCK_StartTimer(INITIAL_WAIT, inav_callback);
 }
 
 const void *INAV_Cmds(enum ProtoCmds cmd)
 {
     switch(cmd) {
-        case PROTOCMD_INIT:  initialize(); return 0;
+        case PROTOCMD_INIT:  initialize(INIT_BIND); return 0;
         case PROTOCMD_DEINIT:
         case PROTOCMD_RESET:
             CLOCK_StopTimer();
             return (void *)(NRF24L01_Reset() ? 1L : -1L);
         case PROTOCMD_CHECK_AUTOBIND: return (void *)1L; // always Autobind
-        case PROTOCMD_BIND:  initialize(); return 0;
+        //case PROTOCMD_CHECK_AUTOBIND: return 0;
+        case PROTOCMD_BIND:  initialize(INIT_BIND); return 0;
         case PROTOCMD_NUMCHAN: return (void *)((long)rc_channel_count);
         case PROTOCMD_DEFAULT_NUMCHAN: return (void *)((long)RC_CHANNEL_COUNT_DEFAULT);
-        case PROTOCMD_CURRENT_ID: return Model.fixed_id ? (void *)((unsigned long)Model.fixed_id) : 0;
-#ifdef INAV_OPTS
+        case PROTOCMD_CURRENT_ID: return 0;
         case PROTOCMD_GETOPTIONS: return inav_opts;
+#ifdef INAV_TELEMETRY
+        case PROTOCMD_TELEMETRYSTATE: return (void *)(long)(Model.proto_opts[PROTOOPTS_TELEMETRY] == TELEM_ON ? PROTO_TELEM_ON : PROTO_TELEM_OFF);
 #else
-        case PROTOCMD_GETOPTIONS: return 0;
-#endif
         case PROTOCMD_TELEMETRYSTATE: return (void *)(long)PROTO_TELEM_UNSUPPORTED;
+#endif
         default: break;
     }
     return 0;
