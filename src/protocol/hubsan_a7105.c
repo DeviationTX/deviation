@@ -46,7 +46,7 @@ enum {
     CHANNEL3,     // Throttle
     CHANNEL4,     // Rudder
     CHANNEL5,     // Leds
-    CHANNEL6,     // Flip (or Altitude Hold on H501S)
+    CHANNEL6,     // Flip (or Altitude Hold on H501S, Stabilized mode on/off on H301)
     CHANNEL7,     // Still camera
     CHANNEL8,     // Video camera
     CHANNEL9,     // Headless
@@ -57,6 +57,7 @@ enum {
 #define CHANNEL_LED         CHANNEL5
 #define CHANNEL_FLIP        CHANNEL6
 #define CHANNEL_ALT_HOLD    CHANNEL6
+#define CHANNEL_STAB        CHANNEL6
 #define CHANNEL_SNAPSHOT    CHANNEL7
 #define CHANNEL_VIDEO       CHANNEL8
 #define CHANNEL_HEADLESS    CHANNEL9
@@ -73,6 +74,14 @@ enum{
 enum{
     // flags going to packet[9] (H107 Plus series)
     FLAG_HEADLESS = 0x08, // headless mode
+};
+
+enum{
+    // flags going to packet[9] (H301)
+    FLAG_H301_VIDEO = 0x01,
+    FLAG_H301_STAB  = 0x02,
+    FLAG_H301_LED   = 0x10,
+    FLAG_H301_RTH   = 0x40,
 };
 
 enum{
@@ -100,7 +109,7 @@ enum{
 #define VTX_STEP_SIZE "5"
 
 static const char * const hubsan4_opts[] = {
-    _tr_noop("Format"), "H107", "H501", NULL,
+    _tr_noop("Format"), "H107", "H301", "H501", NULL,
     _tr_noop("vTX MHz"),  "5645", "5945", VTX_STEP_SIZE, NULL,
     _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
     NULL 
@@ -116,6 +125,7 @@ ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
 enum {
     FORMAT_H107 = 0,
+    FORMAT_H301,
     FORMAT_H501,
 };
 
@@ -124,7 +134,7 @@ enum {
     TELEM_OFF,
 };
 
-#define ID_NORMAL 0x55201041 // H102D, H107/L/C/D, H501S
+#define ID_NORMAL 0x55201041 // H102D, H107/L/C/D, H301, H501S
 #define ID_PLUS   0xAA201041 // H107P/C+/D+
 
 static u8 packet[16];
@@ -338,6 +348,20 @@ static void hubsan_build_packet()
         packet[12] = (txid >> 16) & 0xff;
         packet[13] = (txid >>  8) & 0xff;
         packet[14] = (txid >>  0) & 0xff;
+    }
+    else if( Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H301) {
+        if(packet_count < 100) {
+            packet[9] = FLAG_H301_STAB;
+            packet_count++;
+        } else {
+            packet[9] = GET_FLAG(CHANNEL_LED,  FLAG_H301_LED)
+                      | GET_FLAG(CHANNEL_STAB, FLAG_H301_STAB)
+                      | GET_FLAG(CHANNEL_VIDEO,FLAG_H301_VIDEO)
+                      | GET_FLAG(CHANNEL_RTH,  FLAG_H301_RTH);
+        }
+        packet[10] = 0x18; // ?
+        packet[12] = 0x5c; // ?
+        packet[14] = 0xf6; // ?
     }
     else if(id_data == ID_PLUS || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501) {
         packet[3] = Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H501 ? 0x00 : 0x64;
