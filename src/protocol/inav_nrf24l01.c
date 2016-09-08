@@ -252,8 +252,10 @@ static const u8 rx_tx_addr_bind[RX_TX_ADDR_LEN] = {0x4b,0x5c,0x6d,0x7e,0x8f};
 static u8 rx_tx_addr[RX_TX_ADDR_LEN];
 #define RX_TX_ADDR_4 0xD2 // rxTxAddr[4] always set to this value
 
-#define BIND_ACK_PAYLOAD0 0x83
-#define BIND_ACK_PAYLOAD1 0xa5
+#define BIND_PAYLOAD0       0xae // 10101110
+#define BIND_PAYLOAD1       0xc9 // 11001001
+#define BIND_ACK_PAYLOAD0   0x83 // 10000011
+#define BIND_ACK_PAYLOAD1   0xa5 // 10100101
 
 #ifdef USE_AUTO_ACKKNOWLEDGEMENT
 static u8 ackPayloadSize;
@@ -296,8 +298,8 @@ u8 convert_channel8(u8 channel)
 static void build_bind_packet(void)
 {
     memset(packet, 0, INAV_PROTOCOL_PAYLOAD_SIZE_MAX);
-    packet[0] = 0xae; // 10101110
-    packet[1] = 0xc9; // 11001001
+    packet[0] = BIND_PAYLOAD0;
+    packet[1] = BIND_PAYLOAD1;
     packet[2] = rx_tx_addr[0];
     packet[3] = rx_tx_addr[1];
     packet[4] = rx_tx_addr[2];
@@ -467,8 +469,8 @@ static void init_nrf24l01(void)
     NRF24L01_WriteReg(NRF24L01_01_EN_AA, 0x00);
 #endif
     NRF24L01_WriteReg(NRF24L01_03_SETUP_AW, NRF24L01_03_SETUP_AW_5BYTES); // 5-byte RX/TX address
-    // ARD of 1500us is sufficient for 32 byte ACK payload in  250kbps mode (section 7.4.2, p33 of nRF24L01+ Product Specification)
-    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, NRF24L01_04_ARD_1500us | NRF24L01_04_ARC_1); // 1 retry after 1500us
+    // ARD of 1500us is minimum required for 32 byte ACK payload in 250kbps mode (section 7.4.2, p33 of nRF24L01+ Product Specification)
+    NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, NRF24L01_04_ARD_2500us | NRF24L01_04_ARC_1); // 1 retry after 1500us
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, RF_CHANNEL_BIND);
     // bitrate and power are set using regigister NRF24L01_06_RF_SETUP
     NRF24L01_SetBitrate(NRF24L01_BR_250K);
