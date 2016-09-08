@@ -21,10 +21,8 @@
  * Uses auto acknowledgment and dynamic payload size
  *     ACK payload is used for handshaking in bind phase and telemetry in data phase
  *
- * TELEMETRY NOT YET IMPLEMENTED
- *
  * Bind payload size is 16 bytes
- * Data payload size is 8, 16 or 18 bytes dependent on variant of protocol, (small payload is read more quickly (marginal benefit))
+ * Data payload size is 16 bytes dependent on variant of protocol, (small payload is read more quickly (marginal benefit))
  *
  * Bind Phase
  * uses address {0x4b,0x5c,0x6d,0x7e,0x8f}
@@ -38,29 +36,21 @@
  *        the transmitter requests a number of hopping channels in payload[7]
  *        the receiver sets ackPayload[7] with the number of hopping channels actually allocated - the transmitter must
  *        use this value.
- *    All receiver variants must support the 16 byte payload. Support for the 8 and 18 byte payload is optional.
  *
- * 3) Uses the payload size negotiated in the bind phase, payload size may be 8, 16 or 18 bytes
- * a) For 8 byte payload there are 6 channels: AETR with resolution of 1 (10-bits are used for the channel data), and AUX1
- *    and AUX2 with resolution of 4 (8-bits are used for the channel data)
- * b) For 16 byte payload there are 16 channels: eight 10-bit analog channels, two 8-bit analog channels, and six digital channels as follows:
+ * 3) There are 16 channels: eight 10-bit analog channels, two 8-bit analog channels, and six digital channels as follows:
  *    Channels 0 to 3, are the AETR channels, values 1000 to 2000 with resolution of 1 (10-bit channels)
  *    Channel AUX1 by deviation convention is used for rate, values 1000, 1500, 2000
  *    Channels AUX2 to AUX6 are binary channels, values 1000 or 2000,
  *        by deviation convention these channels are used for: flip, picture, video, headless, and return to home
  *    Channels AUX7 to AUX10 are analog channels, values 1000 to 2000 with resolution of 1 (10-bit channels)
  *    Channels AUX11 and AUX12 are analog channels, values 1000 to 2000 with resolution of 4 (8-bit channels)
- * c) For 18 byte payload there are 18 channels, the first 16 channelsar are as for 16 byte payload, and then there are two
- *    additional channels: AUX13 and AUX14 both with resolution of 4 (8-bit channels)
 ***/
 
 // debug build flags
 //#define NO_RF_CHANNEL_HOPPING
 
-// Auto Ack not yet fully implemented
 #define USE_AUTO_ACKKNOWLEDGEMENT
 
-// Telemetry not yet implemented, requires AUTO_ACK
 #define INAV_TELEMETRY
 //#define INAV_TELEMETRY_DEBUG
 
