@@ -697,11 +697,13 @@ MODULE_CALLTYPE
 static u16 inav_callback()
 {
     static u16 bind_counter;
+    static u8 bind_acked;
 
     switch (phase) {
     case PHASE_INIT:
         phase = PHASE_BIND;
         bind_counter = BIND_COUNT;
+        bind_acked = 0;
         return FIRST_PACKET_DELAY;
         break;
 
@@ -712,11 +714,12 @@ static u16 inav_callback()
             MUSIC_Play(MUSIC_DONE_BINDING);
         } else {
             if (packet_ack() == PKT_ACKED) {
-                if (ackPayload[0] == BIND_ACK_PAYLOAD0 && ackPayload[1] == BIND_ACK_PAYLOAD1) {
-                    // bind packet acked, so set bind_counter to zero to enter data phase on next callback
-                    bind_counter = 0;
-                    return PACKET_PERIOD;
-                }
+                bind_acked = 1;
+            }
+            if (bind_acked == 1) {
+                // bind packet acked, so set bind_counter to zero to enter data phase on next callback
+                bind_counter = 0;
+                return PACKET_PERIOD;
             }
             send_packet(BIND_PACKET);
             --bind_counter;
