@@ -176,8 +176,8 @@ static const char * const inav_opts[] = {
 #ifdef INAV_TELEMETRY
   _tr_noop("Telemetry"),  _tr_noop("On"), _tr_noop("Off"), NULL,
 #endif
-  "RxTx Addr", "-32768", "32767", "1", NULL, // todo: store that elsewhere
-  "RxTx Addr2","-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  "RxTx Addr1", "-32768", "32767", "1", NULL, // todo: store that elsewhere
+  "RxTx Addr2", "-32768", "32767", "1", NULL, // ^^^^^^^^^^^^^^^^^^^^^^^^^^
   NULL
 };
 
@@ -543,7 +543,8 @@ static void initialize_rx_tx_addr(void)
         rx_tx_addr[i] = lfsr & 0xff;
         rand32_r(&lfsr, i);
     }
-    rx_tx_addr[3] &= 0x7f; // clear top bit, rx_tx_addr can be stored easily as a signed value
+    rx_tx_addr[1] &= 0x7f; // clear top bit so saved Model.proto_opts value is positive
+    rx_tx_addr[3] &= 0x7f; // clear top bit so saved Model.proto_opts value is positive
     rx_tx_addr[4] = RX_TX_ADDR_4; // set to constant, so variable part of rx_tx_addr can be stored in 32-bit value
 }
 
