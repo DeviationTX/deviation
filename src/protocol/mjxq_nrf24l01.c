@@ -177,9 +177,10 @@ static void send_packet(u8 bind)
     packet[1] = convert_channel(CHANNEL4);          // rudder
     packet[4] = 0x40;         // rudder does not work well with dyntrim
     packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
-    packet[5] = CHAN2TRIM(packet[2]); // 0x40;      // trim elevator
+    // driven trims cause issues when headless is enabled
+    packet[5] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[2]); // trim elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
-    packet[6] = CHAN2TRIM(packet[3]); // 0x40;      // trim aileron
+    packet[6] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[3]); // trim aileron
     packet[7] = txid[0];
     packet[8] = txid[1];
     packet[9] = txid[2];
@@ -209,10 +210,6 @@ static void send_packet(u8 bind)
         break;
 
     case FORMAT_X600:
-        if (GET_FLAG(CHANNEL_HEADLESS, 1)) { // driven trims cause issues when headless is enabled
-            packet[5] = 0x40;
-            packet[6] = 0x40;
-        }
         packet[10] = GET_FLAG_INV(CHANNEL_LED, 0x02);
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
         if (!bind) {
