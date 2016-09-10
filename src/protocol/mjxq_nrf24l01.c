@@ -408,9 +408,14 @@ static void initialize_txid()
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08
-      ||Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010 ) {
+    
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
+        // txid must be multiple of 8
+        txid[0] = (lfsr >> 16) & 0xf8;
+        txid[1] = (lfsr >> 8 ) & 0xff;
+        txid[2] = 0;
+    }
+    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         // txid must be multiple of 8
         txid[0] = (lfsr >> 16) & 0xf8;
         txid[1] = (lfsr >> 8 ) & 0xff;
