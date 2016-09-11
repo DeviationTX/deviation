@@ -412,8 +412,8 @@ static void initialize_txid()
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
         // txid must be multiple of 8
         txid[0] = (lfsr >> 16) & 0xf8;
-        txid[1] = (lfsr >> 8 ) & 0xff;
-        txid[2] = 0;
+        txid[1] = ((lfsr >> 8 ) & 0xf0) | 0x0c;
+        txid[2] = lfsr & 0xf0;
     }
     else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         // txid must be multiple of 8
