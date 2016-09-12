@@ -24,6 +24,9 @@
  * Bind payload size is 16 bytes
  * Data payload size is 16 bytes dependent on variant of protocol, (small payload is read more quickly (marginal benefit))
  *
+ * Bind and data payloads are whitened (XORed with a pseudo-random bitstream) to remove strings of 0s or 1s in transmission
+ * packet. This improves reception by helping keep the TX and RX clocks in sync.
+ *
  * Bind Phase
  * uses address {0x4b,0x5c,0x6d,0x7e,0x8f}
  * uses channel 0x4c (76)
@@ -50,9 +53,12 @@
 //#define NO_RF_CHANNEL_HOPPING
 
 #define USE_AUTO_ACKKNOWLEDGEMENT
+#define USE_WHITENING
 
 #define INAV_TELEMETRY
 //#define INAV_TELEMETRY_DEBUG
+
+#define UNUSED(x) (void)(x)
 
 
 #ifdef MODULAR
@@ -225,6 +231,7 @@ enum {
 #define INAV_PROTOCOL_PAYLOAD_SIZE_DEFAULT  16
 #define INAV_PROTOCOL_PAYLOAD_SIZE_MAX      16
 
+static u32 lost_packet_counter;
 static u32 packet_counter;
 static u8 packet[INAV_PROTOCOL_PAYLOAD_SIZE_MAX];
 static u8 payload_size;
@@ -242,10 +249,14 @@ static const u8 rx_tx_addr_bind[RX_TX_ADDR_LEN] = {0x4b,0x5c,0x6d,0x7e,0x8f};
 static u8 rx_tx_addr[RX_TX_ADDR_LEN];
 #define RX_TX_ADDR_4 0xD2 // rxTxAddr[4] always set to this value
 
-#define BIND_PAYLOAD0       0xae // 10101110
-#define BIND_PAYLOAD1       0xc9 // 11001001
-#define BIND_ACK_PAYLOAD0   0x83 // 10000011
-#define BIND_ACK_PAYLOAD1   0xa5 // 10100101
+#define BIND_PAYLOAD0           0xad // 10101101
+#define BIND_PAYLOAD1           0xc9 // 11001001
+#define BIND_ACK_PAYLOAD0       0x95 // 10010101
+#define BIND_ACK_PAYLOAD1       0xa9 // 10101001
+#define TELEMETRY_ACK_PAYLOAD0  0x5a // 01011010
+// TELEMETRY_ACK_PAYLOAD1 is sequence count
+#define DATA_PAYLOAD0           0x00
+#define DATA_PAYLOAD1           0x00
 
 #ifdef USE_AUTO_ACKKNOWLEDGEMENT
 static u8 ackPayloadSize;
@@ -261,6 +272,45 @@ static u8 rf_channels[RF_CHANNEL_COUNT_MAX];
 static u8 rf_channel_count;
 
 static protocol_phase_t phase;
+
+#ifndef TELEM_LTM
+// use DSM telemetry until LTM telemetry is implemented
+#define TELEM_LTM TELEM_DSM
+// repurpose the DSM FADESL, FADESR and HOLDS fields to display roll, pitch and yaw
+#define TELEM_LTM_ATTITUDE_PITCH    TELEM_DSM_FLOG_FADESL
+#define TELEM_LTM_ATTITUDE_ROLL     TELEM_DSM_FLOG_FADESR
+#define TELEM_LTM_ATTITUDE_YAW      TELEM_DSM_FLOG_HOLDS
+// use  DSM VOLT2, AMPS1 and AIRSPEED fields
+#define TELEM_LTM_STATUS_VBAT       TELEM_DSM_FLOG_VOLT2
+#define TELEM_LTM_STATUS_CURRENT    TELEM_DSM_AMPS1
+#define TELEM_LTM_STATUS_RSSI       TELEM_DSM_FLOG_FRAMELOSS
+#define TELEM_LTM_STATUS_AIRSPEED   TELEM_DSM_AIRSPEED
+/*
+currently unused LTM telemetry fields
+TELEM_LTM_STATUS_ARMED
+TELEM_LTM_STATUS_FAILSAFE
+TELEM_LTM_STATUS_FLIGHTMODE
+TELEM_LTM_NAVIGATION_GPS_MODE
+TELEM_LTM_NAVIGATION_NAV_MODE
+TELEM_LTM_NAVIGATION_ACTION
+TELEM_LTM_NAVIGATION_WAYPOINT_NUMBER
+TELEM_LTM_NAVIGATION_ERROR
+TELEM_LTM_NAVIGATION_FLAGS
+TELEM_LTM_GPSX_HDOP
+TELEM_LTM_TUNING_P_ROLL
+TELEM_LTM_TUNING_I_ROLL
+TELEM_LTM_TUNING_D_ROLL
+TELEM_LTM_TUNING_P_PITCH
+TELEM_LTM_TUNING_I_PITCH
+TELEM_LTM_TUNING_D_PITCH
+TELEM_LTM_TUNING_P_YAW
+TELEM_LTM_TUNING_I_YAW
+TELEM_LTM_TUNING_D_YAW
+TELEM_LTM_TUNING_RATES_ROLL
+TELEM_LTM_TUNING_RATES_PITCH
+TELEM_LTM_TUNING_RATES_YAW
+*/
+#endif
 
 /*
  * Returns channel value in range [0,1000]
@@ -283,6 +333,26 @@ static u16 convert_channel(u8 channel)
 u8 convert_channel8(u8 channel)
 {
     return (u8)(convert_channel(channel) >> 2);
+}
+
+static void whiten_payload(u8 *payload, u8 len)
+{
+#ifdef USE_WHITENING
+    uint8_t whitenCoeff = 0x6b; // 01101011
+    while (len--) {
+        for (uint8_t m = 1; m; m <<= 1) {
+            if (whitenCoeff & 0x80) {
+                whitenCoeff ^= 0x11;
+                (*payload) ^= m;
+            }
+            whitenCoeff <<= 1;
+        }
+        payload++;
+    }
+#else
+    UNUSED(payload);
+    UNUSED(len);
+#endif
 }
 
 static void build_bind_packet(void)
@@ -364,6 +434,7 @@ static u8 packet_ack(void)
             return PKT_PENDING;
         }
         NRF24L01_ReadPayload(ackPayload, ackPayloadSize);
+        whiten_payload(ackPayload, ackPayloadSize);
         NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_TX_DS)); // clear TX_DS interrupt
         return PKT_ACKED;
     }
@@ -386,6 +457,7 @@ void transmit_packet(void)
     NRF24L01_WriteReg(NRF24L01_07_STATUS, BV(NRF24L01_07_MAX_RT));
     // set NRF24L01_00_MASK_TX_DS and clear NRF24L01_00_PRIM_RX to initiate transmit
 //    NRF24L01_WriteReg(NRF24L01_00_CONFIG, BV(NRF24L01_00_PWR_UP) | BV(NRF24L01_00_CRCO) | BV(NRF24L01_00_EN_CRC) | BV(NRF24L01_00_MASK_TX_DS) | BV(NRF24L01_00_MASK_MAX_RT));
+    whiten_payload(packet, payload_size);
     NRF24L01_WritePayload(packet, payload_size);// asynchronous call
 }
 
@@ -433,6 +505,8 @@ static void send_packet(packet_type_t packet_type)
 
 static void set_data_phase(void)
 {
+    packet_counter = 0;
+    lost_packet_counter = 0;
     phase = PHASE_DATA;
     rf_channel_index = 0;
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[0]);
@@ -583,13 +657,16 @@ static void update_telemetry(void)
     const u8 lostPacketCount = (observeTx & NRF24L01_08_PLOS_CNT_MASK) >> 4;
 //    const u8 autoRetryCount = observeTx & NRF24L01_08_ARC_CNT_MASK;
     NRF24L01_WriteReg(NRF24L01_05_RF_CH, rf_channels[rf_channel_index]); // reset packet loss counter
-    Telemetry.value[TELEM_DSM_FLOG_FRAMELOSS] = lostPacketCount;
-    TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FRAMELOSS);
+
+    lost_packet_counter += lostPacketCount;
+    Telemetry.value[TELEM_LTM_STATUS_RSSI] = 100 - 100 * lost_packet_counter / packet_counter;
+    TELEMETRY_SetUpdated(TELEM_LTM_STATUS_RSSI);
 
     // ackPayload contains telemetry in LTM format.
     // See https://github.com/stronnag/mwptools/blob/master/docs/ltm-definition.txt
-    // ackPayload[0] is a sequence count, LTM begins at ackPayload[1]
-    switch (ackPayload[1]) { // frame type
+    // ackPayload[0] is a sequence count, LTM begins at ackPayload[2]
+    const u8 *ltm = &ackPayload[2];
+    switch (ltm[0]) { // frame type
     case 'G': // GPS frame
         {
         // LTM lat/long: int32 decimal degrees * 10,000,000 (1E7)
@@ -599,58 +676,57 @@ static void update_telemetry(void)
         // Deviation 1 degree = 3,600,000
         // Scale factor = 36/10 = 18/5
         s32 latitude;
-        memcpy(&latitude, &ackPayload[2], sizeof(s32));
+        memcpy(&latitude, &ltm[1], sizeof(s32));
         Telemetry.gps.latitude = latitude * 18 / 5;
         TELEMETRY_SetUpdated(TELEM_GPS_LAT);
 
         s32 longitude;
-        memcpy(&longitude, &ackPayload[6], sizeof(s32));
+        memcpy(&longitude, &ltm[5], sizeof(s32));
         Telemetry.gps.longitude = longitude * 18 / 5;
         TELEMETRY_SetUpdated(TELEM_GPS_LONG);
 
-        Telemetry.gps.velocity = ackPayload[10] * 1000; // LTM m/s; DEV mm/s
+        Telemetry.gps.velocity = ltm[9] * 1000; // LTM m/s; DEV mm/s
         TELEMETRY_SetUpdated(TELEM_GPS_SPEED);
 
         u32 altitude;
-        memcpy(&altitude, &ackPayload[11], sizeof(u32)); 
+        memcpy(&altitude, &ltm[10], sizeof(u32)); 
         Telemetry.gps.altitude = altitude * 10; // LTM:cm; DEV:mm
         TELEMETRY_SetUpdated(TELEM_GPS_ALT);
 
-        Telemetry.gps.satcount = ackPayload[15] >> 2;
+        Telemetry.gps.satcount = ltm[14] >> 2;
         TELEMETRY_SetUpdated(TELEM_GPS_SATCOUNT);
         }
         break;
     case 'A': // Attitude frame
         {
-        const u16 heading = ackPayload[6] | (ackPayload[7] << 8);
+        const u16 heading = ltm[5] | (ltm[6] << 8);
         Telemetry.gps.heading = heading;
         TELEMETRY_SetUpdated(TELEM_GPS_HEADING);
 
-        // repurpose the FADESL, FADESR and HOLDS fields to display roll, pitch and yaw
-        const s16 pitch = ackPayload[2] | (ackPayload[3] << 8);
-        Telemetry.value[TELEM_DSM_FLOG_FADESL] = pitch; // LTM:degrees [-180,180]
-        TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESL);
+        const s16 pitch = ltm[1] | (ltm[2] << 8);
+        Telemetry.value[TELEM_LTM_ATTITUDE_PITCH] = pitch; // LTM:degrees [-180,180]
+        TELEMETRY_SetUpdated(TELEM_LTM_ATTITUDE_PITCH);
 
-        const s16 roll = ackPayload[4] | (ackPayload[5] << 8);
-        Telemetry.value[TELEM_DSM_FLOG_FADESR] = roll; // LTM:degrees [-180,180]
-        TELEMETRY_SetUpdated(TELEM_DSM_FLOG_FADESR);
+        const s16 roll = ltm[3] | (ltm[4] << 8);
+        Telemetry.value[TELEM_LTM_ATTITUDE_ROLL] = roll; // LTM:degrees [-180,180]
+        TELEMETRY_SetUpdated(TELEM_LTM_ATTITUDE_ROLL);
 
-        Telemetry.value[TELEM_DSM_FLOG_HOLDS] = heading;
-        TELEMETRY_SetUpdated(TELEM_DSM_FLOG_HOLDS);
+        Telemetry.value[TELEM_LTM_ATTITUDE_YAW] = heading;
+        TELEMETRY_SetUpdated(TELEM_LTM_ATTITUDE_YAW);
         }
         break;
     case 'S': // Status frame
         {
-        const u16 vBat = ackPayload[2] | (ackPayload[3] << 8);
-        Telemetry.value[TELEM_DSM_FLOG_VOLT2] = (s32)(vBat); // LTM:mV; DEV:V/10
-        TELEMETRY_SetUpdated(TELEM_DSM_FLOG_VOLT2);
+        const u16 vBat = ltm[1] | (ltm[2] << 8);
+        Telemetry.value[TELEM_LTM_STATUS_VBAT] = (s32)(vBat); // LTM:mV; DEV:V/10
+        TELEMETRY_SetUpdated(TELEM_LTM_STATUS_VBAT);
 
-        const u16 amps = ackPayload[4] | (ackPayload[5] << 8);
-        Telemetry.value[TELEM_DSM_AMPS1] = (s32)(amps); // LTM:mA; DEV:A/10
-        TELEMETRY_SetUpdated(TELEM_DSM_AMPS1);
+        const u16 amps = ltm[3] | (ltm[4] << 8);
+        Telemetry.value[TELEM_LTM_STATUS_CURRENT] = (s32)(amps); // LTM:mA; DEV:A/10
+        TELEMETRY_SetUpdated(TELEM_LTM_STATUS_CURRENT);
 
-        Telemetry.value[TELEM_DSM_AIRSPEED] = ackPayload[7];
-        TELEMETRY_SetUpdated(TELEM_DSM_AIRSPEED);
+        Telemetry.value[TELEM_LTM_STATUS_AIRSPEED] = ltm[6];
+        TELEMETRY_SetUpdated(TELEM_LTM_STATUS_AIRSPEED);
         }
         break;
     default:
@@ -751,7 +827,7 @@ static void initialize(init_bind_t bind)
 
 #ifdef INAV_TELEMETRY
     memset(&Telemetry, 0, sizeof(Telemetry));
-    TELEMETRY_SetType(TELEM_DSM);
+    TELEMETRY_SetType(TELEM_LTM);
 #endif
 
     if (bind) {
