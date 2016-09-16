@@ -120,8 +120,9 @@ static u8 txid[5];
 static u8 rf_chan = 0; 
 static u16 counter;
 static u16 packet_period;
-static const u8 rf_channels[][3] = {{0x05, 0x19, 0x28},     // Hontai, FQ777-951
-                                    {0x0a, 0x1e, 0x2d}};    // JJRC X1
+static const u8 rf_channels[][3] = {{0x05, 0x19, 0x28},     // Hontai
+                                    {0x0a, 0x1e, 0x2d},     // JJRC X1
+                                    {0x05, 0x19, 0x28}};    // FQ777-951
 static const u8 rx_tx_addr[] = {0xd2, 0xb5, 0x99, 0xb3, 0x4a};
 static const u8 addr_vals[4][16] = {
                     {0x24, 0x26, 0x2a, 0x2c, 0x32, 0x34, 0x36, 0x4a,
@@ -189,54 +190,48 @@ static void send_packet(u8 bind)
         memcpy(packet, txid, 5);
         memset(&packet[5], 0, 3);
     } else {
-        if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_FQ777) {
-            packet[0] = GET_FLAG(CHANNEL_PICTURE, 0x01)
-                      | GET_FLAG(CHANNEL_VIDEO, 0x02);
-            packet[1] = 0;
-            packet[2] = 0;
-            packet[3] = (scale_channel(CHANNEL3, 0x00, 0x7f) << 1) // throttle
-                      | GET_FLAG(CHANNEL_FLIP, 0x01);
-            packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01) // aileron
-                      | 0xc0; // high rate (mid=0xa0, low=0x60)
-            packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
-            packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01) // rudder
-                      | GET_FLAG( CHANNEL_HEADLESS, 0x40);
-            packet[7] = 0;
-            packet[8] = 0;
-            packet[9] = 0;
-        } else {
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
-                packet[0] = 0x0b;
-            } else {
-                packet[0] = GET_FLAG(CHANNEL_ARM, 0x02);
-            }
-            packet[1] = 0x00;
-            packet[2] = 0x00;
-            packet[3] = (scale_channel(CHANNEL3, 0, 127) << 1)    // throttle
-                      | GET_FLAG(CHANNEL_PICTURE, 0x01);
-            packet[4] = scale_channel(CHANNEL1, 63, 0);           // aileron
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
+        memset(packet,0,PACKET_SIZE);
+        packet[3] = scale_channel(CHANNEL3, 0x00, 0x7f) << 1; // throttle
+        packet[4] = scale_channel(CHANNEL1, 0x3f, 0x01); // aileron   
+        packet[5] = scale_channel(CHANNEL2, 0x01, 0x3f); // elevator
+        packet[6] = scale_channel(CHANNEL4, 0x3f, 0x01); // rudder  
+        packet[7] = scale_channel(CHANNEL1, -16, 16); // aileron trim
+        packet[8] = scale_channel(CHANNEL4, -16, 16); // rudder trim
+        packet[9] = scale_channel(CHANNEL2, -16, 16); // elevator trim
+        
+        // feature flags
+        switch(Model.proto_opts[PROTOOPTS_FORMAT]) {
+            case FORMAT_HONTAI:
+                packet[0] =  0x0b;
+                packet[3] |= GET_FLAG(CHANNEL_PICTURE, 0x01);
                 packet[4] |= GET_FLAG(CHANNEL_RTH, 0x80)
-                           | GET_FLAG(CHANNEL_HEADLESS, 0x40);
-            } else {
-                packet[4] |= 0x80;                                // not sure what this bit does
-            }
-            packet[5] = scale_channel(CHANNEL2, 0, 63)            // elevator
-                      | GET_FLAG(CHANNEL_CALIBRATE, 0x80)
-                      | GET_FLAG(CHANNEL_FLIP, 0x40);
-            packet[6] = scale_channel(CHANNEL4, 0, 63)            // rudder
-                      | GET_FLAG(CHANNEL_VIDEO, 0x80);
-            packet[7] = scale_channel(CHANNEL1, -16, 16);         // aileron trim
-            if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_HONTAI) {
-                packet[8] = scale_channel(CHANNEL4, -16, 16);         // rudder trim
-            } else {
-                packet[8] = 0xc0    // always in expert mode
-                          | GET_FLAG(CHANNEL_RTH, 0x02)
-                          | GET_FLAG(CHANNEL_HEADLESS, 0x01);
-            }
-            packet[9] = scale_channel(CHANNEL2, -16, 16);         // elevator trim
+                          |  GET_FLAG(CHANNEL_HEADLESS, 0x40);
+                packet[5] |= GET_FLAG(CHANNEL_CALIBRATE, 0x80)
+                          |  GET_FLAG(CHANNEL_FLIP, 0x40);
+                packet[6] |= GET_FLAG(CHANNEL_VIDEO, 0x80);
+                break;
+            case FORMAT_JJRCX1:
+                packet[0] =  GET_FLAG(CHANNEL_ARM, 0x02);
+                packet[3] |= GET_FLAG(CHANNEL_PICTURE, 0x01);
+                packet[4] |= 0x80; // unknown
+                packet[5] |= GET_FLAG(CHANNEL_CALIBRATE, 0x80)
+                          |  GET_FLAG(CHANNEL_FLIP, 0x40);
+                packet[6] |= GET_FLAG(CHANNEL_VIDEO, 0x80);
+                packet[8] =  0xc0 // high rate, no rudder trim
+                          |  GET_FLAG(CHANNEL_RTH, 0x02)
+                          |  GET_FLAG(CHANNEL_HEADLESS, 0x01);
+                break;
+            case FORMAT_FQ777:
+                // todo: add missing calibration flag
+                packet[0] =  GET_FLAG(CHANNEL_PICTURE, 0x01)
+                          |  GET_FLAG(CHANNEL_VIDEO, 0x02);
+                packet[3] |= GET_FLAG(CHANNEL_FLIP, 0x01);
+                packet[4] |= 0xc0; // high rate (mid=0xa0, low=0x60)
+                packet[6] |= GET_FLAG(CHANNEL_HEADLESS, 0x40);
+                break;
         }
     }
+    
     crc16(packet, bind ? BIND_PACKET_SIZE : PACKET_SIZE);
     
     // Power on, TX mode, 2byte CRC
