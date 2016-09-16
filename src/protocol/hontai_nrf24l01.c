@@ -42,6 +42,7 @@
 #define USE_FIXED_MFGID
 #define BIND_COUNT 20
 #define PACKET_PERIOD    150
+#define FQ777_PACKET_PERIOD 150
 #define dbgprintf printf
 #else
 #define BIND_COUNT 80
