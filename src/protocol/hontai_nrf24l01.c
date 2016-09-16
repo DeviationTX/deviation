@@ -229,6 +229,8 @@ static void send_packet(u8 bind)
                 packet[3] |= GET_FLAG(CHANNEL_FLIP, 0x01);
                 packet[4] |= 0xc0; // high rate (mid=0xa0, low=0x60)
                 packet[6] |= GET_FLAG(CHANNEL_HEADLESS, 0x40);
+                if((packet[4] & 0x3f) > 0x3d && (packet[5] & 0x3f) < 3)
+                    packet[5] |= 0x80; // accelerometer recalibration
                 break;
         }
     }
