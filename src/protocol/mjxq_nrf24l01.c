@@ -58,7 +58,7 @@
 #define ADDRESS_LENGTH     5
 
 static const char * const mjxq_opts[] = {
-  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", NULL,
+  _tr_noop("Format"), "WLH08", "X600", "X800", "H26D", "E010", NULL,
   NULL
 };
 enum {
@@ -70,6 +70,7 @@ enum {
     FORMAT_X600,
     FORMAT_X800,
     FORMAT_H26D,
+    FORMAT_E010,
 };
 ctassert(LAST_PROTO_OPT <= NUM_PROTO_OPTS, too_many_protocol_opts);
 
@@ -176,9 +177,10 @@ static void send_packet(u8 bind)
     packet[1] = convert_channel(CHANNEL4);          // rudder
     packet[4] = 0x40;         // rudder does not work well with dyntrim
     packet[2] = 0x80 ^ convert_channel(CHANNEL2);   // elevator
-    packet[5] = CHAN2TRIM(packet[2]); // 0x40;      // trim elevator
+    // driven trims cause issues when headless is enabled
+    packet[5] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[2]); // trim elevator
     packet[3] = convert_channel(CHANNEL1);          // aileron
-    packet[6] = CHAN2TRIM(packet[3]); // 0x40;      // trim aileron
+    packet[6] = GET_FLAG(CHANNEL_HEADLESS, 1) ? 0x40 : CHAN2TRIM(packet[3]); // trim aileron
     packet[7] = txid[0];
     packet[8] = txid[1];
     packet[9] = txid[2];
@@ -195,6 +197,7 @@ static void send_packet(u8 bind)
         packet[10] = pan_tilt_value();
         // fall through on purpose - no break
     case FORMAT_WLH08:
+    case FORMAT_E010:
         packet[10] += GET_FLAG(CHANNEL_RTH, 0x02)
                     | GET_FLAG(CHANNEL_HEADLESS, 0x01);
         if (!bind) {
@@ -207,10 +210,6 @@ static void send_packet(u8 bind)
         break;
 
     case FORMAT_X600:
-        if (GET_FLAG(CHANNEL_HEADLESS, 1)) { // driven trims cause issues when headless is enabled
-            packet[5] = 0x40;
-            packet[6] = 0x40;
-        }
         packet[10] = GET_FLAG_INV(CHANNEL_LED, 0x02);
         packet[11] = GET_FLAG(CHANNEL_RTH, 0x01);
         if (!bind) {
@@ -279,7 +278,7 @@ static void mjxq_init()
     memcpy(rx_tx_addr, "\x6d\x6a\x77\x77\x77", sizeof(rx_tx_addr));
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         memcpy(rf_channels, "\x12\x22\x32\x42", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
+    } else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D || Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
         memcpy(rf_channels, "\x36\x3e\x46\x2e", sizeof(rf_channels));
     } else {
         memcpy(rf_channels, "\x0a\x35\x42\x3d", sizeof(rf_channels));
@@ -309,7 +308,10 @@ static void mjxq_init()
     NRF24L01_WriteReg(NRF24L01_02_EN_RXADDR, 0x01);
     NRF24L01_WriteReg(NRF24L01_04_SETUP_RETR, 0x00); // no retransmits
     NRF24L01_WriteReg(NRF24L01_11_RX_PW_P0, PACKET_SIZE);
-    NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010)
+        NRF24L01_SetBitrate(NRF24L01_BR_250K);             // 250kbps
+    else
+        NRF24L01_SetBitrate(NRF24L01_BR_1M);             // 1Mbps
     NRF24L01_SetPower(Model.tx_power);
     NRF24L01_Activate(0x73);                          // Activate feature register
     NRF24L01_WriteReg(NRF24L01_1C_DYNPD, 0x00);       // Disable dynamic payload length on all pipes
@@ -350,7 +352,7 @@ static void mjxq_init2()
 {
     if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_H26D) {
         memcpy(rf_channels, "\x32\x3e\x42\x4e", sizeof(rf_channels));
-    } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08) {
+    } else if (Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_WLH08 && Model.proto_opts[PROTOOPTS_FORMAT] != FORMAT_E010) {
         memcpy(rf_channels, mjx_tx_rf_map[Model.fixed_id % (sizeof(mjx_tx_rf_map)/sizeof(mjx_tx_rf_map[0]))].rfchan, sizeof(rf_channels));
     }
 }
@@ -406,8 +408,14 @@ static void initialize_txid()
     }
     // Pump zero bytes for LFSR to diverge more
     for (u8 i = 0; i < sizeof(lfsr); ++i) rand32_r(&lfsr, 0);
-
-    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
+    
+    if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_E010) {
+        // txid must be multiple of 8
+        txid[0] = (lfsr >> 16) & 0xf8;
+        txid[1] = ((lfsr >> 8 ) & 0xf0) | 0x0c;
+        txid[2] = lfsr & 0xf0;
+    }
+    else if (Model.proto_opts[PROTOOPTS_FORMAT] == FORMAT_WLH08) {
         // txid must be multiple of 8
         txid[0] = (lfsr >> 16) & 0xf8;
         txid[1] = (lfsr >> 8 ) & 0xff;
