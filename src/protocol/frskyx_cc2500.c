@@ -149,7 +149,6 @@ static void initialize_data(u8 bind) {
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);  // Frequency offset hack 
   CC2500_WriteReg(CC2500_18_MCSM0,    0x8); 
   CC2500_WriteReg(CC2500_09_ADDR, bind ? 0x03 : (fixed_id & 0xff));
-  CC2500_WriteReg(CC2500_07_PKTCTRL1,0x05);
 }
 
 
@@ -727,7 +726,7 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_17_MCSM1, 0x00);
   CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
-  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);
+  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x05);
   CC2500_WriteReg(CC2500_08_PKTCTRL0, 0x01);
   CC2500_WriteReg(CC2500_3E_PATABLE, 0xff);
   CC2500_WriteReg(CC2500_0B_FSCTRL1, 0x0A);
@@ -759,7 +758,6 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_2E_TEST0, 0x0B);
   CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
   CC2500_WriteReg(CC2500_09_ADDR, 0x00);
-  CC2500_WriteReg(CC2500_07_PKTCTRL1, 0x04);      
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
   CC2500_Strobe(CC2500_SIDLE);    
   //calibrate hop channels
