@@ -723,8 +723,7 @@ static u16 frskyx_cb() {
 
 static void frskyX_init() {
   CC2500_Reset();
-  CC2500_WriteReg(CC2500_02_IOCFG0, 0x06);    
-  CC2500_WriteReg(CC2500_00_IOCFG2, 0x06);
+  CC2500_SetTxRxMode(TXRX_OFF); // sets PA controls (GD0/2) to off
   CC2500_WriteReg(CC2500_17_MCSM1, 0x0C);
   CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
