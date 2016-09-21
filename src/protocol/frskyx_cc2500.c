@@ -722,7 +722,7 @@ static u16 frskyx_cb() {
 
 static void frskyX_init() {
   CC2500_Reset();
-  CC2500_SetTxRxMode(TXRX_OFF); // sets PA controls (GD0/2) to off
+
   CC2500_WriteReg(CC2500_17_MCSM1, 0x00);
   CC2500_WriteReg(CC2500_18_MCSM0, 0x18);
   CC2500_WriteReg(CC2500_06_PKTLEN, 0x1E);
@@ -749,14 +749,9 @@ static void frskyX_init() {
   CC2500_WriteReg(CC2500_24_FSCAL2, 0x0A);
   CC2500_WriteReg(CC2500_25_FSCAL1, 0x00);
   CC2500_WriteReg(CC2500_26_FSCAL0, 0x11);
-  CC2500_WriteReg(CC2500_29_FSTEST, 0x59);
-  CC2500_WriteReg(CC2500_2C_TEST2, 0x88);
-  CC2500_WriteReg(CC2500_2D_TEST1, 0x31);
-  CC2500_WriteReg(CC2500_2E_TEST0, 0x0B);
-  CC2500_WriteReg(CC2500_03_FIFOTHR, 0x07);
   CC2500_WriteReg(CC2500_09_ADDR, 0x00);
   CC2500_WriteReg(CC2500_0C_FSCTRL0, fine);
-  CC2500_Strobe(CC2500_SIDLE);    
+
   //calibrate hop channels
   for (u8 c = 0; c < 47; c++) {
       CC2500_Strobe(CC2500_SIDLE);    
